@@ -1,9 +1,12 @@
 # Flame HUB 🔥
 This repository contains the HUB Ecosystem of FLAME.
 
-[![main](https://github.com/PHT-Medic/central/actions/workflows/main.yml/badge.svg)](https://github.com/PHT-Medic/central/actions/workflows/main.yml)
-[![CodeQL](https://github.com/PHT-Medic/central/actions/workflows/codeql.yml/badge.svg)](https://github.com/PHT-Medic/central/actions/workflows/codeql.yml)
-[![Known Vulnerabilities](https://snyk.io/test/github/PHT-Medic/central/badge.svg)](https://snyk.io/test/github/PHT-Medic/central)
+> [!WARNING]  
+> The repository is in an early stage and is not yet functional.
+
+[![main](https://github.com/PrivateAim/hub/actions/workflows/main.yml/badge.svg)](https://github.com/PrivateAim/hub/actions/workflows/main.yml)
+[![CodeQL](https://github.com/PrivateAim/hub/actions/workflows/codeql.yml/badge.svg)](https://github.com/PrivateAim/hub/actions/workflows/codeql.yml)
+[![Known Vulnerabilities](https://snyk.io/test/github/PrivateAim/hub/badge.svg)](https://snyk.io/test/github/PrivateAim/hub)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits&logoColor=white)](https://conventionalcommits.org)
 
 **Table of Contents**
