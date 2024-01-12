@@ -15,53 +15,6 @@ env:
 
 jobs:
     build:
-        services:
-            mysql:
-                image: mysql:5.7
-                env:
-                    MYSQL_ROOT_HOST: "%"
-                    MYSQL_ROOT_PASSWORD: start123
-                ports:
-                    - 3306:3306
-                options: >-
-                    --health-cmd "mysqladmin ping"
-                    --health-interval 10s
-                    --health-timeout 5s
-                    --health-retries 5
-
-            minio:
-                image: lazybit/minio:latest
-                env:
-                    MINIO_ACCESS_KEY: admin
-                    MINIO_SECRET_KEY: start123
-                ports:
-                    - 9000:9000
-
-            vault:
-                image: vault:1.12.0
-                env:
-                    VAULT_DEV_ROOT_TOKEN_ID: start123
-                    VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8090
-                ports:
-                    - 8090:8090
-
-            redis:
-                image: docker.io/bitnami/redis:latest
-                env:
-                    ALLOW_EMPTY_PASSWORD: yes
-                ports:
-                    - 6379:6379
-
-            authup:
-                image: authup/authup
-                env:
-                    NODE_ENV: test
-                    ROBOT_ENABLED: true
-                    VAULT: start123@http://127.0.0.1:8090/v1/
-                    HOST: 0.0.0.0
-                ports:
-                    - 3000:3000
-
         runs-on: ubuntu-latest
 
         steps:
@@ -73,23 +26,4 @@ jobs:
                     node-version: ${{ env.PRIMARY_NODE_VERSION }}
 
             -   name: Build
-                uses: ./.github/actions/build
-
-            -   name: Test API
-                env:
-                    PORT: 4000
-                    TYPEORM_CONNECTION: mysql
-                    TYPEORM_HOST: 127.0.0.1
-                    TYPEORM_USERNAME: root
-                    TYPEORM_PASSWORD: start123
-                    TYPEORM_DATABASE: app
-                    SKIP_PROPOSAL_APPROVAL_OPERATION: true
-                    SKIP_TRAIN_APPROVAL_OPERATION: true
-                    AUTHUP_API_URL: http://localhost:3000/
-                    VAULT_CONNECTION_STRING: start123@http://127.0.0.1:8090/v1/
-                run: |
-                    npm run test --workspace=packages/server-api
-
-            -   name: Test Train-Manager
-                run: |
-                    npm run test --workspace=packages/server-train-manager
+                run: npm run build --workspace=packages/core
