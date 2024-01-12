@@ -7,7 +7,7 @@
 
 import { ATitle } from '@authup/client-vue';
 import type {
-    TrainStation,
+    AnalysisNode,
 } from '@personalhealthtrain/core';
 import {
     DomainEventSubscriptionName,
@@ -34,7 +34,7 @@ enum Direction {
 
 export default defineComponent({
     props: {
-        ...defineListProps<TrainStation>(),
+        ...defineListProps<AnalysisNode>(),
         realmId: {
             type: String,
         },
@@ -51,8 +51,8 @@ export default defineComponent({
             default: Direction.OUT,
         },
     },
-    slots: Object as SlotsType<ListSlotsType<TrainStation>>,
-    emits: defineListEvents<TrainStation>(),
+    slots: Object as SlotsType<ListSlotsType<AnalysisNode>>,
+    emits: defineListEvents<AnalysisNode>(),
     async setup(props, ctx) {
         const source = computed(() => (props.target === DomainType.NODE ?
             DomainType.ANALYSIS :
@@ -73,20 +73,20 @@ export default defineComponent({
             return false;
         };
 
-        const isSocketEventForSource = (item: TrainStation) => {
+        const isSocketEventForSource = (item: AnalysisNode) => {
             switch (source.value) {
                 case DomainType.NODE:
                     if (typeof props.sourceId === 'undefined') {
-                        return props.realmId === item.station_realm_id;
+                        return props.realmId === item.node_realm_id;
                     }
 
-                    return props.sourceId === item.station_id;
+                    return props.sourceId === item.node_id;
                 case DomainType.ANALYSIS:
                     if (typeof props.sourceId === 'undefined') {
-                        return props.realmId === item.train_realm_id;
+                        return props.realmId === item.analysis_realm_id;
                     }
 
-                    return props.sourceId === item.train_id;
+                    return props.sourceId === item.analysis_id;
             }
 
             return false;
@@ -146,7 +146,7 @@ export default defineComponent({
                 },
             },
             queryFilters: (q) => {
-                let filter : FiltersBuildInput<TrainStation>;
+                let filter : FiltersBuildInput<AnalysisNode>;
 
                 if (props.target === DomainType.NODE) {
                     filter = {
@@ -160,9 +160,9 @@ export default defineComponent({
 
                 if (props.realmId) {
                     if (props.direction === Direction.IN) {
-                        filter.station_realm_id = props.realmId;
+                        filter.node_realm_id = props.realmId;
                     } else {
-                        filter.train_realm_id = props.realmId;
+                        filter.analysis_realm_id = props.realmId;
                     }
                 }
 
@@ -207,7 +207,7 @@ export default defineComponent({
                         onDeleted: itemProps.deleted,
                         onFailed: itemProps.failed,
                     }, {
-                        default: (slotProps: DomainDetailsSlotProps<TrainStation>) => {
+                        default: (slotProps: DomainDetailsSlotProps<AnalysisNode>) => {
                             if (sections.slot) {
                                 return sections.slot;
                             }
@@ -216,14 +216,14 @@ export default defineComponent({
 
                             if (
                                 props.target === DomainType.NODE &&
-                                slotProps.data.station
+                                slotProps.data.node
                             ) {
-                                text = h('div', [slotProps.data.station.name]);
+                                text = h('div', [slotProps.data.node.name]);
                             } else if (
                                 props.target === DomainType.ANALYSIS &&
-                                slotProps.data.train
+                                slotProps.data.analysis
                             ) {
-                                text = h('div', [slotProps.data.train.name]);
+                                text = h('div', [slotProps.data.analysis.name]);
                             } else {
                                 text = h('div', [slotProps.data.id]);
                             }

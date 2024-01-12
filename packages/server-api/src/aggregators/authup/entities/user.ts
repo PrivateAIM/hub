@@ -6,13 +6,13 @@
  */
 import type { UserEventContext } from '@authup/core';
 import { useDataSource } from 'typeorm-extension';
-import { ProposalEntity, TrainEntity, UserSecretEntity } from '../../../domains';
+import { ProjectEntity, AnalysisEntity, UserSecretEntity } from '../../../domains';
 
 export async function handleAuthupUserEvent(context: UserEventContext) {
     if (context.event === 'deleted') {
         const dataSource = await useDataSource();
 
-        const proposalRepository = dataSource.getRepository(ProposalEntity);
+        const proposalRepository = dataSource.getRepository(ProjectEntity);
         const proposals = await proposalRepository.find({
             where: {
                 user_id: context.data.id,
@@ -25,7 +25,7 @@ export async function handleAuthupUserEvent(context: UserEventContext) {
 
         await proposalRepository.save(proposals);
 
-        const trainRepository = dataSource.getRepository(TrainEntity);
+        const trainRepository = dataSource.getRepository(AnalysisEntity);
         const trains = await trainRepository.find({
             where: {
                 user_id: context.data.id,
@@ -38,7 +38,7 @@ export async function handleAuthupUserEvent(context: UserEventContext) {
 
         await trainRepository.save(trains);
 
-        const trainFileRepository = dataSource.getRepository(TrainEntity);
+        const trainFileRepository = dataSource.getRepository(AnalysisEntity);
         const trainFiles = await trainFileRepository.find({
             where: {
                 user_id: context.data.id,

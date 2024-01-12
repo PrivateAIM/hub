@@ -13,14 +13,14 @@ import {
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceReadable } from '@authup/core';
-import { TrainStationEntity, onlyRealmWritableQueryResources } from '../../../../../domains';
+import { AnalysisNodeEntity, onlyRealmWritableQueryResources } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 
 export async function getOneTrainStationRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(TrainStationEntity);
+    const repository = dataSource.getRepository(AnalysisNodeEntity);
     const query = repository.createQueryBuilder('trainStation')
         .where('trainStation.id = :id', { id });
 
@@ -36,8 +36,8 @@ export async function getOneTrainStationRouteHandler(req: Request, res: Response
     }
 
     if (
-        !isRealmResourceReadable(useRequestEnv(req, 'realm'), entity.train_realm_id) &&
-        !isRealmResourceReadable(useRequestEnv(req, 'realm'), entity.station_realm_id)
+        !isRealmResourceReadable(useRequestEnv(req, 'realm'), entity.analysis_realm_id) &&
+        !isRealmResourceReadable(useRequestEnv(req, 'realm'), entity.node_realm_id)
     ) {
         throw new ForbiddenError();
     }
@@ -47,7 +47,7 @@ export async function getOneTrainStationRouteHandler(req: Request, res: Response
 
 export async function getManyTrainStationRouteHandler(req: Request, res: Response) : Promise<any> {
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(TrainStationEntity);
+    const repository = dataSource.getRepository(AnalysisNodeEntity);
     const query = await repository.createQueryBuilder('trainStation');
     query.distinctOn(['trainStation.id']);
 

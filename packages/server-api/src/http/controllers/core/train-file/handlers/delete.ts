@@ -12,9 +12,9 @@ import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useMinio } from '../../../../../core/minio';
-import { TrainFileEntity } from '../../../../../domains/train-file/entity';
+import { AnalysisFileEntity } from '../../../../../domains/analysis-file/entity';
 import { useRequestEnv } from '../../../../request';
-import { TrainEntity, generateTrainMinioBucketName } from '../../../../../domains/train';
+import { AnalysisEntity, generateTrainMinioBucketName } from '../../../../../domains/analysis';
 
 export async function deleteTrainFileRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -28,7 +28,7 @@ export async function deleteTrainFileRouteHandler(req: Request, res: Response) :
     }
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(TrainFileEntity);
+    const repository = dataSource.getRepository(AnalysisFileEntity);
 
     const entity = await repository.findOneBy({ id });
 
@@ -55,7 +55,7 @@ export async function deleteTrainFileRouteHandler(req: Request, res: Response) :
     entity.id = entityId;
 
     // train
-    const trainRepository = dataSource.getRepository(TrainEntity);
+    const trainRepository = dataSource.getRepository(AnalysisEntity);
     let train = await trainRepository.findOneBy({ id: entity.analysis_id });
     train = trainRepository.merge(train, {
         hash: null,

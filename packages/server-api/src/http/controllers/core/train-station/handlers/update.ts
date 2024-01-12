@@ -11,7 +11,7 @@ import { PermissionID } from '@personalhealthtrain/core';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { TrainStationEntity } from '../../../../../domains/train-station/entity';
+import { AnalysisNodeEntity } from '../../../../../domains/anaylsis-node/entity';
 import { useRequestEnv } from '../../../../request';
 import { runTrainStationValidation } from '../utils';
 
@@ -19,7 +19,7 @@ export async function updateTrainStationRouteHandler(req: Request, res: Response
     const id = useRequestParam(req, 'id');
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(TrainStationEntity);
+    const repository = dataSource.getRepository(AnalysisNodeEntity);
     let entity = await repository.findOneBy({ id });
 
     if (!entity) {
@@ -28,10 +28,10 @@ export async function updateTrainStationRouteHandler(req: Request, res: Response
 
     const ability = useRequestEnv(req, 'ability');
 
-    const isAuthorityOfStation = isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.station_realm_id);
+    const isAuthorityOfStation = isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.node_realm_id);
     const isAuthorizedForStation = ability.has(PermissionID.ANALYSIS_APPROVE);
 
-    const isAuthorityOfTrain = isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.train_realm_id);
+    const isAuthorityOfTrain = isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.analysis_realm_id);
     const isAuthorizedForTrain = ability.has(PermissionID.ANALYSIS_EDIT);
 
     if (

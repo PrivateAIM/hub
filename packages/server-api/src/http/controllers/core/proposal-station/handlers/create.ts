@@ -10,7 +10,7 @@ import { ForbiddenError } from '@ebec/http';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { ProposalStationEntity } from '../../../../../domains/proposal-station/entity';
+import { ProjectNodeEntity } from '../../../../../domains/project-node/entity';
 import { useRequestEnv } from '../../../../request';
 import { runProposalStationValidation } from '../utils';
 import { useEnv } from '../../../../../config/env';
@@ -28,7 +28,7 @@ export async function createProposalStationRouteHandler(req: Request, res: Respo
     const result = await runProposalStationValidation(req, 'create');
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(ProposalStationEntity);
+    const repository = dataSource.getRepository(ProjectNodeEntity);
     let entity = repository.create(result.data);
 
     if (useEnv('skipProposalApprovalOperation')) {

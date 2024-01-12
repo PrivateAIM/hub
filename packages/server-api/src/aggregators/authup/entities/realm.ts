@@ -7,14 +7,14 @@
 import type { RealmEventContext } from '@authup/core';
 import { useDataSource } from 'typeorm-extension';
 import {
-    ProposalEntity, ProposalStationEntity, RegistryProjectEntity, StationEntity, TrainEntity, UserSecretEntity,
+    ProjectEntity, ProjectNodeEntity, RegistryProjectEntity, NodeEntity, AnalysisEntity, UserSecretEntity,
 } from '../../../domains';
 
 export async function handleAuthupRealmEvent(context: RealmEventContext) {
     if (context.event === 'deleted') {
         const dataSource = await useDataSource();
 
-        const proposalRepository = dataSource.getRepository(ProposalEntity);
+        const proposalRepository = dataSource.getRepository(ProjectEntity);
         const proposals = await proposalRepository.find({
             where: {
                 realm_id: context.data.id,
@@ -23,7 +23,7 @@ export async function handleAuthupRealmEvent(context: RealmEventContext) {
 
         await proposalRepository.remove(proposals);
 
-        const proposalStationRepository = dataSource.getRepository(ProposalStationEntity);
+        const proposalStationRepository = dataSource.getRepository(ProjectNodeEntity);
         const proposalStations = await proposalStationRepository.createQueryBuilder()
             .where('proposal_realm_id = :realmId', { realmId: context.data.id })
             .orWhere('station_realm_id = :realmId', { realmId: context.data.id })
@@ -40,7 +40,7 @@ export async function handleAuthupRealmEvent(context: RealmEventContext) {
 
         await registryProjectRepository.remove(registryProjects);
 
-        const stationRepository = dataSource.getRepository(StationEntity);
+        const stationRepository = dataSource.getRepository(NodeEntity);
         const stations = await stationRepository.find({
             where: {
                 realm_id: context.data.id,
@@ -49,7 +49,7 @@ export async function handleAuthupRealmEvent(context: RealmEventContext) {
 
         await stationRepository.remove(stations);
 
-        const trainRepository = dataSource.getRepository(TrainEntity);
+        const trainRepository = dataSource.getRepository(AnalysisEntity);
         const trains = await trainRepository.find({
             where: {
                 realm_id: context.data.id,
@@ -58,7 +58,7 @@ export async function handleAuthupRealmEvent(context: RealmEventContext) {
 
         await trainRepository.remove(trains);
 
-        const trainFileRepository = dataSource.getRepository(TrainEntity);
+        const trainFileRepository = dataSource.getRepository(AnalysisEntity);
         const trainFiles = await trainFileRepository.find({
             where: {
                 realm_id: context.data.id,
@@ -67,7 +67,7 @@ export async function handleAuthupRealmEvent(context: RealmEventContext) {
 
         await trainRepository.remove(trainFiles);
 
-        const trainLogRepository = dataSource.getRepository(TrainEntity);
+        const trainLogRepository = dataSource.getRepository(AnalysisEntity);
         const trainLogs = await trainLogRepository.find({
             where: {
                 realm_id: context.data.id,
@@ -76,7 +76,7 @@ export async function handleAuthupRealmEvent(context: RealmEventContext) {
 
         await trainLogRepository.remove(trainLogs);
 
-        const trainStationRepository = dataSource.getRepository(ProposalStationEntity);
+        const trainStationRepository = dataSource.getRepository(ProjectNodeEntity);
         const trainStations = await trainStationRepository.createQueryBuilder()
             .where('station_realm_id = :realmId', { realmId: context.data.id })
             .orWhere('proposal_realm_id = :realmId', { realmId: context.data.id })

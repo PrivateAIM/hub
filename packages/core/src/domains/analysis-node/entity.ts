@@ -13,7 +13,7 @@ import type { Analysis } from '../analysis';
 import type { DomainEventBaseContext } from '../types-base';
 import type { AnalysisNodeApprovalStatus, AnalysisNodeRunStatus } from './constants';
 
-export interface TrainStation {
+export interface AnalysisNode {
     id: string;
 
     // ------------------------------------------------------------------
@@ -42,20 +42,20 @@ export interface TrainStation {
 
     // ------------------------------------------------------------------
 
-    train_id: Analysis['id'];
+    analysis_id: Analysis['id'];
 
-    train: Analysis;
+    analysis: Analysis;
 
-    train_realm_id: Realm['id'];
+    analysis_realm_id: Realm['id'];
 
-    station_id: Node['id'];
+    node_id: Node['id'];
 
-    station: Node;
+    node: Node;
 
-    station_realm_id: Realm['id'];
+    node_realm_id: Realm['id'];
 }
 
 export type TrainStationEventContext = DomainEventBaseContext & {
     type: `${DomainType.TRAIN_STATION}`,
-    data: TrainStation
+    data: AnalysisNode
 };

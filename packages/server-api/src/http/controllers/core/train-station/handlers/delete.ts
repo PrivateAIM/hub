@@ -12,9 +12,9 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { MoreThan } from 'typeorm';
 import { isRealmResourceWritable } from '@authup/core';
 import { useDataSource } from 'typeorm-extension';
-import { TrainStationEntity } from '../../../../../domains/train-station/entity';
+import { AnalysisNodeEntity } from '../../../../../domains/anaylsis-node/entity';
 import { useRequestEnv } from '../../../../request';
-import { TrainEntity } from '../../../../../domains/train';
+import { AnalysisEntity } from '../../../../../domains/analysis';
 
 export async function deleteTrainStationRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -28,7 +28,7 @@ export async function deleteTrainStationRouteHandler(req: Request, res: Response
     }
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(TrainStationEntity);
+    const repository = dataSource.getRepository(AnalysisNodeEntity);
 
     const entity = await repository.findOneBy({ id });
 
@@ -37,8 +37,8 @@ export async function deleteTrainStationRouteHandler(req: Request, res: Response
     }
 
     if (
-        !isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.station_realm_id) &&
-        !isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.train_realm_id)
+        !isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.node_realm_id) &&
+        !isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.analysis_realm_id)
     ) {
         throw new ForbiddenError();
     }
@@ -55,7 +55,7 @@ export async function deleteTrainStationRouteHandler(req: Request, res: Response
         .update()
         .where({
             index: MoreThan(entity.index),
-            train_id: entity.train_id,
+            train_id: entity.analysis_id,
         })
         .set({
             index: () => '`index` - 1',
@@ -64,13 +64,13 @@ export async function deleteTrainStationRouteHandler(req: Request, res: Response
 
     // -------------------------------------------
 
-    const trainRepository = dataSource.getRepository(TrainEntity);
-    const train = await trainRepository.findOneBy({ id: entity.train_id });
+    const trainRepository = dataSource.getRepository(AnalysisEntity);
+    const train = await trainRepository.findOneBy({ id: entity.analysis_id });
 
     train.nodes -= 1;
     await trainRepository.save(train);
 
-    entity.train = train;
+    entity.analysis = train;
 
     // -------------------------------------------
 

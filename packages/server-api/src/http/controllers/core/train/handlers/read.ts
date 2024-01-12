@@ -15,7 +15,7 @@ import {
     useDataSource,
 } from 'typeorm-extension';
 import { isRealmResourceReadable } from '@authup/core';
-import { TrainEntity, onlyRealmWritableQueryResources } from '../../../../../domains';
+import { AnalysisEntity, onlyRealmWritableQueryResources } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 
 export async function getOneTrainRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -27,7 +27,7 @@ export async function getOneTrainRouteHandler(req: Request, res: Response) : Pro
     }
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(TrainEntity);
+    const repository = dataSource.getRepository(AnalysisEntity);
     const query = repository.createQueryBuilder('train')
         .where('train.id = :id', { id });
 
@@ -53,7 +53,7 @@ export async function getOneTrainRouteHandler(req: Request, res: Response) : Pro
 
 export async function getManyTrainRouteHandler(req: Request, res: Response) : Promise<any> {
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(TrainEntity);
+    const repository = dataSource.getRepository(AnalysisEntity);
     const query = repository.createQueryBuilder('train');
 
     const { pagination, filters } = applyQuery(query, useRequestQuery(req), {

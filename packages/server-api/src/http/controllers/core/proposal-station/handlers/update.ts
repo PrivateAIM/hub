@@ -11,7 +11,7 @@ import { PermissionID } from '@personalhealthtrain/core';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { ProposalStationEntity } from '../../../../../domains/proposal-station/entity';
+import { ProjectNodeEntity } from '../../../../../domains/project-node/entity';
 import { useRequestEnv } from '../../../../request';
 import { runProposalStationValidation } from '../utils';
 
@@ -19,7 +19,7 @@ export async function updateProposalStationRouteHandler(req: Request, res: Respo
     const id = useRequestParam(req, 'id');
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(ProposalStationEntity);
+    const repository = dataSource.getRepository(ProjectNodeEntity);
     let entity = await repository.findOneBy({ id });
 
     if (!entity) {

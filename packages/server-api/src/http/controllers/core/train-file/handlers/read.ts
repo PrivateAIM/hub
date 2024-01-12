@@ -13,7 +13,7 @@ import type { Request, Response } from 'routup';
 import { send, useRequestParam } from 'routup';
 import { applyFilters, useDataSource } from 'typeorm-extension';
 import { onlyRealmWritableQueryResources } from '../../../../../domains';
-import { TrainFileEntity } from '../../../../../domains/train-file/entity';
+import { AnalysisFileEntity } from '../../../../../domains/analysis-file/entity';
 import { useRequestEnv } from '../../../../request';
 
 export async function getOneTrainFileRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -28,7 +28,7 @@ export async function getOneTrainFileRouteHandler(req: Request, res: Response) :
     const id = useRequestParam(req, 'id');
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(TrainFileEntity);
+    const repository = dataSource.getRepository(AnalysisFileEntity);
 
     const entity = await repository.findOneBy({
         id,
@@ -49,7 +49,7 @@ export async function getManyTrainFileGetManyRouteHandler(req: Request, res: Res
     const { filter } = useRequestQuery(req);
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(TrainFileEntity);
+    const repository = dataSource.getRepository(AnalysisFileEntity);
     const query = repository.createQueryBuilder('trainFile');
 
     onlyRealmWritableQueryResources(query, useRequestEnv(req, 'realm'));

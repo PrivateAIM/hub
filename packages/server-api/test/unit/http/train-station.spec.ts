@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { TrainStation } from '@personalhealthtrain/core';
+import type { AnalysisNode } from '@personalhealthtrain/core';
 import { removeDateProperties } from '../../utils/date-properties';
 import { expectPropertiesEqualToSrc } from '../../utils/properties';
 import { useSuperTest } from '../../utils/supertest';
@@ -28,7 +28,7 @@ describe('src/controllers/core/train-station', () => {
         await dropTestDatabase();
     });
 
-    let details : TrainStation;
+    let details : AnalysisNode;
 
     it('should create resource', async () => {
         const proposal = await createSuperTestProposal(superTest);

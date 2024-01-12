@@ -20,7 +20,7 @@ import type {
 } from 'typeorm';
 import { EventSubscriber } from 'typeorm';
 import { useAuthupClient } from '../../core';
-import { StationEntity } from '../../domains';
+import { NodeEntity } from '../../domains';
 
 async function publishEvent(
     event: `${DomainEventName}`,
@@ -44,7 +44,7 @@ async function publishEvent(
     );
 }
 
-async function createRobot(dataSource: DataSource, entity: StationEntity) {
+async function createRobot(dataSource: DataSource, entity: NodeEntity) {
     const authupClient = useAuthupClient();
     const response = await authupClient.robot.getMany({
         page: {
@@ -63,7 +63,7 @@ async function createRobot(dataSource: DataSource, entity: StationEntity) {
     }
 }
 
-async function deleteRobot(dataSource: DataSource, entity: StationEntity) {
+async function deleteRobot(dataSource: DataSource, entity: NodeEntity) {
     const authupClient = useAuthupClient();
     const response = await authupClient.robot.getMany({
         page: {
@@ -80,12 +80,12 @@ async function deleteRobot(dataSource: DataSource, entity: StationEntity) {
 }
 
 @EventSubscriber()
-export class StationSubscriber implements EntitySubscriberInterface<StationEntity> {
+export class StationSubscriber implements EntitySubscriberInterface<NodeEntity> {
     listenTo(): CallableFunction | string {
-        return StationEntity;
+        return NodeEntity;
     }
 
-    async afterInsert(event: InsertEvent<StationEntity>): Promise<any> {
+    async afterInsert(event: InsertEvent<NodeEntity>): Promise<any> {
         await publishEvent(DomainEventName.CREATED, event.entity);
 
         if (event.entity.ecosystem === Ecosystem.DEFAULT) {
@@ -93,15 +93,15 @@ export class StationSubscriber implements EntitySubscriberInterface<StationEntit
         }
     }
 
-    async afterUpdate(event: UpdateEvent<StationEntity>): Promise<any> {
-        await publishEvent(DomainEventName.UPDATED, event.entity as StationEntity);
+    async afterUpdate(event: UpdateEvent<NodeEntity>): Promise<any> {
+        await publishEvent(DomainEventName.UPDATED, event.entity as NodeEntity);
 
         if (event.entity.ecosystem === Ecosystem.DEFAULT) {
-            await createRobot(event.connection, event.entity as StationEntity);
+            await createRobot(event.connection, event.entity as NodeEntity);
         }
     }
 
-    async beforeRemove(event: RemoveEvent<StationEntity>): Promise<any> {
+    async beforeRemove(event: RemoveEvent<NodeEntity>): Promise<any> {
         await publishEvent(DomainEventName.DELETED, event.entity);
 
         if (event.entity.ecosystem === Ecosystem.DEFAULT) {

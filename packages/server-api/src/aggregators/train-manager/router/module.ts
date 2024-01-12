@@ -27,19 +27,19 @@ import { publish } from 'amqp-extension';
 import type { FindOptionsWhere } from 'typeorm';
 import { useDataSource } from 'typeorm-extension';
 import { RegistryProjectEntity } from '../../../domains/registry-project/entity';
-import { StationEntity } from '../../../domains/station';
-import { TrainEntity } from '../../../domains/train';
-import type { TrainLogSaveContext } from '../../../domains/train-log';
-import { saveTrainLog } from '../../../domains/train-log';
-import { TrainStationEntity } from '../../../domains/train-station/entity';
+import { NodeEntity } from '../../../domains/node';
+import { AnalysisEntity } from '../../../domains/analysis';
+import type { AnalysisLogSaveContext } from '../../../domains/analysis-log';
+import { saveAnalysisLog } from '../../../domains/analysis-log';
+import { AnalysisNodeEntity } from '../../../domains/anaylsis-node/entity';
 
 export async function handleTrainManagerRouterEvent(
     context: RouterEventContext | ComponentContextWithError<RouterEventContext>,
 ) {
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(TrainEntity);
+    const repository = dataSource.getRepository(AnalysisEntity);
 
-    const where : FindOptionsWhere<TrainEntity> = {};
+    const where : FindOptionsWhere<AnalysisEntity> = {};
 
     if (
         isRouterRoutePayload(context.data)
@@ -62,7 +62,7 @@ export async function handleTrainManagerRouterEvent(
 
     // -------------------------------------------------------------------------------
 
-    let trainLogContext : TrainLogSaveContext = {
+    let trainLogContext : AnalysisLogSaveContext = {
         train: entity,
         component: ComponentName.ROUTER,
         command: context.command,
@@ -118,21 +118,21 @@ export async function handleTrainManagerRouterEvent(
                     entity.run_status = AnalysisRunStatus.RUNNING;
                     trainLogContext.status = AnalysisRunStatus.RUNNING;
 
-                    const stationRepository = dataSource.getRepository(StationEntity);
+                    const stationRepository = dataSource.getRepository(NodeEntity);
                     const station = await stationRepository.findOneBy({
                         registry_project_id: registryProject.id,
                     });
 
                     if (station) {
-                        const trainStationRepository = dataSource.getRepository(TrainStationEntity);
+                        const trainStationRepository = dataSource.getRepository(AnalysisNodeEntity);
                         const trainStation = await trainStationRepository.findOneBy({
-                            train_id: entity.id,
-                            station_id: station.id,
+                            analysis_id: entity.id,
+                            node_id: station.id,
                         });
 
                         if (trainStation) {
                             entity.run_station_index = trainStation.index;
-                            entity.run_station_id = trainStation.station_id;
+                            entity.run_station_id = trainStation.node_id;
 
                             if (context.event === RouterEvent.ROUTED) {
                                 trainStation.artifact_tag = context.data.artifactTag;
@@ -201,9 +201,9 @@ export async function handleTrainManagerRouterEvent(
             entity.run_status = AnalysisRunStatus.STARTED;
             trainLogContext.status = AnalysisRunStatus.STARTED;
 
-            const trainStationRepository = dataSource.getRepository(TrainStationEntity);
+            const trainStationRepository = dataSource.getRepository(AnalysisNodeEntity);
             const trainStations = await trainStationRepository.findBy({
-                train_id: entity.id,
+                analysis_id: entity.id,
             });
 
             for (let i = 0; i < trainStations.length; i++) {
@@ -217,5 +217,5 @@ export async function handleTrainManagerRouterEvent(
         }
     }
 
-    await saveTrainLog(trainLogContext);
+    await saveAnalysisLog(trainLogContext);
 }

@@ -19,7 +19,7 @@ import {
     buildDomainChannelName,
     buildDomainNamespaceName,
 } from '@personalhealthtrain/core';
-import { TrainLogEntity } from '../../domains';
+import { AnalysisLogEntity } from '../../domains';
 
 async function publishEvent(
     event: `${DomainEventName}`,
@@ -44,20 +44,20 @@ async function publishEvent(
 }
 
 @EventSubscriber()
-export class TrainLogSubscriber implements EntitySubscriberInterface<TrainLogEntity> {
+export class TrainLogSubscriber implements EntitySubscriberInterface<AnalysisLogEntity> {
     listenTo(): CallableFunction | string {
-        return TrainLogEntity;
+        return AnalysisLogEntity;
     }
 
-    async afterInsert(event: InsertEvent<TrainLogEntity>): Promise<any> {
+    async afterInsert(event: InsertEvent<AnalysisLogEntity>): Promise<any> {
         await publishEvent(DomainEventName.CREATED, event.entity);
     }
 
-    async afterUpdate(event: UpdateEvent<TrainLogEntity>): Promise<any> {
-        await publishEvent(DomainEventName.UPDATED, event.entity as TrainLogEntity);
+    async afterUpdate(event: UpdateEvent<AnalysisLogEntity>): Promise<any> {
+        await publishEvent(DomainEventName.UPDATED, event.entity as AnalysisLogEntity);
     }
 
-    async beforeRemove(event: RemoveEvent<TrainLogEntity>): Promise<any> {
+    async beforeRemove(event: RemoveEvent<AnalysisLogEntity>): Promise<any> {
         await publishEvent(DomainEventName.DELETED, event.entity);
     }
 }

@@ -14,9 +14,9 @@ import { useDataSource } from 'typeorm-extension';
 import { useLogger } from '../../../../../config';
 import { useMinio } from '../../../../../core/minio';
 import { streamToBuffer } from '../../../../../core/utils';
-import { TrainStationEntity } from '../../../../../domains/train-station/entity';
-import { TrainEntity, generateTrainMinioBucketName } from '../../../../../domains/train';
-import { TrainFileEntity } from '../../../../../domains/train-file/entity';
+import { AnalysisNodeEntity } from '../../../../../domains/anaylsis-node/entity';
+import { AnalysisEntity, generateTrainMinioBucketName } from '../../../../../domains/analysis';
+import { AnalysisFileEntity } from '../../../../../domains/analysis-file/entity';
 import { useRequestEnv } from '../../../../request';
 
 export async function handleTrainFilesDownloadRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -27,7 +27,7 @@ export async function handleTrainFilesDownloadRouteHandler(req: Request, res: Re
     }
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(TrainEntity);
+    const repository = dataSource.getRepository(AnalysisEntity);
 
     const train = await repository.findOneBy({ id });
 
@@ -36,9 +36,9 @@ export async function handleTrainFilesDownloadRouteHandler(req: Request, res: Re
     }
 
     if (!isRealmResourceReadable(useRequestEnv(req, 'realm'), train.realm_id)) {
-        const proposalStations = await dataSource.getRepository(TrainStationEntity).find({
+        const proposalStations = await dataSource.getRepository(AnalysisNodeEntity).find({
             where: {
-                train_id: train.id,
+                analysis_id: train.id,
             },
             relations: ['station'],
         });
@@ -46,7 +46,7 @@ export async function handleTrainFilesDownloadRouteHandler(req: Request, res: Re
         let isPermitted = false;
 
         for (let i = 0; i < proposalStations.length; i++) {
-            if (isRealmResourceReadable(useRequestEnv(req, 'realm'), proposalStations[i].station.realm_id)) {
+            if (isRealmResourceReadable(useRequestEnv(req, 'realm'), proposalStations[i].node.realm_id)) {
                 isPermitted = true;
                 break;
             }
@@ -75,7 +75,7 @@ export async function handleTrainFilesDownloadRouteHandler(req: Request, res: Re
         return;
     }
 
-    const files = await dataSource.getRepository(TrainFileEntity).findBy({
+    const files = await dataSource.getRepository(AnalysisFileEntity).findBy({
         analysis_id: train.id,
     });
 

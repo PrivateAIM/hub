@@ -22,7 +22,7 @@ import {
     buildDomainNamespaceName,
 } from '@personalhealthtrain/core';
 import { publish as publishMessage } from 'amqp-extension';
-import { TrainEntity } from '../../domains';
+import { AnalysisEntity } from '../../domains';
 
 async function publishEvent(
     event: `${DomainEventName}`,
@@ -46,12 +46,12 @@ async function publishEvent(
     );
 }
 @EventSubscriber()
-export class TrainSubscriber implements EntitySubscriberInterface<TrainEntity> {
+export class TrainSubscriber implements EntitySubscriberInterface<AnalysisEntity> {
     listenTo(): CallableFunction | string {
-        return TrainEntity;
+        return AnalysisEntity;
     }
 
-    async afterInsert(event: InsertEvent<TrainEntity>): Promise<any> {
+    async afterInsert(event: InsertEvent<AnalysisEntity>): Promise<any> {
         await publishEvent(DomainEventName.CREATED, event.entity);
 
         const message = buildCoreQueuePayload({
@@ -64,11 +64,11 @@ export class TrainSubscriber implements EntitySubscriberInterface<TrainEntity> {
         await publishMessage(message);
     }
 
-    async afterUpdate(event: UpdateEvent<TrainEntity>): Promise<any> {
-        await publishEvent(DomainEventName.UPDATED, event.entity as TrainEntity);
+    async afterUpdate(event: UpdateEvent<AnalysisEntity>): Promise<any> {
+        await publishEvent(DomainEventName.UPDATED, event.entity as AnalysisEntity);
     }
 
-    async beforeRemove(event: RemoveEvent<TrainEntity>): Promise<any> {
+    async beforeRemove(event: RemoveEvent<AnalysisEntity>): Promise<any> {
         await publishEvent(DomainEventName.DELETED, event.entity);
 
         const message = buildCoreQueuePayload({

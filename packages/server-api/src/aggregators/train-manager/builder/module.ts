@@ -20,22 +20,22 @@ import {
     AnalysisBuildStatus,
 } from '@personalhealthtrain/core';
 import { useDataSource } from 'typeorm-extension';
-import type { TrainLogSaveContext } from '../../../domains/train-log';
-import { saveTrainLog } from '../../../domains/train-log';
-import { TrainEntity } from '../../../domains/train';
+import type { AnalysisLogSaveContext } from '../../../domains/analysis-log';
+import { saveAnalysisLog } from '../../../domains/analysis-log';
+import { AnalysisEntity } from '../../../domains/analysis';
 
 export async function handleTrainManagerBuilderEvent(
     context: BuilderEventContext | ComponentContextWithError<BuilderEventContext>,
 ) {
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(TrainEntity);
+    const repository = dataSource.getRepository(AnalysisEntity);
 
     const entity = await repository.findOneBy({ id: context.data.id });
     if (!entity) {
         return;
     }
 
-    let trainLogContext : TrainLogSaveContext = {
+    let trainLogContext : AnalysisLogSaveContext = {
         train: entity,
         component: ComponentName.BUILDER,
         command: context.command,
@@ -96,5 +96,5 @@ export async function handleTrainManagerBuilderEvent(
 
     await repository.save(entity);
 
-    await saveTrainLog(trainLogContext);
+    await saveAnalysisLog(trainLogContext);
 }

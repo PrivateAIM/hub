@@ -6,7 +6,7 @@
  */
 
 import { defineComponent, h } from 'vue';
-import type { TrainStation } from '@personalhealthtrain/core';
+import type { AnalysisNode } from '@personalhealthtrain/core';
 import {
     DomainType,
 } from '@personalhealthtrain/core';
@@ -24,7 +24,7 @@ export default defineComponent({
         },
         realmId: String,
     },
-    emits: defineEntityManagerEvents<TrainStation>(),
+    emits: defineEntityManagerEvents<AnalysisNode>(),
     async setup(props, setup) {
         const manager = createEntityManager({
             type: `${DomainType.TRAIN_STATION}`,

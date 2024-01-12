@@ -7,7 +7,6 @@
 
 import type { Realm, User } from '@authup/core';
 import type { DomainType } from '../constants';
-import type { Project } from '../project';
 import type { Analysis } from '../analysis';
 import type { DomainEventBaseContext } from '../types-base';
 

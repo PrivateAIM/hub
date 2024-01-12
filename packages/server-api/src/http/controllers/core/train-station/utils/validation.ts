@@ -11,9 +11,9 @@ import { BadRequestError, NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/core';
 import type { Request } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { StationEntity } from '../../../../../domains/station/entity';
-import type { TrainStationEntity } from '../../../../../domains/train-station/entity';
-import { TrainEntity } from '../../../../../domains/train';
+import { NodeEntity } from '../../../../../domains/node/entity';
+import type { AnalysisNodeEntity } from '../../../../../domains/anaylsis-node/entity';
+import { AnalysisEntity } from '../../../../../domains/analysis';
 import { useRequestEnv } from '../../../../request';
 import type { RequestValidationResult } from '../../../../validation';
 import {
@@ -23,13 +23,13 @@ import {
     initRequestValidationResult,
     matchedValidationData,
 } from '../../../../validation';
-import { ProposalStationEntity } from '../../../../../domains/proposal-station/entity';
+import { ProjectNodeEntity } from '../../../../../domains/project-node/entity';
 
 export async function runTrainStationValidation(
     req: Request,
     operation: 'create' | 'update',
-) : Promise<RequestValidationResult<TrainStationEntity>> {
-    const result : RequestValidationResult<TrainStationEntity> = initRequestValidationResult();
+) : Promise<RequestValidationResult<AnalysisNodeEntity>> {
+    const result : RequestValidationResult<AnalysisNodeEntity> = initRequestValidationResult();
     if (operation === 'create') {
         await check('station_id')
             .exists()
@@ -71,38 +71,38 @@ export async function runTrainStationValidation(
 
     // ----------------------------------------------
 
-    await extendRequestValidationResultWithRelation(result, TrainEntity, {
-        id: 'train_id',
-        entity: 'train',
+    await extendRequestValidationResultWithRelation(result, AnalysisEntity, {
+        id: 'analysis_id',
+        entity: 'analysis',
     });
-    if (result.relation.train) {
+    if (result.relation.analysis) {
         if (
-            !isRealmResourceWritable(useRequestEnv(req, 'realm'), result.relation.train.realm_id)
+            !isRealmResourceWritable(useRequestEnv(req, 'realm'), result.relation.analysis.realm_id)
         ) {
             throw new BadRequestError(buildRequestValidationErrorMessage('train_id'));
         }
 
-        result.data.train_realm_id = result.relation.train.realm_id;
+        result.data.analysis_realm_id = result.relation.analysis.realm_id;
     }
 
-    await extendRequestValidationResultWithRelation(result, StationEntity, {
-        id: 'station_id',
-        entity: 'station',
+    await extendRequestValidationResultWithRelation(result, NodeEntity, {
+        id: 'node_id',
+        entity: 'node',
     });
 
-    if (result.relation.station) {
-        result.data.station_realm_id = result.relation.station.realm_id;
+    if (result.relation.node) {
+        result.data.node_realm_id = result.relation.node.realm_id;
     }
 
     if (
-        result.relation.station &&
-        result.relation.train
+        result.relation.node &&
+        result.relation.analysis
     ) {
         const dataSource = await useDataSource();
-        const proposalStationRepository = dataSource.getRepository(ProposalStationEntity);
+        const proposalStationRepository = dataSource.getRepository(ProjectNodeEntity);
         const proposalStation = await proposalStationRepository.findOneBy({
-            project_id: result.relation.train.project_id,
-            node_id: result.relation.station.id,
+            project_id: result.relation.analysis.project_id,
+            node_id: result.relation.node.id,
         });
 
         if (!proposalStation) {

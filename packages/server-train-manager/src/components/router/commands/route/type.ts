@@ -8,11 +8,11 @@
 import type {
     RegistryProject,
     Node,
-    TrainStation,
+    AnalysisNode,
 } from '@personalhealthtrain/core';
 import type { RouterRoutePayload } from '../../type';
 
-export type StationExtended = Node & Pick<TrainStation, 'index' | 'run_status'>;
+export type StationExtended = Node & Pick<AnalysisNode, 'index' | 'run_status'>;
 
 export type RouteContext = {
     payload: RouterRoutePayload,

@@ -13,8 +13,8 @@ import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '../../../../request';
 import { runTrainValidation } from '../utils';
-import { ProposalEntity } from '../../../../../domains/proposal/entity';
-import { TrainEntity } from '../../../../../domains/train';
+import { ProjectEntity } from '../../../../../domains/project/entity';
+import { AnalysisEntity } from '../../../../../domains/analysis';
 
 export async function createTrainRouteHandler(req: Request, res: Response) : Promise<any> {
     const ability = useRequestEnv(req, 'ability');
@@ -32,7 +32,7 @@ export async function createTrainRouteHandler(req: Request, res: Response) : Pro
     }
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository<Analysis>(TrainEntity);
+    const repository = dataSource.getRepository<Analysis>(AnalysisEntity);
 
     const realm = useRequestEnv(req, 'realm');
 
@@ -45,7 +45,7 @@ export async function createTrainRouteHandler(req: Request, res: Response) : Pro
     await repository.save(entity);
 
     result.relation.project.analyses++;
-    const proposalRepository = dataSource.getRepository(ProposalEntity);
+    const proposalRepository = dataSource.getRepository(ProjectEntity);
     await proposalRepository.save(result.relation.project);
 
     return sendCreated(res, entity);

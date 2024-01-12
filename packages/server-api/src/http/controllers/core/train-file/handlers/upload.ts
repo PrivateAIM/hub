@@ -18,8 +18,8 @@ import { send, sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { ensureMinioBucket, useMinio } from '../../../../../core/minio';
 import { streamToBuffer } from '../../../../../core/utils';
-import { TrainEntity, generateTrainMinioBucketName } from '../../../../../domains/train';
-import { TrainFileEntity } from '../../../../../domains/train-file/entity';
+import { AnalysisEntity, generateTrainMinioBucketName } from '../../../../../domains/analysis';
+import { AnalysisFileEntity } from '../../../../../domains/analysis-file/entity';
 import { useRequestEnv } from '../../../../request';
 
 export async function uploadTrainFilesRouteHandler(req: Request, res: Response) {
@@ -33,7 +33,7 @@ export async function uploadTrainFilesRouteHandler(req: Request, res: Response) 
 
     const dataSource = await useDataSource();
 
-    const repository = dataSource.getRepository<AnalysisFile>(TrainFileEntity);
+    const repository = dataSource.getRepository<AnalysisFile>(AnalysisFileEntity);
 
     const instance = BusBoy({ headers: req.headers, preservePath: true });
 
@@ -115,7 +115,7 @@ export async function uploadTrainFilesRouteHandler(req: Request, res: Response) 
         }
 
         const bucketName = generateTrainMinioBucketName(trainId);
-        const trainRepository = dataSource.getRepository(TrainEntity);
+        const trainRepository = dataSource.getRepository(AnalysisEntity);
         const train = await trainRepository.findOneBy({ id: trainId });
         if (!train) {
             const objectNames = files.map((file) => file.hash);

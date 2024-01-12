@@ -7,7 +7,6 @@
 
 import type { Realm } from '@authup/core';
 import type { DomainType } from '../constants';
-import type { Ecosystem } from '../ecosystem';
 import type { RegistryProject } from '../registry-project';
 import type { Registry } from '../registry';
 import type { DomainEventBaseContext } from '../types-base';
@@ -19,12 +18,7 @@ export interface Node {
 
     name: string;
 
-    public_key: string | null;
-
     email: string | null;
-
-    // todo: this is properly deprecated
-    ecosystem: `${Ecosystem}` | null;
 
     hidden: boolean;
 

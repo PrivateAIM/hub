@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { MasterImage, Analysis, TrainStation } from '@personalhealthtrain/core';
+import type { MasterImage, Analysis, AnalysisNode } from '@personalhealthtrain/core';
 import type { PropType } from 'vue';
 import {
     defineComponent, ref,
@@ -52,23 +52,23 @@ export default defineComponent({
 
         const trainStationList = ref<null | Record<string, any>>(null);
 
-        const handleTrainStationCreated = (item: TrainStation) => {
+        const handleTrainStationCreated = (item: AnalysisNode) => {
             if (trainStationList.value) {
                 trainStationList.value.handleCreated(item);
             }
 
-            if (item.train) {
-                emit('updated', item.train);
+            if (item.analysis) {
+                emit('updated', item.analysis);
             }
         };
 
-        const handleTrainStationDeleted = (item: TrainStation) => {
+        const handleTrainStationDeleted = (item: AnalysisNode) => {
             if (trainStationList.value) {
                 trainStationList.value.handleDeleted(item);
             }
 
-            if (item.train) {
-                emit('updated', item.train);
+            if (item.analysis) {
+                emit('updated', item.analysis);
             }
         };
 

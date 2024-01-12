@@ -11,8 +11,8 @@ import { isRealmResourceWritable } from '@authup/core';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { TrainEntity } from '../../../../../domains/train';
-import { ProposalEntity } from '../../../../../domains/proposal/entity';
+import { AnalysisEntity } from '../../../../../domains/analysis';
+import { ProjectEntity } from '../../../../../domains/project/entity';
 import { useRequestEnv } from '../../../../request';
 
 export async function deleteTrainRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -24,7 +24,7 @@ export async function deleteTrainRouteHandler(req: Request, res: Response) : Pro
     }
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(TrainEntity);
+    const repository = dataSource.getRepository(AnalysisEntity);
 
     const entity = await repository.findOne({ where: { id }, relations: ['proposal'] });
 
@@ -45,7 +45,7 @@ export async function deleteTrainRouteHandler(req: Request, res: Response) : Pro
     entity.id = entityId;
 
     project.analyses--;
-    const proposalRepository = dataSource.getRepository(ProposalEntity);
+    const proposalRepository = dataSource.getRepository(ProjectEntity);
     await proposalRepository.save(project);
 
     entity.project = project;

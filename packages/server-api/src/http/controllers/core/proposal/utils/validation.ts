@@ -11,7 +11,7 @@ import { check, validationResult } from 'express-validator';
 import { ProposalRisk } from '@personalhealthtrain/core';
 import type { Request } from 'routup';
 import { MasterImageEntity } from '../../../../../domains/master-image/entity';
-import type { ProposalEntity } from '../../../../../domains/proposal/entity';
+import type { ProjectEntity } from '../../../../../domains/project/entity';
 import type { RequestValidationResult } from '../../../../validation';
 import {
     RequestValidationError, extendRequestValidationResultWithRelation,
@@ -23,8 +23,8 @@ import { useRequestEnv } from '../../../../request';
 export async function runProposalValidation(
     req: Request,
     operation: 'create' | 'update',
-) : Promise<RequestValidationResult<ProposalEntity>> {
-    const result : RequestValidationResult<ProposalEntity> = initRequestValidationResult();
+) : Promise<RequestValidationResult<ProjectEntity>> {
+    const result : RequestValidationResult<ProjectEntity> = initRequestValidationResult();
 
     const titleChain = check('title')
         .exists()

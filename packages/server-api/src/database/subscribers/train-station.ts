@@ -16,7 +16,7 @@ import {
     EventSubscriber,
 } from 'typeorm';
 import type {
-    TrainStation,
+    AnalysisNode,
 } from '@personalhealthtrain/core';
 import {
     DomainEventName,
@@ -25,11 +25,11 @@ import {
     buildDomainChannelName,
     buildDomainNamespaceName,
 } from '@personalhealthtrain/core';
-import { TrainStationEntity } from '../../domains';
+import { AnalysisNodeEntity } from '../../domains';
 
 async function publishEvent(
     event: `${DomainEventName}`,
-    data: TrainStation,
+    data: AnalysisNode,
 ) {
     await publishDomainEvent(
         {
@@ -40,11 +40,11 @@ async function publishEvent(
         [
             {
                 channel: (id) => buildDomainChannelName(DomainSubType.ANALYSIS_NODE_IN, id),
-                namespace: buildDomainNamespaceName(data.station_realm_id),
+                namespace: buildDomainNamespaceName(data.node_realm_id),
             },
             {
                 channel: (id) => buildDomainChannelName(DomainSubType.ANALYSIS_NODE_OUT, id),
-                namespace: buildDomainNamespaceName(data.train_realm_id),
+                namespace: buildDomainNamespaceName(data.analysis_realm_id),
             },
             {
                 channel: (id) => buildDomainChannelName(DomainType.TRAIN_STATION, id),
@@ -60,20 +60,20 @@ async function publishEvent(
 }
 
 @EventSubscriber()
-export class TrainStationSubscriber implements EntitySubscriberInterface<TrainStationEntity> {
+export class TrainStationSubscriber implements EntitySubscriberInterface<AnalysisNodeEntity> {
     listenTo(): CallableFunction | string {
-        return TrainStationEntity;
+        return AnalysisNodeEntity;
     }
 
-    async afterInsert(event: InsertEvent<TrainStationEntity>): Promise<any> {
+    async afterInsert(event: InsertEvent<AnalysisNodeEntity>): Promise<any> {
         await publishEvent(DomainEventName.CREATED, event.entity);
     }
 
-    async afterUpdate(event: UpdateEvent<TrainStationEntity>): Promise<any> {
-        await publishEvent(DomainEventName.UPDATED, event.entity as TrainStationEntity);
+    async afterUpdate(event: UpdateEvent<AnalysisNodeEntity>): Promise<any> {
+        await publishEvent(DomainEventName.UPDATED, event.entity as AnalysisNodeEntity);
     }
 
-    async beforeRemove(event: RemoveEvent<TrainStationEntity>): Promise<any> {
+    async beforeRemove(event: RemoveEvent<AnalysisNodeEntity>): Promise<any> {
         await publishEvent(DomainEventName.DELETED, event.entity);
     }
 }

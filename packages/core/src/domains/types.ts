@@ -18,7 +18,7 @@ import type { Node, NodeEventContext } from './node';
 import type { Analysis, AnalysisEventContext } from './analysis';
 import type { AnalysisFile, AnalysisFileEventContext } from './analysis-file';
 import type { AnalysisLog, AnalysisLogEventContext } from './analysis-log';
-import type { TrainStation, TrainStationEventContext } from './analysis-node';
+import type { AnalysisNode, TrainStationEventContext } from './analysis-node';
 
 export type DomainsEventContext = MasterImageEventContext |
 MasterImageGroupEventContext |
@@ -79,7 +79,7 @@ export type DomainEntity<T extends `${DomainType}` | `${DomainSubType}`> =
                                         T extends `${DomainType.ANALYSIS_FILE}` ?
                                             AnalysisFile :
                                             T extends `${DomainType.TRAIN_STATION}` | `${DomainSubType.ANALYSIS_NODE_IN}` | `${DomainSubType.ANALYSIS_NODE_OUT}` ?
-                                                TrainStation :
+                                                AnalysisNode :
                                                 never;
 
 export type DomainInput = `${DomainType}` | DomainType | `${DomainSubType}` | DomainSubType;

@@ -13,7 +13,7 @@ import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import {
-    TrainEntity,
+    AnalysisEntity,
     detectTrainBuildStatus,
     detectTrainRunStatus,
     generateTrainHash,
@@ -53,7 +53,7 @@ export async function handleTrainCommandRouteHandler(req: Request, res: Response
     const validationData = matchedData(req, { includeOptionals: true });
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(TrainEntity);
+    const repository = dataSource.getRepository(AnalysisEntity);
 
     let entity = await repository.findOneBy({ id });
 

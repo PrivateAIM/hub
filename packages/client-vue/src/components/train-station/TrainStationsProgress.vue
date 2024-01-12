@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Analysis, TrainStation } from '@personalhealthtrain/core';
+import type { Analysis, AnalysisNode } from '@personalhealthtrain/core';
 import {
     AnalysisBuildStatus,
     AnalysisRunStatus,
@@ -38,7 +38,7 @@ export default defineComponent({
     setup(props) {
         const entity = toRef(props, 'entity');
 
-        const query : BuildInput<TrainStation> = {
+        const query : BuildInput<AnalysisNode> = {
             filters: {
                 train_id: entity.value.id,
             },

@@ -10,11 +10,11 @@ import { BadRequestError, ForbiddenError } from '@ebec/http';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { TrainStationEntity } from '../../../../../domains/train-station/entity';
+import { AnalysisNodeEntity } from '../../../../../domains/anaylsis-node/entity';
 import { useRequestEnv } from '../../../../request';
 import { runTrainStationValidation } from '../utils';
 import { useEnv } from '../../../../../config/env';
-import { TrainEntity } from '../../../../../domains/train';
+import { AnalysisEntity } from '../../../../../domains/analysis';
 
 export async function createTrainStationRouteHandler(req: Request, res: Response) : Promise<any> {
     const ability = useRequestEnv(req, 'ability');
@@ -24,17 +24,17 @@ export async function createTrainStationRouteHandler(req: Request, res: Response
 
     const result = await runTrainStationValidation(req, 'create');
 
-    if (useEnv('env') !== 'test' && !result.relation.station.ecosystem) {
+    if (useEnv('env') !== 'test' && !result.relation.node.ecosystem) {
         throw new BadRequestError('The referenced station must be assigned to an ecosystem.');
     }
 
     // todo: this should also work in the test-suite
-    if (useEnv('env') !== 'test' && !result.relation.station.registry_id) {
+    if (useEnv('env') !== 'test' && !result.relation.node.registry_id) {
         throw new BadRequestError('The referenced station must be assigned to a registry');
     }
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(TrainStationEntity);
+    const repository = dataSource.getRepository(AnalysisNodeEntity);
 
     let entity = repository.create(result.data);
 
@@ -44,18 +44,18 @@ export async function createTrainStationRouteHandler(req: Request, res: Response
 
     if (!entity.index) {
         entity.index = await repository.countBy({
-            train_id: entity.train_id,
+            analysis_id: entity.analysis_id,
         });
     }
 
     entity = await repository.save(entity);
 
-    result.relation.train.nodes += 1;
-    const trainRepository = dataSource.getRepository(TrainEntity);
-    await trainRepository.save(result.relation.train);
+    result.relation.analysis.nodes += 1;
+    const trainRepository = dataSource.getRepository(AnalysisEntity);
+    await trainRepository.save(result.relation.analysis);
 
-    entity.train = result.relation.train;
-    entity.station = result.relation.station;
+    entity.analysis = result.relation.analysis;
+    entity.node = result.relation.node;
 
     return sendCreated(res, entity);
 }

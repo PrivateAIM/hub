@@ -14,7 +14,7 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { RegistryCommand } from '../../../../../components';
 import { buildRegistryPayload } from '../../../../../components/registry/utils/queue';
-import { StationEntity } from '../../../../../domains/station';
+import { NodeEntity } from '../../../../../domains/node';
 import { RegistryProjectEntity } from '../../../../../domains/registry-project/entity';
 import { useRequestEnv } from '../../../../request';
 
@@ -27,7 +27,7 @@ export async function deleteStationRouteHandler(req: Request, res: Response) : P
     }
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(StationEntity);
+    const repository = dataSource.getRepository(NodeEntity);
 
     const entity = await repository.findOneBy({ id });
 

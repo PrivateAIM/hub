@@ -19,7 +19,7 @@ import {
     buildDomainChannelName,
     buildDomainNamespaceName,
 } from '@personalhealthtrain/core';
-import { ProposalEntity } from '../../domains';
+import { ProjectEntity } from '../../domains';
 
 async function publishEvent(
     event: `${DomainEventName}`,
@@ -44,20 +44,20 @@ async function publishEvent(
 }
 
 @EventSubscriber()
-export class ProposalSubscriber implements EntitySubscriberInterface<ProposalEntity> {
+export class ProposalSubscriber implements EntitySubscriberInterface<ProjectEntity> {
     listenTo(): CallableFunction | string {
-        return ProposalEntity;
+        return ProjectEntity;
     }
 
-    async afterInsert(event: InsertEvent<ProposalEntity>): Promise<any> {
+    async afterInsert(event: InsertEvent<ProjectEntity>): Promise<any> {
         await publishEvent(DomainEventName.CREATED, event.entity);
     }
 
-    async afterUpdate(event: UpdateEvent<ProposalEntity>): Promise<any> {
-        await publishEvent(DomainEventName.UPDATED, event.entity as ProposalEntity);
+    async afterUpdate(event: UpdateEvent<ProjectEntity>): Promise<any> {
+        await publishEvent(DomainEventName.UPDATED, event.entity as ProjectEntity);
     }
 
-    async beforeRemove(event: RemoveEvent<ProposalEntity>): Promise<any> {
+    async beforeRemove(event: RemoveEvent<ProjectEntity>): Promise<any> {
         await publishEvent(DomainEventName.DELETED, event.entity);
     }
 }

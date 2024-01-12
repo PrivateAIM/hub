@@ -19,16 +19,16 @@ import {
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { onlyRealmWritableQueryResources } from '../../../../../domains';
-import { StationEntity } from '../../../../../domains/station/entity';
+import { NodeEntity } from '../../../../../domains/node/entity';
 import { useRequestEnv } from '../../../../request';
 
 async function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>, fields: any) {
-    const protectedFields : ParseAllowedOption<StationEntity> = [
+    const protectedFields : ParseAllowedOption<NodeEntity> = [
         'public_key',
         'email',
     ];
 
-    const fieldsParsed = parseQueryFields<StationEntity>(fields, {
+    const fieldsParsed = parseQueryFields<NodeEntity>(fields, {
         default: [
             'id',
             'name',
@@ -72,7 +72,7 @@ export async function getOneStationRouteHandler(req: Request, res: Response) : P
     const { fields, include } = useRequestQuery(req);
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(StationEntity);
+    const repository = dataSource.getRepository(NodeEntity);
     const query = repository.createQueryBuilder('station')
         .where('station.id = :id', { id });
 
@@ -98,7 +98,7 @@ export async function getManyStationRouteHandler(req: Request, res: Response) : 
     } = useRequestQuery(req);
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(StationEntity);
+    const repository = dataSource.getRepository(NodeEntity);
     const query = repository.createQueryBuilder('station');
 
     await checkAndApplyFields(req, query, fields);

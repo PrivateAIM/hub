@@ -14,13 +14,13 @@ import {
     useDataSource,
 } from 'typeorm-extension';
 import { NotFoundError } from '@ebec/http';
-import { TrainLogEntity } from '../../../../../domains';
+import { AnalysisLogEntity } from '../../../../../domains';
 
 export async function getOneTrainLogRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(TrainLogEntity);
+    const repository = dataSource.getRepository(AnalysisLogEntity);
     const query = repository.createQueryBuilder('trainLog')
         .where('trainLog.id = :id', { id });
 
@@ -40,7 +40,7 @@ export async function getOneTrainLogRouteHandler(req: Request, res: Response) : 
 
 export async function getManyTrainLogRouteHandler(req: Request, res: Response) : Promise<any> {
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(TrainLogEntity);
+    const repository = dataSource.getRepository(AnalysisLogEntity);
     const query = await repository.createQueryBuilder('trainLog');
     query.distinctOn(['trainLog.id']);
 

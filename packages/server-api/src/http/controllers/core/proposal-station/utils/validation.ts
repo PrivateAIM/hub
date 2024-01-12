@@ -10,9 +10,9 @@ import { ProjectNodeApprovalStatus } from '@personalhealthtrain/core';
 import { NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/core';
 import type { Request } from 'routup';
-import type { ProposalStationEntity } from '../../../../../domains/proposal-station/entity';
-import { ProposalEntity } from '../../../../../domains/proposal/entity';
-import { StationEntity } from '../../../../../domains/station';
+import type { ProjectNodeEntity } from '../../../../../domains/project-node/entity';
+import { ProjectEntity } from '../../../../../domains/project/entity';
+import { NodeEntity } from '../../../../../domains/node';
 import { useRequestEnv } from '../../../../request';
 import type { RequestValidationResult } from '../../../../validation';
 import {
@@ -24,8 +24,8 @@ import {
 export async function runProposalStationValidation(
     req: Request,
     operation: 'create' | 'update',
-) : Promise<RequestValidationResult<ProposalStationEntity>> {
-    const result : RequestValidationResult<ProposalStationEntity> = initRequestValidationResult();
+) : Promise<RequestValidationResult<ProjectNodeEntity>> {
+    const result : RequestValidationResult<ProjectNodeEntity> = initRequestValidationResult();
 
     if (operation === 'create') {
         await check('proposal_id')
@@ -63,7 +63,7 @@ export async function runProposalStationValidation(
 
     // ----------------------------------------------
 
-    await extendRequestValidationResultWithRelation(result, ProposalEntity, {
+    await extendRequestValidationResultWithRelation(result, ProjectEntity, {
         id: 'project_id',
         entity: 'project',
     });
@@ -76,7 +76,7 @@ export async function runProposalStationValidation(
         }
     }
 
-    await extendRequestValidationResultWithRelation(result, StationEntity, {
+    await extendRequestValidationResultWithRelation(result, NodeEntity, {
         id: 'node_id',
         entity: 'node',
     });

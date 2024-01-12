@@ -15,7 +15,7 @@ import {
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceReadable } from '@authup/core';
-import { ProposalStationEntity, onlyRealmWritableQueryResources } from '../../../../../domains';
+import { ProjectNodeEntity, onlyRealmWritableQueryResources } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 
 export async function getOneProposalStationRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -23,7 +23,7 @@ export async function getOneProposalStationRouteHandler(req: Request, res: Respo
     const { include } = useRequestQuery(req);
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(ProposalStationEntity);
+    const repository = dataSource.getRepository(ProjectNodeEntity);
     const query = repository.createQueryBuilder('proposalStation')
         .where('proposalStation.id = :id', { id });
 
@@ -51,7 +51,7 @@ export async function getOneProposalStationRouteHandler(req: Request, res: Respo
 export async function getManyProposalStationRouteHandler(req: Request, res: Response) : Promise<any> {
     const dataSource = await useDataSource();
 
-    const repository = dataSource.getRepository(ProposalStationEntity);
+    const repository = dataSource.getRepository(ProjectNodeEntity);
     const query = await repository.createQueryBuilder('proposalStation');
     query.distinctOn(['proposalStation.id']);
 

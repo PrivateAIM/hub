@@ -44,10 +44,6 @@ export interface Analysis {
 
     run_status: AnalysisRunStatus | null;
 
-    run_station_id: Node['id'] | null;
-
-    run_station_index: number | null;
-
     // ------------------------------------------------------------------
 
     result_status: AnalysisResultStatus | null;
@@ -57,16 +53,6 @@ export interface Analysis {
     created_at: Date;
 
     updated_at: Date;
-
-    // ------------------------------------------------------------------
-
-    incoming_registry_project_id: RegistryProject['id'] | null;
-
-    incoming_registry_project: RegistryProject | null;
-
-    outgoing_registry_project_id: RegistryProject['id'] | null;
-
-    outgoing_registry_project: RegistryProject | null;
 
     // ------------------------------------------------------------------
 

@@ -11,7 +11,7 @@ import { isRealmResourceWritable } from '@authup/core';
 import { ForbiddenError } from '@ebec/http';
 import type { Request } from 'routup';
 import { RegistryEntity } from '../../../../../domains';
-import type { StationEntity } from '../../../../../domains';
+import type { NodeEntity } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 import type { RequestValidationResult } from '../../../../validation';
 import {
@@ -23,8 +23,8 @@ import {
 export async function runStationValidation(
     req: Request,
     operation: 'create' | 'update',
-) : Promise<RequestValidationResult<StationEntity>> {
-    const result : RequestValidationResult<StationEntity> = initRequestValidationResult();
+) : Promise<RequestValidationResult<NodeEntity>> {
+    const result : RequestValidationResult<NodeEntity> = initRequestValidationResult();
 
     const nameChain = check('name')
         .isLength({ min: 3, max: 128 })

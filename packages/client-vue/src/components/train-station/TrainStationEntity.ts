@@ -11,7 +11,7 @@ import {
     buildDomainChannelName,
 } from '@personalhealthtrain/core';
 import type {
-    TrainStation,
+    AnalysisNode,
 } from '@personalhealthtrain/core';
 import type { FiltersBuildInput } from 'rapiq';
 import {
@@ -36,13 +36,13 @@ enum Target {
 export default defineComponent({
     props: {
         entity: {
-            type: Object as PropType<TrainStation>,
+            type: Object as PropType<AnalysisNode>,
         },
         entityId: {
             type: String,
         },
         queryFilters: {
-            type: Object as PropType<FiltersBuildInput<TrainStation>>,
+            type: Object as PropType<FiltersBuildInput<AnalysisNode>>,
         },
         direction: {
             type: String as PropType<`${Direction.IN}` | `${Direction.OUT}`>,
@@ -51,7 +51,7 @@ export default defineComponent({
             type: String as PropType<`${Target.STATION}` | `${Target.TRAIN}`>,
         },
     },
-    emits: defineEntityManagerEvents<TrainStation>(),
+    emits: defineEntityManagerEvents<AnalysisNode>(),
     async setup(props, setup) {
         const apiClient = injectAPIClient();
         const manager = createEntityManager({

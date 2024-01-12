@@ -8,7 +8,7 @@
 import type { BuildInput } from 'rapiq';
 import type {
     APIClient,
-    TrainStation,
+    AnalysisNode,
 } from '@personalhealthtrain/core';
 import {
     REGISTRY_ARTIFACT_TAG_BASE,
@@ -69,7 +69,7 @@ export async function executeRouterRouteCommand(
 
     // -------------------------------------------------------------------
 
-    const query : BuildInput<TrainStation> = {
+    const query : BuildInput<AnalysisNode> = {
         filter: {
             train_id: data.repositoryName,
         },

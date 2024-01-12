@@ -13,7 +13,7 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '../../../../request';
 import { runTrainValidation } from '../utils';
-import { TrainEntity } from '../../../../../domains/train';
+import { AnalysisEntity } from '../../../../../domains/analysis';
 
 export async function updateTrainRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -29,7 +29,7 @@ export async function updateTrainRouteHandler(req: Request, res: Response) : Pro
     }
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(TrainEntity);
+    const repository = dataSource.getRepository(AnalysisEntity);
     let entity = await repository.findOneBy({ id });
 
     if (!entity) {

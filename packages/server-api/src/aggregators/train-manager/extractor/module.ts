@@ -19,15 +19,15 @@ import {
     AnalysisResultStatus,
 } from '@personalhealthtrain/core';
 import { useDataSource } from 'typeorm-extension';
-import { TrainEntity } from '../../../domains/train';
-import type { TrainLogSaveContext } from '../../../domains/train-log';
-import { saveTrainLog } from '../../../domains/train-log';
+import { AnalysisEntity } from '../../../domains/analysis';
+import type { AnalysisLogSaveContext } from '../../../domains/analysis-log';
+import { saveAnalysisLog } from '../../../domains/analysis-log';
 
 export async function handleTrainManagerExtractorEvent(
     context: ExtractorEventContext | ComponentContextWithError<ExtractorEventContext>,
 ) {
     const dataSource = await useDataSource();
-    const trainRepository = dataSource.getRepository(TrainEntity);
+    const trainRepository = dataSource.getRepository(AnalysisEntity);
 
     const entity = await trainRepository.findOneBy({ id: context.data.id });
     if (!entity) {
@@ -36,7 +36,7 @@ export async function handleTrainManagerExtractorEvent(
 
     // -------------------------------------------------------------------------------
 
-    let trainLogContext : TrainLogSaveContext = {
+    let trainLogContext : AnalysisLogSaveContext = {
         train: entity,
         component: ComponentName.EXTRACTOR,
         command: context.command,
@@ -87,7 +87,7 @@ export async function handleTrainManagerExtractorEvent(
 
     await trainRepository.save(entity);
 
-    await saveTrainLog({
+    await saveAnalysisLog({
         ...trainLogContext,
         status,
     });

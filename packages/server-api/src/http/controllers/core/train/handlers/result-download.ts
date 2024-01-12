@@ -14,7 +14,7 @@ import {
 } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useMinio } from '../../../../../core/minio';
-import { TrainEntity, generateTrainMinioBucketName } from '../../../../../domains/train';
+import { AnalysisEntity, generateTrainMinioBucketName } from '../../../../../domains/analysis';
 import { useRequestEnv } from '../../../../request';
 
 export async function handleTrainResultDownloadRouteHandler(req: Request, res: Response) {
@@ -30,7 +30,7 @@ export async function handleTrainResultDownloadRouteHandler(req: Request, res: R
     }
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(TrainEntity);
+    const repository = dataSource.getRepository(AnalysisEntity);
 
     const entity = await repository.findOneBy({
         id,

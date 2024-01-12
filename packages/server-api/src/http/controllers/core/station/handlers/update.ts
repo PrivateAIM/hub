@@ -19,7 +19,7 @@ import { RegistryCommand } from '../../../../../components';
 import { buildRegistryPayload } from '../../../../../components/registry/utils/queue';
 import { useRequestEnv } from '../../../../request';
 import { runStationValidation } from '../utils';
-import { StationEntity } from '../../../../../domains/station';
+import { NodeEntity } from '../../../../../domains/node';
 import { RegistryProjectEntity } from '../../../../../domains/registry-project/entity';
 
 export async function updateStationRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -36,7 +36,7 @@ export async function updateStationRouteHandler(req: Request, res: Response) : P
     }
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(StationEntity);
+    const repository = dataSource.getRepository(NodeEntity);
     const query = repository.createQueryBuilder('station')
         .addSelect([
             'station.public_key',

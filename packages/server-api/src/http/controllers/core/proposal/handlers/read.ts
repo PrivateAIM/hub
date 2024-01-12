@@ -13,13 +13,13 @@ import {
     useDataSource,
 } from 'typeorm-extension';
 import { NotFoundError } from '@ebec/http';
-import { ProposalEntity } from '../../../../../domains';
+import { ProjectEntity } from '../../../../../domains';
 
 export async function getOneProposalRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(ProposalEntity);
+    const repository = dataSource.getRepository(ProjectEntity);
     const query = repository.createQueryBuilder('proposal')
         .where('proposal.id = :id', { id });
 
@@ -61,7 +61,7 @@ export async function getManyProposalRouteHandler(req: Request, res: Response) :
 
     const dataSource = await useDataSource();
 
-    const repository = dataSource.getRepository(ProposalEntity);
+    const repository = dataSource.getRepository(ProjectEntity);
     const query = repository.createQueryBuilder('proposal');
 
     const { pagination } = applyQuery(query, useRequestQuery(req), {

@@ -6,7 +6,7 @@
  */
 
 import {
-    TrainStation,
+    AnalysisNode,
 } from '@personalhealthtrain/core';
 
 import {
@@ -20,7 +20,7 @@ import {
     updateTrainStationRouteHandler,
 } from './handlers';
 
-type PartialTrainStation = Partial<TrainStation>;
+type PartialTrainStation = Partial<AnalysisNode>;
 
 @DTags('train', 'station')
 @DController('/train-stations')
@@ -45,7 +45,7 @@ export class TrainStationController {
     @DPost('/:id', [ForceLoggedInMiddleware])
     async edit(
         @DPath('id') id: string,
-            @DBody() data: TrainStation,
+            @DBody() data: AnalysisNode,
             @DRequest() req: any,
             @DResponse() res: any,
     ): Promise<PartialTrainStation | undefined> {

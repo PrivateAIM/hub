@@ -11,12 +11,12 @@ import { useClient } from 'hapic';
 import { In } from 'typeorm';
 import { useDataSource } from 'typeorm-extension';
 import { ApiKey, useLogger } from '../../../../../config';
-import { StationEntity } from '../../../../../domains';
+import { NodeEntity } from '../../../../../domains';
 import { transformStationRegistryResponse } from '../../../utils';
 
 export async function syncStationsOfStationRegistry() {
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(StationEntity);
+    const repository = dataSource.getRepository(NodeEntity);
     const response = await useClient(ApiKey.AACHEN_STATION_REGISTRY).get('stations');
 
     let externalEntities = transformStationRegistryResponse(response.data)
@@ -60,8 +60,8 @@ export async function syncStationsOfStationRegistry() {
     });
     const entitiesExternalNames = entities.map((item) => item.external_name);
 
-    const existing : StationEntity[] = [];
-    const nonExisting : StationEntity[] = [];
+    const existing : NodeEntity[] = [];
+    const nonExisting : NodeEntity[] = [];
 
     for (let i = 0; i < externalEntities.length; i++) {
         const index = entitiesExternalNames.indexOf(externalEntities[i].external_name);

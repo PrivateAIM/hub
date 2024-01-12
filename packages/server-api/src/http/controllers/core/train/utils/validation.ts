@@ -11,23 +11,23 @@ import { BadRequestError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/core';
 import type { Request } from 'routup';
 import { MasterImageEntity } from '../../../../../domains/master-image';
-import { ProposalEntity } from '../../../../../domains/proposal/entity';
+import { ProjectEntity } from '../../../../../domains/project/entity';
 import { RegistryEntity } from '../../../../../domains/registry/entity';
-import type { TrainEntity } from '../../../../../domains/train';
+import type { AnalysisEntity } from '../../../../../domains/analysis';
 import type { RequestValidationResult } from '../../../../validation';
 import {
     RequestValidationError, extendRequestValidationResultWithRelation,
     initRequestValidationResult,
     matchedValidationData,
 } from '../../../../validation';
-import { TrainFileEntity } from '../../../../../domains/train-file/entity';
+import { AnalysisFileEntity } from '../../../../../domains/analysis-file/entity';
 import { useRequestEnv } from '../../../../request';
 
 export async function runTrainValidation(
     req: Request,
     operation: 'create' | 'update',
-) : Promise<RequestValidationResult<TrainEntity>> {
-    const result : RequestValidationResult<TrainEntity> = initRequestValidationResult();
+) : Promise<RequestValidationResult<AnalysisEntity>> {
+    const result : RequestValidationResult<AnalysisEntity> = initRequestValidationResult();
 
     if (operation === 'create') {
         await check('proposal_id')
@@ -107,7 +107,7 @@ export async function runTrainValidation(
         id: 'master_image_id',
         entity: 'master_image',
     });
-    await extendRequestValidationResultWithRelation(result, ProposalEntity, {
+    await extendRequestValidationResultWithRelation(result, ProjectEntity, {
         id: 'project_id',
         entity: 'project',
     });
@@ -116,7 +116,7 @@ export async function runTrainValidation(
         entity: 'registry',
     });
 
-    await extendRequestValidationResultWithRelation(result, TrainFileEntity, {
+    await extendRequestValidationResultWithRelation(result, AnalysisFileEntity, {
         id: 'entrypoint_file_id',
         entity: 'entrypoint_file',
     });

@@ -11,7 +11,7 @@ import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '../../../../request';
-import { ProposalEntity } from '../../../../../domains/proposal/entity';
+import { ProjectEntity } from '../../../../../domains/project/entity';
 import { runProposalValidation } from '../utils/validation';
 
 export async function createProposalRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -23,7 +23,7 @@ export async function createProposalRouteHandler(req: Request, res: Response) : 
     const result = await runProposalValidation(req, 'create');
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(ProposalEntity);
+    const repository = dataSource.getRepository(ProjectEntity);
     const entity = repository.create({
         user_id: useRequestEnv(req, 'userId'),
         ...result.data,

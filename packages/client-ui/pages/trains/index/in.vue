@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 import { VCTimeago } from '@vuecs/timeago';
-import type { TrainStation } from '@personalhealthtrain/core';
+import type { AnalysisNode } from '@personalhealthtrain/core';
 import { PermissionID } from '@personalhealthtrain/core';
 import { BDropdown, BTable } from 'bootstrap-vue-next';
 import { storeToRefs } from 'pinia';
@@ -77,7 +77,7 @@ export default defineNuxtComponent({
 
         const canManage = computed(() => store.has(PermissionID.ANALYSIS_APPROVE));
 
-        const query : BuildInput<TrainStation> = {
+        const query : BuildInput<AnalysisNode> = {
             include: {
                 station: true,
                 train: true,
@@ -87,15 +87,15 @@ export default defineNuxtComponent({
             },
         };
 
-        const download = (item: TrainStation) => {
+        const download = (item: AnalysisNode) => {
             const app = useRuntimeConfig();
 
-            window.open(new URL(useAPI().train.getFilesDownloadPath(item.train_id), app.public.apiUrl).href, '_blank');
+            window.open(new URL(useAPI().train.getFilesDownloadPath(item.analysis_id), app.public.apiUrl).href, '_blank');
         };
 
         const listNode = ref<null | typeof TrainStationList>(null);
 
-        const handleUpdated = (item: TrainStation) => {
+        const handleUpdated = (item: AnalysisNode) => {
             if (listNode.value) {
                 listNode.value.handleUpdated(item);
             }

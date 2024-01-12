@@ -12,8 +12,8 @@ import {
 import {
     createConfig, getWritableDirPath, useEnv, useLogger,
 } from '../config';
+import {setupAuthupService} from "../core";
 import { buildDataSourceOptions } from '../database';
-import { setupAuthupService } from '../domains';
 import { createRouter } from '../http/router';
 import { createHttpServer } from '../http/server';
 import { generateSwaggerDocumentation } from '../http/swagger';

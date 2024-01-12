@@ -5,19 +5,19 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Node, TrainStation } from '@personalhealthtrain/core';
+import type { Node, AnalysisNode } from '@personalhealthtrain/core';
 import { hasOwnProperty } from '@personalhealthtrain/core';
 import { BaseError } from '../../../../error';
 import type { StationExtended } from '../type';
 
 export function mergeStationsWithTrainStations(
     stations: Node[],
-    trainStations: TrainStation[],
+    trainStations: AnalysisNode[],
     requiredAttributes?: (keyof StationExtended)[],
 ) : StationExtended[] {
-    const aggregatedTrainStations : Record<TrainStation['id'], TrainStation> = {};
+    const aggregatedTrainStations : Record<AnalysisNode['id'], AnalysisNode> = {};
     for (let i = 0; i < trainStations.length; i++) {
-        aggregatedTrainStations[trainStations[i].station_id] = trainStations[i];
+        aggregatedTrainStations[trainStations[i].node_id] = trainStations[i];
     }
 
     const items : StationExtended[] = [];

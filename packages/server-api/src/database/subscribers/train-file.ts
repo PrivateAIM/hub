@@ -19,7 +19,7 @@ import {
     buildDomainChannelName,
     buildDomainNamespaceName,
 } from '@personalhealthtrain/core';
-import { TrainFileEntity } from '../../domains';
+import { AnalysisFileEntity } from '../../domains';
 
 async function publishEvent(
     event: `${DomainEventName}`,
@@ -43,20 +43,20 @@ async function publishEvent(
     );
 }
 @EventSubscriber()
-export class TrainFileSubscriber implements EntitySubscriberInterface<TrainFileEntity> {
+export class TrainFileSubscriber implements EntitySubscriberInterface<AnalysisFileEntity> {
     listenTo(): CallableFunction | string {
-        return TrainFileEntity;
+        return AnalysisFileEntity;
     }
 
-    async afterInsert(event: InsertEvent<TrainFileEntity>): Promise<any> {
+    async afterInsert(event: InsertEvent<AnalysisFileEntity>): Promise<any> {
         await publishEvent(DomainEventName.CREATED, event.entity);
     }
 
-    async afterUpdate(event: UpdateEvent<TrainFileEntity>): Promise<any> {
-        await publishEvent(DomainEventName.UPDATED, event.entity as TrainFileEntity);
+    async afterUpdate(event: UpdateEvent<AnalysisFileEntity>): Promise<any> {
+        await publishEvent(DomainEventName.UPDATED, event.entity as AnalysisFileEntity);
     }
 
-    async beforeRemove(event: RemoveEvent<TrainFileEntity>): Promise<any> {
+    async beforeRemove(event: RemoveEvent<AnalysisFileEntity>): Promise<any> {
         await publishEvent(DomainEventName.DELETED, event.entity);
     }
 }

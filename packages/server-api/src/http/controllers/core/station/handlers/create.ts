@@ -21,7 +21,7 @@ import { buildRegistryPayload } from '../../../../../components/registry/utils/q
 import { RequestValidationError } from '../../../../validation';
 import { useRequestEnv } from '../../../../request';
 import { runStationValidation } from '../utils';
-import { StationEntity } from '../../../../../domains/station';
+import { NodeEntity } from '../../../../../domains/node';
 import { RegistryProjectEntity } from '../../../../../domains/registry-project/entity';
 
 export async function createStationRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -45,7 +45,7 @@ export async function createStationRouteHandler(req: Request, res: Response) : P
     }
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(StationEntity);
+    const repository = dataSource.getRepository(NodeEntity);
 
     const entity = repository.create(result.data);
 
