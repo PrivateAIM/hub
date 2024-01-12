@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 import type { PropType } from 'vue';
-import type { Proposal } from '@personalhealthtrain/core';
+import type { Project } from '@personalhealthtrain/core';
 import { TrainBasicForm } from '@personalhealthtrain/client-vue';
 import { defineNuxtComponent, navigateTo } from '#app';
 
@@ -14,7 +14,7 @@ export default defineNuxtComponent({
     components: { TrainBasicForm },
     props: {
         proposal: {
-            type: Object as PropType<Proposal>,
+            type: Object as PropType<Project>,
             required: true,
         },
     },

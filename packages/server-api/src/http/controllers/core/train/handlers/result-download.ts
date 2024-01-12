@@ -25,7 +25,7 @@ export async function handleTrainResultDownloadRouteHandler(req: Request, res: R
     }
 
     const ability = useRequestEnv(req, 'ability');
-    if (!ability.has(PermissionID.TRAIN_RESULT_READ)) {
+    if (!ability.has(PermissionID.ANALYSIS_RESULT_READ)) {
         throw new ForbiddenError('You are not authorized to read the train-result file.');
     }
 

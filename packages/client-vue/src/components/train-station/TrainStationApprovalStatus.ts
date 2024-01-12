@@ -6,22 +6,22 @@
  */
 import type { PropType } from 'vue';
 import { computed, defineComponent, h } from 'vue';
-import { TrainStationApprovalStatus } from '@personalhealthtrain/core';
+import { AnalysisNodeApprovalStatus } from '@personalhealthtrain/core';
 import { hasNormalizedSlot, normalizeSlot } from '../../core';
 
 export default defineComponent({
     props: {
         status: {
-            type: String as PropType<TrainStationApprovalStatus>,
+            type: String as PropType<AnalysisNodeApprovalStatus>,
             default: undefined,
         },
     },
     setup(props, { slots }) {
         const statusText = computed(() => {
             switch (props.status) {
-                case TrainStationApprovalStatus.APPROVED:
+                case AnalysisNodeApprovalStatus.APPROVED:
                     return 'approved';
-                case TrainStationApprovalStatus.REJECTED:
+                case AnalysisNodeApprovalStatus.REJECTED:
                     return 'rejected';
                 default:
                     return 'none';

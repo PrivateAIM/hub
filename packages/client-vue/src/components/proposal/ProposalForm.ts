@@ -20,7 +20,7 @@ import type {
     PropType,
 } from 'vue';
 
-import type { MasterImage, Proposal, Station } from '@personalhealthtrain/core';
+import type { MasterImage, Project, Node } from '@personalhealthtrain/core';
 import { DomainType, ProposalRisk } from '@personalhealthtrain/core';
 import { useUpdatedAt } from '../../composables';
 import type { ListProps } from '../../core';
@@ -40,11 +40,11 @@ import { FSearch } from '../utility';
 export default defineComponent({
     props: {
         entity: {
-            type: Object as PropType<Proposal>,
+            type: Object as PropType<Project>,
             default: undefined,
         },
     },
-    emits: defineEntityManagerEvents<Proposal>(),
+    emits: defineEntityManagerEvents<Project>(),
     setup(props, setup) {
         const apiClient = injectAPIClient();
         const busy = ref(false);
@@ -89,7 +89,7 @@ export default defineComponent({
         ];
 
         const manager = createEntityManager({
-            type: `${DomainType.PROPOSAL}`,
+            type: `${DomainType.PROJECT}`,
             setup,
             props,
         });
@@ -128,7 +128,7 @@ export default defineComponent({
 
             if (!existed && manager.data.value) {
                 for (let i = 0; i < stationIds.value.length; i++) {
-                    await apiClient.proposalStation.create({
+                    await apiClient.projectNode.create({
                         proposal_id: manager.data.value.id,
                         station_id: stationIds.value[i],
                     });
@@ -235,15 +235,15 @@ export default defineComponent({
                             hidden: false,
                         },
                     },
-                } satisfies ListProps<Station>, {
-                    [EntityListSlotName.HEADER]: (props: ListHeaderSlotProps<Station>) => [
+                } satisfies ListProps<Node>, {
+                    [EntityListSlotName.HEADER]: (props: ListHeaderSlotProps<Node>) => [
                         h('label', 'Stations'),
                         h(FSearch, {
                             load: props.load,
                             meta: props.meta,
                         }),
                     ],
-                    [EntityListSlotName.ITEM_ACTIONS]: (props: ListItemSlotProps<Station>) => {
+                    [EntityListSlotName.ITEM_ACTIONS]: (props: ListItemSlotProps<Node>) => {
                         if (manager.data.value) {
                             return h(ProposalStationAssignAction, {
                                 stationId: props.data.id,

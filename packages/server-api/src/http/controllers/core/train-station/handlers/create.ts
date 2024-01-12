@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionID, TrainStationApprovalStatus } from '@personalhealthtrain/core';
+import { PermissionID, AnalysisNodeApprovalStatus } from '@personalhealthtrain/core';
 import { BadRequestError, ForbiddenError } from '@ebec/http';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
@@ -18,7 +18,7 @@ import { TrainEntity } from '../../../../../domains/train';
 
 export async function createTrainStationRouteHandler(req: Request, res: Response) : Promise<any> {
     const ability = useRequestEnv(req, 'ability');
-    if (!ability.has(PermissionID.TRAIN_EDIT)) {
+    if (!ability.has(PermissionID.ANALYSIS_EDIT)) {
         throw new ForbiddenError();
     }
 
@@ -39,7 +39,7 @@ export async function createTrainStationRouteHandler(req: Request, res: Response
     let entity = repository.create(result.data);
 
     if (useEnv('skipTrainApprovalOperation')) {
-        entity.approval_status = TrainStationApprovalStatus.APPROVED;
+        entity.approval_status = AnalysisNodeApprovalStatus.APPROVED;
     }
 
     if (!entity.index) {
@@ -50,7 +50,7 @@ export async function createTrainStationRouteHandler(req: Request, res: Response
 
     entity = await repository.save(entity);
 
-    result.relation.train.stations += 1;
+    result.relation.train.nodes += 1;
     const trainRepository = dataSource.getRepository(TrainEntity);
     await trainRepository.save(result.relation.train);
 

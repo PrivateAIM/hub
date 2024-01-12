@@ -6,16 +6,16 @@
  */
 
 import type {
-    Train,
+    Analysis,
 } from '@personalhealthtrain/core';
 import type { BuilderCommand, BuilderEvent } from './constants';
 
 export type BuilderBuildPayload = {
-    id: Train['id']
+    id: Analysis['id']
 };
 
 export type BuilderCheckPayload = {
-    id: Train['id']
+    id: Analysis['id']
 };
 
 export type BuilderBuildCommandContext = {

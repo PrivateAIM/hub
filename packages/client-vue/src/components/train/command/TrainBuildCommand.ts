@@ -7,12 +7,12 @@
 
 import { computed, defineComponent, ref } from 'vue';
 import type { PropType } from 'vue';
-import type { Train } from '@personalhealthtrain/core';
+import type { Analysis } from '@personalhealthtrain/core';
 import {
     PermissionID,
-    TrainAPICommand,
-    TrainBuildStatus,
-    TrainConfigurationStatus,
+    AnalysisAPICommand,
+    AnalysisBuildStatus,
+    AnalysisConfigurationStatus,
 } from '@personalhealthtrain/core';
 import {
     injectAPIClient, injectAuthupStore, renderActionCommand, wrapFnWithBusyState,
@@ -22,12 +22,12 @@ import type { TrainCommandProperties } from './type';
 export default defineComponent({
     props: {
         entity: {
-            type: Object as PropType<Train>,
+            type: Object as PropType<Analysis>,
             required: true,
         },
         command: {
-            type: String as PropType<TrainAPICommand>,
-            default: TrainAPICommand.BUILD_START,
+            type: String as PropType<AnalysisAPICommand>,
+            default: AnalysisAPICommand.BUILD_START,
         },
 
         elementType: {
@@ -49,27 +49,27 @@ export default defineComponent({
         const busy = ref(false);
 
         const store = injectAuthupStore();
-        const isAllowed = computed(() => store.has(PermissionID.TRAIN_EDIT));
+        const isAllowed = computed(() => store.has(PermissionID.ANALYSIS_EDIT));
 
         const isDisabled = computed<boolean>(() => {
-            if (props.entity.configuration_status !== TrainConfigurationStatus.FINISHED) {
+            if (props.entity.configuration_status !== AnalysisConfigurationStatus.FINISHED) {
                 return true;
             }
 
-            if (props.command === TrainAPICommand.BUILD_START) {
+            if (props.command === AnalysisAPICommand.BUILD_START) {
                 return !!props.entity.build_status &&
                     [
-                        TrainBuildStatus.STOPPED,
-                        TrainBuildStatus.STOPPING,
-                        TrainBuildStatus.FAILED,
+                        AnalysisBuildStatus.STOPPED,
+                        AnalysisBuildStatus.STOPPING,
+                        AnalysisBuildStatus.FAILED,
                     ].indexOf(props.entity.build_status) === -1;
             }
 
-            if (props.command === TrainAPICommand.BUILD_STOP) {
+            if (props.command === AnalysisAPICommand.BUILD_STOP) {
                 return !!props.entity.build_status && [
-                    TrainBuildStatus.STARTING,
-                    TrainBuildStatus.STARTED,
-                    TrainBuildStatus.STOPPING,
+                    AnalysisBuildStatus.STARTING,
+                    AnalysisBuildStatus.STARTED,
+                    AnalysisBuildStatus.STOPPING,
                 ].indexOf(props.entity.build_status) === -1;
             }
 
@@ -78,11 +78,11 @@ export default defineComponent({
 
         const commandText = computed(() => {
             switch (props.command) {
-                case TrainAPICommand.BUILD_START:
+                case AnalysisAPICommand.BUILD_START:
                     return 'start';
-                case TrainAPICommand.BUILD_STOP:
+                case AnalysisAPICommand.BUILD_STOP:
                     return 'stop';
-                case TrainAPICommand.BUILD_STATUS:
+                case AnalysisAPICommand.BUILD_STATUS:
                     return 'check';
                 default:
                     return '';
@@ -91,11 +91,11 @@ export default defineComponent({
 
         const iconClass = computed(() => {
             switch (props.command) {
-                case TrainAPICommand.BUILD_START:
+                case AnalysisAPICommand.BUILD_START:
                     return 'fa fa-play';
-                case TrainAPICommand.BUILD_STOP:
+                case AnalysisAPICommand.BUILD_STOP:
                     return 'fa fa-stop';
-                case TrainAPICommand.BUILD_STATUS:
+                case AnalysisAPICommand.BUILD_STATUS:
                     return 'fas fa-shield-alt';
                 default:
                     return '';
@@ -104,11 +104,11 @@ export default defineComponent({
 
         const classSuffix = computed(() => {
             switch (props.command) {
-                case TrainAPICommand.BUILD_START:
+                case AnalysisAPICommand.BUILD_START:
                     return 'success';
-                case TrainAPICommand.BUILD_STOP:
+                case AnalysisAPICommand.BUILD_STOP:
                     return 'danger';
-                case TrainAPICommand.BUILD_STATUS:
+                case AnalysisAPICommand.BUILD_STATUS:
                     return 'primary';
                 default:
                     return 'info';

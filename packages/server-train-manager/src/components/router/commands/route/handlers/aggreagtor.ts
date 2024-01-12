@@ -9,7 +9,7 @@ import type { APIClient } from '@personalhealthtrain/core';
 import {
     Ecosystem, REGISTRY_ARTIFACT_TAG_BASE,
     REGISTRY_ARTIFACT_TAG_LATEST,
-    TrainStationRunStatus,
+    AnalysisNodeRunStatus,
 } from '@personalhealthtrain/core';
 import { useClient } from 'hapic';
 import { RouterCommand } from '../../../constants';
@@ -37,7 +37,7 @@ export async function routeAggregatorProject(context: RouteContextExtended) : Pr
     let nextIndex = -1;
 
     for (let i = 0; i < context.items.length; i++) {
-        if (context.items[i].run_status === TrainStationRunStatus.DEPARTED) {
+        if (context.items[i].run_status === AnalysisNodeRunStatus.DEPARTED) {
             continue;
         }
 

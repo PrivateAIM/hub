@@ -6,7 +6,7 @@
  */
 
 import { check, validationResult } from 'express-validator';
-import { TrainStationApprovalStatus } from '@personalhealthtrain/core';
+import { AnalysisNodeApprovalStatus } from '@personalhealthtrain/core';
 import { BadRequestError, NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/core';
 import type { Request } from 'routup';
@@ -51,7 +51,7 @@ export async function runTrainStationValidation(
     if (operation === 'update') {
         await check('approval_status')
             .optional({ nullable: true })
-            .isIn(Object.values(TrainStationApprovalStatus))
+            .isIn(Object.values(AnalysisNodeApprovalStatus))
             .run(req);
 
         await check('comment')
@@ -101,8 +101,8 @@ export async function runTrainStationValidation(
         const dataSource = await useDataSource();
         const proposalStationRepository = dataSource.getRepository(ProposalStationEntity);
         const proposalStation = await proposalStationRepository.findOneBy({
-            proposal_id: result.relation.train.proposal_id,
-            station_id: result.relation.station.id,
+            project_id: result.relation.train.project_id,
+            node_id: result.relation.station.id,
         });
 
         if (!proposalStation) {

@@ -9,13 +9,13 @@ import { BadRequestError } from '@ebec/http';
 import { RouterCommand, buildRouterQueuePayload } from '@personalhealthtrain/server-train-manager';
 import { publish } from 'amqp-extension';
 import {
-    TrainBuildStatus,
+    AnalysisBuildStatus,
 } from '@personalhealthtrain/core';
 import type { TrainEntity } from '../entity';
 
 export async function detectTrainRunStatus(train: TrainEntity) : Promise<TrainEntity> {
     if (
-        train.build_status !== TrainBuildStatus.FINISHED
+        train.build_status !== AnalysisBuildStatus.FINISHED
     ) {
         throw new BadRequestError('The train has not been build yet...');
     } else {

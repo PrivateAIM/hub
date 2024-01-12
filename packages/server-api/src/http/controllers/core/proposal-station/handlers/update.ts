@@ -28,10 +28,10 @@ export async function updateProposalStationRouteHandler(req: Request, res: Respo
 
     const ability = useRequestEnv(req, 'ability');
 
-    const isAuthorityOfStation = isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.station_realm_id);
+    const isAuthorityOfStation = isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.node_realm_id);
     const isAuthorizedForStation = ability.has(PermissionID.PROPOSAL_APPROVE);
 
-    const isAuthorityOfProposal = isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.proposal_realm_id);
+    const isAuthorityOfProposal = isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.project_realm_id);
     if (isAuthorityOfProposal && !isAuthorityOfStation) {
         throw new ForbiddenError('Only permitted target station members can update this object.');
     }

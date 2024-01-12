@@ -35,7 +35,7 @@ export function registerProposalStationSocketHandlers(
     // ------------------------------------------------------------
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainType.PROPOSAL_STATION, DomainEventSubscriptionName.SUBSCRIBE),
+        buildDomainEventSubscriptionFullName(DomainType.PROJECT_NODE, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             if (
                 !socket.data.ability.has(PermissionID.PROPOSAL_APPROVE)
@@ -47,7 +47,7 @@ export function registerProposalStationSocketHandlers(
                 return;
             }
 
-            incrSocketRoomConnections(socket, buildDomainChannelName(DomainType.PROPOSAL_STATION, target));
+            incrSocketRoomConnections(socket, buildDomainChannelName(DomainType.PROJECT_NODE, target));
 
             if (isSocketClientToServerEventCallback(cb)) {
                 cb();
@@ -56,9 +56,9 @@ export function registerProposalStationSocketHandlers(
     );
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainType.PROPOSAL_STATION, DomainEventSubscriptionName.UNSUBSCRIBE),
+        buildDomainEventSubscriptionFullName(DomainType.PROJECT_NODE, DomainEventSubscriptionName.UNSUBSCRIBE),
         (target) => {
-            decrSocketRoomConnections(socket, buildDomainChannelName(DomainType.PROPOSAL_STATION, target));
+            decrSocketRoomConnections(socket, buildDomainChannelName(DomainType.PROJECT_NODE, target));
         },
     );
 }
@@ -72,7 +72,7 @@ export function registerProposalStationForRealmSocketHandlers(
     // ------------------------------------------------------------
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainSubType.PROPOSAL_STATION_IN, DomainEventSubscriptionName.SUBSCRIBE),
+        buildDomainEventSubscriptionFullName(DomainSubType.PROJECT_NODE_IN, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             if (
                 !socket.data.ability.has(PermissionID.PROPOSAL_APPROVE)
@@ -86,7 +86,7 @@ export function registerProposalStationForRealmSocketHandlers(
 
             incrSocketRoomConnections(
                 socket,
-                buildDomainChannelName(DomainSubType.PROPOSAL_STATION_IN, target),
+                buildDomainChannelName(DomainSubType.PROJECT_NODE_IN, target),
             );
 
             if (isSocketClientToServerEventCallback(cb)) {
@@ -96,11 +96,11 @@ export function registerProposalStationForRealmSocketHandlers(
     );
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainSubType.PROPOSAL_STATION_IN, DomainEventSubscriptionName.UNSUBSCRIBE),
+        buildDomainEventSubscriptionFullName(DomainSubType.PROJECT_NODE_IN, DomainEventSubscriptionName.UNSUBSCRIBE),
         (target) => {
             decrSocketRoomConnections(
                 socket,
-                buildDomainChannelName(DomainSubType.PROPOSAL_STATION_IN, target),
+                buildDomainChannelName(DomainSubType.PROJECT_NODE_IN, target),
             );
         },
     );
@@ -108,10 +108,10 @@ export function registerProposalStationForRealmSocketHandlers(
     // ------------------------------------------------------------
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainSubType.PROPOSAL_STATION_OUT, DomainEventSubscriptionName.SUBSCRIBE),
+        buildDomainEventSubscriptionFullName(DomainSubType.PROJECT_NODE_OUT, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             if (
-                !socket.data.ability.has(PermissionID.PROPOSAL_EDIT)
+                !socket.data.ability.has(PermissionID.PROJECT_EDIT)
             ) {
                 if (isSocketClientToServerEventErrorCallback(cb)) {
                     cb(new UnauthorizedError());
@@ -122,7 +122,7 @@ export function registerProposalStationForRealmSocketHandlers(
 
             incrSocketRoomConnections(
                 socket,
-                buildDomainChannelName(DomainSubType.PROPOSAL_STATION_OUT, target),
+                buildDomainChannelName(DomainSubType.PROJECT_NODE_OUT, target),
             );
 
             if (isSocketClientToServerEventCallback(cb)) {
@@ -132,11 +132,11 @@ export function registerProposalStationForRealmSocketHandlers(
     );
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainSubType.PROPOSAL_STATION_OUT, DomainEventSubscriptionName.UNSUBSCRIBE),
+        buildDomainEventSubscriptionFullName(DomainSubType.PROJECT_NODE_OUT, DomainEventSubscriptionName.UNSUBSCRIBE),
         (target) => {
             decrSocketRoomConnections(
                 socket,
-                buildDomainChannelName(DomainSubType.PROPOSAL_STATION_OUT, target),
+                buildDomainChannelName(DomainSubType.PROJECT_NODE_OUT, target),
             );
         },
     );

@@ -6,8 +6,8 @@
  */
 import {
     PermissionID,
-    ProposalStationApprovalCommand,
-    ProposalStationApprovalStatus,
+    ProjectNodeApprovalCommand,
+    ProjectNodeApprovalStatus,
 } from '@personalhealthtrain/core';
 import type { PropType } from 'vue';
 import {
@@ -27,9 +27,9 @@ export default defineComponent({
             type: String,
             required: true,
         },
-        approvalStatus: String as PropType<ProposalStationApprovalStatus>,
+        approvalStatus: String as PropType<ProjectNodeApprovalStatus>,
         command: {
-            type: String as PropType<ProposalStationApprovalCommand>,
+            type: String as PropType<ProjectNodeApprovalCommand>,
             required: true,
         },
         elementType: {
@@ -52,9 +52,9 @@ export default defineComponent({
 
         const commandText = computed(() => {
             switch (props.command) {
-                case ProposalStationApprovalCommand.APPROVE:
+                case ProjectNodeApprovalCommand.APPROVE:
                     return 'approve';
-                case ProposalStationApprovalCommand.REJECT:
+                case ProjectNodeApprovalCommand.REJECT:
                     return 'reject';
                 default:
                     return '';
@@ -63,9 +63,9 @@ export default defineComponent({
 
         const iconClass = computed(() => {
             switch (props.command) {
-                case ProposalStationApprovalCommand.APPROVE:
+                case ProjectNodeApprovalCommand.APPROVE:
                     return 'fa fa-check';
-                case ProposalStationApprovalCommand.REJECT:
+                case ProjectNodeApprovalCommand.REJECT:
                     return 'fa fa-ban';
                 default:
                     return 'fa fa-sync-alt';
@@ -74,9 +74,9 @@ export default defineComponent({
 
         const classSuffix = computed(() => {
             switch (props.command) {
-                case ProposalStationApprovalCommand.APPROVE:
+                case ProjectNodeApprovalCommand.APPROVE:
                     return 'success';
-                case ProposalStationApprovalCommand.REJECT:
+                case ProjectNodeApprovalCommand.REJECT:
                     return 'danger';
                 default:
                     return 'info';
@@ -88,28 +88,28 @@ export default defineComponent({
         const isDisabled = computed(() => {
             if (props.approvalStatus) {
                 if (
-                    props.approvalStatus === ProposalStationApprovalStatus.APPROVED &&
-                    props.command === ProposalStationApprovalCommand.APPROVE
+                    props.approvalStatus === ProjectNodeApprovalStatus.APPROVED &&
+                    props.command === ProjectNodeApprovalCommand.APPROVE
                 ) {
                     return true;
                 }
 
-                return props.approvalStatus === ProposalStationApprovalStatus.REJECTED &&
-                    props.command === ProposalStationApprovalCommand.REJECT;
+                return props.approvalStatus === ProjectNodeApprovalStatus.REJECTED &&
+                    props.command === ProjectNodeApprovalCommand.REJECT;
             }
 
-            return props.command === ProposalStationApprovalCommand.REJECT;
+            return props.command === ProjectNodeApprovalCommand.REJECT;
         });
 
         const execute = wrapFnWithBusyState(busy, async () => {
             let status;
 
             switch (props.command) {
-                case ProposalStationApprovalCommand.APPROVE:
-                    status = ProposalStationApprovalStatus.APPROVED;
+                case ProjectNodeApprovalCommand.APPROVE:
+                    status = ProjectNodeApprovalStatus.APPROVED;
                     break;
-                case ProposalStationApprovalCommand.REJECT:
-                    status = ProposalStationApprovalStatus.REJECTED;
+                case ProjectNodeApprovalCommand.REJECT:
+                    status = ProjectNodeApprovalStatus.REJECTED;
                     break;
                 default:
                     status = null;
@@ -117,7 +117,7 @@ export default defineComponent({
             }
 
             try {
-                const item = await apiClient.proposalStation.update(props.entityId, {
+                const item = await apiClient.projectNode.update(props.entityId, {
                     approval_status: status,
                 });
 

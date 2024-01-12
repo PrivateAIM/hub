@@ -24,18 +24,18 @@ export default defineNuxtComponent({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
             [LayoutKey.REQUIRED_PERMISSIONS]: [
-                PermissionID.PROPOSAL_ADD,
-                PermissionID.PROPOSAL_DROP,
-                PermissionID.PROPOSAL_EDIT,
+                PermissionID.PROJECT_ADD,
+                PermissionID.PROJECT_DROP,
+                PermissionID.PROJECT_EDIT,
 
-                PermissionID.TRAIN_ADD,
-                PermissionID.TRAIN_EDIT,
-                PermissionID.TRAIN_DROP,
+                PermissionID.ANALYSIS_ADD,
+                PermissionID.ANALYSIS_EDIT,
+                PermissionID.ANALYSIS_DROP,
 
-                PermissionID.TRAIN_RESULT_READ,
+                PermissionID.ANALYSIS_RESULT_READ,
 
-                PermissionID.TRAIN_EXECUTION_START,
-                PermissionID.TRAIN_EXECUTION_STOP,
+                PermissionID.ANALYSIS_EXECUTION_START,
+                PermissionID.ANALYSIS_EXECUTION_STOP,
             ],
         });
 

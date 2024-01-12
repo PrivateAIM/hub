@@ -17,7 +17,7 @@ import type {
 } from '@personalhealthtrain/server-train-manager';
 import {
 
-    TrainBuildStatus,
+    AnalysisBuildStatus,
 } from '@personalhealthtrain/core';
 import { useDataSource } from 'typeorm-extension';
 import type { TrainLogSaveContext } from '../../../domains/train-log';
@@ -52,13 +52,13 @@ export async function handleTrainManagerBuilderEvent(
             }
             break;
         case BuilderEvent.BUILDING:
-            entity.build_status = TrainBuildStatus.STARTED;
+            entity.build_status = AnalysisBuildStatus.STARTED;
 
-            trainLogContext.status = TrainBuildStatus.STARTED;
+            trainLogContext.status = AnalysisBuildStatus.STARTED;
             break;
         case BuilderEvent.FAILED: {
             if (context.command === BuilderCommand.BUILD) {
-                entity.build_status = TrainBuildStatus.FAILED;
+                entity.build_status = AnalysisBuildStatus.FAILED;
             }
 
             if (
@@ -67,7 +67,7 @@ export async function handleTrainManagerBuilderEvent(
             ) {
                 trainLogContext = {
                     ...trainLogContext,
-                    status: TrainBuildStatus.FAILED,
+                    status: AnalysisBuildStatus.FAILED,
                     statusMessage: context.error.message,
 
                     error: true,
@@ -79,9 +79,9 @@ export async function handleTrainManagerBuilderEvent(
             break;
         }
         case BuilderEvent.PUSHED:
-            entity.build_status = TrainBuildStatus.FINISHED;
+            entity.build_status = AnalysisBuildStatus.FINISHED;
 
-            trainLogContext.status = TrainBuildStatus.FINISHED;
+            trainLogContext.status = AnalysisBuildStatus.FINISHED;
             break;
     }
 

@@ -25,10 +25,10 @@ export function registerStationSocketHandlers(
     if (!socket.data.userId && !socket.data.robotId) return;
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainType.STATION, DomainEventSubscriptionName.SUBSCRIBE),
+        buildDomainEventSubscriptionFullName(DomainType.NODE, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             if (
-                !socket.data.ability.has(PermissionID.STATION_EDIT)
+                !socket.data.ability.has(PermissionID.NODE_EDIT)
             ) {
                 if (isSocketClientToServerEventErrorCallback(cb)) {
                     cb(new UnauthorizedError());
@@ -37,7 +37,7 @@ export function registerStationSocketHandlers(
                 return;
             }
 
-            incrSocketRoomConnections(socket, buildDomainChannelName(DomainType.STATION, target));
+            incrSocketRoomConnections(socket, buildDomainChannelName(DomainType.NODE, target));
 
             if (isSocketClientToServerEventCallback(cb)) {
                 cb();
@@ -46,9 +46,9 @@ export function registerStationSocketHandlers(
     );
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainType.STATION, DomainEventSubscriptionName.UNSUBSCRIBE),
+        buildDomainEventSubscriptionFullName(DomainType.NODE, DomainEventSubscriptionName.UNSUBSCRIBE),
         (target) => {
-            decrSocketRoomConnections(socket, buildDomainChannelName(DomainType.STATION, target));
+            decrSocketRoomConnections(socket, buildDomainChannelName(DomainType.NODE, target));
         },
     );
 }

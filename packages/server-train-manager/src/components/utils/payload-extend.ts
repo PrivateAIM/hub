@@ -7,16 +7,16 @@
 
 import { hasOwnProperty } from '@personalhealthtrain/core';
 import type {
-    APIClient, Registry, Train,
+    APIClient, Registry, Analysis,
 } from '@personalhealthtrain/core';
 import { isClientErrorWithStatusCode, useClient } from 'hapic';
 import { BaseError } from '../error';
 import type { ComponentPayloadExtended } from '../type';
 
-export async function extendPayload<T extends Partial<ComponentPayloadExtended<{ id: Train['id'] }>>>(
+export async function extendPayload<T extends Partial<ComponentPayloadExtended<{ id: Analysis['id'] }>>>(
     data: T,
 ) : Promise<ComponentPayloadExtended<T>> {
-    let train : Train;
+    let train : Analysis;
     let registry: Registry;
 
     // -----------------------------------------------------------------------------------

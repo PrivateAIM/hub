@@ -20,17 +20,17 @@ import {
 } from 'typeorm';
 import type {
     MasterImage,
-    Proposal, Registry, RegistryProject,
-    Station,
-    Train,
-    TrainBuildStatus,
-    TrainFile,
-    TrainResultStatus,
-    TrainRunStatus,
+    Project, Registry, RegistryProject,
+    Node,
+    Analysis,
+    AnalysisBuildStatus,
+    AnalysisFile,
+    AnalysisResultStatus,
+    AnalysisRunStatus,
     UserSecret,
 } from '@personalhealthtrain/core';
 import {
-    TrainConfigurationStatus, TrainType,
+    AnalysisConfigurationStatus, TrainType,
 } from '@personalhealthtrain/core';
 import type { Realm, User } from '@authup/core';
 import { ProposalEntity } from '../proposal/entity';
@@ -41,7 +41,7 @@ import { RegistryEntity } from '../registry/entity';
 import { RegistryProjectEntity } from '../registry-project/entity';
 
 @Entity()
-export class TrainEntity implements Train {
+export class TrainEntity implements Analysis {
     @PrimaryGeneratedColumn('uuid')
         id: string;
 
@@ -66,14 +66,14 @@ export class TrainEntity implements Train {
         session_id: string;
 
     @Column({ nullable: true })
-        entrypoint_file_id: TrainFile['id'];
+        entrypoint_file_id: AnalysisFile['id'];
 
     @OneToOne(() => TrainFileEntity, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'entrypoint_file_id' })
         entrypoint_file: TrainFileEntity;
 
     @Column({ type: 'int', unsigned: true, default: 0 })
-        stations: number;
+        nodes: number;
 
     // ------------------------------------------------------------------
 
@@ -81,7 +81,7 @@ export class TrainEntity implements Train {
     @Column({
         type: 'varchar', length: 64, nullable: true, default: null,
     })
-        configuration_status: TrainConfigurationStatus | null;
+        configuration_status: AnalysisConfigurationStatus | null;
 
     // ------------------------------------------------------------------
 
@@ -89,7 +89,7 @@ export class TrainEntity implements Train {
     @Column({
         type: 'varchar', length: 64, nullable: true, default: null,
     })
-        build_status: TrainBuildStatus | null;
+        build_status: AnalysisBuildStatus | null;
 
     // ------------------------------------------------------------------
 
@@ -97,12 +97,12 @@ export class TrainEntity implements Train {
     @Column({
         type: 'varchar', length: 64, nullable: true, default: null,
     })
-        run_status: TrainRunStatus | null;
+        run_status: AnalysisRunStatus | null;
 
     @Column({
         type: 'uuid', nullable: true, default: null,
     })
-        run_station_id: Station['id'] | null;
+        run_station_id: Node['id'] | null;
 
     @Column({
         type: 'integer', unsigned: true, nullable: true, default: null,
@@ -114,7 +114,7 @@ export class TrainEntity implements Train {
     @Column({
         type: 'varchar', length: 64, default: null,
     })
-        result_status: TrainResultStatus | null;
+        result_status: AnalysisResultStatus | null;
 
     // ------------------------------------------------------------------
 
@@ -177,11 +177,11 @@ export class TrainEntity implements Train {
 
     // ------------------------------------------------------------------
     @Column({ type: 'uuid' })
-        proposal_id: Proposal['id'];
+        project_id: Project['id'];
 
-    @ManyToOne(() => ProposalEntity, (proposal) => proposal.trains, { onDelete: 'CASCADE' })
+    @ManyToOne(() => ProposalEntity, (proposal) => proposal.analyses, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'proposal_id' })
-        proposal: ProposalEntity;
+        project: ProposalEntity;
 
     // ------------------------------------------------------------------
 
@@ -199,37 +199,37 @@ export class TrainEntity implements Train {
     setConfigurationStatus() {
         this.configuration_status = null;
 
-        if (this.stations > 0) {
-            this.configuration_status = TrainConfigurationStatus.BASE_CONFIGURED;
+        if (this.nodes > 0) {
+            this.configuration_status = AnalysisConfigurationStatus.BASE_CONFIGURED;
         } else {
             return;
         }
 
         if (this.user_rsa_secret_id) {
-            this.configuration_status = TrainConfigurationStatus.SECURITY_CONFIGURED;
+            this.configuration_status = AnalysisConfigurationStatus.SECURITY_CONFIGURED;
         } else {
             return;
         }
 
         if (this.entrypoint_file_id) {
-            this.configuration_status = TrainConfigurationStatus.RESOURCE_CONFIGURED;
+            this.configuration_status = AnalysisConfigurationStatus.RESOURCE_CONFIGURED;
         } else {
             return;
         }
 
         if (this.hash) {
-            this.configuration_status = TrainConfigurationStatus.HASH_GENERATED;
+            this.configuration_status = AnalysisConfigurationStatus.HASH_GENERATED;
         } else {
             return;
         }
 
         if (this.hash_signed) {
-            this.configuration_status = TrainConfigurationStatus.HASH_SIGNED;
+            this.configuration_status = AnalysisConfigurationStatus.HASH_SIGNED;
         } else {
             return;
         }
 
         // check if all conditions are met
-        this.configuration_status = TrainConfigurationStatus.FINISHED;
+        this.configuration_status = AnalysisConfigurationStatus.FINISHED;
     }
 }

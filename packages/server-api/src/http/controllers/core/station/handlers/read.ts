@@ -53,7 +53,7 @@ async function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>,
         const ability = useRequestEnv(req, 'ability');
 
         if (
-            !ability.has(PermissionID.STATION_EDIT)
+            !ability.has(PermissionID.NODE_EDIT)
         ) {
             throw new ForbiddenError(
                 `You are not permitted to read the restricted fields: ${

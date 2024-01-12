@@ -7,7 +7,7 @@
 
 import type { DomainType } from '../constants';
 import type { Ecosystem } from '../ecosystem';
-import type { Proposal } from '../proposal';
+import type { Project } from '../project';
 import type { DomainEventBaseContext } from '../types-base';
 
 export interface Registry {

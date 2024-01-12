@@ -26,7 +26,7 @@ export async function updateStationRouteHandler(req: Request, res: Response) : P
     const id = useRequestParam(req, 'id');
 
     const ability = useRequestEnv(req, 'ability');
-    if (!ability.has(PermissionID.STATION_EDIT)) {
+    if (!ability.has(PermissionID.NODE_EDIT)) {
         throw new ForbiddenError();
     }
 

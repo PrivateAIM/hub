@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 
-import { TrainBuildStatus } from '@personalhealthtrain/core';
+import { AnalysisBuildStatus } from '@personalhealthtrain/core';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
@@ -19,19 +19,19 @@ export default defineComponent({
     computed: {
         statusText() {
             switch (this.status) {
-                case TrainBuildStatus.STARTING:
+                case AnalysisBuildStatus.STARTING:
                     return 'starting...';
-                case TrainBuildStatus.STOPPING:
+                case AnalysisBuildStatus.STOPPING:
                     return 'stopping...';
 
-                case TrainBuildStatus.STARTED:
+                case AnalysisBuildStatus.STARTED:
                     return 'started';
-                case TrainBuildStatus.STOPPED:
+                case AnalysisBuildStatus.STOPPED:
                     return 'stopped';
 
-                case TrainBuildStatus.FINISHED:
+                case AnalysisBuildStatus.FINISHED:
                     return 'finished';
-                case TrainBuildStatus.FAILED:
+                case AnalysisBuildStatus.FAILED:
                     return 'failed';
                 default:
                     return 'none';
@@ -39,15 +39,15 @@ export default defineComponent({
         },
         classSuffix() {
             switch (this.status) {
-                case TrainBuildStatus.STARTING:
-                case TrainBuildStatus.STARTED:
-                case TrainBuildStatus.STOPPED:
+                case AnalysisBuildStatus.STARTING:
+                case AnalysisBuildStatus.STARTED:
+                case AnalysisBuildStatus.STOPPED:
                     return 'primary';
-                case TrainBuildStatus.FINISHED:
+                case AnalysisBuildStatus.FINISHED:
                     return 'success';
-                case TrainBuildStatus.STOPPING:
+                case AnalysisBuildStatus.STOPPING:
                     return 'warning';
-                case TrainBuildStatus.FAILED:
+                case AnalysisBuildStatus.FAILED:
                     return 'danger';
                 default:
                     return 'info';

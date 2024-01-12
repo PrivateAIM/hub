@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { TrainFile } from '@personalhealthtrain/core';
+import type { AnalysisFile } from '@personalhealthtrain/core';
 import type { SuperTest, Test } from 'supertest';
 
-export const TEST_DEFAULT_TRAIN_FILE : Partial<TrainFile> = {
+export const TEST_DEFAULT_TRAIN_FILE : Partial<AnalysisFile> = {
     directory: '.',
     hash: '158b78c9ea3314386d98bd0b24518e144dad8ba7fcf3617b50c99500fd639448',
     name: 'tood.txt',

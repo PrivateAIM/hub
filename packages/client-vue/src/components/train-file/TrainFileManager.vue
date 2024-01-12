@@ -1,6 +1,6 @@
 <script lang="ts">
 import type {
-    Train, TrainFile,
+    Analysis, AnalysisFile,
 } from '@personalhealthtrain/core';
 import {
     hasOwnProperty,
@@ -25,7 +25,7 @@ export default defineComponent({
     },
     props: {
         entity: {
-            type: Object as PropType<Train>,
+            type: Object as PropType<Analysis>,
             required: true,
         },
     },
@@ -44,7 +44,7 @@ export default defineComponent({
         const selectAll = ref(false);
         const directoryMode = ref(true);
         const busy = ref(false);
-        const entryPointFile = ref<null | TrainFile>(null);
+        const entryPointFile = ref<null | AnalysisFile>(null);
 
         const paths = computed(() => form.path.split('/').filter((el) => el !== ''));
 
@@ -67,20 +67,20 @@ export default defineComponent({
         });
 
         const fileListNode = ref<null | typeof TrainFileList>(null);
-        const fileListQuery = computed<BuildInput<TrainFile>>(() => ({
+        const fileListQuery = computed<BuildInput<AnalysisFile>>(() => ({
             filters: {
                 train_id: refs.entity.value.id,
             },
         }));
 
-        const handleCreated = (entity: TrainFile) => {
+        const handleCreated = (entity: AnalysisFile) => {
             if (fileListNode.value) {
                 fileListNode.value.handleCreated(entity);
             }
 
             emit('created', entity);
         };
-        const handleDeleted = (entity: TrainFile) => {
+        const handleDeleted = (entity: AnalysisFile) => {
             if (fileListNode.value) {
                 fileListNode.value.handleDeleted(entity);
             }
@@ -93,7 +93,7 @@ export default defineComponent({
             emit('deleted', entity);
         };
 
-        const handleUpdated = (entity: TrainFile) => {
+        const handleUpdated = (entity: AnalysisFile) => {
             if (fileListNode.value) {
                 fileListNode.value.handleUpdated(entity);
             }
@@ -143,7 +143,7 @@ export default defineComponent({
         const selectAllFiles = () => {
             if (selectAll.value) {
                 if (fileListNode.value) {
-                    selected.value = (fileListNode.value.data as unknown as TrainFile[])
+                    selected.value = (fileListNode.value.data as unknown as AnalysisFile[])
                         .map((file) => file.id)
                         .filter((id) => id !== form.entrypoint_file_id);
                 }
@@ -152,7 +152,7 @@ export default defineComponent({
             }
         };
 
-        const toggleFile = (file: TrainFile) => {
+        const toggleFile = (file: AnalysisFile) => {
             const index = selected.value.findIndex((el) => el === file.id);
             if (index === -1) {
                 selected.value.push(file.id);
@@ -191,7 +191,7 @@ export default defineComponent({
             }
         };
 
-        const changeEntryPointFile = (file: TrainFile) => {
+        const changeEntryPointFile = (file: AnalysisFile) => {
             if (form.entrypoint_file_id === file.id) {
                 form.entrypoint_file_id = null as string;
                 entryPointFile.value = null;

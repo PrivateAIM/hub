@@ -19,7 +19,7 @@ export async function updateProposalRouteHandler(req: Request, res: Response) : 
     const id = useRequestParam(req, 'id');
 
     const ability = useRequestEnv(req, 'ability');
-    if (!ability.has(PermissionID.PROPOSAL_EDIT)) {
+    if (!ability.has(PermissionID.PROJECT_EDIT)) {
         throw new ForbiddenError();
     }
 

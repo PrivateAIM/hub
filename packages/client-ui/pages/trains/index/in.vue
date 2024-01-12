@@ -46,7 +46,7 @@ export default defineNuxtComponent({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
             [LayoutKey.REQUIRED_PERMISSIONS]: [
-                PermissionID.TRAIN_APPROVE,
+                PermissionID.ANALYSIS_APPROVE,
             ],
         });
 
@@ -75,7 +75,7 @@ export default defineNuxtComponent({
         const store = useAuthStore();
         const { realmId } = storeToRefs(store);
 
-        const canManage = computed(() => store.has(PermissionID.TRAIN_APPROVE));
+        const canManage = computed(() => store.has(PermissionID.ANALYSIS_APPROVE));
 
         const query : BuildInput<TrainStation> = {
             include: {

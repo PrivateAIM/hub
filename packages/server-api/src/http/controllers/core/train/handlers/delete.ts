@@ -19,7 +19,7 @@ export async function deleteTrainRouteHandler(req: Request, res: Response) : Pro
     const id = useRequestParam(req, 'id');
 
     const ability = useRequestEnv(req, 'ability');
-    if (!ability.has(PermissionID.TRAIN_DROP)) {
+    if (!ability.has(PermissionID.ANALYSIS_DROP)) {
         throw new ForbiddenError();
     }
 
@@ -36,7 +36,7 @@ export async function deleteTrainRouteHandler(req: Request, res: Response) : Pro
         throw new ForbiddenError();
     }
 
-    const { proposal } = entity;
+    const { project } = entity;
 
     const { id: entityId } = entity;
 
@@ -44,11 +44,11 @@ export async function deleteTrainRouteHandler(req: Request, res: Response) : Pro
 
     entity.id = entityId;
 
-    proposal.trains--;
+    project.analyses--;
     const proposalRepository = dataSource.getRepository(ProposalEntity);
-    await proposalRepository.save(proposal);
+    await proposalRepository.save(project);
 
-    entity.proposal = proposal;
+    entity.project = project;
 
     return sendAccepted(res, entity);
 }

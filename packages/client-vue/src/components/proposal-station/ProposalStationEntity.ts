@@ -11,7 +11,7 @@ import {
     buildDomainChannelName,
 } from '@personalhealthtrain/core';
 import type {
-    ProposalStation,
+    ProjectNode,
 } from '@personalhealthtrain/core';
 import type { FiltersBuildInput } from 'rapiq';
 import {
@@ -36,13 +36,13 @@ enum Target {
 export default defineComponent({
     props: {
         entity: {
-            type: Object as PropType<ProposalStation>,
+            type: Object as PropType<ProjectNode>,
         },
         entityId: {
             type: String,
         },
         queryFilters: {
-            type: Object as PropType<FiltersBuildInput<ProposalStation>>,
+            type: Object as PropType<FiltersBuildInput<ProjectNode>>,
         },
         direction: {
             type: String as PropType<`${Direction.IN}` | `${Direction.OUT}`>,
@@ -51,7 +51,7 @@ export default defineComponent({
             type: String as PropType<`${Target.STATION}` | `${Target.PROPOSAL}`>,
         },
     },
-    emits: defineEntityManagerEvents<ProposalStation>(),
+    emits: defineEntityManagerEvents<ProjectNode>(),
     async setup(props, setup) {
         const apiClient = injectAPIClient();
         const manager = createEntityManager({
@@ -70,7 +70,7 @@ export default defineComponent({
 
                 return undefined;
             },
-            type: `${DomainType.PROPOSAL_STATION}`,
+            type: `${DomainType.PROJECT_NODE}`,
             setup,
             props,
             socket: {
@@ -91,14 +91,14 @@ export default defineComponent({
                 },
                 buildChannelName(id) {
                     if (props.direction === Direction.IN) {
-                        return buildDomainChannelName(DomainSubType.PROPOSAL_STATION_IN, id);
+                        return buildDomainChannelName(DomainSubType.PROJECT_NODE_IN, id);
                     }
 
                     if (props.direction === Direction.OUT) {
-                        return buildDomainChannelName(DomainSubType.PROPOSAL_STATION_OUT, id);
+                        return buildDomainChannelName(DomainSubType.PROJECT_NODE_OUT, id);
                     }
 
-                    return buildDomainChannelName(DomainType.PROPOSAL_STATION, id);
+                    return buildDomainChannelName(DomainType.PROJECT_NODE, id);
                 },
             },
         });
@@ -112,7 +112,7 @@ export default defineComponent({
         ) {
             if (props.target === Target.PROPOSAL) {
                 manager.data.value[props.target] = await apiClient
-                    .proposal.getOne(manager.data.value.proposal_id);
+                    .project.getOne(manager.data.value.proposal_id);
             } else {
                 manager.data.value[props.target] = await apiClient
                     .station.getOne(manager.data.value.station_id);

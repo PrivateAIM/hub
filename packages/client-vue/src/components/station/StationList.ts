@@ -5,19 +5,19 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import { DomainType } from '@personalhealthtrain/core';
-import type { Station } from '@personalhealthtrain/core';
+import type { Node } from '@personalhealthtrain/core';
 import type { SlotsType } from 'vue';
 import { defineComponent } from 'vue';
 import { createList, defineListEvents, defineListProps } from '../../core';
 import type { ListSlotsType } from '../../core';
 
 export default defineComponent({
-    props: defineListProps<Station>(),
-    slots: Object as SlotsType<ListSlotsType<Station>>,
-    emits: defineListEvents<Station>(),
+    props: defineListProps<Node>(),
+    slots: Object as SlotsType<ListSlotsType<Node>>,
+    emits: defineListEvents<Node>(),
     setup(props, setup) {
         const { render, setDefaults } = createList({
-            type: `${DomainType.STATION}`,
+            type: `${DomainType.NODE}`,
             props,
             setup,
             query: {

@@ -44,7 +44,7 @@ export default defineComponent({
         },
         target: {
             type: String as PropType<'station' | 'train'>,
-            default: DomainType.STATION,
+            default: DomainType.NODE,
         },
         direction: {
             type: String as PropType<'in' | 'out'>,
@@ -54,17 +54,17 @@ export default defineComponent({
     slots: Object as SlotsType<ListSlotsType<TrainStation>>,
     emits: defineListEvents<TrainStation>(),
     async setup(props, ctx) {
-        const source = computed(() => (props.target === DomainType.STATION ?
-            DomainType.TRAIN :
-            DomainType.STATION));
+        const source = computed(() => (props.target === DomainType.NODE ?
+            DomainType.ANALYSIS :
+            DomainType.NODE));
 
         const isSameSocketRoom = (room?: string) => {
             if (props.realmId) {
                 switch (props.direction) {
                     case Direction.IN:
-                        return room === buildDomainChannelName(DomainSubType.TRAIN_STATION_IN);
+                        return room === buildDomainChannelName(DomainSubType.ANALYSIS_NODE_IN);
                     case Direction.OUT:
-                        return room === buildDomainChannelName(DomainSubType.TRAIN_STATION_OUT);
+                        return room === buildDomainChannelName(DomainSubType.ANALYSIS_NODE_OUT);
                 }
             } else {
                 return room === buildDomainChannelName(DomainType.TRAIN_STATION);
@@ -75,13 +75,13 @@ export default defineComponent({
 
         const isSocketEventForSource = (item: TrainStation) => {
             switch (source.value) {
-                case DomainType.STATION:
+                case DomainType.NODE:
                     if (typeof props.sourceId === 'undefined') {
                         return props.realmId === item.station_realm_id;
                     }
 
                     return props.sourceId === item.station_id;
-                case DomainType.TRAIN:
+                case DomainType.ANALYSIS:
                     if (typeof props.sourceId === 'undefined') {
                         return props.realmId === item.train_realm_id;
                     }
@@ -108,13 +108,13 @@ export default defineComponent({
                     if (props.realmId) {
                         if (props.direction === Direction.IN) {
                             return buildDomainEventSubscriptionFullName(
-                                DomainSubType.TRAIN_STATION_IN,
+                                DomainSubType.ANALYSIS_NODE_IN,
                                 DomainEventSubscriptionName.SUBSCRIBE,
                             );
                         }
 
                         return buildDomainEventSubscriptionFullName(
-                            DomainSubType.TRAIN_STATION_OUT,
+                            DomainSubType.ANALYSIS_NODE_OUT,
                             DomainEventSubscriptionName.SUBSCRIBE,
                         );
                     }
@@ -128,13 +128,13 @@ export default defineComponent({
                     if (props.realmId) {
                         if (props.direction === Direction.IN) {
                             return buildDomainEventSubscriptionFullName(
-                                DomainSubType.TRAIN_STATION_IN,
+                                DomainSubType.ANALYSIS_NODE_IN,
                                 DomainEventSubscriptionName.UNSUBSCRIBE,
                             );
                         }
 
                         return buildDomainEventSubscriptionFullName(
-                            DomainSubType.TRAIN_STATION_OUT,
+                            DomainSubType.ANALYSIS_NODE_OUT,
                             DomainEventSubscriptionName.UNSUBSCRIBE,
                         );
                     }
@@ -148,7 +148,7 @@ export default defineComponent({
             queryFilters: (q) => {
                 let filter : FiltersBuildInput<TrainStation>;
 
-                if (props.target === DomainType.STATION) {
+                if (props.target === DomainType.NODE) {
                     filter = {
                         'station.name': q.length > 0 ? `~${q}` : q,
                     };
@@ -169,7 +169,7 @@ export default defineComponent({
                 return filter;
             },
             query: () => {
-                if (props.target === DomainType.STATION) {
+                if (props.target === DomainType.NODE) {
                     return {
                         include: ['station'],
                     };
@@ -184,11 +184,11 @@ export default defineComponent({
         setDefaults({
             header: {
                 content: () => h(ATitle, {
-                    text: props.target === DomainType.STATION ?
+                    text: props.target === DomainType.NODE ?
                         'Stations' :
                         'Trains',
                     icon: true,
-                    iconClass: props.target === DomainType.STATION ?
+                    iconClass: props.target === DomainType.NODE ?
                         'fa fa-hospital' :
                         'fa-solid fa-train-tram',
                 }),
@@ -215,12 +215,12 @@ export default defineComponent({
                             let text : VNodeChild | undefined;
 
                             if (
-                                props.target === DomainType.STATION &&
+                                props.target === DomainType.NODE &&
                                 slotProps.data.station
                             ) {
                                 text = h('div', [slotProps.data.station.name]);
                             } else if (
-                                props.target === DomainType.TRAIN &&
+                                props.target === DomainType.ANALYSIS &&
                                 slotProps.data.train
                             ) {
                                 text = h('div', [slotProps.data.train.name]);

@@ -11,9 +11,9 @@ import {
     computed,
     defineComponent, reactive, ref, toRefs, watch,
 } from 'vue';
-import type { Train, TrainFile } from '@personalhealthtrain/core';
+import type { Analysis, AnalysisFile } from '@personalhealthtrain/core';
 import {
-    TrainConfigurationStatus,
+    AnalysisConfigurationStatus,
 } from '@personalhealthtrain/core';
 import { initFormAttributesFromSource, injectAPIClient } from '../../../core';
 import TrainWizardStepBase from './TrainWizardStepBase.vue';
@@ -38,7 +38,7 @@ export default defineComponent({
     },
     props: {
         entity: {
-            type: Object as PropType<Train>,
+            type: Object as PropType<Analysis>,
             required: true,
         },
     },
@@ -62,7 +62,7 @@ export default defineComponent({
             hash: null,
         });
 
-        const updateForm = (entity: Partial<Train>) => {
+        const updateForm = (entity: Partial<Analysis>) => {
             initFormAttributesFromSource(form, entity);
         };
 
@@ -83,7 +83,7 @@ export default defineComponent({
             'finish',
         ];
 
-        const isConfigured = computed(() => refs.entity.value.configuration_status === TrainConfigurationStatus.FINISHED);
+        const isConfigured = computed(() => refs.entity.value.configuration_status === AnalysisConfigurationStatus.FINISHED);
 
         const updatedAt = computed(() => (refs.entity.value ?
             refs.entity.value.updated_at :
@@ -95,13 +95,13 @@ export default defineComponent({
             }
         });
 
-        const handleUpdated = (entity: Train) => {
+        const handleUpdated = (entity: Analysis) => {
             updateForm(entity);
 
             emit('updated', entity);
         };
 
-        const update = async (data: Partial<Train>) => {
+        const update = async (data: Partial<Analysis>) => {
             if (!initialized.value) return;
 
             const keys = Object.keys(data);
@@ -119,7 +119,7 @@ export default defineComponent({
                 throw new Error('A master image must be selected...');
             }
 
-            if (refs.entity.value.stations <= 0) {
+            if (refs.entity.value.nodes <= 0) {
                 throw new Error('One or more stations have to be selected...');
             }
 
@@ -249,7 +249,7 @@ export default defineComponent({
         const setFhirQuery = (query: string) => {
             updateForm({ query });
         };
-        const setEntrypointFile = (item?: TrainFile) => {
+        const setEntrypointFile = (item?: AnalysisFile) => {
             updateForm({ entrypoint_file_id: item ? item.id : null as string });
         };
 

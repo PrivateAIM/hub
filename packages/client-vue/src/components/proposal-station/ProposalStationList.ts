@@ -7,7 +7,7 @@
 
 import { ATitle } from '@authup/client-vue';
 import type {
-    ProposalStation,
+    ProjectNode,
 } from '@personalhealthtrain/core';
 import {
     DomainEventSubscriptionName,
@@ -35,7 +35,7 @@ enum Direction {
 export default defineComponent({
     name: 'ProposalStationList',
     props: {
-        ...defineListProps<ProposalStation>(),
+        ...defineListProps<ProjectNode>(),
         realmId: {
             type: String,
         },
@@ -45,49 +45,49 @@ export default defineComponent({
         },
         target: {
             type: String as PropType<'station' | 'proposal'>,
-            default: DomainType.STATION,
+            default: DomainType.NODE,
         },
         direction: {
             type: String as PropType<'in' | 'out'>,
             default: Direction.OUT,
         },
     },
-    slots: Object as SlotsType<ListSlotsType<ProposalStation>>,
-    emits: defineListEvents<ProposalStation>(),
+    slots: Object as SlotsType<ListSlotsType<ProjectNode>>,
+    emits: defineListEvents<ProjectNode>(),
     async setup(props, ctx) {
-        const source = computed(() => (props.target === DomainType.STATION ?
-            DomainType.PROPOSAL :
-            DomainType.STATION));
+        const source = computed(() => (props.target === DomainType.NODE ?
+            DomainType.PROJECT :
+            DomainType.NODE));
 
         const isSameSocketRoom = (room?: string) => {
             if (props.realmId) {
                 switch (props.direction) {
                     case Direction.IN:
-                        return room === buildDomainChannelName(DomainSubType.PROPOSAL_STATION_IN);
+                        return room === buildDomainChannelName(DomainSubType.PROJECT_NODE_IN);
                     case Direction.OUT:
-                        return room === buildDomainChannelName(DomainSubType.PROPOSAL_STATION_OUT);
+                        return room === buildDomainChannelName(DomainSubType.PROJECT_NODE_OUT);
                 }
             } else {
-                return room === buildDomainChannelName(DomainType.PROPOSAL_STATION);
+                return room === buildDomainChannelName(DomainType.PROJECT_NODE);
             }
 
             return false;
         };
 
-        const isSocketEventForSource = (item: ProposalStation) => {
+        const isSocketEventForSource = (item: ProjectNode) => {
             switch (source.value) {
-                case DomainType.STATION:
+                case DomainType.NODE:
                     if (typeof props.sourceId === 'undefined') {
-                        return props.realmId === item.station_realm_id;
+                        return props.realmId === item.node_realm_id;
                     }
 
-                    return props.sourceId === item.station_id;
-                case DomainType.PROPOSAL:
+                    return props.sourceId === item.node_id;
+                case DomainType.PROJECT:
                     if (typeof props.sourceId === 'undefined') {
-                        return props.realmId === item.proposal_realm_id;
+                        return props.realmId === item.project_realm_id;
                     }
 
-                    return props.sourceId === item.proposal_id;
+                    return props.sourceId === item.project_id;
             }
 
             return false;
@@ -97,7 +97,7 @@ export default defineComponent({
             render,
             setDefaults,
         } = createList({
-            type: `${DomainType.PROPOSAL_STATION}`,
+            type: `${DomainType.PROJECT_NODE}`,
             props,
             setup: ctx,
             socket: {
@@ -109,19 +109,19 @@ export default defineComponent({
                     if (props.realmId) {
                         if (props.direction === Direction.IN) {
                             return buildDomainEventSubscriptionFullName(
-                                DomainSubType.PROPOSAL_STATION_IN,
+                                DomainSubType.PROJECT_NODE_IN,
                                 DomainEventSubscriptionName.SUBSCRIBE,
                             );
                         }
 
                         return buildDomainEventSubscriptionFullName(
-                            DomainSubType.PROPOSAL_STATION_OUT,
+                            DomainSubType.PROJECT_NODE_OUT,
                             DomainEventSubscriptionName.SUBSCRIBE,
                         );
                     }
 
                     return buildDomainEventSubscriptionFullName(
-                        DomainType.PROPOSAL_STATION,
+                        DomainType.PROJECT_NODE,
                         DomainEventSubscriptionName.SUBSCRIBE,
                     );
                 },
@@ -129,27 +129,27 @@ export default defineComponent({
                     if (props.realmId) {
                         if (props.direction === Direction.IN) {
                             return buildDomainEventSubscriptionFullName(
-                                DomainSubType.PROPOSAL_STATION_IN,
+                                DomainSubType.PROJECT_NODE_IN,
                                 DomainEventSubscriptionName.UNSUBSCRIBE,
                             );
                         }
 
                         return buildDomainEventSubscriptionFullName(
-                            DomainSubType.PROPOSAL_STATION_OUT,
+                            DomainSubType.PROJECT_NODE_OUT,
                             DomainEventSubscriptionName.UNSUBSCRIBE,
                         );
                     }
 
                     return buildDomainEventSubscriptionFullName(
-                        DomainType.PROPOSAL_STATION,
+                        DomainType.PROJECT_NODE,
                         DomainEventSubscriptionName.UNSUBSCRIBE,
                     );
                 },
             },
             queryFilters: (q) => {
-                let filter : FiltersBuildInput<ProposalStation>;
+                let filter : FiltersBuildInput<ProjectNode>;
 
-                if (props.target === DomainType.STATION) {
+                if (props.target === DomainType.NODE) {
                     filter = {
                         'station.name': q.length > 0 ? `~${q}` : q,
                     };
@@ -161,16 +161,16 @@ export default defineComponent({
 
                 if (props.realmId) {
                     if (props.direction === Direction.IN) {
-                        filter.station_realm_id = props.realmId;
+                        filter.node_realm_id = props.realmId;
                     } else {
-                        filter.proposal_realm_id = props.realmId;
+                        filter.project_realm_id = props.realmId;
                     }
                 }
 
                 return filter;
             },
             query: () => {
-                if (props.target === DomainType.STATION) {
+                if (props.target === DomainType.NODE) {
                     return {
                         include: ['station'],
                     };
@@ -185,11 +185,11 @@ export default defineComponent({
         setDefaults({
             header: {
                 content: () => h(ATitle, {
-                    text: props.target === DomainType.STATION ?
+                    text: props.target === DomainType.NODE ?
                         'Stations' :
                         'Trains',
                     icon: true,
-                    iconClass: props.target === DomainType.STATION ?
+                    iconClass: props.target === DomainType.NODE ?
                         'fa fa-hospital' :
                         'fa-solid fa-file',
                 }),
@@ -209,7 +209,7 @@ export default defineComponent({
                         onDeleted: itemProps.deleted,
                         onFailed: itemProps.failed,
                     }, {
-                        default: (slotProps: DomainDetailsSlotProps<ProposalStation>) => {
+                        default: (slotProps: DomainDetailsSlotProps<ProjectNode>) => {
                             if (slotContent.slot) {
                                 return slotContent.slot;
                             }
@@ -217,15 +217,15 @@ export default defineComponent({
                             let text : VNodeChild | undefined;
 
                             if (
-                                props.target === DomainType.STATION &&
-                                slotProps.data.station
+                                props.target === DomainType.NODE &&
+                                slotProps.data.node
                             ) {
-                                text = h('div', [slotProps.data.station.name]);
+                                text = h('div', [slotProps.data.node.name]);
                             } else if (
-                                props.target === DomainType.PROPOSAL &&
-                                slotProps.data.proposal
+                                props.target === DomainType.PROJECT &&
+                                slotProps.data.project
                             ) {
-                                text = h('div', [slotProps.data.proposal.title]);
+                                text = h('div', [slotProps.data.project.name]);
                             } else {
                                 text = h('div', [slotProps.data.id]);
                             }

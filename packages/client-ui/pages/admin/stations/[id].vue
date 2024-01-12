@@ -7,7 +7,7 @@
 <script lang="ts">
 import { createEntityManager } from '@personalhealthtrain/client-vue';
 import type {
-    Station,
+    Node,
 } from '@personalhealthtrain/core';
 import {
     DomainType,
@@ -25,7 +25,7 @@ export default defineNuxtComponent({
         const route = useRoute();
 
         const manager = createEntityManager({
-            type: `${DomainType.STATION}`,
+            type: `${DomainType.NODE}`,
             props: {
                 entityId: route.params.id as string,
             },
@@ -66,7 +66,7 @@ export default defineNuxtComponent({
 
         return {
             tabs,
-            entity: manager.data.value as Station,
+            entity: manager.data.value as Node,
             handleUpdated: manager.updated,
             handleFailed: manager.failed,
         };

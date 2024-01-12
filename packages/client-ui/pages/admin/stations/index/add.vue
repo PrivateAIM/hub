@@ -5,7 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Station } from '@personalhealthtrain/core';
+import type { Node } from '@personalhealthtrain/core';
 import { PermissionID } from '@personalhealthtrain/core';
 import { storeToRefs } from 'pinia';
 import { StationForm } from '@personalhealthtrain/client-vue';
@@ -29,7 +29,7 @@ export default defineNuxtComponent({
         const store = useAuthStore();
         const { realmManagementId, realmManagementName } = storeToRefs(store);
 
-        const handleCreated = async (e: Station) => {
+        const handleCreated = async (e: Node) => {
             emit('created', e);
         };
 

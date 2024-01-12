@@ -39,21 +39,21 @@ async function publishEvent(
         },
         [
             {
-                channel: (id) => buildDomainChannelName(DomainSubType.TRAIN_STATION_IN, id),
+                channel: (id) => buildDomainChannelName(DomainSubType.ANALYSIS_NODE_IN, id),
                 namespace: buildDomainNamespaceName(data.station_realm_id),
             },
             {
-                channel: (id) => buildDomainChannelName(DomainSubType.TRAIN_STATION_OUT, id),
+                channel: (id) => buildDomainChannelName(DomainSubType.ANALYSIS_NODE_OUT, id),
                 namespace: buildDomainNamespaceName(data.train_realm_id),
             },
             {
                 channel: (id) => buildDomainChannelName(DomainType.TRAIN_STATION, id),
             },
             {
-                channel: (id) => buildDomainChannelName(DomainSubType.TRAIN_STATION_IN, id),
+                channel: (id) => buildDomainChannelName(DomainSubType.ANALYSIS_NODE_IN, id),
             },
             {
-                channel: (id) => buildDomainChannelName(DomainSubType.TRAIN_STATION_OUT, id),
+                channel: (id) => buildDomainChannelName(DomainSubType.ANALYSIS_NODE_OUT, id),
             },
         ],
     );

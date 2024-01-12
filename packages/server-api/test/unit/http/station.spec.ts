@@ -6,7 +6,7 @@
  */
 
 import type {
-    Station,
+    Node,
 } from '@personalhealthtrain/core';
 import { removeDateProperties } from '../../utils/date-properties';
 import { expectPropertiesEqualToSrc } from '../../utils/properties';
@@ -25,7 +25,7 @@ describe('src/controllers/core/station', () => {
         await dropTestDatabase();
     });
 
-    let details: Station;
+    let details: Node;
 
     it('should create station', async () => {
         const response = await createSuperTestStation(superTest);

@@ -9,8 +9,8 @@ import { BadRequestError } from '@ebec/http';
 import {
     Ecosystem,
     RegistryProjectType,
-    TrainBuildStatus,
-    TrainStationApprovalStatus,
+    AnalysisBuildStatus,
+    AnalysisNodeApprovalStatus,
 } from '@personalhealthtrain/core';
 import { BuilderCommand, buildBuilderQueuePayload } from '@personalhealthtrain/server-train-manager';
 import { publish } from 'amqp-extension';
@@ -38,7 +38,7 @@ export async function startBuildTrain(
         });
 
         for (let i = 0; i < trainStations.length; i++) {
-            if (trainStations[i].approval_status !== TrainStationApprovalStatus.APPROVED) {
+            if (trainStations[i].approval_status !== AnalysisNodeApprovalStatus.APPROVED) {
                 throw new BadRequestError('Not all stations have approved the train yet.');
             }
         }
@@ -81,7 +81,7 @@ export async function startBuildTrain(
             },
         }));
 
-        train.build_status = TrainBuildStatus.STARTING;
+        train.build_status = AnalysisBuildStatus.STARTING;
 
         await repository.save(train);
     }

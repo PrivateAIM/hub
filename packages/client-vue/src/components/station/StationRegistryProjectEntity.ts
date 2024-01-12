@@ -7,7 +7,7 @@
 
 import type { PropType } from 'vue';
 import { defineComponent, h } from 'vue';
-import type { RegistryProject, Station } from '@personalhealthtrain/core';
+import type { RegistryProject, Node } from '@personalhealthtrain/core';
 import {
     Ecosystem,
 } from '@personalhealthtrain/core';
@@ -16,7 +16,7 @@ import RegistryProjectDetails from '../registry-project/RegistryProjectEntity';
 export default defineComponent({
     props: {
         entity: {
-            type: Object as PropType<Station>,
+            type: Object as PropType<Node>,
             required: true,
         },
     },

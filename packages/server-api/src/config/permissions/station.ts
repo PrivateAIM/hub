@@ -16,15 +16,15 @@ export enum PresetRoleName {
 export function getPresetRolePermissions(type: string) : PermissionIDType[] {
     const map : Record<string, PermissionIDType[]> = {
         [PresetRoleName.STATION_EMPLOYEE]: [
-            PermissionID.PROPOSAL_ADD,
-            PermissionID.PROPOSAL_DROP,
-            PermissionID.PROPOSAL_EDIT,
+            PermissionID.PROJECT_ADD,
+            PermissionID.PROJECT_DROP,
+            PermissionID.PROJECT_EDIT,
 
-            PermissionID.TRAIN_ADD,
-            PermissionID.TRAIN_EDIT,
-            PermissionID.TRAIN_EXECUTION_START,
-            PermissionID.TRAIN_EXECUTION_STOP,
-            PermissionID.TRAIN_RESULT_READ,
+            PermissionID.ANALYSIS_ADD,
+            PermissionID.ANALYSIS_EDIT,
+            PermissionID.ANALYSIS_EXECUTION_START,
+            PermissionID.ANALYSIS_EXECUTION_STOP,
+            PermissionID.ANALYSIS_RESULT_READ,
         ],
         [PresetRoleName.STATION_AUTHORITY]: [
             PermissionID.ADMIN_UI_USE,
@@ -33,14 +33,14 @@ export function getPresetRolePermissions(type: string) : PermissionIDType[] {
             PermissionID.ROBOT_DROP,
             PermissionID.ROBOT_EDIT,
 
-            PermissionID.PROPOSAL_ADD,
-            PermissionID.PROPOSAL_DROP,
-            PermissionID.PROPOSAL_EDIT,
+            PermissionID.PROJECT_ADD,
+            PermissionID.PROJECT_DROP,
+            PermissionID.PROJECT_EDIT,
             PermissionID.PROPOSAL_APPROVE,
 
-            PermissionID.STATION_ADD,
-            PermissionID.STATION_DROP,
-            PermissionID.STATION_EDIT,
+            PermissionID.NODE_ADD,
+            PermissionID.NODE_DROP,
+            PermissionID.NODE_EDIT,
 
             PermissionID.PROVIDER_ADD,
             PermissionID.PROVIDER_DROP,
@@ -48,13 +48,13 @@ export function getPresetRolePermissions(type: string) : PermissionIDType[] {
 
             PermissionID.REGISTRY_PROJECT_MANAGE,
 
-            PermissionID.TRAIN_ADD,
-            PermissionID.TRAIN_DROP,
-            PermissionID.TRAIN_EDIT,
-            PermissionID.TRAIN_APPROVE,
-            PermissionID.TRAIN_EXECUTION_START,
-            PermissionID.TRAIN_EXECUTION_STOP,
-            PermissionID.TRAIN_RESULT_READ,
+            PermissionID.ANALYSIS_ADD,
+            PermissionID.ANALYSIS_DROP,
+            PermissionID.ANALYSIS_EDIT,
+            PermissionID.ANALYSIS_APPROVE,
+            PermissionID.ANALYSIS_EXECUTION_START,
+            PermissionID.ANALYSIS_EXECUTION_STOP,
+            PermissionID.ANALYSIS_RESULT_READ,
 
             PermissionID.USER_ADD,
             PermissionID.USER_EDIT,

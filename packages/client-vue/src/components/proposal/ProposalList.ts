@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import type {
-    Proposal,
+    Project,
 } from '@personalhealthtrain/core';
 import {
     DomainType,
@@ -17,17 +17,17 @@ import { createList, defineListEvents, defineListProps } from '../../core';
 
 export default defineComponent({
     props: {
-        ...defineListProps<Proposal>(),
+        ...defineListProps<Project>(),
         realmId: {
             type: String,
             default: undefined,
         },
     },
-    slots: Object as SlotsType<ListSlotsType<Proposal>>,
-    emits: defineListEvents<Proposal>(),
+    slots: Object as SlotsType<ListSlotsType<Project>>,
+    emits: defineListEvents<Project>(),
     setup(props, setup) {
         const { render, setDefaults } = createList({
-            type: `${DomainType.PROPOSAL}`,
+            type: `${DomainType.PROJECT}`,
             props,
             setup,
             queryFilters: (q) => ({

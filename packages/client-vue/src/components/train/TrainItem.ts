@@ -11,7 +11,7 @@ import {
     defineComponent, h, ref,
 } from 'vue';
 import type {
-    Train,
+    Analysis,
 } from '@personalhealthtrain/core';
 import {
     PermissionID,
@@ -33,7 +33,7 @@ export default defineComponent({
     },
     props: {
         entity: {
-            type: Object as PropType<Train>,
+            type: Object as PropType<Analysis>,
             required: true,
         },
     },
@@ -61,14 +61,14 @@ export default defineComponent({
                 emit('failed', e);
             },
         }, {
-            default: (slotProps: EntityManagerSlotProps<Train>) : VNodeChild => {
+            default: (slotProps: EntityManagerSlotProps<Analysis>) : VNodeChild => {
                 if (!slotProps.data) {
                     return [];
                 }
 
                 let deleteButton : VNodeArrayChildren = [];
 
-                if (store.has(PermissionID.TRAIN_DROP)) {
+                if (store.has(PermissionID.ANALYSIS_DROP)) {
                     deleteButton = [
                         h(EntityDelete, {
                             withText: false,
@@ -101,7 +101,7 @@ export default defineComponent({
                                             entityId: slotProps.data.id,
                                             entityName: slotProps.data.name,
                                             editable: true,
-                                            onUpdated(item: Train) {
+                                            onUpdated(item: Analysis) {
                                                 slotProps.updated(item);
                                             },
                                         },
@@ -168,7 +168,7 @@ export default defineComponent({
                             entity: slotProps.data,
                             withCommand: extendedView.value,
                             listDirection: extendedView.value ? 'column' : 'row',
-                            onUpdated(item: Train) {
+                            onUpdated(item: Analysis) {
                                 slotProps.updated(item);
                             },
                             onFailed(error: Error) {

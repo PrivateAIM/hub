@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 import { VCTimeago } from '@vuecs/timeago';
-import type { ProposalStation } from '@personalhealthtrain/core';
+import type { ProjectNode } from '@personalhealthtrain/core';
 import {
     PermissionID,
 } from '@personalhealthtrain/core';
@@ -103,9 +103,9 @@ export default defineNuxtComponent({
 
         const modalNode = ref<boolean>(false);
 
-        const entity = ref<null | ProposalStation>(null);
+        const entity = ref<null | ProjectNode>(null);
 
-        const edit = (item: ProposalStation) => {
+        const edit = (item: ProjectNode) => {
             entity.value = item;
 
             modalNode.value = true;
@@ -113,7 +113,7 @@ export default defineNuxtComponent({
 
         const listNode = ref<null | typeof ProposalStationList>(null);
 
-        const handleUpdated = (item: ProposalStation) => {
+        const handleUpdated = (item: ProjectNode) => {
             if (listNode.value) {
                 listNode.value.handleUpdated(item);
             }

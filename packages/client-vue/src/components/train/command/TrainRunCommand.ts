@@ -8,12 +8,12 @@ import {
     computed, defineComponent, ref, toRefs,
 } from 'vue';
 import type { PropType } from 'vue';
-import type { Train } from '@personalhealthtrain/core';
+import type { Analysis } from '@personalhealthtrain/core';
 import {
     PermissionID,
-    TrainAPICommand,
-    TrainBuildStatus,
-    TrainRunStatus,
+    AnalysisAPICommand,
+    AnalysisBuildStatus,
+    AnalysisRunStatus,
 } from '@personalhealthtrain/core';
 import type { TrainCommandProperties } from './type';
 import {
@@ -23,12 +23,12 @@ import {
 export default defineComponent({
     props: {
         entity: {
-            type: Object as PropType<Train>,
+            type: Object as PropType<Analysis>,
             required: true,
         },
         command: {
-            type: String as PropType<TrainAPICommand>,
-            default: TrainAPICommand.RUN_START,
+            type: String as PropType<AnalysisAPICommand>,
+            default: AnalysisAPICommand.RUN_START,
         },
         elementType: {
             type: String as PropType<TrainCommandProperties['elementType']>,
@@ -50,22 +50,22 @@ export default defineComponent({
         const busy = ref(false);
 
         const store = injectAuthupStore();
-        const isAllowed = computed(() => store.has(PermissionID.TRAIN_EXECUTION_START) ||
-                store.has(PermissionID.TRAIN_EXECUTION_STOP));
+        const isAllowed = computed(() => store.has(PermissionID.ANALYSIS_EXECUTION_START) ||
+                store.has(PermissionID.ANALYSIS_EXECUTION_STOP));
 
         const isDisabled = computed(() => {
-            if (refs.entity.value.build_status !== TrainBuildStatus.FINISHED) {
+            if (refs.entity.value.build_status !== AnalysisBuildStatus.FINISHED) {
                 return true;
             }
 
-            if (refs.command.value === TrainAPICommand.RUN_START) {
+            if (refs.command.value === AnalysisAPICommand.RUN_START) {
                 return !!refs.entity.value.run_status &&
-                    [TrainRunStatus.STOPPED, TrainRunStatus.STOPPING, TrainRunStatus.FAILED].indexOf(refs.entity.value.run_status) === -1;
+                    [AnalysisRunStatus.STOPPED, AnalysisRunStatus.STOPPING, AnalysisRunStatus.FAILED].indexOf(refs.entity.value.run_status) === -1;
             }
 
-            if (refs.command.value === TrainAPICommand.RUN_RESET) {
+            if (refs.command.value === AnalysisAPICommand.RUN_RESET) {
                 return !!refs.entity.value.run_status &&
-                    [TrainRunStatus.STOPPED, TrainRunStatus.STOPPING, TrainRunStatus.FAILED].indexOf(refs.entity.value.run_status) === -1;
+                    [AnalysisRunStatus.STOPPED, AnalysisRunStatus.STOPPING, AnalysisRunStatus.FAILED].indexOf(refs.entity.value.run_status) === -1;
             }
 
             return false;
@@ -73,11 +73,11 @@ export default defineComponent({
 
         const commandText = computed(() => {
             switch (refs.command.value) {
-                case TrainAPICommand.RUN_START:
+                case AnalysisAPICommand.RUN_START:
                     return 'start';
-                case TrainAPICommand.RUN_RESET:
+                case AnalysisAPICommand.RUN_RESET:
                     return 'reset';
-                case TrainAPICommand.RUN_STATUS:
+                case AnalysisAPICommand.RUN_STATUS:
                     return 'check';
                 default:
                     return '';
@@ -86,11 +86,11 @@ export default defineComponent({
 
         const iconClass = computed(() => {
             switch (refs.command.value) {
-                case TrainAPICommand.RUN_START:
+                case AnalysisAPICommand.RUN_START:
                     return 'fa fa-play';
-                case TrainAPICommand.RUN_RESET:
+                case AnalysisAPICommand.RUN_RESET:
                     return 'fa-solid fa-retweet';
-                case TrainAPICommand.RUN_STATUS:
+                case AnalysisAPICommand.RUN_STATUS:
                     return 'fas fa-shield-alt';
                 default:
                     return '';
@@ -99,11 +99,11 @@ export default defineComponent({
 
         const classSuffix = computed(() => {
             switch (refs.command.value) {
-                case TrainAPICommand.RUN_START:
+                case AnalysisAPICommand.RUN_START:
                     return 'success';
-                case TrainAPICommand.RUN_RESET:
+                case AnalysisAPICommand.RUN_RESET:
                     return 'danger';
-                case TrainAPICommand.RUN_STATUS:
+                case AnalysisAPICommand.RUN_STATUS:
                     return 'primary';
                 default:
                     return 'info';

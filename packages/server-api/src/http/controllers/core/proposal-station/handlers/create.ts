@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionID, ProposalStationApprovalStatus } from '@personalhealthtrain/core';
+import { PermissionID, ProjectNodeApprovalStatus } from '@personalhealthtrain/core';
 import { ForbiddenError } from '@ebec/http';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
@@ -19,8 +19,8 @@ export async function createProposalStationRouteHandler(req: Request, res: Respo
     const ability = useRequestEnv(req, 'ability');
 
     if (
-        !ability.has(PermissionID.PROPOSAL_EDIT) &&
-        !ability.has(PermissionID.PROPOSAL_ADD)
+        !ability.has(PermissionID.PROJECT_EDIT) &&
+        !ability.has(PermissionID.PROJECT_ADD)
     ) {
         throw new ForbiddenError('You are not allowed to add a proposal station.');
     }
@@ -32,7 +32,7 @@ export async function createProposalStationRouteHandler(req: Request, res: Respo
     let entity = repository.create(result.data);
 
     if (useEnv('skipProposalApprovalOperation')) {
-        entity.approval_status = ProposalStationApprovalStatus.APPROVED;
+        entity.approval_status = ProjectNodeApprovalStatus.APPROVED;
     }
 
     entity = await repository.save(entity);

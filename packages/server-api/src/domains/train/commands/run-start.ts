@@ -9,7 +9,7 @@ import { BadRequestError } from '@ebec/http';
 import { RouterCommand, buildRouterQueuePayload } from '@personalhealthtrain/server-train-manager';
 import { publish } from 'amqp-extension';
 import {
-    TrainRunStatus,
+    AnalysisRunStatus,
 } from '@personalhealthtrain/core';
 import { useDataSource } from 'typeorm-extension';
 import { resolveTrain } from './utils';
@@ -23,7 +23,7 @@ export async function startTrain(train: TrainEntity | string) : Promise<TrainEnt
 
     if (
         !!train.run_status &&
-        [TrainRunStatus.STARTING, TrainRunStatus.RUNNING].indexOf(train.run_status) !== -1
+        [AnalysisRunStatus.STARTING, AnalysisRunStatus.RUNNING].indexOf(train.run_status) !== -1
     ) {
         throw new BadRequestError('The train has already been started...');
     } else {
@@ -35,7 +35,7 @@ export async function startTrain(train: TrainEntity | string) : Promise<TrainEnt
         }));
 
         train = repository.merge(train, {
-            run_status: TrainRunStatus.STARTING,
+            run_status: AnalysisRunStatus.STARTING,
         });
 
         await repository.save(train);

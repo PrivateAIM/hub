@@ -8,7 +8,7 @@
 import { storeToRefs } from 'pinia';
 import { computed, toRefs } from 'vue';
 import type { PropType } from 'vue';
-import type { Proposal, ProposalStation } from '@personalhealthtrain/core';
+import type { Project, ProjectNode } from '@personalhealthtrain/core';
 import { defineNuxtComponent } from '#app';
 import DomainEntityNav from '../../../components/DomainEntityNav';
 import { useAuthStore } from '../../../store/auth';
@@ -17,11 +17,11 @@ export default defineNuxtComponent({
     components: { DomainEntityNav },
     props: {
         proposal: {
-            type: Object as PropType<Proposal>,
+            type: Object as PropType<Project>,
             required: true,
         },
         visitorProposalStation: {
-            type: Object as PropType<ProposalStation>,
+            type: Object as PropType<ProjectNode>,
             default: undefined,
         },
     },

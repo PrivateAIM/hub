@@ -6,7 +6,7 @@
  */
 
 import {
-    Proposal,
+    Project,
 } from '@personalhealthtrain/core';
 
 import {
@@ -21,7 +21,7 @@ import {
     updateProposalRouteHandler,
 } from './handlers';
 
-type PartialProposal = Partial<Proposal>;
+type PartialProposal = Partial<Project>;
 
 @DTags('proposal')
 @DController('/proposals')
@@ -46,7 +46,7 @@ export class ProposalController {
     @DPost('/:id', [ForceLoggedInMiddleware])
     async update(
         @DPath('id') id: string,
-            @DBody() data: Proposal,
+            @DBody() data: Project,
             @DRequest() req: any,
             @DResponse() res: any,
     ): Promise<PartialProposal | undefined> {
@@ -55,7 +55,7 @@ export class ProposalController {
 
     @DPost('', [ForceLoggedInMiddleware])
     async add(
-        @DBody() data: Proposal,
+        @DBody() data: Project,
             @DRequest() req: any,
             @DResponse() res: any,
     ): Promise<PartialProposal | undefined> {

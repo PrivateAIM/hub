@@ -18,7 +18,7 @@ export async function deleteTrainLogRouteHandler(req: Request, res: Response) : 
 
     const ability = useRequestEnv(req, 'ability');
     if (
-        !ability.has(PermissionID.TRAIN_EDIT)
+        !ability.has(PermissionID.ANALYSIS_EDIT)
     ) {
         throw new ForbiddenError();
     }

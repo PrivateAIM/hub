@@ -32,12 +32,12 @@ export function registerTrainSocketHandlers(
     if (!socket.data.userId && !socket.data.robotId) return;
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainType.TRAIN, DomainEventSubscriptionName.SUBSCRIBE),
+        buildDomainEventSubscriptionFullName(DomainType.ANALYSIS, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             if (
-                !socket.data.ability.has(PermissionID.TRAIN_EDIT) &&
-                !socket.data.ability.has(PermissionID.TRAIN_EXECUTION_START) &&
-                !socket.data.ability.has(PermissionID.TRAIN_EXECUTION_STOP)
+                !socket.data.ability.has(PermissionID.ANALYSIS_EDIT) &&
+                !socket.data.ability.has(PermissionID.ANALYSIS_EXECUTION_START) &&
+                !socket.data.ability.has(PermissionID.ANALYSIS_EXECUTION_STOP)
             ) {
                 if (isSocketClientToServerEventErrorCallback(cb)) {
                     cb(new UnauthorizedError());
@@ -46,7 +46,7 @@ export function registerTrainSocketHandlers(
                 return;
             }
 
-            incrSocketRoomConnections(socket, buildDomainChannelName(DomainType.TRAIN, target));
+            incrSocketRoomConnections(socket, buildDomainChannelName(DomainType.ANALYSIS, target));
 
             if (isSocketClientToServerEventCallback(cb)) {
                 cb();
@@ -55,9 +55,9 @@ export function registerTrainSocketHandlers(
     );
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainType.TRAIN, DomainEventSubscriptionName.UNSUBSCRIBE),
+        buildDomainEventSubscriptionFullName(DomainType.ANALYSIS, DomainEventSubscriptionName.UNSUBSCRIBE),
         (target) => {
-            decrSocketRoomConnections(socket, buildDomainChannelName(DomainType.TRAIN, target));
+            decrSocketRoomConnections(socket, buildDomainChannelName(DomainType.ANALYSIS, target));
         },
     );
 }

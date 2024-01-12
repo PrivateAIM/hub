@@ -6,12 +6,12 @@
  */
 import { computed, defineComponent, ref } from 'vue';
 import type { PropType } from 'vue';
-import type { Train } from '@personalhealthtrain/core';
+import type { Analysis } from '@personalhealthtrain/core';
 import {
     PermissionID,
-    TrainAPICommand,
-    TrainResultStatus,
-    TrainRunStatus,
+    AnalysisAPICommand,
+    AnalysisResultStatus,
+    AnalysisRunStatus,
 } from '@personalhealthtrain/core';
 import {
     injectAPIClient, injectAuthupStore, renderActionCommand, wrapFnWithBusyState,
@@ -21,12 +21,12 @@ import type { TrainCommandProperties } from './type';
 export default defineComponent({
     props: {
         entity: {
-            type: Object as PropType<Train>,
+            type: Object as PropType<Analysis>,
             required: true,
         },
         command: {
-            type: String as PropType<`${TrainAPICommand}` | 'resultDownload'>,
-            default: TrainAPICommand.RESULT_START,
+            type: String as PropType<`${AnalysisAPICommand}` | 'resultDownload'>,
+            default: AnalysisAPICommand.RESULT_START,
         },
 
         elementType: {
@@ -48,25 +48,25 @@ export default defineComponent({
         const busy = ref(false);
 
         const store = injectAuthupStore();
-        const isAllowed = computed(() => store.has(PermissionID.TRAIN_RESULT_READ));
+        const isAllowed = computed(() => store.has(PermissionID.ANALYSIS_RESULT_READ));
 
         const isDisabled = computed(() => {
-            if (props.entity.run_status !== TrainRunStatus.FINISHED) {
+            if (props.entity.run_status !== AnalysisRunStatus.FINISHED) {
                 return true;
             }
 
             if (props.command === 'resultDownload') {
                 return !props.entity.result_status ||
                     (
-                        props.entity.result_status !== TrainResultStatus.FINISHED &&
-                        props.entity.result_status !== TrainResultStatus.DOWNLOADED
+                        props.entity.result_status !== AnalysisResultStatus.FINISHED &&
+                        props.entity.result_status !== AnalysisResultStatus.DOWNLOADED
                     );
             }
 
-            if (props.command === TrainAPICommand.RESULT_START) {
+            if (props.command === AnalysisAPICommand.RESULT_START) {
                 return !!props.entity.result_status &&
                     [
-                        TrainResultStatus.FAILED,
+                        AnalysisResultStatus.FAILED,
                     ].indexOf(props.entity.result_status) === -1;
             }
 
@@ -77,9 +77,9 @@ export default defineComponent({
             switch (props.command) {
                 case 'resultDownload':
                     return 'download';
-                case TrainAPICommand.RESULT_START:
+                case AnalysisAPICommand.RESULT_START:
                     return 'start';
-                case TrainAPICommand.RESULT_STATUS:
+                case AnalysisAPICommand.RESULT_STATUS:
                     return 'check';
                 default:
                     return '';
@@ -90,9 +90,9 @@ export default defineComponent({
             switch (props.command) {
                 case 'resultDownload':
                     return 'fa fa-download';
-                case TrainAPICommand.RESULT_START:
+                case AnalysisAPICommand.RESULT_START:
                     return 'fa fa-wrench';
-                case TrainAPICommand.RESULT_STATUS:
+                case AnalysisAPICommand.RESULT_STATUS:
                     return 'fas fa-shield-alt';
                 default:
                     return '';
@@ -103,9 +103,9 @@ export default defineComponent({
             switch (props.command) {
                 case 'resultDownload':
                     return 'dark';
-                case TrainAPICommand.RESULT_START:
+                case AnalysisAPICommand.RESULT_START:
                     return 'success';
-                case TrainAPICommand.RESULT_STATUS:
+                case AnalysisAPICommand.RESULT_STATUS:
                     return 'primary';
                 default:
                     return 'info';

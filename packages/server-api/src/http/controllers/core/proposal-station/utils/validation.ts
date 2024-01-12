@@ -6,7 +6,7 @@
  */
 
 import { check, validationResult } from 'express-validator';
-import { ProposalStationApprovalStatus } from '@personalhealthtrain/core';
+import { ProjectNodeApprovalStatus } from '@personalhealthtrain/core';
 import { NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/core';
 import type { Request } from 'routup';
@@ -42,7 +42,7 @@ export async function runProposalStationValidation(
     if (operation === 'update') {
         await check('approval_status')
             .optional()
-            .isIn(Object.values(ProposalStationApprovalStatus))
+            .isIn(Object.values(ProjectNodeApprovalStatus))
             .run(req);
 
         await check('comment')
@@ -64,24 +64,24 @@ export async function runProposalStationValidation(
     // ----------------------------------------------
 
     await extendRequestValidationResultWithRelation(result, ProposalEntity, {
-        id: 'proposal_id',
-        entity: 'proposal',
+        id: 'project_id',
+        entity: 'project',
     });
 
-    if (result.relation.proposal) {
-        result.data.proposal_realm_id = result.relation.proposal.realm_id;
+    if (result.relation.project) {
+        result.data.project_realm_id = result.relation.project.realm_id;
 
-        if (!isRealmResourceWritable(useRequestEnv(req, 'realm'), result.relation.proposal.realm_id)) {
+        if (!isRealmResourceWritable(useRequestEnv(req, 'realm'), result.relation.project.realm_id)) {
             throw new NotFoundError('The referenced proposal realm is not permitted.');
         }
     }
 
     await extendRequestValidationResultWithRelation(result, StationEntity, {
-        id: 'station_id',
-        entity: 'station',
+        id: 'node_id',
+        entity: 'node',
     });
-    if (result.relation.station) {
-        result.data.station_realm_id = result.relation.station.realm_id;
+    if (result.relation.node) {
+        result.data.node_realm_id = result.relation.node.realm_id;
     }
 
     return result;

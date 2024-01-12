@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { MasterImage, Train, TrainStation } from '@personalhealthtrain/core';
+import type { MasterImage, Analysis, TrainStation } from '@personalhealthtrain/core';
 import type { PropType } from 'vue';
 import {
     defineComponent, ref,
@@ -29,7 +29,7 @@ export default defineComponent({
     },
     props: {
         train: {
-            type: Object as PropType<Train>,
+            type: Object as PropType<Analysis>,
             required: true,
         },
     },
@@ -109,7 +109,7 @@ export default defineComponent({
                         ref="proposalStationList"
                         :realm-id="train.realm_id"
                         :direction="'out'"
-                        :query="{filters: {proposal_id: train.proposal_id}}"
+                        :query="{filters: {proposal_id: train.project_id}}"
                     >
                         <template #header="props">
                             <span>Stations <span class="text-info">available</span></span>

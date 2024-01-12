@@ -6,8 +6,8 @@
   -->
 <script lang="ts">
 import type {
-    Proposal,
-    ProposalStation,
+    Project,
+    ProjectNode,
 } from '@personalhealthtrain/core';
 import {
     DomainType,
@@ -39,8 +39,8 @@ export default defineNuxtComponent({
 
         const toast = useToast();
 
-        const manager = createEntityManager<`${DomainType.PROPOSAL}`>({
-            type: `${DomainType.PROPOSAL}`,
+        const manager = createEntityManager<`${DomainType.PROJECT}`>({
+            type: `${DomainType.PROJECT}`,
             props: {
                 entityId: useRoute().params.id as string,
             },
@@ -68,10 +68,10 @@ export default defineNuxtComponent({
 
         const store = useAuthStore();
 
-        const proposalStation : Ref<ProposalStation | null> = ref(null);
+        const proposalStation : Ref<ProjectNode | null> = ref(null);
 
         if (manager.data.value.realm_id !== store.realmId) {
-            const response = await useAPI().proposalStation.getMany({
+            const response = await useAPI().projectNode.getMany({
                 filter: {
                     proposal_id: manager.data.value.id,
                     station_realm_id: store.realmId,
@@ -111,7 +111,7 @@ export default defineNuxtComponent({
 
             if (
                 isProposalOwner.value &&
-                store.has(PermissionID.PROPOSAL_EDIT)
+                store.has(PermissionID.PROJECT_EDIT)
             ) {
                 items.push({ name: 'Settings', icon: 'fa fa-cog', urlSuffix: '/settings' });
             }
@@ -119,7 +119,7 @@ export default defineNuxtComponent({
             return items;
         });
 
-        const handleUpdated = (data: Proposal) => {
+        const handleUpdated = (data: Project) => {
             manager.updated(data);
         };
 

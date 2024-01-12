@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Proposal } from '@personalhealthtrain/core';
+import type { Project } from '@personalhealthtrain/core';
 import { PermissionID } from '@personalhealthtrain/core';
 import type { PropType } from 'vue';
 import { ProposalForm } from '@personalhealthtrain/client-vue';
@@ -17,20 +17,20 @@ export default defineNuxtComponent({
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
         [LayoutKey.REQUIRED_PERMISSIONS]: [
-            PermissionID.PROPOSAL_EDIT,
-            PermissionID.PROPOSAL_DROP,
+            PermissionID.PROJECT_EDIT,
+            PermissionID.PROJECT_DROP,
         ],
     },
     components: { ProposalForm },
     props: {
         proposal: {
-            type: Object as PropType<Proposal>,
+            type: Object as PropType<Project>,
             required: true,
         },
     },
     emits: ['updated'],
     setup(props, { emit }) {
-        const handleUpdated = (entity: Proposal) => {
+        const handleUpdated = (entity: Project) => {
             emit('updated', entity);
         };
 

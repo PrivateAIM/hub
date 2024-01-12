@@ -32,9 +32,9 @@ export function registerTrainLogSocketHandlers(
     if (!socket.data.userId && !socket.data.robotId) return;
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainType.TRAIN_LOG, DomainEventSubscriptionName.SUBSCRIBE),
+        buildDomainEventSubscriptionFullName(DomainType.ANALYSIS_LOG, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
-            if (!socket.data.ability.has(PermissionID.TRAIN_EDIT)) {
+            if (!socket.data.ability.has(PermissionID.ANALYSIS_EDIT)) {
                 if (isSocketClientToServerEventErrorCallback(cb)) {
                     cb(new UnauthorizedError());
                 }
@@ -42,7 +42,7 @@ export function registerTrainLogSocketHandlers(
                 return;
             }
 
-            incrSocketRoomConnections(socket, buildDomainChannelName(DomainType.TRAIN_LOG, target));
+            incrSocketRoomConnections(socket, buildDomainChannelName(DomainType.ANALYSIS_LOG, target));
 
             if (isSocketClientToServerEventCallback(cb)) {
                 cb();
@@ -51,9 +51,9 @@ export function registerTrainLogSocketHandlers(
     );
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainType.TRAIN_LOG, DomainEventSubscriptionName.UNSUBSCRIBE),
+        buildDomainEventSubscriptionFullName(DomainType.ANALYSIS_LOG, DomainEventSubscriptionName.UNSUBSCRIBE),
         (target) => {
-            decrSocketRoomConnections(socket, buildDomainChannelName(DomainType.TRAIN_LOG, target));
+            decrSocketRoomConnections(socket, buildDomainChannelName(DomainType.ANALYSIS_LOG, target));
         },
     );
 }

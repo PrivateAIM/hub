@@ -6,8 +6,8 @@
  */
 
 import type {
-    Train,
-    TrainAPICommand,
+    Analysis,
+    AnalysisAPICommand,
 } from '@personalhealthtrain/core';
 import {
     DBody, DController, DDelete, DGet, DPath, DPost, DRequest, DResponse, DTags,
@@ -24,7 +24,7 @@ import {
 } from './handlers';
 import { ForceLoggedInMiddleware } from '../../../middleware';
 
-type PartialTrain = Partial<Train>;
+type PartialTrain = Partial<Analysis>;
 
 @DTags('train')
 @DController('/trains')
@@ -87,7 +87,7 @@ export class TrainController {
     async doTask(
         @DPath('id') id: string,
             @DBody() data: {
-                command: TrainAPICommand
+                command: AnalysisAPICommand
             },
             @DRequest() req: any,
             @DResponse() res: any,

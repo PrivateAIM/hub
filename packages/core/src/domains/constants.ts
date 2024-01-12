@@ -8,24 +8,23 @@
 export enum DomainType {
     MASTER_IMAGE = 'masterImage',
     MASTER_IMAGE_GROUP = 'masterImageGroup',
-    PROPOSAL = 'proposal',
-    PROPOSAL_STATION = 'proposalStation',
+    PROJECT = 'project',
+    PROJECT_NODE = 'projectNode',
     REGISTRY = 'registry',
     REGISTRY_PROJECT = 'registryProject',
-    STATION = 'station',
+    NODE = 'node',
     SERVICE = 'service', // special domain type
-    TRAIN = 'train',
-    TRAIN_FILE = 'trainFile',
-    TRAIN_LOG = 'trainLog',
-    TRAIN_STATION = 'trainStation',
-    USER_SECRET = 'userSecret',
+    ANALYSIS = 'analysis',
+    ANALYSIS_FILE = 'analysisFile',
+    ANALYSIS_LOG = 'analysisLog',
+    TRAIN_STATION = 'analysisNode'
 }
 
 export enum DomainSubType {
-    PROPOSAL_STATION_IN = 'proposalStationIn',
-    PROPOSAL_STATION_OUT = 'proposalStationOut',
-    TRAIN_STATION_IN = 'trainStationIn',
-    TRAIN_STATION_OUT = 'TrainStationOut',
+    PROJECT_NODE_IN = 'projectNodeIn',
+    PROJECT_NODE_OUT = 'projectNodeOut',
+    ANALYSIS_NODE_IN = 'analysisNodeIn',
+    ANALYSIS_NODE_OUT = 'analysisNodeOut',
 }
 
 export enum DomainEventName {

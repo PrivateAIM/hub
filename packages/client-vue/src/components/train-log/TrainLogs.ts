@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import type {
-    TrainLog,
+    AnalysisLog,
 } from '@personalhealthtrain/core';
 import {
     DomainType,
@@ -33,7 +33,7 @@ export default defineComponent({
     setup(props, setup) {
         const rootNode = ref<null | HTMLElement>(null);
 
-        const scrollToLastLine = (meta: ListMeta<TrainLog>) => {
+        const scrollToLastLine = (meta: ListMeta<AnalysisLog>) => {
             if (!rootNode.value) {
                 return;
             }
@@ -49,13 +49,13 @@ export default defineComponent({
             render,
             setDefaults,
         } = createList({
-            type: `${DomainType.TRAIN_LOG}`,
+            type: `${DomainType.ANALYSIS_LOG}`,
             onCreated(_entity, meta) {
                 scrollToLastLine(meta);
             },
             socket: {
                 processEvent(event) {
-                    return event.meta.roomName !== buildDomainChannelName(DomainType.TRAIN_LOG) ||
+                    return event.meta.roomName !== buildDomainChannelName(DomainType.ANALYSIS_LOG) ||
                         event.data.train_id !== props.entityId;
                 },
             },
@@ -80,7 +80,7 @@ export default defineComponent({
                 content: 'No more logs available...',
             },
             item: {
-                content(item: TrainLog, slotProps: ListItemSlotProps<TrainLog>) {
+                content(item: AnalysisLog, slotProps: ListItemSlotProps<AnalysisLog>) {
                     return h(
                         TrainLogComponent,
                         {
@@ -91,7 +91,7 @@ export default defineComponent({
                                     slotProps.deleted(item);
                                 }
                             },
-                            onUpdated(e: TrainLog) {
+                            onUpdated(e: AnalysisLog) {
                                 if (slotProps && slotProps.updated) {
                                     slotProps.updated(e);
                                 }

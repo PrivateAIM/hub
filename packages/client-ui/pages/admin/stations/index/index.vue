@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 import { VCTimeago } from '@vuecs/timeago';
-import type { Station } from '@personalhealthtrain/core';
+import type { Node } from '@personalhealthtrain/core';
 import { PermissionID } from '@personalhealthtrain/core';
 import { BTable } from 'bootstrap-vue-next';
 import { storeToRefs } from 'pinia';
@@ -58,18 +58,18 @@ export default defineNuxtComponent({
         const store = useAuthStore();
         const { realmManagementId } = storeToRefs(store);
 
-        const canView = computed(() => store.has(PermissionID.STATION_EDIT) ||
-                store.has(PermissionID.STATION_DROP));
+        const canView = computed(() => store.has(PermissionID.NODE_EDIT) ||
+                store.has(PermissionID.NODE_DROP));
 
-        const canDrop = computed(() => store.has(PermissionID.STATION_DROP));
+        const canDrop = computed(() => store.has(PermissionID.NODE_DROP));
 
-        const query = computed<BuildInput<Station>>(() => ({
+        const query = computed<BuildInput<Node>>(() => ({
             filters: {
                 realm_id: realmManagementId.value,
             },
         }));
 
-        const handleDeleted = async (item: Station) => {
+        const handleDeleted = async (item: Node) => {
             emit('deleted', item);
         };
 

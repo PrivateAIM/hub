@@ -29,10 +29,10 @@ export async function updateTrainStationRouteHandler(req: Request, res: Response
     const ability = useRequestEnv(req, 'ability');
 
     const isAuthorityOfStation = isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.station_realm_id);
-    const isAuthorizedForStation = ability.has(PermissionID.TRAIN_APPROVE);
+    const isAuthorizedForStation = ability.has(PermissionID.ANALYSIS_APPROVE);
 
     const isAuthorityOfTrain = isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.train_realm_id);
-    const isAuthorizedForTrain = ability.has(PermissionID.TRAIN_EDIT);
+    const isAuthorizedForTrain = ability.has(PermissionID.ANALYSIS_EDIT);
 
     if (
         !(isAuthorityOfStation && isAuthorizedForStation) &&

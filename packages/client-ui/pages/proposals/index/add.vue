@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Proposal } from '@personalhealthtrain/core';
+import type { Project } from '@personalhealthtrain/core';
 import {
     PermissionID,
 } from '@personalhealthtrain/core';
@@ -25,10 +25,10 @@ export default defineNuxtComponent({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
             [LayoutKey.REQUIRED_PERMISSIONS]: [
-                PermissionID.PROPOSAL_ADD,
+                PermissionID.PROJECT_ADD,
             ],
         });
-        const handleCreated = (entity: Proposal) => {
+        const handleCreated = (entity: Project) => {
             emit('created', entity);
         };
 

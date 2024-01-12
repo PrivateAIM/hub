@@ -7,12 +7,12 @@
 
 import type {
     RegistryProject,
-    Station,
+    Node,
     TrainStation,
 } from '@personalhealthtrain/core';
 import type { RouterRoutePayload } from '../../type';
 
-export type StationExtended = Station & Pick<TrainStation, 'index' | 'run_status'>;
+export type StationExtended = Node & Pick<TrainStation, 'index' | 'run_status'>;
 
 export type RouteContext = {
     payload: RouterRoutePayload,

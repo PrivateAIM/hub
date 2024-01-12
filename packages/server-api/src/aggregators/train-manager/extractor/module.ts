@@ -15,8 +15,8 @@ import {
     ExtractorEvent,
 } from '@personalhealthtrain/server-train-manager';
 import {
-    TrainBuildStatus,
-    TrainResultStatus,
+    AnalysisBuildStatus,
+    AnalysisResultStatus,
 } from '@personalhealthtrain/core';
 import { useDataSource } from 'typeorm-extension';
 import { TrainEntity } from '../../../domains/train';
@@ -45,24 +45,24 @@ export async function handleTrainManagerExtractorEvent(
 
     // -------------------------------------------------------------------------------
 
-    let status : TrainResultStatus;
+    let status : AnalysisResultStatus;
 
     switch (context.event) {
         case ExtractorEvent.DOWNLOADING:
-            status = TrainResultStatus.DOWNLOADING;
+            status = AnalysisResultStatus.DOWNLOADING;
             break;
         case ExtractorEvent.DOWNLOADED:
-            status = TrainResultStatus.DOWNLOADED;
+            status = AnalysisResultStatus.DOWNLOADED;
             break;
         case ExtractorEvent.EXTRACTING:
-            status = TrainResultStatus.PROCESSING;
+            status = AnalysisResultStatus.PROCESSING;
             break;
         case ExtractorEvent.EXTRACTED:
-            status = TrainResultStatus.FINISHED;
+            status = AnalysisResultStatus.FINISHED;
             break;
         case ExtractorEvent.FAILED: {
             if (context.command === ExtractorCommand.EXTRACT) {
-                status = TrainResultStatus.FAILED;
+                status = AnalysisResultStatus.FAILED;
             }
 
             if (
@@ -71,7 +71,7 @@ export async function handleTrainManagerExtractorEvent(
             ) {
                 trainLogContext = {
                     ...trainLogContext,
-                    status: TrainBuildStatus.FAILED,
+                    status: AnalysisBuildStatus.FAILED,
                     statusMessage: context.error.message,
 
                     error: true,

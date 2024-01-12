@@ -9,7 +9,7 @@ import type { EntityManagerSlotProps } from '@authup/client-vue';
 import { ARobot } from '@authup/client-vue';
 import type { PropType } from 'vue';
 import { defineComponent, h, reactive } from 'vue';
-import type { Station } from '@personalhealthtrain/core';
+import type { Node } from '@personalhealthtrain/core';
 import {
     Ecosystem,
 } from '@personalhealthtrain/core';
@@ -22,7 +22,7 @@ import { initFormAttributesFromSource, useValidationTranslator } from '../../cor
 export default defineComponent({
     props: {
         entity: {
-            type: Object as PropType<Station>,
+            type: Object as PropType<Node>,
             required: true,
         },
     },

@@ -16,11 +16,11 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 import type {
-    Station,
-    Train,
+    Node,
+    Analysis,
     TrainStation,
-    TrainStationApprovalStatus,
-    TrainStationRunStatus,
+    AnalysisNodeApprovalStatus,
+    AnalysisNodeRunStatus,
 } from '@personalhealthtrain/core';
 import type { Realm } from '@authup/core';
 import { TrainEntity } from '../train/entity';
@@ -36,10 +36,10 @@ export class TrainStationEntity implements TrainStation {
     // ------------------------------------------------------------------
 
     @Column({ default: null })
-        approval_status: TrainStationApprovalStatus | null;
+        approval_status: AnalysisNodeApprovalStatus | null;
 
     @Column({ type: 'varchar', nullable: true, default: null })
-        run_status: TrainStationRunStatus | null;
+        run_status: AnalysisNodeRunStatus | null;
 
     // ------------------------------------------------------------------
 
@@ -66,7 +66,7 @@ export class TrainStationEntity implements TrainStation {
     // ------------------------------------------------------------------
 
     @Column()
-        train_id: Train['id'];
+        train_id: Analysis['id'];
 
     @ManyToOne(() => TrainEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'train_id' })
@@ -76,7 +76,7 @@ export class TrainStationEntity implements TrainStation {
         train_realm_id: Realm['id'];
 
     @Column()
-        station_id: Station['id'];
+        station_id: Node['id'];
 
     @ManyToOne(() => StationEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'station_id' })

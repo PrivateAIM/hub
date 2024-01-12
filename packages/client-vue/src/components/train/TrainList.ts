@@ -6,7 +6,7 @@
  */
 import { DomainType } from '@personalhealthtrain/core';
 import type {
-    Train,
+    Analysis,
 } from '@personalhealthtrain/core';
 import type { SetupContext, SlotsType } from 'vue';
 import { defineComponent, h } from 'vue';
@@ -15,10 +15,10 @@ import { createList, defineListEvents, defineListProps } from '../../core';
 import TrainItem from './TrainItem';
 
 export default defineComponent({
-    props: defineListProps<Train>(),
-    slots: Object as SlotsType<ListSlotsType<Train>>,
+    props: defineListProps<Analysis>(),
+    slots: Object as SlotsType<ListSlotsType<Analysis>>,
     emits: {
-        ...defineListEvents<Train>(),
+        ...defineListEvents<Analysis>(),
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         executed: (_component: string, _command :string) => true,
     },
@@ -29,9 +29,9 @@ export default defineComponent({
             handleUpdated,
             handleDeleted,
         } = createList({
-            type: `${DomainType.TRAIN}`,
+            type: `${DomainType.ANALYSIS}`,
             props,
-            setup: setup as unknown as SetupContext<ListEventsType<Train>>,
+            setup: setup as unknown as SetupContext<ListEventsType<Analysis>>,
         });
 
         setDefaults({

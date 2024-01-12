@@ -6,7 +6,7 @@
  */
 
 import { BadRequestError } from '@ebec/http';
-import { TrainBuildStatus } from '@personalhealthtrain/core';
+import { AnalysisBuildStatus } from '@personalhealthtrain/core';
 import { useDataSource } from 'typeorm-extension';
 import { resolveTrain } from './utils';
 import { TrainEntity } from '../entity';
@@ -21,14 +21,14 @@ export async function stopBuildTrain(train: TrainEntity | string) : Promise<Trai
         throw new BadRequestError('The train build can not longer be stopped...');
     } else {
         // if we already send a stop event, we dont send it again... :)
-        if (train.build_status !== TrainBuildStatus.STOPPING) {
+        if (train.build_status !== AnalysisBuildStatus.STOPPING) {
             // todo: implement stop routine
         }
 
         train = repository.merge(train, {
-            build_status: train.build_status !== TrainBuildStatus.STOPPING ?
-                TrainBuildStatus.STOPPING :
-                TrainBuildStatus.STOPPED,
+            build_status: train.build_status !== AnalysisBuildStatus.STOPPING ?
+                AnalysisBuildStatus.STOPPING :
+                AnalysisBuildStatus.STOPPED,
         });
 
         await repository.save(train);

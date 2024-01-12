@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import { VCTimeago } from '@vuecs/timeago';
-import type { TrainLog } from '@personalhealthtrain/core';
+import type { AnalysisLog } from '@personalhealthtrain/core';
 import { defineComponent, h, toRefs } from 'vue';
 import type {
     PropType, VNode, VNodeArrayChildren,
@@ -19,7 +19,7 @@ export default defineComponent({
             default: 0,
         },
         entity: {
-            type: Object as PropType<TrainLog>,
+            type: Object as PropType<AnalysisLog>,
             required: true,
         },
     },

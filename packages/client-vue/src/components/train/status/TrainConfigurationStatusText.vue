@@ -15,7 +15,7 @@
     </span>
 </template>
 <script lang="ts">
-import { TrainConfigurationStatus } from '@personalhealthtrain/core';
+import { AnalysisConfigurationStatus } from '@personalhealthtrain/core';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
@@ -28,17 +28,17 @@ export default defineComponent({
     computed: {
         statusText() {
             switch (this.status) {
-                case TrainConfigurationStatus.BASE_CONFIGURED:
+                case AnalysisConfigurationStatus.BASE_CONFIGURED:
                     return 'base configured';
-                case TrainConfigurationStatus.SECURITY_CONFIGURED:
+                case AnalysisConfigurationStatus.SECURITY_CONFIGURED:
                     return 'security configured';
-                case TrainConfigurationStatus.RESOURCE_CONFIGURED:
+                case AnalysisConfigurationStatus.RESOURCE_CONFIGURED:
                     return 'files uploaded';
-                case TrainConfigurationStatus.HASH_GENERATED:
+                case AnalysisConfigurationStatus.HASH_GENERATED:
                     return 'hash generated';
-                case TrainConfigurationStatus.HASH_SIGNED:
+                case AnalysisConfigurationStatus.HASH_SIGNED:
                     return 'hash signed';
-                case TrainConfigurationStatus.FINISHED:
+                case AnalysisConfigurationStatus.FINISHED:
                     return 'finished';
                 default:
                     return 'none';
@@ -46,13 +46,13 @@ export default defineComponent({
         },
         classSuffix() {
             switch (this.status) {
-                case TrainConfigurationStatus.BASE_CONFIGURED:
-                case TrainConfigurationStatus.SECURITY_CONFIGURED:
-                case TrainConfigurationStatus.RESOURCE_CONFIGURED:
-                case TrainConfigurationStatus.HASH_SIGNED:
-                case TrainConfigurationStatus.HASH_GENERATED:
+                case AnalysisConfigurationStatus.BASE_CONFIGURED:
+                case AnalysisConfigurationStatus.SECURITY_CONFIGURED:
+                case AnalysisConfigurationStatus.RESOURCE_CONFIGURED:
+                case AnalysisConfigurationStatus.HASH_SIGNED:
+                case AnalysisConfigurationStatus.HASH_GENERATED:
                     return 'primary';
-                case TrainConfigurationStatus.FINISHED:
+                case AnalysisConfigurationStatus.FINISHED:
                     return 'success';
                 default:
                     return 'info';
@@ -60,17 +60,17 @@ export default defineComponent({
         },
         iconClass() {
             switch (this.status) {
-                case TrainConfigurationStatus.BASE_CONFIGURED:
+                case AnalysisConfigurationStatus.BASE_CONFIGURED:
                     return 'fas fa-cog';
-                case TrainConfigurationStatus.SECURITY_CONFIGURED:
+                case AnalysisConfigurationStatus.SECURITY_CONFIGURED:
                     return 'fa fa-key';
-                case TrainConfigurationStatus.RESOURCE_CONFIGURED:
+                case AnalysisConfigurationStatus.RESOURCE_CONFIGURED:
                     return 'fa fa-clone';
-                case TrainConfigurationStatus.HASH_GENERATED:
+                case AnalysisConfigurationStatus.HASH_GENERATED:
                     return 'fa fa-signature';
-                case TrainConfigurationStatus.HASH_SIGNED:
+                case AnalysisConfigurationStatus.HASH_SIGNED:
                     return 'fa fa-signature';
-                case TrainConfigurationStatus.FINISHED:
+                case AnalysisConfigurationStatus.FINISHED:
                     return 'fa fa-sign';
                 default:
                     return '';

@@ -11,7 +11,7 @@ import type {
 } from 'typeorm';
 import { EventSubscriber } from 'typeorm';
 import type {
-    TrainFile,
+    AnalysisFile,
 } from '@personalhealthtrain/core';
 import {
     DomainEventName,
@@ -23,20 +23,20 @@ import { TrainFileEntity } from '../../domains';
 
 async function publishEvent(
     event: `${DomainEventName}`,
-    data: TrainFile,
+    data: AnalysisFile,
 ) {
     await publishDomainEvent(
         {
-            type: DomainType.TRAIN_FILE,
+            type: DomainType.ANALYSIS_FILE,
             event,
             data,
         },
         [
             {
-                channel: (id) => buildDomainChannelName(DomainType.TRAIN_FILE, id),
+                channel: (id) => buildDomainChannelName(DomainType.ANALYSIS_FILE, id),
             },
             {
-                channel: (id) => buildDomainChannelName(DomainType.TRAIN_FILE, id),
+                channel: (id) => buildDomainChannelName(DomainType.ANALYSIS_FILE, id),
                 namespace: buildDomainNamespaceName(data.realm_id),
             },
         ],

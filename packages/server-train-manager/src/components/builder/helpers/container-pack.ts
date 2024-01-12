@@ -8,7 +8,7 @@
 import stream from 'node:stream';
 import crypto from 'node:crypto';
 import type { APIClient } from '@personalhealthtrain/core';
-import { TrainContainerFileName, TrainContainerPath } from '@personalhealthtrain/core';
+import { TrainContainerFileName, AnalysisContainerPath } from '@personalhealthtrain/core';
 import type { Container } from 'dockerode';
 import { useClient } from 'hapic';
 import tar from 'tar-stream';
@@ -165,7 +165,7 @@ export async function packContainerWithTrain(container: Container, context: Cont
 
                     pack.finalize();
 
-                    container.putArchive(pack, { path: TrainContainerPath.MAIN })
+                    container.putArchive(pack, { path: AnalysisContainerPath.MAIN })
                         .then(() => resolve())
                         .catch(() => reject(new BuilderError('The train pack stream could not be forwarded to the container.')));
                 });

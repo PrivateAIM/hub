@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { TrainRunStatus } from '@personalhealthtrain/core';
+import { AnalysisRunStatus } from '@personalhealthtrain/core';
 import { RouterCommand, buildRouterQueuePayload } from '@personalhealthtrain/server-train-manager';
 import { publish } from 'amqp-extension';
 import { BadRequestError } from '@ebec/http';
@@ -19,10 +19,10 @@ export async function resetTrain(train: TrainEntity | string) : Promise<TrainEnt
 
     train = await resolveTrain(train, repository);
 
-    if (train.run_status === TrainRunStatus.FINISHED) {
+    if (train.run_status === AnalysisRunStatus.FINISHED) {
         throw new BadRequestError('The train has already been terminated...');
     } else {
-        if (train.run_status !== TrainRunStatus.STOPPING) {
+        if (train.run_status !== AnalysisRunStatus.STOPPING) {
             await publish(buildRouterQueuePayload({
                 command: RouterCommand.RESET,
                 data: {
@@ -32,7 +32,7 @@ export async function resetTrain(train: TrainEntity | string) : Promise<TrainEnt
         }
 
         train = repository.merge(train, {
-            run_status: train.run_status !== TrainRunStatus.STOPPING ? TrainRunStatus.STOPPING : TrainRunStatus.STOPPED,
+            run_status: train.run_status !== AnalysisRunStatus.STOPPING ? AnalysisRunStatus.STOPPING : AnalysisRunStatus.STOPPED,
         });
 
         await repository.save(train);

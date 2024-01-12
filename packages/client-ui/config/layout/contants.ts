@@ -55,19 +55,19 @@ export const LayoutSideDefaultNavigation: NavigationItem[] = [
         icon: 'fas fa-file',
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
         [LayoutKey.REQUIRED_PERMISSIONS]: [
-            PermissionID.PROPOSAL_ADD,
-            PermissionID.PROPOSAL_DROP,
-            PermissionID.PROPOSAL_EDIT,
+            PermissionID.PROJECT_ADD,
+            PermissionID.PROJECT_DROP,
+            PermissionID.PROJECT_EDIT,
             PermissionID.PROPOSAL_APPROVE,
 
-            PermissionID.TRAIN_ADD,
-            PermissionID.TRAIN_DROP,
-            PermissionID.TRAIN_EDIT,
-            PermissionID.TRAIN_APPROVE,
+            PermissionID.ANALYSIS_ADD,
+            PermissionID.ANALYSIS_DROP,
+            PermissionID.ANALYSIS_EDIT,
+            PermissionID.ANALYSIS_APPROVE,
 
-            PermissionID.TRAIN_RESULT_READ,
-            PermissionID.TRAIN_EXECUTION_START,
-            PermissionID.TRAIN_EXECUTION_STOP,
+            PermissionID.ANALYSIS_RESULT_READ,
+            PermissionID.ANALYSIS_EXECUTION_START,
+            PermissionID.ANALYSIS_EXECUTION_STOP,
         ],
     },
     {
@@ -77,13 +77,13 @@ export const LayoutSideDefaultNavigation: NavigationItem[] = [
         icon: 'fas fa-train',
         requireLoggedIn: true,
         requirePermissions: [
-            PermissionID.TRAIN_ADD,
-            PermissionID.TRAIN_DROP,
-            PermissionID.TRAIN_EDIT,
-            PermissionID.TRAIN_APPROVE,
+            PermissionID.ANALYSIS_ADD,
+            PermissionID.ANALYSIS_DROP,
+            PermissionID.ANALYSIS_EDIT,
+            PermissionID.ANALYSIS_APPROVE,
 
-            PermissionID.TRAIN_EXECUTION_START,
-            PermissionID.TRAIN_EXECUTION_STOP,
+            PermissionID.ANALYSIS_EXECUTION_START,
+            PermissionID.ANALYSIS_EXECUTION_STOP,
         ],
     },
     {
@@ -148,7 +148,7 @@ export const LayoutSideAdminNavigation: NavigationItem[] = [
 
                     PermissionID.PROVIDER_ADD,
                     PermissionID.PROVIDER_DROP,
-                    PermissionID.PROPOSAL_EDIT,
+                    PermissionID.PROJECT_EDIT,
                 ],
             },
             {
@@ -222,9 +222,9 @@ export const LayoutSideAdminNavigation: NavigationItem[] = [
         icon: 'fas fa-globe',
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
         [LayoutKey.REQUIRED_PERMISSIONS]: [
-            PermissionID.STATION_ADD,
-            PermissionID.STATION_DROP,
-            PermissionID.STATION_EDIT,
+            PermissionID.NODE_ADD,
+            PermissionID.NODE_DROP,
+            PermissionID.NODE_EDIT,
 
             PermissionID.SERVICE_MANAGE,
         ],
@@ -236,9 +236,9 @@ export const LayoutSideAdminNavigation: NavigationItem[] = [
                 icon: 'fa-solid fa-house-medical',
                 [LayoutKey.REQUIRED_LOGGED_IN]: true,
                 [LayoutKey.REQUIRED_PERMISSIONS]: [
-                    PermissionID.STATION_ADD,
-                    PermissionID.STATION_DROP,
-                    PermissionID.STATION_EDIT,
+                    PermissionID.NODE_ADD,
+                    PermissionID.NODE_DROP,
+                    PermissionID.NODE_EDIT,
                 ],
             },
             {

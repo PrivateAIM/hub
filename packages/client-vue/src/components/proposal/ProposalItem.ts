@@ -12,7 +12,7 @@ import {
     computed, defineComponent, h,
 } from 'vue';
 import type {
-    Proposal,
+    Project,
 } from '@personalhealthtrain/core';
 import {
     DomainType,
@@ -29,14 +29,14 @@ import type { EntityManagerSlotProps } from '../../core';
 export default defineComponent({
     props: {
         entity: {
-            type: Object as PropType<Proposal>,
+            type: Object as PropType<Project>,
             required: true,
         },
     },
     emits: ['updated', 'failed', 'deleted'],
     setup(props, { slots, emit }) {
         const store = injectAuthupStore();
-        const canDrop = computed(() => store.has(PermissionID.PROPOSAL_DROP));
+        const canDrop = computed(() => store.has(PermissionID.PROJECT_DROP));
 
         return () => h(ProposalEntity, {
             entity: props.entity,
@@ -50,7 +50,7 @@ export default defineComponent({
                 emit('failed', e);
             },
         }, {
-            default: (props: EntityManagerSlotProps<Proposal>) => {
+            default: (props: EntityManagerSlotProps<Project>) => {
                 if (!props.data) {
                     return [];
                 }
@@ -65,8 +65,8 @@ export default defineComponent({
                         {
                             withText: false,
                             entityId: props.data.id,
-                            entityType: DomainType.PROPOSAL,
-                            disabled: props.busy || props.data.trains > 0,
+                            entityType: DomainType.PROJECT,
+                            disabled: props.busy || props.data.analyses > 0,
                             class: 'btn btn-xs btn-danger ms-1',
                             onDeleted(data: any) {
                                 props.deleted(data);
@@ -120,7 +120,7 @@ export default defineComponent({
                                                 class: 'mb-0',
                                             },
                                             [
-                                                props.data.title,
+                                                props.data.name,
                                             ],
                                         ),
                                     ],
@@ -144,7 +144,7 @@ export default defineComponent({
                                     h(
                                         'small',
                                         [
-                                            h('span', { class: 'text-primary' }, [props.data.trains]),
+                                            h('span', { class: 'text-primary' }, [props.data.analyses]),
                                             ' ',
                                             'Train(s)',
                                         ],

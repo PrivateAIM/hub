@@ -91,11 +91,11 @@ export default defineComponent({
                 },
                 buildChannelName(id) {
                     if (props.direction === Direction.IN) {
-                        return buildDomainChannelName(DomainSubType.TRAIN_STATION_IN, id);
+                        return buildDomainChannelName(DomainSubType.ANALYSIS_NODE_IN, id);
                     }
 
                     if (props.direction === Direction.OUT) {
-                        return buildDomainChannelName(DomainSubType.TRAIN_STATION_OUT, id);
+                        return buildDomainChannelName(DomainSubType.ANALYSIS_NODE_OUT, id);
                     }
 
                     return buildDomainChannelName(DomainType.TRAIN_STATION, id);

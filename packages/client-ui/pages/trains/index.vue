@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Train } from '@personalhealthtrain/core';
+import type { Analysis } from '@personalhealthtrain/core';
 import { defineNuxtComponent } from '#app';
 import { definePageMeta, navigateTo, useToast } from '#imports';
 import DomainEntityNav from '../../components/DomainEntityNav';
@@ -38,7 +38,7 @@ export default defineNuxtComponent({
 
         const toast = useToast();
 
-        const handleCreated = async (train: Train) => {
+        const handleCreated = async (train: Analysis) => {
             toast.show({ variant: 'success', body: 'The train was successfully created.' });
 
             await navigateTo(`/trains/${train.id}/setup`);

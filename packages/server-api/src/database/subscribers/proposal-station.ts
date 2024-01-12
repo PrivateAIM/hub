@@ -16,7 +16,7 @@ import {
     EventSubscriber,
 } from 'typeorm';
 import type {
-    ProposalStation,
+    ProjectNode,
 } from '@personalhealthtrain/core';
 import {
     DomainEventName,
@@ -29,31 +29,31 @@ import { ProposalStationEntity } from '../../domains';
 
 async function publishEvent(
     event: `${DomainEventName}`,
-    data: ProposalStation,
+    data: ProjectNode,
 ) {
     await publishDomainEvent(
         {
-            type: DomainType.PROPOSAL_STATION,
+            type: DomainType.PROJECT_NODE,
             event,
             data,
         },
         [
             {
-                channel: (id) => buildDomainChannelName(DomainSubType.PROPOSAL_STATION_IN, id),
-                namespace: buildDomainNamespaceName(data.station_realm_id),
+                channel: (id) => buildDomainChannelName(DomainSubType.PROJECT_NODE_IN, id),
+                namespace: buildDomainNamespaceName(data.node_realm_id),
             },
             {
-                channel: (id) => buildDomainChannelName(DomainSubType.PROPOSAL_STATION_OUT, id),
-                namespace: buildDomainNamespaceName(data.proposal_realm_id),
+                channel: (id) => buildDomainChannelName(DomainSubType.PROJECT_NODE_OUT, id),
+                namespace: buildDomainNamespaceName(data.project_realm_id),
             },
             {
-                channel: (id) => buildDomainChannelName(DomainType.PROPOSAL_STATION, id),
+                channel: (id) => buildDomainChannelName(DomainType.PROJECT_NODE, id),
             },
             {
-                channel: (id) => buildDomainChannelName(DomainSubType.PROPOSAL_STATION_IN, id),
+                channel: (id) => buildDomainChannelName(DomainSubType.PROJECT_NODE_IN, id),
             },
             {
-                channel: (id) => buildDomainChannelName(DomainSubType.PROPOSAL_STATION_OUT, id),
+                channel: (id) => buildDomainChannelName(DomainSubType.PROJECT_NODE_OUT, id),
             },
         ],
     );

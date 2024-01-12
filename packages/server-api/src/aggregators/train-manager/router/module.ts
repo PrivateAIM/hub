@@ -8,9 +8,9 @@
 import {
     REGISTRY_ARTIFACT_TAG_BASE,
     RegistryProjectType,
-    TrainContainerPath,
-    TrainRunStatus,
-    TrainStationRunStatus,
+    AnalysisContainerPath,
+    AnalysisRunStatus,
+    AnalysisNodeRunStatus,
 } from '@personalhealthtrain/core';
 import type { ComponentContextWithError } from '@personalhealthtrain/server-core';
 import { ComponentError, isComponentContextWithError } from '@personalhealthtrain/server-core';
@@ -85,15 +85,15 @@ export async function handleTrainManagerRouterEvent(
 
             switch (registryProject.type) {
                 case RegistryProjectType.INCOMING: {
-                    entity.run_status = TrainRunStatus.RUNNING;
-                    trainLogContext.status = TrainRunStatus.RUNNING;
+                    entity.run_status = AnalysisRunStatus.RUNNING;
+                    trainLogContext.status = AnalysisRunStatus.RUNNING;
 
                     await repository.save(entity);
                     break;
                 }
                 case RegistryProjectType.OUTGOING: {
-                    entity.run_status = TrainRunStatus.FINISHED;
-                    trainLogContext.status = TrainRunStatus.FINISHED;
+                    entity.run_status = AnalysisRunStatus.FINISHED;
+                    trainLogContext.status = AnalysisRunStatus.FINISHED;
 
                     entity.outgoing_registry_project_id = registryProject.id;
 
@@ -106,8 +106,8 @@ export async function handleTrainManagerRouterEvent(
                                 id: entity.id,
 
                                 filePaths: [
-                                    TrainContainerPath.RESULTS,
-                                    TrainContainerPath.CONFIG,
+                                    AnalysisContainerPath.RESULTS,
+                                    AnalysisContainerPath.CONFIG,
                                 ],
                             },
                         }));
@@ -115,8 +115,8 @@ export async function handleTrainManagerRouterEvent(
                     break;
                 }
                 case RegistryProjectType.STATION: {
-                    entity.run_status = TrainRunStatus.RUNNING;
-                    trainLogContext.status = TrainRunStatus.RUNNING;
+                    entity.run_status = AnalysisRunStatus.RUNNING;
+                    trainLogContext.status = AnalysisRunStatus.RUNNING;
 
                     const stationRepository = dataSource.getRepository(StationEntity);
                     const station = await stationRepository.findOneBy({
@@ -139,9 +139,9 @@ export async function handleTrainManagerRouterEvent(
 
                                 // operator was station ;)
                                 if (context.data.operator === registryProject.account_name) {
-                                    trainStation.run_status = TrainStationRunStatus.DEPARTED;
+                                    trainStation.run_status = AnalysisNodeRunStatus.DEPARTED;
                                 } else {
-                                    trainStation.run_status = TrainStationRunStatus.ARRIVED;
+                                    trainStation.run_status = AnalysisNodeRunStatus.ARRIVED;
                                 }
                             }
 
@@ -158,7 +158,7 @@ export async function handleTrainManagerRouterEvent(
         }
         case RouterEvent.FAILED: {
             if (context.command === RouterCommand.ROUTE) {
-                entity.run_status = TrainRunStatus.FAILED;
+                entity.run_status = AnalysisRunStatus.FAILED;
                 entity.run_station_id = null;
                 entity.run_station_index = null;
 
@@ -173,7 +173,7 @@ export async function handleTrainManagerRouterEvent(
             ) {
                 trainLogContext = {
                     ...trainLogContext,
-                    status: TrainRunStatus.FAILED,
+                    status: AnalysisRunStatus.FAILED,
 
                     error: true,
                     errorCode: `${context.error.code}`,
@@ -193,13 +193,13 @@ export async function handleTrainManagerRouterEvent(
             break;
         }
         case RouterEvent.STARTING: {
-            entity.run_status = TrainRunStatus.STARTING;
-            trainLogContext.status = TrainRunStatus.STARTING;
+            entity.run_status = AnalysisRunStatus.STARTING;
+            trainLogContext.status = AnalysisRunStatus.STARTING;
             break;
         }
         case RouterEvent.STARTED: {
-            entity.run_status = TrainRunStatus.STARTED;
-            trainLogContext.status = TrainRunStatus.STARTED;
+            entity.run_status = AnalysisRunStatus.STARTED;
+            trainLogContext.status = AnalysisRunStatus.STARTED;
 
             const trainStationRepository = dataSource.getRepository(TrainStationEntity);
             const trainStations = await trainStationRepository.findBy({

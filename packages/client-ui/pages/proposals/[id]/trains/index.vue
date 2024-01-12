@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Proposal, ProposalStation } from '@personalhealthtrain/core';
+import type { Project, ProjectNode } from '@personalhealthtrain/core';
 import { PermissionID } from '@personalhealthtrain/core';
 import { computed } from 'vue';
 import type { PropType } from 'vue';
@@ -18,11 +18,11 @@ export default defineNuxtComponent({
     components: { TrainList },
     props: {
         proposal: {
-            type: Object as PropType<Proposal>,
+            type: Object as PropType<Project>,
             required: true,
         },
         visitorProposalStation: {
-            type: Object as PropType<ProposalStation>,
+            type: Object as PropType<ProjectNode>,
             default: undefined,
         },
     },
@@ -31,14 +31,14 @@ export default defineNuxtComponent({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
             [LayoutKey.REQUIRED_PERMISSIONS]: [
-                PermissionID.TRAIN_ADD,
-                PermissionID.TRAIN_EDIT,
-                PermissionID.TRAIN_DROP,
+                PermissionID.ANALYSIS_ADD,
+                PermissionID.ANALYSIS_EDIT,
+                PermissionID.ANALYSIS_DROP,
 
-                PermissionID.TRAIN_RESULT_READ,
+                PermissionID.ANALYSIS_RESULT_READ,
 
-                PermissionID.TRAIN_EXECUTION_START,
-                PermissionID.TRAIN_EXECUTION_STOP,
+                PermissionID.ANALYSIS_EXECUTION_START,
+                PermissionID.ANALYSIS_EXECUTION_STOP,
             ],
         });
 

@@ -5,12 +5,12 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Train, TrainStation } from '@personalhealthtrain/core';
+import type { Analysis, TrainStation } from '@personalhealthtrain/core';
 import {
-    TrainBuildStatus,
-    TrainRunStatus,
-    TrainStationRunStatus,
-    TrainStationStatic,
+    AnalysisBuildStatus,
+    AnalysisRunStatus,
+    AnalysisNodeRunStatus,
+    AnalysisNodeStatic,
 } from '@personalhealthtrain/core';
 import type { BuildInput } from 'rapiq';
 import type { PropType } from 'vue';
@@ -23,7 +23,7 @@ export default defineComponent({
     components: { TrainStationList, TrainStationStaticRunStatusText, TrainStationRunStatusText },
     props: {
         entity: {
-            type: Object as PropType<Train>,
+            type: Object as PropType<Analysis>,
             required: true,
         },
         withHeader: {
@@ -48,13 +48,13 @@ export default defineComponent({
         };
 
         const progressPercentage = computed(() => {
-            if (entity.value.build_status !== TrainBuildStatus.FINISHED) {
+            if (entity.value.build_status !== AnalysisBuildStatus.FINISHED) {
                 return 0;
             }
 
-            const total = entity.value.stations + 2; // + 2 because incoming + outgoing
+            const total = entity.value.nodes + 2; // + 2 because incoming + outgoing
 
-            if (entity.value.run_status === TrainRunStatus.FINISHED) {
+            if (entity.value.run_status === AnalysisRunStatus.FINISHED) {
                 return 100;
             }
 
@@ -72,9 +72,9 @@ export default defineComponent({
         return {
             query,
             progressPercentage,
-            trainRunStatus: TrainRunStatus,
-            trainStationStatic: TrainStationStatic,
-            trainStationRunStatus: TrainStationRunStatus,
+            trainRunStatus: AnalysisRunStatus,
+            trainStationStatic: AnalysisNodeStatic,
+            trainStationRunStatus: AnalysisNodeRunStatus,
         };
     },
 });

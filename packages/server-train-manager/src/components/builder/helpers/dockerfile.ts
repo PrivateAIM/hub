@@ -9,14 +9,14 @@ import path from 'node:path';
 import type {
     APIClient,
     MasterImage,
-    Train, TrainFile,
+    Analysis, AnalysisFile,
 } from '@personalhealthtrain/core';
-import { TrainContainerPath, getHostNameFromString } from '@personalhealthtrain/core';
+import { AnalysisContainerPath, getHostNameFromString } from '@personalhealthtrain/core';
 import { useClient } from 'hapic';
 import { BuilderError } from '../error';
 
 type DockerFileBuildContext = {
-    entity: Pick<Train, 'id' | 'master_image_id' | 'entrypoint_file_id'>,
+    entity: Pick<Analysis, 'id' | 'master_image_id' | 'entrypoint_file_id'>,
     hostname: string
 };
 
@@ -26,7 +26,7 @@ export async function buildTrainDockerFile(context: DockerFileBuildContext) : Pr
 }> {
     const client = useClient<APIClient>();
 
-    let entryPoint : TrainFile;
+    let entryPoint : AnalysisFile;
 
     try {
         entryPoint = await client.trainFile.getOne(context.entity.entrypoint_file_id);
@@ -78,11 +78,11 @@ export async function buildTrainDockerFile(context: DockerFileBuildContext) : Pr
     const masterImagePath = `${getHostNameFromString(context.hostname)}/master/${masterImage.virtual_path}`;
     const content = `
     FROM ${masterImagePath}
-    RUN mkdir ${TrainContainerPath.MAIN} &&\
-        mkdir ${TrainContainerPath.RESULTS} &&\
-        chmod -R +x ${TrainContainerPath.MAIN}
+    RUN mkdir ${AnalysisContainerPath.MAIN} &&\
+        mkdir ${AnalysisContainerPath.RESULTS} &&\
+        chmod -R +x ${AnalysisContainerPath.MAIN}
 
-    CMD ["${entrypointCommand}", ${argumentsString}"${path.posix.join(TrainContainerPath.MAIN, entrypointPath)}"]
+    CMD ["${entrypointCommand}", ${argumentsString}"${path.posix.join(AnalysisContainerPath.MAIN, entrypointPath)}"]
     `;
 
     return {

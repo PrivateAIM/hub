@@ -1,6 +1,6 @@
 <script lang="ts">
 import { storeToRefs } from '@authup/client-vue';
-import type { Train } from '@personalhealthtrain/core';
+import type { Analysis } from '@personalhealthtrain/core';
 import { SecretType } from '@personalhealthtrain/core';
 import { defineComponent, toRefs } from 'vue';
 import { injectAPIClient, injectAuthupStore } from '../../core';
@@ -29,7 +29,7 @@ export default defineComponent({
         const store = injectAuthupStore();
         const { userId } = storeToRefs(store);
 
-        const payload : Partial<Train> = {};
+        const payload : Partial<Analysis> = {};
 
         const set = async (type: `${SecretType}`, value: string | null) => {
             switch (type) {

@@ -8,18 +8,18 @@
 import {
     Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn,
 } from 'typeorm';
-import type { MasterImage, Proposal } from '@personalhealthtrain/core';
+import type { MasterImage, Project } from '@personalhealthtrain/core';
 import { ProposalRisk } from '@personalhealthtrain/core';
 import type { Realm, User } from '@authup/core';
 import { MasterImageEntity } from '../master-image';
 
 @Entity({ name: 'proposals' })
-export class ProposalEntity implements Proposal {
+export class ProposalEntity implements Project {
     @PrimaryGeneratedColumn('uuid')
         id: string;
 
     @Column({ type: 'varchar', length: 256 })
-        title: string;
+        name: string;
 
     @Column({ type: 'varchar' })
         requested_data: string;
@@ -31,7 +31,7 @@ export class ProposalEntity implements Proposal {
         risk_comment: string;
 
     @Column({ type: 'int', unsigned: true, default: 0 })
-        trains: number;
+        analyses: number;
 
     // ------------------------------------------------------------------
 

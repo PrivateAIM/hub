@@ -10,8 +10,8 @@ import {
     computed,
     defineComponent, reactive, ref, toRefs, watch,
 } from 'vue';
-import type { Train } from '@personalhealthtrain/core';
-import { TrainAPICommand } from '@personalhealthtrain/core';
+import type { Analysis } from '@personalhealthtrain/core';
+import { AnalysisAPICommand } from '@personalhealthtrain/core';
 import useVuelidate from '@vuelidate/core';
 import type { PropType } from 'vue';
 import { initFormAttributesFromSource, injectAPIClient, wrapFnWithBusyState } from '../../../core';
@@ -19,7 +19,7 @@ import { initFormAttributesFromSource, injectAPIClient, wrapFnWithBusyState } fr
 export default defineComponent({
     props: {
         train: {
-            type: Object as PropType<Train>,
+            type: Object as PropType<Analysis>,
             required: true,
         },
     },
@@ -74,7 +74,7 @@ export default defineComponent({
 
         const generate = wrapFnWithBusyState(busy, async () => {
             try {
-                const train = await apiClient.train.runCommand(refs.train.value.id, TrainAPICommand.GENERATE_HASH);
+                const train = await apiClient.train.runCommand(refs.train.value.id, AnalysisAPICommand.GENERATE_HASH);
 
                 form.hash = train.hash;
 

@@ -26,7 +26,7 @@ import { RegistryProjectEntity } from '../../../../../domains/registry-project/e
 
 export async function createStationRouteHandler(req: Request, res: Response) : Promise<any> {
     const ability = useRequestEnv(req, 'ability');
-    if (!ability.has(PermissionID.STATION_ADD)) {
+    if (!ability.has(PermissionID.NODE_ADD)) {
         throw new ForbiddenError();
     }
 

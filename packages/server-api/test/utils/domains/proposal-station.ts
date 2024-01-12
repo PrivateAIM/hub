@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ProposalStation } from '@personalhealthtrain/core';
+import type { ProjectNode } from '@personalhealthtrain/core';
 import type { SuperTest, Test } from 'supertest';
 
-export async function createSuperTestProposalStation(superTest: SuperTest<Test>, proposalStation: Partial<ProposalStation>) {
+export async function createSuperTestProposalStation(superTest: SuperTest<Test>, proposalStation: Partial<ProjectNode>) {
     return superTest
         .post('/proposal-stations')
         .send(proposalStation)

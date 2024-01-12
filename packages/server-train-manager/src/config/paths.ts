@@ -6,7 +6,7 @@
  */
 
 import path from 'node:path';
-import type { Train } from '@personalhealthtrain/core';
+import type { Analysis } from '@personalhealthtrain/core';
 
 let writableDirPath : string | undefined;
 
@@ -19,6 +19,6 @@ export function getWritableDirPath() {
     return writableDirPath;
 }
 
-export function generateTrainMinioBucketName(id: Train['id']) {
+export function generateTrainMinioBucketName(id: Analysis['id']) {
     return `trains.${id}`;
 }

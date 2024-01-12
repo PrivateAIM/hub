@@ -9,9 +9,9 @@ import { BadRequestError } from '@ebec/http';
 import { ExtractorCommand, buildExtractorQueuePayload } from '@personalhealthtrain/server-train-manager';
 import { publish } from 'amqp-extension';
 import {
-    TrainContainerPath,
-    TrainResultStatus,
-    TrainRunStatus,
+    AnalysisContainerPath,
+    AnalysisResultStatus,
+    AnalysisRunStatus,
 } from '@personalhealthtrain/core';
 import { useDataSource } from 'typeorm-extension';
 import { resolveTrain } from './utils';
@@ -25,7 +25,7 @@ export async function triggerTrainResultStart(
 
     train = await resolveTrain(train, repository);
 
-    if (train.run_status !== TrainRunStatus.FINISHED) {
+    if (train.run_status !== AnalysisRunStatus.FINISHED) {
         throw new BadRequestError('The train has not finished yet...');
     }
 
@@ -36,14 +36,14 @@ export async function triggerTrainResultStart(
             id: train.id,
 
             filePaths: [
-                TrainContainerPath.RESULTS,
-                TrainContainerPath.CONFIG,
+                AnalysisContainerPath.RESULTS,
+                AnalysisContainerPath.CONFIG,
             ],
         },
     }));
 
     train = repository.merge(train, {
-        result_status: TrainResultStatus.STARTED,
+        result_status: AnalysisResultStatus.STARTED,
     });
 
     await repository.save(train);

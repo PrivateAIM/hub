@@ -6,7 +6,7 @@
  */
 
 import type {
-    ProposalStation,
+    ProjectNode,
 } from '@personalhealthtrain/core';
 import {
     DBody, DController, DDelete, DGet, DPath, DPost, DRequest, DResponse, DTags,
@@ -21,7 +21,7 @@ import {
     updateProposalStationRouteHandler,
 } from './handlers';
 
-type PartialProposalStation = Partial<ProposalStation>;
+type PartialProposalStation = Partial<ProjectNode>;
 
 @DTags('proposal', 'station')
 @DController('/proposal-stations')
@@ -36,7 +36,7 @@ export class ProposalStationController {
 
     @DPost('', [ForceLoggedInMiddleware])
     async add(
-        @DBody() data: Pick<ProposalStation, 'station_id' | 'proposal_id'>,
+        @DBody() data: Pick<ProjectNode, 'node_id' | 'project_id'>,
             @DRequest() req: any,
             @DResponse() res: any,
     ): Promise<PartialProposalStation | undefined> {
@@ -55,7 +55,7 @@ export class ProposalStationController {
     @DPost('/:id', [ForceLoggedInMiddleware])
     async edit(
         @DPath('id') id: string,
-            @DBody() data: Pick<ProposalStation, 'comment' | 'approval_status'>,
+            @DBody() data: Pick<ProjectNode, 'comment' | 'approval_status'>,
             @DRequest() req: any,
             @DResponse() res: any,
     ): Promise<PartialProposalStation | undefined> {

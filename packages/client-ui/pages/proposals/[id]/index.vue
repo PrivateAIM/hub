@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Proposal, ProposalStation } from '@personalhealthtrain/core';
+import type { Project, ProjectNode } from '@personalhealthtrain/core';
 import type { BuildInput } from 'rapiq';
 import type { PropType } from 'vue';
 import { ProposalStationApprovalStatus, ProposalStationList } from '@personalhealthtrain/client-vue';
@@ -20,16 +20,16 @@ export default defineNuxtComponent({
     },
     props: {
         proposal: {
-            type: Object as PropType<Proposal>,
+            type: Object as PropType<Project>,
             required: true,
         },
         visitorProposalStation: {
-            type: Object as PropType<ProposalStation>,
+            type: Object as PropType<ProjectNode>,
             default: null,
         },
     },
     setup(props) {
-        const proposalStationQuery : BuildInput<ProposalStation> = {
+        const proposalStationQuery : BuildInput<ProjectNode> = {
             filter: {
                 proposal_id: props.proposal.id,
             },
@@ -62,7 +62,7 @@ export default defineNuxtComponent({
                                     <i class="fa fa-train-tram fa-4x" />
                                 </div>
                                 <p class="badge bg-dark">
-                                    {{ proposal.trains }}
+                                    {{ proposal.analyses }}
                                 </p>
                             </div>
                         </div>

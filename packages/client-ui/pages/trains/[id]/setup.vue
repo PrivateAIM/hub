@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 import type { PropType } from 'vue';
-import type { Train } from '@personalhealthtrain/core';
+import type { Analysis } from '@personalhealthtrain/core';
 import { TrainWizard } from '@personalhealthtrain/client-vue';
 import { navigateTo } from '#imports';
 import { defineNuxtComponent } from '#app';
@@ -15,7 +15,7 @@ export default defineNuxtComponent({
     components: { TrainWizard },
     props: {
         entity: {
-            type: Object as PropType<Train>,
+            type: Object as PropType<Analysis>,
             required: true,
         },
     },
@@ -25,7 +25,7 @@ export default defineNuxtComponent({
             await navigateTo(`/trains/${props.entity.id}`);
         };
 
-        const handleUpdated = (entity: Train) => {
+        const handleUpdated = (entity: Analysis) => {
             emit('updated', entity);
         };
 

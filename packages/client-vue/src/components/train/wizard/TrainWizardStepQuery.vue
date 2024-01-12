@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Train } from '@personalhealthtrain/core';
+import type { Analysis } from '@personalhealthtrain/core';
 import useVuelidate from '@vuelidate/core';
 import type { PropType } from 'vue';
 import {
@@ -15,7 +15,7 @@ import {
 export default defineComponent({
     props: {
         train: {
-            type: Object as PropType<Train>,
+            type: Object as PropType<Analysis>,
             required: true,
         },
     },

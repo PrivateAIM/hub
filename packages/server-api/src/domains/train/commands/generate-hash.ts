@@ -6,7 +6,7 @@
  */
 
 import crypto from 'node:crypto';
-import { TrainConfigurationStatus } from '@personalhealthtrain/core';
+import { AnalysisConfigurationStatus } from '@personalhealthtrain/core';
 import { useDataSource } from 'typeorm-extension';
 import { useMinio } from '../../../core/minio';
 import { streamToBuffer } from '../../../core/utils';
@@ -71,7 +71,7 @@ export async function generateTrainHash(train: TrainEntity | string) : Promise<T
     }
 
     train.hash = hash.digest('hex');
-    train.configuration_status = TrainConfigurationStatus.HASH_GENERATED;
+    train.configuration_status = AnalysisConfigurationStatus.HASH_GENERATED;
 
     train = await repository.save(train);
 

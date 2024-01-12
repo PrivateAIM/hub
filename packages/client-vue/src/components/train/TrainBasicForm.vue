@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Proposal, Train } from '@personalhealthtrain/core';
+import type { Project, Analysis } from '@personalhealthtrain/core';
 import { DomainType, TrainType } from '@personalhealthtrain/core';
 import { maxLength, minLength, required } from '@vuelidate/validators';
 import type { BuildInput } from 'rapiq';
@@ -28,7 +28,7 @@ export default defineComponent({
     },
     props: {
         entity: {
-            type: Object as PropType<Train>,
+            type: Object as PropType<Analysis>,
         },
         proposalId: {
             type: String as PropType<string | undefined | null>,
@@ -37,7 +37,7 @@ export default defineComponent({
             type: String,
         },
     },
-    emits: defineEntityManagerEvents<Train>(),
+    emits: defineEntityManagerEvents<Analysis>(),
     setup(props, setup) {
         const busy = ref(false);
         const form = reactive({
@@ -59,7 +59,7 @@ export default defineComponent({
             },
         }, form);
 
-        const proposalQuery = computed<BuildInput<Proposal>>(() => ({
+        const proposalQuery = computed<BuildInput<Project>>(() => ({
             filters: {
                 ...(props.realmId ? { realm_id: props.realmId } : {}),
             },
@@ -70,7 +70,7 @@ export default defineComponent({
         }
 
         const manager = createEntityManager({
-            type: `${DomainType.TRAIN}`,
+            type: `${DomainType.ANALYSIS}`,
             setup,
             props,
         });

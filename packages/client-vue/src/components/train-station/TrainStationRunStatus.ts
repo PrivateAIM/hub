@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { TrainStationRunStatus } from '@personalhealthtrain/core';
+import { AnalysisNodeRunStatus } from '@personalhealthtrain/core';
 import { computed, defineComponent, h } from 'vue';
 import { hasNormalizedSlot, normalizeSlot } from '../../core';
 
@@ -19,9 +19,9 @@ export default defineComponent({
     setup(props, { slots }) {
         const statusText = computed(() => {
             switch (props.status) {
-                case TrainStationRunStatus.ARRIVED:
+                case AnalysisNodeRunStatus.ARRIVED:
                     return 'arrived';
-                case TrainStationRunStatus.DEPARTED:
+                case AnalysisNodeRunStatus.DEPARTED:
                     return 'departed';
                 default:
                     return 'none';
@@ -30,9 +30,9 @@ export default defineComponent({
 
         const classSuffix = computed(() => {
             switch (props.status) {
-                case TrainStationRunStatus.ARRIVED:
+                case AnalysisNodeRunStatus.ARRIVED:
                     return 'primary';
-                case TrainStationRunStatus.DEPARTED:
+                case AnalysisNodeRunStatus.DEPARTED:
                     return 'success';
                 default:
                     return 'info';

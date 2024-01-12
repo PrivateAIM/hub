@@ -78,10 +78,10 @@ export default {
 
         const store = useAuthStore();
 
-        const canView = computed(() => store.has(PermissionID.STATION_EDIT) ||
-                store.has(PermissionID.STATION_DROP));
+        const canView = computed(() => store.has(PermissionID.NODE_EDIT) ||
+                store.has(PermissionID.NODE_DROP));
 
-        const canDrop = computed(() => store.has(PermissionID.STATION_DROP));
+        const canDrop = computed(() => store.has(PermissionID.NODE_DROP));
 
         const listNode = ref<null | typeof RegistryProjectList>(null);
 

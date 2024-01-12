@@ -21,8 +21,8 @@ export async function deleteTrainStationRouteHandler(req: Request, res: Response
 
     const ability = useRequestEnv(req, 'ability');
     if (
-        !ability.has(PermissionID.TRAIN_EDIT) &&
-        !ability.has(PermissionID.TRAIN_APPROVE)
+        !ability.has(PermissionID.ANALYSIS_EDIT) &&
+        !ability.has(PermissionID.ANALYSIS_APPROVE)
     ) {
         throw new ForbiddenError();
     }
@@ -67,7 +67,7 @@ export async function deleteTrainStationRouteHandler(req: Request, res: Response
     const trainRepository = dataSource.getRepository(TrainEntity);
     const train = await trainRepository.findOneBy({ id: entity.train_id });
 
-    train.stations -= 1;
+    train.nodes -= 1;
     await trainRepository.save(train);
 
     entity.train = train;

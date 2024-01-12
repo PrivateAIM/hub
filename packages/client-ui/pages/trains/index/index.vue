@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Train } from '@personalhealthtrain/core';
+import type { Analysis } from '@personalhealthtrain/core';
 import { PermissionID } from '@personalhealthtrain/core';
 import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
@@ -27,21 +27,21 @@ export default defineNuxtComponent({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
             [LayoutKey.REQUIRED_PERMISSIONS]: [
-                PermissionID.TRAIN_ADD,
-                PermissionID.TRAIN_EDIT,
-                PermissionID.TRAIN_DROP,
+                PermissionID.ANALYSIS_ADD,
+                PermissionID.ANALYSIS_EDIT,
+                PermissionID.ANALYSIS_DROP,
 
-                PermissionID.TRAIN_RESULT_READ,
+                PermissionID.ANALYSIS_RESULT_READ,
 
-                PermissionID.TRAIN_EXECUTION_START,
-                PermissionID.TRAIN_EXECUTION_STOP,
+                PermissionID.ANALYSIS_EXECUTION_START,
+                PermissionID.ANALYSIS_EXECUTION_STOP,
             ],
         });
 
         const store = useAuthStore();
         const { realmId } = storeToRefs(store);
 
-        const query = computed<BuildInput<Train>>(() => ({
+        const query = computed<BuildInput<Analysis>>(() => ({
             filter: {
                 realm_id: realmId.value,
             },

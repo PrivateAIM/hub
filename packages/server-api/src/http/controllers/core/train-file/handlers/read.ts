@@ -19,8 +19,8 @@ import { useRequestEnv } from '../../../../request';
 export async function getOneTrainFileRouteHandler(req: Request, res: Response) : Promise<any> {
     const ability = useRequestEnv(req, 'ability');
     if (
-        !ability.has(PermissionID.TRAIN_ADD) &&
-        !ability.has(PermissionID.TRAIN_EDIT)
+        !ability.has(PermissionID.ANALYSIS_ADD) &&
+        !ability.has(PermissionID.ANALYSIS_EDIT)
     ) {
         throw new ForbiddenError();
     }

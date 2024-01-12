@@ -9,7 +9,7 @@ import {
     DomainEventSubscriptionName,
     DomainType,
     PermissionID,
-    ProposalSocketClientToServerEventName,
+    ProjectSocketClientToServerEventName,
     buildDomainChannelName,
     buildDomainEventSubscriptionFullName,
     isSocketClientToServerEventCallback,
@@ -33,11 +33,11 @@ export function registerProposalSocketHandlers(
     if (!socket.data.userId && !socket.data.robotId) return;
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainType.PROPOSAL, DomainEventSubscriptionName.SUBSCRIBE),
+        buildDomainEventSubscriptionFullName(DomainType.PROJECT, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             if (
-                !socket.data.ability.has(PermissionID.PROPOSAL_DROP) &&
-                !socket.data.ability.has(PermissionID.PROPOSAL_EDIT)
+                !socket.data.ability.has(PermissionID.PROJECT_DROP) &&
+                !socket.data.ability.has(PermissionID.PROJECT_EDIT)
             ) {
                 if (isSocketClientToServerEventErrorCallback(cb)) {
                     cb(new UnauthorizedError());
@@ -46,7 +46,7 @@ export function registerProposalSocketHandlers(
                 return;
             }
 
-            incrSocketRoomConnections(socket, buildDomainChannelName(DomainType.PROPOSAL, target));
+            incrSocketRoomConnections(socket, buildDomainChannelName(DomainType.PROJECT, target));
 
             if (isSocketClientToServerEventCallback(cb)) {
                 cb();
@@ -54,7 +54,9 @@ export function registerProposalSocketHandlers(
         },
     );
 
-    socket.on(ProposalSocketClientToServerEventName.UNSUBSCRIBE, (target) => {
-        decrSocketRoomConnections(socket, buildDomainChannelName(DomainType.PROPOSAL, target));
+    socket.on(
+        buildDomainEventSubscriptionFullName(DomainType.PROJECT, DomainEventSubscriptionName.UNSUBSCRIBE),
+        (target) => {
+        decrSocketRoomConnections(socket, buildDomainChannelName(DomainType.PROJECT, target));
     });
 }

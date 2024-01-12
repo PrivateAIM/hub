@@ -6,7 +6,7 @@
  */
 
 import type {
-    TrainFile,
+    AnalysisFile,
 } from '@personalhealthtrain/core';
 import {
     DController, DDelete, DGet, DPath, DPost, DRequest, DResponse, DTags,
@@ -20,7 +20,7 @@ import {
 } from './handlers';
 import { ForceLoggedInMiddleware } from '../../../middleware';
 
-type PartialTrainFile = Partial<TrainFile>;
+type PartialTrainFile = Partial<AnalysisFile>;
 
 @DTags('train')
 @DController('/train-files')

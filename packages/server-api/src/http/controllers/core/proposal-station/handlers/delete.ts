@@ -20,8 +20,8 @@ export async function deleteProposalStationRouteHandler(req: Request, res: Respo
     const ability = useRequestEnv(req, 'ability');
 
     if (
-        !ability.has(PermissionID.PROPOSAL_EDIT) &&
-        !ability.has(PermissionID.PROPOSAL_DROP)
+        !ability.has(PermissionID.PROJECT_EDIT) &&
+        !ability.has(PermissionID.PROJECT_DROP)
     ) {
         throw new ForbiddenError('You are not allowed to drop a proposal station.');
     }
@@ -36,8 +36,8 @@ export async function deleteProposalStationRouteHandler(req: Request, res: Respo
     }
 
     if (
-        !isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.station_realm_id) &&
-        !isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.proposal_realm_id)
+        !isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.node_realm_id) &&
+        !isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.project_realm_id)
     ) {
         throw new ForbiddenError('You are not authorized to drop this proposal station.');
     }

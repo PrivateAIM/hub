@@ -10,7 +10,7 @@ import {
     CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn,
 } from 'typeorm';
 import type {
-    Proposal, ProposalStation, ProposalStationApprovalStatus, Station,
+    Project, ProjectNode, ProjectNodeApprovalStatus, Node,
 } from '@personalhealthtrain/core';
 import type { Realm } from '@authup/core';
 import { ProposalEntity } from '../proposal/entity';
@@ -18,12 +18,12 @@ import { StationEntity } from '../station/entity';
 
 @Unique(['proposal_id', 'station_id'])
 @Entity({ name: 'proposal_stations' })
-export class ProposalStationEntity implements ProposalStation {
+export class ProposalStationEntity implements ProjectNode {
     @PrimaryGeneratedColumn('uuid')
         id: string;
 
     @Column({ default: null })
-        approval_status: ProposalStationApprovalStatus | null;
+        approval_status: ProjectNodeApprovalStatus | null;
 
     @Column({ type: 'text', nullable: true })
         comment: string;
@@ -39,22 +39,22 @@ export class ProposalStationEntity implements ProposalStation {
     // ------------------------------------------------------------------
 
     @Column()
-        proposal_id: Proposal['id'];
+        project_id: Project['id'];
 
     @ManyToOne(() => ProposalEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'proposal_id' })
-        proposal: ProposalEntity;
+        project: ProposalEntity;
 
     @Column({ type: 'uuid' })
-        proposal_realm_id: Realm['id'];
+        project_realm_id: Realm['id'];
 
     @Column()
-        station_id: Station['id'];
+        node_id: Node['id'];
 
     @ManyToOne(() => StationEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'station_id' })
-        station: StationEntity;
+        node: StationEntity;
 
     @Column({ type: 'uuid' })
-        station_realm_id: string;
+        node_realm_id: string;
 }

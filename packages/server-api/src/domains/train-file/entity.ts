@@ -14,13 +14,13 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-import type { Train, TrainFile } from '@personalhealthtrain/core';
+import type { Analysis, AnalysisFile } from '@personalhealthtrain/core';
 // eslint-disable-next-line import/no-cycle
 import type { Realm, User } from '@authup/core';
 import { TrainEntity } from '../train/entity';
 
 @Entity({ name: 'train_files' })
-export class TrainFileEntity implements TrainFile {
+export class TrainFileEntity implements AnalysisFile {
     @PrimaryGeneratedColumn('uuid')
         id: string;
 
@@ -55,9 +55,9 @@ export class TrainFileEntity implements TrainFile {
     // ------------------------------------------------------------------
 
     @Column()
-        train_id: Train['id'];
+        analysis_id: Analysis['id'];
 
     @ManyToOne(() => TrainEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'train_id' })
-        train: TrainEntity;
+        analysis: TrainEntity;
 }

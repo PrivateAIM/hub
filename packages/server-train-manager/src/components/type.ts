@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Registry, RegistryProject, Train } from '@personalhealthtrain/core';
+import type { Registry, RegistryProject, Analysis } from '@personalhealthtrain/core';
 
 export type ComponentPayloadExtended<T extends Record<string, any>> = T & {
-    entity: Train,
+    entity: Analysis,
 
     registry: Registry,
 

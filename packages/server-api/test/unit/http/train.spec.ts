@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Train, TrainType } from '@personalhealthtrain/core';
+import type { Analysis, TrainType } from '@personalhealthtrain/core';
 import { removeDateProperties } from '../../utils/date-properties';
 import { useSuperTest } from '../../utils/supertest';
 import { dropTestDatabase, useTestDatabase } from '../../utils/database';
@@ -24,13 +24,13 @@ describe('src/controllers/core/train', () => {
         await dropTestDatabase();
     });
 
-    let details : Train;
+    let details : Analysis;
 
     it('should create resource', async () => {
         const proposal = await createSuperTestProposal(superTest);
         const response = await createSuperTestTrain(superTest, {
             ...TEST_DEFAULT_TRAIN,
-            proposal_id: proposal.body.id,
+            project_id: proposal.body.id,
         });
 
         expect(response.status).toEqual(201);
@@ -88,33 +88,33 @@ describe('src/controllers/core/train', () => {
         const proposal = await createSuperTestProposal(superTest);
         const response = await createSuperTestTrain(superTest, {
             ...details,
-            proposal_id: proposal.body.id,
+            project_id: proposal.body.id,
             type: 'xyz' as TrainType,
         });
 
         expect(response.status).toEqual(400);
-        expect(response.body.message).toEqual(buildRequestValidationErrorMessage<Train>(['type']));
+        expect(response.body.message).toEqual(buildRequestValidationErrorMessage<Analysis>(['type']));
     });
 
     it('should not create resource with invalid proposal', async () => {
         const response = await createSuperTestTrain(superTest, {
             ...details,
-            proposal_id: '28eb7728-c78d-4c2f-ab99-dc4bcee78da9',
+            project_id: '28eb7728-c78d-4c2f-ab99-dc4bcee78da9',
         });
 
         expect(response.status).toEqual(400);
-        expect(response.body.message).toEqual(buildRequestValidationErrorMessage<Train>(['proposal_id']));
+        expect(response.body.message).toEqual(buildRequestValidationErrorMessage<Analysis>(['project_id']));
     });
 
     it('should not create resource with invalid master-image', async () => {
         const proposal = await createSuperTestProposal(superTest);
         const response = await createSuperTestTrain(superTest, {
             ...details,
-            proposal_id: proposal.body.id,
+            project_id: proposal.body.id,
             master_image_id: '28eb7728-c78d-4c2f-ab99-dc4bcee78da9',
         });
 
         expect(response.status).toEqual(400);
-        expect(response.body.message).toEqual(buildRequestValidationErrorMessage<Train>(['master_image_id']));
+        expect(response.body.message).toEqual(buildRequestValidationErrorMessage<Analysis>(['master_image_id']));
     });
 });

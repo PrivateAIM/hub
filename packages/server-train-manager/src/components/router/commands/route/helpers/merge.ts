@@ -5,13 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Station, TrainStation } from '@personalhealthtrain/core';
+import type { Node, TrainStation } from '@personalhealthtrain/core';
 import { hasOwnProperty } from '@personalhealthtrain/core';
 import { BaseError } from '../../../../error';
 import type { StationExtended } from '../type';
 
 export function mergeStationsWithTrainStations(
-    stations: Station[],
+    stations: Node[],
     trainStations: TrainStation[],
     requiredAttributes?: (keyof StationExtended)[],
 ) : StationExtended[] {

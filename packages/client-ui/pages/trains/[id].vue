@@ -28,7 +28,7 @@ export default defineNuxtComponent({
         const toast = useToast();
 
         const manager = createEntityManager({
-            type: `${DomainType.TRAIN}`,
+            type: `${DomainType.ANALYSIS}`,
             props: {
                 entityId: useRoute().params.id as string,
             },

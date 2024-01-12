@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Station } from '@personalhealthtrain/core';
+import type { Node } from '@personalhealthtrain/core';
 import type { PropType } from 'vue';
 import { StationForm } from '@personalhealthtrain/client-vue';
 import { defineNuxtComponent } from '#app';
@@ -14,13 +14,13 @@ export default defineNuxtComponent({
     components: { StationForm },
     props: {
         entity: {
-            type: Object as PropType<Station>,
+            type: Object as PropType<Node>,
             required: true,
         },
     },
     emits: ['failed', 'updated'],
     methods: {
-        handleUpdated(e: Station) {
+        handleUpdated(e: Node) {
             this.$emit('updated', e);
         },
         handleFailed(e: Error) {

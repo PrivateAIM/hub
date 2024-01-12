@@ -6,7 +6,7 @@
  */
 
 import path from 'node:path';
-import type { TrainFile } from '@personalhealthtrain/core';
+import type { AnalysisFile } from '@personalhealthtrain/core';
 import tar from 'tar-stream';
 import {
     dropTestDatabase,
@@ -27,12 +27,12 @@ describe('src/controllers/core/train-file', () => {
         await dropTestDatabase();
     });
 
-    let details: TrainFile;
+    let details: AnalysisFile;
 
     it('should create resource', async () => {
         const { body: proposal } = await createSuperTestProposal(superTest);
         const { body: train } = await createSuperTestTrain(superTest, {
-            proposal_id: proposal.id,
+            project_id: proposal.id,
         });
 
         const filePath = path.join(__dirname, '..', '..', 'data', 'train.py');
@@ -93,7 +93,7 @@ describe('src/controllers/core/train-file', () => {
         });
 
         superTest
-            .get(`/trains/${details.train_id}/files/download`)
+            .get(`/trains/${details.analysis_id}/files/download`)
             .auth('admin', 'start123')
             .pipe(extract);
     });

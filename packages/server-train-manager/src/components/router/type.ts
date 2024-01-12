@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Train } from '@personalhealthtrain/core';
+import type { Analysis } from '@personalhealthtrain/core';
 import type { RouterCommand, RouterEvent } from './constants';
 
 export type RouterRoutePayload = {
@@ -16,15 +16,15 @@ export type RouterRoutePayload = {
 };
 
 export type RouterResetPayload = {
-    id: Train['id']
+    id: Analysis['id']
 };
 
 export type RouterStartPayload = {
-    id: Train['id']
+    id: Analysis['id']
 };
 
 export type RouterCheckPayload = {
-    id: Train['id']
+    id: Analysis['id']
 };
 
 export type RouterCheckCommandContext = {

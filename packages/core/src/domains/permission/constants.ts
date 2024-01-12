@@ -10,25 +10,25 @@ import { PermissionName as AuthPermissionName } from '@authup/core';
 export enum PermissionKey {
     ADMIN_UI_USE = 'admin_ui_use',
 
-    PROPOSAL_ADD = 'proposal_add',
-    PROPOSAL_DROP = 'proposal_drop',
-    PROPOSAL_EDIT = 'proposal_edit',
-    PROPOSAL_APPROVE = 'proposal_approve',
+    PROJECT_ADD = 'proposal_add',
+    PROJECT_DROP = 'proposal_drop',
+    PROJECT_EDIT = 'proposal_edit',
+    PROPOSAL_APPROVE = 'proposal_approve', // todo: maybe approve + reject
 
     REGISTRY_MANAGE = 'registry_manage',
     REGISTRY_PROJECT_MANAGE = 'registry_project_manage',
 
-    STATION_ADD = 'station_add',
-    STATION_DROP = 'station_drop',
-    STATION_EDIT = 'station_edit',
+    NODE_ADD = 'station_add',
+    NODE_DROP = 'station_drop',
+    NODE_EDIT = 'station_edit',
 
-    TRAIN_APPROVE = 'train_approve',
-    TRAIN_EDIT = 'train_edit',
-    TRAIN_ADD = 'train_add',
-    TRAIN_EXECUTION_START = 'train_execution_start',
-    TRAIN_EXECUTION_STOP = 'train_execution_stop',
-    TRAIN_DROP = 'train_drop',
-    TRAIN_RESULT_READ = 'train_result_read',
+    ANALYSIS_APPROVE = 'analysis_approve',
+    ANALYSIS_EDIT = 'analysis_edit',
+    ANALYSIS_ADD = 'analysis_add',
+    ANALYSIS_EXECUTION_START = 'analysis_execution_start',
+    ANALYSIS_EXECUTION_STOP = 'analysis_execution_stop',
+    ANALYSIS_DROP = 'analysis_drop',
+    ANALYSIS_RESULT_READ = 'analysis_result_read', // todo: this is maybe not required anymore
 
     MASTER_IMAGE_MANAGE = 'master_image_manage',
     MASTER_IMAGE_GROUP_MANAGE = 'master_image_group_manage',

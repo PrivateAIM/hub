@@ -19,7 +19,7 @@ export async function updateTrainRouteHandler(req: Request, res: Response) : Pro
     const id = useRequestParam(req, 'id');
 
     const ability = useRequestEnv(req, 'ability');
-    if (!ability.has(PermissionID.TRAIN_EDIT)) {
+    if (!ability.has(PermissionID.ANALYSIS_EDIT)) {
         throw new ForbiddenError();
     }
 
@@ -42,7 +42,7 @@ export async function updateTrainRouteHandler(req: Request, res: Response) : Pro
 
     if (
         result.relation.entrypoint_file &&
-        result.relation.entrypoint_file.train_id !== entity.id
+        result.relation.entrypoint_file.analysis_id !== entity.id
     ) {
         throw new BadRequestError('The entrypoint file id is associated to another train.');
     }

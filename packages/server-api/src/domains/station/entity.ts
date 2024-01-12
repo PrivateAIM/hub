@@ -15,7 +15,7 @@ import {
     PrimaryGeneratedColumn, Unique,
     UpdateDateColumn,
 } from 'typeorm';
-import type { Registry, Station } from '@personalhealthtrain/core';
+import type { Registry, Node } from '@personalhealthtrain/core';
 import {
     Ecosystem, RegistryProject,
 } from '@personalhealthtrain/core';
@@ -26,7 +26,7 @@ import { RegistryEntity } from '../registry/entity';
 @Unique('station_external_name_index', ['external_name'])
 @Unique(['name', 'realm_id'])
 @Entity({ name: 'stations' })
-export class StationEntity implements Station {
+export class StationEntity implements Node {
     @PrimaryGeneratedColumn('uuid')
         id: string;
 

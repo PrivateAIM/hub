@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ProposalStation } from '@personalhealthtrain/core';
-import { DomainType, ProposalStationApprovalStatus } from '@personalhealthtrain/core';
+import type { ProjectNode } from '@personalhealthtrain/core';
+import { DomainType, ProjectNodeApprovalStatus } from '@personalhealthtrain/core';
 import {
     buildFormGroup, buildFormInput, buildFormSelect, buildFormSubmit,
 } from '@vuecs/form-controls';
@@ -24,7 +24,7 @@ import {
 export default defineComponent({
     props: {
         entity: {
-            type: Object as PropType<ProposalStation>,
+            type: Object as PropType<ProjectNode>,
             required: true,
         },
     },
@@ -32,12 +32,12 @@ export default defineComponent({
         const busy = ref(false);
         const form = reactive({
             comment: '',
-            approval_status: '' as ProposalStationApprovalStatus,
+            approval_status: '' as ProjectNodeApprovalStatus,
         });
 
         const options = [
-            ProposalStationApprovalStatus.APPROVED,
-            ProposalStationApprovalStatus.REJECTED,
+            ProjectNodeApprovalStatus.APPROVED,
+            ProjectNodeApprovalStatus.REJECTED,
         ];
 
         const $v = useVuelidate({
@@ -53,7 +53,7 @@ export default defineComponent({
         const updatedAt = useUpdatedAt(props.entity);
 
         const manager = createEntityManager({
-            type: `${DomainType.PROPOSAL_STATION}`,
+            type: `${DomainType.PROJECT_NODE}`,
             setup,
             props,
         });

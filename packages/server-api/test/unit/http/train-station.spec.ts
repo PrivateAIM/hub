@@ -35,12 +35,12 @@ describe('src/controllers/core/train-station', () => {
         const station = await createSuperTestStation(superTest);
 
         await createSuperTestProposalStation(superTest, {
-            station_id: station.body.id,
-            proposal_id: proposal.body.id,
+            node_id: station.body.id,
+            project_id: proposal.body.id,
         });
 
         const train = await createSuperTestTrain(superTest, {
-            proposal_id: proposal.body.id,
+            project_id: proposal.body.id,
         });
 
         const response = await superTest

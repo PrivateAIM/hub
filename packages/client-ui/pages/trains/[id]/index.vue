@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 import type { PropType } from 'vue';
-import type { Train } from '@personalhealthtrain/core';
+import type { Analysis } from '@personalhealthtrain/core';
 import { TrainLogs, TrainPipeline, TrainStationsProgress } from '@personalhealthtrain/client-vue';
 import { defineNuxtComponent } from '#app';
 
@@ -14,13 +14,13 @@ export default defineNuxtComponent({
     components: { TrainLogs, TrainPipeline, TrainStationsProgress },
     props: {
         entity: {
-            type: Object as PropType<Train>,
+            type: Object as PropType<Analysis>,
             required: true,
         },
     },
     emits: ['failed', 'executed', 'updated'],
     setup(props, { emit }) {
-        const handleUpdated = (train: Train) => {
+        const handleUpdated = (train: Analysis) => {
             emit('updated', train);
         };
 
@@ -45,7 +45,7 @@ export default defineNuxtComponent({
     <div v-if="entity">
         <div class="panel-box mb-3">
             <h6 class="mb-3">
-                <span class="text-info">{{ entity.stations }}</span> Station(s)
+                <span class="text-info">{{ entity.nodes }}</span> Station(s)
                 <i class="fa-solid fa-house-medical" />
             </h6>
 

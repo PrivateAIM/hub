@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { TrainBuildStatus, TrainRunStatus, TrainStationStatic } from '@personalhealthtrain/core';
+import { AnalysisBuildStatus, AnalysisRunStatus, AnalysisNodeStatic } from '@personalhealthtrain/core';
 import type { PropType } from 'vue';
 import { computed, defineComponent, h } from 'vue';
 import { hasNormalizedSlot, normalizeSlot } from '../../core';
@@ -33,12 +33,12 @@ export default defineComponent({
     setup(props, { slots }) {
         const arrived = computed(() => {
             switch (props.id) {
-                case TrainStationStatic.INCOMING:
-                    return props.trainBuildStatus === TrainBuildStatus.FINISHED &&
-                        props.trainRunStatus !== TrainRunStatus.FINISHED &&
+                case AnalysisNodeStatic.INCOMING:
+                    return props.trainBuildStatus === AnalysisBuildStatus.FINISHED &&
+                        props.trainRunStatus !== AnalysisRunStatus.FINISHED &&
                         props.trainRunStationIndex === null;
-                case TrainStationStatic.OUTGOING:
-                    return props.trainRunStatus === TrainRunStatus.FINISHED;
+                case AnalysisNodeStatic.OUTGOING:
+                    return props.trainRunStatus === AnalysisRunStatus.FINISHED;
             }
 
             return false;
@@ -46,11 +46,11 @@ export default defineComponent({
 
         const departed = computed(() => {
             switch (props.id) {
-                case TrainStationStatic.INCOMING:
-                    return props.trainBuildStatus === TrainBuildStatus.FINISHED &&
+                case AnalysisNodeStatic.INCOMING:
+                    return props.trainBuildStatus === AnalysisBuildStatus.FINISHED &&
                         (
-                            props.trainRunStatus === TrainRunStatus.RUNNING ||
-                            props.trainRunStatus === TrainRunStatus.FINISHED
+                            props.trainRunStatus === AnalysisRunStatus.RUNNING ||
+                            props.trainRunStatus === AnalysisRunStatus.FINISHED
                         );
             }
 

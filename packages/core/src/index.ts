@@ -5,9 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './api-client';
+export * from './http';
 export * from './error';
-export * from './config';
 export * from './domains';
 export * from './socket';
 export * from './utils';

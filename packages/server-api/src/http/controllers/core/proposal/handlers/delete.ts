@@ -18,7 +18,7 @@ export async function deleteProposalRouteHandler(req: Request, res: Response) : 
     const id = useRequestParam(req, 'id');
 
     const ability = useRequestEnv(req, 'ability');
-    if (!ability.has(PermissionID.PROPOSAL_DROP)) {
+    if (!ability.has(PermissionID.PROJECT_DROP)) {
         throw new ForbiddenError();
     }
 
@@ -34,7 +34,7 @@ export async function deleteProposalRouteHandler(req: Request, res: Response) : 
         throw new ForbiddenError();
     }
 
-    if (entity.trains > 0) {
+    if (entity.analyses > 0) {
         throw new BadRequestError('Remove all trains associated to the proposal before removing it.');
     }
 

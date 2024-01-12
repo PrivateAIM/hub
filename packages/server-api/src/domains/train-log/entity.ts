@@ -15,14 +15,14 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 import type {
-    Train,
-    TrainLog,
+    Analysis,
+    AnalysisLog,
 } from '@personalhealthtrain/core';
 import type { Realm } from '@authup/core';
 import { TrainEntity } from '../train/entity';
 
 @Entity({ name: 'train_logs' })
-export class TrainLogEntity implements TrainLog {
+export class TrainLogEntity implements AnalysisLog {
     @PrimaryGeneratedColumn('uuid')
         id: string;
 
@@ -70,11 +70,11 @@ export class TrainLogEntity implements TrainLog {
     // ------------------------------------------------------------------
 
     @Column()
-        train_id: Train['id'];
+        analysis_id: Analysis['id'];
 
     @ManyToOne(() => TrainEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'train_id' })
-        train: TrainEntity;
+        analysis: TrainEntity;
 
     @Column({ type: 'uuid' })
         realm_id: Realm['id'];

@@ -6,18 +6,18 @@
  */
 
 import { randomBytes } from 'crypto';
-import type { Train } from '@personalhealthtrain/core';
+import type { Analysis } from '@personalhealthtrain/core';
 import { TrainType } from '@personalhealthtrain/core';
 import type { SuperTest, Test } from 'supertest';
 
-export const TEST_DEFAULT_TRAIN : Partial<Train> = {
+export const TEST_DEFAULT_TRAIN : Partial<Analysis> = {
     name: 'development',
     type: TrainType.DISCOVERY,
     hash_signed: randomBytes(40).toString('hex'),
     query: '{"key": "value"}',
 };
 
-export async function createSuperTestTrain(superTest: SuperTest<Test>, entity?: Partial<Train>) {
+export async function createSuperTestTrain(superTest: SuperTest<Test>, entity?: Partial<Analysis>) {
     return superTest
         .post('/trains')
         .send({

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Train } from '@personalhealthtrain/core';
+import type { Analysis } from '@personalhealthtrain/core';
 import type { ExtractorCommand, ExtractorEvent } from './constants';
 
 export type ExtractorFileType = 'file' | 'link' | 'symlink' | 'directory' |
@@ -20,14 +20,14 @@ export type ExtractingFile = {
 };
 
 export type ExtractorExtractPayload = {
-    id: Train['id'],
+    id: Analysis['id'],
 
     filePaths?: string[],
     files?: ExtractingFile[]
 };
 
 export type ExtractorCheckPayload = {
-    id: Train['id']
+    id: Analysis['id']
 };
 
 export type ExtractorPayload<C extends `${ExtractorCommand}`> =

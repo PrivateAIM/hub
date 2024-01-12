@@ -7,7 +7,7 @@
 
 import type {
     APIClient,
-    Train,
+    Analysis,
     TrainConfig,
 } from '@personalhealthtrain/core';
 import {
@@ -19,7 +19,7 @@ import { useClient } from 'hapic';
 import { mergeStationsWithTrainStations } from '../../router/commands/route/helpers/merge';
 
 type TrainConfigBuildContext = {
-    entity: Train,
+    entity: Analysis,
     masterImagePath: string
 };
 
@@ -52,7 +52,7 @@ export async function buildTrainConfig(context: TrainConfigBuildContext) : Promi
             address: masterImagePath,
             tag: 'latest',
         },
-        proposal_id: entity.proposal_id,
+        proposal_id: entity.project_id,
         session_id: entity.session_id,
         file_list: [],
         hash: entity.hash,

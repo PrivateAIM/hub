@@ -38,7 +38,7 @@ export function registerTrainStationSocketHandlers(
         buildDomainEventSubscriptionFullName(DomainType.TRAIN_STATION, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             if (
-                !socket.data.ability.has(PermissionID.TRAIN_APPROVE)
+                !socket.data.ability.has(PermissionID.ANALYSIS_APPROVE)
             ) {
                 if (isSocketClientToServerEventErrorCallback(cb)) {
                     cb(new UnauthorizedError());
@@ -72,10 +72,10 @@ export function registerTrainStationForRealmSocketHandlers(
     // ------------------------------------------------------------
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainSubType.TRAIN_STATION_IN, DomainEventSubscriptionName.SUBSCRIBE),
+        buildDomainEventSubscriptionFullName(DomainSubType.ANALYSIS_NODE_IN, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             if (
-                !socket.data.ability.has(PermissionID.TRAIN_APPROVE)
+                !socket.data.ability.has(PermissionID.ANALYSIS_APPROVE)
             ) {
                 if (isSocketClientToServerEventErrorCallback(cb)) {
                     cb(new UnauthorizedError());
@@ -84,7 +84,7 @@ export function registerTrainStationForRealmSocketHandlers(
                 return;
             }
 
-            incrSocketRoomConnections(socket, buildDomainChannelName(DomainSubType.TRAIN_STATION_IN, target));
+            incrSocketRoomConnections(socket, buildDomainChannelName(DomainSubType.ANALYSIS_NODE_IN, target));
 
             if (isSocketClientToServerEventCallback(cb)) {
                 cb();
@@ -93,18 +93,18 @@ export function registerTrainStationForRealmSocketHandlers(
     );
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainSubType.TRAIN_STATION_IN, DomainEventSubscriptionName.UNSUBSCRIBE),
+        buildDomainEventSubscriptionFullName(DomainSubType.ANALYSIS_NODE_IN, DomainEventSubscriptionName.UNSUBSCRIBE),
         (target) => {
-            decrSocketRoomConnections(socket, buildDomainChannelName(DomainSubType.TRAIN_STATION_IN, target));
+            decrSocketRoomConnections(socket, buildDomainChannelName(DomainSubType.ANALYSIS_NODE_IN, target));
         },
     );
 
     // ----------------------------------------------------------
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainSubType.TRAIN_STATION_OUT, DomainEventSubscriptionName.SUBSCRIBE),
+        buildDomainEventSubscriptionFullName(DomainSubType.ANALYSIS_NODE_OUT, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
-            if (!socket.data.ability.has(PermissionID.TRAIN_EDIT)) {
+            if (!socket.data.ability.has(PermissionID.ANALYSIS_EDIT)) {
                 if (isSocketClientToServerEventErrorCallback(cb)) {
                     cb(new UnauthorizedError());
                 }
@@ -112,7 +112,7 @@ export function registerTrainStationForRealmSocketHandlers(
                 return;
             }
 
-            incrSocketRoomConnections(socket, buildDomainChannelName(DomainSubType.TRAIN_STATION_OUT, target));
+            incrSocketRoomConnections(socket, buildDomainChannelName(DomainSubType.ANALYSIS_NODE_OUT, target));
 
             if (isSocketClientToServerEventCallback(cb)) {
                 cb();
@@ -121,9 +121,9 @@ export function registerTrainStationForRealmSocketHandlers(
     );
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainSubType.TRAIN_STATION_OUT, DomainEventSubscriptionName.UNSUBSCRIBE),
+        buildDomainEventSubscriptionFullName(DomainSubType.ANALYSIS_NODE_OUT, DomainEventSubscriptionName.UNSUBSCRIBE),
         (target) => {
-            decrSocketRoomConnections(socket, buildDomainChannelName(DomainSubType.TRAIN_STATION_OUT, target));
+            decrSocketRoomConnections(socket, buildDomainChannelName(DomainSubType.ANALYSIS_NODE_OUT, target));
         },
     );
 }

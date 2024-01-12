@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 import { defineComponent } from 'vue';
-import type { Train } from '@personalhealthtrain/core';
+import type { Analysis } from '@personalhealthtrain/core';
 import type { PropType } from 'vue';
 import TrainUserSecretPicker from '../TrainUserSecretPicker.vue';
 
@@ -16,13 +16,13 @@ export default defineComponent({
     },
     props: {
         entity: {
-            type: Object as PropType<Train>,
+            type: Object as PropType<Analysis>,
             required: true,
         },
     },
     emits: ['updated'],
     setup(props, { emit }) {
-        const handleUpdated = (item: Partial<Train>) => {
+        const handleUpdated = (item: Partial<Analysis>) => {
             emit('updated', item);
         };
 

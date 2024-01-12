@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Proposal } from '@personalhealthtrain/core';
+import type { Project } from '@personalhealthtrain/core';
 import { removeDateProperties } from '../../utils/date-properties';
 import { useSuperTest } from '../../utils/supertest';
 import { dropTestDatabase, useTestDatabase } from '../../utils/database';
@@ -23,7 +23,7 @@ describe('src/controllers/core/proposal', () => {
         await dropTestDatabase();
     });
 
-    let details : Proposal;
+    let details : Project;
 
     it('should create resource', async () => {
         const response = await createSuperTestProposal(superTest);
@@ -58,7 +58,7 @@ describe('src/controllers/core/proposal', () => {
     });
 
     it('should update resource', async () => {
-        details.title = 'TestA';
+        details.name = 'TestA';
 
         const response = await superTest
             .post(`/proposals/${details.id}`)

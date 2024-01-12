@@ -5,15 +5,15 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Train } from '@personalhealthtrain/core';
+import type { Analysis } from '@personalhealthtrain/core';
 import type { CoreCommand, CoreEvent } from './constants';
 
 export type CoreConfigurePayload = {
-    id: Train['id']
+    id: Analysis['id']
 };
 
 export type CoreDestroyPayload = {
-    id: Train['id']
+    id: Analysis['id']
 };
 
 export type CoreConfigureCommandContext = {

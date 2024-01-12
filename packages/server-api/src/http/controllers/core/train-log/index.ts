@@ -6,7 +6,7 @@
  */
 
 import type {
-    TrainLog,
+    AnalysisLog,
 } from '@personalhealthtrain/core';
 
 import {
@@ -19,7 +19,7 @@ import {
     getOneTrainLogRouteHandler,
 } from './handlers';
 
-type PartialTrainLog = Partial<TrainLog>;
+type PartialTrainLog = Partial<AnalysisLog>;
 
 @DTags('train')
 @DController('/train-logs')

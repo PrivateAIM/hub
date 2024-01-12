@@ -16,7 +16,7 @@ import { runProposalValidation } from '../utils/validation';
 
 export async function createProposalRouteHandler(req: Request, res: Response) : Promise<any> {
     const ability = useRequestEnv(req, 'ability');
-    if (!ability.has(PermissionID.PROPOSAL_ADD)) {
+    if (!ability.has(PermissionID.PROJECT_ADD)) {
         throw new ForbiddenError();
     }
 

@@ -5,35 +5,35 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { TrainResultStatus } from '@personalhealthtrain/core';
+import { AnalysisResultStatus } from '@personalhealthtrain/core';
 import type { PropType } from 'vue';
 import { computed, defineComponent } from 'vue';
 
 export default defineComponent({
     props: {
         status: {
-            type: Object as PropType<TrainResultStatus>,
+            type: Object as PropType<AnalysisResultStatus>,
         },
     },
     setup(props) {
         const statusText = computed(() => {
             switch (props.status) {
-                case TrainResultStatus.STARTED:
+                case AnalysisResultStatus.STARTED:
                     return 'started';
 
-                case TrainResultStatus.DOWNLOADING:
+                case AnalysisResultStatus.DOWNLOADING:
                     return 'downloading...';
-                case TrainResultStatus.DOWNLOADED:
+                case AnalysisResultStatus.DOWNLOADED:
                     return 'downloaded';
 
-                case TrainResultStatus.PROCESSING:
+                case AnalysisResultStatus.PROCESSING:
                     return 'extracting...';
-                case TrainResultStatus.PROCESSED:
+                case AnalysisResultStatus.PROCESSED:
                     return 'extracted';
 
-                case TrainResultStatus.FINISHED:
+                case AnalysisResultStatus.FINISHED:
                     return 'finished';
-                case TrainResultStatus.FAILED:
+                case AnalysisResultStatus.FAILED:
                     return 'failed';
 
                 default:
@@ -43,16 +43,16 @@ export default defineComponent({
 
         const classSuffix = computed(() => {
             switch (props.status) {
-                case TrainResultStatus.STARTED:
-                case TrainResultStatus.DOWNLOADING:
-                case TrainResultStatus.PROCESSING:
-                case TrainResultStatus.PROCESSED:
+                case AnalysisResultStatus.STARTED:
+                case AnalysisResultStatus.DOWNLOADING:
+                case AnalysisResultStatus.PROCESSING:
+                case AnalysisResultStatus.PROCESSED:
                     return 'primary';
 
-                case TrainResultStatus.FINISHED:
+                case AnalysisResultStatus.FINISHED:
                     return 'success';
 
-                case TrainResultStatus.FAILED:
+                case AnalysisResultStatus.FAILED:
                     return 'danger';
 
                 default:

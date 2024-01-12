@@ -6,7 +6,7 @@
  */
 import { DomainType } from '@personalhealthtrain/core';
 import type {
-    TrainFile,
+    AnalysisFile,
 } from '@personalhealthtrain/core';
 import type { SlotsType } from 'vue';
 import { defineComponent } from 'vue';
@@ -15,14 +15,14 @@ import { createList, defineListEvents, defineListProps } from '../../core';
 
 export default defineComponent({
     props: {
-        ...defineListProps<TrainFile>(),
+        ...defineListProps<AnalysisFile>(),
         realmId: {
             type: String,
             default: undefined,
         },
     },
-    slots: Object as SlotsType<ListSlotsType<TrainFile>>,
-    emits: defineListEvents<TrainFile>(),
+    slots: Object as SlotsType<ListSlotsType<AnalysisFile>>,
+    emits: defineListEvents<AnalysisFile>(),
     setup(props, setup) {
         // todo: include sort
 
@@ -30,7 +30,7 @@ export default defineComponent({
             render,
             setDefaults,
         } = createList({
-            type: `${DomainType.TRAIN_FILE}`,
+            type: `${DomainType.ANALYSIS_FILE}`,
             props,
             setup,
         });

@@ -5,12 +5,12 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Train } from '@personalhealthtrain/core';
+import type { Analysis } from '@personalhealthtrain/core';
 import {
     PermissionID,
-    TrainAPICommand, TrainBuildStatus,
-    TrainConfigurationStatus, TrainResultStatus,
-    TrainRunStatus,
+    AnalysisAPICommand, AnalysisBuildStatus,
+    AnalysisConfigurationStatus, AnalysisResultStatus,
+    AnalysisRunStatus,
 } from '@personalhealthtrain/core';
 import type { PropType } from 'vue';
 import { computed, defineComponent } from 'vue';
@@ -46,22 +46,22 @@ export default defineComponent({
             default: true,
         },
         entity: {
-            type: Object as PropType<Train>,
+            type: Object as PropType<Analysis>,
             required: true,
         },
     },
     emits: ['updated', 'executed', 'failed'],
     setup(props, { emit }) {
-        const canEdit = computed(() => injectAuthupStore().has(PermissionID.TRAIN_EDIT));
+        const canEdit = computed(() => injectAuthupStore().has(PermissionID.ANALYSIS_EDIT));
 
         // ---------------------------------------------------------
         const canConfigure = computed(() => canEdit.value &&
-              props.entity.configuration_status !== TrainConfigurationStatus.FINISHED);
+              props.entity.configuration_status !== AnalysisConfigurationStatus.FINISHED);
 
         const handleExecuted = (type: string, command: string) => {
             emit('executed', type, command);
         };
-        const handleUpdated = (item: Train) => {
+        const handleUpdated = (item: Analysis) => {
             emit('updated', item);
         };
         const handleFailed = (e: Error) => {
@@ -69,11 +69,11 @@ export default defineComponent({
         };
 
         return {
-            trainBuildStatus: TrainBuildStatus,
-            trainConfigurationStatus: TrainConfigurationStatus,
-            trainRunStatus: TrainRunStatus,
-            trainResultStatus: TrainResultStatus,
-            trainCommand: TrainAPICommand,
+            trainBuildStatus: AnalysisBuildStatus,
+            trainConfigurationStatus: AnalysisConfigurationStatus,
+            trainRunStatus: AnalysisRunStatus,
+            trainResultStatus: AnalysisResultStatus,
+            trainCommand: AnalysisAPICommand,
 
             busy: false,
 

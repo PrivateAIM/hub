@@ -11,7 +11,7 @@ import type {
 } from 'typeorm';
 import { EventSubscriber } from 'typeorm';
 import type {
-    TrainLog,
+    AnalysisLog,
 } from '@personalhealthtrain/core';
 import {
     DomainEventName,
@@ -23,20 +23,20 @@ import { TrainLogEntity } from '../../domains';
 
 async function publishEvent(
     event: `${DomainEventName}`,
-    data: TrainLog,
+    data: AnalysisLog,
 ) {
     await publishDomainEvent(
         {
-            type: DomainType.TRAIN_LOG,
+            type: DomainType.ANALYSIS_LOG,
             event,
             data,
         },
         [
             {
-                channel: (id) => buildDomainChannelName(DomainType.TRAIN_LOG, id),
+                channel: (id) => buildDomainChannelName(DomainType.ANALYSIS_LOG, id),
             },
             {
-                channel: (id) => buildDomainChannelName(DomainType.TRAIN_LOG, id),
+                channel: (id) => buildDomainChannelName(DomainType.ANALYSIS_LOG, id),
                 namespace: buildDomainNamespaceName(data.realm_id),
             },
         ],

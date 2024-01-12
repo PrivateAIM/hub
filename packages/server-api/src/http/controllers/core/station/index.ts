@@ -6,7 +6,7 @@
  */
 
 import type {
-    Station,
+    Node,
 } from '@personalhealthtrain/core';
 import {
     DBody, DController, DDelete, DGet, DPath, DPost, DRequest, DResponse, DTags,
@@ -21,7 +21,7 @@ import {
     updateStationRouteHandler,
 } from './handlers';
 
-type PartialStation = Partial<Station>;
+type PartialStation = Partial<Node>;
 
 @DTags('station')
 @DController('/stations')

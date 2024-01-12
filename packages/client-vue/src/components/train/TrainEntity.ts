@@ -9,7 +9,7 @@ import {
     DomainType,
 } from '@personalhealthtrain/core';
 import type {
-    Train,
+    Analysis,
 } from '@personalhealthtrain/core';
 import {
     defineComponent,
@@ -23,12 +23,12 @@ import {
 } from '../../core';
 
 export default defineComponent({
-    props: defineEntityManagerProps<Train>(),
-    emits: defineEntityManagerEvents<Train>(),
-    slots: Object as SlotsType<EntityManagerSlotsType<Train>>,
+    props: defineEntityManagerProps<Analysis>(),
+    emits: defineEntityManagerEvents<Analysis>(),
+    slots: Object as SlotsType<EntityManagerSlotsType<Analysis>>,
     async setup(props, setup) {
         const manager = createEntityManager({
-            type: `${DomainType.TRAIN}`,
+            type: `${DomainType.ANALYSIS}`,
             setup,
             props,
         });

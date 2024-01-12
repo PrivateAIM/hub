@@ -4,7 +4,7 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { PermissionID, TrainStationApprovalCommand, TrainStationApprovalStatus } from '@personalhealthtrain/core';
+import { PermissionID, AnalysisNodeApprovalCommand, AnalysisNodeApprovalStatus } from '@personalhealthtrain/core';
 import type { PropType } from 'vue';
 import { computed, defineComponent, ref } from 'vue';
 import type { ActionCommandProperties } from '../../core';
@@ -17,10 +17,10 @@ export default defineComponent({
             type: String,
             required: true,
         },
-        approvalStatus: String as PropType<TrainStationApprovalStatus>,
+        approvalStatus: String as PropType<AnalysisNodeApprovalStatus>,
 
         command: {
-            type: String as PropType<TrainStationApprovalCommand>,
+            type: String as PropType<AnalysisNodeApprovalCommand>,
             required: true,
         },
         elementType: {
@@ -43,9 +43,9 @@ export default defineComponent({
 
         const commandText = computed(() => {
             switch (props.command) {
-                case TrainStationApprovalCommand.APPROVE:
+                case AnalysisNodeApprovalCommand.APPROVE:
                     return 'approve';
-                case TrainStationApprovalCommand.REJECT:
+                case AnalysisNodeApprovalCommand.REJECT:
                     return 'reject';
                 default:
                     return '';
@@ -54,9 +54,9 @@ export default defineComponent({
 
         const iconClass = computed(() => {
             switch (props.command) {
-                case TrainStationApprovalCommand.APPROVE:
+                case AnalysisNodeApprovalCommand.APPROVE:
                     return 'fa fa-check';
-                case TrainStationApprovalCommand.REJECT:
+                case AnalysisNodeApprovalCommand.REJECT:
                     return 'fa fa-ban';
                 default:
                     return 'fa fa-sync-alt';
@@ -65,9 +65,9 @@ export default defineComponent({
 
         const classSuffix = computed(() => {
             switch (props.command) {
-                case TrainStationApprovalCommand.APPROVE:
+                case AnalysisNodeApprovalCommand.APPROVE:
                     return 'success';
-                case TrainStationApprovalCommand.REJECT:
+                case AnalysisNodeApprovalCommand.REJECT:
                     return 'danger';
                 default:
                     return 'info';
@@ -79,17 +79,17 @@ export default defineComponent({
         const isDisabled = computed(() => {
             if (props.approvalStatus) {
                 if (
-                    props.approvalStatus === TrainStationApprovalStatus.APPROVED &&
-                    props.command === TrainStationApprovalCommand.APPROVE
+                    props.approvalStatus === AnalysisNodeApprovalStatus.APPROVED &&
+                    props.command === AnalysisNodeApprovalCommand.APPROVE
                 ) {
                     return true;
                 }
 
-                return props.approvalStatus === TrainStationApprovalStatus.REJECTED &&
-                    props.command === TrainStationApprovalCommand.REJECT;
+                return props.approvalStatus === AnalysisNodeApprovalStatus.REJECTED &&
+                    props.command === AnalysisNodeApprovalCommand.REJECT;
             }
 
-            return props.command === TrainStationApprovalCommand.REJECT;
+            return props.command === AnalysisNodeApprovalCommand.REJECT;
         });
 
         const execute = async () => {
@@ -100,11 +100,11 @@ export default defineComponent({
             let status;
 
             switch (props.command) {
-                case TrainStationApprovalCommand.APPROVE:
-                    status = TrainStationApprovalStatus.APPROVED;
+                case AnalysisNodeApprovalCommand.APPROVE:
+                    status = AnalysisNodeApprovalStatus.APPROVED;
                     break;
-                case TrainStationApprovalCommand.REJECT:
-                    status = TrainStationApprovalStatus.REJECTED;
+                case AnalysisNodeApprovalCommand.REJECT:
+                    status = AnalysisNodeApprovalStatus.REJECTED;
                     break;
                 default:
                     status = null;
@@ -131,7 +131,7 @@ export default defineComponent({
             withText: props.withText,
             isDisabled: isDisabled.value,
             iconClass: iconClass.value,
-            isAllowed: store.has(PermissionID.TRAIN_APPROVE),
+            isAllowed: store.has(PermissionID.ANALYSIS_APPROVE),
             commandText: commandText.value,
             classSuffix: classSuffix.value,
             slots: setup.slots,

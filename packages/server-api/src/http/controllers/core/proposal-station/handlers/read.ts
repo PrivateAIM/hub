@@ -39,8 +39,8 @@ export async function getOneProposalStationRouteHandler(req: Request, res: Respo
     }
 
     if (
-        !isRealmResourceReadable(useRequestEnv(req, 'realm'), entity.station_realm_id) &&
-        !isRealmResourceReadable(useRequestEnv(req, 'realm'), entity.proposal_realm_id)
+        !isRealmResourceReadable(useRequestEnv(req, 'realm'), entity.node_realm_id) &&
+        !isRealmResourceReadable(useRequestEnv(req, 'realm'), entity.project_realm_id)
     ) {
         throw new ForbiddenError();
     }

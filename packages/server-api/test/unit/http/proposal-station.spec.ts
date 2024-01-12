@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ProposalStation } from '@personalhealthtrain/core';
+import type { ProjectNode } from '@personalhealthtrain/core';
 import { useSuperTest } from '../../utils/supertest';
 import { dropTestDatabase, useTestDatabase } from '../../utils/database';
 import { createSuperTestProposal, createSuperTestStation } from '../../utils/domains';
@@ -22,7 +22,7 @@ describe('src/controllers/core/proposal-station', () => {
         await dropTestDatabase();
     });
 
-    let details : ProposalStation;
+    let details : ProjectNode;
 
     it('should create resource', async () => {
         const proposal = await createSuperTestProposal(superTest);

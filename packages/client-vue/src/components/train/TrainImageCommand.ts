@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { MasterImage, TrainFile } from '@personalhealthtrain/core';
+import type { MasterImage, AnalysisFile } from '@personalhealthtrain/core';
 import {
     computed, defineComponent, h, ref, toRefs, watch,
 } from 'vue';
@@ -34,7 +34,7 @@ export default defineComponent({
         const masterImageEntity = ref<null | MasterImage>(null);
         const masterImageBusy = ref(false);
 
-        const trainFileEntity = ref<null | TrainFile>(null);
+        const trainFileEntity = ref<null | AnalysisFile>(null);
         const trainFileBusy = ref(false);
 
         const command = computed(() => {

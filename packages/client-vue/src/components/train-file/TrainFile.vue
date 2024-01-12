@@ -9,7 +9,7 @@ import {
     DomainType,
 } from '@personalhealthtrain/core';
 import type {
-    TrainFile,
+    AnalysisFile,
 } from '@personalhealthtrain/core';
 import type { PropType } from 'vue';
 import {
@@ -20,7 +20,7 @@ import { createEntityManager, defineEntityManagerEvents } from '../../core';
 export default defineComponent({
     props: {
         entity: {
-            type: Object as PropType<TrainFile>,
+            type: Object as PropType<AnalysisFile>,
             required: true,
         },
         filesSelected: {
@@ -32,15 +32,15 @@ export default defineComponent({
         },
     },
     emits: {
-        ...defineEntityManagerEvents<TrainFile>(),
+        ...defineEntityManagerEvents<AnalysisFile>(),
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        toggle: (_entity?: TrainFile) => true,
+        toggle: (_entity?: AnalysisFile) => true,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        check: (_entity?: TrainFile) => true,
+        check: (_entity?: AnalysisFile) => true,
     },
     setup(props, setup) {
         const manager = createEntityManager({
-            type: `${DomainType.TRAIN_FILE}`,
+            type: `${DomainType.ANALYSIS_FILE}`,
             props,
             setup,
         });

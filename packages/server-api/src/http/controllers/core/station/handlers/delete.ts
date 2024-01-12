@@ -22,7 +22,7 @@ export async function deleteStationRouteHandler(req: Request, res: Response) : P
     const id = useRequestParam(req, 'id');
 
     const ability = useRequestEnv(req, 'ability');
-    if (!ability.has(PermissionID.STATION_DROP)) {
+    if (!ability.has(PermissionID.NODE_DROP)) {
         throw new ForbiddenError();
     }
 

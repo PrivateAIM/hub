@@ -21,8 +21,8 @@ export async function deleteTrainFileRouteHandler(req: Request, res: Response) :
 
     const ability = useRequestEnv(req, 'ability');
     if (
-        !ability.has(PermissionID.TRAIN_ADD) &&
-        !ability.has(PermissionID.TRAIN_EDIT)
+        !ability.has(PermissionID.ANALYSIS_ADD) &&
+        !ability.has(PermissionID.ANALYSIS_EDIT)
     ) {
         throw new ForbiddenError();
     }
@@ -41,7 +41,7 @@ export async function deleteTrainFileRouteHandler(req: Request, res: Response) :
     }
 
     const minio = useMinio();
-    const bucketName = generateTrainMinioBucketName(entity.train_id);
+    const bucketName = generateTrainMinioBucketName(entity.analysis_id);
     try {
         await minio.removeObject(bucketName, entity.hash);
     } catch (e) {
@@ -56,7 +56,7 @@ export async function deleteTrainFileRouteHandler(req: Request, res: Response) :
 
     // train
     const trainRepository = dataSource.getRepository(TrainEntity);
-    let train = await trainRepository.findOneBy({ id: entity.train_id });
+    let train = await trainRepository.findOneBy({ id: entity.analysis_id });
     train = trainRepository.merge(train, {
         hash: null,
         hash_signed: null,

@@ -9,7 +9,7 @@ import {
     DomainType,
 } from '@personalhealthtrain/core';
 import type {
-    Proposal,
+    Project,
 } from '@personalhealthtrain/core';
 import type { SlotsType } from 'vue';
 import {
@@ -25,12 +25,12 @@ import {
 } from '../../core';
 
 export default defineComponent({
-    props: defineEntityManagerProps<Proposal>(),
-    emits: defineEntityManagerEvents<Proposal>(),
-    slots: Object as SlotsType<EntityManagerSlotsType<Proposal>>,
+    props: defineEntityManagerProps<Project>(),
+    emits: defineEntityManagerEvents<Project>(),
+    slots: Object as SlotsType<EntityManagerSlotsType<Project>>,
     async setup(props, setup) {
         const manager = createEntityManager({
-            type: `${DomainType.PROPOSAL}`,
+            type: `${DomainType.PROJECT}`,
             setup,
             props,
         });

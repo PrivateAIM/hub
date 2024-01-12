@@ -76,7 +76,7 @@ export async function handleTrainFilesDownloadRouteHandler(req: Request, res: Re
     }
 
     const files = await dataSource.getRepository(TrainFileEntity).findBy({
-        train_id: train.id,
+        analysis_id: train.id,
     });
 
     if (files.length === 0) {

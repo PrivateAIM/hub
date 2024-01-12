@@ -108,8 +108,8 @@ export async function runTrainValidation(
         entity: 'master_image',
     });
     await extendRequestValidationResultWithRelation(result, ProposalEntity, {
-        id: 'proposal_id',
-        entity: 'proposal',
+        id: 'project_id',
+        entity: 'project',
     });
     await extendRequestValidationResultWithRelation(result, RegistryEntity, {
         id: 'registry_id',
@@ -121,12 +121,12 @@ export async function runTrainValidation(
         entity: 'entrypoint_file',
     });
 
-    if (result.relation.proposal) {
-        if (!isRealmResourceWritable(useRequestEnv(req, 'realm'), result.relation.proposal.realm_id)) {
+    if (result.relation.project) {
+        if (!isRealmResourceWritable(useRequestEnv(req, 'realm'), result.relation.project.realm_id)) {
             throw new BadRequestError('The referenced proposal realm is not permitted.');
         }
 
-        result.data.realm_id = result.relation.proposal.realm_id;
+        result.data.realm_id = result.relation.project.realm_id;
     }
 
     if (result.relation.registry) {

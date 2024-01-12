@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Train } from '@personalhealthtrain/core';
+import type { Analysis } from '@personalhealthtrain/core';
 import { PermissionID } from '@personalhealthtrain/core';
 import { ForbiddenError } from '@ebec/http';
 import type { Request, Response } from 'routup';
@@ -18,7 +18,7 @@ import { TrainEntity } from '../../../../../domains/train';
 
 export async function createTrainRouteHandler(req: Request, res: Response) : Promise<any> {
     const ability = useRequestEnv(req, 'ability');
-    if (!ability.has(PermissionID.TRAIN_ADD)) {
+    if (!ability.has(PermissionID.ANALYSIS_ADD)) {
         throw new ForbiddenError();
     }
 
@@ -26,13 +26,13 @@ export async function createTrainRouteHandler(req: Request, res: Response) : Pro
 
     if (
         !result.data.master_image_id &&
-        result.relation.proposal
+        result.relation.project
     ) {
-        result.data.master_image_id = result.relation.proposal.master_image_id;
+        result.data.master_image_id = result.relation.project.master_image_id;
     }
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository<Train>(TrainEntity);
+    const repository = dataSource.getRepository<Analysis>(TrainEntity);
 
     const realm = useRequestEnv(req, 'realm');
 
@@ -44,9 +44,9 @@ export async function createTrainRouteHandler(req: Request, res: Response) : Pro
 
     await repository.save(entity);
 
-    result.relation.proposal.trains++;
+    result.relation.project.analyses++;
     const proposalRepository = dataSource.getRepository(ProposalEntity);
-    await proposalRepository.save(result.relation.proposal);
+    await proposalRepository.save(result.relation.project);
 
     return sendCreated(res, entity);
 }

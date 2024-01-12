@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { TrainRunStatus } from '@personalhealthtrain/core';
+import { AnalysisRunStatus } from '@personalhealthtrain/core';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
@@ -18,17 +18,17 @@ export default defineComponent({
     computed: {
         statusText() {
             switch (this.status) {
-                case TrainRunStatus.STARTING:
+                case AnalysisRunStatus.STARTING:
                     return 'starting...';
-                case TrainRunStatus.RUNNING:
+                case AnalysisRunStatus.RUNNING:
                     return 'running...';
-                case TrainRunStatus.STOPPING:
+                case AnalysisRunStatus.STOPPING:
                     return 'stopping...';
-                case TrainRunStatus.STOPPED:
+                case AnalysisRunStatus.STOPPED:
                     return 'stopped...';
-                case TrainRunStatus.FINISHED:
+                case AnalysisRunStatus.FINISHED:
                     return 'finished';
-                case TrainRunStatus.FAILED:
+                case AnalysisRunStatus.FAILED:
                     return 'failed';
                 default:
                     return 'none';
@@ -36,15 +36,15 @@ export default defineComponent({
         },
         classSuffix() {
             switch (this.status) {
-                case TrainRunStatus.STARTING:
-                case TrainRunStatus.STOPPING:
-                case TrainRunStatus.RUNNING:
+                case AnalysisRunStatus.STARTING:
+                case AnalysisRunStatus.STOPPING:
+                case AnalysisRunStatus.RUNNING:
                     return 'primary';
-                case TrainRunStatus.STOPPED:
+                case AnalysisRunStatus.STOPPED:
                     return 'warning';
-                case TrainRunStatus.FINISHED:
+                case AnalysisRunStatus.FINISHED:
                     return 'success';
-                case TrainRunStatus.FAILED:
+                case AnalysisRunStatus.FAILED:
                     return 'danger';
                 default:
                     return 'info';

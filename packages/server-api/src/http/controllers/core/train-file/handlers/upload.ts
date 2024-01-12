@@ -7,7 +7,7 @@
 
 import path from 'node:path';
 import crypto from 'node:crypto';
-import type { TrainFile } from '@personalhealthtrain/core';
+import type { AnalysisFile } from '@personalhealthtrain/core';
 import { PermissionID } from '@personalhealthtrain/core';
 import type { FileInfo } from 'busboy';
 import BusBoy from 'busboy';
@@ -25,19 +25,19 @@ import { useRequestEnv } from '../../../../request';
 export async function uploadTrainFilesRouteHandler(req: Request, res: Response) {
     const ability = useRequestEnv(req, 'ability');
     if (
-        !ability.has(PermissionID.TRAIN_ADD) &&
-        !ability.has(PermissionID.TRAIN_EDIT)
+        !ability.has(PermissionID.ANALYSIS_ADD) &&
+        !ability.has(PermissionID.ANALYSIS_EDIT)
     ) {
         throw new ForbiddenError();
     }
 
     const dataSource = await useDataSource();
 
-    const repository = dataSource.getRepository<TrainFile>(TrainFileEntity);
+    const repository = dataSource.getRepository<AnalysisFile>(TrainFileEntity);
 
     const instance = BusBoy({ headers: req.headers, preservePath: true });
 
-    const files: TrainFile[] = [];
+    const files: AnalysisFile[] = [];
 
     const minio = useMinio();
 
@@ -84,7 +84,7 @@ export async function uploadTrainFilesRouteHandler(req: Request, res: Response) 
                                         size: buffer.length,
                                         directory: filePath,
                                         user_id: useRequestEnv(req, 'userId'),
-                                        train_id: trainId,
+                                        analysis_id: trainId,
                                         realm_id: realm.id,
                                     }));
 

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Station } from '@personalhealthtrain/core';
+import type { Node } from '@personalhealthtrain/core';
 import {
     DomainEventName,
     DomainType,
@@ -24,20 +24,20 @@ import { StationEntity } from '../../domains';
 
 async function publishEvent(
     event: `${DomainEventName}`,
-    data: Station,
+    data: Node,
 ) {
     await publishDomainEvent(
         {
-            type: DomainType.STATION,
+            type: DomainType.NODE,
             event,
             data,
         },
         [
             {
-                channel: (id) => buildDomainChannelName(DomainType.STATION, id),
+                channel: (id) => buildDomainChannelName(DomainType.NODE, id),
             },
             {
-                channel: (id) => buildDomainChannelName(DomainType.STATION, id),
+                channel: (id) => buildDomainChannelName(DomainType.NODE, id),
                 namespace: buildDomainNamespaceName(data.realm_id),
             },
         ],

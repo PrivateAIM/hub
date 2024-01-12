@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Train } from '@personalhealthtrain/core';
+import type { Analysis } from '@personalhealthtrain/core';
 
 export type ContainerPackContext = {
-    train: Train,
+    train: Analysis,
     masterImagePath: string
 };

@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Train } from '@personalhealthtrain/core';
+import type { Analysis } from '@personalhealthtrain/core';
 import { storeToRefs } from 'pinia';
 import { ref } from 'vue';
 import { TrainBasicForm } from '@personalhealthtrain/client-vue';
@@ -27,7 +27,7 @@ export default defineNuxtComponent({
             proposalId.value = route.query.proposal_id;
         }
 
-        const handleCreated = async (train: Train) => {
+        const handleCreated = async (train: Analysis) => {
             emit('created', train);
         };
 

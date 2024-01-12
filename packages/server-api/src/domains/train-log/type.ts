@@ -6,7 +6,7 @@
  */
 
 import type {
-    Train,
+    Analysis,
 } from '@personalhealthtrain/core';
 
 import type {
@@ -14,8 +14,8 @@ import type {
 } from '@personalhealthtrain/server-train-manager';
 
 export type TrainLogSaveContext = {
-    train: Pick<Train, 'id'> &
-    Partial<Pick<Train, 'realm_id' | 'run_station_index' | 'run_station_id'>>,
+    train: Pick<Analysis, 'id'> &
+    Partial<Pick<Analysis, 'realm_id' | 'run_station_index' | 'run_station_id'>>,
 
     error?: boolean,
     errorCode?: string,

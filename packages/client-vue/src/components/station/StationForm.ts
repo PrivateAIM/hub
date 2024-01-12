@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import { ARealms } from '@authup/client-vue';
-import type { Registry, Station } from '@personalhealthtrain/core';
+import type { Registry, Node } from '@personalhealthtrain/core';
 import {
     DomainType,
     Ecosystem,
@@ -39,7 +39,7 @@ import RegistryList from '../registry/RegistryList';
 export default defineComponent({
     props: {
         entity: {
-            type: Object as PropType<Station>,
+            type: Object as PropType<Node>,
             default: undefined,
         },
         realmId: {
@@ -51,7 +51,7 @@ export default defineComponent({
             default: undefined,
         },
     },
-    emits: defineEntityManagerEvents<Station>(),
+    emits: defineEntityManagerEvents<Node>(),
     setup(props, setup) {
         const busy = ref(false);
         const form = reactive({
@@ -102,7 +102,7 @@ export default defineComponent({
         ];
 
         const manager = createEntityManager({
-            type: `${DomainType.STATION}`,
+            type: `${DomainType.NODE}`,
             setup,
             props,
         });
@@ -156,7 +156,7 @@ export default defineComponent({
         const submit = wrapFnWithBusyState(busy, async () => {
             if ($v.value.$invalid) return;
 
-            await manager.createOrUpdate(form as Partial<Station>);
+            await manager.createOrUpdate(form as Partial<Node>);
         });
 
         const toggleFormData = <T extends keyof typeof form>(key: T, id: any) => {
@@ -175,7 +175,7 @@ export default defineComponent({
                         ARealms,
                         {},
                         {
-                            [EntityListSlotName.BODY]: (props: ListBodySlotProps<Station>) => buildFormGroup({
+                            [EntityListSlotName.BODY]: (props: ListBodySlotProps<Node>) => buildFormGroup({
                                 validationTranslator: useValidationTranslator(),
                                 validationResult: $v.value.realm_id,
                                 label: true,

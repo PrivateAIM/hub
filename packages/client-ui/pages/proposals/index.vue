@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Proposal } from '@personalhealthtrain/core';
+import type { Project } from '@personalhealthtrain/core';
 import { defineNuxtComponent, navigateTo } from '#app';
 import { definePageMeta, useToast } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
@@ -37,7 +37,7 @@ export default defineNuxtComponent({
 
         const toast = useToast();
 
-        const handleCreated = (entity: Proposal) => {
+        const handleCreated = (entity: Project) => {
             toast.show({ variant: 'success', body: 'The proposal was successfully created.' });
 
             navigateTo({

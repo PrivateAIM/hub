@@ -6,7 +6,7 @@
   -->
 
 <script lang="ts">
-import type { Station } from '@personalhealthtrain/core';
+import type { Node } from '@personalhealthtrain/core';
 import { PermissionID } from '@personalhealthtrain/core';
 import { definePageMeta, useToast } from '#imports';
 import { defineNuxtComponent, navigateTo } from '#app';
@@ -18,9 +18,9 @@ export default defineNuxtComponent({
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.REQUIRED_PERMISSIONS]: [
-                PermissionID.STATION_EDIT,
-                PermissionID.STATION_DROP,
-                PermissionID.STATION_ADD,
+                PermissionID.NODE_EDIT,
+                PermissionID.NODE_DROP,
+                PermissionID.NODE_ADD,
             ],
         });
 
@@ -39,13 +39,13 @@ export default defineNuxtComponent({
 
         const toast = useToast();
 
-        const handleCreated = async (e: Station) => {
+        const handleCreated = async (e: Node) => {
             toast.show({ variant: 'success', body: 'The station was successfully created.' });
 
             await navigateTo(`/admin/stations/${e.id}`);
         };
 
-        const handleDeleted = (e: Station) => {
+        const handleDeleted = (e: Node) => {
             toast.show({ variant: 'success', body: 'The station was successfully deleted.' });
         };
 
