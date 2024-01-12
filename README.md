@@ -1,29 +1,47 @@
-# Central 🐋
-This repository contains the main central packages of the Personal Health Train (PHT).
+# Flame HUB 🔥
+This repository contains the HUB Ecosystem of FLAME.
 
 [![main](https://github.com/PHT-Medic/central/actions/workflows/main.yml/badge.svg)](https://github.com/PHT-Medic/central/actions/workflows/main.yml)
 [![CodeQL](https://github.com/PHT-Medic/central/actions/workflows/codeql.yml/badge.svg)](https://github.com/PHT-Medic/central/actions/workflows/codeql.yml)
 [![Known Vulnerabilities](https://snyk.io/test/github/PHT-Medic/central/badge.svg)](https://snyk.io/test/github/PHT-Medic/central)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits&logoColor=white)](https://conventionalcommits.org)
 
-![](assets/ui.jpg)
-
 **Table of Contents**
 
-- [Installation & Build](#installation--build)
-- [Configuration](#configuration)
 - [Packages](#packages)
 - [Usage](#usage)
 - [Contributing](#contributing)
 - [Credits](#credits)
 - [License](#license)
 
-## Installation & Build
+## Packages
+
+The repository contains the following packages:
+
+**`General`**
+- **@privateaim/flame-core** 🧱: This package contains common constants, functions, types, ...
+
+**`Client`**
+- **@privateaim/flame-client-ui** 🧸: This package contains the User Interface.
+- **@privateaim/flame-client-vue** 🧩: This package contains vue components for frontend applications.
+
+**`Server`**
+- **@privateaim/flame-server-core** 🧱: This package contains common constants, functions, types, ... for the server side.
+- **@privateaim/flame-server-api** 🌴: This package contains aggregators, components and many more.
+- **@privateaim/flame-server-realtime** 🚄: This package contains the realtime application which connects the API with socket based clients.
+- **@privateaim/flame-server-train-manager** 🏭: This package contains the train manager, which is responsible to route, build and extract a train.
+
+## Usage
+
+### Development
+
+**1. Installation & Build**
+
 Download the source code.
 
 ```shell
-$ git clone https://github.com/PHT-Medic/central
-$ cd central
+$ git clone https://github.com/PrivateAim/hub
+$ cd hub
 ```
 
 In addition, `Node.js` must be installed on the host machine, to start packages and to install required dependencies.
@@ -39,27 +57,12 @@ To build all packages, run:
 $ npm run build
 ```
 
-## Configuration
+**2. Configuration**
+
 Read the `README.md` in each package directory. Each package must be configured individually.
 
-## Packages
+**3. Execution**
 
-The repository contains the following packages:
-
-**`General`**
-- **@personalhealthtrain/core** 🧱: This package contains common constants, functions, types, ...
-
-**`Client`**
-- **@personalhealthtrain/client-ui** 🧸: This package contains the User Interface.
-- **@personalhealthtrain/client-vue** 🧩: This package contains vue components for frontend applications.
-
-**`Server`**
-- **@personalhealthtrain/server-core** 🧱: This package contains common constants, functions, types, ... for the server side.
-- **@personalhealthtrain/server-api** 🌴: This package contains aggregators, components and many more.
-- **@personalhealthtrain/server-realtime** 🚄: This package contains the realtime application which connects the API with socket based clients.
-- **@personalhealthtrain/server-train-manager** 🏭: This package contains the train manager, which is responsible to route, build and extract a train.
-
-## Usage
 Start the ui-, api-, & realtime-application in a single terminal window (or as background process) with the following command:
 ```shell
 $ npm run server-api
