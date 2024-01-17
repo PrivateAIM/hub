@@ -16,7 +16,6 @@ import { Request, Response, useRequestParam } from 'routup';
 import { RegistryHook } from '../../../../components';
 import { ForceLoggedInMiddleware } from '../../../middleware';
 import { postHarborHookRouteHandler } from './handlers/registry/hook';
-import { handleStationRegistryCommandRouteHandler } from './handlers/station-registry/command';
 import { handleRegistryCommandRouteHandler } from './handlers/registry/command';
 
 @DTags('extra')
@@ -42,15 +41,13 @@ export class ServiceController {
     async execHarborTask(
     @DRequest() req: Request,
         @DResponse() res: Response,
-        @DBody() data: { command: RegistryAPICommand },
+        @DBody() _data: { command: RegistryAPICommand },
     ) {
         const id = useRequestParam(req, 'id');
 
         switch (id) {
             case ServiceID.REGISTRY:
                 return handleRegistryCommandRouteHandler(req, res);
-            case ServiceID.STATION_REGISTRY:
-                return handleStationRegistryCommandRouteHandler(req, res);
         }
 
         throw new NotFoundError();

@@ -9,4 +9,3 @@ export { default as StationForm } from './StationForm';
 export { default as StationList } from './StationList';
 export { default as StationRegistryProjectEntity } from './StationRegistryProjectEntity';
 export { default as StationRobotEntity } from './StationRobotEntity';
-export { default as StationRegistryManagement } from './StationRegistryManagement';

@@ -10,9 +10,6 @@ export enum ServiceID {
     SYSTEM = 'SYSTEM',
     EMAIL_SERVICE = 'EMAIL_SERVICE',
 
-    // Cooperation(s)
-    STATION_REGISTRY = 'STATION_REGISTRY',
-
     // Third Party Service(s)
     GITHUB = 'GITHUB',
     REGISTRY = 'REGISTRY',

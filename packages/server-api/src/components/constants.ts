@@ -7,7 +7,4 @@
 
 export enum ComponentName {
     REGISTRY = 'registry',
-    SECRET_STORAGE = 'secret_storage',
-    STATION_REGISTRY = 'station_registry',
-    TRAIN = 'train',
 }

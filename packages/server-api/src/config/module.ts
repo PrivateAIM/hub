@@ -29,11 +29,6 @@ export function createConfig() : Config {
     });
     setVaultClient(vaultClient);
 
-    const aachenService = new Client({
-        baseURL: 'https://menzel.informatik.rwth-aachen.de:3005/centralservice/api/',
-    });
-    setClient(aachenService, ApiKey.AACHEN_CENTRAL_SERVICE);
-
     const stationRegistry = new Client({
         baseURL: 'https://station-registry.hs-mittweida.de/api/',
     });

@@ -10,7 +10,6 @@ import { consume } from 'amqp-extension';
 import { useLogger } from '../../../../config';
 import { ComponentName } from '../../../constants';
 import { executeRegistryCommand } from '../../../registry';
-import { executeStationRegistryCommand } from '../../../station-registry';
 import { ROUTER_QUEUE_ROUTING_KEY } from './constants';
 import type { QueueRouterPayload } from './type';
 
@@ -28,13 +27,6 @@ export function buildRouterComponent() {
                 switch (payload.metadata.component) {
                     case ComponentName.REGISTRY: {
                         await executeRegistryCommand({
-                            command: payload.metadata.command as any,
-                            data: payload.data as any,
-                        });
-                        break;
-                    }
-                    case ComponentName.STATION_REGISTRY: {
-                        await executeStationRegistryCommand({
                             command: payload.metadata.command as any,
                             data: payload.data as any,
                         });

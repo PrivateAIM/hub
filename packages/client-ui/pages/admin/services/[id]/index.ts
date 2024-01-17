@@ -7,7 +7,7 @@
 
 import type { PropType } from 'vue';
 import { ServiceID } from '@personalhealthtrain/core';
-import { MasterImagesSync, StationRegistryManagement } from '@personalhealthtrain/client-vue';
+import { MasterImagesSync } from '@personalhealthtrain/client-vue';
 import { useToast } from '#imports';
 import { defineNuxtComponent } from '#app';
 
@@ -22,12 +22,6 @@ export default defineNuxtComponent({
     setup(props, { emit }) {
         const toast = useToast();
 
-        const handleExecuted = () => {
-            if (toast) {
-                toast.show({ variant: 'success', body: 'You successfully executed the sync routine.' });
-            }
-        };
-
         const handleFailed = (e: Error) => {
             if (toast) {
                 toast.show({ variant: 'warning', body: e.message });
@@ -39,18 +33,6 @@ export default defineNuxtComponent({
                 entityId: props.entityId,
                 onUpdated(event: any) {
                     emit('updated', event);
-                },
-                onFailed(e: Error) {
-                    handleFailed(e);
-                },
-            });
-        }
-
-        if (props.entityId === ServiceID.STATION_REGISTRY) {
-            return () => h(StationRegistryManagement, {
-                entityId: props.entityId,
-                onExecuted() {
-                    handleExecuted();
                 },
                 onFailed(e: Error) {
                     handleFailed(e);
