@@ -6,7 +6,6 @@
  */
 
 import {
-    Ecosystem,
     PermissionID, RegistryProjectType, createNanoID, isHex,
 } from '@personalhealthtrain/core';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
@@ -19,8 +18,8 @@ import { RegistryCommand } from '../../../../../components';
 import { buildRegistryPayload } from '../../../../../components/registry/utils/queue';
 import { useRequestEnv } from '../../../../request';
 import { runStationValidation } from '../utils';
-import { NodeEntity } from '../../../../../domains/node';
-import { RegistryProjectEntity } from '../../../../../domains/registry-project/entity';
+import { NodeEntity } from '../../../../../domains';
+import { RegistryProjectEntity } from '../../../../../domains';
 
 export async function updateStationRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -54,20 +53,9 @@ export async function updateStationRouteHandler(req: Request, res: Response) : P
         throw new ForbiddenError('You are not permitted to delete this station.');
     }
 
-    if (
-        result.data.public_key &&
-        result.data.public_key !== entity.public_key &&
-        !isHex(result.data.public_key)
-    ) {
-        result.data.public_key = Buffer.from(result.data.public_key, 'utf8').toString('hex');
-    }
-
     entity = repository.merge(entity, result.data);
 
-    if (
-        entity.ecosystem === Ecosystem.DEFAULT &&
-        entity.registry_id
-    ) {
+    if (entity.registry_id) {
         const registryProjectExternalName = entity.external_name || createNanoID();
         const registryProjectRepository = dataSource.getRepository(RegistryProjectEntity);
 
@@ -90,7 +78,6 @@ export async function updateStationRouteHandler(req: Request, res: Response) : P
             registryProject = registryProjectRepository.create({
                 external_name: registryProjectExternalName,
                 name: entity.name,
-                ecosystem: entity.ecosystem,
                 type: RegistryProjectType.STATION,
                 realm_id: entity.realm_id,
                 registry_id: entity.registry_id,

@@ -10,9 +10,6 @@ import { ARobot } from '@authup/client-vue';
 import type { PropType } from 'vue';
 import { defineComponent, h, reactive } from 'vue';
 import type { Node } from '@personalhealthtrain/core';
-import {
-    Ecosystem,
-} from '@personalhealthtrain/core';
 import type { Robot } from '@authup/core';
 import { buildFormGroup, buildFormInput, buildFormSubmit } from '@vuecs/form-controls';
 import useVuelidate from '@vuelidate/core';
@@ -28,16 +25,6 @@ export default defineComponent({
     },
     emits: ['failed'],
     setup(props, { emit }) {
-        if (props.entity.ecosystem !== Ecosystem.DEFAULT) {
-            return () => h(
-                'div',
-                { class: 'alert alert-sm alert-danger' },
-                [
-                    'The robot creation is only permitted for the default ecosystem.',
-                ],
-            );
-        }
-
         const form = reactive({
             id: '',
             secret: '',

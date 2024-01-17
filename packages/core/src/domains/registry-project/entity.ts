@@ -8,7 +8,6 @@
 import type { Realm } from '@authup/core';
 import type { DomainType } from '../constants';
 import type { Registry } from '../registry';
-import type { Ecosystem } from '../ecosystem';
 import type { DomainEventBaseContext } from '../types-base';
 import type { RegistryProjectType } from './constants';
 
@@ -16,8 +15,6 @@ export interface RegistryProject {
     id: string;
 
     name: string;
-
-    ecosystem: `${Ecosystem}`;
 
     type: `${RegistryProjectType}`;
 

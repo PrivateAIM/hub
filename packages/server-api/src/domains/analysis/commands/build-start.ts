@@ -7,17 +7,14 @@
 
 import { BadRequestError } from '@ebec/http';
 import {
-    Ecosystem,
-    RegistryProjectType,
     AnalysisBuildStatus,
     AnalysisNodeApprovalStatus,
 } from '@personalhealthtrain/core';
 import { BuilderCommand, buildBuilderQueuePayload } from '@personalhealthtrain/server-train-manager';
 import { publish } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
-import { RegistryProjectEntity } from '../../registry-project/entity';
-import { RegistryEntity } from '../../registry/entity';
-import { AnalysisNodeEntity } from '../../anaylsis-node/entity';
+import { RegistryEntity } from '../../registry';
+import { AnalysisNodeEntity } from '../../anaylsis-node';
 import { AnalysisEntity } from '../entity';
 import { resolveTrain } from './utils';
 
@@ -45,33 +42,13 @@ export async function startBuildTrain(
 
         if (!train.registry_id) {
             const registryRepository = dataSource.getRepository(RegistryEntity);
-            const registry = await registryRepository.findOne({
-                where: {
-                    ecosystem: Ecosystem.DEFAULT,
-                },
-            });
+            const registry = await registryRepository.findOne({});
 
             if (!registry) {
-                throw new BadRequestError('No registry is registered for the default ecosystem.');
+                throw new BadRequestError('No registry is registered.');
             }
 
             train.registry_id = registry.id;
-        }
-
-        if (!train.incoming_registry_project_id) {
-            const projectRepository = dataSource.getRepository(RegistryProjectEntity);
-            const project = await projectRepository.findOne({
-                where: {
-                    registry_id: train.registry_id,
-                    type: RegistryProjectType.INCOMING,
-                },
-            });
-
-            if (!project) {
-                throw new BadRequestError('No incoming project is registered for the default ecosystem.');
-            }
-
-            train.incoming_registry_project_id = project.id;
         }
 
         await publish(buildBuilderQueuePayload({

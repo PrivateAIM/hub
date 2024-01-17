@@ -33,7 +33,7 @@ import { RequestValidationError } from '../../../../validation';
  * @param req
  * @param res
  */
-export async function handleTrainCommandRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function handleAnalysisCommandRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
     if (typeof id !== 'string') {

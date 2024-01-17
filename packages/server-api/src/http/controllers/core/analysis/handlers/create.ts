@@ -12,17 +12,17 @@ import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '../../../../request';
-import { runTrainValidation } from '../utils';
+import { runAnalysisValidation } from '../utils';
 import { ProjectEntity } from '../../../../../domains/project/entity';
 import { AnalysisEntity } from '../../../../../domains/analysis';
 
-export async function createTrainRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function createAnalysisRouteHandler(req: Request, res: Response) : Promise<any> {
     const ability = useRequestEnv(req, 'ability');
     if (!ability.has(PermissionID.ANALYSIS_ADD)) {
         throw new ForbiddenError();
     }
 
-    const result = await runTrainValidation(req, 'create');
+    const result = await runAnalysisValidation(req, 'create');
 
     if (
         !result.data.master_image_id &&

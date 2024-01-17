@@ -7,7 +7,6 @@
 
 export * from './permission';
 export * from './realm';
-export * from './ecosystem';
 export * from './master-image-group';
 export * from './master-image';
 export * from './project';

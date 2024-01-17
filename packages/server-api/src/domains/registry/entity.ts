@@ -13,9 +13,6 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 import type { Registry } from '@personalhealthtrain/core';
-import {
-    Ecosystem,
-} from '@personalhealthtrain/core';
 
 @Entity({ name: 'registries' })
 export class RegistryEntity implements Registry {
@@ -27,9 +24,6 @@ export class RegistryEntity implements Registry {
 
     @Column({ type: 'varchar', length: 512 })
         host: string;
-
-    @Column({ type: 'varchar', length: 64, default: Ecosystem.DEFAULT })
-        ecosystem: Ecosystem;
 
     // ------------------------------------------------------------------
 

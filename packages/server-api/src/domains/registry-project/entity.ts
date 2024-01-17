@@ -15,10 +15,10 @@ import {
 } from 'typeorm';
 import type { Registry, RegistryProject } from '@personalhealthtrain/core';
 import {
-    Ecosystem, RegistryProjectType,
+    RegistryProjectType,
 } from '@personalhealthtrain/core';
 import type { Realm } from '@authup/core';
-import { RegistryEntity } from '../registry/entity';
+import { RegistryEntity } from '../registry';
 
 @Unique(['name', 'registry_id'])
 @Unique(['external_name', 'registry_id'])
@@ -30,9 +30,6 @@ export class RegistryProjectEntity implements RegistryProject {
 
     @Column({ type: 'varchar', length: 128 })
         name: string;
-
-    @Column({ type: 'varchar', length: 64, default: Ecosystem.DEFAULT })
-        ecosystem: `${Ecosystem}`;
 
     @Column({
         type: 'varchar', length: 64, nullable: true, default: RegistryProjectType.DEFAULT,

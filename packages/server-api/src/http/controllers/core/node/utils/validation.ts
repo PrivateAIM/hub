@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Ecosystem } from '@personalhealthtrain/core';
 import { check, validationResult } from 'express-validator';
 import { isRealmResourceWritable } from '@authup/core';
 import { ForbiddenError } from '@ebec/http';
@@ -85,11 +84,6 @@ export async function runStationValidation(
             .exists()
             .isUUID()
             .optional({ nullable: true })
-            .run(req);
-
-        await check('ecosystem')
-            .exists()
-            .isIn(Object.values(Ecosystem))
             .run(req);
     }
 

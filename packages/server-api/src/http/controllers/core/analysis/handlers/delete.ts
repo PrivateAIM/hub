@@ -15,7 +15,7 @@ import { AnalysisEntity } from '../../../../../domains/analysis';
 import { ProjectEntity } from '../../../../../domains/project/entity';
 import { useRequestEnv } from '../../../../request';
 
-export async function deleteTrainRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function deleteAnalysisRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
     const ability = useRequestEnv(req, 'ability');

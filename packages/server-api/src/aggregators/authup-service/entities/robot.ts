@@ -6,7 +6,7 @@
  */
 
 import type { RobotEventContext } from '@authup/core';
-import { Ecosystem, ServiceID } from '@personalhealthtrain/core';
+import { ServiceID } from '@personalhealthtrain/core';
 import { publish } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
 import { RegistryCommand } from '../../../components';
@@ -21,9 +21,6 @@ export async function handleAuthupRobotEvent(context: RobotEventContext) {
             const projectRepository = dataSource.getRepository(RegistryProjectEntity);
             const projects = await projectRepository.find({
                 select: ['id'],
-                where: {
-                    ecosystem: Ecosystem.DEFAULT,
-                },
             });
 
             for (let i = 0; i < projects.length; i++) {

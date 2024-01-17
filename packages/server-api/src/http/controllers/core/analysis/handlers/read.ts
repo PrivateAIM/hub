@@ -18,7 +18,7 @@ import { isRealmResourceReadable } from '@authup/core';
 import { AnalysisEntity, onlyRealmWritableQueryResources } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 
-export async function getOneTrainRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function getOneAnalysisRouteHandler(req: Request, res: Response) : Promise<any> {
     const { include } = useRequestQuery(req);
     const id = useRequestParam(req, 'id');
 
@@ -51,7 +51,7 @@ export async function getOneTrainRouteHandler(req: Request, res: Response) : Pro
     return send(res, entity);
 }
 
-export async function getManyTrainRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function getManyAnalysisRouteHandler(req: Request, res: Response) : Promise<any> {
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisEntity);
     const query = repository.createQueryBuilder('train');

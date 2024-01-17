@@ -6,13 +6,11 @@
  */
 
 import {
-    Ecosystem,
     REGISTRY_ARTIFACT_TAG_BASE,
 } from '@personalhealthtrain/core';
 import { RouterCommand } from '../../../constants';
 import { useRouterLogger } from '../../../utils';
 import { transferInternal } from '../transfer/internal';
-import { transferEcosystemOut } from '../transfer/ecosystem';
 import type { RouteContextExtended } from '../type';
 
 export async function routeIncomingProject(context: RouteContextExtended) : Promise<void> {
@@ -32,31 +30,17 @@ export async function routeIncomingProject(context: RouteContextExtended) : Prom
 
     const nextStation = context.items[nextIndex];
 
-    if (nextStation.ecosystem === Ecosystem.DEFAULT) {
-        await transferInternal(
-            {
-                source: {
-                    project: context.project,
-                    repositoryName: context.payload.repositoryName,
-                    artifactTag: context.payload.artifactTag,
-                },
-                destination: {
-                    project: nextStation.registry_project,
-                    repositoryName: context.payload.repositoryName,
-                },
-            },
-        );
-    } else {
-        await transferEcosystemOut(
-            {
+    await transferInternal(
+        {
+            source: {
                 project: context.project,
                 repositoryName: context.payload.repositoryName,
                 artifactTag: context.payload.artifactTag,
             },
-            {
-                ecosystem: nextStation.ecosystem,
+            destination: {
+                project: nextStation.registry_project,
                 repositoryName: context.payload.repositoryName,
             },
-        );
-    }
+        },
+    );
 }

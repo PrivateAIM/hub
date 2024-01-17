@@ -6,9 +6,9 @@
  */
 
 import type { Registry } from '@personalhealthtrain/core';
-import { DomainType, Ecosystem } from '@personalhealthtrain/core';
+import { DomainType } from '@personalhealthtrain/core';
 import {
-    buildFormGroup, buildFormInput, buildFormSelect, buildFormSubmit,
+    buildFormGroup, buildFormInput, buildFormSubmit,
 } from '@vuecs/form-controls';
 import useVuelidate from '@vuelidate/core';
 import { maxLength, minLength, required } from '@vuelidate/validators';
@@ -39,7 +39,6 @@ export default defineComponent({
         const form = reactive({
             name: '',
             host: '',
-            ecosystem: Ecosystem.DEFAULT,
             account_name: '',
             account_secret: '',
         });
@@ -54,9 +53,6 @@ export default defineComponent({
                 required,
                 maxLength: maxLength(512),
             },
-            ecosystem: {
-                required,
-            },
             account_name: {
                 inLength: minLength(3),
                 maxLength: maxLength(256),
@@ -66,11 +62,6 @@ export default defineComponent({
                 maxLength: maxLength(256),
             },
         }, form);
-
-        const ecosystems = [
-            { id: Ecosystem.DEFAULT, value: 'DEFAULT' },
-            { id: Ecosystem.PADME, value: 'PADME' },
-        ];
 
         const updatedAt = useUpdatedAt(props.entity);
 
@@ -133,23 +124,6 @@ export default defineComponent({
                     },
                     props: {
                         placeholder: 'e.g. ghcr.io',
-                    },
-                }),
-            });
-
-            const ecosystem = buildFormGroup({
-                validationTranslator: useValidationTranslator(),
-                validationResult: $v.value.ecosystem,
-                label: true,
-                labelContent: 'Ecosystem',
-                content: buildFormSelect({
-                    value: form.ecosystem,
-                    onChange(input) {
-                        form.ecosystem = input;
-                    },
-                    options: ecosystems,
-                    props: {
-                        disabled: !!manager.data.value,
                     },
                 }),
             });
@@ -221,7 +195,6 @@ export default defineComponent({
                         'It is only possible to register harbor registries > v2.3.0',
                     ],
                 ),
-                ecosystem,
                 h('hr'),
                 submitNode,
             ]);

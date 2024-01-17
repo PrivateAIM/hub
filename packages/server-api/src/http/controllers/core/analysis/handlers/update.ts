@@ -12,10 +12,10 @@ import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '../../../../request';
-import { runTrainValidation } from '../utils';
+import { runAnalysisValidation } from '../utils';
 import { AnalysisEntity } from '../../../../../domains/analysis';
 
-export async function updateTrainRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function updateAnalysisRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
     const ability = useRequestEnv(req, 'ability');
@@ -23,7 +23,7 @@ export async function updateTrainRouteHandler(req: Request, res: Response) : Pro
         throw new ForbiddenError();
     }
 
-    const result = await runTrainValidation(req, 'update');
+    const result = await runAnalysisValidation(req, 'update');
     if (!result.data) {
         return sendAccepted(res);
     }

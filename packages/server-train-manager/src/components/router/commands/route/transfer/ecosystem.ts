@@ -10,7 +10,7 @@ import type {
     Registry,
 } from '@personalhealthtrain/core';
 import {
-    Ecosystem, REGISTRY_ARTIFACT_TAG_BASE,
+    REGISTRY_ARTIFACT_TAG_BASE,
     RegistryProjectType,
 } from '@personalhealthtrain/core';
 import { useClient } from 'hapic';
@@ -29,8 +29,7 @@ export async function transferEcosystemOut(
     const sourceArtifactTag = source.artifactTag || 'latest';
 
     if (
-        sourceArtifactTag === REGISTRY_ARTIFACT_TAG_BASE ||
-        destination.ecosystem === Ecosystem.DEFAULT
+        sourceArtifactTag === REGISTRY_ARTIFACT_TAG_BASE
     ) {
         // don't move base tag to external ... ^^
         return;

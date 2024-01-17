@@ -8,7 +8,6 @@ import { ARealms } from '@authup/client-vue';
 import type { Registry, Node } from '@personalhealthtrain/core';
 import {
     DomainType,
-    Ecosystem,
     alphaNumHyphenUnderscoreRegex, hexToUTF8, isHex,
 } from '@personalhealthtrain/core';
 import {
@@ -24,7 +23,7 @@ import type {
     PropType, VNodeArrayChildren,
 } from 'vue';
 import {
-    computed, defineComponent, h, nextTick, reactive, ref, watch,
+    computed, defineComponent, h, reactive, ref, watch,
 } from 'vue';
 import { useUpdatedAt } from '../../composables';
 import {
@@ -96,11 +95,6 @@ export default defineComponent({
             },
         }, form);
 
-        const ecosystems = [
-            { id: Ecosystem.DEFAULT, value: 'DEFAULT' },
-            { id: Ecosystem.PADME, value: 'PADME' },
-        ];
-
         const manager = createEntityManager({
             type: `${DomainType.NODE}`,
             setup,
@@ -111,8 +105,6 @@ export default defineComponent({
                 (manager.data.value && manager.data.value.realm_id));
 
         const updatedAt = useUpdatedAt(props.entity);
-
-        const registryNode = ref<typeof RegistryList | null>(null);
 
         const readContent = (input: string) => (
             isHex(input) ?
@@ -137,12 +129,6 @@ export default defineComponent({
             ) {
                 form.name = (props.realmName || props.realmId) as string;
             }
-
-            nextTick(() => {
-                if (registryNode.value) {
-                    registryNode.value.load();
-                }
-            });
         };
 
         initForm();
@@ -280,62 +266,30 @@ export default defineComponent({
                 ]),
             ]);
 
-            const ecosystem = buildFormGroup({
-                validationTranslator: useValidationTranslator(),
-                validationResult: $v.value.ecosystem,
-                label: true,
-                labelContent: 'Ecosystem',
-                content: buildFormSelect({
-                    value: form.ecosystem,
-                    options: ecosystems,
-                    onChange(input) {
-                        form.ecosystem = input;
+            const registry : VNodeArrayChildren = [
+                h('hr'),
+                h(RegistryList, {}, {
+                    [EntityListSlotName.ITEM_ACTIONS]: (props: ListItemSlotProps<Registry>) => h('button', {
+                        disabled: props.busy,
+                        class: ['btn btn-xs', {
+                            'btn-dark': form.registry_id !== props.data.id,
+                            'btn-warning': form.registry_id === props.data.id,
+                        }],
+                        onClick($event: any) {
+                            $event.preventDefault();
 
-                        nextTick(() => {
-                            if (registryNode.value) {
-                                registryNode.value.load();
-                            }
-                        });
-                    },
-                }),
-            });
-
-            let registry : VNodeArrayChildren = [];
-
-            if (form.ecosystem) {
-                registry = [
-                    h('hr'),
-                    h(RegistryList, {
-                        ref: registryNode,
-                        loadOnSetup: false,
-                        query: {
-                            filters: {
-                                ecosystem: form.ecosystem as Ecosystem,
-                            },
+                            toggleFormData('registry_id', props.data.id);
                         },
-                    }, {
-                        [EntityListSlotName.ITEM_ACTIONS]: (props: ListItemSlotProps<Registry>) => h('button', {
-                            disabled: props.busy,
-                            class: ['btn btn-xs', {
-                                'btn-dark': form.registry_id !== props.data.id,
-                                'btn-warning': form.registry_id === props.data.id,
-                            }],
-                            onClick($event: any) {
-                                $event.preventDefault();
-
-                                toggleFormData('registry_id', props.data.id);
+                    }, [
+                        h('i', {
+                            class: {
+                                'fa fa-plus': form.registry_id !== props.data.id,
+                                'fa fa-minus': form.registry_id === props.data.id,
                             },
-                        }, [
-                            h('i', {
-                                class: {
-                                    'fa fa-plus': form.registry_id !== props.data.id,
-                                    'fa fa-minus': form.registry_id === props.data.id,
-                                },
-                            }),
-                        ]),
-                    }),
-                ];
-            }
+                        }),
+                    ]),
+                }),
+            ];
 
             const submitNode = buildFormSubmit({
                 submit,
@@ -356,7 +310,6 @@ export default defineComponent({
                         h('hr'),
                         externalName,
                         h('hr'),
-                        ecosystem,
                         registry,
 
                     ]),

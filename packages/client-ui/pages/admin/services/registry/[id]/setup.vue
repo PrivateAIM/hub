@@ -6,11 +6,10 @@
   -->
 <script lang="ts">
 import type { Registry } from '@personalhealthtrain/core';
-import { Ecosystem } from '@personalhealthtrain/core';
 import type { PropType } from 'vue';
 import { RegistryCleanup, RegistrySetup } from '@personalhealthtrain/client-vue';
 import { useToast } from '#imports';
-import { defineNuxtComponent, navigateTo } from '#app';
+import { defineNuxtComponent } from '#app';
 
 export default defineNuxtComponent({
     components: { RegistryCleanup, RegistrySetup },
@@ -22,11 +21,6 @@ export default defineNuxtComponent({
     },
     async setup(props) {
         const toast = useToast();
-
-        if (props.entity.ecosystem !== Ecosystem.DEFAULT) {
-            await navigateTo(`/admin/services/registry/${props.entity.id}`);
-        }
-
         const handleExecuted = () => {
             if (toast) {
                 toast.show({ variant: 'success', body: 'You successfully executed the setup routine.' });

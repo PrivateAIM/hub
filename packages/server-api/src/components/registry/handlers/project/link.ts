@@ -4,7 +4,7 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { Ecosystem, buildRegistryClientConnectionStringFromRegistry } from '@personalhealthtrain/core';
+import { buildRegistryClientConnectionStringFromRegistry } from '@personalhealthtrain/core';
 import { useDataSource } from 'typeorm-extension';
 import { useLogger } from '../../../../config';
 import { RegistryEntity, RegistryProjectEntity } from '../../../../domains';
@@ -34,15 +34,6 @@ export async function linkRegistryProject(
                 command: RegistryCommand.PROJECT_LINK,
             });
 
-        return;
-    }
-
-    if (entity.ecosystem !== Ecosystem.DEFAULT) {
-        useLogger()
-            .warn('Only default ecosystem supported.', {
-                component: 'registry',
-                command: RegistryCommand.PROJECT_LINK,
-            });
         return;
     }
 

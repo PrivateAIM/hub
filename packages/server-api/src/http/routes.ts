@@ -17,17 +17,16 @@ import {
     useRequestQuery,
 } from '@routup/basic/query';
 import type { Router } from 'routup';
-import { TrainLogController } from './controllers/core/train-log';
-import { UserSecretController } from './controllers/core/user-secret';
+import { TrainLogController } from './controllers/core/analysis-log';
 import { MasterImageController } from './controllers/core/master-image';
-import { ProposalController } from './controllers/core/proposal';
-import { ProposalStationController } from './controllers/core/proposal-station';
-import { StationController } from './controllers/core/station';
-import { TrainController } from './controllers/core/train';
-import { TrainFileController } from './controllers/core/train-file';
-import { TrainStationController } from './controllers/core/train-station';
+import { ProposalController } from './controllers/core/project';
+import { ProposalStationController } from './controllers/core/project-node';
+import { StationController } from './controllers/core/node';
+import { AnalysisController } from './controllers/core/analysis';
+import { TrainFileController } from './controllers/core/analysis-file';
+import { TrainStationController } from './controllers/core/analysis-node';
 import { ServiceController } from './controllers/special/service';
-import { MasterImageGroupController } from './controllers/core/master-image-groups';
+import { MasterImageGroupController } from './controllers/core/master-image-group';
 import { RegistryController } from './controllers/core/registry';
 import { RegistryProjectController } from './controllers/core/registry-project';
 
@@ -42,11 +41,10 @@ export function registerControllers(router: Router) {
             RegistryController,
             RegistryProjectController,
             StationController,
-            TrainController,
+            AnalysisController,
             TrainFileController,
             TrainLogController,
             TrainStationController,
-            UserSecretController,
 
             // Extra
             ServiceController,

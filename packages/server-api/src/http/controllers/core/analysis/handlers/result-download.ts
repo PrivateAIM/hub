@@ -17,7 +17,7 @@ import { useMinio } from '../../../../../core/minio';
 import { AnalysisEntity, generateTrainMinioBucketName } from '../../../../../domains/analysis';
 import { useRequestEnv } from '../../../../request';
 
-export async function handleTrainResultDownloadRouteHandler(req: Request, res: Response) {
+export async function handleAnalysisResultDownloadRouteHandler(req: Request, res: Response) {
     const id = useRequestParam(req, 'id');
 
     if (!id) {

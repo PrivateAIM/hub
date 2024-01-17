@@ -6,13 +6,10 @@
  */
 
 import type { Node } from '@personalhealthtrain/core';
-import { Ecosystem } from '@personalhealthtrain/core';
 import type { SuperTest, Test } from 'supertest';
 
 export const TEST_DEFAULT_STATION : Partial<Node> = {
     name: 'foo-bar-baz',
-    public_key: 'fooBarBazFooBarBaz',
-    ecosystem: Ecosystem.DEFAULT,
     external_name: 'test',
 };
 

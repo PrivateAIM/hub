@@ -6,9 +6,9 @@
  */
 
 import { body, check, validationResult } from 'express-validator';
-import { Ecosystem, getHostNameFromString } from '@personalhealthtrain/core';
+import { getHostNameFromString } from '@personalhealthtrain/core';
 import type { Request } from 'routup';
-import type { RegistryEntity } from '../../../../../domains/registry/entity';
+import type { RegistryEntity } from '../../../../../domains';
 import type { RequestValidationResult } from '../../../../validation';
 import {
     RequestValidationError,
@@ -44,15 +44,6 @@ export async function runRegistryValidation(
     }
 
     await hostChain.run(req);
-
-    // ----------------------------------------------
-
-    if (operation === 'create') {
-        await check('ecosystem')
-            .exists()
-            .isIn(Object.values(Ecosystem))
-            .run(req);
-    }
 
     // ----------------------------------------------
 

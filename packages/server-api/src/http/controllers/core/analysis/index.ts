@@ -13,28 +13,28 @@ import {
     DBody, DController, DDelete, DGet, DPath, DPost, DRequest, DResponse, DTags,
 } from '@routup/decorators';
 import {
-    createTrainRouteHandler,
-    deleteTrainRouteHandler,
-    getManyTrainRouteHandler,
-    getOneTrainRouteHandler,
-    handleTrainCommandRouteHandler,
-    handleTrainFilesDownloadRouteHandler,
-    handleTrainResultDownloadRouteHandler,
-    updateTrainRouteHandler,
+    createAnalysisRouteHandler,
+    deleteAnalysisRouteHandler,
+    getManyAnalysisRouteHandler,
+    getOneAnalysisRouteHandler,
+    handleAnalysisCommandRouteHandler,
+    handleAnalysisFilesDownloadRouteHandler,
+    handleAnalysisResultDownloadRouteHandler,
+    updateAnalysisRouteHandler,
 } from './handlers';
 import { ForceLoggedInMiddleware } from '../../../middleware';
 
-type PartialTrain = Partial<Analysis>;
+type PartialAnalysis = Partial<Analysis>;
 
-@DTags('train')
-@DController('/trains')
-export class TrainController {
+@DTags('analysis')
+@DController('/analyses')
+export class AnalysisController {
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
         @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<PartialTrain[]> {
-        return getManyTrainRouteHandler(req, res);
+    ): Promise<PartialAnalysis[]> {
+        return getManyAnalysisRouteHandler(req, res);
     }
 
     @DGet('/:id/files/download', [ForceLoggedInMiddleware])
@@ -43,7 +43,7 @@ export class TrainController {
             @DRequest() req: any,
             @DResponse() res: any,
     ): Promise<any> {
-        return handleTrainFilesDownloadRouteHandler(req, res);
+        return handleAnalysisFilesDownloadRouteHandler(req, res);
     }
 
     @DGet('/:id/result/download', [ForceLoggedInMiddleware])
@@ -52,7 +52,7 @@ export class TrainController {
             @DRequest() req: any,
             @DResponse() res: any,
     ): Promise<any> {
-        return handleTrainResultDownloadRouteHandler(req, res);
+        return handleAnalysisResultDownloadRouteHandler(req, res);
     }
 
     @DGet('/:id', [ForceLoggedInMiddleware])
@@ -60,27 +60,27 @@ export class TrainController {
         @DPath('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<PartialTrain | undefined> {
-        return getOneTrainRouteHandler(req, res);
+    ): Promise<PartialAnalysis | undefined> {
+        return getOneAnalysisRouteHandler(req, res);
     }
 
     @DPost('/:id', [ForceLoggedInMiddleware])
     async edit(
         @DPath('id') id: string,
-            @DBody() data: PartialTrain,
+            @DBody() data: PartialAnalysis,
             @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<PartialTrain | undefined> {
-        return updateTrainRouteHandler(req, res);
+    ): Promise<PartialAnalysis | undefined> {
+        return updateAnalysisRouteHandler(req, res);
     }
 
     @DPost('', [ForceLoggedInMiddleware])
     async add(
-        @DBody() data: PartialTrain,
+        @DBody() data: PartialAnalysis,
             @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<PartialTrain | undefined> {
-        return createTrainRouteHandler(req, res);
+    ): Promise<PartialAnalysis | undefined> {
+        return createAnalysisRouteHandler(req, res);
     }
 
     @DPost('/:id/command', [ForceLoggedInMiddleware])
@@ -91,8 +91,8 @@ export class TrainController {
             },
             @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<PartialTrain | undefined> {
-        return handleTrainCommandRouteHandler(req, res);
+    ): Promise<PartialAnalysis | undefined> {
+        return handleAnalysisCommandRouteHandler(req, res);
     }
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
@@ -100,8 +100,8 @@ export class TrainController {
         @DPath('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<PartialTrain | undefined> {
-        return deleteTrainRouteHandler(req, res);
+    ): Promise<PartialAnalysis | undefined> {
+        return deleteAnalysisRouteHandler(req, res);
     }
 
     // --------------------------------------------------------------------------

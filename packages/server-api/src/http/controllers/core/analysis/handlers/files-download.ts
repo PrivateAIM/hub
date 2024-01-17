@@ -19,7 +19,7 @@ import { AnalysisEntity, generateTrainMinioBucketName } from '../../../../../dom
 import { AnalysisFileEntity } from '../../../../../domains/analysis-file/entity';
 import { useRequestEnv } from '../../../../request';
 
-export async function handleTrainFilesDownloadRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function handleAnalysisFilesDownloadRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
     if (typeof id !== 'string') {

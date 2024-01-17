@@ -5,55 +5,36 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Ecosystem, TrainType } from '@personalhealthtrain/core';
 import { check, validationResult } from 'express-validator';
 import { BadRequestError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/core';
 import type { Request } from 'routup';
-import { MasterImageEntity } from '../../../../../domains/master-image';
-import { ProjectEntity } from '../../../../../domains/project/entity';
-import { RegistryEntity } from '../../../../../domains/registry/entity';
-import type { AnalysisEntity } from '../../../../../domains/analysis';
+import { MasterImageEntity } from '../../../../../domains';
+import { ProjectEntity } from '../../../../../domains';
+import { RegistryEntity } from '../../../../../domains';
+import type { AnalysisEntity } from '../../../../../domains';
 import type { RequestValidationResult } from '../../../../validation';
 import {
     RequestValidationError, extendRequestValidationResultWithRelation,
     initRequestValidationResult,
     matchedValidationData,
 } from '../../../../validation';
-import { AnalysisFileEntity } from '../../../../../domains/analysis-file/entity';
+import { AnalysisFileEntity } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 
-export async function runTrainValidation(
+export async function runAnalysisValidation(
     req: Request,
     operation: 'create' | 'update',
 ) : Promise<RequestValidationResult<AnalysisEntity>> {
     const result : RequestValidationResult<AnalysisEntity> = initRequestValidationResult();
 
     if (operation === 'create') {
-        await check('proposal_id')
+        await check('project_id')
             .exists()
             .notEmpty()
             .isUUID()
             .run(req);
-
-        await check('type')
-            .exists()
-            .isString()
-            .custom((value) => Object.values(TrainType).includes(value))
-            .run(req);
     }
-
-    await check('user_rsa_secret_id')
-        .notEmpty()
-        .isUUID()
-        .optional({ nullable: true })
-        .run(req);
-
-    await check('user_paillier_secret_id')
-        .notEmpty()
-        .isUUID()
-        .optional({ nullable: true })
-        .run(req);
 
     await check('name')
         .notEmpty()
@@ -63,12 +44,6 @@ export async function runTrainValidation(
 
     await check('entrypoint_file_id')
         .isUUID()
-        .optional({ nullable: true })
-        .run(req);
-
-    await check('hash_signed')
-        .notEmpty()
-        .isLength({ min: 10, max: 8096 })
         .optional({ nullable: true })
         .run(req);
 
@@ -83,12 +58,6 @@ export async function runTrainValidation(
         .exists()
         .notEmpty()
         .isUUID()
-        .optional({ nullable: true })
-        .run(req);
-
-    await check('query')
-        .isString()
-        .isLength({ min: 1, max: 4096 })
         .optional({ nullable: true })
         .run(req);
 
@@ -123,16 +92,10 @@ export async function runTrainValidation(
 
     if (result.relation.project) {
         if (!isRealmResourceWritable(useRequestEnv(req, 'realm'), result.relation.project.realm_id)) {
-            throw new BadRequestError('The referenced proposal realm is not permitted.');
+            throw new BadRequestError('The referenced project realm is not permitted.');
         }
 
         result.data.realm_id = result.relation.project.realm_id;
-    }
-
-    if (result.relation.registry) {
-        if (result.relation.registry.ecosystem !== Ecosystem.DEFAULT) {
-            throw new BadRequestError('The registry must be part of the default ecosystem.');
-        }
     }
 
     return result;

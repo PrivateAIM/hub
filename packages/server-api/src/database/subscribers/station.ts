@@ -9,7 +9,6 @@ import type { Node } from '@personalhealthtrain/core';
 import {
     DomainEventName,
     DomainType,
-    Ecosystem,
     buildDomainChannelName,
     buildDomainNamespaceName,
 } from '@personalhealthtrain/core';
@@ -88,24 +87,18 @@ export class StationSubscriber implements EntitySubscriberInterface<NodeEntity> 
     async afterInsert(event: InsertEvent<NodeEntity>): Promise<any> {
         await publishEvent(DomainEventName.CREATED, event.entity);
 
-        if (event.entity.ecosystem === Ecosystem.DEFAULT) {
-            await createRobot(event.connection, event.entity);
-        }
+        await createRobot(event.connection, event.entity);
     }
 
     async afterUpdate(event: UpdateEvent<NodeEntity>): Promise<any> {
         await publishEvent(DomainEventName.UPDATED, event.entity as NodeEntity);
 
-        if (event.entity.ecosystem === Ecosystem.DEFAULT) {
-            await createRobot(event.connection, event.entity as NodeEntity);
-        }
+        await createRobot(event.connection, event.entity as NodeEntity);
     }
 
     async beforeRemove(event: RemoveEvent<NodeEntity>): Promise<any> {
         await publishEvent(DomainEventName.DELETED, event.entity);
 
-        if (event.entity.ecosystem === Ecosystem.DEFAULT) {
-            await deleteRobot(event.connection, event.entity);
-        }
+        await deleteRobot(event.connection, event.entity);
     }
 }

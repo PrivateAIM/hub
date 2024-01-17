@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Ecosystem, Registry, RegistryProject } from '@personalhealthtrain/core';
+import type { Registry, RegistryProject } from '@personalhealthtrain/core';
 
 export type TransferItem = {
     project: RegistryProject,
@@ -14,7 +14,6 @@ export type TransferItem = {
 };
 
 export type TransferEcosystemItem = {
-    ecosystem: `${Ecosystem}`,
     repositoryName: string,
     artifactTag?: string,
 };

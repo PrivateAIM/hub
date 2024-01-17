@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { DomainType, Ecosystem, PermissionID } from '@personalhealthtrain/core';
+import { DomainType, PermissionID } from '@personalhealthtrain/core';
 import { createEntityManager } from '@personalhealthtrain/client-vue';
 import { computed } from 'vue';
 import {
@@ -71,8 +71,7 @@ export default defineNuxtComponent({
                 name: 'General', icon: 'fas fa-bars', urlSuffix: '',
             },
             ...(
-                manager.data.value &&
-                manager.data.value.ecosystem === Ecosystem.DEFAULT ?
+                manager.data.value ?
                     [
                         {
                             name: 'Cleanup', icon: 'fa-solid fa-hands-bubbles', urlSuffix: 'cleanup',

@@ -6,13 +6,12 @@
  */
 
 import {
-    Ecosystem, REGISTRY_ARTIFACT_TAG_BASE,
+    REGISTRY_ARTIFACT_TAG_BASE,
 } from '@personalhealthtrain/core';
 import { RouterCommand, RouterErrorCode } from '../../../constants';
 import { useRouterLogger } from '../../../utils';
 import type { RouteContextExtended } from '../type';
 import { transferInternal } from '../transfer/internal';
-import { transferEcosystemOut } from '../transfer/ecosystem';
 import { transferOutgoing } from '../transfer/outgoing';
 import { RouterError } from '../../../error';
 
@@ -48,30 +47,16 @@ export async function routeStationProject(context: RouteContextExtended) : Promi
     } else {
         const nextStation = context.items[nextIndex];
 
-        if (nextStation.ecosystem === Ecosystem.DEFAULT) {
-            await transferInternal({
-                source: {
-                    project: currentStation.registry_project,
-                    repositoryName: context.payload.repositoryName,
-                    artifactTag: context.payload.artifactTag,
-                },
-                destination: {
-                    project: nextStation.registry_project,
-                    repositoryName: context.payload.repositoryName,
-                },
-            });
-        } else {
-            await transferEcosystemOut(
-                {
-                    project: currentStation.registry_project,
-                    repositoryName: context.payload.repositoryName,
-                    artifactTag: context.payload.artifactTag,
-                },
-                {
-                    ecosystem: nextStation.ecosystem,
-                    repositoryName: context.payload.repositoryName,
-                },
-            );
-        }
+        await transferInternal({
+            source: {
+                project: currentStation.registry_project,
+                repositoryName: context.payload.repositoryName,
+                artifactTag: context.payload.artifactTag,
+            },
+            destination: {
+                project: nextStation.registry_project,
+                repositoryName: context.payload.repositoryName,
+            },
+        });
     }
 }

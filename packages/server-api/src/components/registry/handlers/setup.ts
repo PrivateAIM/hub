@@ -7,7 +7,6 @@
 
 import { publish } from 'amqp-extension';
 import {
-    Ecosystem,
     REGISTRY_INCOMING_PROJECT_NAME,
     REGISTRY_MASTER_IMAGE_PROJECT_NAME,
     REGISTRY_OUTGOING_PROJECT_NAME,
@@ -38,18 +37,6 @@ export async function setupRegistry(payload: RegistrySetupPayload) {
     if (!entity) {
         useLogger()
             .error('Registry not found.', {
-                component: 'registry',
-                command: RegistryCommand.SETUP,
-            });
-
-        return payload;
-    }
-
-    // ---------------------------------------------------------------------
-
-    if (entity.ecosystem !== Ecosystem.DEFAULT) {
-        useLogger()
-            .warn('Only default ecosystem is supported.', {
                 component: 'registry',
                 command: RegistryCommand.SETUP,
             });

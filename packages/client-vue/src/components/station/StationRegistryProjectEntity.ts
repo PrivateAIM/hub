@@ -8,9 +8,6 @@
 import type { PropType } from 'vue';
 import { defineComponent, h } from 'vue';
 import type { RegistryProject, Node } from '@personalhealthtrain/core';
-import {
-    Ecosystem,
-} from '@personalhealthtrain/core';
 import RegistryProjectDetails from '../registry-project/RegistryProjectEntity';
 
 export default defineComponent({
@@ -22,16 +19,6 @@ export default defineComponent({
     },
     emits: ['resolved', 'failed', 'updated'],
     setup(props, { emit }) {
-        if (props.entity.ecosystem !== Ecosystem.DEFAULT) {
-            return () => h(
-                'div',
-                { class: 'alert alert-sm alert-danger' },
-                [
-                    'The registry creation is only permitted for the default ecosystem.',
-                ],
-            );
-        }
-
         if (!props.entity.registry_id) {
             return () => h(
                 'div',
