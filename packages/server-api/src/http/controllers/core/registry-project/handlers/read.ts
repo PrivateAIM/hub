@@ -35,7 +35,6 @@ function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>, field
         default: [
             'id',
             'name',
-            'ecosystem',
             'type',
             'public',
             'external_name',
@@ -110,12 +109,12 @@ export async function getManyRegistryProjectRouteHandler(req: Request, res: Resp
 
     applyFilters(query, filter, {
         defaultAlias: 'registryProject',
-        allowed: ['id', 'ecosystem', 'name', 'registry_id', 'external_name', 'type'],
+        allowed: ['id', 'name', 'registry_id', 'external_name', 'type'],
     });
 
     applySort(query, sort, {
         defaultAlias: 'registryProject',
-        allowed: ['id', 'ecosystem', 'updated_at', 'created_at'],
+        allowed: ['id', 'updated_at', 'created_at'],
     });
 
     applyRelations(query, include, {

@@ -8,17 +8,17 @@ import { adjustFilePath } from 'typeorm-extension';
 import { hasClient, hasConfig } from 'redis-extension';
 import type { DataSourceOptions } from 'typeorm';
 import {
+    AnalysisEntity,
+    AnalysisFileEntity,
+    AnalysisLogEntity,
+    AnalysisNodeEntity,
     MasterImageEntity,
     MasterImageGroupEntity,
+    NodeEntity,
     ProjectEntity,
     ProjectNodeEntity,
     RegistryEntity,
     RegistryProjectEntity,
-    NodeEntity,
-    AnalysisEntity,
-    AnalysisFileEntity,
-    AnalysisLogEntity,
-    AnalysisNodeEntity, UserSecretEntity,
 } from '../../domains';
 import { DatabaseQueryResultCache } from '../cache';
 import { MasterImageSubscriber } from '../subscribers/master-image';
@@ -50,7 +50,6 @@ export async function extendDataSourceOptions(options: DataSourceOptions) : Prom
             AnalysisLogEntity,
             AnalysisFileEntity,
             AnalysisNodeEntity,
-            UserSecretEntity,
         ],
         migrations: [],
         migrationsTransactionMode: 'each',

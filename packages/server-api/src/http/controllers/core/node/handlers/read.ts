@@ -19,12 +19,11 @@ import {
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { onlyRealmWritableQueryResources } from '../../../../../domains';
-import { NodeEntity } from '../../../../../domains/node/entity';
+import { NodeEntity } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 
 async function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>, fields: any) {
     const protectedFields : ParseAllowedOption<NodeEntity> = [
-        'public_key',
         'email',
     ];
 
@@ -32,7 +31,6 @@ async function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>,
         default: [
             'id',
             'name',
-            'ecosystem',
             'external_name',
             'hidden',
             'realm_id',

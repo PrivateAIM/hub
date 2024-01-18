@@ -16,13 +16,10 @@ import {
     AnalysisEntity,
     detectTrainBuildStatus,
     detectTrainRunStatus,
-    generateTrainHash,
     resetTrain,
     startBuildTrain,
     startTrain,
     stopBuildTrain,
-    triggerTrainResultStart,
-    triggerTrainResultStatus,
 } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 import { RequestValidationError } from '../../../../validation';
@@ -86,19 +83,6 @@ export async function handleAnalysisCommandRouteHandler(req: Request, res: Respo
             break;
         case AnalysisAPICommand.RUN_RESET:
             entity = await resetTrain(entity);
-            break;
-
-        // Result Service
-        case AnalysisAPICommand.RESULT_STATUS:
-            entity = await triggerTrainResultStatus(entity.id);
-            break;
-        case AnalysisAPICommand.RESULT_START:
-            entity = await triggerTrainResultStart(entity.id);
-            break;
-
-        // General Commands
-        case AnalysisAPICommand.GENERATE_HASH:
-            entity = await generateTrainHash(entity);
             break;
     }
 

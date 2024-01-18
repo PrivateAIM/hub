@@ -5,12 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { isPropertySet } from '@authup/core';
 import {
-    PermissionID, RegistryProjectType, createNanoID,
-    isHex,
+    PermissionID,
+    RegistryProjectType,
+    createNanoID,
 } from '@personalhealthtrain/core';
-import { BadRequestError, ForbiddenError } from '@ebec/http';
+import { ForbiddenError } from '@ebec/http';
 import { validationResult } from 'express-validator';
 import { publish } from 'amqp-extension';
 import type { Request, Response } from 'routup';
@@ -21,8 +21,7 @@ import { buildRegistryPayload } from '../../../../../components/registry/utils/q
 import { RequestValidationError } from '../../../../validation';
 import { useRequestEnv } from '../../../../request';
 import { runStationValidation } from '../utils';
-import { NodeEntity } from '../../../../../domains/node';
-import { RegistryProjectEntity } from '../../../../../domains/registry-project/entity';
+import { NodeEntity, RegistryProjectEntity } from '../../../../../domains';
 
 export async function createStationRouteHandler(req: Request, res: Response) : Promise<any> {
     const ability = useRequestEnv(req, 'ability');
@@ -37,13 +36,6 @@ export async function createStationRouteHandler(req: Request, res: Response) : P
 
     const result = await runStationValidation(req, 'create');
 
-    if (
-        typeof result.data.public_key === 'string' &&
-        !isHex(result.data.public_key)
-    ) {
-        result.data.public_key = Buffer.from(result.data.public_key, 'utf8').toString('hex');
-    }
-
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(NodeEntity);
 
@@ -51,18 +43,7 @@ export async function createStationRouteHandler(req: Request, res: Response) : P
 
     // -----------------------------------------------------
 
-    if (
-        result.relation.registry &&
-        !entity.ecosystem
-    ) {
-        entity.ecosystem = result.relation.registry.ecosystem;
-    }
-
     if (entity.registry_id) {
-        if (entity.ecosystem !== result.relation.registry.ecosystem) {
-            throw new BadRequestError('The ecosystem of the station and the registry must be the same.');
-        }
-
         const registryProjectExternalName = entity.external_name || createNanoID();
         entity.external_name = registryProjectExternalName;
 
@@ -70,7 +51,6 @@ export async function createStationRouteHandler(req: Request, res: Response) : P
         const registryProject = registryProjectRepository.create({
             external_name: registryProjectExternalName,
             name: entity.name,
-            ecosystem: entity.ecosystem,
             type: RegistryProjectType.STATION,
             realm_id: entity.realm_id,
             registry_id: entity.registry_id,

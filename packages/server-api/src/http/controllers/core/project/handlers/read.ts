@@ -28,11 +28,8 @@ export async function getOneProjectRouteHandler(req: Request, res: Response) : P
         fields: {
             default: [
                 'id',
-                'title',
-                'requested_data',
-                'risk',
-                'risk_comment',
-                'trains',
+                'name',
+                'analyses',
                 'created_at',
                 'updated_at',
                 'realm_id',
@@ -55,10 +52,6 @@ export async function getOneProjectRouteHandler(req: Request, res: Response) : P
 }
 
 export async function getManyProjectRouteHandler(req: Request, res: Response) : Promise<any> {
-    const {
-        filter,
-    } = useRequestQuery(req);
-
     const dataSource = await useDataSource();
 
     const repository = dataSource.getRepository(ProjectEntity);
@@ -69,11 +62,8 @@ export async function getManyProjectRouteHandler(req: Request, res: Response) : 
         fields: {
             default: [
                 'id',
-                'title',
-                'requested_data',
-                'risk',
-                'risk_comment',
-                'trains',
+                'name',
+                'analyses',
                 'created_at',
                 'updated_at',
                 'realm_id',
@@ -82,7 +72,7 @@ export async function getManyProjectRouteHandler(req: Request, res: Response) : 
             ],
         },
         filters: {
-            allowed: ['id', 'title', 'realm_id', 'user_id'],
+            allowed: ['id', 'name', 'realm_id', 'user_id'],
         },
         pagination: {
             maxLimit: 50,

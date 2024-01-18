@@ -16,7 +16,7 @@ import { ForbiddenError, NotFoundError } from '@ebec/http';
 import type { ParseAllowedOption } from 'rapiq';
 import { parseQueryFields } from 'rapiq';
 import { PermissionID } from '@personalhealthtrain/core';
-import { RegistryEntity } from '../../../../../domains/registry/entity';
+import { RegistryEntity } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 
 function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>) {
@@ -29,7 +29,6 @@ function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>) {
             'id',
             'name',
             'host',
-            'ecosystem',
             'account_name',
             'created_at',
             'updated_at',
@@ -89,7 +88,7 @@ export async function getManyRegistryRouteHandler(req: Request, res: Response) :
 
     applyFilters(query, filter, {
         defaultAlias: 'registry',
-        allowed: ['id', 'ecosystem', 'name'],
+        allowed: ['id', 'name'],
     });
 
     applySort(query, sort, {

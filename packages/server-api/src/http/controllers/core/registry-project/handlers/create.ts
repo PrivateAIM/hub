@@ -15,7 +15,7 @@ import { RegistryCommand } from '../../../../../components';
 import { buildRegistryPayload } from '../../../../../components/registry/utils/queue';
 import { useRequestEnv } from '../../../../request';
 import { runRegistryProjectValidation } from '../utils';
-import { RegistryProjectEntity } from '../../../../../domains/registry-project/entity';
+import { RegistryProjectEntity } from '../../../../../domains';
 
 export async function createRegistryProjectRouteHandler(req: Request, res: Response) : Promise<any> {
     const ability = useRequestEnv(req, 'ability');
@@ -27,10 +27,7 @@ export async function createRegistryProjectRouteHandler(req: Request, res: Respo
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(RegistryProjectEntity);
-    const entity = repository.create({
-        ecosystem: result.relation.registry.ecosystem,
-        ...result.data,
-    });
+    const entity = repository.create(result.data);
 
     await repository.save(entity);
 
