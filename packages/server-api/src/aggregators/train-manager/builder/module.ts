@@ -20,9 +20,9 @@ import {
     AnalysisBuildStatus,
 } from '@personalhealthtrain/core';
 import { useDataSource } from 'typeorm-extension';
-import type { AnalysisLogSaveContext } from '../../../domains/analysis-log';
-import { saveAnalysisLog } from '../../../domains/analysis-log';
-import { AnalysisEntity } from '../../../domains/analysis';
+import type { AnalysisLogSaveContext } from '../../../domains';
+import { saveAnalysisLog } from '../../../domains';
+import { AnalysisEntity } from '../../../domains';
 
 export async function handleTrainManagerBuilderEvent(
     context: BuilderEventContext | ComponentContextWithError<BuilderEventContext>,
@@ -90,7 +90,6 @@ export async function handleTrainManagerBuilderEvent(
         context.event !== BuilderEvent.NONE
     ) {
         entity.run_status = null;
-        entity.run_station_index = null;
         entity.result_status = null;
     }
 

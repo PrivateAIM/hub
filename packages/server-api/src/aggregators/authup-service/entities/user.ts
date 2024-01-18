@@ -6,54 +6,45 @@
  */
 import type { UserEventContext } from '@authup/core';
 import { useDataSource } from 'typeorm-extension';
-import { ProjectEntity, AnalysisEntity, UserSecretEntity } from '../../../domains';
+import { AnalysisEntity, ProjectEntity } from '../../../domains';
 
 export async function handleAuthupUserEvent(context: UserEventContext) {
     if (context.event === 'deleted') {
         const dataSource = await useDataSource();
 
-        const proposalRepository = dataSource.getRepository(ProjectEntity);
-        const proposals = await proposalRepository.find({
+        const projectRepository = dataSource.getRepository(ProjectEntity);
+        const projects = await projectRepository.find({
             where: {
                 user_id: context.data.id,
             },
         });
 
-        for (let i = 0; i < proposals.length; i++) {
-            proposals[i].user_id = null;
+        for (let i = 0; i < projects.length; i++) {
+            projects[i].user_id = null;
         }
 
-        await proposalRepository.save(proposals);
+        await projectRepository.save(projects);
 
-        const trainRepository = dataSource.getRepository(AnalysisEntity);
-        const trains = await trainRepository.find({
+        const analysisRepository = dataSource.getRepository(AnalysisEntity);
+        const analyses = await analysisRepository.find({
             where: {
                 user_id: context.data.id,
             },
         });
 
-        for (let i = 0; i < trains.length; i++) {
-            trains[i].user_id = null;
+        for (let i = 0; i < analyses.length; i++) {
+            analyses[i].user_id = null;
         }
 
-        await trainRepository.save(trains);
+        await analysisRepository.save(analyses);
 
-        const trainFileRepository = dataSource.getRepository(AnalysisEntity);
-        const trainFiles = await trainFileRepository.find({
+        const analysisFileRepository = dataSource.getRepository(AnalysisEntity);
+        const analysisFiles = await analysisFileRepository.find({
             where: {
                 user_id: context.data.id,
             },
         });
 
-        await trainRepository.remove(trainFiles);
-
-        const userSecretRepository = dataSource.getRepository(UserSecretEntity);
-        const userSecrets = await userSecretRepository.find({
-            where: {
-                user_id: context.data.id,
-            },
-        });
-
-        await userSecretRepository.remove(userSecrets);
+        await analysisRepository.remove(analysisFiles);
     }
 }

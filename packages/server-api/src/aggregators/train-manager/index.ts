@@ -6,6 +6,4 @@
  */
 
 export * from './builder';
-export * from './extractor';
 export * from './module';
-export * from './router';

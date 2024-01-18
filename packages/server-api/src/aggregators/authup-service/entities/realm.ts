@@ -7,29 +7,29 @@
 import type { RealmEventContext } from '@authup/core';
 import { useDataSource } from 'typeorm-extension';
 import {
-    ProjectEntity, ProjectNodeEntity, RegistryProjectEntity, NodeEntity, AnalysisEntity, UserSecretEntity,
+    AnalysisEntity, NodeEntity, ProjectEntity, ProjectNodeEntity, RegistryProjectEntity,
 } from '../../../domains';
 
 export async function handleAuthupRealmEvent(context: RealmEventContext) {
     if (context.event === 'deleted') {
         const dataSource = await useDataSource();
 
-        const proposalRepository = dataSource.getRepository(ProjectEntity);
-        const proposals = await proposalRepository.find({
+        const projectRepository = dataSource.getRepository(ProjectEntity);
+        const projects = await projectRepository.find({
             where: {
                 realm_id: context.data.id,
             },
         });
 
-        await proposalRepository.remove(proposals);
+        await projectRepository.remove(projects);
 
-        const proposalStationRepository = dataSource.getRepository(ProjectNodeEntity);
-        const proposalStations = await proposalStationRepository.createQueryBuilder()
-            .where('proposal_realm_id = :realmId', { realmId: context.data.id })
-            .orWhere('station_realm_id = :realmId', { realmId: context.data.id })
+        const projectNodeRepository = dataSource.getRepository(ProjectNodeEntity);
+        const projectNodes = await projectNodeRepository.createQueryBuilder()
+            .where('project_realm_id = :realmId', { realmId: context.data.id })
+            .orWhere('node_realm_id = :realmId', { realmId: context.data.id })
             .getMany();
 
-        await proposalStationRepository.remove(proposalStations);
+        await projectNodeRepository.remove(projectNodes);
 
         const registryProjectRepository = dataSource.getRepository(RegistryProjectEntity);
         const registryProjects = await registryProjectRepository.find({
@@ -40,57 +40,48 @@ export async function handleAuthupRealmEvent(context: RealmEventContext) {
 
         await registryProjectRepository.remove(registryProjects);
 
-        const stationRepository = dataSource.getRepository(NodeEntity);
-        const stations = await stationRepository.find({
+        const nodeRepository = dataSource.getRepository(NodeEntity);
+        const nodes = await nodeRepository.find({
             where: {
                 realm_id: context.data.id,
             },
         });
 
-        await stationRepository.remove(stations);
+        await nodeRepository.remove(nodes);
 
-        const trainRepository = dataSource.getRepository(AnalysisEntity);
-        const trains = await trainRepository.find({
+        const analysisRepository = dataSource.getRepository(AnalysisEntity);
+        const analyses = await analysisRepository.find({
             where: {
                 realm_id: context.data.id,
             },
         });
 
-        await trainRepository.remove(trains);
+        await analysisRepository.remove(analyses);
 
-        const trainFileRepository = dataSource.getRepository(AnalysisEntity);
-        const trainFiles = await trainFileRepository.find({
+        const analysisFileRepository = dataSource.getRepository(AnalysisEntity);
+        const analysisFiles = await analysisFileRepository.find({
             where: {
                 realm_id: context.data.id,
             },
         });
 
-        await trainRepository.remove(trainFiles);
+        await analysisRepository.remove(analysisFiles);
 
-        const trainLogRepository = dataSource.getRepository(AnalysisEntity);
-        const trainLogs = await trainLogRepository.find({
+        const analysisLogRepository = dataSource.getRepository(AnalysisEntity);
+        const analysisLogs = await analysisLogRepository.find({
             where: {
                 realm_id: context.data.id,
             },
         });
 
-        await trainLogRepository.remove(trainLogs);
+        await analysisLogRepository.remove(analysisLogs);
 
-        const trainStationRepository = dataSource.getRepository(ProjectNodeEntity);
-        const trainStations = await trainStationRepository.createQueryBuilder()
-            .where('station_realm_id = :realmId', { realmId: context.data.id })
-            .orWhere('proposal_realm_id = :realmId', { realmId: context.data.id })
+        const analyseNodeRepository = dataSource.getRepository(ProjectNodeEntity);
+        const analyseNodes = await analyseNodeRepository.createQueryBuilder()
+            .where('node_realm_id = :realmId', { realmId: context.data.id })
+            .orWhere('project_realm_id = :realmId', { realmId: context.data.id })
             .getMany();
 
-        await proposalStationRepository.remove(trainStations);
-
-        const userSecretRepository = dataSource.getRepository(UserSecretEntity);
-        const userSecrets = await userSecretRepository.find({
-            where: {
-                realm_id: context.data.id,
-            },
-        });
-
-        await userSecretRepository.remove(userSecrets);
+        await projectNodeRepository.remove(analyseNodes);
     }
 }

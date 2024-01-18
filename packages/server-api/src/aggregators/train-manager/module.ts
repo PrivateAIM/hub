@@ -11,9 +11,7 @@ import type { ConsumeMessage } from 'amqp-extension';
 import { consume } from 'amqp-extension';
 import { useLogger } from '../../config';
 import type { Aggregator } from '../type';
-import { handleTrainManagerExtractorEvent } from './extractor';
 import { handleTrainManagerBuilderEvent } from './builder';
-import { handleTrainManagerRouterEvent } from './router';
 
 export function buildTrainManagerAggregator() : Aggregator {
     return {
@@ -48,24 +46,6 @@ export function buildTrainManagerAggregator() : Aggregator {
                 switch (payload.metadata.component) {
                     case ComponentName.BUILDER: {
                         await handleTrainManagerBuilderEvent({
-                            command: payload.metadata.command as any,
-                            event: payload.metadata.event as any,
-                            data: payload.data as any,
-                            ...(error ? { error } : {}),
-                        });
-                        break;
-                    }
-                    case ComponentName.EXTRACTOR: {
-                        await handleTrainManagerExtractorEvent({
-                            command: payload.metadata.command as any,
-                            event: payload.metadata.event as any,
-                            data: payload.data as any,
-                            ...(error ? { error } : {}),
-                        });
-                        break;
-                    }
-                    case ComponentName.ROUTER: {
-                        await handleTrainManagerRouterEvent({
                             command: payload.metadata.command as any,
                             event: payload.metadata.event as any,
                             data: payload.data as any,
