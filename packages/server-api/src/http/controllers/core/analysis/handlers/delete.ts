@@ -11,8 +11,8 @@ import { isRealmResourceWritable } from '@authup/core';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { AnalysisEntity } from '../../../../../domains/analysis';
-import { ProjectEntity } from '../../../../../domains/project/entity';
+import { AnalysisEntity } from '../../../../../domains';
+import { ProjectEntity } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 
 export async function deleteAnalysisRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -26,7 +26,7 @@ export async function deleteAnalysisRouteHandler(req: Request, res: Response) : 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisEntity);
 
-    const entity = await repository.findOne({ where: { id }, relations: ['proposal'] });
+    const entity = await repository.findOne({ where: { id }, relations: ['project'] });
 
     if (!entity) {
         throw new NotFoundError();

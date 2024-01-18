@@ -10,7 +10,7 @@ import { AnalysisConfigurationStatus } from '@personalhealthtrain/core';
 import { useDataSource } from 'typeorm-extension';
 import { useMinio } from '../../../core/minio';
 import { streamToBuffer } from '../../../core/utils';
-import { generateTrainMinioBucketName } from '../utils';
+import { generateAnalysisMinioBucketName } from '../utils';
 import { resolveTrain } from './utils';
 import { AnalysisEntity } from '../entity';
 import { AnalysisFileEntity } from '../../analysis-file/entity';
@@ -32,7 +32,7 @@ export async function generateTrainHash(train: AnalysisEntity | string) : Promis
         .getMany();
 
     const minio = useMinio();
-    const bucketName = generateTrainMinioBucketName(train.id);
+    const bucketName = generateAnalysisMinioBucketName(train.id);
 
     const promises : Promise<Buffer>[] = [];
 

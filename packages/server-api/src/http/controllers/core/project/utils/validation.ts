@@ -8,10 +8,9 @@
 import { isRealmResourceWritable } from '@authup/core';
 import { ForbiddenError } from '@ebec/http';
 import { check, validationResult } from 'express-validator';
-import { ProposalRisk } from '@personalhealthtrain/core';
 import type { Request } from 'routup';
-import { MasterImageEntity } from '../../../../../domains/master-image/entity';
-import type { ProjectEntity } from '../../../../../domains/project/entity';
+import { MasterImageEntity } from '../../../../../domains';
+import type { ProjectEntity } from '../../../../../domains';
 import type { RequestValidationResult } from '../../../../validation';
 import {
     RequestValidationError, extendRequestValidationResultWithRelation,
@@ -20,7 +19,7 @@ import {
 } from '../../../../validation';
 import { useRequestEnv } from '../../../../request';
 
-export async function runProposalValidation(
+export async function runProjectValidation(
     req: Request,
     operation: 'create' | 'update',
 ) : Promise<RequestValidationResult<ProjectEntity>> {
@@ -35,31 +34,6 @@ export async function runProposalValidation(
     }
 
     await titleChain.run(req);
-
-    // ----------------------------------------------
-
-    const requestDataAndRiskCommentChain = check(['requested_data', 'risk_comment'])
-        .exists()
-        .isLength({ min: 10, max: 2048 });
-
-    if (operation === 'update') {
-        requestDataAndRiskCommentChain.optional();
-    }
-
-    await requestDataAndRiskCommentChain.run(req);
-
-    // ----------------------------------------------
-
-    const riskChain = check('risk')
-        .exists()
-        .isString()
-        .isIn(Object.values(ProposalRisk));
-
-    if (operation === 'update') {
-        riskChain.optional();
-    }
-
-    await riskChain.run(req);
 
     // ----------------------------------------------
 
@@ -90,7 +64,7 @@ export async function runProposalValidation(
         const realm = useRequestEnv(req, 'realm');
         if (result.data.realm_id) {
             if (!isRealmResourceWritable(realm, result.data.realm_id)) {
-                throw new ForbiddenError('You are not permitted to create this proposal.');
+                throw new ForbiddenError('You are not permitted to create this project.');
             }
         } else {
             result.data.realm_id = realm.id;

@@ -13,25 +13,25 @@ import {
 } from '@routup/decorators';
 
 import {
-    deleteTrainFileRouteHandler,
-    getManyTrainFileGetManyRouteHandler,
-    getOneTrainFileRouteHandler,
-    uploadTrainFilesRouteHandler,
+    deleteAnalysisFileRouteHandler,
+    getManyAnalysisFileGetManyRouteHandler,
+    getOneAnalysisFileRouteHandler,
+    uploadAnalysisFilesRouteHandler,
 } from './handlers';
 import { ForceLoggedInMiddleware } from '../../../middleware';
 
-type PartialTrainFile = Partial<AnalysisFile>;
+type PartialAnalysisFile = Partial<AnalysisFile>;
 
-@DTags('train')
-@DController('/train-files')
-export class TrainFileController {
+@DTags('analysis')
+@DController('/analysis-files')
+export class AnalysisFileController {
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<PartialTrainFile | undefined> {
-        return await getOneTrainFileRouteHandler(req, res) as PartialTrainFile | undefined;
+    ): Promise<PartialAnalysisFile | undefined> {
+        return await getOneAnalysisFileRouteHandler(req, res) as PartialAnalysisFile | undefined;
     }
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
@@ -39,16 +39,16 @@ export class TrainFileController {
         @DPath('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<PartialTrainFile | undefined> {
-        return await deleteTrainFileRouteHandler(req, res) as PartialTrainFile | undefined;
+    ): Promise<PartialAnalysisFile | undefined> {
+        return await deleteAnalysisFileRouteHandler(req, res) as PartialAnalysisFile | undefined;
     }
 
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
         @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<PartialTrainFile[]> {
-        return await getManyTrainFileGetManyRouteHandler(req, res) as PartialTrainFile[];
+    ): Promise<PartialAnalysisFile[]> {
+        return await getManyAnalysisFileGetManyRouteHandler(req, res) as PartialAnalysisFile[];
     }
 
     @DPost('', [ForceLoggedInMiddleware])
@@ -56,6 +56,6 @@ export class TrainFileController {
         @DRequest() req: any,
             @DResponse() res: any,
     ): Promise<any> {
-        return await uploadTrainFilesRouteHandler(req, res) as any;
+        return await uploadAnalysisFilesRouteHandler(req, res) as any;
     }
 }

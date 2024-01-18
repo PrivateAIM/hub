@@ -28,14 +28,14 @@ export async function getOneAnalysisRouteHandler(req: Request, res: Response) : 
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisEntity);
-    const query = repository.createQueryBuilder('train')
-        .where('train.id = :id', { id });
+    const query = repository.createQueryBuilder('analysis')
+        .where('analysis.id = :id', { id });
 
-    onlyRealmWritableQueryResources(query, useRequestEnv(req, 'realm'), 'train.realm_id');
+    onlyRealmWritableQueryResources(query, useRequestEnv(req, 'realm'), 'analysis.realm_id');
 
     applyRelations(query, include, {
-        defaultAlias: 'train',
-        allowed: ['proposal', 'master_image', 'entrypoint_file'],
+        defaultAlias: 'analysis',
+        allowed: ['project', 'master_image', 'entrypoint_file'],
     });
 
     const entity = await query.getOne();
@@ -54,15 +54,15 @@ export async function getOneAnalysisRouteHandler(req: Request, res: Response) : 
 export async function getManyAnalysisRouteHandler(req: Request, res: Response) : Promise<any> {
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisEntity);
-    const query = repository.createQueryBuilder('train');
+    const query = repository.createQueryBuilder('analysis');
 
     const { pagination, filters } = applyQuery(query, useRequestQuery(req), {
-        defaultAlias: 'train',
+        defaultAlias: 'analysis',
         filters: {
             allowed: [
                 'id',
                 'name',
-                'proposal_id',
+                'project_id',
                 'realm_id',
                 'build_status',
                 'run_status',
@@ -74,7 +74,7 @@ export async function getManyAnalysisRouteHandler(req: Request, res: Response) :
             maxLimit: 50,
         },
         relations: {
-            allowed: ['proposal', 'master_image', 'entrypoint_file'],
+            allowed: ['project', 'master_image', 'entrypoint_file'],
         },
         sort: {
             allowed: ['created_at', 'updated_at'],
@@ -89,7 +89,7 @@ export async function getManyAnalysisRouteHandler(req: Request, res: Response) :
     if (filters) {
         for (let i = 0; i < filters.length; i++) {
             if (
-                filters[i].path === 'train' &&
+                filters[i].path === 'analysis' &&
                 filters[i].key === 'realm_id'
             ) {
                 filterRealmId = filters[i].value as string;
@@ -98,14 +98,14 @@ export async function getManyAnalysisRouteHandler(req: Request, res: Response) :
         }
     }
 
-    // todo: train-station realms should also be valid
+    // todo: analyse-nodes realms should also be valid
 
     if (filterRealmId) {
         if (!isRealmResourceReadable(useRequestEnv(req, 'realm'), filterRealmId)) {
-            throw new ForbiddenError('You are not permitted to inspect trains for the given realm.');
+            throw new ForbiddenError('You are not permitted to inspect the analysis for the given realm.');
         }
     } else {
-        onlyRealmWritableQueryResources(query, useRequestEnv(req, 'realm'), 'train.realm_id');
+        onlyRealmWritableQueryResources(query, useRequestEnv(req, 'realm'), 'analysis.realm_id');
     }
 
     const [entities, total] = await query.getManyAndCount();

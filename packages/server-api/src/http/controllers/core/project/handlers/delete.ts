@@ -14,7 +14,7 @@ import { useDataSource } from 'typeorm-extension';
 import { ProjectEntity } from '../../../../../domains/project/entity';
 import { useRequestEnv } from '../../../../request';
 
-export async function deleteProposalRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function deleteProjectRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
     const ability = useRequestEnv(req, 'ability');

@@ -11,9 +11,9 @@ import { BadRequestError, NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/core';
 import type { Request } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { NodeEntity } from '../../../../../domains/node/entity';
-import type { AnalysisNodeEntity } from '../../../../../domains/anaylsis-node/entity';
-import { AnalysisEntity } from '../../../../../domains/analysis';
+import { NodeEntity } from '../../../../../domains';
+import type { AnalysisNodeEntity } from '../../../../../domains';
+import { AnalysisEntity } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 import type { RequestValidationResult } from '../../../../validation';
 import {
@@ -23,20 +23,20 @@ import {
     initRequestValidationResult,
     matchedValidationData,
 } from '../../../../validation';
-import { ProjectNodeEntity } from '../../../../../domains/project-node/entity';
+import { ProjectNodeEntity } from '../../../../../domains';
 
-export async function runTrainStationValidation(
+export async function runAnalysisNodeValidation(
     req: Request,
     operation: 'create' | 'update',
 ) : Promise<RequestValidationResult<AnalysisNodeEntity>> {
     const result : RequestValidationResult<AnalysisNodeEntity> = initRequestValidationResult();
     if (operation === 'create') {
-        await check('station_id')
+        await check('node_id')
             .exists()
             .isUUID()
             .run(req);
 
-        await check('train_id')
+        await check('analysis_id')
             .exists()
             .isUUID()
             .run(req);
@@ -79,7 +79,7 @@ export async function runTrainStationValidation(
         if (
             !isRealmResourceWritable(useRequestEnv(req, 'realm'), result.relation.analysis.realm_id)
         ) {
-            throw new BadRequestError(buildRequestValidationErrorMessage('train_id'));
+            throw new BadRequestError(buildRequestValidationErrorMessage('analysis_id'));
         }
 
         result.data.analysis_realm_id = result.relation.analysis.realm_id;
@@ -106,7 +106,7 @@ export async function runTrainStationValidation(
         });
 
         if (!proposalStation) {
-            throw new NotFoundError('The referenced station is not part of the train proposal.');
+            throw new NotFoundError('The referenced node is not part of the analysis project.');
         }
     }
 

@@ -28,7 +28,7 @@ import { useRequestEnv } from '../../../../request';
 import { RequestValidationError } from '../../../../validation';
 
 /**
- * Execute a train command (start, stop, build).
+ * Execute a analysis command (start, stop, build).
  *
  * @param req
  * @param res

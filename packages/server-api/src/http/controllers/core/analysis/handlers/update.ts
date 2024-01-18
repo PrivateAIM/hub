@@ -13,7 +13,7 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '../../../../request';
 import { runAnalysisValidation } from '../utils';
-import { AnalysisEntity } from '../../../../../domains/analysis';
+import { AnalysisEntity } from '../../../../../domains';
 
 export async function updateAnalysisRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -44,7 +44,7 @@ export async function updateAnalysisRouteHandler(req: Request, res: Response) : 
         result.relation.entrypoint_file &&
         result.relation.entrypoint_file.analysis_id !== entity.id
     ) {
-        throw new BadRequestError('The entrypoint file id is associated to another train.');
+        throw new BadRequestError('The entrypoint file id is associated to another analysis.');
     }
 
     if (

@@ -13,8 +13,8 @@ import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '../../../../request';
 import { runAnalysisValidation } from '../utils';
-import { ProjectEntity } from '../../../../../domains/project/entity';
-import { AnalysisEntity } from '../../../../../domains/analysis';
+import { ProjectEntity } from '../../../../../domains';
+import { AnalysisEntity } from '../../../../../domains';
 
 export async function createAnalysisRouteHandler(req: Request, res: Response) : Promise<any> {
     const ability = useRequestEnv(req, 'ability');

@@ -16,17 +16,17 @@ import {
 import { NotFoundError } from '@ebec/http';
 import { AnalysisLogEntity } from '../../../../../domains';
 
-export async function getOneTrainLogRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function getOneAnalysisLogRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisLogEntity);
-    const query = repository.createQueryBuilder('trainLog')
-        .where('trainLog.id = :id', { id });
+    const query = repository.createQueryBuilder('log')
+        .where('log.id = :id', { id });
 
     applyRelations(query, useRequestQuery(req, 'include'), {
-        allowed: ['train'],
-        defaultAlias: 'trainLog',
+        allowed: ['analysis'],
+        defaultAlias: 'log',
     });
 
     const entity = await query.getOne();
@@ -38,28 +38,28 @@ export async function getOneTrainLogRouteHandler(req: Request, res: Response) : 
     return send(res, entity);
 }
 
-export async function getManyTrainLogRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function getManyAnalysisLogRouteHandler(req: Request, res: Response) : Promise<any> {
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisLogEntity);
-    const query = await repository.createQueryBuilder('trainLog');
-    query.distinctOn(['trainLog.id']);
+    const query = await repository.createQueryBuilder('log');
+    query.distinctOn(['log.id']);
 
     const { pagination } = applyQuery(query, useRequestQuery(req), {
-        defaultAlias: 'trainLog',
+        defaultAlias: 'log',
         filters: {
             allowed: [
                 'command',
                 'step',
                 'error',
                 'status',
-                'train_id',
+                'analysis_id',
             ],
         },
         pagination: {
             maxLimit: 50,
         },
         relations: {
-            allowed: ['train'],
+            allowed: ['analysis'],
         },
         sort: {
             allowed: ['command', 'step', 'status', 'created_at', 'updated_at'],

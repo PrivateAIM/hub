@@ -16,13 +16,13 @@ import { BadRequestError, ForbiddenError } from '@ebec/http';
 import type { Request, Response } from 'routup';
 import { send, sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { ensureMinioBucket, useMinio } from '../../../../../core/minio';
-import { streamToBuffer } from '../../../../../core/utils';
-import { AnalysisEntity, generateTrainMinioBucketName } from '../../../../../domains/analysis';
-import { AnalysisFileEntity } from '../../../../../domains/analysis-file/entity';
+import { ensureMinioBucket, useMinio } from '../../../../../core';
+import { streamToBuffer } from '../../../../../core';
+import { AnalysisEntity, generateAnalysisMinioBucketName } from '../../../../../domains';
+import { AnalysisFileEntity } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 
-export async function uploadTrainFilesRouteHandler(req: Request, res: Response) {
+export async function uploadAnalysisFilesRouteHandler(req: Request, res: Response) {
     const ability = useRequestEnv(req, 'ability');
     if (
         !ability.has(PermissionID.ANALYSIS_ADD) &&
@@ -41,23 +41,23 @@ export async function uploadTrainFilesRouteHandler(req: Request, res: Response) 
 
     const minio = useMinio();
 
-    let trainId : string | undefined;
+    let analysisId : string | undefined;
     instance.on('field', (name, value) => {
-        if (name === 'train_id') {
-            trainId = value;
+        if (name === 'analysis_id') {
+            analysisId = value;
         }
     });
 
     const promises : Promise<UploadedObjectInfo>[] = [];
     instance.on('file', (filename, file, info: FileInfo) => {
-        if (typeof info.filename === 'undefined' || typeof trainId === 'undefined') {
+        if (typeof info.filename === 'undefined' || typeof analysisId === 'undefined') {
             return;
         }
 
         const promise = new Promise<UploadedObjectInfo>((resolve, reject) => {
             const hash = crypto.createHash('sha256');
 
-            hash.update(trainId);
+            hash.update(analysisId);
             hash.update(info.filename);
 
             const fileName: string = path.basename(info.filename);
@@ -67,7 +67,7 @@ export async function uploadTrainFilesRouteHandler(req: Request, res: Response) 
 
             streamToBuffer(file)
                 .then((buffer) => {
-                    const bucketName = generateTrainMinioBucketName(trainId);
+                    const bucketName = generateAnalysisMinioBucketName(analysisId);
                     ensureMinioBucket(minio, bucketName)
                         .then(() => {
                             minio.putObject(
@@ -84,7 +84,7 @@ export async function uploadTrainFilesRouteHandler(req: Request, res: Response) 
                                         size: buffer.length,
                                         directory: filePath,
                                         user_id: useRequestEnv(req, 'userId'),
-                                        analysis_id: trainId,
+                                        analysis_id: analysisId,
                                         realm_id: realm.id,
                                     }));
 
@@ -109,14 +109,15 @@ export async function uploadTrainFilesRouteHandler(req: Request, res: Response) 
     instance.on('finish', async () => {
         await Promise.all(promises);
 
-        if (typeof trainId === 'undefined') {
+        if (typeof analysisId === 'undefined') {
             res.statusCode = 400;
             send(res);
+            return;
         }
 
-        const bucketName = generateTrainMinioBucketName(trainId);
+        const bucketName = generateAnalysisMinioBucketName(analysisId);
         const trainRepository = dataSource.getRepository(AnalysisEntity);
-        const train = await trainRepository.findOneBy({ id: trainId });
+        const train = await trainRepository.findOneBy({ id: analysisId });
         if (!train) {
             const objectNames = files.map((file) => file.hash);
             if (objectNames.length > 0) {
@@ -142,11 +143,6 @@ export async function uploadTrainFilesRouteHandler(req: Request, res: Response) 
         }
 
         await repository.save(files, { listeners: true });
-
-        train.hash = null;
-        train.hash_signed = null;
-
-        await trainRepository.save(train);
 
         sendCreated(res, {
             data: files,

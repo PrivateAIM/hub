@@ -14,23 +14,24 @@ import {
 } from '@routup/decorators';
 import { ForceLoggedInMiddleware } from '../../../middleware';
 import {
-    createTrainStationRouteHandler, deleteTrainStationRouteHandler,
-    getManyTrainStationRouteHandler,
-    getOneTrainStationRouteHandler,
-    updateTrainStationRouteHandler,
+    createAnalysisNodeRouteHandler,
+    deleteAnalysisNodeRouteHandler,
+    getManyAnalysisNodeRouteHandler,
+    getOneAnalysisNodeRouteHandler,
+    updateAnalysisNodeRouteHandler,
 } from './handlers';
 
-type PartialTrainStation = Partial<AnalysisNode>;
+type PartialAnalysisNode = Partial<AnalysisNode>;
 
-@DTags('train', 'station')
-@DController('/train-stations')
-export class TrainStationController {
+@DTags('analysis', 'node')
+@DController('/analysis-nodes')
+export class AnalysisNodeController {
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
         @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<PartialTrainStation[]> {
-        return await getManyTrainStationRouteHandler(req, res) as PartialTrainStation[];
+    ): Promise<PartialAnalysisNode[]> {
+        return await getManyAnalysisNodeRouteHandler(req, res) as PartialAnalysisNode[];
     }
 
     @DGet('/:id', [ForceLoggedInMiddleware])
@@ -38,8 +39,8 @@ export class TrainStationController {
         @DPath('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<PartialTrainStation | undefined> {
-        return await getOneTrainStationRouteHandler(req, res) as PartialTrainStation | undefined;
+    ): Promise<PartialAnalysisNode | undefined> {
+        return await getOneAnalysisNodeRouteHandler(req, res) as PartialAnalysisNode | undefined;
     }
 
     @DPost('/:id', [ForceLoggedInMiddleware])
@@ -48,17 +49,17 @@ export class TrainStationController {
             @DBody() data: AnalysisNode,
             @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<PartialTrainStation | undefined> {
-        return await updateTrainStationRouteHandler(req, res) as PartialTrainStation | undefined;
+    ): Promise<PartialAnalysisNode | undefined> {
+        return await updateAnalysisNodeRouteHandler(req, res) as PartialAnalysisNode | undefined;
     }
 
     @DPost('', [ForceLoggedInMiddleware])
     async add(
-        @DBody() data: PartialTrainStation,
+        @DBody() data: PartialAnalysisNode,
             @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<PartialTrainStation | undefined> {
-        return await createTrainStationRouteHandler(req, res) as PartialTrainStation | undefined;
+    ): Promise<PartialAnalysisNode | undefined> {
+        return await createAnalysisNodeRouteHandler(req, res) as PartialAnalysisNode | undefined;
     }
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
@@ -66,7 +67,7 @@ export class TrainStationController {
         @DPath('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<PartialTrainStation | undefined> {
-        return await deleteTrainStationRouteHandler(req, res) as PartialTrainStation | undefined;
+    ): Promise<PartialAnalysisNode | undefined> {
+        return await deleteAnalysisNodeRouteHandler(req, res) as PartialAnalysisNode | undefined;
     }
 }

@@ -10,10 +10,10 @@ import { ForbiddenError, NotFoundError } from '@ebec/http';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { AnalysisLogEntity } from '../../../../../domains/analysis-log';
+import { AnalysisLogEntity } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 
-export async function deleteTrainLogRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function deleteAnalysisLogRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
     const ability = useRequestEnv(req, 'ability');

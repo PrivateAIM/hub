@@ -5,28 +5,24 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionID, AnalysisNodeApprovalStatus } from '@personalhealthtrain/core';
+import { AnalysisNodeApprovalStatus, PermissionID } from '@personalhealthtrain/core';
 import { BadRequestError, ForbiddenError } from '@ebec/http';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { AnalysisNodeEntity } from '../../../../../domains/anaylsis-node/entity';
+import { AnalysisNodeEntity } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
-import { runTrainStationValidation } from '../utils';
-import { useEnv } from '../../../../../config/env';
-import { AnalysisEntity } from '../../../../../domains/analysis';
+import { runAnalysisNodeValidation } from '../utils';
+import { useEnv } from '../../../../../config';
+import { AnalysisEntity } from '../../../../../domains';
 
-export async function createTrainStationRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function createAnalysisNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const ability = useRequestEnv(req, 'ability');
     if (!ability.has(PermissionID.ANALYSIS_EDIT)) {
         throw new ForbiddenError();
     }
 
-    const result = await runTrainStationValidation(req, 'create');
-
-    if (useEnv('env') !== 'test' && !result.relation.node.ecosystem) {
-        throw new BadRequestError('The referenced station must be assigned to an ecosystem.');
-    }
+    const result = await runAnalysisNodeValidation(req, 'create');
 
     // todo: this should also work in the test-suite
     if (useEnv('env') !== 'test' && !result.relation.node.registry_id) {
@@ -51,8 +47,8 @@ export async function createTrainStationRouteHandler(req: Request, res: Response
     entity = await repository.save(entity);
 
     result.relation.analysis.nodes += 1;
-    const trainRepository = dataSource.getRepository(AnalysisEntity);
-    await trainRepository.save(result.relation.analysis);
+    const analysisRepository = dataSource.getRepository(AnalysisEntity);
+    await analysisRepository.save(result.relation.analysis);
 
     entity.analysis = result.relation.analysis;
     entity.node = result.relation.node;

@@ -13,10 +13,10 @@ import type { Request, Response } from 'routup';
 import { send, useRequestParam } from 'routup';
 import { applyFilters, useDataSource } from 'typeorm-extension';
 import { onlyRealmWritableQueryResources } from '../../../../../domains';
-import { AnalysisFileEntity } from '../../../../../domains/analysis-file/entity';
+import { AnalysisFileEntity } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 
-export async function getOneTrainFileRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function getOneAnalysisFileRouteHandler(req: Request, res: Response) : Promise<any> {
     const ability = useRequestEnv(req, 'ability');
     if (
         !ability.has(PermissionID.ANALYSIS_ADD) &&
@@ -45,7 +45,7 @@ export async function getOneTrainFileRouteHandler(req: Request, res: Response) :
     return send(res, entity);
 }
 
-export async function getManyTrainFileGetManyRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function getManyAnalysisFileGetManyRouteHandler(req: Request, res: Response) : Promise<any> {
     const { filter } = useRequestQuery(req);
 
     const dataSource = await useDataSource();
@@ -56,7 +56,7 @@ export async function getManyTrainFileGetManyRouteHandler(req: Request, res: Res
 
     applyFilters(query, filter, {
         defaultAlias: 'trainFile',
-        allowed: ['id', 'name', 'train_id', 'realm_id'],
+        allowed: ['id', 'name', 'analysis_id', 'realm_id'],
     });
 
     const [entities, total] = await query.getManyAndCount();

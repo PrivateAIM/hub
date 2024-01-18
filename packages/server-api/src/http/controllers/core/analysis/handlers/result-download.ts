@@ -13,8 +13,8 @@ import {
     HeaderName, setResponseHeaderAttachment, useRequestParam,
 } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { useMinio } from '../../../../../core/minio';
-import { AnalysisEntity, generateTrainMinioBucketName } from '../../../../../domains/analysis';
+import { useMinio } from '../../../../../core';
+import { AnalysisEntity, generateAnalysisMinioBucketName } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 
 export async function handleAnalysisResultDownloadRouteHandler(req: Request, res: Response) {
@@ -26,7 +26,7 @@ export async function handleAnalysisResultDownloadRouteHandler(req: Request, res
 
     const ability = useRequestEnv(req, 'ability');
     if (!ability.has(PermissionID.ANALYSIS_RESULT_READ)) {
-        throw new ForbiddenError('You are not authorized to read the train-result file.');
+        throw new ForbiddenError('You are not authorized to read the analysis-result file.');
     }
 
     const dataSource = await useDataSource();
@@ -40,15 +40,15 @@ export async function handleAnalysisResultDownloadRouteHandler(req: Request, res
     }
 
     if (!isRealmResourceReadable(useRequestEnv(req, 'realm'), entity.realm_id)) {
-        throw new ForbiddenError('You are not permitted to read the train-result file.');
+        throw new ForbiddenError('You are not permitted to read the analysis-result file.');
     }
 
     const minio = useMinio();
 
-    const bucketName = generateTrainMinioBucketName(entity.id);
+    const bucketName = generateAnalysisMinioBucketName(entity.id);
     const hasBucket = await minio.bucketExists(bucketName);
     if (!hasBucket) {
-        throw new NotFoundError('The train storage is not yet initialized.');
+        throw new NotFoundError('The analysis storage is not yet initialized.');
     }
 
     try {
@@ -61,6 +61,6 @@ export async function handleAnalysisResultDownloadRouteHandler(req: Request, res
 
         stream.pipe(res);
     } catch (e) {
-        throw new NotFoundError('The train result does not exist in the storage.');
+        throw new NotFoundError('The analysis result does not exist in the storage.');
     }
 }

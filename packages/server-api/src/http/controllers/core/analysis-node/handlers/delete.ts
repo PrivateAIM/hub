@@ -12,11 +12,11 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { MoreThan } from 'typeorm';
 import { isRealmResourceWritable } from '@authup/core';
 import { useDataSource } from 'typeorm-extension';
-import { AnalysisNodeEntity } from '../../../../../domains/anaylsis-node/entity';
+import { AnalysisNodeEntity } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
-import { AnalysisEntity } from '../../../../../domains/analysis';
+import { AnalysisEntity } from '../../../../../domains';
 
-export async function deleteTrainStationRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function deleteAnalysisNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
     const ability = useRequestEnv(req, 'ability');
@@ -55,7 +55,7 @@ export async function deleteTrainStationRouteHandler(req: Request, res: Response
         .update()
         .where({
             index: MoreThan(entity.index),
-            train_id: entity.analysis_id,
+            analysis_id: entity.analysis_id,
         })
         .set({
             index: () => '`index` - 1',
@@ -64,13 +64,13 @@ export async function deleteTrainStationRouteHandler(req: Request, res: Response
 
     // -------------------------------------------
 
-    const trainRepository = dataSource.getRepository(AnalysisEntity);
-    const train = await trainRepository.findOneBy({ id: entity.analysis_id });
+    const analysisRepository = dataSource.getRepository(AnalysisEntity);
+    const analysis = await analysisRepository.findOneBy({ id: entity.analysis_id });
 
-    train.nodes -= 1;
-    await trainRepository.save(train);
+    analysis.nodes -= 1;
+    await analysisRepository.save(analysis);
 
-    entity.analysis = train;
+    entity.analysis = analysis;
 
     // -------------------------------------------
 

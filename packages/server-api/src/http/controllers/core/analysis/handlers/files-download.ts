@@ -12,11 +12,11 @@ import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceReadable } from '@authup/core';
 import { useDataSource } from 'typeorm-extension';
 import { useLogger } from '../../../../../config';
-import { useMinio } from '../../../../../core/minio';
-import { streamToBuffer } from '../../../../../core/utils';
-import { AnalysisNodeEntity } from '../../../../../domains/anaylsis-node/entity';
-import { AnalysisEntity, generateTrainMinioBucketName } from '../../../../../domains/analysis';
-import { AnalysisFileEntity } from '../../../../../domains/analysis-file/entity';
+import { useMinio } from '../../../../../core';
+import { streamToBuffer } from '../../../../../core';
+import { AnalysisNodeEntity } from '../../../../../domains';
+import { AnalysisEntity, generateAnalysisMinioBucketName } from '../../../../../domains';
+import { AnalysisFileEntity } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 
 export async function handleAnalysisFilesDownloadRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -29,31 +29,31 @@ export async function handleAnalysisFilesDownloadRouteHandler(req: Request, res:
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisEntity);
 
-    const train = await repository.findOneBy({ id });
+    const entity = await repository.findOneBy({ id });
 
-    if (!train) {
+    if (!entity) {
         throw new NotFoundError();
     }
 
-    if (!isRealmResourceReadable(useRequestEnv(req, 'realm'), train.realm_id)) {
-        const proposalStations = await dataSource.getRepository(AnalysisNodeEntity).find({
+    if (!isRealmResourceReadable(useRequestEnv(req, 'realm'), entity.realm_id)) {
+        const analysisNodes = await dataSource.getRepository(AnalysisNodeEntity).find({
             where: {
-                analysis_id: train.id,
+                analysis_id: entity.id,
             },
-            relations: ['station'],
+            relations: ['node'],
         });
 
         let isPermitted = false;
 
-        for (let i = 0; i < proposalStations.length; i++) {
-            if (isRealmResourceReadable(useRequestEnv(req, 'realm'), proposalStations[i].node.realm_id)) {
+        for (let i = 0; i < analysisNodes.length; i++) {
+            if (isRealmResourceReadable(useRequestEnv(req, 'realm'), analysisNodes[i].node.realm_id)) {
                 isPermitted = true;
                 break;
             }
         }
 
         if (!isPermitted) {
-            throw new ForbiddenError('You are not allowed to inspect the train files.');
+            throw new ForbiddenError('You are not allowed to inspect the analysis files.');
         }
     }
 
@@ -67,7 +67,7 @@ export async function handleAnalysisFilesDownloadRouteHandler(req: Request, res:
 
     const minio = useMinio();
 
-    const bucketName = generateTrainMinioBucketName(train.id);
+    const bucketName = generateAnalysisMinioBucketName(entity.id);
     const hasBucket = await minio.bucketExists(bucketName);
     if (!hasBucket) {
         pack.finalize();
@@ -76,7 +76,7 @@ export async function handleAnalysisFilesDownloadRouteHandler(req: Request, res:
     }
 
     const files = await dataSource.getRepository(AnalysisFileEntity).findBy({
-        analysis_id: train.id,
+        analysis_id: entity.id,
     });
 
     if (files.length === 0) {
@@ -105,20 +105,20 @@ export async function handleAnalysisFilesDownloadRouteHandler(req: Request, res:
 
                     name += file.name;
 
-                    useLogger().debug(`Packing train file ${name} (${data.byteLength} bytes) for streaming.`);
+                    useLogger().debug(`Packing analysis file ${name} (${data.byteLength} bytes) for streaming.`);
 
                     pack.entry({
                         name,
                         size: data.byteLength,
                     }, data, (err) => {
                         if (err) {
-                            useLogger().error(`Packing train file ${name} for streaming failed.`);
+                            useLogger().error(`Packing analysis file ${name} for streaming failed.`);
                             reject(err);
 
                             return;
                         }
 
-                        useLogger().debug(`Packed train file ${name} for streaming.`);
+                        useLogger().debug(`Packed analysis file ${name} for streaming.`);
                         resolve();
                     });
                 })

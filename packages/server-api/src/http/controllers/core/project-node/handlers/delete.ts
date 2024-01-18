@@ -11,10 +11,10 @@ import { isRealmResourceWritable } from '@authup/core';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { ProjectNodeEntity } from '../../../../../domains/project-node/entity';
+import { ProjectNodeEntity } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 
-export async function deleteProposalStationRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function deleteProjectNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
     const ability = useRequestEnv(req, 'ability');
@@ -23,7 +23,7 @@ export async function deleteProposalStationRouteHandler(req: Request, res: Respo
         !ability.has(PermissionID.PROJECT_EDIT) &&
         !ability.has(PermissionID.PROJECT_DROP)
     ) {
-        throw new ForbiddenError('You are not allowed to drop a proposal station.');
+        throw new ForbiddenError('You are not allowed to drop a project node.');
     }
 
     const dataSource = await useDataSource();
@@ -39,7 +39,7 @@ export async function deleteProposalStationRouteHandler(req: Request, res: Respo
         !isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.node_realm_id) &&
         !isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.project_realm_id)
     ) {
-        throw new ForbiddenError('You are not authorized to drop this proposal station.');
+        throw new ForbiddenError('You are not authorized to drop this project node.');
     }
 
     const { id: entityId } = entity;

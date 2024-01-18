@@ -14,22 +14,22 @@ import {
 } from '@routup/decorators';
 import { ForceLoggedInMiddleware } from '../../../middleware';
 import {
-    deleteTrainLogRouteHandler,
-    getManyTrainLogRouteHandler,
-    getOneTrainLogRouteHandler,
+    deleteAnalysisLogRouteHandler,
+    getManyAnalysisLogRouteHandler,
+    getOneAnalysisLogRouteHandler,
 } from './handlers';
 
-type PartialTrainLog = Partial<AnalysisLog>;
+type PartialAnalysisLog = Partial<AnalysisLog>;
 
-@DTags('train')
-@DController('/train-logs')
+@DTags('analysis')
+@DController('/analysis-logs')
 export class TrainLogController {
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
         @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<PartialTrainLog[]> {
-        return await getManyTrainLogRouteHandler(req, res) as PartialTrainLog[];
+    ): Promise<PartialAnalysisLog[]> {
+        return await getManyAnalysisLogRouteHandler(req, res) as PartialAnalysisLog[];
     }
 
     @DGet('/:id', [ForceLoggedInMiddleware])
@@ -37,8 +37,8 @@ export class TrainLogController {
         @DPath('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<PartialTrainLog | undefined> {
-        return await getOneTrainLogRouteHandler(req, res) as PartialTrainLog | undefined;
+    ): Promise<PartialAnalysisLog | undefined> {
+        return await getOneAnalysisLogRouteHandler(req, res) as PartialAnalysisLog | undefined;
     }
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
@@ -46,7 +46,7 @@ export class TrainLogController {
         @DPath('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<PartialTrainLog | undefined> {
-        return await deleteTrainLogRouteHandler(req, res) as PartialTrainLog | undefined;
+    ): Promise<PartialAnalysisLog | undefined> {
+        return await deleteAnalysisLogRouteHandler(req, res) as PartialAnalysisLog | undefined;
     }
 }

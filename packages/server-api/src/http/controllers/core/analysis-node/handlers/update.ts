@@ -13,9 +13,9 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { AnalysisNodeEntity } from '../../../../../domains/anaylsis-node/entity';
 import { useRequestEnv } from '../../../../request';
-import { runTrainStationValidation } from '../utils';
+import { runAnalysisNodeValidation } from '../utils';
 
-export async function updateTrainStationRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function updateAnalysisNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
     const dataSource = await useDataSource();
@@ -28,22 +28,22 @@ export async function updateTrainStationRouteHandler(req: Request, res: Response
 
     const ability = useRequestEnv(req, 'ability');
 
-    const isAuthorityOfStation = isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.node_realm_id);
-    const isAuthorizedForStation = ability.has(PermissionID.ANALYSIS_APPROVE);
+    const isAuthorityOfNode = isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.node_realm_id);
+    const isAuthorizedForNode = ability.has(PermissionID.ANALYSIS_APPROVE);
 
-    const isAuthorityOfTrain = isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.analysis_realm_id);
-    const isAuthorizedForTrain = ability.has(PermissionID.ANALYSIS_EDIT);
+    const isAuthorityOfAnalysis = isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.analysis_realm_id);
+    const isAuthorizedForAnalysis = ability.has(PermissionID.ANALYSIS_EDIT);
 
     if (
-        !(isAuthorityOfStation && isAuthorizedForStation) &&
-        !(isAuthorityOfTrain && isAuthorizedForTrain)
+        !(isAuthorityOfNode && isAuthorizedForNode) &&
+        !(isAuthorityOfAnalysis && isAuthorizedForAnalysis)
     ) {
         throw new ForbiddenError();
     }
 
-    const result = await runTrainStationValidation(req, 'update');
+    const result = await runAnalysisNodeValidation(req, 'update');
 
-    if (!isAuthorityOfStation) {
+    if (!isAuthorityOfNode) {
         if (result.data.approval_status) {
             delete result.data.approval_status;
         }
@@ -53,7 +53,7 @@ export async function updateTrainStationRouteHandler(req: Request, res: Response
         }
     }
 
-    if (!isAuthorityOfTrain) {
+    if (!isAuthorityOfAnalysis) {
         if (result.data.index) {
             delete result.data.index;
         }

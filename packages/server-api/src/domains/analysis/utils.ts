@@ -8,6 +8,6 @@
 import type { Analysis } from '@personalhealthtrain/core';
 
 // todo: also present in server-core package.
-export function generateTrainMinioBucketName(id: Analysis['id']) {
+export function generateAnalysisMinioBucketName(id: Analysis['id']) {
     return `trains.${id}`;
 }

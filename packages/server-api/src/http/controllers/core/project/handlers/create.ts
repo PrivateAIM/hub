@@ -11,16 +11,16 @@ import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '../../../../request';
-import { ProjectEntity } from '../../../../../domains/project/entity';
-import { runProposalValidation } from '../utils/validation';
+import { ProjectEntity } from '../../../../../domains';
+import { runProjectValidation } from '../utils/validation';
 
-export async function createProposalRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function createProjectRouteHandler(req: Request, res: Response) : Promise<any> {
     const ability = useRequestEnv(req, 'ability');
     if (!ability.has(PermissionID.PROJECT_ADD)) {
         throw new ForbiddenError();
     }
 
-    const result = await runProposalValidation(req, 'create');
+    const result = await runProjectValidation(req, 'create');
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(ProjectEntity);

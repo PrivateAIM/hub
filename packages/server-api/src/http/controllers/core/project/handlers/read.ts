@@ -15,7 +15,7 @@ import {
 import { NotFoundError } from '@ebec/http';
 import { ProjectEntity } from '../../../../../domains';
 
-export async function getOneProposalRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function getOneProjectRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
     const dataSource = await useDataSource();
@@ -54,7 +54,7 @@ export async function getOneProposalRouteHandler(req: Request, res: Response) : 
     return send(res, entity);
 }
 
-export async function getManyProposalRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function getManyProjectRouteHandler(req: Request, res: Response) : Promise<any> {
     const {
         filter,
     } = useRequestQuery(req);

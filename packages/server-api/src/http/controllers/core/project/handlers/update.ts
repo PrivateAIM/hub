@@ -13,9 +13,9 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { ProjectEntity } from '../../../../../domains/project/entity';
 import { useRequestEnv } from '../../../../request';
-import { runProposalValidation } from '../utils/validation';
+import { runProjectValidation } from '../utils/validation';
 
-export async function updateProposalRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function updateProjectRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
     const ability = useRequestEnv(req, 'ability');
@@ -23,7 +23,7 @@ export async function updateProposalRouteHandler(req: Request, res: Response) : 
         throw new ForbiddenError();
     }
 
-    const result = await runProposalValidation(req, 'update');
+    const result = await runProjectValidation(req, 'update');
     if (!result.data) {
         return sendAccepted(res);
     }

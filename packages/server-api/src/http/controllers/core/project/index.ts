@@ -14,24 +14,24 @@ import {
 } from '@routup/decorators';
 import { ForceLoggedInMiddleware } from '../../../middleware';
 import {
-    createProposalRouteHandler,
-    deleteProposalRouteHandler,
-    getManyProposalRouteHandler,
-    getOneProposalRouteHandler,
-    updateProposalRouteHandler,
+    createProjectRouteHandler,
+    deleteProjectRouteHandler,
+    getManyProjectRouteHandler,
+    getOneProjectRouteHandler,
+    updateProjectRouteHandler,
 } from './handlers';
 
-type PartialProposal = Partial<Project>;
+type PartialProject = Partial<Project>;
 
-@DTags('proposal')
-@DController('/proposals')
+@DTags('projects')
+@DController('/projects')
 export class ProposalController {
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
         @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<PartialProposal[]> {
-        return await getManyProposalRouteHandler(req, res) as PartialProposal[];
+    ): Promise<PartialProject[]> {
+        return await getManyProjectRouteHandler(req, res) as PartialProject[];
     }
 
     @DGet('/:id', [ForceLoggedInMiddleware])
@@ -39,8 +39,8 @@ export class ProposalController {
         @DPath('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<PartialProposal | undefined> {
-        return await getOneProposalRouteHandler(req, res) as PartialProposal | undefined;
+    ): Promise<PartialProject | undefined> {
+        return await getOneProjectRouteHandler(req, res) as PartialProject | undefined;
     }
 
     @DPost('/:id', [ForceLoggedInMiddleware])
@@ -49,8 +49,8 @@ export class ProposalController {
             @DBody() data: Project,
             @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<PartialProposal | undefined> {
-        return await updateProposalRouteHandler(req, res) as PartialProposal | undefined;
+    ): Promise<PartialProject | undefined> {
+        return await updateProjectRouteHandler(req, res) as PartialProject | undefined;
     }
 
     @DPost('', [ForceLoggedInMiddleware])
@@ -58,8 +58,8 @@ export class ProposalController {
         @DBody() data: Project,
             @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<PartialProposal | undefined> {
-        return await createProposalRouteHandler(req, res) as PartialProposal | undefined;
+    ): Promise<PartialProject | undefined> {
+        return await createProjectRouteHandler(req, res) as PartialProject | undefined;
     }
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
@@ -67,7 +67,7 @@ export class ProposalController {
         @DPath('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<PartialProposal | undefined> {
-        return await deleteProposalRouteHandler(req, res) as PartialProposal | undefined;
+    ): Promise<PartialProject | undefined> {
+        return await deleteProjectRouteHandler(req, res) as PartialProject | undefined;
     }
 }

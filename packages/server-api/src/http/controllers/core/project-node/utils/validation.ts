@@ -10,9 +10,9 @@ import { ProjectNodeApprovalStatus } from '@personalhealthtrain/core';
 import { NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/core';
 import type { Request } from 'routup';
-import type { ProjectNodeEntity } from '../../../../../domains/project-node/entity';
-import { ProjectEntity } from '../../../../../domains/project/entity';
-import { NodeEntity } from '../../../../../domains/node';
+import type { ProjectNodeEntity } from '../../../../../domains';
+import { ProjectEntity } from '../../../../../domains';
+import { NodeEntity } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 import type { RequestValidationResult } from '../../../../validation';
 import {
@@ -21,19 +21,19 @@ import {
     matchedValidationData,
 } from '../../../../validation';
 
-export async function runProposalStationValidation(
+export async function runProjectNodeValidation(
     req: Request,
     operation: 'create' | 'update',
 ) : Promise<RequestValidationResult<ProjectNodeEntity>> {
     const result : RequestValidationResult<ProjectNodeEntity> = initRequestValidationResult();
 
     if (operation === 'create') {
-        await check('proposal_id')
+        await check('project_id')
             .exists()
             .isUUID()
             .run(req);
 
-        await check('station_id')
+        await check('node_id')
             .exists()
             .isUUID()
             .run(req);
@@ -72,7 +72,7 @@ export async function runProposalStationValidation(
         result.data.project_realm_id = result.relation.project.realm_id;
 
         if (!isRealmResourceWritable(useRequestEnv(req, 'realm'), result.relation.project.realm_id)) {
-            throw new NotFoundError('The referenced proposal realm is not permitted.');
+            throw new NotFoundError('The referenced project realm is not permitted.');
         }
     }
 

@@ -16,17 +16,17 @@ import { isRealmResourceReadable } from '@authup/core';
 import { AnalysisNodeEntity, onlyRealmWritableQueryResources } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 
-export async function getOneTrainStationRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function getOneAnalysisNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisNodeEntity);
-    const query = repository.createQueryBuilder('trainStation')
-        .where('trainStation.id = :id', { id });
+    const query = repository.createQueryBuilder('analysisNode')
+        .where('analysisNode.id = :id', { id });
 
     applyRelations(query, useRequestQuery(req, 'include'), {
-        allowed: ['station', 'train'],
-        defaultAlias: 'trainStation',
+        allowed: ['node', 'analysis'],
+        defaultAlias: 'analysisNode',
     });
 
     const entity = await query.getOne();
@@ -45,40 +45,40 @@ export async function getOneTrainStationRouteHandler(req: Request, res: Response
     return send(res, entity);
 }
 
-export async function getManyTrainStationRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function getManyAnalysisNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisNodeEntity);
-    const query = await repository.createQueryBuilder('trainStation');
-    query.distinctOn(['trainStation.id']);
+    const query = repository.createQueryBuilder('analysisNode');
+    query.distinctOn(['analysisNode.id']);
 
     onlyRealmWritableQueryResources(query, useRequestEnv(req, 'realm'), [
-        'trainStation.train_realm_id',
-        'trainStation.station_realm_id',
+        'analysisNode.train_realm_id',
+        'analysisNode.station_realm_id',
     ]);
 
     const { pagination } = applyQuery(query, useRequestQuery(req), {
-        defaultAlias: 'trainStation',
+        defaultAlias: 'analysisNode',
         filters: {
             allowed: [
                 'run_status',
                 'approval_status',
 
-                'train_id',
-                'train_realm_id',
-                'train.id',
-                'train.name',
+                'analysis_id',
+                'analysis_realm_id',
+                'analysis.id',
+                'analysis.name',
 
-                'station_id',
-                'station_realm_id',
-                'station.name',
-                'station.realm_id',
+                'node_id',
+                'node_realm_id',
+                'node.name',
+                'node.realm_id',
             ],
         },
         pagination: {
             maxLimit: 50,
         },
         relations: {
-            allowed: ['station', 'train'],
+            allowed: ['node', 'analysis'],
         },
         sort: {
             allowed: ['created_at', 'updated_at', 'index'],

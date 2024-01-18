@@ -11,12 +11,12 @@ import { isRealmResourceWritable } from '@authup/core';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { useMinio } from '../../../../../core/minio';
-import { AnalysisFileEntity } from '../../../../../domains/analysis-file/entity';
+import { useMinio } from '../../../../../core';
+import { AnalysisFileEntity } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
-import { AnalysisEntity, generateTrainMinioBucketName } from '../../../../../domains/analysis';
+import { generateAnalysisMinioBucketName } from '../../../../../domains';
 
-export async function deleteTrainFileRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function deleteAnalysisFileRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
     const ability = useRequestEnv(req, 'ability');
@@ -41,7 +41,7 @@ export async function deleteTrainFileRouteHandler(req: Request, res: Response) :
     }
 
     const minio = useMinio();
-    const bucketName = generateTrainMinioBucketName(entity.analysis_id);
+    const bucketName = generateAnalysisMinioBucketName(entity.analysis_id);
     try {
         await minio.removeObject(bucketName, entity.hash);
     } catch (e) {
@@ -53,15 +53,6 @@ export async function deleteTrainFileRouteHandler(req: Request, res: Response) :
     await repository.remove(entity);
 
     entity.id = entityId;
-
-    // train
-    const trainRepository = dataSource.getRepository(AnalysisEntity);
-    let train = await trainRepository.findOneBy({ id: entity.analysis_id });
-    train = trainRepository.merge(train, {
-        hash: null,
-        hash_signed: null,
-    });
-    await trainRepository.save(train);
 
     return sendAccepted(res, entity);
 }

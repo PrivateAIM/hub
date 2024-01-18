@@ -18,18 +18,18 @@ import { isRealmResourceReadable } from '@authup/core';
 import { ProjectNodeEntity, onlyRealmWritableQueryResources } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 
-export async function getOneProposalStationRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function getOneProjectNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
     const { include } = useRequestQuery(req);
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(ProjectNodeEntity);
-    const query = repository.createQueryBuilder('proposalStation')
-        .where('proposalStation.id = :id', { id });
+    const query = repository.createQueryBuilder('analysisNode')
+        .where('analysisNode.id = :id', { id });
 
     applyRelations(query, include, {
-        allowed: ['station', 'proposal'],
-        defaultAlias: 'proposalStation',
+        allowed: ['node', 'project'],
+        defaultAlias: 'analysisNode',
     });
 
     const entity = await query.getOne();
@@ -48,37 +48,37 @@ export async function getOneProposalStationRouteHandler(req: Request, res: Respo
     return send(res, entity);
 }
 
-export async function getManyProposalStationRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function getManyProjectNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const dataSource = await useDataSource();
 
     const repository = dataSource.getRepository(ProjectNodeEntity);
-    const query = await repository.createQueryBuilder('proposalStation');
-    query.distinctOn(['proposalStation.id']);
+    const query = repository.createQueryBuilder('analysisNode');
+    query.distinctOn(['analysisNode.id']);
 
     onlyRealmWritableQueryResources(query, useRequestEnv(req, 'realm'), [
-        'proposalStation.station_realm_id',
-        'proposalStation.proposal_realm_id',
+        'analysisNode.station_realm_id',
+        'analysisNode.project_realm_id',
     ]);
 
     const { pagination } = applyQuery(query, useRequestQuery(req), {
-        defaultAlias: 'proposalStation',
+        defaultAlias: 'analysisNode',
         filters: {
             allowed: [
-                'proposal_realm_id',
-                'proposal_id',
-                'proposal.id',
-                'proposal.title',
+                'project_realm_id',
+                'project_id',
+                'project.id',
+                'project.name',
 
-                'station_realm_id',
-                'station_id',
-                'station.name',
+                'node_realm_id',
+                'node_id',
+                'node.name',
             ],
         },
         pagination: {
             maxLimit: 50,
         },
         relations: {
-            allowed: ['station', 'proposal'],
+            allowed: ['node', 'project'],
         },
         sort: {
             allowed: ['created_at', 'updated_at'],
