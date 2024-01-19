@@ -5,23 +5,18 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { randomBytes } from 'crypto';
 import type { Analysis } from '@personalhealthtrain/core';
-import { TrainType } from '@personalhealthtrain/core';
 import type { SuperTest, Test } from 'supertest';
 
-export const TEST_DEFAULT_TRAIN : Partial<Analysis> = {
-    name: 'development',
-    type: TrainType.DISCOVERY,
-    hash_signed: randomBytes(40).toString('hex'),
-    query: '{"key": "value"}',
+export const TEST_DEFAULT_ANALYSIS : Partial<Analysis> = {
+    name: 'development'
 };
 
 export async function createSuperTestTrain(superTest: SuperTest<Test>, entity?: Partial<Analysis>) {
     return superTest
-        .post('/trains')
+        .post('/analyses')
         .send({
-            ...TEST_DEFAULT_TRAIN,
+            ...TEST_DEFAULT_ANALYSIS,
             ...(entity || {}),
         })
         .auth('admin', 'start123');

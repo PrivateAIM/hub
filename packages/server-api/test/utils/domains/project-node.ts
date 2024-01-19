@@ -8,9 +8,9 @@
 import type { ProjectNode } from '@personalhealthtrain/core';
 import type { SuperTest, Test } from 'supertest';
 
-export async function createSuperTestProposalStation(superTest: SuperTest<Test>, proposalStation: Partial<ProjectNode>) {
+export async function createSuperTestProjectNode(superTest: SuperTest<Test>, proposalStation: Partial<ProjectNode>) {
     return superTest
-        .post('/proposal-stations')
+        .post('/project-nodes')
         .send(proposalStation)
         .auth('admin', 'start123');
 }

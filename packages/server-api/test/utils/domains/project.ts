@@ -6,21 +6,17 @@
  */
 
 import type { Project } from '@personalhealthtrain/core';
-import { ProposalRisk } from '@personalhealthtrain/core';
 import type { SuperTest, Test } from 'supertest';
 
-export const TEST_DEFAULT_PROPOSAL : Partial<Project> = {
+export const TEST_DEFAULT_PROJECT : Partial<Project> = {
     name: 'development',
-    requested_data: 'I request everything and more :P',
-    risk_comment: 'There is no risk at all :) ^^',
-    risk: ProposalRisk.LOW,
 };
 
-export async function createSuperTestProposal(superTest: SuperTest<Test>, proposal?: Partial<Project>) {
+export async function createSuperTestProject(superTest: SuperTest<Test>, proposal?: Partial<Project>) {
     return superTest
-        .post('/proposals')
+        .post('/projects')
         .send({
-            ...TEST_DEFAULT_PROPOSAL,
+            ...TEST_DEFAULT_PROJECT,
             ...(proposal || {}),
         })
         .auth('admin', 'start123');

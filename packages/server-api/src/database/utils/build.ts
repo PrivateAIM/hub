@@ -16,7 +16,7 @@ export async function buildDataSourceOptions() : Promise<DataSourceOptions> {
         throw new Error('The database configuration could not be read from env variables.');
     }
 
-    if (options.type !== 'mysql' && options.type !== 'postgres') {
+    if (options.type !== 'mysql' && options.type !== 'postgres' && options.type !== 'better-sqlite3') {
         throw new Error(`The database type ${options.type} is not supported.`);
     }
 

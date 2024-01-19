@@ -8,11 +8,11 @@
 import type {
     Node,
 } from '@personalhealthtrain/core';
-import { removeDateProperties } from '../../utils/date-properties';
-import { expectPropertiesEqualToSrc } from '../../utils/properties';
-import { useSuperTest } from '../../utils/supertest';
-import { dropTestDatabase, useTestDatabase } from '../../utils/database';
-import { createSuperTestStation } from '../../utils/domains';
+import { removeDateProperties } from '../../utils';
+import { expectPropertiesEqualToSrc } from '../../utils';
+import { useSuperTest } from '../../utils';
+import { dropTestDatabase, useTestDatabase } from '../../utils';
+import { createSuperTestNode } from '../../utils/domains';
 
 describe('src/controllers/core/station', () => {
     const superTest = useSuperTest();
@@ -27,8 +27,8 @@ describe('src/controllers/core/station', () => {
 
     let details: Node;
 
-    it('should create station', async () => {
-        const response = await createSuperTestStation(superTest);
+    it('should create node', async () => {
+        const response = await createSuperTestNode(superTest);
 
         expect(response.status).toEqual(201);
         expect(response.body).toBeDefined();
@@ -38,7 +38,7 @@ describe('src/controllers/core/station', () => {
 
     it('should read collection', async () => {
         const response = await superTest
-            .get('/stations')
+            .get('/nodes')
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(200);
@@ -49,7 +49,7 @@ describe('src/controllers/core/station', () => {
 
     it('should read resource', async () => {
         const response = await superTest
-            .get(`/stations/${details.id}?fields=%2Bpublic_key,%2Bemail`)
+            .get(`/nodes/${details.id}?fields=%2Bemail`)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(200);
@@ -60,24 +60,21 @@ describe('src/controllers/core/station', () => {
 
     it('should update resource', async () => {
         details.name = 'TestA';
-        details.public_key = 'baz-bar-foo';
 
         const response = await superTest
-            .post(`/stations/${details.id}`)
+            .post(`/nodes/${details.id}`)
             .send(details)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(202);
         expect(response.body).toBeDefined();
 
-        details.public_key = Buffer.from(details.public_key, 'utf-8').toString('hex');
-
         expectPropertiesEqualToSrc(details, response.body);
     });
 
     it('should delete resource', async () => {
         const response = await superTest
-            .delete(`/stations/${details.id}`)
+            .delete(`/nodes/${details.id}`)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(202);

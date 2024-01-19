@@ -14,7 +14,7 @@ import {
     useSuperTest,
     useTestDatabase,
 } from '../../utils';
-import { createSuperTestProposal, createSuperTestTrain } from '../../utils/domains';
+import { createSuperTestProject, createSuperTestTrain } from '../../utils/domains';
 
 describe('src/controllers/core/train-file', () => {
     const superTest = useSuperTest();
@@ -30,7 +30,7 @@ describe('src/controllers/core/train-file', () => {
     let details: AnalysisFile;
 
     it('should create resource', async () => {
-        const { body: proposal } = await createSuperTestProposal(superTest);
+        const { body: proposal } = await createSuperTestProject(superTest);
         const { body: train } = await createSuperTestTrain(superTest, {
             project_id: proposal.id,
         });

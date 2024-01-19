@@ -9,7 +9,7 @@ import type { MasterImage, MasterImageGroup } from '@personalhealthtrain/core';
 import { MasterImageCommand } from '@personalhealthtrain/core';
 import { dropTestDatabase, useSuperTest, useTestDatabase } from '../../utils';
 
-describe('src/controllers/core/train-file', () => {
+describe('src/controllers/core/master-image', () => {
     const superTest = useSuperTest();
 
     beforeAll(async () => {

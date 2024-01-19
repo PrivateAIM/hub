@@ -13,7 +13,7 @@ export const TEST_DEFAULT_STATION : Partial<Node> = {
     external_name: 'test',
 };
 
-export async function createSuperTestStation(superTest: SuperTest<Test>, entity?: Partial<Node>) {
+export async function createSuperTestNode(superTest: SuperTest<Test>, entity?: Partial<Node>) {
     return superTest
         .post('/stations')
         .send({

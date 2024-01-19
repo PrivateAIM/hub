@@ -5,15 +5,15 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Analysis, TrainType } from '@personalhealthtrain/core';
-import { removeDateProperties } from '../../utils/date-properties';
-import { useSuperTest } from '../../utils/supertest';
-import { dropTestDatabase, useTestDatabase } from '../../utils/database';
-import { TEST_DEFAULT_TRAIN, createSuperTestProposal, createSuperTestTrain } from '../../utils/domains';
-import { expectPropertiesEqualToSrc } from '../../utils/properties';
+import type { Analysis } from '@personalhealthtrain/core';
+import { removeDateProperties } from '../../utils';
+import { useSuperTest } from '../../utils';
+import { dropTestDatabase, useTestDatabase } from '../../utils';
+import { TEST_DEFAULT_ANALYSIS, createSuperTestProject, createSuperTestTrain } from '../../utils/domains';
+import { expectPropertiesEqualToSrc } from '../../utils';
 import { buildRequestValidationErrorMessage } from '../../../src/http/validation';
 
-describe('src/controllers/core/train', () => {
+describe('src/controllers/core/analysis', () => {
     const superTest = useSuperTest();
 
     beforeAll(async () => {
@@ -27,9 +27,9 @@ describe('src/controllers/core/train', () => {
     let details : Analysis;
 
     it('should create resource', async () => {
-        const proposal = await createSuperTestProposal(superTest);
+        const proposal = await createSuperTestProject(superTest);
         const response = await createSuperTestTrain(superTest, {
-            ...TEST_DEFAULT_TRAIN,
+            ...TEST_DEFAULT_ANALYSIS,
             project_id: proposal.body.id,
         });
 
@@ -42,7 +42,7 @@ describe('src/controllers/core/train', () => {
 
     it('should get collection', async () => {
         const response = await superTest
-            .get('/trains')
+            .get('/analyses')
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(200);
@@ -53,7 +53,7 @@ describe('src/controllers/core/train', () => {
 
     it('should read resource', async () => {
         const response = await superTest
-            .get(`/trains/${details.id}`)
+            .get(`/analyses/${details.id}`)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(200);
@@ -66,7 +66,7 @@ describe('src/controllers/core/train', () => {
         details.name = 'TestA';
 
         const response = await superTest
-            .post(`/trains/${details.id}`)
+            .post(`/analyses/${details.id}`)
             .send(details)
             .auth('admin', 'start123');
 
@@ -78,22 +78,20 @@ describe('src/controllers/core/train', () => {
 
     it('should delete resource', async () => {
         const response = await superTest
-            .delete(`/trains/${details.id}`)
+            .delete(`/analyses/${details.id}`)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(202);
     });
 
     it('should not create resource with invalid parameters', async () => {
-        const proposal = await createSuperTestProposal(superTest);
+        const proposal = await createSuperTestProject(superTest);
         const response = await createSuperTestTrain(superTest, {
             ...details,
             project_id: proposal.body.id,
-            type: 'xyz' as TrainType,
         });
 
         expect(response.status).toEqual(400);
-        expect(response.body.message).toEqual(buildRequestValidationErrorMessage<Analysis>(['type']));
     });
 
     it('should not create resource with invalid proposal', async () => {
@@ -107,10 +105,10 @@ describe('src/controllers/core/train', () => {
     });
 
     it('should not create resource with invalid master-image', async () => {
-        const proposal = await createSuperTestProposal(superTest);
+        const project = await createSuperTestProject(superTest);
         const response = await createSuperTestTrain(superTest, {
             ...details,
-            project_id: proposal.body.id,
+            project_id: project.body.id,
             master_image_id: '28eb7728-c78d-4c2f-ab99-dc4bcee78da9',
         });
 

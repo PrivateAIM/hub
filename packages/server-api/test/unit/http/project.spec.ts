@@ -6,13 +6,13 @@
  */
 
 import type { Project } from '@personalhealthtrain/core';
-import { removeDateProperties } from '../../utils/date-properties';
-import { useSuperTest } from '../../utils/supertest';
-import { dropTestDatabase, useTestDatabase } from '../../utils/database';
-import { createSuperTestProposal } from '../../utils/domains';
-import { expectPropertiesEqualToSrc } from '../../utils/properties';
+import { removeDateProperties } from '../../utils';
+import { useSuperTest } from '../../utils';
+import { dropTestDatabase, useTestDatabase } from '../../utils';
+import { createSuperTestProject } from '../../utils/domains';
+import { expectPropertiesEqualToSrc } from '../../utils';
 
-describe('src/controllers/core/proposal', () => {
+describe('src/controllers/core/project', () => {
     const superTest = useSuperTest();
 
     beforeAll(async () => {
@@ -26,18 +26,18 @@ describe('src/controllers/core/proposal', () => {
     let details : Project;
 
     it('should create resource', async () => {
-        const response = await createSuperTestProposal(superTest);
+        const response = await createSuperTestProject(superTest);
 
         expect(response.status).toEqual(201);
         expect(response.body).toBeDefined();
-        expect(response.body.trains).toEqual(0);
+        expect(response.body.analyses).toEqual(0);
 
         details = removeDateProperties(response.body);
     });
 
     it('should read collection', async () => {
         const response = await superTest
-            .get('/proposals')
+            .get('/projects')
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(200);
@@ -48,7 +48,7 @@ describe('src/controllers/core/proposal', () => {
 
     it('should read resource', async () => {
         const response = await superTest
-            .get(`/proposals/${details.id}`)
+            .get(`/projects/${details.id}`)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(200);
@@ -61,7 +61,7 @@ describe('src/controllers/core/proposal', () => {
         details.name = 'TestA';
 
         const response = await superTest
-            .post(`/proposals/${details.id}`)
+            .post(`/projects/${details.id}`)
             .send(details)
             .auth('admin', 'start123');
 
@@ -73,7 +73,7 @@ describe('src/controllers/core/proposal', () => {
 
     it('should delete resource', async () => {
         const response = await superTest
-            .delete(`/proposals/${details.id}`)
+            .delete(`/projects/${details.id}`)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(202);

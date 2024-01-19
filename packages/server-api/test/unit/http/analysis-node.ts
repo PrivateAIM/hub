@@ -5,22 +5,19 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type {
-    UserSecret,
-} from '@personalhealthtrain/core';
+import type { AnalysisNode } from '@personalhealthtrain/core';
+import { removeDateProperties } from '../../utils/date-properties';
+import { expectPropertiesEqualToSrc } from '../../utils/properties';
+import { useSuperTest } from '../../utils/supertest';
+import { dropTestDatabase, useTestDatabase } from '../../utils/database';
 import {
-    SecretType,
-} from '@personalhealthtrain/core';
-import { createUserSecretHash } from '../../../src/domains';
-import {
-    dropTestDatabase,
-    expectPropertiesEqualToSrc,
-    removeDateProperties,
-    useSuperTest,
-    useTestDatabase,
-} from '../../utils';
+    createSuperTestProject,
+    createSuperTestProjectNode,
+    createSuperTestNode,
+    createSuperTestTrain,
+} from '../../utils/domains';
 
-describe('src/controllers/core/user-secret', () => {
+describe('src/controllers/core/train-station', () => {
     const superTest = useSuperTest();
 
     beforeAll(async () => {
@@ -31,27 +28,41 @@ describe('src/controllers/core/user-secret', () => {
         await dropTestDatabase();
     });
 
-    let details : UserSecret;
+    let details : AnalysisNode;
 
     it('should create resource', async () => {
+        const proposal = await createSuperTestProject(superTest);
+        const station = await createSuperTestNode(superTest);
+
+        await createSuperTestProjectNode(superTest, {
+            node_id: station.body.id,
+            project_id: proposal.body.id,
+        });
+
+        const train = await createSuperTestTrain(superTest, {
+            project_id: proposal.body.id,
+        });
+
         const response = await superTest
-            .post('/user-secrets')
+            .post('/train-stations')
             .auth('admin', 'start123')
             .send({
-                key: SecretType.RSA_PUBLIC_KEY,
-                content: 'foo-bar-baz',
-                type: SecretType.RSA_PUBLIC_KEY,
+                train_id: train.body.id,
+                station_id: station.body.id,
             });
 
         expect(response.status).toEqual(201);
         expect(response.body).toBeDefined();
+
+        delete response.body.train;
+        delete response.body.station;
 
         details = removeDateProperties(response.body);
     });
 
     it('should read collection', async () => {
         const response = await superTest
-            .get('/user-secrets')
+            .get('/train-stations')
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(200);
@@ -62,7 +73,7 @@ describe('src/controllers/core/user-secret', () => {
 
     it('should read resource', async () => {
         const response = await superTest
-            .get(`/user-secrets/${details.id}`)
+            .get(`/train-stations/${details.id}`)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(200);
@@ -71,26 +82,9 @@ describe('src/controllers/core/user-secret', () => {
         expectPropertiesEqualToSrc(details, response.body);
     });
 
-    it('should update resource', async () => {
-        details.content = 'baz-bar-foo';
-
-        const response = await superTest
-            .post(`/user-secrets/${details.id}`)
-            .send(details)
-            .auth('admin', 'start123');
-
-        expect(response.status).toEqual(202);
-        expect(response.body).toBeDefined();
-
-        details.content = Buffer.from(details.content, 'utf-8').toString('hex');
-        details.hash = createUserSecretHash(details.content);
-
-        expectPropertiesEqualToSrc(details, response.body);
-    });
-
     it('should delete resource', async () => {
         const response = await superTest
-            .delete(`/user-secrets/${details.id}`)
+            .delete(`/train-stations/${details.id}`)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(202);

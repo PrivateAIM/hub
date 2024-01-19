@@ -6,12 +6,12 @@
  */
 
 import type { ProjectNode } from '@personalhealthtrain/core';
-import { useSuperTest } from '../../utils/supertest';
-import { dropTestDatabase, useTestDatabase } from '../../utils/database';
-import { createSuperTestProposal, createSuperTestStation } from '../../utils/domains';
-import { expectPropertiesEqualToSrc } from '../../utils/properties';
+import { useSuperTest } from '../../utils';
+import { dropTestDatabase, useTestDatabase } from '../../utils';
+import { createSuperTestNode, createSuperTestProject } from '../../utils/domains';
+import { expectPropertiesEqualToSrc } from '../../utils';
 
-describe('src/controllers/core/proposal-station', () => {
+describe('src/controllers/core/project-node', () => {
     const superTest = useSuperTest();
 
     beforeAll(async () => {
@@ -25,11 +25,11 @@ describe('src/controllers/core/proposal-station', () => {
     let details : ProjectNode;
 
     it('should create resource', async () => {
-        const proposal = await createSuperTestProposal(superTest);
-        const station = await createSuperTestStation(superTest);
+        const proposal = await createSuperTestProject(superTest);
+        const station = await createSuperTestNode(superTest);
 
         const response = await superTest
-            .post('/proposal-stations')
+            .post('/project-nodes')
             .auth('admin', 'start123')
             .send({
                 proposal_id: proposal.body.id,
@@ -44,7 +44,7 @@ describe('src/controllers/core/proposal-station', () => {
 
     it('should read collection', async () => {
         const response = await superTest
-            .get('/proposal-stations')
+            .get('/project-nodes')
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(200);
@@ -55,7 +55,7 @@ describe('src/controllers/core/proposal-station', () => {
 
     it('should read resource', async () => {
         const response = await superTest
-            .get(`/proposal-stations/${details.id}`)
+            .get(`/project-nodes/${details.id}`)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(200);
@@ -66,7 +66,7 @@ describe('src/controllers/core/proposal-station', () => {
 
     it('should delete resource', async () => {
         const response = await superTest
-            .delete(`/proposal-stations/${details.id}`)
+            .delete(`/project-nodes/${details.id}`)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(202);

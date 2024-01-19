@@ -1,10 +1,12 @@
-import type {Realm} from "@authup/core";
-import {Permission, REALM_MASTER_NAME, Robot, ROBOT_SYSTEM_NAME, Role} from "@authup/core";
-import {ServerError} from "@ebec/http";
-import {isClientErrorWithStatusCode} from "@hapic/harbor";
-import {PermissionKey, ServiceID} from "@personalhealthtrain/core";
-import {getPresetRolePermissions, PresetRoleName, useLogger} from "../../config";
-import {useAuthupClient} from "./module";
+import type {
+    Permission, Realm, Robot, Role,
+} from '@authup/core';
+import { REALM_MASTER_NAME, ROBOT_SYSTEM_NAME } from '@authup/core';
+import { ServerError } from '@ebec/http';
+import { isClientErrorWithStatusCode } from '@hapic/harbor';
+import { PermissionKey, ServiceID } from '@personalhealthtrain/core';
+import { PresetRoleName, getPresetRolePermissions, useLogger } from '../../config';
+import { useAuthupClient } from './module';
 
 export async function setupAuthupService(): Promise<any> {
     const authupClient = useAuthupClient();
@@ -54,7 +56,7 @@ export async function setupAuthupService(): Promise<any> {
     /**
      * Create registry robot account.
      */
-    const {data: robots} = await authupClient.robot.getMany({
+    const { data: robots } = await authupClient.robot.getMany({
         filter: {
             realm_id: realm.id,
             name: ServiceID.REGISTRY,
@@ -91,7 +93,7 @@ export async function setupAuthupService(): Promise<any> {
             if (isClientErrorWithStatusCode(e, 409)) {
                 useLogger().debug(`Permission ${permissionNames[i]} already exists`);
 
-                const {data: permissions} = await authupClient.permission.getMany({
+                const { data: permissions } = await authupClient.permission.getMany({
                     filter: {
                         realm_id: null,
                         name: permissionNames[i],
@@ -145,7 +147,7 @@ export async function setupAuthupService(): Promise<any> {
     for (let i = 0; i < roleNames.length; i++) {
         const names = getPresetRolePermissions(roleNames[i]);
 
-        const {data: permissions} = await authupClient.permission.getMany({
+        const { data: permissions } = await authupClient.permission.getMany({
             filter: {
                 name: names,
             },
@@ -153,7 +155,7 @@ export async function setupAuthupService(): Promise<any> {
 
         let role: Role;
 
-        const {data: roles} = await authupClient.role.getMany({
+        const { data: roles } = await authupClient.role.getMany({
             filter: {
                 realm_id: null,
                 name: roleNames[i],

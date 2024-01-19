@@ -15,10 +15,13 @@ import {
 import {
     DataSource,
 } from 'typeorm';
-import { buildDataSourceOptions } from '../../src/database';
+import { extendDataSourceOptions } from '../../src/database';
 
 export async function useTestDatabase() {
-    const options = await buildDataSourceOptions();
+    const options = await extendDataSourceOptions({
+        type: 'better-sqlite3',
+        database: ':memory:',
+    });
 
     await dropDatabase({ options, ifExist: true });
     await createDatabase({ options, synchronize: false });
