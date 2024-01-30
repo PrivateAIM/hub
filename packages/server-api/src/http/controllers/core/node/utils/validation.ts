@@ -19,7 +19,7 @@ import {
     matchedValidationData,
 } from '../../../../validation';
 
-export async function runStationValidation(
+export async function runNodeValidation(
     req: Request,
     operation: 'create' | 'update',
 ) : Promise<RequestValidationResult<NodeEntity>> {
@@ -35,14 +35,6 @@ export async function runStationValidation(
     }
 
     await nameChain.run(req);
-
-    // -------------------------------------------------------------
-
-    await check('public_key')
-        .isLength({ min: 5, max: 4096 })
-        .exists()
-        .optional({ nullable: true })
-        .run(req);
 
     // -------------------------------------------------------------
 
@@ -109,7 +101,7 @@ export async function runStationValidation(
         const realm = useRequestEnv(req, 'realm');
         if (result.data.realm_id) {
             if (!isRealmResourceWritable(realm, result.data.realm_id)) {
-                throw new ForbiddenError('You are not permitted to create this station.');
+                throw new ForbiddenError('You are not permitted to create this node.');
             }
         } else {
             result.data.realm_id = realm.id;

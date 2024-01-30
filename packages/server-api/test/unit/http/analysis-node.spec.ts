@@ -6,15 +6,15 @@
  */
 
 import type { AnalysisNode } from '@personalhealthtrain/core';
-import { removeDateProperties } from '../../utils/date-properties';
-import { expectPropertiesEqualToSrc } from '../../utils/properties';
-import { useSuperTest } from '../../utils/supertest';
-import { dropTestDatabase, useTestDatabase } from '../../utils/database';
+import { removeDateProperties } from '../../utils';
+import { expectPropertiesEqualToSrc } from '../../utils';
+import { useSuperTest } from '../../utils';
+import { dropTestDatabase, useTestDatabase } from '../../utils';
 import {
     createSuperTestProject,
     createSuperTestProjectNode,
     createSuperTestNode,
-    createSuperTestTrain,
+    createSuperTestAnalysis,
 } from '../../utils/domains';
 
 describe('src/controllers/core/train-station', () => {
@@ -31,38 +31,43 @@ describe('src/controllers/core/train-station', () => {
     let details : AnalysisNode;
 
     it('should create resource', async () => {
-        const proposal = await createSuperTestProject(superTest);
-        const station = await createSuperTestNode(superTest);
+        const project = await createSuperTestProject(superTest);
+        expect(project.body.id).toBeDefined();
+
+        const node = await createSuperTestNode(superTest);
+        expect(node.body.id).toBeDefined();
 
         await createSuperTestProjectNode(superTest, {
-            node_id: station.body.id,
-            project_id: proposal.body.id,
+            node_id: node.body.id,
+            project_id: project.body.id,
         });
 
-        const train = await createSuperTestTrain(superTest, {
-            project_id: proposal.body.id,
+        const analysis = await createSuperTestAnalysis(superTest, {
+            project_id: project.body.id,
         });
+
+        expect(analysis.body.id).toBeDefined();
 
         const response = await superTest
-            .post('/train-stations')
+            .post('/analysis-nodes')
             .auth('admin', 'start123')
             .send({
-                train_id: train.body.id,
-                station_id: station.body.id,
-            });
+                analysis_id: analysis.body.id,
+                node_id: node.body.id,
+            } satisfies Partial<AnalysisNode>);
 
         expect(response.status).toEqual(201);
         expect(response.body).toBeDefined();
 
-        delete response.body.train;
-        delete response.body.station;
+        delete response.body.analysis;
+        delete response.body.node;
 
         details = removeDateProperties(response.body);
     });
 
     it('should read collection', async () => {
         const response = await superTest
-            .get('/train-stations')
+            .get('/analysis-nodes')
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(200);
@@ -73,7 +78,7 @@ describe('src/controllers/core/train-station', () => {
 
     it('should read resource', async () => {
         const response = await superTest
-            .get(`/train-stations/${details.id}`)
+            .get(`/analysis-nodes/${details.id}`)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(200);
@@ -84,7 +89,7 @@ describe('src/controllers/core/train-station', () => {
 
     it('should delete resource', async () => {
         const response = await superTest
-            .delete(`/train-stations/${details.id}`)
+            .delete(`/analysis-nodes/${details.id}`)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(202);

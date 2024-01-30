@@ -65,7 +65,7 @@ async function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>,
     applyQueryFieldsParseOutput(query, fieldsParsed, { defaultAlias: 'station' });
 }
 
-export async function getOneStationRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function getOneNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
     const { fields, include } = useRequestQuery(req);
 
@@ -90,7 +90,7 @@ export async function getOneStationRouteHandler(req: Request, res: Response) : P
     return send(res, entity);
 }
 
-export async function getManyStationRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function getManyNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const {
         filter, page, fields, include,
     } = useRequestQuery(req);

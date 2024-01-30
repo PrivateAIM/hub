@@ -14,34 +14,34 @@ import {
 
 import { ForceLoggedInMiddleware } from '../../../middleware';
 import {
-    createStationRouteHandler,
-    deleteStationRouteHandler,
-    getManyStationRouteHandler,
-    getOneStationRouteHandler,
-    updateStationRouteHandler,
+    createNodeRouteHandler,
+    deleteNodeRouteHandler,
+    getManyNodeRouteHandler,
+    getOneNodeRouteHandler,
+    updateNodeRouteHandler,
 } from './handlers';
 
-type PartialStation = Partial<Node>;
+type PartialNode = Partial<Node>;
 
-@DTags('station')
-@DController('/stations')
-export class StationController {
+@DTags('node')
+@DController('/nodes')
+export class NodeController {
     @DGet('', [ForceLoggedInMiddleware])
 
     async getMany(
         @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<PartialStation[]> {
-        return await getManyStationRouteHandler(req, res) as PartialStation[];
+    ): Promise<PartialNode[]> {
+        return await getManyNodeRouteHandler(req, res) as PartialNode[];
     }
 
     @DPost('', [ForceLoggedInMiddleware])
     async add(
-        @DBody() data: PartialStation,
+        @DBody() data: PartialNode,
             @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<PartialStation | undefined> {
-        return await createStationRouteHandler(req, res) as PartialStation | undefined;
+    ): Promise<PartialNode | undefined> {
+        return await createNodeRouteHandler(req, res) as PartialNode | undefined;
     }
 
     @DGet('/:id', [ForceLoggedInMiddleware])
@@ -49,18 +49,18 @@ export class StationController {
         @DPath('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<PartialStation | undefined> {
-        return await getOneStationRouteHandler(req, res) as PartialStation | undefined;
+    ): Promise<PartialNode | undefined> {
+        return await getOneNodeRouteHandler(req, res) as PartialNode | undefined;
     }
 
     @DPost('/:id', [ForceLoggedInMiddleware])
     async edit(
         @DPath('id') id: string,
-            @DBody() data: PartialStation,
+            @DBody() data: PartialNode,
             @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<PartialStation | undefined> {
-        return await updateStationRouteHandler(req, res) as PartialStation | undefined;
+    ): Promise<PartialNode | undefined> {
+        return await updateNodeRouteHandler(req, res) as PartialNode | undefined;
     }
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
@@ -68,7 +68,7 @@ export class StationController {
         @DPath('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<PartialStation | undefined> {
-        return await deleteStationRouteHandler(req, res) as PartialStation | undefined;
+    ): Promise<PartialNode | undefined> {
+        return await deleteNodeRouteHandler(req, res) as PartialNode | undefined;
     }
 }

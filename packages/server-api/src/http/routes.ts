@@ -21,9 +21,8 @@ import { TrainLogController } from './controllers/core/analysis-log';
 import { MasterImageController } from './controllers/core/master-image';
 import { ProposalController } from './controllers/core/project';
 import { ProposalStationController } from './controllers/core/project-node';
-import { StationController } from './controllers/core/node';
+import { NodeController } from './controllers/core/node';
 import { AnalysisController } from './controllers/core/analysis';
-import { AnalysisFileController } from './controllers/core/analysis-file';
 import { AnalysisNodeController } from './controllers/core/analysis-node';
 import { ServiceController } from './controllers/special/service';
 import { MasterImageGroupController } from './controllers/core/master-image-group';
@@ -40,9 +39,8 @@ export function registerControllers(router: Router) {
             ProposalStationController,
             RegistryController,
             RegistryProjectController,
-            StationController,
+            NodeController,
             AnalysisController,
-            AnalysisFileController,
             TrainLogController,
             AnalysisNodeController,
 

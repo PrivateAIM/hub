@@ -22,7 +22,6 @@ import type {
     MasterImage,
     Project,
     Registry,
-    RegistryProject,
     Analysis,
     AnalysisBuildStatus,
     AnalysisFile,
@@ -120,7 +119,7 @@ export class AnalysisEntity implements Analysis {
         project_id: Project['id'];
 
     @ManyToOne(() => ProjectEntity, (proposal) => proposal.analyses, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'proposal_id' })
+    @JoinColumn({ name: 'project_id' })
         project: ProjectEntity;
 
     // ------------------------------------------------------------------

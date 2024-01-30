@@ -6,7 +6,7 @@
  */
 
 import {
-    PermissionID, RegistryProjectType, createNanoID, isHex,
+    PermissionID, RegistryProjectType, createNanoID,
 } from '@personalhealthtrain/core';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/core';
@@ -17,11 +17,11 @@ import { useDataSource } from 'typeorm-extension';
 import { RegistryCommand } from '../../../../../components';
 import { buildRegistryPayload } from '../../../../../components/registry/utils/queue';
 import { useRequestEnv } from '../../../../request';
-import { runStationValidation } from '../utils';
+import { runNodeValidation } from '../utils';
 import { NodeEntity } from '../../../../../domains';
 import { RegistryProjectEntity } from '../../../../../domains';
 
-export async function updateStationRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function updateNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
     const ability = useRequestEnv(req, 'ability');
@@ -29,7 +29,7 @@ export async function updateStationRouteHandler(req: Request, res: Response) : P
         throw new ForbiddenError();
     }
 
-    const result = await runStationValidation(req, 'update');
+    const result = await runNodeValidation(req, 'update');
     if (!result.data) {
         return sendAccepted(res);
     }
@@ -38,7 +38,6 @@ export async function updateStationRouteHandler(req: Request, res: Response) : P
     const repository = dataSource.getRepository(NodeEntity);
     const query = repository.createQueryBuilder('station')
         .addSelect([
-            'station.public_key',
             'station.external_name',
         ])
         .where('station.id = :id', { id });

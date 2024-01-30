@@ -20,10 +20,10 @@ import { RegistryCommand } from '../../../../../components';
 import { buildRegistryPayload } from '../../../../../components/registry/utils/queue';
 import { RequestValidationError } from '../../../../validation';
 import { useRequestEnv } from '../../../../request';
-import { runStationValidation } from '../utils';
+import { runNodeValidation } from '../utils';
 import { NodeEntity, RegistryProjectEntity } from '../../../../../domains';
 
-export async function createStationRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function createNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const ability = useRequestEnv(req, 'ability');
     if (!ability.has(PermissionID.NODE_ADD)) {
         throw new ForbiddenError();
@@ -34,7 +34,7 @@ export async function createStationRouteHandler(req: Request, res: Response) : P
         throw new RequestValidationError(validation);
     }
 
-    const result = await runStationValidation(req, 'create');
+    const result = await runNodeValidation(req, 'create');
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(NodeEntity);

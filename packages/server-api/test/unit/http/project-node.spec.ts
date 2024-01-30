@@ -25,16 +25,16 @@ describe('src/controllers/core/project-node', () => {
     let details : ProjectNode;
 
     it('should create resource', async () => {
-        const proposal = await createSuperTestProject(superTest);
-        const station = await createSuperTestNode(superTest);
+        const project = await createSuperTestProject(superTest);
+        const node = await createSuperTestNode(superTest);
 
         const response = await superTest
             .post('/project-nodes')
             .auth('admin', 'start123')
             .send({
-                proposal_id: proposal.body.id,
-                station_id: station.body.id,
-            });
+                project_id: project.body.id,
+                node_id: node.body.id,
+            } as Partial<ProjectNode>);
 
         expect(response.status).toEqual(201);
         expect(response.body).toBeDefined();

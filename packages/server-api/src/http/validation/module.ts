@@ -34,7 +34,7 @@ export class RequestValidationError extends BadRequestError {
         let message : string;
 
         if (parameterNames.length > 0) {
-            message = buildRequestValidationErrorMessage(parameterNames);
+            message = buildRequestValidationErrorMessage(Array.from(new Set(parameterNames)));
         } else {
             message = 'An unexpected validation error occurred.';
         }

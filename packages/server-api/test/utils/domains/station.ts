@@ -8,16 +8,16 @@
 import type { Node } from '@personalhealthtrain/core';
 import type { SuperTest, Test } from 'supertest';
 
-export const TEST_DEFAULT_STATION : Partial<Node> = {
+export const TEST_DEFAULT_NODE : Partial<Node> = {
     name: 'foo-bar-baz',
     external_name: 'test',
 };
 
 export async function createSuperTestNode(superTest: SuperTest<Test>, entity?: Partial<Node>) {
     return superTest
-        .post('/stations')
+        .post('/nodes')
         .send({
-            ...TEST_DEFAULT_STATION,
+            ...TEST_DEFAULT_NODE,
             ...(entity || {}),
         })
         .auth('admin', 'start123');

@@ -18,7 +18,7 @@ import { NodeEntity } from '../../../../../domains/node';
 import { RegistryProjectEntity } from '../../../../../domains/registry-project/entity';
 import { useRequestEnv } from '../../../../request';
 
-export async function deleteStationRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function deleteNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
     const ability = useRequestEnv(req, 'ability');

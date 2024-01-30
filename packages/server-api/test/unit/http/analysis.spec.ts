@@ -9,7 +9,7 @@ import type { Analysis } from '@personalhealthtrain/core';
 import { removeDateProperties } from '../../utils';
 import { useSuperTest } from '../../utils';
 import { dropTestDatabase, useTestDatabase } from '../../utils';
-import { TEST_DEFAULT_ANALYSIS, createSuperTestProject, createSuperTestTrain } from '../../utils/domains';
+import { TEST_DEFAULT_ANALYSIS, createSuperTestProject, createSuperTestAnalysis } from '../../utils/domains';
 import { expectPropertiesEqualToSrc } from '../../utils';
 import { buildRequestValidationErrorMessage } from '../../../src/http/validation';
 
@@ -28,14 +28,14 @@ describe('src/controllers/core/analysis', () => {
 
     it('should create resource', async () => {
         const proposal = await createSuperTestProject(superTest);
-        const response = await createSuperTestTrain(superTest, {
+        const response = await createSuperTestAnalysis(superTest, {
             ...TEST_DEFAULT_ANALYSIS,
             project_id: proposal.body.id,
         });
 
         expect(response.status).toEqual(201);
         expect(response.body).toBeDefined();
-        expect(response.body.proposal_id).toEqual(proposal.body.id);
+        expect(response.body.project_id).toEqual(proposal.body.id);
 
         details = removeDateProperties(response.body);
     });
@@ -84,18 +84,8 @@ describe('src/controllers/core/analysis', () => {
         expect(response.status).toEqual(202);
     });
 
-    it('should not create resource with invalid parameters', async () => {
-        const proposal = await createSuperTestProject(superTest);
-        const response = await createSuperTestTrain(superTest, {
-            ...details,
-            project_id: proposal.body.id,
-        });
-
-        expect(response.status).toEqual(400);
-    });
-
-    it('should not create resource with invalid proposal', async () => {
-        const response = await createSuperTestTrain(superTest, {
+    it('should not create resource with invalid project', async () => {
+        const response = await createSuperTestAnalysis(superTest, {
             ...details,
             project_id: '28eb7728-c78d-4c2f-ab99-dc4bcee78da9',
         });
@@ -106,7 +96,7 @@ describe('src/controllers/core/analysis', () => {
 
     it('should not create resource with invalid master-image', async () => {
         const project = await createSuperTestProject(superTest);
-        const response = await createSuperTestTrain(superTest, {
+        const response = await createSuperTestAnalysis(superTest, {
             ...details,
             project_id: project.body.id,
             master_image_id: '28eb7728-c78d-4c2f-ab99-dc4bcee78da9',

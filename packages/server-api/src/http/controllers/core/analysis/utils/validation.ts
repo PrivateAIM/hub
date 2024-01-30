@@ -76,6 +76,7 @@ export async function runAnalysisValidation(
         id: 'master_image_id',
         entity: 'master_image',
     });
+
     await extendRequestValidationResultWithRelation(result, ProjectEntity, {
         id: 'project_id',
         entity: 'project',

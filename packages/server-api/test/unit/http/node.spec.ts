@@ -14,7 +14,7 @@ import { useSuperTest } from '../../utils';
 import { dropTestDatabase, useTestDatabase } from '../../utils';
 import { createSuperTestNode } from '../../utils/domains';
 
-describe('src/controllers/core/station', () => {
+describe('src/controllers/core/node', () => {
     const superTest = useSuperTest();
 
     beforeAll(async () => {

@@ -12,6 +12,9 @@ import { useLogger } from '../../config';
 
 export function registerErrorHandler(router: Router) {
     router.use(errorHandler((error, req, res) => {
+        if(isObject(error.cause)) {
+            console.log(error.cause.message);
+        }
         // catch and decorate some db errors :)
         switch (error.code) {
             case 'ER_DUP_ENTRY':

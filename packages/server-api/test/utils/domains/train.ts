@@ -12,7 +12,7 @@ export const TEST_DEFAULT_ANALYSIS : Partial<Analysis> = {
     name: 'development'
 };
 
-export async function createSuperTestTrain(superTest: SuperTest<Test>, entity?: Partial<Analysis>) {
+export async function createSuperTestAnalysis(superTest: SuperTest<Test>, entity?: Partial<Analysis>) {
     return superTest
         .post('/analyses')
         .send({
