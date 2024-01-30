@@ -7,4 +7,6 @@
 
 export * from './authup';
 export * from './minio';
+export * from './redis';
 export * from './utils';
+export * from './vault';

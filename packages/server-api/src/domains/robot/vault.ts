@@ -6,21 +6,20 @@
  */
 
 import {
-    hasClient,
     isClientErrorWithStatusCode,
-    useClient,
-} from '@hapic/vault';
+} from 'hapic';
+import { hasVaultClient, useVaultClient } from '../../core';
 import type { RobotVaultPayload } from './type';
 import { isRobotVaultPayload } from './utils';
 
 export async function findRobotCredentialsInVault(
     name: string,
 ) : Promise<RobotVaultPayload | undefined> {
-    if (!hasClient()) {
+    if (!hasVaultClient()) {
         return undefined;
     }
 
-    const client = useClient();
+    const client = useVaultClient();
 
     try {
         const response = await client.keyValueV1.getOne(

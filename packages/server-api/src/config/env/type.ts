@@ -13,10 +13,10 @@ export interface Environment {
 
     jwtMaxAge: number,
 
-    minioConnectionString: string,
-    redisConnectionString: string,
-    rabbitMqConnectionString: string,
-    vaultConnectionString: string,
+    minioConnectionString?: string | boolean,
+    redisConnectionString?: string | boolean,
+    rabbitMqConnectionString?: string | boolean,
+    vaultConnectionString: string | boolean,
 
     apiUrl: string,
     authupApiUrl: string,

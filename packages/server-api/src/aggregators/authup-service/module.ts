@@ -7,8 +7,9 @@
 
 import { DomainType } from '@authup/core';
 import type { DomainsEventContext } from '@authup/core';
+import { isBoolFalse, isBoolTrue } from '@personalhealthtrain/core';
 import { createClient } from 'redis-extension';
-import { useEnv, useLogger } from '../../config';
+import {ConfigDefaults, useEnv, useLogger} from '../../config';
 import type { Aggregator } from '../type';
 import {
     handleAuthupRealmEvent,
@@ -19,8 +20,16 @@ import {
 export function buildAuthupAggregator() : Aggregator {
     return {
         start() {
+            const connectionString = useEnv('redisConnectionString');
+            if (typeof connectionString === 'undefined' || isBoolFalse(connectionString)) {
+                useLogger().info('Authup aggregator is missing redis configuration.');
+                return;
+            }
+
             const redisSub = createClient({
-                connectionString: useEnv('redisConnectionString'),
+                connectionString: isBoolTrue(connectionString) ?
+                    ConfigDefaults.REDIS :
+                    connectionString,
             });
 
             redisSub.subscribe('realm', 'user', 'robot');

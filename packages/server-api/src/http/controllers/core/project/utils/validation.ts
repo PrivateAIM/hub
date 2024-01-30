@@ -25,7 +25,7 @@ export async function runProjectValidation(
 ) : Promise<RequestValidationResult<ProjectEntity>> {
     const result : RequestValidationResult<ProjectEntity> = initRequestValidationResult();
 
-    const titleChain = check('title')
+    const titleChain = check('name')
         .exists()
         .isLength({ min: 5, max: 100 });
 

@@ -6,7 +6,12 @@
  */
 
 import path from 'node:path';
-import { readBoolFromProcessEnv, readFromProcessEnv, readIntFromProcessEnv } from '@personalhealthtrain/server-core';
+import {
+    readBoolFromProcessEnv,
+    readBoolOrStringFromProcessEnv,
+    readFromProcessEnv,
+    readIntFromProcessEnv
+} from '@personalhealthtrain/server-core';
 import { config } from 'dotenv';
 import type { EnvironmentName } from './constants';
 import type { Environment } from './type';
@@ -35,10 +40,10 @@ export function useEnv(key?: string) : any {
 
         jwtMaxAge: readIntFromProcessEnv('JWT_MAX_AGE', 3600),
 
-        minioConnectionString: readFromProcessEnv('MINIO_CONNECTION_STRING', 'http://admin:start123@127.0.0.1:9000'),
-        redisConnectionString: readFromProcessEnv('REDIS_CONNECTION_STRING', 'redis://127.0.0.1'),
-        rabbitMqConnectionString: readFromProcessEnv('RABBITMQ_CONNECTION_STRING', 'amqp://root:start123@127.0.0.1'),
-        vaultConnectionString: readFromProcessEnv('VAULT_CONNECTION_STRING', 'start123@http://127.0.0.1:8090/v1/'),
+        minioConnectionString: readBoolOrStringFromProcessEnv('MINIO_CONNECTION_STRING'),
+        redisConnectionString: readBoolOrStringFromProcessEnv('REDIS_CONNECTION_STRING'),
+        rabbitMqConnectionString: readBoolOrStringFromProcessEnv('RABBITMQ_CONNECTION_STRING'),
+        vaultConnectionString: readBoolOrStringFromProcessEnv('VAULT_CONNECTION_STRING'),
 
         apiUrl: readFromProcessEnv('API_URL', 'http://127.0.0.1:3002/'),
         authupApiUrl: readFromProcessEnv('AUTHUP_API_URL', 'http://127.0.0.1:3010/'),

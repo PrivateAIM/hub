@@ -6,19 +6,16 @@
  */
 
 import { isClientErrorWithStatusCode } from '@hapic/harbor';
-import {
-    hasClient,
-    useClient,
-} from '@hapic/vault';
+import { hasVaultClient, useVaultClient } from '../../core';
 import type { RegistryProjectVaultPayload } from './type';
 import { isRegistryProjectVaultPayload } from './utils';
 
 export async function creteRegistryProjectVaultEngine() {
-    if (!hasClient()) {
+    if (!hasVaultClient()) {
         return;
     }
 
-    const client = useClient();
+    const client = useVaultClient();
 
     await client.mount.create(
         'registry-project',
@@ -32,11 +29,11 @@ export async function creteRegistryProjectVaultEngine() {
 }
 
 export async function removeRegistryProjectFromVault(name: string) {
-    if (!hasClient()) {
+    if (!hasVaultClient()) {
         return;
     }
 
-    const client = useClient();
+    const client = useVaultClient();
 
     try {
         await client.keyValueV1.delete(
@@ -53,8 +50,12 @@ export async function removeRegistryProjectFromVault(name: string) {
 }
 
 export async function saveRegistryProjectToVault(name: string, data: RegistryProjectVaultPayload) {
+    if (!hasVaultClient()) {
+        return;
+    }
+
     try {
-        await useClient()
+        await useVaultClient()
             .keyValueV1.create(
                 'registry-project',
                 name,
@@ -71,11 +72,11 @@ export async function saveRegistryProjectToVault(name: string, data: RegistryPro
 export async function findRegistryProjectInVault(
     name: string,
 ) : Promise<RegistryProjectVaultPayload | undefined> {
-    if (!hasClient()) {
+    if (!hasVaultClient()) {
         return undefined;
     }
 
-    const client = useClient();
+    const client = useVaultClient();
 
     try {
         const response = await client.keyValueV1.getOne(
