@@ -9,8 +9,8 @@ import { basic } from '@routup/basic';
 import type { Router } from 'routup';
 import { EnvironmentName, useEnv } from '../config';
 import {
-    registerAuthupMiddleware, registerCorsMiddleware,
-    registerLicenseAgreementMiddleware,
+    registerAuthupMiddleware,
+    registerCorsMiddleware,
     registerPrometheusMiddleware,
     registerRateLimiterMiddleware,
     registerSwaggerMiddleware,
@@ -20,16 +20,11 @@ export function registerMiddlewares(router: Router) {
     registerCorsMiddleware(router);
     router.use(basic());
 
-    const isTestEnvironment = useEnv('env') === EnvironmentName.TEST;
-    if (!isTestEnvironment) {
+    if (useEnv('env') !== EnvironmentName.TEST) {
         registerRateLimiterMiddleware(router);
         registerPrometheusMiddleware(router);
         registerSwaggerMiddleware(router);
     }
 
     registerAuthupMiddleware(router);
-
-    if (!isTestEnvironment) {
-        registerLicenseAgreementMiddleware(router);
-    }
 }

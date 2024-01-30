@@ -6,9 +6,8 @@
  */
 
 import type { QueryResultCache } from 'typeorm/cache/QueryResultCache';
-import { hasClient, hasConfig, useClient } from 'redis-extension';
 import type { QueryResultCacheOptions } from 'typeorm/cache/QueryResultCacheOptions';
-import type { QueryRunner } from 'typeorm';
+import { hasRedisClient, useRedisClient } from '../../core';
 
 type DatabaseQueryResultCacheOptions = {
     redisAlias?: string,
@@ -37,15 +36,12 @@ export class DatabaseQueryResultCache implements QueryResultCache {
         return query.replace(/[^a-zA-Z0-9_-]+/g, '');
     }
 
-    async clear(queryRunner?: QueryRunner): Promise<void> {
-        if (
-            !hasConfig(this.options.redisAlias) &&
-            !hasClient(this.options.redisAlias)
-        ) {
+    async clear(): Promise<void> {
+        if (!hasRedisClient()) {
             return;
         }
 
-        const client = useClient(this.options.redisAlias);
+        const client = useRedisClient();
         const pipeline = client.pipeline();
 
         const keys = await client.keys(this.buildFullQualifiedId('*'));
@@ -64,11 +60,8 @@ export class DatabaseQueryResultCache implements QueryResultCache {
         return Promise.resolve(undefined);
     }
 
-    async getFromCache(options: QueryResultCacheOptions, queryRunner?: QueryRunner): Promise<QueryResultCacheOptions | undefined> {
-        if (
-            !hasConfig(this.options.redisAlias) &&
-            !hasClient(this.options.redisAlias)
-        ) {
+    async getFromCache(options: QueryResultCacheOptions): Promise<QueryResultCacheOptions | undefined> {
+        if (!hasRedisClient()) {
             return undefined;
         }
 
@@ -79,7 +72,7 @@ export class DatabaseQueryResultCache implements QueryResultCache {
         }
 
         const key = this.buildFullQualifiedId(options.identifier || options.query);
-        const client = useClient(this.options.redisAlias);
+        const client = useRedisClient();
 
         const data = await client.get(
             key,
@@ -100,15 +93,12 @@ export class DatabaseQueryResultCache implements QueryResultCache {
         return savedCache.time + savedCache.duration < new Date().getTime();
     }
 
-    async remove(identifiers: string[], queryRunner?: QueryRunner): Promise<void> {
-        if (
-            !hasConfig(this.options.redisAlias) &&
-            !hasClient(this.options.redisAlias)
-        ) {
+    async remove(identifiers: string[]): Promise<void> {
+        if (!hasRedisClient()) {
             return;
         }
 
-        const client = useClient(this.options.redisAlias);
+        const client = useRedisClient();
         const pipeline = client.pipeline();
 
         for (let i = 0; i < identifiers.length; i++) {
@@ -120,13 +110,8 @@ export class DatabaseQueryResultCache implements QueryResultCache {
 
     async storeInCache(
         options: QueryResultCacheOptions,
-        savedCache: QueryResultCacheOptions | undefined,
-        queryRunner?: QueryRunner,
     ): Promise<void> {
-        if (
-            !hasConfig(this.options.redisAlias) &&
-            !hasClient(this.options.redisAlias)
-        ) {
+        if (!hasRedisClient()) {
             return;
         }
 
@@ -137,7 +122,7 @@ export class DatabaseQueryResultCache implements QueryResultCache {
         }
 
         const key = this.buildFullQualifiedId(options.identifier || options.query);
-        const client = useClient(this.options.redisAlias);
+        const client = useRedisClient();
 
         await client.set(
             key,
@@ -147,7 +132,7 @@ export class DatabaseQueryResultCache implements QueryResultCache {
         );
     }
 
-    synchronize(queryRunner?: QueryRunner): Promise<void> {
+    synchronize(): Promise<void> {
         return Promise.resolve(undefined);
     }
 }

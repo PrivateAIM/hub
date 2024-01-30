@@ -7,16 +7,16 @@
 
 import { setInterval } from 'node:timers';
 import { AbilityManager, CookieName, ROBOT_SYSTEM_NAME } from '@authup/core';
-import type { OAuth2TokenGrantResponse } from '@authup/core';
+import type { OAuth2TokenGrantResponse, TokenCreatorOptions } from '@authup/core';
+import type { TokenVerifierRedisCacheOptions } from '@authup/server-adapter';
 import { createHTTPMiddleware } from '@authup/server-adapter';
 import { useClient as useVaultClient } from '@hapic/vault';
 import { parseAuthorizationHeader } from 'hapic';
-import { useClient as useRedisClient } from 'redis-extension';
 import { coreHandler } from 'routup';
 import { useRequestCookie } from '@routup/basic/cookie';
 import type { Router } from 'routup';
-import { EnvironmentName, useEnv, useLogger } from '../../config';
-import { useAuthupClient } from '../../core';
+import { EnvironmentName, useEnv } from '../../config';
+import { hasRedisClient, useAuthupClient, useRedisClient } from '../../core';
 import { setRequestEnv, useRequestEnv } from '../request';
 
 export function registerAuthupMiddleware(router: Router) {
@@ -75,19 +75,35 @@ export function registerAuthupMiddleware(router: Router) {
         next();
     }));
 
+    let tokenCreator : TokenCreatorOptions;
+    if (useEnv('env') === EnvironmentName.TEST) {
+        tokenCreator = {
+            type: 'user',
+            name: 'admin',
+            password: 'start123',
+        };
+    } else {
+        tokenCreator = {
+            type: 'robotInVault',
+            name: ROBOT_SYSTEM_NAME,
+            vault: useVaultClient(),
+        };
+    }
+
+    let tokenCache : TokenVerifierRedisCacheOptions | undefined;
+    if (hasRedisClient()) {
+        tokenCache = {
+            type: 'redis',
+            client: useRedisClient(),
+        };
+    }
+
     const middleware = createHTTPMiddleware({
         tokenByCookie: (req, cookieName) => useRequestCookie(req, cookieName),
         tokenVerifier: {
             baseURL: useEnv('authupApiUrl'),
-            creator: {
-                type: 'robotInVault',
-                name: ROBOT_SYSTEM_NAME,
-                vault: useVaultClient(),
-            },
-            cache: {
-                type: 'redis',
-                client: useRedisClient(),
-            },
+            creator: tokenCreator,
+            cache: tokenCache,
         },
         tokenVerifierHandler: (req, data) => {
             const ability = new AbilityManager(data.permissions);
@@ -120,8 +136,14 @@ export function registerAuthupMiddleware(router: Router) {
     // todo: permissions should be created and set for test suite :)
     if (useEnv('env') === EnvironmentName.TEST) {
         router.use(coreHandler(async (req, res, next) => {
-            const ability = useRequestEnv(req, 'ability');
+            let ability : AbilityManager | undefined = useRequestEnv(req, 'ability');
+            if (typeof ability === 'undefined') {
+                ability = new AbilityManager();
+            }
+
             ability.has = (_input: any) => true;
+
+            setRequestEnv(req, 'ability', ability);
 
             next();
         }));

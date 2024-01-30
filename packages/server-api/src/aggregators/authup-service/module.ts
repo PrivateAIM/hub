@@ -19,8 +19,13 @@ import {
 export function buildAuthupAggregator() : Aggregator {
     return {
         start() {
+            const connectionString = useEnv('redisConnectionString');
+            if (typeof connectionString === 'undefined') {
+                useLogger().info('Authup aggregator is missing redis configuration.')
+            }
+
             const redisSub = createClient({
-                connectionString: useEnv('redisConnectionString'),
+                connectionString,
             });
 
             redisSub.subscribe('realm', 'user', 'robot');

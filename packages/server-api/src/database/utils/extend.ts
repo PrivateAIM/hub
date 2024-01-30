@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import { adjustFilePath } from 'typeorm-extension';
-import { hasClient, hasConfig } from 'redis-extension';
 import type { DataSourceOptions } from 'typeorm';
+import {hasRedisClient} from "../../core";
 import {
     AnalysisEntity,
     AnalysisFileEntity,
@@ -80,7 +80,7 @@ export async function extendDataSourceOptions(options: DataSourceOptions) : Prom
         migrations,
     } as DataSourceOptions);
 
-    if (hasClient() || hasConfig()) {
+    if (hasRedisClient()) {
         Object.assign(options, {
             cache: {
                 provider() {
