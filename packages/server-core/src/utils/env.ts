@@ -41,6 +41,22 @@ export function readBoolFromProcessEnv(key: string, alt?: boolean): boolean | un
     return alt;
 }
 
+export function readBoolOrStringFromProcessEnv(
+    key: string,
+    alt?: boolean | string,
+) : boolean | string | undefined {
+    if (hasProcessEnv(key)) {
+        const value = readBoolFromProcessEnv(key, undefined);
+        if (typeof value === 'undefined') {
+            return readFromProcessEnv(key, alt);
+        }
+
+        return value;
+    }
+
+    return alt;
+}
+
 export function readIntFromProcessEnv(key: string, alt?: number): number | undefined {
     const value = readFromProcessEnv(key, alt);
     const intValue = parseInt(`${value}`, 10);

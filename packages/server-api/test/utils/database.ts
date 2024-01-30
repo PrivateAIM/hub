@@ -28,7 +28,7 @@ export async function useTestDatabase() {
 
     const dataSource = new DataSource(options);
     await dataSource.initialize();
-    await dataSource.runMigrations();
+    await dataSource.synchronize();
 
     setDataSource(dataSource);
 

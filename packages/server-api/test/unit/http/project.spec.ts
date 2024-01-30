@@ -6,11 +6,10 @@
  */
 
 import type { Project } from '@personalhealthtrain/core';
-import { removeDateProperties } from '../../utils';
-import { useSuperTest } from '../../utils';
-import { dropTestDatabase, useTestDatabase } from '../../utils';
+import {
+    dropTestDatabase, expectPropertiesEqualToSrc, removeDateProperties, useSuperTest, useTestDatabase,
+} from '../../utils';
 import { createSuperTestProject } from '../../utils/domains';
-import { expectPropertiesEqualToSrc } from '../../utils';
 
 describe('src/controllers/core/project', () => {
     const superTest = useSuperTest();

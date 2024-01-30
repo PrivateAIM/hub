@@ -7,12 +7,15 @@
 
 import type { TokenCreatorOptions } from '@authup/core';
 import { APIClient, ROBOT_SYSTEM_NAME, mountClientResponseErrorTokenHook } from '@authup/core';
-import { setConfig as setAmqpConfig } from 'amqp-extension';
+import { isBoolFalse, isBoolTrue } from '@personalhealthtrain/core';
+import { hasConfig as hasAmqpConfig, setConfig as setAmqpConfig } from 'amqp-extension';
 import { createClient } from 'redis-extension';
 import { VaultClient } from '@hapic/vault';
 import { buildAuthupAggregator, buildTrainManagerAggregator } from '../aggregators';
-import {setAuthupClient, setMinioConfig, setRedisClient, setVaultClient} from '../core';
-import { EnvironmentName, useEnv } from './env';
+import {
+    setAuthupClient, setMinioConfig, setRedisClient, setVaultClient,
+} from '../core';
+import { ConfigDefaults, EnvironmentName, useEnv } from './env';
 
 import { buildRouterComponent } from '../components';
 
@@ -24,9 +27,12 @@ export type Config = {
 export function createConfig() : Config {
     let vaultClient : VaultClient | undefined;
     let connectionString = useEnv('vaultConnectionString');
-    if (typeof connectionString !== 'undefined') {
+    if (
+        typeof connectionString !== 'undefined' &&
+        !isBoolFalse(connectionString)
+    ) {
         vaultClient = new VaultClient({
-            connectionString,
+            connectionString: isBoolTrue(connectionString) ? ConfigDefaults.VAULT : connectionString,
         });
 
         setVaultClient(vaultClient);
@@ -63,9 +69,14 @@ export function createConfig() : Config {
     // ---------------------------------------------
 
     connectionString = useEnv('redisConnectionString');
-    if (typeof connectionString !== 'undefined') {
+    if (
+        typeof connectionString !== 'undefined' &&
+        !isBoolFalse(connectionString)
+    ) {
         const redisClient = createClient({
-            connectionString,
+            connectionString: isBoolTrue(connectionString) ?
+                ConfigDefaults.REDIS :
+                connectionString,
         });
         setRedisClient(redisClient);
     }
@@ -73,9 +84,12 @@ export function createConfig() : Config {
     // ---------------------------------------------
 
     connectionString = useEnv('rabbitMqConnectionString');
-    if(typeof connectionString !== 'undefined') {
+    if (
+        typeof connectionString !== 'undefined' &&
+        !isBoolFalse(connectionString)
+    ) {
         setAmqpConfig({
-            connection:,
+            connection: isBoolTrue(connectionString) ? ConfigDefaults.RABBITMQ : connectionString,
             exchange: {
                 name: 'pht',
                 type: 'topic',
@@ -85,7 +99,17 @@ export function createConfig() : Config {
 
     // ---------------------------------------------
 
-    setMinioConfig(useEnv('minioConnectionString'));
+    connectionString = useEnv('minioConnectionString');
+    if (
+        typeof connectionString !== 'undefined' &&
+        !isBoolFalse(connectionString)
+    ) {
+        setMinioConfig(
+            isBoolTrue(connectionString) ?
+                ConfigDefaults.MINIO :
+                connectionString,
+        );
+    }
 
     // ---------------------------------------------
 
@@ -95,7 +119,10 @@ export function createConfig() : Config {
 
     const aggregators : {start: () => void}[] = [];
 
-    if (!isTest) {
+    if (
+        !isTest &&
+        hasAmqpConfig()
+    ) {
         aggregators.push(buildAuthupAggregator());
         aggregators.push(buildTrainManagerAggregator());
     }
@@ -103,7 +130,10 @@ export function createConfig() : Config {
     // ---------------------------------------------
 
     const components : {start: () => void}[] = [];
-    if (!isTest) {
+    if (
+        !isTest &&
+        hasAmqpConfig()
+    ) {
         components.push(
             buildRouterComponent(),
         );
