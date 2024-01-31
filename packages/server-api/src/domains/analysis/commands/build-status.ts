@@ -8,14 +8,14 @@
 import { BuilderCommand, buildBuilderQueuePayload } from '@personalhealthtrain/server-train-manager';
 import { publish } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
-import { resolveTrain } from './utils';
+import { resolveAnalysis } from './utils';
 import { AnalysisEntity } from '../entity';
 
-export async function detectTrainBuildStatus(train: AnalysisEntity | string) : Promise<AnalysisEntity> {
+export async function detectAnalysisBuildStatus(train: AnalysisEntity | string) : Promise<AnalysisEntity> {
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisEntity);
 
-    train = await resolveTrain(train, repository);
+    train = await resolveAnalysis(train, repository);
 
     await publish(buildBuilderQueuePayload({
         command: BuilderCommand.CHECK,

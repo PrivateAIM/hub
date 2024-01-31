@@ -8,14 +8,14 @@
 import { BadRequestError } from '@ebec/http';
 import { AnalysisBuildStatus } from '@personalhealthtrain/core';
 import { useDataSource } from 'typeorm-extension';
-import { resolveTrain } from './utils';
+import { resolveAnalysis } from './utils';
 import { AnalysisEntity } from '../entity';
 
-export async function stopBuildTrain(train: AnalysisEntity | string) : Promise<AnalysisEntity> {
+export async function stopAnalysisBuild(train: AnalysisEntity | string) : Promise<AnalysisEntity> {
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisEntity);
 
-    train = await resolveTrain(train, repository);
+    train = await resolveAnalysis(train, repository);
 
     if (train.run_status) {
         throw new BadRequestError('The train build can not longer be stopped...');

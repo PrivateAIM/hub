@@ -16,15 +16,15 @@ import { useDataSource } from 'typeorm-extension';
 import { RegistryEntity } from '../../registry';
 import { AnalysisNodeEntity } from '../../anaylsis-node';
 import { AnalysisEntity } from '../entity';
-import { resolveTrain } from './utils';
+import { resolveAnalysis } from './utils';
 
-export async function startBuildTrain(
+export async function startAnalysisBuild(
     train: AnalysisEntity | string,
 ) : Promise<AnalysisEntity> {
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisEntity);
 
-    train = await resolveTrain(train, repository);
+    train = await resolveAnalysis(train, repository);
 
     if (train.run_status) {
         throw new BadRequestError('The train can not longer be build...');

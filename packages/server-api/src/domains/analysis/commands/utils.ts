@@ -10,12 +10,12 @@ import type { Repository } from 'typeorm';
 import { useDataSource } from 'typeorm-extension';
 import { AnalysisEntity } from '../entity';
 
-export async function resolveTrain(
-    train: AnalysisEntity | string,
+export async function resolveAnalysis(
+    input: AnalysisEntity | string,
     repository?: Repository<AnalysisEntity>,
 ) : Promise<AnalysisEntity | undefined> {
-    if (typeof train !== 'string') {
-        return train;
+    if (typeof input !== 'string') {
+        return input;
     }
 
     if (typeof repository === 'undefined') {
@@ -23,9 +23,9 @@ export async function resolveTrain(
         repository = dataSource.getRepository(AnalysisEntity);
     }
 
-    const entity = await repository.findOneBy({ id: train });
+    const entity = await repository.findOneBy({ id: input });
     if (!entity) {
-        throw new BadRequestError('The train could not be resolved.');
+        throw new BadRequestError('The analysis could not be resolved.');
     }
 
     return entity;

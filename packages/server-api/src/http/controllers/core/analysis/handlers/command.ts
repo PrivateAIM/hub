@@ -14,12 +14,9 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import {
     AnalysisEntity,
-    detectTrainBuildStatus,
-    detectTrainRunStatus,
-    resetTrain,
-    startBuildTrain,
-    startTrain,
-    stopBuildTrain,
+    detectAnalysisBuildStatus,
+    startAnalysisBuild,
+    stopAnalysisBuild,
 } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 import { RequestValidationError } from '../../../../validation';
@@ -65,24 +62,13 @@ export async function handleAnalysisCommandRouteHandler(req: Request, res: Respo
     switch (validationData.command as AnalysisAPICommand) {
         // Build Commands
         case AnalysisAPICommand.BUILD_STATUS:
-            entity = await detectTrainBuildStatus(entity);
+            entity = await detectAnalysisBuildStatus(entity);
             break;
         case AnalysisAPICommand.BUILD_START:
-            entity = await startBuildTrain(entity);
+            entity = await startAnalysisBuild(entity);
             break;
         case AnalysisAPICommand.BUILD_STOP:
-            entity = await stopBuildTrain(entity);
-            break;
-
-        // Run Commands
-        case AnalysisAPICommand.RUN_STATUS:
-            entity = await detectTrainRunStatus(entity);
-            break;
-        case AnalysisAPICommand.RUN_START:
-            entity = await startTrain(entity);
-            break;
-        case AnalysisAPICommand.RUN_RESET:
-            entity = await resetTrain(entity);
+            entity = await stopAnalysisBuild(entity);
             break;
     }
 
