@@ -6,7 +6,7 @@
  */
 
 import type { MasterImage } from '@personalhealthtrain/core';
-import type { SuperTest, Test } from 'supertest';
+import type { TestAgent } from '../supertest';
 
 export const TEST_DEFAULT_MASTER_IMAGE : Partial<MasterImage> = {
     group_virtual_path: 'python',
@@ -15,7 +15,7 @@ export const TEST_DEFAULT_MASTER_IMAGE : Partial<MasterImage> = {
     virtual_path: 'python/base',
 };
 
-export async function createSuperTestMasterImage(superTest: SuperTest<Test>, entity?: Partial<MasterImage>) {
+export async function createSuperTestMasterImage(superTest: TestAgent, entity?: Partial<MasterImage>) {
     return superTest
         .post('/master-images')
         .send({

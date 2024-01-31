@@ -8,5 +8,5 @@
 export * from './master-image';
 export * from './project';
 export * from './project-node';
-export * from './station';
-export * from './train';
+export * from './node';
+export * from './analysis';

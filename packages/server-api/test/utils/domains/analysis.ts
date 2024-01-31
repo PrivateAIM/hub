@@ -6,13 +6,13 @@
  */
 
 import type { Analysis } from '@personalhealthtrain/core';
-import type { SuperTest, Test } from 'supertest';
+import type { TestAgent } from '../supertest';
 
 export const TEST_DEFAULT_ANALYSIS : Partial<Analysis> = {
-    name: 'development'
+    name: 'development',
 };
 
-export async function createSuperTestAnalysis(superTest: SuperTest<Test>, entity?: Partial<Analysis>) {
+export async function createSuperTestAnalysis(superTest: TestAgent, entity?: Partial<Analysis>) {
     return superTest
         .post('/analyses')
         .send({

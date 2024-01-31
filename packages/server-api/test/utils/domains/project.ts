@@ -6,13 +6,13 @@
  */
 
 import type { Project } from '@personalhealthtrain/core';
-import type { SuperTest, Test } from 'supertest';
+import type { TestAgent } from '../supertest';
 
 export const TEST_DEFAULT_PROJECT : Partial<Project> = {
     name: 'development',
 };
 
-export async function createSuperTestProject(superTest: SuperTest<Test>, proposal?: Partial<Project>) {
+export async function createSuperTestProject(superTest: TestAgent, proposal?: Partial<Project>) {
     return superTest
         .post('/projects')
         .send({

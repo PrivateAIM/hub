@@ -6,14 +6,14 @@
  */
 
 import type { Node } from '@personalhealthtrain/core';
-import type { SuperTest, Test } from 'supertest';
+import type { TestAgent } from '../supertest';
 
 export const TEST_DEFAULT_NODE : Partial<Node> = {
     name: 'foo-bar-baz',
     external_name: 'test',
 };
 
-export async function createSuperTestNode(superTest: SuperTest<Test>, entity?: Partial<Node>) {
+export async function createSuperTestNode(superTest: TestAgent, entity?: Partial<Node>) {
     return superTest
         .post('/nodes')
         .send({

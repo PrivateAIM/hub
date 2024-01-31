@@ -6,9 +6,9 @@
  */
 
 import type { ProjectNode } from '@personalhealthtrain/core';
-import type { SuperTest, Test } from 'supertest';
+import type { TestAgent } from '../supertest';
 
-export async function createSuperTestProjectNode(superTest: SuperTest<Test>, proposalStation: Partial<ProjectNode>) {
+export async function createSuperTestProjectNode(superTest: TestAgent, proposalStation: Partial<ProjectNode>) {
     return superTest
         .post('/project-nodes')
         .send(proposalStation)
