@@ -46,7 +46,7 @@ export async function executePushCommand(
     });
 
     const client = useClient<APIClient>();
-    const { data: analysisNodes } = await client.trainStation.getMany({
+    const { data: analysisNodes } = await client.analysisNode.getMany({
         filter: {
             analysis_id: data.entity.id,
         },
@@ -60,7 +60,7 @@ export async function executePushCommand(
         throw BuilderError.notFound();
     }
 
-    const { data: nodes } = await client.station.getMany({
+    const { data: nodes } = await client.node.getMany({
         filter: {
             id: analysisNodes.map((analysisNode) => analysisNode.node_id),
         },

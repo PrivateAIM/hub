@@ -35,15 +35,16 @@ export class APIClient extends Client {
 
     public readonly registryProject : RegistryProjectAPI;
 
-    public readonly station : NodeAPI;
+    public readonly node : NodeAPI;
 
-    public readonly train : AnalysisAPI;
+    public readonly analysis : AnalysisAPI;
 
-    public readonly trainFile : AnalysisFileAPI;
+    // todo: this is going to be moved to storage service package.
+    public readonly analysisFile : AnalysisFileAPI;
 
-    public readonly trainLog: AnalysisLogAPI;
+    public readonly analysisLog: AnalysisLogAPI;
 
-    public readonly trainStation : TrainStationAPI;
+    public readonly analysisNode : TrainStationAPI;
 
     public readonly service : ServiceAPI;
 
@@ -56,11 +57,11 @@ export class APIClient extends Client {
         this.projectNode = new ProjectNodeAPI({ client: this });
         this.registry = new RegistryAPI({ client: this });
         this.registryProject = new RegistryProjectAPI({ client: this });
-        this.station = new NodeAPI({ client: this });
-        this.train = new AnalysisAPI({ client: this });
-        this.trainFile = new AnalysisFileAPI({ client: this });
-        this.trainLog = new AnalysisLogAPI({ client: this });
-        this.trainStation = new TrainStationAPI({ client: this });
+        this.node = new NodeAPI({ client: this });
+        this.analysis = new AnalysisAPI({ client: this });
+        this.analysisFile = new AnalysisFileAPI({ client: this });
+        this.analysisLog = new AnalysisLogAPI({ client: this });
+        this.analysisNode = new TrainStationAPI({ client: this });
         this.service = new ServiceAPI({ client: this });
 
         this.on(HookName.RESPONSE_ERROR, ((error) => {

@@ -115,7 +115,7 @@ export default defineComponent({
         const execute = wrapFnWithBusyState(busy, async () => {
             if (props.command === 'resultDownload') {
                 window.open(
-                    apiClient.train.getResultDownloadURL(props.entity.id),
+                    apiClient.analysis.getResultDownloadURL(props.entity.id),
                     '_blank',
                 );
                 return;
@@ -123,7 +123,7 @@ export default defineComponent({
 
             try {
                 const train = await apiClient
-                    .train.runCommand(props.entity.id, props.command);
+                    .analysis.runCommand(props.entity.id, props.command);
 
                 emit('executed', props.command);
                 emit('updated', train);

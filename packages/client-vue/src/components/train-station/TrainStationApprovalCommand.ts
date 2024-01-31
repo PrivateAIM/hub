@@ -112,7 +112,7 @@ export default defineComponent({
             }
 
             try {
-                const item = await apiClient.trainStation.update(props.entityId, {
+                const item = await apiClient.analysisNode.update(props.entityId, {
                     approval_status: status,
                 });
 

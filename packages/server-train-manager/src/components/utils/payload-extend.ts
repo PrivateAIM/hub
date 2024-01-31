@@ -27,7 +27,7 @@ export async function extendPayload<T extends Partial<ComponentPayloadExtended<{
         train = data.entity;
     } else {
         try {
-            train = await client.train.getOne(data.id);
+            train = await client.analysis.getOne(data.id);
         } catch (e) {
             if (isClientErrorWithStatusCode(e, 404)) {
                 throw BaseError.notFound({

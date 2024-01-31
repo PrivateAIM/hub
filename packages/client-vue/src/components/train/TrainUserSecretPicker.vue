@@ -43,7 +43,7 @@ export default defineComponent({
                 }
             }
 
-            await apiClient.train.update(refs.trainId.value, payload);
+            await apiClient.analysis.update(refs.trainId.value, payload);
 
             emit('updated', payload);
         };

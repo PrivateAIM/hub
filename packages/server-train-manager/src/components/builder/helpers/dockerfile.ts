@@ -29,7 +29,7 @@ export async function buildTrainDockerFile(context: DockerFileBuildContext) : Pr
     let entryPoint : AnalysisFile;
 
     try {
-        entryPoint = await client.trainFile.getOne(context.entity.entrypoint_file_id);
+        entryPoint = await client.analysisFile.getOne(context.entity.entrypoint_file_id);
     } catch (e) {
         throw BuilderError.entrypointNotFound();
     }

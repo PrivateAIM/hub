@@ -98,7 +98,7 @@ export default defineComponent({
             if (!refs.trainFileId.value) return;
 
             try {
-                trainFileEntity.value = await apiClient.trainFile.getOne(refs.trainFileId.value);
+                trainFileEntity.value = await apiClient.analysisFile.getOne(refs.trainFileId.value);
             } catch (e) {
                 if (e instanceof Error) {
                     emit('failed', e);

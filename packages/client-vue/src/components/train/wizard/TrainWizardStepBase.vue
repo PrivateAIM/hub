@@ -38,7 +38,7 @@ export default defineComponent({
         const apiClient = injectAPIClient();
         const handleMasterImageSelected = async (item: MasterImage) => {
             try {
-                const response = await apiClient.train.update(props.train.id, {
+                const response = await apiClient.analysis.update(props.train.id, {
                     master_image_id: item ? item.id : null as string,
                 });
 

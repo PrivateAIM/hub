@@ -108,7 +108,7 @@ export default defineComponent({
 
             if (keys.length === 0) return;
 
-            const item = await apiClient.train.update(refs.entity.value.id, data);
+            const item = await apiClient.analysis.update(refs.entity.value.id, data);
             handleUpdated(item);
         };
 

@@ -87,7 +87,7 @@ export default defineNuxtComponent({
         const stationId : Ref<string | null> = ref(null);
 
         try {
-            const response = await useAPI().station.getMany({
+            const response = await useAPI().node.getMany({
                 filter: {
                     realm_id: realmId.value,
                 },

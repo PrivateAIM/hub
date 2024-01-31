@@ -26,13 +26,13 @@ export function useDomainAPI(
         case DomainType.REGISTRY_PROJECT:
             return client.registryProject;
         case DomainType.NODE:
-            return client.station;
+            return client.node;
         case DomainType.ANALYSIS:
-            return client.train;
+            return client.analysis;
         case DomainType.ANALYSIS_FILE:
-            return client.trainFile;
+            return client.analysisFile;
         case DomainType.TRAIN_STATION:
-            return client.trainStation;
+            return client.analysisNode;
         case DomainType.SERVICE:
             return client.service;
     }

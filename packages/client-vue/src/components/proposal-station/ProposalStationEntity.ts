@@ -115,7 +115,7 @@ export default defineComponent({
                     .project.getOne(manager.data.value.proposal_id);
             } else {
                 manager.data.value[props.target] = await apiClient
-                    .station.getOne(manager.data.value.station_id);
+                    .node.getOne(manager.data.value.station_id);
             }
         }
 

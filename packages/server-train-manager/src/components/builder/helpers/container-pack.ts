@@ -33,7 +33,7 @@ export async function packContainerWithTrain(container: Container, context: Cont
 
     return new Promise<void>((resolve, reject) => {
         client.request({
-            url: client.train.getFilesDownloadPath(context.train.id),
+            url: client.analysis.getFilesDownloadPath(context.train.id),
             responseType: 'stream',
         })
             .then((response) => {

@@ -118,7 +118,7 @@ export default defineComponent({
         const execute = wrapFnWithBusyState(busy, async () => {
             try {
                 const train = await apiClient
-                    .train.runCommand(props.entity.id, props.command);
+                    .analysis.runCommand(props.entity.id, props.command);
 
                 emit('executed', props.command);
                 emit('updated', train);

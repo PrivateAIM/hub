@@ -74,7 +74,7 @@ export default defineComponent({
 
         const generate = wrapFnWithBusyState(busy, async () => {
             try {
-                const train = await apiClient.train.runCommand(refs.train.value.id, AnalysisAPICommand.GENERATE_HASH);
+                const train = await apiClient.analysis.runCommand(refs.train.value.id, AnalysisAPICommand.GENERATE_HASH);
 
                 form.hash = train.hash;
 

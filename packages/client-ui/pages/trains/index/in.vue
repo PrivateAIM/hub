@@ -90,7 +90,7 @@ export default defineNuxtComponent({
         const download = (item: AnalysisNode) => {
             const app = useRuntimeConfig();
 
-            window.open(new URL(useAPI().train.getFilesDownloadPath(item.analysis_id), app.public.apiUrl).href, '_blank');
+            window.open(new URL(useAPI().analysis.getFilesDownloadPath(item.analysis_id), app.public.apiUrl).href, '_blank');
         };
 
         const listNode = ref<null | typeof TrainStationList>(null);

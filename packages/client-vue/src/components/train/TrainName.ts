@@ -63,7 +63,7 @@ export default defineComponent({
 
         const save = wrapFnWithBusyState(busy, async () => {
             try {
-                const train = await apiClient.train.update(props.entityId, {
+                const train = await apiClient.analysis.update(props.entityId, {
                     name: name.value,
                 });
 
