@@ -5,18 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type {
-    APIClient,
-} from '@personalhealthtrain/core';
 import {
-    REGISTRY_ARTIFACT_TAG_BASE,
     REGISTRY_ARTIFACT_TAG_LATEST,
-    TrainContainerFileName,
 } from '@personalhealthtrain/core';
-import { useClient } from 'hapic';
 import {
-    buildDockerAuthConfig,
-    buildRemoteDockerImageURL, pullDockerImage,
+    pullDockerImage,
     useDocker,
 } from '../../../../core';
 import type { ComponentPayloadExtended } from '../../../type';
@@ -41,10 +34,6 @@ export async function executeBuilderBuildCommand(
         throw BuilderError.registryNotFound();
     }
 
-    if (!data.entity.incoming_registry_project_id) {
-        throw BuilderError.registryProjectNotFound();
-    }
-
     // -----------------------------------------------------------------------------------
 
     const { content: dockerFile, masterImagePath } = await buildTrainDockerFile({
@@ -67,27 +56,11 @@ export async function executeBuilderBuildCommand(
         command: BuilderCommand.BUILD,
     });
 
-    const client = useClient<APIClient>();
-    const incomingProject = await client.registryProject.getOne(data.entity.incoming_registry_project_id);
-
-    data.registryProject = incomingProject;
-
-    const imageURL = buildRemoteDockerImageURL({
-        hostname: data.registry.host,
-        projectName: incomingProject.external_name,
-        repositoryName: data.entity.id,
-    });
-
-    const authConfig = buildDockerAuthConfig({
-        host: data.registry.host,
-        user: data.registry.account_name,
-        password: data.registry.account_secret,
-    });
+    const imageURL = data.entity.id;
 
     await buildDockerImage({
         content: dockerFile,
         imageName: imageURL,
-        authConfig,
     });
 
     // -----------------------------------------------------------------------------------
@@ -101,10 +74,6 @@ export async function executeBuilderBuildCommand(
         .createContainer({ Image: imageURL });
 
     // -----------------------------------------------------------------------------------
-
-    useBuilderLogger().debug(`Building ${TrainContainerFileName.CONFIG}`, {
-        command: BuilderCommand.BUILD,
-    });
 
     await packContainerWithTrain(container, {
         train: data.entity,
@@ -120,11 +89,6 @@ export async function executeBuilderBuildCommand(
     await container.commit({
         repo: imageURL,
         tag: REGISTRY_ARTIFACT_TAG_LATEST,
-    });
-
-    await container.commit({
-        repo: imageURL,
-        tag: REGISTRY_ARTIFACT_TAG_BASE,
     });
 
     await container.remove({

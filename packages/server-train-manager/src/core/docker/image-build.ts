@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { ImageBuildOptions } from 'dockerode';
 import { createGzip } from 'node:zlib';
 import tar from 'tar-stream';
 import { useDocker } from './instance';
@@ -15,7 +16,7 @@ export async function buildDockerImage(
     context: {
         content: string,
         imageName: string,
-        authConfig: DockerAuthConfig
+        authConfig?: DockerAuthConfig
     },
 ) {
     const pack = tar.pack();
@@ -34,11 +35,15 @@ export async function buildDockerImage(
     entry.write(context.content);
     entry.end();
 
+    const options : ImageBuildOptions = {
+        t: context.imageName
+    };
+    if(context.authConfig) {
+        options.authconfig = context.authConfig;
+    }
+
     const stream = await useDocker()
-        .buildImage(pack.pipe(createGzip()), {
-            t: context.imageName,
-            authconfig: context.authConfig,
-        });
+        .buildImage(pack.pipe(createGzip()), options);
 
     return new Promise<any>(((resolve, reject) => {
         useDocker().modem.followProgress(stream as any, (error: Error, output: any[]) => {

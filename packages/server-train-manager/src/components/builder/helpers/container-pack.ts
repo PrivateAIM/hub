@@ -6,103 +6,21 @@
  */
 
 import stream from 'node:stream';
-import crypto from 'node:crypto';
 import type { APIClient } from '@personalhealthtrain/core';
-import { TrainContainerFileName, AnalysisContainerPath } from '@personalhealthtrain/core';
+import { AnalysisContainerPath } from '@personalhealthtrain/core';
 import type { Container } from 'dockerode';
 import { useClient } from 'hapic';
 import tar from 'tar-stream';
 import {
-    createSignature, encryptSymmetric, generateRSAKeyPair,
     streamToBuffer,
 } from '../../../core';
 import { BuilderCommand } from '../constants';
 import { BuilderError } from '../error';
-import { useBuilderLogger } from '../utils';
-import { createPackFromFileContent } from './file-gzip';
-import { buildTrainConfig } from './train-config';
+import { useBuilderLogger } from '../utils'
 import type { ContainerPackContext } from './type';
 
 export async function packContainerWithTrain(container: Container, context: ContainerPackContext) {
-    const keyPair = await generateRSAKeyPair();
-
-    const symmetricKey = crypto.randomBytes(32);
-    const symmetricKeyIv = crypto.randomBytes(16);
-
-    // -----------------------------------------------------------------------------------
-
-    const trainConfig = await buildTrainConfig({
-        entity: context.train,
-        masterImagePath: context.masterImagePath,
-    });
-
-    trainConfig.build = {
-        rsa_public_key: Buffer.from(keyPair.publicKey, 'utf-8').toString('hex'),
-        signature: createSignature({
-            data: `${trainConfig.hash}${trainConfig.signature}`,
-            key: keyPair.privateKey,
-        }),
-    };
-
-    const stationFirstIndex = trainConfig.route.findIndex((route) => route.index === 0);
-    if (stationFirstIndex === -1) {
-        throw new BuilderError('First station in route could not be determined.');
-    }
-
-    if (typeof trainConfig.route[stationFirstIndex].rsa_public_key !== 'string') {
-        throw new BuilderError('The public key of the first station in the route is not defined.');
-    }
-
-    const stationPublicKeyString = Buffer.from(
-        trainConfig.route[stationFirstIndex].rsa_public_key,
-        'hex',
-    ).toString('utf-8');
-
-    const stationPublicKey = crypto.createPublicKey(stationPublicKeyString);
-
-    const symmetricKeyEncrypted = crypto.publicEncrypt({
-        key: stationPublicKey,
-        padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
-        oaepHash: 'sha512',
-    }, symmetricKey);
-
-    trainConfig.route[stationFirstIndex].encrypted_key = symmetricKeyEncrypted.toString('hex');
-
-    // -----------------------------------------------------------------------------------
-
-    useBuilderLogger()
-        .debug(`Writing ${TrainContainerFileName.CONFIG} to container`, {
-            command: BuilderCommand.BUILD,
-        });
-
-    await container.putArchive(
-        createPackFromFileContent(JSON.stringify(trainConfig), TrainContainerFileName.CONFIG),
-        {
-            path: '/opt',
-        },
-    );
-
-    // -----------------------------------------------------------------------------------
-
     const pack = tar.pack();
-
-    // -----------------------------------------------------------------------------------
-
-    if (context.train.query) {
-        useBuilderLogger()
-            .debug(`Writing ${TrainContainerFileName.QUERY} to container`, {
-                command: BuilderCommand.BUILD,
-            });
-
-        let { query } = context.train;
-        if (typeof query !== 'string') {
-            query = JSON.stringify(query);
-        }
-
-        const queryEncrypted = encryptSymmetric(symmetricKey, symmetricKeyIv, query);
-
-        pack.entry({ name: TrainContainerFileName.QUERY }, queryEncrypted);
-    }
 
     // -----------------------------------------------------------------------------------
 
@@ -151,14 +69,14 @@ export async function packContainerWithTrain(container: Container, context: Cont
                 extract.on('finish', () => {
                     for (let i = 0; i < files.length; i++) {
                         useBuilderLogger()
-                            .debug(`Encrypting/Packing train file ${files[i][0]}.`, {
+                            .debug(`Encrypting/Packing analysis file ${files[i][0]}.`, {
                                 command: BuilderCommand.BUILD,
                             });
 
-                        pack.entry({ name: files[i][0] }, encryptSymmetric(symmetricKey, symmetricKeyIv, files[i][1]));
+                        pack.entry({ name: files[i][0] }, files[i][1]);
 
                         useBuilderLogger()
-                            .debug(`Encrypted/Packed train file ${files[i][0]}.`, {
+                            .debug(`Encrypted/Packed analysis file ${files[i][0]}.`, {
                                 command: BuilderCommand.BUILD,
                             });
                     }
@@ -167,7 +85,7 @@ export async function packContainerWithTrain(container: Container, context: Cont
 
                     container.putArchive(pack, { path: AnalysisContainerPath.MAIN })
                         .then(() => resolve())
-                        .catch(() => reject(new BuilderError('The train pack stream could not be forwarded to the container.')));
+                        .catch(() => reject(new BuilderError('The analysis pack stream could not be forwarded to the container.')));
                 });
 
                 const readStream = stream.Readable.fromWeb(response.data as any);

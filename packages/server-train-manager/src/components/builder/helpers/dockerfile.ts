@@ -8,8 +8,8 @@
 import path from 'node:path';
 import type {
     APIClient,
-    MasterImage,
-    Analysis, AnalysisFile,
+    Analysis,
+    AnalysisFile, MasterImage,
 } from '@personalhealthtrain/core';
 import { AnalysisContainerPath, getHostNameFromString } from '@personalhealthtrain/core';
 import { useClient } from 'hapic';
@@ -79,7 +79,6 @@ export async function buildTrainDockerFile(context: DockerFileBuildContext) : Pr
     const content = `
     FROM ${masterImagePath}
     RUN mkdir ${AnalysisContainerPath.MAIN} &&\
-        mkdir ${AnalysisContainerPath.RESULTS} &&\
         chmod -R +x ${AnalysisContainerPath.MAIN}
 
     CMD ["${entrypointCommand}", ${argumentsString}"${path.posix.join(AnalysisContainerPath.MAIN, entrypointPath)}"]

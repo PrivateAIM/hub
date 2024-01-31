@@ -5,14 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type {
-    APIClient,
-} from '@personalhealthtrain/core';
+import type { APIClient } from '@personalhealthtrain/core';
 import {
     buildRegistryClientConnectionStringFromRegistry,
 } from '@personalhealthtrain/core';
-
 import { isClientErrorWithStatusCode, useClient } from 'hapic';
+
 import { createBasicHarborAPIClient } from '../../../../core';
 import type { ComponentPayloadExtended } from '../../../type';
 import { extendPayload } from '../../../utils';
@@ -34,7 +32,19 @@ export async function executeBuilderCheckCommand(
         throw BuilderError.registryNotFound();
     }
 
-    if (!data.entity.incoming_registry_project_id) {
+    // -----------------------------------------------------------------------------------
+
+    const client = useClient<APIClient>();
+    const { data: analysisNodes } = await client.trainStation.getMany({
+        filter: {
+            analysis_id: data.entity.id,
+        },
+        page: {
+            limit: 1,
+        },
+    });
+
+    if (analysisNodes.length === 0) {
         await writeNoneEvent({
             command: BuilderCommand.CHECK,
             data,
@@ -43,17 +53,35 @@ export async function executeBuilderCheckCommand(
         return data;
     }
 
-    // -----------------------------------------------------------------------------------
+    const { data: nodes } = await client.station.getMany({
+        filter: {
+            id: analysisNodes.map((analysisNode) => analysisNode.node_id),
+        },
+        relations: {
+            registry_project: true,
+        },
+    });
+
+    const [node] = nodes;
+
+    if (typeof node === 'undefined') {
+        await writeNoneEvent({
+            command: BuilderCommand.CHECK,
+            data,
+        });
+
+        return data;
+    }
 
     const connectionString = buildRegistryClientConnectionStringFromRegistry(data.registry);
-    const httpClient = createBasicHarborAPIClient(connectionString);
-
-    const client = useClient<APIClient>();
-    const incomingProject = await client.registryProject.getOne(data.entity.incoming_registry_project_id);
+    const harborClient = createBasicHarborAPIClient(connectionString);
 
     try {
-        const harborRepository = await httpClient.projectRepository
-            .getOne({ projectName: incomingProject.external_name, repositoryName: data.id });
+        const harborRepository = await harborClient.projectRepository
+            .getOne({
+                projectName: node.registry_project.external_name,
+                repositoryName: data.id,
+            });
 
         if (
             harborRepository &&

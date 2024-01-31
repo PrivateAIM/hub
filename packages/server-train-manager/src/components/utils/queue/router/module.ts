@@ -14,8 +14,6 @@ import { ComponentName } from '../../../constants';
 import { executeCoreCommand } from '../../../core';
 import {
     executeBuilderCommand,
-    executeExtractorCommand,
-    executeRouterCommand,
 } from '../../../index';
 import { useLogger } from '../../../../core';
 import { ROUTER_QUEUE_ROUTING_KEY } from './constants';
@@ -48,14 +46,6 @@ export function buildComponentRouter() : Component {
                     }
                     case ComponentName.CORE: {
                         await executeCoreCommand(context);
-                        break;
-                    }
-                    case ComponentName.EXTRACTOR: {
-                        await executeExtractorCommand(context);
-                        break;
-                    }
-                    case ComponentName.ROUTER: {
-                        await executeRouterCommand(context);
                         break;
                     }
                 }

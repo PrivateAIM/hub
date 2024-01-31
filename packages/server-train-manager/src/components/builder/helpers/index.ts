@@ -7,6 +7,5 @@
 
 export * from './dockerfile';
 export * from './file-gzip';
-export * from './train-config';
 export * from './container-pack';
 export * from './type';

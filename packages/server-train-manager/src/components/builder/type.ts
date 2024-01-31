@@ -6,7 +6,7 @@
  */
 
 import type {
-    Analysis,
+    Analysis, AnalysisNode, Node
 } from '@personalhealthtrain/core';
 import type { BuilderCommand, BuilderEvent } from './constants';
 

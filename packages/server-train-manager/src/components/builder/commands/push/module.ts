@@ -5,11 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { APIClient } from '@personalhealthtrain/core';
 import {
-    REGISTRY_ARTIFACT_TAG_BASE, REGISTRY_ARTIFACT_TAG_LATEST,
+    REGISTRY_ARTIFACT_TAG_LATEST,
 } from '@personalhealthtrain/core';
+import { useClient } from 'hapic';
 import {
-    buildDockerAuthConfig, buildRemoteDockerImageURL, pushDockerImage,
+    buildDockerAuthConfig, buildRemoteDockerImageURL, pushDockerImage, useDocker,
 } from '../../../../core';
 import type { ComponentPayloadExtended } from '../../../type';
 import { extendPayload } from '../../../utils';
@@ -37,49 +39,81 @@ export async function executePushCommand(
 
     // -----------------------------------------------------------------------------------
 
-    useBuilderLogger().debug('Push committed containers as image', {
-        command: BuilderCommand.BUILD,
-    });
-
     const authConfig = buildDockerAuthConfig({
         host: data.registry.host,
         user: data.registry.account_name,
         password: data.registry.account_secret,
     });
 
-    // -----------------------------------------------------------------------------------
-
-    const baseImageURL = buildRemoteDockerImageURL({
-        hostname: data.registry.host,
-        projectName: data.registryProject.external_name,
-        repositoryName: data.entity.id,
-        tagOrDigest: REGISTRY_ARTIFACT_TAG_BASE,
+    const client = useClient<APIClient>();
+    const { data: analysisNodes } = await client.trainStation.getMany({
+        filter: {
+            analysis_id: data.entity.id,
+        },
+        sort: {
+            index: 'ASC',
+        },
     });
 
-    await pushDockerImage(baseImageURL, authConfig);
+    if (analysisNodes.length === 0) {
+        // todo: custom error
+        throw BuilderError.notFound();
+    }
 
-    useBuilderLogger().debug('Pushed image', {
+    const { data: nodes } = await client.station.getMany({
+        filter: {
+            id: analysisNodes.map((analysisNode) => analysisNode.node_id),
+        },
+        relations: {
+            registry_project: true,
+        },
+    });
+
+    // -----------------------------------------------------------------------------------
+
+    useBuilderLogger().debug('Tagging image for nodes', {
         command: BuilderCommand.BUILD,
-        image: baseImageURL,
+    });
+
+    const localImageUrl = `${data.id}:${REGISTRY_ARTIFACT_TAG_LATEST}`;
+
+    const image = await useDocker()
+        .getImage(localImageUrl);
+
+    for (let i = 0; i < nodes.length; i++) {
+        const nodeImageURL = buildRemoteDockerImageURL({
+            hostname: data.registry.host,
+            projectName: nodes[i].registry_project.external_name,
+            repositoryName: data.entity.id,
+            tagOrDigest: REGISTRY_ARTIFACT_TAG_LATEST,
+        });
+
+        await image.tag({
+            repo: nodeImageURL,
+            tag: REGISTRY_ARTIFACT_TAG_LATEST,
+        });
+    }
+
+    await image.remove({
+        force: true,
     });
 
     // -----------------------------------------------------------------------------------
 
-    const latestImageURL = buildRemoteDockerImageURL({
-        hostname: data.registry.host,
-        projectName: data.registryProject.external_name,
-        repositoryName: data.entity.id,
-        tagOrDigest: REGISTRY_ARTIFACT_TAG_LATEST,
-    });
-
-    await pushDockerImage(latestImageURL, authConfig);
-
-    useBuilderLogger().debug('Pushed image', {
+    useBuilderLogger().debug('Pushing image for nodes', {
         command: BuilderCommand.BUILD,
-        image: latestImageURL,
     });
 
-    // -----------------------------------------------------------------------------------
+    for (let i = 0; i < nodes.length; i++) {
+        const nodeImageURL = buildRemoteDockerImageURL({
+            hostname: data.registry.host,
+            projectName: nodes[i].registry_project.external_name,
+            repositoryName: data.entity.id,
+            tagOrDigest: REGISTRY_ARTIFACT_TAG_LATEST,
+        });
+
+        await pushDockerImage(nodeImageURL, authConfig);
+    }
 
     return data;
 }
