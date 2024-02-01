@@ -22,11 +22,11 @@ import type {
     SocketServerInterface,
 } from '../../type';
 import {
-    decrSocketRoomConnections,
-    incrSocketRoomConnections,
+    unsubscribeSocketRoom,
+    subscribeSocketRoom,
 } from '../../utils';
 
-export function registerTrainStationSocketHandlers(
+export function registerAnalysisNodeSocketHandlers(
     io: SocketServerInterface | SocketNamespaceInterface,
     socket: SocketInterface,
 ) {
@@ -47,7 +47,7 @@ export function registerTrainStationSocketHandlers(
                 return;
             }
 
-            incrSocketRoomConnections(socket, buildDomainChannelName(DomainType.TRAIN_STATION, target));
+            subscribeSocketRoom(socket, buildDomainChannelName(DomainType.TRAIN_STATION, target));
 
             if (isSocketClientToServerEventCallback(cb)) {
                 cb();
@@ -58,7 +58,7 @@ export function registerTrainStationSocketHandlers(
     socket.on(
         buildDomainEventSubscriptionFullName(DomainType.TRAIN_STATION, DomainEventSubscriptionName.SUBSCRIBE),
         (target) => {
-            decrSocketRoomConnections(socket, buildDomainChannelName(DomainType.TRAIN_STATION, target));
+            unsubscribeSocketRoom(socket, buildDomainChannelName(DomainType.TRAIN_STATION, target));
         },
     );
 }
@@ -84,7 +84,7 @@ export function registerTrainStationForRealmSocketHandlers(
                 return;
             }
 
-            incrSocketRoomConnections(socket, buildDomainChannelName(DomainSubType.ANALYSIS_NODE_IN, target));
+            subscribeSocketRoom(socket, buildDomainChannelName(DomainSubType.ANALYSIS_NODE_IN, target));
 
             if (isSocketClientToServerEventCallback(cb)) {
                 cb();
@@ -95,7 +95,7 @@ export function registerTrainStationForRealmSocketHandlers(
     socket.on(
         buildDomainEventSubscriptionFullName(DomainSubType.ANALYSIS_NODE_IN, DomainEventSubscriptionName.UNSUBSCRIBE),
         (target) => {
-            decrSocketRoomConnections(socket, buildDomainChannelName(DomainSubType.ANALYSIS_NODE_IN, target));
+            unsubscribeSocketRoom(socket, buildDomainChannelName(DomainSubType.ANALYSIS_NODE_IN, target));
         },
     );
 
@@ -112,7 +112,7 @@ export function registerTrainStationForRealmSocketHandlers(
                 return;
             }
 
-            incrSocketRoomConnections(socket, buildDomainChannelName(DomainSubType.ANALYSIS_NODE_OUT, target));
+            subscribeSocketRoom(socket, buildDomainChannelName(DomainSubType.ANALYSIS_NODE_OUT, target));
 
             if (isSocketClientToServerEventCallback(cb)) {
                 cb();
@@ -123,7 +123,7 @@ export function registerTrainStationForRealmSocketHandlers(
     socket.on(
         buildDomainEventSubscriptionFullName(DomainSubType.ANALYSIS_NODE_OUT, DomainEventSubscriptionName.UNSUBSCRIBE),
         (target) => {
-            decrSocketRoomConnections(socket, buildDomainChannelName(DomainSubType.ANALYSIS_NODE_OUT, target));
+            unsubscribeSocketRoom(socket, buildDomainChannelName(DomainSubType.ANALYSIS_NODE_OUT, target));
         },
     );
 }

@@ -21,8 +21,8 @@ import type {
     SocketServerInterface,
 } from '../../type';
 import {
-    decrSocketRoomConnections,
-    incrSocketRoomConnections,
+    unsubscribeSocketRoom,
+    subscribeSocketRoom,
 } from '../../utils';
 
 export function registerRegistryProjectSocketHandlers(
@@ -44,7 +44,7 @@ export function registerRegistryProjectSocketHandlers(
                 return;
             }
 
-            incrSocketRoomConnections(socket, buildDomainChannelName(DomainType.REGISTRY_PROJECT, target));
+            subscribeSocketRoom(socket, buildDomainChannelName(DomainType.REGISTRY_PROJECT, target));
 
             if (isSocketClientToServerEventCallback(cb)) {
                 cb();
@@ -55,7 +55,7 @@ export function registerRegistryProjectSocketHandlers(
     socket.on(
         buildDomainEventSubscriptionFullName(DomainType.REGISTRY_PROJECT, DomainEventSubscriptionName.UNSUBSCRIBE),
         (target) => {
-            decrSocketRoomConnections(socket, buildDomainChannelName(DomainType.REGISTRY_PROJECT, target));
+            unsubscribeSocketRoom(socket, buildDomainChannelName(DomainType.REGISTRY_PROJECT, target));
         },
     );
 }

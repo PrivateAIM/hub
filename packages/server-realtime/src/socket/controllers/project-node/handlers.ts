@@ -22,11 +22,11 @@ import type {
     SocketServerInterface,
 } from '../../type';
 import {
-    decrSocketRoomConnections,
-    incrSocketRoomConnections,
+    unsubscribeSocketRoom,
+    subscribeSocketRoom,
 } from '../../utils';
 
-export function registerProposalStationSocketHandlers(
+export function registerProjectNodeSocketHandlers(
     io: SocketServerInterface | SocketNamespaceInterface,
     socket: SocketInterface,
 ) {
@@ -47,7 +47,7 @@ export function registerProposalStationSocketHandlers(
                 return;
             }
 
-            incrSocketRoomConnections(socket, buildDomainChannelName(DomainType.PROJECT_NODE, target));
+            subscribeSocketRoom(socket, buildDomainChannelName(DomainType.PROJECT_NODE, target));
 
             if (isSocketClientToServerEventCallback(cb)) {
                 cb();
@@ -58,7 +58,7 @@ export function registerProposalStationSocketHandlers(
     socket.on(
         buildDomainEventSubscriptionFullName(DomainType.PROJECT_NODE, DomainEventSubscriptionName.UNSUBSCRIBE),
         (target) => {
-            decrSocketRoomConnections(socket, buildDomainChannelName(DomainType.PROJECT_NODE, target));
+            unsubscribeSocketRoom(socket, buildDomainChannelName(DomainType.PROJECT_NODE, target));
         },
     );
 }
@@ -84,7 +84,7 @@ export function registerProposalStationForRealmSocketHandlers(
                 return;
             }
 
-            incrSocketRoomConnections(
+            subscribeSocketRoom(
                 socket,
                 buildDomainChannelName(DomainSubType.PROJECT_NODE_IN, target),
             );
@@ -98,7 +98,7 @@ export function registerProposalStationForRealmSocketHandlers(
     socket.on(
         buildDomainEventSubscriptionFullName(DomainSubType.PROJECT_NODE_IN, DomainEventSubscriptionName.UNSUBSCRIBE),
         (target) => {
-            decrSocketRoomConnections(
+            unsubscribeSocketRoom(
                 socket,
                 buildDomainChannelName(DomainSubType.PROJECT_NODE_IN, target),
             );
@@ -120,7 +120,7 @@ export function registerProposalStationForRealmSocketHandlers(
                 return;
             }
 
-            incrSocketRoomConnections(
+            subscribeSocketRoom(
                 socket,
                 buildDomainChannelName(DomainSubType.PROJECT_NODE_OUT, target),
             );
@@ -134,7 +134,7 @@ export function registerProposalStationForRealmSocketHandlers(
     socket.on(
         buildDomainEventSubscriptionFullName(DomainSubType.PROJECT_NODE_OUT, DomainEventSubscriptionName.UNSUBSCRIBE),
         (target) => {
-            decrSocketRoomConnections(
+            unsubscribeSocketRoom(
                 socket,
                 buildDomainChannelName(DomainSubType.PROJECT_NODE_OUT, target),
             );

@@ -9,7 +9,6 @@ import {
     DomainEventSubscriptionName,
     DomainType,
     PermissionID,
-    ProjectSocketClientToServerEventName,
     buildDomainChannelName,
     buildDomainEventSubscriptionFullName,
     isSocketClientToServerEventCallback,
@@ -22,23 +21,20 @@ import type {
     SocketServerInterface,
 } from '../../type';
 import {
-    decrSocketRoomConnections,
-    incrSocketRoomConnections,
+    unsubscribeSocketRoom,
+    subscribeSocketRoom,
 } from '../../utils';
 
-export function registerProposalSocketHandlers(
+export function registerAnalysisLogSocketHandlers(
     io: SocketServerInterface | SocketNamespaceInterface,
     socket: SocketInterface,
 ) {
     if (!socket.data.userId && !socket.data.robotId) return;
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainType.PROJECT, DomainEventSubscriptionName.SUBSCRIBE),
+        buildDomainEventSubscriptionFullName(DomainType.ANALYSIS_LOG, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
-            if (
-                !socket.data.ability.has(PermissionID.PROJECT_DROP) &&
-                !socket.data.ability.has(PermissionID.PROJECT_EDIT)
-            ) {
+            if (!socket.data.ability.has(PermissionID.ANALYSIS_EDIT)) {
                 if (isSocketClientToServerEventErrorCallback(cb)) {
                     cb(new UnauthorizedError());
                 }
@@ -46,7 +42,7 @@ export function registerProposalSocketHandlers(
                 return;
             }
 
-            incrSocketRoomConnections(socket, buildDomainChannelName(DomainType.PROJECT, target));
+            subscribeSocketRoom(socket, buildDomainChannelName(DomainType.ANALYSIS_LOG, target));
 
             if (isSocketClientToServerEventCallback(cb)) {
                 cb();
@@ -55,8 +51,9 @@ export function registerProposalSocketHandlers(
     );
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainType.PROJECT, DomainEventSubscriptionName.UNSUBSCRIBE),
+        buildDomainEventSubscriptionFullName(DomainType.ANALYSIS_LOG, DomainEventSubscriptionName.UNSUBSCRIBE),
         (target) => {
-        decrSocketRoomConnections(socket, buildDomainChannelName(DomainType.PROJECT, target));
-    });
+            unsubscribeSocketRoom(socket, buildDomainChannelName(DomainType.ANALYSIS_LOG, target));
+        },
+    );
 }

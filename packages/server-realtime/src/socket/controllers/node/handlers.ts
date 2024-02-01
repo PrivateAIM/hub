@@ -15,26 +15,21 @@ import {
     isSocketClientToServerEventErrorCallback,
 } from '@personalhealthtrain/core';
 import { UnauthorizedError } from '@ebec/http';
-import type {
-    SocketInterface,
-    SocketNamespaceInterface,
-    SocketServerInterface,
-} from '../../type';
-import {
-    decrSocketRoomConnections,
-    incrSocketRoomConnections,
-} from '../../utils';
+import type { SocketInterface, SocketNamespaceInterface, SocketServerInterface } from '../../type';
+import { unsubscribeSocketRoom, subscribeSocketRoom } from '../../utils';
 
-export function registerTrainLogSocketHandlers(
+export function registerNodeSocketHandlers(
     io: SocketServerInterface | SocketNamespaceInterface,
     socket: SocketInterface,
 ) {
     if (!socket.data.userId && !socket.data.robotId) return;
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainType.ANALYSIS_LOG, DomainEventSubscriptionName.SUBSCRIBE),
+        buildDomainEventSubscriptionFullName(DomainType.NODE, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
-            if (!socket.data.ability.has(PermissionID.ANALYSIS_EDIT)) {
+            if (
+                !socket.data.ability.has(PermissionID.NODE_EDIT)
+            ) {
                 if (isSocketClientToServerEventErrorCallback(cb)) {
                     cb(new UnauthorizedError());
                 }
@@ -42,7 +37,7 @@ export function registerTrainLogSocketHandlers(
                 return;
             }
 
-            incrSocketRoomConnections(socket, buildDomainChannelName(DomainType.ANALYSIS_LOG, target));
+            subscribeSocketRoom(socket, buildDomainChannelName(DomainType.NODE, target));
 
             if (isSocketClientToServerEventCallback(cb)) {
                 cb();
@@ -51,9 +46,9 @@ export function registerTrainLogSocketHandlers(
     );
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainType.ANALYSIS_LOG, DomainEventSubscriptionName.UNSUBSCRIBE),
+        buildDomainEventSubscriptionFullName(DomainType.NODE, DomainEventSubscriptionName.UNSUBSCRIBE),
         (target) => {
-            decrSocketRoomConnections(socket, buildDomainChannelName(DomainType.ANALYSIS_LOG, target));
+            unsubscribeSocketRoom(socket, buildDomainChannelName(DomainType.NODE, target));
         },
     );
 }

@@ -7,7 +7,7 @@
 
 import type { SocketInterface } from './type';
 
-export function incrSocketRoomConnections(
+export function subscribeSocketRoom(
     socket: SocketInterface,
     roomName: string,
 ) {
@@ -24,7 +24,7 @@ export function incrSocketRoomConnections(
     socket.join(roomName);
 }
 
-export function decrSocketRoomConnections(
+export function unsubscribeSocketRoom(
     socket: SocketInterface,
     roomName: string,
 ) {

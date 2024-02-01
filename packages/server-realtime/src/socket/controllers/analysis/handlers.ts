@@ -11,6 +11,7 @@ import {
     PermissionID,
     buildDomainChannelName,
     buildDomainEventSubscriptionFullName,
+    isSocketClientToServerEventCallback,
     isSocketClientToServerEventErrorCallback,
 } from '@personalhealthtrain/core';
 import { UnauthorizedError } from '@ebec/http';
@@ -20,20 +21,24 @@ import type {
     SocketServerInterface,
 } from '../../type';
 import {
-    decrSocketRoomConnections,
-    incrSocketRoomConnections,
+    unsubscribeSocketRoom,
+    subscribeSocketRoom,
 } from '../../utils';
 
-export function registerTrainFileSocketHandlers(
+export function registerAnalysisSocketHandlers(
     io: SocketServerInterface | SocketNamespaceInterface,
     socket: SocketInterface,
 ) {
     if (!socket.data.userId && !socket.data.robotId) return;
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainType.ANALYSIS_FILE, DomainEventSubscriptionName.SUBSCRIBE),
+        buildDomainEventSubscriptionFullName(DomainType.ANALYSIS, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
-            if (!socket.data.ability.has(PermissionID.ANALYSIS_EDIT)) {
+            if (
+                !socket.data.ability.has(PermissionID.ANALYSIS_EDIT) &&
+                !socket.data.ability.has(PermissionID.ANALYSIS_EXECUTION_START) &&
+                !socket.data.ability.has(PermissionID.ANALYSIS_EXECUTION_STOP)
+            ) {
                 if (isSocketClientToServerEventErrorCallback(cb)) {
                     cb(new UnauthorizedError());
                 }
@@ -41,18 +46,18 @@ export function registerTrainFileSocketHandlers(
                 return;
             }
 
-            incrSocketRoomConnections(socket, buildDomainChannelName(DomainType.ANALYSIS_FILE, target));
+            subscribeSocketRoom(socket, buildDomainChannelName(DomainType.ANALYSIS, target));
 
-            if (typeof cb === 'function') {
+            if (isSocketClientToServerEventCallback(cb)) {
                 cb();
             }
         },
     );
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainType.ANALYSIS_FILE, DomainEventSubscriptionName.UNSUBSCRIBE),
+        buildDomainEventSubscriptionFullName(DomainType.ANALYSIS, DomainEventSubscriptionName.UNSUBSCRIBE),
         (target) => {
-            decrSocketRoomConnections(socket, buildDomainChannelName(DomainType.ANALYSIS_FILE, target));
+            unsubscribeSocketRoom(socket, buildDomainChannelName(DomainType.ANALYSIS, target));
         },
     );
 }

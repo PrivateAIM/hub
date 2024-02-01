@@ -5,61 +5,52 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { registerTrainLogSocketHandlers } from './controllers/train-log/handlers';
-import { registerTrainSocketHandlers } from './controllers/train/handlers';
-import { registerUserHandlers } from './controllers/user/handlers';
+import { registerAnalysisLogSocketHandlers } from './controllers';
+import { registerAnalysisSocketHandlers } from './controllers';
 import type { SocketNamespaceInterface, SocketServerInterface } from './type';
-import { registerProposalSocketHandlers } from './controllers/proposal/handlers';
+import { registerProjectSocketHandlers } from './controllers';
 import {
     registerProposalStationForRealmSocketHandlers,
-    registerProposalStationSocketHandlers,
-} from './controllers/proposal-station/handlers';
+    registerProjectNodeSocketHandlers,
+} from './controllers';
 import {
     registerTrainStationForRealmSocketHandlers,
-    registerTrainStationSocketHandlers,
-} from './controllers/train-station/handlers';
-import { registerTrainFileSocketHandlers } from './controllers/train-file/handlers';
-import { registerStationSocketHandlers } from './controllers/station/handlers';
-import { registerRegistryProjectSocketHandlers } from './controllers/registry-project/handlers';
+    registerAnalysisNodeSocketHandlers,
+} from './controllers';
+import { registerAnalysisFileSocketHandlers } from './controllers';
+import { registerNodeSocketHandlers } from './controllers';
+import { registerRegistryProjectSocketHandlers } from './controllers';
 
 export function registerSocketHandlers(io: SocketServerInterface) {
     io.on('connection', (socket) => {
         // this will be the root namespace with all realm resources
 
-        if (socket.data.userId) {
-            registerUserHandlers(io, socket);
-        }
-
-        registerProposalSocketHandlers(io, socket);
-        registerProposalStationSocketHandlers(io, socket);
+        registerProjectSocketHandlers(io, socket);
+        registerProjectNodeSocketHandlers(io, socket);
 
         registerRegistryProjectSocketHandlers(io, socket);
 
-        registerStationSocketHandlers(io, socket);
+        registerNodeSocketHandlers(io, socket);
 
-        registerTrainSocketHandlers(io, socket);
-        registerTrainFileSocketHandlers(io, socket);
-        registerTrainLogSocketHandlers(io, socket);
-        registerTrainStationSocketHandlers(io, socket);
+        registerAnalysisSocketHandlers(io, socket);
+        registerAnalysisFileSocketHandlers(io, socket);
+        registerAnalysisLogSocketHandlers(io, socket);
+        registerAnalysisNodeSocketHandlers(io, socket);
     });
 }
 
 export function registerSocketNamespaceHandlers(io: SocketNamespaceInterface) {
     io.on('connection', (socket) => {
-        if (socket.data.userId) {
-            registerUserHandlers(io, socket);
-        }
-
-        registerProposalSocketHandlers(io, socket);
+        registerProjectSocketHandlers(io, socket);
         registerProposalStationForRealmSocketHandlers(io, socket);
 
         registerRegistryProjectSocketHandlers(io, socket);
 
-        registerStationSocketHandlers(io, socket);
+        registerNodeSocketHandlers(io, socket);
 
-        registerTrainSocketHandlers(io, socket);
-        registerTrainFileSocketHandlers(io, socket);
-        registerTrainLogSocketHandlers(io, socket);
+        registerAnalysisSocketHandlers(io, socket);
+        registerAnalysisFileSocketHandlers(io, socket);
+        registerAnalysisLogSocketHandlers(io, socket);
         registerTrainStationForRealmSocketHandlers(io, socket);
     });
 }
