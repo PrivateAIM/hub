@@ -14,9 +14,9 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { RegistryCommand } from '../../../../../components';
 import { buildRegistryPayload } from '../../../../../components/registry/utils/queue';
-import { NodeEntity } from '../../../../../domains/node';
-import { RegistryProjectEntity } from '../../../../../domains/registry-project/entity';
+import { NodeEntity, RegistryProjectEntity } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
+import { deleteNodeRobot } from '../utils';
 
 export async function deleteNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -62,6 +62,10 @@ export async function deleteNodeRouteHandler(req: Request, res: Response) : Prom
     }
 
     const { id: entityId } = entity;
+
+    if (entity.robot_id) {
+        await deleteNodeRobot(entity);
+    }
 
     await repository.remove(entity);
 

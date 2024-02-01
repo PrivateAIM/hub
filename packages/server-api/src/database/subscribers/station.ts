@@ -14,11 +14,9 @@ import {
 } from '@personalhealthtrain/core';
 import { publishDomainEvent } from '@personalhealthtrain/server-core';
 import type {
-    DataSource,
     EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
 import { EventSubscriber } from 'typeorm';
-import { useAuthupClient } from '../../core';
 import { NodeEntity } from '../../domains';
 
 async function publishEvent(
@@ -43,41 +41,6 @@ async function publishEvent(
     );
 }
 
-async function createRobot(dataSource: DataSource, entity: NodeEntity) {
-    const authupClient = useAuthupClient();
-    const response = await authupClient.robot.getMany({
-        page: {
-            limit: 1,
-        },
-        filter: {
-            name: entity.id,
-            realm_id: entity.realm_id,
-        },
-    });
-    if (response.data.length === 0) {
-        await authupClient.robot.create({
-            name: entity.id,
-            realm_id: entity.realm_id,
-        });
-    }
-}
-
-async function deleteRobot(dataSource: DataSource, entity: NodeEntity) {
-    const authupClient = useAuthupClient();
-    const response = await authupClient.robot.getMany({
-        page: {
-            limit: 1,
-        },
-        filter: {
-            name: entity.id,
-            realm_id: entity.realm_id,
-        },
-    });
-    if (response.data.length === 1) {
-        await authupClient.robot.delete(response.data[0].id);
-    }
-}
-
 @EventSubscriber()
 export class StationSubscriber implements EntitySubscriberInterface<NodeEntity> {
     listenTo(): CallableFunction | string {
@@ -86,19 +49,13 @@ export class StationSubscriber implements EntitySubscriberInterface<NodeEntity> 
 
     async afterInsert(event: InsertEvent<NodeEntity>): Promise<any> {
         await publishEvent(DomainEventName.CREATED, event.entity);
-
-        await createRobot(event.connection, event.entity);
     }
 
     async afterUpdate(event: UpdateEvent<NodeEntity>): Promise<any> {
         await publishEvent(DomainEventName.UPDATED, event.entity as NodeEntity);
-
-        await createRobot(event.connection, event.entity as NodeEntity);
     }
 
     async beforeRemove(event: RemoveEvent<NodeEntity>): Promise<any> {
         await publishEvent(DomainEventName.DELETED, event.entity);
-
-        await deleteRobot(event.connection, event.entity);
     }
 }

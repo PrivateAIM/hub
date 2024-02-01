@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Realm } from '@authup/core';
+import type { Realm, Robot } from '@authup/core';
 import type { DomainType } from '../constants';
 import type { RegistryProject } from '../registry-project';
 import type { Registry } from '../registry';
@@ -31,6 +31,10 @@ export interface Node {
     registry_project_id: RegistryProject['id'] | null;
 
     registry_project: RegistryProject;
+
+    // ------------------------------------------------------------------
+
+    robot_id: Robot['id'] | null;
 
     // ------------------------------------------------------------------
 

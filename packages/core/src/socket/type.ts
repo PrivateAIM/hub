@@ -36,6 +36,9 @@ export type SocketClientToServerEvents = {
         target?: SocketClientToServerEventTarget,
         cb?: SocketClientToServerEventCallback | SocketClientToServerEventErrorCallback
     ) => void
+} & {
+    nodeRegister: (cb?: SocketClientToServerEventCallback | SocketClientToServerEventErrorCallback) => void,
+    nodeUnregister: (cb?: SocketClientToServerEventCallback | SocketClientToServerEventErrorCallback) => void
 };
 
 // -----------------------------------

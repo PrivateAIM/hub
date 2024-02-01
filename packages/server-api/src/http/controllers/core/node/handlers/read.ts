@@ -40,11 +40,11 @@ async function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>,
             'updated_at',
         ],
         allowed: protectedFields,
-        defaultPath: 'station',
+        defaultPath: 'node',
     });
 
     const protectedSelected = fieldsParsed
-        .filter((field) => field.path === 'station' &&
+        .filter((field) => field.path === 'node' &&
             protectedFields.indexOf(field.key as any) !== -1);
 
     if (protectedSelected.length > 0) {
@@ -59,10 +59,10 @@ async function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>,
             );
         }
 
-        onlyRealmWritableQueryResources(query, useRequestEnv(req, 'realm'), 'station.realm_id');
+        onlyRealmWritableQueryResources(query, useRequestEnv(req, 'realm'), 'node.realm_id');
     }
 
-    applyQueryFieldsParseOutput(query, fieldsParsed, { defaultAlias: 'station' });
+    applyQueryFieldsParseOutput(query, fieldsParsed, { defaultAlias: 'node' });
 }
 
 export async function getOneNodeRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -71,13 +71,13 @@ export async function getOneNodeRouteHandler(req: Request, res: Response) : Prom
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(NodeEntity);
-    const query = repository.createQueryBuilder('station')
-        .where('station.id = :id', { id });
+    const query = repository.createQueryBuilder('node')
+        .where('node.id = :id', { id });
 
     await checkAndApplyFields(req, query, fields);
 
     applyRelations(query, include, {
-        defaultAlias: 'station',
+        defaultAlias: 'node',
         allowed: ['registry_project', 'registry'],
     });
 
@@ -97,18 +97,18 @@ export async function getManyNodeRouteHandler(req: Request, res: Response) : Pro
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(NodeEntity);
-    const query = repository.createQueryBuilder('station');
+    const query = repository.createQueryBuilder('node');
 
     await checkAndApplyFields(req, query, fields);
 
     applyRelations(query, include, {
-        defaultAlias: 'station',
+        defaultAlias: 'node',
         allowed: ['registry_project', 'registry'],
     });
 
     applyFilters(query, filter, {
-        allowed: ['id', 'name', 'hidden', 'realm_id'],
-        defaultAlias: 'station',
+        allowed: ['id', 'name', 'hidden', 'realm_id', 'robot_id'],
+        defaultAlias: 'node',
     });
 
     const pagination = applyPagination(query, page, { maxLimit: 50 });

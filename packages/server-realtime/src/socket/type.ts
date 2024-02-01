@@ -6,6 +6,7 @@
  */
 
 import type {
+    Node,
     SocketClientToServerEvents,
     SocketServerToClientEvents,
 } from '@personalhealthtrain/core';
@@ -24,7 +25,9 @@ export type SocketDataInterface = {
     userId?: User['id'],
     robotId?: Robot['id'],
 
-    roomConnections: Record<string, number>
+    nodeId?: Node['id'],
+
+    roomConnections: Record<string, number>,
 };
 
 export type SocketServerInterface = Server<

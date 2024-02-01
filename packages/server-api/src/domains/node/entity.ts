@@ -15,11 +15,11 @@ import {
     PrimaryGeneratedColumn, Unique,
     UpdateDateColumn,
 } from 'typeorm';
-import type { Registry, Node } from '@personalhealthtrain/core';
+import type { Node, Registry } from '@personalhealthtrain/core';
 import {
     RegistryProject,
 } from '@personalhealthtrain/core';
-import type { Realm } from '@authup/core';
+import type {Realm, Robot} from '@authup/core';
 import { RegistryProjectEntity } from '../registry-project';
 import { RegistryEntity } from '../registry';
 
@@ -59,6 +59,9 @@ export class NodeEntity implements Node {
     @ManyToOne(() => RegistryProjectEntity, { onDelete: 'CASCADE', nullable: true })
     @JoinColumn({ name: 'registry_project_id' })
         registry_project: RegistryProject;
+
+    @Column({ type: 'uuid', nullable: true })
+        robot_id: Robot['id'] | null;
 
     @Column({ type: 'uuid' })
         realm_id: Realm['id'];
