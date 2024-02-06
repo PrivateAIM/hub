@@ -50,3 +50,9 @@ SocketServerToClientEvents,
 DefaultEventsMap,
 SocketDataInterface
 >;
+
+export type SocketHandlerContext = {
+    server: SocketServerInterface,
+    socket: SocketInterface,
+    namespace?: SocketNamespaceInterface
+}

@@ -94,6 +94,8 @@ export function createSocketServer(context : SocketServerContext) : Server {
         next();
     });
 
+    // server.of('foo').adapter.rooms.get('xxx')
+
     useLogger().info('Registering socket controllers...');
 
     // register handlers
@@ -128,7 +130,7 @@ export function createSocketServer(context : SocketServerContext) : Server {
         next();
     });
 
-    registerSocketNamespaceHandlers(realmWorkspaces);
+    registerSocketNamespaceHandlers(realmWorkspaces, server);
 
     return server;
 }

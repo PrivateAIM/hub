@@ -70,7 +70,7 @@ export default defineComponent({
 
                 return undefined;
             },
-            type: `${DomainType.TRAIN_STATION}`,
+            type: `${DomainType.ANALYSIS_NODE}`,
             setup,
             props,
             socket: {
@@ -98,7 +98,7 @@ export default defineComponent({
                         return buildDomainChannelName(DomainSubType.ANALYSIS_NODE_OUT, id);
                     }
 
-                    return buildDomainChannelName(DomainType.TRAIN_STATION, id);
+                    return buildDomainChannelName(DomainType.ANALYSIS_NODE, id);
                 },
             },
         });

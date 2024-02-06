@@ -15,19 +15,14 @@ import {
 } from '@personalhealthtrain/core';
 import { UnauthorizedError } from '@ebec/http';
 import type {
-    SocketInterface,
-    SocketNamespaceInterface,
-    SocketServerInterface,
+    SocketHandlerContext,
 } from '../../type';
 import {
-    unsubscribeSocketRoom,
     subscribeSocketRoom,
+    unsubscribeSocketRoom,
 } from '../../utils';
 
-export function registerAnalysisFileSocketHandlers(
-    io: SocketServerInterface | SocketNamespaceInterface,
-    socket: SocketInterface,
-) {
+export function registerAnalysisFileSocketHandlers({ socket }: SocketHandlerContext) {
     if (!socket.data.userId && !socket.data.robotId) return;
 
     socket.on(

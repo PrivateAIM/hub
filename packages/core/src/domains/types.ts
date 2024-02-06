@@ -53,7 +53,7 @@ export type DomainEventContext<T extends `${DomainType}` | `${DomainSubType}`> =
                                         AnalysisLogEventContext :
                                         T extends `${DomainType.ANALYSIS_FILE}` ?
                                             AnalysisFileEventContext :
-                                            T extends `${DomainType.TRAIN_STATION}` | `${DomainSubType.ANALYSIS_NODE_IN}` | `${DomainSubType.ANALYSIS_NODE_OUT}` ?
+                                            T extends `${DomainType.ANALYSIS_NODE}` | `${DomainSubType.ANALYSIS_NODE_IN}` | `${DomainSubType.ANALYSIS_NODE_OUT}` ?
                                                 TrainStationEventContext :
                                                 never;
 
@@ -78,7 +78,7 @@ export type DomainEntity<T extends `${DomainType}` | `${DomainSubType}`> =
                                         AnalysisLog :
                                         T extends `${DomainType.ANALYSIS_FILE}` ?
                                             AnalysisFile :
-                                            T extends `${DomainType.TRAIN_STATION}` | `${DomainSubType.ANALYSIS_NODE_IN}` | `${DomainSubType.ANALYSIS_NODE_OUT}` ?
+                                            T extends `${DomainType.ANALYSIS_NODE}` | `${DomainSubType.ANALYSIS_NODE_IN}` | `${DomainSubType.ANALYSIS_NODE_OUT}` ?
                                                 AnalysisNode :
                                                 never;
 

@@ -5,27 +5,29 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { NodeSocketServerMessage } from '@personalhealthtrain/core';
 import {
     DomainEventSubscriptionName,
     DomainType,
+    NodeSocketClientEventName,
+    NodeSocketServerEventName,
     PermissionID,
     buildDomainChannelName,
     buildDomainEventSubscriptionFullName,
+    buildSocketRealmNamespaceName,
     isSocketClientToServerEventCallback,
     isSocketClientToServerEventErrorCallback,
 } from '@personalhealthtrain/core';
 import { UnauthorizedError } from '@ebec/http';
 import { useAPIClient } from '../../../core';
-import type { SocketInterface, SocketNamespaceInterface, SocketServerInterface } from '../../type';
+import type { SocketHandlerContext } from '../../type';
 import { subscribeSocketRoom, unsubscribeSocketRoom } from '../../utils';
-import { NodeSocketEventName } from './constants';
 import { buildNodeSocketRoom } from './utils';
 
-export function registerNodeSocketHandlers(
-    io: SocketServerInterface | SocketNamespaceInterface,
-    socket: SocketInterface,
-) {
+export function registerNodeSocketHandlers({ socket, server }: SocketHandlerContext) {
     if (!socket.data.userId && !socket.data.robotId) return;
+
+    const apiClient = useAPIClient();
 
     socket.on(
         buildDomainEventSubscriptionFullName(DomainType.NODE, DomainEventSubscriptionName.SUBSCRIBE),
@@ -55,14 +57,12 @@ export function registerNodeSocketHandlers(
         },
     );
 
-    const apiClient = useAPIClient();
-
     socket.on(
-        NodeSocketEventName.REGISTER,
+        NodeSocketClientEventName.CONNECT,
         async (cb) => {
             if (!socket.data.robotId) {
                 if (isSocketClientToServerEventErrorCallback(cb)) {
-                // todo: error with custom error code
+                    // todo: error with custom error code
                     cb(new Error('Only robot accounts are permitted for this event.'));
                 }
 
@@ -98,6 +98,8 @@ export function registerNodeSocketHandlers(
 
             subscribeSocketRoom(socket, buildNodeSocketRoom(node.id));
 
+            // todo: check socket.data.socketRooms size and emit connected
+
             if (isSocketClientToServerEventCallback(cb)) {
                 cb();
             }
@@ -105,15 +107,42 @@ export function registerNodeSocketHandlers(
     );
 
     socket.on(
-        NodeSocketEventName.UNREGISTER,
+        NodeSocketClientEventName.DISCONNECT,
         async (cb) => {
             if (socket.data.nodeId) {
                 unsubscribeSocketRoom(socket, buildNodeSocketRoom(socket.data.nodeId));
             }
+
+            // todo: check socket.data.socketRooms size and emit disconnected
 
             if (isSocketClientToServerEventCallback(cb)) {
                 cb();
             }
         },
     );
+
+    socket.on(
+        NodeSocketClientEventName.MESSAGE,
+        async (data) => {
+            const response = await apiClient.node.getMany({
+                filters: {
+                    id: data.to,
+                },
+            });
+
+            for (let i = 0; i < response.data.length; i++) {
+                const message : NodeSocketServerMessage = {
+                    from: socket.data.nodeId,
+                    data: data.data,
+                    metadata: data.metadata,
+                };
+
+                server.of(buildSocketRealmNamespaceName(response.data[i].realm_id))
+                    .to(buildNodeSocketRoom(response.data[i].id))
+                    .emit(NodeSocketServerEventName.MESSAGE, message);
+            }
+        },
+    );
+
+    // todo: listen for disconnect -> check socket.data.socketRooms
 }

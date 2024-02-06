@@ -33,7 +33,7 @@ async function publishEvent(
 ) {
     await publishDomainEvent(
         {
-            type: DomainType.TRAIN_STATION,
+            type: DomainType.ANALYSIS_NODE,
             event,
             data,
         },
@@ -47,7 +47,7 @@ async function publishEvent(
                 namespace: buildDomainNamespaceName(data.analysis_realm_id),
             },
             {
-                channel: (id) => buildDomainChannelName(DomainType.TRAIN_STATION, id),
+                channel: (id) => buildDomainChannelName(DomainType.ANALYSIS_NODE, id),
             },
             {
                 channel: (id) => buildDomainChannelName(DomainSubType.ANALYSIS_NODE_IN, id),

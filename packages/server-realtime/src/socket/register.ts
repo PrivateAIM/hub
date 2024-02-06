@@ -5,52 +5,64 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { registerAnalysisLogSocketHandlers } from './controllers';
-import { registerAnalysisSocketHandlers } from './controllers';
-import type { SocketNamespaceInterface, SocketServerInterface } from './type';
-import { registerProjectSocketHandlers } from './controllers';
 import {
-    registerProposalStationForRealmSocketHandlers,
-    registerProjectNodeSocketHandlers,
-} from './controllers';
-import {
-    registerTrainStationForRealmSocketHandlers,
+    registerAnalysisFileSocketHandlers,
+    registerAnalysisLogSocketHandlers,
     registerAnalysisNodeSocketHandlers,
+    registerAnalysisSocketHandlers,
+    registerNodeSocketHandlers,
+    registerProjectNodeForRealmSocketHandlers,
+    registerProjectNodeSocketHandlers,
+    registerProjectSocketHandlers,
+    registerRegistryProjectSocketHandlers,
+    registerAnalysisNodeForRealmSocketHandlers,
 } from './controllers';
-import { registerAnalysisFileSocketHandlers } from './controllers';
-import { registerNodeSocketHandlers } from './controllers';
-import { registerRegistryProjectSocketHandlers } from './controllers';
+import type { SocketHandlerContext, SocketNamespaceInterface, SocketServerInterface } from './type';
 
-export function registerSocketHandlers(io: SocketServerInterface) {
-    io.on('connection', (socket) => {
+export function registerSocketHandlers(server: SocketServerInterface) {
+    server.on('connection', (socket) => {
         // this will be the root namespace with all realm resources
 
-        registerProjectSocketHandlers(io, socket);
-        registerProjectNodeSocketHandlers(io, socket);
+        const context : SocketHandlerContext = {
+            server,
+            socket,
+        };
 
-        registerRegistryProjectSocketHandlers(io, socket);
+        registerProjectSocketHandlers(context);
+        registerProjectNodeSocketHandlers(context);
 
-        registerNodeSocketHandlers(io, socket);
+        registerRegistryProjectSocketHandlers(context);
 
-        registerAnalysisSocketHandlers(io, socket);
-        registerAnalysisFileSocketHandlers(io, socket);
-        registerAnalysisLogSocketHandlers(io, socket);
-        registerAnalysisNodeSocketHandlers(io, socket);
+        registerNodeSocketHandlers(context);
+
+        registerAnalysisSocketHandlers(context);
+        registerAnalysisFileSocketHandlers(context);
+        registerAnalysisLogSocketHandlers(context);
+        registerAnalysisNodeSocketHandlers(context);
     });
 }
 
-export function registerSocketNamespaceHandlers(io: SocketNamespaceInterface) {
-    io.on('connection', (socket) => {
-        registerProjectSocketHandlers(io, socket);
-        registerProposalStationForRealmSocketHandlers(io, socket);
+export function registerSocketNamespaceHandlers(
+    namespace: SocketNamespaceInterface,
+    server: SocketServerInterface,
+) {
+    namespace.on('connection', (socket) => {
+        const context : SocketHandlerContext = {
+            server,
+            socket,
+            namespace,
+        };
 
-        registerRegistryProjectSocketHandlers(io, socket);
+        registerProjectSocketHandlers(context);
+        registerProjectNodeForRealmSocketHandlers(context);
 
-        registerNodeSocketHandlers(io, socket);
+        registerRegistryProjectSocketHandlers(context);
 
-        registerAnalysisSocketHandlers(io, socket);
-        registerAnalysisFileSocketHandlers(io, socket);
-        registerAnalysisLogSocketHandlers(io, socket);
-        registerTrainStationForRealmSocketHandlers(io, socket);
+        registerNodeSocketHandlers(context);
+
+        registerAnalysisSocketHandlers(context);
+        registerAnalysisFileSocketHandlers(context);
+        registerAnalysisLogSocketHandlers(context);
+        registerAnalysisNodeForRealmSocketHandlers(context);
     });
 }

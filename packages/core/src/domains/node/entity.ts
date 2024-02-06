@@ -6,10 +6,12 @@
  */
 
 import type { Realm, Robot } from '@authup/core';
+import type { SocketClientToServerEventCallback, SocketClientToServerEventErrorCallback, SocketServerToClientEventContext } from '../../socket';
 import type { DomainType } from '../constants';
 import type { RegistryProject } from '../registry-project';
 import type { Registry } from '../registry';
 import type { DomainEventBaseContext } from '../types-base';
+import type { NodeSocketClientEventName, NodeSocketServerEventName } from './constants';
 
 export interface Node {
     id: string;
@@ -50,4 +52,49 @@ export interface Node {
 export type NodeEventContext = DomainEventBaseContext & {
     type: `${DomainType.NODE}`,
     data: Node
+};
+
+export type NodeSocketClientMessage = {
+    to: Node['id'][],
+    data: Record<string, any>,
+    metadata: Record<string, any>
+};
+
+export type NodeSocketClientToServerEvents = {
+    [NodeSocketClientEventName.CONNECT]: (
+        cb?: SocketClientToServerEventCallback | SocketClientToServerEventErrorCallback
+    ) => void,
+    [NodeSocketClientEventName.DISCONNECT]: (
+        cb?: SocketClientToServerEventCallback | SocketClientToServerEventErrorCallback
+    ) => void,
+    [NodeSocketClientEventName.MESSAGE]: (
+        data: NodeSocketClientMessage
+    ) => void
+};
+
+export type NodeSocketEventConnectedContext = {
+    data: {
+        id: Node['id']
+    }
+};
+
+export type NodeSocketEventDisconnectedContext = NodeSocketEventConnectedContext;
+
+export type NodeSocketServerMessage = {
+    from: Node['id'],
+    data: Record<string, any>,
+    metadata: Record<string, any>
+};
+
+export type NodeSocketServerToClientEvents = {
+    [NodeSocketServerEventName.CONNECTED]: (
+        data: SocketServerToClientEventContext<NodeSocketEventConnectedContext>
+    ) => void,
+    [NodeSocketServerEventName.DISCONNECTED]: (
+        data: SocketServerToClientEventContext<NodeSocketEventDisconnectedContext>
+    ) => void,
+    [NodeSocketServerEventName.MESSAGE]: (
+        data: NodeSocketServerMessage,
+        cb?: SocketClientToServerEventCallback | SocketClientToServerEventErrorCallback
+    ) => void
 };

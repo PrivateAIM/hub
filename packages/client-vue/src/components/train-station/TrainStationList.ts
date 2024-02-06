@@ -67,7 +67,7 @@ export default defineComponent({
                         return room === buildDomainChannelName(DomainSubType.ANALYSIS_NODE_OUT);
                 }
             } else {
-                return room === buildDomainChannelName(DomainType.TRAIN_STATION);
+                return room === buildDomainChannelName(DomainType.ANALYSIS_NODE);
             }
 
             return false;
@@ -96,7 +96,7 @@ export default defineComponent({
             render,
             setDefaults,
         } = createList({
-            type: `${DomainType.TRAIN_STATION}`,
+            type: `${DomainType.ANALYSIS_NODE}`,
             props,
             setup: ctx,
             socket: {
@@ -120,7 +120,7 @@ export default defineComponent({
                     }
 
                     return buildDomainEventSubscriptionFullName(
-                        DomainType.TRAIN_STATION,
+                        DomainType.ANALYSIS_NODE,
                         DomainEventSubscriptionName.SUBSCRIBE,
                     );
                 },
@@ -140,7 +140,7 @@ export default defineComponent({
                     }
 
                     return buildDomainEventSubscriptionFullName(
-                        DomainType.TRAIN_STATION,
+                        DomainType.ANALYSIS_NODE,
                         DomainEventSubscriptionName.UNSUBSCRIBE,
                     );
                 },

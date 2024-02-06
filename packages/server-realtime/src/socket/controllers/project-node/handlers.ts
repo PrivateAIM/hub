@@ -17,19 +17,14 @@ import {
 } from '@personalhealthtrain/core';
 import { UnauthorizedError } from '@ebec/http';
 import type {
-    SocketInterface,
-    SocketNamespaceInterface,
-    SocketServerInterface,
+    SocketHandlerContext
 } from '../../type';
 import {
-    unsubscribeSocketRoom,
     subscribeSocketRoom,
+    unsubscribeSocketRoom,
 } from '../../utils';
 
-export function registerProjectNodeSocketHandlers(
-    io: SocketServerInterface | SocketNamespaceInterface,
-    socket: SocketInterface,
-) {
+export function registerProjectNodeSocketHandlers({ socket }: SocketHandlerContext) {
     if (!socket.data.userId && !socket.data.robotId) return;
 
     // ------------------------------------------------------------
@@ -63,10 +58,7 @@ export function registerProjectNodeSocketHandlers(
     );
 }
 
-export function registerProposalStationForRealmSocketHandlers(
-    io: SocketServerInterface | SocketNamespaceInterface,
-    socket: SocketInterface,
-) {
+export function registerProjectNodeForRealmSocketHandlers({ socket }: SocketHandlerContext) {
     if (!socket.data.userId && !socket.data.robotId) return;
 
     // ------------------------------------------------------------

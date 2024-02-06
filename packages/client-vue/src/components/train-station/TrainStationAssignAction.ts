@@ -27,7 +27,7 @@ export default defineComponent({
     emits: defineEntityManagerEvents<AnalysisNode>(),
     async setup(props, setup) {
         const manager = createEntityManager({
-            type: `${DomainType.TRAIN_STATION}`,
+            type: `${DomainType.ANALYSIS_NODE}`,
             setup,
             socket: {
                 processEvent(event) {

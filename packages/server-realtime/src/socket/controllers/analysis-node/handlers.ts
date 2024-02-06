@@ -17,25 +17,20 @@ import {
 } from '@personalhealthtrain/core';
 import { UnauthorizedError } from '@ebec/http';
 import type {
-    SocketInterface,
-    SocketNamespaceInterface,
-    SocketServerInterface,
+    SocketHandlerContext,
 } from '../../type';
 import {
-    unsubscribeSocketRoom,
     subscribeSocketRoom,
+    unsubscribeSocketRoom,
 } from '../../utils';
 
-export function registerAnalysisNodeSocketHandlers(
-    io: SocketServerInterface | SocketNamespaceInterface,
-    socket: SocketInterface,
-) {
+export function registerAnalysisNodeSocketHandlers({ socket } : SocketHandlerContext) {
     if (!socket.data.userId && !socket.data.robotId) return;
 
     // ------------------------------------------------------------
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainType.TRAIN_STATION, DomainEventSubscriptionName.SUBSCRIBE),
+        buildDomainEventSubscriptionFullName(DomainType.ANALYSIS_NODE, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             if (
                 !socket.data.ability.has(PermissionID.ANALYSIS_APPROVE)
@@ -47,7 +42,7 @@ export function registerAnalysisNodeSocketHandlers(
                 return;
             }
 
-            subscribeSocketRoom(socket, buildDomainChannelName(DomainType.TRAIN_STATION, target));
+            subscribeSocketRoom(socket, buildDomainChannelName(DomainType.ANALYSIS_NODE, target));
 
             if (isSocketClientToServerEventCallback(cb)) {
                 cb();
@@ -56,17 +51,14 @@ export function registerAnalysisNodeSocketHandlers(
     );
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainType.TRAIN_STATION, DomainEventSubscriptionName.SUBSCRIBE),
+        buildDomainEventSubscriptionFullName(DomainType.ANALYSIS_NODE, DomainEventSubscriptionName.SUBSCRIBE),
         (target) => {
-            unsubscribeSocketRoom(socket, buildDomainChannelName(DomainType.TRAIN_STATION, target));
+            unsubscribeSocketRoom(socket, buildDomainChannelName(DomainType.ANALYSIS_NODE, target));
         },
     );
 }
 
-export function registerTrainStationForRealmSocketHandlers(
-    io: SocketServerInterface | SocketNamespaceInterface,
-    socket: SocketInterface,
-) {
+export function registerAnalysisNodeForRealmSocketHandlers({ socket } : SocketHandlerContext) {
     if (!socket.data.userId && !socket.data.robotId) return;
 
     // ------------------------------------------------------------

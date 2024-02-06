@@ -31,7 +31,7 @@ export function useDomainAPI(
             return client.analysis;
         case DomainType.ANALYSIS_FILE:
             return client.analysisFile;
-        case DomainType.TRAIN_STATION:
+        case DomainType.ANALYSIS_NODE:
             return client.analysisNode;
         case DomainType.SERVICE:
             return client.service;

@@ -6,14 +6,17 @@
  */
 
 import type {
-    DomainEventBaseContext,
+    AnalyseNodeSocketClientToServerEvents,
     DomainEventContext,
-    DomainEventFullName, DomainEventSubscriptionFullName,
+    DomainEventFullName,
+    DomainEventSubscriptionFullName,
     DomainSubType,
     DomainType,
+    NodeSocketClientToServerEvents,
+    NodeSocketServerToClientEvents,
 } from '../domains';
 
-export type SocketServerToClientEventContext<T extends DomainEventBaseContext> = T & {
+export type SocketServerToClientEventContext<T extends Record<string, any>> = T & {
     meta: {
         roomName?: string,
         roomId?: string | number
@@ -24,7 +27,8 @@ export type SocketServerToClientEvents = {
     [K in `${DomainType}` | `${DomainSubType}` as DomainEventFullName<K>]: (
         data: SocketServerToClientEventContext<DomainEventContext<K>>
     ) => void
-};
+} &
+NodeSocketServerToClientEvents;
 // ------------------------------------------------------------------------------------
 
 export type SocketClientToServerEventTarget = string | number | undefined;
@@ -36,9 +40,8 @@ export type SocketClientToServerEvents = {
         target?: SocketClientToServerEventTarget,
         cb?: SocketClientToServerEventCallback | SocketClientToServerEventErrorCallback
     ) => void
-} & {
-    nodeRegister: (cb?: SocketClientToServerEventCallback | SocketClientToServerEventErrorCallback) => void,
-    nodeUnregister: (cb?: SocketClientToServerEventCallback | SocketClientToServerEventErrorCallback) => void
-};
+} &
+AnalyseNodeSocketClientToServerEvents &
+NodeSocketClientToServerEvents;
 
 // -----------------------------------
