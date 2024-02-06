@@ -32,6 +32,8 @@ async function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>,
             'name',
             'external_name',
             'hidden',
+            'type',
+            'online',
             'robot_id',
             'realm_id',
             'registry_id',
@@ -107,7 +109,7 @@ export async function getManyNodeRouteHandler(req: Request, res: Response) : Pro
     });
 
     applyFilters(query, filter, {
-        allowed: ['id', 'name', 'hidden', 'realm_id', 'robot_id'],
+        allowed: ['id', 'name', 'online', 'hidden', 'realm_id', 'robot_id'],
         defaultAlias: 'node',
     });
 

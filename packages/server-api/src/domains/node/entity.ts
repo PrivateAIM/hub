@@ -17,9 +17,10 @@ import {
 } from 'typeorm';
 import type { Node, Registry } from '@personalhealthtrain/core';
 import {
+    NodeType,
     RegistryProject,
 } from '@personalhealthtrain/core';
-import type {Realm, Robot} from '@authup/core';
+import type { Realm, Robot } from '@authup/core';
 import { RegistryProjectEntity } from '../registry-project';
 import { RegistryEntity } from '../registry';
 
@@ -43,6 +44,16 @@ export class NodeEntity implements Node {
 
     @Column({ type: 'boolean', default: false })
         hidden: boolean;
+
+    @Column({
+        type: 'varchar', length: 64, default: NodeType.DEFAULT,
+    })
+        type: NodeType;
+
+    @Column({
+        type: 'boolean', default: false,
+    })
+        online: boolean;
 
     // ------------------------------------------------------------------
 

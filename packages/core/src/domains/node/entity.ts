@@ -11,7 +11,7 @@ import type { DomainType } from '../constants';
 import type { RegistryProject } from '../registry-project';
 import type { Registry } from '../registry';
 import type { DomainEventBaseContext } from '../types-base';
-import type { NodeSocketClientEventName, NodeSocketServerEventName } from './constants';
+import type { NodeSocketClientEventName, NodeSocketServerEventName, NodeType } from './constants';
 
 export interface Node {
     id: string;
@@ -23,6 +23,10 @@ export interface Node {
     email: string | null;
 
     hidden: boolean;
+
+    type: `${NodeType}`;
+
+    online: boolean;
 
     // ------------------------------------------------------------------
 
