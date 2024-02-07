@@ -11,7 +11,7 @@ import {
     readBoolOrStringFromProcessEnv,
     readFromProcessEnv,
     readIntFromProcessEnv
-} from '@personalhealthtrain/server-core';
+} from '@privateaim/flame-server-kit';
 import { config } from 'dotenv';
 import type { EnvironmentName } from './constants';
 import type { Environment } from './type';

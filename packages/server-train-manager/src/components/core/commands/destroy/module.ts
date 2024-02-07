@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { generateTrainMinioBucketName } from '@personalhealthtrain/server-core';
+import { generateTrainMinioBucketName } from '@privateaim/flame-server-kit';
 import { getMinioBucketObjectList, useMinio } from '../../../../core';
 import type { CoreDestroyPayload } from '../../type';
 

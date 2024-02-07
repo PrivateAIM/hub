@@ -7,8 +7,8 @@
 
 import type {
     Component,
-} from '@personalhealthtrain/server-core';
-import { isComponentCommandQueuePayload } from '@personalhealthtrain/server-core';
+} from '@privateaim/flame-server-kit';
+import { isComponentCommandQueuePayload } from '@privateaim/flame-server-kit';
 import { consume } from 'amqp-extension';
 import { ComponentName } from '../../../constants';
 import { executeCoreCommand } from '../../../core';

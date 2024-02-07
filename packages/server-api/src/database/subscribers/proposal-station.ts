@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { publishDomainEvent } from '@personalhealthtrain/server-core';
+import { publishDomainEvent } from '@privateaim/flame-server-kit';
 import type {
     EntitySubscriberInterface,
     InsertEvent,

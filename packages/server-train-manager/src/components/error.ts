@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentErrorOptions } from '@personalhealthtrain/server-core';
-import { ComponentError } from '@personalhealthtrain/server-core';
+import type { ComponentErrorOptions } from '@privateaim/flame-server-kit';
+import { ComponentError } from '@privateaim/flame-server-kit';
 import { ErrorCode } from './constants';
 
 export class BaseError extends ComponentError {

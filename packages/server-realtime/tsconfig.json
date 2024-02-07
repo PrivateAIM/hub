@@ -5,8 +5,8 @@
             "@personalhealthtrain/core": [
                 "./packages/core/src"
             ],
-            "@personalhealthtrain/server-core": [
-                "./packages/server-core/src"
+            "@privateaim/flame-server-kit": [
+                "./packages/server-kit/src"
             ]
         }
     }

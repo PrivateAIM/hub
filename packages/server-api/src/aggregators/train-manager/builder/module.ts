@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ComponentError, isComponentContextWithError } from '@personalhealthtrain/server-core';
-import type { ComponentContextWithError } from '@personalhealthtrain/server-core';
+import { ComponentError, isComponentContextWithError } from '@privateaim/flame-server-kit';
+import type { ComponentContextWithError } from '@privateaim/flame-server-kit';
 import {
     BuilderCommand,
     BuilderEvent,

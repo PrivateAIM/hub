@@ -12,7 +12,7 @@ import {
     buildDomainChannelName,
     buildDomainNamespaceName,
 } from '@personalhealthtrain/core';
-import { publishDomainEvent } from '@personalhealthtrain/server-core';
+import { publishDomainEvent } from '@privateaim/flame-server-kit';
 import type {
     EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';

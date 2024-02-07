@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentContextWithCommand, ComponentContextWithError } from '@personalhealthtrain/server-core';
+import type { ComponentContextWithCommand, ComponentContextWithError } from '@privateaim/flame-server-kit';
 import { publish } from 'amqp-extension';
 import type { BuilderCommand } from '../constants';
 import { BuilderEvent } from '../constants';

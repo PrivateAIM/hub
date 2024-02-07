@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ComponentError, isComponentEventQueuePayload } from '@personalhealthtrain/server-core';
+import { ComponentError, isComponentEventQueuePayload } from '@privateaim/flame-server-kit';
 import { ComponentName } from '@personalhealthtrain/server-train-manager';
 import type { ConsumeMessage } from 'amqp-extension';
 import { consume } from 'amqp-extension';

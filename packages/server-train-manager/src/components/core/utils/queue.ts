@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { transformComponentErrorForQueuePayload } from '@personalhealthtrain/server-core';
-import type { ComponentContextWithError } from '@personalhealthtrain/server-core';
+import { transformComponentErrorForQueuePayload } from '@privateaim/flame-server-kit';
+import type { ComponentContextWithError } from '@privateaim/flame-server-kit';
 import type { PublishOptionsExtended } from 'amqp-extension';
 import { ComponentName } from '../../constants';
 import type { QueueRouterPayload } from '../../utils';

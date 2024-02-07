@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentContextWithError } from '@personalhealthtrain/server-core';
+import type { ComponentContextWithError } from '@privateaim/flame-server-kit';
 import { publish } from 'amqp-extension';
 import { CoreEvent } from '../constants';
 import type { CoreCommandContext } from '../type';

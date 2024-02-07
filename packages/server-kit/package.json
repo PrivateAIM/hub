@@ -1,5 +1,6 @@
 {
-    "name": "@personalhealthtrain/server-core",
+    "name": "@privateaim/flame-server-kit",
+    "version": "0.0.0",
     "private": true,
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -9,8 +10,7 @@
         "url": "https://tada5hi.net"
     },
     "license": "MIT",
-    "version": "2.5.2",
-    "description": "This package contains the common packages for server applications of the PHT.",
+    "description": "This package contains common constants, functions, types, ... for the server side.",
     "scripts": {
         "build": "tsc -p tsconfig.build.json"
     },

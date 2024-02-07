@@ -29,8 +29,8 @@ The repository contains the following packages:
 - **@privateaim/flame-client-vue** 🧩: This package contains vue components for frontend applications.
 
 **`Server`**
-- **@privateaim/flame-server-core** 🧱: This package contains common constants, functions, types, ... for the server side.
-- **@privateaim/flame-server-api** 🌴: This package contains aggregators, components and many more.
+- **@privateaim/flame-server-kit** 🧱: This package contains common constants, functions, types, ... for the server side.
+- **@privateaim/flame-server-core** 🌴: This package contains aggregators, components and many more.
 - **@privateaim/flame-server-realtime** 🚄: This package contains the realtime application which connects the API with socket based clients.
 - **@privateaim/flame-server-train-manager** 🏭: This package contains the train manager, which is responsible to route, build and extract a train.
 

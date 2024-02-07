@@ -6,7 +6,7 @@
  */
 
 import { ROBOT_SYSTEM_NAME, mountClientResponseErrorTokenHook } from '@authup/core';
-import type { Aggregator, Component } from '@personalhealthtrain/server-core';
+import type { Aggregator, Component } from '@privateaim/flame-server-kit';
 import { setClient as setHTTPClient } from 'hapic';
 import {
     APIClient,
