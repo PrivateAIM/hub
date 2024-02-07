@@ -41,7 +41,7 @@
     },
     "homepage": "https://github.com/PHT-Medic/central#readme",
     "devDependencies": {
-        "@authup/client-vue": "^1.0.0-beta.1",
+        "@authup/client-vue": "^1.0.0-beta.3",
         "@authup/core": "^1.0.0-beta.3",
         "@personalhealthtrain/core": "2.5.2",
         "@types/node": "^20.11.10",
