@@ -8,7 +8,7 @@
 import {
     Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn,
 } from 'typeorm';
-import type { MasterImage, Project } from '@personalhealthtrain/core';
+import type { MasterImage, Project } from '@privateaim/core';
 import type { Realm, User } from '@authup/core';
 import { MasterImageEntity } from '../master-image';
 

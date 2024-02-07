@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { AnalysisNodeApprovalStatus, PermissionID } from '@personalhealthtrain/core';
+import { AnalysisNodeApprovalStatus, PermissionID } from '@privateaim/core';
 import { BadRequestError, ForbiddenError } from '@ebec/http';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';

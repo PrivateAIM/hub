@@ -7,7 +7,7 @@
 
 import type {
     AnalysisLog,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 
 import {
     DController, DDelete, DGet, DPath, DRequest, DResponse, DTags,

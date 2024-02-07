@@ -5,13 +5,13 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Analysis } from '@personalhealthtrain/core';
+import type { Analysis } from '@privateaim/core';
 import {
     PermissionID,
     AnalysisAPICommand, AnalysisBuildStatus,
     AnalysisConfigurationStatus, AnalysisResultStatus,
     AnalysisRunStatus,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import type { PropType } from 'vue';
 import { computed, defineComponent } from 'vue';
 import { VCLink } from '@vuecs/link';

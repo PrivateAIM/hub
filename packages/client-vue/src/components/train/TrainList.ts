@@ -4,10 +4,10 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { DomainType } from '@personalhealthtrain/core';
+import { DomainType } from '@privateaim/core';
 import type {
     Analysis,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import type { SetupContext, SlotsType } from 'vue';
 import { defineComponent, h } from 'vue';
 import type { ListEventsType, ListSlotsType } from '../../core';

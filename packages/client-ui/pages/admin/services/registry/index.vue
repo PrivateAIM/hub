@@ -6,8 +6,8 @@
   -->
 
 <script lang="ts">
-import type { Registry } from '@personalhealthtrain/core';
-import { PermissionID } from '@personalhealthtrain/core';
+import type { Registry } from '@privateaim/core';
+import { PermissionID } from '@privateaim/core';
 import { definePageMeta, useToast } from '#imports';
 import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';

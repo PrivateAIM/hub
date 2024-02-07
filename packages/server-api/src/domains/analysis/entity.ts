@@ -27,10 +27,10 @@ import type {
     AnalysisFile,
     AnalysisResultStatus,
     AnalysisRunStatus,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import {
     AnalysisConfigurationStatus,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import type { Realm, User } from '@authup/core';
 import { ProjectEntity } from '../project/entity';
 import { MasterImageEntity } from '../master-image/entity';

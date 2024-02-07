@@ -9,10 +9,10 @@ import {
     DomainSubType,
     DomainType,
     buildDomainChannelName,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import type {
     ProjectNode,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import type { FiltersBuildInput } from 'rapiq';
 import {
     defineComponent, h,

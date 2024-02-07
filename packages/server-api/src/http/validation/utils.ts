@@ -8,7 +8,7 @@
 import { BadRequestError } from '@ebec/http';
 import type { MatchedDataOptions } from 'express-validator';
 import { matchedData } from 'express-validator';
-import { deleteUndefinedObjectProperties } from '@personalhealthtrain/core';
+import { deleteUndefinedObjectProperties } from '@privateaim/core';
 import type { Request } from 'routup';
 import type { EntityTarget } from 'typeorm';
 import { useDataSource } from 'typeorm-extension';

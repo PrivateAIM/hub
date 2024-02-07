@@ -7,7 +7,7 @@
 
 import { isRealmResourceReadable } from '@authup/core';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
-import { PermissionID } from '@personalhealthtrain/core';
+import { PermissionID } from '@privateaim/core';
 import type { Request, Response } from 'routup';
 import {
     HeaderName, setResponseHeaderAttachment, useRequestParam,

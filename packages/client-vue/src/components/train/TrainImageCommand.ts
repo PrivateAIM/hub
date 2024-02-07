@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { MasterImage, AnalysisFile } from '@personalhealthtrain/core';
+import type { MasterImage, AnalysisFile } from '@privateaim/core';
 import {
     computed, defineComponent, h, ref, toRefs, watch,
 } from 'vue';

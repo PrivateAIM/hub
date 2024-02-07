@@ -9,7 +9,7 @@
         ],
         "strict": true,
         "paths": {
-            "@personalhealthtrain/core": ["./packages/core/src"]
+            "@privateaim/core": ["./packages/core/src"]
         }
     },
     "include": [

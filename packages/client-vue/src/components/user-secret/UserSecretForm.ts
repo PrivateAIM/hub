@@ -5,11 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { UserSecret } from '@personalhealthtrain/core';
+import type { UserSecret } from '@privateaim/core';
 import {
     DomainType,
     SecretType, hexToUTF8, isHex,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import useVuelidate from '@vuelidate/core';
 import { maxLength, minLength, required } from '@vuelidate/validators';
 import type { PropType } from 'vue';

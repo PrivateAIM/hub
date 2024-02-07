@@ -8,11 +8,11 @@
 import type {
     Project,
     ProjectNode,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import {
     DomainType,
     PermissionID,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import { createEntityManager } from '@personalhealthtrain/client-vue';
 import type { Ref } from 'vue';
 import {

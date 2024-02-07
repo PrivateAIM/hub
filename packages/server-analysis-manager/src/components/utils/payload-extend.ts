@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { hasOwnProperty } from '@personalhealthtrain/core';
+import { hasOwnProperty } from '@privateaim/core';
 import type {
     APIClient, Registry, Analysis,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import { isClientErrorWithStatusCode, useClient } from 'hapic';
 import { BaseError } from '../error';
 import type { ComponentPayloadExtended } from '../type';

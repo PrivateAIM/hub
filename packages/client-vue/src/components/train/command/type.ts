@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Analysis, AnalysisAPICommand } from '@personalhealthtrain/core';
+import type { Analysis, AnalysisAPICommand } from '@privateaim/core';
 import type { ActionCommandProperties } from '../../../core';
 
 export type TrainCommandProperties = {

@@ -7,7 +7,7 @@
 
 import {
     PermissionID, RegistryAPICommand,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import {
     ForbiddenError,
 } from '@ebec/http';

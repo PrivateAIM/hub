@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { APIClient } from '@personalhealthtrain/core';
+import type { APIClient } from '@privateaim/core';
 import {
     REGISTRY_ARTIFACT_TAG_LATEST,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import { useClient } from 'hapic';
 import {
     buildDockerAuthConfig, buildRemoteDockerImageURL, pushDockerImage, useDocker,

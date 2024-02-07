@@ -8,13 +8,13 @@ import {
     computed, defineComponent, ref, toRefs,
 } from 'vue';
 import type { PropType } from 'vue';
-import type { Analysis } from '@personalhealthtrain/core';
+import type { Analysis } from '@privateaim/core';
 import {
     PermissionID,
     AnalysisAPICommand,
     AnalysisBuildStatus,
     AnalysisRunStatus,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import type { TrainCommandProperties } from './type';
 import {
     injectAPIClient, injectAuthupStore, renderActionCommand, wrapFnWithBusyState,

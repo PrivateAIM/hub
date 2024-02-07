@@ -12,12 +12,12 @@ import type {
 import { EventSubscriber } from 'typeorm';
 import type {
     MasterImageGroup,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import {
     DomainEventName,
     DomainType,
     buildDomainChannelName,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import { MasterImageGroupEntity } from '../../domains';
 
 async function publishEvent(

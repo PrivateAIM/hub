@@ -2,7 +2,7 @@
     "extends": "../../tsconfig.json",
     "compilerOptions": {
         "paths": {
-            "@personalhealthtrain/core": [
+            "@privateaim/core": [
                 "./packages/core/src"
             ]
         }

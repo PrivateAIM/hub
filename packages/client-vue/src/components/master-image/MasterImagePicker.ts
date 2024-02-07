@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { MasterImage, MasterImageGroup } from '@personalhealthtrain/core';
+import type { MasterImage, MasterImageGroup } from '@privateaim/core';
 import type { FormSelectOption } from '@vuecs/form-controls';
 import { buildFormGroup, buildFormSelect } from '@vuecs/form-controls';
 import type { ListBodySlotProps } from '@vuecs/list-controls';

@@ -1,10 +1,10 @@
 <script lang="ts">
 import type {
     Analysis, AnalysisFile,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import {
     hasOwnProperty,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import type { PropType } from 'vue';
 import {
     computed, defineComponent, reactive, ref, toRefs, watch,

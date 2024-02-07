@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Analysis } from '@personalhealthtrain/core';
+import type { Analysis } from '@privateaim/core';
 import { defineNuxtComponent } from '#app';
 import { definePageMeta, navigateTo, useToast } from '#imports';
 import DomainEntityNav from '../../components/DomainEntityNav';

@@ -8,14 +8,14 @@
 import { ATitle } from '@authup/client-vue';
 import type {
     ProjectNode,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import {
     DomainEventSubscriptionName,
     DomainSubType,
     DomainType,
     buildDomainChannelName,
     buildDomainEventSubscriptionFullName,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import type { FiltersBuildInput } from 'rapiq';
 
 import type { PropType, SlotsType, VNodeChild } from 'vue';

@@ -6,7 +6,7 @@
  */
 
 import type { PropType } from 'vue';
-import { ServiceID } from '@personalhealthtrain/core';
+import { ServiceID } from '@privateaim/core';
 import { MasterImagesSync } from '@personalhealthtrain/client-vue';
 import { useToast } from '#imports';
 import { defineNuxtComponent } from '#app';

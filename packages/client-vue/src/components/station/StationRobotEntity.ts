@@ -9,7 +9,7 @@ import type { EntityManagerSlotProps } from '@authup/client-vue';
 import { ARobot } from '@authup/client-vue';
 import type { PropType } from 'vue';
 import { defineComponent, h, reactive } from 'vue';
-import type { Node } from '@personalhealthtrain/core';
+import type { Node } from '@privateaim/core';
 import type { Robot } from '@authup/core';
 import { buildFormGroup, buildFormInput, buildFormSubmit } from '@vuecs/form-controls';
 import useVuelidate from '@vuelidate/core';

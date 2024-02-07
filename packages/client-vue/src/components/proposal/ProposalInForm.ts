@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ProjectNode } from '@personalhealthtrain/core';
-import { DomainType, ProjectNodeApprovalStatus } from '@personalhealthtrain/core';
+import type { ProjectNode } from '@privateaim/core';
+import { DomainType, ProjectNodeApprovalStatus } from '@privateaim/core';
 import {
     buildFormGroup, buildFormInput, buildFormSelect, buildFormSubmit,
 } from '@vuecs/form-controls';

@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { AnalysisRunStatus } from '@personalhealthtrain/core';
+import { AnalysisRunStatus } from '@privateaim/core';
 import { defineComponent } from 'vue';
 
 export default defineComponent({

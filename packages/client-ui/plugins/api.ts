@@ -12,7 +12,7 @@ import {
     APIClient as AuthAPIClient,
     ClientResponseErrorTokenHook,
 } from '@authup/core';
-import { APIClient, ErrorCode } from '@personalhealthtrain/core';
+import { APIClient, ErrorCode } from '@privateaim/core';
 import { HookName, isObject } from 'hapic';
 import type { Pinia } from 'pinia';
 import { storeToRefs } from 'pinia';

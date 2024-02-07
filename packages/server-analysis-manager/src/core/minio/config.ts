@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { parseProxyConnectionString } from '@personalhealthtrain/core';
+import { parseProxyConnectionString } from '@privateaim/core';
 import type { ClientOptions } from 'minio';
 
 let instance : ClientOptions | undefined;

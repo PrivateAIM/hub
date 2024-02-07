@@ -4,7 +4,7 @@ import type {
 import { REALM_MASTER_NAME, ROBOT_SYSTEM_NAME } from '@authup/core';
 import { ServerError } from '@ebec/http';
 import { isClientErrorWithStatusCode } from '@hapic/harbor';
-import { PermissionKey, ServiceID } from '@personalhealthtrain/core';
+import { PermissionKey, ServiceID } from '@privateaim/core';
 import { PresetRoleName, getPresetRolePermissions, useLogger } from '../../config';
 import { useAuthupClient } from './module';
 

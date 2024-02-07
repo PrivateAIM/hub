@@ -6,7 +6,7 @@
  */
 
 import path from 'node:path';
-import type { Analysis } from '@personalhealthtrain/core';
+import type { Analysis } from '@privateaim/core';
 
 let writableDirPath : string | undefined;
 

@@ -12,7 +12,7 @@ import type {
     DomainEventSubscriptionFullName,
     DomainType,
     SocketServerToClientEventContext,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import type { MaybeRef } from 'vue';
 
 export type EntitySocketContext<

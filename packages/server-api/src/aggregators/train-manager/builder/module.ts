@@ -18,7 +18,7 @@ import type {
 import {
 
     AnalysisBuildStatus,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import { useDataSource } from 'typeorm-extension';
 import type { AnalysisLogSaveContext } from '../../../domains';
 import { saveAnalysisLog } from '../../../domains';

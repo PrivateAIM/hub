@@ -16,7 +16,7 @@
         "@ebec/http": "^2.3.0",
         "@hapic/harbor": "^2.3.2",
         "@hapic/vault": "^2.3.2",
-        "@personalhealthtrain/core": "2.5.2",
+        "@privateaim/core": "^0.0.0",
         "@privateaim/server-kit": "^0.0.0",
         "@privateaim/server-analysis-manager": "^0.0.0",
         "@routup/basic": "^1.3.1",

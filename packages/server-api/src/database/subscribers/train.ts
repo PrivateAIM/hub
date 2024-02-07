@@ -13,14 +13,14 @@ import type {
 import { EventSubscriber } from 'typeorm';
 import type {
     Node, Analysis,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import {
     DomainEventName,
     DomainType,
     buildDomainChannelName,
 
     buildDomainNamespaceName,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import { publish as publishMessage } from 'amqp-extension';
 import { AnalysisEntity } from '../../domains';
 

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { MasterImageCommand } from '@personalhealthtrain/core';
+import { MasterImageCommand } from '@privateaim/core';
 import { BadRequestError, NotFoundError } from '@ebec/http';
 import { useRequestBody } from '@routup/basic/body';
 import type { Request, Response } from 'routup';

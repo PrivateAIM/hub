@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { isObject } from '@personalhealthtrain/core';
+import { isObject } from '@privateaim/core';
 import type { RegistryProjectVaultPayload } from './type';
 
 export function isRegistryProjectVaultPayload(

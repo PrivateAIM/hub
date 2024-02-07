@@ -11,7 +11,7 @@ import type {
 } from '@hapic/harbor';
 import {
     ServiceID,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import { useEnv, useLogger } from '../../../../config';
 import { useAuthupClient } from '../../../../core';
 import { findRobotCredentialsInVault } from '../../../../domains';

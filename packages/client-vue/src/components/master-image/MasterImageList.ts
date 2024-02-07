@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { DomainType } from '@personalhealthtrain/core';
+import { DomainType } from '@privateaim/core';
 import type { SlotsType } from 'vue';
 import { defineComponent } from 'vue';
-import type { MasterImage } from '@personalhealthtrain/core';
+import type { MasterImage } from '@privateaim/core';
 import type { ListSlotsType } from '../../core';
 import {
     createList,

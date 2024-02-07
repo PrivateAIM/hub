@@ -20,7 +20,7 @@ export default defineNuxtConfig({
     telemetry: false,
     ssr: true,
     alias: {
-        '@personalhealthtrain/core': path.join(__dirname, '..', 'core', 'src'),
+        '@privateaim/core': path.join(__dirname, '..', 'core', 'src'),
         '@personalhealthtrain/client-vue': path.join(__dirname, '..', 'client-vue', 'src'),
     },
     /*

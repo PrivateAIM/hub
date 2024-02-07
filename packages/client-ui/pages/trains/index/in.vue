@@ -6,8 +6,8 @@
   -->
 <script lang="ts">
 import { VCTimeago } from '@vuecs/timeago';
-import type { AnalysisNode } from '@personalhealthtrain/core';
-import { PermissionID } from '@personalhealthtrain/core';
+import type { AnalysisNode } from '@privateaim/core';
+import { PermissionID } from '@privateaim/core';
 import { BDropdown, BTable } from 'bootstrap-vue-next';
 import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';

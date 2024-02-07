@@ -15,7 +15,7 @@
     </span>
 </template>
 <script lang="ts">
-import { AnalysisConfigurationStatus } from '@personalhealthtrain/core';
+import { AnalysisConfigurationStatus } from '@privateaim/core';
 import { defineComponent } from 'vue';
 
 export default defineComponent({

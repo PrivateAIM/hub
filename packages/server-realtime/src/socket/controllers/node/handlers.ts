@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { NodeSocketServerMessage } from '@personalhealthtrain/core';
+import type { NodeSocketServerMessage } from '@privateaim/core';
 import {
     DomainEventSubscriptionName,
     DomainType,
@@ -17,7 +17,7 @@ import {
     buildSocketRealmNamespaceName,
     isSocketClientToServerEventCallback,
     isSocketClientToServerEventErrorCallback,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import { UnauthorizedError } from '@ebec/http';
 import { useAPIClient } from '../../../core';
 import type { SocketHandlerContext } from '../../type';

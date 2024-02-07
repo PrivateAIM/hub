@@ -4,7 +4,7 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import type { MasterImage, MasterImageCommand } from '@personalhealthtrain/core';
+import type { MasterImage, MasterImageCommand } from '@privateaim/core';
 
 import {
     DBody, DController, DDelete, DGet, DPath, DPost, DRequest, DResponse, DTags,

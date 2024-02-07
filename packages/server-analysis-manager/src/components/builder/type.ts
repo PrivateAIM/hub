@@ -7,7 +7,7 @@
 
 import type {
     Analysis, AnalysisNode, Node
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import type { BuilderCommand, BuilderEvent } from './constants';
 
 export type BuilderBuildPayload = {

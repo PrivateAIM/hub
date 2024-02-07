@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 
-import type { Registry } from '@personalhealthtrain/core';
+import type { Registry } from '@privateaim/core';
 import type { PropType } from 'vue';
 import { RegistryCleanup } from '@personalhealthtrain/client-vue';
 import { useToast } from '#imports';

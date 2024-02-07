@@ -20,8 +20,8 @@ import type {
     PropType,
 } from 'vue';
 
-import type { MasterImage, Project, Node } from '@personalhealthtrain/core';
-import { DomainType, ProposalRisk } from '@personalhealthtrain/core';
+import type { MasterImage, Project, Node } from '@privateaim/core';
+import { DomainType, ProposalRisk } from '@privateaim/core';
 import { useUpdatedAt } from '../../composables';
 import type { ListProps } from '../../core';
 import {

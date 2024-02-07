@@ -7,7 +7,7 @@
 
 import {
     Registry,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 
 import {
     DBody, DController, DDelete, DGet, DPath, DPost, DRequest, DResponse, DTags,

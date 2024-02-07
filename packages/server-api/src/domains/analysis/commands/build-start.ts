@@ -9,7 +9,7 @@ import { BadRequestError } from '@ebec/http';
 import {
     AnalysisBuildStatus,
     AnalysisNodeApprovalStatus,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import { BuilderCommand, buildBuilderQueuePayload } from '@privateaim/server-analysis-manager';
 import { publish } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';

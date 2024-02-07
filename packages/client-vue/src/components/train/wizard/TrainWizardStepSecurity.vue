@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 import { defineComponent } from 'vue';
-import type { Analysis } from '@personalhealthtrain/core';
+import type { Analysis } from '@privateaim/core';
 import type { PropType } from 'vue';
 import TrainUserSecretPicker from '../TrainUserSecretPicker.vue';
 

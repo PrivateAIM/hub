@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Project, ProjectNode } from '@personalhealthtrain/core';
+import type { Project, ProjectNode } from '@privateaim/core';
 import type { BuildInput } from 'rapiq';
 import type { PropType } from 'vue';
 import { ProposalStationApprovalStatus, ProposalStationList } from '@personalhealthtrain/client-vue';

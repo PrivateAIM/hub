@@ -7,10 +7,10 @@
 
 import {
     DomainType,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import type {
     Analysis,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import {
     defineComponent,
 } from 'vue';

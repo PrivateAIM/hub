@@ -7,7 +7,7 @@
 
 import type {
     Analysis,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 
 import type {
     ComponentName,

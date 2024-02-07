@@ -6,7 +6,7 @@
  */
 
 import type { RobotEventContext } from '@authup/core';
-import { ServiceID } from '@personalhealthtrain/core';
+import { ServiceID } from '@privateaim/core';
 import { publish } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
 import { RegistryCommand } from '../../../components';

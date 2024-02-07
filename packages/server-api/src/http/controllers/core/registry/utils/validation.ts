@@ -6,7 +6,7 @@
  */
 
 import { body, check, validationResult } from 'express-validator';
-import { getHostNameFromString } from '@personalhealthtrain/core';
+import { getHostNameFromString } from '@privateaim/core';
 import type { Request } from 'routup';
 import type { RegistryEntity } from '../../../../../domains';
 import type { RequestValidationResult } from '../../../../validation';

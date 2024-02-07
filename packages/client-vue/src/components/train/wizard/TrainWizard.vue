@@ -11,10 +11,10 @@ import {
     computed,
     defineComponent, reactive, ref, toRefs, watch,
 } from 'vue';
-import type { Analysis, AnalysisFile } from '@personalhealthtrain/core';
+import type { Analysis, AnalysisFile } from '@privateaim/core';
 import {
     AnalysisConfigurationStatus,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import { initFormAttributesFromSource, injectAPIClient } from '../../../core';
 import TrainWizardStepBase from './TrainWizardStepBase.vue';
 import TrainFileManager from '../../train-file/TrainFileManager.vue';

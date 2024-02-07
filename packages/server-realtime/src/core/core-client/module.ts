@@ -1,4 +1,4 @@
-import type { APIClient } from '@personalhealthtrain/core';
+import type { APIClient } from '@privateaim/core';
 
 let instance : APIClient | undefined;
 

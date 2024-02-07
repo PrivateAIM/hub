@@ -6,8 +6,8 @@
   -->
 <script lang="ts">
 import { VCTimeago } from '@vuecs/timeago';
-import type { Registry } from '@personalhealthtrain/core';
-import { PermissionID } from '@personalhealthtrain/core';
+import type { Registry } from '@privateaim/core';
+import { PermissionID } from '@privateaim/core';
 import { BSpinner, BTable } from 'bootstrap-vue-next';
 import type { BuildInput } from 'rapiq';
 import { computed, ref } from 'vue';

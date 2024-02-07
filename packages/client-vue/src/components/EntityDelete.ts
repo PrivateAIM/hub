@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { DomainType } from '@personalhealthtrain/core';
-import { useDomainAPI } from '@personalhealthtrain/core';
+import type { DomainType } from '@privateaim/core';
+import { useDomainAPI } from '@privateaim/core';
 import type {
     Component,
     PropType,

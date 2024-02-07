@@ -6,7 +6,7 @@
  */
 
 import type { StoreManagerOptions } from '@vuecs/list-controls/core';
-import type { APIClient } from '@personalhealthtrain/core';
+import type { APIClient } from '@privateaim/core';
 import type { AuthupAPIClient, AuthupStore, SocketManager } from './core';
 
 export type Options = {

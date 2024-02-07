@@ -13,10 +13,10 @@ import {
     ManyToOne, PrimaryGeneratedColumn, Unique,
     UpdateDateColumn,
 } from 'typeorm';
-import type { Registry, RegistryProject } from '@personalhealthtrain/core';
+import type { Registry, RegistryProject } from '@privateaim/core';
 import {
     RegistryProjectType,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import type { Realm } from '@authup/core';
 import { RegistryEntity } from '../registry';
 

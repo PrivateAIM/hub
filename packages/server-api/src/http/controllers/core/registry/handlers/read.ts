@@ -15,7 +15,7 @@ import {
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import type { ParseAllowedOption } from 'rapiq';
 import { parseQueryFields } from 'rapiq';
-import { PermissionID } from '@personalhealthtrain/core';
+import { PermissionID } from '@privateaim/core';
 import { RegistryEntity } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 

@@ -10,7 +10,7 @@ import type { Robot } from '@authup/core';
 import { storeToRefs } from 'pinia';
 import type { Ref } from 'vue';
 import { h, ref } from 'vue';
-import { ServiceID } from '@personalhealthtrain/core';
+import { ServiceID } from '@privateaim/core';
 import { useToast } from '#imports';
 import { createError, defineNuxtComponent, navigateTo } from '#app';
 import { useAuthupAPI } from '../../../../composables/api';

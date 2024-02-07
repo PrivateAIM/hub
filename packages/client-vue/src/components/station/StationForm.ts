@@ -5,11 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import { ARealms } from '@authup/client-vue';
-import type { Registry, Node } from '@personalhealthtrain/core';
+import type { Registry, Node } from '@privateaim/core';
 import {
     DomainType,
     alphaNumHyphenUnderscoreRegex, hexToUTF8, isHex,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import {
     buildFormGroup,
     buildFormInput, buildFormSelect, buildFormSubmit, buildFormTextarea,

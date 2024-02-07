@@ -7,7 +7,7 @@
 <script lang="ts">
 import { ARobotForm } from '@authup/client-vue';
 import type { Robot } from '@authup/core';
-import type { ServiceID } from '@personalhealthtrain/core';
+import type { ServiceID } from '@privateaim/core';
 import type { PropType, Ref } from 'vue';
 import { ref, toRefs } from 'vue';
 import {

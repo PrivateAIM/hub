@@ -12,13 +12,13 @@ import type {
 import { EventSubscriber } from 'typeorm';
 import type {
     AnalysisFile,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import {
     DomainEventName,
     DomainType,
     buildDomainChannelName,
     buildDomainNamespaceName,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import { AnalysisFileEntity } from '../../domains';
 
 async function publishEvent(

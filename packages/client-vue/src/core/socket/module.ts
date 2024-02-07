@@ -8,10 +8,10 @@
 import type {
     SocketClientToServerEvents,
     SocketServerToClientEvents,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import {
     buildSocketRealmNamespaceName,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import type { ManagerOptions, Socket } from 'socket.io-client';
 import { Manager } from 'socket.io-client';
 import type { AuthupStore } from '../authup';

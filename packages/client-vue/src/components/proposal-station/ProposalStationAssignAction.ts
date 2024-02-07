@@ -6,10 +6,10 @@
  */
 
 import { defineComponent, h } from 'vue';
-import type { ProjectNode } from '@personalhealthtrain/core';
+import type { ProjectNode } from '@privateaim/core';
 import {
     DomainType,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import { createEntityManager, defineEntityManagerEvents } from '../../core';
 
 export default defineComponent({

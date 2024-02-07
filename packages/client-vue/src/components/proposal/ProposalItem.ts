@@ -13,11 +13,11 @@ import {
 } from 'vue';
 import type {
     Project,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import {
     DomainType,
     PermissionID,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import { VCLink } from '@vuecs/link';
 import {
     EntityListSlotName, hasNormalizedSlot, injectAuthupStore, normalizeSlot,

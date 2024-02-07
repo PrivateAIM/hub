@@ -8,7 +8,7 @@
 import type { APIClient as AuthupAPIClient } from '@authup/core';
 import type { Options, SocketManager } from '@personalhealthtrain/client-vue';
 import { install } from '@personalhealthtrain/client-vue';
-import type { APIClient } from '@personalhealthtrain/core';
+import type { APIClient } from '@privateaim/core';
 import type { Pinia } from 'pinia';
 import { ref } from 'vue';
 import { defineNuxtPlugin } from '#app';

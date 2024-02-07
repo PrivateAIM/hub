@@ -6,8 +6,8 @@
  */
 
 import stream from 'node:stream';
-import type { APIClient } from '@personalhealthtrain/core';
-import { AnalysisContainerPath } from '@personalhealthtrain/core';
+import type { APIClient } from '@privateaim/core';
+import { AnalysisContainerPath } from '@privateaim/core';
 import type { Container } from 'dockerode';
 import { useClient } from 'hapic';
 import tar from 'tar-stream';

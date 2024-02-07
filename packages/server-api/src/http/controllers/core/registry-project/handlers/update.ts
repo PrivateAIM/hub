@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionID } from '@personalhealthtrain/core';
+import { PermissionID } from '@privateaim/core';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { publish } from 'amqp-extension';
 import type { Request, Response } from 'routup';

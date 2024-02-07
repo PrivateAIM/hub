@@ -17,7 +17,7 @@ import {
 import type {
     Analysis,
     AnalysisLog,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import type { Realm } from '@authup/core';
 import { AnalysisEntity } from '../analysis';
 

@@ -5,13 +5,13 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Analysis, AnalysisNode } from '@personalhealthtrain/core';
+import type { Analysis, AnalysisNode } from '@privateaim/core';
 import {
     AnalysisBuildStatus,
     AnalysisRunStatus,
     AnalysisNodeRunStatus,
     AnalysisNodeStatic,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import type { BuildInput } from 'rapiq';
 import type { PropType } from 'vue';
 import { computed, defineComponent, toRef } from 'vue';

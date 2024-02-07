@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 
-import { AnalysisBuildStatus } from '@personalhealthtrain/core';
+import { AnalysisBuildStatus } from '@privateaim/core';
 import { defineComponent } from 'vue';
 
 export default defineComponent({

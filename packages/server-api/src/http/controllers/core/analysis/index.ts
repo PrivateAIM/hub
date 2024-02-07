@@ -8,7 +8,7 @@
 import type {
     Analysis,
     AnalysisAPICommand,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import {
     DBody, DController, DDelete, DGet, DPath, DPost, DRequest, DResponse, DTags,
 } from '@routup/decorators';

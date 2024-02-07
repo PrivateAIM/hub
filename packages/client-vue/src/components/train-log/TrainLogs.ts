@@ -6,11 +6,11 @@
  */
 import type {
     AnalysisLog,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import {
     DomainType,
     buildDomainChannelName,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import type { ListItemSlotProps } from '@vuecs/list-controls';
 import {
     defineComponent, h, ref,

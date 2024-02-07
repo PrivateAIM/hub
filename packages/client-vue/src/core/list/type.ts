@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { DomainEntity, DomainType } from '@personalhealthtrain/core';
+import type { DomainEntity, DomainType } from '@privateaim/core';
 import type {
     ListBodyBuildOptionsInput,
     ListBodySlotProps,

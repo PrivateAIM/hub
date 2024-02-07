@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Registry } from '@personalhealthtrain/core';
-import { DomainType } from '@personalhealthtrain/core';
+import type { Registry } from '@privateaim/core';
+import { DomainType } from '@privateaim/core';
 import {
     buildFormGroup, buildFormInput, buildFormSubmit,
 } from '@vuecs/form-controls';

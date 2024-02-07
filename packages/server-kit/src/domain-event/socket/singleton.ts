@@ -7,7 +7,7 @@
 
 import { Emitter } from '@socket.io/redis-emitter';
 import { useClient } from 'redis-extension';
-import type { SocketServerToClientEvents } from '@personalhealthtrain/core';
+import type { SocketServerToClientEvents } from '@privateaim/core';
 
 let instance : undefined | Emitter<SocketServerToClientEvents>;
 

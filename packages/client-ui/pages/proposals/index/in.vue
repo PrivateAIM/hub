@@ -6,10 +6,10 @@
   -->
 <script lang="ts">
 import { VCTimeago } from '@vuecs/timeago';
-import type { ProjectNode } from '@personalhealthtrain/core';
+import type { ProjectNode } from '@privateaim/core';
 import {
     PermissionID,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import {
     BDropdown, BDropdownDivider, BDropdownItem, BModal, BSpinner, BTable,
 } from 'bootstrap-vue-next';

@@ -10,8 +10,8 @@ import type {
     APIClient,
     Analysis,
     AnalysisFile, MasterImage,
-} from '@personalhealthtrain/core';
-import { AnalysisContainerPath, getHostNameFromString } from '@personalhealthtrain/core';
+} from '@privateaim/core';
+import { AnalysisContainerPath, getHostNameFromString } from '@privateaim/core';
 import { useClient } from 'hapic';
 import { BuilderError } from '../error';
 

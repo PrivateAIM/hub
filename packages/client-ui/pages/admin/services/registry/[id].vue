@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { DomainType, PermissionID } from '@personalhealthtrain/core';
+import { DomainType, PermissionID } from '@privateaim/core';
 import { createEntityManager } from '@personalhealthtrain/client-vue';
 import { computed } from 'vue';
 import {

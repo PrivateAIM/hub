@@ -1,7 +1,7 @@
 <script lang="ts">
 import { storeToRefs } from '@authup/client-vue';
-import type { Analysis } from '@personalhealthtrain/core';
-import { SecretType } from '@personalhealthtrain/core';
+import type { Analysis } from '@privateaim/core';
+import { SecretType } from '@privateaim/core';
 import { defineComponent, toRefs } from 'vue';
 import { injectAPIClient, injectAuthupStore } from '../../core';
 import UserSecretList from '../user-secret/UserSecretList';

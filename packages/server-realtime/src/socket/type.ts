@@ -9,7 +9,7 @@ import type {
     Node,
     SocketClientToServerEvents,
     SocketServerToClientEvents,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import type {
     AbilityManager, Realm, Robot, User,
 } from '@authup/core';

@@ -6,10 +6,10 @@
  */
 import type {
     Project,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import {
     DomainType,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import type { SlotsType } from 'vue';
 import { defineComponent } from 'vue';
 import type { ListSlotsType } from '../../core';

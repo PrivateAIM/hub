@@ -6,7 +6,7 @@
   -->
 
 <script lang="ts">
-import { PermissionID } from '@personalhealthtrain/core';
+import { PermissionID } from '@privateaim/core';
 import type { PropType } from 'vue';
 import type { Realm } from '@authup/core';
 import { definePageMeta } from '#imports';

@@ -12,13 +12,13 @@ import type {
 import { EventSubscriber } from 'typeorm';
 import type {
     AnalysisLog,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import {
     DomainEventName,
     DomainType,
     buildDomainChannelName,
     buildDomainNamespaceName,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import { AnalysisLogEntity } from '../../domains';
 
 async function publishEvent(

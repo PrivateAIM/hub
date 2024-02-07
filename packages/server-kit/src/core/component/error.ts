@@ -6,7 +6,7 @@
  */
 
 import { BaseError, createExtractOptionsFn } from '@ebec/http/core';
-import { isObject } from '@personalhealthtrain/core';
+import { isObject } from '@privateaim/core';
 import type { ComponentErrorInput, ComponentErrorOptions } from './type';
 
 export function isOptions(input: unknown) : input is ComponentErrorOptions {

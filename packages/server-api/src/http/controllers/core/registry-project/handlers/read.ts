@@ -20,7 +20,7 @@ import {
     useDataSource,
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
-import { PermissionID } from '@personalhealthtrain/core';
+import { PermissionID } from '@privateaim/core';
 import { useRequestEnv } from '../../../../request';
 import { RegistryProjectEntity, onlyRealmWritableQueryResources } from '../../../../../domains';
 

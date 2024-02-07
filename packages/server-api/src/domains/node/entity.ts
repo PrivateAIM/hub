@@ -15,11 +15,11 @@ import {
     PrimaryGeneratedColumn, Unique,
     UpdateDateColumn,
 } from 'typeorm';
-import type { Node, Registry } from '@personalhealthtrain/core';
+import type { Node, Registry } from '@privateaim/core';
 import {
     NodeType,
     RegistryProject,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import type { Realm, Robot } from '@authup/core';
 import { RegistryProjectEntity } from '../registry-project';
 import { RegistryEntity } from '../registry';

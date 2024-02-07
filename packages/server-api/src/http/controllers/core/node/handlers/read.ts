@@ -9,7 +9,7 @@ import { useRequestQuery } from '@routup/basic/query';
 import type { Request, Response } from 'routup';
 import { send, useRequestParam } from 'routup';
 import type { SelectQueryBuilder } from 'typeorm';
-import { PermissionID } from '@personalhealthtrain/core';
+import { PermissionID } from '@privateaim/core';
 import type { ParseAllowedOption } from 'rapiq';
 import {
     parseQueryFields,

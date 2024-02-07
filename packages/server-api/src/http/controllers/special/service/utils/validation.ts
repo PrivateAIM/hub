@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { RegistryAPICommand } from '@personalhealthtrain/core';
+import { RegistryAPICommand } from '@privateaim/core';
 import { check, validationResult } from 'express-validator';
 import type { Request } from 'routup';
 import type { RequestValidationResult } from '../../../../validation';

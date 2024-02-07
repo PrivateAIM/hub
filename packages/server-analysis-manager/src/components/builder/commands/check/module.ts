@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { APIClient } from '@personalhealthtrain/core';
+import type { APIClient } from '@privateaim/core';
 import {
     buildRegistryClientConnectionStringFromRegistry,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import { isClientErrorWithStatusCode, useClient } from 'hapic';
 
 import { createBasicHarborAPIClient } from '../../../../core';

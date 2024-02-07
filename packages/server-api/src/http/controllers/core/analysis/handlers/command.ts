@@ -6,7 +6,7 @@
  */
 
 import { check, matchedData, validationResult } from 'express-validator';
-import { AnalysisAPICommand } from '@personalhealthtrain/core';
+import { AnalysisAPICommand } from '@privateaim/core';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/core';
 import type { Request, Response } from 'routup';

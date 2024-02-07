@@ -6,7 +6,7 @@
  */
 
 import { check, validationResult } from 'express-validator';
-import { ProjectNodeApprovalStatus } from '@personalhealthtrain/core';
+import { ProjectNodeApprovalStatus } from '@privateaim/core';
 import { NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/core';
 import type { Request } from 'routup';

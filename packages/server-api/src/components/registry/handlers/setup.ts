@@ -11,7 +11,7 @@ import {
     REGISTRY_MASTER_IMAGE_PROJECT_NAME,
     REGISTRY_OUTGOING_PROJECT_NAME,
     RegistryProjectType, generateRegistryProjectId,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import { useDataSource } from 'typeorm-extension';
 import { RegistryEntity, RegistryProjectEntity } from '../../../domains';
 import { useLogger } from '../../../config';

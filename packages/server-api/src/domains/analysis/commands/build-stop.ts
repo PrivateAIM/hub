@@ -6,7 +6,7 @@
  */
 
 import { BadRequestError } from '@ebec/http';
-import { AnalysisBuildStatus } from '@personalhealthtrain/core';
+import { AnalysisBuildStatus } from '@privateaim/core';
 import { useDataSource } from 'typeorm-extension';
 import { resolveAnalysis } from './utils';
 import { AnalysisEntity } from '../entity';

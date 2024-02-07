@@ -6,11 +6,11 @@
  */
 
 import { ASearch } from '@authup/client-vue';
-import type { MasterImage } from '@personalhealthtrain/core';
+import type { MasterImage } from '@privateaim/core';
 import {
     DomainType,
     MasterImageCommand,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import type { ListHeaderSlotProps } from '@vuecs/list-controls';
 import {
     defineComponent, h, reactive, ref,

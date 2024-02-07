@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { PermissionIDType } from '@personalhealthtrain/core';
-import { PermissionID } from '@personalhealthtrain/core';
+import type { PermissionIDType } from '@privateaim/core';
+import { PermissionID } from '@privateaim/core';
 
 export enum PresetRoleName {
     STATION_AUTHORITY = 'StationAuthority',

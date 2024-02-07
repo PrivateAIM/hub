@@ -12,10 +12,10 @@ import {
 } from 'vue';
 import type {
     Analysis,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import {
     PermissionID,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import { VCLink } from '@vuecs/link';
 import TrainEntity from './TrainEntity';
 import TrainPipeline from './TrainPipeline.vue';

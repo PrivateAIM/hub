@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { hasOwnProperty, isObject } from '@personalhealthtrain/core';
+import { hasOwnProperty, isObject } from '@privateaim/core';
 import type { ObjectLiteral } from '../../type';
 import { isQueuePayload } from '../queue';
 import type { QueuePayloadError } from '../queue';

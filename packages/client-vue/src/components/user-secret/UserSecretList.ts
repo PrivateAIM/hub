@@ -4,8 +4,8 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import type { UserSecret } from '@personalhealthtrain/core';
-import { DomainType, SecretType } from '@personalhealthtrain/core';
+import type { UserSecret } from '@privateaim/core';
+import { DomainType, SecretType } from '@privateaim/core';
 import type { SlotsType } from 'vue';
 import { defineComponent, h } from 'vue';
 import { createList, defineListEvents, defineListProps } from '../../core';

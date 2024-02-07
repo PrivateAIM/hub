@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { getHostNameFromString } from '@personalhealthtrain/core';
+import { getHostNameFromString } from '@privateaim/core';
 import type { ConnectionOptions } from '@hapic/harbor';
 import type { DockerAuthConfig } from './type';
 

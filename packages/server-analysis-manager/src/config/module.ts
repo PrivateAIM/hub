@@ -10,7 +10,7 @@ import type { Aggregator, Component } from '@privateaim/server-kit';
 import { setClient as setHTTPClient } from 'hapic';
 import {
     APIClient,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import { setConfig as setAmqpConfig } from 'amqp-extension';
 import type { Client } from 'redis-extension';
 import { setConfig as setRedisConfig, useClient as useRedisClient } from 'redis-extension';

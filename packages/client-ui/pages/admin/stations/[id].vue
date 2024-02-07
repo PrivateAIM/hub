@@ -8,10 +8,10 @@
 import { createEntityManager } from '@personalhealthtrain/client-vue';
 import type {
     Node,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import {
     DomainType,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import {
     useRoute,
     useToast,

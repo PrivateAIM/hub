@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { ServiceID } from '@personalhealthtrain/core';
+import { ServiceID } from '@privateaim/core';
 import {
     createError, defineNuxtComponent, definePageMeta, navigateTo, useRoute,
 } from '#imports';

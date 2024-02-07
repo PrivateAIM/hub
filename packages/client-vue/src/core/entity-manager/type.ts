@@ -8,7 +8,7 @@
 import type {
     DomainEntity,
     DomainType,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import type { BuildInput, FieldsBuildInput, FiltersBuildInput } from 'rapiq';
 import type {
     MaybeRef, Ref, SetupContext, SlotsType,

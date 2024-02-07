@@ -9,7 +9,7 @@ import {
     PermissionID,
     RegistryProjectType,
     createNanoID,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import { ForbiddenError } from '@ebec/http';
 import { validationResult } from 'express-validator';
 import { publish } from 'amqp-extension';

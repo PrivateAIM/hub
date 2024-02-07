@@ -17,14 +17,14 @@ import {
 } from 'typeorm';
 import type {
     ProjectNode,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import {
     DomainEventName,
     DomainSubType,
     DomainType,
     buildDomainChannelName,
     buildDomainNamespaceName,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import { ProjectNodeEntity } from '../../domains';
 
 async function publishEvent(

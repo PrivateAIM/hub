@@ -10,8 +10,8 @@ import {
     computed,
     defineComponent, reactive, ref, toRefs, watch,
 } from 'vue';
-import type { Analysis } from '@personalhealthtrain/core';
-import { AnalysisAPICommand } from '@personalhealthtrain/core';
+import type { Analysis } from '@privateaim/core';
+import { AnalysisAPICommand } from '@privateaim/core';
 import useVuelidate from '@vuelidate/core';
 import type { PropType } from 'vue';
 import { initFormAttributesFromSource, injectAPIClient, wrapFnWithBusyState } from '../../../core';

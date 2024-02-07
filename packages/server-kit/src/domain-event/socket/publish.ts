@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { DomainsEventContext } from '@personalhealthtrain/core';
-import { DomainEventName, buildDomainEventFullName } from '@personalhealthtrain/core';
+import type { DomainsEventContext } from '@privateaim/core';
+import { DomainEventName, buildDomainEventFullName } from '@privateaim/core';
 import { hasClient, hasConfig } from 'redis-extension';
 import type { DomainEventDestinations } from '../type';
 import { buildDomainEventChannelName, transformDomainEventData } from '../utils';

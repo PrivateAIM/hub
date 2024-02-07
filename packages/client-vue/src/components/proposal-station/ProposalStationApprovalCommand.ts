@@ -8,7 +8,7 @@ import {
     PermissionID,
     ProjectNodeApprovalCommand,
     ProjectNodeApprovalStatus,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import type { PropType } from 'vue';
 import {
     computed, defineComponent, ref,

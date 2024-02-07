@@ -5,13 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Node } from '@personalhealthtrain/core';
+import type { Node } from '@privateaim/core';
 import {
     DomainEventName,
     DomainType,
     buildDomainChannelName,
     buildDomainNamespaceName,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import { publishDomainEvent } from '@privateaim/server-kit';
 import type {
     EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,

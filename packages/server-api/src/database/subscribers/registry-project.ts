@@ -10,12 +10,12 @@ import type {
     EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
 import { EventSubscriber } from 'typeorm';
-import type { RegistryProject } from '@personalhealthtrain/core';
+import type { RegistryProject } from '@privateaim/core';
 import {
     DomainEventName,
     DomainType,
     buildDomainChannelName,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import { RegistryProjectEntity } from '../../domains';
 
 async function publishEvent(

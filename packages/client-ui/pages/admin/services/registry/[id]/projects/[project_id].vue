@@ -5,13 +5,13 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { DomainType } from '@personalhealthtrain/core';
+import { DomainType } from '@privateaim/core';
 import type { FieldsBuildInput } from 'rapiq';
 import type { PropType } from 'vue';
 import type {
     Registry,
     RegistryProject,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import { RegistryProjectForm, createEntityManager } from '@personalhealthtrain/client-vue';
 import { useToast } from '#imports';
 import {

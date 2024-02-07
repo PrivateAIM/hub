@@ -7,7 +7,7 @@
 <script lang="ts">
 import {
     DomainType,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import { TrainName, createEntityManager } from '@personalhealthtrain/client-vue';
 import { isClientErrorWithStatusCode } from 'hapic';
 import { definePageMeta, useToast } from '#imports';

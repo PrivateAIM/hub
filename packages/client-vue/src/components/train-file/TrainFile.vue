@@ -7,10 +7,10 @@
 <script lang="ts">
 import {
     DomainType,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import type {
     AnalysisFile,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import type { PropType } from 'vue';
 import {
     computed, defineComponent, ref,

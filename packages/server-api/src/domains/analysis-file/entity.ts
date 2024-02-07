@@ -14,7 +14,7 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-import type { Analysis, AnalysisFile } from '@personalhealthtrain/core';
+import type { Analysis, AnalysisFile } from '@privateaim/core';
 import type { Realm, User } from '@authup/core';
 // eslint-disable-next-line import/no-cycle
 import { AnalysisEntity } from '../analysis';

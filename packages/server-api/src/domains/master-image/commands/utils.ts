@@ -6,7 +6,7 @@
  */
 
 import type { Group, Image } from 'docker-scan';
-import type { MasterImage, MasterImageGroup } from '@personalhealthtrain/core';
+import type { MasterImage, MasterImageGroup } from '@privateaim/core';
 import { useDataSource } from 'typeorm-extension';
 import { MasterImageEntity } from '../entity';
 import { MasterImageGroupEntity } from '../../master-image-group/entity';

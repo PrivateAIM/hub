@@ -12,12 +12,12 @@ import type {
 import { EventSubscriber } from 'typeorm';
 import type {
     Registry,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import {
     DomainEventName,
     DomainType,
     buildDomainChannelName,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import { RegistryEntity } from '../../domains';
 
 async function publishEvent(

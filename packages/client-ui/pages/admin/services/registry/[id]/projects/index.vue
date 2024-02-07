@@ -5,8 +5,8 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Registry, RegistryProject } from '@personalhealthtrain/core';
-import { PermissionID } from '@personalhealthtrain/core';
+import type { Registry, RegistryProject } from '@privateaim/core';
+import { PermissionID } from '@privateaim/core';
 import { BModal, BTable } from 'bootstrap-vue-next';
 import type { BuildInput } from 'rapiq';
 import { computed, ref, toRefs } from 'vue';

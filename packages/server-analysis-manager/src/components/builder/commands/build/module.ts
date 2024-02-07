@@ -7,7 +7,7 @@
 
 import {
     REGISTRY_ARTIFACT_TAG_LATEST,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import {
     pullDockerImage,
     useDocker,

@@ -7,7 +7,7 @@
 
 import {
     PermissionID, RegistryProjectType, createNanoID,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/core';
 import { publish } from 'amqp-extension';

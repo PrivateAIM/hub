@@ -11,7 +11,7 @@ import {
 } from 'typeorm';
 import type {
     Project, ProjectNode, ProjectNodeApprovalStatus, Node,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import type { Realm } from '@authup/core';
 import { ProjectEntity } from '../project/entity';
 import { NodeEntity } from '../node/entity';

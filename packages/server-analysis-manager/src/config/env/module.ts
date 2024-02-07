@@ -7,7 +7,7 @@
 
 import path from 'node:path';
 import { readFromProcessEnv } from '@privateaim/server-kit';
-import { hasOwnProperty } from '@personalhealthtrain/core';
+import { hasOwnProperty } from '@privateaim/core';
 import { config } from 'dotenv';
 import type { EnvironmentName } from './constants';
 import type { Environment } from './type';

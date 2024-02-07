@@ -8,7 +8,7 @@
 import {
     REGISTRY_MASTER_IMAGE_PROJECT_NAME,
     buildRegistryClientConnectionStringFromRegistry,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import { publish } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
 import { useLogger } from '../../../config';

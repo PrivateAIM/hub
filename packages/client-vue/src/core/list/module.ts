@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { hasOwnProperty } from '@personalhealthtrain/core';
-import type { DomainAPI, DomainEntity, DomainType } from '@personalhealthtrain/core';
+import { hasOwnProperty } from '@privateaim/core';
+import type { DomainAPI, DomainEntity, DomainType } from '@privateaim/core';
 import type {
     ListFooterBuildOptionsInput, ListHeaderBuildOptionsInput,
 } from '@vuecs/list-controls';

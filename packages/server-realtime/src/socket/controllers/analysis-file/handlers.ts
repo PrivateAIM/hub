@@ -12,7 +12,7 @@ import {
     buildDomainChannelName,
     buildDomainEventSubscriptionFullName,
     isSocketClientToServerEventErrorCallback,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import { UnauthorizedError } from '@ebec/http';
 import type {
     SocketHandlerContext,

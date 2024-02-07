@@ -5,10 +5,10 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Project } from '@personalhealthtrain/core';
+import type { Project } from '@privateaim/core';
 import {
     PermissionID,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 
 import { ProposalForm } from '@personalhealthtrain/client-vue';
 import { definePageMeta } from '#imports';

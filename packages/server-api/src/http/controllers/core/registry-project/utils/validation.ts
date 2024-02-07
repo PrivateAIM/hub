@@ -6,7 +6,7 @@
  */
 
 import { check, validationResult } from 'express-validator';
-import { RegistryProjectType } from '@personalhealthtrain/core';
+import { RegistryProjectType } from '@privateaim/core';
 import type { Request } from 'routup';
 import type { RegistryProjectEntity } from '../../../../../domains/registry-project/entity';
 import { RegistryEntity } from '../../../../../domains/registry/entity';
