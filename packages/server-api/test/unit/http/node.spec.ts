@@ -7,7 +7,7 @@
 
 import type {
     Node,
-} from '@personalhealthtrain/core';
+} from '@privateaim/core';
 import { removeDateProperties } from '../../utils';
 import { expectPropertiesEqualToSrc } from '../../utils';
 import { useSuperTest } from '../../utils';

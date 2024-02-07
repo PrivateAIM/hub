@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ProjectNode } from '@personalhealthtrain/core';
+import type { ProjectNode } from '@privateaim/core';
 import { useSuperTest } from '../../utils';
 import { dropTestDatabase, useTestDatabase } from '../../utils';
 import { createSuperTestNode, createSuperTestProject } from '../../utils/domains';

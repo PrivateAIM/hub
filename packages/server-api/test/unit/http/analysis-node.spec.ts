@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { AnalysisNode } from '@personalhealthtrain/core';
+import type { AnalysisNode } from '@privateaim/core';
 import { removeDateProperties } from '../../utils';
 import { expectPropertiesEqualToSrc } from '../../utils';
 import { useSuperTest } from '../../utils';

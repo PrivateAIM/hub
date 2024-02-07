@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Node } from '@personalhealthtrain/core';
+import type { Node } from '@privateaim/core';
 import type { TestAgent } from '../supertest';
 
 export const TEST_DEFAULT_NODE : Partial<Node> = {

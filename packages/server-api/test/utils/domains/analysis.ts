@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Analysis } from '@personalhealthtrain/core';
+import type { Analysis } from '@privateaim/core';
 import type { TestAgent } from '../supertest';
 
 export const TEST_DEFAULT_ANALYSIS : Partial<Analysis> = {

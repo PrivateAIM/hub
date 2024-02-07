@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Analysis } from '@personalhealthtrain/core';
+import type { Analysis } from '@privateaim/core';
 import { removeDateProperties } from '../../utils';
 import { useSuperTest } from '../../utils';
 import { dropTestDatabase, useTestDatabase } from '../../utils';

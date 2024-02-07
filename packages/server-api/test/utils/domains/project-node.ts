@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ProjectNode } from '@personalhealthtrain/core';
+import type { ProjectNode } from '@privateaim/core';
 import type { TestAgent } from '../supertest';
 
 export async function createSuperTestProjectNode(superTest: TestAgent, proposalStation: Partial<ProjectNode>) {

@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { MasterImage, MasterImageGroup } from '@personalhealthtrain/core';
-import { MasterImageCommand } from '@personalhealthtrain/core';
+import type { MasterImage, MasterImageGroup } from '@privateaim/core';
+import { MasterImageCommand } from '@privateaim/core';
 import { dropTestDatabase, useSuperTest, useTestDatabase } from '../../utils';
 
 describe('src/controllers/core/master-image', () => {

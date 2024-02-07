@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { hasOwnProperty } from '@personalhealthtrain/core';
+import { hasOwnProperty } from '@privateaim/core';
 
 export function removeDateProperties<
 T extends Record<string, any>,
