@@ -1,9 +1,7 @@
-# Central - Realtime 🚄
+# HUB - Realtime 🚄
 
-[![npm version](https://badge.fury.io/js/@personalhealthtrain%central-realtime.svg)](https://badge.fury.io/js/@personalhealthtrain%2Fcentral-realtime)
-
-This repository contains the Realtime Application of the Personal Health Train (PHT).
-It communicates with some services of the PHT and need therefore to be configured properly, like described
+This repository contains the Realtime Application of the HUB Ecosystem of FLAME.
+It communicates with some services of FLAME and need therefore to be configured properly, like described
 in the following sections.
 
 ## Configuration
@@ -13,6 +11,7 @@ PORT=<port>
 NODE_ENV=<development|production>
 
 API_URL=http://localhost:<port>/
+AUTHUP_URL=http://localhost:<port>/
 
 REDIS_CONNECTION_STRING=redis://<username>:<password>@<host>
 RABBITMQ_CONNECTION_STRING=amqp://<username>:<password>@<host>
