@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { createEntityManager } from '@personalhealthtrain/client-vue';
+import { createEntityManager } from '@privateaim/client-vue';
 import type {
     Node,
 } from '@privateaim/core';

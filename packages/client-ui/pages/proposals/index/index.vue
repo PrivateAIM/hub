@@ -10,7 +10,7 @@ import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import {
     FPagination, FSearch, FTitle, ProposalItem, ProposalList,
-} from '@personalhealthtrain/client-vue';
+} from '@privateaim/client-vue';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
 import { defineNuxtComponent, definePageMeta } from '#imports';
 import { useAuthStore } from '~/store/auth';

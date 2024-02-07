@@ -8,7 +8,7 @@
 import type { Registry, RegistryProject } from '@privateaim/core';
 import { PermissionID } from '@privateaim/core';
 import type { PropType } from 'vue';
-import { RegistryProjectForm } from '@personalhealthtrain/client-vue';
+import { RegistryProjectForm } from '@privateaim/client-vue';
 import { definePageMeta, useToast } from '#imports';
 import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../../../../config/layout';

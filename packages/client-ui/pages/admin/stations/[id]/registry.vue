@@ -7,7 +7,7 @@
 <script lang="ts">
 import type { Node } from '@privateaim/core';
 import type { PropType } from 'vue';
-import { StationForm, StationRegistryProjectEntity } from '@personalhealthtrain/client-vue';
+import { StationForm, StationRegistryProjectEntity } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
 
 export default defineNuxtComponent({

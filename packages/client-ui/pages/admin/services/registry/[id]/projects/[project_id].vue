@@ -12,7 +12,7 @@ import type {
     Registry,
     RegistryProject,
 } from '@privateaim/core';
-import { RegistryProjectForm, createEntityManager } from '@personalhealthtrain/client-vue';
+import { RegistryProjectForm, createEntityManager } from '@privateaim/client-vue';
 import { useToast } from '#imports';
 import {
     createError, defineNuxtComponent, navigateTo, useRoute,

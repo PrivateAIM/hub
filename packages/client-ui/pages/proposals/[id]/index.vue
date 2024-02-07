@@ -8,7 +8,7 @@
 import type { Project, ProjectNode } from '@privateaim/core';
 import type { BuildInput } from 'rapiq';
 import type { PropType } from 'vue';
-import { ProposalStationApprovalStatus, ProposalStationList } from '@personalhealthtrain/client-vue';
+import { ProposalStationApprovalStatus, ProposalStationList } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 

@@ -17,7 +17,7 @@ import {
     FTitle,
     RegistryProjectDetails,
     RegistryProjectList,
-} from '@personalhealthtrain/client-vue';
+} from '@privateaim/client-vue';
 import { definePageMeta, useToast } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '../../../../../../config/layout';
 import { useAuthStore } from '../../../../../../store/auth';

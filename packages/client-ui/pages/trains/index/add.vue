@@ -8,7 +8,7 @@
 import type { Analysis } from '@privateaim/core';
 import { storeToRefs } from 'pinia';
 import { ref } from 'vue';
-import { TrainBasicForm } from '@personalhealthtrain/client-vue';
+import { TrainBasicForm } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
 import { useRoute } from '#imports';
 import { useAuthStore } from '../../../store/auth';

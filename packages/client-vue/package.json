@@ -1,6 +1,6 @@
 {
-    "name": "@personalhealthtrain/client-vue",
-    "version": "2.5.2",
+    "name": "@privateaim/client-vue",
+    "version": "0.0.0",
     "description": "This package contains vue components.",
     "main": "dist/index.cjs",
     "module": "dist/index.mjs",
@@ -33,13 +33,13 @@
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/PHT-Medic/central.git",
+        "url": "git+https://github.com/PrivateAim/hub.git",
         "directory": "packages/client-vue"
     },
     "bugs": {
-        "url": "https://github.com/PHT-Medic/central/issues"
+        "url": "https://github.com/PrivateAim/hub/issues"
     },
-    "homepage": "https://github.com/PHT-Medic/central#readme",
+    "homepage": "https://github.com/PrivateAim/hub#readme",
     "devDependencies": {
         "@authup/client-vue": "^1.0.0-beta.3",
         "@authup/core": "^1.0.0-beta.3",

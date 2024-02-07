@@ -8,7 +8,7 @@
 import { AIdentityProviders } from '@authup/client-vue';
 import {
     FPagination, FSearch, FTitle, LoginForm,
-} from '@personalhealthtrain/client-vue';
+} from '@privateaim/client-vue';
 import {
     definePageMeta,
     navigateTo, useAuthupAPI, useRoute, useToast,

@@ -17,7 +17,7 @@ import {
     FTitle,
     UserSecretForm,
     UserSecretList,
-} from '@personalhealthtrain/client-vue';
+} from '@privateaim/client-vue';
 import { useToast } from '#imports';
 import { defineNuxtComponent } from '#app';
 import { useAuthStore } from '../../../store/auth';

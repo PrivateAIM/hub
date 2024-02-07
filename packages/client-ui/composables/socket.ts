@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { SocketManager } from '@personalhealthtrain/client-vue';
+import type { SocketManager } from '@privateaim/client-vue';
 import { useNuxtApp } from '#app';
 
 export function useSocket() : SocketManager {

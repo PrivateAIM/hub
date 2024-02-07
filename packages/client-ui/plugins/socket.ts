@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { SocketManager } from '@personalhealthtrain/client-vue';
+import { SocketManager } from '@privateaim/client-vue';
 import type { Pinia } from 'pinia';
 import { ref } from 'vue';
 import { useRuntimeConfig } from '#imports';

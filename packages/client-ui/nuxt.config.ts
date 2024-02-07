@@ -21,7 +21,7 @@ export default defineNuxtConfig({
     ssr: true,
     alias: {
         '@privateaim/core': path.join(__dirname, '..', 'core', 'src'),
-        '@personalhealthtrain/client-vue': path.join(__dirname, '..', 'client-vue', 'src'),
+        '@privateaim/client-vue': path.join(__dirname, '..', 'client-vue', 'src'),
     },
     /*
     ** Global CSS

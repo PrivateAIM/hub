@@ -8,7 +8,7 @@
 
 import type { Registry } from '@privateaim/core';
 import type { PropType } from 'vue';
-import { RegistryCleanup } from '@personalhealthtrain/client-vue';
+import { RegistryCleanup } from '@privateaim/client-vue';
 import { useToast } from '#imports';
 import { defineNuxtComponent } from '#imports';
 

@@ -9,7 +9,7 @@
 import { toRefs } from 'vue';
 import type { PropType } from 'vue';
 import type { Registry } from '@privateaim/core';
-import { RegistryForm } from '@personalhealthtrain/client-vue';
+import { RegistryForm } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
 
 export default defineNuxtComponent({

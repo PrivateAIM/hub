@@ -24,7 +24,7 @@ import {
     ProposalStationApprovalCommand,
     ProposalStationApprovalStatus,
     ProposalStationList,
-} from '@personalhealthtrain/client-vue';
+} from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
 import { definePageMeta } from '#imports';
 import { useAPI } from '../../../composables/api';

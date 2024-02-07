@@ -13,7 +13,7 @@ import type { BuildInput } from 'rapiq';
 import { computed, ref } from 'vue';
 import {
     EntityDelete, FPagination, FSearch, FTitle, RegistryList,
-} from '@personalhealthtrain/client-vue';
+} from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
 import { definePageMeta } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';

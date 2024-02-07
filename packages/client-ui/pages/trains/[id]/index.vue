@@ -7,7 +7,7 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import type { Analysis } from '@privateaim/core';
-import { TrainLogs, TrainPipeline, TrainStationsProgress } from '@personalhealthtrain/client-vue';
+import { TrainLogs, TrainPipeline, TrainStationsProgress } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
 
 export default defineNuxtComponent({

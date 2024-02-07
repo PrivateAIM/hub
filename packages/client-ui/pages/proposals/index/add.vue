@@ -10,7 +10,7 @@ import {
     PermissionID,
 } from '@privateaim/core';
 
-import { ProposalForm } from '@personalhealthtrain/client-vue';
+import { ProposalForm } from '@privateaim/client-vue';
 import { definePageMeta } from '#imports';
 import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';

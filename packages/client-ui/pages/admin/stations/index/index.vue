@@ -14,7 +14,7 @@ import type { BuildInput } from 'rapiq';
 import { computed } from 'vue';
 import {
     EntityDelete, FPagination, FSearch, FTitle, StationList,
-} from '@personalhealthtrain/client-vue';
+} from '@privateaim/client-vue';
 import { definePageMeta } from '#imports';
 import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';

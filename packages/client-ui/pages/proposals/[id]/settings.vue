@@ -8,7 +8,7 @@
 import type { Project } from '@privateaim/core';
 import { PermissionID } from '@privateaim/core';
 import type { PropType } from 'vue';
-import { ProposalForm } from '@personalhealthtrain/client-vue';
+import { ProposalForm } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 

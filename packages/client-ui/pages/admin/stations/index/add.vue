@@ -8,7 +8,7 @@
 import type { Node } from '@privateaim/core';
 import { PermissionID } from '@privateaim/core';
 import { storeToRefs } from 'pinia';
-import { StationForm } from '@personalhealthtrain/client-vue';
+import { StationForm } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
 import { definePageMeta } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';

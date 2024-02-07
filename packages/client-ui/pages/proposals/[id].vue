@@ -13,7 +13,7 @@ import {
     DomainType,
     PermissionID,
 } from '@privateaim/core';
-import { createEntityManager } from '@personalhealthtrain/client-vue';
+import { createEntityManager } from '@privateaim/client-vue';
 import type { Ref } from 'vue';
 import {
     computed, ref,

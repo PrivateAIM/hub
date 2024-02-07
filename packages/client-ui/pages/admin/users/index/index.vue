@@ -7,7 +7,7 @@ import {
 import { AEntityDelete, AUsers } from '@authup/client-vue';
 import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
-import { FPagination, FSearch, FTitle } from '@personalhealthtrain/client-vue';
+import { FPagination, FSearch, FTitle } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
 import { useAuthStore } from '../../../../store/auth';
 

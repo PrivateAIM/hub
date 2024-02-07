@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 import { DomainType, PermissionID } from '@privateaim/core';
-import { createEntityManager } from '@personalhealthtrain/client-vue';
+import { createEntityManager } from '@privateaim/client-vue';
 import { computed } from 'vue';
 import {
     createError,

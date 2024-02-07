@@ -7,7 +7,7 @@
 <script lang="ts">
 import type { Registry } from '@privateaim/core';
 import { PermissionID } from '@privateaim/core';
-import { RegistryForm } from '@personalhealthtrain/client-vue';
+import { RegistryForm } from '@privateaim/client-vue';
 import { definePageMeta, navigateTo } from '#imports';
 import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';

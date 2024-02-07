@@ -9,7 +9,7 @@ import type { Project, ProjectNode } from '@privateaim/core';
 import { PermissionID } from '@privateaim/core';
 import { computed } from 'vue';
 import type { PropType } from 'vue';
-import { TrainList } from '@personalhealthtrain/client-vue';
+import { TrainList } from '@privateaim/client-vue';
 import { definePageMeta } from '#imports';
 import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';

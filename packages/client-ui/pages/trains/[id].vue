@@ -8,7 +8,7 @@
 import {
     DomainType,
 } from '@privateaim/core';
-import { TrainName, createEntityManager } from '@personalhealthtrain/client-vue';
+import { TrainName, createEntityManager } from '@privateaim/client-vue';
 import { isClientErrorWithStatusCode } from 'hapic';
 import { definePageMeta, useToast } from '#imports';
 import {

@@ -6,7 +6,7 @@
   -->
 
 <script>
-import { MasterImagesSync } from '@personalhealthtrain/client-vue';
+import { MasterImagesSync } from '@privateaim/client-vue';
 
 export default {
     components: { MasterImagesSync },

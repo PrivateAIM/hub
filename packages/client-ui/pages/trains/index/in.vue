@@ -21,7 +21,7 @@ import {
     TrainStationApprovalStatus,
     TrainStationList,
     TrainStationRunStatus,
-} from '@personalhealthtrain/client-vue';
+} from '@privateaim/client-vue';
 import { defineNuxtComponent, useRuntimeConfig } from '#app';
 import { definePageMeta, useAPI } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
