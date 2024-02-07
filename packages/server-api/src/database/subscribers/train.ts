@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { publishDomainEvent } from '@privateaim/flame-server-kit';
-import { CoreCommand, buildCoreQueuePayload } from '@personalhealthtrain/server-train-manager';
+import { publishDomainEvent } from '@privateaim/server-kit';
+import { CoreCommand, buildCoreQueuePayload } from '@privateaim/server-analysis-manager';
 import type {
     EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';

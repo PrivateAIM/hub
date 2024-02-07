@@ -11,7 +11,7 @@ import type {
 
 import type {
     ComponentName,
-} from '@personalhealthtrain/server-train-manager';
+} from '@privateaim/server-analysis-manager';
 
 export type AnalysisLogSaveContext = {
     train: Pick<Analysis, 'id'> &

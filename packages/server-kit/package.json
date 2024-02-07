@@ -1,5 +1,5 @@
 {
-    "name": "@privateaim/flame-server-kit",
+    "name": "@privateaim/server-kit",
     "version": "0.0.0",
     "private": true,
     "main": "dist/index.js",

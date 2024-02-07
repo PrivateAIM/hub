@@ -6,7 +6,7 @@
  */
 
 import path from 'node:path';
-import { readFromProcessEnv, readIntFromProcessEnv } from '@privateaim/flame-server-kit';
+import { readFromProcessEnv, readIntFromProcessEnv } from '@privateaim/server-kit';
 import { hasOwnProperty } from '@personalhealthtrain/core';
 import { config } from 'dotenv';
 import type { EnvironmentName } from './constants';

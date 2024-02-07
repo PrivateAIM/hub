@@ -22,17 +22,17 @@ This repository contains the HUB Ecosystem of FLAME.
 The repository contains the following packages:
 
 **`General`**
-- **@privateaim/flame-core** 🧱: This package contains common constants, functions, types, ...
+- **@privateaim/core** 🧱: This package contains common constants, functions, types, ...
 
 **`Client`**
-- **@privateaim/flame-client-ui** 🧸: This package contains the User Interface.
-- **@privateaim/flame-client-vue** 🧩: This package contains vue components for frontend applications.
+- **@privateaim/client-ui** 🧸: This package contains the User Interface.
+- **@privateaim/client-vue** 🧩: This package contains vue components for frontend applications.
 
 **`Server`**
-- **@privateaim/flame-server-kit** 🧱: This package contains common constants, functions, types, ... for the server side.
-- **@privateaim/flame-server-core** 🌴: This package contains aggregators, components and many more.
-- **@privateaim/flame-server-realtime** 🚄: This package contains the realtime application which connects the API with socket based clients.
-- **@privateaim/flame-server-train-manager** 🏭: This package contains the train manager, which is responsible to route, build and extract a train.
+- **@privateaim/server-kit** 🧱: This package contains common constants, functions, types, ... for the server side.
+- **@privateaim/server-core** 🌴: This package contains aggregators, components and many more.
+- **@privateaim/server-realtime** 🚄: This package contains the realtime application which connects the API with socket based clients.
+- **@privateaim/server-analysis-manager** 🏭: This package contains the analysis manager, which is responsible to build and distribute an analysis.
 
 ## Usage
 

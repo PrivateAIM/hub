@@ -34,10 +34,10 @@ jobs:
                 run: npm run build --workspace=packages/core
 
             -   name: Build Server Core
-                run: npm run build --workspace=packages/server-core
+                run: npm run build --workspace=packages/server-kit
 
             -   name: Build Server Train Manager
-                run: npm run build --workspace=packages/server-train-manager
+                run: npm run build --workspace=packages/server-analysis-manager
 
             -   name: Build Server API
                 run: npm run build --workspace=packages/server-api

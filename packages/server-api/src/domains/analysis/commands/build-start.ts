@@ -10,7 +10,7 @@ import {
     AnalysisBuildStatus,
     AnalysisNodeApprovalStatus,
 } from '@personalhealthtrain/core';
-import { BuilderCommand, buildBuilderQueuePayload } from '@personalhealthtrain/server-train-manager';
+import { BuilderCommand, buildBuilderQueuePayload } from '@privateaim/server-analysis-manager';
 import { publish } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
 import { RegistryEntity } from '../../registry';

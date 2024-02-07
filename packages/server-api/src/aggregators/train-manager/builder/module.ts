@@ -5,16 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ComponentError, isComponentContextWithError } from '@privateaim/flame-server-kit';
-import type { ComponentContextWithError } from '@privateaim/flame-server-kit';
+import { ComponentError, isComponentContextWithError } from '@privateaim/server-kit';
+import type { ComponentContextWithError } from '@privateaim/server-kit';
 import {
     BuilderCommand,
     BuilderEvent,
     ComponentName,
-} from '@personalhealthtrain/server-train-manager';
+} from '@privateaim/server-analysis-manager';
 import type {
     BuilderEventContext,
-} from '@personalhealthtrain/server-train-manager';
+} from '@privateaim/server-analysis-manager';
 import {
 
     AnalysisBuildStatus,

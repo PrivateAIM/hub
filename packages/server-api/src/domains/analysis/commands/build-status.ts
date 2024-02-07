@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BuilderCommand, buildBuilderQueuePayload } from '@personalhealthtrain/server-train-manager';
+import { BuilderCommand, buildBuilderQueuePayload } from '@privateaim/server-analysis-manager';
 import { publish } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
 import { resolveAnalysis } from './utils';
