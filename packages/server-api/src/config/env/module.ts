@@ -40,17 +40,28 @@ export function useEnv(key?: string) : any {
 
         jwtMaxAge: readInt('JWT_MAX_AGE', 3600),
 
-        minioConnectionString: oneOf([readBool('MINIO_CONNECTION_STRING'), read('MINIO_CONNECTION_STRING')]),
-        redisConnectionString: oneOf([readBool('REDIS_CONNECTION_STRING'), read('REDIS_CONNECTION_STRING')]),
-        rabbitMqConnectionString: oneOf([readBool('RABBITMQ_CONNECTION_STRING'), read('RABBITMQ_CONNECTION_STRING')]),
-        vaultConnectionString: oneOf([readBool('VAULT_CONNECTION_STRING'), read('VAULT_CONNECTION_STRING')]),
+        minioConnectionString: oneOf([
+            readBool('MINIO_CONNECTION_STRING'),
+            read('MINIO_CONNECTION_STRING'),
+        ]),
+        redisConnectionString: oneOf([
+            readBool('REDIS_CONNECTION_STRING'),
+            read('REDIS_CONNECTION_STRING'),
+        ]),
+        rabbitMqConnectionString: oneOf([
+            readBool('RABBITMQ_CONNECTION_STRING'),
+            read('RABBITMQ_CONNECTION_STRING')]),
+        vaultConnectionString: oneOf([
+            readBool('VAULT_CONNECTION_STRING'),
+            read('VAULT_CONNECTION_STRING'),
+        ]),
 
         apiUrl: read('API_URL', 'http://127.0.0.1:3002/'),
         authupApiUrl: read('AUTHUP_API_URL', 'http://127.0.0.1:3010/'),
         appUrl: read('APP_URL', 'http://127.0.0.1:3000/'),
 
-        skipProposalApprovalOperation: readBool('SKIP_PROPOSAL_APPROVAL_OPERATION'),
-        skipTrainApprovalOperation: readBool('SKIP_TRAIN_APPROVAL_OPERATION'),
+        skipProjectApproval: readBool('SKIP_PROJECT_APPROVAL'),
+        skipAnalysisApproval: readBool('SKIP_ANALYSIS_APPROVAL'),
 
         httpProxyAPIs: read('HTTP_PROXY_APIS', null),
     };

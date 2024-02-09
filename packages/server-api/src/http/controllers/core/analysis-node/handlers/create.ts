@@ -34,7 +34,7 @@ export async function createAnalysisNodeRouteHandler(req: Request, res: Response
 
     let entity = repository.create(result.data);
 
-    if (useEnv('skipTrainApprovalOperation')) {
+    if (useEnv('skipAnalysisApproval')) {
         entity.approval_status = AnalysisNodeApprovalStatus.APPROVED;
     }
 

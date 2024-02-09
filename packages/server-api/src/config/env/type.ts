@@ -22,8 +22,8 @@ export interface Environment {
     authupApiUrl: string,
     appUrl: string,
 
-    skipProposalApprovalOperation: boolean,
-    skipTrainApprovalOperation: boolean,
+    skipProjectApproval: boolean,
+    skipAnalysisApproval: boolean,
 
     httpProxyAPIs: string | undefined,
 }

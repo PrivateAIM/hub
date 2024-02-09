@@ -31,7 +31,7 @@ export async function createProjectNodeRouteHandler(req: Request, res: Response)
     const repository = dataSource.getRepository(ProjectNodeEntity);
     let entity = repository.create(result.data);
 
-    if (useEnv('skipProposalApprovalOperation')) {
+    if (useEnv('skipProjectApproval')) {
         entity.approval_status = ProjectNodeApprovalStatus.APPROVED;
     }
 
