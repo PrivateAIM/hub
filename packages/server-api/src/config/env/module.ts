@@ -7,11 +7,11 @@
 
 import path from 'node:path';
 import {
-    readBoolFromProcessEnv,
-    readBoolOrStringFromProcessEnv,
-    readFromProcessEnv,
-    readIntFromProcessEnv
-} from '@privateaim/server-kit';
+    oneOf,
+    read,
+    readBool,
+    readInt,
+} from 'envix';
 import { config } from 'dotenv';
 import type { EnvironmentName } from './constants';
 import type { Environment } from './type';
@@ -35,24 +35,24 @@ export function useEnv(key?: string) : any {
     }
 
     instance = {
-        env: readFromProcessEnv('NODE_ENV', 'development') as `${EnvironmentName}`,
-        port: readIntFromProcessEnv('PORT', 3002),
+        env: read('NODE_ENV', 'development') as `${EnvironmentName}`,
+        port: readInt('PORT', 3002),
 
-        jwtMaxAge: readIntFromProcessEnv('JWT_MAX_AGE', 3600),
+        jwtMaxAge: readInt('JWT_MAX_AGE', 3600),
 
-        minioConnectionString: readBoolOrStringFromProcessEnv('MINIO_CONNECTION_STRING'),
-        redisConnectionString: readBoolOrStringFromProcessEnv('REDIS_CONNECTION_STRING'),
-        rabbitMqConnectionString: readBoolOrStringFromProcessEnv('RABBITMQ_CONNECTION_STRING'),
-        vaultConnectionString: readBoolOrStringFromProcessEnv('VAULT_CONNECTION_STRING'),
+        minioConnectionString: oneOf([readBool('MINIO_CONNECTION_STRING'), read('MINIO_CONNECTION_STRING')]),
+        redisConnectionString: oneOf([readBool('REDIS_CONNECTION_STRING'), read('REDIS_CONNECTION_STRING')]),
+        rabbitMqConnectionString: oneOf([readBool('RABBITMQ_CONNECTION_STRING'), read('RABBITMQ_CONNECTION_STRING')]),
+        vaultConnectionString: oneOf([readBool('VAULT_CONNECTION_STRING'), read('VAULT_CONNECTION_STRING')]),
 
-        apiUrl: readFromProcessEnv('API_URL', 'http://127.0.0.1:3002/'),
-        authupApiUrl: readFromProcessEnv('AUTHUP_API_URL', 'http://127.0.0.1:3010/'),
-        appUrl: readFromProcessEnv('APP_URL', 'http://127.0.0.1:3000/'),
+        apiUrl: read('API_URL', 'http://127.0.0.1:3002/'),
+        authupApiUrl: read('AUTHUP_API_URL', 'http://127.0.0.1:3010/'),
+        appUrl: read('APP_URL', 'http://127.0.0.1:3000/'),
 
-        skipProposalApprovalOperation: readBoolFromProcessEnv('SKIP_PROPOSAL_APPROVAL_OPERATION', false),
-        skipTrainApprovalOperation: readBoolFromProcessEnv('SKIP_TRAIN_APPROVAL_OPERATION', false),
+        skipProposalApprovalOperation: readBool('SKIP_PROPOSAL_APPROVAL_OPERATION'),
+        skipTrainApprovalOperation: readBool('SKIP_TRAIN_APPROVAL_OPERATION'),
 
-        httpProxyAPIs: readFromProcessEnv('HTTP_PROXY_APIS', null),
+        httpProxyAPIs: read('HTTP_PROXY_APIS', null),
     };
 
     if (typeof key === 'string') {

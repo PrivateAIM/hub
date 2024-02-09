@@ -6,7 +6,7 @@
  */
 
 import path from 'node:path';
-import { readFromProcessEnv, readIntFromProcessEnv } from '@privateaim/server-kit';
+import { read, readInt } from 'envix';
 import { hasOwnProperty } from '@privateaim/core';
 import { config } from 'dotenv';
 import type { EnvironmentName } from './constants';
@@ -31,13 +31,13 @@ export function useEnv(key?: string) : any {
     }
 
     instance = {
-        env: readFromProcessEnv('NODE_ENV', 'development') as `${EnvironmentName}`,
-        port: readIntFromProcessEnv('PORT', 3001),
-        redisConnectionString: readFromProcessEnv('REDIS_CONNECTION_STRING', null),
-        vaultConnectionString: readFromProcessEnv('VAULT_CONNECTION_STRING', 'start123@http://127.0.0.1:8090/v1/'),
+        env: read('NODE_ENV', 'development') as `${EnvironmentName}`,
+        port: readInt('PORT', 3001),
+        redisConnectionString: read('REDIS_CONNECTION_STRING', null),
+        vaultConnectionString: read('VAULT_CONNECTION_STRING', 'start123@http://127.0.0.1:8090/v1/'),
 
-        apiURL: readFromProcessEnv('API_URL', 'http://127.0.0.1:3002/'),
-        authupApiURL: readFromProcessEnv('AUTHUP_API_URL', 'http://127.0.0.1:3010/'),
+        apiURL: read('API_URL', 'http://127.0.0.1:3002/'),
+        authupApiURL: read('AUTHUP_API_URL', 'http://127.0.0.1:3010/'),
     };
 
     if (typeof key === 'string') {

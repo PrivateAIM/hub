@@ -4,9 +4,6 @@
         "paths": {
             "@privateaim/core": [
                 "./packages/core/src"
-            ],
-            "@privateaim/flame-server-kit": [
-                "./packages/server-kit/src"
             ]
         }
     }

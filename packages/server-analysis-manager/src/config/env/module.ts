@@ -6,7 +6,7 @@
  */
 
 import path from 'node:path';
-import { readFromProcessEnv } from '@privateaim/server-kit';
+import { read } from 'envix';
 import { hasOwnProperty } from '@privateaim/core';
 import { config } from 'dotenv';
 import type { EnvironmentName } from './constants';
@@ -31,15 +31,15 @@ export function useEnv(key?: string) : any {
     }
 
     instance = {
-        env: readFromProcessEnv('NODE_ENV', 'development') as `${EnvironmentName}`,
+        env: read('NODE_ENV', 'development') as `${EnvironmentName}`,
 
-        minioConnectionString: readFromProcessEnv('MINIO_CONNECTION_STRING', 'http://admin:start123@127.0.0.1:9000'),
-        redisConnectionString: readFromProcessEnv('REDIS_CONNECTION_STRING', null),
-        rabbitMqConnectionString: readFromProcessEnv('RABBITMQ_CONNECTION_STRING', 'amqp://root:start123@127.0.0.1'),
-        vaultConnectionString: readFromProcessEnv('VAULT_CONNECTION_STRING', 'start123@http://127.0.0.1:8090/v1/'),
+        minioConnectionString: read('MINIO_CONNECTION_STRING', 'http://admin:start123@127.0.0.1:9000'),
+        redisConnectionString: read('REDIS_CONNECTION_STRING', null),
+        rabbitMqConnectionString: read('RABBITMQ_CONNECTION_STRING', 'amqp://root:start123@127.0.0.1'),
+        vaultConnectionString: read('VAULT_CONNECTION_STRING', 'start123@http://127.0.0.1:8090/v1/'),
 
-        apiUrl: readFromProcessEnv('API_URL', 'http://127.0.0.1:3002/'),
-        authupApiUrl: readFromProcessEnv('AUTHUP_API_URL', 'http://127.0.0.1:3010/'),
+        apiUrl: read('API_URL', 'http://127.0.0.1:3002/'),
+        authupApiUrl: read('AUTHUP_API_URL', 'http://127.0.0.1:3010/'),
     };
 
     if (typeof key === 'string') {
