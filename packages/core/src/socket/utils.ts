@@ -5,23 +5,23 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { SocketClientToServerEventCallback, SocketClientToServerEventErrorCallback, SocketClientToServerEventTarget } from './type';
+import type { SocketResourcesNamespaceCTSEventCallback, SocketResourcesNamespaceCTSEventTarget } from './namespaces';
 
 export function isSocketClientToServerEventTarget(
     input: unknown,
-) : input is SocketClientToServerEventTarget {
+) : input is SocketResourcesNamespaceCTSEventTarget {
     return typeof input === 'number' ||
         typeof input === 'string' ||
         typeof input === 'undefined';
 }
 export function isSocketClientToServerEventCallback(
     input: unknown,
-) : input is SocketClientToServerEventCallback {
+) : input is SocketResourcesNamespaceCTSEventCallback {
     return typeof input === 'function';
 }
 
 export function isSocketClientToServerEventErrorCallback(
     input: unknown,
-) : input is SocketClientToServerEventErrorCallback {
-    return !isSocketClientToServerEventCallback(input) || input.length < 1;
+) : input is SocketResourcesNamespaceCTSEventCallback {
+    return isSocketClientToServerEventCallback(input) && input.length >= 1;
 }

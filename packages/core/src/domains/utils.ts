@@ -35,5 +35,5 @@ export function buildDomainChannelName(type: DomainInput, id?: string | number) 
 }
 
 export function buildDomainNamespaceName(id: string) {
-    return `/realm#${id}`;
+    return `/resources#${id}`;
 }

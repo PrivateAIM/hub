@@ -17,23 +17,23 @@ import {
 } from '@privateaim/core';
 import { UnauthorizedError } from '@ebec/http';
 import type {
-    SocketHandlerContext
-} from '../../type';
+    ResourcesNamespaceSocket,
+} from '../../types';
 import {
     subscribeSocketRoom,
     unsubscribeSocketRoom,
-} from '../../utils';
+} from '../../../../utils';
 
-export function registerProjectNodeSocketHandlers({ socket }: SocketHandlerContext) {
+export function registerAnalysisNodeSocketHandlers(socket: ResourcesNamespaceSocket) {
     if (!socket.data.userId && !socket.data.robotId) return;
 
     // ------------------------------------------------------------
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainType.PROJECT_NODE, DomainEventSubscriptionName.SUBSCRIBE),
+        buildDomainEventSubscriptionFullName(DomainType.ANALYSIS_NODE, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             if (
-                !socket.data.ability.has(PermissionID.PROPOSAL_APPROVE)
+                !socket.data.ability.has(PermissionID.ANALYSIS_APPROVE)
             ) {
                 if (isSocketClientToServerEventErrorCallback(cb)) {
                     cb(new UnauthorizedError());
@@ -42,7 +42,7 @@ export function registerProjectNodeSocketHandlers({ socket }: SocketHandlerConte
                 return;
             }
 
-            subscribeSocketRoom(socket, buildDomainChannelName(DomainType.PROJECT_NODE, target));
+            subscribeSocketRoom(socket, buildDomainChannelName(DomainType.ANALYSIS_NODE, target));
 
             if (isSocketClientToServerEventCallback(cb)) {
                 cb();
@@ -51,23 +51,23 @@ export function registerProjectNodeSocketHandlers({ socket }: SocketHandlerConte
     );
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainType.PROJECT_NODE, DomainEventSubscriptionName.UNSUBSCRIBE),
+        buildDomainEventSubscriptionFullName(DomainType.ANALYSIS_NODE, DomainEventSubscriptionName.SUBSCRIBE),
         (target) => {
-            unsubscribeSocketRoom(socket, buildDomainChannelName(DomainType.PROJECT_NODE, target));
+            unsubscribeSocketRoom(socket, buildDomainChannelName(DomainType.ANALYSIS_NODE, target));
         },
     );
 }
 
-export function registerProjectNodeForRealmSocketHandlers({ socket }: SocketHandlerContext) {
+export function registerAnalysisNodeForRealmSocketHandlers(socket: ResourcesNamespaceSocket) {
     if (!socket.data.userId && !socket.data.robotId) return;
 
     // ------------------------------------------------------------
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainSubType.PROJECT_NODE_IN, DomainEventSubscriptionName.SUBSCRIBE),
+        buildDomainEventSubscriptionFullName(DomainSubType.ANALYSIS_NODE_IN, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             if (
-                !socket.data.ability.has(PermissionID.PROPOSAL_APPROVE)
+                !socket.data.ability.has(PermissionID.ANALYSIS_APPROVE)
             ) {
                 if (isSocketClientToServerEventErrorCallback(cb)) {
                     cb(new UnauthorizedError());
@@ -76,10 +76,7 @@ export function registerProjectNodeForRealmSocketHandlers({ socket }: SocketHand
                 return;
             }
 
-            subscribeSocketRoom(
-                socket,
-                buildDomainChannelName(DomainSubType.PROJECT_NODE_IN, target),
-            );
+            subscribeSocketRoom(socket, buildDomainChannelName(DomainSubType.ANALYSIS_NODE_IN, target));
 
             if (isSocketClientToServerEventCallback(cb)) {
                 cb();
@@ -88,23 +85,18 @@ export function registerProjectNodeForRealmSocketHandlers({ socket }: SocketHand
     );
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainSubType.PROJECT_NODE_IN, DomainEventSubscriptionName.UNSUBSCRIBE),
+        buildDomainEventSubscriptionFullName(DomainSubType.ANALYSIS_NODE_IN, DomainEventSubscriptionName.UNSUBSCRIBE),
         (target) => {
-            unsubscribeSocketRoom(
-                socket,
-                buildDomainChannelName(DomainSubType.PROJECT_NODE_IN, target),
-            );
+            unsubscribeSocketRoom(socket, buildDomainChannelName(DomainSubType.ANALYSIS_NODE_IN, target));
         },
     );
 
-    // ------------------------------------------------------------
+    // ----------------------------------------------------------
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainSubType.PROJECT_NODE_OUT, DomainEventSubscriptionName.SUBSCRIBE),
+        buildDomainEventSubscriptionFullName(DomainSubType.ANALYSIS_NODE_OUT, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
-            if (
-                !socket.data.ability.has(PermissionID.PROJECT_EDIT)
-            ) {
+            if (!socket.data.ability.has(PermissionID.ANALYSIS_EDIT)) {
                 if (isSocketClientToServerEventErrorCallback(cb)) {
                     cb(new UnauthorizedError());
                 }
@@ -112,10 +104,7 @@ export function registerProjectNodeForRealmSocketHandlers({ socket }: SocketHand
                 return;
             }
 
-            subscribeSocketRoom(
-                socket,
-                buildDomainChannelName(DomainSubType.PROJECT_NODE_OUT, target),
-            );
+            subscribeSocketRoom(socket, buildDomainChannelName(DomainSubType.ANALYSIS_NODE_OUT, target));
 
             if (isSocketClientToServerEventCallback(cb)) {
                 cb();
@@ -124,12 +113,9 @@ export function registerProjectNodeForRealmSocketHandlers({ socket }: SocketHand
     );
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainSubType.PROJECT_NODE_OUT, DomainEventSubscriptionName.UNSUBSCRIBE),
+        buildDomainEventSubscriptionFullName(DomainSubType.ANALYSIS_NODE_OUT, DomainEventSubscriptionName.UNSUBSCRIBE),
         (target) => {
-            unsubscribeSocketRoom(
-                socket,
-                buildDomainChannelName(DomainSubType.PROJECT_NODE_OUT, target),
-            );
+            unsubscribeSocketRoom(socket, buildDomainChannelName(DomainSubType.ANALYSIS_NODE_OUT, target));
         },
     );
 }

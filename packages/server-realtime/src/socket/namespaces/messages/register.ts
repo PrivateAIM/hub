@@ -1,0 +1,48 @@
+import type { SocketMessagesNamespaceMessageParty } from '@privateaim/core';
+import { buildConnectionRobotRoom, buildConnectionUserRoom, registerConnectionController } from '../../controllers';
+import type { MessagesNamespace, MessagesNamespaceSocket } from './types';
+
+export function registerMessagesNamespaceControllers(nsp: MessagesNamespace) {
+    nsp.on('connection', (socket: MessagesNamespaceSocket) => {
+        registerConnectionController(socket);
+
+        socket.on('send', (data) => {
+            if (!socket.data.userId && !socket.data.robotId) {
+                return;
+            }
+
+            let from : SocketMessagesNamespaceMessageParty;
+            if (socket.data.userId) {
+                from = {
+                    type: 'user',
+                    id: socket.data.userId,
+                };
+            } else {
+                from = {
+                    type: 'robot',
+                    id: socket.data.robotId,
+                };
+            }
+            for (let i = 0; i < data.to.length; i++) {
+                const to = data.to[i];
+                if (to.type === 'user') {
+                    nsp.in(buildConnectionUserRoom(to.id))
+                        .emit('send', {
+                            from,
+                            data: data[i].data,
+                            metadata: data[i].metadata,
+                        });
+
+                    continue;
+                }
+
+                nsp.in(buildConnectionRobotRoom(to.id))
+                    .emit('send', {
+                        from,
+                        data: data[i].data,
+                        metadata: data[i].metadata,
+                    });
+            }
+        });
+    });
+}

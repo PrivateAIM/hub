@@ -16,20 +16,23 @@ import {
 } from '@privateaim/core';
 import { UnauthorizedError } from '@ebec/http';
 import type {
-    SocketHandlerContext,
-} from '../../type';
+    ResourcesNamespaceSocket,
+} from '../../types';
 import {
-    subscribeSocketRoom,
     unsubscribeSocketRoom,
-} from '../../utils';
+    subscribeSocketRoom,
+} from '../../../../utils';
 
-export function registerAnalysisLogSocketHandlers({ socket }: SocketHandlerContext) {
+export function registerProjectSocketHandlers(socket: ResourcesNamespaceSocket) {
     if (!socket.data.userId && !socket.data.robotId) return;
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainType.ANALYSIS_LOG, DomainEventSubscriptionName.SUBSCRIBE),
+        buildDomainEventSubscriptionFullName(DomainType.PROJECT, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
-            if (!socket.data.ability.has(PermissionID.ANALYSIS_EDIT)) {
+            if (
+                !socket.data.ability.has(PermissionID.PROJECT_DROP) &&
+                !socket.data.ability.has(PermissionID.PROJECT_EDIT)
+            ) {
                 if (isSocketClientToServerEventErrorCallback(cb)) {
                     cb(new UnauthorizedError());
                 }
@@ -37,7 +40,7 @@ export function registerAnalysisLogSocketHandlers({ socket }: SocketHandlerConte
                 return;
             }
 
-            subscribeSocketRoom(socket, buildDomainChannelName(DomainType.ANALYSIS_LOG, target));
+            subscribeSocketRoom(socket, buildDomainChannelName(DomainType.PROJECT, target));
 
             if (isSocketClientToServerEventCallback(cb)) {
                 cb();
@@ -46,9 +49,9 @@ export function registerAnalysisLogSocketHandlers({ socket }: SocketHandlerConte
     );
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainType.ANALYSIS_LOG, DomainEventSubscriptionName.UNSUBSCRIBE),
+        buildDomainEventSubscriptionFullName(DomainType.PROJECT, DomainEventSubscriptionName.UNSUBSCRIBE),
         (target) => {
-            unsubscribeSocketRoom(socket, buildDomainChannelName(DomainType.ANALYSIS_LOG, target));
+            unsubscribeSocketRoom(socket, buildDomainChannelName(DomainType.PROJECT, target));
         },
     );
 }

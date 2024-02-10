@@ -8,15 +8,13 @@
 import type { Server as HTTPServer } from 'node:http';
 import { Server } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
-import { ForbiddenError, UnauthorizedError } from '@ebec/http';
 import {
-    AbilityManager, OAuth2SubKind, REALM_MASTER_NAME, ROBOT_SYSTEM_NAME,
+    AbilityManager, OAuth2SubKind, ROBOT_SYSTEM_NAME,
 } from '@authup/core';
 import { createSocketMiddleware } from '@authup/server-adapter';
 import { useEnv } from '../config';
-import { useLogger } from '../core';
-import { registerSocketHandlers, registerSocketNamespaceHandlers } from './register';
-import type { SocketInterface, SocketServerInterface } from './type';
+import { registerMessagesNamespace, registerResourcesNamespaces } from './namespaces';
+import type { SocketBase } from './types';
 import type { Config } from '../config';
 
 interface SocketServerContext {
@@ -25,7 +23,7 @@ interface SocketServerContext {
 }
 
 export function createSocketServer(context : SocketServerContext) : Server {
-    const server : SocketServerInterface = new Server(context.httpServer, {
+    const server = new Server(context.httpServer, {
         adapter: createAdapter(context.config.redisPub, context.config.redisSub) as any,
         cors: {
             origin(origin, callback) {
@@ -37,7 +35,7 @@ export function createSocketServer(context : SocketServerContext) : Server {
         // ...
     });
 
-    const socketMiddleware = createSocketMiddleware({
+    const authMiddleware = createSocketMiddleware({
         tokenVerifier: {
             baseURL: useEnv('authupApiURL'),
             creator: {
@@ -50,7 +48,7 @@ export function createSocketServer(context : SocketServerContext) : Server {
                 client: context.config.redisDatabase,
             },
         },
-        tokenVerifierHandler: (socket: SocketInterface, data) => {
+        tokenVerifierHandler: (socket: SocketBase, data) => {
             switch (data.sub_kind) {
                 case OAuth2SubKind.USER: {
                     socket.data.userId = data.sub;
@@ -68,69 +66,15 @@ export function createSocketServer(context : SocketServerContext) : Server {
         },
     });
 
-    useLogger().info('Mounting socket middleware...');
-    server.use(socketMiddleware);
-
-    server.use((socket: SocketInterface, next) => {
-        if (!socket.data.userId && !socket.data.robotId) {
-            useLogger().error('Client is not authenticated.');
-            next(new UnauthorizedError());
-            return;
-        }
-
-        if (socket.data.realmName !== REALM_MASTER_NAME) {
-            useLogger().error(`Realm ${socket.data.realmName} is not permitted for the global scope.`);
-            next(new ForbiddenError());
-
-            return;
-        }
-
-        if (socket.data.userId) {
-            useLogger().debug(`User ${socket.data.userId} (${socket.id}) connected.`);
-        } else if (socket.data.robotId) {
-            useLogger().debug(`Robot ${socket.data.robotId} (${socket.id}) connected.`);
-        }
-
-        next();
+    registerMessagesNamespace({
+        server,
+        authMiddleware,
     });
 
-    // server.of('foo').adapter.rooms.get('xxx')
-
-    useLogger().info('Registering socket controllers...');
-
-    // register handlers
-    registerSocketHandlers(server);
-
-    // build & register realm workspaces
-    const realmWorkspaces = server.of(/^\/realm#[a-z0-9A-Z-_]+$/);
-    realmWorkspaces.use(socketMiddleware);
-
-    realmWorkspaces.use((socket: SocketInterface, next) => {
-        if (!socket.data.userId && !socket.data.robotId) {
-            useLogger().error('Client is not authenticated.');
-
-            next(new UnauthorizedError());
-            return;
-        }
-
-        const matches = socket.nsp.name.match(/^\/realm#([a-z0-9A-Z-_]+)$/);
-
-        if (matches[1] !== socket.data.realmId && socket.data.realmName !== REALM_MASTER_NAME) {
-            useLogger().error(`Realm ${socket.data.realmName} is not permitted for the realm ${matches[1]}.`);
-            next(new ForbiddenError());
-            return;
-        }
-
-        if (socket.data.userId) {
-            useLogger().debug(`User ${socket.data.userId} (${socket.id}) connected.`);
-        } else if (socket.data.robotId) {
-            useLogger().debug(`Robot ${socket.data.robotId} (${socket.id}) connected.`);
-        }
-
-        next();
+    registerResourcesNamespaces({
+        server,
+        authMiddleware,
     });
-
-    registerSocketNamespaceHandlers(realmWorkspaces, server);
 
     return server;
 }

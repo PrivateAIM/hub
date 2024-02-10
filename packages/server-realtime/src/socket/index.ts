@@ -5,8 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './controllers';
-export * from './register';
+export * from './namespaces';
 export * from './server';
-export * from './type';
+export * from './types';
 export * from './utils';

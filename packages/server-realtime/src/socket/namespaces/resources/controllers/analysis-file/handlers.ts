@@ -15,14 +15,14 @@ import {
 } from '@privateaim/core';
 import { UnauthorizedError } from '@ebec/http';
 import type {
-    SocketHandlerContext,
-} from '../../type';
+    ResourcesNamespaceSocket,
+} from '../../types';
 import {
     subscribeSocketRoom,
     unsubscribeSocketRoom,
-} from '../../utils';
+} from '../../../../utils';
 
-export function registerAnalysisFileSocketHandlers({ socket }: SocketHandlerContext) {
+export function registerAnalysisFileSocketHandlers(socket: ResourcesNamespaceSocket) {
     if (!socket.data.userId && !socket.data.robotId) return;
 
     socket.on(

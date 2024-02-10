@@ -6,8 +6,8 @@
  */
 
 import type {
-    SocketClientToServerEvents,
-    SocketServerToClientEvents,
+    SocketResourcesNamespaceCTSEvents,
+    SocketResourcesNamespaceSTCEvents,
 } from '@privateaim/core';
 import {
     buildSocketRealmNamespaceName,
@@ -23,7 +23,7 @@ type SocketModuleManagerConfiguration = {
     store?: AuthupStore
 };
 
-export type SocketClient = Socket<SocketServerToClientEvents, SocketClientToServerEvents>;
+export type SocketClient = Socket<SocketResourcesNamespaceSTCEvents, SocketResourcesNamespaceCTSEvents>;
 
 export class SocketManager {
     protected manager : Manager;

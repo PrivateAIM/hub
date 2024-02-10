@@ -60,6 +60,6 @@ export type TrainStationEventContext = DomainEventBaseContext & {
 };
 
 export type AnalyseNodeSocketEventData = Record<string, { online: boolean, realmId: string }>;
-export type AnalyseNodeSocketClientToServerEvents = {
+export type AnalyseNodeSocketCTSEvents = {
     analysisNodes: (id: Analysis['id'], cb?: (err: null | Error, data: AnalyseNodeSocketEventData) => void) => void
 }

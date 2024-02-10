@@ -5,29 +5,23 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { AnalyseNodeSocketEventData } from '@privateaim/core';
 import {
     DomainEventSubscriptionName,
     DomainType,
     PermissionID,
     buildDomainChannelName,
     buildDomainEventSubscriptionFullName,
-    buildSocketRealmNamespaceName,
     isSocketClientToServerEventCallback,
     isSocketClientToServerEventErrorCallback,
 } from '@privateaim/core';
 import { UnauthorizedError } from '@ebec/http';
-import { useAPIClient } from '../../../core';
-import type {
-    SocketHandlerContext,
-} from '../../type';
+import type { ResourcesNamespaceSocket } from '../../types';
 import {
     subscribeSocketRoom,
     unsubscribeSocketRoom,
-} from '../../utils';
-import { buildNodeSocketRoom } from '../node';
+} from '../../../../utils';
 
-export function registerAnalysisSocketHandlers({ socket, server }: SocketHandlerContext) {
+export function registerAnalysisSocketHandlers(socket: ResourcesNamespaceSocket) {
     if (!socket.data.userId && !socket.data.robotId) return;
 
     socket.on(
@@ -59,29 +53,4 @@ export function registerAnalysisSocketHandlers({ socket, server }: SocketHandler
             unsubscribeSocketRoom(socket, buildDomainChannelName(DomainType.ANALYSIS, target));
         },
     );
-
-    socket.on('analysisNodes', async (id, cb) => {
-        // todo: might should cache this with redis
-        const apiClient = useAPIClient();
-        const response = await apiClient.analysisNode.getMany({
-            filter: {
-                analysis_id: id,
-            },
-        });
-
-        const data : AnalyseNodeSocketEventData = {};
-
-        for (let i = 0; i < response.data.length; i++) {
-            const nodeRoom = buildNodeSocketRoom(response.data[i].node_id);
-            const nodeRoomNamespace = server.of(buildSocketRealmNamespaceName(response.data[i].node_realm_id));
-            const nodeRoomSockets = nodeRoomNamespace.adapter.rooms.get(nodeRoom);
-
-            data[response.data[i].node_id] = {
-                online: nodeRoomSockets.size > 0,
-                realmId: response.data[i].node_realm_id,
-            };
-        }
-
-        cb(null, data);
-    });
 }

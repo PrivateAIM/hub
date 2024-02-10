@@ -1,5 +1,5 @@
 {
-    "bootstrap-sha": "6bd5505381d9158b369bb757fcb2c447a3423636",
+    "bootstrap-sha": "a74e43ba51cdc556e99605e3eefcb1cec3a64363",
     "include-component-in-tag": true,
     "release-type": "node",
     "bump-minor-pre-major": true,
@@ -9,9 +9,9 @@
         "packages/client-vue": {"component": "client-vue" },
         "packages/core": {"component": "core" },
         "packages/server-api": {"component": "server-api" },
-        "packages/server-core": {"component": "server-core" },
+        "packages/server-kit": {"component": "server-kit" },
         "packages/server-realtime": {"component": "server-realtime" },
-        "packages/server-train-manager": {"component": "server-train-manager" }
+        "packages/server-analysis-manager": {"component": "server-analysis-manager" }
     },
     "plugins": [
         {
@@ -26,9 +26,9 @@
                 "client-vue",
                 "core",
                 "server-api",
-                "server-core",
+                "server-kit",
                 "server-realtime",
-                "server-train-manager"
+                "server-analysis-manager"
             ]
         }
     ],

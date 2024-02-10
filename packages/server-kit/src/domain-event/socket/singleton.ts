@@ -7,16 +7,16 @@
 
 import { Emitter } from '@socket.io/redis-emitter';
 import { useClient } from 'redis-extension';
-import type { SocketServerToClientEvents } from '@privateaim/core';
+import type { SocketResourcesNamespaceSTCEvents } from '@privateaim/core';
 
-let instance : undefined | Emitter<SocketServerToClientEvents>;
+let instance : undefined | Emitter<SocketResourcesNamespaceSTCEvents>;
 
-export function useSocketEmitter() : Emitter<SocketServerToClientEvents> {
+export function useSocketEmitter() : Emitter<SocketResourcesNamespaceSTCEvents> {
     if (typeof instance !== 'undefined') {
         return instance;
     }
 
-    instance = new Emitter<SocketServerToClientEvents>(useClient());
+    instance = new Emitter<SocketResourcesNamespaceSTCEvents>(useClient());
 
     return instance;
 }

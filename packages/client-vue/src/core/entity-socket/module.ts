@@ -18,7 +18,7 @@ import type {
     DomainEventSubscriptionFullName,
     DomainInput,
     DomainType,
-    SocketServerToClientEventContext,
+    SocketSTCEventContext,
 } from '@privateaim/core';
 import {
     computed, isRef, onMounted, onUnmounted, watch,
@@ -59,7 +59,7 @@ export function createEntitySocket<
 
     const lockId = computed(() => (isRef(ctx.lockId) ? ctx.lockId.value : ctx.lockId));
 
-    const processEvent = (event: SocketServerToClientEventContext<DomainEventContext<A>>) : boolean => {
+    const processEvent = (event: SocketSTCEventContext<DomainEventContext<A>>) : boolean => {
         if (
             ctx.processEvent &&
             !ctx.processEvent(event, realmId.value)
@@ -82,7 +82,7 @@ export function createEntitySocket<
         return event.data.id !== lockId.value;
     };
 
-    const handleCreated = (event: SocketServerToClientEventContext<DomainEventContext<A>>) => {
+    const handleCreated = (event: SocketSTCEventContext<DomainEventContext<A>>) => {
         if (!processEvent(event)) {
             return;
         }
@@ -92,7 +92,7 @@ export function createEntitySocket<
         }
     };
 
-    const handleUpdated = (event: SocketServerToClientEventContext<DomainEventContext<A>>) => {
+    const handleUpdated = (event: SocketSTCEventContext<DomainEventContext<A>>) => {
         if (!processEvent(event)) {
             return;
         }
@@ -101,7 +101,7 @@ export function createEntitySocket<
             ctx.onUpdated(event.data as T);
         }
     };
-    const handleDeleted = (event: SocketServerToClientEventContext<DomainEventContext<A>>) => {
+    const handleDeleted = (event: SocketSTCEventContext<DomainEventContext<A>>) => {
         if (!processEvent(event)) {
             return;
         }

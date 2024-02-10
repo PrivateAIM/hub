@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { SocketInterface } from './type';
+import type { SocketBase } from './types';
 
 export function subscribeSocketRoom(
-    socket: SocketInterface,
+    socket: SocketBase,
     roomName: string,
 ) {
     if (!socket.data.roomConnections) {
@@ -25,7 +25,7 @@ export function subscribeSocketRoom(
 }
 
 export function unsubscribeSocketRoom(
-    socket: SocketInterface,
+    socket: SocketBase,
     roomName: string,
 ) {
     if (!socket.data.roomConnections) {

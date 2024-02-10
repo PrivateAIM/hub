@@ -5,5 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './type';
+export * from './namespaces';
+export * from './constants';
+export * from './types';
 export * from './utils';

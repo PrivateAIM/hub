@@ -16,22 +16,21 @@ import {
 } from '@privateaim/core';
 import { UnauthorizedError } from '@ebec/http';
 import type {
-    SocketHandlerContext,
-} from '../../type';
+    ResourcesNamespaceSocket,
+} from '../../types';
 import {
-    unsubscribeSocketRoom,
     subscribeSocketRoom,
-} from '../../utils';
+    unsubscribeSocketRoom,
+} from '../../../../utils';
 
-export function registerProjectSocketHandlers({ socket }: SocketHandlerContext) {
+export function registerRegistryProjectSocketHandlers(socket: ResourcesNamespaceSocket) {
     if (!socket.data.userId && !socket.data.robotId) return;
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainType.PROJECT, DomainEventSubscriptionName.SUBSCRIBE),
+        buildDomainEventSubscriptionFullName(DomainType.REGISTRY_PROJECT, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             if (
-                !socket.data.ability.has(PermissionID.PROJECT_DROP) &&
-                !socket.data.ability.has(PermissionID.PROJECT_EDIT)
+                !socket.data.ability.has(PermissionID.REGISTRY_MANAGE)
             ) {
                 if (isSocketClientToServerEventErrorCallback(cb)) {
                     cb(new UnauthorizedError());
@@ -40,7 +39,7 @@ export function registerProjectSocketHandlers({ socket }: SocketHandlerContext) 
                 return;
             }
 
-            subscribeSocketRoom(socket, buildDomainChannelName(DomainType.PROJECT, target));
+            subscribeSocketRoom(socket, buildDomainChannelName(DomainType.REGISTRY_PROJECT, target));
 
             if (isSocketClientToServerEventCallback(cb)) {
                 cb();
@@ -49,9 +48,9 @@ export function registerProjectSocketHandlers({ socket }: SocketHandlerContext) 
     );
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainType.PROJECT, DomainEventSubscriptionName.UNSUBSCRIBE),
+        buildDomainEventSubscriptionFullName(DomainType.REGISTRY_PROJECT, DomainEventSubscriptionName.UNSUBSCRIBE),
         (target) => {
-            unsubscribeSocketRoom(socket, buildDomainChannelName(DomainType.PROJECT, target));
+            unsubscribeSocketRoom(socket, buildDomainChannelName(DomainType.REGISTRY_PROJECT, target));
         },
     );
 }
