@@ -7,23 +7,19 @@
 
 import { DomainEventName } from '@privateaim/core';
 import type { DomainsEventContext } from '@privateaim/core';
-import { hasClient, hasConfig, useClient } from 'redis-extension';
+import type { Client } from 'redis-extension';
 import type { DomainEventDestinations } from '../type';
 import { buildDomainEventChannelName, transformDomainEventData } from '../utils';
 
 export async function publishDomainRedisEvent(
+    client: Client,
     context: DomainsEventContext,
     destinations: DomainEventDestinations,
 ) : Promise<any> {
-    if (!hasClient() && !hasConfig()) {
-        return Promise.resolve();
-    }
-
     context = transformDomainEventData(context);
 
     const json = JSON.stringify(context);
 
-    const client = useClient();
     const pipeline = client.pipeline();
     for (let i = 0; i < destinations.length; i++) {
         const { namespace } = destinations[i];

@@ -12,7 +12,7 @@ import type {
 } from 'typeorm';
 import { EventSubscriber } from 'typeorm';
 import type {
-    Node, Analysis,
+    Analysis,
 } from '@privateaim/core';
 import {
     DomainEventName,
@@ -22,6 +22,7 @@ import {
     buildDomainNamespaceName,
 } from '@privateaim/core';
 import { publish as publishMessage } from 'amqp-extension';
+import { useRedisClient } from '../../core';
 import { AnalysisEntity } from '../../domains';
 
 async function publishEvent(
@@ -29,6 +30,7 @@ async function publishEvent(
     data: Analysis,
 ) {
     await publishDomainEvent(
+        useRedisClient(),
         {
             type: DomainType.ANALYSIS,
             event,

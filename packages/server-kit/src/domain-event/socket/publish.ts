@@ -5,25 +5,22 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { DomainsEventContext } from '@privateaim/core';
+import type { DomainsEventContext, SocketResourcesNamespaceSTCEvents } from '@privateaim/core';
 import { DomainEventName, buildDomainEventFullName } from '@privateaim/core';
-import { hasClient, hasConfig } from 'redis-extension';
+import { Emitter } from '@socket.io/redis-emitter';
+import type { Client } from 'redis-extension';
 import type { DomainEventDestinations } from '../type';
 import { buildDomainEventChannelName, transformDomainEventData } from '../utils';
-import { useSocketEmitter } from './singleton';
 
 export function publishDomainSocketEvent(
+    client: Client,
     context: DomainsEventContext,
     destinations: DomainEventDestinations,
 ) {
-    if (!hasClient() && !hasConfig()) {
-        return;
-    }
-
     context = transformDomainEventData(context);
 
     for (let i = 0; i < destinations.length; i++) {
-        let emitter = useSocketEmitter();
+        let emitter = new Emitter<SocketResourcesNamespaceSTCEvents>(client);
         if (destinations[i].namespace) {
             emitter = emitter.of(destinations[i].namespace);
         }

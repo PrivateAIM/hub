@@ -19,6 +19,7 @@ import {
     buildDomainChannelName,
     buildDomainNamespaceName,
 } from '@privateaim/core';
+import {useRedisClient} from "../../core";
 import { ProjectEntity } from '../../domains';
 
 async function publishEvent(
@@ -26,6 +27,7 @@ async function publishEvent(
     data: Project,
 ) {
     await publishDomainEvent(
+        useRedisClient(),
         {
             type: DomainType.PROJECT,
             event,
