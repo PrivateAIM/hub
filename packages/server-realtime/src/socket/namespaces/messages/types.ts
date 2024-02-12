@@ -1,4 +1,8 @@
-import type { SocketMessagesNamespaceCTSMessagesEvents, SocketMessagesNamespaceSTCEvents, SocketSTSEvents } from '@privateaim/core';
+import type {
+    SocketMessagesNamespaceCTSMessagesEvents,
+    SocketMessagesNamespaceSTCEvents,
+    SocketSTSEvents,
+} from '@privateaim/core';
 import type { Namespace, Socket } from 'socket.io';
 import type { SocketData } from '../../types';
 

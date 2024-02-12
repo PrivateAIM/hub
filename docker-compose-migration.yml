@@ -1,0 +1,28 @@
+# This file is used to generate driver specific migrations.
+version: '3.9'
+services:
+    mysql:
+        image: mysql
+        command: --default-authentication-plugin=mysql_native_password
+        restart: always
+        healthcheck:
+            test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+            interval: 3s
+            timeout: 5s
+            retries: 5
+        environment:
+            MYSQL_ROOT_PASSWORD: start123
+        ports:
+            - '3306:3306'
+    postgres:
+        image: postgres
+        restart: always
+        healthcheck:
+            test: [ "CMD", "pg_isready" ]
+            interval: 3s
+            timeout: 5s
+            retries: 5
+        environment:
+            POSTGRES_PASSWORD: start123
+        ports:
+            - '5432:5432'
