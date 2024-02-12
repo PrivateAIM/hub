@@ -8,10 +8,9 @@
 import type {
     Node,
 } from '@privateaim/core';
-import { removeDateProperties } from '../../utils';
-import { expectPropertiesEqualToSrc } from '../../utils';
-import { useSuperTest } from '../../utils';
-import { dropTestDatabase, useTestDatabase } from '../../utils';
+import {
+    dropTestDatabase, expectPropertiesEqualToSrc, removeDateProperties, useSuperTest, useTestDatabase,
+} from '../../utils';
 import { createSuperTestNode } from '../../utils/domains';
 
 describe('src/controllers/core/node', () => {

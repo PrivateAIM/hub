@@ -22,7 +22,7 @@ export default defineNuxtComponent({
         const items = [
             {
                 id: ServiceID.SYSTEM, name: 'System', icon: 'fa-solid fa-atom', version: 'v1.0.0-alpha.0',
-            }
+            },
         ];
 
         const thirdPartyItems = [

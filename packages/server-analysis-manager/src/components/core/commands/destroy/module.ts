@@ -7,7 +7,7 @@
 
 import { getMinioBucketObjectList, useMinio } from '../../../../core';
 import type { CoreDestroyPayload } from '../../type';
-import {buildMinioBucketName} from '../utils';
+import { buildMinioBucketName } from '../utils';
 
 export async function executeCoreDestroyCommand(
     payload: CoreDestroyPayload,

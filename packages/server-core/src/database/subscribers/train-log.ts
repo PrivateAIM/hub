@@ -19,7 +19,7 @@ import {
     buildDomainChannelName,
     buildDomainNamespaceName,
 } from '@privateaim/core';
-import {useRedisClient, useRedisPublishClient} from "../../core";
+import { useRedisPublishClient } from '../../core';
 import { AnalysisLogEntity } from '../../domains';
 
 async function publishEvent(

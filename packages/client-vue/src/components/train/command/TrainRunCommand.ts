@@ -10,10 +10,10 @@ import {
 import type { PropType } from 'vue';
 import type { Analysis } from '@privateaim/core';
 import {
-    PermissionID,
     AnalysisAPICommand,
     AnalysisBuildStatus,
     AnalysisRunStatus,
+    PermissionID,
 } from '@privateaim/core';
 import type { TrainCommandProperties } from './type';
 import {

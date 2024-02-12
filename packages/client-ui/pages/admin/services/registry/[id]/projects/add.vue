@@ -5,7 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Registry, RegistryProject } from '@privateaim/core';
+import type { Registry } from '@privateaim/core';
 import { PermissionID } from '@privateaim/core';
 import type { PropType } from 'vue';
 import { RegistryProjectForm } from '@privateaim/client-vue';
@@ -32,7 +32,7 @@ export default defineNuxtComponent({
 
         const toast = useToast();
 
-        const handleCreated = (e: RegistryProject) => {
+        const handleCreated = () => {
             toast.show({ variant: 'success', body: 'The project was successfully created.' });
         };
 

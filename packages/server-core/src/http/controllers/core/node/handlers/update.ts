@@ -17,9 +17,8 @@ import { useDataSource } from 'typeorm-extension';
 import { RegistryCommand } from '../../../../../components';
 import { buildRegistryPayload } from '../../../../../components/registry/utils/queue';
 import { useRequestEnv } from '../../../../request';
-import {createNodeRobot, runNodeValidation} from '../utils';
-import { NodeEntity } from '../../../../../domains';
-import { RegistryProjectEntity } from '../../../../../domains';
+import { createNodeRobot, runNodeValidation } from '../utils';
+import { NodeEntity, RegistryProjectEntity } from '../../../../../domains';
 
 export async function updateNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -109,7 +108,7 @@ export async function updateNodeRouteHandler(req: Request, res: Response) : Prom
         }
     }
 
-    if(!entity.robot_id) {
+    if (!entity.robot_id) {
         await createNodeRobot(entity);
     }
 

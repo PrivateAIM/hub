@@ -1,4 +1,4 @@
 export enum NodeSocketEventName {
     REGISTER = 'nodeRegister',
-    UNREGISTER = 'nodeUnregister'
+    UNREGISTER = 'nodeUnregister',
 }

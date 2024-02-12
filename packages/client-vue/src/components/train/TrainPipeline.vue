@@ -7,14 +7,13 @@
 <script lang="ts">
 import type { Analysis } from '@privateaim/core';
 import {
+    AnalysisAPICommand,
+    AnalysisBuildStatus, AnalysisConfigurationStatus,
+    AnalysisResultStatus, AnalysisRunStatus,
     PermissionID,
-    AnalysisAPICommand, AnalysisBuildStatus,
-    AnalysisConfigurationStatus, AnalysisResultStatus,
-    AnalysisRunStatus,
 } from '@privateaim/core';
 import type { PropType } from 'vue';
 import { computed, defineComponent } from 'vue';
-import { VCLink } from '@vuecs/link';
 import { injectAuthupStore } from '../../core';
 import Dropdown from '../Dropdown';
 import TrainResultCommand from './command/TrainResultCommand';

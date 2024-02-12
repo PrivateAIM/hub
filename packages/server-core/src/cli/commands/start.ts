@@ -6,12 +6,8 @@
  */
 
 import dotenv from 'dotenv';
-import type { Arguments, CommandModule } from 'yargs';
+import type { CommandModule } from 'yargs';
 import { startCommand } from '../../commands';
-
-interface StartArguments extends Arguments {
-
-}
 
 export class StartCommand implements CommandModule {
     command = 'start';
@@ -19,7 +15,7 @@ export class StartCommand implements CommandModule {
     describe = 'Start the backend server.';
 
     // eslint-disable-next-line class-methods-use-this
-    async handler(args: StartArguments) {
+    async handler() {
         dotenv.config();
 
         await startCommand();

@@ -11,8 +11,7 @@ import { NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/core';
 import type { Request } from 'routup';
 import type { ProjectNodeEntity } from '../../../../../domains';
-import { ProjectEntity } from '../../../../../domains';
-import { NodeEntity } from '../../../../../domains';
+import { NodeEntity, ProjectEntity } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 import type { RequestValidationResult } from '../../../../validation';
 import {

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Registry, RegistryProject, Analysis } from '@privateaim/core';
+import type { Analysis, Registry, RegistryProject } from '@privateaim/core';
 
 export type ComponentPayloadExtended<T extends Record<string, any>> = T & {
     entity: Analysis,

@@ -8,9 +8,9 @@
 import type { Analysis, AnalysisNode } from '@privateaim/core';
 import {
     AnalysisBuildStatus,
-    AnalysisRunStatus,
     AnalysisNodeRunStatus,
     AnalysisNodeStatic,
+    AnalysisRunStatus,
 } from '@privateaim/core';
 import type { BuildInput } from 'rapiq';
 import type { PropType } from 'vue';

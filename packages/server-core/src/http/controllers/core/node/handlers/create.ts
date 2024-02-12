@@ -20,7 +20,7 @@ import { RegistryCommand } from '../../../../../components';
 import { buildRegistryPayload } from '../../../../../components/registry/utils/queue';
 import { RequestValidationError } from '../../../../validation';
 import { useRequestEnv } from '../../../../request';
-import {createNodeRobot, runNodeValidation} from '../utils';
+import { createNodeRobot, runNodeValidation } from '../utils';
 import { NodeEntity, RegistryProjectEntity } from '../../../../../domains';
 
 export async function createNodeRouteHandler(req: Request, res: Response) : Promise<any> {

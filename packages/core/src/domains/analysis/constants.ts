@@ -77,5 +77,5 @@ export enum AnalysisAPICommand {
 // -------------------------------------------------------------------------
 
 export enum AnalysisContainerPath {
-    MAIN = '/opt/'
+    MAIN = '/opt/',
 }

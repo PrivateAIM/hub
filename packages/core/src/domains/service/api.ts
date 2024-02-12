@@ -10,7 +10,6 @@ import { BaseAPI } from '../base';
 import type { RegistryAPICommand } from './registry';
 import { ServiceID } from './constants';
 import type { SingleResourceResponse } from '../types-base';
-import type { SecretStorageAPICommand } from './secret-engine';
 import type { Registry } from '../registry';
 import type { RegistryProject } from '../registry-project';
 

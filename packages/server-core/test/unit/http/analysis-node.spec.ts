@@ -6,15 +6,14 @@
  */
 
 import type { AnalysisNode } from '@privateaim/core';
-import { removeDateProperties } from '../../utils';
-import { expectPropertiesEqualToSrc } from '../../utils';
-import { useSuperTest } from '../../utils';
-import { dropTestDatabase, useTestDatabase } from '../../utils';
 import {
+    dropTestDatabase, expectPropertiesEqualToSrc, removeDateProperties, useSuperTest, useTestDatabase,
+} from '../../utils';
+import {
+    createSuperTestAnalysis,
+    createSuperTestNode,
     createSuperTestProject,
     createSuperTestProjectNode,
-    createSuperTestNode,
-    createSuperTestAnalysis,
 } from '../../utils/domains';
 
 describe('src/controllers/core/train-station', () => {

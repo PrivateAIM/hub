@@ -21,7 +21,7 @@ export async function buildDataSourceOptions() : Promise<DataSourceOptions> {
     }
 
     if (useEnv('env') === EnvironmentName.TEST) {
-        if(options.type === 'better-sqlite3') {
+        if (options.type === 'better-sqlite3') {
             Object.assign(options, {
                 database: ':memory:',
             } satisfies Partial<DataSourceOptions>);

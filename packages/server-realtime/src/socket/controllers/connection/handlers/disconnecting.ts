@@ -1,9 +1,9 @@
 import { SocketSTCEventName } from '@privateaim/core';
 import type { SocketBase } from '../../../types';
 import {
-    buildConnectionRobotRoom, buildConnectionUserRoom,
-    buildConnectionRobotSubscriptionRoom,
-    buildConnectionUserSubscriptionRoom
+    buildConnectionRobotRoom, buildConnectionRobotSubscriptionRoom,
+    buildConnectionUserRoom,
+    buildConnectionUserSubscriptionRoom,
 } from '../utils';
 
 export function registerSocketConnectionDisconnectingHandler(socket: SocketBase) {

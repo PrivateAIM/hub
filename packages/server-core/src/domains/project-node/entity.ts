@@ -10,7 +10,7 @@ import {
     CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn,
 } from 'typeorm';
 import type {
-    Project, ProjectNode, ProjectNodeApprovalStatus, Node,
+    Node, Project, ProjectNode, ProjectNodeApprovalStatus,
 } from '@privateaim/core';
 import type { Realm } from '@authup/core';
 import { ProjectEntity } from '../project/entity';

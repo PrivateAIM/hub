@@ -9,10 +9,10 @@ import { computed, defineComponent, ref } from 'vue';
 import type { PropType } from 'vue';
 import type { Analysis } from '@privateaim/core';
 import {
-    PermissionID,
     AnalysisAPICommand,
     AnalysisBuildStatus,
     AnalysisConfigurationStatus,
+    PermissionID,
 } from '@privateaim/core';
 import {
     injectAPIClient, injectAuthupStore, renderActionCommand, wrapFnWithBusyState,

@@ -7,7 +7,6 @@
 
 import { SocketManager } from '@privateaim/client-vue';
 import type { Pinia } from 'pinia';
-import { ref } from 'vue';
 import { useRuntimeConfig } from '#imports';
 import { useAuthStore } from '../store/auth';
 

@@ -9,8 +9,7 @@
 import type { Registry } from '@privateaim/core';
 import type { PropType } from 'vue';
 import { RegistryCleanup } from '@privateaim/client-vue';
-import { useToast } from '#imports';
-import { defineNuxtComponent } from '#imports';
+import { defineNuxtComponent, useToast } from '#imports';
 
 export default defineNuxtComponent({
     components: { RegistryCleanup },
@@ -20,7 +19,7 @@ export default defineNuxtComponent({
             required: true,
         },
     },
-    async setup(props) {
+    async setup() {
         const toast = useToast();
 
         const handleExecuted = () => {

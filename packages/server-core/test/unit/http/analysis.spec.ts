@@ -6,11 +6,10 @@
  */
 
 import type { Analysis } from '@privateaim/core';
-import { removeDateProperties } from '../../utils';
-import { useSuperTest } from '../../utils';
-import { dropTestDatabase, useTestDatabase } from '../../utils';
-import { TEST_DEFAULT_ANALYSIS, createSuperTestProject, createSuperTestAnalysis } from '../../utils/domains';
-import { expectPropertiesEqualToSrc } from '../../utils';
+import {
+    dropTestDatabase, expectPropertiesEqualToSrc, removeDateProperties, useSuperTest, useTestDatabase,
+} from '../../utils';
+import { TEST_DEFAULT_ANALYSIS, createSuperTestAnalysis, createSuperTestProject } from '../../utils/domains';
 import { buildRequestValidationErrorMessage } from '../../../src/http/validation';
 
 describe('src/controllers/core/analysis', () => {

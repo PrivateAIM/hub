@@ -17,9 +17,7 @@ import type {
     AnalysisResultStatus,
     AnalysisRunStatus,
 } from './constants';
-import type { Node } from '../node';
 import type { Registry } from '../registry';
-import type { RegistryProject } from '../registry-project';
 
 export interface Analysis {
     id: string;

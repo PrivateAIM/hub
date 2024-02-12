@@ -6,7 +6,7 @@
  */
 import { adjustFilePath } from 'typeorm-extension';
 import type { DataSourceOptions } from 'typeorm';
-import {hasRedisClient} from "../../core";
+import { hasRedisClient } from '../../core';
 import {
     AnalysisEntity,
     AnalysisFileEntity,

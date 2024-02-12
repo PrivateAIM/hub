@@ -15,7 +15,7 @@ export class MigrationStatusCommand implements CommandModule {
 
     describe = 'Status of database migrations.';
 
-    async handler(args: any) {
+    async handler() {
         createConfig();
 
         const options = await buildDataSourceOptions();

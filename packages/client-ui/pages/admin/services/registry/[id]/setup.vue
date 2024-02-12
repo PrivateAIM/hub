@@ -19,7 +19,7 @@ export default defineNuxtComponent({
             required: true,
         },
     },
-    async setup(props) {
+    async setup() {
         const toast = useToast();
         const handleExecuted = () => {
             if (toast) {

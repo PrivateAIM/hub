@@ -6,7 +6,7 @@
  */
 
 import type {
-    Analysis, AnalysisNode, Node
+    Analysis,
 } from '@privateaim/core';
 import type { BuilderCommand, BuilderEvent } from './constants';
 

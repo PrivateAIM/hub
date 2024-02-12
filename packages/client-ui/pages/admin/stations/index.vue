@@ -45,7 +45,7 @@ export default defineNuxtComponent({
             await navigateTo(`/admin/stations/${e.id}`);
         };
 
-        const handleDeleted = (e: Node) => {
+        const handleDeleted = () => {
             toast.show({ variant: 'success', body: 'The station was successfully deleted.' });
         };
 

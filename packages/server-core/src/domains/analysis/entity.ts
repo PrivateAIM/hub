@@ -19,14 +19,14 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 import type {
-    MasterImage,
-    Project,
-    Registry,
     Analysis,
     AnalysisBuildStatus,
     AnalysisFile,
     AnalysisResultStatus,
     AnalysisRunStatus,
+    MasterImage,
+    Project,
+    Registry,
 } from '@privateaim/core';
 import {
     AnalysisConfigurationStatus,

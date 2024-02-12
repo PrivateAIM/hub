@@ -17,7 +17,7 @@ import {
 } from '@privateaim/core';
 import { UnauthorizedError } from '@ebec/http';
 import type {
-    ResourcesNamespaceSocket
+    ResourcesNamespaceSocket,
 } from '../../types';
 import {
     subscribeSocketRoom,

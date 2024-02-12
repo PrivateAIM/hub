@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import { ARealms } from '@authup/client-vue';
-import type { Registry, Node } from '@privateaim/core';
+import type { Node, Registry } from '@privateaim/core';
 import {
     DomainType,
     alphaNumHyphenUnderscoreRegex, hexToUTF8, isHex,

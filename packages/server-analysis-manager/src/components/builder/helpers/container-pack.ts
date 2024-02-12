@@ -16,7 +16,7 @@ import {
 } from '../../../core';
 import { BuilderCommand } from '../constants';
 import { BuilderError } from '../error';
-import { useBuilderLogger } from '../utils'
+import { useBuilderLogger } from '../utils';
 import type { ContainerPackContext } from './type';
 
 export async function packContainerWithTrain(container: Container, context: ContainerPackContext) {

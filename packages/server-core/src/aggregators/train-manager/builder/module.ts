@@ -21,8 +21,7 @@ import {
 } from '@privateaim/core';
 import { useDataSource } from 'typeorm-extension';
 import type { AnalysisLogSaveContext } from '../../../domains';
-import { saveAnalysisLog } from '../../../domains';
-import { AnalysisEntity } from '../../../domains';
+import { AnalysisEntity, saveAnalysisLog } from '../../../domains';
 
 export async function handleTrainManagerBuilderEvent(
     context: BuilderEventContext | ComponentContextWithError<BuilderEventContext>,

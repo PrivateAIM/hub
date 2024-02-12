@@ -12,11 +12,10 @@ import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceReadable } from '@authup/core';
 import { useDataSource } from 'typeorm-extension';
 import { useLogger } from '../../../../../config';
-import { useMinio } from '../../../../../core';
-import { streamToBuffer } from '../../../../../core';
-import { AnalysisNodeEntity } from '../../../../../domains';
-import { AnalysisEntity, generateAnalysisMinioBucketName } from '../../../../../domains';
-import { AnalysisFileEntity } from '../../../../../domains';
+import { streamToBuffer, useMinio } from '../../../../../core';
+import {
+    AnalysisEntity, AnalysisFileEntity, AnalysisNodeEntity, generateAnalysisMinioBucketName,
+} from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 
 export async function handleAnalysisFilesDownloadRouteHandler(req: Request, res: Response) : Promise<any> {

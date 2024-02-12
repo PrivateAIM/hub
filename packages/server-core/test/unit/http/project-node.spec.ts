@@ -6,10 +6,10 @@
  */
 
 import type { ProjectNode } from '@privateaim/core';
-import { useSuperTest } from '../../utils';
-import { dropTestDatabase, useTestDatabase } from '../../utils';
+import {
+    dropTestDatabase, expectPropertiesEqualToSrc, useSuperTest, useTestDatabase,
+} from '../../utils';
 import { createSuperTestNode, createSuperTestProject } from '../../utils/domains';
-import { expectPropertiesEqualToSrc } from '../../utils';
 
 describe('src/controllers/core/project-node', () => {
     const superTest = useSuperTest();

@@ -9,7 +9,6 @@ import {
 import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
 import { defineNuxtComponent } from '#app';
-import { resolveComponent } from '#imports';
 import { useAuthStore } from '../../../../store/auth';
 
 export default defineNuxtComponent({
@@ -23,8 +22,6 @@ export default defineNuxtComponent({
     },
     emits: ['deleted'],
     setup(props, { emit }) {
-        const list = resolveComponent('RobotList');
-
         const handleDeleted = (e: Robot) => {
             emit('deleted', e);
         };

@@ -17,7 +17,7 @@ import type {
     EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
 import { EventSubscriber } from 'typeorm';
-import {useRedisClient, useRedisPublishClient} from "../../core";
+import { useRedisPublishClient } from '../../core';
 import { NodeEntity } from '../../domains';
 
 async function publishEvent(

@@ -11,8 +11,7 @@ import { isRealmResourceWritable } from '@authup/core';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { AnalysisEntity } from '../../../../../domains';
-import { ProjectEntity } from '../../../../../domains';
+import { AnalysisEntity, ProjectEntity } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 
 export async function deleteAnalysisRouteHandler(req: Request, res: Response) : Promise<any> {

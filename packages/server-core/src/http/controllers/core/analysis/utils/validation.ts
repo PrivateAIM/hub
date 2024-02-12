@@ -9,9 +9,9 @@ import { check, validationResult } from 'express-validator';
 import { BadRequestError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/core';
 import type { Request } from 'routup';
-import { MasterImageEntity } from '../../../../../domains';
-import { ProjectEntity } from '../../../../../domains';
-import { RegistryEntity } from '../../../../../domains';
+import {
+    AnalysisFileEntity, MasterImageEntity, ProjectEntity, RegistryEntity,
+} from '../../../../../domains';
 import type { AnalysisEntity } from '../../../../../domains';
 import type { RequestValidationResult } from '../../../../validation';
 import {
@@ -19,7 +19,6 @@ import {
     initRequestValidationResult,
     matchedValidationData,
 } from '../../../../validation';
-import { AnalysisFileEntity } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 
 export async function runAnalysisValidation(

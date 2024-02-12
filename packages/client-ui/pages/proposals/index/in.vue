@@ -121,7 +121,7 @@ export default defineNuxtComponent({
             modalNode.value = false;
         };
 
-        const handleFailed = (e: Error) => {
+        const handleFailed = () => {
             // todo: handle error
         };
 

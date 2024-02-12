@@ -22,7 +22,7 @@ import {
     buildDomainNamespaceName,
 } from '@privateaim/core';
 import { publish as publishMessage } from 'amqp-extension';
-import {useRedisClient, useRedisPublishClient} from '../../core';
+import { useRedisPublishClient } from '../../core';
 import { AnalysisEntity } from '../../domains';
 
 async function publishEvent(

@@ -7,7 +7,7 @@
 
 import { hasOwnProperty } from '@privateaim/core';
 import type {
-    APIClient, Registry, Analysis,
+    APIClient, Analysis, Registry,
 } from '@privateaim/core';
 import { isClientErrorWithStatusCode, useClient } from 'hapic';
 import { BaseError } from '../error';

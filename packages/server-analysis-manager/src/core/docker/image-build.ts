@@ -36,9 +36,9 @@ export async function buildDockerImage(
     entry.end();
 
     const options : ImageBuildOptions = {
-        t: context.imageName
+        t: context.imageName,
     };
-    if(context.authConfig) {
+    if (context.authConfig) {
         options.authconfig = context.authConfig;
     }
 

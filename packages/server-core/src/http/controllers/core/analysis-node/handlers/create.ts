@@ -10,11 +10,10 @@ import { BadRequestError, ForbiddenError } from '@ebec/http';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { AnalysisNodeEntity } from '../../../../../domains';
+import { AnalysisEntity, AnalysisNodeEntity } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 import { runAnalysisNodeValidation } from '../utils';
 import { useEnv } from '../../../../../config';
-import { AnalysisEntity } from '../../../../../domains';
 
 export async function createAnalysisNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const ability = useRequestEnv(req, 'ability');

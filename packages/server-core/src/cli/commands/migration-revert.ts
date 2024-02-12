@@ -15,7 +15,7 @@ export class MigrationRevertCommand implements CommandModule {
 
     describe = 'Revert database migration.';
 
-    async handler(args: any) {
+    async handler() {
         createConfig();
 
         const options = await buildDataSourceOptions();

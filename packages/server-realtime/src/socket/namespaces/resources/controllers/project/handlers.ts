@@ -19,8 +19,8 @@ import type {
     ResourcesNamespaceSocket,
 } from '../../types';
 import {
-    unsubscribeSocketRoom,
     subscribeSocketRoom,
+    unsubscribeSocketRoom,
 } from '../../../../utils';
 
 export function registerProjectSocketHandlers(socket: ResourcesNamespaceSocket) {

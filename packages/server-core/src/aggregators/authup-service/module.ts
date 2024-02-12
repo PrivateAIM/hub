@@ -9,7 +9,7 @@ import { DomainType } from '@authup/core';
 import type { DomainsEventContext } from '@authup/core';
 import { isBoolFalse, isBoolTrue } from '@privateaim/core';
 import { createClient } from 'redis-extension';
-import {ConfigDefaults, useEnv, useLogger} from '../../config';
+import { ConfigDefaults, useEnv, useLogger } from '../../config';
 import type { Aggregator } from '../type';
 import {
     handleAuthupRealmEvent,

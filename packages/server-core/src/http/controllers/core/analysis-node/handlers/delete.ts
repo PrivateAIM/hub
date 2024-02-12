@@ -12,9 +12,8 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { MoreThan } from 'typeorm';
 import { isRealmResourceWritable } from '@authup/core';
 import { useDataSource } from 'typeorm-extension';
-import { AnalysisNodeEntity } from '../../../../../domains';
+import { AnalysisEntity, AnalysisNodeEntity } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
-import { AnalysisEntity } from '../../../../../domains';
 
 export async function deleteAnalysisNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');

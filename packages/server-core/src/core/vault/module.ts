@@ -1,4 +1,4 @@
-import type { VaultClient } from "@hapic/vault";
+import type { VaultClient } from '@hapic/vault';
 
 let instance : undefined | VaultClient;
 
