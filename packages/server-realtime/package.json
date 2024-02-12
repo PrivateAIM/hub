@@ -7,7 +7,7 @@
         "email": "contact@tada5hi.net",
         "url": "https://tada5hi.net"
     },
-    "license": "MIT",
+    "license": "Apache-2.0",
     "description": "This package contains the realtime application which connects the API with socket based clients.",
     "dependencies": {
         "@authup/core": "^1.0.0-beta.3",

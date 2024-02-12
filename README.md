@@ -91,11 +91,10 @@ These guidelines will help to ensure that contributions are made effectively and
 
 ## Credits
 If you have any questions, feel free to contact the author & creator [Peter Placzek](https://github.com/tada5hi)  of the project.
-The project was initial developed during this bachelor thesis, and he worked after that time as employee
-on the project.
+The project was initial developed during this bachelor thesis.
 
 ## License
 
 Made with 💚
 
-Published under [MIT License](./LICENSE).
+Published under [Apache 2.0](./LICENSE).

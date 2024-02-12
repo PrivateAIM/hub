@@ -9,7 +9,7 @@
         "email": "contact@tada5hi.net",
         "url": "https://tada5hi.net"
     },
-    "license": "MIT",
+    "license": "Apache-2.0",
     "description": "This package contains common constants, functions, types, ... for the server side.",
     "scripts": {
         "build": "tsc -p tsconfig.build.json"

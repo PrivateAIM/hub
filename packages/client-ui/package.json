@@ -1,13 +1,13 @@
 {
     "name": "@privateaim/client-ui",
     "private": true,
+    "version": "0.0.0",
+    "license": "Apache-2.0",
     "author": {
         "name": "Peter Placzek",
         "email": "contact@tada5hi.net",
         "url": "https://tada5hi.net"
     },
-    "license": "MIT",
-    "version": "0.0.0",
     "description": "This package contains the frontend application of the HUB Ecosystem.",
     "scripts": {
         "dev": "nuxi dev",
