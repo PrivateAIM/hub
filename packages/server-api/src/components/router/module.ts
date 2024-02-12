@@ -5,15 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { Component } from '@privateaim/server-kit';
 import type { ConsumeMessage } from 'amqp-extension';
 import { consume } from 'amqp-extension';
-import { useLogger } from '../../../../config';
-import { ComponentName } from '../../../constants';
-import { executeRegistryCommand } from '../../../registry';
+import { useLogger } from '../../config';
+import { ComponentName } from '../constants';
+import { executeRegistryCommand } from '../registry';
 import { ROUTER_QUEUE_ROUTING_KEY } from './constants';
 import type { QueueRouterPayload } from './type';
 
-export function buildRouterComponent() {
+export function buildRouterComponent() : Component {
     function start() {
         return consume({ exchange: { routingKey: ROUTER_QUEUE_ROUTING_KEY } }, {
             $any: async (message: ConsumeMessage) => {

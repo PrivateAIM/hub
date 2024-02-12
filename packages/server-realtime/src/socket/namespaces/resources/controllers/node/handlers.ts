@@ -15,14 +15,11 @@ import {
     isSocketClientToServerEventErrorCallback,
 } from '@privateaim/core';
 import { UnauthorizedError } from '@ebec/http';
-import { useAPIClient } from '../../../../../core';
 import type { ResourcesNamespaceSocket } from '../../types';
 import { subscribeSocketRoom, unsubscribeSocketRoom } from '../../../../utils';
 
 export function registerNodeSocketHandlers(socket: ResourcesNamespaceSocket) {
     if (!socket.data.userId && !socket.data.robotId) return;
-
-    const apiClient = useAPIClient();
 
     socket.on(
         buildDomainEventSubscriptionFullName(DomainType.NODE, DomainEventSubscriptionName.SUBSCRIBE),

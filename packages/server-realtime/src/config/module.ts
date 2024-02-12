@@ -5,28 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ROBOT_SYSTEM_NAME, mountClientResponseErrorTokenHook } from '@authup/core';
-import { APIClient } from '@privateaim/core';
 import { setConfig as setRedisConfig, useClient as useRedisClient } from 'redis-extension';
-import { setAPIClient } from '../core';
 import { useEnv } from './env';
 import type { Config } from './type';
 
 export function createConfig() : Config {
     setRedisConfig({ connectionString: useEnv('redisConnectionString') });
-
-    const apiClient = new APIClient({
-        baseURL: useEnv('apiURL'),
-    });
-    mountClientResponseErrorTokenHook(apiClient, {
-        baseURL: useEnv('authupApiURL'),
-        tokenCreator: {
-            type: 'robotInVault',
-            name: ROBOT_SYSTEM_NAME,
-            vault: useEnv('vaultConnectionString'),
-        },
-    });
-    setAPIClient(apiClient);
 
     const redisDatabase = useRedisClient();
     const redisPub = redisDatabase.duplicate();

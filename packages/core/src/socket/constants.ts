@@ -7,9 +7,11 @@ export enum SocketSTCEventName {
 }
 
 export enum SocketCTSEventName {
-    USER_CONNECTION_SUBSCRIBE = 'userStatusSubscribe',
-    USER_CONNECTION_UNSUBSCRIBE = 'userStatusUnsubscribe',
+    USER_CONNECTIONS = 'userConnections',
+    USER_CONNECTION_SUBSCRIBE = 'userConnectionSubscribe',
+    USER_CONNECTION_UNSUBSCRIBE = 'userConnectionUnsubscribe',
 
-    ROBOT_CONNECTION_SUBSCRIBE = 'robotStatusSubscribe',
-    ROBOT_CONNECTION_UNSUBSCRIBE = 'robotStatusUnsubscribe',
+    ROBOT_CONNECTIONS = 'robotConnections',
+    ROBOT_CONNECTION_SUBSCRIBE = 'robotConnectionSubscribe',
+    ROBOT_CONNECTION_UNSUBSCRIBE = 'robotConnectionUnsubscribe',
 }

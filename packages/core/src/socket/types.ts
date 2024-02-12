@@ -7,8 +7,11 @@ export type SocketSTCEventContext<T extends Record<string, any>> = T & {
     }
 };
 
-export type SocketEventSubscriptionTarget = string | number | undefined;
-export type SocketEventCallback<T = any> = (error: Error | null, data: T) => void;
+export type SocketEventTarget = string | number | undefined;
+export interface SocketEventCallback<T = any> {
+    (error: Error | null) : void;
+    (error: Error | null, data: T) : void;
+}
 
 export type SocketSTSEvents = {
     [event: string]: (...args: any[]) => void;
@@ -19,8 +22,17 @@ export type SocketSTCEvents = {
 };
 
 export type SocketCTSEvents = {
-    [K in `${SocketCTSEventName}`]: (
-        target: SocketEventSubscriptionTarget,
+    [K in `${SocketCTSEventName.USER_CONNECTION_SUBSCRIBE}` |
+        `${SocketCTSEventName.USER_CONNECTION_UNSUBSCRIBE}` |
+        `${SocketCTSEventName.ROBOT_CONNECTION_SUBSCRIBE}` |
+        `${SocketCTSEventName.ROBOT_CONNECTION_UNSUBSCRIBE}`
+    ]: (
+        target: SocketEventTarget,
         cb?: SocketEventCallback<undefined>
+    ) => void
+} & {
+    [K in `${SocketCTSEventName.USER_CONNECTIONS}` | `${SocketCTSEventName.ROBOT_CONNECTIONS}`]: (
+        target: SocketEventTarget,
+        cb?: SocketEventCallback<number>
     ) => void
 };

@@ -7,7 +7,6 @@
 
 import path from 'node:path';
 import { read, readInt } from 'envix';
-import { hasOwnProperty } from '@privateaim/core';
 import { config } from 'dotenv';
 import type { EnvironmentName } from './constants';
 import type { Environment } from './type';
@@ -36,7 +35,6 @@ export function useEnv(key?: string) : any {
         redisConnectionString: read('REDIS_CONNECTION_STRING', null),
         vaultConnectionString: read('VAULT_CONNECTION_STRING', 'start123@http://127.0.0.1:8090/v1/'),
 
-        apiURL: read('API_URL', 'http://127.0.0.1:3002/'),
         authupApiURL: read('AUTHUP_API_URL', 'http://127.0.0.1:3010/'),
     };
 
@@ -45,10 +43,4 @@ export function useEnv(key?: string) : any {
     }
 
     return instance;
-}
-
-export function isSetEnv(key: keyof Environment) : boolean {
-    const env = useEnv();
-
-    return hasOwnProperty(env, key) && typeof env[key] !== 'undefined' && env[key] !== null;
 }
