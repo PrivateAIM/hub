@@ -14,4 +14,7 @@ runs:
             shell: bash
             if: steps.build-cache.outputs.cache-hit != 'true'
             run: |
-                npm run build
+                npm run build --workspace=packages/core && \
+                npm run build --workspace=packages/server-kit && \
+                npm run build --workspace=packages/server-analysis-manager && \
+                npm run build --workspace=packages/server-api

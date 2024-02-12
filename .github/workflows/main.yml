@@ -30,17 +30,8 @@ jobs:
                 with:
                     node-version: ${{ env.PRIMARY_NODE_VERSION }}
 
-            -   name: Build Core
-                run: npm run build --workspace=packages/core
-
-            -   name: Build Server Core
-                run: npm run build --workspace=packages/server-kit
-
-            -   name: Build Server Train Manager
-                run: npm run build --workspace=packages/server-analysis-manager
-
-            -   name: Build Server API
-                run: npm run build --workspace=packages/server-api
+            -   name: Build
+                uses: ./.github/actions/build
 
             -   name: Test Server API
                 env:
