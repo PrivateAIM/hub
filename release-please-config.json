@@ -8,7 +8,7 @@
         "packages/client-ui": {"component": "client-ui" },
         "packages/client-vue": {"component": "client-vue" },
         "packages/core": {"component": "core" },
-        "packages/server-api": {"component": "server-api" },
+        "packages/server-core": {"component": "server-core" },
         "packages/server-kit": {"component": "server-kit" },
         "packages/server-realtime": {"component": "server-realtime" },
         "packages/server-analysis-manager": {"component": "server-analysis-manager" }
@@ -25,7 +25,7 @@
                 "client-ui",
                 "client-vue",
                 "core",
-                "server-api",
+                "server-core",
                 "server-kit",
                 "server-realtime",
                 "server-analysis-manager"

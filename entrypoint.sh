@@ -14,10 +14,10 @@ BASE_DIR=/usr/src/project
 cd "${BASE_DIR}"
 
 case "${1}" in
-    api) PACKAGE=api;;
+    core) PACKAGE=core;;
     ui) PACKAGE=ui;;
     realtime) PACKAGE=realtime;;
-    train-manager) PACKAGE=train-manager;;
+    analysis-manager) PACKAGE=analysis-manager;;
     cli) PACKAGE=cli;;
     *) echo "Unknown package: ${1}";;
 esac
@@ -26,17 +26,17 @@ shift
 
 if [[ -z "${PACKAGE}" ]]; then
     printf 'Usage:\n'
-    printf '  api <command>\n    Start or run the api service in dev mode.\n'
+    printf '  core <command>\n    Start or run the core service in dev mode.\n'
     printf '  ui <command>\n    Start or run the ui in dev mode.\n'
     printf '  realtime <command>\n    Start or run the realtime service in dev mode.\n'
-    printf '  train-manager <command>\n    Start or run the train-manager service in dev mode.\n'
+    printf '  analysis-manager <command>\n    Start or run the analysis-manager service in dev mode.\n'
     printf '  cli <command>\n    Run a CLI command.\n'
     exit 0
 fi
 
 case "${PACKAGE}" in
-    api)
-        exec npm run "$1" --workspace=packages/server-api
+    core)
+        exec npm run "$1" --workspace=packages/server-core
         ;;
     ui)
         export NUXT_HOST=0.0.0.0
@@ -46,11 +46,11 @@ case "${PACKAGE}" in
     realtime)
         exec npm run "$1" --workspace=packages/server-realtime
         ;;
-    train-manager)
-        exec npm run "$1" --workspace=packages/server-train-manager
+    analysis-manager)
+        exec npm run "$1" --workspace=packages/server-analysis-manager
         ;;
     cli)
-        exec npm run cli --workspace=packages/server-api -- "$@"
+        exec npm run cli --workspace=packages/server-core -- "$@"
         ;;
 esac
 

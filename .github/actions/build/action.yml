@@ -17,4 +17,4 @@ runs:
                 npm run build --workspace=packages/core && \
                 npm run build --workspace=packages/server-kit && \
                 npm run build --workspace=packages/server-analysis-manager && \
-                npm run build --workspace=packages/server-api
+                npm run build --workspace=packages/server-core

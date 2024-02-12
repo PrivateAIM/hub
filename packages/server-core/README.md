@@ -1,9 +1,9 @@
-# Central - API 🌴
+# Hub - Server Core 🌴
 
 [![npm version](https://badge.fury.io/js/@personalhealthtrain%2Fcentral-api.svg)](https://badge.fury.io/js/@personalhealthtrain%2Fcentral-api)
 
-This repository contains the Central API of the Personal Health Train (PHT).
-It communicates with some services of the PHT and need therefore to be configured properly, like described 
+This repository contains the server core service of the HUB ecosystem.
+It communicates with some services of FLAME and need therefore to be configured properly, like described 
 in the following sections.
 
 ## Configuration
@@ -13,9 +13,8 @@ PORT=<port>
 NODE_ENV=<development|production>
 
 API_URL=http://localhost:<port>/
-INTERNAL_API_URL=http://localhost:<port>/
-WEB_APP_URL=http://localhost:<ui port>/
 
+AUTHUP_API_URL=http://localhost:<port>/
 VAULT_CONNECTION_STRING=<token>@<api url>
 RABBITMQ_CONNECTION_STRING=amqp://<username>:<password>@<host>
 HARBOR_CONNECTION_STRING=<user>:<password>@<api url>
