@@ -1,7 +1,7 @@
 {
     "name": "@privateaim/client-vue",
     "private": true,
-    "version": "0.0.0",
+    "version": "1.0.0",
     "license": "Apache-2.0",
     "description": "This package contains vue components.",
     "main": "dist/index.cjs",
@@ -44,7 +44,7 @@
     "devDependencies": {
         "@authup/client-vue": "^1.0.0-beta.3",
         "@authup/core": "^1.0.0-beta.3",
-        "@privateaim/core": "^0.0.0",
+        "@privateaim/core": "^1.0.0",
         "@types/node": "^20.11.10",
         "@vitejs/plugin-vue": "^5.0.3",
         "@vuecs/form-controls": "^1.2.0",
@@ -68,7 +68,7 @@
     "peerDependencies": {
         "@authup/client-vue": ">=0.40.3 <1.0.0",
         "@authup/core": ">=0.41.0 <1.0.0",
-        "@privateaim/core": "^0.0.0",
+        "@privateaim/core": "^1.0.0",
         "@vuecs/form-controls": "^1.2.0",
         "@vuecs/link": "^1.0.0",
         "@vuecs/list-controls": "^1.1.1",

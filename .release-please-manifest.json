@@ -1,9 +1,9 @@
 {
-    "packages/client-ui": "0.0.0",
-    "packages/client-vue": "0.0.0",
-    "packages/core": "0.0.0",
-    "packages/server-core": "0.0.0",
-    "packages/server-kit": "0.0.0",
-    "packages/server-realtime": "0.0.0",
-    "packages/server-analysis-manager": "0.0.0"
+    "packages/client-ui": "1.0.0",
+    "packages/client-vue": "1.0.0",
+    "packages/core": "1.0.0",
+    "packages/server-core": "1.0.0",
+    "packages/server-kit": "1.0.0",
+    "packages/server-realtime": "1.0.0",
+    "packages/server-analysis-manager": "1.0.0"
 }
