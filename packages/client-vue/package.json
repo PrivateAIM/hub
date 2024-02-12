@@ -45,7 +45,7 @@
         "@authup/client-vue": "^1.0.0-beta.3",
         "@authup/core": "^1.0.0-beta.3",
         "@privateaim/core": "^0.0.0",
-        "@types/node": "^20.11.10",
+        "@types/node": "^20.11.17",
         "@vitejs/plugin-vue": "^5.0.4",
         "@vuecs/form-controls": "^1.2.0",
         "@vuecs/link": "^1.0.0",
