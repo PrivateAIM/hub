@@ -16,7 +16,7 @@ import {
     DomainType,
     buildDomainChannelName,
 } from '@privateaim/core';
-import {useRedisClient} from "../../core";
+import {useRedisClient, useRedisPublishClient} from "../../core";
 import { RegistryProjectEntity } from '../../domains';
 
 async function publishEvent(
@@ -24,7 +24,7 @@ async function publishEvent(
     data: RegistryProject,
 ) {
     await publishDomainEvent(
-        useRedisClient(),
+        useRedisPublishClient(),
         {
             type: DomainType.REGISTRY_PROJECT,
             event,

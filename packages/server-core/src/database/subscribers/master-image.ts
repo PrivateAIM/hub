@@ -18,7 +18,7 @@ import {
     DomainType,
     buildDomainChannelName,
 } from '@privateaim/core';
-import { useRedisClient } from '../../core';
+import {useRedisClient, useRedisPublishClient} from '../../core';
 import { MasterImageEntity } from '../../domains';
 
 async function publishEvent(
@@ -26,7 +26,7 @@ async function publishEvent(
     data: MasterImage,
 ) {
     await publishDomainEvent(
-        useRedisClient(),
+        useRedisPublishClient(),
         {
             type: DomainType.MASTER_IMAGE,
             event,

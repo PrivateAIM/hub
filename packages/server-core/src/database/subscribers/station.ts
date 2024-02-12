@@ -17,7 +17,7 @@ import type {
     EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
 import { EventSubscriber } from 'typeorm';
-import {useRedisClient} from "../../core";
+import {useRedisClient, useRedisPublishClient} from "../../core";
 import { NodeEntity } from '../../domains';
 
 async function publishEvent(
@@ -25,7 +25,7 @@ async function publishEvent(
     data: Node,
 ) {
     await publishDomainEvent(
-        useRedisClient(),
+        useRedisPublishClient(),
         {
             type: DomainType.NODE,
             event,

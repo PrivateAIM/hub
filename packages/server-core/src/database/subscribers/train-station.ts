@@ -25,7 +25,7 @@ import {
     buildDomainChannelName,
     buildDomainNamespaceName,
 } from '@privateaim/core';
-import {useRedisClient} from "../../core";
+import {useRedisClient, useRedisPublishClient} from "../../core";
 import { AnalysisNodeEntity } from '../../domains';
 
 async function publishEvent(
@@ -33,7 +33,7 @@ async function publishEvent(
     data: AnalysisNode,
 ) {
     await publishDomainEvent(
-        useRedisClient(),
+        useRedisPublishClient(),
         {
             type: DomainType.ANALYSIS_NODE,
             event,

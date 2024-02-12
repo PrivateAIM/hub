@@ -22,7 +22,7 @@ import {
     buildDomainNamespaceName,
 } from '@privateaim/core';
 import { publish as publishMessage } from 'amqp-extension';
-import { useRedisClient } from '../../core';
+import {useRedisClient, useRedisPublishClient} from '../../core';
 import { AnalysisEntity } from '../../domains';
 
 async function publishEvent(
@@ -30,7 +30,7 @@ async function publishEvent(
     data: Analysis,
 ) {
     await publishDomainEvent(
-        useRedisClient(),
+        useRedisPublishClient(),
         {
             type: DomainType.ANALYSIS,
             event,

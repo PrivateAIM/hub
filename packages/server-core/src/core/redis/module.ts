@@ -1,6 +1,7 @@
 import type { Client } from 'redis-extension';
 
 let instance : undefined | Client;
+let instancePublish : undefined | Client;
 
 export function setRedisClient(client: Client) {
     instance = client;
@@ -16,4 +17,13 @@ export function useRedisClient() {
     }
 
     return instance;
+}
+
+export function useRedisPublishClient() {
+    if (typeof instancePublish !== 'undefined') {
+        return instancePublish;
+    }
+
+    instancePublish = useRedisClient().duplicate();
+    return instancePublish;
 }
