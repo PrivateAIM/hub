@@ -7,8 +7,8 @@
 
 import type { PublishOptionsExtended } from 'amqp-extension';
 import { ComponentName } from '../../constants';
-import { ROUTER_QUEUE_ROUTING_KEY } from '../../utils';
-import type { QueueRouterPayload } from '../../utils';
+import { ROUTER_QUEUE_ROUTING_KEY } from '../../router';
+import type { QueueRouterPayload } from '../../router';
 import type { RegistryCommandContext } from '../type';
 
 export function buildRegistryPayload(
