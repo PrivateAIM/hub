@@ -41,7 +41,7 @@ export function createConfig() : Config {
     // ---------------------------------------------
 
     const authupClient = new APIClient({
-        baseURL: useEnv('authupApiUrl'),
+        baseURL: useEnv('authupApiURL'),
     });
 
     let tokenCreator : TokenCreatorOptions;
@@ -60,7 +60,7 @@ export function createConfig() : Config {
     }
 
     mountClientResponseErrorTokenHook(authupClient, {
-        baseURL: useEnv('authupApiUrl'),
+        baseURL: useEnv('authupApiURL'),
         tokenCreator,
     });
 

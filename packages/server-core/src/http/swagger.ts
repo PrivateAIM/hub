@@ -27,7 +27,7 @@ export async function generateSwaggerDocumentation() {
                 allow: ['**/@authup/**'],
             },
             yaml: true,
-            servers: [useEnv('apiUrl')],
+            servers: [useEnv('publicURL')],
             name: 'API Documentation',
             description: 'Explore the REST Endpoints of the Central API.',
             version: packageJson.version,
@@ -42,7 +42,7 @@ export async function generateSwaggerDocumentation() {
                     type: 'oauth2',
                     flows: {
                         password: {
-                            tokenUrl: new URL('token', useEnv('apiUrl')).href,
+                            tokenUrl: new URL('token', useEnv('publicURL')).href,
                         },
                     },
                 },

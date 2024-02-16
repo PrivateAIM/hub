@@ -1,7 +1,8 @@
 version: '3.9'
 services:
     mysql:
-        image: mysql
+        image: mysql:5.7
+        container_name: mysql
         command: --default-authentication-plugin=mysql_native_password
         restart: always
         healthcheck:
@@ -10,9 +11,8 @@ services:
             timeout: 5s
             retries: 5
         environment:
+            MYSQL_ROOT_HOST: "%"
             MYSQL_ROOT_PASSWORD: start123
-        ports:
-            - '3306:3306'
     redis:
         image: bitnami/redis
         healthcheck:
@@ -20,8 +20,8 @@ services:
             interval: 3s
             timeout: 5s
             retries: 5
-        ports:
-            - '6379:6379'
+        environment:
+            ALLOW_EMPTY_PASSWORD: yes
     mq:
         image: bitnami/rabbitmq
         healthcheck:
@@ -31,47 +31,66 @@ services:
             retries: 5
         ports:
             - '5672:5672'
+        environment:
+            RABBITMQ_USERNAME: root
+            RABBITMQ_PASSWORD: start123
     vault:
-        image: vault
-        ports:
-            - '8090:8090'
+        image: vault:1.12.0
         healthcheck:
             test: [ "CMD", "wget", "--spider", "--proxy", "off", "http://localhost:8090/v1/sys/health?standbyok=true" ]
             interval: 10s
             timeout: 3s
             retries: 10
             start_period: 5s
+        environment:
+            VAULT_DEV_ROOT_TOKEN_ID: start123
+            VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8090
     authup:
         image: authup/authup
+        pull_policy: always
+        restart: always
         depends_on:
-            - mysql
-            - redis
-            - vault
+            mysql:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+            vault:
+                condition: service_healthy
         ports:
-            - '3000:3010'
+            - '3010:3000'
         environment:
             DB_TYPE: 'mysql'
-            DB_USER: 'root'
-            DB_PASSWORD: 'start'
+            DB_HOST: 'mysql'
+            DB_USERNAME: 'root'
+            DB_PASSWORD: 'start123'
             DB_DATABASE: 'auth'
             VAULT: start123@http://vault:8090/v1/
-    serverCore:
-        build: './Dockerfile'
+            REDIS: redis://redis
+    server-core:
+        build: '.'
+        restart: always
         depends_on:
-            - authup
-            - mq
-            - mysql
-            - redis
-            - vault
+            authup:
+                condition: service_healthy
+            mq:
+                condition: service_healthy
+            mysql:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+            vault:
+                condition: service_healthy
         ports:
-            - '3000:3001'
+            - '3001:3000'
         environment:
             REDIS_CONNECTION_STRING: redis://redis
             VAULT_CONNECTION_STRING: start123@http://vault:8090/v1/
-            RABBITMQ_CONNECTION_STRING: amqp://root:start123@mq
+            # RABBITMQ_CONNECTION_STRING: amqp://root:start123@mq
+            PUBLIC_URL: http://localhost:3001/
             AUTHUP_API_URL: http://authup:3000/
             DB_TYPE: 'mysql'
-            DB_USER: 'root'
-            DB_PASSWORD: 'start'
+            DB_HOST: 'mysql'
+            DB_USERNAME: 'root'
+            DB_PASSWORD: 'start123'
             DB_DATABASE: 'core'
 

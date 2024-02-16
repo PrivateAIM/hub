@@ -18,9 +18,9 @@ export interface Environment {
     rabbitMqConnectionString?: string | boolean,
     vaultConnectionString: string | boolean,
 
-    apiUrl: string,
-    authupApiUrl: string,
-    appUrl: string,
+    publicURL: string,
+    authupApiURL: string,
+    appURL: string,
 
     skipProjectApproval: boolean,
     skipAnalysisApproval: boolean,

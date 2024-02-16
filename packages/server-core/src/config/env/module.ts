@@ -13,7 +13,7 @@ import {
     readInt,
 } from 'envix';
 import { config } from 'dotenv';
-import type { EnvironmentName } from './constants';
+import { EnvironmentName } from './constants';
 import type { Environment } from './type';
 
 config({
@@ -34,9 +34,10 @@ export function useEnv(key?: string) : any {
         return instance;
     }
 
+    const port = readInt('PORT', 3000);
     instance = {
-        env: read('NODE_ENV', 'development') as `${EnvironmentName}`,
-        port: readInt('PORT', 3002),
+        env: read('NODE_ENV', EnvironmentName.DEVELOPMENT) as `${EnvironmentName}`,
+        port,
 
         jwtMaxAge: readInt('JWT_MAX_AGE', 3600),
 
@@ -56,9 +57,9 @@ export function useEnv(key?: string) : any {
             read('VAULT_CONNECTION_STRING'),
         ]),
 
-        apiUrl: read('API_URL', 'http://127.0.0.1:3002/'),
-        authupApiUrl: read('AUTHUP_API_URL', 'http://127.0.0.1:3010/'),
-        appUrl: read('APP_URL', 'http://127.0.0.1:3000/'),
+        publicURL: read('PUBLIC_URL', `http://127.0.0.1:${port}/`),
+        authupApiURL: read('AUTHUP_API_URL', 'http://127.0.0.1:3010/'),
+        appURL: read('APP_URL', 'http://127.0.0.1:3000/'),
 
         skipProjectApproval: readBool('SKIP_PROJECT_APPROVAL'),
         skipAnalysisApproval: readBool('SKIP_ANALYSIS_APPROVAL'),

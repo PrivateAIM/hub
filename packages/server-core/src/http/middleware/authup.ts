@@ -101,7 +101,7 @@ export function registerAuthupMiddleware(router: Router) {
     const middleware = createHTTPMiddleware({
         tokenByCookie: (req, cookieName) => useRequestCookie(req, cookieName),
         tokenVerifier: {
-            baseURL: useEnv('authupApiUrl'),
+            baseURL: useEnv('authupApiURL'),
             creator: tokenCreator,
             cache: tokenCache,
         },

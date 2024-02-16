@@ -39,7 +39,7 @@ export async function saveRemoteRegistryProjectWebhook(
             name: 'api',
             targets: [
                 buildRegistryWebhookTarget({
-                    url: useEnv('apiUrl'),
+                    url: useEnv('publicURL'),
                     robot: {
                         id: engineData.id,
                         secret: engineData.secret,

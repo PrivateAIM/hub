@@ -14,6 +14,6 @@ import { getWritableDirPath, useEnv } from '../../config';
 export function registerSwaggerMiddleware(router: Router) {
     const document = loadSync(path.join(getWritableDirPath(), 'swagger.json'));
     router.use('/docs', swaggerUI(document, {
-        baseURL: useEnv('apiUrl'),
+        baseURL: useEnv('publicURL'),
     }));
 }

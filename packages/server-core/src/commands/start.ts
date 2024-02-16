@@ -19,16 +19,16 @@ import { createHttpServer } from '../http/server';
 import { generateSwaggerDocumentation } from '../http/swagger';
 
 export async function startCommand() {
-    const config = await createConfig();
+    const config = createConfig();
 
     const logger = useLogger();
 
     logger.info(`Environment: ${useEnv('env')}`);
     logger.info(`WritableDirectoryPath: ${getWritableDirPath()}`);
     logger.info(`Port: ${useEnv('port')}`);
-    logger.info(`Public-URL: ${useEnv('apiUrl')}`);
-    logger.info(`Authup-URL: ${useEnv('authupApiUrl')}`);
-    logger.info(`Docs-URL: ${new URL('docs/', useEnv('apiUrl')).href}`);
+    logger.info(`Public-URL: ${useEnv('publicURL')}`);
+    logger.info(`Authup-URL: ${useEnv('authupApiURL')}`);
+    logger.info(`Docs-URL: ${new URL('docs/', useEnv('publicURL')).href}`);
 
     logger.info('Generating documentation...');
 
