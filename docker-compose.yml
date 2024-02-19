@@ -66,6 +66,7 @@ services:
             DB_DATABASE: 'auth'
             VAULT: start123@http://vault:8090/v1/
             REDIS: redis://redis
+            PUBLIC_URL: http://localhost:3010/
     server-core:
         build: '.'
         restart: always
