@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2024.
+ * Author Peter Placzek (tada5hi)
+ * For the full copyright and license information,
+ * view the LICENSE file that was distributed with this source code.
+ */
+
 import { REALM_MASTER_NAME } from '@authup/core';
 import { ForbiddenError, UnauthorizedError } from '@ebec/http';
 import { useLogger } from '../../../core';
