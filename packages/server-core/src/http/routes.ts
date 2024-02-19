@@ -24,6 +24,7 @@ import { ProposalStationController } from './controllers/core/project-node';
 import { NodeController } from './controllers/core/node';
 import { AnalysisController } from './controllers/core/analysis';
 import { AnalysisNodeController } from './controllers/core/analysis-node';
+import { RootController } from './controllers/core/root';
 import { ServiceController } from './controllers/special/service';
 import { MasterImageGroupController } from './controllers/core/master-image-group';
 import { RegistryController } from './controllers/core/registry';
@@ -43,6 +44,8 @@ export function registerControllers(router: Router) {
             AnalysisController,
             TrainLogController,
             AnalysisNodeController,
+
+            RootController,
 
             // Extra
             ServiceController,
