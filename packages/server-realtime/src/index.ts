@@ -18,16 +18,15 @@ import { createSocketServer } from './socket';
     const httpServer = createHttpServer();
     const socketServer = createSocketServer({ httpServer, config });
 
-    function signalStart() {
-        useLogger().info(`Listening on 0.0.0.0:${useEnv('port')}`);
-    }
-
     /*
     Start Server
     */
     function start() {
-        socketServer.listen(useEnv('port'));
-        signalStart();
+        const port = useEnv('port');
+        httpServer.listen(port);
+
+        useLogger().info(`Listening on 0.0.0.0:${port}`);
+        useLogger().info(`Socket.io server mounted on path: ${socketServer.path()}`)
     }
 
     start();

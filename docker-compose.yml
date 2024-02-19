@@ -93,4 +93,20 @@ services:
             DB_USERNAME: 'root'
             DB_PASSWORD: 'start123'
             DB_DATABASE: 'core'
-
+    server-realtime:
+        build: '.'
+        restart: always
+        command: realtime start
+        depends_on:
+            authup:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+            vault:
+                condition: service_healthy
+        ports:
+            - '3002:3000'
+        environment:
+            REDIS_CONNECTION_STRING: redis://redis
+            VAULT_CONNECTION_STRING: start123@http://vault:8090/v1/
+            AUTHUP_API_URL: http://authup:3000/
