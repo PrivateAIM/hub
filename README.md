@@ -66,9 +66,9 @@ Read the `README.md` in each package directory. Each package must be configured 
 
 **3. Execution**
 
-Start the ui-, api-, & realtime-application in a single terminal window (or as background process) with the following command:
+Start the applications/services in a single terminal window (or as background process) with the following command:
 ```shell
-$ npm run server-api
+$ npm run server-core
 ```
 
 ```shell
@@ -80,7 +80,7 @@ $ npm run server-realtime
 ```
 
 ```shell
-$ npm run server-train-manager
+$ npm run server-analysis-manager
 ```
 
 ## Contributing
