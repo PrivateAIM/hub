@@ -10,6 +10,10 @@ import { PermissionName as AuthPermissionName } from '@authup/core';
 export enum PermissionKey {
     ADMIN_UI_USE = 'admin_ui_use',
 
+    BUCKET_ADD = 'bucket_add',
+    BUCKET_EDIT = 'bucket_edit',
+    BUCKET_DROP = 'bucket_drop',
+
     PROJECT_ADD = 'proposal_add',
     PROJECT_DROP = 'proposal_drop',
     PROJECT_EDIT = 'proposal_edit',

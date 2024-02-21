@@ -17,6 +17,10 @@ export function useRedis() {
     return singleton.use();
 }
 
+export function hasRedis() {
+    return singleton.has() || singleton.hasFactory();
+}
+
 export function setRedisFactory(factory: Factory<Client>) {
     return singleton.setFactory(factory);
 }

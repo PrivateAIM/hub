@@ -7,13 +7,10 @@
 
 import type { Server } from 'node:http';
 import http from 'node:http';
-import { Router, coreHandler, createNodeDispatcher } from 'routup';
+import { createNodeDispatcher } from 'routup';
+import { createHTTPRouter } from './router';
 
 export function createHttpServer() : Server {
-    const router = new Router();
-    router.get('/', coreHandler(() => ({
-        timestamp: Date.now(),
-    })));
-
+    const router = createHTTPRouter();
     return new http.Server(createNodeDispatcher(router));
 }
