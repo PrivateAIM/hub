@@ -6,7 +6,7 @@
  */
 
 import type { Analysis } from '@privateaim/core';
-import { buildHTTPValidationErrorMessage } from '@privateaim/server-kit/src/http/validation/validation';
+import { buildHTTPValidationErrorMessage } from '@privateaim/server-kit';
 import {
     dropTestDatabase, expectPropertiesEqualToSrc, removeDateProperties, useSuperTest, useTestDatabase,
 } from '../../utils';
