@@ -5,28 +5,25 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { check, validationResult } from 'express-validator';
+import { check } from 'express-validator';
 import { BadRequestError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/core';
 import type { Request } from 'routup';
+import type { HTTPValidationResult } from '@privateaim/server-kit';
+import {
+    createHTTPValidationResult,
+    extendHTTPValidationResultWithRelation,
+} from '@privateaim/server-kit';
 import {
     AnalysisFileEntity, MasterImageEntity, ProjectEntity, RegistryEntity,
 } from '../../../../../domains';
 import type { AnalysisEntity } from '../../../../../domains';
-import type { RequestValidationResult } from '../../../../validation';
-import {
-    RequestValidationError, extendRequestValidationResultWithRelation,
-    initRequestValidationResult,
-    matchedValidationData,
-} from '../../../../validation';
 import { useRequestEnv } from '../../../../request';
 
 export async function runAnalysisValidation(
     req: Request,
     operation: 'create' | 'update',
-) : Promise<RequestValidationResult<AnalysisEntity>> {
-    const result : RequestValidationResult<AnalysisEntity> = initRequestValidationResult();
-
+) : Promise<HTTPValidationResult<AnalysisEntity>> {
     if (operation === 'create') {
         await check('project_id')
             .exists()
@@ -62,30 +59,25 @@ export async function runAnalysisValidation(
 
     // ----------------------------------------------
 
-    const validation = validationResult(req);
-    if (!validation.isEmpty()) {
-        throw new RequestValidationError(validation);
-    }
-
-    result.data = matchedValidationData(req, { includeOptionals: true });
+    const result = createHTTPValidationResult<AnalysisEntity>(req);
 
     // ----------------------------------------------
 
-    await extendRequestValidationResultWithRelation(result, MasterImageEntity, {
+    await extendHTTPValidationResultWithRelation(result, MasterImageEntity, {
         id: 'master_image_id',
         entity: 'master_image',
     });
 
-    await extendRequestValidationResultWithRelation(result, ProjectEntity, {
+    await extendHTTPValidationResultWithRelation(result, ProjectEntity, {
         id: 'project_id',
         entity: 'project',
     });
-    await extendRequestValidationResultWithRelation(result, RegistryEntity, {
+    await extendHTTPValidationResultWithRelation(result, RegistryEntity, {
         id: 'registry_id',
         entity: 'registry',
     });
 
-    await extendRequestValidationResultWithRelation(result, AnalysisFileEntity, {
+    await extendHTTPValidationResultWithRelation(result, AnalysisFileEntity, {
         id: 'entrypoint_file_id',
         entity: 'entrypoint_file',
     });

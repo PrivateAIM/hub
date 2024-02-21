@@ -5,29 +5,26 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { check, validationResult } from 'express-validator';
+import { check } from 'express-validator';
 import { AnalysisNodeApprovalStatus } from '@privateaim/core';
 import { BadRequestError, NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/core';
 import type { Request } from 'routup';
 import { useDataSource } from 'typeorm-extension';
+import type { HTTPValidationResult } from '@privateaim/server-kit';
+import {
+    buildHTTPValidationErrorMessage,
+    createHTTPValidationResult,
+    extendHTTPValidationResultWithRelation,
+} from '@privateaim/server-kit';
 import { AnalysisEntity, NodeEntity, ProjectNodeEntity } from '../../../../../domains';
 import type { AnalysisNodeEntity } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
-import type { RequestValidationResult } from '../../../../validation';
-import {
-    RequestValidationError,
-    buildRequestValidationErrorMessage,
-    extendRequestValidationResultWithRelation,
-    initRequestValidationResult,
-    matchedValidationData,
-} from '../../../../validation';
 
 export async function runAnalysisNodeValidation(
     req: Request,
     operation: 'create' | 'update',
-) : Promise<RequestValidationResult<AnalysisNodeEntity>> {
-    const result : RequestValidationResult<AnalysisNodeEntity> = initRequestValidationResult();
+) : Promise<HTTPValidationResult<AnalysisNodeEntity>> {
     if (operation === 'create') {
         await check('node_id')
             .exists()
@@ -58,18 +55,11 @@ export async function runAnalysisNodeValidation(
             .run(req);
     }
 
-    // ----------------------------------------------
-
-    const validation = validationResult(req);
-    if (!validation.isEmpty()) {
-        throw new RequestValidationError(validation);
-    }
-
-    result.data = matchedValidationData(req, { includeOptionals: true });
+    const result = createHTTPValidationResult<AnalysisNodeEntity>(req);
 
     // ----------------------------------------------
 
-    await extendRequestValidationResultWithRelation(result, AnalysisEntity, {
+    await extendHTTPValidationResultWithRelation(result, AnalysisEntity, {
         id: 'analysis_id',
         entity: 'analysis',
     });
@@ -77,13 +67,13 @@ export async function runAnalysisNodeValidation(
         if (
             !isRealmResourceWritable(useRequestEnv(req, 'realm'), result.relation.analysis.realm_id)
         ) {
-            throw new BadRequestError(buildRequestValidationErrorMessage('analysis_id'));
+            throw new BadRequestError(buildHTTPValidationErrorMessage('analysis_id'));
         }
 
         result.data.analysis_realm_id = result.relation.analysis.realm_id;
     }
 
-    await extendRequestValidationResultWithRelation(result, NodeEntity, {
+    await extendHTTPValidationResultWithRelation(result, NodeEntity, {
         id: 'node_id',
         entity: 'node',
     });

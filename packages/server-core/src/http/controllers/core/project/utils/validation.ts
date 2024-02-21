@@ -7,24 +7,21 @@
 
 import { isRealmResourceWritable } from '@authup/core';
 import { ForbiddenError } from '@ebec/http';
-import { check, validationResult } from 'express-validator';
+import { check } from 'express-validator';
 import type { Request } from 'routup';
+import type { HTTPValidationResult } from '@privateaim/server-kit';
+import {
+    createHTTPValidationResult,
+    extendHTTPValidationResultWithRelation,
+} from '@privateaim/server-kit';
 import { MasterImageEntity } from '../../../../../domains';
 import type { ProjectEntity } from '../../../../../domains';
-import type { RequestValidationResult } from '../../../../validation';
-import {
-    RequestValidationError, extendRequestValidationResultWithRelation,
-    initRequestValidationResult,
-    matchedValidationData,
-} from '../../../../validation';
 import { useRequestEnv } from '../../../../request';
 
 export async function runProjectValidation(
     req: Request,
     operation: 'create' | 'update',
-) : Promise<RequestValidationResult<ProjectEntity>> {
-    const result : RequestValidationResult<ProjectEntity> = initRequestValidationResult();
-
+) : Promise<HTTPValidationResult<ProjectEntity>> {
     const titleChain = check('name')
         .exists()
         .isLength({ min: 5, max: 100 });
@@ -44,16 +41,11 @@ export async function runProjectValidation(
 
     // ----------------------------------------------
 
-    const validation = validationResult(req);
-    if (!validation.isEmpty()) {
-        throw new RequestValidationError(validation);
-    }
-
-    result.data = matchedValidationData(req, { includeOptionals: true });
+    const result = createHTTPValidationResult<ProjectEntity>(req);
 
     // ----------------------------------------------
 
-    await extendRequestValidationResultWithRelation(result, MasterImageEntity, {
+    await extendHTTPValidationResultWithRelation(result, MasterImageEntity, {
         id: 'master_image_id',
         entity: 'master_image',
     });

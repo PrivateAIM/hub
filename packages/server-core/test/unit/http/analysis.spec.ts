@@ -6,11 +6,11 @@
  */
 
 import type { Analysis } from '@privateaim/core';
+import { buildHTTPValidationErrorMessage } from '@privateaim/server-kit/src/http/validation/validation';
 import {
     dropTestDatabase, expectPropertiesEqualToSrc, removeDateProperties, useSuperTest, useTestDatabase,
 } from '../../utils';
 import { TEST_DEFAULT_ANALYSIS, createSuperTestAnalysis, createSuperTestProject } from '../../utils/domains';
-import { buildRequestValidationErrorMessage } from '../../../src/http/validation';
 
 describe('src/controllers/core/analysis', () => {
     const superTest = useSuperTest();
@@ -90,7 +90,7 @@ describe('src/controllers/core/analysis', () => {
         });
 
         expect(response.status).toEqual(400);
-        expect(response.body.message).toEqual(buildRequestValidationErrorMessage<Analysis>(['project_id']));
+        expect(response.body.message).toEqual(buildHTTPValidationErrorMessage<Analysis>(['project_id']));
     });
 
     it('should not create resource with invalid master-image', async () => {
@@ -102,6 +102,6 @@ describe('src/controllers/core/analysis', () => {
         });
 
         expect(response.status).toEqual(400);
-        expect(response.body.message).toEqual(buildRequestValidationErrorMessage<Analysis>(['master_image_id']));
+        expect(response.body.message).toEqual(buildHTTPValidationErrorMessage<Analysis>(['master_image_id']));
     });
 });

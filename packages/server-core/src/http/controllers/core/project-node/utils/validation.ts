@@ -5,27 +5,24 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { check, validationResult } from 'express-validator';
+import { check } from 'express-validator';
 import { ProjectNodeApprovalStatus } from '@privateaim/core';
 import { NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/core';
 import type { Request } from 'routup';
+import type { HTTPValidationResult } from '@privateaim/server-kit';
+import {
+    createHTTPValidationResult,
+    extendHTTPValidationResultWithRelation,
+} from '@privateaim/server-kit';
 import type { ProjectNodeEntity } from '../../../../../domains';
 import { NodeEntity, ProjectEntity } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
-import type { RequestValidationResult } from '../../../../validation';
-import {
-    RequestValidationError, extendRequestValidationResultWithRelation,
-    initRequestValidationResult,
-    matchedValidationData,
-} from '../../../../validation';
 
 export async function runProjectNodeValidation(
     req: Request,
     operation: 'create' | 'update',
-) : Promise<RequestValidationResult<ProjectNodeEntity>> {
-    const result : RequestValidationResult<ProjectNodeEntity> = initRequestValidationResult();
-
+) : Promise<HTTPValidationResult<ProjectNodeEntity>> {
     if (operation === 'create') {
         await check('project_id')
             .exists()
@@ -53,16 +50,11 @@ export async function runProjectNodeValidation(
 
     // ----------------------------------------------
 
-    const validation = validationResult(req);
-    if (!validation.isEmpty()) {
-        throw new RequestValidationError(validation);
-    }
-
-    result.data = matchedValidationData(req, { includeOptionals: true });
+    const result = createHTTPValidationResult<ProjectNodeEntity>(req);
 
     // ----------------------------------------------
 
-    await extendRequestValidationResultWithRelation(result, ProjectEntity, {
+    await extendHTTPValidationResultWithRelation(result, ProjectEntity, {
         id: 'project_id',
         entity: 'project',
     });
@@ -75,7 +67,7 @@ export async function runProjectNodeValidation(
         }
     }
 
-    await extendRequestValidationResultWithRelation(result, NodeEntity, {
+    await extendHTTPValidationResultWithRelation(result, NodeEntity, {
         id: 'node_id',
         entity: 'node',
     });

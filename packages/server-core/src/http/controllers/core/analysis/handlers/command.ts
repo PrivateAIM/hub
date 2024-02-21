@@ -12,6 +12,7 @@ import { isRealmResourceWritable } from '@authup/core';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
+import { HTTPValidationError } from '@privateaim/server-kit';
 import {
     AnalysisEntity,
     detectAnalysisBuildStatus,
@@ -19,7 +20,6 @@ import {
     stopAnalysisBuild,
 } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
-import { RequestValidationError } from '../../../../validation';
 
 /**
  * Execute a analysis command (start, stop, build).
@@ -41,7 +41,7 @@ export async function handleAnalysisCommandRouteHandler(req: Request, res: Respo
 
     const validation = validationResult(req);
     if (!validation.isEmpty()) {
-        throw new RequestValidationError(validation);
+        throw new HTTPValidationError(validation);
     }
 
     const validationData = matchedData(req, { includeOptionals: true });

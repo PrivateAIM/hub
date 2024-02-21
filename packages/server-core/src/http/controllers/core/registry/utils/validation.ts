@@ -5,23 +5,19 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { body, check, validationResult } from 'express-validator';
+import {
+    createHTTPValidationResult,
+} from '@privateaim/server-kit';
+import { body, check } from 'express-validator';
 import { getHostNameFromString } from '@privateaim/core';
 import type { Request } from 'routup';
+import type { HTTPValidationResult } from '@privateaim/server-kit';
 import type { RegistryEntity } from '../../../../../domains';
-import type { RequestValidationResult } from '../../../../validation';
-import {
-    RequestValidationError,
-    initRequestValidationResult,
-    matchedValidationData,
-} from '../../../../validation';
 
 export async function runRegistryValidation(
     req: Request,
     operation: 'create' | 'update',
-) : Promise<RequestValidationResult<RegistryEntity>> {
-    const result : RequestValidationResult<RegistryEntity> = initRequestValidationResult();
-
+) : Promise<HTTPValidationResult<RegistryEntity>> {
     const titleChain = check('name')
         .exists()
         .isLength({ min: 3, max: 128 });
@@ -63,13 +59,7 @@ export async function runRegistryValidation(
 
     // ----------------------------------------------
 
-    const validation = validationResult(req);
-    if (!validation.isEmpty()) {
-        throw new RequestValidationError(validation);
-    }
-
-    result.data = matchedValidationData(req, { includeOptionals: true });
-
+    const result = createHTTPValidationResult<RegistryEntity>(req);
     if (result.data.host) {
         result.data.host = getHostNameFromString(result.data.host);
     }
