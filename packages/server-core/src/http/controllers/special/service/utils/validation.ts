@@ -6,14 +6,10 @@
  */
 
 import { RegistryAPICommand } from '@privateaim/core';
-import { check, validationResult } from 'express-validator';
+import type { HTTPValidationResult } from '@privateaim/server-kit';
+import { createHTTPValidationResult } from '@privateaim/server-kit';
+import { check } from 'express-validator';
 import type { Request } from 'routup';
-import type { RequestValidationResult } from '../../../../validation';
-import {
-    RequestValidationError,
-    initRequestValidationResult,
-    matchedValidationData,
-} from '../../../../validation';
 
 type ValidationResult = {
     id: string,
@@ -23,9 +19,7 @@ type ValidationResult = {
 
 export async function runServiceRegistryValidation(
     req: Request,
-) : Promise<RequestValidationResult<ValidationResult>> {
-    const result : RequestValidationResult<ValidationResult> = initRequestValidationResult();
-
+) : Promise<HTTPValidationResult<ValidationResult>> {
     await check('id')
         .exists()
         .notEmpty()
@@ -45,12 +39,5 @@ export async function runServiceRegistryValidation(
 
     // ----------------------------------------------
 
-    const validation = validationResult(req);
-    if (!validation.isEmpty()) {
-        throw new RequestValidationError(validation);
-    }
-
-    result.data = matchedValidationData(req, { includeOptionals: true });
-
-    return result;
+    return createHTTPValidationResult<ValidationResult>(req);
 }

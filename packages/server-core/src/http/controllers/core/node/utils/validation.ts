@@ -5,26 +5,23 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { check, validationResult } from 'express-validator';
+import { check } from 'express-validator';
 import { isRealmResourceWritable } from '@authup/core';
 import { ForbiddenError } from '@ebec/http';
 import type { Request } from 'routup';
+import type { HTTPValidationResult } from '@privateaim/server-kit';
+import {
+    createHTTPValidationResult,
+    extendHTTPValidationResultWithRelation,
+} from '@privateaim/server-kit';
 import { RegistryEntity } from '../../../../../domains';
 import type { NodeEntity } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
-import type { RequestValidationResult } from '../../../../validation';
-import {
-    RequestValidationError,
-    extendRequestValidationResultWithRelation, initRequestValidationResult,
-    matchedValidationData,
-} from '../../../../validation';
 
 export async function runNodeValidation(
     req: Request,
     operation: 'create' | 'update',
-) : Promise<RequestValidationResult<NodeEntity>> {
-    const result : RequestValidationResult<NodeEntity> = initRequestValidationResult();
-
+) : Promise<HTTPValidationResult<NodeEntity>> {
     const nameChain = check('name')
         .isLength({ min: 3, max: 128 })
         .exists()
@@ -81,16 +78,11 @@ export async function runNodeValidation(
 
     // ----------------------------------------------
 
-    const validation = validationResult(req);
-    if (!validation.isEmpty()) {
-        throw new RequestValidationError(validation);
-    }
-
-    result.data = matchedValidationData(req, { includeOptionals: true });
+    const result = createHTTPValidationResult<NodeEntity>(req);
 
     // ----------------------------------------------
 
-    await extendRequestValidationResultWithRelation(result, RegistryEntity, {
+    await extendHTTPValidationResultWithRelation(result, RegistryEntity, {
         id: 'registry_id',
         entity: 'registry',
     });

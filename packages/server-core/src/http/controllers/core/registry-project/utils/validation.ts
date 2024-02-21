@@ -5,24 +5,21 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { check, validationResult } from 'express-validator';
+import { check } from 'express-validator';
 import { RegistryProjectType } from '@privateaim/core';
 import type { Request } from 'routup';
-import type { RegistryProjectEntity } from '../../../../../domains/registry-project/entity';
-import { RegistryEntity } from '../../../../../domains/registry/entity';
-import type { RequestValidationResult } from '../../../../validation';
+import type { HTTPValidationResult } from '@privateaim/server-kit';
 import {
-    RequestValidationError, extendRequestValidationResultWithRelation,
-    initRequestValidationResult,
-    matchedValidationData,
-} from '../../../../validation';
+    createHTTPValidationResult,
+    extendHTTPValidationResultWithRelation,
+} from '@privateaim/server-kit';
+import type { RegistryProjectEntity } from '../../../../../domains';
+import { RegistryEntity } from '../../../../../domains';
 
 export async function runRegistryProjectValidation(
     req: Request,
     operation: 'create' | 'update',
-) : Promise<RequestValidationResult<RegistryProjectEntity>> {
-    const result : RequestValidationResult<RegistryProjectEntity> = initRequestValidationResult();
-
+) : Promise<HTTPValidationResult<RegistryProjectEntity>> {
     const registryChain = check('registry_id')
         .exists()
         .isUUID();
@@ -69,13 +66,8 @@ export async function runRegistryProjectValidation(
 
     // ----------------------------------------------
 
-    const validation = validationResult(req);
-    if (!validation.isEmpty()) {
-        throw new RequestValidationError(validation);
-    }
-
-    result.data = matchedValidationData(req, { includeOptionals: true });
-    await extendRequestValidationResultWithRelation(result, RegistryEntity, {
+    const result = createHTTPValidationResult<RegistryProjectEntity>(req);
+    await extendHTTPValidationResultWithRelation(result, RegistryEntity, {
         id: 'registry_id',
         entity: 'registry',
     });
