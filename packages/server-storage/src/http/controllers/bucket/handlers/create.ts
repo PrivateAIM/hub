@@ -10,6 +10,7 @@ import { ForbiddenError } from '@ebec/http';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
+import { useMinio } from '../../../../core';
 import { useRequestEnv } from '../../../request';
 import { BucketEntity } from '../../../../domains';
 import { runProjectValidation } from '../utils/validation';
@@ -31,6 +32,9 @@ export async function executeBucketRouteCreateHandler(req: Request, res: Respons
     });
 
     await repository.save(entity);
+
+    const minio = useMinio();
+    await minio.makeBucket(entity.name, entity.region);
 
     return sendCreated(res, entity);
 }

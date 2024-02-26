@@ -11,6 +11,7 @@ import type {
 import {
     DBody, DController, DDelete, DGet, DPath, DPost, DRequest, DResponse, DTags,
 } from '@routup/decorators';
+import type { BucketFileEntity } from '../../../domains';
 import { BucketEntity } from '../../../domains';
 import { ForceLoggedInMiddleware } from '../../middlewares';
 import {
@@ -19,6 +20,7 @@ import {
     executeBucketRouteGetManyHandler,
     executeBucketRouteGetOneHandler,
     executeBucketRouteUpdateHandler,
+    executeBucketRouteUploadHandler,
 } from './handlers';
 
 type PartialBucket = Partial<Project>;
@@ -32,6 +34,15 @@ export class BucketController {
             @DResponse() res: any,
     ): Promise<PartialBucket[]> {
         return await executeBucketRouteGetManyHandler(req, res) as PartialBucket[];
+    }
+
+    @DGet('/:id/upload', [ForceLoggedInMiddleware])
+    async upload(
+        @DPath('id') id: string,
+            @DRequest() req: any,
+            @DResponse() res: any,
+    ): Promise<BucketFileEntity[]> {
+        return await executeBucketRouteUploadHandler(req, res) as BucketFileEntity[];
     }
 
     @DGet('/:id', [ForceLoggedInMiddleware])

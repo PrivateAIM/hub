@@ -6,11 +6,12 @@
  */
 
 import { PermissionID } from '@privateaim/core';
-import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
+import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/core';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
+import { useMinio } from '../../../../core';
 import { BucketEntity } from '../../../../domains';
 import { useRequestEnv } from '../../../request';
 
@@ -34,11 +35,14 @@ export async function executeBucketRouteDeleteHandler(req: Request, res: Respons
         throw new ForbiddenError();
     }
 
-    const { id: entityId } = entity;
+    const { id: entityId, name: entityName } = entity;
 
     await repository.remove(entity);
 
     entity.id = entityId;
+
+    const minio = useMinio();
+    await minio.removeBucket(entityName);
 
     return sendAccepted(res, entity);
 }
