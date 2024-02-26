@@ -41,12 +41,14 @@ export class BucketEntity {
 
     // ------------------------------------------------------------------
 
-    @Column({ type: 'uuid', nullable: true })
-        user_id: User['id'] | null;
+    @Column({ type: 'uuid' })
+        actor_id: string;
+
+    @Column({ type: 'varchar', length: 64 })
+        actor_type: string;
+
+    // ------------------------------------------------------------------
 
     @Column({ type: 'uuid', nullable: true })
         realm_id: Realm['id'] | null;
-
-    @Column({ type: 'uuid', nullable: true })
-        robot_id: Robot['id'] | null;
 }

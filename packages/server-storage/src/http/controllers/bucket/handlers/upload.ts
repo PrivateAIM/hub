@@ -4,7 +4,7 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { NotFoundError } from '@ebec/http';
+import { ForbiddenError, NotFoundError } from '@ebec/http';
 import Busboy from 'busboy';
 import crypto from 'node:crypto';
 import path from 'node:path';
@@ -12,9 +12,15 @@ import { send, sendCreated, useRequestParam } from 'routup';
 import type { Request, Response } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { streamToBuffer, useMinio } from '../../../../core';
-import { BucketEntity, BucketFileEntity } from '../../../../domains';
+import { BucketEntity, BucketFileEntity, getActorFromRequest } from '../../../../domains';
+import { useRequestEnv } from '../../../request';
 
 export async function executeBucketRouteUploadHandler(req: Request, res: Response) : Promise<any> {
+    const actor = getActorFromRequest(req);
+    if (!actor) {
+        throw new ForbiddenError('Only users and robots are permitted to upload bucket files.');
+    }
+
     // todo: check permissions by membership
     const id = useRequestParam(req, 'id');
 
@@ -61,7 +67,9 @@ export async function executeBucketRouteUploadHandler(req: Request, res: Respons
                                 hash,
                                 size: buffer.length,
                                 directory: path.dirname(info.filename),
-                                // todo: userid, realmId, missing
+                                realm_id: useRequestEnv(req, 'realmId'),
+                                actor_type: actor.type,
+                                actor_id: actor.id,
                             }));
 
                             resolve();
