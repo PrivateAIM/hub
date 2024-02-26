@@ -33,8 +33,8 @@ export async function executeBucketRouteGetOneHandler(req: Request, res: Respons
                 'created_at',
                 'updated_at',
                 'realm_id',
-                'robot_id',
-                'user_id',
+                'actor_type',
+                'actor_id',
             ],
         },
     });
@@ -64,12 +64,12 @@ export async function executeBucketRouteGetManyHandler(req: Request, res: Respon
                 'created_at',
                 'updated_at',
                 'realm_id',
-                'robot_id',
-                'user_id',
+                'actor_id',
+                'actor_type',
             ],
         },
         filters: {
-            allowed: ['id', 'name', 'realm_id', 'user_id', 'robot_id'],
+            allowed: ['id', 'name', 'realm_id', 'actor_type', 'actor_id'],
         },
         pagination: {
             maxLimit: 50,

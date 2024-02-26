@@ -11,6 +11,7 @@ import { isRealmResourceWritable } from '@authup/core';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
+import { useMinio } from '../../../../core';
 import { BucketEntity } from '../../../../domains';
 import { useRequestEnv } from '../../../request';
 import { runProjectValidation } from '../utils/validation';
@@ -43,6 +44,12 @@ export async function executeBucketRouteUpdateHandler(req: Request, res: Respons
     entity = repository.merge(entity, result.data);
 
     await repository.save(entity);
+
+    const minio = useMinio();
+    const hasBucket = await minio.bucketExists(entity.name);
+    if (!hasBucket) {
+        await minio.makeBucket(entity.name, entity.region);
+    }
 
     return sendAccepted(res, entity);
 }

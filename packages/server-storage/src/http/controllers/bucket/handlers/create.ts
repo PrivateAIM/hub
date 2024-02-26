@@ -10,8 +10,9 @@ import { ForbiddenError } from '@ebec/http';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
+import { useMinio } from '../../../../core';
 import { useRequestEnv } from '../../../request';
-import { BucketEntity } from '../../../../domains';
+import { BucketEntity, getActorFromRequest } from '../../../../domains';
 import { runProjectValidation } from '../utils/validation';
 
 export async function executeBucketRouteCreateHandler(req: Request, res: Response) : Promise<any> {
@@ -20,17 +21,25 @@ export async function executeBucketRouteCreateHandler(req: Request, res: Respons
         throw new ForbiddenError();
     }
 
+    const actor = getActorFromRequest(req);
+    if (!actor) {
+        throw new ForbiddenError('Only users and robots are permitted to create a bucket.');
+    }
+
     const result = await runProjectValidation(req, 'create');
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(BucketEntity);
     const entity = repository.create({
-        user_id: useRequestEnv(req, 'userId'),
-        robot_id: useRequestEnv(req, 'robotId'),
+        actor_id: actor.id,
+        actor_type: actor.type,
         ...result.data,
     });
 
     await repository.save(entity);
+
+    const minio = useMinio();
+    await minio.makeBucket(entity.name, entity.region);
 
     return sendCreated(res, entity);
 }

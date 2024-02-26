@@ -5,10 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { setupAuthup, setupDatabase, setupRedis } from './services';
+import {
+    setupAuthup,
+    setupDatabase,
+    setupMinio,
+    setupRedis,
+} from './services';
 
 export async function setup() {
     await setupDatabase();
     setupRedis();
+    setupMinio();
     setupAuthup();
 }

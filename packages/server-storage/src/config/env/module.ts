@@ -33,6 +33,7 @@ export function useEnv(key?: string) : any {
         env: read('NODE_ENV', 'development') as `${EnvironmentName}`,
         port: readInt('PORT', 3000),
         redisConnectionString: read('REDIS_CONNECTION_STRING', null),
+        minioConnectionString: read('MINIO_CONNECTION_STRING', 'http://admin:start123@127.0.0.1:9000'),
         vaultConnectionString: read('VAULT_CONNECTION_STRING', 'start123@http://127.0.0.1:8090/v1/'),
 
         authupApiURL: read('AUTHUP_API_URL', 'http://127.0.0.1:3010/'),

@@ -35,8 +35,8 @@ export async function executeBucketFileRouteGetOneHandler(req: Request, res: Res
                 'created_at',
                 'updated_at',
                 'realm_id',
-                'robot_id',
-                'user_id',
+                'actor_type',
+                'actor_id',
             ],
         },
         relations: {
@@ -71,15 +71,15 @@ export async function executeBucketFileRouteGetManyHandler(req: Request, res: Re
                 'created_at',
                 'updated_at',
                 'realm_id',
-                'robot_id',
-                'user_id',
+                'actor_type',
+                'actor_id',
             ],
         },
         relations: {
             allowed: ['bucket'],
         },
         filters: {
-            allowed: ['id', 'name', 'directory', 'realm_id', 'user_id', 'robot_id'],
+            allowed: ['id', 'name', 'directory', 'realm_id', 'actor_type', 'actor_id'],
         },
         pagination: {
             maxLimit: 50,
