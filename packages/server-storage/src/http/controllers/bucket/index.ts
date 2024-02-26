@@ -36,7 +36,7 @@ export class BucketController {
         return await executeBucketRouteGetManyHandler(req, res) as PartialBucket[];
     }
 
-    @DGet('/:id/upload', [ForceLoggedInMiddleware])
+    @DPost('/:id/upload', [ForceLoggedInMiddleware])
     async upload(
         @DPath('id') id: string,
             @DRequest() req: any,
