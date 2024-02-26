@@ -6,5 +6,6 @@
  */
 
 export * from './authup';
+export * from './minio';
 export * from './database';
 export * from './redis';

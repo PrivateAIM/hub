@@ -12,6 +12,7 @@ export interface Environment {
     port: number,
 
     redisConnectionString: string,
+    minioConnectionString: string,
     vaultConnectionString: string,
 
     authupApiURL: string,
