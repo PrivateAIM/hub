@@ -5,8 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './auth';
-export * from './authup';
-export * from './basic';
-export * from './cors';
-export * from './error';
+module.exports = async () => {
+    // eslint-disable-next-line no-undef
+    await globalThis.MINIO_CONTAINER.stop();
+};

@@ -25,12 +25,6 @@ export class BucketEntity {
     @Column({ type: 'varchar', length: 256, nullable: true })
         region: string | null;
 
-    @Column({ type: 'varchar', length: 256, nullable: true })
-        ref_type: string | null;
-
-    @Column({ type: 'varchar', length: 256, nullable: true })
-        ref_id: string | null;
-
     // ------------------------------------------------------------------
 
     @CreateDateColumn()

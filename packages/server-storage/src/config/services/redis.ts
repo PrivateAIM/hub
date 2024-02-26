@@ -9,8 +9,11 @@ import { createClient } from 'redis-extension';
 import { setRedisFactory } from '../../core';
 import { useEnv } from '../env';
 
-export function setupRedis() {
-    setRedisFactory(() => createClient({
-        connectionString: useEnv('redisConnectionString'),
-    }));
+export function configureRedis() {
+    const connectionString = useEnv('redisConnectionString');
+    if (connectionString) {
+        setRedisFactory(() => createClient({
+            connectionString,
+        }));
+    }
 }

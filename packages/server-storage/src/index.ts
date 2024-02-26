@@ -5,11 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { setup, useEnv } from './config';
+import { config } from 'dotenv';
+import { configure, useEnv } from './config';
+import { setupDatabase } from './config/services';
 import { createHttpServer } from './http';
 
 (async () => {
-    await setup();
+    config();
+
+    await setupDatabase();
+    configure();
 
     const httpServer = createHttpServer();
 

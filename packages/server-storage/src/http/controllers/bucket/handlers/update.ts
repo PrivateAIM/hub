@@ -14,7 +14,7 @@ import { useDataSource } from 'typeorm-extension';
 import { useMinio } from '../../../../core';
 import { BucketEntity } from '../../../../domains';
 import { useRequestEnv } from '../../../request';
-import { runProjectValidation } from '../utils/validation';
+import { runBucketValidation } from '../utils/validation';
 
 export async function executeBucketRouteUpdateHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -24,7 +24,7 @@ export async function executeBucketRouteUpdateHandler(req: Request, res: Respons
         throw new ForbiddenError();
     }
 
-    const result = await runProjectValidation(req, 'update');
+    const result = await runBucketValidation(req, 'update');
     if (!result.data) {
         return sendAccepted(res);
     }
@@ -48,7 +48,11 @@ export async function executeBucketRouteUpdateHandler(req: Request, res: Respons
     const minio = useMinio();
     const hasBucket = await minio.bucketExists(entity.name);
     if (!hasBucket) {
-        await minio.makeBucket(entity.name, entity.region);
+        if (entity.region) {
+            await minio.makeBucket(entity.name, entity.region);
+        } else {
+            await minio.makeBucket(entity.name);
+        }
     }
 
     return sendAccepted(res, entity);

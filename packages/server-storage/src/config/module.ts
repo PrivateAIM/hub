@@ -6,15 +6,13 @@
  */
 
 import {
-    setupAuthup,
-    setupDatabase,
-    setupMinio,
-    setupRedis,
+    configureAuthup,
+    configureMinio,
+    configureRedis,
 } from './services';
 
-export async function setup() {
-    await setupDatabase();
-    setupRedis();
-    setupMinio();
-    setupAuthup();
+export function configure() {
+    configureRedis();
+    configureMinio();
+    configureAuthup();
 }

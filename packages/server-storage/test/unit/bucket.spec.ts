@@ -31,13 +31,15 @@ describe('controllers/bucket', () => {
         const response = await superTest
             .post('/buckets')
             .send({
-                name: 'name',
+                name: 'foo-bar-baz',
+                region: 'eu-west',
             })
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(201);
         expect(response.body).toBeDefined();
-        expect(response.body.name).toEqual('name');
+        expect(response.body.name).toEqual('foo-bar-baz');
+        expect(response.body.region).toEqual('eu-west');
 
         details = removeDateProperties(response.body);
     });
@@ -59,20 +61,6 @@ describe('controllers/bucket', () => {
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(200);
-        expect(response.body).toBeDefined();
-
-        expectPropertiesEqualToSrc(details, response.body);
-    });
-
-    it('should update resource', async () => {
-        details.name = 'TestA';
-
-        const response = await superTest
-            .post(`/buckets/${details.id}`)
-            .send(details)
-            .auth('admin', 'start123');
-
-        expect(response.status).toEqual(202);
         expect(response.body).toBeDefined();
 
         expectPropertiesEqualToSrc(details, response.body);

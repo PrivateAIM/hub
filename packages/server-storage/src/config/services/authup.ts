@@ -9,7 +9,7 @@ import { APIClient, mountClientResponseErrorTokenHook } from '@authup/core';
 import { setAuthupClientFactory } from '../../core';
 import { useEnv } from '../env';
 
-export function setupAuthup() {
+export function configureAuthup() {
     setAuthupClientFactory(() => {
         const baseURL = useEnv('authupApiURL');
         const authupClient = new APIClient({

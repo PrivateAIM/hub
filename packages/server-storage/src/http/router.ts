@@ -18,12 +18,19 @@ import {
 } from '@routup/basic/query';
 
 import { Router, coreHandler } from 'routup';
+import {
+    mountAuthupMiddleware,
+    mountBasicMiddleware,
+    mountCorsMiddleware,
+    mountErrorMiddleware,
+} from './middlewares';
 import { BucketController, BucketFileController } from './controllers';
-import { mountAuthupMiddleware } from './middlewares';
 
 export function createHTTPRouter() : Router {
     const router = new Router();
 
+    mountCorsMiddleware(router);
+    mountBasicMiddleware(router);
     mountAuthupMiddleware(router);
 
     router.get('/', coreHandler(() => ({
@@ -59,6 +66,8 @@ export function createHTTPRouter() : Router {
             },
         },
     }));
+
+    mountErrorMiddleware(router);
 
     return router;
 }
