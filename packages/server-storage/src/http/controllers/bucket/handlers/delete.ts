@@ -37,12 +37,12 @@ export async function executeBucketRouteDeleteHandler(req: Request, res: Respons
 
     const { id: entityId, name: entityName } = entity;
 
+    const minio = useMinio();
+    await minio.removeBucket(entityName);
+
     await repository.remove(entity);
 
     entity.id = entityId;
-
-    const minio = useMinio();
-    await minio.removeBucket(entityName);
 
     return sendAccepted(res, entity);
 }

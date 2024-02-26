@@ -11,6 +11,7 @@ import { isRealmResourceWritable } from '@authup/core';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
+import { useMinio } from '../../../../core';
 import { BucketFileEntity } from '../../../../domains';
 import { useRequestEnv } from '../../../request';
 
@@ -24,7 +25,12 @@ export async function executeBucketFileRouteDeleteHandler(req: Request, res: Res
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(BucketFileEntity);
-    const entity = await repository.findOneBy({ id });
+    const entity = await repository.findOne({
+        where: {
+            id,
+        },
+        relations: ['bucket'],
+    });
 
     if (!entity) {
         throw new NotFoundError();
@@ -33,6 +39,9 @@ export async function executeBucketFileRouteDeleteHandler(req: Request, res: Res
     if (!isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.realm_id)) {
         throw new ForbiddenError();
     }
+
+    const minio = useMinio();
+    await minio.removeObject(entity.bucket.name, entity.hash);
 
     const { id: entityId } = entity;
 
