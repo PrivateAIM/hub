@@ -14,26 +14,24 @@ import type { Request } from 'routup';
 import type { BucketEntity } from '../../../../domains';
 import { useRequestEnv } from '../../../request';
 
-export async function runProjectValidation(
+export async function runBucketValidation(
     req: Request,
     operation: 'create' | 'update',
 ) : Promise<HTTPValidationResult<BucketEntity>> {
-    const titleChain = check('name')
-        .exists()
-        .isLength({ min: 5, max: 100 });
+    if (operation === 'create') {
+        const nameChain = check('name')
+            .exists()
+            .isLength({ min: 5, max: 256 });
 
-    if (operation === 'update') {
-        titleChain.optional();
+        await nameChain.run(req);
+
+        const regionChain = check('region')
+            .exists()
+            .isLength({ min: 5, max: 256 })
+            .optional();
+
+        await regionChain.run(req);
     }
-
-    await titleChain.run(req);
-
-    // ----------------------------------------------
-
-    await check('master_image_id')
-        .isUUID()
-        .optional({ nullable: true })
-        .run(req);
 
     // ----------------------------------------------
 

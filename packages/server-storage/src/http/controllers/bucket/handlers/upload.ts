@@ -8,12 +8,78 @@ import { ForbiddenError, NotFoundError } from '@ebec/http';
 import Busboy from 'busboy';
 import crypto from 'node:crypto';
 import path from 'node:path';
-import { send, sendCreated, useRequestParam } from 'routup';
+import { sendCreated, useRequestParam } from 'routup';
 import type { Request, Response } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { streamToBuffer, useMinio } from '../../../../core';
 import { BucketEntity, BucketFileEntity, getActorFromRequest } from '../../../../domains';
 import { useRequestEnv } from '../../../request';
+
+export async function uploadRequestFiles(req: Request, bucketName: string) {
+    const minio = useMinio();
+
+    const instance = Busboy({
+        headers: req.headers,
+        preservePath: true,
+    });
+
+    return new Promise<BucketFileEntity[]>((resolve, reject) => {
+        const files : BucketFileEntity[] = [];
+        const promises : Promise<void>[] = [];
+        instance.on('file', (_, file, info) => {
+            if (typeof info.filename === 'undefined') {
+                return;
+            }
+
+            const promise = new Promise<void>((fileResolve, fileReject) => {
+                const hashBuilder = crypto.createHash('sha256');
+                hashBuilder.update(info.filename);
+
+                const hash = hashBuilder.digest('hex');
+
+                streamToBuffer(file)
+                    .then((buffer) => {
+                        minio.putObject(
+                            bucketName,
+                            hash,
+                            buffer,
+                            buffer.length,
+                        )
+                            .then(() => {
+                                files.push({
+                                    name: path.basename(info.filename),
+                                    path: info.filename,
+                                    hash,
+                                    size: buffer.length,
+                                    directory: path.dirname(info.filename),
+                                    realm_id: useRequestEnv(req, 'realmId'),
+                                } satisfies Partial<BucketFileEntity> as BucketFileEntity);
+
+                                fileResolve();
+                            })
+                            .catch((e) => fileReject(e));
+                    })
+                    .catch((e) => fileReject(e));
+            });
+
+            promises.push(promise);
+        });
+
+        instance.on('error', (err) => {
+            req.unpipe(instance);
+
+            reject(err);
+        });
+
+        instance.on('finish', async () => {
+            Promise.all(promises)
+                .then(() => resolve(files))
+                .catch((e) => reject(e));
+        });
+
+        req.pipe(instance);
+    });
+}
 
 export async function executeBucketRouteUploadHandler(req: Request, res: Response) : Promise<any> {
     const actor = getActorFromRequest(req);
@@ -31,92 +97,24 @@ export async function executeBucketRouteUploadHandler(req: Request, res: Respons
         throw new NotFoundError();
     }
 
-    const fileRepository = dataSource.getRepository(BucketFileEntity);
+    let files = await uploadRequestFiles(req, entity.name);
 
-    const minio = useMinio();
+    if (files.length > 0) {
+        files = files.map((file) => ({
+            ...file,
+            actor_type: actor.type,
+            actor_id: actor.id,
+            bucket_id: entity.id,
+        }));
 
-    const instance = Busboy({
-        headers: req.headers,
-        preservePath: true,
-    });
-
-    const files : BucketFileEntity[] = [];
-    const promises : Promise<void>[] = [];
-    instance.on('file', (fileName, file, info) => {
-        if (typeof info.filename === 'undefined') {
-            return;
-        }
-
-        const promise = new Promise<void>((resolve, reject) => {
-            const hashBuilder = crypto.createHash('sha256');
-            hashBuilder.update(info.filename);
-
-            const hash = hashBuilder.digest('hex');
-
-            streamToBuffer(file)
-                .then((buffer) => {
-                    minio.putObject(
-                        entity.name,
-                        hash,
-                        buffer,
-                        buffer.length,
-                    )
-                        .then(() => {
-                            files.push(fileRepository.create({
-                                name: fileName,
-                                hash,
-                                size: buffer.length,
-                                directory: path.dirname(info.filename),
-                                realm_id: useRequestEnv(req, 'realmId'),
-                                actor_type: actor.type,
-                                actor_id: actor.id,
-                            }));
-
-                            resolve();
-                        })
-                        .catch((e) => reject(e));
-                })
-                .catch((e) => reject(e));
-        });
-
-        promises.push(promise);
-    });
-
-    instance.on('error', () => {
-        req.unpipe(instance);
-
-        res.statusCode = 400;
-        send(res);
-    });
-
-    instance.on('finish', async () => {
-        try {
-            await Promise.all(promises);
-        } catch (e) {
-            res.statusCode = 400;
-            await send(res);
-            return;
-        }
-
-        if (files.length === 0) {
-            await sendCreated(res, {
-                data: [],
-                meta: {
-                    total: 0,
-                },
-            });
-            return;
-        }
-
+        const fileRepository = dataSource.getRepository(BucketFileEntity);
         await fileRepository.save(files, { listeners: true });
+    }
 
-        await sendCreated(res, {
-            data: files,
-            meta: {
-                total: files.length,
-            },
-        });
+    return sendCreated(res, {
+        data: files,
+        meta: {
+            total: files.length,
+        },
     });
-
-    req.pipe(instance);
 }

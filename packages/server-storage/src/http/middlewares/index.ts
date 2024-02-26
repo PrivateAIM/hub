@@ -7,3 +7,6 @@
 
 export * from './auth';
 export * from './authup';
+export * from './basic';
+export * from './cors';
+export * from './error';

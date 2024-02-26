@@ -1,9 +1,11 @@
 /*
- * Copyright (c) 2022-2024.
+ * Copyright (c) 2024.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './router';
-export * from './server';
+module.exports = async () => {
+    // eslint-disable-next-line no-undef
+    await globalThis.MINIO_CONTAINER.stop();
+};

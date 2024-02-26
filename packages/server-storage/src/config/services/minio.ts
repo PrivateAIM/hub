@@ -11,7 +11,7 @@ import { Client } from 'minio';
 import { setMinioFactory } from '../../core';
 import { useEnv } from '../env';
 
-export function setupMinio() {
+export function configureMinio() {
     const connectionString = useEnv('minioConnectionString');
     const connectionConfig = parseProxyConnectionString(connectionString);
 

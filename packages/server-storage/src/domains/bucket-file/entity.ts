@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Realm, Robot, User } from '@authup/core';
+import type { Realm } from '@authup/core';
 import {
     Column,
     CreateDateColumn,
@@ -22,6 +22,9 @@ export class BucketFileEntity {
 
     @Column({ type: 'varchar', length: 256 })
         name: string;
+
+    @Column({ type: 'varchar', length: 512 })
+        path: string;
 
     @Column({ type: 'varchar', length: 4096 })
         hash: string;

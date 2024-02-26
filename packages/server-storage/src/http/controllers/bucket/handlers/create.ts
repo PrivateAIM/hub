@@ -13,7 +13,7 @@ import { useDataSource } from 'typeorm-extension';
 import { useMinio } from '../../../../core';
 import { useRequestEnv } from '../../../request';
 import { BucketEntity, getActorFromRequest } from '../../../../domains';
-import { runProjectValidation } from '../utils/validation';
+import { runBucketValidation } from '../utils/validation';
 
 export async function executeBucketRouteCreateHandler(req: Request, res: Response) : Promise<any> {
     const ability = useRequestEnv(req, 'ability');
@@ -26,7 +26,7 @@ export async function executeBucketRouteCreateHandler(req: Request, res: Respons
         throw new ForbiddenError('Only users and robots are permitted to create a bucket.');
     }
 
-    const result = await runProjectValidation(req, 'create');
+    const result = await runBucketValidation(req, 'create');
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(BucketEntity);
@@ -39,7 +39,11 @@ export async function executeBucketRouteCreateHandler(req: Request, res: Respons
     await repository.save(entity);
 
     const minio = useMinio();
-    await minio.makeBucket(entity.name, entity.region);
+    if (entity.region) {
+        await minio.makeBucket(entity.name, entity.region);
+    } else {
+        await minio.makeBucket(entity.name);
+    }
 
     return sendCreated(res, entity);
 }
