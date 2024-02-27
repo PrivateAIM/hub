@@ -6,6 +6,7 @@
  */
 
 import path from 'node:path';
+import tar from 'tar-stream';
 import type { BucketFileEntity } from '../../src/domains';
 import {
     dropTestDatabase,
@@ -69,6 +70,50 @@ describe('controllers/bucket-file', () => {
         expect(response.body).toBeDefined();
 
         expectPropertiesEqualToSrc(details, response.body);
+    });
+
+    it('should stream resource', (done) => {
+        const extract = tar.extract();
+
+        const headers : Record<string, any>[] = [];
+
+        extract.on('entry', async (header, stream, callback) => {
+            headers.push(header);
+
+            callback();
+        });
+
+        extract.on('finish', () => {
+            expect(headers.length).toBeGreaterThanOrEqual(1);
+            done();
+        });
+
+        superTest
+            .get(`/bucket-files/${details.id}/stream`)
+            .auth('admin', 'start123')
+            .pipe(extract);
+    });
+
+    it('should stream resource collection', (done) => {
+        const extract = tar.extract();
+
+        const headers : Record<string, any>[] = [];
+
+        extract.on('entry', async (header, stream, callback) => {
+            headers.push(header);
+
+            callback();
+        });
+
+        extract.on('finish', () => {
+            expect(headers.length).toBeGreaterThanOrEqual(1);
+            done();
+        });
+
+        superTest
+            .get(`/buckets/${details.bucket_id}/stream`)
+            .auth('admin', 'start123')
+            .pipe(extract);
     });
 
     it('should delete resource', async () => {

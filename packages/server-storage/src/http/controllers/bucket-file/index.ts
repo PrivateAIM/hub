@@ -14,6 +14,7 @@ import {
     executeBucketFileRouteDeleteHandler,
     executeBucketFileRouteGetManyHandler,
     executeBucketFileRouteGetOneHandler,
+    executeBucketFileRouteStreamHandler,
 } from './handlers';
 
 type PartialBucketFile = Partial<BucketFileEntity>;
@@ -27,6 +28,15 @@ export class BucketFileController {
             @DResponse() res: any,
     ): Promise<PartialBucketFile[]> {
         return await executeBucketFileRouteGetManyHandler(req, res) as PartialBucketFile[];
+    }
+
+    @DGet('/:id/stream', [ForceLoggedInMiddleware])
+    async stream(
+        @DPath('id') id: string,
+            @DRequest() req: any,
+            @DResponse() res: any,
+    ): Promise<ReadableStream> {
+        return await executeBucketFileRouteStreamHandler(req, res) as ReadableStream;
     }
 
     @DGet('/:id', [ForceLoggedInMiddleware])

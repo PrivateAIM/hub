@@ -13,17 +13,16 @@ import tar from 'tar-stream';
 import { useDataSource } from 'typeorm-extension';
 import { streamToBuffer, useMinio } from '../../../../core';
 import {
-    BucketEntity, BucketFileEntity,
+    BucketFileEntity,
 } from '../../../../domains';
 
 async function packFile(
     pack: Pack,
-    name: string,
     file: BucketFileEntity,
 ) : Promise<void> {
     const minio = useMinio();
     return new Promise<void>((resolve, reject) => {
-        minio.getObject(name, file.hash)
+        minio.getObject(file.bucket.name, file.hash)
             .then((stream) => streamToBuffer(stream))
             .then((data) => {
                 pack.entry({
@@ -43,34 +42,21 @@ async function packFile(
     });
 }
 
-async function packFiles(
-    pack: Pack,
-    name: string,
-    files: BucketFileEntity[],
-) {
-    const promises : Promise<void>[] = [];
-
-    for (let i = 0; i < files.length; i++) {
-        promises.push(packFile(pack, name, files[i]));
-    }
-
-    await Promise.all(promises);
-}
-
-export async function executeBucketRouteStreamHandler(req: Request, res: Response) : Promise<any> {
+export async function executeBucketFileRouteStreamHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(BucketEntity);
-    const entity = await repository.findOneBy({ id });
+    const repository = dataSource.getRepository(BucketFileEntity);
+    const entity = await repository.findOne({
+        where: {
+            id,
+        },
+        relations: ['bucket'],
+    });
+
     if (!entity) {
         throw new NotFoundError();
     }
-
-    const fileRepository = dataSource.getRepository(BucketFileEntity);
-    const files = await fileRepository.findBy({
-        bucket_id: entity.id,
-    });
 
     res.writeHead(200, {
         'Content-Type': 'application/x-tar',
@@ -80,7 +66,7 @@ export async function executeBucketRouteStreamHandler(req: Request, res: Respons
     const pack = tar.pack();
     pack.pipe(res);
 
-    await packFiles(pack, entity.name, files);
+    await packFile(pack, entity);
 
     pack.finalize();
 }
