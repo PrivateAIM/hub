@@ -10,6 +10,7 @@ import { buildQuery } from 'rapiq';
 import { nullifyEmptyObjectProperties } from '@privateaim/core';
 import type { CollectionResourceResponse, SingleResourceResponse } from '@privateaim/core';
 import { BaseAPI } from '../base';
+import type { BucketFile } from '../bucket-file';
 import type { Bucket } from './entity';
 
 export class BucketAPI extends BaseAPI {
@@ -37,6 +38,16 @@ export class BucketAPI extends BaseAPI {
 
     async update(id: Bucket['id'], data: Record<string, any>): Promise<SingleResourceResponse<Bucket>> {
         const response = await this.client.post(`buckets/${id}`, nullifyEmptyObjectProperties(data));
+        return response.data;
+    }
+
+    async upload(id: Bucket['id'], formData: FormData): Promise<CollectionResourceResponse<BucketFile>> {
+        const response = await this.client.post(`buckets/${id}`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+
         return response.data;
     }
 }
