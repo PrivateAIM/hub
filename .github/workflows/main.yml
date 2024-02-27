@@ -41,3 +41,7 @@ jobs:
                     AUTHUP_API_URL: http://localhost:3000/
                 run: |
                     npm run test --workspace=packages/server-core
+
+            -   name: Test Server Storage
+                run: |
+                    npm run test --workspace=packages/server-storage
