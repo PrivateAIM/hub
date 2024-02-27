@@ -83,7 +83,7 @@ export async function packContainerWithTrain(container: Container, context: Cont
                         .catch(() => reject(new BuilderError('The analysis pack stream could not be forwarded to the container.')));
                 });
 
-                const readStream = stream.Readable.fromWeb(response.data as any);
+                const readStream = stream.Readable.fromWeb(response as any);
 
                 readStream.pipe(extract);
             })
