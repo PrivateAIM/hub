@@ -8,39 +8,11 @@
 import { NotFoundError } from '@ebec/http';
 import type { Request, Response } from 'routup';
 import { useRequestParam } from 'routup';
-import type { Pack } from 'tar-stream';
-import tar from 'tar-stream';
 import { useDataSource } from 'typeorm-extension';
-import { streamToBuffer, useMinio } from '../../../../core';
+import { useMinio } from '../../../../core';
 import {
     BucketFileEntity,
 } from '../../../../domains';
-
-async function packFile(
-    pack: Pack,
-    file: BucketFileEntity,
-) : Promise<void> {
-    const minio = useMinio();
-    return new Promise<void>((resolve, reject) => {
-        minio.getObject(file.bucket.name, file.hash)
-            .then((stream) => streamToBuffer(stream))
-            .then((data) => {
-                pack.entry({
-                    name: file.path,
-                    size: data.byteLength,
-                }, data, (err) => {
-                    if (err) {
-                        reject(err);
-
-                        return;
-                    }
-
-                    resolve();
-                });
-            })
-            .catch((e) => reject(e));
-    });
-}
 
 export async function executeBucketFileRouteStreamHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -59,14 +31,14 @@ export async function executeBucketFileRouteStreamHandler(req: Request, res: Res
     }
 
     res.writeHead(200, {
-        'Content-Type': 'application/x-tar',
-        'Transfer-Encoding': 'chunked',
+        'Content-Type': 'application/gzip',
     });
 
-    const pack = tar.pack();
-    pack.pipe(res);
+    // todo: this should work
+    // setResponseHeaderAttachment(res, entity.path);
 
-    await packFile(pack, entity);
+    const minio = useMinio();
+    const stream = await minio.getObject(entity.bucket.name, entity.hash);
 
-    pack.finalize();
+    stream.pipe(res);
 }

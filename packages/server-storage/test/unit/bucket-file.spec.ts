@@ -72,26 +72,14 @@ describe('controllers/bucket-file', () => {
         expectPropertiesEqualToSrc(details, response.body);
     });
 
-    it('should stream resource', (done) => {
-        const extract = tar.extract();
-
-        const headers : Record<string, any>[] = [];
-
-        extract.on('entry', async (header, stream, callback) => {
-            headers.push(header);
-
-            callback();
-        });
-
-        extract.on('finish', () => {
-            expect(headers.length).toBeGreaterThanOrEqual(1);
-            done();
-        });
-
-        superTest
+    it('should stream resource', async () => {
+        const response = await superTest
             .get(`/bucket-files/${details.id}/stream`)
-            .auth('admin', 'start123')
-            .pipe(extract);
+            .auth('admin', 'start123');
+
+        expect(response.status).toEqual(200);
+        expect(response.body).toBeDefined();
+        expect((response.body as Buffer).byteLength).toBeGreaterThan(0);
     });
 
     it('should stream resource collection', (done) => {
