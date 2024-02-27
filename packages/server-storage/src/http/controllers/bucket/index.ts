@@ -19,6 +19,7 @@ import {
     executeBucketRouteDeleteHandler,
     executeBucketRouteGetManyHandler,
     executeBucketRouteGetOneHandler,
+    executeBucketRouteStreamHandler,
     executeBucketRouteUpdateHandler,
     executeBucketRouteUploadHandler,
 } from './handlers';
@@ -34,6 +35,15 @@ export class BucketController {
             @DResponse() res: any,
     ): Promise<PartialBucket[]> {
         return await executeBucketRouteGetManyHandler(req, res) as PartialBucket[];
+    }
+
+    @DGet('/:id/stream', [ForceLoggedInMiddleware])
+    async stream(
+        @DPath('id') id: string,
+            @DRequest() req: any,
+            @DResponse() res: any,
+    ): Promise<ReadableStream> {
+        return await executeBucketRouteStreamHandler(req, res) as ReadableStream;
     }
 
     @DPost('/:id/upload', [ForceLoggedInMiddleware])

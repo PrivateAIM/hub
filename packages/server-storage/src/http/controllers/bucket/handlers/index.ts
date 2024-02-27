@@ -8,5 +8,6 @@
 export * from './create';
 export * from './delete';
 export * from './read';
+export * from './stream';
 export * from './update';
 export * from './upload';

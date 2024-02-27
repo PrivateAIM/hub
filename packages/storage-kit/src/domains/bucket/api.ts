@@ -52,7 +52,16 @@ export class BucketAPI extends BaseAPI {
         return response.data;
     }
 
-    getDownloadPath(id: Analysis['id']): string {
-        return `buckets/${id}/files/download`;
+    getStreamPath(id: Analysis['id']): string {
+        return `buckets/${id}/stream`;
+    }
+
+    async stream(id: Bucket['id']) : Promise<ReadableStream<any>> {
+        const response = await this.client.request({
+            url: this.getStreamPath(id),
+            responseType: 'stream',
+        });
+
+        return response.data;
     }
 }
