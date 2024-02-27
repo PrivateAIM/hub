@@ -5,14 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { BucketFile } from '@privateaim/storage-kit';
 import path from 'node:path';
 import type {
-    APIClient,
     Analysis,
-    AnalysisFile, MasterImage,
+    MasterImage,
 } from '@privateaim/core';
 import { AnalysisContainerPath, getHostNameFromString } from '@privateaim/core';
-import { useClient } from 'hapic';
+import { useCoreClient, useStorageClient } from '../../../core';
 import { BuilderError } from '../error';
 
 type DockerFileBuildContext = {
@@ -24,12 +24,13 @@ export async function buildTrainDockerFile(context: DockerFileBuildContext) : Pr
     content: string,
     masterImagePath: string
 }> {
-    const client = useClient<APIClient>();
+    const storageClient = useStorageClient();
+    const coreClient = useCoreClient();
 
-    let entryPoint : AnalysisFile;
+    let entryPoint : BucketFile;
 
     try {
-        entryPoint = await client.analysisFile.getOne(context.entity.entrypoint_file_id);
+        entryPoint = await storageClient.bucketFile.getOne(context.entity.entrypoint_file_id);
     } catch (e) {
         throw BuilderError.entrypointNotFound();
     }
@@ -37,7 +38,7 @@ export async function buildTrainDockerFile(context: DockerFileBuildContext) : Pr
     let masterImage : MasterImage;
 
     try {
-        masterImage = await client.masterImage.getOne(context.entity.master_image_id);
+        masterImage = await coreClient.masterImage.getOne(context.entity.master_image_id);
     } catch (e) {
         throw BuilderError.masterImageNotFound();
     }
@@ -50,7 +51,7 @@ export async function buildTrainDockerFile(context: DockerFileBuildContext) : Pr
     let entrypointCommand = masterImage.command;
     let entrypointCommandArguments = masterImage.command_arguments;
 
-    const { data: masterImageGroups } = await client.masterImageGroup.getMany({
+    const { data: masterImageGroups } = await coreClient.masterImageGroup.getMany({
         filter: {
             virtual_path: masterImage.group_virtual_path,
         },

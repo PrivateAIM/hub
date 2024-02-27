@@ -6,7 +6,7 @@
  */
 
 import path from 'node:path';
-import { read } from 'envix';
+import { orFail, read } from 'envix';
 import { hasOwnProperty } from '@privateaim/core';
 import { config } from 'dotenv';
 import type { EnvironmentName } from './constants';
@@ -33,13 +33,12 @@ export function useEnv(key?: string) : any {
     instance = {
         env: read('NODE_ENV', 'development') as `${EnvironmentName}`,
 
-        minioConnectionString: read('MINIO_CONNECTION_STRING', 'http://admin:start123@127.0.0.1:9000'),
-        redisConnectionString: read('REDIS_CONNECTION_STRING', null),
         rabbitMqConnectionString: read('RABBITMQ_CONNECTION_STRING', 'amqp://root:start123@127.0.0.1'),
         vaultConnectionString: read('VAULT_CONNECTION_STRING', 'start123@http://127.0.0.1:8090/v1/'),
 
-        apiUrl: read('API_URL', 'http://127.0.0.1:3002/'),
-        authupApiUrl: read('AUTHUP_API_URL', 'http://127.0.0.1:3010/'),
+        coreURL: orFail(read('CORE_URL')),
+        authupURL: orFail(read('AUTHUP_URL')),
+        storageURL: orFail(read('STORAGE_URL')),
     };
 
     if (typeof key === 'string') {

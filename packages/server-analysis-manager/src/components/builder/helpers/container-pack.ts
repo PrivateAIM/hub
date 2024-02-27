@@ -6,13 +6,11 @@
  */
 
 import stream from 'node:stream';
-import type { APIClient } from '@privateaim/core';
 import { AnalysisContainerPath } from '@privateaim/core';
 import type { Container } from 'dockerode';
-import { useClient } from 'hapic';
 import tar from 'tar-stream';
 import {
-    streamToBuffer,
+    streamToBuffer, useStorageClient,
 } from '../../../core';
 import { BuilderCommand } from '../constants';
 import { BuilderError } from '../error';
@@ -29,11 +27,11 @@ export async function packContainerWithTrain(container: Container, context: Cont
             command: BuilderCommand.BUILD,
         });
 
-    const client = useClient<APIClient>();
+    const client = useStorageClient();
 
     return new Promise<void>((resolve, reject) => {
         client.request({
-            url: client.analysis.getFilesDownloadPath(context.train.id),
+            url: client.bucket.getDownloadPath(context.train.id),
             responseType: 'stream',
         })
             .then((response) => {

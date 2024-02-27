@@ -7,9 +7,10 @@
 
 import { hasOwnProperty } from '@privateaim/core';
 import type {
-    APIClient, Analysis, Registry,
+    Analysis, Registry,
 } from '@privateaim/core';
-import { isClientErrorWithStatusCode, useClient } from 'hapic';
+import { isClientErrorWithStatusCode } from 'hapic';
+import { useCoreClient } from '../../core';
 import { BaseError } from '../error';
 import type { ComponentPayloadExtended } from '../type';
 
@@ -21,7 +22,7 @@ export async function extendPayload<T extends Partial<ComponentPayloadExtended<{
 
     // -----------------------------------------------------------------------------------
 
-    const client = useClient<APIClient>();
+    const client = useCoreClient();
 
     if (data.entity) {
         train = data.entity;
