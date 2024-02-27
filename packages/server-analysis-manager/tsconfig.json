@@ -5,8 +5,11 @@
             "@privateaim/core": [
                 "./packages/core/src"
             ],
-            "@privateaim/flame-server-kit": [
+            "@privateaim/server-kit": [
                 "./packages/server-kit/src"
+            ],
+            "@privateaim/storage-kit": [
+                "./packages/storage-kit/src"
             ]
         }
     }

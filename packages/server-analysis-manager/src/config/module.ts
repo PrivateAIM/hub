@@ -5,66 +5,39 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { mountClientResponseErrorTokenHook } from '@authup/core';
+import type { TokenCreatorOptions } from '@authup/core';
 import type { Aggregator, Component } from '@privateaim/server-kit';
-import { setClient as setHTTPClient } from 'hapic';
-import {
-    APIClient,
-} from '@privateaim/core';
-import { setConfig as setAmqpConfig } from 'amqp-extension';
-import type { Client } from 'redis-extension';
-import { setConfig as setRedisConfig, useClient as useRedisClient } from 'redis-extension';
 import { buildComponentRouter } from '../components';
-import { setMinioConfig } from '../core';
-import { isSetEnv, useEnv } from './env';
+import { useEnv } from './env';
+import {
+    configureAMQP,
+    configureCoreService,
+    configureStorageService,
+} from './services';
 
 export type Config = {
-    redis: Client,
-
     aggregators: {start: () => void}[]
     components: {start: () => void}[]
 };
 
 export function createConfig() : Config {
-    if (isSetEnv('redisConnectionString')) {
-        setRedisConfig({ connectionString: useEnv('redisConnectionString') });
-    }
+    const tokenCreator : TokenCreatorOptions = {
+        type: 'robotInVault',
+        name: 'system',
+        vault: useEnv('vaultConnectionString'),
+    };
 
-    setMinioConfig(useEnv('minioConnectionString'));
+    configureStorageService({ tokenCreator });
+    configureCoreService({ tokenCreator });
+    configureAMQP();
 
-    const redis = useRedisClient();
-
-    setAmqpConfig({
-        connection: useEnv('rabbitMqConnectionString'),
-        exchange: {
-            name: 'pht',
-            type: 'topic',
-        },
-    });
-
-    const centralClient = new APIClient({
-        baseURL: useEnv('apiUrl'),
-    });
-    mountClientResponseErrorTokenHook(centralClient, {
-        baseURL: useEnv('authupApiUrl'),
-        tokenCreator: {
-            type: 'robotInVault',
-            name: 'system',
-            vault: useEnv('vaultConnectionString'),
-        },
-    });
-    setHTTPClient(centralClient);
-
-    const aggregators : Aggregator[] = [
-    ];
+    const aggregators : Aggregator[] = [];
 
     const components : Component[] = [
         buildComponentRouter(),
     ];
 
     return {
-        redis,
-
         aggregators,
         components,
     };

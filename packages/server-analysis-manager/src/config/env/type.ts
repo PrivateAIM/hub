@@ -10,7 +10,8 @@ import type { EnvironmentName } from './constants';
 export interface Environment {
     env: `${EnvironmentName}`,
 
-    minioConnectionString: string,
+    storageURL: string,
+
     redisConnectionString: string,
     rabbitMqConnectionString: string,
     vaultConnectionString: string,

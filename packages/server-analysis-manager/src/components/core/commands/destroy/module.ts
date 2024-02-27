@@ -5,14 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { getMinioBucketObjectList, useMinio } from '../../../../core';
+import { getMinioBucketObjectList, useStorageClient } from '../../../../core';
 import type { CoreDestroyPayload } from '../../type';
 import { buildMinioBucketName } from '../utils';
 
 export async function executeCoreDestroyCommand(
     payload: CoreDestroyPayload,
 ) : Promise<CoreDestroyPayload> {
-    const minio = useMinio();
+    const minio = useStorageClient();
 
     const bucketName = buildMinioBucketName(payload.id);
     const hasBucket = await minio.bucketExists(bucketName);
