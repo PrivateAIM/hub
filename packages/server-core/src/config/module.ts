@@ -6,7 +6,7 @@
  */
 
 import type { TokenCreatorOptions } from '@authup/core';
-import { APIClient, ROBOT_SYSTEM_NAME, mountClientResponseErrorTokenHook } from '@authup/core';
+import { APIClient, mountClientResponseErrorTokenHook } from '@authup/core';
 import { isBoolFalse, isBoolTrue } from '@privateaim/core';
 import { hasConfig as hasAmqpConfig, setConfig as setAmqpConfig } from 'amqp-extension';
 import { createClient } from 'redis-extension';
@@ -54,7 +54,7 @@ export function createConfig() : Config {
     } else {
         tokenCreator = {
             type: 'robotInVault',
-            name: ROBOT_SYSTEM_NAME,
+            name: 'system',
             vault: vaultClient,
         };
     }

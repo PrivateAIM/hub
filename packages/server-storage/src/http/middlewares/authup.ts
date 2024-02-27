@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { AbilityDescriptor } from '@authup/core';
+import type { Ability } from '@authup/core';
 import { AbilityManager, REALM_MASTER_NAME } from '@authup/core';
 import { createHTTPMiddleware } from '@authup/server-adapter';
 import type { TokenVerificationData, TokenVerifierRedisCacheOptions } from '@authup/server-adapter';
@@ -42,7 +42,7 @@ function createFakeTokenVerificationData() : TokenVerificationDataMinimal {
             inverse: false,
             power: 999,
             target: null,
-        } as AbilityDescriptor)),
+        } satisfies Ability)),
     };
 }
 

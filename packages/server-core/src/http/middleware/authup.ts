@@ -6,7 +6,7 @@
  */
 
 import { setInterval } from 'node:timers';
-import { AbilityManager, CookieName, ROBOT_SYSTEM_NAME } from '@authup/core';
+import { AbilityManager, CookieName } from '@authup/core';
 import type { OAuth2TokenGrantResponse, TokenCreatorOptions } from '@authup/core';
 import type { TokenVerifierRedisCacheOptions } from '@authup/server-adapter';
 import { createHTTPMiddleware } from '@authup/server-adapter';
@@ -85,7 +85,7 @@ export function registerAuthupMiddleware(router: Router) {
     } else {
         tokenCreator = {
             type: 'robotInVault',
-            name: ROBOT_SYSTEM_NAME,
+            name: 'system',
             vault: useVaultClient(),
         };
     }

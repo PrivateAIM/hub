@@ -9,7 +9,7 @@ import type { Server as HTTPServer } from 'node:http';
 import { Server } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
 import {
-    AbilityManager, OAuth2SubKind, ROBOT_SYSTEM_NAME,
+    AbilityManager, OAuth2SubKind,
 } from '@authup/core';
 import { createSocketMiddleware } from '@authup/server-adapter';
 import { useEnv } from '../config';
@@ -40,7 +40,7 @@ export function createSocketServer(context : SocketServerContext) : Server {
             baseURL: useEnv('authupApiURL'),
             creator: {
                 type: 'robotInVault',
-                name: ROBOT_SYSTEM_NAME,
+                name: 'system',
                 vault: useEnv('vaultConnectionString'),
             },
             cache: {

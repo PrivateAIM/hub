@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { REALM_MASTER_NAME, ROBOT_SYSTEM_NAME } from '@authup/core';
+import { REALM_MASTER_NAME } from '@authup/core';
 import type { OptionsInput } from '@routup/rate-limit';
 import { rateLimit } from '@routup/rate-limit';
 import type { Request, Router } from 'routup';
@@ -20,7 +20,7 @@ export function registerRateLimiterMiddleware(router: Router) {
 
                 if (
                     name === REALM_MASTER_NAME &&
-                    useRequestEnv(req, 'robotName') === ROBOT_SYSTEM_NAME
+                    useRequestEnv(req, 'robotName') === 'system'
                 ) {
                     return true;
                 }

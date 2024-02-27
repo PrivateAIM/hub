@@ -8,7 +8,7 @@
 import type {
     Permission, Realm, Robot, Role,
 } from '@authup/core';
-import { REALM_MASTER_NAME, ROBOT_SYSTEM_NAME } from '@authup/core';
+import { REALM_MASTER_NAME } from '@authup/core';
 import { ServerError } from '@ebec/http';
 import { isClientErrorWithStatusCode } from '@hapic/harbor';
 import { PermissionKey, ServiceID } from '@privateaim/core';
@@ -34,7 +34,7 @@ export async function setupAuthupService(): Promise<any> {
     const robotResponse = await authupClient.robot.getMany({
         filter: {
             realm_id: realm.id,
-            name: ROBOT_SYSTEM_NAME,
+            name: 'system',
         },
     });
 

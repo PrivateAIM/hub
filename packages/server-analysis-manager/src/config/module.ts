@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ROBOT_SYSTEM_NAME, mountClientResponseErrorTokenHook } from '@authup/core';
+import { mountClientResponseErrorTokenHook } from '@authup/core';
 import type { Aggregator, Component } from '@privateaim/server-kit';
 import { setClient as setHTTPClient } from 'hapic';
 import {
@@ -49,7 +49,7 @@ export function createConfig() : Config {
         baseURL: useEnv('authupApiUrl'),
         tokenCreator: {
             type: 'robotInVault',
-            name: ROBOT_SYSTEM_NAME,
+            name: 'system',
             vault: useEnv('vaultConnectionString'),
         },
     });
