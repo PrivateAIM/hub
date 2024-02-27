@@ -5,6 +5,4 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export function buildMinioBucketName(input: string) {
-    return `analysis.${input}`;
-}
+export * from './bucket';

@@ -5,13 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { APIClient } from '@privateaim/core';
 import {
     REGISTRY_ARTIFACT_TAG_LATEST,
 } from '@privateaim/core';
-import { useClient } from 'hapic';
 import {
-    buildDockerAuthConfig, buildRemoteDockerImageURL, pushDockerImage, useDocker,
+    buildDockerAuthConfig, buildRemoteDockerImageURL, pushDockerImage, useCoreClient, useDocker,
 } from '../../../../core';
 import type { ComponentPayloadExtended } from '../../../type';
 import { extendPayload } from '../../../utils';
@@ -45,7 +43,7 @@ export async function executePushCommand(
         password: data.registry.account_secret,
     });
 
-    const client = useClient<APIClient>();
+    const client = useCoreClient();
     const { data: analysisNodes } = await client.analysisNode.getMany({
         filter: {
             analysis_id: data.entity.id,

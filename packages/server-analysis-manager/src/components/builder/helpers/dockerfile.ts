@@ -7,12 +7,12 @@
 
 import path from 'node:path';
 import type {
-    APIClient,
     Analysis,
-    AnalysisFile, MasterImage,
+    AnalysisFile,
+    MasterImage,
 } from '@privateaim/core';
 import { AnalysisContainerPath, getHostNameFromString } from '@privateaim/core';
-import { useClient } from 'hapic';
+import { useCoreClient } from '../../../core';
 import { BuilderError } from '../error';
 
 type DockerFileBuildContext = {
@@ -24,7 +24,7 @@ export async function buildTrainDockerFile(context: DockerFileBuildContext) : Pr
     content: string,
     masterImagePath: string
 }> {
-    const client = useClient<APIClient>();
+    const client = useCoreClient();
 
     let entryPoint : AnalysisFile;
 

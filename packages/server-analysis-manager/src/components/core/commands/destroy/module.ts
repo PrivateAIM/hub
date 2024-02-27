@@ -5,22 +5,19 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { getMinioBucketObjectList, useStorageClient } from '../../../../core';
+import { BucketType } from '../../../../constants';
+import { useStorageClient } from '../../../../core';
+import { buildBucketName } from '../../../../helpers';
 import type { CoreDestroyPayload } from '../../type';
-import { buildMinioBucketName } from '../utils';
 
 export async function executeCoreDestroyCommand(
     payload: CoreDestroyPayload,
 ) : Promise<CoreDestroyPayload> {
-    const minio = useStorageClient();
+    const storage = useStorageClient();
 
-    const bucketName = buildMinioBucketName(payload.id);
-    const hasBucket = await minio.bucketExists(bucketName);
-    if (hasBucket) {
-        const items = await getMinioBucketObjectList(minio, bucketName);
-        await minio.removeObjects(bucketName, items);
-        await minio.removeBucket(bucketName);
-    }
+    await storage.bucket.delete(buildBucketName(BucketType.FILES, payload.id));
+    await storage.bucket.delete(buildBucketName(BucketType.TEMP, payload.id));
+    await storage.bucket.delete(buildBucketName(BucketType.RESULTS, payload.id));
 
     return payload;
 }

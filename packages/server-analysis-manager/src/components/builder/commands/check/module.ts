@@ -5,13 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { APIClient } from '@privateaim/core';
 import {
     buildRegistryClientConnectionStringFromRegistry,
 } from '@privateaim/core';
-import { isClientErrorWithStatusCode, useClient } from 'hapic';
+import { isClientErrorWithStatusCode } from 'hapic';
 
-import { createBasicHarborAPIClient } from '../../../../core';
+import { createBasicHarborAPIClient, useCoreClient } from '../../../../core';
 import type { ComponentPayloadExtended } from '../../../type';
 import { extendPayload } from '../../../utils';
 import { BuilderCommand } from '../../constants';
@@ -34,7 +33,7 @@ export async function executeBuilderCheckCommand(
 
     // -----------------------------------------------------------------------------------
 
-    const client = useClient<APIClient>();
+    const client = useCoreClient();
     const { data: analysisNodes } = await client.analysisNode.getMany({
         filter: {
             analysis_id: data.entity.id,

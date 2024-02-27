@@ -5,20 +5,19 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { BucketType } from '../../../../constants';
 import { useStorageClient } from '../../../../core';
+import { buildBucketName } from '../../../../helpers';
 import type { CoreConfigurePayload } from '../../type';
-import { buildMinioBucketName } from '../utils';
 
 export async function executeCoreConfigureCommand(
     payload: CoreConfigurePayload,
 ) : Promise<CoreConfigurePayload> {
-    const minio = useStorageClient();
+    const storage = useStorageClient();
 
-    const bucketName = buildMinioBucketName(payload.id);
-    const hasBucket = await minio.bucketExists(bucketName);
-    if (!hasBucket) {
-        await minio.makeBucket(bucketName, 'eu-west-1');
-    }
+    await storage.bucket.create({ name: buildBucketName(BucketType.FILES, payload.id) });
+    await storage.bucket.create({ name: buildBucketName(BucketType.TEMP, payload.id) });
+    await storage.bucket.create({ name: buildBucketName(BucketType.RESULTS, payload.id) });
 
     return payload;
 }
