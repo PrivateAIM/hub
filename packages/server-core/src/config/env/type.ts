@@ -13,7 +13,6 @@ export interface Environment {
 
     jwtMaxAge: number,
 
-    minioConnectionString?: string | boolean,
     redisConnectionString?: string | boolean,
     rabbitMqConnectionString?: string | boolean,
     vaultConnectionString: string | boolean,
@@ -23,7 +22,5 @@ export interface Environment {
     appURL: string,
 
     skipProjectApproval: boolean,
-    skipAnalysisApproval: boolean,
-
-    httpProxyAPIs: string | undefined,
+    skipAnalysisApproval: boolean
 }

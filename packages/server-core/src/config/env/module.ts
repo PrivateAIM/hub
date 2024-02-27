@@ -41,10 +41,6 @@ export function useEnv(key?: string) : any {
 
         jwtMaxAge: readInt('JWT_MAX_AGE', 3600),
 
-        minioConnectionString: oneOf([
-            readBool('MINIO_CONNECTION_STRING'),
-            read('MINIO_CONNECTION_STRING'),
-        ]),
         redisConnectionString: oneOf([
             readBool('REDIS_CONNECTION_STRING'),
             read('REDIS_CONNECTION_STRING'),
@@ -63,8 +59,6 @@ export function useEnv(key?: string) : any {
 
         skipProjectApproval: readBool('SKIP_PROJECT_APPROVAL'),
         skipAnalysisApproval: readBool('SKIP_ANALYSIS_APPROVAL'),
-
-        httpProxyAPIs: read('HTTP_PROXY_APIS', null),
     };
 
     if (typeof key === 'string') {

@@ -13,7 +13,9 @@ import { createClient } from 'redis-extension';
 import { VaultClient } from '@hapic/vault';
 import { buildAuthupAggregator, buildTrainManagerAggregator } from '../aggregators';
 import {
-    setAuthupClient, setMinioConfig, setRedisClient, setVaultClient,
+    setAuthupClient,
+    setRedisClient,
+    setVaultClient,
 } from '../core';
 import { ConfigDefaults, EnvironmentName, useEnv } from './env';
 
@@ -95,20 +97,6 @@ export function createConfig() : Config {
                 type: 'topic',
             },
         });
-    }
-
-    // ---------------------------------------------
-
-    connectionString = useEnv('minioConnectionString');
-    if (
-        typeof connectionString !== 'undefined' &&
-        !isBoolFalse(connectionString)
-    ) {
-        setMinioConfig(
-            isBoolTrue(connectionString) ?
-                ConfigDefaults.MINIO :
-                connectionString,
-        );
     }
 
     // ---------------------------------------------
