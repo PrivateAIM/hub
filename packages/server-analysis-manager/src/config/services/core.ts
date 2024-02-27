@@ -22,7 +22,7 @@ export function configureCoreService(context: StorageServiceConfigurationContext
 
         mountClientResponseErrorTokenHook(client, {
             tokenCreator: context.tokenCreator,
-            baseURL: useEnv('authupApiUrl'),
+            baseURL: useEnv('authupURL'),
         });
 
         return client;

@@ -13,8 +13,11 @@ PORT=<port>
 NODE_ENV=development
 
 RABBITMQ_CONNECTION_STRING=amqp://<username>:<password>@<host>
-REDIS_CONNECTION_STRING=redis://<username>:<password>@<host>
 VAULT_CONNECTION_STRING=<token>@<url>/v1/
+
+AUTHUP_URL=...
+CORE_URL=...
+STORAGE_URL=...
 ```
 
 ## Credits
