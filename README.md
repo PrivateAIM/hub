@@ -23,6 +23,7 @@ The repository contains the following packages:
 
 **`General`**
 - **@privateaim/core** 🧱: This package contains common constants, functions, types, ...
+- **@privateaim/storage-kit** 🧱: This package contains an api-client, types and utils in the context of the storage service, ...
 
 **`Client`**
 - **@privateaim/client-ui** 🧸: This package contains the User Interface.

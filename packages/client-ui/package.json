@@ -11,7 +11,8 @@
     "description": "This package contains the frontend application of the HUB Ecosystem.",
     "scripts": {
         "dev": "nuxi dev",
-        "build": "nuxi build",
+        "build": "echo 1",
+        "build-alt": "nuxi build",
         "start": "nuxi start",
         "generate": "nuxi generate",
         "prepare": "nuxi prepare",

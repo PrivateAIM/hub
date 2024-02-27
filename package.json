@@ -34,7 +34,7 @@
     },
     "scripts": {
         "commit": "npx git-cz",
-        "build": "npm run build --workspace=packages/core && npm run build --workspace=packages/server-kit && npm run build --workspace=packages/server-analysis-manager && npm run build --workspace=packages/server-realtime && npm run build --workspace=packages/server-storage && npm run build --workspace=packages/server-core",
+        "build": "npx nx run-many -t build",
         "test": "npx nx run-many -t test",
         "lint": "eslint --ext .ts,.vue,.js ./packages/",
         "lint:fix": "npm run lint -- --fix",

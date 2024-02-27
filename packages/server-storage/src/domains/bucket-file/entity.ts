@@ -6,6 +6,7 @@
  */
 
 import type { Realm } from '@authup/core';
+import type { BucketFile } from '@privateaim/storage-kit';
 import {
     Column,
     CreateDateColumn,
@@ -16,7 +17,7 @@ import {
 import { BucketEntity } from '../bucket';
 
 @Entity({ name: 'bucket_files' })
-export class BucketFileEntity {
+export class BucketFileEntity implements BucketFile {
     @PrimaryGeneratedColumn('uuid')
         id: string;
 

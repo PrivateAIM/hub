@@ -12,7 +12,8 @@
         "packages/server-kit": {"component": "server-kit" },
         "packages/server-realtime": {"component": "server-realtime" },
         "packages/server-analysis-manager": {"component": "server-analysis-manager" },
-        "packages/server-storage": {"component": "server-storage"}
+        "packages/server-storage": {"component": "server-storage"},
+        "packages/storage-kit": {"component": "storage-kit"}
     },
     "plugins": [
         {
@@ -30,7 +31,8 @@
                 "server-kit",
                 "server-realtime",
                 "server-analysis-manager",
-                "server-storage"
+                "server-storage",
+                "storage-kit"
             ]
         }
     ],

@@ -5,7 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Realm, Robot, User } from '@authup/core';
+import type { Realm } from '@authup/core';
+import type { Bucket } from '@privateaim/storage-kit';
 import {
     Column,
     CreateDateColumn,
@@ -15,7 +16,7 @@ import {
 } from 'typeorm';
 
 @Entity({ name: 'buckets' })
-export class BucketEntity {
+export class BucketEntity implements Bucket {
     @PrimaryGeneratedColumn('uuid')
         id: string;
 

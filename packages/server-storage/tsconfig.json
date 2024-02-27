@@ -4,6 +4,9 @@
         "paths": {
             "@privateaim/core": [
                 "./packages/core/src"
+            ],
+            "@privateaim/storage-kit": [
+                "./packages/storage-kit/src"
             ]
         }
     }
