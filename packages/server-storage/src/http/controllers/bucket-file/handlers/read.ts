@@ -20,7 +20,7 @@ export async function executeBucketFileRouteGetOneHandler(req: Request, res: Res
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(BucketFileEntity);
-    const query = repository.createQueryBuilder('bucket')
+    const query = repository.createQueryBuilder('bucketFile')
         .where('bucketFile.id = :id', { id });
 
     applyQuery(query, useRequestQuery(req), {
@@ -29,6 +29,7 @@ export async function executeBucketFileRouteGetOneHandler(req: Request, res: Res
             default: [
                 'id',
                 'name',
+                'path',
                 'directory',
                 'size',
                 'hash',
@@ -37,6 +38,7 @@ export async function executeBucketFileRouteGetOneHandler(req: Request, res: Res
                 'realm_id',
                 'actor_type',
                 'actor_id',
+                'bucket_id',
             ],
         },
         relations: {
@@ -57,14 +59,15 @@ export async function executeBucketFileRouteGetManyHandler(req: Request, res: Re
     const dataSource = await useDataSource();
 
     const repository = dataSource.getRepository(BucketFileEntity);
-    const query = repository.createQueryBuilder('bucket');
+    const query = repository.createQueryBuilder('bucketFile');
 
     const { pagination } = applyQuery(query, useRequestQuery(req), {
-        defaultAlias: 'bucket',
+        defaultAlias: 'bucketFile',
         fields: {
             default: [
                 'id',
                 'name',
+                'path',
                 'directory',
                 'size',
                 'hash',
@@ -73,6 +76,7 @@ export async function executeBucketFileRouteGetManyHandler(req: Request, res: Re
                 'realm_id',
                 'actor_type',
                 'actor_id',
+                'bucket_id',
             ],
         },
         relations: {
