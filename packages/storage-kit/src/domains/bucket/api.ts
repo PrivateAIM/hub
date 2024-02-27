@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { Analysis } from '@privateaim/core/src';
 import type { BuildInput } from 'rapiq';
 import { buildQuery } from 'rapiq';
 import { nullifyEmptyObjectProperties } from '@privateaim/core';
@@ -49,5 +50,9 @@ export class BucketAPI extends BaseAPI {
         });
 
         return response.data;
+    }
+
+    getDownloadPath(id: Analysis['id']): string {
+        return `buckets/${id}/files/download`;
     }
 }
