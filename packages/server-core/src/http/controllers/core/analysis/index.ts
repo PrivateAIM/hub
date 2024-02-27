@@ -18,8 +18,6 @@ import {
     getManyAnalysisRouteHandler,
     getOneAnalysisRouteHandler,
     handleAnalysisCommandRouteHandler,
-    handleAnalysisFilesDownloadRouteHandler,
-    handleAnalysisResultDownloadRouteHandler,
     updateAnalysisRouteHandler,
 } from './handlers';
 import { ForceLoggedInMiddleware } from '../../../middleware';
@@ -35,24 +33,6 @@ export class AnalysisController {
             @DResponse() res: any,
     ): Promise<PartialAnalysis[]> {
         return getManyAnalysisRouteHandler(req, res);
-    }
-
-    @DGet('/:id/files/download', [ForceLoggedInMiddleware])
-    async getFiles(
-        @DPath('id') id: string,
-            @DRequest() req: any,
-            @DResponse() res: any,
-    ): Promise<any> {
-        return handleAnalysisFilesDownloadRouteHandler(req, res);
-    }
-
-    @DGet('/:id/result/download', [ForceLoggedInMiddleware])
-    async getResult(
-        @DPath('id') id: string,
-            @DRequest() req: any,
-            @DResponse() res: any,
-    ): Promise<any> {
-        return handleAnalysisResultDownloadRouteHandler(req, res);
     }
 
     @DGet('/:id', [ForceLoggedInMiddleware])
