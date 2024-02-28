@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.2.0](https://github.com/PrivateAIM/hub/compare/server-kit-v0.1.0...server-kit-v0.2.0) (2024-02-28)
+
+
+### Features
+
+* bump authup to v1.0.0-beta.5 ([13aeab2](https://github.com/PrivateAIM/hub/commit/13aeab2eb8a00069512eee17fc129d56a58309bc))
+* move http request validation logic to kit package ([#104](https://github.com/PrivateAIM/hub/issues/104)) ([5c26e44](https://github.com/PrivateAIM/hub/commit/5c26e44fdd1df48c5c35756495df08423481770d))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core bumped from ^0.1.0 to ^0.2.0
+
 ## 0.1.0 (2024-02-19)
 
 
