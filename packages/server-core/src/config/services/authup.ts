@@ -11,9 +11,14 @@ import { hasVaultClient, setAuthupFactory, useVaultClient } from '../../core';
 import { useEnv } from '../env';
 
 export function configureAuthup() {
+    const baseURL = useEnv('authupApiURL');
+    if (typeof baseURL !== 'string') {
+        return;
+    }
+
     setAuthupFactory(() => {
         const authupClient = new APIClient({
-            baseURL: useEnv('authupApiURL'),
+            baseURL,
         });
 
         let tokenCreator : TokenCreatorOptions;
@@ -32,7 +37,7 @@ export function configureAuthup() {
         }
 
         mountClientResponseErrorTokenHook(authupClient, {
-            baseURL: useEnv('authupApiURL'),
+            baseURL,
             tokenCreator,
         });
 

@@ -6,12 +6,16 @@
  */
 
 import type { Robot } from '@authup/core';
-import { useAuthupClient } from '../../../../../core';
+import { hasAuthupClient, useAuthupClient } from '../../../../../core';
 import type { NodeEntity } from '../../../../../domains';
 
-export async function createNodeRobot(entity: NodeEntity) : Promise<Robot> {
+export async function createNodeRobot(entity: NodeEntity) : Promise<void> {
     if (entity.robot_id) {
         throw new Error('Node Robot already exists.');
+    }
+
+    if (!hasAuthupClient()) {
+        return;
     }
 
     const authupClient = useAuthupClient();
@@ -28,11 +32,13 @@ export async function createNodeRobot(entity: NodeEntity) : Promise<Robot> {
     }
 
     entity.robot_id = robot.id;
-
-    return robot;
 }
 
-export async function deleteNodeRobot(entity: NodeEntity) {
+export async function deleteNodeRobot(entity: NodeEntity) : Promise<void> {
+    if (!hasAuthupClient()) {
+        return;
+    }
+
     const authupClient = useAuthupClient();
 
     try {
