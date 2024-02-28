@@ -9,9 +9,9 @@ import {
     REGISTRY_MASTER_IMAGE_PROJECT_NAME,
     buildRegistryClientConnectionStringFromRegistry,
 } from '@privateaim/core';
-import { publish } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
 import { useLogger } from '../../../config';
+import { useAmqpClient } from '../../../core';
 import { RegistryEntity, RegistryProjectEntity } from '../../../domains';
 import { ComponentName } from '../../constants';
 import { RegistryCommand } from '../constants';
@@ -76,6 +76,7 @@ export async function cleanupRegistry(payload: RegistryCleanupPayload) {
             },
         });
 
-        await publish(queueMessage);
+        const client = useAmqpClient();
+        await client.publish(queueMessage);
     }
 }

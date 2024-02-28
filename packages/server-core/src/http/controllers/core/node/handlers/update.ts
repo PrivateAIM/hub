@@ -10,12 +10,12 @@ import {
 } from '@privateaim/core';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/core';
-import { publish } from 'amqp-extension';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { RegistryCommand } from '../../../../../components';
 import { buildRegistryPayload } from '../../../../../components/registry/utils/queue';
+import { hasAmqpClient, useAmqpClient } from '../../../../../core';
 import { useRequestEnv } from '../../../../request';
 import { createNodeRobot, runNodeValidation } from '../utils';
 import { NodeEntity, RegistryProjectEntity } from '../../../../../domains';
@@ -57,12 +57,12 @@ export async function updateNodeRouteHandler(req: Request, res: Response) : Prom
         const registryProjectExternalName = entity.external_name || createNanoID();
         const registryProjectRepository = dataSource.getRepository(RegistryProjectEntity);
 
-        let registryProject : RegistryProjectEntity | undefined;
+        let registryProject: RegistryProjectEntity | undefined;
         if (entity.registry_project_id) {
             registryProject = await registryProjectRepository.findOneBy({ id: entity.registry_project_id });
         }
 
-        let registryOperation : 'link' | 'relink' = 'link';
+        let registryOperation: 'link' | 'relink' = 'link';
         if (registryProject) {
             if (registryProject.external_name !== registryProjectExternalName) {
                 registryProject = registryProjectRepository.merge(registryProject, {
@@ -88,23 +88,26 @@ export async function updateNodeRouteHandler(req: Request, res: Response) : Prom
         entity.registry_project_id = registryProject.id;
         entity.external_name = registryProjectExternalName;
 
-        if (registryOperation === 'link') {
-            await publish(buildRegistryPayload({
-                command: RegistryCommand.PROJECT_LINK,
-                data: {
-                    id: registryProject.id,
-                },
-            }));
-        } else {
-            await publish(buildRegistryPayload({
-                command: RegistryCommand.PROJECT_RELINK,
-                data: {
-                    id: registryProject.id,
-                    registryId: registryProject.registry_id,
-                    externalName: registryProject.external_name,
-                    accountId: registryProject.account_id,
-                },
-            }));
+        if (hasAmqpClient()) {
+            const client = useAmqpClient();
+            if (registryOperation === 'link') {
+                await client.publish(buildRegistryPayload({
+                    command: RegistryCommand.PROJECT_LINK,
+                    data: {
+                        id: registryProject.id,
+                    },
+                }));
+            } else {
+                await client.publish(buildRegistryPayload({
+                    command: RegistryCommand.PROJECT_RELINK,
+                    data: {
+                        id: registryProject.id,
+                        registryId: registryProject.registry_id,
+                        externalName: registryProject.external_name,
+                        accountId: registryProject.account_id,
+                    },
+                }));
+            }
         }
     }
 

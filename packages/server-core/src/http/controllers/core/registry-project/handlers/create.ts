@@ -7,12 +7,12 @@
 
 import { PermissionID } from '@privateaim/core';
 import { ForbiddenError } from '@ebec/http';
-import { publish } from 'amqp-extension';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { RegistryCommand } from '../../../../../components';
 import { buildRegistryPayload } from '../../../../../components/registry/utils/queue';
+import { hasAmqpClient, useAmqpClient } from '../../../../../core';
 import { useRequestEnv } from '../../../../request';
 import { runRegistryProjectValidation } from '../utils';
 import { RegistryProjectEntity } from '../../../../../domains';
@@ -31,12 +31,15 @@ export async function createRegistryProjectRouteHandler(req: Request, res: Respo
 
     await repository.save(entity);
 
-    await publish(buildRegistryPayload({
-        command: RegistryCommand.PROJECT_LINK,
-        data: {
-            id: entity.id,
-        },
-    }));
+    if (hasAmqpClient()) {
+        const client = useAmqpClient();
+        await client.publish(buildRegistryPayload({
+            command: RegistryCommand.PROJECT_LINK,
+            data: {
+                id: entity.id,
+            },
+        }));
+    }
 
     return sendCreated(res, entity);
 }

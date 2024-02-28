@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { publish } from 'amqp-extension';
 import {
     REGISTRY_INCOMING_PROJECT_NAME,
     REGISTRY_MASTER_IMAGE_PROJECT_NAME,
@@ -13,6 +12,7 @@ import {
     RegistryProjectType, generateRegistryProjectId,
 } from '@privateaim/core';
 import { useDataSource } from 'typeorm-extension';
+import { useAmqpClient } from '../../../core';
 import { RegistryEntity, RegistryProjectEntity } from '../../../domains';
 import { useLogger } from '../../../config';
 import { RegistryCommand } from '../constants';
@@ -124,6 +124,7 @@ export async function setupRegistry(payload: RegistrySetupPayload) {
         select: ['id'],
     });
 
+    const client = useAmqpClient();
     for (let i = 0; i < entities.length; i++) {
         const queueMessage = buildRegistryPayload({
             command: RegistryCommand.PROJECT_LINK,
@@ -132,7 +133,7 @@ export async function setupRegistry(payload: RegistrySetupPayload) {
             },
         });
 
-        await publish(queueMessage);
+        await client.publish(queueMessage);
     }
 
     return payload;

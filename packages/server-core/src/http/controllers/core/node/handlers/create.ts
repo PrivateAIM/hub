@@ -11,14 +11,12 @@ import {
     createNanoID,
 } from '@privateaim/core';
 import { ForbiddenError } from '@ebec/http';
-import { validationResult } from 'express-validator';
-import { publish } from 'amqp-extension';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { HTTPValidationError } from '@privateaim/server-kit';
 import { RegistryCommand } from '../../../../../components';
 import { buildRegistryPayload } from '../../../../../components/registry/utils/queue';
+import { hasAmqpClient, useAmqpClient } from '../../../../../core';
 import { useRequestEnv } from '../../../../request';
 import { createNodeRobot, runNodeValidation } from '../utils';
 import { NodeEntity, RegistryProjectEntity } from '../../../../../domains';
@@ -27,11 +25,6 @@ export async function createNodeRouteHandler(req: Request, res: Response) : Prom
     const ability = useRequestEnv(req, 'ability');
     if (!ability.has(PermissionID.NODE_ADD)) {
         throw new ForbiddenError();
-    }
-
-    const validation = validationResult(req);
-    if (!validation.isEmpty()) {
-        throw new HTTPValidationError(validation);
     }
 
     const result = await runNodeValidation(req, 'create');
@@ -61,12 +54,15 @@ export async function createNodeRouteHandler(req: Request, res: Response) : Prom
 
         entity.registry_project_id = registryProject.id;
 
-        await publish(buildRegistryPayload({
-            command: RegistryCommand.PROJECT_LINK,
-            data: {
-                id: registryProject.id,
-            },
-        }));
+        if (hasAmqpClient()) {
+            const client = useAmqpClient();
+            await client.publish(buildRegistryPayload({
+                command: RegistryCommand.PROJECT_LINK,
+                data: {
+                    id: registryProject.id,
+                },
+            }));
+        }
     }
 
     // -----------------------------------------------------

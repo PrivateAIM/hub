@@ -6,7 +6,7 @@
  */
 
 import type { ComponentContextWithCommand, ComponentContextWithError } from '@privateaim/server-kit';
-import { publish } from 'amqp-extension';
+import { useAmqpClient } from '../../../core';
 import type { BuilderCommand } from '../constants';
 import { BuilderEvent } from '../constants';
 import type { BuilderCommandContext } from '../type';
@@ -18,7 +18,8 @@ export async function writeFailedEvent(
         `${BuilderCommand}`
     >,
 ) {
-    await publish(buildBuilderAggregatorQueuePayload({
+    const client = useAmqpClient();
+    await client.publish(buildBuilderAggregatorQueuePayload({
         event: BuilderEvent.FAILED,
         command: context.command,
         data: context.data,

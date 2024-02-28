@@ -7,8 +7,8 @@
 
 import type { Component } from '@privateaim/server-kit';
 import type { ConsumeMessage } from 'amqp-extension';
-import { consume } from 'amqp-extension';
 import { useLogger } from '../../config';
+import { useAmqpClient } from '../../core';
 import { ComponentName } from '../constants';
 import { executeRegistryCommand } from '../registry';
 import { ROUTER_QUEUE_ROUTING_KEY } from './constants';
@@ -16,7 +16,8 @@ import type { QueueRouterPayload } from './type';
 
 export function buildRouterComponent() : Component {
     function start() {
-        return consume({ exchange: { routingKey: ROUTER_QUEUE_ROUTING_KEY } }, {
+        const client = useAmqpClient();
+        return client.consume({ exchange: { routingKey: ROUTER_QUEUE_ROUTING_KEY } }, {
             $any: async (message: ConsumeMessage) => {
                 const payload : QueueRouterPayload<any> = JSON.parse(message.content.toString('utf-8'));
 

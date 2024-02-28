@@ -7,10 +7,10 @@
 
 import type { RobotEventContext } from '@authup/core';
 import { ServiceID } from '@privateaim/core';
-import { publish } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
 import { RegistryCommand } from '../../../components';
 import { buildRegistryPayload } from '../../../components/registry/utils/queue';
+import { useAmqpClient } from '../../../core';
 import { RegistryProjectEntity } from '../../../domains';
 
 export async function handleAuthupRobotEvent(context: RobotEventContext) {
@@ -31,7 +31,8 @@ export async function handleAuthupRobotEvent(context: RobotEventContext) {
                     },
                 });
 
-                await publish(queueMessage);
+                const client = useAmqpClient();
+                await client.publish(queueMessage);
             }
         }
     }

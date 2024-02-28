@@ -6,8 +6,8 @@
  */
 
 import { BuilderCommand, buildBuilderQueuePayload } from '@privateaim/server-analysis-manager';
-import { publish } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
+import { useAmqpClient } from '../../../core';
 import { resolveAnalysis } from './utils';
 import { AnalysisEntity } from '../entity';
 
@@ -17,7 +17,8 @@ export async function detectAnalysisBuildStatus(train: AnalysisEntity | string) 
 
     train = await resolveAnalysis(train, repository);
 
-    await publish(buildBuilderQueuePayload({
+    const client = useAmqpClient();
+    await client.publish(buildBuilderQueuePayload({
         command: BuilderCommand.CHECK,
         data: {
             id: train.id,

@@ -13,6 +13,8 @@ services:
         environment:
             MYSQL_ROOT_HOST: "%"
             MYSQL_ROOT_PASSWORD: start123
+        networks:
+            hub:
     redis:
         image: bitnami/redis
         healthcheck:
@@ -22,8 +24,25 @@ services:
             retries: 5
         environment:
             ALLOW_EMPTY_PASSWORD: yes
+        networks:
+            hub:
+    minio:
+        image: minio/minio
+        healthcheck:
+            test: bash -c ':> /dev/tcp/127.0.0.1/9000' || exit 1
+            interval: 3s
+            timeout: 5s
+            retries: 5
+        ports:
+            - '9000:9000'
+        environment:
+            MINIO_ACCESS_KEY: admin
+            MINIO_SECRET_KEY: start123
+        command: server /data
+        networks:
+            hub:
     mq:
-        image: bitnami/rabbitmq
+        image: rabbitmq
         healthcheck:
             test: rabbitmq-diagnostics -q ping
             interval: 3s
@@ -32,8 +51,10 @@ services:
         ports:
             - '5672:5672'
         environment:
-            RABBITMQ_USERNAME: root
-            RABBITMQ_PASSWORD: start123
+            RABBITMQ_DEFAULT_USER: root
+            RABBITMQ_DEFAULT_PASS: start123
+        networks:
+            hub:
     vault:
         image: vault:1.12.0
         healthcheck:
@@ -45,6 +66,8 @@ services:
         environment:
             VAULT_DEV_ROOT_TOKEN_ID: start123
             VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8090
+        networks:
+            hub:
     authup:
         image: authup/authup
         pull_policy: always
@@ -67,7 +90,9 @@ services:
             VAULT: start123@http://vault:8090/v1/
             REDIS: redis://redis
             PUBLIC_URL: http://localhost:3010/
-    server-core:
+        networks:
+            hub:
+    core:
         build: '.'
         restart: always
         depends_on:
@@ -86,15 +111,17 @@ services:
         environment:
             REDIS_CONNECTION_STRING: redis://redis
             VAULT_CONNECTION_STRING: start123@http://vault:8090/v1/
-            # RABBITMQ_CONNECTION_STRING: amqp://root:start123@mq
+            RABBITMQ_CONNECTION_STRING: amqp://root:start123@172.40.1.1
             PUBLIC_URL: http://localhost:3001/
-            AUTHUP_API_URL: http://authup:3000/
+            AUTHUP_URL: http://authup:3010/
             DB_TYPE: 'mysql'
             DB_HOST: 'mysql'
             DB_USERNAME: 'root'
             DB_PASSWORD: 'start123'
             DB_DATABASE: 'core'
-    server-realtime:
+        networks:
+            hub:
+    realtime:
         build: '.'
         restart: always
         command: realtime start
@@ -110,4 +137,62 @@ services:
         environment:
             REDIS_CONNECTION_STRING: redis://redis
             VAULT_CONNECTION_STRING: start123@http://vault:8090/v1/
-            AUTHUP_API_URL: http://authup:3000/
+            AUTHUP_URL: http://authup:3010/
+        networks:
+            hub:
+    analysis-manager:
+        build: '.'
+        restart: always
+        command: analysis-manager start
+        depends_on:
+            authup:
+                condition: service_healthy
+            mq:
+                condition: service_healthy
+            vault:
+                condition: service_healthy
+        ports:
+            - '3003:3000'
+        environment:
+            RABBITMQ_CONNECTION_STRING: amqp://root:start123@172.40.1.1
+            VAULT_CONNECTION_STRING: start123@http://vault:8090/v1/
+            AUTHUP_URL: http://authup:3010/
+            STORAGE_URL: http://storage:3000/
+        networks:
+            hub:
+    storage:
+        build: '.'
+        restart: always
+        command: storage start
+        depends_on:
+            authup:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+            minio:
+                condition: service_healthy
+            vault:
+                condition: service_healthy
+        ports:
+            - '3004:3000'
+        environment:
+            DB_TYPE: 'mysql'
+            DB_HOST: 'mysql'
+            DB_USERNAME: 'root'
+            DB_PASSWORD: 'start123'
+            DB_DATABASE: 'storage'
+            REDIS_CONNECTION_STRING: redis://redis
+            MINIO_CONNECTION_STRING: http://admin:start123@minio:9000
+            VAULT_CONNECTION_STRING: start123@http://vault:8090/v1/
+            AUTHUP_URL: http://authup:3010/
+        networks:
+            hub:
+networks:
+    hub:
+        driver: bridge
+        driver_opts:
+            com.docker.network.bridge.name: dnpm
+        ipam:
+            driver: default
+            config:
+                - subnet: 172.40.1.0/24

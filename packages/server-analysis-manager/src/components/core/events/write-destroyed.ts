@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { publish } from 'amqp-extension';
+import { useAmqpClient } from '../../../core';
 import { CoreEvent } from '../constants';
 import type { CoreDestroyCommandContext } from '../type';
 import { buildCoreAggregatorQueuePayload } from '../utils';
@@ -13,7 +13,8 @@ import { buildCoreAggregatorQueuePayload } from '../utils';
 export async function writeDestroyedEvent(
     context: CoreDestroyCommandContext,
 ) {
-    await publish(buildCoreAggregatorQueuePayload({
+    const client = useAmqpClient();
+    await client.publish(buildCoreAggregatorQueuePayload({
         event: CoreEvent.DESTROYED,
         command: context.command,
         data: context.data,

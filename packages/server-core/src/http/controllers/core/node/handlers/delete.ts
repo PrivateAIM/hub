@@ -8,12 +8,12 @@
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { PermissionID } from '@privateaim/core';
 import { isRealmResourceWritable } from '@authup/core';
-import { publish } from 'amqp-extension';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { RegistryCommand } from '../../../../../components';
 import { buildRegistryPayload } from '../../../../../components/registry/utils/queue';
+import { hasAmqpClient, useAmqpClient } from '../../../../../core';
 import { NodeEntity, RegistryProjectEntity } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 import { deleteNodeRobot } from '../utils';
@@ -39,25 +39,26 @@ export async function deleteNodeRouteHandler(req: Request, res: Response) : Prom
         throw new ForbiddenError('You are not permitted to delete this station.');
     }
 
-    if (
-        entity.registry_project_id
-    ) {
-        const registryProjectRepository = dataSource.getRepository(RegistryProjectEntity);
+    if (hasAmqpClient()) {
+        if (entity.registry_project_id) {
+            const registryProjectRepository = dataSource.getRepository(RegistryProjectEntity);
 
-        const registryProject = await registryProjectRepository.findOneBy({ id: entity.registry_project_id });
-        if (registryProject) {
-            const queueMessage = buildRegistryPayload({
-                command: RegistryCommand.PROJECT_UNLINK,
-                data: {
-                    id: registryProject.id,
-                    registryId: registryProject.registry_id,
-                    externalName: registryProject.external_name,
-                    accountId: registryProject.account_id,
-                },
-            });
+            const registryProject = await registryProjectRepository.findOneBy({ id: entity.registry_project_id });
+            if (registryProject) {
+                const queueMessage = buildRegistryPayload({
+                    command: RegistryCommand.PROJECT_UNLINK,
+                    data: {
+                        id: registryProject.id,
+                        registryId: registryProject.registry_id,
+                        externalName: registryProject.external_name,
+                        accountId: registryProject.account_id,
+                    },
+                });
 
-            await publish(queueMessage);
-            await registryProjectRepository.remove(registryProject);
+                const client = useAmqpClient();
+                await client.publish(queueMessage);
+                await registryProjectRepository.remove(registryProject);
+            }
         }
     }
 

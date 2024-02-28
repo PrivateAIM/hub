@@ -7,20 +7,20 @@
 
 import { ComponentError, isComponentEventQueuePayload } from '@privateaim/server-kit';
 import { ComponentName } from '@privateaim/server-analysis-manager';
-import type { ConsumeMessage } from 'amqp-extension';
-import { consume } from 'amqp-extension';
 import { useLogger } from '../../config';
+import { useAmqpClient } from '../../core';
 import type { Aggregator } from '../type';
 import { handleTrainManagerBuilderEvent } from './builder';
 
 export function buildTrainManagerAggregator() : Aggregator {
+    const client = useAmqpClient();
     return {
-        start: () => consume({
+        start: () => client.consume({
             exchange: {
                 routingKey: 'api.aggregator.tm',
             },
         }, {
-            $any: async (message: ConsumeMessage) => {
+            $any: async (message) => {
                 const payload = JSON.parse(message.content.toString('utf-8'));
                 if (!isComponentEventQueuePayload(payload)) {
                     useLogger().error('Train-Manager aggregation event could not be processed.');

@@ -21,8 +21,7 @@ import {
 
     buildDomainNamespaceName,
 } from '@privateaim/core';
-import { publish as publishMessage } from 'amqp-extension';
-import { useRedisPublishClient } from '../../core';
+import { hasAmqpClient, useAmqpClient, useRedisPublishClient } from '../../core';
 import { AnalysisEntity } from '../../domains';
 
 async function publishEvent(
@@ -56,14 +55,17 @@ export class TrainSubscriber implements EntitySubscriberInterface<AnalysisEntity
     async afterInsert(event: InsertEvent<AnalysisEntity>): Promise<any> {
         await publishEvent(DomainEventName.CREATED, event.entity);
 
-        const message = buildCoreQueuePayload({
-            command: CoreCommand.CONFIGURE,
-            data: {
-                id: event.entity.id,
-            },
-        });
+        if (hasAmqpClient()) {
+            const message = buildCoreQueuePayload({
+                command: CoreCommand.CONFIGURE,
+                data: {
+                    id: event.entity.id,
+                },
+            });
 
-        await publishMessage(message);
+            const client = useAmqpClient();
+            await client.publish(message);
+        }
     }
 
     async afterUpdate(event: UpdateEvent<AnalysisEntity>): Promise<any> {
@@ -73,13 +75,16 @@ export class TrainSubscriber implements EntitySubscriberInterface<AnalysisEntity
     async beforeRemove(event: RemoveEvent<AnalysisEntity>): Promise<any> {
         await publishEvent(DomainEventName.DELETED, event.entity);
 
-        const message = buildCoreQueuePayload({
-            command: CoreCommand.DESTROY,
-            data: {
-                id: event.entity.id,
-            },
-        });
+        if (hasAmqpClient()) {
+            const message = buildCoreQueuePayload({
+                command: CoreCommand.DESTROY,
+                data: {
+                    id: event.entity.id,
+                },
+            });
 
-        await publishMessage(message);
+            const client = useAmqpClient();
+            await client.publish(message);
+        }
     }
 }

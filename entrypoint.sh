@@ -18,6 +18,7 @@ case "${1}" in
     ui) PACKAGE=ui;;
     realtime) PACKAGE=realtime;;
     analysis-manager) PACKAGE=analysis-manager;;
+    storage) PACKAGE=storage;;
     cli) PACKAGE=cli;;
     *) echo "Unknown package: ${1}";;
 esac
@@ -48,6 +49,9 @@ case "${PACKAGE}" in
         ;;
     analysis-manager)
         exec npm run "$1" --workspace=packages/server-analysis-manager
+        ;;
+    storage)
+        exec npm run "$1" --workspace=packages/server-storage
         ;;
     cli)
         exec npm run cli --workspace=packages/server-core -- "$@"

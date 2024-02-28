@@ -5,15 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { setConfig as setAmqpConfig } from 'amqp-extension/dist/config/module';
+import { Client } from 'amqp-extension';
+import { setAmqpFactory } from '../../core/amqp';
 import { useEnv } from '../env';
 
 export function configureAMQP() {
-    setAmqpConfig({
+    setAmqpFactory(() => new Client({
         connection: useEnv('rabbitMqConnectionString'),
         exchange: {
             name: 'pht',
             type: 'topic',
         },
-    });
+    }));
 }

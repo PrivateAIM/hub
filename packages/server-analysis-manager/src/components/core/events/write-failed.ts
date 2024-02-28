@@ -6,7 +6,7 @@
  */
 
 import type { ComponentContextWithError } from '@privateaim/server-kit';
-import { publish } from 'amqp-extension';
+import { useAmqpClient } from '../../../core';
 import { CoreEvent } from '../constants';
 import type { CoreCommandContext } from '../type';
 import { buildCoreAggregatorQueuePayload } from '../utils';
@@ -14,7 +14,8 @@ import { buildCoreAggregatorQueuePayload } from '../utils';
 export async function writeFailedEvent(
     context: ComponentContextWithError<CoreCommandContext>,
 ) {
-    await publish(buildCoreAggregatorQueuePayload({
+    const client = useAmqpClient();
+    await client.publish(buildCoreAggregatorQueuePayload({
         event: CoreEvent.FAILED,
         command: context.command,
         data: context.data,

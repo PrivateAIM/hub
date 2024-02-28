@@ -6,12 +6,12 @@
  */
 
 import { useRequestBody } from '@routup/basic/body';
-import { publish } from 'amqp-extension';
 import type { Request, Response } from 'routup';
 import { sendAccepted } from 'routup';
 import { RegistryCommand, RegistryHookSchema } from '../../../../../../components';
 import { buildRegistryPayload } from '../../../../../../components/registry/utils/queue';
 import { useLogger } from '../../../../../../config';
+import { hasAmqpClient, useAmqpClient } from '../../../../../../core';
 
 export async function postHarborHookRouteHandler(req: Request, res: Response) : Promise<any> {
     const body = useRequestBody(req);
@@ -19,8 +19,9 @@ export async function postHarborHookRouteHandler(req: Request, res: Response) : 
     const validation = await RegistryHookSchema.safeParseAsync(body);
     if (validation.success === false) {
         useLogger().warn('The registry hook has a malformed shape.', { error: validation.error });
-    } else {
-        await publish(buildRegistryPayload({
+    } else if (hasAmqpClient()) {
+        const client = useAmqpClient();
+        await client.publish(buildRegistryPayload({
             command: RegistryCommand.EVENT_HANDLE,
             data: {
                 event: validation.data.type,
@@ -34,5 +35,5 @@ export async function postHarborHookRouteHandler(req: Request, res: Response) : 
         }));
     }
 
-    sendAccepted(res);
+    return sendAccepted(res);
 }

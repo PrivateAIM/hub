@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { setConfig, useConnection } from 'amqp-extension';
+import { Client } from 'amqp-extension';
 import { isBoolFalse, isBoolTrue } from '@privateaim/core';
 import { setAmqpFactory } from '../../core';
 import { ConfigDefaults, useEnv } from '../env';
@@ -16,16 +16,12 @@ export function configureAmqp() {
         typeof connectionString !== 'undefined' &&
         !isBoolFalse(connectionString)
     ) {
-        setAmqpFactory(() => {
-            const config = setConfig({
-                connection: isBoolTrue(connectionString) ? ConfigDefaults.RABBITMQ : connectionString,
-                exchange: {
-                    name: 'pht',
-                    type: 'topic',
-                },
-            });
-
-            return useConnection(config);
-        });
+        setAmqpFactory(() => new Client({
+            connection: isBoolTrue(connectionString) ? ConfigDefaults.RABBITMQ : connectionString,
+            exchange: {
+                name: 'pht',
+                type: 'topic',
+            },
+        }));
     }
 }

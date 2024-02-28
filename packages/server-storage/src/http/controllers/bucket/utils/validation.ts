@@ -7,8 +7,8 @@
 
 import { isRealmResourceWritable } from '@authup/core';
 import { ForbiddenError } from '@ebec/http';
-import type { HTTPValidationResult } from '@privateaim/server-kit/src';
-import { createHTTPValidationResult } from '@privateaim/server-kit/src';
+import type { HTTPValidationResult } from '@privateaim/server-kit';
+import { createHTTPValidationResult } from '@privateaim/server-kit';
 import { check } from 'express-validator';
 import type { Request } from 'routup';
 import type { BucketEntity } from '../../../../domains';

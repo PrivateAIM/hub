@@ -11,13 +11,13 @@ import {
 import {
     ForbiddenError,
 } from '@ebec/http';
-import { publish } from 'amqp-extension';
 import type { Request, Response } from 'routup';
 import { sendAccepted } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { buildRegistryPayload } from '../../../../../../components/registry/utils/queue';
+import { hasAmqpClient, useAmqpClient } from '../../../../../../core';
 import { useRequestEnv } from '../../../../../request';
-import { useEnv, useLogger } from '../../../../../../config';
+import { useLogger } from '../../../../../../config';
 import {
     RegistryCommand,
 } from '../../../../../../components';
@@ -33,10 +33,11 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
 
     const { data: result } = await runServiceRegistryValidation(req);
 
-    if (useEnv('env') === 'test') {
-        sendAccepted(res);
-        return;
+    if (!hasAmqpClient()) {
+        return sendAccepted(res);
     }
+
+    const client = useAmqpClient();
 
     const dataSource = await useDataSource();
 
@@ -62,7 +63,7 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
                     },
                 });
 
-                await publish(queueMessage);
+                await client.publish(queueMessage);
             } else if (result.command === RegistryAPICommand.DELETE) {
                 useLogger().info('Submitting delete registry command.');
 
@@ -73,7 +74,7 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
                     },
                 });
 
-                await publish(queueMessage);
+                await client.publish(queueMessage);
             } else {
                 useLogger().info('Submitting cleanup registry command.');
 
@@ -84,7 +85,7 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
                     },
                 });
 
-                await publish(queueMessage);
+                await client.publish(queueMessage);
             }
             break;
         }
@@ -106,7 +107,7 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
                         secret: result.secret,
                     },
                 });
-                await publish(queueMessage);
+                await client.publish(queueMessage);
             } else {
                 const queueMessage = buildRegistryPayload({
                     command: RegistryCommand.PROJECT_UNLINK,
@@ -117,11 +118,11 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
                         accountId: entity.account_id,
                     },
                 });
-                await publish(queueMessage);
+                await client.publish(queueMessage);
             }
             break;
         }
     }
 
-    sendAccepted(res);
+    return sendAccepted(res);
 }

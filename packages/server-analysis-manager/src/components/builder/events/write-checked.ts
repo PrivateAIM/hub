@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { publish } from 'amqp-extension';
+import { useAmqpClient } from '../../../core';
 import { BuilderEvent } from '../constants';
 import type { BuilderCheckCommandContext, BuilderCheckPayload } from '../type';
 import { buildBuilderAggregatorQueuePayload } from '../utils';
@@ -13,7 +13,8 @@ import { buildBuilderAggregatorQueuePayload } from '../utils';
 export async function writeCheckedEvent(
     context: BuilderCheckCommandContext,
 ) : Promise<BuilderCheckPayload> {
-    await publish(buildBuilderAggregatorQueuePayload({
+    const client = useAmqpClient();
+    await client.publish(buildBuilderAggregatorQueuePayload({
         event: BuilderEvent.CHECKED,
         command: context.command,
         data: context.data, //  { id: 'xxx' }

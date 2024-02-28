@@ -9,18 +9,18 @@ import type {
     Component,
 } from '@privateaim/server-kit';
 import { isComponentCommandQueuePayload } from '@privateaim/server-kit';
-import { consume } from 'amqp-extension';
 import { ComponentName } from '../../../constants';
 import { executeCoreCommand } from '../../../core';
 import {
     executeBuilderCommand,
 } from '../../../index';
-import { useLogger } from '../../../../core';
+import { useAmqpClient, useLogger } from '../../../../core';
 import { ROUTER_QUEUE_ROUTING_KEY } from './constants';
 
 export function buildComponentRouter() : Component {
     function start() {
-        return consume({
+        const client = useAmqpClient();
+        return client.consume({
             exchange: { routingKey: ROUTER_QUEUE_ROUTING_KEY },
         }, {
             $any: async (message) => {
