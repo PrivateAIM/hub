@@ -5,12 +5,15 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { has } from 'envix';
 import type { Server as HTTPServer } from 'node:http';
 import { Server } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
+import type { TokenCreatorOptions } from '@authup/core';
 import {
     AbilityManager, OAuth2SubKind,
 } from '@authup/core';
+import type { TokenVerifierCacheOptions } from '@authup/server-adapter';
 import { createSocketMiddleware } from '@authup/server-adapter';
 import { useEnv } from '../config';
 import { registerMessagesNamespace, registerResourcesNamespaces } from './namespaces';
@@ -35,18 +38,34 @@ export function createSocketServer(context : SocketServerContext) : Server {
         // ...
     });
 
+    let cache : TokenVerifierCacheOptions | undefined;
+    if (has('REDIS_CONNECTION_STRING')) {
+        cache = {
+            type: 'redis',
+            client: context.config.redisDatabase,
+        };
+    }
+
+    let creator : TokenCreatorOptions | undefined;
+    if (has('VAULT_CONNECTION_STRING')) {
+        creator = {
+            type: 'robotInVault',
+            name: 'system',
+            vault: useEnv('vaultConnectionString'),
+        };
+    } else {
+        creator = {
+            type: 'user',
+            name: 'admin',
+            password: 'start123',
+        };
+    }
+
     const authMiddleware = createSocketMiddleware({
         tokenVerifier: {
             baseURL: useEnv('authupApiURL'),
-            creator: {
-                type: 'robotInVault',
-                name: 'system',
-                vault: useEnv('vaultConnectionString'),
-            },
-            cache: {
-                type: 'redis',
-                client: context.config.redisDatabase,
-            },
+            creator,
+            cache,
         },
         tokenVerifierHandler: (socket: SocketBase, data) => {
             switch (data.sub_kind) {

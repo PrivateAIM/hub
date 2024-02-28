@@ -12,10 +12,14 @@ import type { SocketBase, SocketNamespaceContext } from '../../types';
 import { registerResourcesNamespaceControllers } from './register';
 
 export function registerResourcesNamespaces({ server, authMiddleware } : SocketNamespaceContext) {
-    const workspace = server.of(/^\/resources(?:#[a-z0-9A-Z-_]+)?$/);
-    workspace.use(authMiddleware);
+    const nsp = server.of(/^\/resources(?:#[a-z0-9A-Z-_]+)?$/);
+    nsp.use((socket, next) => {
+        useLogger().info(`${socket.nsp.name}: ${socket.id} connected.`);
+        next();
+    });
+    nsp.use(authMiddleware);
 
-    workspace.use((socket: SocketBase, next) => {
+    nsp.use((socket: SocketBase, next) => {
         if (!socket.data.userId && !socket.data.robotId) {
             useLogger().error('Socket is not authenticated.');
 
@@ -46,5 +50,5 @@ export function registerResourcesNamespaces({ server, authMiddleware } : SocketN
         next();
     });
 
-    registerResourcesNamespaceControllers(workspace);
+    registerResourcesNamespaceControllers(nsp);
 }

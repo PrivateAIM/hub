@@ -36,8 +36,8 @@ export function registerMessagesNamespaceControllers(nsp: MessagesNamespace) {
                     nsp.in(buildConnectionUserRoom(to.id))
                         .emit('send', {
                             from,
-                            data: data[i].data,
-                            metadata: data[i].metadata,
+                            data: data.data,
+                            metadata: data.metadata,
                         });
 
                     continue;
@@ -46,8 +46,8 @@ export function registerMessagesNamespaceControllers(nsp: MessagesNamespace) {
                 nsp.in(buildConnectionRobotRoom(to.id))
                     .emit('send', {
                         from,
-                        data: data[i].data,
-                        metadata: data[i].metadata,
+                        data: data.data,
+                        metadata: data.metadata,
                     });
             }
         });

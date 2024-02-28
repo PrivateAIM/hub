@@ -13,6 +13,10 @@ import type { MessagesNamespace } from './types';
 
 export function registerMessagesNamespace({ authMiddleware, server } : SocketNamespaceContext) {
     const nsp : MessagesNamespace = server.of('/messages');
+    nsp.use((socket, next) => {
+        useLogger().info(`${socket.nsp.name}: ${socket.id} connected.`);
+        next();
+    });
     nsp.use(authMiddleware);
     nsp.use((socket, next) => {
         if (!socket.data.userId && !socket.data.robotId) {
@@ -20,6 +24,8 @@ export function registerMessagesNamespace({ authMiddleware, server } : SocketNam
 
             next(new UnauthorizedError());
         }
+
+        next();
     });
 
     registerMessagesNamespaceControllers(nsp);

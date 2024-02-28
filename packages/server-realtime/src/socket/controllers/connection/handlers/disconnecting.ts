@@ -29,7 +29,7 @@ export function registerSocketConnectionDisconnectingHandler(socket: SocketBase)
         socket.leave(roomName);
 
         const sockets = socket.nsp.adapter.rooms.get(roomName);
-        if (sockets.size !== 0) {
+        if (sockets && sockets.size !== 0) {
             return;
         }
 

@@ -6,7 +6,7 @@
  */
 
 import path from 'node:path';
-import { read, readInt } from 'envix';
+import { orFail, read, readInt } from 'envix';
 import { config } from 'dotenv';
 import type { EnvironmentName } from './constants';
 import type { Environment } from './type';
@@ -32,8 +32,8 @@ export function useEnv(key?: string) : any {
     instance = {
         env: read('NODE_ENV', 'development') as `${EnvironmentName}`,
         port: readInt('PORT', 3000),
-        redisConnectionString: read('REDIS_CONNECTION_STRING', null),
-        vaultConnectionString: read('VAULT_CONNECTION_STRING', 'start123@http://127.0.0.1:8090/v1/'),
+        redisConnectionString: orFail(read('REDIS_CONNECTION_STRING')),
+        vaultConnectionString: read('VAULT_CONNECTION_STRING'),
 
         authupApiURL: read('AUTHUP_URL', 'http://127.0.0.1:3010/'),
     };

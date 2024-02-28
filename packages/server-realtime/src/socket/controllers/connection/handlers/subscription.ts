@@ -92,6 +92,6 @@ export function registerSocketConnectionSubscriptionHandlers(socket: SocketBase)
             return;
         }
 
-        socket.join(buildConnectionRobotSubscriptionRoom(target));
+        socket.leave(buildConnectionRobotSubscriptionRoom(target));
     });
 }

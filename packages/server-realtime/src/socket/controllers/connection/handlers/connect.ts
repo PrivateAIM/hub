@@ -28,7 +28,7 @@ export function registerSocketConnectionConnectHandler(socket: SocketBase) {
     socket.join(roomName);
 
     const sockets = socket.nsp.adapter.rooms.get(roomName);
-    if (sockets.size !== 1) {
+    if (sockets && sockets.size > 1) {
         return;
     }
 
