@@ -11,11 +11,14 @@ import type { TokenVerificationData, TokenVerifierRedisCacheOptions } from '@aut
 import { createHTTPMiddleware } from '@authup/server-adapter';
 import { useClient as useVaultClient } from '@hapic/vault';
 import { PermissionID } from '@privateaim/core';
-import { coreHandler } from 'routup';
+import { parseAuthorizationHeader } from 'hapic';
+import { coreHandler, getRequestHeader } from 'routup';
 import { useRequestCookie } from '@routup/basic/cookie';
 import type { Request, Router } from 'routup';
-import { EnvironmentName, useEnv } from '../../config';
-import { hasRedisClient, hasVaultClient, useRedisClient } from '../../core';
+import { useEnv } from '../../config';
+import {
+    hasAuthupClient, hasRedisClient, hasVaultClient, useAuthupClient, useRedisClient,
+} from '../../core';
 import { setRequestEnv } from '../request';
 
 type TokenVerificationDataMinimal = Pick<
@@ -76,47 +79,84 @@ function applyTokenVerificationData(
 }
 
 export function registerAuthupMiddleware(router: Router) {
-    if (useEnv('env') === EnvironmentName.TEST) {
+    if (!hasAuthupClient()) {
         const data = createFakeTokenVerificationData();
 
         router.use(coreHandler((req, res, next) => {
             applyTokenVerificationData(req, data);
             next();
         }));
-    } else {
-        let tokenCreator : TokenCreatorOptions;
-        if (hasVaultClient()) {
-            tokenCreator = {
-                type: 'robotInVault',
-                name: 'system',
-                vault: useVaultClient(),
-            };
-        } else {
-            tokenCreator = {
-                type: 'user',
-                name: 'admin',
-                password: 'start123',
-            };
-        }
 
-        let tokenCache : TokenVerifierRedisCacheOptions | undefined;
-        if (hasRedisClient()) {
-            tokenCache = {
-                type: 'redis',
-                client: useRedisClient(),
-            };
-        }
-
-        const middleware = createHTTPMiddleware({
-            tokenByCookie: (req, cookieName) => useRequestCookie(req, cookieName),
-            tokenVerifier: {
-                baseURL: useEnv('authupApiURL'),
-                creator: tokenCreator,
-                cache: tokenCache,
-            },
-            tokenVerifierHandler: (req, data) => applyTokenVerificationData(req, data),
-        });
-
-        router.use(coreHandler((req, res, next) => middleware(req, res, next)));
+        return;
     }
+
+    let cache : Record<string, string> = {};
+
+    setInterval(() => {
+        cache = {};
+    }, 120 * 1000);
+
+    router.use(coreHandler(async (req, res, next) => {
+        const headerRaw = getRequestHeader(req, 'authorization');
+        if (typeof headerRaw !== 'string') {
+            next();
+        }
+
+        if (cache[headerRaw]) {
+            req.headers.authorization = `Bearer ${cache[headerRaw]}`;
+            next();
+            return;
+        }
+
+        const header = parseAuthorizationHeader(headerRaw);
+
+        if (header.type === 'Basic') {
+            const authupClient = useAuthupClient();
+
+            const token = await authupClient.token.createWithPasswordGrant({
+                username: header.username,
+                password: header.password,
+            });
+
+            cache[req.headers.authorization] = token.access_token;
+            req.headers.authorization = `Bearer ${token.access_token}`;
+        }
+
+        next();
+    }));
+
+    let tokenCreator : TokenCreatorOptions;
+    if (hasVaultClient()) {
+        tokenCreator = {
+            type: 'robotInVault',
+            name: 'system',
+            vault: useVaultClient(),
+        };
+    } else {
+        tokenCreator = {
+            type: 'user',
+            name: 'admin',
+            password: 'start123',
+        };
+    }
+
+    let tokenCache : TokenVerifierRedisCacheOptions | undefined;
+    if (hasRedisClient()) {
+        tokenCache = {
+            type: 'redis',
+            client: useRedisClient(),
+        };
+    }
+
+    const middleware = createHTTPMiddleware({
+        tokenByCookie: (req, cookieName) => useRequestCookie(req, cookieName),
+        tokenVerifier: {
+            baseURL: useEnv('authupApiURL'),
+            creator: tokenCreator,
+            cache: tokenCache,
+        },
+        tokenVerifierHandler: (req, data) => applyTokenVerificationData(req, data),
+    });
+
+    router.use(coreHandler((req, res, next) => middleware(req, res, next)));
 }
