@@ -7,6 +7,5 @@
 
 export * from './env';
 export * from './log';
-export * from './permissions';
 export * from './module';
 export * from './paths';

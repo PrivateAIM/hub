@@ -12,7 +12,7 @@ import { REALM_MASTER_NAME } from '@authup/core';
 import { ServerError } from '@ebec/http';
 import { isClientErrorWithStatusCode } from '@hapic/harbor';
 import { PermissionKey, ServiceID } from '@privateaim/core';
-import { PresetRoleName, getPresetRolePermissions, useLogger } from '../../config';
+import { useLogger } from '../../config';
 import { useAuthupClient } from './module';
 
 export async function setupAuthupService(): Promise<any> {
@@ -137,57 +137,6 @@ export async function setupAuthupService(): Promise<any> {
                 });
 
                 useLogger().debug(`Created permission ${permissionNames[i]} for system robot.`);
-            } catch (e) {
-                if (!isClientErrorWithStatusCode(e, 409)) {
-                    throw e;
-                }
-            }
-        }
-    }
-
-    // -------------------------------------------------
-
-    /**
-     * Create roles
-     */
-    const roleNames = Object.values(PresetRoleName);
-    for (let i = 0; i < roleNames.length; i++) {
-        const names = getPresetRolePermissions(roleNames[i]);
-
-        const { data: permissions } = await authupClient.permission.getMany({
-            filter: {
-                name: names,
-            },
-        });
-
-        let role: Role;
-
-        const { data: roles } = await authupClient.role.getMany({
-            filter: {
-                realm_id: null,
-                name: roleNames[i],
-            },
-        });
-
-        if (roles.length === 0) {
-            role = await authupClient.role.create({
-                name: roleNames[i],
-            });
-
-            useLogger().debug(`Created role ${roleNames[i]}`);
-        } else {
-            // eslint-disable-next-line prefer-destructuring
-            role = roles[0];
-
-            useLogger().debug(`Role ${permissionNames[i]} already exists`);
-        }
-
-        for (let i = 0; i < permissions.length; i++) {
-            try {
-                await authupClient.rolePermission.create({
-                    role_id: role.id,
-                    permission_id: permissions[i].id,
-                });
             } catch (e) {
                 if (!isClientErrorWithStatusCode(e, 409)) {
                     throw e;
