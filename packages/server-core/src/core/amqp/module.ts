@@ -5,22 +5,23 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { createConnection } from 'amqp-extension';
 import type { Factory } from 'singa';
 import { singa } from 'singa';
-import type { VaultClient } from '@hapic/vault';
 
-const instance = singa<VaultClient>({
-    name: 'vault',
+type Connection = ReturnType<typeof createConnection>;
+
+const instance = singa<Connection>({
+    name: 'amqp',
 });
-
-export function setVaultFactory(factory: Factory<VaultClient>) {
+export function setAmqpFactory(factory: Factory<Connection>) {
     instance.setFactory(factory);
 }
 
-export function hasVaultClient() {
+export function hasAmqpClient() {
     return instance.has() || instance.hasFactory();
 }
 
-export function useVaultClient() {
-    return instance.use();
+export function useAmqpClient() {
+    instance.use();
 }

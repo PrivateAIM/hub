@@ -7,9 +7,8 @@
 
 import { DomainType } from '@authup/core';
 import type { DomainsEventContext } from '@authup/core';
-import { isBoolFalse, isBoolTrue } from '@privateaim/core';
-import { createClient } from 'redis-extension';
-import { ConfigDefaults, useEnv, useLogger } from '../../config';
+import { useLogger } from '../../config';
+import { hasRedisClient, useRedisSubscribeClient } from '../../core';
 import type { Aggregator } from '../type';
 import {
     handleAuthupRealmEvent,
@@ -20,17 +19,12 @@ import {
 export function buildAuthupAggregator() : Aggregator {
     return {
         start() {
-            const connectionString = useEnv('redisConnectionString');
-            if (typeof connectionString === 'undefined' || isBoolFalse(connectionString)) {
+            if (!hasRedisClient()) {
                 useLogger().info('Authup aggregator is missing redis configuration.');
                 return;
             }
 
-            const redisSub = createClient({
-                connectionString: isBoolTrue(connectionString) ?
-                    ConfigDefaults.REDIS :
-                    connectionString,
-            });
+            const redisSub = useRedisSubscribeClient();
 
             redisSub.subscribe('realm', 'user', 'robot');
 
