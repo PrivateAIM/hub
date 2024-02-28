@@ -90,6 +90,7 @@ services:
             VAULT: start123@http://vault:8090/v1/
             REDIS: redis://redis
             PUBLIC_URL: http://localhost:3010/
+            ROBOT_ADMIN_ENABLED: true
         networks:
             hub:
     core:
@@ -113,12 +114,14 @@ services:
             VAULT_CONNECTION_STRING: start123@http://vault:8090/v1/
             RABBITMQ_CONNECTION_STRING: amqp://root:start123@172.40.1.1
             PUBLIC_URL: http://localhost:3001/
-            AUTHUP_URL: http://authup:3010/
+            AUTHUP_URL: http://authup:3000/
             DB_TYPE: 'mysql'
             DB_HOST: 'mysql'
             DB_USERNAME: 'root'
             DB_PASSWORD: 'start123'
             DB_DATABASE: 'core'
+            SKIP_PROJECT_APPROVAL: true
+            SKIP_ANALYSIS_APPROVAL: true
         networks:
             hub:
     realtime:
@@ -137,7 +140,7 @@ services:
         environment:
             REDIS_CONNECTION_STRING: redis://redis
             VAULT_CONNECTION_STRING: start123@http://vault:8090/v1/
-            AUTHUP_URL: http://authup:3010/
+            AUTHUP_URL: http://authup:3000/
         networks:
             hub:
     analysis-manager:
@@ -156,7 +159,8 @@ services:
         environment:
             RABBITMQ_CONNECTION_STRING: amqp://root:start123@172.40.1.1
             VAULT_CONNECTION_STRING: start123@http://vault:8090/v1/
-            AUTHUP_URL: http://authup:3010/
+            AUTHUP_URL: http://authup:3000/
+            CORE_URL: http://core:3000/
             STORAGE_URL: http://storage:3000/
         networks:
             hub:
@@ -184,7 +188,7 @@ services:
             REDIS_CONNECTION_STRING: redis://redis
             MINIO_CONNECTION_STRING: http://admin:start123@minio:9000
             VAULT_CONNECTION_STRING: start123@http://vault:8090/v1/
-            AUTHUP_URL: http://authup:3010/
+            AUTHUP_URL: http://authup:3000/
         networks:
             hub:
 networks:

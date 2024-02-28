@@ -66,9 +66,9 @@ export async function startCommand() {
         logger.info('Applied database schema.');
     }
 
-    if (!check.schema) {
-        await setupAuthupService();
-    }
+    // if (!check.schema) {
+    await setupAuthupService();
+    // }
 
     const router = createRouter();
     const httpServer = createHttpServer({ router });
