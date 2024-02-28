@@ -6,31 +6,39 @@
  */
 
 import type { Client } from 'redis-extension';
+import type { Factory } from 'singa';
+import { singa } from 'singa';
 
-let instance : undefined | Client;
-let instancePublish : undefined | Client;
+const instance = singa<Client>({
+    name: 'redis',
+});
 
-export function setRedisClient(client: Client) {
-    instance = client;
+const instancePublish = singa<Client>({
+    name: 'redisPublish',
+    factory: () => instance.use().duplicate(),
+});
+
+const instanceSubscribe = singa<Client>({
+    name: 'redisSubscribe',
+    factory: () => instance.use().duplicate(),
+});
+
+export function setRedisFactory(factory: Factory<Client>) {
+    instance.setFactory(factory);
 }
 
 export function hasRedisClient() {
-    return typeof instance !== 'undefined';
+    return instance.has() || instance.hasFactory();
 }
 
 export function useRedisClient() {
-    if (typeof instance === 'undefined') {
-        throw Error('Redis is not configured.');
-    }
-
-    return instance;
+    return instance.use();
 }
 
 export function useRedisPublishClient() {
-    if (typeof instancePublish !== 'undefined') {
-        return instancePublish;
-    }
+    return instancePublish.use();
+}
 
-    instancePublish = useRedisClient().duplicate();
-    return instancePublish;
+export function useRedisSubscribeClient() {
+    return instanceSubscribe.use();
 }

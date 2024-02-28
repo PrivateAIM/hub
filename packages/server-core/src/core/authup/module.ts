@@ -6,18 +6,21 @@
  */
 
 import type { APIClient } from '@authup/core';
-import { ServerError } from '@ebec/http';
+import type { Factory } from 'singa';
+import { singa } from 'singa';
 
-let instance : APIClient;
+const instance = singa<APIClient>({
+    name: 'authup',
+});
 
 export function useAuthupClient() {
-    if (typeof instance !== 'undefined') {
-        return instance;
-    }
-
-    throw new ServerError('The authup client is not initialised.');
+    return instance.use();
 }
 
-export function setAuthupClient(client: APIClient) {
-    instance = client;
+export function hasAuthupClient() {
+    return instance.has() || instance.hasFactory();
+}
+
+export function setAuthupFactory(factory: Factory<APIClient>) {
+    instance.setFactory(factory);
 }

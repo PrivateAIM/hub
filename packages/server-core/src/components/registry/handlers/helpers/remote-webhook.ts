@@ -13,7 +13,7 @@ import {
     ServiceID,
 } from '@privateaim/core';
 import { useEnv, useLogger } from '../../../../config';
-import { useAuthupClient } from '../../../../core';
+import { hasAuthupClient, useAuthupClient } from '../../../../core';
 import { findRobotCredentialsInVault } from '../../../../domains';
 import { buildRegistryWebhookTarget } from '../utils';
 
@@ -24,7 +24,9 @@ export async function saveRemoteRegistryProjectWebhook(
         isProjectName?: boolean
     },
 ) : Promise<{ id: number } | undefined> {
-    await useAuthupClient().robot.integrity(ServiceID.REGISTRY);
+    if (hasAuthupClient()) {
+        await useAuthupClient().robot.integrity(ServiceID.REGISTRY);
+    }
 
     const engineData = await findRobotCredentialsInVault(ServiceID.REGISTRY);
 
