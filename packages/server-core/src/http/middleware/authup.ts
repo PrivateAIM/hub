@@ -15,7 +15,7 @@ import { parseAuthorizationHeader } from 'hapic';
 import { coreHandler, getRequestHeader } from 'routup';
 import { useRequestCookie } from '@routup/basic/cookie';
 import type { Request, Router } from 'routup';
-import { useEnv } from '../../config';
+import { EnvironmentName, useEnv } from '../../config';
 import {
     hasAuthupClient, hasRedisClient, hasVaultClient, useAuthupClient, useRedisClient,
 } from '../../core';
@@ -31,6 +31,16 @@ TokenVerificationData,
 'sub_name'
 >;
 
+function generateAbilities() : Ability[] {
+    return Object.values(PermissionID).map((name) => ({
+        name,
+        condition: null,
+        inverse: false,
+        power: 999,
+        target: null,
+    } satisfies Ability));
+}
+
 function createFakeTokenVerificationData() : TokenVerificationDataMinimal {
     return {
         realm_id: 'd94b2f28-29e3-4ced-b8f1-6923a01dc1ee',
@@ -40,13 +50,7 @@ function createFakeTokenVerificationData() : TokenVerificationDataMinimal {
         sub: 'd94b2f28-29e3-4ced-b8f1-6923a01dc1ee',
         sub_name: 'admin',
 
-        permissions: Object.values(PermissionID).map((name) => ({
-            name,
-            condition: null,
-            inverse: false,
-            power: 999,
-            target: null,
-        } satisfies Ability)),
+        permissions: generateAbilities(),
     };
 }
 
@@ -54,7 +58,14 @@ function applyTokenVerificationData(
     req: Request,
     data: TokenVerificationDataMinimal,
 ) {
-    const ability = new AbilityManager(data.permissions);
+    let abilities : Ability[];
+    if (useEnv('env') === EnvironmentName.TEST) {
+        abilities = generateAbilities();
+    } else {
+        abilities = data.permissions;
+    }
+
+    const ability = new AbilityManager(abilities);
     setRequestEnv(req, 'ability', ability);
 
     setRequestEnv(req, 'realmId', data.realm_id);
