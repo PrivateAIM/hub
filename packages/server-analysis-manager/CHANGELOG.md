@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.2.0](https://github.com/PrivateAIM/hub/compare/server-analysis-manager-v0.1.0...server-analysis-manager-v0.2.0) (2024-02-28)
+
+
+### Features
+
+* bucket stream route handler ([84f7de9](https://github.com/PrivateAIM/hub/commit/84f7de90d09dc7a8d95386c52b1242d0df4084dc))
+* bump authup to v1.0.0-beta.5 ([13aeab2](https://github.com/PrivateAIM/hub/commit/13aeab2eb8a00069512eee17fc129d56a58309bc))
+* integration of storage-sdk in analysis-service ([#129](https://github.com/PrivateAIM/hub/issues/129)) ([2f27f9b](https://github.com/PrivateAIM/hub/commit/2f27f9ba6c533f7e6e13211365d7a0b6a73cab43))
+* refactored amqp usage & extended docker-compose file ([4a557dc](https://github.com/PrivateAIM/hub/commit/4a557dc4558e575e7d4f1a9ce317dba417a3ef21))
+
+
+### Bug Fixes
+
+* bucket client stream fn usage ([57cc2b0](https://github.com/PrivateAIM/hub/commit/57cc2b09a3086d40e22c8bbac9ad26f75615d0f1))
+* **deps:** bump dotenv from 16.4.4 to 16.4.5 ([#98](https://github.com/PrivateAIM/hub/issues/98)) ([4588390](https://github.com/PrivateAIM/hub/commit/458839089cdf27c40dde9c65db822463a0ca5f3a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core bumped from ^0.1.0 to ^0.2.0
+    * @privateaim/server-kit bumped from ^0.1.0 to ^0.2.0
+    * @privateaim/storage-kit bumped from ^0.0.0 to ^0.2.0
+
 ## 0.1.0 (2024-02-19)
 
 

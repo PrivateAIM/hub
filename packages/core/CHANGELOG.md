@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.2.0](https://github.com/PrivateAIM/hub/compare/core-v0.1.0...core-v0.2.0) (2024-02-28)
+
+
+### Features
+
+* bump authup to v1.0.0-beta.5 ([13aeab2](https://github.com/PrivateAIM/hub/commit/13aeab2eb8a00069512eee17fc129d56a58309bc))
+* initialize storage service (database, config, entities, controllers) ([#97](https://github.com/PrivateAIM/hub/issues/97)) ([7c19d31](https://github.com/PrivateAIM/hub/commit/7c19d3126a4c5ff2acfa007226aba8104d380a14))
+
+
+### Bug Fixes
+
+* remove minio driver from core service ([affb432](https://github.com/PrivateAIM/hub/commit/affb4326e407d185d98575c5aa9d8b6ec8bce172))
+* uri in project-node api client & fixed docker-compose ([5fe5091](https://github.com/PrivateAIM/hub/commit/5fe509118ece00fd2b4ffccd7493a7400ca615f1))
+
 ## 0.1.0 (2024-02-19)
 
 
