@@ -118,7 +118,7 @@ export function registerAuthupMiddleware(router: Router) {
                 password: header.password,
             });
 
-            cache[req.headers.authorization] = token.access_token;
+            cache[headerRaw] = token.access_token;
             req.headers.authorization = `Bearer ${token.access_token}`;
         }
 
