@@ -5,13 +5,21 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { createConfig } from './config';
+import { createConfig, useEnv } from './config';
+import { useLogger } from './core';
+import { createHttpServer } from './http';
 
 const config = createConfig();
+const server = createHttpServer();
 
 function start() {
     config.components.forEach((c) => c.start());
     config.aggregators.forEach((a) => a.start());
+
+    const port = useEnv('port');
+    server.listen(port);
+
+    useLogger().info(`Listening on 0.0.0.0:${port}`);
 }
 
 start();

@@ -6,7 +6,7 @@
  */
 
 import path from 'node:path';
-import { orFail, read } from 'envix';
+import { orFail, read, readInt } from 'envix';
 import { hasOwnProperty } from '@privateaim/core';
 import { config } from 'dotenv';
 import type { EnvironmentName } from './constants';
@@ -32,6 +32,7 @@ export function useEnv(key?: string) : any {
 
     instance = {
         env: read('NODE_ENV', 'development') as `${EnvironmentName}`,
+        port: readInt('PORT', 3000),
 
         rabbitMqConnectionString: read('RABBITMQ_CONNECTION_STRING', 'amqp://root:start123@127.0.0.1'),
         vaultConnectionString: read('VAULT_CONNECTION_STRING', 'start123@http://127.0.0.1:8090/v1/'),

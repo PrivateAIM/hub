@@ -10,6 +10,8 @@ import type { EnvironmentName } from './constants';
 export interface Environment {
     env: `${EnvironmentName}`,
 
+    port: number,
+
     rabbitMqConnectionString: string,
     vaultConnectionString: string,
 
