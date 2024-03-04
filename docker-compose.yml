@@ -89,7 +89,8 @@ services:
             DB_DATABASE: 'auth'
             VAULT: start123@http://vault:8090/v1/
             REDIS: redis://redis
-            PUBLIC_URL: http://localhost:3010/
+            PUBLIC_URL: ${AUTHUP_PUBLIC_URL:-http://localhost:3010/}
+            AUTHORIZE_REDIRECT_URL: ${WEB_PUBLIC_URL:-http://localhost:3000/}
             ROBOT_ADMIN_ENABLED: true
         networks:
             hub:
@@ -113,7 +114,7 @@ services:
             REDIS_CONNECTION_STRING: redis://redis
             VAULT_CONNECTION_STRING: start123@http://vault:8090/v1/
             RABBITMQ_CONNECTION_STRING: amqp://root:start123@172.40.1.1
-            PUBLIC_URL: http://localhost:3001/
+            PUBLIC_URL: ${CORE_PUBLIC_URL:-http://localhost:3001/}
             AUTHUP_URL: http://authup:3000/
             DB_TYPE: 'mysql'
             DB_HOST: 'mysql'
