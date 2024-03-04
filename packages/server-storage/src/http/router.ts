@@ -18,6 +18,7 @@ import {
 } from '@routup/basic/query';
 
 import { Router, coreHandler } from 'routup';
+import { EnvironmentName, useEnv } from '../config';
 import {
     mountAuthupMiddleware,
     mountBasicMiddleware,
@@ -33,7 +34,9 @@ export function createHTTPRouter() : Router {
     mountCorsMiddleware(router);
     mountBasicMiddleware(router);
     mountAuthupMiddleware(router);
-    mountSwaggerMiddleware(router);
+    if (useEnv('env') !== EnvironmentName.TEST) {
+        mountSwaggerMiddleware(router);
+    }
 
     router.get('/', coreHandler(() => ({
         timestamp: Date.now(),
