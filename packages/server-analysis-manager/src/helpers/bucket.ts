@@ -6,8 +6,20 @@
  */
 
 import type { Analysis } from '@privateaim/core';
-import type { BucketType } from '../constants';
+import { BucketType } from '../constants';
 
 export function buildBucketName(type: `${BucketType}`, id: Analysis['id']) {
-    return `${type}.${id}`;
+    switch (type) {
+        case BucketType.CODE: {
+            return `analysis-code-files.${id}`;
+        }
+        case BucketType.TEMP: {
+            return `analysis-temp-files.${id}`;
+        }
+        case BucketType.RESULT: {
+            return `analysis-result-files.${id}`;
+        }
+    }
+
+    throw new SyntaxError('The argument can only have any bucket type value.');
 }

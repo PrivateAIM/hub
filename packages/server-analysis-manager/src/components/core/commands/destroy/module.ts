@@ -24,9 +24,9 @@ export async function executeCoreDestroyCommand(
     });
 
     const names = [
-        buildBucketName(BucketType.FILES, payload.id),
+        buildBucketName(BucketType.CODE, payload.id),
         buildBucketName(BucketType.TEMP, payload.id),
-        buildBucketName(BucketType.RESULTS, payload.id),
+        buildBucketName(BucketType.RESULT, payload.id),
     ];
 
     for (let i = 0; i < names.length; i++) {

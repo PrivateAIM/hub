@@ -6,7 +6,7 @@
  */
 
 export enum BucketType {
-    FILES = 'analysis-files',
-    RESULTS = 'analysis-results',
-    TEMP = 'analysis-temp',
+    CODE = 'CODE',
+    RESULT = 'RESULT',
+    TEMP = 'TEMP',
 }
