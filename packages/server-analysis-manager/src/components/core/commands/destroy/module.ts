@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { isClientErrorWithStatusCode } from 'hapic';
 import { BucketType } from '../../../../constants';
 import { useStorageClient } from '../../../../core';
 import { buildBucketName } from '../../../../helpers';
@@ -22,9 +23,23 @@ export async function executeCoreDestroyCommand(
         command: CoreCommand.CONFIGURE,
     });
 
-    await storage.bucket.delete(buildBucketName(BucketType.FILES, payload.id));
-    await storage.bucket.delete(buildBucketName(BucketType.TEMP, payload.id));
-    await storage.bucket.delete(buildBucketName(BucketType.RESULTS, payload.id));
+    const names = [
+        buildBucketName(BucketType.FILES, payload.id),
+        buildBucketName(BucketType.TEMP, payload.id),
+        buildBucketName(BucketType.RESULTS, payload.id),
+    ];
+
+    for (let i = 0; i < names.length; i++) {
+        try {
+            await storage.bucket.delete(names[i]);
+        } catch (e) {
+            if (isClientErrorWithStatusCode(e, [404, 409])) {
+                continue;
+            }
+
+            throw e;
+        }
+    }
 
     logger.debug('Destroyed analysis buckets...', {
         command: CoreCommand.CONFIGURE,
