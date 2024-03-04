@@ -5,9 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type {
-    Project,
-} from '@privateaim/core';
+import type { Bucket } from '@privateaim/storage-kit';
 import {
     DBody, DController, DDelete, DGet, DPath, DPost, DRequest, DResponse, DTags,
 } from '@routup/decorators';
@@ -24,7 +22,8 @@ import {
     executeBucketRouteUploadHandler,
 } from './handlers';
 
-type PartialBucket = Partial<Project>;
+type BucketCreate = Pick<Bucket, 'name' | 'region'>;
+type BucketUpdate = BucketCreate;
 
 @DTags('buckets')
 @DController('/buckets')
@@ -33,8 +32,8 @@ export class BucketController {
     async getMany(
         @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<PartialBucket[]> {
-        return await executeBucketRouteGetManyHandler(req, res) as PartialBucket[];
+    ): Promise<Bucket[]> {
+        return await executeBucketRouteGetManyHandler(req, res) as Bucket[];
     }
 
     @DGet('/:id/stream', [ForceLoggedInMiddleware])
@@ -60,27 +59,27 @@ export class BucketController {
         @DPath('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<PartialBucket | undefined> {
-        return await executeBucketRouteGetOneHandler(req, res) as PartialBucket | undefined;
+    ): Promise<Bucket | undefined> {
+        return await executeBucketRouteGetOneHandler(req, res) as Bucket | undefined;
     }
 
     @DPost('/:id', [ForceLoggedInMiddleware])
     async update(
         @DPath('id') id: string,
-            @DBody() data: BucketEntity,
+            @DBody() data: BucketUpdate,
             @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<PartialBucket | undefined> {
-        return await executeBucketRouteUpdateHandler(req, res) as PartialBucket | undefined;
+    ): Promise<Bucket | undefined> {
+        return await executeBucketRouteUpdateHandler(req, res) as Bucket | undefined;
     }
 
     @DPost('', [ForceLoggedInMiddleware])
     async add(
-        @DBody() data: BucketEntity,
+        @DBody() data: BucketCreate,
             @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<PartialBucket | undefined> {
-        return await executeBucketRouteCreateHandler(req, res) as PartialBucket | undefined;
+    ): Promise<Bucket | undefined> {
+        return await executeBucketRouteCreateHandler(req, res) as Bucket | undefined;
     }
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
@@ -88,7 +87,7 @@ export class BucketController {
         @DPath('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<PartialBucket | undefined> {
-        return await executeBucketRouteDeleteHandler(req, res) as PartialBucket | undefined;
+    ): Promise<Bucket | undefined> {
+        return await executeBucketRouteDeleteHandler(req, res) as Bucket | undefined;
     }
 }

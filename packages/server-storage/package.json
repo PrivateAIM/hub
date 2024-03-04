@@ -18,8 +18,8 @@
         "@routup/basic": "^1.3.1",
         "@routup/decorators": "^3.3.1",
         "busboy": "^1.6.0",
-        "dotenv": "^16.4.4",
         "cors": "^2.8.5",
+        "dotenv": "^16.4.4",
         "envix": "^1.3.0",
         "hapic": "^2.5.0",
         "minio": "^7.1.3",
@@ -32,9 +32,11 @@
         "winston": "^3.11.0"
     },
     "devDependencies": {
+        "@routup/swagger": "^2.3.5",
         "@types/busboy": "^1.5.3",
         "@types/cors": "^2.8.17",
         "@types/tar-stream": "^2.2.3",
+        "locter": "^2.0.2",
         "testcontainers": "^10.7.1"
     },
     "scripts": {

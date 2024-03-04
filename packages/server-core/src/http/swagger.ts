@@ -29,7 +29,7 @@ export async function generateSwaggerDocumentation() {
             yaml: true,
             servers: [useEnv('publicURL')],
             name: 'API Documentation',
-            description: 'Explore the REST Endpoints of the Central API.',
+            description: 'Explore the REST Endpoints of the Core API.',
             version: packageJson.version,
             outputDirectory: getWritableDirPath(),
             securityDefinitions: {

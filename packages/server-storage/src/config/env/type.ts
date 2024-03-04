@@ -11,6 +11,8 @@ export interface Environment {
     env: `${EnvironmentName}`,
     port: number,
 
+    publicURL: string,
+
     redisConnectionString?: string | null,
     minioConnectionString: string,
     vaultConnectionString: string,

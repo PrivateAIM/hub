@@ -8,13 +8,18 @@
 import { config } from 'dotenv';
 import { configure, useEnv } from './config';
 import { setupDatabase } from './config/services';
-import { createHttpServer } from './http';
+import {
+    createHttpServer,
+    generateSwaggerDocumentation,
+} from './http';
 
 (async () => {
     config();
 
     await setupDatabase();
     configure();
+
+    await generateSwaggerDocumentation();
 
     const httpServer = createHttpServer();
 

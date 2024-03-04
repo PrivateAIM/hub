@@ -23,6 +23,7 @@ import {
     mountBasicMiddleware,
     mountCorsMiddleware,
     mountErrorMiddleware,
+    mountSwaggerMiddleware,
 } from './middlewares';
 import { BucketController, BucketFileController } from './controllers';
 
@@ -32,6 +33,7 @@ export function createHTTPRouter() : Router {
     mountCorsMiddleware(router);
     mountBasicMiddleware(router);
     mountAuthupMiddleware(router);
+    mountSwaggerMiddleware(router);
 
     router.get('/', coreHandler(() => ({
         timestamp: Date.now(),
