@@ -4,6 +4,7 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
+import { isUUID } from '@authup/core';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import Busboy from 'busboy';
 import crypto from 'node:crypto';
@@ -92,7 +93,13 @@ export async function executeBucketRouteUploadHandler(req: Request, res: Respons
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(BucketEntity);
-    const entity = await repository.findOneBy({ id });
+    const query = repository.createQueryBuilder('bucket');
+    if (isUUID(id)) {
+        query.where('bucket.id LIKE :id', { id });
+    } else {
+        query.where('bucket.name LIKE :name', { name: id });
+    }
+    const entity = await query.getOne();
     if (typeof entity === 'undefined') {
         throw new NotFoundError();
     }

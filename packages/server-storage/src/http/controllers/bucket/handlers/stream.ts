@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { isUUID } from '@authup/core';
 import { NotFoundError } from '@ebec/http';
 import type { Request, Response } from 'routup';
 import { useRequestParam } from 'routup';
@@ -62,7 +63,13 @@ export async function executeBucketRouteStreamHandler(req: Request, res: Respons
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(BucketEntity);
-    const entity = await repository.findOneBy({ id });
+    const query = repository.createQueryBuilder('bucket');
+    if (isUUID(id)) {
+        query.where('bucket.id LIKE :id', { id });
+    } else {
+        query.where('bucket.name LIKE :name', { name: id });
+    }
+    const entity = await query.getOne();
     if (!entity) {
         throw new NotFoundError();
     }

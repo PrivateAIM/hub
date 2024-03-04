@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { isUUID } from '@authup/core';
 import { useRequestQuery } from '@routup/basic/query';
 import type { Request, Response } from 'routup';
 import { send, useRequestParam } from 'routup';
@@ -20,8 +21,13 @@ export async function executeBucketRouteGetOneHandler(req: Request, res: Respons
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(BucketEntity);
-    const query = repository.createQueryBuilder('bucket')
-        .where('bucket.id = :id', { id });
+    const query = repository.createQueryBuilder('bucket');
+
+    if (isUUID(id)) {
+        query.where('bucket.id LIKE :id', { id });
+    } else {
+        query.where('bucket.name LIKE :name', { name: id });
+    }
 
     applyQuery(query, useRequestQuery(req), {
         defaultAlias: 'bucket',

@@ -7,7 +7,7 @@
 
 import { PermissionID } from '@privateaim/core';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
-import { isRealmResourceWritable } from '@authup/core';
+import { isRealmResourceWritable, isUUID } from '@authup/core';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
@@ -26,7 +26,13 @@ export async function executeBucketRouteUpdateHandler(req: Request, res: Respons
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(BucketEntity);
-    let entity = await repository.findOneBy({ id });
+    const query = repository.createQueryBuilder('bucket');
+    if (isUUID(id)) {
+        query.where('bucket.id LIKE :id', { id });
+    } else {
+        query.where('bucket.name LIKE :name', { name: id });
+    }
+    let entity = await query.getOne();
     if (!entity) {
         throw new NotFoundError();
     }
