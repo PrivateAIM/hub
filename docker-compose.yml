@@ -195,7 +195,7 @@ networks:
     hub:
         driver: bridge
         driver_opts:
-            com.docker.network.bridge.name: dnpm
+            com.docker.network.bridge.name: hub
         ipam:
             driver: default
             config:
