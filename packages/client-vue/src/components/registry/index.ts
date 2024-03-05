@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export { default as RegistryCleanup } from './RegistryCleanup';
-export { default as RegistryForm } from './RegistryForm';
-export { default as RegistryList } from './RegistryList';
-export { default as RegistrySetup } from './RegistrySetup';
+export { default as RegistryCleanup } from './FRegistryCleanup';
+export { default as RegistryForm } from './FRegistryForm';
+export { default as RegistryList } from './FRegistries';
+export { default as RegistrySetup } from './FRegistrySetup';

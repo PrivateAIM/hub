@@ -8,13 +8,13 @@
 import type { Analysis } from '@privateaim/core';
 import { storeToRefs } from 'pinia';
 import { ref } from 'vue';
-import { TrainBasicForm } from '@privateaim/client-vue';
+import { FAnalysisBasicForm } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
 import { useRoute } from '#imports';
 import { useAuthStore } from '../../../store/auth';
 
 export default defineNuxtComponent({
-    components: { TrainBasicForm },
+    components: { TrainBasicForm: FAnalysisBasicForm },
     emits: ['created'],
     setup(_props, { emit }) {
         const proposalId = ref<string | null>(null);
@@ -41,7 +41,7 @@ export default defineNuxtComponent({
 </script>
 <template>
     <TrainBasicForm
-        :proposal-id="proposalId"
+        :project-id="proposalId"
         :realm-id="realmId"
         @created="handleCreated"
     />

@@ -8,7 +8,7 @@
 import {
     DomainType,
 } from '@privateaim/core';
-import { TrainName, createEntityManager } from '@privateaim/client-vue';
+import { FAnalysisName, createEntityManager } from '@privateaim/client-vue';
 import { isClientErrorWithStatusCode } from 'hapic';
 import { definePageMeta, useToast } from '#imports';
 import {
@@ -18,7 +18,7 @@ import DomainEntityNav from '../../components/DomainEntityNav';
 import { LayoutKey, LayoutNavigationID } from '../../config/layout';
 
 export default defineNuxtComponent({
-    components: { DomainEntityNav, TrainName },
+    components: { DomainEntityNav, TrainName: FAnalysisName },
     async setup() {
         definePageMeta({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,

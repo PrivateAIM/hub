@@ -9,13 +9,13 @@ import type { Project, ProjectNode } from '@privateaim/core';
 import { PermissionID } from '@privateaim/core';
 import { computed } from 'vue';
 import type { PropType } from 'vue';
-import { TrainList } from '@privateaim/client-vue';
+import { FAnalyses } from '@privateaim/client-vue';
 import { definePageMeta } from '#imports';
 import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
 
 export default defineNuxtComponent({
-    components: { TrainList },
+    components: { TrainList: FAnalyses },
     props: {
         proposal: {
             type: Object as PropType<Project>,
