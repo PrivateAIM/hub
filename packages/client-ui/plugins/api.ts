@@ -12,72 +12,58 @@ import {
     APIClient as AuthAPIClient,
     ClientResponseErrorTokenHook,
 } from '@authup/core';
-import { APIClient, ErrorCode } from '@privateaim/core';
-import { HookName, isObject } from 'hapic';
+import { APIClient as CoreAPIClient } from '@privateaim/core';
+import { APIClient as StorageAPIClient } from '@privateaim/storage-kit';
 import type { Pinia } from 'pinia';
 import { storeToRefs } from 'pinia';
-import { LicenseAgreementEvent, useLicenseAgreementEventEmitter } from '../domains/license-agreement';
 import { useAuthStore } from '../store/auth';
 import { useRuntimeConfig } from '#imports';
 
 declare module '#app' {
     interface NuxtApp {
-        $api: APIClient;
+        $coreAPI: CoreAPIClient;
+        $storageAPI: StorageAPIClient;
         $authupAPI: AuthAPIClient;
     }
 }
 
 declare module '@vue/runtime-core' {
     interface ComponentCustomProperties {
-        $api: APIClient;
+        $coreAPI: CoreAPIClient;
+        $storageAPI: StorageAPIClient;
         $authupAPI: AuthAPIClient;
     }
 }
 export default defineNuxtPlugin((ctx) => {
     const runtimeConfig = useRuntimeConfig();
 
-    let { apiUrl } = runtimeConfig.public;
-
-    const resourceAPI = new APIClient({ baseURL: apiUrl });
-    resourceAPI.on(HookName.RESPONSE_ERROR, (error) => {
-        if (
-            error.response &&
-            isObject(error.response.data)
-        ) {
-            if (error.response.data.code === ErrorCode.LICENSE_AGREEMENT) {
-                const eventEmitter = useLicenseAgreementEventEmitter();
-                eventEmitter.emit(LicenseAgreementEvent.ACCEPT);
-
-                return new Promise((resolve, reject) => {
-                    eventEmitter.on(LicenseAgreementEvent.ACCEPTED, () => {
-                        resolve(resourceAPI.request(error.request));
-                    });
-
-                    eventEmitter.on(LicenseAgreementEvent.DECLINED, () => {
-                        reject(error);
-                    });
-                });
-            }
-        }
-
-        throw error;
-    });
-    ctx.provide('api', resourceAPI);
+    const {
+        coreApiUrl,
+        storageApiUrl,
+        authupApiUrl,
+    } = runtimeConfig.public;
 
     // -----------------------------------------------------------------------------------
 
-    apiUrl = runtimeConfig.public.authupApiUrl;
+    const coreAPI = new CoreAPIClient({ baseURL: coreApiUrl });
+    ctx.provide('coreAPI', coreAPI);
 
-    const authupAPI = new AuthAPIClient({ baseURL: apiUrl });
+    // -----------------------------------------------------------------------------------
 
+    const storageAPI = new StorageAPIClient({ baseURL: storageApiUrl });
+    ctx.provide('storageAPI', storageAPI);
+
+    // -----------------------------------------------------------------------------------
+
+    const authupAPI = new AuthAPIClient({ baseURL: authupApiUrl });
     ctx.provide('authupAPI', authupAPI);
 
     // -----------------------------------------------------------------------------------
 
     const store = useAuthStore(ctx.$pinia as Pinia);
 
-    const tokenHookOptions : ClientResponseErrorTokenHookOptions = {
-        baseURL: runtimeConfig.public.apiUrl,
+    const authupTokenHookOptions : ClientResponseErrorTokenHookOptions = {
+        baseURL: authupApiUrl,
         tokenCreator: () => {
             const { refreshToken } = storeToRefs(store);
 
@@ -103,29 +89,41 @@ export default defineNuxtPlugin((ctx) => {
 
     const authupTokenHook = new ClientResponseErrorTokenHook(
         authupAPI,
+        authupTokenHookOptions,
+    );
+
+    const tokenHookOptions : ClientResponseErrorTokenHookOptions = {
+        ...authupTokenHookOptions,
+        timer: false,
+        tokenCreated(response) {
+            authupTokenHook.setTimer(response);
+
+            if (authupTokenHookOptions.tokenCreated) {
+                authupTokenHookOptions.tokenCreated(response);
+            }
+        },
+    };
+
+    const coreTokenHook = new ClientResponseErrorTokenHook(
+        coreAPI,
         tokenHookOptions,
     );
 
-    const resourceTokenHook = new ClientResponseErrorTokenHook(
-        resourceAPI,
-        {
-            ...tokenHookOptions,
-            timer: false,
-            tokenCreated(response) {
-                authupTokenHook.setTimer(response);
-
-                if (tokenHookOptions.tokenCreated) {
-                    tokenHookOptions.tokenCreated(response);
-                }
-            },
-        },
+    const storageTokenHook = new ClientResponseErrorTokenHook(
+        storageAPI,
+        tokenHookOptions,
     );
 
     store.$subscribe((mutation, state) => {
         if (mutation.storeId !== 'auth') return;
 
         if (state.accessToken) {
-            resourceAPI.setAuthorizationHeader({
+            coreAPI.setAuthorizationHeader({
+                type: 'Bearer',
+                token: state.accessToken,
+            });
+
+            storageAPI.setAuthorizationHeader({
                 type: 'Bearer',
                 token: state.accessToken,
             });
@@ -135,13 +133,16 @@ export default defineNuxtPlugin((ctx) => {
                 token: state.accessToken,
             });
 
-            resourceTokenHook.mount();
+            coreTokenHook.mount();
+            storageTokenHook.mount();
             authupTokenHook.mount();
         } else {
-            resourceAPI.unsetAuthorizationHeader();
+            coreAPI.unsetAuthorizationHeader();
+            storageAPI.unsetAuthorizationHeader();
             authupAPI.unsetAuthorizationHeader();
 
-            resourceTokenHook.unmount();
+            coreTokenHook.unmount();
+            storageTokenHook.unmount();
             authupTokenHook.unmount();
         }
     });
