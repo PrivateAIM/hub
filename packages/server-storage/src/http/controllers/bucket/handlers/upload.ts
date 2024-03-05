@@ -100,7 +100,7 @@ export async function executeBucketRouteUploadHandler(req: Request, res: Respons
         query.where('bucket.name LIKE :name', { name: id });
     }
     const entity = await query.getOne();
-    if (typeof entity === 'undefined') {
+    if (!entity) {
         throw new NotFoundError();
     }
 
