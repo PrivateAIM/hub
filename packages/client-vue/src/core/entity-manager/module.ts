@@ -15,7 +15,7 @@ import type { Ref, VNodeChild } from 'vue';
 import {
     computed, isRef, ref, toRef, watch,
 } from 'vue';
-import { injectCoreAPIClient } from '../core-api-client';
+import { injectCoreAPIClient } from '../services/core/module';
 import type { EntitySocket, EntitySocketContext } from '../entity-socket';
 import { createEntitySocket } from '../entity-socket';
 import { extendObjectProperties } from '../object';

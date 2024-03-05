@@ -24,7 +24,7 @@ import {
     computed, isRef, onMounted, onUnmounted, watch,
 } from 'vue';
 import { storeToRefs } from '@authup/client-vue';
-import { injectAuthupStore } from '../authup';
+import { injectAuthupStore } from '../services/authup';
 import type { EntitySocket, EntitySocketContext } from './type';
 import { injectSocketManager } from '../socket';
 

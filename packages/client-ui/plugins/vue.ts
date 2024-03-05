@@ -28,7 +28,7 @@ export default defineNuxtPlugin((ctx) => {
     });
 
     const options : Options = {
-        apiClient: ctx.$api as APIClient,
+        coreAPIClient: ctx.$api as APIClient,
         authupApiClient: ctx.$authupAPI as AuthupAPIClient,
         authupStore,
         socketManager,

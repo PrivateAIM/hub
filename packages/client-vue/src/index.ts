@@ -11,17 +11,20 @@ import './css';
 import * as components from './components';
 import type { Options } from './type';
 import {
-    provideCoreAPIClient,
     provideAuthupAPIClient,
     provideAuthupStore,
+    provideCoreAPIClient,
     provideSocketManager,
+    provideStorageAPIClient,
 } from './core';
 
-export function install(instance: App, options?: Options) : void {
-    options = options || {};
+export function install(instance: App, options: Options = {}) : void {
+    if (options.coreAPIClient) {
+        provideCoreAPIClient(options.coreAPIClient, instance);
+    }
 
-    if (options.apiClient) {
-        provideCoreAPIClient(options.apiClient, instance);
+    if (options.storageAPIClient) {
+        provideStorageAPIClient(options.storageAPIClient, instance);
     }
 
     if (options.authupApiClient) {

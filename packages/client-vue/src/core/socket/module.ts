@@ -14,8 +14,8 @@ import {
 } from '@privateaim/core';
 import type { ManagerOptions, Socket } from 'socket.io-client';
 import { Manager } from 'socket.io-client';
-import type { AuthupStore } from '../authup';
-import { injectAuthupStore } from '../authup';
+import type { AuthupStore } from '../services/authup';
+import { injectAuthupStore } from '../services/authup';
 
 type SocketModuleManagerConfiguration = {
     url: string,

@@ -6,13 +6,16 @@
  */
 
 import type { StoreManagerOptions } from '@vuecs/list-controls/core';
-import type { APIClient } from '@privateaim/core';
+import type { APIClient as CoreAPIClient } from '@privateaim/core';
+import type { APIClient as StorageAPIClient } from '@privateaim/storage-kit';
 import type { AuthupAPIClient, AuthupStore, SocketManager } from './core';
 
 export type Options = {
-    apiClient?: APIClient,
-    authupStore?: AuthupStore,
+    coreAPIClient?: CoreAPIClient,
+    storageAPIClient?: StorageAPIClient,
     authupApiClient?: AuthupAPIClient,
+
+    authupStore?: AuthupStore,
     socketManager?: SocketManager,
     components?: boolean | string[],
     storeManager?: StoreManagerOptions
