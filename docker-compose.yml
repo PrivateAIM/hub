@@ -42,7 +42,7 @@ services:
         networks:
             hub:
     mq:
-        image: rabbitmq
+        image: rabbitmq:3-management
         healthcheck:
             test: rabbitmq-diagnostics -q ping
             interval: 3s
