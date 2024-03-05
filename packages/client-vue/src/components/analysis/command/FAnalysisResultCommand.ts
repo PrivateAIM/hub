@@ -16,7 +16,7 @@ import {
 import {
     injectAPIClient, injectAuthupStore, renderActionCommand, wrapFnWithBusyState,
 } from '../../../core';
-import type { TrainCommandProperties } from './type';
+import type { AnalysisCommandProperties } from './type';
 
 export default defineComponent({
     props: {
@@ -30,7 +30,7 @@ export default defineComponent({
         },
 
         elementType: {
-            type: String as PropType<TrainCommandProperties['elementType']>,
+            type: String as PropType<AnalysisCommandProperties['elementType']>,
             default: 'button',
         },
         withIcon: {
@@ -122,11 +122,11 @@ export default defineComponent({
             }
 
             try {
-                const train = await apiClient
+                const entity = await apiClient
                     .analysis.runCommand(props.entity.id, props.command);
 
                 emit('executed', props.command);
-                emit('updated', train);
+                emit('updated', entity);
             } catch (e) {
                 if (e instanceof Error) {
                     emit('failed', e);

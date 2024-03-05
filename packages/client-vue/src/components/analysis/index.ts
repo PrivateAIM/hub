@@ -10,7 +10,7 @@ export * from './wizard';
 export { default as FAnalysisBasicForm } from './FAnalysisBasicForm.vue';
 export { default as FAnalysis } from './FAnalysis';
 export { default as FAnalysisImageCommand } from './FAnalysisImageCommand';
-export { default as FAnalysisItem } from './FAnalysisItem';
+export { FAnalysisItem } from './FAnalysisItem';
 export { default as FAnalyses } from './FAnalyses';
 export { default as FAnalysisName } from './FAnalysisName';
 export { default as FAnalysisPipeline } from './FAnalysisPipeline.vue';

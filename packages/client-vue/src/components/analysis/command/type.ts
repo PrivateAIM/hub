@@ -8,7 +8,7 @@
 import type { Analysis, AnalysisAPICommand } from '@privateaim/core';
 import type { ActionCommandProperties } from '../../../core';
 
-export type TrainCommandProperties = {
+export type AnalysisCommandProperties = {
     entity: Analysis,
     command: `${AnalysisAPICommand}` | 'resultDownload',
 } & ActionCommandProperties;

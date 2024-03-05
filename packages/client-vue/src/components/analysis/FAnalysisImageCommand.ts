@@ -13,7 +13,7 @@ import { injectAPIClient, wrapFnWithBusyState } from '../../core';
 
 export default defineComponent({
     props: {
-        trainId: {
+        analysisId: {
             type: String,
             default: undefined,
         },
@@ -21,7 +21,7 @@ export default defineComponent({
             type: String,
             default: undefined,
         },
-        trainFileId: {
+        analysisFileId: {
             type: String,
             default: undefined,
         },
@@ -34,8 +34,8 @@ export default defineComponent({
         const masterImageEntity = ref<null | MasterImage>(null);
         const masterImageBusy = ref(false);
 
-        const trainFileEntity = ref<null | AnalysisFile>(null);
-        const trainFileBusy = ref(false);
+        const analysisFileEntity = ref<null | AnalysisFile>(null);
+        const analysisFileBusy = ref(false);
 
         const command = computed(() => {
             let command = '<Command>';
@@ -52,14 +52,14 @@ export default defineComponent({
         });
 
         const file = computed(() => {
-            if (!trainFileEntity.value) {
+            if (!analysisFileEntity.value) {
                 return '<File>';
             }
 
-            let fileDirectoryPath = trainFileEntity.value.directory || '.';
+            let fileDirectoryPath = analysisFileEntity.value.directory || '.';
             if (fileDirectoryPath === '.') fileDirectoryPath = './';
 
-            return `${fileDirectoryPath}${trainFileEntity.value.name}`;
+            return `${fileDirectoryPath}${analysisFileEntity.value.name}`;
         });
 
         const loadMasterImage = wrapFnWithBusyState(masterImageBusy, async () => {
@@ -94,11 +94,11 @@ export default defineComponent({
             }
         });
 
-        const loadTrainFile = wrapFnWithBusyState(trainFileBusy, async () => {
-            if (!refs.trainFileId.value) return;
+        const loadAnalysisFile = wrapFnWithBusyState(analysisFileBusy, async () => {
+            if (!refs.analysisFileId.value) return;
 
             try {
-                trainFileEntity.value = await apiClient.analysisFile.getOne(refs.trainFileId.value);
+                analysisFileEntity.value = await apiClient.analysisFile.getOne(refs.analysisFileId.value);
             } catch (e) {
                 if (e instanceof Error) {
                     emit('failed', e);
@@ -106,19 +106,19 @@ export default defineComponent({
             }
         });
 
-        await loadTrainFile();
+        await loadAnalysisFile();
 
-        watch(refs.trainFileId, async (value, oldValue) => {
+        watch(refs.analysisFileId, async (value, oldValue) => {
             if (value) {
                 if (value !== oldValue) {
-                    await loadTrainFile();
+                    await loadAnalysisFile();
                 }
             } else {
-                trainFileEntity.value = null;
+                analysisFileEntity.value = null;
             }
         });
 
-        await Promise.all([loadMasterImage, loadTrainFile]);
+        await Promise.all([loadMasterImage, loadAnalysisFile]);
 
         return () => h('div', {
             class: 'command-box',

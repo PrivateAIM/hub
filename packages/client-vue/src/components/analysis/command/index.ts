@@ -5,5 +5,5 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export { default as TrainBuildCommand } from './FAnalysisBuildCommand';
-export { default as TrainResultCommand } from './FAnalysisResultCommand';
+export { default as FAnalysisBuildCommand } from './FAnalysisBuildCommand';
+export { default as FAnalysisResultCommand } from './FAnalysisResultCommand';

@@ -12,7 +12,7 @@ import type { SetupContext, SlotsType } from 'vue';
 import { defineComponent, h } from 'vue';
 import type { ListEventsType, ListSlotsType } from '../../core';
 import { createList, defineListEvents, defineListProps } from '../../core';
-import TrainItem from './FAnalysisItem';
+import { FAnalysisItem } from './FAnalysisItem';
 
 export default defineComponent({
     props: defineListProps<Analysis>(),
@@ -37,7 +37,7 @@ export default defineComponent({
         setDefaults({
             item: {
                 content(item) {
-                    return h(TrainItem, {
+                    return h(FAnalysisItem, {
                         entity: item,
                         onDeleted: handleDeleted,
                         onUpdated: handleUpdated,
@@ -49,7 +49,7 @@ export default defineComponent({
             },
 
             noMore: {
-                content: 'No more trains available...',
+                content: 'No more analyses available...',
             },
         });
 

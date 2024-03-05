@@ -25,7 +25,7 @@ import EntityDelete from '../EntityDelete';
 import type { EntityManagerSlotProps } from '../../core';
 import { injectAuthupStore } from '../../core';
 
-export default defineComponent({
+const FAnalysisItem = defineComponent({
     components: {
         TrainName,
         TrainStationsProgress,
@@ -203,3 +203,7 @@ export default defineComponent({
         });
     },
 });
+
+export {
+    FAnalysisItem,
+};

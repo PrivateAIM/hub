@@ -353,8 +353,8 @@ export default defineComponent({
                 <train-image-command
                     class="mt-2 mb-2"
                     :master-image-id="entity.master_image_id"
-                    :train-file-id="entity.entrypoint_file_id"
-                    :train-id="entity.id"
+                    :analysis-file-id="entity.entrypoint_file_id"
+                    :analysis-id="entity.id"
                 />
 
                 <div
