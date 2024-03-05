@@ -13,14 +13,14 @@ import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
 import { computed, ref } from 'vue';
 import {
+    FAnalysisName,
+    FAnalysisNodeApprovalCommand,
+    FAnalysisNodeApprovalStatus,
+    FAnalysisNodeRunStatus,
+    FAnalysisNodes,
     FPagination,
     FSearch,
     FTitle,
-    FAnalysisName,
-    TrainStationApprovalCommand,
-    TrainStationApprovalStatus,
-    TrainStationList,
-    TrainStationRunStatus,
 } from '@privateaim/client-vue';
 import { defineNuxtComponent, useRuntimeConfig } from '#app';
 import { definePageMeta, useAPI } from '#imports';
@@ -35,10 +35,10 @@ export default defineNuxtComponent({
         TrainName: FAnalysisName,
         BDropdown,
         BTable,
-        TrainStationRunStatus,
-        TrainStationApprovalCommand,
-        TrainStationApprovalStatus,
-        TrainStationList,
+        TrainStationRunStatus: FAnalysisNodeRunStatus,
+        TrainStationApprovalCommand: FAnalysisNodeApprovalCommand,
+        TrainStationApprovalStatus: FAnalysisNodeApprovalStatus,
+        TrainStationList: FAnalysisNodes,
         VCTimeago,
     },
     setup() {
@@ -93,7 +93,7 @@ export default defineNuxtComponent({
             window.open(new URL(useAPI().analysis.getFilesDownloadPath(item.analysis_id), app.public.apiUrl).href, '_blank');
         };
 
-        const listNode = ref<null | typeof TrainStationList>(null);
+        const listNode = ref<null | typeof FAnalysisNodes>(null);
 
         const handleUpdated = (item: AnalysisNode) => {
             if (listNode.value) {

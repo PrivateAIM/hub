@@ -9,7 +9,6 @@ import type { Analysis, AnalysisNode } from '@privateaim/core';
 import {
     AnalysisBuildStatus,
     AnalysisNodeRunStatus,
-    AnalysisNodeStatic,
     AnalysisRunStatus,
 } from '@privateaim/core';
 import type { BuildInput } from 'rapiq';
@@ -57,9 +56,8 @@ export default defineComponent({
         return {
             query,
             progressPercentage,
-            trainRunStatus: AnalysisRunStatus,
-            trainStationStatic: AnalysisNodeStatic,
-            trainStationRunStatus: AnalysisNodeRunStatus,
+            analysisRunStatus: AnalysisRunStatus,
+            analysisNodeRunStatus: AnalysisNodeRunStatus,
         };
     },
 });
@@ -89,8 +87,8 @@ export default defineComponent({
                                     class="d-flex justify-content-center icon-circle progress-step text-light"
                                     :class="{
                                         'bg-secondary': !item.run_status,
-                                        'bg-dark': item.run_status === trainStationRunStatus.DEPARTED,
-                                        'active': item.run_status === trainStationRunStatus.ARRIVED
+                                        'bg-dark': item.run_status === analysisNodeRunStatus.DEPARTED,
+                                        'active': item.run_status === analysisNodeRunStatus.ARRIVED
                                     }"
                                 >
                                     <span class="icon">{{ item.node.name }}</span>
@@ -112,8 +110,8 @@ export default defineComponent({
                 <div
                     class="progress-bar"
                     :class="{
-                        'bg-dark': entity.run_status !== trainRunStatus.FINISHED,
-                        'bg-success': entity.run_status === trainRunStatus.FINISHED
+                        'bg-dark': entity.run_status !== analysisRunStatus.FINISHED,
+                        'bg-success': entity.run_status === analysisRunStatus.FINISHED
                     }"
                     :style="{width: progressPercentage + '%'}"
                     :aria-valuenow="progressPercentage"

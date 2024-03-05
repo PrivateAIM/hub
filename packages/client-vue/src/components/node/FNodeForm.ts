@@ -226,7 +226,7 @@ export default defineComponent({
                         class: 'form-check-label',
                         for: 'station-switch',
                     }, [
-                        'Hide for proposal & train selection?',
+                        'Hide for project & analysis selection?',
                     ]),
                 ]),
             ]);
