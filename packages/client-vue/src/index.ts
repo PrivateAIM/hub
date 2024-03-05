@@ -11,7 +11,7 @@ import './css';
 import * as components from './components';
 import type { Options } from './type';
 import {
-    provideAPIClient,
+    provideCoreAPIClient,
     provideAuthupAPIClient,
     provideAuthupStore,
     provideSocketManager,
@@ -21,7 +21,7 @@ export function install(instance: App, options?: Options) : void {
     options = options || {};
 
     if (options.apiClient) {
-        provideAPIClient(options.apiClient, instance);
+        provideCoreAPIClient(options.apiClient, instance);
     }
 
     if (options.authupApiClient) {

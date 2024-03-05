@@ -15,7 +15,7 @@ import type { ListHeaderSlotProps } from '@vuecs/list-controls';
 import {
     defineComponent, h, reactive, ref,
 } from 'vue';
-import { EntityListSlotName, injectAPIClient } from '../../core';
+import { EntityListSlotName, injectCoreAPIClient } from '../../core';
 import EntityDelete from '../EntityDelete';
 import MasterImageList from './FMasterImages';
 
@@ -23,7 +23,7 @@ export default defineComponent({
     components: { EntityDelete, MasterImageList },
     emits: ['failed'],
     setup(props, { emit }) {
-        const apiClient = injectAPIClient();
+        const apiClient = injectCoreAPIClient();
         const meta = reactive({
             busy: false,
             created: '?',

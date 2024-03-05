@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { AnalysisFileType } from '@privateaim/core/src/domains/analysis-file/constants';
+import { AnalysisFileType } from '@privateaim/core';
 import type { BucketFile } from '@privateaim/storage-kit';
 import path from 'node:path';
 import type {

@@ -8,7 +8,7 @@ import { AnalysisNodeApprovalCommand, AnalysisNodeApprovalStatus, PermissionID }
 import type { PropType } from 'vue';
 import { computed, defineComponent, ref } from 'vue';
 import type { ActionCommandProperties } from '../../core';
-import { injectAPIClient, injectAuthupStore, renderActionCommand } from '../../core';
+import { injectCoreAPIClient, injectAuthupStore, renderActionCommand } from '../../core';
 
 export default defineComponent({
     name: 'TrainStationCommand',
@@ -38,7 +38,7 @@ export default defineComponent({
     },
     emits: ['failed', 'updated'],
     setup(props, setup) {
-        const apiClient = injectAPIClient();
+        const apiClient = injectCoreAPIClient();
         const busy = ref(false);
 
         const commandText = computed(() => {

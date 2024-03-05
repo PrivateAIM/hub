@@ -9,7 +9,7 @@ import type { PropType } from 'vue';
 import { defineComponent, h, ref } from 'vue';
 import type { Registry } from '@privateaim/core';
 import { RegistryAPICommand } from '@privateaim/core';
-import { injectAPIClient } from '../../core';
+import { injectCoreAPIClient } from '../../core';
 import EntityDelete from '../EntityDelete';
 import MasterImageList from '../master-image/FMasterImages';
 
@@ -23,7 +23,7 @@ export default defineComponent({
     },
     emits: ['executed', 'failed'],
     setup(props, { emit }) {
-        const apiClient = injectAPIClient();
+        const apiClient = injectCoreAPIClient();
         const busy = ref(false);
 
         const setup = async () => {

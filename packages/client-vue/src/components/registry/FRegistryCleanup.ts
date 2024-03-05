@@ -11,7 +11,7 @@ import type { Registry } from '@privateaim/core';
 import { RegistryAPICommand } from '@privateaim/core';
 import EntityDelete from '../EntityDelete';
 import MasterImageList from '../master-image/FMasterImages';
-import { injectAPIClient } from '../../core';
+import { injectCoreAPIClient } from '../../core';
 
 export default defineComponent({
     components: { EntityDelete, MasterImageList },
@@ -24,7 +24,7 @@ export default defineComponent({
     emits: ['executed', 'failed'],
     setup(props, { emit }) {
         const busy = ref(false);
-        const apiClient = injectAPIClient();
+        const apiClient = injectCoreAPIClient();
 
         const execute = async () => {
             if (busy.value) return;
