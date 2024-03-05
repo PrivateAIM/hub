@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { AnalysisFileType } from '@privateaim/core/src/domains/analysis-file/constants';
 import type { BucketFile } from '@privateaim/storage-kit';
 import path from 'node:path';
 import type {
@@ -16,7 +17,7 @@ import { useCoreClient, useStorageClient } from '../../../core';
 import { BuilderError } from '../error';
 
 type DockerFileBuildContext = {
-    entity: Pick<Analysis, 'id' | 'master_image_id' | 'entrypoint_file_id'>,
+    entity: Pick<Analysis, 'id' | 'master_image_id'>,
     hostname: string
 };
 
@@ -29,8 +30,20 @@ export async function buildTrainDockerFile(context: DockerFileBuildContext) : Pr
 
     let entryPoint : BucketFile;
 
+    const { data: analysisFiles } = await coreClient.analysisFile.getMany({
+        filter: {
+            root: true,
+            type: AnalysisFileType.CODE,
+        },
+    });
+
+    const [analysisFile] = analysisFiles;
+    if (typeof analysisFile === 'undefined') {
+        throw BuilderError.entrypointNotFound();
+    }
+
     try {
-        entryPoint = await storageClient.bucketFile.getOne(context.entity.entrypoint_file_id);
+        entryPoint = await storageClient.bucketFile.getOne(analysisFile.bucket_file_id);
     } catch (e) {
         throw BuilderError.entrypointNotFound();
     }

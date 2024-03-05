@@ -38,11 +38,6 @@ export async function runAnalysisValidation(
         .optional({ nullable: true })
         .run(req);
 
-    await check('entrypoint_file_id')
-        .isUUID()
-        .optional({ nullable: true })
-        .run(req);
-
     await check('master_image_id')
         .exists()
         .notEmpty()
@@ -75,11 +70,6 @@ export async function runAnalysisValidation(
     await extendHTTPValidationResultWithRelation(result, RegistryEntity, {
         id: 'registry_id',
         entity: 'registry',
-    });
-
-    await extendHTTPValidationResultWithRelation(result, AnalysisFileEntity, {
-        id: 'entrypoint_file_id',
-        entity: 'entrypoint_file',
     });
 
     if (result.relation.project) {

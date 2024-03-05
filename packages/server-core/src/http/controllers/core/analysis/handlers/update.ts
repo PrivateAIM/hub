@@ -41,13 +41,6 @@ export async function updateAnalysisRouteHandler(req: Request, res: Response) : 
     }
 
     if (
-        result.relation.entrypoint_file &&
-        result.relation.entrypoint_file.analysis_id !== entity.id
-    ) {
-        throw new BadRequestError('The entrypoint file id is associated to another analysis.');
-    }
-
-    if (
         entity.registry_id &&
         result.data.registry_id &&
         entity.registry_id !== result.data.registry_id

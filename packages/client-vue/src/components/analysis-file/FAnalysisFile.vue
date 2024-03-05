@@ -47,8 +47,6 @@ export default defineComponent({
 
         const busy = ref(false);
 
-        const path = computed(() => `${manager.data.value.directory}/${manager.data.value.name}`);
-
         const marked = computed(() => {
             if (!props.filesSelected) {
                 return false;
@@ -71,7 +69,6 @@ export default defineComponent({
             drop: manager.delete,
             marked,
             markToggle,
-            path,
             isMatch,
             toggle,
             busy,
@@ -89,8 +86,7 @@ export default defineComponent({
             @click.prevent="markToggle"
         >
             <span class="title">
-                {{ path }}
-                <small class="text-muted ms-1">{{ entity.size }} Bytes</small>
+                {{ entity.name }}
             </span>
         </div>
         <div class="ms-auto d-flex flex-row me-1">

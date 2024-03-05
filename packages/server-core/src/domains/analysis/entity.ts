@@ -14,14 +14,12 @@ import {
     Index,
     JoinColumn,
     ManyToOne,
-    OneToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
 import type {
     Analysis,
     AnalysisBuildStatus,
-    AnalysisFile,
     AnalysisResultStatus,
     AnalysisRunStatus,
     MasterImage,
@@ -34,7 +32,6 @@ import {
 import type { Realm, User } from '@authup/core';
 import { ProjectEntity } from '../project/entity';
 import { MasterImageEntity } from '../master-image/entity';
-import { AnalysisFileEntity } from '../analysis-file/entity';
 import { RegistryEntity } from '../registry/entity';
 
 @Entity()
@@ -45,13 +42,6 @@ export class AnalysisEntity implements Analysis {
     @Index()
     @Column({ type: 'varchar', length: 128, nullable: true })
         name: string;
-
-    @Column({ nullable: true })
-        entrypoint_file_id: AnalysisFile['id'];
-
-    @OneToOne(() => AnalysisFileEntity, { onDelete: 'SET NULL', nullable: true })
-    @JoinColumn({ name: 'entrypoint_file_id' })
-        entrypoint_file: AnalysisFileEntity;
 
     @Column({ type: 'int', unsigned: true, default: 0 })
         nodes: number;
@@ -140,12 +130,6 @@ export class AnalysisEntity implements Analysis {
 
         if (this.nodes > 0) {
             this.configuration_status = AnalysisConfigurationStatus.BASE_CONFIGURED;
-        } else {
-            return;
-        }
-
-        if (this.entrypoint_file_id) {
-            this.configuration_status = AnalysisConfigurationStatus.RESOURCE_CONFIGURED;
         } else {
             return;
         }

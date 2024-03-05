@@ -18,7 +18,7 @@ import {
 } from 'vue';
 import type { BuildInput } from 'rapiq';
 import { injectAPIClient, wrapFnWithBusyState } from '../../core';
-import TrainFileNode from './TrainFile.vue';
+import TrainFileNode from './FAnalysisFile.vue';
 import TrainFileList from './TrainFileList';
 import TrainFormFile from './TrainFormFile.vue';
 import TrainImageCommand from '../analysis/FAnalysisImageCommand';

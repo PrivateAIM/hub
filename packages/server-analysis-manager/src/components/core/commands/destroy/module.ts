@@ -5,10 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { AnalysisFileType, buildAnalysisFileBucketName } from '@privateaim/core';
 import { isClientErrorWithStatusCode } from 'hapic';
-import { BucketType } from '../../../../constants';
 import { useStorageClient } from '../../../../core';
-import { buildBucketName } from '../../../../helpers';
 import { CoreCommand } from '../../constants';
 import type { CoreDestroyPayload } from '../../type';
 import { useCoreLogger } from '../../utils';
@@ -24,9 +23,9 @@ export async function executeCoreDestroyCommand(
     });
 
     const names = [
-        buildBucketName(BucketType.CODE, payload.id),
-        buildBucketName(BucketType.TEMP, payload.id),
-        buildBucketName(BucketType.RESULT, payload.id),
+        buildAnalysisFileBucketName(AnalysisFileType.CODE, payload.id),
+        buildAnalysisFileBucketName(AnalysisFileType.TEMP, payload.id),
+        buildAnalysisFileBucketName(AnalysisFileType.RESULT, payload.id),
     ];
 
     for (let i = 0; i < names.length; i++) {

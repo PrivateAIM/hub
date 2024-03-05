@@ -35,7 +35,7 @@ export async function getOneAnalysisRouteHandler(req: Request, res: Response) : 
 
     applyRelations(query, include, {
         defaultAlias: 'analysis',
-        allowed: ['project', 'master_image', 'entrypoint_file'],
+        allowed: ['project', 'master_image'],
     });
 
     const entity = await query.getOne();
@@ -74,7 +74,7 @@ export async function getManyAnalysisRouteHandler(req: Request, res: Response) :
             maxLimit: 50,
         },
         relations: {
-            allowed: ['project', 'master_image', 'entrypoint_file'],
+            allowed: ['project', 'master_image'],
         },
         sort: {
             allowed: ['created_at', 'updated_at'],

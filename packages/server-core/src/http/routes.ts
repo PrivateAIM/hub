@@ -17,7 +17,8 @@ import {
     useRequestQuery,
 } from '@routup/basic/query';
 import type { Router } from 'routup';
-import { TrainLogController } from './controllers/core/analysis-log';
+import { AnalysisFileController } from './controllers/core/analysis-file';
+import { AnalysisLogController } from './controllers/core/analysis-log';
 import { MasterImageController } from './controllers/core/master-image';
 import { ProposalController } from './controllers/core/project';
 import { ProposalStationController } from './controllers/core/project-node';
@@ -42,7 +43,8 @@ export function registerControllers(router: Router) {
             RegistryProjectController,
             NodeController,
             AnalysisController,
-            TrainLogController,
+            AnalysisFileController,
+            AnalysisLogController,
             AnalysisNodeController,
 
             RootController,

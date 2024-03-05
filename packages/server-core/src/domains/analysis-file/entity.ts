@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { Analysis, AnalysisFile, AnalysisFileType } from '@privateaim/core';
 import {
     Column,
     CreateDateColumn,
@@ -14,7 +15,6 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-import type { Analysis, AnalysisFile } from '@privateaim/core';
 import type { Realm, User } from '@authup/core';
 // eslint-disable-next-line import/no-cycle
 import { AnalysisEntity } from '../analysis';
@@ -27,14 +27,11 @@ export class AnalysisFileEntity implements AnalysisFile {
     @Column({ type: 'varchar', length: 256 })
         name: string;
 
-    @Column({ type: 'varchar', length: 4096 })
-        hash: string;
+    @Column({ type: 'varchar', length: 64 })
+        type: `${AnalysisFileType}`;
 
-    @Column({ nullable: true })
-        directory: string;
-
-    @Column({ type: 'int', unsigned: true, nullable: true })
-        size: number | null;
+    @Column({ type: 'boolean', default: false })
+        root: boolean;
 
     // ------------------------------------------------------------------
 
@@ -47,7 +44,18 @@ export class AnalysisFileEntity implements AnalysisFile {
     // ------------------------------------------------------------------
 
     @Column({ type: 'uuid' })
-        user_id: User['id'];
+        bucket_file_id: string;
+
+    @Column({ type: 'uuid' })
+        target_realm_id: string;
+
+    // ------------------------------------------------------------------
+
+    @Column({ type: 'uuid', nullable: true })
+        robot_id: string | null;
+
+    @Column({ type: 'uuid', nullable: true })
+        user_id: User['id'] | null;
 
     @Column({ type: 'uuid' })
         realm_id: Realm['id'];
@@ -60,4 +68,6 @@ export class AnalysisFileEntity implements AnalysisFile {
     @ManyToOne(() => AnalysisEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'analysis_id' })
         analysis: AnalysisEntity;
+
+    // ------------------------------------------------------------------
 }

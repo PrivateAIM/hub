@@ -23,7 +23,7 @@ type PartialAnalysisLog = Partial<AnalysisLog>;
 
 @DTags('analysis')
 @DController('/analysis-logs')
-export class TrainLogController {
+export class AnalysisLogController {
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
         @DRequest() req: any,
