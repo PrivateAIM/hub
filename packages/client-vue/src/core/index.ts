@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './api-client';
+export * from './core-api-client';
 export * from './authup';
 export * from './entity-action-command';
 export * from './entity-assign-action';
@@ -17,5 +17,6 @@ export * from './busy';
 export * from './object';
 export * from './slot';
 export * from './socket';
+export * from './storage-api-client';
 export * from './translator';
 export * from './vuelidate';

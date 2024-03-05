@@ -37,7 +37,7 @@ export default defineComponent({
 
         setDefaults({
             noMore: {
-                content: 'No more train files available...',
+                content: 'No more analysis files available...',
             },
         });
 

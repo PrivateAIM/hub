@@ -5,8 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export { default as TrainFile } from './TrainFile.vue';
-export { default as TrainFileList } from './TrainFileList';
-export { default as TrainFileManager } from './TrainFileManager.vue';
-export { default as TrainFolder } from './TrainFolder.vue';
-export { default as TrainFormFile } from './TrainFormFile.vue';
+export { default as TrainFile } from './FAnalysisFile.vue';
+export { default as TrainFileList } from './FAnalysisFiles';
+export { default as TrainFileManager } from './FAnalysisFileManager.vue';
+export { default as TrainFormFile } from './FAnalysisFormFile.vue';

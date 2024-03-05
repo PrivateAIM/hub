@@ -5,18 +5,21 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Analysis } from '@privateaim/core';
-import { BucketType } from '../constants';
+import type { Analysis } from '../analysis';
+import { AnalysisFileType } from './constants';
 
-export function buildBucketName(type: `${BucketType}`, id: Analysis['id']) {
+export function buildAnalysisFileBucketName(
+    type: `${AnalysisFileType}`,
+    id: Analysis['id'],
+) {
     switch (type) {
-        case BucketType.CODE: {
+        case AnalysisFileType.CODE: {
             return `analysis-code-files.${id}`;
         }
-        case BucketType.TEMP: {
+        case AnalysisFileType.TEMP: {
             return `analysis-temp-files.${id}`;
         }
-        case BucketType.RESULT: {
+        case AnalysisFileType.RESULT: {
             return `analysis-result-files.${id}`;
         }
     }

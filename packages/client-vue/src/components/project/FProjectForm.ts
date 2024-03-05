@@ -29,7 +29,7 @@ import {
     createEntityManager,
     defineEntityManagerEvents,
     initFormAttributesFromSource,
-    injectAPIClient,
+    injectCoreAPIClient,
     renderEntityAssignAction, useValidationTranslator, wrapFnWithBusyState,
 } from '../../core';
 import MasterImagePicker from '../master-image/FMasterImagePicker';
@@ -46,7 +46,7 @@ export default defineComponent({
     },
     emits: defineEntityManagerEvents<Project>(),
     setup(props, setup) {
-        const apiClient = injectAPIClient();
+        const apiClient = injectCoreAPIClient();
         const busy = ref(false);
         const form = reactive({
             name: '',

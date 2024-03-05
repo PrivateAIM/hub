@@ -9,7 +9,7 @@ import type { AnalysisFile, MasterImage } from '@privateaim/core';
 import {
     computed, defineComponent, h, ref, toRefs, watch,
 } from 'vue';
-import { injectAPIClient, wrapFnWithBusyState } from '../../core';
+import { injectCoreAPIClient, wrapFnWithBusyState } from '../../core';
 
 export default defineComponent({
     props: {
@@ -28,7 +28,7 @@ export default defineComponent({
     },
     emits: ['failed'],
     async setup(props, { emit }) {
-        const apiClient = injectAPIClient();
+        const apiClient = injectCoreAPIClient();
         const refs = toRefs(props);
 
         const masterImageEntity = ref<null | MasterImage>(null);
@@ -56,10 +56,7 @@ export default defineComponent({
                 return '<File>';
             }
 
-            let fileDirectoryPath = analysisFileEntity.value.directory || '.';
-            if (fileDirectoryPath === '.') fileDirectoryPath = './';
-
-            return `${fileDirectoryPath}${analysisFileEntity.value.name}`;
+            return analysisFileEntity.value.name;
         });
 
         const loadMasterImage = wrapFnWithBusyState(masterImageBusy, async () => {

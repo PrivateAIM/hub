@@ -11,7 +11,7 @@ import { inject, provide } from 'vue';
 
 const symbol = Symbol.for('APIClient');
 
-export function provideAPIClient(client: APIClient, instance?: App) {
+export function provideCoreAPIClient(client: APIClient, instance?: App) {
     if (instance) {
         instance.provide(symbol, client);
         return;
@@ -20,7 +20,7 @@ export function provideAPIClient(client: APIClient, instance?: App) {
     provide(symbol, client);
 }
 
-export function injectAPIClient(): APIClient {
+export function injectCoreAPIClient(): APIClient {
     const instance = inject(symbol);
     if (!instance) {
         throw new Error('The API Client is not set.');

@@ -26,7 +26,7 @@ import type { EntityManagerSlotsType } from '../../core';
 import {
     createEntityManager,
     defineEntityManagerEvents,
-    defineEntityManagerProps, injectAPIClient,
+    defineEntityManagerProps, injectCoreAPIClient,
     useValidationTranslator,
     wrapFnWithBusyState,
 } from '../../core';
@@ -36,7 +36,7 @@ export default defineComponent({
     emits: defineEntityManagerEvents<RegistryProject>(),
     slots: Object as SlotsType<EntityManagerSlotsType<RegistryProject>>,
     async setup(props, setup) {
-        const apiClient = injectAPIClient();
+        const apiClient = injectCoreAPIClient();
         const busy = ref(false);
 
         const form = reactive({

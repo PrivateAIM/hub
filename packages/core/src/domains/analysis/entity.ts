@@ -9,7 +9,6 @@ import type { Realm, User } from '@authup/core';
 import type { DomainType } from '../constants';
 import type { MasterImage } from '../master-image';
 import type { Project } from '../project';
-import type { AnalysisFile } from '../analysis-file';
 import type { DomainEventBaseContext } from '../types-base';
 import type {
     AnalysisBuildStatus,
@@ -23,10 +22,6 @@ export interface Analysis {
     id: string;
 
     name: string | null;
-
-    entrypoint_file_id: AnalysisFile['id'];
-
-    entrypoint_file: AnalysisFile;
 
     nodes: number;
 

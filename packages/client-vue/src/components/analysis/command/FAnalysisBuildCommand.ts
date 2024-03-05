@@ -15,7 +15,7 @@ import {
     PermissionID,
 } from '@privateaim/core';
 import {
-    injectAPIClient, injectAuthupStore, renderActionCommand, wrapFnWithBusyState,
+    injectCoreAPIClient, injectAuthupStore, renderActionCommand, wrapFnWithBusyState,
 } from '../../../core';
 import type { AnalysisCommandProperties } from './type';
 
@@ -45,7 +45,7 @@ export default defineComponent({
     },
     emits: ['failed', 'updated', 'executed'],
     setup(props, { emit, slots }) {
-        const apiClient = injectAPIClient();
+        const apiClient = injectCoreAPIClient();
         const busy = ref(false);
 
         const store = injectAuthupStore();

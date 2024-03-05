@@ -15,9 +15,9 @@ import type { Analysis, AnalysisFile } from '@privateaim/core';
 import {
     AnalysisConfigurationStatus,
 } from '@privateaim/core';
-import { initFormAttributesFromSource, injectAPIClient } from '../../../core';
+import { initFormAttributesFromSource, injectCoreAPIClient } from '../../../core';
 import TrainWizardStepBase from './FAnalysisWizardStepBase.vue';
-import TrainFileManager from '../../analysis-file/TrainFileManager.vue';
+import TrainFileManager from '../../analysis-file/FAnalysisFileManager.vue';
 import TrainWizardStepFinal from './FAnalysisWizardStepFinal.vue';
 
 export default defineComponent({
@@ -38,7 +38,7 @@ export default defineComponent({
     },
     emits: ['finished', 'failed', 'updated'],
     async setup(props, { emit }) {
-        const apiClient = injectAPIClient();
+        const apiClient = injectCoreAPIClient();
         const refs = toRefs(props);
 
         const form = reactive({

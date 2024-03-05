@@ -6,8 +6,8 @@
   -->
 
 <script lang="ts">
-import type {
-    Analysis, AnalysisFile,
+import {
+    Analysis, AnalysisFile, AnalysisFileType, buildAnalysisFileBucketName,
 } from '@privateaim/core';
 import {
     hasOwnProperty,
@@ -17,10 +17,10 @@ import {
     computed, defineComponent, reactive, ref, toRefs, watch,
 } from 'vue';
 import type { BuildInput } from 'rapiq';
-import { injectAPIClient, wrapFnWithBusyState } from '../../core';
-import TrainFileNode from './TrainFile.vue';
-import TrainFileList from './TrainFileList';
-import TrainFormFile from './TrainFormFile.vue';
+import { injectCoreAPIClient, injectStorageAPIClient, wrapFnWithBusyState } from '../../core';
+import TrainFileNode from './FAnalysisFile.vue';
+import TrainFileList from './FAnalysisFiles';
+import TrainFormFile from './FAnalysisFormFile.vue';
 import TrainImageCommand from '../analysis/FAnalysisImageCommand';
 
 export default defineComponent({
@@ -38,11 +38,12 @@ export default defineComponent({
     },
     emits: ['created', 'updated', 'deleted', 'uploaded', 'failed', 'setEntrypointFile'],
     setup(props, { emit }) {
-        const apiClient = injectAPIClient();
+        const coreClient = injectCoreAPIClient();
+        const storageClient = injectStorageAPIClient();
+
         const refs = toRefs(props);
 
         const form = reactive({
-            entrypoint_file_id: '',
             path: '',
             files: [],
         });
@@ -51,27 +52,12 @@ export default defineComponent({
         const selectAll = ref(false);
         const directoryMode = ref(true);
         const busy = ref(false);
-        const entryPointFile = ref<null | AnalysisFile>(null);
 
         const paths = computed(() => form.path.split('/').filter((el) => el !== ''));
-
-        const initFromProperties = () => {
-            if (refs.entity.value.entrypoint_file_id) {
-                form.entrypoint_file_id = refs.entity.value.entrypoint_file_id;
-            }
-        };
-
-        initFromProperties();
 
         const updatedAt = computed(() => (refs.entity.value ?
             refs.entity.value.updated_at :
             undefined));
-
-        watch(updatedAt, (val, oldValue) => {
-            if (val && val !== oldValue) {
-                initFromProperties();
-            }
-        });
 
         const fileListNode = ref<null | typeof TrainFileList>(null);
         const fileListQuery = computed<BuildInput<AnalysisFile>>(() => ({
@@ -121,9 +107,18 @@ export default defineComponent({
 
                 form.files = [];
 
-                const response = await apiClient.analysisFile.upload(formData);
-                for (let i = 0; i < response.data.length; i++) {
-                    handleCreated(response.data[i]);
+                // todo: replace this with reference
+                const {
+                    data: bucketFiles
+                } = await storageClient.bucket.upload(buildAnalysisFileBucketName(AnalysisFileType.CODE, props.entity.id), formData);
+                for(let i=0; i<bucketFiles.length; i++) {
+                    const file = await coreClient.analysisFile.create({
+                        type: AnalysisFileType.CODE,
+                        bucket_file_id: bucketFiles[i].id,
+                        analysis_id: props.entity.id
+                    });
+
+                    handleCreated(file);
                 }
 
                 emit('uploaded');
@@ -137,7 +132,7 @@ export default defineComponent({
 
             try {
                 for (let i = 0; i < selected.value.length; i++) {
-                    const file = await apiClient.analysisFile.delete(selected.value[i]);
+                    const file = await coreClient.analysisFile.delete(selected.value[i]);
                     handleDeleted(file);
                 }
             } catch (e) {
@@ -151,8 +146,7 @@ export default defineComponent({
             if (selectAll.value) {
                 if (fileListNode.value) {
                     selected.value = (fileListNode.value.data as unknown as AnalysisFile[])
-                        .map((file) => file.id)
-                        .filter((id) => id !== form.entrypoint_file_id);
+                        .map((file) => file.id);
                 }
             } else {
                 selected.value = [];
@@ -199,25 +193,10 @@ export default defineComponent({
         };
 
         const changeEntryPointFile = (file: AnalysisFile) => {
-            if (form.entrypoint_file_id === file.id) {
-                form.entrypoint_file_id = null as string;
-                entryPointFile.value = null;
-            } else {
-                form.entrypoint_file_id = file.id;
-                entryPointFile.value = file;
-            }
+            // todo: submit to api update ( root: true/false )
+            // todo: set old analysis root file to false.
 
-            refs.entity.value.entrypoint_file_id = form.entrypoint_file_id;
-
-            // do not allow deletion of entrypoint file.
-            if (form.entrypoint_file_id) {
-                const index = selected.value.findIndex((file) => file === form.entrypoint_file_id);
-                if (index !== -1) {
-                    selected.value.splice(index, 1);
-                }
-            }
-
-            emit('setEntrypointFile', entryPointFile.value);
+            emit('setEntrypointFile', file);
         };
 
         return {
@@ -353,16 +332,8 @@ export default defineComponent({
                 <train-image-command
                     class="mt-2 mb-2"
                     :master-image-id="entity.master_image_id"
-                    :analysis-file-id="entity.entrypoint_file_id"
                     :analysis-id="entity.id"
                 />
-
-                <div
-                    v-if="!form.entrypoint_file_id"
-                    class="alert alert-warning alert-sm mb-0"
-                >
-                    A file from the list below must be selected as entrypoint for the image command.
-                </div>
 
                 <hr>
 
@@ -408,7 +379,6 @@ export default defineComponent({
                                     class="me-1"
                                     :entity="file"
                                     :files-selected="selected"
-                                    :file-selected-id="form.entrypoint_file_id"
                                     @check="toggleFile"
                                     @updated="props.updated"
                                     @deleted="props.deleted"

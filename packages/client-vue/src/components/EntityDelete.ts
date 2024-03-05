@@ -16,7 +16,7 @@ import type {
 import {
     defineComponent, getCurrentInstance, h, mergeProps, ref, resolveDynamicComponent,
 } from 'vue';
-import { injectAPIClient, useTranslator } from '../core';
+import { injectCoreAPIClient, useTranslator } from '../core';
 
 enum ElementType {
     BUTTON = 'button',
@@ -59,7 +59,7 @@ export default defineComponent({
         },
     },
     setup(props, ctx) {
-        const apiClient = injectAPIClient();
+        const apiClient = injectCoreAPIClient();
         const instance = getCurrentInstance();
         const busy = ref(false);
 
