@@ -11,16 +11,16 @@ import { FAnalysisBasicForm } from '@privateaim/client-vue';
 import { defineNuxtComponent, navigateTo } from '#app';
 
 export default defineNuxtComponent({
-    components: { TrainBasicForm: FAnalysisBasicForm },
+    components: { FAnalysisBasicForm },
     props: {
-        proposal: {
+        entity: {
             type: Object as PropType<Project>,
             required: true,
         },
     },
     setup(props) {
         const handleCreated = async () => {
-            await navigateTo(`/proposals/${props.proposal.id}/trains`);
+            await navigateTo(`/projects/${props.entity.id}/analyses`);
         };
 
         return {
@@ -30,8 +30,8 @@ export default defineNuxtComponent({
 });
 </script>
 <template>
-    <TrainBasicForm
-        :project-id="proposal.id"
+    <FAnalysisBasicForm
+        :project-id="entity.id"
         @created="handleCreated"
     />
 </template>

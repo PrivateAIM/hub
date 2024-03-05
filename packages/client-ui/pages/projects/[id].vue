@@ -20,12 +20,13 @@ import {
 } from 'vue';
 import {
     definePageMeta,
-    useCoreAPI, useToast,
+    useToast,
 } from '#imports';
 import {
     createError, defineNuxtComponent, navigateTo, useRoute,
 } from '#app';
 import DomainEntityNav from '../../components/DomainEntityNav';
+import { useCoreAPI } from '../../composables/api';
 import { LayoutKey, LayoutNavigationID } from '../../config/layout';
 import { useAuthStore } from '../../store/auth';
 
@@ -46,7 +47,7 @@ export default defineNuxtComponent({
             },
             onUpdated() {
                 if (toast) {
-                    toast.show({ variant: 'success', body: 'The proposal was successfully updated.' });
+                    toast.show({ variant: 'success', body: 'The project was successfully updated.' });
                 }
             },
             onFailed(e) {
@@ -68,27 +69,27 @@ export default defineNuxtComponent({
 
         const store = useAuthStore();
 
-        const proposalStation : Ref<ProjectNode | null> = ref(null);
+        const projectNode : Ref<ProjectNode | null> = ref(null);
 
         if (manager.data.value.realm_id !== store.realmId) {
             const response = await useCoreAPI().projectNode.getMany({
                 filter: {
-                    proposal_id: manager.data.value.id,
-                    station_realm_id: store.realmId,
+                    project_id: manager.data.value.id,
+                    node_realm_id: store.realmId,
                 },
             });
 
             const data = response.data.pop();
 
             if (data) {
-                proposalStation.value = data;
+                projectNode.value = data;
             }
         }
 
         // todo: maybe ref of store.realmId
         const isProposalOwner = computed(() => manager.data.value && store.realmId === manager.data.value.realm_id);
 
-        const isStationAuthority = computed(() => !!proposalStation.value);
+        const isStationAuthority = computed(() => !!projectNode.value);
 
         const route = useRoute();
         const backLink = computed(() => {
@@ -96,7 +97,7 @@ export default defineNuxtComponent({
                 return route.query.refPath;
             }
 
-            return '/proposals';
+            return '/projects';
         });
 
         const tabs = computed(() => {
@@ -106,7 +107,7 @@ export default defineNuxtComponent({
             ];
 
             if (isProposalOwner.value || isStationAuthority.value) {
-                items.push({ name: 'Trains', icon: 'fas fa-train', urlSuffix: '/trains' });
+                items.push({ name: 'Analyses', icon: 'fas fa-train', urlSuffix: '/analyses' });
             }
 
             if (
@@ -129,7 +130,7 @@ export default defineNuxtComponent({
 
         return {
             entity: manager.data.value,
-            proposalStation: proposalStation.value,
+            proposalStation: projectNode.value,
             backLink,
             tabs,
             handleDeleted,
@@ -141,7 +142,7 @@ export default defineNuxtComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            📜 {{ entity.title }}
+            📜 {{ entity.name }}
         </h1>
 
         <div class="m-b-20 m-t-10">
@@ -150,7 +151,7 @@ export default defineNuxtComponent({
                     <div class="flex-wrap flex-row d-flex align-items-center">
                         <DomainEntityNav
                             :items="tabs"
-                            :path="'/proposals/' + entity.id"
+                            :path="'/projects/' + entity.id"
                             :prev-link="true"
                         />
                     </div>
@@ -159,8 +160,8 @@ export default defineNuxtComponent({
         </div>
 
         <NuxtPage
-            :proposal="entity"
-            :visitor-proposal-station="proposalStation"
+            :entity="entity"
+            :visitor-project-node="proposalStation"
             @deleted="handleDeleted"
             @updated="handleUpdated"
         />

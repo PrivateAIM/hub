@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 import { storeToRefs } from 'pinia';
-import { computed, toRefs } from 'vue';
+import { computed, toRef } from 'vue';
 import type { PropType } from 'vue';
 import type { Project, ProjectNode } from '@privateaim/core';
 import { defineNuxtComponent } from '#app';
@@ -16,22 +16,22 @@ import { useAuthStore } from '../../../store/auth';
 export default defineNuxtComponent({
     components: { DomainEntityNav },
     props: {
-        proposal: {
+        entity: {
             type: Object as PropType<Project>,
             required: true,
         },
-        visitorProposalStation: {
+        visitorProjectNode: {
             type: Object as PropType<ProjectNode>,
             default: undefined,
         },
     },
     setup(props) {
-        const refs = toRefs(props);
+        const entity = toRef(props, 'entity');
 
         const store = useAuthStore();
         const { realmId } = storeToRefs(store);
 
-        const isOwner = computed(() => refs.proposal.value.realm_id === realmId.value);
+        const isOwner = computed(() => entity.value.realm_id === realmId.value);
 
         const tabs = computed(() => [
             {
@@ -45,8 +45,6 @@ export default defineNuxtComponent({
         ]);
 
         return {
-            proposal: refs.proposal,
-            visitorProposalStation: refs.visitorProposalStation,
             tabs,
         };
     },
@@ -58,13 +56,13 @@ export default defineNuxtComponent({
             <DomainEntityNav
                 :items="tabs"
                 :direction="'vertical'"
-                :path="'/proposals/' + proposal.id + '/trains'"
+                :path="'/projects/' + entity.id + '/analyses'"
             />
         </div>
         <div class="content-container">
             <NuxtPage
-                :proposal="proposal"
-                :visitor-proposal-station="visitorProposalStation"
+                :entity="entity"
+                :visitor-project-node="visitorProjectNode"
             />
         </div>
     </div>

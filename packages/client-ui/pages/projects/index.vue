@@ -5,20 +5,19 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Analysis } from '@privateaim/core';
-import { defineNuxtComponent } from '#app';
-import { definePageMeta, navigateTo, useToast } from '#imports';
-import DomainEntityNav from '../../components/DomainEntityNav';
-import { LayoutKey, LayoutNavigationID } from '../../config/layout';
+import type { Project } from '@privateaim/core';
+import { defineNuxtComponent, navigateTo } from '#app';
+import { definePageMeta, useToast } from '#imports';
+import { LayoutKey, LayoutNavigationID } from '~/config/layout';
 
 export default defineNuxtComponent({
-    components: { DomainEntityNav },
     setup() {
         definePageMeta({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
         });
-        const items = [
+
+        const tabs = [
             {
                 name: 'Create',
                 urlSuffix: '/add',
@@ -38,15 +37,17 @@ export default defineNuxtComponent({
 
         const toast = useToast();
 
-        const handleCreated = async (train: Analysis) => {
-            toast.show({ variant: 'success', body: 'The train was successfully created.' });
+        const handleCreated = (entity: Project) => {
+            toast.show({ variant: 'success', body: 'The project was successfully created.' });
 
-            await navigateTo(`/trains/${train.id}/setup`);
+            navigateTo({
+                path: `/projects/${entity.id}`,
+            });
         };
 
         return {
             handleCreated,
-            items,
+            tabs,
         };
     },
 });
@@ -54,14 +55,14 @@ export default defineNuxtComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            🚊 Train(s) <span class="sub-title">Manage incoming & outgoing trains</span>
+            📜 Project(s) <span class="sub-title">Manage incoming & outgoing projects</span>
         </h1>
 
         <div class="content-wrapper">
             <div class="content-sidebar flex-column">
                 <DomainEntityNav
-                    :items="items"
-                    :path="'/trains'"
+                    :items="tabs"
+                    :path="'/projects'"
                     :direction="'vertical'"
                 />
             </div>

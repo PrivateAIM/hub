@@ -8,46 +8,42 @@
 import type { Project, ProjectNode } from '@privateaim/core';
 import type { BuildInput } from 'rapiq';
 import type { PropType } from 'vue';
-import { ProposalStationApprovalStatus, ProposalStationList } from '@privateaim/client-vue';
+import { FProjectNodeApprovalStatus, FProjectNodes } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 
 export default defineNuxtComponent({
-    components: { ProposalStationApprovalStatus, ProposalStationList },
+    components: { FProjectNodeApprovalStatus, FProjectNodes },
     meta: {
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
     },
     props: {
-        proposal: {
+        entity: {
             type: Object as PropType<Project>,
             required: true,
         },
-        visitorProposalStation: {
-            type: Object as PropType<ProjectNode>,
-            default: null,
-        },
     },
     setup(props) {
-        const proposalStationQuery : BuildInput<ProjectNode> = {
+        const projectNodeQuery : BuildInput<ProjectNode> = {
             filter: {
-                proposal_id: props.proposal.id,
+                project_id: props.entity.id,
             },
             sort: {
-                station: {
+                node: {
                     name: 'ASC',
                 },
             },
         };
 
         return {
-            proposalStationQuery,
+            projectNodeQuery,
         };
     },
 });
 </script>
 <template>
-    <div v-if="proposal">
+    <div v-if="entity">
         <div class="row">
             <div class="col">
                 <h6><i class="fa-solid fa-info" /> Info</h6>
@@ -62,7 +58,7 @@ export default defineNuxtComponent({
                                     <i class="fa fa-train-tram fa-4x" />
                                 </div>
                                 <p class="badge bg-dark">
-                                    {{ proposal.analyses }}
+                                    {{ entity.analyses }}
                                 </p>
                             </div>
                         </div>
@@ -79,39 +75,8 @@ export default defineNuxtComponent({
                                     <i class="fa fa-compact-disc fa-4x" />
                                 </div>
                                 <p class="badge bg-dark">
-                                    {{ proposal.master_image ? proposal.master_image.name : proposal.master_image_id }}
+                                    {{ entity.master_image ? entity.master_image.name : entity.master_image_id }}
                                 </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="card-grey card mt-2">
-                            <div class="card-header">
-                                <h5>Risk</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col">
-                                        <div class="text-center">
-                                            <div class="mb-1">
-                                                <i class="fa fa-exclamation-triangle fa-4x" />
-                                            </div>
-                                            <span class="badge bg-dark">
-                                                {{ proposal.risk }}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div
-                                        v-if="proposal.risk_comment"
-                                        class="col"
-                                    >
-                                        <div>
-                                            <strong>Comment</strong>
-                                            <br>
-                                            {{ proposal.risk_comment }}
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -127,7 +92,7 @@ export default defineNuxtComponent({
                                     <i class="fas fa-university fa-4x" />
                                 </div>
                                 <p class="badge bg-dark">
-                                    {{ proposal.realm_id }}
+                                    {{ entity.realm_id }}
                                 </p>
                             </div>
                         </div>
@@ -142,7 +107,7 @@ export default defineNuxtComponent({
                                     <i class="fa fa-user fa-4x" />
                                 </div>
                                 <p class="badge bg-dark">
-                                    {{ proposal.user_id }}
+                                    {{ entity.user_id }}
                                 </p>
                             </div>
                         </div>
@@ -150,9 +115,9 @@ export default defineNuxtComponent({
                 </div>
             </div>
             <div class="col">
-                <ProposalStationList
+                <FProjectNodes
                     :header-search="false"
-                    :query="proposalStationQuery"
+                    :query="projectNodeQuery"
                 >
                     <template #body="{ data }">
                         <div class="list">
@@ -164,10 +129,10 @@ export default defineNuxtComponent({
                                     class="list-item card mb-2"
                                 >
                                     <div class="card-header">
-                                        <h5>{{ item.station.name }}</h5>
+                                        <h5>{{ item.node.name }}</h5>
                                     </div>
                                     <div class="card-body">
-                                        <strong>Status</strong> <proposal-station-approval-status :status="item.approval_status" />
+                                        <strong>Status</strong> <FProjectNodeApprovalStatus :status="item.approval_status" />
                                         <br>
                                         <strong>Comment</strong><br> {{ item.comment || 'No comment' }}
                                     </div>
@@ -175,7 +140,7 @@ export default defineNuxtComponent({
                             </template>
                         </div>
                     </template>
-                </ProposalStationList>
+                </FProjectNodes>
             </div>
         </div>
     </div>

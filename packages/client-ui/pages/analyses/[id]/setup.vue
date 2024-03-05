@@ -12,7 +12,7 @@ import { navigateTo } from '#imports';
 import { defineNuxtComponent } from '#app';
 
 export default defineNuxtComponent({
-    components: { TrainWizard: FAnalysisWizard },
+    components: { FAnalysisWizard },
     props: {
         entity: {
             type: Object as PropType<Analysis>,
@@ -22,7 +22,7 @@ export default defineNuxtComponent({
     emits: ['updated', 'failed'],
     setup(props, { emit }) {
         const handleFinished = async () => {
-            await navigateTo(`/trains/${props.entity.id}`);
+            await navigateTo(`/analyses/${props.entity.id}`);
         };
 
         const handleUpdated = (entity: Analysis) => {
@@ -42,7 +42,7 @@ export default defineNuxtComponent({
 });
 </script>
 <template>
-    <train-wizard
+    <FAnalysisWizard
         v-if="entity"
         :entity="entity"
         @updated="handleUpdated"

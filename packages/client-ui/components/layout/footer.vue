@@ -7,13 +7,12 @@
 <script lang="ts">
 import { BToaster } from 'bootstrap-vue-next';
 import { defineComponent } from 'vue';
-import { LicenseAgreement } from '../license-agreement';
 
 export default defineComponent({
-    components: { BToaster, LicenseAgreement },
+    components: { BToaster },
     data() {
         return {
-            startYear: 2020,
+            startYear: 2024,
         };
     },
     computed: {
@@ -28,11 +27,9 @@ export default defineComponent({
 <template>
     <div>
         <div class="page-footer">
-            <LicenseAgreement />
-
             <div class="copyright">
                 &copy; {{ year }}
-                <a href="https://pht-medic.github.io/documentation/about/team.html">PHT-meDIC</a>
+                <a href="https://privateaim.de">PrivateAim</a>
             </div>
         </div>
         <BToaster />

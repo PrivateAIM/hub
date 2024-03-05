@@ -9,7 +9,7 @@ import { PermissionID } from '@privateaim/core';
 import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import {
-    FPagination, FSearch, FTitle, ProposalItem, ProposalList,
+    FPagination, FProjectItem, FProjects, FSearch, FTitle,
 } from '@privateaim/client-vue';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
 import { defineNuxtComponent, definePageMeta } from '#imports';
@@ -17,7 +17,7 @@ import { useAuthStore } from '~/store/auth';
 
 export default defineNuxtComponent({
     components: {
-        ListPagination: FPagination, ListSearch: FSearch, ListTitle: FTitle, ProposalList, ProposalItem,
+        ListPagination: FPagination, ListSearch: FSearch, ListTitle: FTitle, FProjects, FProjectItem,
     },
     setup() {
         definePageMeta({
@@ -60,10 +60,10 @@ export default defineNuxtComponent({
 <template>
     <div>
         <div class="alert alert-primary alert-sm">
-            This is a slight overview of all proposals, which are created by you or one of your co workers.
+            This is a slight overview of all projects, which are created by you or one of your co workers.
         </div>
         <div class="m-t-10">
-            <ProposalList
+            <FProjects
                 :query="query"
             >
                 <template #header="props">
@@ -80,13 +80,13 @@ export default defineNuxtComponent({
                     />
                 </template>
                 <template #item="props">
-                    <ProposalItem
+                    <FProjectItem
                         :entity="props.data"
                         @updated="props.updated"
                         @deleted="props.deleted"
                     />
                 </template>
-            </ProposalList>
+            </FProjects>
         </div>
     </div>
 </template>

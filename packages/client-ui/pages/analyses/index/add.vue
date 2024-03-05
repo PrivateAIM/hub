@@ -14,25 +14,25 @@ import { useRoute } from '#imports';
 import { useAuthStore } from '../../../store/auth';
 
 export default defineNuxtComponent({
-    components: { TrainBasicForm: FAnalysisBasicForm },
+    components: { FAnalysisBasicForm },
     emits: ['created'],
     setup(_props, { emit }) {
-        const proposalId = ref<string | null>(null);
+        const projectId = ref<string | null>(null);
 
         const store = useAuthStore();
         const { realmId } = storeToRefs(store);
 
         const route = useRoute();
-        if (typeof route.query.proposal_id === 'string') {
-            proposalId.value = route.query.proposal_id;
+        if (typeof route.query.project_id === 'string') {
+            projectId.value = route.query.project_id;
         }
 
-        const handleCreated = async (train: Analysis) => {
-            emit('created', train);
+        const handleCreated = async (entity: Analysis) => {
+            emit('created', entity);
         };
 
         return {
-            proposalId,
+            projectId,
             realmId,
             handleCreated,
         };
@@ -40,8 +40,8 @@ export default defineNuxtComponent({
 });
 </script>
 <template>
-    <TrainBasicForm
-        :project-id="proposalId"
+    <FAnalysisBasicForm
+        :project-id="projectId"
         :realm-id="realmId"
         @created="handleCreated"
     />

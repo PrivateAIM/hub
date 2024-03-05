@@ -10,14 +10,14 @@ import {
     PermissionID,
 } from '@privateaim/core';
 
-import { ProposalForm } from '@privateaim/client-vue';
+import { FProjectForm } from '@privateaim/client-vue';
 import { definePageMeta } from '#imports';
 import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
 
 export default defineNuxtComponent({
     components: {
-        ProposalForm,
+        FProjectForm,
     },
     emits: ['created'],
     setup(props, { emit }) {
@@ -39,5 +39,5 @@ export default defineNuxtComponent({
 });
 </script>
 <template>
-    <ProposalForm @created="handleCreated" />
+    <FProjectForm @created="handleCreated" />
 </template>

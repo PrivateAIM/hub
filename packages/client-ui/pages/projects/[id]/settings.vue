@@ -8,7 +8,7 @@
 import type { Project } from '@privateaim/core';
 import { PermissionID } from '@privateaim/core';
 import type { PropType } from 'vue';
-import { ProposalForm } from '@privateaim/client-vue';
+import { FProjectForm } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 
@@ -21,7 +21,7 @@ export default defineNuxtComponent({
             PermissionID.PROJECT_DROP,
         ],
     },
-    components: { ProposalForm },
+    components: { FProjectForm },
     props: {
         proposal: {
             type: Object as PropType<Project>,
@@ -41,7 +41,7 @@ export default defineNuxtComponent({
 });
 </script>
 <template>
-    <ProposalForm
+    <FProjectForm
         :entity="proposal"
         @updated="handleUpdated"
     />

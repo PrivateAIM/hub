@@ -32,13 +32,13 @@ export default defineNuxtComponent({
         ListPagination: FPagination,
         ListSearch: FSearch,
         ListTitle: FTitle,
-        TrainName: FAnalysisName,
+        FAnalysisName,
         BDropdown,
         BTable,
-        TrainStationRunStatus: FAnalysisNodeRunStatus,
-        TrainStationApprovalCommand: FAnalysisNodeApprovalCommand,
-        TrainStationApprovalStatus: FAnalysisNodeApprovalStatus,
-        TrainStationList: FAnalysisNodes,
+        FAnalysisNodeRunStatus,
+        FAnalysisNodeApprovalCommand,
+        FAnalysisNodeApprovalStatus,
+        FAnalysisNodes,
         VCTimeago,
     },
     setup() {
@@ -52,7 +52,7 @@ export default defineNuxtComponent({
 
         const fields = [
             {
-                key: 'train_id', label: 'ID', thClass: 'text-left', tdClass: 'text-left',
+                key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left',
             },
             {
                 key: 'realm', label: 'Realm', thClass: 'text-left', tdClass: 'text-left',
@@ -79,8 +79,8 @@ export default defineNuxtComponent({
 
         const query : BuildInput<AnalysisNode> = {
             include: {
-                station: true,
-                train: true,
+                node: true,
+                analysis: true,
             },
             sort: {
                 updated_at: 'DESC',
@@ -90,7 +90,7 @@ export default defineNuxtComponent({
         const download = (item: AnalysisNode) => {
             const app = useRuntimeConfig();
 
-            window.open(new URL(useCoreAPI().analysis.getFilesDownloadPath(item.analysis_id), app.public.apiUrl).href, '_blank');
+            window.open(new URL(useCoreAPI().analysis.getFilesDownloadPath(item.analysis_id), app.public.coreApiUrl).href, '_blank');
         };
 
         const listNode = ref<null | typeof FAnalysisNodes>(null);
@@ -116,13 +116,13 @@ export default defineNuxtComponent({
 <template>
     <div>
         <div class="alert alert-primary alert-sm">
-            This is an overview of all incoming trains from other stations, that want to run an algorithm on your infrastructure.
+            This is an overview of all incoming analyses from other realms, that want to run an algorithm on your infrastructure.
         </div>
 
         <div class="m-t-10">
-            <TrainStationList
+            <FAnalysisNodes
                 :ref="listNode"
-                :target="'train'"
+                :target="'analysis'"
                 :realm-id="realmId"
                 :direction="'in'"
                 :query="query"
@@ -148,39 +148,39 @@ export default defineNuxtComponent({
                         head-variant="'dark'"
                         outlined
                     >
-                        <template #cell(train_id)="data">
-                            <template v-if="data.item.train_id">
-                                <TrainName
-                                    :entity-id="data.item.train.id"
-                                    :entity-name="data.item.train.name"
+                        <template #cell(id)="data">
+                            <template v-if="data.item.analysis">
+                                <FAnalysisName
+                                    :entity-id="data.item.analysis.id"
+                                    :entity-name="data.item.analysis.name"
                                 />
                             </template>
                             <template v-else>
-                                {{ data.item.train_id }}
+                                {{ data.item.analysis_id }}
                             </template>
                         </template>
                         <template #cell(realm)="data">
                             <span class="bg-dark badge">{{ data.item.train_realm_id }}</span>
                         </template>
                         <template #cell(approval_status)="data">
-                            <train-station-approval-status :status="data.item.approval_status">
+                            <FAnalysisNodeApprovalStatus :status="data.item.approval_status">
                                 <template #default="statusProps">
                                     <span
                                         class="badge"
                                         :class="'bg-'+statusProps.classSuffix"
                                     >{{ statusProps.statusText }}</span>
                                 </template>
-                            </train-station-approval-status>
+                            </FAnalysisNodeApprovalStatus>
                         </template>
                         <template #cell(run_status)="data">
-                            <train-station-run-status :status="data.item.run_status">
+                            <FAnalysisNodeRunStatus :status="data.item.run_status">
                                 <template #default="statusProps">
                                     <span
                                         class="badge"
                                         :class="'bg-'+statusProps.classSuffix"
                                     >{{ statusProps.statusText }}</span>
                                 </template>
-                            </train-station-run-status>
+                            </FAnalysisNodeRunStatus>
                         </template>
                         <template #cell(created_at)="data">
                             <VCTimeago :datetime="data.item.created_at" />
@@ -205,7 +205,7 @@ export default defineNuxtComponent({
                                     <template #button-content>
                                         <i class="fa fa-bars" />
                                     </template>
-                                    <train-station-approval-command
+                                    <FAnalysisNodeApprovalCommand
                                         :entity-id="data.item.id"
                                         :approval-status="data.item.approval_status"
                                         :with-icon="true"
@@ -213,7 +213,7 @@ export default defineNuxtComponent({
                                         :command="'approve'"
                                         @updated="props.updated"
                                     />
-                                    <train-station-approval-command
+                                    <FAnalysisNodeApprovalCommand
                                         :entity-id="data.item.id"
                                         :approval-status="data.item.approval_status"
                                         :with-icon="true"
@@ -233,7 +233,7 @@ export default defineNuxtComponent({
                         </template>
                     </BTable>
                 </template>
-            </TrainStationList>
+            </FAnalysisNodes>
         </div>
     </div>
 </template>

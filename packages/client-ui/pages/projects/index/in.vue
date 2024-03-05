@@ -20,10 +20,10 @@ import {
     FPagination,
     FSearch,
     FTitle,
-    ProposalInForm,
-    ProposalStationApprovalCommand,
-    ProposalStationApprovalStatus,
-    ProposalStationList,
+    FProjectInForm,
+    FProjectNodeApprovalCommand,
+    FProjectNodeApprovalStatus,
+    FProjectNodes,
 } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
 import { definePageMeta } from '#imports';
@@ -42,10 +42,10 @@ export default defineNuxtComponent({
         BDropdownItem,
         BSpinner,
         BTable,
-        ProposalStationList,
-        ProposalStationApprovalCommand,
-        ProposalStationApprovalStatus,
-        ProposalInForm,
+        FProjectNodes: FProjectNodes,
+        FProjectNodeApprovalCommand: FProjectNodeApprovalCommand,
+        FProjectNodeApprovalStatus: FProjectNodeApprovalStatus,
+        FProjectInForm: FProjectInForm,
         VCTimeago,
     },
     async setup() {
@@ -59,10 +59,10 @@ export default defineNuxtComponent({
 
         const fields = [
             {
-                key: 'proposal_id', label: 'Id', thClass: 'text-center', tdClass: 'text-center',
+                key: 'project_id', label: 'Id', thClass: 'text-center', tdClass: 'text-center',
             },
             {
-                key: 'proposal_title', label: 'Title', thClass: 'text-left', tdClass: 'text-left',
+                key: 'project_name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
             },
             {
                 key: 'realm', label: 'Realm', thClass: 'text-left', tdClass: 'text-left',
@@ -84,7 +84,7 @@ export default defineNuxtComponent({
 
         const canManage = computed(() => store.has(PermissionID.PROPOSAL_APPROVE));
 
-        const stationId : Ref<string | null> = ref(null);
+        const nodeId : Ref<string | null> = ref(null);
 
         try {
             const response = await useCoreAPI().node.getMany({
@@ -95,7 +95,7 @@ export default defineNuxtComponent({
 
             const station = response.data.pop();
             if (station) {
-                stationId.value = station.id;
+                nodeId.value = station.id;
             }
         } catch (e) {
             // do nothing :)
@@ -111,7 +111,7 @@ export default defineNuxtComponent({
             modalNode.value = true;
         };
 
-        const listNode = ref<null | typeof ProposalStationList>(null);
+        const listNode = ref<null | typeof FProjectNodes>(null);
 
         const handleUpdated = (item: ProjectNode) => {
             if (listNode.value) {
@@ -127,7 +127,7 @@ export default defineNuxtComponent({
 
         return {
             realmId,
-            stationId,
+            stationId: nodeId,
             entity,
             handleFailed,
             handleUpdated,
@@ -143,11 +143,11 @@ export default defineNuxtComponent({
 <template>
     <div>
         <div class="alert alert-primary alert-sm">
-            This is a slight overview of all incoming proposals from other stations. If you approve a proposal,
-            your station can be used by inherited trains.
+            This is a slight overview of all incoming projects from other realms. If you approve a project,
+            your nodes can be used by inherited analyses.
         </div>
         <div class="m-t-10">
-            <proposal-station-list
+            <FProjectNodes
                 ref="listNode"
                 :direction="'in'"
                 :target="'proposal'"
@@ -180,7 +180,7 @@ export default defineNuxtComponent({
                         </template>
 
                         <template #cell(approval_status)="data">
-                            <proposal-station-approval-status
+                            <FProjectNodeApprovalStatus
                                 :status="data.item.approval_status"
                             >
                                 <template #default="slotProps">
@@ -191,19 +191,19 @@ export default defineNuxtComponent({
                                         {{ slotProps.statusText }}
                                     </span>
                                 </template>
-                            </proposal-station-approval-status>
+                            </FProjectNodeApprovalStatus>
                         </template>
 
-                        <template #cell(proposal_id)="data">
-                            {{ data.item.proposal.id }}
+                        <template #cell(project_id)="data">
+                            {{ data.item.project.id }}
                         </template>
-                        <template #cell(proposal_title)="data">
-                            {{ data.item.proposal.title }}
+                        <template #cell(project_name)="data">
+                            {{ data.item.project.name }}
                         </template>
                         <template #cell(options)="data">
                             <NuxtLink
                                 class="btn btn-primary btn-xs me-1"
-                                :to="'/proposals/'+data.item.proposal_id+'?refPath=/proposals/in'"
+                                :to="'/projects/'+data.item.project_id+'?refPath=/projects/in'"
                             >
                                 <i class="fa fa-arrow-right" />
                             </NuxtLink>
@@ -219,7 +219,7 @@ export default defineNuxtComponent({
                                         <i class="fa fa-comment-alt ps-1 pe-1" /> comment
                                     </b-dropdown-item>
                                     <b-dropdown-divider />
-                                    <proposal-station-approval-command
+                                    <FProjectNodeApprovalCommand
                                         :entity-id="data.item.id"
                                         :approval-status="data.item.approval_status"
                                         :with-icon="true"
@@ -227,7 +227,7 @@ export default defineNuxtComponent({
                                         :command="'approve'"
                                         @updated="props.updated"
                                     />
-                                    <proposal-station-approval-command
+                                    <FProjectNodeApprovalCommand
                                         :entity-id="data.item.id"
                                         :approval-status="data.item.approval_status"
                                         :with-icon="true"
@@ -252,7 +252,7 @@ export default defineNuxtComponent({
                         </template>
                     </BTable>
                 </template>
-            </proposal-station-list>
+            </FProjectNodes>
         </div>
 
         <BModal
@@ -264,10 +264,10 @@ export default defineNuxtComponent({
             :hide-footer="true"
         >
             <template #title>
-                <i class="fas fa-file-import" /> Proposal {{ entity ? entity.proposal.title : '' }}
+                <i class="fas fa-file-import" /> Project {{ entity ? entity.project.name : '' }}
             </template>
             <template v-if="entity">
-                <ProposalInForm
+                <FProjectInForm
                     :entity="entity"
                     @updated="handleUpdated"
                     @failed="handleFailed"

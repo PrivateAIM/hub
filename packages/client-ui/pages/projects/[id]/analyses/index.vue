@@ -5,24 +5,29 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Analysis } from '@privateaim/core';
+import type { Analysis, Project, ProjectNode } from '@privateaim/core';
 import { PermissionID } from '@privateaim/core';
-import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
 import { computed } from 'vue';
-import {
-    FPagination, FSearch, FTitle, FAnalyses,
-} from '@privateaim/client-vue';
+import type { PropType } from 'vue';
+import { FAnalyses } from '@privateaim/client-vue';
 import { definePageMeta } from '#imports';
 import { defineNuxtComponent } from '#app';
-import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
-import { useAuthStore } from '../../../store/auth';
+import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
 
 export default defineNuxtComponent({
-    components: {
-        ListPagination: FPagination, ListSearch: FSearch, ListTitle: FTitle, TrainList: FAnalyses,
+    components: { FAnalyses },
+    props: {
+        entity: {
+            type: Object as PropType<Project>,
+            required: true,
+        },
+        visitorProjectNode: {
+            type: Object as PropType<ProjectNode>,
+            default: undefined,
+        },
     },
-    setup() {
+    setup(props) {
         definePageMeta({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
@@ -38,12 +43,9 @@ export default defineNuxtComponent({
             ],
         });
 
-        const store = useAuthStore();
-        const { realmId } = storeToRefs(store);
-
         const query = computed<BuildInput<Analysis>>(() => ({
             filter: {
-                realm_id: realmId.value,
+                project_id: props.entity.id,
             },
         }));
 
@@ -55,26 +57,15 @@ export default defineNuxtComponent({
 </script>
 <template>
     <div>
-        <div class="alert alert-primary alert-sm">
-            This is an overview of all created trains, either by you or a person of your station.
-        </div>
-
         <div class="m-t-10">
-            <TrainList :query="query">
-                <template #header="props">
-                    <ListTitle />
-                    <ListSearch
-                        :load="props.load"
-                        :meta="props.meta"
-                    />
-                </template>
-                <template #footer="props">
-                    <ListPagination
-                        :load="props.load"
-                        :meta="props.meta"
-                    />
-                </template>
-            </TrainList>
+            <template v-if="visitorProjectNode">
+                <div class="alert alert-sm alert-warning">
+                    You are not permitted to view the analyses list.
+                </div>
+            </template>
+            <template v-else>
+                <FAnalyses :query="query" />
+            </template>
         </div>
     </div>
 </template>

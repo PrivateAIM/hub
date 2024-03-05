@@ -37,7 +37,7 @@ import StationList from '../node/FNodes';
 import FProjectNodeAssignAction from '../project-node/FProjectNodeAssignAction';
 import { FSearch } from '../utility';
 
-export default defineComponent({
+const FProjectForm = defineComponent({
     props: {
         entity: {
             type: Object as PropType<Project>,
@@ -218,3 +218,7 @@ export default defineComponent({
         };
     },
 });
+
+export {
+    FProjectForm,
+};
