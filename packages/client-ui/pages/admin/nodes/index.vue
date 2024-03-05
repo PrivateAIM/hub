@@ -40,13 +40,13 @@ export default defineNuxtComponent({
         const toast = useToast();
 
         const handleCreated = async (e: Node) => {
-            toast.show({ variant: 'success', body: 'The station was successfully created.' });
+            toast.show({ variant: 'success', body: 'The node was successfully created.' });
 
-            await navigateTo(`/admin/stations/${e.id}`);
+            await navigateTo(`/admin/nodes/${e.id}`);
         };
 
         const handleDeleted = () => {
-            toast.show({ variant: 'success', body: 'The station was successfully deleted.' });
+            toast.show({ variant: 'success', body: 'The node was successfully deleted.' });
         };
 
         const handleFailed = (e: Error) => {
@@ -65,14 +65,14 @@ export default defineNuxtComponent({
 <template>
     <div class="container">
         <h1 class="title no-border mb-3">
-            Station <span class="sub-title">Management</span>
+            Node <span class="sub-title">Management</span>
         </h1>
         <div class="content-wrapper">
             <div class="content-sidebar flex-column">
                 <DomainEntityNav
                     :direction="'vertical'"
                     :items="tabs"
-                    :path="'/admin/stations'"
+                    :path="'/admin/nodes'"
                 />
             </div>
             <div class="content-container">

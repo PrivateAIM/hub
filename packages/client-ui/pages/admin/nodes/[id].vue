@@ -36,7 +36,7 @@ export default defineNuxtComponent({
             },
             onUpdated() {
                 if (toast) {
-                    toast.show({ variant: 'success', body: 'The station was successfully updated.' });
+                    toast.show({ variant: 'success', body: 'The node was successfully updated.' });
                 }
             },
         });
@@ -46,7 +46,6 @@ export default defineNuxtComponent({
                 fields: [
                     '+registry_id',
                     '+registry_project_id',
-                    '+public_key',
                     '+email',
                     '+external_name',
                 ],
@@ -54,7 +53,7 @@ export default defineNuxtComponent({
         });
 
         if (!manager.data.value) {
-            await navigateTo({ path: '/admin/stations' });
+            await navigateTo({ path: '/admin/nodes' });
             throw createError({});
         }
 
@@ -83,7 +82,7 @@ export default defineNuxtComponent({
             <div class="flex-wrap flex-row d-flex">
                 <DomainEntityNav
                     :items="tabs"
-                    :path="'/admin/stations/' + entity.id"
+                    :path="'/admin/nodes/' + entity.id"
                     :prev-link="true"
                 />
             </div>

@@ -8,21 +8,21 @@
 import type { Node } from '@privateaim/core';
 import { PermissionID } from '@privateaim/core';
 import { storeToRefs } from 'pinia';
-import { StationForm } from '@privateaim/client-vue';
+import { FNodeForm } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
 import { definePageMeta } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
 import { useAuthStore } from '../../../../store/auth';
 
 export default defineNuxtComponent({
-    components: { StationForm },
+    components: { FNodeForm: FNodeForm },
     emits: ['created', 'failed'],
     setup(props, { emit }) {
         definePageMeta({
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.REQUIRED_PERMISSIONS]: [
-                PermissionID.USER_ADD,
+                PermissionID.NODE_ADD,
             ],
         });
 
@@ -47,7 +47,7 @@ export default defineNuxtComponent({
 });
 </script>
 <template>
-    <StationForm
+    <FNodeForm
         :realm-id="realmManagementId"
         :realm-name="realmManagementName"
         @created="handleCreated"

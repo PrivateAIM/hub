@@ -7,11 +7,11 @@
 <script lang="ts">
 import type { Node } from '@privateaim/core';
 import type { PropType } from 'vue';
-import { StationForm } from '@privateaim/client-vue';
+import { FNodeRegistryProjectEntity } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
 
 export default defineNuxtComponent({
-    components: { StationForm },
+    components: { FNodeRegistryProjectEntity },
     props: {
         entity: {
             type: Object as PropType<Node>,
@@ -19,18 +19,24 @@ export default defineNuxtComponent({
         },
     },
     emits: ['failed', 'updated'],
-    methods: {
-        handleUpdated(e: Node) {
-            this.$emit('updated', e);
-        },
-        handleFailed(e: Error) {
-            this.$emit('failed', e);
-        },
+    setup(props, { emit }) {
+        const handleUpdated = (e: Node) => {
+            emit('updated', e);
+        };
+
+        const handleFailed = (e: Error) => {
+            emit('failed', e);
+        };
+
+        return {
+            handleUpdated,
+            handleFailed,
+        };
     },
 });
 </script>
 <template>
-    <StationForm
+    <FNodeRegistryProjectEntity
         v-if="entity"
         :entity="entity"
         :realm-id="entity.realm_id"

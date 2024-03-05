@@ -13,7 +13,7 @@ import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
 import { computed } from 'vue';
 import {
-    EntityDelete, FPagination, FSearch, FTitle, StationList,
+    EntityDelete, FPagination, FSearch, FTitle, FNodes,
 } from '@privateaim/client-vue';
 import { definePageMeta } from '#imports';
 import { defineNuxtComponent } from '#app';
@@ -27,7 +27,7 @@ export default defineNuxtComponent({
         ListTitle: FTitle,
         EntityDelete,
         BTable,
-        StationList,
+        FNodes: FNodes,
         VCTimeago,
     },
     emits: ['deleted'],
@@ -85,7 +85,7 @@ export default defineNuxtComponent({
 });
 </script>
 <template>
-    <StationList
+    <FNodes
         :query="query"
         :load-on-init="true"
         @deleted="handleDeleted"
@@ -136,5 +136,5 @@ export default defineNuxtComponent({
                 </template>
             </BTable>
         </template>
-    </StationList>
+    </FNodes>
 </template>
