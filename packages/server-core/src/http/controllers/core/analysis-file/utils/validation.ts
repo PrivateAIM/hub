@@ -28,6 +28,20 @@ export async function runAnalysisFileValidation(
             .run(req);
     }
 
+    // ----------------------------------------------
+
+    const nameChain = check('name')
+        .exists()
+        .isString();
+
+    if (operation === 'update') {
+        nameChain.optional();
+    }
+
+    await nameChain.run(req);
+
+    // ----------------------------------------------
+
     const bucketFileChain = check('bucket_file_id')
         .exists()
         .isUUID();
@@ -38,10 +52,13 @@ export async function runAnalysisFileValidation(
 
     await bucketFileChain.run(req);
 
+    // ----------------------------------------------
+
     await check('target_realm_id')
         .exists()
         .isUUID()
-        .optional({ nullable: true });
+        .optional({ nullable: true })
+        .run(req);
 
     await check('type')
         .exists()
@@ -51,7 +68,7 @@ export async function runAnalysisFileValidation(
     await check('root')
         .exists()
         .isBoolean()
-        .optional()
+        .default(false)
         .run(req);
 
     const result = createHTTPValidationResult<AnalysisFileEntity>(req);
