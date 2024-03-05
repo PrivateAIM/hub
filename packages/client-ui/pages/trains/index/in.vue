@@ -23,7 +23,7 @@ import {
     FTitle,
 } from '@privateaim/client-vue';
 import { defineNuxtComponent, useRuntimeConfig } from '#app';
-import { definePageMeta, useAPI } from '#imports';
+import { definePageMeta, useCoreAPI } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 import { useAuthStore } from '../../../store/auth';
 
@@ -90,7 +90,7 @@ export default defineNuxtComponent({
         const download = (item: AnalysisNode) => {
             const app = useRuntimeConfig();
 
-            window.open(new URL(useAPI().analysis.getFilesDownloadPath(item.analysis_id), app.public.apiUrl).href, '_blank');
+            window.open(new URL(useCoreAPI().analysis.getFilesDownloadPath(item.analysis_id), app.public.apiUrl).href, '_blank');
         };
 
         const listNode = ref<null | typeof FAnalysisNodes>(null);

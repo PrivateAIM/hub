@@ -9,7 +9,7 @@ import { VCCountdown } from '@vuecs/countdown';
 import { VCNavItems } from '@vuecs/navigation';
 import { storeToRefs } from 'pinia';
 import { defineNuxtComponent } from '#app';
-import { computed, useAPI } from '#imports';
+import { computed, useCoreAPI } from '#imports';
 import { useAuthStore } from '../../store/auth';
 
 export default defineNuxtComponent({
@@ -27,13 +27,13 @@ export default defineNuxtComponent({
         });
 
         const docsURL = computed(() => {
-            const api = useAPI();
+            const api = useCoreAPI();
 
             return new URL('docs/', api.getBaseURL()).href;
         });
 
         const metricsURL = computed(() => {
-            const api = useAPI();
+            const api = useCoreAPI();
 
             return new URL('metrics', api.getBaseURL()).href;
         });

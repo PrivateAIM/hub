@@ -20,7 +20,7 @@ import {
 } from 'vue';
 import {
     definePageMeta,
-    useAPI, useToast,
+    useCoreAPI, useToast,
 } from '#imports';
 import {
     createError, defineNuxtComponent, navigateTo, useRoute,
@@ -71,7 +71,7 @@ export default defineNuxtComponent({
         const proposalStation : Ref<ProjectNode | null> = ref(null);
 
         if (manager.data.value.realm_id !== store.realmId) {
-            const response = await useAPI().projectNode.getMany({
+            const response = await useCoreAPI().projectNode.getMany({
                 filter: {
                     proposal_id: manager.data.value.id,
                     station_realm_id: store.realmId,

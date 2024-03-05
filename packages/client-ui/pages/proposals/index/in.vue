@@ -27,7 +27,7 @@ import {
 } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
 import { definePageMeta } from '#imports';
-import { useAPI } from '../../../composables/api';
+import { useCoreAPI } from '../../../composables/api';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 import { useAuthStore } from '../../../store/auth';
 
@@ -87,7 +87,7 @@ export default defineNuxtComponent({
         const stationId : Ref<string | null> = ref(null);
 
         try {
-            const response = await useAPI().node.getMany({
+            const response = await useCoreAPI().node.getMany({
                 filter: {
                     realm_id: realmId.value,
                 },
