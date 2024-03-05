@@ -23,8 +23,7 @@
     "scripts": {
         "build:types": "vue-tsc --declaration --emitDeclarationOnly -p tsconfig.build.json",
         "build:js": "cross-env NODE_ENV=production rollup -c",
-        "build": "echo 1",
-        "build-alt": "rimraf ./dist && npm run build:js && npm run build:types",
+        "build": "rimraf ./dist && npm run build:js && npm run build:types",
         "build:watch": "npm run build -- --watch"
     },
     "keywords": [],

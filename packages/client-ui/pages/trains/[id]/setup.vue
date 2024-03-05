@@ -7,12 +7,12 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import type { Analysis } from '@privateaim/core';
-import { TrainWizard } from '@privateaim/client-vue';
+import { FAnalysisWizard } from '@privateaim/client-vue';
 import { navigateTo } from '#imports';
 import { defineNuxtComponent } from '#app';
 
 export default defineNuxtComponent({
-    components: { TrainWizard },
+    components: { TrainWizard: FAnalysisWizard },
     props: {
         entity: {
             type: Object as PropType<Analysis>,

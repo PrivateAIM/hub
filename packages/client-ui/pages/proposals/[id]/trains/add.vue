@@ -7,11 +7,11 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import type { Project } from '@privateaim/core';
-import { TrainBasicForm } from '@privateaim/client-vue';
+import { FAnalysisBasicForm } from '@privateaim/client-vue';
 import { defineNuxtComponent, navigateTo } from '#app';
 
 export default defineNuxtComponent({
-    components: { TrainBasicForm },
+    components: { TrainBasicForm: FAnalysisBasicForm },
     props: {
         proposal: {
             type: Object as PropType<Project>,
@@ -31,7 +31,7 @@ export default defineNuxtComponent({
 </script>
 <template>
     <TrainBasicForm
-        :proposal-id="proposal.id"
+        :project-id="proposal.id"
         @created="handleCreated"
     />
 </template>

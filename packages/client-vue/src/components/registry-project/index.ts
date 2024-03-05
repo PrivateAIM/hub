@@ -5,6 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export { default as RegistryProjectDetails } from './RegistryProjectEntity';
-export { default as RegistryProjectForm } from './RegistryProjectForm';
-export { default as RegistryProjectList } from './RegistryProjectList';
+export { default as RegistryProjectDetails } from './FRegistryProject';
+export { default as RegistryProjectForm } from './FRegistryProjectForm';
+export { default as RegistryProjectList } from './FRegistryProjects';
