@@ -15,7 +15,7 @@
         "build": "tsc -p tsconfig.build.json"
     },
     "dependencies": {
-        "@authup/core": "^1.0.0-beta.5",
+        "@authup/core": "^1.0.0-beta.7",
         "@ebec/http": "^2.3.0",
         "@privateaim/core": "^0.2.0",
         "@socket.io/redis-emitter": "^5.1.0"

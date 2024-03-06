@@ -43,7 +43,7 @@
     "homepage": "https://github.com/PrivateAim/hub#readme",
     "devDependencies": {
         "@authup/client-vue": "^1.0.0-beta.5",
-        "@authup/core": "^1.0.0-beta.5",
+        "@authup/core": "^1.0.0-beta.7",
         "@privateaim/core": "^0.2.0",
         "@privateaim/storage-kit": "^0.2.0",
         "@types/node": "^20.11.24",
@@ -68,7 +68,7 @@
     },
     "peerDependencies": {
         "@authup/client-vue": "^1.0.0-beta.5",
-        "@authup/core": "^1.0.0-beta.5",
+        "@authup/core": "^1.0.0-beta.7",
         "@privateaim/core": "^0.2.0",
         "@privateaim/storage-kit": "^0.2.0",
         "@vuecs/form-controls": "^1.2.0",
