@@ -5,5 +5,5 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export { default as TrainLog } from './FAnalysisLog';
-export { default as TrainLogs } from './FAnalsisLogs';
+export { default as FAnalysisLog } from './FAnalysisLog';
+export { default as FAnalysisLogs } from './FAnalsisLogs';

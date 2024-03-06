@@ -18,7 +18,7 @@ import DomainEntityNav from '../../components/DomainEntityNav';
 import { LayoutKey, LayoutNavigationID } from '../../config/layout';
 
 export default defineNuxtComponent({
-    components: { DomainEntityNav, TrainName: FAnalysisName },
+    components: { DomainEntityNav, FAnalysisName },
     async setup() {
         definePageMeta({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
@@ -68,10 +68,10 @@ export default defineNuxtComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            🚊 Train
+            <i class="fa fa-bar-chart"></i> Analysis
             <span class="sub-title">
                 <template v-if="entity">
-                    <TrainName
+                    <FAnalysisName
                         :entity-id="entity.id"
                         :entity-name="entity.name"
                     />

@@ -115,7 +115,7 @@ export default defineNuxtComponent({
                     <nuxt-link
                         v-if="canView"
                         class="btn btn-xs btn-outline-primary"
-                        :to="'/admin/stations/'+data.item.id"
+                        :to="'/admin/nodes/'+data.item.id"
                     >
                         <i class="fa fa-bars" />
                     </nuxt-link>
@@ -123,7 +123,7 @@ export default defineNuxtComponent({
                         v-if="canDrop"
                         class="btn btn-xs btn-outline-danger ms-1"
                         :entity-id="data.item.id"
-                        :entity-type="'station'"
+                        :entity-type="'node'"
                         :with-text="false"
                         @deleted="props.deleted"
                     />

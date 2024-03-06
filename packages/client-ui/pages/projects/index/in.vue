@@ -93,9 +93,9 @@ export default defineNuxtComponent({
                 },
             });
 
-            const station = response.data.pop();
-            if (station) {
-                nodeId.value = station.id;
+            const node = response.data.pop();
+            if (node) {
+                nodeId.value = node.id;
             }
         } catch (e) {
             // do nothing :)
@@ -127,7 +127,7 @@ export default defineNuxtComponent({
 
         return {
             realmId,
-            stationId: nodeId,
+            nodeId,
             entity,
             handleFailed,
             handleUpdated,
@@ -150,9 +150,9 @@ export default defineNuxtComponent({
             <FProjectNodes
                 ref="listNode"
                 :direction="'in'"
-                :target="'proposal'"
+                :target="'project'"
                 :realm-id="realmId"
-                :source-id="stationId"
+                :source-id="nodeId"
             >
                 <template #header="props">
                     <ListTitle />
@@ -176,7 +176,7 @@ export default defineNuxtComponent({
                         outlined
                     >
                         <template #cell(realm)="data">
-                            <span class="bg-dark badge">{{ data.item.proposal_realm_id }}</span>
+                            <span class="bg-dark badge">{{ data.item.project_realm_id }}</span>
                         </template>
 
                         <template #cell(approval_status)="data">

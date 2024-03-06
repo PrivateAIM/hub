@@ -56,14 +56,14 @@ export default defineNuxtComponent({
                 }
             },
             onDeleted() {
-                return navigateTo('/proposals');
+                return navigateTo('/projects');
             },
         });
 
         await manager.resolve();
 
         if (!manager.data.value) {
-            await navigateTo({ path: '/proposals' });
+            await navigateTo({ path: '/projects' });
             throw createError({});
         }
 
@@ -87,9 +87,9 @@ export default defineNuxtComponent({
         }
 
         // todo: maybe ref of store.realmId
-        const isProposalOwner = computed(() => manager.data.value && store.realmId === manager.data.value.realm_id);
+        const isProjectOwner = computed(() => manager.data.value && store.realmId === manager.data.value.realm_id);
 
-        const isStationAuthority = computed(() => !!projectNode.value);
+        const isNodeAuthority = computed(() => !!projectNode.value);
 
         const route = useRoute();
         const backLink = computed(() => {
@@ -106,12 +106,12 @@ export default defineNuxtComponent({
 
             ];
 
-            if (isProposalOwner.value || isStationAuthority.value) {
-                items.push({ name: 'Analyses', icon: 'fas fa-train', urlSuffix: '/analyses' });
+            if (isProjectOwner.value || isNodeAuthority.value) {
+                items.push({ name: 'Analyses', icon: 'fa fa-bar-chart', urlSuffix: '/analyses' });
             }
 
             if (
-                isProposalOwner.value &&
+                isProjectOwner.value &&
                 store.has(PermissionID.PROJECT_EDIT)
             ) {
                 items.push({ name: 'Settings', icon: 'fa fa-cog', urlSuffix: '/settings' });
@@ -130,7 +130,7 @@ export default defineNuxtComponent({
 
         return {
             entity: manager.data.value,
-            proposalStation: projectNode.value,
+            projectNode: projectNode.value,
             backLink,
             tabs,
             handleDeleted,
@@ -142,7 +142,7 @@ export default defineNuxtComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            📜 {{ entity.name }}
+            <i class="fas fa-tasks" /> {{ entity.name }}
         </h1>
 
         <div class="m-b-20 m-t-10">
@@ -161,7 +161,7 @@ export default defineNuxtComponent({
 
         <NuxtPage
             :entity="entity"
-            :visitor-project-node="proposalStation"
+            :visitor-project-node="projectNode"
             @deleted="handleDeleted"
             @updated="handleUpdated"
         />

@@ -51,11 +51,11 @@ export default defineNuxtComponent({
                     <div class="col">
                         <div class="card-grey card mt-2">
                             <div class="card-header">
-                                <h5>Trains</h5>
+                                <h5>Analyses</h5>
                             </div>
                             <div class="card-body text-center">
                                 <div class="mb-1">
-                                    <i class="fa fa-train-tram fa-4x" />
+                                    <i class="fa fa-bar-chart fa-4x" />
                                 </div>
                                 <p class="badge bg-dark">
                                     {{ entity.analyses }}
@@ -146,10 +146,6 @@ export default defineNuxtComponent({
     </div>
 </template>
 <style>
-.proposal-stats > div {
-    min-width: 120px;
-}
-
 .widget-content {
     padding: 1rem;
     -webkit-box-orient: horizontal;

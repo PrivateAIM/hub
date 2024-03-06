@@ -23,7 +23,7 @@ export default defineNuxtComponent({
     },
     components: { FProjectForm },
     props: {
-        proposal: {
+        entity: {
             type: Object as PropType<Project>,
             required: true,
         },
@@ -42,7 +42,7 @@ export default defineNuxtComponent({
 </script>
 <template>
     <FProjectForm
-        :entity="proposal"
+        :entity="entity"
         @updated="handleUpdated"
     />
 </template>

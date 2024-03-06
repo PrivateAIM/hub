@@ -7,11 +7,11 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import type { Analysis } from '@privateaim/core';
-import { FAnalysisNodeProgress, FAnalysisPipeline, TrainLogs } from '@privateaim/client-vue';
+import { FAnalysisNodeProgress, FAnalysisPipeline, FAnalysisLogs } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
 
 export default defineNuxtComponent({
-    components: { TrainLogs, TrainPipeline: FAnalysisPipeline, TrainStationsProgress: FAnalysisNodeProgress },
+    components: { FAnalysisLogs, FAnalysisPipeline, FAnalysisNodeProgress },
     props: {
         entity: {
             type: Object as PropType<Analysis>,
@@ -20,8 +20,8 @@ export default defineNuxtComponent({
     },
     emits: ['failed', 'executed', 'updated'],
     setup(props, { emit }) {
-        const handleUpdated = (train: Analysis) => {
-            emit('updated', train);
+        const handleUpdated = (entity: Analysis) => {
+            emit('updated', entity);
         };
 
         const handleFailed = (e: Error) => {
@@ -45,18 +45,18 @@ export default defineNuxtComponent({
     <div v-if="entity">
         <div class="panel-box mb-3">
             <h6 class="mb-3">
-                <span class="text-info">{{ entity.nodes }}</span> Station(s)
+                <span class="text-info">{{ entity.nodes }}</span> Node(s)
                 <i class="fa-solid fa-house-medical" />
             </h6>
 
-            <train-stations-progress :entity="entity" />
+            <FAnalysisNodeProgress :entity="entity" />
         </div>
         <div class="row">
             <div class="col-12 col-md-5">
                 <div class="panel-box mb-3">
                     <h6><i class="fa fa-list" /> Pipeline</h6>
 
-                    <train-pipeline
+                    <FAnalysisPipeline
                         :list-direction="'column'"
                         :entity="entity"
                         @updated="handleUpdated"
@@ -69,7 +69,7 @@ export default defineNuxtComponent({
                 <div class="panel-box">
                     <h6><i class="fa fa-history" /> Logs</h6>
 
-                    <TrainLogs :entity-id="entity.id" />
+                    <FAnalysisLogs :entity-id="entity.id" />
                 </div>
             </div>
         </div>

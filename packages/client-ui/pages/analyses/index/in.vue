@@ -160,7 +160,7 @@ export default defineNuxtComponent({
                             </template>
                         </template>
                         <template #cell(realm)="data">
-                            <span class="bg-dark badge">{{ data.item.train_realm_id }}</span>
+                            <span class="bg-dark badge">{{ data.item.analysis_realm_id }}</span>
                         </template>
                         <template #cell(approval_status)="data">
                             <FAnalysisNodeApprovalStatus :status="data.item.approval_status">

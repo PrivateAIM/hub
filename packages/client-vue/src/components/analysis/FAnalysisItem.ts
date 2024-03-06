@@ -124,7 +124,7 @@ const FAnalysisItem = defineComponent({
                                                 return [
                                                     h('i', { class: 'fa-solid fa-train-tram me-1' }),
                                                     h(VCLink, {
-                                                        to: `/trains/${nameProps.entityId}`,
+                                                        to: `/analyses/${nameProps.entityId}`,
                                                     }, [
                                                         nameProps.nameDisplay,
                                                     ]),

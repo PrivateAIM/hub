@@ -73,6 +73,13 @@
     padding: 0.25rem 0;
 }
 
+.log-container .alert {
+    border-radius: 0px;
+    background: rgba(36, 41, 47, 1);
+    color: #eee;
+    border: 0;
+}
+
 .log-body .line {
     line-height: 20px;
     color: #d0d7de;
