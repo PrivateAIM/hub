@@ -35,7 +35,7 @@ export async function handleTrainManagerBuilderEvent(
     }
 
     let trainLogContext : AnalysisLogSaveContext = {
-        train: entity,
+        entity,
         component: ComponentName.BUILDER,
         command: context.command,
         event: context.event,

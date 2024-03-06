@@ -30,7 +30,7 @@ export default defineNuxtComponent({
             displayNav.value = !displayNav.value;
         };
 
-        const infoText = computed(() => realmManagementName.value || 'Personal Health Train');
+        const infoText = computed(() => realmManagementName.value || 'PrivateAim');
 
         return {
             infoText,
@@ -59,7 +59,7 @@ export default defineNuxtComponent({
                     </button>
                 </div>
                 <div class="logo">
-                    <span>U</span>I
+                    <span>H</span>U<span>B</span>
                     <span class="info-text">{{ infoText }}</span>
                 </div>
             </div>

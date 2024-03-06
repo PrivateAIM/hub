@@ -9,7 +9,7 @@ import type { APIClient } from '@privateaim/storage-kit';
 import type { App } from 'vue';
 import { inject, provide } from 'vue';
 
-const symbol = Symbol.for('APIClient');
+const symbol = Symbol.for('FStorageAPIClient');
 
 export function provideStorageAPIClient(client: APIClient, instance?: App) {
     if (instance) {

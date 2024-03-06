@@ -14,7 +14,7 @@ import type {
 } from '@privateaim/server-analysis-manager';
 
 export type AnalysisLogSaveContext = {
-    train: Pick<Analysis, 'id'> &
+    entity: Pick<Analysis, 'id'> &
     Partial<Pick<Analysis, 'realm_id'>>,
 
     error?: boolean,

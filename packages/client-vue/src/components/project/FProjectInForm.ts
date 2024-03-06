@@ -21,7 +21,7 @@ import {
     createEntityManager, initFormAttributesFromSource, useValidationTranslator, wrapFnWithBusyState,
 } from '../../core';
 
-export default defineComponent({
+const FProjectInForm = defineComponent({
     props: {
         entity: {
             type: Object as PropType<ProjectNode>,
@@ -134,3 +134,7 @@ export default defineComponent({
         };
     },
 });
+
+export {
+    FProjectInForm
+}

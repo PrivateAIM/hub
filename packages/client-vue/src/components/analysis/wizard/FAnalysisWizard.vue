@@ -293,7 +293,7 @@ export default defineComponent({
                     :before-change="passWizardStep"
                 >
                     <train-wizard-step-base
-                        :train="entity"
+                        :entity="entity"
                         @updated="handleUpdated"
                     />
                 </TabContent>

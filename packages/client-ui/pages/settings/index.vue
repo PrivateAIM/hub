@@ -4,6 +4,33 @@
   - For the full copyright and license information,
   - view the LICENSE file that was distributed with this source code.
   -->
+<script lang="ts">
+import { defineNuxtComponent, definePageMeta } from '#imports';
+import { LayoutKey, LayoutNavigationID } from '~/config/layout';
+
+export default defineNuxtComponent({
+    setup() {
+        definePageMeta({
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
+
+        });
+
+        const items = [
+            {
+                name: 'Account', icon: 'fas fa-bars', urlSuffix: '',
+            },
+            {
+                name: 'Security', icon: 'fa fa-lock', urlSuffix: '/security',
+            }
+        ];
+
+        return {
+            items,
+        };
+    },
+});
+</script>
 <template>
     <div>
         <h1 class="title no-border mb-3">
@@ -24,33 +51,3 @@
         </div>
     </div>
 </template>
-<script lang="ts">
-import { defineNuxtComponent, definePageMeta } from '#imports';
-import { LayoutKey, LayoutNavigationID } from '~/config/layout';
-
-export default defineNuxtComponent({
-    setup() {
-        definePageMeta({
-            [LayoutKey.REQUIRED_LOGGED_IN]: true,
-            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
-
-        });
-
-        const items = [
-            {
-                name: 'Account', icon: 'fas fa-bars', urlSuffix: '',
-            },
-            {
-                name: 'Security', icon: 'fa fa-lock', urlSuffix: '/security',
-            },
-            {
-                name: 'Secrets', icon: 'fa fa-key', urlSuffix: '/secrets',
-            },
-        ];
-
-        return {
-            items,
-        };
-    },
-});
-</script>

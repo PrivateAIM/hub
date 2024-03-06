@@ -27,7 +27,7 @@ export default defineComponent({
         FProjectNodes,
     },
     props: {
-        train: {
+        entity: {
             type: Object as PropType<Analysis>,
             required: true,
         },
@@ -37,7 +37,7 @@ export default defineComponent({
         const apiClient = injectCoreAPIClient();
         const handleMasterImageSelected = async (item: MasterImage) => {
             try {
-                const response = await apiClient.analysis.update(props.train.id, {
+                const response = await apiClient.analysis.update(props.entity.id, {
                     master_image_id: item ? item.id : null as string,
                 });
 
@@ -91,7 +91,7 @@ export default defineComponent({
             <h6><i class="fa fa-compact-disc" /> MasterImage</h6>
             <div class="mb-2">
                 <FMasterImagePicker
-                    :entity-id="train.master_image_id"
+                    :entity-id="entity.master_image_id"
                     @selected="handleMasterImageSelected"
                 />
             </div>
@@ -100,15 +100,15 @@ export default defineComponent({
         <hr>
 
         <div>
-            <h6><i class="fa fa-city" /> Stations</h6>
+            <h6><i class="fa fa-city" /> Nodes</h6>
 
             <div class="row">
                 <div class="col-12 col-xl-6">
                     <FProjectNodes
                         ref="FProjectNodes"
-                        :realm-id="train.realm_id"
+                        :realm-id="entity.realm_id"
                         :direction="'out'"
-                        :query="{filters: {proposal_id: train.project_id}}"
+                        :query="{filters: {project_id: entity.project_id}}"
                     >
                         <template #header="props">
                             <span>Nodes <span class="text-info">available</span></span>
@@ -128,8 +128,8 @@ export default defineComponent({
                         <template #itemActions="props">
                             <FAnalysisNodeAssignAction
                                 :node-id="props.data.node_id"
-                                :analysis-id="train.id"
-                                :realm-id="train.realm_id"
+                                :analysis-id="entity.id"
+                                :realm-id="entity.realm_id"
                                 @created="handleTrainStationCreated"
                                 @deleted="handleTrainStationDeleted"
                                 @failed="handleFailed"
@@ -140,9 +140,9 @@ export default defineComponent({
                 <div class="col-12 col-xl-6">
                     <FAnalysisNodes
                         ref="FAnalysisNodes"
-                        :realm-id="train.realm_id"
+                        :realm-id="entity.realm_id"
                         :direction="'out'"
-                        :query="{filters: {train_id: train.id}}"
+                        :query="{filters: {train_id: entity.id}}"
                     >
                         <template #header>
                             <span>Nodes <span class="text-success">selected</span></span>

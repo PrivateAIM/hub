@@ -8,6 +8,6 @@
 import type { Analysis } from '@privateaim/core';
 
 export type ContainerPackContext = {
-    train: Analysis,
+    entity: Analysis,
     masterImagePath: string
 };

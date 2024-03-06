@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export { default as ProposalStationApprovalCommand } from './FProjectNodeApprovalCommand';
-export { default as ProposalStationApprovalStatus } from './FProjectNodeApprovalStatus';
-export { default as ProposalStationAssignAction } from './FProjectNodeAssignAction';
-export { default as ProposalStationEntity } from './FProjectNode';
-export { default as ProposalStationList } from './FProjectNodes';
+export { default as FProjectNodeApprovalCommand } from './FProjectNodeApprovalCommand';
+export { default as FProjectNodeApprovalStatus } from './FProjectNodeApprovalStatus';
+export { default as FProjectNodeAssignAction } from './FProjectNodeAssignAction';
+export { default as FProjectNode } from './FProjectNode';
+export { default as FProjectNodes } from './FProjectNodes';

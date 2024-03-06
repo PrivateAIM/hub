@@ -49,10 +49,10 @@ export const LayoutSideDefaultNavigation: NavigationItem[] = [
         rootLink: true,
     },
     {
-        name: 'Proposals',
+        name: 'Projects',
         type: 'link',
-        url: '/proposals',
-        icon: 'fas fa-file',
+        url: '/projects',
+        icon: 'fas fa-tasks',
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
         [LayoutKey.REQUIRED_PERMISSIONS]: [
             PermissionID.PROJECT_ADD,
@@ -71,10 +71,10 @@ export const LayoutSideDefaultNavigation: NavigationItem[] = [
         ],
     },
     {
-        name: 'Trains',
+        name: 'Analyses',
         type: 'link',
-        url: '/trains',
-        icon: 'fas fa-train',
+        url: '/analyses',
+        icon: 'fa fa-bar-chart',
         requireLoggedIn: true,
         requirePermissions: [
             PermissionID.ANALYSIS_ADD,
@@ -230,9 +230,9 @@ export const LayoutSideAdminNavigation: NavigationItem[] = [
         ],
         children: [
             {
-                name: 'Stations',
+                name: 'Nodes',
                 type: 'link',
-                url: '/admin/stations',
+                url: '/admin/nodes',
                 icon: 'fa-solid fa-house-medical',
                 [LayoutKey.REQUIRED_LOGGED_IN]: true,
                 [LayoutKey.REQUIRED_PERMISSIONS]: [

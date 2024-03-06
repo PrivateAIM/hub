@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export { default as StationForm } from './FNodeForm';
-export { default as StationList } from './FNodes';
-export { default as StationRegistryProjectEntity } from './FNodeRegistryProject';
-export { default as StationRobotEntity } from './FNodeRobot';
+export { default as FNodeForm } from './FNodeForm';
+export { default as FNodes } from './FNodes';
+export { default as FNodeRegistryProjectEntity } from './FNodeRegistryProject';
+export { default as FNodeRobotEntity } from './FNodeRobot';

@@ -24,7 +24,7 @@ import {
     defineEntityManagerProps,
 } from '../../core';
 
-export default defineComponent({
+const FProject = defineComponent({
     props: defineEntityManagerProps<Project>(),
     emits: defineEntityManagerEvents<Project>(),
     slots: Object as SlotsType<EntityManagerSlotsType<Project>>,
@@ -44,3 +44,7 @@ export default defineComponent({
         }
     },
 });
+
+export {
+    FProject,
+};

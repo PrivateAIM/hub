@@ -8,7 +8,8 @@
 import type { APIClient as AuthupAPIClient } from '@authup/core';
 import type { Options, SocketManager } from '@privateaim/client-vue';
 import { install } from '@privateaim/client-vue';
-import type { APIClient } from '@privateaim/core';
+import type { APIClient as CoreAPIClient } from '@privateaim/core';
+import type { APIClient as StorageAPIClient } from '@privateaim/storage-kit';
 import type { Pinia } from 'pinia';
 import { ref } from 'vue';
 import { defineNuxtPlugin } from '#app';
@@ -28,7 +29,8 @@ export default defineNuxtPlugin((ctx) => {
     });
 
     const options : Options = {
-        coreAPIClient: ctx.$api as APIClient,
+        coreAPIClient: ctx.$coreAPI as CoreAPIClient,
+        storageAPIClient: ctx.$storageAPI as StorageAPIClient,
         authupApiClient: ctx.$authupAPI as AuthupAPIClient,
         authupStore,
         socketManager,

@@ -23,10 +23,10 @@ import {
     EntityListSlotName, hasNormalizedSlot, injectAuthupStore, normalizeSlot,
 } from '../../core';
 import EntityDelete from '../EntityDelete';
-import ProposalEntity from './FProject';
+import { FProject } from './FProject';
 import type { EntityManagerSlotProps } from '../../core';
 
-export default defineComponent({
+const FProjectItem = defineComponent({
     props: {
         entity: {
             type: Object as PropType<Project>,
@@ -38,7 +38,7 @@ export default defineComponent({
         const store = injectAuthupStore();
         const canDrop = computed(() => store.has(PermissionID.PROJECT_DROP));
 
-        return () => h(ProposalEntity, {
+        return () => h(FProject, {
             entity: props.entity,
             onDeleted(entity) {
                 emit('deleted', entity);
@@ -179,3 +179,7 @@ export default defineComponent({
         });
     },
 });
+
+export {
+    FProjectItem,
+};

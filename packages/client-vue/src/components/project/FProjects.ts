@@ -15,7 +15,7 @@ import { defineComponent } from 'vue';
 import type { ListSlotsType } from '../../core';
 import { createList, defineListEvents, defineListProps } from '../../core';
 
-export default defineComponent({
+const FProjects = defineComponent({
     props: {
         ...defineListProps<Project>(),
         realmId: {
@@ -41,3 +41,7 @@ export default defineComponent({
         return () => render();
     },
 });
+
+export {
+    FProjects,
+};

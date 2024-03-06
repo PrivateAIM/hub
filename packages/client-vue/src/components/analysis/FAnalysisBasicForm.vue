@@ -18,8 +18,8 @@ import { VCFormInput, VCFormSelect } from '@vuecs/form-controls';
 import {
     createEntityManager, defineEntityManagerEvents, useValidationTranslator, wrapFnWithBusyState,
 } from '../../core';
-import FProjects from '../project/FProjects';
-import FProjectItem from '../project/FProjectItem';
+import { FProjects } from '../project/FProjects';
+import { FProjectItem } from '../project';
 
 export default defineComponent({
     components: {

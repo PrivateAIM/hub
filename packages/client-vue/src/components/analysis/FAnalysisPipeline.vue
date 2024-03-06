@@ -112,7 +112,7 @@ export default defineComponent({
                     v-if="canConfigure"
                     class="btn btn-xs btn-primary"
                     type="button"
-                    :to="'/trains/'+entity.id+'/setup'"
+                    :to="'/analyses/'+entity.id+'/setup'"
                 >
                     <i class="fas fa-wrench pe-1" /> setup
                 </MyLink>
