@@ -59,7 +59,7 @@ export default defineNuxtComponent({
                     </button>
                 </div>
                 <div class="logo">
-                    <span>P</span>o<span>r</span>t<span>a</span>l
+                    <span>H</span>U<span>B</span>
                     <span class="info-text">{{ infoText }}</span>
                 </div>
             </div>

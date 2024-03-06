@@ -9,7 +9,7 @@ import type { APIClient } from '@privateaim/core';
 import type { App } from 'vue';
 import { inject, provide } from 'vue';
 
-const symbol = Symbol.for('APIClient');
+const symbol = Symbol.for('FCoreAPIClient');
 
 export function provideCoreAPIClient(client: APIClient, instance?: App) {
     if (instance) {

@@ -54,7 +54,8 @@ export default defineNuxtComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            🚊 Analyses <span class="sub-title">Manage incoming & outgoing analyses</span>
+            <i class="fa fa-bar-chart" /> Analyses
+            <span class="sub-title">Manage incoming & outgoing analyses</span>
         </h1>
 
         <div class="content-wrapper">

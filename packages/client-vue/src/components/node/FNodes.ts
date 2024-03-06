@@ -29,7 +29,7 @@ export default defineComponent({
 
         setDefaults({
             noMore: {
-                content: 'No more stations available...',
+                content: 'No more nodes available...',
             },
         });
 

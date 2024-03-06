@@ -153,7 +153,7 @@ const FAnalysisItem = defineComponent({
                                     h(VCLink, {
                                         class: 'btn btn-dark btn-xs ms-1',
                                         type: 'button',
-                                        to: `/trains/${slotProps.data.id}`,
+                                        to: `/analyses/${slotProps.data.id}`,
                                     }, [
                                         h('i', { class: 'fa fa-bars' }),
                                     ]),

@@ -256,7 +256,8 @@ export function createList<
 
     if (loadOnSetup) {
         Promise.resolve()
-            .then(() => load());
+            .then(() => load())
+            .catch((e) => console.log(e));
     }
 
     if (

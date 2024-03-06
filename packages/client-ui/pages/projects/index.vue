@@ -55,7 +55,8 @@ export default defineNuxtComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            📜 Project(s) <span class="sub-title">Manage incoming & outgoing projects</span>
+            <i class="fas fa-tasks" /> Projects
+            <span class="sub-title">Manage incoming & outgoing projects</span>
         </h1>
 
         <div class="content-wrapper">

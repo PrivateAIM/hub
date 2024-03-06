@@ -76,11 +76,6 @@ export default defineNuxtComponent({
 
             <ul class="sidebar-menu nav-items navbar-nav">
                 <li class="nav-item">
-                    <div class="nav-separator">
-                        API
-                    </div>
-                </li>
-                <li class="nav-item">
                     <a
                         class="nav-link"
                         :href="docsURL"
@@ -96,20 +91,6 @@ export default defineNuxtComponent({
                         target="_blank"
                     >
                         <i class="fa fa-chart-bar" /> <span class="nav-link-text">Metrics</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <div class="nav-separator">
-                        General
-                    </div>
-                </li>
-                <li class="nav-item">
-                    <a
-                        class="nav-link"
-                        href="https://pht-medic.github.io/documentation/"
-                        target="_blank"
-                    >
-                        <i class="fa fa-file-pdf" /> <span class="nav-link-text">Documentation / Guide</span>
                     </a>
                 </li>
             </ul>

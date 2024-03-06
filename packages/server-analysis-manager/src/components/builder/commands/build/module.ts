@@ -76,7 +76,7 @@ export async function executeBuilderBuildCommand(
     // -----------------------------------------------------------------------------------
 
     await packContainerWithTrain(container, {
-        train: data.entity,
+        entity: data.entity,
         masterImagePath,
     });
 

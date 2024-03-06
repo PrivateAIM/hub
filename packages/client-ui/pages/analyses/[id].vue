@@ -44,7 +44,7 @@ export default defineNuxtComponent({
         if (!manager.data.value) {
             if (isClientErrorWithStatusCode(manager.error, 404)) {
                 await navigateTo({
-                    path: '/trains',
+                    path: '/analyses',
                 });
             }
 
@@ -92,7 +92,7 @@ export default defineNuxtComponent({
                         <DomainEntityNav
                             :prev-link="true"
                             :items="tabs"
-                            :path="'/trains/' + entity.id"
+                            :path="'/analyses/' + entity.id"
                         />
                     </div>
                 </div>
