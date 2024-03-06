@@ -5,45 +5,46 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { OrchestratedToast } from 'bootstrap-vue-next';
 import { isObject } from '@privateaim/core';
 import { useToast as _useToast } from 'bootstrap-vue-next';
-
-type ColorVariant = 'primary' |
-'secondary' |
-'success' |
-'danger' |
-'warning' |
-'info' |
-'light' |
-'dark';
-
-type ContainerVerticalAlign = 'top' | 'bottom' | 'middle';
-type ContainerHorizontalAlign = 'left' | 'center' | 'right';
-type ContainerPosition = `${ContainerVerticalAlign}-${ContainerHorizontalAlign}`;
-type ToastOptions = {
-    pos?: ContainerPosition,
-    body: string,
-    variant?: ColorVariant
-};
 
 export function useToast() {
     const toast = _useToast();
 
+    const show = (
+        el: string | OrchestratedToast,
+        options: OrchestratedToast = {},
+    ) => {
+        if (typeof toast.show === 'undefined') {
+            return Symbol('');
+        }
+
+        if (isObject(el)) {
+            el.pos = el.pos || 'top-center';
+            return toast.show({
+                props: el,
+            });
+        }
+
+        options.pos = options.pos || 'top-center';
+
+        return toast.show({
+            props: {
+                ...(options || {}),
+                body: el,
+            },
+        });
+    };
+
     return {
         hide(el: symbol) {
-            toast.hide(el);
-        },
-        show(el: string | ToastOptions, options?: Omit<ToastOptions, 'body'>) {
-            if (isObject(el)) {
-                el.pos = el.pos || 'top-center';
-                return toast.show(el);
+            if (typeof toast.remove === 'undefined') {
+                return;
             }
 
-            if (options) {
-                options.pos = options.pos || 'top-center';
-            }
-
-            return toast.show(el, options);
+            toast.remove(el);
         },
+        show,
     };
 }

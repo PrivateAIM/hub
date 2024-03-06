@@ -11,7 +11,10 @@ import {
 } from '@privateaim/client-vue';
 import {
     definePageMeta,
-    navigateTo, useAuthupAPI, useRoute, useToast,
+    navigateTo,
+    useAuthupAPI,
+    useRoute,
+    useToast,
 } from '#imports';
 import {
     defineNuxtComponent,

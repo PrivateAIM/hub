@@ -5,11 +5,11 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { BToaster } from 'bootstrap-vue-next';
+import { BToastOrchestrator } from 'bootstrap-vue-next';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-    components: { BToaster },
+    components: { BToastOrchestrator },
     data() {
         return {
             startYear: 2024,
@@ -32,6 +32,6 @@ export default defineComponent({
                 <a href="https://privateaim.de">PrivateAim</a>
             </div>
         </div>
-        <BToaster />
+        <BToastOrchestrator />
     </div>
 </template>
