@@ -79,7 +79,7 @@ export default defineComponent({
 
         const types = [
             { id: RegistryProjectType.DEFAULT, value: 'DEFAULT' },
-            { id: RegistryProjectType.STATION, value: 'Station' },
+            { id: RegistryProjectType.NODE, value: 'Node' },
             { id: RegistryProjectType.AGGREGATOR, value: 'Aggregator' },
             { id: RegistryProjectType.INCOMING, value: 'Incoming' },
             { id: RegistryProjectType.OUTGOING, value: 'Outgoing' },

@@ -11,16 +11,5 @@ export enum RegistryProjectType {
     INCOMING = 'incoming',
     OUTGOING = 'outgoing',
     MASTER_IMAGES = 'masterImages',
-    STATION = 'station',
-}
-
-export enum RegistryProjectSocketServerToClientEventName {
-    CREATED = 'registryProjectCreated',
-    UPDATED = 'registryProjectUpdated',
-    DELETED = 'registryProjectDeleted',
-}
-
-export enum RegistryProjectSocketClientToServerEventName {
-    SUBSCRIBE = 'registryProjectSubscribe',
-    UNSUBSCRIBE = 'registryProjectUnsubscribe',
+    NODE = 'node',
 }

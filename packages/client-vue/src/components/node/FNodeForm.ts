@@ -220,11 +220,11 @@ export default defineComponent({
                             form.hidden = !form.hidden;
                         },
 
-                        id: 'station-switch',
+                        id: 'node-switch',
                     }),
                     h('label', {
                         class: 'form-check-label',
-                        for: 'station-switch',
+                        for: 'node-switch',
                     }, [
                         'Hide for project & analysis selection?',
                     ]),

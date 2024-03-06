@@ -44,7 +44,6 @@ export default defineComponent({
         const form = reactive({
             query: null,
             master_image_id: null,
-            station_ids: [],
 
             user_rsa_secret_id: null,
             user_paillier_secret_id: null,
@@ -111,7 +110,7 @@ export default defineComponent({
             }
 
             if (refs.entity.value.nodes <= 0) {
-                throw new Error('One or more stations have to be selected...');
+                throw new Error('One or more nodes have to be selected...');
             }
 
             return true;

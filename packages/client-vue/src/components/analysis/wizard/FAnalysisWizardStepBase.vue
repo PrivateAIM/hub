@@ -51,7 +51,7 @@ export default defineComponent({
 
         const FAnalysisNodes = ref<null | Record<string, any>>(null);
 
-        const handleTrainStationCreated = (item: AnalysisNode) => {
+        const handleAnalysisNodeCreated = (item: AnalysisNode) => {
             if (FAnalysisNodes.value) {
                 FAnalysisNodes.value.handleCreated(item);
             }
@@ -61,7 +61,7 @@ export default defineComponent({
             }
         };
 
-        const handleTrainStationDeleted = (item: AnalysisNode) => {
+        const handleAnalysisNodeDeleted = (item: AnalysisNode) => {
             if (FAnalysisNodes.value) {
                 FAnalysisNodes.value.handleDeleted(item);
             }
@@ -78,8 +78,8 @@ export default defineComponent({
         return {
             handleFailed,
             handleMasterImageSelected,
-            handleTrainStationCreated,
-            handleTrainStationDeleted,
+            handleAnalysisNodeCreated,
+            handleAnalysisNodeDeleted,
             FAnalysisNodes,
         };
     },
@@ -130,8 +130,8 @@ export default defineComponent({
                                 :node-id="props.data.node_id"
                                 :analysis-id="entity.id"
                                 :realm-id="entity.realm_id"
-                                @created="handleTrainStationCreated"
-                                @deleted="handleTrainStationDeleted"
+                                @created="handleAnalysisNodeCreated"
+                                @deleted="handleAnalysisNodeDeleted"
                                 @failed="handleFailed"
                             />
                         </template>

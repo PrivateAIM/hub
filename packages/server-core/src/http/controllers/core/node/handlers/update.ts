@@ -76,7 +76,7 @@ export async function updateNodeRouteHandler(req: Request, res: Response) : Prom
             registryProject = registryProjectRepository.create({
                 external_name: registryProjectExternalName,
                 name: entity.name,
-                type: RegistryProjectType.STATION,
+                type: RegistryProjectType.NODE,
                 realm_id: entity.realm_id,
                 registry_id: entity.registry_id,
                 public: false,

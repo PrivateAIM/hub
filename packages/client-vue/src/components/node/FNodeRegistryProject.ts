@@ -24,7 +24,7 @@ export default defineComponent({
                 'div',
                 { class: 'alert alert-sm alert-warning' },
                 [
-                    'The station has not been assigned to a registry yet.',
+                    'The node has not been assigned to a registry yet.',
                 ],
             );
         }

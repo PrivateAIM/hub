@@ -19,7 +19,7 @@ import {
 import { VCLink } from '@vuecs/link';
 import TrainEntity from './FAnalysis';
 import TrainPipeline from './FAnalysisPipeline.vue';
-import TrainStationsProgress from '../analysis-node/FAnalysisNodesProgress.vue';
+import FAnalysisNodesProgress from '../analysis-node/FAnalysisNodesProgress.vue';
 import TrainName from './FAnalysisName';
 import EntityDelete from '../EntityDelete';
 import type { EntityManagerSlotProps } from '../../core';
@@ -28,7 +28,7 @@ import { injectAuthupStore } from '../../core';
 const FAnalysisItem = defineComponent({
     components: {
         TrainName,
-        TrainStationsProgress,
+        FAnalysisNodesProgress,
         TrainPipeline,
     },
     props: {
@@ -181,7 +181,7 @@ const FAnalysisItem = defineComponent({
                                 handleExecuted(component, command);
                             },
                         }),
-                        h(TrainStationsProgress, {
+                        h(FAnalysisNodesProgress, {
                             class: 'mt-1 mb-1',
                             entity: slotProps.data,
                             elementType: 'progress-bar',

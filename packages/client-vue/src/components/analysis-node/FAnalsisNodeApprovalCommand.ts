@@ -8,10 +8,9 @@ import { AnalysisNodeApprovalCommand, AnalysisNodeApprovalStatus, PermissionID }
 import type { PropType } from 'vue';
 import { computed, defineComponent, ref } from 'vue';
 import type { ActionCommandProperties } from '../../core';
-import { injectCoreAPIClient, injectAuthupStore, renderActionCommand } from '../../core';
+import { injectAuthupStore, injectCoreAPIClient, renderActionCommand } from '../../core';
 
 export default defineComponent({
-    name: 'TrainStationCommand',
     props: {
         entityId: {
             type: String,

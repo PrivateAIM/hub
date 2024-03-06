@@ -33,7 +33,7 @@ import {
     renderEntityAssignAction, useValidationTranslator, wrapFnWithBusyState,
 } from '../../core';
 import MasterImagePicker from '../master-image/FMasterImagePicker';
-import StationList from '../node/FNodes';
+import FNodes from '../node/FNodes';
 import FProjectNodeAssignAction from '../project-node/FProjectNodeAssignAction';
 import { FSearch } from '../utility';
 
@@ -154,7 +154,7 @@ const FProjectForm = defineComponent({
             });
 
             const nodeVNode = h('div', [
-                h(StationList, {
+                h(FNodes, {
                     query: {
                         filters: {
                             hidden: false,
