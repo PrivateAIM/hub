@@ -18,7 +18,7 @@ import { VCFormInput, VCFormSelect } from '@vuecs/form-controls';
 import {
     createEntityManager, defineEntityManagerEvents, useValidationTranslator, wrapFnWithBusyState,
 } from '../../core';
-import { FProjects } from '../project/FProjects';
+import { FProjects } from '../project';
 import { FProjectItem } from '../project';
 
 export default defineComponent({
@@ -131,12 +131,12 @@ export default defineComponent({
                 v-if="!projectId"
                 class="col"
             >
-                <proposal-list :query="proposalQuery">
+                <FProjects :query="proposalQuery">
                     <template #header>
-                        <label>Proposals</label>
+                        <label>Projects</label>
                     </template>
                     <template #item="props">
-                        <proposal-item
+                        <FProjectItem
                             :key="props.data.id"
                             :entity="props.data"
                             @updated="props.updated"
@@ -161,9 +161,9 @@ export default defineComponent({
                                     />
                                 </button>
                             </template>
-                        </proposal-item>
+                        </FProjectItem>
                     </template>
-                </proposal-list>
+                </FProjects>
 
                 <div
                     v-if="!v$.project_id.required && !v$.project_id.$model"

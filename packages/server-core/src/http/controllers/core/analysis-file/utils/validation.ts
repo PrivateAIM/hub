@@ -66,7 +66,8 @@ export async function runAnalysisFileValidation(
         .run(req);
 
     await check('root')
-        .exists()
+        .optional()
+        .toBoolean()
         .isBoolean()
         .default(false)
         .run(req);
