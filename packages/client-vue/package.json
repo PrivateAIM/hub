@@ -46,7 +46,7 @@
         "@authup/core": "^1.0.0-beta.5",
         "@privateaim/core": "^0.2.0",
         "@privateaim/storage-kit": "^0.2.0",
-        "@types/node": "^20.11.24",
+        "@types/node": "^20.11.25",
         "@vitejs/plugin-vue": "^5.0.4",
         "@vuecs/form-controls": "^1.2.0",
         "@vuecs/link": "^1.0.0",
