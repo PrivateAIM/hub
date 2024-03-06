@@ -43,6 +43,7 @@ services:
             hub:
     mq:
         image: rabbitmq:3-management
+        hostname: mq
         healthcheck:
             test: rabbitmq-diagnostics -q ping
             interval: 3s
@@ -113,7 +114,7 @@ services:
         environment:
             REDIS_CONNECTION_STRING: redis://redis
             VAULT_CONNECTION_STRING: start123@http://vault:8090/v1/
-            RABBITMQ_CONNECTION_STRING: amqp://root:start123@172.40.1.1
+            RABBITMQ_CONNECTION_STRING: ${MQ_CONNECTION_URL:-amqp://root:start123@172.40.1.1}
             PUBLIC_URL: ${CORE_PUBLIC_URL:-http://localhost:3001/}
             AUTHUP_URL: http://authup:3000/
             DB_TYPE: 'mysql'
@@ -158,7 +159,7 @@ services:
         ports:
             - '3003:3000'
         environment:
-            RABBITMQ_CONNECTION_STRING: amqp://root:start123@172.40.1.1
+            RABBITMQ_CONNECTION_STRING: ${MQ_CONNECTION_URL:-amqp://root:start123@172.40.1.1}
             VAULT_CONNECTION_STRING: start123@http://vault:8090/v1/
             AUTHUP_URL: http://authup:3000/
             CORE_URL: http://core:3000/
