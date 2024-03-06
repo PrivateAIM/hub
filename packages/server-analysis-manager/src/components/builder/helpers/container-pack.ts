@@ -30,7 +30,7 @@ export async function packContainerWithTrain(container: Container, context: Cont
     const client = useStorageClient();
 
     return new Promise<void>((resolve, reject) => {
-        client.bucket.stream(context.train.id)
+        client.bucket.stream(context.entity.id)
             .then((response) => {
                 const extract = tar.extract();
 
