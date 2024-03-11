@@ -12,7 +12,7 @@ import { Readable } from 'node:stream';
 import { createClient } from 'hapic';
 import tar from 'tar';
 import { scanDirectory } from 'docker-scan';
-import { getWritableDirPath } from '../../../config';
+import { getWritableDirPath, useEnv } from '../../../config';
 import type { ReturnContext } from './utils';
 import { mergeMasterImageGroupsWithDatabase, mergeMasterImagesWithDatabase } from './utils';
 
@@ -29,7 +29,7 @@ export async function syncMasterImages() : Promise<MasterImagesSyncresponse> {
 
     const client = createClient();
     const response = await client.get(
-        'https://github.com/PHT-Medic/master-images/archive/master.tar.gz',
+        new URL('archive/master.tar.gz', useEnv('masterImagesURL')).href,
         {
             responseType: 'stream',
         },
