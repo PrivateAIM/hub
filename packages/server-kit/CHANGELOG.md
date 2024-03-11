@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.3.0](https://github.com/PrivateAIM/hub/compare/server-kit-v0.2.0...server-kit-v0.3.0) (2024-03-11)
+
+
+### Bug Fixes
+
+* **deps:** bump @authup/core from 1.0.0-beta.5 to 1.0.0-beta.7 ([#155](https://github.com/PrivateAIM/hub/issues/155)) ([e0da3b4](https://github.com/PrivateAIM/hub/commit/e0da3b4ccabc30e8871cd01f373f3437a0f1928a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core bumped from ^0.2.0 to ^0.3.0
+
 ## [0.2.0](https://github.com/PrivateAIM/hub/compare/server-kit-v0.1.0...server-kit-v0.2.0) (2024-02-28)
 
 

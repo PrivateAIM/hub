@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.3.0](https://github.com/PrivateAIM/hub/compare/core-v0.2.0...core-v0.3.0) (2024-03-11)
+
+
+### Features
+
+* initial user interface draft ([#148](https://github.com/PrivateAIM/hub/issues/148)) ([600a3cf](https://github.com/PrivateAIM/hub/commit/600a3cf3ad42ca60a610eb2eb3d1a912c42bd12f))
+* minor cleanup in vue components ([8753567](https://github.com/PrivateAIM/hub/commit/8753567023992d2b4bbf6efcc2468ee06fd31604))
+* refactor analysis-file for new context ([#144](https://github.com/PrivateAIM/hub/issues/144)) ([6a6383c](https://github.com/PrivateAIM/hub/commit/6a6383cf5d920463626f9d6d4798d59597e31d88))
+
+
+### Bug Fixes
+
+* **deps:** bump @authup/core from 1.0.0-beta.5 to 1.0.0-beta.7 ([#155](https://github.com/PrivateAIM/hub/issues/155)) ([e0da3b4](https://github.com/PrivateAIM/hub/commit/e0da3b4ccabc30e8871cd01f373f3437a0f1928a))
+
 ## [0.2.0](https://github.com/PrivateAIM/hub/compare/core-v0.1.0...core-v0.2.0) (2024-02-28)
 
 

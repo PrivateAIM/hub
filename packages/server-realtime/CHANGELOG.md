@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.3.0](https://github.com/PrivateAIM/hub/compare/server-realtime-v0.2.0...server-realtime-v0.3.0) (2024-03-11)
+
+
+### Bug Fixes
+
+* **deps:** bump @authup/core from 1.0.0-beta.5 to 1.0.0-beta.7 ([#155](https://github.com/PrivateAIM/hub/issues/155)) ([e0da3b4](https://github.com/PrivateAIM/hub/commit/e0da3b4ccabc30e8871cd01f373f3437a0f1928a))
+* **deps:** bump @authup/server-adapter from 1.0.0-beta.5 to 1.0.0-beta.7 ([#157](https://github.com/PrivateAIM/hub/issues/157)) ([0aa827b](https://github.com/PrivateAIM/hub/commit/0aa827b7752e3903dad305e5aeb91d754df2d908))
+* **deps:** bump winston from 3.11.0 to 3.12.0 ([#138](https://github.com/PrivateAIM/hub/issues/138)) ([b8b5248](https://github.com/PrivateAIM/hub/commit/b8b5248f4f44b859c367822c21638c8ee9cbefa0))
+* middlewares in realtime service & connection handlers ([7e6b04d](https://github.com/PrivateAIM/hub/commit/7e6b04d3825fe5a2ff785da7c93ca0034b80af0b))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core bumped from ^0.2.0 to ^0.3.0
+
 ## [0.2.0](https://github.com/PrivateAIM/hub/compare/server-realtime-v0.1.0...server-realtime-v0.2.0) (2024-02-28)
 
 
