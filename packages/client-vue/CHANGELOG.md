@@ -1,5 +1,34 @@
 # Changelog
 
+## [0.3.0](https://github.com/PrivateAIM/hub/compare/client-vue-v0.2.0...client-vue-v0.3.0) (2024-03-11)
+
+
+### Features
+
+* adjusted usage of terms and uris of train, station & proposal ([eef58f3](https://github.com/PrivateAIM/hub/commit/eef58f32901150ba0e19a29c5685c92c73188f3f))
+* initial user interface draft ([#148](https://github.com/PrivateAIM/hub/issues/148)) ([600a3cf](https://github.com/PrivateAIM/hub/commit/600a3cf3ad42ca60a610eb2eb3d1a912c42bd12f))
+* minor cleanup in vue components ([8753567](https://github.com/PrivateAIM/hub/commit/8753567023992d2b4bbf6efcc2468ee06fd31604))
+* refactor analysis-file for new context ([#144](https://github.com/PrivateAIM/hub/issues/144)) ([6a6383c](https://github.com/PrivateAIM/hub/commit/6a6383cf5d920463626f9d6d4798d59597e31d88))
+* refactored and adjusted vue components ([#143](https://github.com/PrivateAIM/hub/issues/143)) ([ee98e72](https://github.com/PrivateAIM/hub/commit/ee98e7210848c9da8ff64bb6235b6cda34654446))
+
+
+### Bug Fixes
+
+* **deps:** bump @authup/core from 1.0.0-beta.5 to 1.0.0-beta.7 ([#155](https://github.com/PrivateAIM/hub/issues/155)) ([e0da3b4](https://github.com/PrivateAIM/hub/commit/e0da3b4ccabc30e8871cd01f373f3437a0f1928a))
+* minor restructuring of source code ([6f504f6](https://github.com/PrivateAIM/hub/commit/6f504f60d07ea8e43f24b9762b2bc8a650525477))
+* sanitize root property of analysis-file ([d7989fd](https://github.com/PrivateAIM/hub/commit/d7989fd435ec08ed7e0de2ce862111b31b448206))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core bumped from ^0.2.0 to ^0.3.0
+    * @privateaim/storage-kit bumped from ^0.2.0 to ^0.3.0
+  * peerDependencies
+    * @privateaim/core bumped from ^0.2.0 to ^0.3.0
+    * @privateaim/storage-kit bumped from ^0.2.0 to ^0.3.0
+
 ## [0.2.0](https://github.com/PrivateAIM/hub/compare/client-vue-v0.1.0...client-vue-v0.2.0) (2024-02-28)
 
 

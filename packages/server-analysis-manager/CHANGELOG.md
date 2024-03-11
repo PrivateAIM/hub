@@ -1,5 +1,36 @@
 # Changelog
 
+## [0.3.0](https://github.com/PrivateAIM/hub/compare/server-analysis-manager-v0.2.0...server-analysis-manager-v0.3.0) (2024-03-11)
+
+
+### Features
+
+* better analysis buckets naming strategy ([afc3bbd](https://github.com/PrivateAIM/hub/commit/afc3bbd67c90dd40009091a1fd87a2ab0f01703d))
+* http server and implement health endpoint ([acab9a7](https://github.com/PrivateAIM/hub/commit/acab9a72ef46524a6bc4d20c5c03dea6c55abcfd))
+* initial user interface draft ([#148](https://github.com/PrivateAIM/hub/issues/148)) ([600a3cf](https://github.com/PrivateAIM/hub/commit/600a3cf3ad42ca60a610eb2eb3d1a912c42bd12f))
+* log analysis buckets configuration/destroying-process ([537d650](https://github.com/PrivateAIM/hub/commit/537d65081dee96b3a37cf413a481a6d9447806ba))
+* refactor analysis-file for new context ([#144](https://github.com/PrivateAIM/hub/issues/144)) ([6a6383c](https://github.com/PrivateAIM/hub/commit/6a6383cf5d920463626f9d6d4798d59597e31d88))
+
+
+### Bug Fixes
+
+* **deps:** bump @authup/core from 1.0.0-beta.5 to 1.0.0-beta.7 ([#155](https://github.com/PrivateAIM/hub/issues/155)) ([e0da3b4](https://github.com/PrivateAIM/hub/commit/e0da3b4ccabc30e8871cd01f373f3437a0f1928a))
+* **deps:** bump @authup/server-adapter from 1.0.0-beta.5 to 1.0.0-beta.7 ([#157](https://github.com/PrivateAIM/hub/issues/157)) ([0aa827b](https://github.com/PrivateAIM/hub/commit/0aa827b7752e3903dad305e5aeb91d754df2d908))
+* **deps:** bump amqp-extension from 3.0.0 to 3.1.0 ([#149](https://github.com/PrivateAIM/hub/issues/149)) ([bad4cda](https://github.com/PrivateAIM/hub/commit/bad4cda509d374efcd56242410d5458b52af1415))
+* **deps:** bump amqp-extension from 3.1.0 to 3.1.1 ([#158](https://github.com/PrivateAIM/hub/issues/158)) ([d4afe51](https://github.com/PrivateAIM/hub/commit/d4afe51fac465990dacc8760490ffc483b601832))
+* **deps:** bump amqp-extension from 3.1.1 to 3.2.0 ([#168](https://github.com/PrivateAIM/hub/issues/168)) ([70ea6ca](https://github.com/PrivateAIM/hub/commit/70ea6ca2cecf63b006906c24e6c28d2b5bbd3aae))
+* **deps:** bump winston from 3.11.0 to 3.12.0 ([#138](https://github.com/PrivateAIM/hub/issues/138)) ([b8b5248](https://github.com/PrivateAIM/hub/commit/b8b5248f4f44b859c367822c21638c8ee9cbefa0))
+* only throw error on bucket creation if status code is not equal to 404/409 ([66fbbf4](https://github.com/PrivateAIM/hub/commit/66fbbf4fdf3de4e2cfccf4f1db8cb314993bfc1b))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core bumped from ^0.2.0 to ^0.3.0
+    * @privateaim/server-kit bumped from ^0.2.0 to ^0.3.0
+    * @privateaim/storage-kit bumped from ^0.2.0 to ^0.3.0
+
 ## [0.2.0](https://github.com/PrivateAIM/hub/compare/server-analysis-manager-v0.1.0...server-analysis-manager-v0.2.0) (2024-02-28)
 
 
