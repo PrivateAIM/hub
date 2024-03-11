@@ -13,7 +13,7 @@ import {
     readInt,
 } from 'envix';
 import { config } from 'dotenv';
-import { EnvironmentName } from './constants';
+import { ConfigDefaults, EnvironmentName } from './constants';
 import type { Environment } from './type';
 
 config({
@@ -56,6 +56,8 @@ export function useEnv(key?: string) : any {
         publicURL: read('PUBLIC_URL', `http://127.0.0.1:${port}/`),
         authupApiURL: read('AUTHUP_URL'),
         appURL: read('APP_URL', 'http://127.0.0.1:3000/'),
+
+        masterImagesURL: read('MASTER_IMAGE_URL', ConfigDefaults.MASTER_IMAGE),
 
         skipProjectApproval: readBool('SKIP_PROJECT_APPROVAL'),
         skipAnalysisApproval: readBool('SKIP_ANALYSIS_APPROVAL'),

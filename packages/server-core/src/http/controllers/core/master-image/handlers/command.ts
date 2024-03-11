@@ -8,8 +8,9 @@
 import { MasterImageCommand } from '@privateaim/core';
 import { BadRequestError, NotFoundError } from '@ebec/http';
 import { useRequestBody } from '@routup/basic/body';
+import { sendAccepted } from 'routup';
 import type { Request, Response } from 'routup';
-import { syncMasterImages } from '../../../../../domains/master-image';
+import { syncMasterImages } from '../../../../../domains';
 
 export async function commandMasterImageRouteHandler(req: Request, res: Response) {
     const body = useRequestBody(req);
@@ -25,7 +26,9 @@ export async function commandMasterImageRouteHandler(req: Request, res: Response
 
     switch (command) {
         case MasterImageCommand.SYNC: {
-            return syncMasterImages(req, res);
+            const output = await syncMasterImages();
+
+            return sendAccepted(res, output);
         }
     }
 

@@ -21,6 +21,8 @@ export interface Environment {
     authupApiURL: string,
     appURL: string,
 
+    masterImagesURL: string,
+
     skipProjectApproval: boolean,
     skipAnalysisApproval: boolean
 }

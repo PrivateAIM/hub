@@ -14,6 +14,7 @@ import {
 } from '../config';
 import { setupAuthupService } from '../core';
 import { buildDataSourceOptions } from '../database';
+import { syncMasterImages } from '../domains';
 import { createRouter } from '../http/router';
 import { createHttpServer } from '../http/server';
 import { generateSwaggerDocumentation } from '../http/swagger';
@@ -69,6 +70,10 @@ export async function startCommand() {
     // if (!check.schema) {
     await setupAuthupService();
     // }
+
+    logger.info('Syncing master images...');
+    await syncMasterImages();
+    logger.info('Synced master images.');
 
     const router = createRouter();
     const httpServer = createHttpServer({ router });
