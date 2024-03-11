@@ -158,6 +158,8 @@ services:
                 condition: service_healthy
         ports:
             - '3003:3000'
+        volumes:
+            - "/var/run/docker.sock:/var/run/docker.sock:ro"
         environment:
             RABBITMQ_CONNECTION_STRING: ${MQ_CONNECTION_URL:-amqp://root:start123@172.40.1.1}
             VAULT_CONNECTION_STRING: start123@http://vault:8090/v1/

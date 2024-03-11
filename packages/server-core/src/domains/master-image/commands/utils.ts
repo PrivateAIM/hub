@@ -9,9 +9,9 @@ import type { Group, Image } from 'docker-scan';
 import type { MasterImage, MasterImageGroup } from '@privateaim/core';
 import { useDataSource } from 'typeorm-extension';
 import { MasterImageEntity } from '../entity';
-import { MasterImageGroupEntity } from '../../master-image-group/entity';
+import { MasterImageGroupEntity } from '../../master-image-group';
 
-type ReturnContext<T> = {
+export type ReturnContext<T> = {
     updated: T[],
     created: T[],
     deleted: T[]

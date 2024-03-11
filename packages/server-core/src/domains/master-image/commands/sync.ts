@@ -5,18 +5,23 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { MasterImage, MasterImageGroup } from '@privateaim/core';
 import fs from 'node:fs';
 import path from 'node:path';
 import { Readable } from 'node:stream';
 import { createClient } from 'hapic';
 import tar from 'tar';
 import { scanDirectory } from 'docker-scan';
-import type { Request, Response } from 'routup';
-import { sendAccepted } from 'routup';
 import { getWritableDirPath } from '../../../config';
+import type { ReturnContext } from './utils';
 import { mergeMasterImageGroupsWithDatabase, mergeMasterImagesWithDatabase } from './utils';
 
-export async function syncMasterImages(req: Request, res: Response) : Promise<any> {
+type MasterImagesSyncresponse = {
+    images: ReturnContext<MasterImage>,
+    groups: ReturnContext<MasterImageGroup>
+};
+
+export async function syncMasterImages() : Promise<MasterImagesSyncresponse> {
     const directoryPath: string = path.join(getWritableDirPath(), 'master-images');
 
     await fs.promises.rm(directoryPath, { force: true, recursive: true });
@@ -33,34 +38,35 @@ export async function syncMasterImages(req: Request, res: Response) : Promise<an
     const tarPath = path.join(getWritableDirPath(), 'master-images.tar.gz');
     const writable = fs.createWriteStream(tarPath);
 
-    writable.on('error', () => {
-        res.statusCode = 400;
-        res.end();
-    });
-
-    writable.on('finish', async () => {
-        await tar.extract({
-            file: tarPath,
-            cwd: directoryPath,
-            onentry(entry) {
-                entry.path = entry.path.split('/').splice(1).join('/');
-            },
+    return new Promise((resolve, reject) => {
+        writable.on('error', (err) => {
+            reject(err);
         });
 
-        const data = await scanDirectory(directoryPath);
+        writable.on('finish', async () => {
+            await tar.extract({
+                file: tarPath,
+                cwd: directoryPath,
+                onentry(entry) {
+                    entry.path = entry.path.split('/').splice(1).join('/');
+                },
+            });
 
-        // languages
-        const groups = await mergeMasterImageGroupsWithDatabase(data.groups);
+            const data = await scanDirectory(directoryPath);
 
-        // images
-        const images = await mergeMasterImagesWithDatabase(data.images);
+            // languages
+            const groups = await mergeMasterImageGroupsWithDatabase(data.groups);
 
-        sendAccepted(res, {
-            groups,
-            images,
+            // images
+            const images = await mergeMasterImagesWithDatabase(data.images);
+
+            resolve({
+                groups,
+                images,
+            });
         });
-    });
 
-    const readStream = Readable.fromWeb(response.data as any);
-    readStream.pipe(writable);
+        const readStream = Readable.fromWeb(response.data as any);
+        readStream.pipe(writable);
+    });
 }
