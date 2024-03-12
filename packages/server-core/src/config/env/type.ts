@@ -16,6 +16,7 @@ export interface Environment {
     redisConnectionString?: string | boolean,
     rabbitMqConnectionString?: string | boolean,
     vaultConnectionString: string | boolean,
+    harborURL?: string,
 
     publicURL: string,
     authupApiURL: string,

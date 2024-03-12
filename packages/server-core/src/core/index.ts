@@ -7,6 +7,7 @@
 
 export * from './amqp';
 export * from './authup';
+export * from './harbor';
 export * from './redis';
 export * from './utils';
 export * from './vault';
