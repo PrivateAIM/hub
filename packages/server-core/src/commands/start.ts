@@ -12,7 +12,7 @@ import {
 import {
     createConfig, getWritableDirPath, useEnv, useLogger,
 } from '../config';
-import { setupAuthupService } from '../core';
+import { setupAuthupService, setupHarborService } from '../core';
 import { buildDataSourceOptions } from '../database';
 import { syncMasterImages } from '../domains';
 import { createRouter } from '../http/router';
@@ -68,12 +68,18 @@ export async function startCommand() {
     }
 
     // if (!check.schema) {
+    logger.info('Executing authup service setup...');
     await setupAuthupService();
+    logger.info('Executed authup service setup.');
     // }
 
     logger.info('Syncing master images...');
     await syncMasterImages();
     logger.info('Synced master images.');
+
+    logger.info('Executing harbor service setup...');
+    await setupHarborService();
+    logger.info('Executed harbor service setup.');
 
     const router = createRouter();
     const httpServer = createHttpServer({ router });
