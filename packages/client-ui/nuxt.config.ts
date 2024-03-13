@@ -11,9 +11,9 @@ import { defineNuxtConfig } from 'nuxt/config';
 export default defineNuxtConfig({
     runtimeConfig: {
         public: {
-            coreApiUrl: process.env.CORE_API_URL,
-            storageApiUrl: process.env.STORAGE_API_URL,
-            authupApiUrl: process.env.AUTHUP_API_URL,
+            coreUrl: process.env.CORE_URL,
+            storageUrl: process.env.STORAGE_URL,
+            authupUrl: process.env.AUTHUP_URL,
             realtimeUrl: process.env.REALTIME_URL,
             realtimeTransports: process.env.REALTIME_TRANSPORTS,
         },

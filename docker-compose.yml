@@ -91,7 +91,7 @@ services:
             VAULT: start123@http://vault:8090/v1/
             REDIS: redis://redis
             PUBLIC_URL: ${AUTHUP_PUBLIC_URL:-http://localhost:3010/}
-            AUTHORIZE_REDIRECT_URL: ${WEB_PUBLIC_URL:-http://localhost:3000/}
+            AUTHORIZE_REDIRECT_URL: ${UI_URL:-http://localhost:3000/}
             ROBOT_ADMIN_ENABLED: true
         networks:
             hub:
@@ -115,7 +115,7 @@ services:
             REDIS_CONNECTION_STRING: redis://redis
             VAULT_CONNECTION_STRING: start123@http://vault:8090/v1/
             RABBITMQ_CONNECTION_STRING: ${MQ_CONNECTION_URL:-amqp://root:start123@172.40.1.1}
-            PUBLIC_URL: ${CORE_PUBLIC_URL:-http://localhost:3001/}
+            PUBLIC_URL: ${CORE_URL:-http://localhost:3001/}
             AUTHUP_URL: http://authup:3000/
             DB_TYPE: 'mysql'
             DB_HOST: 'mysql'
@@ -189,11 +189,32 @@ services:
             DB_USERNAME: 'root'
             DB_PASSWORD: 'start123'
             DB_DATABASE: 'storage'
-            PUBLIC_URL: ${STORAGE_PUBLIC_URL:-http://localhost:3000}
+            PUBLIC_URL: ${STORAGE_URL:-http://localhost:3000}
             REDIS_CONNECTION_STRING: redis://redis
             MINIO_CONNECTION_STRING: http://admin:start123@minio:9000
             VAULT_CONNECTION_STRING: start123@http://vault:8090/v1/
             AUTHUP_URL: http://authup:3000/
+        networks:
+            hub:
+    ui:
+        build: '.'
+        restart: always
+        command: ui start
+        depends_on:
+            authup:
+                condition: service_healthy
+            core:
+                condition: service_healthy
+            storage:
+                condition: service_healthy
+            realtime:
+                condition: service_healthy
+        ports:
+            - '3000:3000'
+        environment:
+            STORAGE_URL: ${STORAGE_URL:-http://localhost:3000}
+            CORE_URL: ${CORE_URL:-http://localhost:3001}
+            REALTIME_URL: ${REALTIME_URL:-http://localhost:3002}
         networks:
             hub:
 networks:

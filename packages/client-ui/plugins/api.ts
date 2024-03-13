@@ -38,24 +38,24 @@ export default defineNuxtPlugin((ctx) => {
     const runtimeConfig = useRuntimeConfig();
 
     const {
-        coreApiUrl,
-        storageApiUrl,
-        authupApiUrl,
+        coreUrl,
+        storageUrl,
+        authupUrl,
     } = runtimeConfig.public;
 
     // -----------------------------------------------------------------------------------
 
-    const coreAPI = new CoreAPIClient({ baseURL: coreApiUrl });
+    const coreAPI = new CoreAPIClient({ baseURL: coreUrl });
     ctx.provide('coreAPI', coreAPI);
 
     // -----------------------------------------------------------------------------------
 
-    const storageAPI = new StorageAPIClient({ baseURL: storageApiUrl });
+    const storageAPI = new StorageAPIClient({ baseURL: storageUrl });
     ctx.provide('storageAPI', storageAPI);
 
     // -----------------------------------------------------------------------------------
 
-    const authupAPI = new AuthAPIClient({ baseURL: authupApiUrl });
+    const authupAPI = new AuthAPIClient({ baseURL: authupUrl });
     ctx.provide('authupAPI', authupAPI);
 
     // -----------------------------------------------------------------------------------
@@ -63,7 +63,7 @@ export default defineNuxtPlugin((ctx) => {
     const store = useAuthStore(ctx.$pinia as Pinia);
 
     const authupTokenHookOptions : ClientResponseErrorTokenHookOptions = {
-        baseURL: authupApiUrl,
+        baseURL: authupUrl,
         tokenCreator: () => {
             const { refreshToken } = storeToRefs(store);
 

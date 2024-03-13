@@ -12,5 +12,5 @@ import { useRuntimeConfig } from '#imports';
 export const useAuthStore = defineStore('auth', () => {
     const config = useRuntimeConfig();
 
-    return createStore({ baseURL: config.public.authupApiUrl });
+    return createStore({ baseURL: config.public.authupUrl });
 });
