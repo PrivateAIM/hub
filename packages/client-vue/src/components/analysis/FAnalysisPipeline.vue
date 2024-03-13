@@ -5,6 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import { VCLink } from "@vuecs/link";
 import type { Analysis } from '@privateaim/core';
 import {
     AnalysisAPICommand,
@@ -24,6 +25,7 @@ import TrainConfigurationStatusText from './FAnalysisConfigurationStatusText.vue
 
 export default defineComponent({
     components: {
+        VCLink,
         Dropdown,
         TrainResultCommand,
         TrainConfigurationStatusText,
@@ -108,14 +110,14 @@ export default defineComponent({
                 v-if="withCommand"
                 class="ms-auto"
             >
-                <MyLink
+                <VCLink
                     v-if="canConfigure"
                     class="btn btn-xs btn-primary"
                     type="button"
                     :to="'/analyses/'+entity.id+'/setup'"
                 >
                     <i class="fas fa-wrench pe-1" /> setup
-                </MyLink>
+                </VCLink>
             </div>
         </div>
 

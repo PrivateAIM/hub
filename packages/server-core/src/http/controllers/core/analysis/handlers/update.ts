@@ -5,15 +5,15 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
-import { PermissionID } from '@privateaim/core';
 import { isRealmResourceWritable } from '@authup/core';
+import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
+import { AnalysisConfigurationStatus, AnalysisFileType, PermissionID } from '@privateaim/core';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
+import { AnalysisEntity, AnalysisFileEntity } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 import { runAnalysisValidation } from '../utils';
-import { AnalysisEntity } from '../../../../../domains';
 
 export async function updateAnalysisRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -49,6 +49,27 @@ export async function updateAnalysisRouteHandler(req: Request, res: Response) : 
     }
 
     entity = repository.merge(entity, result.data);
+
+    if (entity.build_status) {
+        entity.configuration_status = AnalysisConfigurationStatus.FINISHED;
+    } else {
+        // todo: this should be much cleaner!
+        entity.configuration_status = null;
+        if (entity.nodes > 0) {
+            entity.configuration_status = AnalysisConfigurationStatus.BASE_CONFIGURED;
+        }
+
+        const analysisFileRepository = dataSource.getRepository(AnalysisFileEntity);
+        const analysisFile = await analysisFileRepository.findOneBy({
+            analysis_id: entity.id,
+            type: AnalysisFileType.CODE,
+            root: true,
+        });
+
+        if (analysisFile) {
+            entity.configuration_status = AnalysisConfigurationStatus.RESOURCE_CONFIGURED;
+        }
+    }
 
     await repository.save(entity);
 

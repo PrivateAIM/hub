@@ -9,16 +9,18 @@ import { FormWizard, TabContent, WizardButton } from 'vue3-form-wizard';
 import type { PropType, Ref } from 'vue';
 import {
     computed,
-    defineComponent, reactive, ref, toRefs, watch,
+    defineComponent,
+    reactive,
+    ref,
+    toRef,
+    watch,
 } from 'vue';
 import type { Analysis, AnalysisFile } from '@privateaim/core';
-import {
-    AnalysisConfigurationStatus,
-} from '@privateaim/core';
+import { AnalysisConfigurationStatus, AnalysisFileType } from '@privateaim/core';
 import { initFormAttributesFromSource, injectCoreAPIClient } from '../../../core';
-import TrainWizardStepBase from './FAnalysisWizardStepBase.vue';
-import TrainFileManager from '../../analysis-file/FAnalysisFileManager.vue';
-import TrainWizardStepFinal from './FAnalysisWizardStepFinal.vue';
+import FAnalysisWizardStepBase from './FAnalysisWizardStepBase.vue';
+import FAnalysisFileManager from '../../analysis-file/FAnalysisFileManager.vue';
+import FAnalysisWizardStepFinal from './FAnalysisWizardStepFinal.vue';
 
 export default defineComponent({
     components: {
@@ -26,9 +28,9 @@ export default defineComponent({
         WizardButton,
         TabContent,
 
-        TrainWizardStepFinal,
-        TrainFileManager,
-        TrainWizardStepBase,
+        FAnalysisWizardStepFinal,
+        FAnalysisFileManager,
+        FAnalysisWizardStepBase,
     },
     props: {
         entity: {
@@ -39,16 +41,30 @@ export default defineComponent({
     emits: ['finished', 'failed', 'updated'],
     async setup(props, { emit }) {
         const apiClient = injectCoreAPIClient();
-        const refs = toRefs(props);
+        const entity = toRef(props, 'entity');
+
+        const entrypointFile = ref(null) as Ref<AnalysisFile | null>;
+
+        const resolveEntrypointFile = async () => {
+            const { data } = await apiClient.analysisFile.getMany({
+                filter: {
+                    root: true,
+                    type: AnalysisFileType.CODE,
+                    analysis_id: entity.value.id,
+                },
+            });
+
+            if (data.length > 0) {
+                [entrypointFile.value] = data;
+            }
+        };
+
+        await resolveEntrypointFile();
 
         const form = reactive({
             query: null,
             master_image_id: null,
 
-            user_rsa_secret_id: null,
-            user_paillier_secret_id: null,
-
-            entrypoint_file_id: null,
             files: [],
 
             hash_signed: '',
@@ -59,7 +75,7 @@ export default defineComponent({
             initFormAttributesFromSource(form, entity);
         };
 
-        updateForm(refs.entity.value);
+        updateForm(entity.value);
 
         const initialized = ref(false);
         const valid = ref(false);
@@ -68,20 +84,18 @@ export default defineComponent({
         const index = ref(0);
 
         const steps = [
-            'configuration',
-            'files',
-            'finish',
+            AnalysisConfigurationStatus.BASE_CONFIGURED,
+            AnalysisConfigurationStatus.RESOURCE_CONFIGURED,
+            AnalysisConfigurationStatus.FINISHED,
         ];
 
-        const isConfigured = computed(() => refs.entity.value.configuration_status === AnalysisConfigurationStatus.FINISHED);
-
-        const updatedAt = computed(() => (refs.entity.value ?
-            refs.entity.value.updated_at :
+        const updatedAt = computed(() => (entity.value ?
+            entity.value.updated_at :
             undefined));
 
         watch(updatedAt, (val, oldValue) => {
             if (val && val !== oldValue) {
-                updateForm(refs.entity.value);
+                updateForm(entity.value);
             }
         });
 
@@ -91,25 +105,18 @@ export default defineComponent({
             emit('updated', entity);
         };
 
-        const update = async (data: Partial<Analysis>) => {
-            if (!initialized.value) return;
-
-            const keys = Object.keys(data);
-
-            if (keys.length === 0) return;
-
-            const item = await apiClient.analysis.update(refs.entity.value.id, data);
-            handleUpdated(item);
+        const handleFailed = (e?: Error | null) => {
+            emit('failed', e);
         };
 
-        const wizardNode : Ref<typeof FormWizard> = ref(null);
+        const wizardNode : Ref<typeof FormWizard | null> = ref(null);
 
         const canPassBaseWizardStep = async () => {
             if (!form.master_image_id) {
                 throw new Error('A master image must be selected...');
             }
 
-            if (refs.entity.value.nodes <= 0) {
+            if (entity.value.nodes <= 0) {
                 throw new Error('One or more nodes have to be selected...');
             }
 
@@ -117,11 +124,9 @@ export default defineComponent({
         };
 
         const canPassFilesWizardStep = async () => {
-            if (!form.entrypoint_file_id || form.entrypoint_file_id.length === 0) {
+            if (!entrypointFile.value) {
                 throw new Error('An uploaded file must be selected as entrypoint.');
             }
-
-            await update({ entrypoint_file_id: form.entrypoint_file_id });
 
             return true;
         };
@@ -131,10 +136,10 @@ export default defineComponent({
             let promise : Promise<any>;
 
             switch (step) {
-                case 'configuration':
+                case AnalysisConfigurationStatus.BASE_CONFIGURED:
                     promise = canPassBaseWizardStep();
                     break;
-                case 'files':
+                case AnalysisConfigurationStatus.RESOURCE_CONFIGURED:
                     promise = canPassFilesWizardStep();
                     break;
                 default:
@@ -192,7 +197,11 @@ export default defineComponent({
         };
 
         const setEntrypointFile = (item?: AnalysisFile) => {
-            updateForm({ entrypoint_file_id: item ? item.id : null as string });
+            if (item) {
+                entrypointFile.value = item;
+            } else {
+                entrypointFile.value = null;
+            }
         };
 
         const handleWizardChangedEvent = (prevIndex: number, nextIndex: number) => {
@@ -213,8 +222,7 @@ export default defineComponent({
         return {
             startIndex,
 
-            isConfigured,
-
+            handleFailed,
             handleUpdated,
             handleWizardChangedEvent,
             handleWizardFinishedEvent,
@@ -224,6 +232,7 @@ export default defineComponent({
             nextWizardStep,
             passWizardStep,
 
+            entrypointFile,
             setEntrypointFile,
 
             wizardNode,
@@ -232,85 +241,78 @@ export default defineComponent({
 });
 </script>
 <template>
-    <div>
-        <div v-if="isConfigured">
-            <div class="alert alert-info alert-sm">
-                The train is not in the configuration stage and already left the factory.
+    <FormWizard
+        ref="wizardNode"
+        color="#333"
+        title="Train Wizard"
+        :subtitle="'Configure your analysis step by step'"
+        :start-index="startIndex"
+        @on-change="handleWizardChangedEvent"
+        @on-complete="handleWizardFinishedEvent"
+        @on-error="handleWizardErrorEvent"
+    >
+        <template #title>
+            <h4 class="wizard-title">
+                <i class="fa fa-hat-wizard" /> Analysis Wizard
+            </h4>
+            <p class="category">
+                Configure your analysis step by step
+            </p>
+        </template>
+        <template #footer="props">
+            <div class="wizard-footer-left">
+                <WizardButton
+                    v-if="props.activeTabIndex > 0 && !props.isLastStep"
+                    :style="props.fillButtonStyle"
+                    @click.native="prevWizardStep"
+                >
+                    Back
+                </WizardButton>
             </div>
-        </div>
-        <div v-else>
-            <FormWizard
-                ref="wizardNode"
-                color="#333"
-                title="Train Wizard"
-                :subtitle="'Configure your analysis step by step'"
-                :start-index="startIndex"
-                @on-change="handleWizardChangedEvent"
-                @on-complete="handleWizardFinishedEvent"
-                @on-error="handleWizardErrorEvent"
-            >
-                <template #title>
-                    <h4 class="wizard-title">
-                        <i class="fa fa-hat-wizard" /> Analysis Wizard
-                    </h4>
-                    <p class="category">
-                        Configure your analysis step by step
-                    </p>
-                </template>
-                <template #footer="props">
-                    <div class="wizard-footer-left">
-                        <WizardButton
-                            v-if="props.activeTabIndex > 0 && !props.isLastStep"
-                            :style="props.fillButtonStyle"
-                            @click.native="prevWizardStep"
-                        >
-                            Back
-                        </WizardButton>
-                    </div>
-                    <div class="wizard-footer-right">
-                        <WizardButton
-                            v-if="!props.isLastStep"
-                            class="wizard-footer-right"
-                            :style="props.fillButtonStyle"
-                            @click.native="nextWizardStep"
-                        >
-                            Next
-                        </WizardButton>
-
-                        <WizardButton
-                            v-else
-                            class="wizard-footer-right finish-button"
-                            :style="props.fillButtonStyle"
-                        >
-                            Build train
-                        </WizardButton>
-                    </div>
-                </template>
-
-                <TabContent
-                    title="Base"
-                    :before-change="passWizardStep"
+            <div class="wizard-footer-right">
+                <WizardButton
+                    v-if="!props.isLastStep"
+                    class="wizard-footer-right"
+                    :style="props.fillButtonStyle"
+                    @click.native="nextWizardStep"
                 >
-                    <train-wizard-step-base
-                        :entity="entity"
-                        @updated="handleUpdated"
-                    />
-                </TabContent>
+                    Next
+                </WizardButton>
 
-                <TabContent
-                    title="Files"
-                    :before-change="passWizardStep"
+                <WizardButton
+                    v-else
+                    class="wizard-footer-right finish-button"
+                    :style="props.fillButtonStyle"
                 >
-                    <train-file-manager
-                        :entity="entity"
-                        @setEntrypointFile="setEntrypointFile"
-                    />
-                </TabContent>
+                    Build Analysis
+                </WizardButton>
+            </div>
+        </template>
 
-                <TabContent title="Finish">
-                    <train-wizard-step-final />
-                </TabContent>
-            </FormWizard>
-        </div>
-    </div>
+        <TabContent
+            title="Base"
+            :before-change="passWizardStep"
+        >
+            <FAnalysisWizardStepBase
+                :entity="entity"
+                @updated="handleUpdated"
+            />
+        </TabContent>
+
+        <TabContent
+            title="Files"
+            :before-change="passWizardStep"
+        >
+            <FAnalysisFileManager
+                :entity="entity"
+                :entrypoint-file="entrypointFile"
+                @setEntrypointFile="setEntrypointFile"
+                @failed="handleFailed"
+            />
+        </TabContent>
+
+        <TabContent title="Finish">
+            <FAnalysisWizardStepFinal />
+        </TabContent>
+    </FormWizard>
 </template>

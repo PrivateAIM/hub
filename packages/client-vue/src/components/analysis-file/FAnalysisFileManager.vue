@@ -6,34 +6,40 @@
   -->
 
 <script lang="ts">
-import {
-    Analysis, AnalysisFile, AnalysisFileType, buildAnalysisFileBucketName,
+import type {
+    Analysis,
+    AnalysisFile,
 } from '@privateaim/core';
 import {
+    AnalysisFileType,
+    buildAnalysisFileBucketName,
     hasOwnProperty,
 } from '@privateaim/core';
-import type { PropType } from 'vue';
+import type { PropType, Ref } from 'vue';
 import {
-    computed, defineComponent, reactive, ref, toRefs, watch,
+    computed, defineComponent, ref,
 } from 'vue';
 import type { BuildInput } from 'rapiq';
 import { injectCoreAPIClient, injectStorageAPIClient, wrapFnWithBusyState } from '../../core';
-import TrainFileNode from './FAnalysisFile.vue';
-import TrainFileList from './FAnalysisFiles';
-import TrainFormFile from './FAnalysisFormFile.vue';
-import TrainImageCommand from '../analysis/FAnalysisImageCommand';
+import FAnalysisFile from './FAnalysisFile.vue';
+import FAnalysisFiles from './FAnalysisFiles';
+import FAnalysisFormFile from './FAnalysisFormFile.vue';
+import FAnalysisImageCommand from '../analysis/FAnalysisImageCommand';
 
 export default defineComponent({
     components: {
-        TrainFileList,
-        TrainImageCommand,
-        TrainFormFile,
-        TrainFileNode,
+        FAnalysisFiles,
+        FAnalysisImageCommand,
+        FAnalysisFormFile,
+        FAnalysisFile,
     },
     props: {
         entity: {
             type: Object as PropType<Analysis>,
             required: true,
+        },
+        fileEntity: {
+            type: Object as PropType<AnalysisFile>,
         },
     },
     emits: ['created', 'updated', 'deleted', 'uploaded', 'failed', 'setEntrypointFile'],
@@ -41,28 +47,23 @@ export default defineComponent({
         const coreClient = injectCoreAPIClient();
         const storageClient = injectStorageAPIClient();
 
-        const refs = toRefs(props);
+        const entrypointFile = ref(null) as Ref<AnalysisFile | null>;
+        if (props.fileEntity) {
+            entrypointFile.value = props.fileEntity;
+        }
 
-        const form = reactive({
-            path: '',
-            files: [],
-        });
+        const tempFiles = ref<File[]>([]);
 
-        const selected = ref([]);
-        const selectAll = ref(false);
-        const directoryMode = ref(true);
-        const busy = ref(false);
+        const selected = ref<string[]>([]);
+        const selectAll = ref<boolean>(false);
+        const directoryMode = ref<boolean>(true);
+        const busy = ref<boolean>(false);
 
-        const paths = computed(() => form.path.split('/').filter((el) => el !== ''));
-
-        const updatedAt = computed(() => (refs.entity.value ?
-            refs.entity.value.updated_at :
-            undefined));
-
-        const fileListNode = ref<null | typeof TrainFileList>(null);
+        const fileListNode = ref<null | typeof FAnalysisFiles>(null);
         const fileListQuery = computed<BuildInput<AnalysisFile>>(() => ({
             filters: {
-                train_id: refs.entity.value.id,
+                analysis_id: props.entity.id,
+                type: AnalysisFileType.CODE,
             },
         }));
 
@@ -95,31 +96,33 @@ export default defineComponent({
         };
 
         const upload = wrapFnWithBusyState(busy, async () => {
-            if (form.files.length === 0) return;
+            if (tempFiles.value.length === 0) return;
 
             try {
                 const formData = new FormData();
-                formData.set('train_id', refs.entity.value.id);
-
-                for (let i = 0; i < form.files.length; i++) {
-                    formData.append(`files[${i}]`, form.files[i]);
+                for (let i = 0; i < tempFiles.value.length; i++) {
+                    formData.append(`files[${i}]`, tempFiles.value[i]);
                 }
-
-                form.files = [];
 
                 // todo: replace this with reference
                 const {
-                    data: bucketFiles
-                } = await storageClient.bucket.upload(buildAnalysisFileBucketName(AnalysisFileType.CODE, props.entity.id), formData);
-                for(let i=0; i<bucketFiles.length; i++) {
+                    data: bucketFiles,
+                } = await storageClient.bucket.upload(
+                    buildAnalysisFileBucketName(AnalysisFileType.CODE, props.entity.id),
+                    formData,
+                );
+
+                for (let i = 0; i < bucketFiles.length; i++) {
                     const file = await coreClient.analysisFile.create({
                         type: AnalysisFileType.CODE,
                         bucket_file_id: bucketFiles[i].id,
-                        analysis_id: props.entity.id
+                        analysis_id: props.entity.id,
                     });
 
                     handleCreated(file);
                 }
+
+                tempFiles.value = [];
 
                 emit('uploaded');
             } catch (e) {
@@ -164,11 +167,11 @@ export default defineComponent({
 
         const filesNode = ref<null | string>(null);
 
-        const checkFormFiles = ($event: any) => {
+        const checkTempFiles = ($event: any) => {
             $event.preventDefault();
 
             for (let i = 0; i < $event.target.files.length; i++) {
-                form.files.push($event.target.files[i]);
+                tempFiles.value.push($event.target.files[i]);
             }
 
             if (filesNode.value) {
@@ -176,8 +179,8 @@ export default defineComponent({
             }
         };
 
-        const dropFormFile = ($event: any) => {
-            const index = form.files.findIndex((file) => {
+        const dropTempFile = ($event: any) => {
+            const index = tempFiles.value.findIndex((file) => {
                 if (
                     hasOwnProperty(file, 'webkitRelativePath') &&
                     hasOwnProperty($event, 'webkitRelativePath')
@@ -188,30 +191,52 @@ export default defineComponent({
             });
 
             if (index !== -1) {
-                form.files.splice(index, 1);
+                tempFiles.value.splice(index, 1);
             }
         };
 
-        const changeEntryPointFile = (file: AnalysisFile) => {
-            // todo: submit to api update ( root: true/false )
-            // todo: set old analysis root file to false.
+        const changeEntryPointFile = async (file: AnalysisFile) => {
+            if (entrypointFile.value) {
+                if (entrypointFile.value.id === file.id) {
+                    entrypointFile.value = null;
 
-            emit('setEntrypointFile', file);
+                    await coreClient.analysisFile.update(file.id, {
+                        root: false,
+                    });
+
+                    emit('setEntrypointFile', null);
+                } else {
+                    await coreClient.analysisFile.update(entrypointFile.value.id, {
+                        root: false,
+                    });
+
+                    await coreClient.analysisFile.update(file.id, {
+                        root: true,
+                    });
+
+                    emit('setEntrypointFile', file);
+                }
+            } else {
+                await coreClient.analysisFile.update(file.id, {
+                    root: true,
+                });
+
+                emit('setEntrypointFile', file);
+            }
         };
 
         return {
             directoryMode,
             busy,
-            checkFormFiles,
-            paths,
-            form,
+            checkTempFiles,
+            tempFiles,
 
             selected,
             selectAll,
             dropSelected,
             selectAllFiles,
 
-            dropFormFile,
+            dropTempFile,
 
             upload,
 
@@ -220,6 +245,8 @@ export default defineComponent({
             handleUpdated,
 
             toggleFile,
+
+            entrypointFile,
             changeEntryPointFile,
 
             filesNode,
@@ -244,7 +271,7 @@ export default defineComponent({
                         class="form-control"
                         multiple
                         :disbaled="busy"
-                        @change="checkFormFiles"
+                        @change="checkTempFiles"
                     >
                 </div>
                 <div class="form-group">
@@ -279,22 +306,14 @@ export default defineComponent({
                         <h6 class="title text-muted">
                             Path:
                             <span class="sub-title">
-                                <template
-                                    v-for="(path, key) in paths"
-                                    :key="key"
-                                >
-                                    {{ path }} <span class="text-dark">/</span>
-                                </template>
-                                <template v-if="paths.length === 0">
-                                    [root]
-                                </template>
+                                [root]
                             </span>
                         </h6>
                     </div>
                 </div>
 
                 <div
-                    v-if="form.files.length === 0"
+                    v-if="tempFiles.length === 0"
                     class="alert alert-info alert-sm m-t-10"
                 >
                     You have not selected any files to upload...
@@ -302,13 +321,13 @@ export default defineComponent({
 
                 <div class="d-flex flex-column">
                     <template
-                        v-for="(file,key) in form.files"
+                        v-for="(file,key) in tempFiles"
                         :key="key"
                     >
-                        <train-form-file
+                        <FAnalysisFormFile
                             class="me-1"
                             :file="file"
-                            @drop="dropFormFile"
+                            @drop="dropTempFile"
                         />
                     </template>
                 </div>
@@ -317,7 +336,7 @@ export default defineComponent({
                     <button
                         type="button"
                         class="btn btn-xs btn-dark"
-                        :disabled="busy || form.files.length === 0"
+                        :disabled="busy || tempFiles.length === 0"
                         @click.prevent="upload"
                     >
                         Upload
@@ -329,9 +348,10 @@ export default defineComponent({
 
                 <span>Entrypoint Command</span>
                 <br>
-                <train-image-command
+                <FAnalysisImageCommand
                     class="mt-2 mb-2"
                     :master-image-id="entity.master_image_id"
+                    :analysis-file="entrypointFile"
                     :analysis-id="entity.id"
                 />
 
@@ -359,7 +379,7 @@ export default defineComponent({
                     <label for="selectAllFiles">Select all</label>
                 </div>
 
-                <TrainFileList
+                <FAnalysisFiles
                     ref="fileListNode"
                     :query="fileListQuery"
                     :header-search="false"
@@ -375,7 +395,7 @@ export default defineComponent({
                                 v-for="file in props.data"
                                 :key="file.id"
                             >
-                                <TrainFileNode
+                                <FAnalysisFile
                                     class="me-1"
                                     :entity="file"
                                     :files-selected="selected"
@@ -387,7 +407,7 @@ export default defineComponent({
                             </template>
                         </div>
                     </template>
-                </TrainFileList>
+                </FAnalysisFiles>
 
                 <div class="form-group">
                     <button

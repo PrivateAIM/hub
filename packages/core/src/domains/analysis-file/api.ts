@@ -16,7 +16,7 @@ export class AnalysisFileAPI extends BaseAPI {
     async getMany(
         options?: BuildInput<AnalysisFile>,
     ): Promise<CollectionResourceResponse<AnalysisFile>> {
-        const response = await this.client.get(`analysis-files/${buildQuery(options)}`);
+        const response = await this.client.get(`analysis-files${buildQuery(options)}`);
 
         return response.data;
     }
