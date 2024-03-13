@@ -90,7 +90,7 @@ services:
             DB_DATABASE: 'auth'
             VAULT: start123@http://vault:8090/v1/
             REDIS: redis://redis
-            PUBLIC_URL: ${AUTHUP_PUBLIC_URL:-http://localhost:3010/}
+            PUBLIC_URL: ${AUTHUP_URL:-http://localhost:3010/}
             AUTHORIZE_REDIRECT_URL: ${UI_URL:-http://localhost:3000/}
             ROBOT_ADMIN_ENABLED: true
         networks:
@@ -215,6 +215,7 @@ services:
             STORAGE_URL: ${STORAGE_URL:-http://localhost:3000}
             CORE_URL: ${CORE_URL:-http://localhost:3001}
             REALTIME_URL: ${REALTIME_URL:-http://localhost:3002}
+            AUTHUP_URL: ${AUTHUP_URL:http://localhost:3010}
         networks:
             hub:
 networks:
