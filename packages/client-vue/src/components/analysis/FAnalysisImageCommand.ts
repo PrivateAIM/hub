@@ -6,8 +6,9 @@
  */
 
 import type { AnalysisFile, MasterImage } from '@privateaim/core';
+import type { PropType } from 'vue';
 import {
-    computed, defineComponent, h, ref, toRefs, watch,
+    computed, defineComponent, h, ref, toRef, watch,
 } from 'vue';
 import { injectCoreAPIClient, wrapFnWithBusyState } from '../../core';
 
@@ -25,11 +26,17 @@ export default defineComponent({
             type: String,
             default: undefined,
         },
+        analysisFile: {
+            type: Object as PropType<AnalysisFile>,
+        },
     },
     emits: ['failed'],
     async setup(props, { emit }) {
         const apiClient = injectCoreAPIClient();
-        const refs = toRefs(props);
+
+        const analysisFileId = toRef(props, 'analysisFileId');
+        const analysisFile = toRef(props, 'analysisFile');
+        const masterImageId = toRef(props, 'masterImageId');
 
         const masterImageEntity = ref<null | MasterImage>(null);
         const masterImageBusy = ref(false);
@@ -60,10 +67,10 @@ export default defineComponent({
         });
 
         const loadMasterImage = wrapFnWithBusyState(masterImageBusy, async () => {
-            if (!refs.masterImageId.value) return;
+            if (!masterImageId.value) return;
 
             try {
-                const item = await apiClient.masterImage.getOne(refs.masterImageId.value);
+                const item = await apiClient.masterImage.getOne(masterImageId.value);
                 const { data } = await apiClient.masterImageGroup.getMany({
                     filters: {
                         virtual_path: item.group_virtual_path,
@@ -85,37 +92,57 @@ export default defineComponent({
 
         await loadMasterImage();
 
-        watch(refs.masterImageId, async (value, oldValue) => {
+        watch(masterImageId, async (value, oldValue) => {
             if (value && value !== oldValue) {
                 await loadMasterImage();
             }
         });
 
-        const loadAnalysisFile = wrapFnWithBusyState(analysisFileBusy, async () => {
-            if (!refs.analysisFileId.value) return;
+        const resolveAnalysisFile = wrapFnWithBusyState(analysisFileBusy, async () => {
+            if (props.analysisFile) {
+                analysisFileEntity.value = props.analysisFile;
+                return;
+            }
 
-            try {
-                analysisFileEntity.value = await apiClient.analysisFile.getOne(refs.analysisFileId.value);
-            } catch (e) {
-                if (e instanceof Error) {
-                    emit('failed', e);
+            if (props.analysisFileId) {
+                if (
+                    analysisFileEntity.value &&
+                    analysisFileEntity.value.id === props.analysisFileId
+                ) {
+                    return;
+                }
+
+                try {
+                    analysisFileEntity.value = await apiClient.analysisFile.getOne(props.analysisFileId);
+                } catch (e) {
+                    if (e instanceof Error) {
+                        emit('failed', e);
+                    }
                 }
             }
+
+            analysisFileEntity.value = null;
         });
 
-        await loadAnalysisFile();
+        await resolveAnalysisFile();
 
-        watch(refs.analysisFileId, async (value, oldValue) => {
-            if (value) {
-                if (value !== oldValue) {
-                    await loadAnalysisFile();
-                }
-            } else {
-                analysisFileEntity.value = null;
+        watch(analysisFileId, async () => {
+            await resolveAnalysisFile();
+        });
+
+        const analysisFileUpdated = computed(() => {
+            if (analysisFile.value) {
+                return analysisFile.value.updated_at;
             }
+
+            return undefined;
         });
 
-        await Promise.all([loadMasterImage, loadAnalysisFile]);
+        watch(analysisFileUpdated, async () => {
+            await resolveAnalysisFile();
+        });
+
+        await Promise.all([loadMasterImage, resolveAnalysisFile]);
 
         return () => h('div', {
             class: 'command-box',

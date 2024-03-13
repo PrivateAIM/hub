@@ -20,14 +20,13 @@ import {
 import type {
     Analysis,
     AnalysisBuildStatus,
+    AnalysisConfigurationStatus,
     AnalysisResultStatus,
     AnalysisRunStatus,
     MasterImage,
     Project,
+
     Registry,
-} from '@privateaim/core';
-import {
-    AnalysisConfigurationStatus,
 } from '@privateaim/core';
 import type { Realm, User } from '@authup/core';
 import { ProjectEntity } from '../project/entity';
@@ -126,15 +125,15 @@ export class AnalysisEntity implements Analysis {
     @BeforeInsert()
     @BeforeUpdate()
     setConfigurationStatus() {
-        this.configuration_status = null;
+        // this.configuration_status = null;
 
         if (this.nodes > 0) {
-            this.configuration_status = AnalysisConfigurationStatus.BASE_CONFIGURED;
+            // this.configuration_status = AnalysisConfigurationStatus.BASE_CONFIGURED;
         } else {
-            return;
+            // return;
         }
 
         // check if all conditions are met
-        this.configuration_status = AnalysisConfigurationStatus.FINISHED;
+        // this.configuration_status = AnalysisConfigurationStatus.FINISHED;
     }
 }
