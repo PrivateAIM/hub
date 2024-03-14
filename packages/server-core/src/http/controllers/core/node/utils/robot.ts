@@ -6,25 +6,27 @@
  */
 
 import type { Robot } from '@authup/core';
+import { isClientErrorWithStatusCode } from 'hapic';
 import { hasAuthupClient, useAuthupClient } from '../../../../../core';
 import type { NodeEntity } from '../../../../../domains';
 
 export async function createNodeRobot(entity: NodeEntity) : Promise<void> {
-    if (entity.robot_id) {
-        throw new Error('Node Robot already exists.');
-    }
-
     if (!hasAuthupClient()) {
         return;
     }
 
     const authupClient = useAuthupClient();
 
-    let robot : Robot;
+    let robot : Robot | undefined;
     try {
         robot = await authupClient.robot.getOne(entity.robot_id);
     } catch (e) {
-        // todo: only on 404
+        if (!isClientErrorWithStatusCode(e, 404)) {
+            throw e;
+        }
+    }
+
+    if (typeof robot === 'undefined') {
         robot = await authupClient.robot.create({
             name: entity.id,
             realm_id: entity.realm_id,
@@ -35,7 +37,7 @@ export async function createNodeRobot(entity: NodeEntity) : Promise<void> {
 }
 
 export async function deleteNodeRobot(entity: NodeEntity) : Promise<void> {
-    if (!hasAuthupClient()) {
+    if (!hasAuthupClient() || !entity.robot_id) {
         return;
     }
 
@@ -44,7 +46,9 @@ export async function deleteNodeRobot(entity: NodeEntity) : Promise<void> {
     try {
         await authupClient.robot.delete(entity.robot_id);
     } catch (e) {
-        // toto: check for 404
+        if (!isClientErrorWithStatusCode(e, 404)) {
+            throw e;
+        }
     }
 
     entity.robot_id = null;

@@ -68,6 +68,14 @@ export async function runNodeValidation(
 
     // -------------------------------------------------------------
 
+    await check('robot_id')
+        .exists()
+        .isUUID()
+        .optional({ nullable: true })
+        .run(req);
+
+    // -------------------------------------------------------------
+
     if (operation === 'create') {
         await check('realm_id')
             .exists()
