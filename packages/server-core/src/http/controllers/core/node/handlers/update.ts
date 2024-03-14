@@ -111,9 +111,7 @@ export async function updateNodeRouteHandler(req: Request, res: Response) : Prom
         }
     }
 
-    if (!entity.robot_id) {
-        await createNodeRobot(entity);
-    }
+    await createNodeRobot(entity);
 
     await repository.save(entity);
 

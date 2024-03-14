@@ -18,11 +18,13 @@ export async function createNodeRobot(entity: NodeEntity) : Promise<void> {
     const authupClient = useAuthupClient();
 
     let robot : Robot | undefined;
-    try {
-        robot = await authupClient.robot.getOne(entity.robot_id);
-    } catch (e) {
-        if (!isClientErrorWithStatusCode(e, 404)) {
-            throw e;
+    if (entity.robot_id) {
+        try {
+            robot = await authupClient.robot.getOne(entity.robot_id);
+        } catch (e) {
+            if (!isClientErrorWithStatusCode(e, 404)) {
+                throw e;
+            }
         }
     }
 
