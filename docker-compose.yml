@@ -116,6 +116,7 @@ services:
             VAULT_CONNECTION_STRING: start123@http://vault:8090/v1/
             RABBITMQ_CONNECTION_STRING: ${MQ_CONNECTION_URL:-amqp://root:start123@172.40.1.1}
             PUBLIC_URL: ${CORE_URL:-http://localhost:3001/}
+            HARBOR_URL: ${HARBOR_URL:-}
             AUTHUP_URL: http://authup:3000/
             DB_TYPE: 'mysql'
             DB_HOST: 'mysql'
@@ -215,7 +216,7 @@ services:
             STORAGE_URL: ${STORAGE_URL:-http://localhost:3000}
             CORE_URL: ${CORE_URL:-http://localhost:3001}
             REALTIME_URL: ${REALTIME_URL:-http://localhost:3002}
-            AUTHUP_URL: ${AUTHUP_URL:http://localhost:3010}
+            AUTHUP_URL: ${AUTHUP_URL:-http://localhost:3010}
         networks:
             hub:
 networks:
