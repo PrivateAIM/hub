@@ -22,7 +22,7 @@
         "@authup/core": "^1.0.0-beta.7",
         "@bootstrap-vue-next/nuxt": "^0.16.6",
         "@fortawesome/fontawesome-free": "^6.5.1",
-        "@nuxtjs/google-fonts": "^3.1.3",
+        "@nuxtjs/google-fonts": "^3.2.0",
         "@privateaim/client-vue": "^0.3.0",
         "@privateaim/core": "^0.3.0",
         "@privateaim/storage-kit": "^0.3.0",
