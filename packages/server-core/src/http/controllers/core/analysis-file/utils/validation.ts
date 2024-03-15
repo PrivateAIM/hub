@@ -42,28 +42,23 @@ export async function runAnalysisFileValidation(
 
     // ----------------------------------------------
 
-    const bucketFileChain = check('bucket_file_id')
-        .exists()
-        .isUUID();
+    if (operation === 'create') {
+        await check('bucket_file_id')
+            .exists()
+            .isUUID()
+            .run(req);
 
-    if (operation === 'update') {
-        bucketFileChain.optional();
+        await check('target_realm_id')
+            .exists()
+            .isUUID()
+            .optional({ nullable: true })
+            .run(req);
+
+        await check('type')
+            .exists()
+            .isIn(Object.values(AnalysisFileType))
+            .run(req);
     }
-
-    await bucketFileChain.run(req);
-
-    // ----------------------------------------------
-
-    await check('target_realm_id')
-        .exists()
-        .isUUID()
-        .optional({ nullable: true })
-        .run(req);
-
-    await check('type')
-        .exists()
-        .isIn(Object.values(AnalysisFileType))
-        .run(req);
 
     await check('root')
         .optional()
@@ -83,22 +78,21 @@ export async function runAnalysisFileValidation(
 
     // ----------------------------------------------
 
-    result.data.realm_id = useRequestEnv(req, 'realmId');
+    if (operation === 'create') {
+        result.data.realm_id = useRequestEnv(req, 'realmId');
+        if (!result.data.target_realm_id) {
+            result.data.target_realm_id = result.data.realm_id;
+        }
 
-    if (!result.data.target_realm_id) {
-        result.data.target_realm_id = result.data.realm_id;
-    }
+        const userId = useRequestEnv(req, 'userId');
+        if (userId) {
+            result.data.user_id = userId;
+        }
 
-    // ----------------------------------------------
-
-    const userId = useRequestEnv(req, 'userId');
-    if (userId) {
-        result.data.user_id = userId;
-    }
-
-    const robotId = useRequestEnv(req, 'robotId');
-    if (robotId) {
-        result.data.robot_id = robotId;
+        const robotId = useRequestEnv(req, 'robotId');
+        if (robotId) {
+            result.data.robot_id = robotId;
+        }
     }
 
     // ----------------------------------------------

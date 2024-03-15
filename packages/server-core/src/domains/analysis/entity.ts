@@ -5,6 +5,19 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { Realm, User } from '@authup/core';
+import type {
+    Analysis,
+    AnalysisResultStatus,
+    AnalysisRunStatus,
+    MasterImage,
+    Project,
+    Registry,
+} from '@privateaim/core';
+import {
+    AnalysisBuildStatus,
+    AnalysisConfigurationStatus,
+} from '@privateaim/core';
 import {
     BeforeInsert,
     BeforeUpdate,
@@ -17,20 +30,8 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-import type {
-    Analysis,
-    AnalysisBuildStatus,
-    AnalysisConfigurationStatus,
-    AnalysisResultStatus,
-    AnalysisRunStatus,
-    MasterImage,
-    Project,
-
-    Registry,
-} from '@privateaim/core';
-import type { Realm, User } from '@authup/core';
-import { ProjectEntity } from '../project/entity';
 import { MasterImageEntity } from '../master-image/entity';
+import { ProjectEntity } from '../project/entity';
 import { RegistryEntity } from '../registry/entity';
 
 @Entity()
@@ -125,15 +126,15 @@ export class AnalysisEntity implements Analysis {
     @BeforeInsert()
     @BeforeUpdate()
     setConfigurationStatus() {
-        // this.configuration_status = null;
-
-        if (this.nodes > 0) {
-            // this.configuration_status = AnalysisConfigurationStatus.BASE_CONFIGURED;
-        } else {
-            // return;
+        if (
+            this.build_status &&
+            this.build_status === AnalysisBuildStatus.FINISHED
+        ) {
+            this.configuration_status = AnalysisConfigurationStatus.FINISHED;
         }
 
-        // check if all conditions are met
-        // this.configuration_status = AnalysisConfigurationStatus.FINISHED;
+        if (this.run_status) {
+            this.configuration_status = AnalysisConfigurationStatus.FINISHED;
+        }
     }
 }
