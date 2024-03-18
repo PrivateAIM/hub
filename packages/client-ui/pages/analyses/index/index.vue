@@ -55,10 +55,6 @@ export default defineNuxtComponent({
 </script>
 <template>
     <div>
-        <div class="alert alert-primary alert-sm">
-            This is an overview of all created analyses, either by you or a person of your realm.
-        </div>
-
         <div class="m-t-10">
             <FAnalyses :query="query">
                 <template #header="props">

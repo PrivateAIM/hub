@@ -9,11 +9,11 @@ import { computed } from 'vue';
 import type { BuildInput } from 'rapiq';
 import type { PropType } from 'vue';
 import { type Analysis, type AnalysisFile, AnalysisFileType } from '@privateaim/core';
-import { FAnalysisFiles } from '@privateaim/client-vue';
+import { FAnalysisFileDownload, FAnalysisFiles } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
 
 export default defineNuxtComponent({
-    components: { FAnalysisFiles },
+    components: { FAnalysisFiles, FAnalysisFileDownload },
     props: {
         entity: {
             type: Object as PropType<Analysis>,
@@ -40,6 +40,13 @@ export default defineNuxtComponent({
         <FAnalysisFiles
             v-if="entity"
             :query="query"
-        />
+        >
+            <template #itemActions="{ data }">
+                <FAnalysisFileDownload
+                    :entity="data"
+                    :with-icon="true"
+                />
+            </template>
+        </FAnalysisFiles>
     </div>
 </template>

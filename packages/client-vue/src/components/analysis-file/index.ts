@@ -6,6 +6,7 @@
  */
 
 export { default as FAnalysisFile } from './FAnalysisFile.vue';
+export { FAnalysisFileDownload } from './FAnalysisFileDownload';
 export { FAnalysisFiles } from './FAnalysisFiles';
 export { default as FAnalysisFileManager } from './FAnalysisFileManager.vue';
 export { default as FAnalysisFormFile } from './FAnalysisFormFile.vue';

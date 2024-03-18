@@ -59,9 +59,6 @@ export default defineNuxtComponent({
 </script>
 <template>
     <div>
-        <div class="alert alert-primary alert-sm">
-            This is a slight overview of all projects, which are created by you or one of your co workers.
-        </div>
         <div class="m-t-10">
             <FProjects
                 :query="query"

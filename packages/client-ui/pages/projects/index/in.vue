@@ -18,12 +18,12 @@ import type { Ref } from 'vue';
 import { computed, ref } from 'vue';
 import {
     FPagination,
-    FSearch,
-    FTitle,
     FProjectInForm,
     FProjectNodeApprovalCommand,
     FProjectNodeApprovalStatus,
     FProjectNodes,
+    FSearch,
+    FTitle,
 } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
 import { definePageMeta } from '#imports';
@@ -42,10 +42,10 @@ export default defineNuxtComponent({
         BDropdownItem,
         BSpinner,
         BTable,
-        FProjectNodes: FProjectNodes,
-        FProjectNodeApprovalCommand: FProjectNodeApprovalCommand,
-        FProjectNodeApprovalStatus: FProjectNodeApprovalStatus,
-        FProjectInForm: FProjectInForm,
+        FProjectNodes,
+        FProjectNodeApprovalCommand,
+        FProjectNodeApprovalStatus,
+        FProjectInForm,
         VCTimeago,
     },
     async setup() {
@@ -142,10 +142,6 @@ export default defineNuxtComponent({
 </script>
 <template>
     <div>
-        <div class="alert alert-primary alert-sm">
-            This is a slight overview of all incoming projects from other realms. If you approve a project,
-            your nodes can be used by inherited analyses.
-        </div>
         <div class="m-t-10">
             <FProjectNodes
                 ref="listNode"
