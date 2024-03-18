@@ -7,11 +7,8 @@
 
 export enum ServiceID {
     // Core Service(s)
-    SYSTEM = 'SYSTEM',
-    EMAIL_SERVICE = 'EMAIL_SERVICE',
+    SYSTEM = 'system',
 
     // Third Party Service(s)
-    GITHUB = 'GITHUB',
-    REGISTRY = 'REGISTRY',
-    SECRET_STORAGE = 'SECRET_STORAGE',
+    REGISTRY = 'registry',
 }
