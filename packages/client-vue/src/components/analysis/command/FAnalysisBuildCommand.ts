@@ -15,7 +15,10 @@ import {
     PermissionID,
 } from '@privateaim/core';
 import {
-    injectCoreAPIClient, injectAuthupStore, renderActionCommand, wrapFnWithBusyState,
+    injectAuthupStore,
+    injectCoreAPIClient,
+    renderActionCommand,
+    wrapFnWithBusyState,
 } from '../../../core';
 import type { AnalysisCommandProperties } from './type';
 
@@ -59,7 +62,6 @@ export default defineComponent({
             if (props.command === AnalysisAPICommand.BUILD_START) {
                 return !!props.entity.build_status &&
                     [
-                        AnalysisBuildStatus.STOPPED,
                         AnalysisBuildStatus.STOPPING,
                         AnalysisBuildStatus.FAILED,
                     ].indexOf(props.entity.build_status) === -1;
@@ -67,8 +69,6 @@ export default defineComponent({
 
             if (props.command === AnalysisAPICommand.BUILD_STOP) {
                 return !!props.entity.build_status && [
-                    AnalysisBuildStatus.STARTING,
-                    AnalysisBuildStatus.STARTED,
                     AnalysisBuildStatus.STOPPING,
                 ].indexOf(props.entity.build_status) === -1;
             }

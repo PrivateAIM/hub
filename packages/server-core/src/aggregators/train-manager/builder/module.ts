@@ -43,10 +43,7 @@ export async function handleTrainManagerBuilderEvent(
 
     switch (context.event) {
         case BuilderEvent.NONE:
-            if (
-                entity.run_status === null &&
-                entity.result_status === null
-            ) {
+            if (!entity.run_status) {
                 entity.build_status = null;
             }
             break;
@@ -89,7 +86,6 @@ export async function handleTrainManagerBuilderEvent(
         context.event !== BuilderEvent.NONE
     ) {
         entity.run_status = null;
-        entity.result_status = null;
     }
 
     await repository.save(entity);

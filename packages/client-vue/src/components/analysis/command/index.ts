@@ -6,4 +6,3 @@
  */
 
 export { default as FAnalysisBuildCommand } from './FAnalysisBuildCommand';
-export { default as FAnalysisResultCommand } from './FAnalysisResultCommand';

@@ -5,7 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { VCLink } from "@vuecs/link";
+import { VCLink } from '@vuecs/link';
 import type { Analysis } from '@privateaim/core';
 import {
     AnalysisAPICommand,
@@ -17,19 +17,15 @@ import type { PropType } from 'vue';
 import { computed, defineComponent } from 'vue';
 import { injectAuthupStore } from '../../core';
 import Dropdown from '../Dropdown';
-import TrainResultCommand from './command/FAnalysisResultCommand';
 import TrainBuildStatusText from './FAnalysisBuildStatusText.vue';
 import TrainBuildCommand from './command/FAnalysisBuildCommand';
-import TrainResultStatusText from '../analysis-result/FAnalysisResultStatusText.vue';
 import TrainConfigurationStatusText from './FAnalysisConfigurationStatusText.vue';
 
 export default defineComponent({
     components: {
         VCLink,
         Dropdown,
-        TrainResultCommand,
         TrainConfigurationStatusText,
-        TrainResultStatusText,
         TrainBuildCommand,
         TrainBuildStatusText,
     },
@@ -168,58 +164,6 @@ export default defineComponent({
                         :with-icon="true"
                         :entity="entity"
                         @executed="(command) => handleExecuted('build', command)"
-                        @updated="handleUpdated"
-                        @failed="handleFailed"
-                    />
-                </Dropdown>
-            </div>
-        </div>
-        <div
-            class="d-flex flex-grow-1 align-items-center"
-            style="flex-basis: 0"
-            :class="{
-                'flex-row': listDirection === 'column',
-                'flex-column': listDirection === 'row'
-            }"
-        >
-            <div class="me-1">
-                <strong>4. Result</strong>
-            </div>
-            <div>
-                Status: <train-result-status-text :status="entity.result_status" />
-            </div>
-            <div
-                v-if="withCommand"
-                class="ms-auto flex-row d-flex"
-            >
-                <train-result-command
-                    class="me-1"
-                    :command="'resultDownload'"
-                    :with-icon="true"
-                    :entity="entity"
-                    @executed="(command) => handleExecuted('result', command)"
-                    @updated="handleUpdated"
-                    @failed="handleFailed"
-                />
-                <train-result-command
-                    class="me-1"
-                    :command="trainCommand.RESULT_START"
-                    :with-icon="true"
-                    :entity="entity"
-                    @executed="(command) => handleExecuted('result', command)"
-                    @updated="handleUpdated"
-                    @failed="handleFailed"
-                />
-                <Dropdown
-                    variant="dark"
-                    :size="'xs' as 'sm'"
-                >
-                    <train-result-command
-                        :command="trainCommand.RESULT_STATUS"
-                        :with-icon="true"
-                        :element-type="'dropDownItem'"
-                        :entity="entity"
-                        @executed="(command) => handleExecuted('result', command)"
                         @updated="handleUpdated"
                         @failed="handleFailed"
                     />

@@ -67,10 +67,8 @@ export default defineComponent({
         <template v-if="elementType === 'steps'">
             <div class="train-stations-progress">
                 <FAnalysisNodes
+                    :header="false"
                     :query="query"
-                    :header-title="false"
-                    :header-search="false"
-                    :footer-pagination="false"
                     :no-more="false"
                     :realm-id="entity.realm_id"
                     :source-id="entity.id"
@@ -84,7 +82,7 @@ export default defineComponent({
                                 class="d-flex flex-column progress-step"
                             >
                                 <div
-                                    class="d-flex justify-content-center icon-circle progress-step text-light"
+                                    class="d-flex justify-content-center icon-circle text-light p-1"
                                     :class="{
                                         'bg-secondary': !item.run_status,
                                         'bg-dark': item.run_status === analysisNodeRunStatus.DEPARTED,

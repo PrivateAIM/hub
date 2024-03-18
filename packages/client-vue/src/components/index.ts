@@ -16,7 +16,6 @@ export * from './node';
 export * from './analysis';
 export * from './analysis-file';
 export * from './analysis-log';
-export * from './analysis-result';
 export * from './analysis-node';
 export { default as EntityDelete } from './EntityDelete';
 export * from './utility';

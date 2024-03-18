@@ -155,12 +155,10 @@ TrainStationProgress
 }
 
 .progress-step {
-    width: 100px;
     display: flex;
     justify-content: center;
     align-content: center;
     text-align: center;
-
 }
 
 .icon-circle {

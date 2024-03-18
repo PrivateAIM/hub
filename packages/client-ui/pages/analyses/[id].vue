@@ -53,6 +53,7 @@ export default defineNuxtComponent({
 
         const tabs = [
             { name: 'Overview', icon: 'fas fa-bars', urlSuffix: '' },
+            { name: 'Results', icon: 'fas fa-chart-bar', urlSuffix: '/results' },
             { name: 'Setup', icon: 'fa fa-wrench', urlSuffix: '/setup' },
         ];
 
@@ -68,7 +69,7 @@ export default defineNuxtComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            <i class="fa fa-bar-chart"></i> Analysis
+            <i class="fa fa-bar-chart" /> Analysis
             <span class="sub-title">
                 <template v-if="entity">
                     <FAnalysisName
