@@ -7,5 +7,5 @@
 
 export { default as FNodeForm } from './FNodeForm';
 export { default as FNodes } from './FNodes';
-export { default as FNodeRegistryProjectEntity } from './FNodeRegistryProject';
+export { default as FNodeRegistryProject } from './FNodeRegistryProject';
 export { default as FNodeRobotEntity } from './FNodeRobot';

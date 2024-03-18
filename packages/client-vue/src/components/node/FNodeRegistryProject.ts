@@ -57,10 +57,12 @@ export default defineComponent({
                 onResolved: (entity?: RegistryProject) => {
                     if (!entity) { return; }
 
-                    emit('updated', {
-                        registry_project_id: entity.id,
-                        registry_project: entity,
-                    });
+                    if (props.entity.registry_project_id !== entity.id) {
+                        emit('updated', {
+                            registry_project_id: entity.id,
+                            registry_project: entity,
+                        });
+                    }
                 },
             },
         );

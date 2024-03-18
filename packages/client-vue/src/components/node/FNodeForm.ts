@@ -66,7 +66,7 @@ export default defineComponent({
             name: {
                 required,
                 minLength: minLength(3),
-                maxLength: maxLength(30),
+                maxLength: maxLength(128),
             },
             realm_id: {
                 required,
@@ -232,7 +232,6 @@ export default defineComponent({
             ]);
 
             const registry : VNodeArrayChildren = [
-                h('hr'),
                 h(RegistryList, {}, {
                     [EntityListSlotName.ITEM_ACTIONS]: (props: ListItemSlotProps<Registry>) => h('button', {
                         disabled: props.busy,
@@ -284,7 +283,6 @@ export default defineComponent({
                         hidden,
                         h('hr'),
                         emailNode,
-                        h('hr'),
                         h('hr'),
                         submitNode,
                     ]),

@@ -50,8 +50,7 @@ export default defineComponent({
                 emit('failed', e);
             },
             queryFilters: {
-                name: props.entity.id,
-                realm_id: props.entity.realm_id,
+                id: props.entity.robot_id,
             },
         }, {
             default: (slotProps: EntityManagerSlotProps<Robot>) => {

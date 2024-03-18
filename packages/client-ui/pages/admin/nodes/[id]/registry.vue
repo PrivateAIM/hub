@@ -7,11 +7,11 @@
 <script lang="ts">
 import type { Node } from '@privateaim/core';
 import type { PropType } from 'vue';
-import { FNodeRegistryProjectEntity } from '@privateaim/client-vue';
+import { FNodeRegistryProject } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
 
 export default defineNuxtComponent({
-    components: { FNodeRegistryProjectEntity },
+    components: { FNodeRegistryProject },
     props: {
         entity: {
             type: Object as PropType<Node>,
@@ -36,7 +36,7 @@ export default defineNuxtComponent({
 });
 </script>
 <template>
-    <FNodeRegistryProjectEntity
+    <FNodeRegistryProject
         v-if="entity"
         :entity="entity"
         :realm-id="entity.realm_id"
