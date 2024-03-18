@@ -12,7 +12,7 @@ export default defineNuxtComponent({
     setup() {
         useHead({
             charset: 'utf-8',
-            titleTemplate: 'PHT - User Interface (UI)',
+            titleTemplate: 'PrivateAim - HUB',
             meta: [],
             link: [],
         });

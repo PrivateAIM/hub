@@ -39,10 +39,6 @@ export interface Analysis {
 
     // ------------------------------------------------------------------
 
-    result_status: AnalysisResultStatus | null;
-
-    // ------------------------------------------------------------------
-
     created_at: Date;
 
     updated_at: Date;

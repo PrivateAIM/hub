@@ -7,7 +7,7 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import type { Analysis } from '@privateaim/core';
-import { FAnalysisNodeProgress, FAnalysisPipeline, FAnalysisLogs } from '@privateaim/client-vue';
+import { FAnalysisLogs, FAnalysisNodeProgress, FAnalysisPipeline } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
 
 export default defineNuxtComponent({
@@ -45,8 +45,7 @@ export default defineNuxtComponent({
     <div v-if="entity">
         <div class="panel-box mb-3">
             <h6 class="mb-3">
-                <span class="text-info">{{ entity.nodes }}</span> Node(s)
-                <i class="fa-solid fa-house-medical" />
+                <i class="fa-solid fa-server" /> Node(s)
             </h6>
 
             <FAnalysisNodeProgress :entity="entity" />

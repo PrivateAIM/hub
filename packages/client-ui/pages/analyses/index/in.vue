@@ -115,10 +115,6 @@ export default defineNuxtComponent({
 </script>
 <template>
     <div>
-        <div class="alert alert-primary alert-sm">
-            This is an overview of all incoming analyses from other realms, that want to run an algorithm on your infrastructure.
-        </div>
-
         <div class="m-t-10">
             <FAnalysisNodes
                 :ref="listNode"

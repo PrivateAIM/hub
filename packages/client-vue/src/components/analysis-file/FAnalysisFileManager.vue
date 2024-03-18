@@ -22,7 +22,7 @@ import {
 import type { BuildInput } from 'rapiq';
 import { injectCoreAPIClient, injectStorageAPIClient, wrapFnWithBusyState } from '../../core';
 import FAnalysisFile from './FAnalysisFile.vue';
-import FAnalysisFiles from './FAnalysisFiles';
+import { FAnalysisFiles } from './FAnalysisFiles';
 import FAnalysisFormFile from './FAnalysisFormFile.vue';
 import FAnalysisImageCommand from '../analysis/FAnalysisImageCommand';
 

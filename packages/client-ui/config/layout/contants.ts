@@ -233,7 +233,7 @@ export const LayoutSideAdminNavigation: NavigationItem[] = [
                 name: 'Nodes',
                 type: 'link',
                 url: '/admin/nodes',
-                icon: 'fa-solid fa-house-medical',
+                icon: 'fa-solid fa-server',
                 [LayoutKey.REQUIRED_LOGGED_IN]: true,
                 [LayoutKey.REQUIRED_PERMISSIONS]: [
                     PermissionID.NODE_ADD,

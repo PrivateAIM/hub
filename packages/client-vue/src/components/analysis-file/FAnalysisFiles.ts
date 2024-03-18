@@ -13,7 +13,7 @@ import { defineComponent } from 'vue';
 import type { ListSlotsType } from '../../core';
 import { createList, defineListEvents, defineListProps } from '../../core';
 
-export default defineComponent({
+const FAnalysisFiles = defineComponent({
     props: {
         ...defineListProps<AnalysisFile>(),
         realmId: {
@@ -44,3 +44,7 @@ export default defineComponent({
         return () => render();
     },
 });
+
+export {
+    FAnalysisFiles,
+};
