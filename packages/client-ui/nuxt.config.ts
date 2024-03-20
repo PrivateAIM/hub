@@ -23,6 +23,7 @@ export default defineNuxtConfig({
     alias: {
         '@privateaim/core': path.join(__dirname, '..', 'core', 'src'),
         '@privateaim/client-vue': path.join(__dirname, '..', 'client-vue', 'src'),
+        '@privateaim/storage-kit': path.join(__dirname, '..', 'storage-kit', 'src'),
     },
     /*
     ** Global CSS

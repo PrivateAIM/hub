@@ -305,7 +305,7 @@ export default defineComponent({
         >
             <FAnalysisFileManager
                 :entity="entity"
-                :entrypoint-file="entrypointFile"
+                :file-entity="entrypointFile"
                 @setEntrypointFile="setEntrypointFile"
                 @failed="handleFailed"
             />

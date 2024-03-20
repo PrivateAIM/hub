@@ -51,6 +51,13 @@ export default defineComponent({
         if (props.fileEntity) {
             entrypointFile.value = props.fileEntity;
         }
+        const entrypointFileId = computed(() => {
+            if (entrypointFile.value) {
+                return entrypointFile.value.id;
+            }
+
+            return undefined;
+        });
 
         const tempFiles = ref<File[]>([]);
 
@@ -199,11 +206,11 @@ export default defineComponent({
         const changeEntryPointFile = async (file: AnalysisFile) => {
             if (entrypointFile.value) {
                 if (entrypointFile.value.id === file.id) {
-                    entrypointFile.value = null;
-
                     await coreClient.analysisFile.update(file.id, {
                         root: false,
                     });
+
+                    entrypointFile.value = null;
 
                     emit('setEntrypointFile', null);
                 } else {
@@ -215,12 +222,16 @@ export default defineComponent({
                         root: true,
                     });
 
+                    entrypointFile.value = file;
+
                     emit('setEntrypointFile', file);
                 }
             } else {
                 await coreClient.analysisFile.update(file.id, {
                     root: true,
                 });
+
+                entrypointFile.value = file;
 
                 emit('setEntrypointFile', file);
             }
@@ -248,6 +259,7 @@ export default defineComponent({
             toggleFile,
 
             entrypointFile,
+            entrypointFileId,
             changeEntryPointFile,
 
             filesNode,
@@ -400,6 +412,7 @@ export default defineComponent({
                                     class="me-1"
                                     :entity="file"
                                     :files-selected="selected"
+                                    :file-selected-id="entrypointFileId"
                                     @check="toggleFile"
                                     @updated="props.updated"
                                     @deleted="props.deleted"
