@@ -53,7 +53,7 @@ export default defineNuxtComponent({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
             [LayoutKey.REQUIRED_PERMISSIONS]: [
-                PermissionID.PROPOSAL_APPROVE,
+                PermissionID.PROJECT_APPROVE,
             ],
         });
 
@@ -82,7 +82,7 @@ export default defineNuxtComponent({
         const store = useAuthStore();
         const { realmId } = storeToRefs(store);
 
-        const canManage = computed(() => store.has(PermissionID.PROPOSAL_APPROVE));
+        const canManage = computed(() => store.has(PermissionID.PROJECT_APPROVE));
 
         const nodeId : Ref<string | null> = ref(null);
 

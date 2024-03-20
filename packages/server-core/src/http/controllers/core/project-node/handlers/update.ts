@@ -29,7 +29,7 @@ export async function updateProjectNodeRouteHandler(req: Request, res: Response)
     const ability = useRequestEnv(req, 'ability');
 
     const isAuthorityOfNode = isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.node_realm_id);
-    const isAuthorizedForNode = ability.has(PermissionID.PROPOSAL_APPROVE);
+    const isAuthorizedForNode = ability.has(PermissionID.PROJECT_APPROVE);
 
     const isAuthorityOfProject = isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.project_realm_id);
     if (isAuthorityOfProject && !isAuthorityOfNode) {

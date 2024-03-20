@@ -14,8 +14,8 @@ import {
     computed, defineComponent, ref,
 } from 'vue';
 import {
-    injectCoreAPIClient,
     injectAuthupStore,
+    injectCoreAPIClient,
     renderActionCommand,
     wrapFnWithBusyState,
 } from '../../core';
@@ -134,7 +134,7 @@ export default defineComponent({
             withText: props.withText,
             isDisabled: isDisabled.value,
             iconClass: iconClass.value,
-            isAllowed: store.has(PermissionID.PROPOSAL_APPROVE),
+            isAllowed: store.has(PermissionID.PROJECT_APPROVE),
             commandText: commandText.value,
             classSuffix: classSuffix.value,
             slots,

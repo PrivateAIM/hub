@@ -8,23 +8,21 @@
 import { PermissionName as AuthPermissionName } from '@authup/core';
 
 export enum PermissionKey {
-    ADMIN_UI_USE = 'admin_ui_use',
-
     BUCKET_ADD = 'bucket_add',
     BUCKET_EDIT = 'bucket_edit',
     BUCKET_DROP = 'bucket_drop',
 
-    PROJECT_ADD = 'proposal_add',
-    PROJECT_DROP = 'proposal_drop',
-    PROJECT_EDIT = 'proposal_edit',
-    PROPOSAL_APPROVE = 'proposal_approve', // todo: maybe approve + reject
+    PROJECT_ADD = 'project_add',
+    PROJECT_DROP = 'project_drop',
+    PROJECT_EDIT = 'project_edit',
+    PROJECT_APPROVE = 'project_approve',
 
     REGISTRY_MANAGE = 'registry_manage',
     REGISTRY_PROJECT_MANAGE = 'registry_project_manage',
 
-    NODE_ADD = 'station_add',
-    NODE_DROP = 'station_drop',
-    NODE_EDIT = 'station_edit',
+    NODE_ADD = 'node_add',
+    NODE_DROP = 'node_drop',
+    NODE_EDIT = 'node_edit',
 
     ANALYSIS_APPROVE = 'analysis_approve',
     ANALYSIS_EDIT = 'analysis_edit',

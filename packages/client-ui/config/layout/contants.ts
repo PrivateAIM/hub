@@ -58,7 +58,7 @@ export const LayoutSideDefaultNavigation: NavigationItem[] = [
             PermissionID.PROJECT_ADD,
             PermissionID.PROJECT_DROP,
             PermissionID.PROJECT_EDIT,
-            PermissionID.PROPOSAL_APPROVE,
+            PermissionID.PROJECT_APPROVE,
 
             PermissionID.ANALYSIS_ADD,
             PermissionID.ANALYSIS_DROP,
