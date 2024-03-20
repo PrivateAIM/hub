@@ -21,6 +21,7 @@ import {
 
     buildDomainNamespaceName,
 } from '@privateaim/core';
+import { useLogger } from '../../config';
 import { hasAmqpClient, useAmqpClient, useRedisPublishClient } from '../../core';
 import { AnalysisEntity } from '../../domains';
 
@@ -56,15 +57,23 @@ export class TrainSubscriber implements EntitySubscriberInterface<AnalysisEntity
         await publishEvent(DomainEventName.CREATED, event.entity);
 
         if (hasAmqpClient()) {
-            const message = buildCoreQueuePayload({
-                command: CoreCommand.CONFIGURE,
-                data: {
-                    id: event.entity.id,
-                },
-            });
+            try {
+                useLogger().debug('publishing analysis configure command...');
 
-            const client = useAmqpClient();
-            await client.publish(message);
+                const message = buildCoreQueuePayload({
+                    command: CoreCommand.CONFIGURE,
+                    data: {
+                        id: event.entity.id,
+                    },
+                });
+
+                const client = useAmqpClient();
+                await client.publish(message);
+            } catch (e) {
+                useLogger().error('publishing analysis configure command failed.');
+
+                throw e;
+            }
         }
     }
 
@@ -76,15 +85,23 @@ export class TrainSubscriber implements EntitySubscriberInterface<AnalysisEntity
         await publishEvent(DomainEventName.DELETED, event.entity);
 
         if (hasAmqpClient()) {
-            const message = buildCoreQueuePayload({
-                command: CoreCommand.DESTROY,
-                data: {
-                    id: event.entity.id,
-                },
-            });
+            try {
+                useLogger().debug('publishing analysis destroy command...');
 
-            const client = useAmqpClient();
-            await client.publish(message);
+                const message = buildCoreQueuePayload({
+                    command: CoreCommand.DESTROY,
+                    data: {
+                        id: event.entity.id,
+                    },
+                });
+
+                const client = useAmqpClient();
+                await client.publish(message);
+            } catch (e) {
+                useLogger().debug('publishing analysis destroy command failed.');
+
+                throw e;
+            }
         }
     }
 }

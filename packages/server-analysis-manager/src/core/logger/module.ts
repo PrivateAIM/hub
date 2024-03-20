@@ -31,7 +31,11 @@ export function useLogger() : Logger {
     }
 
     logger = createLogger({
-        format: format.json(),
+        format: format.combine(
+            format.timestamp(),
+            format.colorize(),
+            format.simple(),
+        ),
         level: 'debug',
         transports: [
             new transports.Console({
