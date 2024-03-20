@@ -117,6 +117,7 @@ export default defineComponent({
                         type: AnalysisFileType.CODE,
                         bucket_file_id: bucketFiles[i].id,
                         analysis_id: props.entity.id,
+                        name: bucketFiles[i].path,
                     });
 
                     handleCreated(file);
