@@ -55,6 +55,10 @@ export async function extendDataSourceOptions(options: DataSourceOptions) : Prom
         migrationsTransactionMode: 'each',
         subscribers: [
             ...(options.subscribers ? options.subscribers : []) as string[],
+            AnalysisSubscriber,
+            AnalysisFileSubscriber,
+            AnalysisLogSubscriber,
+            AnalysisNodeSubscriber,
             MasterImageSubscriber,
             MasterImageGroupSubscriber,
             ProjectSubscriber,
@@ -62,10 +66,6 @@ export async function extendDataSourceOptions(options: DataSourceOptions) : Prom
             RegistrySubscriber,
             RegistryProjectSubscriber,
             NodeSubscriber,
-            AnalysisSubscriber,
-            AnalysisFileSubscriber,
-            AnalysisLogSubscriber,
-            AnalysisNodeSubscriber,
         ],
     };
 

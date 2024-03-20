@@ -6,7 +6,6 @@
  */
 
 import { publishDomainEvent } from '@privateaim/server-kit';
-import { CoreCommand, buildCoreQueuePayload } from '@privateaim/server-analysis-manager';
 import type {
     EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
@@ -22,7 +21,7 @@ import {
     buildDomainNamespaceName,
 } from '@privateaim/core';
 import { useLogger } from '../../config';
-import { hasAmqpClient, useAmqpClient, useRedisPublishClient } from '../../core';
+import { useRedisPublishClient } from '../../core';
 import { AnalysisEntity } from '../../domains';
 
 async function publishEvent(
@@ -49,29 +48,11 @@ async function publishEvent(
 }
 @EventSubscriber()
 export class AnalysisSubscriber implements EntitySubscriberInterface<AnalysisEntity> {
-    listenTo(): CallableFunction | string {
+    listenTo() {
         return AnalysisEntity;
     }
 
     async afterInsert(event: InsertEvent<AnalysisEntity>): Promise<any> {
-        if (hasAmqpClient()) {
-            try {
-                const message = buildCoreQueuePayload({
-                    command: CoreCommand.CONFIGURE,
-                    data: {
-                        id: event.entity.id,
-                    },
-                });
-
-                const client = useAmqpClient();
-                await client.publish(message);
-            } catch (e) {
-                useLogger().error(e);
-
-                throw e;
-            }
-        }
-
         try {
             await publishEvent(DomainEventName.CREATED, event.entity);
         } catch (e) {
@@ -90,24 +71,6 @@ export class AnalysisSubscriber implements EntitySubscriberInterface<AnalysisEnt
     }
 
     async beforeRemove(event: RemoveEvent<AnalysisEntity>): Promise<any> {
-        if (hasAmqpClient()) {
-            try {
-                const message = buildCoreQueuePayload({
-                    command: CoreCommand.DESTROY,
-                    data: {
-                        id: event.entity.id,
-                    },
-                });
-
-                const client = useAmqpClient();
-                await client.publish(message);
-            } catch (e) {
-                useLogger().error(e);
-
-                throw e;
-            }
-        }
-
         try {
             await publishEvent(DomainEventName.DELETED, event.entity);
         } catch (e) {

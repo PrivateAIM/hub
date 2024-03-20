@@ -8,9 +8,12 @@
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { PermissionID } from '@privateaim/core';
 import { isRealmResourceWritable } from '@authup/core';
+import { CoreCommand, buildCoreQueuePayload } from '@privateaim/server-analysis-manager';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
+import { useLogger } from '../../../../../config';
+import { hasAmqpClient, useAmqpClient } from '../../../../../core';
 import { AnalysisEntity, ProjectEntity } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 
@@ -46,6 +49,18 @@ export async function deleteAnalysisRouteHandler(req: Request, res: Response) : 
     project.analyses--;
     const proposalRepository = dataSource.getRepository(ProjectEntity);
     await proposalRepository.save(project);
+
+    if (hasAmqpClient()) {
+        const message = buildCoreQueuePayload({
+            command: CoreCommand.DESTROY,
+            data: {
+                id: entity.id,
+            },
+        });
+
+        const client = useAmqpClient();
+        await client.publish(message);
+    }
 
     entity.project = project;
 
