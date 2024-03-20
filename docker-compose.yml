@@ -69,6 +69,24 @@ services:
             VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8090
         networks:
             hub:
+    nginx:
+        image: nginxproxy/nginx-proxy:alpine
+        depends_on:
+            authup:
+                condition: service_healthy
+            core:
+                condition: service_healthy
+            storage:
+                condition: service_healthy
+            realtime:
+                condition: service_healthy
+        ports:
+            - '3000:3000'
+        volumes:
+            - './nginx.conf:/etc/nginx/nginx.conf'
+            - '/var/run/docker.sock:/tmp/docker.sock:ro'
+        networks:
+            hub:
     authup:
         image: authup/authup
         pull_policy: always
@@ -80,8 +98,6 @@ services:
                 condition: service_healthy
             vault:
                 condition: service_healthy
-        ports:
-            - '3010:3000'
         environment:
             DB_TYPE: 'mysql'
             DB_HOST: 'mysql'
@@ -90,8 +106,8 @@ services:
             DB_DATABASE: 'auth'
             VAULT: start123@http://vault:8090/v1/
             REDIS: redis://redis
-            PUBLIC_URL: ${AUTHUP_URL:-http://localhost:3010/}
-            AUTHORIZE_REDIRECT_URL: ${UI_URL:-http://localhost:3000/}
+            PUBLIC_URL: ${PUBLIC_URL:-http://localhost:3000}/auth/
+            AUTHORIZE_REDIRECT_URL: ${PUBLIC_URL:-http://localhost:3000/}
             ROBOT_ADMIN_ENABLED: true
         networks:
             hub:
@@ -109,13 +125,11 @@ services:
                 condition: service_healthy
             vault:
                 condition: service_healthy
-        ports:
-            - '3001:3000'
         environment:
             REDIS_CONNECTION_STRING: redis://redis
             VAULT_CONNECTION_STRING: start123@http://vault:8090/v1/
             RABBITMQ_CONNECTION_STRING: ${MQ_CONNECTION_URL:-amqp://root:start123@172.40.1.1}
-            PUBLIC_URL: ${CORE_URL:-http://localhost:3001/}
+            PUBLIC_URL: ${PUBLIC_URL:-http://localhost:3000}/core/
             HARBOR_URL: ${HARBOR_URL:-}
             AUTHUP_URL: http://authup:3000/
             DB_TYPE: 'mysql'
@@ -138,8 +152,6 @@ services:
                 condition: service_healthy
             vault:
                 condition: service_healthy
-        ports:
-            - '3002:3000'
         environment:
             REDIS_CONNECTION_STRING: redis://redis
             VAULT_CONNECTION_STRING: start123@http://vault:8090/v1/
@@ -157,8 +169,6 @@ services:
                 condition: service_healthy
             vault:
                 condition: service_healthy
-        ports:
-            - '3003:3000'
         volumes:
             - "/var/run/docker.sock:/var/run/docker.sock:ro"
         environment:
@@ -182,15 +192,13 @@ services:
                 condition: service_healthy
             vault:
                 condition: service_healthy
-        ports:
-            - '3004:3000'
         environment:
             DB_TYPE: 'mysql'
             DB_HOST: 'mysql'
             DB_USERNAME: 'root'
             DB_PASSWORD: 'start123'
             DB_DATABASE: 'storage'
-            PUBLIC_URL: ${STORAGE_URL:-http://localhost:3000}
+            PUBLIC_URL: ${PUBLIC_URL:-http://localhost:3000}/storage/
             REDIS_CONNECTION_STRING: redis://redis
             MINIO_CONNECTION_STRING: http://admin:start123@minio:9000
             VAULT_CONNECTION_STRING: start123@http://vault:8090/v1/
@@ -210,13 +218,11 @@ services:
                 condition: service_healthy
             realtime:
                 condition: service_healthy
-        ports:
-            - '3000:3000'
         environment:
-            STORAGE_URL: ${STORAGE_URL:-http://localhost:3000}
-            CORE_URL: ${CORE_URL:-http://localhost:3001}
-            REALTIME_URL: ${REALTIME_URL:-http://localhost:3002}
-            AUTHUP_URL: ${AUTHUP_URL:-http://localhost:3010}
+            STORAGE_URL: ${PUBLIC_URL:-http://localhost:3000}/storage/
+            CORE_URL: ${PUBLIC_URL:-http://localhost:3000}/core/
+            REALTIME_URL: ${PUBLIC_URL:-http://localhost:3000}/
+            AUTHUP_URL: ${PUBLIC_URL:-http://localhost:3000}/auth/
         networks:
             hub:
 networks:
