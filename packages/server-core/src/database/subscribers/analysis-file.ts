@@ -19,6 +19,7 @@ import {
     buildDomainChannelName,
     buildDomainNamespaceName,
 } from '@privateaim/core';
+import { useLogger } from '../../config';
 import { useRedisPublishClient } from '../../core';
 import { AnalysisFileEntity } from '../../domains';
 
@@ -51,14 +52,29 @@ export class AnalysisFileSubscriber implements EntitySubscriberInterface<Analysi
     }
 
     async afterInsert(event: InsertEvent<AnalysisFileEntity>): Promise<any> {
-        await publishEvent(DomainEventName.CREATED, event.entity);
+        try {
+            await publishEvent(DomainEventName.CREATED, event.entity);
+        } catch (e) {
+            useLogger().error(e);
+            throw e;
+        }
     }
 
     async afterUpdate(event: UpdateEvent<AnalysisFileEntity>): Promise<any> {
-        await publishEvent(DomainEventName.UPDATED, event.entity as AnalysisFileEntity);
+        try {
+            await publishEvent(DomainEventName.UPDATED, event.entity as AnalysisFileEntity);
+        } catch (e) {
+            useLogger().error(e);
+            throw e;
+        }
     }
 
     async beforeRemove(event: RemoveEvent<AnalysisFileEntity>): Promise<any> {
-        await publishEvent(DomainEventName.DELETED, event.entity);
+        try {
+            await publishEvent(DomainEventName.DELETED, event.entity);
+        } catch (e) {
+            useLogger().error(e);
+            throw e;
+        }
     }
 }

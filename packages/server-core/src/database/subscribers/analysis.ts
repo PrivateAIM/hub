@@ -54,14 +54,8 @@ export class AnalysisSubscriber implements EntitySubscriberInterface<AnalysisEnt
     }
 
     async afterInsert(event: InsertEvent<AnalysisEntity>): Promise<any> {
-        await publishEvent(DomainEventName.CREATED, event.entity);
-
-        useLogger().debug(`amqp client: ${hasAmqpClient()}`);
-
         if (hasAmqpClient()) {
             try {
-                useLogger().debug('publishing analysis configure command...');
-
                 const message = buildCoreQueuePayload({
                     command: CoreCommand.CONFIGURE,
                     data: {
@@ -77,19 +71,27 @@ export class AnalysisSubscriber implements EntitySubscriberInterface<AnalysisEnt
                 throw e;
             }
         }
+
+        try {
+            await publishEvent(DomainEventName.CREATED, event.entity);
+        } catch (e) {
+            useLogger().error(e);
+            throw e;
+        }
     }
 
     async afterUpdate(event: UpdateEvent<AnalysisEntity>): Promise<any> {
-        await publishEvent(DomainEventName.UPDATED, event.entity as AnalysisEntity);
+        try {
+            await publishEvent(DomainEventName.UPDATED, event.entity as AnalysisEntity);
+        } catch (e) {
+            useLogger().error(e);
+            throw e;
+        }
     }
 
     async beforeRemove(event: RemoveEvent<AnalysisEntity>): Promise<any> {
-        await publishEvent(DomainEventName.DELETED, event.entity);
-
         if (hasAmqpClient()) {
             try {
-                useLogger().debug('publishing analysis destroy command...');
-
                 const message = buildCoreQueuePayload({
                     command: CoreCommand.DESTROY,
                     data: {
@@ -104,6 +106,13 @@ export class AnalysisSubscriber implements EntitySubscriberInterface<AnalysisEnt
 
                 throw e;
             }
+        }
+
+        try {
+            await publishEvent(DomainEventName.DELETED, event.entity);
+        } catch (e) {
+            useLogger().error(e);
+            throw e;
         }
     }
 }
