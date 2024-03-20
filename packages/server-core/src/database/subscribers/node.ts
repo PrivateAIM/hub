@@ -44,7 +44,7 @@ async function publishEvent(
 }
 
 @EventSubscriber()
-export class StationSubscriber implements EntitySubscriberInterface<NodeEntity> {
+export class NodeSubscriber implements EntitySubscriberInterface<NodeEntity> {
     listenTo(): CallableFunction | string {
         return NodeEntity;
     }

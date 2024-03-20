@@ -62,7 +62,7 @@ async function publishEvent(
 }
 
 @EventSubscriber()
-export class TrainStationSubscriber implements EntitySubscriberInterface<AnalysisNodeEntity> {
+export class AnalysisNodeSubscriber implements EntitySubscriberInterface<AnalysisNodeEntity> {
     listenTo(): CallableFunction | string {
         return AnalysisNodeEntity;
     }

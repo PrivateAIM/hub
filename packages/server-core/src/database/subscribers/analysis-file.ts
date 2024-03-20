@@ -45,7 +45,7 @@ async function publishEvent(
     );
 }
 @EventSubscriber()
-export class TrainFileSubscriber implements EntitySubscriberInterface<AnalysisFileEntity> {
+export class AnalysisFileSubscriber implements EntitySubscriberInterface<AnalysisFileEntity> {
     listenTo(): CallableFunction | string {
         return AnalysisFileEntity;
     }

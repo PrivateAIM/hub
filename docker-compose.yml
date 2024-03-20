@@ -219,10 +219,10 @@ services:
             realtime:
                 condition: service_healthy
         environment:
-            STORAGE_URL: ${PUBLIC_URL:-http://localhost:3000}/storage/
-            CORE_URL: ${PUBLIC_URL:-http://localhost:3000}/core/
-            REALTIME_URL: ${PUBLIC_URL:-http://localhost:3000}/
-            AUTHUP_URL: ${PUBLIC_URL:-http://localhost:3000}/auth/
+            NUXT_PUBLIC_STORAGE_URL: ${PUBLIC_URL:-http://localhost:3000}/storage/
+            NUXT_PUBLIC_CORE_URL: ${PUBLIC_URL:-http://localhost:3000}/core/
+            NUXT_PUBLIC_REALTIME_URL: ${PUBLIC_URL:-http://localhost:3000}/
+            NUXT_PUBLIC_AUTHUP_URL: ${PUBLIC_URL:-http://localhost:3000}/auth/
         networks:
             hub:
 networks:

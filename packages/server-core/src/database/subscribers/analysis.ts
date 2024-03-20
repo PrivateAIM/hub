@@ -48,13 +48,15 @@ async function publishEvent(
     );
 }
 @EventSubscriber()
-export class TrainSubscriber implements EntitySubscriberInterface<AnalysisEntity> {
+export class AnalysisSubscriber implements EntitySubscriberInterface<AnalysisEntity> {
     listenTo(): CallableFunction | string {
         return AnalysisEntity;
     }
 
     async afterInsert(event: InsertEvent<AnalysisEntity>): Promise<any> {
         await publishEvent(DomainEventName.CREATED, event.entity);
+
+        useLogger().debug(`amqp client: ${hasAmqpClient()}`);
 
         if (hasAmqpClient()) {
             try {
@@ -70,7 +72,7 @@ export class TrainSubscriber implements EntitySubscriberInterface<AnalysisEntity
                 const client = useAmqpClient();
                 await client.publish(message);
             } catch (e) {
-                useLogger().error('publishing analysis configure command failed.');
+                useLogger().error(e);
 
                 throw e;
             }
@@ -98,7 +100,7 @@ export class TrainSubscriber implements EntitySubscriberInterface<AnalysisEntity
                 const client = useAmqpClient();
                 await client.publish(message);
             } catch (e) {
-                useLogger().debug('publishing analysis destroy command failed.');
+                useLogger().error(e);
 
                 throw e;
             }

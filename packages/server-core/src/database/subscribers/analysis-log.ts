@@ -11,7 +11,7 @@ import type {
 } from 'typeorm';
 import { EventSubscriber } from 'typeorm';
 import type {
-    Project,
+    AnalysisLog,
 } from '@privateaim/core';
 import {
     DomainEventName,
@@ -20,46 +20,46 @@ import {
     buildDomainNamespaceName,
 } from '@privateaim/core';
 import { useRedisPublishClient } from '../../core';
-import { ProjectEntity } from '../../domains';
+import { AnalysisLogEntity } from '../../domains';
 
 async function publishEvent(
     event: `${DomainEventName}`,
-    data: Project,
+    data: AnalysisLog,
 ) {
     await publishDomainEvent(
         useRedisPublishClient(),
         {
-            type: DomainType.PROJECT,
+            type: DomainType.ANALYSIS_LOG,
             event,
             data,
         },
         [
             {
-                channel: (id) => buildDomainChannelName(DomainType.PROJECT, id),
-                namespace: buildDomainNamespaceName(data.realm_id),
+                channel: (id) => buildDomainChannelName(DomainType.ANALYSIS_LOG, id),
             },
             {
-                channel: (id) => buildDomainChannelName(DomainType.PROJECT, id),
+                channel: (id) => buildDomainChannelName(DomainType.ANALYSIS_LOG, id),
+                namespace: buildDomainNamespaceName(data.realm_id),
             },
         ],
     );
 }
 
 @EventSubscriber()
-export class ProposalSubscriber implements EntitySubscriberInterface<ProjectEntity> {
+export class AnalysisLogSubscriber implements EntitySubscriberInterface<AnalysisLogEntity> {
     listenTo(): CallableFunction | string {
-        return ProjectEntity;
+        return AnalysisLogEntity;
     }
 
-    async afterInsert(event: InsertEvent<ProjectEntity>): Promise<any> {
+    async afterInsert(event: InsertEvent<AnalysisLogEntity>): Promise<any> {
         await publishEvent(DomainEventName.CREATED, event.entity);
     }
 
-    async afterUpdate(event: UpdateEvent<ProjectEntity>): Promise<any> {
-        await publishEvent(DomainEventName.UPDATED, event.entity as ProjectEntity);
+    async afterUpdate(event: UpdateEvent<AnalysisLogEntity>): Promise<any> {
+        await publishEvent(DomainEventName.UPDATED, event.entity as AnalysisLogEntity);
     }
 
-    async beforeRemove(event: RemoveEvent<ProjectEntity>): Promise<any> {
+    async beforeRemove(event: RemoveEvent<AnalysisLogEntity>): Promise<any> {
         await publishEvent(DomainEventName.DELETED, event.entity);
     }
 }

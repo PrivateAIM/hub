@@ -23,15 +23,15 @@ import {
 import { DatabaseQueryResultCache } from '../cache';
 import { MasterImageSubscriber } from '../subscribers/master-image';
 import { MasterImageGroupSubscriber } from '../subscribers/master-image-group';
-import { ProposalSubscriber } from '../subscribers/proposal';
-import { ProposalStationSubscriber } from '../subscribers/proposal-station';
+import { ProjectSubscriber } from '../subscribers/project';
+import { ProjectNodeSubscriber } from '../subscribers/project-node';
 import { RegistrySubscriber } from '../subscribers/registry';
 import { RegistryProjectSubscriber } from '../subscribers/registry-project';
-import { StationSubscriber } from '../subscribers/station';
-import { TrainSubscriber } from '../subscribers/train';
-import { TrainFileSubscriber } from '../subscribers/train-file';
-import { TrainLogSubscriber } from '../subscribers/train-log';
-import { TrainStationSubscriber } from '../subscribers/train-station';
+import { NodeSubscriber } from '../subscribers/node';
+import { AnalysisSubscriber } from '../subscribers/analysis';
+import { AnalysisFileSubscriber } from '../subscribers/analysis-file';
+import { AnalysisLogSubscriber } from '../subscribers/analysis-log';
+import { AnalysisNodeSubscriber } from '../subscribers/analysis-node';
 
 export async function extendDataSourceOptions(options: DataSourceOptions) : Promise<DataSourceOptions> {
     options = {
@@ -57,15 +57,15 @@ export async function extendDataSourceOptions(options: DataSourceOptions) : Prom
             ...(options.subscribers ? options.subscribers : []) as string[],
             MasterImageSubscriber,
             MasterImageGroupSubscriber,
-            ProposalSubscriber,
-            ProposalStationSubscriber,
+            ProjectSubscriber,
+            ProjectNodeSubscriber,
             RegistrySubscriber,
             RegistryProjectSubscriber,
-            StationSubscriber,
-            TrainSubscriber,
-            TrainFileSubscriber,
-            TrainLogSubscriber,
-            TrainStationSubscriber,
+            NodeSubscriber,
+            AnalysisSubscriber,
+            AnalysisFileSubscriber,
+            AnalysisLogSubscriber,
+            AnalysisNodeSubscriber,
         ],
     };
 
