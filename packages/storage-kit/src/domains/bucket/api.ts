@@ -43,7 +43,7 @@ export class BucketAPI extends BaseAPI {
     }
 
     async upload(id: Bucket['id'], formData: FormData): Promise<CollectionResourceResponse<BucketFile>> {
-        const response = await this.client.post(`buckets/${id}`, formData, {
+        const response = await this.client.post(`buckets/${id}/upload`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },

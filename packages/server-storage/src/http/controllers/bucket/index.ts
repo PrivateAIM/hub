@@ -10,7 +10,6 @@ import {
     DBody, DController, DDelete, DGet, DPath, DPost, DRequest, DResponse, DTags,
 } from '@routup/decorators';
 import type { BucketFileEntity } from '../../../domains';
-import { BucketEntity } from '../../../domains';
 import { ForceLoggedInMiddleware } from '../../middlewares';
 import {
     executeBucketRouteCreateHandler,
