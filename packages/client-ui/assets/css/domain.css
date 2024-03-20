@@ -159,6 +159,7 @@ TrainStationProgress
     justify-content: center;
     align-content: center;
     text-align: center;
+    min-width: 100px;
 }
 
 .icon-circle {

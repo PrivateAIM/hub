@@ -244,7 +244,7 @@ export default defineComponent({
     <FormWizard
         ref="wizardNode"
         color="#333"
-        title="Train Wizard"
+        title="Wizard"
         :subtitle="'Configure your analysis step by step'"
         :start-index="startIndex"
         @on-change="handleWizardChangedEvent"
@@ -253,7 +253,7 @@ export default defineComponent({
     >
         <template #title>
             <h4 class="wizard-title">
-                <i class="fa fa-hat-wizard" /> Analysis Wizard
+                <i class="fa fa-hat-wizard" /> Wizard
             </h4>
             <p class="category">
                 Configure your analysis step by step

@@ -67,7 +67,7 @@ export default defineComponent({
             h('i', {
                 class: ['fa', {
                     'fa-plus': !manager.data.value,
-                    'fa-trash': manager.data.value,
+                    'fa-minus': manager.data.value,
                 }],
             }),
         ]);

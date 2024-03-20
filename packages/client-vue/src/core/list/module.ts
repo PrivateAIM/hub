@@ -21,7 +21,7 @@ import {
 } from 'vue';
 import { createMerger, isObject } from 'smob';
 import { boolableToObject } from '../../utils';
-import { injectCoreAPIClient } from '../services/core/module';
+import { injectCoreAPIClient } from '../services';
 import { createEntitySocket } from '../entity-socket';
 import type { EntitySocketContext } from '../entity-socket';
 import { isQuerySortedDescByDate } from '../query';

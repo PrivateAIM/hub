@@ -53,8 +53,8 @@ export default defineNuxtComponent({
 
         const tabs = [
             { name: 'Overview', icon: 'fas fa-bars', urlSuffix: '' },
+            { name: 'Configuration', icon: 'fa fa-wrench', urlSuffix: '/setup' },
             { name: 'Results', icon: 'fas fa-chart-bar', urlSuffix: '/results' },
-            { name: 'Setup', icon: 'fa fa-wrench', urlSuffix: '/setup' },
         ];
 
         return {
