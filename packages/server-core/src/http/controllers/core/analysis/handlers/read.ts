@@ -66,7 +66,8 @@ export async function getManyAnalysisRouteHandler(req: Request, res: Response) :
                 'realm_id',
                 'build_status',
                 'run_status',
-                'configuration_status'
+                'configuration_locked',
+                'configuration_status',
             ],
         },
         pagination: {

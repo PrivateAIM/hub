@@ -48,6 +48,9 @@ export class AnalysisEntity implements Analysis {
 
     // ------------------------------------------------------------------
 
+    @Column({ type: 'boolean', default: false })
+        configuration_locked: boolean;
+
     @Index()
     @Column({
         type: 'varchar', length: 64, nullable: true, default: null,
