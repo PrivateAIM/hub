@@ -8,3 +8,4 @@
 export * from './build-start';
 export * from './build-stop';
 export * from './build-status';
+export * from './configuration-lock';

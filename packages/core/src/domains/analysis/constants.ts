@@ -64,14 +64,8 @@ export enum AnalysisAPICommand {
     BUILD_STOP = 'buildStop',
     BUILD_STATUS = 'buildStatus',
 
-    RUN_START = 'runStart',
-    RUN_RESET = 'runReset',
-    RUN_STATUS = 'runStatus',
-
-    RESULT_STATUS = 'resultStatus',
-    RESULT_START = 'resultStart',
-
-    GENERATE_HASH = 'generateHash',
+    CONFIGURATION_LOCK = 'configurationLock',
+    CONFIGURATION_UNLOCK = 'configurationUnlock',
 }
 
 // -------------------------------------------------------------------------

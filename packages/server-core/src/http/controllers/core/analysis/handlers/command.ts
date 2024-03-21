@@ -5,17 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { check, matchedData, validationResult } from 'express-validator';
-import { AnalysisAPICommand } from '@privateaim/core';
-import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/core';
+import { ForbiddenError, NotFoundError } from '@ebec/http';
+import { AnalysisAPICommand } from '@privateaim/core';
+import { HTTPValidationError } from '@privateaim/server-kit';
+import { check, matchedData, validationResult } from 'express-validator';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { HTTPValidationError } from '@privateaim/server-kit';
 import {
     AnalysisEntity,
-    detectAnalysisBuildStatus,
+    detectAnalysisBuildStatus, lockAnalysisConfiguration,
     startAnalysisBuild,
     stopAnalysisBuild,
 } from '../../../../../domains';
@@ -69,6 +69,9 @@ export async function handleAnalysisCommandRouteHandler(req: Request, res: Respo
             break;
         case AnalysisAPICommand.BUILD_STOP:
             entity = await stopAnalysisBuild(entity);
+            break;
+        case AnalysisAPICommand.CONFIGURATION_LOCK:
+            entity = await lockAnalysisConfiguration(entity);
             break;
     }
 
