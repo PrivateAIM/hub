@@ -6,7 +6,7 @@
  */
 
 import { AnalysisNodeApprovalStatus, PermissionID } from '@privateaim/core';
-import { ForbiddenError } from '@ebec/http';
+import { BadRequestError, ForbiddenError } from '@ebec/http';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
@@ -22,6 +22,12 @@ export async function createAnalysisNodeRouteHandler(req: Request, res: Response
     }
 
     const result = await runAnalysisNodeValidation(req, 'create');
+    if (
+        result.relation.analysis &&
+        result.relation.analysis.configuration_locked
+    ) {
+        throw new BadRequestError('The analysis is locked right now. It is not possible to add new nodes.');
+    }
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisNodeEntity);
