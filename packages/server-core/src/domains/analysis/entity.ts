@@ -19,8 +19,6 @@ import {
     AnalysisConfigurationStatus,
 } from '@privateaim/core';
 import {
-    BeforeInsert,
-    BeforeUpdate,
     Column,
     CreateDateColumn,
     Entity,
@@ -47,6 +45,9 @@ export class AnalysisEntity implements Analysis {
         nodes: number;
 
     // ------------------------------------------------------------------
+
+    @Column({ type: 'boolean', default: false })
+        configuration_locked: boolean;
 
     @Index()
     @Column({
@@ -120,21 +121,4 @@ export class AnalysisEntity implements Analysis {
     @ManyToOne(() => MasterImageEntity, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'master_image_id' })
         master_image: MasterImageEntity;
-
-    // ------------------------------------------------------------------
-
-    @BeforeInsert()
-    @BeforeUpdate()
-    setConfigurationStatus() {
-        if (
-            this.build_status &&
-            this.build_status === AnalysisBuildStatus.FINISHED
-        ) {
-            this.configuration_status = AnalysisConfigurationStatus.FINISHED;
-        }
-
-        if (this.run_status) {
-            this.configuration_status = AnalysisConfigurationStatus.FINISHED;
-        }
-    }
 }

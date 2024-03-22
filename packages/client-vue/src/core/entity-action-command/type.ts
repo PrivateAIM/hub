@@ -5,8 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { ActionCommandElementType } from './constants';
+
 export type ActionCommandProperties = {
-    elementType: 'button' | 'link' | 'dropDownItem',
+    elementType: `${ActionCommandElementType}`,
     withIcon: boolean,
     withText: boolean
 };

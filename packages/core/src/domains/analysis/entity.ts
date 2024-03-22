@@ -13,7 +13,6 @@ import type { DomainEventBaseContext } from '../types-base';
 import type {
     AnalysisBuildStatus,
     AnalysisConfigurationStatus,
-    AnalysisResultStatus,
     AnalysisRunStatus,
 } from './constants';
 import type { Registry } from '../registry';
@@ -27,7 +26,7 @@ export interface Analysis {
 
     // ------------------------------------------------------------------
 
-    configuration_status: AnalysisConfigurationStatus | null;
+    configuration_locked: boolean;
 
     // ------------------------------------------------------------------
 

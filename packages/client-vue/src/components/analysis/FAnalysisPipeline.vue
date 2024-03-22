@@ -9,25 +9,25 @@ import { VCLink } from '@vuecs/link';
 import type { Analysis } from '@privateaim/core';
 import {
     AnalysisAPICommand,
-    AnalysisBuildStatus, AnalysisConfigurationStatus,
-    AnalysisResultStatus, AnalysisRunStatus,
-    PermissionID,
+    AnalysisBuildStatus,
+    AnalysisConfigurationStatus,
+    AnalysisResultStatus,
+    AnalysisRunStatus,
 } from '@privateaim/core';
 import type { PropType } from 'vue';
-import { computed, defineComponent } from 'vue';
-import { injectAuthupStore } from '../../core';
+import { defineComponent } from 'vue';
 import Dropdown from '../Dropdown';
-import TrainBuildStatusText from './FAnalysisBuildStatusText.vue';
-import TrainBuildCommand from './command/FAnalysisBuildCommand';
-import TrainConfigurationStatusText from './FAnalysisConfigurationStatusText.vue';
+import {FAnalysisCommand} from "./command";
+import FAnalysisBuildStatusText from "./FAnalysisBuildStatusText.vue";
+import FAnalysisConfigurationStatusText from "./FAnalysisConfigurationStatusText.vue";
 
 export default defineComponent({
     components: {
+        FAnalysisBuildStatusText,
+        FAnalysisConfigurationStatusText,
+        FAnalysisCommand,
         VCLink,
         Dropdown,
-        TrainConfigurationStatusText,
-        TrainBuildCommand,
-        TrainBuildStatusText,
     },
     props: {
         listDirection: {
@@ -45,12 +45,6 @@ export default defineComponent({
     },
     emits: ['updated', 'executed', 'failed'],
     setup(props, { emit }) {
-        const canEdit = computed(() => injectAuthupStore().has(PermissionID.ANALYSIS_EDIT));
-
-        // ---------------------------------------------------------
-        const canConfigure = computed(() => canEdit.value &&
-              props.entity.configuration_status !== AnalysisConfigurationStatus.FINISHED);
-
         const handleExecuted = (type: string, command: string) => {
             emit('executed', type, command);
         };
@@ -73,9 +67,6 @@ export default defineComponent({
             handleUpdated,
             handleFailed,
             handleExecuted,
-
-            canConfigure,
-            canEdit,
         };
     },
 });
@@ -97,23 +88,31 @@ export default defineComponent({
             }"
         >
             <div class="me-1">
-                <strong>1. Config</strong>
+                <strong>1. Configuration</strong>
             </div>
             <div>
-                Status: <train-configuration-status-text :status="entity.configuration_status" />
+                Status: <FAnalysisConfigurationStatusText :locked="entity.configuration_locked" />
             </div>
             <div
                 v-if="withCommand"
                 class="ms-auto"
             >
-                <VCLink
-                    v-if="canConfigure"
-                    class="btn btn-xs btn-primary"
-                    type="button"
-                    :to="'/analyses/'+entity.id+'/setup'"
-                >
-                    <i class="fas fa-wrench pe-1" /> setup
-                </VCLink>
+                <FAnalysisCommand
+                    :command="trainCommand.CONFIGURATION_LOCK"
+                   :with-icon="true"
+                   :entity="entity"
+                   @executed="(command: string) => handleExecuted('configuration', command)"
+                   @updated="handleUpdated"
+                   @failed="handleFailed"
+                />
+                <FAnalysisCommand
+                    :command="trainCommand.CONFIGURATION_UNLOCK"
+                    :with-icon="true"
+                    :entity="entity"
+                    @executed="(command: string) => handleExecuted('configuration', command)"
+                    @updated="handleUpdated"
+                    @failed="handleFailed"
+                />
             </div>
         </div>
 
@@ -129,14 +128,13 @@ export default defineComponent({
                 <strong>2. Build</strong>
             </div>
             <div>
-                Status: <train-build-status-text :status="entity.build_status" />
+                Status: <FAnalysisBuildStatusText :status="entity.build_status" />
             </div>
             <div
                 v-if="withCommand"
-                class="ms-auto flex-row d-flex"
+                class="ms-auto flex-row d-flex justify-between"
             >
-                <train-build-command
-                    class="me-1"
+                <FAnalysisCommand
                     :command="trainCommand.BUILD_START"
                     :with-icon="true"
                     :entity="entity"
@@ -144,30 +142,22 @@ export default defineComponent({
                     @updated="handleUpdated"
                     @failed="handleFailed"
                 />
-                <Dropdown
-                    variant="dark"
-                    :size="'xs' as 'sm'"
-                    html="<i class='fa fa-bars'></i>"
-                >
-                    <train-build-command
-                        :command="trainCommand.BUILD_STATUS"
-                        :element-type="'dropDownItem'"
-                        :with-icon="true"
-                        :entity="entity"
-                        @executed="(command) => handleExecuted('build', command)"
-                        @updated="handleUpdated"
-                        @failed="handleFailed"
-                    />
-                    <train-build-command
-                        :command="trainCommand.BUILD_STOP"
-                        :element-type="'dropDownItem'"
-                        :with-icon="true"
-                        :entity="entity"
-                        @executed="(command) => handleExecuted('build', command)"
-                        @updated="handleUpdated"
-                        @failed="handleFailed"
-                    />
-                </Dropdown>
+                <FAnalysisCommand
+                    :command="trainCommand.BUILD_STATUS"
+                    :with-icon="true"
+                    :entity="entity"
+                    @executed="(command) => handleExecuted('build', command)"
+                    @updated="handleUpdated"
+                    @failed="handleFailed"
+                />
+                <FAnalysisCommand
+                    :command="trainCommand.BUILD_STOP"
+                    :with-icon="true"
+                    :entity="entity"
+                    @executed="(command) => handleExecuted('build', command)"
+                    @updated="handleUpdated"
+                    @failed="handleFailed"
+                />
             </div>
         </div>
     </div>

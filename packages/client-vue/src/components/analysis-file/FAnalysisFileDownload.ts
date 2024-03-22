@@ -8,7 +8,7 @@
 import type { AnalysisFile } from '@privateaim/core';
 import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
-import { injectStorageAPIClient, renderActionCommand } from '../../core';
+import { ActionCommandElementType, injectStorageAPIClient, renderActionCommand } from '../../core';
 
 const FAnalysisFileDownload = defineComponent({
     props: {
@@ -17,8 +17,8 @@ const FAnalysisFileDownload = defineComponent({
             required: true,
         },
         elementType: {
-            type: String as PropType<'button' | 'link' | 'dropDownItem'>,
-            default: 'button',
+            type: String as PropType<`${ActionCommandElementType}`>,
+            default: ActionCommandElementType.BUTTON,
         },
         withIcon: {
             type: Boolean,
@@ -33,8 +33,10 @@ const FAnalysisFileDownload = defineComponent({
         const storageClient = injectStorageAPIClient();
 
         const execute = async () => {
+            const url = storageClient.bucketFile.getStreamURL(props.entity.bucket_file_id);
+
             window.open(
-                storageClient.bucketFile.getStreamPath(props.entity.bucket_file_id),
+                url,
                 '_blank',
             );
         };
