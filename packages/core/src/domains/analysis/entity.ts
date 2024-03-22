@@ -28,8 +28,6 @@ export interface Analysis {
 
     configuration_locked: boolean;
 
-    configuration_status: AnalysisConfigurationStatus | null;
-
     // ------------------------------------------------------------------
 
     build_status: AnalysisBuildStatus | null;

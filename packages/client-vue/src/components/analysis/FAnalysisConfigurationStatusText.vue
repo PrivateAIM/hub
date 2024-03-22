@@ -4,6 +4,51 @@
   - For the full copyright and license information,
   - view the LICENSE file that was distributed with this source code.
   -->
+
+<script lang="ts">
+import { computed, defineComponent, toRef } from 'vue';
+
+export default defineComponent({
+    props: {
+        locked: {
+            type: Boolean,
+            default: false,
+        },
+    },
+    setup(props) {
+        const locked = toRef(props, 'locked');
+        const statusText = computed(() => {
+            if (locked.value) {
+                return 'locked';
+            }
+
+            return 'not locked';
+        });
+
+        const iconClass = computed(() => {
+            if (locked.value) {
+                return 'fas fa-lock';
+            }
+
+            return 'fas fa-unlock';
+        });
+
+        const classSuffix = computed(() => {
+            if (locked.value) {
+                return 'success';
+            }
+
+            return 'danger';
+        });
+
+        return {
+            statusText,
+            iconClass,
+            classSuffix,
+        };
+    },
+});
+</script>
 <template>
     <span>
         <slot
@@ -14,68 +59,3 @@
         </slot>
     </span>
 </template>
-<script lang="ts">
-import { AnalysisConfigurationStatus } from '@privateaim/core';
-import { defineComponent } from 'vue';
-
-export default defineComponent({
-    props: {
-        status: {
-            type: String,
-            default: null,
-        },
-    },
-    computed: {
-        statusText() {
-            switch (this.status) {
-                case AnalysisConfigurationStatus.BASE_CONFIGURED:
-                    return 'base configured';
-                case AnalysisConfigurationStatus.SECURITY_CONFIGURED:
-                    return 'security configured';
-                case AnalysisConfigurationStatus.RESOURCE_CONFIGURED:
-                    return 'files uploaded';
-                case AnalysisConfigurationStatus.HASH_GENERATED:
-                    return 'hash generated';
-                case AnalysisConfigurationStatus.HASH_SIGNED:
-                    return 'hash signed';
-                case AnalysisConfigurationStatus.FINISHED:
-                    return 'finished';
-                default:
-                    return 'none';
-            }
-        },
-        classSuffix() {
-            switch (this.status) {
-                case AnalysisConfigurationStatus.BASE_CONFIGURED:
-                case AnalysisConfigurationStatus.SECURITY_CONFIGURED:
-                case AnalysisConfigurationStatus.RESOURCE_CONFIGURED:
-                case AnalysisConfigurationStatus.HASH_SIGNED:
-                case AnalysisConfigurationStatus.HASH_GENERATED:
-                    return 'primary';
-                case AnalysisConfigurationStatus.FINISHED:
-                    return 'success';
-                default:
-                    return 'info';
-            }
-        },
-        iconClass() {
-            switch (this.status) {
-                case AnalysisConfigurationStatus.BASE_CONFIGURED:
-                    return 'fas fa-cog';
-                case AnalysisConfigurationStatus.SECURITY_CONFIGURED:
-                    return 'fa fa-key';
-                case AnalysisConfigurationStatus.RESOURCE_CONFIGURED:
-                    return 'fa fa-clone';
-                case AnalysisConfigurationStatus.HASH_GENERATED:
-                    return 'fa fa-signature';
-                case AnalysisConfigurationStatus.HASH_SIGNED:
-                    return 'fa fa-signature';
-                case AnalysisConfigurationStatus.FINISHED:
-                    return 'fa fa-sign';
-                default:
-                    return '';
-            }
-        },
-    },
-});
-</script>

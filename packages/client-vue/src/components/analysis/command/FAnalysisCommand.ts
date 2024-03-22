@@ -1,41 +1,36 @@
 /*
- * Copyright (c) 2022-2024.
+ * Copyright (c) 2024.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { computed, defineComponent, ref } from 'vue';
-import type { PropType } from 'vue';
-import type { Analysis } from '@privateaim/core';
 import {
-    AnalysisAPICommand,
-    AnalysisBuildStatus,
-    AnalysisConfigurationStatus,
-    PermissionID,
+    AnalysisAPICommand, AnalysisBuildStatus, PermissionID,
 } from '@privateaim/core';
+import type { Analysis } from '@privateaim/core';
+import type { PropType } from 'vue';
 import {
-    injectAuthupStore,
-    injectCoreAPIClient,
-    renderActionCommand,
-    wrapFnWithBusyState,
+    computed, defineComponent, ref, toRef,
+} from 'vue';
+import {
+    ActionCommandElementType, injectAuthupStore, injectCoreAPIClient, renderActionCommand, wrapFnWithBusyState,
 } from '../../../core';
-import type { AnalysisCommandProperties } from './type';
 
-export default defineComponent({
+const FAnalysisCommand = defineComponent({
     props: {
         entity: {
             type: Object as PropType<Analysis>,
             required: true,
         },
         command: {
-            type: String as PropType<AnalysisAPICommand>,
-            default: AnalysisAPICommand.BUILD_START,
+            type: String as PropType<`${AnalysisAPICommand}`>,
+            required: true,
         },
 
         elementType: {
-            type: String as PropType<AnalysisCommandProperties['elementType']>,
-            default: 'button',
+            type: String as PropType<`${ActionCommandElementType}`>,
+            default: ActionCommandElementType.BUTTON,
         },
         withIcon: {
             type: Boolean,
@@ -46,16 +41,40 @@ export default defineComponent({
             default: true,
         },
     },
-    emits: ['failed', 'updated', 'executed'],
+    emits: ['updated', 'executed', 'failed'],
     setup(props, { emit, slots }) {
         const apiClient = injectCoreAPIClient();
         const busy = ref(false);
 
+        const entity = toRef(props, 'entity');
+
+        const execute = wrapFnWithBusyState(busy, async () => {
+            try {
+                const entity = await apiClient
+                    .analysis.runCommand(props.entity.id, props.command);
+
+                emit('executed', props.command);
+                emit('updated', entity);
+            } catch (e) {
+                if (e instanceof Error) {
+                    emit('failed', e);
+                }
+            }
+        });
+
         const store = injectAuthupStore();
         const isAllowed = computed(() => store.has(PermissionID.ANALYSIS_EDIT));
 
-        const isDisabled = computed<boolean>(() => {
-            if (props.entity.configuration_status !== AnalysisConfigurationStatus.FINISHED) {
+        const isHidden = computed<boolean>(() => {
+            if (props.command === AnalysisAPICommand.CONFIGURATION_LOCK) {
+                return entity.value.configuration_locked;
+            }
+
+            if (props.command === AnalysisAPICommand.CONFIGURATION_UNLOCK) {
+                return !entity.value.configuration_locked;
+            }
+
+            if (!entity.value.configuration_locked) {
                 return true;
             }
 
@@ -84,6 +103,10 @@ export default defineComponent({
                     return 'stop';
                 case AnalysisAPICommand.BUILD_STATUS:
                     return 'check';
+                case AnalysisAPICommand.CONFIGURATION_LOCK:
+                    return 'lock';
+                case AnalysisAPICommand.CONFIGURATION_UNLOCK:
+                    return 'unlock';
                 default:
                     return '';
             }
@@ -97,6 +120,10 @@ export default defineComponent({
                     return 'fa fa-stop';
                 case AnalysisAPICommand.BUILD_STATUS:
                     return 'fas fa-shield-alt';
+                case AnalysisAPICommand.CONFIGURATION_LOCK:
+                    return 'fas fa-lock';
+                case AnalysisAPICommand.CONFIGURATION_UNLOCK:
+                    return 'fas fa-unlock';
                 default:
                     return '';
             }
@@ -105,8 +132,10 @@ export default defineComponent({
         const classSuffix = computed(() => {
             switch (props.command) {
                 case AnalysisAPICommand.BUILD_START:
+                case AnalysisAPICommand.CONFIGURATION_LOCK:
                     return 'success';
                 case AnalysisAPICommand.BUILD_STOP:
+                case AnalysisAPICommand.CONFIGURATION_UNLOCK:
                     return 'danger';
                 case AnalysisAPICommand.BUILD_STATUS:
                     return 'primary';
@@ -115,31 +144,27 @@ export default defineComponent({
             }
         });
 
-        const execute = wrapFnWithBusyState(busy, async () => {
-            try {
-                const entity = await apiClient
-                    .analysis.runCommand(props.entity.id, props.command);
-
-                emit('executed', props.command);
-                emit('updated', entity);
-            } catch (e) {
-                if (e instanceof Error) {
-                    emit('failed', e);
-                }
+        return () => {
+            if (isHidden.value) {
+                return [];
             }
-        });
 
-        return () => renderActionCommand({
-            execute,
-            elementType: props.elementType,
-            withIcon: props.withIcon,
-            withText: props.withText,
-            isDisabled: isDisabled.value,
-            iconClass: iconClass.value,
-            isAllowed: isAllowed.value,
-            commandText: commandText.value,
-            classSuffix: classSuffix.value,
-            slots,
-        });
+            return renderActionCommand({
+                execute,
+                elementType: props.elementType,
+                withIcon: props.withIcon,
+                withText: props.withText,
+                isDisabled: isHidden.value,
+                iconClass: iconClass.value,
+                isAllowed: isAllowed.value,
+                commandText: commandText.value,
+                classSuffix: classSuffix.value,
+                slots,
+            });
+        };
     },
 });
+
+export {
+    FAnalysisCommand,
+};

@@ -50,27 +50,6 @@ export async function updateAnalysisRouteHandler(req: Request, res: Response) : 
 
     entity = repository.merge(entity, result.data);
 
-    if (entity.build_status) {
-        entity.configuration_status = AnalysisConfigurationStatus.FINISHED;
-    } else {
-        // todo: this should be much cleaner!
-        entity.configuration_status = null;
-        if (entity.nodes > 0) {
-            entity.configuration_status = AnalysisConfigurationStatus.BASE_CONFIGURED;
-        }
-
-        const analysisFileRepository = dataSource.getRepository(AnalysisFileEntity);
-        const analysisFile = await analysisFileRepository.findOneBy({
-            analysis_id: entity.id,
-            type: AnalysisFileType.CODE,
-            root: true,
-        });
-
-        if (analysisFile) {
-            entity.configuration_status = AnalysisConfigurationStatus.RESOURCE_CONFIGURED;
-        }
-    }
-
     await repository.save(entity);
 
     return sendAccepted(res, entity);
