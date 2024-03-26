@@ -283,8 +283,9 @@ export default defineComponent({
                     v-else
                     class="wizard-footer-right finish-button"
                     :style="props.fillButtonStyle"
+                    @click.native="handleWizardFinishedEvent"
                 >
-                    Build Analysis
+                    Lock
                 </WizardButton>
             </div>
         </template>

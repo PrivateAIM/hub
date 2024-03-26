@@ -142,7 +142,7 @@ export default defineComponent({
                         ref="FAnalysisNodes"
                         :realm-id="entity.realm_id"
                         :direction="'out'"
-                        :query="{filters: {train_id: entity.id}}"
+                        :query="{filters: {analysis_id: entity.id}}"
                     >
                         <template #header>
                             <span>Nodes <span class="text-success">selected</span></span>

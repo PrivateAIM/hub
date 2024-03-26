@@ -132,8 +132,9 @@ export default defineComponent({
             </div>
             <div
                 v-if="withCommand"
-                class="ms-auto flex-row d-flex justify-between"
+                class="ms-auto flex-row d-flex justify-between gap-1"
             >
+                <div>
                 <FAnalysisCommand
                     :command="trainCommand.BUILD_START"
                     :with-icon="true"
@@ -142,6 +143,8 @@ export default defineComponent({
                     @updated="handleUpdated"
                     @failed="handleFailed"
                 />
+                </div>
+                <div>
                 <FAnalysisCommand
                     :command="trainCommand.BUILD_STATUS"
                     :with-icon="true"
@@ -150,6 +153,8 @@ export default defineComponent({
                     @updated="handleUpdated"
                     @failed="handleFailed"
                 />
+                </div>
+                <div>
                 <FAnalysisCommand
                     :command="trainCommand.BUILD_STOP"
                     :with-icon="true"
@@ -158,6 +163,7 @@ export default defineComponent({
                     @updated="handleUpdated"
                     @failed="handleFailed"
                 />
+                </div>
             </div>
         </div>
     </div>

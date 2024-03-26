@@ -5,16 +5,18 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
-    AnalysisAPICommand, AnalysisBuildStatus, PermissionID,
-} from '@privateaim/core';
 import type { Analysis } from '@privateaim/core';
+import { AnalysisAPICommand, AnalysisBuildStatus, PermissionID } from '@privateaim/core';
 import type { PropType } from 'vue';
 import {
     computed, defineComponent, ref, toRef,
 } from 'vue';
 import {
-    ActionCommandElementType, injectAuthupStore, injectCoreAPIClient, renderActionCommand, wrapFnWithBusyState,
+    ActionCommandElementType,
+    injectAuthupStore,
+    injectCoreAPIClient,
+    renderActionCommand,
+    wrapFnWithBusyState,
 } from '../../../core';
 
 const FAnalysisCommand = defineComponent({
@@ -79,17 +81,20 @@ const FAnalysisCommand = defineComponent({
             }
 
             if (props.command === AnalysisAPICommand.BUILD_START) {
-                return !!props.entity.build_status &&
-                    [
-                        AnalysisBuildStatus.STOPPING,
-                        AnalysisBuildStatus.FAILED,
-                    ].indexOf(props.entity.build_status) === -1;
+                if (!entity.value.build_status) {
+                    return false;
+                }
+
+                return entity.value.build_status === AnalysisBuildStatus.STOPPING ||
+                    entity.value.build_status === AnalysisBuildStatus.FAILED;
             }
 
             if (props.command === AnalysisAPICommand.BUILD_STOP) {
-                return !!props.entity.build_status && [
-                    AnalysisBuildStatus.STOPPING,
-                ].indexOf(props.entity.build_status) === -1;
+                if (!entity.value.build_status) {
+                    return true;
+                }
+
+                return props.entity.build_status === AnalysisBuildStatus.STOPPING;
             }
 
             return false;
