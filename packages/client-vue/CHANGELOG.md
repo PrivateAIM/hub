@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.3.0](https://github.com/PrivateAIM/hub/compare/client-vue-v0.3.0...client-vue-v0.3.0) (2024-03-26)
+
+
+### Features
+
+* adjusted permission names ([3f5e863](https://github.com/PrivateAIM/hub/commit/3f5e8637937f52c73280fe911dd5c150d446da4f))
+* enhanced analysis comamnd component + build commands view ([15f48d9](https://github.com/PrivateAIM/hub/commit/15f48d91d1fa283784d85a70549b9db63f4f4f3c))
+* refactor analysis configuration ([#200](https://github.com/PrivateAIM/hub/issues/200)) ([e7bfc3f](https://github.com/PrivateAIM/hub/commit/e7bfc3f23d5b9ce6fc6d9e8d0a144fe54ea03335))
+* refactor analysis file management ([#176](https://github.com/PrivateAIM/hub/issues/176)) ([0ea979a](https://github.com/PrivateAIM/hub/commit/0ea979a2eed3cb557e82c6c96f83b367b0f89f0f))
+* view for downloading results + refactored entities/types ([#188](https://github.com/PrivateAIM/hub/issues/188)) ([084040e](https://github.com/PrivateAIM/hub/commit/084040eec1e74b10ec40c577d5f8e3a5fcedf250))
+
+
+### Bug Fixes
+
+* add missing name attribute for linking analysis-file ([c19a56c](https://github.com/PrivateAIM/hub/commit/c19a56c0b4a1f927c245793827f24ef981105cd3))
+* analysis build command execution ([c793150](https://github.com/PrivateAIM/hub/commit/c7931509d3da05ada66bdc8f547ec961260d63ce))
+* analysis entrypoint file selection ([ebf63b8](https://github.com/PrivateAIM/hub/commit/ebf63b8a79f7bcd95d0e61f922f37e7d97aa4582))
+* **deps:** bump @authup/core from 1.0.0-beta.7 to 1.0.0-beta.8 ([#210](https://github.com/PrivateAIM/hub/issues/210)) ([6e8adf2](https://github.com/PrivateAIM/hub/commit/6e8adf2c80dba69eb66a76250e1fc1acc1bb71dd))
+* minor adjustments in analysis wizard ([d6098a7](https://github.com/PrivateAIM/hub/commit/d6098a70f5d282028964fda3c3fd41e1314daac6))
+* minor enhancement for node related components ([7c0ea49](https://github.com/PrivateAIM/hub/commit/7c0ea49d79cdc417941532421e7d68d6c4f43998))
+
 ## [0.3.0](https://github.com/PrivateAIM/hub/compare/client-vue-v0.2.0...client-vue-v0.3.0) (2024-03-11)
 
 
