@@ -16,53 +16,54 @@ import { useAmqpClient } from '../../../core';
 import { RegistryEntity } from '../../registry';
 import { AnalysisNodeEntity } from '../../anaylsis-node';
 import { AnalysisEntity } from '../entity';
-import { resolveAnalysis } from './utils';
 
 export async function startAnalysisBuild(
-    train: AnalysisEntity | string,
+    entity: AnalysisEntity,
 ) : Promise<AnalysisEntity> {
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisEntity);
 
-    train = await resolveAnalysis(train, repository);
-
-    if (train.run_status) {
-        throw new BadRequestError('The train can not longer be build...');
-    } else {
-        const trainStationRepository = dataSource.getRepository(AnalysisNodeEntity);
-        const trainStations = await trainStationRepository.findBy({
-            analysis_id: train.id,
-        });
-
-        for (let i = 0; i < trainStations.length; i++) {
-            if (trainStations[i].approval_status !== AnalysisNodeApprovalStatus.APPROVED) {
-                throw new BadRequestError('Not all stations have approved the train yet.');
-            }
-        }
-
-        if (!train.registry_id) {
-            const registryRepository = dataSource.getRepository(RegistryEntity);
-            const registry = await registryRepository.findOne({});
-
-            if (!registry) {
-                throw new BadRequestError('No registry is registered.');
-            }
-
-            train.registry_id = registry.id;
-        }
-
-        const client = useAmqpClient();
-        await client.publish(buildBuilderQueuePayload({
-            command: BuilderCommand.BUILD,
-            data: {
-                id: train.id,
-            },
-        }));
-
-        train.build_status = AnalysisBuildStatus.STARTING;
-
-        await repository.save(train);
+    if (!entity.configuration_locked) {
+        throw new BadRequestError('The configuration must be locked, to build the analysis.');
     }
 
-    return train;
+    if (entity.run_status) {
+        throw new BadRequestError('The analysis can not longer be build.');
+    }
+
+    const analysisNodeRepository = dataSource.getRepository(AnalysisNodeEntity);
+    const trainStations = await analysisNodeRepository.findBy({
+        analysis_id: entity.id,
+    });
+
+    for (let i = 0; i < trainStations.length; i++) {
+        if (trainStations[i].approval_status !== AnalysisNodeApprovalStatus.APPROVED) {
+            throw new BadRequestError('Not all nodes have approved the analysis yet.');
+        }
+    }
+
+    if (!entity.registry_id) {
+        const registryRepository = dataSource.getRepository(RegistryEntity);
+        const registry = await registryRepository.findOne({});
+
+        if (!registry) {
+            throw new BadRequestError('No registry is registered.');
+        }
+
+        entity.registry_id = registry.id;
+    }
+
+    const client = useAmqpClient();
+    await client.publish(buildBuilderQueuePayload({
+        command: BuilderCommand.BUILD,
+        data: {
+            id: entity.id,
+        },
+    }));
+
+    entity.build_status = AnalysisBuildStatus.STARTING;
+
+    await repository.save(entity);
+
+    return entity;
 }

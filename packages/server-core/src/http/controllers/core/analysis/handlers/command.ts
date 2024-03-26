@@ -30,7 +30,7 @@ import { useRequestEnv } from '../../../../request';
 export async function handleAnalysisCommandRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
-    if (typeof id !== 'string') {
+    if (typeof id !== 'string' || id.length === 0) {
         throw new NotFoundError();
     }
 

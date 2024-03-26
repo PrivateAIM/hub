@@ -52,11 +52,11 @@ const FAnalysisCommand = defineComponent({
 
         const execute = wrapFnWithBusyState(busy, async () => {
             try {
-                const entity = await apiClient
-                    .analysis.runCommand(props.entity.id, props.command);
+                const response = await apiClient
+                    .analysis.runCommand(entity.value.id, props.command);
 
                 emit('executed', props.command);
-                emit('updated', entity);
+                emit('updated', response);
             } catch (e) {
                 if (e instanceof Error) {
                     emit('failed', e);
@@ -94,7 +94,7 @@ const FAnalysisCommand = defineComponent({
                     return true;
                 }
 
-                return props.entity.build_status === AnalysisBuildStatus.STOPPING;
+                return entity.value.build_status === AnalysisBuildStatus.STOPPING;
             }
 
             return false;
