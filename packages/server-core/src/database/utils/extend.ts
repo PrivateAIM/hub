@@ -90,5 +90,11 @@ export async function extendDataSourceOptions(options: DataSourceOptions) : Prom
         } as Partial<DataSourceOptions>);
     }
 
+    if (options.type === 'mysql') {
+        Object.assign(options, {
+            connectorPackage: 'mysql2',
+        } satisfies Partial<DataSourceOptions>);
+    }
+
     return options;
 }

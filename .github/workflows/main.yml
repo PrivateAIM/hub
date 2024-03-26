@@ -20,6 +20,7 @@ jobs:
                 image: authup/authup
                 ports:
                     - 3000:3000
+
         runs-on: ubuntu-latest
 
         steps:
