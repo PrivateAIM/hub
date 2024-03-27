@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.3.0](https://github.com/PrivateAIM/hub/compare/server-storage-v0.3.0...server-storage-v0.3.0) (2024-03-26)
+
+
+### Features
+
+* enable mysql8 usage ([78d9e0b](https://github.com/PrivateAIM/hub/commit/78d9e0bdbad2fc389676af675a7fdd2b61f5e388))
+
+
+### Bug Fixes
+
+* api client for uploading bucket file ([e584f9f](https://github.com/PrivateAIM/hub/commit/e584f9fd6549b7f4974604d8059d88b2ed448c2b))
+* **deps:** bump @authup/core from 1.0.0-beta.7 to 1.0.0-beta.8 ([#210](https://github.com/PrivateAIM/hub/issues/210)) ([6e8adf2](https://github.com/PrivateAIM/hub/commit/6e8adf2c80dba69eb66a76250e1fc1acc1bb71dd))
+* **deps:** bump winston from 3.12.0 to 3.13.0 ([#204](https://github.com/PrivateAIM/hub/issues/204)) ([f6d55e9](https://github.com/PrivateAIM/hub/commit/f6d55e957d3330b7c79582fffdc7cd7f345d0a00))
+
 ## [0.3.0](https://github.com/PrivateAIM/hub/compare/server-storage-v0.2.0...server-storage-v0.3.0) (2024-03-11)
 
 

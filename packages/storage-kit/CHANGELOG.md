@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.3.0](https://github.com/PrivateAIM/hub/compare/storage-kit-v0.3.0...storage-kit-v0.3.0) (2024-03-26)
+
+
+### Features
+
+* refactor analysis configuration ([#200](https://github.com/PrivateAIM/hub/issues/200)) ([e7bfc3f](https://github.com/PrivateAIM/hub/commit/e7bfc3f23d5b9ce6fc6d9e8d0a144fe54ea03335))
+* view for downloading results + refactored entities/types ([#188](https://github.com/PrivateAIM/hub/issues/188)) ([084040e](https://github.com/PrivateAIM/hub/commit/084040eec1e74b10ec40c577d5f8e3a5fcedf250))
+
+
+### Bug Fixes
+
+* api client for uploading bucket file ([e584f9f](https://github.com/PrivateAIM/hub/commit/e584f9fd6549b7f4974604d8059d88b2ed448c2b))
+* **deps:** bump @authup/core from 1.0.0-beta.7 to 1.0.0-beta.8 ([#210](https://github.com/PrivateAIM/hub/issues/210)) ([6e8adf2](https://github.com/PrivateAIM/hub/commit/6e8adf2c80dba69eb66a76250e1fc1acc1bb71dd))
+
 ## [0.3.0](https://github.com/PrivateAIM/hub/compare/storage-kit-v0.2.0...storage-kit-v0.3.0) (2024-03-11)
 
 
