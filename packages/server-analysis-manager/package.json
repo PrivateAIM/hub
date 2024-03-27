@@ -24,7 +24,7 @@
         "@authup/core": "^1.0.0-beta.8",
         "@authup/server-adapter": "^1.0.0-beta.8",
         "@ebec/http": "^2.3.0",
-        "@hapic/harbor": "^2.3.2",
+        "@hapic/harbor": "^2.3.3",
         "@privateaim/core": "^0.3.0",
         "@privateaim/server-kit": "^0.3.0",
         "@privateaim/storage-kit": "^0.3.0",
