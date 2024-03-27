@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.3.0](https://github.com/PrivateAIM/hub/compare/server-realtime-v0.3.0...server-realtime-v0.3.0) (2024-03-27)
+
+
+### Features
+
+* adjusted permission names ([3f5e863](https://github.com/PrivateAIM/hub/commit/3f5e8637937f52c73280fe911dd5c150d446da4f))
+
+
+### Bug Fixes
+
+* **deps:** bump [@socket](https://github.com/socket).io/redis-adapter from 8.2.1 to 8.3.0 ([#180](https://github.com/PrivateAIM/hub/issues/180)) ([665d86f](https://github.com/PrivateAIM/hub/commit/665d86fa563af1a28a15c4d77c19dee5c6843aa6))
+* **deps:** bump @authup/core from 1.0.0-beta.7 to 1.0.0-beta.8 ([#210](https://github.com/PrivateAIM/hub/issues/210)) ([6e8adf2](https://github.com/PrivateAIM/hub/commit/6e8adf2c80dba69eb66a76250e1fc1acc1bb71dd))
+* **deps:** bump @authup/server-adapter from 1.0.0-beta.7 to 1.0.0-beta.8 ([#207](https://github.com/PrivateAIM/hub/issues/207)) ([d7133b5](https://github.com/PrivateAIM/hub/commit/d7133b5cba04eef3150535b6860849a9ed6a584a))
+* **deps:** bump socket.io from 4.7.4 to 4.7.5 ([#183](https://github.com/PrivateAIM/hub/issues/183)) ([7424606](https://github.com/PrivateAIM/hub/commit/74246064f95283eb3f14536d0833e3e1a5da4677))
+* **deps:** bump winston from 3.12.0 to 3.13.0 ([#204](https://github.com/PrivateAIM/hub/issues/204)) ([f6d55e9](https://github.com/PrivateAIM/hub/commit/f6d55e957d3330b7c79582fffdc7cd7f345d0a00))
+
 ## [0.3.0](https://github.com/PrivateAIM/hub/compare/server-realtime-v0.2.0...server-realtime-v0.3.0) (2024-03-11)
 
 

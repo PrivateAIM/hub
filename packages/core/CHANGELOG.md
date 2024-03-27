@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.3.0](https://github.com/PrivateAIM/hub/compare/core-v0.3.0...core-v0.3.0) (2024-03-27)
+
+
+### Features
+
+* adjusted permission names ([3f5e863](https://github.com/PrivateAIM/hub/commit/3f5e8637937f52c73280fe911dd5c150d446da4f))
+* refactor analysis configuration ([#200](https://github.com/PrivateAIM/hub/issues/200)) ([e7bfc3f](https://github.com/PrivateAIM/hub/commit/e7bfc3f23d5b9ce6fc6d9e8d0a144fe54ea03335))
+* refactor analysis file management ([#176](https://github.com/PrivateAIM/hub/issues/176)) ([0ea979a](https://github.com/PrivateAIM/hub/commit/0ea979a2eed3cb557e82c6c96f83b367b0f89f0f))
+* view for downloading results + refactored entities/types ([#188](https://github.com/PrivateAIM/hub/issues/188)) ([084040e](https://github.com/PrivateAIM/hub/commit/084040eec1e74b10ec40c577d5f8e3a5fcedf250))
+
+
+### Bug Fixes
+
+* **deps:** bump @authup/core from 1.0.0-beta.7 to 1.0.0-beta.8 ([#210](https://github.com/PrivateAIM/hub/issues/210)) ([6e8adf2](https://github.com/PrivateAIM/hub/commit/6e8adf2c80dba69eb66a76250e1fc1acc1bb71dd))
+* transform service ids to lower case ([484ebb6](https://github.com/PrivateAIM/hub/commit/484ebb650f9e2ab0efc38771332a84bd4c578988))
+
 ## [0.3.0](https://github.com/PrivateAIM/hub/compare/core-v0.2.0...core-v0.3.0) (2024-03-11)
 
 

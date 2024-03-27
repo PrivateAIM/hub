@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/PrivateAIM/hub/compare/server-kit-v0.3.0...server-kit-v0.3.0) (2024-03-27)
+
+
+### Bug Fixes
+
+* **deps:** bump @authup/core from 1.0.0-beta.7 to 1.0.0-beta.8 ([#210](https://github.com/PrivateAIM/hub/issues/210)) ([6e8adf2](https://github.com/PrivateAIM/hub/commit/6e8adf2c80dba69eb66a76250e1fc1acc1bb71dd))
+
 ## [0.3.0](https://github.com/PrivateAIM/hub/compare/server-kit-v0.2.0...server-kit-v0.3.0) (2024-03-11)
 
 

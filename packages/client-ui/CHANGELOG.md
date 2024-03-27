@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.3.0](https://github.com/PrivateAIM/hub/compare/client-ui-v0.3.0...client-ui-v0.3.0) (2024-03-27)
+
+
+### Features
+
+* add ui package to docker-compose ([75f6bfc](https://github.com/PrivateAIM/hub/commit/75f6bfc56eeb8b58c8f120209583d81d03605a95))
+* adjusted permission names ([3f5e863](https://github.com/PrivateAIM/hub/commit/3f5e8637937f52c73280fe911dd5c150d446da4f))
+* view for downloading results + refactored entities/types ([#188](https://github.com/PrivateAIM/hub/issues/188)) ([084040e](https://github.com/PrivateAIM/hub/commit/084040eec1e74b10ec40c577d5f8e3a5fcedf250))
+
+
+### Bug Fixes
+
+* analysis entrypoint file selection ([ebf63b8](https://github.com/PrivateAIM/hub/commit/ebf63b8a79f7bcd95d0e61f922f37e7d97aa4582))
+* **deps:** bump @authup/core from 1.0.0-beta.7 to 1.0.0-beta.8 ([#210](https://github.com/PrivateAIM/hub/issues/210)) ([6e8adf2](https://github.com/PrivateAIM/hub/commit/6e8adf2c80dba69eb66a76250e1fc1acc1bb71dd))
+* minor adjustments in analysis wizard ([d6098a7](https://github.com/PrivateAIM/hub/commit/d6098a70f5d282028964fda3c3fd41e1314daac6))
+* minor enhancement for node related components ([7c0ea49](https://github.com/PrivateAIM/hub/commit/7c0ea49d79cdc417941532421e7d68d6c4f43998))
+
 ## [0.3.0](https://github.com/PrivateAIM/hub/compare/client-ui-v0.2.0...client-ui-v0.3.0) (2024-03-11)
 
 
