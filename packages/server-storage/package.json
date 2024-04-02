@@ -23,7 +23,7 @@
         "dotenv": "^16.4.4",
         "envix": "^1.3.0",
         "hapic": "^2.5.1",
-        "locter": "^2.0.2",
+        "locter": "^2.1.0",
         "minio": "^7.1.3",
         "mysql2": "^3.9.3",
         "redis-extension": "^1.3.0",
