@@ -1,13 +1,16 @@
 # Flame HUB 🔥
-This repository contains the HUB Ecosystem of FLAME.
-
-> [!WARNING]  
-> The repository is in an early stage and is not yet functional.
 
 [![main](https://github.com/PrivateAim/hub/actions/workflows/main.yml/badge.svg)](https://github.com/PrivateAim/hub/actions/workflows/main.yml)
 [![CodeQL](https://github.com/PrivateAim/hub/actions/workflows/codeql.yml/badge.svg)](https://github.com/PrivateAim/hub/actions/workflows/codeql.yml)
 [![Known Vulnerabilities](https://snyk.io/test/github/PrivateAim/hub/badge.svg)](https://snyk.io/test/github/PrivateAim/hub)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits&logoColor=white)](https://conventionalcommits.org)
+
+This repository contains the HUB ecosystem of FLAME.
+
+> 🚧 **Work in Progress**
+>
+> The HUB ecosystem is currently in active development and not usable for production yet.
+
 
 **Table of Contents**
 
