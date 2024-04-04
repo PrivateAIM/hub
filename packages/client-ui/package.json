@@ -44,7 +44,7 @@
         "browser-storage-adapter": "^1.1.2",
         "events": "^3.3.0",
         "hapic": "^2.5.1",
-        "ilingo": "^3.0.0",
+        "ilingo": "^3.2.0",
         "nuxt": "^3.11.1",
         "pinia": "^2.1.7",
         "rapiq": "^0.9.0",
