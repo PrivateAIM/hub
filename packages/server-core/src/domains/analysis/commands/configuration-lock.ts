@@ -6,7 +6,6 @@
  */
 
 import { BadRequestError } from '@ebec/http';
-import type { AnalysisNode } from '@privateaim/core';
 import { AnalysisFileType, AnalysisNodeApprovalStatus, NodeType } from '@privateaim/core';
 import { useDataSource } from 'typeorm-extension';
 import { AnalysisFileEntity } from '../../analysis-file';
@@ -14,12 +13,16 @@ import { AnalysisNodeEntity } from '../../anaylsis-node';
 import { AnalysisEntity } from '../entity';
 
 export async function lockAnalysisConfiguration(entity: AnalysisEntity) : Promise<AnalysisEntity> {
-    const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(AnalysisEntity);
-
     if (!entity.master_image_id) {
         throw new BadRequestError('A master image must be assigned to the analysis.');
     }
+
+    if (entity.configuration_locked) {
+        return entity;
+    }
+
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository(AnalysisEntity);
 
     const analysisFileRepository = dataSource.getRepository(AnalysisFileEntity);
     const analysisFile = await analysisFileRepository.findOneBy({
