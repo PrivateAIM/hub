@@ -15,9 +15,10 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import {
     AnalysisEntity,
-    detectAnalysisBuildStatus, lockAnalysisConfiguration,
+    detectAnalysisBuildStatus,
+    lockAnalysisConfiguration,
     startAnalysisBuild,
-    stopAnalysisBuild,
+    stopAnalysisBuild, unlockAnalysisConfiguration,
 } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 
@@ -73,6 +74,8 @@ export async function handleAnalysisCommandRouteHandler(req: Request, res: Respo
         case AnalysisAPICommand.CONFIGURATION_LOCK:
             entity = await lockAnalysisConfiguration(entity);
             break;
+        case AnalysisAPICommand.CONFIGURATION_UNLOCK:
+            entity = await unlockAnalysisConfiguration(entity);
     }
 
     return sendAccepted(res, entity);
