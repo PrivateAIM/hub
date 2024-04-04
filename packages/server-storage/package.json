@@ -38,7 +38,7 @@
         "@types/busboy": "^1.5.3",
         "@types/cors": "^2.8.17",
         "@types/tar-stream": "^2.2.3",
-        "testcontainers": "^10.8.0"
+        "testcontainers": "^10.8.1"
     },
     "scripts": {
         "dev": "ts-node src/index.ts",
