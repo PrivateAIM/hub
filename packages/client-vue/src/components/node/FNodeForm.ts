@@ -8,11 +8,11 @@ import { ARealms } from '@authup/client-vue';
 import type { Node, Registry } from '@privateaim/core';
 import {
     DomainType,
-    alphaNumHyphenUnderscoreRegex,
+    NodeType, alphaNumHyphenUnderscoreRegex,
 } from '@privateaim/core';
 import {
     buildFormGroup,
-    buildFormInput, buildFormSelect, buildFormSubmit,
+    buildFormInput, buildFormInputCheckbox, buildFormSelect, buildFormSubmit,
 } from '@vuecs/form-controls';
 import type { ListBodySlotProps, ListItemSlotProps } from '@vuecs/list-controls';
 import useVuelidate from '@vuelidate/core';
@@ -60,6 +60,7 @@ export default defineComponent({
             realm_id: '',
             registry_id: '',
             hidden: false,
+            type: NodeType.DEFAULT,
         });
 
         const $v = useVuelidate({
@@ -83,6 +84,9 @@ export default defineComponent({
                 minLength: minLength(10),
                 maxLength: maxLength(256),
                 email,
+            },
+            type: {
+                required,
             },
         }, form);
 
@@ -177,6 +181,23 @@ export default defineComponent({
                 }),
             });
 
+            const type = buildFormGroup({
+                validationTranslator: useValidationTranslator(),
+                validationResult: $v.value.type,
+                label: true,
+                labelContent: 'Type',
+                content: buildFormSelect({
+                    value: form.type,
+                    options: Object.values(NodeType).map((type) => ({
+                        id: type,
+                        value: type,
+                    })),
+                    onChange(input) {
+                        form.type = input;
+                    },
+                }),
+            });
+
             const externalName = buildFormGroup({
                 validationTranslator: useValidationTranslator(),
                 validationResult: $v.value.external_name,
@@ -203,33 +224,20 @@ export default defineComponent({
                 }),
             });
 
-            const hidden = h('div', {
-                class: 'form-group mb-1',
-            }, [
-                h('label', { class: 'mb-2' }, ['Hidden']),
-                h('div', { class: 'form-check form-switch' }, [
-                    h('input', {
-                        type: 'checkbox',
-                        class: 'form-check-input',
-                        checked: form.hidden,
-                        onInput: ($event: any) => {
-                            if ($event.target.composing) {
-                                return;
-                            }
-
-                            form.hidden = !form.hidden;
-                        },
-
-                        id: 'node-switch',
-                    }),
-                    h('label', {
-                        class: 'form-check-label',
-                        for: 'node-switch',
-                    }, [
-                        'Hide for project & analysis selection?',
-                    ]),
-                ]),
-            ]);
+            const hidden = buildFormGroup({
+                validationTranslator: useValidationTranslator(),
+                validationResult: $v.value.hidden,
+                label: true,
+                labelContent: 'Visibility',
+                content: buildFormInputCheckbox({
+                    groupClass: 'form-switch',
+                    value: form.hidden,
+                    onChange(input) {
+                        form.hidden = input;
+                    },
+                    labelContent: 'Hide for project/analysis selection?',
+                }),
+            });
 
             const registry : VNodeArrayChildren = [
                 h(RegistryList, {}, {
@@ -280,6 +288,8 @@ export default defineComponent({
                     h('div', {
                         class: 'col',
                     }, [
+                        type,
+                        h('hr'),
                         hidden,
                         h('hr'),
                         emailNode,

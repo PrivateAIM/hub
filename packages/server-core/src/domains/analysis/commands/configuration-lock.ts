@@ -6,7 +6,8 @@
  */
 
 import { BadRequestError } from '@ebec/http';
-import { AnalysisFileType, AnalysisNodeApprovalStatus } from '@privateaim/core';
+import type { AnalysisNode } from '@privateaim/core';
+import { AnalysisFileType, AnalysisNodeApprovalStatus, NodeType } from '@privateaim/core';
 import { useDataSource } from 'typeorm-extension';
 import { AnalysisFileEntity } from '../../analysis-file';
 import { AnalysisNodeEntity } from '../../anaylsis-node';
@@ -31,14 +32,34 @@ export async function lockAnalysisConfiguration(entity: AnalysisEntity) : Promis
     }
 
     const analysisNodeRepository = dataSource.getRepository(AnalysisNodeEntity);
-    const analysisNodes = await analysisNodeRepository.findBy({
-        analysis_id: entity.id,
+    const analysisNodes = await analysisNodeRepository.find({
+        where: {
+            analysis_id: entity.id,
+        },
+        relations: ['node'],
     });
+
+    let aggregatorNodes = 0;
 
     for (let i = 0; i < analysisNodes.length; i++) {
         if (analysisNodes[i].approval_status !== AnalysisNodeApprovalStatus.APPROVED) {
             throw new BadRequestError('At least one node has not approved the analysis.');
         }
+
+        if (
+            analysisNodes[i].node &&
+            analysisNodes[i].node.type === NodeType.AGGREGATOR
+        ) {
+            aggregatorNodes++;
+        }
+    }
+
+    if (aggregatorNodes > 1) {
+        throw new BadRequestError('Only one aggregator node can be part of the analysis.');
+    }
+
+    if (aggregatorNodes === 0) {
+        throw new BadRequestError('At least one aggregator node has to be part of the analysis.');
     }
 
     entity.configuration_locked = true;

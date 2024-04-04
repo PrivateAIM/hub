@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { NodeType } from '@privateaim/core';
 import { check } from 'express-validator';
 import { isRealmResourceWritable } from '@authup/core';
 import { ForbiddenError } from '@ebec/http';
@@ -40,6 +41,13 @@ export async function runNodeValidation(
         .exists()
         .isEmail()
         .optional({ nullable: true })
+        .run(req);
+
+    // -------------------------------------------------------------
+
+    await check('type')
+        .isIn(Object.values(NodeType))
+        .optional()
         .run(req);
 
     // -------------------------------------------------------------
