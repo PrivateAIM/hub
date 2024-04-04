@@ -32,11 +32,14 @@ export async function lockAnalysisConfiguration(entity: AnalysisEntity) : Promis
     }
 
     const analysisNodeRepository = dataSource.getRepository(AnalysisNodeEntity);
-    const analysisNodes = await analysisNodeRepository.findBy({
-        analysis_id: entity.id,
+    const analysisNodes = await analysisNodeRepository.find({
+        where: {
+            analysis_id: entity.id,
+        },
+        relations: ['node'],
     });
 
-    let aggregatorNode : AnalysisNode | undefined;
+    let aggregatorNodes = 0;
 
     for (let i = 0; i < analysisNodes.length; i++) {
         if (analysisNodes[i].approval_status !== AnalysisNodeApprovalStatus.APPROVED) {
@@ -47,11 +50,15 @@ export async function lockAnalysisConfiguration(entity: AnalysisEntity) : Promis
             analysisNodes[i].node &&
             analysisNodes[i].node.type === NodeType.AGGREGATOR
         ) {
-            aggregatorNode = analysisNodes[i];
+            aggregatorNodes++;
         }
     }
 
-    if (!aggregatorNode) {
+    if (aggregatorNodes > 1) {
+        throw new BadRequestError('Only one aggregator node can be part of the analysis.');
+    }
+
+    if (aggregatorNodes === 0) {
         throw new BadRequestError('At least one aggregator node has to be part of the analysis.');
     }
 
