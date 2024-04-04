@@ -5,15 +5,15 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { AnalysisNodeApprovalStatus, PermissionID } from '@privateaim/core';
 import { BadRequestError, ForbiddenError } from '@ebec/http';
+import { AnalysisNodeApprovalStatus, NodeType, PermissionID } from '@privateaim/core';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
+import { useEnv } from '../../../../../config';
 import { AnalysisEntity, AnalysisNodeEntity } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 import { runAnalysisNodeValidation } from '../utils';
-import { useEnv } from '../../../../../config';
 
 export async function createAnalysisNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const ability = useRequestEnv(req, 'ability');
@@ -34,7 +34,10 @@ export async function createAnalysisNodeRouteHandler(req: Request, res: Response
 
     let entity = repository.create(result.data);
 
-    if (useEnv('skipAnalysisApproval')) {
+    if (
+        useEnv('skipAnalysisApproval') ||
+        (result.relation.node && result.relation.node.type === NodeType.AGGREGATOR)
+    ) {
         entity.approval_status = AnalysisNodeApprovalStatus.APPROVED;
     }
 
