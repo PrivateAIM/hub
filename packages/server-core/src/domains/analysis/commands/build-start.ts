@@ -32,8 +32,10 @@ export async function startAnalysisBuild(
     }
 
     const analysisNodeRepository = dataSource.getRepository(AnalysisNodeEntity);
-    const trainStations = await analysisNodeRepository.findBy({
-        analysis_id: entity.id,
+    const trainStations = await analysisNodeRepository.find({
+        where: {
+            analysis_id: entity.id,
+        },
     });
 
     for (let i = 0; i < trainStations.length; i++) {
@@ -44,7 +46,9 @@ export async function startAnalysisBuild(
 
     if (!entity.registry_id) {
         const registryRepository = dataSource.getRepository(RegistryEntity);
-        const registry = await registryRepository.findOne({});
+        const [registry] = await registryRepository.find({
+            take: 1,
+        });
 
         if (!registry) {
             throw new BadRequestError('No registry is registered.');
