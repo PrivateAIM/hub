@@ -6,7 +6,8 @@
  */
 
 import { BadRequestError } from '@ebec/http';
-import { AnalysisFileType, AnalysisNodeApprovalStatus } from '@privateaim/core';
+import type { AnalysisNode } from '@privateaim/core';
+import { AnalysisFileType, AnalysisNodeApprovalStatus, NodeType } from '@privateaim/core';
 import { useDataSource } from 'typeorm-extension';
 import { AnalysisFileEntity } from '../../analysis-file';
 import { AnalysisNodeEntity } from '../../anaylsis-node';
@@ -35,10 +36,23 @@ export async function lockAnalysisConfiguration(entity: AnalysisEntity) : Promis
         analysis_id: entity.id,
     });
 
+    let aggregatorNode : AnalysisNode | undefined;
+
     for (let i = 0; i < analysisNodes.length; i++) {
         if (analysisNodes[i].approval_status !== AnalysisNodeApprovalStatus.APPROVED) {
             throw new BadRequestError('At least one node has not approved the analysis.');
         }
+
+        if (
+            analysisNodes[i].node &&
+            analysisNodes[i].node.type === NodeType.AGGREGATOR
+        ) {
+            aggregatorNode = analysisNodes[i];
+        }
+    }
+
+    if (!aggregatorNode) {
+        throw new BadRequestError('At least one aggregator node has to be part of the analysis.');
     }
 
     entity.configuration_locked = true;
