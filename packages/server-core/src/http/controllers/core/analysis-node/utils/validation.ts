@@ -63,6 +63,7 @@ export async function runAnalysisNodeValidation(
         id: 'analysis_id',
         entity: 'analysis',
     });
+
     if (result.relation.analysis) {
         if (
             !isRealmResourceWritable(useRequestEnv(req, 'realm'), result.relation.analysis.realm_id)
@@ -80,6 +81,13 @@ export async function runAnalysisNodeValidation(
 
     if (result.relation.node) {
         result.data.node_realm_id = result.relation.node.realm_id;
+    }
+
+    if (
+        result.relation.analysis &&
+        result.relation.analysis.configuration_locked
+    ) {
+        throw new BadRequestError('The analysis is locked. No additional nodes can be assigned nor modified.');
     }
 
     if (
