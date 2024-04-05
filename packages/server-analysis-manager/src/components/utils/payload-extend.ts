@@ -74,9 +74,5 @@ export function cleanupPayload<T extends Record<string, any>>(payload: T): T {
         delete payload.registry;
     }
 
-    if (hasOwnProperty(payload, 'registryProject')) {
-        delete payload.registryProject;
-    }
-
     return payload;
 }

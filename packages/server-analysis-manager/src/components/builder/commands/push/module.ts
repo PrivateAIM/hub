@@ -31,10 +31,6 @@ export async function executePushCommand(
         throw BuilderError.registryNotFound();
     }
 
-    if (!data.registryProject) {
-        throw BuilderError.registryProjectNotFound();
-    }
-
     // -----------------------------------------------------------------------------------
 
     const authConfig = buildDockerAuthConfig({
@@ -75,7 +71,7 @@ export async function executePushCommand(
 
     const localImageUrl = `${data.id}:${REGISTRY_ARTIFACT_TAG_LATEST}`;
 
-    const image = await useDocker()
+    const image = useDocker()
         .getImage(localImageUrl);
 
     for (let i = 0; i < nodes.length; i++) {
