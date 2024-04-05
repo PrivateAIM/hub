@@ -6,7 +6,7 @@
  */
 
 import stream from 'node:stream';
-import { AnalysisContainerPath } from '@privateaim/core';
+import { AnalysisContainerPath, AnalysisFileType, buildAnalysisFileBucketName } from '@privateaim/core';
 import type { Container } from 'dockerode';
 import tar from 'tar-stream';
 import {
@@ -30,7 +30,7 @@ export async function packContainerWithTrain(container: Container, context: Cont
     const client = useStorageClient();
 
     return new Promise<void>((resolve, reject) => {
-        client.bucket.stream(context.entity.id)
+        client.bucket.stream(buildAnalysisFileBucketName(AnalysisFileType.CODE, context.entity.id))
             .then((response) => {
                 const extract = tar.extract();
 
