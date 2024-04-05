@@ -18,6 +18,7 @@ import {
     writeFailedEvent,
 } from './events';
 import type { CoreCommandContext } from './type';
+import { useCoreLogger } from './utils';
 
 export async function executeCoreCommand(
     context: CoreCommandContext,
@@ -28,11 +29,15 @@ export async function executeCoreCommand(
                 .then((data) => writeConfiguringEvent({ data, command: context.command }))
                 .then(executeCoreConfigureCommand)
                 .then((data) => writeConfiguredEvent({ data, command: context.command }))
-                .catch((err: Error) => writeFailedEvent({
-                    data: context.data,
-                    command: context.command,
-                    error: err,
-                }));
+                .catch((err: Error) => {
+                    useCoreLogger().error(err);
+
+                    return writeFailedEvent({
+                        data: context.data,
+                        command: context.command,
+                        error: err,
+                    });
+                });
             break;
         }
         case CoreCommand.DESTROY: {
@@ -40,11 +45,15 @@ export async function executeCoreCommand(
                 .then((data) => writeDestroyingEvent({ data, command: context.command }))
                 .then(executeCoreDestroyCommand)
                 .then((data) => writeDestroyedEvent({ data, command: context.command }))
-                .catch((err: Error) => writeFailedEvent({
-                    data: context.data,
-                    command: context.command,
-                    error: err,
-                }));
+                .catch((err: Error) => {
+                    useCoreLogger().error(err);
+
+                    return writeFailedEvent({
+                        data: context.data,
+                        command: context.command,
+                        error: err,
+                    });
+                });
             break;
         }
     }

@@ -17,7 +17,7 @@ import type { ComponentPayloadExtended } from '../type';
 export async function extendPayload<T extends Partial<ComponentPayloadExtended<{ id: Analysis['id'] }>>>(
     data: T,
 ) : Promise<ComponentPayloadExtended<T>> {
-    let train : Analysis;
+    let entity : Analysis;
     let registry: Registry;
 
     // -----------------------------------------------------------------------------------
@@ -25,10 +25,10 @@ export async function extendPayload<T extends Partial<ComponentPayloadExtended<{
     const client = useCoreClient();
 
     if (data.entity) {
-        train = data.entity;
+        entity = data.entity;
     } else {
         try {
-            train = await client.analysis.getOne(data.id);
+            entity = await client.analysis.getOne(data.id);
         } catch (e) {
             if (isClientErrorWithStatusCode(e, 404)) {
                 throw BaseError.notFound({
@@ -44,7 +44,7 @@ export async function extendPayload<T extends Partial<ComponentPayloadExtended<{
         registry = data.registry;
     } else {
         try {
-            registry = await client.registry.getOne(train.registry_id, {
+            registry = await client.registry.getOne(entity.registry_id, {
                 fields: ['+account_secret'],
             });
         } catch (e) {
@@ -60,7 +60,7 @@ export async function extendPayload<T extends Partial<ComponentPayloadExtended<{
 
     return {
         ...data,
-        entity: train,
+        entity,
         registry,
     };
 }

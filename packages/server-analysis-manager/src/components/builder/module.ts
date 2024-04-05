@@ -22,6 +22,7 @@ import {
     writePushingEvent,
 } from './events';
 import type { BuilderCommandContext } from './type';
+import { useBuilderLogger } from './utils';
 
 export async function executeBuilderCommand(
     context: BuilderCommandContext,
@@ -36,11 +37,15 @@ export async function executeBuilderCommand(
                 .then((data) => writePushingEvent({ data, command: context.command }))
                 .then(executePushCommand)
                 .then((data) => writePushedEvent({ data, command: context.command }))
-                .catch((err: Error) => writeFailedEvent({
-                    data: context.data,
-                    command: context.command,
-                    error: err,
-                }));
+                .catch((err: Error) => {
+                    useBuilderLogger().error(err);
+
+                    return writeFailedEvent({
+                        data: context.data,
+                        command: context.command,
+                        error: err,
+                    });
+                });
             break;
         }
         case BuilderCommand.CHECK: {
@@ -49,11 +54,15 @@ export async function executeBuilderCommand(
                 .then((data) => writeCheckingEvent({ data, command: context.command }))
                 .then(executeBuilderCheckCommand)
                 .then((data) => writeCheckedEvent({ data, command: context.command }))
-                .catch((err: Error) => writeFailedEvent({
-                    data: context.data,
-                    command: context.command,
-                    error: err,
-                }));
+                .catch((err: Error) => {
+                    useBuilderLogger().error(err);
+
+                    return writeFailedEvent({
+                        data: context.data,
+                        command: context.command,
+                        error: err,
+                    });
+                });
             break;
         }
     }
