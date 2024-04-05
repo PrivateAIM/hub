@@ -40,7 +40,7 @@ export async function packContainerWithTrain(container: Container, context: Cont
                     streamToBuffer(stream)
                         .then((buff) => {
                             useBuilderLogger()
-                                .debug(`Extracting train file ${header.name} (${header.size} bytes).`, {
+                                .debug(`Extracting analysis file ${header.name} (${header.size} bytes).`, {
                                     command: BuilderCommand.BUILD,
                                 });
 
@@ -50,7 +50,7 @@ export async function packContainerWithTrain(container: Container, context: Cont
                         })
                         .catch((e) => {
                             useBuilderLogger()
-                                .error(`Extracting train file ${header.name} (${header.size} bytes) failed.`, {
+                                .error(`Extracting analysis file ${header.name} (${header.size} bytes) failed.`, {
                                     command: BuilderCommand.BUILD,
                                 });
                             callback(e);
@@ -58,7 +58,7 @@ export async function packContainerWithTrain(container: Container, context: Cont
                 });
 
                 extract.on('error', () => {
-                    reject(new BuilderError('The train file stream could not be extracted'));
+                    reject(new BuilderError('The analysis file stream could not be extracted'));
                 });
 
                 extract.on('finish', () => {
