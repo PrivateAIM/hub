@@ -17,7 +17,7 @@ type StorageServiceConfigurationContext = {
 export function configureCoreService(context: StorageServiceConfigurationContext) {
     setCoreFactory(() => {
         const client = new APIClient({
-            baseURL: useEnv('storageURL'),
+            baseURL: useEnv('coreURL'),
         });
 
         mountClientResponseErrorTokenHook(client, {
