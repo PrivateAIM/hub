@@ -5,10 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import path from 'node:path';
-import type { Logger, LoggerOptions } from 'winston';
-import { createLogger, format, transports } from 'winston';
-import { useEnv } from '../env';
+import type { Logger } from '@privateaim/server-kit';
+import { createLogger } from '@privateaim/server-kit';
 
 import { getWritableDirPath } from '../paths';
 
@@ -32,41 +30,8 @@ export function useLogger() : Logger {
         return logger;
     }
 
-    let items : LoggerOptions['transports'];
-
-    if (useEnv('env') === 'production') {
-        items = [
-            new transports.Console({
-                level: 'info',
-            }),
-            new transports.File({
-                filename: path.join(getWritableDirPath(), 'access.log'),
-                level: 'http',
-                maxsize: 10 * 1024 * 1024, // 10MB
-                maxFiles: 5,
-            }),
-            new transports.File({
-                filename: path.join(getWritableDirPath(), 'error.log'),
-                level: 'warn',
-                maxsize: 10 * 1024 * 1024, // 10MB
-                maxFiles: 5,
-            }),
-        ];
-    } else {
-        items = [
-            new transports.Console({
-                level: 'debug',
-            }),
-        ];
-    }
-
     logger = createLogger({
-        format: format.combine(
-            format.timestamp(),
-            format.colorize(),
-            format.simple(),
-        ),
-        transports: items,
+        directory: getWritableDirPath(),
     });
 
     return logger;

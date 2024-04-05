@@ -5,9 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import path from 'node:path';
-import type { Logger } from 'winston';
-import { createLogger, format, transports } from 'winston';
+import type { Logger } from '@privateaim/server-kit';
+import { createLogger } from '@privateaim/server-kit';
 import { getWritableDirPath } from '../../config';
 
 let logger : undefined | any;
@@ -31,17 +30,7 @@ export function useLogger() : Logger {
     }
 
     logger = createLogger({
-        format: format.json(),
-        level: 'debug',
-        transports: [
-            new transports.Console({
-                level: 'debug',
-            }),
-            new transports.File({
-                filename: path.join(getWritableDirPath(), 'error.log'),
-                level: 'warn',
-            }),
-        ],
+        directory: getWritableDirPath(),
     });
 
     return logger;

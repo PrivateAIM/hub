@@ -5,9 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import path from 'node:path';
-import type { Logger } from 'winston';
-import { createLogger, format, transports } from 'winston';
+import type { Logger } from '@privateaim/server-kit';
+import { createLogger } from '@privateaim/server-kit';
 import { getWritableDirPath } from '../../../config';
 import { ComponentName } from '../../constants';
 
@@ -19,20 +18,13 @@ export function useBuilderLogger() : Logger {
     }
 
     instance = createLogger({
-        format: format.json(),
-        defaultMeta: {
-            component: ComponentName.BUILDER,
+        options: {
+            defaultMeta: {
+                component: ComponentName.BUILDER,
+            },
         },
-        level: 'debug',
-        transports: [
-            new transports.Console({
-                level: 'debug',
-            }),
-            new transports.File({
-                filename: path.join(getWritableDirPath(), 'error.log'),
-                level: 'warn',
-            }),
-        ],
+        // todo: allow customizing specific path
+        directory: getWritableDirPath(),
     });
 
     return instance;

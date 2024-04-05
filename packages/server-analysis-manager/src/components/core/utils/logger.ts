@@ -5,9 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import path from 'node:path';
-import type { Logger } from 'winston';
-import { createLogger, format, transports } from 'winston';
+import type { Logger } from '@privateaim/server-kit';
+import { createLogger } from '@privateaim/server-kit';
 import { getWritableDirPath } from '../../../config';
 import { ComponentName } from '../../constants';
 
@@ -19,20 +18,13 @@ export function useCoreLogger() : Logger {
     }
 
     instance = createLogger({
-        format: format.json(),
-        defaultMeta: {
-            component: ComponentName.CORE,
+        options: {
+            defaultMeta: {
+                component: ComponentName.CORE,
+            },
         },
-        level: 'debug',
-        transports: [
-            new transports.Console({
-                level: 'debug',
-            }),
-            new transports.File({
-                filename: path.join(getWritableDirPath(), 'error.log'),
-                level: 'warn',
-            }),
-        ],
+        // todo: allow specifying custom path
+        directory: getWritableDirPath(),
     });
 
     return instance;

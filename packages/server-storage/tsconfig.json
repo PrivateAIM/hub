@@ -7,6 +7,9 @@
             ],
             "@privateaim/storage-kit": [
                 "./packages/storage-kit/src"
+            ],
+            "@privateaim/server-kit": [
+                "./packages/server-kit/src"
             ]
         }
     }

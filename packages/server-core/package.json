@@ -46,7 +46,6 @@
         "tar": "^6.2.1",
         "typeorm": "^0.3.20",
         "typeorm-extension": "^3.4.0",
-        "winston": "^3.13.0",
         "yargs": "^17.7.1",
         "zod": "^3.22.4"
     },
