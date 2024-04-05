@@ -5,14 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { AnalysisFileType } from '@privateaim/core';
+import { AnalysisContainerPath, AnalysisFileType, getHostNameFromString } from '@privateaim/core';
 import type { BucketFile } from '@privateaim/storage-kit';
 import path from 'node:path';
 import type {
     Analysis,
     MasterImage,
 } from '@privateaim/core';
-import { AnalysisContainerPath, getHostNameFromString } from '@privateaim/core';
 import { useCoreClient, useStorageClient } from '../../../core';
 import { BuilderError } from '../error';
 
@@ -92,10 +91,10 @@ export async function buildTrainDockerFile(context: DockerFileBuildContext) : Pr
     const masterImagePath = `${getHostNameFromString(context.hostname)}/master/${masterImage.virtual_path}`;
     const content = `
     FROM ${masterImagePath}
-    RUN mkdir ${AnalysisContainerPath.MAIN} &&\
-        chmod -R +x ${AnalysisContainerPath.MAIN}
+    RUN mkdir -p ${AnalysisContainerPath.CODE}
+    RUN chmod -R +x ${AnalysisContainerPath.CODE}
 
-    CMD ["${entrypointCommand}", ${argumentsString}"${path.posix.join(AnalysisContainerPath.MAIN, entrypointPath)}"]
+    CMD ["${entrypointCommand}", ${argumentsString}"${path.posix.join(AnalysisContainerPath.CODE, entrypointPath)}"]
     `;
 
     return {

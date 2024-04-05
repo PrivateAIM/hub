@@ -78,7 +78,7 @@ export async function packContainerWithTrain(container: Container, context: Cont
 
                     pack.finalize();
 
-                    container.putArchive(pack, { path: AnalysisContainerPath.MAIN })
+                    container.putArchive(pack, { path: AnalysisContainerPath.CODE })
                         .then(() => resolve())
                         .catch(() => reject(new BuilderError('The analysis pack stream could not be forwarded to the container.')));
                 });
