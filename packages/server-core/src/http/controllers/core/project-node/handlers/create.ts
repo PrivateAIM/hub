@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionID, ProjectNodeApprovalStatus } from '@privateaim/core';
+import { NodeType, PermissionID, ProjectNodeApprovalStatus } from '@privateaim/core';
 import { ForbiddenError } from '@ebec/http';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
@@ -31,7 +31,10 @@ export async function createProjectNodeRouteHandler(req: Request, res: Response)
     const repository = dataSource.getRepository(ProjectNodeEntity);
     let entity = repository.create(result.data);
 
-    if (useEnv('skipProjectApproval')) {
+    if (
+        useEnv('skipProjectApproval') ||
+        (result.relation.node && result.relation.node.type === NodeType.AGGREGATOR)
+    ) {
         entity.approval_status = ProjectNodeApprovalStatus.APPROVED;
     }
 

@@ -23,3 +23,9 @@ export type DockerContainerFile = {
     size: number,
     content: string
 };
+
+export type DockerConnectionOptions = {
+    host: string,
+    user: string,
+    password: string
+};
