@@ -17,7 +17,7 @@ import {
     injectCoreAPIClient,
     renderActionCommand,
     wrapFnWithBusyState,
-} from '../../../core';
+} from '../../core';
 
 const FAnalysisCommand = defineComponent({
     props: {
@@ -85,8 +85,8 @@ const FAnalysisCommand = defineComponent({
                     return false;
                 }
 
-                return entity.value.build_status === AnalysisBuildStatus.STOPPING ||
-                    entity.value.build_status === AnalysisBuildStatus.FAILED;
+                return entity.value.build_status !== AnalysisBuildStatus.STOPPING &&
+                    entity.value.build_status !== AnalysisBuildStatus.FAILED;
             }
 
             if (props.command === AnalysisAPICommand.BUILD_STOP) {
@@ -94,7 +94,12 @@ const FAnalysisCommand = defineComponent({
                     return true;
                 }
 
-                return entity.value.build_status === AnalysisBuildStatus.STOPPING;
+                return entity.value.build_status === AnalysisBuildStatus.STOPPING ||
+                    entity.value.build_status === AnalysisBuildStatus.FINISHED;
+            }
+
+            if (props.command === AnalysisAPICommand.BUILD_STATUS) {
+                return entity.value.build_status === AnalysisBuildStatus.FINISHED;
             }
 
             return false;

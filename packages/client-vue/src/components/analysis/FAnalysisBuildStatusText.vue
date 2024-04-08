@@ -7,12 +7,12 @@
 <script lang="ts">
 
 import { AnalysisBuildStatus } from '@privateaim/core';
-import { defineComponent } from 'vue';
+import {defineComponent, PropType} from 'vue';
 
 export default defineComponent({
     props: {
         status: {
-            type: String,
+            type: String as PropType<`${AnalysisBuildStatus}`>,
             default: null,
         },
     },
