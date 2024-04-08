@@ -10,7 +10,12 @@ import { basic } from '@routup/basic';
 import type { Router } from 'routup';
 import { EnvironmentName, useEnv } from '../config';
 import {
-    hasAuthupClient, hasRedisClient, hasVaultClient, useAuthupClient, useRedisClient, useVaultClient,
+    hasAuthupClient,
+    hasRedisClient,
+    hasVaultClient,
+    useAuthupClient,
+    useRedisClient,
+    useVaultClient,
 } from '../core';
 import {
     registerCorsMiddleware,
@@ -39,5 +44,6 @@ export function registerMiddlewares(router: Router) {
         redisClient: hasRedisClient() ?
             useRedisClient() :
             undefined,
+        fakeAbilities: useEnv('env') === EnvironmentName.TEST,
     });
 }

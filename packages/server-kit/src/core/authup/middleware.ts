@@ -23,18 +23,12 @@ export function registerAuthupMiddleware(
         const data = createFakeTokenVerificationData();
 
         router.use(coreHandler((req, res, next) => {
-            applyTokenVerificationData(req, data, true);
+            applyTokenVerificationData(req, data, options.fakeAbilities);
             next();
         }));
 
         return;
     }
-
-    let cache : Record<string, string> = {};
-
-    setInterval(() => {
-        cache = {};
-    }, 120 * 1000);
 
     router.use(coreHandler(async (req, res, next) => {
         const headerRaw = getRequestHeader(req, 'authorization');
@@ -42,10 +36,15 @@ export function registerAuthupMiddleware(
             next();
         }
 
-        if (cache[headerRaw]) {
-            req.headers.authorization = `Bearer ${cache[headerRaw]}`;
-            next();
-            return;
+        const cacheKey = `authorization-header:${headerRaw}`;
+
+        if (options.redisClient) {
+            const data = await options.redisClient.get(cacheKey);
+            if (data) {
+                req.headers.authorization = `Bearer ${data}`;
+                next();
+                return;
+            }
         }
 
         const header = parseAuthorizationHeader(headerRaw);
@@ -56,8 +55,10 @@ export function registerAuthupMiddleware(
                 password: header.password,
             });
 
-            cache[headerRaw] = token.access_token;
             req.headers.authorization = `Bearer ${token.access_token}`;
+            if (options.redisClient) {
+                await options.redisClient.setex(cacheKey, token.expires_in, token.access_token);
+            }
         }
 
         next();
@@ -98,7 +99,7 @@ export function registerAuthupMiddleware(
         tokenVerifierHandler: (
             req,
             data,
-        ) => applyTokenVerificationData(req, data, false),
+        ) => applyTokenVerificationData(req, data, options.fakeAbilities),
     });
 
     router.use(coreHandler((

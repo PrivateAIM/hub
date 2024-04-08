@@ -13,4 +13,5 @@ export type AuthupMiddlewareRegistrationOptions = {
     client?: AuthupClient,
     vaultClient?: VaultClient,
     redisClient?: RedisClient,
+    fakeAbilities?: boolean
 };
