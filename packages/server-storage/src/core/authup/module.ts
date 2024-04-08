@@ -17,6 +17,10 @@ export function useAuthupClient() {
     return singleton.use();
 }
 
+export function hasAuthupClient() {
+    return singleton.has() || singleton.hasFactory();
+}
+
 export function setAuthupClientFactory(factory: Factory<APIClient>) {
     return singleton.setFactory(factory);
 }

@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { mountAuthupMiddleware } from '@privateaim/server-kit';
 import { decorators } from '@routup/decorators';
 import {
     useRequestBody,
@@ -20,7 +21,9 @@ import {
 import { Router, coreHandler } from 'routup';
 import { EnvironmentName, useEnv } from '../config';
 import {
-    mountAuthupMiddleware,
+    hasAuthupClient, hasRedis, useAuthupClient, useRedis,
+} from '../core';
+import {
     mountBasicMiddleware,
     mountCorsMiddleware,
     mountErrorMiddleware,
@@ -33,7 +36,18 @@ export function createHTTPRouter() : Router {
 
     mountCorsMiddleware(router);
     mountBasicMiddleware(router);
-    mountAuthupMiddleware(router);
+
+    mountAuthupMiddleware(router, {
+        client: hasAuthupClient() ?
+            useAuthupClient() :
+            undefined,
+        // todo: enable vault client
+        redisClient: hasRedis() ?
+            useRedis() :
+            undefined,
+        fakeAbilities: useEnv('env') === EnvironmentName.TEST,
+    });
+
     if (useEnv('env') !== EnvironmentName.TEST) {
         mountSwaggerMiddleware(router);
     }

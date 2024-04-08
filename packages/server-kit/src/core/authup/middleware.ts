@@ -15,7 +15,7 @@ import { coreHandler, getRequestHeader } from 'routup';
 import type { AuthupMiddlewareRegistrationOptions } from './types';
 import { applyTokenVerificationData, createFakeTokenVerificationData } from './utils';
 
-export function registerAuthupMiddleware(
+export function mountAuthupMiddleware(
     router: Router,
     options: AuthupMiddlewareRegistrationOptions,
 ) {
