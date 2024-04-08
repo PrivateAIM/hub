@@ -34,11 +34,11 @@ export function useEnv(key?: string) : any {
         port: readInt('PORT', 3000),
         publicURL: read('PUBLIC_URL', 'http://localhost:3000'),
 
-        redisConnectionString: read('REDIS_CONNECTION_STRING', null),
+        redisConnectionString: read('REDIS_CONNECTION_STRING'),
         minioConnectionString: read('MINIO_CONNECTION_STRING', 'http://admin:start123@127.0.0.1:9000'),
-        vaultConnectionString: read('VAULT_CONNECTION_STRING', 'start123@http://127.0.0.1:8090/v1/'),
+        vaultConnectionString: read('VAULT_CONNECTION_STRING'),
 
-        authupApiURL: read('AUTHUP_URL', 'http://127.0.0.1:3010/'),
+        authupURL: read('AUTHUP_URL'),
     };
 
     if (typeof key === 'string') {

@@ -9,10 +9,12 @@ import type { TokenCreatorOptions } from '@authup/core';
 import { APIClient, mountClientResponseErrorTokenHook } from '@authup/core';
 import { hasVaultClient, setAuthupFactory, useVaultClient } from '../../core';
 import { useEnv } from '../env';
+import { useLogger } from '../log';
 
 export function configureAuthup() {
     const baseURL = useEnv('authupApiURL');
-    if (typeof baseURL !== 'string') {
+    if (!baseURL) {
+        useLogger().debug('Authup service url is not set.');
         return;
     }
 

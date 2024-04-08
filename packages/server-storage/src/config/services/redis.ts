@@ -11,9 +11,12 @@ import { useEnv } from '../env';
 
 export function configureRedis() {
     const connectionString = useEnv('redisConnectionString');
-    if (connectionString) {
-        setRedisFactory(() => createClient({
-            connectionString,
-        }));
+    if (!connectionString) {
+        // todo: log debug message
+        return;
     }
+
+    setRedisFactory(() => createClient({
+        connectionString,
+    }));
 }

@@ -5,8 +5,5 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './auth';
-export * from './basic';
-export * from './cors';
-export * from './error';
-export * from './swagger';
+export * from './middleware';
+export * from './types';
