@@ -15,7 +15,7 @@ export interface Environment {
 
     redisConnectionString?: string | null,
     minioConnectionString: string,
-    vaultConnectionString: string,
+    vaultConnectionString?: string | null,
 
-    authupApiURL: string,
+    authupURL?: string,
 }

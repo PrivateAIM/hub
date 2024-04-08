@@ -11,7 +11,7 @@ import { useEnv } from '../env';
 
 export function configureAuthup() {
     setAuthupClientFactory(() => {
-        const baseURL = useEnv('authupApiURL');
+        const baseURL = useEnv('authupURL');
         const authupClient = new APIClient({
             baseURL,
         });
