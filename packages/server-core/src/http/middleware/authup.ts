@@ -142,6 +142,7 @@ export function registerAuthupMiddleware(router: Router) {
             type: 'robotInVault',
             name: 'system',
             vault: useVaultClient(),
+            baseURL: useEnv('authupApiURL'),
         };
     } else {
         tokenCreator = {

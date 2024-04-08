@@ -6,6 +6,7 @@
  */
 
 export * from './aggregator';
+export * from './authup';
 export * from './component';
 export * from './logger';
 export * from './queue';
