@@ -10,8 +10,12 @@ import { setAuthupClientFactory } from '../../core';
 import { useEnv } from '../env';
 
 export function configureAuthup() {
+    const baseURL = useEnv('authupURL');
+    if (!baseURL) {
+        return;
+    }
+
     setAuthupClientFactory(() => {
-        const baseURL = useEnv('authupURL');
         const authupClient = new APIClient({
             baseURL,
         });
