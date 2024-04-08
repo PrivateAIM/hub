@@ -17,7 +17,7 @@ import {
 import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
 import Dropdown from '../Dropdown';
-import {FAnalysisCommand} from "./command";
+import {FAnalysisCommand} from "./FAnalysisCommand";
 import FAnalysisBuildStatusText from "./FAnalysisBuildStatusText.vue";
 import FAnalysisConfigurationStatusText from "./FAnalysisConfigurationStatusText.vue";
 

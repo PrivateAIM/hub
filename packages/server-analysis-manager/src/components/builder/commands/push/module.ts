@@ -92,6 +92,10 @@ export async function executePushCommand(
         force: true,
     });
 
+    useBuilderLogger().debug('Tagged image for nodes', {
+        command: BuilderCommand.BUILD,
+    });
+
     // -----------------------------------------------------------------------------------
 
     useBuilderLogger().debug('Pushing image for nodes', {
@@ -108,6 +112,10 @@ export async function executePushCommand(
 
         await pushDockerImage(nodeImageURL, authConfig);
     }
+
+    useBuilderLogger().debug('Pushed image for nodes', {
+        command: BuilderCommand.BUILD,
+    });
 
     return data;
 }
