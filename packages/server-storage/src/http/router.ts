@@ -21,7 +21,7 @@ import {
 import { Router, coreHandler } from 'routup';
 import { EnvironmentName, useEnv } from '../config';
 import {
-    hasAuthupClient, hasRedis, useAuthupClient, useRedis,
+    hasAuthupClient, hasRedis, hasVaultClient, useAuthupClient, useRedis, useVaultClient,
 } from '../core';
 import {
     mountBasicMiddleware,
@@ -41,7 +41,9 @@ export function createHTTPRouter() : Router {
         client: hasAuthupClient() ?
             useAuthupClient() :
             undefined,
-        // todo: enable vault client
+        vaultClient: hasVaultClient() ?
+            useVaultClient() :
+            undefined,
         redisClient: hasRedis() ?
             useRedis() :
             undefined,

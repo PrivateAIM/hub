@@ -9,10 +9,12 @@ import {
     configureAuthup,
     configureMinio,
     configureRedis,
+    configureVault,
 } from './services';
 
 export function configure() {
     configureRedis();
     configureMinio();
     configureAuthup();
+    configureVault();
 }
