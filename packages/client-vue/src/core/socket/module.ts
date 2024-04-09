@@ -14,13 +14,12 @@ import {
 } from '@privateaim/core';
 import type { ManagerOptions, Socket } from 'socket.io-client';
 import { Manager } from 'socket.io-client';
-import type { AuthupStore } from '../services/authup';
-import { injectAuthupStore } from '../services/authup';
+import type { AuthupStore } from '../services';
 
-type SocketModuleManagerConfiguration = {
+type SocketManagerContext = {
     url: string,
     options?: Partial<ManagerOptions>,
-    store?: AuthupStore
+    store: AuthupStore
 };
 
 export type SocketClient = Socket<SocketResourcesNamespaceSTCEvents, SocketResourcesNamespaceCTSEvents>;
@@ -30,22 +29,22 @@ export class SocketManager {
 
     protected sockets : Record<string, SocketClient>;
 
-    protected store : AuthupStore | undefined;
+    protected store : AuthupStore;
 
     //--------------------------------------------------------------------
 
     constructor(
-        managerConfiguration : SocketModuleManagerConfiguration,
+        ctx : SocketManagerContext,
     ) {
         this.sockets = {};
 
-        this.manager = new Manager(managerConfiguration.url, {
+        this.manager = new Manager(ctx.url, {
             autoConnect: false,
             reconnectionAttempts: 10,
-            ...managerConfiguration.options,
+            ...ctx.options,
         });
 
-        this.store = managerConfiguration.store;
+        this.store = ctx.store;
     }
 
     //--------------------------------------------------------------------
@@ -66,13 +65,13 @@ export class SocketManager {
         if (typeof this.manager === 'undefined') {
             throw new Error('Manager not initialized...');
         }
+
         if (this.sockets[namespace]) {
             return this.sockets[namespace];
         }
 
         const getToken = (cb: CallableFunction) => {
-            const store = injectAuthupStore();
-            const token = store.accessToken;
+            const token = this.store.accessToken;
 
             if (token) {
                 return cb({ token });

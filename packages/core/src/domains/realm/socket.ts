@@ -8,11 +8,11 @@
 import type { Realm } from '@authup/core';
 
 export function buildSocketRealmNamespaceName(realmId: Realm['id']) {
-    return `/realm#${realmId}`;
+    return `/resources#${realmId}`;
 }
 
 export function parseSocketRealmNamespaceName(name: string) : string | undefined {
-    return name.startsWith('/realm#') ?
-        name.substring('/realm#'.length) :
+    return name.startsWith('/resources#') ?
+        name.substring('/resources#'.length) :
         name;
 }
