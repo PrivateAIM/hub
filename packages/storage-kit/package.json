@@ -20,13 +20,13 @@
         "url": "https://github.com/tada5hi"
     },
     "devDependencies": {
-        "@authup/core": "^1.0.0-beta.8",
+        "@authup/core": "^1.0.0-beta.9",
         "@privateaim/core": "^0.3.0",
         "hapic": "^2.5.1",
         "rapiq": "^0.9.0"
     },
     "peerDependencies": {
-        "@authup/core": "^1.0.0-beta.8",
+        "@authup/core": "^1.0.0-beta.9",
         "@privateaim/core": "^0.3.0",
         "hapic": "^2.5.1",
         "rapiq": "^0.9.0"
