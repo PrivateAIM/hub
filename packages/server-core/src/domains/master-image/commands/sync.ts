@@ -10,18 +10,18 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { Readable } from 'node:stream';
 import { createClient } from 'hapic';
-import tar from 'tar';
+import {extract} from 'tar';
 import { scanDirectory } from 'docker-scan';
 import { getWritableDirPath, useEnv } from '../../../config';
 import type { ReturnContext } from './utils';
 import { mergeMasterImageGroupsWithDatabase, mergeMasterImagesWithDatabase } from './utils';
 
-type MasterImagesSyncresponse = {
+type MasterImagesSyncResponse = {
     images: ReturnContext<MasterImage>,
     groups: ReturnContext<MasterImageGroup>
 };
 
-export async function syncMasterImages() : Promise<MasterImagesSyncresponse> {
+export async function syncMasterImages() : Promise<MasterImagesSyncResponse> {
     const directoryPath: string = path.join(getWritableDirPath(), 'master-images');
 
     await fs.promises.rm(directoryPath, { force: true, recursive: true });
@@ -44,7 +44,7 @@ export async function syncMasterImages() : Promise<MasterImagesSyncresponse> {
         });
 
         writable.on('finish', async () => {
-            await tar.extract({
+            await extract({
                 file: tarPath,
                 cwd: directoryPath,
                 onentry(entry) {
