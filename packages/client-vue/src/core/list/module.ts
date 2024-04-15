@@ -271,12 +271,23 @@ export function createList<
         };
 
         socketContext.onCreated = (entity) => {
+            const limit = meta.value?.pagination?.limit;
+            if(typeof limit !== 'number') {
+                handleCreated(entity);
+                return;
+            }
+
+            if(total.value < limit) {
+                handleCreated(entity);
+                return;
+            }
+
             const isSorted = query &&
                 query.sort &&
                 isQuerySortedDescByDate(query.sort) &&
                 meta.value?.pagination?.offset === 0;
 
-            if (isSorted || total.value < (meta.value?.pagination?.limit ?? 0)) {
+            if (isSorted) {
                 handleCreated(entity);
             }
         };

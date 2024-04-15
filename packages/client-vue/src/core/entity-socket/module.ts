@@ -24,7 +24,7 @@ import {
     computed, isRef, onMounted, onUnmounted, watch,
 } from 'vue';
 import { storeToRefs } from '@authup/client-vue';
-import { injectAuthupStore } from '../services/authup';
+import { injectAuthupStore } from '../services';
 import type { EntitySocket, EntitySocketContext } from './type';
 import { injectSocketManager } from '../socket';
 
@@ -136,13 +136,16 @@ export function createEntitySocket<
         socket.emit(
             event,
             targetId.value,
+            (err) => {
+                // todo: handle error!
+            }
         );
 
         if (ctx.onCreated) {
             socket.on(buildDomainEventFullName(
                 ctx.type as DomainInput,
                 DomainEventName.CREATED,
-            ), handleUpdated);
+            ), handleCreated);
         }
 
         if (ctx.onUpdated) {
