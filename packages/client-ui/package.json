@@ -20,7 +20,7 @@
     "devDependencies": {
         "@authup/client-vue": "^1.0.0-beta.9",
         "@authup/core": "^1.0.0-beta.9",
-        "@bootstrap-vue-next/nuxt": "^0.17.0",
+        "@bootstrap-vue-next/nuxt": "^0.17.1",
         "@fortawesome/fontawesome-free": "^6.5.2",
         "@nuxtjs/google-fonts": "^3.2.0",
         "@privateaim/client-vue": "^0.3.0",
