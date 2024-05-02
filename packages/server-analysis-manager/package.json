@@ -41,7 +41,7 @@
         "uuid": "^9.0.1"
     },
     "devDependencies": {
-        "@types/dockerode": "^3.3.28",
+        "@types/dockerode": "^3.3.29",
         "@types/tar-stream": "^2.2.2",
         "@types/uuid": "^9.0.8",
         "ts-node": "^10.9.2"
