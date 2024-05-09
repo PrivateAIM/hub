@@ -46,3 +46,18 @@ jobs:
             -   name: Test Server Storage
                 run: |
                     npm run test --workspace=packages/server-storage
+    lint:
+        runs-on: ubuntu-latest
+        steps:
+             -   uses: actions/checkout@v4
+
+             -   name: Install
+                 uses: ./.github/actions/install
+                 with:
+                     node-version: ${{ env.PRIMARY_NODE_VERSION }}
+
+             -   name: Build
+                 uses: ./.github/actions/build
+
+             -   name: Lint
+                 run: npm run lint
