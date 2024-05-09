@@ -36,7 +36,7 @@
         "typeorm-extension": "^3.5.1"
     },
     "devDependencies": {
-        "@types/busboy": "^1.5.3",
+        "@types/busboy": "^1.5.4",
         "@types/cors": "^2.8.17",
         "@types/tar-stream": "^2.2.3",
         "testcontainers": "^10.9.0"
