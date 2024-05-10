@@ -15,7 +15,7 @@ import {
     extendHTTPValidationResultWithRelation,
 } from '@privateaim/server-kit';
 import {
-    AnalysisFileEntity, MasterImageEntity, ProjectEntity, RegistryEntity,
+    MasterImageEntity, ProjectEntity, RegistryEntity,
 } from '../../../../../domains';
 import type { AnalysisEntity } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';

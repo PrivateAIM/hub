@@ -19,6 +19,7 @@
     },
     "devDependencies": {
         "@authup/client-web-kit": "^1.0.0-beta.12",
+        "@authup/core-http-kit": "^1.0.0-beta.12",
         "@authup/core-kit": "^1.0.0-beta.12",
         "@bootstrap-vue-next/nuxt": "^0.17.6",
         "@fortawesome/fontawesome-free": "^6.5.2",

@@ -22,7 +22,7 @@ export default defineNuxtComponent({
             },
             {
                 name: 'Security', icon: 'fa fa-lock', urlSuffix: '/security',
-            }
+            },
         ];
 
         return {

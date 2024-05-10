@@ -6,7 +6,7 @@
  */
 
 import type { Ability } from '@authup/kit';
-import { AbilityManager, } from '@authup/kit';
+import { AbilityManager } from '@authup/kit';
 import { REALM_MASTER_NAME } from '@authup/core-kit';
 import type { TokenVerificationData } from '@authup/server-core-plugin-kit';
 import { PermissionID } from '@privateaim/core';

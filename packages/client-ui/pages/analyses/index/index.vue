@@ -11,7 +11,7 @@ import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
 import { computed } from 'vue';
 import {
-    FPagination, FSearch, FTitle, FAnalyses,
+    FAnalyses, FPagination, FSearch, FTitle,
 } from '@privateaim/client-vue';
 import { definePageMeta } from '#imports';
 import { defineNuxtComponent } from '#app';

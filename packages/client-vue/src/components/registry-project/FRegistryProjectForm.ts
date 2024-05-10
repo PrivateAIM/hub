@@ -5,12 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {buildFormSubmitWithTranslations, createFormSubmitTranslations} from "@authup/client-web-kit";
-import {getSeverity, useTranslationsForNestedValidations} from "@ilingo/vuelidate";
+import { buildFormSubmitWithTranslations, createFormSubmitTranslations } from '@authup/client-web-kit';
+import { getSeverity, useTranslationsForNestedValidations } from '@ilingo/vuelidate';
 import type { Registry, RegistryProject } from '@privateaim/core';
 import { DomainType, RegistryProjectType, createNanoID } from '@privateaim/core';
 import {
-    buildFormGroup, buildFormInput, buildFormSelect, buildFormSubmit,
+    buildFormGroup, buildFormInput, buildFormSelect,
 } from '@vuecs/form-controls';
 import type { ListItemSlotProps } from '@vuecs/list-controls';
 import useVuelidate from '@vuelidate/core';

@@ -272,12 +272,12 @@ export function createList<
 
         socketContext.onCreated = (entity) => {
             const limit = meta.value?.pagination?.limit;
-            if(typeof limit !== 'number') {
+            if (typeof limit !== 'number') {
                 handleCreated(entity);
                 return;
             }
 
-            if(total.value < limit) {
+            if (total.value < limit) {
                 handleCreated(entity);
                 return;
             }

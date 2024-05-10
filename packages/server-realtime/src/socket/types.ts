@@ -15,7 +15,7 @@ import type {
 import type {
     Realm, Robot, User,
 } from '@authup/core-kit';
-import { AbilityManager } from '@authup/kit';
+import type { AbilityManager } from '@authup/kit';
 import type { Namespace, Server, Socket } from 'socket.io';
 
 export type SocketData = {

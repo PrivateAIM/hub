@@ -26,7 +26,7 @@ import { createSocketServer } from './socket';
         httpServer.listen(port);
 
         useLogger().info(`Listening on 0.0.0.0:${port}`);
-        useLogger().info(`Socket.io server mounted on path: ${socketServer.path()}`)
+        useLogger().info(`Socket.io server mounted on path: ${socketServer.path()}`);
     }
 
     start();

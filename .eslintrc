@@ -29,6 +29,8 @@
     "ignorePatterns": [
         "**/dist/*",
         "**/*.d.ts",
+        "**/node_modules/**",
+        "**/.nuxt",
         "**/writable/**",
         "**/packages/frontend/ui/components/svg/**"
     ],

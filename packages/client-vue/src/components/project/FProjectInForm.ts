@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {buildFormSubmitWithTranslations, createFormSubmitTranslations} from "@authup/client-web-kit";
-import {getSeverity, useTranslationsForNestedValidations} from "@ilingo/vuelidate";
+import { buildFormSubmitWithTranslations, createFormSubmitTranslations } from '@authup/client-web-kit';
+import { getSeverity, useTranslationsForNestedValidations } from '@ilingo/vuelidate';
 import type { ProjectNode } from '@privateaim/core';
 import { DomainType, ProjectNodeApprovalStatus } from '@privateaim/core';
 import {
@@ -78,7 +78,6 @@ const FProjectInForm = defineComponent({
             await manager.createOrUpdate(form);
         });
 
-
         const translationsValidation = useTranslationsForNestedValidations($v.value);
         const translationsSubmit = createFormSubmitTranslations();
 
@@ -140,5 +139,5 @@ const FProjectInForm = defineComponent({
 });
 
 export {
-    FProjectInForm
-}
+    FProjectInForm,
+};

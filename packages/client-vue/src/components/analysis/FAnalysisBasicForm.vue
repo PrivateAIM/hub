@@ -5,7 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import {IVuelidate} from "@ilingo/vuelidate";
+import { IVuelidate } from '@ilingo/vuelidate';
 import type { Analysis, Project } from '@privateaim/core';
 import { DomainType } from '@privateaim/core';
 import { maxLength, minLength, required } from '@vuelidate/validators';
@@ -15,17 +15,18 @@ import type { PropType } from 'vue';
 import {
     computed, defineComponent, reactive, ref,
 } from 'vue';
-import { VCFormInput, VCFormSelect } from '@vuecs/form-controls';
+import { VCFormInput } from '@vuecs/form-controls';
 import {
     createEntityManager, defineEntityManagerEvents, wrapFnWithBusyState,
 } from '../../core';
-import { FProjects } from '../project';
-import { FProjectItem } from '../project';
+import { FProjectItem, FProjects } from '../project';
 
 export default defineComponent({
     components: {
         IVuelidate,
-        VCFormInput, VCFormSelect, FProjects, FProjectItem,
+        VCFormInput,
+        FProjects,
+        FProjectItem,
     },
     props: {
         entity: {
@@ -90,7 +91,7 @@ export default defineComponent({
             add,
             toggle,
             proposalQuery,
-            busy
+            busy,
         };
     },
 });

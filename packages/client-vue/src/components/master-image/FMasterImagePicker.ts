@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {useTranslationsForNestedValidations, getSeverity} from "@ilingo/vuelidate";
+import { getSeverity, useTranslationsForNestedValidations } from '@ilingo/vuelidate';
 import type { MasterImage, MasterImageGroup } from '@privateaim/core';
 import type { FormSelectOption } from '@vuecs/form-controls';
 import { buildFormGroup, buildFormSelect } from '@vuecs/form-controls';

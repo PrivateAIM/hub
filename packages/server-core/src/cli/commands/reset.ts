@@ -25,7 +25,7 @@ export class ResetCommand implements CommandModule {
         return args;
     }
 
-    async handler(args: ResetArguments) {
+    async handler(_args: ResetArguments) {
         const spinner = useLogger();
 
         spinner.info('Executing database reset...');

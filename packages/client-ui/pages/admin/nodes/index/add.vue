@@ -15,7 +15,7 @@ import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
 import { useAuthStore } from '../../../../store/auth';
 
 export default defineNuxtComponent({
-    components: { FNodeForm: FNodeForm },
+    components: { FNodeForm },
     emits: ['created', 'failed'],
     setup(props, { emit }) {
         definePageMeta({

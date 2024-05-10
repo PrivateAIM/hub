@@ -25,7 +25,8 @@ export class ServiceController {
     async handleHarborHook(
     @DRequest() req: Request,
         @DResponse() res: Response,
-        @DBody() harborHook: RegistryHook,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        @DBody() _harborHook: RegistryHook,
     ) {
         const id = useRequestParam(req, 'id');
 
@@ -41,6 +42,7 @@ export class ServiceController {
     async execHarborTask(
     @DRequest() req: Request,
         @DResponse() res: Response,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         @DBody() _data: { command: RegistryAPICommand },
     ) {
         const id = useRequestParam(req, 'id');

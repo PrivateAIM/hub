@@ -10,7 +10,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { Readable } from 'node:stream';
 import { createClient } from 'hapic';
-import {extract} from 'tar';
+import { extract } from 'tar';
 import { scanDirectory } from 'docker-scan';
 import { getWritableDirPath, useEnv } from '../../../config';
 import type { ReturnContext } from './utils';

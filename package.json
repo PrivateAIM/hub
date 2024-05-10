@@ -36,7 +36,7 @@
         "commit": "npx git-cz",
         "build": "npx nx run-many -t build",
         "test": "npx nx run-many -t test",
-        "lint": "eslint --ext .ts,.vue,.js ./packages/",
+        "lint": "eslint ./packages/**/*.{ts,vue}",
         "lint:fix": "npm run lint -- --fix",
         "prepare": "husky install",
         "cli": "npm run cli --workspace=packages/server-api",

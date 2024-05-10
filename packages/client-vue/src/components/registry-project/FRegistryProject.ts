@@ -4,7 +4,7 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import {getSeverity, useTranslationsForNestedValidations} from "@ilingo/vuelidate";
+import { getSeverity, useTranslationsForNestedValidations } from '@ilingo/vuelidate';
 import type {
     RegistryProject,
 } from '@privateaim/core';

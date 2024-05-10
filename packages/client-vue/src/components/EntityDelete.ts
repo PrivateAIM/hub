@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {TranslatorTranslationDefaultKey, TranslatorTranslationGroup, useTranslation} from "@authup/client-web-kit";
+import { TranslatorTranslationDefaultKey, TranslatorTranslationGroup, useTranslation } from '@authup/client-web-kit';
 import type { DomainType } from '@privateaim/core';
 import { useDomainAPI } from '@privateaim/core';
 import type {

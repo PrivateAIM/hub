@@ -5,7 +5,6 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { VCLink } from '@vuecs/link';
 import type { Analysis } from '@privateaim/core';
 import {
     AnalysisAPICommand,
@@ -16,18 +15,15 @@ import {
 } from '@privateaim/core';
 import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
-import Dropdown from '../Dropdown';
-import {FAnalysisCommand} from "./FAnalysisCommand";
-import FAnalysisBuildStatusText from "./FAnalysisBuildStatusText.vue";
-import FAnalysisConfigurationStatusText from "./FAnalysisConfigurationStatusText.vue";
+import { FAnalysisCommand } from './FAnalysisCommand';
+import FAnalysisBuildStatusText from './FAnalysisBuildStatusText.vue';
+import FAnalysisConfigurationStatusText from './FAnalysisConfigurationStatusText.vue';
 
 export default defineComponent({
     components: {
         FAnalysisBuildStatusText,
         FAnalysisConfigurationStatusText,
         FAnalysisCommand,
-        VCLink,
-        Dropdown,
     },
     props: {
         listDirection: {
@@ -99,11 +95,11 @@ export default defineComponent({
             >
                 <FAnalysisCommand
                     :command="trainCommand.CONFIGURATION_LOCK"
-                   :with-icon="true"
-                   :entity="entity"
-                   @executed="(command: string) => handleExecuted('configuration', command)"
-                   @updated="handleUpdated"
-                   @failed="handleFailed"
+                    :with-icon="true"
+                    :entity="entity"
+                    @executed="(command: string) => handleExecuted('configuration', command)"
+                    @updated="handleUpdated"
+                    @failed="handleFailed"
                 />
                 <FAnalysisCommand
                     :command="trainCommand.CONFIGURATION_UNLOCK"
@@ -135,34 +131,34 @@ export default defineComponent({
                 class="ms-auto flex-row d-flex justify-between gap-1"
             >
                 <div>
-                <FAnalysisCommand
-                    :command="trainCommand.BUILD_START"
-                    :with-icon="true"
-                    :entity="entity"
-                    @executed="(command) => handleExecuted('build', command)"
-                    @updated="handleUpdated"
-                    @failed="handleFailed"
-                />
+                    <FAnalysisCommand
+                        :command="trainCommand.BUILD_START"
+                        :with-icon="true"
+                        :entity="entity"
+                        @executed="(command) => handleExecuted('build', command)"
+                        @updated="handleUpdated"
+                        @failed="handleFailed"
+                    />
                 </div>
                 <div>
-                <FAnalysisCommand
-                    :command="trainCommand.BUILD_STATUS"
-                    :with-icon="true"
-                    :entity="entity"
-                    @executed="(command) => handleExecuted('build', command)"
-                    @updated="handleUpdated"
-                    @failed="handleFailed"
-                />
+                    <FAnalysisCommand
+                        :command="trainCommand.BUILD_STATUS"
+                        :with-icon="true"
+                        :entity="entity"
+                        @executed="(command) => handleExecuted('build', command)"
+                        @updated="handleUpdated"
+                        @failed="handleFailed"
+                    />
                 </div>
                 <div>
-                <FAnalysisCommand
-                    :command="trainCommand.BUILD_STOP"
-                    :with-icon="true"
-                    :entity="entity"
-                    @executed="(command) => handleExecuted('build', command)"
-                    @updated="handleUpdated"
-                    @failed="handleFailed"
-                />
+                    <FAnalysisCommand
+                        :command="trainCommand.BUILD_STOP"
+                        :with-icon="true"
+                        :entity="entity"
+                        @executed="(command) => handleExecuted('build', command)"
+                        @updated="handleUpdated"
+                        @failed="handleFailed"
+                    />
                 </div>
             </div>
         </div>

@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {buildFormSubmitWithTranslations, createFormSubmitTranslations} from "@authup/client-web-kit";
-import {getSeverity, useTranslationsForNestedValidations} from "@ilingo/vuelidate";
+import { buildFormSubmitWithTranslations, createFormSubmitTranslations } from '@authup/client-web-kit';
+import { getSeverity, useTranslationsForNestedValidations } from '@ilingo/vuelidate';
 import type { Registry } from '@privateaim/core';
 import { DomainType } from '@privateaim/core';
 import {

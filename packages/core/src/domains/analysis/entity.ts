@@ -12,7 +12,6 @@ import type { Project } from '../project';
 import type { DomainEventBaseContext } from '../types-base';
 import type {
     AnalysisBuildStatus,
-    AnalysisConfigurationStatus,
     AnalysisRunStatus,
 } from './constants';
 import type { Registry } from '../registry';

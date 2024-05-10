@@ -6,8 +6,8 @@
  */
 
 import type { EntityManagerSlotProps } from '@authup/client-web-kit';
-import {ARobot, buildFormSubmitWithTranslations, createFormSubmitTranslations} from '@authup/client-web-kit';
-import {getSeverity, useTranslationsForNestedValidations} from "@ilingo/vuelidate";
+import { ARobot, buildFormSubmitWithTranslations, createFormSubmitTranslations } from '@authup/client-web-kit';
+import { getSeverity, useTranslationsForNestedValidations } from '@ilingo/vuelidate';
 import type { PropType } from 'vue';
 import { defineComponent, h, reactive } from 'vue';
 import type { Node } from '@privateaim/core';

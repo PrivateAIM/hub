@@ -7,11 +7,11 @@
 
 import { isRealmResourceWritable } from '@authup/core-kit';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
-import { AnalysisConfigurationStatus, AnalysisFileType, PermissionID } from '@privateaim/core';
+import { PermissionID } from '@privateaim/core';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { AnalysisEntity, AnalysisFileEntity } from '../../../../../domains';
+import { AnalysisEntity } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 import { runAnalysisValidation } from '../utils';
 

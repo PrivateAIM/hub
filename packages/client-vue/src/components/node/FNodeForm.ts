@@ -4,8 +4,8 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import {ARealms, buildFormSubmitWithTranslations, createFormSubmitTranslations} from '@authup/client-web-kit';
-import {getSeverity, useTranslationsForNestedValidations} from "@ilingo/vuelidate";
+import { ARealms, buildFormSubmitWithTranslations, createFormSubmitTranslations } from '@authup/client-web-kit';
+import { getSeverity, useTranslationsForNestedValidations } from '@ilingo/vuelidate';
 import type { Node, Registry } from '@privateaim/core';
 import {
     DomainType,
@@ -13,7 +13,7 @@ import {
 } from '@privateaim/core';
 import {
     buildFormGroup,
-    buildFormInput, buildFormInputCheckbox, buildFormSelect, buildFormSubmit,
+    buildFormInput, buildFormInputCheckbox, buildFormSelect,
 } from '@vuecs/form-controls';
 import type { ListBodySlotProps, ListItemSlotProps } from '@vuecs/list-controls';
 import useVuelidate from '@vuelidate/core';
@@ -70,11 +70,14 @@ export default defineComponent({
                 minLength: minLength(3),
                 maxLength: maxLength(128),
             },
+            hidden: {
+
+            },
             realm_id: {
                 required,
             },
             registry_id: {
-
+                required,
             },
             external_name: {
                 alphaNumHyphenUnderscore: helpers.regex(alphaNumHyphenUnderscoreRegex),
@@ -178,9 +181,9 @@ export default defineComponent({
                 label: true,
                 labelContent: 'Name',
                 content: buildFormInput({
-                    value: form.name,
+                    value: $v.value.name.$model,
                     onChange(input) {
-                        form.name = input;
+                        $v.value.name.$model = input;
                     },
                 }),
             });
@@ -244,26 +247,31 @@ export default defineComponent({
             });
 
             const registry : VNodeArrayChildren = [
-                h(RegistryList, {}, {
-                    [EntityListSlotName.ITEM_ACTIONS]: (props: ListItemSlotProps<Registry>) => h('button', {
-                        disabled: props.busy,
-                        class: ['btn btn-xs', {
-                            'btn-dark': form.registry_id !== props.data.id,
-                            'btn-warning': form.registry_id === props.data.id,
-                        }],
-                        onClick($event: any) {
-                            $event.preventDefault();
+                buildFormGroup({
+                    label: true,
+                    labelContent: 'Registry',
+                    content:
+                        h(RegistryList, {}, {
+                            [EntityListSlotName.ITEM_ACTIONS]: (props: ListItemSlotProps<Registry>) => h('button', {
+                                disabled: props.busy,
+                                class: ['btn btn-xs', {
+                                    'btn-dark': form.registry_id !== props.data.id,
+                                    'btn-warning': form.registry_id === props.data.id,
+                                }],
+                                onClick($event: any) {
+                                    $event.preventDefault();
 
-                            toggleFormData('registry_id', props.data.id);
-                        },
-                    }, [
-                        h('i', {
-                            class: {
-                                'fa fa-plus': form.registry_id !== props.data.id,
-                                'fa fa-minus': form.registry_id === props.data.id,
-                            },
+                                    toggleFormData('registry_id', props.data.id);
+                                },
+                            }, [
+                                h('i', {
+                                    class: {
+                                        'fa fa-plus': form.registry_id !== props.data.id,
+                                        'fa fa-minus': form.registry_id === props.data.id,
+                                    },
+                                }),
+                            ]),
                         }),
-                    ]),
                 }),
             ];
 

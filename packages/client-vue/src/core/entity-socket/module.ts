@@ -136,9 +136,9 @@ export function createEntitySocket<
         socket.emit(
             event,
             targetId.value,
-            (err) => {
+            () => {
                 // todo: handle error!
-            }
+            },
         );
 
         if (ctx.onCreated) {
