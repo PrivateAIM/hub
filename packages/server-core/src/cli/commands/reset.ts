@@ -25,6 +25,7 @@ export class ResetCommand implements CommandModule {
         return args;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async handler(_args: ResetArguments) {
         const spinner = useLogger();
 
