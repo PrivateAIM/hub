@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ATitle } from '@authup/client-vue';
+import { ATitle } from '@authup/client-web-kit';
 import type {
     AnalysisNode,
 } from '@privateaim/core';

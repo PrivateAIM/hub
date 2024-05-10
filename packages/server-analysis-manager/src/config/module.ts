@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { TokenCreatorOptions } from '@authup/core';
+import type { TokenCreatorOptions } from '@authup/core-http-kit';
 import type { Aggregator, Component } from '@privateaim/server-kit';
 import { buildComponentRouter } from '../components';
 import { useEnv } from './env';

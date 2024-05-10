@@ -4,8 +4,10 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
+import {buildFormSubmitWithTranslations, createFormSubmitTranslations} from "@authup/client-web-kit";
+import {getSeverity, useTranslationsForNestedValidations} from "@ilingo/vuelidate";
 import {
-    buildFormGroup, buildFormInput, buildFormSubmit,
+    buildFormGroup, buildFormInput,
 } from '@vuecs/form-controls';
 import type { ListHeaderSlotProps, ListItemSlotProps } from '@vuecs/list-controls';
 import useVuelidate from '@vuelidate/core';
@@ -30,7 +32,8 @@ import {
     defineEntityManagerEvents,
     initFormAttributesFromSource,
     injectCoreAPIClient,
-    renderEntityAssignAction, useValidationTranslator, wrapFnWithBusyState,
+    renderEntityAssignAction,
+    wrapFnWithBusyState,
 } from '../../core';
 import MasterImagePicker from '../master-image/FMasterImagePicker';
 import FNodes from '../node/FNodes';
@@ -123,10 +126,13 @@ const FProjectForm = defineComponent({
             }
         };
 
+        const translationsValidation = useTranslationsForNestedValidations($v.value);
+        const translationsSubmit = createFormSubmitTranslations();
+
         return () => {
             const name = buildFormGroup({
-                validationTranslator: useValidationTranslator(),
-                validationResult: $v.value.name,
+                validationMessages: translationsValidation.name.value,
+                validationSeverity: getSeverity($v.value.name),
                 label: true,
                 labelContent: 'Name',
                 content: buildFormInput({
@@ -144,14 +150,12 @@ const FProjectForm = defineComponent({
                 },
             });
 
-            const submitNode = buildFormSubmit({
+            const submitNode = buildFormSubmitWithTranslations({
                 submit,
                 busy: busy.value,
-                updateText: 'Update',
-                createText: 'Create',
                 isEditing: !!manager.data.value,
-                validationResult: $v.value,
-            });
+                invalid: $v.value.$invalid,
+            }, translationsSubmit);
 
             const nodeVNode = h('div', [
                 h(FNodes, {

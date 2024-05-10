@@ -5,8 +5,8 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { ARobotForm } from '@authup/client-vue';
-import type { Robot } from '@authup/core';
+import { ARobotForm } from '@authup/client-web-kit';
+import type { Robot } from '@authup/core-kit';
 import { storeToRefs } from 'pinia';
 import type { Ref } from 'vue';
 import { h, ref } from 'vue';

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Robot } from '@authup/core';
+import type { Robot } from '@authup/core-kit';
 import { stringifyAuthorizationHeader } from 'hapic';
 import type { HarborClient, ProjectWebhookTarget } from '@hapic/harbor';
 import { createClient } from '@hapic/harbor';

@@ -10,7 +10,7 @@ import { ForbiddenError, NotFoundError } from '@ebec/http';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { isRealmResourceWritable } from '@authup/core';
+import { isRealmResourceWritable } from '@authup/core-kit';
 import { RegistryCommand } from '../../../../../components';
 import { buildRegistryPayload } from '../../../../../components/registry/utils/queue';
 import { hasAmqpClient, useAmqpClient } from '../../../../../core';

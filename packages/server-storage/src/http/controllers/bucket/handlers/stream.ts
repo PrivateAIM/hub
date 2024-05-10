@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { isUUID } from '@authup/core';
+import { isUUID } from '@authup/kit';
 import { NotFoundError } from '@ebec/http';
 import type { Request, Response } from 'routup';
 import { useRequestParam } from 'routup';

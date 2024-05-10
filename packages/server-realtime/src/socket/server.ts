@@ -9,12 +9,12 @@ import { has } from 'envix';
 import type { Server as HTTPServer } from 'node:http';
 import { Server } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
-import type { TokenCreatorOptions } from '@authup/core';
+import type { TokenCreatorOptions } from '@authup/core-http-kit';
 import {
     AbilityManager, OAuth2SubKind,
-} from '@authup/core';
-import type { TokenVerifierCacheOptions } from '@authup/server-adapter';
-import { createSocketMiddleware } from '@authup/server-adapter';
+} from '@authup/kit';
+import type { TokenVerifierCacheOptions } from '@authup/server-core-plugin-kit';
+import { createMiddleware } from '@authup/server-core-plugin-socket-io';
 import { useEnv } from '../config';
 import { registerMessagesNamespace, registerResourcesNamespaces } from './namespaces';
 import type { SocketBase } from './types';
@@ -61,7 +61,7 @@ export function createSocketServer(context : SocketServerContext) : Server {
         };
     }
 
-    const authMiddleware = createSocketMiddleware({
+    const authMiddleware = createMiddleware({
         tokenVerifier: {
             baseURL: useEnv('authupApiURL'),
             creator,

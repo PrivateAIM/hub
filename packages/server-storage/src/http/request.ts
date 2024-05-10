@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { AbilityManager } from '@authup/core';
+import type { AbilityManager } from '@authup/kit';
 import { setRequestEnv as setEnv, useRequestEnv as useEnv } from 'routup';
 import type { Request } from 'routup';
 

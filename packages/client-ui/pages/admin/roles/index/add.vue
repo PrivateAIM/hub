@@ -6,9 +6,9 @@
   -->
 
 <script lang="ts">
-import { ARoleForm } from '@authup/client-vue';
-import type { Role } from '@authup/core';
-import { PermissionName } from '@authup/core';
+import { ARoleForm } from '@authup/client-web-kit';
+import type { Role } from '@authup/core-kit';
+import { PermissionName } from '@authup/core-kit';
 import { storeToRefs } from 'pinia';
 import { defineNuxtComponent, navigateTo } from '#app';
 import { definePageMeta } from '#imports';

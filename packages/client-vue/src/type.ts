@@ -8,14 +8,14 @@
 import type { StoreManagerOptions } from '@vuecs/list-controls/core';
 import type { APIClient as CoreAPIClient } from '@privateaim/core';
 import type { APIClient as StorageAPIClient } from '@privateaim/storage-kit';
-import type { AuthupAPIClient, AuthupStore, SocketManager } from './core';
+import { Options as AuthupOptions } from '@authup/client-web-kit';
+import type { SocketManager } from './core';
 
 export type Options = {
+    authup?: AuthupOptions,
     coreAPIClient?: CoreAPIClient,
     storageAPIClient?: StorageAPIClient,
-    authupApiClient?: AuthupAPIClient,
 
-    authupStore?: AuthupStore,
     socketManager?: SocketManager,
     components?: boolean | string[],
     storeManager?: StoreManagerOptions

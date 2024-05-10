@@ -4,7 +4,7 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import type { RealmEventContext } from '@authup/core';
+import type { RealmEventContext } from '@authup/core-kit';
 import { useDataSource } from 'typeorm-extension';
 import {
     AnalysisEntity, NodeEntity, ProjectEntity, ProjectNodeEntity, RegistryProjectEntity,

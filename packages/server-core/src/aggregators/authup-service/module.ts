@@ -5,8 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { DomainType } from '@authup/core';
-import type { DomainsEventContext } from '@authup/core';
+import { DomainType } from '@authup/core-kit';
 import { useLogger } from '../../config';
 import { hasRedisClient, useRedisSubscribeClient } from '../../core';
 import type { Aggregator } from '../type';
@@ -30,7 +29,7 @@ export function buildAuthupAggregator() : Aggregator {
 
             redisSub.on('message', async (channel, message) => {
                 useLogger().info(`Received event from channel ${channel}`);
-                const event = JSON.parse(message) as DomainsEventContext;
+                const event = JSON.parse(message);
 
                 switch (event.type) {
                     case DomainType.REALM: {

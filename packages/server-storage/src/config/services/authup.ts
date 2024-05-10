@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { APIClient, mountClientResponseErrorTokenHook } from '@authup/core';
+import { Client, mountClientResponseErrorTokenHook } from '@authup/core-http-kit';
 import { setAuthupClientFactory } from '../../core';
 import { useEnv } from '../env';
 
@@ -16,7 +16,7 @@ export function configureAuthup() {
     }
 
     setAuthupClientFactory(() => {
-        const authupClient = new APIClient({
+        const authupClient = new Client({
             baseURL,
         });
 

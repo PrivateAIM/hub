@@ -7,11 +7,11 @@
 
 <script lang="ts">
 import { BTable } from 'bootstrap-vue-next';
-import type { User } from '@authup/core';
+import type { User } from '@authup/core-kit';
 import {
     PermissionName, isRealmResourceWritable,
-} from '@authup/core';
-import { AEntityDelete, AUsers } from '@authup/client-vue';
+} from '@authup/core-kit';
+import { AEntityDelete, AUsers } from '@authup/client-web-kit';
 import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
 import { FPagination, FSearch, FTitle } from '@privateaim/client-vue';

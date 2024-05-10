@@ -4,7 +4,7 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { isUUID } from '@authup/core';
+import { isUUID } from '@authup/kit';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import Busboy from 'busboy';
 import crypto from 'node:crypto';

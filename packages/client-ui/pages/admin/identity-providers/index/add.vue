@@ -6,9 +6,9 @@
   -->
 
 <script lang="ts">
-import { AIdentityProviderOAuth2Form } from '@authup/client-vue';
-import type { IdentityProvider } from '@authup/core';
-import { IdentityProviderProtocol, PermissionName } from '@authup/core';
+import { AIdentityProviderOAuth2Form } from '@authup/client-web-kit';
+import type { IdentityProvider } from '@authup/core-kit';
+import { IdentityProviderProtocol, PermissionName } from '@authup/core-kit';
 import { VCFormSelect } from '@vuecs/form-controls';
 import { storeToRefs } from 'pinia';
 import { ref } from 'vue';

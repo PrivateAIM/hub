@@ -6,8 +6,8 @@
   -->
 
 <script lang="ts">
-import { APagination, AUserPermissionAssignments } from '@authup/client-vue';
-import type { User } from '@authup/core';
+import { APagination, AUserPermissionAssignments } from '@authup/client-web-kit';
+import type { User } from '@authup/core-kit';
 import type { PropType } from 'vue';
 import { defineNuxtComponent } from '#app';
 

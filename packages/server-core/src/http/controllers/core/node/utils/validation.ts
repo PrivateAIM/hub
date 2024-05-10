@@ -7,7 +7,7 @@
 
 import { NodeType } from '@privateaim/core';
 import { check } from 'express-validator';
-import { isRealmResourceWritable } from '@authup/core';
+import { isRealmResourceWritable } from '@authup/core-kit';
 import { ForbiddenError } from '@ebec/http';
 import type { Request } from 'routup';
 import type { HTTPValidationResult } from '@privateaim/server-kit';

@@ -15,7 +15,7 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-import type { Realm, User } from '@authup/core';
+import type { Realm, User } from '@authup/core-kit';
 // eslint-disable-next-line import/no-cycle
 import { AnalysisEntity } from '../analysis';
 

@@ -20,7 +20,7 @@ import {
     NodeType,
     RegistryProject,
 } from '@privateaim/core';
-import type { Realm, Robot } from '@authup/core';
+import type { Realm, Robot } from '@authup/core-kit';
 import { RegistryProjectEntity } from '../registry-project';
 import { RegistryEntity } from '../registry';
 

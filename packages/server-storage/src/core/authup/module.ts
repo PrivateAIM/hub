@@ -5,11 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { APIClient } from '@authup/core';
+import type { Client } from '@authup/core-http-kit';
 import type { Factory } from 'singa';
 import { singa } from 'singa';
 
-const singleton = singa<APIClient>({
+const singleton = singa<Client>({
     name: 'authup',
 });
 
@@ -21,6 +21,6 @@ export function hasAuthupClient() {
     return singleton.has() || singleton.hasFactory();
 }
 
-export function setAuthupClientFactory(factory: Factory<APIClient>) {
+export function setAuthupClientFactory(factory: Factory<Client>) {
     return singleton.setFactory(factory);
 }

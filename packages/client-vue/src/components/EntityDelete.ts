@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import {TranslatorTranslationDefaultKey, TranslatorTranslationGroup, useTranslation} from "@authup/client-web-kit";
 import type { DomainType } from '@privateaim/core';
 import { useDomainAPI } from '@privateaim/core';
 import type {
@@ -16,7 +17,7 @@ import type {
 import {
     defineComponent, getCurrentInstance, h, mergeProps, ref, resolveDynamicComponent,
 } from 'vue';
-import { injectCoreAPIClient, useTranslator } from '../core';
+import { injectCoreAPIClient } from '../core';
 
 enum ElementType {
     BUTTON = 'button',
@@ -86,6 +87,11 @@ export default defineComponent({
             busy.value = false;
         };
 
+        const translation = useTranslation({
+            group: TranslatorTranslationGroup.DEFAULT,
+            key: TranslatorTranslationDefaultKey.DELETE,
+        });
+
         const render = () => {
             let tag : Component | string = 'button';
             const data : VNodeProps = {};
@@ -118,8 +124,7 @@ export default defineComponent({
             let text : VNodeArrayChildren = [];
             if (props.withText) {
                 text = [
-                    useTranslator()
-                        .getSync('app.delete.button', props.locale),
+                    translation.value,
                 ];
             }
 

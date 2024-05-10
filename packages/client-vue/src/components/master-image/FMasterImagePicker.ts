@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import {useTranslationsForNestedValidations, getSeverity} from "@ilingo/vuelidate";
 import type { MasterImage, MasterImageGroup } from '@privateaim/core';
 import type { FormSelectOption } from '@vuecs/form-controls';
 import { buildFormGroup, buildFormSelect } from '@vuecs/form-controls';
@@ -16,7 +17,7 @@ import {
     computed, defineComponent, h, reactive, ref, toRefs, watch,
 } from 'vue';
 import {
-    EntityListSlotName, injectCoreAPIClient, useValidationTranslator, wrapFnWithBusyState,
+    EntityListSlotName, injectCoreAPIClient, wrapFnWithBusyState,
 } from '../../core';
 import MasterImageGroupList from '../master-image-group/FMasterImageGroups';
 import MasterImageList from './FMasterImages';
@@ -110,6 +111,9 @@ export default defineComponent({
         });
 
         init();
+
+        const translationsValidation = useTranslationsForNestedValidations($v.value);
+
         await loadImage();
 
         const itemListNode = ref<null | Record<string, any>>(null);
@@ -169,8 +173,8 @@ export default defineComponent({
                             }));
 
                             return buildFormGroup({
-                                validationTranslator: useValidationTranslator(),
-                                validationResult: $v.value.master_image_id,
+                                validationMessages: translationsValidation.master_image_id.value,
+                                validationSeverity: getSeverity($v.value.master_image_id),
                                 label: true,
                                 labelContent: [
                                     'Image',
@@ -214,8 +218,8 @@ export default defineComponent({
                                 }));
 
                                 return buildFormGroup({
-                                    validationTranslator: useValidationTranslator(),
-                                    validationResult: $v.value.group_virtual_path,
+                                    validationMessages: translationsValidation.group_virtual_path.value,
+                                    validationSeverity: getSeverity($v.value.group_virtual_path),
                                     label: true,
                                     labelContent: [
                                         'Group',

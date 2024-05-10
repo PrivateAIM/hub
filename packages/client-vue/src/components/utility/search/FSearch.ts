@@ -8,7 +8,7 @@
 import type { ListLoadFn } from '@vuecs/list-controls';
 import type { PropType, SlotsType } from 'vue';
 import { defineComponent, h } from 'vue';
-import { ASearch } from '@authup/client-vue';
+import { ASearch } from '@authup/client-web-kit';
 import type { ListMeta } from '../../../core';
 
 export const FSearch = defineComponent({

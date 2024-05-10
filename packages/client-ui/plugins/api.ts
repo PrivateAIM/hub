@@ -7,11 +7,11 @@
 
 import type {
     ClientResponseErrorTokenHookOptions,
-} from '@authup/core';
+} from '@authup/core-http-kit';
 import {
-    APIClient as AuthAPIClient,
+    Client as AuthAPIClient,
     ClientResponseErrorTokenHook,
-} from '@authup/core';
+} from '@authup/core-http-kit';
 import { APIClient as CoreAPIClient } from '@privateaim/core';
 import { APIClient as StorageAPIClient } from '@privateaim/storage-kit';
 import type { Pinia } from 'pinia';

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { REALM_MASTER_NAME } from '@authup/core';
+import { REALM_MASTER_NAME } from '@authup/core-kit';
 import { ForbiddenError, UnauthorizedError } from '@ebec/http';
 import { useLogger } from '../../../core';
 import type { SocketBase, SocketNamespaceContext } from '../../types';

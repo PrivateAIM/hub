@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Realm, Robot } from '@authup/core';
+import type { Realm, Robot } from '@authup/core-kit';
 import type { DomainType } from '../constants';
 import type { RegistryProject } from '../registry-project';
 import type { Registry } from '../registry';

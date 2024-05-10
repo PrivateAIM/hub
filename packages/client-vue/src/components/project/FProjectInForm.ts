@@ -5,10 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import {buildFormSubmitWithTranslations, createFormSubmitTranslations} from "@authup/client-web-kit";
+import {getSeverity, useTranslationsForNestedValidations} from "@ilingo/vuelidate";
 import type { ProjectNode } from '@privateaim/core';
 import { DomainType, ProjectNodeApprovalStatus } from '@privateaim/core';
 import {
-    buildFormGroup, buildFormInput, buildFormSelect, buildFormSubmit,
+    buildFormGroup, buildFormInput, buildFormSelect,
 } from '@vuecs/form-controls';
 import useVuelidate from '@vuelidate/core';
 import { maxLength, minLength, required } from '@vuelidate/validators';
@@ -18,7 +20,7 @@ import {
 import type { PropType } from 'vue';
 import { useUpdatedAt } from '../../composables';
 import {
-    createEntityManager, initFormAttributesFromSource, useValidationTranslator, wrapFnWithBusyState,
+    createEntityManager, initFormAttributesFromSource, wrapFnWithBusyState,
 } from '../../core';
 
 const FProjectInForm = defineComponent({
@@ -76,10 +78,14 @@ const FProjectInForm = defineComponent({
             await manager.createOrUpdate(form);
         });
 
+
+        const translationsValidation = useTranslationsForNestedValidations($v.value);
+        const translationsSubmit = createFormSubmitTranslations();
+
         return () => {
             const comment = buildFormGroup({
-                validationTranslator: useValidationTranslator(),
-                validationResult: $v.value.comment,
+                validationMessages: translationsValidation.comment.value,
+                validationSeverity: getSeverity($v.value.comment),
                 label: true,
                 labelContent: 'Comment',
                 content: buildFormInput({
@@ -94,8 +100,8 @@ const FProjectInForm = defineComponent({
             });
 
             const status = buildFormGroup({
-                validationTranslator: useValidationTranslator(),
-                validationResult: $v.value.approval_status,
+                validationMessages: translationsValidation.approval_status.value,
+                validationSeverity: getSeverity($v.value.approval_status),
                 label: true,
                 labelContent: 'Status',
                 content: buildFormSelect({
@@ -110,14 +116,12 @@ const FProjectInForm = defineComponent({
                 }),
             });
 
-            const submitNode = buildFormSubmit({
+            const submitNode = buildFormSubmitWithTranslations({
                 submit,
                 busy: busy.value,
-                updateText: 'Update',
-                createText: 'Create',
-                isEditing: true,
-                validationResult: $v.value,
-            });
+                isEditing: !!manager.data.value,
+                invalid: $v.value.$invalid,
+            }, translationsSubmit);
 
             return h(
                 'div',

@@ -5,8 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import installAuthup from '@authup/client-vue';
-import type { APIClient } from '@authup/core';
 import type { StoreManagerOptions } from '@vuecs/core';
 import bootstrap from '@vuecs/preset-bootstrap-v5';
 import fontAwesome from '@vuecs/preset-font-awesome';
@@ -65,9 +63,4 @@ export default defineNuxtPlugin((ctx) => {
 
     ctx.vueApp.use(installPagination);
     ctx.vueApp.use(installTimeago);
-
-    ctx.vueApp.use(installAuthup, {
-        apiClient: ctx.$authupAPI as APIClient,
-        components: false,
-    });
 });

@@ -14,7 +14,7 @@ import {
     applyRelations,
     useDataSource,
 } from 'typeorm-extension';
-import { isRealmResourceReadable } from '@authup/core';
+import { isRealmResourceReadable } from '@authup/core-kit';
 import { AnalysisEntity, onlyRealmWritableQueryResources } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 

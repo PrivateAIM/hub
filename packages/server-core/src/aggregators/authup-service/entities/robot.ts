@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { RobotEventContext } from '@authup/core';
+import type { RobotEventContext } from '@authup/core-kit';
 import { ServiceID } from '@privateaim/core';
 import { useDataSource } from 'typeorm-extension';
 import { RegistryCommand } from '../../../components';

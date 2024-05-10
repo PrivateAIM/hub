@@ -7,7 +7,7 @@
 
 import type { PropType, SlotsType } from 'vue';
 import { defineComponent, h } from 'vue';
-import { ATitle } from '@authup/client-vue';
+import { ATitle } from '@authup/client-web-kit';
 
 export const FTitle = defineComponent({
     props: {

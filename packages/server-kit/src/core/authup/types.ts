@@ -7,7 +7,7 @@
 
 import type { VaultClient } from '@hapic/vault';
 import type { Client as RedisClient } from 'redis-extension';
-import type { APIClient as AuthupClient } from '@authup/core';
+import type { Client as AuthupClient } from '@authup/core-http-kit';
 
 export type AuthupMiddlewareRegistrationOptions = {
     client?: AuthupClient,

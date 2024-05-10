@@ -17,7 +17,7 @@ import type { Registry, RegistryProject } from '@privateaim/core';
 import {
     RegistryProjectType,
 } from '@privateaim/core';
-import type { Realm } from '@authup/core';
+import type { Realm } from '@authup/core-kit';
 import { RegistryEntity } from '../registry';
 
 @Unique(['name', 'registry_id'])

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { injectStore, provideStore } from '@authup/client-vue';
+import { injectStore, provideStore } from '@authup/client-web-kit';
 import type { App } from 'vue';
 
 export type AuthupStore = ReturnType<typeof injectStore>;

@@ -7,8 +7,8 @@
 
 import type {
     Permission, Realm, Robot, Role,
-} from '@authup/core';
-import { REALM_MASTER_NAME } from '@authup/core';
+} from '@authup/core-kit';
+import { REALM_MASTER_NAME } from '@authup/core-kit';
 import { ServerError } from '@ebec/http';
 import { isClientErrorWithStatusCode } from '@hapic/harbor';
 import { PermissionKey, ServiceID } from '@privateaim/core';

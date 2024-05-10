@@ -4,7 +4,8 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { ARealms } from '@authup/client-vue';
+import {ARealms, buildFormSubmitWithTranslations, createFormSubmitTranslations} from '@authup/client-web-kit';
+import {getSeverity, useTranslationsForNestedValidations} from "@ilingo/vuelidate";
 import type { Node, Registry } from '@privateaim/core';
 import {
     DomainType,
@@ -28,9 +29,9 @@ import {
 import { useUpdatedAt } from '../../composables';
 import {
     EntityListSlotName,
-    createEntityManager, defineEntityManagerEvents,
+    createEntityManager,
+    defineEntityManagerEvents,
     initFormAttributesFromSource,
-    useValidationTranslator,
     wrapFnWithBusyState,
 } from '../../core';
 import RegistryList from '../registry/FRegistries';
@@ -138,6 +139,9 @@ export default defineComponent({
             }
         };
 
+        const translationsValidation = useTranslationsForNestedValidations($v.value);
+        const translationsSubmit = createFormSubmitTranslations();
+
         return () => {
             let realm : VNodeArrayChildren = [];
             if (!isRealmLocked.value) {
@@ -147,8 +151,8 @@ export default defineComponent({
                         {},
                         {
                             [EntityListSlotName.BODY]: (props: ListBodySlotProps<Node>) => buildFormGroup({
-                                validationTranslator: useValidationTranslator(),
-                                validationResult: $v.value.realm_id,
+                                validationMessages: translationsValidation.realm_id.value,
+                                validationSeverity: getSeverity($v.value.realm_id),
                                 label: true,
                                 labelContent: 'Realms',
                                 content: buildFormSelect({
@@ -169,8 +173,8 @@ export default defineComponent({
             }
 
             const name = buildFormGroup({
-                validationTranslator: useValidationTranslator(),
-                validationResult: $v.value.name,
+                validationMessages: translationsValidation.name.value,
+                validationSeverity: getSeverity($v.value.name),
                 label: true,
                 labelContent: 'Name',
                 content: buildFormInput({
@@ -182,8 +186,8 @@ export default defineComponent({
             });
 
             const type = buildFormGroup({
-                validationTranslator: useValidationTranslator(),
-                validationResult: $v.value.type,
+                validationMessages: translationsValidation.type.value,
+                validationSeverity: getSeverity($v.value.type),
                 label: true,
                 labelContent: 'Type',
                 content: buildFormSelect({
@@ -199,8 +203,8 @@ export default defineComponent({
             });
 
             const externalName = buildFormGroup({
-                validationTranslator: useValidationTranslator(),
-                validationResult: $v.value.external_name,
+                validationMessages: translationsValidation.external_name.value,
+                validationSeverity: getSeverity($v.value.external_name),
                 label: true,
                 labelContent: 'External Name',
                 content: buildFormInput({
@@ -212,8 +216,8 @@ export default defineComponent({
             });
 
             const emailNode = buildFormGroup({
-                validationTranslator: useValidationTranslator(),
-                validationResult: $v.value.email,
+                validationMessages: translationsValidation.email.value,
+                validationSeverity: getSeverity($v.value.email),
                 label: true,
                 labelContent: 'E-Mail',
                 content: buildFormInput({
@@ -225,8 +229,8 @@ export default defineComponent({
             });
 
             const hidden = buildFormGroup({
-                validationTranslator: useValidationTranslator(),
-                validationResult: $v.value.hidden,
+                validationMessages: translationsValidation.hidden.value,
+                validationSeverity: getSeverity($v.value.hidden),
                 label: true,
                 labelContent: 'Visibility',
                 content: buildFormInputCheckbox({
@@ -263,14 +267,12 @@ export default defineComponent({
                 }),
             ];
 
-            const submitNode = buildFormSubmit({
+            const submitNode = buildFormSubmitWithTranslations({
                 submit,
                 busy: busy.value,
-                createText: 'Create',
-                updateText: 'Update',
-                validationResult: $v.value,
                 isEditing: !!manager.data.value,
-            });
+                invalid: $v.value.$invalid,
+            }, translationsSubmit);
 
             return h('div', [
                 h('div', { class: 'row' }, [

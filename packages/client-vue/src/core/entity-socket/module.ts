@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { DomainEventName, REALM_MASTER_NAME } from '@authup/core';
+import { DomainEventName, REALM_MASTER_NAME } from '@authup/core-kit';
 import {
     DomainEventSubscriptionName,
     buildDomainChannelName,
@@ -23,7 +23,7 @@ import type {
 import {
     computed, isRef, onMounted, onUnmounted, watch,
 } from 'vue';
-import { storeToRefs } from '@authup/client-vue';
+import { storeToRefs } from '@authup/client-web-kit';
 import { injectAuthupStore } from '../services';
 import type { EntitySocket, EntitySocketContext } from './type';
 import { injectSocketManager } from '../socket';

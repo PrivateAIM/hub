@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { TokenCreatorOptions } from '@authup/core';
-import { APIClient, mountClientResponseErrorTokenHook } from '@authup/core';
+import type { TokenCreatorOptions } from '@authup/core-http-kit';
+import { Client, mountClientResponseErrorTokenHook } from '@authup/core-http-kit';
 import { hasVaultClient, setAuthupFactory, useVaultClient } from '../../core';
 import { useEnv } from '../env';
 import { useLogger } from '../log';
@@ -19,7 +19,7 @@ export function configureAuthup() {
     }
 
     setAuthupFactory(() => {
-        const authupClient = new APIClient({
+        const authupClient = new Client({
             baseURL,
         });
 

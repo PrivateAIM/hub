@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { TokenCreatorOptions } from '@authup/core';
-import type { TokenVerifierRedisCacheOptions } from '@authup/server-adapter';
-import { createHTTPMiddleware } from '@authup/server-adapter';
+import type { TokenCreatorOptions } from '@authup/core-http-kit';
+import type { TokenVerifierRedisCacheOptions } from '@authup/server-core-plugin-kit';
+import { createMiddleware } from '@authup/server-core-plugin-http';
 import { useRequestCookie } from '@routup/basic/cookie';
 import { parseAuthorizationHeader } from 'hapic';
 import type { Router } from 'routup';
@@ -89,7 +89,7 @@ export function mountAuthupMiddleware(
         };
     }
 
-    const middleware = createHTTPMiddleware({
+    const middleware = createMiddleware({
         tokenByCookie: (req, cookieName) => useRequestCookie(req, cookieName),
         tokenVerifier: {
             baseURL: options.client.getBaseURL(),

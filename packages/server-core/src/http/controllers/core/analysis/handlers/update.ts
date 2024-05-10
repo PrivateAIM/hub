@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { isRealmResourceWritable } from '@authup/core';
+import { isRealmResourceWritable } from '@authup/core-kit';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
 import { AnalysisConfigurationStatus, AnalysisFileType, PermissionID } from '@privateaim/core';
 import type { Request, Response } from 'routup';

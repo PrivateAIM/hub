@@ -7,7 +7,7 @@
 
 import type { PropType } from 'vue';
 import { defineComponent, h } from 'vue';
-import { APagination } from '@authup/client-vue';
+import { APagination } from '@authup/client-web-kit';
 
 type PaginationLoadFn = (data?: any) => (Promise<void> | void);
 

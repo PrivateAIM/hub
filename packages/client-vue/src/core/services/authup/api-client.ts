@@ -5,15 +5,15 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { injectAPIClient, provideAPIClient } from '@authup/client-vue';
-import type { APIClient } from '@authup/core';
+import { injectAPIClient, provideAPIClient } from '@authup/client-web-kit';
+import type { Client } from '@authup/core-http-kit';
 import type { App } from 'vue';
 
-export type AuthupAPIClient = APIClient;
-export function provideAuthupAPIClient(client: APIClient, instance?: App) {
+export type AuthupAPIClient = Client;
+export function provideAuthupAPIClient(client: Client, instance?: App) {
     provideAPIClient(client, instance);
 }
 
-export function injectAuthupAPIClient() : APIClient {
+export function injectAuthupAPIClient() : Client {
     return injectAPIClient();
 }

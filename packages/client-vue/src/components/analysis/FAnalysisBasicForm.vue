@@ -5,6 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import {IVuelidate} from "@ilingo/vuelidate";
 import type { Analysis, Project } from '@privateaim/core';
 import { DomainType } from '@privateaim/core';
 import { maxLength, minLength, required } from '@vuelidate/validators';
@@ -16,13 +17,14 @@ import {
 } from 'vue';
 import { VCFormInput, VCFormSelect } from '@vuecs/form-controls';
 import {
-    createEntityManager, defineEntityManagerEvents, useValidationTranslator, wrapFnWithBusyState,
+    createEntityManager, defineEntityManagerEvents, wrapFnWithBusyState,
 } from '../../core';
 import { FProjects } from '../project';
 import { FProjectItem } from '../project';
 
 export default defineComponent({
     components: {
+        IVuelidate,
         VCFormInput, VCFormSelect, FProjects, FProjectItem,
     },
     props: {
@@ -82,16 +84,13 @@ export default defineComponent({
             }
         };
 
-        const translator = useValidationTranslator();
-
         return {
             v$: $v,
             form,
             add,
             toggle,
             proposalQuery,
-            busy,
-            translator,
+            busy
         };
     },
 });
@@ -100,19 +99,23 @@ export default defineComponent({
     <form @submit.prevent="add">
         <div class="row">
             <div class="col">
-                <VCFormGroup
-                    :validation-translator="translator"
-                    :validation-result="v$.name"
-                >
-                    <template #label>
-                        Name
+                <IVuelidate :validation="v$.name">
+                    <template #default="props">
+                        <VCFormGroup
+                            :validation-messages="props.data"
+                            :validation-severity="props.severity"
+                        >
+                            <template #label>
+                                Name
+                            </template>
+                            <template #default>
+                                <VCFormInput
+                                    v-model="v$.name.$model"
+                                />
+                            </template>
+                        </VCFormGroup>
                     </template>
-                    <template #default>
-                        <VCFormInput
-                            v-model="v$.name.$model"
-                        />
-                    </template>
-                </VCFormGroup>
+                </IVuelidate>
 
                 <hr>
 

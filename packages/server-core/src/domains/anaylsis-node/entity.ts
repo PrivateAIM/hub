@@ -22,7 +22,7 @@ import type {
     AnalysisNodeRunStatus,
     Node,
 } from '@privateaim/core';
-import type { Realm } from '@authup/core';
+import type { Realm } from '@authup/core-kit';
 import { AnalysisEntity } from '../analysis';
 import { NodeEntity } from '../node';
 

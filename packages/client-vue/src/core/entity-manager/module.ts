@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { hasOwnProperty } from '@authup/core';
+import { hasOwnProperty } from '@authup/kit';
 import type {
     DomainAPI, DomainEntity, DomainEntityID, DomainType,
 } from '@privateaim/core';
@@ -15,7 +15,7 @@ import type { Ref, VNodeChild } from 'vue';
 import {
     computed, isRef, ref, toRef, watch,
 } from 'vue';
-import { injectCoreAPIClient } from '../services/core/module';
+import { injectCoreAPIClient } from '../services';
 import type { EntitySocket, EntitySocketContext } from '../entity-socket';
 import { createEntitySocket } from '../entity-socket';
 import { extendObjectProperties } from '../object';

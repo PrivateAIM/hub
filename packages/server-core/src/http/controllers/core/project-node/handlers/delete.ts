@@ -7,7 +7,7 @@
 
 import { PermissionID } from '@privateaim/core';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
-import { isRealmResourceWritable } from '@authup/core';
+import { isRealmResourceWritable } from '@authup/core-kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';

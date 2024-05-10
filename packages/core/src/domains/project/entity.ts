@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Realm, User } from '@authup/core';
+import type { Realm, User } from '@authup/core-kit';
 import type { DomainType } from '../constants';
 import type { MasterImage } from '../master-image';
 import type { DomainEventBaseContext } from '../types-base';

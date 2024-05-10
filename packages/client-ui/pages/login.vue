@@ -5,7 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { AIdentityProviders } from '@authup/client-vue';
+import { AIdentityProviders } from '@authup/client-web-kit';
 import {
     FPagination, FSearch, FTitle, LoginForm,
 } from '@privateaim/client-vue';

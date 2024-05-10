@@ -12,7 +12,7 @@ import {
 import type {
     Node, Project, ProjectNode, ProjectNodeApprovalStatus,
 } from '@privateaim/core';
-import type { Realm } from '@authup/core';
+import type { Realm } from '@authup/core-kit';
 import { ProjectEntity } from '../project/entity';
 import { NodeEntity } from '../node/entity';
 

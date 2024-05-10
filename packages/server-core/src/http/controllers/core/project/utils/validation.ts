@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { isRealmResourceWritable } from '@authup/core';
+import { isRealmResourceWritable } from '@authup/core-kit';
 import { ForbiddenError } from '@ebec/http';
 import { check } from 'express-validator';
 import type { Request } from 'routup';

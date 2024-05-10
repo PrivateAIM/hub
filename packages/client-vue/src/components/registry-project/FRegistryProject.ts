@@ -4,6 +4,7 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
+import {getSeverity, useTranslationsForNestedValidations} from "@ilingo/vuelidate";
 import type {
     RegistryProject,
 } from '@privateaim/core';
@@ -26,8 +27,8 @@ import type { EntityManagerSlotsType } from '../../core';
 import {
     createEntityManager,
     defineEntityManagerEvents,
-    defineEntityManagerProps, injectCoreAPIClient,
-    useValidationTranslator,
+    defineEntityManagerProps,
+    injectCoreAPIClient,
     wrapFnWithBusyState,
 } from '../../core';
 
@@ -102,6 +103,8 @@ export default defineComponent({
             );
         }
 
+        const translationsValidation = useTranslationsForNestedValidations(vuelidate.value);
+
         return () => {
             const fallback = () : VNodeChild => h('div', [
                 h('div', {
@@ -131,8 +134,8 @@ export default defineComponent({
                         buildFormGroup({
                             label: true,
                             labelContent: 'Secret',
-                            validationResult: vuelidate.value.secret,
-                            validationTranslator: useValidationTranslator(),
+                            validationMessages: translationsValidation.secret.value,
+                            validationSeverity: getSeverity(vuelidate.value.secret),
                             content: buildFormInput({
                                 props: {
                                     placeholder: '...',

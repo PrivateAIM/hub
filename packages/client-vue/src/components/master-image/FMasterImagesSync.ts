@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ASearch } from '@authup/client-vue';
+import { ASearch } from '@authup/client-web-kit';
 import type { MasterImage } from '@privateaim/core';
 import {
     DomainType,

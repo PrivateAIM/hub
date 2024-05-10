@@ -18,7 +18,7 @@ import type {
     Analysis,
     AnalysisLog,
 } from '@privateaim/core';
-import type { Realm } from '@authup/core';
+import type { Realm } from '@authup/core-kit';
 import { AnalysisEntity } from '../analysis';
 
 @Entity({ name: 'analysis_logs' })

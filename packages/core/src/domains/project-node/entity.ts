@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Realm } from '@authup/core';
+import type { Realm } from '@authup/core-kit';
 import type { DomainType } from '../constants';
 import type { Project } from '../project';
 import type { Node } from '../node';

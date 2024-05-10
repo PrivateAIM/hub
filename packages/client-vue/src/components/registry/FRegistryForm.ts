@@ -5,10 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import {buildFormSubmitWithTranslations, createFormSubmitTranslations} from "@authup/client-web-kit";
+import {getSeverity, useTranslationsForNestedValidations} from "@ilingo/vuelidate";
 import type { Registry } from '@privateaim/core';
 import { DomainType } from '@privateaim/core';
 import {
-    buildFormGroup, buildFormInput, buildFormSubmit,
+    buildFormGroup, buildFormInput,
 } from '@vuecs/form-controls';
 import useVuelidate from '@vuelidate/core';
 import { maxLength, minLength, required } from '@vuelidate/validators';
@@ -20,9 +22,9 @@ import type {
 } from 'vue';
 import { useUpdatedAt } from '../../composables';
 import {
-    createEntityManager, defineEntityManagerEvents,
+    createEntityManager,
+    defineEntityManagerEvents,
     initFormAttributesFromSource,
-    useValidationTranslator,
     wrapFnWithBusyState,
 } from '../../core';
 
@@ -95,10 +97,13 @@ export default defineComponent({
             await manager.createOrUpdate(form);
         });
 
+        const translationsValidation = useTranslationsForNestedValidations($v.value);
+        const translationsSubmit = createFormSubmitTranslations();
+
         return () => {
             const name = buildFormGroup({
-                validationTranslator: useValidationTranslator(),
-                validationResult: $v.value.name,
+                validationMessages: translationsValidation.name.value,
+                validationSeverity: getSeverity($v.value.name),
                 label: true,
                 labelContent: 'Name',
                 content: buildFormInput({
@@ -113,8 +118,8 @@ export default defineComponent({
             });
 
             const host = buildFormGroup({
-                validationTranslator: useValidationTranslator(),
-                validationResult: $v.value.host,
+                validationMessages: translationsValidation.host.value,
+                validationSeverity: getSeverity($v.value.host),
                 label: true,
                 labelContent: 'Host',
                 content: buildFormInput({
@@ -129,8 +134,8 @@ export default defineComponent({
             });
 
             const accountName = buildFormGroup({
-                validationTranslator: useValidationTranslator(),
-                validationResult: $v.value.account_name,
+                validationMessages: translationsValidation.account_name.value,
+                validationSeverity: getSeverity($v.value.account_name),
                 label: true,
                 labelContent: 'Account Name',
                 content: buildFormInput({
@@ -145,8 +150,8 @@ export default defineComponent({
             });
 
             const accountSecret = buildFormGroup({
-                validationTranslator: useValidationTranslator(),
-                validationResult: $v.value.account_secret,
+                validationMessages: translationsValidation.account_secret.value,
+                validationSeverity: getSeverity($v.value.account_secret),
                 label: true,
                 labelContent: 'Account Secret',
                 content: buildFormInput({
@@ -160,14 +165,12 @@ export default defineComponent({
                 }),
             });
 
-            const submitNode = buildFormSubmit({
+            const submitNode = buildFormSubmitWithTranslations({
                 submit,
                 busy: busy.value,
-                createText: 'Create',
-                updateText: 'Update',
                 isEditing: !!manager.data.value,
-                validationResult: $v.value,
-            });
+                invalid: $v.value.$invalid,
+            }, translationsSubmit);
 
             return h('form', [
                 h('div', { class: 'row' }, [

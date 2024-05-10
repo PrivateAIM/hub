@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { APIClient as AuthupAPIClient } from '@authup/core';
+import type { Client as AuthupAPIClient } from '@authup/core-http-kit';
 import type { Options, SocketManager } from '@privateaim/client-vue';
 import { install } from '@privateaim/client-vue';
 import type { APIClient as CoreAPIClient } from '@privateaim/core';
@@ -31,8 +31,10 @@ export default defineNuxtPlugin((ctx) => {
     const options : Options = {
         coreAPIClient: ctx.$coreAPI as CoreAPIClient,
         storageAPIClient: ctx.$storageAPI as StorageAPIClient,
-        authupApiClient: ctx.$authupAPI as AuthupAPIClient,
-        authupStore,
+        authup: {
+            apiClient: ctx.$authupAPI as AuthupAPIClient,
+            store: authupStore,
+        },
         socketManager,
     };
 

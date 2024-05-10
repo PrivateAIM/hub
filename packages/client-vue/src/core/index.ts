@@ -16,5 +16,4 @@ export * from './object';
 export * from './slot';
 export * from './socket';
 export * from './services';
-export * from './translator';
 export * from './vuelidate';

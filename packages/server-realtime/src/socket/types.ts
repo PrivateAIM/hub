@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { SocketNextFunction } from '@authup/server-adapter';
+import type { Next } from '@authup/server-core-plugin-socket-io';
 import type {
     Node,
     SocketCTSEvents,
@@ -13,8 +13,9 @@ import type {
     SocketSTSEvents,
 } from '@privateaim/core';
 import type {
-    AbilityManager, Realm, Robot, User,
-} from '@authup/core';
+    Realm, Robot, User,
+} from '@authup/core-kit';
+import { AbilityManager } from '@authup/kit';
 import type { Namespace, Server, Socket } from 'socket.io';
 
 export type SocketData = {
@@ -53,7 +54,7 @@ SocketSTSEvents,
 SocketData
 >;
 
-export type SocketMiddleware = (socket: SocketBase, next: SocketNextFunction) => Promise<void>;
+export type SocketMiddleware = (socket: SocketBase, next: Next) => Promise<void>;
 export type SocketNamespaceContext = {
     server: SererBase,
     authMiddleware: SocketMiddleware

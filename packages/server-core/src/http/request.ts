@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { AbilityManager } from '@authup/core';
+import type { AbilityManager } from '@authup/kit';
 import { setRequestEnv as setEnv, useRequestEnv as useEnv } from 'routup';
 import type { Request } from 'routup';
 
@@ -14,8 +14,7 @@ type RequestEnv = {
 
     realmId?: string,
     realmName?: string,
-    // todo: set id?: string when authup >= 0.31.3
-    realm?: { id: string, name?: string },
+    realm?: { id?: string, name?: string },
 
     userId?: string,
     userName?: string,

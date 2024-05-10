@@ -18,8 +18,8 @@
         "typecheck": "nuxi typecheck"
     },
     "devDependencies": {
-        "@authup/client-vue": "^1.0.0-beta.9",
-        "@authup/core": "^1.0.0-beta.9",
+        "@authup/client-web-kit": "^1.0.0-beta.12",
+        "@authup/core-kit": "^1.0.0-beta.12",
         "@bootstrap-vue-next/nuxt": "^0.17.6",
         "@fortawesome/fontawesome-free": "^6.5.2",
         "@nuxtjs/google-fonts": "^3.2.0",
@@ -28,7 +28,7 @@
         "@privateaim/storage-kit": "^0.3.0",
         "@pinia/nuxt": "^0.5.1",
         "@vuecs/countdown": "^1.0.0",
-        "@vuecs/form-controls": "^1.3.0",
+        "@vuecs/form-controls": "^2.2.0",
         "@vuecs/gravatar": "^1.0.1",
         "@vuecs/list-controls": "^1.1.1",
         "@vuecs/navigation": "^1.1.1",
@@ -44,7 +44,7 @@
         "browser-storage-adapter": "^1.1.2",
         "events": "^3.3.0",
         "hapic": "^2.5.1",
-        "ilingo": "^3.2.0",
+        "ilingo": "^4.3.1",
         "nuxt": "^3.11.2",
         "pinia": "^2.1.7",
         "rapiq": "^0.9.0",

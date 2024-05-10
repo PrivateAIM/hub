@@ -5,16 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { EntityManagerSlotProps } from '@authup/client-vue';
-import { ARobot } from '@authup/client-vue';
+import type { EntityManagerSlotProps } from '@authup/client-web-kit';
+import {ARobot, buildFormSubmitWithTranslations, createFormSubmitTranslations} from '@authup/client-web-kit';
+import {getSeverity, useTranslationsForNestedValidations} from "@ilingo/vuelidate";
 import type { PropType } from 'vue';
 import { defineComponent, h, reactive } from 'vue';
 import type { Node } from '@privateaim/core';
-import type { Robot } from '@authup/core';
-import { buildFormGroup, buildFormInput, buildFormSubmit } from '@vuecs/form-controls';
+import type { Robot } from '@authup/core-kit';
+import { buildFormGroup, buildFormInput } from '@vuecs/form-controls';
 import useVuelidate from '@vuelidate/core';
 import { maxLength, minLength } from '@vuelidate/validators';
-import { initFormAttributesFromSource, useValidationTranslator } from '../../core';
+import { initFormAttributesFromSource } from '../../core';
 
 export default defineComponent({
     props: {
@@ -39,6 +40,8 @@ export default defineComponent({
                 maxLength: maxLength(256),
             },
         }, form);
+
+        const translationsValidation = useTranslationsForNestedValidations($v.value);
 
         return () => h(ARobot, {
             onResolved(entity) {
@@ -65,8 +68,8 @@ export default defineComponent({
                 }
 
                 const id = buildFormGroup({
-                    validationTranslator: useValidationTranslator(),
-                    validationResult: $v.value.id,
+                    validationMessages: translationsValidation.id.value,
+                    validationSeverity: getSeverity($v.value.id),
                     label: true,
                     labelContent: 'ID',
                     content: buildFormInput({
@@ -78,8 +81,8 @@ export default defineComponent({
                 });
 
                 const secret = buildFormGroup({
-                    validationTranslator: useValidationTranslator(),
-                    validationResult: $v.value.secret,
+                    validationMessages: translationsValidation.secret.value,
+                    validationSeverity: getSeverity($v.value.secret),
                     label: true,
                     labelContent: 'Secret',
                     content: buildFormInput({
@@ -93,18 +96,19 @@ export default defineComponent({
                     }),
                 });
 
-                const submitForm = buildFormSubmit({
+                const translationsSubmit = createFormSubmitTranslations();
+
+                const submitNode = buildFormSubmitWithTranslations({
                     submit: () => slotProps.update(form),
                     busy: slotProps.busy,
-                    updateText: 'Update',
-                    createText: 'Create',
                     isEditing: !!slotProps.data,
-                });
+                    invalid: $v.value.$invalid,
+                }, translationsSubmit);
 
                 return h('div', [
                     id,
                     secret,
-                    submitForm,
+                    submitNode,
                 ]);
             },
         });

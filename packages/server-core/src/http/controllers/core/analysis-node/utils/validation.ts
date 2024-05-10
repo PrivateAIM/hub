@@ -8,7 +8,7 @@
 import { check } from 'express-validator';
 import { AnalysisNodeApprovalStatus } from '@privateaim/core';
 import { BadRequestError, NotFoundError } from '@ebec/http';
-import { isRealmResourceWritable } from '@authup/core';
+import { isRealmResourceWritable } from '@authup/core-kit';
 import type { Request } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import type { HTTPValidationResult } from '@privateaim/server-kit';
