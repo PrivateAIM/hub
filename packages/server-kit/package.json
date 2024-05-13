@@ -19,7 +19,7 @@
         "@authup/core-kit": "^1.0.0-beta.12",
         "@authup/core-http-kit": "^1.0.0-beta.12",
         "@authup/server-core-plugin-kit": "^1.0.0-beta.12",
-        "@authup/server-core-plugin-http": "^1.0.0-beta.12",
+        "@authup/server-core-plugin-http": "^1.0.0-beta.13",
         "@ebec/http": "^2.3.0",
         "@privateaim/core": "^0.3.0",
         "@routup/basic": "^1.3.2",
