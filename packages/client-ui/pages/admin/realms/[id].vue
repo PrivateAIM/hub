@@ -6,6 +6,7 @@
   -->
 
 <script lang="ts">
+import {injectHTTPClient, useStore} from "@authup/client-web-kit";
 import type { Realm } from '@authup/core-kit';
 import { PermissionName, isRealmResourceWritable } from '@authup/core-kit';
 import { storeToRefs } from 'pinia';
@@ -13,13 +14,12 @@ import { ref } from 'vue';
 import type { Ref } from 'vue';
 import {
     definePageMeta,
-    useAuthupAPI, useToast,
+    useToast,
 } from '#imports';
 import {
     createError, defineNuxtComponent, navigateTo, useRoute,
 } from '#app';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
-import { useAuthStore } from '../../../store/auth';
 import { updateObjectProperties } from '../../../utils';
 
 export default defineNuxtComponent({
@@ -39,13 +39,13 @@ export default defineNuxtComponent({
         ];
 
         const toast = useToast();
-
         const route = useRoute();
+        const store = useStore();
 
         const entity: Ref<Realm> = ref(null) as any;
 
         try {
-            entity.value = await useAuthupAPI()
+            entity.value = await injectHTTPClient()
                 .realm
                 .getOne(route.params.id as string);
         } catch (e) {
@@ -53,7 +53,7 @@ export default defineNuxtComponent({
             throw createError({});
         }
 
-        const store = useAuthStore();
+
         const { realmManagement } = storeToRefs(store);
 
         if (!isRealmResourceWritable(realmManagement.value, entity.value.id)) {

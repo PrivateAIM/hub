@@ -4,6 +4,7 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
+import { useAbilityCheck, useStore } from '@authup/client-web-kit';
 import {
     PermissionID,
     ProjectNodeApprovalCommand,
@@ -14,7 +15,6 @@ import {
     computed, defineComponent, ref,
 } from 'vue';
 import {
-    injectAuthupStore,
     injectCoreAPIClient,
     renderActionCommand,
     wrapFnWithBusyState,
@@ -83,8 +83,6 @@ export default defineComponent({
             }
         });
 
-        const store = injectAuthupStore();
-
         const isDisabled = computed(() => {
             if (props.approvalStatus) {
                 if (
@@ -127,6 +125,8 @@ export default defineComponent({
             }
         });
 
+        const isAllowed = useAbilityCheck(PermissionID.PROJECT_APPROVE);
+
         return () => renderActionCommand({
             execute,
             elementType: props.elementType,
@@ -134,7 +134,7 @@ export default defineComponent({
             withText: props.withText,
             isDisabled: isDisabled.value,
             iconClass: iconClass.value,
-            isAllowed: store.has(PermissionID.PROJECT_APPROVE),
+            isAllowed: isAllowed.value,
             commandText: commandText.value,
             classSuffix: classSuffix.value,
             slots,

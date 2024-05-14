@@ -6,14 +6,12 @@
   -->
 
 <script lang="ts">
-import { APermissionForm } from '@authup/client-web-kit';
+import {APermissionForm, useStore} from '@authup/client-web-kit';
 import type { Permission } from '@authup/core-kit';
 import { PermissionName } from '@authup/core-kit';
-import { storeToRefs } from 'pinia';
 import { defineNuxtComponent, navigateTo } from '#app';
 import { definePageMeta } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
-import { useAuthStore } from '../../../../store/auth';
 
 export default defineNuxtComponent({
     components: {
@@ -37,11 +35,7 @@ export default defineNuxtComponent({
             emit('failed', e);
         };
 
-        const store = useAuthStore();
-        const { realmManagementId } = storeToRefs(store);
-
         return {
-            realmManagementId,
             handleCreated,
             handleFailed,
         };
@@ -50,7 +44,6 @@ export default defineNuxtComponent({
 </script>
 <template>
     <APermissionForm
-        :realm-id="realmManagementId"
         @failed="handleFailed"
         @created="handleCreated"
     />

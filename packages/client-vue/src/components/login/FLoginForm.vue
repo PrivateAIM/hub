@@ -6,6 +6,7 @@
   -->
 
 <script lang="ts">
+import {useStore} from "@authup/client-web-kit";
 import { IVuelidate } from '@ilingo/vuelidate';
 import useVuelidate from '@vuelidate/core';
 import { maxLength, minLength, required } from '@vuelidate/validators';
@@ -13,7 +14,6 @@ import {
     defineComponent, reactive, ref, toRef, watch,
 } from 'vue';
 import { VCFormInput, VCFormSubmit } from '@vuecs/form-controls';
-import { injectAuthupStore } from '../../core';
 
 export default defineComponent({
     components: {
@@ -60,7 +60,7 @@ export default defineComponent({
             },
         }, form);
 
-        const store = injectAuthupStore();
+        const store = useStore();
 
         const busy = ref(false);
 

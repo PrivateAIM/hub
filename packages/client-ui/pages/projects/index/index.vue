@@ -13,7 +13,7 @@ import {
 } from '@privateaim/client-vue';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
 import { defineNuxtComponent, definePageMeta } from '#imports';
-import { useAuthStore } from '~/store/auth';
+import {useStore} from "@authup/client-web-kit";
 
 export default defineNuxtComponent({
     components: {
@@ -39,7 +39,7 @@ export default defineNuxtComponent({
             ],
         });
 
-        const store = useAuthStore();
+        const store = useStore();
         const { realmId } = storeToRefs(store);
 
         const query = computed(() => ({

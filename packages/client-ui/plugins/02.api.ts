@@ -5,25 +5,22 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import {STORE_ID, injectHTTPClient, useStore} from '@authup/client-web-kit';
 import type {
     ClientResponseErrorTokenHookOptions,
 } from '@authup/core-http-kit';
 import {
-    Client as AuthAPIClient,
     ClientResponseErrorTokenHook,
 } from '@authup/core-http-kit';
 import { APIClient as CoreAPIClient } from '@privateaim/core';
 import { APIClient as StorageAPIClient } from '@privateaim/storage-kit';
-import type { Pinia } from 'pinia';
 import { storeToRefs } from 'pinia';
-import { useAuthStore } from '../store/auth';
 import { useRuntimeConfig } from '#imports';
 
 declare module '#app' {
     interface NuxtApp {
         $coreAPI: CoreAPIClient;
         $storageAPI: StorageAPIClient;
-        $authupAPI: AuthAPIClient;
     }
 }
 
@@ -31,7 +28,6 @@ declare module '@vue/runtime-core' {
     interface ComponentCustomProperties {
         $coreAPI: CoreAPIClient;
         $storageAPI: StorageAPIClient;
-        $authupAPI: AuthAPIClient;
     }
 }
 export default defineNuxtPlugin((ctx) => {
@@ -40,7 +36,6 @@ export default defineNuxtPlugin((ctx) => {
     const {
         coreUrl,
         storageUrl,
-        authupUrl,
     } = runtimeConfig.public;
 
     // -----------------------------------------------------------------------------------
@@ -55,18 +50,14 @@ export default defineNuxtPlugin((ctx) => {
 
     // -----------------------------------------------------------------------------------
 
-    const authupAPI = new AuthAPIClient({ baseURL: authupUrl });
-    ctx.provide('authupAPI', authupAPI);
+    const store = useStore();
+    const { refreshToken } = storeToRefs(store);
 
-    // -----------------------------------------------------------------------------------
+    const authupAPI = injectHTTPClient();
 
-    const store = useAuthStore(ctx.$pinia as Pinia);
-
-    const authupTokenHookOptions : ClientResponseErrorTokenHookOptions = {
-        baseURL: authupUrl,
+    const tokenHookOptions : ClientResponseErrorTokenHookOptions = {
+        baseURL: authupAPI.getBaseURL(),
         tokenCreator: () => {
-            const { refreshToken } = storeToRefs(store);
-
             if (!refreshToken.value) {
                 throw new Error('No refresh token available.');
             }
@@ -76,32 +67,12 @@ export default defineNuxtPlugin((ctx) => {
             });
         },
         tokenCreated: (response) => {
-            store.setAccessTokenExpireDate(undefined);
-
-            setTimeout(() => {
-                store.handleTokenGrantResponse(response);
-            }, 0);
+            store.handleTokenGrantResponse(response);
         },
         tokenFailed: () => {
             store.logout();
         },
-    };
-
-    const authupTokenHook = new ClientResponseErrorTokenHook(
-        authupAPI,
-        authupTokenHookOptions,
-    );
-
-    const tokenHookOptions : ClientResponseErrorTokenHookOptions = {
-        ...authupTokenHookOptions,
         timer: false,
-        tokenCreated(response) {
-            authupTokenHook.setTimer(response);
-
-            if (authupTokenHookOptions.tokenCreated) {
-                authupTokenHookOptions.tokenCreated(response);
-            }
-        },
     };
 
     const coreTokenHook = new ClientResponseErrorTokenHook(
@@ -115,7 +86,7 @@ export default defineNuxtPlugin((ctx) => {
     );
 
     store.$subscribe((mutation, state) => {
-        if (mutation.storeId !== 'auth') return;
+        if (mutation.storeId !== STORE_ID) return;
 
         if (state.accessToken) {
             coreAPI.setAuthorizationHeader({
@@ -128,22 +99,14 @@ export default defineNuxtPlugin((ctx) => {
                 token: state.accessToken,
             });
 
-            authupAPI.setAuthorizationHeader({
-                type: 'Bearer',
-                token: state.accessToken,
-            });
-
             coreTokenHook.mount();
             storageTokenHook.mount();
-            authupTokenHook.mount();
         } else {
             coreAPI.unsetAuthorizationHeader();
             storageAPI.unsetAuthorizationHeader();
-            authupAPI.unsetAuthorizationHeader();
 
             coreTokenHook.unmount();
             storageTokenHook.unmount();
-            authupTokenHook.unmount();
         }
     });
 });

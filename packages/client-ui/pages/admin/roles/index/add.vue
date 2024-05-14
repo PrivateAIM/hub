@@ -6,14 +6,13 @@
   -->
 
 <script lang="ts">
-import { ARoleForm } from '@authup/client-web-kit';
+import {ARoleForm, useStore} from '@authup/client-web-kit';
 import type { Role } from '@authup/core-kit';
 import { PermissionName } from '@authup/core-kit';
 import { storeToRefs } from 'pinia';
 import { defineNuxtComponent, navigateTo } from '#app';
 import { definePageMeta } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
-import { useAuthStore } from '../../../../store/auth';
 
 export default defineNuxtComponent({
     components: {
@@ -37,7 +36,7 @@ export default defineNuxtComponent({
             emit('failed', e);
         };
 
-        const store = useAuthStore();
+        const store = useStore();
         const { realmManagementId } = storeToRefs(store);
 
         return {

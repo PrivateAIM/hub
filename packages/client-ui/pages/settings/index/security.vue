@@ -7,11 +7,10 @@
 
 <script lang="ts">
 import { storeToRefs } from 'pinia';
-import { AUserPasswordForm } from '@authup/client-web-kit';
+import {AUserPasswordForm, useStore} from '@authup/client-web-kit';
 import { definePageMeta, useToast } from '#imports';
 import { defineNuxtComponent } from '#app';
 import { LayoutKey } from '~/config/layout';
-import { useAuthStore } from '~/store/auth';
 
 export default defineNuxtComponent({
     components: {
@@ -24,7 +23,7 @@ export default defineNuxtComponent({
 
         const toast = useToast();
 
-        const store = useAuthStore();
+        const store = useStore();
         const { userId } = storeToRefs(store);
 
         const handleUpdated = () => {

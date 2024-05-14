@@ -10,14 +10,13 @@
 import { VCTimeago } from '@vuecs/timeago';
 import { BTable } from 'bootstrap-vue-next';
 import {
-    AEntityDelete, APagination, APermissions, ASearch, ATitle,
+    AEntityDelete, APagination, APermissions, ASearch, ATitle, useAbilityCheck, useStore,
 } from '@authup/client-web-kit';
 import type { Permission } from '@authup/core-kit';
 import { PermissionName, isRealmResourceWritable } from '@authup/core-kit';
 import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
 import { defineNuxtComponent } from '#app';
-import { useAuthStore } from '../../../../store/auth';
 
 export default defineNuxtComponent({
     components: {
@@ -35,7 +34,7 @@ export default defineNuxtComponent({
             emit('deleted', e);
         };
 
-        const store = useAuthStore();
+        const store = useStore();
         const { realm, realmManagementId } = storeToRefs(store);
 
         const query : BuildInput<Permission> = {
@@ -48,8 +47,8 @@ export default defineNuxtComponent({
             resource: Permission,
         ) => isRealmResourceWritable(realm.value, resource.realm_id);
 
-        const hasEditPermission = store.has(PermissionName.PERMISSION_EDIT);
-        const hasDropPermission = store.has(PermissionName.PERMISSION_DROP);
+        const hasEditPermission = useAbilityCheck(PermissionName.PERMISSION_EDIT);
+        const hasDropPermission = useAbilityCheck(PermissionName.PERMISSION_DROP);
 
         const fields = [
             {

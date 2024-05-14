@@ -5,13 +5,13 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import {useStore} from "@authup/client-web-kit";
 import type { Analysis } from '@privateaim/core';
 import { storeToRefs } from 'pinia';
 import { ref } from 'vue';
 import { FAnalysisBasicForm } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
 import { useRoute } from '#imports';
-import { useAuthStore } from '../../../store/auth';
 
 export default defineNuxtComponent({
     components: { FAnalysisBasicForm },
@@ -19,7 +19,7 @@ export default defineNuxtComponent({
     setup(_props, { emit }) {
         const projectId = ref<string | null>(null);
 
-        const store = useAuthStore();
+        const store = useStore();
         const { realmId } = storeToRefs(store);
 
         const route = useRoute();

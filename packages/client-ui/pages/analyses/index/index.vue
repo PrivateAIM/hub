@@ -5,6 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import {useStore} from "@authup/client-web-kit";
 import type { Analysis } from '@privateaim/core';
 import { PermissionID } from '@privateaim/core';
 import { storeToRefs } from 'pinia';
@@ -16,7 +17,6 @@ import {
 import { definePageMeta } from '#imports';
 import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
-import { useAuthStore } from '../../../store/auth';
 
 export default defineNuxtComponent({
     components: {
@@ -38,7 +38,7 @@ export default defineNuxtComponent({
             ],
         });
 
-        const store = useAuthStore();
+        const store = useStore();
         const { realmId } = storeToRefs(store);
 
         const query = computed<BuildInput<Analysis>>(() => ({

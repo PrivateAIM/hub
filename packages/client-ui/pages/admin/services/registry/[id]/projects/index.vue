@@ -5,6 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import {useAbilityCheck, useStore} from "@authup/client-web-kit";
 import type { Registry, RegistryProject } from '@privateaim/core';
 import { PermissionID } from '@privateaim/core';
 import { BModal, BTable } from 'bootstrap-vue-next';
@@ -20,7 +21,6 @@ import {
 } from '@privateaim/client-vue';
 import { definePageMeta, useToast } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '../../../../../../config/layout';
-import { useAuthStore } from '../../../../../../store/auth';
 
 export default {
     components: {
@@ -76,12 +76,9 @@ export default {
             },
         ];
 
-        const store = useAuthStore();
-
-        const canView = computed(() => store.has(PermissionID.NODE_EDIT) ||
-                store.has(PermissionID.NODE_DROP));
-
-        const canDrop = computed(() => store.has(PermissionID.NODE_DROP));
+        const canEdit = useAbilityCheck(PermissionID.NODE_EDIT);
+        const canDrop = useAbilityCheck(PermissionID.NODE_DROP);
+        const canView = computed(() => canEdit.value || canDrop.value);
 
         const listNode = ref<null | typeof RegistryProjectList>(null);
 

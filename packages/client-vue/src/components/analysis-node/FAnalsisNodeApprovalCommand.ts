@@ -4,11 +4,12 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
+import { useAbilityCheck } from '@authup/client-web-kit';
 import { AnalysisNodeApprovalCommand, AnalysisNodeApprovalStatus, PermissionID } from '@privateaim/core';
 import type { PropType } from 'vue';
 import { computed, defineComponent, ref } from 'vue';
 import type { ActionCommandProperties } from '../../core';
-import { injectAuthupStore, injectCoreAPIClient, renderActionCommand } from '../../core';
+import { injectCoreAPIClient, renderActionCommand } from '../../core';
 
 export default defineComponent({
     props: {
@@ -73,8 +74,6 @@ export default defineComponent({
             }
         });
 
-        const store = injectAuthupStore();
-
         const isDisabled = computed(() => {
             if (props.approvalStatus) {
                 if (
@@ -123,6 +122,8 @@ export default defineComponent({
             busy.value = false;
         };
 
+        const isAllowed = useAbilityCheck(PermissionID.ANALYSIS_APPROVE);
+
         return () => renderActionCommand({
             execute,
             elementType: props.elementType,
@@ -130,7 +131,7 @@ export default defineComponent({
             withText: props.withText,
             isDisabled: isDisabled.value,
             iconClass: iconClass.value,
-            isAllowed: store.has(PermissionID.ANALYSIS_APPROVE),
+            isAllowed: isAllowed.value,
             commandText: commandText.value,
             classSuffix: classSuffix.value,
             slots: setup.slots,

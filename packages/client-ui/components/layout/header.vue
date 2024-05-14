@@ -5,6 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import {useStore} from "@authup/client-web-kit";
 import { VCGravatar } from '@vuecs/gravatar';
 import { VCNavItems } from '@vuecs/navigation';
 import { BCollapse } from 'bootstrap-vue-next';
@@ -12,7 +13,6 @@ import { storeToRefs } from 'pinia';
 import { computed } from 'vue';
 import { ref } from '#imports';
 import { defineNuxtComponent } from '#app';
-import { useAuthStore } from '../../store/auth';
 
 export default defineNuxtComponent({
     components: {
@@ -21,7 +21,7 @@ export default defineNuxtComponent({
         VCNavItems,
     },
     setup() {
-        const store = useAuthStore();
+        const store = useStore();
         const { loggedIn, user, realmManagementName } = storeToRefs(store);
 
         const displayNav = ref(false);

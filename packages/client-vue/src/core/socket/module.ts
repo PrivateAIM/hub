@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { Store } from '@authup/client-web-kit';
 import type {
     SocketResourcesNamespaceCTSEvents,
     SocketResourcesNamespaceSTCEvents,
@@ -14,12 +15,11 @@ import {
 } from '@privateaim/core';
 import type { ManagerOptions, Socket } from 'socket.io-client';
 import { Manager } from 'socket.io-client';
-import type { AuthupStore } from '../services';
 
 type SocketManagerContext = {
     url: string,
     options?: Partial<ManagerOptions>,
-    store: AuthupStore
+    store: Store
 };
 
 export type SocketClient = Socket<SocketResourcesNamespaceSTCEvents, SocketResourcesNamespaceCTSEvents>;
@@ -29,7 +29,7 @@ export class SocketManager {
 
     protected sockets : Record<string, SocketClient>;
 
-    protected store : AuthupStore;
+    protected store : Store;
 
     //--------------------------------------------------------------------
 

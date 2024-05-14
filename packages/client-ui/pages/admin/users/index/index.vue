@@ -11,12 +11,11 @@ import type { User } from '@authup/core-kit';
 import {
     PermissionName, isRealmResourceWritable,
 } from '@authup/core-kit';
-import { AEntityDelete, AUsers } from '@authup/client-web-kit';
+import {AEntityDelete, AUsers, useAbilityCheck, useStore} from '@authup/client-web-kit';
 import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
 import { FPagination, FSearch, FTitle } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
-import { useAuthStore } from '../../../../store/auth';
 
 export default defineNuxtComponent({
     components: {
@@ -28,7 +27,7 @@ export default defineNuxtComponent({
             emit('deleted', e);
         };
 
-        const store = useAuthStore();
+        const store = useStore();
         const { realm, realmManagementId } = storeToRefs(store);
 
         const query : BuildInput<User> = {
@@ -41,8 +40,8 @@ export default defineNuxtComponent({
             resource: User,
         ) => isRealmResourceWritable(realm.value, resource.realm_id);
 
-        const hasEditPermission = store.has(PermissionName.USER_EDIT);
-        const hasDropPermission = store.has(PermissionName.USER_DROP);
+        const hasEditPermission = useAbilityCheck(PermissionName.USER_EDIT);
+        const hasDropPermission = useAbilityCheck(PermissionName.USER_DROP);
 
         const fields = [
             {

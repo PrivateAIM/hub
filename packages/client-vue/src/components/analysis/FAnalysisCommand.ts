@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { useAbilityCheck } from '@authup/client-web-kit';
 import type { Analysis } from '@privateaim/core';
 import { AnalysisAPICommand, AnalysisBuildStatus, PermissionID } from '@privateaim/core';
 import type { PropType } from 'vue';
@@ -13,7 +14,6 @@ import {
 } from 'vue';
 import {
     ActionCommandElementType,
-    injectAuthupStore,
     injectCoreAPIClient,
     renderActionCommand,
     wrapFnWithBusyState,
@@ -64,8 +64,7 @@ const FAnalysisCommand = defineComponent({
             }
         });
 
-        const store = injectAuthupStore();
-        const isAllowed = computed(() => store.has(PermissionID.ANALYSIS_EDIT));
+        const isAllowed = useAbilityCheck(PermissionID.ANALYSIS_EDIT);
 
         const isHidden = computed<boolean>(() => {
             if (props.command === AnalysisAPICommand.CONFIGURATION_LOCK) {

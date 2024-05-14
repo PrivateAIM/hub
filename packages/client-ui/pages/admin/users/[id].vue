@@ -6,20 +6,20 @@
   -->
 
 <script lang="ts">
+import {injectHTTPClient, useStore} from "@authup/client-web-kit";
 import type { User } from '@authup/core-kit';
 import { PermissionName, isRealmResourceWritable } from '@authup/core-kit';
 import { storeToRefs } from 'pinia';
 import { ref } from 'vue';
 import type { Ref } from 'vue';
 import {
-    definePageMeta, updateObjectProperties, useAuthupAPI, useToast,
+    definePageMeta, updateObjectProperties, useToast,
 } from '#imports';
 import {
     createError, defineNuxtComponent, navigateTo, useRoute,
 } from '#app';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
 import DomainEntityNav from '../../../components/DomainEntityNav';
-import { useAuthStore } from '../../../store/auth';
 
 export default defineNuxtComponent({
     components: { DomainEntityNav },
@@ -48,13 +48,13 @@ export default defineNuxtComponent({
         ];
 
         const toast = useToast();
-
         const route = useRoute();
+        const store = useStore();
 
         const entity : Ref<User> = ref(null) as any;
 
         try {
-            entity.value = await useAuthupAPI()
+            entity.value = await injectHTTPClient()
                 .user
                 .getOne(route.params.id as string, { fields: ['+email'] });
         } catch (e) {
@@ -62,7 +62,6 @@ export default defineNuxtComponent({
             throw createError({});
         }
 
-        const store = useAuthStore();
         const { realmManagement } = storeToRefs(store);
 
         if (!isRealmResourceWritable(realmManagement.value, entity.value.realm_id)) {

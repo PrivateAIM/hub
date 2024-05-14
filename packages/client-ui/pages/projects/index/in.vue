@@ -5,6 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import {useAbilityCheck, useStore} from "@authup/client-web-kit";
 import { VCTimeago } from '@vuecs/timeago';
 import type { ProjectNode } from '@privateaim/core';
 import {
@@ -29,7 +30,6 @@ import { defineNuxtComponent } from '#app';
 import { definePageMeta } from '#imports';
 import { useCoreAPI } from '../../../composables/api';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
-import { useAuthStore } from '../../../store/auth';
 
 export default defineNuxtComponent({
     components: {
@@ -79,10 +79,10 @@ export default defineNuxtComponent({
             { key: 'options', label: '', tdClass: 'text-left' },
         ];
 
-        const store = useAuthStore();
+        const store = useStore();
         const { realmId } = storeToRefs(store);
 
-        const canManage = computed(() => store.has(PermissionID.PROJECT_APPROVE));
+        const canManage = useAbilityCheck(PermissionID.PROJECT_APPROVE);
 
         const nodeId : Ref<string | null> = ref(null);
 

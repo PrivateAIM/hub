@@ -6,17 +6,15 @@
   -->
 
 <script lang="ts">
-
 import { BTable } from 'bootstrap-vue-next';
 import type { Robot } from '@authup/core-kit';
 import { PermissionName, isRealmResourceWritable } from '@authup/core-kit';
 import {
-    AEntityDelete, APagination, ARobots, ASearch, ATitle,
+    AEntityDelete, APagination, ARobots, ASearch, ATitle, useAbilityCheck, useStore,
 } from '@authup/client-web-kit';
 import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
 import { defineNuxtComponent } from '#app';
-import { useAuthStore } from '../../../../store/auth';
 
 export default defineNuxtComponent({
     components: {
@@ -33,7 +31,7 @@ export default defineNuxtComponent({
             emit('deleted', e);
         };
 
-        const store = useAuthStore();
+        const store = useStore();
         const { realm, realmManagementId } = storeToRefs(store);
 
         const query : BuildInput<Robot> = {
@@ -46,8 +44,8 @@ export default defineNuxtComponent({
             resource: Robot,
         ) => isRealmResourceWritable(realm.value, resource.realm_id);
 
-        const hasEditPermission = store.has(PermissionName.ROBOT_EDIT);
-        const hasDropPermission = store.has(PermissionName.ROBOT_DROP);
+        const hasEditPermission = useAbilityCheck(PermissionName.ROBOT_EDIT);
+        const hasDropPermission = useAbilityCheck(PermissionName.ROBOT_DROP);
 
         const fields = [
             {

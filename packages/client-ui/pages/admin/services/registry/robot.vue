@@ -5,7 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { ARobotForm } from '@authup/client-web-kit';
+import {ARobotForm, injectHTTPClient, useStore} from '@authup/client-web-kit';
 import type { Robot } from '@authup/core-kit';
 import { storeToRefs } from 'pinia';
 import type { Ref } from 'vue';
@@ -13,8 +13,6 @@ import { h, ref } from 'vue';
 import { ServiceID } from '@privateaim/core';
 import { useToast } from '#imports';
 import { createError, defineNuxtComponent, navigateTo } from '#app';
-import { useAuthupAPI } from '../../../../composables/api';
-import { useAuthStore } from '../../../../store/auth';
 import { updateObjectProperties } from '../../../../utils';
 
 export default defineNuxtComponent({
@@ -24,7 +22,7 @@ export default defineNuxtComponent({
         let entity : Ref<Robot>;
 
         try {
-            const response = await useAuthupAPI().robot.getMany({
+            const response = await injectHTTPClient().robot.getMany({
                 filter: {
                     name: ServiceID.REGISTRY,
                 },
@@ -48,7 +46,7 @@ export default defineNuxtComponent({
             toast.show({ variant: 'success', body: 'The robot was successfully updated.' });
         };
 
-        const store = useAuthStore();
+        const store = useStore();
         const { realmId } = storeToRefs(store);
 
         return () => h(ARobotForm, {

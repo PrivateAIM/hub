@@ -5,6 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import {useAbilityCheck, useStore} from "@authup/client-web-kit";
 import { VCTimeago } from '@vuecs/timeago';
 import type { Registry } from '@privateaim/core';
 import { PermissionID } from '@privateaim/core';
@@ -17,7 +18,6 @@ import {
 import { defineNuxtComponent } from '#app';
 import { definePageMeta } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
-import { useAuthStore } from '../../../../../store/auth';
 
 export default defineNuxtComponent({
     components: {
@@ -55,8 +55,8 @@ export default defineNuxtComponent({
             },
         };
 
-        const store = useAuthStore();
-        const canManage = computed(() => store.has(PermissionID.REGISTRY_MANAGE));
+        const store = useStore();
+        const canManage = computed(() => useAbilityCheck(PermissionID.REGISTRY_MANAGE));
 
         const registryNode = ref<typeof RegistryList | null>(null);
 

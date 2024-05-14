@@ -5,6 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import {useStore} from "@authup/client-web-kit";
 import type { Node } from '@privateaim/core';
 import { PermissionID } from '@privateaim/core';
 import { storeToRefs } from 'pinia';
@@ -12,7 +13,6 @@ import { FNodeForm } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
 import { definePageMeta } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
-import { useAuthStore } from '../../../../store/auth';
 
 export default defineNuxtComponent({
     components: { FNodeForm },
@@ -26,7 +26,7 @@ export default defineNuxtComponent({
             ],
         });
 
-        const store = useAuthStore();
+        const store = useStore();
         const { realmManagementId, realmManagementName } = storeToRefs(store);
 
         const handleCreated = async (e: Node) => {

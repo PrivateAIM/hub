@@ -5,14 +5,13 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { AIdentityProviders } from '@authup/client-web-kit';
+import {AIdentityProviders, injectHTTPClient} from '@authup/client-web-kit';
 import {
     FPagination, FSearch, FTitle, LoginForm,
 } from '@privateaim/client-vue';
 import {
     definePageMeta,
     navigateTo,
-    useAuthupAPI,
     useRoute,
     useToast,
 } from '#imports';
@@ -39,6 +38,7 @@ export default defineNuxtComponent({
 
         const toast = useToast();
         const route = useRoute();
+        const apiClient = injectHTTPClient();
 
         const handleDone = () => {
             const { redirect, ...query } = route.query;
@@ -56,7 +56,6 @@ export default defineNuxtComponent({
         };
 
         const buildIdentityProviderURL = (id: string) => {
-            const apiClient = useAuthupAPI();
             return apiClient.identityProvider.getAuthorizeUri(
                 apiClient.getBaseURL() as string,
                 id,

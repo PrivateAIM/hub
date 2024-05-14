@@ -5,13 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { useStore } from '@authup/client-web-kit';
 import { storeToRefs } from 'pinia';
 import type { RouteLocationNormalized } from 'vue-router';
 import {
     navigateTo,
 } from '#app';
 import { LayoutKey } from '../config/layout';
-import { useAuthStore } from '../store/auth';
 
 function checkAbilityOrPermission(route: RouteLocationNormalized, has: (name: string) => boolean) {
     const layoutKeys : string[] = [
@@ -55,7 +55,7 @@ function checkAbilityOrPermission(route: RouteLocationNormalized, has: (name: st
 }
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
-    const store = useAuthStore();
+    const store = useStore();
     const { loggedIn } = storeToRefs(store);
 
     let redirectPath = '/';
@@ -67,7 +67,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     try {
         await store.resolve();
     } catch (e) {
-        await store.logout();
+        store.logout();
 
         if (!to.fullPath.startsWith('/logout') && !to.fullPath.startsWith('/login')) {
             return navigateTo({
@@ -98,7 +98,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
         }
 
         try {
-            checkAbilityOrPermission(to, (name) => store.has(name));
+            checkAbilityOrPermission(to, (name) => store.abilities.has(name));
         } catch (e) {
             return navigateTo({
                 path: redirectPath,

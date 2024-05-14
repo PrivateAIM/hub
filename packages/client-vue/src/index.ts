@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { install as installAuthup } from '@authup/client-web-kit';
 import { applyStoreManagerOptions, installStoreManager } from '@vuecs/list-controls/core';
 import type { App, Component, Plugin } from 'vue';
 import './css';
@@ -18,8 +17,6 @@ import {
 } from './core';
 
 export function install(instance: App, options: Options = {}) : void {
-    installAuthup(instance, options.authup);
-
     if (options.coreAPIClient) {
         provideCoreAPIClient(options.coreAPIClient, instance);
     }

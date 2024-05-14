@@ -5,6 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import {useAbilityCheck, useStore} from "@authup/client-web-kit";
 import { VCTimeago } from '@vuecs/timeago';
 import type { AnalysisNode } from '@privateaim/core';
 import { PermissionID } from '@privateaim/core';
@@ -25,7 +26,6 @@ import {
 import { defineNuxtComponent, useRuntimeConfig } from '#app';
 import { definePageMeta, useCoreAPI } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
-import { useAuthStore } from '../../../store/auth';
 
 export default defineNuxtComponent({
     components: {
@@ -72,10 +72,10 @@ export default defineNuxtComponent({
             { key: 'options', label: '', tdClass: 'text-left' },
         ];
 
-        const store = useAuthStore();
+        const store = useStore();
         const { realmId } = storeToRefs(store);
 
-        const canManage = computed(() => store.has(PermissionID.ANALYSIS_APPROVE));
+        const canManage = computed(() => useAbilityCheck(PermissionID.ANALYSIS_APPROVE));
 
         const query : BuildInput<AnalysisNode> = {
             include: {

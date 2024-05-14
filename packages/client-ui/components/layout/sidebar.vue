@@ -5,17 +5,17 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import {useStore} from "@authup/client-web-kit";
 import { VCCountdown } from '@vuecs/countdown';
 import { VCNavItems } from '@vuecs/navigation';
 import { storeToRefs } from 'pinia';
 import { defineNuxtComponent } from '#app';
 import { computed, useCoreAPI } from '#imports';
-import { useAuthStore } from '../../store/auth';
 
 export default defineNuxtComponent({
     components: { VCCountdown, VCNavItems },
     setup() {
-        const store = useAuthStore();
+        const store = useStore();
         const { loggedIn, accessTokenExpireDate: tokenExpireDate, realmManagement } = storeToRefs(store);
 
         const tokenExpiresIn = computed(() => {

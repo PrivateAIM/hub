@@ -23,8 +23,7 @@ import type {
 import {
     computed, isRef, onMounted, onUnmounted, watch,
 } from 'vue';
-import { storeToRefs } from '@authup/client-web-kit';
-import { injectAuthupStore } from '../services';
+import { storeToRefs, useStore } from '@authup/client-web-kit';
 import type { EntitySocket, EntitySocketContext } from './type';
 import { injectSocketManager } from '../socket';
 
@@ -36,7 +35,7 @@ export function createEntitySocket<
 >(
     ctx: EntitySocketContext<A, T>,
 ) : EntitySocket {
-    const store = injectAuthupStore();
+    const store = useStore();
     const storeRefs = storeToRefs(store);
 
     const realmId = computed(() => {

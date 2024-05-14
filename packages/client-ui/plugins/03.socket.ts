@@ -5,10 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { useStore } from '@authup/client-web-kit';
 import { SocketManager } from '@privateaim/client-vue';
-import type { Pinia } from 'pinia';
 import { useRuntimeConfig } from '#imports';
-import { useAuthStore } from '../store/auth';
 
 declare module '#app' {
     interface NuxtApp {
@@ -49,7 +48,7 @@ export default defineNuxtPlugin((ctx) => {
         options: {
             transports,
         },
-        store: useAuthStore(ctx.$pinia as Pinia),
+        store: useStore(),
     });
 
     ctx.provide('socket', adapter);

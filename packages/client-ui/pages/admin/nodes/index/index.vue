@@ -5,6 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import {useAbilityCheck, useStore} from "@authup/client-web-kit";
 import { VCTimeago } from '@vuecs/timeago';
 import type { Node } from '@privateaim/core';
 import { PermissionID } from '@privateaim/core';
@@ -18,7 +19,6 @@ import {
 import { definePageMeta } from '#imports';
 import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
-import { useAuthStore } from '../../../../store/auth';
 
 export default defineNuxtComponent({
     components: {
@@ -55,13 +55,12 @@ export default defineNuxtComponent({
             },
         ];
 
-        const store = useAuthStore();
+        const store = useStore();
         const { realmManagementId } = storeToRefs(store);
 
-        const canView = computed(() => store.has(PermissionID.NODE_EDIT) ||
-                store.has(PermissionID.NODE_DROP));
-
-        const canDrop = computed(() => store.has(PermissionID.NODE_DROP));
+        const canEdit = useAbilityCheck(PermissionID.NODE_EDIT);
+        const canDrop = useAbilityCheck(PermissionID.NODE_DROP);
+        const canView = computed(() => canEdit.value || canDrop.value);
 
         const query = computed<BuildInput<Node>>(() => ({
             filters: {

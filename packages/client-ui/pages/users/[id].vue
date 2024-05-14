@@ -5,11 +5,12 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import {injectHTTPClient} from "@authup/client-web-kit";
 import type { User } from '@authup/core-kit';
 import { isClientErrorWithStatusCode } from 'hapic';
 import type { Ref } from 'vue';
 import { ref } from 'vue';
-import { definePageMeta, useAuthupAPI } from '#imports';
+import { definePageMeta } from '#imports';
 import {
     createError, defineNuxtComponent, navigateTo, useRoute,
 } from '#app';
@@ -27,7 +28,7 @@ export default defineNuxtComponent({
         const user = ref<null | User>(null) as Ref<User>;
 
         try {
-            user.value = await useAuthupAPI().user.getOne(useRoute().params.id as string);
+            user.value = await injectHTTPClient().user.getOne(useRoute().params.id as string);
         } catch (e) {
             if (isClientErrorWithStatusCode(e, 404)) {
                 navigateTo({

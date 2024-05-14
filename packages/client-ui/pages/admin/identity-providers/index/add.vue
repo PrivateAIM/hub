@@ -6,7 +6,7 @@
   -->
 
 <script lang="ts">
-import { AIdentityProviderOAuth2Form } from '@authup/client-web-kit';
+import {AIdentityProviderOAuth2Form, useStore} from '@authup/client-web-kit';
 import type { IdentityProvider } from '@authup/core-kit';
 import { IdentityProviderProtocol, PermissionName } from '@authup/core-kit';
 import { VCFormSelect } from '@vuecs/form-controls';
@@ -15,7 +15,6 @@ import { ref } from 'vue';
 import { defineNuxtComponent, navigateTo } from '#app';
 import { definePageMeta } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
-import { useAuthStore } from '../../../../store/auth';
 
 export default defineNuxtComponent({
     components: {
@@ -48,7 +47,7 @@ export default defineNuxtComponent({
             { id: IdentityProviderProtocol.LDAP, value: 'LDAP' },
         ];
 
-        const store = useAuthStore();
+        const store = useStore();
         const { realmManagementId } = storeToRefs(store);
 
         return {

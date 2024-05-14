@@ -4,6 +4,7 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
+import {useAbilityCheck, useStore} from "@authup/client-web-kit";
 import { VCTimeago } from '@vuecs/timeago';
 import type {
     PropType, VNode,
@@ -20,7 +21,7 @@ import {
 } from '@privateaim/core';
 import { VCLink } from '@vuecs/link';
 import {
-    EntityListSlotName, hasNormalizedSlot, injectAuthupStore, normalizeSlot,
+    EntityListSlotName, hasNormalizedSlot, normalizeSlot,
 } from '../../core';
 import EntityDelete from '../EntityDelete';
 import { FProject } from './FProject';
@@ -35,8 +36,8 @@ const FProjectItem = defineComponent({
     },
     emits: ['updated', 'failed', 'deleted'],
     setup(props, { slots, emit }) {
-        const store = injectAuthupStore();
-        const canDrop = computed(() => store.has(PermissionID.PROJECT_DROP));
+        const store = useStore();
+        const canDrop = useAbilityCheck(PermissionID.PROJECT_DROP);
 
         return () => h(FProject, {
             entity: props.entity,

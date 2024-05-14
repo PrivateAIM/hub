@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { useAbilityCheck } from '@authup/client-web-kit';
 import { VCTimeago } from '@vuecs/timeago';
 import type { PropType, VNodeArrayChildren, VNodeChild } from 'vue';
 import {
@@ -23,7 +24,6 @@ import FAnalysisNodesProgress from '../analysis-node/FAnalysisNodesProgress.vue'
 import TrainName from './FAnalysisName';
 import EntityDelete from '../EntityDelete';
 import type { EntityManagerSlotProps } from '../../core';
-import { injectAuthupStore } from '../../core';
 
 const FAnalysisItem = defineComponent({
     components: {
@@ -39,7 +39,6 @@ const FAnalysisItem = defineComponent({
     },
     emits: ['updated', 'deleted', 'failed', 'executed'],
     setup(props, { emit }) {
-        const store = injectAuthupStore();
         const extendedView = ref(false);
         const toggleView = () => {
             extendedView.value = !extendedView.value;
@@ -48,6 +47,8 @@ const FAnalysisItem = defineComponent({
         const handleExecuted = (component: string, command: string) => {
             emit('executed', component, command);
         };
+
+        const isAllowed = useAbilityCheck(PermissionID.ANALYSIS_DROP);
 
         return () => h(TrainEntity, {
             entity: props.entity,
@@ -68,7 +69,7 @@ const FAnalysisItem = defineComponent({
 
                 let deleteButton : VNodeArrayChildren = [];
 
-                if (store.has(PermissionID.ANALYSIS_DROP)) {
+                if (isAllowed.value) {
                     deleteButton = [
                         h(EntityDelete, {
                             withText: false,

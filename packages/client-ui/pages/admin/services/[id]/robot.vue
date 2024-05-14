@@ -5,7 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { ARobotForm } from '@authup/client-web-kit';
+import {ARobotForm, injectHTTPClient} from '@authup/client-web-kit';
 import type { Robot } from '@authup/core-kit';
 import type { ServiceID } from '@privateaim/core';
 import type { PropType, Ref } from 'vue';
@@ -15,7 +15,6 @@ import {
     defineNuxtComponent,
     navigateTo,
     updateObjectProperties,
-    useAuthupAPI,
     useToast,
 } from '#imports';
 
@@ -37,7 +36,7 @@ export default defineNuxtComponent({
         let entity : Ref<Robot>;
 
         try {
-            const response = await useAuthupAPI().robot.getMany({
+            const response = await injectHTTPClient().robot.getMany({
                 filter: {
                     name: refs.entityId.value,
                 },

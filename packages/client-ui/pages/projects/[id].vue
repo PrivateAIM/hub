@@ -5,6 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import { useAbilityCheck, useStore } from '@authup/client-web-kit';
 import type {
     Project,
     ProjectNode,
@@ -28,7 +29,6 @@ import {
 import DomainEntityNav from '../../components/DomainEntityNav';
 import { useCoreAPI } from '../../composables/api';
 import { LayoutKey, LayoutNavigationID } from '../../config/layout';
-import { useAuthStore } from '../../store/auth';
 
 export default defineNuxtComponent({
     components: { DomainEntityNav },
@@ -39,6 +39,10 @@ export default defineNuxtComponent({
         });
 
         const toast = useToast();
+        const route = useRoute();
+        const store = useStore();
+
+        const canEdit = useAbilityCheck(PermissionID.PROJECT_EDIT);
 
         const manager = createEntityManager<`${DomainType.PROJECT}`>({
             type: `${DomainType.PROJECT}`,
@@ -67,8 +71,6 @@ export default defineNuxtComponent({
             throw createError({});
         }
 
-        const store = useAuthStore();
-
         const projectNode : Ref<ProjectNode | null> = ref(null);
 
         if (manager.data.value.realm_id !== store.realmId) {
@@ -91,7 +93,6 @@ export default defineNuxtComponent({
 
         const isNodeAuthority = computed(() => !!projectNode.value);
 
-        const route = useRoute();
         const backLink = computed(() => {
             if (typeof route.query.refPath === 'string') {
                 return route.query.refPath;
@@ -112,7 +113,7 @@ export default defineNuxtComponent({
 
             if (
                 isProjectOwner.value &&
-                store.has(PermissionID.PROJECT_EDIT)
+                canEdit.value
             ) {
                 items.push({ name: 'Settings', icon: 'fa fa-cog', urlSuffix: '/settings' });
             }

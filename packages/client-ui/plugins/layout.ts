@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { useStore } from '@authup/client-web-kit';
 import type { StoreManagerOptions } from '@vuecs/core';
 import bootstrap from '@vuecs/preset-bootstrap-v5';
 import fontAwesome from '@vuecs/preset-font-awesome';
@@ -16,11 +17,9 @@ import installNavigation from '@vuecs/navigation';
 import installPagination from '@vuecs/pagination';
 import installTimeago from '@vuecs/timeago';
 
-import type { Pinia } from 'pinia';
 import { storeToRefs } from 'pinia';
 import { defineNuxtPlugin } from '#app';
 import { Navigation } from '../config/layout';
-import { useAuthStore } from '../store/auth';
 
 export default defineNuxtPlugin((ctx) => {
     const storeManagerOptions : StoreManagerOptions = {
@@ -51,13 +50,13 @@ export default defineNuxtPlugin((ctx) => {
     ctx.vueApp.use(installCountdown);
     ctx.vueApp.use(installFormControl);
 
-    const store = useAuthStore(ctx.$pinia as Pinia);
+    const store = useStore();
     const { loggedIn } = storeToRefs(store);
 
     ctx.vueApp.use(installNavigation, {
         provider: new Navigation({
             isLoggedIn: () => loggedIn.value,
-            hasPermission: (name) => store.has(name),
+            hasPermission: (name) => store.abilities.has(name),
         }),
     });
 
