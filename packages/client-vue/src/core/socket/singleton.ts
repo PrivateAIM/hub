@@ -5,25 +5,33 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { App } from 'vue';
-import { inject, provide } from 'vue';
-import type { SocketManager } from './module';
+import {App, hasInjectionContext} from 'vue';
+import { inject, provide } from '@authup/client-web-kit';
+import type { SocketClientManager } from './types';
 
 const SocketSymbol = Symbol.for('PSocket');
 
-export function provideSocketManager(manager: SocketManager, instance?: App) {
-    if (instance) {
-        instance.provide(SocketSymbol, manager);
-        return;
+export function isSocketManagerUsable() {
+    if (!hasInjectionContext()) {
+        return false;
     }
-    provide(SocketSymbol, manager);
+
+    const instance = inject(SocketSymbol);
+    return !!instance;
 }
 
-export function injectSocketManager() : SocketManager {
-    const manager = inject(SocketSymbol);
+export function provideSocketManager(
+    manager: SocketClientManager,
+    app?: App,
+) {
+    provide(SocketSymbol, manager, app);
+}
+
+export function injectSocketManager(app?: App) : SocketClientManager {
+    const manager = inject<SocketClientManager>(SocketSymbol, app);
     if (!manager) {
         throw new Error('The Socket Manager is not provided.');
     }
 
-    return manager as SocketManager;
+    return manager;
 }

@@ -34,6 +34,8 @@ export function buildDomainChannelName(type: DomainInput, id?: string | number) 
     return `${type}${id ? `:${id}` : ''}`;
 }
 
-export function buildDomainNamespaceName(id: string) {
-    return `/resources#${id}`;
+export function buildDomainNamespaceName(id?: string) {
+    return id ?
+        `/resources#${id}` :
+        '/resources';
 }

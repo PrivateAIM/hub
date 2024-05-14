@@ -11,6 +11,7 @@ import {
     buildDomainChannelName,
     buildDomainEventFullName,
     buildDomainEventSubscriptionFullName,
+    buildDomainNamespaceName,
 } from '@privateaim/core';
 import type {
     DomainEntity,
@@ -25,7 +26,7 @@ import {
 } from 'vue';
 import { storeToRefs, useStore } from '@authup/client-web-kit';
 import type { EntitySocket, EntitySocketContext } from './type';
-import { injectSocketManager } from '../socket';
+import { injectSocketManager, isSocketManagerUsable } from '../socket';
 
 type DT<T> = T extends DomainEntity<infer U> ? U extends `${DomainType}` ? U : never : never;
 
@@ -35,6 +36,18 @@ export function createEntitySocket<
 >(
     ctx: EntitySocketContext<A, T>,
 ) : EntitySocket {
+    if (!isSocketManagerUsable()) {
+        return {
+            mount() {
+
+            },
+            unmount() {
+
+            },
+        };
+    }
+
+    const socketManager = injectSocketManager();
     const store = useStore();
     const storeRefs = storeToRefs(store);
 
@@ -110,17 +123,15 @@ export function createEntitySocket<
         }
     };
 
-    const socketManager = injectSocketManager();
-    const useSocket = () => socketManager.forRealm(realmId.value);
     let mounted = false;
-    const mount = () => {
+    const mount = async () => {
         if ((ctx.target && !targetId.value) || mounted) {
             return;
         }
 
         mounted = true;
 
-        const socket = useSocket();
+        const socket = await socketManager.connect(buildDomainNamespaceName(realmId.value));
 
         let event : DomainEventSubscriptionFullName | undefined;
         if (ctx.buildSubscribeEventName) {
@@ -162,14 +173,14 @@ export function createEntitySocket<
         }
     };
 
-    const unmount = () => {
+    const unmount = async () => {
         if ((ctx.target && !targetId.value) || !mounted) {
             return;
         }
 
         mounted = false;
 
-        const socket = useSocket();
+        const socket = await socketManager.connect(buildDomainNamespaceName(realmId.value));
 
         let event : DomainEventSubscriptionFullName | undefined;
         if (ctx.buildUnsubscribeEventName) {
