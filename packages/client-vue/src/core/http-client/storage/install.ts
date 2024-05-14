@@ -8,10 +8,10 @@
 import { APIClient as Client } from '@privateaim/storage-kit';
 import type { App } from 'vue';
 import { setupBaseHTTPClient } from '../setup';
+import type { BaseHTTPClientInstallOptions } from '../types';
 import { isStorageHTTPClientUsable, provideStorageHTTPClient } from './singleton';
-import type { CoreHTTPClientInstallOptions } from './types';
 
-export function installStorageHTTPClient(app: App, options: CoreHTTPClientInstallOptions) {
+export function installStorageHTTPClient(app: App, options: BaseHTTPClientInstallOptions) {
     if (isStorageHTTPClientUsable(app)) {
         return;
     }

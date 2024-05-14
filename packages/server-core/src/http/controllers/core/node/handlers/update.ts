@@ -23,7 +23,7 @@ import { NodeEntity, RegistryProjectEntity } from '../../../../../domains';
 export async function updateNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
-    const ability = useRequestEnv(req, 'ability');
+    const ability = useRequestEnv(req, 'abilities');
     if (!ability.has(PermissionID.NODE_EDIT)) {
         throw new ForbiddenError();
     }

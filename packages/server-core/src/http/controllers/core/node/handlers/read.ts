@@ -50,7 +50,7 @@ async function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>,
             protectedFields.indexOf(field.key as any) !== -1);
 
     if (protectedSelected.length > 0) {
-        const ability = useRequestEnv(req, 'ability');
+        const ability = useRequestEnv(req, 'abilities');
 
         if (
             !ability.has(PermissionID.NODE_EDIT)

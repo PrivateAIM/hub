@@ -25,7 +25,7 @@ export function registerNodeSocketHandlers(socket: ResourcesNamespaceSocket) {
         buildDomainEventSubscriptionFullName(DomainType.NODE, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             if (
-                !socket.data.ability.has(PermissionID.NODE_EDIT)
+                !socket.data.abilities.has(PermissionID.NODE_EDIT)
             ) {
                 if (isSocketClientToServerEventErrorCallback(cb)) {
                     cb(new UnauthorizedError());

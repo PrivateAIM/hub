@@ -16,7 +16,7 @@ import { runProjectNodeValidation } from '../utils';
 import { useEnv } from '../../../../../config';
 
 export async function createProjectNodeRouteHandler(req: Request, res: Response) : Promise<any> {
-    const ability = useRequestEnv(req, 'ability');
+    const ability = useRequestEnv(req, 'abilities');
 
     if (
         !ability.has(PermissionID.PROJECT_EDIT) &&

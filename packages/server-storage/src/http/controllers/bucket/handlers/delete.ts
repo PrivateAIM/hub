@@ -35,7 +35,7 @@ export async function executeBucketRouteDeleteHandler(req: Request, res: Respons
 
     const actor = getActorFromRequest(req);
     if (!isBucketOwnedByActor(entity, actor)) {
-        const ability = useRequestEnv(req, 'ability');
+        const ability = useRequestEnv(req, 'abilities');
         if (!ability.has(PermissionID.BUCKET_DROP)) {
             throw new ForbiddenError();
         }

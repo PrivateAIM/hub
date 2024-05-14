@@ -30,8 +30,8 @@ export function registerProjectSocketHandlers(socket: ResourcesNamespaceSocket) 
         buildDomainEventSubscriptionFullName(DomainType.PROJECT, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             if (
-                !socket.data.ability.has(PermissionID.PROJECT_DROP) &&
-                !socket.data.ability.has(PermissionID.PROJECT_EDIT)
+                !socket.data.abilities.has(PermissionID.PROJECT_DROP) &&
+                !socket.data.abilities.has(PermissionID.PROJECT_EDIT)
             ) {
                 if (isSocketClientToServerEventErrorCallback(cb)) {
                     cb(new UnauthorizedError());

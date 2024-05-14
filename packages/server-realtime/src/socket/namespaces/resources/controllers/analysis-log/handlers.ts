@@ -29,7 +29,7 @@ export function registerAnalysisLogSocketHandlers(socket: ResourcesNamespaceSock
     socket.on(
         buildDomainEventSubscriptionFullName(DomainType.ANALYSIS_LOG, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
-            if (!socket.data.ability.has(PermissionID.ANALYSIS_EDIT)) {
+            if (!socket.data.abilities.has(PermissionID.ANALYSIS_EDIT)) {
                 if (isSocketClientToServerEventErrorCallback(cb)) {
                     cb(new UnauthorizedError());
                 }

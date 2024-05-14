@@ -15,7 +15,7 @@ import { ProjectEntity } from '../../../../../domains';
 import { runProjectValidation } from '../utils/validation';
 
 export async function createProjectRouteHandler(req: Request, res: Response) : Promise<any> {
-    const ability = useRequestEnv(req, 'ability');
+    const ability = useRequestEnv(req, 'abilities');
     if (!ability.has(PermissionID.PROJECT_ADD)) {
         throw new ForbiddenError();
     }

@@ -18,7 +18,7 @@ import { runRegistryProjectValidation } from '../utils';
 import { RegistryProjectEntity } from '../../../../../domains';
 
 export async function createRegistryProjectRouteHandler(req: Request, res: Response) : Promise<any> {
-    const ability = useRequestEnv(req, 'ability');
+    const ability = useRequestEnv(req, 'abilities');
     if (!ability.has(PermissionID.REGISTRY_PROJECT_MANAGE)) {
         throw new ForbiddenError();
     }

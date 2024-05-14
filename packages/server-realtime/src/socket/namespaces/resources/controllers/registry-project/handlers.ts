@@ -30,7 +30,7 @@ export function registerRegistryProjectSocketHandlers(socket: ResourcesNamespace
         buildDomainEventSubscriptionFullName(DomainType.REGISTRY_PROJECT, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             if (
-                !socket.data.ability.has(PermissionID.REGISTRY_MANAGE)
+                !socket.data.abilities.has(PermissionID.REGISTRY_MANAGE)
             ) {
                 if (isSocketClientToServerEventErrorCallback(cb)) {
                     cb(new UnauthorizedError());

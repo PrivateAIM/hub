@@ -28,7 +28,7 @@ export function registerAnalysisFileSocketHandlers(socket: ResourcesNamespaceSoc
     socket.on(
         buildDomainEventSubscriptionFullName(DomainType.ANALYSIS_FILE, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
-            if (!socket.data.ability.has(PermissionID.ANALYSIS_EDIT)) {
+            if (!socket.data.abilities.has(PermissionID.ANALYSIS_EDIT)) {
                 if (isSocketClientToServerEventErrorCallback(cb)) {
                     cb(new UnauthorizedError());
                 }

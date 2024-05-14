@@ -21,7 +21,7 @@ import { createNodeRobot, runNodeValidation } from '../utils';
 import { NodeEntity, RegistryEntity, RegistryProjectEntity } from '../../../../../domains';
 
 export async function createNodeRouteHandler(req: Request, res: Response) : Promise<any> {
-    const ability = useRequestEnv(req, 'ability');
+    const ability = useRequestEnv(req, 'abilities');
     if (!ability.has(PermissionID.NODE_ADD)) {
         throw new ForbiddenError();
     }

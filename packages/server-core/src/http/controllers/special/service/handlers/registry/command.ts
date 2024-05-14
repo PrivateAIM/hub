@@ -25,7 +25,7 @@ import { RegistryEntity, RegistryProjectEntity } from '../../../../../../domains
 import { runServiceRegistryValidation } from '../../utils/validation';
 
 export async function handleRegistryCommandRouteHandler(req: Request, res: Response) : Promise<any> {
-    const ability = useRequestEnv(req, 'ability');
+    const ability = useRequestEnv(req, 'abilities');
 
     if (!ability.has(PermissionID.REGISTRY_MANAGE)) {
         throw new ForbiddenError('You are not permitted to manage the registry.');

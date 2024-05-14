@@ -16,7 +16,7 @@ import { BucketEntity, getActorFromRequest } from '../../../../domains';
 import { runBucketValidation } from '../utils/validation';
 
 export async function executeBucketRouteCreateHandler(req: Request, res: Response) : Promise<any> {
-    const ability = useRequestEnv(req, 'ability');
+    const ability = useRequestEnv(req, 'abilities');
     if (!ability.has(PermissionID.BUCKET_ADD)) {
         throw new ForbiddenError();
     }

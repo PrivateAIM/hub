@@ -41,7 +41,7 @@ export async function executeBucketFileRouteDeleteHandler(req: Request, res: Res
         !isBucketOwnedByActor(entity.bucket, actor) &&
         !isBucketFileOwnedByActor(entity, actor)
     ) {
-        const ability = useRequestEnv(req, 'ability');
+        const ability = useRequestEnv(req, 'abilities');
         if (!ability.has(PermissionID.BUCKET_EDIT)) {
             throw new ForbiddenError();
         }

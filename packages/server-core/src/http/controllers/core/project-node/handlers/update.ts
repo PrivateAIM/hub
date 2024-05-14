@@ -26,7 +26,7 @@ export async function updateProjectNodeRouteHandler(req: Request, res: Response)
         throw new NotFoundError();
     }
 
-    const ability = useRequestEnv(req, 'ability');
+    const ability = useRequestEnv(req, 'abilities');
 
     const isAuthorityOfNode = isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.node_realm_id);
     const isAuthorizedForNode = ability.has(PermissionID.PROJECT_APPROVE);

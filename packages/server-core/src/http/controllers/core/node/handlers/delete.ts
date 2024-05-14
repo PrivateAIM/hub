@@ -21,7 +21,7 @@ import { deleteNodeRobot } from '../utils';
 export async function deleteNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
-    const ability = useRequestEnv(req, 'ability');
+    const ability = useRequestEnv(req, 'abilities');
     if (!ability.has(PermissionID.NODE_DROP)) {
         throw new ForbiddenError();
     }

@@ -18,7 +18,7 @@ import { runAnalysisValidation } from '../utils';
 import { AnalysisEntity, ProjectEntity } from '../../../../../domains';
 
 export async function createAnalysisRouteHandler(req: Request, res: Response) : Promise<any> {
-    const ability = useRequestEnv(req, 'ability');
+    const ability = useRequestEnv(req, 'abilities');
     if (!ability.has(PermissionID.ANALYSIS_ADD)) {
         throw new ForbiddenError();
     }

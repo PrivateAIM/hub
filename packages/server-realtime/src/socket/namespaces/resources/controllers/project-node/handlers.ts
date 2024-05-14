@@ -33,7 +33,7 @@ export function registerProjectNodeSocketHandlers(socket: ResourcesNamespaceSock
         buildDomainEventSubscriptionFullName(DomainType.PROJECT_NODE, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             if (
-                !socket.data.ability.has(PermissionID.PROJECT_APPROVE)
+                !socket.data.abilities.has(PermissionID.PROJECT_APPROVE)
             ) {
                 if (isSocketClientToServerEventErrorCallback(cb)) {
                     cb(new UnauthorizedError());
@@ -67,7 +67,7 @@ export function registerProjectNodeForRealmSocketHandlers(socket: ResourcesNames
         buildDomainEventSubscriptionFullName(DomainSubType.PROJECT_NODE_IN, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             if (
-                !socket.data.ability.has(PermissionID.PROJECT_APPROVE)
+                !socket.data.abilities.has(PermissionID.PROJECT_APPROVE)
             ) {
                 if (isSocketClientToServerEventErrorCallback(cb)) {
                     cb(new UnauthorizedError());
@@ -103,7 +103,7 @@ export function registerProjectNodeForRealmSocketHandlers(socket: ResourcesNames
         buildDomainEventSubscriptionFullName(DomainSubType.PROJECT_NODE_OUT, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             if (
-                !socket.data.ability.has(PermissionID.PROJECT_EDIT)
+                !socket.data.abilities.has(PermissionID.PROJECT_EDIT)
             ) {
                 if (isSocketClientToServerEventErrorCallback(cb)) {
                     cb(new UnauthorizedError());

@@ -28,9 +28,9 @@ export function registerAnalysisSocketHandlers(socket: ResourcesNamespaceSocket)
         buildDomainEventSubscriptionFullName(DomainType.ANALYSIS, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             if (
-                !socket.data.ability.has(PermissionID.ANALYSIS_EDIT) &&
-                !socket.data.ability.has(PermissionID.ANALYSIS_EXECUTION_START) &&
-                !socket.data.ability.has(PermissionID.ANALYSIS_EXECUTION_STOP)
+                !socket.data.abilities.has(PermissionID.ANALYSIS_EDIT) &&
+                !socket.data.abilities.has(PermissionID.ANALYSIS_EXECUTION_START) &&
+                !socket.data.abilities.has(PermissionID.ANALYSIS_EXECUTION_STOP)
             ) {
                 if (isSocketClientToServerEventErrorCallback(cb)) {
                     cb(new UnauthorizedError());

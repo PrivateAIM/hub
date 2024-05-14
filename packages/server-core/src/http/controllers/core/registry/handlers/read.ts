@@ -41,7 +41,7 @@ function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>) {
         .filter((field) => field.path === 'registry' &&
             protectedFields.indexOf(field.key as any) !== -1);
 
-    const ability = useRequestEnv(req, 'ability');
+    const ability = useRequestEnv(req, 'abilities');
     if (protectedSelected.length > 0) {
         if (
             !ability.has(PermissionID.REGISTRY_MANAGE)

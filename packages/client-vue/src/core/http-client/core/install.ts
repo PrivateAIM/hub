@@ -8,10 +8,10 @@
 import { APIClient as Client } from '@privateaim/core';
 import type { App } from 'vue';
 import { setupBaseHTTPClient } from '../setup';
+import type { BaseHTTPClientInstallOptions } from '../types';
 import { isCoreHTTPClientUsable, provideCoreHTTPClient } from './singleton';
-import type { CoreHTTPClientInstallOptions } from './types';
 
-export function installCoreHTTPClient(app: App, options: CoreHTTPClientInstallOptions) {
+export function installCoreHTTPClient(app: App, options: BaseHTTPClientInstallOptions) {
     if (isCoreHTTPClientUsable(app)) {
         return;
     }

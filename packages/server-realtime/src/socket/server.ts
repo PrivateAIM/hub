@@ -11,7 +11,7 @@ import { Server } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
 import type { TokenCreatorOptions } from '@authup/core-http-kit';
 import {
-    AbilityManager, OAuth2SubKind,
+    Abilities, OAuth2SubKind,
 } from '@authup/kit';
 import type { TokenVerifierCacheOptions } from '@authup/server-core-plugin-kit';
 import { createMiddleware } from '@authup/server-core-plugin-socket-io';
@@ -81,7 +81,7 @@ export function createSocketServer(context : SocketServerContext) : Server {
 
             socket.data.realmId = data.realm_id;
             socket.data.realmName = data.realm_name;
-            socket.data.ability = new AbilityManager(data.permissions);
+            socket.data.abilities = new Abilities(data.permissions);
         },
     });
 

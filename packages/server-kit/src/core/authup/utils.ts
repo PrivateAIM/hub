@@ -6,7 +6,7 @@
  */
 
 import type { Ability } from '@authup/kit';
-import { AbilityManager } from '@authup/kit';
+import { Abilities } from '@authup/kit';
 import { REALM_MASTER_NAME } from '@authup/core-kit';
 import type { TokenVerificationData } from '@authup/server-core-plugin-kit';
 import { PermissionID } from '@privateaim/core';
@@ -58,8 +58,8 @@ export function applyTokenVerificationData(
         abilities = data.permissions;
     }
 
-    const ability = new AbilityManager(abilities);
-    setRequestEnv(req, 'ability', ability);
+    const ability = new Abilities(abilities);
+    setRequestEnv(req, 'abilities', ability);
 
     setRequestEnv(req, 'realmId', data.realm_id);
     setRequestEnv(req, 'realmName', data.realm_name);

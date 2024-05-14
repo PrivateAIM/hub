@@ -17,7 +17,7 @@ import { useRequestEnv } from '../../../../request';
 export async function deleteProjectNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
-    const ability = useRequestEnv(req, 'ability');
+    const ability = useRequestEnv(req, 'abilities');
 
     if (
         !ability.has(PermissionID.PROJECT_EDIT) &&

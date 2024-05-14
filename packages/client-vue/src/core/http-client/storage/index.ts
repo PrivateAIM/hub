@@ -7,4 +7,3 @@
 
 export * from './install';
 export * from './singleton';
-export * from './types';

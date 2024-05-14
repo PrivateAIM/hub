@@ -18,7 +18,7 @@ import { useRequestEnv } from '../../../../request';
 export async function deleteAnalysisNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
-    const ability = useRequestEnv(req, 'ability');
+    const ability = useRequestEnv(req, 'abilities');
     if (
         !ability.has(PermissionID.ANALYSIS_EDIT) &&
         !ability.has(PermissionID.ANALYSIS_APPROVE)
