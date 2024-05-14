@@ -16,7 +16,7 @@ import {
 } from 'bootstrap-vue-next';
 import { storeToRefs } from 'pinia';
 import type { Ref } from 'vue';
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import {
     FPagination,
     FProjectInForm,
@@ -24,11 +24,10 @@ import {
     FProjectNodeApprovalStatus,
     FProjectNodes,
     FSearch,
-    FTitle,
+    FTitle, injectCoreHTTPClient,
 } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
 import { definePageMeta } from '#imports';
-import { useCoreAPI } from '../../../composables/api';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 
 export default defineNuxtComponent({
@@ -79,6 +78,7 @@ export default defineNuxtComponent({
             { key: 'options', label: '', tdClass: 'text-left' },
         ];
 
+        const api = injectCoreHTTPClient();
         const store = useStore();
         const { realmId } = storeToRefs(store);
 
@@ -87,7 +87,7 @@ export default defineNuxtComponent({
         const nodeId : Ref<string | null> = ref(null);
 
         try {
-            const response = await useCoreAPI().node.getMany({
+            const response = await api.node.getMany({
                 filter: {
                     realm_id: realmId.value,
                 },

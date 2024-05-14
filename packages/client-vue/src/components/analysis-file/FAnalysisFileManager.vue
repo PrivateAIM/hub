@@ -20,7 +20,7 @@ import {
     computed, defineComponent, ref,
 } from 'vue';
 import type { BuildInput } from 'rapiq';
-import { injectCoreAPIClient, injectStorageAPIClient, wrapFnWithBusyState } from '../../core';
+import { injectCoreHTTPClient, injectStorageHTTPClient, wrapFnWithBusyState } from '../../core';
 import FAnalysisFile from './FAnalysisFile.vue';
 import { FAnalysisFiles } from './FAnalysisFiles';
 import FAnalysisFormFile from './FAnalysisFormFile.vue';
@@ -44,8 +44,8 @@ export default defineComponent({
     },
     emits: ['created', 'updated', 'deleted', 'uploaded', 'failed', 'setEntrypointFile'],
     setup(props, { emit }) {
-        const coreClient = injectCoreAPIClient();
-        const storageClient = injectStorageAPIClient();
+        const coreClient = injectCoreHTTPClient();
+        const storageClient = injectStorageHTTPClient();
 
         const entrypointFile = ref(null) as Ref<AnalysisFile | null>;
         if (props.fileEntity) {

@@ -14,7 +14,7 @@ import {
     DomainType,
     PermissionID,
 } from '@privateaim/core';
-import { createEntityManager } from '@privateaim/client-vue';
+import {createEntityManager, injectCoreHTTPClient} from '@privateaim/client-vue';
 import type { Ref } from 'vue';
 import {
     computed, ref,
@@ -27,7 +27,6 @@ import {
     createError, defineNuxtComponent, navigateTo, useRoute,
 } from '#app';
 import DomainEntityNav from '../../components/DomainEntityNav';
-import { useCoreAPI } from '../../composables/api';
 import { LayoutKey, LayoutNavigationID } from '../../config/layout';
 
 export default defineNuxtComponent({
@@ -41,6 +40,7 @@ export default defineNuxtComponent({
         const toast = useToast();
         const route = useRoute();
         const store = useStore();
+        const api = injectCoreHTTPClient()
 
         const canEdit = useAbilityCheck(PermissionID.PROJECT_EDIT);
 
@@ -74,7 +74,7 @@ export default defineNuxtComponent({
         const projectNode : Ref<ProjectNode | null> = ref(null);
 
         if (manager.data.value.realm_id !== store.realmId) {
-            const response = await useCoreAPI().projectNode.getMany({
+            const response = await api.projectNode.getMany({
                 filter: {
                     project_id: manager.data.value.id,
                     node_realm_id: store.realmId,

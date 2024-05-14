@@ -20,7 +20,7 @@ import {
 } from 'vue';
 import type { PropType, VNodeChild } from 'vue';
 import {
-    createEntityManager, defineEntityManagerEvents, injectCoreAPIClient,
+    createEntityManager, defineEntityManagerEvents, injectCoreHTTPClient,
 } from '../../core';
 
 enum Direction {
@@ -53,7 +53,7 @@ export default defineComponent({
     },
     emits: defineEntityManagerEvents<AnalysisNode>(),
     async setup(props, setup) {
-        const apiClient = injectCoreAPIClient();
+        const apiClient = injectCoreHTTPClient();
         const manager = createEntityManager({
             realmId: (entity) => {
                 if (!entity) {

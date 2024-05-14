@@ -17,7 +17,7 @@ import {
     computed, defineComponent, h, reactive, ref, toRefs, watch,
 } from 'vue';
 import {
-    EntityListSlotName, injectCoreAPIClient, wrapFnWithBusyState,
+    EntityListSlotName, injectCoreHTTPClient, wrapFnWithBusyState,
 } from '../../core';
 import MasterImageGroupList from '../master-image-group/FMasterImageGroups';
 import MasterImageList from './FMasterImages';
@@ -33,7 +33,7 @@ export default defineComponent({
     emits: ['selected'],
     async setup(props, { emit }) {
         const refs = toRefs(props);
-        const apiClient = injectCoreAPIClient();
+        const apiClient = injectCoreHTTPClient();
 
         const busy = ref(false);
         const form = reactive({

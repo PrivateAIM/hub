@@ -14,7 +14,7 @@ import {
 } from 'vue';
 import {
     ActionCommandElementType,
-    injectCoreAPIClient,
+    injectCoreHTTPClient,
     renderActionCommand,
     wrapFnWithBusyState,
 } from '../../core';
@@ -45,7 +45,7 @@ const FAnalysisCommand = defineComponent({
     },
     emits: ['updated', 'executed', 'failed'],
     setup(props, { emit, slots }) {
-        const apiClient = injectCoreAPIClient();
+        const apiClient = injectCoreHTTPClient();
         const busy = ref(false);
 
         const entity = toRef(props, 'entity');

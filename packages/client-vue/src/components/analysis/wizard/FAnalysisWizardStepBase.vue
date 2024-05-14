@@ -14,7 +14,7 @@ import FProjectNodes from '../../project-node/FProjectNodes';
 import FMasterImagePicker from '../../master-image/FMasterImagePicker';
 import FAnalysisNodes from '../../analysis-node/FAnalysisNodes';
 import FAnalysisNodeAssignAction from '../../analysis-node/FAnalysisNodeAssignAction';
-import { injectCoreAPIClient } from '../../../core';
+import { injectCoreHTTPClient } from '../../../core';
 import { FPagination, FSearch } from '../../utility';
 
 export default defineComponent({
@@ -34,7 +34,7 @@ export default defineComponent({
     },
     emits: ['updated', 'failed'],
     setup(props, { emit }) {
-        const apiClient = injectCoreAPIClient();
+        const apiClient = injectCoreHTTPClient();
         const handleMasterImageSelected = async (item: MasterImage) => {
             try {
                 const response = await apiClient.analysis.update(props.entity.id, {

@@ -6,14 +6,11 @@
  */
 
 import type { StoreManagerOptions } from '@vuecs/list-controls/core';
-import type { APIClient as CoreAPIClient } from '@privateaim/core';
-import type { APIClient as StorageAPIClient } from '@privateaim/storage-kit';
 
 export type Options = {
-    realtimeURL?: string,
-
-    coreAPIClient?: CoreAPIClient,
-    storageAPIClient?: StorageAPIClient,
+    coreURL: string,
+    storageURL: string,
+    realtimeURL: string,
 
     components?: boolean | string[],
     storeManager?: StoreManagerOptions

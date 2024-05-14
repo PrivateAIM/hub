@@ -31,7 +31,7 @@ import {
     createEntityManager,
     defineEntityManagerEvents,
     initFormAttributesFromSource,
-    injectCoreAPIClient,
+    injectCoreHTTPClient,
     renderEntityAssignAction,
     wrapFnWithBusyState,
 } from '../../core';
@@ -49,7 +49,7 @@ const FProjectForm = defineComponent({
     },
     emits: defineEntityManagerEvents<Project>(),
     setup(props, setup) {
-        const apiClient = injectCoreAPIClient();
+        const apiClient = injectCoreHTTPClient();
         const busy = ref(false);
         const form = reactive({
             name: '',

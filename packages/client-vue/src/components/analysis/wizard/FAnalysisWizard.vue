@@ -17,7 +17,7 @@ import {
 } from 'vue';
 import type { Analysis, AnalysisFile } from '@privateaim/core';
 import { AnalysisConfigurationStatus, AnalysisFileType } from '@privateaim/core';
-import { initFormAttributesFromSource, injectCoreAPIClient } from '../../../core';
+import { initFormAttributesFromSource, injectCoreHTTPClient } from '../../../core';
 import FAnalysisWizardStepBase from './FAnalysisWizardStepBase.vue';
 import FAnalysisFileManager from '../../analysis-file/FAnalysisFileManager.vue';
 import FAnalysisWizardStepFinal from './FAnalysisWizardStepFinal.vue';
@@ -40,7 +40,7 @@ export default defineComponent({
     },
     emits: ['finished', 'failed', 'updated'],
     async setup(props, { emit }) {
-        const apiClient = injectCoreAPIClient();
+        const apiClient = injectCoreHTTPClient();
         const entity = toRef(props, 'entity');
 
         const entrypointFile = ref(null) as Ref<AnalysisFile | null>;

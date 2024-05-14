@@ -5,7 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {App, hasInjectionContext} from 'vue';
+import type { App } from 'vue';
+import { hasInjectionContext } from 'vue';
 import { inject, provide } from '@authup/client-web-kit';
 import type { SocketClientManager } from './types';
 

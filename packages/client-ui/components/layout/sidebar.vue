@@ -5,17 +5,20 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import {useStore} from "@authup/client-web-kit";
+import { useStore } from '@authup/client-web-kit';
+import { injectCoreHTTPClient } from '@privateaim/client-vue';
 import { VCCountdown } from '@vuecs/countdown';
 import { VCNavItems } from '@vuecs/navigation';
 import { storeToRefs } from 'pinia';
 import { defineNuxtComponent } from '#app';
-import { computed, useCoreAPI } from '#imports';
+import { computed } from '#imports';
 
 export default defineNuxtComponent({
     components: { VCCountdown, VCNavItems },
     setup() {
+        const api = injectCoreHTTPClient();
         const store = useStore();
+
         const { loggedIn, accessTokenExpireDate: tokenExpireDate, realmManagement } = storeToRefs(store);
 
         const tokenExpiresIn = computed(() => {
@@ -26,17 +29,9 @@ export default defineNuxtComponent({
             return tokenExpireDate.value.getTime() - Date.now();
         });
 
-        const docsURL = computed(() => {
-            const api = useCoreAPI();
+        const docsURL = computed(() => new URL('docs/', api.getBaseURL()).href);
 
-            return new URL('docs/', api.getBaseURL()).href;
-        });
-
-        const metricsURL = computed(() => {
-            const api = useCoreAPI();
-
-            return new URL('metrics', api.getBaseURL()).href;
-        });
+        const metricsURL = computed(() => new URL('metrics', api.getBaseURL()).href);
 
         return {
             loggedIn,

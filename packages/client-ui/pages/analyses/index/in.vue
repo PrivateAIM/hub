@@ -21,10 +21,10 @@ import {
     FAnalysisNodes,
     FPagination,
     FSearch,
-    FTitle,
+    FTitle, injectCoreHTTPClient,
 } from '@privateaim/client-vue';
-import { defineNuxtComponent, useRuntimeConfig } from '#app';
-import { definePageMeta, useCoreAPI } from '#imports';
+import { defineNuxtComponent } from '#app';
+import { definePageMeta } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 
 export default defineNuxtComponent({
@@ -72,6 +72,7 @@ export default defineNuxtComponent({
             { key: 'options', label: '', tdClass: 'text-left' },
         ];
 
+        const api = injectCoreHTTPClient();
         const store = useStore();
         const { realmId } = storeToRefs(store);
 
@@ -88,9 +89,7 @@ export default defineNuxtComponent({
         };
 
         const download = (item: AnalysisNode) => {
-            const app = useRuntimeConfig();
-
-            window.open(new URL(useCoreAPI().analysis.getFilesDownloadPath(item.analysis_id), app.public.coreApiUrl).href, '_blank');
+            window.open(api.analysis.getFileDownloadURL(item.analysis_id), '_blank');
         };
 
         const listNode = ref<null | typeof FAnalysisNodes>(null);

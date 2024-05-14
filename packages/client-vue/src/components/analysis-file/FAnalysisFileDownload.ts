@@ -8,7 +8,7 @@
 import type { AnalysisFile } from '@privateaim/core';
 import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
-import { ActionCommandElementType, injectStorageAPIClient, renderActionCommand } from '../../core';
+import { ActionCommandElementType, injectStorageHTTPClient, renderActionCommand } from '../../core';
 
 const FAnalysisFileDownload = defineComponent({
     props: {
@@ -30,7 +30,7 @@ const FAnalysisFileDownload = defineComponent({
         },
     },
     setup(props, { slots }) {
-        const storageClient = injectStorageAPIClient();
+        const storageClient = injectStorageHTTPClient();
 
         const execute = async () => {
             const url = storageClient.bucketFile.getStreamURL(props.entity.bucket_file_id);

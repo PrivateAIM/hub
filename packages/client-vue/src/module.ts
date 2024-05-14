@@ -8,23 +8,25 @@
 import { applyStoreManagerOptions, installStoreManager } from '@vuecs/list-controls/core';
 import type { App, Component } from 'vue';
 import * as components from './components';
-import { installSocketManager, provideCoreAPIClient, provideStorageAPIClient } from './core';
+import {
+    installCoreHTTPClient,
+    installSocketManager,
+    installStorageHTTPClient,
+} from './core';
 import type { Options } from './type';
 
 export function install(app: App, options: Options): void {
-    if (options.coreAPIClient) {
-        provideCoreAPIClient(options.coreAPIClient, app);
-    }
+    installCoreHTTPClient(app, {
+        baseURL: options.coreURL,
+    });
 
-    if (options.storageAPIClient) {
-        provideStorageAPIClient(options.storageAPIClient, app);
-    }
+    installStorageHTTPClient(app, {
+        baseURL: options.storageURL,
+    });
 
-    if (options.realtimeURL) {
-        installSocketManager(app, {
-            baseURL: options.realtimeURL,
-        });
-    }
+    installSocketManager(app, {
+        baseURL: options.realtimeURL,
+    });
 
     const storeManager = installStoreManager(app);
     if (options.storeManager) {

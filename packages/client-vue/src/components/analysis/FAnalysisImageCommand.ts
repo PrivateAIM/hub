@@ -10,7 +10,7 @@ import type { PropType } from 'vue';
 import {
     computed, defineComponent, h, ref, toRef, watch,
 } from 'vue';
-import { injectCoreAPIClient, wrapFnWithBusyState } from '../../core';
+import { injectCoreHTTPClient, wrapFnWithBusyState } from '../../core';
 
 export default defineComponent({
     props: {
@@ -32,7 +32,7 @@ export default defineComponent({
     },
     emits: ['failed'],
     async setup(props, { emit }) {
-        const apiClient = injectCoreAPIClient();
+        const apiClient = injectCoreHTTPClient();
 
         const analysisFileId = toRef(props, 'analysisFileId');
         const analysisFile = toRef(props, 'analysisFile');

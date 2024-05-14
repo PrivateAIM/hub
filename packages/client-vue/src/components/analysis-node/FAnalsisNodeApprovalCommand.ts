@@ -9,7 +9,7 @@ import { AnalysisNodeApprovalCommand, AnalysisNodeApprovalStatus, PermissionID }
 import type { PropType } from 'vue';
 import { computed, defineComponent, ref } from 'vue';
 import type { ActionCommandProperties } from '../../core';
-import { injectCoreAPIClient, renderActionCommand } from '../../core';
+import { injectCoreHTTPClient, renderActionCommand } from '../../core';
 
 export default defineComponent({
     props: {
@@ -38,7 +38,7 @@ export default defineComponent({
     },
     emits: ['failed', 'updated'],
     setup(props, setup) {
-        const apiClient = injectCoreAPIClient();
+        const apiClient = injectCoreHTTPClient();
         const busy = ref(false);
 
         const commandText = computed(() => {

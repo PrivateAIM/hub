@@ -27,10 +27,15 @@ export class AnalysisAPI extends BaseAPI {
         ).href;
     }
 
-    getFilesDownloadPath(
-        trainId: Analysis['id'],
-    ): string {
-        return `analyses/${trainId}/files/download`;
+    getFilesDownloadPath(id: Analysis['id']): string {
+        return `analyses/${id}/files/download`;
+    }
+
+    getFileDownloadURL(id: Analysis['id']) {
+        return new URL(
+            this.getFilesDownloadPath(id),
+            this.client.getBaseURL(),
+        ).href;
     }
 
     async getMany(

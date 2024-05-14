@@ -10,7 +10,7 @@ import {
     computed, defineComponent, h, ref, toRef, watch,
 } from 'vue';
 import {
-    hasNormalizedSlot, injectCoreAPIClient, normalizeSlot, wrapFnWithBusyState,
+    hasNormalizedSlot, injectCoreHTTPClient, normalizeSlot, wrapFnWithBusyState,
 } from '../../core';
 
 export default defineComponent({
@@ -30,7 +30,7 @@ export default defineComponent({
     },
     emits: ['updated', 'failed'],
     setup(props, { emit, slots }) {
-        const apiClient = injectCoreAPIClient();
+        const apiClient = injectCoreHTTPClient();
         const busy = ref(false);
         const name = ref('');
 

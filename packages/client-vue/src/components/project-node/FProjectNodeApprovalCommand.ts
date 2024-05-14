@@ -15,7 +15,7 @@ import {
     computed, defineComponent, ref,
 } from 'vue';
 import {
-    injectCoreAPIClient,
+    injectCoreHTTPClient,
     renderActionCommand,
     wrapFnWithBusyState,
 } from '../../core';
@@ -48,7 +48,7 @@ export default defineComponent({
     emits: ['failed', 'updated'],
     setup(props, { emit, slots }) {
         const busy = ref(false);
-        const apiClient = injectCoreAPIClient();
+        const apiClient = injectCoreHTTPClient();
 
         const commandText = computed(() => {
             switch (props.command) {

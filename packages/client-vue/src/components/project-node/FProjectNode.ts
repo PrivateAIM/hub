@@ -21,7 +21,7 @@ import type {
     PropType,
     VNodeChild,
 } from 'vue';
-import { createEntityManager, defineEntityManagerEvents, injectCoreAPIClient } from '../../core';
+import { createEntityManager, defineEntityManagerEvents, injectCoreHTTPClient } from '../../core';
 
 enum Direction {
     IN = 'in',
@@ -53,7 +53,7 @@ export default defineComponent({
     },
     emits: defineEntityManagerEvents<ProjectNode>(),
     async setup(props, setup) {
-        const apiClient = injectCoreAPIClient();
+        const apiClient = injectCoreHTTPClient();
         const manager = createEntityManager({
             realmId: (entity) => {
                 if (!entity) {
