@@ -5,7 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import {useStore} from "@authup/client-web-kit";
+import { useStore } from '@authup/client-web-kit';
 import type { Analysis } from '@privateaim/core';
 import { PermissionID } from '@privateaim/core';
 import { storeToRefs } from 'pinia';

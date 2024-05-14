@@ -11,9 +11,9 @@ import { storeToRefs } from 'pinia';
 import {
     FPagination, FProjectItem, FProjects, FSearch, FTitle,
 } from '@privateaim/client-vue';
+import { useStore } from '@authup/client-web-kit';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
 import { defineNuxtComponent, definePageMeta } from '#imports';
-import {useStore} from "@authup/client-web-kit";
 
 export default defineNuxtComponent({
     components: {

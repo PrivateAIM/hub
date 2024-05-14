@@ -4,13 +4,13 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import {useAbilityCheck, useStore} from "@authup/client-web-kit";
+import { useAbilityCheck } from '@authup/client-web-kit';
 import { VCTimeago } from '@vuecs/timeago';
 import type {
     PropType, VNode,
 } from 'vue';
 import {
-    computed, defineComponent, h,
+    defineComponent, h,
 } from 'vue';
 import type {
     Project,
@@ -36,7 +36,6 @@ const FProjectItem = defineComponent({
     },
     emits: ['updated', 'failed', 'deleted'],
     setup(props, { slots, emit }) {
-        const store = useStore();
         const canDrop = useAbilityCheck(PermissionID.PROJECT_DROP);
 
         return () => h(FProject, {

@@ -6,7 +6,7 @@
   -->
 
 <script lang="ts">
-import {injectHTTPClient, useStore} from "@authup/client-web-kit";
+import { injectHTTPClient, useStore } from '@authup/client-web-kit';
 import type { Realm } from '@authup/core-kit';
 import { PermissionName, isRealmResourceWritable } from '@authup/core-kit';
 import { storeToRefs } from 'pinia';
@@ -52,7 +52,6 @@ export default defineNuxtComponent({
             await navigateTo({ path: '/admin/realms' });
             throw createError({});
         }
-
 
         const { realmManagement } = storeToRefs(store);
 

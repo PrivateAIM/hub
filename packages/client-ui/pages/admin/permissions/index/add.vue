@@ -6,7 +6,7 @@
   -->
 
 <script lang="ts">
-import {APermissionForm, useStore} from '@authup/client-web-kit';
+import { APermissionForm } from '@authup/client-web-kit';
 import type { Permission } from '@authup/core-kit';
 import { PermissionName } from '@authup/core-kit';
 import { defineNuxtComponent, navigateTo } from '#app';

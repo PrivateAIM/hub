@@ -7,7 +7,7 @@
 
 <script lang="ts">
 
-import {AUserForm, useStore} from '@authup/client-web-kit';
+import { AUserForm, useStore } from '@authup/client-web-kit';
 import type { User } from '@authup/core-kit';
 import { storeToRefs } from 'pinia';
 import { definePageMeta, useToast } from '#imports';

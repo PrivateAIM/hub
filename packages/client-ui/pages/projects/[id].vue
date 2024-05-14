@@ -14,7 +14,7 @@ import {
     DomainType,
     PermissionID,
 } from '@privateaim/core';
-import {createEntityManager, injectCoreHTTPClient} from '@privateaim/client-vue';
+import { createEntityManager, injectCoreHTTPClient } from '@privateaim/client-vue';
 import type { Ref } from 'vue';
 import {
     computed, ref,
@@ -40,7 +40,7 @@ export default defineNuxtComponent({
         const toast = useToast();
         const route = useRoute();
         const store = useStore();
-        const api = injectCoreHTTPClient()
+        const api = injectCoreHTTPClient();
 
         const canEdit = useAbilityCheck(PermissionID.PROJECT_EDIT);
 

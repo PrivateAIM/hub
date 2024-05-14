@@ -5,7 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import {useAbilityCheck, useStore} from "@authup/client-web-kit";
+import { useAbilityCheck, useStore } from '@authup/client-web-kit';
 import { VCTimeago } from '@vuecs/timeago';
 import type { ProjectNode } from '@privateaim/core';
 import {

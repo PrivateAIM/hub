@@ -7,7 +7,7 @@
 
 <script lang="ts">
 
-import {injectHTTPClient, useStore} from "@authup/client-web-kit";
+import { injectHTTPClient, useStore } from '@authup/client-web-kit';
 import type { Role } from '@authup/core-kit';
 import { PermissionName, isRealmResourceWritable } from '@authup/core-kit';
 import { storeToRefs } from 'pinia';

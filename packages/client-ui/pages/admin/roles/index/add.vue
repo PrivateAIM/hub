@@ -6,7 +6,7 @@
   -->
 
 <script lang="ts">
-import {ARoleForm, useStore} from '@authup/client-web-kit';
+import { ARoleForm, useStore } from '@authup/client-web-kit';
 import type { Role } from '@authup/core-kit';
 import { PermissionName } from '@authup/core-kit';
 import { storeToRefs } from 'pinia';

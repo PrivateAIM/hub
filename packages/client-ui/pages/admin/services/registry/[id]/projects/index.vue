@@ -5,7 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import {useAbilityCheck, useStore} from "@authup/client-web-kit";
+import { useAbilityCheck } from '@authup/client-web-kit';
 import type { Registry, RegistryProject } from '@privateaim/core';
 import { PermissionID } from '@privateaim/core';
 import { BModal, BTable } from 'bootstrap-vue-next';

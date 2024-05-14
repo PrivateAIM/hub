@@ -5,7 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import {injectHTTPClient} from "@authup/client-web-kit";
+import { injectHTTPClient } from '@authup/client-web-kit';
 import type { User } from '@authup/core-kit';
 import { isClientErrorWithStatusCode } from 'hapic';
 import type { Ref } from 'vue';

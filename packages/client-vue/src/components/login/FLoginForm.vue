@@ -6,7 +6,7 @@
   -->
 
 <script lang="ts">
-import {useStore} from "@authup/client-web-kit";
+import { useStore } from '@authup/client-web-kit';
 import { IVuelidate } from '@ilingo/vuelidate';
 import useVuelidate from '@vuelidate/core';
 import { maxLength, minLength, required } from '@vuelidate/validators';

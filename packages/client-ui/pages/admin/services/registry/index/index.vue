@@ -5,13 +5,13 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import {useAbilityCheck, useStore} from "@authup/client-web-kit";
+import { useAbilityCheck } from '@authup/client-web-kit';
 import { VCTimeago } from '@vuecs/timeago';
 import type { Registry } from '@privateaim/core';
 import { PermissionID } from '@privateaim/core';
 import { BSpinner, BTable } from 'bootstrap-vue-next';
 import type { BuildInput } from 'rapiq';
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import {
     EntityDelete, FPagination, FSearch, FTitle, RegistryList,
 } from '@privateaim/client-vue';
@@ -55,8 +55,7 @@ export default defineNuxtComponent({
             },
         };
 
-        const store = useStore();
-        const canManage = computed(() => useAbilityCheck(PermissionID.REGISTRY_MANAGE));
+        const canManage = useAbilityCheck(PermissionID.REGISTRY_MANAGE);
 
         const registryNode = ref<typeof RegistryList | null>(null);
 

@@ -4,7 +4,7 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { useAbilityCheck, useStore } from '@authup/client-web-kit';
+import { useAbilityCheck } from '@authup/client-web-kit';
 import {
     PermissionID,
     ProjectNodeApprovalCommand,

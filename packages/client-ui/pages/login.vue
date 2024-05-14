@@ -5,7 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import {AIdentityProviders, injectHTTPClient} from '@authup/client-web-kit';
+import { AIdentityProviders, injectHTTPClient } from '@authup/client-web-kit';
 import {
     FPagination, FSearch, FTitle, LoginForm,
 } from '@privateaim/client-vue';
@@ -55,12 +55,10 @@ export default defineNuxtComponent({
             }
         };
 
-        const buildIdentityProviderURL = (id: string) => {
-            return apiClient.identityProvider.getAuthorizeUri(
-                apiClient.getBaseURL() as string,
-                id,
-            );
-        };
+        const buildIdentityProviderURL = (id: string) => apiClient.identityProvider.getAuthorizeUri(
+            apiClient.getBaseURL() as string,
+            id,
+        );
 
         return {
             handleDone,

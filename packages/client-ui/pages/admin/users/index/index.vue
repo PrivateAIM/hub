@@ -11,7 +11,9 @@ import type { User } from '@authup/core-kit';
 import {
     PermissionName, isRealmResourceWritable,
 } from '@authup/core-kit';
-import {AEntityDelete, AUsers, useAbilityCheck, useStore} from '@authup/client-web-kit';
+import {
+    AEntityDelete, AUsers, useAbilityCheck, useStore,
+} from '@authup/client-web-kit';
 import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
 import { FPagination, FSearch, FTitle } from '@privateaim/client-vue';

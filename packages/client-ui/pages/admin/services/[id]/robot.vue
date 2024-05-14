@@ -5,7 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import {ARobotForm, injectHTTPClient} from '@authup/client-web-kit';
+import { ARobotForm, injectHTTPClient } from '@authup/client-web-kit';
 import type { Robot } from '@authup/core-kit';
 import type { ServiceID } from '@privateaim/core';
 import type { PropType, Ref } from 'vue';
