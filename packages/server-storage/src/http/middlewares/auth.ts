@@ -10,7 +10,7 @@ import type { HandlerInterface } from '@routup/decorators';
 import type {
     Next, Request, Response,
 } from 'routup';
-import { useRequestEnv } from '../request';
+import { useRequestEnv } from '@privateaim/server-http-kit';
 
 export class ForceLoggedInMiddleware implements HandlerInterface {
     public run(request: Request, response: Response, next: Next) {

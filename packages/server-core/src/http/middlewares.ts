@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { mountAuthupMiddleware } from '@privateaim/server-kit';
+import { mountAuthupMiddleware } from '@privateaim/server-http-kit';
 import { basic } from '@routup/basic';
 import type { Router } from 'routup';
 import { EnvironmentName, useEnv } from '../config';

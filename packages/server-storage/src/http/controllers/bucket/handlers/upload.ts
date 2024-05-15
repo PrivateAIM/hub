@@ -12,9 +12,9 @@ import path from 'node:path';
 import { sendCreated, useRequestParam } from 'routup';
 import type { Request, Response } from 'routup';
 import { useDataSource } from 'typeorm-extension';
+import { useRequestEnv } from '@privateaim/server-http-kit';
 import { streamToBuffer, useMinio } from '../../../../core';
 import { BucketEntity, BucketFileEntity, getActorFromRequest } from '../../../../domains';
-import { useRequestEnv } from '../../../request';
 
 export async function uploadRequestFiles(req: Request, bucketName: string) {
     const minio = useMinio();

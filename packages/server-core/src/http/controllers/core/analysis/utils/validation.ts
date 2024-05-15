@@ -9,11 +9,11 @@ import { check } from 'express-validator';
 import { BadRequestError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/core-kit';
 import type { Request } from 'routup';
-import type { HTTPValidationResult } from '@privateaim/server-kit';
+import type { HTTPValidationResult } from '@privateaim/server-http-kit';
 import {
     createHTTPValidationResult,
     extendHTTPValidationResultWithRelation,
-} from '@privateaim/server-kit';
+} from '@privateaim/server-http-kit';
 import {
     MasterImageEntity, ProjectEntity, RegistryEntity,
 } from '../../../../../domains';

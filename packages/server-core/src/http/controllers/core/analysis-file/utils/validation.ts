@@ -8,11 +8,11 @@
 import { AnalysisFileType } from '@privateaim/core';
 import { check } from 'express-validator';
 import type { Request } from 'routup';
-import type { HTTPValidationResult } from '@privateaim/server-kit';
+import type { HTTPValidationResult } from '@privateaim/server-http-kit';
 import {
     createHTTPValidationResult,
     extendHTTPValidationResultWithRelation,
-} from '@privateaim/server-kit';
+} from '@privateaim/server-http-kit';
 import { AnalysisEntity } from '../../../../../domains';
 import type { AnalysisFileEntity } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
