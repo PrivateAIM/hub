@@ -1,6 +1,6 @@
 {
     "name": "@privateaim/server-analysis-manager",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "private": true,
     "author": {
         "name": "Peter Placzek",
@@ -24,9 +24,9 @@
         "@authup/core-http-kit": "^1.0.0-beta.13",
         "@ebec/http": "^2.3.0",
         "@hapic/harbor": "^2.3.3",
-        "@privateaim/core": "^0.3.0",
-        "@privateaim/server-kit": "^0.3.0",
-        "@privateaim/storage-kit": "^0.3.0",
+        "@privateaim/core": "^0.4.0",
+        "@privateaim/server-kit": "^0.4.0",
+        "@privateaim/storage-kit": "^0.4.0",
         "amqp-extension": "^3.3.0",
         "dockerode": "^4.0.2",
         "dotenv": "^16.4.5",

@@ -1,12 +1,12 @@
 {
-    ".": "0.3.0",
-    "packages/client-ui": "0.3.0",
-    "packages/client-vue": "0.3.0",
-    "packages/core": "0.3.0",
-    "packages/server-core": "0.3.0",
-    "packages/server-kit": "0.3.0",
-    "packages/server-realtime": "0.3.0",
-    "packages/server-analysis-manager": "0.3.0",
-    "packages/server-storage": "0.3.0",
-    "packages/storage-kit": "0.3.0"
+    ".": "0.4.0",
+    "packages/client-ui": "0.4.0",
+    "packages/client-vue": "0.4.0",
+    "packages/core": "0.4.0",
+    "packages/server-core": "0.4.0",
+    "packages/server-kit": "0.4.0",
+    "packages/server-realtime": "0.4.0",
+    "packages/server-analysis-manager": "0.4.0",
+    "packages/server-storage": "0.4.0",
+    "packages/storage-kit": "0.4.0"
 }

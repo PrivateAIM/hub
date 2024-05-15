@@ -1,6 +1,6 @@
 {
     "name": "@privateaim/server-realtime",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "private": true,
     "author": {
         "name": "Peter Placzek",
@@ -15,8 +15,8 @@
         "@authup/server-core-plugin-kit": "^1.0.0-beta.13",
         "@authup/server-core-plugin-socket-io": "^1.0.0-beta.13",
         "@ebec/http": "^2.3.0",
-        "@privateaim/core": "^0.3.0",
-        "@privateaim/server-kit": "^0.3.0",
+        "@privateaim/core": "^0.4.0",
+        "@privateaim/server-kit": "^0.4.0",
         "@socket.io/redis-adapter": "^8.3.0",
         "dotenv": "^16.4.5",
         "envix": "^1.3.0",
