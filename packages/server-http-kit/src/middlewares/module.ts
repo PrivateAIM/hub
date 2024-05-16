@@ -10,6 +10,7 @@ import { mountAuthupMiddleware } from '../services';
 import { boolableToObject } from '../utils';
 import { mountBasicMiddleware } from './basic';
 import { mountCorsMiddleware } from './cors';
+import { mountDecoratorsMiddleware } from './decorators';
 import { mountPrometheusMiddleware } from './prometheus';
 import { mountRateLimiterMiddleware } from './rate-limit';
 import { mountSwaggerMiddleware } from './swagger';
@@ -44,5 +45,9 @@ export function mountMiddlewares(router: Router, ctx: MiddlewareRegistrationCont
 
     if (ctx.swagger) {
         mountSwaggerMiddleware(router, boolableToObject(ctx.swagger));
+    }
+
+    if (ctx.decorators) {
+        mountDecoratorsMiddleware(router, ctx.decorators);
     }
 }
