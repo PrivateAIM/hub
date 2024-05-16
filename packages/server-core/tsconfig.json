@@ -8,6 +8,9 @@
             "@privateaim/server-kit": [
                 "./packages/server-kit/src"
             ],
+            "@privateaim/server-http-kit": [
+                "./packages/server-http-kit/src"
+            ],
             "@privateaim/server-analysis-manager": [
                 "./packages/server-analysis-manager/src"
             ]

@@ -6,8 +6,8 @@
  */
 
 import { RegistryAPICommand } from '@privateaim/core';
-import type { HTTPValidationResult } from '@privateaim/server-kit';
-import { createHTTPValidationResult } from '@privateaim/server-kit';
+import type { HTTPValidationResult } from '@privateaim/server-http-kit';
+import { createHTTPValidationResult } from '@privateaim/server-http-kit';
 import { check } from 'express-validator';
 import type { Request } from 'routup';
 

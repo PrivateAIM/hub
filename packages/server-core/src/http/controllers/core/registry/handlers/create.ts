@@ -10,9 +10,9 @@ import { ForbiddenError } from '@ebec/http';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { useRequestEnv } from '../../../../request';
+import { useRequestEnv } from '@privateaim/server-http-kit';
 import { runRegistryValidation } from '../utils';
-import { RegistryEntity } from '../../../../../domains/registry/entity';
+import { RegistryEntity } from '../../../../../domains';
 
 export async function createRegistryRouteHandler(req: Request, res: Response) : Promise<any> {
     const ability = useRequestEnv(req, 'abilities');

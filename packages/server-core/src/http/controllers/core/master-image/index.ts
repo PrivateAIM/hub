@@ -9,7 +9,7 @@ import type { MasterImage, MasterImageCommand } from '@privateaim/core';
 import {
     DBody, DController, DDelete, DGet, DPath, DPost, DRequest, DResponse, DTags,
 } from '@routup/decorators';
-import { ForceLoggedInMiddleware } from '../../../middleware';
+import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import {
     commandMasterImageRouteHandler,
     deleteMasterImageRouteHandler,

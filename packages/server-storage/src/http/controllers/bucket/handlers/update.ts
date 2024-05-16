@@ -12,9 +12,9 @@ import { isRealmResourceWritable } from '@authup/core-kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
+import { useRequestEnv } from '@privateaim/server-http-kit';
 import { useMinio } from '../../../../core';
 import { BucketEntity, getActorFromRequest, isBucketOwnedByActor } from '../../../../domains';
-import { useRequestEnv } from '../../../request';
 import { runBucketValidation } from '../utils/validation';
 
 export async function executeBucketRouteUpdateHandler(req: Request, res: Response) : Promise<any> {

@@ -6,7 +6,7 @@
  */
 
 import type { Request } from 'routup';
-import { useRequestEnv } from '../../http/request';
+import { useRequestEnv } from '@privateaim/server-http-kit';
 import { ActorType } from './constants';
 import type { Actor } from './type';
 

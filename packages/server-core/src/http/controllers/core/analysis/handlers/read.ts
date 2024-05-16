@@ -15,8 +15,8 @@ import {
     useDataSource,
 } from 'typeorm-extension';
 import { isRealmResourceReadable } from '@authup/core-kit';
+import { useRequestEnv } from '@privateaim/server-http-kit';
 import { AnalysisEntity, onlyRealmWritableQueryResources } from '../../../../../domains';
-import { useRequestEnv } from '../../../../request';
 
 export async function getOneAnalysisRouteHandler(req: Request, res: Response) : Promise<any> {
     const { include } = useRequestQuery(req);

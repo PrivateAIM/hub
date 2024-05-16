@@ -10,14 +10,14 @@ import { check } from 'express-validator';
 import { isRealmResourceWritable } from '@authup/core-kit';
 import { ForbiddenError } from '@ebec/http';
 import type { Request } from 'routup';
-import type { HTTPValidationResult } from '@privateaim/server-kit';
+import type { HTTPValidationResult } from '@privateaim/server-http-kit';
 import {
     createHTTPValidationResult,
     extendHTTPValidationResultWithRelation,
-} from '@privateaim/server-kit';
+    useRequestEnv,
+} from '@privateaim/server-http-kit';
 import { RegistryEntity } from '../../../../../domains';
 import type { NodeEntity } from '../../../../../domains';
-import { useRequestEnv } from '../../../../request';
 
 export async function runNodeValidation(
     req: Request,

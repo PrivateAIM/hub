@@ -11,7 +11,7 @@ import { REALM_MASTER_NAME } from '@authup/core-kit';
 import type { TokenVerificationData } from '@authup/server-core-plugin-kit';
 import { PermissionID } from '@privateaim/core';
 import type { Request } from 'routup';
-import { setRequestEnv } from 'routup';
+import { setRequestEnv } from '../../request';
 
 type TokenVerificationDataMinimal = Pick<
 TokenVerificationData,

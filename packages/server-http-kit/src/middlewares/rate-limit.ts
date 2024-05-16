@@ -11,7 +11,7 @@ import { rateLimit } from '@routup/rate-limit';
 import type { Request, Router } from 'routup';
 import { useRequestEnv } from '../request';
 
-export function registerRateLimiterMiddleware(router: Router) {
+export function mountRateLimiterMiddleware(router: Router) {
     const options : OptionsInput = {
         skip(req: Request) {
             const robot = useRequestEnv(req, 'robotId');

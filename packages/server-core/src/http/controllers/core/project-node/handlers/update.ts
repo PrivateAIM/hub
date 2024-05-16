@@ -11,8 +11,8 @@ import { PermissionID } from '@privateaim/core';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
+import { useRequestEnv } from '@privateaim/server-http-kit';
 import { ProjectNodeEntity } from '../../../../../domains';
-import { useRequestEnv } from '../../../../request';
 import { runProjectNodeValidation } from '../utils';
 
 export async function updateProjectNodeRouteHandler(req: Request, res: Response) : Promise<any> {

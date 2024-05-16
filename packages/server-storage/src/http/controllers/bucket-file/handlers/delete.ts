@@ -11,6 +11,7 @@ import { isRealmResourceWritable } from '@authup/core-kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
+import { useRequestEnv } from '@privateaim/server-http-kit';
 import { useMinio } from '../../../../core';
 import {
     BucketFileEntity,
@@ -18,7 +19,6 @@ import {
     isBucketFileOwnedByActor,
     isBucketOwnedByActor,
 } from '../../../../domains';
-import { useRequestEnv } from '../../../request';
 
 export async function executeBucketFileRouteDeleteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');

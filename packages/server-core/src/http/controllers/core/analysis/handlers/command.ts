@@ -8,7 +8,7 @@
 import { isRealmResourceWritable } from '@authup/core-kit';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { AnalysisAPICommand } from '@privateaim/core';
-import { HTTPValidationError } from '@privateaim/server-kit';
+import { HTTPValidationError, useRequestEnv } from '@privateaim/server-http-kit';
 import { check, matchedData, validationResult } from 'express-validator';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
@@ -20,7 +20,6 @@ import {
     startAnalysisBuild,
     stopAnalysisBuild, unlockAnalysisConfiguration,
 } from '../../../../../domains';
-import { useRequestEnv } from '../../../../request';
 
 /**
  * Execute a analysis command (start, stop, build).

@@ -10,8 +10,8 @@ import { isRealmResourceWritable } from '@authup/core-kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
+import { useRequestEnv } from '@privateaim/server-http-kit';
 import { AnalysisFileEntity } from '../../../../../domains';
-import { useRequestEnv } from '../../../../request';
 import { runAnalysisFileValidation } from '../utils';
 
 export async function updateAnalysisFileRouteHandler(req: Request, res: Response) : Promise<any> {

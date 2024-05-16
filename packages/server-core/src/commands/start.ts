@@ -5,19 +5,20 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { generateSwagger } from '@privateaim/server-http-kit';
+import path from 'node:path';
 import { DataSource } from 'typeorm';
 import {
     checkDatabase, createDatabase, setDataSource, synchronizeDatabaseSchema,
 } from 'typeorm-extension';
 import {
-    createConfig, getWritableDirPath, useEnv, useLogger,
+    createConfig, getRootDirPath, getWritableDirPath, useEnv, useLogger,
 } from '../config';
 import { setupAuthupService, setupHarborService } from '../core';
 import { buildDataSourceOptions } from '../database';
 import { syncMasterImages } from '../domains';
 import { createRouter } from '../http/router';
 import { createHttpServer } from '../http/server';
-import { generateSwaggerDocumentation } from '../http/swagger';
 
 export async function startCommand() {
     const config = createConfig();
@@ -33,7 +34,12 @@ export async function startCommand() {
 
     logger.info('Generating documentation...');
 
-    await generateSwaggerDocumentation();
+    await generateSwagger({
+        authupURL: useEnv('authupApiURL'),
+        baseURL: useEnv('publicURL'),
+        cwd: getRootDirPath(),
+        controllerBasePath: path.join(getRootDirPath(), 'src', 'http', 'controllers'),
+    });
 
     logger.info('Generated documentation.');
 

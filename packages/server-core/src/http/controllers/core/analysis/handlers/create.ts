@@ -12,8 +12,8 @@ import { CoreCommand, buildCoreQueuePayload } from '@privateaim/server-analysis-
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
+import { useRequestEnv } from '@privateaim/server-http-kit';
 import { hasAmqpClient, useAmqpClient } from '../../../../../core';
-import { useRequestEnv } from '../../../../request';
 import { runAnalysisValidation } from '../utils';
 import { AnalysisEntity, ProjectEntity } from '../../../../../domains';
 

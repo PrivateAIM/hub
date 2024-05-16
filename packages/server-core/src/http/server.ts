@@ -15,11 +15,7 @@ interface HttpServerContext {
     router: Router
 }
 
-export interface HttpServerInterface extends Server {
-
-}
-
-export function createHttpServer({ router } : HttpServerContext) : HttpServerInterface {
+export function createHttpServer({ router } : HttpServerContext) : Server {
     useLogger().debug('setup http server...', { service: 'http' });
 
     return new http.Server(createNodeDispatcher(router));

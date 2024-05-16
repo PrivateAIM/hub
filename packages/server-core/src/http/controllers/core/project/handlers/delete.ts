@@ -11,8 +11,8 @@ import { isRealmResourceWritable } from '@authup/core-kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { ProjectEntity } from '../../../../../domains/project/entity';
-import { useRequestEnv } from '../../../../request';
+import { useRequestEnv } from '@privateaim/server-http-kit';
+import { ProjectEntity } from '../../../../../domains';
 
 export async function deleteProjectRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');

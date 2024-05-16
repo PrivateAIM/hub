@@ -8,11 +8,11 @@
 import { check } from 'express-validator';
 import { RegistryProjectType } from '@privateaim/core';
 import type { Request } from 'routup';
-import type { HTTPValidationResult } from '@privateaim/server-kit';
+import type { HTTPValidationResult } from '@privateaim/server-http-kit';
 import {
     createHTTPValidationResult,
     extendHTTPValidationResultWithRelation,
-} from '@privateaim/server-kit';
+} from '@privateaim/server-http-kit';
 import type { RegistryProjectEntity } from '../../../../../domains';
 import { RegistryEntity } from '../../../../../domains';
 

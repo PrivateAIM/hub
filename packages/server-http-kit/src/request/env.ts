@@ -1,27 +1,13 @@
 /*
- * Copyright (c) 2022-2024.
+ * Copyright (c) 2024.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Abilities } from '@authup/kit';
 import { setRequestEnv as setEnv, useRequestEnv as useEnv } from 'routup';
 import type { Request } from 'routup';
-
-type RequestEnv = {
-    abilities?: Abilities,
-
-    realmId?: string,
-    realmName?: string,
-    realm?: { id?: string, name?: string },
-
-    userId?: string,
-    userName?: string,
-
-    robotId?: string,
-    robotName?: string
-};
+import type { RequestEnv } from './types';
 
 export function useRequestEnv(req: Request) : RequestEnv;
 export function useRequestEnv<T extends keyof RequestEnv>(req: Request, key: T) : RequestEnv[T];

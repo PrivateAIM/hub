@@ -11,15 +11,15 @@ import { BadRequestError, NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/core-kit';
 import type { Request } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import type { HTTPValidationResult } from '@privateaim/server-kit';
+import type { HTTPValidationResult } from '@privateaim/server-http-kit';
 import {
     buildHTTPValidationErrorMessage,
     createHTTPValidationResult,
     extendHTTPValidationResultWithRelation,
-} from '@privateaim/server-kit';
+    useRequestEnv,
+} from '@privateaim/server-http-kit';
 import { AnalysisEntity, NodeEntity, ProjectNodeEntity } from '../../../../../domains';
 import type { AnalysisNodeEntity } from '../../../../../domains';
-import { useRequestEnv } from '../../../../request';
 
 export async function runAnalysisNodeValidation(
     req: Request,
