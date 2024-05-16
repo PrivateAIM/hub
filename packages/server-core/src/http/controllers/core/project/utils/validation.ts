@@ -16,7 +16,7 @@ import {
 } from '@privateaim/server-http-kit';
 import { MasterImageEntity } from '../../../../../domains';
 import type { ProjectEntity } from '../../../../../domains';
-import { useRequestEnv } from '../../../../request';
+import { useRequestEnv } from '@privateaim/server-http-kit';
 
 export async function runProjectValidation(
     req: Request,

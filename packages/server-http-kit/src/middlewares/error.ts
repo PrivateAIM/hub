@@ -8,9 +8,9 @@
 import { isObject } from '@privateaim/core';
 import type { Router } from 'routup';
 import { errorHandler } from 'routup';
-import { useLogger } from '../../config';
+import { useLogger } from '@privateaim/server-kit';
 
-export function registerErrorHandler(router: Router) {
+export function mountErrorMiddleware(router: Router) {
     router.use(errorHandler((error, req, res) => {
         // catch and decorate some db errors :)
         switch (error.code) {

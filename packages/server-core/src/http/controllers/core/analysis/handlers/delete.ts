@@ -12,9 +12,9 @@ import { CoreCommand, buildCoreQueuePayload } from '@privateaim/server-analysis-
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
+import { useRequestEnv } from '@privateaim/server-http-kit';
 import { hasAmqpClient, useAmqpClient } from '../../../../../core';
 import { AnalysisEntity, ProjectEntity } from '../../../../../domains';
-import { useRequestEnv } from '../../../../request';
 
 export async function deleteAnalysisRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');

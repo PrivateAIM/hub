@@ -14,13 +14,13 @@ import {
 import type { Request, Response } from 'routup';
 import { sendAccepted } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { buildRegistryPayload } from '../../../../../../components/registry/utils/queue';
-import { hasAmqpClient, useAmqpClient } from '../../../../../../core';
-import { useRequestEnv } from '../../../../../request';
-import { useLogger } from '../../../../../../config';
+import { useRequestEnv } from '@privateaim/server-http-kit';
 import {
     RegistryCommand,
+    buildRegistryPayload,
 } from '../../../../../../components';
+import { hasAmqpClient, useAmqpClient } from '../../../../../../core';
+import { useLogger } from '../../../../../../config';
 import { RegistryEntity, RegistryProjectEntity } from '../../../../../../domains';
 import { runServiceRegistryValidation } from '../../utils/validation';
 

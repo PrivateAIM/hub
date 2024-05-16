@@ -10,10 +10,9 @@ import { ForbiddenError } from '@ebec/http';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { RegistryCommand } from '../../../../../components';
-import { buildRegistryPayload } from '../../../../../components/registry/utils/queue';
+import { useRequestEnv } from '@privateaim/server-http-kit';
+import { RegistryCommand, buildRegistryPayload } from '../../../../../components';
 import { hasAmqpClient, useAmqpClient } from '../../../../../core';
-import { useRequestEnv } from '../../../../request';
 import { runRegistryProjectValidation } from '../utils';
 import { RegistryProjectEntity } from '../../../../../domains';
 

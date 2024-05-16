@@ -16,7 +16,7 @@ import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { RegistryCommand, buildRegistryPayload } from '../../../../../components';
 import { hasAmqpClient, useAmqpClient } from '../../../../../core';
-import { useRequestEnv } from '../../../../request';
+import { useRequestEnv } from '@privateaim/server-http-kit';
 import { createNodeRobot, runNodeValidation } from '../utils';
 import { NodeEntity, RegistryEntity, RegistryProjectEntity } from '../../../../../domains';
 

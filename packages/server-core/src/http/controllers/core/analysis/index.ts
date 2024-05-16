@@ -12,6 +12,7 @@ import type {
 import {
     DBody, DController, DDelete, DGet, DPath, DPost, DRequest, DResponse, DTags,
 } from '@routup/decorators';
+import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import {
     createAnalysisRouteHandler,
     deleteAnalysisRouteHandler,
@@ -20,7 +21,6 @@ import {
     handleAnalysisCommandRouteHandler,
     updateAnalysisRouteHandler,
 } from './handlers';
-import { ForceLoggedInMiddleware } from '../../../middleware';
 
 type PartialAnalysis = Partial<Analysis>;
 

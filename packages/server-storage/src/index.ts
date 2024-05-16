@@ -5,12 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { generateSwagger } from '@privateaim/server-http-kit';
 import { config } from 'dotenv';
+import path from 'node:path';
+import process from 'node:process';
 import { configure, useEnv } from './config';
 import { setupDatabase } from './config/services';
 import {
     createHttpServer,
-    generateSwaggerDocumentation,
 } from './http';
 
 (async () => {
@@ -19,7 +21,11 @@ import {
     await setupDatabase();
     configure();
 
-    await generateSwaggerDocumentation();
+    await generateSwagger({
+        authupURL: useEnv('authupURL'),
+        baseURL: useEnv('publicURL'),
+        controllerBasePath: path.join(process.cwd(), 'src', 'http', 'controllers'),
+    });
 
     const httpServer = createHttpServer();
 

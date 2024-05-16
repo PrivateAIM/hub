@@ -13,8 +13,8 @@ import {
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceReadable } from '@authup/core-kit';
+import { useRequestEnv } from '@privateaim/server-http-kit';
 import { AnalysisFileEntity, onlyRealmWritableQueryResources } from '../../../../../domains';
-import { useRequestEnv } from '../../../../request';
 
 export async function getOneAnalysisFileRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');

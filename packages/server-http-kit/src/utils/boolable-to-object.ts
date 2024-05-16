@@ -5,8 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './auth';
-export * from './basic';
-export * from './cors';
-export * from './error';
-export * from './swagger';
+export function boolableToObject<T extends Record<string, any>>(input: T | boolean) : T {
+    if (typeof input === 'boolean') {
+        return {} as T;
+    }
+
+    return input;
+}

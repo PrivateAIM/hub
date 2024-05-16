@@ -21,7 +21,7 @@ import {
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { PermissionID } from '@privateaim/core';
-import { useRequestEnv } from '../../../../request';
+import { useRequestEnv } from '@privateaim/server-http-kit';
 import { RegistryProjectEntity, onlyRealmWritableQueryResources } from '../../../../../domains';
 
 function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>, fields: any) {

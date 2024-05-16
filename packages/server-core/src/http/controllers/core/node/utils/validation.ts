@@ -17,7 +17,7 @@ import {
 } from '@privateaim/server-http-kit';
 import { RegistryEntity } from '../../../../../domains';
 import type { NodeEntity } from '../../../../../domains';
-import { useRequestEnv } from '../../../../request';
+import { useRequestEnv } from '@privateaim/server-http-kit';
 
 export async function runNodeValidation(
     req: Request,

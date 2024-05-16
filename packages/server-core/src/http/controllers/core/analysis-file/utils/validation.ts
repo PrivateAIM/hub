@@ -15,7 +15,7 @@ import {
 } from '@privateaim/server-http-kit';
 import { AnalysisEntity } from '../../../../../domains';
 import type { AnalysisFileEntity } from '../../../../../domains';
-import { useRequestEnv } from '../../../../request';
+import { useRequestEnv } from '@privateaim/server-http-kit';
 
 export async function runAnalysisFileValidation(
     req: Request,

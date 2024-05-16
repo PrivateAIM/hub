@@ -18,8 +18,8 @@ import {
     applyFilters, applyPagination, applyQueryFieldsParseOutput, applyRelations, useDataSource,
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
+import { useRequestEnv } from '@privateaim/server-http-kit';
 import { NodeEntity, onlyRealmWritableQueryResources } from '../../../../../domains';
-import { useRequestEnv } from '../../../../request';
 
 async function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>, fields: any) {
     const protectedFields : ParseAllowedOption<NodeEntity> = [

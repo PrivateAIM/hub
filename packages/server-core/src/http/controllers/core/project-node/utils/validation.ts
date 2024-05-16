@@ -17,7 +17,7 @@ import {
 } from '@privateaim/server-http-kit';
 import type { ProjectNodeEntity } from '../../../../../domains';
 import { NodeEntity, ProjectEntity } from '../../../../../domains';
-import { useRequestEnv } from '../../../../request';
+import { useRequestEnv } from '@privateaim/server-http-kit';
 
 export async function runProjectNodeValidation(
     req: Request,

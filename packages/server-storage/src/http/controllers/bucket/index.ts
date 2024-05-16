@@ -9,8 +9,8 @@ import type { Bucket } from '@privateaim/storage-kit';
 import {
     DBody, DController, DDelete, DGet, DPath, DPost, DRequest, DResponse, DTags,
 } from '@routup/decorators';
+import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { BucketFileEntity } from '../../../domains';
-import { ForceLoggedInMiddleware } from '../../middlewares';
 import {
     executeBucketRouteCreateHandler,
     executeBucketRouteDeleteHandler,

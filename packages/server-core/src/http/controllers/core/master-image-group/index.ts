@@ -10,7 +10,7 @@ import type { MasterImageGroup } from '@privateaim/core';
 import {
     DController, DDelete, DGet, DPath, DRequest, DResponse, DTags,
 } from '@routup/decorators';
-import { ForceLoggedInMiddleware } from '../../../middleware';
+import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import {
     deleteMasterImageGroupRouteHandler,
     getManyMasterImageGroupRouteHandler,

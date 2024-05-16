@@ -10,8 +10,8 @@ import { ForbiddenError, NotFoundError } from '@ebec/http';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { useRequestEnv } from '../../../../request';
-import { RegistryEntity } from '../../../../../domains/registry/entity';
+import { useRequestEnv } from '@privateaim/server-http-kit';
+import { RegistryEntity } from '../../../../../domains';
 
 export async function deleteRegistryRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');

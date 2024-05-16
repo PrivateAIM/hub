@@ -16,7 +16,7 @@ import {
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceReadable } from '@authup/core-kit';
 import { ProjectNodeEntity, onlyRealmWritableQueryResources } from '../../../../../domains';
-import { useRequestEnv } from '../../../../request';
+import { useRequestEnv } from '@privateaim/server-http-kit';
 
 export async function getOneProjectNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');

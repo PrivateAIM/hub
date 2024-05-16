@@ -13,8 +13,8 @@ import {
 
 import { NotFoundError } from '@ebec/http';
 import { Request, Response, useRequestParam } from 'routup';
+import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import { RegistryHook } from '../../../../components';
-import { ForceLoggedInMiddleware } from '../../../middleware';
 import { postHarborHookRouteHandler } from './handlers/registry/hook';
 import { handleRegistryCommandRouteHandler } from './handlers/registry/command';
 

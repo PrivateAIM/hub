@@ -5,90 +5,59 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { mountAuthupMiddleware } from '@privateaim/server-http-kit';
-import { decorators } from '@routup/decorators';
+import type { MiddlewareSwaggerOptions } from '@privateaim/server-http-kit';
 import {
-    useRequestBody,
-} from '@routup/basic/body';
-import {
-    useRequestCookie,
-    useRequestCookies,
-} from '@routup/basic/cookie';
-import {
-    useRequestQuery,
-} from '@routup/basic/query';
-
+    mountErrorMiddleware,
+    mountMiddlewares,
+} from '@privateaim/server-http-kit';
 import { Router, coreHandler } from 'routup';
 import { EnvironmentName, useEnv } from '../config';
 import {
     hasAuthupClient, hasRedis, hasVaultClient, useAuthupClient, useRedis, useVaultClient,
 } from '../core';
-import {
-    mountBasicMiddleware,
-    mountCorsMiddleware,
-    mountErrorMiddleware,
-    mountSwaggerMiddleware,
-} from './middlewares';
 import { BucketController, BucketFileController } from './controllers';
 
 export function createHTTPRouter() : Router {
     const router = new Router();
 
-    mountCorsMiddleware(router);
-    mountBasicMiddleware(router);
+    let swagger : MiddlewareSwaggerOptions | boolean;
+    if (useEnv('env') !== EnvironmentName.TEST) {
+        swagger = {
+            baseURL: useEnv('publicURL'),
+        };
+    } else {
+        swagger = false;
+    }
 
-    mountAuthupMiddleware(router, {
-        client: hasAuthupClient() ?
-            useAuthupClient() :
-            undefined,
-        vaultClient: hasVaultClient() ?
-            useVaultClient() :
-            undefined,
-        redisClient: hasRedis() ?
-            useRedis() :
-            undefined,
-        fakeAbilities: useEnv('env') === EnvironmentName.TEST,
+    mountMiddlewares(router, {
+        basic: true,
+        cors: true,
+        authup: {
+            client: hasAuthupClient() ?
+                useAuthupClient() :
+                undefined,
+            vaultClient: hasVaultClient() ?
+                useVaultClient() :
+                undefined,
+            redisClient: hasRedis() ?
+                useRedis() :
+                undefined,
+            fakeAbilities: useEnv('env') === EnvironmentName.TEST,
+        },
+        swagger,
+        decorators: {
+            controllers: [
+                BucketController,
+                BucketFileController,
+            ],
+        },
     });
 
-    if (useEnv('env') !== EnvironmentName.TEST) {
-        mountSwaggerMiddleware(router);
-    }
+    mountErrorMiddleware(router);
 
     router.get('/', coreHandler(() => ({
         timestamp: Date.now(),
     })));
-
-    router.use(decorators({
-        controllers: [
-            BucketController,
-            BucketFileController,
-        ],
-        parameter: {
-            body: (context, name) => {
-                if (name) {
-                    return useRequestBody(context.request, name);
-                }
-
-                return useRequestBody(context.request);
-            },
-            cookie: (context, name) => {
-                if (name) {
-                    return useRequestCookie(context.request, name);
-                }
-
-                return useRequestCookies(context.request);
-            },
-            query: (context, name) => {
-                if (name) {
-                    return useRequestQuery(context.request, name);
-                }
-
-                return useRequestQuery(context.request);
-            },
-        },
-    }));
-
-    mountErrorMiddleware(router);
 
     return router;
 }

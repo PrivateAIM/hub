@@ -11,8 +11,8 @@ import { PermissionID } from '@privateaim/core';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { AnalysisNodeEntity } from '../../../../../domains/anaylsis-node/entity';
-import { useRequestEnv } from '../../../../request';
+import { useRequestEnv } from '@privateaim/server-http-kit';
+import { AnalysisNodeEntity } from '../../../../../domains';
 import { runAnalysisNodeValidation } from '../utils';
 
 export async function updateAnalysisNodeRouteHandler(req: Request, res: Response) : Promise<any> {

@@ -8,6 +8,6 @@
 import { prometheus } from '@routup/prometheus';
 import type { Router } from 'routup';
 
-export function registerPrometheusMiddleware(router: Router) {
+export function mountPrometheusMiddleware(router: Router) {
     router.use(prometheus());
 }

@@ -10,11 +10,11 @@ import { swaggerUI } from '@routup/swagger';
 import { loadSync } from 'locter';
 import process from 'node:process';
 import type { Router } from 'routup';
-import { useEnv } from '../../config';
+import type { MiddlewareSwaggerOptions } from './types';
 
-export function mountSwaggerMiddleware(router: Router) {
-    const document = loadSync(path.join(process.cwd(), 'writable', 'swagger.json'));
+export function mountSwaggerMiddleware(router: Router, options: MiddlewareSwaggerOptions) {
+    const document = loadSync(path.join(options.cwd || process.cwd(), 'swagger.json'));
     router.use('/docs', swaggerUI(document, {
-        baseURL: useEnv('publicURL'),
+        baseURL: options.baseURL,
     }));
 }

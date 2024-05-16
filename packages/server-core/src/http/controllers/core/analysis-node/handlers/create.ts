@@ -10,9 +10,9 @@ import { AnalysisNodeApprovalStatus, NodeType, PermissionID } from '@privateaim/
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
+import { useRequestEnv } from '@privateaim/server-http-kit';
 import { useEnv } from '../../../../../config';
 import { AnalysisEntity, AnalysisNodeEntity } from '../../../../../domains';
-import { useRequestEnv } from '../../../../request';
 import { runAnalysisNodeValidation } from '../utils';
 
 export async function createAnalysisNodeRouteHandler(req: Request, res: Response) : Promise<any> {

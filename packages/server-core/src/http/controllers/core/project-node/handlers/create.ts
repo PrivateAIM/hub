@@ -10,8 +10,8 @@ import { ForbiddenError } from '@ebec/http';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
+import { useRequestEnv } from '@privateaim/server-http-kit';
 import { ProjectNodeEntity } from '../../../../../domains';
-import { useRequestEnv } from '../../../../request';
 import { runProjectNodeValidation } from '../utils';
 import { useEnv } from '../../../../../config';
 

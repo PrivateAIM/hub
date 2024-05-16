@@ -5,17 +5,87 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { mountErrorMiddleware, mountMiddlewares } from '@privateaim/server-http-kit';
+import type { MiddlewareSwaggerOptions } from '@privateaim/server-http-kit';
 import { Router } from 'routup';
-import { registerMiddlewares } from './middlewares';
-import { registerControllers } from './routes';
-import { registerErrorHandler } from './middleware';
+import { EnvironmentName, useEnv } from '../config';
+
+import {
+    hasAuthupClient,
+    hasRedisClient,
+    hasVaultClient,
+    useAuthupClient,
+    useRedisClient,
+    useVaultClient,
+} from '../core';
+import { AnalysisController } from './controllers/core/analysis';
+import { AnalysisFileController } from './controllers/core/analysis-file';
+import { AnalysisLogController } from './controllers/core/analysis-log';
+import { AnalysisNodeController } from './controllers/core/analysis-node';
+import { MasterImageController } from './controllers/core/master-image';
+import { MasterImageGroupController } from './controllers/core/master-image-group';
+import { NodeController } from './controllers/core/node';
+import { ProposalController } from './controllers/core/project';
+import { ProposalStationController } from './controllers/core/project-node';
+import { RegistryController } from './controllers/core/registry';
+import { RegistryProjectController } from './controllers/core/registry-project';
+import { RootController } from './controllers/core/root';
+import { ServiceController } from './controllers/special/service';
 
 export function createRouter() : Router {
     const router = new Router();
 
-    registerMiddlewares(router);
-    registerControllers(router);
-    registerErrorHandler(router);
+    let swagger : MiddlewareSwaggerOptions | boolean;
+    if (useEnv('env') !== EnvironmentName.TEST) {
+        swagger = {
+            baseURL: useEnv('publicURL'),
+        };
+    } else {
+        swagger = false;
+    }
+
+    mountMiddlewares(router, {
+        basic: true,
+        cors: true,
+        prometheus: true, // not in test env
+        rateLimit: true, // not in test env
+        authup: {
+            client: hasAuthupClient() ?
+                useAuthupClient() :
+                undefined,
+            vaultClient: hasVaultClient() ?
+                useVaultClient() :
+                undefined,
+            redisClient: hasRedisClient() ?
+                useRedisClient() :
+                undefined,
+            fakeAbilities: useEnv('env') === EnvironmentName.TEST,
+        },
+        swagger,
+        decorators: {
+            controllers: [
+                // Core
+                MasterImageController,
+                MasterImageGroupController,
+                ProposalController,
+                ProposalStationController,
+                RegistryController,
+                RegistryProjectController,
+                NodeController,
+                AnalysisController,
+                AnalysisFileController,
+                AnalysisLogController,
+                AnalysisNodeController,
+
+                RootController,
+
+                // Extra
+                ServiceController,
+            ],
+        },
+    });
+
+    mountErrorMiddleware(router);
 
     return router;
 }
