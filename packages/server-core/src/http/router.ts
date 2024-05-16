@@ -35,8 +35,10 @@ import { ServiceController } from './controllers/special/service';
 export function createRouter() : Router {
     const router = new Router();
 
+    const isTestEnvironment = useEnv('env') === EnvironmentName.TEST;
+
     let swagger : MiddlewareSwaggerOptions | boolean;
-    if (useEnv('env') !== EnvironmentName.TEST) {
+    if (!isTestEnvironment) {
         swagger = {
             baseURL: useEnv('publicURL'),
         };
@@ -47,8 +49,8 @@ export function createRouter() : Router {
     mountMiddlewares(router, {
         basic: true,
         cors: true,
-        prometheus: true, // not in test env
-        rateLimit: true, // not in test env
+        prometheus: !isTestEnvironment,
+        rateLimit: !isTestEnvironment,
         authup: {
             client: hasAuthupClient() ?
                 useAuthupClient() :
@@ -59,7 +61,7 @@ export function createRouter() : Router {
             redisClient: hasRedisClient() ?
                 useRedisClient() :
                 undefined,
-            fakeAbilities: useEnv('env') === EnvironmentName.TEST,
+            fakeAbilities: isTestEnvironment,
         },
         swagger,
         decorators: {

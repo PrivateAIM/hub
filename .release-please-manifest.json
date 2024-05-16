@@ -4,6 +4,7 @@
     "packages/client-vue": "0.4.0",
     "packages/core": "0.4.0",
     "packages/server-core": "0.4.0",
+    "packages/server-http-kit": "0.4.0",
     "packages/server-kit": "0.4.0",
     "packages/server-realtime": "0.4.0",
     "packages/server-analysis-manager": "0.4.0",
