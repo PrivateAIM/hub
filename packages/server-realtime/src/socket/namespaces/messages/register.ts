@@ -6,12 +6,12 @@
  */
 
 import type { SocketMessagesNamespaceMessageParty } from '@privateaim/core';
-import { buildConnectionRobotRoom, buildConnectionUserRoom, registerConnectionController } from '../../controllers';
+import { buildConnectionRobotRoom, buildConnectionUserRoom, mountConnectionController } from '@privateaim/server-realtime-kit';
 import type { MessagesNamespace, MessagesNamespaceSocket } from './types';
 
 export function registerMessagesNamespaceControllers(nsp: MessagesNamespace) {
     nsp.on('connection', (socket: MessagesNamespaceSocket) => {
-        registerConnectionController(socket);
+        mountConnectionController(socket);
 
         socket.on('send', (data) => {
             if (!socket.data.userId && !socket.data.robotId) {

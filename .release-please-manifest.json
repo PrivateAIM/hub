@@ -7,6 +7,7 @@
     "packages/server-http-kit": "0.4.0",
     "packages/server-kit": "0.4.0",
     "packages/server-realtime": "0.4.0",
+    "packages/server-realtime-kit": "0.4.0",
     "packages/server-analysis-manager": "0.4.0",
     "packages/server-storage": "0.4.0",
     "packages/storage-kit": "0.4.0"

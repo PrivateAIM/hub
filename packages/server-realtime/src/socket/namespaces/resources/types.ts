@@ -7,7 +7,7 @@
 
 import type { SocketResourcesNamespaceCTSEvents, SocketResourcesNamespaceSTCEvents, SocketSTSEvents } from '@privateaim/core';
 import type { Namespace, Socket } from 'socket.io';
-import type { SocketData } from '../../types';
+import type { SocketData } from '@privateaim/server-realtime-kit';
 
 export type ResourcesNamespace = Namespace<
 SocketResourcesNamespaceCTSEvents,

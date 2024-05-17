@@ -15,8 +15,11 @@ import {
     isSocketClientToServerEventErrorCallback,
 } from '@privateaim/core';
 import { UnauthorizedError } from '@ebec/http';
+import {
+    subscribeSocketRoom,
+    unsubscribeSocketRoom,
+} from '@privateaim/server-realtime-kit';
 import type { ResourcesNamespaceSocket } from '../../types';
-import { subscribeSocketRoom, unsubscribeSocketRoom } from '../../../../utils';
 
 export function registerNodeSocketHandlers(socket: ResourcesNamespaceSocket) {
     if (!socket.data.userId && !socket.data.robotId) return;

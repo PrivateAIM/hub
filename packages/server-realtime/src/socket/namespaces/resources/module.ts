@@ -7,19 +7,20 @@
 
 import { REALM_MASTER_NAME } from '@authup/core-kit';
 import { ForbiddenError, UnauthorizedError } from '@ebec/http';
+import type { Socket } from '@privateaim/server-realtime-kit';
 import { useLogger } from '../../../core';
-import type { SocketBase, SocketNamespaceContext } from '../../types';
+import type { SocketNamespaceContext } from '../../types';
 import { registerResourcesNamespaceControllers } from './register';
 
-export function registerResourcesNamespaces({ server, authMiddleware } : SocketNamespaceContext) {
+export function registerResourcesNamespaces({ server, authupMiddleware } : SocketNamespaceContext) {
     const nsp = server.of(/^\/resources(?:#[a-z0-9A-Z-_]+)?$/);
     nsp.use((socket, next) => {
         useLogger().info(`${socket.nsp.name}: ${socket.id} connected.`);
         next();
     });
-    nsp.use(authMiddleware);
+    nsp.use(authupMiddleware);
 
-    nsp.use((socket: SocketBase, next) => {
+    nsp.use((socket: Socket, next) => {
         if (!socket.data.userId && !socket.data.robotId) {
             useLogger().error('Socket is not authenticated.');
 

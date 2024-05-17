@@ -15,13 +15,13 @@ import {
     isSocketClientToServerEventErrorCallback,
 } from '@privateaim/core';
 import { UnauthorizedError } from '@ebec/http';
-import type {
-    ResourcesNamespaceSocket,
-} from '../../types';
 import {
     subscribeSocketRoom,
     unsubscribeSocketRoom,
-} from '../../../../utils';
+} from '@privateaim/server-realtime-kit';
+import type {
+    ResourcesNamespaceSocket,
+} from '../../types';
 
 export function registerRegistryProjectSocketHandlers(socket: ResourcesNamespaceSocket) {
     if (!socket.data.userId && !socket.data.robotId) return;

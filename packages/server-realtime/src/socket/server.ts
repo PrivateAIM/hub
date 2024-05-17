@@ -5,19 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { createAuthupMiddleware } from '@privateaim/server-realtime-kit';
 import { has } from 'envix';
 import type { Server as HTTPServer } from 'node:http';
 import { Server } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
-import type { TokenCreatorOptions } from '@authup/core-http-kit';
-import {
-    Abilities, OAuth2SubKind,
-} from '@authup/kit';
-import type { TokenVerifierCacheOptions } from '@authup/server-core-plugin-kit';
-import { createMiddleware } from '@authup/server-core-plugin-socket-io';
 import { useEnv } from '../config';
 import { registerMessagesNamespace, registerResourcesNamespaces } from './namespaces';
-import type { SocketBase } from './types';
 import type { Config } from '../config';
 
 interface SocketServerContext {
@@ -35,64 +29,26 @@ export function createSocketServer(context : SocketServerContext) : Server {
             credentials: true,
         },
         transports: ['websocket', 'polling'],
-        // ...
     });
 
-    let cache : TokenVerifierCacheOptions | undefined;
-    if (has('REDIS_CONNECTION_STRING')) {
-        cache = {
-            type: 'redis',
-            client: context.config.redisDatabase,
-        };
-    }
-
-    let creator : TokenCreatorOptions | undefined;
-    if (has('VAULT_CONNECTION_STRING')) {
-        creator = {
-            type: 'robotInVault',
-            name: 'system',
-            vault: useEnv('vaultConnectionString'),
-        };
-    } else {
-        creator = {
-            type: 'user',
-            name: 'admin',
-            password: 'start123',
-        };
-    }
-
-    const authMiddleware = createMiddleware({
-        tokenVerifier: {
-            baseURL: useEnv('authupApiURL'),
-            creator,
-            cache,
-        },
-        tokenVerifierHandler: (socket: SocketBase, data) => {
-            switch (data.sub_kind) {
-                case OAuth2SubKind.USER: {
-                    socket.data.userId = data.sub;
-                    break;
-                }
-                case OAuth2SubKind.ROBOT: {
-                    socket.data.robotId = data.sub;
-                    break;
-                }
-            }
-
-            socket.data.realmId = data.realm_id;
-            socket.data.realmName = data.realm_name;
-            socket.data.abilities = new Abilities(data.permissions);
-        },
+    const authupMiddleware = createAuthupMiddleware({
+        baseURL: useEnv('authupApiURL'),
+        redis: has('REDIS_CONNECTION_STRING') ?
+            context.config.redisDatabase :
+            undefined,
+        vault: has('VAULT_CONNECTION_STRING') ?
+            useEnv('vaultConnectionString') :
+            undefined,
     });
 
     registerMessagesNamespace({
         server,
-        authMiddleware,
+        authupMiddleware,
     });
 
     registerResourcesNamespaces({
         server,
-        authMiddleware,
+        authupMiddleware,
     });
 
     return server;

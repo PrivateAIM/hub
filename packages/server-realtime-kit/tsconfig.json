@@ -7,9 +7,6 @@
             ],
             "@privateaim/server-kit": [
                 "./packages/server-kit/src"
-            ],
-            "@privateaim/server-realtime-kit": [
-                "./packages/server-realtime-kit/src"
             ]
         }
     }

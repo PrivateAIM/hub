@@ -1,7 +1,9 @@
 {
-    "name": "@privateaim/server-realtime",
+    "name": "@privateaim/server-realtime-kit",
     "version": "0.4.0",
     "private": true,
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
     "author": {
         "name": "Peter Placzek",
         "email": "contact@tada5hi.net",
@@ -12,16 +14,19 @@
     "dependencies": {
         "@authup/kit": "^1.0.0-beta.13",
         "@authup/core-kit": "^1.0.0-beta.13",
-        "@ebec/http": "^2.3.0",
+        "@authup/core-realtime-kit": "^1.0.0-beta.13",
+        "@authup/server-core-plugin-kit": "^1.0.0-beta.13",
+        "@authup/server-core-plugin-socket-io": "^1.0.0-beta.13",
         "@privateaim/core": "^0.4.0",
         "@privateaim/server-kit": "^0.4.0",
-        "@privateaim/server-realtime-kit": "^0.4.0",
-        "@socket.io/redis-adapter": "^8.3.0",
-        "dotenv": "^16.4.5",
-        "envix": "^1.3.0",
-        "hapic": "^2.5.1",
+        "@ebec/http": "^2.3.0"
+    },
+    "devDependencies": {
         "redis-extension": "^1.5.0",
-        "routup": "^3.3.0",
+        "socket.io": "^4.7.5"
+    },
+    "peerDependencies": {
+        "redis-extension": "^1.5.0",
         "socket.io": "^4.7.5"
     },
     "scripts": {
