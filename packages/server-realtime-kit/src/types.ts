@@ -7,17 +7,12 @@
 
 import type { Realm, Robot, User } from '@authup/core-kit';
 import type { Abilities } from '@authup/kit';
+import type { SocketCTSEvents, SocketSTCEvents, SocketSTSEvents } from '@privateaim/core';
 import type {
     Namespace as _Namespace,
     Server as _Server,
     Socket as _Socket,
 } from 'socket.io';
-
-/*
-SocketCTSEvents,
-SocketSTCEvents,
-SocketSTSEvents,
- */
 
 export type SocketData = {
     abilities?: Abilities,
@@ -35,39 +30,31 @@ export type SocketData = {
     roomSubscriptions: Record<string, number>,
 };
 
-interface EventsMap {
-    [p: string]: any
-}
-
-interface DefaultEventsMap {
-    [p: string]: (...args: any[]) => void
-}
-
 export type Server<
-    ListenEvents extends EventsMap = DefaultEventsMap,
-    EmitEvents extends EventsMap = ListenEvents,
-    ServerSideEvents extends EventsMap = DefaultEventsMap,
+    ListenEvents extends SocketCTSEvents = SocketCTSEvents,
+    EmitEvents extends SocketSTCEvents = SocketSTCEvents,
+    ServerSideEvents extends SocketSTSEvents = SocketSTSEvents,
     Data extends SocketData = SocketData,
 > = _Server<ListenEvents, EmitEvents, ServerSideEvents, Data>;
 
 export type Socket<
-    ListenEvents extends EventsMap = DefaultEventsMap,
-    EmitEvents extends EventsMap = ListenEvents,
-    ServerSideEvents extends EventsMap = DefaultEventsMap,
+    ListenEvents extends SocketCTSEvents = SocketCTSEvents,
+    EmitEvents extends SocketSTCEvents = SocketSTCEvents,
+    ServerSideEvents extends SocketSTSEvents = SocketSTSEvents,
     Data extends SocketData = SocketData,
 > = _Socket<ListenEvents, EmitEvents, ServerSideEvents, Data>;
 
 export type Namespace<
-    ListenEvents extends EventsMap = DefaultEventsMap,
-    EmitEvents extends EventsMap = ListenEvents,
-    ServerSideEvents extends EventsMap = DefaultEventsMap,
+    ListenEvents extends SocketCTSEvents = SocketCTSEvents,
+    EmitEvents extends SocketSTCEvents = SocketSTCEvents,
+    ServerSideEvents extends SocketSTSEvents = SocketSTSEvents,
     Data extends SocketData = SocketData,
 > = _Namespace<ListenEvents, EmitEvents, ServerSideEvents, Data>;
 
 export type Middleware<
-    ListenEvents extends EventsMap = DefaultEventsMap,
-    EmitEvents extends EventsMap = ListenEvents,
-    ServerSideEvents extends EventsMap = DefaultEventsMap,
+    ListenEvents extends SocketCTSEvents = SocketCTSEvents,
+    EmitEvents extends SocketSTCEvents = SocketSTCEvents,
+    ServerSideEvents extends SocketSTSEvents = SocketSTSEvents,
     Data extends SocketData = SocketData,
 > = (
     socket: Socket<ListenEvents, EmitEvents, ServerSideEvents, Data>,

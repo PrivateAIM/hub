@@ -29,10 +29,9 @@ export function createSocketServer(context : SocketServerContext) : Server {
             credentials: true,
         },
         transports: ['websocket', 'polling'],
-        // ...
     });
 
-    const authMiddleware = createAuthupMiddleware({
+    const authupMiddleware = createAuthupMiddleware({
         baseURL: useEnv('authupApiURL'),
         redis: has('REDIS_CONNECTION_STRING') ?
             context.config.redisDatabase :
@@ -44,12 +43,12 @@ export function createSocketServer(context : SocketServerContext) : Server {
 
     registerMessagesNamespace({
         server,
-        authMiddleware,
+        authupMiddleware,
     });
 
     registerResourcesNamespaces({
         server,
-        authMiddleware,
+        authupMiddleware,
     });
 
     return server;

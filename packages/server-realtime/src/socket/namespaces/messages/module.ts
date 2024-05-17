@@ -11,13 +11,13 @@ import type { SocketNamespaceContext } from '../../types';
 import { registerMessagesNamespaceControllers } from './register';
 import type { MessagesNamespace } from './types';
 
-export function registerMessagesNamespace({ authMiddleware, server } : SocketNamespaceContext) {
+export function registerMessagesNamespace({ authupMiddleware, server } : SocketNamespaceContext) {
     const nsp : MessagesNamespace = server.of('/messages');
     nsp.use((socket, next) => {
         useLogger().info(`${socket.nsp.name}: ${socket.id} connected.`);
         next();
     });
-    nsp.use(authMiddleware);
+    nsp.use(authupMiddleware);
     nsp.use((socket, next) => {
         if (!socket.data.userId && !socket.data.robotId) {
             useLogger().error('Socket is not authenticated.');

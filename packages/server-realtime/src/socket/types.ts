@@ -11,5 +11,5 @@ import type {
 
 export type SocketNamespaceContext = {
     server: Server,
-    authMiddleware: Middleware
+    authupMiddleware: Middleware
 };
