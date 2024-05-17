@@ -6,14 +6,14 @@
  */
 
 import { SocketSTCEventName } from '@privateaim/core';
-import type { SocketBase } from '../../../types';
+import type { Socket } from '@privateaim/server-realtime-kit';
 import {
     buildConnectionRobotRoom, buildConnectionRobotSubscriptionRoom,
     buildConnectionUserRoom,
     buildConnectionUserSubscriptionRoom,
 } from '../utils';
 
-export function registerSocketConnectionDisconnectingHandler(socket: SocketBase) {
+export function registerSocketConnectionDisconnectingHandler(socket: Socket) {
     socket.on('disconnecting', () => {
         if (!socket.data.userId && !socket.data.robotId) {
             return;

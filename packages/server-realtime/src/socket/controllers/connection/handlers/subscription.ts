@@ -6,7 +6,7 @@
  */
 
 import { SocketCTSEventName } from '@privateaim/core';
-import type { SocketBase } from '../../../types';
+import type { Socket } from '@privateaim/server-realtime-kit';
 import {
     buildConnectionRobotRoom,
     buildConnectionRobotSubscriptionRoom,
@@ -14,7 +14,7 @@ import {
     buildConnectionUserSubscriptionRoom,
 } from '../utils';
 
-export function registerSocketConnectionSubscriptionHandlers(socket: SocketBase) {
+export function registerSocketConnectionSubscriptionHandlers(socket: Socket) {
     socket.on(SocketCTSEventName.USER_CONNECTIONS, (
         target,
         cb,

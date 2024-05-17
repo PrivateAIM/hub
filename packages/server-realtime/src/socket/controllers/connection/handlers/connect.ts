@@ -6,14 +6,14 @@
  */
 
 import { SocketSTCEventName } from '@privateaim/core';
-import type { SocketBase } from '../../../types';
+import type { Socket } from '@privateaim/server-realtime-kit';
 import {
     buildConnectionRobotRoom, buildConnectionRobotSubscriptionRoom,
     buildConnectionUserRoom,
     buildConnectionUserSubscriptionRoom,
 } from '../utils';
 
-export function registerSocketConnectionConnectHandler(socket: SocketBase) {
+export function registerSocketConnectionConnectHandler(socket: Socket) {
     if (!socket.data.userId && !socket.data.robotId) {
         return;
     }
