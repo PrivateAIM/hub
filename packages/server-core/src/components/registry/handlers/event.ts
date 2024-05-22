@@ -4,7 +4,7 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { useLogger } from '../../../config';
+import { useLogger } from '@authup/server-kit';
 import { RegistryHookEvent } from '../constants';
 import type { RegistryEventPayload } from '../type';
 

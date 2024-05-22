@@ -10,8 +10,9 @@ import { hasAmqpClient } from '../core';
 import { EnvironmentName, useEnv } from './env';
 
 import { buildRouterComponent } from '../components';
+import { getWritableDirPath } from './paths';
 import {
-    configureAmqp, configureAuthup, configureRedis, configureVault,
+    configureAmqp, configureAuthup, configureRedis, configureVault, setupLogger,
 } from './services';
 
 export type Config = {
@@ -20,6 +21,10 @@ export type Config = {
 };
 
 export function createConfig() : Config {
+    setupLogger({
+        directory: getWritableDirPath(),
+    });
+
     configureVault();
 
     configureAuthup();

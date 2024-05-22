@@ -7,7 +7,7 @@
 
 import type { Component } from '@privateaim/server-kit';
 import type { ConsumeMessage } from 'amqp-extension';
-import { useLogger } from '../../config';
+import { useLogger } from '@authup/server-kit';
 import { useAmqpClient } from '../../core';
 import { ComponentName } from '../constants';
 import { executeRegistryCommand } from '../registry';

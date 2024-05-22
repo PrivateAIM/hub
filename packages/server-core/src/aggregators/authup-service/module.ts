@@ -6,7 +6,7 @@
  */
 
 import { DomainType } from '@authup/core-kit';
-import { useLogger } from '../../config';
+import { useLogger } from '@authup/server-kit';
 import { hasRedisClient, useRedisSubscribeClient } from '../../core';
 import type { Aggregator } from '../type';
 import {

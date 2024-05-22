@@ -6,7 +6,7 @@
  */
 import { buildRegistryClientConnectionStringFromRegistry } from '@privateaim/core';
 import { useDataSource } from 'typeorm-extension';
-import { useLogger } from '../../../../config';
+import { useLogger } from '@authup/server-kit';
 import { RegistryEntity, RegistryProjectEntity, removeRegistryProjectFromVault } from '../../../../domains';
 import { RegistryCommand } from '../../constants';
 import type { RegistryProjectUnlinkPayload } from '../../type';

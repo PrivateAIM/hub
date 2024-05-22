@@ -15,12 +15,12 @@ import type { Request, Response } from 'routup';
 import { sendAccepted } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '@privateaim/server-http-kit';
+import { useLogger } from '@authup/server-kit';
 import {
     RegistryCommand,
     buildRegistryPayload,
 } from '../../../../../../components';
 import { hasAmqpClient, useAmqpClient } from '../../../../../../core';
-import { useLogger } from '../../../../../../config';
 import { RegistryEntity, RegistryProjectEntity } from '../../../../../../domains';
 import { runServiceRegistryValidation } from '../../utils/validation';
 

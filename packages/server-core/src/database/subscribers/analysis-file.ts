@@ -19,7 +19,7 @@ import {
     buildDomainChannelName,
     buildDomainNamespaceName,
 } from '@privateaim/core';
-import { useLogger } from '../../config';
+import { useLogger } from '@authup/server-kit';
 import { useRedisPublishClient } from '../../core';
 import { AnalysisFileEntity } from '../../domains';
 

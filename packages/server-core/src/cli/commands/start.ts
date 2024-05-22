@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import dotenv from 'dotenv';
 import type { CommandModule } from 'yargs';
 import { startCommand } from '../../commands';
 
@@ -16,8 +15,6 @@ export class StartCommand implements CommandModule {
 
     // eslint-disable-next-line class-methods-use-this
     async handler() {
-        dotenv.config();
-
         await startCommand();
     }
 }

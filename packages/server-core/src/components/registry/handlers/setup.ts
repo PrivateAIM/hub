@@ -12,12 +12,12 @@ import {
     RegistryProjectType, generateRegistryProjectId,
 } from '@privateaim/core';
 import { useDataSource } from 'typeorm-extension';
+import { useLogger } from '@authup/server-kit';
 import { useAmqpClient } from '../../../core';
 import { RegistryEntity, RegistryProjectEntity } from '../../../domains';
-import { useLogger } from '../../../config';
 import { RegistryCommand } from '../constants';
 import type { RegistrySetupPayload } from '../type';
-import { buildRegistryPayload } from '../utils/queue';
+import { buildRegistryPayload } from '../utils';
 
 export async function setupRegistry(payload: RegistrySetupPayload) {
     if (!payload.id) {

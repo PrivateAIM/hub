@@ -20,7 +20,7 @@ import {
 
     buildDomainNamespaceName,
 } from '@privateaim/core';
-import { useLogger } from '../../config';
+import { useLogger } from '@authup/server-kit';
 import { useRedisPublishClient } from '../../core';
 import { AnalysisEntity } from '../../domains';
 

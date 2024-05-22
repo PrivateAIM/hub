@@ -12,7 +12,8 @@ import type {
 import {
     ServiceID,
 } from '@privateaim/core';
-import { useEnv, useLogger } from '../../../../config';
+import { useLogger } from '@authup/server-kit';
+import { useEnv } from '../../../../config';
 import { hasAuthupClient, useAuthupClient } from '../../../../core';
 import { findRobotCredentialsInVault } from '../../../../domains';
 import { buildRegistryWebhookTarget } from '../utils';

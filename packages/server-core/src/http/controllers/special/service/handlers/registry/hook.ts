@@ -8,9 +8,8 @@
 import { useRequestBody } from '@routup/basic/body';
 import type { Request, Response } from 'routup';
 import { sendAccepted } from 'routup';
-import { RegistryCommand, RegistryHookSchema } from '../../../../../../components';
-import { buildRegistryPayload } from '../../../../../../components/registry/utils/queue';
-import { useLogger } from '../../../../../../config';
+import { useLogger } from '@authup/server-kit';
+import { RegistryCommand, RegistryHookSchema, buildRegistryPayload } from '../../../../../../components';
 import { hasAmqpClient, useAmqpClient } from '../../../../../../core';
 
 export async function postHarborHookRouteHandler(req: Request, res: Response) : Promise<any> {

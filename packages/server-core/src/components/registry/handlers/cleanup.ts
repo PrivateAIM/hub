@@ -10,13 +10,13 @@ import {
     buildRegistryClientConnectionStringFromRegistry,
 } from '@privateaim/core';
 import { useDataSource } from 'typeorm-extension';
-import { useLogger } from '../../../config';
+import { useLogger } from '@authup/server-kit';
 import { useAmqpClient } from '../../../core';
 import { RegistryEntity, RegistryProjectEntity } from '../../../domains';
 import { ComponentName } from '../../constants';
 import { RegistryCommand } from '../constants';
 import type { RegistryCleanupPayload } from '../type';
-import { buildRegistryPayload } from '../utils/queue';
+import { buildRegistryPayload } from '../utils';
 import { createBasicHarborAPIClient } from './utils';
 
 export async function cleanupRegistry(payload: RegistryCleanupPayload) {

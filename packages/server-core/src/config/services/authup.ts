@@ -7,9 +7,9 @@
 
 import type { TokenCreatorOptions } from '@authup/core-http-kit';
 import { Client, mountClientResponseErrorTokenHook } from '@authup/core-http-kit';
+import { useLogger } from '@authup/server-kit';
 import { hasVaultClient, setAuthupFactory, useVaultClient } from '../../core';
 import { useEnv } from '../env';
-import { useLogger } from '../log';
 
 export function configureAuthup() {
     const baseURL = useEnv('authupApiURL');

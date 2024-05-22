@@ -9,7 +9,7 @@ import type { Arguments, Argv, CommandModule } from 'yargs';
 import {
     dropDatabase,
 } from 'typeorm-extension';
-import { useLogger } from '../../config';
+import { useLogger } from '@authup/server-kit';
 import { buildDataSourceOptions } from '../../database';
 
 interface ResetArguments extends Arguments {

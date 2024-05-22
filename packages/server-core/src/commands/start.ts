@@ -6,13 +6,14 @@
  */
 
 import { generateSwagger } from '@privateaim/server-http-kit';
+import { useLogger } from '@authup/server-kit';
 import path from 'node:path';
 import { DataSource } from 'typeorm';
 import {
     checkDatabase, createDatabase, setDataSource, synchronizeDatabaseSchema,
 } from 'typeorm-extension';
 import {
-    createConfig, getRootDirPath, getWritableDirPath, useEnv, useLogger,
+    createConfig, getRootDirPath, getWritableDirPath, useEnv,
 } from '../config';
 import { setupAuthupService, setupHarborService } from '../core';
 import { buildDataSourceOptions } from '../database';
