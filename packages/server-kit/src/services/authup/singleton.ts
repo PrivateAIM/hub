@@ -17,7 +17,7 @@ export function useAuthupClient() {
     return instance.use();
 }
 
-export function hasAuthupClient() {
+export function isAuthupClientUsable() {
     return instance.has() || instance.hasFactory();
 }
 

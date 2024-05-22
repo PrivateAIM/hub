@@ -6,8 +6,10 @@
  */
 
 import {
+    isAuthupClientUsable,
     isRedisClientUsable,
     isVaultClientUsable,
+    useAuthupClient,
     useRedisClient,
     useVaultClient,
 } from '@privateaim/server-kit';
@@ -16,10 +18,6 @@ import type { MiddlewareSwaggerOptions } from '@privateaim/server-http-kit';
 import { Router } from 'routup';
 import { EnvironmentName, useEnv } from '../config';
 
-import {
-    hasAuthupClient,
-    useAuthupClient,
-} from '../core';
 import { AnalysisController } from './controllers/core/analysis';
 import { AnalysisFileController } from './controllers/core/analysis-file';
 import { AnalysisLogController } from './controllers/core/analysis-log';
@@ -54,7 +52,7 @@ export function createRouter() : Router {
         prometheus: !isTestEnvironment,
         rateLimit: !isTestEnvironment,
         authup: {
-            client: hasAuthupClient() ?
+            client: isAuthupClientUsable() ?
                 useAuthupClient() :
                 undefined,
             vaultClient: isVaultClientUsable() ?

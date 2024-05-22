@@ -12,9 +12,8 @@ import type {
 import {
     ServiceID,
 } from '@privateaim/core';
-import { useLogger } from '@privateaim/server-kit';
+import { isAuthupClientUsable, useAuthupClient, useLogger } from '@privateaim/server-kit';
 import { useEnv } from '../../../../config';
-import { hasAuthupClient, useAuthupClient } from '../../../../core';
 import { findRobotCredentialsInVault } from '../../../../domains';
 import { buildRegistryWebhookTarget } from '../utils';
 
@@ -25,7 +24,7 @@ export async function saveRemoteRegistryProjectWebhook(
         isProjectName?: boolean
     },
 ) : Promise<{ id: number } | undefined> {
-    if (hasAuthupClient()) {
+    if (isAuthupClientUsable()) {
         await useAuthupClient().robot.integrity(ServiceID.REGISTRY);
     }
 

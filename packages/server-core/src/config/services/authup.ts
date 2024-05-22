@@ -7,8 +7,12 @@
 
 import type { TokenCreatorOptions } from '@authup/core-http-kit';
 import { Client, mountClientResponseErrorTokenHook } from '@authup/core-http-kit';
-import { isVaultClientUsable, useLogger, useVaultClient } from '@privateaim/server-kit';
-import { setAuthupFactory } from '../../core';
+import {
+    isVaultClientUsable,
+    setAuthupFactory,
+    useLogger,
+    useVaultClient,
+} from '@privateaim/server-kit';
 import { useEnv } from '../env';
 
 export function configureAuthup() {

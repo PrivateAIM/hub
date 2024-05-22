@@ -7,11 +7,11 @@
 
 import type { Robot } from '@authup/core-kit';
 import { isClientErrorWithStatusCode } from 'hapic';
-import { hasAuthupClient, useAuthupClient } from '../../../../../core';
+import { isAuthupClientUsable, useAuthupClient } from '@privateaim/server-kit';
 import type { NodeEntity } from '../../../../../domains';
 
 export async function createNodeRobot(entity: NodeEntity) : Promise<void> {
-    if (!hasAuthupClient()) {
+    if (!isAuthupClientUsable()) {
         return;
     }
 
@@ -39,7 +39,7 @@ export async function createNodeRobot(entity: NodeEntity) : Promise<void> {
 }
 
 export async function deleteNodeRobot(entity: NodeEntity) : Promise<void> {
-    if (!hasAuthupClient() || !entity.robot_id) {
+    if (!isAuthupClientUsable() || !entity.robot_id) {
         return;
     }
 
