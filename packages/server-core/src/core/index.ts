@@ -9,4 +9,3 @@ export * from './amqp';
 export * from './authup';
 export * from './harbor';
 export * from './utils';
-export * from './vault';

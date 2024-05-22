@@ -6,12 +6,12 @@
  */
 
 import { isClientErrorWithStatusCode } from '@hapic/harbor';
-import { hasVaultClient, useVaultClient } from '../../core';
+import { isVaultClientUsable, useVaultClient } from '@privateaim/server-kit';
 import type { RegistryProjectVaultPayload } from './type';
 import { isRegistryProjectVaultPayload } from './utils';
 
 export async function creteRegistryProjectVaultEngine() {
-    if (!hasVaultClient()) {
+    if (!isVaultClientUsable()) {
         return;
     }
 
@@ -29,7 +29,7 @@ export async function creteRegistryProjectVaultEngine() {
 }
 
 export async function removeRegistryProjectFromVault(name: string) {
-    if (!hasVaultClient()) {
+    if (!isVaultClientUsable()) {
         return;
     }
 
@@ -50,7 +50,7 @@ export async function removeRegistryProjectFromVault(name: string) {
 }
 
 export async function saveRegistryProjectToVault(name: string, data: RegistryProjectVaultPayload) {
-    if (!hasVaultClient()) {
+    if (!isVaultClientUsable()) {
         return;
     }
 
@@ -72,7 +72,7 @@ export async function saveRegistryProjectToVault(name: string, data: RegistryPro
 export async function findRegistryProjectInVault(
     name: string,
 ) : Promise<RegistryProjectVaultPayload | undefined> {
-    if (!hasVaultClient()) {
+    if (!isVaultClientUsable()) {
         return undefined;
     }
 

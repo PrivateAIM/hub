@@ -8,14 +8,14 @@
 import {
     isClientErrorWithStatusCode,
 } from 'hapic';
-import { hasVaultClient, useVaultClient } from '../../core';
+import { isVaultClientUsable, useVaultClient } from '@privateaim/server-kit';
 import type { RobotVaultPayload } from './type';
 import { isRobotVaultPayload } from './utils';
 
 export async function findRobotCredentialsInVault(
     name: string,
 ) : Promise<RobotVaultPayload | undefined> {
-    if (!hasVaultClient()) {
+    if (!isVaultClientUsable()) {
         return undefined;
     }
 

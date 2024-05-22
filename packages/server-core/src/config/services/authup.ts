@@ -7,8 +7,8 @@
 
 import type { TokenCreatorOptions } from '@authup/core-http-kit';
 import { Client, mountClientResponseErrorTokenHook } from '@authup/core-http-kit';
-import { useLogger } from '@privateaim/server-kit';
-import { hasVaultClient, setAuthupFactory, useVaultClient } from '../../core';
+import { isVaultClientUsable, useLogger, useVaultClient } from '@privateaim/server-kit';
+import { setAuthupFactory } from '../../core';
 import { useEnv } from '../env';
 
 export function configureAuthup() {
@@ -24,7 +24,7 @@ export function configureAuthup() {
         });
 
         let tokenCreator : TokenCreatorOptions;
-        if (hasVaultClient()) {
+        if (isVaultClientUsable()) {
             tokenCreator = {
                 type: 'robotInVault',
                 name: 'system',
