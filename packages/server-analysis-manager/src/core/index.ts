@@ -10,6 +10,5 @@ export * from './core';
 export * from './crypto';
 export * from './docker';
 export * from './harbor';
-export * from './logger';
 export * from './storage';
 export * from './utils';

@@ -5,31 +5,22 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { TokenCreatorOptions } from '@authup/core-http-kit';
 import type { Aggregator, Component } from '@privateaim/server-kit';
+import { guessAuthupTokenCreatorOptions } from '@privateaim/server-kit';
 import { buildComponentRouter } from '../components';
-import { useEnv } from './env';
 import {
-    configureAMQP,
-    configureCoreService,
-    configureStorageService,
+    configureAMQP, configureCoreService, configureStorageService, setupLogger, setupVault,
 } from './services';
-
-export type Config = {
-    aggregators: {start: () => void}[]
-    components: {start: () => void}[]
-};
+import type { Config } from './types';
 
 export function createConfig() : Config {
-    const tokenCreator : TokenCreatorOptions = {
-        type: 'robotInVault',
-        name: 'system',
-        vault: useEnv('vaultConnectionString'),
-    };
+    setupLogger();
+    setupVault();
+    configureAMQP();
 
+    const tokenCreator = guessAuthupTokenCreatorOptions();
     configureStorageService({ tokenCreator });
     configureCoreService({ tokenCreator });
-    configureAMQP();
 
     const aggregators : Aggregator[] = [];
 

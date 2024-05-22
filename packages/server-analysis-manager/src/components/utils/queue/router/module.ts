@@ -8,13 +8,13 @@
 import type {
     Component,
 } from '@privateaim/server-kit';
-import { isComponentCommandQueuePayload } from '@privateaim/server-kit';
+import { isComponentCommandQueuePayload, useLogger } from '@privateaim/server-kit';
 import { ComponentName } from '../../../constants';
 import { executeCoreCommand } from '../../../core';
 import {
     executeBuilderCommand,
 } from '../../../index';
-import { useAmqpClient, useLogger } from '../../../../core';
+import { useAmqpClient } from '../../../../core';
 import { ROUTER_QUEUE_ROUTING_KEY } from './constants';
 
 export function buildComponentRouter() : Component {
