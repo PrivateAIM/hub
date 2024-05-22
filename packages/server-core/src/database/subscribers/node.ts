@@ -12,12 +12,11 @@ import {
     buildDomainChannelName,
     buildDomainNamespaceName,
 } from '@privateaim/core';
-import { publishDomainEvent } from '@privateaim/server-kit';
+import { publishDomainEvent, useRedisPublishClient } from '@privateaim/server-kit';
 import type {
     EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
 import { EventSubscriber } from 'typeorm';
-import { useRedisPublishClient } from '../../core';
 import { NodeEntity } from '../../domains';
 
 async function publishEvent(

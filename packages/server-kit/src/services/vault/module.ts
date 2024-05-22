@@ -5,6 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './aggregator';
-export * from './component';
-export * from './queue';
+import { VaultClient, createClient as createVaultClient } from '@hapic/vault';
+
+export {
+    VaultClient,
+    createVaultClient,
+};

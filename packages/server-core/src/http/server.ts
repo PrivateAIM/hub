@@ -9,7 +9,7 @@ import type { Server } from 'node:http';
 import http from 'node:http';
 import { createNodeDispatcher } from 'routup';
 import type { Router } from 'routup';
-import { useLogger } from '@authup/server-kit';
+import { useLogger } from '@privateaim/server-kit';
 
 interface HttpServerContext {
     router: Router

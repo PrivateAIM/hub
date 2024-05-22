@@ -12,7 +12,7 @@ import type {
 import {
     ServiceID,
 } from '@privateaim/core';
-import { useLogger } from '@authup/server-kit';
+import { useLogger } from '@privateaim/server-kit';
 import { useEnv } from '../../../../config';
 import { hasAuthupClient, useAuthupClient } from '../../../../core';
 import { findRobotCredentialsInVault } from '../../../../domains';

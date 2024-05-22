@@ -12,7 +12,7 @@ import { REALM_MASTER_NAME } from '@authup/core-kit';
 import { ServerError } from '@ebec/http';
 import { isClientErrorWithStatusCode } from '@hapic/harbor';
 import { PermissionKey, ServiceID } from '@privateaim/core';
-import { useLogger } from '@authup/server-kit';
+import { useLogger } from '@privateaim/server-kit';
 import { useAuthupClient } from './module';
 
 export async function setupAuthupService(): Promise<any> {

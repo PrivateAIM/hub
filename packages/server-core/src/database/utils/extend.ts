@@ -6,7 +6,7 @@
  */
 import { adjustFilePath } from 'typeorm-extension';
 import type { DataSourceOptions } from 'typeorm';
-import { hasRedisClient } from '../../core';
+import { isRedisClientUsable } from '@privateaim/server-kit';
 import {
     AnalysisEntity,
     AnalysisFileEntity,
@@ -80,7 +80,7 @@ export async function extendDataSourceOptions(options: DataSourceOptions) : Prom
         migrations,
     } as DataSourceOptions);
 
-    if (hasRedisClient()) {
+    if (isRedisClientUsable()) {
         Object.assign(options, {
             cache: {
                 provider() {

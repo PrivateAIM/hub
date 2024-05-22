@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { isRedisClientUsable, useRedisClient } from '@privateaim/server-kit';
 import { mountErrorMiddleware, mountMiddlewares } from '@privateaim/server-http-kit';
 import type { MiddlewareSwaggerOptions } from '@privateaim/server-http-kit';
 import { Router } from 'routup';
@@ -12,10 +13,8 @@ import { EnvironmentName, useEnv } from '../config';
 
 import {
     hasAuthupClient,
-    hasRedisClient,
     hasVaultClient,
     useAuthupClient,
-    useRedisClient,
     useVaultClient,
 } from '../core';
 import { AnalysisController } from './controllers/core/analysis';
@@ -58,7 +57,7 @@ export function createRouter() : Router {
             vaultClient: hasVaultClient() ?
                 useVaultClient() :
                 undefined,
-            redisClient: hasRedisClient() ?
+            redisClient: isRedisClientUsable() ?
                 useRedisClient() :
                 undefined,
             fakeAbilities: isTestEnvironment,

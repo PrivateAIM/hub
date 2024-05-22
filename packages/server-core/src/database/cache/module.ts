@@ -7,7 +7,7 @@
 
 import type { QueryResultCache } from 'typeorm/cache/QueryResultCache';
 import type { QueryResultCacheOptions } from 'typeorm/cache/QueryResultCacheOptions';
-import { hasRedisClient, useRedisClient } from '../../core';
+import { isRedisClientUsable, useRedisClient } from '@privateaim/server-kit';
 
 type DatabaseQueryResultCacheOptions = {
     redisAlias?: string,
@@ -37,7 +37,7 @@ export class DatabaseQueryResultCache implements QueryResultCache {
     }
 
     async clear(): Promise<void> {
-        if (!hasRedisClient()) {
+        if (!isRedisClientUsable()) {
             return;
         }
 
@@ -61,7 +61,7 @@ export class DatabaseQueryResultCache implements QueryResultCache {
     }
 
     async getFromCache(options: QueryResultCacheOptions): Promise<QueryResultCacheOptions | undefined> {
-        if (!hasRedisClient()) {
+        if (!isRedisClientUsable()) {
             return undefined;
         }
 
@@ -94,7 +94,7 @@ export class DatabaseQueryResultCache implements QueryResultCache {
     }
 
     async remove(identifiers: string[]): Promise<void> {
-        if (!hasRedisClient()) {
+        if (!isRedisClientUsable()) {
             return;
         }
 
@@ -111,7 +111,7 @@ export class DatabaseQueryResultCache implements QueryResultCache {
     async storeInCache(
         options: QueryResultCacheOptions,
     ): Promise<void> {
-        if (!hasRedisClient()) {
+        if (!isRedisClientUsable()) {
             return;
         }
 

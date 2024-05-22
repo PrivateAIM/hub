@@ -6,7 +6,7 @@
  */
 
 import { generateSwagger } from '@privateaim/server-http-kit';
-import { useLogger } from '@authup/server-kit';
+import { useLogger } from '@privateaim/server-kit';
 import path from 'node:path';
 import { DataSource } from 'typeorm';
 import {

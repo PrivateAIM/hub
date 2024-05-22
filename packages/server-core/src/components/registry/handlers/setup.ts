@@ -12,7 +12,7 @@ import {
     RegistryProjectType, generateRegistryProjectId,
 } from '@privateaim/core';
 import { useDataSource } from 'typeorm-extension';
-import { useLogger } from '@authup/server-kit';
+import { useLogger } from '@privateaim/server-kit';
 import { useAmqpClient } from '../../../core';
 import { RegistryEntity, RegistryProjectEntity } from '../../../domains';
 import { RegistryCommand } from '../constants';

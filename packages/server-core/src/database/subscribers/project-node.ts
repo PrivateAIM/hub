@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { publishDomainEvent } from '@privateaim/server-kit';
+import { publishDomainEvent, useRedisPublishClient } from '@privateaim/server-kit';
 import type {
     EntitySubscriberInterface,
     InsertEvent,
@@ -25,7 +25,6 @@ import {
     buildDomainChannelName,
     buildDomainNamespaceName,
 } from '@privateaim/core';
-import { useRedisPublishClient } from '../../core';
 import { ProjectNodeEntity } from '../../domains';
 
 async function publishEvent(

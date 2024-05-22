@@ -2,8 +2,17 @@
     "name": "@privateaim/server-kit",
     "version": "0.4.0",
     "private": true,
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
+    "exports": {
+        "./package.json": "./package.json",
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.mjs",
+            "require": "./dist/index.cjs"
+        }
+    },
+    "main": "./dist/index.cjs",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
     "author": {
         "name": "Peter Placzek",
         "email": "contact@tada5hi.net",
@@ -12,7 +21,9 @@
     "license": "Apache-2.0",
     "description": "This package contains common constants, functions, types, ... for the server side.",
     "scripts": {
-        "build": "tsc -p tsconfig.build.json"
+        "build:types": "tsc --emitDeclarationOnly -p tsconfig.build.json",
+        "build:js": "rollup -c",
+        "build": "rimraf ./dist && cross-env NODE_ENV=production npm run build:js && npm run build:types"
     },
     "dependencies": {
         "@ebec/http": "^2.3.0",

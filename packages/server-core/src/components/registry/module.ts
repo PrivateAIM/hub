@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { useLogger } from '@authup/server-kit';
+import { useLogger } from '@privateaim/server-kit';
 import { RegistryCommand } from './constants';
 import {
     dispatchRegistryEventToTrainManager,

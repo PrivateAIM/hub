@@ -8,7 +8,7 @@
 import { useRequestBody } from '@routup/basic/body';
 import type { Request, Response } from 'routup';
 import { sendAccepted } from 'routup';
-import { useLogger } from '@authup/server-kit';
+import { useLogger } from '@privateaim/server-kit';
 import { RegistryCommand, RegistryHookSchema, buildRegistryPayload } from '../../../../../../components';
 import { hasAmqpClient, useAmqpClient } from '../../../../../../core';
 

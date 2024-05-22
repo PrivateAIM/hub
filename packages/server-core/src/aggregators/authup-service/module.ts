@@ -6,8 +6,7 @@
  */
 
 import { DomainType } from '@authup/core-kit';
-import { useLogger } from '@authup/server-kit';
-import { hasRedisClient, useRedisSubscribeClient } from '../../core';
+import { isRedisClientUsable, useLogger, useRedisSubscribeClient } from '@privateaim/server-kit';
 import type { Aggregator } from '../type';
 import {
     handleAuthupRealmEvent,
@@ -18,7 +17,7 @@ import {
 export function buildAuthupAggregator() : Aggregator {
     return {
         start() {
-            if (!hasRedisClient()) {
+            if (!isRedisClientUsable()) {
                 useLogger().info('Authup aggregator is missing redis configuration.');
                 return;
             }

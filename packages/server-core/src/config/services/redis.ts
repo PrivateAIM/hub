@@ -6,8 +6,7 @@
  */
 
 import { isBoolFalse, isBoolTrue } from '@privateaim/core';
-import { createClient } from 'redis-extension';
-import { setRedisFactory } from '../../core';
+import { createRedisClient, setRedisFactory } from '@privateaim/server-kit';
 import { ConfigDefaults, useEnv } from '../env';
 
 export function configureRedis() {
@@ -16,7 +15,7 @@ export function configureRedis() {
         typeof connectionString !== 'undefined' &&
         !isBoolFalse(connectionString)
     ) {
-        setRedisFactory(() => createClient({
+        setRedisFactory(() => createRedisClient({
             connectionString: isBoolTrue(connectionString) ?
                 ConfigDefaults.REDIS :
                 connectionString,
