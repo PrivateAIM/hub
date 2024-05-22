@@ -7,7 +7,7 @@
 
 import { Client } from 'amqp-extension';
 import { isBoolFalse, isBoolTrue } from '@privateaim/core';
-import { setAmqpFactory } from '../../core';
+import { setAmqpClientFactory } from '@privateaim/server-kit';
 import { ConfigDefaults, useEnv } from '../env';
 
 export function configureAmqp() {
@@ -16,7 +16,7 @@ export function configureAmqp() {
         typeof connectionString !== 'undefined' &&
         !isBoolFalse(connectionString)
     ) {
-        setAmqpFactory(() => new Client({
+        setAmqpClientFactory(() => new Client({
             connection: isBoolTrue(connectionString) ? ConfigDefaults.RABBITMQ : connectionString,
             exchange: {
                 name: 'pht',

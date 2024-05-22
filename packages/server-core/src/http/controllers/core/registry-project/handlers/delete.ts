@@ -12,8 +12,8 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { isRealmResourceWritable } from '@authup/core-kit';
 import { useRequestEnv } from '@privateaim/server-http-kit';
+import { hasAmqpClient, useAmqpClient } from '@privateaim/server-kit';
 import { RegistryCommand, buildRegistryPayload } from '../../../../../components';
-import { hasAmqpClient, useAmqpClient } from '../../../../../core';
 import { RegistryProjectEntity } from '../../../../../domains';
 
 export async function deleteRegistryProjectRouteHandler(req: Request, res: Response) : Promise<any> {

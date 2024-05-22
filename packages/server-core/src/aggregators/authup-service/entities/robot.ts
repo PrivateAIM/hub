@@ -8,13 +8,15 @@
 import type { RobotEventContext } from '@authup/core-kit';
 import { ServiceID } from '@privateaim/core';
 import { useDataSource } from 'typeorm-extension';
-import { RegistryCommand } from '../../../components';
-import { buildRegistryPayload } from '../../../components/registry/utils/queue';
-import { useAmqpClient } from '../../../core';
+import { useAmqpClient } from '@privateaim/server-kit';
+import { RegistryCommand, buildRegistryPayload } from '../../../components';
 import { RegistryProjectEntity } from '../../../domains';
 
 export async function handleAuthupRobotEvent(context: RobotEventContext) {
-    if (context.event === 'created' || context.event === 'updated') {
+    if (
+        context.event === 'created' ||
+        context.event === 'updated'
+    ) {
         if (context.data.name === ServiceID.REGISTRY) {
             const dataSource = await useDataSource();
 

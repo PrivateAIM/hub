@@ -13,7 +13,7 @@ import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '@privateaim/server-http-kit';
-import { hasAmqpClient, useAmqpClient } from '../../../../../core';
+import { hasAmqpClient, useAmqpClient } from '@privateaim/server-kit';
 import { runAnalysisValidation } from '../utils';
 import { AnalysisEntity, ProjectEntity } from '../../../../../domains';
 

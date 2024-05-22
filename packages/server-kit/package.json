@@ -37,12 +37,14 @@
     "devDependencies": {
         "@authup/core-http-kit": "^1.0.0-beta.13",
         "@hapic/vault": "^2.3.3",
+        "amqp-extension": "^3.3.0",
         "redis-extension": "^1.5.0",
         "typeorm-extension": "^3.5.1"
     },
     "peerDependencies": {
         "@authup/core-http-kit": "^1.0.0-beta.13",
         "@hapic/vault": "^2.3.3",
+        "amqp-extension": "^3.3.0",
         "redis-extension": "^1.5.0",
         "typeorm-extension": "^3.5.1"
     },

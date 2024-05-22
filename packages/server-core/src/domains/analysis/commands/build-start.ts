@@ -12,7 +12,7 @@ import {
 } from '@privateaim/core';
 import { BuilderCommand, buildBuilderQueuePayload } from '@privateaim/server-analysis-manager';
 import { useDataSource } from 'typeorm-extension';
-import { useAmqpClient } from '../../../core';
+import { useAmqpClient } from '@privateaim/server-kit';
 import { RegistryEntity } from '../../registry';
 import { AnalysisNodeEntity } from '../../anaylsis-node';
 import { AnalysisEntity } from '../entity';

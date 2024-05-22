@@ -7,8 +7,7 @@
 
 import type { Component } from '@privateaim/server-kit';
 import type { ConsumeMessage } from 'amqp-extension';
-import { useLogger } from '@privateaim/server-kit';
-import { useAmqpClient } from '../../core';
+import { useAmqpClient, useLogger } from '@privateaim/server-kit';
 import { ComponentName } from '../constants';
 import { executeRegistryCommand } from '../registry';
 import { ROUTER_QUEUE_ROUTING_KEY } from './constants';

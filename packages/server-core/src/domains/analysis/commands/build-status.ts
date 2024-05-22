@@ -7,7 +7,7 @@
 
 import { BuilderCommand, buildBuilderQueuePayload } from '@privateaim/server-analysis-manager';
 import { useDataSource } from 'typeorm-extension';
-import { useAmqpClient } from '../../../core';
+import { useAmqpClient } from '@privateaim/server-kit';
 import { resolveAnalysis } from './utils';
 import { AnalysisEntity } from '../entity';
 

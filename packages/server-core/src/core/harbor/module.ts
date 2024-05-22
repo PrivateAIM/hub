@@ -8,8 +8,8 @@
 import { parseConnectionString } from '@hapic/harbor';
 import { getHostNameFromString } from '@privateaim/core';
 import { useDataSource } from 'typeorm-extension';
+import { hasAmqpClient, useAmqpClient } from '@privateaim/server-kit';
 import { RegistryCommand, buildRegistryPayload } from '../../components';
-import { hasAmqpClient, useAmqpClient } from '../amqp';
 import { RegistryEntity } from '../../domains';
 import { useEnv } from '../../config';
 
