@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { useLogger } from './core';
+import { useLogger } from '@privateaim/server-kit';
 import { createConfig, useEnv } from './config';
 import { createHttpServer } from './http';
 import { createSocketServer } from './socket';

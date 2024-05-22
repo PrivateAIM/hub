@@ -8,7 +8,7 @@
 import { REALM_MASTER_NAME } from '@authup/core-kit';
 import { ForbiddenError, UnauthorizedError } from '@ebec/http';
 import type { Socket } from '@privateaim/server-realtime-kit';
-import { useLogger } from '../../../core';
+import { useLogger } from '@privateaim/server-kit';
 import type { SocketNamespaceContext } from '../../types';
 import { registerResourcesNamespaceControllers } from './register';
 

@@ -6,7 +6,7 @@
  */
 
 import { UnauthorizedError } from '@ebec/http';
-import { useLogger } from '../../../core';
+import { useLogger } from '@privateaim/server-kit';
 import type { SocketNamespaceContext } from '../../types';
 import { registerMessagesNamespaceControllers } from './register';
 import type { MessagesNamespace } from './types';

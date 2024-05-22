@@ -5,20 +5,21 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { setConfig as setRedisConfig, useClient as useRedisClient } from 'redis-extension';
-import { useEnv } from './env';
+import { useRedisClient, useRedisPublishClient, useRedisSubscribeClient } from '@privateaim/server-kit';
+import { WRITABLE_DIR_PATH } from './constants';
+import { setupLogger, setupRedis } from './services';
 import type { Config } from './type';
 
 export function createConfig() : Config {
-    setRedisConfig({ connectionString: useEnv('redisConnectionString') });
+    setupLogger({
+        directory: WRITABLE_DIR_PATH,
+    });
 
-    const redisDatabase = useRedisClient();
-    const redisPub = redisDatabase.duplicate();
-    const redisSub = redisDatabase.duplicate();
+    setupRedis();
 
     return {
-        redisDatabase,
-        redisPub,
-        redisSub,
+        redisDatabase: useRedisClient(),
+        redisPub: useRedisPublishClient(),
+        redisSub: useRedisSubscribeClient(),
     };
 }
