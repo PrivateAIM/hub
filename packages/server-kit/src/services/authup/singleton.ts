@@ -21,6 +21,6 @@ export function isAuthupClientUsable() {
     return instance.has() || instance.hasFactory();
 }
 
-export function setAuthupFactory(factory: Factory<Client>) {
+export function setAuthupClientFactory(factory: Factory<Client>) {
     instance.setFactory(factory);
 }

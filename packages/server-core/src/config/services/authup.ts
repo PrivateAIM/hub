@@ -5,13 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { TokenCreatorOptions } from '@authup/core-http-kit';
-import { Client, mountClientResponseErrorTokenHook } from '@authup/core-http-kit';
 import {
-    isVaultClientUsable,
-    setAuthupFactory,
+    AuthupClient,
+    setAuthupClientFactory,
     useLogger,
-    useVaultClient,
 } from '@privateaim/server-kit';
 import { useEnv } from '../env';
 
@@ -22,31 +19,7 @@ export function configureAuthup() {
         return;
     }
 
-    setAuthupFactory(() => {
-        const authupClient = new Client({
-            baseURL,
-        });
-
-        let tokenCreator : TokenCreatorOptions;
-        if (isVaultClientUsable()) {
-            tokenCreator = {
-                type: 'robotInVault',
-                name: 'system',
-                vault: useVaultClient(),
-            };
-        } else {
-            tokenCreator = {
-                type: 'user',
-                name: 'admin',
-                password: 'start123',
-            };
-        }
-
-        mountClientResponseErrorTokenHook(authupClient, {
-            baseURL,
-            tokenCreator,
-        });
-
-        return authupClient;
-    });
+    setAuthupClientFactory(() => new AuthupClient({
+        baseURL,
+    }));
 }

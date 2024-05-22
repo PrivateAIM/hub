@@ -5,8 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Client, mountClientResponseErrorTokenHook } from '@authup/core-http-kit';
-import { setAuthupClientFactory } from '../../core';
+import { AuthupClient, setAuthupClientFactory } from '@privateaim/server-kit';
 import { useEnv } from '../env';
 
 export function configureAuthup() {
@@ -15,22 +14,7 @@ export function configureAuthup() {
         return;
     }
 
-    setAuthupClientFactory(() => {
-        const authupClient = new Client({
-            baseURL,
-        });
-
-        // todo use vault for token creation
-
-        mountClientResponseErrorTokenHook(authupClient, {
-            baseURL,
-            tokenCreator: {
-                type: 'user',
-                name: 'admin',
-                password: 'start123',
-            },
-        });
-
-        return authupClient;
-    });
+    setAuthupClientFactory(() => new AuthupClient({
+        baseURL,
+    }));
 }

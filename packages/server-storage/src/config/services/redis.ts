@@ -5,8 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { createClient } from 'redis-extension';
-import { setRedisFactory } from '../../core';
+import { createRedisClient, setRedisFactory } from '@privateaim/server-kit';
 import { useEnv } from '../env';
 
 export function configureRedis() {
@@ -16,7 +15,7 @@ export function configureRedis() {
         return;
     }
 
-    setRedisFactory(() => createClient({
+    setRedisFactory(() => createRedisClient({
         connectionString,
     }));
 }

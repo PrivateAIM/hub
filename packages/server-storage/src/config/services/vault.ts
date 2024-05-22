@@ -5,8 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { VaultClient } from '@hapic/vault';
-import { setVaultFactory } from '../../core';
+import { VaultClient, setVaultFactory } from '@privateaim/server-kit';
 import { useEnv } from '../env';
 
 export function configureVault() {

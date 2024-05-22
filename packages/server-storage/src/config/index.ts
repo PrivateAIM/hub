@@ -7,4 +7,3 @@
 
 export * from './env';
 export * from './module';
-export * from './types';
