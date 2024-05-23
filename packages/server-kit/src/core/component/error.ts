@@ -5,53 +5,24 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BaseError, createExtractOptionsFn } from '@ebec/http/core';
-import { isObject } from '@privateaim/core';
-import type { ComponentErrorInput, ComponentErrorOptions } from './type';
+import type { ComponentErrorOptions } from './type';
 
-export function isOptions(input: unknown) : input is ComponentErrorOptions {
-    if (!isObject(input)) {
-        return false;
-    }
+export class ComponentError extends Error {
+    component: string;
 
-    if (
-        typeof input.step !== 'undefined' &&
-        typeof input.step !== 'number' &&
-        typeof input.step !== 'string'
-    ) {
-        return false;
-    }
+    step?: string;
 
-    if (
-        typeof input.type !== 'undefined' &&
-        typeof input.type !== 'string'
-    ) {
-        return false;
-    }
-
-    return typeof input.command === 'undefined' ||
-        typeof input.command === 'string';
-}
-
-const check = createExtractOptionsFn(isOptions);
-export function extractComponentErrorOptions(...input: ComponentErrorInput[]) {
-    return check(...input);
-}
-
-export class ComponentError extends BaseError {
-    step: string | undefined;
-
-    type: string | undefined;
+    type?: string;
 
     command: string;
 
-    constructor(...input: ComponentErrorInput[]) {
-        super(...input);
+    code?: string | number | null;
 
-        const options = extractComponentErrorOptions(...input);
+    constructor(input: ComponentErrorOptions) {
+        super(input.message, { cause: input.cause });
 
-        this.step = options.step;
-        this.type = options.type;
-        this.command = options.command;
+        this.step = input.step;
+        this.type = input.type;
+        this.command = input.command;
     }
 }

@@ -5,13 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { BuilderCommand, ComponentName } from '@privateaim/server-analysis-manager-kit';
+import type { BuilderCommandContext } from '@privateaim/server-analysis-manager-kit';
 import { extendPayload } from '../utils';
 import {
     executeBuilderBuildCommand,
     executeBuilderCheckCommand,
     executePushCommand,
 } from './commands';
-import { BuilderCommand } from './constants';
 import {
     writeBuildingEvent,
     writeBuiltEvent,
@@ -21,7 +22,6 @@ import {
     writePushedEvent,
     writePushingEvent,
 } from './events';
-import type { BuilderCommandContext } from './type';
 import { useBuilderLogger } from './utils';
 
 export async function executeBuilderCommand(
@@ -30,7 +30,7 @@ export async function executeBuilderCommand(
     switch (context.command) {
         case BuilderCommand.BUILD: {
             await Promise.resolve(context.data)
-                .then(extendPayload)
+                .then((data) => extendPayload(data, ComponentName.BUILDER))
                 .then((data) => writeBuildingEvent({ data, command: context.command }))
                 .then(executeBuilderBuildCommand)
                 .then((data) => writeBuiltEvent({ data, command: context.command }))
@@ -50,7 +50,7 @@ export async function executeBuilderCommand(
         }
         case BuilderCommand.CHECK: {
             await Promise.resolve(context.data)
-                .then(extendPayload)
+                .then((data) => extendPayload(data, ComponentName.BUILDER))
                 .then((data) => writeCheckingEvent({ data, command: context.command }))
                 .then(executeBuilderCheckCommand)
                 .then((data) => writeCheckedEvent({ data, command: context.command }))

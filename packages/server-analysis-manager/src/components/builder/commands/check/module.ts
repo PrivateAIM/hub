@@ -10,18 +10,18 @@ import {
 } from '@privateaim/core';
 import { isClientErrorWithStatusCode } from 'hapic';
 
+import { BuilderCommand, ComponentName } from '@privateaim/server-analysis-manager-kit';
+import type { BuilderCheckPayload } from '@privateaim/server-analysis-manager-kit';
 import { createBasicHarborAPIClient, useCoreClient } from '../../../../core';
 import type { ComponentPayloadExtended } from '../../../type';
 import { extendPayload } from '../../../utils';
-import { BuilderCommand } from '../../constants';
 import { BuilderError } from '../../error';
 import { writeBuiltEvent, writeNoneEvent } from '../../events';
-import type { BuilderCheckPayload } from '../../type';
 
 export async function executeBuilderCheckCommand(
     input: BuilderCheckPayload,
 ) : Promise<ComponentPayloadExtended<BuilderCheckPayload>> {
-    const data = await extendPayload(input);
+    const data = await extendPayload(input, ComponentName.BUILDER);
 
     if (!data.entity) {
         throw BuilderError.notFound();

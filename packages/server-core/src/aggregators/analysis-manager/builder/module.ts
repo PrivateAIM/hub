@@ -11,10 +11,10 @@ import {
     BuilderCommand,
     BuilderEvent,
     ComponentName,
-} from '@privateaim/server-analysis-manager';
+} from '@privateaim/server-analysis-manager-kit';
 import type {
     BuilderEventContext,
-} from '@privateaim/server-analysis-manager';
+} from '@privateaim/server-analysis-manager-kit';
 import {
 
     AnalysisBuildStatus,

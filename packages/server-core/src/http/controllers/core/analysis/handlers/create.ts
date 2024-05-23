@@ -8,7 +8,7 @@
 import type { Analysis } from '@privateaim/core';
 import { PermissionID } from '@privateaim/core';
 import { ForbiddenError } from '@ebec/http';
-import { CoreCommand, buildCoreQueuePayload } from '@privateaim/server-analysis-manager';
+import { CoreCommand, buildCoreQueuePayload } from '@privateaim/server-analysis-manager-kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';

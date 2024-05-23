@@ -7,29 +7,10 @@
 
 import { transformComponentErrorForQueuePayload } from '@privateaim/server-kit';
 import type { ComponentContextWithError } from '@privateaim/server-kit';
-import type { PublishOptionsExtended } from 'amqp-extension';
-import { ComponentName } from '../../constants';
-import type { QueueRouterPayload } from '../../utils';
-import { ROUTER_QUEUE_ROUTING_KEY, cleanupPayload } from '../../utils';
-import type { CoreCommandContext, CoreEventContext } from '../type';
+import { ComponentName } from '@privateaim/server-analysis-manager-kit';
+import type { CoreEventContext } from '@privateaim/server-analysis-manager-kit';
+import { cleanupPayload } from '../../utils';
 import { useCoreLogger } from './logger';
-
-export function buildCoreQueuePayload(
-    context: CoreCommandContext,
-) : PublishOptionsExtended<QueueRouterPayload> {
-    return {
-        exchange: {
-            routingKey: ROUTER_QUEUE_ROUTING_KEY,
-        },
-        content: {
-            data: context.data,
-            metadata: {
-                component: ComponentName.CORE,
-                command: context.command,
-            },
-        },
-    };
-}
 
 export function buildCoreAggregatorQueuePayload(
     context: CoreEventContext | ComponentContextWithError<CoreEventContext>,

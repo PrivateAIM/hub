@@ -9,7 +9,7 @@ import type {
     Component,
 } from '@privateaim/server-kit';
 import { isComponentCommandQueuePayload, useAmqpClient, useLogger } from '@privateaim/server-kit';
-import { ComponentName } from '../../../constants';
+import { ComponentName } from '@privateaim/server-analysis-manager-kit';
 import { executeCoreCommand } from '../../../core';
 import {
     executeBuilderCommand,

@@ -7,9 +7,9 @@
 
 import { AnalysisFileType, buildAnalysisFileBucketName } from '@privateaim/core';
 import { isClientErrorWithStatusCode } from 'hapic';
+import { CoreCommand } from '@privateaim/server-analysis-manager-kit';
+import type { CoreDestroyPayload } from '@privateaim/server-analysis-manager-kit';
 import { useStorageClient } from '../../../../core';
-import { CoreCommand } from '../../constants';
-import type { CoreDestroyPayload } from '../../type';
 import { useCoreLogger } from '../../utils';
 
 export async function executeCoreDestroyCommand(

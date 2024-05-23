@@ -8,23 +8,23 @@
 import {
     REGISTRY_ARTIFACT_TAG_LATEST,
 } from '@privateaim/core';
+import { BuilderCommand, ComponentName } from '@privateaim/server-analysis-manager-kit';
+import type { BuilderBuildPayload } from '@privateaim/server-analysis-manager-kit';
 import {
     pullDockerImage,
     useDocker,
 } from '../../../../core';
 import type { ComponentPayloadExtended } from '../../../type';
 import { extendPayload } from '../../../utils';
-import { BuilderCommand } from '../../constants';
 import { buildTrainDockerFile, packContainerWithTrain } from '../../helpers';
 import { buildDockerImage } from '../../../../core/docker/image-build';
 import { BuilderError } from '../../error';
-import type { BuilderBuildPayload } from '../../type';
 import { useBuilderLogger } from '../../utils';
 
 export async function executeBuilderBuildCommand(
     input: BuilderBuildPayload,
 ) : Promise<ComponentPayloadExtended<BuilderBuildPayload>> {
-    const data = await extendPayload(input);
+    const data = await extendPayload(input, ComponentName.BUILDER);
 
     if (!data.entity) {
         throw BuilderError.notFound();

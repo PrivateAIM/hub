@@ -7,33 +7,26 @@
 
 import type { ComponentErrorOptions } from '@privateaim/server-kit';
 import { ComponentError } from '@privateaim/server-kit';
-import { ErrorCode } from './constants';
+import { ErrorCode } from '@privateaim/server-analysis-manager-kit';
 
 export class BaseError extends ComponentError {
     // --------------------------------------------------------------------
 
-    static notFound(options?: ComponentErrorOptions) {
+    static notFound(
+        options: ComponentErrorOptions,
+    ) {
         return new BaseError({
             code: ErrorCode.NOT_FOUND,
-            ...(options || {}),
+            ...options,
         });
     }
 
     static registryNotFound(
-        options?: ComponentErrorOptions,
+        options: ComponentErrorOptions,
     ) {
         return new BaseError({
             code: ErrorCode.REGISTRY_NOT_FOUND,
-            ...(options || {}),
-        });
-    }
-
-    static registryProjectNotFound(
-        options?: ComponentErrorOptions,
-    ) {
-        return new BaseError({
-            code: ErrorCode.REGISTRY_PROJECT_NOT_FOUND,
-            ...(options || {}),
+            ...options,
         });
     }
 }

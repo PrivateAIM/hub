@@ -9,10 +9,10 @@ import stream from 'node:stream';
 import { AnalysisContainerPath, AnalysisFileType, buildAnalysisFileBucketName } from '@privateaim/core';
 import type { Container } from 'dockerode';
 import tar from 'tar-stream';
+import { BuilderCommand } from '@privateaim/server-analysis-manager-kit';
 import {
     streamToBuffer, useStorageClient,
 } from '../../../core';
-import { BuilderCommand } from '../constants';
 import { BuilderError } from '../error';
 import { useBuilderLogger } from '../utils';
 import type { ContainerPackContext } from './type';
@@ -58,7 +58,9 @@ export async function packContainerWithTrain(container: Container, context: Cont
                 });
 
                 extract.on('error', () => {
-                    reject(new BuilderError('The analysis file stream could not be extracted'));
+                    reject(new BuilderError({
+                        message: 'The analysis file stream could not be extracted',
+                    }));
                 });
 
                 extract.on('finish', () => {
@@ -80,7 +82,9 @@ export async function packContainerWithTrain(container: Container, context: Cont
 
                     container.putArchive(pack, { path: AnalysisContainerPath.CODE })
                         .then(() => resolve())
-                        .catch(() => reject(new BuilderError('The analysis pack stream could not be forwarded to the container.')));
+                        .catch(() => reject(new BuilderError({
+                            message: 'The analysis pack stream could not be forwarded to the container.',
+                        })));
                 });
 
                 const readStream = stream.Readable.fromWeb(response as any);

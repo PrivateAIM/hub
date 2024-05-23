@@ -1,0 +1,32 @@
+{
+    "name": "@privateaim/server-analysis-manager-kit",
+    "version": "0.4.0",
+    "license": "Apache-2.0",
+    "description": "",
+    "exports": {
+        "./package.json": "./package.json",
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.mjs",
+            "require": "./dist/index.cjs"
+        }
+    },
+    "main": "./dist/index.cjs",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
+    "author": {
+        "name": "Peter Placzek",
+        "email": "admin@tada5hi.net",
+        "url": "https://github.com/tada5hi"
+    },
+    "scripts": {
+        "build:types": "tsc --emitDeclarationOnly -p tsconfig.build.json",
+        "build:js": "rollup -c",
+        "build": "rimraf ./dist && cross-env NODE_ENV=production npm run build:js && npm run build:types",
+        "build-watch": "rimraf ./dist && tsc -p tsconfig.build.json --watch"
+    },
+    "gitHead": "5d3b6f4ce1edf2383bdfbf66e913a08c8a3a2e40",
+    "publishConfig": {
+        "access": "public"
+    }
+}

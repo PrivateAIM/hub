@@ -6,8 +6,8 @@
  */
 
 import { useAmqpClient } from '@privateaim/server-kit';
-import { CoreEvent } from '../constants';
-import type { CoreConfigureCommandContext } from '../type';
+import { CoreEvent } from '@privateaim/server-analysis-manager-kit';
+import type { CoreConfigureCommandContext } from '@privateaim/server-analysis-manager-kit';
 import { buildCoreAggregatorQueuePayload } from '../utils';
 
 export async function writeConfiguringEvent(

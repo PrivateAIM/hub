@@ -7,9 +7,8 @@
 
 import type { ComponentContextWithCommand } from '@privateaim/server-kit';
 import { useAmqpClient } from '@privateaim/server-kit';
-import type { BuilderCommand } from '../constants';
-import { BuilderEvent } from '../constants';
-import type { BuilderBuildCommandContext, BuilderBuildPayload } from '../type';
+import type { BuilderBuildCommandContext, BuilderBuildPayload, BuilderCommand } from '@privateaim/server-analysis-manager-kit';
+import { BuilderEvent } from '@privateaim/server-analysis-manager-kit';
 import { buildBuilderAggregatorQueuePayload } from '../utils';
 
 export async function writeBuiltEvent(

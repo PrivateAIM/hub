@@ -16,6 +16,7 @@ import type { ComponentPayloadExtended } from '../type';
 
 export async function extendPayload<T extends Partial<ComponentPayloadExtended<{ id: Analysis['id'] }>>>(
     data: T,
+    component: string,
 ) : Promise<ComponentPayloadExtended<T>> {
     let entity : Analysis;
     let registry: Registry;
@@ -33,6 +34,7 @@ export async function extendPayload<T extends Partial<ComponentPayloadExtended<{
             if (isClientErrorWithStatusCode(e, 404)) {
                 throw BaseError.notFound({
                     cause: e,
+                    component,
                 });
             }
 
@@ -51,6 +53,7 @@ export async function extendPayload<T extends Partial<ComponentPayloadExtended<{
             if (isClientErrorWithStatusCode(e, 404)) {
                 throw BaseError.registryNotFound({
                     cause: e,
+                    component,
                 });
             }
 
