@@ -15,7 +15,7 @@ import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '@privateaim/server-http-kit';
-import { hasAmqpClient, useAmqpClient } from '@privateaim/server-kit';
+import { isAmqpClientUsable, useAmqpClient } from '@privateaim/server-kit';
 import { RegistryCommand, buildRegistryPayload } from '../../../../../components';
 import { createNodeRobot, runNodeValidation } from '../utils';
 import { NodeEntity, RegistryEntity, RegistryProjectEntity } from '../../../../../domains';
@@ -68,7 +68,7 @@ export async function createNodeRouteHandler(req: Request, res: Response) : Prom
 
         entity.registry_project_id = registryProject.id;
 
-        if (hasAmqpClient()) {
+        if (isAmqpClientUsable()) {
             const client = useAmqpClient();
             await client.publish(buildRegistryPayload({
                 command: RegistryCommand.PROJECT_LINK,

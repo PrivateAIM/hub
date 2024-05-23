@@ -6,7 +6,7 @@
  */
 
 import type { Aggregator, Component } from '@privateaim/server-kit';
-import { hasAmqpClient } from '@privateaim/server-kit';
+import { isAmqpClientUsable } from '@privateaim/server-kit';
 import { buildAuthupAggregator, buildTrainManagerAggregator } from '../aggregators';
 import { EnvironmentName, useEnv } from './env';
 
@@ -41,7 +41,7 @@ export function createConfig() : Config {
     // ---------------------------------------------
 
     const aggregators : {start: () => void}[] = [];
-    if (!isTest && hasAmqpClient()) {
+    if (!isTest && isAmqpClientUsable()) {
         aggregators.push(buildAuthupAggregator());
         aggregators.push(buildTrainManagerAggregator());
     }
@@ -49,7 +49,7 @@ export function createConfig() : Config {
     // ---------------------------------------------
 
     const components : {start: () => void}[] = [];
-    if (!isTest && hasAmqpClient()) {
+    if (!isTest && isAmqpClientUsable()) {
         components.push(
             buildRouterComponent(),
         );

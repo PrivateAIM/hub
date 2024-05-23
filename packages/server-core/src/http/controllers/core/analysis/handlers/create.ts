@@ -13,7 +13,7 @@ import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '@privateaim/server-http-kit';
-import { hasAmqpClient, useAmqpClient } from '@privateaim/server-kit';
+import { isAmqpClientUsable, useAmqpClient } from '@privateaim/server-kit';
 import { runAnalysisValidation } from '../utils';
 import { AnalysisEntity, ProjectEntity } from '../../../../../domains';
 
@@ -49,7 +49,7 @@ export async function createAnalysisRouteHandler(req: Request, res: Response) : 
     const proposalRepository = dataSource.getRepository(ProjectEntity);
     await proposalRepository.save(result.relation.project);
 
-    if (hasAmqpClient()) {
+    if (isAmqpClientUsable()) {
         const message = buildCoreQueuePayload({
             command: CoreCommand.CONFIGURE,
             data: {

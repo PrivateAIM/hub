@@ -6,7 +6,7 @@
  */
 
 import type { ComponentContextWithCommand, ComponentContextWithError } from '@privateaim/server-kit';
-import { useAmqpClient } from '../../../core';
+import { useAmqpClient } from '@privateaim/server-kit';
 import type { BuilderCommand } from '../constants';
 import { BuilderEvent } from '../constants';
 import type { BuilderCommandContext } from '../type';

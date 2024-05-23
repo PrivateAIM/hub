@@ -15,7 +15,7 @@ import type { Request, Response } from 'routup';
 import { sendAccepted } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '@privateaim/server-http-kit';
-import { hasAmqpClient, useAmqpClient, useLogger } from '@privateaim/server-kit';
+import { isAmqpClientUsable, useAmqpClient, useLogger } from '@privateaim/server-kit';
 import {
     RegistryCommand,
     buildRegistryPayload,
@@ -32,7 +32,7 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
 
     const { data: result } = await runServiceRegistryValidation(req);
 
-    if (!hasAmqpClient()) {
+    if (!isAmqpClientUsable()) {
         return sendAccepted(res);
     }
 

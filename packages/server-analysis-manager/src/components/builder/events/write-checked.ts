@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { useAmqpClient } from '../../../core';
+import { useAmqpClient } from '@privateaim/server-kit';
 import { BuilderEvent } from '../constants';
 import type { BuilderCheckCommandContext, BuilderCheckPayload } from '../type';
 import { buildBuilderAggregatorQueuePayload } from '../utils';

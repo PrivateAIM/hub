@@ -17,7 +17,7 @@ export function setAmqpClientFactory(factory: Factory<Client>) {
     instance.setFactory(factory);
 }
 
-export function hasAmqpClient() {
+export function isAmqpClientUsable() {
     return instance.has() || instance.hasFactory();
 }
 

@@ -12,7 +12,7 @@ import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '@privateaim/server-http-kit';
-import { hasAmqpClient, useAmqpClient } from '@privateaim/server-kit';
+import { isAmqpClientUsable, useAmqpClient } from '@privateaim/server-kit';
 import { RegistryCommand, buildRegistryPayload } from '../../../../../components';
 import { NodeEntity, RegistryProjectEntity } from '../../../../../domains';
 import { deleteNodeRobot } from '../utils';
@@ -38,7 +38,7 @@ export async function deleteNodeRouteHandler(req: Request, res: Response) : Prom
         throw new ForbiddenError('You are not permitted to delete this station.');
     }
 
-    if (hasAmqpClient()) {
+    if (isAmqpClientUsable()) {
         if (entity.registry_project_id) {
             const registryProjectRepository = dataSource.getRepository(RegistryProjectEntity);
 

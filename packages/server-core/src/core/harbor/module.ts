@@ -8,7 +8,7 @@
 import { parseConnectionString } from '@hapic/harbor';
 import { getHostNameFromString } from '@privateaim/core';
 import { useDataSource } from 'typeorm-extension';
-import { hasAmqpClient, useAmqpClient } from '@privateaim/server-kit';
+import { isAmqpClientUsable, useAmqpClient } from '@privateaim/server-kit';
 import { RegistryCommand, buildRegistryPayload } from '../../components';
 import { RegistryEntity } from '../../domains';
 import { useEnv } from '../../config';
@@ -41,7 +41,7 @@ export async function setupHarborService() {
 
     await repository.save(entity);
 
-    if (!hasAmqpClient()) {
+    if (!isAmqpClientUsable()) {
         return;
     }
 

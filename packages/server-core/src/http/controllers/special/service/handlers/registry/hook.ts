@@ -8,7 +8,7 @@
 import { useRequestBody } from '@routup/basic/body';
 import type { Request, Response } from 'routup';
 import { sendAccepted } from 'routup';
-import { hasAmqpClient, useAmqpClient, useLogger } from '@privateaim/server-kit';
+import { isAmqpClientUsable, useAmqpClient, useLogger } from '@privateaim/server-kit';
 import { RegistryCommand, RegistryHookSchema, buildRegistryPayload } from '../../../../../../components';
 
 export async function postHarborHookRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -17,7 +17,7 @@ export async function postHarborHookRouteHandler(req: Request, res: Response) : 
     const validation = await RegistryHookSchema.safeParseAsync(body);
     if (validation.success === false) {
         useLogger().warn('The registry hook has a malformed shape.', { error: validation.error });
-    } else if (hasAmqpClient()) {
+    } else if (isAmqpClientUsable()) {
         const client = useAmqpClient();
         await client.publish(buildRegistryPayload({
             command: RegistryCommand.EVENT_HANDLE,
