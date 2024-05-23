@@ -7,7 +7,7 @@
 
 import { DomainType } from '@authup/core-kit';
 import { isRedisClientUsable, useLogger, useRedisSubscribeClient } from '@privateaim/server-kit';
-import type { Aggregator } from '../type';
+import type { Aggregator } from '@privateaim/server-kit';
 import {
     handleAuthupRealmEvent,
     handleAuthupRobotEvent,

@@ -7,4 +7,3 @@
 
 export * from './authup';
 export * from './analysis-manager';
-export * from './type';
