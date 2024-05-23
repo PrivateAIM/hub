@@ -6,7 +6,7 @@
  */
 
 import type { ComponentContextWithError } from '@privateaim/server-kit';
-import { useAmqpClient } from '../../../core';
+import { useAmqpClient } from '@privateaim/server-kit';
 import { CoreEvent } from '../constants';
 import type { CoreCommandContext } from '../type';
 import { buildCoreAggregatorQueuePayload } from '../utils';

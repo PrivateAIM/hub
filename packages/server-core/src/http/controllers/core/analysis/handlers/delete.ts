@@ -13,7 +13,7 @@ import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '@privateaim/server-http-kit';
-import { hasAmqpClient, useAmqpClient } from '../../../../../core';
+import { isAmqpClientUsable, useAmqpClient } from '@privateaim/server-kit';
 import { AnalysisEntity, ProjectEntity } from '../../../../../domains';
 
 export async function deleteAnalysisRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -49,7 +49,7 @@ export async function deleteAnalysisRouteHandler(req: Request, res: Response) : 
     const proposalRepository = dataSource.getRepository(ProjectEntity);
     await proposalRepository.save(project);
 
-    if (hasAmqpClient()) {
+    if (isAmqpClientUsable()) {
         const message = buildCoreQueuePayload({
             command: CoreCommand.DESTROY,
             data: {

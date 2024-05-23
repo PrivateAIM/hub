@@ -10,8 +10,7 @@ import {
     buildRegistryClientConnectionStringFromRegistry,
 } from '@privateaim/core';
 import { useDataSource } from 'typeorm-extension';
-import { useLogger } from '@privateaim/server-kit';
-import { useAmqpClient } from '../../../core';
+import { useAmqpClient, useLogger } from '@privateaim/server-kit';
 import { RegistryEntity, RegistryProjectEntity } from '../../../domains';
 import { ComponentName } from '../../constants';
 import { RegistryCommand } from '../constants';

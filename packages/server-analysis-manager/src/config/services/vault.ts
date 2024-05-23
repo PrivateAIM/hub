@@ -6,19 +6,13 @@
  */
 
 import { VaultClient, setVaultFactory } from '@privateaim/server-kit';
-import { isBoolFalse, isBoolTrue } from '@privateaim/core';
-import { ConfigDefaults, useEnv } from '../env';
+import { useEnv } from '../env';
 
-export function configureVault() {
+export function setupVault() {
     const connectionString = useEnv('vaultConnectionString');
-    if (
-        typeof connectionString !== 'undefined' &&
-        !isBoolFalse(connectionString)
-    ) {
+    if (typeof connectionString !== 'undefined') {
         setVaultFactory(() => new VaultClient({
-            connectionString: isBoolTrue(connectionString) ?
-                ConfigDefaults.VAULT :
-                connectionString,
+            connectionString,
         }));
     }
 }

@@ -6,11 +6,11 @@
  */
 
 import { Client } from 'amqp-extension';
-import { setAmqpFactory } from '../../core/amqp';
+import { setAmqpClientFactory } from '@privateaim/server-kit';
 import { useEnv } from '../env';
 
 export function configureAMQP() {
-    setAmqpFactory(() => new Client({
+    setAmqpClientFactory(() => new Client({
         connection: useEnv('rabbitMqConnectionString'),
         exchange: {
             name: 'pht',

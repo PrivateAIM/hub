@@ -12,10 +12,10 @@ import { REALM_MASTER_NAME } from '@authup/core-kit';
 import { ServerError } from '@ebec/http';
 import { isClientErrorWithStatusCode } from '@hapic/harbor';
 import { PermissionKey, ServiceID } from '@privateaim/core';
-import { useLogger } from '@privateaim/server-kit';
-import { useAuthupClient } from './module';
+import { useAuthupClient, useLogger } from '@privateaim/server-kit';
 
 export async function setupAuthupService(): Promise<any> {
+    // todo: check if authup client is usable
     const authupClient = useAuthupClient();
 
     // -------------------------------------------------

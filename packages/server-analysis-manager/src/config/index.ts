@@ -7,4 +7,5 @@
 
 export * from './env';
 export * from './module';
-export * from './paths';
+export * from './constants';
+export * from './types';

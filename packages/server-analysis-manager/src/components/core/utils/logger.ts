@@ -7,7 +7,7 @@
 
 import type { Logger } from '@privateaim/server-kit';
 import { createLogger } from '@privateaim/server-kit';
-import { getWritableDirPath } from '../../../config';
+import { WRITABLE_DIRECTORY_PATH } from '../../../config';
 import { ComponentName } from '../../constants';
 
 let instance : Logger | undefined;
@@ -24,7 +24,7 @@ export function useCoreLogger() : Logger {
             },
         },
         // todo: allow specifying custom path
-        directory: getWritableDirPath(),
+        directory: WRITABLE_DIRECTORY_PATH,
     });
 
     return instance;

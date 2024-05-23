@@ -5,8 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { Aggregator, Component } from '@privateaim/server-kit';
+import { isAmqpClientUsable } from '@privateaim/server-kit';
 import { buildAuthupAggregator, buildTrainManagerAggregator } from '../aggregators';
-import { hasAmqpClient } from '../core';
 import { EnvironmentName, useEnv } from './env';
 
 import { buildRouterComponent } from '../components';
@@ -16,8 +17,8 @@ import {
 } from './services';
 
 export type Config = {
-    aggregators: {start: () => void}[]
-    components: {start: () => void}[]
+    aggregators: Aggregator[]
+    components: Component[]
 };
 
 export function createConfig() : Config {
@@ -40,7 +41,7 @@ export function createConfig() : Config {
     // ---------------------------------------------
 
     const aggregators : {start: () => void}[] = [];
-    if (!isTest && hasAmqpClient()) {
+    if (!isTest && isAmqpClientUsable()) {
         aggregators.push(buildAuthupAggregator());
         aggregators.push(buildTrainManagerAggregator());
     }
@@ -48,7 +49,7 @@ export function createConfig() : Config {
     // ---------------------------------------------
 
     const components : {start: () => void}[] = [];
-    if (!isTest && hasAmqpClient()) {
+    if (!isTest && isAmqpClientUsable()) {
         components.push(
             buildRouterComponent(),
         );

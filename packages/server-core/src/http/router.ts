@@ -5,18 +5,19 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { isRedisClientUsable, useRedisClient } from '@privateaim/server-kit';
+import {
+    isAuthupClientUsable,
+    isRedisClientUsable,
+    isVaultClientUsable,
+    useAuthupClient,
+    useRedisClient,
+    useVaultClient,
+} from '@privateaim/server-kit';
 import { mountErrorMiddleware, mountMiddlewares } from '@privateaim/server-http-kit';
 import type { MiddlewareSwaggerOptions } from '@privateaim/server-http-kit';
 import { Router } from 'routup';
 import { EnvironmentName, useEnv } from '../config';
 
-import {
-    hasAuthupClient,
-    hasVaultClient,
-    useAuthupClient,
-    useVaultClient,
-} from '../core';
 import { AnalysisController } from './controllers/core/analysis';
 import { AnalysisFileController } from './controllers/core/analysis-file';
 import { AnalysisLogController } from './controllers/core/analysis-log';
@@ -51,10 +52,10 @@ export function createRouter() : Router {
         prometheus: !isTestEnvironment,
         rateLimit: !isTestEnvironment,
         authup: {
-            client: hasAuthupClient() ?
+            client: isAuthupClientUsable() ?
                 useAuthupClient() :
                 undefined,
-            vaultClient: hasVaultClient() ?
+            vaultClient: isVaultClientUsable() ?
                 useVaultClient() :
                 undefined,
             redisClient: isRedisClientUsable() ?

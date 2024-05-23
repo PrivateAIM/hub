@@ -4,5 +4,9 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
+import type { Aggregator, Component } from '@privateaim/server-kit';
 
-export * from './module';
+export type Config = {
+    aggregators: Aggregator[]
+    components: Component[]
+};

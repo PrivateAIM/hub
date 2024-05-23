@@ -10,11 +10,16 @@ import {
     mountErrorMiddleware,
     mountMiddlewares,
 } from '@privateaim/server-http-kit';
+import {
+    isAuthupClientUsable,
+    isRedisClientUsable,
+    isVaultClientUsable,
+    useAuthupClient,
+    useRedisClient,
+    useVaultClient,
+} from '@privateaim/server-kit';
 import { Router, coreHandler } from 'routup';
 import { EnvironmentName, useEnv } from '../config';
-import {
-    hasAuthupClient, hasRedis, hasVaultClient, useAuthupClient, useRedis, useVaultClient,
-} from '../core';
 import { BucketController, BucketFileController } from './controllers';
 
 export function createHTTPRouter() : Router {
@@ -33,14 +38,14 @@ export function createHTTPRouter() : Router {
         basic: true,
         cors: true,
         authup: {
-            client: hasAuthupClient() ?
+            client: isAuthupClientUsable() ?
                 useAuthupClient() :
                 undefined,
-            vaultClient: hasVaultClient() ?
+            vaultClient: isVaultClientUsable() ?
                 useVaultClient() :
                 undefined,
-            redisClient: hasRedis() ?
-                useRedis() :
+            redisClient: isRedisClientUsable() ?
+                useRedisClient() :
                 undefined,
             fakeAbilities: useEnv('env') === EnvironmentName.TEST,
         },

@@ -12,11 +12,12 @@ import { singa } from 'singa';
 const instance = singa<Client>({
     name: 'amqp',
 });
-export function setAmqpFactory(factory: Factory<Client>) {
+
+export function setAmqpClientFactory(factory: Factory<Client>) {
     instance.setFactory(factory);
 }
 
-export function hasAmqpClient() {
+export function isAmqpClientUsable() {
     return instance.has() || instance.hasFactory();
 }
 

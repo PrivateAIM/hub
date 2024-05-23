@@ -8,14 +8,11 @@
 import { createRedisClient, setRedisFactory } from '@privateaim/server-kit';
 import { useEnv } from '../env';
 
-export function configureRedis() {
+export function setupRedis() {
     const connectionString = useEnv('redisConnectionString');
-    if (!connectionString) {
-        // todo: log debug message
-        return;
+    if (typeof connectionString !== 'undefined') {
+        setRedisFactory(() => createRedisClient({
+            connectionString,
+        }));
     }
-
-    setRedisFactory(() => createRedisClient({
-        connectionString,
-    }));
 }

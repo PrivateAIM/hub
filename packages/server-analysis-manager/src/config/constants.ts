@@ -5,8 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Client } from 'redis-extension';
+import path from 'node:path';
+import process from 'node:process';
 
-export type Config = {
-    redisDatabase: Client
-};
+export const WRITABLE_DIRECTORY_PATH = path.join(process.cwd(), 'writable');
