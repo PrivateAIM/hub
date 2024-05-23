@@ -19,18 +19,6 @@
         "email": "admin@tada5hi.net",
         "url": "https://github.com/tada5hi"
     },
-    "devDependencies": {
-        "@authup/core-kit": "^1.0.0-beta.13",
-        "@privateaim/core": "^0.4.0",
-        "hapic": "^2.5.1",
-        "rapiq": "^0.9.0"
-    },
-    "peerDependencies": {
-        "@authup/core-kit": "^1.0.0-beta.13",
-        "@privateaim/core": "^0.4.0",
-        "hapic": "^2.5.1",
-        "rapiq": "^0.9.0"
-    },
     "scripts": {
         "build:types": "tsc --emitDeclarationOnly -p tsconfig.build.json",
         "build:js": "rollup -c",

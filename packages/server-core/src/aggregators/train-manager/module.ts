@@ -31,6 +31,7 @@ export function buildTrainManagerAggregator() : Aggregator {
 
                 if (payload.error) {
                     error = new ComponentError({
+                        component: payload.metadata.component,
                         message: payload.error.message,
                         code: payload.error.code,
                         step: `${payload.error.step}`,

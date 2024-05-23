@@ -58,7 +58,9 @@ export async function packContainerWithTrain(container: Container, context: Cont
                 });
 
                 extract.on('error', () => {
-                    reject(new BuilderError('The analysis file stream could not be extracted'));
+                    reject(new BuilderError({
+                        message: 'The analysis file stream could not be extracted',
+                    }));
                 });
 
                 extract.on('finish', () => {
@@ -80,7 +82,9 @@ export async function packContainerWithTrain(container: Container, context: Cont
 
                     container.putArchive(pack, { path: AnalysisContainerPath.CODE })
                         .then(() => resolve())
-                        .catch(() => reject(new BuilderError('The analysis pack stream could not be forwarded to the container.')));
+                        .catch(() => reject(new BuilderError({
+                            message: 'The analysis pack stream could not be forwarded to the container.',
+                        })));
                 });
 
                 const readStream = stream.Readable.fromWeb(response as any);

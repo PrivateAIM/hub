@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BuilderCommand } from '@privateaim/server-analysis-manager-kit';
+import { BuilderCommand, ComponentName } from '@privateaim/server-analysis-manager-kit';
 import type { BuilderCommandContext } from '@privateaim/server-analysis-manager-kit';
 import { extendPayload } from '../utils';
 import {
@@ -30,7 +30,7 @@ export async function executeBuilderCommand(
     switch (context.command) {
         case BuilderCommand.BUILD: {
             await Promise.resolve(context.data)
-                .then(extendPayload)
+                .then((data) => extendPayload(data, ComponentName.BUILDER))
                 .then((data) => writeBuildingEvent({ data, command: context.command }))
                 .then(executeBuilderBuildCommand)
                 .then((data) => writeBuiltEvent({ data, command: context.command }))
@@ -50,7 +50,7 @@ export async function executeBuilderCommand(
         }
         case BuilderCommand.CHECK: {
             await Promise.resolve(context.data)
-                .then(extendPayload)
+                .then((data) => extendPayload(data, ComponentName.BUILDER))
                 .then((data) => writeCheckingEvent({ data, command: context.command }))
                 .then(executeBuilderCheckCommand)
                 .then((data) => writeCheckedEvent({ data, command: context.command }))
