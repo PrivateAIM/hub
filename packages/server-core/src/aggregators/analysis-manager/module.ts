@@ -23,7 +23,7 @@ export function buildTrainManagerAggregator() : Aggregator {
             $any: async (message) => {
                 const payload = JSON.parse(message.content.toString('utf-8'));
                 if (!isComponentEventQueuePayload(payload)) {
-                    useLogger().error('Train-Manager aggregation event could not be processed.');
+                    useLogger().error('Analysis manager aggregation event could not be processed.');
                     return;
                 }
 
