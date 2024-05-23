@@ -11,7 +11,7 @@ import type {
 
 import type {
     ComponentName,
-} from '@privateaim/server-analysis-manager';
+} from '@privateaim/server-analysis-manager-kit';
 
 export type AnalysisLogSaveContext = {
     entity: Pick<Analysis, 'id'> &

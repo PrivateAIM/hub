@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { BuilderErrorCode } from '@privateaim/server-analysis-manager-kit';
 import { BaseError } from '../error';
-import { BuilderErrorCode } from './constants';
 
 export class BuilderError extends BaseError {
     static entrypointNotFound(message?: string) {

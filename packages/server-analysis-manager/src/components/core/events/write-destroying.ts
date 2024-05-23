@@ -6,8 +6,8 @@
  */
 
 import { useAmqpClient } from '@privateaim/server-kit';
-import { CoreEvent } from '../constants';
-import type { CoreDestroyCommandContext } from '../type';
+import { CoreEvent } from '@privateaim/server-analysis-manager-kit';
+import type { CoreDestroyCommandContext } from '@privateaim/server-analysis-manager-kit';
 import { buildCoreAggregatorQueuePayload } from '../utils';
 
 export async function writeDestroyingEvent(

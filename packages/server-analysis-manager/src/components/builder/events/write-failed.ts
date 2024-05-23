@@ -7,9 +7,8 @@
 
 import type { ComponentContextWithCommand, ComponentContextWithError } from '@privateaim/server-kit';
 import { useAmqpClient } from '@privateaim/server-kit';
-import type { BuilderCommand } from '../constants';
-import { BuilderEvent } from '../constants';
-import type { BuilderCommandContext } from '../type';
+import type { BuilderCommand, BuilderCommandContext } from '@privateaim/server-analysis-manager-kit';
+import { BuilderEvent } from '@privateaim/server-analysis-manager-kit';
 import { buildBuilderAggregatorQueuePayload } from '../utils';
 
 export async function writeFailedEvent(

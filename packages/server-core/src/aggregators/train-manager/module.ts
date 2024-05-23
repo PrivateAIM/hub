@@ -8,7 +8,7 @@
 import {
     ComponentError, isComponentEventQueuePayload, useAmqpClient, useLogger,
 } from '@privateaim/server-kit';
-import { ComponentName } from '@privateaim/server-analysis-manager';
+import { ComponentName } from '@privateaim/server-analysis-manager-kit';
 import type { Aggregator } from '../type';
 import { handleTrainManagerBuilderEvent } from './builder';
 

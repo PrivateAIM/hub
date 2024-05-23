@@ -11,8 +11,8 @@
             "@privateaim/server-http-kit": [
                 "./packages/server-http-kit/src"
             ],
-            "@privateaim/server-analysis-manager": [
-                "./packages/server-analysis-manager/src"
+            "@privateaim/server-analysis-manager-kit": [
+                "./packages/server-analysis-manager-kit/src"
             ]
         }
     }

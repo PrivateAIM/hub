@@ -26,6 +26,7 @@
         "@hapic/harbor": "^2.3.3",
         "@privateaim/core": "^0.4.0",
         "@privateaim/server-kit": "^0.4.0",
+        "@privateaim/server-analysis-manager-kit": "^0.4.0",
         "@privateaim/storage-kit": "^0.4.0",
         "amqp-extension": "^3.3.0",
         "dockerode": "^4.0.2",

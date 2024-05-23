@@ -6,8 +6,8 @@
  */
 
 import { useAmqpClient } from '@privateaim/server-kit';
-import { BuilderEvent } from '../constants';
-import type { BuilderCheckCommandContext, BuilderCheckPayload } from '../type';
+import { BuilderEvent } from '@privateaim/server-analysis-manager-kit';
+import type { BuilderCheckCommandContext, BuilderCheckPayload } from '@privateaim/server-analysis-manager-kit';
 import { buildBuilderAggregatorQueuePayload } from '../utils';
 
 export async function writeCheckingEvent(

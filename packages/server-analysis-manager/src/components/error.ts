@@ -7,7 +7,7 @@
 
 import type { ComponentErrorOptions } from '@privateaim/server-kit';
 import { ComponentError } from '@privateaim/server-kit';
-import { ErrorCode } from './constants';
+import { ErrorCode } from '@privateaim/server-analysis-manager-kit';
 
 export class BaseError extends ComponentError {
     // --------------------------------------------------------------------

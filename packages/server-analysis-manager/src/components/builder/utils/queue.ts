@@ -9,29 +9,10 @@ import {
     transformComponentErrorForQueuePayload,
 } from '@privateaim/server-kit';
 import type { ComponentContextWithError } from '@privateaim/server-kit';
-import type { PublishOptionsExtended } from 'amqp-extension';
-import { ComponentName } from '../../constants';
-import type { QueueRouterPayload } from '../../utils';
-import { ROUTER_QUEUE_ROUTING_KEY, cleanupPayload } from '../../utils';
-import type { BuilderCommandContext, BuilderEventContext } from '../type';
+import { ComponentName } from '@privateaim/server-analysis-manager-kit';
+import type { BuilderEventContext } from '@privateaim/server-analysis-manager-kit';
+import { cleanupPayload } from '../../utils';
 import { useBuilderLogger } from './logger';
-
-export function buildBuilderQueuePayload(
-    context: BuilderCommandContext,
-) : PublishOptionsExtended<QueueRouterPayload> {
-    return {
-        exchange: {
-            routingKey: ROUTER_QUEUE_ROUTING_KEY,
-        },
-        content: {
-            data: context.data,
-            metadata: {
-                component: ComponentName.BUILDER,
-                command: context.command,
-            },
-        },
-    };
-}
 
 export function buildBuilderAggregatorQueuePayload(
     context: BuilderEventContext | ComponentContextWithError<BuilderEventContext>,

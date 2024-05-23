@@ -5,11 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { CoreCommand } from '@privateaim/server-analysis-manager-kit';
+import type { CoreCommandContext } from '@privateaim/server-analysis-manager-kit';
 import {
     executeCoreConfigureCommand, executeCoreDestroyCommand,
 
 } from './commands';
-import { CoreCommand } from './constants';
 import {
     writeConfiguredEvent,
     writeConfiguringEvent,
@@ -17,7 +18,6 @@ import {
     writeDestroyingEvent,
     writeFailedEvent,
 } from './events';
-import type { CoreCommandContext } from './type';
 import { useCoreLogger } from './utils';
 
 export async function executeCoreCommand(

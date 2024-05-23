@@ -10,13 +10,13 @@ import {
 } from '@privateaim/core';
 import { isClientErrorWithStatusCode } from 'hapic';
 
+import { BuilderCommand } from '@privateaim/server-analysis-manager-kit';
+import type { BuilderCheckPayload } from '@privateaim/server-analysis-manager-kit';
 import { createBasicHarborAPIClient, useCoreClient } from '../../../../core';
 import type { ComponentPayloadExtended } from '../../../type';
 import { extendPayload } from '../../../utils';
-import { BuilderCommand } from '../../constants';
 import { BuilderError } from '../../error';
 import { writeBuiltEvent, writeNoneEvent } from '../../events';
-import type { BuilderCheckPayload } from '../../type';
 
 export async function executeBuilderCheckCommand(
     input: BuilderCheckPayload,

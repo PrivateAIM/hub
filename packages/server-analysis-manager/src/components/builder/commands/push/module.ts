@@ -8,14 +8,14 @@
 import {
     REGISTRY_ARTIFACT_TAG_LATEST,
 } from '@privateaim/core';
+import { BuilderCommand } from '@privateaim/server-analysis-manager-kit';
+import type { BuilderBuildPayload } from '@privateaim/server-analysis-manager-kit';
 import {
     buildDockerAuthConfig, buildRemoteDockerImageURL, pushDockerImage, useCoreClient, useDocker,
 } from '../../../../core';
 import type { ComponentPayloadExtended } from '../../../type';
 import { extendPayload } from '../../../utils';
-import { BuilderCommand } from '../../constants';
 import { BuilderError } from '../../error';
-import type { BuilderBuildPayload } from '../../type';
 import { useBuilderLogger } from '../../utils';
 
 export async function executePushCommand(

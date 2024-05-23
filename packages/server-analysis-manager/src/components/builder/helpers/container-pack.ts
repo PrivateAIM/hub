@@ -9,10 +9,10 @@ import stream from 'node:stream';
 import { AnalysisContainerPath, AnalysisFileType, buildAnalysisFileBucketName } from '@privateaim/core';
 import type { Container } from 'dockerode';
 import tar from 'tar-stream';
+import { BuilderCommand } from '@privateaim/server-analysis-manager-kit';
 import {
     streamToBuffer, useStorageClient,
 } from '../../../core';
-import { BuilderCommand } from '../constants';
 import { BuilderError } from '../error';
 import { useBuilderLogger } from '../utils';
 import type { ContainerPackContext } from './type';

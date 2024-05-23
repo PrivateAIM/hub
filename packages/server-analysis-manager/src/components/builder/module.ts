@@ -5,13 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { BuilderCommand } from '@privateaim/server-analysis-manager-kit';
+import type { BuilderCommandContext } from '@privateaim/server-analysis-manager-kit';
 import { extendPayload } from '../utils';
 import {
     executeBuilderBuildCommand,
     executeBuilderCheckCommand,
     executePushCommand,
 } from './commands';
-import { BuilderCommand } from './constants';
 import {
     writeBuildingEvent,
     writeBuiltEvent,
@@ -21,7 +22,6 @@ import {
     writePushedEvent,
     writePushingEvent,
 } from './events';
-import type { BuilderCommandContext } from './type';
 import { useBuilderLogger } from './utils';
 
 export async function executeBuilderCommand(

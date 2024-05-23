@@ -10,7 +10,7 @@ import {
     AnalysisBuildStatus,
     AnalysisNodeApprovalStatus,
 } from '@privateaim/core';
-import { BuilderCommand, buildBuilderQueuePayload } from '@privateaim/server-analysis-manager';
+import { BuilderCommand, buildBuilderQueuePayload } from '@privateaim/server-analysis-manager-kit';
 import { useDataSource } from 'typeorm-extension';
 import { useAmqpClient } from '@privateaim/server-kit';
 import { RegistryEntity } from '../../registry';

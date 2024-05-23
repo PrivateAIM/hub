@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024.
+ * Copyright (c) 2024.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
@@ -16,3 +16,5 @@ export enum ErrorCode {
     REGISTRY_PROJECT_NOT_FOUND = 'registryProjectNotFound',
     NONE = 'none',
 }
+
+export const ROUTER_QUEUE_ROUTING_KEY = 'tm.router';

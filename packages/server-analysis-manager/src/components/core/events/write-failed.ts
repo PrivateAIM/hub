@@ -7,8 +7,8 @@
 
 import type { ComponentContextWithError } from '@privateaim/server-kit';
 import { useAmqpClient } from '@privateaim/server-kit';
-import { CoreEvent } from '../constants';
-import type { CoreCommandContext } from '../type';
+import { CoreEvent } from '@privateaim/server-analysis-manager-kit';
+import type { CoreCommandContext } from '@privateaim/server-analysis-manager-kit';
 import { buildCoreAggregatorQueuePayload } from '../utils';
 
 export async function writeFailedEvent(
