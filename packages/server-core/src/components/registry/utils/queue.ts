@@ -6,9 +6,9 @@
  */
 
 import type { PublishOptionsExtended } from 'amqp-extension';
+import type { QueueRouterPayload } from '@privateaim/server-kit';
 import { ComponentName } from '../../constants';
-import { ROUTER_QUEUE_ROUTING_KEY } from '../../router';
-import type { QueueRouterPayload } from '../../router';
+import { QUEUE_ROUTER_ROUTING_KEY } from '../../../constants';
 import type { RegistryCommandContext } from '../type';
 
 export function buildRegistryPayload(
@@ -16,7 +16,7 @@ export function buildRegistryPayload(
 ) : PublishOptionsExtended<QueueRouterPayload> {
     return {
         exchange: {
-            routingKey: ROUTER_QUEUE_ROUTING_KEY,
+            routingKey: QUEUE_ROUTER_ROUTING_KEY,
         },
         content: {
             data: context.data,

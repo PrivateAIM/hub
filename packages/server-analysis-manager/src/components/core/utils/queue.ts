@@ -9,12 +9,13 @@ import { transformComponentErrorForQueuePayload } from '@privateaim/server-kit';
 import type { ComponentContextWithError } from '@privateaim/server-kit';
 import { ComponentName } from '@privateaim/server-analysis-manager-kit';
 import type { CoreEventContext } from '@privateaim/server-analysis-manager-kit';
+import type { PublishOptionsExtended } from 'amqp-extension';
 import { cleanupPayload } from '../../utils';
 import { useCoreLogger } from './logger';
 
 export function buildCoreAggregatorQueuePayload(
     context: CoreEventContext | ComponentContextWithError<CoreEventContext>,
-) {
+) : PublishOptionsExtended {
     const error = transformComponentErrorForQueuePayload(context);
     if (error) {
         useCoreLogger().error('Command execution failed.', {

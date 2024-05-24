@@ -6,4 +6,3 @@
  */
 
 export * from './payload-extend';
-export * from './queue';
