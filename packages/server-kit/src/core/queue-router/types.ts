@@ -5,25 +5,23 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ObjectLiteral } from '../../type';
-
-export type QueueRouterHandlerContext = {
-    command: string,
+export type QueueRouterPayload = {
+    id: string,
+    type: string,
     data: Record<string, any>,
-};
-
-export type QueueRouterHandler<T = QueueRouterHandlerContext> = (ctx: T) => Promise<void> | void;
-
-export type QueueRouterCreateContext = {
-    routingKey: string,
-    handlers: Record<string, QueueRouterHandler>,
-};
-
-export type QueueRouterPayload<T extends ObjectLiteral = ObjectLiteral> = {
-    data: T,
     metadata: {
-        command: string,
-        event?: string,
-        component: string
+        timestamp: number
     }
+};
+
+export type QueueRouterPayloadInput = Pick<
+QueueRouterPayload,
+'type'
+> &
+Partial<Omit<QueueRouterPayload, 'type'>>;
+
+export type QueueRouterHandler = (message: QueueRouterPayload) => Promise<void> | void;
+export type QueueRouterHandlers = {
+    $any?: QueueRouterHandler,
+    [key: string]: QueueRouterHandler
 };

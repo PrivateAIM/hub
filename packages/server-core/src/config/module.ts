@@ -6,7 +6,7 @@
  */
 
 import type { Aggregator, Component } from '@privateaim/server-kit';
-import { createQueueRouterComponent, isAmqpClientUsable } from '@privateaim/server-kit';
+import { createMessageRouterComponent, isAmqpClientUsable, isMessageRouterUsable } from '@privateaim/server-kit';
 import { buildAuthupAggregator, buildTrainManagerAggregator } from '../aggregators';
 import { QUEUE_ROUTER_ROUTING_KEY } from '../constants';
 import { EnvironmentName, useEnv } from './env';
@@ -55,12 +55,9 @@ export function createConfig() : Config {
     // ---------------------------------------------
 
     const components : {start: () => void}[] = [];
-    if (!isTest && isAmqpClientUsable()) {
-        components.push(createQueueRouterComponent({
-            routingKey: QUEUE_ROUTER_ROUTING_KEY,
-            handlers: {
-                [ComponentName.REGISTRY]: (ctx: RegistryCommandContext) => executeRegistryCommand(ctx),
-            },
+    if (!isTest && isMessageRouterUsable()) {
+        components.push(createMessageRouterComponent(QUEUE_ROUTER_ROUTING_KEY, {
+            [ComponentName.REGISTRY]: (ctx: RegistryCommandContext) => executeRegistryCommand(ctx),
         }));
     }
 

@@ -21,13 +21,3 @@ export type QueuePayload<
     metadata: M,
     error?: QueuePayloadError
 };
-
-export type QueueCommandPayload<
-    T extends ObjectLiteral = ObjectLiteral,
-    M extends ObjectLiteral = ObjectLiteral,
-> = QueuePayload<T, {command: string, component: string} & M>;
-
-export type QueueEventPayload<
-    T extends ObjectLiteral = ObjectLiteral,
-    M extends ObjectLiteral = ObjectLiteral,
-> = QueuePayload<T, {command: string, component: string, event: string} & M>;

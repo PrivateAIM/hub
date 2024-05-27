@@ -8,7 +8,7 @@
 import type { BuilderCommandContext, CoreCommandContext } from '@privateaim/server-analysis-manager-kit';
 import { ComponentName } from '@privateaim/server-analysis-manager-kit';
 import type { Aggregator, Component } from '@privateaim/server-kit';
-import { createQueueRouterComponent, guessAuthupTokenCreatorOptions } from '@privateaim/server-kit';
+import { createMessageRouterComponent, guessAuthupTokenCreatorOptions } from '@privateaim/server-kit';
 import {
     executeBuilderCommand, executeCoreCommand,
 } from '../components';

@@ -5,49 +5,28 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { useAmqpClient, useLogger } from '../../services';
-import { isComponentCommandQueuePayload } from '../component';
-import type { Component } from '../component';
-import type { QueueRouterCreateContext } from './types';
+import type { QueueRouterStrategy } from './strategies';
+import type {
+    QueueRouterHandlers,
+    QueueRouterPayload,
+} from './types';
 
-export function createQueueRouterComponent(ctx: QueueRouterCreateContext) : Component {
-    function start() {
-        // todo: check if amqp client is usable ?
-        const client = useAmqpClient();
+export class QueueRouter {
+    protected strategy : QueueRouterStrategy;
 
-        return client.consume({
-            exchange: {
-                routingKey: ctx.routingKey,
-            },
-            prefetchCount: 1,
-            noAck: false,
-        }, {
-            $any: async (message) => {
-                const payload = JSON.parse(message.content.toString('utf-8'));
-                if (!isComponentCommandQueuePayload(payload)) {
-                    useLogger().error('The queue router payload is malformed.');
-                    return;
-                }
+    //----------------------------------------------------------------
 
-                useLogger().debug('Command received', {
-                    component: payload.metadata.component,
-                    command: payload.metadata.command,
-                });
-
-                const handler = ctx.handlers[payload.metadata.component];
-                if (typeof handler !== 'function') {
-                    useLogger().error(`No handler registered for component ${payload.metadata.component}`);
-                }
-
-                await handler({
-                    command: payload.metadata.command,
-                    data: payload.data,
-                });
-            },
-        });
+    constructor(driver: QueueRouterStrategy) {
+        this.strategy = driver;
     }
 
-    return {
-        start,
-    };
+    //----------------------------------------------------------------
+
+    publish(to: string, message: QueueRouterPayload) : Promise<boolean> {
+        return this.strategy.publish(to, message);
+    }
+
+    consume(from: string, handlers: QueueRouterHandlers) : Promise<void> {
+        return this.strategy.consume(from, handlers);
+    }
 }
