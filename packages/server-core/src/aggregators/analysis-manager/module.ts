@@ -13,6 +13,7 @@ import type { Aggregator } from '@privateaim/server-kit';
 import { handleTrainManagerBuilderEvent } from './builder';
 
 export function buildTrainManagerAggregator() : Aggregator {
+    // todo: check queueu-router + env
     const client = useAmqpClient();
     return {
         start: () => client.consume({

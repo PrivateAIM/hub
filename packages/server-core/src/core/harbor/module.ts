@@ -8,8 +8,8 @@
 import { parseConnectionString } from '@hapic/harbor';
 import { getHostNameFromString } from '@privateaim/core';
 import { useDataSource } from 'typeorm-extension';
-import { isAmqpClientUsable, useAmqpClient } from '@privateaim/server-kit';
-import { RegistryCommand, buildRegistryPayload } from '../../components';
+import { isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
+import { RegistryCommand, buildRegistryQueueRouterPayload } from '../../components';
 import { RegistryEntity } from '../../domains';
 import { useEnv } from '../../config';
 
@@ -41,18 +41,18 @@ export async function setupHarborService() {
 
     await repository.save(entity);
 
-    if (!isAmqpClientUsable()) {
+    if (!isQueueRouterUsable()) {
         return;
     }
 
-    const client = useAmqpClient();
+    const queueRouter = useQueueRouter();
 
-    const queueMessage = buildRegistryPayload({
+    const queueMessage = buildRegistryQueueRouterPayload({
         command: RegistryCommand.SETUP,
         data: {
             id: entity.id,
         },
     });
 
-    await client.publish(queueMessage);
+    await queueRouter.publish(queueMessage);
 }

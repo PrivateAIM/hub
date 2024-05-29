@@ -12,8 +12,8 @@ import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '@privateaim/server-http-kit';
-import { isAmqpClientUsable, useAmqpClient } from '@privateaim/server-kit';
-import { RegistryCommand, buildRegistryPayload } from '../../../../../components';
+import { isAmqpClientUsable, useQueueRouter } from '@privateaim/server-kit';
+import { RegistryCommand, buildRegistryQueueRouterPayload } from '../../../../../components';
 import { NodeEntity, RegistryProjectEntity } from '../../../../../domains';
 import { deleteNodeRobot } from '../utils';
 
@@ -44,7 +44,7 @@ export async function deleteNodeRouteHandler(req: Request, res: Response) : Prom
 
             const registryProject = await registryProjectRepository.findOneBy({ id: entity.registry_project_id });
             if (registryProject) {
-                const queueMessage = buildRegistryPayload({
+                const queueMessage = buildRegistryQueueRouterPayload({
                     command: RegistryCommand.PROJECT_UNLINK,
                     data: {
                         id: registryProject.id,
@@ -54,8 +54,8 @@ export async function deleteNodeRouteHandler(req: Request, res: Response) : Prom
                     },
                 });
 
-                const client = useAmqpClient();
-                await client.publish(queueMessage);
+                const queueRouter = useQueueRouter();
+                await queueRouter.publish(queueMessage);
                 await registryProjectRepository.remove(registryProject);
             }
         }

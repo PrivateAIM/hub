@@ -10,12 +10,12 @@ import {
     buildRegistryClientConnectionStringFromRegistry,
 } from '@privateaim/core';
 import { useDataSource } from 'typeorm-extension';
-import { useAmqpClient, useLogger } from '@privateaim/server-kit';
+import { useLogger, useQueueRouter } from '@privateaim/server-kit';
 import { RegistryEntity, RegistryProjectEntity } from '../../../domains';
 import { ComponentName } from '../../constants';
 import { RegistryCommand } from '../constants';
 import type { RegistryCleanupPayload } from '../type';
-import { buildRegistryPayload } from '../utils';
+import { buildRegistryQueueRouterPayload } from '../utils';
 import { createBasicHarborAPIClient } from './utils';
 
 export async function cleanupRegistry(payload: RegistryCleanupPayload) {
@@ -57,6 +57,8 @@ export async function cleanupRegistry(payload: RegistryCleanupPayload) {
     const projectEntities = await projectRepository.find();
     const projectEntityExternalNames = projectEntities.map((item) => item.external_name);
 
+    const queueRouter = useQueueRouter();
+
     for (let i = 0; i < projects.length; i++) {
         const index = projectEntityExternalNames.indexOf(`${projects[i].name}`);
         if (index !== -1) {
@@ -67,7 +69,7 @@ export async function cleanupRegistry(payload: RegistryCleanupPayload) {
             continue;
         }
 
-        const queueMessage = buildRegistryPayload({
+        const queueMessage = buildRegistryQueueRouterPayload({
             command: RegistryCommand.PROJECT_UNLINK,
             data: {
                 registryId: entity.id,
@@ -75,7 +77,6 @@ export async function cleanupRegistry(payload: RegistryCleanupPayload) {
             },
         });
 
-        const client = useAmqpClient();
-        await client.publish(queueMessage);
+        await queueRouter.publish(queueMessage);
     }
 }

@@ -8,8 +8,8 @@
 import type { RobotEventContext } from '@authup/core-kit';
 import { ServiceID } from '@privateaim/core';
 import { useDataSource } from 'typeorm-extension';
-import { useAmqpClient } from '@privateaim/server-kit';
-import { RegistryCommand, buildRegistryPayload } from '../../../components';
+import { useQueueRouter } from '@privateaim/server-kit';
+import { RegistryCommand, buildRegistryQueueRouterPayload } from '../../../components';
 import { RegistryProjectEntity } from '../../../domains';
 
 export async function handleAuthupRobotEvent(context: RobotEventContext) {
@@ -26,15 +26,15 @@ export async function handleAuthupRobotEvent(context: RobotEventContext) {
             });
 
             for (let i = 0; i < projects.length; i++) {
-                const queueMessage = buildRegistryPayload({
+                const queueMessage = buildRegistryQueueRouterPayload({
                     command: RegistryCommand.PROJECT_LINK,
                     data: {
                         id: projects[i].id,
                     },
                 });
 
-                const client = useAmqpClient();
-                await client.publish(queueMessage);
+                const queueRouter = useQueueRouter();
+                await queueRouter.publish(queueMessage);
             }
         }
     }

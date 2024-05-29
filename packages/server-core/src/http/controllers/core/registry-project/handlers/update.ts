@@ -12,8 +12,8 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { isRealmResourceWritable } from '@authup/core-kit';
 import { useRequestEnv } from '@privateaim/server-http-kit';
-import { isAmqpClientUsable, useAmqpClient } from '@privateaim/server-kit';
-import { RegistryCommand, buildRegistryPayload } from '../../../../../components';
+import { isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
+import { RegistryCommand, buildRegistryQueueRouterPayload } from '../../../../../components';
 import { runRegistryProjectValidation } from '../utils';
 import { RegistryProjectEntity } from '../../../../../domains';
 
@@ -46,15 +46,15 @@ export async function updateRegistryProjectRouteHandler(req: Request, res: Respo
 
     await repository.save(entity);
 
-    if (isAmqpClientUsable()) {
-        const client = useAmqpClient();
+    if (isQueueRouterUsable()) {
+        const client = useQueueRouter();
 
         if (
             entity.external_name &&
             result.data.external_name &&
             entity.external_name !== result.data.external_name
         ) {
-            await client.publish(buildRegistryPayload({
+            await client.publish(buildRegistryQueueRouterPayload({
                 command: RegistryCommand.PROJECT_UNLINK,
                 data: {
                     id: entity.id,
@@ -65,7 +65,7 @@ export async function updateRegistryProjectRouteHandler(req: Request, res: Respo
             }));
         }
 
-        await client.publish(buildRegistryPayload({
+        await client.publish(buildRegistryQueueRouterPayload({
             command: RegistryCommand.PROJECT_LINK,
             data: {
                 id: entity.id,

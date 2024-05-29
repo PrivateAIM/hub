@@ -14,8 +14,8 @@ import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '@privateaim/server-http-kit';
-import { isAmqpClientUsable, useAmqpClient } from '@privateaim/server-kit';
-import { RegistryCommand, buildRegistryPayload } from '../../../../../components';
+import { isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
+import { RegistryCommand, buildRegistryQueueRouterPayload } from '../../../../../components';
 import { createNodeRobot, runNodeValidation } from '../utils';
 import { NodeEntity, RegistryProjectEntity } from '../../../../../domains';
 
@@ -87,17 +87,17 @@ export async function updateNodeRouteHandler(req: Request, res: Response) : Prom
         entity.registry_project_id = registryProject.id;
         entity.external_name = registryProjectExternalName;
 
-        if (isAmqpClientUsable()) {
-            const client = useAmqpClient();
+        if (isQueueRouterUsable()) {
+            const queueRouter = useQueueRouter();
             if (registryOperation === 'link') {
-                await client.publish(buildRegistryPayload({
+                await queueRouter.publish(buildRegistryQueueRouterPayload({
                     command: RegistryCommand.PROJECT_LINK,
                     data: {
                         id: registryProject.id,
                     },
                 }));
             } else {
-                await client.publish(buildRegistryPayload({
+                await queueRouter.publish(buildRegistryQueueRouterPayload({
                     command: RegistryCommand.PROJECT_RELINK,
                     data: {
                         id: registryProject.id,

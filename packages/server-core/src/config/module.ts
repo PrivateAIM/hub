@@ -6,16 +6,11 @@
  */
 
 import type { Aggregator, Component } from '@privateaim/server-kit';
-import { createMessageRouterComponent, isAmqpClientUsable, isMessageRouterUsable } from '@privateaim/server-kit';
+import { isAmqpClientUsable } from '@privateaim/server-kit';
 import { buildAuthupAggregator, buildTrainManagerAggregator } from '../aggregators';
-import { QUEUE_ROUTER_ROUTING_KEY } from '../constants';
 import { EnvironmentName, useEnv } from './env';
-import type {
-    RegistryCommandContext,
-} from '../components';
 import {
-    ComponentName,
-    executeRegistryCommand,
+    createRegistryComponent,
 } from '../components';
 import { getWritableDirPath } from './paths';
 import {
@@ -54,12 +49,9 @@ export function createConfig() : Config {
 
     // ---------------------------------------------
 
-    const components : {start: () => void}[] = [];
-    if (!isTest && isMessageRouterUsable()) {
-        components.push(createMessageRouterComponent(QUEUE_ROUTER_ROUTING_KEY, {
-            [ComponentName.REGISTRY]: (ctx: RegistryCommandContext) => executeRegistryCommand(ctx),
-        }));
-    }
+    const components : {start: () => void}[] = [
+        createRegistryComponent(),
+    ];
 
     return {
         aggregators,

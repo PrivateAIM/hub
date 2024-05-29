@@ -8,12 +8,12 @@
 import type { Analysis } from '@privateaim/core';
 import { PermissionID } from '@privateaim/core';
 import { ForbiddenError } from '@ebec/http';
-import { CoreCommand, buildCoreQueuePayload } from '@privateaim/server-analysis-manager-kit';
+import { CoreCommand, buildCoreTaskQueueRouterPayload } from '@privateaim/server-analysis-manager-kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '@privateaim/server-http-kit';
-import { isAmqpClientUsable, useAmqpClient } from '@privateaim/server-kit';
+import { isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
 import { runAnalysisValidation } from '../utils';
 import { AnalysisEntity, ProjectEntity } from '../../../../../domains';
 
@@ -49,15 +49,15 @@ export async function createAnalysisRouteHandler(req: Request, res: Response) : 
     const proposalRepository = dataSource.getRepository(ProjectEntity);
     await proposalRepository.save(result.relation.project);
 
-    if (isAmqpClientUsable()) {
-        const message = buildCoreQueuePayload({
+    if (isQueueRouterUsable()) {
+        const message = buildCoreTaskQueueRouterPayload({
             command: CoreCommand.CONFIGURE,
             data: {
                 id: entity.id,
             },
         });
 
-        const client = useAmqpClient();
+        const client = useQueueRouter();
         await client.publish(message);
     }
 

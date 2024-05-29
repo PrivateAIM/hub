@@ -5,11 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export type QueueRouterPayload<T = any> = {
-    data: T,
-    metadata: {
-        command: string,
-        event?: string,
-        component: string
-    }
-};
+export enum QueueRouterRoutingType {
+    WORK = 'work',
+    PUB_SUB = 'pubSub',
+}

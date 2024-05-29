@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BuilderCommand, buildBuilderQueuePayload } from '@privateaim/server-analysis-manager-kit';
+import { BuilderCommand, buildBuilderTaskQueueRouterPayload } from '@privateaim/server-analysis-manager-kit';
 import { useDataSource } from 'typeorm-extension';
-import { useAmqpClient } from '@privateaim/server-kit';
+import { useQueueRouter } from '@privateaim/server-kit';
 import { resolveAnalysis } from './utils';
 import { AnalysisEntity } from '../entity';
 
@@ -17,8 +17,8 @@ export async function detectAnalysisBuildStatus(train: AnalysisEntity | string) 
 
     train = await resolveAnalysis(train, repository);
 
-    const client = useAmqpClient();
-    await client.publish(buildBuilderQueuePayload({
+    const client = useQueueRouter();
+    await client.publish(buildBuilderTaskQueueRouterPayload({
         command: BuilderCommand.CHECK,
         data: {
             id: train.id,

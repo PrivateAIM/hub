@@ -12,8 +12,8 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { isRealmResourceWritable } from '@authup/core-kit';
 import { useRequestEnv } from '@privateaim/server-http-kit';
-import { isAmqpClientUsable, useAmqpClient } from '@privateaim/server-kit';
-import { RegistryCommand, buildRegistryPayload } from '../../../../../components';
+import { isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
+import { RegistryCommand, buildRegistryQueueRouterPayload } from '../../../../../components';
 import { RegistryProjectEntity } from '../../../../../domains';
 
 export async function deleteRegistryProjectRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -43,9 +43,9 @@ export async function deleteRegistryProjectRouteHandler(req: Request, res: Respo
 
     entity.id = entityId;
 
-    if (isAmqpClientUsable()) {
-        const client = useAmqpClient();
-        await client.publish(buildRegistryPayload({
+    if (isQueueRouterUsable()) {
+        const client = useQueueRouter();
+        await client.publish(buildRegistryQueueRouterPayload({
             command: RegistryCommand.PROJECT_UNLINK,
             data: {
                 id: entity.id,

@@ -12,11 +12,11 @@ import {
     RegistryProjectType, generateRegistryProjectId,
 } from '@privateaim/core';
 import { useDataSource } from 'typeorm-extension';
-import { useAmqpClient, useLogger } from '@privateaim/server-kit';
+import { useLogger, useQueueRouter } from '@privateaim/server-kit';
 import { RegistryEntity, RegistryProjectEntity } from '../../../domains';
 import { RegistryCommand } from '../constants';
 import type { RegistrySetupPayload } from '../type';
-import { buildRegistryPayload } from '../utils';
+import { buildRegistryQueueRouterPayload } from '../utils';
 
 export async function setupRegistry(payload: RegistrySetupPayload) {
     if (!payload.id) {
@@ -123,16 +123,16 @@ export async function setupRegistry(payload: RegistrySetupPayload) {
         select: ['id'],
     });
 
-    const client = useAmqpClient();
+    const queueRouter = useQueueRouter();
     for (let i = 0; i < entities.length; i++) {
-        const queueMessage = buildRegistryPayload({
+        const queueMessage = buildRegistryQueueRouterPayload({
             command: RegistryCommand.PROJECT_LINK,
             data: {
                 id: entities[i].id,
             },
         });
 
-        await client.publish(queueMessage);
+        await queueRouter.publish(queueMessage);
     }
 
     return payload;

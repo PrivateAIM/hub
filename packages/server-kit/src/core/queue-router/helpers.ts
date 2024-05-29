@@ -8,7 +8,7 @@
 import { createNanoID, hasOwnProperty, isObject } from '@privateaim/core';
 import type { QueueRouterPayload, QueueRouterPayloadInput } from './types';
 
-export function buildMessageRouterPayload(
+export function buildQueueRouterPublishPayload(
     input: QueueRouterPayloadInput,
 ) : QueueRouterPayload {
     return {
@@ -17,7 +17,7 @@ export function buildMessageRouterPayload(
         data: input.data || {},
         metadata: {
             timestamp: Date.now(),
-            ...(input.metadata || {}),
+            ...input.metadata,
         },
     };
 }
