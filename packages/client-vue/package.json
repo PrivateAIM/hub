@@ -50,7 +50,7 @@
         "@ilingo/vuelidate": "^5.0.2",
         "@privateaim/core": "^0.4.0",
         "@privateaim/storage-kit": "^0.4.0",
-        "@types/node": "^20.12.7",
+        "@types/node": "^20.12.13",
         "@vitejs/plugin-vue": "^5.0.4",
         "@vuecs/form-controls": "^2.2.0",
         "@vuecs/link": "^1.0.0",
