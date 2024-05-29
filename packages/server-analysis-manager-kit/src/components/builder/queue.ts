@@ -7,12 +7,12 @@
 
 import type { QueueRouterPayload } from '@privateaim/server-kit';
 import { buildQueueRouterPublishPayload } from '@privateaim/server-kit';
-import {cleanupPayload} from "../../utils";
+import { cleanupPayload } from '../../utils';
 import {
     BuilderEventQueueRouterRouting,
     BuilderTaskQueueRouterRouting,
 } from './constants';
-import type { BuilderCommandContext } from './types';
+import type { BuilderCommandContext, BuilderEventContext } from './types';
 
 export function buildBuilderTaskQueueRouterPayload(
     context: BuilderCommandContext,
@@ -27,10 +27,10 @@ export function buildBuilderTaskQueueRouterPayload(
 }
 
 export function buildBuilderEventQueueRouterPayload(
-    context: BuilderCommandContext,
+    context: BuilderEventContext,
 ) : QueueRouterPayload {
     return buildQueueRouterPublishPayload({
-        type: context.command,
+        type: context.event,
         data: cleanupPayload(context.data),
         metadata: {
             routing: BuilderEventQueueRouterRouting,

@@ -12,7 +12,7 @@ import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '@privateaim/server-http-kit';
 import { isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
-import { RegistryCommand, buildRegistryQueueRouterPayload } from '../../../../../components';
+import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../../../../components';
 import { runRegistryProjectValidation } from '../utils';
 import { RegistryProjectEntity } from '../../../../../domains';
 
@@ -32,7 +32,7 @@ export async function createRegistryProjectRouteHandler(req: Request, res: Respo
 
     if (isQueueRouterUsable()) {
         const client = useQueueRouter();
-        await client.publish(buildRegistryQueueRouterPayload({
+        await client.publish(buildRegistryTaskQueueRouterPayload({
             command: RegistryCommand.PROJECT_LINK,
             data: {
                 id: entity.id,

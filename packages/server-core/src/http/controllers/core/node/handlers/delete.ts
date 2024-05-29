@@ -13,7 +13,7 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '@privateaim/server-http-kit';
 import { isAmqpClientUsable, useQueueRouter } from '@privateaim/server-kit';
-import { RegistryCommand, buildRegistryQueueRouterPayload } from '../../../../../components';
+import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../../../../components';
 import { NodeEntity, RegistryProjectEntity } from '../../../../../domains';
 import { deleteNodeRobot } from '../utils';
 
@@ -44,7 +44,7 @@ export async function deleteNodeRouteHandler(req: Request, res: Response) : Prom
 
             const registryProject = await registryProjectRepository.findOneBy({ id: entity.registry_project_id });
             if (registryProject) {
-                const queueMessage = buildRegistryQueueRouterPayload({
+                const queueMessage = buildRegistryTaskQueueRouterPayload({
                     command: RegistryCommand.PROJECT_UNLINK,
                     data: {
                         id: registryProject.id,

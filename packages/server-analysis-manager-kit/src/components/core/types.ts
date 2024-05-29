@@ -7,11 +7,15 @@
 
 import type { CoreCommand, CoreEvent } from './constants';
 
-export type CoreConfigurePayload = {
+export type CoreBasePayload = {
+    error?: Error
+};
+
+export type CoreConfigurePayload = CoreBasePayload & {
     id: string
 };
 
-export type CoreDestroyPayload = {
+export type CoreDestroyPayload = CoreBasePayload & {
     id: string
 };
 

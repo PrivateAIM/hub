@@ -22,7 +22,7 @@ import {
 } from '@privateaim/server-kit';
 import {
     RegistryCommand,
-    buildRegistryQueueRouterPayload,
+    buildRegistryTaskQueueRouterPayload,
 } from '../../../../../../components';
 import { RegistryEntity, RegistryProjectEntity } from '../../../../../../domains';
 import { runServiceRegistryValidation } from '../../utils/validation';
@@ -59,7 +59,7 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
             if (result.command === RegistryAPICommand.SETUP) {
                 useLogger().info('Submitting setup registry command.');
 
-                const queueMessage = buildRegistryQueueRouterPayload({
+                const queueMessage = buildRegistryTaskQueueRouterPayload({
                     command: RegistryCommand.SETUP,
                     data: {
                         id: entity.id,
@@ -70,7 +70,7 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
             } else if (result.command === RegistryAPICommand.DELETE) {
                 useLogger().info('Submitting delete registry command.');
 
-                const queueMessage = buildRegistryQueueRouterPayload({
+                const queueMessage = buildRegistryTaskQueueRouterPayload({
                     command: RegistryCommand.DELETE,
                     data: {
                         id: entity.id,
@@ -81,7 +81,7 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
             } else {
                 useLogger().info('Submitting cleanup registry command.');
 
-                const queueMessage = buildRegistryQueueRouterPayload({
+                const queueMessage = buildRegistryTaskQueueRouterPayload({
                     command: RegistryCommand.CLEANUP,
                     data: {
                         id: entity.id,
@@ -103,7 +103,7 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
                 .getOne();
 
             if (result.command === RegistryAPICommand.PROJECT_LINK) {
-                const queueMessage = buildRegistryQueueRouterPayload({
+                const queueMessage = buildRegistryTaskQueueRouterPayload({
                     command: RegistryCommand.PROJECT_LINK,
                     data: {
                         id: entity.id,
@@ -112,7 +112,7 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
                 });
                 await client.publish(queueMessage);
             } else {
-                const queueMessage = buildRegistryQueueRouterPayload({
+                const queueMessage = buildRegistryTaskQueueRouterPayload({
                     command: RegistryCommand.PROJECT_UNLINK,
                     data: {
                         id: entity.id,

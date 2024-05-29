@@ -15,7 +15,7 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '@privateaim/server-http-kit';
 import { isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
-import { RegistryCommand, buildRegistryQueueRouterPayload } from '../../../../../components';
+import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../../../../components';
 import { createNodeRobot, runNodeValidation } from '../utils';
 import { NodeEntity, RegistryProjectEntity } from '../../../../../domains';
 
@@ -90,14 +90,14 @@ export async function updateNodeRouteHandler(req: Request, res: Response) : Prom
         if (isQueueRouterUsable()) {
             const queueRouter = useQueueRouter();
             if (registryOperation === 'link') {
-                await queueRouter.publish(buildRegistryQueueRouterPayload({
+                await queueRouter.publish(buildRegistryTaskQueueRouterPayload({
                     command: RegistryCommand.PROJECT_LINK,
                     data: {
                         id: registryProject.id,
                     },
                 }));
             } else {
-                await queueRouter.publish(buildRegistryQueueRouterPayload({
+                await queueRouter.publish(buildRegistryTaskQueueRouterPayload({
                     command: RegistryCommand.PROJECT_RELINK,
                     data: {
                         id: registryProject.id,

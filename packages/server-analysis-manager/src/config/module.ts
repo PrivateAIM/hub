@@ -5,12 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { BuilderCommandContext, CoreCommandContext } from '@privateaim/server-analysis-manager-kit';
-import { ComponentName } from '@privateaim/server-analysis-manager-kit';
 import type { Aggregator, Component } from '@privateaim/server-kit';
-import { createMessageRouterComponent, guessAuthupTokenCreatorOptions } from '@privateaim/server-kit';
+import { guessAuthupTokenCreatorOptions } from '@privateaim/server-kit';
 import {
-    executeBuilderCommand, executeCoreCommand,
+    createBuilderComponent, createCoreComponent,
 } from '../components';
 import {
     configureAMQP, configureCoreService, configureStorageService, setupLogger, setupVault,
@@ -29,13 +27,8 @@ export function createConfig() : Config {
     const aggregators : Aggregator[] = [];
 
     const components : Component[] = [
-        createQueueRouterComponent({
-            routingKey: 'tm.router',
-            handlers: {
-                [ComponentName.BUILDER]: (ctx: BuilderCommandContext) => executeBuilderCommand(ctx),
-                [ComponentName.CORE]: (ctx: CoreCommandContext) => executeCoreCommand(ctx),
-            },
-        }),
+        createBuilderComponent(),
+        createCoreComponent(),
     ];
 
     return {

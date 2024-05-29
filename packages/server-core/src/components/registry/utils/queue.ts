@@ -7,20 +7,17 @@
 
 import { buildQueueRouterPublishPayload } from '@privateaim/server-kit';
 import type { QueueRouterPayload } from '@privateaim/server-kit';
-import { ComponentName } from '../../constants';
+import { RegistryTaskQueueRouterRouting } from '../constants';
 import type { RegistryCommandContext } from '../type';
 
-export function buildRegistryQueueRouterPayload(
+export function buildRegistryTaskQueueRouterPayload(
     context: RegistryCommandContext,
 ) : QueueRouterPayload {
     return buildQueueRouterPublishPayload({
         type: context.command,
         data: context.data,
         metadata: {
-            routing: {
-                type: 'work',
-                key: ComponentName.REGISTRY,
-            },
+            routing: RegistryTaskQueueRouterRouting,
         },
     });
 }

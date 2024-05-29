@@ -13,7 +13,7 @@ import {
     useLogger,
     useQueueRouter,
 } from '@privateaim/server-kit';
-import { RegistryCommand, RegistryHookSchema, buildRegistryQueueRouterPayload } from '../../../../../../components';
+import { RegistryCommand, RegistryHookSchema, buildRegistryTaskQueueRouterPayload } from '../../../../../../components';
 
 export async function postHarborHookRouteHandler(req: Request, res: Response) : Promise<any> {
     const body = useRequestBody(req);
@@ -26,7 +26,7 @@ export async function postHarborHookRouteHandler(req: Request, res: Response) : 
 
     if (isQueueRouterUsable()) {
         const client = useQueueRouter();
-        await client.publish(buildRegistryQueueRouterPayload({
+        await client.publish(buildRegistryTaskQueueRouterPayload({
             command: RegistryCommand.EVENT_HANDLE,
             data: {
                 event: validation.data.type,

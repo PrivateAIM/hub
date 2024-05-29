@@ -13,7 +13,7 @@ import { useDataSource } from 'typeorm-extension';
 import { isRealmResourceWritable } from '@authup/core-kit';
 import { useRequestEnv } from '@privateaim/server-http-kit';
 import { isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
-import { RegistryCommand, buildRegistryQueueRouterPayload } from '../../../../../components';
+import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../../../../components';
 import { RegistryProjectEntity } from '../../../../../domains';
 
 export async function deleteRegistryProjectRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -45,7 +45,7 @@ export async function deleteRegistryProjectRouteHandler(req: Request, res: Respo
 
     if (isQueueRouterUsable()) {
         const client = useQueueRouter();
-        await client.publish(buildRegistryQueueRouterPayload({
+        await client.publish(buildRegistryTaskQueueRouterPayload({
             command: RegistryCommand.PROJECT_UNLINK,
             data: {
                 id: entity.id,

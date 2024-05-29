@@ -6,9 +6,7 @@
  */
 
 import type { Aggregator, Component } from '@privateaim/server-kit';
-import { isAmqpClientUsable } from '@privateaim/server-kit';
-import { buildAuthupAggregator, buildTrainManagerAggregator } from '../aggregators';
-import { EnvironmentName, useEnv } from './env';
+import { createAuthupAggregator, createAnalysisManagerBuilderAggregator } from '../aggregators';
 import {
     createRegistryComponent,
 } from '../components';
@@ -37,19 +35,14 @@ export function createConfig() : Config {
 
     // ---------------------------------------------
 
-    const isTest = useEnv('env') === EnvironmentName.TEST;
+    const aggregators : Aggregator[] = [
+        createAuthupAggregator(),
+        createAnalysisManagerBuilderAggregator(),
+    ];
 
     // ---------------------------------------------
 
-    const aggregators : {start: () => void}[] = [];
-    if (!isTest && isAmqpClientUsable()) {
-        aggregators.push(buildAuthupAggregator());
-        aggregators.push(buildTrainManagerAggregator());
-    }
-
-    // ---------------------------------------------
-
-    const components : {start: () => void}[] = [
+    const components : Component[] = [
         createRegistryComponent(),
     ];
 

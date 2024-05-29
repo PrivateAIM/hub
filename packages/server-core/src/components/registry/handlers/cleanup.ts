@@ -15,7 +15,7 @@ import { RegistryEntity, RegistryProjectEntity } from '../../../domains';
 import { ComponentName } from '../../constants';
 import { RegistryCommand } from '../constants';
 import type { RegistryCleanupPayload } from '../type';
-import { buildRegistryQueueRouterPayload } from '../utils';
+import { buildRegistryTaskQueueRouterPayload } from '../utils';
 import { createBasicHarborAPIClient } from './utils';
 
 export async function cleanupRegistry(payload: RegistryCleanupPayload) {
@@ -69,7 +69,7 @@ export async function cleanupRegistry(payload: RegistryCleanupPayload) {
             continue;
         }
 
-        const queueMessage = buildRegistryQueueRouterPayload({
+        const queueMessage = buildRegistryTaskQueueRouterPayload({
             command: RegistryCommand.PROJECT_UNLINK,
             data: {
                 registryId: entity.id,

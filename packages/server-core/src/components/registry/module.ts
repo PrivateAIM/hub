@@ -7,14 +7,12 @@
 
 import type { Component, QueueRouterHandlers } from '@privateaim/server-kit';
 import {
-    QueueRouterRoutingType,
     isQueueRouterUsable,
     useLogger,
     useQueueRouter,
 } from '@privateaim/server-kit';
 import { EnvironmentName, useEnv } from '../../config';
-import { ComponentName } from '../constants';
-import { RegistryCommand } from './constants';
+import { RegistryCommand, RegistryTaskQueueRouterRouting } from './constants';
 import {
     dispatchRegistryEventToTrainManager,
     linkRegistryProject,
@@ -71,7 +69,7 @@ export function createRegistryComponent() : Component {
         // todo: maybe log
         return {
             start() {
-                useLogger().warn('Registry component could not be initialized');
+                useLogger().warn('Registry component has not been initialized');
             },
         };
     }
@@ -80,10 +78,7 @@ export function createRegistryComponent() : Component {
 
     return {
         start() {
-            return queueRouter.consume({
-                type: QueueRouterRoutingType.WORK,
-                key: ComponentName.REGISTRY,
-            }, createRegistryQueueHandlers());
+            return queueRouter.consume(RegistryTaskQueueRouterRouting, createRegistryQueueHandlers());
         },
     };
 }

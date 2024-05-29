@@ -16,7 +16,7 @@ import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '@privateaim/server-http-kit';
 import { isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
-import { RegistryCommand, buildRegistryQueueRouterPayload } from '../../../../../components';
+import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../../../../components';
 import { createNodeRobot, runNodeValidation } from '../utils';
 import { NodeEntity, RegistryEntity, RegistryProjectEntity } from '../../../../../domains';
 
@@ -70,7 +70,7 @@ export async function createNodeRouteHandler(req: Request, res: Response) : Prom
 
         if (isQueueRouterUsable()) {
             const queueRouter = useQueueRouter();
-            await queueRouter.publish(buildRegistryQueueRouterPayload({
+            await queueRouter.publish(buildRegistryTaskQueueRouterPayload({
                 command: RegistryCommand.PROJECT_LINK,
                 data: {
                     id: registryProject.id,

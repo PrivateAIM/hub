@@ -7,9 +7,9 @@
 
 import type { QueueRouterPayload } from '@privateaim/server-kit';
 import { buildQueueRouterPublishPayload } from '@privateaim/server-kit';
-import {cleanupPayload} from "../../utils";
-import {CoreEventQueueRouterRouting, CoreTaskQueueRouterRouting} from './constants';
-import type { CoreCommandContext } from './types';
+import { cleanupPayload } from '../../utils';
+import { CoreEventQueueRouterRouting, CoreTaskQueueRouterRouting } from './constants';
+import type { CoreCommandContext, CoreEventContext } from './types';
 
 export function buildCoreTaskQueueRouterPayload(
     context: CoreCommandContext,
@@ -24,10 +24,10 @@ export function buildCoreTaskQueueRouterPayload(
 }
 
 export function buildCoreEventQueueRouterPayload(
-    context: CoreCommandContext,
+    context: CoreEventContext,
 ) : QueueRouterPayload {
     return buildQueueRouterPublishPayload({
-        type: context.command,
+        type: context.event,
         data: cleanupPayload(context.data),
         metadata: {
             routing: CoreEventQueueRouterRouting,

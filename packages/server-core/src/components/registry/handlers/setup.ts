@@ -16,7 +16,7 @@ import { useLogger, useQueueRouter } from '@privateaim/server-kit';
 import { RegistryEntity, RegistryProjectEntity } from '../../../domains';
 import { RegistryCommand } from '../constants';
 import type { RegistrySetupPayload } from '../type';
-import { buildRegistryQueueRouterPayload } from '../utils';
+import { buildRegistryTaskQueueRouterPayload } from '../utils';
 
 export async function setupRegistry(payload: RegistrySetupPayload) {
     if (!payload.id) {
@@ -125,7 +125,7 @@ export async function setupRegistry(payload: RegistrySetupPayload) {
 
     const queueRouter = useQueueRouter();
     for (let i = 0; i < entities.length; i++) {
-        const queueMessage = buildRegistryQueueRouterPayload({
+        const queueMessage = buildRegistryTaskQueueRouterPayload({
             command: RegistryCommand.PROJECT_LINK,
             data: {
                 id: entities[i].id,

@@ -13,7 +13,7 @@ import { useDataSource } from 'typeorm-extension';
 import { isRealmResourceWritable } from '@authup/core-kit';
 import { useRequestEnv } from '@privateaim/server-http-kit';
 import { isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
-import { RegistryCommand, buildRegistryQueueRouterPayload } from '../../../../../components';
+import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../../../../components';
 import { runRegistryProjectValidation } from '../utils';
 import { RegistryProjectEntity } from '../../../../../domains';
 
@@ -54,7 +54,7 @@ export async function updateRegistryProjectRouteHandler(req: Request, res: Respo
             result.data.external_name &&
             entity.external_name !== result.data.external_name
         ) {
-            await client.publish(buildRegistryQueueRouterPayload({
+            await client.publish(buildRegistryTaskQueueRouterPayload({
                 command: RegistryCommand.PROJECT_UNLINK,
                 data: {
                     id: entity.id,
@@ -65,7 +65,7 @@ export async function updateRegistryProjectRouteHandler(req: Request, res: Respo
             }));
         }
 
-        await client.publish(buildRegistryQueueRouterPayload({
+        await client.publish(buildRegistryTaskQueueRouterPayload({
             command: RegistryCommand.PROJECT_LINK,
             data: {
                 id: entity.id,

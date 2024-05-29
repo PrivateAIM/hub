@@ -1,18 +1,25 @@
 /*
- * Copyright (c) 2022-2024.
+ * Copyright (c) 2024.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BuilderCommand, ComponentName } from '@privateaim/server-analysis-manager-kit';
-import type { BuilderCommandContext } from '@privateaim/server-analysis-manager-kit';
-import { extendPayload } from '../utils';
+import type {
+    BuilderBuildPayload,
+    BuilderCheckPayload,
+} from '@privateaim/server-analysis-manager-kit';
 import {
-    executeBuilderBuildCommand,
-    executeBuilderCheckCommand,
-    executePushCommand,
-} from './commands';
+    BuilderCommand,
+
+    BuilderTaskQueueRouterRouting,
+    ComponentName,
+} from '@privateaim/server-analysis-manager-kit';
+import type { Component, QueueRouterHandlers } from '@privateaim/server-kit';
+import { isQueueRouterUsable, useLogger, useQueueRouter } from '@privateaim/server-kit';
+import { EnvironmentName, useEnv } from '../../config';
+import { extendPayload } from '../utils';
+import { executeBuilderBuildCommand, executeBuilderCheckCommand, executePushCommand } from './commands';
 import {
     writeBuildingEvent,
     writeBuiltEvent,
@@ -24,46 +31,64 @@ import {
 } from './events';
 import { useBuilderLogger } from './utils';
 
-export async function executeBuilderCommand(
-    context: BuilderCommandContext,
-) : Promise<void> {
-    switch (context.command) {
-        case BuilderCommand.BUILD: {
-            await Promise.resolve(context.data)
+function createHandlers() : QueueRouterHandlers<{
+    [BuilderCommand.BUILD]: BuilderBuildPayload,
+    [BuilderCommand.CHECK]: BuilderCheckPayload
+}> {
+    return {
+        [BuilderCommand.BUILD]: async (message) => {
+            await Promise.resolve(message.data)
                 .then((data) => extendPayload(data, ComponentName.BUILDER))
-                .then((data) => writeBuildingEvent({ data, command: context.command }))
+                .then((data) => writeBuildingEvent({ data, command: BuilderCommand.BUILD }))
                 .then(executeBuilderBuildCommand)
-                .then((data) => writeBuiltEvent({ data, command: context.command }))
-                .then((data) => writePushingEvent({ data, command: context.command }))
+                .then((data) => writeBuiltEvent({ data, command: BuilderCommand.BUILD }))
+                .then((data) => writePushingEvent({ data, command: BuilderCommand.BUILD }))
                 .then(executePushCommand)
-                .then((data) => writePushedEvent({ data, command: context.command }))
+                .then((data) => writePushedEvent({ data, command: BuilderCommand.BUILD }))
                 .catch((err: Error) => {
                     useBuilderLogger().error(err);
 
                     return writeFailedEvent({
-                        data: context.data,
-                        command: context.command,
+                        data: message.data,
+                        command: BuilderCommand.BUILD,
                         error: err,
                     });
                 });
-            break;
-        }
-        case BuilderCommand.CHECK: {
-            await Promise.resolve(context.data)
+        },
+        [BuilderCommand.CHECK]: async (message) => {
+            await Promise.resolve(message.data)
                 .then((data) => extendPayload(data, ComponentName.BUILDER))
-                .then((data) => writeCheckingEvent({ data, command: context.command }))
+                .then((data) => writeCheckingEvent({ data, command: BuilderCommand.CHECK }))
                 .then(executeBuilderCheckCommand)
-                .then((data) => writeCheckedEvent({ data, command: context.command }))
+                .then((data) => writeCheckedEvent({ data, command: BuilderCommand.CHECK }))
                 .catch((err: Error) => {
                     useBuilderLogger().error(err);
 
                     return writeFailedEvent({
-                        data: context.data,
-                        command: context.command,
+                        data: message.data,
+                        command: BuilderCommand.CHECK,
                         error: err,
                     });
                 });
-            break;
-        }
+        },
+    };
+}
+
+export function createBuilderComponent() : Component {
+    if (!isQueueRouterUsable() || useEnv('env') === EnvironmentName.TEST) {
+        // todo: maybe log
+        return {
+            start() {
+                useLogger().warn('Builder component could not be started');
+            },
+        };
     }
+
+    const queueRouter = useQueueRouter();
+
+    return {
+        start() {
+            return queueRouter.consume(BuilderTaskQueueRouterRouting, createHandlers());
+        },
+    };
 }
