@@ -6,8 +6,9 @@
  */
 
 import type { Client, ExchangeOptions } from 'amqp-extension';
+import { isLoggerUsable, useLogger } from '../../services';
 import { QueueRouterRoutingType } from './constants';
-import { isMessageRouterPayload } from './helpers';
+import { isQueueRouterPayload } from './helpers';
 import type {
     QueueRouterHandler,
     QueueRouterHandlers,
@@ -41,7 +42,14 @@ export class QueueRouter {
             };
         }
 
+        if (isLoggerUsable()) {
+            useLogger()
+                .debug(`Publishing queue message ${message.type} in ${exchange.routingKey} (namespace: ${exchange.name})`);
+        }
+
         return this.driver.publish({
+            type: message.type,
+            messageId: message.id,
             content: message,
             exchange,
             persistent: message.metadata.persistent ??
@@ -72,8 +80,13 @@ export class QueueRouter {
         }, {
             $any: async (input) => {
                 const payload = JSON.parse(input.content.toString('utf-8'));
-                if (!isMessageRouterPayload(payload)) {
+                if (!isQueueRouterPayload(payload)) {
                     return;
+                }
+
+                if (isLoggerUsable()) {
+                    useLogger()
+                        .debug(`Consuming queue message ${input.properties.type} in ${exchange.routingKey} (namespace: ${exchange.name})`);
                 }
 
                 let handler : QueueRouterHandler | undefined;

@@ -22,7 +22,7 @@ export function buildQueueRouterPublishPayload(
     };
 }
 
-export function isMessageRouterPayload(input: unknown) : input is QueueRouterPayload {
+export function isQueueRouterPayload(input: unknown) : input is QueueRouterPayload {
     return isObject(input) &&
         typeof input.id === 'string' &&
         typeof input.type === 'string' &&
