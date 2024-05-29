@@ -9,8 +9,6 @@ import {
     buildRegistryClientConnectionStringFromRegistry,
 } from '@privateaim/core';
 import { isClientErrorWithStatusCode } from 'hapic';
-
-import { BuilderCommand } from '@privateaim/server-analysis-manager-kit';
 import type { BuilderCheckPayload } from '@privateaim/server-analysis-manager-kit';
 import { createBasicHarborAPIClient, useCoreClient } from '../../../../core';
 import type { ComponentPayloadExtended } from '../../../type';
@@ -44,10 +42,7 @@ export async function executeBuilderCheckCommand(
     });
 
     if (analysisNodes.length === 0) {
-        await writeNoneEvent({
-            command: BuilderCommand.CHECK,
-            data,
-        });
+        await writeNoneEvent(data);
 
         return data;
     }
@@ -64,10 +59,7 @@ export async function executeBuilderCheckCommand(
     const [node] = nodes;
 
     if (typeof node === 'undefined') {
-        await writeNoneEvent({
-            command: BuilderCommand.CHECK,
-            data,
-        });
+        await writeNoneEvent(data);
 
         return data;
     }
@@ -86,10 +78,7 @@ export async function executeBuilderCheckCommand(
             harborRepository &&
             harborRepository.artifact_count > 0
         ) {
-            await writeBuiltEvent({
-                data,
-                command: BuilderCommand.CHECK,
-            });
+            await writeBuiltEvent(data);
 
             return data;
         }
@@ -99,10 +88,7 @@ export async function executeBuilderCheckCommand(
         }
     }
 
-    await writeNoneEvent({
-        command: BuilderCommand.CHECK,
-        data,
-    });
+    await writeNoneEvent(data);
 
     return data;
 }

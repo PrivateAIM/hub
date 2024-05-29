@@ -8,6 +8,7 @@
 import type {
     BuilderBuildPayload,
     BuilderCheckPayload,
+    BuilderPushPayload,
 } from '@privateaim/server-analysis-manager-kit';
 import {
     BuilderCommand,
@@ -19,11 +20,13 @@ import { EnvironmentName, useEnv } from '../../config';
 import { extendPayload } from '../utils';
 import { executeBuilderBuildCommand, executeBuilderCheckCommand, executePushCommand } from './commands';
 import {
+    writeBuildFailedEvent,
     writeBuildingEvent,
     writeBuiltEvent,
+    writeCheckFailedEvent,
     writeCheckedEvent,
     writeCheckingEvent,
-    writeFailedEvent,
+    writePushFailedEvent,
     writePushedEvent,
     writePushingEvent,
 } from './events';
@@ -31,42 +34,50 @@ import { useBuilderLogger } from './utils';
 
 function createHandlers() : QueueRouterHandlers<{
     [BuilderCommand.BUILD]: BuilderBuildPayload,
-    [BuilderCommand.CHECK]: BuilderCheckPayload
+    [BuilderCommand.CHECK]: BuilderCheckPayload,
+    [BuilderCommand.PUSH]: BuilderPushPayload
 }> {
     return {
         [BuilderCommand.BUILD]: async (message) => {
             await Promise.resolve(message.data)
                 .then((data) => extendPayload(data))
-                .then((data) => writeBuildingEvent({ data, command: BuilderCommand.BUILD }))
+                .then((data) => writeBuildingEvent(data))
                 .then(executeBuilderBuildCommand)
-                .then((data) => writeBuiltEvent({ data, command: BuilderCommand.BUILD }))
-                .then((data) => writePushingEvent({ data, command: BuilderCommand.BUILD }))
-                .then(executePushCommand)
-                .then((data) => writePushedEvent({ data, command: BuilderCommand.BUILD }))
+                .then((data) => writeBuiltEvent(data))
                 .catch((err: Error) => {
                     useBuilderLogger().error(err);
 
-                    return writeFailedEvent({
-                        data: message.data,
-                        command: BuilderCommand.BUILD,
-                        error: err,
-                    });
+                    // todo: cleanup docker image
+
+                    message.data.error = err;
+                    return writeBuildFailedEvent(message.data);
+                });
+        },
+        [BuilderCommand.PUSH]: async (message) => {
+            await Promise.resolve(message.data)
+                .then((data) => writePushingEvent(data))
+                .then(executePushCommand)
+                .then((data) => writePushedEvent(data))
+                .catch((err: Error) => {
+                    useBuilderLogger().error(err);
+
+                    // todo: cleanup docker image
+
+                    message.data.error = err;
+                    return writePushFailedEvent(message.data);
                 });
         },
         [BuilderCommand.CHECK]: async (message) => {
             await Promise.resolve(message.data)
                 .then((data) => extendPayload(data))
-                .then((data) => writeCheckingEvent({ data, command: BuilderCommand.CHECK }))
+                .then((data) => writeCheckingEvent(data))
                 .then(executeBuilderCheckCommand)
-                .then((data) => writeCheckedEvent({ data, command: BuilderCommand.CHECK }))
+                .then((data) => writeCheckedEvent(data))
                 .catch((err: Error) => {
                     useBuilderLogger().error(err);
 
-                    return writeFailedEvent({
-                        data: message.data,
-                        command: BuilderCommand.CHECK,
-                        error: err,
-                    });
+                    message.data.error = err;
+                    return writeCheckFailedEvent(message.data);
                 });
         },
     };

@@ -12,17 +12,18 @@ export type BuilderBasePayload = {
     error?: Error
 };
 
-export type BuilderBuildPayload = BuilderBasePayload & {
-    id: string
-};
-
-export type BuilderCheckPayload = BuilderBasePayload & {
-    id: string
-};
+export type BuilderBuildPayload = BuilderBasePayload;
+export type BuilderPushPayload = BuilderBasePayload;
+export type BuilderCheckPayload = BuilderBasePayload;
 
 export type BuilderBuildCommandContext = {
     command: `${BuilderCommand.BUILD}`,
     data: BuilderBuildPayload,
+};
+
+export type BuilderPushCommandContext = {
+    command: `${BuilderCommand.PUSH}`,
+    data: BuilderPushPayload
 };
 
 export type BuilderCheckCommandContext = {
@@ -30,21 +31,27 @@ export type BuilderCheckCommandContext = {
     data: BuilderCheckPayload
 };
 
-export type BuilderBuildEventContext = Omit<BuilderBuildCommandContext, 'command'> & {
-    command: `${BuilderCommand.BUILD}` | `${BuilderCommand.CHECK}`,
-    event: `${BuilderEvent.FAILED}` |
+export type BuilderBuildEventContext = {
+    data: BuilderBuildPayload;
+    event: `${BuilderEvent.BUILD_FAILED}` |
         `${BuilderEvent.BUILT}` |
-        `${BuilderEvent.BUILDING}` |
+        `${BuilderEvent.BUILDING}`;
+};
+
+export type BuilderPushEventContext = {
+    data: BuilderPushPayload,
+    event: `${BuilderEvent.PUSH_FAILED}` |
         `${BuilderEvent.PUSHED}` |
         `${BuilderEvent.PUSHING}`;
 };
 
-export type BuilderCheckEventContext = BuilderCheckCommandContext & {
-    event: `${BuilderEvent.FAILED}` |
+export type BuilderCheckEventContext = {
+    data: BuilderCheckPayload,
+    event: `${BuilderEvent.CHECK_FAILED}` |
         `${BuilderEvent.CHECKED}` |
         `${BuilderEvent.CHECKING}` |
         `${BuilderEvent.NONE}`;
 };
 
-export type BuilderCommandContext = BuilderCheckCommandContext | BuilderBuildCommandContext;
-export type BuilderEventContext = BuilderCheckEventContext | BuilderBuildEventContext;
+export type BuilderCommandContext = BuilderCheckCommandContext | BuilderBuildCommandContext | BuilderPushCommandContext;
+export type BuilderEventContext = BuilderCheckEventContext | BuilderBuildEventContext | BuilderPushEventContext;
