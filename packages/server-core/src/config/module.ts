@@ -6,7 +6,7 @@
  */
 
 import type { Aggregator, Component } from '@privateaim/server-kit';
-import { createAuthupAggregator, createAnalysisManagerBuilderAggregator } from '../aggregators';
+import { createAnalysisManagerBuilderAggregator, createAuthupAggregator } from '../aggregators';
 import {
     createRegistryComponent,
 } from '../components';
