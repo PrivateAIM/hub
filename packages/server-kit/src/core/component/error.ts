@@ -8,21 +8,11 @@
 import type { ComponentErrorOptions } from './type';
 
 export class ComponentError extends Error {
-    component: string;
-
-    step?: string;
-
-    type?: string;
-
-    command: string;
-
-    code?: string | number | null;
+    public code?: string | null;
 
     constructor(input: ComponentErrorOptions) {
         super(input.message, { cause: input.cause });
 
-        this.step = input.step;
-        this.type = input.type;
-        this.command = input.command;
+        this.code = input.code;
     }
 }

@@ -17,6 +17,7 @@ import {
 
     AnalysisBuildStatus,
 } from '@privateaim/core';
+import { isComponentError } from '@privateaim/server-kit';
 import { useDataSource } from 'typeorm-extension';
 import type { AnalysisLogSaveContext } from '../../domains';
 import { AnalysisEntity, saveAnalysisLog } from '../../domains';
@@ -54,15 +55,16 @@ export async function handleAnalysisManagerBuilderBaseEvent(
             // todo: only in case of build, push event
             // entity.build_status = AnalysisBuildStatus.FAILED;
 
-            trainLogContext = {
-                ...trainLogContext,
-                status: AnalysisBuildStatus.FAILED,
-                statusMessage: data.error.message,
+            if (isComponentError(data.error)) {
+                trainLogContext = {
+                    ...trainLogContext,
+                    status: AnalysisBuildStatus.FAILED,
+                    statusMessage: data.error.message,
 
-                error: true,
-                errorCode: (data.error as Error & { code?: string }).code ?? BuilderErrorCode.UNKNOWN,
-                // step: `${context.error.step}`,
-            };
+                    error: true,
+                    errorCode: data.error.code ?? BuilderErrorCode.UNKNOWN,
+                };
+            }
 
             break;
         }

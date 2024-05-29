@@ -13,11 +13,7 @@ export type Component = {
 };
 
 export type ComponentErrorOptions = {
-    component: string,
-    type?: string,
-    command?: string,
-    step?: string,
-    code?: string | number | null,
+    code?: string | null,
     message?: string
     cause?: unknown
 };

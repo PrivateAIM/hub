@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { hasOwnProperty } from '@privateaim/core';
 import type {
     Analysis, Registry,
 } from '@privateaim/core';
@@ -16,7 +15,6 @@ import type { ComponentPayloadExtended } from '../type';
 
 export async function extendPayload<T extends Partial<ComponentPayloadExtended<{ id: Analysis['id'] }>>>(
     data: T,
-    component: string,
 ) : Promise<ComponentPayloadExtended<T>> {
     let entity : Analysis;
     let registry: Registry;
@@ -34,7 +32,6 @@ export async function extendPayload<T extends Partial<ComponentPayloadExtended<{
             if (isClientErrorWithStatusCode(e, 404)) {
                 throw BaseError.notFound({
                     cause: e,
-                    component,
                 });
             }
 
@@ -53,7 +50,6 @@ export async function extendPayload<T extends Partial<ComponentPayloadExtended<{
             if (isClientErrorWithStatusCode(e, 404)) {
                 throw BaseError.registryNotFound({
                     cause: e,
-                    component,
                 });
             }
 
@@ -66,16 +62,4 @@ export async function extendPayload<T extends Partial<ComponentPayloadExtended<{
         entity,
         registry,
     };
-}
-
-export function cleanupPayload<T extends Record<string, any>>(payload: T): T {
-    if (hasOwnProperty(payload, 'entity')) {
-        delete payload.entity;
-    }
-
-    if (hasOwnProperty(payload, 'registry')) {
-        delete payload.registry;
-    }
-
-    return payload;
 }

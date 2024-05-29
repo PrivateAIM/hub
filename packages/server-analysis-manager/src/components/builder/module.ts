@@ -11,9 +11,7 @@ import type {
 } from '@privateaim/server-analysis-manager-kit';
 import {
     BuilderCommand,
-
     BuilderTaskQueueRouterRouting,
-    ComponentName,
 } from '@privateaim/server-analysis-manager-kit';
 import type { Component, QueueRouterHandlers } from '@privateaim/server-kit';
 import { isQueueRouterUsable, useLogger, useQueueRouter } from '@privateaim/server-kit';
@@ -38,7 +36,7 @@ function createHandlers() : QueueRouterHandlers<{
     return {
         [BuilderCommand.BUILD]: async (message) => {
             await Promise.resolve(message.data)
-                .then((data) => extendPayload(data, ComponentName.BUILDER))
+                .then((data) => extendPayload(data))
                 .then((data) => writeBuildingEvent({ data, command: BuilderCommand.BUILD }))
                 .then(executeBuilderBuildCommand)
                 .then((data) => writeBuiltEvent({ data, command: BuilderCommand.BUILD }))
@@ -57,7 +55,7 @@ function createHandlers() : QueueRouterHandlers<{
         },
         [BuilderCommand.CHECK]: async (message) => {
             await Promise.resolve(message.data)
-                .then((data) => extendPayload(data, ComponentName.BUILDER))
+                .then((data) => extendPayload(data))
                 .then((data) => writeCheckingEvent({ data, command: BuilderCommand.CHECK }))
                 .then(executeBuilderCheckCommand)
                 .then((data) => writeCheckedEvent({ data, command: BuilderCommand.CHECK }))

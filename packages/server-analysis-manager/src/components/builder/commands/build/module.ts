@@ -8,7 +8,7 @@
 import {
     REGISTRY_ARTIFACT_TAG_LATEST,
 } from '@privateaim/core';
-import { BuilderCommand, ComponentName } from '@privateaim/server-analysis-manager-kit';
+import { BuilderCommand } from '@privateaim/server-analysis-manager-kit';
 import type { BuilderBuildPayload } from '@privateaim/server-analysis-manager-kit';
 import {
     pullDockerImage,
@@ -24,7 +24,7 @@ import { useBuilderLogger } from '../../utils';
 export async function executeBuilderBuildCommand(
     input: BuilderBuildPayload,
 ) : Promise<ComponentPayloadExtended<BuilderBuildPayload>> {
-    const data = await extendPayload(input, ComponentName.BUILDER);
+    const data = await extendPayload(input);
 
     if (!data.entity) {
         throw BuilderError.notFound();

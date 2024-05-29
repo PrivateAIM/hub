@@ -5,30 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BuilderErrorCode, ComponentName } from '@privateaim/server-analysis-manager-kit';
+import { BuilderErrorCode } from '@privateaim/server-analysis-manager-kit';
 import type { ComponentErrorOptions } from '@privateaim/server-kit';
 import { BaseError } from '../error';
 
 export class BuilderError extends BaseError {
-    constructor(options: Omit<ComponentErrorOptions, 'component'>) {
-        super({
-            ...options,
-            component: ComponentName.BUILDER,
-        });
-    }
-
     static notFound(options?: ComponentErrorOptions): BuilderError {
-        return super.notFound({
-            component: ComponentName.BUILDER,
-            ...(options || {}),
-        });
+        return super.notFound(options);
     }
 
     static registryNotFound(options?: ComponentErrorOptions): BuilderError {
-        return super.notFound({
-            component: ComponentName.BUILDER,
-            ...(options || {}),
-        });
+        return super.notFound(options);
     }
 
     static entrypointNotFound(message?: string) {
