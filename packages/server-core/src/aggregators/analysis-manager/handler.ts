@@ -5,31 +5,30 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ComponentError, isComponentContextWithError } from '@privateaim/server-kit';
-import type { ComponentContextWithError } from '@privateaim/server-kit';
 import {
-    BuilderCommand,
+    BuilderErrorCode,
     BuilderEvent,
     ComponentName,
 } from '@privateaim/server-analysis-manager-kit';
 import type {
-    BuilderEventContext,
+    BuilderBasePayload,
 } from '@privateaim/server-analysis-manager-kit';
 import {
 
     AnalysisBuildStatus,
 } from '@privateaim/core';
 import { useDataSource } from 'typeorm-extension';
-import type { AnalysisLogSaveContext } from '../../../domains';
-import { AnalysisEntity, saveAnalysisLog } from '../../../domains';
+import type { AnalysisLogSaveContext } from '../../domains';
+import { AnalysisEntity, saveAnalysisLog } from '../../domains';
 
-export async function handleTrainManagerBuilderEvent(
-    context: BuilderEventContext | ComponentContextWithError<BuilderEventContext>,
+export async function handleAnalysisManagerBuilderBaseEvent(
+    event: BuilderEvent,
+    data: BuilderBasePayload,
 ) {
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisEntity);
 
-    const entity = await repository.findOneBy({ id: context.data.id });
+    const entity = await repository.findOneBy({ id: data.id });
     if (!entity) {
         return;
     }
@@ -37,11 +36,10 @@ export async function handleTrainManagerBuilderEvent(
     let trainLogContext : AnalysisLogSaveContext = {
         entity,
         component: ComponentName.BUILDER,
-        command: context.command,
-        event: context.event,
+        event,
     };
 
-    switch (context.event) {
+    switch (event) {
         case BuilderEvent.NONE:
             if (!entity.run_status) {
                 entity.build_status = null;
@@ -53,24 +51,18 @@ export async function handleTrainManagerBuilderEvent(
             trainLogContext.status = AnalysisBuildStatus.STARTED;
             break;
         case BuilderEvent.FAILED: {
-            if (context.command === BuilderCommand.BUILD) {
-                entity.build_status = AnalysisBuildStatus.FAILED;
-            }
+            // todo: only in case of build, push event
+            // entity.build_status = AnalysisBuildStatus.FAILED;
 
-            if (
-                isComponentContextWithError(context) &&
-                context.error instanceof ComponentError
-            ) {
-                trainLogContext = {
-                    ...trainLogContext,
-                    status: AnalysisBuildStatus.FAILED,
-                    statusMessage: context.error.message,
+            trainLogContext = {
+                ...trainLogContext,
+                status: AnalysisBuildStatus.FAILED,
+                statusMessage: data.error.message,
 
-                    error: true,
-                    errorCode: `${context.error.code}`,
-                    step: `${context.error.step}`,
-                };
-            }
+                error: true,
+                errorCode: (data.error as Error & { code?: string }).code ?? BuilderErrorCode.UNKNOWN,
+                // step: `${context.error.step}`,
+            };
 
             break;
         }
@@ -82,8 +74,8 @@ export async function handleTrainManagerBuilderEvent(
     }
 
     if (
-        context.event !== BuilderEvent.FAILED &&
-        context.event !== BuilderEvent.NONE
+        event !== BuilderEvent.FAILED &&
+        event !== BuilderEvent.NONE
     ) {
         entity.run_status = null;
     }

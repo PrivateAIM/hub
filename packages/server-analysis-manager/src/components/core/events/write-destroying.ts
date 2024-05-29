@@ -5,16 +5,15 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { useAmqpClient } from '@privateaim/server-kit';
-import { CoreEvent } from '@privateaim/server-analysis-manager-kit';
+import { useQueueRouter } from '@privateaim/server-kit';
+import { CoreEvent, buildCoreEventQueueRouterPayload } from '@privateaim/server-analysis-manager-kit';
 import type { CoreDestroyCommandContext } from '@privateaim/server-analysis-manager-kit';
-import { buildCoreAggregatorQueuePayload } from '../utils';
 
 export async function writeDestroyingEvent(
     context: CoreDestroyCommandContext,
 ) {
-    const client = useAmqpClient();
-    await client.publish(buildCoreAggregatorQueuePayload({
+    const client = useQueueRouter();
+    await client.publish(buildCoreEventQueueRouterPayload({
         event: CoreEvent.DESTROYING,
         command: context.command,
         data: context.data,

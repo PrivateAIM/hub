@@ -6,7 +6,7 @@
  */
 
 export * from './commands';
+export * from './module';
 export * from './helpers';
 export * from './error';
-export * from './module';
 export * from './utils';

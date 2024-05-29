@@ -6,10 +6,9 @@
  */
 
 import type { ComponentContextWithCommand, ComponentContextWithError } from '@privateaim/server-kit';
-import { useAmqpClient } from '@privateaim/server-kit';
+import { useQueueRouter } from '@privateaim/server-kit';
 import type { BuilderCommand, BuilderCommandContext } from '@privateaim/server-analysis-manager-kit';
-import { BuilderEvent } from '@privateaim/server-analysis-manager-kit';
-import { buildBuilderAggregatorQueuePayload } from '../utils';
+import { BuilderEvent, buildBuilderEventQueueRouterPayload } from '@privateaim/server-analysis-manager-kit';
 
 export async function writeFailedEvent(
     context: ComponentContextWithCommand<
@@ -17,11 +16,12 @@ export async function writeFailedEvent(
         `${BuilderCommand}`
     >,
 ) {
-    const client = useAmqpClient();
-    await client.publish(buildBuilderAggregatorQueuePayload({
+    context.data.error = context.error;
+
+    const client = useQueueRouter();
+    await client.publish(buildBuilderEventQueueRouterPayload({
         event: BuilderEvent.FAILED,
         command: context.command,
         data: context.data,
-        error: context.error,
     }));
 }

@@ -5,25 +5,19 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { PublishOptionsExtended } from 'amqp-extension';
-import { ComponentName } from '../../constants';
-import { ROUTER_QUEUE_ROUTING_KEY } from '../../router';
-import type { QueueRouterPayload } from '../../router';
+import { buildQueueRouterPublishPayload } from '@privateaim/server-kit';
+import type { QueueRouterPayload } from '@privateaim/server-kit';
+import { RegistryTaskQueueRouterRouting } from '../constants';
 import type { RegistryCommandContext } from '../type';
 
-export function buildRegistryPayload(
+export function buildRegistryTaskQueueRouterPayload(
     context: RegistryCommandContext,
-) : PublishOptionsExtended<QueueRouterPayload> {
-    return {
-        exchange: {
-            routingKey: ROUTER_QUEUE_ROUTING_KEY,
+) : QueueRouterPayload {
+    return buildQueueRouterPublishPayload({
+        type: context.command,
+        data: context.data,
+        metadata: {
+            routing: RegistryTaskQueueRouterRouting,
         },
-        content: {
-            data: context.data,
-            metadata: {
-                component: ComponentName.REGISTRY,
-                command: context.command,
-            },
-        },
-    };
+    });
 }

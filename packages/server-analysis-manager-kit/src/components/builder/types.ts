@@ -7,11 +7,16 @@
 
 import type { BuilderCommand, BuilderEvent } from './constants';
 
-export type BuilderBuildPayload = {
+export type BuilderBasePayload = {
+    id: string,
+    error?: Error
+};
+
+export type BuilderBuildPayload = BuilderBasePayload & {
     id: string
 };
 
-export type BuilderCheckPayload = {
+export type BuilderCheckPayload = BuilderBasePayload & {
     id: string
 };
 

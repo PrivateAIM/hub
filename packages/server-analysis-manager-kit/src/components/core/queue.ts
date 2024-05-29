@@ -5,24 +5,32 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { PublishOptionsExtended } from 'amqp-extension';
-import { ComponentName, ROUTER_QUEUE_ROUTING_KEY } from '../../constants';
-import type { QueueRouterPayload } from '../../types';
-import type { CoreCommandContext } from './types';
+import type { QueueRouterPayload } from '@privateaim/server-kit';
+import { buildQueueRouterPublishPayload } from '@privateaim/server-kit';
+import { cleanupPayload } from '../../utils';
+import { CoreEventQueueRouterRouting, CoreTaskQueueRouterRouting } from './constants';
+import type { CoreCommandContext, CoreEventContext } from './types';
 
-export function buildCoreQueuePayload(
+export function buildCoreTaskQueueRouterPayload(
     context: CoreCommandContext,
-) : PublishOptionsExtended<QueueRouterPayload> {
-    return {
-        exchange: {
-            routingKey: ROUTER_QUEUE_ROUTING_KEY,
+) : QueueRouterPayload {
+    return buildQueueRouterPublishPayload({
+        type: context.command,
+        data: cleanupPayload(context.data),
+        metadata: {
+            routing: CoreTaskQueueRouterRouting,
         },
-        content: {
-            data: context.data,
-            metadata: {
-                component: ComponentName.CORE,
-                command: context.command,
-            },
+    });
+}
+
+export function buildCoreEventQueueRouterPayload(
+    context: CoreEventContext,
+) : QueueRouterPayload {
+    return buildQueueRouterPublishPayload({
+        type: context.event,
+        data: cleanupPayload(context.data),
+        metadata: {
+            routing: CoreEventQueueRouterRouting,
         },
-    };
+    });
 }

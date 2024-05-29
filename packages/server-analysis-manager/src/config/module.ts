@@ -7,7 +7,9 @@
 
 import type { Aggregator, Component } from '@privateaim/server-kit';
 import { guessAuthupTokenCreatorOptions } from '@privateaim/server-kit';
-import { buildComponentRouter } from '../components';
+import {
+    createBuilderComponent, createCoreComponent,
+} from '../components';
 import {
     configureAMQP, configureCoreService, configureStorageService, setupLogger, setupVault,
 } from './services';
@@ -25,7 +27,8 @@ export function createConfig() : Config {
     const aggregators : Aggregator[] = [];
 
     const components : Component[] = [
-        buildComponentRouter(),
+        createBuilderComponent(),
+        createCoreComponent(),
     ];
 
     return {

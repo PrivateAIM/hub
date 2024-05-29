@@ -10,9 +10,9 @@ import {
     AnalysisBuildStatus,
     AnalysisNodeApprovalStatus,
 } from '@privateaim/core';
-import { BuilderCommand, buildBuilderQueuePayload } from '@privateaim/server-analysis-manager-kit';
+import { BuilderCommand, buildBuilderTaskQueueRouterPayload } from '@privateaim/server-analysis-manager-kit';
 import { useDataSource } from 'typeorm-extension';
-import { useAmqpClient } from '@privateaim/server-kit';
+import { useQueueRouter } from '@privateaim/server-kit';
 import { RegistryEntity } from '../../registry';
 import { AnalysisNodeEntity } from '../../anaylsis-node';
 import { AnalysisEntity } from '../entity';
@@ -57,8 +57,8 @@ export async function startAnalysisBuild(
         entity.registry_id = registry.id;
     }
 
-    const client = useAmqpClient();
-    await client.publish(buildBuilderQueuePayload({
+    const client = useQueueRouter();
+    await client.publish(buildBuilderTaskQueueRouterPayload({
         command: BuilderCommand.BUILD,
         data: {
             id: entity.id,

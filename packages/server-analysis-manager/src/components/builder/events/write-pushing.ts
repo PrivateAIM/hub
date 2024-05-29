@@ -6,16 +6,15 @@
  */
 
 import type { ComponentContextWithCommand } from '@privateaim/server-kit';
-import { useAmqpClient } from '@privateaim/server-kit';
+import { useQueueRouter } from '@privateaim/server-kit';
 import type { BuilderBuildCommandContext, BuilderBuildPayload, BuilderCommand } from '@privateaim/server-analysis-manager-kit';
-import { BuilderEvent } from '@privateaim/server-analysis-manager-kit';
-import { buildBuilderAggregatorQueuePayload } from '../utils';
+import { BuilderEvent, buildBuilderEventQueueRouterPayload } from '@privateaim/server-analysis-manager-kit';
 
 export async function writePushingEvent(
     context: ComponentContextWithCommand<BuilderBuildCommandContext, `${BuilderCommand}`>,
 ) : Promise<BuilderBuildPayload> {
-    const client = useAmqpClient();
-    await client.publish(buildBuilderAggregatorQueuePayload({
+    const client = useQueueRouter();
+    await client.publish(buildBuilderEventQueueRouterPayload({
         event: BuilderEvent.PUSHING,
         command: context.command,
         data: context.data, //  { id: 'xxx' }

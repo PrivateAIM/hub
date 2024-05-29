@@ -5,8 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { useLogger } from '@privateaim/server-kit';
-import { RegistryCommand } from './constants';
+import type { Component, QueueRouterHandlers } from '@privateaim/server-kit';
+import {
+    isQueueRouterUsable,
+    useLogger,
+    useQueueRouter,
+} from '@privateaim/server-kit';
+import { EnvironmentName, useEnv } from '../../config';
+import { RegistryCommand, RegistryTaskQueueRouterRouting } from './constants';
 import {
     dispatchRegistryEventToTrainManager,
     linkRegistryProject,
@@ -15,110 +21,64 @@ import {
     unlinkRegistryProject,
 } from './handlers';
 import { cleanupRegistry } from './handlers/cleanup';
-import type { RegistryCommandContext } from './type';
+import type {
+    RegistryCleanupPayload,
+    RegistryEventPayload,
+    RegistryProjectLinkPayload,
+    RegistryProjectRelinkPayload,
+    RegistryProjectUnlinkPayload,
+    RegistrySetupPayload,
+} from './type';
 
-export async function executeRegistryCommand(context: RegistryCommandContext) {
-    switch (context.command) {
-        case RegistryCommand.SETUP: {
-            useLogger()
-                .info('registry setup initialised', { component: 'registry', id: context.data.id });
+function createRegistryQueueHandlers() : QueueRouterHandlers<{
+    [RegistryCommand.SETUP]: RegistrySetupPayload,
+    [RegistryCommand.EVENT_HANDLE]: RegistryEventPayload,
+    [RegistryCommand.DELETE]: RegistrySetupPayload,
+    [RegistryCommand.CLEANUP]: RegistryCleanupPayload,
+    [RegistryCommand.PROJECT_LINK]: RegistryProjectLinkPayload,
+    [RegistryCommand.PROJECT_UNLINK]: RegistryProjectUnlinkPayload,
+    [RegistryCommand.PROJECT_RELINK]: RegistryProjectRelinkPayload,
+}> {
+    return {
+        [RegistryCommand.SETUP]: async (message) => {
+            await setupRegistry(message.data);
+        },
+        [RegistryCommand.EVENT_HANDLE]: async (message) => {
+            await dispatchRegistryEventToTrainManager(message.data);
+        },
+        [RegistryCommand.DELETE]: async () => {
 
-            try {
-                await setupRegistry(context.data);
+        },
+        [RegistryCommand.CLEANUP]: async (message) => {
+            await cleanupRegistry(message.data);
+        },
+        [RegistryCommand.PROJECT_LINK]: async (message) => {
+            await linkRegistryProject(message.data);
+        },
+        [RegistryCommand.PROJECT_UNLINK]: async (message) => {
+            await unlinkRegistryProject(message.data);
+        },
+        [RegistryCommand.PROJECT_RELINK]: async (message) => {
+            await relinkRegistryProject(message.data);
+        },
+    };
+}
 
-                useLogger()
-                    .info('registry setup completed', { component: 'registry', id: context.data.id });
-            } catch (e) {
-                useLogger()
-                    .warn('registry setup failed', { component: 'registry', id: context.data.id });
-
-                useLogger().error(e);
-            }
-            break;
-        }
-        case RegistryCommand.CLEANUP: {
-            useLogger()
-                .info('registry cleanup initialised', { component: 'registry', id: context.data.id });
-
-            try {
-                await cleanupRegistry(context.data);
-
-                useLogger()
-                    .info('registry cleanup completed', { component: 'registry', id: context.data.id });
-            } catch (e) {
-                useLogger()
-                    .error('registry cleanup failed', { component: 'registry', id: context.data.id });
-
-                useLogger().error(e);
-            }
-            break;
-        }
-        case RegistryCommand.DELETE: {
-            break;
-        }
-        case RegistryCommand.PROJECT_LINK: {
-            useLogger()
-                .info('registry project link initialised', { component: 'registry', id: context.data.id });
-
-            try {
-                await linkRegistryProject(context.data);
-
-                useLogger()
-                    .info('registry project link completed', { component: 'registry', id: context.data.id });
-            } catch (e) {
-                useLogger()
-                    .warn('registry project link failed', { component: 'registry', id: context.data.id });
-
-                useLogger().error(e);
-            }
-            break;
-        }
-        case RegistryCommand.PROJECT_UNLINK: {
-            useLogger()
-                .info('registry project unlink initialised', { component: 'registry', id: context.data.id });
-
-            try {
-                await unlinkRegistryProject(context.data);
-
-                useLogger()
-                    .info('registry project unlink completed', { component: 'registry', id: context.data.id });
-            } catch (e) {
-                useLogger()
-                    .warn('registry project unlink failed', { component: 'registry', id: context.data.id });
-
-                useLogger().error(e);
-            }
-            break;
-        }
-        case RegistryCommand.PROJECT_RELINK: {
-            useLogger()
-                .info('registry project relink initialised', { component: 'registry', id: context.data.id });
-
-            try {
-                await relinkRegistryProject(context.data);
-
-                useLogger()
-                    .info('registry project relink completed', { component: 'registry', id: context.data.id });
-            } catch (e) {
-                useLogger()
-                    .warn('registry project relink failed', { component: 'registry', id: context.data.id });
-
-                useLogger().error(e);
-            }
-
-            break;
-        }
-        case RegistryCommand.EVENT_HANDLE: {
-            try {
-                await dispatchRegistryEventToTrainManager(context.data);
-                useLogger()
-                    .info('registry project event handled.', { component: 'registry', id: context.data.event });
-            } catch (e) {
-                useLogger()
-                    .warn('registry project event handle failed.', { component: 'registry', id: context.data.event });
-
-                useLogger().error(e);
-            }
-        }
+export function createRegistryComponent() : Component {
+    if (!isQueueRouterUsable() || useEnv('env') === EnvironmentName.TEST) {
+        // todo: maybe log
+        return {
+            start() {
+                useLogger().warn('Registry component has not been initialized');
+            },
+        };
     }
+
+    const queueRouter = useQueueRouter();
+
+    return {
+        start() {
+            return queueRouter.consume(RegistryTaskQueueRouterRouting, createRegistryQueueHandlers());
+        },
+    };
 }

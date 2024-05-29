@@ -5,6 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { QueueRouterRoutingType } from '@privateaim/server-kit';
+
 export enum BuilderEvent {
     BUILDING = 'building',
     BUILT = 'built',
@@ -31,3 +33,13 @@ export enum BuilderErrorCode {
     MASTER_IMAGE_NOT_FOUND = 'masterImageNotFound',
     UNKNOWN = 'unknown',
 }
+
+export const BuilderEventQueueRouterRouting = {
+    type: QueueRouterRoutingType.PUB_SUB,
+    key: 'analysisBuilderEvents',
+};
+
+export const BuilderTaskQueueRouterRouting = {
+    type: QueueRouterRoutingType.WORK,
+    key: 'analysisBuilderCommands',
+};

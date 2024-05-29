@@ -6,56 +6,66 @@
  */
 
 import {
-    ComponentError, isComponentEventQueuePayload, useAmqpClient, useLogger,
+    isQueueRouterUsable, useLogger, useQueueRouter,
 } from '@privateaim/server-kit';
-import { ComponentName } from '@privateaim/server-analysis-manager-kit';
-import type { Aggregator } from '@privateaim/server-kit';
-import { handleTrainManagerBuilderEvent } from './builder';
+import type { BuilderBasePayload } from '@privateaim/server-analysis-manager-kit';
+import {
+    BuilderEvent,
+    BuilderEventQueueRouterRouting,
+} from '@privateaim/server-analysis-manager-kit';
+import type { Aggregator, QueueRouterHandlers } from '@privateaim/server-kit';
+import { EnvironmentName, useEnv } from '../../config';
+import { handleAnalysisManagerBuilderBaseEvent } from './handler';
 
-export function buildTrainManagerAggregator() : Aggregator {
-    const client = useAmqpClient();
+export function createAnalysisManagerBuilderHandlers() : QueueRouterHandlers<{
+    [BuilderEvent.BUILDING]: BuilderBasePayload,
+    [BuilderEvent.BUILT]: BuilderBasePayload,
+    [BuilderEvent.CHECKING]: BuilderBasePayload,
+    [BuilderEvent.CHECKED]: BuilderBasePayload,
+    [BuilderEvent.PUSHING]: BuilderBasePayload,
+    [BuilderEvent.PUSHED]: BuilderBasePayload,
+    [BuilderEvent.NONE]: BuilderBasePayload,
+}> {
     return {
-        start: () => client.consume({
-            exchange: {
-                routingKey: 'api.aggregator.tm',
+        [BuilderEvent.BUILDING]: async (message) => {
+            await handleAnalysisManagerBuilderBaseEvent(BuilderEvent.BUILDING, message.data);
+        },
+        [BuilderEvent.BUILT]: async (message) => {
+            await handleAnalysisManagerBuilderBaseEvent(BuilderEvent.BUILT, message.data);
+        },
+        [BuilderEvent.CHECKING]: async (message) => {
+            await handleAnalysisManagerBuilderBaseEvent(BuilderEvent.CHECKING, message.data);
+        },
+        [BuilderEvent.CHECKED]: async (message) => {
+            await handleAnalysisManagerBuilderBaseEvent(BuilderEvent.CHECKED, message.data);
+        },
+        [BuilderEvent.PUSHING]: async (message) => {
+            await handleAnalysisManagerBuilderBaseEvent(BuilderEvent.PUSHING, message.data);
+        },
+        [BuilderEvent.PUSHED]: async (message) => {
+            await handleAnalysisManagerBuilderBaseEvent(BuilderEvent.PUSHED, message.data);
+        },
+        [BuilderEvent.NONE]: async (message) => {
+            await handleAnalysisManagerBuilderBaseEvent(BuilderEvent.NONE, message.data);
+        },
+    };
+}
+
+export function createAnalysisManagerBuilderAggregator() : Aggregator {
+    if (!isQueueRouterUsable() || useEnv('env') === EnvironmentName.TEST) {
+        return {
+            start() {
+                useLogger().warn('Registry component has not been initialized');
             },
-        }, {
-            $any: async (message) => {
-                const payload = JSON.parse(message.content.toString('utf-8'));
-                if (!isComponentEventQueuePayload(payload)) {
-                    useLogger().error('Analysis manager aggregation event could not be processed.');
-                    return;
-                }
+        };
+    }
 
-                let error : ComponentError | undefined;
+    const queueRouter = useQueueRouter();
 
-                if (payload.error) {
-                    error = new ComponentError({
-                        component: payload.metadata.component,
-                        message: payload.error.message,
-                        code: payload.error.code,
-                        step: `${payload.error.step}`,
-                    });
-                }
-
-                useLogger().debug('Event received', {
-                    component: payload.metadata.component,
-                    command: payload.metadata.command,
-                    event: payload.metadata.event,
-                });
-
-                switch (payload.metadata.component) {
-                    case ComponentName.BUILDER: {
-                        await handleTrainManagerBuilderEvent({
-                            command: payload.metadata.command as any,
-                            event: payload.metadata.event as any,
-                            data: payload.data as any,
-                            ...(error ? { error } : {}),
-                        });
-                        break;
-                    }
-                }
-            },
-        }),
+    return {
+        start: () => queueRouter.consume(
+            BuilderEventQueueRouterRouting,
+            createAnalysisManagerBuilderHandlers(),
+        ),
     };
 }

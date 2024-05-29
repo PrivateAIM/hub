@@ -5,6 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { QueueRouterRoutingType } from '@privateaim/server-kit';
+
 export enum RegistryCommand {
     CLEANUP = 'CLEANUP',
     SETUP = 'SETUP',
@@ -28,3 +30,13 @@ export enum RegistryHookEvent {
     QUOTA_EXCEED = 'QUOTA_EXCEED',
     QUOTA_WARNING = 'QUOTA_WARNING',
 }
+
+export const RegistryEventQueueRouterRouting = {
+    type: QueueRouterRoutingType.PUB_SUB,
+    key: 'registryEvents',
+};
+
+export const RegistryTaskQueueRouterRouting = {
+    type: QueueRouterRoutingType.WORK,
+    key: 'registryCommands',
+};

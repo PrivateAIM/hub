@@ -5,24 +5,35 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { PublishOptionsExtended } from 'amqp-extension';
-import type { QueueRouterPayload } from '../../types';
-import { ComponentName, ROUTER_QUEUE_ROUTING_KEY } from '../../constants';
-import type { BuilderCommandContext } from './types';
+import type { QueueRouterPayload } from '@privateaim/server-kit';
+import { buildQueueRouterPublishPayload } from '@privateaim/server-kit';
+import { cleanupPayload } from '../../utils';
+import {
+    BuilderEventQueueRouterRouting,
+    BuilderTaskQueueRouterRouting,
+} from './constants';
+import type { BuilderCommandContext, BuilderEventContext } from './types';
 
-export function buildBuilderQueuePayload(
+export function buildBuilderTaskQueueRouterPayload(
     context: BuilderCommandContext,
-) : PublishOptionsExtended<QueueRouterPayload> {
-    return {
-        exchange: {
-            routingKey: ROUTER_QUEUE_ROUTING_KEY,
+) : QueueRouterPayload {
+    return buildQueueRouterPublishPayload({
+        type: context.command,
+        data: cleanupPayload(context.data),
+        metadata: {
+            routing: BuilderTaskQueueRouterRouting,
         },
-        content: {
-            data: context.data,
-            metadata: {
-                component: ComponentName.BUILDER,
-                command: context.command,
-            },
+    });
+}
+
+export function buildBuilderEventQueueRouterPayload(
+    context: BuilderEventContext,
+) : QueueRouterPayload {
+    return buildQueueRouterPublishPayload({
+        type: context.event,
+        data: cleanupPayload(context.data),
+        metadata: {
+            routing: BuilderEventQueueRouterRouting,
         },
-    };
+    });
 }

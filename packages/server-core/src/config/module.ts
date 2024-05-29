@@ -6,11 +6,10 @@
  */
 
 import type { Aggregator, Component } from '@privateaim/server-kit';
-import { isAmqpClientUsable } from '@privateaim/server-kit';
-import { buildAuthupAggregator, buildTrainManagerAggregator } from '../aggregators';
-import { EnvironmentName, useEnv } from './env';
-
-import { buildRouterComponent } from '../components';
+import { createAnalysisManagerBuilderAggregator, createAuthupAggregator } from '../aggregators';
+import {
+    createRegistryComponent,
+} from '../components';
 import { getWritableDirPath } from './paths';
 import {
     configureAmqp, configureAuthup, configureRedis, configureVault, setupLogger,
@@ -36,24 +35,16 @@ export function createConfig() : Config {
 
     // ---------------------------------------------
 
-    const isTest = useEnv('env') === EnvironmentName.TEST;
+    const aggregators : Aggregator[] = [
+        createAuthupAggregator(),
+        createAnalysisManagerBuilderAggregator(),
+    ];
 
     // ---------------------------------------------
 
-    const aggregators : {start: () => void}[] = [];
-    if (!isTest && isAmqpClientUsable()) {
-        aggregators.push(buildAuthupAggregator());
-        aggregators.push(buildTrainManagerAggregator());
-    }
-
-    // ---------------------------------------------
-
-    const components : {start: () => void}[] = [];
-    if (!isTest && isAmqpClientUsable()) {
-        components.push(
-            buildRouterComponent(),
-        );
-    }
+    const components : Component[] = [
+        createRegistryComponent(),
+    ];
 
     return {
         aggregators,

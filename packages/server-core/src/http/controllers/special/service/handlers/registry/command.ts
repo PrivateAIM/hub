@@ -15,10 +15,14 @@ import type { Request, Response } from 'routup';
 import { sendAccepted } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '@privateaim/server-http-kit';
-import { isAmqpClientUsable, useAmqpClient, useLogger } from '@privateaim/server-kit';
+import {
+    isQueueRouterUsable,
+    useLogger,
+    useQueueRouter,
+} from '@privateaim/server-kit';
 import {
     RegistryCommand,
-    buildRegistryPayload,
+    buildRegistryTaskQueueRouterPayload,
 } from '../../../../../../components';
 import { RegistryEntity, RegistryProjectEntity } from '../../../../../../domains';
 import { runServiceRegistryValidation } from '../../utils/validation';
@@ -32,11 +36,11 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
 
     const { data: result } = await runServiceRegistryValidation(req);
 
-    if (!isAmqpClientUsable()) {
+    if (!isQueueRouterUsable()) {
         return sendAccepted(res);
     }
 
-    const client = useAmqpClient();
+    const client = useQueueRouter();
 
     const dataSource = await useDataSource();
 
@@ -55,7 +59,7 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
             if (result.command === RegistryAPICommand.SETUP) {
                 useLogger().info('Submitting setup registry command.');
 
-                const queueMessage = buildRegistryPayload({
+                const queueMessage = buildRegistryTaskQueueRouterPayload({
                     command: RegistryCommand.SETUP,
                     data: {
                         id: entity.id,
@@ -66,7 +70,7 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
             } else if (result.command === RegistryAPICommand.DELETE) {
                 useLogger().info('Submitting delete registry command.');
 
-                const queueMessage = buildRegistryPayload({
+                const queueMessage = buildRegistryTaskQueueRouterPayload({
                     command: RegistryCommand.DELETE,
                     data: {
                         id: entity.id,
@@ -77,7 +81,7 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
             } else {
                 useLogger().info('Submitting cleanup registry command.');
 
-                const queueMessage = buildRegistryPayload({
+                const queueMessage = buildRegistryTaskQueueRouterPayload({
                     command: RegistryCommand.CLEANUP,
                     data: {
                         id: entity.id,
@@ -99,7 +103,7 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
                 .getOne();
 
             if (result.command === RegistryAPICommand.PROJECT_LINK) {
-                const queueMessage = buildRegistryPayload({
+                const queueMessage = buildRegistryTaskQueueRouterPayload({
                     command: RegistryCommand.PROJECT_LINK,
                     data: {
                         id: entity.id,
@@ -108,7 +112,7 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
                 });
                 await client.publish(queueMessage);
             } else {
-                const queueMessage = buildRegistryPayload({
+                const queueMessage = buildRegistryTaskQueueRouterPayload({
                     command: RegistryCommand.PROJECT_UNLINK,
                     data: {
                         id: entity.id,

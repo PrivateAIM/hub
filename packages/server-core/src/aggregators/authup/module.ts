@@ -8,20 +8,23 @@
 import { DomainType } from '@authup/core-kit';
 import { isRedisClientUsable, useLogger, useRedisSubscribeClient } from '@privateaim/server-kit';
 import type { Aggregator } from '@privateaim/server-kit';
+import { EnvironmentName, useEnv } from '../../config';
 import {
     handleAuthupRealmEvent,
     handleAuthupRobotEvent,
     handleAuthupUserEvent,
 } from './entities';
 
-export function buildAuthupAggregator() : Aggregator {
+export function createAuthupAggregator() : Aggregator {
+    if (!isRedisClientUsable() || useEnv('env') === EnvironmentName.TEST) {
+        return {
+            start() {
+                useLogger().warn('Authup aggregator has not been initialized');
+            },
+        };
+    }
     return {
         start() {
-            if (!isRedisClientUsable()) {
-                useLogger().info('Authup aggregator is missing redis configuration.');
-                return;
-            }
-
             const redisSub = useRedisSubscribeClient();
 
             redisSub.subscribe('realm', 'user', 'robot');
