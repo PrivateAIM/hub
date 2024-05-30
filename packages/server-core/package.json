@@ -37,7 +37,7 @@
         "express-validator": "^7.1.0",
         "hapic": "^2.5.1",
         "locter": "^2.1.0",
-        "mysql2": "^3.9.7",
+        "mysql2": "^3.9.8",
         "pascal-case": "^4.0.0",
         "pg": "^8.11.5",
         "prom-client": "^14.2.0",
