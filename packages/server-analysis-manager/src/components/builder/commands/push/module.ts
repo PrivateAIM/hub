@@ -11,7 +11,7 @@ import {
 import { BuilderCommand } from '@privateaim/server-analysis-manager-kit';
 import type { BuilderBuildPayload } from '@privateaim/server-analysis-manager-kit';
 import {
-    buildDockerAuthConfig, buildRemoteDockerImageURL, pushDockerImage, useCoreClient, useDocker,
+    buildDockerAuthConfig, buildRemoteDockerImageURL, cleanupDockerImages, pushDockerImage, useCoreClient, useDocker,
 } from '../../../../core';
 import type { ComponentPayloadExtended } from '../../../type';
 import { extendPayload } from '../../../utils';
@@ -74,6 +74,9 @@ export async function executePushCommand(
     const image = useDocker()
         .getImage(localImageUrl);
 
+    await image.inspect();
+
+    const imageURLs : string[] = [];
     for (let i = 0; i < nodes.length; i++) {
         const nodeImageURL = buildRemoteDockerImageURL({
             hostname: data.registry.host,
@@ -82,15 +85,25 @@ export async function executePushCommand(
             tagOrDigest: REGISTRY_ARTIFACT_TAG_LATEST,
         });
 
-        await image.tag({
-            repo: nodeImageURL,
-            tag: REGISTRY_ARTIFACT_TAG_LATEST,
-        });
+        imageURLs.push(nodeImageURL);
     }
 
-    await image.remove({
-        force: true,
-    });
+    try {
+        for (let i = 0; i < imageURLs.length; i++) {
+            await image.tag({
+                repo: imageURLs[i],
+                tag: REGISTRY_ARTIFACT_TAG_LATEST,
+            });
+        }
+    } catch (e) {
+        await cleanupDockerImages(imageURLs);
+
+        throw e;
+    } finally {
+        await image.remove({
+            force: true,
+        });
+    }
 
     useBuilderLogger().debug('Tagged image for nodes', {
         command: BuilderCommand.BUILD,
@@ -102,15 +115,14 @@ export async function executePushCommand(
         command: BuilderCommand.BUILD,
     });
 
-    for (let i = 0; i < nodes.length; i++) {
-        const nodeImageURL = buildRemoteDockerImageURL({
-            hostname: data.registry.host,
-            projectName: nodes[i].registry_project.external_name,
-            repositoryName: data.entity.id,
-            tagOrDigest: REGISTRY_ARTIFACT_TAG_LATEST,
-        });
+    try {
+        for (let i = 0; i < imageURLs.length; i++) {
+            await pushDockerImage(imageURLs[i], authConfig);
+        }
+    } catch (e) {
+        await cleanupDockerImages(imageURLs);
 
-        await pushDockerImage(nodeImageURL, authConfig);
+        throw e;
     }
 
     useBuilderLogger().debug('Pushed image for nodes', {

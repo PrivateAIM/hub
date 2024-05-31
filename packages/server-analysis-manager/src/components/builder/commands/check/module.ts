@@ -14,7 +14,7 @@ import { createBasicHarborAPIClient, useCoreClient } from '../../../../core';
 import type { ComponentPayloadExtended } from '../../../type';
 import { extendPayload } from '../../../utils';
 import { BuilderError } from '../../error';
-import { writeBuiltEvent, writeNoneEvent } from '../../events';
+import { writeBuiltEvent, writeNoneEvent } from '../../queue';
 
 export async function executeBuilderCheckCommand(
     input: BuilderCheckPayload,

@@ -23,7 +23,7 @@ import {
     writeDestroyedEvent,
     writeDestroyingEvent,
     writeFailedEvent,
-} from './events';
+} from './queue';
 import { useCoreLogger } from './utils';
 
 function createHandlers() : QueueRouterHandlers<{

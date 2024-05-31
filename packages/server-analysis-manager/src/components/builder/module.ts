@@ -17,6 +17,7 @@ import {
 import type { Component, QueueRouterHandlers } from '@privateaim/server-kit';
 import { isQueueRouterUsable, useLogger, useQueueRouter } from '@privateaim/server-kit';
 import { EnvironmentName, useEnv } from '../../config';
+import { cleanupDockerImage } from '../../core';
 import { extendPayload } from '../utils';
 import { executeBuilderBuildCommand, executeBuilderCheckCommand, executePushCommand } from './commands';
 import {
@@ -26,10 +27,10 @@ import {
     writeCheckFailedEvent,
     writeCheckedEvent,
     writeCheckingEvent,
+    writePushCommand,
     writePushFailedEvent,
-    writePushedEvent,
-    writePushingEvent,
-} from './events';
+    writePushedEvent, writePushingEvent,
+} from './queue';
 import { useBuilderLogger } from './utils';
 
 function createHandlers() : QueueRouterHandlers<{
@@ -44,13 +45,13 @@ function createHandlers() : QueueRouterHandlers<{
                 .then((data) => writeBuildingEvent(data))
                 .then(executeBuilderBuildCommand)
                 .then((data) => writeBuiltEvent(data))
+                .then((data) => writePushCommand(data))
                 .catch((err: Error) => {
                     useBuilderLogger().error(err);
 
-                    // todo: cleanup docker image
-
                     message.data.error = err;
-                    return writeBuildFailedEvent(message.data);
+                    return cleanupDockerImage(message.data.id)
+                        .finally(() => writeBuildFailedEvent(message.data));
                 });
         },
         [BuilderCommand.PUSH]: async (message) => {
@@ -60,8 +61,6 @@ function createHandlers() : QueueRouterHandlers<{
                 .then((data) => writePushedEvent(data))
                 .catch((err: Error) => {
                     useBuilderLogger().error(err);
-
-                    // todo: cleanup docker image
 
                     message.data.error = err;
                     return writePushFailedEvent(message.data);
