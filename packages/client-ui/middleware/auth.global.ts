@@ -87,7 +87,10 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
         if (!loggedIn.value) {
             const query : Record<string, any> = {};
 
-            if (!to.fullPath.startsWith('/logout')) {
+            if (
+                !to.fullPath.startsWith('/logout') &&
+                !to.fullPath.startsWith('/login')
+            ) {
                 query.redirect = to.fullPath;
             }
 
