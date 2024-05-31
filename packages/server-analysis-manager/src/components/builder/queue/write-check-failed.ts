@@ -6,18 +6,15 @@
  */
 
 import { useQueueRouter } from '@privateaim/server-kit';
+import type { BuilderCheckPayload } from '@privateaim/server-analysis-manager-kit';
 import { BuilderEvent, buildBuilderEventQueueRouterPayload } from '@privateaim/server-analysis-manager-kit';
-import type { BuilderCheckCommandContext, BuilderCheckPayload } from '@privateaim/server-analysis-manager-kit';
 
-export async function writeCheckingEvent(
-    context: BuilderCheckCommandContext,
-) : Promise<BuilderCheckPayload> {
+export async function writeCheckFailedEvent(
+    data: BuilderCheckPayload,
+) {
     const client = useQueueRouter();
     await client.publish(buildBuilderEventQueueRouterPayload({
-        event: BuilderEvent.CHECKING,
-        command: context.command,
-        data: context.data, //  { id: 'xxx' }
+        event: BuilderEvent.CHECK_FAILED,
+        data,
     }));
-
-    return context.data;
 }

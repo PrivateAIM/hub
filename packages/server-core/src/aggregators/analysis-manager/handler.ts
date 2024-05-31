@@ -6,6 +6,7 @@
  */
 
 import {
+    BuilderCommand,
     BuilderErrorCode,
     BuilderEvent,
     ComponentName,
@@ -34,30 +35,38 @@ export async function handleAnalysisManagerBuilderBaseEvent(
         return;
     }
 
-    let trainLogContext : AnalysisLogSaveContext = {
+    let logCtx : AnalysisLogSaveContext = {
         entity,
         component: ComponentName.BUILDER,
         event,
     };
 
     switch (event) {
-        case BuilderEvent.NONE:
+        case BuilderEvent.NONE: {
             if (!entity.run_status) {
                 entity.build_status = null;
             }
+
+            logCtx.command = BuilderCommand.CHECK;
             break;
-        case BuilderEvent.BUILDING:
+        }
+        case BuilderEvent.BUILDING: {
             entity.build_status = AnalysisBuildStatus.STARTED;
 
-            trainLogContext.status = AnalysisBuildStatus.STARTED;
+            logCtx.command = BuilderCommand.BUILD;
+            logCtx.status = AnalysisBuildStatus.STARTED;
             break;
-        case BuilderEvent.FAILED: {
-            // todo: only in case of build, push event
-            // entity.build_status = AnalysisBuildStatus.FAILED;
+        }
+        case BuilderEvent.BUILD_FAILED:
+        case BuilderEvent.CHECK_FAILED:
+        case BuilderEvent.PUSH_FAILED: {
+            if (event !== BuilderEvent.CHECK_FAILED) {
+                entity.build_status = AnalysisBuildStatus.FAILED;
+            }
 
             if (isComponentError(data.error)) {
-                trainLogContext = {
-                    ...trainLogContext,
+                logCtx = {
+                    ...logCtx,
                     status: AnalysisBuildStatus.FAILED,
                     statusMessage: data.error.message,
 
@@ -66,23 +75,29 @@ export async function handleAnalysisManagerBuilderBaseEvent(
                 };
             }
 
+            switch (event) {
+                case BuilderEvent.BUILD_FAILED:
+                    logCtx.command = BuilderCommand.BUILD;
+                    break;
+                case BuilderEvent.CHECK_FAILED:
+                    logCtx.command = BuilderCommand.CHECK;
+                    break;
+                case BuilderEvent.PUSH_FAILED:
+                    logCtx.command = BuilderCommand.PUSH;
+                    break;
+            }
+
             break;
         }
         case BuilderEvent.PUSHED:
             entity.build_status = AnalysisBuildStatus.FINISHED;
 
-            trainLogContext.status = AnalysisBuildStatus.FINISHED;
+            logCtx.status = AnalysisBuildStatus.FINISHED;
+            logCtx.command = BuilderCommand.PUSH;
             break;
-    }
-
-    if (
-        event !== BuilderEvent.FAILED &&
-        event !== BuilderEvent.NONE
-    ) {
-        entity.run_status = null;
     }
 
     await repository.save(entity);
 
-    await saveAnalysisLog(trainLogContext);
+    await saveAnalysisLog(logCtx);
 }

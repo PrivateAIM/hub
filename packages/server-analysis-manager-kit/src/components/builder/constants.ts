@@ -8,16 +8,17 @@
 import { QueueRouterRoutingType } from '@privateaim/server-kit';
 
 export enum BuilderEvent {
+    BUILD_FAILED = 'buildFailed',
     BUILDING = 'building',
     BUILT = 'built',
 
+    PUSH_FAILED = 'pushFailed',
     PUSHING = 'pushing',
     PUSHED = 'pushed',
 
+    CHECK_FAILED = 'checkFailed',
     CHECKING = 'checking',
     CHECKED = 'checked',
-
-    FAILED = 'failed',
 
     NONE = 'none',
 }
@@ -25,10 +26,10 @@ export enum BuilderEvent {
 export enum BuilderCommand {
     BUILD = 'build',
     CHECK = 'check',
+    PUSH = 'push',
 }
 
 export enum BuilderErrorCode {
-    TRAIN_NOT_BUILD = 'trainNotBuild',
     ENTRYPOINT_NOT_FOUND = 'entrypointNotFound',
     MASTER_IMAGE_NOT_FOUND = 'masterImageNotFound',
     UNKNOWN = 'unknown',

@@ -7,7 +7,7 @@
 
 export * from './container-read';
 export * from './container-save';
-export * from './image-exists';
+export * from './image-clenaup';
 export * from './image-pull';
 export * from './image-push';
 export * from './image-remove';

@@ -73,27 +73,29 @@ export async function executeBuilderBuildCommand(
     const container = await useDocker()
         .createContainer({ Image: imageURL });
 
-    // -----------------------------------------------------------------------------------
+    try {
+        // -----------------------------------------------------------------------------------
 
-    await packContainerWithTrain(container, {
-        entity: data.entity,
-        masterImagePath,
-    });
+        await packContainerWithTrain(container, {
+            entity: data.entity,
+            masterImagePath,
+        });
 
-    // -----------------------------------------------------------------------------------
+        // -----------------------------------------------------------------------------------
 
-    useBuilderLogger().debug('Committing container', {
-        command: BuilderCommand.BUILD,
-    });
+        useBuilderLogger().debug('Committing container', {
+            command: BuilderCommand.BUILD,
+        });
 
-    await container.commit({
-        repo: imageURL,
-        tag: REGISTRY_ARTIFACT_TAG_LATEST,
-    });
-
-    await container.remove({
-        force: true,
-    });
+        await container.commit({
+            repo: imageURL,
+            tag: REGISTRY_ARTIFACT_TAG_LATEST,
+        });
+    } finally {
+        await container.remove({
+            force: true,
+        });
+    }
 
     return data;
 }
