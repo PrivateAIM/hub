@@ -7,8 +7,8 @@
 
 import type { BuildInput } from 'rapiq';
 import { buildQuery } from 'rapiq';
+import type { AnalysisNode } from '@privateaim/core';
 import { BaseAPI } from '../base';
-import type { AnalysisNode } from './entity';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
 
 export class TrainStationAPI extends BaseAPI {

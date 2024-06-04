@@ -7,9 +7,9 @@
 
 import type { BuildInput } from 'rapiq';
 import { buildQuery } from 'rapiq';
+import type { ProjectNode } from '@privateaim/core';
 import { nullifyEmptyObjectProperties } from '../../utils';
 import { BaseAPI } from '../base';
-import type { ProjectNode } from './entity';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
 
 export class ProjectNodeAPI extends BaseAPI {

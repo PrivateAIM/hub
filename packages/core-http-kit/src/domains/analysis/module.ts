@@ -8,11 +8,10 @@
 import type { RequestBaseOptions } from 'hapic';
 import type { BuildInput } from 'rapiq';
 import { buildQuery } from 'rapiq';
+import type { Analysis, AnalysisAPICommand } from '@privateaim/core';
 import { BaseAPI } from '../base';
-import type { Analysis } from './entity';
 import { nullifyEmptyObjectProperties } from '../../utils';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
-import type { AnalysisAPICommand } from './constants';
 
 export class AnalysisAPI extends BaseAPI {
     // todo: we properly don't need this anymore

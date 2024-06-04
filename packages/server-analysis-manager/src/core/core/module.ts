@@ -7,13 +7,13 @@
 
 import type { Factory } from 'singa';
 import { singa } from 'singa';
-import type { APIClient } from '@privateaim/core';
+import type { Client } from '@privateaim/core-http-kit';
 
-const instance = singa<APIClient>({
+const instance = singa<Client>({
     name: 'core',
 });
 
-export function setCoreFactory(factory: Factory<APIClient>) {
+export function setCoreFactory(factory: Factory<Client>) {
     instance.setFactory(factory);
 }
 

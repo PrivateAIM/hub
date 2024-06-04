@@ -9,7 +9,8 @@
         ],
         "strict": true,
         "paths": {
-            "@privateaim/core": ["./packages/core/src"]
+            "@privateaim/core": ["./packages/core/src"],
+            "@privateaim/core-http-kit": ["./packages/core-http-kit/src"],
         }
     },
     "include": [

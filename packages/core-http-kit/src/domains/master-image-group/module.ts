@@ -7,9 +7,9 @@
 
 import type { BuildInput } from 'rapiq';
 import { buildQuery } from 'rapiq';
+import type { MasterImageGroup } from '@privateaim/core';
 import { BaseAPI } from '../base';
 
-import type { MasterImageGroup } from './entity';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
 
 export class MasterImageGroupAPI extends BaseAPI {

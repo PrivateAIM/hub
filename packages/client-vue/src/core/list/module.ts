@@ -6,7 +6,8 @@
  */
 
 import { hasOwnProperty } from '@privateaim/core';
-import type { DomainAPI, DomainEntity, DomainType } from '@privateaim/core';
+import type { DomainAPI } from '@authup/core-http-kit';
+import type { DomainEntity, DomainType } from '@privateaim/core';
 import type {
     ListFooterBuildOptionsInput, ListHeaderBuildOptionsInput,
 } from '@vuecs/list-controls';

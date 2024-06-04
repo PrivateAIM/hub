@@ -7,7 +7,7 @@
 
 import { mountClientResponseErrorTokenHook } from '@authup/core-http-kit';
 import type { TokenCreator, TokenCreatorOptions } from '@authup/core-http-kit';
-import { APIClient } from '@privateaim/core';
+import { Client } from '@privateaim/core-http-kit';
 import { setCoreFactory } from '../../core';
 import { useEnv } from '../env';
 
@@ -16,7 +16,7 @@ type StorageServiceConfigurationContext = {
 };
 export function configureCoreService(context: StorageServiceConfigurationContext) {
     setCoreFactory(() => {
-        const client = new APIClient({
+        const client = new Client({
             baseURL: useEnv('coreURL'),
         });
 

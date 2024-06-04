@@ -6,8 +6,9 @@
  */
 
 import { TranslatorTranslationDefaultKey, TranslatorTranslationGroup, useTranslation } from '@authup/client-web-kit';
+import type { DomainAPISlim } from '@authup/core-http-kit';
 import type { DomainType } from '@privateaim/core';
-import { useDomainAPI } from '@privateaim/core';
+import { hasOwnProperty, isObject } from '@privateaim/core';
 import type {
     Component,
     PropType,
@@ -67,19 +68,26 @@ export default defineComponent({
         const submit = async () => {
             if (busy.value) return;
 
-            const domainApi = useDomainAPI(apiClient, props.entityType);
-            if (!domainApi) {
+            let domainAPI : DomainAPISlim<any> | undefined;
+
+            if (
+                hasOwnProperty(apiClient, props.entityType) &&
+                isObject(apiClient[props.entityType]) &&
+                hasOwnProperty(apiClient[props.entityType], 'delete')
+            ) {
+                domainAPI = apiClient[props.entityType] as DomainAPISlim<any>;
+            }
+
+            if (!domainAPI) {
                 return;
             }
 
             busy.value = true;
 
             try {
-                if ('delete' in domainApi) {
-                    const response = await domainApi.delete(props.entityId);
-                    response.id = props.entityId;
-                    ctx.emit('deleted', response);
-                }
+                const response = await domainAPI.delete(props.entityId);
+                response.id = props.entityId;
+                ctx.emit('deleted', response);
             } catch (e) {
                 ctx.emit('failed', e);
             }
