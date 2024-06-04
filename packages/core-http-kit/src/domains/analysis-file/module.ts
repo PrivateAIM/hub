@@ -7,9 +7,9 @@
 
 import type { BuildInput } from 'rapiq';
 import { buildQuery } from 'rapiq';
+import type { AnalysisFile } from '@privateaim/core';
 import { nullifyEmptyObjectProperties } from '../../utils';
 import { BaseAPI } from '../base';
-import type { AnalysisFile } from './entity';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
 
 export class AnalysisFileAPI extends BaseAPI {

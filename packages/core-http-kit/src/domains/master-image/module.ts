@@ -8,9 +8,8 @@
 import type { BuildInput } from 'rapiq';
 import { buildQuery } from 'rapiq';
 
+import type { MasterImage, MasterImageCommand } from '@privateaim/core';
 import { BaseAPI } from '../base';
-import type { MasterImage } from './entity';
-import type { MasterImageCommand } from './constants';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
 
 export class MasterImageAPI extends BaseAPI {

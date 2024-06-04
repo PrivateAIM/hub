@@ -5,6 +5,9 @@
             "@privateaim/core": [
                 "./packages/core/src"
             ],
+            "@privateaim/core-http-kit": [
+                "./packages/core-http-kit/src"
+            ],
             "@privateaim/server-kit": [
                 "./packages/server-kit/src"
             ],

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { APIClient as Client } from '@privateaim/core';
+import { Client } from '@privateaim/core-http-kit';
 import type { App } from 'vue';
 import { setupBaseHTTPClient } from '../setup';
 import type { BaseHTTPClientInstallOptions } from '../types';

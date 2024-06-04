@@ -7,6 +7,16 @@
 
 import type { Client, RequestBaseOptions } from 'hapic';
 
+export type SingleResourceResponse<R> = R;
+export type CollectionResourceResponse<R> = {
+    data: R[],
+    meta: {
+        limit: number,
+        offset: number,
+        total: number
+    }
+};
+
 export type BaseAPIContext = {
     client?: Client | RequestBaseOptions
 };

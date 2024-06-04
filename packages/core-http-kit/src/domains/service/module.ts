@@ -5,13 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { nullifyEmptyObjectProperties } from '../../utils';
-import { BaseAPI } from '../base';
-import type { RegistryAPICommand } from './registry';
-import { ServiceID } from './constants';
+import type { Registry, RegistryAPICommand, RegistryProject } from '@privateaim/core';
+import { ServiceID } from '@privateaim/core';
 import type { SingleResourceResponse } from '../types-base';
-import type { Registry } from '../registry';
-import type { RegistryProject } from '../registry-project';
+import { BaseAPI } from '../base';
+import { nullifyEmptyObjectProperties } from '../../utils';
 
 export class ServiceAPI extends BaseAPI {
     async runCommand(

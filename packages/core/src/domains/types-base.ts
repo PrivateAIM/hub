@@ -5,19 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Client, RequestBaseOptions } from 'hapic';
-import type { BuildInput } from 'rapiq';
 import type { DomainEventName } from './constants';
-
-export type SingleResourceResponse<R> = R;
-export type CollectionResourceResponse<R> = {
-    data: R[],
-    meta: {
-        limit: number,
-        offset: number,
-        total: number
-    }
-};
 
 export type DomainEntityWithID = {
     [key: string]: any,
@@ -26,21 +14,6 @@ export type DomainEntityWithID = {
 export type DomainEntityID<T> = T extends DomainEntityWithID ?
     T['id'] :
     never;
-
-export interface DomainAPISlim<T> {
-    getMany(record?: BuildInput<T>) : Promise<CollectionResourceResponse<T>>;
-    getOne(id: DomainEntityID<T>, record?: BuildInput<T>) : Promise<SingleResourceResponse<T>>;
-    delete(id: DomainEntityID<T>) : Promise<SingleResourceResponse<T>>;
-    create(data: Partial<T>) : Promise<SingleResourceResponse<T>>;
-}
-
-export interface DomainAPI<T> extends DomainAPISlim<T> {
-    update(id: DomainEntityID<T>, data: Partial<T>) : Promise<SingleResourceResponse<T>>;
-}
-
-export type BaseAPIContext = {
-    client?: Client | RequestBaseOptions
-};
 
 export type DomainEventBaseContext = {
     event: `${DomainEventName}`,

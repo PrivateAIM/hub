@@ -6,8 +6,9 @@
  */
 
 import { hasOwnProperty } from '@authup/kit';
+import type { DomainAPI } from '@authup/core-http-kit';
 import type {
-    DomainAPI, DomainEntity, DomainEntityID, DomainType,
+    DomainEntity, DomainEntityID, DomainType,
 } from '@privateaim/core';
 import type { BuildInput } from 'rapiq';
 import { isObject } from 'smob';

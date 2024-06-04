@@ -7,8 +7,8 @@
 
 import type { BuildInput } from 'rapiq';
 import { buildQuery } from 'rapiq';
+import type { RegistryProject } from '@privateaim/core';
 import { BaseAPI } from '../base';
-import type { RegistryProject } from './entity';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
 import { nullifyEmptyObjectProperties } from '../../utils';
 

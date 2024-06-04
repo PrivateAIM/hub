@@ -9,7 +9,7 @@ import type { Analysis } from '@privateaim/core/src';
 import type { BuildInput } from 'rapiq';
 import { buildQuery } from 'rapiq';
 import { nullifyEmptyObjectProperties } from '@privateaim/core';
-import type { CollectionResourceResponse, SingleResourceResponse } from '@privateaim/core';
+import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
 import { BaseAPI } from '../base';
 import type { BucketFile } from '../bucket-file';
 import type { Bucket } from './entity';

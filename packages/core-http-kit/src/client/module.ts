@@ -6,7 +6,7 @@
  */
 
 import type { RequestBaseOptions } from 'hapic';
-import { Client, HookName, isClientError } from 'hapic';
+import { Client as BaseClient, HookName, isClientError } from 'hapic';
 import {
     AnalysisAPI,
     AnalysisFileAPI,
@@ -20,9 +20,9 @@ import {
     RegistryProjectAPI,
     ServiceAPI,
     TrainStationAPI,
-} from '../../domains';
+} from '../domains';
 
-export class APIClient extends Client {
+export class Client extends BaseClient {
     public readonly masterImage : MasterImageAPI;
 
     public readonly masterImageGroup : MasterImageGroupAPI;
@@ -39,7 +39,6 @@ export class APIClient extends Client {
 
     public readonly analysis : AnalysisAPI;
 
-    // todo: this is going to be moved to storage service package.
     public readonly analysisFile : AnalysisFileAPI;
 
     public readonly analysisLog: AnalysisLogAPI;
