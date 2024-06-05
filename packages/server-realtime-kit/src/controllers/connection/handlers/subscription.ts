@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { SocketCTSEventName } from '@privateaim/core';
+import { SocketCTSEventName } from '@privateaim/core-realtime-kit';
 import type { Socket } from '../../../types';
 import {
     buildConnectionRobotRoom,

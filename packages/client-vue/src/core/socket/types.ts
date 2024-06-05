@@ -6,7 +6,7 @@
  */
 
 import type { ClientManager } from '@authup/core-realtime-kit';
-import type { SocketResourcesNamespaceCTSEvents, SocketResourcesNamespaceSTCEvents } from '@privateaim/core';
+import type { SocketResourcesNamespaceCTSEvents, SocketResourcesNamespaceSTCEvents } from '@privateaim/core-realtime-kit';
 import type { Socket } from 'socket.io-client';
 
 export type SocketClient = Socket<SocketResourcesNamespaceSTCEvents, SocketResourcesNamespaceCTSEvents>;

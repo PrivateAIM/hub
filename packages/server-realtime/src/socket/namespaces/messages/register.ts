@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { SocketMessagesNamespaceMessageParty } from '@privateaim/core';
+import type { SocketMessagesNamespaceMessageParty } from '@privateaim/core-realtime-kit';
 import { buildConnectionRobotRoom, buildConnectionUserRoom, mountConnectionController } from '@privateaim/server-realtime-kit';
 import type { MessagesNamespace, MessagesNamespaceSocket } from './types';
 

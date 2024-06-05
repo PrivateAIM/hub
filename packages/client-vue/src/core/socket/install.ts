@@ -7,7 +7,7 @@
 
 import { storeToRefs, useStore } from '@authup/client-web-kit';
 import { ClientManager } from '@authup/core-realtime-kit';
-import type { SocketResourcesNamespaceCTSEvents, SocketResourcesNamespaceSTCEvents } from '@privateaim/core';
+import type { SocketResourcesNamespaceCTSEvents, SocketResourcesNamespaceSTCEvents } from '@privateaim/core-realtime-kit';
 import type { App } from 'vue';
 import { ref } from 'vue';
 import { provideSocketManager } from './singleton';

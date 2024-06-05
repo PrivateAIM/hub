@@ -11,8 +11,10 @@ import {
     PermissionID,
     buildDomainChannelName,
     buildDomainEventSubscriptionFullName,
-    isSocketClientToServerEventErrorCallback,
 } from '@privateaim/core';
+import {
+    isSocketClientToServerEventErrorCallback,
+} from '@privateaim/core-realtime-kit';
 import { UnauthorizedError } from '@ebec/http';
 import {
     subscribeSocketRoom,

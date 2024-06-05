@@ -19,8 +19,10 @@ import type {
     DomainEventSubscriptionFullName,
     DomainInput,
     DomainType,
-    SocketSTCEventContext,
 } from '@privateaim/core';
+import type {
+    SocketSTCEventContext,
+} from '@privateaim/core-realtime-kit';
 import {
     computed, isRef, onMounted, onUnmounted, watch,
 } from 'vue';

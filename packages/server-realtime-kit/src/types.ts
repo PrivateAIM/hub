@@ -7,7 +7,7 @@
 
 import type { Realm, Robot, User } from '@authup/core-kit';
 import type { Abilities } from '@authup/kit';
-import type { SocketCTSEvents, SocketSTCEvents, SocketSTSEvents } from '@privateaim/core';
+import type { SocketCTSEvents, SocketSTCEvents, SocketSTSEvents } from '@privateaim/core-realtime-kit';
 import type {
     Namespace as _Namespace,
     Server as _Server,

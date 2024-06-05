@@ -8,7 +8,7 @@
 import type {
     SocketMessagesNamespaceCTSMessagesEvents,
     SocketMessagesNamespaceSTCEvents,
-} from '@privateaim/core';
+} from '@privateaim/core-realtime-kit';
 import type { Namespace, Socket } from '@privateaim/server-realtime-kit';
 
 export type MessagesNamespace = Namespace<

@@ -11,8 +11,10 @@ import type {
     DomainEventContext,
     DomainEventSubscriptionFullName,
     DomainType,
-    SocketSTCEventContext,
 } from '@privateaim/core';
+import type {
+    SocketSTCEventContext,
+} from '@privateaim/core-realtime-kit';
 import type { MaybeRef } from 'vue';
 
 export type EntitySocketContext<

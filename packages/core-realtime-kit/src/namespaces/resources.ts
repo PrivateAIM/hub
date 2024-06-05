@@ -11,7 +11,7 @@ import type {
     DomainEventSubscriptionFullName,
     DomainSubType,
     DomainType,
-} from '../../domains';
+} from '@privateaim/core';
 import type { SocketCTSEvents, SocketSTCEventContext, SocketSTCEvents } from '../types';
 
 export type SocketResourcesNamespaceSTCEvents = SocketSTCEvents & {
