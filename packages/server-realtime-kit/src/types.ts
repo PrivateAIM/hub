@@ -7,7 +7,7 @@
 
 import type { Realm, Robot, User } from '@authup/core-kit';
 import type { Abilities } from '@authup/kit';
-import type { SocketCTSEvents, SocketSTCEvents, SocketSTSEvents } from '@privateaim/core';
+import type { CTSEvents, STCEvents, STSEvents } from '@privateaim/core-realtime-kit';
 import type {
     Namespace as _Namespace,
     Server as _Server,
@@ -31,30 +31,30 @@ export type SocketData = {
 };
 
 export type Server<
-    ListenEvents extends SocketCTSEvents = SocketCTSEvents,
-    EmitEvents extends SocketSTCEvents = SocketSTCEvents,
-    ServerSideEvents extends SocketSTSEvents = SocketSTSEvents,
+    ListenEvents extends CTSEvents = CTSEvents,
+    EmitEvents extends STCEvents = STCEvents,
+    ServerSideEvents extends STSEvents = STSEvents,
     Data extends SocketData = SocketData,
 > = _Server<ListenEvents, EmitEvents, ServerSideEvents, Data>;
 
 export type Socket<
-    ListenEvents extends SocketCTSEvents = SocketCTSEvents,
-    EmitEvents extends SocketSTCEvents = SocketSTCEvents,
-    ServerSideEvents extends SocketSTSEvents = SocketSTSEvents,
+    ListenEvents extends CTSEvents = CTSEvents,
+    EmitEvents extends STCEvents = STCEvents,
+    ServerSideEvents extends STSEvents = STSEvents,
     Data extends SocketData = SocketData,
 > = _Socket<ListenEvents, EmitEvents, ServerSideEvents, Data>;
 
 export type Namespace<
-    ListenEvents extends SocketCTSEvents = SocketCTSEvents,
-    EmitEvents extends SocketSTCEvents = SocketSTCEvents,
-    ServerSideEvents extends SocketSTSEvents = SocketSTSEvents,
+    ListenEvents extends CTSEvents = CTSEvents,
+    EmitEvents extends STCEvents = STCEvents,
+    ServerSideEvents extends STSEvents = STSEvents,
     Data extends SocketData = SocketData,
 > = _Namespace<ListenEvents, EmitEvents, ServerSideEvents, Data>;
 
 export type Middleware<
-    ListenEvents extends SocketCTSEvents = SocketCTSEvents,
-    EmitEvents extends SocketSTCEvents = SocketSTCEvents,
-    ServerSideEvents extends SocketSTSEvents = SocketSTSEvents,
+    ListenEvents extends CTSEvents = CTSEvents,
+    EmitEvents extends STCEvents = STCEvents,
+    ServerSideEvents extends STSEvents = STSEvents,
     Data extends SocketData = SocketData,
 > = (
     socket: Socket<ListenEvents, EmitEvents, ServerSideEvents, Data>,

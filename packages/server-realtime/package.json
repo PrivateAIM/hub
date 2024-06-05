@@ -14,6 +14,7 @@
         "@authup/core-kit": "^1.0.0-beta.13",
         "@ebec/http": "^2.3.0",
         "@privateaim/core": "^0.4.0",
+        "@privateaim/core-realtime-kit": "^0.4.0",
         "@privateaim/server-kit": "^0.4.0",
         "@privateaim/server-realtime-kit": "^0.4.0",
         "@socket.io/redis-adapter": "^8.3.0",

@@ -10,6 +10,7 @@
         "strict": true,
         "paths": {
             "@privateaim/core": ["./packages/core/src"],
+            "@privateaim/core-realtime-kit": ["./packages/core-realtime-kit/src"],
             "@privateaim/core-http-kit": ["./packages/core-http-kit/src"],
         }
     },

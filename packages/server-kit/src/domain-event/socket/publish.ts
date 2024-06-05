@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { DomainsEventContext, SocketResourcesNamespaceSTCEvents } from '@privateaim/core';
+import type { DomainsEventContext } from '@privateaim/core';
 import { DomainEventName, buildDomainEventFullName } from '@privateaim/core';
 import { Emitter } from '@socket.io/redis-emitter';
 import type { Client } from 'redis-extension';
@@ -20,7 +20,7 @@ export function publishDomainSocketEvent(
     context = transformDomainEventData(context);
 
     for (let i = 0; i < destinations.length; i++) {
-        let emitter = new Emitter<SocketResourcesNamespaceSTCEvents>(client);
+        let emitter = new Emitter(client);
         if (destinations[i].namespace) {
             emitter = emitter.of(destinations[i].namespace);
         }
@@ -31,8 +31,6 @@ export function publishDomainSocketEvent(
 
         emitter
             .in(roomName)
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
             .emit(fullEventName, {
                 ...context,
                 meta: {
@@ -47,8 +45,6 @@ export function publishDomainSocketEvent(
             roomName = buildDomainEventChannelName(destinations[i].channel, context.data.id);
             emitter
                 .in(roomName)
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
                 .emit(fullEventName, {
                     ...context,
                     meta: {

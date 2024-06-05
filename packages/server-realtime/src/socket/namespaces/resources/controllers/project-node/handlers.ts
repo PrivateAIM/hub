@@ -12,9 +12,10 @@ import {
     PermissionID,
     buildDomainChannelName,
     buildDomainEventSubscriptionFullName,
-    isSocketClientToServerEventCallback,
-    isSocketClientToServerEventErrorCallback,
 } from '@privateaim/core';
+import {
+    isEventCallback,
+} from '@privateaim/core-realtime-kit';
 import { UnauthorizedError } from '@ebec/http';
 import {
     subscribeSocketRoom,
@@ -35,7 +36,7 @@ export function registerProjectNodeSocketHandlers(socket: ResourcesNamespaceSock
             if (
                 !socket.data.abilities.has(PermissionID.PROJECT_APPROVE)
             ) {
-                if (isSocketClientToServerEventErrorCallback(cb)) {
+                if (isEventCallback(cb)) {
                     cb(new UnauthorizedError());
                 }
 
@@ -44,8 +45,8 @@ export function registerProjectNodeSocketHandlers(socket: ResourcesNamespaceSock
 
             subscribeSocketRoom(socket, buildDomainChannelName(DomainType.PROJECT_NODE, target));
 
-            if (isSocketClientToServerEventCallback(cb)) {
-                cb();
+            if (isEventCallback(cb)) {
+                cb(null);
             }
         },
     );
@@ -69,7 +70,7 @@ export function registerProjectNodeForRealmSocketHandlers(socket: ResourcesNames
             if (
                 !socket.data.abilities.has(PermissionID.PROJECT_APPROVE)
             ) {
-                if (isSocketClientToServerEventErrorCallback(cb)) {
+                if (isEventCallback(cb)) {
                     cb(new UnauthorizedError());
                 }
 
@@ -81,8 +82,8 @@ export function registerProjectNodeForRealmSocketHandlers(socket: ResourcesNames
                 buildDomainChannelName(DomainSubType.PROJECT_NODE_IN, target),
             );
 
-            if (isSocketClientToServerEventCallback(cb)) {
-                cb();
+            if (isEventCallback(cb)) {
+                cb(null);
             }
         },
     );
@@ -105,7 +106,7 @@ export function registerProjectNodeForRealmSocketHandlers(socket: ResourcesNames
             if (
                 !socket.data.abilities.has(PermissionID.PROJECT_EDIT)
             ) {
-                if (isSocketClientToServerEventErrorCallback(cb)) {
+                if (isEventCallback(cb)) {
                     cb(new UnauthorizedError());
                 }
 
@@ -117,8 +118,8 @@ export function registerProjectNodeForRealmSocketHandlers(socket: ResourcesNames
                 buildDomainChannelName(DomainSubType.PROJECT_NODE_OUT, target),
             );
 
-            if (isSocketClientToServerEventCallback(cb)) {
-                cb();
+            if (isEventCallback(cb)) {
+                cb(null);
             }
         },
     );

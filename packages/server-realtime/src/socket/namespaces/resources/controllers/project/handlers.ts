@@ -11,9 +11,10 @@ import {
     PermissionID,
     buildDomainChannelName,
     buildDomainEventSubscriptionFullName,
-    isSocketClientToServerEventCallback,
-    isSocketClientToServerEventErrorCallback,
 } from '@privateaim/core';
+import {
+    isEventCallback,
+} from '@privateaim/core-realtime-kit';
 import { UnauthorizedError } from '@ebec/http';
 import {
     subscribeSocketRoom,
@@ -33,7 +34,7 @@ export function registerProjectSocketHandlers(socket: ResourcesNamespaceSocket) 
                 !socket.data.abilities.has(PermissionID.PROJECT_DROP) &&
                 !socket.data.abilities.has(PermissionID.PROJECT_EDIT)
             ) {
-                if (isSocketClientToServerEventErrorCallback(cb)) {
+                if (isEventCallback(cb)) {
                     cb(new UnauthorizedError());
                 }
 
@@ -42,8 +43,8 @@ export function registerProjectSocketHandlers(socket: ResourcesNamespaceSocket) 
 
             subscribeSocketRoom(socket, buildDomainChannelName(DomainType.PROJECT, target));
 
-            if (isSocketClientToServerEventCallback(cb)) {
-                cb();
+            if (isEventCallback(cb)) {
+                cb(null);
             }
         },
     );

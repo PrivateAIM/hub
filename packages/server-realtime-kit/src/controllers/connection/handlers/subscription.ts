@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { SocketCTSEventName } from '@privateaim/core';
+import { CTSEventName } from '@privateaim/core-realtime-kit';
 import type { Socket } from '../../../types';
 import {
     buildConnectionRobotRoom,
@@ -15,7 +15,7 @@ import {
 } from '../utils';
 
 export function mountConnectionSubscriptionHandlers(socket: Socket) {
-    socket.on(SocketCTSEventName.USER_CONNECTIONS, (
+    socket.on(CTSEventName.USER_CONNECTIONS, (
         target,
         cb,
     ) => {
@@ -34,7 +34,7 @@ export function mountConnectionSubscriptionHandlers(socket: Socket) {
         }
     });
 
-    socket.on(SocketCTSEventName.USER_CONNECTION_SUBSCRIBE, (
+    socket.on(CTSEventName.USER_CONNECTION_SUBSCRIBE, (
         target,
     ) => {
         if (typeof target === 'undefined') {
@@ -44,7 +44,7 @@ export function mountConnectionSubscriptionHandlers(socket: Socket) {
         socket.join(buildConnectionUserSubscriptionRoom(target));
     });
 
-    socket.on(SocketCTSEventName.USER_CONNECTION_UNSUBSCRIBE, (
+    socket.on(CTSEventName.USER_CONNECTION_UNSUBSCRIBE, (
         target,
     ) => {
         if (typeof target === 'undefined') {
@@ -56,7 +56,7 @@ export function mountConnectionSubscriptionHandlers(socket: Socket) {
 
     // ----------------------------------------------------------
 
-    socket.on(SocketCTSEventName.ROBOT_CONNECTIONS, (
+    socket.on(CTSEventName.ROBOT_CONNECTIONS, (
         target,
         cb,
     ) => {
@@ -75,7 +75,7 @@ export function mountConnectionSubscriptionHandlers(socket: Socket) {
         }
     });
 
-    socket.on(SocketCTSEventName.ROBOT_CONNECTION_SUBSCRIBE, (
+    socket.on(CTSEventName.ROBOT_CONNECTION_SUBSCRIBE, (
         target,
     ) => {
         if (typeof target === 'undefined') {
@@ -85,7 +85,7 @@ export function mountConnectionSubscriptionHandlers(socket: Socket) {
         socket.join(buildConnectionRobotSubscriptionRoom(target));
     });
 
-    socket.on(SocketCTSEventName.ROBOT_CONNECTION_UNSUBSCRIBE, (
+    socket.on(CTSEventName.ROBOT_CONNECTION_UNSUBSCRIBE, (
         target,
     ) => {
         if (typeof target === 'undefined') {

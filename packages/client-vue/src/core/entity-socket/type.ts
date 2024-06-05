@@ -11,8 +11,10 @@ import type {
     DomainEventContext,
     DomainEventSubscriptionFullName,
     DomainType,
-    SocketSTCEventContext,
 } from '@privateaim/core';
+import type {
+    STCEventContext,
+} from '@privateaim/core-realtime-kit';
 import type { MaybeRef } from 'vue';
 
 export type EntitySocketContext<
@@ -27,7 +29,7 @@ export type EntitySocketContext<
     onCreated?(entity: T): any,
     onUpdated?(entity: Partial<T>): any,
     onDeleted?(entity: T): any,
-    processEvent?(event: SocketSTCEventContext<DomainEventContext<A>>, realmId?: string) : boolean;
+    processEvent?(event: STCEventContext<DomainEventContext<A>>, realmId?: string) : boolean;
     buildChannelName?(entityId?: DomainEntityID<T>) : string;
     buildSubscribeEventName?(): DomainEventSubscriptionFullName;
     buildUnsubscribeEventName?(): DomainEventSubscriptionFullName;

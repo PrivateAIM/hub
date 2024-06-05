@@ -6,17 +6,17 @@
  */
 
 import type {
-    SocketMessagesNamespaceCTSMessagesEvents,
-    SocketMessagesNamespaceSTCEvents,
-} from '@privateaim/core';
+    MessagesNamespaceCTSMessagesEvents,
+    MessagesNamespaceSTCEvents,
+} from '@privateaim/core-realtime-kit';
 import type { Namespace, Socket } from '@privateaim/server-realtime-kit';
 
 export type MessagesNamespace = Namespace<
-SocketMessagesNamespaceCTSMessagesEvents,
-SocketMessagesNamespaceSTCEvents
+MessagesNamespaceCTSMessagesEvents,
+MessagesNamespaceSTCEvents
 >;
 
 export type MessagesNamespaceSocket = Socket<
-SocketMessagesNamespaceCTSMessagesEvents,
-SocketMessagesNamespaceSTCEvents
+MessagesNamespaceCTSMessagesEvents,
+MessagesNamespaceSTCEvents
 >;

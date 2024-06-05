@@ -5,20 +5,20 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { SocketResourcesNamespaceCTSEvents, SocketResourcesNamespaceSTCEvents, SocketSTSEvents } from '@privateaim/core';
+import type { STSEvents, SocketResourcesNamespaceCTSEvents, SocketResourcesNamespaceSTCEvents } from '@privateaim/core-realtime-kit';
 import type { Namespace, Socket } from 'socket.io';
 import type { SocketData } from '@privateaim/server-realtime-kit';
 
 export type ResourcesNamespace = Namespace<
 SocketResourcesNamespaceCTSEvents,
 SocketResourcesNamespaceSTCEvents,
-SocketSTSEvents,
+STSEvents,
 SocketData
 >;
 
 export type ResourcesNamespaceSocket = Socket<
 SocketResourcesNamespaceCTSEvents,
 SocketResourcesNamespaceSTCEvents,
-SocketSTSEvents,
+STSEvents,
 SocketData
 >;
