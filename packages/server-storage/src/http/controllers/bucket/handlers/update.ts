@@ -6,7 +6,7 @@
  */
 
 import { isUUID } from '@authup/kit';
-import { PermissionID } from '@privateaim/core';
+import { PermissionID } from '@privateaim/kit';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/core-kit';
 import type { Request, Response } from 'routup';

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { createNanoID } from '../../utils';
+import { createNanoID } from '@privateaim/kit';
 
 export function generateRegistryProjectId() {
     return createNanoID('0123456789abcdefghijklmnopqrstuvwxyz');

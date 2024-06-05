@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { hasOwnProperty } from '@privateaim/core';
+import { hasOwnProperty } from '@privateaim/kit';
 
 export function cleanupPayload<T extends Record<string, any>>(payload: T): T {
     if (hasOwnProperty(payload, 'entity')) {

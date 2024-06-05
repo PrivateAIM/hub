@@ -6,7 +6,7 @@
  */
 
 import type { OrchestratedToast } from 'bootstrap-vue-next';
-import { isObject } from '@privateaim/core';
+import { isObject } from '@privateaim/kit';
 import { useToast as _useToast } from 'bootstrap-vue-next';
 
 export function useToast() {

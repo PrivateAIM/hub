@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionID } from '@privateaim/core';
+import { PermissionID } from '@privateaim/kit';
 import { ForbiddenError } from '@ebec/http';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';

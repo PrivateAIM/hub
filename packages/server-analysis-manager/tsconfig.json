@@ -2,21 +2,12 @@
     "extends": "../../tsconfig.json",
     "compilerOptions": {
         "paths": {
-            "@privateaim/core": [
-                "./packages/core/src"
-            ],
-            "@privateaim/core-http-kit": [
-                "./packages/core-http-kit/src"
-            ],
-            "@privateaim/server-kit": [
-                "./packages/server-kit/src"
-            ],
-            "@privateaim/storage-kit": [
-                "./packages/storage-kit/src"
-            ],
-            "@privateaim/server-analysis-manager-kit": [
-                "./packages/server-analysis-manager-kit/src"
-            ]
+            "@privateaim/core": ["./packages/core/src"],
+            "@privateaim/kit": ["./packages/kit/src"],
+            "@privateaim/core-http-kit": ["./packages/core-http-kit/src"],
+            "@privateaim/server-kit": ["./packages/server-kit/src"],
+            "@privateaim/storage-kit": ["./packages/storage-kit/src"],
+            "@privateaim/server-analysis-manager-kit": ["./packages/server-analysis-manager-kit/src"]
         }
     }
 }

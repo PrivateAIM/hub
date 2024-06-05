@@ -7,7 +7,6 @@
 
 import path from 'node:path';
 import { orFail, read, readInt } from 'envix';
-import { hasOwnProperty } from '@privateaim/core';
 import { config } from 'dotenv';
 import type { EnvironmentName } from './constants';
 import type { Environment } from './type';
@@ -47,10 +46,4 @@ export function useEnv(key?: string) : any {
     }
 
     return instance;
-}
-
-export function isSetEnv(key: keyof Environment) : boolean {
-    const env = useEnv();
-
-    return hasOwnProperty(env, key) && typeof env[key] !== 'undefined' && env[key] !== null;
 }

@@ -4,7 +4,7 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { hasOwnProperty, isObject } from '@privateaim/core';
+import { hasOwnProperty, isObject } from '@privateaim/kit';
 
 export function findErrorInDockerModemResponse(res?: unknown) : Error | null {
     if (!res || !Array.isArray(res) || res.length === 0) {

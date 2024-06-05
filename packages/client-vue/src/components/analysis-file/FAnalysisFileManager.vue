@@ -13,8 +13,10 @@ import type {
 import {
     AnalysisFileType,
     buildAnalysisFileBucketName,
-    hasOwnProperty,
 } from '@privateaim/core';
+import {
+    hasOwnProperty,
+} from '@privateaim/kit';
 import type { PropType, Ref } from 'vue';
 import {
     computed, defineComponent, ref,

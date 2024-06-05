@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { parseProxyConnectionString } from '@privateaim/core';
+import { parseProxyConnectionString } from '@privateaim/kit';
 import type { ClientOptions } from 'minio';
 import { Client } from 'minio';
 import { setMinioFactory } from '../../core';

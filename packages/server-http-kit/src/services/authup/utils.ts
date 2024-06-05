@@ -9,7 +9,7 @@ import type { Ability } from '@authup/kit';
 import { Abilities } from '@authup/kit';
 import { REALM_MASTER_NAME } from '@authup/core-kit';
 import type { TokenVerificationData } from '@authup/server-core-plugin-kit';
-import { PermissionID } from '@privateaim/core';
+import { PermissionID } from '@privateaim/kit';
 import type { Request } from 'routup';
 import { setRequestEnv } from '../../request';
 

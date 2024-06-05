@@ -8,8 +8,8 @@
 import {
     PermissionID,
     RegistryProjectType,
-    createNanoID,
 } from '@privateaim/core';
+import { createNanoID } from '@privateaim/kit';
 import { ForbiddenError } from '@ebec/http';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';

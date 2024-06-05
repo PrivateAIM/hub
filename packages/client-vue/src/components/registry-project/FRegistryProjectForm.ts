@@ -8,10 +8,11 @@
 import { buildFormSubmitWithTranslations, createFormSubmitTranslations } from '@authup/client-web-kit';
 import { getSeverity, useTranslationsForNestedValidations } from '@ilingo/vuelidate';
 import type { Registry, RegistryProject } from '@privateaim/core';
-import { DomainType, RegistryProjectType, createNanoID } from '@privateaim/core';
+import { DomainType, RegistryProjectType } from '@privateaim/core';
 import {
     buildFormGroup, buildFormInput, buildFormSelect,
 } from '@vuecs/form-controls';
+import { createNanoID } from '@privateaim/kit';
 import type { ListItemSlotProps } from '@vuecs/list-controls';
 import useVuelidate from '@vuelidate/core';
 import {

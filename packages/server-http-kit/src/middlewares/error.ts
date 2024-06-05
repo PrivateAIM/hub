@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { isObject } from '@privateaim/core';
+import { isObject } from '@privateaim/kit';
 import type { Router } from 'routup';
 import { errorHandler } from 'routup';
 import { useLogger } from '@privateaim/server-kit';

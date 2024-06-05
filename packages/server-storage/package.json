@@ -16,7 +16,7 @@
         "@authup/server-core-plugin-http": "^1.0.0-beta.13",
         "@ebec/http": "^2.3.0",
         "@hapic/vault": "^2.3.3",
-        "@privateaim/core": "^0.4.0",
+        "@privateaim/kit": "^0.4.0",
         "@privateaim/server-kit": "^0.4.0",
         "@privateaim/server-http-kit": "^0.4.0",
         "@privateaim/storage-kit": "^0.4.0",

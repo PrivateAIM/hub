@@ -6,7 +6,7 @@
  */
 
 import { parseConnectionString } from '@hapic/harbor';
-import { getHostNameFromString } from '@privateaim/core';
+import { getHostNameFromString } from '@privateaim/kit';
 import { useDataSource } from 'typeorm-extension';
 import { isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
 import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../components';

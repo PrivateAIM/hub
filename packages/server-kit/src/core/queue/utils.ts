@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { hasOwnProperty, isObject } from '@privateaim/core';
+import { hasOwnProperty, isObject } from '@privateaim/kit';
 import type { QueuePayload } from './type';
 
 export function isQueuePayload(input: unknown) : input is QueuePayload {

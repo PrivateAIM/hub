@@ -26,6 +26,7 @@
         "@nuxtjs/google-fonts": "^3.2.0",
         "@privateaim/client-vue": "^0.4.0",
         "@privateaim/core": "^0.4.0",
+        "@privateaim/kit": "^0.4.0",
         "@privateaim/storage-kit": "^0.4.0",
         "@pinia/nuxt": "^0.5.1",
         "@vuecs/countdown": "^1.0.0",

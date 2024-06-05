@@ -5,7 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { AnalysisContainerPath, AnalysisFileType, getHostNameFromString } from '@privateaim/core';
+import { getHostNameFromString } from '@privateaim/kit';
+import { AnalysisContainerPath, AnalysisFileType } from '@privateaim/core';
 import type { BucketFile } from '@privateaim/storage-kit';
 import path from 'node:path';
 import type {

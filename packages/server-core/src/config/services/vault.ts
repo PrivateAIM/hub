@@ -6,7 +6,7 @@
  */
 
 import { VaultClient, setVaultFactory } from '@privateaim/server-kit';
-import { isBoolFalse, isBoolTrue } from '@privateaim/core';
+import { isBoolFalse, isBoolTrue } from '@privateaim/kit';
 import { ConfigDefaults, useEnv } from '../env';
 
 export function configureVault() {

@@ -6,7 +6,7 @@
  */
 
 import { BadRequestError } from '@ebec/http';
-import { deleteUndefinedObjectProperties } from '@privateaim/core';
+import { deleteUndefinedObjectProperties } from '@privateaim/kit';
 import type { MatchedDataOptions } from 'express-validator';
 import { matchedData, validationResult } from 'express-validator';
 import type { Request } from 'routup';

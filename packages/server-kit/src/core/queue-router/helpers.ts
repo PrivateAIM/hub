@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { createNanoID, hasOwnProperty, isObject } from '@privateaim/core';
+import { createNanoID, hasOwnProperty, isObject } from '@privateaim/kit';
 import type { QueueRouterPayload, QueueRouterPayloadInput } from './types';
 
 export function buildQueueRouterPublishPayload(

@@ -9,8 +9,9 @@ import { getSeverity, useTranslationsForNestedValidations } from '@ilingo/vuelid
 import type { Node, Registry } from '@privateaim/core';
 import {
     DomainType,
-    NodeType, alphaNumHyphenUnderscoreRegex,
+    NodeType,
 } from '@privateaim/core';
+import { alphaNumHyphenUnderscoreRegex } from '@privateaim/kit';
 import {
     buildFormGroup,
     buildFormInput, buildFormInputCheckbox, buildFormSelect,

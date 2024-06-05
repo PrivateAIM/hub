@@ -6,7 +6,7 @@
  */
 
 import { Client } from 'amqp-extension';
-import { isBoolFalse, isBoolTrue } from '@privateaim/core';
+import { isBoolFalse, isBoolTrue } from '@privateaim/kit';
 import { setAmqpClientFactory } from '@privateaim/server-kit';
 import { ConfigDefaults, useEnv } from '../env';
 

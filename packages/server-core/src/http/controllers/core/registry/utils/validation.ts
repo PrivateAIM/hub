@@ -9,7 +9,7 @@ import {
     createHTTPValidationResult,
 } from '@privateaim/server-http-kit';
 import { body, check } from 'express-validator';
-import { getHostNameFromString } from '@privateaim/core';
+import { getHostNameFromString } from '@privateaim/kit';
 import type { Request } from 'routup';
 import type { HTTPValidationResult } from '@privateaim/server-http-kit';
 import type { RegistryEntity } from '../../../../../domains';
