@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export enum SocketSTCEventName {
+export enum STCEventName {
     USER_CONNECTED = 'userConnected',
     USER_DISCONNECTED = 'userDisconnected',
 
@@ -13,7 +13,7 @@ export enum SocketSTCEventName {
     ROBOT_DISCONNECTED = 'robotDisconnected',
 }
 
-export enum SocketCTSEventName {
+export enum CTSEventName {
     USER_CONNECTIONS = 'userConnections',
     USER_CONNECTION_SUBSCRIBE = 'userConnectionSubscribe',
     USER_CONNECTION_UNSUBSCRIBE = 'userConnectionUnsubscribe',

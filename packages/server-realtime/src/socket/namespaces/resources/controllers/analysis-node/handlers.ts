@@ -14,8 +14,7 @@ import {
     buildDomainEventSubscriptionFullName,
 } from '@privateaim/core';
 import {
-    isSocketClientToServerEventCallback,
-    isSocketClientToServerEventErrorCallback,
+    isEventCallback,
 } from '@privateaim/core-realtime-kit';
 import { UnauthorizedError } from '@ebec/http';
 import {
@@ -37,7 +36,7 @@ export function registerAnalysisNodeSocketHandlers(socket: ResourcesNamespaceSoc
             if (
                 !socket.data.abilities.has(PermissionID.ANALYSIS_APPROVE)
             ) {
-                if (isSocketClientToServerEventErrorCallback(cb)) {
+                if (isEventCallback(cb)) {
                     cb(new UnauthorizedError());
                 }
 
@@ -46,8 +45,8 @@ export function registerAnalysisNodeSocketHandlers(socket: ResourcesNamespaceSoc
 
             subscribeSocketRoom(socket, buildDomainChannelName(DomainType.ANALYSIS_NODE, target));
 
-            if (isSocketClientToServerEventCallback(cb)) {
-                cb();
+            if (isEventCallback(cb)) {
+                cb(null);
             }
         },
     );
@@ -71,7 +70,7 @@ export function registerAnalysisNodeForRealmSocketHandlers(socket: ResourcesName
             if (
                 !socket.data.abilities.has(PermissionID.ANALYSIS_APPROVE)
             ) {
-                if (isSocketClientToServerEventErrorCallback(cb)) {
+                if (isEventCallback(cb)) {
                     cb(new UnauthorizedError());
                 }
 
@@ -80,8 +79,8 @@ export function registerAnalysisNodeForRealmSocketHandlers(socket: ResourcesName
 
             subscribeSocketRoom(socket, buildDomainChannelName(DomainSubType.ANALYSIS_NODE_IN, target));
 
-            if (isSocketClientToServerEventCallback(cb)) {
-                cb();
+            if (isEventCallback(cb)) {
+                cb(null);
             }
         },
     );
@@ -99,7 +98,7 @@ export function registerAnalysisNodeForRealmSocketHandlers(socket: ResourcesName
         buildDomainEventSubscriptionFullName(DomainSubType.ANALYSIS_NODE_OUT, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             if (!socket.data.abilities.has(PermissionID.ANALYSIS_EDIT)) {
-                if (isSocketClientToServerEventErrorCallback(cb)) {
+                if (isEventCallback(cb)) {
                     cb(new UnauthorizedError());
                 }
 
@@ -108,8 +107,8 @@ export function registerAnalysisNodeForRealmSocketHandlers(socket: ResourcesName
 
             subscribeSocketRoom(socket, buildDomainChannelName(DomainSubType.ANALYSIS_NODE_OUT, target));
 
-            if (isSocketClientToServerEventCallback(cb)) {
-                cb();
+            if (isEventCallback(cb)) {
+                cb(null);
             }
         },
     );

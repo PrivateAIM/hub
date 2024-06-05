@@ -12,22 +12,22 @@ import type {
     DomainSubType,
     DomainType,
 } from '@privateaim/core';
-import type { SocketCTSEvents, SocketSTCEventContext, SocketSTCEvents } from '../types';
+import type {
+    CTSEvents, EventCallback, EventTarget, STCEventContext, STCEvents,
+} from '../types';
 
-export type SocketResourcesNamespaceSTCEvents = SocketSTCEvents & {
+export type SocketResourcesNamespaceSTCEvents = STCEvents & {
     [K in `${DomainType}` | `${DomainSubType}` as DomainEventFullName<K>]: (
-        data: SocketSTCEventContext<DomainEventContext<K>>
+        data: STCEventContext<DomainEventContext<K>>
     ) => void
 };
+
 // ------------------------------------------------------------------------------------
 
-export type SocketResourcesNamespaceCTSEventTarget = string | number | undefined;
-export type SocketResourcesNamespaceCTSEventCallback = (error?: Error | null) => void;
-
-export type SocketResourcesNamespaceCTSEvents = SocketCTSEvents & {
+export type SocketResourcesNamespaceCTSEvents = CTSEvents & {
     [K in DomainEventSubscriptionFullName<`${DomainType}` | `${DomainSubType}`>]: (
-        target?: SocketResourcesNamespaceCTSEventTarget,
-        cb?: SocketResourcesNamespaceCTSEventCallback
+        target?: EventTarget,
+        cb?: EventCallback
     ) => void
 };
 

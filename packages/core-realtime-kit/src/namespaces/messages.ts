@@ -5,29 +5,29 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { SocketCTSEvents, SocketEventCallback, SocketSTCEvents } from '../types';
+import type { CTSEvents, EventCallback, STCEvents } from '../types';
 
-export type SocketMessagesNamespaceMessageParty = {
+export type MessagesNamespaceMessageParty = {
     type: 'user' | 'robot',
     id: string
 };
 
-export type SocketMessagesNamespaceSTCMessage = {
-    from: SocketMessagesNamespaceMessageParty,
+export type MessagesNamespaceSTCMessage = {
+    from: MessagesNamespaceMessageParty,
     data: Record<string, any>,
     metadata: Record<string, any>
 };
 
-export type SocketMessagesNamespaceSTCEvents = SocketSTCEvents & {
-    send: (data: SocketMessagesNamespaceSTCMessage) => void
+export type MessagesNamespaceSTCEvents = STCEvents & {
+    send: (data: MessagesNamespaceSTCMessage) => void
 };
 
-export type SocketMessagesNamespaceCTSMessage = {
-    to: SocketMessagesNamespaceMessageParty[],
+export type MessagesNamespaceCTSMessage = {
+    to: MessagesNamespaceMessageParty[],
     data: Record<string, any>,
     metadata: Record<string, any>
 };
 
-export type SocketMessagesNamespaceCTSMessagesEvents = SocketCTSEvents & {
-    send: (data: SocketMessagesNamespaceCTSMessage, cb?: SocketEventCallback) => void;
+export type MessagesNamespaceCTSMessagesEvents = CTSEvents & {
+    send: (data: MessagesNamespaceCTSMessage, cb?: EventCallback) => void;
 };

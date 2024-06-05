@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { SocketMessagesNamespaceMessageParty } from '@privateaim/core-realtime-kit';
+import type { MessagesNamespaceMessageParty } from '@privateaim/core-realtime-kit';
 import { buildConnectionRobotRoom, buildConnectionUserRoom, mountConnectionController } from '@privateaim/server-realtime-kit';
 import type { MessagesNamespace, MessagesNamespaceSocket } from './types';
 
@@ -18,7 +18,7 @@ export function registerMessagesNamespaceControllers(nsp: MessagesNamespace) {
                 return;
             }
 
-            let from : SocketMessagesNamespaceMessageParty;
+            let from : MessagesNamespaceMessageParty;
             if (socket.data.userId) {
                 from = {
                     type: 'user',

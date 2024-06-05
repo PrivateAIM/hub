@@ -5,41 +5,41 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { SocketCTSEventName, SocketSTCEventName } from './constants';
+import type { CTSEventName, STCEventName } from './constants';
 
-export type SocketSTCEventContext<T extends Record<string, any>> = T & {
+export type STCEventContext<T extends Record<string, any>> = T & {
     meta: {
         roomName?: string,
         roomId?: string | number
     }
 };
 
-export type SocketEventTarget = string | number | undefined;
-export interface SocketEventCallback<T = any> {
+export type EventTarget = string | number | undefined;
+export interface EventCallback<T = any> {
     (error: Error | null) : void;
     (error: Error | null, data: T) : void;
 }
 
-export type SocketSTSEvents = {
+export type STSEvents = {
     [event: string]: (...args: any[]) => void;
 };
 
-export type SocketSTCEvents = {
-    [K in `${SocketSTCEventName}`]: (data: SocketSTCEventContext<{id: string}>) => void
+export type STCEvents = {
+    [K in `${STCEventName}`]: (data: STCEventContext<{id: string}>) => void
 };
 
-export type SocketCTSEvents = {
-    [K in `${SocketCTSEventName.USER_CONNECTION_SUBSCRIBE}` |
-        `${SocketCTSEventName.USER_CONNECTION_UNSUBSCRIBE}` |
-        `${SocketCTSEventName.ROBOT_CONNECTION_SUBSCRIBE}` |
-        `${SocketCTSEventName.ROBOT_CONNECTION_UNSUBSCRIBE}`
+export type CTSEvents = {
+    [K in `${CTSEventName.USER_CONNECTION_SUBSCRIBE}` |
+        `${CTSEventName.USER_CONNECTION_UNSUBSCRIBE}` |
+        `${CTSEventName.ROBOT_CONNECTION_SUBSCRIBE}` |
+        `${CTSEventName.ROBOT_CONNECTION_UNSUBSCRIBE}`
     ]: (
-        target: SocketEventTarget,
-        cb?: SocketEventCallback<undefined>
+        target: EventTarget,
+        cb?: EventCallback<undefined>
     ) => void
 } & {
-    [K in `${SocketCTSEventName.USER_CONNECTIONS}` | `${SocketCTSEventName.ROBOT_CONNECTIONS}`]: (
-        target: SocketEventTarget,
-        cb?: SocketEventCallback<number>
+    [K in `${CTSEventName.USER_CONNECTIONS}` | `${CTSEventName.ROBOT_CONNECTIONS}`]: (
+        target: EventTarget,
+        cb?: EventCallback<number>
     ) => void
 };

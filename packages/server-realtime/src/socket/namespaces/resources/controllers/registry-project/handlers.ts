@@ -13,8 +13,7 @@ import {
     buildDomainEventSubscriptionFullName,
 } from '@privateaim/core';
 import {
-    isSocketClientToServerEventCallback,
-    isSocketClientToServerEventErrorCallback,
+    isEventCallback,
 } from '@privateaim/core-realtime-kit';
 import { UnauthorizedError } from '@ebec/http';
 import {
@@ -34,7 +33,7 @@ export function registerRegistryProjectSocketHandlers(socket: ResourcesNamespace
             if (
                 !socket.data.abilities.has(PermissionID.REGISTRY_MANAGE)
             ) {
-                if (isSocketClientToServerEventErrorCallback(cb)) {
+                if (isEventCallback(cb)) {
                     cb(new UnauthorizedError());
                 }
 
@@ -43,8 +42,8 @@ export function registerRegistryProjectSocketHandlers(socket: ResourcesNamespace
 
             subscribeSocketRoom(socket, buildDomainChannelName(DomainType.REGISTRY_PROJECT, target));
 
-            if (isSocketClientToServerEventCallback(cb)) {
-                cb();
+            if (isEventCallback(cb)) {
+                cb(null);
             }
         },
     );

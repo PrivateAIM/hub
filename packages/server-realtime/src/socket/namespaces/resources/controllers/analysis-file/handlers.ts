@@ -13,7 +13,7 @@ import {
     buildDomainEventSubscriptionFullName,
 } from '@privateaim/core';
 import {
-    isSocketClientToServerEventErrorCallback,
+    isEventCallback,
 } from '@privateaim/core-realtime-kit';
 import { UnauthorizedError } from '@ebec/http';
 import {
@@ -31,7 +31,7 @@ export function registerAnalysisFileSocketHandlers(socket: ResourcesNamespaceSoc
         buildDomainEventSubscriptionFullName(DomainType.ANALYSIS_FILE, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             if (!socket.data.abilities.has(PermissionID.ANALYSIS_EDIT)) {
-                if (isSocketClientToServerEventErrorCallback(cb)) {
+                if (isEventCallback(cb)) {
                     cb(new UnauthorizedError());
                 }
 
@@ -40,8 +40,8 @@ export function registerAnalysisFileSocketHandlers(socket: ResourcesNamespaceSoc
 
             subscribeSocketRoom(socket, buildDomainChannelName(DomainType.ANALYSIS_FILE, target));
 
-            if (typeof cb === 'function') {
-                cb();
+            if (isEventCallback(cb)) {
+                cb(null);
             }
         },
     );

@@ -13,8 +13,7 @@ import {
     buildDomainEventSubscriptionFullName,
 } from '@privateaim/core';
 import {
-    isSocketClientToServerEventCallback,
-    isSocketClientToServerEventErrorCallback,
+    isEventCallback,
 } from '@privateaim/core-realtime-kit';
 import { UnauthorizedError } from '@ebec/http';
 import {
@@ -32,7 +31,7 @@ export function registerNodeSocketHandlers(socket: ResourcesNamespaceSocket) {
             if (
                 !socket.data.abilities.has(PermissionID.NODE_EDIT)
             ) {
-                if (isSocketClientToServerEventErrorCallback(cb)) {
+                if (isEventCallback(cb)) {
                     cb(new UnauthorizedError());
                 }
 
@@ -41,8 +40,8 @@ export function registerNodeSocketHandlers(socket: ResourcesNamespaceSocket) {
 
             subscribeSocketRoom(socket, buildDomainChannelName(DomainType.NODE, target));
 
-            if (isSocketClientToServerEventCallback(cb)) {
-                cb();
+            if (isEventCallback(cb)) {
+                cb(null);
             }
         },
     );

@@ -21,7 +21,7 @@ import type {
     DomainType,
 } from '@privateaim/core';
 import type {
-    SocketSTCEventContext,
+    STCEventContext,
 } from '@privateaim/core-realtime-kit';
 import {
     computed, isRef, onMounted, onUnmounted, watch,
@@ -73,7 +73,7 @@ export function createEntitySocket<
 
     const lockId = computed(() => (isRef(ctx.lockId) ? ctx.lockId.value : ctx.lockId));
 
-    const processEvent = (event: SocketSTCEventContext<DomainEventContext<A>>) : boolean => {
+    const processEvent = (event: STCEventContext<DomainEventContext<A>>) : boolean => {
         if (
             ctx.processEvent &&
             !ctx.processEvent(event, realmId.value)
@@ -96,7 +96,7 @@ export function createEntitySocket<
         return event.data.id !== lockId.value;
     };
 
-    const handleCreated = (event: SocketSTCEventContext<DomainEventContext<A>>) => {
+    const handleCreated = (event: STCEventContext<DomainEventContext<A>>) => {
         if (!processEvent(event)) {
             return;
         }
@@ -106,7 +106,7 @@ export function createEntitySocket<
         }
     };
 
-    const handleUpdated = (event: SocketSTCEventContext<DomainEventContext<A>>) => {
+    const handleUpdated = (event: STCEventContext<DomainEventContext<A>>) => {
         if (!processEvent(event)) {
             return;
         }
@@ -115,7 +115,7 @@ export function createEntitySocket<
             ctx.onUpdated(event.data as T);
         }
     };
-    const handleDeleted = (event: SocketSTCEventContext<DomainEventContext<A>>) => {
+    const handleDeleted = (event: STCEventContext<DomainEventContext<A>>) => {
         if (!processEvent(event)) {
             return;
         }
