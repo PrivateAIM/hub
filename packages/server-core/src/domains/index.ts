@@ -6,6 +6,7 @@
  */
 
 export * from './analysis';
+export * from './analysis-bucket';
 export * from './analysis-file';
 export * from './analysis-log';
 export * from './anaylsis-node';

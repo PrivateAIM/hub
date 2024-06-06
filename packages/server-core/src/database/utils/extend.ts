@@ -8,6 +8,7 @@ import { adjustFilePath } from 'typeorm-extension';
 import type { DataSourceOptions } from 'typeorm';
 import { isRedisClientUsable } from '@privateaim/server-kit';
 import {
+    AnalysisBucketEntity,
     AnalysisEntity,
     AnalysisFileEntity,
     AnalysisLogEntity,
@@ -47,6 +48,7 @@ export async function extendDataSourceOptions(options: DataSourceOptions) : Prom
             RegistryProjectEntity,
             NodeEntity,
             AnalysisEntity,
+            AnalysisBucketEntity,
             AnalysisLogEntity,
             AnalysisFileEntity,
             AnalysisNodeEntity,

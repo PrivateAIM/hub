@@ -17,6 +17,7 @@ import { mountErrorMiddleware, mountMiddlewares } from '@privateaim/server-http-
 import type { MiddlewareSwaggerOptions } from '@privateaim/server-http-kit';
 import { Router } from 'routup';
 import { EnvironmentName, useEnv } from '../config';
+import { AnalysisBucketEntity } from '../domains';
 
 import { AnalysisController } from './controllers/core/analysis';
 import { AnalysisFileController } from './controllers/core/analysis-file';
@@ -75,6 +76,7 @@ export function createRouter() : Router {
                 RegistryProjectController,
                 NodeController,
                 AnalysisController,
+                AnalysisBucketEntity,
                 AnalysisFileController,
                 AnalysisLogController,
                 AnalysisNodeController,
