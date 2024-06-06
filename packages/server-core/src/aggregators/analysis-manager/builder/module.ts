@@ -14,7 +14,7 @@ import {
     BuilderEventQueueRouterRouting,
 } from '@privateaim/server-analysis-manager-kit';
 import type { Aggregator, QueueRouterHandlers } from '@privateaim/server-kit';
-import { EnvironmentName, useEnv } from '../../config';
+import { EnvironmentName, useEnv } from '../../../config';
 import { handleAnalysisManagerBuilderBaseEvent } from './handler';
 
 export function createAnalysisManagerBuilderHandlers() : QueueRouterHandlers<{
@@ -55,7 +55,7 @@ export function createAnalysisManagerBuilderAggregator() : Aggregator {
     if (!isQueueRouterUsable() || useEnv('env') === EnvironmentName.TEST) {
         return {
             start() {
-                useLogger().warn('Registry component has not been initialized');
+                useLogger().warn('Analysis worker builder component could not been initialized');
             },
         };
     }

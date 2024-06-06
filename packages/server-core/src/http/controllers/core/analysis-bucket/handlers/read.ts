@@ -56,7 +56,7 @@ export async function getManyAnalysisBucketRouteHandler(req: Request, res: Respo
         defaultAlias: 'analysisBucket',
         filters: {
             allowed: [
-                'name',
+                'analysis_id',
                 'type',
 
                 'analysis_id',
@@ -71,7 +71,7 @@ export async function getManyAnalysisBucketRouteHandler(req: Request, res: Respo
             allowed: ['analysis'],
         },
         sort: {
-            allowed: ['name', 'created_at', 'updated_at'],
+            allowed: ['type', 'created_at', 'updated_at'],
         },
     });
 

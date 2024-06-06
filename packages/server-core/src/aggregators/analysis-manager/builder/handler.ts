@@ -20,8 +20,8 @@ import {
 } from '@privateaim/core';
 import { isComponentError } from '@privateaim/server-kit';
 import { useDataSource } from 'typeorm-extension';
-import type { AnalysisLogSaveContext } from '../../domains';
-import { AnalysisEntity, saveAnalysisLog } from '../../domains';
+import type { AnalysisLogSaveContext } from '../../../domains';
+import { AnalysisEntity, saveAnalysisLog } from '../../../domains';
 
 export async function handleAnalysisManagerBuilderBaseEvent(
     event: BuilderEvent,

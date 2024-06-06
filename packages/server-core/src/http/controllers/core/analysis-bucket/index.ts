@@ -7,14 +7,12 @@
 
 import {
     AnalysisBucket,
-    AnalysisFile,
 } from '@privateaim/core';
 import {
-    DBody, DController, DDelete, DGet, DPath, DPost, DRequest, DResponse, DTags,
+    DController, DGet, DPath, DRequest, DResponse, DTags,
 } from '@routup/decorators';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import {
-    deleteAnalysisBucketRouteHandler,
     getManyAnalysisBucketRouteHandler,
     getOneAnalysisBucketRouteHandler,
 } from './handlers';
@@ -39,14 +37,5 @@ export class AnalysisBucketController {
             @DResponse() res: any,
     ): Promise<PartialAnalysisBucket | undefined> {
         return await getOneAnalysisBucketRouteHandler(req, res) as PartialAnalysisBucket | undefined;
-    }
-
-    @DDelete('/:id', [ForceLoggedInMiddleware])
-    async drop(
-        @DPath('id') id: string,
-            @DRequest() req: any,
-            @DResponse() res: any,
-    ): Promise<PartialAnalysisBucket | undefined> {
-        return await deleteAnalysisBucketRouteHandler(req, res) as PartialAnalysisBucket | undefined;
     }
 }

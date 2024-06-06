@@ -26,17 +26,11 @@ export class AnalysisBucketEntity implements AnalysisBucket {
     @PrimaryGeneratedColumn('uuid')
         id: string;
 
-    @Column({ type: 'varchar', length: 256 })
-        name: string;
-
     @Column({ type: 'varchar', length: 64 })
         type: `${AnalysisBucketType}`;
 
     @Column({ type: 'uuid' })
         external_id: string;
-
-    @Column({ type: 'varchar', length: 256 })
-        external_name: string;
 
     // ------------------------------------------------------------------
 

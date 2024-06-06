@@ -16,8 +16,6 @@ export interface AnalysisBucket {
 
     external_id: string;
 
-    external_name: string;
-
     // ------------------------------------------------------------------
 
     created_at: Date;
