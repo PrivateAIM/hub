@@ -42,5 +42,3 @@ export const PermissionID = {
     ...PermissionKey,
     ...AuthPermissionName,
 };
-
-export type PermissionIDType = typeof PermissionID[keyof typeof PermissionID];
