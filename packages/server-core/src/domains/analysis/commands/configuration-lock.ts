@@ -6,9 +6,12 @@
  */
 
 import { BadRequestError } from '@ebec/http';
-import { AnalysisFileType, AnalysisNodeApprovalStatus, NodeType } from '@privateaim/core';
+import {
+    AnalysisBucketType, AnalysisNodeApprovalStatus, NodeType,
+} from '@privateaim/core';
 import { useDataSource } from 'typeorm-extension';
-import { AnalysisFileEntity } from '../../analysis-file';
+import { AnalysisBucketEntity } from '../../analysis-bucket';
+import { AnalysisBucketFileEntity } from '../../analysis-bucket-file';
 import { AnalysisNodeEntity } from '../../anaylsis-node';
 import { AnalysisEntity } from '../entity';
 
@@ -24,11 +27,19 @@ export async function lockAnalysisConfiguration(entity: AnalysisEntity) : Promis
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisEntity);
 
-    const analysisFileRepository = dataSource.getRepository(AnalysisFileEntity);
-    const analysisFile = await analysisFileRepository.findOneBy({
-        type: AnalysisFileType.CODE,
-        root: true,
+    const analysisBucketRepository = dataSource.getRepository(AnalysisBucketEntity);
+    const analysisBucket = await analysisBucketRepository.findOneBy({
+        type: AnalysisBucketType.CODE,
         analysis_id: entity.id,
+    });
+    if (!analysisBucket) {
+        throw new BadRequestError('The analysis bucket for code files does not exist.');
+    }
+
+    const analysisFileRepository = dataSource.getRepository(AnalysisBucketFileEntity);
+    const analysisFile = await analysisFileRepository.findOneBy({
+        root: true,
+        bucket_id: analysisBucket.id,
     });
     if (!analysisFile) {
         throw new BadRequestError('At least one code file must be uploaded and at least one entrypoint file is required.');

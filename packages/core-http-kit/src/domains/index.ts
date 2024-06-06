@@ -13,7 +13,7 @@ export * from './registry';
 export * from './registry-project';
 export * from './node';
 export * from './analysis';
-export * from './analysis-file';
+export * from './analysis-bucket-file';
 export * from './analysis-log';
 export * from './analysis-node';
 export * from './service';

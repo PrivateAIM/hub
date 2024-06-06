@@ -11,24 +11,21 @@ import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '@privateaim/server-http-kit';
-import { AnalysisFileEntity } from '../../../../../domains';
+import { AnalysisBucketFileEntity } from '../../../../../domains';
 import { runAnalysisFileValidation } from '../utils';
 
-export async function updateAnalysisFileRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function updateAnalysisBucketFileRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(AnalysisFileEntity);
+    const repository = dataSource.getRepository(AnalysisBucketFileEntity);
     let entity = await repository.findOneBy({ id });
 
     if (!entity) {
         throw new NotFoundError();
     }
 
-    if (
-        !isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.realm_id) ||
-        !isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.target_realm_id)
-    ) {
+    if (!isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.realm_id)) {
         throw new ForbiddenError();
     }
 

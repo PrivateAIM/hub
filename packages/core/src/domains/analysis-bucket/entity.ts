@@ -7,6 +7,8 @@
 
 import type { Realm } from '@authup/core-kit';
 import type { Analysis } from '../analysis';
+import type { DomainType } from '../constants';
+import type { DomainEventBaseContext } from '../types-base';
 import type { AnalysisBucketType } from './constants';
 
 export interface AnalysisBucket {
@@ -32,3 +34,8 @@ export interface AnalysisBucket {
 
     realm_id: Realm['id'];
 }
+
+export type AnalysisBucketEventContext = DomainEventBaseContext & {
+    type: `${DomainType.ANALYSIS_BUCKET}`,
+    data: AnalysisBucket
+};

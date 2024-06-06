@@ -20,7 +20,7 @@ import { EnvironmentName, useEnv } from '../config';
 import { AnalysisBucketEntity } from '../domains';
 
 import { AnalysisController } from './controllers/core/analysis';
-import { AnalysisFileController } from './controllers/core/analysis-file';
+import { AnalysisBucketFileController } from './controllers/core/analysis-bucket-file';
 import { AnalysisLogController } from './controllers/core/analysis-log';
 import { AnalysisNodeController } from './controllers/core/analysis-node';
 import { MasterImageController } from './controllers/core/master-image';
@@ -77,7 +77,7 @@ export function createRouter() : Router {
                 NodeController,
                 AnalysisController,
                 AnalysisBucketEntity,
-                AnalysisFileController,
+                AnalysisBucketFileController,
                 AnalysisLogController,
                 AnalysisNodeController,
 

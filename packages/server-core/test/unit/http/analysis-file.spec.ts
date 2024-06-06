@@ -6,7 +6,7 @@
  */
 
 import { AnalysisFileType } from '@privateaim/core';
-import type { AnalysisFile, AnalysisNode } from '@privateaim/core';
+import type { AnalysisBucketFile, AnalysisNode } from '@privateaim/core';
 import {
     dropTestDatabase,
     expectPropertiesEqualToSrc,
@@ -47,10 +47,10 @@ describe('controllers/analysis-file', () => {
             .send({
                 analysis_id: analysis.body.id,
                 type: AnalysisFileType.CODE,
-                bucket_file_id: '28eb7728-c78d-4c2f-ab99-dc4bcee78da9',
+                external_id: '28eb7728-c78d-4c2f-ab99-dc4bcee78da9',
                 name: 'foo.bar',
                 root: false,
-            } satisfies Partial<AnalysisFile>);
+            } satisfies Partial<AnalysisBucketFile>);
 
         expect(response.status).toEqual(201);
         expect(response.body).toBeDefined();

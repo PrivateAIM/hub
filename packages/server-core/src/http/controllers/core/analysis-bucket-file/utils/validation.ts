@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { AnalysisFileType } from '@privateaim/core';
 import { check } from 'express-validator';
 import type { Request } from 'routup';
 import type { HTTPValidationResult } from '@privateaim/server-http-kit';
@@ -14,15 +13,15 @@ import {
     extendHTTPValidationResultWithRelation,
     useRequestEnv,
 } from '@privateaim/server-http-kit';
-import { AnalysisEntity } from '../../../../../domains';
-import type { AnalysisFileEntity } from '../../../../../domains';
+import { AnalysisBucketEntity } from '../../../../../domains';
+import type { AnalysisBucketFileEntity } from '../../../../../domains';
 
 export async function runAnalysisFileValidation(
     req: Request,
     operation: 'create' | 'update',
-) : Promise<HTTPValidationResult<AnalysisFileEntity>> {
+) : Promise<HTTPValidationResult<AnalysisBucketFileEntity>> {
     if (operation === 'create') {
-        await check('analysis_id')
+        await check('bucket_id')
             .exists()
             .isUUID()
             .run(req);
@@ -43,20 +42,9 @@ export async function runAnalysisFileValidation(
     // ----------------------------------------------
 
     if (operation === 'create') {
-        await check('bucket_file_id')
+        await check('external_id')
             .exists()
             .isUUID()
-            .run(req);
-
-        await check('target_realm_id')
-            .exists()
-            .isUUID()
-            .optional({ nullable: true })
-            .run(req);
-
-        await check('type')
-            .exists()
-            .isIn(Object.values(AnalysisFileType))
             .run(req);
     }
 
@@ -67,22 +55,20 @@ export async function runAnalysisFileValidation(
         .default(false)
         .run(req);
 
-    const result = createHTTPValidationResult<AnalysisFileEntity>(req);
+    const result = createHTTPValidationResult<AnalysisBucketFileEntity>(req);
 
     // ----------------------------------------------
 
-    await extendHTTPValidationResultWithRelation(result, AnalysisEntity, {
-        id: 'analysis_id',
-        entity: 'analysis',
+    await extendHTTPValidationResultWithRelation(result, AnalysisBucketEntity, {
+        id: 'bucket_id',
+        entity: 'bucket',
     });
 
     // ----------------------------------------------
 
     if (operation === 'create') {
         result.data.realm_id = useRequestEnv(req, 'realmId');
-        if (!result.data.target_realm_id) {
-            result.data.target_realm_id = result.data.realm_id;
-        }
+        result.data.analysis_id = result.relation.analysis.id;
 
         const userId = useRequestEnv(req, 'userId');
         if (userId) {

@@ -6,17 +6,15 @@
  */
 
 import type { Realm, Robot, User } from '@authup/core-kit';
+import type { AnalysisBucket } from '../analysis-bucket';
 import type { DomainType } from '../constants';
 import type { Analysis } from '../analysis';
 import type { DomainEventBaseContext } from '../types-base';
-import type { AnalysisFileType } from './constants';
 
-export interface AnalysisFile {
+export interface AnalysisBucketFile {
     id: string;
 
     name: string;
-
-    type: `${AnalysisFileType}`;
 
     root: boolean;
 
@@ -28,9 +26,13 @@ export interface AnalysisFile {
 
     // ------------------------------------------------------------------
 
-    bucket_file_id: string;
+    external_id: string;
 
-    target_realm_id: string;
+    // ------------------------------------------------------------------
+
+    bucket_id: AnalysisBucket['id'];
+
+    bucket: AnalysisBucket;
 
     // ------------------------------------------------------------------
 
@@ -45,11 +47,9 @@ export interface AnalysisFile {
     user_id: User['id'] | null;
 
     robot_id: Robot['id'] | null;
-
-    // todo: add target_realm_id xand target_node_id
 }
 
 export type AnalysisFileEventContext = DomainEventBaseContext & {
     type: `${DomainType.ANALYSIS_FILE}`,
-    data: AnalysisFile
+    data: AnalysisBucketFile
 };

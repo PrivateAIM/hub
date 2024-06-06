@@ -6,23 +6,23 @@
  */
 import { DomainType } from '@privateaim/core';
 import type {
-    AnalysisFile,
+    AnalysisBucketFile,
 } from '@privateaim/core';
 import type { SlotsType } from 'vue';
 import { defineComponent } from 'vue';
 import type { ListSlotsType } from '../../core';
 import { createList, defineListEvents, defineListProps } from '../../core';
 
-const FAnalysisFiles = defineComponent({
+const FAnalysisBucketFiles = defineComponent({
     props: {
-        ...defineListProps<AnalysisFile>(),
+        ...defineListProps<AnalysisBucketFile>(),
         realmId: {
             type: String,
             default: undefined,
         },
     },
-    slots: Object as SlotsType<ListSlotsType<AnalysisFile>>,
-    emits: defineListEvents<AnalysisFile>(),
+    slots: Object as SlotsType<ListSlotsType<AnalysisBucketFile>>,
+    emits: defineListEvents<AnalysisBucketFile>(),
     setup(props, setup) {
         // todo: include sort
 
@@ -37,7 +37,7 @@ const FAnalysisFiles = defineComponent({
 
         setDefaults({
             noMore: {
-                content: 'No more analysis files available...',
+                content: 'No more analysis bucket files available...',
             },
         });
 
@@ -46,5 +46,5 @@ const FAnalysisFiles = defineComponent({
 });
 
 export {
-    FAnalysisFiles,
+    FAnalysisBucketFiles,
 };

@@ -9,13 +9,13 @@ import { NotFoundError } from '@ebec/http';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { AnalysisFileEntity } from '../../../../../domains';
+import { AnalysisBucketFileEntity } from '../../../../../domains';
 
-export async function deleteAnalysisFileRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function deleteAnalysisBucketFileRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(AnalysisFileEntity);
+    const repository = dataSource.getRepository(AnalysisBucketFileEntity);
 
     const entity = await repository.findOneBy({ id });
 

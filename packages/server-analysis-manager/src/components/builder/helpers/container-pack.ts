@@ -6,12 +6,15 @@
  */
 
 import stream from 'node:stream';
-import { AnalysisContainerPath, AnalysisFileType, buildAnalysisFileBucketName } from '@privateaim/core';
+import {
+    AnalysisBucketType,
+    AnalysisContainerPath,
+} from '@privateaim/core';
 import type { Container } from 'dockerode';
 import tar from 'tar-stream';
 import { BuilderCommand } from '@privateaim/server-analysis-manager-kit';
 import {
-    streamToBuffer, useStorageClient,
+    streamToBuffer, useCoreClient, useStorageClient,
 } from '../../../core';
 import { BuilderError } from '../error';
 import { useBuilderLogger } from '../utils';
@@ -27,10 +30,23 @@ export async function packContainerWithTrain(container: Container, context: Cont
             command: BuilderCommand.BUILD,
         });
 
-    const client = useStorageClient();
+    const core = useCoreClient();
 
+    const { data: analysisBuckets } = await core.analysisBucket.getMany({
+        filters: {
+            type: AnalysisBucketType.CODE,
+            analysis_id: context.entity.id,
+        },
+    });
+
+    const [analysisBucket] = analysisBuckets;
+    if (!analysisBucket) {
+        throw BuilderError.entrypointNotFound();
+    }
+
+    const storage = useStorageClient();
     return new Promise<void>((resolve, reject) => {
-        client.bucket.stream(buildAnalysisFileBucketName(AnalysisFileType.CODE, context.entity.id))
+        storage.bucket.stream(analysisBucket.id)
             .then((response) => {
                 const extract = tar.extract();
 

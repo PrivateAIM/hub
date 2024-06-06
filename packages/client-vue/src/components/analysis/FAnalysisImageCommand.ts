@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { AnalysisFile, MasterImage } from '@privateaim/core';
+import type { AnalysisBucketFile, MasterImage } from '@privateaim/core';
 import type { PropType } from 'vue';
 import {
     computed, defineComponent, h, ref, toRef, watch,
@@ -27,7 +27,7 @@ export default defineComponent({
             default: undefined,
         },
         analysisFile: {
-            type: Object as PropType<AnalysisFile>,
+            type: Object as PropType<AnalysisBucketFile>,
         },
     },
     emits: ['failed'],
@@ -41,7 +41,7 @@ export default defineComponent({
         const masterImageEntity = ref<null | MasterImage>(null);
         const masterImageBusy = ref(false);
 
-        const analysisFileEntity = ref<null | AnalysisFile>(null);
+        const analysisFileEntity = ref<null | AnalysisBucketFile>(null);
         const analysisFileBusy = ref(false);
 
         const command = computed(() => {
@@ -113,7 +113,7 @@ export default defineComponent({
                 }
 
                 try {
-                    analysisFileEntity.value = await apiClient.analysisFile.getOne(props.analysisFileId);
+                    analysisFileEntity.value = await apiClient.analysisBucketFile.getOne(props.analysisFileId);
                 } catch (e) {
                     if (e instanceof Error) {
                         emit('failed', e);

@@ -10,7 +10,7 @@ import { isRedisClientUsable } from '@privateaim/server-kit';
 import {
     AnalysisBucketEntity,
     AnalysisEntity,
-    AnalysisFileEntity,
+    AnalysisBucketFileEntity,
     AnalysisLogEntity,
     AnalysisNodeEntity,
     MasterImageEntity,
@@ -50,7 +50,7 @@ export async function extendDataSourceOptions(options: DataSourceOptions) : Prom
             AnalysisEntity,
             AnalysisBucketEntity,
             AnalysisLogEntity,
-            AnalysisFileEntity,
+            AnalysisBucketFileEntity,
             AnalysisNodeEntity,
         ],
         migrations: [],

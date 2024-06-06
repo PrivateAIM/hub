@@ -5,7 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Analysis, AnalysisFile, AnalysisFileType } from '@privateaim/core';
+import type {
+    Analysis, AnalysisBucket, AnalysisBucketFile,
+} from '@privateaim/core';
 import {
     Column,
     CreateDateColumn,
@@ -18,20 +20,21 @@ import {
 import type { Realm, User } from '@authup/core-kit';
 // eslint-disable-next-line import/no-cycle
 import { AnalysisEntity } from '../analysis';
+import { AnalysisBucketEntity } from '../analysis-bucket';
 
-@Entity({ name: 'analysis_files' })
-export class AnalysisFileEntity implements AnalysisFile {
+@Entity({ name: 'analysis_bucket_files' })
+export class AnalysisBucketFileEntity implements AnalysisBucketFile {
     @PrimaryGeneratedColumn('uuid')
         id: string;
 
     @Column({ type: 'varchar', length: 256 })
         name: string;
 
-    @Column({ type: 'varchar', length: 64 })
-        type: `${AnalysisFileType}`;
-
     @Column({ type: 'boolean', default: false })
         root: boolean;
+
+    @Column({ type: 'uuid' })
+        external_id: string;
 
     // ------------------------------------------------------------------
 
@@ -43,14 +46,6 @@ export class AnalysisFileEntity implements AnalysisFile {
 
     // ------------------------------------------------------------------
 
-    @Column({ type: 'uuid' })
-        bucket_file_id: string;
-
-    @Column({ type: 'uuid' })
-        target_realm_id: string;
-
-    // ------------------------------------------------------------------
-
     @Column({ type: 'uuid', nullable: true })
         robot_id: string | null;
 
@@ -59,6 +54,15 @@ export class AnalysisFileEntity implements AnalysisFile {
 
     @Column({ type: 'uuid' })
         realm_id: Realm['id'];
+
+    // ------------------------------------------------------------------
+
+    @Column()
+        bucket_id: AnalysisBucket['id'];
+
+    @ManyToOne(() => AnalysisBucketEntity, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'bucket_id' })
+        bucket: AnalysisBucketEntity;
 
     // ------------------------------------------------------------------
 

@@ -14,27 +14,24 @@ import {
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceReadable } from '@authup/core-kit';
 import { useRequestEnv } from '@privateaim/server-http-kit';
-import { AnalysisFileEntity, onlyRealmWritableQueryResources } from '../../../../../domains';
+import { AnalysisBucketFileEntity, onlyRealmWritableQueryResources } from '../../../../../domains';
 
-export async function getOneAnalysisFileRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function getOneAnalysisBucketFileRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(AnalysisFileEntity);
+    const repository = dataSource.getRepository(AnalysisBucketFileEntity);
     const query = repository.createQueryBuilder('analysisFile')
         .where('analysisFile.id = :id', { id });
 
     applyRelations(query, useRequestQuery(req, 'include'), {
-        allowed: ['analysis'],
+        allowed: ['analysis', 'bucket'],
         defaultAlias: 'analysisFile',
     });
 
     const entity = await query.getOne();
 
-    if (
-        !isRealmResourceReadable(useRequestEnv(req, 'realm'), entity.realm_id) &&
-        !isRealmResourceReadable(useRequestEnv(req, 'realm'), entity.target_realm_id)
-    ) {
+    if (!isRealmResourceReadable(useRequestEnv(req, 'realm'), entity.realm_id)) {
         throw new ForbiddenError();
     }
 
@@ -45,14 +42,13 @@ export async function getOneAnalysisFileRouteHandler(req: Request, res: Response
     return send(res, entity);
 }
 
-export async function getManyAnalysisFileRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function getManyAnalysisBucketFileRouteHandler(req: Request, res: Response) : Promise<any> {
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(AnalysisFileEntity);
+    const repository = dataSource.getRepository(AnalysisBucketFileEntity);
     const query = repository.createQueryBuilder('analysisFile');
     query.distinctOn(['analysisFile.id']);
 
     onlyRealmWritableQueryResources(query, useRequestEnv(req, 'realm'), [
-        'analysisFile.target_realm_id',
         'analysisFile.realm_id',
     ]);
 
@@ -62,8 +58,8 @@ export async function getManyAnalysisFileRouteHandler(req: Request, res: Respons
             allowed: [
                 'name',
                 'root',
-                'target_realm_id',
-                'type',
+                'bucket_id',
+                'analysis_id',
 
                 'analysis_id',
                 'analysis.id',
@@ -74,7 +70,7 @@ export async function getManyAnalysisFileRouteHandler(req: Request, res: Respons
             maxLimit: 50,
         },
         relations: {
-            allowed: ['analysis'],
+            allowed: ['analysis', 'bucket'],
         },
         sort: {
             allowed: ['name', 'created_at', 'updated_at'],

@@ -5,23 +5,25 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import { BadRequestError } from '@ebec/http';
-import { AnalysisBuildStatus, AnalysisFileType, AnalysisRunStatus } from '@privateaim/core';
+import {
+    AnalysisBucketType, AnalysisBuildStatus, AnalysisRunStatus,
+} from '@privateaim/core';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { AnalysisFileEntity } from '../../../../../domains';
+import { AnalysisBucketFileEntity } from '../../../../../domains';
 import { runAnalysisFileValidation } from '../utils';
 
-export async function createAnalysisFileRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function createAnalysisBucketFileRouteHandler(req: Request, res: Response) : Promise<any> {
     const result = await runAnalysisFileValidation(req, 'create');
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(AnalysisFileEntity);
+    const repository = dataSource.getRepository(AnalysisBucketFileEntity);
 
     let entity = repository.create(result.data);
 
     if (
-        entity.type === AnalysisFileType.CODE &&
+        result.relation.bucket.type === AnalysisBucketType.CODE &&
         result.relation.analysis
     ) {
         if (

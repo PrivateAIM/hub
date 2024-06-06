@@ -7,12 +7,8 @@
 
 <script lang="ts">
 import type {
-    Analysis,
-    AnalysisFile,
-} from '@privateaim/core';
-import {
-    AnalysisFileType,
-    buildAnalysisFileBucketName,
+    AnalysisBucket,
+    AnalysisBucketFile,
 } from '@privateaim/core';
 import {
     hasOwnProperty,
@@ -23,25 +19,25 @@ import {
 } from 'vue';
 import type { BuildInput } from 'rapiq';
 import { injectCoreHTTPClient, injectStorageHTTPClient, wrapFnWithBusyState } from '../../core';
-import FAnalysisFile from './FAnalysisFile.vue';
-import { FAnalysisFiles } from './FAnalysisFiles';
+import FAnalysisFile from './FAnalysisBucketFile.vue';
+import { FAnalysisBucketFiles } from './FAnalysisBucketFiles';
 import FAnalysisFormFile from './FAnalysisFormFile.vue';
 import FAnalysisImageCommand from '../analysis/FAnalysisImageCommand';
 
 export default defineComponent({
     components: {
-        FAnalysisFiles,
+        FAnalysisFiles: FAnalysisBucketFiles,
         FAnalysisImageCommand,
         FAnalysisFormFile,
         FAnalysisFile,
     },
     props: {
         entity: {
-            type: Object as PropType<Analysis>,
+            type: Object as PropType<AnalysisBucket>,
             required: true,
         },
         fileEntity: {
-            type: Object as PropType<AnalysisFile>,
+            type: Object as PropType<AnalysisBucketFile>,
         },
     },
     emits: ['created', 'updated', 'deleted', 'uploaded', 'failed', 'setEntrypointFile'],
@@ -49,7 +45,7 @@ export default defineComponent({
         const coreClient = injectCoreHTTPClient();
         const storageClient = injectStorageHTTPClient();
 
-        const entrypointFile = ref(null) as Ref<AnalysisFile | null>;
+        const entrypointFile = ref(null) as Ref<AnalysisBucketFile | null>;
         if (props.fileEntity) {
             entrypointFile.value = props.fileEntity;
         }
@@ -68,22 +64,21 @@ export default defineComponent({
         const directoryMode = ref<boolean>(true);
         const busy = ref<boolean>(false);
 
-        const fileListNode = ref<null | typeof FAnalysisFiles>(null);
-        const fileListQuery = computed<BuildInput<AnalysisFile>>(() => ({
+        const fileListNode = ref<null | typeof FAnalysisBucketFiles>(null);
+        const fileListQuery = computed<BuildInput<AnalysisBucketFile>>(() => ({
             filters: {
-                analysis_id: props.entity.id,
-                type: AnalysisFileType.CODE,
+                bucket_id: props.entity.id,
             },
         }));
 
-        const handleCreated = (entity: AnalysisFile) => {
+        const handleCreated = (entity: AnalysisBucketFile) => {
             if (fileListNode.value) {
                 fileListNode.value.handleCreated(entity);
             }
 
             emit('created', entity);
         };
-        const handleDeleted = (entity: AnalysisFile) => {
+        const handleDeleted = (entity: AnalysisBucketFile) => {
             if (fileListNode.value) {
                 fileListNode.value.handleDeleted(entity);
             }
@@ -96,7 +91,7 @@ export default defineComponent({
             emit('deleted', entity);
         };
 
-        const handleUpdated = (entity: AnalysisFile) => {
+        const handleUpdated = (entity: AnalysisBucketFile) => {
             if (fileListNode.value) {
                 fileListNode.value.handleUpdated(entity);
             }
@@ -113,19 +108,18 @@ export default defineComponent({
                     formData.append(`files[${i}]`, tempFiles.value[i]);
                 }
 
-                // todo: replace this with reference
                 const {
                     data: bucketFiles,
                 } = await storageClient.bucket.upload(
-                    buildAnalysisFileBucketName(AnalysisFileType.CODE, props.entity.id),
+                    props.entity.external_id,
                     formData,
                 );
 
                 for (let i = 0; i < bucketFiles.length; i++) {
-                    const file = await coreClient.analysisFile.create({
-                        type: AnalysisFileType.CODE,
-                        bucket_file_id: bucketFiles[i].id,
-                        analysis_id: props.entity.id,
+                    const file = await coreClient.analysisBucketFile.create({
+                        external_id: bucketFiles[i].id,
+                        bucket_id: props.entity.id,
+                        analysis_id: props.entity.analysis_id,
                         name: bucketFiles[i].path,
                     });
 
@@ -145,7 +139,7 @@ export default defineComponent({
 
             try {
                 for (let i = 0; i < selected.value.length; i++) {
-                    const file = await coreClient.analysisFile.delete(selected.value[i]);
+                    const file = await coreClient.analysisBucketFile.delete(selected.value[i]);
                     handleDeleted(file);
                 }
             } catch (e) {
@@ -158,7 +152,7 @@ export default defineComponent({
         const selectAllFiles = () => {
             if (selectAll.value) {
                 if (fileListNode.value) {
-                    selected.value = (fileListNode.value.data as unknown as AnalysisFile[])
+                    selected.value = (fileListNode.value.data as unknown as AnalysisBucketFile[])
                         .map((file) => file.id);
                 }
             } else {
@@ -166,7 +160,7 @@ export default defineComponent({
             }
         };
 
-        const toggleFile = (file: AnalysisFile) => {
+        const toggleFile = (file: AnalysisBucketFile) => {
             const index = selected.value.findIndex((el) => el === file.id);
             if (index === -1) {
                 selected.value.push(file.id);
@@ -205,10 +199,10 @@ export default defineComponent({
             }
         };
 
-        const changeEntryPointFile = async (file: AnalysisFile) => {
+        const changeEntryPointFile = async (file: AnalysisBucketFile) => {
             if (entrypointFile.value) {
                 if (entrypointFile.value.id === file.id) {
-                    await coreClient.analysisFile.update(file.id, {
+                    await coreClient.analysisBucketFile.update(file.id, {
                         root: false,
                     });
 
@@ -216,11 +210,11 @@ export default defineComponent({
 
                     emit('setEntrypointFile', null);
                 } else {
-                    await coreClient.analysisFile.update(entrypointFile.value.id, {
+                    await coreClient.analysisBucketFile.update(entrypointFile.value.id, {
                         root: false,
                     });
 
-                    await coreClient.analysisFile.update(file.id, {
+                    await coreClient.analysisBucketFile.update(file.id, {
                         root: true,
                     });
 
@@ -229,7 +223,7 @@ export default defineComponent({
                     emit('setEntrypointFile', file);
                 }
             } else {
-                await coreClient.analysisFile.update(file.id, {
+                await coreClient.analysisBucketFile.update(file.id, {
                     root: true,
                 });
 
@@ -303,9 +297,10 @@ export default defineComponent({
                         >Directory Mode</label>
                     </div>
                 </div>
-
-                <hr>
-
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
                 <div class="d-flex flex-row">
                     <div>
                         <h6 class="title text-muted">
@@ -359,19 +354,6 @@ export default defineComponent({
                 </div>
             </div>
             <div class="col">
-                <h6><i class="fa fa-bars" /> Manage</h6>
-
-                <span>Entrypoint Command</span>
-                <br>
-                <FAnalysisImageCommand
-                    class="mt-2 mb-2"
-                    :master-image-id="entity.master_image_id"
-                    :analysis-file="entrypointFile"
-                    :analysis-id="entity.id"
-                />
-
-                <hr>
-
                 <h6 class="title text-muted">
                     Files
                     <span style="font-size: 0.65rem">

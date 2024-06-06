@@ -11,7 +11,7 @@ import type {
 } from 'typeorm';
 import { EventSubscriber } from 'typeorm';
 import type {
-    AnalysisFile,
+    AnalysisBucketFile,
 } from '@privateaim/core';
 import {
     DomainEventName,
@@ -19,11 +19,11 @@ import {
     buildDomainChannelName,
     buildDomainNamespaceName,
 } from '@privateaim/core';
-import { AnalysisFileEntity } from '../../domains';
+import { AnalysisBucketFileEntity } from '../../domains';
 
 async function publishEvent(
     event: `${DomainEventName}`,
-    data: AnalysisFile,
+    data: AnalysisBucketFile,
 ) {
     await publishDomainEvent(
         useRedisPublishClient(),
@@ -44,12 +44,12 @@ async function publishEvent(
     );
 }
 @EventSubscriber()
-export class AnalysisFileSubscriber implements EntitySubscriberInterface<AnalysisFileEntity> {
+export class AnalysisFileSubscriber implements EntitySubscriberInterface<AnalysisBucketFileEntity> {
     listenTo(): CallableFunction | string {
-        return AnalysisFileEntity;
+        return AnalysisBucketFileEntity;
     }
 
-    async afterInsert(event: InsertEvent<AnalysisFileEntity>): Promise<any> {
+    async afterInsert(event: InsertEvent<AnalysisBucketFileEntity>): Promise<any> {
         try {
             await publishEvent(DomainEventName.CREATED, event.entity);
         } catch (e) {
@@ -58,16 +58,16 @@ export class AnalysisFileSubscriber implements EntitySubscriberInterface<Analysi
         }
     }
 
-    async afterUpdate(event: UpdateEvent<AnalysisFileEntity>): Promise<any> {
+    async afterUpdate(event: UpdateEvent<AnalysisBucketFileEntity>): Promise<any> {
         try {
-            await publishEvent(DomainEventName.UPDATED, event.entity as AnalysisFileEntity);
+            await publishEvent(DomainEventName.UPDATED, event.entity as AnalysisBucketFileEntity);
         } catch (e) {
             useLogger().error(e);
             throw e;
         }
     }
 
-    async beforeRemove(event: RemoveEvent<AnalysisFileEntity>): Promise<any> {
+    async beforeRemove(event: RemoveEvent<AnalysisBucketFileEntity>): Promise<any> {
         try {
             await publishEvent(DomainEventName.DELETED, event.entity);
         } catch (e) {

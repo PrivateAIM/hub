@@ -9,7 +9,7 @@ import {
     DomainType,
 } from '@privateaim/core';
 import type {
-    AnalysisFile,
+    AnalysisBucketFile,
 } from '@privateaim/core';
 import type { PropType } from 'vue';
 import {
@@ -20,7 +20,7 @@ import { createEntityManager, defineEntityManagerEvents } from '../../core';
 export default defineComponent({
     props: {
         entity: {
-            type: Object as PropType<AnalysisFile>,
+            type: Object as PropType<AnalysisBucketFile>,
             required: true,
         },
         filesSelected: {
@@ -32,11 +32,11 @@ export default defineComponent({
         },
     },
     emits: {
-        ...defineEntityManagerEvents<AnalysisFile>(),
+        ...defineEntityManagerEvents<AnalysisBucketFile>(),
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        toggle: (_entity?: AnalysisFile) => true,
+        toggle: (_entity?: AnalysisBucketFile) => true,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        check: (_entity?: AnalysisFile) => true,
+        check: (_entity?: AnalysisBucketFile) => true,
     },
     setup(props, setup) {
         const manager = createEntityManager({
