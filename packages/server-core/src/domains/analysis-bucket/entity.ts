@@ -14,12 +14,13 @@ import {
     Entity,
     JoinColumn,
     ManyToOne,
-    PrimaryGeneratedColumn,
+    PrimaryGeneratedColumn, Unique,
     UpdateDateColumn,
 } from 'typeorm';
 import type { Realm } from '@authup/core-kit';
 import { AnalysisEntity } from '../analysis/entity';
 
+@Unique(['type', 'analysis_id'])
 @Entity({ name: 'analysis_buckets' })
 export class AnalysisBucketEntity implements AnalysisBucket {
     @PrimaryGeneratedColumn('uuid')

@@ -8,14 +8,12 @@
 import type { Analysis } from '@privateaim/core';
 import { PermissionID } from '@privateaim/core';
 import { ForbiddenError } from '@ebec/http';
-import { CoreCommand, buildCoreTaskQueueRouterPayload } from '@privateaim/server-analysis-manager-kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '@privateaim/server-http-kit';
-import { isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
 import { runAnalysisValidation } from '../utils';
-import { AnalysisEntity, ProjectEntity } from '../../../../../domains';
+import { AnalysisEntity, ProjectEntity, runAnalysisSpinUpCommand } from '../../../../../domains';
 
 export async function createAnalysisRouteHandler(req: Request, res: Response) : Promise<any> {
     const ability = useRequestEnv(req, 'abilities');
@@ -49,17 +47,7 @@ export async function createAnalysisRouteHandler(req: Request, res: Response) : 
     const proposalRepository = dataSource.getRepository(ProjectEntity);
     await proposalRepository.save(result.relation.project);
 
-    if (isQueueRouterUsable()) {
-        const message = buildCoreTaskQueueRouterPayload({
-            command: CoreCommand.CONFIGURE,
-            data: {
-                id: entity.id,
-            },
-        });
-
-        const client = useQueueRouter();
-        await client.publish(message);
-    }
+    await runAnalysisSpinUpCommand(entity);
 
     return sendCreated(res, entity);
 }
