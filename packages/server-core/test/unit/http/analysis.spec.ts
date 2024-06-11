@@ -10,7 +10,7 @@ import { buildHTTPValidationErrorMessage } from '@privateaim/server-http-kit';
 import {
     dropTestDatabase, expectPropertiesEqualToSrc, removeDateProperties, useSuperTest, useTestDatabase,
 } from '../../utils';
-import { TEST_DEFAULT_ANALYSIS, createSuperTestAnalysisBucket, createSuperTestProject } from '../../utils/domains';
+import { TEST_DEFAULT_ANALYSIS, createSuperTestAnalysis, createSuperTestProject } from '../../utils/domains';
 
 describe('src/controllers/core/analysis', () => {
     const superTest = useSuperTest();
@@ -27,7 +27,7 @@ describe('src/controllers/core/analysis', () => {
 
     it('should create resource', async () => {
         const proposal = await createSuperTestProject(superTest);
-        const response = await createSuperTestAnalysisBucket(superTest, {
+        const response = await createSuperTestAnalysis(superTest, {
             ...TEST_DEFAULT_ANALYSIS,
             project_id: proposal.body.id,
         });
@@ -84,7 +84,7 @@ describe('src/controllers/core/analysis', () => {
     });
 
     it('should not create resource with invalid project', async () => {
-        const response = await createSuperTestAnalysisBucket(superTest, {
+        const response = await createSuperTestAnalysis(superTest, {
             ...details,
             project_id: '28eb7728-c78d-4c2f-ab99-dc4bcee78da9',
         });
@@ -95,7 +95,7 @@ describe('src/controllers/core/analysis', () => {
 
     it('should not create resource with invalid master-image', async () => {
         const project = await createSuperTestProject(superTest);
-        const response = await createSuperTestAnalysisBucket(superTest, {
+        const response = await createSuperTestAnalysis(superTest, {
             ...details,
             project_id: project.body.id,
             master_image_id: '28eb7728-c78d-4c2f-ab99-dc4bcee78da9',

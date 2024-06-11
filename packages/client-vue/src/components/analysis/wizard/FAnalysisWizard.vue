@@ -15,11 +15,11 @@ import {
     toRef,
     watch,
 } from 'vue';
-import {Analysis, AnalysisBucketFile, AnalysisBucketType} from '@privateaim/core';
-import { AnalysisConfigurationStatus } from '@privateaim/core';
+import type { Analysis, AnalysisBucketFile } from '@privateaim/core';
+import { AnalysisBucketType, AnalysisConfigurationStatus } from '@privateaim/core';
 import { initFormAttributesFromSource, injectCoreHTTPClient } from '../../../core';
 import FAnalysisWizardStepBase from './FAnalysisWizardStepBase.vue';
-import FAnalysisWizardStepFiles from "./FAnalysisWizardStepFiles.vue";
+import FAnalysisWizardStepFiles from './FAnalysisWizardStepFiles.vue';
 import FAnalysisWizardStepFinal from './FAnalysisWizardStepFinal.vue';
 
 export default defineComponent({
@@ -50,17 +50,17 @@ export default defineComponent({
                 filters: {
                     type: AnalysisBucketType.CODE,
                     analysis_id: entity.value.id,
-                }
+                },
             });
             const [bucket] = buckets;
-            if(!bucket) {
+            if (!bucket) {
                 return;
             }
 
             const { data } = await apiClient.analysisBucketFile.getMany({
                 filter: {
                     root: true,
-                    bucket_id: bucket.id
+                    bucket_id: bucket.id,
                 },
             });
 

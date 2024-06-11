@@ -14,6 +14,7 @@ export * from './registry';
 export * from './registry-project';
 export * from './node';
 export * from './analysis';
+export * from './analysis-bucket';
 export * from './analysis-bucket-file';
 export * from './analysis-log';
 export * from './analysis-node';

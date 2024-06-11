@@ -9,8 +9,8 @@ import type { DataSourceOptions } from 'typeorm';
 import { isRedisClientUsable } from '@privateaim/server-kit';
 import {
     AnalysisBucketEntity,
-    AnalysisEntity,
     AnalysisBucketFileEntity,
+    AnalysisEntity,
     AnalysisLogEntity,
     AnalysisNodeEntity,
     MasterImageEntity,

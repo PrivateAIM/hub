@@ -68,7 +68,7 @@ export async function runAnalysisFileValidation(
 
     if (operation === 'create') {
         result.data.realm_id = useRequestEnv(req, 'realmId');
-        result.data.analysis_id = result.relation.analysis.id;
+        result.data.analysis_id = result.relation.bucket.analysis_id;
 
         const userId = useRequestEnv(req, 'userId');
         if (userId) {

@@ -5,16 +5,15 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import FAnalysisBucket from "@privateaim/client-vue/components/analysis-bucket/FAnalysisBucket";
+import { FAnalysisBucket, FAnalysisBucketFileDownload, FAnalysisBucketFiles } from '@privateaim/client-vue';
 import { computed } from 'vue';
 import type { BuildInput } from 'rapiq';
 import type { PropType } from 'vue';
-import {type Analysis, type AnalysisBucket, type AnalysisBucketFile, AnalysisBucketType} from '@privateaim/core';
-import { FAnalysisBucketFileDownload, FAnalysisBucketFiles } from '@privateaim/client-vue';
+import { type Analysis, type AnalysisBucket, AnalysisBucketType } from '@privateaim/core';
 import { defineNuxtComponent } from '#app';
 
 export default defineNuxtComponent({
-    components: {FAnalysisBucket, FAnalysisBucketFiles, FAnalysisFileDownload: FAnalysisBucketFileDownload },
+    components: { FAnalysisBucket, FAnalysisBucketFiles, FAnalysisFileDownload: FAnalysisBucketFileDownload },
     props: {
         entity: {
             type: Object as PropType<Analysis>,
@@ -40,7 +39,6 @@ export default defineNuxtComponent({
     <div class="panel-box">
         <FAnalysisBucket :query="query">
             <template #default="{ data: bucket }">
-
                 <FAnalysisBucketFiles
                     v-if="entity"
                     :query="{ filters: { bucket_id: bucket.id } }"

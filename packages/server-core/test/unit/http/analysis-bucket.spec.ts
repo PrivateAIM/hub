@@ -6,7 +6,7 @@
  */
 
 import type { AnalysisBucket, AnalysisNode } from '@privateaim/core';
-import { AnalysisBucketFile, AnalysisBucketType } from '@privateaim/core';
+import { AnalysisBucketType } from '@privateaim/core';
 import {
     dropTestDatabase,
     expectPropertiesEqualToSrc,
@@ -15,7 +15,7 @@ import {
     useTestDatabase,
 } from '../../utils';
 import {
-    createSuperTestAnalysisBucket,
+    createSuperTestAnalysis,
     createSuperTestProject,
 } from '../../utils/domains';
 
@@ -36,7 +36,7 @@ describe('controllers/analysis-file', () => {
         const project = await createSuperTestProject(superTest);
         expect(project.body.id).toBeDefined();
 
-        const analysis = await createSuperTestAnalysisBucket(superTest, {
+        const analysis = await createSuperTestAnalysis(superTest, {
             project_id: project.body.id,
         });
         expect(analysis.body.id).toBeDefined();

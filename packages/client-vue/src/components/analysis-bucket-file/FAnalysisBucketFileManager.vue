@@ -22,12 +22,10 @@ import { injectCoreHTTPClient, injectStorageHTTPClient, wrapFnWithBusyState } fr
 import FAnalysisFile from './FAnalysisBucketFile.vue';
 import { FAnalysisBucketFiles } from './FAnalysisBucketFiles';
 import FAnalysisFormFile from './FAnalysisFormFile.vue';
-import FAnalysisImageCommand from '../analysis/FAnalysisImageCommand';
 
 export default defineComponent({
     components: {
-        FAnalysisFiles: FAnalysisBucketFiles,
-        FAnalysisImageCommand,
+        FAnalysisBucketFiles,
         FAnalysisFormFile,
         FAnalysisFile,
     },
@@ -103,7 +101,7 @@ export default defineComponent({
         const upload = wrapFnWithBusyState(busy, async () => {
             if (tempFiles.value.length === 0) return;
 
-            if(!props.entity.external_id) {
+            if (!props.entity.external_id) {
                 emit('failed', new Error('The analysis bucket has not created yet.'));
             }
 
@@ -381,7 +379,7 @@ export default defineComponent({
                     <label for="selectAllFiles">Select all</label>
                 </div>
 
-                <FAnalysisFiles
+                <FAnalysisBucketFiles
                     ref="fileListNode"
                     :query="fileListQuery"
                     :header-search="false"
@@ -410,7 +408,7 @@ export default defineComponent({
                             </template>
                         </div>
                     </template>
-                </FAnalysisFiles>
+                </FAnalysisBucketFiles>
 
                 <div class="form-group">
                     <button

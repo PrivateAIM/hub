@@ -66,7 +66,7 @@ describe('controllers/analysis-bucket-file', () => {
 
     it('should read collection', async () => {
         const response = await superTest
-            .get('/analysis-files')
+            .get('/analysis-bucket-files')
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(200);
@@ -77,7 +77,7 @@ describe('controllers/analysis-bucket-file', () => {
 
     it('should read resource', async () => {
         const response = await superTest
-            .get(`/analysis-files/${details.id}`)
+            .get(`/analysis-bucket-files/${details.id}`)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(200);
@@ -88,7 +88,7 @@ describe('controllers/analysis-bucket-file', () => {
 
     it('should delete resource', async () => {
         const response = await superTest
-            .delete(`/analysis-files/${details.id}`)
+            .delete(`/analysis-bucket-files/${details.id}`)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(202);

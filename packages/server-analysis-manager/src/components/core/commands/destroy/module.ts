@@ -25,7 +25,7 @@ export async function executeCoreDestroyCommand(
     for (let i = 0; i < buckets.length; i++) {
         const bucket = buckets[i];
 
-        if(bucket.external_id) {
+        if (bucket.external_id) {
             try {
                 await storage.bucket.delete(bucket.external_id);
             } catch (e) {
