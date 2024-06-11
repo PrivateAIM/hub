@@ -5,44 +5,44 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { AnalysisFileType, buildAnalysisFileBucketName } from '@privateaim/core';
 import { isClientErrorWithStatusCode } from 'hapic';
-import { CoreCommand } from '@privateaim/server-analysis-manager-kit';
 import type { CoreDestroyPayload } from '@privateaim/server-analysis-manager-kit';
-import { useStorageClient } from '../../../../core';
-import { useCoreLogger } from '../../utils';
+import { useCoreClient, useStorageClient } from '../../../../core';
+import { writeBucketDeletedEvent } from '../../queue';
 
 export async function executeCoreDestroyCommand(
     payload: CoreDestroyPayload,
 ) : Promise<CoreDestroyPayload> {
-    const logger = useCoreLogger();
+    const core = useCoreClient();
     const storage = useStorageClient();
 
-    logger.debug('Destroying analysis buckets...', {
-        command: CoreCommand.CONFIGURE,
+    const { data: buckets } = await core.analysisBucket.getMany({
+        filters: {
+            analysis_id: payload.id,
+        },
     });
 
-    const names = [
-        buildAnalysisFileBucketName(AnalysisFileType.CODE, payload.id),
-        buildAnalysisFileBucketName(AnalysisFileType.TEMP, payload.id),
-        buildAnalysisFileBucketName(AnalysisFileType.RESULT, payload.id),
-    ];
+    for (let i = 0; i < buckets.length; i++) {
+        const bucket = buckets[i];
 
-    for (let i = 0; i < names.length; i++) {
-        try {
-            await storage.bucket.delete(names[i]);
-        } catch (e) {
-            if (isClientErrorWithStatusCode(e, [404, 409])) {
-                continue;
+        if (bucket.external_id) {
+            try {
+                await storage.bucket.delete(bucket.external_id);
+            } catch (e) {
+                if (isClientErrorWithStatusCode(e, [404])) {
+                    continue;
+                }
+
+                throw e;
             }
-
-            throw e;
         }
-    }
 
-    logger.debug('Destroyed analysis buckets...', {
-        command: CoreCommand.CONFIGURE,
-    });
+        await writeBucketDeletedEvent({
+            id: payload.id,
+            bucketType: bucket.type,
+            bucketId: bucket.external_id,
+        });
+    }
 
     return payload;
 }

@@ -16,7 +16,7 @@ import {
     createSuperTestProjectNode,
 } from '../../utils/domains';
 
-describe('src/controllers/core/train-station', () => {
+describe('src/controllers/core/analysis-node', () => {
     const superTest = useSuperTest();
 
     beforeAll(async () => {

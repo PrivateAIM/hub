@@ -5,15 +5,15 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import { FAnalysisBucket, FAnalysisBucketFileDownload, FAnalysisBucketFiles } from '@privateaim/client-vue';
 import { computed } from 'vue';
 import type { BuildInput } from 'rapiq';
 import type { PropType } from 'vue';
-import { type Analysis, type AnalysisFile, AnalysisFileType } from '@privateaim/core';
-import { FAnalysisFileDownload, FAnalysisFiles } from '@privateaim/client-vue';
+import { type Analysis, type AnalysisBucket, AnalysisBucketType } from '@privateaim/core';
 import { defineNuxtComponent } from '#app';
 
 export default defineNuxtComponent({
-    components: { FAnalysisFiles, FAnalysisFileDownload },
+    components: { FAnalysisBucket, FAnalysisBucketFiles, FAnalysisFileDownload: FAnalysisBucketFileDownload },
     props: {
         entity: {
             type: Object as PropType<Analysis>,
@@ -22,12 +22,12 @@ export default defineNuxtComponent({
     },
     emits: ['updated', 'failed'],
     setup(props) {
-        const query = computed<BuildInput<AnalysisFile>>(() => ({
+        const query = computed<BuildInput<AnalysisBucket>>(() => ({
             filter: {
-                type: AnalysisFileType.RESULT,
+                type: AnalysisBucketType.RESULT,
                 analysis_id: props.entity.id,
             },
-        } satisfies BuildInput<AnalysisFile>));
+        } satisfies BuildInput<AnalysisBucket>));
 
         return {
             query,
@@ -37,16 +37,25 @@ export default defineNuxtComponent({
 </script>
 <template>
     <div class="panel-box">
-        <FAnalysisFiles
-            v-if="entity"
-            :query="query"
-        >
-            <template #itemActions="{ data }">
-                <FAnalysisFileDownload
-                    :entity="data"
-                    :with-icon="true"
-                />
+        <FAnalysisBucket :query="query">
+            <template #default="{ data: bucket }">
+                <FAnalysisBucketFiles
+                    v-if="entity"
+                    :query="{ filters: { bucket_id: bucket.id } }"
+                >
+                    <template #itemActions="{ data }">
+                        <FAnalysisFileDownload
+                            :entity="data"
+                            :with-icon="true"
+                        />
+                    </template>
+                </FAnalysisBucketFiles>
             </template>
-        </FAnalysisFiles>
+            <template #error>
+                <div class="alert alert-sm alert-warning">
+                    The result bucket does not exist. Therefore, no files can be downloaded.
+                </div>
+            </template>
+        </FAnalysisBucket>
     </div>
 </template>

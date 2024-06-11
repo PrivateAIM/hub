@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { AnalysisBucket, AnalysisBucketEventContext } from './analysis-bucket';
 import type {
     DomainEventName, DomainEventSubscriptionName, DomainSubType, DomainType,
 } from './constants';
@@ -16,7 +17,7 @@ import type { Registry, RegistryEventContext } from './registry';
 import type { RegistryProject, RegistryProjectEventContext } from './registry-project';
 import type { Node, NodeEventContext } from './node';
 import type { Analysis, AnalysisEventContext } from './analysis';
-import type { AnalysisFile, AnalysisFileEventContext } from './analysis-file';
+import type { AnalysisBucketFile, AnalysisFileEventContext } from './analysis-bucket-file';
 import type { AnalysisLog, AnalysisLogEventContext } from './analysis-log';
 import type { AnalysisNode, TrainStationEventContext } from './analysis-node';
 
@@ -49,13 +50,15 @@ export type DomainEventContext<T extends `${DomainType}` | `${DomainSubType}`> =
                                 NodeEventContext :
                                 T extends `${DomainType.ANALYSIS}` ?
                                     AnalysisEventContext :
-                                    T extends `${DomainType.ANALYSIS_LOG}` ?
-                                        AnalysisLogEventContext :
-                                        T extends `${DomainType.ANALYSIS_FILE}` ?
-                                            AnalysisFileEventContext :
-                                            T extends `${DomainType.ANALYSIS_NODE}` | `${DomainSubType.ANALYSIS_NODE_IN}` | `${DomainSubType.ANALYSIS_NODE_OUT}` ?
-                                                TrainStationEventContext :
-                                                never;
+                                    T extends `${DomainType.ANALYSIS_BUCKET}` ?
+                                        AnalysisBucketEventContext :
+                                        T extends `${DomainType.ANALYSIS_LOG}` ?
+                                            AnalysisLogEventContext :
+                                            T extends `${DomainType.ANALYSIS_FILE}` ?
+                                                AnalysisFileEventContext :
+                                                T extends `${DomainType.ANALYSIS_NODE}` | `${DomainSubType.ANALYSIS_NODE_IN}` | `${DomainSubType.ANALYSIS_NODE_OUT}` ?
+                                                    TrainStationEventContext :
+                                                    never;
 
 export type DomainEntity<T extends `${DomainType}` | `${DomainSubType}`> =
     T extends `${DomainType.MASTER_IMAGE}` ?
@@ -74,13 +77,15 @@ export type DomainEntity<T extends `${DomainType}` | `${DomainSubType}`> =
                                 Node :
                                 T extends `${DomainType.ANALYSIS}` ?
                                     Analysis :
-                                    T extends `${DomainType.ANALYSIS_LOG}` ?
-                                        AnalysisLog :
-                                        T extends `${DomainType.ANALYSIS_FILE}` ?
-                                            AnalysisFile :
-                                            T extends `${DomainType.ANALYSIS_NODE}` | `${DomainSubType.ANALYSIS_NODE_IN}` | `${DomainSubType.ANALYSIS_NODE_OUT}` ?
-                                                AnalysisNode :
-                                                never;
+                                    T extends `${DomainType.ANALYSIS_BUCKET}` ?
+                                        AnalysisBucket :
+                                        T extends `${DomainType.ANALYSIS_LOG}` ?
+                                            AnalysisLog :
+                                            T extends `${DomainType.ANALYSIS_FILE}` ?
+                                                AnalysisBucketFile :
+                                                T extends `${DomainType.ANALYSIS_NODE}` | `${DomainSubType.ANALYSIS_NODE_IN}` | `${DomainSubType.ANALYSIS_NODE_OUT}` ?
+                                                    AnalysisNode :
+                                                    never;
 
 export type DomainInput = `${DomainType}` | DomainType | `${DomainSubType}` | DomainSubType;
 

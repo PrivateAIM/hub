@@ -5,7 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Client, ExchangeOptions } from 'amqp-extension';
+import { ExchangeType } from 'amqp-extension';
+import type { Client } from 'amqp-extension';
 import { isLoggerUsable, useLogger } from '../../services';
 import { QueueRouterRoutingType } from './constants';
 import { isQueueRouterPayload } from './helpers';
@@ -27,53 +28,47 @@ export class QueueRouter {
     //----------------------------------------------------------------
 
     publish(message: QueueRouterPayload) : Promise<boolean> {
-        let exchange : ExchangeOptions;
+        let exchange : Client;
         if (message.metadata.routing.type === 'work') {
-            exchange = {
-                type: 'direct',
+            exchange = this.driver.of({
+                type: ExchangeType.DIRECT,
                 name: message.metadata.routing.namespace || '',
-                routingKey: message.metadata.routing.key,
-            };
+            });
         } else {
-            exchange = {
-                type: 'topic',
+            exchange = this.driver.of({
+                type: ExchangeType.TOPIC,
                 name: message.metadata.routing.namespace || 'FLAME',
-                routingKey: message.metadata.routing.key,
-            };
+            });
         }
 
         if (isLoggerUsable()) {
             useLogger()
-                .debug(`Publishing queue message ${message.type} in ${exchange.routingKey} (namespace: ${exchange.name})`);
+                .debug(`Publishing queue message ${message.type} in ${message.metadata.routing.key}`);
         }
 
-        return this.driver.publish({
+        return exchange.publish(message.metadata.routing.key, message, {
             type: message.type,
             messageId: message.id,
-            content: message,
-            exchange,
             persistent: message.metadata.persistent ??
                 message.metadata.routing.type === QueueRouterRoutingType.WORK,
         });
     }
 
     consume(routing: QueueRouterRouting, handlers: QueueRouterHandlers) : Promise<void> {
-        let exchange : ExchangeOptions;
+        let exchange : Client;
         if (routing.type === 'work') {
-            exchange = {
-                type: 'direct',
+            exchange = this.driver.of({
+                type: ExchangeType.DIRECT,
                 name: routing.namespace || '',
-                routingKey: routing.key,
-            };
+            });
         } else {
-            exchange = {
-                type: 'topic',
-                name: routing.namespace,
-                routingKey: routing.key,
-            };
+            exchange = this.driver.of({
+                type: ExchangeType.TOPIC,
+                name: routing.namespace || 'FLAME',
+            });
         }
-        return this.driver.consume({
-            exchange,
+
+        return exchange.consume(routing.key, {
             prefetchCount: routing.type === QueueRouterRoutingType.WORK ? 1 : undefined,
             noAck: routing.type !== QueueRouterRoutingType.WORK,
             requeueOnFailure: routing.type === QueueRouterRoutingType.WORK,
@@ -86,7 +81,7 @@ export class QueueRouter {
 
                 if (isLoggerUsable()) {
                     useLogger()
-                        .debug(`Consuming queue message ${input.properties.type} in ${exchange.routingKey} (namespace: ${exchange.name})`);
+                        .debug(`Consuming queue message ${input.properties.type} in ${routing.key}`);
                 }
 
                 let handler : QueueRouterHandler | undefined;

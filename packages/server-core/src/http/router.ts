@@ -19,7 +19,8 @@ import { Router } from 'routup';
 import { EnvironmentName, useEnv } from '../config';
 
 import { AnalysisController } from './controllers/core/analysis';
-import { AnalysisFileController } from './controllers/core/analysis-file';
+import { AnalysisBucketController } from './controllers/core/analysis-bucket';
+import { AnalysisBucketFileController } from './controllers/core/analysis-bucket-file';
 import { AnalysisLogController } from './controllers/core/analysis-log';
 import { AnalysisNodeController } from './controllers/core/analysis-node';
 import { MasterImageController } from './controllers/core/master-image';
@@ -75,7 +76,8 @@ export function createRouter() : Router {
                 RegistryProjectController,
                 NodeController,
                 AnalysisController,
-                AnalysisFileController,
+                AnalysisBucketController,
+                AnalysisBucketFileController,
                 AnalysisLogController,
                 AnalysisNodeController,
 

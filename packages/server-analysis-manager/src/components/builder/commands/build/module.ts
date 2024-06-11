@@ -16,7 +16,7 @@ import {
 } from '../../../../core';
 import type { ComponentPayloadExtended } from '../../../type';
 import { extendPayload } from '../../../utils';
-import { buildTrainDockerFile, packContainerWithTrain } from '../../helpers';
+import { bundleDockerFile, packContainerWithTrain } from '../../helpers';
 import { buildDockerImage } from '../../../../core/docker/image-build';
 import { BuilderError } from '../../error';
 import { useBuilderLogger } from '../../utils';
@@ -36,7 +36,7 @@ export async function executeBuilderBuildCommand(
 
     // -----------------------------------------------------------------------------------
 
-    const { content: dockerFile, masterImagePath } = await buildTrainDockerFile({
+    const { content: dockerFile, masterImagePath } = await bundleDockerFile({
         entity: data.entity,
         hostname: data.registry.host,
     });

@@ -15,21 +15,21 @@ import {
     toRef,
     watch,
 } from 'vue';
-import type { Analysis, AnalysisFile } from '@privateaim/core';
-import { AnalysisConfigurationStatus, AnalysisFileType } from '@privateaim/core';
+import type { Analysis, AnalysisBucketFile } from '@privateaim/core';
+import { AnalysisBucketType, AnalysisConfigurationStatus } from '@privateaim/core';
 import { initFormAttributesFromSource, injectCoreHTTPClient } from '../../../core';
 import FAnalysisWizardStepBase from './FAnalysisWizardStepBase.vue';
-import FAnalysisFileManager from '../../analysis-file/FAnalysisFileManager.vue';
+import FAnalysisWizardStepFiles from './FAnalysisWizardStepFiles.vue';
 import FAnalysisWizardStepFinal from './FAnalysisWizardStepFinal.vue';
 
 export default defineComponent({
     components: {
+        FAnalysisWizardStepFiles,
         FormWizard,
         WizardButton,
         TabContent,
 
         FAnalysisWizardStepFinal,
-        FAnalysisFileManager,
         FAnalysisWizardStepBase,
     },
     props: {
@@ -43,14 +43,24 @@ export default defineComponent({
         const apiClient = injectCoreHTTPClient();
         const entity = toRef(props, 'entity');
 
-        const entrypointFile = ref(null) as Ref<AnalysisFile | null>;
+        const entrypointFile = ref(null) as Ref<AnalysisBucketFile | null>;
 
         const resolveEntrypointFile = async () => {
-            const { data } = await apiClient.analysisFile.getMany({
+            const { data: buckets } = await apiClient.analysisBucket.getMany({
+                filters: {
+                    type: AnalysisBucketType.CODE,
+                    analysis_id: entity.value.id,
+                },
+            });
+            const [bucket] = buckets;
+            if (!bucket) {
+                return;
+            }
+
+            const { data } = await apiClient.analysisBucketFile.getMany({
                 filter: {
                     root: true,
-                    type: AnalysisFileType.CODE,
-                    analysis_id: entity.value.id,
+                    bucket_id: bucket.id,
                 },
             });
 
@@ -196,7 +206,7 @@ export default defineComponent({
             }
         };
 
-        const setEntrypointFile = (item?: AnalysisFile) => {
+        const setEntrypointFile = (item?: AnalysisBucketFile) => {
             if (item) {
                 entrypointFile.value = item;
             } else {
@@ -304,10 +314,10 @@ export default defineComponent({
             title="Files"
             :before-change="passWizardStep"
         >
-            <FAnalysisFileManager
+            <FAnalysisWizardStepFiles
                 :entity="entity"
-                :file-entity="entrypointFile"
-                @setEntrypointFile="setEntrypointFile"
+                :entrypoint-entity="entrypointFile"
+                @entrypointChanged="setEntrypointFile"
                 @failed="handleFailed"
             />
         </TabContent>

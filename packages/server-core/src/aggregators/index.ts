@@ -6,4 +6,4 @@
  */
 
 export * from './authup';
-export * from './analysis-manager';
+export * from './analysis-manager/builder';

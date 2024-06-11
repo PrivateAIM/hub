@@ -8,6 +8,9 @@
 import { QueueRouterRoutingType } from '@privateaim/server-kit';
 
 export enum CoreEvent {
+    BUCKET_CREATED = 'bucketCreated',
+    BUCKET_DELETED = 'bucketDeleted',
+
     CONFIGURING = 'configuring',
     CONFIGURED = 'configured',
 

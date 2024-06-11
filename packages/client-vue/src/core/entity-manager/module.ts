@@ -289,17 +289,17 @@ export function createEntityManager<
 
     resolveByProps();
 
-    const resolve = async (rctx: EntityManagerResolveContext<T> = {}) => {
+    const resolve = async (resolveCtx: EntityManagerResolveContext<T> = {}) => {
         if (entity.value) {
             return;
         }
 
         let query : (T extends Record<string, any> ? BuildInput<T> : never) | undefined;
-        if (rctx.query) {
-            query = rctx.query;
+        if (resolveCtx.query) {
+            query = resolveCtx.query;
         }
 
-        let { id } = rctx;
+        let { id } = resolveCtx;
 
         if (ctx.props) {
             if (resolveByProps()) {
@@ -321,15 +321,9 @@ export function createEntityManager<
             if (ctx.props.query || ctx.props.queryFilters) {
                 query = {
                     ...(ctx.props.query ? { filters: ctx.props.query } : {}),
+                    ...(ctx.props.queryFields ? { fields: ctx.props.queryFields } : {}),
                     ...(ctx.props.queryFilters ? { filters: ctx.props.queryFilters } : {}),
                 } as any;
-
-                if (
-                    query &&
-                    ctx.props.queryFields
-                ) {
-                    query.fields = ctx.props.queryFields;
-                }
             }
 
             if (ctx.props.entityId) {

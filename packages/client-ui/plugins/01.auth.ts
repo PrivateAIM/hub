@@ -6,6 +6,7 @@
  */
 
 import { install } from '@authup/client-web-kit';
+import type { Pinia } from 'pinia';
 import { useCookie } from '#imports';
 
 export default defineNuxtPlugin({
@@ -14,6 +15,7 @@ export default defineNuxtPlugin({
         const { authupUrl: baseURL } = runtimeConfig.public;
 
         ctx.vueApp.use(install, {
+            pinia: ctx.$pinia as Pinia,
             baseURL,
             cookieSet: (key, value) => {
                 const cookie = useCookie(key);

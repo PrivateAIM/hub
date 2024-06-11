@@ -8,7 +8,6 @@
 import type { Realm, User } from '@authup/core-kit';
 import type {
     Analysis,
-    AnalysisResultStatus,
     AnalysisRunStatus,
     MasterImage,
     Project,
@@ -16,7 +15,6 @@ import type {
 } from '@privateaim/core';
 import {
     AnalysisBuildStatus,
-    AnalysisConfigurationStatus,
 } from '@privateaim/core';
 import {
     Column,
@@ -49,12 +47,6 @@ export class AnalysisEntity implements Analysis {
     @Column({ type: 'boolean', default: false })
         configuration_locked: boolean;
 
-    @Index()
-    @Column({
-        type: 'varchar', length: 64, nullable: true, default: null,
-    })
-        configuration_status: AnalysisConfigurationStatus | null;
-
     // ------------------------------------------------------------------
 
     @Index()
@@ -70,13 +62,6 @@ export class AnalysisEntity implements Analysis {
         type: 'varchar', length: 64, nullable: true, default: null,
     })
         run_status: AnalysisRunStatus | null;
-
-    // ------------------------------------------------------------------
-
-    @Column({
-        type: 'varchar', length: 64, default: null,
-    })
-        result_status: AnalysisResultStatus | null;
 
     // ------------------------------------------------------------------
 

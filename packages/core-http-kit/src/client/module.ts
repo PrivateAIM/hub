@@ -21,6 +21,7 @@ import {
     ServiceAPI,
     TrainStationAPI,
 } from '../domains';
+import { AnalysisBucketAPI } from '../domains/analysis-bucket';
 
 export class Client extends BaseClient {
     public readonly masterImage : MasterImageAPI;
@@ -39,7 +40,9 @@ export class Client extends BaseClient {
 
     public readonly analysis : AnalysisAPI;
 
-    public readonly analysisFile : AnalysisFileAPI;
+    public readonly analysisBucket : AnalysisBucketAPI;
+
+    public readonly analysisBucketFile : AnalysisFileAPI;
 
     public readonly analysisLog: AnalysisLogAPI;
 
@@ -58,7 +61,8 @@ export class Client extends BaseClient {
         this.registryProject = new RegistryProjectAPI({ client: this });
         this.node = new NodeAPI({ client: this });
         this.analysis = new AnalysisAPI({ client: this });
-        this.analysisFile = new AnalysisFileAPI({ client: this });
+        this.analysisBucket = new AnalysisBucketAPI({ client: this });
+        this.analysisBucketFile = new AnalysisFileAPI({ client: this });
         this.analysisLog = new AnalysisLogAPI({ client: this });
         this.analysisNode = new TrainStationAPI({ client: this });
         this.service = new ServiceAPI({ client: this });

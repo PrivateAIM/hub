@@ -6,6 +6,7 @@
  */
 
 import { useStore } from '@authup/client-web-kit';
+import { hasOwnProperty } from '@privateaim/kit';
 import { storeToRefs } from 'pinia';
 import type { RouteLocationNormalized } from 'vue-router';
 import {
@@ -13,31 +14,25 @@ import {
 } from '#app';
 import { LayoutKey } from '../config/layout';
 
-function checkAbilityOrPermission(route: RouteLocationNormalized, has: (name: string) => boolean) {
-    const layoutKeys : string[] = [
-        LayoutKey.REQUIRED_PERMISSIONS,
-    ];
-
+function checkPermission(route: RouteLocationNormalized, has: (name: string) => boolean) {
     let isAllowed : undefined | boolean;
 
-    for (let i = 0; i < layoutKeys.length; i++) {
-        const layoutKey = layoutKeys[i];
+    const layoutKey = LayoutKey.REQUIRED_PERMISSIONS;
 
-        for (let j = 0; j < route.matched.length; j++) {
-            const matchedRecord = route.matched[j];
+    for (let j = 0; j < route.matched.length; j++) {
+        const matchedRecord = route.matched[j];
 
-            if (!Object.prototype.hasOwnProperty.call(matchedRecord.meta, layoutKey)) {
-                continue;
-            }
+        if (!hasOwnProperty(matchedRecord.meta, layoutKey)) {
+            continue;
+        }
 
-            const value = matchedRecord.meta[layoutKey];
-            if (Array.isArray(value)) {
-                isAllowed = value.some((val) => has(val));
-            }
+        const value = matchedRecord.meta[layoutKey];
+        if (Array.isArray(value)) {
+            isAllowed = value.some((val) => has(val));
+        }
 
-            if (isAllowed) {
-                return true;
-            }
+        if (isAllowed) {
+            return true;
         }
     }
 
@@ -45,22 +40,19 @@ function checkAbilityOrPermission(route: RouteLocationNormalized, has: (name: st
         return true;
     }
 
-    if (!isAllowed) {
-        const parts = route.path.split('/');
-        parts.pop();
-        throw new Error(parts.join('/'));
-    }
-
-    return true;
+    return isAllowed;
 }
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
     const store = useStore();
     const { loggedIn } = storeToRefs(store);
 
-    let redirectPath = '/';
+    let redirectPath = '/login';
 
-    if (typeof from !== 'undefined') {
+    if (
+        typeof from !== 'undefined' &&
+        from.fullPath !== to.fullPath
+    ) {
         redirectPath = from.fullPath;
     }
 
@@ -69,7 +61,10 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     } catch (e) {
         store.logout();
 
-        if (!to.fullPath.startsWith('/logout') && !to.fullPath.startsWith('/login')) {
+        if (
+            !to.fullPath.startsWith('/logout') &&
+            !to.fullPath.startsWith('/login')
+        ) {
             return navigateTo({
                 path: '/logout',
                 query: {
@@ -99,15 +94,20 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
                 query,
             });
         }
+    }
 
-        try {
-            checkAbilityOrPermission(to, (name) => store.abilities.has(name));
-        } catch (e) {
+    if (
+        to.matched.some((matched) => !!matched.meta[LayoutKey.REQUIRED_PERMISSIONS])
+    ) {
+        const permitted = checkPermission(to, (name) => store.abilities.has(name));
+        if (!permitted) {
             return navigateTo({
                 path: redirectPath,
             });
         }
-    } else if (
+    }
+
+    if (
         !to.fullPath.startsWith('/logout') &&
         to.matched.some((matched) => matched.meta[LayoutKey.REQUIRED_LOGGED_OUT])
     ) {

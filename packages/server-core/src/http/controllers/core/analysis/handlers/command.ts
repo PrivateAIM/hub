@@ -16,10 +16,12 @@ import { useDataSource } from 'typeorm-extension';
 import {
     AnalysisEntity,
     detectAnalysisBuildStatus,
-    lockAnalysisConfiguration,
+    lockAnalysisConfiguration, runAnalysisSpinUpCommand,
     startAnalysisBuild,
-    stopAnalysisBuild, unlockAnalysisConfiguration,
+    stopAnalysisBuild,
+    unlockAnalysisConfiguration,
 } from '../../../../../domains';
+import { runAnalysisTearDownCommand } from '../../../../../domains/analysis/commands/tear-down';
 
 /**
  * Execute a analysis command (start, stop, build).
@@ -60,6 +62,16 @@ export async function handleAnalysisCommandRouteHandler(req: Request, res: Respo
     }
 
     switch (validationData.command as AnalysisAPICommand) {
+        // General
+        case AnalysisAPICommand.SPIN_UP: {
+            entity = await runAnalysisSpinUpCommand(entity);
+            break;
+        }
+        case AnalysisAPICommand.TEAR_DOWN: {
+            entity = await runAnalysisTearDownCommand(entity);
+            break;
+        }
+
         // Build Commands
         case AnalysisAPICommand.BUILD_STATUS:
             entity = await detectAnalysisBuildStatus(entity);
@@ -70,6 +82,8 @@ export async function handleAnalysisCommandRouteHandler(req: Request, res: Respo
         case AnalysisAPICommand.BUILD_STOP:
             entity = await stopAnalysisBuild(entity);
             break;
+
+        // Configuration
         case AnalysisAPICommand.CONFIGURATION_LOCK:
             entity = await lockAnalysisConfiguration(entity);
             break;

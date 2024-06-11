@@ -6,7 +6,7 @@
  */
 
 import { getHostNameFromString } from '@privateaim/kit';
-import { AnalysisContainerPath, AnalysisFileType } from '@privateaim/core';
+import { AnalysisBucketType, AnalysisContainerPath } from '@privateaim/core';
 import type { BucketFile } from '@privateaim/storage-kit';
 import path from 'node:path';
 import type {
@@ -21,29 +21,39 @@ type DockerFileBuildContext = {
     hostname: string
 };
 
-export async function buildTrainDockerFile(context: DockerFileBuildContext) : Promise<{
+export async function bundleDockerFile(context: DockerFileBuildContext) : Promise<{
     content: string,
     masterImagePath: string
 }> {
     const storageClient = useStorageClient();
     const coreClient = useCoreClient();
 
-    let entryPoint : BucketFile;
-
-    const { data: analysisFiles } = await coreClient.analysisFile.getMany({
+    const { data: analysisBuckets } = await coreClient.analysisBucket.getMany({
         filter: {
-            root: true,
-            type: AnalysisFileType.CODE,
+            analysis_id: context.entity.id,
+            type: AnalysisBucketType.CODE,
         },
     });
-
-    const [analysisFile] = analysisFiles;
-    if (typeof analysisFile === 'undefined') {
+    const [analysisBucket] = analysisBuckets;
+    if (typeof analysisBucket === 'undefined') {
         throw BuilderError.entrypointNotFound();
     }
 
+    const { data: analysisBucketFiles } = await coreClient.analysisBucketFile.getMany({
+        filter: {
+            root: true,
+            bucket_id: analysisBucket.id,
+        },
+    });
+
+    const [analysisBucketFile] = analysisBucketFiles;
+    if (typeof analysisBucketFile === 'undefined') {
+        throw BuilderError.entrypointNotFound();
+    }
+
+    let entryPoint : BucketFile;
     try {
-        entryPoint = await storageClient.bucketFile.getOne(analysisFile.bucket_file_id);
+        entryPoint = await storageClient.bucketFile.getOne(analysisBucketFile.external_id);
     } catch (e) {
         throw BuilderError.entrypointNotFound();
     }

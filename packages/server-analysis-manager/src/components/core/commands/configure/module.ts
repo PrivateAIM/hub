@@ -5,44 +5,53 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { AnalysisFileType, buildAnalysisFileBucketName } from '@privateaim/core';
-import { isClientErrorWithStatusCode } from 'hapic';
-import { CoreCommand } from '@privateaim/server-analysis-manager-kit';
+import {
+    AnalysisBucketType,
+    buildAnalysisBucketName,
+} from '@privateaim/core';
 import type { CoreConfigurePayload } from '@privateaim/server-analysis-manager-kit';
-import { useStorageClient } from '../../../../core';
-import { useCoreLogger } from '../../utils';
+import { useCoreClient, useStorageClient } from '../../../../core';
+import { writeBucketCreatedEvent } from '../../queue';
 
 export async function executeCoreConfigureCommand(
     payload: CoreConfigurePayload,
 ) : Promise<CoreConfigurePayload> {
-    const logger = useCoreLogger();
-    const storage = useStorageClient();
+    const coreClient = useCoreClient();
 
-    logger.debug('Creating analysis buckets...', {
-        command: CoreCommand.CONFIGURE,
+    const bucketTypes = Object.values(AnalysisBucketType);
+    const { data: buckets } = await coreClient.analysisBucket.getMany({
+        filters: {
+            analysis_id: payload.id,
+        },
     });
 
-    const names = [
-        buildAnalysisFileBucketName(AnalysisFileType.CODE, payload.id),
-        buildAnalysisFileBucketName(AnalysisFileType.TEMP, payload.id),
-        buildAnalysisFileBucketName(AnalysisFileType.RESULT, payload.id),
-    ];
+    for (let i = 0; i < buckets.length; i++) {
+        const bucket = buckets[i];
+        if (!bucket.external_id) {
+            continue;
+        }
 
-    for (let i = 0; i < names.length; i++) {
-        try {
-            await storage.bucket.create({ name: names[i] });
-        } catch (e) {
-            if (isClientErrorWithStatusCode(e, [409])) {
-                continue;
-            }
-
-            throw e;
+        const index = bucketTypes.indexOf(bucket.type as AnalysisBucketType);
+        if (index !== -1) {
+            bucketTypes.splice(index, 1);
         }
     }
 
-    logger.debug('Created analysis buckets...', {
-        command: CoreCommand.CONFIGURE,
-    });
+    const storage = useStorageClient();
+
+    for (let i = 0; i < bucketTypes.length; i++) {
+        const name = buildAnalysisBucketName(bucketTypes[i], payload.id);
+
+        // todo: createOrUpdate
+        // todo: handleConflict (maybe random name)
+        const bucket = await storage.bucket.create({ name });
+
+        await writeBucketCreatedEvent({
+            id: payload.id,
+            bucketId: bucket.id,
+            bucketType: bucketTypes[i],
+        });
+    }
 
     return payload;
 }

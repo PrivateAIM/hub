@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { AnalysisBucketType } from '@privateaim/core';
 import type { CoreCommand, CoreEvent } from './constants';
 
 export type CoreBasePayload = {
@@ -42,5 +43,24 @@ export type CoreDestroyEventContext = CoreDestroyCommandContext & {
         `${CoreEvent.NONE}`;
 };
 
+export type CoreBucketEventPayload = {
+    id: string,
+    bucketType: `${AnalysisBucketType}`,
+    bucketId: string
+};
+
+export type CoreBucketCreatedEventContext = {
+    event: `${CoreEvent.BUCKET_CREATED}`,
+    data: CoreBucketEventPayload
+};
+
+export type CoreBucketDeletedEventContext = {
+    event: `${CoreEvent.BUCKET_DELETED}`,
+    data: CoreBucketEventPayload
+};
+
 export type CoreCommandContext = CoreDestroyCommandContext | CoreConfigureCommandContext;
-export type CoreEventContext = CoreDestroyEventContext | CoreConfigureEventContext;
+export type CoreEventContext = CoreDestroyEventContext |
+CoreConfigureEventContext |
+CoreBucketCreatedEventContext |
+CoreBucketDeletedEventContext;
