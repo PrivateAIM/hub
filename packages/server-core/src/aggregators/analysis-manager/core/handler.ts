@@ -27,12 +27,23 @@ export function createAnalysisManagerCoreHandlers(): QueueRouterHandlers<{
                 return;
             }
             const bucketRepository = dataSource.getRepository(AnalysisBucketEntity);
-            const entity = bucketRepository.create({
-                analysis_id: message.data.id,
+            let entity = await bucketRepository.findOneBy({
+                analysis_id: analysis.id,
                 type: message.data.bucketType,
-                external_id: message.data.bucketId,
-                realm_id: analysis.realm_id,
             });
+
+            if (entity) {
+                entity = bucketRepository.merge(entity, {
+                    external_id: message.data.bucketId,
+                });
+            } else {
+                entity = bucketRepository.create({
+                    analysis_id: message.data.id,
+                    type: message.data.bucketType,
+                    external_id: message.data.bucketId,
+                    realm_id: analysis.realm_id,
+                });
+            }
 
             await bucketRepository.save(entity);
         },
@@ -45,7 +56,9 @@ export function createAnalysisManagerCoreHandlers(): QueueRouterHandlers<{
                 // todo: maybe by external_id too
             });
 
-            await bucketRepository.remove(bucket);
+            if (bucket) {
+                await bucketRepository.remove(bucket);
+            }
         },
     };
 }

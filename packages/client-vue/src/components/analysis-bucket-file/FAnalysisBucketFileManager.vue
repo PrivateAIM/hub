@@ -67,6 +67,7 @@ export default defineComponent({
         const fileListNode = ref<null | typeof FAnalysisBucketFiles>(null);
         const fileListQuery = computed<BuildInput<AnalysisBucketFile>>(() => ({
             filters: {
+                analysis_id: props.entity.analysis_id,
                 bucket_id: props.entity.id,
             },
         }));
@@ -101,6 +102,10 @@ export default defineComponent({
 
         const upload = wrapFnWithBusyState(busy, async () => {
             if (tempFiles.value.length === 0) return;
+
+            if(!props.entity.external_id) {
+                emit('failed', new Error('The analysis bucket has not created yet.'));
+            }
 
             try {
                 const formData = new FormData();

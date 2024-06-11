@@ -27,6 +27,9 @@ export async function executeCoreConfigureCommand(
 
     for (let i = 0; i < buckets.length; i++) {
         const bucket = buckets[i];
+        if (!bucket.external_id) {
+            continue;
+        }
 
         const index = bucketTypes.indexOf(bucket.type as AnalysisBucketType);
         if (index !== -1) {
