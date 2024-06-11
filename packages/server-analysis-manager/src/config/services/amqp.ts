@@ -11,10 +11,6 @@ import { useEnv } from '../env';
 
 export function configureAMQP() {
     setAmqpClientFactory(() => new Client({
-        connection: useEnv('rabbitMqConnectionString'),
-        exchange: {
-            name: 'pht',
-            type: 'topic',
-        },
+        connectionOptions: useEnv('rabbitMqConnectionString')
     }));
 }

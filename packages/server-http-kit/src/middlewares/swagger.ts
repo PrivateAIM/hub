@@ -13,7 +13,13 @@ import type { Router } from 'routup';
 import type { MiddlewareSwaggerOptions } from './types';
 
 export function mountSwaggerMiddleware(router: Router, options: MiddlewareSwaggerOptions) {
-    const document = loadSync(path.join(options.cwd || process.cwd(), 'swagger.json'));
+    let document : any;
+    if (options.cwd) {
+        document = loadSync(path.join(options.cwd, 'swagger.json'));
+    } else {
+        document = loadSync(path.join(process.cwd(), 'writable', 'swagger.json'));
+    }
+
     router.use('/docs', swaggerUI(document, {
         baseURL: options.baseURL,
     }));

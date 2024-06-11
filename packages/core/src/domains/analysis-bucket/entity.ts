@@ -16,7 +16,7 @@ export interface AnalysisBucket {
 
     type: `${AnalysisBucketType}`;
 
-    external_id: string;
+    external_id: string | null;
 
     // ------------------------------------------------------------------
 

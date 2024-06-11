@@ -29,8 +29,12 @@ export class AnalysisBucketEntity implements AnalysisBucket {
     @Column({ type: 'varchar', length: 64 })
         type: `${AnalysisBucketType}`;
 
-    @Column({ type: 'uuid' })
-        external_id: string;
+    @Column({
+        type: 'varchar',
+        length: 64,
+        nullable: true,
+    })
+        external_id: string | null;
 
     // ------------------------------------------------------------------
 

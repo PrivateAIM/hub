@@ -17,11 +17,7 @@ export function configureAmqp() {
         !isBoolFalse(connectionString)
     ) {
         setAmqpClientFactory(() => new Client({
-            connection: isBoolTrue(connectionString) ? ConfigDefaults.RABBITMQ : connectionString,
-            exchange: {
-                name: 'pht',
-                type: 'topic',
-            },
+            connectionOptions: isBoolTrue(connectionString) ? ConfigDefaults.RABBITMQ : connectionString,
         }));
     }
 }

@@ -6,15 +6,18 @@
  */
 
 import {
-    AnalysisBucket,
+    AnalysisBucket, AnalysisBucketFile,
 } from '@privateaim/core';
 import {
-    DController, DGet, DPath, DRequest, DResponse, DTags,
+    DBody,
+    DController, DDelete, DGet, DPath, DPost, DRequest, DResponse, DTags,
 } from '@routup/decorators';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import {
+    createAnalysisBucketRouteHandler,
+    deleteAnalysisBucketRouteHandler,
     getManyAnalysisBucketRouteHandler,
-    getOneAnalysisBucketRouteHandler,
+    getOneAnalysisBucketRouteHandler, updateAnalysisBucketRouteHandler,
 } from './handlers';
 
 type PartialAnalysisBucket = Partial<AnalysisBucket>;
@@ -37,5 +40,33 @@ export class AnalysisBucketController {
             @DResponse() res: any,
     ): Promise<PartialAnalysisBucket | undefined> {
         return await getOneAnalysisBucketRouteHandler(req, res) as PartialAnalysisBucket | undefined;
+    }
+
+    @DPost('/:id', [ForceLoggedInMiddleware])
+    async edit(
+        @DPath('id') id: string,
+            @DBody() data: AnalysisBucketFile,
+            @DRequest() req: any,
+            @DResponse() res: any,
+    ): Promise<PartialAnalysisBucket | undefined> {
+        return await updateAnalysisBucketRouteHandler(req, res) as PartialAnalysisBucket | undefined;
+    }
+
+    @DPost('', [ForceLoggedInMiddleware])
+    async add(
+        @DBody() data: PartialAnalysisBucket,
+            @DRequest() req: any,
+            @DResponse() res: any,
+    ): Promise<PartialAnalysisBucket | undefined> {
+        return await createAnalysisBucketRouteHandler(req, res) as PartialAnalysisBucket | undefined;
+    }
+
+    @DDelete('/:id', [ForceLoggedInMiddleware])
+    async drop(
+        @DPath('id') id: string,
+            @DRequest() req: any,
+            @DResponse() res: any,
+    ): Promise<PartialAnalysisBucket | undefined> {
+        return await deleteAnalysisBucketRouteHandler(req, res) as PartialAnalysisBucket | undefined;
     }
 }

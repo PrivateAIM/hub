@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { AnalysisFileType } from '@privateaim/core';
 import type { AnalysisBucketFile, AnalysisNode } from '@privateaim/core';
+import { AnalysisBucketType } from '@privateaim/core';
 import {
     dropTestDatabase,
     expectPropertiesEqualToSrc,
@@ -16,10 +16,11 @@ import {
 } from '../../utils';
 import {
     createSuperTestAnalysis,
+    createSuperTestAnalysisBucket,
     createSuperTestProject,
 } from '../../utils/domains';
 
-describe('controllers/analysis-file', () => {
+describe('controllers/analysis-bucket-file', () => {
     const superTest = useSuperTest();
 
     beforeAll(async () => {
@@ -41,12 +42,17 @@ describe('controllers/analysis-file', () => {
         });
         expect(analysis.body.id).toBeDefined();
 
+        const analysisBucket = await createSuperTestAnalysisBucket(superTest, {
+            analysis_id: analysis.body.id,
+            type: AnalysisBucketType.CODE,
+        });
+        expect(analysisBucket.body.id).toBeDefined();
+
         const response = await superTest
-            .post('/analysis-files')
+            .post('/analysis-bucket-files')
             .auth('admin', 'start123')
             .send({
-                analysis_id: analysis.body.id,
-                type: AnalysisFileType.CODE,
+                bucket_id: analysisBucket.body.id,
                 external_id: '28eb7728-c78d-4c2f-ab99-dc4bcee78da9',
                 name: 'foo.bar',
                 root: false,

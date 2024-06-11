@@ -5,18 +5,21 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { AnalysisNode } from '@privateaim/core';
+import type { AnalysisBucket, AnalysisNode } from '@privateaim/core';
+import { AnalysisBucketFile, AnalysisBucketType } from '@privateaim/core';
 import {
-    dropTestDatabase, expectPropertiesEqualToSrc, removeDateProperties, useSuperTest, useTestDatabase,
+    dropTestDatabase,
+    expectPropertiesEqualToSrc,
+    removeDateProperties,
+    useSuperTest,
+    useTestDatabase,
 } from '../../utils';
 import {
-    createSuperTestAnalysis,
-    createSuperTestNode,
+    createSuperTestAnalysisBucket,
     createSuperTestProject,
-    createSuperTestProjectNode,
 } from '../../utils/domains';
 
-describe('src/controllers/core/analysis-node', () => {
+describe('controllers/analysis-file', () => {
     const superTest = useSuperTest();
 
     beforeAll(async () => {
@@ -33,40 +36,28 @@ describe('src/controllers/core/analysis-node', () => {
         const project = await createSuperTestProject(superTest);
         expect(project.body.id).toBeDefined();
 
-        const node = await createSuperTestNode(superTest);
-        expect(node.body.id).toBeDefined();
-
-        await createSuperTestProjectNode(superTest, {
-            node_id: node.body.id,
+        const analysis = await createSuperTestAnalysisBucket(superTest, {
             project_id: project.body.id,
         });
-
-        const analysis = await createSuperTestAnalysis(superTest, {
-            project_id: project.body.id,
-        });
-
         expect(analysis.body.id).toBeDefined();
 
         const response = await superTest
-            .post('/analysis-nodes')
+            .post('/analysis-buckets')
             .auth('admin', 'start123')
             .send({
                 analysis_id: analysis.body.id,
-                node_id: node.body.id,
-            } satisfies Partial<AnalysisNode>);
+                type: AnalysisBucketType.CODE,
+            } satisfies Partial<AnalysisBucket>);
 
         expect(response.status).toEqual(201);
         expect(response.body).toBeDefined();
-
-        delete response.body.analysis;
-        delete response.body.node;
 
         details = removeDateProperties(response.body);
     });
 
     it('should read collection', async () => {
         const response = await superTest
-            .get('/analysis-nodes')
+            .get('/analysis-buckets')
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(200);
@@ -77,7 +68,7 @@ describe('src/controllers/core/analysis-node', () => {
 
     it('should read resource', async () => {
         const response = await superTest
-            .get(`/analysis-nodes/${details.id}`)
+            .get(`/analysis-buckets/${details.id}`)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(200);
@@ -88,7 +79,7 @@ describe('src/controllers/core/analysis-node', () => {
 
     it('should delete resource', async () => {
         const response = await superTest
-            .delete(`/analysis-nodes/${details.id}`)
+            .delete(`/analysis-buckets/${details.id}`)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(202);
