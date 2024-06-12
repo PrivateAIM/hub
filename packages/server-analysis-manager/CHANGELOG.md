@@ -1,5 +1,37 @@
 # Changelog
 
+## [0.5.0](https://github.com/PrivateAIM/hub/compare/server-analysis-manager-v0.4.0...server-analysis-manager-v0.5.0) (2024-06-12)
+
+
+### Features
+
+* analysis-bucket implementation  ([#433](https://github.com/PrivateAIM/hub/issues/433)) ([15329f4](https://github.com/PrivateAIM/hub/commit/15329f42c5f6ebbe4772715ff2e308e41ae9e91a))
+* analysis-manager-kit package implementation ([#393](https://github.com/PrivateAIM/hub/issues/393)) ([d9faf4a](https://github.com/PrivateAIM/hub/commit/d9faf4a4580634a62ed58ec994369be1369e33ee))
+* cleanup component error handling ([e8869ef](https://github.com/PrivateAIM/hub/commit/e8869efddf658f695fb4c0e6cf8b9596306c123a))
+* extract utils and common consts, fns, ... to kit package ([258bbb2](https://github.com/PrivateAIM/hub/commit/258bbb21bfbf671a7cfad3e91740a1737eaf3f71))
+* move service factories/singletons to server-kit-package ([#387](https://github.com/PrivateAIM/hub/issues/387)) ([669d352](https://github.com/PrivateAIM/hub/commit/669d3526893c8bc2d2dd8fe78f423783c5d7e317))
+* queue-router for components & aggregators ([#396](https://github.com/PrivateAIM/hub/issues/396)) ([0da6066](https://github.com/PrivateAIM/hub/commit/0da6066e378cc97ee8d7b98558e5281dda66cbc9))
+* split builder command-exection/event-split ([#412](https://github.com/PrivateAIM/hub/issues/412)) ([13d0d57](https://github.com/PrivateAIM/hub/commit/13d0d575abb45538d79ffef91357e1528c5afb11))
+* split core package in core & core-http-kit ([#422](https://github.com/PrivateAIM/hub/issues/422)) ([666a4fe](https://github.com/PrivateAIM/hub/commit/666a4feda4a5491d6752325bcb93155b84747171))
+
+
+### Bug Fixes
+
+* **deps:** bump amqp-extension from 4.0.0-beta.1 to 4.0.0-beta.2 ([#450](https://github.com/PrivateAIM/hub/issues/450)) ([b65538a](https://github.com/PrivateAIM/hub/commit/b65538ac7e6a0b28ad87b966a01425c8bd86ea3d))
+* **deps:** bump uuid from 9.0.1 to 10.0.0 ([#443](https://github.com/PrivateAIM/hub/issues/443)) ([ee047a2](https://github.com/PrivateAIM/hub/commit/ee047a2f049098570ec737adc80ec289790172e3))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core bumped from ^0.4.0 to ^0.5.0
+    * @privateaim/kit bumped from ^0.4.0 to ^0.5.0
+    * @privateaim/core-http-kit bumped from ^0.4.0 to ^0.5.0
+    * @privateaim/server-kit bumped from ^0.4.0 to ^0.5.0
+    * @privateaim/server-analysis-manager-kit bumped from ^0.4.0 to ^0.5.0
+    * @privateaim/storage-kit bumped from ^0.4.0 to ^0.5.0
+
 ## [0.4.0](https://github.com/PrivateAIM/hub/compare/server-analysis-manager-v0.4.0...server-analysis-manager-v0.4.0) (2024-06-12)
 
 

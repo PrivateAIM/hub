@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.5.0](https://github.com/PrivateAIM/hub/compare/server-realtime-kit-v0.4.0...server-realtime-kit-v0.5.0) (2024-06-12)
+
+
+### Miscellaneous Chores
+
+* **server-realtime-kit:** Synchronize main versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.4.0 to ^0.5.0
+    * @privateaim/core-realtime-kit bumped from ^0.4.0 to ^0.5.0
+    * @privateaim/server-kit bumped from ^0.4.0 to ^0.5.0
+
 ## [0.4.0](https://github.com/PrivateAIM/hub/compare/server-realtime-kit-v0.4.0...server-realtime-kit-v0.4.0) (2024-06-12)
 
 

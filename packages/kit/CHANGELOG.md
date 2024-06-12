@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/PrivateAIM/hub/compare/kit-v0.4.0...kit-v0.5.0) (2024-06-12)
+
+
+### Miscellaneous Chores
+
+* **kit:** Synchronize main versions
+
 ## [0.4.0](https://github.com/PrivateAIM/hub/compare/kit-v0.4.0...kit-v0.4.0) (2024-06-12)
 
 

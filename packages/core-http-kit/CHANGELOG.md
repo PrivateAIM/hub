@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.5.0](https://github.com/PrivateAIM/hub/compare/core-http-kit-v0.4.0...core-http-kit-v0.5.0) (2024-06-12)
+
+
+### Miscellaneous Chores
+
+* **core-http-kit:** Synchronize main versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core bumped from ^0.4.0 to ^0.5.0
+  * peerDependencies
+    * @privateaim/core bumped from ^0.4.0 to ^0.5.0
+
 ## [0.4.0](https://github.com/PrivateAIM/hub/compare/core-http-kit-v0.4.0...core-http-kit-v0.4.0) (2024-06-12)
 
 
