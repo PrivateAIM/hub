@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.4.0](https://github.com/PrivateAIM/hub/compare/server-realtime-v0.4.0...server-realtime-v0.4.0) (2024-06-12)
+
+
+### Features
+
+* initial implementation & usage refactoring ([#426](https://github.com/PrivateAIM/hub/issues/426)) ([85ff83f](https://github.com/PrivateAIM/hub/commit/85ff83f40dc129f7f1e28b41f445f60bb6d6fcfe))
+* initial implementation of server-realtime-kit package ([#380](https://github.com/PrivateAIM/hub/issues/380)) ([3963b66](https://github.com/PrivateAIM/hub/commit/3963b66d27dcb857041eefed824297f35a32d1b6))
+* move service factories/singletons to server-kit-package ([#387](https://github.com/PrivateAIM/hub/issues/387)) ([669d352](https://github.com/PrivateAIM/hub/commit/669d3526893c8bc2d2dd8fe78f423783c5d7e317))
+
 ## [0.4.0](https://github.com/PrivateAIM/hub/compare/server-realtime-v0.3.0...server-realtime-v0.4.0) (2024-05-15)
 
 
