@@ -70,7 +70,7 @@ export class QueueRouter {
 
         return exchange.consume(routing.key, {
             prefetchCount: routing.type === QueueRouterRoutingType.WORK ? 1 : undefined,
-            noAck: routing.type !== QueueRouterRoutingType.WORK,
+            // noAck: routing.type !== QueueRouterRoutingType.WORK,
             requeueOnFailure: routing.type === QueueRouterRoutingType.WORK,
         }, {
             $any: async (input) => {
@@ -87,7 +87,7 @@ export class QueueRouter {
                 let handler : QueueRouterHandler | undefined;
 
                 if (
-                    input.properties.type === 'string' &&
+                    typeof input.properties.type === 'string' &&
                     handlers[input.properties.type]
                 ) {
                     handler = handlers[input.properties.type];
@@ -96,6 +96,11 @@ export class QueueRouter {
                 }
 
                 if (typeof handler !== 'function') {
+                    if (isLoggerUsable()) {
+                        useLogger()
+                            .debug(`No queue handler to consume message ${input.properties.type} in ${routing.key}`);
+                    }
+
                     return;
                 }
 

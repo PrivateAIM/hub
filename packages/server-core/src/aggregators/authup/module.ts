@@ -11,7 +11,6 @@ import type { Aggregator } from '@privateaim/server-kit';
 import { EnvironmentName, useEnv } from '../../config';
 import {
     handleAuthupRealmEvent,
-    handleAuthupRobotEvent,
     handleAuthupUserEvent,
 } from './entities';
 
@@ -39,7 +38,7 @@ export function createAuthupAggregator() : Aggregator {
                         break;
                     }
                     case DomainType.ROBOT: {
-                        await handleAuthupRobotEvent(event);
+                        // await handleAuthupRobotEvent(event);
                         break;
                     }
                     case DomainType.USER: {
