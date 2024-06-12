@@ -1,4 +1,7 @@
 version: '3.9'
+volumes:
+    mysql:
+        driver: local
 services:
     mysql:
         image: mysql:latest
@@ -12,6 +15,8 @@ services:
         environment:
             MYSQL_ROOT_HOST: "%"
             MYSQL_ROOT_PASSWORD: start123
+        volumes:
+            -  mysql:/var/lib/mysql
         networks:
             hub:
     redis:
