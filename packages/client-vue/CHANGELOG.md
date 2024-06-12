@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.5.0](https://github.com/PrivateAIM/hub/compare/client-vue-v0.4.0...client-vue-v0.5.0) (2024-06-12)
+
+
+### Features
+
+* analysis-bucket implementation  ([#433](https://github.com/PrivateAIM/hub/issues/433)) ([15329f4](https://github.com/PrivateAIM/hub/commit/15329f42c5f6ebbe4772715ff2e308e41ae9e91a))
+* extract utils and common consts, fns, ... to kit package ([258bbb2](https://github.com/PrivateAIM/hub/commit/258bbb21bfbf671a7cfad3e91740a1737eaf3f71))
+* initial implementation & usage refactoring ([#426](https://github.com/PrivateAIM/hub/issues/426)) ([85ff83f](https://github.com/PrivateAIM/hub/commit/85ff83f40dc129f7f1e28b41f445f60bb6d6fcfe))
+* split core package in core & core-http-kit ([#422](https://github.com/PrivateAIM/hub/issues/422)) ([666a4fe](https://github.com/PrivateAIM/hub/commit/666a4feda4a5491d6752325bcb93155b84747171))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core bumped from ^0.4.0 to ^0.5.0
+    * @privateaim/kit bumped from ^0.4.0 to ^0.5.0
+    * @privateaim/core-http-kit bumped from ^0.4.0 to ^0.5.0
+    * @privateaim/storage-kit bumped from ^0.4.0 to ^0.5.0
+  * peerDependencies
+    * @privateaim/core bumped from ^0.4.0 to ^0.5.0
+    * @privateaim/storage-kit bumped from ^0.4.0 to ^0.5.0
+
 ## [0.4.0](https://github.com/PrivateAIM/hub/compare/client-vue-v0.4.0...client-vue-v0.4.0) (2024-06-12)
 
 

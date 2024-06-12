@@ -1,6 +1,6 @@
 {
     "name": "@privateaim/server-kit",
-    "version": "0.4.0",
+    "version": "0.5.0",
     "private": true,
     "exports": {
         "./package.json": "./package.json",
@@ -27,8 +27,8 @@
     },
     "dependencies": {
         "@ebec/http": "^2.3.0",
-        "@privateaim/core": "^0.4.0",
-        "@privateaim/kit": "^0.4.0",
+        "@privateaim/core": "^0.5.0",
+        "@privateaim/kit": "^0.5.0",
         "@socket.io/redis-emitter": "^5.1.0",
         "envix": "^1.5.0",
         "hapic": "^2.5.1",

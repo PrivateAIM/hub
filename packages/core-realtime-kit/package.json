@@ -1,6 +1,6 @@
 {
     "name": "@privateaim/core-realtime-kit",
-    "version": "0.4.0",
+    "version": "0.5.0",
     "license": "Apache-2.0",
     "description": "",
     "exports": {
@@ -26,10 +26,10 @@
         "build-watch": "rimraf ./dist && tsc -p tsconfig.build.json --watch"
     },
     "devDependencies": {
-        "@privateaim/core": "^0.4.0"
+        "@privateaim/core": "^0.5.0"
     },
     "peerDependencies": {
-        "@privateaim/core": "^0.4.0"
+        "@privateaim/core": "^0.5.0"
     },
     "publishConfig": {
         "access": "public"
