@@ -21,7 +21,7 @@
         "@authup/client-web-kit": "^1.0.0-beta.15",
         "@authup/core-http-kit": "^1.0.0-beta.13",
         "@authup/core-kit": "^1.0.0-beta.13",
-        "@bootstrap-vue-next/nuxt": "^0.20.0",
+        "@bootstrap-vue-next/nuxt": "^0.21.2",
         "@fortawesome/fontawesome-free": "^6.5.2",
         "@nuxtjs/google-fonts": "^3.2.0",
         "@privateaim/client-vue": "^0.4.0",
