@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.4.0](https://github.com/PrivateAIM/hub/compare/client-ui-v0.4.0...client-ui-v0.4.0) (2024-06-12)
+
+
+### Features
+
+* analysis-bucket implementation  ([#433](https://github.com/PrivateAIM/hub/issues/433)) ([15329f4](https://github.com/PrivateAIM/hub/commit/15329f42c5f6ebbe4772715ff2e308e41ae9e91a))
+* extract utils and common consts, fns, ... to kit package ([258bbb2](https://github.com/PrivateAIM/hub/commit/258bbb21bfbf671a7cfad3e91740a1737eaf3f71))
+
+
+### Bug Fixes
+
+* minor fix in auth middleware ([f6dc1cd](https://github.com/PrivateAIM/hub/commit/f6dc1cd7bcff4cf01aa8c8adda0a8391da29c3b3))
+
 ## [0.4.0](https://github.com/PrivateAIM/hub/compare/client-ui-v0.3.0...client-ui-v0.4.0) (2024-05-15)
 
 
