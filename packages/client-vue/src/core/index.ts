@@ -15,5 +15,6 @@ export * from './busy';
 export * from './object';
 export * from './slot';
 export * from './socket';
+export * from './translator';
 export * from './http-client';
 export * from './vuelidate';

@@ -50,6 +50,8 @@ export default defineComponent({
             },
         }, form);
 
+        const translationsValidation = useTranslationsForNestedValidations(vuelidate.value);
+
         const manager = createEntityManager({
             type: `${DomainType.REGISTRY_PROJECT}`,
             setup,
@@ -102,8 +104,6 @@ export default defineComponent({
                 ],
             );
         }
-
-        const translationsValidation = useTranslationsForNestedValidations(vuelidate.value);
 
         return () => {
             const fallback = () : VNodeChild => h('div', [

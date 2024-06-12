@@ -13,5 +13,7 @@ export type Options = {
     realtimeURL: string,
 
     components?: boolean | string[],
-    storeManager?: StoreManagerOptions
+    storeManager?: StoreManagerOptions,
+
+    translatorLocale?: string,
 };

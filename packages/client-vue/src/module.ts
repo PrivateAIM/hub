@@ -12,6 +12,7 @@ import {
     installCoreHTTPClient,
     installSocketManager,
     installStorageHTTPClient,
+    installTranslator,
 } from './core';
 import type { Options } from './type';
 
@@ -26,6 +27,10 @@ export function install(app: App, options: Options): void {
 
     installSocketManager(app, {
         baseURL: options.realtimeURL,
+    });
+
+    installTranslator(app, {
+        locale: options.translatorLocale,
     });
 
     const storeManager = installStoreManager(app);

@@ -43,6 +43,8 @@ export default defineComponent({
 
         const translationsValidation = useTranslationsForNestedValidations($v.value);
 
+        const translationsSubmit = createFormSubmitTranslations();
+
         return () => h(ARobot, {
             onResolved(entity) {
                 if (entity) {
@@ -95,8 +97,6 @@ export default defineComponent({
                         },
                     }),
                 });
-
-                const translationsSubmit = createFormSubmitTranslations();
 
                 const submitNode = buildFormSubmitWithTranslations({
                     submit: () => slotProps.update(form),
