@@ -8,7 +8,7 @@
 import { TranslatorTranslationDefaultKey, TranslatorTranslationGroup, useTranslation } from '@authup/client-web-kit';
 import type { DomainAPISlim } from '@authup/core-http-kit';
 import type { DomainType } from '@privateaim/core';
-import { hasOwnProperty, isObject } from '@privateaim/kit';
+import { isObject } from '@privateaim/kit';
 import type {
     Component,
     PropType,
@@ -68,17 +68,12 @@ export default defineComponent({
         const submit = async () => {
             if (busy.value) return;
 
-            let domainAPI : DomainAPISlim<any> | undefined;
-
-            if (
-                hasOwnProperty(apiClient, props.entityType) &&
-                isObject(apiClient[props.entityType]) &&
-                hasOwnProperty(apiClient[props.entityType], 'delete')
-            ) {
-                domainAPI = apiClient[props.entityType] as DomainAPISlim<any>;
+            const domainAPI = (apiClient as Record<string, any>)[props.entityType] as DomainAPISlim<any> | undefined;
+            if (!isObject(domainAPI)) {
+                return;
             }
 
-            if (!domainAPI) {
+            if (typeof domainAPI.delete !== 'function') {
                 return;
             }
 
