@@ -9,7 +9,7 @@ import type { RequestBaseOptions } from 'hapic';
 import { Client as BaseClient, HookName, isClientError } from 'hapic';
 import {
     AnalysisAPI,
-    AnalysisFileAPI,
+    AnalysisBucketFileAPI,
     AnalysisLogAPI,
     MasterImageAPI,
     MasterImageGroupAPI,
@@ -42,7 +42,7 @@ export class Client extends BaseClient {
 
     public readonly analysisBucket : AnalysisBucketAPI;
 
-    public readonly analysisBucketFile : AnalysisFileAPI;
+    public readonly analysisBucketFile : AnalysisBucketFileAPI;
 
     public readonly analysisLog: AnalysisLogAPI;
 
@@ -62,7 +62,7 @@ export class Client extends BaseClient {
         this.node = new NodeAPI({ client: this });
         this.analysis = new AnalysisAPI({ client: this });
         this.analysisBucket = new AnalysisBucketAPI({ client: this });
-        this.analysisBucketFile = new AnalysisFileAPI({ client: this });
+        this.analysisBucketFile = new AnalysisBucketFileAPI({ client: this });
         this.analysisLog = new AnalysisLogAPI({ client: this });
         this.analysisNode = new TrainStationAPI({ client: this });
         this.service = new ServiceAPI({ client: this });

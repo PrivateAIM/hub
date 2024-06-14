@@ -12,11 +12,11 @@ import { nullifyEmptyObjectProperties } from '../../utils';
 import { BaseAPI } from '../base';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
 
-export class AnalysisFileAPI extends BaseAPI {
+export class AnalysisBucketFileAPI extends BaseAPI {
     async getMany(
         options?: BuildInput<AnalysisBucketFile>,
     ): Promise<CollectionResourceResponse<AnalysisBucketFile>> {
-        const response = await this.client.get(`analysis-files${buildQuery(options)}`);
+        const response = await this.client.get(`analysis-bucket-files${buildQuery(options)}`);
 
         return response.data;
     }
@@ -24,7 +24,7 @@ export class AnalysisFileAPI extends BaseAPI {
     async getOne(
         id: AnalysisBucketFile['id'],
     ): Promise<SingleResourceResponse<AnalysisBucketFile>> {
-        const response = await this.client.get(`analysis-files/${id}`);
+        const response = await this.client.get(`analysis-bucket-files/${id}`);
 
         return response.data;
     }
@@ -32,19 +32,19 @@ export class AnalysisFileAPI extends BaseAPI {
     async delete(
         id: AnalysisBucketFile['id'],
     ): Promise<SingleResourceResponse<AnalysisBucketFile>> {
-        const response = await this.client.delete(`analysis-files/${id}`);
+        const response = await this.client.delete(`analysis-bucket-files/${id}`);
 
         return response.data;
     }
 
     async update(id: AnalysisBucketFile['id'], data: Partial<AnalysisBucketFile>): Promise<SingleResourceResponse<AnalysisBucketFile>> {
-        const { data: response } = await this.client.post(`analysis-files/${id}`, nullifyEmptyObjectProperties(data));
+        const { data: response } = await this.client.post(`analysis-bucket-files/${id}`, nullifyEmptyObjectProperties(data));
 
         return response;
     }
 
     async create(data: Partial<AnalysisBucketFile>): Promise<SingleResourceResponse<AnalysisBucketFile>> {
-        const { data: response } = await this.client.post('analysis-files', nullifyEmptyObjectProperties(data));
+        const { data: response } = await this.client.post('analysis-bucket-files', nullifyEmptyObjectProperties(data));
 
         return response;
     }
