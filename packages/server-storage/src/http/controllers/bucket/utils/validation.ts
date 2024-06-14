@@ -20,13 +20,13 @@ export async function runBucketValidation(
     if (operation === 'create') {
         const nameChain = check('name')
             .exists()
-            .isLength({ min: 5, max: 256 });
+            .isLength({ min: 3, max: 256 });
 
         await nameChain.run(req);
 
         const regionChain = check('region')
             .exists()
-            .isLength({ min: 5, max: 256 })
+            .isLength({ min: 3, max: 256 })
             .optional();
 
         await regionChain.run(req);

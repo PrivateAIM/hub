@@ -5,14 +5,21 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import path from 'node:path';
+import process from 'node:process';
 import {
     configureAuthup,
     configureMinio,
     configureRedis,
     configureVault,
+    setupLogger,
 } from './services';
 
 export function configure() {
+    setupLogger({
+        directory: path.join(process.cwd(), 'writable'),
+    });
+
     configureRedis();
     configureMinio();
     configureAuthup();

@@ -65,7 +65,7 @@ export async function executeBucketRouteStreamHandler(req: Request, res: Respons
     const repository = dataSource.getRepository(BucketEntity);
     const query = repository.createQueryBuilder('bucket');
     if (isUUID(id)) {
-        query.where('bucket.id LIKE :id', { id });
+        query.where('bucket.id = :id', { id });
     } else {
         query.where('bucket.name LIKE :name', { name: id });
     }
