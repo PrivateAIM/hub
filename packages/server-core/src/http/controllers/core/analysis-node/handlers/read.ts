@@ -52,8 +52,8 @@ export async function getManyAnalysisNodeRouteHandler(req: Request, res: Respons
     query.distinctOn(['analysisNode.id']);
 
     onlyRealmWritableQueryResources(query, useRequestEnv(req, 'realm'), [
-        'analysisNode.train_realm_id',
-        'analysisNode.station_realm_id',
+        'analysisNode.analysis_realm_id',
+        'analysisNode.node_realm_id',
     ]);
 
     const { pagination } = applyQuery(query, useRequestQuery(req), {
