@@ -12,8 +12,7 @@ import {
 } from 'vue';
 import FProjectNodes from '../../project-node/FProjectNodes';
 import FMasterImagePicker from '../../master-image/FMasterImagePicker';
-import FAnalysisNodes from '../../analysis-node/FAnalysisNodes';
-import FAnalysisNodeAssignAction from '../../analysis-node/FAnalysisNodeAssignAction';
+import { FAnalysisNodeAssignAction, FAnalysisNodes } from '../../analysis-node';
 import { injectCoreHTTPClient } from '../../../core';
 import { FPagination, FSearch } from '../../utility';
 
@@ -127,6 +126,7 @@ export default defineComponent({
 
                         <template #itemActions="props">
                             <FAnalysisNodeAssignAction
+                                :key="props.data.node_id"
                                 :node-id="props.data.node_id"
                                 :analysis-id="entity.id"
                                 :realm-id="entity.realm_id"

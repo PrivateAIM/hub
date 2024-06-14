@@ -37,7 +37,7 @@ import {
 } from '../../core';
 import MasterImagePicker from '../master-image/FMasterImagePicker';
 import FNodes from '../node/FNodes';
-import FProjectNodeAssignAction from '../project-node/FProjectNodeAssignAction';
+import { FProjectNodeAssignAction } from '../project-node';
 import { FSearch } from '../utility';
 
 const FProjectForm = defineComponent({
@@ -175,6 +175,7 @@ const FProjectForm = defineComponent({
                     [EntityListSlotName.ITEM_ACTIONS]: (props: ListItemSlotProps<Node>) => {
                         if (manager.data.value) {
                             return h(FProjectNodeAssignAction, {
+                                key: props.data.id,
                                 nodeId: props.data.id,
                                 projectId: manager.data.value.id,
                                 realmId: manager.data.value.id,
