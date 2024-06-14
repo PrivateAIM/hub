@@ -28,16 +28,16 @@ async function publishEvent(
     await publishDomainEvent(
         useRedisPublishClient(),
         {
-            type: DomainType.ANALYSIS_FILE,
+            type: DomainType.ANALYSIS_BUCKET_FILE,
             event,
             data,
         },
         [
             {
-                channel: (id) => buildDomainChannelName(DomainType.ANALYSIS_FILE, id),
+                channel: (id) => buildDomainChannelName(DomainType.ANALYSIS_BUCKET_FILE, id),
             },
             {
-                channel: (id) => buildDomainChannelName(DomainType.ANALYSIS_FILE, id),
+                channel: (id) => buildDomainChannelName(DomainType.ANALYSIS_BUCKET_FILE, id),
                 namespace: buildDomainNamespaceName(data.realm_id),
             },
         ],

@@ -54,7 +54,7 @@ export type DomainEventContext<T extends `${DomainType}` | `${DomainSubType}`> =
                                         AnalysisBucketEventContext :
                                         T extends `${DomainType.ANALYSIS_LOG}` ?
                                             AnalysisLogEventContext :
-                                            T extends `${DomainType.ANALYSIS_FILE}` ?
+                                            T extends `${DomainType.ANALYSIS_BUCKET_FILE}` ?
                                                 AnalysisFileEventContext :
                                                 T extends `${DomainType.ANALYSIS_NODE}` | `${DomainSubType.ANALYSIS_NODE_IN}` | `${DomainSubType.ANALYSIS_NODE_OUT}` ?
                                                     TrainStationEventContext :
@@ -81,7 +81,7 @@ export type DomainEntity<T extends `${DomainType}` | `${DomainSubType}`> =
                                         AnalysisBucket :
                                         T extends `${DomainType.ANALYSIS_LOG}` ?
                                             AnalysisLog :
-                                            T extends `${DomainType.ANALYSIS_FILE}` ?
+                                            T extends `${DomainType.ANALYSIS_BUCKET_FILE}` ?
                                                 AnalysisBucketFile :
                                                 T extends `${DomainType.ANALYSIS_NODE}` | `${DomainSubType.ANALYSIS_NODE_IN}` | `${DomainSubType.ANALYSIS_NODE_OUT}` ?
                                                     AnalysisNode :

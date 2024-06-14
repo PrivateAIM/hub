@@ -7,7 +7,7 @@
 
 import { install } from '@authup/client-web-kit';
 import type { Pinia } from 'pinia';
-import { useCookie } from '#imports';
+import { tryUseNuxtApp, useCookie } from '#imports';
 
 export default defineNuxtPlugin({
     setup(ctx) {
@@ -18,16 +18,27 @@ export default defineNuxtPlugin({
             pinia: ctx.$pinia as Pinia,
             baseURL,
             cookieSet: (key, value) => {
-                const cookie = useCookie(key);
-                cookie.value = value;
+                const app = tryUseNuxtApp();
+                if (app) {
+                    const cookie = useCookie(key);
+                    cookie.value = value;
+                }
             },
             cookieUnset: (key) => {
-                const cookie = useCookie(key);
-                cookie.value = null;
+                const app = tryUseNuxtApp();
+                if (app) {
+                    const cookie = useCookie(key);
+                    cookie.value = null;
+                }
             },
             cookieGet: (key) => {
-                const cookie = useCookie(key);
-                return cookie.value;
+                const app = tryUseNuxtApp();
+                if (app) {
+                    const cookie = useCookie(key);
+                    return cookie.value;
+                }
+
+                return null;
             },
         });
     },

@@ -40,7 +40,7 @@ export default defineComponent({
     },
     setup(props, setup) {
         const manager = createEntityManager({
-            type: `${DomainType.ANALYSIS_FILE}`,
+            type: `${DomainType.ANALYSIS_BUCKET_FILE}`,
             props,
             setup,
         });

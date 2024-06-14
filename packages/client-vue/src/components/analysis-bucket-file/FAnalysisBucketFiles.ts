@@ -30,7 +30,7 @@ const FAnalysisBucketFiles = defineComponent({
             render,
             setDefaults,
         } = createList({
-            type: `${DomainType.ANALYSIS_FILE}`,
+            type: `${DomainType.ANALYSIS_BUCKET_FILE}`,
             props,
             setup,
         });

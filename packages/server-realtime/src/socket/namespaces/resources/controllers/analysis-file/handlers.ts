@@ -28,7 +28,7 @@ export function registerAnalysisFileSocketHandlers(socket: ResourcesNamespaceSoc
     if (!socket.data.userId && !socket.data.robotId) return;
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainType.ANALYSIS_FILE, DomainEventSubscriptionName.SUBSCRIBE),
+        buildDomainEventSubscriptionFullName(DomainType.ANALYSIS_BUCKET_FILE, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             if (!socket.data.abilities.has(PermissionID.ANALYSIS_EDIT)) {
                 if (isEventCallback(cb)) {
@@ -38,7 +38,7 @@ export function registerAnalysisFileSocketHandlers(socket: ResourcesNamespaceSoc
                 return;
             }
 
-            subscribeSocketRoom(socket, buildDomainChannelName(DomainType.ANALYSIS_FILE, target));
+            subscribeSocketRoom(socket, buildDomainChannelName(DomainType.ANALYSIS_BUCKET_FILE, target));
 
             if (isEventCallback(cb)) {
                 cb(null);
@@ -47,9 +47,9 @@ export function registerAnalysisFileSocketHandlers(socket: ResourcesNamespaceSoc
     );
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainType.ANALYSIS_FILE, DomainEventSubscriptionName.UNSUBSCRIBE),
+        buildDomainEventSubscriptionFullName(DomainType.ANALYSIS_BUCKET_FILE, DomainEventSubscriptionName.UNSUBSCRIBE),
         (target) => {
-            unsubscribeSocketRoom(socket, buildDomainChannelName(DomainType.ANALYSIS_FILE, target));
+            unsubscribeSocketRoom(socket, buildDomainChannelName(DomainType.ANALYSIS_BUCKET_FILE, target));
         },
     );
 }

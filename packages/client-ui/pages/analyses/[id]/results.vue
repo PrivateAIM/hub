@@ -40,7 +40,6 @@ export default defineNuxtComponent({
         <FAnalysisBucket :query="query">
             <template #default="{ data: bucket }">
                 <FAnalysisBucketFiles
-                    v-if="entity"
                     :query="{ filters: { bucket_id: bucket.id } }"
                 >
                     <template #itemActions="{ data }">

@@ -50,6 +50,6 @@ export interface AnalysisBucketFile {
 }
 
 export type AnalysisFileEventContext = DomainEventBaseContext & {
-    type: `${DomainType.ANALYSIS_FILE}`,
+    type: `${DomainType.ANALYSIS_BUCKET_FILE}`,
     data: AnalysisBucketFile
 };

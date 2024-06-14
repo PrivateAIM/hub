@@ -16,7 +16,7 @@ export enum DomainType {
     SERVICE = 'service',
     ANALYSIS = 'analysis',
     ANALYSIS_BUCKET = 'analysisBucket',
-    ANALYSIS_FILE = 'analysisFile',
+    ANALYSIS_BUCKET_FILE = 'analysisBucketFile',
     ANALYSIS_LOG = 'analysisLog',
     ANALYSIS_NODE = 'analysisNode',
 }
