@@ -17,7 +17,7 @@ import {
     BucketFileEntity,
     getActorFromRequest,
     isBucketFileOwnedByActor,
-    isBucketOwnedByActor,
+    isBucketOwnedByActor, toBucketName,
 } from '../../../../domains';
 
 export async function executeBucketFileRouteDeleteHandler(req: Request, res: Response) : Promise<any> {
@@ -52,7 +52,7 @@ export async function executeBucketFileRouteDeleteHandler(req: Request, res: Res
     }
 
     const minio = useMinio();
-    await minio.removeObject(entity.bucket.name, entity.hash);
+    await minio.removeObject(toBucketName(entity.bucket.id), entity.hash);
 
     const { id: entityId } = entity;
 

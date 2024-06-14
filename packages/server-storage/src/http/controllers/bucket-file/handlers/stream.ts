@@ -11,7 +11,7 @@ import { useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useMinio } from '../../../../core';
 import {
-    BucketFileEntity,
+    BucketFileEntity, toBucketName,
 } from '../../../../domains';
 
 export async function executeBucketFileRouteStreamHandler(req: Request, res: Response) : Promise<any> {
@@ -38,7 +38,7 @@ export async function executeBucketFileRouteStreamHandler(req: Request, res: Res
     // setResponseHeaderAttachment(res, entity.path);
 
     const minio = useMinio();
-    const stream = await minio.getObject(entity.bucket.name, entity.hash);
+    const stream = await minio.getObject(toBucketName(entity.bucket.id), entity.hash);
 
     stream.pipe(res);
 }

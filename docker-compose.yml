@@ -2,6 +2,8 @@ version: '3.9'
 volumes:
     mysql:
         driver: local
+    minio:
+        driver: local
 services:
     mysql:
         image: mysql:latest
@@ -58,6 +60,8 @@ services:
         environment:
             RABBITMQ_DEFAULT_USER: root
             RABBITMQ_DEFAULT_PASS: start123
+        volumes:
+            -  minio:/data
         networks:
             hub:
     vault:

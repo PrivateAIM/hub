@@ -14,7 +14,9 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '@privateaim/server-http-kit';
 import { useMinio } from '../../../../core';
-import { BucketEntity, getActorFromRequest, isBucketOwnedByActor } from '../../../../domains';
+import {
+    BucketEntity, getActorFromRequest, isBucketOwnedByActor, toBucketName,
+} from '../../../../domains';
 
 export async function executeBucketRouteDeleteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -45,10 +47,10 @@ export async function executeBucketRouteDeleteHandler(req: Request, res: Respons
         }
     }
 
-    const { id: entityId, name: entityName } = entity;
+    const { id: entityId } = entity;
 
     const minio = useMinio();
-    await minio.removeBucket(entityName);
+    await minio.removeBucket(toBucketName(entityId));
 
     await repository.remove(entity);
 

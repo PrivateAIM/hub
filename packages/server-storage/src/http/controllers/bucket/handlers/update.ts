@@ -14,7 +14,9 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '@privateaim/server-http-kit';
 import { useMinio } from '../../../../core';
-import { BucketEntity, getActorFromRequest, isBucketOwnedByActor } from '../../../../domains';
+import {
+    BucketEntity, getActorFromRequest, isBucketOwnedByActor, toBucketName,
+} from '../../../../domains';
 import { runBucketValidation } from '../utils/validation';
 
 export async function executeBucketRouteUpdateHandler(req: Request, res: Response) : Promise<any> {
@@ -55,12 +57,12 @@ export async function executeBucketRouteUpdateHandler(req: Request, res: Respons
     await repository.save(entity);
 
     const minio = useMinio();
-    const hasBucket = await minio.bucketExists(entity.name);
+    const hasBucket = await minio.bucketExists(entity.id);
     if (!hasBucket) {
         if (entity.region) {
-            await minio.makeBucket(entity.name, entity.region);
+            await minio.makeBucket(toBucketName(entity.id), entity.region);
         } else {
-            await minio.makeBucket(entity.name);
+            await minio.makeBucket(toBucketName(entity.id));
         }
     }
 

@@ -14,7 +14,9 @@ import type { Request, Response } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '@privateaim/server-http-kit';
 import { streamToBuffer, useMinio } from '../../../../core';
-import { BucketEntity, BucketFileEntity, getActorFromRequest } from '../../../../domains';
+import {
+    BucketEntity, BucketFileEntity, getActorFromRequest, toBucketName,
+} from '../../../../domains';
 
 export async function uploadRequestFiles(req: Request, bucketName: string) {
     const minio = useMinio();
@@ -104,7 +106,7 @@ export async function executeBucketRouteUploadHandler(req: Request, res: Respons
         throw new NotFoundError();
     }
 
-    let files = await uploadRequestFiles(req, entity.name);
+    let files = await uploadRequestFiles(req, toBucketName(entity.id));
 
     if (files.length > 0) {
         files = files.map((file) => ({

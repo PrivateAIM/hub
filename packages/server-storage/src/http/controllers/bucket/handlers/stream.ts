@@ -14,7 +14,7 @@ import tar from 'tar-stream';
 import { useDataSource } from 'typeorm-extension';
 import { streamToBuffer, useMinio } from '../../../../core';
 import {
-    BucketEntity, BucketFileEntity,
+    BucketEntity, BucketFileEntity, toBucketName,
 } from '../../../../domains';
 
 async function packFile(
@@ -87,7 +87,7 @@ export async function executeBucketRouteStreamHandler(req: Request, res: Respons
     const pack = tar.pack();
     pack.pipe(res);
 
-    await packFiles(pack, entity.name, files);
+    await packFiles(pack, toBucketName(entity.id), files);
 
     pack.finalize();
 }
