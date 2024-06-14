@@ -56,7 +56,7 @@ export async function getManyProjectNodeRouteHandler(req: Request, res: Response
     query.distinctOn(['analysisNode.id']);
 
     onlyRealmWritableQueryResources(query, useRequestEnv(req, 'realm'), [
-        'analysisNode.station_realm_id',
+        'analysisNode.node_realm_id',
         'analysisNode.project_realm_id',
     ]);
 
