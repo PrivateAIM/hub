@@ -36,15 +36,6 @@ export async function runNodeValidation(
 
     // -------------------------------------------------------------
 
-    await check('email')
-        .isLength({ min: 5, max: 256 })
-        .exists()
-        .isEmail()
-        .optional({ nullable: true })
-        .run(req);
-
-    // -------------------------------------------------------------
-
     await check('type')
         .isIn(Object.values(NodeType))
         .optional()

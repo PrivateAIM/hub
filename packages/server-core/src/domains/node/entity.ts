@@ -37,11 +37,6 @@ export class NodeEntity implements Node {
     @Column({ type: 'varchar', length: 128 })
         name: string;
 
-    @Column({
-        type: 'varchar', length: 256, nullable: true, select: false,
-    })
-        email: string | null;
-
     @Column({ type: 'boolean', default: false })
         hidden: boolean;
 

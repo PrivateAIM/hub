@@ -58,7 +58,6 @@ export default defineComponent({
         const form = reactive({
             name: '',
             external_name: '',
-            email: '',
             realm_id: '',
             registry_id: '',
             hidden: false,
@@ -84,11 +83,6 @@ export default defineComponent({
                 alphaNumHyphenUnderscore: helpers.regex(alphaNumHyphenUnderscoreRegex),
                 minLength: minLength(3),
                 maxLength: maxLength(64),
-            },
-            email: {
-                minLength: minLength(10),
-                maxLength: maxLength(256),
-                email,
             },
             type: {
                 required,
@@ -219,19 +213,6 @@ export default defineComponent({
                 }),
             });
 
-            const emailNode = buildFormGroup({
-                validationMessages: translationsValidation.email.value,
-                validationSeverity: getSeverity($v.value.email),
-                label: true,
-                labelContent: 'E-Mail',
-                content: buildFormInput({
-                    value: form.email,
-                    onChange(input) {
-                        form.email = input;
-                    },
-                }),
-            });
-
             const hidden = buildFormGroup({
                 validationMessages: translationsValidation.hidden.value,
                 validationSeverity: getSeverity($v.value.hidden),
@@ -302,8 +283,6 @@ export default defineComponent({
                         type,
                         h('hr'),
                         hidden,
-                        h('hr'),
-                        emailNode,
                         h('hr'),
                         submitNode,
                     ]),

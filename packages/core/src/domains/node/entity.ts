@@ -19,8 +19,6 @@ export interface Node {
 
     name: string;
 
-    email: string | null;
-
     hidden: boolean;
 
     type: `${NodeType}`;
