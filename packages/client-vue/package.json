@@ -54,7 +54,7 @@
         "@privateaim/storage-kit": "^0.5.0",
         "@types/node": "^20.12.7",
         "@vitejs/plugin-vue": "^5.0.4",
-        "@vuecs/form-controls": "^2.2.0",
+        "@vuecs/form-controls": "^2.3.0",
         "@vuecs/link": "^1.0.0",
         "@vuecs/list-controls": "^1.1.1",
         "@vuecs/pagination": "^1.1.1",
