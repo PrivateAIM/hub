@@ -19,7 +19,7 @@ import {
 import type { ListBodySlotProps, ListItemSlotProps } from '@vuecs/list-controls';
 import useVuelidate from '@vuelidate/core';
 import {
-    email, helpers, maxLength, minLength, required,
+    helpers, maxLength, minLength, required,
 } from '@vuelidate/validators';
 import type {
     PropType, VNodeArrayChildren,
