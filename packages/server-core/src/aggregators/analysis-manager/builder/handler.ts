@@ -17,7 +17,7 @@ import type {
 import {
 
     AnalysisBuildStatus,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import { isComponentError } from '@privateaim/server-kit';
 import { useDataSource } from 'typeorm-extension';
 import type { AnalysisLogSaveContext } from '../../../domains';

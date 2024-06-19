@@ -6,10 +6,10 @@
  */
 import type {
     Project,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import {
     DomainType,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import type { SlotsType } from 'vue';
 import { defineComponent } from 'vue';
 import type { ListSlotsType } from '../../core';

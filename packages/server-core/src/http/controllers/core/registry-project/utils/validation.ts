@@ -6,7 +6,7 @@
  */
 
 import { check } from 'express-validator';
-import { RegistryProjectType } from '@privateaim/core';
+import { RegistryProjectType } from '@privateaim/core-kit';
 import type { Request } from 'routup';
 import type { HTTPValidationResult } from '@privateaim/server-http-kit';
 import {

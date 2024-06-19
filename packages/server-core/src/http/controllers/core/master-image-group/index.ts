@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { MasterImageGroup } from '@privateaim/core';
+import type { MasterImageGroup } from '@privateaim/core-kit';
 
 import {
     DController, DDelete, DGet, DPath, DRequest, DResponse, DTags,

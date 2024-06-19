@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import { VCTimeago } from '@vuecs/timeago';
-import type { AnalysisLog } from '@privateaim/core';
+import type { AnalysisLog } from '@privateaim/core-kit';
 import { defineComponent, h, toRefs } from 'vue';
 import type {
     PropType, VNode, VNodeArrayChildren,

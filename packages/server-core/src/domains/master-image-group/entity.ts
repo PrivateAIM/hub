@@ -12,7 +12,7 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-import type { MasterImageGroup } from '@privateaim/core';
+import type { MasterImageGroup } from '@privateaim/core-kit';
 
 @Entity({ name: 'master_image_groups' })
 export class MasterImageGroupEntity implements MasterImageGroup {

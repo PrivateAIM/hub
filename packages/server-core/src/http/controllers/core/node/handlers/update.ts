@@ -7,7 +7,7 @@
 
 import {
     PermissionID, RegistryProjectType,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import { createNanoID } from '@privateaim/kit';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/core-kit';

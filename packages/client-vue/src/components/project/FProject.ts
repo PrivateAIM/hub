@@ -7,10 +7,10 @@
 
 import {
     DomainType,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import type {
     Project,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import type { SlotsType } from 'vue';
 import {
     defineComponent,

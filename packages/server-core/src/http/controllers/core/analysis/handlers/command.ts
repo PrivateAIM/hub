@@ -7,7 +7,7 @@
 
 import { isRealmResourceWritable } from '@authup/core-kit';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
-import { AnalysisAPICommand } from '@privateaim/core';
+import { AnalysisAPICommand } from '@privateaim/core-kit';
 import { HTTPValidationError, useRequestEnv } from '@privateaim/server-http-kit';
 import { check, matchedData, validationResult } from 'express-validator';
 import type { Request, Response } from 'routup';

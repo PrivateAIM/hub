@@ -9,7 +9,7 @@ import { FAnalysisBucket, FAnalysisBucketFileDownload, FAnalysisBucketFiles } fr
 import { computed } from 'vue';
 import type { BuildInput } from 'rapiq';
 import type { PropType } from 'vue';
-import { type Analysis, type AnalysisBucket, AnalysisBucketType } from '@privateaim/core';
+import { type Analysis, type AnalysisBucket, AnalysisBucketType } from '@privateaim/core-kit';
 import { defineNuxtComponent } from '#app';
 
 export default defineNuxtComponent({

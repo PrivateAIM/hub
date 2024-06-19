@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { RegistryAPICommand } from '@privateaim/core';
-import { ServiceID } from '@privateaim/core';
+import type { RegistryAPICommand } from '@privateaim/core-kit';
+import { ServiceID } from '@privateaim/core-kit';
 import {
     DBody, DController, DPost, DRequest, DResponse, DTags,
 } from '@routup/decorators';

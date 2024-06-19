@@ -7,7 +7,7 @@
 import { BadRequestError } from '@ebec/http';
 import {
     AnalysisBucketType, AnalysisBuildStatus, AnalysisRunStatus,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';

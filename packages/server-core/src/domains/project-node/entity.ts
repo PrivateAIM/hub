@@ -11,7 +11,7 @@ import {
 } from 'typeorm';
 import type {
     Node, Project, ProjectNode, ProjectNodeApprovalStatus,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import type { Realm } from '@authup/core-kit';
 import { ProjectEntity } from '../project/entity';
 import { NodeEntity } from '../node/entity';

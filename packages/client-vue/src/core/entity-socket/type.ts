@@ -11,7 +11,7 @@ import type {
     DomainEventContext,
     DomainEventSubscriptionFullName,
     DomainType,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import type {
     STCEventContext,
 } from '@privateaim/core-realtime-kit';

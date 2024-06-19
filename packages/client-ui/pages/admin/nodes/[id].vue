@@ -8,10 +8,10 @@
 import { createEntityManager } from '@privateaim/client-vue';
 import type {
     Node,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import {
     DomainType,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import {
     useRoute,
     useToast,

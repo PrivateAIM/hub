@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { AnalysisBucketType } from '@privateaim/core';
+import { AnalysisBucketType } from '@privateaim/core-kit';
 import { check } from 'express-validator';
 import type { Request } from 'routup';
 import type { HTTPValidationResult } from '@privateaim/server-http-kit';

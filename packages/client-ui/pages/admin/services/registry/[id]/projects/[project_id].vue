@@ -5,13 +5,13 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { DomainType } from '@privateaim/core';
+import { DomainType } from '@privateaim/core-kit';
 import type { FieldsBuildInput } from 'rapiq';
 import type { PropType } from 'vue';
 import type {
     Registry,
     RegistryProject,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import { RegistryProjectForm, createEntityManager } from '@privateaim/client-vue';
 import { useToast } from '#imports';
 import {

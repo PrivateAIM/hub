@@ -7,7 +7,7 @@
 
 import {
     buildRegistryClientConnectionStringFromRegistry,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import { isClientErrorWithStatusCode } from 'hapic';
 import type { BuilderCheckPayload } from '@privateaim/server-analysis-manager-kit';
 import { createBasicHarborAPIClient, useCoreClient } from '../../../../core';

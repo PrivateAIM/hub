@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Project } from '@privateaim/core';
+import type { Project } from '@privateaim/core-kit';
 import type { TestAgent } from '../supertest';
 
 export const TEST_DEFAULT_PROJECT : Partial<Project> = {

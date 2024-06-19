@@ -7,7 +7,7 @@
 
 import {
     REGISTRY_ARTIFACT_TAG_LATEST,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import { BuilderCommand } from '@privateaim/server-analysis-manager-kit';
 import type { BuilderBuildPayload } from '@privateaim/server-analysis-manager-kit';
 import {

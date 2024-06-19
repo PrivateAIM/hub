@@ -5,13 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Node } from '@privateaim/core';
+import type { Node } from '@privateaim/core-kit';
 import {
     DomainEventName,
     DomainType,
     buildDomainChannelName,
     buildDomainNamespaceName,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import { publishDomainEvent, useRedisPublishClient } from '@privateaim/server-kit';
 import type {
     EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,

@@ -6,13 +6,13 @@
  */
 
 import { getHostNameFromString } from '@privateaim/kit';
-import { AnalysisBucketType, AnalysisContainerPath } from '@privateaim/core';
+import { AnalysisBucketType, AnalysisContainerPath } from '@privateaim/core-kit';
 import type { BucketFile } from '@privateaim/storage-kit';
 import path from 'node:path';
 import type {
     Analysis,
     MasterImage,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import { useCoreClient, useStorageClient } from '../../../core';
 import { BuilderError } from '../error';
 

@@ -17,14 +17,14 @@ import {
 } from 'typeorm';
 import type {
     AnalysisNode,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import {
     DomainEventName,
     DomainSubType,
     DomainType,
     buildDomainChannelName,
     buildDomainNamespaceName,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import { AnalysisNodeEntity } from '../../domains';
 
 async function publishEvent(

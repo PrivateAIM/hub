@@ -9,7 +9,7 @@ import {
     PermissionID,
     ProjectNodeApprovalCommand,
     ProjectNodeApprovalStatus,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import type { PropType } from 'vue';
 import {
     computed, defineComponent, ref,

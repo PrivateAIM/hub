@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { AnalysisBucketType } from '@privateaim/core';
+import type { AnalysisBucketType } from '@privateaim/core-kit';
 import type { CoreCommand, CoreEvent } from './constants';
 
 export type CoreBasePayload = {

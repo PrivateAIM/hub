@@ -9,7 +9,7 @@ import type { Robot } from '@authup/core-kit';
 import { stringifyAuthorizationHeader } from 'hapic';
 import type { HarborClient, ProjectWebhookTarget } from '@hapic/harbor';
 import { createClient } from '@hapic/harbor';
-import { ServiceID } from '@privateaim/core';
+import { ServiceID } from '@privateaim/core-kit';
 
 export function buildRegistryWebhookTarget(
     context: {

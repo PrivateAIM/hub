@@ -5,7 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Registry } from '@privateaim/core';
+import type { Registry } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
 import { RegistryCleanup, RegistrySetup } from '@privateaim/client-vue';
 import { useToast } from '#imports';

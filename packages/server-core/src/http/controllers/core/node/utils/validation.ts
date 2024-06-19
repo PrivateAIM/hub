@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { NodeType } from '@privateaim/core';
+import { NodeType } from '@privateaim/core-kit';
 import { check } from 'express-validator';
 import { isRealmResourceWritable } from '@authup/core-kit';
 import { ForbiddenError } from '@ebec/http';

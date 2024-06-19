@@ -10,7 +10,7 @@ import {
     REGISTRY_MASTER_IMAGE_PROJECT_NAME,
     REGISTRY_OUTGOING_PROJECT_NAME,
     RegistryProjectType, generateRegistryProjectId,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import { useDataSource } from 'typeorm-extension';
 import { useLogger, useQueueRouter } from '@privateaim/server-kit';
 import { RegistryEntity, RegistryProjectEntity } from '../../../domains';

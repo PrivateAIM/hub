@@ -12,10 +12,10 @@ import type {
     MasterImage,
     Project,
     Registry,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import {
     AnalysisBuildStatus,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import {
     Column,
     CreateDateColumn,

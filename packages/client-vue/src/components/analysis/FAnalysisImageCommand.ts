@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { AnalysisBucketFile, MasterImage } from '@privateaim/core';
+import type { AnalysisBucketFile, MasterImage } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
 import {
     computed, defineComponent, h, ref, toRef, watch,

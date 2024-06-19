@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { AnalysisBucket } from '@privateaim/core';
+import type { AnalysisBucket } from '@privateaim/core-kit';
 import type { TestAgent } from '../supertest';
 
 export async function createSuperTestAnalysisBucket(superTest: TestAgent, entity: Partial<AnalysisBucket>) {

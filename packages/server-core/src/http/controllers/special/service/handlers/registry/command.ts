@@ -7,7 +7,7 @@
 
 import {
     PermissionID, RegistryAPICommand,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import {
     ForbiddenError,
 } from '@ebec/http';

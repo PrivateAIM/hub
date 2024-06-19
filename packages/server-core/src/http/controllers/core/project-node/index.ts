@@ -7,7 +7,7 @@
 
 import type {
     ProjectNode,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import {
     DBody, DController, DDelete, DGet, DPath, DPost, DRequest, DResponse, DTags,
 } from '@routup/decorators';

@@ -6,7 +6,7 @@
  */
 
 import { getSeverity, useTranslationsForNestedValidations } from '@ilingo/vuelidate';
-import type { MasterImage, MasterImageGroup } from '@privateaim/core';
+import type { MasterImage, MasterImageGroup } from '@privateaim/core-kit';
 import type { FormSelectOption } from '@vuecs/form-controls';
 import { buildFormGroup, buildFormSelect } from '@vuecs/form-controls';
 import type { ListBodySlotProps } from '@vuecs/list-controls';

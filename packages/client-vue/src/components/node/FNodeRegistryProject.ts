@@ -7,7 +7,7 @@
 
 import type { PropType } from 'vue';
 import { defineComponent, h } from 'vue';
-import type { Node, RegistryProject } from '@privateaim/core';
+import type { Node, RegistryProject } from '@privateaim/core-kit';
 import RegistryProjectDetails from '../registry-project/FRegistryProject';
 
 export default defineComponent({

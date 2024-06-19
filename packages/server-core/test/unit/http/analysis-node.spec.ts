@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { AnalysisNode } from '@privateaim/core';
+import type { AnalysisNode } from '@privateaim/core-kit';
 import {
     dropTestDatabase, expectPropertiesEqualToSrc, removeDateProperties, useSuperTest, useTestDatabase,
 } from '../../utils';

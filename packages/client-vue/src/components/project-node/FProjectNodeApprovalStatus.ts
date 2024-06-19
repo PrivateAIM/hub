@@ -6,7 +6,7 @@
  */
 import { computed, defineComponent, h } from 'vue';
 import type { PropType } from 'vue';
-import { ProjectNodeApprovalStatus } from '@privateaim/core';
+import { ProjectNodeApprovalStatus } from '@privateaim/core-kit';
 import { hasNormalizedSlot, normalizeSlot } from '../../core';
 
 export default defineComponent({

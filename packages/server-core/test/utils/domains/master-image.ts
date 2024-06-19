@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { MasterImage } from '@privateaim/core';
+import type { MasterImage } from '@privateaim/core-kit';
 import type { TestAgent } from '../supertest';
 
 export const TEST_DEFAULT_MASTER_IMAGE : Partial<MasterImage> = {

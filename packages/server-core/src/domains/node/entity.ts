@@ -15,11 +15,11 @@ import {
     PrimaryGeneratedColumn, Unique,
     UpdateDateColumn,
 } from 'typeorm';
-import type { Node, Registry } from '@privateaim/core';
+import type { Node, Registry } from '@privateaim/core-kit';
 import {
     NodeType,
     RegistryProject,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import type { Realm, Robot } from '@authup/core-kit';
 import { RegistryProjectEntity } from '../registry-project';
 import { RegistryEntity } from '../registry';

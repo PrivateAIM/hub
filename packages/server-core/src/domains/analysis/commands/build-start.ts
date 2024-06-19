@@ -9,7 +9,7 @@ import { BadRequestError } from '@ebec/http';
 import {
     AnalysisBuildStatus,
     AnalysisNodeApprovalStatus,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import { BuilderCommand, buildBuilderTaskQueueRouterPayload } from '@privateaim/server-analysis-manager-kit';
 import { useDataSource } from 'typeorm-extension';
 import { useQueueRouter } from '@privateaim/server-kit';

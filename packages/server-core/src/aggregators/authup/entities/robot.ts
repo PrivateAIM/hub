@@ -6,7 +6,7 @@
  */
 
 import type { RobotEventContext } from '@authup/core-kit';
-import { ServiceID } from '@privateaim/core';
+import { ServiceID } from '@privateaim/core-kit';
 import { useDataSource } from 'typeorm-extension';
 import { useQueueRouter } from '@privateaim/server-kit';
 import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../../components';

@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 import { useStore } from '@authup/client-web-kit';
-import type { Analysis } from '@privateaim/core';
+import type { Analysis } from '@privateaim/core-kit';
 import { storeToRefs } from 'pinia';
 import { ref } from 'vue';
 import { FAnalysisBasicForm } from '@privateaim/client-vue';

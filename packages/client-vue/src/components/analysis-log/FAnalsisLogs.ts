@@ -6,11 +6,11 @@
  */
 import type {
     AnalysisLog,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import {
     DomainType,
     buildDomainChannelName,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import type { ListItemSlotProps } from '@vuecs/list-controls';
 import {
     defineComponent, h, ref,

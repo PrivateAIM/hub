@@ -12,14 +12,14 @@ import {
     buildDomainEventFullName,
     buildDomainEventSubscriptionFullName,
     buildDomainNamespaceName,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import type {
     DomainEntity,
     DomainEventContext,
     DomainEventSubscriptionFullName,
     DomainInput,
     DomainType,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import type {
     STCEventContext,
 } from '@privateaim/core-realtime-kit';

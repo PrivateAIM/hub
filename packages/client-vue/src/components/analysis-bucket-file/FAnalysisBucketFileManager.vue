@@ -9,7 +9,7 @@
 import type {
     AnalysisBucket,
     AnalysisBucketFile,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import {
     hasOwnProperty,
 } from '@privateaim/kit';

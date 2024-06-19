@@ -6,11 +6,11 @@
  */
 import { ARealms, buildFormSubmitWithTranslations, createFormSubmitTranslations } from '@authup/client-web-kit';
 import { getSeverity, useTranslationsForNestedValidations } from '@ilingo/vuelidate';
-import type { Node, Registry } from '@privateaim/core';
+import type { Node, Registry } from '@privateaim/core-kit';
 import {
     DomainType,
     NodeType,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import { alphaNumHyphenUnderscoreRegex } from '@privateaim/kit';
 import {
     buildFormGroup,

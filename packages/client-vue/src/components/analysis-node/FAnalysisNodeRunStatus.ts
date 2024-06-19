@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { AnalysisNodeRunStatus } from '@privateaim/core';
+import { AnalysisNodeRunStatus } from '@privateaim/core-kit';
 import { computed, defineComponent, h } from 'vue';
 import { hasNormalizedSlot, normalizeSlot } from '../../core';
 

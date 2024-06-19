@@ -4,8 +4,8 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { DomainType } from '@privateaim/core';
-import type { Node } from '@privateaim/core';
+import { DomainType } from '@privateaim/core-kit';
+import type { Node } from '@privateaim/core-kit';
 import type { SlotsType } from 'vue';
 import { defineComponent } from 'vue';
 import { createList, defineListEvents, defineListProps } from '../../core';

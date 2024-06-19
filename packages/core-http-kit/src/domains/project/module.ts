@@ -7,7 +7,7 @@
 
 import type { BuildInput } from 'rapiq';
 import { buildQuery } from 'rapiq';
-import type { Project } from '@privateaim/core';
+import type { Project } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
 import { nullifyEmptyObjectProperties } from '../../utils';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';

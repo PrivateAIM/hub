@@ -7,7 +7,7 @@
 
 import type {
     AnalysisLog,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 
 import {
     DController, DDelete, DGet, DPath, DRequest, DResponse, DTags,

@@ -8,14 +8,14 @@
 import { ATitle } from '@authup/client-web-kit';
 import type {
     AnalysisNode,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import {
     DomainEventSubscriptionName,
     DomainSubType,
     DomainType,
     buildDomainChannelName,
     buildDomainEventSubscriptionFullName,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import type { FiltersBuildInput } from 'rapiq';
 
 import type { PropType, SlotsType, VNodeChild } from 'vue';

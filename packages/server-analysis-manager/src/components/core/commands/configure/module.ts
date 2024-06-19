@@ -8,7 +8,7 @@
 import {
     AnalysisBucketType,
     buildAnalysisBucketName,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import type { CoreConfigurePayload } from '@privateaim/server-analysis-manager-kit';
 import { useCoreClient, useStorageClient } from '../../../../core';
 import { writeBucketCreatedEvent } from '../../queue';

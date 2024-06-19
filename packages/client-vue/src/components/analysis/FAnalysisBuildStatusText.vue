@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 
-import { AnalysisBuildStatus } from '@privateaim/core';
+import { AnalysisBuildStatus } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
 

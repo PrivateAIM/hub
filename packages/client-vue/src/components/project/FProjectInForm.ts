@@ -7,8 +7,8 @@
 
 import { buildFormSubmitWithTranslations, createFormSubmitTranslations } from '@authup/client-web-kit';
 import { getSeverity, useTranslationsForNestedValidations } from '@ilingo/vuelidate';
-import type { ProjectNode } from '@privateaim/core';
-import { DomainType, ProjectNodeApprovalStatus } from '@privateaim/core';
+import type { ProjectNode } from '@privateaim/core-kit';
+import { DomainType, ProjectNodeApprovalStatus } from '@privateaim/core-kit';
 import {
     buildFormGroup, buildFormInput, buildFormSelect,
 } from '@vuecs/form-controls';

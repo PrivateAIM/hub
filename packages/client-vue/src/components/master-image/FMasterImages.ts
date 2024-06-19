@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { DomainType } from '@privateaim/core';
+import { DomainType } from '@privateaim/core-kit';
 import type { SlotsType } from 'vue';
 import { defineComponent } from 'vue';
-import type { MasterImage } from '@privateaim/core';
+import type { MasterImage } from '@privateaim/core-kit';
 import type { ListSlotsType } from '../../core';
 import {
     createList,

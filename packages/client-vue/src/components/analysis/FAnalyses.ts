@@ -4,10 +4,10 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { DomainType } from '@privateaim/core';
+import { DomainType } from '@privateaim/core-kit';
 import type {
     Analysis,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import type { SetupContext, SlotsType } from 'vue';
 import { defineComponent, h } from 'vue';
 import type { ListEventsType, ListSlotsType } from '../../core';

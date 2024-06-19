@@ -7,7 +7,7 @@
 
 import { TranslatorTranslationDefaultKey, TranslatorTranslationGroup, useTranslation } from '@authup/client-web-kit';
 import type { DomainAPISlim } from '@authup/core-http-kit';
-import type { DomainType } from '@privateaim/core';
+import type { DomainType } from '@privateaim/core-kit';
 import { isObject } from '@privateaim/kit';
 import type {
     Component,

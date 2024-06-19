@@ -10,12 +10,12 @@ import type {
     EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
 import { EventSubscriber } from 'typeorm';
-import type { RegistryProject } from '@privateaim/core';
+import type { RegistryProject } from '@privateaim/core-kit';
 import {
     DomainEventName,
     DomainType,
     buildDomainChannelName,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import { RegistryProjectEntity } from '../../domains';
 
 async function publishEvent(

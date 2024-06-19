@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 import type { PropType } from 'vue';
-import type { Project } from '@privateaim/core';
+import type { Project } from '@privateaim/core-kit';
 import { FAnalysisBasicForm } from '@privateaim/client-vue';
 import { defineNuxtComponent, navigateTo } from '#app';
 

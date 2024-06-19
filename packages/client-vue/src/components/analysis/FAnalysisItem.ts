@@ -13,10 +13,10 @@ import {
 } from 'vue';
 import type {
     Analysis,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import {
     PermissionID,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import { VCLink } from '@vuecs/link';
 import TrainEntity from './FAnalysis';
 import TrainPipeline from './FAnalysisPipeline.vue';

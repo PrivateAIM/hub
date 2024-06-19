@@ -7,7 +7,7 @@
 
 import type {
     Node,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import {
     dropTestDatabase, expectPropertiesEqualToSrc, removeDateProperties, useSuperTest, useTestDatabase,
 } from '../../utils';

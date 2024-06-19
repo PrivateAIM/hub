@@ -6,8 +6,8 @@
   -->
 <script lang="ts">
 import { useAbilityCheck } from '@authup/client-web-kit';
-import type { Registry, RegistryProject } from '@privateaim/core';
-import { PermissionID } from '@privateaim/core';
+import type { Registry, RegistryProject } from '@privateaim/core-kit';
+import { PermissionID } from '@privateaim/core-kit';
 import { BModal, BTable } from 'bootstrap-vue-next';
 import type { BuildInput } from 'rapiq';
 import { computed, ref, toRefs } from 'vue';

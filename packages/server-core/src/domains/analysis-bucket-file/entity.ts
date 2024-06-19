@@ -7,7 +7,7 @@
 
 import type {
     Analysis, AnalysisBucket, AnalysisBucketFile,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import {
     Column,
     CreateDateColumn,

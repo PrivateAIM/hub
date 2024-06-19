@@ -5,8 +5,8 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Registry } from '@privateaim/core';
-import { PermissionID } from '@privateaim/core';
+import type { Registry } from '@privateaim/core-kit';
+import { PermissionID } from '@privateaim/core-kit';
 import { RegistryForm } from '@privateaim/client-vue';
 import { definePageMeta, navigateTo } from '#imports';
 import { defineNuxtComponent } from '#app';

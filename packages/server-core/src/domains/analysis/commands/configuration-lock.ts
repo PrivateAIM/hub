@@ -8,7 +8,7 @@
 import { BadRequestError } from '@ebec/http';
 import {
     AnalysisBucketType, AnalysisNodeApprovalStatus, NodeType,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import { useDataSource } from 'typeorm-extension';
 import { AnalysisBucketEntity } from '../../analysis-bucket';
 import { AnalysisBucketFileEntity } from '../../analysis-bucket-file';

@@ -4,8 +4,8 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { DomainType } from '@privateaim/core';
-import type { Registry } from '@privateaim/core';
+import { DomainType } from '@privateaim/core-kit';
+import type { Registry } from '@privateaim/core-kit';
 import type { SlotsType } from 'vue';
 import { defineComponent } from 'vue';
 import type { ListSlotsType } from '../../core';

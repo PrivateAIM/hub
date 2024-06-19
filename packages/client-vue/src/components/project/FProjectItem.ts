@@ -14,11 +14,11 @@ import {
 } from 'vue';
 import type {
     Project,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import {
     DomainType,
     PermissionID,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import { VCLink } from '@vuecs/link';
 import {
     EntityListSlotName, hasNormalizedSlot, normalizeSlot,

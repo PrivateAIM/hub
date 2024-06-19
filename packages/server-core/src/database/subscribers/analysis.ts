@@ -12,14 +12,14 @@ import type {
 import { EventSubscriber } from 'typeorm';
 import type {
     Analysis,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import {
     DomainEventName,
     DomainType,
     buildDomainChannelName,
 
     buildDomainNamespaceName,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import { AnalysisEntity } from '../../domains';
 
 async function publishEvent(

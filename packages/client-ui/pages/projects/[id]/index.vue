@@ -5,7 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Project, ProjectNode } from '@privateaim/core';
+import type { Project, ProjectNode } from '@privateaim/core-kit';
 import type { BuildInput } from 'rapiq';
 import type { PropType } from 'vue';
 import { FProjectNodeApprovalStatus, FProjectNodes } from '@privateaim/client-vue';

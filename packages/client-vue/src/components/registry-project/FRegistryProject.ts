@@ -7,13 +7,13 @@
 import { getSeverity, useTranslationsForNestedValidations } from '@ilingo/vuelidate';
 import type {
     RegistryProject,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import {
     DomainType,
     RegistryAPICommand,
     ServiceID,
     registryRobotSecretRegex,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import { buildFormGroup, buildFormInput } from '@vuecs/form-controls';
 import useVuelidate from '@vuelidate/core';
 import {

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ProjectNode } from '@privateaim/core';
+import type { ProjectNode } from '@privateaim/core-kit';
 import {
     dropTestDatabase, expectPropertiesEqualToSrc, useSuperTest, useTestDatabase,
 } from '../../utils';

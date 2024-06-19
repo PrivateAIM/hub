@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { AnalysisBucket } from '@privateaim/core';
+import type { AnalysisBucket } from '@privateaim/core-kit';
 import {
     DomainType,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import {
     defineComponent,
 } from 'vue';

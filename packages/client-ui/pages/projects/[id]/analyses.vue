@@ -9,7 +9,7 @@ import { useStore } from '@authup/client-web-kit';
 import { storeToRefs } from 'pinia';
 import { computed, toRef } from 'vue';
 import type { PropType } from 'vue';
-import type { Project, ProjectNode } from '@privateaim/core';
+import type { Project, ProjectNode } from '@privateaim/core-kit';
 import { defineNuxtComponent } from '#app';
 import DomainEntityNav from '../../../components/DomainEntityNav';
 

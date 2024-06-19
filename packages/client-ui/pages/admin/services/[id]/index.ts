@@ -6,7 +6,7 @@
  */
 
 import type { PropType } from 'vue';
-import { ServiceID } from '@privateaim/core';
+import { ServiceID } from '@privateaim/core-kit';
 import { MasterImagesSync } from '@privateaim/client-vue';
 import { useToast } from '#imports';
 import { defineNuxtComponent } from '#app';

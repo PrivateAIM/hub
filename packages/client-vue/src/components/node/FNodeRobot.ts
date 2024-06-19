@@ -10,7 +10,7 @@ import { ARobot, buildFormSubmitWithTranslations, createFormSubmitTranslations }
 import { getSeverity, useTranslationsForNestedValidations } from '@ilingo/vuelidate';
 import type { PropType } from 'vue';
 import { defineComponent, h, reactive } from 'vue';
-import type { Node } from '@privateaim/core';
+import type { Node } from '@privateaim/core-kit';
 import type { Robot } from '@authup/core-kit';
 import { buildFormGroup, buildFormInput } from '@vuecs/form-controls';
 import useVuelidate from '@vuelidate/core';

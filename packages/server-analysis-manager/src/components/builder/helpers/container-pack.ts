@@ -9,7 +9,7 @@ import stream from 'node:stream';
 import {
     AnalysisBucketType,
     AnalysisContainerPath,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import type { Container } from 'dockerode';
 import tar from 'tar-stream';
 import { BuilderCommand } from '@privateaim/server-analysis-manager-kit';

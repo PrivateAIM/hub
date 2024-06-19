@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { RegistryAPICommand } from '@privateaim/core';
+import { RegistryAPICommand } from '@privateaim/core-kit';
 import type { HTTPValidationResult } from '@privateaim/server-http-kit';
 import { createHTTPValidationResult } from '@privateaim/server-http-kit';
 import { check } from 'express-validator';

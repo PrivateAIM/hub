@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Registry, RegistryProject } from '@privateaim/core';
+import type { Registry, RegistryProject } from '@privateaim/core-kit';
 import type { RegistryCommand } from './constants';
 
 type RegistryHookEventData = {

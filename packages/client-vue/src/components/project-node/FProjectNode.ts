@@ -9,10 +9,10 @@ import {
     DomainSubType,
     DomainType,
     buildDomainChannelName,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import type {
     ProjectNode,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import type { FiltersBuildInput } from 'rapiq';
 import {
     defineComponent, h,

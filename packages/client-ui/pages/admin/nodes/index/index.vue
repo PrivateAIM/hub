@@ -7,8 +7,8 @@
 <script lang="ts">
 import { useAbilityCheck, useStore } from '@authup/client-web-kit';
 import { VCTimeago } from '@vuecs/timeago';
-import type { Node } from '@privateaim/core';
-import { PermissionID } from '@privateaim/core';
+import type { Node } from '@privateaim/core-kit';
+import { PermissionID } from '@privateaim/core-kit';
 import { BTable } from 'bootstrap-vue-next';
 import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';

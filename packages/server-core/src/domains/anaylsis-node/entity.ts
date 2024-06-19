@@ -21,7 +21,7 @@ import type {
     AnalysisNodeApprovalStatus,
     AnalysisNodeRunStatus,
     Node,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import type { Realm } from '@authup/core-kit';
 import { AnalysisEntity } from '../analysis';
 import { NodeEntity } from '../node';

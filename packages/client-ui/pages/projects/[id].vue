@@ -9,11 +9,11 @@ import { useAbilityCheck, useStore } from '@authup/client-web-kit';
 import type {
     Project,
     ProjectNode,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import {
     DomainType,
     PermissionID,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import { createEntityManager, injectCoreHTTPClient } from '@privateaim/client-vue';
 import type { Ref } from 'vue';
 import {

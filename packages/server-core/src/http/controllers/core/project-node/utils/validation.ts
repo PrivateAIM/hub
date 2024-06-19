@@ -6,7 +6,7 @@
  */
 
 import { check } from 'express-validator';
-import { ProjectNodeApprovalStatus } from '@privateaim/core';
+import { ProjectNodeApprovalStatus } from '@privateaim/core-kit';
 import { NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/core-kit';
 import type { Request } from 'routup';

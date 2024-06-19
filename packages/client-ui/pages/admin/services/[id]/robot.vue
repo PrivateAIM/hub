@@ -7,7 +7,7 @@
 <script lang="ts">
 import { ARobotForm, injectHTTPClient } from '@authup/client-web-kit';
 import type { Robot } from '@authup/core-kit';
-import type { ServiceID } from '@privateaim/core';
+import type { ServiceID } from '@privateaim/core-kit';
 import type { PropType, Ref } from 'vue';
 import { ref, toRefs } from 'vue';
 import {

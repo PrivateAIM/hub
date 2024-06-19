@@ -7,8 +7,8 @@
 
 import type { PropType } from 'vue';
 import { defineComponent, h, ref } from 'vue';
-import type { Registry } from '@privateaim/core';
-import { RegistryAPICommand } from '@privateaim/core';
+import type { Registry } from '@privateaim/core-kit';
+import { RegistryAPICommand } from '@privateaim/core-kit';
 import { injectCoreHTTPClient } from '../../core';
 import EntityDelete from '../EntityDelete';
 import MasterImageList from '../master-image/FMasterImages';

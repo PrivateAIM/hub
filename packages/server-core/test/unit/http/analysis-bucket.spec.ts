@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { AnalysisBucket, AnalysisNode } from '@privateaim/core';
-import { AnalysisBucketType } from '@privateaim/core';
+import type { AnalysisBucket, AnalysisNode } from '@privateaim/core-kit';
+import { AnalysisBucketType } from '@privateaim/core-kit';
 import {
     dropTestDatabase,
     expectPropertiesEqualToSrc,

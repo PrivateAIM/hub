@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { DomainType } from '@privateaim/core';
-import type { MasterImageGroup } from '@privateaim/core';
+import { DomainType } from '@privateaim/core-kit';
+import type { MasterImageGroup } from '@privateaim/core-kit';
 import type { SlotsType } from 'vue';
 import { defineComponent } from 'vue';
 import {

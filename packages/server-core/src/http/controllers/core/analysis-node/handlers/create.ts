@@ -6,7 +6,7 @@
  */
 
 import { BadRequestError, ForbiddenError } from '@ebec/http';
-import { AnalysisNodeApprovalStatus, NodeType, PermissionID } from '@privateaim/core';
+import { AnalysisNodeApprovalStatus, NodeType, PermissionID } from '@privateaim/core-kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';

@@ -7,10 +7,10 @@
 <script lang="ts">
 import {
     DomainType,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import type {
     AnalysisBucketFile,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import type { PropType } from 'vue';
 import {
     computed, defineComponent, ref,

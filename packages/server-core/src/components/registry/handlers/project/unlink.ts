@@ -4,7 +4,7 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { buildRegistryClientConnectionStringFromRegistry } from '@privateaim/core';
+import { buildRegistryClientConnectionStringFromRegistry } from '@privateaim/core-kit';
 import { useDataSource } from 'typeorm-extension';
 import { useLogger } from '@privateaim/server-kit';
 import { RegistryEntity, RegistryProjectEntity, removeRegistryProjectFromVault } from '../../../../domains';

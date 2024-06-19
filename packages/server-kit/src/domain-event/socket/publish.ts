@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { DomainsEventContext } from '@privateaim/core';
-import { DomainEventName, buildDomainEventFullName } from '@privateaim/core';
+import type { DomainsEventContext } from '@privateaim/core-kit';
+import { DomainEventName, buildDomainEventFullName } from '@privateaim/core-kit';
 import { Emitter } from '@socket.io/redis-emitter';
 import type { Client } from 'redis-extension';
 import type { DomainEventDestinations } from '../type';

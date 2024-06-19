@@ -7,7 +7,7 @@
 <script lang="ts">
 import {
     DomainType,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import { FAnalysisName, createEntityManager } from '@privateaim/client-vue';
 import { isClientErrorWithStatusCode } from 'hapic';
 import { definePageMeta, useToast } from '#imports';

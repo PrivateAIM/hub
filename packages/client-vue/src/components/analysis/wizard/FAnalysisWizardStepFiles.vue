@@ -5,8 +5,8 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { AnalysisBucketType } from '@privateaim/core';
-import type { Analysis, AnalysisBucket, AnalysisBucketFile } from '@privateaim/core';
+import { AnalysisBucketType } from '@privateaim/core-kit';
+import type { Analysis, AnalysisBucket, AnalysisBucketFile } from '@privateaim/core-kit';
 import type { FiltersBuildInput } from 'rapiq';
 import {
     type PropType, computed, defineComponent,

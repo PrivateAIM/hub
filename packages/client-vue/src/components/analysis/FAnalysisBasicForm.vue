@@ -6,8 +6,8 @@
   -->
 <script lang="ts">
 import { IVuelidate } from '@ilingo/vuelidate';
-import type { Analysis, Project } from '@privateaim/core';
-import { DomainType } from '@privateaim/core';
+import type { Analysis, Project } from '@privateaim/core-kit';
+import { DomainType } from '@privateaim/core-kit';
 import { maxLength, minLength, required } from '@vuelidate/validators';
 import type { BuildInput } from 'rapiq';
 import useVuelidate from '@vuelidate/core';

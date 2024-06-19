@@ -6,7 +6,7 @@
  */
 
 import type { NavigationItem } from '@vuecs/navigation';
-import { PermissionID } from '@privateaim/core';
+import { PermissionID } from '@privateaim/core-kit';
 
 export enum LayoutKey {
     NAVIGATION_ID = 'navigationId',

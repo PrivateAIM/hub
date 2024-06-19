@@ -13,7 +13,7 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-import type { MasterImage } from '@privateaim/core';
+import type { MasterImage } from '@privateaim/core-kit';
 
 @Entity({ name: 'master_images' })
 export class MasterImageEntity implements MasterImage {

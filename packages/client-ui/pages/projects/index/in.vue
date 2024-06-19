@@ -7,10 +7,10 @@
 <script lang="ts">
 import { useAbilityCheck, useStore } from '@authup/client-web-kit';
 import { VCTimeago } from '@vuecs/timeago';
-import type { ProjectNode } from '@privateaim/core';
+import type { ProjectNode } from '@privateaim/core-kit';
 import {
     PermissionID,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import {
     BDropdown, BDropdownDivider, BDropdownItem, BModal, BSpinner, BTable,
 } from 'bootstrap-vue-next';

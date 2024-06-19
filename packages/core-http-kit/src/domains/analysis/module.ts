@@ -8,7 +8,7 @@
 import type { RequestBaseOptions } from 'hapic';
 import type { BuildInput } from 'rapiq';
 import { buildQuery } from 'rapiq';
-import type { Analysis, AnalysisAPICommand } from '@privateaim/core';
+import type { Analysis, AnalysisAPICommand } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
 import { nullifyEmptyObjectProperties } from '../../utils';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';

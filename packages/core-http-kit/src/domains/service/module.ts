@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Registry, RegistryAPICommand, RegistryProject } from '@privateaim/core';
-import { ServiceID } from '@privateaim/core';
+import type { Registry, RegistryAPICommand, RegistryProject } from '@privateaim/core-kit';
+import { ServiceID } from '@privateaim/core-kit';
 import type { SingleResourceResponse } from '../types-base';
 import { BaseAPI } from '../base';
 import { nullifyEmptyObjectProperties } from '../../utils';

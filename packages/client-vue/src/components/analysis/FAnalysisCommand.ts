@@ -6,8 +6,8 @@
  */
 
 import { useAbilityCheck } from '@authup/client-web-kit';
-import type { Analysis } from '@privateaim/core';
-import { AnalysisAPICommand, AnalysisBuildStatus, PermissionID } from '@privateaim/core';
+import type { Analysis } from '@privateaim/core-kit';
+import { AnalysisAPICommand, AnalysisBuildStatus, PermissionID } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
 import {
     computed, defineComponent, ref, toRef,

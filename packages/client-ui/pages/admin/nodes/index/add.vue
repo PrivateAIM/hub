@@ -6,8 +6,8 @@
   -->
 <script lang="ts">
 import { useStore } from '@authup/client-web-kit';
-import type { Node } from '@privateaim/core';
-import { PermissionID } from '@privateaim/core';
+import type { Node } from '@privateaim/core-kit';
+import { PermissionID } from '@privateaim/core-kit';
 import { storeToRefs } from 'pinia';
 import { FNodeForm } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';

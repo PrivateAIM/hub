@@ -22,8 +22,8 @@ import type {
     PropType,
 } from 'vue';
 
-import type { MasterImage, Node, Project } from '@privateaim/core';
-import { DomainType } from '@privateaim/core';
+import type { MasterImage, Node, Project } from '@privateaim/core-kit';
+import { DomainType } from '@privateaim/core-kit';
 import { useUpdatedAt } from '../../composables';
 import type { ListProps } from '../../core';
 import {

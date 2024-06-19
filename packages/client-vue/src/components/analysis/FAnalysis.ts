@@ -7,10 +7,10 @@
 
 import {
     DomainType,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import type {
     Analysis,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import {
     defineComponent,
 } from 'vue';

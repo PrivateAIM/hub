@@ -17,7 +17,7 @@ import {
 import type {
     Analysis,
     AnalysisLog,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import type { Realm } from '@authup/core-kit';
 import { AnalysisEntity } from '../analysis';
 

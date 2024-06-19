@@ -6,8 +6,8 @@
   -->
 <script lang="ts">
 import { useStore } from '@authup/client-web-kit';
-import type { Analysis } from '@privateaim/core';
-import { PermissionID } from '@privateaim/core';
+import type { Analysis } from '@privateaim/core-kit';
+import { PermissionID } from '@privateaim/core-kit';
 import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
 import { computed } from 'vue';

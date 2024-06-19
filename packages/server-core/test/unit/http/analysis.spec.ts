@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Analysis } from '@privateaim/core';
+import type { Analysis } from '@privateaim/core-kit';
 import { buildHTTPValidationErrorMessage } from '@privateaim/server-http-kit';
 import {
     dropTestDatabase, expectPropertiesEqualToSrc, removeDateProperties, useSuperTest, useTestDatabase,

@@ -12,7 +12,7 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-import type { Registry } from '@privateaim/core';
+import type { Registry } from '@privateaim/core-kit';
 
 @Entity({ name: 'registries' })
 export class RegistryEntity implements Registry {

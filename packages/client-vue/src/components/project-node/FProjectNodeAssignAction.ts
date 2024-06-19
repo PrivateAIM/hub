@@ -6,10 +6,10 @@
  */
 
 import { defineComponent, h } from 'vue';
-import type { ProjectNode } from '@privateaim/core';
+import type { ProjectNode } from '@privateaim/core-kit';
 import {
     DomainType,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import { createEntityManager, defineEntityManagerEvents } from '../../core';
 
 export default defineComponent({

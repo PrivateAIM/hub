@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { MasterImage, MasterImageGroup } from '@privateaim/core';
-import { MasterImageCommand } from '@privateaim/core';
+import type { MasterImage, MasterImageGroup } from '@privateaim/core-kit';
+import { MasterImageCommand } from '@privateaim/core-kit';
 import { dropTestDatabase, useSuperTest, useTestDatabase } from '../../utils';
 
 describe('src/controllers/core/master-image', () => {

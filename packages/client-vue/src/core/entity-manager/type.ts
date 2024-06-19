@@ -8,7 +8,7 @@
 import type {
     DomainEntity,
     DomainType,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import type { BuildInput, FieldsBuildInput, FiltersBuildInput } from 'rapiq';
 import type {
     MaybeRef, Ref, SetupContext, SlotsType,

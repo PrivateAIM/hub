@@ -5,14 +5,14 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Analysis } from '@privateaim/core';
+import type { Analysis } from '@privateaim/core-kit';
 import {
     AnalysisAPICommand,
     AnalysisBuildStatus,
     AnalysisConfigurationStatus,
     AnalysisResultStatus,
     AnalysisRunStatus,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
 import { FAnalysisCommand } from './FAnalysisCommand';

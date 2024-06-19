@@ -15,7 +15,7 @@ import {
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import type { ParseAllowedOption } from 'rapiq';
 import { parseQueryFields } from 'rapiq';
-import { PermissionID } from '@privateaim/core';
+import { PermissionID } from '@privateaim/core-kit';
 import { useRequestEnv } from '@privateaim/server-http-kit';
 import { RegistryEntity } from '../../../../../domains';
 

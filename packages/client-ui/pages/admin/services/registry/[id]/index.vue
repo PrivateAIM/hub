@@ -8,7 +8,7 @@
 
 import { toRefs } from 'vue';
 import type { PropType } from 'vue';
-import type { Registry } from '@privateaim/core';
+import type { Registry } from '@privateaim/core-kit';
 import { RegistryForm } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
 

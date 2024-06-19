@@ -11,7 +11,7 @@ import type {
     DomainEventSubscriptionFullName,
     DomainSubType,
     DomainType,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import type {
     CTSEvents, EventCallback, EventTarget, STCEventContext, STCEvents,
 } from '../types';

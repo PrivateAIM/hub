@@ -12,7 +12,7 @@ import {
     PermissionID,
     buildDomainChannelName,
     buildDomainEventSubscriptionFullName,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import {
     isEventCallback,
 } from '@privateaim/core-realtime-kit';

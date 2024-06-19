@@ -6,11 +6,11 @@
  */
 
 import { ASearch } from '@authup/client-web-kit';
-import type { MasterImage } from '@privateaim/core';
+import type { MasterImage } from '@privateaim/core-kit';
 import {
     DomainType,
     MasterImageCommand,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import type { ListHeaderSlotProps } from '@vuecs/list-controls';
 import {
     defineComponent, h, reactive, ref,

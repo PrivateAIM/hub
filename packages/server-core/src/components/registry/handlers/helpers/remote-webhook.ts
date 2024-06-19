@@ -11,7 +11,7 @@ import type {
 } from '@hapic/harbor';
 import {
     ServiceID,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import { isAuthupClientUsable, useAuthupClient, useLogger } from '@privateaim/server-kit';
 import { useEnv } from '../../../../config';
 import { findRobotCredentialsInVault } from '../../../../domains';

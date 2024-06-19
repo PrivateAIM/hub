@@ -7,7 +7,7 @@
 
 import type {
     Analysis, Registry,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import { isClientErrorWithStatusCode } from 'hapic';
 import { useCoreClient } from '../../core';
 import { BaseError } from '../error';

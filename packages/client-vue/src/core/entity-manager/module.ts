@@ -9,7 +9,7 @@ import { hasOwnProperty } from '@privateaim/kit';
 import type { DomainAPI } from '@authup/core-http-kit';
 import type {
     DomainEntity, DomainEntityID, DomainType,
-} from '@privateaim/core';
+} from '@privateaim/core-kit';
 import type { BuildInput } from 'rapiq';
 import { isObject } from 'smob';
 import type { Ref, VNodeChild } from 'vue';

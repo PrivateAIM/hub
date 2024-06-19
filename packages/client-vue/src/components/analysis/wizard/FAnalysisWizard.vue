@@ -15,8 +15,8 @@ import {
     toRef,
     watch,
 } from 'vue';
-import type { Analysis, AnalysisBucketFile } from '@privateaim/core';
-import { AnalysisBucketType, AnalysisConfigurationStatus } from '@privateaim/core';
+import type { Analysis, AnalysisBucketFile } from '@privateaim/core-kit';
+import { AnalysisBucketType, AnalysisConfigurationStatus } from '@privateaim/core-kit';
 import { initFormAttributesFromSource, injectCoreHTTPClient } from '../../../core';
 import FAnalysisWizardStepBase from './FAnalysisWizardStepBase.vue';
 import FAnalysisWizardStepFiles from './FAnalysisWizardStepFiles.vue';
