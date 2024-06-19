@@ -26,10 +26,10 @@
         "build-watch": "rimraf ./dist && tsc -p tsconfig.build.json --watch"
     },
     "devDependencies": {
-        "@privateaim/core": "^0.5.0"
+        "@privateaim/core-kit": "^0.5.0"
     },
     "peerDependencies": {
-        "@privateaim/core": "^0.5.0"
+        "@privateaim/core-kit": "^0.5.0"
     },
     "publishConfig": {
         "access": "public"

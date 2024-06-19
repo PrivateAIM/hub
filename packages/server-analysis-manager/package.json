@@ -24,7 +24,7 @@
         "@authup/core-http-kit": "^1.0.0-beta.13",
         "@ebec/http": "^2.3.0",
         "@hapic/harbor": "^2.3.3",
-        "@privateaim/core": "^0.5.0",
+        "@privateaim/core-kit": "^0.5.0",
         "@privateaim/kit": "^0.5.0",
         "@privateaim/core-http-kit": "^0.5.0",
         "@privateaim/server-kit": "^0.5.0",

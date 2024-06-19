@@ -21,7 +21,7 @@ export default defineNuxtConfig({
     telemetry: false,
     ssr: true,
     alias: {
-        '@privateaim/core': path.join(__dirname, '..', 'core', 'src'),
+        '@privateaim/core-kit': path.join(__dirname, '..', 'core-kit', 'src'),
         '@privateaim/kit': path.join(__dirname, '..', 'kit', 'src'),
         '@privateaim/client-vue': path.join(__dirname, '..', 'client-vue', 'src'),
         '@privateaim/storage-kit': path.join(__dirname, '..', 'storage-kit', 'src'),

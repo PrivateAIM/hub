@@ -26,7 +26,7 @@
         "@fortawesome/fontawesome-free": "^6.5.2",
         "@nuxtjs/google-fonts": "^3.2.0",
         "@privateaim/client-vue": "^0.5.0",
-        "@privateaim/core": "^0.5.0",
+        "@privateaim/core-kit": "^0.5.0",
         "@privateaim/kit": "^0.5.0",
         "@privateaim/storage-kit": "^0.5.0",
         "@pinia/nuxt": "^0.5.1",

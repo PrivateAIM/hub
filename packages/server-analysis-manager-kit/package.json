@@ -26,7 +26,7 @@
         "build-watch": "rimraf ./dist && tsc -p tsconfig.build.json --watch"
     },
     "dependencies": {
-        "@privateaim/core": "^0.5.0",
+        "@privateaim/core-kit": "^0.5.0",
         "@privateaim/kit": "^0.5.0",
         "@privateaim/server-kit": "^0.5.0"
     },
