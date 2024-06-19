@@ -9,23 +9,16 @@ import { useRequestQuery } from '@routup/basic/query';
 import type { Request, Response } from 'routup';
 import { send, useRequestParam } from 'routup';
 import type { SelectQueryBuilder } from 'typeorm';
-import { PermissionID } from '@privateaim/core';
-import type { ParseAllowedOption } from 'rapiq';
 import {
     parseQueryFields,
 } from 'rapiq';
 import {
     applyFilters, applyPagination, applyQueryFieldsParseOutput, applyRelations, useDataSource,
 } from 'typeorm-extension';
-import { ForbiddenError, NotFoundError } from '@ebec/http';
-import { useRequestEnv } from '@privateaim/server-http-kit';
-import { NodeEntity, onlyRealmWritableQueryResources } from '../../../../../domains';
+import { NotFoundError } from '@ebec/http';
+import { NodeEntity } from '../../../../../domains';
 
 async function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>, fields: any) {
-    const protectedFields : ParseAllowedOption<NodeEntity> = [
-        'email',
-    ];
-
     const fieldsParsed = parseQueryFields<NodeEntity>(fields, {
         default: [
             'id',
@@ -41,28 +34,8 @@ async function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>,
             'created_at',
             'updated_at',
         ],
-        allowed: protectedFields,
         defaultPath: 'node',
     });
-
-    const protectedSelected = fieldsParsed
-        .filter((field) => field.path === 'node' &&
-            protectedFields.indexOf(field.key as any) !== -1);
-
-    if (protectedSelected.length > 0) {
-        const ability = useRequestEnv(req, 'abilities');
-
-        if (
-            !ability.has(PermissionID.NODE_EDIT)
-        ) {
-            throw new ForbiddenError(
-                `You are not permitted to read the restricted fields: ${
-                    protectedSelected.map((field) => field.key).join(', ')}`,
-            );
-        }
-
-        onlyRealmWritableQueryResources(query, useRequestEnv(req, 'realm'), 'node.realm_id');
-    }
 
     applyQueryFieldsParseOutput(query, fieldsParsed, { defaultAlias: 'node' });
 }
