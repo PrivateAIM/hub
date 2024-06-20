@@ -1,0 +1,33 @@
+{
+    "name": "@privateaim/server-core-realtime",
+    "version": "0.5.0",
+    "private": true,
+    "author": {
+        "name": "Peter Placzek",
+        "email": "contact@tada5hi.net",
+        "url": "https://tada5hi.net"
+    },
+    "license": "Apache-2.0",
+    "description": "This package contains the realtime application which connects the API with socket based clients.",
+    "dependencies": {
+        "@authup/kit": "^1.0.0-beta.13",
+        "@authup/core-kit": "^1.0.0-beta.13",
+        "@ebec/http": "^2.3.0",
+        "@privateaim/core-kit": "^0.5.0",
+        "@privateaim/core-realtime-kit": "^0.5.0",
+        "@privateaim/server-kit": "^0.5.0",
+        "@privateaim/server-realtime-kit": "^0.5.0",
+        "@socket.io/redis-adapter": "^8.3.0",
+        "dotenv": "^16.4.5",
+        "envix": "^1.3.0",
+        "hapic": "^2.5.1",
+        "redis-extension": "^1.5.0",
+        "routup": "^3.3.0",
+        "socket.io": "^4.7.5"
+    },
+    "scripts": {
+        "dev": "ts-node src/server.ts",
+        "build": "rimraf dist && tsc -p tsconfig.build.json",
+        "start": "node dist/index.js"
+    }
+}

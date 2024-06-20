@@ -5,11 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type {
-    Middleware, Server,
-} from '@privateaim/server-realtime-kit';
+import path from 'node:path';
+import process from 'node:process';
 
-export type SocketNamespaceContext = {
-    server: Server,
-    authupMiddleware: Middleware
-};
+export const WRITABLE_DIR_PATH = path.join(process.cwd(), 'writable');

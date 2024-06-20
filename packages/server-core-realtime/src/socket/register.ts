@@ -18,9 +18,9 @@ import {
     registerProjectSocketHandlers,
     registerRegistryProjectSocketHandlers,
 } from './controllers';
-import type { ResourcesNamespace } from './types';
+import type { Namespace } from './types';
 
-export function registerResourcesNamespaceControllers(nsp: ResourcesNamespace) {
+export function registerControllers(nsp: Namespace) {
     nsp.on('connection', (socket) => {
         mountConnectionController(socket);
 

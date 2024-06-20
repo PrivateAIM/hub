@@ -5,14 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { UnauthorizedError } from '@ebec/http';
+import type { MessagesNamespaceCTSMessagesEvents, MessagesNamespaceSTCEvents } from '@privateaim/core-realtime-kit';
+import { useLogger } from '@privateaim/server-kit';
 import { createAuthupMiddleware } from '@privateaim/server-realtime-kit';
 import { has } from 'envix';
 import type { Server as HTTPServer } from 'node:http';
 import { Server } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
 import { useEnv } from '../config';
-import { registerMessagesNamespace, registerResourcesNamespaces } from './namespaces';
 import type { Config } from '../config';
+import { registerControllers } from './register';
 
 interface SocketServerContext {
     httpServer: HTTPServer,
@@ -20,7 +23,10 @@ interface SocketServerContext {
 }
 
 export function createSocketServer(context : SocketServerContext) : Server {
-    const server = new Server(context.httpServer, {
+    const server = new Server<
+    MessagesNamespaceCTSMessagesEvents,
+    MessagesNamespaceSTCEvents
+    >(context.httpServer, {
         adapter: createAdapter(context.config.redisPub, context.config.redisSub) as any,
         cors: {
             origin(origin, callback) {
@@ -41,15 +47,22 @@ export function createSocketServer(context : SocketServerContext) : Server {
             undefined,
     });
 
-    registerMessagesNamespace({
-        server,
-        authupMiddleware,
+    server.use((socket, next) => {
+        useLogger().info(`${socket.nsp.name}: ${socket.id} connected.`);
+        next();
+    });
+    server.use(authupMiddleware);
+    server.use((socket, next) => {
+        if (!socket.data.userId && !socket.data.robotId) {
+            useLogger().error('Socket is not authenticated.');
+
+            next(new UnauthorizedError());
+        }
+
+        next();
     });
 
-    registerResourcesNamespaces({
-        server,
-        authupMiddleware,
-    });
+    registerControllers(server);
 
     return server;
 }
