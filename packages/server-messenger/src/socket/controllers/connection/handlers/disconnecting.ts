@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { STCEventName } from '@privateaim/core-realtime-kit';
+import { STCConnectionEventName } from '../constants';
 import type { Socket } from '../../../types';
 import {
     buildConnectionRobotRoom,
@@ -36,7 +36,7 @@ export function mountSocketConnectionDisconnectingHandler(socket: Socket) {
 
         if (socket.data.userId) {
             socket.nsp.in(buildConnectionUserSubscriptionRoom(socket.data.userId)).emit(
-                STCEventName.USER_DISCONNECTED,
+                STCConnectionEventName.USER_DISCONNECTED,
                 {
                     id: socket.data.userId,
                     meta: {
@@ -50,7 +50,7 @@ export function mountSocketConnectionDisconnectingHandler(socket: Socket) {
 
         if (socket.data.robotId) {
             socket.nsp.in(buildConnectionRobotSubscriptionRoom(socket.data.robotId)).emit(
-                STCEventName.ROBOT_DISCONNECTED,
+                STCConnectionEventName.ROBOT_DISCONNECTED,
                 {
                     id: socket.data.robotId,
                     meta: {

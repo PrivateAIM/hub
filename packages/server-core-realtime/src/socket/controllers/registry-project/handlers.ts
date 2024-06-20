@@ -21,10 +21,10 @@ import {
     unsubscribeSocketRoom,
 } from '@privateaim/server-realtime-kit';
 import type {
-    ResourcesNamespaceSocket,
+    Socket,
 } from '../../types';
 
-export function registerRegistryProjectSocketHandlers(socket: ResourcesNamespaceSocket) {
+export function registerRegistryProjectSocketHandlers(socket: Socket) {
     if (!socket.data.userId && !socket.data.robotId) return;
 
     socket.on(

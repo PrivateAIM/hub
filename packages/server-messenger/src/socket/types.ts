@@ -5,17 +5,33 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { MessagesNamespaceCTSMessagesEvents, MessagesNamespaceSTCEvents } from '@privateaim/core-realtime-kit';
+import type { Server as ServerBase, Socket as SocketBase } from '@privateaim/server-realtime-kit';
 import type {
-    Server as ServerBase, Socket as SocketBase,
-} from '@privateaim/server-realtime-kit';
+    CTSConnectionEvents,
+    CTSMessagingEvents,
+    STCConnectionEvents,
+    STCMessagingEvents,
+} from './controllers';
+
+export type STCEventContext<T extends Record<string, any>> = T & {
+    meta: {
+        roomName?: string,
+        roomId?: string | number
+    }
+};
+
+export type EventTarget = string | number | undefined;
+export interface EventCallback<T = any> {
+    (error: Error | null) : void;
+    (error: Error | null, data: T) : void;
+}
 
 export type Socket = SocketBase<
-MessagesNamespaceCTSMessagesEvents,
-MessagesNamespaceSTCEvents
+CTSMessagingEvents & CTSConnectionEvents,
+STCMessagingEvents & STCConnectionEvents
 >;
 
 export type Server = ServerBase<
-MessagesNamespaceCTSMessagesEvents,
-MessagesNamespaceSTCEvents
+CTSMessagingEvents & CTSConnectionEvents,
+STCMessagingEvents & STCConnectionEvents
 >;

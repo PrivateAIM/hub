@@ -8,14 +8,14 @@
 import { useLogger } from '@privateaim/server-kit';
 import http from 'node:http';
 import { Router, coreHandler, createNodeDispatcher } from 'routup';
-import { createConfig, useEnv } from './config';
+import { setupConfig, useEnv } from './config';
 import { createSocketServer } from './socket';
 
 (async () => {
     /*
     HTTP Server & Express App
     */
-    const config = createConfig();
+    setupConfig();
 
     const router = new Router();
 
@@ -24,7 +24,9 @@ import { createSocketServer } from './socket';
     })));
 
     const httpServer = new http.Server(createNodeDispatcher(router));
-    const socketServer = createSocketServer({ httpServer, config });
+    const socketServer = createSocketServer(httpServer, {
+        authupURL: useEnv('authupApiURL'),
+    });
 
     /*
     Start Server

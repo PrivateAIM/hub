@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { createSocketServer } from '@privateaim/server-core-realtime';
 import { generateSwagger } from '@privateaim/server-http-kit';
 import { useLogger } from '@privateaim/server-kit';
 import path from 'node:path';
@@ -90,6 +91,10 @@ export async function startCommand() {
 
     const router = createRouter();
     const httpServer = createHttpServer({ router });
+
+    createSocketServer(httpServer, {
+        authupURL: useEnv('authupApiURL'),
+    });
 
     config.components.forEach((c) => c.start());
     config.aggregators.forEach((a) => a.start());

@@ -12,30 +12,46 @@ import type {
     SocketResourcesNamespaceCTSEvents,
     SocketResourcesNamespaceSTCEvents,
 } from '@privateaim/core-realtime-kit';
-import { useLogger } from '@privateaim/server-kit';
-import type { Socket, SocketData } from '@privateaim/server-realtime-kit';
+import {
+    isRedisClientUsable,
+    isVaultClientUsable,
+    useLogger,
+    useRedisClient,
+    useRedisPublishClient,
+    useRedisSubscribeClient,
+    useVaultClient,
+} from '@privateaim/server-kit';
+import type { AuthupMiddlewareRegistrationOptions, Socket, SocketData } from '@privateaim/server-realtime-kit';
 import { createAuthupMiddleware } from '@privateaim/server-realtime-kit';
-import { has } from 'envix';
 import type { Server as HTTPServer } from 'node:http';
+import type { ServerOptions } from 'socket.io';
 import { Server } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
-import { useEnv } from '../config';
-import type { Config } from '../config';
 import { registerControllers } from './register';
 
-interface SocketServerContext {
-    httpServer: HTTPServer,
-    config: Config
-}
+type Adapter = ServerOptions['adapter'];
 
-export function createSocketServer(context : SocketServerContext) : Server {
+export type SocketServerCreateOptions = {
+    authupURL?: string
+};
+
+export function createSocketServer(httpServer: HTTPServer, options: SocketServerCreateOptions) : Server {
+    let adapter : Adapter | undefined;
+
+    if (isRedisClientUsable()) {
+        adapter = createAdapter(
+            useRedisPublishClient(),
+            useRedisSubscribeClient(),
+        );
+    }
+
     const server = new Server<
     SocketResourcesNamespaceCTSEvents,
     SocketResourcesNamespaceSTCEvents,
     STSEvents,
     SocketData
-    >(context.httpServer, {
-        adapter: createAdapter(context.config.redisPub, context.config.redisSub) as any,
+    >(httpServer, {
+        adapter,
         cors: {
             origin(origin, callback) {
                 callback(null, true);
@@ -45,15 +61,17 @@ export function createSocketServer(context : SocketServerContext) : Server {
         transports: ['websocket', 'polling'],
     });
 
-    const authupMiddleware = createAuthupMiddleware({
-        baseURL: useEnv('authupApiURL'),
-        redis: has('REDIS_CONNECTION_STRING') ?
-            context.config.redisDatabase :
-            undefined,
-        vault: has('VAULT_CONNECTION_STRING') ?
-            useEnv('vaultConnectionString') :
-            undefined,
-    });
+    const authupMiddlewareOptions : AuthupMiddlewareRegistrationOptions = {
+        baseURL: options.authupURL,
+    };
+    if (isRedisClientUsable()) {
+        authupMiddlewareOptions.redis = useRedisClient();
+    }
+    if (isVaultClientUsable()) {
+        authupMiddlewareOptions.vault = useVaultClient();
+    }
+
+    const authupMiddleware = createAuthupMiddleware(authupMiddlewareOptions);
 
     const nsp = server.of(/^\/resources(?:#[a-z0-9A-Z-_]+)?$/);
     nsp.use((socket, next) => {

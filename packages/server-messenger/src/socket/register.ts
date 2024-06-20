@@ -5,8 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { mountConnectionController } from '@privateaim/server-realtime-kit';
-import { mountMessagingController } from './controllers';
+import { mountConnectionController, mountMessagingController } from './controllers';
 import type { Server, Socket } from './types';
 
 export function registerControllers(server: Server) {

@@ -5,17 +5,18 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { MessagesNamespaceMessageParty } from '@privateaim/core-realtime-kit';
-import { buildConnectionRobotRoom, buildConnectionUserRoom } from '@privateaim/server-realtime-kit';
 import type { Socket } from '../../types';
+import { buildConnectionRobotRoom, buildConnectionUserRoom } from '../connection';
+import { CTSMessagingEventName, STCMessagingEventName } from './constants';
+import type { MessagingParty } from './types';
 
 export function mountMessagingController(socket: Socket) {
-    socket.on('send', (data) => {
+    socket.on(CTSMessagingEventName.SEND, (data) => {
         if (!socket.data.userId && !socket.data.robotId) {
             return;
         }
 
-        let from : MessagesNamespaceMessageParty;
+        let from : MessagingParty;
         if (socket.data.userId) {
             from = {
                 type: 'user',
@@ -31,7 +32,7 @@ export function mountMessagingController(socket: Socket) {
             const to = data.to[i];
             if (to.type === 'user') {
                 socket.in(buildConnectionUserRoom(to.id))
-                    .emit('send', {
+                    .emit(STCMessagingEventName.SEND, {
                         from,
                         data: data.data,
                         metadata: data.metadata,
@@ -41,7 +42,7 @@ export function mountMessagingController(socket: Socket) {
             }
 
             socket.in(buildConnectionRobotRoom(to.id))
-                .emit('send', {
+                .emit(STCMessagingEventName.SEND, {
                     from,
                     data: data.data,
                     metadata: data.metadata,

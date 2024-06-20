@@ -5,5 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './module';
-export * from './utils';
+export enum STCMessagingEventName {
+    SEND = 'send',
+}
+
+export enum CTSMessagingEventName {
+    SEND = 'send',
+}

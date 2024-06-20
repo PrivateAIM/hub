@@ -20,9 +20,9 @@ import {
     subscribeSocketRoom,
     unsubscribeSocketRoom,
 } from '@privateaim/server-realtime-kit';
-import type { ResourcesNamespaceSocket } from '../../types';
+import type { Socket } from '../../types';
 
-export function registerAnalysisSocketHandlers(socket: ResourcesNamespaceSocket) {
+export function registerAnalysisSocketHandlers(socket: Socket) {
     if (!socket.data.userId && !socket.data.robotId) return;
 
     socket.on(

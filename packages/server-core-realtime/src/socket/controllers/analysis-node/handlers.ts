@@ -22,10 +22,10 @@ import {
     unsubscribeSocketRoom,
 } from '@privateaim/server-realtime-kit';
 import type {
-    ResourcesNamespaceSocket,
+    Socket,
 } from '../../types';
 
-export function registerAnalysisNodeSocketHandlers(socket: ResourcesNamespaceSocket) {
+export function registerAnalysisNodeSocketHandlers(socket: Socket) {
     if (!socket.data.userId && !socket.data.robotId) return;
 
     // ------------------------------------------------------------
@@ -59,7 +59,7 @@ export function registerAnalysisNodeSocketHandlers(socket: ResourcesNamespaceSoc
     );
 }
 
-export function registerAnalysisNodeForRealmSocketHandlers(socket: ResourcesNamespaceSocket) {
+export function registerAnalysisNodeForRealmSocketHandlers(socket: Socket) {
     if (!socket.data.userId && !socket.data.robotId) return;
 
     // ------------------------------------------------------------
