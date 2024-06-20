@@ -47,7 +47,7 @@ export async function syncMasterImages() : Promise<MasterImagesSyncResponse> {
             await extract({
                 file: tarPath,
                 cwd: directoryPath,
-                onentry(entry) {
+                onReadEntry(entry) {
                     entry.path = entry.path.split('/').splice(1).join('/');
                 },
             });
