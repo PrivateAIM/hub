@@ -86,7 +86,7 @@ services:
                 condition: service_healthy
             storage:
                 condition: service_healthy
-            realtime:
+            messenger:
                 condition: service_healthy
         ports:
             - '3000:3000'
@@ -149,10 +149,10 @@ services:
             SKIP_ANALYSIS_APPROVAL: true
         networks:
             hub:
-    realtime:
+    messenger:
         build: '.'
         restart: always
-        command: realtime start
+        command: messenger start
         depends_on:
             authup:
                 condition: service_healthy
@@ -224,12 +224,9 @@ services:
                 condition: service_healthy
             storage:
                 condition: service_healthy
-            realtime:
-                condition: service_healthy
         environment:
             NUXT_PUBLIC_STORAGE_URL: ${PUBLIC_URL:-http://localhost:3000}/storage/
             NUXT_PUBLIC_CORE_URL: ${PUBLIC_URL:-http://localhost:3000}/core/
-            NUXT_PUBLIC_REALTIME_URL: ${PUBLIC_URL:-http://localhost:3000}/
             NUXT_PUBLIC_AUTHUP_URL: ${PUBLIC_URL:-http://localhost:3000}/auth/
         networks:
             hub:

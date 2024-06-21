@@ -16,7 +16,7 @@ cd "${BASE_DIR}"
 case "${1}" in
     core) PACKAGE=core;;
     ui) PACKAGE=ui;;
-    realtime) PACKAGE=realtime;;
+    messenger) PACKAGE=messenger;;
     analysis-manager) PACKAGE=analysis-manager;;
     storage) PACKAGE=storage;;
     cli) PACKAGE=cli;;
@@ -29,7 +29,7 @@ if [[ -z "${PACKAGE}" ]]; then
     printf 'Usage:\n'
     printf '  core <command>\n    Start or run the core service in dev mode.\n'
     printf '  ui <command>\n    Start or run the ui in dev mode.\n'
-    printf '  realtime <command>\n    Start or run the realtime service in dev mode.\n'
+    printf '  messenger <command>\n    Start or run the messenger service in dev mode.\n'
     printf '  analysis-manager <command>\n    Start or run the analysis-manager service in dev mode.\n'
     printf '  cli <command>\n    Run a CLI command.\n'
     exit 0
@@ -44,8 +44,8 @@ case "${PACKAGE}" in
         export NUXT_PORT=3000
         exec npm run "$1" --workspace=packages/client-ui
         ;;
-    realtime)
-        exec npm run "$1" --workspace=packages/server-realtime
+    messenger)
+        exec npm run "$1" --workspace=packages/server-messenger
         ;;
     analysis-manager)
         exec npm run "$1" --workspace=packages/server-analysis-manager
