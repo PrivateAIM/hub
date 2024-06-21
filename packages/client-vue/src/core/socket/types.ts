@@ -6,11 +6,11 @@
  */
 
 import type { ClientManager } from '@authup/core-realtime-kit';
-import type { SocketResourcesNamespaceCTSEvents, SocketResourcesNamespaceSTCEvents } from '@privateaim/core-realtime-kit';
+import type { CTSEvents, STCEvents } from '@privateaim/core-realtime-kit';
 import type { Socket } from 'socket.io-client';
 
-export type SocketClient = Socket<SocketResourcesNamespaceSTCEvents, SocketResourcesNamespaceCTSEvents>;
-export type SocketClientManager = ClientManager<SocketResourcesNamespaceSTCEvents, SocketResourcesNamespaceCTSEvents>;
+export type SocketClient = Socket<STCEvents, CTSEvents>;
+export type SocketClientManager = ClientManager<STCEvents, CTSEvents>;
 
 export type SocketManagerInstallOptions = {
     baseURL: string

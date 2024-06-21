@@ -8,9 +8,9 @@
 import { REALM_MASTER_NAME } from '@authup/core-kit';
 import { ForbiddenError, UnauthorizedError } from '@ebec/http';
 import type {
+    CTSEvents,
+    STCEvents,
     STSEvents,
-    SocketResourcesNamespaceCTSEvents,
-    SocketResourcesNamespaceSTCEvents,
 } from '@privateaim/core-realtime-kit';
 import {
     isRedisClientUsable,
@@ -46,8 +46,8 @@ export function createSocketServer(httpServer: HTTPServer, options: SocketServer
     }
 
     const server = new Server<
-    SocketResourcesNamespaceCTSEvents,
-    SocketResourcesNamespaceSTCEvents,
+    CTSEvents,
+    STCEvents,
     STSEvents,
     SocketData
     >(httpServer, {

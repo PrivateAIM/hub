@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { mountConnectionController } from '@privateaim/server-realtime-kit';
 import {
     registerAnalysisFileSocketHandlers,
     registerAnalysisLogSocketHandlers,
@@ -22,8 +21,6 @@ import type { Namespace } from './types';
 
 export function registerControllers(nsp: Namespace) {
     nsp.on('connection', (socket) => {
-        mountConnectionController(socket);
-
         // project-node
         registerProjectSocketHandlers(socket);
         if (socket.data.namespaceId) {

@@ -5,7 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { CTSEventName, STCEventName } from './constants';
+import type {
+    DomainEventContext,
+    DomainEventFullName,
+    DomainEventSubscriptionFullName,
+    DomainSubType,
+    DomainType,
+} from '@privateaim/core-kit';
 
 export type STCEventContext<T extends Record<string, any>> = T & {
     meta: {
@@ -25,21 +31,14 @@ export type STSEvents = {
 };
 
 export type STCEvents = {
-    [K in `${STCEventName}`]: (data: STCEventContext<{id: string}>) => void
+    [K in `${DomainType}` | `${DomainSubType}` as DomainEventFullName<K>]: (
+        data: STCEventContext<DomainEventContext<K>>
+    ) => void
 };
 
 export type CTSEvents = {
-    [K in `${CTSEventName.USER_CONNECTION_SUBSCRIBE}` |
-        `${CTSEventName.USER_CONNECTION_UNSUBSCRIBE}` |
-        `${CTSEventName.ROBOT_CONNECTION_SUBSCRIBE}` |
-        `${CTSEventName.ROBOT_CONNECTION_UNSUBSCRIBE}`
-    ]: (
-        target: EventTarget,
-        cb?: EventCallback<undefined>
-    ) => void
-} & {
-    [K in `${CTSEventName.USER_CONNECTIONS}` | `${CTSEventName.ROBOT_CONNECTIONS}`]: (
-        target: EventTarget,
-        cb?: EventCallback<number>
+    [K in DomainEventSubscriptionFullName<`${DomainType}` | `${DomainSubType}`>]: (
+        target?: EventTarget,
+        cb?: EventCallback
     ) => void
 };

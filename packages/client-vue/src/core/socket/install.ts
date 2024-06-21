@@ -7,7 +7,7 @@
 
 import { storeToRefs, useStore } from '@authup/client-web-kit';
 import { ClientManager } from '@authup/core-realtime-kit';
-import type { SocketResourcesNamespaceCTSEvents, SocketResourcesNamespaceSTCEvents } from '@privateaim/core-realtime-kit';
+import type { CTSEvents, STCEvents } from '@privateaim/core-realtime-kit';
 import type { App } from 'vue';
 import { ref } from 'vue';
 import { provideSocketManager } from './singleton';
@@ -18,8 +18,8 @@ export function installSocketManager(app: App, options: SocketManagerInstallOpti
     const { accessToken } = storeToRefs(store);
 
     const manager = new ClientManager<
-    SocketResourcesNamespaceSTCEvents,
-    SocketResourcesNamespaceCTSEvents
+    STCEvents,
+    CTSEvents
     >({
         url: options.baseURL,
         token: () => accessToken.value,

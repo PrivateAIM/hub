@@ -6,9 +6,9 @@
  */
 
 import type {
+    CTSEvents,
+    STCEvents,
     STSEvents,
-    SocketResourcesNamespaceCTSEvents,
-    SocketResourcesNamespaceSTCEvents,
 } from '@privateaim/core-realtime-kit';
 import type {
     SocketData,
@@ -20,22 +20,22 @@ import type {
 } from 'socket.io';
 
 export type Socket = SocketBase<
-SocketResourcesNamespaceCTSEvents,
-SocketResourcesNamespaceSTCEvents,
+CTSEvents,
+STCEvents,
 STSEvents,
 SocketData
 >;
 
 export type Namespace = NamespaceBase<
-SocketResourcesNamespaceCTSEvents,
-SocketResourcesNamespaceSTCEvents,
+CTSEvents,
+STCEvents,
 STSEvents,
 SocketData
 >;
 
 export type Server = ServerBase<
-SocketResourcesNamespaceCTSEvents,
-SocketResourcesNamespaceSTCEvents,
+CTSEvents,
+STCEvents,
 STSEvents,
 SocketData
 >;
