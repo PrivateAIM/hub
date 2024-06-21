@@ -1,5 +1,4 @@
-import type { EventCallback } from '../../types';
-import type { CTSConnectionEvents, STCConnectionEvents } from '../connection';
+import type { EventCallback } from '../types';
 import type { CTSMessagingEventName, STCMessagingEventName } from './constants';
 
 export type MessagingParty = {
@@ -19,10 +18,10 @@ export type STCMessagingMessage = {
     metadata: Record<string, any>
 };
 
-export type STCMessagingEvents = STCConnectionEvents & {
+export type STCMessagingEvents = {
     [STCMessagingEventName.SEND]: (data: STCMessagingMessage) => void
 };
 
-export type CTSMessagingEvents = CTSConnectionEvents & {
+export type CTSMessagingEvents = {
     [CTSMessagingEventName.SEND]: (data: Message, cb?: EventCallback) => void;
 };

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { STCConnectionEventName } from '../constants';
+import { STCConnectionEventName } from '@privateaim/messenger-kit';
 import type { Socket } from '../../../types';
 import {
     buildConnectionRobotRoom,

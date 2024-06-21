@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { CTSMessagingEventName, STCMessagingEventName } from '@privateaim/messenger-kit';
+import type { MessagingParty } from '@privateaim/messenger-kit';
 import type { Socket } from '../../types';
 import { buildConnectionRobotRoom, buildConnectionUserRoom } from '../connection';
-import { CTSMessagingEventName, STCMessagingEventName } from './constants';
-import type { MessagingParty } from './types';
 
 export function mountMessagingController(socket: Socket) {
     socket.on(CTSMessagingEventName.SEND, (data) => {

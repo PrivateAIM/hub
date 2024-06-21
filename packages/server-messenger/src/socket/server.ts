@@ -6,18 +6,13 @@
  */
 
 import { UnauthorizedError } from '@ebec/http';
+import type { CTSEvents, STCEvents } from '@privateaim/messenger-kit';
 import { useLogger } from '@privateaim/server-kit';
 import { createAuthupMiddleware } from '@privateaim/server-realtime-kit';
 import { has } from 'envix';
 import type { Server as HTTPServer } from 'node:http';
 import { Server } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
-import type {
-    CTSConnectionEvents,
-    CTSMessagingEvents,
-    STCConnectionEvents,
-    STCMessagingEvents,
-} from './controllers';
 import { useEnv } from '../config';
 import type { Config } from '../config';
 import { registerControllers } from './register';
@@ -29,8 +24,8 @@ interface SocketServerContext {
 
 export function createSocketServer(context : SocketServerContext) : Server {
     const server = new Server<
-    CTSMessagingEvents & CTSConnectionEvents,
-    STCMessagingEvents & STCConnectionEvents
+    CTSEvents,
+    STCEvents
     >(context.httpServer, {
         adapter: createAdapter(context.config.redisPub, context.config.redisSub) as any,
         cors: {

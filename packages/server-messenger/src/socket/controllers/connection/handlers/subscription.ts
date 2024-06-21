@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { CTSConnectionEventName } from '../constants';
+import { CTSConnectionEventName } from '@privateaim/messenger-kit';
 import type { Socket } from '../../../types';
 import {
     buildConnectionRobotRoom,

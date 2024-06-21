@@ -7,10 +7,3 @@
 
 export * from './server';
 export * from './types';
-export { CTSConnectionEvents } from './controllers';
-export { CTSMessagingEvents } from './controllers';
-export { Message } from './controllers';
-export { STCMessagingEvents } from './controllers';
-export { STCMessagingMessage } from './controllers';
-export { MessagingParty } from './controllers';
-export { STCConnectionEvents } from './controllers';
