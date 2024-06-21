@@ -26,7 +26,7 @@ export function install(app: App, options: Options): void {
     });
 
     installSocketManager(app, {
-        baseURL: options.realtimeURL,
+        baseURL: options.coreURL,
     });
 
     installTranslator(app, {

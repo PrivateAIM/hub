@@ -7,7 +7,6 @@
 
 import type { Realm, Robot, User } from '@authup/core-kit';
 import type { Abilities } from '@authup/kit';
-import type { CTSEvents, STCEvents, STSEvents } from '@privateaim/core-realtime-kit';
 import type {
     Namespace as _Namespace,
     Server as _Server,
@@ -30,31 +29,39 @@ export type SocketData = {
     roomSubscriptions: Record<string, number>,
 };
 
+export interface EventsMap {
+    [p: string]: any
+}
+
+export interface DefaultEventsMap {
+    [p: string]: (...args: any[]) => void
+}
+
 export type Server<
-    ListenEvents extends CTSEvents = CTSEvents,
-    EmitEvents extends STCEvents = STCEvents,
-    ServerSideEvents extends STSEvents = STSEvents,
+    ListenEvents extends EventsMap = DefaultEventsMap,
+    EmitEvents extends EventsMap = ListenEvents,
+    ServerSideEvents extends EventsMap = DefaultEventsMap,
     Data extends SocketData = SocketData,
 > = _Server<ListenEvents, EmitEvents, ServerSideEvents, Data>;
 
 export type Socket<
-    ListenEvents extends CTSEvents = CTSEvents,
-    EmitEvents extends STCEvents = STCEvents,
-    ServerSideEvents extends STSEvents = STSEvents,
+    ListenEvents extends EventsMap = DefaultEventsMap,
+    EmitEvents extends EventsMap = ListenEvents,
+    ServerSideEvents extends EventsMap = DefaultEventsMap,
     Data extends SocketData = SocketData,
 > = _Socket<ListenEvents, EmitEvents, ServerSideEvents, Data>;
 
 export type Namespace<
-    ListenEvents extends CTSEvents = CTSEvents,
-    EmitEvents extends STCEvents = STCEvents,
-    ServerSideEvents extends STSEvents = STSEvents,
+    ListenEvents extends EventsMap = DefaultEventsMap,
+    EmitEvents extends EventsMap = ListenEvents,
+    ServerSideEvents extends EventsMap = DefaultEventsMap,
     Data extends SocketData = SocketData,
 > = _Namespace<ListenEvents, EmitEvents, ServerSideEvents, Data>;
 
 export type Middleware<
-    ListenEvents extends CTSEvents = CTSEvents,
-    EmitEvents extends STCEvents = STCEvents,
-    ServerSideEvents extends STSEvents = STSEvents,
+    ListenEvents extends EventsMap = DefaultEventsMap,
+    EmitEvents extends EventsMap = ListenEvents,
+    ServerSideEvents extends EventsMap = DefaultEventsMap,
     Data extends SocketData = SocketData,
 > = (
     socket: Socket<ListenEvents, EmitEvents, ServerSideEvents, Data>,

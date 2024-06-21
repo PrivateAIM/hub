@@ -1,0 +1,10 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "paths": {
+            "@privateaim/messenger-kit": ["./packages/messenger-kit/src"],
+            "@privateaim/server-kit": ["./packages/server-kit/src"],
+            "@privateaim/server-realtime-kit": ["./packages/server-realtime-kit/src"]
+        }
+    }
+}

@@ -14,6 +14,5 @@ export default defineNuxtPlugin((ctx) => {
     ctx.vueApp.use(install, {
         coreURL: runtimeConfig.public.coreUrl,
         storageURL: runtimeConfig.public.storageUrl,
-        realtimeURL: runtimeConfig.public.realtimeUrl,
     });
 });
