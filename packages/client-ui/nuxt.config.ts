@@ -12,10 +12,9 @@ export default defineNuxtConfig({
     runtimeConfig: {
         public: {
             coreUrl: process.env.CORE_URL,
+            coreRealtimeTransports: process.env.CORE_REALTIME_TRANSPORTS,
             storageUrl: process.env.STORAGE_URL,
             authupUrl: process.env.AUTHUP_URL,
-            realtimeUrl: process.env.REALTIME_URL,
-            realtimeTransports: process.env.REALTIME_TRANSPORTS,
         },
     },
     telemetry: false,

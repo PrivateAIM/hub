@@ -10,7 +10,6 @@ import type { StoreManagerOptions } from '@vuecs/list-controls/core';
 export type Options = {
     coreURL: string,
     storageURL: string,
-    realtimeURL: string,
 
     components?: boolean | string[],
     storeManager?: StoreManagerOptions,
