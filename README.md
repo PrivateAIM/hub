@@ -9,13 +9,12 @@ This repository contains the HUB ecosystem of FLAME.
 
 > 🚧 **Work in Progress**
 >
-> The HUB ecosystem is currently in active development and not usable for production yet.
+> The HUB ecosystem is currently under active development and is not yet ready for production.
 
 
 **Table of Contents**
 
 - [Packages](#packages)
-- [Usage](#usage)
 - [Contributing](#contributing)
 - [Credits](#credits)
 - [License](#license)
@@ -24,68 +23,24 @@ This repository contains the HUB ecosystem of FLAME.
 
 The repository contains the following packages:
 
-**`General`**
-- **@privateaim/core** 🧱: This package contains common constants, functions, types, ...
-- **@privateaim/storage-kit** 🧱: This package contains an api-client, types and utils in the context of the storage service, ...
-
-**`Client`**
-- **@privateaim/client-ui** 🧸: This package contains the User Interface.
-- **@privateaim/client-vue** 🧩: This package contains vue components for frontend applications.
-
-**`Server`**
-- **@privateaim/server-kit** 🧱: This package contains common constants, functions, types, ... for the server side.
-- **@privateaim/server-core** 🌴: This package contains aggregators, components and many more.
-- **@privateaim/server-realtime** 🚄: This package contains the realtime application which connects the API with socket based clients.
-- **@privateaim/server-analysis-manager** 🏭: This package contains the analysis manager, which is responsible to build and distribute an analysis.
-
-## Usage
-
-### Development
-
-**1. Installation & Build**
-
-Download the source code.
-
-```shell
-$ git clone https://github.com/PrivateAim/hub
-$ cd hub
-```
-
-In addition, `Node.js` must be installed on the host machine, to start packages and to install required dependencies.
-To install the dependencies, run:
-
-```shell
-$ npm i
-```
-
-To build all packages, run:
-
-```shell
-$ npm run build
-```
-
-**2. Configuration**
-
-Read the `README.md` in each package directory. Each package must be configured individually.
-
-**3. Execution**
-
-Start the applications/services in a single terminal window (or as background process) with the following command:
-```shell
-$ npm run server-core
-```
-
-```shell
-$ npm run client-ui
-```
-
-```shell
-$ npm run server-realtime
-```
-
-```shell
-$ npm run server-analysis-manager
-```
+| Name                                                                | Type            | Description                                                                                           |
+|---------------------------------------------------------------------|-----------------|-------------------------------------------------------------------------------------------------------|
+| [client-ui](packages/client-ui)                                     | App             | This package contains the web app.                                                                    |
+| [client-vue](packages/client-vue)                                   | Library         | This package contains components, helpers, ... for the web app.                                       |
+| [core-http-kit](packages/core-http-kit)                             | Library         | This package contains the http API Client for the core service.                                       |
+| [core-kit](packages/core-kit)                                       | Library         | This package contains interfaces/types, ... for the core service.                                     |
+| [core-realtime-kit](packages/core-realtime-kit)                     | Library         | This package contains interfaces/types, ... for the core realtime service.                            |
+| [kit](packages/kit)                                                 | Library         | This package contains helpers/utilities for the whole ecosystem.                                      |
+| [messenger-kit](packages/messenger-kit)                             | Library         | This package contains helpers/utilities for the messenger service.                                    |
+| [server-analysis-manager](packages/server-analysis-manager)         | Service         | This package contains the analysis manager, which is responsible to build and distribute an analysis. |
+| [server-analysis-manager-kit](packages/server-analysis-manager-kit) | Library         | This package contains helpers/utilities for the analysis-manager service.                             |
+| [server-core](packages/server-core)                                 | Service         | This package contains the core service.                                                               |
+| [server-core-realtime](packages/server-core-realtime)               | Library/Service | This package contains the core realtime service.                                                      |
+| [server-http-kit](packages/server-http-kit)                         | Library         | This package contains helpers/utilities for all http services.                                        |
+| [server-kit](packages/server-kit)                                   | Library         | This package contains helpers/utilities for all services.                                             |
+| [server-realtime-kit](packages/server-realtime-kit)                 | Library         | This package contains helpers/utilities for all socket services.                                      |
+| [server-storage](packages/server-storage)                           | Service         | This package contains the storage service.                                                            |
+| [storage-kit](packages/storage-kit)                                 | Library         | This package contains interfaces/types, helpers/utilities, ... for the storage service.               |
 
 ## Contributing
 
