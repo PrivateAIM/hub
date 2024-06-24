@@ -13,7 +13,7 @@
     "dependencies": {
         "@authup/kit": "^1.0.0-beta.13",
         "@authup/core-kit": "^1.0.0-beta.13",
-        "@authup/core-http-kit": "^1.0.0-beta.13",
+        "@authup/core-http-kit": "^1.0.0-beta.18",
         "@authup/server-core-plugin-http": "^1.0.0-beta.13",
         "@ebec/http": "^2.3.0",
         "@hapic/harbor": "^2.3.3",
