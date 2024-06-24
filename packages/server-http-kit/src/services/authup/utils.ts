@@ -26,10 +26,6 @@ TokenVerificationData,
 function generateAbilities(): Ability[] {
     return Object.values(PermissionID).map((name) => ({
         name,
-        condition: null,
-        inverse: false,
-        power: 999,
-        target: null,
     } satisfies Ability));
 }
 
