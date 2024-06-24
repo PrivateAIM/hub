@@ -1,0 +1,71 @@
+/*
+ * Copyright (c) 2021-2024.
+ * Author Peter Placzek (tada5hi)
+ * For the full copyright and license information,
+ * view the LICENSE file that was distributed with this source code.
+ */
+
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn,
+} from 'typeorm';
+import type {
+    Analysis,
+    AnalysisPermission,
+} from '@privateaim/core-kit';
+import type { Permission, Policy, Realm } from '@authup/core-kit';
+import { AnalysisEntity } from '../analysis';
+
+@Entity({ name: 'analysis_permissions' })
+export class AnalysisPermissionEntity implements AnalysisPermission {
+    @PrimaryGeneratedColumn('uuid')
+        id: string;
+
+    // ------------------------------------------------------------------
+
+    @CreateDateColumn()
+        created_at: Date;
+
+    @UpdateDateColumn()
+        updated_at: Date;
+
+    // ------------------------------------------------------------------
+
+    @Column()
+        analysis_id: Analysis['id'];
+
+    @ManyToOne(() => AnalysisEntity, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'analysis_id' })
+        analysis: AnalysisEntity;
+
+    // ------------------------------------------------------------------
+
+    @Column()
+        permission_id: Permission['id'];
+
+    permission: Permission;
+
+    // ------------------------------------------------------------------
+
+    @Column({ type: 'uuid', nullable: true })
+        policy_id: Policy['id'] | null;
+
+    policy: Policy;
+
+    // ------------------------------------------------------------------
+
+    @Column({ type: 'uuid', nullable: true })
+        permission_realm_id: Realm['id'] | null;
+
+    permission_realm: Realm;
+
+    // ------------------------------------------------------------------
+
+    @Column({ type: 'uuid' })
+        realm_id: Realm['id'];
+}

@@ -10,6 +10,7 @@ export * from './analysis-bucket';
 export * from './analysis-bucket-file';
 export * from './analysis-log';
 export * from './anaylsis-node';
+export * from './analysis-permission';
 export * from './master-image';
 export * from './master-image-group';
 export * from './node';
