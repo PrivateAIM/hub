@@ -34,6 +34,8 @@ export async function getOneAnalysisPermissionRouteHandler(req: Request, res: Re
         throw new NotFoundError();
     }
 
+    // todo: resolve permission & policy
+
     if (!isRealmResourceReadable(useRequestEnv(req, 'realm'), entity.analysis_realm_id)) {
         throw new ForbiddenError();
     }
@@ -76,6 +78,8 @@ export async function getManyAnalysisPermissionRouteHandler(req: Request, res: R
     });
 
     const [entities, total] = await query.getManyAndCount();
+
+    // todo: resolve policy, permission.
 
     return send(res, {
         data: entities,
