@@ -7,6 +7,7 @@
 
 import { extendObject } from '@authup/kit';
 import type { AnalysisPermission } from '@privateaim/core-kit';
+import { isAuthupClientUsable, useAuthupClient } from '@privateaim/server-kit';
 import {
     dropTestDatabase, expectPropertiesEqualToSrc, removeDateProperties, useSuperTest, useTestDatabase,
 } from '../../utils';
@@ -34,14 +35,19 @@ describe('src/controllers/core/analysis-permission', () => {
         const project = await createSuperTestProject(superTest);
         expect(project.body.id).toBeDefined();
 
-        // todo: maybe create authup permission (policy)
-
         const analysis = await createSuperTestAnalysis(superTest, {
             project_id: project.body.id,
         });
         expect(analysis.body.id).toBeDefined();
-
         attributes.analysis_id = analysis.body.id;
+
+        // todo: maybe create authup policy
+
+        if (isAuthupClientUsable()) {
+            const authup = useAuthupClient();
+            const permission = await authup.permission.create({ name: 'analysis_permission' });
+            attributes.permission_id = permission.id;
+        }
 
         const response = await superTest
             .post('/analysis-permissions')
