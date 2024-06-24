@@ -45,7 +45,14 @@ export class AnalysisPermissionEntity implements AnalysisPermission {
 
     // ------------------------------------------------------------------
 
-    @Column()
+    analysis_realm: Realm | null;
+
+    @Column({ type: 'uuid', nullable: true })
+        analysis_realm_id: Realm['id'] | null;
+
+    // ------------------------------------------------------------------
+
+    @Column({ type: 'uuid' })
         permission_id: Permission['id'];
 
     permission: Permission;

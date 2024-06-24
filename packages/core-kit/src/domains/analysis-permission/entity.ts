@@ -5,12 +5,20 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { PermissionRelation } from '@authup/core-kit';
+import type { PermissionRelation, Realm } from '@authup/core-kit';
 import type { DomainType } from '../constants';
 import type { DomainEventBaseContext } from '../types-base';
 
 export interface AnalysisPermission extends PermissionRelation {
     id: string;
+
+    // ------------------------------------------------------------------
+
+    analysis_realm: Realm | null;
+
+    analysis_realm_id: Realm['id'] | null;
+
+    // ------------------------------------------------------------------
 
     created_at: Date | string;
 
