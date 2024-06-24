@@ -13,7 +13,6 @@ export enum DomainType {
     REGISTRY = 'registry',
     REGISTRY_PROJECT = 'registryProject',
     NODE = 'node',
-    SERVICE = 'service',
     ANALYSIS = 'analysis',
     ANALYSIS_BUCKET = 'analysisBucket',
     ANALYSIS_BUCKET_FILE = 'analysisBucketFile',

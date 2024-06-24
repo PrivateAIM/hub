@@ -30,7 +30,7 @@ export async function updateAnalysisPermissionRouteHandler(req: Request, res: Re
         throw new NotFoundError();
     }
 
-    if (!isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.realm_id)) {
+    if (!isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.analysis_realm_id)) {
         throw new ForbiddenError();
     }
 
