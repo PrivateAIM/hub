@@ -25,7 +25,7 @@ export async function runAnalysisPermissionValidation(
     operation: 'create' | 'update',
 ) : Promise<HTTPValidationResult<AnalysisPermissionEntity>> {
     if (operation === 'create') {
-        await check('node_id')
+        await check('analysis_id')
             .exists()
             .isUUID()
             .run(req);

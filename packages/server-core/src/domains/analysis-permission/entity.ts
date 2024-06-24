@@ -62,17 +62,12 @@ export class AnalysisPermissionEntity implements AnalysisPermission {
     @Column({ type: 'uuid', nullable: true })
         policy_id: Policy['id'] | null;
 
-    policy: Policy;
+    policy: Policy | null;
 
     // ------------------------------------------------------------------
 
     @Column({ type: 'uuid', nullable: true })
         permission_realm_id: Realm['id'] | null;
 
-    permission_realm: Realm;
-
-    // ------------------------------------------------------------------
-
-    @Column({ type: 'uuid' })
-        realm_id: Realm['id'];
+    permission_realm: Realm | null;
 }

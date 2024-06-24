@@ -6,11 +6,18 @@
  */
 
 import type { PermissionRelation, Realm } from '@authup/core-kit';
+import type { Analysis } from '../analysis';
 import type { DomainType } from '../constants';
 import type { DomainEventBaseContext } from '../types-base';
 
 export interface AnalysisPermission extends PermissionRelation {
     id: string;
+
+    // ------------------------------------------------------------------
+
+    analysis_id: Analysis['id'];
+
+    analysis: Analysis;
 
     // ------------------------------------------------------------------
 
