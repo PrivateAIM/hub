@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { isClientErrorWithStatusCode } from '@hapic/harbor';
 import { isAuthupClientUsable, useAuthupClient } from '@privateaim/server-kit';
 import { check } from 'express-validator';
 import { BadRequestError } from '@ebec/http';
@@ -34,12 +35,12 @@ export async function runAnalysisPermissionValidation(
             .exists()
             .isUUID()
             .run(req);
-
-        await check('policy_id')
-            .isUUID()
-            .optional({ values: 'null' })
-            .run(req);
     }
+
+    await check('policy_id')
+        .isUUID()
+        .optional({ values: 'null' })
+        .run(req);
 
     const result = createHTTPValidationResult<AnalysisPermissionEntity>(req);
 
@@ -63,12 +64,17 @@ export async function runAnalysisPermissionValidation(
     if (isAuthupClientUsable()) {
         const authup = useAuthupClient();
 
-        const permission = await authup.permission.getOne(result.data.permission_id);
+        try {
+            const permission = await authup.permission.getOne(result.data.permission_id);
+            // todo: is requester permitted to assign permission ?!
+            result.data.permission_realm_id = permission.realm_id;
+        } catch (e) {
+            if (isClientErrorWithStatusCode(e, 404)) {
+                throw new BadRequestError(buildHTTPValidationErrorMessage('permission_id'));
+            }
 
-        // todo: is requester permitted to assign permission ?!
-
-        result.data.permission_realm_id = permission.realm_id;
-
+            throw e;
+        }
         // todo: wait for authup implementation
         // const policy = await authup.policy.getOne(result.data.policy_id);
         // result.data.policy_id = policy.id;
