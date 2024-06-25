@@ -10,7 +10,7 @@ RUN rm -rf ./node-modules && \
     npm ci && \
     npm run build && \
     touch packages/server-core/.env && \
-    touch packages/server-realtime/.env && \
+    touch packages/server-messenger/.env && \
     touch packages/server-analysis-manager/.env && \
     touch packages/client-ui/.env
 
