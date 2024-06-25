@@ -7,7 +7,7 @@
 
 import type { Project } from '@privateaim/core-kit';
 import {
-    expectPropertiesEqualToSrc, removeDateProperties, useSuperTest, useTestRuntime,
+    expectPropertiesEqualToSrc, initDataSource, removeDateProperties, useSuperTest,
 } from '../../utils';
 import { createSuperTestProject } from '../../utils/domains';
 
@@ -15,7 +15,7 @@ describe('src/controllers/core/project', () => {
     const superTest = useSuperTest();
 
     beforeAll(async () => {
-        await useTestRuntime();
+        await initDataSource();
     });
 
     let details : Project;

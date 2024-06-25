@@ -9,7 +9,7 @@ import type {
     Node,
 } from '@privateaim/core-kit';
 import {
-    expectPropertiesEqualToSrc, removeDateProperties, useSuperTest, useTestRuntime,
+    expectPropertiesEqualToSrc, initDataSource, removeDateProperties, useSuperTest,
 } from '../../utils';
 import { createSuperTestNode } from '../../utils/domains';
 
@@ -17,7 +17,7 @@ describe('src/controllers/core/node', () => {
     const superTest = useSuperTest();
 
     beforeAll(async () => {
-        await useTestRuntime();
+        await initDataSource();
     });
 
     let details: Node;

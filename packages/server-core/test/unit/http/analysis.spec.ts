@@ -9,9 +9,9 @@ import type { Analysis } from '@privateaim/core-kit';
 import { buildHTTPValidationErrorMessage } from '@privateaim/server-http-kit';
 import {
     expectPropertiesEqualToSrc,
+    initDataSource,
     removeDateProperties,
     useSuperTest,
-    useTestRuntime,
 } from '../../utils';
 import { TEST_DEFAULT_ANALYSIS, createSuperTestAnalysis, createSuperTestProject } from '../../utils/domains';
 
@@ -21,7 +21,7 @@ describe('src/controllers/core/analysis', () => {
     let details : Analysis;
 
     beforeAll(async () => {
-        await useTestRuntime();
+        await initDataSource();
     });
 
     it('should create resource', async () => {

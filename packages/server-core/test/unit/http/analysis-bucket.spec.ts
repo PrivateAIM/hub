@@ -9,8 +9,8 @@ import type { AnalysisBucket, AnalysisNode } from '@privateaim/core-kit';
 import { AnalysisBucketType } from '@privateaim/core-kit';
 import {
     expectPropertiesEqualToSrc,
-    removeDateProperties,
-    useSuperTest, useTestRuntime,
+    initDataSource,
+    removeDateProperties, useSuperTest,
 } from '../../utils';
 import {
     createSuperTestAnalysis,
@@ -21,7 +21,7 @@ describe('controllers/analysis-file', () => {
     const superTest = useSuperTest();
 
     beforeAll(async () => {
-        await useTestRuntime();
+        await initDataSource();
     });
 
     let details : AnalysisNode;

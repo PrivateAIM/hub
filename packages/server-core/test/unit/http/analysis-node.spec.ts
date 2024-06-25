@@ -7,7 +7,7 @@
 
 import type { AnalysisNode } from '@privateaim/core-kit';
 import {
-    expectPropertiesEqualToSrc, removeDateProperties, useSuperTest, useTestRuntime,
+    expectPropertiesEqualToSrc, initDataSource, removeDateProperties, useSuperTest,
 } from '../../utils';
 import {
     createSuperTestAnalysis,
@@ -20,7 +20,7 @@ describe('src/controllers/core/analysis-node', () => {
     const superTest = useSuperTest();
 
     beforeAll(async () => {
-        await useTestRuntime();
+        await initDataSource();
     });
 
     let details : AnalysisNode;

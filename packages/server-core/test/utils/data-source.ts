@@ -8,12 +8,9 @@
 import path from 'node:path';
 import { DataSource } from 'typeorm';
 import { setDataSource } from 'typeorm-extension';
-import { createConfig } from '../../src';
 import { extendDataSourceOptions } from '../../src/database';
 
-export async function useTestRuntime() {
-    createConfig();
-
+export async function initDataSource() {
     const options = await extendDataSourceOptions({
         type: 'better-sqlite3',
         database: path.join(process.cwd(), 'writable', 'test.sql'),

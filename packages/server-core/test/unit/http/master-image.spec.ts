@@ -7,13 +7,13 @@
 
 import type { MasterImage, MasterImageGroup } from '@privateaim/core-kit';
 import { MasterImageCommand } from '@privateaim/core-kit';
-import { useSuperTest, useTestRuntime } from '../../utils';
+import { initDataSource, useSuperTest } from '../../utils';
 
 describe('src/controllers/core/master-image', () => {
     const superTest = useSuperTest();
 
     beforeAll(async () => {
-        await useTestRuntime();
+        await initDataSource();
     });
 
     let masterImage : MasterImage;
