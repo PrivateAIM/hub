@@ -55,6 +55,7 @@
         "zod": "^3.23.7"
     },
     "devDependencies": {
+        "@privateaim/core-http-kit": "^0.6.0",
         "@types/busboy": "^1.5.3",
         "@types/cors": "^2.8.17",
         "@types/module-alias": "^2.0.4",
@@ -71,7 +72,7 @@
         "build": "rimraf dist/ && tsc -p tsconfig.build.json",
         "cli": "node dist/cli/index.js",
         "cli-dev": "ts-node src/cli/index.ts",
-        "test": "cross-env NODE_ENV=test jest --config ./test/jest.config.js --testTimeout=120000 --forceExit",
+        "test": "cross-env NODE_ENV=test jest --config ./test/jest.config.js --forceExit --detectOpenHandles",
         "test:coverage": "npm run test -- --coverage"
     },
     "gitHead": "8881a3d4b427c45ac4b81ac4b31bf3d719463ef7",

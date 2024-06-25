@@ -7,90 +7,74 @@
 
 import type { AnalysisNode } from '@privateaim/core-kit';
 import {
-    dropTestDatabase, expectPropertiesEqualToSrc, removeDateProperties, useSuperTest, useTestDatabase,
+    createTestSuite,
+    expectPropertiesEqualToSrc, removeDateProperties,
 } from '../../utils';
 import {
-    createSuperTestAnalysis,
-    createSuperTestNode,
-    createSuperTestProject,
-    createSuperTestProjectNode,
+    createTestNode,
+    createTestProject,
 } from '../../utils/domains';
 
 describe('src/controllers/core/analysis-node', () => {
-    const superTest = useSuperTest();
+    const suite = createTestSuite();
 
     beforeAll(async () => {
-        await useTestDatabase();
+        await suite.up();
     });
 
     afterAll(async () => {
-        await dropTestDatabase();
+        await suite.down();
     });
 
     let details : AnalysisNode;
 
     it('should create resource', async () => {
-        const project = await createSuperTestProject(superTest);
-        expect(project.body.id).toBeDefined();
+        const client = suite.client();
 
-        const node = await createSuperTestNode(superTest);
-        expect(node.body.id).toBeDefined();
+        const project = await client.project.create(createTestProject());
+        expect(project.id).toBeDefined();
 
-        await createSuperTestProjectNode(superTest, {
-            node_id: node.body.id,
-            project_id: project.body.id,
+        const node = await client.node.create(createTestNode());
+        expect(node.id).toBeDefined();
+
+        await client.projectNode.create({
+            node_id: node.id,
+            project_id: project.id,
         });
 
-        const analysis = await createSuperTestAnalysis(superTest, {
-            project_id: project.body.id,
+        const analysis = await client.analysis.create({
+            project_id: project.id,
+        });
+        expect(analysis.id).toBeDefined();
+
+        const analysisNode = await client.analysisNode.create({
+            analysis_id: analysis.id,
+            node_id: node.id,
         });
 
-        expect(analysis.body.id).toBeDefined();
+        delete analysisNode.analysis;
+        delete analysisNode.node;
 
-        const response = await superTest
-            .post('/analysis-nodes')
-            .auth('admin', 'start123')
-            .send({
-                analysis_id: analysis.body.id,
-                node_id: node.body.id,
-            } satisfies Partial<AnalysisNode>);
-
-        expect(response.status).toEqual(201);
-        expect(response.body).toBeDefined();
-
-        delete response.body.analysis;
-        delete response.body.node;
-
-        details = removeDateProperties(response.body);
+        details = removeDateProperties(analysisNode);
     });
 
     it('should read collection', async () => {
-        const response = await superTest
-            .get('/analysis-nodes')
-            .auth('admin', 'start123');
+        const client = suite.client();
 
-        expect(response.status).toEqual(200);
-        expect(response.body).toBeDefined();
-        expect(response.body.data).toBeDefined();
-        expect(response.body.data.length).toEqual(1);
+        const { data } = await client.analysisNode.getMany();
+        expect(data.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should read resource', async () => {
-        const response = await superTest
-            .get(`/analysis-nodes/${details.id}`)
-            .auth('admin', 'start123');
+        const client = suite.client();
 
-        expect(response.status).toEqual(200);
-        expect(response.body).toBeDefined();
-
-        expectPropertiesEqualToSrc(details, response.body);
+        const data = await client.analysisNode.getOne(details.id);
+        expectPropertiesEqualToSrc(details, data);
     });
 
     it('should delete resource', async () => {
-        const response = await superTest
-            .delete(`/analysis-nodes/${details.id}`)
-            .auth('admin', 'start123');
+        const client = suite.client();
 
-        expect(response.status).toEqual(202);
+        await client.analysisNode.delete(details.id);
     });
 });

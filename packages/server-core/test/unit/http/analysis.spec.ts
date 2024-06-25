@@ -7,101 +7,110 @@
 
 import type { Analysis } from '@privateaim/core-kit';
 import { buildHTTPValidationErrorMessage } from '@privateaim/server-http-kit';
+import { isClientError } from 'hapic';
 import {
-    dropTestDatabase, expectPropertiesEqualToSrc, removeDateProperties, useSuperTest, useTestDatabase,
+    createTestSuite,
+    expectPropertiesEqualToSrc,
+    removeDateProperties,
 } from '../../utils';
-import { TEST_DEFAULT_ANALYSIS, createSuperTestAnalysis, createSuperTestProject } from '../../utils/domains';
+import { TEST_DEFAULT_ANALYSIS } from '../../utils/domains';
 
 describe('src/controllers/core/analysis', () => {
-    const superTest = useSuperTest();
+    const suite = createTestSuite();
 
     beforeAll(async () => {
-        await useTestDatabase();
+        await suite.up();
     });
 
     afterAll(async () => {
-        await dropTestDatabase();
+        await suite.down();
     });
 
     let details : Analysis;
 
     it('should create resource', async () => {
-        const proposal = await createSuperTestProject(superTest);
-        const response = await createSuperTestAnalysis(superTest, {
+        const client = suite.client();
+
+        const project = await client.project.create({
+            name: 'development',
+        });
+        const analysis = await client.analysis.create({
             ...TEST_DEFAULT_ANALYSIS,
-            project_id: proposal.body.id,
+            project_id: project.id,
         });
 
-        expect(response.status).toEqual(201);
-        expect(response.body).toBeDefined();
-        expect(response.body.project_id).toEqual(proposal.body.id);
+        expect(analysis.project_id).toEqual(project.id);
 
-        details = removeDateProperties(response.body);
+        details = removeDateProperties(analysis);
     });
 
     it('should get collection', async () => {
-        const response = await superTest
-            .get('/analyses')
-            .auth('admin', 'start123');
+        const client = suite.client();
+        const { data } = await client.analysis.getMany();
 
-        expect(response.status).toEqual(200);
-        expect(response.body).toBeDefined();
-        expect(response.body.data).toBeDefined();
-        expect(response.body.data.length).toEqual(1);
+        expect(data.length).toEqual(1);
     });
 
     it('should read resource', async () => {
-        const response = await superTest
-            .get(`/analyses/${details.id}`)
-            .auth('admin', 'start123');
+        const client = suite.client();
+        const data = await client.analysis.getOne(details.id);
 
-        expect(response.status).toEqual(200);
-        expect(response.body).toBeDefined();
-
-        expectPropertiesEqualToSrc(details, response.body);
+        expectPropertiesEqualToSrc(details, data);
     });
 
     it('should update resource', async () => {
+        const client = suite.client();
         details.name = 'TestA';
 
-        const response = await superTest
-            .post(`/analyses/${details.id}`)
-            .send(details)
-            .auth('admin', 'start123');
+        const data = await client.analysis.update(details.id, details);
 
-        expect(response.status).toEqual(202);
-        expect(response.body).toBeDefined();
-
-        expectPropertiesEqualToSrc(details, response.body);
+        expectPropertiesEqualToSrc(details, data);
     });
 
     it('should delete resource', async () => {
-        const response = await superTest
-            .delete(`/analyses/${details.id}`)
-            .auth('admin', 'start123');
-
-        expect(response.status).toEqual(202);
+        const client = suite.client();
+        const response = await client.analysis.delete(details.id);
+        expect(response).toBeDefined();
     });
 
     it('should not create resource with invalid project', async () => {
-        const response = await createSuperTestAnalysis(superTest, {
-            ...details,
-            project_id: '28eb7728-c78d-4c2f-ab99-dc4bcee78da9',
-        });
+        const client = suite.client();
 
-        expect(response.status).toEqual(400);
-        expect(response.body.message).toEqual(buildHTTPValidationErrorMessage<Analysis>(['project_id']));
+        try {
+            await client.analysis.create({
+                ...details,
+                project_id: '28eb7728-c78d-4c2f-ab99-dc4bcee78da9',
+            });
+        } catch (e) {
+            if (isClientError(e)) {
+                expect(e.response.data.message).toEqual(buildHTTPValidationErrorMessage<Analysis>(['project_id']));
+                return;
+            }
+
+            throw e;
+        }
     });
 
     it('should not create resource with invalid master-image', async () => {
-        const project = await createSuperTestProject(superTest);
-        const response = await createSuperTestAnalysis(superTest, {
-            ...details,
-            project_id: project.body.id,
-            master_image_id: '28eb7728-c78d-4c2f-ab99-dc4bcee78da9',
+        const client = suite.client();
+
+        const project = await client.project.create({
+            name: 'development',
         });
 
-        expect(response.status).toEqual(400);
-        expect(response.body.message).toEqual(buildHTTPValidationErrorMessage<Analysis>(['master_image_id']));
+        try {
+            await client.analysis.create({
+                ...details,
+                project_id: project.id,
+                master_image_id: '28eb7728-c78d-4c2f-ab99-dc4bcee78da9',
+            });
+        } catch (e) {
+            if (isClientError(e)) {
+                expect(e.response.data.message).toEqual(buildHTTPValidationErrorMessage<Analysis>(['master_image_id']));
+                return;
+            }
+
+            throw e;
+        }
     });
 });

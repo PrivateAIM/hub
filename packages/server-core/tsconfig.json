@@ -3,6 +3,7 @@
     "compilerOptions": {
         "paths": {
             "@privateaim/core-kit": ["./packages/core-kit/src"],
+            "@privateaim/core-http-kit": ["./packages/core-http-kit/src"],
             "@privateaim/kit": ["./packages/kit/src"],
             "@privateaim/server-kit": ["./packages/server-kit/src"],
             "@privateaim/server-core-realtime": ["./packages/server-core-realtime/src"],
