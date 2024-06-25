@@ -1,6 +1,6 @@
 {
     "bootstrap-sha": "a74e43ba51cdc556e99605e3eefcb1cec3a64363",
-    "include-component-in-tag": true,
+    "include-component-in-tag": false,
     "release-type": "node",
     "release-as": "0.6.0",
     "bump-minor-pre-major": true,
