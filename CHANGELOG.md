@@ -1,5 +1,35 @@
 # Changelog
 
+## [0.6.0](https://github.com/PrivateAIM/hub/compare/root-v0.5.0...root-v0.6.0) (2024-06-25)
+
+
+### Features
+
+* adjusted code references for core -&gt; core-kit package renaming ([321b8ac](https://github.com/PrivateAIM/hub/commit/321b8acb33e4fdd93252c72da34fac34cc86cd9f))
+* initial core -&gt; core-kit package renaming ([9ac9709](https://github.com/PrivateAIM/hub/commit/9ac970999922bc76e3f88381f4d3351a51147a46))
+* migrated to authup version v1.0.0-beta.18 ([06928f6](https://github.com/PrivateAIM/hub/commit/06928f681120b423f962a7869f8f6b12708d3047))
+* realtime library/service split ([#474](https://github.com/PrivateAIM/hub/issues/474)) ([43c2dfa](https://github.com/PrivateAIM/hub/commit/43c2dfad654cc61ca9784914cbad56c684434088))
+* tar use new onReadEntry in favor of deprecated onentry fn ([9294bc0](https://github.com/PrivateAIM/hub/commit/9294bc01db06c194a112e6ac51df4defc94363f7))
+
+
+### Bug Fixes
+
+* admin node robot & registry view ([a4c5239](https://github.com/PrivateAIM/hub/commit/a4c5239b34df2c9a4210994b9ec7531932615576))
+* analysis-bucket-file delete operation & auth plugin nuxt-app access ([86e3a2d](https://github.com/PrivateAIM/hub/commit/86e3a2da2b780c1080c83b761f3b0a189c3580de))
+* api routes analysis-bucket-file api client ([d0a9e73](https://github.com/PrivateAIM/hub/commit/d0a9e73271acb7d4b403500097a5cc3e3a30b599))
+* **deps:** bump amqp-extension from 4.0.0-beta.2 to 4.0.0-beta.3 ([#457](https://github.com/PrivateAIM/hub/issues/457)) ([2585ea2](https://github.com/PrivateAIM/hub/commit/2585ea2b22b969c21e82b3b92b2e795198dd5f44))
+* **deps:** bump minio from 8.0.0 to 8.0.1 ([#478](https://github.com/PrivateAIM/hub/issues/478)) ([4df786b](https://github.com/PrivateAIM/hub/commit/4df786b10b385504e0ee1a384699541fcb0954b5))
+* **deps:** bump tar from 7.2.0 to 7.4.0 ([#471](https://github.com/PrivateAIM/hub/issues/471)) ([c2ca2e6](https://github.com/PrivateAIM/hub/commit/c2ca2e6877d5230efeba311d4b4de8e97bbadadf))
+* entity delete component ([1d691ca](https://github.com/PrivateAIM/hub/commit/1d691cabd1adbf9f7c70a06f01f4886cebf4c0c7))
+* http node read handler ([19c41b7](https://github.com/PrivateAIM/hub/commit/19c41b7184460b4bf9c30652fa0944fb4431deea))
+* node assign action for projects & analysis ([d6eff55](https://github.com/PrivateAIM/hub/commit/d6eff55addb47c5fd14798f2bd3e0b6cc8e4b2da))
+* project-node read endpoint ([6c46153](https://github.com/PrivateAIM/hub/commit/6c46153114eec1f6aaa9e9fd1dae0bc69519ef89))
+* reenable authup robot aggregator ([a684e57](https://github.com/PrivateAIM/hub/commit/a684e5764bb6e483211968a63b655b09070dacb1))
+* remove node email attribute ([66ee923](https://github.com/PrivateAIM/hub/commit/66ee923c424468e79eba39766ce5fd8443d79811))
+* restriction for analysis-node collection endpoint ([73412f9](https://github.com/PrivateAIM/hub/commit/73412f95d1b13ccacf45bfa4e99dcdcc1ea4dfef))
+* **storage:** add missing logger configuration + enhanced db queries ([5fd1515](https://github.com/PrivateAIM/hub/commit/5fd15156cb6aaae254a2710bb832a58ce789c20d))
+* **storage:** use primary key as minio bucket name + persist minio storage in docker-compose ([cfc4cbb](https://github.com/PrivateAIM/hub/commit/cfc4cbbb3df1cfe1a6c56cae7fc1efffd44971d9))
+
 ## [0.5.0](https://github.com/PrivateAIM/hub/compare/root-v0.4.0...root-v0.5.0) (2024-06-12)
 
 

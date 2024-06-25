@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.6.0](https://github.com/PrivateAIM/hub/compare/client-ui-v0.5.0...client-ui-v0.6.0) (2024-06-25)
+
+
+### Features
+
+* adjusted code references for core -&gt; core-kit package renaming ([321b8ac](https://github.com/PrivateAIM/hub/commit/321b8acb33e4fdd93252c72da34fac34cc86cd9f))
+* initial core -&gt; core-kit package renaming ([9ac9709](https://github.com/PrivateAIM/hub/commit/9ac970999922bc76e3f88381f4d3351a51147a46))
+* migrated to authup version v1.0.0-beta.18 ([06928f6](https://github.com/PrivateAIM/hub/commit/06928f681120b423f962a7869f8f6b12708d3047))
+* realtime library/service split ([#474](https://github.com/PrivateAIM/hub/issues/474)) ([43c2dfa](https://github.com/PrivateAIM/hub/commit/43c2dfad654cc61ca9784914cbad56c684434088))
+
+
+### Bug Fixes
+
+* admin node robot & registry view ([a4c5239](https://github.com/PrivateAIM/hub/commit/a4c5239b34df2c9a4210994b9ec7531932615576))
+* analysis-bucket-file delete operation & auth plugin nuxt-app access ([86e3a2d](https://github.com/PrivateAIM/hub/commit/86e3a2da2b780c1080c83b761f3b0a189c3580de))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/client-vue bumped from ^0.5.0 to ^0.6.0
+    * @privateaim/core-kit bumped from ^0.5.0 to ^0.6.0
+    * @privateaim/kit bumped from ^0.5.0 to ^0.6.0
+    * @privateaim/storage-kit bumped from ^0.5.0 to ^0.6.0
+
 ## [0.5.0](https://github.com/PrivateAIM/hub/compare/client-ui-v0.4.0...client-ui-v0.5.0) (2024-06-12)
 
 

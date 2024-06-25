@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.6.0](https://github.com/PrivateAIM/hub/compare/server-analysis-manager-v0.5.0...server-analysis-manager-v0.6.0) (2024-06-25)
+
+
+### Features
+
+* adjusted code references for core -&gt; core-kit package renaming ([321b8ac](https://github.com/PrivateAIM/hub/commit/321b8acb33e4fdd93252c72da34fac34cc86cd9f))
+* initial core -&gt; core-kit package renaming ([9ac9709](https://github.com/PrivateAIM/hub/commit/9ac970999922bc76e3f88381f4d3351a51147a46))
+* migrated to authup version v1.0.0-beta.18 ([06928f6](https://github.com/PrivateAIM/hub/commit/06928f681120b423f962a7869f8f6b12708d3047))
+
+
+### Bug Fixes
+
+* **deps:** bump amqp-extension from 4.0.0-beta.2 to 4.0.0-beta.3 ([#457](https://github.com/PrivateAIM/hub/issues/457)) ([2585ea2](https://github.com/PrivateAIM/hub/commit/2585ea2b22b969c21e82b3b92b2e795198dd5f44))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.5.0 to ^0.6.0
+    * @privateaim/kit bumped from ^0.5.0 to ^0.6.0
+    * @privateaim/core-http-kit bumped from ^0.5.0 to ^0.6.0
+    * @privateaim/server-kit bumped from ^0.5.0 to ^0.6.0
+    * @privateaim/server-analysis-manager-kit bumped from ^0.5.0 to ^0.6.0
+    * @privateaim/storage-kit bumped from ^0.5.0 to ^0.6.0
+
 ## [0.5.0](https://github.com/PrivateAIM/hub/compare/server-analysis-manager-v0.4.0...server-analysis-manager-v0.5.0) (2024-06-12)
 
 

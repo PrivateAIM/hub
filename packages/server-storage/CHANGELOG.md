@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.6.0](https://github.com/PrivateAIM/hub/compare/server-storage-v0.5.0...server-storage-v0.6.0) (2024-06-25)
+
+
+### Features
+
+* migrated to authup version v1.0.0-beta.18 ([06928f6](https://github.com/PrivateAIM/hub/commit/06928f681120b423f962a7869f8f6b12708d3047))
+
+
+### Bug Fixes
+
+* **deps:** bump minio from 8.0.0 to 8.0.1 ([#478](https://github.com/PrivateAIM/hub/issues/478)) ([4df786b](https://github.com/PrivateAIM/hub/commit/4df786b10b385504e0ee1a384699541fcb0954b5))
+* **storage:** add missing logger configuration + enhanced db queries ([5fd1515](https://github.com/PrivateAIM/hub/commit/5fd15156cb6aaae254a2710bb832a58ce789c20d))
+* **storage:** use primary key as minio bucket name + persist minio storage in docker-compose ([cfc4cbb](https://github.com/PrivateAIM/hub/commit/cfc4cbbb3df1cfe1a6c56cae7fc1efffd44971d9))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.5.0 to ^0.6.0
+    * @privateaim/server-kit bumped from ^0.5.0 to ^0.6.0
+    * @privateaim/server-http-kit bumped from ^0.5.0 to ^0.6.0
+    * @privateaim/storage-kit bumped from ^0.5.0 to ^0.6.0
+
 ## [0.5.0](https://github.com/PrivateAIM/hub/compare/server-storage-v0.4.0...server-storage-v0.5.0) (2024-06-12)
 
 
