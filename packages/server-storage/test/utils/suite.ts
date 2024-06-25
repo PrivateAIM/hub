@@ -5,25 +5,25 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Client } from '@privateaim/core-http-kit';
+import { APIClient } from '@privateaim/storage-kit';
 import { createServer } from 'node:http';
 import type { Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { createNodeDispatcher } from 'routup';
-import { createConfig } from '../../src';
-import { createRouter } from '../../src/http/router';
+import { configure } from '../../src/config';
+import { createHTTPRouter } from '../../src/http';
 import { dropTestDatabase, useTestDatabase } from './database';
 
 class TestSuite {
-    protected _client : Client | undefined;
+    protected _client : APIClient | undefined;
 
     protected _server : Server | undefined;
 
     constructor() {
-        createConfig();
+        configure();
     }
 
-    client() : Client {
+    client() : APIClient {
         if (typeof this._client === 'undefined') {
             this.createClient();
         }
@@ -44,7 +44,7 @@ class TestSuite {
     }
 
     protected async startServer() : Promise<void> {
-        const router = createRouter();
+        const router = createHTTPRouter();
         const server = createServer(createNodeDispatcher(router));
 
         this._server = await new Promise<Server>((resolve, reject) => {
@@ -80,7 +80,7 @@ class TestSuite {
         const address = this._server.address() as AddressInfo;
         const baseURL = `http://localhost:${address.port}`;
 
-        const client = new Client({
+        const client = new APIClient({
             baseURL,
         });
 

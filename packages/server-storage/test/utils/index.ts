@@ -8,4 +8,4 @@
 export * from './database';
 export * from './date-properties';
 export * from './properties';
-export * from './supertest';
+export * from './suite';

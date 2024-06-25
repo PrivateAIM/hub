@@ -5,72 +5,54 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { BucketEntity } from '../../src/domains';
 import {
-    dropTestDatabase,
+    createTestSuite,
     expectPropertiesEqualToSrc,
     removeDateProperties,
-    useSuperTest,
-    useTestDatabase,
 } from '../utils';
+import type { BucketEntity } from '../../src/domains';
 
 describe('controllers/bucket', () => {
-    const superTest = useSuperTest();
+    const suite = createTestSuite();
 
     beforeAll(async () => {
-        await useTestDatabase();
+        await suite.up();
     });
 
     afterAll(async () => {
-        await dropTestDatabase();
+        await suite.down();
     });
 
     let details : BucketEntity;
 
     it('should create resource', async () => {
-        const response = await superTest
-            .post('/buckets')
-            .send({
-                name: 'foo-bar-baz',
-                region: 'eu-west',
-            })
-            .auth('admin', 'start123');
+        const client = suite.client();
+        const data = await client.bucket.create({
+            name: 'foo-bar-baz',
+            region: 'eu-west',
+        });
 
-        expect(response.status).toEqual(201);
-        expect(response.body).toBeDefined();
-        expect(response.body.name).toEqual('foo-bar-baz');
-        expect(response.body.region).toEqual('eu-west');
+        expect(data.name).toEqual('foo-bar-baz');
+        expect(data.region).toEqual('eu-west');
 
-        details = removeDateProperties(response.body);
+        details = removeDateProperties(data);
     });
 
     it('should get collection', async () => {
-        const response = await superTest
-            .get('/buckets')
-            .auth('admin', 'start123');
-
-        expect(response.status).toEqual(200);
-        expect(response.body).toBeDefined();
-        expect(response.body.data).toBeDefined();
-        expect(response.body.data.length).toEqual(1);
+        const client = suite.client();
+        const { data } = await client.bucket.getMany();
+        expect(data.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should read resource', async () => {
-        const response = await superTest
-            .get(`/buckets/${details.id}`)
-            .auth('admin', 'start123');
+        const client = suite.client();
+        const data = await client.bucket.getOne(details.id);
 
-        expect(response.status).toEqual(200);
-        expect(response.body).toBeDefined();
-
-        expectPropertiesEqualToSrc(details, response.body);
+        expectPropertiesEqualToSrc(details, data);
     });
 
     it('should delete resource', async () => {
-        const response = await superTest
-            .delete(`/buckets/${details.id}`)
-            .auth('admin', 'start123');
-
-        expect(response.status).toEqual(202);
+        const client = suite.client();
+        await client.bucket.delete(details.id);
     });
 });

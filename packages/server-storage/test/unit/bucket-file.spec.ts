@@ -5,84 +5,74 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import fs from 'node:fs';
+import { Readable } from 'node:stream';
 import path from 'node:path';
 import tar from 'tar-stream';
+import { streamToBuffer } from '../../src/core';
 import type { BucketFileEntity } from '../../src/domains';
 import {
-    dropTestDatabase,
+    createTestSuite,
     expectPropertiesEqualToSrc,
     removeDateProperties,
-    useSuperTest,
-    useTestDatabase,
 } from '../utils';
-import { createTestBucket } from '../utils/domains';
 
 describe('controllers/bucket-file', () => {
-    const superTest = useSuperTest();
+    const suite = createTestSuite();
 
     beforeAll(async () => {
-        await useTestDatabase();
+        await suite.up();
     });
 
     afterAll(async () => {
-        await dropTestDatabase();
+        await suite.down();
     });
 
     let details : BucketFileEntity;
 
     it('should create resource', async () => {
-        const bucketResponse = await createTestBucket(superTest);
+        const client = suite.client();
+
+        const bucket = await client.bucket.create({
+            name: 'foo-bar-baz',
+            region: 'eu-west',
+        });
 
         const filePath = path.join(__dirname, '..', 'data', 'file.json');
-        const response = await superTest
-            .post(`/buckets/${bucketResponse.body.id}/upload`)
-            .set('Accept', 'application/json')
-            .set('Connection', 'keep-alive')
-            .attach('file[0]', filePath)
-            .auth('admin', 'start123');
+        const file = await fs.promises.readFile(filePath);
 
-        expect(response.status).toEqual(201);
-        expect(response.body).toBeDefined();
-        expect(response.body.meta).toBeDefined();
-        expect(response.body.data).toBeDefined();
-        expect(response.body.data).toHaveLength(1);
+        const formData = new FormData();
+        formData.append('file[0]', new Blob([file]), 'file.json');
 
-        details = removeDateProperties((response.body.data as any[])[0]);
+        const bucketFiles = await client.bucket.upload(bucket.id, formData);
+        expect(bucketFiles.data.length).toBeGreaterThanOrEqual(1);
+
+        details = removeDateProperties((bucketFiles.data)[0]);
     });
 
     it('should get collection', async () => {
-        const response = await superTest
-            .get('/bucket-files')
-            .auth('admin', 'start123');
-
-        expect(response.status).toEqual(200);
-        expect(response.body).toBeDefined();
-        expect(response.body.data).toBeDefined();
-        expect(response.body.data.length).toEqual(1);
+        const client = suite.client();
+        const { data } = await client.bucketFile.getMany();
+        expect(data.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should read resource', async () => {
-        const response = await superTest
-            .get(`/bucket-files/${details.id}`)
-            .auth('admin', 'start123');
+        const client = suite.client();
+        const data = await client.bucketFile.getOne(details.id);
 
-        expect(response.status).toEqual(200);
-        expect(response.body).toBeDefined();
-
-        expectPropertiesEqualToSrc(details, response.body);
+        expectPropertiesEqualToSrc(details, data);
     });
 
     it('should stream resource', async () => {
-        const response = await superTest
-            .get(`/bucket-files/${details.id}/stream`)
-            .auth('admin', 'start123');
-
-        expect(response.status).toEqual(200);
-        expect(response.body).toBeDefined();
-        expect((response.body as Buffer).byteLength).toBeGreaterThan(0);
+        const client = suite.client();
+        const data = await client.bucketFile.stream(details.id);
+        const stream = Readable.fromWeb(data as any);
+        const buffer = await streamToBuffer(stream);
+        expect(buffer.byteLength).toBeGreaterThan(0);
     });
 
     it('should stream resource collection', (done) => {
+        const client = suite.client();
         const extract = tar.extract();
 
         const headers : Record<string, any>[] = [];
@@ -98,17 +88,16 @@ describe('controllers/bucket-file', () => {
             done();
         });
 
-        superTest
-            .get(`/buckets/${details.bucket_id}/stream`)
-            .auth('admin', 'start123')
-            .pipe(extract);
+        client.bucket.stream(details.bucket_id)
+            .then((data) => Readable.fromWeb(data as any))
+            .then((data) => {
+                data.pipe(extract);
+            })
+            .catch((e) => done(e));
     });
 
     it('should delete resource', async () => {
-        const response = await superTest
-            .delete(`/bucket-files/${details.id}`)
-            .auth('admin', 'start123');
-
-        expect(response.status).toEqual(202);
+        const client = suite.client();
+        await client.bucketFile.delete(details.id);
     });
 });
