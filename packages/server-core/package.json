@@ -55,6 +55,7 @@
         "zod": "^3.23.7"
     },
     "devDependencies": {
+        "@privateaim/core-http-kit": "^0.6.0",
         "@types/busboy": "^1.5.3",
         "@types/cors": "^2.8.17",
         "@types/module-alias": "^2.0.4",

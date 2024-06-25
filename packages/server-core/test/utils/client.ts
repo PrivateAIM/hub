@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { Client } from '@privateaim/core-http-kit';
 import type { Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
