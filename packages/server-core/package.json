@@ -71,7 +71,7 @@
         "build": "rimraf dist/ && tsc -p tsconfig.build.json",
         "cli": "node dist/cli/index.js",
         "cli-dev": "ts-node src/cli/index.ts",
-        "test": "cross-env NODE_ENV=test jest --config ./test/jest.config.js --testTimeout=120000 --forceExit",
+        "test": "cross-env NODE_ENV=test jest --config ./test/jest.config.js --forceExit --detectOpenHandles",
         "test:coverage": "npm run test -- --coverage"
     },
     "gitHead": "8881a3d4b427c45ac4b81ac4b31bf3d719463ef7",

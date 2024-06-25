@@ -13,6 +13,13 @@ export const TEST_DEFAULT_NODE : Partial<Node> = {
     external_name: 'test',
 };
 
+export function createTestNode() : Partial<Node> {
+    return {
+        name: 'foo-bar-baz',
+        external_name: 'test',
+    };
+}
+
 export async function createSuperTestNode(superTest: TestAgent, entity?: Partial<Node>) {
     return superTest
         .post('/nodes')

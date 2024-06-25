@@ -12,6 +12,12 @@ export const TEST_DEFAULT_PROJECT : Partial<Project> = {
     name: 'development',
 };
 
+export function createTestProject() : Partial<Project> {
+    return {
+        name: 'development',
+    };
+}
+
 export async function createSuperTestProject(superTest: TestAgent, proposal?: Partial<Project>) {
     return superTest
         .post('/projects')

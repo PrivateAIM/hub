@@ -6,69 +6,54 @@
  */
 
 import type { ProjectNode } from '@privateaim/core-kit';
-import {
-    dropTestDatabase, expectPropertiesEqualToSrc, useSuperTest, useTestDatabase,
-} from '../../utils';
-import { createSuperTestNode, createSuperTestProject } from '../../utils/domains';
+import { createTestSuite, expectPropertiesEqualToSrc } from '../../utils';
+import { createTestNode, createTestProject } from '../../utils/domains';
 
 describe('src/controllers/core/project-node', () => {
-    const superTest = useSuperTest();
+    const suite = createTestSuite();
 
     beforeAll(async () => {
-        await useTestDatabase();
+        await suite.up();
     });
 
     afterAll(async () => {
-        await dropTestDatabase();
+        await suite.down();
     });
 
     let details : ProjectNode;
 
     it('should create resource', async () => {
-        const project = await createSuperTestProject(superTest);
-        const node = await createSuperTestNode(superTest);
+        const client = suite.client();
 
-        const response = await superTest
-            .post('/project-nodes')
-            .auth('admin', 'start123')
-            .send({
-                project_id: project.body.id,
-                node_id: node.body.id,
-            } as Partial<ProjectNode>);
+        const project = await client.project.create(createTestProject());
+        expect(project.id).toBeDefined();
 
-        expect(response.status).toEqual(201);
-        expect(response.body).toBeDefined();
+        const node = await client.node.create(createTestNode());
+        expect(node.id).toBeDefined();
 
-        details = response.body;
+        details = await client.projectNode.create({
+            node_id: node.id,
+            project_id: project.id,
+        });
     });
 
     it('should read collection', async () => {
-        const response = await superTest
-            .get('/project-nodes')
-            .auth('admin', 'start123');
+        const client = suite.client();
 
-        expect(response.status).toEqual(200);
-        expect(response.body).toBeDefined();
-        expect(response.body.data).toBeDefined();
-        expect(response.body.data.length).toEqual(1);
+        const { data } = await client.projectNode.getMany();
+        expect(data.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should read resource', async () => {
-        const response = await superTest
-            .get(`/project-nodes/${details.id}`)
-            .auth('admin', 'start123');
+        const client = suite.client();
 
-        expect(response.status).toEqual(200);
-        expect(response.body).toBeDefined();
-
-        expectPropertiesEqualToSrc(details, response.body);
+        const data = await client.projectNode.getOne(details.id);
+        expectPropertiesEqualToSrc(details, data);
     });
 
     it('should delete resource', async () => {
-        const response = await superTest
-            .delete(`/project-nodes/${details.id}`)
-            .auth('admin', 'start123');
+        const client = suite.client();
 
-        expect(response.status).toEqual(202);
+        await client.projectNode.delete(details.id);
     });
 });

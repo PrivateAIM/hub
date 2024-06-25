@@ -5,92 +5,74 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { AnalysisBucketFile, AnalysisNode } from '@privateaim/core-kit';
+import type { AnalysisBucketFile } from '@privateaim/core-kit';
 import { AnalysisBucketType } from '@privateaim/core-kit';
 import {
-    dropTestDatabase,
+    createTestSuite,
     expectPropertiesEqualToSrc,
     removeDateProperties,
-    useSuperTest,
-    useTestDatabase,
 } from '../../utils';
 import {
-    createSuperTestAnalysis,
-    createSuperTestAnalysisBucket,
-    createSuperTestProject,
+    createTestProject,
 } from '../../utils/domains';
 
 describe('controllers/analysis-bucket-file', () => {
-    const superTest = useSuperTest();
+    const suite = createTestSuite();
 
     beforeAll(async () => {
-        await useTestDatabase();
+        await suite.up();
     });
 
     afterAll(async () => {
-        await dropTestDatabase();
+        await suite.down();
     });
 
-    let details : AnalysisNode;
+    let details : AnalysisBucketFile;
 
     it('should create resource', async () => {
-        const project = await createSuperTestProject(superTest);
-        expect(project.body.id).toBeDefined();
+        const client = suite.client();
 
-        const analysis = await createSuperTestAnalysis(superTest, {
-            project_id: project.body.id,
+        const project = await client.project.create(createTestProject());
+        expect(project.id).toBeDefined();
+
+        const analysis = await client.analysis.create({
+            project_id: project.id,
         });
-        expect(analysis.body.id).toBeDefined();
+        expect(analysis.id).toBeDefined();
 
-        const analysisBucket = await createSuperTestAnalysisBucket(superTest, {
-            analysis_id: analysis.body.id,
+        const analysisBucket = await client.analysisBucket.create({
+            analysis_id: analysis.id,
             type: AnalysisBucketType.CODE,
         });
-        expect(analysisBucket.body.id).toBeDefined();
+        expect(analysisBucket.id).toBeDefined();
 
-        const response = await superTest
-            .post('/analysis-bucket-files')
-            .auth('admin', 'start123')
-            .send({
-                bucket_id: analysisBucket.body.id,
-                external_id: '28eb7728-c78d-4c2f-ab99-dc4bcee78da9',
-                name: 'foo.bar',
-                root: false,
-            } satisfies Partial<AnalysisBucketFile>);
+        const analysisBucketFile = await client.analysisBucketFile.create({
+            bucket_id: analysisBucket.id,
+            external_id: '28eb7728-c78d-4c2f-ab99-dc4bcee78da9',
+            name: 'foo.bar',
+            root: false,
+        });
 
-        expect(response.status).toEqual(201);
-        expect(response.body).toBeDefined();
-
-        details = removeDateProperties(response.body);
+        details = removeDateProperties(analysisBucketFile);
     });
 
     it('should read collection', async () => {
-        const response = await superTest
-            .get('/analysis-bucket-files')
-            .auth('admin', 'start123');
+        const client = suite.client();
 
-        expect(response.status).toEqual(200);
-        expect(response.body).toBeDefined();
-        expect(response.body.data).toBeDefined();
-        expect(response.body.data.length).toEqual(1);
+        const { data } = await client.analysisBucketFile.getMany();
+        expect(data.length).toEqual(1);
     });
 
     it('should read resource', async () => {
-        const response = await superTest
-            .get(`/analysis-bucket-files/${details.id}`)
-            .auth('admin', 'start123');
+        const client = suite.client();
 
-        expect(response.status).toEqual(200);
-        expect(response.body).toBeDefined();
-
-        expectPropertiesEqualToSrc(details, response.body);
+        const data = await client.analysisBucketFile.getOne(details.id);
+        expectPropertiesEqualToSrc(details, data);
     });
 
     it('should delete resource', async () => {
-        const response = await superTest
-            .delete(`/analysis-bucket-files/${details.id}`)
-            .auth('admin', 'start123');
+        const client = suite.client();
 
-        expect(response.status).toEqual(202);
+        await client.analysisBucketFile.delete(details.id);
     });
 });

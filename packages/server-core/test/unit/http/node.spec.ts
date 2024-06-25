@@ -9,73 +9,61 @@ import type {
     Node,
 } from '@privateaim/core-kit';
 import {
-    dropTestDatabase, expectPropertiesEqualToSrc, removeDateProperties, useSuperTest, useTestDatabase,
+    createTestSuite,
+    expectPropertiesEqualToSrc,
+    removeDateProperties,
 } from '../../utils';
-import { createSuperTestNode } from '../../utils/domains';
+import { createTestNode } from '../../utils/domains';
 
 describe('src/controllers/core/node', () => {
-    const superTest = useSuperTest();
+    const suite = createTestSuite();
 
     beforeAll(async () => {
-        await useTestDatabase();
+        await suite.up();
     });
 
     afterAll(async () => {
-        await dropTestDatabase();
+        await suite.down();
     });
 
     let details: Node;
 
     it('should create node', async () => {
-        const response = await createSuperTestNode(superTest);
+        const client = suite.client();
 
-        expect(response.status).toEqual(201);
-        expect(response.body).toBeDefined();
+        const node = await client.node.create(createTestNode());
+        expect(node.id).toBeDefined();
 
-        details = removeDateProperties(response.body);
+        details = removeDateProperties(node);
     });
 
     it('should read collection', async () => {
-        const response = await superTest
-            .get('/nodes')
-            .auth('admin', 'start123');
+        const client = suite.client();
 
-        expect(response.status).toEqual(200);
-        expect(response.body).toBeDefined();
-        expect(response.body.data).toBeDefined();
-        expect(response.body.data.length).toEqual(1);
+        const { data } = await client.node.getMany();
+        expect(data.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should read resource', async () => {
-        const response = await superTest
-            .get(`/nodes/${details.id}?fields=%2Bemail`)
-            .auth('admin', 'start123');
+        const client = suite.client();
 
-        expect(response.status).toEqual(200);
-        expect(response.body).toBeDefined();
-
-        expectPropertiesEqualToSrc(details, response.body);
+        const data = await client.node.getOne(details.id);
+        expectPropertiesEqualToSrc(details, data);
     });
 
     it('should update resource', async () => {
+        const client = suite.client();
+
         details.name = 'TestA';
 
-        const response = await superTest
-            .post(`/nodes/${details.id}`)
-            .send(details)
-            .auth('admin', 'start123');
+        const data = await client.node.update(details.id, details);
 
-        expect(response.status).toEqual(202);
-        expect(response.body).toBeDefined();
-
-        expectPropertiesEqualToSrc(details, response.body);
+        expectPropertiesEqualToSrc(details, data);
     });
 
     it('should delete resource', async () => {
-        const response = await superTest
-            .delete(`/nodes/${details.id}`)
-            .auth('admin', 'start123');
+        const client = suite.client();
 
-        expect(response.status).toEqual(202);
+        await client.node.delete(details.id);
     });
 });

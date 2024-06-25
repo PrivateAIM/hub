@@ -22,4 +22,12 @@ export class MasterImageGroupAPI extends BaseAPI {
         const response = await this.client.delete(`master-image-groups/${id}`);
         return response.data;
     }
+
+    async delete(
+        id: MasterImageGroup['id'],
+    ): Promise<SingleResourceResponse<MasterImageGroup>> {
+        const response = await this.client.delete(`master-image-groups/${id}`);
+
+        return response.data;
+    }
 }

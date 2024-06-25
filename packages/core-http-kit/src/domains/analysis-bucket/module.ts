@@ -27,4 +27,18 @@ export class AnalysisBucketAPI extends BaseAPI {
 
         return response.data;
     }
+
+    async create(data: Partial<AnalysisBucket>): Promise<SingleResourceResponse<AnalysisBucket>> {
+        const { data: response } = await this.client.post('analysis-buckets', data);
+
+        return response;
+    }
+
+    async delete(
+        id: AnalysisBucket['id'],
+    ): Promise<SingleResourceResponse<AnalysisBucket>> {
+        const response = await this.client.delete(`analysis-buckets/${id}`);
+
+        return response.data;
+    }
 }

@@ -7,77 +7,57 @@
 
 import type { MasterImage, MasterImageGroup } from '@privateaim/core-kit';
 import { MasterImageCommand } from '@privateaim/core-kit';
-import { dropTestDatabase, useSuperTest, useTestDatabase } from '../../utils';
+import { createTestSuite } from '../../utils';
 
 describe('src/controllers/core/master-image', () => {
-    const superTest = useSuperTest();
+    const suite = createTestSuite();
 
     beforeAll(async () => {
-        await useTestDatabase();
+        await suite.up();
     });
 
     afterAll(async () => {
-        await dropTestDatabase();
+        await suite.down();
     });
 
     let masterImage : MasterImage;
     let masterImageGroup : MasterImageGroup;
 
     it('sync with git repository', async () => {
-        const response = await superTest
-            .post('/master-images/command')
-            .send({
-                command: MasterImageCommand.SYNC,
-            })
-            .auth('admin', 'start123');
+        const client = suite.client();
+        const response = await client.masterImage.runCommand(MasterImageCommand.SYNC);
 
-        expect(response.status).toEqual(202);
-        expect(response.body).toBeDefined();
-        expect(response.body.groups).toBeDefined();
-        expect(response.body.images).toBeDefined();
+        expect(response.groups).toBeDefined();
+        expect(response.images).toBeDefined();
     });
 
     it('should read collection', async () => {
-        const response = await superTest
-            .get('/master-images')
-            .auth('admin', 'start123');
+        const client = suite.client();
 
-        expect(response.status).toEqual(200);
-        expect(response.body).toBeDefined();
-        expect(response.body.data).toBeDefined();
-        expect(response.body.data.length).toBeGreaterThan(0);
+        const { data } = await client.masterImage.getMany();
+        expect(data.length).toBeGreaterThan(0);
 
-        // eslint-disable-next-line prefer-destructuring
-        masterImage = response.body.data[0];
+        [masterImage] = data;
     });
 
     it('should read group collection', async () => {
-        const response = await superTest
-            .get('/master-image-groups')
-            .auth('admin', 'start123');
+        const client = suite.client();
 
-        expect(response.status).toEqual(200);
-        expect(response.body).toBeDefined();
-        expect(response.body.data).toBeDefined();
-        expect(response.body.data.length).toBeGreaterThan(0);
+        const { data } = await client.masterImageGroup.getMany();
+        expect(data.length).toBeGreaterThan(0);
 
-        // eslint-disable-next-line prefer-destructuring
-        masterImageGroup = response.body.data[0];
+        [masterImageGroup] = data;
     });
 
     it('should delete resource', async () => {
-        const response = await superTest
-            .delete(`/master-images/${masterImage.id}`)
-            .auth('admin', 'start123');
+        const client = suite.client();
 
-        expect(response.status).toEqual(202);
+        await client.masterImage.delete(masterImage.id);
     });
 
     it('should delete group resource', async () => {
-        const response = await superTest
-            .delete(`/master-image-groups/${masterImageGroup.id}`)
-            .auth('admin', 'start123');
+        const client = suite.client();
 
-        expect(response.status).toEqual(202);
+        await client.masterImageGroup.delete(masterImageGroup.id);
     });
 });
