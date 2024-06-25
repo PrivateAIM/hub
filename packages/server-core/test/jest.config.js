@@ -7,6 +7,8 @@
 
 module.exports = {
     testSequencer: './test/utils/test-sequencer.js',
+    globalSetup: './test/utils/setup.js',
+    globalTeardown: './test/utils/teardown.js',
     testEnvironment: 'node',
     transform: {
         '^.+\\.tsx?$': 'ts-jest',

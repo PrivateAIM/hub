@@ -7,7 +7,7 @@
 
 import type { Project } from '@privateaim/core-kit';
 import {
-    dropTestDatabase, expectPropertiesEqualToSrc, removeDateProperties, useSuperTest, useTestDatabase,
+    expectPropertiesEqualToSrc, removeDateProperties, useSuperTest, useTestRuntime,
 } from '../../utils';
 import { createSuperTestProject } from '../../utils/domains';
 
@@ -15,11 +15,7 @@ describe('src/controllers/core/project', () => {
     const superTest = useSuperTest();
 
     beforeAll(async () => {
-        await useTestDatabase();
-    });
-
-    afterAll(async () => {
-        await dropTestDatabase();
+        await useTestRuntime();
     });
 
     let details : Project;
@@ -42,7 +38,7 @@ describe('src/controllers/core/project', () => {
         expect(response.status).toEqual(200);
         expect(response.body).toBeDefined();
         expect(response.body.data).toBeDefined();
-        expect(response.body.data.length).toEqual(1);
+        expect(response.body.data.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should read resource', async () => {

@@ -8,11 +8,9 @@
 import type { AnalysisBucketFile, AnalysisNode } from '@privateaim/core-kit';
 import { AnalysisBucketType } from '@privateaim/core-kit';
 import {
-    dropTestDatabase,
     expectPropertiesEqualToSrc,
     removeDateProperties,
-    useSuperTest,
-    useTestDatabase,
+    useSuperTest, useTestRuntime,
 } from '../../utils';
 import {
     createSuperTestAnalysis,
@@ -24,11 +22,7 @@ describe('controllers/analysis-bucket-file', () => {
     const superTest = useSuperTest();
 
     beforeAll(async () => {
-        await useTestDatabase();
-    });
-
-    afterAll(async () => {
-        await dropTestDatabase();
+        await useTestRuntime();
     });
 
     let details : AnalysisNode;

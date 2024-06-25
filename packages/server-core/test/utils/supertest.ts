@@ -7,14 +7,11 @@
 
 import { createNodeDispatcher } from 'routup';
 import supertest from 'supertest';
-import { createConfig } from '../../src';
 import { createRouter } from '../../src/http/router';
 
 export type TestAgent = ReturnType<typeof supertest>;
 
 export function useSuperTest() : TestAgent {
-    createConfig();
-
     const router = createRouter();
     return supertest(createNodeDispatcher(router));
 }

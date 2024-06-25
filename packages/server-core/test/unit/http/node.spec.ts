@@ -9,7 +9,7 @@ import type {
     Node,
 } from '@privateaim/core-kit';
 import {
-    dropTestDatabase, expectPropertiesEqualToSrc, removeDateProperties, useSuperTest, useTestDatabase,
+    expectPropertiesEqualToSrc, removeDateProperties, useSuperTest, useTestRuntime,
 } from '../../utils';
 import { createSuperTestNode } from '../../utils/domains';
 
@@ -17,11 +17,7 @@ describe('src/controllers/core/node', () => {
     const superTest = useSuperTest();
 
     beforeAll(async () => {
-        await useTestDatabase();
-    });
-
-    afterAll(async () => {
-        await dropTestDatabase();
+        await useTestRuntime();
     });
 
     let details: Node;
@@ -43,7 +39,7 @@ describe('src/controllers/core/node', () => {
         expect(response.status).toEqual(200);
         expect(response.body).toBeDefined();
         expect(response.body.data).toBeDefined();
-        expect(response.body.data.length).toEqual(1);
+        expect(response.body.data.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should read resource', async () => {

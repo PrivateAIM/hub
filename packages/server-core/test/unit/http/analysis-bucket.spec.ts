@@ -8,11 +8,9 @@
 import type { AnalysisBucket, AnalysisNode } from '@privateaim/core-kit';
 import { AnalysisBucketType } from '@privateaim/core-kit';
 import {
-    dropTestDatabase,
     expectPropertiesEqualToSrc,
     removeDateProperties,
-    useSuperTest,
-    useTestDatabase,
+    useSuperTest, useTestRuntime,
 } from '../../utils';
 import {
     createSuperTestAnalysis,
@@ -23,11 +21,7 @@ describe('controllers/analysis-file', () => {
     const superTest = useSuperTest();
 
     beforeAll(async () => {
-        await useTestDatabase();
-    });
-
-    afterAll(async () => {
-        await dropTestDatabase();
+        await useTestRuntime();
     });
 
     let details : AnalysisNode;
@@ -63,7 +57,7 @@ describe('controllers/analysis-file', () => {
         expect(response.status).toEqual(200);
         expect(response.body).toBeDefined();
         expect(response.body.data).toBeDefined();
-        expect(response.body.data.length).toEqual(1);
+        expect(response.body.data.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should read resource', async () => {

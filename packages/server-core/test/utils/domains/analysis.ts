@@ -5,11 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { faker } from '@faker-js/faker';
 import type { Analysis } from '@privateaim/core-kit';
 import type { TestAgent } from '../supertest';
 
 export const TEST_DEFAULT_ANALYSIS : Partial<Analysis> = {
-    name: 'development',
+    name: faker.lorem.slug(),
 };
 
 export async function createSuperTestAnalysis(superTest: TestAgent, entity?: Partial<Analysis>) {

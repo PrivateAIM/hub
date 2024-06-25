@@ -8,22 +8,21 @@
 import type { Analysis } from '@privateaim/core-kit';
 import { buildHTTPValidationErrorMessage } from '@privateaim/server-http-kit';
 import {
-    dropTestDatabase, expectPropertiesEqualToSrc, removeDateProperties, useSuperTest, useTestDatabase,
+    expectPropertiesEqualToSrc,
+    removeDateProperties,
+    useSuperTest,
+    useTestRuntime,
 } from '../../utils';
 import { TEST_DEFAULT_ANALYSIS, createSuperTestAnalysis, createSuperTestProject } from '../../utils/domains';
 
 describe('src/controllers/core/analysis', () => {
     const superTest = useSuperTest();
 
-    beforeAll(async () => {
-        await useTestDatabase();
-    });
-
-    afterAll(async () => {
-        await dropTestDatabase();
-    });
-
     let details : Analysis;
+
+    beforeAll(async () => {
+        await useTestRuntime();
+    });
 
     it('should create resource', async () => {
         const proposal = await createSuperTestProject(superTest);
@@ -47,7 +46,7 @@ describe('src/controllers/core/analysis', () => {
         expect(response.status).toEqual(200);
         expect(response.body).toBeDefined();
         expect(response.body.data).toBeDefined();
-        expect(response.body.data.length).toEqual(1);
+        expect(response.body.data.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should read resource', async () => {
