@@ -12,7 +12,7 @@ import process from 'node:process';
 import type { Router } from 'routup';
 import type { MiddlewareSwaggerOptions } from './types';
 
-export function mountSwaggerMiddleware(router: Router, options: MiddlewareSwaggerOptions) {
+export function mountSwaggerMiddleware(router: Router, options: MiddlewareSwaggerOptions = {}) {
     let document : any;
     if (options.cwd) {
         document = loadSync(path.join(options.cwd, 'swagger.json'));

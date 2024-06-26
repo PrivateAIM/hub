@@ -16,6 +16,8 @@ export {
     mountAuthupClientResponseErrorTokenHook,
 };
 
+// todo: extend constructor options
+
 export class AuthupClient extends Client {
     constructor(options: ClientOptions = {}) {
         super(options);
