@@ -5,26 +5,34 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ClientOptions } from '@authup/core-http-kit';
+import type { ClientResponseErrorTokenHookOptions } from '@authup/core-http-kit';
 import {
     Client, mountClientResponseErrorTokenHook as mountAuthupClientResponseErrorTokenHook,
     mountClientResponseErrorTokenHook,
 } from '@authup/core-http-kit';
 import { guessAuthupTokenCreatorOptions } from './helpers';
+import type { AuthupClientOptions } from './types';
 
 export {
     mountAuthupClientResponseErrorTokenHook,
 };
 
-// todo: extend constructor options
-
 export class AuthupClient extends Client {
-    constructor(options: ClientOptions = {}) {
+    constructor(options: AuthupClientOptions = {}) {
         super(options);
 
-        mountClientResponseErrorTokenHook(this, {
-            baseURL: options.baseURL,
-            tokenCreator: guessAuthupTokenCreatorOptions(),
-        });
+        let tokenHook : ClientResponseErrorTokenHookOptions;
+        if (options.tokenHook) {
+            tokenHook = options.tokenHook;
+            tokenHook.baseURL = tokenHook.baseURL || options.baseURL;
+        } else {
+            const tokenCreator = guessAuthupTokenCreatorOptions();
+            tokenHook = {
+                baseURL: options.baseURL,
+                tokenCreator,
+            };
+        }
+
+        mountClientResponseErrorTokenHook(this, tokenHook);
     }
 }
