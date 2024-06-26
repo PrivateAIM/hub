@@ -6,17 +6,27 @@
  */
 
 import { useLogger } from '@privateaim/server-kit';
-import { createConfig, useEnv } from './config';
+import { config } from 'dotenv';
+import path from 'node:path';
+import process from 'node:process';
+import { configure, useEnv } from './config';
 import { createHttpServer } from './http';
 import { createSocketServer } from './socket';
+
+config({
+    debug: false,
+    path: path.resolve(process.cwd(), 'env'),
+});
 
 (async () => {
     /*
     HTTP Server & Express App
     */
-    const config = createConfig();
+
+    configure();
+
     const httpServer = createHttpServer();
-    const socketServer = createSocketServer({ httpServer, config });
+    const socketServer = createSocketServer(httpServer);
 
     /*
     Start Server

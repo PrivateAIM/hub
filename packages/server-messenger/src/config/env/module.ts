@@ -5,16 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import path from 'node:path';
-import { orFail, read, readInt } from 'envix';
-import { config } from 'dotenv';
+import {
+    orFail, read, readInt,
+} from 'envix';
 import type { EnvironmentName } from './constants';
 import type { Environment } from './type';
-
-config({
-    debug: false,
-    path: path.resolve(__dirname, '..', '..', '..', '.env'),
-});
 
 let instance : Environment | undefined;
 
@@ -35,7 +30,7 @@ export function useEnv(key?: string) : any {
         redisConnectionString: orFail(read('REDIS_CONNECTION_STRING')),
         vaultConnectionString: read('VAULT_CONNECTION_STRING'),
 
-        authupApiURL: read('AUTHUP_URL', 'http://127.0.0.1:3010/'),
+        authupURL: read('AUTHUP_URL', 'http://127.0.0.1:3010/'),
     };
 
     if (typeof key === 'string') {

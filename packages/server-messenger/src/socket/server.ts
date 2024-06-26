@@ -7,27 +7,37 @@
 
 import { UnauthorizedError } from '@ebec/http';
 import type { CTSEvents, STCEvents } from '@privateaim/messenger-kit';
-import { useLogger } from '@privateaim/server-kit';
+import {
+    isRedisClientUsable,
+    isVaultClientUsable,
+    useLogger,
+    useRedisClient,
+    useRedisPublishClient,
+    useRedisSubscribeClient,
+    useVaultClient,
+} from '@privateaim/server-kit';
 import { createAuthupMiddleware } from '@privateaim/server-realtime-kit';
-import { has } from 'envix';
 import type { Server as HTTPServer } from 'node:http';
+import type { ServerOptions } from 'socket.io';
 import { Server } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
 import { useEnv } from '../config';
-import type { Config } from '../config';
 import { registerControllers } from './register';
 
-interface SocketServerContext {
-    httpServer: HTTPServer,
-    config: Config
-}
+export function createSocketServer(httpServer: HTTPServer) : Server {
+    let adapter : ServerOptions['adapter'] | undefined;
+    if (isRedisClientUsable()) {
+        adapter = createAdapter(
+            useRedisPublishClient(),
+            useRedisSubscribeClient(),
+        );
+    }
 
-export function createSocketServer(context : SocketServerContext) : Server {
     const server = new Server<
     CTSEvents,
     STCEvents
-    >(context.httpServer, {
-        adapter: createAdapter(context.config.redisPub, context.config.redisSub) as any,
+    >(httpServer, {
+        adapter,
         cors: {
             origin(origin, callback) {
                 callback(null, true);
@@ -38,12 +48,12 @@ export function createSocketServer(context : SocketServerContext) : Server {
     });
 
     const authupMiddleware = createAuthupMiddleware({
-        baseURL: useEnv('authupApiURL'),
-        redis: has('REDIS_CONNECTION_STRING') ?
-            context.config.redisDatabase :
+        baseURL: useEnv('authupURL'),
+        redis: isRedisClientUsable() ?
+            useRedisClient() :
             undefined,
-        vault: has('VAULT_CONNECTION_STRING') ?
-            useEnv('vaultConnectionString') :
+        vault: isVaultClientUsable() ?
+            useVaultClient() :
             undefined,
     });
 

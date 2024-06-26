@@ -5,21 +5,15 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { useRedisClient, useRedisPublishClient, useRedisSubscribeClient } from '@privateaim/server-kit';
 import { WRITABLE_DIR_PATH } from './constants';
-import { setupLogger, setupRedis } from './services';
-import type { Config } from './type';
+import { setupLogger, setupRedis, setupVault } from './services';
 
-export function createConfig() : Config {
+export function configure() {
     setupLogger({
         directory: WRITABLE_DIR_PATH,
     });
 
     setupRedis();
 
-    return {
-        redisDatabase: useRedisClient(),
-        redisPub: useRedisPublishClient(),
-        redisSub: useRedisSubscribeClient(),
-    };
+    setupVault();
 }
