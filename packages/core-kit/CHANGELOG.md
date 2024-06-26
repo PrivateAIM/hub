@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.7.0](https://github.com/PrivateAIM/hub/compare/v0.6.0...v0.7.0) (2024-06-26)
+
+
+### Features
+
+* initial analysis-permission implementation ([#502](https://github.com/PrivateAIM/hub/issues/502)) ([63cfdbe](https://github.com/PrivateAIM/hub/commit/63cfdbe4c97302dd37b9e2ce22da2592ffb8edbd))
+* initial core -&gt; core-kit package renaming ([9ac9709](https://github.com/PrivateAIM/hub/commit/9ac970999922bc76e3f88381f4d3351a51147a46))
+* migrated to authup version v1.0.0-beta.18 ([06928f6](https://github.com/PrivateAIM/hub/commit/06928f681120b423f962a7869f8f6b12708d3047))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.6.0 to ^0.7.0
+  * peerDependencies
+    * @privateaim/kit bumped from ^0.6.0 to ^0.7.0
+
 ## [0.6.0](https://github.com/PrivateAIM/hub/compare/core-kit-v0.5.0...core-kit-v0.6.0) (2024-06-25)
 
 
