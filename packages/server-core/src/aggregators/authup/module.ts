@@ -10,6 +10,7 @@ import { isRedisClientUsable, useLogger, useRedisSubscribeClient } from '@privat
 import type { Aggregator } from '@privateaim/server-kit';
 import { EnvironmentName, useEnv } from '../../config';
 import {
+    handleAuthupPermissionEvent,
     handleAuthupRealmEvent, handleAuthupRobotEvent,
     handleAuthupUserEvent,
 } from './entities';
@@ -22,17 +23,27 @@ export function createAuthupAggregator() : Aggregator {
             },
         };
     }
+
     return {
         start() {
             const redisSub = useRedisSubscribeClient();
 
-            redisSub.subscribe('realm', 'user', 'robot');
+            redisSub.subscribe(
+                'permission',
+                'realm',
+                'user',
+                'robot',
+            );
 
             redisSub.on('message', async (channel, message) => {
                 useLogger().info(`Received event from channel ${channel}`);
                 const event = JSON.parse(message);
 
                 switch (event.type) {
+                    case DomainType.PERMISSION: {
+                        await handleAuthupPermissionEvent(event);
+                        break;
+                    }
                     case DomainType.REALM: {
                         await handleAuthupRealmEvent(event);
                         break;

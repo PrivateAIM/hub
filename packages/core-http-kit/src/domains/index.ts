@@ -16,5 +16,6 @@ export * from './analysis';
 export * from './analysis-bucket-file';
 export * from './analysis-log';
 export * from './analysis-node';
+export * from './analysis-permission';
 export * from './service';
 export * from './types-base';
