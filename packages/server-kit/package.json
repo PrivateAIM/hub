@@ -1,7 +1,6 @@
 {
     "name": "@privateaim/server-kit",
     "version": "0.6.0",
-    "private": true,
     "exports": {
         "./package.json": "./package.json",
         ".": {

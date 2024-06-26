@@ -1,7 +1,6 @@
 {
     "name": "@privateaim/server-http-kit",
     "version": "0.6.0",
-    "private": true,
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "author": {
