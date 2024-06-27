@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.8.0](https://github.com/PrivateAIM/hub/compare/v0.7.0...v0.8.0) (2024-06-27)
+
+
+### Bug Fixes
+
+* **deps:** bump mysql2 from 3.10.0 to 3.10.1 ([#461](https://github.com/PrivateAIM/hub/issues/461)) ([f415417](https://github.com/PrivateAIM/hub/commit/f4154174a7049dea2624b99988ea013790167142))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/server-kit bumped from ^0.7.0 to ^0.8.0
+    * @privateaim/server-core-realtime bumped from ^0.7.0 to ^0.7.1
+    * @privateaim/server-http-kit bumped from ^0.7.0 to ^0.8.0
+    * @privateaim/server-analysis-manager-kit bumped from ^0.7.0 to ^0.7.1
+
 ## [0.7.0](https://github.com/PrivateAIM/hub/compare/v0.6.0...v0.7.0) (2024-06-26)
 
 

@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.0](https://github.com/PrivateAIM/hub/compare/v0.7.0...v0.8.0) (2024-06-27)
+
+
+### Features
+
+* add token hook options to authup client constructor ([bbe5e32](https://github.com/PrivateAIM/hub/commit/bbe5e3263230fe1a0b0b0ef18b0e47f7b196a204))
+* expose all middlewares ([4681e3f](https://github.com/PrivateAIM/hub/commit/4681e3f5b4ce030e3651c00854d3db9c941e336f))
+
 ## [0.7.0](https://github.com/PrivateAIM/hub/compare/v0.6.0...v0.7.0) (2024-06-26)
 
 
