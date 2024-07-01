@@ -1,5 +1,4 @@
 {
-    "bootstrap-sha": "a74e43ba51cdc556e99605e3eefcb1cec3a64363",
     "include-component-in-tag": false,
     "release-type": "node",
     "release-as": "0.8.0",
@@ -29,29 +28,8 @@
         {
             "type": "node-workspace",
             "updatePeerDependencies": true,
-            "merge": false
-        },
-        {
-            "type": "linked-versions",
-            "groupName": "main",
-            "components": [
-                "root",
-                "client-ui",
-                "client-vue",
-                "core-http-kit",
-                "core-kit",
-                "core-realtime-kit",
-                "kit",
-                "server-analysis-manager",
-                "server-analysis-manager-kit",
-                "server-core",
-                "server-http-kit",
-                "server-kit",
-                "server-messenger",
-                "server-realtime-kit",
-                "server-storage",
-                "storage-kit"
-            ]
+            "merge": false,
+            "updateAllPackages": true
         }
     ],
     "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json"
