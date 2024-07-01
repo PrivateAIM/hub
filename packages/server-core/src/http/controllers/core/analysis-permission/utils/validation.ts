@@ -80,23 +80,28 @@ export async function runAnalysisPermissionValidation(
             throw e;
         }
 
+        // todo: this is not possible right now :/
+        /*
         const data = buildAbilityFromPermission(permission);
         const ability = useRequestEnv(req, 'abilities');
         if (!ability.has(data)) {
             throw new ForbiddenError(`You don't own the permission ${data.name}`);
         }
+         */
 
-        try {
-            const policy = await authup.policy.getOne(result.data.policy_id);
+        if (result.data.policy_id) {
+            try {
+                const policy = await authup.policy.getOne(result.data.policy_id);
 
-            result.data.policy = policy;
-            result.data.policy_id = policy.id;
-        } catch (e) {
-            if (isClientErrorWithStatusCode(e, 404)) {
-                throw new BadRequestError(buildHTTPValidationErrorMessage('permission_id'));
+                result.data.policy = policy;
+                result.data.policy_id = policy.id;
+            } catch (e) {
+                if (isClientErrorWithStatusCode(e, 404)) {
+                    throw new BadRequestError(buildHTTPValidationErrorMessage('permission_id'));
+                }
+
+                throw e;
             }
-
-            throw e;
         }
     }
 
