@@ -22,7 +22,7 @@
         "@routup/basic": "^1.4.0",
         "@routup/decorators": "^3.4.0",
         "@routup/prometheus": "^2.4.0",
-        "@routup/rate-limit": "^2.3.0",
+        "@routup/rate-limit": "^2.4.0",
         "@routup/swagger": "^2.4.0",
         "cors": "^2.8.5",
         "hapic": "^2.5.1",
@@ -32,13 +32,13 @@
         "@types/cors": "^2.8.17",
         "express-validator": "^7.1.0",
         "redis-extension": "^1.5.0",
-        "routup": "^3.3.0",
+        "routup": "^4.0.0",
         "typeorm-extension": "^3.5.1"
     },
     "peerDependencies": {
         "express-validator": "^7.1.0",
         "redis-extension": "^1.5.0",
-        "routup": "^3.3.0",
+        "routup": "^4.0.0",
         "typeorm-extension": "^3.5.1"
     },
     "scripts": {
