@@ -38,6 +38,7 @@ The repository contains the following packages:
 | [server-core-realtime](packages/server-core-realtime)               | Library/Service | This package contains the core realtime service.                                                      |
 | [server-http-kit](packages/server-http-kit)                         | Library         | This package contains helpers/utilities for all http services.                                        |
 | [server-kit](packages/server-kit)                                   | Library         | This package contains helpers/utilities for all services.                                             |
+| [server-messenger](packages/server-realtime-kit)                    | Service         | This package contains the messenger service.                                                          |
 | [server-realtime-kit](packages/server-realtime-kit)                 | Library         | This package contains helpers/utilities for all socket services.                                      |
 | [server-storage](packages/server-storage)                           | Service         | This package contains the storage service.                                                            |
 | [storage-kit](packages/storage-kit)                                 | Library         | This package contains interfaces/types, helpers/utilities, ... for the storage service.               |
