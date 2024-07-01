@@ -57,6 +57,7 @@ export async function getOneAnalysisPermissionRouteHandler(req: Request, res: Re
         .where('analysisPermission.id = :id', { id });
 
     const relationsMap = getRelations(req);
+
     if (relationsMap.analysis) {
         applyQueryRelationsParseOutput(query, [
             relationsMap.analysis,
@@ -78,8 +79,9 @@ export async function getOneAnalysisPermissionRouteHandler(req: Request, res: Re
         }
 
         if (relationsMap.policy) {
-            // todo: enable when policy api client is defined
-            // entity.policy = await authupClient.policy.getOne(entity.policy_id);
+            if (entity.policy_id) {
+                entity.policy = await authupClient.policy.getOne(entity.policy_id);
+            }
         }
     }
 

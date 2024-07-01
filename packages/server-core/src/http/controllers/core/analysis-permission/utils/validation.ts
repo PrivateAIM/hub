@@ -8,9 +8,9 @@
 import { isClientErrorWithStatusCode } from '@hapic/harbor';
 import { isAuthupClientUsable, useAuthupClient } from '@privateaim/server-kit';
 import { check } from 'express-validator';
-import { BadRequestError, ForbiddenError } from '@ebec/http';
+import { BadRequestError } from '@ebec/http';
 import type { Permission } from '@authup/core-kit';
-import { buildAbilityFromPermission, isRealmResourceWritable } from '@authup/core-kit';
+import { isRealmResourceWritable } from '@authup/core-kit';
 import type { Request } from 'routup';
 import type { HTTPValidationResult } from '@privateaim/server-http-kit';
 import {
@@ -72,6 +72,9 @@ export async function runAnalysisPermissionValidation(
 
             result.data.permission = permission;
             result.data.permission_realm_id = permission.realm_id;
+
+            // todo: remove this when validation is reworked.
+            result.relation.permission = permission;
         } catch (e) {
             if (isClientErrorWithStatusCode(e, 404)) {
                 throw new BadRequestError(buildHTTPValidationErrorMessage('permission_id'));
@@ -95,6 +98,9 @@ export async function runAnalysisPermissionValidation(
 
                 result.data.policy = policy;
                 result.data.policy_id = policy.id;
+
+                // todo: remove this when validation is reworked.
+                result.relation.policy = policy;
             } catch (e) {
                 if (isClientErrorWithStatusCode(e, 404)) {
                     throw new BadRequestError(buildHTTPValidationErrorMessage('permission_id'));

@@ -55,6 +55,10 @@ describe('src/controllers/core/analysis-permission', () => {
         }
 
         const analysisPermission = await client.analysisPermission.create(attributes);
+
+        delete analysisPermission.analysis;
+        delete analysisPermission.permission;
+
         extendObject(attributes, removeDateProperties(analysisPermission));
     });
 
