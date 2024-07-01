@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionID } from '@privateaim/core-kit';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/core-kit';
+import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
@@ -20,8 +20,8 @@ export async function deleteProjectNodeRouteHandler(req: Request, res: Response)
     const ability = useRequestEnv(req, 'abilities');
 
     if (
-        !ability.has(PermissionID.PROJECT_EDIT) &&
-        !ability.has(PermissionID.PROJECT_DROP)
+        !ability.has(PermissionName.PROJECT_UPDATE) &&
+        !ability.has(PermissionName.PROJECT_DELETE)
     ) {
         throw new ForbiddenError('You are not allowed to drop a project node.');
     }

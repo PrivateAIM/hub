@@ -7,9 +7,9 @@
 
 import type { Ability } from '@authup/kit';
 import { Abilities } from '@authup/kit';
-import { REALM_MASTER_NAME } from '@authup/core-kit';
+import { PermissionName as AuthupPermissionName, REALM_MASTER_NAME } from '@authup/core-kit';
 import type { TokenVerificationData } from '@authup/server-core-plugin-kit';
-import { PermissionID } from '@privateaim/kit';
+import { PermissionName } from '@privateaim/kit';
 import type { Request } from 'routup';
 import { setRequestEnv } from '../../request';
 
@@ -24,7 +24,10 @@ TokenVerificationData,
 >;
 
 function generateAbilities(): Ability[] {
-    return Object.values(PermissionID).map((name) => ({
+    return Object.values({
+        ...PermissionName,
+        ...AuthupPermissionName,
+    }).map((name) => ({
         name,
     } satisfies Ability));
 }

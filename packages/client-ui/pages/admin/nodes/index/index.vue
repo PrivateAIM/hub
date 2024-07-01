@@ -6,9 +6,9 @@
   -->
 <script lang="ts">
 import { useAbilityCheck, useStore } from '@authup/client-web-kit';
+import { PermissionName } from '@privateaim/kit';
 import { VCTimeago } from '@vuecs/timeago';
 import type { Node } from '@privateaim/core-kit';
-import { PermissionID } from '@privateaim/core-kit';
 import { BTable } from 'bootstrap-vue-next';
 import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
@@ -58,8 +58,8 @@ export default defineNuxtComponent({
         const store = useStore();
         const { realmManagementId } = storeToRefs(store);
 
-        const canEdit = useAbilityCheck(PermissionID.NODE_EDIT);
-        const canDrop = useAbilityCheck(PermissionID.NODE_DROP);
+        const canEdit = useAbilityCheck(PermissionName.NODE_UPDATE);
+        const canDrop = useAbilityCheck(PermissionName.NODE_DELETE);
         const canView = computed(() => canEdit.value || canDrop.value);
 
         const query = computed<BuildInput<Node>>(() => ({

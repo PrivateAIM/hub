@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import { useAbilityCheck } from '@authup/client-web-kit';
+import { PermissionName } from '@privateaim/kit';
 import { VCTimeago } from '@vuecs/timeago';
 import type {
     PropType, VNode,
@@ -17,7 +18,6 @@ import type {
 } from '@privateaim/core-kit';
 import {
     DomainType,
-    PermissionID,
 } from '@privateaim/core-kit';
 import { VCLink } from '@vuecs/link';
 import {
@@ -36,7 +36,7 @@ const FProjectItem = defineComponent({
     },
     emits: ['updated', 'failed', 'deleted'],
     setup(props, { slots, emit }) {
-        const canDrop = useAbilityCheck(PermissionID.PROJECT_DROP);
+        const canDrop = useAbilityCheck(PermissionName.PROJECT_DELETE);
 
         return () => h(FProject, {
             entity: props.entity,

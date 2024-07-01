@@ -7,7 +7,7 @@
 
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/core-kit';
-import { PermissionID } from '@privateaim/core-kit';
+import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
@@ -29,10 +29,10 @@ export async function updateAnalysisNodeRouteHandler(req: Request, res: Response
     const ability = useRequestEnv(req, 'abilities');
 
     const isAuthorityOfNode = isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.node_realm_id);
-    const isAuthorizedForNode = ability.has(PermissionID.ANALYSIS_APPROVE);
+    const isAuthorizedForNode = ability.has(PermissionName.ANALYSIS_APPROVE);
 
     const isAuthorityOfAnalysis = isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.analysis_realm_id);
-    const isAuthorizedForAnalysis = ability.has(PermissionID.ANALYSIS_EDIT);
+    const isAuthorizedForAnalysis = ability.has(PermissionName.ANALYSIS_UPDATE);
 
     if (
         !(isAuthorityOfNode && isAuthorizedForNode) &&

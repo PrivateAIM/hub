@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionID } from '@privateaim/core-kit';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
+import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
@@ -18,7 +18,7 @@ export async function deleteRegistryRouteHandler(req: Request, res: Response) : 
 
     const ability = useRequestEnv(req, 'abilities');
 
-    if (!ability.has(PermissionID.REGISTRY_MANAGE)) {
+    if (!ability.has(PermissionName.REGISTRY_MANAGE)) {
         throw new ForbiddenError();
     }
 

@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionID } from '@privateaim/core-kit';
 import { ForbiddenError } from '@ebec/http';
+import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
@@ -17,7 +17,7 @@ import { RegistryEntity } from '../../../../../domains';
 export async function createRegistryRouteHandler(req: Request, res: Response) : Promise<any> {
     const ability = useRequestEnv(req, 'abilities');
 
-    if (!ability.has(PermissionID.REGISTRY_MANAGE)) {
+    if (!ability.has(PermissionName.REGISTRY_MANAGE)) {
         throw new ForbiddenError();
     }
 

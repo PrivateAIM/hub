@@ -7,7 +7,7 @@
 <script lang="ts">
 import { useAbilityCheck } from '@authup/client-web-kit';
 import type { Registry, RegistryProject } from '@privateaim/core-kit';
-import { PermissionID } from '@privateaim/core-kit';
+import { PermissionName } from '@privateaim/kit';
 import { BModal, BTable } from 'bootstrap-vue-next';
 import type { BuildInput } from 'rapiq';
 import { computed, ref, toRefs } from 'vue';
@@ -76,8 +76,8 @@ export default {
             },
         ];
 
-        const canEdit = useAbilityCheck(PermissionID.NODE_EDIT);
-        const canDrop = useAbilityCheck(PermissionID.NODE_DROP);
+        const canEdit = useAbilityCheck(PermissionName.NODE_UPDATE);
+        const canDrop = useAbilityCheck(PermissionName.NODE_DELETE);
         const canView = computed(() => canEdit.value || canDrop.value);
 
         const listNode = ref<null | typeof RegistryProjectList>(null);

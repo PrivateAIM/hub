@@ -7,7 +7,7 @@
 <script lang="ts">
 import { useStore } from '@authup/client-web-kit';
 import type { Analysis } from '@privateaim/core-kit';
-import { PermissionID } from '@privateaim/core-kit';
+import { PermissionName } from '@privateaim/kit';
 import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
 import { computed } from 'vue';
@@ -27,14 +27,14 @@ export default defineNuxtComponent({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
             [LayoutKey.REQUIRED_PERMISSIONS]: [
-                PermissionID.ANALYSIS_ADD,
-                PermissionID.ANALYSIS_EDIT,
-                PermissionID.ANALYSIS_DROP,
+                PermissionName.ANALYSIS_CREATE,
+                PermissionName.ANALYSIS_UPDATE,
+                PermissionName.ANALYSIS_DELETE,
 
-                PermissionID.ANALYSIS_RESULT_READ,
+                PermissionName.ANALYSIS_RESULT_READ,
 
-                PermissionID.ANALYSIS_EXECUTION_START,
-                PermissionID.ANALYSIS_EXECUTION_STOP,
+                PermissionName.ANALYSIS_EXECUTION_START,
+                PermissionName.ANALYSIS_EXECUTION_STOP,
             ],
         });
 

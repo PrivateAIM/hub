@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { PermissionName } from '@privateaim/kit';
 import { useRequestQuery } from '@routup/basic/query';
 import type { ParseAllowedOption } from 'rapiq';
 import { parseQueryFields } from 'rapiq';
@@ -20,7 +21,6 @@ import {
     useDataSource,
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
-import { PermissionID } from '@privateaim/core-kit';
 import { useRequestEnv } from '@privateaim/server-http-kit';
 import { RegistryProjectEntity, onlyRealmWritableQueryResources } from '../../../../../domains';
 
@@ -57,7 +57,7 @@ function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>, field
     if (protectedSelected.length > 0) {
         const ability = useRequestEnv(req, 'abilities');
         if (
-            !ability.has(PermissionID.REGISTRY_PROJECT_MANAGE)
+            !ability.has(PermissionName.REGISTRY_PROJECT_MANAGE)
         ) {
             throw new ForbiddenError(
                 `You are not permitted to read the restricted fields: ${

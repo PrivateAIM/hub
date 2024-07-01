@@ -6,11 +6,9 @@
   -->
 <script lang="ts">
 import { useAbilityCheck, useStore } from '@authup/client-web-kit';
+import { PermissionName } from '@privateaim/kit';
 import { VCTimeago } from '@vuecs/timeago';
 import type { ProjectNode } from '@privateaim/core-kit';
-import {
-    PermissionID,
-} from '@privateaim/core-kit';
 import {
     BDropdown, BDropdownDivider, BDropdownItem, BModal, BSpinner, BTable,
 } from 'bootstrap-vue-next';
@@ -52,7 +50,7 @@ export default defineNuxtComponent({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
             [LayoutKey.REQUIRED_PERMISSIONS]: [
-                PermissionID.PROJECT_APPROVE,
+                PermissionName.PROJECT_APPROVE,
             ],
         });
 
@@ -82,7 +80,7 @@ export default defineNuxtComponent({
         const store = useStore();
         const { realmId } = storeToRefs(store);
 
-        const canManage = useAbilityCheck(PermissionID.PROJECT_APPROVE);
+        const canManage = useAbilityCheck(PermissionName.PROJECT_APPROVE);
 
         const nodeId : Ref<string | null> = ref(null);
 

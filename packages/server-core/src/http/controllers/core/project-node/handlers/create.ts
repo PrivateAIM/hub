@@ -5,8 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { NodeType, PermissionID, ProjectNodeApprovalStatus } from '@privateaim/core-kit';
+import { NodeType, ProjectNodeApprovalStatus } from '@privateaim/core-kit';
 import { ForbiddenError } from '@ebec/http';
+import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
@@ -19,8 +20,8 @@ export async function createProjectNodeRouteHandler(req: Request, res: Response)
     const ability = useRequestEnv(req, 'abilities');
 
     if (
-        !ability.has(PermissionID.PROJECT_EDIT) &&
-        !ability.has(PermissionID.PROJECT_ADD)
+        !ability.has(PermissionName.PROJECT_UPDATE) &&
+        !ability.has(PermissionName.PROJECT_CREATE)
     ) {
         throw new ForbiddenError('You are not allowed to add a project node.');
     }

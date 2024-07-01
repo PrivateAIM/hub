@@ -9,7 +9,6 @@ import {
     DomainEventSubscriptionName,
     DomainSubType,
     DomainType,
-    PermissionID,
     buildDomainChannelName,
     buildDomainEventSubscriptionFullName,
 } from '@privateaim/core-kit';
@@ -17,6 +16,7 @@ import {
     isEventCallback,
 } from '@privateaim/core-realtime-kit';
 import { UnauthorizedError } from '@ebec/http';
+import { PermissionName } from '@privateaim/kit';
 import {
     subscribeSocketRoom,
     unsubscribeSocketRoom,
@@ -34,7 +34,7 @@ export function registerProjectNodeSocketHandlers(socket: Socket) {
         buildDomainEventSubscriptionFullName(DomainType.PROJECT_NODE, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             if (
-                !socket.data.abilities.has(PermissionID.PROJECT_APPROVE)
+                !socket.data.abilities.has(PermissionName.PROJECT_APPROVE)
             ) {
                 if (isEventCallback(cb)) {
                     cb(new UnauthorizedError());
@@ -68,7 +68,7 @@ export function registerProjectNodeForRealmSocketHandlers(socket: Socket) {
         buildDomainEventSubscriptionFullName(DomainSubType.PROJECT_NODE_IN, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             if (
-                !socket.data.abilities.has(PermissionID.PROJECT_APPROVE)
+                !socket.data.abilities.has(PermissionName.PROJECT_APPROVE)
             ) {
                 if (isEventCallback(cb)) {
                     cb(new UnauthorizedError());
@@ -104,7 +104,7 @@ export function registerProjectNodeForRealmSocketHandlers(socket: Socket) {
         buildDomainEventSubscriptionFullName(DomainSubType.PROJECT_NODE_OUT, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             if (
-                !socket.data.abilities.has(PermissionID.PROJECT_EDIT)
+                !socket.data.abilities.has(PermissionName.PROJECT_UPDATE)
             ) {
                 if (isEventCallback(cb)) {
                     cb(new UnauthorizedError());

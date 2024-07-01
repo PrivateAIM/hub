@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionID } from '@privateaim/kit';
+import { PermissionName } from '@privateaim/kit';
 import { ForbiddenError } from '@ebec/http';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
@@ -17,7 +17,7 @@ import { runBucketValidation } from '../utils/validation';
 
 export async function executeBucketRouteCreateHandler(req: Request, res: Response) : Promise<any> {
     const ability = useRequestEnv(req, 'abilities');
-    if (!ability.has(PermissionID.BUCKET_ADD)) {
+    if (!ability.has(PermissionName.BUCKET_CREATE)) {
         throw new ForbiddenError();
     }
 

@@ -7,7 +7,7 @@
 
 <script lang="ts">
 import type { Registry } from '@privateaim/core-kit';
-import { PermissionID } from '@privateaim/core-kit';
+import { PermissionName } from '@privateaim/kit';
 import { definePageMeta, useToast } from '#imports';
 import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
@@ -18,7 +18,7 @@ export default defineNuxtComponent({
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.REQUIRED_PERMISSIONS]: [
-                PermissionID.REGISTRY_MANAGE,
+                PermissionName.REGISTRY_MANAGE,
             ],
         });
 

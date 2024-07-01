@@ -6,10 +6,9 @@
  */
 
 import {
-    PermissionID,
     RegistryProjectType,
 } from '@privateaim/core-kit';
-import { createNanoID } from '@privateaim/kit';
+import { PermissionName, createNanoID } from '@privateaim/kit';
 import { ForbiddenError } from '@ebec/http';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
@@ -22,7 +21,7 @@ import { NodeEntity, RegistryEntity, RegistryProjectEntity } from '../../../../.
 
 export async function createNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const ability = useRequestEnv(req, 'abilities');
-    if (!ability.has(PermissionID.NODE_ADD)) {
+    if (!ability.has(PermissionName.NODE_CREATE)) {
         throw new ForbiddenError();
     }
 

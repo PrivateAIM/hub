@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionID } from '@privateaim/kit';
+import { PermissionName } from '@privateaim/kit';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/core-kit';
 import type { Request, Response } from 'routup';
@@ -42,7 +42,7 @@ export async function executeBucketFileRouteDeleteHandler(req: Request, res: Res
         !isBucketFileOwnedByActor(entity, actor)
     ) {
         const ability = useRequestEnv(req, 'abilities');
-        if (!ability.has(PermissionID.BUCKET_EDIT)) {
+        if (!ability.has(PermissionName.BUCKET_UPDATE)) {
             throw new ForbiddenError();
         }
 

@@ -46,7 +46,6 @@ export default defineNuxtComponent({
                 fields: [
                     '+registry_id',
                     '+registry_project_id',
-                    '+email',
                     '+external_name',
                 ],
             },

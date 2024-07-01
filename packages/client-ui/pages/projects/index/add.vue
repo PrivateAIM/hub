@@ -6,11 +6,8 @@
   -->
 <script lang="ts">
 import type { Project } from '@privateaim/core-kit';
-import {
-    PermissionID,
-} from '@privateaim/core-kit';
-
 import { FProjectForm } from '@privateaim/client-vue';
+import { PermissionName } from '@privateaim/kit';
 import { definePageMeta } from '#imports';
 import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
@@ -25,7 +22,7 @@ export default defineNuxtComponent({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
             [LayoutKey.REQUIRED_PERMISSIONS]: [
-                PermissionID.PROJECT_ADD,
+                PermissionName.PROJECT_CREATE,
             ],
         });
         const handleCreated = (entity: Project) => {

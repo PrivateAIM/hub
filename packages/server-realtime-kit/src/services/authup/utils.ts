@@ -5,11 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { PermissionName as AuthupPermissionName, REALM_MASTER_NAME } from '@authup/core-kit';
 import type { Ability } from '@authup/kit';
 import { Abilities, OAuth2SubKind } from '@authup/kit';
-import { REALM_MASTER_NAME } from '@authup/core-kit';
 import type { TokenVerificationData } from '@authup/server-core-plugin-kit';
-import { PermissionID } from '@privateaim/kit';
+import { PermissionName } from '@privateaim/kit';
 import type { Socket } from '../../types';
 
 type TokenVerificationDataMinimal = Pick<
@@ -23,7 +23,10 @@ TokenVerificationData,
 >;
 
 function generateAbilities(): Ability[] {
-    return Object.values(PermissionID).map((name) => ({
+    return Object.values({
+        ...PermissionName,
+        ...AuthupPermissionName,
+    }).map((name) => ({
         name,
     } satisfies Ability));
 }

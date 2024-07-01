@@ -6,9 +6,9 @@
   -->
 <script lang="ts">
 import { useAbilityCheck } from '@authup/client-web-kit';
+import { PermissionName } from '@privateaim/kit';
 import { VCTimeago } from '@vuecs/timeago';
 import type { Registry } from '@privateaim/core-kit';
-import { PermissionID } from '@privateaim/core-kit';
 import { BSpinner, BTable } from 'bootstrap-vue-next';
 import type { BuildInput } from 'rapiq';
 import { ref } from 'vue';
@@ -55,7 +55,7 @@ export default defineNuxtComponent({
             },
         };
 
-        const canManage = useAbilityCheck(PermissionID.REGISTRY_MANAGE);
+        const canManage = useAbilityCheck(PermissionName.REGISTRY_MANAGE);
 
         const registryNode = ref<typeof RegistryList | null>(null);
 

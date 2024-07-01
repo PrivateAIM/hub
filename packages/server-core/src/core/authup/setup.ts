@@ -6,12 +6,13 @@
  */
 
 import type {
-    Permission, Realm, Robot, Role,
+    Realm,
 } from '@authup/core-kit';
 import { REALM_MASTER_NAME } from '@authup/core-kit';
 import { ServerError } from '@ebec/http';
 import { isClientErrorWithStatusCode } from '@hapic/harbor';
-import { PermissionKey, ServiceID } from '@privateaim/core-kit';
+import { ServiceID } from '@privateaim/core-kit';
+import { PermissionName } from '@privateaim/kit';
 import { useAuthupClient, useLogger } from '@privateaim/server-kit';
 
 export async function setupAuthupService(): Promise<any> {
@@ -26,36 +27,6 @@ export async function setupAuthupService(): Promise<any> {
         realm = await authupClient.realm.getOne(REALM_MASTER_NAME);
     } catch (e) {
         throw new ServerError(`The ${REALM_MASTER_NAME} does not exist.`);
-    }
-
-    // -------------------------------------------------
-
-    let robotEntity: Robot | undefined;
-    const robotResponse = await authupClient.robot.getMany({
-        filter: {
-            realm_id: realm.id,
-            name: 'system',
-        },
-    });
-
-    if (robotResponse.data.length === 1) {
-        // eslint-disable-next-line prefer-destructuring
-        robotEntity = robotResponse.data[0];
-    }
-
-    // -------------------------------------------------
-
-    let roleEntity: Role | undefined;
-    const roleResponse = await authupClient.role.getMany({
-        filter: {
-            realm_id: null,
-            name: 'admin',
-        },
-    });
-
-    if (roleResponse.data.length === 1) {
-        // eslint-disable-next-line prefer-destructuring
-        roleEntity = roleResponse.data[0];
     }
 
     // -------------------------------------------------
@@ -86,12 +57,10 @@ export async function setupAuthupService(): Promise<any> {
     /**
      * Create permissions
      */
-    const permissionNames = Object.values(PermissionKey);
+    const permissionNames = Object.values(PermissionName);
     for (let i = 0; i < permissionNames.length; i++) {
-        let permission: Permission;
-
         try {
-            permission = await authupClient.permission.create({
+            await authupClient.permission.create({
                 name: permissionNames[i],
             });
 
@@ -99,48 +68,8 @@ export async function setupAuthupService(): Promise<any> {
         } catch (e) {
             if (isClientErrorWithStatusCode(e, 409)) {
                 useLogger().debug(`Permission ${permissionNames[i]} already exists`);
-
-                const { data: permissions } = await authupClient.permission.getMany({
-                    filter: {
-                        realm_id: null,
-                        name: permissionNames[i],
-                    },
-                });
-
-                // eslint-disable-next-line prefer-destructuring
-                permission = permissions[0];
             } else {
                 throw e;
-            }
-        }
-
-        if (roleEntity) {
-            try {
-                await authupClient.rolePermission.create({
-                    permission_id: permission.id,
-                    role_id: roleEntity.id,
-                });
-
-                useLogger().debug(`Created permission ${permissionNames[i]} for admin role.`);
-            } catch (e) {
-                if (!isClientErrorWithStatusCode(e, 409)) {
-                    throw e;
-                }
-            }
-        }
-
-        if (robotEntity) {
-            try {
-                await authupClient.robotPermission.create({
-                    permission_id: permission.id,
-                    robot_id: robotEntity.id,
-                });
-
-                useLogger().debug(`Created permission ${permissionNames[i]} for system robot.`);
-            } catch (e) {
-                if (!isClientErrorWithStatusCode(e, 409)) {
-                    throw e;
-                }
             }
         }
     }

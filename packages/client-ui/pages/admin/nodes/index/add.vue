@@ -7,7 +7,7 @@
 <script lang="ts">
 import { useStore } from '@authup/client-web-kit';
 import type { Node } from '@privateaim/core-kit';
-import { PermissionID } from '@privateaim/core-kit';
+import { PermissionName } from '@privateaim/kit';
 import { storeToRefs } from 'pinia';
 import { FNodeForm } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
@@ -22,7 +22,7 @@ export default defineNuxtComponent({
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.REQUIRED_PERMISSIONS]: [
-                PermissionID.NODE_ADD,
+                PermissionName.NODE_CREATE,
             ],
         });
 

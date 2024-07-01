@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionID } from '@privateaim/core-kit';
 import { ForbiddenError } from '@ebec/http';
+import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
@@ -16,7 +16,7 @@ import { runProjectValidation } from '../utils/validation';
 
 export async function createProjectRouteHandler(req: Request, res: Response) : Promise<any> {
     const ability = useRequestEnv(req, 'abilities');
-    if (!ability.has(PermissionID.PROJECT_ADD)) {
+    if (!ability.has(PermissionName.PROJECT_CREATE)) {
         throw new ForbiddenError();
     }
 

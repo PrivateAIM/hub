@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 import type { Registry } from '@privateaim/core-kit';
-import { PermissionID } from '@privateaim/core-kit';
+import { PermissionName } from '@privateaim/kit';
 import type { PropType } from 'vue';
 import { RegistryProjectForm } from '@privateaim/client-vue';
 import { definePageMeta, useToast } from '#imports';
@@ -26,7 +26,7 @@ export default defineNuxtComponent({
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.REQUIRED_PERMISSIONS]: [
-                PermissionID.REGISTRY_MANAGE,
+                PermissionName.REGISTRY_MANAGE,
             ],
         });
 

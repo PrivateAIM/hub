@@ -15,6 +15,7 @@
         "@authup/kit": "^1.0.0-beta.19",
         "@authup/core-kit": "^1.0.0-beta.19",
         "@ebec/http": "^2.3.0",
+        "@privateaim/kit": "^0.7.0",
         "@privateaim/core-kit": "^0.7.0",
         "@privateaim/core-realtime-kit": "^0.7.0",
         "@privateaim/server-kit": "^0.7.0",

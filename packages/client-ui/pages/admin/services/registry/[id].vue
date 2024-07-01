@@ -5,8 +5,9 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { DomainType, PermissionID } from '@privateaim/core-kit';
+import { DomainType } from '@privateaim/core-kit';
 import { createEntityManager } from '@privateaim/client-vue';
+import { PermissionName } from '@privateaim/kit';
 import { computed } from 'vue';
 import {
     createError,
@@ -22,7 +23,7 @@ export default defineNuxtComponent({
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.REQUIRED_PERMISSIONS]: [
-                PermissionID.REGISTRY_MANAGE,
+                PermissionName.REGISTRY_MANAGE,
             ],
         });
 

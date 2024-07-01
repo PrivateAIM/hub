@@ -5,8 +5,8 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import { PermissionName } from '@authup/core-kit';
 import type { Registry } from '@privateaim/core-kit';
-import { PermissionID } from '@privateaim/core-kit';
 import { RegistryForm } from '@privateaim/client-vue';
 import { definePageMeta, navigateTo } from '#imports';
 import { defineNuxtComponent } from '#app';
@@ -19,7 +19,7 @@ export default defineNuxtComponent({
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.REQUIRED_PERMISSIONS]: [
-                PermissionID.ROBOT_ADD,
+                PermissionName.ROBOT_CREATE,
             ],
         });
 

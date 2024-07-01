@@ -29,7 +29,7 @@ export default defineNuxtComponent({
         definePageMeta({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.REQUIRED_PERMISSIONS]: [
-                PermissionName.REALM_EDIT,
+                PermissionName.IDENTITY_PROVIDER_UPDATE,
             ],
         });
 

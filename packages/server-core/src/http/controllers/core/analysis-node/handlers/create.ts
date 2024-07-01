@@ -6,7 +6,8 @@
  */
 
 import { BadRequestError, ForbiddenError } from '@ebec/http';
-import { AnalysisNodeApprovalStatus, NodeType, PermissionID } from '@privateaim/core-kit';
+import { AnalysisNodeApprovalStatus, NodeType } from '@privateaim/core-kit';
+import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
@@ -17,7 +18,7 @@ import { runAnalysisNodeValidation } from '../utils';
 
 export async function createAnalysisNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const ability = useRequestEnv(req, 'abilities');
-    if (!ability.has(PermissionID.ANALYSIS_EDIT)) {
+    if (!ability.has(PermissionName.ANALYSIS_UPDATE)) {
         throw new ForbiddenError();
     }
 

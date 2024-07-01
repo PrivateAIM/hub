@@ -7,7 +7,7 @@
 
 import { isRealmResourceWritable } from '@authup/core-kit';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
-import { PermissionID } from '@privateaim/core-kit';
+import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
@@ -19,7 +19,7 @@ export async function updateAnalysisRouteHandler(req: Request, res: Response) : 
     const id = useRequestParam(req, 'id');
 
     const ability = useRequestEnv(req, 'abilities');
-    if (!ability.has(PermissionID.ANALYSIS_EDIT)) {
+    if (!ability.has(PermissionName.ANALYSIS_UPDATE)) {
         throw new ForbiddenError();
     }
 

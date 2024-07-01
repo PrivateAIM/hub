@@ -8,7 +8,6 @@
 import {
     DomainEventSubscriptionName,
     DomainType,
-    PermissionID,
     buildDomainChannelName,
     buildDomainEventSubscriptionFullName,
 } from '@privateaim/core-kit';
@@ -16,6 +15,7 @@ import {
     isEventCallback,
 } from '@privateaim/core-realtime-kit';
 import { UnauthorizedError } from '@ebec/http';
+import { PermissionName } from '@privateaim/kit';
 import {
     subscribeSocketRoom,
     unsubscribeSocketRoom,
@@ -29,9 +29,9 @@ export function registerAnalysisSocketHandlers(socket: Socket) {
         buildDomainEventSubscriptionFullName(DomainType.ANALYSIS, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             if (
-                !socket.data.abilities.has(PermissionID.ANALYSIS_EDIT) &&
-                !socket.data.abilities.has(PermissionID.ANALYSIS_EXECUTION_START) &&
-                !socket.data.abilities.has(PermissionID.ANALYSIS_EXECUTION_STOP)
+                !socket.data.abilities.has(PermissionName.ANALYSIS_UPDATE) &&
+                !socket.data.abilities.has(PermissionName.ANALYSIS_EXECUTION_START) &&
+                !socket.data.abilities.has(PermissionName.ANALYSIS_EXECUTION_STOP)
             ) {
                 if (isEventCallback(cb)) {
                     cb(new UnauthorizedError());

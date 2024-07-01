@@ -6,9 +6,9 @@
   -->
 <script lang="ts">
 import { useAbilityCheck, useStore } from '@authup/client-web-kit';
+import { PermissionName } from '@privateaim/kit';
 import { VCTimeago } from '@vuecs/timeago';
 import type { AnalysisNode } from '@privateaim/core-kit';
-import { PermissionID } from '@privateaim/core-kit';
 import { BDropdown, BTable } from 'bootstrap-vue-next';
 import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
@@ -46,7 +46,7 @@ export default defineNuxtComponent({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
             [LayoutKey.REQUIRED_PERMISSIONS]: [
-                PermissionID.ANALYSIS_APPROVE,
+                PermissionName.ANALYSIS_APPROVE,
             ],
         });
 
@@ -76,7 +76,7 @@ export default defineNuxtComponent({
         const store = useStore();
         const { realmId } = storeToRefs(store);
 
-        const canManage = computed(() => useAbilityCheck(PermissionID.ANALYSIS_APPROVE));
+        const canManage = computed(() => useAbilityCheck(PermissionName.ANALYSIS_APPROVE));
 
         const query : BuildInput<AnalysisNode> = {
             include: {

@@ -5,13 +5,13 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { PermissionID } from '@privateaim/core-kit';
 import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import {
     FPagination, FProjectItem, FProjects, FSearch, FTitle,
 } from '@privateaim/client-vue';
 import { useStore } from '@authup/client-web-kit';
+import { PermissionName } from '@privateaim/kit';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
 import { defineNuxtComponent, definePageMeta } from '#imports';
 
@@ -24,18 +24,18 @@ export default defineNuxtComponent({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
             [LayoutKey.REQUIRED_PERMISSIONS]: [
-                PermissionID.PROJECT_ADD,
-                PermissionID.PROJECT_DROP,
-                PermissionID.PROJECT_EDIT,
+                PermissionName.PROJECT_CREATE,
+                PermissionName.PROJECT_DELETE,
+                PermissionName.PROJECT_UPDATE,
 
-                PermissionID.ANALYSIS_ADD,
-                PermissionID.ANALYSIS_EDIT,
-                PermissionID.ANALYSIS_DROP,
+                PermissionName.ANALYSIS_CREATE,
+                PermissionName.ANALYSIS_UPDATE,
+                PermissionName.ANALYSIS_DELETE,
 
-                PermissionID.ANALYSIS_RESULT_READ,
+                PermissionName.ANALYSIS_RESULT_READ,
 
-                PermissionID.ANALYSIS_EXECUTION_START,
-                PermissionID.ANALYSIS_EXECUTION_STOP,
+                PermissionName.ANALYSIS_EXECUTION_START,
+                PermissionName.ANALYSIS_EXECUTION_STOP,
             ],
         });
 

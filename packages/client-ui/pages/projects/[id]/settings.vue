@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 import type { Project } from '@privateaim/core-kit';
-import { PermissionID } from '@privateaim/core-kit';
+import { PermissionName } from '@privateaim/kit';
 import type { PropType } from 'vue';
 import { FProjectForm } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
@@ -17,8 +17,8 @@ export default defineNuxtComponent({
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
         [LayoutKey.REQUIRED_PERMISSIONS]: [
-            PermissionID.PROJECT_EDIT,
-            PermissionID.PROJECT_DROP,
+            PermissionName.PROJECT_UPDATE,
+            PermissionName.PROJECT_DELETE,
         ],
     },
     components: { FProjectForm },

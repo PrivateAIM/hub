@@ -6,6 +6,7 @@
  */
 
 import { useAbilityCheck } from '@authup/client-web-kit';
+import { PermissionName } from '@privateaim/kit';
 import { VCTimeago } from '@vuecs/timeago';
 import type { PropType, VNodeArrayChildren, VNodeChild } from 'vue';
 import {
@@ -13,9 +14,6 @@ import {
 } from 'vue';
 import type {
     Analysis,
-} from '@privateaim/core-kit';
-import {
-    PermissionID,
 } from '@privateaim/core-kit';
 import { VCLink } from '@vuecs/link';
 import TrainEntity from './FAnalysis';
@@ -48,7 +46,7 @@ const FAnalysisItem = defineComponent({
             emit('executed', component, command);
         };
 
-        const isAllowed = useAbilityCheck(PermissionID.ANALYSIS_DROP);
+        const isAllowed = useAbilityCheck(PermissionName.ANALYSIS_DELETE);
 
         return () => h(TrainEntity, {
             entity: props.entity,

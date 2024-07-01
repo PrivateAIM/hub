@@ -6,10 +6,10 @@
  */
 import { useAbilityCheck } from '@authup/client-web-kit';
 import {
-    PermissionID,
     ProjectNodeApprovalCommand,
     ProjectNodeApprovalStatus,
 } from '@privateaim/core-kit';
+import { PermissionName } from '@privateaim/kit';
 import type { PropType } from 'vue';
 import {
     computed, defineComponent, ref,
@@ -125,7 +125,7 @@ export default defineComponent({
             }
         });
 
-        const isAllowed = useAbilityCheck(PermissionID.PROJECT_APPROVE);
+        const isAllowed = useAbilityCheck(PermissionName.PROJECT_APPROVE);
 
         return () => renderActionCommand({
             execute,

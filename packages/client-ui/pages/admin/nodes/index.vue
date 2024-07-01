@@ -7,7 +7,7 @@
 
 <script lang="ts">
 import type { Node } from '@privateaim/core-kit';
-import { PermissionID } from '@privateaim/core-kit';
+import { PermissionName } from '@privateaim/kit';
 import { definePageMeta, useToast } from '#imports';
 import { defineNuxtComponent, navigateTo } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
@@ -18,9 +18,9 @@ export default defineNuxtComponent({
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.REQUIRED_PERMISSIONS]: [
-                PermissionID.NODE_EDIT,
-                PermissionID.NODE_DROP,
-                PermissionID.NODE_ADD,
+                PermissionName.NODE_UPDATE,
+                PermissionName.NODE_DELETE,
+                PermissionName.NODE_CREATE,
             ],
         });
 

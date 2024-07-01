@@ -6,8 +6,8 @@
  */
 
 import { ForbiddenError, NotFoundError } from '@ebec/http';
-import { PermissionID } from '@privateaim/core-kit';
 import { isRealmResourceWritable } from '@authup/core-kit';
+import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
@@ -21,7 +21,7 @@ export async function deleteNodeRouteHandler(req: Request, res: Response) : Prom
     const id = useRequestParam(req, 'id');
 
     const ability = useRequestEnv(req, 'abilities');
-    if (!ability.has(PermissionID.NODE_DROP)) {
+    if (!ability.has(PermissionName.NODE_DELETE)) {
         throw new ForbiddenError();
     }
 

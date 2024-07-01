@@ -5,7 +5,8 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { PermissionID, ServiceID } from '@privateaim/core-kit';
+import { ServiceID } from '@privateaim/core-kit';
+import { PermissionName } from '@privateaim/kit';
 import { definePageMeta, navigateTo } from '#imports';
 import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
@@ -15,7 +16,7 @@ export default defineNuxtComponent({
         definePageMeta({
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
             [LayoutKey.REQUIRED_PERMISSIONS]: [
-                PermissionID.SERVICE_MANAGE,
+                PermissionName.SERVICE_MANAGE,
             ],
         });
 

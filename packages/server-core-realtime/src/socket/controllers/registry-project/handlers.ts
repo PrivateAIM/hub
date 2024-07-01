@@ -8,7 +8,6 @@
 import {
     DomainEventSubscriptionName,
     DomainType,
-    PermissionID,
     buildDomainChannelName,
     buildDomainEventSubscriptionFullName,
 } from '@privateaim/core-kit';
@@ -16,6 +15,7 @@ import {
     isEventCallback,
 } from '@privateaim/core-realtime-kit';
 import { UnauthorizedError } from '@ebec/http';
+import { PermissionName } from '@privateaim/kit';
 import {
     subscribeSocketRoom,
     unsubscribeSocketRoom,
@@ -31,7 +31,7 @@ export function registerRegistryProjectSocketHandlers(socket: Socket) {
         buildDomainEventSubscriptionFullName(DomainType.REGISTRY_PROJECT, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             if (
-                !socket.data.abilities.has(PermissionID.REGISTRY_MANAGE)
+                !socket.data.abilities.has(PermissionName.REGISTRY_MANAGE)
             ) {
                 if (isEventCallback(cb)) {
                     cb(new UnauthorizedError());

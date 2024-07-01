@@ -6,9 +6,9 @@
  */
 
 import {
-    PermissionID, RegistryProjectType,
+    RegistryProjectType,
 } from '@privateaim/core-kit';
-import { createNanoID } from '@privateaim/kit';
+import { PermissionName, createNanoID } from '@privateaim/kit';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/core-kit';
 import type { Request, Response } from 'routup';
@@ -24,7 +24,7 @@ export async function updateNodeRouteHandler(req: Request, res: Response) : Prom
     const id = useRequestParam(req, 'id');
 
     const ability = useRequestEnv(req, 'abilities');
-    if (!ability.has(PermissionID.NODE_EDIT)) {
+    if (!ability.has(PermissionName.NODE_UPDATE)) {
         throw new ForbiddenError();
     }
 

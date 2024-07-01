@@ -7,7 +7,8 @@
 
 import { useAbilityCheck } from '@authup/client-web-kit';
 import type { Analysis } from '@privateaim/core-kit';
-import { AnalysisAPICommand, AnalysisBuildStatus, PermissionID } from '@privateaim/core-kit';
+import { AnalysisAPICommand, AnalysisBuildStatus } from '@privateaim/core-kit';
+import { PermissionName } from '@privateaim/kit';
 import type { PropType } from 'vue';
 import {
     computed, defineComponent, ref, toRef,
@@ -64,7 +65,7 @@ const FAnalysisCommand = defineComponent({
             }
         });
 
-        const isAllowed = useAbilityCheck(PermissionID.ANALYSIS_EDIT);
+        const isAllowed = useAbilityCheck(PermissionName.ANALYSIS_UPDATE);
 
         const isHidden = computed<boolean>(() => {
             if (props.command === AnalysisAPICommand.CONFIGURATION_LOCK) {
