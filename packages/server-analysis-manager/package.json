@@ -21,7 +21,7 @@
         "test:coverage": "npm run test -- --coverage"
     },
     "dependencies": {
-        "@authup/core-http-kit": "^1.0.0-beta.18",
+        "@authup/core-http-kit": "^1.0.0-beta.19",
         "@ebec/http": "^2.3.0",
         "@hapic/harbor": "^2.3.3",
         "@privateaim/core-kit": "^0.7.0",
