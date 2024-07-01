@@ -8,8 +8,9 @@
 import { isClientErrorWithStatusCode } from '@hapic/harbor';
 import { isAuthupClientUsable, useAuthupClient } from '@privateaim/server-kit';
 import { check } from 'express-validator';
-import { BadRequestError } from '@ebec/http';
-import { isRealmResourceWritable } from '@authup/core-kit';
+import { BadRequestError, ForbiddenError } from '@ebec/http';
+import type { Permission } from '@authup/core-kit';
+import { buildAbilityFromPermission, isRealmResourceWritable } from '@authup/core-kit';
 import type { Request } from 'routup';
 import type { HTTPValidationResult } from '@privateaim/server-http-kit';
 import {
@@ -64,9 +65,12 @@ export async function runAnalysisPermissionValidation(
     if (isAuthupClientUsable()) {
         const authup = useAuthupClient();
 
+        let permission : Permission;
+
         try {
-            const permission = await authup.permission.getOne(result.data.permission_id);
-            // todo: is requester permitted to assign permission ?!
+            permission = await authup.permission.getOne(result.data.permission_id);
+
+            result.data.permission = permission;
             result.data.permission_realm_id = permission.realm_id;
         } catch (e) {
             if (isClientErrorWithStatusCode(e, 404)) {
@@ -75,9 +79,25 @@ export async function runAnalysisPermissionValidation(
 
             throw e;
         }
-        // todo: wait for authup implementation
-        // const policy = await authup.policy.getOne(result.data.policy_id);
-        // result.data.policy_id = policy.id;
+
+        const data = buildAbilityFromPermission(permission);
+        const ability = useRequestEnv(req, 'abilities');
+        if (!ability.has(data)) {
+            throw new ForbiddenError(`You don't own the permission ${data.name}`);
+        }
+
+        try {
+            const policy = await authup.policy.getOne(result.data.policy_id);
+
+            result.data.policy = policy;
+            result.data.policy_id = policy.id;
+        } catch (e) {
+            if (isClientErrorWithStatusCode(e, 404)) {
+                throw new BadRequestError(buildHTTPValidationErrorMessage('permission_id'));
+            }
+
+            throw e;
+        }
     }
 
     // ----------------------------------------------

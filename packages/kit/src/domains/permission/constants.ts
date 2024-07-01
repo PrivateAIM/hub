@@ -5,8 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionName as AuthPermissionName } from '@authup/core-kit';
-
 export enum PermissionName {
     BUCKET_CREATE = 'bucket_create',
     BUCKET_UPDATE = 'bucket_update',
