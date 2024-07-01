@@ -21,7 +21,7 @@
         "@privateaim/server-http-kit": "^0.7.0",
         "@privateaim/storage-kit": "^0.7.0",
         "@routup/basic": "^1.4.0",
-        "@routup/decorators": "^3.3.1",
+        "@routup/decorators": "^3.4.0",
         "busboy": "^1.6.0",
         "cors": "^2.8.5",
         "dotenv": "^16.4.4",
