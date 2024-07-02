@@ -42,8 +42,8 @@ services:
         ports:
             - '9000:9000'
         environment:
-            MINIO_ACCESS_KEY: admin
-            MINIO_SECRET_KEY: start123
+            MINIO_ROOT_USER: admin
+            MINIO_ROOT_PASSWORD: start123
         command: server /data
         networks:
             hub:
