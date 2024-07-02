@@ -6,6 +6,7 @@
  */
 
 import { NotFoundError } from '@ebec/http';
+import { useLogger } from '@privateaim/server-kit';
 import type { Request, Response } from 'routup';
 import { useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
@@ -19,11 +20,8 @@ export async function executeBucketFileRouteStreamHandler(req: Request, res: Res
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(BucketFileEntity);
-    const entity = await repository.findOne({
-        where: {
-            id,
-        },
-        relations: ['bucket'],
+    const entity = await repository.findOneBy({
+        id,
     });
 
     if (!entity) {
@@ -37,8 +35,12 @@ export async function executeBucketFileRouteStreamHandler(req: Request, res: Res
     // todo: this should work
     // setResponseHeaderAttachment(res, entity.path);
 
+    const bucketName = toBucketName(entity.bucket_id);
+
+    useLogger().debug(`Streaming file ${entity.hash} (${id}) of ${bucketName}`);
+
     const minio = useMinio();
-    const stream = await minio.getObject(toBucketName(entity.bucket.id), entity.hash);
+    const stream = await minio.getObject(bucketName, entity.hash);
 
     stream.pipe(res);
 }

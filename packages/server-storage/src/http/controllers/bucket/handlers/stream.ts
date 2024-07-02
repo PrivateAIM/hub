@@ -7,6 +7,7 @@
 
 import { isUUID } from '@authup/kit';
 import { NotFoundError } from '@ebec/http';
+import { useLogger } from '@privateaim/server-kit';
 import type { Request, Response } from 'routup';
 import { useRequestParam } from 'routup';
 import type { Pack } from 'tar-stream';
@@ -44,18 +45,30 @@ async function packFile(
     });
 }
 
-async function packFiles(
-    pack: Pack,
+async function streamFiles(
+    res: Response,
     name: string,
     files: BucketFileEntity[],
 ) {
-    const promises : Promise<void>[] = [];
+    return new Promise<void>((resolve, reject) => {
+        const pack = tar.pack();
+        pack.pipe(res);
+        pack.on('error', (err) => {
+            reject(err);
+        });
 
-    for (let i = 0; i < files.length; i++) {
-        promises.push(packFile(pack, name, files[i]));
-    }
+        const promises : Promise<void>[] = [];
 
-    await Promise.all(promises);
+        for (let i = 0; i < files.length; i++) {
+            promises.push(packFile(pack, name, files[i]));
+        }
+
+        Promise.resolve()
+            .then(() => Promise.all(promises))
+            .then(() => pack.finalize())
+            .then(() => resolve())
+            .catch((e) => reject(e));
+    });
 }
 
 export async function executeBucketRouteStreamHandler(req: Request, res: Response) : Promise<any> {
@@ -84,10 +97,9 @@ export async function executeBucketRouteStreamHandler(req: Request, res: Respons
         'Transfer-Encoding': 'chunked',
     });
 
-    const pack = tar.pack();
-    pack.pipe(res);
+    const bucketName = toBucketName(entity.id);
 
-    await packFiles(pack, toBucketName(entity.id), files);
+    useLogger().debug(`Streaming files of ${bucketName}`);
 
-    pack.finalize();
+    await streamFiles(res, bucketName, files);
 }
