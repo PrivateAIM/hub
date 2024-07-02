@@ -318,9 +318,13 @@ export function createEntityManager<
                 return;
             }
 
-            if (ctx.props.query || ctx.props.queryFilters) {
+            if (
+                ctx.props.query ||
+                ctx.props.queryFields ||
+                ctx.props.queryFilters
+            ) {
                 query = {
-                    ...(ctx.props.query ? { filters: ctx.props.query } : {}),
+                    ...(ctx.props.query ? ctx.props.query : {}),
                     ...(ctx.props.queryFields ? { fields: ctx.props.queryFields } : {}),
                     ...(ctx.props.queryFilters ? { filters: ctx.props.queryFilters } : {}),
                 } as any;
