@@ -44,5 +44,8 @@ export async function executeBucketFileRouteStreamHandler(req: Request, res: Res
     stream.on('end', () => {
         useLogger().debug(`Streamed file ${entity.hash} (${id}) of ${bucketName}`);
     });
+    stream.on('error', (err) => {
+        useLogger().debug(err);
+    });
     stream.pipe(res);
 }
