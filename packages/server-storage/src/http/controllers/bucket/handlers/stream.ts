@@ -103,7 +103,11 @@ export async function executeBucketRouteStreamHandler(req: Request, res: Respons
 
     useLogger().debug(`Streaming files of ${bucketName}`);
 
-    await streamFiles(res, bucketName, files);
+    try {
+        await streamFiles(res, bucketName, files);
 
-    useLogger().debug(`Streamed files of ${bucketName}`);
+        useLogger().debug(`Streamed files of ${bucketName}`);
+    } catch (err) {
+        useLogger().error(err);
+    }
 }
