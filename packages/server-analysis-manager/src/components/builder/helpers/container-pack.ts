@@ -20,7 +20,7 @@ import { BuilderError } from '../error';
 import { useBuilderLogger } from '../utils';
 import type { ContainerPackContext } from './type';
 
-export async function packContainerWithTrain(container: Container, context: ContainerPackContext) {
+export async function packContainerWithAnalysis(container: Container, context: ContainerPackContext) {
     const pack = tar.pack();
 
     // -----------------------------------------------------------------------------------
@@ -46,7 +46,7 @@ export async function packContainerWithTrain(container: Container, context: Cont
 
     const storage = useStorageClient();
     return new Promise<void>((resolve, reject) => {
-        storage.bucket.stream(analysisBucket.id)
+        storage.bucket.stream(analysisBucket.external_id)
             .then((response) => {
                 const extract = tar.extract();
 
