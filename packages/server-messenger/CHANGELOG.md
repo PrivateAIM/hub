@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.8.0](https://github.com/PrivateAIM/hub/compare/v0.7.0...v0.8.0) (2024-07-02)
+
+
+### Bug Fixes
+
+* **deps:** bump authup to v1.0.0.beta-19 ([3410786](https://github.com/PrivateAIM/hub/commit/34107860d7f810cea7b2024b0f303cd70d32a5fe))
+* **deps:** bump routup to v4.x ([787bb7c](https://github.com/PrivateAIM/hub/commit/787bb7cb6951f32fed29ac77467dcdec76683672))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/messenger-kit bumped from ^0.7.0 to ^0.7.1
+    * @privateaim/server-kit bumped from ^0.7.0 to ^0.8.0
+    * @privateaim/server-realtime-kit bumped from ^0.7.0 to ^0.8.0
+
 ## [0.7.0](https://github.com/PrivateAIM/hub/compare/v0.6.0...v0.7.0) (2024-06-26)
 
 

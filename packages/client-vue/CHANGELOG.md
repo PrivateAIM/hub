@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.8.0](https://github.com/PrivateAIM/hub/compare/v0.7.0...v0.8.0) (2024-07-02)
+
+
+### Features
+
+* simplified and adjusted permission usage across codespace ([1839f5e](https://github.com/PrivateAIM/hub/commit/1839f5eb768f120e268e57e0a496fef5eb0eca41))
+
+
+### Bug Fixes
+
+* **deps:** bump authup to v1.0.0.beta-19 ([3410786](https://github.com/PrivateAIM/hub/commit/34107860d7f810cea7b2024b0f303cd70d32a5fe))
+* query prop access in entity-manager ([a87f8fe](https://github.com/PrivateAIM/hub/commit/a87f8fec1f0882962e84ad315d0ab297c5d24392))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core-kit bumped from ^0.7.0 to ^0.8.0
+    * @privateaim/kit bumped from ^0.7.0 to ^0.8.0
+    * @privateaim/core-http-kit bumped from ^0.7.0 to ^0.8.0
+    * @privateaim/storage-kit bumped from ^0.7.0 to ^0.8.0
+  * peerDependencies
+    * @privateaim/core-kit bumped from ^0.7.0 to ^0.8.0
+    * @privateaim/storage-kit bumped from ^0.7.0 to ^0.8.0
+
 ## [0.7.0](https://github.com/PrivateAIM/hub/compare/v0.6.0...v0.7.0) (2024-06-26)
 
 

@@ -1,5 +1,37 @@
 # Changelog
 
+## [0.8.0](https://github.com/PrivateAIM/hub/compare/v0.7.0...v0.8.0) (2024-07-02)
+
+
+### Features
+
+* enhance logging for bucket(-file) streaming ([c94bd52](https://github.com/PrivateAIM/hub/commit/c94bd522d6a3fbbc47639a2d2a591549de6018ba))
+* simplified and adjusted permission usage across codespace ([1839f5e](https://github.com/PrivateAIM/hub/commit/1839f5eb768f120e268e57e0a496fef5eb0eca41))
+
+
+### Bug Fixes
+
+* adjusted flow to streaming bucket-files ([67e06c1](https://github.com/PrivateAIM/hub/commit/67e06c1c160ef2571696638d2d1befaff27a2498))
+* **deps:** bump @hapic/vault from 2.3.3 to 2.3.4 ([#538](https://github.com/PrivateAIM/hub/issues/538)) ([ed2c1fd](https://github.com/PrivateAIM/hub/commit/ed2c1fd0a18482bbc05b5f6f0e9f43bb667abc91))
+* **deps:** bump @routup/basic from 1.3.2 to 1.4.0 ([#523](https://github.com/PrivateAIM/hub/issues/523)) ([409a594](https://github.com/PrivateAIM/hub/commit/409a59460fbce2934ba489e7fde579063e2fc6d4))
+* **deps:** bump @routup/decorators from 3.3.2 to 3.4.0 ([#531](https://github.com/PrivateAIM/hub/issues/531)) ([295f692](https://github.com/PrivateAIM/hub/commit/295f6926b8492aa58856ec2e0ea469e9b19388d3))
+* **deps:** bump authup to v1.0.0.beta-19 ([3410786](https://github.com/PrivateAIM/hub/commit/34107860d7f810cea7b2024b0f303cd70d32a5fe))
+* **deps:** bump mysql2 from 3.10.0 to 3.10.1 ([#461](https://github.com/PrivateAIM/hub/issues/461)) ([f415417](https://github.com/PrivateAIM/hub/commit/f4154174a7049dea2624b99988ea013790167142))
+* **deps:** bump mysql2 from 3.10.1 to 3.10.2 ([#529](https://github.com/PrivateAIM/hub/issues/529)) ([1c73408](https://github.com/PrivateAIM/hub/commit/1c73408e5ca2ca1107a985628a7b421d28ff41ce))
+* **deps:** bump routup to v4.x ([787bb7c](https://github.com/PrivateAIM/hub/commit/787bb7cb6951f32fed29ac77467dcdec76683672))
+* log error on bucket-file streaming ([c89e83a](https://github.com/PrivateAIM/hub/commit/c89e83a957892f248993bdc1532c8bacec4909f8))
+* minor logging adjustments for streaming bucket(-file)s ([76f4c18](https://github.com/PrivateAIM/hub/commit/76f4c1857536ce4e8ebda3e4958040ef3e0c418c))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.7.0 to ^0.8.0
+    * @privateaim/server-kit bumped from ^0.7.0 to ^0.8.0
+    * @privateaim/server-http-kit bumped from ^0.7.0 to ^0.8.0
+    * @privateaim/storage-kit bumped from ^0.7.0 to ^0.8.0
+
 ## [0.7.0](https://github.com/PrivateAIM/hub/compare/v0.6.0...v0.7.0) (2024-06-26)
 
 

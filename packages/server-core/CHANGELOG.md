@@ -1,5 +1,44 @@
 # Changelog
 
+## [0.8.0](https://github.com/PrivateAIM/hub/compare/v0.7.0...v0.8.0) (2024-07-02)
+
+
+### Features
+
+* add missing analysis-permission validation steps ([30cba38](https://github.com/PrivateAIM/hub/commit/30cba3846cd7579b9482b7cd8f622d4cb39f5529))
+* add missing policies fetch for analysis-permission get-many handler ([62fc56c](https://github.com/PrivateAIM/hub/commit/62fc56c324aaf0cee10b59045d987d544cbf61df))
+* simplified and adjusted permission usage across codespace ([1839f5e](https://github.com/PrivateAIM/hub/commit/1839f5eb768f120e268e57e0a496fef5eb0eca41))
+
+
+### Bug Fixes
+
+* analysis-permission test-suite ([5604d85](https://github.com/PrivateAIM/hub/commit/5604d8599a634c5f6e84040f58a5ccb29f3c2431))
+* **deps:** bump @hapic/harbor from 2.3.3 to 2.3.4 ([#537](https://github.com/PrivateAIM/hub/issues/537)) ([f8f805f](https://github.com/PrivateAIM/hub/commit/f8f805f2a7c30168dc503671f9927bf9689858ec))
+* **deps:** bump @hapic/vault from 2.3.3 to 2.3.4 ([#538](https://github.com/PrivateAIM/hub/issues/538)) ([ed2c1fd](https://github.com/PrivateAIM/hub/commit/ed2c1fd0a18482bbc05b5f6f0e9f43bb667abc91))
+* **deps:** bump @routup/basic from 1.3.2 to 1.4.0 ([#523](https://github.com/PrivateAIM/hub/issues/523)) ([409a594](https://github.com/PrivateAIM/hub/commit/409a59460fbce2934ba489e7fde579063e2fc6d4))
+* **deps:** bump @routup/decorators from 3.3.2 to 3.4.0 ([#531](https://github.com/PrivateAIM/hub/issues/531)) ([295f692](https://github.com/PrivateAIM/hub/commit/295f6926b8492aa58856ec2e0ea469e9b19388d3))
+* **deps:** bump @routup/prometheus from 2.3.0 to 2.4.0 ([#525](https://github.com/PrivateAIM/hub/issues/525)) ([b98e5f1](https://github.com/PrivateAIM/hub/commit/b98e5f1020f2363c5074f98408e4786cdde24e0d))
+* **deps:** bump @routup/swagger from 2.3.6 to 2.4.0 ([#530](https://github.com/PrivateAIM/hub/issues/530)) ([cef8d2c](https://github.com/PrivateAIM/hub/commit/cef8d2c2de5d29c0cc7cf84abf8ef980b05c5fe9))
+* **deps:** bump authup to v1.0.0.beta-19 ([3410786](https://github.com/PrivateAIM/hub/commit/34107860d7f810cea7b2024b0f303cd70d32a5fe))
+* **deps:** bump mysql2 from 3.10.0 to 3.10.1 ([#461](https://github.com/PrivateAIM/hub/issues/461)) ([f415417](https://github.com/PrivateAIM/hub/commit/f4154174a7049dea2624b99988ea013790167142))
+* **deps:** bump mysql2 from 3.10.1 to 3.10.2 ([#529](https://github.com/PrivateAIM/hub/issues/529)) ([1c73408](https://github.com/PrivateAIM/hub/commit/1c73408e5ca2ca1107a985628a7b421d28ff41ce))
+* **deps:** bump routup to v4.x ([787bb7c](https://github.com/PrivateAIM/hub/commit/787bb7cb6951f32fed29ac77467dcdec76683672))
+* read analysis-permission read handler ([b1794b1](https://github.com/PrivateAIM/hub/commit/b1794b1934f14932772576ab484f68a2cae31c4c))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.7.0 to ^0.8.0
+    * @privateaim/kit bumped from ^0.7.0 to ^0.8.0
+    * @privateaim/server-kit bumped from ^0.7.0 to ^0.8.0
+    * @privateaim/server-core-realtime bumped from ^0.7.0 to ^0.8.0
+    * @privateaim/server-http-kit bumped from ^0.7.0 to ^0.8.0
+    * @privateaim/server-analysis-manager-kit bumped from ^0.7.0 to ^0.7.1
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.7.0 to ^0.8.0
+
 ## [0.7.0](https://github.com/PrivateAIM/hub/compare/v0.6.0...v0.7.0) (2024-06-26)
 
 

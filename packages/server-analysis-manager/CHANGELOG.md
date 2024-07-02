@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.8.0](https://github.com/PrivateAIM/hub/compare/v0.7.0...v0.8.0) (2024-07-02)
+
+
+### Bug Fixes
+
+* **deps:** bump @hapic/harbor from 2.3.3 to 2.3.4 ([#537](https://github.com/PrivateAIM/hub/issues/537)) ([f8f805f](https://github.com/PrivateAIM/hub/commit/f8f805f2a7c30168dc503671f9927bf9689858ec))
+* **deps:** bump authup to v1.0.0.beta-19 ([3410786](https://github.com/PrivateAIM/hub/commit/34107860d7f810cea7b2024b0f303cd70d32a5fe))
+* **deps:** bump routup to v4.x ([787bb7c](https://github.com/PrivateAIM/hub/commit/787bb7cb6951f32fed29ac77467dcdec76683672))
+* streaming bucket files for analysis builind operation ([205b93e](https://github.com/PrivateAIM/hub/commit/205b93e4c8d61ad6db1faef1738a80aa9230fc93))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.7.0 to ^0.8.0
+    * @privateaim/kit bumped from ^0.7.0 to ^0.8.0
+    * @privateaim/core-http-kit bumped from ^0.7.0 to ^0.8.0
+    * @privateaim/server-kit bumped from ^0.7.0 to ^0.8.0
+    * @privateaim/server-analysis-manager-kit bumped from ^0.7.0 to ^0.7.1
+    * @privateaim/storage-kit bumped from ^0.7.0 to ^0.8.0
+
 ## [0.7.0](https://github.com/PrivateAIM/hub/compare/v0.6.0...v0.7.0) (2024-06-26)
 
 
