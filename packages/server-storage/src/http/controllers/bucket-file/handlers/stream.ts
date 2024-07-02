@@ -41,6 +41,8 @@ export async function executeBucketFileRouteStreamHandler(req: Request, res: Res
 
     const minio = useMinio();
     const stream = await minio.getObject(bucketName, entity.hash);
-
+    stream.on('end', () => {
+        useLogger().debug(`Streamed file ${entity.hash} (${id}) of ${bucketName}`);
+    });
     stream.pipe(res);
 }

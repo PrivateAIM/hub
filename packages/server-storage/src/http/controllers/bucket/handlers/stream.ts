@@ -28,6 +28,8 @@ async function packFile(
         minio.getObject(name, file.hash)
             .then((stream) => streamToBuffer(stream))
             .then((data) => {
+                useLogger().debug(`Packing file ${file.path} (${file.id})`);
+
                 pack.entry({
                     name: file.path,
                     size: data.byteLength,
@@ -102,4 +104,6 @@ export async function executeBucketRouteStreamHandler(req: Request, res: Respons
     useLogger().debug(`Streaming files of ${bucketName}`);
 
     await streamFiles(res, bucketName, files);
+
+    useLogger().debug(`Streamed files of ${bucketName}`);
 }
