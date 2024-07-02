@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.8.0](https://github.com/PrivateAIM/hub/compare/v0.7.0...v0.8.0) (2024-07-02)
+
+
+### Features
+
+* add token hook options to authup client constructor ([bbe5e32](https://github.com/PrivateAIM/hub/commit/bbe5e3263230fe1a0b0b0ef18b0e47f7b196a204))
+* expose all middlewares ([4681e3f](https://github.com/PrivateAIM/hub/commit/4681e3f5b4ce030e3651c00854d3db9c941e336f))
+
+
+### Bug Fixes
+
+* **deps:** bump @hapic/vault from 2.3.3 to 2.3.4 ([#538](https://github.com/PrivateAIM/hub/issues/538)) ([ed2c1fd](https://github.com/PrivateAIM/hub/commit/ed2c1fd0a18482bbc05b5f6f0e9f43bb667abc91))
+* **deps:** bump authup to v1.0.0.beta-19 ([3410786](https://github.com/PrivateAIM/hub/commit/34107860d7f810cea7b2024b0f303cd70d32a5fe))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.7.0 to ^0.8.0
+    * @privateaim/kit bumped from ^0.7.0 to ^0.8.0
+
 ## [0.7.0](https://github.com/PrivateAIM/hub/compare/v0.6.0...v0.7.0) (2024-06-26)
 
 
