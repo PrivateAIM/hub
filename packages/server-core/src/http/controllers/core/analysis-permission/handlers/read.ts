@@ -148,10 +148,20 @@ export async function getManyAnalysisPermissionRouteHandler(req: Request, res: R
             permissionMap = groupById(permissions);
         }
 
-        const policyMap : Record<string, Policy> = {};
+        let policyMap : Record<string, Policy> = {};
         if (relationsMap.policy) {
-            // todo: enable when policy api client is defined
-            // entity.policy = await authupClient.policy.getOne(entity.policy_id);
+            const id = entities
+                .map((entity) => entity.policy_id)
+                .filter(Boolean);
+            if (id.length > 0) {
+                const { data: policies } = await authupClient.policy.getMany({
+                    filter: {
+                        id,
+                    },
+                });
+
+                policyMap = groupById(policies);
+            }
         }
 
         for (let i = 0; i < entities.length; i++) {
