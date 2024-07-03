@@ -65,22 +65,23 @@ export async function runAnalysisPermissionValidation(
     if (isAuthupClientUsable()) {
         const authup = useAuthupClient();
 
-        let permission : Permission;
+        if (result.data.permission_id) {
+            let permission: Permission;
+            try {
+                permission = await authup.permission.getOne(result.data.permission_id);
 
-        try {
-            permission = await authup.permission.getOne(result.data.permission_id);
+                result.data.permission = permission;
+                result.data.permission_realm_id = permission.realm_id;
 
-            result.data.permission = permission;
-            result.data.permission_realm_id = permission.realm_id;
+                // todo: remove this when validation is reworked.
+                result.relation.permission = permission;
+            } catch (e) {
+                if (isClientErrorWithStatusCode(e, 404)) {
+                    throw new BadRequestError(buildHTTPValidationErrorMessage('permission_id'));
+                }
 
-            // todo: remove this when validation is reworked.
-            result.relation.permission = permission;
-        } catch (e) {
-            if (isClientErrorWithStatusCode(e, 404)) {
-                throw new BadRequestError(buildHTTPValidationErrorMessage('permission_id'));
+                throw e;
             }
-
-            throw e;
         }
 
         // todo: this is not possible right now :/
