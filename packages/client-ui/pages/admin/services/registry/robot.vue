@@ -53,7 +53,7 @@ export default defineNuxtComponent({
             name: ServiceID.REGISTRY,
             realmId: realmId.value,
             entity: entity.value,
-            onUpdated(item) {
+            onUpdated: (item) => {
                 handleUpdated(item);
             },
         });

@@ -43,7 +43,7 @@ const FProjectItem = defineComponent({
             onDeleted(entity) {
                 emit('deleted', entity);
             },
-            onUpdated(entity) {
+            onUpdated: (entity) => {
                 emit('updated', entity);
             },
             onFailed(e) {

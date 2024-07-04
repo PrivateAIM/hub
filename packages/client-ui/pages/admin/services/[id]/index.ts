@@ -31,7 +31,7 @@ export default defineNuxtComponent({
         if (props.entityId === ServiceID.REGISTRY) {
             return () => h(MasterImagesSync, {
                 entityId: props.entityId,
-                onUpdated(event: any) {
+                onUpdated: (event: any) => {
                     emit('updated', event);
                 },
                 onFailed(e: Error) {

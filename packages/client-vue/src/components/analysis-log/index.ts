@@ -6,4 +6,4 @@
  */
 
 export { default as FAnalysisLog } from './FAnalysisLog';
-export { default as FAnalysisLogs } from './FAnalsisLogs';
+export { default as FAnalysisLogs } from './FAnalysisLogs';

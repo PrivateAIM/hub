@@ -232,7 +232,7 @@ export function createList<
 
                 total.value--;
             },
-            onUpdated(value: T) {
+            onUpdated: (value: T) => {
                 if (context.setup.emit) {
                     context.setup.emit('updated', value);
                 }

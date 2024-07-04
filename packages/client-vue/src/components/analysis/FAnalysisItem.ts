@@ -53,7 +53,7 @@ const FAnalysisItem = defineComponent({
             onDeleted(entity) {
                 emit('deleted', entity);
             },
-            onUpdated(entity) {
+            onUpdated: (entity) => {
                 emit('updated', entity);
             },
             onFailed(e) {
@@ -100,7 +100,7 @@ const FAnalysisItem = defineComponent({
                                             entityId: slotProps.data.id,
                                             entityName: slotProps.data.name,
                                             editable: true,
-                                            onUpdated(item: Analysis) {
+                                            onUpdated: (item: Analysis) => {
                                                 slotProps.updated(item);
                                             },
                                         },
@@ -167,7 +167,7 @@ const FAnalysisItem = defineComponent({
                             entity: slotProps.data,
                             withCommand: extendedView.value,
                             listDirection: extendedView.value ? 'column' : 'row',
-                            onUpdated(item: Analysis) {
+                            onUpdated: (item: Analysis) => {
                                 slotProps.updated(item);
                             },
                             onFailed(error: Error) {

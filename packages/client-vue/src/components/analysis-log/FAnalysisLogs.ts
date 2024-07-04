@@ -91,7 +91,7 @@ export default defineComponent({
                                     slotProps.deleted(item);
                                 }
                             },
-                            onUpdated(e: AnalysisLog) {
+                            onUpdated: (e: AnalysisLog) => {
                                 if (slotProps && slotProps.updated) {
                                     slotProps.updated(e);
                                 }

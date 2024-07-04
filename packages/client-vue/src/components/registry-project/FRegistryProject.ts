@@ -61,7 +61,7 @@ export default defineComponent({
                     form.secret = entity.account_secret || '';
                 }
             },
-            onUpdated(entity) {
+            onUpdated: (entity) => {
                 if (entity) {
                     form.secret = entity.account_secret || '';
                 }
