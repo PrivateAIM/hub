@@ -10,7 +10,7 @@ import { isRedisClientUsable, useLogger, useRedisSubscribeClient } from '@privat
 import type { Aggregator } from '@privateaim/server-kit';
 import { EnvironmentName, useEnv } from '../../config';
 import {
-    handleAuthupPermissionEvent,
+    handleAuthupPermissionEvent, handleAuthupPolicyEvent,
     handleAuthupRealmEvent, handleAuthupRobotEvent,
     handleAuthupUserEvent,
 } from './entities';
@@ -30,6 +30,7 @@ export function createAuthupAggregator() : Aggregator {
 
             redisSub.subscribe(
                 'permission',
+                'policy',
                 'realm',
                 'user',
                 'robot',
@@ -40,6 +41,10 @@ export function createAuthupAggregator() : Aggregator {
                 const event = JSON.parse(message);
 
                 switch (event.type) {
+                    case DomainType.POLICY: {
+                        await handleAuthupPolicyEvent(event);
+                        break;
+                    }
                     case DomainType.PERMISSION: {
                         await handleAuthupPermissionEvent(event);
                         break;

@@ -6,6 +6,7 @@
  */
 
 export * from './permission';
+export * from './policy';
 export * from './realm';
 export * from './robot';
 export * from './user';
