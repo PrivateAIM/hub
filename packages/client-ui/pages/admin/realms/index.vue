@@ -45,7 +45,6 @@ export default defineNuxtComponent({
         };
 
         const handleFailed = (e: Error) => {
-            const toast = useToast();
             toast.show({ variant: 'warning', body: e.message });
         };
 
