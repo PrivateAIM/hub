@@ -70,7 +70,7 @@ services:
         image: hashicorp/vault
         pull_policy: always
         healthcheck:
-            test: [ "CMD", "wget", "--spider", "--proxy", "off", "http://localhost:8090/v1/sys/health?standbyok=true" ]
+            test: [ "CMD", "wget", "--spider", "--proxy", "off", "http://127.0.0.1:8090/v1/sys/health?standbyok=true" ]
             interval: 10s
             timeout: 3s
             retries: 10
