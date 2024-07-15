@@ -12,7 +12,12 @@ import { tryUseNuxtApp, useCookie } from '#imports';
 export default defineNuxtPlugin({
     setup(ctx) {
         const runtimeConfig = useRuntimeConfig();
-        const { authupUrl: baseURL } = runtimeConfig.public;
+        let baseURL : string | undefined;
+        if (runtimeConfig.authupUrl) {
+            baseURL = runtimeConfig.authupUrl as string;
+        } else {
+            baseURL = runtimeConfig.public.authupUrl;
+        }
 
         ctx.vueApp.use(install, {
             pinia: ctx.$pinia as Pinia,

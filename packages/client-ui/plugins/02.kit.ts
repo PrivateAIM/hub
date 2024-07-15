@@ -11,8 +11,22 @@ import { defineNuxtPlugin, useRuntimeConfig } from '#imports';
 export default defineNuxtPlugin((ctx) => {
     const runtimeConfig = useRuntimeConfig();
 
+    let coreURL : string | undefined;
+    if (runtimeConfig.coreUrl) {
+        coreURL = runtimeConfig.coreUrl as string;
+    } else {
+        coreURL = runtimeConfig.public.coreUrl;
+    }
+
+    let storageURL : string | undefined;
+    if (runtimeConfig.coreUrl) {
+        storageURL = runtimeConfig.storageUrl as string;
+    } else {
+        storageURL = runtimeConfig.public.storageUrl;
+    }
+
     ctx.vueApp.use(install, {
-        coreURL: runtimeConfig.public.coreUrl,
-        storageURL: runtimeConfig.public.storageUrl,
+        coreURL,
+        storageURL,
     });
 });

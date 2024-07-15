@@ -237,8 +237,11 @@ services:
             storage:
                 condition: service_healthy
         environment:
+            NUXT_STORAGE_URL: http://storage:3000/
             NUXT_PUBLIC_STORAGE_URL: ${STORAGE_PUBLIC_URL:-http://localhost:3000/storage/}
+            NUXT_CORE_URL: http://core:3000/
             NUXT_PUBLIC_CORE_URL: ${CORE_PUBLIC_URL:-http://localhost:3000/core/}
+            NUXT_AUTHUP_URL: http://authup:3000/
             NUXT_PUBLIC_AUTHUP_URL: ${AUTHUP_PUBLIC_URL:-http://localhost:3000/auth/}
         networks:
             hub:

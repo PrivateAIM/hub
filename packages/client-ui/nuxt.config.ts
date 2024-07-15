@@ -10,6 +10,10 @@ import { defineNuxtConfig } from 'nuxt/config';
 
 export default defineNuxtConfig({
     runtimeConfig: {
+        authupUrl: process.env.AUTHUP_URL,
+        coreUrl: process.env.CORE_URL,
+        storageUrl: process.env.STORAGE_URL,
+
         public: {
             coreUrl: process.env.CORE_URL,
             coreRealtimeTransports: process.env.CORE_REALTIME_TRANSPORTS,
