@@ -4,6 +4,8 @@ volumes:
         driver: local
     minio:
         driver: local
+    vault:
+        driver: local
 services:
     mysql:
         image: mysql:latest
@@ -73,7 +75,10 @@ services:
             timeout: 3s
             retries: 10
             start_period: 5s
+        volumes:
+            -  vault:/vault
         environment:
+            SKIP_SETCAP: true
             VAULT_DEV_ROOT_TOKEN_ID: start123
             VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8090
         networks:
