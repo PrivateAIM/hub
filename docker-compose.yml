@@ -65,7 +65,8 @@ services:
         networks:
             hub:
     vault:
-        image: vault:1.12.0
+        image: hashicorp/vault
+        pull_policy: always
         healthcheck:
             test: [ "CMD", "wget", "--spider", "--proxy", "off", "http://localhost:8090/v1/sys/health?standbyok=true" ]
             interval: 10s
