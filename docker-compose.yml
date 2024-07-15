@@ -126,7 +126,7 @@ services:
             DB_DATABASE: 'auth'
             VAULT: start123@http://vault:8090/v1/
             REDIS: redis://redis
-            PUBLIC_URL: ${PUBLIC_URL:-http://localhost:3000}/auth/
+            PUBLIC_URL: ${AUTHUP_PUBLIC_URL:-http://localhost:3000/auth/}
             AUTHORIZE_REDIRECT_URL: ${PUBLIC_URL:-http://localhost:3000/}
             ROBOT_ADMIN_ENABLED: true
         networks:
@@ -149,7 +149,7 @@ services:
             REDIS_CONNECTION_STRING: redis://redis
             VAULT_CONNECTION_STRING: start123@http://vault:8090/v1/
             RABBITMQ_CONNECTION_STRING: ${MQ_CONNECTION_URL:-amqp://root:start123@172.40.1.1}
-            PUBLIC_URL: ${PUBLIC_URL:-http://localhost:3000}/core/
+            PUBLIC_URL: ${CORE_PUBLIC_URL:-http://localhost:3000/core/}
             HARBOR_URL: ${HARBOR_URL:-}
             AUTHUP_URL: http://authup:3000/
             DB_TYPE: 'mysql'
@@ -218,7 +218,7 @@ services:
             DB_USERNAME: 'root'
             DB_PASSWORD: 'start123'
             DB_DATABASE: 'storage'
-            PUBLIC_URL: ${PUBLIC_URL:-http://localhost:3000}/storage/
+            PUBLIC_URL: ${STORAGE_PUBLIC_URL:-http://localhost:3000/storage/}
             REDIS_CONNECTION_STRING: redis://redis
             MINIO_CONNECTION_STRING: http://admin:start123@minio:9000
             VAULT_CONNECTION_STRING: start123@http://vault:8090/v1/
@@ -237,9 +237,9 @@ services:
             storage:
                 condition: service_healthy
         environment:
-            NUXT_PUBLIC_STORAGE_URL: ${PUBLIC_URL:-http://localhost:3000}/storage/
-            NUXT_PUBLIC_CORE_URL: ${PUBLIC_URL:-http://localhost:3000}/core/
-            NUXT_PUBLIC_AUTHUP_URL: ${PUBLIC_URL:-http://localhost:3000}/auth/
+            NUXT_PUBLIC_STORAGE_URL: ${STORAGE_PUBLIC_URL:-http://localhost:3000/storage/}
+            NUXT_PUBLIC_CORE_URL: ${CORE_PUBLIC_URL:-http://localhost:3000/core/}
+            NUXT_PUBLIC_AUTHUP_URL: ${AUTHUP_PUBLIC_URL:-http://localhost:3000/auth/}
         networks:
             hub:
 networks:
