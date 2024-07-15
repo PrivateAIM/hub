@@ -73,7 +73,10 @@ export async function linkRegistryProject(
             .warn('Project could not be created.', {
                 component: 'registry',
                 command: RegistryCommand.PROJECT_LINK,
-            }, e);
+            });
+
+        useLogger()
+            .error(e);
 
         throw e;
     }
@@ -104,7 +107,10 @@ export async function linkRegistryProject(
             .warn('Robot account could not be created.', {
                 component: 'registry',
                 command: RegistryCommand.PROJECT_LINK,
-            }, e);
+            });
+
+        useLogger()
+            .error(e);
 
         throw e;
     }
@@ -128,7 +134,10 @@ export async function linkRegistryProject(
             .warn('Webhook could not be created.', {
                 component: 'registry',
                 command: RegistryCommand.PROJECT_LINK,
-            }, e);
+            });
+
+        useLogger()
+            .error(e);
 
         throw e;
     }

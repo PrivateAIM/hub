@@ -45,7 +45,10 @@ export async function unlinkRegistryProject(
             .warn('Project repositories could not be deleted.', {
                 component: 'registry',
                 command: RegistryCommand.PROJECT_UNLINK,
-            }, e);
+            });
+
+        useLogger()
+            .error(e);
 
         throw e;
     }
@@ -58,7 +61,10 @@ export async function unlinkRegistryProject(
             .warn('Project could not be deleted.', {
                 component: 'registry',
                 command: RegistryCommand.PROJECT_UNLINK,
-            }, e);
+            });
+
+        useLogger()
+            .error(e);
 
         throw e;
     }
