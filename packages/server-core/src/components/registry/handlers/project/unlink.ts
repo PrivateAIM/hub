@@ -45,7 +45,7 @@ export async function unlinkRegistryProject(
             .warn('Project repositories could not be deleted.', {
                 component: 'registry',
                 command: RegistryCommand.PROJECT_UNLINK,
-            });
+            }, e);
 
         throw e;
     }
@@ -58,7 +58,7 @@ export async function unlinkRegistryProject(
             .warn('Project could not be deleted.', {
                 component: 'registry',
                 command: RegistryCommand.PROJECT_UNLINK,
-            });
+            }, e);
 
         throw e;
     }
@@ -72,7 +72,7 @@ export async function unlinkRegistryProject(
                 .warn('Robot Account could not be deleted.', {
                     component: 'registry',
                     command: RegistryCommand.PROJECT_UNLINK,
-                });
+                }, e);
         }
     }
 
@@ -83,7 +83,7 @@ export async function unlinkRegistryProject(
             .warn('Vault project representation could not be deleted.', {
                 component: 'registry',
                 command: RegistryCommand.PROJECT_UNLINK,
-            });
+            }, e);
 
         throw e;
     }
