@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { buildRobotPermissionForAllResources, isClientErrorWithStatusCode } from '@hapic/harbor';
+import { RobotPermissionAction, RobotPermissionResource, isClientErrorWithStatusCode } from '@hapic/harbor';
 import type { HarborClient, Robot } from '@hapic/harbor';
 import type { RegistryProjectVaultPayload } from '../../../../domains';
 import { findRegistryProjectInVault, saveRegistryProjectToVault } from '../../../../domains';
@@ -29,7 +29,23 @@ export async function ensureRemoteRegistryProjectAccount(
         try {
             robotAccount = await httpClient.robot.create({
                 name: context.name,
-                permissions: [buildRobotPermissionForAllResources(context.name)], // todo: check if namespace is correct
+                permissions: [
+                    {
+                        namespace: context.name,
+                        kind: 'project',
+                        access: [
+                            { resource: RobotPermissionResource.ARTIFACT, action: RobotPermissionAction.LIST },
+                            { resource: RobotPermissionResource.ARTIFACT, action: RobotPermissionAction.READ },
+
+                            { resource: RobotPermissionResource.REPOSITORY, action: RobotPermissionAction.LIST },
+                            { resource: RobotPermissionResource.REPOSITORY, action: RobotPermissionAction.PULL },
+
+                            { resource: RobotPermissionResource.TAG, action: RobotPermissionAction.LIST },
+
+                            { resource: RobotPermissionResource.PROJECT, action: RobotPermissionAction.READ },
+                        ],
+                    },
+                ],
             });
         } catch (e) {
             if (isClientErrorWithStatusCode(e, 409)) {
