@@ -8,7 +8,7 @@
 import { QueueRouterRoutingType } from '@privateaim/server-kit';
 
 export enum MasterImagesEvent {
-    SYNCHRONISING = 'synchronizing',
+    SYNCHRONIZING = 'synchronizing',
     SYNCHRONIZED = 'synchronized',
     SYNCHRONIZATION_FAILED = 'synchronizationFailed',
 
@@ -23,6 +23,8 @@ export enum MasterImagesEvent {
 
 export enum MasterImagesCommand {
     SYNCHRONIZE = 'synchronize',
+    BUILD = 'build',
+    PUSH = 'push',
 }
 
 export const MasterImagesEventQueueRouterRouting = {
