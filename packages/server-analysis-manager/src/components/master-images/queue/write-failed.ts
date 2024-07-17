@@ -6,8 +6,6 @@
  */
 
 import type {
-    MasterImagesBasePayload,
-
     MasterImagesEvent,
 } from '@privateaim/server-analysis-manager-kit';
 import { buildMasterImagesEventQueueRouterPayload } from '@privateaim/server-analysis-manager-kit';
