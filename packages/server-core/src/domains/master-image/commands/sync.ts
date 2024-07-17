@@ -7,6 +7,7 @@
 
 import { MasterImagesCommand, buildMasterImagesTaskQueueRouterPayload } from '@privateaim/server-analysis-manager-kit';
 import { isQueueRouterUsable, useLogger, useQueueRouter } from '@privateaim/server-kit';
+import { useEnv } from '../../../config';
 
 export async function runMasterImagesSynchronizeCommand() : Promise<void> {
     if (!isQueueRouterUsable()) {
@@ -17,8 +18,8 @@ export async function runMasterImagesSynchronizeCommand() : Promise<void> {
     const message = buildMasterImagesTaskQueueRouterPayload({
         command: MasterImagesCommand.SYNCHRONIZE,
         data: {
-            branch: 'master', // todo: extract from request
-            url: 'https://github.com/PrivateAim/master-images/', // todo: extract from request
+            branch: useEnv('masterImagesBranch'),
+            url: useEnv('masterImagesURL'),
         },
     });
 

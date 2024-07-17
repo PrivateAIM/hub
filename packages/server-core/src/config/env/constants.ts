@@ -15,5 +15,6 @@ export enum ConfigDefaults {
     REDIS = 'redis://127.0.0.1',
     RABBITMQ = 'amqp://root:start123@127.0.0.1',
     VAULT = 'start123@http://127.0.0.1:8090/v1/',
-    MASTER_IMAGE = 'https://github.com/PHT-Medic/master-images/',
+    MASTER_IMAGE_URL = 'https://github.com/PrivateAim/master-images/',
+    MASTER_IMAGE_BRANCH = 'master',
 }

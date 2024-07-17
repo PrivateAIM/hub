@@ -23,6 +23,7 @@ export interface Environment {
     appURL: string,
 
     masterImagesURL: string,
+    masterImagesBranch: string,
 
     skipProjectApproval: boolean,
     skipAnalysisApproval: boolean
