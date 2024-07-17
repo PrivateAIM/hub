@@ -8,6 +8,7 @@
 export enum ComponentName {
     BUILDER = 'builder',
     CORE = 'core',
+    MASTER_IMAGES = 'masterImages',
 }
 
 export enum ErrorCode {
@@ -16,5 +17,3 @@ export enum ErrorCode {
     REGISTRY_PROJECT_NOT_FOUND = 'registryProjectNotFound',
     NONE = 'none',
 }
-
-export const ROUTER_QUEUE_ROUTING_KEY = 'tm.router';
