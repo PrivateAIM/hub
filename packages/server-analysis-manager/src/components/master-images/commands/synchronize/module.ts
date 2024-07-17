@@ -19,8 +19,8 @@ export async function executeMasterImagesSynchronizeCommand(
 
     await saveGitRepository({
         destination: outputDirectoryPath,
-        branch: payload.branch || 'master',
-        url: payload.url || 'https://github.com/PHT-Medic/master-images/',
+        branch: payload.branch,
+        url: payload.url,
     });
 
     const { images, groups } = await scanDirectory(path.join(outputDirectoryPath, 'data'));

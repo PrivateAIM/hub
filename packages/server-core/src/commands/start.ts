@@ -18,7 +18,6 @@ import {
 } from '../config';
 import { setupAuthupService, setupHarborService } from '../core';
 import { buildDataSourceOptions } from '../database';
-import { syncMasterImages } from '../domains';
 import { createRouter } from '../http/router';
 import { createHttpServer } from '../http/server';
 
@@ -80,10 +79,6 @@ export async function startCommand() {
     await setupAuthupService();
     logger.info('Executed authup service setup.');
     // }
-
-    logger.info('Syncing master images...');
-    await syncMasterImages();
-    logger.info('Synced master images.');
 
     logger.info('Executing harbor service setup...');
     await setupHarborService();

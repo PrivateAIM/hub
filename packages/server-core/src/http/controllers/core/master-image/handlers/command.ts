@@ -10,7 +10,7 @@ import { BadRequestError, NotFoundError } from '@ebec/http';
 import { useRequestBody } from '@routup/basic/body';
 import { sendAccepted } from 'routup';
 import type { Request, Response } from 'routup';
-import { syncMasterImages } from '../../../../../domains';
+import { runMasterImagesSynchronizeCommand } from '../../../../../domains';
 
 export async function commandMasterImageRouteHandler(req: Request, res: Response) {
     const body = useRequestBody(req);
@@ -26,9 +26,9 @@ export async function commandMasterImageRouteHandler(req: Request, res: Response
 
     switch (command) {
         case MasterImageCommand.SYNC: {
-            const output = await syncMasterImages();
+            await runMasterImagesSynchronizeCommand();
 
-            return sendAccepted(res, output);
+            return sendAccepted(res);
         }
     }
 

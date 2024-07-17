@@ -7,7 +7,10 @@
 
 import type { Aggregator, Component } from '@privateaim/server-kit';
 import { createAnalysisManagerBuilderAggregator, createAuthupAggregator } from '../aggregators';
-import { createAnalysisManagerCoreAggregator } from '../aggregators/analysis-manager';
+import {
+    createAnalysisManagerCoreAggregator,
+    createAnalysisManagerMasterImagesAggregator,
+} from '../aggregators/analysis-manager';
 import {
     createRegistryComponent,
 } from '../components';
@@ -40,6 +43,7 @@ export function createConfig() : Config {
         createAuthupAggregator(),
         createAnalysisManagerBuilderAggregator(),
         createAnalysisManagerCoreAggregator(),
+        createAnalysisManagerMasterImagesAggregator(),
     ];
 
     // ---------------------------------------------
