@@ -6,7 +6,6 @@
  */
 
 import { scanDirectory } from 'docker-scan';
-import fs from 'node:fs';
 import path from 'node:path';
 import { WRITABLE_DIRECTORY_PATH } from '../../src/config';
 import { cloneGitRepository } from '../../src/core';
