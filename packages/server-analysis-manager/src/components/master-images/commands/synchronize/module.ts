@@ -10,14 +10,14 @@ import type { MasterImagesSynchronizeCommandPayload } from '@privateaim/server-a
 import path from 'node:path';
 import { WRITABLE_DIRECTORY_PATH } from '../../../../config';
 import { writeBuildCommand } from '../../queue';
-import { saveGitRepository } from './helpers';
+import { cloneGitRepository } from '../../../../core';
 
 export async function executeMasterImagesSynchronizeCommand(
     payload: MasterImagesSynchronizeCommandPayload,
 ) {
     const outputDirectoryPath = path.join(WRITABLE_DIRECTORY_PATH, 'master-images');
 
-    await saveGitRepository({
+    await cloneGitRepository({
         destination: outputDirectoryPath,
         branch: payload.branch,
         url: payload.url,

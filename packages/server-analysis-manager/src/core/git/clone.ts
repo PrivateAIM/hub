@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { createNanoID } from '@privateaim/kit';
 import { createClient } from 'hapic';
 import fs from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -15,19 +16,24 @@ import { extract } from 'tar';
 type GitRepositorySaveOptions = {
     destination: string,
     url: string,
-    branch: string
+    branch?: string
 };
-export async function saveGitRepository(options: GitRepositorySaveOptions) {
-    const tmpFilePath = path.join(tmpdir(), 'master-images.tar.gz');
+export async function cloneGitRepository(options: GitRepositorySaveOptions) {
+    const branch = options.branch || 'master';
+    let { url } = options;
+    if (!url.endsWith('/')) {
+        url += '/';
+    }
+
+    const tmpFilePath = path.join(tmpdir(), `${createNanoID()}.tar.gz`);
 
     await fs.promises.rm(options.destination, { force: true, recursive: true });
     await fs.promises.mkdir(options.destination, { recursive: true });
 
     const client = createClient();
 
-    // todo: add branch + repo option
     const response = await client.get(
-        new URL(`archive/${options.branch}.tar.gz`, options.url).href,
+        new URL(`archive/${branch}.tar.gz`, url).href,
         {
             responseType: 'stream',
         },
@@ -40,16 +46,18 @@ export async function saveGitRepository(options: GitRepositorySaveOptions) {
             reject(err);
         });
 
-        writable.on('finish', async () => {
-            await extract({
-                file: tmpFilePath,
-                cwd: options.destination,
-                onReadEntry(entry) {
-                    entry.path = entry.path.split('/').splice(1).join('/');
-                },
-            });
-
-            resolve();
+        writable.on('finish', () => {
+            Promise.resolve()
+                .then(() => extract({
+                    file: tmpFilePath,
+                    cwd: options.destination,
+                    onReadEntry(entry) {
+                        entry.path = entry.path.split('/').splice(1).join('/');
+                    },
+                }))
+                .then(() => fs.promises.rm(tmpFilePath))
+                .then(() => resolve())
+                .catch((e) => reject(e));
         });
 
         const readStream = Readable.fromWeb(response.data as any);
