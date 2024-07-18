@@ -13,50 +13,32 @@ import {
 } from '@privateaim/core-kit';
 import type { ListHeaderSlotProps } from '@vuecs/list-controls';
 import {
-    defineComponent, h, reactive, ref,
+    defineComponent, h, ref,
 } from 'vue';
-import { EntityListSlotName, injectCoreHTTPClient } from '../../core';
+import { EntityListSlotName, injectCoreHTTPClient, wrapFnWithBusyState } from '../../core';
 import EntityDelete from '../EntityDelete';
 import MasterImageList from './FMasterImages';
 
 export default defineComponent({
     components: { EntityDelete, MasterImageList },
-    emits: ['failed'],
+    emits: ['executed', 'failed'],
     setup(props, { emit }) {
         const apiClient = injectCoreHTTPClient();
-        const meta = reactive({
-            busy: false,
-            created: '?',
-            deleted: '?',
-            updated: '?',
-        });
-
+        const busy = ref(false);
         const itemList = ref<null | Record<string, any>>(null);
 
-        const syncMasterImages = async () => {
-            if (meta.busy) return;
-
-            meta.busy = true;
-
+        const syncMasterImages = wrapFnWithBusyState(busy, async () => {
             try {
-                const { images } = await apiClient.masterImage
+                await apiClient.masterImage
                     .runCommand(MasterImageCommand.SYNC);
 
-                meta.created = images.created.length;
-                meta.deleted = images.deleted.length;
-                meta.updated = images.updated.length;
-
-                if (itemList.value) {
-                    await itemList.value.load();
-                }
+                emit('executed');
             } catch (e) {
                 if (e instanceof Error) {
                     emit('failed', e);
                 }
             }
-
-            meta.busy = false;
-        };
+        });
 
         const handleDeleted = async (data: MasterImage) => {
             if (itemList.value) {
@@ -68,14 +50,14 @@ export default defineComponent({
             'div',
             [
                 h('p', [
-                    'The creation of the master image project, will also register a webhook, ' +
-                    'which will keep the master images between the harbor service and the UI in sync. ' +
-                    'It is also possible to manually sync the master images from harbor.',
+                    'The master images and groups are extracted from the git repository after executing the sync command and are then transferred to the database.' +
+                    ' ' +
+                    'In addition, the master images are built and transferred to all registered registry instances.',
                 ]),
                 h('div', { class: 'mb-1' }, [
                     h('button', {
                         type: 'button',
-                        disabled: meta.busy,
+                        disabled: busy.value,
                         class: 'btn btn-xs btn-success',
                         onClick(event: any) {
                             event.preventDefault();
@@ -86,18 +68,6 @@ export default defineComponent({
                         h('i', { class: 'fa fa-sync me-1' }),
                         'Sync',
                     ]),
-                ]),
-                h('p', { class: 'text-muted' }, [
-                    'Results of the last synchronisation:',
-                    h('br'),
-                    'created: ',
-                    h('strong', { class: 'text-success ms-1 me-1' }, [meta.created]),
-                    h('br'),
-                    'updated: ',
-                    h('strong', { class: 'text-primary ms-1 me-1' }, [meta.updated]),
-                    h('br'),
-                    'deleted:',
-                    h('strong', { class: 'text-danger ms-1 me-1' }, [meta.deleted]),
                 ]),
 
                 h(MasterImageList, {
