@@ -30,6 +30,9 @@
         "@privateaim/kit": "^0.8.0",
         "@privateaim/server-kit": "^0.8.0"
     },
+    "devDependencies": {
+        "docker-scan": "^1.1.0"
+    },
     "gitHead": "5d3b6f4ce1edf2383bdfbf66e913a08c8a3a2e40",
     "publishConfig": {
         "access": "public"

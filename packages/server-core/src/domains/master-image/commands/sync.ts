@@ -5,68 +5,24 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { MasterImage, MasterImageGroup } from '@privateaim/core-kit';
-import fs from 'node:fs';
-import path from 'node:path';
-import { Readable } from 'node:stream';
-import { createClient } from 'hapic';
-import { extract } from 'tar';
-import { scanDirectory } from 'docker-scan';
-import { getWritableDirPath, useEnv } from '../../../config';
-import type { ReturnContext } from './utils';
-import { mergeMasterImageGroupsWithDatabase, mergeMasterImagesWithDatabase } from './utils';
+import { MasterImagesCommand, buildMasterImagesTaskQueueRouterPayload } from '@privateaim/server-analysis-manager-kit';
+import { isQueueRouterUsable, useLogger, useQueueRouter } from '@privateaim/server-kit';
+import { useEnv } from '../../../config';
 
-type MasterImagesSyncResponse = {
-    images: ReturnContext<MasterImage>,
-    groups: ReturnContext<MasterImageGroup>
-};
+export async function runMasterImagesSynchronizeCommand() : Promise<void> {
+    if (!isQueueRouterUsable()) {
+        useLogger().warn('The master-images command synchronize could not be executed.');
+        return;
+    }
 
-export async function syncMasterImages() : Promise<MasterImagesSyncResponse> {
-    const directoryPath: string = path.join(getWritableDirPath(), 'master-images');
-
-    await fs.promises.rm(directoryPath, { force: true, recursive: true });
-    await fs.promises.mkdir(directoryPath, { recursive: true });
-
-    const client = createClient();
-    const response = await client.get(
-        new URL('archive/master.tar.gz', useEnv('masterImagesURL')).href,
-        {
-            responseType: 'stream',
+    const message = buildMasterImagesTaskQueueRouterPayload({
+        command: MasterImagesCommand.SYNCHRONIZE,
+        data: {
+            branch: useEnv('masterImagesBranch'),
+            url: useEnv('masterImagesURL'),
         },
-    );
-
-    const tarPath = path.join(getWritableDirPath(), 'master-images.tar.gz');
-    const writable = fs.createWriteStream(tarPath);
-
-    return new Promise((resolve, reject) => {
-        writable.on('error', (err) => {
-            reject(err);
-        });
-
-        writable.on('finish', async () => {
-            await extract({
-                file: tarPath,
-                cwd: directoryPath,
-                onReadEntry(entry) {
-                    entry.path = entry.path.split('/').splice(1).join('/');
-                },
-            });
-
-            const data = await scanDirectory(directoryPath);
-
-            // languages
-            const groups = await mergeMasterImageGroupsWithDatabase(data.groups);
-
-            // images
-            const images = await mergeMasterImagesWithDatabase(data.images);
-
-            resolve({
-                groups,
-                images,
-            });
-        });
-
-        const readStream = Readable.fromWeb(response.data as any);
-        readStream.pipe(writable);
     });
+
+    const client = useQueueRouter();
+    await client.publish(message);
 }

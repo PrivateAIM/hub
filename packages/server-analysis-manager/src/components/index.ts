@@ -7,5 +7,6 @@
 
 export * from './builder';
 export * from './core';
+export * from './master-images';
 export * from './type';
 export * from './utils';

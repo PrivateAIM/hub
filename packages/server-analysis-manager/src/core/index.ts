@@ -8,6 +8,7 @@
 export * from './core';
 export * from './crypto';
 export * from './docker';
+export * from './git';
 export * from './harbor';
 export * from './storage';
 export * from './utils';

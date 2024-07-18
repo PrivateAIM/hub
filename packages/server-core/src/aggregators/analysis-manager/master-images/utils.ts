@@ -8,8 +8,7 @@
 import type { Group, Image } from 'docker-scan';
 import type { MasterImage, MasterImageGroup } from '@privateaim/core-kit';
 import { useDataSource } from 'typeorm-extension';
-import { MasterImageEntity } from '../entity';
-import { MasterImageGroupEntity } from '../../master-image-group';
+import { MasterImageEntity, MasterImageGroupEntity } from '../../../domains';
 
 export type ReturnContext<T> = {
     updated: T[],
@@ -17,17 +16,9 @@ export type ReturnContext<T> = {
     deleted: T[]
 };
 
-export async function mergeMasterImagesWithDatabase(
+export async function syncMasterImages(
     entities: Image[],
 ) : Promise<ReturnContext<MasterImage>> {
-    if (entities.length === 0) {
-        return {
-            created: [],
-            updated: [],
-            deleted: [],
-        };
-    }
-
     const dataSource = await useDataSource();
 
     const virtualPaths : string[] = entities.map((entity) => entity.virtualPath);
@@ -89,17 +80,9 @@ export async function mergeMasterImagesWithDatabase(
     return context;
 }
 
-export async function mergeMasterImageGroupsWithDatabase(
+export async function syncMasterImageGroups(
     entities: Group[],
 ) : Promise<ReturnContext<MasterImageGroup>> {
-    if (entities.length === 0) {
-        return {
-            created: [],
-            updated: [],
-            deleted: [],
-        };
-    }
-
     const dataSource = await useDataSource();
 
     const dirVirtualPaths : string[] = entities.map((entity) => entity.virtualPath);

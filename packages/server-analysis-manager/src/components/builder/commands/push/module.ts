@@ -11,7 +11,12 @@ import {
 import { BuilderCommand } from '@privateaim/server-analysis-manager-kit';
 import type { BuilderBuildPayload } from '@privateaim/server-analysis-manager-kit';
 import {
-    buildDockerAuthConfig, buildRemoteDockerImageURL, cleanupDockerImages, pushDockerImage, useCoreClient, useDocker,
+    buildDockerAuthConfigFromRegistry,
+    buildRemoteDockerImageURL,
+    cleanupDockerImages,
+    pushDockerImage,
+    useCoreClient,
+    useDocker,
 } from '../../../../core';
 import type { ComponentPayloadExtended } from '../../../type';
 import { extendPayload } from '../../../utils';
@@ -33,11 +38,7 @@ export async function executePushCommand(
 
     // -----------------------------------------------------------------------------------
 
-    const authConfig = buildDockerAuthConfig({
-        host: data.registry.host,
-        user: data.registry.account_name,
-        password: data.registry.account_secret,
-    });
+    const authConfig = buildDockerAuthConfigFromRegistry(data.registry);
 
     const client = useCoreClient();
     const { data: analysisNodes } = await client.analysisNode.getMany({

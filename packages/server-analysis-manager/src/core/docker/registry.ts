@@ -6,7 +6,6 @@
  */
 
 import { getHostNameFromString } from '@privateaim/kit';
-import type { DockerAuthConfig, DockerConnectionOptions } from './type';
 
 type RemoteDockerImageURLBuildContext = {
     projectName: string,
@@ -30,12 +29,4 @@ export function buildRemoteDockerImageURL(context: RemoteDockerImageURLBuildCont
     }
 
     return basePath;
-}
-
-export function buildDockerAuthConfig(config: DockerConnectionOptions) : DockerAuthConfig {
-    return {
-        username: config.user,
-        password: config.password,
-        serveraddress: getHostNameFromString(config.host),
-    };
 }
