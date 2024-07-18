@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { scanDirectory } from 'docker-scan';
 import fs from 'node:fs';
 import path from 'node:path';
 import { WRITABLE_DIRECTORY_PATH } from '../../src/config';
@@ -20,7 +21,9 @@ describe('git/clone', () => {
             branch: 'master',
         });
 
-        const files = await fs.promises.readdir(destination);
-        expect(files.length).toBeGreaterThan(0);
+        const { images, groups } = await scanDirectory(path.join(destination, 'data'));
+
+        expect(images.length).toBeGreaterThan(0);
+        expect(groups.length).toBeGreaterThan(0);
     });
 });

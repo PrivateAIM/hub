@@ -23,10 +23,11 @@ export async function executeMasterImagesSynchronizeCommand(
         url: payload.url,
     });
 
-    const { images, groups } = await scanDirectory(path.join(outputDirectoryPath, 'data'));
+    const dataDirectory = path.join(outputDirectoryPath, 'data');
+    const { images, groups } = await scanDirectory(dataDirectory);
 
     await writeBuildCommand({
-        directory: outputDirectoryPath,
+        directory: dataDirectory,
         images,
     });
 

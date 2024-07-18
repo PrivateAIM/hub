@@ -62,7 +62,7 @@ function createHandlers() : QueueRouterHandlers<{
                     // todo: use logger
                     console.error(err);
 
-                    return writeFailedEvent(MasterImagesEvent.SYNCHRONIZATION_FAILED, {
+                    return writeFailedEvent(MasterImagesEvent.BUILD_FAILED, {
                         error: err,
                     });
                 });
