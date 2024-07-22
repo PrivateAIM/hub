@@ -10,17 +10,19 @@ import type { MasterImagesSynchronizeCommandPayload } from '@privateaim/server-a
 import path from 'node:path';
 import { WRITABLE_DIRECTORY_PATH } from '../../../../config';
 import { writeBuildCommand } from '../../queue';
-import { cloneGitRepository } from '../../../../core';
+import { GitHubClient } from '../../../../core';
 
 export async function executeMasterImagesSynchronizeCommand(
     payload: MasterImagesSynchronizeCommandPayload,
 ) {
     const outputDirectoryPath = path.join(WRITABLE_DIRECTORY_PATH, 'master-images');
 
-    await cloneGitRepository({
+    const gitHubClient = new GitHubClient();
+    await gitHubClient.cloneRepository({
         destination: outputDirectoryPath,
+        owner: payload.owner,
+        repository: payload.repository,
         branch: payload.branch,
-        url: payload.url,
     });
 
     const dataDirectory = path.join(outputDirectoryPath, 'data');

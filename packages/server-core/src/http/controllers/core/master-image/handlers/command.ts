@@ -26,7 +26,9 @@ export async function commandMasterImageRouteHandler(req: Request, res: Response
 
     switch (command) {
         case MasterImageCommand.SYNC: {
-            await runMasterImagesSynchronizeCommand();
+            await runMasterImagesSynchronizeCommand({
+                branch: body.branch,
+            });
 
             return sendAccepted(res);
         }
