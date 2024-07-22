@@ -58,8 +58,9 @@ export function useEnv(key?: string) : any {
         authupApiURL: read('AUTHUP_URL'),
         appURL: read('APP_URL', 'http://127.0.0.1:3000/'),
 
-        masterImagesURL: read('MASTER_IMAGE_URL', ConfigDefaults.MASTER_IMAGE_URL),
-        masterImagesBranch: read('MASTER_IMAGE_BRANCH', ConfigDefaults.MASTER_IMAGE_BRANCH),
+        masterImagesOwner: read('MASTER_IMAGES_OWNER', ConfigDefaults.MASTER_IMAGES_OWNER),
+        masterImagesRepository: read('MASTER_IMAGES_REPOSITORY', ConfigDefaults.MASTER_IMAGES_REPOSITORY),
+        masterImagesBranch: read('MASTER_IMAGES_BRANCH', ConfigDefaults.MASTER_IMAGES_BRANCH),
 
         skipProjectApproval: readBool('SKIP_PROJECT_APPROVAL'),
         skipAnalysisApproval: readBool('SKIP_ANALYSIS_APPROVAL'),

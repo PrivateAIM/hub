@@ -13,7 +13,8 @@ export type MasterImagesBasePayload = {
 };
 
 export type MasterImagesSynchronizeCommandPayload = {
-    url: string,
+    owner: string,
+    repository: string,
     branch: string
 };
 

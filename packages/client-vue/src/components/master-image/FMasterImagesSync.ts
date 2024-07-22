@@ -50,7 +50,7 @@ export default defineComponent({
             'div',
             [
                 h('p', [
-                    'The master images and groups are extracted from the git repository after executing the sync command and are then transferred to the database.' +
+                    'The master images and groups are extracted from the GitHub repository after executing the sync command and are then transferred to the database.' +
                     ' ' +
                     'In addition, the master images are built and transferred to all registered registry instances.',
                 ]),

@@ -9,7 +9,13 @@ import { MasterImagesCommand, buildMasterImagesTaskQueueRouterPayload } from '@p
 import { isQueueRouterUsable, useLogger, useQueueRouter } from '@privateaim/server-kit';
 import { useEnv } from '../../../config';
 
-export async function runMasterImagesSynchronizeCommand() : Promise<void> {
+export type MasterImagesSynchronizeOptions = {
+    owner?: string,
+    repository?: string,
+    branch?: string,
+};
+
+export async function runMasterImagesSynchronizeCommand(options: MasterImagesSynchronizeOptions = {}) : Promise<void> {
     if (!isQueueRouterUsable()) {
         useLogger().warn('The master-images command synchronize could not be executed.');
         return;
@@ -18,8 +24,9 @@ export async function runMasterImagesSynchronizeCommand() : Promise<void> {
     const message = buildMasterImagesTaskQueueRouterPayload({
         command: MasterImagesCommand.SYNCHRONIZE,
         data: {
-            branch: useEnv('masterImagesBranch'),
-            url: useEnv('masterImagesURL'),
+            owner: options.owner || useEnv('masterImagesOwner'),
+            repository: options.repository || useEnv('masterImagesRepository'),
+            branch: options.branch || useEnv('masterImagesBranch'),
         },
     });
 
