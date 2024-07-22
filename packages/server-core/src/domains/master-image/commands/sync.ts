@@ -24,9 +24,9 @@ export async function runMasterImagesSynchronizeCommand(options: MasterImagesSyn
     const message = buildMasterImagesTaskQueueRouterPayload({
         command: MasterImagesCommand.SYNCHRONIZE,
         data: {
-            owner: options.owner || useEnv('masterImageOwner'),
-            repository: options.repository || useEnv('masterImageRepository'),
-            branch: options.branch || useEnv('masterImageBranch'),
+            owner: options.owner || useEnv('masterImagesOwner'),
+            repository: options.repository || useEnv('masterImagesRepository'),
+            branch: options.branch || useEnv('masterImagesBranch'),
         },
     });
 

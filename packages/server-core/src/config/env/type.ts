@@ -22,10 +22,9 @@ export interface Environment {
     authupApiURL?: string,
     appURL: string,
 
-    masterImageRepository: string,
-    masterImageOwner: string,
-    masterImagesURL: string,
-    masterImageBranch: string,
+    masterImagesRepository: string,
+    masterImagesOwner: string,
+    masterImagesBranch: string,
 
     skipProjectApproval: boolean,
     skipAnalysisApproval: boolean
