@@ -79,6 +79,15 @@ export class QueueRouter {
                     return;
                 }
 
+                if (input.fields.redelivered) {
+                    if (isLoggerUsable()) {
+                        useLogger()
+                            .debug(`Queue message ${input.properties.type} in ${routing.key} is not processed again.`);
+                    }
+
+                    return;
+                }
+
                 if (isLoggerUsable()) {
                     useLogger()
                         .debug(`Consuming queue message ${input.properties.type} in ${routing.key}`);
