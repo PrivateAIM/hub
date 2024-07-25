@@ -47,7 +47,7 @@
         "uuid": "^10.0.0"
     },
     "devDependencies": {
-        "@types/dockerode": "^3.3.29",
+        "@types/dockerode": "^3.3.31",
         "@types/tar-fs": "^2.0.4",
         "@types/tar-stream": "^2.2.2",
         "@types/uuid": "^10.0.0",
