@@ -6,17 +6,22 @@
  */
 
 import {
-    Cache as RedisCache,
     Client as RedisClient,
     ClientOptions as RedisClientOptions,
-    KeyPathID as RedisKeyPathID,
+    JsonAdapter as RedisJsonAdapter,
+    Watcher as RedisWatcher,
+    buildKeyPath as buildRedisKeyPath,
     createClient as createRedisClient,
+    parseKeyPath as parseRedisKeyPath,
 } from 'redis-extension';
 
 export {
     createRedisClient,
     RedisClient,
     RedisClientOptions,
-    RedisKeyPathID,
-    RedisCache,
+    RedisJsonAdapter,
+    RedisWatcher,
+
+    buildRedisKeyPath,
+    parseRedisKeyPath,
 };

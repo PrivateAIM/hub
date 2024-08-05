@@ -38,7 +38,7 @@
         "test": "npx nx run-many -t test",
         "lint": "eslint ./packages/**/*.{ts,vue}",
         "lint:fix": "npm run lint -- --fix",
-        "prepare": "husky install",
+        "prepare": "husky",
         "cli": "npm run cli --workspace=packages/server-api",
         "client-ui": "npm run dev --workspace=packages/client-ui",
         "server-api": "npm run dev --workspace=packages/server-api",
