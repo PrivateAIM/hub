@@ -5,8 +5,5 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './aggregator';
-export * from './memory-cache';
-export * from './component';
-export * from './queue';
-export * from './queue-router';
+export * from './module';
+export * from './singleton';
