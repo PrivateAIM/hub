@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './helpers';
-export * from './module';
-export * from './singleton';
-export * from './singleton-publish';
-export * from './singleton-subscribe';
+import { buildKeyPath as buildRedisKeyPath } from 'redis-extension';
+
+export {
+    buildRedisKeyPath,
+};
