@@ -7,7 +7,7 @@
 
 import { MasterImageCommand } from '@privateaim/core-kit';
 import { BadRequestError, NotFoundError } from '@ebec/http';
-import { MemoryCache } from '@privateaim/server-kit';
+import { useMemoryCache } from '@privateaim/server-kit';
 import { useRequestBody } from '@routup/basic/body';
 import { sendAccepted } from 'routup';
 import type { Request, Response } from 'routup';
@@ -24,7 +24,7 @@ export async function commandMasterImageRouteHandler(req: Request, res: Response
         throw new BadRequestError('The master image command is not valid.');
     }
 
-    const memoryCache = new MemoryCache();
+    const memoryCache = useMemoryCache();
 
     const { command } = body;
 
@@ -36,7 +36,10 @@ export async function commandMasterImageRouteHandler(req: Request, res: Response
 
             await runMasterImagesSynchronizeCommand()
                 .then(() => {
+                    // todo: maybe additional meta information
                     memoryCache.set(MemoryCacheID.MASTER_IMAGES, {
+                        now: Date.now(),
+                    }, {
                         ttl: 1000 * 60 * 15, // 15 minutes
                     });
                 });

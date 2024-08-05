@@ -11,10 +11,13 @@ type BlockerOptions = {
     ttl: number;
 };
 
-export class MemoryCache {
+export class MemoryCache<
+    KEY extends string = string,
+    VALUE = any,
+> {
     protected options : BlockerOptions;
 
-    protected cache : TTLCache<string, string>;
+    protected cache : TTLCache<KEY, VALUE>;
 
     constructor(options: Partial<BlockerOptions> = {}) {
         this.options = {
@@ -22,20 +25,24 @@ export class MemoryCache {
             ttl: 1000 * 60,
             ...options,
         };
-        this.cache = new TTLCache<string, string>();
+        this.cache = new TTLCache<KEY, VALUE>();
     }
 
-    set(id: string, options: BlockerOptions) {
-        this.cache.set(id, '', {
+    set(id: KEY, value: VALUE, options: BlockerOptions) {
+        this.cache.set(id, value, {
             ttl: options.ttl,
         });
     }
 
-    del(id: string) : void {
+    get(id: KEY): VALUE | undefined {
+        return this.cache.get(id);
+    }
+
+    del(id: KEY) : void {
         this.cache.delete(id);
     }
 
-    has(id: string) : boolean {
+    has(id: KEY) : boolean {
         return this.cache.has(id);
     }
 }
