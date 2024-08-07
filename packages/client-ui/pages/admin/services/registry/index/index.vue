@@ -13,7 +13,7 @@ import { BSpinner, BTable } from 'bootstrap-vue-next';
 import type { BuildInput } from 'rapiq';
 import { ref } from 'vue';
 import {
-    EntityDelete, FPagination, FSearch, FTitle, RegistryList,
+    FEntityDelete, FPagination, FSearch, FTitle, RegistryList,
 } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
 import { definePageMeta } from '#imports';
@@ -26,7 +26,7 @@ export default defineNuxtComponent({
         ListTitle: FTitle,
         BSpinner,
         BTable,
-        EntityDelete,
+        EntityDelete: FEntityDelete,
         RegistryList,
         VCTimeago,
     },

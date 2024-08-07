@@ -4,11 +4,8 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { useAbilityCheck } from '@authup/client-web-kit';
-import { PermissionName } from '@privateaim/kit';
-import { VCTimeago } from '@vuecs/timeago';
 import type {
-    PropType, VNode,
+    PropType,
 } from 'vue';
 import {
     defineComponent, h,
@@ -16,15 +13,8 @@ import {
 import type {
     Project,
 } from '@privateaim/core-kit';
-import {
-    DomainType,
-} from '@privateaim/core-kit';
-import { VCLink } from '@vuecs/link';
-import {
-    EntityListSlotName, hasNormalizedSlot, normalizeSlot,
-} from '../../core';
-import EntityDelete from '../EntityDelete';
 import { FProject } from './FProject';
+import FProjectItemCard from './FProjectItemCard.vue';
 import type { EntityManagerSlotProps } from '../../core';
 
 const FProjectItem = defineComponent({
@@ -35,9 +25,7 @@ const FProjectItem = defineComponent({
         },
     },
     emits: ['updated', 'failed', 'deleted'],
-    setup(props, { slots, emit }) {
-        const canDrop = useAbilityCheck(PermissionName.PROJECT_DELETE);
-
+    setup(props, { emit }) {
         return () => h(FProject, {
             entity: props.entity,
             onDeleted(entity) {
@@ -50,131 +38,16 @@ const FProjectItem = defineComponent({
                 emit('failed', e);
             },
         }, {
-            default: (props: EntityManagerSlotProps<Project>) => {
-                if (!props.data) {
+            default: (slotProps: EntityManagerSlotProps<Project>) => {
+                if (!slotProps.data) {
                     return [];
                 }
 
-                let deleteAction : VNode | undefined;
-
-                let itemActions : VNode | VNode[] | undefined;
-
-                if (canDrop.value) {
-                    deleteAction = h(
-                        EntityDelete,
-                        {
-                            withText: false,
-                            entityId: props.data.id,
-                            entityType: DomainType.PROJECT,
-                            disabled: props.busy || props.data.analyses > 0,
-                            class: 'btn btn-xs btn-danger ms-1',
-                            onDeleted(data: any) {
-                                props.deleted(data);
-                            },
-                        },
-                    );
-                }
-
-                if (hasNormalizedSlot(EntityListSlotName.ITEM_ACTIONS, slots)) {
-                    itemActions = normalizeSlot(EntityListSlotName.ITEM_ACTIONS, props, slots);
-                } else {
-                    itemActions = [
-                        h(
-                            VCLink,
-                            {
-                                to: `/projects/${props.data.id}`,
-                                disabled: props.busy,
-                                class: 'btn btn-xs btn-dark',
-                            },
-                            [
-                                h('i', { class: 'fa fa-bars' }),
-                            ],
-                        ),
-                    ];
-
-                    if (deleteAction) {
-                        itemActions.push(deleteAction);
-                    }
-                }
-
-                return h(
-                    'div',
-                    { class: 'p-1 w-100' },
-                    [
-                        h(
-                            'div',
-                            { class: 'd-flex flex-row algin-items-center' },
-                            [
-                                h('div', [
-                                    h('i', {
-                                        class: 'fa-solid fa-scroll pe-1',
-                                    }),
-                                ]),
-                                h(
-                                    'div',
-                                    [
-                                        h(
-                                            VCLink,
-                                            {
-                                                to: `/projects/${props.data.id}`,
-                                                class: 'mb-0',
-                                            },
-                                            [
-                                                props.data.name,
-                                            ],
-                                        ),
-                                    ],
-                                ),
-                                h(
-                                    'div',
-                                    {
-                                        class: 'ms-auto',
-                                    },
-                                    itemActions,
-                                ),
-                            ],
-                        ),
-                        h(
-                            'div',
-                            {
-                                class: 'd-flex flex-row',
-                            },
-                            [
-                                h('div', [
-                                    h(
-                                        'small',
-                                        [
-                                            h('span', { class: 'text-primary' }, [props.data.analyses]),
-                                            ' ',
-                                            'Analyses',
-                                        ],
-                                    ),
-                                    h('span', { class: 'me-1' }, [',']),
-                                    h('small', [
-                                        h('span', { class: 'text-muted' }, [
-                                            'updated',
-                                        ]),
-                                        ' ',
-                                        h(VCTimeago, {
-                                            datetime: props.data.updated_at,
-                                        }),
-                                    ]),
-                                ]),
-                                h('div', { class: 'ms-auto' }, [
-                                    h('small', [
-                                        h('span', { class: 'text-muted' }, [
-                                            'created by',
-                                        ]),
-                                        ' ',
-                                        h('span', [
-                                            props.data.user_id,
-                                        ]),
-                                    ]),
-                                ]),
-                            ],
-                        ),
-                    ],
-                );
+                return h(FProjectItemCard, {
+                    entity: slotProps.data,
+                    busy: slotProps.busy,
+                    onDeleted: slotProps.deleted,
+                });
             },
         });
     },

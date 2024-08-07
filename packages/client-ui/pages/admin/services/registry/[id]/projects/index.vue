@@ -13,7 +13,7 @@ import type { BuildInput } from 'rapiq';
 import { computed, ref, toRefs } from 'vue';
 import type { PropType, Ref } from 'vue';
 import {
-    EntityDelete, FPagination,
+    FEntityDelete, FPagination,
     FSearch,
     FTitle,
     RegistryProjectDetails,
@@ -29,7 +29,7 @@ export default {
         ListTitle: FTitle,
         BModal,
         BTable,
-        EntityDelete,
+        EntityDelete: FEntityDelete,
         RegistryProjectDetails,
         RegistryProjectList,
     },

@@ -69,7 +69,7 @@ export default defineNuxtComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            <i class="fa fa-bar-chart" /> Analysis
+            <i class="fas fa-microscope" /> Analysis
             <span class="sub-title">
                 <template v-if="entity">
                     <FAnalysisName

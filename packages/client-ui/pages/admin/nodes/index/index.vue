@@ -14,7 +14,7 @@ import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
 import { computed } from 'vue';
 import {
-    EntityDelete, FNodes, FPagination, FSearch, FTitle,
+    FEntityDelete, FNodes, FPagination, FSearch, FTitle,
 } from '@privateaim/client-vue';
 import { definePageMeta } from '#imports';
 import { defineNuxtComponent } from '#app';
@@ -25,7 +25,7 @@ export default defineNuxtComponent({
         ListPagination: FPagination,
         ListSearch: FSearch,
         ListTitle: FTitle,
-        EntityDelete,
+        EntityDelete: FEntityDelete,
         BTable,
         FNodes,
         VCTimeago,

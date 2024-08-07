@@ -18,5 +18,5 @@ export * from './analysis-bucket';
 export * from './analysis-bucket-file';
 export * from './analysis-log';
 export * from './analysis-node';
-export { default as EntityDelete } from './EntityDelete';
+export { default as FEntityDelete } from './FEntityDelete';
 export * from './utility';

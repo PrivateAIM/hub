@@ -10,7 +10,7 @@ import { defineComponent, h, ref } from 'vue';
 import type { Registry } from '@privateaim/core-kit';
 import { RegistryAPICommand } from '@privateaim/core-kit';
 import { injectCoreHTTPClient } from '../../core';
-import EntityDelete from '../EntityDelete';
+import EntityDelete from '../FEntityDelete';
 import MasterImageList from '../master-image/FMasterImages';
 
 export default defineComponent({
