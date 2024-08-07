@@ -34,15 +34,17 @@ export async function commandMasterImageRouteHandler(req: Request, res: Response
                 throw new BadRequestError('A master images synchronization process is already in progress.');
             }
 
-            await runMasterImagesSynchronizeCommand()
-                .then(() => {
-                    // todo: maybe additional meta information
-                    memoryCache.set(MemoryCacheID.MASTER_IMAGES, {
-                        now: Date.now(),
-                    }, {
-                        ttl: 1000 * 60 * 15, // 15 minutes
-                    });
-                });
+            memoryCache.set(MemoryCacheID.MASTER_IMAGES, {
+                now: Date.now(),
+            }, {
+                ttl: 1000 * 60 * 15, // 15 minutes
+            });
+
+            try {
+                await runMasterImagesSynchronizeCommand();
+            } catch (e) {
+                memoryCache.del(MemoryCacheID.MASTER_IMAGES);
+            }
 
             return sendAccepted(res);
         }
