@@ -44,6 +44,8 @@ export async function commandMasterImageRouteHandler(req: Request, res: Response
                 await runMasterImagesSynchronizeCommand();
             } catch (e) {
                 memoryCache.del(MemoryCacheID.MASTER_IMAGES);
+
+                throw e;
             }
 
             return sendAccepted(res);
