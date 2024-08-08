@@ -9,6 +9,9 @@ import path from 'node:path';
 import { defineNuxtConfig } from 'nuxt/config';
 
 export default defineNuxtConfig({
+    experimental: {
+        scanPageMeta: false,
+    },
     runtimeConfig: {
         authupUrl: process.env.AUTHUP_URL,
         coreUrl: process.env.CORE_URL,

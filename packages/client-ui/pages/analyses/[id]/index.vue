@@ -43,32 +43,39 @@ export default defineNuxtComponent({
 
 <template>
     <div v-if="entity">
-        <div class="panel-box mb-3">
-            <h6 class="mb-3">
-                <i class="fa-solid fa-server" /> Node(s)
-            </h6>
-
-            <FAnalysisNodeProgress :entity="entity" />
+        <div class="card-grey card mb-3">
+            <div class="card-header">
+                <span class="title">Nodes</span>
+            </div>
+            <div class="card-body text-center">
+                <FAnalysisNodeProgress :entity="entity" />
+            </div>
         </div>
-        <div class="row">
-            <div class="col-12 col-md-5">
-                <div class="panel-box mb-3">
-                    <h6><i class="fa fa-list" /> Pipeline</h6>
-
-                    <FAnalysisPipeline
-                        :list-direction="'column'"
-                        :entity="entity"
-                        @updated="handleUpdated"
-                        @failed="handleFailed"
-                        @executed="handleExecuted"
-                    />
+        <div class="d-flex flex-row gap-3">
+            <div class="flex-grow-1">
+                <div class="card-grey card">
+                    <div class="card-header">
+                        <span class="title">Pipeline</span>
+                    </div>
+                    <div class="card-body">
+                        <FAnalysisPipeline
+                            :list-direction="'column'"
+                            :entity="entity"
+                            @updated="handleUpdated"
+                            @failed="handleFailed"
+                            @executed="handleExecuted"
+                        />
+                    </div>
                 </div>
             </div>
-            <div class="col-12 col-md-7">
-                <div class="panel-box">
-                    <h6><i class="fa fa-history" /> Logs</h6>
-
-                    <FAnalysisLogs :entity-id="entity.id" />
+            <div class="flex-grow-1">
+                <div class="card-grey card">
+                    <div class="card-header">
+                        <span class="title">Logs</span>
+                    </div>
+                    <div class="card-body">
+                        <FAnalysisLogs :entity-id="entity.id" />
+                    </div>
                 </div>
             </div>
         </div>
