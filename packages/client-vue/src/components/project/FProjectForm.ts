@@ -7,7 +7,7 @@
 import { buildFormSubmitWithTranslations, createFormSubmitTranslations } from '@authup/client-web-kit';
 import { getSeverity, useTranslationsForNestedValidations } from '@ilingo/vuelidate';
 import {
-    buildFormGroup, buildFormInput,
+    buildFormGroup, buildFormInput, buildFormTextarea,
 } from '@vuecs/form-controls';
 import type { ListHeaderSlotProps, ListItemSlotProps } from '@vuecs/list-controls';
 import useVuelidate from '@vuelidate/core';
@@ -53,6 +53,7 @@ const FProjectForm = defineComponent({
         const busy = ref(false);
         const form = reactive({
             name: '',
+            description: '',
             master_image_id: '',
         });
 
@@ -61,6 +62,9 @@ const FProjectForm = defineComponent({
                 required,
                 minLength: minLength(5),
                 maxLength: maxLength(100),
+            },
+            description: {
+
             },
             master_image_id: {
                 required,
@@ -143,6 +147,22 @@ const FProjectForm = defineComponent({
                 }),
             });
 
+            const description = buildFormGroup({
+                validationMessages: translationsValidation.description.value,
+                validationSeverity: getSeverity($v.value.description),
+                label: true,
+                labelContent: 'Description',
+                content: buildFormTextarea({
+                    value: $v.value.description.$model,
+                    onChange(input) {
+                        $v.value.description.$model = input;
+                    },
+                    props: {
+                        rows: 4,
+                    },
+                }),
+            });
+
             const masterImagePicker = h(MasterImagePicker, {
                 entityId: form.master_image_id,
                 onSelected(value: MasterImage) {
@@ -205,6 +225,8 @@ const FProjectForm = defineComponent({
                         { class: 'col' },
                         [
                             name,
+                            h('hr'),
+                            description,
                             h('hr'),
                             masterImagePicker,
                         ],
