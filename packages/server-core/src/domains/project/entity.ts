@@ -9,7 +9,7 @@ import {
     Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn,
 } from 'typeorm';
 import type { MasterImage, Project } from '@privateaim/core-kit';
-import type { Realm, User } from '@authup/core-kit';
+import type { Realm, Robot, User } from '@authup/core-kit';
 import { MasterImageEntity } from '../master-image';
 
 @Entity({ name: 'projects' })
@@ -20,8 +20,16 @@ export class ProjectEntity implements Project {
     @Column({ type: 'varchar', length: 256 })
         name: string;
 
+    @Column({ type: 'text', nullable: true })
+        description: string | null;
+
+    // ------------------------------------------------------------------
+
     @Column({ type: 'int', unsigned: true, default: 0 })
         analyses: number;
+
+    @Column({ type: 'int', unsigned: true, default: 0 })
+        nodes: number;
 
     // ------------------------------------------------------------------
 
@@ -37,7 +45,10 @@ export class ProjectEntity implements Project {
         realm_id: Realm['id'];
 
     @Column({ type: 'uuid', nullable: true })
-        user_id: User['id'];
+        user_id: User['id'] | null;
+
+    @Column({ type: 'uuid', nullable: true })
+        robot_id: Robot['id'] | null;
 
     @Column({ nullable: true, default: null })
         master_image_id: MasterImage['id'] | null;

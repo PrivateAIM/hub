@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Realm, User } from '@authup/core-kit';
+import type { Realm, Robot, User } from '@authup/core-kit';
 import type { DomainType } from '../constants';
 import type { MasterImage } from '../master-image';
 import type { DomainEventBaseContext } from '../types-base';
@@ -14,6 +14,12 @@ export interface Project {
     id: string;
 
     name: string;
+
+    description: string | null;
+
+    // ------------------------------------------------------------------
+
+    nodes: number;
 
     analyses: number;
 
@@ -27,7 +33,9 @@ export interface Project {
 
     realm_id: Realm['id'];
 
-    user_id: User['id'];
+    robot_id: Robot['id'] | null;
+
+    user_id: User['id'] | null;
 
     master_image_id: MasterImage['id'] | null;
 
