@@ -8,7 +8,7 @@ volumes:
         driver: local
 services:
     mysql:
-        image: mysql:latest
+        image: mysql:8
         container_name: mysql
         restart: always
         healthcheck:
