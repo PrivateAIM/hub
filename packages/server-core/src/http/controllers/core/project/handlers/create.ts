@@ -22,12 +22,19 @@ export async function createProjectRouteHandler(req: Request, res: Response) : P
 
     const result = await runProjectValidation(req, 'create');
 
+    const userId = useRequestEnv(req, 'userId');
+    if (userId) {
+        result.data.user_id = userId;
+    }
+
+    const robotId = useRequestEnv(req, 'robotId');
+    if (robotId) {
+        result.data.robot_id = robotId;
+    }
+
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(ProjectEntity);
-    const entity = repository.create({
-        user_id: useRequestEnv(req, 'userId'),
-        ...result.data,
-    });
+    const entity = repository.create(result.data);
 
     await repository.save(entity);
 

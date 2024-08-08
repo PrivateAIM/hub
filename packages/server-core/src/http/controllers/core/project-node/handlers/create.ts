@@ -12,7 +12,7 @@ import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '@privateaim/server-http-kit';
-import { ProjectNodeEntity } from '../../../../../domains';
+import { ProjectEntity, ProjectNodeEntity } from '../../../../../domains';
 import { runProjectNodeValidation } from '../utils';
 import { useEnv } from '../../../../../config';
 
@@ -40,6 +40,10 @@ export async function createProjectNodeRouteHandler(req: Request, res: Response)
     }
 
     entity = await repository.save(entity);
+
+    result.relation.project.nodes += 1;
+    const projectRepository = dataSource.getRepository(ProjectEntity);
+    await projectRepository.save(result.relation.project);
 
     return sendCreated(res, entity);
 }
