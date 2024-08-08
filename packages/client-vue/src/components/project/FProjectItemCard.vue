@@ -98,8 +98,22 @@ export default defineComponent({
                 <div>
                     <strong><i class="fa fa-microscope" /> Analyses</strong>
                 </div>
-                <div class="text-primary">
+                <div
+                    class="h6"
+                    :class="{'text-success': entity.analyses > 0, 'text-muted': entity.analyses === 0}"
+                >
                     {{ entity.analyses }}
+                </div>
+            </div>
+            <div class="d-flex flex-grow-1 align-items-center flex-column">
+                <div>
+                    <strong><i class="fa-solid fa-server" /> Nodes</strong>
+                </div>
+                <div
+                    class="h6"
+                    :class="{'text-success': entity.nodes > 0, 'text-muted': entity.nodes === 0}"
+                >
+                    {{ entity.nodes }}
                 </div>
             </div>
             <!-- todo: this is only possible when authup supports user access from other realm -->

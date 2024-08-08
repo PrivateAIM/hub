@@ -87,7 +87,7 @@ export default defineComponent({
                 <strong>1. Configuration</strong>
             </div>
             <div>
-                Status: <FAnalysisConfigurationStatusText :locked="entity.configuration_locked" />
+                <FAnalysisConfigurationStatusText :locked="entity.configuration_locked" />
             </div>
             <div
                 v-if="withCommand"
@@ -124,7 +124,7 @@ export default defineComponent({
                 <strong>2. Build</strong>
             </div>
             <div>
-                Status: <FAnalysisBuildStatusText :status="entity.build_status" />
+                <FAnalysisBuildStatusText :status="entity.build_status" />
             </div>
             <div
                 v-if="withCommand"
