@@ -12,7 +12,7 @@ import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '@privateaim/server-http-kit';
-import { AnalysisEntity, ProjectEntity, ProjectNodeEntity } from '../../../../../domains';
+import { ProjectEntity, ProjectNodeEntity } from '../../../../../domains';
 import { runProjectNodeValidation } from '../utils';
 import { useEnv } from '../../../../../config';
 
