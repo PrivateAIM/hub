@@ -19,14 +19,15 @@ import { VCFormInput } from '@vuecs/form-controls';
 import {
     createEntityManager, defineEntityManagerEvents, wrapFnWithBusyState,
 } from '../../core';
-import { FProjectItem, FProjects } from '../project';
+import { FProjects } from '../project';
+import { FSearch } from '../utility';
 
 export default defineComponent({
     components: {
+        FSearch,
         IVuelidate,
         VCFormInput,
         FProjects,
-        FProjectItem,
     },
     props: {
         entity: {
@@ -136,36 +137,32 @@ export default defineComponent({
                 class="col"
             >
                 <FProjects :query="proposalQuery">
-                    <template #header>
+                    <template #header="props">
                         <label>Projects</label>
+
+                        <FSearch
+                            :load="props.load"
+                            :meta="props.meta"
+                        />
                     </template>
-                    <template #item="props">
-                        <FProjectItem
-                            :key="props.data.id"
-                            :entity="props.data"
-                            @updated="props.updated"
-                            @deleted="props.deleted"
+                    <template #itemActions="props">
+                        <button
+                            :disabled="props.busy"
+                            type="button"
+                            class="btn btn-xs"
+                            :class="{
+                                'btn-dark': form.project_id !== props.data.id,
+                                'btn-warning': form.project_id === props.data.id
+                            }"
+                            @click.prevent="toggle('project_id', props.data.id)"
                         >
-                            <template #itemActions>
-                                <button
-                                    :disabled="props.busy"
-                                    type="button"
-                                    class="btn btn-xs"
-                                    :class="{
-                                        'btn-dark': form.project_id !== props.data.id,
-                                        'btn-warning': form.project_id === props.data.id
-                                    }"
-                                    @click.prevent="toggle('project_id', props.data.id)"
-                                >
-                                    <i
-                                        :class="{
-                                            'fa fa-plus': form.project_id !== props.data.id,
-                                            'fa fa-minus': form.project_id === props.data.id
-                                        }"
-                                    />
-                                </button>
-                            </template>
-                        </FProjectItem>
+                            <i
+                                :class="{
+                                    'fa fa-plus': form.project_id !== props.data.id,
+                                    'fa fa-minus': form.project_id === props.data.id
+                                }"
+                            />
+                        </button>
                     </template>
                 </FProjects>
 
