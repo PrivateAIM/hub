@@ -34,6 +34,14 @@ export async function runProjectValidation(
 
     // ----------------------------------------------
 
+    await check('description')
+        .isString()
+        .isLength({ min: 5, max: 4096 })
+        .optional({ values: 'null' })
+        .run(req);
+
+    // ----------------------------------------------
+
     await check('master_image_id')
         .isUUID()
         .optional({ nullable: true })
