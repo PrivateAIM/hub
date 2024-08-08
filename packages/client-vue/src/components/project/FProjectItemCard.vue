@@ -56,10 +56,8 @@ export default defineComponent({
     <div class="d-flex flex-column w-100">
         <div class="w-100">
             <div class="d-flex flex-row align-items-center">
-                <div class="me-1">
-                    <i class="fas fa-project-diagram" />
-                </div>
                 <div>
+                    <i class="fas fa-project-diagram me-1" />
                     <VCLink
                         :to="'/projects/' + entity.id"
                         class="mb-0"
