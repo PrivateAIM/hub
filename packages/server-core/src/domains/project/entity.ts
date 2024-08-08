@@ -20,7 +20,7 @@ export class ProjectEntity implements Project {
     @Column({ type: 'varchar', length: 256 })
         name: string;
 
-    @Column({ type: 'varchar', length: 4096, nullable: true })
+    @Column({ type: 'text', nullable: true })
         description: string | null;
 
     // ------------------------------------------------------------------
