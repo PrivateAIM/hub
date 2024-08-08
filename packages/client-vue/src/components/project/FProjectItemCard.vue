@@ -54,7 +54,7 @@ export default defineComponent({
 </script>
 <template>
     <div class="d-flex flex-column w-100">
-        <div class="p-1 w-100">
+        <div class="w-100">
             <div class="d-flex flex-row align-items-center">
                 <div class="me-1">
                     <i class="fas fa-project-diagram" />
@@ -99,7 +99,6 @@ export default defineComponent({
                     <strong><i class="fa fa-microscope" /> Analyses</strong>
                 </div>
                 <div
-                    class="h6"
                     :class="{'text-success': entity.analyses > 0, 'text-muted': entity.analyses === 0}"
                 >
                     {{ entity.analyses }}
@@ -110,7 +109,6 @@ export default defineComponent({
                     <strong><i class="fa-solid fa-server" /> Nodes</strong>
                 </div>
                 <div
-                    class="h6"
                     :class="{'text-success': entity.nodes > 0, 'text-muted': entity.nodes === 0}"
                 >
                     {{ entity.nodes }}
@@ -120,7 +118,7 @@ export default defineComponent({
                 <div>
                     <strong><i class="fa-solid fa-user" /> Creator</strong>
                 </div>
-                <div class="h6">
+                <div>
                     <template v-if="entity.user_id">
                         {{ entity.user_id }}
                     </template>
