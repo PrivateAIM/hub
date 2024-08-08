@@ -12,7 +12,7 @@ import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '@privateaim/server-http-kit';
-import { ProjectNodeEntity } from '../../../../../domains';
+import { ProjectEntity, ProjectNodeEntity } from '../../../../../domains';
 
 export async function deleteProjectNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -47,6 +47,18 @@ export async function deleteProjectNodeRouteHandler(req: Request, res: Response)
     await repository.remove(entity);
 
     entity.id = entityId;
+
+    // -------------------------------------------
+
+    const projectRepository = dataSource.getRepository(ProjectEntity);
+    const project = await projectRepository.findOneBy({ id: entity.project_id });
+
+    project.nodes -= 1;
+    await projectRepository.save(project);
+
+    entity.project = project;
+
+    // -------------------------------------------
 
     return sendAccepted(res, entity);
 }

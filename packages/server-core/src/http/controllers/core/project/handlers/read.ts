@@ -20,19 +20,22 @@ export async function getOneProjectRouteHandler(req: Request, res: Response) : P
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(ProjectEntity);
-    const query = repository.createQueryBuilder('proposal')
-        .where('proposal.id = :id', { id });
+    const query = repository.createQueryBuilder('project')
+        .where('project.id = :id', { id });
 
     applyQuery(query, useRequestQuery(req), {
-        defaultAlias: 'proposal',
+        defaultAlias: 'project',
         fields: {
             default: [
                 'id',
                 'name',
+                'description',
+                'nodes',
                 'analyses',
                 'created_at',
                 'updated_at',
                 'realm_id',
+                'robot_id',
                 'user_id',
                 'master_image_id',
             ],
@@ -55,18 +58,21 @@ export async function getManyProjectRouteHandler(req: Request, res: Response) : 
     const dataSource = await useDataSource();
 
     const repository = dataSource.getRepository(ProjectEntity);
-    const query = repository.createQueryBuilder('proposal');
+    const query = repository.createQueryBuilder('project');
 
     const { pagination } = applyQuery(query, useRequestQuery(req), {
-        defaultAlias: 'proposal',
+        defaultAlias: 'project',
         fields: {
             default: [
                 'id',
                 'name',
+                'description',
                 'analyses',
+                'nodes',
                 'created_at',
                 'updated_at',
                 'realm_id',
+                'robot_id',
                 'user_id',
                 'master_image_id',
             ],
