@@ -46,6 +46,7 @@ export default defineComponent({
         const form = reactive({
             project_id: '',
             name: '',
+            description: '',
         });
 
         const $v = useVuelidate({
@@ -55,6 +56,10 @@ export default defineComponent({
             name: {
                 minLength: minLength(3),
                 maxLength: maxLength(128),
+            },
+            description: {
+                minLength: minLength(5),
+                maxLength: maxLength(4096),
             },
         }, form);
 
@@ -120,6 +125,25 @@ export default defineComponent({
                 </IVuelidate>
 
                 <hr>
+
+                <IVuelidate :validation="v$.description">
+                    <template #default="props">
+                        <VCFormGroup
+                            :validation-messages="props.data"
+                            :validation-severity="props.severity"
+                        >
+                            <template #label>
+                                Description
+                            </template>
+                            <template #default>
+                                <VCFormTextarea
+                                    v-model="v$.description.$model"
+                                    rows="4"
+                                />
+                            </template>
+                        </VCFormGroup>
+                    </template>
+                </IVuelidate>
 
                 <div>
                     <button

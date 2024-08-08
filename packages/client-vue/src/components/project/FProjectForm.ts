@@ -64,7 +64,8 @@ const FProjectForm = defineComponent({
                 maxLength: maxLength(100),
             },
             description: {
-
+                minLength: minLength(5),
+                maxLength: maxLength(4096),
             },
             master_image_id: {
                 required,

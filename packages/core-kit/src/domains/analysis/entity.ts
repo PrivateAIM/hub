@@ -21,6 +21,8 @@ export interface Analysis {
 
     name: string | null;
 
+    description: string | null;
+
     nodes: number;
 
     // ------------------------------------------------------------------

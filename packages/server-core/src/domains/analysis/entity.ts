@@ -39,6 +39,9 @@ export class AnalysisEntity implements Analysis {
     @Column({ type: 'varchar', length: 128, nullable: true })
         name: string;
 
+    @Column({ type: 'text', nullable: true })
+        description: string | null;
+
     @Column({ type: 'int', unsigned: true, default: 0 })
         nodes: number;
 

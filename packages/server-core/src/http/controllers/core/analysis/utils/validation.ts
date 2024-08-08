@@ -38,6 +38,12 @@ export async function runAnalysisValidation(
         .optional({ nullable: true })
         .run(req);
 
+    await check('description')
+        .isString()
+        .isLength({ min: 5, max: 4096 })
+        .optional({ values: 'null' })
+        .run(req);
+
     await check('master_image_id')
         .exists()
         .notEmpty()

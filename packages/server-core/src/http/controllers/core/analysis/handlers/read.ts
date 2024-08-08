@@ -62,6 +62,7 @@ export async function getManyAnalysisRouteHandler(req: Request, res: Response) :
             allowed: [
                 'id',
                 'name',
+                'description',
                 'project_id',
                 'realm_id',
                 'build_status',
