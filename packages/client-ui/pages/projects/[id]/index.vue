@@ -44,105 +44,103 @@ export default defineNuxtComponent({
 </script>
 <template>
     <div v-if="entity">
-        <div class="row">
-            <div class="col">
-                <h6><i class="fa-solid fa-info" /> Info</h6>
-                <div class="row">
-                    <div class="col">
-                        <div class="card-grey card mt-2">
-                            <div class="card-header">
-                                <h5>Analyses</h5>
-                            </div>
-                            <div class="card-body text-center">
-                                <div class="mb-1">
-                                    <i class="fa fa-bar-chart fa-4x" />
-                                </div>
-                                <p class="badge bg-dark">
-                                    {{ entity.analyses }}
-                                </p>
-                            </div>
+        <div class="mb-2">
+            <h6><i class="fa-solid fa-info" /> Info</h6>
+            <div class="d-flex flex-row gap-3 w-100">
+                <div class="card-grey card flex-grow-1">
+                    <div class="card-header">
+                        <span class="title">Analyses</span>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="mb-2">
+                            <i class="fas fa-microscope fa-4x" />
+                        </div>
+                        <div class="h6">
+                            {{ entity.analyses }}
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col">
-                        <div class="card-grey card mt-2">
-                            <div class="card-header">
-                                <h5>MasterImage</h5>
+
+                <template v-if="entity.master_image_id">
+                    <div class="card-grey card flex-grow-1">
+                        <div class="card-header">
+                            <span class="title">MasterImage</span>
+                        </div>
+                        <div class="card-body text-center">
+                            <div class="mb-2">
+                                <i class="fa fa-compact-disc fa-4x" />
                             </div>
-                            <div class="card-body text-center">
-                                <div class="mb-1">
-                                    <i class="fa fa-compact-disc fa-4x" />
-                                </div>
-                                <p class="badge bg-dark">
-                                    {{ entity.master_image ? entity.master_image.name : entity.master_image_id }}
-                                </p>
+                            <div class="h6">
+                                {{ entity.master_image ? entity.master_image.name : entity.master_image_id }}
                             </div>
+                        </div>
+                    </div>
+                </template>
+
+                <div class="card-grey card flex-grow-1">
+                    <div class="card-header">
+                        <span class="title">Realm</span>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="mb-2">
+                            <i class="fas fa-university fa-4x" />
+                        </div>
+                        <div class="h6">
+                            {{ entity.realm_id }}
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col">
-                        <div class="card-grey card mt-2">
-                            <div class="card-header">
-                                <h5>Realm</h5>
-                            </div>
-                            <div class="card-body text-center">
-                                <div class="mb-1">
-                                    <i class="fas fa-university fa-4x" />
-                                </div>
-                                <p class="badge bg-dark">
-                                    {{ entity.realm_id }}
-                                </p>
-                            </div>
-                        </div>
+
+                <div class="card-grey card flex-grow-1">
+                    <div class="card-header">
+                        <span class="title">Creator</span>
                     </div>
-                    <div class="col">
-                        <div class="card-grey card mt-2">
-                            <div class="card-header">
-                                <h5>User</h5>
-                            </div>
-                            <div class="card-body text-center">
-                                <div class="mb-1">
-                                    <i class="fa fa-user fa-4x" />
-                                </div>
-                                <p class="badge bg-dark">
-                                    {{ entity.user_id }}
-                                </p>
-                            </div>
+                    <div class="card-body text-center">
+                        <div class="mb-1">
+                            <i class="fa fa-user fa-4x" />
+                        </div>
+                        <div class="h6">
+                            {{ entity.user_id }}
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col">
-                <FProjectNodes
-                    :header-search="false"
-                    :query="projectNodeQuery"
-                >
-                    <template #body="{ data }">
-                        <div class="list">
-                            <template
-                                v-for="item in data"
-                                :key="item.id"
-                            >
-                                <div
-                                    class="list-item card mb-2"
-                                >
-                                    <div class="card-header">
-                                        <h5>{{ item.node.name }}</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <strong>Status</strong> <FProjectNodeApprovalStatus :status="item.approval_status" />
-                                        <br>
-                                        <strong>Comment</strong><br> {{ item.comment || 'No comment' }}
-                                    </div>
-                                </div>
-                            </template>
-                        </div>
-                    </template>
-                </FProjectNodes>
             </div>
         </div>
+        <FProjectNodes
+            :header-search="false"
+            :query="projectNodeQuery"
+        >
+            <template #body="{ data }">
+                <div class="d-flex flex-row gap-3 w-100">
+                    <template
+                        v-for="item in data"
+                        :key="item.id"
+                    >
+                        <div class="card card-grey flex-grow-1">
+                            <div class="card-header">
+                                <span class="title">{{ item.node.name }}</span>
+                            </div>
+                            <div class="card-body">
+                                <div>
+                                    <strong>Status</strong> <FProjectNodeApprovalStatus :status="item.approval_status" />
+                                </div>
+                                <div>
+                                    <strong>Updated</strong> <VCTimeago :datetime="item.updated_at" />
+                                </div>
+                                <template v-if="item.node">
+                                    <div>
+                                        <strong>Type</strong> {{ item.node.type }}
+                                    </div>
+                                </template>
+                                <div>
+                                    <strong>Comment</strong><br> {{ item.comment || 'No comment' }}
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </template>
+        </FProjectNodes>
     </div>
 </template>
 <style>

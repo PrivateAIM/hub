@@ -109,24 +109,18 @@ Card
     text-decoration: none;
 }
 
-.card .card-header h5 {
-    margin-bottom: 0;
+.card .card-header .title {
     color: #37474f;
-    font-size: 15px;
-    font-weight: 600;
-    display: inline-block;
-    margin-right: 10px;
-    margin-left: 0.5rem;
-    line-height: 1.4;
+    font-size: 1rem;
     position: relative;
+    margin: 0 0 0 1rem;
 }
 
-.card .card-header h5:after {
+.card .card-header .title:after {
     color: #6259ca;
     position: absolute;
     left: -1rem;
     top: 0;
-    padding-left: 0.25rem;
     content: "\f054";
     font-family: var(--fa-style-family, "Font Awesome 6 Free");
     font-weight: 900;
