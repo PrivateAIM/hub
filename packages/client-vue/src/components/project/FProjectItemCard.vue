@@ -116,6 +116,19 @@ export default defineComponent({
                     {{ entity.nodes }}
                 </div>
             </div>
+            <div class="d-flex flex-grow-1 align-items-center flex-column">
+                <div>
+                    <strong><i class="fa-solid fa-user" /> Creator</strong>
+                </div>
+                <div class="h6">
+                    <template v-if="entity.user_id">
+                        {{ entity.user_id }}
+                    </template>
+                    <template v-else-if="entity.robot_id">
+                        {{ entity.robot_id }}
+                    </template>
+                </div>
+            </div>
             <!-- todo: this is only possible when authup supports user access from other realm -->
             <!--
             <div class="d-flex flex-grow-1 align-items-center flex-column">
