@@ -9,7 +9,7 @@ import type { PropType } from 'vue';
 import { defineComponent, h, ref } from 'vue';
 import type { Registry } from '@privateaim/core-kit';
 import { RegistryAPICommand } from '@privateaim/core-kit';
-import EntityDelete from '../EntityDelete';
+import EntityDelete from '../FEntityDelete';
 import MasterImageList from '../master-image/FMasterImages';
 import { injectCoreHTTPClient } from '../../core';
 

@@ -16,7 +16,7 @@ import {
     defineComponent, h, ref,
 } from 'vue';
 import { EntityListSlotName, injectCoreHTTPClient, wrapFnWithBusyState } from '../../core';
-import EntityDelete from '../EntityDelete';
+import EntityDelete from '../FEntityDelete';
 import MasterImageList from './FMasterImages';
 
 export default defineComponent({

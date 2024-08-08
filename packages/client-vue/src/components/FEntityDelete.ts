@@ -27,7 +27,7 @@ enum ElementType {
 }
 
 export default defineComponent({
-    name: 'EntityDelete',
+    name: 'FEntityDelete',
     props: {
         elementIcon: {
             type: String,

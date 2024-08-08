@@ -53,7 +53,7 @@ export const LayoutSideDefaultNavigation: NavigationItem[] = [
         name: 'Projects',
         type: 'link',
         url: '/projects',
-        icon: 'fas fa-tasks',
+        icon: 'fas fa-project-diagram',
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
         [LayoutKey.REQUIRED_PERMISSIONS]: [
             PermissionName.PROJECT_CREATE,
@@ -75,7 +75,7 @@ export const LayoutSideDefaultNavigation: NavigationItem[] = [
         name: 'Analyses',
         type: 'link',
         url: '/analyses',
-        icon: 'fa fa-bar-chart',
+        icon: 'fas fa-microscope',
         requireLoggedIn: true,
         requirePermissions: [
             PermissionName.ANALYSIS_CREATE,
