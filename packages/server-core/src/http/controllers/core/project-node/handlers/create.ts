@@ -45,7 +45,5 @@ export async function createProjectNodeRouteHandler(req: Request, res: Response)
     const projectRepository = dataSource.getRepository(ProjectEntity);
     await projectRepository.save(result.relation.project);
 
-    entity.project = result.relation.project;
-
     return sendCreated(res, entity);
 }
