@@ -66,13 +66,13 @@ export async function startCommand() {
 
     logger.info('Established database connection.');
 
-    if (!check.schema) {
-        logger.info('Applying database schema...');
+    // if (!check.schema) {
+    logger.info('Applying database schema...');
 
-        await synchronizeDatabaseSchema(dataSource);
+    await synchronizeDatabaseSchema(dataSource);
 
-        logger.info('Applied database schema.');
-    }
+    logger.info('Applied database schema.');
+    // }
 
     // if (!check.schema) {
     logger.info('Executing authup service setup...');
