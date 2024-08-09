@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.8.0](https://github.com/PrivateAIM/hub/compare/v0.8.0...v0.8.0) (2024-08-09)
+
+
+### Features
+
+* add error log formatting ([976c4cd](https://github.com/PrivateAIM/hub/commit/976c4cdf0648368b3164ba97a36cac13f99c203e))
+* add memory-cache & track master images synchronization progress ([bd43978](https://github.com/PrivateAIM/hub/commit/bd439781941e1130f812a30e721227e2893670ea))
+
+
+### Bug Fixes
+
+* change order when blocking master image sync process ([8e9efc1](https://github.com/PrivateAIM/hub/commit/8e9efc1c707ea3582fe802a8e1073b0c496d5acb))
+* **deps:** bump typeorm-extension from 3.5.1 to 3.6.0 ([#619](https://github.com/PrivateAIM/hub/issues/619)) ([7af46a3](https://github.com/PrivateAIM/hub/commit/7af46a317755cb8e1d5c26779d5d9157964ba51d))
+* **deps:** bump winston from 3.13.0 to 3.13.1 ([#563](https://github.com/PrivateAIM/hub/issues/563)) ([0fe28d4](https://github.com/PrivateAIM/hub/commit/0fe28d4d1179924cc13afe0e24b5095b9b4a2fd7))
+* do not process requeued message multiple times ([077495b](https://github.com/PrivateAIM/hub/commit/077495b69ca7f9c3dd497b2f5db15f05534b4f92))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.8.0 to ^0.8.1
+
 ## [0.8.0](https://github.com/PrivateAIM/hub/compare/v0.7.0...v0.8.0) (2024-07-02)
 
 

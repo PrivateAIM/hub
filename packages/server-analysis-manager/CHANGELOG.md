@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.8.0](https://github.com/PrivateAIM/hub/compare/v0.8.0...v0.8.0) (2024-08-09)
+
+
+### Features
+
+* allow specifying branch for syncing master-images ([#587](https://github.com/PrivateAIM/hub/issues/587)) ([b6ff9a5](https://github.com/PrivateAIM/hub/commit/b6ff9a54e8b42fcf7dfd2c1cf0e318973c0e13ec))
+* emit correct error event + adjusted directory path for building master images ([16dc3b1](https://github.com/PrivateAIM/hub/commit/16dc3b17de2444f45beab7b1d037eac971bdd2b0))
+* master image workflow to sync, build & push image/groups ([#574](https://github.com/PrivateAIM/hub/issues/574)) ([146e66f](https://github.com/PrivateAIM/hub/commit/146e66f2408ddd1363e1077a0bd189b87d5b411e))
+
+
+### Bug Fixes
+
+* **deps:** bump tar from 7.4.0 to 7.4.3 ([#606](https://github.com/PrivateAIM/hub/issues/606)) ([78a32e7](https://github.com/PrivateAIM/hub/commit/78a32e70480db136c997a050217547e976bdae65))
+* harbor reigstry robot permission assignment ([2a0a8f7](https://github.com/PrivateAIM/hub/commit/2a0a8f75df581d7cbbf3654456f3211efa654b19))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.8.0 to ^0.8.1
+    * @privateaim/core-http-kit bumped from ^0.8.0 to ^0.8.1
+    * @privateaim/server-analysis-manager-kit bumped from ^0.7.1 to ^0.8.0
+    * @privateaim/storage-kit bumped from ^0.8.0 to ^0.8.1
+
 ## [0.8.0](https://github.com/PrivateAIM/hub/compare/v0.7.0...v0.8.0) (2024-07-02)
 
 
