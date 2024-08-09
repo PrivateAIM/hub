@@ -12,3 +12,4 @@ export { default as FAnalysisNode } from './FAnalysisNode';
 export { default as FAnalysisNodes } from './FAnalysisNodes';
 export { default as FAnalysisNodeRunStatus } from './FAnalysisNodeRunStatus';
 export { default as FAnalysisNodeProgress } from './FAnalysisNodesProgress.vue';
+export { default as FAnalysisNodeInCard } from './FAnalysisNodeInCard.vue';

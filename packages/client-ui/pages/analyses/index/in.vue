@@ -17,6 +17,7 @@ import {
     FAnalysisName,
     FAnalysisNodeApprovalCommand,
     FAnalysisNodeApprovalStatus,
+    FAnalysisNodeInCard,
     FAnalysisNodeRunStatus,
     FAnalysisNodes,
     FPagination,
@@ -33,6 +34,7 @@ export default defineNuxtComponent({
         ListSearch: FSearch,
         ListTitle: FTitle,
         FAnalysisName,
+        FAnalysisNodeInCard,
         BDropdown,
         BTable,
         FAnalysisNodeRunStatus,
@@ -135,98 +137,12 @@ export default defineNuxtComponent({
                         :meta="props.meta"
                     />
                 </template>
-                <template #body="props">
-                    <BTable
-                        :items="props.data"
-                        :fields="fields"
-                        :busy="props.busy"
-                        head-variant="'dark'"
-                        outlined
-                    >
-                        <template #cell(id)="data">
-                            <template v-if="data.item.analysis">
-                                <FAnalysisName
-                                    :entity-id="data.item.analysis.id"
-                                    :entity-name="data.item.analysis.name"
-                                />
-                            </template>
-                            <template v-else>
-                                {{ data.item.analysis_id }}
-                            </template>
-                        </template>
-                        <template #cell(realm)="data">
-                            <span class="bg-dark badge">{{ data.item.analysis_realm_id }}</span>
-                        </template>
-                        <template #cell(approval_status)="data">
-                            <FAnalysisNodeApprovalStatus :status="data.item.approval_status">
-                                <template #default="statusProps">
-                                    <span
-                                        class="badge"
-                                        :class="'bg-'+statusProps.classSuffix"
-                                    >{{ statusProps.statusText }}</span>
-                                </template>
-                            </FAnalysisNodeApprovalStatus>
-                        </template>
-                        <template #cell(run_status)="data">
-                            <FAnalysisNodeRunStatus :status="data.item.run_status">
-                                <template #default="statusProps">
-                                    <span
-                                        class="badge"
-                                        :class="'bg-'+statusProps.classSuffix"
-                                    >{{ statusProps.statusText }}</span>
-                                </template>
-                            </FAnalysisNodeRunStatus>
-                        </template>
-                        <template #cell(created_at)="data">
-                            <VCTimeago :datetime="data.item.created_at" />
-                        </template>
-                        <template #cell(updated_at)="data">
-                            <VCTimeago :datetime="data.item.updated_at" />
-                        </template>
-
-                        <template #cell(options)="data">
-                            <button
-                                type="button"
-                                class="btn btn-dark btn-xs me-1"
-                                @click.prevent="download(data.item)"
-                            >
-                                <i class="fa fa-file-download" />
-                            </button>
-                            <template v-if="canManage">
-                                <b-dropdown
-                                    class="dropdown-xs"
-                                    :no-caret="true"
-                                >
-                                    <template #button-content>
-                                        <i class="fa fa-bars" />
-                                    </template>
-                                    <FAnalysisNodeApprovalCommand
-                                        :entity-id="data.item.id"
-                                        :approval-status="data.item.approval_status"
-                                        :with-icon="true"
-                                        :element-type="'dropDownItem'"
-                                        :command="'approve'"
-                                        @updated="props.updated"
-                                    />
-                                    <FAnalysisNodeApprovalCommand
-                                        :entity-id="data.item.id"
-                                        :approval-status="data.item.approval_status"
-                                        :with-icon="true"
-                                        :element-type="'dropDownItem'"
-                                        :command="'reject'"
-                                        @updated="props.updated"
-                                    />
-                                </b-dropdown>
-                            </template>
-                        </template>
-
-                        <template #table-busy>
-                            <div class="text-center text-danger my-2">
-                                <b-spinner class="align-middle" />
-                                <strong>Loading...</strong>
-                            </div>
-                        </template>
-                    </BTable>
+                <template #item="props">
+                    <FAnalysisNodeInCard
+                        :key="props.data.id"
+                        :entity="props.data"
+                        @updated="props.updated"
+                    />
                 </template>
             </FAnalysisNodes>
         </div>
