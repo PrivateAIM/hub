@@ -19,11 +19,11 @@
         "@hapic/harbor": "^2.4.0",
         "@hapic/vault": "^2.3.4",
         "@privateaim/core-kit": "^0.8.0",
-        "@privateaim/kit": "^0.8.0",
+        "@privateaim/kit": "^0.8.1",
         "@privateaim/server-kit": "^0.8.0",
-        "@privateaim/server-core-realtime": "^0.8.0",
+        "@privateaim/server-core-realtime": "^0.8.1",
         "@privateaim/server-http-kit": "^0.8.0",
-        "@privateaim/server-analysis-manager-kit": "^0.7.1",
+        "@privateaim/server-analysis-manager-kit": "^0.8.0",
         "@routup/basic": "^1.4.0",
         "@routup/decorators": "^3.4.0",
         "@routup/prometheus": "^2.4.0",
@@ -54,7 +54,7 @@
         "zod": "^3.23.7"
     },
     "devDependencies": {
-        "@privateaim/core-http-kit": "^0.8.0",
+        "@privateaim/core-http-kit": "^0.8.1",
         "@types/busboy": "^1.5.3",
         "@types/cors": "^2.8.17",
         "@types/module-alias": "^2.0.4",
