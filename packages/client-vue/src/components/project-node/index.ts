@@ -10,3 +10,4 @@ export { default as FProjectNodeApprovalStatus } from './FProjectNodeApprovalSta
 export { default as FProjectNodeAssignAction } from './FProjectNodeAssignAction';
 export { default as FProjectNode } from './FProjectNode';
 export { default as FProjectNodes } from './FProjectNodes';
+export { default as FProjectNodeInCard } from './FProjectNodeInCard.vue';

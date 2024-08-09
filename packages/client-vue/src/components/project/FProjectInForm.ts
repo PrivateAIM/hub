@@ -10,7 +10,7 @@ import { getSeverity, useTranslationsForNestedValidations } from '@ilingo/vuelid
 import type { ProjectNode } from '@privateaim/core-kit';
 import { DomainType, ProjectNodeApprovalStatus } from '@privateaim/core-kit';
 import {
-    buildFormGroup, buildFormInput, buildFormSelect,
+    buildFormGroup, buildFormSelect, buildFormTextarea,
 } from '@vuecs/form-controls';
 import useVuelidate from '@vuelidate/core';
 import { maxLength, minLength, required } from '@vuelidate/validators';
@@ -87,12 +87,13 @@ const FProjectInForm = defineComponent({
                 validationSeverity: getSeverity($v.value.comment),
                 label: true,
                 labelContent: 'Comment',
-                content: buildFormInput({
+                content: buildFormTextarea({
                     value: form.comment,
                     onChange(input) {
                         form.comment = input;
                     },
                     props: {
+                        rows: 4,
                         placeholder: 'Write a comment why you want to approve or either reject the project...',
                     },
                 }),

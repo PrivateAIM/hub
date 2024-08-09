@@ -16,7 +16,7 @@ import {
     buildDomainChannelName,
     buildDomainEventSubscriptionFullName,
 } from '@privateaim/core-kit';
-import type { FiltersBuildInput } from 'rapiq';
+import type { FiltersBuildInput, RelationsBuildInput } from 'rapiq';
 
 import type { PropType, SlotsType, VNodeChild } from 'vue';
 import { computed, defineComponent, h } from 'vue';
@@ -49,6 +49,14 @@ export default defineComponent({
         direction: {
             type: String as PropType<'in' | 'out'>,
             default: Direction.OUT,
+        },
+        includeNode: {
+            type: Boolean,
+            default: false,
+        },
+        includeProject: {
+            type: Boolean,
+            default: false,
         },
     },
     slots: Object as SlotsType<ListSlotsType<ProjectNode>>,
@@ -169,14 +177,17 @@ export default defineComponent({
                 return filter;
             },
             query: () => {
-                if (props.target === DomainType.NODE) {
-                    return {
-                        include: ['node'],
-                    };
+                const include : string[] = [];
+                if (props.target === DomainType.NODE || props.includeNode) {
+                    include.push('node');
+                }
+
+                if (props.target === DomainType.PROJECT || props.includeProject) {
+                    include.push('project');
                 }
 
                 return {
-                    include: ['project'],
+                    include: include as RelationsBuildInput<ProjectNode>,
                 };
             },
         });

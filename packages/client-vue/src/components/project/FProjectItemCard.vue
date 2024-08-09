@@ -36,7 +36,16 @@ export default defineComponent({
     slots: Object as SlotsType<{
         [EntityListSlotName.ITEM_ACTIONS]: {
             data: Project
-        }
+        },
+        header: {
+            data: Project
+        },
+        body: {
+            data: Project
+        },
+        footer: {
+            data: Project
+        },
     }>,
     setup(_props, { emit }) {
         const canDelete = useAbilityCheck(PermissionName.PROJECT_DELETE);
@@ -57,13 +66,18 @@ export default defineComponent({
         <div class="w-100">
             <div class="d-flex flex-row align-items-center">
                 <div>
-                    <i class="fas fa-project-diagram me-1" />
-                    <VCLink
-                        :to="'/projects/' + entity.id"
-                        class="mb-0"
+                    <slot
+                        name="title"
+                        :data="entity"
                     >
-                        {{ entity.name }}
-                    </VCLink>
+                        <i class="fas fa-project-diagram me-1" />
+                        <VCLink
+                            :to="'/projects/' + entity.id"
+                            class="mb-0"
+                        >
+                            {{ entity.name }}
+                        </VCLink>
+                    </slot>
                 </div>
                 <div class="ms-auto">
                     <slot
@@ -91,40 +105,44 @@ export default defineComponent({
                 </div>
             </div>
         </div>
-        <div class="d-flex justify-content-between flex-row">
-            <div class="d-flex flex-grow-1 align-items-center flex-column">
-                <div>
-                    <strong><i class="fa fa-microscope" /> Analyses</strong>
+        <slot
+            name="body"
+            :data="entity"
+        >
+            <div class="d-flex justify-content-between flex-row">
+                <div class="d-flex flex-grow-1 align-items-center flex-column">
+                    <div>
+                        <strong><i class="fa fa-microscope" /> Analyses</strong>
+                    </div>
+                    <div
+                        :class="{'text-success': entity.analyses > 0, 'text-muted': entity.analyses === 0}"
+                    >
+                        {{ entity.analyses }}
+                    </div>
                 </div>
-                <div
-                    :class="{'text-success': entity.analyses > 0, 'text-muted': entity.analyses === 0}"
-                >
-                    {{ entity.analyses }}
+                <div class="d-flex flex-grow-1 align-items-center flex-column">
+                    <div>
+                        <strong><i class="fa-solid fa-server" /> Nodes</strong>
+                    </div>
+                    <div
+                        :class="{'text-success': entity.nodes > 0, 'text-muted': entity.nodes === 0}"
+                    >
+                        {{ entity.nodes }}
+                    </div>
                 </div>
-            </div>
-            <div class="d-flex flex-grow-1 align-items-center flex-column">
-                <div>
-                    <strong><i class="fa-solid fa-server" /> Nodes</strong>
+                <div class="d-flex flex-grow-1 align-items-center flex-column">
+                    <div>
+                        <strong><i class="fa-solid fa-user" /> Creator</strong>
+                    </div>
+                    <div>
+                        <template v-if="entity.user_id">
+                            {{ entity.user_id }}
+                        </template>
+                        <template v-else-if="entity.robot_id">
+                            {{ entity.robot_id }}
+                        </template>
+                    </div>
                 </div>
-                <div
-                    :class="{'text-success': entity.nodes > 0, 'text-muted': entity.nodes === 0}"
-                >
-                    {{ entity.nodes }}
-                </div>
-            </div>
-            <div class="d-flex flex-grow-1 align-items-center flex-column">
-                <div>
-                    <strong><i class="fa-solid fa-user" /> Creator</strong>
-                </div>
-                <div>
-                    <template v-if="entity.user_id">
-                        {{ entity.user_id }}
-                    </template>
-                    <template v-else-if="entity.robot_id">
-                        {{ entity.robot_id }}
-                    </template>
-                </div>
-            </div>
             <!-- todo: this is only possible when authup supports user access from other realm -->
             <!--
             <div class="d-flex flex-grow-1 align-items-center flex-column">
@@ -140,24 +158,30 @@ export default defineComponent({
                 </div>
             </div>
             -->
-        </div>
-        <div class="d-flex flex-row">
-            <div class="">
-                <small>
-                    <span class="text-muted">
-                        created
-                    </span>
-                    <VCTimeago :datetime="entity.created_at" />
-                </small>
             </div>
-            <div class="ms-auto">
-                <small>
-                    <span class="text-muted">
-                        updated
-                    </span>
-                    <VCTimeago :datetime="entity.updated_at" />
-                </small>
+        </slot>
+        <slot
+            name="footer"
+            :data="entity"
+        >
+            <div class="d-flex flex-row">
+                <div class="">
+                    <small>
+                        <span class="text-muted">
+                            created
+                        </span>
+                        <VCTimeago :datetime="entity.created_at" />
+                    </small>
+                </div>
+                <div class="ms-auto">
+                    <small>
+                        <span class="text-muted">
+                            updated
+                        </span>
+                        <VCTimeago :datetime="entity.updated_at" />
+                    </small>
+                </div>
             </div>
-        </div>
+        </slot>
     </div>
 </template>
