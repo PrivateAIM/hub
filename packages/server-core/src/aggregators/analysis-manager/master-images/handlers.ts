@@ -12,7 +12,7 @@ import type {
 import {
     MasterImagesEvent,
 } from '@privateaim/server-analysis-manager-kit';
-import { useMemoryCache } from '@privateaim/server-kit';
+import { useLogger, useMemoryCache } from '@privateaim/server-kit';
 import type { QueueRouterHandlers } from '@privateaim/server-kit';
 import { MemoryCacheID } from '../../../constants';
 import { syncMasterImageGroups, syncMasterImages } from './utils';
@@ -28,6 +28,13 @@ export function createAnalysisManagerMasterImagesHandlers() : QueueRouterHandler
     return {
         [MasterImagesEvent.SYNCHRONIZED]: async (message) => {
             memoryCache.del(MemoryCacheID.MASTER_IMAGES);
+
+            useLogger().debug(message.data);
+
+            useLogger().debug('Synchronizing master images', {
+                groups: message.data.groups.length,
+                images: message.data.images.length,
+            });
 
             // languages
             await syncMasterImageGroups(message.data.groups);
