@@ -11,10 +11,8 @@ import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
 import { injectCoreHTTPClient } from '../../core';
 import FAnalysisName from '../analysis/FAnalysisName';
-import {
-    FAnalysisNodeApprovalCommand,
-    FAnalysisNodeApprovalStatus,
-} from './index';
+import { FAnalysisNodeApprovalCommand } from './FAnalsisNodeApprovalCommand';
+import { FAnalysisNodeApprovalStatus } from './FAnalysisNodeApprovalStatus';
 
 export default defineComponent({
     components: {

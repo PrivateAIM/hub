@@ -21,7 +21,7 @@ import {
 } from '../../core';
 import type { ActionCommandProperties } from '../../core';
 
-export default defineComponent({
+const FProjectNodeApprovalCommand = defineComponent({
     props: {
         entityId: {
             type: String,
@@ -141,3 +141,7 @@ export default defineComponent({
         });
     },
 });
+
+export {
+    FProjectNodeApprovalCommand,
+};

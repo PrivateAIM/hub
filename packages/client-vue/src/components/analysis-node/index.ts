@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export { default as FAnalysisNodeApprovalCommand } from './FAnalsisNodeApprovalCommand';
-export { default as FAnalysisNodeApprovalStatus } from './FAnalysisNodeApprovalStatus';
+export { FAnalysisNodeApprovalCommand } from './FAnalsisNodeApprovalCommand';
+export { FAnalysisNodeApprovalStatus } from './FAnalysisNodeApprovalStatus';
 export { default as FAnalysisNodeAssignAction } from './FAnalysisNodeAssignAction';
 export { default as FAnalysisNode } from './FAnalysisNode';
 export { default as FAnalysisNodes } from './FAnalysisNodes';

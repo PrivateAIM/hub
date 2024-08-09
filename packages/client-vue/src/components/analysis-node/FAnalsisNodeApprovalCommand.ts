@@ -12,7 +12,7 @@ import { computed, defineComponent, ref } from 'vue';
 import type { ActionCommandProperties } from '../../core';
 import { injectCoreHTTPClient, renderActionCommand } from '../../core';
 
-export default defineComponent({
+const FAnalysisNodeApprovalCommand = defineComponent({
     props: {
         entityId: {
             type: String,
@@ -139,3 +139,7 @@ export default defineComponent({
         });
     },
 });
+
+export {
+    FAnalysisNodeApprovalCommand,
+};

@@ -9,7 +9,7 @@ import { computed, defineComponent, h } from 'vue';
 import { AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
 import { hasNormalizedSlot, normalizeSlot } from '../../core';
 
-export default defineComponent({
+const FAnalysisNodeApprovalStatus = defineComponent({
     props: {
         status: {
             type: String as PropType<AnalysisNodeApprovalStatus>,
@@ -49,3 +49,7 @@ export default defineComponent({
         return () => h('span', { class: `text-${classSuffix.value}` }, statusText.value);
     },
 });
+
+export {
+    FAnalysisNodeApprovalStatus,
+};

@@ -11,7 +11,8 @@ import type { ProjectNode } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { FProjectInForm } from '../project/FProjectInForm';
-import { FProjectNodeApprovalCommand, FProjectNodeApprovalStatus } from './index';
+import { FProjectNodeApprovalCommand } from './FProjectNodeApprovalCommand';
+import { FProjectNodeApprovalStatus } from './FProjectNodeApprovalStatus';
 
 export default defineComponent({
     components: {

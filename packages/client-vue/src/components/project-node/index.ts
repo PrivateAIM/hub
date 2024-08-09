@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export { default as FProjectNodeApprovalCommand } from './FProjectNodeApprovalCommand';
-export { default as FProjectNodeApprovalStatus } from './FProjectNodeApprovalStatus';
+export { FProjectNodeApprovalCommand } from './FProjectNodeApprovalCommand';
+export { FProjectNodeApprovalStatus } from './FProjectNodeApprovalStatus';
 export { default as FProjectNodeAssignAction } from './FProjectNodeAssignAction';
 export { default as FProjectNode } from './FProjectNode';
 export { default as FProjectNodes } from './FProjectNodes';

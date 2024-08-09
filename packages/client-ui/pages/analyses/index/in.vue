@@ -14,11 +14,7 @@ import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
 import { computed, ref } from 'vue';
 import {
-    FAnalysisName,
-    FAnalysisNodeApprovalCommand,
-    FAnalysisNodeApprovalStatus,
     FAnalysisNodeInCard,
-    FAnalysisNodeRunStatus,
     FAnalysisNodes,
     FPagination,
     FSearch,
@@ -33,13 +29,9 @@ export default defineNuxtComponent({
         ListPagination: FPagination,
         ListSearch: FSearch,
         ListTitle: FTitle,
-        FAnalysisName,
         FAnalysisNodeInCard,
         BDropdown,
         BTable,
-        FAnalysisNodeRunStatus,
-        FAnalysisNodeApprovalCommand,
-        FAnalysisNodeApprovalStatus,
         FAnalysisNodes,
         VCTimeago,
     },
