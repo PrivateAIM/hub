@@ -17,15 +17,14 @@ export type ReturnContext<T> = {
 };
 
 export async function syncMasterImages(
-    entities: Image[],
+    input: Image[],
 ) : Promise<ReturnContext<MasterImage>> {
     const dataSource = await useDataSource();
 
-    const virtualPaths : string[] = entities.map((entity) => entity.virtualPath);
+    const virtualPaths = input.map((entity) => entity.virtualPath);
 
     const repository = dataSource.getRepository(MasterImageEntity);
-    const dbEntities = await repository.createQueryBuilder()
-        .getMany();
+    const entities = await repository.find();
 
     const context : ReturnContext<MasterImage> = {
         created: [],
@@ -33,40 +32,40 @@ export async function syncMasterImages(
         deleted: [],
     };
 
-    context.deleted = dbEntities
+    context.deleted = entities
         .filter((image) => virtualPaths.indexOf(image.virtual_path) === -1);
 
-    for (let i = 0; i < entities.length; i++) {
-        const parts = entities[i].virtualPath.split('/');
+    for (let i = 0; i < input.length; i++) {
+        const parts = input[i].virtualPath.split('/');
         parts.pop();
 
         const data : Partial<MasterImage> = {
-            name: entities[i].name,
-            path: entities[i].path,
+            name: input[i].name,
+            path: input[i].path,
             group_virtual_path: parts.join('/'),
+            virtual_path: input[i].virtualPath,
         };
 
-        if (typeof entities[i].command === 'string') {
-            data.command = entities[i].command;
+        if (typeof input[i].command === 'string') {
+            data.command = input[i].command;
         }
 
-        if (typeof entities[i].command_arguments !== 'undefined') {
-            data.command_arguments = entities[i].commandArguments;
+        if (typeof input[i].command_arguments !== 'undefined') {
+            data.command_arguments = input[i].commandArguments;
         }
 
-        const index = dbEntities.findIndex((dbEntity) => dbEntity.virtual_path === entities[i].virtualPath);
+        const index = entities.findIndex(
+            (entity) => entity.virtual_path === data.virtual_path,
+        );
         if (index === -1) {
-            context.created.push(repository.create({
-                virtual_path: entities[i].virtualPath,
-                ...data,
-            }));
+            context.created.push(repository.create(data));
         } else {
-            context.updated.push(repository.merge(dbEntities[index], data));
+            context.updated.push(repository.merge(entities[index], data));
         }
     }
 
     if (context.created.length > 0) {
-        await repository.insert(context.created);
+        await repository.save(context.created);
     }
 
     if (context.updated.length > 0) {
@@ -74,22 +73,21 @@ export async function syncMasterImages(
     }
 
     if (context.deleted.length > 0) {
-        await repository.delete(context.deleted.map((entry) => entry.id));
+        await repository.remove(context.deleted);
     }
 
     return context;
 }
 
 export async function syncMasterImageGroups(
-    entities: Group[],
+    input: Group[],
 ) : Promise<ReturnContext<MasterImageGroup>> {
     const dataSource = await useDataSource();
 
-    const dirVirtualPaths : string[] = entities.map((entity) => entity.virtualPath);
+    const dirVirtualPaths : string[] = input.map((entity) => entity.virtualPath);
 
     const repository = dataSource.getRepository(MasterImageGroupEntity);
-    const dbEntities = await repository.createQueryBuilder()
-        .getMany();
+    const entities = await repository.find();
 
     const context : ReturnContext<MasterImageGroup> = {
         created: [],
@@ -97,36 +95,38 @@ export async function syncMasterImageGroups(
         deleted: [],
     };
 
-    context.deleted = dbEntities
-        .filter((image) => dirVirtualPaths.indexOf(image.virtual_path) === -1);
+    // db entries which does not exist anymore
+    context.deleted = entities.filter(
+        (image) => dirVirtualPaths.indexOf(image.virtual_path) === -1,
+    );
 
-    for (let i = 0; i < entities.length; i++) {
+    for (let i = 0; i < input.length; i++) {
         const data : Partial<MasterImageGroup> = {
-            name: entities[i].name,
-            path: entities[i].path,
+            name: input[i].name,
+            path: input[i].path,
         };
 
-        if (typeof entities[i].command === 'string') {
-            data.command = entities[i].command;
+        if (typeof input[i].command === 'string') {
+            data.command = input[i].command;
         }
 
-        if (typeof entities[i].command_arguments !== 'undefined') {
-            data.command_arguments = entities[i].commandArguments;
+        if (typeof input[i].command_arguments !== 'undefined') {
+            data.command_arguments = input[i].commandArguments;
         }
 
-        const index = dbEntities.findIndex((dbEntity) => dbEntity.virtual_path === entities[i].virtualPath);
+        const index = entities.findIndex((dbEntity) => dbEntity.virtual_path === input[i].virtualPath);
         if (index === -1) {
             context.created.push(repository.create({
-                virtual_path: entities[i].virtualPath,
+                virtual_path: input[i].virtualPath,
                 ...data,
             }));
         } else {
-            context.updated.push(repository.merge(dbEntities[index], data));
+            context.updated.push(repository.merge(entities[index], data));
         }
     }
 
     if (context.created.length > 0) {
-        await repository.insert(context.created);
+        await repository.save(context.created);
     }
 
     if (context.updated.length > 0) {
@@ -134,7 +134,7 @@ export async function syncMasterImageGroups(
     }
 
     if (context.deleted.length > 0) {
-        await repository.delete(context.deleted.map((entry) => entry.id));
+        await repository.remove(context.deleted);
     }
 
     return context;

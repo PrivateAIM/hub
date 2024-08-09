@@ -122,7 +122,7 @@ export default defineComponent({
                             />
                         </button>
                         <VCLink
-                            :to="'/projects/' + entity.id"
+                            :to="'/analyses/' + entity.id"
                             :disabled="busy"
                             class="btn btn-xs btn-dark ms-1"
                         >

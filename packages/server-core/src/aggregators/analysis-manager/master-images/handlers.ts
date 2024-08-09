@@ -15,7 +15,7 @@ import {
 import { useLogger, useMemoryCache } from '@privateaim/server-kit';
 import type { QueueRouterHandlers } from '@privateaim/server-kit';
 import { MemoryCacheID } from '../../../constants';
-import { syncMasterImageGroups, syncMasterImages } from './utils';
+import { syncMasterImageGroups, syncMasterImages } from './synchronize';
 
 export function createAnalysisManagerMasterImagesHandlers() : QueueRouterHandlers<{
     [MasterImagesEvent.SYNCHRONIZED]: MaterImagesSynchronizedEventPayload,
@@ -29,18 +29,24 @@ export function createAnalysisManagerMasterImagesHandlers() : QueueRouterHandler
         [MasterImagesEvent.SYNCHRONIZED]: async (message) => {
             memoryCache.del(MemoryCacheID.MASTER_IMAGES);
 
-            useLogger().debug(message.data);
-
             useLogger().debug('Synchronizing master images', {
                 groups: message.data.groups.length,
                 images: message.data.images.length,
             });
 
             // languages
-            await syncMasterImageGroups(message.data.groups);
+            const imageGroups = await syncMasterImageGroups(message.data.groups);
+
+            useLogger().info(`Created ${imageGroups.created.length} master image groups`);
+            useLogger().info(`Updated ${imageGroups.updated.length} master image groups`);
+            useLogger().info(`Deleted ${imageGroups.deleted.length} master image groups`);
 
             // images
-            await syncMasterImages(message.data.images);
+            const images = await syncMasterImages(message.data.images);
+
+            useLogger().info(`Created ${images.created.length} master images`);
+            useLogger().info(`Updated ${images.updated.length} master images`);
+            useLogger().info(`Deleted ${images.deleted.length} master images`);
         },
         [MasterImagesEvent.BUILD_FAILED]: () => {
             memoryCache.del(MemoryCacheID.MASTER_IMAGES);
