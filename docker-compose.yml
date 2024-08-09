@@ -159,6 +159,7 @@ services:
             DB_DATABASE: 'core'
             SKIP_PROJECT_APPROVAL: true
             SKIP_ANALYSIS_APPROVAL: true
+            MASTER_IMAGES_BRANCH: ${MASTER_IMAGES_BRANCH:-master}
         networks:
             hub:
     messenger:
