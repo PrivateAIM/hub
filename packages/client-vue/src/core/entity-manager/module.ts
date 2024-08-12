@@ -21,7 +21,6 @@ import type { EntitySocket, EntitySocketContext } from '../entity-socket';
 import { createEntitySocket } from '../entity-socket';
 import { extendObjectProperties } from '../object';
 import { hasNormalizedSlot, normalizeSlot } from '../slot';
-import { EntityManagerError } from './error';
 import type {
     EntityManager, EntityManagerContext, EntityManagerRenderFn, EntityManagerResolveContext,
 } from './type';
@@ -405,7 +404,6 @@ export function createEntityManager<
         failed,
 
         render: () => undefined,
-        renderError: () => undefined,
     };
 
     if (

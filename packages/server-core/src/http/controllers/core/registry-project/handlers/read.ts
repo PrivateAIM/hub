@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionName } from '@privateaim/kit';
 import { useRequestQuery } from '@routup/basic/query';
 import type { ParseAllowedOption } from 'rapiq';
 import { parseQueryFields } from 'rapiq';
@@ -20,7 +19,7 @@ import {
     applySort,
     useDataSource,
 } from 'typeorm-extension';
-import { ForbiddenError, NotFoundError } from '@ebec/http';
+import { NotFoundError } from '@ebec/http';
 import { useRequestEnv } from '@privateaim/server-http-kit';
 import { RegistryProjectEntity, onlyRealmWritableQueryResources } from '../../../../../domains';
 
@@ -55,15 +54,16 @@ function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>, field
             protectedFields.indexOf(field.key as any) !== -1);
 
     if (protectedSelected.length > 0) {
+        // todo: re enable this as soon as possible
+        /*
         const ability = useRequestEnv(req, 'abilities');
-        if (
-            !ability.has(PermissionName.REGISTRY_PROJECT_MANAGE)
-        ) {
+        if (!ability.has(PermissionName.REGISTRY_PROJECT_MANAGE)) {
             throw new ForbiddenError(
                 `You are not permitted to read the restricted fields: ${
                     protectedSelected.map((field) => field.key).join(', ')}`,
             );
         }
+        */
 
         onlyRealmWritableQueryResources(query, useRequestEnv(req, 'realm'));
     }
