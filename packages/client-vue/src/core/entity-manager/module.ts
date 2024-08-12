@@ -290,7 +290,7 @@ export function createEntityManager<
     resolveByProps();
 
     const resolve = async (resolveCtx: EntityManagerResolveContext<T> = {}) => {
-        if (entity.value) {
+        if (entity.value && !resolveCtx.reset) {
             return;
         }
 
@@ -385,22 +385,8 @@ export function createEntityManager<
         }
     };
 
-    const resolveOrFail = async (resolveContext: EntityManagerResolveContext<T> = {}) => {
-        await resolve(resolveContext);
-
-        if (typeof entity.value === 'undefined') {
-            if (!error.value) {
-                throw EntityManagerError.unresolvable();
-            }
-
-            // eslint-disable-next-line no-throw-literal
-            throw error.value as Error;
-        }
-    };
-
     const manager : EntityManager<T> = {
         resolve,
-        resolveOrFail,
         lockId,
         busy,
         data: entity,
@@ -422,36 +408,43 @@ export function createEntityManager<
         renderError: () => undefined,
     };
 
+    if (
+        ctx.setup &&
+        ctx.setup.expose
+    ) {
+        ctx.setup.expose(manager);
+    }
+
     manager.render = (content?: VNodeChild | EntityManagerRenderFn): VNodeChild => {
         if (!ctx.setup || !ctx.setup.slots) {
-            return typeof content === 'function' ?
-                content() :
-                content;
-        }
+            if (entity.value) {
+                return typeof content === 'function' ?
+                    content() :
+                    content;
+            }
 
-        if (hasNormalizedSlot('default', ctx.setup.slots)) {
-            return normalizeSlot(
-                'default',
-                buildEntityManagerSlotProps(manager),
-                ctx.setup.slots,
-            );
-        }
-
-        return typeof content === 'function' ?
-            content() :
-            content;
-    };
-
-    manager.renderError = (error: unknown) : VNodeChild => {
-        if (!ctx.setup || !ctx.setup.slots) {
             return undefined;
         }
 
-        if (
+        if (entity.value) {
+            if (hasNormalizedSlot('default', ctx.setup.slots)) {
+                return normalizeSlot(
+                    'default',
+                    buildEntityManagerSlotProps(manager),
+                    ctx.setup.slots,
+                );
+            }
+        } else if (
             isObject(error) &&
             hasNormalizedSlot('error', ctx.setup.slots)
         ) {
             return normalizeSlot('error', error, ctx.setup.slots);
+        }
+
+        if (entity.value) {
+            return typeof content === 'function' ?
+                content() :
+                content;
         }
 
         return undefined;

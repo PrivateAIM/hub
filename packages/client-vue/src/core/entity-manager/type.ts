@@ -29,6 +29,7 @@ export type EntityManagerRenderFn = () => VNodeChild;
 
 export type EntityManagerResolveContext<T> = {
     id?: EntityID<T>,
+    reset?: boolean,
     query?: T extends Record<string, any> ? BuildInput<T> : never
 };
 
@@ -46,9 +47,7 @@ export type EntityManager<T> = {
     deleted(entity?: T) : void;
     failed(e: Error) : void;
     resolve(ctx?: EntityManagerResolveContext<T>) : Promise<void>;
-    resolveOrFail(ctx?: EntityManagerResolveContext<T>) : Promise<void>;
     render(content?: VNodeChild | EntityManagerRenderFn) : VNodeChild;
-    renderError(error: unknown) : VNodeChild;
 };
 
 export type EntityManagerProps<T> = {

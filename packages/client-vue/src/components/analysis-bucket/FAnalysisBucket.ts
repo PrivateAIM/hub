@@ -31,12 +31,8 @@ export default defineComponent({
             props,
         });
 
-        try {
-            await manager.resolveOrFail();
+        await manager.resolve();
 
-            return () => manager.render();
-        } catch (e) {
-            return () => manager.renderError(e);
-        }
+        return () => manager.render();
     },
 });

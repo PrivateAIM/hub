@@ -9,7 +9,7 @@ import { AnalysisBucketType } from '@privateaim/core-kit';
 import type { Analysis, AnalysisBucket, AnalysisBucketFile } from '@privateaim/core-kit';
 import type { FiltersBuildInput } from 'rapiq';
 import {
-    type PropType, computed, defineComponent,
+    type PropType, computed, defineComponent, ref,
 } from 'vue';
 import FAnalysisBucketFileManager from '../../analysis-bucket-file/FAnalysisBucketFileManager.vue';
 import FAnalysisBucket from '../../analysis-bucket/FAnalysisBucket';
@@ -32,6 +32,7 @@ export default defineComponent({
     },
     emits: ['failed', 'entrypointChanged'],
     setup(props, { emit }) {
+        const analysisBucketNode = ref<typeof FAnalysisBucket | null>(null);
         const queryFilters = computed(() => ({
             analysis_id: props.entity.id,
             type: AnalysisBucketType.CODE,
@@ -45,17 +46,29 @@ export default defineComponent({
             emit('entrypointChanged', e);
         };
 
+        const retry = () => {
+            if (analysisBucketNode.value) {
+                analysisBucketNode.value.resolve({ reset: true });
+            }
+        };
+
         return {
             handleFailed,
             handleEntrypointChanged,
             queryFilters,
+
+            analysisBucketNode,
+            retry,
         };
     },
 });
 </script>
 <template>
     <div>
-        <FAnalysisBucket :query-filters="queryFilters">
+        <FAnalysisBucket
+            ref="analysisBucketNode"
+            :query-filters="queryFilters"
+        >
             <template #default="{ data: bucket }">
                 <span>Entrypoint Command</span>
                 <br>
@@ -75,7 +88,17 @@ export default defineComponent({
             </template>
             <template #error>
                 <div class="alert alert-sm alert-warning">
-                    The code bucket does not exist. Therefore, no files can be uploaded.
+                    <p>
+                        The code bucket does not exist. Therefore, no files can be uploaded.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="btn btn-xs btn-dark"
+                        @click.prevent="retry"
+                    >
+                        <i class="fas fa-rotate-right" /> Retry
+                    </button>
                 </div>
             </template>
         </FAnalysisBucket>

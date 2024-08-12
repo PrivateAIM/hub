@@ -295,7 +295,7 @@ export default defineComponent({
                     :style="props.fillButtonStyle"
                     @click.native="handleWizardFinishedEvent"
                 >
-                    Lock
+                    Finish
                 </WizardButton>
             </div>
         </template>
