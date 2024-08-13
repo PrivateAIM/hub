@@ -42,7 +42,6 @@ export default defineComponent({
         }, form);
 
         const translationsValidation = useTranslationsForNestedValidations($v.value);
-
         const translationsSubmit = createFormSubmitTranslations();
 
         return () => h(ARobot, {

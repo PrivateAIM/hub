@@ -37,7 +37,9 @@ export async function buildDockerImage(
 
     const options : ImageBuildOptions = {
         t: context.imageName,
+        nocache: true,
     };
+
     if (context.authConfig) {
         options.authconfig = context.authConfig;
     }
