@@ -1,0 +1,20 @@
+global:
+    imagePullPolicy: "Always"
+
+mysql:
+    nameOverride: "hub-mysql"
+    image:
+        pullPolicy: "Always"
+    auth:
+        rootPassword: "start123"
+        replicationPassword: "start123"
+    secondary:
+        persistence:
+            enabled: true
+            size: 8Gi
+        replicaCount: 2
+    primary:
+        persistence:
+            enabled: true
+            size: 8Gi
+    architecture: "replication"
