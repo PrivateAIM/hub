@@ -2,6 +2,9 @@ dependencies:
 - name: mysql
   repository: https://charts.bitnami.com/bitnami
   version: 11.1.15
+- name: redis
+  repository: https://charts.bitnami.com/bitnami
+  version: 20.0.2
 - name: authup-server-core
   repository: file://../authup-server-core
   version: 0.1.0
@@ -11,5 +14,5 @@ dependencies:
 - name: hub-server-core
   repository: file://../hub-server-core
   version: 0.1.0
-digest: sha256:7c2a09e77dccd122af2dc4b32b299bc6eeedfefada3933c82de3a18023ea7bb4
-generated: "2024-08-14T16:32:54.0609282+02:00"
+digest: sha256:912078b73d91df0fd9c17c6611c94389400a8ac03229c33db59ea07d1ee8cb28
+generated: "2024-08-15T11:34:48.4455155+02:00"

@@ -23,6 +23,13 @@ spec:
                   '-c',
                   'until nc -z -v -w30 {{ .Release.Name }}-hub-mysql-primary 3306; do echo "Waiting for db..."; sleep 5; done'
               ]
+          -   name: wait-for-redis
+              image: busybox
+              command: [
+                  'sh',
+                  '-c',
+                  'until nc -z -v -w30 {{ .Release.Name }}-hub-redis-master 6379; do echo "Waiting for redis..."; sleep 5; done'
+              ]
           -   name: wait-for-authup
               image: busybox
               command: [
@@ -38,6 +45,8 @@ spec:
             - containerPort: 3000
               protocol: TCP
           env:
+              -   name: REDIS
+                  value: "redis://default:{{ .Values.global.redis.password }}@{{ .Release.Name }}-hub-redis-master"
               -   name: AUTHUP_URL
                   value: "http://{{ .Release.Name }}-authup-server-core:3000/"
               -   name: SKIP_PROJECT_APPROVAL

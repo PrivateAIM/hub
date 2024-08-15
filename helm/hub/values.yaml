@@ -1,6 +1,14 @@
 global:
     imagePullPolicy: "Always"
 
+    redis:
+        password: "start123"
+
+redis:
+    nameOverride: "hub-redis"
+    auth:
+        enabled: true
+
 mysql:
     nameOverride: "hub-mysql"
     image:
