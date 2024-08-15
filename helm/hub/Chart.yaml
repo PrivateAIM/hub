@@ -23,6 +23,10 @@ dependencies:
         version: 20.0.2
         repository: https://charts.bitnami.com/bitnami
 
+    -   name: rabbitmq
+        version: 14.6.6
+        repository: https://charts.bitnami.com/bitnami
+
     -   name: authup-server-core
         repository: file://../authup-server-core
         version: 0.1.0

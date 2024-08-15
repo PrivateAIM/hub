@@ -4,6 +4,12 @@ global:
     redis:
         password: "start123"
 
+rabbitmq:
+    nameOverride: "hub-rabbitmq"
+    auth:
+        username: "root"
+        password: "start123"
+
 redis:
     nameOverride: "hub-redis"
     auth:
