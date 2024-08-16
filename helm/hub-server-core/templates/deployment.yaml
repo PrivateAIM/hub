@@ -15,6 +15,7 @@ spec:
       labels:
         app: "{{ .Release.Name }}-hub-server-core"
     spec:
+      restartPolicy: Always
       initContainers:
           -   name: wait-for-db
               image: busybox
@@ -37,6 +38,13 @@ spec:
                   '-c',
                   'until nc -z -v -w30 {{ .Release.Name }}-hub-rabbitmq 5672; do echo "Waiting for rabbitmq..."; sleep 5; done'
               ]
+          -   name: wait-for-vault
+              image: busybox
+              command: [
+                  'sh',
+                  '-c',
+                  'until nc -z -v -w30 {{ .Release.Name }}-vault 8200; do echo "Waiting for vault..."; sleep 5; done'
+              ]
           -   name: wait-for-authup
               image: busybox
               command: [
@@ -54,6 +62,8 @@ spec:
           env:
               -   name: REDIS_CONNECTION_STRING
                   value: "redis://default:{{ .Values.global.redis.password }}@{{ .Release.Name }}-hub-redis-master"
+              -   name: VAULT_CONNECTION_STRING
+                  value: "start123@http://{{ .Release.Name }}-vault:8200/v1/"
               -   name: RABBITMQ_CONNECTION_STRING
                   value: "amqp://root:start123@{{ .Release.Name }}-hub-rabbitmq"
               -   name: AUTHUP_URL
@@ -90,6 +100,5 @@ spec:
                   port: 3000
               periodSeconds: 10
               timeoutSeconds: 10
-      restartPolicy: Always
 
 

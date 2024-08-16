@@ -15,6 +15,7 @@ spec:
       labels:
         app: "{{ .Release.Name }}-hub-client-ui"
     spec:
+      restartPolicy: Always
       containers:
         - name: "{{ .Release.Name }}-hub-client-ui"
           image: "ghcr.io/privateaim/hub:latest"
@@ -54,6 +55,5 @@ spec:
                   port: 3000
               periodSeconds: 10
               timeoutSeconds: 10
-      restartPolicy: Always
 
 

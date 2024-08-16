@@ -4,6 +4,13 @@ global:
     redis:
         password: "start123"
 
+vault:
+    server:
+        enabled: true
+        dev:
+            enabled: true
+            devRootToken: start123
+
 rabbitmq:
     nameOverride: "hub-rabbitmq"
     auth:
@@ -14,6 +21,12 @@ redis:
     nameOverride: "hub-redis"
     auth:
         enabled: true
+
+minio:
+    nameOverride: "hub-minio"
+    auth:
+        rootUser: "admin"
+        rootPassword: "start123"
 
 mysql:
     nameOverride: "hub-mysql"

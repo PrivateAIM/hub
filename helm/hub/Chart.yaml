@@ -27,8 +27,16 @@ dependencies:
         version: 14.6.6
         repository: https://charts.bitnami.com/bitnami
 
-    -   name: authup-server-core
-        repository: file://../authup-server-core
+    -   name: minio
+        version: 14.7.0
+        repository: https://charts.bitnami.com/bitnami
+
+    -   name: vault
+        version: 0.28.1
+        repository: https://helm.releases.hashicorp.com
+
+    -   name: authup
+        repository: file://../third-party/authup
         version: 0.1.0
 
     -   name: hub-client-ui
@@ -37,4 +45,12 @@ dependencies:
 
     -   name: hub-server-core
         repository: file://../hub-server-core
+        version: 0.1.0
+
+    -   name: hub-server-messenger
+        repository: file://../hub-server-messenger
+        version: 0.1.0
+
+    -   name: hub-server-storage
+        repository: file://../hub-server-storage
         version: 0.1.0

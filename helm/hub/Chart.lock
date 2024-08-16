@@ -8,8 +8,14 @@ dependencies:
 - name: rabbitmq
   repository: https://charts.bitnami.com/bitnami
   version: 14.6.6
-- name: authup-server-core
-  repository: file://../authup-server-core
+- name: minio
+  repository: https://charts.bitnami.com/bitnami
+  version: 14.7.0
+- name: vault
+  repository: https://helm.releases.hashicorp.com
+  version: 0.28.1
+- name: authup
+  repository: file://../third-party/authup
   version: 0.1.0
 - name: hub-client-ui
   repository: file://../hub-client-ui
@@ -17,5 +23,11 @@ dependencies:
 - name: hub-server-core
   repository: file://../hub-server-core
   version: 0.1.0
-digest: sha256:4bedf9be168eddb467427a6f46218e19304bd3d82cb4fbeeb36de81ad85302be
-generated: "2024-08-15T12:15:08.9587485+02:00"
+- name: hub-server-messenger
+  repository: file://../hub-server-messenger
+  version: 0.1.0
+- name: hub-server-storage
+  repository: file://../hub-server-storage
+  version: 0.1.0
+digest: sha256:c9a933fc72bf11d4dee74ee1e331cf25c0e08f924be891255c7b3d10cc80b82a
+generated: "2024-08-15T17:51:04.3555556+02:00"
