@@ -7,6 +7,7 @@
 
 import { CTSMessagingEventName, STCMessagingEventName } from '@privateaim/messenger-kit';
 import type { MessagingParty } from '@privateaim/messenger-kit';
+import { useLogger } from '@privateaim/server-kit';
 import type { Socket } from '../../types';
 import { buildConnectionRobotRoom, buildConnectionUserRoom } from '../connection';
 
@@ -28,8 +29,13 @@ export function mountMessagingController(socket: Socket) {
                 id: socket.data.robotId,
             };
         }
+
         for (let i = 0; i < data.to.length; i++) {
             const to = data.to[i];
+
+            useLogger()
+                .info(`Sending message from ${from.id} (${from.type}) to ${to.id} (${to.type})`);
+
             if (to.type === 'user') {
                 socket.in(buildConnectionUserRoom(to.id))
                     .emit(STCMessagingEventName.SEND, {
