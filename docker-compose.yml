@@ -127,6 +127,7 @@ services:
             VAULT: start123@http://vault:8090/v1/
             REDIS: redis://redis
             PUBLIC_URL: ${AUTHUP_PUBLIC_URL:-http://localhost:3000/auth/}
+            COOKIE_DOMAIN: ${COOKIE_DOMAIN:-localhost}
             AUTHORIZE_REDIRECT_URL: ${PUBLIC_URL:-http://localhost:3000/}
             ROBOT_ADMIN_ENABLED: true
         networks:
@@ -238,6 +239,7 @@ services:
             storage:
                 condition: service_healthy
         environment:
+            NUXT_PUBLIC_COOKIE_DOMAIN: ${COOKIE_DOMAIN:-localhost}
             NUXT_STORAGE_URL: http://storage:3000/
             NUXT_PUBLIC_STORAGE_URL: ${STORAGE_PUBLIC_URL:-http://localhost:3000/storage/}
             NUXT_CORE_URL: http://core:3000/

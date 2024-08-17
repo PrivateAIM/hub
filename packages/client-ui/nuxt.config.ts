@@ -22,6 +22,7 @@ export default defineNuxtConfig({
             coreRealtimeTransports: process.env.CORE_REALTIME_TRANSPORTS,
             storageUrl: process.env.STORAGE_URL,
             authupUrl: process.env.AUTHUP_URL,
+            cookieDomain: process.env.COOKIE_DOMAIN,
         },
     },
     telemetry: false,

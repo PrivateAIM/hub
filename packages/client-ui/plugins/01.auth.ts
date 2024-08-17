@@ -19,27 +19,32 @@ export default defineNuxtPlugin({
             baseURL = runtimeConfig.public.authupUrl;
         }
 
+        const cookieOptions : { domain?: string } = {};
+        if (typeof runtimeConfig.public.cookieDomain === 'string') {
+            cookieOptions.domain = runtimeConfig.public.cookieDomain;
+        }
+
         ctx.vueApp.use(install, {
             pinia: ctx.$pinia as Pinia,
             baseURL,
             cookieSet: (key, value) => {
                 const app = tryUseNuxtApp();
                 if (app) {
-                    const cookie = useCookie(key);
+                    const cookie = useCookie(key, cookieOptions);
                     cookie.value = value;
                 }
             },
             cookieUnset: (key) => {
                 const app = tryUseNuxtApp();
                 if (app) {
-                    const cookie = useCookie(key);
+                    const cookie = useCookie(key, cookieOptions);
                     cookie.value = null;
                 }
             },
             cookieGet: (key) => {
                 const app = tryUseNuxtApp();
                 if (app) {
-                    const cookie = useCookie(key);
+                    const cookie = useCookie(key, cookieOptions);
                     return cookie.value;
                 }
 
