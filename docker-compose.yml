@@ -41,6 +41,8 @@ services:
             interval: 3s
             timeout: 5s
             retries: 5
+        volumes:
+            -  minio:/data
         ports:
             - '9000:9000'
         environment:
@@ -62,8 +64,6 @@ services:
         environment:
             RABBITMQ_DEFAULT_USER: root
             RABBITMQ_DEFAULT_PASS: start123
-        volumes:
-            -  minio:/data
         networks:
             hub:
     vault:
