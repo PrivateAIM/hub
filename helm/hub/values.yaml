@@ -4,6 +4,14 @@ global:
     redis:
         password: "start123"
 
+    hub:
+        hostname: "localhost"
+
+ingress:
+    enabled: true
+
+## services
+
 vault:
     server:
         enabled: true

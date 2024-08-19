@@ -1,0 +1,46 @@
+{{- if .Values.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+    name: {{ .Release.Name }}-hub
+spec:
+    rules:
+        - host: {{ .Values.global.hub.hostname }}
+          http:
+              paths:
+                  - path: /
+                    pathType: "Prefix"
+                    backend:
+                        service:
+                            name: {{ .Release.Name }}-hub-client-ui
+                            port:
+                                number: 3000
+                  - path: /core(/|$)(.*)
+                    pathType: "Prefix"
+                    backend:
+                        service:
+                            name: {{ .Release.Name }}-hub-server-core
+                            port:
+                                number: 3000
+                  - path: /messenger(/|$)(.*)
+                    pathType: "Prefix"
+                    backend:
+                        service:
+                            name: {{ .Release.Name }}-hub-server-messenger
+                            port:
+                                number: 3000
+                  - path: /storage(/|$)(.*)
+                    pathType: "Prefix"
+                    backend:
+                        service:
+                            name: {{ .Release.Name }}-hub-server-storage
+                            port:
+                                number: 3000
+                  - path: /auth(/|$)(.*)
+                    pathType: "Prefix"
+                    backend:
+                        service:
+                            name: {{ .Release.Name }}-authup-server-core
+                            port:
+                                number: 3000
+{{- end }}
