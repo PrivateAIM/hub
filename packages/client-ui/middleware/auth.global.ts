@@ -6,7 +6,7 @@
  */
 
 import { useStore } from '@authup/client-web-kit';
-import { hasOwnProperty } from '@privateaim/kit';
+import { hasOwnProperty, isObject } from '@privateaim/kit';
 import { storeToRefs } from 'pinia';
 import type { RouteLocationNormalized } from 'vue-router';
 import {
@@ -51,7 +51,8 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 
     if (
         typeof from !== 'undefined' &&
-        from.fullPath !== to.fullPath
+        from.fullPath !== to.fullPath &&
+        !from.fullPath.startsWith('/?redirect')
     ) {
         redirectPath = from.fullPath;
     }
