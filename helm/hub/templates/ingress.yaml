@@ -3,44 +3,47 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
     name: {{ .Release.Name }}-hub
+    annotations:
+        nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
     rules:
         - host: {{ .Values.global.hub.hostname }}
           http:
               paths:
-                  - path: /
-                    pathType: "Prefix"
-                    backend:
-                        service:
-                            name: {{ .Release.Name }}-hub-client-ui
-                            port:
-                                number: 3000
                   - path: /core(/|$)(.*)
-                    pathType: "Prefix"
+                    pathType: "ImplementationSpecific"
                     backend:
                         service:
                             name: {{ .Release.Name }}-hub-server-core
                             port:
                                 number: 3000
                   - path: /messenger(/|$)(.*)
-                    pathType: "Prefix"
+                    pathType: "ImplementationSpecific"
                     backend:
                         service:
                             name: {{ .Release.Name }}-hub-server-messenger
                             port:
                                 number: 3000
                   - path: /storage(/|$)(.*)
-                    pathType: "Prefix"
+                    pathType: "ImplementationSpecific"
                     backend:
                         service:
                             name: {{ .Release.Name }}-hub-server-storage
                             port:
                                 number: 3000
                   - path: /auth(/|$)(.*)
-                    pathType: "Prefix"
+                    pathType: "ImplementationSpecific"
                     backend:
                         service:
                             name: {{ .Release.Name }}-authup-server-core
+                            port:
+                                number: 3000
+
+                  - path: /
+                    pathType: "ImplementationSpecific"
+                    backend:
+                        service:
+                            name: {{ .Release.Name }}-hub-client-ui
                             port:
                                 number: 3000
 {{- end }}

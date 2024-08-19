@@ -60,3 +60,36 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+core publicURL
+*/}}
+{{- define "core.publicURL" -}}
+{{- if .Values.core.hostname }}
+http://{{- .Values.core.hostname }}
+{{- else }}
+http://{{ .Values.global.hub.hostname }}/core
+{{- end }}
+{{- end }}
+
+{{/*
+storage publicURL
+*/}}
+{{- define "storage.publicURL" -}}
+{{- if .Values.storage.hostname }}
+http://{{- .Values.storage.hostname }}
+{{- else }}
+http://{{ .Values.global.hub.hostname }}/storage
+{{- end }}
+{{- end }}
+
+{{/*
+authup publicURL
+*/}}
+{{- define "authup.publicURL" -}}
+{{- if .Values.authup.hostname }}
+http://{{- .Values.authup.hostname }}
+{{- else }}
+http://{{ .Values.global.hub.hostname }}/auth
+{{- end }}
+{{- end }}

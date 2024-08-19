@@ -28,15 +28,15 @@ spec:
               -   name: NUXT_STORAGE_URL
                   value: "http://{{ .Release.Name }}-hub-server-storage:3000/"
               -   name: NUXT_PUBLIC_STORAGE_URL
-                  value: "http://{{ .Release.Name }}-hub-server-storage:3000/"
+                  value: {{ include "storage.publicURL" . | quote }}
               -   name: NUXT_CORE_URL
                   value: "http://{{ .Release.Name }}-hub-server-core:3000/"
               -   name: NUXT_PUBLIC_CORE_URL
-                  value: "http://{{ .Release.Name }}-hub-server-core:3000/"
+                  value: {{ include "core.publicURL" . | quote }}
               -   name: NUXT_AUTHUP_URL
                   value: "http://{{ .Release.Name }}-authup-server-core:3000/"
               -   name: NUXT_PUBLIC_AUTHUP_URL
-                  value: "http://{{ .Release.Name }}-authup-server-core:3000/"
+                  value: {{ include "authup.publicURL" . | quote }}
           resources:
               requests:
                   memory: "512Mi"
