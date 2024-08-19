@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.8.1](https://github.com/PrivateAIM/hub/compare/v0.8.0...v0.8.1) (2024-08-19)
+
+
+### Bug Fixes
+
+* add transaction logs between parties ([514d722](https://github.com/PrivateAIM/hub/commit/514d722172807db9e68bbc19508391d3251dc565))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/messenger-kit bumped from ^0.7.1 to ^0.7.2
+    * @privateaim/server-kit bumped from ^0.8.0 to ^0.8.1
+    * @privateaim/server-realtime-kit bumped from ^0.8.0 to ^0.8.1
+
 ## [0.8.0](https://github.com/PrivateAIM/hub/compare/v0.7.0...v0.8.0) (2024-07-02)
 
 

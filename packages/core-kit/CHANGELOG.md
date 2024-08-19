@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.8.1](https://github.com/PrivateAIM/hub/compare/v0.8.0...v0.8.1) (2024-08-19)
+
+
+### Features
+
+* add description column to analysis entity ([438297b](https://github.com/PrivateAIM/hub/commit/438297beacbb264d3a8034f5a4a79fef7dff1d33))
+* extended and modified project columns (nodes, robot_id, user_id, description) ([#642](https://github.com/PrivateAIM/hub/issues/642)) ([afe9491](https://github.com/PrivateAIM/hub/commit/afe9491c84f98193fe5158fe2c51ec06a247921f))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.8.0 to ^0.8.1
+  * peerDependencies
+    * @privateaim/kit bumped from ^0.8.0 to ^0.8.1
+
 ## [0.8.0](https://github.com/PrivateAIM/hub/compare/v0.7.0...v0.8.0) (2024-07-02)
 
 
