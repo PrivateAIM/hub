@@ -1,5 +1,69 @@
 # Changelog
 
+## [0.8.1](https://github.com/PrivateAIM/hub/compare/v0.8.0...v0.8.1) (2024-08-19)
+
+
+### Features
+
+* add authup policy aggregator ([adb2235](https://github.com/PrivateAIM/hub/commit/adb22356c177dea09a7e722786f92e13f57481bd))
+* add description column to analysis entity ([438297b](https://github.com/PrivateAIM/hub/commit/438297beacbb264d3a8034f5a4a79fef7dff1d33))
+* add error log formatting ([976c4cd](https://github.com/PrivateAIM/hub/commit/976c4cdf0648368b3164ba97a36cac13f99c203e))
+* add memory-cache & track master images synchronization progress ([bd43978](https://github.com/PrivateAIM/hub/commit/bd439781941e1130f812a30e721227e2893670ea))
+* add project form description field ([66f2aff](https://github.com/PrivateAIM/hub/commit/66f2affa8bae402618d75fad3225ed0e49bf970a))
+* adjust analysis details view ([d80ac5c](https://github.com/PrivateAIM/hub/commit/d80ac5c41c1faf77290d7d986d785d8deabcbdff))
+* allow specifying branch for syncing master-images ([#587](https://github.com/PrivateAIM/hub/issues/587)) ([b6ff9a5](https://github.com/PrivateAIM/hub/commit/b6ff9a54e8b42fcf7dfd2c1cf0e318973c0e13ec))
+* allow specifying cookie domain ([fb52746](https://github.com/PrivateAIM/hub/commit/fb527465b2842ba8b2d8856c66775cc7a0b879aa))
+* emit correct error event + adjusted directory path for building master images ([16dc3b1](https://github.com/PrivateAIM/hub/commit/16dc3b17de2444f45beab7b1d037eac971bdd2b0))
+* enable recheck in analysis-wizard if storage bucket is not yet available ([cc88e5f](https://github.com/PrivateAIM/hub/commit/cc88e5f5f43cee3e3baf6aadbc6843027af89d5c))
+* extended and modified project columns (nodes, robot_id, user_id, description) ([#642](https://github.com/PrivateAIM/hub/issues/642)) ([afe9491](https://github.com/PrivateAIM/hub/commit/afe9491c84f98193fe5158fe2c51ec06a247921f))
+* initial refactoring of analysis incoming view ([10425af](https://github.com/PrivateAIM/hub/commit/10425af18fcaedf9569876590bd7f4fc1fcf2a92))
+* initial refactoring of projects incoming view ([c524618](https://github.com/PrivateAIM/hub/commit/c5246185847c3f8d83d9ac22cfecd62f7351392b))
+* master image workflow to sync, build & push image/groups ([#574](https://github.com/PrivateAIM/hub/issues/574)) ([146e66f](https://github.com/PrivateAIM/hub/commit/146e66f2408ddd1363e1077a0bd189b87d5b411e))
+* prettify project details view ([a788ba8](https://github.com/PrivateAIM/hub/commit/a788ba8868d86d4987a48ac141527d04d5fa289a))
+* public & private service URLs for client-ui ([d5c2d41](https://github.com/PrivateAIM/hub/commit/d5c2d41b83a57d9acb14f0649988e11a55d7b726))
+* refactored analyses & projects list view ([#639](https://github.com/PrivateAIM/hub/issues/639)) ([ee7a6e7](https://github.com/PrivateAIM/hub/commit/ee7a6e7a1f5d3d12c0726d543337c728d4fb0138))
+* set nocache options for docker build ([bff52ad](https://github.com/PrivateAIM/hub/commit/bff52ada573cd1ecd8efff722f1164d842dfe145))
+
+
+### Bug Fixes
+
+* add missing rethrow statement ([d73935a](https://github.com/PrivateAIM/hub/commit/d73935aedbf347e6cf280a49cb1b2986c43cad8d))
+* add transaction logs between parties ([514d722](https://github.com/PrivateAIM/hub/commit/514d722172807db9e68bbc19508391d3251dc565))
+* always run db schema synchronization ([b3ba492](https://github.com/PrivateAIM/hub/commit/b3ba4926bc69af70fa94f4004d8c64b40101f116))
+* analysis-manager aggregator handler ([8fe18e4](https://github.com/PrivateAIM/hub/commit/8fe18e46d29586cd75f0cf936108b4edc9411392))
+* analysis-permisison permission_id field validation ([051ab7e](https://github.com/PrivateAIM/hub/commit/051ab7e2b5b8d10672d66d94635b233eb85d48b3))
+* apply schema check again ([7e820e6](https://github.com/PrivateAIM/hub/commit/7e820e665e91c8a61b2684c4d47474cacac1a11a))
+* bump nuxt to v3.12.3 and fix corrseponding issues ([312420b](https://github.com/PrivateAIM/hub/commit/312420bce1620b032cb4e752011058dd21a1dcbd))
+* change order when blocking master image sync process ([8e9efc1](https://github.com/PrivateAIM/hub/commit/8e9efc1c707ea3582fe802a8e1073b0c496d5acb))
+* **deps:** bump express-validator from 7.1.0 to 7.2.0 ([#654](https://github.com/PrivateAIM/hub/issues/654)) ([1b1d70e](https://github.com/PrivateAIM/hub/commit/1b1d70e759c94d05fc1ae7098f308275735ce971))
+* **deps:** bump mysql2 from 3.10.2 to 3.11.0 ([#610](https://github.com/PrivateAIM/hub/issues/610)) ([3786b07](https://github.com/PrivateAIM/hub/commit/3786b079bc2d65cdf87b982e4d937cb283f78aad))
+* **deps:** bump tar from 7.4.0 to 7.4.3 ([#606](https://github.com/PrivateAIM/hub/issues/606)) ([78a32e7](https://github.com/PrivateAIM/hub/commit/78a32e70480db136c997a050217547e976bdae65))
+* **deps:** bump typeorm-extension from 3.5.1 to 3.6.0 ([#619](https://github.com/PrivateAIM/hub/issues/619)) ([7af46a3](https://github.com/PrivateAIM/hub/commit/7af46a317755cb8e1d5c26779d5d9157964ba51d))
+* **deps:** bump typeorm-extension from 3.6.0 to 3.6.1 ([#652](https://github.com/PrivateAIM/hub/issues/652)) ([c862af7](https://github.com/PrivateAIM/hub/commit/c862af75dec7d42e3da9c50761e7ab61225a1c8f))
+* **deps:** bump winston from 3.13.0 to 3.13.1 ([#563](https://github.com/PrivateAIM/hub/issues/563)) ([0fe28d4](https://github.com/PrivateAIM/hub/commit/0fe28d4d1179924cc13afe0e24b5095b9b4a2fd7))
+* **deps:** bump winston from 3.13.1 to 3.14.1 ([#647](https://github.com/PrivateAIM/hub/issues/647)) ([768e839](https://github.com/PrivateAIM/hub/commit/768e83904ca74d343c43a173f040b1ed6ebf9c82))
+* **deps:** downgrade eslint to v8.x ([6d3a24d](https://github.com/PrivateAIM/hub/commit/6d3a24d3dfbdfe46bc2ba4609b21c40046d70992))
+* disable no-cache option ([cbf0cf2](https://github.com/PrivateAIM/hub/commit/cbf0cf2ece1e932b0fc946606bc2bb1e2988b31f))
+* do not process requeued message multiple times ([077495b](https://github.com/PrivateAIM/hub/commit/077495b69ca7f9c3dd497b2f5db15f05534b4f92))
+* enhance logging for registry component ([b1a8bb3](https://github.com/PrivateAIM/hub/commit/b1a8bb3b80aa4d00398a3624677d4401f701b134))
+* harbor reigstry robot permission assignment ([2a0a8f7](https://github.com/PrivateAIM/hub/commit/2a0a8f75df581d7cbbf3654456f3211efa654b19))
+* master images synchronization process ([604a375](https://github.com/PrivateAIM/hub/commit/604a375b525e73d17c208731dd7256ea30412d57))
+* minor cleanup in project item card view ([d16fea6](https://github.com/PrivateAIM/hub/commit/d16fea6c9822912b68009e39f885d924bdb87477))
+* naming in project read handlers ([fb03369](https://github.com/PrivateAIM/hub/commit/fb0336995dfe5482762b6f6a019b25106722cd89))
+* project list in analysis basic form ([27e7f72](https://github.com/PrivateAIM/hub/commit/27e7f72c10f4a5284ab04cde09a1c68f7b64d7a3))
+* reenable db check in start command ([c83f34f](https://github.com/PrivateAIM/hub/commit/c83f34f101b225356b515da23948d56a36107585))
+* set project description column to varchar ([dea15b0](https://github.com/PrivateAIM/hub/commit/dea15b027a02153f6300690be9d0d8ba8fab3add))
+* set volume mount to correct container ([d227f70](https://github.com/PrivateAIM/hub/commit/d227f705af9c9c3b7f5e1531212d82abb060a554))
+* show error message on realm creation ([c41942c](https://github.com/PrivateAIM/hub/commit/c41942c135a63590334c9661dcc16bb57ecc97b9))
+* temporarily disable registry project manage restriction ([8f8d8dd](https://github.com/PrivateAIM/hub/commit/8f8d8dd88ea917cf3b967232107487170bcdbaf9))
+* use non default export for {analysis,project}-node command & status ([ad74cf6](https://github.com/PrivateAIM/hub/commit/ad74cf625143e4f81d45d6894b86e47c725ad52c))
+
+
+### Reverts
+
+* "chore: set mysql version to v8" ([078d334](https://github.com/PrivateAIM/hub/commit/078d334f10bc63646185a0371adf13b072719006))
+* "fix: set project description column to varchar" ([705454c](https://github.com/PrivateAIM/hub/commit/705454cc51d3fd943cbcb32b9c4eff64758ae7aa))
+
 ## [0.8.0](https://github.com/PrivateAIM/hub/compare/v0.7.0...v0.8.0) (2024-07-02)
 
 

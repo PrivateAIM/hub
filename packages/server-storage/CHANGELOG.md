@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.8.1](https://github.com/PrivateAIM/hub/compare/v0.8.0...v0.8.1) (2024-08-19)
+
+
+### Bug Fixes
+
+* **deps:** bump express-validator from 7.1.0 to 7.2.0 ([#654](https://github.com/PrivateAIM/hub/issues/654)) ([1b1d70e](https://github.com/PrivateAIM/hub/commit/1b1d70e759c94d05fc1ae7098f308275735ce971))
+* **deps:** bump mysql2 from 3.10.2 to 3.11.0 ([#610](https://github.com/PrivateAIM/hub/issues/610)) ([3786b07](https://github.com/PrivateAIM/hub/commit/3786b079bc2d65cdf87b982e4d937cb283f78aad))
+* **deps:** bump typeorm-extension from 3.5.1 to 3.6.0 ([#619](https://github.com/PrivateAIM/hub/issues/619)) ([7af46a3](https://github.com/PrivateAIM/hub/commit/7af46a317755cb8e1d5c26779d5d9157964ba51d))
+* **deps:** bump typeorm-extension from 3.6.0 to 3.6.1 ([#652](https://github.com/PrivateAIM/hub/issues/652)) ([c862af7](https://github.com/PrivateAIM/hub/commit/c862af75dec7d42e3da9c50761e7ab61225a1c8f))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.8.0 to ^0.8.1
+    * @privateaim/server-kit bumped from ^0.8.0 to ^0.8.1
+    * @privateaim/server-http-kit bumped from ^0.8.0 to ^0.8.1
+    * @privateaim/storage-kit bumped from ^0.8.0 to ^0.8.1
+
 ## [0.8.0](https://github.com/PrivateAIM/hub/compare/v0.7.0...v0.8.0) (2024-07-02)
 
 
