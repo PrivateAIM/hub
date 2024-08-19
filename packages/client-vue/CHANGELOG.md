@@ -1,5 +1,41 @@
 # Changelog
 
+## [0.8.0](https://github.com/PrivateAIM/hub/compare/v0.8.0...v0.8.0) (2024-08-19)
+
+
+### Features
+
+* add description column to analysis entity ([438297b](https://github.com/PrivateAIM/hub/commit/438297beacbb264d3a8034f5a4a79fef7dff1d33))
+* add project form description field ([66f2aff](https://github.com/PrivateAIM/hub/commit/66f2affa8bae402618d75fad3225ed0e49bf970a))
+* allow specifying branch for syncing master-images ([#587](https://github.com/PrivateAIM/hub/issues/587)) ([b6ff9a5](https://github.com/PrivateAIM/hub/commit/b6ff9a54e8b42fcf7dfd2c1cf0e318973c0e13ec))
+* enable recheck in analysis-wizard if storage bucket is not yet available ([cc88e5f](https://github.com/PrivateAIM/hub/commit/cc88e5f5f43cee3e3baf6aadbc6843027af89d5c))
+* initial refactoring of analysis incoming view ([10425af](https://github.com/PrivateAIM/hub/commit/10425af18fcaedf9569876590bd7f4fc1fcf2a92))
+* initial refactoring of projects incoming view ([c524618](https://github.com/PrivateAIM/hub/commit/c5246185847c3f8d83d9ac22cfecd62f7351392b))
+* master image workflow to sync, build & push image/groups ([#574](https://github.com/PrivateAIM/hub/issues/574)) ([146e66f](https://github.com/PrivateAIM/hub/commit/146e66f2408ddd1363e1077a0bd189b87d5b411e))
+* refactored analyses & projects list view ([#639](https://github.com/PrivateAIM/hub/issues/639)) ([ee7a6e7](https://github.com/PrivateAIM/hub/commit/ee7a6e7a1f5d3d12c0726d543337c728d4fb0138))
+* set nocache options for docker build ([bff52ad](https://github.com/PrivateAIM/hub/commit/bff52ada573cd1ecd8efff722f1164d842dfe145))
+
+
+### Bug Fixes
+
+* bump nuxt to v3.12.3 and fix corrseponding issues ([312420b](https://github.com/PrivateAIM/hub/commit/312420bce1620b032cb4e752011058dd21a1dcbd))
+* master images synchronization process ([604a375](https://github.com/PrivateAIM/hub/commit/604a375b525e73d17c208731dd7256ea30412d57))
+* minor cleanup in project item card view ([d16fea6](https://github.com/PrivateAIM/hub/commit/d16fea6c9822912b68009e39f885d924bdb87477))
+* project list in analysis basic form ([27e7f72](https://github.com/PrivateAIM/hub/commit/27e7f72c10f4a5284ab04cde09a1c68f7b64d7a3))
+* temporarily disable registry project manage restriction ([8f8d8dd](https://github.com/PrivateAIM/hub/commit/8f8d8dd88ea917cf3b967232107487170bcdbaf9))
+* use non default export for {analysis,project}-node command & status ([ad74cf6](https://github.com/PrivateAIM/hub/commit/ad74cf625143e4f81d45d6894b86e47c725ad52c))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.8.0 to ^0.8.1
+    * @privateaim/core-http-kit bumped from ^0.8.0 to ^0.8.1
+    * @privateaim/storage-kit bumped from ^0.8.0 to ^0.8.1
+  * peerDependencies
+    * @privateaim/storage-kit bumped from ^0.8.0 to ^0.8.1
+
 ## [0.8.0](https://github.com/PrivateAIM/hub/compare/v0.7.0...v0.8.0) (2024-07-02)
 
 

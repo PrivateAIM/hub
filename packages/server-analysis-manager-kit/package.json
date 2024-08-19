@@ -1,6 +1,6 @@
 {
     "name": "@privateaim/server-analysis-manager-kit",
-    "version": "0.7.1",
+    "version": "0.8.0",
     "license": "Apache-2.0",
     "description": "",
     "exports": {
@@ -27,7 +27,7 @@
     },
     "dependencies": {
         "@privateaim/core-kit": "^0.8.0",
-        "@privateaim/kit": "^0.8.0",
+        "@privateaim/kit": "^0.8.1",
         "@privateaim/server-kit": "^0.8.0"
     },
     "devDependencies": {

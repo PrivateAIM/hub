@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.8.0](https://github.com/PrivateAIM/hub/compare/v0.8.0...v0.8.0) (2024-08-19)
+
+
+### Features
+
+* adjust analysis details view ([d80ac5c](https://github.com/PrivateAIM/hub/commit/d80ac5c41c1faf77290d7d986d785d8deabcbdff))
+* allow specifying cookie domain ([fb52746](https://github.com/PrivateAIM/hub/commit/fb527465b2842ba8b2d8856c66775cc7a0b879aa))
+* initial refactoring of analysis incoming view ([10425af](https://github.com/PrivateAIM/hub/commit/10425af18fcaedf9569876590bd7f4fc1fcf2a92))
+* initial refactoring of projects incoming view ([c524618](https://github.com/PrivateAIM/hub/commit/c5246185847c3f8d83d9ac22cfecd62f7351392b))
+* prettify project details view ([a788ba8](https://github.com/PrivateAIM/hub/commit/a788ba8868d86d4987a48ac141527d04d5fa289a))
+* public & private service URLs for client-ui ([d5c2d41](https://github.com/PrivateAIM/hub/commit/d5c2d41b83a57d9acb14f0649988e11a55d7b726))
+* refactored analyses & projects list view ([#639](https://github.com/PrivateAIM/hub/issues/639)) ([ee7a6e7](https://github.com/PrivateAIM/hub/commit/ee7a6e7a1f5d3d12c0726d543337c728d4fb0138))
+
+
+### Bug Fixes
+
+* bump nuxt to v3.12.3 and fix corrseponding issues ([312420b](https://github.com/PrivateAIM/hub/commit/312420bce1620b032cb4e752011058dd21a1dcbd))
+* show error message on realm creation ([c41942c](https://github.com/PrivateAIM/hub/commit/c41942c135a63590334c9661dcc16bb57ecc97b9))
+* use non default export for {analysis,project}-node command & status ([ad74cf6](https://github.com/PrivateAIM/hub/commit/ad74cf625143e4f81d45d6894b86e47c725ad52c))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.8.0 to ^0.8.1
+    * @privateaim/storage-kit bumped from ^0.8.0 to ^0.8.1
+
 ## [0.8.0](https://github.com/PrivateAIM/hub/compare/v0.7.0...v0.8.0) (2024-07-02)
 
 
