@@ -54,3 +54,7 @@ dependencies:
     -   name: hub-server-storage
         repository: file://../hub-server-storage
         version: 0.1.0
+
+    -   name: hub-server-analysis-manager
+        repository: file://../hub-server-analysis-manager
+        version: 0.1.0

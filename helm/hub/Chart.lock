@@ -29,5 +29,8 @@ dependencies:
 - name: hub-server-storage
   repository: file://../hub-server-storage
   version: 0.1.0
-digest: sha256:c9a933fc72bf11d4dee74ee1e331cf25c0e08f924be891255c7b3d10cc80b82a
-generated: "2024-08-15T17:51:04.3555556+02:00"
+- name: hub-server-analysis-manager
+  repository: file://../hub-server-analysis-manager
+  version: 0.1.0
+digest: sha256:ca732c53486d1774332a1b3248735c327bae9c6738520fa590ed8540063c0ef2
+generated: "2024-08-19T11:47:26.0838507+02:00"
