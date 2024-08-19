@@ -6,7 +6,7 @@
  */
 
 import { useStore } from '@authup/client-web-kit';
-import { hasOwnProperty, isObject } from '@privateaim/kit';
+import { hasOwnProperty } from '@privateaim/kit';
 import { storeToRefs } from 'pinia';
 import type { RouteLocationNormalized } from 'vue-router';
 import {
@@ -43,33 +43,52 @@ function checkPermission(route: RouteLocationNormalized, has: (name: string) => 
     return isAllowed;
 }
 
+type RedirectPathBuildContext = {
+    location?: RouteLocationNormalized,
+    excluded?: string[]
+};
+function buildRedirectPath(
+    context: RedirectPathBuildContext = {},
+) : string | undefined {
+    if (!context.location || context.location.query.redirect) {
+        return undefined;
+    }
+
+    if (context.excluded) {
+        for (let i = 0; i < context.excluded.length; i++) {
+            if (context.location.fullPath.startsWith(context.excluded[i])) {
+                return undefined;
+            }
+        }
+    }
+
+    return context.location.fullPath;
+}
+
 export default defineNuxtRouteMiddleware(async (to, from) => {
     const store = useStore();
     const { loggedIn } = storeToRefs(store);
-
-    let redirectPath = '/login';
-
-    if (
-        typeof from !== 'undefined' &&
-        from.fullPath !== to.fullPath &&
-        !from.fullPath.startsWith('/?redirect')
-    ) {
-        redirectPath = from.fullPath;
-    }
 
     try {
         await store.resolve();
     } catch (e) {
         store.logout();
 
-        if (
-            !to.fullPath.startsWith('/logout') &&
-            !to.fullPath.startsWith('/login')
-        ) {
+        const redirect = buildRedirectPath({
+            location: to,
+            excluded: [
+                '/logout',
+                '/login',
+            ],
+        });
+
+        if (redirect) {
+            console.log(`Resolving failed, redirecting to /logout?redirect=${redirect}`);
+
             return navigateTo({
                 path: '/logout',
                 query: {
-                    redirect: redirectPath,
+                    redirect,
                 },
             });
         }
@@ -81,14 +100,20 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
         to.matched.some((matched) => !!matched.meta[LayoutKey.REQUIRED_LOGGED_IN])
     ) {
         if (!loggedIn.value) {
-            const query : Record<string, any> = {};
-
-            if (
-                !to.fullPath.startsWith('/logout') &&
-                !to.fullPath.startsWith('/login')
-            ) {
-                query.redirect = to.fullPath;
+            const query : Record<string, string> = {};
+            const redirect = buildRedirectPath({
+                location: to,
+                excluded: [
+                    '/logout',
+                    '/login',
+                    '/',
+                ],
+            });
+            if (redirect) {
+                query.redirect = redirect;
             }
+
+            console.log(`Not loggedIn, redirecting to /login${redirect ? `?redirect=${redirect}` : ''}`);
 
             return navigateTo({
                 path: '/login',
@@ -102,25 +127,38 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     ) {
         const permitted = checkPermission(to, (name) => store.abilities.has(name));
         if (!permitted) {
+            const path = from ? from.fullPath : '/';
+            console.log(`Not permitted, redirecting to ${path}`);
+            // go back to the previous path if defined.
             return navigateTo({
-                path: redirectPath,
+                path,
             });
         }
     }
 
-    if (
-        !to.fullPath.startsWith('/logout') &&
-        to.matched.some((matched) => matched.meta[LayoutKey.REQUIRED_LOGGED_OUT])
-    ) {
-        const query : Record<string, any> = {};
-        if (!redirectPath.includes('logout')) {
-            query.redirect = redirectPath;
-        }
-
+    if (to.matched.some((matched) => matched.meta[LayoutKey.REQUIRED_LOGGED_OUT])) {
         if (loggedIn.value) {
+            const query : Record<string, string> = {};
+            const redirect = buildRedirectPath({
+                location: from,
+                excluded: [
+                    '/logout',
+                    '/login',
+                ],
+            });
+
+            if (redirect) {
+                query.redirect = redirect;
+            }
+
+            console.log(`Not loggedOut, redirecting to /logout${redirect ? `?redirect=${redirect}` : ''}`);
+
+            // logout and then go to the desired path.
             return navigateTo({
                 path: '/logout',
-                query,
+                query: {
+                    redirect,
+                },
             });
         }
     }
