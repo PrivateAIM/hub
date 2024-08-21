@@ -2,7 +2,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-    name: {{ .Release.Name }}-hub
+    name: {{ .Release.Name }}-hub-sub-paths
     annotations:
         nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
@@ -38,9 +38,18 @@ spec:
                             name: {{ .Release.Name }}-authup-server-core
                             port:
                                 number: 3000
-
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+    name: {{ .Release.Name }}-hub-root-path
+spec:
+    rules:
+        - host: {{ .Values.global.hub.hostname }}
+          http:
+              paths:
                   - path: /
-                    pathType: "ImplementationSpecific"
+                    pathType: "Prefix"
                     backend:
                         service:
                             name: {{ .Release.Name }}-hub-client-ui

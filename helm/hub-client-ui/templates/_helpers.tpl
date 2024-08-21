@@ -68,7 +68,7 @@ core publicURL
 {{- if .Values.core.hostname }}
 http://{{- .Values.core.hostname }}
 {{- else }}
-http://{{ .Values.global.hub.hostname }}/core
+http://{{ .Values.global.hub.hostname }}/core/
 {{- end }}
 {{- end }}
 
@@ -79,7 +79,7 @@ storage publicURL
 {{- if .Values.storage.hostname }}
 http://{{- .Values.storage.hostname }}
 {{- else }}
-http://{{ .Values.global.hub.hostname }}/storage
+http://{{ .Values.global.hub.hostname }}/storage/
 {{- end }}
 {{- end }}
 
@@ -90,6 +90,6 @@ authup publicURL
 {{- if .Values.authup.hostname }}
 http://{{- .Values.authup.hostname }}
 {{- else }}
-http://{{ .Values.global.hub.hostname }}/auth
+http://{{ .Values.global.hub.hostname }}/auth/
 {{- end }}
 {{- end }}
