@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ .Release.Name }}-hub-analysis-manager"
+  labels:
+    app: "{{ .Release.Name }}-hub-analysis-manager"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "{{ .Release.Name }}-hub-analysis-manager"
+  template:
+    metadata:
+      name: "{{ .Release.Name }}-hub-analysis-manager"
+      labels:
+        app: "{{ .Release.Name }}-hub-analysis-manager"
+    spec:
+      restartPolicy: Always
+      initContainers:
+          -   name: wait-for-rabbitmq
+              image: busybox
+              command: [
+                  'sh',
+                  '-c',
+                  'until nc -z -v -w30 {{ .Release.Name }}-hub-rabbitmq 5672; do echo "Waiting for rabbitmq..."; sleep 5; done'
+              ]
+          -   name: wait-for-vault
+              image: busybox
+              command: [
+                  'sh',
+                  '-c',
+                  'until nc -z -v -w30 {{ .Release.Name }}-vault 8200; do echo "Waiting for vault..."; sleep 5; done'
+              ]
+          -   name: wait-for-authup
+              image: busybox
+              command: [
+                  'sh',
+                  '-c',
+                  'until nc -z -v -w30 {{ .Release.Name }}-authup-server-core 3000; do echo "Waiting for authup..."; sleep 5; done'
+              ]
+      containers:
+        - name: "{{ .Release.Name }}-hub-analysis-manager"
+          image: "ghcr.io/privateaim/hub:latest"
+          args: ['analysis-manager', 'start']
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+          env:
+              -   name: REDIS_CONNECTION_STRING
+                  value: "redis://default:{{ .Values.global.redis.password }}@{{ .Release.Name }}-hub-redis-master"
+              -   name: VAULT_CONNECTION_STRING
+                  value: "start123@http://{{ .Release.Name }}-vault:8200/v1/"
+              -   name: RABBITMQ_CONNECTION_STRING
+                  value: "amqp://root:start123@{{ .Release.Name }}-hub-rabbitmq"
+              -   name: AUTHUP_URL
+                  value: "http://{{ .Release.Name }}-authup-server-core:3000/"
+              -   name: CORE_URL
+                  value: "http://{{ .Release.Name }}-hub-server-core:3000/"
+              -   name: STORAGE_URL
+                  value: "http://{{ .Release.Name }}-hub-server-storage:3000/"
+          volumeMounts:
+              -   mountPath: "/var/run/docker.sock"
+                  name: "{{ .Release.Name }}-hub-analysis-manager-docker-volume"
+          readinessProbe:
+              httpGet:
+                  path: "/"
+                  port: 3000
+              initialDelaySeconds: 60
+              periodSeconds: 5
+              timeoutSeconds: 10
+          livenessProbe:
+              httpGet:
+                  path: "/"
+                  port: 3000
+              periodSeconds: 10
+              timeoutSeconds: 10
+      volumes:
+          -   name: "{{ .Release.Name }}-hub-analysis-manager-docker-volume"
+              hostPath:
+                  path: "/var/run/docker.sock"
+                  type: "Socket"
+
+

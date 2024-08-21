@@ -1,0 +1,9 @@
+global:
+    redis:
+        password: "start123"
+
+ingress:
+    enabled: false
+    hostname: ""
+    path: ""
+    pathType: "Prefix"

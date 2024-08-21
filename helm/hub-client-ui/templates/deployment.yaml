@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ .Release.Name }}-hub-client-ui"
+  labels:
+    app: "{{ .Release.Name }}-hub-client-ui"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: "{{ .Release.Name }}-hub-client-ui"
+  template:
+    metadata:
+      name: "{{ .Release.Name }}-hub-client-ui"
+      labels:
+        app: "{{ .Release.Name }}-hub-client-ui"
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: "{{ .Release.Name }}-hub-client-ui"
+          image: "ghcr.io/privateaim/hub:latest"
+          args: ["ui", "start"]
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+          env:
+              -   name: NUXT_STORAGE_URL
+                  value: "http://{{ .Release.Name }}-hub-server-storage:3000/"
+              -   name: NUXT_PUBLIC_STORAGE_URL
+                  value: {{ include "storage.publicURL" . | quote }}
+              -   name: NUXT_CORE_URL
+                  value: "http://{{ .Release.Name }}-hub-server-core:3000/"
+              -   name: NUXT_PUBLIC_CORE_URL
+                  value: {{ include "core.publicURL" . | quote }}
+              -   name: NUXT_AUTHUP_URL
+                  value: "http://{{ .Release.Name }}-authup-server-core:3000/"
+              -   name: NUXT_PUBLIC_AUTHUP_URL
+                  value: {{ include "authup.publicURL" . | quote }}
+          resources:
+              requests:
+                  memory: "512Mi"
+              limits:
+                  memory: "2048Mi"
+          readinessProbe:
+              httpGet:
+                  path: "/"
+                  port: 3000
+              initialDelaySeconds: 60
+              periodSeconds: 5
+              timeoutSeconds: 10
+          livenessProbe:
+              httpGet:
+                  path: "/"
+                  port: 3000
+              periodSeconds: 10
+              timeoutSeconds: 10
+
+

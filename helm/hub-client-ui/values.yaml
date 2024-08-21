@@ -1,0 +1,15 @@
+global:
+    hub:
+        hostname: "localhost"
+
+authup:
+    hostname: ""
+
+core:
+    hostname: ""
+
+messenger:
+    hostname: ""
+
+storage:
+    hostname: ""

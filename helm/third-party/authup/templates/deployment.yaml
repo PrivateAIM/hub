@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ .Release.Name }}-authup-server-core"
+  labels:
+    app: "{{ .Release.Name }}-authup-server-core"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "{{ .Release.Name }}-authup-server-core"
+  template:
+    metadata:
+      name: "{{ .Release.Name }}-authup-server-core"
+      labels:
+        app: "{{ .Release.Name }}-authup-server-core"
+    spec:
+      restartPolicy: Always
+      initContainers:
+          -   name: wait-for-db
+              image: busybox
+              command: [
+                  'sh',
+                  '-c',
+                  'until nc -z -v -w30 {{ .Release.Name }}-hub-mysql-primary 3306; do echo "Waiting for db..."; sleep 5; done'
+              ]
+          -   name: wait-for-redis
+              image: busybox
+              command: [
+                  'sh',
+                  '-c',
+                  'until nc -z -v -w30 {{ .Release.Name }}-hub-redis-master 6379; do echo "Waiting for redis..."; sleep 5; done'
+              ]
+          -   name: wait-for-vault
+              image: busybox
+              command: [
+                  'sh',
+                  '-c',
+                  'until nc -z -v -w30 {{ .Release.Name }}-vault 8200; do echo "Waiting for vault..."; sleep 5; done'
+              ]
+      containers:
+        - name: "{{ .Release.Name }}-authup-server-core"
+          image: "authup/authup:latest"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+          env:
+              -   name: VAULT
+                  value: "start123@http://{{ .Release.Name }}-vault:8200/v1/"
+              -   name: REDIS
+                  value: "redis://default:{{ .Values.global.redis.password }}@{{ .Release.Name }}-hub-redis-master"
+              -   name: ROBOT_ADMIN_ENABLED
+                  value: "true"
+              -   name: DB_TYPE
+                  value: "mysql"
+              -   name: DB_HOST
+                  value: "{{ .Release.Name }}-hub-mysql-primary"
+              -   name: DB_USERNAME
+                  value: "root"
+              -   name: DB_PASSWORD
+                  value: "start123"
+              -   name: DB_DATABASE
+                  value: "auth"
+          resources:
+              requests:
+                  memory: "512Mi"
+              limits:
+                  memory: "2048Mi"
+          readinessProbe:
+              httpGet:
+                  path: "/"
+                  port: 3000
+              initialDelaySeconds: 60
+              periodSeconds: 5
+              timeoutSeconds: 10
+          livenessProbe:
+              httpGet:
+                  path: "/"
+                  port: 3000
+              periodSeconds: 10
+              timeoutSeconds: 10
+
+
