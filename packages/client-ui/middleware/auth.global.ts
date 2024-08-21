@@ -106,7 +106,6 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
                 excluded: [
                     '/logout',
                     '/login',
-                    '/',
                 ],
             });
             if (redirect) {
