@@ -11,7 +11,6 @@ import { AnalysisBucketType } from '@privateaim/core-kit';
 import type { BuildInput } from 'rapiq';
 import type { PropType } from 'vue';
 import { computed, defineComponent } from 'vue';
-import { injectCoreHTTPClient } from '../../core';
 import { FAnalysisBucket, FAnalysisBucketDownload } from '../analysis-bucket';
 import FAnalysisName from '../analysis/FAnalysisName';
 import { FAnalysisNodeApprovalCommand } from './FAnalsisNodeApprovalCommand';
