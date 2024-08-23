@@ -38,8 +38,6 @@ export default defineComponent({
     },
     emits: ['deleted', 'failed', 'updated'],
     setup(props, { emit }) {
-        const api = injectCoreHTTPClient();
-
         const bucketQuery = computed<BuildInput<AnalysisBucket>>(() => ({
             filter: {
                 type: AnalysisBucketType.CODE,
