@@ -13,7 +13,7 @@ import { type Analysis, type AnalysisBucket, AnalysisBucketType } from '@private
 import { defineNuxtComponent } from '#app';
 
 export default defineNuxtComponent({
-    components: { FAnalysisBucket, FAnalysisBucketFiles, FAnalysisFileDownload: FAnalysisBucketFileDownload },
+    components: { FAnalysisBucket, FAnalysisBucketFiles, FAnalysisBucketFileDownload },
     props: {
         entity: {
             type: Object as PropType<Analysis>,
@@ -43,7 +43,7 @@ export default defineNuxtComponent({
                     :query="{ filters: { bucket_id: bucket.id } }"
                 >
                     <template #itemActions="{ data }">
-                        <FAnalysisFileDownload
+                        <FAnalysisBucketFileDownload
                             :entity="data"
                             :with-icon="true"
                         />

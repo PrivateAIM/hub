@@ -6,3 +6,4 @@
  */
 
 export { default as FAnalysisBucket } from './FAnalysisBucket';
+export { FAnalysisBucketDownload } from './FAnalysisBucketDownload';
