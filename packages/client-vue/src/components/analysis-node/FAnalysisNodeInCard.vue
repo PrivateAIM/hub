@@ -6,16 +6,21 @@
   -->
 <script lang="ts">
 import { VCLink } from '@vuecs/link';
-import type { AnalysisNode } from '@privateaim/core-kit';
+import type { AnalysisBucket, AnalysisNode } from '@privateaim/core-kit';
+import { AnalysisBucketType } from '@privateaim/core-kit';
+import type { BuildInput } from 'rapiq';
 import type { PropType } from 'vue';
-import { defineComponent } from 'vue';
+import { computed, defineComponent } from 'vue';
 import { injectCoreHTTPClient } from '../../core';
+import { FAnalysisBucket, FAnalysisBucketDownload } from '../analysis-bucket';
 import FAnalysisName from '../analysis/FAnalysisName';
 import { FAnalysisNodeApprovalCommand } from './FAnalsisNodeApprovalCommand';
 import { FAnalysisNodeApprovalStatus } from './FAnalysisNodeApprovalStatus';
 
 export default defineComponent({
     components: {
+        FAnalysisBucket,
+        FAnalysisBucketDownload,
         FAnalysisName,
         FAnalysisNodeApprovalCommand,
         FAnalysisNodeApprovalStatus,
@@ -35,9 +40,12 @@ export default defineComponent({
     setup(props, { emit }) {
         const api = injectCoreHTTPClient();
 
-        const download = () => {
-            window.open(api.analysis.getFileDownloadURL(props.entity.analysis_id), '_blank');
-        };
+        const bucketQuery = computed<BuildInput<AnalysisBucket>>(() => ({
+            filter: {
+                type: AnalysisBucketType.CODE,
+                analysis_id: props.entity.analysis_id,
+            },
+        } satisfies BuildInput<AnalysisBucket>));
 
         const handleDeleted = (data: AnalysisNode) => {
             emit('deleted', data);
@@ -52,7 +60,7 @@ export default defineComponent({
         };
 
         return {
-            download,
+            bucketQuery,
 
             handleDeleted,
             handleFailed,
@@ -90,13 +98,15 @@ export default defineComponent({
                         >
                             <i class="fa fa-bars" />
                         </VCLink>
-                        <button
-                            type="button"
-                            class="btn btn-dark btn-xs me-1"
-                            @click.prevent="download()"
-                        >
-                            <i class="fa fa-file-download" />
-                        </button>
+                        <FAnalysisBucket :query="bucketQuery">
+                            <template #default="{ data: bucket }">
+                                <FAnalysisBucketDownload
+                                    :entity="bucket"
+                                    :with-icon="true"
+                                    :with-text="false"
+                                />
+                            </template>
+                        </FAnalysisBucket>
                         <FAnalysisNodeApprovalCommand
                             :entity-id="entity.id"
                             :approval-status="entity.approval_status"

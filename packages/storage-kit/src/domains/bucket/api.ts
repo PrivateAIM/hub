@@ -55,6 +55,10 @@ export class BucketAPI extends BaseAPI {
         return `buckets/${id}/stream`;
     }
 
+    getStreamURL(id: BucketFile['id']) : string {
+        return new URL(this.getStreamPath(id), this.client.getBaseURL()).href;
+    }
+
     async stream(id: Bucket['id']) : Promise<ReadableStream<any>> {
         const response = await this.client.request({
             url: this.getStreamPath(id),
