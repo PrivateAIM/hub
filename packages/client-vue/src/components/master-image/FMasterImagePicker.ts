@@ -14,7 +14,7 @@ import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import type { VNodeArrayChildren } from 'vue';
 import {
-    computed, defineComponent, h, reactive, ref, toRefs, watch,
+    computed, defineComponent, h, nextTick, reactive, ref, toRefs, watch,
 } from 'vue';
 import {
     EntityListSlotName, injectCoreHTTPClient, wrapFnWithBusyState,
@@ -28,6 +28,10 @@ export default defineComponent({
         entityId: {
             type: String,
             default: undefined,
+        },
+        mandatory: {
+            type: Boolean,
+            default: true,
         },
     },
     emits: ['selected'],
@@ -114,26 +118,32 @@ export default defineComponent({
 
         const translationsValidation = useTranslationsForNestedValidations($v.value);
 
-        await loadImage();
+        Promise.resolve()
+            .then(() => loadImage());
 
         const itemListNode = ref<null | Record<string, any>>(null);
 
-        const selectGroup = (group: MasterImageGroup | null) => {
-            if (!group) {
+        const selectGroup = (input: MasterImageGroup | null) => {
+            if (!input) {
                 form.group_virtual_path = '';
                 masterImageGroupEntity.value = null;
                 emit('selected', null); // todo: check
                 return;
             }
 
-            const changed = group.virtual_path !== form.group_virtual_path;
+            const changed = input.virtual_path !== form.group_virtual_path;
 
-            form.group_virtual_path = group.virtual_path;
-            masterImageGroupEntity.value = group;
+            form.group_virtual_path = input.virtual_path;
+            masterImageGroupEntity.value = input;
 
-            if (changed && itemListNode.value) {
+            if (changed) {
                 form.master_image_id = '';
-                itemListNode.value.load();
+
+                nextTick(async () => {
+                    if (itemListNode.value) {
+                        await itemListNode.value.load();
+                    }
+                });
             }
         };
 
@@ -173,6 +183,9 @@ export default defineComponent({
                             }));
 
                             return buildFormGroup({
+                                props: {
+                                    key: form.group_virtual_path,
+                                },
                                 validationMessages: translationsValidation.master_image_id.value,
                                 validationSeverity: getSeverity($v.value.master_image_id),
                                 label: true,
@@ -228,11 +241,10 @@ export default defineComponent({
                                             h(''),
                                     ],
                                     content: buildFormSelect({
-
                                         value: form.group_virtual_path,
                                         onChange(input) {
                                             const index = props.data.findIndex((el) => el.virtual_path === input);
-                                            if (index !== -1) {
+                                            if (index > -1) {
                                                 selectGroup(props.data[index]);
                                                 return;
                                             }
