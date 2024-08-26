@@ -28,11 +28,7 @@ export default defineComponent({
         entityId: {
             type: String,
             default: undefined,
-        },
-        mandatory: {
-            type: Boolean,
-            default: true,
-        },
+        }
     },
     emits: ['selected'],
     async setup(props, { emit }) {
