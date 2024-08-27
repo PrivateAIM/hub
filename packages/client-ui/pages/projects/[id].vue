@@ -17,19 +17,19 @@ import { createEntityManager, injectCoreHTTPClient } from '@privateaim/client-vu
 import { PermissionName } from '@privateaim/kit';
 import type { Ref } from 'vue';
 import {
-    computed, ref,
+    computed, defineComponent, ref,
 } from 'vue';
 import {
     definePageMeta,
     useToast,
 } from '#imports';
 import {
-    createError, defineNuxtComponent, navigateTo, useRoute,
+    createError, navigateTo, useRoute,
 } from '#app';
 import DomainEntityNav from '../../components/DomainEntityNav';
 import { LayoutKey, LayoutNavigationID } from '../../config/layout';
 
-export default defineNuxtComponent({
+export default defineComponent({
     components: { DomainEntityNav },
     async setup() {
         definePageMeta({

@@ -10,14 +10,15 @@ import {
 } from '@privateaim/core-kit';
 import { FAnalysisName, createEntityManager } from '@privateaim/client-vue';
 import { isClientErrorWithStatusCode } from 'hapic';
+import { defineComponent } from 'vue';
 import { definePageMeta, useToast } from '#imports';
 import {
-    createError, defineNuxtComponent, navigateTo, useRoute,
+    createError, navigateTo, useRoute,
 } from '#app';
 import DomainEntityNav from '../../components/DomainEntityNav';
 import { LayoutKey, LayoutNavigationID } from '../../config/layout';
 
-export default defineNuxtComponent({
+export default defineComponent({
     components: { DomainEntityNav, FAnalysisName },
     async setup() {
         definePageMeta({

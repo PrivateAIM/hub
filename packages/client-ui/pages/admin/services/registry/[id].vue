@@ -8,16 +8,15 @@
 import { DomainType } from '@privateaim/core-kit';
 import { createEntityManager } from '@privateaim/client-vue';
 import { PermissionName } from '@privateaim/kit';
-import { computed } from 'vue';
+import { computed, defineComponent } from 'vue';
 import {
     createError,
     definePageMeta,
     navigateTo, useRoute, useToast,
 } from '#imports';
-import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
 
-export default defineNuxtComponent({
+export default defineComponent({
     async setup() {
         definePageMeta({
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,

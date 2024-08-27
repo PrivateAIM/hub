@@ -12,13 +12,14 @@ import type {
 import {
     DomainType,
 } from '@privateaim/core-kit';
+import { defineComponent } from 'vue';
 import {
     useRoute,
     useToast,
 } from '#imports';
-import { createError, defineNuxtComponent, navigateTo } from '#app';
+import { createError, navigateTo } from '#app';
 
-export default defineNuxtComponent({
+export default defineComponent({
     async setup() {
         const toast = useToast();
 

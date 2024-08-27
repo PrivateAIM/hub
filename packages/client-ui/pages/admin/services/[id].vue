@@ -6,14 +6,15 @@
   -->
 <script lang="ts">
 import { ServiceID } from '@privateaim/core-kit';
+import { defineComponent } from 'vue';
 import {
-    createError, defineNuxtComponent, definePageMeta, navigateTo, useRoute,
+    createError, definePageMeta, navigateTo, useRoute,
 } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
 
 const services = Object.values(ServiceID);
 
-export default defineNuxtComponent({
+export default defineComponent({
     async setup() {
         definePageMeta({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
