@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.8.2](https://github.com/PrivateAIM/hub/compare/v0.8.1...v0.8.2) (2024-08-28)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.8.1 to ^0.8.2
+    * @privateaim/core-kit bumped from ^0.8.1 to ^0.8.2
+    * @privateaim/core-realtime-kit bumped from ^0.7.2 to ^0.7.3
+    * @privateaim/server-kit bumped from ^0.8.1 to ^0.8.2
+    * @privateaim/server-realtime-kit bumped from ^0.8.1 to ^0.8.2
+
 ## [0.8.1](https://github.com/PrivateAIM/hub/compare/v0.8.0...v0.8.1) (2024-08-19)
 
 

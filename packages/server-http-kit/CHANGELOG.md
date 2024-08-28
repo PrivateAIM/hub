@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.8.2](https://github.com/PrivateAIM/hub/compare/v0.8.1...v0.8.2) (2024-08-28)
+
+
+### Bug Fixes
+
+* **deps:** bump locter from 2.1.0 to 2.1.1 ([#685](https://github.com/PrivateAIM/hub/issues/685)) ([e5e0860](https://github.com/PrivateAIM/hub/commit/e5e086024d7a9157c1833aa656bcc91a0574e4a9))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.8.1 to ^0.8.2
+    * @privateaim/server-kit bumped from ^0.8.1 to ^0.8.2
+
 ## [0.8.1](https://github.com/PrivateAIM/hub/compare/v0.8.0...v0.8.1) (2024-08-19)
 
 
