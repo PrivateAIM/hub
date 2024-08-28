@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.8.2](https://github.com/PrivateAIM/hub/compare/v0.8.1...v0.8.2) (2024-08-28)
+
+
+### Bug Fixes
+
+* avoid infinite redirects in client ui ([47a2554](https://github.com/PrivateAIM/hub/commit/47a2554e7c53d01c7aee54d3c5c527aee25ce3e4))
+* code inspection/download button ([#684](https://github.com/PrivateAIM/hub/issues/684)) ([4a987a5](https://github.com/PrivateAIM/hub/commit/4a987a5ed88c734e6ee58d311303052d88119bb1))
+* downgrade to nuxt v3.12.4 ([4222d38](https://github.com/PrivateAIM/hub/commit/4222d3874339e725e646ab789f12b264ec2d1704))
+* remove root path of excluded paths ([4745b8e](https://github.com/PrivateAIM/hub/commit/4745b8eecc55165b79d438fcd880ccf9d80853f4))
+* service robot view in admin area ([f9072b9](https://github.com/PrivateAIM/hub/commit/f9072b9e1c2c0ae932a0d74dd8e897a593742225))
+* temporary fix for routing issue ([a6764c2](https://github.com/PrivateAIM/hub/commit/a6764c2862ff10490d8cf7284c14bf37aab22e8c))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/client-vue bumped from ^0.8.1 to ^0.8.2
+    * @privateaim/core-kit bumped from ^0.8.1 to ^0.8.2
+    * @privateaim/kit bumped from ^0.8.1 to ^0.8.2
+    * @privateaim/storage-kit bumped from ^0.8.1 to ^0.8.2
+
 ## [0.8.1](https://github.com/PrivateAIM/hub/compare/v0.8.0...v0.8.1) (2024-08-19)
 
 

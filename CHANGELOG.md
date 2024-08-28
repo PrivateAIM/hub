@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.8.2](https://github.com/PrivateAIM/hub/compare/v0.8.1...v0.8.2) (2024-08-28)
+
+
+### Features
+
+* intiital chart templates with minimal configuration ([#661](https://github.com/PrivateAIM/hub/issues/661)) ([f793577](https://github.com/PrivateAIM/hub/commit/f7935774e777cb60ffa81de3ae1ed1ac81b27507))
+
+
+### Bug Fixes
+
+* avoid infinite redirects in client ui ([47a2554](https://github.com/PrivateAIM/hub/commit/47a2554e7c53d01c7aee54d3c5c527aee25ce3e4))
+* code inspection/download button ([#684](https://github.com/PrivateAIM/hub/issues/684)) ([4a987a5](https://github.com/PrivateAIM/hub/commit/4a987a5ed88c734e6ee58d311303052d88119bb1))
+* **deps:** bump locter from 2.1.0 to 2.1.1 ([#685](https://github.com/PrivateAIM/hub/issues/685)) ([e5e0860](https://github.com/PrivateAIM/hub/commit/e5e086024d7a9157c1833aa656bcc91a0574e4a9))
+* downgrade to nuxt v3.12.4 ([4222d38](https://github.com/PrivateAIM/hub/commit/4222d3874339e725e646ab789f12b264ec2d1704))
+* master-image-picker - switching between groups ([#687](https://github.com/PrivateAIM/hub/issues/687)) ([e14df50](https://github.com/PrivateAIM/hub/commit/e14df508d6c366f30ae5257e3b95915d67c35d9d))
+* remove root path of excluded paths ([4745b8e](https://github.com/PrivateAIM/hub/commit/4745b8eecc55165b79d438fcd880ccf9d80853f4))
+* service robot view in admin area ([f9072b9](https://github.com/PrivateAIM/hub/commit/f9072b9e1c2c0ae932a0d74dd8e897a593742225))
+* temporary fix for routing issue ([a6764c2](https://github.com/PrivateAIM/hub/commit/a6764c2862ff10490d8cf7284c14bf37aab22e8c))
+
 ## [0.8.1](https://github.com/PrivateAIM/hub/compare/v0.8.0...v0.8.1) (2024-08-19)
 
 

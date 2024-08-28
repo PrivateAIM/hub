@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.8.2](https://github.com/PrivateAIM/hub/compare/v0.8.1...v0.8.2) (2024-08-28)
+
+
+### Bug Fixes
+
+* code inspection/download button ([#684](https://github.com/PrivateAIM/hub/issues/684)) ([4a987a5](https://github.com/PrivateAIM/hub/commit/4a987a5ed88c734e6ee58d311303052d88119bb1))
+* master-image-picker - switching between groups ([#687](https://github.com/PrivateAIM/hub/issues/687)) ([e14df50](https://github.com/PrivateAIM/hub/commit/e14df508d6c366f30ae5257e3b95915d67c35d9d))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core-kit bumped from ^0.8.1 to ^0.8.2
+    * @privateaim/kit bumped from ^0.8.1 to ^0.8.2
+    * @privateaim/core-http-kit bumped from ^0.8.1 to ^0.8.2
+    * @privateaim/storage-kit bumped from ^0.8.1 to ^0.8.2
+  * peerDependencies
+    * @privateaim/core-kit bumped from ^0.8.1 to ^0.8.2
+    * @privateaim/storage-kit bumped from ^0.8.1 to ^0.8.2
+
 ## [0.8.1](https://github.com/PrivateAIM/hub/compare/v0.8.0...v0.8.1) (2024-08-19)
 
 
