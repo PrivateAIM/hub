@@ -8,17 +8,16 @@
 import { ARobotForm, injectHTTPClient } from '@authup/client-web-kit';
 import type { Robot } from '@authup/core-kit';
 import type { ServiceID } from '@privateaim/core-kit';
-import type { PropType, Ref } from 'vue';
-import { ref, toRefs } from 'vue';
+import type { PropType } from 'vue';
+import { defineComponent, ref } from 'vue';
 import {
     createError,
-    defineNuxtComponent,
     navigateTo,
     updateObjectProperties,
     useToast,
 } from '#imports';
 
-export default defineNuxtComponent({
+export default defineComponent({
     components: {
         ARobotForm,
     },
@@ -29,16 +28,14 @@ export default defineNuxtComponent({
         },
     },
     async setup(props) {
-        const refs = toRefs(props);
-
         const toast = useToast();
 
-        let entity : Ref<Robot>;
+        const entity = ref<Robot | null>(null);
 
         try {
             const response = await injectHTTPClient().robot.getMany({
                 filter: {
-                    name: refs.entityId.value,
+                    name: props.entityId,
                 },
                 fields: ['+secret'],
             });
@@ -48,14 +45,16 @@ export default defineNuxtComponent({
                 throw new Error('The robot was not found.');
             }
 
-            entity = ref(robot);
+            entity.value = robot;
         } catch (e) {
             await navigateTo({ path: '/admin/services' });
             throw createError({});
         }
 
         const handleUpdated = (item: Robot) => {
-            updateObjectProperties(entity, item);
+            if (entity.value) {
+                updateObjectProperties(entity.value, item);
+            }
 
             toast.show({ variant: 'success', body: 'The robot was successfully updated.' });
         };
