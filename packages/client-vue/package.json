@@ -1,6 +1,5 @@
 {
     "name": "@privateaim/client-vue",
-    "private": true,
     "version": "0.8.1",
     "license": "Apache-2.0",
     "description": "This package contains vue components.",
