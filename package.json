@@ -27,7 +27,7 @@
         "jest-serial-runner": "^1.2.0",
         "nx": "^19.6.3",
         "rimraf": "^6.0.1",
-        "rollup": "^4.21.0",
+        "rollup": "^4.21.1",
         "ts-jest": "^29.2.5",
         "typescript": "5.5.4",
         "workspaces-publish": "^1.4.4"
