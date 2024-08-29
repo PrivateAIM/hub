@@ -81,7 +81,15 @@ export async function getManyAnalysisNodeRouteHandler(req: Request, res: Respons
             allowed: ['node', 'analysis'],
         },
         sort: {
-            allowed: ['created_at', 'updated_at', 'index'],
+            allowed: [
+                'created_at',
+                'updated_at',
+                'index',
+                'analysis.created_at',
+                'analysis.updated_at',
+                'node.created_at',
+                'node.updated_at',
+            ],
         },
     });
 
