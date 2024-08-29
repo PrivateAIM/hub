@@ -68,7 +68,7 @@
         "smob": "^1.5.0",
         "socket.io-client": "^4.7.5",
         "vue": "^3.4.31",
-        "vue-tsc": "^2.0.29",
+        "vue-tsc": "^2.1.2",
         "vue3-form-wizard": "^0.2.4"
     },
     "peerDependencies": {
