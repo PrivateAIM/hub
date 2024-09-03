@@ -73,9 +73,9 @@ export default defineComponent({
 });
 </script>
 <template>
-    <div class="container">
+    <div>
         <h1 class="title no-border mb-3">
-            {{ entity.name }} <span class="sub-title">Details</span>
+            <i class="fa-solid fa-server"></i> {{ entity.name }} <span class="sub-title">Details</span>
         </h1>
 
         <div class="m-b-20 m-t-10">

@@ -63,9 +63,9 @@ export default defineNuxtComponent({
 });
 </script>
 <template>
-    <div class="container">
+    <div>
         <h1 class="title no-border mb-3">
-            Node <span class="sub-title">Management</span>
+           <i class="fa-solid fa-server"></i> Node <span class="sub-title">Management</span>
         </h1>
         <div class="content-wrapper">
             <div class="content-sidebar flex-column">

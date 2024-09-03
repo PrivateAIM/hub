@@ -42,9 +42,9 @@ export default defineComponent({
 });
 </script>
 <template>
-    <div class="container">
+    <div>
         <h1 class="title no-border mb-3">
-            {{ serviceId }} <span class="sub-title">Service</span>
+            <i class="fa fa-map-signs"></i> {{ serviceId }} <span class="sub-title">Service</span>
         </h1>
 
         <div class="m-b-20 m-t-10">

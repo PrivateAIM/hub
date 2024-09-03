@@ -28,7 +28,7 @@ export default defineNuxtComponent({
 });
 </script>
 <template>
-    <div class="container">
+    <div>
         <h1 class="title no-border mb-3">
             <i class="fa-brands fa-docker" /> Registry <span class="sub-title">Management</span>
         </h1>

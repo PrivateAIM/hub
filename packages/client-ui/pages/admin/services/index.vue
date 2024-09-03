@@ -45,9 +45,9 @@ export default defineNuxtComponent({
 });
 </script>
 <template>
-    <div class="container">
+    <div>
         <h1 class="title no-border mb-3">
-            Services <span class="sub-title">Management</span>
+            <i class="fa fa-map-signs"></i> Services <span class="sub-title">Management</span>
         </h1>
 
         <h6>
@@ -58,7 +58,7 @@ export default defineNuxtComponent({
                 <div
                     v-for="(item,key) in items"
                     :key="key"
-                    class="col-md-4 col-12 mb-3"
+                    class="col-sm-4 col-md-3 col-12 mb-3"
                 >
                     <div
                         class="event-card p-3 d-flex flex-column text-center"
@@ -83,7 +83,7 @@ export default defineNuxtComponent({
                 <div
                     v-for="(item,key) in thirdPartyItems"
                     :key="key"
-                    class="col-md-4 col-12 mb-3"
+                    class="col-sm-4 col-md-3 col-12 mb-3"
                 >
                     <div
                         class="event-card p-3 d-flex flex-column text-center"
