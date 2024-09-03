@@ -40,7 +40,10 @@ export function renderActionCommand(ctx: Context) : VNodeChild {
         disabled: ctx.isDisabled,
     };
 
-    const iconClasses : string[] = [ctx.iconClass, 'pe-1'];
+    const iconClasses : string[] = [ctx.iconClass];
+    if (ctx.withIcon && ctx.withText) {
+        iconClasses.push('pe-1');
+    }
 
     let tag : string | Component | undefined;
 
