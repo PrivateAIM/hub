@@ -18,16 +18,14 @@ export enum AnalysisNodeApprovalStatus {
 // -------------------------------------------------------------------------
 
 export enum AnalysisNodeRunStatus {
-    ARRIVED = 'arrived',
-    PULLED = 'pulled',
-    PUSHED = 'pushed', // todo: this won't happen anymore
-    DEPARTED = 'departed', // todo: this won't happen anymore
-    FAILED = 'failed', // todo: this won't happen anymore
-}
+    STARTING = 'starting',
+    STARTED = 'started',
 
-// -------------------------------------------------------------------------
+    STOPPING = 'stopping',
+    STOPPED = 'stopped',
 
-export enum AnalysisNodeStatic {
-    INCOMING = 'incoming',
-    OUTGOING = 'outgoing',
+    FINISHING = 'finishing',
+    FINISHED = 'finished',
+
+    FAILED = 'failed',
 }

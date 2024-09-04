@@ -85,8 +85,13 @@ export default defineComponent({
                                     class="d-flex justify-content-center icon-circle text-light p-1"
                                     :class="{
                                         'bg-secondary': !item.run_status,
-                                        'bg-dark': item.run_status === analysisNodeRunStatus.DEPARTED,
-                                        'active': item.run_status === analysisNodeRunStatus.ARRIVED
+                                        'bg-primary': item.run_status === analysisNodeRunStatus.STARTED ||
+                                            item.run_status === analysisNodeRunStatus.STARTING,
+                                        'bg-success': item.run_status === analysisNodeRunStatus.FINISHED ||
+                                            item.run_status === analysisNodeRunStatus.FINISHING,
+                                        'bg-warning': item.run_status === analysisNodeRunStatus.STOPPED ||
+                                            item.run_status === analysisNodeRunStatus.STOPPING,
+                                        'bg-danger': item.run_status === analysisNodeRunStatus.FAILED
                                     }"
                                 >
                                     <span class="icon">{{ item.node.name }}</span>

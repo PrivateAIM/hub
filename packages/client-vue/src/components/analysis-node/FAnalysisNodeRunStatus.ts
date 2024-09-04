@@ -18,25 +18,33 @@ export default defineComponent({
     },
     setup(props, { slots }) {
         const statusText = computed(() => {
-            switch (props.status) {
-                case AnalysisNodeRunStatus.ARRIVED:
-                    return 'arrived';
-                case AnalysisNodeRunStatus.DEPARTED:
-                    return 'departed';
-                default:
-                    return 'none';
+            if (props.status) {
+                return props.status;
             }
+
+            return 'none';
         });
 
         const classSuffix = computed(() => {
             switch (props.status) {
-                case AnalysisNodeRunStatus.ARRIVED:
+                case AnalysisNodeRunStatus.STARTED:
+                case AnalysisNodeRunStatus.STARTING: {
                     return 'primary';
-                case AnalysisNodeRunStatus.DEPARTED:
+                }
+                case AnalysisNodeRunStatus.FINISHED:
+                case AnalysisNodeRunStatus.FINISHING: {
                     return 'success';
-                default:
-                    return 'info';
+                }
+                case AnalysisNodeRunStatus.STOPPED:
+                case AnalysisNodeRunStatus.STOPPING: {
+                    return 'warning';
+                }
+                case AnalysisNodeRunStatus.FAILED: {
+                    return 'danger';
+                }
             }
+
+            return 'info';
         });
 
         if (hasNormalizedSlot('default', slots)) {
