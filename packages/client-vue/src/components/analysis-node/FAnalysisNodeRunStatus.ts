@@ -31,9 +31,11 @@ export default defineComponent({
                 case AnalysisNodeRunStatus.STARTING: {
                     return 'primary';
                 }
-                case AnalysisNodeRunStatus.FINISHED:
-                case AnalysisNodeRunStatus.FINISHING: {
+                case AnalysisNodeRunStatus.FINISHED: {
                     return 'success';
+                }
+                case AnalysisNodeRunStatus.RUNNING: {
+                    return 'dark';
                 }
                 case AnalysisNodeRunStatus.STOPPED:
                 case AnalysisNodeRunStatus.STOPPING: {

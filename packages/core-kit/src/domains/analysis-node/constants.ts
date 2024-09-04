@@ -24,7 +24,7 @@ export enum AnalysisNodeRunStatus {
     STOPPING = 'stopping',
     STOPPED = 'stopped',
 
-    FINISHING = 'finishing',
+    RUNNING = 'running',
     FINISHED = 'finished',
 
     FAILED = 'failed',

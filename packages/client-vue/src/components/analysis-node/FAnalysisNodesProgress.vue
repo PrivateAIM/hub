@@ -87,8 +87,8 @@ export default defineComponent({
                                         'bg-secondary': !item.run_status,
                                         'bg-primary': item.run_status === analysisNodeRunStatus.STARTED ||
                                             item.run_status === analysisNodeRunStatus.STARTING,
-                                        'bg-success': item.run_status === analysisNodeRunStatus.FINISHED ||
-                                            item.run_status === analysisNodeRunStatus.FINISHING,
+                                        'bg-success': item.run_status === analysisNodeRunStatus.FINISHED,
+                                        'bg-dark': item.run_status === analysisNodeRunStatus.RUNNING,
                                         'bg-warning': item.run_status === analysisNodeRunStatus.STOPPED ||
                                             item.run_status === analysisNodeRunStatus.STOPPING,
                                         'bg-danger': item.run_status === analysisNodeRunStatus.FAILED
