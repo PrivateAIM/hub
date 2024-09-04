@@ -29,21 +29,22 @@ export async function updateAnalysisNodeRouteHandler(req: Request, res: Response
     const ability = useRequestEnv(req, 'abilities');
 
     const isAuthorityOfNode = isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.node_realm_id);
-    const isAuthorizedForNode = ability.has(PermissionName.ANALYSIS_APPROVE);
-
     const isAuthorityOfAnalysis = isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.analysis_realm_id);
-    const isAuthorizedForAnalysis = ability.has(PermissionName.ANALYSIS_UPDATE);
 
-    if (
-        !(isAuthorityOfNode && isAuthorizedForNode) &&
-        !(isAuthorityOfAnalysis && isAuthorizedForAnalysis)
-    ) {
+    if (!isAuthorityOfNode && !isAuthorityOfAnalysis) {
+        throw new ForbiddenError();
+    }
+
+    const canUpdate = ability.has(PermissionName.ANALYSIS_UPDATE);
+    const canApprove = ability.has(PermissionName.ANALYSIS_APPROVE);
+
+    if (!canUpdate && !canApprove) {
         throw new ForbiddenError();
     }
 
     const result = await runAnalysisNodeValidation(req, 'update');
 
-    if (!isAuthorityOfNode) {
+    if (!isAuthorityOfNode || !canApprove) {
         if (result.data.approval_status) {
             delete result.data.approval_status;
         }
@@ -53,7 +54,13 @@ export async function updateAnalysisNodeRouteHandler(req: Request, res: Response
         }
     }
 
-    if (!isAuthorityOfAnalysis) {
+    if (!isAuthorityOfNode || !canUpdate) {
+        if (result.data.run_status) {
+            delete result.data.run_status;
+        }
+    }
+
+    if (!isAuthorityOfAnalysis || !canUpdate) {
         if (result.data.index) {
             delete result.data.index;
         }

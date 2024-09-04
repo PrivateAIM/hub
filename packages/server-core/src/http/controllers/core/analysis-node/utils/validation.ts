@@ -6,7 +6,7 @@
  */
 
 import { check } from 'express-validator';
-import { AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
+import { AnalysisNodeApprovalStatus, AnalysisNodeRunStatus } from '@privateaim/core-kit';
 import { BadRequestError, NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/core-kit';
 import type { Request } from 'routup';
@@ -36,6 +36,11 @@ export async function runAnalysisNodeValidation(
             .isUUID()
             .run(req);
     }
+
+    await check('run_status')
+        .isIn(Object.values(AnalysisNodeRunStatus))
+        .optional({ values: 'null' })
+        .run(req);
 
     await check('index')
         .exists()
