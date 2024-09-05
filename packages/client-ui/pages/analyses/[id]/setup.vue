@@ -42,11 +42,18 @@ export default defineNuxtComponent({
 });
 </script>
 <template>
-    <FAnalysisWizard
-        v-if="entity"
-        :entity="entity"
-        @updated="handleUpdated"
-        @finished="handleFinished"
-        @failed="handleFailed"
-    />
+    <template v-if="entity.configuration_locked">
+        <div class="alert alert-sm alert-warning">
+            The analysis is locked and can no longer be modified.
+        </div>
+    </template>
+    <template v-else>
+        <FAnalysisWizard
+            v-if="entity"
+            :entity="entity"
+            @updated="handleUpdated"
+            @finished="handleFinished"
+            @failed="handleFailed"
+        />
+    </template>
 </template>

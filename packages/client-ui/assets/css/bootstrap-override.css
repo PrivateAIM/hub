@@ -76,7 +76,7 @@
 .nav-pills .nav-link.active,
 .nav-pills .nav-link.router-link-exact-active,
 .nav-pills .show>.nav-link {
-    color: #aeb2b7;
+    color: #dfe4eb;
     background-color: rgb(64, 67, 78);
     border-color: #171a1d;
 }

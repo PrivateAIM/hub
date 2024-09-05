@@ -36,25 +36,23 @@ export default defineNuxtComponent({
 });
 </script>
 <template>
-    <div class="panel-box">
-        <FAnalysisBucket :query="query">
-            <template #default="{ data: bucket }">
-                <FAnalysisBucketFiles
-                    :query="{ filters: { bucket_id: bucket.id } }"
-                >
-                    <template #itemActions="{ data }">
-                        <FAnalysisBucketFileDownload
-                            :entity="data"
-                            :with-icon="true"
-                        />
-                    </template>
-                </FAnalysisBucketFiles>
-            </template>
-            <template #error>
-                <div class="alert alert-sm alert-warning">
-                    The result bucket does not exist. Therefore, no files can be downloaded.
-                </div>
-            </template>
-        </FAnalysisBucket>
-    </div>
+    <FAnalysisBucket :query="query">
+        <template #default="{ data: bucket }">
+            <FAnalysisBucketFiles
+                :query="{ filters: { bucket_id: bucket.id } }"
+            >
+                <template #itemActions="{ data }">
+                    <FAnalysisBucketFileDownload
+                        :entity="data"
+                        :with-icon="true"
+                    />
+                </template>
+            </FAnalysisBucketFiles>
+        </template>
+        <template #error>
+            <div class="alert alert-sm alert-warning">
+                The result storage for the analysis does not exist. Therefore, no files can be downloaded.
+            </div>
+        </template>
+    </FAnalysisBucket>
 </template>
