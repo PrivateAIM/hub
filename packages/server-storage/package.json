@@ -20,7 +20,7 @@
         "@privateaim/server-kit": "^0.8.2",
         "@privateaim/server-http-kit": "^0.8.2",
         "@privateaim/storage-kit": "^0.8.2",
-        "@routup/basic": "^1.4.0",
+        "@routup/basic": "^1.4.1",
         "@routup/decorators": "^3.4.0",
         "busboy": "^1.6.0",
         "cors": "^2.8.5",
