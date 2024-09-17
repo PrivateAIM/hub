@@ -32,13 +32,13 @@
         "@types/cors": "^2.8.17",
         "express-validator": "^7.2.0",
         "redis-extension": "^1.5.0",
-        "routup": "^4.0.0",
+        "routup": "^4.0.1",
         "typeorm-extension": "^3.6.1"
     },
     "peerDependencies": {
         "express-validator": "^7.2.0",
         "redis-extension": "^1.5.0",
-        "routup": "^4.0.0",
+        "routup": "^4.0.1",
         "typeorm-extension": "^3.6.1"
     },
     "scripts": {
