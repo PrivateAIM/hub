@@ -19,7 +19,7 @@
         "@ebec/http": "^2.3.0",
         "@privateaim/kit": "^0.8.2",
         "@privateaim/server-kit": "^0.8.2",
-        "@routup/basic": "^1.4.0",
+        "@routup/basic": "^1.4.1",
         "@routup/decorators": "^3.4.0",
         "@routup/prometheus": "^2.4.0",
         "@routup/rate-limit": "^2.4.0",
