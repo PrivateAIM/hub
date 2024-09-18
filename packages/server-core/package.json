@@ -46,7 +46,7 @@
         "rapiq": "^0.9.0",
         "redis-extension": "^1.5.0",
         "reflect-metadata": "^0.2.2",
-        "routup": "^4.0.0",
+        "routup": "^4.0.1",
         "singa": "^1.0.0",
         "typeorm": "^0.3.20",
         "typeorm-extension": "^3.6.1",
