@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.8.3](https://github.com/PrivateAIM/hub/compare/v0.8.2...v0.8.3) (2024-09-19)
+
+
+### Bug Fixes
+
+* **deps:** bump routup from 4.0.0 to 4.0.1 ([#754](https://github.com/PrivateAIM/hub/issues/754)) ([beaf196](https://github.com/PrivateAIM/hub/commit/beaf196efdcab56695622a164b88eb4024848703))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.8.2 to ^0.8.3
+    * @privateaim/core-kit bumped from ^0.8.2 to ^0.8.3
+    * @privateaim/core-realtime-kit bumped from ^0.7.3 to ^0.7.4
+    * @privateaim/server-kit bumped from ^0.8.2 to ^0.8.3
+    * @privateaim/server-realtime-kit bumped from ^0.8.2 to ^0.8.3
+
 ## [0.8.2](https://github.com/PrivateAIM/hub/compare/v0.8.1...v0.8.2) (2024-08-28)
 
 

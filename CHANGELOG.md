@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.8.3](https://github.com/PrivateAIM/hub/compare/v0.8.2...v0.8.3) (2024-09-19)
+
+
+### Features
+
+* add additional created_at/updated_at of child relations ([7db1a89](https://github.com/PrivateAIM/hub/commit/7db1a89aca1098e2fc716e6a626afaf816153422))
+* align node robot view to default robot view ([#762](https://github.com/PrivateAIM/hub/issues/762)) ([54c5d92](https://github.com/PrivateAIM/hub/commit/54c5d9262797f8bb42aaf12fd887300d6f2a2df0))
+* permit node authority to update run_status if permission is granted ([06d1ba7](https://github.com/PrivateAIM/hub/commit/06d1ba787040fc86226bd1ca3d34271a6487ad1a))
+* redesigned nav (-pills) and stretched admin nodes/services view ([fad6da2](https://github.com/PrivateAIM/hub/commit/fad6da2de2aac07fe10bcbefc37ea091078383b5))
+* refactored analysis-node status variants ([a28a5a0](https://github.com/PrivateAIM/hub/commit/a28a5a0ed24496d246f837ba987e508727c04549))
+* replaced finishing status with running status ([4c68b89](https://github.com/PrivateAIM/hub/commit/4c68b89b05ac2f8fd25ca580be6162303359558b))
+
+
+### Bug Fixes
+
+* **deps:** bump @routup/basic from 1.4.0 to 1.4.1 ([#752](https://github.com/PrivateAIM/hub/issues/752)) ([c190870](https://github.com/PrivateAIM/hub/commit/c1908702123c9d6d471d3f62543e91f5f645154d))
+* **deps:** bump @routup/decorators from 3.4.0 to 3.4.1 ([#751](https://github.com/PrivateAIM/hub/issues/751)) ([89de8dc](https://github.com/PrivateAIM/hub/commit/89de8dc84d72f3322317df613ae06419b4909b72))
+* **deps:** bump @routup/swagger from 2.4.0 to 2.4.1 ([#756](https://github.com/PrivateAIM/hub/issues/756)) ([91a19cd](https://github.com/PrivateAIM/hub/commit/91a19cdd32536ca9cbad23170e685a868431b094))
+* **deps:** bump pg from 8.12.0 to 8.13.0 ([#753](https://github.com/PrivateAIM/hub/issues/753)) ([9f6e01e](https://github.com/PrivateAIM/hub/commit/9f6e01e9e85c86364d65be7afb66710595ada868))
+* **deps:** bump routup from 4.0.0 to 4.0.1 ([#754](https://github.com/PrivateAIM/hub/issues/754)) ([beaf196](https://github.com/PrivateAIM/hub/commit/beaf196efdcab56695622a164b88eb4024848703))
+* don't show analysis wizard if analysis is locked ([791c698](https://github.com/PrivateAIM/hub/commit/791c6987a00d1950ca581c126b8e32bbc4afc823))
+
 ## [0.8.2](https://github.com/PrivateAIM/hub/compare/v0.8.1...v0.8.2) (2024-08-28)
 
 

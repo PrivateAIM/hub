@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.8.3](https://github.com/PrivateAIM/hub/compare/v0.8.2...v0.8.3) (2024-09-19)
+
+
+### Features
+
+* align node robot view to default robot view ([#762](https://github.com/PrivateAIM/hub/issues/762)) ([54c5d92](https://github.com/PrivateAIM/hub/commit/54c5d9262797f8bb42aaf12fd887300d6f2a2df0))
+* redesigned nav (-pills) and stretched admin nodes/services view ([fad6da2](https://github.com/PrivateAIM/hub/commit/fad6da2de2aac07fe10bcbefc37ea091078383b5))
+* refactored analysis-node status variants ([a28a5a0](https://github.com/PrivateAIM/hub/commit/a28a5a0ed24496d246f837ba987e508727c04549))
+
+
+### Bug Fixes
+
+* don't show analysis wizard if analysis is locked ([791c698](https://github.com/PrivateAIM/hub/commit/791c6987a00d1950ca581c126b8e32bbc4afc823))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/client-vue bumped from ^0.8.2 to ^0.8.3
+    * @privateaim/core-kit bumped from ^0.8.2 to ^0.8.3
+    * @privateaim/kit bumped from ^0.8.2 to ^0.8.3
+    * @privateaim/storage-kit bumped from ^0.8.2 to ^0.8.3
+
 ## [0.8.2](https://github.com/PrivateAIM/hub/compare/v0.8.1...v0.8.2) (2024-08-28)
 
 
