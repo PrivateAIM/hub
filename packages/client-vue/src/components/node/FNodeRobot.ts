@@ -6,16 +6,14 @@
  */
 
 import type { EntityManagerSlotProps } from '@authup/client-web-kit';
-import { ARobot, buildFormSubmitWithTranslations, createFormSubmitTranslations } from '@authup/client-web-kit';
-import { getSeverity, useTranslationsForNestedValidations } from '@ilingo/vuelidate';
+import {
+    ARobot,
+    ARobotForm,
+} from '@authup/client-web-kit';
 import type { PropType } from 'vue';
-import { defineComponent, h, reactive } from 'vue';
+import { defineComponent, h } from 'vue';
 import type { Node } from '@privateaim/core-kit';
 import type { Robot } from '@authup/core-kit';
-import { buildFormGroup, buildFormInput } from '@vuecs/form-controls';
-import useVuelidate from '@vuelidate/core';
-import { maxLength, minLength } from '@vuelidate/validators';
-import { initFormAttributesFromSource } from '../../core';
 
 export default defineComponent({
     props: {
@@ -24,35 +22,13 @@ export default defineComponent({
             required: true,
         },
     },
-    emits: ['failed'],
+    emits: ['failed', 'updated'],
     setup(props, { emit }) {
-        const form = reactive({
-            id: '',
-            secret: '',
-        });
-
-        const $v = useVuelidate({
-            id: {
-
-            },
-            secret: {
-                minLength: minLength(3),
-                maxLength: maxLength(256),
-            },
-        }, form);
-
-        const translationsValidation = useTranslationsForNestedValidations($v.value);
-        const translationsSubmit = createFormSubmitTranslations();
-
         return () => h(ARobot, {
-            onResolved(entity) {
-                if (entity) {
-                    initFormAttributesFromSource(form, entity);
-                }
-            },
             onFailed: (e) => {
                 emit('failed', e);
             },
+            queryFields: ['+secret'],
             queryFilters: {
                 id: props.entity.robot_id,
             },
@@ -68,47 +44,15 @@ export default defineComponent({
                     );
                 }
 
-                const id = buildFormGroup({
-                    validationMessages: translationsValidation.id.value,
-                    validationSeverity: getSeverity($v.value.id),
-                    label: true,
-                    labelContent: 'ID',
-                    content: buildFormInput({
-                        value: form.id,
-                        props: {
-                            disabled: true,
-                        },
-                    }),
+                return h(ARobotForm, {
+                    entity: slotProps.data,
+                    name: slotProps.data.name,
+                    realmId: slotProps.data.realm_id,
+                    onUpdated: (item) => {
+                        emit('updated', item);
+                        slotProps.updated(item);
+                    },
                 });
-
-                const secret = buildFormGroup({
-                    validationMessages: translationsValidation.secret.value,
-                    validationSeverity: getSeverity($v.value.secret),
-                    label: true,
-                    labelContent: 'Secret',
-                    content: buildFormInput({
-                        value: form.secret,
-                        props: {
-                            placeholder: '...',
-                        },
-                        onChange(value) {
-                            form.secret = value;
-                        },
-                    }),
-                });
-
-                const submitNode = buildFormSubmitWithTranslations({
-                    submit: () => slotProps.update(form),
-                    busy: slotProps.busy,
-                    isEditing: !!slotProps.data,
-                    invalid: $v.value.$invalid,
-                }, translationsSubmit);
-
-                return h('div', [
-                    id,
-                    secret,
-                    submitNode,
-                ]);
             },
         });
     },

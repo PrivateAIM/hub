@@ -18,11 +18,25 @@ export default defineNuxtComponent({
             required: true,
         },
     },
-    emits: ['failed'],
+    emits: ['failed', 'updated'],
     methods: {
         handleFailed(e: Error) {
             this.$emit('failed', e);
         },
+    },
+    setup(props, { emit }) {
+        const handleFailed = (e: Error) => {
+            emit('failed', e);
+        };
+
+        const handleUpdated = () => {
+            emit('updated', props.entity);
+        };
+
+        return {
+            handleFailed,
+            handleUpdated,
+        };
     },
 });
 </script>
@@ -32,5 +46,6 @@ export default defineNuxtComponent({
         :entity="entity"
         :realm-id="entity.realm_id"
         @failed="handleFailed"
+        @updated="handleUpdated"
     />
 </template>
