@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.7.4](https://github.com/PrivateAIM/hub/compare/v0.7.3...v0.7.4) (2024-09-19)
+
+
+### Features
+
+* realtime library/service split ([#474](https://github.com/PrivateAIM/hub/issues/474)) ([43c2dfa](https://github.com/PrivateAIM/hub/commit/43c2dfad654cc61ca9784914cbad56c684434088))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core-kit bumped from ^0.8.2 to ^0.8.3
+  * peerDependencies
+    * @privateaim/core-kit bumped from ^0.8.2 to ^0.8.3
+
 ## [0.7.3](https://github.com/PrivateAIM/hub/compare/v0.7.2...v0.7.3) (2024-08-28)
 
 

@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.8.3](https://github.com/PrivateAIM/hub/compare/v0.8.2...v0.8.3) (2024-09-19)
+
+
+### Features
+
+* refactored analysis-node status variants ([a28a5a0](https://github.com/PrivateAIM/hub/commit/a28a5a0ed24496d246f837ba987e508727c04549))
+* replaced finishing status with running status ([4c68b89](https://github.com/PrivateAIM/hub/commit/4c68b89b05ac2f8fd25ca580be6162303359558b))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.8.2 to ^0.8.3
+  * peerDependencies
+    * @privateaim/kit bumped from ^0.8.2 to ^0.8.3
+
 ## [0.8.2](https://github.com/PrivateAIM/hub/compare/v0.8.1...v0.8.2) (2024-08-28)
 
 

@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.8.3](https://github.com/PrivateAIM/hub/compare/v0.8.2...v0.8.3) (2024-09-19)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.8.2 to ^0.8.3
+  * peerDependencies
+    * @privateaim/kit bumped from ^0.8.2 to ^0.8.3
+
 ## [0.8.2](https://github.com/PrivateAIM/hub/compare/v0.8.1...v0.8.2) (2024-08-28)
 
 

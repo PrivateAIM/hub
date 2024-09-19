@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.8.3](https://github.com/PrivateAIM/hub/compare/v0.8.2...v0.8.3) (2024-09-19)
+
+
+### Bug Fixes
+
+* **deps:** bump @routup/basic from 1.4.0 to 1.4.1 ([#752](https://github.com/PrivateAIM/hub/issues/752)) ([c190870](https://github.com/PrivateAIM/hub/commit/c1908702123c9d6d471d3f62543e91f5f645154d))
+* **deps:** bump @routup/decorators from 3.4.0 to 3.4.1 ([#751](https://github.com/PrivateAIM/hub/issues/751)) ([89de8dc](https://github.com/PrivateAIM/hub/commit/89de8dc84d72f3322317df613ae06419b4909b72))
+* **deps:** bump @routup/swagger from 2.4.0 to 2.4.1 ([#756](https://github.com/PrivateAIM/hub/issues/756)) ([91a19cd](https://github.com/PrivateAIM/hub/commit/91a19cdd32536ca9cbad23170e685a868431b094))
+* **deps:** bump routup from 4.0.0 to 4.0.1 ([#754](https://github.com/PrivateAIM/hub/issues/754)) ([beaf196](https://github.com/PrivateAIM/hub/commit/beaf196efdcab56695622a164b88eb4024848703))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.8.2 to ^0.8.3
+    * @privateaim/server-kit bumped from ^0.8.2 to ^0.8.3
+
 ## [0.8.2](https://github.com/PrivateAIM/hub/compare/v0.8.1...v0.8.2) (2024-08-28)
 
 
