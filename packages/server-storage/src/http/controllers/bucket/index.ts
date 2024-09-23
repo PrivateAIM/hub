@@ -40,8 +40,8 @@ export class BucketController {
         @DPath('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<ReadableStream> {
-        return await executeBucketRouteStreamHandler(req, res) as ReadableStream;
+    ): Promise<any> {
+        return await executeBucketRouteStreamHandler(req, res) as any;
     }
 
     @DPost('/:id/upload', [ForceLoggedInMiddleware])

@@ -35,8 +35,8 @@ export class BucketFileController {
         @DPath('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<ReadableStream> {
-        return await executeBucketFileRouteStreamHandler(req, res) as ReadableStream;
+    ): Promise<any> {
+        return await executeBucketFileRouteStreamHandler(req, res) as any;
     }
 
     @DGet('/:id', [ForceLoggedInMiddleware])
