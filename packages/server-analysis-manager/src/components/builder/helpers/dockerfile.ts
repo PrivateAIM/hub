@@ -71,8 +71,15 @@ export async function bundleDockerFile(context: DockerFileBuildContext) : Promis
         entryPoint.name,
     );
 
-    let entrypointCommand = masterImage.command;
-    let entrypointCommandArguments = masterImage.command_arguments;
+    let { command } = masterImage;
+    let commandArguments : string[] = [];
+
+    if (
+        masterImage.command_arguments &&
+        Array.isArray(masterImage.command_arguments)
+    ) {
+        commandArguments = masterImage.command_arguments;
+    }
 
     const { data: masterImageGroups } = await coreClient.masterImageGroup.getMany({
         filter: {
@@ -81,23 +88,30 @@ export async function bundleDockerFile(context: DockerFileBuildContext) : Promis
     });
 
     if (masterImageGroups.length > 0) {
-        const masterImageGroup = masterImageGroups.shift();
-        if (masterImageGroup) {
-            entrypointCommand = entrypointCommand || masterImageGroup.command;
-            entrypointCommandArguments = entrypointCommandArguments || masterImageGroup.command_arguments;
+        const masterImageGroup = masterImageGroups[0];
+
+        if (
+            !command &&
+            masterImageGroup.command
+        ) {
+            command = masterImageGroup.command;
+        }
+
+        if (
+            commandArguments.length === 0 &&
+            masterImageGroup.command_arguments &&
+            Array.isArray(masterImageGroup.command_arguments)
+        ) {
+            commandArguments = masterImageGroup.command_arguments;
         }
     }
 
-    let argumentsString = '';
-
-    if (entrypointCommandArguments) {
-        let parts = Array.isArray(entrypointCommandArguments) ?
-            entrypointCommandArguments :
-            [entrypointCommandArguments];
-
-        parts = parts.map((part) => `"${part}"`);
-        argumentsString = `${parts.join(', ')} `;
+    const cmdParts : string[] = [];
+    cmdParts.push(`"${command}"`);
+    for (let i = 0; i < commandArguments.length; i++) {
+        cmdParts.push(`"${commandArguments[i]}"`);
     }
+    cmdParts.push(`"${path.posix.join(AnalysisContainerPath.CODE, entrypointPath)}"`);
 
     const masterImagePath = `${getHostNameFromString(context.hostname)}/master/${masterImage.virtual_path}`;
     const content = `
@@ -105,7 +119,7 @@ export async function bundleDockerFile(context: DockerFileBuildContext) : Promis
     RUN mkdir -p ${AnalysisContainerPath.CODE}
     RUN chmod -R +x ${AnalysisContainerPath.CODE}
 
-    CMD ["${entrypointCommand}", ${argumentsString}"${path.posix.join(AnalysisContainerPath.CODE, entrypointPath)}"]
+    CMD [${cmdParts.join(', ')}]
     `;
 
     return {

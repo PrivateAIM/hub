@@ -50,7 +50,7 @@ export async function syncMasterImages(
             data.command = input[i].command;
         }
 
-        if (typeof input[i].command_arguments !== 'undefined') {
+        if (typeof input[i].commandArguments !== 'undefined') {
             data.command_arguments = input[i].commandArguments;
         }
 
@@ -110,7 +110,7 @@ export async function syncMasterImageGroups(
             data.command = input[i].command;
         }
 
-        if (typeof input[i].command_arguments !== 'undefined') {
+        if (typeof input[i].commandArguments !== 'undefined') {
             data.command_arguments = input[i].commandArguments;
         }
 

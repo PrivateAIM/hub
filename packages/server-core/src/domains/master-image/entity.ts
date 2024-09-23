@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { deserialize, serialize } from '@authup/kit';
 import {
     Column,
     CreateDateColumn,
@@ -37,8 +38,19 @@ export class MasterImageEntity implements MasterImage {
     @Column({ type: 'text', nullable: true })
         command: string | null;
 
-    @Column({ type: 'json', nullable: true })
-        command_arguments: any | null;
+    @Column({
+        type: 'text',
+        nullable: true,
+        transformer: {
+            to(value: any): any {
+                return serialize(value);
+            },
+            from(value: any): any {
+                return deserialize(value);
+            },
+        },
+    })
+        command_arguments: unknown | null;
 
     // ------------------------------------------------------------------
 
