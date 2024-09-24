@@ -20,6 +20,7 @@ import { setupAuthupService, setupHarborService } from '../core';
 import { buildDataSourceOptions } from '../database';
 import { createRouter } from '../http/router';
 import { createHttpServer } from '../http/server';
+import { DatabaseIntegrityService } from '../services';
 
 export async function startCommand() {
     const config = createConfig();
@@ -73,6 +74,9 @@ export async function startCommand() {
 
         logger.info('Applied database schema.');
     }
+
+    const databaseIntegrity = new DatabaseIntegrityService(dataSource);
+    await databaseIntegrity.check();
 
     // if (!check.schema) {
     logger.info('Executing authup service setup...');
