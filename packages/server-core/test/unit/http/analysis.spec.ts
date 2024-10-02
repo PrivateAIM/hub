@@ -6,6 +6,7 @@
  */
 
 import type { Analysis } from '@privateaim/core-kit';
+import { createNanoID } from '@privateaim/kit';
 import { buildHTTPValidationErrorMessage } from '@privateaim/server-http-kit';
 import { isClientError } from 'hapic';
 import {
@@ -74,6 +75,8 @@ describe('src/controllers/core/analysis', () => {
     });
 
     it('should not create resource with invalid project', async () => {
+        expect.assertions(1);
+
         const client = suite.client();
 
         try {
@@ -92,10 +95,12 @@ describe('src/controllers/core/analysis', () => {
     });
 
     it('should not create resource with invalid master-image', async () => {
+        expect.assertions(1);
+
         const client = suite.client();
 
         const project = await client.project.create({
-            name: 'development',
+            name: createNanoID(),
         });
 
         try {
