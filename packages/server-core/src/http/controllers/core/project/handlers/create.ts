@@ -5,12 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { isEntityUnique, useDataSource } from 'typeorm-extension';
 import { ForbiddenError } from '@ebec/http';
 import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
-import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '@privateaim/server-http-kit';
+import { DatabaseConflictError } from '../../../../../database';
 import { ProjectEntity } from '../../../../../domains';
 import { runProjectValidation } from '../utils/validation';
 
@@ -35,6 +36,15 @@ export async function createProjectRouteHandler(req: Request, res: Response) : P
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(ProjectEntity);
     const entity = repository.create(result.data);
+
+    const isUnique = await isEntityUnique({
+        entity,
+        entityTarget: ProjectEntity,
+        dataSource,
+    });
+    if (!isUnique) {
+        throw new DatabaseConflictError();
+    }
 
     await repository.save(entity);
 

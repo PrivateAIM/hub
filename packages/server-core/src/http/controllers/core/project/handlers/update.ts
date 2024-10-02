@@ -10,8 +10,9 @@ import { isRealmResourceWritable } from '@authup/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
-import { useDataSource } from 'typeorm-extension';
+import { isEntityUnique, useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '@privateaim/server-http-kit';
+import { DatabaseConflictError } from '../../../../../database';
 import { ProjectEntity } from '../../../../../domains';
 import { runProjectValidation } from '../utils/validation';
 
@@ -41,6 +42,16 @@ export async function updateProjectRouteHandler(req: Request, res: Response) : P
     }
 
     entity = repository.merge(entity, result.data);
+
+    const isUnique = await isEntityUnique({
+        entity,
+        entityTarget: ProjectEntity,
+        entityExisting: entity,
+        dataSource,
+    });
+    if (!isUnique) {
+        throw new DatabaseConflictError();
+    }
 
     await repository.save(entity);
 

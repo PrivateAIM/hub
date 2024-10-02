@@ -17,7 +17,7 @@ export class ProjectEntity implements Project {
     @PrimaryGeneratedColumn('uuid')
         id: string;
 
-    @Column({ type: 'varchar', length: 256 })
+    @Column({ type: 'varchar', length: 256, unique: true })
         name: string;
 
     @Column({ type: 'text', nullable: true })
