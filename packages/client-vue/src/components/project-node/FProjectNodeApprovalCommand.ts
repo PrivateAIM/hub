@@ -27,9 +27,9 @@ const FProjectNodeApprovalCommand = defineComponent({
             type: String,
             required: true,
         },
-        approvalStatus: String as PropType<ProjectNodeApprovalStatus>,
+        approvalStatus: String as PropType<`${ProjectNodeApprovalStatus}`>,
         command: {
-            type: String as PropType<ProjectNodeApprovalCommand>,
+            type: String as PropType<`${ProjectNodeApprovalCommand}`>,
             required: true,
         },
         elementType: {

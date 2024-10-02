@@ -44,11 +44,11 @@ export default defineComponent({
         },
         target: {
             type: String as PropType<'node' | 'analysis'>,
-            default: DomainType.NODE,
+            default: `${DomainType.NODE}`,
         },
         direction: {
             type: String as PropType<'in' | 'out'>,
-            default: Direction.OUT,
+            default: `${Direction.OUT}`,
         },
     },
     slots: Object as SlotsType<ListSlotsType<AnalysisNode>>,

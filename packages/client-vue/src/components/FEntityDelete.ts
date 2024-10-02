@@ -19,12 +19,7 @@ import {
     defineComponent, getCurrentInstance, h, mergeProps, ref, resolveDynamicComponent,
 } from 'vue';
 import { injectCoreHTTPClient } from '../core';
-
-enum ElementType {
-    BUTTON = 'button',
-    LINK = 'link',
-    DROP_DOWN_ITEM = 'dropDownItem',
-}
+import { ElementType } from './constants';
 
 export default defineComponent({
     name: 'FEntityDelete',
@@ -39,7 +34,7 @@ export default defineComponent({
         },
         elementType: {
             type: String as PropType<`${ElementType}`>,
-            default: ElementType.BUTTON,
+            default: `${ElementType.BUTTON}`,
         },
 
         entityId: {

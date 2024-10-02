@@ -161,7 +161,7 @@ export default defineComponent({
                             {{ entity.project.user_id }}
                         </template>
                         <template v-else-if="entity.project.robot_id">
-                            {{ entity.project.project.robot_id }}
+                            {{ entity.project.robot_id }}
                         </template>
                     </div>
                 </div>

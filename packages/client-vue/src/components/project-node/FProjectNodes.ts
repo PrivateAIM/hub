@@ -48,7 +48,7 @@ export default defineComponent({
         },
         direction: {
             type: String as PropType<'in' | 'out'>,
-            default: Direction.OUT,
+            default: `${Direction.OUT}`,
         },
         includeNode: {
             type: Boolean,
