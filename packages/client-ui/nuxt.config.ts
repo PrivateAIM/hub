@@ -42,6 +42,7 @@ export default defineNuxtConfig({
         '@fortawesome/fontawesome-free/css/all.css',
         'bootstrap/dist/css/bootstrap.css',
         '@/assets/css/vue-layout-navigation.css',
+        '@/assets/css/vue-form-wizard.css',
         '@/assets/css/root.css',
         '@/assets/css/core/header.css',
         '@/assets/css/core/navbar.css',
