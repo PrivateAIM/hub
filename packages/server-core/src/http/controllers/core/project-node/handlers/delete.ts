@@ -5,14 +5,21 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/core-kit';
+import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
+import { AnalysisNodeRunStatus } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
+import { useRequestEnv } from '@privateaim/server-http-kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
+import { In } from 'typeorm';
 import { useDataSource } from 'typeorm-extension';
-import { useRequestEnv } from '@privateaim/server-http-kit';
-import { ProjectEntity, ProjectNodeEntity } from '../../../../../domains';
+import {
+    AnalysisEntity,
+    AnalysisNodeEntity,
+    ProjectEntity,
+    ProjectNodeEntity,
+} from '../../../../../domains';
 
 export async function deleteProjectNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -41,6 +48,56 @@ export async function deleteProjectNodeRouteHandler(req: Request, res: Response)
     ) {
         throw new ForbiddenError('You are not authorized to drop this project node.');
     }
+
+    // -------------------------------------------
+
+    const analysisRepository = dataSource.getRepository(AnalysisEntity);
+    const analyses = await analysisRepository.find({
+        where: {
+            project_id: entity.project_id,
+        },
+    });
+
+    if (analyses.length > 0) {
+        const analysisIDs = analyses.map((analysis) => analysis.id);
+
+        const analysisNodeRepository = dataSource.getRepository(AnalysisNodeEntity);
+        const analysisNodes = await analysisNodeRepository.find({
+            where: {
+                analysis_id: In(analysisIDs),
+                node_id: entity.node_id,
+            },
+        });
+
+        if (analysisNodes.length > 0) {
+            let nodeIsActivelyUsed: boolean = false;
+            for (let i = 0; i < analysisNodes.length; i++) {
+                if (
+                    analysisNodes[i].run_status &&
+                    analysisNodes[i].run_status !== AnalysisNodeRunStatus.FAILED
+                ) {
+                    nodeIsActivelyUsed = true;
+                    break;
+                }
+
+                const index = analyses.findIndex((analysis) => analysis.id === analysisNodes[i].analysis_id);
+                if (index !== -1) {
+                    analyses[i].nodes -= 1;
+                }
+            }
+
+            if (nodeIsActivelyUsed) {
+                throw new BadRequestError(
+                    'The node can not be disconnected from the project because it is used by an analysis.',
+                );
+            }
+
+            await analysisNodeRepository.remove(analysisNodes);
+            await analysisRepository.save(analyses);
+        }
+    }
+
+    // -------------------------------------------
 
     const { id: entityId } = entity;
 
