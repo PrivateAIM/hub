@@ -17,7 +17,7 @@ export function mountErrorMiddleware(router: Router) {
         const isServerError = error.statusCode >= 500 &&
             error.statusCode < 600;
 
-        if (isServerError) {
+        if (isServerError || error.logMessage) {
             useLogger().error(error);
 
             if (error.cause) {
@@ -62,7 +62,8 @@ export function mountErrorMiddleware(router: Router) {
         const exposeError = typeof error.expose === 'boolean' ?
             error.expose :
             !isServerError;
-        if (exposeError) {
+
+        if (!exposeError) {
             error.message = 'An internal server error occurred.';
         }
 
@@ -72,7 +73,7 @@ export function mountErrorMiddleware(router: Router) {
             statusCode: error.statusCode,
             code: `${error.code}`,
             message: error.message,
-            ...(isObject(error.data) && exposeError ? error.data : {}),
+            ...(exposeError && isObject(error.data) ? error.data : {}),
         };
     }));
 }
