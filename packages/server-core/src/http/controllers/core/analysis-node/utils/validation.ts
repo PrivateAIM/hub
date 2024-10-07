@@ -16,7 +16,7 @@ import {
     buildHTTPValidationErrorMessage,
     createHTTPValidationResult,
     extendHTTPValidationResultWithRelation,
-    useRequestEnv, useRequestIdentityRealm,
+    useRequestIdentityRealm,
 } from '@privateaim/server-http-kit';
 import { AnalysisEntity, NodeEntity, ProjectNodeEntity } from '../../../../../domains';
 import type { AnalysisNodeEntity } from '../../../../../domains';

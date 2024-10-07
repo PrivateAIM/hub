@@ -20,7 +20,7 @@ import {
     useDataSource,
 } from 'typeorm-extension';
 import { NotFoundError } from '@ebec/http';
-import { useRequestEnv, useRequestIdentityRealm } from '@privateaim/server-http-kit';
+import { useRequestIdentityRealm } from '@privateaim/server-http-kit';
 import { RegistryProjectEntity, onlyRealmWritableQueryResources } from '../../../../../domains';
 
 function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>, fields: any) {

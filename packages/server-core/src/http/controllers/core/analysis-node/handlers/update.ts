@@ -11,7 +11,7 @@ import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { useRequestEnv, useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
+import { useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { AnalysisNodeEntity } from '../../../../../domains';
 import { runAnalysisNodeValidation } from '../utils';
 

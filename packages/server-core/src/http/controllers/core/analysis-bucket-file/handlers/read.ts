@@ -13,7 +13,7 @@ import {
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceReadable } from '@authup/core-kit';
-import { useRequestEnv, useRequestIdentityRealm } from '@privateaim/server-http-kit';
+import { useRequestIdentityRealm } from '@privateaim/server-http-kit';
 import { AnalysisBucketFileEntity, onlyRealmWritableQueryResources } from '../../../../../domains';
 
 export async function getOneAnalysisBucketFileRouteHandler(req: Request, res: Response) : Promise<any> {

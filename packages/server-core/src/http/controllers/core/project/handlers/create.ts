@@ -6,11 +6,11 @@
  */
 
 import { isEntityUnique, useDataSource } from 'typeorm-extension';
-import { BadRequestError, ForbiddenError } from '@ebec/http';
+import { BadRequestError } from '@ebec/http';
 import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
-import { useRequestEnv, useRequestIdentityOrFail, useRequestPermissionChecker } from '@privateaim/server-http-kit';
+import { useRequestIdentityOrFail, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { DatabaseConflictError } from '../../../../../database';
 import { ProjectEntity } from '../../../../../domains';
 import { runProjectValidation } from '../utils/validation';
