@@ -6,7 +6,7 @@
  */
 
 import type { Realm, Robot, User } from '@authup/core-kit';
-import type { Abilities } from '@authup/kit';
+import type { PermissionChecker } from '@authup/kit';
 import type {
     Namespace as _Namespace,
     Server as _Server,
@@ -14,7 +14,7 @@ import type {
 } from 'socket.io';
 
 export type SocketData = {
-    abilities?: Abilities,
+    permissionChecker?: PermissionChecker,
 
     realmId?: Realm['id'],
     realmName?: Realm['name'],

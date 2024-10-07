@@ -8,7 +8,7 @@
 import { isRealmResourceWritable } from '@authup/core-kit';
 import { ForbiddenError } from '@ebec/http';
 import type { HTTPValidationResult } from '@privateaim/server-http-kit';
-import { createHTTPValidationResult, useRequestEnv } from '@privateaim/server-http-kit';
+import { createHTTPValidationResult, useRequestIdentityRealm } from '@privateaim/server-http-kit';
 import { check } from 'express-validator';
 import type { Request } from 'routup';
 import type { BucketEntity } from '../../../../domains';
@@ -39,7 +39,7 @@ export async function runBucketValidation(
     // ----------------------------------------------
 
     if (operation === 'create') {
-        const realm = useRequestEnv(req, 'realm');
+        const realm = useRequestIdentityRealm(req);
         if (result.data.realm_id) {
             if (!isRealmResourceWritable(realm, result.data.realm_id)) {
                 throw new ForbiddenError('You are not permitted to create this bucket.');

@@ -6,9 +6,9 @@
  */
 
 import { PermissionName as AuthupPermissionName, REALM_MASTER_NAME } from '@authup/core-kit';
-import type { Ability } from '@authup/kit';
-import { Abilities, OAuth2SubKind } from '@authup/kit';
-import type { TokenVerificationData } from '@authup/server-core-plugin-kit';
+import type { PermissionItem } from '@authup/kit';
+import { OAuth2SubKind, PermissionChecker, PermissionMemoryProvider } from '@authup/kit';
+import type { TokenVerificationData } from '@authup/server-adapter-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { Socket } from '../../types';
 
@@ -22,13 +22,13 @@ TokenVerificationData,
 'sub_name'
 >;
 
-function generateAbilities(): Ability[] {
+function generateAbilities(): PermissionItem[] {
     return Object.values({
         ...PermissionName,
         ...AuthupPermissionName,
     }).map((name) => ({
         name,
-    } satisfies Ability));
+    } satisfies PermissionItem));
 }
 
 export function createFakeTokenVerificationData(): TokenVerificationDataMinimal {
@@ -49,7 +49,7 @@ export function applyTokenVerificationData(
     data: TokenVerificationDataMinimal,
     fakeAbilities?: boolean,
 ) {
-    let abilities: Ability[];
+    let abilities: PermissionItem[];
     if (fakeAbilities) {
         abilities = generateAbilities();
     } else {
@@ -58,7 +58,10 @@ export function applyTokenVerificationData(
 
     socket.data.realmId = data.realm_id;
     socket.data.realmName = data.realm_name;
-    socket.data.abilities = new Abilities(abilities);
+
+    socket.data.permissionChecker = new PermissionChecker({
+        provider: new PermissionMemoryProvider(abilities),
+    });
 
     switch (data.sub_kind) {
         case OAuth2SubKind.USER: {

@@ -5,18 +5,20 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Abilities } from '@authup/kit';
+import type { RequestPermissionChecker } from './permission';
+
+export type RequestIdentity = {
+    id: string;
+    type: 'user' | 'client' | 'robot',
+    realmId: string,
+    realmName: string
+    attributes?: Record<string, any>,
+};
 
 export type RequestEnv = {
-    abilities?: Abilities,
+    permissionChecker?: RequestPermissionChecker,
 
-    realmId?: string,
-    realmName?: string,
-    realm?: { id?: string, name?: string },
+    identity?: RequestIdentity,
 
-    userId?: string,
-    userName?: string,
-
-    robotId?: string,
-    robotName?: string
+    scopes?: string[],
 };

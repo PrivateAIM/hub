@@ -30,10 +30,14 @@ export function registerProjectSocketHandlers(socket: Socket) {
     socket.on(
         buildDomainEventSubscriptionFullName(DomainType.PROJECT, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
-            if (
-                !socket.data.abilities.has(PermissionName.PROJECT_DELETE) &&
-                !socket.data.abilities.has(PermissionName.PROJECT_UPDATE)
-            ) {
+            try {
+                await socket.data.permissionChecker.preCheckOneOf({
+                    name: [
+                        PermissionName.PROJECT_DELETE,
+                        PermissionName.PROJECT_UPDATE,
+                    ],
+                });
+            } catch (e) {
                 if (isEventCallback(cb)) {
                     cb(new UnauthorizedError());
                 }

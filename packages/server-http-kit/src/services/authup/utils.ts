@@ -5,13 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Ability } from '@authup/kit';
-import { Abilities } from '@authup/kit';
-import { PermissionName as AuthupPermissionName, REALM_MASTER_NAME } from '@authup/core-kit';
-import type { TokenVerificationData } from '@authup/server-core-plugin-kit';
+import type { PermissionItem } from '@authup/kit';
+import { PermissionChecker, PermissionMemoryProvider } from '@authup/kit';
+import { PermissionName as AuthupPermissionName, REALM_MASTER_NAME, transformOAuth2ScopeToArray } from '@authup/core-kit';
+import type { TokenVerificationData } from '@authup/server-adapter-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { Request } from 'routup';
-import { setRequestEnv } from '../../request';
+import { RequestPermissionChecker, setRequestEnv } from '../../request';
 
 type TokenVerificationDataMinimal = Pick<
 TokenVerificationData,
@@ -20,16 +20,17 @@ TokenVerificationData,
 'realm_name' |
 'sub' |
 'sub_kind' |
-'sub_name'
+'sub_name' |
+'scope'
 >;
 
-function generateAbilities(): Ability[] {
+function generateAbilities(): PermissionItem[] {
     return Object.values({
         ...PermissionName,
         ...AuthupPermissionName,
     }).map((name) => ({
         name,
-    } satisfies Ability));
+    } satisfies PermissionItem));
 }
 
 export function createFakeTokenVerificationData(): TokenVerificationDataMinimal {
@@ -50,33 +51,29 @@ export function applyTokenVerificationData(
     data: TokenVerificationDataMinimal,
     fakeAbilities?: boolean,
 ) {
-    let abilities: Ability[];
+    let abilities: PermissionItem[];
     if (fakeAbilities) {
         abilities = generateAbilities();
     } else {
         abilities = data.permissions;
     }
 
-    const ability = new Abilities(abilities);
-    setRequestEnv(req, 'abilities', ability);
+    const permissionChecker = new PermissionChecker({
+        provider: new PermissionMemoryProvider(abilities),
+    });
+    const requestPermissionChecker = new RequestPermissionChecker(req, permissionChecker);
+    setRequestEnv(req, 'permissionChecker', requestPermissionChecker);
 
-    setRequestEnv(req, 'realmId', data.realm_id);
-    setRequestEnv(req, 'realmName', data.realm_name);
-    setRequestEnv(req, 'realm', {
-        id: data.realm_id,
-        name: data.realm_name,
+    setRequestEnv(req, 'identity', {
+        id: data.sub,
+        type: data.sub_kind,
+        realmId: data.realm_id,
+        realmName: data.realm_name,
+        attributes: {
+            id: data.sub,
+            name: data.sub_name,
+        },
     });
 
-    switch (data.sub_kind) {
-        case 'user': {
-            setRequestEnv(req, 'userId', data.sub);
-            setRequestEnv(req, 'userName', data.sub_name);
-            break;
-        }
-        case 'robot': {
-            setRequestEnv(req, 'robotId', data.sub);
-            setRequestEnv(req, 'robotName', data.sub_name);
-            break;
-        }
-    }
+    setRequestEnv(req, 'scopes', transformOAuth2ScopeToArray(data.scope));
 }

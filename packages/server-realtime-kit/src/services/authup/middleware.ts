@@ -6,8 +6,8 @@
  */
 
 import type { TokenCreatorOptions } from '@authup/core-http-kit';
-import type { TokenVerifierRedisCacheOptions } from '@authup/server-core-plugin-kit';
-import { createMiddleware } from '@authup/server-core-plugin-socket-io';
+import type { TokenVerifierRedisCacheOptions } from '@authup/server-adapter-kit';
+import { createMiddleware } from '@authup/server-adapter-socket-io';
 import type {
     Middleware, Namespace, Server, Socket,
 } from '../../types';

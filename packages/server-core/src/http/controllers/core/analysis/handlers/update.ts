@@ -11,17 +11,15 @@ import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { useRequestEnv } from '@privateaim/server-http-kit';
+import { useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { AnalysisEntity } from '../../../../../domains';
 import { runAnalysisValidation } from '../utils';
 
 export async function updateAnalysisRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
-    const ability = useRequestEnv(req, 'abilities');
-    if (!ability.has(PermissionName.ANALYSIS_UPDATE)) {
-        throw new ForbiddenError();
-    }
+    const permissionChecker = useRequestPermissionChecker(req);
+    await permissionChecker.preCheck({ name: PermissionName.ANALYSIS_UPDATE });
 
     const result = await runAnalysisValidation(req, 'update');
     if (!result.data) {
@@ -36,7 +34,14 @@ export async function updateAnalysisRouteHandler(req: Request, res: Response) : 
         throw new NotFoundError();
     }
 
-    if (!isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.realm_id)) {
+    await permissionChecker.check({
+        name: PermissionName.ANALYSIS_UPDATE,
+        data: {
+            attributes: entity,
+        },
+    });
+
+    if (!isRealmResourceWritable(useRequestIdentityRealm(req), entity.realm_id)) {
         throw new ForbiddenError();
     }
 

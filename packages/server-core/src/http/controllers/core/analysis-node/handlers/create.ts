@@ -5,22 +5,20 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BadRequestError, ForbiddenError } from '@ebec/http';
+import { BadRequestError } from '@ebec/http';
 import { AnalysisNodeApprovalStatus, NodeType } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { useRequestEnv } from '@privateaim/server-http-kit';
+import { useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { useEnv } from '../../../../../config';
 import { AnalysisEntity, AnalysisNodeEntity } from '../../../../../domains';
 import { runAnalysisNodeValidation } from '../utils';
 
 export async function createAnalysisNodeRouteHandler(req: Request, res: Response) : Promise<any> {
-    const ability = useRequestEnv(req, 'abilities');
-    if (!ability.has(PermissionName.ANALYSIS_UPDATE)) {
-        throw new ForbiddenError();
-    }
+    const permissionChecker = useRequestPermissionChecker(req);
+    await permissionChecker.preCheck({ name: PermissionName.ANALYSIS_UPDATE });
 
     const result = await runAnalysisNodeValidation(req, 'create');
     if (

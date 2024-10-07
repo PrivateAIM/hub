@@ -10,7 +10,7 @@ import { isRealmResourceWritable } from '@authup/core-kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { useRequestEnv } from '@privateaim/server-http-kit';
+import { useRequestIdentityRealm } from '@privateaim/server-http-kit';
 import { AnalysisBucketFileEntity } from '../../../../../domains';
 import { runAnalysisFileValidation } from '../utils';
 
@@ -25,7 +25,7 @@ export async function updateAnalysisBucketFileRouteHandler(req: Request, res: Re
         throw new NotFoundError();
     }
 
-    if (!isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.realm_id)) {
+    if (!isRealmResourceWritable(useRequestIdentityRealm(req), entity.realm_id)) {
         throw new ForbiddenError();
     }
 

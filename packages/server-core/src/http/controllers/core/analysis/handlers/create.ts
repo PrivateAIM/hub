@@ -5,21 +5,22 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Analysis } from '@privateaim/core-kit';
 import { ForbiddenError } from '@ebec/http';
+import type { Analysis } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { useRequestEnv } from '@privateaim/server-http-kit';
+import {
+    useRequestIdentityOrFail,
+    useRequestPermissionChecker,
+} from '@privateaim/server-http-kit';
 import { runAnalysisValidation } from '../utils';
 import { AnalysisEntity, ProjectEntity, runAnalysisSpinUpCommand } from '../../../../../domains';
 
 export async function createAnalysisRouteHandler(req: Request, res: Response) : Promise<any> {
-    const ability = useRequestEnv(req, 'abilities');
-    if (!ability.has(PermissionName.ANALYSIS_CREATE)) {
-        throw new ForbiddenError();
-    }
+    const permissionChecker = useRequestPermissionChecker(req);
+    await permissionChecker.preCheck({ name: PermissionName.ANALYSIS_CREATE });
 
     const result = await runAnalysisValidation(req, 'create');
 
@@ -33,12 +34,28 @@ export async function createAnalysisRouteHandler(req: Request, res: Response) : 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository<Analysis>(AnalysisEntity);
 
-    const realm = useRequestEnv(req, 'realm');
+    const identity = useRequestIdentityOrFail(req);
 
     const entity = repository.create({
-        realm_id: realm.id,
-        user_id: useRequestEnv(req, 'userId'),
+        realm_id: identity.realmId,
         ...result.data,
+    });
+    switch (identity.type) {
+        case 'user': {
+            entity.user_id = identity.id;
+            break;
+        }
+        // todo: support robot as well
+        default: {
+            throw new ForbiddenError('Only user accounts are permitted to create an analysis.');
+        }
+    }
+
+    await permissionChecker.check({
+        name: PermissionName.ANALYSIS_CREATE,
+        data: {
+            attributes: entity,
+        },
     });
 
     await repository.save(entity);

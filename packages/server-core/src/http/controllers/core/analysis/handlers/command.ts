@@ -8,7 +8,7 @@
 import { isRealmResourceWritable } from '@authup/core-kit';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { AnalysisAPICommand } from '@privateaim/core-kit';
-import { HTTPValidationError, useRequestEnv } from '@privateaim/server-http-kit';
+import { HTTPValidationError, useRequestIdentityRealm } from '@privateaim/server-http-kit';
 import { check, matchedData, validationResult } from 'express-validator';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
@@ -57,7 +57,7 @@ export async function handleAnalysisCommandRouteHandler(req: Request, res: Respo
         throw new NotFoundError();
     }
 
-    if (!isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.realm_id)) {
+    if (!isRealmResourceWritable(useRequestIdentityRealm(req), entity.realm_id)) {
         throw new ForbiddenError();
     }
 

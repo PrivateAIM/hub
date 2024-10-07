@@ -5,22 +5,19 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ForbiddenError, NotFoundError } from '@ebec/http';
+import { NotFoundError } from '@ebec/http';
 import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { useRequestEnv } from '@privateaim/server-http-kit';
+import { useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { RegistryEntity } from '../../../../../domains';
 
 export async function deleteRegistryRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
-    const ability = useRequestEnv(req, 'abilities');
-
-    if (!ability.has(PermissionName.REGISTRY_MANAGE)) {
-        throw new ForbiddenError();
-    }
+    const permissionChecker = useRequestPermissionChecker(req);
+    await permissionChecker.preCheck({ name: PermissionName.REGISTRY_MANAGE });
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(RegistryEntity);

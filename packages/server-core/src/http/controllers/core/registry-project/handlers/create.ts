@@ -5,22 +5,19 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ForbiddenError } from '@ebec/http';
 import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { useRequestEnv } from '@privateaim/server-http-kit';
+import { useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
 import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../../../../components';
 import { runRegistryProjectValidation } from '../utils';
 import { RegistryProjectEntity } from '../../../../../domains';
 
 export async function createRegistryProjectRouteHandler(req: Request, res: Response) : Promise<any> {
-    const ability = useRequestEnv(req, 'abilities');
-    if (!ability.has(PermissionName.REGISTRY_PROJECT_MANAGE)) {
-        throw new ForbiddenError();
-    }
+    const permissionChecker = useRequestPermissionChecker(req);
+    await permissionChecker.preCheck({ name: PermissionName.REGISTRY_PROJECT_MANAGE });
 
     const result = await runRegistryProjectValidation(req, 'create');
 

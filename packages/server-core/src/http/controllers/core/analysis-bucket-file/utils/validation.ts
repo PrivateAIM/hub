@@ -11,7 +11,6 @@ import type { HTTPValidationResult } from '@privateaim/server-http-kit';
 import {
     createHTTPValidationResult,
     extendHTTPValidationResultWithRelation,
-    useRequestEnv,
 } from '@privateaim/server-http-kit';
 import { AnalysisBucketEntity } from '../../../../../domains';
 import type { AnalysisBucketFileEntity } from '../../../../../domains';
@@ -63,25 +62,6 @@ export async function runAnalysisFileValidation(
         id: 'bucket_id',
         entity: 'bucket',
     });
-
-    // ----------------------------------------------
-
-    if (operation === 'create') {
-        result.data.realm_id = useRequestEnv(req, 'realmId');
-        result.data.analysis_id = result.relation.bucket.analysis_id;
-
-        const userId = useRequestEnv(req, 'userId');
-        if (userId) {
-            result.data.user_id = userId;
-        }
-
-        const robotId = useRequestEnv(req, 'robotId');
-        if (robotId) {
-            result.data.robot_id = robotId;
-        }
-    }
-
-    // ----------------------------------------------
 
     return result;
 }

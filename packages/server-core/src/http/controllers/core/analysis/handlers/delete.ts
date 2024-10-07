@@ -11,17 +11,15 @@ import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { useRequestEnv } from '@privateaim/server-http-kit';
+import { useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { AnalysisEntity, ProjectEntity } from '../../../../../domains';
 import { runAnalysisTearDownCommand } from '../../../../../domains/analysis/commands/tear-down';
 
 export async function deleteAnalysisRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
-    const ability = useRequestEnv(req, 'abilities');
-    if (!ability.has(PermissionName.ANALYSIS_DELETE)) {
-        throw new ForbiddenError();
-    }
+    const permissionChecker = useRequestPermissionChecker(req);
+    await permissionChecker.preCheck({ name: PermissionName.ANALYSIS_DELETE });
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisEntity);
@@ -32,7 +30,14 @@ export async function deleteAnalysisRouteHandler(req: Request, res: Response) : 
         throw new NotFoundError();
     }
 
-    if (!isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.realm_id)) {
+    await permissionChecker.check({
+        name: PermissionName.ANALYSIS_DELETE,
+        data: {
+            attributes: entity,
+        },
+    });
+
+    if (!isRealmResourceWritable(useRequestIdentityRealm(req), entity.realm_id)) {
         throw new ForbiddenError();
     }
 

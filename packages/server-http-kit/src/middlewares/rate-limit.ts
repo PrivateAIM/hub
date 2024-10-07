@@ -9,32 +9,27 @@ import { REALM_MASTER_NAME } from '@authup/core-kit';
 import type { OptionsInput } from '@routup/rate-limit';
 import { rateLimit } from '@routup/rate-limit';
 import type { Request, Router } from 'routup';
-import { useRequestEnv } from '../request';
+import { useRequestIdentity } from '../request';
 
 export function mountRateLimiterMiddleware(router: Router) {
     const options : OptionsInput = {
         skip(req: Request) {
-            const robot = useRequestEnv(req, 'robotId');
-            if (robot) {
-                const { name } = useRequestEnv(req, 'realm');
+            const identity = useRequestIdentity(req);
 
-                if (
-                    name === REALM_MASTER_NAME &&
-                    useRequestEnv(req, 'robotName') === 'system'
-                ) {
-                    return true;
-                }
-            }
-
-            return false;
+            return identity &&
+                identity.type === 'robot' &&
+                identity.realmName === REALM_MASTER_NAME;
         },
         max(req: Request) {
-            if (useRequestEnv(req, 'userId')) {
+            const identity = useRequestIdentity(req);
+            if (identity && identity.type === 'user') {
                 return 60 * 100; // 100 req p. sec
             }
 
-            const robot = useRequestEnv(req, 'robotId');
-            if (robot) {
+            if (
+                identity &&
+                (identity.type === 'robot' || identity.type === 'client')
+            ) {
                 return 60 * 1000; // 1000 req p. sec
             }
 

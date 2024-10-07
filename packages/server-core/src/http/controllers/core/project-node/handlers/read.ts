@@ -15,7 +15,7 @@ import {
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceReadable } from '@authup/core-kit';
-import { useRequestEnv } from '@privateaim/server-http-kit';
+import { useRequestIdentityRealm } from '@privateaim/server-http-kit';
 import { ProjectNodeEntity, onlyRealmWritableQueryResources } from '../../../../../domains';
 
 export async function getOneProjectNodeRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -39,8 +39,8 @@ export async function getOneProjectNodeRouteHandler(req: Request, res: Response)
     }
 
     if (
-        !isRealmResourceReadable(useRequestEnv(req, 'realm'), entity.node_realm_id) &&
-        !isRealmResourceReadable(useRequestEnv(req, 'realm'), entity.project_realm_id)
+        !isRealmResourceReadable(useRequestIdentityRealm(req), entity.node_realm_id) &&
+        !isRealmResourceReadable(useRequestIdentityRealm(req), entity.project_realm_id)
     ) {
         throw new ForbiddenError();
     }
@@ -55,7 +55,7 @@ export async function getManyProjectNodeRouteHandler(req: Request, res: Response
     const query = repository.createQueryBuilder('analysisNode');
     query.distinctOn(['analysisNode.id']);
 
-    onlyRealmWritableQueryResources(query, useRequestEnv(req, 'realm'), [
+    onlyRealmWritableQueryResources(query, useRequestIdentityRealm(req), [
         'analysisNode.node_realm_id',
         'analysisNode.project_realm_id',
     ]);

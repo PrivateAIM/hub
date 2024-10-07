@@ -13,7 +13,7 @@ import {
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceReadable } from '@authup/core-kit';
-import { useRequestEnv } from '@privateaim/server-http-kit';
+import { useRequestIdentityRealm } from '@privateaim/server-http-kit';
 import { AnalysisBucketFileEntity, onlyRealmWritableQueryResources } from '../../../../../domains';
 
 export async function getOneAnalysisBucketFileRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -31,7 +31,7 @@ export async function getOneAnalysisBucketFileRouteHandler(req: Request, res: Re
 
     const entity = await query.getOne();
 
-    if (!isRealmResourceReadable(useRequestEnv(req, 'realm'), entity.realm_id)) {
+    if (!isRealmResourceReadable(useRequestIdentityRealm(req), entity.realm_id)) {
         throw new ForbiddenError();
     }
 
@@ -48,7 +48,7 @@ export async function getManyAnalysisBucketFileRouteHandler(req: Request, res: R
     const query = repository.createQueryBuilder('analysisFile');
     query.distinctOn(['analysisFile.id']);
 
-    onlyRealmWritableQueryResources(query, useRequestEnv(req, 'realm'), [
+    onlyRealmWritableQueryResources(query, useRequestIdentityRealm(req), [
         'analysisFile.realm_id',
     ]);
 

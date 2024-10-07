@@ -17,7 +17,7 @@ import {
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import type { Permission, Policy } from '@authup/core-kit';
 import { isRealmResourceReadable } from '@authup/core-kit';
-import { useRequestEnv } from '@privateaim/server-http-kit';
+import { useRequestIdentityRealm } from '@privateaim/server-http-kit';
 import { AnalysisPermissionEntity, onlyRealmWritableQueryResources } from '../../../../../domains';
 
 type RelationMapKey = 'analysis' | 'permission' | 'policy';
@@ -85,7 +85,7 @@ export async function getOneAnalysisPermissionRouteHandler(req: Request, res: Re
         }
     }
 
-    if (!isRealmResourceReadable(useRequestEnv(req, 'realm'), entity.analysis_realm_id)) {
+    if (!isRealmResourceReadable(useRequestIdentityRealm(req), entity.analysis_realm_id)) {
         throw new ForbiddenError();
     }
 
@@ -98,7 +98,7 @@ export async function getManyAnalysisPermissionRouteHandler(req: Request, res: R
     const query = repository.createQueryBuilder('analysisPermission');
     query.distinctOn(['analysisPermission.id']);
 
-    onlyRealmWritableQueryResources(query, useRequestEnv(req, 'realm'), [
+    onlyRealmWritableQueryResources(query, useRequestIdentityRealm(req), [
         'analysisPermission.analysis_realm_id',
     ]);
 

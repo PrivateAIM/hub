@@ -5,5 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+export * from './permission';
 export * from './env';
+export * from './identity';
+export * from './identity-realm';
 export * from './types';

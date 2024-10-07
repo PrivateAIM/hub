@@ -11,13 +11,16 @@ import { isRealmResourceWritable } from '@authup/core-kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { useRequestEnv } from '@privateaim/server-http-kit';
+import {
+    useRequestIdentityOrFail,
+    useRequestIdentityRealm,
+    useRequestPermissionChecker,
+} from '@privateaim/server-http-kit';
 import { useMinio } from '../../../../core';
 import {
     BucketFileEntity,
-    getActorFromRequest,
-    isBucketFileOwnedByActor,
-    isBucketOwnedByActor, toBucketName,
+    isBucketFileOwnedByIdentity,
+    isBucketOwnedByIdentity, toBucketName,
 } from '../../../../domains';
 
 export async function executeBucketFileRouteDeleteHandler(req: Request, res: Response) : Promise<any> {
@@ -36,17 +39,15 @@ export async function executeBucketFileRouteDeleteHandler(req: Request, res: Res
         throw new NotFoundError();
     }
 
-    const actor = getActorFromRequest(req);
+    const actor = useRequestIdentityOrFail(req);
     if (
-        !isBucketOwnedByActor(entity.bucket, actor) &&
-        !isBucketFileOwnedByActor(entity, actor)
+        !isBucketOwnedByIdentity(entity.bucket, actor) &&
+        !isBucketFileOwnedByIdentity(entity, actor)
     ) {
-        const ability = useRequestEnv(req, 'abilities');
-        if (!ability.has(PermissionName.BUCKET_UPDATE)) {
-            throw new ForbiddenError();
-        }
+        const permissionChecker = useRequestPermissionChecker(req);
+        await permissionChecker.preCheck({ name: PermissionName.BUCKET_UPDATE });
 
-        if (!isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.realm_id)) {
+        if (!isRealmResourceWritable(useRequestIdentityRealm(req), entity.realm_id)) {
             throw new ForbiddenError();
         }
     }

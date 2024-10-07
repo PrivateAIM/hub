@@ -11,21 +11,21 @@
     "license": "Apache-2.0",
     "description": "This package contains the realtime application which connects the API with socket based clients.",
     "dependencies": {
-        "@authup/kit": "^1.0.0-beta.19",
-        "@authup/core-kit": "^1.0.0-beta.19",
-        "@authup/core-realtime-kit": "^1.0.0-beta.19",
-        "@authup/server-core-plugin-kit": "^1.0.0-beta.19",
-        "@authup/server-core-plugin-socket-io": "^1.0.0-beta.19",
+        "@authup/kit": "^1.0.0-beta.20",
+        "@authup/core-kit": "^1.0.0-beta.20",
+        "@authup/core-realtime-kit": "^1.0.0-beta.20",
+        "@authup/server-adapter-kit": "^1.0.0-beta.20",
+        "@authup/server-adapter-socket-io": "^1.0.0-beta.20",
         "@privateaim/kit": "^0.8.3",
         "@privateaim/server-kit": "^0.8.3",
         "@ebec/http": "^2.3.0"
     },
     "devDependencies": {
-        "redis-extension": "^1.5.0",
+        "redis-extension": "^2.0.0",
         "socket.io": "^4.8.0"
     },
     "peerDependencies": {
-        "redis-extension": "^1.5.0",
+        "redis-extension": "^2.0.0",
         "socket.io": "^4.8.0"
     },
     "scripts": {

@@ -6,25 +6,23 @@
  */
 
 import { NodeType, ProjectNodeApprovalStatus } from '@privateaim/core-kit';
-import { ForbiddenError } from '@ebec/http';
 import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { useRequestEnv } from '@privateaim/server-http-kit';
+import { useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { ProjectEntity, ProjectNodeEntity } from '../../../../../domains';
 import { runProjectNodeValidation } from '../utils';
 import { useEnv } from '../../../../../config';
 
 export async function createProjectNodeRouteHandler(req: Request, res: Response) : Promise<any> {
-    const ability = useRequestEnv(req, 'abilities');
-
-    if (
-        !ability.has(PermissionName.PROJECT_UPDATE) &&
-        !ability.has(PermissionName.PROJECT_CREATE)
-    ) {
-        throw new ForbiddenError('You are not allowed to add a project node.');
-    }
+    const permissionChecker = useRequestPermissionChecker(req);
+    await permissionChecker.preCheck({
+        name: [
+            PermissionName.PROJECT_CREATE,
+            PermissionName.PROJECT_UPDATE,
+        ],
+    });
 
     const result = await runProjectNodeValidation(req, 'create');
 

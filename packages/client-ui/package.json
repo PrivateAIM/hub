@@ -18,9 +18,9 @@
         "typecheck": "nuxi typecheck"
     },
     "devDependencies": {
-        "@authup/client-web-kit": "^1.0.0-beta.19",
-        "@authup/core-http-kit": "^1.0.0-beta.19",
-        "@authup/core-kit": "^1.0.0-beta.19",
+        "@authup/client-web-kit": "^1.0.0-beta.20",
+        "@authup/core-http-kit": "^1.0.0-beta.20",
+        "@authup/core-kit": "^1.0.0-beta.20",
         "@ilingo/vuelidate": "^5.0.3",
         "@fortawesome/fontawesome-free": "^6.6.0",
         "@nuxtjs/google-fonts": "^3.2.0",
