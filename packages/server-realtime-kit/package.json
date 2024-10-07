@@ -21,21 +21,12 @@
         "@ebec/http": "^2.3.0"
     },
     "devDependencies": {
-<<<<<<< Updated upstream
-        "redis-extension": "^1.5.0",
+        "redis-extension": "^2.0.0",
         "socket.io": "^4.8.0"
     },
     "peerDependencies": {
-        "redis-extension": "^1.5.0",
+        "redis-extension": "^2.0.0",
         "socket.io": "^4.8.0"
-=======
-        "redis-extension": "^2.0.0",
-        "socket.io": "^4.7.5"
-    },
-    "peerDependencies": {
-        "redis-extension": "^2.0.0",
-        "socket.io": "^4.7.5"
->>>>>>> Stashed changes
     },
     "scripts": {
         "dev": "ts-node src/index.ts",
