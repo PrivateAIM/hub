@@ -11,7 +11,7 @@ import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { useRequestEnv } from '@privateaim/server-http-kit';
+import { useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { ProjectNodeEntity } from '../../../../../domains';
 import { runProjectNodeValidation } from '../utils';
 
@@ -26,22 +26,14 @@ export async function updateProjectNodeRouteHandler(req: Request, res: Response)
         throw new NotFoundError();
     }
 
-    const ability = useRequestEnv(req, 'abilities');
+    const permissionChecker = useRequestPermissionChecker(req);
 
-    const isAuthorityOfNode = isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.node_realm_id);
-    const isAuthorizedForNode = ability.has(PermissionName.PROJECT_APPROVE);
-
-    const isAuthorityOfProject = isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.project_realm_id);
-    if (isAuthorityOfProject && !isAuthorityOfNode) {
-        throw new ForbiddenError('Only permitted target node members can update this object.');
-    }
-
-    if (
-        !isAuthorityOfNode ||
-        !isAuthorizedForNode
-    ) {
+    const isAuthorityOfNode = isRealmResourceWritable(useRequestIdentityRealm(req), entity.node_realm_id);
+    if (isAuthorityOfNode) {
         throw new ForbiddenError('You are not permitted to update this object.');
     }
+
+    await permissionChecker.preCheck({ name: PermissionName.PROJECT_APPROVE });
 
     const result = await runProjectNodeValidation(req, 'update');
 

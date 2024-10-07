@@ -14,7 +14,7 @@ import type { HTTPValidationResult } from '@privateaim/server-http-kit';
 import {
     createHTTPValidationResult,
     extendHTTPValidationResultWithRelation,
-    useRequestEnv,
+    useRequestIdentityRealm,
 } from '@privateaim/server-http-kit';
 import { RegistryEntity } from '../../../../../domains';
 import type { NodeEntity } from '../../../../../domains';
@@ -97,7 +97,7 @@ export async function runNodeValidation(
     // ----------------------------------------------
 
     if (operation === 'create') {
-        const realm = useRequestEnv(req, 'realm');
+        const realm = useRequestIdentityRealm(req);
         if (result.data.realm_id) {
             if (!isRealmResourceWritable(realm, result.data.realm_id)) {
                 throw new ForbiddenError('You are not permitted to create this node.');

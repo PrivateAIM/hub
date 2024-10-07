@@ -6,31 +6,34 @@
  */
 
 import { isEntityUnique, useDataSource } from 'typeorm-extension';
-import { ForbiddenError } from '@ebec/http';
+import { BadRequestError, ForbiddenError } from '@ebec/http';
 import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
-import { useRequestEnv } from '@privateaim/server-http-kit';
+import { useRequestEnv, useRequestIdentityOrFail, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { DatabaseConflictError } from '../../../../../database';
 import { ProjectEntity } from '../../../../../domains';
 import { runProjectValidation } from '../utils/validation';
 
 export async function createProjectRouteHandler(req: Request, res: Response) : Promise<any> {
-    const ability = useRequestEnv(req, 'abilities');
-    if (!ability.has(PermissionName.PROJECT_CREATE)) {
-        throw new ForbiddenError();
-    }
+    const permissionChecker = useRequestPermissionChecker(req);
+    await permissionChecker.preCheck({ name: PermissionName.PROJECT_CREATE });
 
     const result = await runProjectValidation(req, 'create');
 
-    const userId = useRequestEnv(req, 'userId');
-    if (userId) {
-        result.data.user_id = userId;
-    }
-
-    const robotId = useRequestEnv(req, 'robotId');
-    if (robotId) {
-        result.data.robot_id = robotId;
+    const identity = useRequestIdentityOrFail(req);
+    switch (identity.type) {
+        case 'user': {
+            result.data.user_id = identity.id;
+            break;
+        }
+        case 'robot': {
+            result.data.robot_id = identity.id;
+            break;
+        }
+        default: {
+            throw new BadRequestError('Only user-/robot-accounts are permitted to create a project');
+        }
     }
 
     const dataSource = await useDataSource();

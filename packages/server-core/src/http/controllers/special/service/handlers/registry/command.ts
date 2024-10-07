@@ -8,14 +8,11 @@
 import {
     RegistryAPICommand,
 } from '@privateaim/core-kit';
-import {
-    ForbiddenError,
-} from '@ebec/http';
 import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { useRequestEnv } from '@privateaim/server-http-kit';
+import { useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import {
     isQueueRouterUsable,
     useLogger,
@@ -29,11 +26,8 @@ import { RegistryEntity, RegistryProjectEntity } from '../../../../../../domains
 import { runServiceRegistryValidation } from '../../utils/validation';
 
 export async function handleRegistryCommandRouteHandler(req: Request, res: Response) : Promise<any> {
-    const ability = useRequestEnv(req, 'abilities');
-
-    if (!ability.has(PermissionName.REGISTRY_MANAGE)) {
-        throw new ForbiddenError('You are not permitted to manage the registry.');
-    }
+    const permissionChecker = useRequestPermissionChecker(req);
+    await permissionChecker.preCheck({ name: PermissionName.REGISTRY_MANAGE });
 
     const { data: result } = await runServiceRegistryValidation(req);
 

@@ -30,9 +30,14 @@ export function registerRegistryProjectSocketHandlers(socket: Socket) {
     socket.on(
         buildDomainEventSubscriptionFullName(DomainType.REGISTRY_PROJECT, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
-            if (
-                !socket.data.abilities.has(PermissionName.REGISTRY_MANAGE)
-            ) {
+            try {
+                await socket.data.permissionChecker.preCheckOneOf({
+                    name: [
+                        PermissionName.REGISTRY_MANAGE,
+                        PermissionName.REGISTRY_PROJECT_MANAGE,
+                    ],
+                });
+            } catch (e) {
                 if (isEventCallback(cb)) {
                     cb(new UnauthorizedError());
                 }

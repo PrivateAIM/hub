@@ -11,7 +11,7 @@ import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { useRequestEnv } from '@privateaim/server-http-kit';
+import { useRequestEnv, useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { AnalysisNodeEntity } from '../../../../../domains';
 import { runAnalysisNodeValidation } from '../utils';
 
@@ -26,17 +26,29 @@ export async function updateAnalysisNodeRouteHandler(req: Request, res: Response
         throw new NotFoundError();
     }
 
-    const ability = useRequestEnv(req, 'abilities');
-
-    const isAuthorityOfNode = isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.node_realm_id);
-    const isAuthorityOfAnalysis = isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.analysis_realm_id);
+    const isAuthorityOfNode = isRealmResourceWritable(useRequestIdentityRealm(req), entity.node_realm_id);
+    const isAuthorityOfAnalysis = isRealmResourceWritable(useRequestIdentityRealm(req), entity.analysis_realm_id);
 
     if (!isAuthorityOfNode && !isAuthorityOfAnalysis) {
         throw new ForbiddenError();
     }
 
-    const canUpdate = ability.has(PermissionName.ANALYSIS_UPDATE);
-    const canApprove = ability.has(PermissionName.ANALYSIS_APPROVE);
+    const permissionChecker = useRequestPermissionChecker(req);
+
+    let canUpdate = false;
+    try {
+        await permissionChecker.preCheck({ name: PermissionName.ANALYSIS_UPDATE });
+        canUpdate = true;
+    } catch (e) {
+        // do nothing
+    }
+    let canApprove = false;
+    try {
+        await permissionChecker.preCheck({ name: PermissionName.ANALYSIS_APPROVE });
+        canApprove = true;
+    } catch (e) {
+        // do nothing
+    }
 
     if (!canUpdate && !canApprove) {
         throw new ForbiddenError();

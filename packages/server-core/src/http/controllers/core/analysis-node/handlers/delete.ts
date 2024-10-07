@@ -12,19 +12,19 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { MoreThan } from 'typeorm';
 import { isRealmResourceWritable } from '@authup/core-kit';
 import { useDataSource } from 'typeorm-extension';
-import { useRequestEnv } from '@privateaim/server-http-kit';
+import { useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { AnalysisEntity, AnalysisNodeEntity } from '../../../../../domains';
 
 export async function deleteAnalysisNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
-    const ability = useRequestEnv(req, 'abilities');
-    if (
-        !ability.has(PermissionName.ANALYSIS_UPDATE) &&
-        !ability.has(PermissionName.ANALYSIS_APPROVE)
-    ) {
-        throw new ForbiddenError();
-    }
+    const permissionChecker = useRequestPermissionChecker(req);
+    await permissionChecker.preCheckOneOf({
+        name: [
+            PermissionName.ANALYSIS_UPDATE,
+            PermissionName.ANALYSIS_APPROVE,
+        ],
+    });
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisNodeEntity);
@@ -36,8 +36,8 @@ export async function deleteAnalysisNodeRouteHandler(req: Request, res: Response
     }
 
     if (
-        !isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.node_realm_id) &&
-        !isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.analysis_realm_id)
+        !isRealmResourceWritable(useRequestIdentityRealm(req), entity.node_realm_id) &&
+        !isRealmResourceWritable(useRequestIdentityRealm(req), entity.analysis_realm_id)
     ) {
         throw new ForbiddenError();
     }

@@ -33,9 +33,13 @@ export function registerProjectNodeSocketHandlers(socket: Socket) {
     socket.on(
         buildDomainEventSubscriptionFullName(DomainType.PROJECT_NODE, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
-            if (
-                !socket.data.abilities.has(PermissionName.PROJECT_APPROVE)
-            ) {
+            try {
+                await socket.data.permissionChecker.preCheckOneOf({
+                    name: [
+                        PermissionName.PROJECT_APPROVE,
+                    ],
+                });
+            } catch (e) {
                 if (isEventCallback(cb)) {
                     cb(new UnauthorizedError());
                 }
@@ -67,9 +71,13 @@ export function registerProjectNodeForRealmSocketHandlers(socket: Socket) {
     socket.on(
         buildDomainEventSubscriptionFullName(DomainSubType.PROJECT_NODE_IN, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
-            if (
-                !socket.data.abilities.has(PermissionName.PROJECT_APPROVE)
-            ) {
+            try {
+                await socket.data.permissionChecker.preCheckOneOf({
+                    name: [
+                        PermissionName.PROJECT_APPROVE,
+                    ],
+                });
+            } catch (e) {
                 if (isEventCallback(cb)) {
                     cb(new UnauthorizedError());
                 }
@@ -103,9 +111,13 @@ export function registerProjectNodeForRealmSocketHandlers(socket: Socket) {
     socket.on(
         buildDomainEventSubscriptionFullName(DomainSubType.PROJECT_NODE_OUT, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
-            if (
-                !socket.data.abilities.has(PermissionName.PROJECT_UPDATE)
-            ) {
+            try {
+                await socket.data.permissionChecker.preCheckOneOf({
+                    name: [
+                        PermissionName.PROJECT_UPDATE,
+                    ],
+                });
+            } catch (e) {
                 if (isEventCallback(cb)) {
                     cb(new UnauthorizedError());
                 }

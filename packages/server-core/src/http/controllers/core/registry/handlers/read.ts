@@ -13,13 +13,13 @@ import type { SelectQueryBuilder } from 'typeorm';
 import {
     applyFilters, applyPagination, applyQueryFieldsParseOutput, applySort, useDataSource,
 } from 'typeorm-extension';
-import { ForbiddenError, NotFoundError } from '@ebec/http';
+import { NotFoundError } from '@ebec/http';
 import type { ParseAllowedOption } from 'rapiq';
 import { parseQueryFields } from 'rapiq';
-import { useRequestEnv } from '@privateaim/server-http-kit';
+import { useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { RegistryEntity } from '../../../../../domains';
 
-function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>) {
+async function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>) {
     const protectedFields : ParseAllowedOption<RegistryEntity> = [
         'account_secret',
     ];
@@ -41,16 +41,16 @@ function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>) {
         .filter((field) => field.path === 'registry' &&
             protectedFields.indexOf(field.key as any) !== -1);
 
-    const ability = useRequestEnv(req, 'abilities');
     if (protectedSelected.length > 0) {
-        if (
-            !ability.has(PermissionName.REGISTRY_MANAGE)
-        ) {
+        const permissionChecker = useRequestPermissionChecker(req);
+        await permissionChecker.preCheck({ name: PermissionName.REGISTRY_MANAGE });
+
+        /*
             throw new ForbiddenError(
                 `You are not permitted to read the restricted fields: ${
                     protectedSelected.map((field) => field.key).join(', ')}`,
             );
-        }
+        */
     }
 
     applyQueryFieldsParseOutput(query, fieldsParsed, { defaultAlias: 'registry' });
@@ -64,7 +64,7 @@ export async function getOneRegistryRouteHandler(req: Request, res: Response) : 
     const query = repository.createQueryBuilder('registry')
         .where('registry.id = :id', { id });
 
-    checkAndApplyFields(req, query);
+    await checkAndApplyFields(req, query);
 
     const entity = await query.getOne();
 
@@ -84,7 +84,7 @@ export async function getManyRegistryRouteHandler(req: Request, res: Response) :
     const repository = dataSource.getRepository(RegistryEntity);
     const query = repository.createQueryBuilder('registry');
 
-    checkAndApplyFields(req, query);
+    await checkAndApplyFields(req, query);
 
     applyFilters(query, filter, {
         defaultAlias: 'registry',

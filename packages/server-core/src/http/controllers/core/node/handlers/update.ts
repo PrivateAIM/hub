@@ -14,7 +14,7 @@ import { isRealmResourceWritable } from '@authup/core-kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { useRequestEnv } from '@privateaim/server-http-kit';
+import { useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
 import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../../../../components';
 import { createNodeRobot, runNodeValidation } from '../utils';
@@ -23,10 +23,8 @@ import { NodeEntity, RegistryProjectEntity } from '../../../../../domains';
 export async function updateNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
-    const ability = useRequestEnv(req, 'abilities');
-    if (!ability.has(PermissionName.NODE_UPDATE)) {
-        throw new ForbiddenError();
-    }
+    const permissionChecker = useRequestPermissionChecker(req);
+    await permissionChecker.preCheck({ name: PermissionName.NODE_UPDATE });
 
     const result = await runNodeValidation(req, 'update');
     if (!result.data) {
@@ -47,7 +45,7 @@ export async function updateNodeRouteHandler(req: Request, res: Response) : Prom
         throw new NotFoundError();
     }
 
-    if (!isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.realm_id)) {
+    if (!isRealmResourceWritable(useRequestIdentityRealm(req), entity.realm_id)) {
         throw new ForbiddenError('You are not permitted to delete this station.');
     }
 

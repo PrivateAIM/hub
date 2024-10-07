@@ -13,7 +13,7 @@ import type { HTTPValidationResult } from '@privateaim/server-http-kit';
 import {
     createHTTPValidationResult,
     extendHTTPValidationResultWithRelation,
-    useRequestEnv,
+    useRequestIdentityRealm,
 } from '@privateaim/server-http-kit';
 import {
     MasterImageEntity, ProjectEntity, RegistryEntity,
@@ -79,7 +79,7 @@ export async function runAnalysisValidation(
     });
 
     if (result.relation.project) {
-        if (!isRealmResourceWritable(useRequestEnv(req, 'realm'), result.relation.project.realm_id)) {
+        if (!isRealmResourceWritable(useRequestIdentityRealm(req), result.relation.project.realm_id)) {
             throw new BadRequestError('The referenced project realm is not permitted.');
         }
 

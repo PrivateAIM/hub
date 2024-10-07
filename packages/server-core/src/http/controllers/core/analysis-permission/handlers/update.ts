@@ -11,15 +11,13 @@ import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { useRequestEnv } from '@privateaim/server-http-kit';
+import { useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { AnalysisPermissionEntity } from '../../../../../domains';
 import { runAnalysisPermissionValidation } from '../utils';
 
 export async function updateAnalysisPermissionRouteHandler(req: Request, res: Response) : Promise<any> {
-    const ability = useRequestEnv(req, 'abilities');
-    if (!ability.has(PermissionName.ANALYSIS_UPDATE)) {
-        throw new ForbiddenError();
-    }
+    const permissionChecker = useRequestPermissionChecker(req);
+    await permissionChecker.preCheck({ name: PermissionName.ANALYSIS_UPDATE });
 
     const id = useRequestParam(req, 'id');
 
@@ -30,7 +28,7 @@ export async function updateAnalysisPermissionRouteHandler(req: Request, res: Re
         throw new NotFoundError();
     }
 
-    if (!isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.analysis_realm_id)) {
+    if (!isRealmResourceWritable(useRequestIdentityRealm(req), entity.analysis_realm_id)) {
         throw new ForbiddenError();
     }
 

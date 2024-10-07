@@ -5,17 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import { isUUID } from '@authup/kit';
-import { ForbiddenError, NotFoundError } from '@ebec/http';
+import { NotFoundError } from '@ebec/http';
 import Busboy from 'busboy';
 import crypto from 'node:crypto';
 import path from 'node:path';
 import { sendCreated, useRequestParam } from 'routup';
 import type { Request, Response } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { useRequestEnv } from '@privateaim/server-http-kit';
+import { useRequestIdentityOrFail } from '@privateaim/server-http-kit';
 import { streamToBuffer, useMinio } from '../../../../core';
 import {
-    BucketEntity, BucketFileEntity, getActorFromRequest, toBucketName,
+    BucketEntity, BucketFileEntity, toBucketName,
 } from '../../../../domains';
 
 export async function uploadRequestFiles(req: Request, bucketName: string) {
@@ -25,6 +25,8 @@ export async function uploadRequestFiles(req: Request, bucketName: string) {
         headers: req.headers,
         preservePath: true,
     });
+
+    const identity = useRequestIdentityOrFail(req);
 
     return new Promise<BucketFileEntity[]>((resolve, reject) => {
         const files : BucketFileEntity[] = [];
@@ -55,7 +57,7 @@ export async function uploadRequestFiles(req: Request, bucketName: string) {
                                     hash,
                                     size: buffer.length,
                                     directory: path.dirname(info.filename),
-                                    realm_id: useRequestEnv(req, 'realmId'),
+                                    realm_id: identity.realmId,
                                 } satisfies Partial<BucketFileEntity> as BucketFileEntity);
 
                                 fileResolve();
@@ -85,10 +87,7 @@ export async function uploadRequestFiles(req: Request, bucketName: string) {
 }
 
 export async function executeBucketRouteUploadHandler(req: Request, res: Response) : Promise<any> {
-    const actor = getActorFromRequest(req);
-    if (!actor) {
-        throw new ForbiddenError('Only users and robots are permitted to upload bucket files.');
-    }
+    const actor = useRequestIdentityOrFail(req);
 
     // todo: check permissions by membership
     const id = useRequestParam(req, 'id');

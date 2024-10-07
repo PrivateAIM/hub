@@ -16,7 +16,7 @@ import {
     buildHTTPValidationErrorMessage,
     createHTTPValidationResult,
     extendHTTPValidationResultWithRelation,
-    useRequestEnv,
+    useRequestEnv, useRequestIdentityRealm,
 } from '@privateaim/server-http-kit';
 import { AnalysisEntity, NodeEntity, ProjectNodeEntity } from '../../../../../domains';
 import type { AnalysisNodeEntity } from '../../../../../domains';
@@ -70,9 +70,7 @@ export async function runAnalysisNodeValidation(
     });
 
     if (result.relation.analysis) {
-        if (
-            !isRealmResourceWritable(useRequestEnv(req, 'realm'), result.relation.analysis.realm_id)
-        ) {
+        if (!isRealmResourceWritable(useRequestIdentityRealm(req), result.relation.analysis.realm_id)) {
             throw new BadRequestError(buildHTTPValidationErrorMessage('analysis_id'));
         }
 

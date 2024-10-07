@@ -6,8 +6,8 @@
  */
 
 import type { TokenCreatorOptions } from '@authup/core-http-kit';
-import type { TokenVerifierRedisCacheOptions } from '@authup/server-core-plugin-kit';
-import { createMiddleware } from '@authup/server-core-plugin-http';
+import type { TokenVerifierRedisCacheOptions } from '@authup/server-adapter-kit';
+import { createMiddleware } from '@authup/server-adapter-http';
 import { useRequestCookie } from '@routup/basic/cookie';
 import { parseAuthorizationHeader } from 'hapic';
 import type { Router } from 'routup';

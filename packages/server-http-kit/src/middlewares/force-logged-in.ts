@@ -5,21 +5,15 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { UnauthorizedError } from '@ebec/http';
 import type { HandlerInterface } from '@routup/decorators';
 import type {
     Next, Request, Response,
 } from 'routup';
-import { useRequestEnv } from '../request';
+import { useRequestIdentityOrFail } from '../request';
 
 export class ForceLoggedInMiddleware implements HandlerInterface {
     public run(request: Request, response: Response, next: Next) {
-        if (
-            typeof useRequestEnv(request, 'userId') === 'undefined' &&
-            typeof useRequestEnv(request, 'robotId') === 'undefined'
-        ) {
-            throw new UnauthorizedError();
-        }
+        useRequestIdentityOrFail(request);
 
         next();
     }

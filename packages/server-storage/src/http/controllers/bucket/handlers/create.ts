@@ -10,18 +10,16 @@ import { ForbiddenError } from '@ebec/http';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { useRequestEnv } from '@privateaim/server-http-kit';
+import { useRequestIdentityOrFail, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { useMinio } from '../../../../core';
-import { BucketEntity, getActorFromRequest, toBucketName } from '../../../../domains';
+import { BucketEntity, toBucketName } from '../../../../domains';
 import { runBucketValidation } from '../utils/validation';
 
 export async function executeBucketRouteCreateHandler(req: Request, res: Response) : Promise<any> {
-    const ability = useRequestEnv(req, 'abilities');
-    if (!ability.has(PermissionName.BUCKET_CREATE)) {
-        throw new ForbiddenError();
-    }
+    const permissionChecker = useRequestPermissionChecker(req);
+    await permissionChecker.preCheck({ name: PermissionName.BUCKET_CREATE });
 
-    const actor = getActorFromRequest(req);
+    const actor = useRequestIdentityOrFail(req);
     if (!actor) {
         throw new ForbiddenError('Only users and robots are permitted to create a bucket.');
     }

@@ -28,9 +28,13 @@ export function registerNodeSocketHandlers(socket: Socket) {
     socket.on(
         buildDomainEventSubscriptionFullName(DomainType.NODE, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
-            if (
-                !socket.data.abilities.has(PermissionName.NODE_UPDATE)
-            ) {
+            try {
+                await socket.data.permissionChecker.preCheckOneOf({
+                    name: [
+                        PermissionName.NODE_UPDATE,
+                    ],
+                });
+            } catch (e) {
                 if (isEventCallback(cb)) {
                     cb(new UnauthorizedError());
                 }

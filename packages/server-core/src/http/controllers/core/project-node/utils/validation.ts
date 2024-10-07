@@ -14,7 +14,7 @@ import type { HTTPValidationResult } from '@privateaim/server-http-kit';
 import {
     createHTTPValidationResult,
     extendHTTPValidationResultWithRelation,
-    useRequestEnv,
+    useRequestEnv, useRequestIdentityRealm,
 } from '@privateaim/server-http-kit';
 import type { ProjectNodeEntity } from '../../../../../domains';
 import { NodeEntity, ProjectEntity } from '../../../../../domains';
@@ -62,7 +62,7 @@ export async function runProjectNodeValidation(
     if (result.relation.project) {
         result.data.project_realm_id = result.relation.project.realm_id;
 
-        if (!isRealmResourceWritable(useRequestEnv(req, 'realm'), result.relation.project.realm_id)) {
+        if (!isRealmResourceWritable(useRequestIdentityRealm(req), result.relation.project.realm_id)) {
             throw new NotFoundError('The referenced project realm is not permitted.');
         }
     }

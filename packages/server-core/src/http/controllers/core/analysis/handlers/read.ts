@@ -15,7 +15,7 @@ import {
     useDataSource,
 } from 'typeorm-extension';
 import { isRealmResourceReadable } from '@authup/core-kit';
-import { useRequestEnv } from '@privateaim/server-http-kit';
+import { useRequestIdentityRealm } from '@privateaim/server-http-kit';
 import { AnalysisEntity, onlyRealmWritableQueryResources } from '../../../../../domains';
 
 export async function getOneAnalysisRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -31,7 +31,7 @@ export async function getOneAnalysisRouteHandler(req: Request, res: Response) : 
     const query = repository.createQueryBuilder('analysis')
         .where('analysis.id = :id', { id });
 
-    onlyRealmWritableQueryResources(query, useRequestEnv(req, 'realm'), 'analysis.realm_id');
+    onlyRealmWritableQueryResources(query, useRequestIdentityRealm(req), 'analysis.realm_id');
 
     applyRelations(query, include, {
         defaultAlias: 'analysis',
@@ -44,7 +44,7 @@ export async function getOneAnalysisRouteHandler(req: Request, res: Response) : 
         throw new NotFoundError();
     }
 
-    if (!isRealmResourceReadable(useRequestEnv(req, 'realm'), entity.realm_id)) {
+    if (!isRealmResourceReadable(useRequestIdentityRealm(req), entity.realm_id)) {
         throw new ForbiddenError();
     }
 
@@ -101,11 +101,11 @@ export async function getManyAnalysisRouteHandler(req: Request, res: Response) :
     // todo: analyse-nodes realms should also be valid
 
     if (filterRealmId) {
-        if (!isRealmResourceReadable(useRequestEnv(req, 'realm'), filterRealmId)) {
+        if (!isRealmResourceReadable(useRequestIdentityRealm(req), filterRealmId)) {
             throw new ForbiddenError('You are not permitted to inspect the analysis for the given realm.');
         }
     } else {
-        onlyRealmWritableQueryResources(query, useRequestEnv(req, 'realm'), 'analysis.realm_id');
+        onlyRealmWritableQueryResources(query, useRequestIdentityRealm(req), 'analysis.realm_id');
     }
 
     const [entities, total] = await query.getManyAndCount();

@@ -28,11 +28,15 @@ export function registerAnalysisSocketHandlers(socket: Socket) {
     socket.on(
         buildDomainEventSubscriptionFullName(DomainType.ANALYSIS, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
-            if (
-                !socket.data.abilities.has(PermissionName.ANALYSIS_UPDATE) &&
-                !socket.data.abilities.has(PermissionName.ANALYSIS_EXECUTION_START) &&
-                !socket.data.abilities.has(PermissionName.ANALYSIS_EXECUTION_STOP)
-            ) {
+            try {
+                await socket.data.permissionChecker.preCheckOneOf({
+                    name: [
+                        PermissionName.ANALYSIS_UPDATE,
+                        PermissionName.ANALYSIS_EXECUTION_START,
+                        PermissionName.ANALYSIS_EXECUTION_STOP,
+                    ],
+                });
+            } catch (e) {
                 if (isEventCallback(cb)) {
                     cb(new UnauthorizedError());
                 }

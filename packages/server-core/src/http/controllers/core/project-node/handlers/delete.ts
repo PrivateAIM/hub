@@ -9,7 +9,7 @@ import { isRealmResourceWritable } from '@authup/core-kit';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
 import { AnalysisNodeRunStatus } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
-import { useRequestEnv } from '@privateaim/server-http-kit';
+import { useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { In } from 'typeorm';
@@ -24,14 +24,13 @@ import {
 export async function deleteProjectNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
-    const ability = useRequestEnv(req, 'abilities');
-
-    if (
-        !ability.has(PermissionName.PROJECT_UPDATE) &&
-        !ability.has(PermissionName.PROJECT_DELETE)
-    ) {
-        throw new ForbiddenError('You are not allowed to drop a project node.');
-    }
+    const permissionChecker = useRequestPermissionChecker(req);
+    await permissionChecker.preCheck({
+        name: [
+            PermissionName.PROJECT_CREATE,
+            PermissionName.PROJECT_UPDATE,
+        ],
+    });
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(ProjectNodeEntity);
@@ -43,8 +42,8 @@ export async function deleteProjectNodeRouteHandler(req: Request, res: Response)
     }
 
     if (
-        !isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.node_realm_id) &&
-        !isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.project_realm_id)
+        !isRealmResourceWritable(useRequestIdentityRealm(req), entity.node_realm_id) &&
+        !isRealmResourceWritable(useRequestIdentityRealm(req), entity.project_realm_id)
     ) {
         throw new ForbiddenError('You are not authorized to drop this project node.');
     }

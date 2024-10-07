@@ -10,16 +10,14 @@ import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { useRequestEnv } from '@privateaim/server-http-kit';
+import { useRequestEnv, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { MasterImageGroupEntity } from '../../../../../domains';
 
 export async function deleteMasterImageGroupRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
-    const ability = useRequestEnv(req, 'abilities');
-    if (!ability.has(PermissionName.MASTER_IMAGE_GROUP_MANAGE)) {
-        throw new ForbiddenError();
-    }
+    const permissionChecker = useRequestPermissionChecker(req);
+    await permissionChecker.preCheck({ name: PermissionName.MASTER_IMAGE_GROUP_MANAGE });
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(MasterImageGroupEntity);

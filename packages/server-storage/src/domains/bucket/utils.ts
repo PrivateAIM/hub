@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Actor } from '../actor';
+import type { RequestIdentity } from '@privateaim/server-http-kit';
 import type { BucketEntity } from './entity';
 
-export function isBucketOwnedByActor(entity: BucketEntity, actor: Actor) {
+export function isBucketOwnedByIdentity(entity: BucketEntity, actor: RequestIdentity) {
     return entity.actor_type === actor.type &&
         entity.actor_id === actor.id;
 }
