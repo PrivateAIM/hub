@@ -5,13 +5,44 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { BuiltInPolicyType, PermissionError } from '@authup/kit';
 import { isObject } from '@privateaim/kit';
 import type { Router } from 'routup';
 import { errorHandler } from 'routup';
 import { useLogger } from '@privateaim/server-kit';
+import { EntityRelationLookupError } from 'typeorm-extension';
 
 export function mountErrorMiddleware(router: Router) {
     router.use(errorHandler((error, req, res) => {
+        const isServerError = error.statusCode >= 500 &&
+            error.statusCode < 600;
+
+        if (isServerError) {
+            useLogger().error(error);
+
+            if (error.cause) {
+                useLogger().error(error.cause);
+            }
+        }
+
+        if (error.cause instanceof PermissionError) {
+            error.expose = true;
+
+            if (
+                error.cause.policy &&
+                error.cause.policy.type === BuiltInPolicyType.IDENTITY
+            ) {
+                error.statusCode = 401;
+            } else {
+                error.statusCode = 403;
+            }
+        }
+
+        if (error.cause instanceof EntityRelationLookupError) {
+            error.expose = true;
+            error.statusCode = 400;
+        }
+
         // catch and decorate some db errors :)
         switch (error.code) {
             case 'ER_DUP_ENTRY':
@@ -28,18 +59,10 @@ export function mountErrorMiddleware(router: Router) {
                 break;
         }
 
-        const isServerError = (typeof error.expose !== 'undefined' && !error.expose) ||
-            (error.statusCode >= 500 && error.statusCode < 600);
-
-        if (isServerError || error.logMessage) {
-            useLogger().error(error);
-
-            if (error.cause) {
-                useLogger().error(error.cause);
-            }
-        }
-
-        if (isServerError) {
+        const exposeError = typeof error.expose === 'boolean' ?
+            error.expose :
+            !isServerError;
+        if (exposeError) {
             error.message = 'An internal server error occurred.';
         }
 
@@ -49,7 +72,7 @@ export function mountErrorMiddleware(router: Router) {
             statusCode: error.statusCode,
             code: `${error.code}`,
             message: error.message,
-            ...(isObject(error.data) && !isServerError ? error.data : {}),
+            ...(isObject(error.data) && exposeError ? error.data : {}),
         };
     }));
 }
