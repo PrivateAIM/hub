@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.8.4](https://github.com/PrivateAIM/hub/compare/v0.8.3...v0.8.4) (2024-10-07)
+
+
+### Features
+
+* bump authup & implement async policy & permission evaluation ([#807](https://github.com/PrivateAIM/hub/issues/807)) ([d065562](https://github.com/PrivateAIM/hub/commit/d065562585076e26553ad5a39f4a5789f7e18f24))
+* delete project-node relation on analysis-node deletion (if possible) ([#794](https://github.com/PrivateAIM/hub/issues/794)) ([0e953e3](https://github.com/PrivateAIM/hub/commit/0e953e39bdd16329ebd3026395262ba3dd6631bb))
+* enforce uniqueness for project name attribute ([#793](https://github.com/PrivateAIM/hub/issues/793)) ([0681249](https://github.com/PrivateAIM/hub/commit/0681249654e601c7cc4eec39a76ce8c2600ef7e9))
+* handle permission-/policy-error in error middleware ([4b4fae4](https://github.com/PrivateAIM/hub/commit/4b4fae4fd048ddf9509af3d611a201484b0d4eaf))
+* initial implementation of database-integrity service ([077fdd3](https://github.com/PrivateAIM/hub/commit/077fdd3aa5e29b285655289ff70c1c85f7d8219c))
+
+
+### Bug Fixes
+
+* building and scanning master image command arguments ([95041ea](https://github.com/PrivateAIM/hub/commit/95041ea8a037171080cdb2e9e0f5024baf53080b))
+* bump nuxt + vue & defining enum based component properties ([bdb65d2](https://github.com/PrivateAIM/hub/commit/bdb65d26fc95f7b61f3a7319d9e903ad316e315c))
+* condition for exposing error via middleware ([e7a5fee](https://github.com/PrivateAIM/hub/commit/e7a5feec09eec7f63c91e13781b4abc19cb787f6))
+* **deps:** bump locter from 2.1.1 to 2.1.2 ([#795](https://github.com/PrivateAIM/hub/issues/795)) ([fdb8cba](https://github.com/PrivateAIM/hub/commit/fdb8cba0c5a991a57ed9a26a324b9f2fed6caf5c))
+* **deps:** bump socket.io from 4.7.5 to 4.8.0 ([#800](https://github.com/PrivateAIM/hub/issues/800)) ([2f05947](https://github.com/PrivateAIM/hub/commit/2f05947e33a9e6a97cd7a49853e49e171004dfd3))
+* make analysis wizard step clickable ([#792](https://github.com/PrivateAIM/hub/issues/792)) ([3372b8a](https://github.com/PrivateAIM/hub/commit/3372b8ad509c3bca59fc56726b2e2bb7376cbfc0))
+* remove Readable response type for bucket controllers ([f8a9fe0](https://github.com/PrivateAIM/hub/commit/f8a9fe0b8e274677cc3e0afee248103dcef8aebf))
+
 ## [0.8.3](https://github.com/PrivateAIM/hub/compare/v0.8.2...v0.8.3) (2024-09-19)
 
 

@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.8.4](https://github.com/PrivateAIM/hub/compare/v0.8.3...v0.8.4) (2024-10-07)
+
+
+### Features
+
+* bump authup & implement async policy & permission evaluation ([#807](https://github.com/PrivateAIM/hub/issues/807)) ([d065562](https://github.com/PrivateAIM/hub/commit/d065562585076e26553ad5a39f4a5789f7e18f24))
+
+
+### Bug Fixes
+
+* bump nuxt + vue & defining enum based component properties ([bdb65d2](https://github.com/PrivateAIM/hub/commit/bdb65d26fc95f7b61f3a7319d9e903ad316e315c))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core-kit bumped from ^0.8.3 to ^0.8.4
+    * @privateaim/kit bumped from ^0.8.3 to ^0.8.4
+    * @privateaim/core-http-kit bumped from ^0.8.3 to ^0.8.4
+    * @privateaim/storage-kit bumped from ^0.8.3 to ^0.8.4
+  * peerDependencies
+    * @privateaim/core-kit bumped from ^0.8.3 to ^0.8.4
+    * @privateaim/storage-kit bumped from ^0.8.3 to ^0.8.4
+
 ## [0.8.3](https://github.com/PrivateAIM/hub/compare/v0.8.2...v0.8.3) (2024-09-19)
 
 
