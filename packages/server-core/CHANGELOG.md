@@ -1,5 +1,35 @@
 # Changelog
 
+## [0.8.4](https://github.com/PrivateAIM/hub/compare/v0.8.3...v0.8.4) (2024-10-09)
+
+
+### Features
+
+* bump authup & implement async policy & permission evaluation ([#807](https://github.com/PrivateAIM/hub/issues/807)) ([d065562](https://github.com/PrivateAIM/hub/commit/d065562585076e26553ad5a39f4a5789f7e18f24))
+* delete project-node relation on analysis-node deletion (if possible) ([#794](https://github.com/PrivateAIM/hub/issues/794)) ([0e953e3](https://github.com/PrivateAIM/hub/commit/0e953e39bdd16329ebd3026395262ba3dd6631bb))
+* enforce uniqueness for project name attribute ([#793](https://github.com/PrivateAIM/hub/issues/793)) ([0681249](https://github.com/PrivateAIM/hub/commit/0681249654e601c7cc4eec39a76ce8c2600ef7e9))
+* initial implementation of database-integrity service ([077fdd3](https://github.com/PrivateAIM/hub/commit/077fdd3aa5e29b285655289ff70c1c85f7d8219c))
+
+
+### Bug Fixes
+
+* building and scanning master image command arguments ([95041ea](https://github.com/PrivateAIM/hub/commit/95041ea8a037171080cdb2e9e0f5024baf53080b))
+* **deps:** bump locter from 2.1.1 to 2.1.2 ([#795](https://github.com/PrivateAIM/hub/issues/795)) ([fdb8cba](https://github.com/PrivateAIM/hub/commit/fdb8cba0c5a991a57ed9a26a324b9f2fed6caf5c))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.8.3 to ^0.8.4
+    * @privateaim/kit bumped from ^0.8.3 to ^0.8.4
+    * @privateaim/server-kit bumped from ^0.8.3 to ^0.8.4
+    * @privateaim/server-core-realtime bumped from ^0.8.3 to ^0.8.4
+    * @privateaim/server-http-kit bumped from ^0.8.3 to ^0.8.4
+    * @privateaim/server-analysis-manager-kit bumped from ^0.7.4 to ^0.7.5
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.8.3 to ^0.8.4
+
 ## [0.8.3](https://github.com/PrivateAIM/hub/compare/v0.8.2...v0.8.3) (2024-09-19)
 
 

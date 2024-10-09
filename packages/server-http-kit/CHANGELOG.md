@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.8.4](https://github.com/PrivateAIM/hub/compare/v0.8.3...v0.8.4) (2024-10-09)
+
+
+### Features
+
+* bump authup & implement async policy & permission evaluation ([#807](https://github.com/PrivateAIM/hub/issues/807)) ([d065562](https://github.com/PrivateAIM/hub/commit/d065562585076e26553ad5a39f4a5789f7e18f24))
+* handle permission-/policy-error in error middleware ([4b4fae4](https://github.com/PrivateAIM/hub/commit/4b4fae4fd048ddf9509af3d611a201484b0d4eaf))
+
+
+### Bug Fixes
+
+* condition for exposing error via middleware ([e7a5fee](https://github.com/PrivateAIM/hub/commit/e7a5feec09eec7f63c91e13781b4abc19cb787f6))
+* **deps:** bump locter from 2.1.1 to 2.1.2 ([#795](https://github.com/PrivateAIM/hub/issues/795)) ([fdb8cba](https://github.com/PrivateAIM/hub/commit/fdb8cba0c5a991a57ed9a26a324b9f2fed6caf5c))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.8.3 to ^0.8.4
+    * @privateaim/server-kit bumped from ^0.8.3 to ^0.8.4
+
 ## [0.8.3](https://github.com/PrivateAIM/hub/compare/v0.8.2...v0.8.3) (2024-09-19)
 
 
