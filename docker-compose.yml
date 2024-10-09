@@ -105,12 +105,6 @@ services:
         image: authup/authup
         pull_policy: always
         restart: always
-        healthcheck:
-            test: [ "CMD", "wget", "--spider", "--proxy", "off", "http://127.0.0.1:3000" ]
-            interval: 10s
-            timeout: 3s
-            retries: 10
-            start_period: 5s
         depends_on:
             mysql:
                 condition: service_healthy

@@ -83,7 +83,15 @@ export async function executeBucketFileRouteGetManyHandler(req: Request, res: Re
             allowed: ['bucket'],
         },
         filters: {
-            allowed: ['id', 'name', 'directory', 'realm_id', 'actor_type', 'actor_id'],
+            allowed: [
+                'id',
+                'name',
+                'directory',
+                'realm_id',
+                'actor_type',
+                'actor_id',
+                'bucket_id',
+            ],
         },
         pagination: {
             maxLimit: 50,
