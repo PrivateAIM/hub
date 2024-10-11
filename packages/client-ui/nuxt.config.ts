@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { ModuleOptions } from '@authup/client-web-nuxt';
 import path from 'node:path';
 import { defineNuxtConfig } from 'nuxt/config';
 
@@ -61,6 +62,14 @@ export default defineNuxtConfig({
     */
     modules: [
         [
+            // ../client-web-nuxt/src/module
+            '@authup/client-web-nuxt', {
+                apiURLRuntimeKey: 'authupUrl',
+                apiURLServerRuntimeKey: 'authupUrl',
+                cookieDomainRuntimeKey: 'cookieDomain',
+            } satisfies ModuleOptions,
+        ],
+        [
             '@nuxtjs/google-fonts', {
                 families: {
                     Asap: true,
@@ -69,6 +78,5 @@ export default defineNuxtConfig({
                 download: true,
             },
         ],
-        '@pinia/nuxt',
     ],
 });

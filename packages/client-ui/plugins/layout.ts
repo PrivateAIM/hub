@@ -17,7 +17,6 @@ import installNavigation from '@vuecs/navigation';
 import installPagination from '@vuecs/pagination';
 import installTimeago from '@vuecs/timeago';
 
-import { storeToRefs } from 'pinia';
 import { defineNuxtPlugin } from '#app';
 import { Navigation } from '../config/layout';
 
@@ -51,13 +50,9 @@ export default defineNuxtPlugin((ctx) => {
     ctx.vueApp.use(installFormControl);
 
     const store = useStore();
-    const { loggedIn } = storeToRefs(store);
 
     ctx.vueApp.use(installNavigation, {
-        provider: new Navigation({
-            isLoggedIn: () => loggedIn.value,
-            hasPermission: (name) => store.abilities.has(name),
-        }),
+        provider: new Navigation(store),
     });
 
     ctx.vueApp.use(installPagination);
