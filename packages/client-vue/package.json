@@ -43,7 +43,7 @@
     "devDependencies": {
         "@authup/client-web-kit": "^1.0.0-beta.20",
         "@authup/core-kit": "^1.0.0-beta.20",
-        "@authup/core-http-kit": "^1.0.0-beta.20",
+        "@authup/core-http-kit": "^1.0.0-beta.21",
         "@authup/core-realtime-kit": "^1.0.0-beta.20",
         "@authup/kit": "^1.0.0-beta.20",
         "@ilingo/vuelidate": "^5.0.3",
@@ -74,7 +74,7 @@
     "peerDependencies": {
         "@authup/client-web-kit": "^1.0.0-beta.20",
         "@authup/core-kit": "^1.0.0-beta.20",
-        "@authup/core-http-kit": "^1.0.0-beta.20",
+        "@authup/core-http-kit": "^1.0.0-beta.21",
         "@authup/core-realtime-kit": "^1.0.0-beta.20",
         "@authup/kit": "^1.0.0-beta.20",
         "@ilingo/vuelidate": "^5.0.3",
