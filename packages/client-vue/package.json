@@ -41,7 +41,7 @@
     },
     "homepage": "https://github.com/PrivateAim/hub#readme",
     "devDependencies": {
-        "@authup/client-web-kit": "^1.0.0-beta.20",
+        "@authup/client-web-kit": "^1.0.0-beta.21",
         "@authup/core-kit": "^1.0.0-beta.20",
         "@authup/core-http-kit": "^1.0.0-beta.20",
         "@authup/core-realtime-kit": "^1.0.0-beta.20",
@@ -72,7 +72,7 @@
         "vue3-form-wizard": "^0.2.4"
     },
     "peerDependencies": {
-        "@authup/client-web-kit": "^1.0.0-beta.20",
+        "@authup/client-web-kit": "^1.0.0-beta.21",
         "@authup/core-kit": "^1.0.0-beta.20",
         "@authup/core-http-kit": "^1.0.0-beta.20",
         "@authup/core-realtime-kit": "^1.0.0-beta.20",
