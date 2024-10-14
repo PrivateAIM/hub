@@ -13,7 +13,7 @@
     "description": "This package contains the realtime application which connects the API with socket based clients.",
     "dependencies": {
         "@authup/kit": "^1.0.0-beta.20",
-        "@authup/core-kit": "^1.0.0-beta.20",
+        "@authup/core-kit": "^1.0.0-beta.21",
         "@ebec/http": "^2.3.0",
         "@privateaim/kit": "^0.8.3",
         "@privateaim/core-kit": "^0.8.3",
