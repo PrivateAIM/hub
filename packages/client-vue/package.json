@@ -51,7 +51,7 @@
         "@privateaim/kit": "^0.8.3",
         "@privateaim/core-http-kit": "^0.8.3",
         "@privateaim/storage-kit": "^0.8.3",
-        "@types/node": "^22.7.4",
+        "@types/node": "^22.7.6",
         "@vitejs/plugin-vue": "^5.1.4",
         "@vuecs/form-controls": "^2.3.0",
         "@vuecs/link": "^1.0.0",
