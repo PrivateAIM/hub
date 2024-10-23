@@ -11,7 +11,7 @@
     "description": "",
     "dependencies": {
         "@authup/kit": "^1.0.0-beta.20",
-        "@authup/core-kit": "^1.0.0-beta.20",
+        "@authup/core-kit": "^1.0.0-beta.22",
         "@ebec/http": "^2.3.0",
         "@hapic/vault": "^2.3.4",
         "@privateaim/kit": "^0.8.3",
