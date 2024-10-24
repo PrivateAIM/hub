@@ -5,25 +5,26 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { MemoryCache } from '../../src';
+import { Cache, MemoryCacheAdapter } from '../../src';
 
 describe('memory-cache', () => {
-    it('should support operations (set,get,has,del)', () => {
-        const cache = new MemoryCache();
-        cache.set('foo', { bar: 'baz' }, {
+    it('should support operations (set,get,has,del)', async () => {
+        const adapter = new MemoryCacheAdapter();
+        const cache = new Cache(adapter);
+        await cache.set('foo', { bar: 'baz' }, {
             ttl: 1000 * 60 * 15,
         });
 
-        expect(cache.has('foo')).toBeTruthy();
+        expect(await cache.has('foo')).toBeTruthy();
 
-        let value = cache.get('foo');
+        let value = await cache.get('foo');
         expect(value).toEqual({ bar: 'baz' });
 
-        cache.del('foo');
+        await cache.drop('foo');
 
-        expect(cache.has('foo')).toBeFalsy();
+        expect(await cache.has('foo')).toBeFalsy();
 
-        value = cache.get('foo');
+        value = await cache.get('foo');
         expect(value).toBeUndefined();
     });
 });

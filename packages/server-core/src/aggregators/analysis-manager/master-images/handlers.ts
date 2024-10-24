@@ -12,7 +12,7 @@ import type {
 import {
     MasterImagesEvent,
 } from '@privateaim/server-analysis-manager-kit';
-import { useLogger, useMemoryCache } from '@privateaim/server-kit';
+import { useCache, useLogger } from '@privateaim/server-kit';
 import type { QueueRouterHandlers } from '@privateaim/server-kit';
 import { MemoryCacheID } from '../../../constants';
 import { syncMasterImageGroups, syncMasterImages } from './synchronize';
@@ -23,11 +23,11 @@ export function createAnalysisManagerMasterImagesHandlers() : QueueRouterHandler
     [MasterImagesEvent.PUSH_FAILED]: MasterImagesBasePayload,
     [MasterImagesEvent.SYNCHRONIZATION_FAILED]: MasterImagesBasePayload
 }> {
-    const memoryCache = useMemoryCache();
+    const memoryCache = useCache();
 
     return {
         [MasterImagesEvent.SYNCHRONIZED]: async (message) => {
-            memoryCache.del(MemoryCacheID.MASTER_IMAGES);
+            await memoryCache.drop(MemoryCacheID.MASTER_IMAGES);
 
             useLogger().debug('Synchronizing master images', {
                 groups: message.data.groups.length,
@@ -48,14 +48,14 @@ export function createAnalysisManagerMasterImagesHandlers() : QueueRouterHandler
             useLogger().info(`Updated ${images.updated.length} master images`);
             useLogger().info(`Deleted ${images.deleted.length} master images`);
         },
-        [MasterImagesEvent.BUILD_FAILED]: () => {
-            memoryCache.del(MemoryCacheID.MASTER_IMAGES);
+        [MasterImagesEvent.BUILD_FAILED]: async () => {
+            await memoryCache.drop(MemoryCacheID.MASTER_IMAGES);
         },
-        [MasterImagesEvent.PUSH_FAILED]: () => {
-            memoryCache.del(MemoryCacheID.MASTER_IMAGES);
+        [MasterImagesEvent.PUSH_FAILED]: async () => {
+            await memoryCache.drop(MemoryCacheID.MASTER_IMAGES);
         },
-        [MasterImagesEvent.SYNCHRONIZATION_FAILED]: () => {
-            memoryCache.del(MemoryCacheID.MASTER_IMAGES);
+        [MasterImagesEvent.SYNCHRONIZATION_FAILED]: async () => {
+            await memoryCache.drop(MemoryCacheID.MASTER_IMAGES);
         },
     };
 }
