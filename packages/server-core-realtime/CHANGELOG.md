@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.8.4](https://github.com/PrivateAIM/hub/compare/v0.8.3...v0.8.4) (2024-10-24)
+
+
+### Features
+
+* bump authup & implement async policy & permission evaluation ([#807](https://github.com/PrivateAIM/hub/issues/807)) ([d065562](https://github.com/PrivateAIM/hub/commit/d065562585076e26553ad5a39f4a5789f7e18f24))
+* bump authup & vuecs packages + refactored navigation ([c4db8d5](https://github.com/PrivateAIM/hub/commit/c4db8d51588b3d701815e2ba2f9b80e594f3663f))
+
+
+### Bug Fixes
+
+* **deps:** bump socket.io from 4.7.5 to 4.8.0 ([#800](https://github.com/PrivateAIM/hub/issues/800)) ([2f05947](https://github.com/PrivateAIM/hub/commit/2f05947e33a9e6a97cd7a49853e49e171004dfd3))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.8.3 to ^0.8.4
+    * @privateaim/core-kit bumped from ^0.8.3 to ^0.8.4
+    * @privateaim/core-realtime-kit bumped from ^0.7.4 to ^0.7.5
+    * @privateaim/server-kit bumped from ^0.8.3 to ^0.8.4
+    * @privateaim/server-realtime-kit bumped from ^0.8.3 to ^0.8.4
+
 ## [0.8.3](https://github.com/PrivateAIM/hub/compare/v0.8.2...v0.8.3) (2024-09-19)
 
 

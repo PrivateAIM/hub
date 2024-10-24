@@ -1,6 +1,6 @@
 {
     "name": "@privateaim/server-realtime-kit",
-    "version": "0.8.3",
+    "version": "0.8.4",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "author": {
@@ -16,8 +16,8 @@
         "@authup/core-realtime-kit": "^1.0.0-beta.22",
         "@authup/server-adapter-kit": "^1.0.0-beta.20",
         "@authup/server-adapter-socket-io": "^1.0.0-beta.20",
-        "@privateaim/kit": "^0.8.3",
-        "@privateaim/server-kit": "^0.8.3",
+        "@privateaim/kit": "^0.8.4",
+        "@privateaim/server-kit": "^0.8.4",
         "@ebec/http": "^2.3.0"
     },
     "devDependencies": {

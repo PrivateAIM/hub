@@ -1,7 +1,7 @@
 {
     "name": "@privateaim/client-ui",
     "private": true,
-    "version": "0.8.3",
+    "version": "0.8.4",
     "license": "Apache-2.0",
     "author": {
         "name": "Peter Placzek",
@@ -26,10 +26,10 @@
         "@ilingo/vuelidate": "^5.0.3",
         "@fortawesome/fontawesome-free": "^6.6.0",
         "@nuxtjs/google-fonts": "^3.2.0",
-        "@privateaim/client-vue": "^0.8.3",
-        "@privateaim/core-kit": "^0.8.3",
-        "@privateaim/kit": "^0.8.3",
-        "@privateaim/storage-kit": "^0.8.3",
+        "@privateaim/client-vue": "^0.8.4",
+        "@privateaim/core-kit": "^0.8.4",
+        "@privateaim/kit": "^0.8.4",
+        "@privateaim/storage-kit": "^0.8.4",
         "@pinia/nuxt": "^0.5.4",
         "@vuecs/countdown": "^1.0.0",
         "@vuecs/form-controls": "^2.3.1",
