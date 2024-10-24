@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.8.4](https://github.com/PrivateAIM/hub/compare/v0.8.3...v0.8.4) (2024-10-24)
+
+
+### Features
+
+* bump authup & implement async policy & permission evaluation ([#807](https://github.com/PrivateAIM/hub/issues/807)) ([d065562](https://github.com/PrivateAIM/hub/commit/d065562585076e26553ad5a39f4a5789f7e18f24))
+* bump authup & vuecs packages + refactored navigation ([c4db8d5](https://github.com/PrivateAIM/hub/commit/c4db8d51588b3d701815e2ba2f9b80e594f3663f))
+
+
+### Bug Fixes
+
+* building and scanning master image command arguments ([95041ea](https://github.com/PrivateAIM/hub/commit/95041ea8a037171080cdb2e9e0f5024baf53080b))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.8.3 to ^0.8.4
+    * @privateaim/kit bumped from ^0.8.3 to ^0.8.4
+    * @privateaim/core-http-kit bumped from ^0.8.3 to ^0.8.4
+    * @privateaim/server-kit bumped from ^0.8.3 to ^0.8.4
+    * @privateaim/server-analysis-manager-kit bumped from ^0.7.4 to ^0.7.5
+    * @privateaim/storage-kit bumped from ^0.8.3 to ^0.8.4
+
 ## [0.8.3](https://github.com/PrivateAIM/hub/compare/v0.8.2...v0.8.3) (2024-09-19)
 
 

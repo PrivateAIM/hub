@@ -1,6 +1,6 @@
 {
     "name": "@privateaim/server-storage",
-    "version": "0.8.3",
+    "version": "0.8.4",
     "private": true,
     "author": {
         "name": "Peter Placzek",
@@ -14,10 +14,10 @@
         "@authup/core-kit": "^1.0.0-beta.22",
         "@ebec/http": "^2.3.0",
         "@hapic/vault": "^2.3.4",
-        "@privateaim/kit": "^0.8.3",
-        "@privateaim/server-kit": "^0.8.3",
-        "@privateaim/server-http-kit": "^0.8.3",
-        "@privateaim/storage-kit": "^0.8.3",
+        "@privateaim/kit": "^0.8.4",
+        "@privateaim/server-kit": "^0.8.4",
+        "@privateaim/server-http-kit": "^0.8.4",
+        "@privateaim/storage-kit": "^0.8.4",
         "@routup/basic": "^1.4.1",
         "@routup/decorators": "^3.4.1",
         "busboy": "^1.6.0",
