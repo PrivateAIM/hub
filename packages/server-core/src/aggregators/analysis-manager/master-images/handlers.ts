@@ -12,9 +12,9 @@ import type {
 import {
     MasterImagesEvent,
 } from '@privateaim/server-analysis-manager-kit';
-import { useCache, useLogger } from '@privateaim/server-kit';
+import { useLogger } from '@privateaim/server-kit';
 import type { QueueRouterHandlers } from '@privateaim/server-kit';
-import { MemoryCacheID } from '../../../constants';
+import { useMasterImageService } from '../../../services';
 import { syncMasterImageGroups, syncMasterImages } from './synchronize';
 
 export function createAnalysisManagerMasterImagesHandlers() : QueueRouterHandlers<{
@@ -23,11 +23,11 @@ export function createAnalysisManagerMasterImagesHandlers() : QueueRouterHandler
     [MasterImagesEvent.PUSH_FAILED]: MasterImagesBasePayload,
     [MasterImagesEvent.SYNCHRONIZATION_FAILED]: MasterImagesBasePayload
 }> {
-    const memoryCache = useCache();
+    const masterImageService = useMasterImageService();
 
     return {
         [MasterImagesEvent.SYNCHRONIZED]: async (message) => {
-            await memoryCache.drop(MemoryCacheID.MASTER_IMAGES);
+            await masterImageService.setSynchronization(false);
 
             useLogger().debug('Synchronizing master images', {
                 groups: message.data.groups.length,
@@ -49,13 +49,13 @@ export function createAnalysisManagerMasterImagesHandlers() : QueueRouterHandler
             useLogger().info(`Deleted ${images.deleted.length} master images`);
         },
         [MasterImagesEvent.BUILD_FAILED]: async () => {
-            await memoryCache.drop(MemoryCacheID.MASTER_IMAGES);
+            await masterImageService.setSynchronization(false);
         },
         [MasterImagesEvent.PUSH_FAILED]: async () => {
-            await memoryCache.drop(MemoryCacheID.MASTER_IMAGES);
+            await masterImageService.setSynchronization(false);
         },
         [MasterImagesEvent.SYNCHRONIZATION_FAILED]: async () => {
-            await memoryCache.drop(MemoryCacheID.MASTER_IMAGES);
+            await masterImageService.setSynchronization(false);
         },
     };
 }

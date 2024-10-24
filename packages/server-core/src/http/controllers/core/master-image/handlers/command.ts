@@ -7,12 +7,11 @@
 
 import { MasterImageCommand } from '@privateaim/core-kit';
 import { BadRequestError, NotFoundError } from '@ebec/http';
-import { useCache } from '@privateaim/server-kit';
 import { useRequestBody } from '@routup/basic/body';
 import { sendAccepted } from 'routup';
 import type { Request, Response } from 'routup';
-import { MemoryCacheID } from '../../../../../constants';
 import { runMasterImagesSynchronizeCommand } from '../../../../../domains';
+import { useMasterImageService } from '../../../../../services';
 
 export async function commandMasterImageRouteHandler(req: Request, res: Response) {
     const body = useRequestBody(req);
@@ -23,27 +22,23 @@ export async function commandMasterImageRouteHandler(req: Request, res: Response
     ) {
         throw new BadRequestError('The master image command is not valid.');
     }
-
-    const memoryCache = useCache();
+    const masterImageService = useMasterImageService();
 
     const { command } = body;
 
     switch (command) {
         case MasterImageCommand.SYNC: {
-            if (await memoryCache.get(MemoryCacheID.MASTER_IMAGES)) {
+            const isActive = await masterImageService.isSynchronizing();
+            if (isActive) {
                 throw new BadRequestError('A master images synchronization process is already in progress.');
             }
 
-            await memoryCache.set(MemoryCacheID.MASTER_IMAGES, {
-                now: Date.now(),
-            }, {
-                ttl: 1000 * 60 * 15, // 15 minutes
-            });
+            await masterImageService.setSynchronization(true);
 
             try {
                 await runMasterImagesSynchronizeCommand();
             } catch (e) {
-                await memoryCache.drop(MemoryCacheID.MASTER_IMAGES);
+                await masterImageService.setSynchronization(false);
 
                 throw e;
             }

@@ -6,3 +6,4 @@
  */
 
 export * from './database-integrity';
+export * from './master-image';
