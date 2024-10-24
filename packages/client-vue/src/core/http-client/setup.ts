@@ -7,13 +7,17 @@
 
 import type { Client as BaseClient } from 'hapic';
 import {
-    STORE_ID, injectHTTPClient, injectStore, storeToRefs,
+    StoreDispatcherEventName,
+    injectHTTPClient,
+    injectStoreDispatcher,
+    injectStoreFactory,
+    storeToRefs,
 } from '@authup/client-web-kit';
 import { ClientResponseErrorTokenHook } from '@authup/core-http-kit';
 import type { App } from 'vue';
 
 export function setupBaseHTTPClient(app: App, client: BaseClient) {
-    const storeCreator = injectStore(app);
+    const storeCreator = injectStoreFactory(app);
     const store = storeCreator();
     const { refreshToken } = storeToRefs(store);
 
@@ -33,7 +37,7 @@ export function setupBaseHTTPClient(app: App, client: BaseClient) {
                 });
             },
             tokenCreated: (response) => {
-                store.handleTokenGrantResponse(response);
+                store.applyTokenGrantResponse(response);
             },
             tokenFailed: () => {
                 store.logout();
@@ -42,13 +46,11 @@ export function setupBaseHTTPClient(app: App, client: BaseClient) {
         },
     );
 
-    store.$subscribe((mutation, state) => {
-        if (mutation.storeId !== STORE_ID) return;
-
-        if (state.accessToken) {
+    const handleAccessTokenEvent = (token: string | null) => {
+        if (token) {
             client.setAuthorizationHeader({
                 type: 'Bearer',
-                token: state.accessToken,
+                token,
             });
 
             tokenHook.mount();
@@ -57,5 +59,13 @@ export function setupBaseHTTPClient(app: App, client: BaseClient) {
 
             tokenHook.unmount();
         }
-    });
+    };
+
+    const dispatcher = injectStoreDispatcher(app);
+    dispatcher.on(
+        StoreDispatcherEventName.ACCESS_TOKEN_UPDATED,
+        (token) => handleAccessTokenEvent(token),
+    );
+
+    handleAccessTokenEvent(store.accessToken);
 }

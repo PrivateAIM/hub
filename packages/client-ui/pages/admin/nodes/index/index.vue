@@ -5,7 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { useAbilityCheck, useStore } from '@authup/client-web-kit';
+import { usePermissionCheck, useStore } from '@authup/client-web-kit';
 import { PermissionName } from '@privateaim/kit';
 import { VCTimeago } from '@vuecs/timeago';
 import type { Node } from '@privateaim/core-kit';
@@ -58,8 +58,8 @@ export default defineNuxtComponent({
         const store = useStore();
         const { realmManagementId } = storeToRefs(store);
 
-        const canEdit = useAbilityCheck(PermissionName.NODE_UPDATE);
-        const canDrop = useAbilityCheck(PermissionName.NODE_DELETE);
+        const canEdit = usePermissionCheck({ name: PermissionName.NODE_UPDATE });
+        const canDrop = usePermissionCheck({ name: PermissionName.NODE_DELETE });
         const canView = computed(() => canEdit.value || canDrop.value);
 
         const query = computed<BuildInput<Node>>(() => ({

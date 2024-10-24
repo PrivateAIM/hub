@@ -4,7 +4,7 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { useAbilityCheck } from '@authup/client-web-kit';
+import { usePermissionCheck } from '@authup/client-web-kit';
 import { AnalysisNodeApprovalCommand, AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { PropType } from 'vue';
@@ -123,7 +123,7 @@ const FAnalysisNodeApprovalCommand = defineComponent({
             busy.value = false;
         };
 
-        const isAllowed = useAbilityCheck(PermissionName.ANALYSIS_APPROVE);
+        const isAllowed = usePermissionCheck({ name: PermissionName.ANALYSIS_APPROVE });
 
         return () => renderActionCommand({
             execute,

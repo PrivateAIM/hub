@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { useAbilityCheck } from '@authup/client-web-kit';
+import { usePermissionCheck } from '@authup/client-web-kit';
 import type { Analysis } from '@privateaim/core-kit';
 import { AnalysisAPICommand, AnalysisBuildStatus } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
@@ -65,7 +65,7 @@ const FAnalysisCommand = defineComponent({
             }
         });
 
-        const isAllowed = useAbilityCheck(PermissionName.ANALYSIS_UPDATE);
+        const isAllowed = usePermissionCheck({ name: PermissionName.ANALYSIS_UPDATE });
 
         const isHidden = computed<boolean>(() => {
             if (props.command === AnalysisAPICommand.CONFIGURATION_LOCK) {

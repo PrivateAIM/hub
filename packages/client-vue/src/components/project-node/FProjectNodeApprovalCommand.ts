@@ -4,7 +4,7 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { useAbilityCheck } from '@authup/client-web-kit';
+import { usePermissionCheck } from '@authup/client-web-kit';
 import {
     ProjectNodeApprovalCommand,
     ProjectNodeApprovalStatus,
@@ -125,7 +125,7 @@ const FProjectNodeApprovalCommand = defineComponent({
             }
         });
 
-        const isAllowed = useAbilityCheck(PermissionName.PROJECT_APPROVE);
+        const isAllowed = usePermissionCheck({ name: PermissionName.PROJECT_APPROVE });
 
         return () => renderActionCommand({
             execute,

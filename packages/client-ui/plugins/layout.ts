@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { useStore } from '@authup/client-web-kit';
+import { StoreDispatcherEventName, injectStoreDispatcher, useStore } from '@authup/client-web-kit';
 import type { StoreManagerOptions } from '@vuecs/core';
 import bootstrap from '@vuecs/preset-bootstrap-v5';
 import fontAwesome from '@vuecs/preset-font-awesome';
@@ -13,7 +13,7 @@ import fontAwesome from '@vuecs/preset-font-awesome';
 import { applyStoreManagerOptions, installStoreManager } from '@vuecs/form-controls/core';
 import installCountdown from '@vuecs/countdown';
 import installFormControl from '@vuecs/form-controls';
-import installNavigation from '@vuecs/navigation';
+import { injectNavigationManager, install as installNavigation } from '@vuecs/navigation';
 import installPagination from '@vuecs/pagination';
 import installTimeago from '@vuecs/timeago';
 
@@ -50,10 +50,24 @@ export default defineNuxtPlugin((ctx) => {
     ctx.vueApp.use(installFormControl);
 
     const store = useStore();
+    const navigation = new Navigation(store);
 
     ctx.vueApp.use(installNavigation, {
-        provider: new Navigation(store),
+        items: ({
+            level,
+            parent,
+        }) => navigation.getItems(level, parent),
     });
+
+    const navigationManager = injectNavigationManager(ctx.vueApp);
+    const storeDispatcher = injectStoreDispatcher(ctx.vueApp);
+    storeDispatcher.on(
+        StoreDispatcherEventName.ACCESS_TOKEN_UPDATED,
+        () => navigationManager.build({
+            reset: true,
+            path: ctx._route.fullPath,
+        }),
+    );
 
     ctx.vueApp.use(installPagination);
     ctx.vueApp.use(installTimeago);

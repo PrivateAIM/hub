@@ -47,7 +47,7 @@ export default defineNuxtComponent({
     <div class="page-sidebar">
         <VCNavItems
             class="sidebar-menu navbar-nav"
-            :tier="1"
+            :level="1"
         />
 
         <div class="mt-auto">
@@ -69,23 +69,23 @@ export default defineNuxtComponent({
                 </small>
             </div>
 
-            <ul class="sidebar-menu nav-items navbar-nav">
-                <li class="nav-item">
+            <ul class="sidebar-menu vc-nav-items navbar-nav">
+                <li class="vc-nav-item">
                     <a
-                        class="nav-link"
+                        class="vc-nav-link"
                         :href="docsURL"
                         target="_blank"
                     >
-                        <i class="fa fa-file" /> <span class="nav-link-text">Documentation</span>
+                        <i class="fa fa-file" /> <span class="vc-nav-link-text">Documentation</span>
                     </a>
                 </li>
-                <li class="nav-item">
+                <li class="vc-nav-item">
                     <a
-                        class="nav-link"
+                        class="vc-nav-link"
                         :href="metricsURL"
                         target="_blank"
                     >
-                        <i class="fa fa-chart-bar" /> <span class="nav-link-text">Metrics</span>
+                        <i class="fa fa-chart-bar" /> <span class="vc-nav-link-text">Metrics</span>
                     </a>
                 </li>
             </ul>

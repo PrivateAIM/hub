@@ -6,7 +6,7 @@
   -->
 
 <script lang="ts">
-import { useAbilityCheck } from '@authup/client-web-kit';
+import { usePermissionCheck } from '@authup/client-web-kit';
 import type { Analysis } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import { VCLink } from '@vuecs/link';
@@ -50,7 +50,7 @@ export default defineComponent({
             extendedView.value = !extendedView.value;
         };
 
-        const canDelete = useAbilityCheck(PermissionName.ANALYSIS_DELETE);
+        const canDelete = usePermissionCheck({ name: PermissionName.ANALYSIS_DELETE });
 
         const handleDeleted = (data: Analysis) => {
             emit('deleted', data);

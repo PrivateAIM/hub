@@ -219,23 +219,13 @@ export function createList<
                 total: total.value,
             },
             onCreated(value: T) {
-                if (context.setup.emit) {
-                    context.setup.emit('created', value);
-                }
-
-                total.value++;
+                handleCreated(value);
             },
             onDeleted(value: T) {
-                if (context.setup.emit) {
-                    context.setup.emit('deleted', value);
-                }
-
-                total.value--;
+                handleDeleted(value);
             },
             onUpdated: (value: T) => {
-                if (context.setup.emit) {
-                    context.setup.emit('updated', value);
-                }
+                handleUpdated(value);
             },
             slotItems: context.setup.slots || {},
         });

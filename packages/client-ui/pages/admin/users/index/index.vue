@@ -12,7 +12,7 @@ import {
     PermissionName, isRealmResourceWritable,
 } from '@authup/core-kit';
 import {
-    AEntityDelete, AUsers, useAbilityCheck, useStore,
+    AEntityDelete, AUsers, usePermissionCheck, useStore,
 } from '@authup/client-web-kit';
 import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
@@ -42,8 +42,8 @@ export default defineNuxtComponent({
             resource: User,
         ) => isRealmResourceWritable(realm.value, resource.realm_id);
 
-        const hasEditPermission = useAbilityCheck(PermissionName.USER_UPDATE);
-        const hasDropPermission = useAbilityCheck(PermissionName.USER_DELETE);
+        const hasEditPermission = usePermissionCheck({ name: PermissionName.USER_UPDATE });
+        const hasDropPermission = usePermissionCheck({ name: PermissionName.USER_DELETE });
 
         const fields = [
             {

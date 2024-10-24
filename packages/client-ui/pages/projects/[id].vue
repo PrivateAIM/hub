@@ -5,7 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { useAbilityCheck, useStore } from '@authup/client-web-kit';
+import { usePermissionCheck, useStore } from '@authup/client-web-kit';
 import type {
     Project,
     ProjectNode,
@@ -42,7 +42,7 @@ export default defineComponent({
         const store = useStore();
         const api = injectCoreHTTPClient();
 
-        const canEdit = useAbilityCheck(PermissionName.PROJECT_UPDATE);
+        const canEdit = usePermissionCheck({ name: PermissionName.PROJECT_UPDATE });
 
         const manager = createEntityManager<`${DomainType.PROJECT}`>({
             type: `${DomainType.PROJECT}`,

@@ -5,7 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { useAbilityCheck } from '@authup/client-web-kit';
+import { usePermissionCheck } from '@authup/client-web-kit';
 import { PermissionName } from '@privateaim/kit';
 import { VCTimeago } from '@vuecs/timeago';
 import type { Registry } from '@privateaim/core-kit';
@@ -55,7 +55,7 @@ export default defineNuxtComponent({
             },
         };
 
-        const canManage = useAbilityCheck(PermissionName.REGISTRY_MANAGE);
+        const canManage = usePermissionCheck({ name: PermissionName.REGISTRY_MANAGE });
 
         const registryNode = ref<typeof RegistryList | null>(null);
 

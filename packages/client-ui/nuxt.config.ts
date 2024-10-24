@@ -39,6 +39,9 @@ export default defineNuxtConfig({
     */
     css: [
         'bootstrap-vue-next/dist/bootstrap-vue-next.css',
+        '@vuecs/pagination/dist/index.css',
+        '@vuecs/navigation/dist/index.css',
+        '@authup/client-web-kit/index.css',
         '@/../client-vue/dist/index.css',
         '@fortawesome/fontawesome-free/css/all.css',
         'bootstrap/dist/css/bootstrap.css',
@@ -65,7 +68,6 @@ export default defineNuxtConfig({
             // ../client-web-nuxt/src/module
             '@authup/client-web-nuxt', {
                 apiURLRuntimeKey: 'authupUrl',
-                apiURLServerRuntimeKey: 'authupUrl',
                 cookieDomainRuntimeKey: 'cookieDomain',
             } satisfies ModuleOptions,
         ],

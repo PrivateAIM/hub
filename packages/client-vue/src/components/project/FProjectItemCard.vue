@@ -6,7 +6,7 @@
   -->
 
 <script lang="ts">
-import { useAbilityCheck } from '@authup/client-web-kit';
+import { usePermissionCheck } from '@authup/client-web-kit';
 import type { Project } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import { VCLink } from '@vuecs/link';
@@ -48,7 +48,7 @@ export default defineComponent({
         },
     }>,
     setup(_props, { emit }) {
-        const canDelete = useAbilityCheck(PermissionName.PROJECT_DELETE);
+        const canDelete = usePermissionCheck({ name: PermissionName.PROJECT_DELETE });
 
         const handleDeleted = (data: Project) => {
             emit('deleted', data);

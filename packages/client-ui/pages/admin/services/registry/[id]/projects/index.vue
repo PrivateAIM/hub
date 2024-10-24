@@ -5,7 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { useAbilityCheck } from '@authup/client-web-kit';
+import { usePermissionCheck } from '@authup/client-web-kit';
 import type { Registry, RegistryProject } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import { BModal, BTable } from 'bootstrap-vue-next';
@@ -76,8 +76,8 @@ export default {
             },
         ];
 
-        const canEdit = useAbilityCheck(PermissionName.NODE_UPDATE);
-        const canDrop = useAbilityCheck(PermissionName.NODE_DELETE);
+        const canEdit = usePermissionCheck({ name: PermissionName.NODE_UPDATE });
+        const canDrop = usePermissionCheck({ name: PermissionName.NODE_DELETE });
         const canView = computed(() => canEdit.value || canDrop.value);
 
         const listNode = ref<null | typeof RegistryProjectList>(null);

@@ -11,7 +11,7 @@ import { BTable } from 'bootstrap-vue-next';
 import type { Realm } from '@authup/core-kit';
 import { PermissionName, isRealmResourceWritable } from '@authup/core-kit';
 import {
-    AEntityDelete, APagination, ARealms, ASearch, ATitle, useAbilityCheck, useStore,
+    AEntityDelete, APagination, ARealms, ASearch, ATitle, usePermissionCheck, useStore,
 } from '@authup/client-web-kit';
 import { storeToRefs } from 'pinia';
 import { defineNuxtComponent } from '#imports';
@@ -42,8 +42,8 @@ export default defineNuxtComponent({
             entity: Realm,
         ) => isRealmResourceWritable(realm.value, entity.id);
 
-        const hasEditPermission = useAbilityCheck(PermissionName.REALM_UPDATE);
-        const hasDropPermission = useAbilityCheck(PermissionName.REALM_DELETE);
+        const hasEditPermission = usePermissionCheck({ name: PermissionName.REALM_UPDATE });
+        const hasDropPermission = usePermissionCheck({ name: PermissionName.REALM_DELETE });
 
         const fields = [
             {

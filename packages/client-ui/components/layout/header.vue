@@ -71,33 +71,33 @@ export default defineNuxtComponent({
                 >
                     <VCNavItems
                         class="navbar-nav"
-                        :tier="0"
+                        :level="0"
                     />
                     <ul
                         v-if="loggedIn && user"
-                        class="navbar-nav nav-items navbar-gadgets"
+                        class="navbar-nav vc-nav-items navbar-gadgets"
                     >
-                        <li class="nav-item">
+                        <li class="vc-nav-item">
                             <nuxt-link
-                                class="nav-link user-link"
+                                class="vc-nav-link user-link"
                                 :to="'/users/'+user.id"
                             >
                                 <VCGravatar :email="user.email ? user.email : ''" />
                                 <span>{{ user.display_name ? user.display_name : user.name }}</span>
                             </nuxt-link>
                         </li>
-                        <li class="nav-item">
+                        <li class="vc-nav-item">
                             <nuxt-link
                                 :to="'/settings'"
-                                class="nav-link"
+                                class="vc-nav-link"
                             >
                                 <i class="fa fa-cog" />
                             </nuxt-link>
                         </li>
-                        <li class="nav-item">
+                        <li class="vc-nav-item">
                             <nuxt-link
                                 :to="'/logout'"
-                                class="nav-link"
+                                class="vc-nav-link"
                             >
                                 <i class="fa fa-power-off" />
                             </nuxt-link>
