@@ -12,7 +12,7 @@ import type { AnalysisNode } from '@privateaim/core-kit';
 import { BDropdown, BTable } from 'bootstrap-vue-next';
 import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import {
     FAnalysisNodeInCard,
     FAnalysisNodes,
