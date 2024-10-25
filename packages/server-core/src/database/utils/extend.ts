@@ -15,7 +15,7 @@ import {
     AnalysisNodeEntity,
     AnalysisPermissionEntity,
     MasterImageEntity,
-    MasterImageGroupEntity,
+    MasterImageEventLogEntity, MasterImageGroupEntity,
     NodeEntity,
     ProjectEntity,
     ProjectNodeEntity,
@@ -42,6 +42,7 @@ export async function extendDataSourceOptions(options: DataSourceOptions) : Prom
         entities: [
             ...(options.entities ? options.entities : []) as string[],
             MasterImageEntity,
+            MasterImageEventLogEntity,
             MasterImageGroupEntity,
             ProjectEntity,
             ProjectNodeEntity,

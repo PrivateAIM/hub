@@ -5,12 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { MasterImageCommand } from '@privateaim/core-kit';
 import { BadRequestError, NotFoundError } from '@ebec/http';
+import { MasterImageCommand } from '@privateaim/core-kit';
 import { useRequestBody } from '@routup/basic/body';
-import { sendAccepted } from 'routup';
 import type { Request, Response } from 'routup';
-import { runMasterImagesSynchronizeCommand } from '../../../../../domains';
+import { sendAccepted } from 'routup';
 import { useMasterImageService } from '../../../../../services';
 
 export async function commandMasterImageRouteHandler(req: Request, res: Response) {
@@ -28,20 +27,7 @@ export async function commandMasterImageRouteHandler(req: Request, res: Response
 
     switch (command) {
         case MasterImageCommand.SYNC: {
-            const isActive = await masterImageService.isSynchronizing();
-            if (isActive) {
-                throw new BadRequestError('A master images synchronization process is already in progress.');
-            }
-
-            await masterImageService.setSynchronization(true);
-
-            try {
-                await runMasterImagesSynchronizeCommand();
-            } catch (e) {
-                await masterImageService.setSynchronization(false);
-
-                throw e;
-            }
+            await masterImageService.synchronize();
 
             return sendAccepted(res);
         }
