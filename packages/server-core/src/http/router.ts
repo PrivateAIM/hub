@@ -25,6 +25,7 @@ import { AnalysisLogController } from './controllers/analysis-log';
 import { AnalysisNodeController } from './controllers/analysis-node';
 import { AnalysisPermissionController } from './controllers/analysis-permission';
 import { MasterImageController } from './controllers/master-image';
+import { MasterImageEventLogController } from './controllers/master-image-event-log';
 import { MasterImageGroupController } from './controllers/master-image-group';
 import { NodeController } from './controllers/node';
 import { ProposalController } from './controllers/project';
@@ -70,6 +71,7 @@ export function createRouter() : Router {
             controllers: [
                 // Core
                 MasterImageController,
+                MasterImageEventLogController,
                 MasterImageGroupController,
                 ProposalController,
                 ProposalStationController,

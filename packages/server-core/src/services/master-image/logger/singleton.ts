@@ -6,11 +6,11 @@
  */
 
 import { singa } from 'singa';
-import { MasterImageService } from './module';
+import { MasterImageLoggerService } from './module';
 
-const instance = singa<MasterImageService>({
+const instance = singa<MasterImageLoggerService>({
     name: 'masterImage',
-    factory: () => new MasterImageService(),
+    factory: () => new MasterImageLoggerService(),
 });
 
 export function useMasterImageService() {

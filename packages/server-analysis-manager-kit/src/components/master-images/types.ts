@@ -5,94 +5,59 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Group, Image } from 'docker-scan';
+import type {
+    MasterImagesBuildCommandPayload,
+    MasterImagesBuildingEventPayload,
+    MasterImagesBuiltEventPayload,
+} from './build';
 import type { MasterImagesCommand, MasterImagesEvent } from './constants';
+import type {
+    MasterImagesPushCommandPayload,
+    MasterImagesPushEventPayload,
+} from './push';
+import type {
+    MasterImagesSynchronizeCommandPayload,
+    MaterImagesSynchronizedEventPayload,
+} from './synchronize';
 
 export type MasterImagesBasePayload = {
     error?: Error
 };
 
-export type MasterImagesSynchronizeCommandPayload = {
-    owner: string,
-    repository: string,
-    branch: string
+//-----------------------------------------------------------------------
+
+export type MasterImagesCommandMap = {
+    [MasterImagesCommand.BUILD]: MasterImagesBuildCommandPayload,
+    [MasterImagesCommand.PUSH]: MasterImagesPushCommandPayload,
+    [MasterImagesCommand.SYNCHRONIZE]: MasterImagesSynchronizeCommandPayload,
 };
 
-export type MasterImagesSynchronizeCommandContext = {
-    command: `${MasterImagesCommand.SYNCHRONIZE}`,
-    data: MasterImagesSynchronizeCommandPayload,
-};
-
-export type MasterImagesBuildCommandPayload = {
-    images: Image[],
-    directory: string
-};
-export type MasterImagesBuildCommandContext = {
-    command: `${MasterImagesCommand.BUILD}`,
-    data: MasterImagesBuildCommandPayload,
-};
+export type MasterImagesCommandContext = {
+    [K in keyof MasterImagesCommandMap]: {
+        command: K,
+        data: MasterImagesCommandMap[K]
+    }
+}[keyof MasterImagesCommandMap];
 
 //-----------------------------------------------------------------------
 
-export type MasterImagesPushCommandPayloadTag = { name: string, registryId: string };
-export type MasterImagesPushCommandPayload = {
-    tags: MasterImagesPushCommandPayloadTag[]
+export type MasterImagesEventMap = {
+    [MasterImagesEvent.BUILDING]: MasterImagesBuildingEventPayload,
+    [MasterImagesEvent.BUILT]: MasterImagesBuiltEventPayload,
+    [MasterImagesEvent.BUILD_FAILED]: MasterImagesBasePayload,
+
+    [MasterImagesEvent.PUSHING]: MasterImagesPushEventPayload,
+    [MasterImagesEvent.PUSHED]: MasterImagesPushEventPayload,
+    [MasterImagesEvent.PUSH_FAILED]: MasterImagesBasePayload,
+
+    [MasterImagesEvent.SYNCHRONIZING]: MasterImagesBasePayload,
+    [MasterImagesEvent.SYNCHRONIZED]: MaterImagesSynchronizedEventPayload,
+    [MasterImagesEvent.SYNCHRONIZATION_FAILED]: MasterImagesBasePayload
 };
 
-export type MasterImagesPushCommandContext = {
-    command: `${MasterImagesCommand.PUSH}`,
-    data: MasterImagesPushCommandPayload,
-};
-
-//-----------------------------------------------------------------------
-
-export type MaterImagesSynchronizedEventPayload = {
-    images: Image[],
-    groups: Group[]
-};
-export type MasterImagesSynchronizedEventContext = {
-    data: MaterImagesSynchronizedEventPayload,
-    event: `${MasterImagesEvent.SYNCHRONIZED}`;
-};
-export type MasterImagesSynchronizingEventContext = {
-    data: MasterImagesBasePayload,
-    event: `${MasterImagesEvent.SYNCHRONIZING}`;
-};
-
-//-----------------------------------------------------------------------
-
-export type MasterImagesFailedEventContext = {
-    data: MasterImagesBasePayload,
-    event: `${MasterImagesEvent.BUILD_FAILED}` |
-        `${MasterImagesEvent.SYNCHRONIZATION_FAILED}` |
-        `${MasterImagesEvent.PUSH_FAILED}`;
-};
-
-//-----------------------------------------------------------------------
-
-export type MasterImagesBuildEventPayload = MasterImagesBuildCommandPayload;
-export type MasterImagesBuildEventContext = {
-    data: MasterImagesBuildEventPayload,
-    event: `${MasterImagesEvent.BUILDING}` |
-        `${MasterImagesEvent.BUILT}`;
-};
-
-//-----------------------------------------------------------------------
-
-export type MasterImagesPushEventContext = {
-    data: MasterImagesPushCommandPayload,
-    event: `${MasterImagesEvent.PUSHING}` |
-        `${MasterImagesEvent.PUSHED}`;
-};
-
-//-----------------------------------------------------------------------
-
-export type MasterImagesCommandContext = MasterImagesSynchronizeCommandContext |
-MasterImagesBuildCommandContext |
-MasterImagesPushCommandContext;
-
-export type MasterImagesEventContext = MasterImagesSynchronizedEventContext |
-MasterImagesSynchronizingEventContext |
-MasterImagesBuildEventContext |
-MasterImagesPushEventContext |
-MasterImagesFailedEventContext;
+export type MasterImagesEventContext = {
+    [K in keyof MasterImagesEventMap]: {
+        event: K,
+        data: MasterImagesEventMap[K]
+    }
+}[keyof MasterImagesEventMap];
