@@ -6,23 +6,20 @@
  */
 
 import { scanDirectory } from 'docker-scan';
-import path from 'node:path';
-import { WRITABLE_DIRECTORY_PATH } from '../../src/config';
+import { MASTER_IMAGES_DATA_DIRECTORY_PATH, MASTER_IMAGES_DIRECTORY_PATH } from '../../src';
 import { GitHubClient } from '../../src/core';
 
 describe('git/clone', () => {
     it('should clone git repository', async () => {
-        const destination = path.join(WRITABLE_DIRECTORY_PATH, 'git');
-
         const gitHubClient = new GitHubClient();
         await gitHubClient.cloneRepository({
             owner: 'PrivateAim',
             repository: 'master-images',
             branch: 'master',
-            destination,
+            destination: MASTER_IMAGES_DIRECTORY_PATH,
         });
 
-        const { images, groups } = await scanDirectory(path.join(destination, 'data'));
+        const { images, groups } = await scanDirectory(MASTER_IMAGES_DATA_DIRECTORY_PATH);
 
         expect(images.length).toBeGreaterThan(0);
         expect(groups.length).toBeGreaterThan(0);
