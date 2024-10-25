@@ -13,6 +13,7 @@ import {
     AnalysisLogAPI,
     AnalysisPermissionAPI,
     MasterImageAPI,
+    MasterImageEventLogAPI,
     MasterImageGroupAPI,
     NodeAPI,
     ProjectAPI,
@@ -28,6 +29,8 @@ export class Client extends BaseClient {
     public readonly masterImage : MasterImageAPI;
 
     public readonly masterImageGroup : MasterImageGroupAPI;
+
+    public readonly masterImageEventLog : MasterImageEventLogAPI;
 
     public readonly project : ProjectAPI;
 
@@ -58,6 +61,7 @@ export class Client extends BaseClient {
 
         this.masterImage = new MasterImageAPI({ client: this });
         this.masterImageGroup = new MasterImageGroupAPI({ client: this });
+        this.masterImageEventLog = new MasterImageEventLogAPI({ client: this });
         this.project = new ProjectAPI({ client: this });
         this.projectNode = new ProjectNodeAPI({ client: this });
         this.registry = new RegistryAPI({ client: this });

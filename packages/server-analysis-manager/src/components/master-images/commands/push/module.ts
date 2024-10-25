@@ -5,8 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type {
-    MasterImagesPushCommandPayload,
+import type { MasterImagesPushCommandPayload } from '@privateaim/server-analysis-manager-kit';
+import {
+    MasterImagesEvent,
 } from '@privateaim/server-analysis-manager-kit';
 import {
     buildDockerAuthConfigFromRegistry,
@@ -14,6 +15,7 @@ import {
     useDocker,
     waitForDockerActionStream,
 } from '../../../../core';
+import { writeMasterImagesEvent } from '../../queue';
 
 async function pushMasterImage(tag: string, registryId: string) {
     const coreClient = useCoreClient();
@@ -34,13 +36,26 @@ async function pushMasterImage(tag: string, registryId: string) {
 export async function executeMasterImagesPushCommand(
     payload: MasterImagesPushCommandPayload,
 ) {
-    const promises : Promise<unknown>[] = [];
+    await writeMasterImagesEvent({
+        event: MasterImagesEvent.PUSHING,
+        data: {
+            id: payload.id,
+        },
+    });
 
+    const promises : Promise<unknown>[] = [];
     for (let i = 0; i < payload.tags.length; i++) {
         promises.push(pushMasterImage(payload.tags[i].name, payload.tags[i].registryId));
     }
 
     await Promise.all(promises);
+
+    await writeMasterImagesEvent({
+        event: MasterImagesEvent.PUSHED,
+        data: {
+            id: payload.id,
+        },
+    });
 
     return payload;
 }

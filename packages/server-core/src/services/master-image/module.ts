@@ -79,9 +79,9 @@ export class MasterImageService {
 
     // -------------------------------------------------
 
-    async handleEvent(
-        name: `${MasterImagesEvent}`,
-        description?: string,
+    async logEvent(
+        name: MasterImagesEvent,
+        data: unknown,
     ) {
         if (
             name === MasterImagesEvent.BUILD_FAILED ||
@@ -94,13 +94,6 @@ export class MasterImageService {
             await this.setIsSynchronizing(true);
         }
 
-        await this.logEvent(name, description);
-    }
-
-    protected async logEvent(
-        name: `${MasterImagesEvent}`,
-        description?: string,
-    ) {
         const dataSource = await useDataSource();
         const repository = dataSource.getRepository(MasterImageEventLogEntity);
 
@@ -111,7 +104,7 @@ export class MasterImageService {
             expiring: true,
             expires_at: new Date(expiresAtMs).toISOString(),
             name,
-            description,
+            data,
         });
 
         await repository.save(entity);

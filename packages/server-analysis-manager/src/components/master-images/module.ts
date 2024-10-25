@@ -24,13 +24,7 @@ import {
     executeMasterImagesSynchronizeCommand,
 } from './commands';
 import {
-    writeBuildingEvent,
-    writeBuiltEvent,
-    writeFailedEvent,
-    writePushedEvent,
-    writePushingEvent,
-    writeSynchronizedEvent,
-    writeSynchronizingEvent,
+    writeMasterImagesEvent,
 } from './queue';
 
 function createHandlers() : QueueRouterHandlers<{
@@ -41,43 +35,46 @@ function createHandlers() : QueueRouterHandlers<{
     return {
         [MasterImagesCommand.SYNCHRONIZE]: async (message) => {
             await Promise.resolve(message.data)
-                .then((data) => writeSynchronizingEvent(data))
                 .then((data) => executeMasterImagesSynchronizeCommand(data))
-                .then((data) => writeSynchronizedEvent(data))
                 .catch((err: Error) => {
                     // todo: use logger
                     console.error(err);
 
-                    return writeFailedEvent(MasterImagesEvent.SYNCHRONIZATION_FAILED, {
-                        error: err,
+                    return writeMasterImagesEvent({
+                        event: MasterImagesEvent.SYNCHRONIZATION_FAILED,
+                        data: {
+                            error: err,
+                        },
                     });
                 });
         },
         [MasterImagesCommand.BUILD]: async (message) => {
             await Promise.resolve(message.data)
-                .then((data) => writeBuildingEvent(data))
                 .then((data) => executeMasterImagesBuildCommand(data))
-                .then((data) => writeBuiltEvent(data))
                 .catch((err: Error) => {
                     // todo: use logger
                     console.error(err);
 
-                    return writeFailedEvent(MasterImagesEvent.BUILD_FAILED, {
-                        error: err,
+                    return writeMasterImagesEvent({
+                        event: MasterImagesEvent.BUILD_FAILED,
+                        data: {
+                            error: err,
+                        },
                     });
                 });
         },
         [MasterImagesCommand.PUSH]: async (message) => {
             await Promise.resolve(message.data)
-                .then((data) => writePushingEvent((data)))
                 .then((data) => executeMasterImagesPushCommand(data))
-                .then((data) => writePushedEvent(data))
                 .catch((err: Error) => {
                     // todo: use logger
                     console.error(err);
 
-                    return writeFailedEvent(MasterImagesEvent.PUSH_FAILED, {
-                        error: err,
+                    return writeMasterImagesEvent({
+                        event: MasterImagesEvent.PUSH_FAILED,
+                        data: {
+                            error: err,
+                        },
                     });
                 });
         },

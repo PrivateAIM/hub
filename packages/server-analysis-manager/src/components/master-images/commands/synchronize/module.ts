@@ -7,30 +7,38 @@
 
 import { scanDirectory } from 'docker-scan';
 import type { MasterImagesSynchronizeCommandPayload } from '@privateaim/server-analysis-manager-kit';
-import path from 'node:path';
-import { WRITABLE_DIRECTORY_PATH } from '../../../../config';
-import { writeBuildCommand } from '../../queue';
+import { MasterImagesEvent } from '@privateaim/server-analysis-manager-kit';
+import { MASTER_IMAGES_DATA_DIRECTORY_PATH, MASTER_IMAGES_DIRECTORY_PATH } from '../../constants';
+import { writeMasterImagesEvent } from '../../queue';
 import { GitHubClient } from '../../../../core';
 
 export async function executeMasterImagesSynchronizeCommand(
     payload: MasterImagesSynchronizeCommandPayload,
 ) {
-    const outputDirectoryPath = path.join(WRITABLE_DIRECTORY_PATH, 'master-images');
+    await writeMasterImagesEvent({
+        event: MasterImagesEvent.SYNCHRONIZING,
+        data: {},
+    });
 
     const gitHubClient = new GitHubClient();
     await gitHubClient.cloneRepository({
-        destination: outputDirectoryPath,
+        destination: MASTER_IMAGES_DIRECTORY_PATH,
         owner: payload.owner,
         repository: payload.repository,
         branch: payload.branch,
     });
 
-    const dataDirectory = path.join(outputDirectoryPath, 'data');
-    const { images, groups } = await scanDirectory(dataDirectory);
-
-    await writeBuildCommand({
-        directory: dataDirectory,
+    const {
         images,
+        groups,
+    } = await scanDirectory(MASTER_IMAGES_DATA_DIRECTORY_PATH);
+
+    await writeMasterImagesEvent({
+        event: MasterImagesEvent.SYNCHRONIZED,
+        data: {
+            images,
+            groups,
+        },
     });
 
     return {

@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { deserialize, serialize } from '@authup/kit';
 import {
     Column,
     CreateDateColumn,
@@ -24,16 +25,29 @@ export class MasterImageEventLogEntity implements MasterImageEventLog {
     @Column({ type: 'varchar', length: 64 })
         name: string;
 
-    @Column({ type: 'text', nullable: true })
-        description: string | null;
+    @Column({
+        type: 'text',
+        nullable: true,
+        transformer: {
+            to(value: any): any {
+                return serialize(value);
+            },
+            from(value: any): any {
+                return deserialize(value);
+            },
+        },
+    })
+        data: unknown | null;
+
+    // ------------------------------------------------------------------
 
     @Column({ type: 'boolean', default: false })
         expiring: boolean;
 
-    // ------------------------------------------------------------------
-
     @CreateDateColumn()
         expires_at: Date;
+
+    // ------------------------------------------------------------------
 
     @CreateDateColumn()
         created_at: Date;
