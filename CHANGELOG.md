@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.8.5](https://github.com/PrivateAIM/hub/compare/v0.8.4...v0.8.5) (2024-10-25)
+
+
+### Features
+
+* implement basic master image event log (db-) entity ([d2fdb7f](https://github.com/PrivateAIM/hub/commit/d2fdb7fed7bf1380e0350f74edb47738a1f81550))
+* initial hybrid cache (redis or memory) implementation ([b1cd569](https://github.com/PrivateAIM/hub/commit/b1cd569ff52d222f61d4b87abc921cb769de8264))
+
+
+### Bug Fixes
+
+* minor adjustment to set synchronization state ([a716ec7](https://github.com/PrivateAIM/hub/commit/a716ec714d1d9954e4bb7eb164aa56efed60d592))
+* move http controllers ([f71c275](https://github.com/PrivateAIM/hub/commit/f71c275afadcd5d48afe76f57b2a361227b294a5))
+
 ## [0.8.4](https://github.com/PrivateAIM/hub/compare/v0.8.3...v0.8.4) (2024-10-24)
 
 

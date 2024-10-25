@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.8.5](https://github.com/PrivateAIM/hub/compare/v0.8.4...v0.8.5) (2024-10-25)
+
+
+### Features
+
+* implement basic master image event log (db-) entity ([d2fdb7f](https://github.com/PrivateAIM/hub/commit/d2fdb7fed7bf1380e0350f74edb47738a1f81550))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.8.4 to ^0.8.5
+  * peerDependencies
+    * @privateaim/kit bumped from ^0.8.4 to ^0.8.5
+
 ## [0.8.4](https://github.com/PrivateAIM/hub/compare/v0.8.3...v0.8.4) (2024-10-24)
 
 

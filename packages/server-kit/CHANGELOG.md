@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.8.5](https://github.com/PrivateAIM/hub/compare/v0.8.4...v0.8.5) (2024-10-25)
+
+
+### Features
+
+* initial hybrid cache (redis or memory) implementation ([b1cd569](https://github.com/PrivateAIM/hub/commit/b1cd569ff52d222f61d4b87abc921cb769de8264))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.8.4 to ^0.8.5
+    * @privateaim/kit bumped from ^0.8.4 to ^0.8.5
+
 ## [0.8.4](https://github.com/PrivateAIM/hub/compare/v0.8.3...v0.8.4) (2024-10-24)
 
 
