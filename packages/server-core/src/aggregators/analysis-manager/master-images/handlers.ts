@@ -6,57 +6,39 @@
  */
 
 import type {
-    MasterImagesBasePayload,
-    MasterImagesBuildingEventPayload,
-    MasterImagesBuiltEventPayload,
-    MasterImagesPushEventPayload,
-    MaterImagesSynchronizedEventPayload,
+    MasterImagesEventContext,
+    MasterImagesEventMap,
 } from '@privateaim/server-analysis-manager-kit';
 import {
     MasterImagesCommand,
     MasterImagesEvent,
-    buildMasterImagesTaskQueueRouterPayload,
+    useMasterImageQueueService,
 } from '@privateaim/server-analysis-manager-kit';
 import type { QueueRouterHandlers } from '@privateaim/server-kit';
-import { useQueueRouter } from '@privateaim/server-kit';
-import { MasterImageDatabaseService, useMasterImageService } from '../../../services';
+import { MasterImageSynchronizerService, useMasterImageService } from '../../../services';
 
-export function createAnalysisManagerMasterImagesHandlers() : QueueRouterHandlers<{
-    [MasterImagesEvent.BUILDING]: MasterImagesBuildingEventPayload,
-    [MasterImagesEvent.BUILT]: MasterImagesBuiltEventPayload,
-    [MasterImagesEvent.BUILD_FAILED]: MasterImagesBasePayload,
-
-    [MasterImagesEvent.PUSHING]: MasterImagesPushEventPayload,
-    [MasterImagesEvent.PUSHED]: MasterImagesPushEventPayload,
-    [MasterImagesEvent.PUSH_FAILED]: MasterImagesBasePayload,
-
-    [MasterImagesEvent.SYNCHRONIZING]: MasterImagesBasePayload,
-    [MasterImagesEvent.SYNCHRONIZED]: MaterImagesSynchronizedEventPayload,
-    [MasterImagesEvent.SYNCHRONIZATION_FAILED]: MasterImagesBasePayload
-}> {
-    const queueRouter = useQueueRouter();
-    const masterImageService = useMasterImageService();
-    const masterImageDatabaseService = new MasterImageDatabaseService();
+export function createAnalysisManagerMasterImagesHandlers() : QueueRouterHandlers<Partial<MasterImagesEventMap>> {
+    const logger = useMasterImageService();
+    const synchronizer = new MasterImageSynchronizerService();
+    const queue = useMasterImageQueueService();
 
     return {
-        [MasterImagesEvent.SYNCHRONIZING]: async (message) => {
-            await masterImageService.logEvent(
-                MasterImagesEvent.SYNCHRONIZING,
-                message.data,
-            );
+        $any: async (message) => {
+            await logger.logEvent({
+                event: message.type,
+                data: message.data,
+            } as MasterImagesEventContext);
         },
-        [MasterImagesEvent.SYNCHRONIZED]: async (message) => {
-            await masterImageService.logEvent(
-                MasterImagesEvent.SYNCHRONIZED,
-                message.data,
-            );
-
-            await masterImageDatabaseService
-                .synchronizeGroups(message.data.groups);
+        [MasterImagesEvent.SYNCHRONIZED]: async (
+            message,
+        ) => {
+            // groups
+            await synchronizer
+                .syncGroups(message.data.groups);
 
             // images
-            const output = await masterImageDatabaseService
-                .synchronize(message.data.images);
+            const output = await synchronizer
+                .syncImages(message.data.images);
 
             const entities = [
                 ...output.created,
@@ -64,7 +46,7 @@ export function createAnalysisManagerMasterImagesHandlers() : QueueRouterHandler
             ];
 
             for (let i = 0; i < entities.length; i++) {
-                const queueRouterPayload = buildMasterImagesTaskQueueRouterPayload({
+                await queue.publishCommand({
                     command: MasterImagesCommand.BUILD,
                     data: {
                         id: entities[i].id,
@@ -72,66 +54,18 @@ export function createAnalysisManagerMasterImagesHandlers() : QueueRouterHandler
                         virtualPath: entities[i].virtual_path,
                     },
                 });
-
-                await queueRouter.publish(queueRouterPayload);
             }
         },
-        [MasterImagesEvent.SYNCHRONIZATION_FAILED]: async (message) => {
-            await masterImageService.logEvent(
-                MasterImagesEvent.SYNCHRONIZATION_FAILED,
-                message.data,
-            );
-        },
-
-        [MasterImagesEvent.BUILDING]: async (message) => {
-            await masterImageService.logEvent(
-                MasterImagesEvent.BUILDING,
-                message.data,
-            );
-        },
         [MasterImagesEvent.BUILT]: async (message) => {
-            await masterImageService.logEvent(
-                MasterImagesEvent.BUILT,
-                message.data,
-            );
-
-            const queueRouter = useQueueRouter();
-
-            const queueRouterPayload = buildMasterImagesTaskQueueRouterPayload({
+            await queue.publishCommand({
                 command: MasterImagesCommand.PUSH,
                 data: {
                     id: message.data.id,
                     tags: message.data.tags,
                 },
             });
-
-            await queueRouter.publish(queueRouterPayload);
         },
-        [MasterImagesEvent.BUILD_FAILED]: async (message) => {
-            await masterImageService.logEvent(
-                MasterImagesEvent.BUILD_FAILED,
-                message.data,
-            );
-        },
-
-        [MasterImagesEvent.PUSHING]: async (message) => {
-            await masterImageService.logEvent(
-                MasterImagesEvent.PUSHING,
-                message.data,
-            );
-        },
-        [MasterImagesEvent.PUSHED]: async (message) => {
-            await masterImageService.logEvent(
-                MasterImagesEvent.PUSHED,
-                message.data,
-            );
-        },
-        [MasterImagesEvent.PUSH_FAILED]: async (message) => {
-            await masterImageService.logEvent(
-                MasterImagesEvent.PUSH_FAILED,
-                message.data,
-            );
-
+        [MasterImagesEvent.PUSH_FAILED]: async () => {
             // todo: clear built docker image
         },
     };

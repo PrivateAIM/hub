@@ -8,7 +8,7 @@
 export * from './build';
 export * from './push';
 export * from './synchronize';
+export * from './service';
 
 export * from './constants';
-export * from './queue';
 export * from './types';

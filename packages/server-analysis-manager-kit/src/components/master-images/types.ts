@@ -5,20 +5,19 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Group, Image } from 'docker-scan';
 import type {
-    MasterImagesBuildCommandContext,
-    MasterImagesBuildEventContext,
+    MasterImagesBuildCommandPayload,
+    MasterImagesBuildingEventPayload,
+    MasterImagesBuiltEventPayload,
 } from './build';
 import type { MasterImagesCommand, MasterImagesEvent } from './constants';
 import type {
-    MasterImagesPushCommandContext,
-    MasterImagesPushEventContext,
+    MasterImagesPushCommandPayload,
+    MasterImagesPushEventPayload,
 } from './push';
 import type {
-    MasterImagesSynchronizeCommandContext,
-    MasterImagesSynchronizedEventContext,
-    MasterImagesSynchronizingEventContext,
+    MasterImagesSynchronizeCommandPayload,
+    MaterImagesSynchronizedEventPayload,
 } from './synchronize';
 
 export type MasterImagesBasePayload = {
@@ -27,21 +26,38 @@ export type MasterImagesBasePayload = {
 
 //-----------------------------------------------------------------------
 
-export type MasterImagesFailedEventContext = {
-    data: MasterImagesBasePayload,
-    event: `${MasterImagesEvent.BUILD_FAILED}` |
-        `${MasterImagesEvent.SYNCHRONIZATION_FAILED}` |
-        `${MasterImagesEvent.PUSH_FAILED}`;
+export type MasterImagesCommandMap = {
+    [MasterImagesCommand.BUILD]: MasterImagesBuildCommandPayload,
+    [MasterImagesCommand.PUSH]: MasterImagesPushCommandPayload,
+    [MasterImagesCommand.SYNCHRONIZE]: MasterImagesSynchronizeCommandPayload,
 };
+
+export type MasterImagesCommandContext = {
+    [K in keyof MasterImagesCommandMap]: {
+        command: K,
+        data: MasterImagesCommandMap[K]
+    }
+}[keyof MasterImagesCommandMap];
 
 //-----------------------------------------------------------------------
 
-export type MasterImagesCommandContext = MasterImagesSynchronizeCommandContext |
-MasterImagesBuildCommandContext |
-MasterImagesPushCommandContext;
+export type MasterImagesEventMap = {
+    [MasterImagesEvent.BUILDING]: MasterImagesBuildingEventPayload,
+    [MasterImagesEvent.BUILT]: MasterImagesBuiltEventPayload,
+    [MasterImagesEvent.BUILD_FAILED]: MasterImagesBasePayload,
 
-export type MasterImagesEventContext = MasterImagesSynchronizedEventContext |
-MasterImagesSynchronizingEventContext |
-MasterImagesBuildEventContext |
-MasterImagesPushEventContext |
-MasterImagesFailedEventContext;
+    [MasterImagesEvent.PUSHING]: MasterImagesPushEventPayload,
+    [MasterImagesEvent.PUSHED]: MasterImagesPushEventPayload,
+    [MasterImagesEvent.PUSH_FAILED]: MasterImagesBasePayload,
+
+    [MasterImagesEvent.SYNCHRONIZING]: MasterImagesBasePayload,
+    [MasterImagesEvent.SYNCHRONIZED]: MaterImagesSynchronizedEventPayload,
+    [MasterImagesEvent.SYNCHRONIZATION_FAILED]: MasterImagesBasePayload
+};
+
+export type MasterImagesEventContext = {
+    [K in keyof MasterImagesEventMap]: {
+        event: K,
+        data: MasterImagesEventMap[K]
+    }
+}[keyof MasterImagesEventMap];

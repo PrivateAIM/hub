@@ -28,7 +28,8 @@
     "dependencies": {
         "@privateaim/core-kit": "^0.8.4",
         "@privateaim/kit": "^0.8.4",
-        "@privateaim/server-kit": "^0.8.4"
+        "@privateaim/server-kit": "^0.8.4",
+        "singa": "^1.0.0"
     },
     "devDependencies": {
         "docker-scan": "^1.1.0"

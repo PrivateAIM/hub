@@ -6,41 +6,35 @@
  */
 
 import type {
-    MasterImagesBuildCommandPayload,
-    MasterImagesPushCommandPayload,
-    MasterImagesSynchronizeCommandPayload,
+    MasterImagesCommandMap,
 } from '@privateaim/server-analysis-manager-kit';
 import {
     MasterImagesCommand,
     MasterImagesEvent,
-    MasterImagesTaskQueueRouterRouting,
+    useMasterImageQueueService,
 } from '@privateaim/server-analysis-manager-kit';
 import type { Component, QueueRouterHandlers } from '@privateaim/server-kit';
-import { isQueueRouterUsable, useLogger, useQueueRouter } from '@privateaim/server-kit';
+import { isQueueRouterUsable, useLogger } from '@privateaim/server-kit';
 import { EnvironmentName, useEnv } from '../../config';
 import {
     executeMasterImagesBuildCommand,
     executeMasterImagesPushCommand,
     executeMasterImagesSynchronizeCommand,
 } from './commands';
-import {
-    writeMasterImagesEvent,
-} from './queue';
 
-function createHandlers() : QueueRouterHandlers<{
-    [MasterImagesCommand.SYNCHRONIZE]: MasterImagesSynchronizeCommandPayload,
-    [MasterImagesCommand.BUILD]: MasterImagesBuildCommandPayload,
-    [MasterImagesCommand.PUSH]: MasterImagesPushCommandPayload
-}> {
+function createHandlers() : QueueRouterHandlers<MasterImagesCommandMap> {
     return {
-        [MasterImagesCommand.SYNCHRONIZE]: async (message) => {
+        [MasterImagesCommand.SYNCHRONIZE]: async (
+            message,
+        ) => {
             await Promise.resolve(message.data)
                 .then((data) => executeMasterImagesSynchronizeCommand(data))
                 .catch((err: Error) => {
                     // todo: use logger
                     console.error(err);
 
-                    return writeMasterImagesEvent({
+                    const queue = useMasterImageQueueService();
+                    return queue.publishEvent({
                         event: MasterImagesEvent.SYNCHRONIZATION_FAILED,
                         data: {
                             error: err,
@@ -48,14 +42,17 @@ function createHandlers() : QueueRouterHandlers<{
                     });
                 });
         },
-        [MasterImagesCommand.BUILD]: async (message) => {
+        [MasterImagesCommand.BUILD]: async (
+            message,
+        ) => {
             await Promise.resolve(message.data)
                 .then((data) => executeMasterImagesBuildCommand(data))
                 .catch((err: Error) => {
                     // todo: use logger
                     console.error(err);
 
-                    return writeMasterImagesEvent({
+                    const queue = useMasterImageQueueService();
+                    return queue.publishEvent({
                         event: MasterImagesEvent.BUILD_FAILED,
                         data: {
                             error: err,
@@ -63,14 +60,17 @@ function createHandlers() : QueueRouterHandlers<{
                     });
                 });
         },
-        [MasterImagesCommand.PUSH]: async (message) => {
+        [MasterImagesCommand.PUSH]: async (
+            message,
+        ) => {
             await Promise.resolve(message.data)
                 .then((data) => executeMasterImagesPushCommand(data))
                 .catch((err: Error) => {
                     // todo: use logger
                     console.error(err);
 
-                    return writeMasterImagesEvent({
+                    const queue = useMasterImageQueueService();
+                    return queue.publishEvent({
                         event: MasterImagesEvent.PUSH_FAILED,
                         data: {
                             error: err,
@@ -91,11 +91,11 @@ export function createMasterImagesComponent() : Component {
         };
     }
 
-    const queueRouter = useQueueRouter();
+    const queue = useMasterImageQueueService();
 
     return {
         start() {
-            return queueRouter.consume(MasterImagesTaskQueueRouterRouting, createHandlers());
+            return queue.consumeCommands(createHandlers());
         },
     };
 }

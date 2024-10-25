@@ -7,15 +7,15 @@
 
 import { scanDirectory } from 'docker-scan';
 import type { MasterImagesSynchronizeCommandPayload } from '@privateaim/server-analysis-manager-kit';
-import { MasterImagesEvent } from '@privateaim/server-analysis-manager-kit';
+import { MasterImagesEvent, useMasterImageQueueService } from '@privateaim/server-analysis-manager-kit';
 import { MASTER_IMAGES_DATA_DIRECTORY_PATH, MASTER_IMAGES_DIRECTORY_PATH } from '../../constants';
-import { writeMasterImagesEvent } from '../../queue';
 import { GitHubClient } from '../../../../core';
 
 export async function executeMasterImagesSynchronizeCommand(
     payload: MasterImagesSynchronizeCommandPayload,
 ) {
-    await writeMasterImagesEvent({
+    const queue = useMasterImageQueueService();
+    await queue.publishEvent({
         event: MasterImagesEvent.SYNCHRONIZING,
         data: {},
     });
@@ -33,7 +33,7 @@ export async function executeMasterImagesSynchronizeCommand(
         groups,
     } = await scanDirectory(MASTER_IMAGES_DATA_DIRECTORY_PATH);
 
-    await writeMasterImagesEvent({
+    await queue.publishEvent({
         event: MasterImagesEvent.SYNCHRONIZED,
         data: {
             images,

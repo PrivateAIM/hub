@@ -7,7 +7,7 @@
 
 import type { MasterImagesPushCommandPayload } from '@privateaim/server-analysis-manager-kit';
 import {
-    MasterImagesEvent,
+    MasterImagesEvent, useMasterImageQueueService,
 } from '@privateaim/server-analysis-manager-kit';
 import {
     buildDockerAuthConfigFromRegistry,
@@ -15,7 +15,6 @@ import {
     useDocker,
     waitForDockerActionStream,
 } from '../../../../core';
-import { writeMasterImagesEvent } from '../../queue';
 
 async function pushMasterImage(tag: string, registryId: string) {
     const coreClient = useCoreClient();
@@ -36,7 +35,8 @@ async function pushMasterImage(tag: string, registryId: string) {
 export async function executeMasterImagesPushCommand(
     payload: MasterImagesPushCommandPayload,
 ) {
-    await writeMasterImagesEvent({
+    const queue = useMasterImageQueueService();
+    await queue.publishEvent({
         event: MasterImagesEvent.PUSHING,
         data: {
             id: payload.id,
@@ -50,7 +50,7 @@ export async function executeMasterImagesPushCommand(
 
     await Promise.all(promises);
 
-    await writeMasterImagesEvent({
+    await queue.publishEvent({
         event: MasterImagesEvent.PUSHED,
         data: {
             id: payload.id,

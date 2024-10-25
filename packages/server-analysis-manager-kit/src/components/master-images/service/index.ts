@@ -5,8 +5,5 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export type MasterImageServiceSynchronizeOptions = {
-    owner?: string,
-    repository?: string,
-    branch?: string,
-};
+export * from './module';
+export * from './singleton';

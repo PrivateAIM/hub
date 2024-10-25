@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { MasterImagesEventQueueRouterRouting } from '@privateaim/server-analysis-manager-kit';
-import { isQueueRouterUsable, useLogger, useQueueRouter } from '@privateaim/server-kit';
+import { useMasterImageQueueService } from '@privateaim/server-analysis-manager-kit';
+import { isQueueRouterUsable, useLogger } from '@privateaim/server-kit';
 import type { Aggregator } from '@privateaim/server-kit';
 import { EnvironmentName, useEnv } from '../../../config';
 import { createAnalysisManagerMasterImagesHandlers } from './handlers';
@@ -20,12 +20,9 @@ export function createAnalysisManagerMasterImagesAggregator() : Aggregator {
         };
     }
 
-    const queueRouter = useQueueRouter();
+    const queue = useMasterImageQueueService();
 
     return {
-        start: () => queueRouter.consume(
-            MasterImagesEventQueueRouterRouting,
-            createAnalysisManagerMasterImagesHandlers(),
-        ),
+        start: () => queue.consumeEvents(createAnalysisManagerMasterImagesHandlers()),
     };
 }

@@ -12,23 +12,24 @@ import type {
     MasterImagesBuildCommandPayload,
     MasterImagesPushCommandPayloadTag,
 } from '@privateaim/server-analysis-manager-kit';
-import { MasterImagesEvent } from '@privateaim/server-analysis-manager-kit';
+import { MasterImagesEvent, useMasterImageQueueService } from '@privateaim/server-analysis-manager-kit';
 import {
     buildRemoteDockerImageURL, useCoreClient, useDocker, waitForDockerActionStream,
 } from '../../../../core';
 import { MASTER_IMAGES_DATA_DIRECTORY_PATH } from '../../constants';
-import { writeMasterImagesEvent } from '../../queue';
 
 export async function executeMasterImagesBuildCommand(
     payload: MasterImagesBuildCommandPayload,
 ) {
     const coreClient = useCoreClient();
     const docker = useDocker();
+    const queue = useMasterImageQueueService();
+
     const promises : Promise<unknown>[] = [];
 
     const { data: registries } = await coreClient.registry.getMany();
 
-    await writeMasterImagesEvent({
+    await queue.publishEvent({
         event: MasterImagesEvent.BUILDING,
         data: {
             id: payload.id,
@@ -63,7 +64,7 @@ export async function executeMasterImagesBuildCommand(
 
     await Promise.all(promises);
 
-    await writeMasterImagesEvent({
+    await queue.publishEvent({
         event: MasterImagesEvent.BUILT,
         data: {
             id: payload.id,

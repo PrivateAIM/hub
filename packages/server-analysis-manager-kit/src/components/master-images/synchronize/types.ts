@@ -6,8 +6,6 @@
  */
 
 import type { Group, Image } from 'docker-scan';
-import type { MasterImagesCommand, MasterImagesEvent } from '../constants';
-import type { MasterImagesBasePayload } from '../types';
 
 export type MasterImagesSynchronizeCommandPayload = {
     owner: string,
@@ -15,22 +13,7 @@ export type MasterImagesSynchronizeCommandPayload = {
     branch: string
 };
 
-export type MasterImagesSynchronizeCommandContext = {
-    command: `${MasterImagesCommand.SYNCHRONIZE}`,
-    data: MasterImagesSynchronizeCommandPayload,
-};
-
-//-----------------------------------------------------------------------
-
 export type MaterImagesSynchronizedEventPayload = {
     images: Image[],
     groups: Group[]
-};
-export type MasterImagesSynchronizedEventContext = {
-    data: MaterImagesSynchronizedEventPayload,
-    event: `${MasterImagesEvent.SYNCHRONIZED}`;
-};
-export type MasterImagesSynchronizingEventContext = {
-    data: MasterImagesBasePayload,
-    event: `${MasterImagesEvent.SYNCHRONIZING}`;
 };

@@ -9,27 +9,28 @@ import type { Group, Image } from 'docker-scan';
 import { useDataSource } from 'typeorm-extension';
 import { MasterImageEntity, MasterImageGroupEntity } from '../../../domains';
 
-export type MasterImageDatabaseSyncResult<T> = {
+export type MasterImageSynchronizerResult<T> = {
     updated: T[],
     created: T[],
     deleted: T[]
 };
 
-export class MasterImageDatabaseService {
-    async synchronize(input: Image[]) : Promise<MasterImageDatabaseSyncResult<MasterImageEntity>> {
+export class MasterImageSynchronizerService {
+    async syncImages(
+        input: Image[],
+    ) : Promise<MasterImageSynchronizerResult<MasterImageEntity>> {
         const dataSource = await useDataSource();
-
-        const virtualPaths = input.map((entity) => entity.virtualPath);
 
         const repository = dataSource.getRepository(MasterImageEntity);
         const entities = await repository.find();
 
-        const result : MasterImageDatabaseSyncResult<MasterImageEntity> = {
+        const result : MasterImageSynchronizerResult<MasterImageEntity> = {
             created: [],
             updated: [],
             deleted: [],
         };
 
+        const virtualPaths = input.map((entity) => entity.virtualPath);
         result.deleted = entities
             .filter((image) => virtualPaths.indexOf(image.virtual_path) === -1);
 
@@ -77,21 +78,21 @@ export class MasterImageDatabaseService {
         return result;
     }
 
-    async synchronizeGroups(input: Group[]) : Promise<MasterImageDatabaseSyncResult<MasterImageGroupEntity>> {
+    async syncGroups(
+        input: Group[],
+    ) : Promise<MasterImageSynchronizerResult<MasterImageGroupEntity>> {
         const dataSource = await useDataSource();
-
-        const dirVirtualPaths : string[] = input.map((entity) => entity.virtualPath);
 
         const repository = dataSource.getRepository(MasterImageGroupEntity);
         const entities = await repository.find();
 
-        const result : MasterImageDatabaseSyncResult<MasterImageGroupEntity> = {
+        const result : MasterImageSynchronizerResult<MasterImageGroupEntity> = {
             created: [],
             updated: [],
             deleted: [],
         };
 
-        // db entries which does not exist anymore
+        const dirVirtualPaths : string[] = input.map((entity) => entity.virtualPath);
         result.deleted = entities.filter(
             (image) => dirVirtualPaths.indexOf(image.virtual_path) === -1,
         );
