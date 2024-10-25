@@ -18,21 +18,21 @@ import type { MiddlewareSwaggerOptions } from '@privateaim/server-http-kit';
 import { Router } from 'routup';
 import { EnvironmentName, useEnv } from '../config';
 
-import { AnalysisController } from './controllers/core/analysis';
-import { AnalysisBucketController } from './controllers/core/analysis-bucket';
-import { AnalysisBucketFileController } from './controllers/core/analysis-bucket-file';
-import { AnalysisLogController } from './controllers/core/analysis-log';
-import { AnalysisNodeController } from './controllers/core/analysis-node';
-import { AnalysisPermissionController } from './controllers/core/analysis-permission';
-import { MasterImageController } from './controllers/core/master-image';
-import { MasterImageGroupController } from './controllers/core/master-image-group';
-import { NodeController } from './controllers/core/node';
-import { ProposalController } from './controllers/core/project';
-import { ProposalStationController } from './controllers/core/project-node';
-import { RegistryController } from './controllers/core/registry';
-import { RegistryProjectController } from './controllers/core/registry-project';
-import { RootController } from './controllers/core/root';
-import { ServiceController } from './controllers/special/service';
+import { AnalysisController } from './controllers/analysis';
+import { AnalysisBucketController } from './controllers/analysis-bucket';
+import { AnalysisBucketFileController } from './controllers/analysis-bucket-file';
+import { AnalysisLogController } from './controllers/analysis-log';
+import { AnalysisNodeController } from './controllers/analysis-node';
+import { AnalysisPermissionController } from './controllers/analysis-permission';
+import { MasterImageController } from './controllers/master-image';
+import { MasterImageGroupController } from './controllers/master-image-group';
+import { NodeController } from './controllers/node';
+import { ProposalController } from './controllers/project';
+import { ProposalStationController } from './controllers/project-node';
+import { RegistryController } from './controllers/registry';
+import { RegistryProjectController } from './controllers/registry-project';
+import { RootController } from './controllers/root';
+import { ServiceController } from './controllers/service';
 
 export function createRouter() : Router {
     const router = new Router();
