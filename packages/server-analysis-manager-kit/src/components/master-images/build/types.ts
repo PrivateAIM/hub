@@ -13,6 +13,11 @@ export type MasterImagesBuildCommandPayload = {
     virtualPath: string
 };
 
+export type MasterImagesBuildFailedEventPayload = {
+    id: string,
+    error: Error
+};
+
 export type MasterImagesBuildingEventPayload = {
     id: string
 };

@@ -55,6 +55,7 @@ function createHandlers() : QueueRouterHandlers<MasterImagesCommandMap> {
                     return queue.publishEvent({
                         event: MasterImagesEvent.BUILD_FAILED,
                         data: {
+                            id: message.data.id,
                             error: err,
                         },
                     });
@@ -73,6 +74,7 @@ function createHandlers() : QueueRouterHandlers<MasterImagesCommandMap> {
                     return queue.publishEvent({
                         event: MasterImagesEvent.PUSH_FAILED,
                         data: {
+                            id: message.data.id,
                             error: err,
                         },
                     });

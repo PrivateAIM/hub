@@ -40,6 +40,7 @@ export async function executeMasterImagesPushCommand(
         event: MasterImagesEvent.PUSHING,
         data: {
             id: payload.id,
+            tags: payload.tags,
         },
     });
 
@@ -54,6 +55,7 @@ export async function executeMasterImagesPushCommand(
         event: MasterImagesEvent.PUSHED,
         data: {
             id: payload.id,
+            tags: payload.tags,
         },
     });
 

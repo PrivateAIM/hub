@@ -42,16 +42,27 @@ export async function getManyMasterImageEventLogRouteHandler(req: Request, res: 
     const { pagination } = applyQuery(query, useRequestQuery(req), {
         defaultAlias: 'log',
         filters: {
-            allowed: [],
+            allowed: [
+                'name',
+                'master_image_id',
+                'created_at',
+                'updated_at',
+            ],
         },
         pagination: {
             maxLimit: 50,
         },
         relations: {
-            allowed: [],
+            allowed: [
+                'master_image',
+            ],
         },
         sort: {
-            allowed: ['expires_at', 'created_at', 'updated_at'],
+            allowed: [
+                'expires_at',
+                'created_at',
+                'updated_at',
+            ],
         },
     });
 

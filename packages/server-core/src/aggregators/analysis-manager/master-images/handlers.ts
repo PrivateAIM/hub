@@ -42,7 +42,7 @@ export function createAnalysisManagerMasterImagesHandlers() : QueueRouterHandler
 
             const entities = [
                 ...output.created,
-                ...output.deleted,
+                ...output.updated,
             ];
 
             for (let i = 0; i < entities.length; i++) {

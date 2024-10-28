@@ -4,7 +4,6 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { adjustFilePath } from 'typeorm-extension';
 import type { DataSourceOptions } from 'typeorm';
 import { isRedisClientUsable } from '@privateaim/server-kit';
 import {
@@ -75,11 +74,11 @@ export async function extendDataSourceOptions(options: DataSourceOptions) : Prom
     };
 
     const migrations : string[] = [];
-    const migration = await adjustFilePath(
-        `src/database/migrations/${options.type}/*.{ts,js}`,
-    );
+    // const migration = await adjustFilePath(
+    //     `src/database/migrations/${options.type}/*.{ts,js}`,
+    // );
 
-    migrations.push(migration);
+    // migrations.push(migration);
 
     Object.assign(options, {
         migrations,

@@ -16,7 +16,7 @@ import { MasterImagesEvent, useMasterImageQueueService } from '@privateaim/serve
 import {
     buildRemoteDockerImageURL, useCoreClient, useDocker, waitForDockerActionStream,
 } from '../../../../core';
-import { MASTER_IMAGES_DATA_DIRECTORY_PATH } from '../../constants';
+import { MASTER_IMAGES_DATA_DIRECTORY_PATH } from '../../../../constants';
 
 export async function executeMasterImagesBuildCommand(
     payload: MasterImagesBuildCommandPayload,

@@ -9,13 +9,15 @@ import { deserialize, serialize } from '@authup/kit';
 import {
     Column,
     CreateDateColumn,
-    Entity,
+    Entity, JoinColumn, ManyToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
 import type {
+    MasterImage,
     MasterImageEventLog,
 } from '@privateaim/core-kit';
+import { MasterImageEntity } from '../master-image';
 
 @Entity({ name: 'master_image_event_logs' })
 export class MasterImageEventLogEntity implements MasterImageEventLog {
@@ -46,6 +48,15 @@ export class MasterImageEventLogEntity implements MasterImageEventLog {
 
     @CreateDateColumn()
         expires_at: Date;
+
+    // ------------------------------------------------------------------
+
+    @Column({ nullable: true })
+        master_image_id: MasterImage['id'] | null;
+
+    @ManyToOne(() => MasterImageEntity, { onDelete: 'SET NULL' })
+    @JoinColumn({ name: 'master_image_id' })
+        master_image: MasterImageEntity | null;
 
     // ------------------------------------------------------------------
 

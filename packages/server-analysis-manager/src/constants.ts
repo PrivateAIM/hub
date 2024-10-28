@@ -6,7 +6,9 @@
  */
 
 import path from 'node:path';
-import { WRITABLE_DIRECTORY_PATH } from '../../config';
+import process from 'node:process';
+
+export const WRITABLE_DIRECTORY_PATH = path.join(process.cwd(), 'writable');
 
 export const MASTER_IMAGES_DIRECTORY_PATH = path.join(
     WRITABLE_DIRECTORY_PATH,

@@ -5,27 +5,64 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type {
-    MasterImagesEventContext,
-} from '@privateaim/server-analysis-manager-kit';
+import { hasOwnProperty, isObject } from '@privateaim/kit';
+import type { MasterImagesEventContext } from '@privateaim/server-analysis-manager-kit';
+import { MasterImagesEvent } from '@privateaim/server-analysis-manager-kit';
 import { useDataSource } from 'typeorm-extension';
 import { MasterImageEventLogEntity } from '../../../domains';
 
 export class MasterImageLoggerService {
-    async logEvent(ctx: MasterImagesEventContext) {
+    async logEvent(input: MasterImagesEventContext) {
+        let id : string | undefined;
+
+        if (
+            isObject(input.data) &&
+            hasOwnProperty(input.data, 'id') &&
+            typeof input.data.id === 'string'
+        ) {
+            id = input.data.id;
+        }
+
         const dataSource = await useDataSource();
         const repository = dataSource.getRepository(MasterImageEventLogEntity);
 
         // expires in 1 Week
         const expiresAtMs = Date.now() + (1000 * 60 * 60 * 24 * 7);
 
+        // todo: add data if error
+
         const entity = repository.create({
             expiring: true,
             expires_at: new Date(expiresAtMs).toISOString(),
-            name: `${ctx.event}`,
-            data: ctx.data,
+            name: `${input.event}`,
+            data: this.buildEventData(input),
+            master_image_id: id,
         });
 
         await repository.save(entity);
+    }
+
+    buildEventData(input: MasterImagesEventContext) {
+        if (
+            input.event === MasterImagesEvent.BUILD_FAILED ||
+            input.event === MasterImagesEvent.PUSH_FAILED ||
+            input.event === MasterImagesEvent.SYNCHRONIZATION_FAILED
+        ) {
+            return {
+                error: input.data.error,
+            };
+        }
+
+        if (
+            input.event === MasterImagesEvent.BUILT ||
+            input.event === MasterImagesEvent.PUSHING ||
+            input.event === MasterImagesEvent.PUSHED
+        ) {
+            return {
+                tags: input.data.tags,
+            };
+        }
+
+        return undefined;
     }
 }

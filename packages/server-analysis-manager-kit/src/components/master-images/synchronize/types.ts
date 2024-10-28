@@ -13,6 +13,10 @@ export type MasterImagesSynchronizeCommandPayload = {
     branch: string
 };
 
+export type MasterImagesSynchronizationFailedEventPayload = {
+    error: Error
+};
+
 export type MaterImagesSynchronizedEventPayload = {
     images: Image[],
     groups: Group[]

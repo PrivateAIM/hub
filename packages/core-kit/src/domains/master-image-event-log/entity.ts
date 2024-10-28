@@ -6,6 +6,7 @@
  */
 
 import type { DomainType } from '../constants';
+import type { MasterImage } from '../master-image';
 import type { DomainEventBaseContext } from '../types-base';
 
 export interface MasterImageEventLog {
@@ -20,6 +21,12 @@ export interface MasterImageEventLog {
     expiring: boolean;
 
     expires_at: Date;
+
+    // ------------------------------------------------------------------
+
+    master_image_id: string | null;
+
+    master_image: MasterImage | null;
 
     // ------------------------------------------------------------------
 

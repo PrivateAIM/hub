@@ -14,6 +14,12 @@ export type MasterImagesPushCommandPayload = {
     tags: MasterImagesPushCommandPayloadTag[]
 };
 
+export type MasterImagesPushFailedEventPayload = {
+    id: string,
+    error: Error
+};
+
 export type MasterImagesPushEventPayload = {
-    id: string
+    id: string,
+    tags: MasterImagesPushCommandPayloadTag[]
 };

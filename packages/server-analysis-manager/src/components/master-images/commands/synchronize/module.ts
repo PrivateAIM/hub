@@ -8,7 +8,7 @@
 import { scanDirectory } from 'docker-scan';
 import type { MasterImagesSynchronizeCommandPayload } from '@privateaim/server-analysis-manager-kit';
 import { MasterImagesEvent, useMasterImageQueueService } from '@privateaim/server-analysis-manager-kit';
-import { MASTER_IMAGES_DATA_DIRECTORY_PATH, MASTER_IMAGES_DIRECTORY_PATH } from '../../constants';
+import { MASTER_IMAGES_DATA_DIRECTORY_PATH, MASTER_IMAGES_DIRECTORY_PATH } from '../../../../constants';
 import { GitHubClient } from '../../../../core';
 
 export async function executeMasterImagesSynchronizeCommand(

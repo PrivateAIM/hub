@@ -6,30 +6,30 @@
  */
 
 import type {
-    MasterImagesBuildCommandPayload,
+    MasterImagesBuildCommandPayload, MasterImagesBuildFailedEventPayload,
     MasterImagesBuildingEventPayload,
     MasterImagesBuiltEventPayload,
 } from './build';
 import type { MasterImagesCommand, MasterImagesEvent } from './constants';
 import type {
     MasterImagesPushCommandPayload,
-    MasterImagesPushEventPayload,
+    MasterImagesPushEventPayload, MasterImagesPushFailedEventPayload,
 } from './push';
 import type {
-    MasterImagesSynchronizeCommandPayload,
+    MasterImagesSynchronizationFailedEventPayload, MasterImagesSynchronizeCommandPayload,
     MaterImagesSynchronizedEventPayload,
 } from './synchronize';
 
-export type MasterImagesBasePayload = {
-    error?: Error
-};
-
 //-----------------------------------------------------------------------
 
-export type MasterImagesCommandMap = {
+type MasterImagesCommandMapRaw = {
     [MasterImagesCommand.BUILD]: MasterImagesBuildCommandPayload,
     [MasterImagesCommand.PUSH]: MasterImagesPushCommandPayload,
     [MasterImagesCommand.SYNCHRONIZE]: MasterImagesSynchronizeCommandPayload,
+};
+
+export type MasterImagesCommandMap = {
+    [K in keyof MasterImagesCommandMapRaw as `${K}`]: MasterImagesCommandMapRaw[K]
 };
 
 export type MasterImagesCommandContext = {
@@ -41,18 +41,22 @@ export type MasterImagesCommandContext = {
 
 //-----------------------------------------------------------------------
 
-export type MasterImagesEventMap = {
+type MasterImagesEventMapRaw = {
     [MasterImagesEvent.BUILDING]: MasterImagesBuildingEventPayload,
     [MasterImagesEvent.BUILT]: MasterImagesBuiltEventPayload,
-    [MasterImagesEvent.BUILD_FAILED]: MasterImagesBasePayload,
+    [MasterImagesEvent.BUILD_FAILED]: MasterImagesBuildFailedEventPayload,
 
     [MasterImagesEvent.PUSHING]: MasterImagesPushEventPayload,
     [MasterImagesEvent.PUSHED]: MasterImagesPushEventPayload,
-    [MasterImagesEvent.PUSH_FAILED]: MasterImagesBasePayload,
+    [MasterImagesEvent.PUSH_FAILED]: MasterImagesPushFailedEventPayload,
 
-    [MasterImagesEvent.SYNCHRONIZING]: MasterImagesBasePayload,
+    [MasterImagesEvent.SYNCHRONIZING]: Record<string, any>,
     [MasterImagesEvent.SYNCHRONIZED]: MaterImagesSynchronizedEventPayload,
-    [MasterImagesEvent.SYNCHRONIZATION_FAILED]: MasterImagesBasePayload
+    [MasterImagesEvent.SYNCHRONIZATION_FAILED]: MasterImagesSynchronizationFailedEventPayload
+};
+
+export type MasterImagesEventMap = {
+    [K in keyof MasterImagesEventMapRaw as `${K}`]: MasterImagesEventMapRaw[K]
 };
 
 export type MasterImagesEventContext = {
