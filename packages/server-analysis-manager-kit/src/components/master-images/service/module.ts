@@ -10,7 +10,6 @@ import { buildQueueRouterPublishPayload, useCache, useQueueRouter } from '@priva
 import { cleanupPayload } from '../../../utils';
 import {
     MasterImagesCommand,
-    MasterImagesEvent,
     MasterImagesEventQueueRouterRouting,
     MasterImagesTaskQueueRouterRouting,
 } from '../constants';
@@ -75,16 +74,7 @@ export class MasterImageQueueService {
     ) {
         await this.queueRouter.consume(MasterImagesEventQueueRouterRouting, {
             $any: async (message) => {
-                if (
-                    message.type === MasterImagesEvent.BUILD_FAILED ||
-                    message.type === MasterImagesEvent.PUSH_FAILED ||
-                    message.type === MasterImagesEvent.SYNCHRONIZED ||
-                    message.type === MasterImagesEvent.SYNCHRONIZATION_FAILED
-                ) {
-                    await this.clearCommandLock(MasterImagesCommand.SYNCHRONIZE);
-                } else {
-                    await this.setCommandLock(MasterImagesCommand.SYNCHRONIZE);
-                }
+                await this.setCommandLock(MasterImagesCommand.SYNCHRONIZE);
 
                 if (handlers[message.type]) {
                     await handlers[message.type](message);
@@ -109,10 +99,6 @@ export class MasterImageQueueService {
         const isActive = await this.cache.get(`master-images-command:${command}`);
 
         return !!isActive;
-    }
-
-    protected async clearCommandLock(command: string) {
-        await this.cache.drop(`master-images-command:${command}`);
     }
 
     // -------------------------------------------------

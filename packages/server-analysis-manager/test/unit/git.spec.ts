@@ -6,7 +6,7 @@
  */
 
 import { scanDirectory } from 'docker-scan';
-import { MASTER_IMAGES_DATA_DIRECTORY_PATH, MASTER_IMAGES_DIRECTORY_PATH } from '../../src';
+import { MASTER_IMAGES_DATA_DIRECTORY_PATH, MASTER_IMAGES_DIRECTORY_PATH } from '../../src/constants';
 import { GitHubClient } from '../../src/core';
 
 describe('git/clone', () => {
