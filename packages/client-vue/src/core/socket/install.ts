@@ -23,9 +23,6 @@ export function installSocketManager(app: App, options: SocketManagerInstallOpti
     CTSEvents
     >({
         url: options.baseURL,
-        options: {
-            path: '/core/socket.io',
-        },
         token: () => accessToken.value,
     });
 
