@@ -22,13 +22,19 @@ export default defineNuxtComponent({
 
         const items = [
             {
-                id: ServiceID.SYSTEM, name: 'System', icon: 'fa-solid fa-atom', version: 'v1.0.0-alpha.0',
+                id: 'master-images',
+                name: 'Master Images',
+                icon: 'fa-solid fa-atom',
+                version: 'v1.0.0-alpha.0',
             },
         ];
 
         const thirdPartyItems = [
             {
-                id: ServiceID.REGISTRY, name: 'Image Registry', icon: 'fab fa-docker', version: 'v2.4.0',
+                id: ServiceID.REGISTRY,
+                name: 'Image Registry',
+                icon: 'fab fa-docker',
+                version: 'v2.4.0',
             },
         ];
 
@@ -47,7 +53,7 @@ export default defineNuxtComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            <i class="fa fa-map-signs"></i> Services <span class="sub-title">Management</span>
+            <i class="fa fa-map-signs" /> Services <span class="sub-title">Management</span>
         </h1>
 
         <h6>

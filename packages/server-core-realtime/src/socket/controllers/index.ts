@@ -13,3 +13,4 @@ export * from './analysis';
 export * from './analysis-file';
 export * from './analysis-log';
 export * from './analysis-node';
+export * from './master-image-event-log';

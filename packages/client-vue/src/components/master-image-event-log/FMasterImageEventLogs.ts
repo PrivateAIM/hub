@@ -13,7 +13,7 @@ import {
 } from '@privateaim/core-kit';
 import type { ListItemSlotProps } from '@vuecs/list-controls';
 import {
-    defineComponent, h, ref,
+    defineComponent, h, nextTick, ref,
 } from 'vue';
 import type { ListMeta } from '../../core';
 import { createList } from '../../core';
@@ -43,6 +43,11 @@ export default defineComponent({
             onCreated(_entity, meta) {
                 scrollToLastLine(meta);
             },
+            onLoaded(meta) {
+                nextTick(() => {
+                    scrollToLastLine(meta);
+                });
+            },
             socket: {
                 processEvent(event) {
                     return event.meta.roomName !== buildDomainChannelName(DomainType.MASTER_IMAGE_EVENT_LOG);
@@ -55,10 +60,10 @@ export default defineComponent({
                 sort: {
                     created_at: 'ASC',
                 },
+                relations: {
+                    master_image: true,
+                },
             },
-            queryFilters: (q) => ({
-                title: q.length > 0 ? `~${q}` : q,
-            }),
         });
 
         setDefaults({

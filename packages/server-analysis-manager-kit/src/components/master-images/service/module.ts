@@ -91,7 +91,7 @@ export class MasterImageQueueService {
 
     protected async setCommandLock(command: string) {
         await this.cache.set(`master-images-command:${command}`, true, {
-            ttl: 1000 * 120,
+            ttl: 1000 * 60,
         });
     }
 

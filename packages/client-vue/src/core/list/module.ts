@@ -157,17 +157,29 @@ export function createList<
             meta.value.busy = false;
         }
 
-        if (
-            context.loadAll &&
-            total.value > data.value.length
-        ) {
-            await load({
-                ...meta.value,
-                pagination: {
-                    ...meta.value.pagination,
-                    offset: (meta.value.pagination?.offset ?? 0) + (meta.value.pagination?.limit ?? 0),
-                },
-            });
+        if (context.loadAll) {
+            if (
+                total.value > data.value.length
+            ) {
+                await load({
+                    ...meta.value,
+                    pagination: {
+                        ...meta.value.pagination,
+                        offset: (meta.value.pagination?.offset ?? 0) + (meta.value.pagination?.limit ?? 0),
+                    },
+                });
+
+                return;
+            }
+
+            if (context.onLoaded) {
+                context.onLoaded(meta.value);
+            }
+
+            return;
+        }
+        if (context.onLoaded) {
+            context.onLoaded(meta.value);
         }
     }
 

@@ -9,20 +9,10 @@ import { hasOwnProperty, isObject } from '@privateaim/kit';
 import type { MasterImagesEventContext } from '@privateaim/server-analysis-manager-kit';
 import { MasterImagesEvent } from '@privateaim/server-analysis-manager-kit';
 import { useDataSource } from 'typeorm-extension';
-import { MasterImageEventLogEntity } from '../../../domains';
+import { MasterImageEntity, MasterImageEventLogEntity } from '../../../domains';
 
 export class MasterImageLoggerService {
     async logEvent(input: MasterImagesEventContext) {
-        let id : string | undefined;
-
-        if (
-            isObject(input.data) &&
-            hasOwnProperty(input.data, 'id') &&
-            typeof input.data.id === 'string'
-        ) {
-            id = input.data.id;
-        }
-
         const dataSource = await useDataSource();
         const repository = dataSource.getRepository(MasterImageEventLogEntity);
 
@@ -36,8 +26,22 @@ export class MasterImageLoggerService {
             expires_at: new Date(expiresAtMs).toISOString(),
             name: `${input.event}`,
             data: this.buildEventData(input),
-            master_image_id: id,
         });
+
+        if (
+            isObject(input.data) &&
+            hasOwnProperty(input.data, 'id') &&
+            typeof input.data.id === 'string'
+        ) {
+            entity.master_image_id = input.data.id;
+
+            const masterImageRepository = dataSource.getRepository(MasterImageEntity);
+            entity.master_image = await masterImageRepository.findOne({
+                where: {
+                    id: entity.master_image_id,
+                },
+            });
+        }
 
         await repository.save(entity);
     }

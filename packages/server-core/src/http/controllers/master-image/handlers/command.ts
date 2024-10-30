@@ -29,14 +29,22 @@ export async function commandMasterImageRouteHandler(req: Request, res: Response
 
     switch (command) {
         case MasterImageCommand.SYNC: {
-            await queue.publishCommand({
-                command: MasterImagesCommand.SYNCHRONIZE,
-                data: {
-                    owner: useEnv('masterImagesOwner'),
-                    repository: useEnv('masterImagesRepository'),
-                    branch: useEnv('masterImagesBranch'),
-                },
-            });
+            try {
+                await queue.publishCommand({
+                    command: MasterImagesCommand.SYNCHRONIZE,
+                    data: {
+                        owner: useEnv('masterImagesOwner'),
+                        repository: useEnv('masterImagesRepository'),
+                        branch: useEnv('masterImagesBranch'),
+                    },
+                });
+            } catch (e) {
+                if (e instanceof Error) {
+                    throw new BadRequestError(e.message);
+                }
+
+                throw e;
+            }
 
             return sendAccepted(res);
         }

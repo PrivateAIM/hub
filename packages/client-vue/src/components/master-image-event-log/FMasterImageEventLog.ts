@@ -7,7 +7,7 @@
 import { VCTimeago } from '@vuecs/timeago';
 import type { MasterImageEventLog } from '@privateaim/core-kit';
 import {
-    defineComponent, h, toRef,
+    VNode, defineComponent, h, toRef,
 } from 'vue';
 import type {
     PropType, VNodeArrayChildren,
@@ -27,13 +27,17 @@ export default defineComponent({
     setup(props) {
         const entity = toRef(props, 'entity');
 
-        const message : VNodeArrayChildren = [];
-
-        message.push(h('div', [
+        const message : VNodeArrayChildren = [
             'Event ',
-            h('strong', `${entity.value.name}`),
-            ' triggered.',
-        ]));
+        ];
+
+        message.push(h('strong', `${entity.value.name}`));
+
+        if (entity.value.master_image) {
+            message.push(h('span', { class: 'ms-1' }, [`(${entity.value.master_image.virtual_path})`]));
+        }
+
+        message.push(' triggered.');
 
         // todo: render entity.value.data depending on event name
 

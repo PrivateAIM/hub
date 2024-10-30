@@ -23,6 +23,7 @@ import type { AnalysisLog, AnalysisLogEventContext } from './analysis-log';
 import type { AnalysisNode, TrainStationEventContext } from './analysis-node';
 
 export type DomainsEventContext = MasterImageEventContext |
+MasterImageEventLogEventContext |
 MasterImageGroupEventContext |
 ProjectEventContext |
 ProjectNodeEventContext |
