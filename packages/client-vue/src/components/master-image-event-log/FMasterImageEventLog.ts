@@ -7,7 +7,7 @@
 import { VCTimeago } from '@vuecs/timeago';
 import type { MasterImageEventLog } from '@privateaim/core-kit';
 import {
-    VNode, defineComponent, h, toRef,
+    defineComponent, h, toRef,
 } from 'vue';
 import type {
     PropType, VNodeArrayChildren,
