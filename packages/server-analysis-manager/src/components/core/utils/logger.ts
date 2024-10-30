@@ -8,7 +8,8 @@
 import type { Logger } from '@privateaim/server-kit';
 import { createLogger } from '@privateaim/server-kit';
 import { ComponentName } from '@privateaim/server-analysis-manager-kit';
-import { WRITABLE_DIRECTORY_PATH } from '../../../config';
+
+import { WRITABLE_DIRECTORY_PATH } from '../../../constants';
 
 let instance : Logger | undefined;
 

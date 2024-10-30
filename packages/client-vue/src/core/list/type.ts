@@ -123,5 +123,6 @@ export type ListCreateContext<
     query?: BuildInput<Entity<T>> | (() => BuildInput<Entity<T>>),
     queryFilters?: ((q: string) => FiltersBuildInput<Entity<T>>),
     onCreated?: (entity: T, meta: ListMeta<T>) => void | Promise<void>,
+    onLoaded?: (meta: ListMeta<T>) => void | Promise<void>,
     socket?: boolean | Omit<EntitySocketContext<A, T>, 'type'>
 };

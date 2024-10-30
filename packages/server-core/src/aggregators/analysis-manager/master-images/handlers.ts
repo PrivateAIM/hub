@@ -6,101 +6,67 @@
  */
 
 import type {
-    MasterImagesBasePayload,
-    MaterImagesSynchronizedEventPayload,
+    MasterImagesEventContext,
+    MasterImagesEventMap,
 } from '@privateaim/server-analysis-manager-kit';
 import {
+    MasterImagesCommand,
     MasterImagesEvent,
+    useMasterImageQueueService,
 } from '@privateaim/server-analysis-manager-kit';
 import type { QueueRouterHandlers } from '@privateaim/server-kit';
-import { useLogger } from '@privateaim/server-kit';
-import { useMasterImageService } from '../../../services';
-import { syncMasterImageGroups, syncMasterImages } from './synchronize';
+import { MasterImageSynchronizerService, useMasterImageService } from '../../../services';
 
-export function createAnalysisManagerMasterImagesHandlers() : QueueRouterHandlers<{
-    [MasterImagesEvent.BUILDING]: MasterImagesBasePayload,
-    [MasterImagesEvent.BUILT]: MasterImagesBasePayload,
-    [MasterImagesEvent.BUILD_FAILED]: MasterImagesBasePayload,
-
-    [MasterImagesEvent.PUSHING]: MasterImagesBasePayload,
-    [MasterImagesEvent.PUSHED]: MasterImagesBasePayload,
-    [MasterImagesEvent.PUSH_FAILED]: MasterImagesBasePayload,
-
-    [MasterImagesEvent.SYNCHRONIZING]: MasterImagesBasePayload,
-    [MasterImagesEvent.SYNCHRONIZED]: MaterImagesSynchronizedEventPayload,
-    [MasterImagesEvent.SYNCHRONIZATION_FAILED]: MasterImagesBasePayload
-}> {
-    const masterImageService = useMasterImageService();
+export function createAnalysisManagerMasterImagesHandlers() : QueueRouterHandlers<Partial<MasterImagesEventMap>> {
+    const logger = useMasterImageService();
+    const synchronizer = new MasterImageSynchronizerService();
+    const queue = useMasterImageQueueService();
 
     return {
-        [MasterImagesEvent.SYNCHRONIZING]: async () => {
-            await masterImageService.handleEvent(
-                MasterImagesEvent.SYNCHRONIZING,
-            );
+        $any: async (message) => {
+            await logger.logEvent({
+                event: message.type,
+                data: message.data,
+            } as MasterImagesEventContext);
         },
-        [MasterImagesEvent.SYNCHRONIZED]: async (message) => {
-            useLogger().debug('Synchronizing master images', {
-                groups: message.data.groups.length,
-                images: message.data.images.length,
-            });
-
-            // languages
-            const imageGroups = await syncMasterImageGroups(message.data.groups);
-
-            useLogger().info(`Created ${imageGroups.created.length} master image groups`);
-            useLogger().info(`Updated ${imageGroups.updated.length} master image groups`);
-            useLogger().info(`Deleted ${imageGroups.deleted.length} master image groups`);
+        [MasterImagesEvent.SYNCHRONIZED]: async (
+            message,
+        ) => {
+            // groups
+            await synchronizer
+                .syncGroups(message.data.groups);
 
             // images
-            const images = await syncMasterImages(message.data.images);
+            const output = await synchronizer
+                .syncImages(message.data.images);
 
-            useLogger().info(`Created ${images.created.length} master images`);
-            useLogger().info(`Updated ${images.updated.length} master images`);
-            useLogger().info(`Deleted ${images.deleted.length} master images`);
+            const entities = [
+                ...output.created,
+                ...output.updated,
+            ];
 
-            await masterImageService.handleEvent(
-                MasterImagesEvent.SYNCHRONIZED,
-            );
+            for (let i = 0; i < entities.length; i++) {
+                await queue.publishCommand({
+                    command: MasterImagesCommand.BUILD,
+                    data: {
+                        id: entities[i].id,
+                        path: entities[i].path,
+                        virtualPath: entities[i].virtual_path,
+                    },
+                });
+            }
         },
-        [MasterImagesEvent.SYNCHRONIZATION_FAILED]: async (message) => {
-            await masterImageService.handleEvent(
-                MasterImagesEvent.SYNCHRONIZATION_FAILED,
-                `${message.data.error}`,
-            );
+        [MasterImagesEvent.BUILT]: async (message) => {
+            await queue.publishCommand({
+                command: MasterImagesCommand.PUSH,
+                data: {
+                    id: message.data.id,
+                    tags: message.data.tags,
+                },
+            });
         },
-
-        [MasterImagesEvent.BUILDING]: async () => {
-            await masterImageService.handleEvent(
-                MasterImagesEvent.BUILDING,
-            );
-        },
-        [MasterImagesEvent.BUILT]: async () => {
-            await masterImageService.handleEvent(
-                MasterImagesEvent.BUILT,
-            );
-        },
-        [MasterImagesEvent.BUILD_FAILED]: async (message) => {
-            await masterImageService.handleEvent(
-                MasterImagesEvent.BUILD_FAILED,
-                `${message.data.error}`,
-            );
-        },
-
-        [MasterImagesEvent.PUSHING]: async () => {
-            await masterImageService.handleEvent(
-                MasterImagesEvent.PUSHING,
-            );
-        },
-        [MasterImagesEvent.PUSHED]: async () => {
-            await masterImageService.handleEvent(
-                MasterImagesEvent.PUSHED,
-            );
-        },
-        [MasterImagesEvent.PUSH_FAILED]: async (message) => {
-            await masterImageService.handleEvent(
-                MasterImagesEvent.PUSH_FAILED,
-                `${message.data.error}`,
-            );
+        [MasterImagesEvent.PUSH_FAILED]: async () => {
+            // todo: clear built docker image
         },
     };
 }

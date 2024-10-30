@@ -5,11 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { storeToRefs, useStore } from '@authup/client-web-kit';
+import {
+    StoreDispatcherEventName, injectStoreDispatcher, storeToRefs, useStore,
+} from '@authup/client-web-kit';
 import { ClientManager } from '@authup/core-realtime-kit';
 import type { CTSEvents, STCEvents } from '@privateaim/core-realtime-kit';
 import type { App } from 'vue';
-import { ref } from 'vue';
 import { provideSocketManager } from './singleton';
 import type { SocketManagerInstallOptions } from './types';
 
@@ -25,19 +26,14 @@ export function installSocketManager(app: App, options: SocketManagerInstallOpti
         token: () => accessToken.value,
     });
 
-    const oldValue = ref<string | undefined>();
-
-    store.$subscribe((
-        mutation,
-        state,
-    ) => {
-        if (state.accessToken !== oldValue.value) {
-            oldValue.value = state.accessToken;
-
+    const storeDispatcher = injectStoreDispatcher();
+    storeDispatcher.on(
+        StoreDispatcherEventName.ACCESS_TOKEN_UPDATED,
+        () => {
             Promise.resolve()
                 .then(() => manager.reconnect());
-        }
-    });
+        },
+    );
 
     provideSocketManager(manager, app);
 }

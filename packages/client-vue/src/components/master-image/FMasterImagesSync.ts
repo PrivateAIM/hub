@@ -5,13 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ASearch } from '@authup/client-web-kit';
 import type { MasterImage } from '@privateaim/core-kit';
 import {
     DomainType,
     MasterImageCommand,
 } from '@privateaim/core-kit';
-import type { ListHeaderSlotProps } from '@vuecs/list-controls';
 import {
     defineComponent, h, ref,
 } from 'vue';
@@ -49,11 +47,6 @@ export default defineComponent({
         return () => h(
             'div',
             [
-                h('p', [
-                    'The master images and groups are extracted from the GitHub repository after executing the sync command and are then transferred to the database.' +
-                    ' ' +
-                    'In addition, the master images are built and transferred to all registered registry instances.',
-                ]),
                 h('div', { class: 'mb-1' }, [
                     h('button', {
                         type: 'button',
@@ -72,26 +65,17 @@ export default defineComponent({
 
                 h(MasterImageList, {
                     ref: itemList,
-                    scopedSlots: {
-                        [EntityListSlotName.HEADER]: (props: ListHeaderSlotProps<MasterImage>) => [
-                            h(ASearch, {
-                                load: props.load,
-                                meta: props.meta,
-                                busy: props.busy,
-                            }),
-                            h('strong', ['Overview']),
-                        ],
-                        [EntityListSlotName.ITEM_ACTIONS]: (props : { data: MasterImage }) => h(EntityDelete, {
-                            class: 'btn btn-xs btn-danger',
-                            elementType: 'button',
-                            entityId: props.data.id,
-                            entityType: DomainType.MASTER_IMAGE,
-                            withText: false,
-                            onDeleted(item: MasterImage) {
-                                return handleDeleted(item);
-                            },
-                        }),
-                    },
+                }, {
+                    [EntityListSlotName.ITEM_ACTIONS]: (props : { data: MasterImage }) => h(EntityDelete, {
+                        class: 'btn btn-xs btn-danger',
+                        elementType: 'button',
+                        entityId: props.data.id,
+                        entityType: DomainType.MASTER_IMAGE,
+                        withText: false,
+                        onDeleted(item: MasterImage) {
+                            return handleDeleted(item);
+                        },
+                    }),
                 }),
             ],
         );

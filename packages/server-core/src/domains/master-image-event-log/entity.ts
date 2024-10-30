@@ -5,16 +5,19 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { deserialize, serialize } from '@authup/kit';
 import {
     Column,
     CreateDateColumn,
-    Entity,
+    Entity, JoinColumn, ManyToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
 import type {
+    MasterImage,
     MasterImageEventLog,
 } from '@privateaim/core-kit';
+import { MasterImageEntity } from '../master-image';
 
 @Entity({ name: 'master_image_event_logs' })
 export class MasterImageEventLogEntity implements MasterImageEventLog {
@@ -24,16 +27,38 @@ export class MasterImageEventLogEntity implements MasterImageEventLog {
     @Column({ type: 'varchar', length: 64 })
         name: string;
 
-    @Column({ type: 'text', nullable: true })
-        description: string | null;
+    @Column({
+        type: 'text',
+        nullable: true,
+        transformer: {
+            to(value: any): any {
+                return serialize(value);
+            },
+            from(value: any): any {
+                return deserialize(value);
+            },
+        },
+    })
+        data: unknown | null;
+
+    // ------------------------------------------------------------------
 
     @Column({ type: 'boolean', default: false })
         expiring: boolean;
 
-    // ------------------------------------------------------------------
-
     @CreateDateColumn()
         expires_at: Date;
+
+    // ------------------------------------------------------------------
+
+    @Column({ nullable: true })
+        master_image_id: MasterImage['id'] | null;
+
+    @ManyToOne(() => MasterImageEntity, { onDelete: 'SET NULL' })
+    @JoinColumn({ name: 'master_image_id' })
+        master_image: MasterImageEntity | null;
+
+    // ------------------------------------------------------------------
 
     @CreateDateColumn()
         created_at: Date;

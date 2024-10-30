@@ -5,20 +5,37 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { DomainType } from '../constants';
+import type { MasterImage } from '../master-image';
+import type { DomainEventBaseContext } from '../types-base';
+
 export interface MasterImageEventLog {
     id: string;
 
     name: string;
 
-    description: string | null;
-
-    expiring: boolean;
+    data: unknown | null;
 
     // ------------------------------------------------------------------
 
+    expiring: boolean;
+
     expires_at: Date;
+
+    // ------------------------------------------------------------------
+
+    master_image_id: string | null;
+
+    master_image: MasterImage | null;
+
+    // ------------------------------------------------------------------
 
     created_at: Date;
 
     updated_at: Date;
 }
+
+export type MasterImageEventLogEventContext = DomainEventBaseContext & {
+    type: `${DomainType.MASTER_IMAGE_EVENT_LOG}`,
+    data: MasterImageEventLog
+};

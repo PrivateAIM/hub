@@ -6,7 +6,7 @@
  */
 
 import { createLogger, setLoggerFactory } from '@privateaim/server-kit';
-import { WRITABLE_DIRECTORY_PATH } from '../constants';
+import { WRITABLE_DIRECTORY_PATH } from '../../constants';
 
 export function setupLogger(): void {
     setLoggerFactory(() => createLogger({
