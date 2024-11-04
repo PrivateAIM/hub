@@ -8,11 +8,13 @@
 import type {
     DomainEventName, DomainEventSubscriptionName,
 } from './constants';
-import type { DomainEventFullName, DomainEventSubscriptionFullName, DomainInput } from './types';
+import type {
+    DomainEventFullName, DomainEventSubscriptionFullName,
+} from './types';
 
-export function buildDomainEventFullName<T extends DomainInput>(
+export function buildDomainEventFullName<T extends string>(
     type: T,
-    event: `${DomainEventName}` | DomainEventName,
+    event: `${DomainEventName}`,
 ) : DomainEventFullName<T> {
     const eventCapitalized = event.substring(0, 1).toUpperCase() + event.substring(1);
 
@@ -20,17 +22,17 @@ export function buildDomainEventFullName<T extends DomainInput>(
 }
 
 export function buildDomainEventSubscriptionFullName<
-    T extends DomainInput,
+    T extends string,
 >(
     type: T,
-    event: `${DomainEventSubscriptionName}` | DomainEventSubscriptionName,
+    event: `${DomainEventSubscriptionName}`,
 ) : DomainEventSubscriptionFullName<T> {
     const eventCapitalized = event.substring(0, 1).toUpperCase() + event.substring(1);
 
     return type + eventCapitalized as DomainEventSubscriptionFullName<T>;
 }
 
-export function buildDomainChannelName(type: DomainInput, id?: string | number) {
+export function buildDomainChannelName(type: string, id?: string | number) {
     return `${type}${id ? `:${id}` : ''}`;
 }
 

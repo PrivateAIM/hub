@@ -6,9 +6,7 @@
  */
 
 import type { Realm } from '@authup/core-kit';
-import type { DomainType } from '../constants';
 import type { Registry } from '../registry';
-import type { DomainEventBaseContext } from '../types-base';
 import type { RegistryProjectType } from './constants';
 
 export interface RegistryProject {
@@ -57,8 +55,3 @@ export interface RegistryProject {
 
     updated_at: Date;
 }
-
-export type RegistryProjectEventContext = DomainEventBaseContext & {
-    type: `${DomainType.REGISTRY_PROJECT}`,
-    data: RegistryProject
-};

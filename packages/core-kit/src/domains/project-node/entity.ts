@@ -6,10 +6,8 @@
  */
 
 import type { Realm } from '@authup/core-kit';
-import type { DomainType } from '../constants';
 import type { Project } from '../project';
 import type { Node } from '../node';
-import type { DomainEventBaseContext } from '../types-base';
 import type { ProjectNodeApprovalStatus } from './constants';
 
 export interface ProjectNode {
@@ -39,8 +37,3 @@ export interface ProjectNode {
 
     node_realm_id: Realm['id'];
 }
-
-export type ProjectNodeEventContext = DomainEventBaseContext & {
-    type: `${DomainType.PROJECT_NODE}`,
-    data: ProjectNode
-};

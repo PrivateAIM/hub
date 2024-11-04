@@ -6,14 +6,16 @@
  */
 
 import type {
-    DomainEventContext,
     DomainEventFullName,
     DomainEventSubscriptionFullName,
-    DomainSubType,
-    DomainType,
+    DomainTypeMap,
+    EventRecord,
 } from '@privateaim/core-kit';
 
-export type STCEventContext<T extends Record<string, any>> = T & {
+export type STCEventRecord<
+    TYPE extends string,
+    RECORD extends Record<string, any>,
+> = EventRecord<TYPE, RECORD> & {
     meta: {
         roomName?: string,
         roomId?: string | number
@@ -30,15 +32,20 @@ export type STSEvents = {
     [event: string]: (...args: any[]) => void;
 };
 
+export type STCEventHandler<
+    TYPE extends string,
+    RECORD extends Record<string, any>,
+> = (
+    data: STCEventRecord<TYPE, RECORD>
+) => void;
 export type STCEvents = {
-    [K in `${DomainType}` | `${DomainSubType}` as DomainEventFullName<K>]: (
-        data: STCEventContext<DomainEventContext<K>>
-    ) => void
+    [K in keyof DomainTypeMap as DomainEventFullName<K>]: STCEventHandler<K, DomainTypeMap[K]>
 };
 
+export type CTSEventHandler = (
+    target: EventTarget,
+    cb: EventCallback
+) => void;
 export type CTSEvents = {
-    [K in DomainEventSubscriptionFullName<`${DomainType}` | `${DomainSubType}`>]: (
-        target?: EventTarget,
-        cb?: EventCallback
-    ) => void
+    [K in keyof DomainTypeMap as DomainEventSubscriptionFullName<K>]: CTSEventHandler
 };

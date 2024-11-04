@@ -6,10 +6,8 @@
  */
 
 import type { Realm, User } from '@authup/core-kit';
-import type { DomainType } from '../constants';
 import type { MasterImage } from '../master-image';
 import type { Project } from '../project';
-import type { DomainEventBaseContext } from '../types-base';
 import type {
     AnalysisBuildStatus,
     AnalysisRunStatus,
@@ -67,8 +65,3 @@ export interface Analysis {
 
     master_image: MasterImage;
 }
-
-export type AnalysisEventContext = DomainEventBaseContext & {
-    type: `${DomainType.ANALYSIS}`,
-    data: Analysis
-};

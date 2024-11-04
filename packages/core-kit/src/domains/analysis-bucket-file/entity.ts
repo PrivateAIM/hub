@@ -7,9 +7,7 @@
 
 import type { Realm, Robot, User } from '@authup/core-kit';
 import type { AnalysisBucket } from '../analysis-bucket';
-import type { DomainType } from '../constants';
 import type { Analysis } from '../analysis';
-import type { DomainEventBaseContext } from '../types-base';
 
 export interface AnalysisBucketFile {
     id: string;
@@ -48,8 +46,3 @@ export interface AnalysisBucketFile {
 
     robot_id: Robot['id'] | null;
 }
-
-export type AnalysisFileEventContext = DomainEventBaseContext & {
-    type: `${DomainType.ANALYSIS_BUCKET_FILE}`,
-    data: AnalysisBucketFile
-};

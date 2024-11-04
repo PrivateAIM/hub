@@ -6,14 +6,14 @@
  */
 
 import { DomainEventName } from '@privateaim/core-kit';
-import type { DomainsEventContext } from '@privateaim/core-kit';
+import type { DomainsEvents } from '@privateaim/core-kit';
 import type { Client } from 'redis-extension';
 import type { DomainEventDestinations } from '../type';
 import { buildDomainEventChannelName, transformDomainEventData } from '../utils';
 
 export async function publishDomainRedisEvent(
     client: Client,
-    context: DomainsEventContext,
+    context: DomainsEvents,
     destinations: DomainEventDestinations,
 ) : Promise<any> {
     context = transformDomainEventData(context);

@@ -6,10 +6,8 @@
  */
 
 import type { Realm } from '@authup/core-kit';
-import type { DomainType } from '../constants';
 import type { Node } from '../node';
 import type { Analysis } from '../analysis';
-import type { DomainEventBaseContext } from '../types-base';
 import type { AnalysisNodeApprovalStatus, AnalysisNodeRunStatus } from './constants';
 
 export interface AnalysisNode {
@@ -53,13 +51,3 @@ export interface AnalysisNode {
 
     node_realm_id: Realm['id'];
 }
-
-export type TrainStationEventContext = DomainEventBaseContext & {
-    type: `${DomainType.ANALYSIS_NODE}`,
-    data: AnalysisNode
-};
-
-export type AnalyseNodeSocketEventData = Record<string, { online: boolean, realmId: string }>;
-export type AnalyseNodeSocketCTSEvents = {
-    analysisNodes: (id: Analysis['id'], cb?: (err: null | Error, data: AnalyseNodeSocketEventData) => void) => void
-};

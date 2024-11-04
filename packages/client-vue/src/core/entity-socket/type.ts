@@ -6,20 +6,17 @@
  */
 
 import type {
-    DomainEntity,
     DomainEntityID,
-    DomainEventContext,
     DomainEventSubscriptionFullName,
-    DomainType,
 } from '@privateaim/core-kit';
 import type {
-    STCEventContext,
+    STCEventRecord,
 } from '@privateaim/core-realtime-kit';
 import type { MaybeRef } from 'vue';
 
 export type EntitySocketContext<
-    A extends `${DomainType}`,
-    T = DomainEntity<A>,
+    A extends string,
+    T extends Record<string, any>,
 > = {
     type: A,
     realmId?: MaybeRef<string | undefined>,
@@ -29,10 +26,10 @@ export type EntitySocketContext<
     onCreated?(entity: T): any,
     onUpdated?(entity: Partial<T>): any,
     onDeleted?(entity: T): any,
-    processEvent?(event: STCEventContext<DomainEventContext<A>>, realmId?: string) : boolean;
+    processEvent?(event: STCEventRecord<A, T>, realmId?: string) : boolean;
     buildChannelName?(entityId?: DomainEntityID<T>) : string;
-    buildSubscribeEventName?(): DomainEventSubscriptionFullName;
-    buildUnsubscribeEventName?(): DomainEventSubscriptionFullName;
+    buildSubscribeEventName?(): DomainEventSubscriptionFullName<any>;
+    buildUnsubscribeEventName?(): DomainEventSubscriptionFullName<any>;
 };
 
 export type EntitySocket = {

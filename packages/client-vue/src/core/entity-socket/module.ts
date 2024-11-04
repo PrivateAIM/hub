@@ -6,6 +6,10 @@
  */
 
 import { DomainEventName, REALM_MASTER_NAME } from '@authup/core-kit';
+import type {
+    DomainEventSubscriptionFullName,
+    DomainTypeMap,
+} from '@privateaim/core-kit';
 import {
     DomainEventSubscriptionName,
     buildDomainChannelName,
@@ -14,14 +18,8 @@ import {
     buildDomainNamespaceName,
 } from '@privateaim/core-kit';
 import type {
-    DomainEntity,
-    DomainEventContext,
-    DomainEventSubscriptionFullName,
-    DomainInput,
-    DomainType,
-} from '@privateaim/core-kit';
-import type {
-    STCEventContext,
+    STCEventHandler,
+    STCEventRecord,
 } from '@privateaim/core-realtime-kit';
 import {
     computed, isRef, onMounted, onUnmounted, watch,
@@ -30,13 +28,11 @@ import { storeToRefs, useStore } from '@authup/client-web-kit';
 import type { EntitySocket, EntitySocketContext } from './type';
 import { injectSocketManager, isSocketManagerUsable } from '../socket';
 
-type DT<T> = T extends DomainEntity<infer U> ? U extends `${DomainType}` ? U : never : never;
-
 export function createEntitySocket<
-    A extends DT<DomainEntity<any>>,
-    T = DomainEntity<A>,
+    TYPE extends keyof DomainTypeMap,
+    RECORD extends DomainTypeMap[TYPE],
 >(
-    ctx: EntitySocketContext<A, T>,
+    ctx: EntitySocketContext<TYPE, RECORD>,
 ) : EntitySocket {
     if (!isSocketManagerUsable()) {
         return {
@@ -73,7 +69,7 @@ export function createEntitySocket<
 
     const lockId = computed(() => (isRef(ctx.lockId) ? ctx.lockId.value : ctx.lockId));
 
-    const processEvent = (event: STCEventContext<DomainEventContext<A>>) : boolean => {
+    const processEvent = (event: STCEventRecord<TYPE, RECORD>) : boolean => {
         if (
             ctx.processEvent &&
             !ctx.processEvent(event, realmId.value)
@@ -96,32 +92,38 @@ export function createEntitySocket<
         return event.data.id !== lockId.value;
     };
 
-    const handleCreated = (event: STCEventContext<DomainEventContext<A>>) => {
+    const handleCreated : STCEventHandler<TYPE, RECORD> = (
+        event,
+    ) => {
         if (!processEvent(event)) {
             return;
         }
 
         if (ctx.onCreated) {
-            ctx.onCreated(event.data as T);
+            ctx.onCreated(event.data as RECORD);
         }
     };
 
-    const handleUpdated = (event: STCEventContext<DomainEventContext<A>>) => {
+    const handleUpdated : STCEventHandler<TYPE, RECORD> = (
+        event,
+    ) => {
         if (!processEvent(event)) {
             return;
         }
 
         if (ctx.onUpdated) {
-            ctx.onUpdated(event.data as T);
+            ctx.onUpdated(event.data as RECORD);
         }
     };
-    const handleDeleted = (event: STCEventContext<DomainEventContext<A>>) => {
+    const handleDeleted : STCEventHandler<TYPE, RECORD> = (
+        event,
+    ) => {
         if (!processEvent(event)) {
             return;
         }
 
         if (ctx.onDeleted) {
-            ctx.onDeleted(event.data as T);
+            ctx.onDeleted(event.data as RECORD);
         }
     };
 
@@ -135,41 +137,41 @@ export function createEntitySocket<
 
         const socket = await socketManager.connect(buildDomainNamespaceName(realmId.value));
 
-        let event : DomainEventSubscriptionFullName | undefined;
+        let event : DomainEventSubscriptionFullName<TYPE> | undefined;
         if (ctx.buildSubscribeEventName) {
             event = ctx.buildSubscribeEventName();
         } else {
             event = buildDomainEventSubscriptionFullName(
-                ctx.type as DomainInput,
+                ctx.type,
                 DomainEventSubscriptionName.SUBSCRIBE,
             );
         }
 
-        socket.emit(
+        socket.emit<any>(
             event,
-            targetId.value,
+            targetId.value as EventTarget,
             () => {
                 // todo: handle error!
             },
         );
 
         if (ctx.onCreated) {
-            socket.on(buildDomainEventFullName(
-                ctx.type as DomainInput,
+            socket.on<any>(buildDomainEventFullName(
+                ctx.type,
                 DomainEventName.CREATED,
             ), handleCreated);
         }
 
         if (ctx.onUpdated) {
-            socket.on(buildDomainEventFullName(
-                ctx.type as DomainInput,
+            socket.on<any>(buildDomainEventFullName(
+                ctx.type,
                 DomainEventName.UPDATED,
             ), handleUpdated);
         }
 
         if (ctx.onDeleted) {
-            socket.on(buildDomainEventFullName(
-                ctx.type as DomainInput,
+            socket.on<any>(buildDomainEventFullName(
+                ctx.type,
                 DomainEventName.DELETED,
             ), handleDeleted);
         }
@@ -184,38 +186,38 @@ export function createEntitySocket<
 
         const socket = await socketManager.connect(buildDomainNamespaceName(realmId.value));
 
-        let event : DomainEventSubscriptionFullName | undefined;
+        let event : DomainEventSubscriptionFullName<TYPE>;
         if (ctx.buildUnsubscribeEventName) {
             event = ctx.buildUnsubscribeEventName();
         } else {
             event = buildDomainEventSubscriptionFullName(
-                ctx.type as DomainInput,
+                ctx.type,
                 DomainEventSubscriptionName.SUBSCRIBE,
             );
         }
 
-        socket.emit(
+        socket.emit<any>(
             event,
-            targetId.value,
+            targetId.value as EventTarget,
         );
 
         if (ctx.onCreated) {
-            socket.off(buildDomainEventFullName(
-                ctx.type as DomainInput,
+            socket.off<any>(buildDomainEventFullName(
+                ctx.type,
                 DomainEventName.UPDATED,
             ), handleCreated);
         }
 
         if (ctx.onUpdated) {
-            socket.off(buildDomainEventFullName(
-                ctx.type as DomainInput,
+            socket.off<any>(buildDomainEventFullName(
+                ctx.type,
                 DomainEventName.UPDATED,
             ), handleUpdated);
         }
 
         if (ctx.onDeleted) {
-            socket.off(buildDomainEventFullName(
-                ctx.type as DomainInput,
+            socket.off<any>(buildDomainEventFullName(
+                ctx.type,
                 DomainEventName.DELETED,
             ), handleDeleted);
         }
@@ -226,8 +228,9 @@ export function createEntitySocket<
 
     watch(targetId, (val, oldValue) => {
         if (val !== oldValue) {
-            unmount();
-            mount();
+            Promise.resolve()
+                .then(() => unmount())
+                .then(() => mount());
         }
     });
 

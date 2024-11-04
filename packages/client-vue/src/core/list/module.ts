@@ -7,7 +7,7 @@
 
 import { hasOwnProperty } from '@privateaim/kit';
 import type { DomainAPI } from '@authup/core-http-kit';
-import type { DomainEntity, DomainType } from '@privateaim/core-kit';
+import type { DomainTypeMap } from '@privateaim/core-kit';
 import type {
     ListFooterBuildOptionsInput, ListHeaderBuildOptionsInput,
 } from '@vuecs/list-controls';
@@ -40,7 +40,6 @@ import {
 } from './utils';
 
 type Entity<T> = T extends Record<string, any> ? T : never;
-type DomainTypeInfer<T> = T extends DomainEntity<infer U> ? U extends `${DomainType}` ? U : never : never;
 
 const merger = createMerger({
     array: false,
@@ -49,19 +48,19 @@ const merger = createMerger({
 });
 
 export function createList<
-    A extends DomainTypeInfer<DomainEntity<any>>,
-    T = DomainEntity<A>,
+    TYPE extends keyof DomainTypeMap,
+    RECORD extends DomainTypeMap[TYPE],
 >(
-    context: ListCreateContext<A, T>,
-) : List<T> {
-    const data : Ref<T[]> = ref([]);
+    context: ListCreateContext<TYPE, RECORD>,
+) : List<RECORD> {
+    const data : Ref<RECORD[]> = ref([]);
     const busy = ref(false);
     const total = ref(0);
     const meta = ref({
         pagination: {
             limit: 10,
         },
-    }) as Ref<ListMeta<T>>;
+    }) as Ref<ListMeta<RECORD>>;
 
     const realmId = computed<string | undefined>(
         () => {
@@ -79,21 +78,21 @@ export function createList<
 
     const client = injectCoreHTTPClient();
 
-    let domainAPI : DomainAPI<Entity<T>> | undefined;
+    let domainAPI : DomainAPI<Entity<RECORD>> | undefined;
     if (hasOwnProperty(client, context.type)) {
         domainAPI = client[context.type] as any;
     }
 
-    let query : BuildInput<Entity<T>> | undefined;
+    let query : BuildInput<Entity<RECORD>> | undefined;
 
-    async function load(input: ListMeta<T> = {}) {
+    async function load(input: ListMeta<RECORD> = {}) {
         if (!domainAPI || busy.value) return;
 
         busy.value = true;
         meta.value.busy = true;
 
         try {
-            let filters : FiltersBuildInput<Entity<T>> | undefined;
+            let filters : FiltersBuildInput<Entity<RECORD>> | undefined;
             if (
                 context.queryFilters &&
                 input.filters &&
@@ -101,7 +100,7 @@ export function createList<
                 typeof input.filters.name === 'string'
             ) {
                 // todo: queryFilters should customize full filters object!
-                filters = context.queryFilters(input.filters.name) as FiltersBuildInput<Entity<T>>;
+                filters = context.queryFilters(input.filters.name) as FiltersBuildInput<Entity<RECORD>>;
             }
 
             query = undefined;
@@ -121,7 +120,7 @@ export function createList<
                 }
             }
 
-            const nextQuery : ListMeta<T> = merger(
+            const nextQuery : ListMeta<RECORD> = merger(
                 (filters ? { filters } : {}),
                 input || {},
                 {
@@ -134,15 +133,15 @@ export function createList<
             );
 
             const response = await domainAPI.getMany(
-                nextQuery as BuildInput<Entity<T>>,
+                nextQuery as BuildInput<Entity<RECORD>>,
             );
 
             meta.value = nextQuery;
 
             if (context.loadAll) {
-                data.value.push(...response.data as T[]);
+                data.value.push(...response.data as RECORD[]);
             } else {
-                data.value = response.data as T[];
+                data.value = response.data as RECORD[];
             }
 
             total.value = response.meta.total;
@@ -195,15 +194,15 @@ export function createList<
     });
     const handleUpdated = buildListUpdatedHandler(data);
 
-    let options : ListRenderOptions<T> = context.props;
+    let options : ListRenderOptions<RECORD> = context.props;
 
-    const setDefaults = (defaults: ListRenderOptions<T>) => {
+    const setDefaults = (defaults: ListRenderOptions<RECORD>) => {
         options = mergeListOptions(context.props, defaults);
     };
 
     function render() : VNodeChild {
-        const header : ListHeaderBuildOptionsInput<T> = boolableToObject(options.header || {});
-        const footer : ListFooterBuildOptionsInput<T> = boolableToObject(options.footer || {});
+        const header : ListHeaderBuildOptionsInput<RECORD> = boolableToObject(options.header || {});
+        const footer : ListFooterBuildOptionsInput<RECORD> = boolableToObject(options.footer || {});
 
         if (options.item) {
             if (
@@ -216,7 +215,7 @@ export function createList<
             }
         }
 
-        return buildList<T, ListMeta<T>>({
+        return buildList<RECORD, ListMeta<RECORD>>({
             footer,
             header,
             noMore: options.noMore,
@@ -225,18 +224,18 @@ export function createList<
             total: total.value,
             load,
             busy: busy.value,
-            data: data.value as Entity<T>[],
+            data: data.value as Entity<RECORD>[],
             meta: {
                 ...meta.value,
                 total: total.value,
             },
-            onCreated(value: T) {
+            onCreated(value: RECORD) {
                 handleCreated(value);
             },
-            onDeleted(value: T) {
+            onDeleted(value: RECORD) {
                 handleDeleted(value);
             },
-            onUpdated: (value: T) => {
+            onUpdated: (value: RECORD) => {
                 handleUpdated(value);
             },
             slotItems: context.setup.slots || {},
@@ -268,7 +267,7 @@ export function createList<
         typeof context.socket === 'undefined' ||
         context.socket
     ) {
-        const socketContext : EntitySocketContext<A, T> = {
+        const socketContext : EntitySocketContext<TYPE, RECORD> = {
             type: context.type,
             ...(isObject(context.socket) ? context.socket : {}),
         };
@@ -294,10 +293,10 @@ export function createList<
                 handleCreated(entity);
             }
         };
-        socketContext.onDeleted = (entity: T) => {
+        socketContext.onDeleted = (entity: RECORD) => {
             handleDeleted(entity);
         };
-        socketContext.onUpdated = (entity: T) => {
+        socketContext.onUpdated = (entity: RECORD) => {
             handleDeleted(entity);
         };
         socketContext.realmId = realmId;

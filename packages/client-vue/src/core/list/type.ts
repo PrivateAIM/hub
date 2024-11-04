@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { DomainEntity, DomainType } from '@privateaim/core-kit';
 import type {
     ListBodyBuildOptionsInput,
     ListBodySlotProps,
@@ -112,17 +111,17 @@ export type ListEventsType<T> = {
 };
 
 export type ListCreateContext<
-    A extends `${DomainType}`,
-    T = DomainEntity<A>,
+    TYPE extends string,
+    RECORD extends Record<string, any>,
 > = {
-    type: A,
+    type: TYPE,
     realmId?: MaybeRef<string>,
-    setup: SetupContext<ListEventsType<T>>,
-    props: ListProps<T>,
+    setup: SetupContext<ListEventsType<RECORD>>,
+    props: ListProps<RECORD>,
     loadAll?: boolean,
-    query?: BuildInput<Entity<T>> | (() => BuildInput<Entity<T>>),
-    queryFilters?: ((q: string) => FiltersBuildInput<Entity<T>>),
-    onCreated?: (entity: T, meta: ListMeta<T>) => void | Promise<void>,
-    onLoaded?: (meta: ListMeta<T>) => void | Promise<void>,
-    socket?: boolean | Omit<EntitySocketContext<A, T>, 'type'>
+    query?: BuildInput<Entity<RECORD>> | (() => BuildInput<Entity<RECORD>>),
+    queryFilters?: ((q: string) => FiltersBuildInput<Entity<RECORD>>),
+    onCreated?: (entity: RECORD, meta: ListMeta<RECORD>) => void | Promise<void>,
+    onLoaded?: (meta: ListMeta<RECORD>) => void | Promise<void>,
+    socket?: boolean | Omit<EntitySocketContext<TYPE, RECORD>, 'type'>
 };

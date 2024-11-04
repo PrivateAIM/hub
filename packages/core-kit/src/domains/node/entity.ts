@@ -6,10 +6,8 @@
  */
 
 import type { Realm, Robot } from '@authup/core-kit';
-import type { DomainType } from '../constants';
 import type { RegistryProject } from '../registry-project';
 import type { Registry } from '../registry';
-import type { DomainEventBaseContext } from '../types-base';
 import type { NodeType } from './constants';
 
 export interface Node {
@@ -49,8 +47,3 @@ export interface Node {
 
     updated_at: Date;
 }
-
-export type NodeEventContext = DomainEventBaseContext & {
-    type: `${DomainType.NODE}`,
-    data: Node
-};

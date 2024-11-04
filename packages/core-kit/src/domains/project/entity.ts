@@ -6,9 +6,7 @@
  */
 
 import type { Realm, Robot, User } from '@authup/core-kit';
-import type { DomainType } from '../constants';
 import type { MasterImage } from '../master-image';
-import type { DomainEventBaseContext } from '../types-base';
 
 export interface Project {
     id: string;
@@ -41,8 +39,3 @@ export interface Project {
 
     master_image: MasterImage | null;
 }
-
-export type ProjectEventContext = DomainEventBaseContext & {
-    type: `${DomainType.PROJECT}`,
-    data: Project
-};

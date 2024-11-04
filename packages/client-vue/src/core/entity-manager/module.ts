@@ -8,7 +8,7 @@
 import { hasOwnProperty } from '@privateaim/kit';
 import type { DomainAPI } from '@authup/core-http-kit';
 import type {
-    DomainEntity, DomainEntityID, DomainType,
+    DomainEntityID, DomainTypeMap,
 } from '@privateaim/core-kit';
 import type { BuildInput } from 'rapiq';
 import { isObject } from 'smob';
@@ -26,22 +26,20 @@ import type {
 } from './type';
 import { buildEntityManagerSlotProps } from './utils';
 
-type DomainTypeInfer<T> = T extends DomainEntity<infer U> ? U extends `${DomainType}` ? U : never : never;
-
 export function createEntityManager<
-    A extends DomainTypeInfer<DomainEntity<any>>,
-    T = DomainEntity<A>,
+    TYPE extends keyof DomainTypeMap,
+    RECORD extends DomainTypeMap[TYPE],
 >(
-    ctx: EntityManagerContext<A, T>,
-) : EntityManager<T> {
+    ctx: EntityManagerContext<TYPE, RECORD>,
+) : EntityManager<RECORD> {
     const client = injectCoreHTTPClient();
-    let domainAPI : DomainAPI<T> | undefined;
+    let domainAPI : DomainAPI<RECORD> | undefined;
     if (hasOwnProperty(client, ctx.type)) {
         domainAPI = client[ctx.type] as any;
     }
 
-    const entity : Ref<T | undefined> = ref(undefined);
-    const entityId = computed<DomainEntityID<T> | undefined>(
+    const entity : Ref<RECORD | undefined> = ref(undefined);
+    const entityId = computed<DomainEntityID<RECORD> | undefined>(
         () => (
             entity.value ? (entity.value as any).id : undefined),
     );
@@ -71,13 +69,13 @@ export function createEntityManager<
         },
     );
 
-    const lockId = ref(undefined) as Ref<DomainEntityID<T> | undefined>;
+    const lockId = ref(undefined) as Ref<DomainEntityID<RECORD> | undefined>;
 
     if (ctx.props && ctx.props.entity) {
         entity.value = ctx.props.entity;
     }
 
-    const created = (value: T) => {
+    const created = (value: RECORD) => {
         if (ctx.setup && ctx.setup.emit) {
             ctx.setup.emit('created', value);
         }
@@ -87,23 +85,23 @@ export function createEntityManager<
         }
     };
 
-    const deleted = (value: T) => {
+    const deleted = (value: RECORD) => {
         if (ctx.setup && ctx.setup.emit) {
-            ctx.setup.emit('deleted', (value || entity.value) as T);
+            ctx.setup.emit('deleted', (value || entity.value) as RECORD);
         }
 
         if (ctx.onDeleted) {
-            ctx.onDeleted((value || entity.value) as T);
+            ctx.onDeleted((value || entity.value) as RECORD);
         }
     };
 
-    const updated = (value: Partial<T>) => {
+    const updated = (value: Partial<RECORD>) => {
         if (entity.value) {
             extendObjectProperties(entity.value, value);
         }
 
         if (ctx.setup && ctx.setup.emit) {
-            ctx.setup.emit('updated', (entity.value || value) as T);
+            ctx.setup.emit('updated', (entity.value || value) as RECORD);
         }
 
         if (ctx.onUpdated) {
@@ -111,7 +109,7 @@ export function createEntityManager<
         }
     };
 
-    const resolved = (value?: T) => {
+    const resolved = (value?: RECORD) => {
         if (ctx.setup && ctx.setup.emit) {
             ctx.setup.emit('resolved', value);
         }
@@ -133,7 +131,7 @@ export function createEntityManager<
 
     const busy = ref(false);
 
-    const update = async (data: Partial<T>) => {
+    const update = async (data: Partial<RECORD>) => {
         if (!domainAPI || busy.value || !entityId.value) {
             return;
         }
@@ -186,7 +184,7 @@ export function createEntityManager<
         }
     };
 
-    const create = async (data: Partial<T>) : Promise<void> => {
+    const create = async (data: Partial<RECORD>) : Promise<void> => {
         if (!domainAPI || busy.value) {
             return;
         }
@@ -211,7 +209,7 @@ export function createEntityManager<
         }
     };
 
-    const createOrUpdate = async (data: Partial<T>) : Promise<void> => {
+    const createOrUpdate = async (data: Partial<RECORD>) : Promise<void> => {
         if (entity.value) {
             await update(data);
         } else {
@@ -227,7 +225,7 @@ export function createEntityManager<
         typeof ctx.socket === 'function' ||
         ctx.socket
     ) {
-        let socketContext : EntitySocketContext<A, T> = {
+        let socketContext : EntitySocketContext<TYPE, RECORD> = {
             type: ctx.type,
         };
 
@@ -288,12 +286,12 @@ export function createEntityManager<
 
     resolveByProps();
 
-    const resolve = async (resolveCtx: EntityManagerResolveContext<T> = {}) => {
+    const resolve = async (resolveCtx: EntityManagerResolveContext<RECORD> = {}) => {
         if (entity.value && !resolveCtx.reset) {
             return;
         }
 
-        let query : (T extends Record<string, any> ? BuildInput<T> : never) | undefined;
+        let query : (RECORD extends Record<string, any> ? BuildInput<RECORD> : never) | undefined;
         if (resolveCtx.query) {
             query = resolveCtx.query;
         }
@@ -384,7 +382,7 @@ export function createEntityManager<
         }
     };
 
-    const manager : EntityManager<T> = {
+    const manager : EntityManager<RECORD> = {
         resolve,
         lockId,
         busy,

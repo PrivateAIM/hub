@@ -6,11 +6,9 @@
  */
 
 import type { Realm } from '@authup/core-kit';
-import type { DomainType } from '../constants';
 import type {
     Analysis,
 } from '../analysis';
-import type { DomainEventBaseContext } from '../types-base';
 
 export interface AnalysisLog {
     id: string;
@@ -71,8 +69,3 @@ export interface AnalysisLog {
 
     realm_id: Realm['id'];
 }
-
-export type AnalysisLogEventContext = DomainEventBaseContext & {
-    type: `${DomainType.ANALYSIS_LOG}`,
-    data: AnalysisLog
-};

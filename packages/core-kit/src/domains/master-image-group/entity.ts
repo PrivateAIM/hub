@@ -5,9 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { DomainType } from '../constants';
-import type { DomainEventBaseContext } from '../types-base';
-
 export interface MasterImageGroup {
     id: string;
 
@@ -27,8 +24,3 @@ export interface MasterImageGroup {
 
     updated_at: Date;
 }
-
-export type MasterImageGroupEventContext = DomainEventBaseContext & {
-    type: `${DomainType.MASTER_IMAGE_GROUP}`,
-    data: MasterImageGroup
-};
