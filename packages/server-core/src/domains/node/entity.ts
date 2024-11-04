@@ -34,6 +34,13 @@ export class NodeEntity implements Node {
     @Column({ type: 'varchar', length: 64, nullable: true })
         external_name: string;
 
+    @Column({
+        type: 'varchar',
+        length: 4096,
+        nullable: true,
+    })
+        public_key: string;
+
     @Column({ type: 'varchar', length: 128 })
         name: string;
 

@@ -50,6 +50,14 @@ export async function runNodeValidation(
 
     // -------------------------------------------------------------
 
+    await check('public_key')
+        .isLength({ min: 5, max: 4096 })
+        .exists()
+        .optional({ nullable: true })
+        .run(req);
+
+    // -------------------------------------------------------------
+
     await check('external_name')
         .isLength({ min: 1, max: 64 })
         .exists()

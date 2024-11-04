@@ -8,7 +8,7 @@
 import {
     RegistryProjectType,
 } from '@privateaim/core-kit';
-import { PermissionName, createNanoID } from '@privateaim/kit';
+import { PermissionName, createNanoID, isHex } from '@privateaim/kit';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/core-kit';
 import type { Request, Response } from 'routup';
@@ -29,6 +29,15 @@ export async function updateNodeRouteHandler(req: Request, res: Response) : Prom
     const result = await runNodeValidation(req, 'update');
     if (!result.data) {
         return sendAccepted(res);
+    }
+
+    if (
+        result.data.public_key &&
+        !isHex(result.data.public_key)
+    ) {
+        result.data.public_key = Buffer
+            .from(result.data.public_key, 'utf8')
+            .toString('hex');
     }
 
     const dataSource = await useDataSource();

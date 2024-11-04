@@ -8,7 +8,7 @@
 import {
     RegistryProjectType,
 } from '@privateaim/core-kit';
-import { PermissionName, createNanoID } from '@privateaim/kit';
+import { PermissionName, createNanoID, isHex } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
@@ -28,6 +28,17 @@ export async function createNodeRouteHandler(req: Request, res: Response) : Prom
     const repository = dataSource.getRepository(NodeEntity);
 
     const entity = repository.create(result.data);
+
+    // -----------------------------------------------------
+
+    if (
+        entity.public_key &&
+        !isHex(result.data.public_key)
+    ) {
+        entity.public_key = Buffer
+            .from(entity.public_key, 'utf8')
+            .toString('hex');
+    }
 
     // -----------------------------------------------------
 

@@ -15,6 +15,8 @@ export interface Node {
 
     external_name: string | null;
 
+    public_key: string | null;
+
     name: string;
 
     hidden: boolean;
