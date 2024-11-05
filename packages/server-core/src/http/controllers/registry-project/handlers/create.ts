@@ -8,22 +8,33 @@
 import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
-import { useDataSource } from 'typeorm-extension';
+import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
 import { useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
+import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../../../components';
-import { runRegistryProjectValidation } from '../utils';
-import { RegistryProjectEntity } from '../../../../domains';
+import { RegistryProjectValidator } from '../utils';
+import { AnalysisNodeEntity, RegistryProjectEntity } from '../../../../domains';
+import { HTTPHandlerOperation } from '../../constants';
 
 export async function createRegistryProjectRouteHandler(req: Request, res: Response) : Promise<any> {
     const permissionChecker = useRequestPermissionChecker(req);
     await permissionChecker.preCheck({ name: PermissionName.REGISTRY_PROJECT_MANAGE });
 
-    const result = await runRegistryProjectValidation(req, 'create');
+    const validator = new RegistryProjectValidator();
+    const validatorAdapter = new RoutupContainerAdapter(validator);
+    const data = await validatorAdapter.run(req, {
+        group: HTTPHandlerOperation.CREATE,
+    });
 
     const dataSource = await useDataSource();
+    await validateEntityJoinColumns(data, {
+        dataSource,
+        entityTarget: AnalysisNodeEntity,
+    });
+
     const repository = dataSource.getRepository(RegistryProjectEntity);
-    const entity = repository.create(result.data);
+    const entity = repository.create(data);
 
     await repository.save(entity);
 

@@ -6,16 +6,16 @@
  */
 
 import { Container } from 'validup';
+import type { AnalysisBucketFile } from '@privateaim/core-kit';
 import { createValidator } from '@validup/adapter-validator';
-import type { AnalysisPermissionEntity } from '../../../../domains';
 import { HTTPHandlerOperation } from '../../constants';
 
-export class AnalysisPermissionValidator extends Container<AnalysisPermissionEntity> {
+export class AnalysisBucketFileValidator extends Container<AnalysisBucketFile> {
     protected initialize() {
         super.initialize();
 
         this.mount(
-            'permission_id',
+            'bucket_id',
             { group: HTTPHandlerOperation.CREATE },
             createValidator((chain) => chain
                 .exists()
@@ -24,20 +24,37 @@ export class AnalysisPermissionValidator extends Container<AnalysisPermissionEnt
         );
 
         this.mount(
-            'analysis_id',
+            'name',
             { group: HTTPHandlerOperation.CREATE },
             createValidator((chain) => chain
                 .exists()
-                .notEmpty()
+                .isString()),
+        );
+
+        this.mount(
+            'name',
+            { group: HTTPHandlerOperation.UPDATE },
+            createValidator((chain) => chain
+                .exists()
+                .isString()
+                .optional({ values: 'undefined' })),
+        );
+
+        this.mount(
+            'external_id',
+            { group: HTTPHandlerOperation.CREATE },
+            createValidator((chain) => chain
+                .exists()
                 .isUUID()),
         );
 
         this.mount(
-            'policy_id',
+            'root',
             createValidator((chain) => chain
-                .exists()
-                .notEmpty()
-                .isUUID()),
+                .optional()
+                .toBoolean()
+                .isBoolean()
+                .default(false)),
         );
     }
 }

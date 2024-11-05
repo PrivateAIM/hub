@@ -11,27 +11,39 @@ import {
 import { useRequestIdentityOrFail } from '@privateaim/server-http-kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
-import { useDataSource } from 'typeorm-extension';
-import { AnalysisBucketFileEntity } from '../../../../domains';
-import { runAnalysisFileValidation } from '../utils';
+import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
+import { RoutupContainerAdapter } from '@validup/adapter-routup';
+import { AnalysisBucketFileEntity, AnalysisEntity } from '../../../../domains';
+import { AnalysisBucketFileValidator } from '../utils';
+import { HTTPHandlerOperation } from '../../constants';
 
 export async function createAnalysisBucketFileRouteHandler(req: Request, res: Response) : Promise<any> {
-    const result = await runAnalysisFileValidation(req, 'create');
-    result.data.analysis_id = result.relation.bucket.analysis_id;
+    const validator = new AnalysisBucketFileValidator();
+    const validatorAdapter = new RoutupContainerAdapter(validator);
+    const data = await validatorAdapter.run(req, {
+        group: HTTPHandlerOperation.CREATE,
+    });
+
+    data.analysis_id = data.bucket.analysis_id;
 
     const dataSource = await useDataSource();
+    await validateEntityJoinColumns(data, {
+        dataSource,
+        entityTarget: AnalysisEntity,
+    });
+
     const repository = dataSource.getRepository(AnalysisBucketFileEntity);
 
     const identity = useRequestIdentityOrFail(req);
-    result.data.realm_id = identity.realmId;
+    data.realm_id = identity.realmId;
 
     switch (identity.type) {
         case 'user': {
-            result.data.user_id = identity.id;
+            data.user_id = identity.id;
             break;
         }
         case 'robot': {
-            result.data.robot_id = identity.id;
+            data.robot_id = identity.id;
             break;
         }
         default: {
@@ -39,22 +51,19 @@ export async function createAnalysisBucketFileRouteHandler(req: Request, res: Re
         }
     }
 
-    let entity = repository.create(result.data);
+    let entity = repository.create(data);
 
-    if (
-        result.relation.bucket.type === AnalysisBucketType.CODE &&
-        result.relation.analysis
-    ) {
+    if (data.bucket.type === AnalysisBucketType.CODE) {
         if (
-            result.relation.analysis.build_status &&
-            result.relation.analysis.build_status !== AnalysisBuildStatus.FAILED
+            data.analysis.build_status &&
+            data.analysis.build_status !== AnalysisBuildStatus.FAILED
         ) {
             throw new BadRequestError('The analysis has already been built and can no longer be modified.');
         }
 
         if (
-            result.relation.analysis.run_status &&
-            result.relation.analysis.run_status !== AnalysisRunStatus.FAILED
+            data.analysis.run_status &&
+            data.analysis.run_status !== AnalysisRunStatus.FAILED
         ) {
             throw new BadRequestError('The analysis has already been started and can no longer be modified.');
         }

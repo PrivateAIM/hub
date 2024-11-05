@@ -5,75 +5,49 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { check } from 'express-validator';
 import { ProjectNodeApprovalStatus } from '@privateaim/core-kit';
-import { NotFoundError } from '@ebec/http';
-import { isRealmResourceWritable } from '@authup/core-kit';
-import type { Request } from 'routup';
-import type { HTTPValidationResult } from '@privateaim/server-http-kit';
-import {
-    createHTTPValidationResult,
-    extendHTTPValidationResultWithRelation,
-    useRequestIdentityRealm,
-} from '@privateaim/server-http-kit';
+import { Container } from 'validup';
+import { createValidator } from '@validup/adapter-validator';
 import type { ProjectNodeEntity } from '../../../../domains';
-import { NodeEntity, ProjectEntity } from '../../../../domains';
+import { HTTPHandlerOperation } from '../../constants';
 
-export async function runProjectNodeValidation(
-    req: Request,
-    operation: 'create' | 'update',
-) : Promise<HTTPValidationResult<ProjectNodeEntity>> {
-    if (operation === 'create') {
-        await check('project_id')
-            .exists()
-            .isUUID()
-            .run(req);
+export class ProjectNodeValidator extends Container<ProjectNodeEntity> {
+    protected initialize() {
+        super.initialize();
 
-        await check('node_id')
-            .exists()
-            .isUUID()
-            .run(req);
+        this.mount(
+            'project_id',
+            { group: HTTPHandlerOperation.CREATE },
+            createValidator((chain) => chain
+                .exists()
+                .notEmpty()
+                .isUUID()),
+        );
+
+        this.mount(
+            'node_id',
+            { group: HTTPHandlerOperation.CREATE },
+            createValidator((chain) => chain
+                .exists()
+                .notEmpty()
+                .isUUID()),
+        );
+
+        this.mount(
+            'approval_status',
+            { group: HTTPHandlerOperation.UPDATE },
+            createValidator((chain) => chain
+                .optional()
+                .isIn(Object.values(ProjectNodeApprovalStatus))),
+        );
+
+        this.mount(
+            'comment',
+            { group: HTTPHandlerOperation.UPDATE },
+            createValidator((chain) => chain
+                .optional({ nullable: true })
+                .isString()
+                .isLength({ min: 3, max: 4096 })),
+        );
     }
-
-    if (operation === 'update') {
-        await check('approval_status')
-            .optional()
-            .isIn(Object.values(ProjectNodeApprovalStatus))
-            .run(req);
-
-        await check('comment')
-            .optional({ nullable: true })
-            .isString()
-            .isLength({ min: 3, max: 4096 })
-            .run(req);
-    }
-
-    // ----------------------------------------------
-
-    const result = createHTTPValidationResult<ProjectNodeEntity>(req);
-
-    // ----------------------------------------------
-
-    await extendHTTPValidationResultWithRelation(result, ProjectEntity, {
-        id: 'project_id',
-        entity: 'project',
-    });
-
-    if (result.relation.project) {
-        result.data.project_realm_id = result.relation.project.realm_id;
-
-        if (!isRealmResourceWritable(useRequestIdentityRealm(req), result.relation.project.realm_id)) {
-            throw new NotFoundError('The referenced project realm is not permitted.');
-        }
-    }
-
-    await extendHTTPValidationResultWithRelation(result, NodeEntity, {
-        id: 'node_id',
-        entity: 'node',
-    });
-    if (result.relation.node) {
-        result.data.node_realm_id = result.relation.node.realm_id;
-    }
-
-    return result;
 }

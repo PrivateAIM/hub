@@ -7,37 +7,43 @@
 
 import { Container } from 'validup';
 import { createValidator } from '@validup/adapter-validator';
-import type { AnalysisPermissionEntity } from '../../../../domains';
+import type { ProjectEntity } from '../../../../domains';
 import { HTTPHandlerOperation } from '../../constants';
 
-export class AnalysisPermissionValidator extends Container<AnalysisPermissionEntity> {
+export class ProjectValidator extends Container<ProjectEntity> {
     protected initialize() {
         super.initialize();
 
         this.mount(
-            'permission_id',
+            'name',
             { group: HTTPHandlerOperation.CREATE },
             createValidator((chain) => chain
                 .exists()
-                .notEmpty()
-                .isUUID()),
+                .isLength({ min: 5, max: 100 })),
         );
 
         this.mount(
-            'analysis_id',
+            'name',
             { group: HTTPHandlerOperation.CREATE },
             createValidator((chain) => chain
                 .exists()
-                .notEmpty()
-                .isUUID()),
+                .isLength({ min: 5, max: 100 })
+                .optional()),
         );
 
         this.mount(
-            'policy_id',
+            'description',
             createValidator((chain) => chain
-                .exists()
-                .notEmpty()
-                .isUUID()),
+                .isString()
+                .isLength({ min: 5, max: 4096 })
+                .optional({ values: 'null' })),
+        );
+
+        this.mount(
+            'master_image_id',
+            createValidator((chain) => chain
+                .isUUID()
+                .optional({ nullable: true })),
         );
     }
 }

@@ -5,18 +5,18 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { AnalysisNodeApprovalStatus, AnalysisNodeRunStatus } from '@privateaim/core-kit';
+import { RegistryProjectType } from '@privateaim/core-kit';
 import { Container } from 'validup';
 import { createValidator } from '@validup/adapter-validator';
-import type { AnalysisNodeEntity } from '../../../../domains';
+import type { RegistryProjectEntity } from '../../../../domains';
 import { HTTPHandlerOperation } from '../../constants';
 
-export class AnalysisNodeValidator extends Container<AnalysisNodeEntity> {
+export class RegistryProjectValidator extends Container<RegistryProjectEntity> {
     protected initialize() {
         super.initialize();
 
         this.mount(
-            'node_id',
+            'registry_id',
             { group: HTTPHandlerOperation.CREATE },
             createValidator((chain) => chain
                 .exists()
@@ -25,41 +25,47 @@ export class AnalysisNodeValidator extends Container<AnalysisNodeEntity> {
         );
 
         this.mount(
-            'analysis_id',
+            'name',
             { group: HTTPHandlerOperation.CREATE },
             createValidator((chain) => chain
                 .exists()
-                .notEmpty()
-                .isUUID()),
+                .isLength({ min: 5, max: 128 })),
         );
 
         this.mount(
-            'run_status',
-            createValidator((chain) => chain
-                .isIn(Object.values(AnalysisNodeRunStatus))
-                .optional({ values: 'null' })),
-        );
-
-        this.mount(
-            'index',
+            'name',
+            { group: HTTPHandlerOperation.UPDATE },
             createValidator((chain) => chain
                 .exists()
-                .isInt()
+                .isLength({ min: 5, max: 128 })
                 .optional()),
         );
 
         this.mount(
-            'approval_status',
+            'external_name',
+            { group: HTTPHandlerOperation.CREATE },
             createValidator((chain) => chain
-                .optional({ nullable: true })
-                .isIn(Object.values(AnalysisNodeApprovalStatus))),
+                .isLength({ min: 1, max: 255 })
+                .exists()
+                .matches(/^[a-z0-9-_]*$/)),
         );
 
         this.mount(
-            'comment',
+            'external_name',
+            { group: HTTPHandlerOperation.UPDATE },
             createValidator((chain) => chain
-                .optional({ nullable: true })
-                .isString()),
+                .isLength({ min: 1, max: 255 })
+                .exists()
+                .matches(/^[a-z0-9-_]*$/)
+                .optional()),
+        );
+
+        this.mount(
+            'type',
+            { group: HTTPHandlerOperation.CREATE },
+            createValidator((chain) => chain
+                .exists()
+                .isIn(Object.values(RegistryProjectType))),
         );
     }
 }

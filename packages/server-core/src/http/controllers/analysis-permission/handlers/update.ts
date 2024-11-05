@@ -5,19 +5,52 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ForbiddenError, NotFoundError } from '@ebec/http';
+import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
+import {
+    buildHTTPValidationErrorMessage,
+    useRequestIdentityRealm,
+    useRequestPermissionChecker,
+} from '@privateaim/server-http-kit';
+import { isAuthupClientUsable, useAuthupClient } from '@privateaim/server-kit';
+import { RoutupContainerAdapter } from '@validup/adapter-routup';
+import { isClientErrorWithStatusCode } from '@hapic/harbor';
 import { AnalysisPermissionEntity } from '../../../../domains';
-import { runAnalysisPermissionValidation } from '../utils';
+import { AnalysisPermissionValidator } from '../utils';
+import { HTTPHandlerOperation } from '../../constants';
 
 export async function updateAnalysisPermissionRouteHandler(req: Request, res: Response) : Promise<any> {
     const permissionChecker = useRequestPermissionChecker(req);
     await permissionChecker.preCheck({ name: PermissionName.ANALYSIS_UPDATE });
+
+    const validator = new AnalysisPermissionValidator();
+    const validatorAdapter = new RoutupContainerAdapter(validator);
+    const data = await validatorAdapter.run(req, {
+        group: HTTPHandlerOperation.UPDATE,
+    });
+
+    if (isAuthupClientUsable()) {
+        const authup = useAuthupClient();
+
+        if (data.policy_id) {
+            try {
+                const policy = await authup.policy.getOne(data.policy_id);
+
+                data.policy = policy;
+                data.policy_id = policy.id;
+            } catch (e) {
+                if (isClientErrorWithStatusCode(e, 404)) {
+                    throw new BadRequestError(buildHTTPValidationErrorMessage('permission_id'));
+                }
+
+                throw e;
+            }
+        }
+    }
 
     const id = useRequestParam(req, 'id');
 
@@ -32,9 +65,7 @@ export async function updateAnalysisPermissionRouteHandler(req: Request, res: Re
         throw new ForbiddenError();
     }
 
-    const result = await runAnalysisPermissionValidation(req, 'update');
-
-    entity = repository.merge(entity, result.data);
+    entity = repository.merge(entity, data);
 
     entity = await repository.save(entity);
 

@@ -10,10 +10,12 @@ import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
 import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
-import { useDataSource } from 'typeorm-extension';
+import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
 import { useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
+import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { AnalysisEntity } from '../../../../domains';
-import { runAnalysisValidation } from '../utils';
+import { AnalysisValidator } from '../utils';
+import { HTTPHandlerOperation } from '../../constants';
 
 export async function updateAnalysisRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -21,15 +23,20 @@ export async function updateAnalysisRouteHandler(req: Request, res: Response) : 
     const permissionChecker = useRequestPermissionChecker(req);
     await permissionChecker.preCheck({ name: PermissionName.ANALYSIS_UPDATE });
 
-    const result = await runAnalysisValidation(req, 'update');
-    if (!result.data) {
-        return sendAccepted(res);
-    }
+    const validator = new AnalysisValidator();
+    const validatorAdapter = new RoutupContainerAdapter(validator);
+    const data = await validatorAdapter.run(req, {
+        group: HTTPHandlerOperation.UPDATE,
+    });
 
     const dataSource = await useDataSource();
+    await validateEntityJoinColumns(data, {
+        dataSource,
+        entityTarget: AnalysisEntity,
+    });
+
     const repository = dataSource.getRepository(AnalysisEntity);
     let entity = await repository.findOneBy({ id });
-
     if (!entity) {
         throw new NotFoundError();
     }
@@ -47,13 +54,13 @@ export async function updateAnalysisRouteHandler(req: Request, res: Response) : 
 
     if (
         entity.registry_id &&
-        result.data.registry_id &&
-        entity.registry_id !== result.data.registry_id
+        data.registry_id &&
+        entity.registry_id !== data.registry_id
     ) {
         throw new BadRequestError('The registry can not be changed after it is specified.');
     }
 
-    entity = repository.merge(entity, result.data);
+    entity = repository.merge(entity, data);
 
     await repository.save(entity);
 

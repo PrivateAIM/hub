@@ -12,9 +12,11 @@ import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { isEntityUnique, useDataSource } from 'typeorm-extension';
 import { useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
+import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { DatabaseConflictError } from '../../../../database';
 import { ProjectEntity } from '../../../../domains';
-import { runProjectValidation } from '../utils/validation';
+import { ProjectValidator } from '../utils/validator';
+import { HTTPHandlerOperation } from '../../constants';
 
 export async function updateProjectRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -22,15 +24,15 @@ export async function updateProjectRouteHandler(req: Request, res: Response) : P
     const permissionChecker = useRequestPermissionChecker(req);
     await permissionChecker.preCheck({ name: PermissionName.PROJECT_UPDATE });
 
-    const result = await runProjectValidation(req, 'update');
-    if (!result.data) {
-        return sendAccepted(res);
-    }
+    const validator = new ProjectValidator();
+    const validatorAdapter = new RoutupContainerAdapter(validator);
+    const data = await validatorAdapter.run(req, {
+        group: HTTPHandlerOperation.UPDATE,
+    });
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(ProjectEntity);
     let entity = await repository.findOneBy({ id });
-
     if (!entity) {
         throw new NotFoundError();
     }
@@ -39,7 +41,7 @@ export async function updateProjectRouteHandler(req: Request, res: Response) : P
         throw new ForbiddenError();
     }
 
-    entity = repository.merge(entity, result.data);
+    entity = repository.merge(entity, data);
 
     const isUnique = await isEntityUnique({
         entity,
