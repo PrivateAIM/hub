@@ -19,6 +19,8 @@ export async function createAnalysisBucketRouteHandler(req: Request, res: Respon
         group: HTTPHandlerOperation.CREATE,
     });
 
+    data.realm_id = data.analysis.realm_id;
+
     const dataSource = await useDataSource();
     await validateEntityJoinColumns(data, {
         dataSource,
@@ -27,9 +29,6 @@ export async function createAnalysisBucketRouteHandler(req: Request, res: Respon
     const repository = dataSource.getRepository(AnalysisBucketEntity);
 
     let entity = repository.create(data);
-
-    entity.realm_id = entity.analysis.realm_id;
-    entity.analysis_id = entity.analysis.id;
 
     entity = await repository.save(entity);
 

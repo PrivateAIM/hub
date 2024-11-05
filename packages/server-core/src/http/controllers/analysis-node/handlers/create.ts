@@ -28,14 +28,14 @@ export async function createAnalysisNodeRouteHandler(req: Request, res: Response
         group: HTTPHandlerOperation.CREATE,
     });
 
+    data.analysis_realm_id = data.analysis.realm_id;
+    data.node_realm_id = data.node.realm_id;
+
     const dataSource = await useDataSource();
     await validateEntityJoinColumns(data, {
         dataSource,
         entityTarget: AnalysisNodeEntity,
     });
-
-    data.analysis_realm_id = data.analysis.realm_id;
-    data.node_realm_id = data.node.realm_id;
 
     if (data.analysis.configuration_locked) {
         throw new BadRequestError('The analysis is locked right now. It is not possible to add new nodes.');

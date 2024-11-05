@@ -11,6 +11,7 @@ import type { Router } from 'routup';
 import { errorHandler } from 'routup';
 import { useLogger } from '@privateaim/server-kit';
 import { EntityRelationLookupError } from 'typeorm-extension';
+import { ValidupNestedError } from 'validup';
 
 export function mountErrorMiddleware(router: Router) {
     router.use(errorHandler((error, req, res) => {
@@ -41,6 +42,15 @@ export function mountErrorMiddleware(router: Router) {
         if (error.cause instanceof EntityRelationLookupError) {
             error.expose = true;
             error.statusCode = 400;
+        }
+
+        if (error.cause instanceof ValidupNestedError) {
+            error.expose = true;
+            error.statusCode = 400;
+            error.data = {
+                children: error.cause.children,
+                attributes: error.cause.children.map((child) => child.pathAbsolute),
+            };
         }
 
         // catch and decorate some db errors :)

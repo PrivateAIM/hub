@@ -44,8 +44,8 @@ export async function updateNodeRouteHandler(req: Request, res: Response) : Prom
         data.public_key &&
         !isHex(data.public_key)
     ) {
-        result.data.public_key = Buffer
-            .from(result.data.public_key, 'utf8')
+        data.public_key = Buffer
+            .from(data.public_key, 'utf8')
             .toString('hex');
     }
 
@@ -65,7 +65,7 @@ export async function updateNodeRouteHandler(req: Request, res: Response) : Prom
         throw new ForbiddenError('You are not permitted to delete this station.');
     }
 
-    entity = repository.merge(entity, result.data);
+    entity = repository.merge(entity, data);
 
     if (entity.registry_id) {
         const registryProjectExternalName = entity.external_name || createNanoID();

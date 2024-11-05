@@ -56,7 +56,7 @@ export async function createNodeRouteHandler(req: Request, res: Response) : Prom
 
     if (
         entity.public_key &&
-        !isHex(result.data.public_key)
+        !isHex(data.public_key)
     ) {
         entity.public_key = Buffer
             .from(entity.public_key, 'utf8')
