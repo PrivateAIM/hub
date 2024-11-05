@@ -15,7 +15,7 @@ import { isAuthupClientUsable, useAuthupClient } from '@privateaim/server-kit';
 import type { Permission } from '@authup/core-kit';
 import { isClientErrorWithStatusCode } from '@hapic/harbor';
 import { BadRequestError } from '@ebec/http';
-import { AnalysisNodeEntity, AnalysisPermissionEntity } from '../../../../domains';
+import { AnalysisPermissionEntity } from '../../../../domains';
 import { AnalysisPermissionValidator } from '../utils';
 import { HTTPHandlerOperation } from '../../constants';
 
@@ -32,7 +32,7 @@ export async function createAnalysisPermissionRouteHandler(req: Request, res: Re
     const dataSource = await useDataSource();
     await validateEntityJoinColumns(data, {
         dataSource,
-        entityTarget: AnalysisNodeEntity,
+        entityTarget: AnalysisPermissionEntity,
     });
 
     data.analysis_realm_id = data.analysis.realm_id;

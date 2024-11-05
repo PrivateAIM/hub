@@ -30,6 +30,8 @@ export async function updateAnalysisRouteHandler(req: Request, res: Response) : 
     });
 
     const dataSource = await useDataSource();
+
+    // todo: this should only validate non null/undefined values
     await validateEntityJoinColumns(data, {
         dataSource,
         entityTarget: AnalysisEntity,

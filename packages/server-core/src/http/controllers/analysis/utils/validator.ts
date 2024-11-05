@@ -25,11 +25,11 @@ export class AnalysisValidator extends Container<Analysis> {
 
         this.mount(
             'name',
-            { group: HTTPHandlerOperation.UPDATE },
+            { group: HTTPHandlerOperation.UPDATE, optional: true },
             createValidator((chain) => chain
                 .isString()
                 .isLength({ min: 3, max: 128 })
-                .optional({ values: 'undefined' })),
+                .optional({ values: 'null' })),
         );
 
         this.mount(
@@ -50,16 +50,18 @@ export class AnalysisValidator extends Container<Analysis> {
 
         this.mount(
             'master_image_id',
+            { optional: true },
             createValidator((chain) => chain
                 .isUUID()
-                .optional({ nullable: true })),
+                .optional({ values: 'null' })),
         );
 
         this.mount(
             'registry_id',
+            { optional: true },
             createValidator((chain) => chain
                 .isUUID()
-                .optional({ nullable: true })),
+                .optional({ values: 'null' })),
         );
     }
 }

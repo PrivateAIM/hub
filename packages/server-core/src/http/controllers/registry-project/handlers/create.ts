@@ -14,7 +14,7 @@ import { isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../../../components';
 import { RegistryProjectValidator } from '../utils';
-import { AnalysisNodeEntity, RegistryProjectEntity } from '../../../../domains';
+import { RegistryProjectEntity } from '../../../../domains';
 import { HTTPHandlerOperation } from '../../constants';
 
 export async function createRegistryProjectRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -30,7 +30,7 @@ export async function createRegistryProjectRouteHandler(req: Request, res: Respo
     const dataSource = await useDataSource();
     await validateEntityJoinColumns(data, {
         dataSource,
-        entityTarget: AnalysisNodeEntity,
+        entityTarget: RegistryProjectEntity,
     });
 
     const repository = dataSource.getRepository(RegistryProjectEntity);

@@ -13,7 +13,7 @@ import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
-import { AnalysisBucketFileEntity, AnalysisEntity } from '../../../../domains';
+import { AnalysisBucketFileEntity } from '../../../../domains';
 import { AnalysisBucketFileValidator } from '../utils';
 import { HTTPHandlerOperation } from '../../constants';
 
@@ -29,7 +29,7 @@ export async function createAnalysisBucketFileRouteHandler(req: Request, res: Re
     const dataSource = await useDataSource();
     await validateEntityJoinColumns(data, {
         dataSource,
-        entityTarget: AnalysisEntity,
+        entityTarget: AnalysisBucketFileEntity,
     });
 
     const repository = dataSource.getRepository(AnalysisBucketFileEntity);

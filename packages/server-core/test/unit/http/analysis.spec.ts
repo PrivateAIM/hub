@@ -9,6 +9,7 @@ import type { Analysis } from '@privateaim/core-kit';
 import { createNanoID } from '@privateaim/kit';
 import { buildHTTPValidationErrorMessage } from '@privateaim/server-http-kit';
 import { isClientError } from 'hapic';
+import { EntityRelationLookupError } from 'typeorm-extension';
 import {
     createTestSuite,
     expectPropertiesEqualToSrc,
@@ -86,7 +87,7 @@ describe('src/controllers/core/analysis', () => {
             });
         } catch (e) {
             if (isClientError(e)) {
-                expect(e.response.data.message).toEqual(buildHTTPValidationErrorMessage<Analysis>(['project_id']));
+                expect(e.response.data.message).toEqual(EntityRelationLookupError.notFound('project', ['project_id']).message);
                 return;
             }
 
@@ -111,7 +112,7 @@ describe('src/controllers/core/analysis', () => {
             });
         } catch (e) {
             if (isClientError(e)) {
-                expect(e.response.data.message).toEqual(buildHTTPValidationErrorMessage<Analysis>(['master_image_id']));
+                expect(e.response.data.message).toEqual(EntityRelationLookupError.notFound('master_image', ['master_image_id']).message);
                 return;
             }
 

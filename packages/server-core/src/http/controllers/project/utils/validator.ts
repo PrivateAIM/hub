@@ -24,15 +24,15 @@ export class ProjectValidator extends Container<ProjectEntity> {
 
         this.mount(
             'name',
-            { group: HTTPHandlerOperation.CREATE },
+            { group: HTTPHandlerOperation.UPDATE, optional: true },
             createValidator((chain) => chain
                 .exists()
-                .isLength({ min: 5, max: 100 })
-                .optional()),
+                .isLength({ min: 5, max: 100 })),
         );
 
         this.mount(
             'description',
+            { optional: true },
             createValidator((chain) => chain
                 .isString()
                 .isLength({ min: 5, max: 4096 })
