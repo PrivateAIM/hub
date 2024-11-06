@@ -26,6 +26,7 @@ export class AnalysisBucketValidator extends Container<AnalysisBucket> {
 
         this.mount(
             'type',
+            { group: HTTPHandlerOperation.CREATE },
             createValidator((chain) => chain
                 .notEmpty()
                 .isIn(Object.values(AnalysisBucketType))),

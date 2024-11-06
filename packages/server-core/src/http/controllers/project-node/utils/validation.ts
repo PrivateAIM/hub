@@ -37,13 +37,13 @@ export class ProjectNodeValidator extends Container<ProjectNodeEntity> {
             'approval_status',
             { group: HTTPHandlerOperation.UPDATE },
             createValidator((chain) => chain
-                .optional()
+                .optional({ values: 'null' })
                 .isIn(Object.values(ProjectNodeApprovalStatus))),
         );
 
         this.mount(
             'comment',
-            { group: HTTPHandlerOperation.UPDATE },
+            { group: HTTPHandlerOperation.UPDATE, optional: true },
             createValidator((chain) => chain
                 .optional({ nullable: true })
                 .isString()

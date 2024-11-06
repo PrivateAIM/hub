@@ -35,6 +35,7 @@ export class AnalysisNodeValidator extends Container<AnalysisNodeEntity> {
 
         this.mount(
             'run_status',
+            { optional: true },
             createValidator((chain) => chain
                 .isIn(Object.values(AnalysisNodeRunStatus))
                 .optional({ values: 'null' })),
@@ -42,14 +43,16 @@ export class AnalysisNodeValidator extends Container<AnalysisNodeEntity> {
 
         this.mount(
             'index',
+            { optional: true },
             createValidator((chain) => chain
                 .exists()
                 .isInt()
-                .optional()),
+                .optional({ values: 'null' })),
         );
 
         this.mount(
             'approval_status',
+            { optional: true },
             createValidator((chain) => chain
                 .optional({ nullable: true })
                 .isIn(Object.values(AnalysisNodeApprovalStatus))),
@@ -57,6 +60,7 @@ export class AnalysisNodeValidator extends Container<AnalysisNodeEntity> {
 
         this.mount(
             'comment',
+            { optional: true },
             createValidator((chain) => chain
                 .optional({ nullable: true })
                 .isString()),

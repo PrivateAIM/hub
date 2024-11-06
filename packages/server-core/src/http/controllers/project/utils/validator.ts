@@ -41,6 +41,7 @@ export class ProjectValidator extends Container<ProjectEntity> {
 
         this.mount(
             'master_image_id',
+            { optional: true },
             createValidator((chain) => chain
                 .isUUID()
                 .optional({ nullable: true })),

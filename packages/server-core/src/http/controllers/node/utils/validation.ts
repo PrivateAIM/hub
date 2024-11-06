@@ -26,7 +26,7 @@ export class NodeValidator extends Container<NodeEntity> {
 
         this.mount(
             'name',
-            { group: HTTPHandlerOperation.UPDATE },
+            { group: HTTPHandlerOperation.UPDATE, optional: true },
             createValidator((chain) => chain
                 .isLength({ min: 3, max: 128 })
                 .optional({ values: 'null' })),
@@ -34,28 +34,32 @@ export class NodeValidator extends Container<NodeEntity> {
 
         this.mount(
             'type',
+            { optional: true },
             createValidator((chain) => chain
                 .isIn(Object.values(NodeType))
-                .optional()),
+                .optional({ values: 'null' })),
         );
 
         this.mount(
             'hidden',
+            { optional: true },
             createValidator((chain) => chain
                 .isBoolean()
-                .optional()),
+                .optional({ values: 'null' })),
         );
 
         this.mount(
             'public_key',
+            { optional: true },
             createValidator((chain) => chain
                 .isLength({ min: 5, max: 4096 })
                 .exists()
-                .optional({ nullable: true })),
+                .optional({ values: 'null' })),
         );
 
         this.mount(
             'external_name',
+            { optional: true },
             createValidator((chain) => chain
                 .isLength({ min: 1, max: 64 })
                 .exists()
@@ -65,6 +69,7 @@ export class NodeValidator extends Container<NodeEntity> {
 
         this.mount(
             'registry_id',
+            { optional: true },
             createValidator((chain) => chain
                 .isUUID()
                 .optional({ nullable: true })),
@@ -72,6 +77,7 @@ export class NodeValidator extends Container<NodeEntity> {
 
         this.mount(
             'robot_id',
+            { optional: true },
             createValidator((chain) => chain
                 .isUUID()
                 .optional({ nullable: true })),
@@ -79,7 +85,7 @@ export class NodeValidator extends Container<NodeEntity> {
 
         this.mount(
             'realm_id',
-            { group: HTTPHandlerOperation.CREATE },
+            { group: HTTPHandlerOperation.CREATE, optional: true },
             createValidator((chain) => chain
                 .exists()
                 .isUUID()

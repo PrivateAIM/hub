@@ -33,11 +33,11 @@ export class AnalysisBucketFileValidator extends Container<AnalysisBucketFile> {
 
         this.mount(
             'name',
-            { group: HTTPHandlerOperation.UPDATE },
+            { group: HTTPHandlerOperation.UPDATE, optional: true },
             createValidator((chain) => chain
                 .exists()
                 .isString()
-                .optional({ values: 'undefined' })),
+                .optional({ values: 'null' })),
         );
 
         this.mount(

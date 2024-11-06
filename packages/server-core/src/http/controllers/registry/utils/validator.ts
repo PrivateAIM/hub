@@ -24,7 +24,7 @@ export class RegistryValidator extends Container<RegistryEntity> {
 
         this.mount(
             'name',
-            { group: HTTPHandlerOperation.UPDATE },
+            { group: HTTPHandlerOperation.UPDATE, optional: true },
             createValidator((chain) => chain
                 .exists()
                 .isLength({ min: 3, max: 128 })
@@ -42,7 +42,7 @@ export class RegistryValidator extends Container<RegistryEntity> {
 
         this.mount(
             'host',
-            { group: HTTPHandlerOperation.CREATE },
+            { group: HTTPHandlerOperation.CREATE, optional: true },
             createValidator((chain) => chain
                 .exists()
                 .isString()
@@ -52,6 +52,7 @@ export class RegistryValidator extends Container<RegistryEntity> {
 
         this.mount(
             'account_name',
+            { optional: true },
             createValidator((chain) => chain
                 .exists()
                 .isLength({ min: 3, max: 256 })
@@ -60,6 +61,7 @@ export class RegistryValidator extends Container<RegistryEntity> {
 
         this.mount(
             'account_secret',
+            { optional: true },
             createValidator((chain) => chain
                 .exists()
                 .isLength({ min: 3, max: 256 })

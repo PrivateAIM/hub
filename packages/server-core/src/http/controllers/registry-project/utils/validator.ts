@@ -34,11 +34,11 @@ export class RegistryProjectValidator extends Container<RegistryProjectEntity> {
 
         this.mount(
             'name',
-            { group: HTTPHandlerOperation.UPDATE },
+            { group: HTTPHandlerOperation.UPDATE, optional: true },
             createValidator((chain) => chain
                 .exists()
                 .isLength({ min: 5, max: 128 })
-                .optional()),
+                .optional({ values: 'null' })),
         );
 
         this.mount(
@@ -52,12 +52,12 @@ export class RegistryProjectValidator extends Container<RegistryProjectEntity> {
 
         this.mount(
             'external_name',
-            { group: HTTPHandlerOperation.UPDATE },
+            { group: HTTPHandlerOperation.UPDATE, optional: true },
             createValidator((chain) => chain
                 .isLength({ min: 1, max: 255 })
                 .exists()
                 .matches(/^[a-z0-9-_]*$/)
-                .optional()),
+                .optional({ values: 'null' })),
         );
 
         this.mount(
