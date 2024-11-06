@@ -6,14 +6,14 @@
  */
 import { BadRequestError } from '@ebec/http';
 import {
-    AnalysisBucketType, AnalysisBuildStatus, AnalysisRunStatus,
+    AnalysisBucketType,
 } from '@privateaim/core-kit';
 import { useRequestIdentityOrFail } from '@privateaim/server-http-kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
-import { AnalysisBucketFileEntity } from '../../../../domains';
+import { AnalysisBucketFileEntity, AnalysisEntity } from '../../../../domains';
 import { AnalysisBucketFileValidator } from '../utils';
 import { HTTPHandlerOperation } from '../../constants';
 
@@ -24,13 +24,13 @@ export async function createAnalysisBucketFileRouteHandler(req: Request, res: Re
         group: HTTPHandlerOperation.CREATE,
     });
 
-    data.analysis_id = data.bucket.analysis_id;
-
     const dataSource = await useDataSource();
     await validateEntityJoinColumns(data, {
         dataSource,
         entityTarget: AnalysisBucketFileEntity,
     });
+
+    data.analysis_id = data.bucket.analysis_id;
 
     const repository = dataSource.getRepository(AnalysisBucketFileEntity);
 
@@ -54,18 +54,15 @@ export async function createAnalysisBucketFileRouteHandler(req: Request, res: Re
     let entity = repository.create(data);
 
     if (data.bucket.type === AnalysisBucketType.CODE) {
-        if (
-            data.analysis.build_status &&
-            data.analysis.build_status !== AnalysisBuildStatus.FAILED
-        ) {
-            throw new BadRequestError('The analysis has already been built and can no longer be modified.');
-        }
+        const analysisRepository = dataSource.getRepository(AnalysisEntity);
+        const analysis = await analysisRepository.findOne({
+            where: {
+                id: data.analysis_id,
+            },
+        });
 
-        if (
-            data.analysis.run_status &&
-            data.analysis.run_status !== AnalysisRunStatus.FAILED
-        ) {
-            throw new BadRequestError('The analysis has already been started and can no longer be modified.');
+        if (analysis.configuration_locked) {
+            throw new BadRequestError('The analysis has already been locked and can therefore no longer be modified.');
         }
     }
 

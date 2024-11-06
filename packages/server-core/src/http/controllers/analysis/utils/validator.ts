@@ -25,7 +25,7 @@ export class AnalysisValidator extends Container<Analysis> {
 
         this.mount(
             'name',
-            { group: HTTPHandlerOperation.UPDATE, optional: true },
+            { optional: true },
             createValidator((chain) => chain
                 .isString()
                 .isLength({ min: 3, max: 128 })
@@ -33,15 +33,8 @@ export class AnalysisValidator extends Container<Analysis> {
         );
 
         this.mount(
-            'name',
-            { group: HTTPHandlerOperation.CREATE },
-            createValidator((chain) => chain
-                .isString()
-                .isLength({ min: 3, max: 128 })),
-        );
-
-        this.mount(
             'description',
+            { optional: true },
             createValidator((chain) => chain
                 .isString()
                 .isLength({ min: 5, max: 4096 })

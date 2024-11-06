@@ -34,10 +34,10 @@ export class AnalysisPermissionValidator extends Container<AnalysisPermissionEnt
 
         this.mount(
             'policy_id',
+            { optional: true },
             createValidator((chain) => chain
-                .exists()
-                .notEmpty()
-                .isUUID()),
+                .isUUID()
+                .optional({ values: 'null' })),
         );
     }
 }

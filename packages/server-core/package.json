@@ -51,7 +51,7 @@
         "routup": "^4.0.1",
         "singa": "^1.0.0",
         "typeorm": "^0.3.20",
-        "typeorm-extension": "^3.6.2",
+        "typeorm-extension": "^3.6.3",
         "validup": "^0.1.7",
         "yargs": "^17.7.1",
         "zod": "^3.23.7"
