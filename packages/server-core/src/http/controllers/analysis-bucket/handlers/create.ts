@@ -6,17 +6,30 @@
  */
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
-import { useDataSource } from 'typeorm-extension';
+import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
+import { RoutupContainerAdapter } from '@validup/adapter-routup';
+import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
 import { AnalysisBucketEntity } from '../../../../domains';
-import { runAnalysisBucketValidation } from '../utils';
+import { AnalysisBucketValidator } from '../utils';
 
 export async function createAnalysisBucketRouteHandler(req: Request, res: Response) : Promise<any> {
-    const result = await runAnalysisBucketValidation(req, 'create');
+    const validator = new AnalysisBucketValidator();
+    const validatorAdapter = new RoutupContainerAdapter(validator);
+    const data = await validatorAdapter.run(req, {
+        group: HTTPHandlerOperation.CREATE,
+    });
 
     const dataSource = await useDataSource();
+    await validateEntityJoinColumns(data, {
+        dataSource,
+        entityTarget: AnalysisBucketEntity,
+    });
+
+    data.realm_id = data.analysis.realm_id;
+
     const repository = dataSource.getRepository(AnalysisBucketEntity);
 
-    let entity = repository.create(result.data);
+    let entity = repository.create(data);
 
     entity = await repository.save(entity);
 

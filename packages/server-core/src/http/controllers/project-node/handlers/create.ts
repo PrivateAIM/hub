@@ -9,10 +9,13 @@ import { NodeType, ProjectNodeApprovalStatus } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
-import { useDataSource } from 'typeorm-extension';
-import { useRequestPermissionChecker } from '@privateaim/server-http-kit';
+import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
+import { HTTPHandlerOperation, useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
+import { isRealmResourceWritable } from '@authup/core-kit';
+import { NotFoundError } from '@ebec/http';
+import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { ProjectEntity, ProjectNodeEntity } from '../../../../domains';
-import { runProjectNodeValidation } from '../utils';
+import { ProjectNodeValidator } from '../utils';
 import { useEnv } from '../../../../config';
 
 export async function createProjectNodeRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -24,24 +27,40 @@ export async function createProjectNodeRouteHandler(req: Request, res: Response)
         ],
     });
 
-    const result = await runProjectNodeValidation(req, 'create');
+    const validator = new ProjectNodeValidator();
+    const validatorAdapter = new RoutupContainerAdapter(validator);
+    const data = await validatorAdapter.run(req, {
+        group: HTTPHandlerOperation.CREATE,
+    });
 
     const dataSource = await useDataSource();
+    await validateEntityJoinColumns(data, {
+        dataSource,
+        entityTarget: ProjectNodeEntity,
+    });
+
+    data.project_realm_id = data.project.realm_id;
+    data.node_realm_id = data.node.realm_id;
+
+    if (!isRealmResourceWritable(useRequestIdentityRealm(req), data.project.realm_id)) {
+        throw new NotFoundError('The referenced project realm is not permitted.');
+    }
+
     const repository = dataSource.getRepository(ProjectNodeEntity);
-    let entity = repository.create(result.data);
+    let entity = repository.create(data);
 
     if (
         useEnv('skipProjectApproval') ||
-        (result.relation.node && result.relation.node.type === NodeType.AGGREGATOR)
+        (data.node.type === NodeType.AGGREGATOR)
     ) {
         entity.approval_status = ProjectNodeApprovalStatus.APPROVED;
     }
 
     entity = await repository.save(entity);
 
-    result.relation.project.nodes += 1;
+    data.project.nodes += 1;
     const projectRepository = dataSource.getRepository(ProjectEntity);
-    await projectRepository.save(result.relation.project);
+    await projectRepository.save(data.project);
 
     return sendCreated(res, entity);
 }

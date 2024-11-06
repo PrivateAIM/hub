@@ -10,12 +10,19 @@ import { isRealmResourceWritable } from '@authup/core-kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { useRequestIdentityRealm } from '@privateaim/server-http-kit';
+import { HTTPHandlerOperation, useRequestIdentityRealm } from '@privateaim/server-http-kit';
+import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { AnalysisBucketEntity } from '../../../../domains';
-import { runAnalysisBucketValidation } from '../utils';
+import { AnalysisBucketValidator } from '../utils';
 
 export async function updateAnalysisBucketRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
+
+    const validator = new AnalysisBucketValidator();
+    const validatorAdapter = new RoutupContainerAdapter(validator);
+    const data = await validatorAdapter.run(req, {
+        group: HTTPHandlerOperation.UPDATE,
+    });
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisBucketEntity);
@@ -29,9 +36,7 @@ export async function updateAnalysisBucketRouteHandler(req: Request, res: Respon
         throw new ForbiddenError();
     }
 
-    const result = await runAnalysisBucketValidation(req, 'update');
-
-    entity = repository.merge(entity, result.data);
+    entity = repository.merge(entity, data);
 
     entity = await repository.save(entity);
 

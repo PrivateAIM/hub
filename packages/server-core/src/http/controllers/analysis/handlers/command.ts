@@ -8,8 +8,8 @@
 import { isRealmResourceWritable } from '@authup/core-kit';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { AnalysisAPICommand } from '@privateaim/core-kit';
-import { HTTPValidationError, useRequestIdentityRealm } from '@privateaim/server-http-kit';
-import { check, matchedData, validationResult } from 'express-validator';
+import { HTTPHandlerOperation, useRequestIdentityRealm } from '@privateaim/server-http-kit';
+import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
@@ -22,6 +22,7 @@ import {
     unlockAnalysisConfiguration,
 } from '../../../../domains';
 import { runAnalysisTearDownCommand } from '../../../../domains/analysis/commands/tear-down';
+import { AnalysisCommandValidator } from '../utils';
 
 /**
  * Execute a analysis command (start, stop, build).
@@ -36,17 +37,11 @@ export async function handleAnalysisCommandRouteHandler(req: Request, res: Respo
         throw new NotFoundError();
     }
 
-    await check('command')
-        .exists()
-        .custom((command) => Object.values(AnalysisAPICommand).includes(command))
-        .run(req);
-
-    const validation = validationResult(req);
-    if (!validation.isEmpty()) {
-        throw new HTTPValidationError(validation);
-    }
-
-    const validationData = matchedData(req, { includeOptionals: true });
+    const validator = new AnalysisCommandValidator();
+    const validatorAdapter = new RoutupContainerAdapter(validator);
+    const data = await validatorAdapter.run(req, {
+        group: HTTPHandlerOperation.CREATE,
+    });
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisEntity);
@@ -61,7 +56,7 @@ export async function handleAnalysisCommandRouteHandler(req: Request, res: Respo
         throw new ForbiddenError();
     }
 
-    switch (validationData.command as AnalysisAPICommand) {
+    switch (data.command) {
         // General
         case AnalysisAPICommand.SPIN_UP: {
             entity = await runAnalysisSpinUpCommand(entity);

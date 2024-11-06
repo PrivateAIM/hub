@@ -6,12 +6,13 @@
  */
 
 import { NotFoundError } from '@ebec/http';
-import { PermissionName } from '@privateaim/kit';
+import { PermissionName, getHostNameFromString } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { useRequestPermissionChecker } from '@privateaim/server-http-kit';
-import { runRegistryValidation } from '../utils';
+import { HTTPHandlerOperation, useRequestPermissionChecker } from '@privateaim/server-http-kit';
+import { RoutupContainerAdapter } from '@validup/adapter-routup';
+import { RegistryValidator } from '../utils';
 import { RegistryEntity } from '../../../../domains';
 
 export async function updateRegistryRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -20,10 +21,12 @@ export async function updateRegistryRouteHandler(req: Request, res: Response) : 
     const permissionChecker = useRequestPermissionChecker(req);
     await permissionChecker.preCheck({ name: PermissionName.REGISTRY_MANAGE });
 
-    const result = await runRegistryValidation(req, 'update');
-    if (!result.data) {
-        return sendAccepted(res);
-    }
+    const validator = new RegistryValidator();
+    const validatorAdapter = new RoutupContainerAdapter(validator);
+    const data = await validatorAdapter.run(req, {
+        group: HTTPHandlerOperation.UPDATE,
+    });
+    data.host = getHostNameFromString(data.host);
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(RegistryEntity);
@@ -33,7 +36,7 @@ export async function updateRegistryRouteHandler(req: Request, res: Response) : 
         throw new NotFoundError();
     }
 
-    entity = repository.merge(entity, result.data);
+    entity = repository.merge(entity, data);
 
     await repository.save(entity);
 

@@ -5,37 +5,58 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BadRequestError } from '@ebec/http';
+import { BadRequestError, NotFoundError } from '@ebec/http';
 import { AnalysisNodeApprovalStatus, NodeType } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
-import { useDataSource } from 'typeorm-extension';
-import { useRequestPermissionChecker } from '@privateaim/server-http-kit';
+import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
+import { HTTPHandlerOperation, useRequestPermissionChecker } from '@privateaim/server-http-kit';
+import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { useEnv } from '../../../../config';
-import { AnalysisEntity, AnalysisNodeEntity } from '../../../../domains';
-import { runAnalysisNodeValidation } from '../utils';
+import { AnalysisEntity, AnalysisNodeEntity, ProjectNodeEntity } from '../../../../domains';
+import { AnalysisNodeValidator } from '../utils';
 
 export async function createAnalysisNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const permissionChecker = useRequestPermissionChecker(req);
     await permissionChecker.preCheck({ name: PermissionName.ANALYSIS_UPDATE });
 
-    const result = await runAnalysisNodeValidation(req, 'create');
-    if (
-        result.relation.analysis &&
-        result.relation.analysis.configuration_locked
-    ) {
-        throw new BadRequestError('The analysis is locked right now. It is not possible to add new nodes.');
-    }
+    const validator = new AnalysisNodeValidator();
+    const validatorAdapter = new RoutupContainerAdapter(validator);
+    const data = await validatorAdapter.run(req, {
+        group: HTTPHandlerOperation.CREATE,
+    });
 
     const dataSource = await useDataSource();
+    await validateEntityJoinColumns(data, {
+        dataSource,
+        entityTarget: AnalysisNodeEntity,
+    });
+
+    data.analysis_realm_id = data.analysis.realm_id;
+    data.node_realm_id = data.node.realm_id;
+
+    if (data.analysis.configuration_locked) {
+        throw new BadRequestError('The analysis has already been locked and can therefore no longer be modified.');
+    }
+
+    const projectNodeRepository = dataSource.getRepository(ProjectNodeEntity);
+    const projectNode = await projectNodeRepository.findOneBy({
+        project_id: data.analysis.project_id,
+        node_id: data.node_id,
+    });
+
+    if (!projectNode) {
+        throw new NotFoundError('The referenced node is not part of the analysis project.');
+    }
+
     const repository = dataSource.getRepository(AnalysisNodeEntity);
 
-    let entity = repository.create(result.data);
+    let entity = repository.create(data);
 
     if (
         useEnv('skipAnalysisApproval') ||
-        (result.relation.node && result.relation.node.type === NodeType.AGGREGATOR)
+        data.node.type === NodeType.AGGREGATOR
     ) {
         entity.approval_status = AnalysisNodeApprovalStatus.APPROVED;
     }
@@ -48,12 +69,9 @@ export async function createAnalysisNodeRouteHandler(req: Request, res: Response
 
     entity = await repository.save(entity);
 
-    result.relation.analysis.nodes += 1;
+    data.analysis.nodes += 1;
     const analysisRepository = dataSource.getRepository(AnalysisEntity);
-    await analysisRepository.save(result.relation.analysis);
-
-    entity.analysis = result.relation.analysis;
-    entity.node = result.relation.node;
+    await analysisRepository.save(data.analysis);
 
     return sendCreated(res, entity);
 }

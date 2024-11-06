@@ -10,35 +10,44 @@ import type { Analysis } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
-import { useDataSource } from 'typeorm-extension';
+import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
 import {
+    HTTPHandlerOperation,
     useRequestIdentityOrFail,
     useRequestPermissionChecker,
 } from '@privateaim/server-http-kit';
-import { runAnalysisValidation } from '../utils';
+import { RoutupContainerAdapter } from '@validup/adapter-routup';
+import { AnalysisValidator } from '../utils';
 import { AnalysisEntity, ProjectEntity, runAnalysisSpinUpCommand } from '../../../../domains';
 
 export async function createAnalysisRouteHandler(req: Request, res: Response) : Promise<any> {
     const permissionChecker = useRequestPermissionChecker(req);
     await permissionChecker.preCheck({ name: PermissionName.ANALYSIS_CREATE });
 
-    const result = await runAnalysisValidation(req, 'create');
-
-    if (
-        !result.data.master_image_id &&
-        result.relation.project
-    ) {
-        result.data.master_image_id = result.relation.project.master_image_id;
-    }
+    const validator = new AnalysisValidator();
+    const validatorAdapter = new RoutupContainerAdapter(validator);
+    const data = await validatorAdapter.run(req, {
+        group: HTTPHandlerOperation.CREATE,
+    });
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository<Analysis>(AnalysisEntity);
+    await validateEntityJoinColumns(data, {
+        dataSource,
+        entityTarget: AnalysisEntity,
+    });
 
+    if (!data.master_image_id) {
+        data.master_image_id = data.project.master_image_id;
+    }
+
+    data.realm_id = data.project.realm_id;
+
+    const repository = dataSource.getRepository<Analysis>(AnalysisEntity);
     const identity = useRequestIdentityOrFail(req);
 
     const entity = repository.create({
         realm_id: identity.realmId,
-        ...result.data,
+        ...data,
     });
     switch (identity.type) {
         case 'user': {
@@ -60,9 +69,9 @@ export async function createAnalysisRouteHandler(req: Request, res: Response) : 
 
     await repository.save(entity);
 
-    result.relation.project.analyses++;
+    entity.project.analyses++;
     const proposalRepository = dataSource.getRepository(ProjectEntity);
-    await proposalRepository.save(result.relation.project);
+    await proposalRepository.save(entity.project);
 
     await runAnalysisSpinUpCommand(entity);
 

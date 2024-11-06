@@ -11,29 +11,51 @@ import {
 import { PermissionName, createNanoID, isHex } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
-import { useDataSource } from 'typeorm-extension';
-import { useRequestPermissionChecker } from '@privateaim/server-http-kit';
+import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
+import { HTTPHandlerOperation, useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
+import { isRealmResourceWritable } from '@authup/core-kit';
+import { ForbiddenError } from '@ebec/http';
+import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../../../components';
-import { createNodeRobot, runNodeValidation } from '../utils';
-import { NodeEntity, RegistryEntity, RegistryProjectEntity } from '../../../../domains';
+import { NodeValidator, createNodeRobot } from '../utils';
+import {
+    NodeEntity, RegistryEntity, RegistryProjectEntity,
+} from '../../../../domains';
 
 export async function createNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const permissionChecker = useRequestPermissionChecker(req);
     await permissionChecker.preCheck({ name: PermissionName.NODE_CREATE });
 
-    const result = await runNodeValidation(req, 'create');
+    const validator = new NodeValidator();
+    const validatorAdapter = new RoutupContainerAdapter(validator);
+    const data = await validatorAdapter.run(req, {
+        group: HTTPHandlerOperation.CREATE,
+    });
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(NodeEntity);
+    await validateEntityJoinColumns(data, {
+        dataSource,
+        entityTarget: NodeEntity,
+    });
 
-    const entity = repository.create(result.data);
+    const realm = useRequestIdentityRealm(req);
+    if (data.realm_id) {
+        if (!isRealmResourceWritable(realm, data.realm_id)) {
+            throw new ForbiddenError('You are not permitted to create this node.');
+        }
+    } else {
+        data.realm_id = realm.id;
+    }
+
+    const repository = dataSource.getRepository(NodeEntity);
+    const entity = repository.create(data);
 
     // -----------------------------------------------------
 
     if (
         entity.public_key &&
-        !isHex(result.data.public_key)
+        !isHex(data.public_key)
     ) {
         entity.public_key = Buffer
             .from(entity.public_key, 'utf8')

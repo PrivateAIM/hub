@@ -13,11 +13,12 @@ import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/core-kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
-import { useDataSource } from 'typeorm-extension';
-import { useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
+import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
+import { HTTPHandlerOperation, useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
+import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../../../components';
-import { createNodeRobot, runNodeValidation } from '../utils';
+import { NodeValidator, createNodeRobot } from '../utils';
 import { NodeEntity, RegistryProjectEntity } from '../../../../domains';
 
 export async function updateNodeRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -26,30 +27,35 @@ export async function updateNodeRouteHandler(req: Request, res: Response) : Prom
     const permissionChecker = useRequestPermissionChecker(req);
     await permissionChecker.preCheck({ name: PermissionName.NODE_UPDATE });
 
-    const result = await runNodeValidation(req, 'update');
-    if (!result.data) {
-        return sendAccepted(res);
-    }
+    const validator = new NodeValidator();
+    const validatorAdapter = new RoutupContainerAdapter(validator);
+    const data = await validatorAdapter.run(req, {
+        group: HTTPHandlerOperation.UPDATE,
+    });
+
+    const dataSource = await useDataSource();
+    await validateEntityJoinColumns(data, {
+        dataSource,
+        entityTarget: NodeEntity,
+    });
 
     if (
-        result.data.public_key &&
-        !isHex(result.data.public_key)
+        data.public_key &&
+        !isHex(data.public_key)
     ) {
-        result.data.public_key = Buffer
-            .from(result.data.public_key, 'utf8')
+        data.public_key = Buffer
+            .from(data.public_key, 'utf8')
             .toString('hex');
     }
 
-    const dataSource = await useDataSource();
     const repository = dataSource.getRepository(NodeEntity);
-    const query = repository.createQueryBuilder('station')
+    const query = repository.createQueryBuilder('node')
         .addSelect([
-            'station.external_name',
+            'node.external_name',
         ])
-        .where('station.id = :id', { id });
+        .where('node.id = :id', { id });
 
     let entity = await query.getOne();
-
     if (!entity) {
         throw new NotFoundError();
     }
@@ -58,7 +64,7 @@ export async function updateNodeRouteHandler(req: Request, res: Response) : Prom
         throw new ForbiddenError('You are not permitted to delete this station.');
     }
 
-    entity = repository.merge(entity, result.data);
+    entity = repository.merge(entity, data);
 
     if (entity.registry_id) {
         const registryProjectExternalName = entity.external_name || createNanoID();

@@ -6,114 +6,90 @@
  */
 
 import { NodeType } from '@privateaim/core-kit';
-import { check } from 'express-validator';
-import { isRealmResourceWritable } from '@authup/core-kit';
-import { ForbiddenError } from '@ebec/http';
-import type { Request } from 'routup';
-import type { HTTPValidationResult } from '@privateaim/server-http-kit';
-import {
-    createHTTPValidationResult,
-    extendHTTPValidationResultWithRelation,
-    useRequestIdentityRealm,
-} from '@privateaim/server-http-kit';
-import { RegistryEntity } from '../../../../domains';
+import { Container } from 'validup';
+import { createValidator } from '@validup/adapter-validator';
+import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
 import type { NodeEntity } from '../../../../domains';
 
-export async function runNodeValidation(
-    req: Request,
-    operation: 'create' | 'update',
-) : Promise<HTTPValidationResult<NodeEntity>> {
-    const nameChain = check('name')
-        .isLength({ min: 3, max: 128 })
-        .exists()
-        .notEmpty();
+export class NodeValidator extends Container<NodeEntity> {
+    protected initialize() {
+        super.initialize();
 
-    if (operation === 'update') {
-        nameChain.optional();
+        this.mount(
+            'name',
+            { group: HTTPHandlerOperation.CREATE },
+            createValidator((chain) => chain
+                .isLength({ min: 3, max: 128 })
+                .exists()
+                .notEmpty()),
+        );
+
+        this.mount(
+            'name',
+            { group: HTTPHandlerOperation.UPDATE, optional: true },
+            createValidator((chain) => chain
+                .isLength({ min: 3, max: 128 })
+                .optional({ values: 'null' })),
+        );
+
+        this.mount(
+            'type',
+            { optional: true },
+            createValidator((chain) => chain
+                .isIn(Object.values(NodeType))
+                .optional({ values: 'null' })),
+        );
+
+        this.mount(
+            'hidden',
+            { optional: true },
+            createValidator((chain) => chain
+                .isBoolean()
+                .optional({ values: 'null' })),
+        );
+
+        this.mount(
+            'public_key',
+            { optional: true },
+            createValidator((chain) => chain
+                .isLength({ min: 5, max: 4096 })
+                .exists()
+                .optional({ values: 'null' })),
+        );
+
+        this.mount(
+            'external_name',
+            { optional: true },
+            createValidator((chain) => chain
+                .isLength({ min: 1, max: 64 })
+                .exists()
+                .matches(/^[a-z0-9-_]*$/)
+                .optional({ nullable: true })),
+        );
+
+        this.mount(
+            'registry_id',
+            { optional: true },
+            createValidator((chain) => chain
+                .isUUID()
+                .optional({ nullable: true })),
+        );
+
+        this.mount(
+            'robot_id',
+            { optional: true },
+            createValidator((chain) => chain
+                .isUUID()
+                .optional({ nullable: true })),
+        );
+
+        this.mount(
+            'realm_id',
+            { group: HTTPHandlerOperation.CREATE, optional: true },
+            createValidator((chain) => chain
+                .exists()
+                .isUUID()
+                .optional({ nullable: true })),
+        );
     }
-
-    await nameChain.run(req);
-
-    // -------------------------------------------------------------
-
-    await check('type')
-        .isIn(Object.values(NodeType))
-        .optional()
-        .run(req);
-
-    // -------------------------------------------------------------
-
-    await check('hidden')
-        .isBoolean()
-        .optional()
-        .run(req);
-
-    // -------------------------------------------------------------
-
-    await check('public_key')
-        .isLength({ min: 5, max: 4096 })
-        .exists()
-        .optional({ nullable: true })
-        .run(req);
-
-    // -------------------------------------------------------------
-
-    await check('external_name')
-        .isLength({ min: 1, max: 64 })
-        .exists()
-        .matches(/^[a-z0-9-_]*$/)
-        .optional({ nullable: true })
-        .run(req);
-
-    // -------------------------------------------------------------
-
-    await check('registry_id')
-        .exists()
-        .isUUID()
-        .optional({ nullable: true })
-        .run(req);
-
-    // -------------------------------------------------------------
-
-    await check('robot_id')
-        .exists()
-        .isUUID()
-        .optional({ nullable: true })
-        .run(req);
-
-    // -------------------------------------------------------------
-
-    if (operation === 'create') {
-        await check('realm_id')
-            .exists()
-            .isUUID()
-            .optional({ nullable: true })
-            .run(req);
-    }
-
-    // ----------------------------------------------
-
-    const result = createHTTPValidationResult<NodeEntity>(req);
-
-    // ----------------------------------------------
-
-    await extendHTTPValidationResultWithRelation(result, RegistryEntity, {
-        id: 'registry_id',
-        entity: 'registry',
-    });
-
-    // ----------------------------------------------
-
-    if (operation === 'create') {
-        const realm = useRequestIdentityRealm(req);
-        if (result.data.realm_id) {
-            if (!isRealmResourceWritable(realm, result.data.realm_id)) {
-                throw new ForbiddenError('You are not permitted to create this node.');
-            }
-        } else {
-            result.data.realm_id = realm.id;
-        }
-    }
-
-    return result;
 }

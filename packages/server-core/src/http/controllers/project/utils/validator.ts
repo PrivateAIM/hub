@@ -5,49 +5,46 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ProjectNodeApprovalStatus } from '@privateaim/core-kit';
 import { Container } from 'validup';
 import { createValidator } from '@validup/adapter-validator';
 import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
-import type { ProjectNodeEntity } from '../../../../domains';
+import type { ProjectEntity } from '../../../../domains';
 
-export class ProjectNodeValidator extends Container<ProjectNodeEntity> {
+export class ProjectValidator extends Container<ProjectEntity> {
     protected initialize() {
         super.initialize();
 
         this.mount(
-            'project_id',
+            'name',
             { group: HTTPHandlerOperation.CREATE },
             createValidator((chain) => chain
                 .exists()
-                .notEmpty()
-                .isUUID()),
+                .isLength({ min: 5, max: 100 })),
         );
 
         this.mount(
-            'node_id',
-            { group: HTTPHandlerOperation.CREATE },
-            createValidator((chain) => chain
-                .exists()
-                .notEmpty()
-                .isUUID()),
-        );
-
-        this.mount(
-            'approval_status',
-            { group: HTTPHandlerOperation.UPDATE },
-            createValidator((chain) => chain
-                .optional({ values: 'null' })
-                .isIn(Object.values(ProjectNodeApprovalStatus))),
-        );
-
-        this.mount(
-            'comment',
+            'name',
             { group: HTTPHandlerOperation.UPDATE, optional: true },
             createValidator((chain) => chain
-                .optional({ nullable: true })
+                .exists()
+                .isLength({ min: 5, max: 100 })),
+        );
+
+        this.mount(
+            'description',
+            { optional: true },
+            createValidator((chain) => chain
                 .isString()
-                .isLength({ min: 3, max: 4096 })),
+                .isLength({ min: 5, max: 4096 })
+                .optional({ values: 'null' })),
+        );
+
+        this.mount(
+            'master_image_id',
+            { optional: true },
+            createValidator((chain) => chain
+                .isUUID()
+                .optional({ nullable: true })),
         );
     }
 }

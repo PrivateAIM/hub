@@ -6,32 +6,43 @@
  */
 import { BadRequestError } from '@ebec/http';
 import {
-    AnalysisBucketType, AnalysisBuildStatus, AnalysisRunStatus,
+    AnalysisBucketType,
 } from '@privateaim/core-kit';
-import { useRequestIdentityOrFail } from '@privateaim/server-http-kit';
+import { HTTPHandlerOperation, useRequestIdentityOrFail } from '@privateaim/server-http-kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
-import { useDataSource } from 'typeorm-extension';
-import { AnalysisBucketFileEntity } from '../../../../domains';
-import { runAnalysisFileValidation } from '../utils';
+import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
+import { RoutupContainerAdapter } from '@validup/adapter-routup';
+import { AnalysisBucketFileEntity, AnalysisEntity } from '../../../../domains';
+import { AnalysisBucketFileValidator } from '../utils';
 
 export async function createAnalysisBucketFileRouteHandler(req: Request, res: Response) : Promise<any> {
-    const result = await runAnalysisFileValidation(req, 'create');
-    result.data.analysis_id = result.relation.bucket.analysis_id;
+    const validator = new AnalysisBucketFileValidator();
+    const validatorAdapter = new RoutupContainerAdapter(validator);
+    const data = await validatorAdapter.run(req, {
+        group: HTTPHandlerOperation.CREATE,
+    });
 
     const dataSource = await useDataSource();
+    await validateEntityJoinColumns(data, {
+        dataSource,
+        entityTarget: AnalysisBucketFileEntity,
+    });
+
+    data.analysis_id = data.bucket.analysis_id;
+
     const repository = dataSource.getRepository(AnalysisBucketFileEntity);
 
     const identity = useRequestIdentityOrFail(req);
-    result.data.realm_id = identity.realmId;
+    data.realm_id = identity.realmId;
 
     switch (identity.type) {
         case 'user': {
-            result.data.user_id = identity.id;
+            data.user_id = identity.id;
             break;
         }
         case 'robot': {
-            result.data.robot_id = identity.id;
+            data.robot_id = identity.id;
             break;
         }
         default: {
@@ -39,24 +50,18 @@ export async function createAnalysisBucketFileRouteHandler(req: Request, res: Re
         }
     }
 
-    let entity = repository.create(result.data);
+    let entity = repository.create(data);
 
-    if (
-        result.relation.bucket.type === AnalysisBucketType.CODE &&
-        result.relation.analysis
-    ) {
-        if (
-            result.relation.analysis.build_status &&
-            result.relation.analysis.build_status !== AnalysisBuildStatus.FAILED
-        ) {
-            throw new BadRequestError('The analysis has already been built and can no longer be modified.');
-        }
+    if (data.bucket.type === AnalysisBucketType.CODE) {
+        const analysisRepository = dataSource.getRepository(AnalysisEntity);
+        const analysis = await analysisRepository.findOne({
+            where: {
+                id: data.analysis_id,
+            },
+        });
 
-        if (
-            result.relation.analysis.run_status &&
-            result.relation.analysis.run_status !== AnalysisRunStatus.FAILED
-        ) {
-            throw new BadRequestError('The analysis has already been started and can no longer be modified.');
+        if (analysis.configuration_locked) {
+            throw new BadRequestError('The analysis has already been locked and can therefore no longer be modified.');
         }
     }
 

@@ -9,10 +9,12 @@ import { isUUID } from '@authup/kit';
 import { PermissionName } from '@privateaim/kit';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/core-kit';
+import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import {
+    HTTPHandlerOperation,
     useRequestIdentityOrFail,
     useRequestIdentityRealm,
     useRequestPermissionChecker,
@@ -21,13 +23,14 @@ import { useMinio } from '../../../../core';
 import {
     BucketEntity, isBucketOwnedByIdentity, toBucketName,
 } from '../../../../domains';
-import { runBucketValidation } from '../utils/validation';
+import { BucketValidator } from '../utils/validation';
 
 export async function executeBucketRouteUpdateHandler(req: Request, res: Response) : Promise<any> {
-    const result = await runBucketValidation(req, 'update');
-    if (!result.data) {
-        return sendAccepted(res);
-    }
+    const validator = new BucketValidator();
+    const validatorAdapter = new RoutupContainerAdapter(validator);
+    const data = await validatorAdapter.run(req, {
+        group: HTTPHandlerOperation.UPDATE,
+    });
 
     const id = useRequestParam(req, 'id');
 
@@ -54,7 +57,7 @@ export async function executeBucketRouteUpdateHandler(req: Request, res: Respons
         }
     }
 
-    entity = repository.merge(entity, result.data);
+    entity = repository.merge(entity, data);
 
     await repository.save(entity);
 

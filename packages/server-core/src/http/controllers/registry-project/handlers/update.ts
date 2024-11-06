@@ -11,10 +11,11 @@ import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { isRealmResourceWritable } from '@authup/core-kit';
-import { useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
+import { HTTPHandlerOperation, useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
+import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../../../components';
-import { runRegistryProjectValidation } from '../utils';
+import { RegistryProjectValidator } from '../utils';
 import { RegistryProjectEntity } from '../../../../domains';
 
 export async function updateRegistryProjectRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -23,10 +24,11 @@ export async function updateRegistryProjectRouteHandler(req: Request, res: Respo
     const permissionChecker = useRequestPermissionChecker(req);
     await permissionChecker.preCheck({ name: PermissionName.REGISTRY_PROJECT_MANAGE });
 
-    const result = await runRegistryProjectValidation(req, 'update');
-    if (!result.data) {
-        return sendAccepted(res);
-    }
+    const validator = new RegistryProjectValidator();
+    const validatorAdapter = new RoutupContainerAdapter(validator);
+    const data = await validatorAdapter.run(req, {
+        group: HTTPHandlerOperation.CREATE,
+    });
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(RegistryProjectEntity);
@@ -40,7 +42,7 @@ export async function updateRegistryProjectRouteHandler(req: Request, res: Respo
         throw new ForbiddenError();
     }
 
-    entity = repository.merge(entity, result.data);
+    entity = repository.merge(entity, data);
 
     await repository.save(entity);
 
@@ -49,16 +51,16 @@ export async function updateRegistryProjectRouteHandler(req: Request, res: Respo
 
         if (
             entity.external_name &&
-            result.data.external_name &&
-            entity.external_name !== result.data.external_name
+            data.external_name &&
+            entity.external_name !== data.external_name
         ) {
             await client.publish(buildRegistryTaskQueueRouterPayload({
                 command: RegistryCommand.PROJECT_UNLINK,
                 data: {
                     id: entity.id,
                     registryId: entity.registry_id,
-                    externalName: result.data.external_name,
-                    accountId: result.data.account_id,
+                    externalName: data.external_name,
+                    accountId: data.account_id,
                 },
             }));
         }

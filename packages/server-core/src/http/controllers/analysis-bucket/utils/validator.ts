@@ -5,23 +5,15 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { AnalysisBucket } from '@privateaim/core-kit';
+import { AnalysisBucketType } from '@privateaim/core-kit';
 import { Container } from 'validup';
 import { createValidator } from '@validup/adapter-validator';
 import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
-import type { AnalysisPermissionEntity } from '../../../../domains';
 
-export class AnalysisPermissionValidator extends Container<AnalysisPermissionEntity> {
+export class AnalysisBucketValidator extends Container<AnalysisBucket> {
     protected initialize() {
         super.initialize();
-
-        this.mount(
-            'permission_id',
-            { group: HTTPHandlerOperation.CREATE },
-            createValidator((chain) => chain
-                .exists()
-                .notEmpty()
-                .isUUID()),
-        );
 
         this.mount(
             'analysis_id',
@@ -33,11 +25,11 @@ export class AnalysisPermissionValidator extends Container<AnalysisPermissionEnt
         );
 
         this.mount(
-            'policy_id',
-            { optional: true },
+            'type',
+            { group: HTTPHandlerOperation.CREATE },
             createValidator((chain) => chain
-                .isUUID()
-                .optional({ values: 'null' })),
+                .notEmpty()
+                .isIn(Object.values(AnalysisBucketType))),
         );
     }
 }

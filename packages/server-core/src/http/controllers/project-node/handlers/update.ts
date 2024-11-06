@@ -11,17 +11,23 @@ import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
+import { HTTPHandlerOperation, useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
+import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { ProjectNodeEntity } from '../../../../domains';
-import { runProjectNodeValidation } from '../utils';
+import { ProjectNodeValidator } from '../utils';
 
 export async function updateProjectNodeRouteHandler(req: Request, res: Response) : Promise<any> {
+    const validator = new ProjectNodeValidator();
+    const validatorAdapter = new RoutupContainerAdapter(validator);
+    const data = await validatorAdapter.run(req, {
+        group: HTTPHandlerOperation.CREATE,
+    });
+
     const id = useRequestParam(req, 'id');
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(ProjectNodeEntity);
     let entity = await repository.findOneBy({ id });
-
     if (!entity) {
         throw new NotFoundError();
     }
@@ -35,9 +41,7 @@ export async function updateProjectNodeRouteHandler(req: Request, res: Response)
 
     await permissionChecker.preCheck({ name: PermissionName.PROJECT_APPROVE });
 
-    const result = await runProjectNodeValidation(req, 'update');
-
-    entity = repository.merge(entity, result.data);
+    entity = repository.merge(entity, data);
 
     entity = await repository.save(entity);
 

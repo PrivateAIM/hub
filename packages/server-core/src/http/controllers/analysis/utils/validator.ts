@@ -5,18 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { AnalysisNodeApprovalStatus, AnalysisNodeRunStatus } from '@privateaim/core-kit';
 import { Container } from 'validup';
 import { createValidator } from '@validup/adapter-validator';
+import type { Analysis } from '@privateaim/core-kit';
 import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
-import type { AnalysisNodeEntity } from '../../../../domains';
 
-export class AnalysisNodeValidator extends Container<AnalysisNodeEntity> {
+export class AnalysisValidator extends Container<Analysis> {
     protected initialize() {
         super.initialize();
 
         this.mount(
-            'node_id',
+            'project_id',
             { group: HTTPHandlerOperation.CREATE },
             createValidator((chain) => chain
                 .exists()
@@ -25,45 +24,37 @@ export class AnalysisNodeValidator extends Container<AnalysisNodeEntity> {
         );
 
         this.mount(
-            'analysis_id',
-            { group: HTTPHandlerOperation.CREATE },
-            createValidator((chain) => chain
-                .exists()
-                .notEmpty()
-                .isUUID()),
-        );
-
-        this.mount(
-            'run_status',
+            'name',
             { optional: true },
             createValidator((chain) => chain
-                .isIn(Object.values(AnalysisNodeRunStatus))
+                .isString()
+                .isLength({ min: 3, max: 128 })
                 .optional({ values: 'null' })),
         );
 
         this.mount(
-            'index',
+            'description',
             { optional: true },
             createValidator((chain) => chain
-                .exists()
-                .isInt()
+                .isString()
+                .isLength({ min: 5, max: 4096 })
                 .optional({ values: 'null' })),
         );
 
         this.mount(
-            'approval_status',
+            'master_image_id',
             { optional: true },
             createValidator((chain) => chain
-                .optional({ nullable: true })
-                .isIn(Object.values(AnalysisNodeApprovalStatus))),
+                .isUUID()
+                .optional({ values: 'null' })),
         );
 
         this.mount(
-            'comment',
+            'registry_id',
             { optional: true },
             createValidator((chain) => chain
-                .optional({ nullable: true })
-                .isString()),
+                .isUUID()
+                .optional({ values: 'null' })),
         );
     }
 }

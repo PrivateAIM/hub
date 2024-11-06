@@ -5,18 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { AnalysisNodeApprovalStatus, AnalysisNodeRunStatus } from '@privateaim/core-kit';
 import { Container } from 'validup';
+import type { AnalysisBucketFile } from '@privateaim/core-kit';
 import { createValidator } from '@validup/adapter-validator';
 import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
-import type { AnalysisNodeEntity } from '../../../../domains';
 
-export class AnalysisNodeValidator extends Container<AnalysisNodeEntity> {
+export class AnalysisBucketFileValidator extends Container<AnalysisBucketFile> {
     protected initialize() {
         super.initialize();
 
         this.mount(
-            'node_id',
+            'bucket_id',
             { group: HTTPHandlerOperation.CREATE },
             createValidator((chain) => chain
                 .exists()
@@ -25,45 +24,37 @@ export class AnalysisNodeValidator extends Container<AnalysisNodeEntity> {
         );
 
         this.mount(
-            'analysis_id',
+            'name',
             { group: HTTPHandlerOperation.CREATE },
             createValidator((chain) => chain
                 .exists()
-                .notEmpty()
-                .isUUID()),
-        );
-
-        this.mount(
-            'run_status',
-            { optional: true },
-            createValidator((chain) => chain
-                .isIn(Object.values(AnalysisNodeRunStatus))
-                .optional({ values: 'null' })),
-        );
-
-        this.mount(
-            'index',
-            { optional: true },
-            createValidator((chain) => chain
-                .exists()
-                .isInt()
-                .optional({ values: 'null' })),
-        );
-
-        this.mount(
-            'approval_status',
-            { optional: true },
-            createValidator((chain) => chain
-                .optional({ nullable: true })
-                .isIn(Object.values(AnalysisNodeApprovalStatus))),
-        );
-
-        this.mount(
-            'comment',
-            { optional: true },
-            createValidator((chain) => chain
-                .optional({ nullable: true })
                 .isString()),
+        );
+
+        this.mount(
+            'name',
+            { group: HTTPHandlerOperation.UPDATE, optional: true },
+            createValidator((chain) => chain
+                .exists()
+                .isString()
+                .optional({ values: 'null' })),
+        );
+
+        this.mount(
+            'external_id',
+            { group: HTTPHandlerOperation.CREATE },
+            createValidator((chain) => chain
+                .exists()
+                .isUUID()),
+        );
+
+        this.mount(
+            'root',
+            createValidator((chain) => chain
+                .optional()
+                .toBoolean()
+                .isBoolean()
+                .default(false)),
         );
     }
 }
