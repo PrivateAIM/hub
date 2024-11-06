@@ -12,13 +12,13 @@ import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import {
-    buildHTTPValidationErrorMessage,
     useRequestIdentityRealm,
     useRequestPermissionChecker,
 } from '@privateaim/server-http-kit';
 import { isAuthupClientUsable, useAuthupClient } from '@privateaim/server-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { isClientErrorWithStatusCode } from '@hapic/harbor';
+import { buildErrorMessageForAttributes } from 'validup';
 import { AnalysisPermissionEntity } from '../../../../domains';
 import { AnalysisPermissionValidator } from '../utils';
 import { HTTPHandlerOperation } from '../../constants';
@@ -44,7 +44,7 @@ export async function updateAnalysisPermissionRouteHandler(req: Request, res: Re
                 data.policy_id = policy.id;
             } catch (e) {
                 if (isClientErrorWithStatusCode(e, 404)) {
-                    throw new BadRequestError(buildHTTPValidationErrorMessage('permission_id'));
+                    throw new BadRequestError(buildErrorMessageForAttributes(['permission_id']));
                 }
 
                 throw e;

@@ -7,7 +7,6 @@
 
 import type { Analysis } from '@privateaim/core-kit';
 import { createNanoID } from '@privateaim/kit';
-import { buildHTTPValidationErrorMessage } from '@privateaim/server-http-kit';
 import { isClientError } from 'hapic';
 import { EntityRelationLookupError } from 'typeorm-extension';
 import {

@@ -9,6 +9,7 @@ import {
     RegistryAPICommand,
 } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
+import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import type { Request, Response } from 'routup';
 import { sendAccepted } from 'routup';
 import { useDataSource } from 'typeorm-extension';
@@ -23,13 +24,15 @@ import {
     buildRegistryTaskQueueRouterPayload,
 } from '../../../../../components';
 import { RegistryEntity, RegistryProjectEntity } from '../../../../../domains';
-import { runServiceRegistryValidation } from '../../utils/validation';
+import { ServiceRegistryValidator } from '../../utils/validation';
 
 export async function handleRegistryCommandRouteHandler(req: Request, res: Response) : Promise<any> {
     const permissionChecker = useRequestPermissionChecker(req);
     await permissionChecker.preCheck({ name: PermissionName.REGISTRY_MANAGE });
 
-    const { data: result } = await runServiceRegistryValidation(req);
+    const validator = new ServiceRegistryValidator();
+    const validatorAdapter = new RoutupContainerAdapter(validator);
+    const result = await validatorAdapter.run(req);
 
     if (!isQueueRouterUsable()) {
         return sendAccepted(res);

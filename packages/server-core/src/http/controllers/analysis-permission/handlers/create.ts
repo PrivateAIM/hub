@@ -9,12 +9,13 @@ import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
-import { buildHTTPValidationErrorMessage, useRequestPermissionChecker } from '@privateaim/server-http-kit';
+import { useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { isAuthupClientUsable, useAuthupClient } from '@privateaim/server-kit';
 import type { Permission } from '@authup/core-kit';
 import { isClientErrorWithStatusCode } from '@hapic/harbor';
 import { BadRequestError } from '@ebec/http';
+import { buildErrorMessageForAttributes } from 'validup';
 import { AnalysisPermissionEntity } from '../../../../domains';
 import { AnalysisPermissionValidator } from '../utils';
 import { HTTPHandlerOperation } from '../../constants';
@@ -49,7 +50,7 @@ export async function createAnalysisPermissionRouteHandler(req: Request, res: Re
                 data.permission_realm_id = permission.realm_id;
             } catch (e) {
                 if (isClientErrorWithStatusCode(e, 404)) {
-                    throw new BadRequestError(buildHTTPValidationErrorMessage('permission_id'));
+                    throw new BadRequestError(buildErrorMessageForAttributes(['permission_id']));
                 }
 
                 throw e;
@@ -73,7 +74,7 @@ export async function createAnalysisPermissionRouteHandler(req: Request, res: Re
                 data.policy_id = policy.id;
             } catch (e) {
                 if (isClientErrorWithStatusCode(e, 404)) {
-                    throw new BadRequestError(buildHTTPValidationErrorMessage('permission_id'));
+                    throw new BadRequestError(buildErrorMessageForAttributes(['permission_id']));
                 }
 
                 throw e;

@@ -31,13 +31,11 @@
     },
     "devDependencies": {
         "@types/cors": "^2.8.17",
-        "express-validator": "^7.2.0",
         "redis-extension": "^2.0.1",
         "routup": "^4.0.1",
         "typeorm-extension": "^3.6.2"
     },
     "peerDependencies": {
-        "express-validator": "^7.2.0",
         "redis-extension": "^2.0.1",
         "routup": "^4.0.1",
         "typeorm-extension": "^3.6.2"

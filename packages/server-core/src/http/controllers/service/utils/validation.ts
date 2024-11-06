@@ -6,10 +6,8 @@
  */
 
 import { RegistryAPICommand } from '@privateaim/core-kit';
-import type { HTTPValidationResult } from '@privateaim/server-http-kit';
-import { createHTTPValidationResult } from '@privateaim/server-http-kit';
-import { check } from 'express-validator';
-import type { Request } from 'routup';
+import { createValidator } from '@validup/adapter-validator';
+import { Container } from 'validup';
 
 type ValidationResult = {
     id: string,
@@ -17,27 +15,29 @@ type ValidationResult = {
     secret?: string
 };
 
-export async function runServiceRegistryValidation(
-    req: Request,
-) : Promise<HTTPValidationResult<ValidationResult>> {
-    await check('id')
-        .exists()
-        .notEmpty()
-        .isUUID()
-        .run(req);
+export class ServiceRegistryValidator extends Container<ValidationResult> {
+    protected initialize() {
+        super.initialize();
 
-    await check('command')
-        .exists()
-        .isString()
-        .custom((value) => Object.values(RegistryAPICommand).includes(value))
-        .run(req);
+        this.mount(
+            'id',
+            createValidator((chain) => chain
+                .isUUID()),
+        );
 
-    await check('secret')
-        .matches(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/)
-        .optional({ nullable: true })
-        .run(req);
+        this.mount(
+            'command',
+            createValidator((chain) => chain
+                .isString()
+                .custom((value) => Object.values(RegistryAPICommand).includes(value))),
+        );
 
-    // ----------------------------------------------
-
-    return createHTTPValidationResult<ValidationResult>(req);
+        this.mount(
+            'secret',
+            { optional: true },
+            createValidator((chain) => chain
+                .matches(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/)
+                .optional({ nullable: true })),
+        );
+    }
 }
