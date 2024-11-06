@@ -27,7 +27,7 @@
         "cors": "^2.8.5",
         "hapic": "^2.5.1",
         "locter": "^2.1.4",
-        "validup": "^0.1.7"
+        "validup": "^0.1.8"
     },
     "devDependencies": {
         "@types/cors": "^2.8.17",
