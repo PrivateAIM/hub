@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { isPropertySet } from '@authup/kit';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/core-kit';
 import { PermissionName } from '@privateaim/kit';
@@ -38,10 +39,6 @@ export async function updateAnalysisNodeRouteHandler(req: Request, res: Response
         throw new NotFoundError();
     }
 
-    if (entity.analysis.configuration_locked) {
-        throw new BadRequestError('The analysis is locked right now. It is not possible to add new nodes.');
-    }
-
     const isAuthorityOfNode = isRealmResourceWritable(useRequestIdentityRealm(req), entity.node_realm_id);
     const isAuthorityOfAnalysis = isRealmResourceWritable(useRequestIdentityRealm(req), entity.analysis_realm_id);
 
@@ -70,18 +67,27 @@ export async function updateAnalysisNodeRouteHandler(req: Request, res: Response
         throw new ForbiddenError();
     }
 
-    if (!isAuthorityOfNode || !canApprove) {
-        if (data.approval_status || data.comment) {
+    if (
+        isPropertySet(data, 'approval_status') ||
+        isPropertySet(data, 'comment')
+    ) {
+        if (!isAuthorityOfNode || !canApprove) {
             throw new BadRequestError(
-                'You are either no authority of the node or you don\'t have the required permissions',
+                'You are either no authority of the node or you don\'t have the required permissions.',
             );
+        }
+    }
+
+    if (isPropertySet(data, 'approval_status')) {
+        if (entity.analysis.configuration_locked) {
+            throw new BadRequestError('The analysis is locked right now. It is not possible to add new nodes.');
         }
     }
 
     if (!isAuthorityOfNode || !canUpdate) {
         if (data.run_status) {
             throw new BadRequestError(
-                'You are either no authority of the node or you don\'t have the required permissions',
+                'You are either no authority of the node or you don\'t have the required permissions.',
             );
         }
     }
@@ -89,7 +95,7 @@ export async function updateAnalysisNodeRouteHandler(req: Request, res: Response
     if (!isAuthorityOfAnalysis || !canUpdate) {
         if (data.index) {
             throw new BadRequestError(
-                'You are either no authority of the analysis or you don\'t have the required permissions',
+                'You are either no authority of the analysis or you don\'t have the required permissions.',
             );
         }
     }
