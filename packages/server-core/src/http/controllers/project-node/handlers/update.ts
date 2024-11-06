@@ -11,10 +11,9 @@ import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
+import { HTTPHandlerOperation, useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { ProjectNodeEntity } from '../../../../domains';
-import { HTTPHandlerOperation } from '../../constants';
 import { ProjectNodeValidator } from '../utils';
 
 export async function updateProjectNodeRouteHandler(req: Request, res: Response) : Promise<any> {

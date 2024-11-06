@@ -10,11 +10,10 @@ import { PermissionName, getHostNameFromString } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { useRequestPermissionChecker } from '@privateaim/server-http-kit';
+import { HTTPHandlerOperation, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { RegistryValidator } from '../utils';
 import { RegistryEntity } from '../../../../domains';
-import { HTTPHandlerOperation } from '../../constants';
 
 export async function updateRegistryRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');

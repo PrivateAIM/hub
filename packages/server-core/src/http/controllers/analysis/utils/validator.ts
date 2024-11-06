@@ -8,7 +8,7 @@
 import { Container } from 'validup';
 import { createValidator } from '@validup/adapter-validator';
 import type { Analysis } from '@privateaim/core-kit';
-import { HTTPHandlerOperation } from '../../constants';
+import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
 
 export class AnalysisValidator extends Container<Analysis> {
     protected initialize() {

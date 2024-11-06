@@ -8,7 +8,7 @@
 import { isRealmResourceWritable } from '@authup/core-kit';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { AnalysisAPICommand } from '@privateaim/core-kit';
-import { useRequestIdentityRealm } from '@privateaim/server-http-kit';
+import { HTTPHandlerOperation, useRequestIdentityRealm } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
@@ -22,7 +22,6 @@ import {
     unlockAnalysisConfiguration,
 } from '../../../../domains';
 import { runAnalysisTearDownCommand } from '../../../../domains/analysis/commands/tear-down';
-import { HTTPHandlerOperation } from '../../constants';
 import { AnalysisCommandValidator } from '../utils';
 
 /**

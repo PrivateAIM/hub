@@ -12,6 +12,7 @@ import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import {
+    HTTPHandlerOperation,
     useRequestIdentityRealm,
     useRequestPermissionChecker,
 } from '@privateaim/server-http-kit';
@@ -21,7 +22,6 @@ import { isClientErrorWithStatusCode } from '@hapic/harbor';
 import { buildErrorMessageForAttributes } from 'validup';
 import { AnalysisPermissionEntity } from '../../../../domains';
 import { AnalysisPermissionValidator } from '../utils';
-import { HTTPHandlerOperation } from '../../constants';
 
 export async function updateAnalysisPermissionRouteHandler(req: Request, res: Response) : Promise<any> {
     const permissionChecker = useRequestPermissionChecker(req);

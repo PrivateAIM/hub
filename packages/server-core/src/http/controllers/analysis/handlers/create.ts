@@ -12,13 +12,13 @@ import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
 import {
+    HTTPHandlerOperation,
     useRequestIdentityOrFail,
     useRequestPermissionChecker,
 } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { AnalysisValidator } from '../utils';
 import { AnalysisEntity, ProjectEntity, runAnalysisSpinUpCommand } from '../../../../domains';
-import { HTTPHandlerOperation } from '../../constants';
 
 export async function createAnalysisRouteHandler(req: Request, res: Response) : Promise<any> {
     const permissionChecker = useRequestPermissionChecker(req);

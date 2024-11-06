@@ -8,8 +8,8 @@
 import { NodeType } from '@privateaim/core-kit';
 import { Container } from 'validup';
 import { createValidator } from '@validup/adapter-validator';
+import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
 import type { NodeEntity } from '../../../../domains';
-import { HTTPHandlerOperation } from '../../constants';
 
 export class NodeValidator extends Container<NodeEntity> {
     protected initialize() {

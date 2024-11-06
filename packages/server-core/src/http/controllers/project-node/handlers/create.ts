@@ -10,14 +10,13 @@ import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
-import { useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
+import { HTTPHandlerOperation, useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { isRealmResourceWritable } from '@authup/core-kit';
 import { NotFoundError } from '@ebec/http';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { ProjectEntity, ProjectNodeEntity } from '../../../../domains';
 import { ProjectNodeValidator } from '../utils';
 import { useEnv } from '../../../../config';
-import { HTTPHandlerOperation } from '../../constants';
 
 export async function createProjectNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const permissionChecker = useRequestPermissionChecker(req);

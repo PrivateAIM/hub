@@ -11,12 +11,11 @@ import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
-import { useRequestPermissionChecker } from '@privateaim/server-http-kit';
+import { HTTPHandlerOperation, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { useEnv } from '../../../../config';
 import { AnalysisEntity, AnalysisNodeEntity, ProjectNodeEntity } from '../../../../domains';
 import { AnalysisNodeValidator } from '../utils';
-import { HTTPHandlerOperation } from '../../constants';
 
 export async function createAnalysisNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const permissionChecker = useRequestPermissionChecker(req);

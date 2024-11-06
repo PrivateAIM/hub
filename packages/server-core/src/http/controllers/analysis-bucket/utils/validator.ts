@@ -9,7 +9,7 @@ import type { AnalysisBucket } from '@privateaim/core-kit';
 import { AnalysisBucketType } from '@privateaim/core-kit';
 import { Container } from 'validup';
 import { createValidator } from '@validup/adapter-validator';
-import { HTTPHandlerOperation } from '../../constants';
+import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
 
 export class AnalysisBucketValidator extends Container<AnalysisBucket> {
     protected initialize() {

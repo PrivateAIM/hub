@@ -8,7 +8,7 @@
 import { Container } from 'validup';
 import type { AnalysisBucketFile } from '@privateaim/core-kit';
 import { createValidator } from '@validup/adapter-validator';
-import { HTTPHandlerOperation } from '../../constants';
+import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
 
 export class AnalysisBucketFileValidator extends Container<AnalysisBucketFile> {
     protected initialize() {

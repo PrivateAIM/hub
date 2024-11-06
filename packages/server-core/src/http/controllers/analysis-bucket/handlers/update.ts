@@ -10,11 +10,10 @@ import { isRealmResourceWritable } from '@authup/core-kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { useRequestIdentityRealm } from '@privateaim/server-http-kit';
+import { HTTPHandlerOperation, useRequestIdentityRealm } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { AnalysisBucketEntity } from '../../../../domains';
 import { AnalysisBucketValidator } from '../utils';
-import { HTTPHandlerOperation } from '../../constants';
 
 export async function updateAnalysisBucketRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');

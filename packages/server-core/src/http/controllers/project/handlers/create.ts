@@ -11,6 +11,7 @@ import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import {
+    HTTPHandlerOperation,
     useRequestIdentityOrFail,
     useRequestIdentityRealm,
     useRequestPermissionChecker,
@@ -20,7 +21,6 @@ import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { DatabaseConflictError } from '../../../../database';
 import { ProjectEntity } from '../../../../domains';
 import { ProjectValidator } from '../utils/validator';
-import { HTTPHandlerOperation } from '../../constants';
 
 export async function createProjectRouteHandler(req: Request, res: Response) : Promise<any> {
     const permissionChecker = useRequestPermissionChecker(req);

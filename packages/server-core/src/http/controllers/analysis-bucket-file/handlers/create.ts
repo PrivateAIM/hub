@@ -8,14 +8,13 @@ import { BadRequestError } from '@ebec/http';
 import {
     AnalysisBucketType,
 } from '@privateaim/core-kit';
-import { useRequestIdentityOrFail } from '@privateaim/server-http-kit';
+import { HTTPHandlerOperation, useRequestIdentityOrFail } from '@privateaim/server-http-kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { AnalysisBucketFileEntity, AnalysisEntity } from '../../../../domains';
 import { AnalysisBucketFileValidator } from '../utils';
-import { HTTPHandlerOperation } from '../../constants';
 
 export async function createAnalysisBucketFileRouteHandler(req: Request, res: Response) : Promise<any> {
     const validator = new AnalysisBucketFileValidator();

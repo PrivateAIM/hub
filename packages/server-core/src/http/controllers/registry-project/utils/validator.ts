@@ -8,8 +8,8 @@
 import { RegistryProjectType } from '@privateaim/core-kit';
 import { Container } from 'validup';
 import { createValidator } from '@validup/adapter-validator';
+import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
 import type { RegistryProjectEntity } from '../../../../domains';
-import { HTTPHandlerOperation } from '../../constants';
 
 export class RegistryProjectValidator extends Container<RegistryProjectEntity> {
     protected initialize() {

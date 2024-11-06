@@ -9,7 +9,7 @@ import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
-import { useRequestPermissionChecker } from '@privateaim/server-http-kit';
+import { HTTPHandlerOperation, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { isAuthupClientUsable, useAuthupClient } from '@privateaim/server-kit';
 import type { Permission } from '@authup/core-kit';
@@ -18,7 +18,6 @@ import { BadRequestError } from '@ebec/http';
 import { buildErrorMessageForAttributes } from 'validup';
 import { AnalysisPermissionEntity } from '../../../../domains';
 import { AnalysisPermissionValidator } from '../utils';
-import { HTTPHandlerOperation } from '../../constants';
 
 export async function createAnalysisPermissionRouteHandler(req: Request, res: Response) : Promise<any> {
     const permissionChecker = useRequestPermissionChecker(req);
