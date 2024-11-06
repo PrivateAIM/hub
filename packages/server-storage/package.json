@@ -20,7 +20,7 @@
         "@privateaim/storage-kit": "^0.8.4",
         "@routup/basic": "^1.4.1",
         "@routup/decorators": "^3.4.1",
-        "@validup/adapter-routup": "^0.1.8",
+        "@validup/adapter-routup": "^0.1.9",
         "@validup/adapter-validator": "^0.1.7",
         "busboy": "^1.6.0",
         "cors": "^2.8.5",
