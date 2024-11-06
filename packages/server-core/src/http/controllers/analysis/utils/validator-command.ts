@@ -6,7 +6,7 @@
  */
 
 import { AnalysisAPICommand } from '@privateaim/core-kit';
-import { createValidator } from '@validup/adapter-validator';
+import { createValidationChain, createValidator } from '@validup/adapter-validator';
 import { Container } from 'validup';
 
 export class AnalysisCommandValidator extends Container<{ command: AnalysisAPICommand }> {
@@ -15,9 +15,12 @@ export class AnalysisCommandValidator extends Container<{ command: AnalysisAPICo
 
         this.mount(
             'command',
-            createValidator((chain) => chain
-                .exists()
-                .custom((command) => Object.values(AnalysisAPICommand).includes(command))),
+            createValidator(() => {
+                const chain = createValidationChain();
+                return chain
+                    .exists()
+                    .custom((command) => Object.values(AnalysisAPICommand).includes(command));
+            }),
         );
     }
 }

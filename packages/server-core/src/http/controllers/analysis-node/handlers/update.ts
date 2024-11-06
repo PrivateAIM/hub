@@ -85,7 +85,7 @@ export async function updateAnalysisNodeRouteHandler(req: Request, res: Response
     }
 
     if (!isAuthorityOfNode || !canUpdate) {
-        if (data.run_status) {
+        if (isPropertySet(data, 'run_status')) {
             throw new BadRequestError(
                 'You are either no authority of the node or you don\'t have the required permissions.',
             );

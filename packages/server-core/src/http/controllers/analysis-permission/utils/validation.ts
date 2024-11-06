@@ -6,7 +6,7 @@
  */
 
 import { Container } from 'validup';
-import { createValidator } from '@validup/adapter-validator';
+import { createValidationChain, createValidator } from '@validup/adapter-validator';
 import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
 import type { AnalysisPermissionEntity } from '../../../../domains';
 
@@ -17,27 +17,38 @@ export class AnalysisPermissionValidator extends Container<AnalysisPermissionEnt
         this.mount(
             'permission_id',
             { group: HTTPHandlerOperation.CREATE },
-            createValidator((chain) => chain
-                .exists()
-                .notEmpty()
-                .isUUID()),
+            createValidator(() => {
+                const chain = createValidationChain();
+                return chain
+                    .exists()
+                    .notEmpty()
+                    .isUUID();
+            }),
         );
 
         this.mount(
             'analysis_id',
             { group: HTTPHandlerOperation.CREATE },
-            createValidator((chain) => chain
-                .exists()
-                .notEmpty()
-                .isUUID()),
+            createValidator(() => {
+                const chain = createValidationChain();
+
+                return chain
+                    .exists()
+                    .notEmpty()
+                    .isUUID();
+            }),
         );
 
         this.mount(
             'policy_id',
             { optional: true },
-            createValidator((chain) => chain
-                .isUUID()
-                .optional({ values: 'null' })),
+            createValidator(() => {
+                const chain = createValidationChain();
+
+                return chain
+                    .isUUID()
+                    .optional({ values: 'null' });
+            }),
         );
     }
 }

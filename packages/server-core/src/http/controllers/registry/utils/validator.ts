@@ -6,7 +6,7 @@
  */
 
 import { Container } from 'validup';
-import { createValidator } from '@validup/adapter-validator';
+import { createValidationChain, createValidator } from '@validup/adapter-validator';
 import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
 import type { RegistryEntity } from '../../../../domains';
 
@@ -14,58 +14,66 @@ export class RegistryValidator extends Container<RegistryEntity> {
     protected initialize() {
         super.initialize();
 
+        const nameValidator = createValidator(() => {
+            const chain = createValidationChain();
+            return chain
+                .exists()
+                .isLength({ min: 3, max: 128 });
+        });
+
         this.mount(
             'name',
             { group: HTTPHandlerOperation.CREATE },
-            createValidator((chain) => chain
-                .exists()
-                .isLength({ min: 3, max: 128 })),
+            nameValidator,
         );
 
         this.mount(
             'name',
             { group: HTTPHandlerOperation.UPDATE, optional: true },
-            createValidator((chain) => chain
-                .exists()
-                .isLength({ min: 3, max: 128 })
-                .optional({ values: 'null' })),
+            nameValidator,
         );
 
+        const hostValidator = createValidator(() => {
+            const chain = createValidationChain();
+            return chain
+                .exists()
+                .isString()
+                .isLength({ min: 3, max: 512 });
+        });
         this.mount(
             'host',
             { group: HTTPHandlerOperation.CREATE },
-            createValidator((chain) => chain
-                .exists()
-                .isString()
-                .isLength({ min: 3, max: 512 })),
+            hostValidator,
         );
 
         this.mount(
             'host',
             { group: HTTPHandlerOperation.CREATE, optional: true },
-            createValidator((chain) => chain
-                .exists()
-                .isString()
-                .isLength({ min: 3, max: 512 })
-                .optional({ values: 'null' })),
+            hostValidator,
         );
 
         this.mount(
             'account_name',
             { optional: true },
-            createValidator((chain) => chain
-                .exists()
-                .isLength({ min: 3, max: 256 })
-                .optional({ nullable: true })),
+            createValidator(() => {
+                const chain = createValidationChain();
+                return chain
+                    .exists()
+                    .isLength({ min: 3, max: 256 })
+                    .optional({ nullable: true });
+            }),
         );
 
         this.mount(
             'account_secret',
             { optional: true },
-            createValidator((chain) => chain
-                .exists()
-                .isLength({ min: 3, max: 256 })
-                .optional({ nullable: true })),
+            createValidator(() => {
+                const chain = createValidationChain();
+                return chain
+                    .exists()
+                    .isLength({ min: 3, max: 256 })
+                    .optional({ nullable: true });
+            }),
         );
     }
 }

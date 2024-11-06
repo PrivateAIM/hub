@@ -6,7 +6,7 @@
  */
 
 import { Container } from 'validup';
-import { createValidator } from '@validup/adapter-validator';
+import { createValidationChain, createValidator } from '@validup/adapter-validator';
 import type { Analysis } from '@privateaim/core-kit';
 import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
 
@@ -17,44 +17,59 @@ export class AnalysisValidator extends Container<Analysis> {
         this.mount(
             'project_id',
             { group: HTTPHandlerOperation.CREATE },
-            createValidator((chain) => chain
-                .exists()
-                .notEmpty()
-                .isUUID()),
+            createValidator(() => {
+                const chain = createValidationChain();
+                return chain
+                    .exists()
+                    .notEmpty()
+                    .isUUID();
+            }),
         );
 
         this.mount(
             'name',
             { optional: true },
-            createValidator((chain) => chain
-                .isString()
-                .isLength({ min: 3, max: 128 })
-                .optional({ values: 'null' })),
+            createValidator(() => {
+                const chain = createValidationChain();
+                return chain
+                    .isString()
+                    .isLength({ min: 3, max: 128 })
+                    .optional({ values: 'null' });
+            }),
         );
 
         this.mount(
             'description',
             { optional: true },
-            createValidator((chain) => chain
-                .isString()
-                .isLength({ min: 5, max: 4096 })
-                .optional({ values: 'null' })),
+            createValidator(() => {
+                const chain = createValidationChain();
+                return chain
+                    .isString()
+                    .isLength({ min: 5, max: 4096 })
+                    .optional({ values: 'null' });
+            }),
         );
 
         this.mount(
             'master_image_id',
             { optional: true },
-            createValidator((chain) => chain
-                .isUUID()
-                .optional({ values: 'null' })),
+            createValidator(() => {
+                const chain = createValidationChain();
+                return chain
+                    .isUUID()
+                    .optional({ values: 'null' });
+            }),
         );
 
         this.mount(
             'registry_id',
             { optional: true },
-            createValidator((chain) => chain
-                .isUUID()
-                .optional({ values: 'null' })),
+            createValidator(() => {
+                const chain = createValidationChain();
+                return chain
+                    .isUUID()
+                    .optional({ values: 'null' });
+            }),
         );
     }
 }

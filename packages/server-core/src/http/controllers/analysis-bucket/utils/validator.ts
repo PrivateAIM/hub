@@ -8,7 +8,7 @@
 import type { AnalysisBucket } from '@privateaim/core-kit';
 import { AnalysisBucketType } from '@privateaim/core-kit';
 import { Container } from 'validup';
-import { createValidator } from '@validup/adapter-validator';
+import { createValidationChain, createValidator } from '@validup/adapter-validator';
 import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
 
 export class AnalysisBucketValidator extends Container<AnalysisBucket> {
@@ -18,18 +18,26 @@ export class AnalysisBucketValidator extends Container<AnalysisBucket> {
         this.mount(
             'analysis_id',
             { group: HTTPHandlerOperation.CREATE },
-            createValidator((chain) => chain
-                .exists()
-                .notEmpty()
-                .isUUID()),
+            createValidator(() => {
+                const chain = createValidationChain();
+
+                return chain
+                    .exists()
+                    .notEmpty()
+                    .isUUID();
+            }),
         );
 
         this.mount(
             'type',
             { group: HTTPHandlerOperation.CREATE },
-            createValidator((chain) => chain
-                .notEmpty()
-                .isIn(Object.values(AnalysisBucketType))),
+            createValidator(() => {
+                const chain = createValidationChain();
+
+                return chain
+                    .notEmpty()
+                    .isIn(Object.values(AnalysisBucketType));
+            }),
         );
     }
 }

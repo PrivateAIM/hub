@@ -6,7 +6,7 @@
  */
 
 import { RegistryAPICommand } from '@privateaim/core-kit';
-import { createValidator } from '@validup/adapter-validator';
+import { createValidationChain, createValidator } from '@validup/adapter-validator';
 import { Container } from 'validup';
 
 type ValidationResult = {
@@ -21,23 +21,32 @@ export class ServiceRegistryValidator extends Container<ValidationResult> {
 
         this.mount(
             'id',
-            createValidator((chain) => chain
-                .isUUID()),
+            createValidator(() => {
+                const chain = createValidationChain();
+                return chain
+                    .isUUID();
+            }),
         );
 
         this.mount(
             'command',
-            createValidator((chain) => chain
-                .isString()
-                .custom((value) => Object.values(RegistryAPICommand).includes(value))),
+            createValidator(() => {
+                const chain = createValidationChain();
+                return chain
+                    .isString()
+                    .custom((value) => Object.values(RegistryAPICommand).includes(value));
+            }),
         );
 
         this.mount(
             'secret',
             { optional: true },
-            createValidator((chain) => chain
-                .matches(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/)
-                .optional({ nullable: true })),
+            createValidator(() => {
+                const chain = createValidationChain();
+                return chain
+                    .matches(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/)
+                    .optional({ nullable: true });
+            }),
         );
     }
 }

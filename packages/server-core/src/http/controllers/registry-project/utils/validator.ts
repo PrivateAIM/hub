@@ -7,7 +7,7 @@
 
 import { RegistryProjectType } from '@privateaim/core-kit';
 import { Container } from 'validup';
-import { createValidator } from '@validup/adapter-validator';
+import { createValidationChain, createValidator } from '@validup/adapter-validator';
 import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
 import type { RegistryProjectEntity } from '../../../../domains';
 
@@ -18,54 +18,61 @@ export class RegistryProjectValidator extends Container<RegistryProjectEntity> {
         this.mount(
             'registry_id',
             { group: HTTPHandlerOperation.CREATE },
-            createValidator((chain) => chain
-                .exists()
-                .notEmpty()
-                .isUUID()),
+            createValidator(() => {
+                const chain = createValidationChain();
+                return chain
+                    .exists()
+                    .notEmpty()
+                    .isUUID();
+            }),
         );
 
+        const nameValidator = createValidator(() => {
+            const chain = createValidationChain();
+            return chain
+                .exists()
+                .isLength({ min: 5, max: 128 });
+        });
         this.mount(
             'name',
             { group: HTTPHandlerOperation.CREATE },
-            createValidator((chain) => chain
-                .exists()
-                .isLength({ min: 5, max: 128 })),
+            nameValidator,
         );
 
         this.mount(
             'name',
             { group: HTTPHandlerOperation.UPDATE, optional: true },
-            createValidator((chain) => chain
-                .exists()
-                .isLength({ min: 5, max: 128 })
-                .optional({ values: 'null' })),
+            nameValidator,
         );
 
+        const externalNameValidator = createValidator(() => {
+            const chain = createValidationChain();
+            return chain
+                .isLength({ min: 1, max: 255 })
+                .exists()
+                .matches(/^[a-z0-9-_]*$/);
+        });
         this.mount(
             'external_name',
             { group: HTTPHandlerOperation.CREATE },
-            createValidator((chain) => chain
-                .isLength({ min: 1, max: 255 })
-                .exists()
-                .matches(/^[a-z0-9-_]*$/)),
+            externalNameValidator,
         );
 
         this.mount(
             'external_name',
             { group: HTTPHandlerOperation.UPDATE, optional: true },
-            createValidator((chain) => chain
-                .isLength({ min: 1, max: 255 })
-                .exists()
-                .matches(/^[a-z0-9-_]*$/)
-                .optional({ values: 'null' })),
+            externalNameValidator,
         );
 
         this.mount(
             'type',
             { group: HTTPHandlerOperation.CREATE },
-            createValidator((chain) => chain
-                .exists()
-                .isIn(Object.values(RegistryProjectType))),
+            createValidator(() => {
+                const chain = createValidationChain();
+                return chain
+                    .exists()
+                    .isIn(Object.values(RegistryProjectType));
+            }),
         );
     }
 }

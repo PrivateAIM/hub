@@ -7,7 +7,7 @@
 
 import { ProjectNodeApprovalStatus } from '@privateaim/core-kit';
 import { Container } from 'validup';
-import { createValidator } from '@validup/adapter-validator';
+import { createValidationChain, createValidator } from '@validup/adapter-validator';
 import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
 import type { ProjectNodeEntity } from '../../../../domains';
 
@@ -18,36 +18,48 @@ export class ProjectNodeValidator extends Container<ProjectNodeEntity> {
         this.mount(
             'project_id',
             { group: HTTPHandlerOperation.CREATE },
-            createValidator((chain) => chain
-                .exists()
-                .notEmpty()
-                .isUUID()),
+            createValidator(() => {
+                const chain = createValidationChain();
+                return chain
+                    .exists()
+                    .notEmpty()
+                    .isUUID();
+            }),
         );
 
         this.mount(
             'node_id',
             { group: HTTPHandlerOperation.CREATE },
-            createValidator((chain) => chain
-                .exists()
-                .notEmpty()
-                .isUUID()),
+            createValidator(() => {
+                const chain = createValidationChain();
+                return chain
+                    .exists()
+                    .notEmpty()
+                    .isUUID();
+            }),
         );
 
         this.mount(
             'approval_status',
             { group: HTTPHandlerOperation.UPDATE },
-            createValidator((chain) => chain
-                .optional({ values: 'null' })
-                .isIn(Object.values(ProjectNodeApprovalStatus))),
+            createValidator(() => {
+                const chain = createValidationChain();
+                return chain
+                    .optional({ values: 'null' })
+                    .isIn(Object.values(ProjectNodeApprovalStatus));
+            }),
         );
 
         this.mount(
             'comment',
             { group: HTTPHandlerOperation.UPDATE, optional: true },
-            createValidator((chain) => chain
-                .optional({ nullable: true })
-                .isString()
-                .isLength({ min: 3, max: 4096 })),
+            createValidator(() => {
+                const chain = createValidationChain();
+                return chain
+                    .optional({ nullable: true })
+                    .isString()
+                    .isLength({ min: 3, max: 4096 });
+            }),
         );
     }
 }

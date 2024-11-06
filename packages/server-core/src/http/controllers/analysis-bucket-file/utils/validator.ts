@@ -7,7 +7,7 @@
 
 import { Container } from 'validup';
 import type { AnalysisBucketFile } from '@privateaim/core-kit';
-import { createValidator } from '@validup/adapter-validator';
+import { createValidationChain, createValidator } from '@validup/adapter-validator';
 import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
 
 export class AnalysisBucketFileValidator extends Container<AnalysisBucketFile> {
@@ -17,44 +17,56 @@ export class AnalysisBucketFileValidator extends Container<AnalysisBucketFile> {
         this.mount(
             'bucket_id',
             { group: HTTPHandlerOperation.CREATE },
-            createValidator((chain) => chain
-                .exists()
-                .notEmpty()
-                .isUUID()),
+            createValidator(() => {
+                const chain = createValidationChain();
+                return chain
+                    .exists()
+                    .notEmpty()
+                    .isUUID();
+            }),
         );
 
+        const nameValidator = createValidator(() => {
+            const chain = createValidationChain();
+
+            return chain
+                .exists()
+                .isString();
+        });
         this.mount(
             'name',
             { group: HTTPHandlerOperation.CREATE },
-            createValidator((chain) => chain
-                .exists()
-                .isString()),
+            nameValidator,
         );
 
         this.mount(
             'name',
             { group: HTTPHandlerOperation.UPDATE, optional: true },
-            createValidator((chain) => chain
-                .exists()
-                .isString()
-                .optional({ values: 'null' })),
+            nameValidator,
         );
 
         this.mount(
             'external_id',
             { group: HTTPHandlerOperation.CREATE },
-            createValidator((chain) => chain
-                .exists()
-                .isUUID()),
+            createValidator(() => {
+                const chain = createValidationChain();
+
+                return chain
+                    .exists()
+                    .isUUID();
+            }),
         );
 
         this.mount(
             'root',
-            createValidator((chain) => chain
-                .optional()
-                .toBoolean()
-                .isBoolean()
-                .default(false)),
+            createValidator(() => {
+                const chain = createValidationChain();
+                return chain
+                    .optional()
+                    .toBoolean()
+                    .isBoolean()
+                    .default(false);
+            }),
         );
     }
 }

@@ -20,8 +20,8 @@
         "@privateaim/storage-kit": "^0.8.4",
         "@routup/basic": "^1.4.1",
         "@routup/decorators": "^3.4.1",
-        "@validup/adapter-routup": "^0.1.8",
-        "@validup/adapter-validator": "^0.1.7",
+        "@validup/adapter-routup": "^0.1.9",
+        "@validup/adapter-validator": "^0.2.0",
         "busboy": "^1.6.0",
         "cors": "^2.8.5",
         "dotenv": "^16.4.4",
@@ -36,7 +36,7 @@
         "tar-stream": "^3.1.6",
         "typeorm": "^0.3.20",
         "typeorm-extension": "^3.6.3",
-        "validup": "^0.1.7"
+        "validup": "^0.1.8"
     },
     "devDependencies": {
         "@types/busboy": "^1.5.3",
