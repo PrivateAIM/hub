@@ -18,7 +18,8 @@ import { HTTPHandlerOperation, useRequestIdentityRealm, useRequestPermissionChec
 import { isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../../../components';
-import { NodeValidator, createNodeRobot } from '../utils';
+import { isNodeRobotServiceUsable, useNodeRobotService } from '../../../../services';
+import { NodeValidator } from '../utils';
 import { NodeEntity, RegistryProjectEntity } from '../../../../domains';
 
 export async function updateNodeRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -124,7 +125,15 @@ export async function updateNodeRouteHandler(req: Request, res: Response) : Prom
         }
     }
 
-    await createNodeRobot(entity);
+    // -----------------------------------------------------
+
+    if (isNodeRobotServiceUsable()) {
+        const nodeRobotService = useNodeRobotService();
+        const robot = await nodeRobotService.save(entity);
+        await nodeRobotService.assignPermissions(robot);
+    }
+
+    // -----------------------------------------------------
 
     await repository.save(entity);
 

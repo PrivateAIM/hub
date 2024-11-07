@@ -18,7 +18,8 @@ import { isRealmResourceWritable } from '@authup/core-kit';
 import { ForbiddenError } from '@ebec/http';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../../../components';
-import { NodeValidator, createNodeRobot } from '../utils';
+import { isNodeRobotServiceUsable, useNodeRobotService } from '../../../../services';
+import { NodeValidator } from '../utils';
 import {
     NodeEntity, RegistryEntity, RegistryProjectEntity,
 } from '../../../../domains';
@@ -110,7 +111,11 @@ export async function createNodeRouteHandler(req: Request, res: Response) : Prom
 
     // -----------------------------------------------------
 
-    await createNodeRobot(entity);
+    if (isNodeRobotServiceUsable()) {
+        const nodeRobotService = useNodeRobotService();
+        const robot = await nodeRobotService.save(entity);
+        await nodeRobotService.assignPermissions(robot);
+    }
 
     // -----------------------------------------------------
 
