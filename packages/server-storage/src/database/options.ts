@@ -6,7 +6,7 @@
  */
 
 import type { DataSourceOptions } from 'typeorm';
-import { adjustFilePath, readDataSourceOptionsFromEnv } from 'typeorm-extension';
+import { readDataSourceOptionsFromEnv } from 'typeorm-extension';
 import { EnvironmentName, useEnv } from '../config';
 import { BucketEntity, BucketFileEntity } from '../domains';
 
@@ -25,11 +25,11 @@ export async function extendDataSourceOptions(options: DataSourceOptions): Promi
     };
 
     const migrations: string[] = [];
-    const migration = await adjustFilePath(
-        `src/database/migrations/${options.type}/*.{ts,js}`,
-    );
+    // const migration = await adjustFilePath(
+    //    `src/database/migrations/${options.type}/*.{ts,js}`,
+    // );
 
-    migrations.push(migration);
+    // migrations.push(migration);
 
     Object.assign(options, {
         migrations,
