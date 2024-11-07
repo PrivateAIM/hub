@@ -53,6 +53,8 @@ export class NodeRobotService {
                 name: entity.id,
                 realm_id: entity.realm_id,
             });
+
+            entity.robot_id = robot.id;
         }
 
         return robot;
