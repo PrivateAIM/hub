@@ -4,13 +4,15 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import type { RealmEventContext } from '@authup/core-kit';
+import type {
+    DomainType, EventRecord, Realm,
+} from '@authup/core-kit';
 import { useDataSource } from 'typeorm-extension';
 import {
     AnalysisEntity, NodeEntity, ProjectEntity, ProjectNodeEntity, RegistryProjectEntity,
 } from '../../../domains';
 
-export async function handleAuthupRealmEvent(context: RealmEventContext) {
+export async function handleAuthupRealmEvent(context: EventRecord<DomainType.REALM, Realm>) {
     if (context.event === 'deleted') {
         const dataSource = await useDataSource();
 

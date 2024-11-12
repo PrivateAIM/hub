@@ -6,7 +6,7 @@
   -->
 
 <script lang="ts">
-import { useStore } from '@authup/client-web-kit';
+import { injectStore } from '@authup/client-web-kit';
 import { IVuelidate } from '@ilingo/vuelidate';
 import useVuelidate from '@vuelidate/core';
 import { maxLength, minLength, required } from '@vuelidate/validators';
@@ -28,6 +28,8 @@ export default defineComponent({
     },
     emits: ['done', 'failed'],
     setup(props, { emit }) {
+        const store = injectStore();
+
         const realmId = toRef(props, 'realmId');
 
         const form = reactive({
@@ -59,8 +61,6 @@ export default defineComponent({
 
             },
         }, form);
-
-        const store = useStore();
 
         const busy = ref(false);
 

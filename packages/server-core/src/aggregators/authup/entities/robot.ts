@@ -5,14 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { RobotEventContext } from '@authup/core-kit';
+import type {
+    DomainType, EventRecord, Robot,
+} from '@authup/core-kit';
 import { ServiceID } from '@privateaim/core-kit';
 import { useDataSource } from 'typeorm-extension';
 import { useQueueRouter } from '@privateaim/server-kit';
 import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../../components';
 import { RegistryProjectEntity } from '../../../domains';
 
-export async function handleAuthupRobotEvent(context: RobotEventContext) {
+export async function handleAuthupRobotEvent(context: EventRecord<DomainType.ROBOT, Robot>) {
     if (
         context.event !== 'created' &&
         context.event !== 'updated'

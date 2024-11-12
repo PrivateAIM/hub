@@ -10,7 +10,7 @@ import { storeToRefs } from 'pinia';
 import {
     FPagination, FProjectItem, FProjects, FSearch, FTitle,
 } from '@privateaim/client-vue';
-import { useStore } from '@authup/client-web-kit';
+import { injectStore } from '@authup/client-web-kit';
 import { PermissionName } from '@privateaim/kit';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
 import { defineNuxtComponent, definePageMeta } from '#imports';
@@ -39,7 +39,7 @@ export default defineNuxtComponent({
             ],
         });
 
-        const store = useStore();
+        const store = injectStore();
         const { realmId } = storeToRefs(store);
 
         const query = computed(() => ({

@@ -5,7 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { useStore } from '@authup/client-web-kit';
+import { injectStore } from '@authup/client-web-kit';
 import type { Node } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import { storeToRefs } from 'pinia';
@@ -26,7 +26,7 @@ export default defineNuxtComponent({
             ],
         });
 
-        const store = useStore();
+        const store = injectStore();
         const { realmManagementId, realmManagementName } = storeToRefs(store);
 
         const handleCreated = async (e: Node) => {

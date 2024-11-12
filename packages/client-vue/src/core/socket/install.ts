@@ -6,7 +6,7 @@
  */
 
 import {
-    StoreDispatcherEventName, injectStoreDispatcher, storeToRefs, useStore,
+    StoreDispatcherEventName, injectStore, injectStoreDispatcher, storeToRefs,
 } from '@authup/client-web-kit';
 import { ClientManager } from '@authup/core-realtime-kit';
 import type { CTSEvents, STCEvents } from '@privateaim/core-realtime-kit';
@@ -15,7 +15,7 @@ import { provideSocketManager } from './singleton';
 import type { SocketManagerInstallOptions } from './types';
 
 export function installSocketManager(app: App, options: SocketManagerInstallOptions) {
-    const store = useStore();
+    const store = injectStore();
     const { accessToken } = storeToRefs(store);
 
     const manager = new ClientManager<

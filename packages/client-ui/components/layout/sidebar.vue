@@ -5,7 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { useStore } from '@authup/client-web-kit';
+import { injectStore } from '@authup/client-web-kit';
 import { injectCoreHTTPClient } from '@privateaim/client-vue';
 import { VCCountdown } from '@vuecs/countdown';
 import { VCNavItems } from '@vuecs/navigation';
@@ -17,7 +17,7 @@ export default defineNuxtComponent({
     components: { VCCountdown, VCNavItems },
     setup() {
         const api = injectCoreHTTPClient();
-        const store = useStore();
+        const store = injectStore();
 
         const { loggedIn, accessTokenExpireDate: tokenExpireDate, realmManagement } = storeToRefs(store);
 

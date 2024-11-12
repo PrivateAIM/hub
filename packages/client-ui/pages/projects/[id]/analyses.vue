@@ -5,7 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { useStore } from '@authup/client-web-kit';
+import { injectStore } from '@authup/client-web-kit';
 import { storeToRefs } from 'pinia';
 import { computed, toRef } from 'vue';
 import type { PropType } from 'vue';
@@ -28,7 +28,7 @@ export default defineNuxtComponent({
     setup(props) {
         const entity = toRef(props, 'entity');
 
-        const store = useStore();
+        const store = injectStore();
         const { realmId } = storeToRefs(store);
 
         const isOwner = computed(() => entity.value.realm_id === realmId.value);

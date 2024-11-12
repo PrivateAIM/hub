@@ -41,7 +41,7 @@ export default defineNuxtConfig({
         'bootstrap-vue-next/dist/bootstrap-vue-next.css',
         '@vuecs/pagination/dist/index.css',
         '@vuecs/navigation/dist/index.css',
-        '@authup/client-web-kit/index.css',
+        '@authup/client-web-kit/dist/index.css',
         '@/../client-vue/dist/index.css',
         '@fortawesome/fontawesome-free/css/all.css',
         'bootstrap/dist/css/bootstrap.css',

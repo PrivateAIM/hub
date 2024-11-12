@@ -24,7 +24,7 @@ import type {
 import {
     computed, isRef, onMounted, onUnmounted, watch,
 } from 'vue';
-import { storeToRefs, useStore } from '@authup/client-web-kit';
+import { injectStore, storeToRefs } from '@authup/client-web-kit';
 import type { EntitySocket, EntitySocketContext } from './type';
 import { injectSocketManager, isSocketManagerUsable } from '../socket';
 
@@ -46,7 +46,7 @@ export function createEntitySocket<
     }
 
     const socketManager = injectSocketManager();
-    const store = useStore();
+    const store = injectStore();
     const storeRefs = storeToRefs(store);
 
     const realmId = computed(() => {

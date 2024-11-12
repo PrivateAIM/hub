@@ -5,7 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { usePermissionCheck, useStore } from '@authup/client-web-kit';
+import { usePermissionCheck, injectStore } from '@authup/client-web-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { ProjectNode } from '@privateaim/core-kit';
 import { storeToRefs } from 'pinia';
@@ -40,7 +40,7 @@ export default defineNuxtComponent({
         });
 
         const api = injectCoreHTTPClient();
-        const store = useStore();
+        const store = injectStore();
         const { realmId } = storeToRefs(store);
 
         const canManage = usePermissionCheck({ name: PermissionName.PROJECT_APPROVE });

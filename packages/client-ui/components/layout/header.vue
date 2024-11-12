@@ -5,7 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { useStore } from '@authup/client-web-kit';
+import { injectStore } from '@authup/client-web-kit';
 import { VCGravatar } from '@vuecs/gravatar';
 import { VCNavItems } from '@vuecs/navigation';
 import { BCollapse } from 'bootstrap-vue-next';
@@ -21,7 +21,7 @@ export default defineNuxtComponent({
         VCNavItems,
     },
     setup() {
-        const store = useStore();
+        const store = injectStore();
         const { loggedIn, user, realmManagementName } = storeToRefs(store);
 
         const displayNav = ref(false);

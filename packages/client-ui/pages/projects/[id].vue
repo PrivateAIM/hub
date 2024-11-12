@@ -5,7 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { usePermissionCheck, useStore } from '@authup/client-web-kit';
+import { usePermissionCheck, injectStore } from '@authup/client-web-kit';
 import type {
     Project,
     ProjectNode,
@@ -39,7 +39,7 @@ export default defineComponent({
 
         const toast = useToast();
         const route = useRoute();
-        const store = useStore();
+        const store = injectStore();
         const api = injectCoreHTTPClient();
 
         const canEdit = usePermissionCheck({ name: PermissionName.PROJECT_UPDATE });

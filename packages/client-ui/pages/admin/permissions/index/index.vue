@@ -9,7 +9,7 @@
 import { VCTimeago } from '@vuecs/timeago';
 import { BTable } from 'bootstrap-vue-next';
 import {
-    AEntityDelete, APagination, APermissions, ASearch, ATitle, usePermissionCheck, useStore,
+    AEntityDelete, APagination, APermissions, ASearch, ATitle, usePermissionCheck, injectStore,
 } from '@authup/client-web-kit';
 import type { Permission } from '@authup/core-kit';
 import { PermissionName, isRealmResourceWritable } from '@authup/core-kit';
@@ -33,7 +33,7 @@ export default defineNuxtComponent({
             emit('deleted', e);
         };
 
-        const store = useStore();
+        const store = injectStore();
         const { realm, realmManagementId } = storeToRefs(store);
 
         const query : BuildInput<Permission> = {

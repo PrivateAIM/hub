@@ -5,7 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { usePermissionCheck, useStore } from '@authup/client-web-kit';
+import { usePermissionCheck, injectStore } from '@authup/client-web-kit';
 import { PermissionName } from '@privateaim/kit';
 import { VCTimeago } from '@vuecs/timeago';
 import type { Node } from '@privateaim/core-kit';
@@ -55,7 +55,7 @@ export default defineNuxtComponent({
             },
         ];
 
-        const store = useStore();
+        const store = injectStore();
         const { realmManagementId } = storeToRefs(store);
 
         const canEdit = usePermissionCheck({ name: PermissionName.NODE_UPDATE });

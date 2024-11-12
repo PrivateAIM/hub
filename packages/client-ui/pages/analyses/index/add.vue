@@ -5,7 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { useStore } from '@authup/client-web-kit';
+import { injectStore } from '@authup/client-web-kit';
 import type { Analysis } from '@privateaim/core-kit';
 import { storeToRefs } from 'pinia';
 import { ref } from 'vue';
@@ -19,7 +19,7 @@ export default defineNuxtComponent({
     setup(_props, { emit }) {
         const projectId = ref<string | null>(null);
 
-        const store = useStore();
+        const store = injectStore();
         const { realmId } = storeToRefs(store);
 
         const route = useRoute();

@@ -6,7 +6,7 @@
   -->
 
 <script lang="ts">
-import { injectHTTPClient, useStore } from '@authup/client-web-kit';
+import { injectHTTPClient, injectStore } from '@authup/client-web-kit';
 import type { Robot } from '@authup/core-kit';
 import { PermissionName, isRealmResourceWritable } from '@authup/core-kit';
 import { storeToRefs } from 'pinia';
@@ -49,7 +49,7 @@ export default defineComponent({
 
         const toast = useToast();
         const route = useRoute();
-        const store = useStore();
+        const store = injectStore();
 
         const entity: Ref<Robot> = ref(null) as any;
 

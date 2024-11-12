@@ -41,10 +41,10 @@
     },
     "homepage": "https://github.com/PrivateAim/hub#readme",
     "devDependencies": {
-        "@authup/client-web-kit": "^1.0.0-beta.22",
+        "@authup/client-web-kit": "^1.0.0-beta.23",
         "@authup/core-kit": "^1.0.0-beta.23",
-        "@authup/core-http-kit": "^1.0.0-beta.22",
-        "@authup/core-realtime-kit": "^1.0.0-beta.22",
+        "@authup/core-http-kit": "^1.0.0-beta.23",
+        "@authup/core-realtime-kit": "^1.0.0-beta.23",
         "@authup/kit": "^1.0.0-beta.23",
         "@ilingo/vuelidate": "^5.0.3",
         "@privateaim/core-kit": "^0.8.4",
