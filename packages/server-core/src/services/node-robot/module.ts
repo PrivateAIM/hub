@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Robot } from '@authup/core-kit';
+import type { Permission, Robot } from '@authup/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { AuthupClient } from '@privateaim/server-kit';
-import { useAuthupClient } from '@privateaim/server-kit';
+import { useAuthupClient, useLogger } from '@privateaim/server-kit';
 import { isClientErrorWithStatusCode } from 'hapic';
 import type { NodeEntity } from '../../domains';
 
@@ -100,7 +100,19 @@ export class NodeRobotService {
                 continue;
             }
 
-            const permission = await this.authup.permission.getOne(permissionNames[i]);
+            let permission : Permission;
+
+            try {
+                permission = await this.authup.permission.getOne(permissionNames[i]);
+            } catch (e) {
+                if (!isClientErrorWithStatusCode(e, 404)) {
+                    throw e;
+                }
+
+                useLogger()
+                    .warn(`The node-robot permission could not be created, due non existing permission ${permissionNames[i]}.`);
+            }
+
             await this.authup.robotPermission.create({
                 robot_id: robot.id,
                 permission_id: permission.id,
