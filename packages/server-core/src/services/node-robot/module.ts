@@ -113,10 +113,12 @@ export class NodeRobotService {
                     .warn(`The node-robot permission could not be created, due non existing permission ${permissionNames[i]}.`);
             }
 
-            await this.authup.robotPermission.create({
-                robot_id: robot.id,
-                permission_id: permission.id,
-            });
+            if (permission) {
+                await this.authup.robotPermission.create({
+                    robot_id: robot.id,
+                    permission_id: permission.id,
+                });
+            }
         }
     }
 }
