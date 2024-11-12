@@ -22,6 +22,9 @@ updates:
           majorProd:
               applies-to: version-updates
               dependency-type: production
+              exclude-patterns:
+                  - "prom-client"
+                  - "nanoid"
               update-types:
                   - "major"
           majorDev:
@@ -29,8 +32,6 @@ updates:
               dependency-type: development
               exclude-patterns:
                   - "eslint"
-                  - "prom-client"
-                  - "nanoid"
               update-types:
                   - "major"
           minorAndPatch:
