@@ -12,7 +12,7 @@ import {
     PermissionName, isRealmResourceWritable,
 } from '@authup/core-kit';
 import {
-    AEntityDelete, AUsers, usePermissionCheck, injectStore,
+    AEntityDelete, AUsers, injectStore, usePermissionCheck,
 } from '@authup/client-web-kit';
 import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';

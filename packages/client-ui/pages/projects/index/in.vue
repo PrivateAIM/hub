@@ -5,7 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { usePermissionCheck, injectStore } from '@authup/client-web-kit';
+import { injectStore, usePermissionCheck } from '@authup/client-web-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { ProjectNode } from '@privateaim/core-kit';
 import { storeToRefs } from 'pinia';
