@@ -11,10 +11,10 @@ import {
     DomainType,
     NodeType,
 } from '@privateaim/core-kit';
-import { alphaNumHyphenUnderscoreRegex, hexToUTF8, isHex } from '@privateaim/kit';
+import { alphaNumHyphenUnderscoreRegex } from '@privateaim/kit';
 import {
     buildFormGroup,
-    buildFormInput, buildFormInputCheckbox, buildFormSelect, buildFormTextarea,
+    buildFormInput, buildFormInputCheckbox, buildFormSelect,
 } from '@vuecs/form-controls';
 import type { ListBodySlotProps, ListItemSlotProps } from '@vuecs/list-controls';
 import useVuelidate from '@vuelidate/core';
@@ -57,7 +57,6 @@ export default defineComponent({
         const busy = ref(false);
         const form = reactive({
             name: '',
-            public_key: '',
             external_name: '',
             realm_id: '',
             registry_id: '',
@@ -70,10 +69,6 @@ export default defineComponent({
                 required,
                 minLength: minLength(3),
                 maxLength: maxLength(128),
-            },
-            public_key: {
-                minLength: minLength(10),
-                maxLength: maxLength(4096),
             },
             hidden: {
 
@@ -107,12 +102,6 @@ export default defineComponent({
 
         const initForm = () => {
             initFormAttributesFromSource(form, manager.data.value);
-
-            if (form.public_key) {
-                form.public_key = isHex(form.public_key) ?
-                    hexToUTF8(form.public_key) :
-                    form.public_key;
-            }
 
             if (!form.realm_id && props.realmId) {
                 form.realm_id = props.realmId;
@@ -224,22 +213,6 @@ export default defineComponent({
                 }),
             });
 
-            const publicKey = buildFormGroup({
-                validationMessages: translationsValidation.public_key.value,
-                validationSeverity: getSeverity($v.value.public_key),
-                label: true,
-                labelContent: 'PublicKey',
-                content: buildFormTextarea({
-                    value: form.public_key,
-                    onChange(input) {
-                        form.public_key = input;
-                    },
-                    props: {
-                        rows: 6,
-                    },
-                }),
-            });
-
             const hidden = buildFormGroup({
                 validationMessages: translationsValidation.hidden.value,
                 validationSeverity: getSeverity($v.value.hidden),
@@ -310,8 +283,6 @@ export default defineComponent({
                         type,
                         h('hr'),
                         hidden,
-                        h('hr'),
-                        publicKey,
                         h('hr'),
                         submitNode,
                     ]),

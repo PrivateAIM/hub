@@ -111,7 +111,7 @@ export default defineComponent({
                     class: 'mb-2 d-flex flex-column',
                 }, [
                     h('div', { class: 'form-group' }, [
-                        h('label', { class: 'pe-1' }, 'Namespace'),
+                        h('label', { class: 'pe-1' }, 'Project'),
                         h('input', {
                             class: 'form-control',
                             type: 'text',
@@ -122,7 +122,7 @@ export default defineComponent({
 
                     h('div', [
                         h('div', { class: 'form-group' }, [
-                            h('label', { class: 'pe-1' }, 'ID'),
+                            h('label', { class: 'pe-1' }, 'Account ID'),
                             h('input', {
                                 class: 'form-control',
                                 type: 'text',
@@ -133,7 +133,7 @@ export default defineComponent({
                         ]),
                         buildFormGroup({
                             label: true,
-                            labelContent: 'Secret',
+                            labelContent: 'Account Secret',
                             validationMessages: translationsValidation.secret.value,
                             validationSeverity: getSeverity(vuelidate.value.secret),
                             content: buildFormInput({

@@ -59,6 +59,7 @@ export default defineComponent({
 
         const tabs = [
             { name: 'Overview', icon: 'fas fa-bars', urlSuffix: '' },
+            { name: 'Crypto', icon: 'fas fa-shield-alt', urlSuffix: 'crypto' },
             { name: 'Robot', icon: 'fas fa-robot', urlSuffix: 'robot' },
             { name: 'Registry', icon: 'fab fa-docker', urlSuffix: 'registry' },
         ];
