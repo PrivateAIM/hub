@@ -5,7 +5,6 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { injectCoreHTTPClient } from '@privateaim/client-vue';
 import type { Node } from '@privateaim/core-kit';
 import {
     CryptoAsymmetricAlgorithm,
@@ -18,6 +17,7 @@ import { useClipboard } from '@vueuse/core';
 import {
     type PropType, defineComponent, ref,
 } from 'vue';
+import { injectCoreHTTPClient } from '../../core';
 
 export default defineComponent({
     props: {
