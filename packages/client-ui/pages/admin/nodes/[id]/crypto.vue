@@ -46,8 +46,8 @@ export default defineNuxtComponent({
             emit('failed', e);
         };
 
-        const handleUpdated = () => {
-            emit('updated', props.entity);
+        const handleUpdated = (entity: Node) => {
+            emit('updated', entity);
         };
 
         return {
