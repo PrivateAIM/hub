@@ -23,7 +23,7 @@
     "dependencies": {
         "@authup/core-http-kit": "^1.0.0-beta.23",
         "@ebec/http": "^2.3.0",
-        "@hapic/harbor": "^2.4.0",
+        "@hapic/harbor": "^2.5.0",
         "@privateaim/core-kit": "^0.8.4",
         "@privateaim/kit": "^0.8.4",
         "@privateaim/core-http-kit": "^0.8.4",
@@ -31,12 +31,12 @@
         "@privateaim/server-analysis-manager-kit": "^0.7.5",
         "@privateaim/storage-kit": "^0.8.4",
         "amqp-extension": "^4.0.0-beta.3",
-        "dockerode": "^4.0.2",
+        "dockerode": "^4.0.3",
         "docker-scan": "^1.1.0",
         "dotenv": "^16.4.5",
         "envix": "^1.3.0",
         "gunzip-maybe": "^1.4.2",
-        "hapic": "^2.5.1",
+        "hapic": "^2.5.2",
         "routup": "^4.0.1",
         "rapiq": "^0.9.0",
         "redis-extension": "^2.0.1",
@@ -44,10 +44,10 @@
         "tar": "^7.4.3",
         "tar-fs": "^3.0.6",
         "tar-stream": "^3.1.6",
-        "uuid": "^11.0.3"
+        "uuid": "^11.0.4"
     },
     "devDependencies": {
-        "@types/dockerode": "^3.3.31",
+        "@types/dockerode": "^3.3.33",
         "@types/tar-fs": "^2.0.4",
         "@types/tar-stream": "^2.2.2",
         "@types/uuid": "^10.0.0",
