@@ -13,6 +13,9 @@ export default defineNuxtConfig({
     experimental: {
         scanPageMeta: false,
     },
+    devtools: {
+        componentInspector: false,
+    },
     runtimeConfig: {
         authupUrl: process.env.AUTHUP_URL,
         coreUrl: process.env.CORE_URL,

@@ -6,7 +6,6 @@
  */
 
 import {
-    BeforeInsert, BeforeUpdate,
     Column,
     CreateDateColumn,
     Entity,
@@ -86,14 +85,4 @@ export class NodeEntity implements Node {
 
     @UpdateDateColumn()
         updated_at: Date;
-
-    // ------------------------------------------------------------------
-
-    @BeforeInsert()
-    @BeforeUpdate()
-    setHidden() {
-        if (!this.registry_id) {
-            this.hidden = true;
-        }
-    }
 }

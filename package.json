@@ -47,8 +47,6 @@
         "server-train-manager": "npm run dev --workspace=packages/server-train-manager"
     },
     "lint-staged": {
-        "*.vue": "npm run lint:fix",
-        "*.js": "npm run lint:fix",
-        "*.ts": "npm run lint:fix"
+        "*.{vue,js,ts}": "npm run lint:fix"
     }
 }

@@ -77,7 +77,7 @@ export default defineComponent({
                 required,
             },
             registry_id: {
-                required,
+
             },
             external_name: {
                 alphaNumHyphenUnderscore: helpers.regex(alphaNumHyphenUnderscoreRegex),

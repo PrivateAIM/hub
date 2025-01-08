@@ -32,15 +32,23 @@ export async function startAnalysisBuild(
     }
 
     const analysisNodeRepository = dataSource.getRepository(AnalysisNodeEntity);
-    const trainStations = await analysisNodeRepository.find({
+    const analysisNodes = await analysisNodeRepository.find({
         where: {
             analysis_id: entity.id,
         },
+        relations: ['node'],
     });
 
-    for (let i = 0; i < trainStations.length; i++) {
-        if (trainStations[i].approval_status !== AnalysisNodeApprovalStatus.APPROVED) {
+    for (let i = 0; i < analysisNodes.length; i++) {
+        if (analysisNodes[i].approval_status !== AnalysisNodeApprovalStatus.APPROVED) {
             throw new BadRequestError('Not all nodes have approved the analysis yet.');
+        }
+
+        if (
+            analysisNodes[i].node &&
+            !analysisNodes[i].node.registry_id
+        ) {
+            throw new BadRequestError(`The node ${analysisNodes[i].node.name} is not assigned to a registry yet.`);
         }
     }
 
