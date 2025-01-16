@@ -70,21 +70,28 @@ export default defineComponent({
             :query-filters="queryFilters"
         >
             <template #default="{ data: bucket }">
-                <span>Entrypoint Command</span>
-                <br>
-                <FAnalysisImageCommand
-                    class="mt-2 mb-2"
-                    :master-image-id="entity.master_image_id"
-                    :analysis-file="entrypointEntity"
-                    :analysis-id="entity.id"
-                />
+                <div class="row">
+                    <div class="col-9">
+                        <h6><i class="fa fa-file" /> Files</h6>
 
-                <FAnalysisBucketFileManager
-                    :entity="bucket"
-                    :file-entity="entrypointEntity"
-                    @set-entrypoint-file="handleEntrypointChanged"
-                    @failed="handleFailed"
-                />
+                        <FAnalysisBucketFileManager
+                            :entity="bucket"
+                            :file-entity="entrypointEntity"
+                            @set-entrypoint-file="handleEntrypointChanged"
+                            @failed="handleFailed"
+                        />
+                    </div>
+                    <div class="col-3">
+                        <h6><i class="fa fa-terminal" /> Command</h6>
+
+                        <FAnalysisImageCommand
+                            class="mt-2 mb-2"
+                            :master-image-id="entity.master_image_id"
+                            :analysis-file="entrypointEntity"
+                            :analysis-id="entity.id"
+                        />
+                    </div>
+                </div>
             </template>
             <template #error>
                 <div class="alert alert-sm alert-warning">
