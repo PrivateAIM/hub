@@ -183,7 +183,7 @@ export function createList<
     }
 
     const handleCreated = buildListCreatedHandler(data, (cbEntity) => {
-        total.value--;
+        total.value++;
 
         if (context.onCreated) {
             context.onCreated(cbEntity, meta.value);
