@@ -13,9 +13,11 @@ export default defineNuxtConfig({
     experimental: {
         scanPageMeta: false,
     },
+
     devtools: {
         componentInspector: false,
     },
+
     runtimeConfig: {
         authupUrl: process.env.AUTHUP_URL,
         coreUrl: process.env.CORE_URL,
@@ -29,14 +31,17 @@ export default defineNuxtConfig({
             cookieDomain: process.env.COOKIE_DOMAIN,
         },
     },
+
     telemetry: false,
     ssr: true,
+
     alias: {
         '@privateaim/core-kit': path.join(__dirname, '..', 'core-kit', 'src'),
         '@privateaim/kit': path.join(__dirname, '..', 'kit', 'src'),
         '@privateaim/client-vue': path.join(__dirname, '..', 'client-vue', 'src'),
         '@privateaim/storage-kit': path.join(__dirname, '..', 'storage-kit', 'src'),
     },
+
     /*
     ** Global CSS
     */
@@ -63,6 +68,7 @@ export default defineNuxtConfig({
 
         '@/assets/css/bootstrap-override.css',
     ],
+
     /*
     ** Nuxt.js modules
     */
@@ -84,4 +90,6 @@ export default defineNuxtConfig({
             },
         ],
     ],
+
+    compatibilityDate: '2025-01-21',
 });
