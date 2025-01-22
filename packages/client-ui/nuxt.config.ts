@@ -11,6 +11,7 @@ import { defineNuxtConfig } from 'nuxt/config';
 
 export default defineNuxtConfig({
     experimental: {
+        appManifest: false,
         scanPageMeta: false,
     },
 
@@ -43,8 +44,8 @@ export default defineNuxtConfig({
     },
 
     /*
-    ** Global CSS
-    */
+ ** Global CSS
+ */
     css: [
         'bootstrap-vue-next/dist/bootstrap-vue-next.css',
         '@vuecs/pagination/dist/index.css',
@@ -70,8 +71,8 @@ export default defineNuxtConfig({
     ],
 
     /*
-    ** Nuxt.js modules
-    */
+ ** Nuxt.js modules
+ */
     modules: [
         [
             // ../client-web-nuxt/src/module
@@ -90,6 +91,5 @@ export default defineNuxtConfig({
             },
         ],
     ],
-
     compatibilityDate: '2025-01-21',
 });

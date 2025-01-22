@@ -50,7 +50,7 @@ export function mountAuthupMiddleware(
         const header = parseAuthorizationHeader(headerRaw);
 
         if (header.type === 'Basic') {
-            const token = await options.client.token.createWithPasswordGrant({
+            const token = await options.client.token.createWithPassword({
                 username: header.username,
                 password: header.password,
             });

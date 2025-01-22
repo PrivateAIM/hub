@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BuiltInPolicyType, PermissionError } from '@authup/kit';
+import { BuiltInPolicyType, PermissionError } from '@authup/access';
 import { isObject } from '@privateaim/kit';
 import type { Router } from 'routup';
 import { errorHandler } from 'routup';

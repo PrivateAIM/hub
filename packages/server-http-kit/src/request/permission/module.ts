@@ -9,7 +9,7 @@ import { ScopeName } from '@authup/core-kit';
 import type {
     PermissionChecker,
     PermissionCheckerCheckContext,
-} from '@authup/kit';
+} from '@authup/access';
 import type { Request } from 'routup';
 import { useRequestEnv } from '../env';
 import { useRequestIdentity } from '../identity';

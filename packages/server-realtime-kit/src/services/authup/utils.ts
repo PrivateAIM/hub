@@ -6,8 +6,9 @@
  */
 
 import { PermissionName as AuthupPermissionName, REALM_MASTER_NAME } from '@authup/core-kit';
-import type { PermissionItem } from '@authup/kit';
-import { OAuth2SubKind, PermissionChecker, PermissionMemoryProvider } from '@authup/kit';
+import type { PermissionItem } from '@authup/access';
+import { OAuth2SubKind } from '@authup/specs';
+import { PermissionChecker, PermissionMemoryProvider } from '@authup/access';
 import type { TokenVerificationData } from '@authup/server-adapter-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { Socket } from '../../types';
