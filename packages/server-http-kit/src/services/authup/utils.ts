@@ -5,13 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { PermissionItem } from '@authup/access';
+import type { PermissionProvider } from '@authup/access';
 import { PermissionChecker, PermissionMemoryProvider } from '@authup/access';
-import { PermissionName as AuthupPermissionName, REALM_MASTER_NAME, transformOAuth2ScopeToArray } from '@authup/core-kit';
+import { REALM_MASTER_NAME, transformOAuth2ScopeToArray } from '@authup/core-kit';
 import type { TokenVerificationData } from '@authup/server-adapter-kit';
-import { PermissionName } from '@privateaim/kit';
 import type { Request } from 'routup';
 import { RequestPermissionChecker, setRequestEnv } from '../../request';
+import { FakePermissionProvider } from './permission-provider';
 
 type TokenVerificationDataMinimal = Pick<
 TokenVerificationData,
@@ -24,15 +24,6 @@ TokenVerificationData,
 'scope'
 >;
 
-function generateAbilities(): PermissionItem[] {
-    return Object.values({
-        ...PermissionName,
-        ...AuthupPermissionName,
-    }).map((name) => ({
-        name,
-    } satisfies PermissionItem));
-}
-
 export function createFakeTokenVerificationData(): TokenVerificationDataMinimal {
     return {
         realm_id: 'd94b2f28-29e3-4ced-b8f1-6923a01dc1ee',
@@ -42,7 +33,7 @@ export function createFakeTokenVerificationData(): TokenVerificationDataMinimal 
         sub: 'd94b2f28-29e3-4ced-b8f1-6923a01dc1ee',
         sub_name: 'admin',
 
-        permissions: generateAbilities(),
+        permissions: [],
     };
 }
 
@@ -51,15 +42,15 @@ export function applyTokenVerificationData(
     data: TokenVerificationDataMinimal,
     fakeAbilities?: boolean,
 ) {
-    let abilities: PermissionItem[];
+    let provider : PermissionProvider;
     if (fakeAbilities) {
-        abilities = generateAbilities();
+        provider = new FakePermissionProvider();
     } else {
-        abilities = data.permissions;
+        provider = new PermissionMemoryProvider(data.permissions);
     }
 
     const permissionChecker = new PermissionChecker({
-        provider: new PermissionMemoryProvider(abilities),
+        provider,
     });
     const requestPermissionChecker = new RequestPermissionChecker(req, permissionChecker);
     setRequestEnv(req, 'permissionChecker', requestPermissionChecker);
