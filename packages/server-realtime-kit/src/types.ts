@@ -6,7 +6,7 @@
  */
 
 import type { Realm, Robot, User } from '@authup/core-kit';
-import type { PermissionChecker } from '@authup/kit';
+import type { PermissionChecker } from '@authup/access';
 import type {
     Namespace as _Namespace,
     Server as _Server,

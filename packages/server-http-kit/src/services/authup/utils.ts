@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { PermissionItem } from '@authup/kit';
-import { PermissionChecker, PermissionMemoryProvider } from '@authup/kit';
+import type { PermissionItem } from '@authup/access';
+import { PermissionChecker, PermissionMemoryProvider } from '@authup/access';
 import { PermissionName as AuthupPermissionName, REALM_MASTER_NAME, transformOAuth2ScopeToArray } from '@authup/core-kit';
 import type { TokenVerificationData } from '@authup/server-adapter-kit';
 import { PermissionName } from '@privateaim/kit';
