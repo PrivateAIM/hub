@@ -14,7 +14,7 @@ import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { isAuthupClientUsable, useAuthupClient } from '@privateaim/server-kit';
 import type { Permission } from '@authup/core-kit';
 import { isClientErrorWithStatusCode } from '@hapic/harbor';
-import { BadRequestError } from '@ebec/http';
+import { BadRequestError, ForbiddenError } from '@ebec/http';
 import { buildErrorMessageForAttributes } from 'validup';
 import { AnalysisPermissionEntity } from '../../../../domains';
 import { AnalysisPermissionValidator } from '../utils';
@@ -54,16 +54,13 @@ export async function createAnalysisPermissionRouteHandler(req: Request, res: Re
 
                 throw e;
             }
-        }
 
-        // todo: this is not possible right now :/
-        /*
-        const data = buildAbilityFromPermission(permission);
-        const ability = useRequestEnv(req, 'abilities');
-        if (!ability.has(data)) {
-            throw new ForbiddenError(`You don't own the permission ${data.name}`);
+            try {
+                await permissionChecker.preCheck({ name: permission.name });
+            } catch (e) {
+                throw new ForbiddenError(`You don't own the permission ${permission.name}`);
+            }
         }
-         */
 
         if (data.policy_id) {
             try {
@@ -73,7 +70,7 @@ export async function createAnalysisPermissionRouteHandler(req: Request, res: Re
                 data.policy_id = policy.id;
             } catch (e) {
                 if (isClientErrorWithStatusCode(e, 404)) {
-                    throw new BadRequestError(buildErrorMessageForAttributes(['permission_id']));
+                    throw new BadRequestError(buildErrorMessageForAttributes(['policy_id']));
                 }
 
                 throw e;
