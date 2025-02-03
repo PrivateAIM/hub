@@ -13,7 +13,7 @@ import {
     parseQueryFields,
 } from 'rapiq';
 import {
-    applyFilters, applyPagination, applyQueryFieldsParseOutput, applyRelations, useDataSource,
+    applyFilters, applyPagination, applyQueryFieldsParseOutput, applyRelations, applySort, useDataSource,
 } from 'typeorm-extension';
 import { NotFoundError } from '@ebec/http';
 import { NodeEntity } from '../../../../domains';
@@ -68,7 +68,7 @@ export async function getOneNodeRouteHandler(req: Request, res: Response) : Prom
 
 export async function getManyNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const {
-        filter, page, fields, include,
+        filter, page, fields, include, sort,
     } = useRequestQuery(req);
 
     const dataSource = await useDataSource();
@@ -80,6 +80,11 @@ export async function getManyNodeRouteHandler(req: Request, res: Response) : Pro
     applyRelations(query, include, {
         defaultAlias: 'node',
         allowed: ['registry_project', 'registry'],
+    });
+
+    applySort(query, sort, {
+        defaultAlias: 'node',
+        allowed: ['name', 'updated_at', 'created_at'],
     });
 
     applyFilters(query, filter, {

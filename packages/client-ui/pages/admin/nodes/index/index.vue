@@ -66,6 +66,9 @@ export default defineNuxtComponent({
             filters: {
                 realm_id: realmManagementId.value,
             },
+            sort: {
+                updated_at: 'DESC',
+            },
         }));
 
         const handleDeleted = async (item: Node) => {
