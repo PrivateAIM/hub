@@ -15,9 +15,11 @@ import type { PropType, SlotsType } from 'vue';
 import { defineComponent } from 'vue';
 import type { EntityListSlotName } from '../../core';
 import FEntityDelete from '../FEntityDelete';
+import FProjectCreator from './FProjectCreator.vue';
 
 export default defineComponent({
     components: {
+        FProjectCreator,
         FEntityDelete,
         VCLink,
         VCTimeago,
@@ -132,32 +134,12 @@ export default defineComponent({
                 </div>
                 <div class="d-flex flex-grow-1 align-items-center flex-column">
                     <div>
-                        <strong><i class="fa-solid fa-user" /> Creator</strong>
+                        <strong><i class="fa fa-user" /> Creator</strong>
                     </div>
                     <div>
-                        <template v-if="entity.user_id">
-                            {{ entity.user_id }}
-                        </template>
-                        <template v-else-if="entity.robot_id">
-                            {{ entity.robot_id }}
-                        </template>
+                        <FProjectCreator :entity="entity" />
                     </div>
                 </div>
-            <!-- todo: this is only possible when authup supports user access from other realm -->
-            <!--
-            <div class="d-flex flex-grow-1 align-items-center flex-column">
-                <div>
-                    <strong><i class="fa fa-user" /> Creator</strong>
-                </div>
-                <div>
-                    <AUser :entity-id="entity.user_id">
-                        <template #default="{ data }">
-                            {{ data.name }}
-                        </template>
-                    </AUser>
-                </div>
-            </div>
-            -->
             </div>
         </slot>
         <slot

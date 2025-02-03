@@ -5,15 +5,24 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import { ARealm } from '@authup/client-web-kit';
+import {
+    FMasterImage, FProjectCreator, FProjectNodeApprovalStatus, FProjectNodes,
+} from '@privateaim/client-vue';
 import type { Project, ProjectNode } from '@privateaim/core-kit';
 import type { BuildInput } from 'rapiq';
 import type { PropType } from 'vue';
-import { FProjectNodeApprovalStatus, FProjectNodes } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 
 export default defineNuxtComponent({
-    components: { FProjectNodeApprovalStatus, FProjectNodes },
+    components: {
+        FProjectCreator,
+        ARealm,
+        FMasterImage,
+        FProjectNodeApprovalStatus,
+        FProjectNodes,
+    },
     meta: {
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
@@ -71,7 +80,19 @@ export default defineNuxtComponent({
                                 <i class="fa fa-compact-disc fa-4x" />
                             </div>
                             <div class="h6">
-                                {{ entity.master_image ? entity.master_image.name : entity.master_image_id }}
+                                <template v-if="entity.master_image">
+                                    {{ entity.master_image.name }}
+                                </template>
+                                <template v-else>
+                                    <FMasterImage :entity-id="entity.master_image_id">
+                                        <template #default="{ data }">
+                                            {{ data.name }}
+                                        </template>
+                                        <template #error>
+                                            {{ entity.master_image_id }}
+                                        </template>
+                                    </FMasterImage>
+                                </template>
                             </div>
                         </div>
                     </div>
@@ -86,7 +107,14 @@ export default defineNuxtComponent({
                             <i class="fas fa-university fa-4x" />
                         </div>
                         <div class="h6">
-                            {{ entity.realm_id }}
+                            <ARealm :entity-id="entity.realm_id">
+                                <template #default="{ data }">
+                                    {{ data.name }}
+                                </template>
+                                <template #error>
+                                    {{ entity.realm_id }}
+                                </template>
+                            </ARealm>
                         </div>
                     </div>
                 </div>
@@ -100,7 +128,7 @@ export default defineNuxtComponent({
                             <i class="fa fa-user fa-4x" />
                         </div>
                         <div class="h6">
-                            {{ entity.user_id }}
+                            <FProjectCreator :entity="entity" />
                         </div>
                     </div>
                 </div>

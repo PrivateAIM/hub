@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+export { FMasterImage } from './FMasterImage';
 export { default as MasterImageList } from './FMasterImages';
 export { default as MasterImagePicker } from './FMasterImagePicker';
 export { default as MasterImagesSync } from './FMasterImagesSync';

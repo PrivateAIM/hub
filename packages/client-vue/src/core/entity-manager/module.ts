@@ -430,17 +430,15 @@ export function createEntityManager<
                     ctx.setup.slots,
                 );
             }
-        } else if (
+
+            return typeof content === 'function' ?
+                content() :
+                content;
+        } if (
             isObject(error) &&
             hasNormalizedSlot('error', ctx.setup.slots)
         ) {
             return normalizeSlot('error', error, ctx.setup.slots);
-        }
-
-        if (entity.value) {
-            return typeof content === 'function' ?
-                content() :
-                content;
         }
 
         return undefined;

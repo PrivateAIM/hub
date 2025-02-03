@@ -10,5 +10,6 @@ export { FProjectForm } from './FProjectForm';
 export { FProjectInForm } from './FProjectInForm';
 export { FProjectItem } from './FProjectItem';
 
+export { default as FProjectCreator } from './FProjectCreator.vue';
 export { default as FProjectItemCard } from './FProjectItemCard.vue';
 export { FProjects } from './FProjects';
