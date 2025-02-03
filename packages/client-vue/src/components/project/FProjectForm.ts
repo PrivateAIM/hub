@@ -9,7 +9,7 @@ import { getSeverity, useTranslationsForNestedValidations } from '@ilingo/vuelid
 import {
     buildFormGroup, buildFormInput, buildFormTextarea,
 } from '@vuecs/form-controls';
-import type { ListHeaderSlotProps, ListItemSlotProps } from '@vuecs/list-controls';
+import type { ListFooterSlotProps, ListHeaderSlotProps, ListItemSlotProps } from '@vuecs/list-controls';
 import useVuelidate from '@vuelidate/core';
 import { maxLength, minLength, required } from '@vuelidate/validators';
 import {
@@ -38,7 +38,7 @@ import {
 import MasterImagePicker from '../master-image/FMasterImagePicker';
 import FNodes from '../node/FNodes';
 import { FProjectNodeAssignAction } from '../project-node';
-import { FSearch } from '../utility';
+import { FPagination, FSearch } from '../utility';
 
 const FProjectForm = defineComponent({
     props: {
@@ -211,6 +211,10 @@ const FProjectForm = defineComponent({
                             drop: () => toggleNodeIds(props.data.id),
                         });
                     },
+                    [EntityListSlotName.FOOTER]: (props: ListFooterSlotProps<Node>) => h(FPagination, {
+                        load: props.load,
+                        meta: props.meta,
+                    }),
                 }),
                 h('div', { class: 'alert alert-dark alert-sm' }, [
                     'Chose a arbitrary amount of target nodes.',
