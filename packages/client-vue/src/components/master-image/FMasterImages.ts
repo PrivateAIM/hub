@@ -6,6 +6,7 @@
  */
 
 import { DomainType } from '@privateaim/core-kit';
+import { hasOwnProperty } from '@privateaim/kit';
 import type { SlotsType } from 'vue';
 import { defineComponent } from 'vue';
 import type { MasterImage } from '@privateaim/core-kit';
@@ -25,9 +26,17 @@ export default defineComponent({
             type: `${DomainType.MASTER_IMAGE}`,
             props,
             setup: ctx,
-            queryFilters: (q) => ({
-                path: q.length > 0 ? `~${q}` : q,
-            }),
+            queryFilters: (filters) => {
+                if (
+                    hasOwnProperty(filters, 'name') &&
+                    typeof filters.name === 'string' &&
+                    filters.name.length > 0
+                ) {
+                    filters.path = filters.name;
+
+                    delete filters.name;
+                }
+            },
             query: {
                 sort: {
                     path: 'ASC',

@@ -10,13 +10,20 @@ import { PermissionName } from '@privateaim/kit';
 import type { BuildInput } from 'rapiq';
 import { computed } from 'vue';
 import type { PropType } from 'vue';
-import { FAnalyses } from '@privateaim/client-vue';
+import {
+    FAnalyses,
+    FPagination as ListPagination,
+    FSearch as ListSearch,
+    FTitle as ListTitle,
+} from '@privateaim/client-vue';
 import { definePageMeta } from '#imports';
 import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
 
 export default defineNuxtComponent({
-    components: { FAnalyses },
+    components: {
+        ListTitle, ListSearch, ListPagination, FAnalyses,
+    },
     props: {
         entity: {
             type: Object as PropType<Project>,
@@ -64,7 +71,21 @@ export default defineNuxtComponent({
                 </div>
             </template>
             <template v-else>
-                <FAnalyses :query="query" />
+                <FAnalyses :query="query">
+                    <template #header="props">
+                        <ListTitle />
+                        <ListSearch
+                            :load="props.load"
+                            :meta="props.meta"
+                        />
+                    </template>
+                    <template #footer="props">
+                        <ListPagination
+                            :load="props.load"
+                            :meta="props.meta"
+                        />
+                    </template>
+                </FAnalyses>
             </template>
         </div>
     </div>

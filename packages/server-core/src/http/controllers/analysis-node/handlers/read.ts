@@ -67,6 +67,7 @@ export async function getManyAnalysisNodeRouteHandler(req: Request, res: Respons
                 'analysis_realm_id',
                 'analysis.id',
                 'analysis.name',
+                'analysis.project_id',
 
                 'node_id',
                 'node_realm_id',

@@ -35,7 +35,10 @@ export default defineNuxtComponent({
 
         const tabs = computed(() => [
             {
-                name: 'Overview', routeName: 'settings-id', icon: 'fas fa-bars', urlSuffix: '',
+                name: 'Outgoing', icon: 'fa fa-file-export', urlSuffix: '',
+            },
+            {
+                name: 'Incoming', icon: 'fa fa-file-import', urlSuffix: '/in',
             },
             ...(isOwner.value ? [
                 {

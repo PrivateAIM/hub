@@ -11,6 +11,7 @@ import {
     DomainType,
     buildDomainChannelName,
 } from '@privateaim/core-kit';
+import { hasOwnProperty } from '@privateaim/kit';
 import type { ListItemSlotProps } from '@vuecs/list-controls';
 import {
     defineComponent, h, ref,
@@ -70,9 +71,17 @@ export default defineComponent({
                     created_at: 'ASC',
                 },
             },
-            queryFilters: (q) => ({
-                title: q.length > 0 ? `~${q}` : q,
-            }),
+            queryFilters: (filters) => {
+                if (
+                    hasOwnProperty(filters, 'name') &&
+                    typeof filters.name === 'string' &&
+                    filters.name.length > 0
+                ) {
+                    filters.title = filters.name;
+
+                    delete filters.name;
+                }
+            },
         });
 
         setDefaults({

@@ -120,7 +120,7 @@ export type ListCreateContext<
     props: ListProps<RECORD>,
     loadAll?: boolean,
     query?: BuildInput<Entity<RECORD>> | (() => BuildInput<Entity<RECORD>>),
-    queryFilters?: ((q: string) => FiltersBuildInput<Entity<RECORD>>),
+    queryFilters?: ((data: FiltersBuildInput<Entity<RECORD>>) => void),
     onCreated?: (entity: RECORD, meta: ListMeta<RECORD>) => void | Promise<void>,
     onLoaded?: (meta: ListMeta<RECORD>) => void | Promise<void>,
     socket?: boolean | Omit<EntitySocketContext<TYPE, RECORD>, 'type'>

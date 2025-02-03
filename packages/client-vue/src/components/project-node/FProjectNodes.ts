@@ -16,7 +16,8 @@ import {
     buildDomainChannelName,
     buildDomainEventSubscriptionFullName,
 } from '@privateaim/core-kit';
-import type { FiltersBuildInput, RelationsBuildInput } from 'rapiq';
+import { hasOwnProperty } from '@privateaim/kit';
+import type { RelationsBuildInput } from 'rapiq';
 
 import type { PropType, SlotsType, VNodeChild } from 'vue';
 import { computed, defineComponent, h } from 'vue';
@@ -153,28 +154,28 @@ export default defineComponent({
                     );
                 },
             },
-            queryFilters: (q) => {
-                let filter : FiltersBuildInput<ProjectNode>;
+            queryFilters: (filters) => {
+                if (
+                    hasOwnProperty(filters, 'name') &&
+                    typeof filters.name === 'string' &&
+                    filters.name.length > 0
+                ) {
+                    if (props.target === DomainType.NODE) {
+                        filters['node.name'] = filters.name;
+                    } else {
+                        filters['project.name'] = filters.name;
+                    }
 
-                if (props.target === DomainType.NODE) {
-                    filter = {
-                        'node.name': q.length > 0 ? `~${q}` : q,
-                    };
-                } else {
-                    filter = {
-                        'project.name': q.length > 0 ? `~${q}` : q,
-                    };
+                    delete filters.name;
                 }
 
                 if (props.realmId) {
                     if (props.direction === Direction.IN) {
-                        filter.node_realm_id = props.realmId;
+                        filters.node_realm_id = props.realmId;
                     } else {
-                        filter.project_realm_id = props.realmId;
+                        filters.project_realm_id = props.realmId;
                     }
                 }
-
-                return filter;
             },
             query: () => {
                 const include : string[] = [];

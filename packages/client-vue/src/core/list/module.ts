@@ -92,15 +92,11 @@ export function createList<
         meta.value.busy = true;
 
         try {
-            let filters : FiltersBuildInput<Entity<RECORD>> | undefined;
-            if (
-                context.queryFilters &&
-                input.filters &&
-                hasOwnProperty(input.filters, 'name') &&
-                typeof input.filters.name === 'string'
-            ) {
-                // todo: queryFilters should customize full filters object!
-                filters = context.queryFilters(input.filters.name) as FiltersBuildInput<Entity<RECORD>>;
+            if (context.queryFilters) {
+                const filters = (input.filters || {}) as FiltersBuildInput<Entity<RECORD>>;
+                context.queryFilters(filters);
+
+                input.filters = filters;
             }
 
             query = undefined;
@@ -121,7 +117,6 @@ export function createList<
             }
 
             const nextQuery : ListMeta<RECORD> = merger(
-                (filters ? { filters } : {}),
                 input || {},
                 {
                     pagination: {

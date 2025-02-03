@@ -16,8 +16,7 @@ import {
     buildDomainChannelName,
     buildDomainEventSubscriptionFullName,
 } from '@privateaim/core-kit';
-import type { FiltersBuildInput } from 'rapiq';
-
+import { hasOwnProperty } from '@privateaim/kit';
 import type { PropType, SlotsType, VNodeChild } from 'vue';
 import { computed, defineComponent, h } from 'vue';
 import type { ListSlotsType } from '../../core';
@@ -145,28 +144,28 @@ export default defineComponent({
                     );
                 },
             },
-            queryFilters: (q) => {
-                let filter : FiltersBuildInput<AnalysisNode>;
+            queryFilters: (filters) => {
+                if (
+                    hasOwnProperty(filters, 'name') &&
+                    typeof filters.name === 'string' &&
+                    filters.name.length > 0
+                ) {
+                    if (props.target === DomainType.NODE) {
+                        filters['node.name'] = filters.name;
+                    } else {
+                        filters['analysis.name'] = filters.name;
+                    }
 
-                if (props.target === DomainType.NODE) {
-                    filter = {
-                        'node.name': q.length > 0 ? `~${q}` : q,
-                    };
-                } else {
-                    filter = {
-                        'analysis.name': q.length > 0 ? `~${q}` : q,
-                    };
+                    delete filters.name;
                 }
 
                 if (props.realmId) {
                     if (props.direction === Direction.IN) {
-                        filter.node_realm_id = props.realmId;
+                        filters.node_realm_id = props.realmId;
                     } else {
-                        filter.analysis_realm_id = props.realmId;
+                        filters.analysis_realm_id = props.realmId;
                     }
                 }
-
-                return filter;
             },
             query: () => {
                 if (props.target === DomainType.NODE) {
