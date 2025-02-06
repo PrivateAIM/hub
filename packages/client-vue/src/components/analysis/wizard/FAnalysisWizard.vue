@@ -17,10 +17,10 @@ import {
 } from 'vue';
 import type { Analysis, AnalysisBucketFile } from '@privateaim/core-kit';
 import { AnalysisBucketType, AnalysisConfigurationStatus } from '@privateaim/core-kit';
-import { initFormAttributesFromSource, injectCoreHTTPClient } from '../../../core';
-import FAnalysisWizardStepBase from './FAnalysisWizardStepBase.vue';
+import { initFormAttributesFromSource, injectCoreHTTPClient, wrapFnWithBusyState } from '../../../core';
+import FAnalysisWizardStepNodes from './FAnalysisWizardStepNodes.vue';
+import FAnalysisWizardStepMasterImage from './FAnalysisWizardStepMasterImage.vue';
 import FAnalysisWizardStepFiles from './FAnalysisWizardStepFiles.vue';
-import FAnalysisWizardStepFinal from './FAnalysisWizardStepFinal.vue';
 
 export default defineComponent({
     components: {
@@ -29,8 +29,8 @@ export default defineComponent({
         WizardButton,
         TabContent,
 
-        FAnalysisWizardStepFinal,
-        FAnalysisWizardStepBase,
+        FAnalysisWizardStepMasterImage,
+        FAnalysisWizardStepNodes,
     },
     props: {
         entity: {
@@ -87,6 +87,8 @@ export default defineComponent({
 
         updateForm(entity.value);
 
+        const isBusy = ref(false);
+
         const initialized = ref(false);
         const valid = ref(false);
 
@@ -94,9 +96,9 @@ export default defineComponent({
         const index = ref(0);
 
         const steps = [
-            AnalysisConfigurationStatus.BASE_CONFIGURED,
-            AnalysisConfigurationStatus.RESOURCE_CONFIGURED,
-            AnalysisConfigurationStatus.FINISHED,
+            AnalysisConfigurationStatus.NODES,
+            AnalysisConfigurationStatus.MASTER_IMAGE,
+            AnalysisConfigurationStatus.FILES,
         ];
 
         const updatedAt = computed(() => (entity.value ?
@@ -121,13 +123,17 @@ export default defineComponent({
 
         const wizardNode : Ref<typeof FormWizard | null> = ref(null);
 
-        const canPassBaseWizardStep = async () => {
-            if (!form.master_image_id) {
-                throw new Error('A master image must be selected...');
-            }
-
+        const canPassNodesWizardStep = async () => {
             if (entity.value.nodes <= 0) {
                 throw new Error('One or more nodes have to be selected...');
+            }
+
+            return true;
+        };
+
+        const canPassMasterImageWizardStep = async () => {
+            if (!form.master_image_id) {
+                throw new Error('A master image must be selected...');
             }
 
             return true;
@@ -142,14 +148,18 @@ export default defineComponent({
         };
 
         const passWizardStep = () : Promise<boolean> => new Promise((resolve, reject) => {
+            isBusy.value = true;
             const step = steps[index.value];
             let promise : Promise<any>;
 
             switch (step) {
-                case AnalysisConfigurationStatus.BASE_CONFIGURED:
-                    promise = canPassBaseWizardStep();
+                case AnalysisConfigurationStatus.NODES:
+                    promise = canPassNodesWizardStep();
                     break;
-                case AnalysisConfigurationStatus.RESOURCE_CONFIGURED:
+                case AnalysisConfigurationStatus.MASTER_IMAGE:
+                    promise = canPassMasterImageWizardStep();
+                    break;
+                case AnalysisConfigurationStatus.FILES:
                     promise = canPassFilesWizardStep();
                     break;
                 default:
@@ -161,7 +171,10 @@ export default defineComponent({
 
             promise
                 .then(() => resolve(true))
-                .catch((e) => reject(e));
+                .catch((e) => reject(e))
+                .finally(() => {
+                    isBusy.value = false;
+                });
         });
 
         const init = async () => {
@@ -225,11 +238,20 @@ export default defineComponent({
             }
         };
 
-        const handleWizardFinishedEvent = () => {
-            emit('finished');
-        };
+        const handleWizardFinishedEvent = wrapFnWithBusyState(isBusy, async () => {
+            try {
+                await canPassFilesWizardStep();
+                emit('finished');
+            } catch (e) {
+                if (e instanceof Error) {
+                    emit('failed', e);
+                }
+            }
+        });
 
         return {
+            isBusy,
+
             startIndex,
 
             handleFailed,
@@ -273,6 +295,7 @@ export default defineComponent({
             <div class="wizard-footer-left">
                 <WizardButton
                     v-if="props.activeTabIndex > 0 && !props.isLastStep"
+                    :disabled="isBusy"
                     :style="props.fillButtonStyle"
                     @click.native="prevWizardStep"
                 >
@@ -282,6 +305,7 @@ export default defineComponent({
             <div class="wizard-footer-right">
                 <WizardButton
                     v-if="!props.isLastStep"
+                    :disabled="isBusy"
                     class="wizard-footer-right"
                     :style="props.fillButtonStyle"
                     @click.native="nextWizardStep"
@@ -291,6 +315,7 @@ export default defineComponent({
 
                 <WizardButton
                     v-else
+                    :disabled="isBusy"
                     class="wizard-footer-right finish-button"
                     :style="props.fillButtonStyle"
                     @click.native="handleWizardFinishedEvent"
@@ -301,10 +326,20 @@ export default defineComponent({
         </template>
 
         <TabContent
-            title="Base"
+            title="Nodes"
             :before-change="passWizardStep"
         >
-            <FAnalysisWizardStepBase
+            <FAnalysisWizardStepNodes
+                :entity="entity"
+                @updated="handleUpdated"
+            />
+        </TabContent>
+
+        <TabContent
+            title="MasterImage"
+            :before-change="passWizardStep"
+        >
+            <FAnalysisWizardStepMasterImage
                 :entity="entity"
                 @updated="handleUpdated"
             />
@@ -320,10 +355,6 @@ export default defineComponent({
                 @entrypointChanged="setEntrypointFile"
                 @failed="handleFailed"
             />
-        </TabContent>
-
-        <TabContent title="Finish">
-            <FAnalysisWizardStepFinal />
         </TabContent>
     </FormWizard>
 </template>
