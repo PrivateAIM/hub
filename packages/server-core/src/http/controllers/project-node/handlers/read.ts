@@ -84,6 +84,7 @@ export async function getManyProjectNodeRouteHandler(req: Request, res: Response
             allowed: [
                 'created_at',
                 'updated_at',
+                'project.name',
                 'project.created_at',
                 'project.updated_at',
                 'node.name',
