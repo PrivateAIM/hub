@@ -10,6 +10,7 @@ import type { PropType, Ref } from 'vue';
 import {
     computed,
     defineComponent,
+    h,
     reactive,
     ref,
     toRef,
@@ -17,10 +18,12 @@ import {
 } from 'vue';
 import type { Analysis, AnalysisBucketFile } from '@privateaim/core-kit';
 import { AnalysisBucketType, AnalysisConfigurationStatus } from '@privateaim/core-kit';
+import { useModalController } from 'bootstrap-vue-next';
 import { initFormAttributesFromSource, injectCoreHTTPClient, wrapFnWithBusyState } from '../../../core';
 import FAnalysisWizardStepNodes from './FAnalysisWizardStepNodes.vue';
 import FAnalysisWizardStepMasterImage from './FAnalysisWizardStepMasterImage.vue';
 import FAnalysisWizardStepFiles from './FAnalysisWizardStepFiles.vue';
+import FAnalysisWizardLockModal from './FAnalysisWizardLockModal.vue';
 
 export default defineComponent({
     components: {
@@ -40,6 +43,7 @@ export default defineComponent({
     },
     emits: ['finished', 'failed', 'updated'],
     async setup(props, { emit }) {
+        const { confirm } = useModalController();
         const apiClient = injectCoreHTTPClient();
         const entity = toRef(props, 'entity');
 
@@ -241,6 +245,16 @@ export default defineComponent({
         const handleWizardFinishedEvent = wrapFnWithBusyState(isBusy, async () => {
             try {
                 await canPassFilesWizardStep();
+
+                await confirm({
+                    component: h(FAnalysisWizardLockModal, {
+                        entity: entity.value,
+                        onUpdated: (el) => {
+                            handleUpdated(el);
+                        },
+                    }),
+                });
+
                 emit('finished');
             } catch (e) {
                 if (e instanceof Error) {
