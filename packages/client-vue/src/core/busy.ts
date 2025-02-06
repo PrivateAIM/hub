@@ -8,19 +8,19 @@
 import type { Ref } from 'vue';
 
 type Fn = (...args: any[]) => Promise<void>;
-type OutputFn = () => Promise<void>;
-export function wrapFnWithBusyState(
+type OutputFn<ARGS extends unknown[]> = (...args: ARGS) => Promise<void>;
+export function wrapFnWithBusyState<T extends Fn = Fn>(
     busy: Ref<boolean>,
-    fn: Fn,
-): OutputFn {
-    return async (...args: any[]) => {
+    fn: T,
+): OutputFn<Parameters<T>> {
+    return async () => {
         if (busy.value) {
             return Promise.resolve();
         }
 
         busy.value = true;
 
-        return fn(...args)
+        return fn()
             .finally(() => {
                 busy.value = false;
             });
