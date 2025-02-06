@@ -13,14 +13,14 @@ export function wrapFnWithBusyState<T extends Fn = Fn>(
     busy: Ref<boolean>,
     fn: T,
 ): OutputFn<Parameters<T>> {
-    return async () => {
+    return async (...args: Parameters<T>) => {
         if (busy.value) {
             return Promise.resolve();
         }
 
         busy.value = true;
 
-        return fn()
+        return fn(...args)
             .finally(() => {
                 busy.value = false;
             });
