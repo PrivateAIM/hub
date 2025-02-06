@@ -24,7 +24,8 @@
 
         "@typescript-eslint/no-this-alias": "off",
 
-        "vue/no-v-for-template-key": "off"
+        "vue/no-v-for-template-key": "off",
+        "vue/no-multiple-template-root": "off"
     },
     "ignorePatterns": [
         "**/dist/*",

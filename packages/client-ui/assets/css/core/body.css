@@ -65,10 +65,12 @@ Content
 }
 
 .list .list-item {
+    background-color: #f1f1f1;
+    /*
     background-color: #ececec;
-    border: 1px solid #dedede;
 
-    box-shadow: 0 4px 25px 0 rgba(0,0,0,.1);
+     */
+    border: 1px solid #dedede;
     transition: all .3s ease-in-out;
 
     border-radius: 4px;
@@ -78,7 +80,8 @@ Content
     vertical-align: middle;
 }
 
-.list .list-item.active {
+.list .list-item.active,
+.list .list-item.checked {
     background-color: #d7d3d3;
 }
 

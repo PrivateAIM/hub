@@ -72,14 +72,30 @@ export default defineComponent({
             <template #default="{ data: bucket }">
                 <div class="row">
                     <div class="col-9">
-                        <h6><i class="fa fa-file" /> Files</h6>
-
                         <FAnalysisBucketFileManager
                             :entity="bucket"
                             :file-entity="entrypointEntity"
                             @set-entrypoint-file="handleEntrypointChanged"
                             @failed="handleFailed"
-                        />
+                        >
+                            <template #header="props">
+                                <div class="d-flex flex-row">
+                                    <div>
+                                        <h6><i class="fa fa-file" /> Files</h6>
+                                    </div>
+                                    <div class="ms-auto">
+                                        <button
+                                            style="width: 120px"
+                                            type="button"
+                                            class="btn btn-primary btn-xs"
+                                            @click.prevent="props.add"
+                                        >
+                                            <i class="fa fa-plus me-1" /> Add
+                                        </button>
+                                    </div>
+                                </div>
+                            </template>
+                        </FAnalysisBucketFileManager>
                     </div>
                     <div class="col-3">
                         <h6><i class="fa fa-terminal" /> Command</h6>
