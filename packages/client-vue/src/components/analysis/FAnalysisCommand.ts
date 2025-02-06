@@ -14,10 +14,7 @@ import {
     computed, defineComponent, ref, toRef,
 } from 'vue';
 import {
-    ActionCommandElementType,
-    injectCoreHTTPClient,
-    renderActionCommand,
-    wrapFnWithBusyState,
+    ActionCommandElementType, injectCoreHTTPClient, renderActionCommand, wrapFnWithBusyState,
 } from '../../core';
 
 const FAnalysisCommand = defineComponent({
@@ -65,41 +62,52 @@ const FAnalysisCommand = defineComponent({
             }
         });
 
-        const isAllowed = usePermissionCheck({ name: PermissionName.ANALYSIS_UPDATE });
+        const isAllowed = usePermissionCheck({
+            name: PermissionName.ANALYSIS_UPDATE,
+        });
 
-        const isHidden = computed<boolean>(() => {
+        const shouldDisplay = computed<boolean>(() => {
             if (props.command === AnalysisAPICommand.CONFIGURATION_LOCK) {
-                return entity.value.configuration_locked;
+                return !entity.value.configuration_locked &&
+                    !entity.value.build_status;
             }
 
             if (props.command === AnalysisAPICommand.CONFIGURATION_UNLOCK) {
-                return !entity.value.configuration_locked;
+                if (!entity.value.configuration_locked) {
+                    return false;
+                }
+
+                if (entity.value.configuration_locked && !entity.value.build_status) {
+                    return true;
+                }
+
+                return entity.value.build_status === AnalysisBuildStatus.FAILED ||
+                    entity.value.build_status === AnalysisBuildStatus.STOPPED ||
+                    entity.value.build_status === AnalysisBuildStatus.STOPPING;
             }
 
             if (!entity.value.configuration_locked) {
-                return true;
+                return false;
             }
 
             if (props.command === AnalysisAPICommand.BUILD_START) {
                 if (!entity.value.build_status) {
-                    return false;
-                }
-
-                return entity.value.build_status !== AnalysisBuildStatus.STOPPING &&
-                    entity.value.build_status !== AnalysisBuildStatus.FAILED;
-            }
-
-            if (props.command === AnalysisAPICommand.BUILD_STOP) {
-                if (!entity.value.build_status) {
                     return true;
                 }
 
+                return entity.value.build_status === AnalysisBuildStatus.FAILED ||
+                    entity.value.build_status === AnalysisBuildStatus.STOPPED;
+            }
+
+            if (props.command === AnalysisAPICommand.BUILD_STOP) {
                 return entity.value.build_status === AnalysisBuildStatus.STOPPING ||
-                    entity.value.build_status === AnalysisBuildStatus.FINISHED;
+                    entity.value.build_status === AnalysisBuildStatus.STARTED ||
+                    entity.value.build_status === AnalysisBuildStatus.STARTING;
             }
 
             if (props.command === AnalysisAPICommand.BUILD_STATUS) {
-                return entity.value.build_status === AnalysisBuildStatus.FINISHED;
+                return entity.value.build_status &&
+                    entity.value.build_status !== AnalysisBuildStatus.FINISHED;
             }
 
             return false;
@@ -155,7 +163,7 @@ const FAnalysisCommand = defineComponent({
         });
 
         return () => {
-            if (isHidden.value) {
+            if (!shouldDisplay.value) {
                 return [];
             }
 
@@ -164,7 +172,7 @@ const FAnalysisCommand = defineComponent({
                 elementType: props.elementType,
                 withIcon: props.withIcon,
                 withText: props.withText,
-                isDisabled: isHidden.value,
+                isDisabled: !shouldDisplay.value,
                 iconClass: iconClass.value,
                 isAllowed: isAllowed.value,
                 commandText: commandText.value,
