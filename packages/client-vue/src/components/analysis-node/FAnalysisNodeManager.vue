@@ -47,6 +47,11 @@ export default defineComponent({
             filters: {
                 analysis_id: props.entity.id,
             },
+            sort: {
+                node: {
+                    name: 'ASC',
+                },
+            },
         }));
 
         const vProjectNodesNode = ref<null | typeof FProjectNodes>(null);
@@ -199,7 +204,16 @@ export default defineComponent({
                     ref="vProjectNodesNode"
                     :realm-id="entity.realm_id"
                     :direction="'out'"
-                    :query="{ filters: { project_id: entity.project_id } }"
+                    :query="{
+                        filters: {
+                            project_id: entity.project_id
+                        },
+                        sort: {
+                            node: {
+                                name: 'ASC'
+                            }
+                        }
+                    }"
                 >
                     <template #header="props">
                         <ListSearch

@@ -88,6 +88,7 @@ export async function getManyAnalysisNodeRouteHandler(req: Request, res: Respons
                 'index',
                 'analysis.created_at',
                 'analysis.updated_at',
+                'node.name',
                 'node.created_at',
                 'node.updated_at',
             ],
