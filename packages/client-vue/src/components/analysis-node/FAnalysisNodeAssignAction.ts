@@ -5,12 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { defineComponent, h } from 'vue';
+import { defineComponent } from 'vue';
 import type { AnalysisNode } from '@privateaim/core-kit';
 import {
     DomainType,
 } from '@privateaim/core-kit';
 import { createEntityManager, defineEntityManagerEvents } from '../../core';
+import { renderToggleButton } from '../utility';
 
 export default defineComponent({
     props: {
@@ -46,30 +47,19 @@ export default defineComponent({
             },
         });
 
-        return () => h('button', {
-            class: ['btn btn-xs', {
-                'btn-success': !manager.data.value,
-                'btn-danger': manager.data.value,
-            }],
-            onClick($event: any) {
-                $event.preventDefault();
-
-                if (manager.data.value) {
-                    return manager.delete();
+        return () => renderToggleButton({
+            isBusy: manager.busy.value,
+            value: !!manager.data.value,
+            changed: (value) => {
+                if (value) {
+                    return manager.create({
+                        analysis_id: props.analysisId,
+                        node_id: props.nodeId,
+                    });
                 }
 
-                return manager.create({
-                    analysis_id: props.analysisId,
-                    node_id: props.nodeId,
-                });
+                return manager.delete();
             },
-        }, [
-            h('i', {
-                class: ['fa', {
-                    'fa-plus': !manager.data.value,
-                    'fa-minus': manager.data.value,
-                }],
-            }),
-        ]);
+        });
     },
 });
