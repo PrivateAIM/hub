@@ -31,7 +31,7 @@ export default defineComponent({
             required: true,
         },
     },
-    emits: ['created', 'updated', 'deleted', 'selected', 'failed'],
+    emits: ['created', 'updated', 'deleted', 'selected', 'failed', 'analysisUpdated'],
     setup(props, { emit }) {
         const coreClient = injectCoreHTTPClient();
 
@@ -61,11 +61,19 @@ export default defineComponent({
                 vNode.value.handleCreated(entity);
             }
 
+            if (entity.analysis) {
+                emit('analysisUpdated', entity.analysis);
+            }
+
             emit('created', entity);
         };
         const handleDeleted = (entity: AnalysisNode) => {
             if (vNode.value) {
                 vNode.value.handleDeleted(entity);
+            }
+
+            if (entity.analysis) {
+                emit('analysisUpdated', entity.analysis);
             }
 
             emit('deleted', entity);
@@ -74,6 +82,10 @@ export default defineComponent({
         const handleUpdated = (entity: AnalysisNode) => {
             if (vNode.value) {
                 vNode.value.handleUpdated(entity);
+            }
+
+            if (entity.analysis) {
+                emit('analysisUpdated', entity.analysis);
             }
 
             emit('updated', entity);

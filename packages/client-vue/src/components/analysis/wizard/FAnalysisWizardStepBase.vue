@@ -31,7 +31,7 @@ export default defineComponent({
         const handleMasterImageSelected = async (item: MasterImage) => {
             try {
                 const response = await apiClient.analysis.update(props.entity.id, {
-                    master_image_id: item ? item.id : null as string,
+                    master_image_id: item ? item.id : null,
                 });
 
                 emit('updated', response);
@@ -46,8 +46,13 @@ export default defineComponent({
             emit('failed', e);
         };
 
+        const handleUpdated = (e: Analysis) => {
+            emit('updated', e);
+        };
+
         return {
             handleFailed,
+            handleUpdated,
             handleMasterImageSelected,
         };
     },
@@ -71,6 +76,7 @@ export default defineComponent({
             <FAnalysisNodeManager
                 :entity="entity"
                 @failed="handleFailed"
+                @analysis-updated="handleUpdated"
             >
                 <template #header="props">
                     <div class="d-flex flex-row">
