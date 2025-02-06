@@ -214,13 +214,18 @@ export default defineComponent({
 <template>
     <div class="d-flex flex-column gap-1">
         <div>
-            <button
-                type="button"
-                class="btn btn-primary btn-block"
-                @click.prevent="toggleModal"
+            <slot
+                name="header"
+                :add="toggleModal"
             >
-                <i class="fa fa-upload" /> Upload
-            </button>
+                <button
+                    type="button"
+                    class="btn btn-primary btn-block"
+                    @click.prevent="toggleModal"
+                >
+                    <i class="fa fa-upload" /> Upload
+                </button>
+            </slot>
         </div>
         <div>
             <div class="form-check">

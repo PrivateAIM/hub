@@ -8,3 +8,5 @@
 export * from './title';
 export * from './search';
 export * from './pagination';
+
+export { default as FItemToggle } from './FItemToggle.vue';
