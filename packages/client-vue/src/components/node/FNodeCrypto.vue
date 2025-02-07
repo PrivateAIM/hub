@@ -112,7 +112,7 @@ export default defineComponent({
                         publicExponent: new Uint8Array([1, 0, 1]),
                     };
                 }
-                console.log(algorithmOptions);
+
                 const algorithm = new CryptoAsymmetricAlgorithm(algorithmOptions);
                 const keyPair = await algorithm.generateKeyPair();
 

@@ -167,7 +167,7 @@ export default defineComponent({
                     promise = canPassFilesWizardStep();
                     break;
                 default:
-                    promise = new Promise<void>((resolve) => resolve());
+                    promise = new Promise<void>((resolve) => { resolve(); });
                     break;
             }
 

@@ -37,14 +37,14 @@ export default defineComponent({
                 let entity: Analysis;
                 if (lockIt.value) {
                     entity = await apiClient
-                        .analysis.runCommand(props.entity.value.id, AnalysisAPICommand.CONFIGURATION_LOCK);
+                        .analysis.runCommand(props.entity.id, AnalysisAPICommand.CONFIGURATION_LOCK);
 
                     emit('updated', entity);
                 }
 
                 if (buildIt.value) {
                     entity = await apiClient
-                        .analysis.runCommand(props.entity.value.id, AnalysisAPICommand.BUILD_START);
+                        .analysis.runCommand(props.entity.id, AnalysisAPICommand.BUILD_START);
 
                     emit('updated', entity);
                 }
