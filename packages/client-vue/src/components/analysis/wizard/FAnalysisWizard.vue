@@ -167,9 +167,7 @@ export default defineComponent({
                     promise = canPassFilesWizardStep();
                     break;
                 default:
-                    promise = new Promise((resolve, reject) => {
-                        reject(new Error('This step is not finished yet. Please fill out all required fields or make a choice of truth.'));
-                    });
+                    promise = new Promise<void>((resolve) => resolve());
                     break;
             }
 
@@ -246,16 +244,26 @@ export default defineComponent({
             try {
                 await canPassFilesWizardStep();
 
-                await confirm({
+                if (typeof confirm === 'undefined') {
+                    emit('finished');
+                    return;
+                }
+
+                const finished = await confirm({
                     component: h(FAnalysisWizardLockModal, {
                         entity: entity.value,
                         onUpdated: (el) => {
                             handleUpdated(el);
                         },
+                        onFailed: (e) => {
+                            handleFailed(e);
+                        },
                     }),
                 });
 
-                emit('finished');
+                if (finished) {
+                    emit('finished');
+                }
             } catch (e) {
                 if (e instanceof Error) {
                     emit('failed', e);
@@ -302,13 +310,13 @@ export default defineComponent({
                 <i class="fa fa-hat-wizard" /> Wizard
             </h4>
             <p class="category">
-                Configure your analysis step by step
+                Analysis configuration step by step
             </p>
         </template>
         <template #footer="props">
             <div class="wizard-footer-left">
                 <WizardButton
-                    v-if="props.activeTabIndex > 0 && !props.isLastStep"
+                    v-if="props.activeTabIndex > 0"
                     :disabled="isBusy"
                     :style="props.fillButtonStyle"
                     @click.native="prevWizardStep"

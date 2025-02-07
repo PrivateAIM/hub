@@ -5,19 +5,16 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Analysis, MasterImage } from '@privateaim/core-kit';
+import type { Analysis } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
 import {
     defineComponent,
 } from 'vue';
-import FMasterImagePicker from '../../master-image/FMasterImagePicker';
-import { injectCoreHTTPClient } from '../../../core';
 import FAnalysisNodeManager from '../../analysis-node/FAnalysisNodeManager.vue';
 
 export default defineComponent({
     components: {
         FAnalysisNodeManager,
-        FMasterImagePicker,
     },
     props: {
         entity: {
@@ -27,21 +24,6 @@ export default defineComponent({
     },
     emits: ['updated', 'failed'],
     setup(props, { emit }) {
-        const apiClient = injectCoreHTTPClient();
-        const handleMasterImageSelected = async (item: MasterImage) => {
-            try {
-                const response = await apiClient.analysis.update(props.entity.id, {
-                    master_image_id: item ? item.id : null,
-                });
-
-                emit('updated', response);
-            } catch (e) {
-                if (e instanceof Error) {
-                    emit('failed', e);
-                }
-            }
-        };
-
         const handleFailed = (e: Error) => {
             emit('failed', e);
         };
@@ -53,25 +35,12 @@ export default defineComponent({
         return {
             handleFailed,
             handleUpdated,
-            handleMasterImageSelected,
         };
     },
 });
 </script>
 <template>
     <div class="d-flex flex-column">
-        <div>
-            <h6><i class="fa fa-compact-disc" /> MasterImage</h6>
-            <div class="mb-2">
-                <FMasterImagePicker
-                    :entity-id="entity.master_image_id"
-                    @selected="handleMasterImageSelected"
-                />
-            </div>
-        </div>
-
-        <hr>
-
         <div>
             <FAnalysisNodeManager
                 :entity="entity"
