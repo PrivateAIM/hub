@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.8.6](https://github.com/PrivateAIM/hub/compare/v0.8.5...v0.8.6) (2025-02-07)
+
+
+### Features
+
+* add analysis incoming view on project page ([488303a](https://github.com/PrivateAIM/hub/commit/488303a2d3c77b1af978090ed7bc34d6d3dc6e2e))
+* avoid displaying uuids when meaningful ([0a4a13f](https://github.com/PrivateAIM/hub/commit/0a4a13f28a2a488eacdba78e5961d24f15c0bce2))
+* emit updated analysis object ([b5724b0](https://github.com/PrivateAIM/hub/commit/b5724b0b51df229fed85a17f37e9f385371d4e0b))
+* enable sorting {analysis,project}-node by analysis name ([6e0f243](https://github.com/PrivateAIM/hub/commit/6e0f2438282ba4561d3c3a6ebf0c5bdd1c2b85d6))
+* enable sorting {analysis,project}-node by node name ([5cd32c0](https://github.com/PrivateAIM/hub/commit/5cd32c040ff7b1c16ed76c0b73f07403b2666aa2))
+* redesigned station picker ([#977](https://github.com/PrivateAIM/hub/issues/977)) ([d9b967b](https://github.com/PrivateAIM/hub/commit/d9b967b4cdb15cdcb1085e662b55600dc1073b37))
+* reorganized analysis wizard steps ([#978](https://github.com/PrivateAIM/hub/issues/978)) ([9e1913e](https://github.com/PrivateAIM/hub/commit/9e1913e2dbbd98f1fc018ed621d37b78261446eb))
+* unify assign action for relational components ([775120a](https://github.com/PrivateAIM/hub/commit/775120a1b24b6f1f409fd003b4d5b23f00adde4d))
+
+
+### Bug Fixes
+
+* add missing pagination to project node selection ([b9e6a4d](https://github.com/PrivateAIM/hub/commit/b9e6a4de22473521937d25a718233c08d5c369fd))
+* **deps:** bump the minorandpatch group across 1 directory with 11 updates ([#973](https://github.com/PrivateAIM/hub/issues/973)) ([6c3b98e](https://github.com/PrivateAIM/hub/commit/6c3b98e665d641005d223e348ff0970b453dbf0e))
+* sorting of nodes (in admin view) ([8205c44](https://github.com/PrivateAIM/hub/commit/8205c449866f0e61f4b1a39ec3c21b41656749bd))
+
 ## [0.8.5](https://github.com/PrivateAIM/hub/compare/v0.8.4...v0.8.5) (2025-01-22)
 
 
