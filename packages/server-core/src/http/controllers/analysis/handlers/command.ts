@@ -84,6 +84,7 @@ export async function handleAnalysisCommandRouteHandler(req: Request, res: Respo
             break;
         case AnalysisAPICommand.CONFIGURATION_UNLOCK:
             entity = await unlockAnalysisConfiguration(entity);
+            break;
     }
 
     return sendAccepted(res, entity);

@@ -7,7 +7,11 @@
 
 import { BadRequestError } from '@ebec/http';
 import {
-    AnalysisBucketType, AnalysisNodeApprovalStatus, NodeType,
+    AnalysisAPICommand,
+    AnalysisBucketType,
+    AnalysisNodeApprovalStatus,
+    NodeType,
+    isAnalysisAPICommandExecutable,
 } from '@privateaim/core-kit';
 import { useDataSource } from 'typeorm-extension';
 import { AnalysisBucketEntity } from '../../analysis-bucket';
@@ -16,12 +20,9 @@ import { AnalysisNodeEntity } from '../../anaylsis-node';
 import { AnalysisEntity } from '../entity';
 
 export async function lockAnalysisConfiguration(entity: AnalysisEntity) : Promise<AnalysisEntity> {
-    if (!entity.master_image_id) {
-        throw new BadRequestError('A master image must be assigned to the analysis.');
-    }
-
-    if (entity.configuration_locked) {
-        return entity;
+    const check = isAnalysisAPICommandExecutable(entity, AnalysisAPICommand.CONFIGURATION_LOCK);
+    if (!check.success) {
+        throw new BadRequestError(check.message);
     }
 
     const dataSource = await useDataSource();

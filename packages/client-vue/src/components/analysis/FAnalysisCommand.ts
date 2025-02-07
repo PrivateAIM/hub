@@ -7,7 +7,7 @@
 
 import { usePermissionCheck } from '@authup/client-web-kit';
 import type { Analysis } from '@privateaim/core-kit';
-import { AnalysisAPICommand, AnalysisBuildStatus } from '@privateaim/core-kit';
+import { AnalysisAPICommand, isAnalysisAPICommandExecutable } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { PropType } from 'vue';
 import {
@@ -66,52 +66,12 @@ const FAnalysisCommand = defineComponent({
             name: PermissionName.ANALYSIS_UPDATE,
         });
 
-        const shouldDisplay = computed<boolean>(() => {
-            if (props.command === AnalysisAPICommand.CONFIGURATION_LOCK) {
-                return !entity.value.configuration_locked &&
-                    !entity.value.build_status;
-            }
-
-            if (props.command === AnalysisAPICommand.CONFIGURATION_UNLOCK) {
-                if (!entity.value.configuration_locked) {
-                    return false;
-                }
-
-                if (entity.value.configuration_locked && !entity.value.build_status) {
-                    return true;
-                }
-
-                return entity.value.build_status === AnalysisBuildStatus.FAILED ||
-                    entity.value.build_status === AnalysisBuildStatus.STOPPED ||
-                    entity.value.build_status === AnalysisBuildStatus.STOPPING;
-            }
-
-            if (!entity.value.configuration_locked) {
-                return false;
-            }
-
-            if (props.command === AnalysisAPICommand.BUILD_START) {
-                if (!entity.value.build_status) {
-                    return true;
-                }
-
-                return entity.value.build_status === AnalysisBuildStatus.FAILED ||
-                    entity.value.build_status === AnalysisBuildStatus.STOPPED;
-            }
-
-            if (props.command === AnalysisAPICommand.BUILD_STOP) {
-                return entity.value.build_status === AnalysisBuildStatus.STOPPING ||
-                    entity.value.build_status === AnalysisBuildStatus.STARTED ||
-                    entity.value.build_status === AnalysisBuildStatus.STARTING;
-            }
-
-            if (props.command === AnalysisAPICommand.BUILD_STATUS) {
-                return entity.value.build_status &&
-                    entity.value.build_status !== AnalysisBuildStatus.FINISHED;
-            }
-
-            return false;
-        });
+        const shouldDisplay = computed<boolean>(
+            () => {
+                const check = isAnalysisAPICommandExecutable(entity.value, props.command);
+                return check.success;
+            },
+        );
 
         const commandText = computed(() => {
             switch (props.command) {

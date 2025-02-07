@@ -7,8 +7,8 @@
 
 import { BadRequestError } from '@ebec/http';
 import {
-    AnalysisBuildStatus,
-    AnalysisNodeApprovalStatus,
+    AnalysisAPICommand, AnalysisBuildStatus,
+    AnalysisNodeApprovalStatus, isAnalysisAPICommandExecutable,
 } from '@privateaim/core-kit';
 import { BuilderCommand, buildBuilderTaskQueueRouterPayload } from '@privateaim/server-analysis-manager-kit';
 import { useDataSource } from 'typeorm-extension';
@@ -23,12 +23,9 @@ export async function startAnalysisBuild(
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisEntity);
 
-    if (!entity.configuration_locked) {
-        throw new BadRequestError('The configuration must be locked, to build the analysis.');
-    }
-
-    if (entity.run_status) {
-        throw new BadRequestError('The analysis can not longer be build.');
+    const check = isAnalysisAPICommandExecutable(entity, AnalysisAPICommand.BUILD_START);
+    if (!check.success) {
+        throw new BadRequestError(check.message);
     }
 
     const analysisNodeRepository = dataSource.getRepository(AnalysisNodeEntity);
@@ -65,6 +62,10 @@ export async function startAnalysisBuild(
         entity.registry_id = registry.id;
     }
 
+    entity.build_status = AnalysisBuildStatus.STARTING;
+
+    await repository.save(entity);
+
     const client = useQueueRouter();
     await client.publish(buildBuilderTaskQueueRouterPayload({
         command: BuilderCommand.BUILD,
@@ -72,10 +73,6 @@ export async function startAnalysisBuild(
             id: entity.id,
         },
     }));
-
-    entity.build_status = AnalysisBuildStatus.STARTING;
-
-    await repository.save(entity);
 
     return entity;
 }

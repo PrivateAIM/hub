@@ -5,20 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { NodeType } from '@privateaim/core-kit';
+import { BadRequestError } from '@ebec/http';
+import { AnalysisAPICommand, NodeType, isAnalysisAPICommandExecutable } from '@privateaim/core-kit';
 import { useDataSource } from 'typeorm-extension';
 import { useEnv } from '../../../config';
 import { AnalysisNodeEntity } from '../../anaylsis-node';
 import { AnalysisEntity } from '../entity';
 
 export async function unlockAnalysisConfiguration(entity: AnalysisEntity) : Promise<AnalysisEntity> {
-    if (!entity.configuration_locked) {
-        return entity;
-    }
-
-    const skipAnalysisApproval = useEnv('skipAnalysisApproval');
-    if (skipAnalysisApproval) {
-        return entity;
+    const check = isAnalysisAPICommandExecutable(entity, AnalysisAPICommand.CONFIGURATION_UNLOCK);
+    if (!check.success) {
+        throw new BadRequestError(check.message);
     }
 
     const dataSource = await useDataSource();
@@ -32,6 +29,7 @@ export async function unlockAnalysisConfiguration(entity: AnalysisEntity) : Prom
         relations: ['node'],
     });
 
+    const skipAnalysisApproval = useEnv('skipAnalysisApproval');
     for (let i = 0; i < analysisNodes.length; i++) {
         if (
             analysisNodes[i].node &&
@@ -40,12 +38,16 @@ export async function unlockAnalysisConfiguration(entity: AnalysisEntity) : Prom
             continue;
         }
 
-        analysisNodes[i].approval_status = null;
+        if (!skipAnalysisApproval) {
+            analysisNodes[i].approval_status = null;
+        }
 
         await analysisNodeRepository.save(analysisNodes[i]);
     }
 
     entity.configuration_locked = false;
+    entity.build_status = null;
+
     await repository.save(entity);
 
     return entity;
