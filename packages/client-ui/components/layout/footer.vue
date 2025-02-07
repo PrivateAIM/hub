@@ -5,11 +5,14 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { BToastOrchestrator } from 'bootstrap-vue-next';
+import { BModalOrchestrator, BToastOrchestrator } from 'bootstrap-vue-next';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-    components: { BToastOrchestrator },
+    components: {
+        BModalOrchestrator,
+        BToastOrchestrator,
+    },
     data() {
         return {
             startYear: 2024,
@@ -33,5 +36,6 @@ export default defineComponent({
             </div>
         </div>
         <BToastOrchestrator />
+        <BModalOrchestrator />
     </div>
 </template>

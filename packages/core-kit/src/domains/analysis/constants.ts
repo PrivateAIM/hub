@@ -19,11 +19,9 @@ export enum AnalysisBuildStatus {
 // -------------------------------------------------------------------------
 
 export enum AnalysisConfigurationStatus {
-    BASE_CONFIGURED = 'base',
-    SECURITY_CONFIGURED = 'security_configured', // todo: still relevant ?
-    RESOURCE_CONFIGURED = 'resource_configured',
-    HASH_GENERATED = 'hash_generated', // todo: still relevant ?
-    HASH_SIGNED = 'hash_signed', // todo: signed by xyz
+    NODES = 'nodes',
+    MASTER_IMAGE = 'masterImage',
+    FILES = 'files',
     FINISHED = 'finished',
 }
 

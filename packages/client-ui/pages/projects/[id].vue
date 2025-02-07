@@ -108,7 +108,7 @@ export default defineComponent({
             ];
 
             if (isProjectOwner.value || isNodeAuthority.value) {
-                items.push({ name: 'Analyses', icon: 'fa fa-bar-chart', urlSuffix: '/analyses' });
+                items.push({ name: 'Analyses', icon: 'fas fa-microscope', urlSuffix: '/analyses' });
             }
 
             if (
