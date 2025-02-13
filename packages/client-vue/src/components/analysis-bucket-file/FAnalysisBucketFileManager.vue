@@ -249,6 +249,18 @@ export default defineComponent({
                 @updated="handleUpdated"
                 @deleted="handleDeleted"
             >
+                <template #noMore>
+                    <p class="mb-2">
+                        No files are selected for the analysis yet.
+                    </p>
+                    <button
+                        type="button"
+                        class="btn btn-xs btn-dark"
+                        @click.prevent="toggleModal"
+                    >
+                        <i class="fa fa-add" /> Add
+                    </button>
+                </template>
                 <template #body="props">
                     <div class="d-flex flex-column">
                         <template
