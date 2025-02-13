@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.8.6](https://github.com/PrivateAIM/hub/compare/v0.8.5...v0.8.6) (2025-02-13)
+
+
+### Features
+
+* refactor command precondition + change order in build_start command ([#981](https://github.com/PrivateAIM/hub/issues/981)) ([85aa834](https://github.com/PrivateAIM/hub/commit/85aa8348dd91a4394ed700d5f57f5de28f80f827))
+* reorganized analysis wizard steps ([#978](https://github.com/PrivateAIM/hub/issues/978)) ([9e1913e](https://github.com/PrivateAIM/hub/commit/9e1913e2dbbd98f1fc018ed621d37b78261446eb))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.8.5 to ^0.8.6
+  * peerDependencies
+    * @privateaim/kit bumped from ^0.8.5 to ^0.8.6
+
 ## [0.8.5](https://github.com/PrivateAIM/hub/compare/v0.8.4...v0.8.5) (2025-01-22)
 
 
