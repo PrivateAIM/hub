@@ -6,10 +6,8 @@
   -->
 
 <script lang="ts">
-
-import { AUserForm, injectStore } from '@authup/client-web-kit';
+import { AUserForm, injectStore, storeToRefs } from '@authup/client-web-kit';
 import type { User } from '@authup/core-kit';
-import { storeToRefs } from 'pinia';
 import { definePageMeta, useToast } from '#imports';
 import { defineNuxtComponent } from '#app';
 import { LayoutKey } from '../../../config/layout';

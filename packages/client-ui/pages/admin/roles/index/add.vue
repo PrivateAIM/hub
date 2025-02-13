@@ -6,10 +6,9 @@
   -->
 
 <script lang="ts">
-import { ARoleForm, injectStore } from '@authup/client-web-kit';
+import { ARoleForm, injectStore, storeToRefs } from '@authup/client-web-kit';
 import type { Role } from '@authup/core-kit';
 import { PermissionName } from '@authup/core-kit';
-import { storeToRefs } from 'pinia';
 import { defineNuxtComponent, navigateTo } from '#app';
 import { definePageMeta } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';

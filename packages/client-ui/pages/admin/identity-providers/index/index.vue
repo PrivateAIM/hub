@@ -11,9 +11,9 @@ import { BTable } from 'bootstrap-vue-next';
 import type { IdentityProvider } from '@authup/core-kit';
 import { PermissionName, isRealmResourceWritable } from '@authup/core-kit';
 import {
-    AEntityDelete, AIdentityProviders, APagination, ASearch, ATitle, injectStore, usePermissionCheck,
+    AEntityDelete, AIdentityProviders, APagination, ASearch, ATitle, injectStore, storeToRefs,
+    usePermissionCheck,
 } from '@authup/client-web-kit';
-import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
 import { defineNuxtComponent } from '#app';
 

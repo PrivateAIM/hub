@@ -5,8 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { injectStore } from '@authup/client-web-kit';
-import { storeToRefs } from 'pinia';
+import { injectStore, storeToRefs } from '@authup/client-web-kit';
 import { computed, toRef } from 'vue';
 import type { PropType } from 'vue';
 import type { Project, ProjectNode } from '@privateaim/core-kit';

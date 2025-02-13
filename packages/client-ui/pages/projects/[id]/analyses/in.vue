@@ -5,10 +5,9 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { injectStore, usePermissionCheck } from '@authup/client-web-kit';
+import { injectStore, storeToRefs, usePermissionCheck } from '@authup/client-web-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { AnalysisNode, Project, ProjectNode } from '@privateaim/core-kit';
-import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
 import { type PropType, defineComponent, ref } from 'vue';
 import {
