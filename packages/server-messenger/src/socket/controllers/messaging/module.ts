@@ -5,19 +5,43 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { CTSMessagingEventName, STCMessagingEventName } from '@privateaim/messenger-kit';
-import type { MessagingParty } from '@privateaim/messenger-kit';
+import {
+    CTSMessagingEventName,
+    CTSMessagingMessageValidator,
+    STCMessagingEventName,
+} from '@privateaim/messenger-kit';
+import type {
+    CTSMessagingMessage,
+    CTSMessagingParty,
+} from '@privateaim/messenger-kit';
 import { useLogger } from '@privateaim/server-kit';
 import type { Socket } from '../../types';
 import { buildConnectionRobotRoom, buildConnectionUserRoom } from '../connection';
 
 export function mountMessagingController(socket: Socket) {
-    socket.on(CTSMessagingEventName.SEND, (data) => {
+    const validator = new CTSMessagingMessageValidator();
+
+    socket.on(CTSMessagingEventName.SEND, async (raw, cb) => {
         if (!socket.data.userId && !socket.data.robotId) {
             return;
         }
 
-        let from : MessagingParty;
+        let data :CTSMessagingMessage;
+
+        try {
+            data = await validator.run(raw);
+        } catch (e) {
+            useLogger()
+                .error(e);
+
+            if (typeof cb === 'function') {
+                cb(e);
+            }
+
+            return;
+        }
+
+        let from : CTSMessagingParty;
         if (socket.data.userId) {
             from = {
                 type: 'user',
@@ -53,6 +77,10 @@ export function mountMessagingController(socket: Socket) {
                     data: data.data,
                     metadata: data.metadata,
                 });
+        }
+
+        if (typeof cb === 'function') {
+            cb(null);
         }
     });
 }
