@@ -15,6 +15,7 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 import type { MasterImage } from '@privateaim/core-kit';
+import { MasterImageCommandArgument } from '@privateaim/core-kit';
 
 @Entity({ name: 'master_images' })
 export class MasterImageEntity implements MasterImage {
@@ -50,7 +51,7 @@ export class MasterImageEntity implements MasterImage {
             },
         },
     })
-        command_arguments: unknown | null;
+        command_arguments: MasterImageCommandArgument[] | null;
 
     // ------------------------------------------------------------------
 

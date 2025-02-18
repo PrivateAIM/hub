@@ -32,7 +32,7 @@
         "@privateaim/storage-kit": "^0.8.5",
         "amqp-extension": "^4.0.0-beta.3",
         "dockerode": "^4.0.4",
-        "docker-scan": "^1.1.0",
+        "docken": "^1.0.0",
         "dotenv": "^16.4.5",
         "envix": "^1.3.0",
         "gunzip-maybe": "^1.4.2",

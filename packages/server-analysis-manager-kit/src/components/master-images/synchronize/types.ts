@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Group, Image } from 'docker-scan';
+import type { Meta } from 'docken';
 
 export type MasterImagesSynchronizeCommandPayload = {
     owner: string,
@@ -18,6 +18,6 @@ export type MasterImagesSynchronizationFailedEventPayload = {
 };
 
 export type MaterImagesSynchronizedEventPayload = {
-    images: Image[],
-    groups: Group[]
+    images: Meta[],
+    groups: Meta[]
 };

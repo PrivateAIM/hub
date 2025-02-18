@@ -5,9 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Group, Image } from 'docker-scan';
+import type { Meta } from 'docken';
 import { useDataSource } from 'typeorm-extension';
 import { MasterImageEntity, MasterImageGroupEntity } from '../../../domains';
+import { MasterImageSyncAttributesValidator } from './validators';
 
 export type MasterImageSynchronizerResult<T> = {
     updated: T[],
@@ -16,8 +17,14 @@ export type MasterImageSynchronizerResult<T> = {
 };
 
 export class MasterImageSynchronizerService {
+    protected validator : MasterImageSyncAttributesValidator;
+
+    constructor() {
+        this.validator = new MasterImageSyncAttributesValidator();
+    }
+
     async syncImages(
-        input: Image[],
+        input: Meta[],
     ) : Promise<MasterImageSynchronizerResult<MasterImageEntity>> {
         const dataSource = await useDataSource();
 
@@ -39,18 +46,19 @@ export class MasterImageSynchronizerService {
             parts.pop();
 
             const data : Partial<MasterImageEntity> = {
-                name: input[i].name,
                 path: input[i].path,
                 group_virtual_path: parts.join('/'),
                 virtual_path: input[i].virtualPath,
             };
 
-            if (typeof input[i].command === 'string') {
-                data.command = input[i].command;
+            const attributes = await this.validator.run(input[i].attributes);
+            data.name = attributes.name;
+            if (attributes.command) {
+                data.command = attributes.command;
             }
 
-            if (typeof input[i].commandArguments !== 'undefined') {
-                data.command_arguments = input[i].commandArguments;
+            if (attributes.commandArguments) {
+                data.command_arguments = attributes.commandArguments;
             }
 
             const index = entities.findIndex(
@@ -79,7 +87,7 @@ export class MasterImageSynchronizerService {
     }
 
     async syncGroups(
-        input: Group[],
+        input: Meta[],
     ) : Promise<MasterImageSynchronizerResult<MasterImageGroupEntity>> {
         const dataSource = await useDataSource();
 
@@ -99,16 +107,17 @@ export class MasterImageSynchronizerService {
 
         for (let i = 0; i < input.length; i++) {
             const data : Partial<MasterImageGroupEntity> = {
-                name: input[i].name,
                 path: input[i].path,
             };
 
-            if (typeof input[i].command === 'string') {
-                data.command = input[i].command;
+            const attributes = await this.validator.run(input[i].attributes);
+            data.name = attributes.name;
+            if (attributes.command) {
+                data.command = attributes.command;
             }
 
-            if (typeof input[i].commandArguments !== 'undefined') {
-                data.command_arguments = input[i].commandArguments;
+            if (attributes.commandArguments) {
+                data.command_arguments = attributes.commandArguments;
             }
 
             const index = entities.findIndex((dbEntity) => dbEntity.virtual_path === input[i].virtualPath);
