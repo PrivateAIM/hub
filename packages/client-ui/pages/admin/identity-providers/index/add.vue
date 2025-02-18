@@ -6,11 +6,10 @@
   -->
 
 <script lang="ts">
-import { AIdentityProviderOAuth2Form, injectStore } from '@authup/client-web-kit';
+import { AIdentityProviderOAuth2Form, injectStore, storeToRefs } from '@authup/client-web-kit';
 import type { IdentityProvider } from '@authup/core-kit';
 import { IdentityProviderProtocol, PermissionName } from '@authup/core-kit';
 import { VCFormSelect } from '@vuecs/form-controls';
-import { storeToRefs } from 'pinia';
 import { ref } from 'vue';
 import { defineNuxtComponent, navigateTo } from '#app';
 import { definePageMeta } from '#imports';

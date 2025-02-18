@@ -10,9 +10,9 @@ import { BTable } from 'bootstrap-vue-next';
 import type { Role } from '@authup/core-kit';
 import { PermissionName, isRealmResourceWritable } from '@authup/core-kit';
 import {
-    AEntityDelete, APagination, ARoles, ASearch, ATitle, injectStore, usePermissionCheck,
+    AEntityDelete, APagination, ARoles, ASearch, ATitle, injectStore, storeToRefs,
+    usePermissionCheck,
 } from '@authup/client-web-kit';
-import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
 import { defineNuxtComponent } from '#imports';
 

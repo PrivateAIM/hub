@@ -5,11 +5,10 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { injectStore } from '@authup/client-web-kit';
+import { injectStore, storeToRefs } from '@authup/client-web-kit';
 import { injectCoreHTTPClient } from '@privateaim/client-vue';
 import { VCCountdown } from '@vuecs/countdown';
 import { VCNavItems } from '@vuecs/navigation';
-import { storeToRefs } from 'pinia';
 import { defineNuxtComponent } from '#app';
 import { computed } from '#imports';
 

@@ -6,10 +6,9 @@
   -->
 
 <script lang="ts">
-import { injectHTTPClient, injectStore } from '@authup/client-web-kit';
+import { injectHTTPClient, injectStore, storeToRefs } from '@authup/client-web-kit';
 import type { User } from '@authup/core-kit';
 import { PermissionName, isRealmResourceWritable } from '@authup/core-kit';
-import { storeToRefs } from 'pinia';
 import { defineComponent, ref } from 'vue';
 import type { Ref } from 'vue';
 import {

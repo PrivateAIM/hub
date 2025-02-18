@@ -23,7 +23,14 @@
         "build:types": "tsc --emitDeclarationOnly -p tsconfig.build.json",
         "build:js": "rollup -c",
         "build": "rimraf ./dist && cross-env NODE_ENV=production npm run build:js && npm run build:types",
-        "build-watch": "rimraf ./dist && tsc -p tsconfig.build.json --watch"
+        "build-watch": "rimraf ./dist && tsc -p tsconfig.build.json --watch",
+        "test": "cross-env NODE_ENV=test jest --config ./test/jest.config.js",
+        "test:coverage": "npm run test -- --coverage"
+    },
+    "dependencies": {
+        "@validup/adapter-zod": "^0.1.8",
+        "validup": "^0.1.8",
+        "zod": "^3.24.1"
     },
     "devDependencies": {
         "@privateaim/core-kit": "^0.8.5"

@@ -1,21 +1,21 @@
 import type { EventCallback } from '../types';
 import type { CTSMessagingEventName, STCMessagingEventName } from './constants';
 
-export type MessagingParty = {
+export type CTSMessagingParty = {
     type: 'user' | 'robot',
     id: string
 };
 
-export type Message = {
-    to: MessagingParty[],
-    data: Record<string, any>,
-    metadata: Record<string, any>
+export type CTSMessagingMessage = {
+    to: CTSMessagingParty[],
+    data?: Record<string, any> | string | null,
+    metadata?: Record<string, any> | null
 };
 
 export type STCMessagingMessage = {
-    from: MessagingParty,
-    data: Record<string, any>,
-    metadata: Record<string, any>
+    from: CTSMessagingParty,
+    data?: Record<string, any> | string | null,
+    metadata?: Record<string, any> | null
 };
 
 export type STCMessagingEvents = {
@@ -23,5 +23,5 @@ export type STCMessagingEvents = {
 };
 
 export type CTSMessagingEvents = {
-    [CTSMessagingEventName.SEND]: (data: Message, cb?: EventCallback) => void;
+    [CTSMessagingEventName.SEND]: (data: CTSMessagingMessage, cb?: EventCallback) => void;
 };

@@ -5,25 +5,25 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { BadRequestError } from '@ebec/http';
+import { AnalysisAPICommand, isAnalysisAPICommandExecutable } from '@privateaim/core-kit';
 import { BuilderCommand, buildBuilderTaskQueueRouterPayload } from '@privateaim/server-analysis-manager-kit';
-import { useDataSource } from 'typeorm-extension';
 import { useQueueRouter } from '@privateaim/server-kit';
-import { resolveAnalysis } from './utils';
-import { AnalysisEntity } from '../entity';
+import type { AnalysisEntity } from '../entity';
 
-export async function detectAnalysisBuildStatus(train: AnalysisEntity | string) : Promise<AnalysisEntity> {
-    const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(AnalysisEntity);
-
-    train = await resolveAnalysis(train, repository);
+export async function detectAnalysisBuildStatus(entity: AnalysisEntity) : Promise<AnalysisEntity> {
+    const check = isAnalysisAPICommandExecutable(entity, AnalysisAPICommand.BUILD_STATUS);
+    if (!check.success) {
+        throw new BadRequestError(check.message);
+    }
 
     const client = useQueueRouter();
     await client.publish(buildBuilderTaskQueueRouterPayload({
         command: BuilderCommand.CHECK,
         data: {
-            id: train.id,
+            id: entity.id,
         },
     }));
 
-    return train;
+    return entity;
 }

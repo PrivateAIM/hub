@@ -5,11 +5,10 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { injectStore } from '@authup/client-web-kit';
+import { injectStore, storeToRefs } from '@authup/client-web-kit';
 import { VCGravatar } from '@vuecs/gravatar';
 import { VCNavItems } from '@vuecs/navigation';
 import { BCollapse } from 'bootstrap-vue-next';
-import { storeToRefs } from 'pinia';
 import { computed } from 'vue';
 import { ref } from '#imports';
 import { defineNuxtComponent } from '#app';

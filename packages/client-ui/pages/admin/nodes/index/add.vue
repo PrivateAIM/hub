@@ -5,10 +5,9 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { injectStore } from '@authup/client-web-kit';
+import { injectStore, storeToRefs } from '@authup/client-web-kit';
 import type { Node } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
-import { storeToRefs } from 'pinia';
 import { FNodeForm } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
 import { definePageMeta } from '#imports';

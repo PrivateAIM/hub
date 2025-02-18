@@ -43,7 +43,7 @@
         "locter": "^2.1.6",
         "mysql2": "^3.12.0",
         "pascal-case": "^4.0.0",
-        "pg": "^8.13.1",
+        "pg": "^8.13.2",
         "prom-client": "^14.2.0",
         "rapiq": "^0.9.0",
         "redis-extension": "^2.0.1",
@@ -54,7 +54,7 @@
         "typeorm-extension": "^3.6.3",
         "validup": "^0.1.8",
         "yargs": "^17.7.1",
-        "zod": "^3.24.1"
+        "zod": "^3.24.2"
     },
     "devDependencies": {
         "@privateaim/core-http-kit": "^0.8.5",

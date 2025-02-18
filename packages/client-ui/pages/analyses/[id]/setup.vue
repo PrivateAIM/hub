@@ -27,6 +27,11 @@ export default defineNuxtComponent({
 
         const handleUpdated = (entity: Analysis) => {
             emit('updated', entity);
+
+            if (entity.configuration_locked) {
+                Promise.resolve()
+                    .then(() => handleFinished());
+            }
         };
 
         const handleFailed = (e: Error) => {

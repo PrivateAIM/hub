@@ -6,11 +6,10 @@
   -->
 <script>
 import { computed } from 'vue';
-import { storeToRefs } from 'pinia';
+import { injectStore, storeToRefs } from '@authup/client-web-kit';
 import {
     FPagination, FProjectItem, FProjects, FSearch, FTitle,
 } from '@privateaim/client-vue';
-import { injectStore } from '@authup/client-web-kit';
 import { PermissionName } from '@privateaim/kit';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
 import { defineNuxtComponent, definePageMeta } from '#imports';

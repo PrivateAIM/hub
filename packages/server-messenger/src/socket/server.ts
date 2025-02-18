@@ -59,6 +59,11 @@ export function createSocketServer(httpServer: HTTPServer) : Server {
 
     server.use((socket, next) => {
         useLogger().info(`${socket.nsp.name}: ${socket.id} connected.`);
+
+        socket.on('disconnect', () => {
+            useLogger().info(`${socket.nsp.name}: ${socket.id} disconnected.`);
+        });
+
         next();
     });
     server.use(authupMiddleware);

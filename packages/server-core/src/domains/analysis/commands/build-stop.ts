@@ -6,33 +6,24 @@
  */
 
 import { BadRequestError } from '@ebec/http';
-import { AnalysisBuildStatus } from '@privateaim/core-kit';
+import { AnalysisAPICommand, AnalysisBuildStatus, isAnalysisAPICommandExecutable } from '@privateaim/core-kit';
 import { useDataSource } from 'typeorm-extension';
-import { resolveAnalysis } from './utils';
 import { AnalysisEntity } from '../entity';
 
-export async function stopAnalysisBuild(train: AnalysisEntity | string) : Promise<AnalysisEntity> {
+export async function stopAnalysisBuild(entity: AnalysisEntity) : Promise<AnalysisEntity> {
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisEntity);
 
-    train = await resolveAnalysis(train, repository);
-
-    if (train.run_status) {
-        throw new BadRequestError('The train build can not longer be stopped...');
-    } else {
-        // if we already send a stop event, we dont send it again... :)
-        if (train.build_status !== AnalysisBuildStatus.STOPPING) {
-            // todo: implement stop routine
-        }
-
-        train = repository.merge(train, {
-            build_status: train.build_status !== AnalysisBuildStatus.STOPPING ?
-                AnalysisBuildStatus.STOPPING :
-                AnalysisBuildStatus.STOPPED,
-        });
-
-        await repository.save(train);
+    const check = isAnalysisAPICommandExecutable(entity, AnalysisAPICommand.BUILD_STOP);
+    if (!check.success) {
+        throw new BadRequestError(check.message);
     }
 
-    return train;
+    entity.build_status = entity.build_status !== AnalysisBuildStatus.STOPPING ?
+        AnalysisBuildStatus.STOPPING :
+        AnalysisBuildStatus.STOPPED;
+
+    await repository.save(entity);
+
+    return entity;
 }

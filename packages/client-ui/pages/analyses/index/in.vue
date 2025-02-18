@@ -5,12 +5,11 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { injectStore, usePermissionCheck } from '@authup/client-web-kit';
+import { injectStore, storeToRefs, usePermissionCheck } from '@authup/client-web-kit';
 import { PermissionName } from '@privateaim/kit';
 import { VCTimeago } from '@vuecs/timeago';
 import type { AnalysisNode } from '@privateaim/core-kit';
 import { BDropdown, BTable } from 'bootstrap-vue-next';
-import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
 import { ref } from 'vue';
 import {
