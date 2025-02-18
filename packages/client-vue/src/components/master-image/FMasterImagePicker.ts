@@ -147,11 +147,6 @@ export default defineComponent({
             if (entity) {
                 form.master_image_id = entity.id;
 
-                if (masterImageGroupEntity.value) {
-                    entity.command = entity.command || masterImageGroupEntity.value.command;
-                    entity.command_arguments = entity.command_arguments || masterImageGroupEntity.value.command_arguments;
-                }
-
                 emit('selected', entity);
                 return;
             }

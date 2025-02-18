@@ -45,44 +45,40 @@ export default defineComponent({
         const analysisFileBusy = ref(false);
 
         const command = computed(() => {
-            let command = '<Command>';
+            if (!masterImageEntity.value && !analysisFileEntity.value) {
+                return '<Command> <File>';
+            }
+
+            const parts: string[] = [];
 
             if (
                 masterImageEntity.value &&
                 masterImageEntity.value.command &&
                 !masterImageEntity.value.command.match(/\//g)
             ) {
-                command = `/usr/bin/${masterImageEntity.value.command}`;
+                parts.push(`/usr/bin/${masterImageEntity.value.command}`);
+            } else {
+                parts.push('<Command>');
             }
 
-            return command;
-        });
+            // todo: append command arguments (before)
 
-        const file = computed(() => {
-            if (!analysisFileEntity.value) {
-                return '<File>';
+            if (analysisFileEntity.value) {
+                parts.push(analysisFileEntity.value.name);
+            } else {
+                parts.push('<File>');
             }
 
-            return analysisFileEntity.value.name;
+            // todo: append command arguments (after)
+
+            return parts.join(' ');
         });
 
         const loadMasterImage = wrapFnWithBusyState(masterImageBusy, async () => {
             if (!masterImageId.value) return;
 
             try {
-                const item = await apiClient.masterImage.getOne(masterImageId.value);
-                const { data } = await apiClient.masterImageGroup.getMany({
-                    filters: {
-                        virtual_path: item.group_virtual_path,
-                    },
-                });
-
-                if (data.length === 1) {
-                    item.command = item.command || data[0].command;
-                    item.command_arguments = item.command_arguments || data[0].command_arguments;
-                }
-
-                masterImageEntity.value = item;
+                masterImageEntity.value = await apiClient.masterImage.getOne(masterImageId.value);
             } catch (e) {
                 if (e instanceof Error) {
                     emit('failed', e);
@@ -151,8 +147,6 @@ export default defineComponent({
                 '$',
             ]),
             command.value,
-            ' ',
-            file.value,
         ]);
     },
 });
