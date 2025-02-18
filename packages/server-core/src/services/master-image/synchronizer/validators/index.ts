@@ -6,4 +6,4 @@
  */
 
 export * from './attributes';
-export * from './command-arguments';
+export * from './command-argument';
