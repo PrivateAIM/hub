@@ -22,7 +22,6 @@ describe('components > master-images', () => {
     it('should sync master images from directory', async () => {
         const { images, groups } = await scanMasterImagesDirectory();
 
-        console.log(images, groups);
         expect(images.length).toBeGreaterThan(0);
         expect(groups.length).toBeGreaterThan(0);
     });
