@@ -25,7 +25,7 @@ export class MasterImageGroupEntity implements MasterImageGroup {
     @Column({ type: 'varchar', length: 512 })
         path: string;
 
-    @Index({ unique: true })
+    @Index()
     @Column({ type: 'varchar', length: 512 })
         virtual_path: string;
 
