@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { deserialize, serialize } from '@authup/kit';
 import {
     Column,
     CreateDateColumn,
@@ -27,25 +26,8 @@ export class MasterImageGroupEntity implements MasterImageGroup {
         path: string;
 
     @Index({ unique: true })
-    @Column({ type: 'varchar', length: 256 })
+    @Column({ type: 'varchar', length: 512 })
         virtual_path: string;
-
-    @Column({ type: 'text', nullable: true })
-        command: string | null;
-
-    @Column({
-        type: 'text',
-        nullable: true,
-        transformer: {
-            to(value: any): any {
-                return serialize(value);
-            },
-            from(value: any): any {
-                return deserialize(value);
-            },
-        },
-    })
-        command_arguments: unknown | null;
 
     // ------------------------------------------------------------------
 
