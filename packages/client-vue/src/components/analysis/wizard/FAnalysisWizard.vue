@@ -101,8 +101,8 @@ export default defineComponent({
 
         const steps = [
             AnalysisConfigurationStatus.NODES,
-            AnalysisConfigurationStatus.MASTER_IMAGE,
             AnalysisConfigurationStatus.FILES,
+            AnalysisConfigurationStatus.MASTER_IMAGE,
         ];
 
         const updatedAt = computed(() => (entity.value ?
@@ -358,16 +358,6 @@ export default defineComponent({
         </TabContent>
 
         <TabContent
-            title="MasterImage"
-            :before-change="passWizardStep"
-        >
-            <FAnalysisWizardStepMasterImage
-                :entity="entity"
-                @updated="handleUpdated"
-            />
-        </TabContent>
-
-        <TabContent
             title="Files"
             :before-change="passWizardStep"
         >
@@ -376,6 +366,17 @@ export default defineComponent({
                 :entrypoint-entity="entrypointFile"
                 @entrypointChanged="setEntrypointFile"
                 @failed="handleFailed"
+            />
+        </TabContent>
+
+        <TabContent
+            title="MasterImage"
+            :before-change="passWizardStep"
+        >
+            <FAnalysisWizardStepMasterImage
+                :entrypoint-entity="entrypointFile"
+                :entity="entity"
+                @updated="handleUpdated"
             />
         </TabContent>
     </FormWizard>

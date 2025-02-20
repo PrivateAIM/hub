@@ -5,22 +5,27 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Analysis, MasterImage } from '@privateaim/core-kit';
+import type { Analysis, AnalysisBucketFile, MasterImage } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
 import {
     defineComponent,
 } from 'vue';
 import FMasterImagePicker from '../../master-image/FMasterImagePicker';
 import { injectCoreHTTPClient } from '../../../core';
+import FAnalysisImageCommand from '../FAnalysisImageCommand';
 
 export default defineComponent({
     components: {
+        FAnalysisImageCommand,
         FMasterImagePicker,
     },
     props: {
         entity: {
             type: Object as PropType<Analysis>,
             required: true,
+        },
+        entrypointEntity: {
+            type: Object as PropType<AnalysisBucketFile>,
         },
     },
     emits: ['updated', 'failed'],
@@ -52,7 +57,17 @@ export default defineComponent({
 });
 </script>
 <template>
-    <div class="d-flex flex-column">
+    <div class="d-flex flex-column gap-2">
+        <div>
+            <h6><i class="fa fa-terminal" /> Command</h6>
+
+            <FAnalysisImageCommand
+                class="mt-2 mb-2"
+                :master-image-id="entity.master_image_id"
+                :analysis-file="entrypointEntity"
+                :analysis-id="entity.id"
+            />
+        </div>
         <div>
             <h6><i class="fa fa-compact-disc" /> MasterImage</h6>
             <div class="mb-2">

@@ -14,7 +14,7 @@ import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import type { VNodeArrayChildren } from 'vue';
 import {
-    computed, defineComponent, h, nextTick, reactive, ref, toRefs, watch,
+    computed, defineComponent, h, nextTick, reactive, ref, toRef, watch,
 } from 'vue';
 import {
     EntityListSlotName, injectCoreHTTPClient, wrapFnWithBusyState,
@@ -32,7 +32,7 @@ export default defineComponent({
     },
     emits: ['selected'],
     async setup(props, { emit }) {
-        const refs = toRefs(props);
+        const entityId = toRef(props, 'entityId');
         const apiClient = injectCoreHTTPClient();
 
         const busy = ref(false);
@@ -98,12 +98,12 @@ export default defineComponent({
         });
 
         const init = () => {
-            if (!refs.entityId.value) return;
+            if (!entityId.value) return;
 
-            form.master_image_id = refs.entityId.value;
+            form.master_image_id = entityId.value;
         };
 
-        watch(refs.entityId, (val, oldValue) => {
+        watch(entityId, (val, oldValue) => {
             if (val && val !== oldValue) {
                 init();
                 loadImage();

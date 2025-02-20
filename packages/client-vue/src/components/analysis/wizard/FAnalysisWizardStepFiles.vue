@@ -13,12 +13,10 @@ import {
 } from 'vue';
 import FAnalysisBucketFileManager from '../../analysis-bucket-file/FAnalysisBucketFileManager.vue';
 import FAnalysisBucket from '../../analysis-bucket/FAnalysisBucket';
-import FAnalysisImageCommand from '../FAnalysisImageCommand';
 
 export default defineComponent({
     components: {
         FAnalysisBucketFileManager,
-        FAnalysisImageCommand,
         FAnalysisBucket,
     },
     props: {
@@ -70,44 +68,30 @@ export default defineComponent({
             :query-filters="queryFilters"
         >
             <template #default="{ data: bucket }">
-                <div class="row">
-                    <div class="col-9">
-                        <FAnalysisBucketFileManager
-                            :entity="bucket"
-                            :file-entity="entrypointEntity"
-                            @set-entrypoint-file="handleEntrypointChanged"
-                            @failed="handleFailed"
-                        >
-                            <template #header="props">
-                                <div class="d-flex flex-row">
-                                    <div>
-                                        <h6><i class="fa fa-file" /> Files</h6>
-                                    </div>
-                                    <div class="ms-auto">
-                                        <button
-                                            style="width: 120px"
-                                            type="button"
-                                            class="btn btn-primary btn-xs"
-                                            @click.prevent="props.add"
-                                        >
-                                            <i class="fa fa-plus me-1" /> Add
-                                        </button>
-                                    </div>
-                                </div>
-                            </template>
-                        </FAnalysisBucketFileManager>
-                    </div>
-                    <div class="col-3">
-                        <h6><i class="fa fa-terminal" /> Command</h6>
-
-                        <FAnalysisImageCommand
-                            class="mt-2 mb-2"
-                            :master-image-id="entity.master_image_id"
-                            :analysis-file="entrypointEntity"
-                            :analysis-id="entity.id"
-                        />
-                    </div>
-                </div>
+                <FAnalysisBucketFileManager
+                    :entity="bucket"
+                    :file-entity="entrypointEntity"
+                    @set-entrypoint-file="handleEntrypointChanged"
+                    @failed="handleFailed"
+                >
+                    <template #header="props">
+                        <div class="d-flex flex-row">
+                            <div>
+                                <h6><i class="fa fa-file" /> Files</h6>
+                            </div>
+                            <div class="ms-auto">
+                                <button
+                                    style="width: 120px"
+                                    type="button"
+                                    class="btn btn-primary btn-xs"
+                                    @click.prevent="props.add"
+                                >
+                                    <i class="fa fa-plus me-1" /> Add
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                </FAnalysisBucketFileManager>
             </template>
             <template #error>
                 <div class="alert alert-sm alert-warning">
