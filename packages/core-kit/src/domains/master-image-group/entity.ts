@@ -14,10 +14,6 @@ export interface MasterImageGroup {
 
     virtual_path: string;
 
-    command: string | null;
-
-    command_arguments: any | null;
-
     // ------------------------------------------------------------------
 
     created_at: Date;

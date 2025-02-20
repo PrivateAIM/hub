@@ -15,21 +15,22 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 import type { MasterImage } from '@privateaim/core-kit';
+import { MasterImageCommandArgument } from '@privateaim/core-kit';
 
 @Entity({ name: 'master_images' })
 export class MasterImageEntity implements MasterImage {
     @PrimaryGeneratedColumn('uuid')
         id: string;
 
-    @Column({ type: 'varchar', nullable: true })
+    @Column({ type: 'varchar', nullable: true, length: 512 })
         path: string | null;
 
     @Index({ unique: true })
-    @Column({ type: 'varchar', length: 256 })
+    @Column({ type: 'varchar', length: 512 })
         virtual_path: string;
 
     @Index()
-    @Column({ type: 'varchar', length: 256 })
+    @Column({ type: 'varchar', length: 512 })
         group_virtual_path: string;
 
     @Column({ type: 'varchar' })
@@ -50,7 +51,7 @@ export class MasterImageEntity implements MasterImage {
             },
         },
     })
-        command_arguments: unknown | null;
+        command_arguments: MasterImageCommandArgument[] | null;
 
     // ------------------------------------------------------------------
 

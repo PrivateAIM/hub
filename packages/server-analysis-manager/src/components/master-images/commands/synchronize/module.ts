@@ -5,11 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { scanDirectory } from 'docker-scan';
-import type { MasterImagesSynchronizeCommandPayload } from '@privateaim/server-analysis-manager-kit';
+import type {
+    MasterImagesSynchronizeCommandPayload,
+} from '@privateaim/server-analysis-manager-kit';
 import { MasterImagesEvent, useMasterImageQueueService } from '@privateaim/server-analysis-manager-kit';
-import { MASTER_IMAGES_DATA_DIRECTORY_PATH, MASTER_IMAGES_DIRECTORY_PATH } from '../../../../constants';
+import { MASTER_IMAGES_DIRECTORY_PATH } from '../../../../constants';
 import { GitHubClient } from '../../../../core';
+import { scanMasterImagesDirectory } from './helper';
 
 export async function executeMasterImagesSynchronizeCommand(
     payload: MasterImagesSynchronizeCommandPayload,
@@ -28,21 +30,12 @@ export async function executeMasterImagesSynchronizeCommand(
         branch: payload.branch,
     });
 
-    const {
-        images,
-        groups,
-    } = await scanDirectory(MASTER_IMAGES_DATA_DIRECTORY_PATH);
+    const data = await scanMasterImagesDirectory();
 
     await queue.publishEvent({
         event: MasterImagesEvent.SYNCHRONIZED,
-        data: {
-            images,
-            groups,
-        },
+        data,
     });
 
-    return {
-        images,
-        groups,
-    };
+    return data;
 }
