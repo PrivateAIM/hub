@@ -25,7 +25,7 @@ export class MasterImageEntity implements MasterImage {
     @Column({ type: 'varchar', nullable: true, length: 512 })
         path: string | null;
 
-    @Index({ unique: true })
+    @Index()
     @Column({ type: 'varchar', length: 512 })
         virtual_path: string;
 
