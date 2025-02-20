@@ -32,17 +32,13 @@ export function createAnalysisManagerMasterImagesHandlers() : QueueRouterHandler
         [MasterImagesEvent.SYNCHRONIZED]: async (
             message,
         ) => {
-            // groups
-            await synchronizer
-                .syncGroups(message.data.groups);
-
-            // images
+            // groups & images
             const output = await synchronizer
-                .syncImages(message.data.images);
+                .sync(message.data);
 
             const entities = [
-                ...output.created,
-                ...output.updated,
+                ...output.images.created,
+                ...output.images.updated,
             ];
 
             for (let i = 0; i < entities.length; i++) {
