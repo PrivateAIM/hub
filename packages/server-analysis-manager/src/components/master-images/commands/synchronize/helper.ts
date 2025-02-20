@@ -30,17 +30,10 @@ export async function scanMasterImagesDirectory() : Promise<{
     for (let i = 0; i < result.images.length; i++) {
         const attributes = await imageValidator.run(result.images[i].attributes);
 
-        let name : string;
-        if (attributes.name) {
-            name = attributes.name;
-        } else {
-            name = result.images[i].path.split('/').pop();
-        }
-
         output.images.push({
             path: result.images[i].path,
             virtualPath: result.images[i].virtualPath,
-            name: name || result.images[i].path,
+            name: result.images[i].path.split('/').pop() || result.images[i].path,
             command: attributes.command,
             commandArguments: attributes.commandArguments || [],
         });
