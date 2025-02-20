@@ -6,7 +6,7 @@
  */
 
 import type { Realm, User } from '@authup/core-kit';
-import type { MasterImage } from '../master-image';
+import type { MasterImage, MasterImageCommandArgument } from '../master-image';
 import type { Project } from '../project';
 import type {
     AnalysisBuildStatus,
@@ -58,6 +58,10 @@ export interface Analysis {
     project_id: Project['id'];
 
     project: Project;
+
+    // ------------------------------------------------------------------
+
+    image_command_arguments: MasterImageCommandArgument[] | null;
 
     // ------------------------------------------------------------------
 
