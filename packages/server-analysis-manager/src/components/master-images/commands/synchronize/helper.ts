@@ -53,13 +53,14 @@ export async function scanMasterImagesDirectory() : Promise<{
         if (attributes.name) {
             name = attributes.name;
         } else {
-            name = result.images[i].path.split('/').shift();
+            const parts = result.groups[i].path.split('/');
+            name = parts.slice(0, -1).join('/');
         }
 
         output.groups.push({
-            path: result.images[i].path,
-            virtualPath: result.images[i].virtualPath,
-            name: name || result.images[i].path,
+            path: result.groups[i].path,
+            virtualPath: result.groups[i].virtualPath,
+            name: name || result.groups[i].path,
         });
     }
 
