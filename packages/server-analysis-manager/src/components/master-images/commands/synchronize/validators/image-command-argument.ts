@@ -10,7 +10,7 @@ import { createValidator } from '@validup/adapter-zod';
 import { z } from 'zod';
 import type { MasterImageCommandArgument } from '@privateaim/core-kit';
 
-export class MasterImageCommandArgumentValidator extends Container<MasterImageCommandArgument> {
+export class DockenImageAttributeCommandArguments extends Container<MasterImageCommandArgument> {
     protected initialize() {
         super.initialize();
 
@@ -18,7 +18,7 @@ export class MasterImageCommandArgumentValidator extends Container<MasterImageCo
             'value',
             createValidator(
                 z.string()
-                    .min(3)
+                    .min(2)
                     .max(512),
             ),
         );

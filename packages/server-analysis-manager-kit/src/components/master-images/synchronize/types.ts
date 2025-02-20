@@ -5,7 +5,21 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Meta } from 'docken';
+import type { MasterImageCommandArgument } from '@privateaim/core-kit';
+
+export type MasterImageSyncData = {
+    name: string,
+    path: string,
+    virtualPath: string,
+    command: string,
+    commandArguments?: MasterImageCommandArgument[]
+};
+
+export type MasterImageGroupSyncData = {
+    name: string,
+    path: string,
+    virtualPath: string,
+};
 
 export type MasterImagesSynchronizeCommandPayload = {
     owner: string,
@@ -18,6 +32,6 @@ export type MasterImagesSynchronizationFailedEventPayload = {
 };
 
 export type MaterImagesSynchronizedEventPayload = {
-    images: Meta[],
-    groups: Meta[]
+    images: MasterImageSyncData[],
+    groups: MasterImageGroupSyncData[]
 };

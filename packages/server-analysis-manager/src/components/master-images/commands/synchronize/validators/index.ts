@@ -5,5 +5,6 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-export * from './attributes';
-export * from './command-argument';
+export * from './group';
+export * from './image';
+export * from './image-command-argument';

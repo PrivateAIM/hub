@@ -9,25 +9,28 @@ import { Container } from 'validup';
 import { createValidator } from '@validup/adapter-zod';
 import { z } from 'zod';
 import type { MasterImageCommandArgument } from '@privateaim/core-kit';
-import type { MasterImageSyncAttributes } from '../types';
-import { MasterImageCommandArgumentValidator } from './command-argument';
+import { DockenImageAttributeCommandArguments } from './image-command-argument';
+import type { DockenImageAttributes } from '../types';
 
-export class MasterImageSyncAttributesValidator extends Container<MasterImageSyncAttributes> {
+export class DockenImageAttributesValidator extends Container<DockenImageAttributes> {
     protected initialize() {
         super.initialize();
 
         this.mount(
             'name',
+            { optional: true },
             createValidator(
                 z.string()
-                    .min(3)
-                    .max(128),
+                    .min(1)
+                    .max(128)
+                    .or(z.null())
+                    .or(z.undefined())
+                    .optional(),
             ),
         );
 
         this.mount(
             'command',
-            { optional: true },
             createValidator(
                 z.string()
                     .min(3)
@@ -35,7 +38,7 @@ export class MasterImageSyncAttributesValidator extends Container<MasterImageSyn
             ),
         );
 
-        const commandArgumentValidator = new MasterImageCommandArgumentValidator();
+        const commandArgumentValidator = new DockenImageAttributeCommandArguments();
         this.mount('commandArguments', { optional: true }, (ctx) => {
             if (!Array.isArray(ctx.value)) {
                 // todo: throw error

@@ -4,22 +4,23 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-
-import { scanDirectory } from 'docken';
-import { MASTER_IMAGES_DATA_DIRECTORY_PATH, MASTER_IMAGES_DIRECTORY_PATH } from '../../src/constants';
+import { scanMasterImagesDirectory } from '../../src/components/master-images/commands';
 import { GitHubClient } from '../../src/core';
+import { MASTER_IMAGES_DIRECTORY_PATH } from '../../src/constants';
 
-describe('git/clone', () => {
-    it('should clone git repository', async () => {
+describe('components > master-images', () => {
+    it('should clone master images to directory', async () => {
         const gitHubClient = new GitHubClient();
         await gitHubClient.cloneRepository({
             owner: 'PrivateAim',
             repository: 'master-images',
-            branch: 'master',
+            branch: 'develop',
             destination: MASTER_IMAGES_DIRECTORY_PATH,
         });
+    });
 
-        const { images, groups } = await scanDirectory(MASTER_IMAGES_DATA_DIRECTORY_PATH);
+    fit('should sync master images from directory', async () => {
+        const { images, groups } = await scanMasterImagesDirectory();
 
         expect(images.length).toBeGreaterThan(0);
         expect(groups.length).toBeGreaterThan(0);
