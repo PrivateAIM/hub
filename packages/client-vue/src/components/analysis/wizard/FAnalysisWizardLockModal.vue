@@ -131,20 +131,20 @@ export default defineComponent({
                     <button
                         :disabled="isBusy"
                         type="button"
-                        class="btn btn-xs btn-dark"
-                        @click.prevent="execute(props.ok)"
+                        class="btn btn-secondary btn-xs"
+                        @click.prevent="props.cancel()"
                     >
-                        Continue
+                        <i class="fa fa-abort" /> Cancel
                     </button>
                 </div>
                 <div class="ms-auto">
                     <button
                         :disabled="isBusy"
                         type="button"
-                        class="btn btn-secondary btn-xs"
-                        @click.prevent="props.cancel()"
+                        class="btn btn-xs btn-dark"
+                        @click.prevent="execute(props.ok)"
                     >
-                        <i class="fa fa-abort" /> Cancel
+                        Continue
                     </button>
                 </div>
             </div>

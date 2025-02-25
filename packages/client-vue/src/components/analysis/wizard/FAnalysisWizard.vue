@@ -21,7 +21,7 @@ import { AnalysisBucketType, AnalysisConfigurationStatus } from '@privateaim/cor
 import { useModalController } from 'bootstrap-vue-next';
 import { initFormAttributesFromSource, injectCoreHTTPClient, wrapFnWithBusyState } from '../../../core';
 import FAnalysisWizardStepNodes from './FAnalysisWizardStepNodes.vue';
-import FAnalysisWizardStepMasterImage from './FAnalysisWizardStepMasterImage.vue';
+import FAnalysisWizardStepMasterImage from './FAnalysisWizardStepImage.vue';
 import FAnalysisWizardStepFiles from './FAnalysisWizardStepFiles.vue';
 import FAnalysisWizardLockModal from './FAnalysisWizardLockModal.vue';
 

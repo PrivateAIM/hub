@@ -72,7 +72,7 @@ export default defineComponent({
 <template>
     <div class="d-flex flex-column gap-2">
         <div>
-            <h6><i class="fa fa-compact-disc" /> MasterImage</h6>
+            <h6><i class="fa fa-compact-disc" /> Base</h6>
             <div class="mb-2">
                 <FMasterImagePicker
                     :entity-id="entity.master_image_id"
