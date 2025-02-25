@@ -12,12 +12,13 @@ import path from 'node:path';
 import type {
     Analysis,
     MasterImage,
+    MasterImageCommandArgument,
 } from '@privateaim/core-kit';
 import { useCoreClient, useStorageClient } from '../../../core';
 import { BuilderError } from '../error';
 
 type DockerFileBuildContext = {
-    entity: Pick<Analysis, 'id' | 'master_image_id'>,
+    entity: Pick<Analysis, 'id' | 'master_image_id' | 'image_command_arguments'>,
     hostname: string
 };
 
@@ -71,30 +72,39 @@ export async function bundleDockerFile(context: DockerFileBuildContext) : Promis
         entryPoint.name,
     );
 
+    let commandArguments : MasterImageCommandArgument[];
+    if (context.entity.image_command_arguments) {
+        commandArguments = context.entity.image_command_arguments;
+    } else if (masterImage.command_arguments) {
+        commandArguments = masterImage.command_arguments;
+    } else {
+        commandArguments = [];
+    }
+
     const cmdParts : string[] = [];
 
     // todo: maybe rename to binary
     cmdParts.push(`"${masterImage.command}"`);
 
-    if (masterImage.command_arguments) {
-        for (let i = 0; i < masterImage.command_arguments.length; i++) {
+    if (commandArguments) {
+        for (let i = 0; i < commandArguments.length; i++) {
             if (
-                masterImage.command_arguments[i].position === 'before' ||
-                !masterImage.command_arguments[i].position
+                commandArguments[i].position === 'before' ||
+                !commandArguments[i].position
             ) {
-                cmdParts.push(`"${masterImage.command_arguments[i].value}"`);
+                cmdParts.push(`"${commandArguments[i].value}"`);
             }
         }
     }
 
     cmdParts.push(`"${path.posix.join(AnalysisContainerPath.CODE, entrypointPath)}"`);
 
-    if (masterImage.command_arguments) {
-        for (let i = 0; i < masterImage.command_arguments.length; i++) {
+    if (commandArguments) {
+        for (let i = 0; i < commandArguments.length; i++) {
             if (
-                masterImage.command_arguments[i].position === 'after'
+                commandArguments[i].position === 'after'
             ) {
-                cmdParts.push(`"${masterImage.command_arguments[i].value}"`);
+                cmdParts.push(`"${commandArguments[i].value}"`);
             }
         }
     }
