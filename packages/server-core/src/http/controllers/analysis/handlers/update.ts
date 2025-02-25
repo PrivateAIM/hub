@@ -13,6 +13,7 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
 import { HTTPHandlerOperation, useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
+import { isPropertySet } from '@authup/kit';
 import { AnalysisEntity } from '../../../../domains';
 import { AnalysisValidator } from '../utils';
 
@@ -59,6 +60,12 @@ export async function updateAnalysisRouteHandler(req: Request, res: Response) : 
         entity.registry_id !== data.registry_id
     ) {
         throw new BadRequestError('The registry can not be changed after it is specified.');
+    }
+
+    if (isPropertySet(data, 'image_command_arguments')) {
+        if (data.master_image_id !== entity.master_image_id) {
+            data.image_command_arguments = null;
+        }
     }
 
     entity = repository.merge(entity, data);

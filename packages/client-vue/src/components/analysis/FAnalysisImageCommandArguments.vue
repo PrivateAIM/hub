@@ -98,12 +98,15 @@ export default defineComponent({
             names: string[],
         ) => {
             const next : MasterImageCommandArgument[] = [
-                ...names,
-                ...itemsAfter.value,
-            ].map((value) => ({
-                position: 'before',
-                value,
-            } satisfies MasterImageCommandArgument));
+                ...names.map((value) => ({
+                    position: 'before',
+                    value,
+                } satisfies MasterImageCommandArgument)),
+                ...itemsAfter.value.map((value) => ({
+                    position: 'after',
+                    value,
+                } satisfies MasterImageCommandArgument)),
+            ];
 
             const prev = [...items.value];
 
@@ -127,12 +130,15 @@ export default defineComponent({
             names: string[],
         ) => {
             const next : MasterImageCommandArgument[] = [
-                ...itemsBefore.value,
-                ...names,
-            ].map((value) => ({
-                position: 'after',
-                value,
-            } satisfies MasterImageCommandArgument));
+                ...itemsBefore.value.map((value) => ({
+                    position: 'before',
+                    value,
+                } satisfies MasterImageCommandArgument)),
+                ...names.map((value) => ({
+                    position: 'after',
+                    value,
+                } satisfies MasterImageCommandArgument)),
+            ];
 
             const prev = [...items.value];
 
