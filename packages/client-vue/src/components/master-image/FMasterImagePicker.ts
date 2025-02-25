@@ -12,7 +12,7 @@ import { buildFormGroup, buildFormSelect } from '@vuecs/form-controls';
 import type { ListBodySlotProps } from '@vuecs/list-controls';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
-import type { VNodeArrayChildren } from 'vue';
+import type { PropType, VNodeArrayChildren } from 'vue';
 import {
     computed, defineComponent, h, nextTick, reactive, ref, toRef, watch,
 } from 'vue';
@@ -27,10 +27,12 @@ export default defineComponent({
     props: {
         entityId: {
             type: String,
-            default: undefined,
+        },
+        entity: {
+            type: Object as PropType<MasterImage>,
         },
     },
-    emits: ['selected'],
+    emits: ['selected', 'resolved'],
     async setup(props, { emit }) {
         const entityId = toRef(props, 'entityId');
         const apiClient = injectCoreHTTPClient();
@@ -90,6 +92,8 @@ export default defineComponent({
 
                     if (entity) {
                         masterImageGroupEntity.value = entity;
+
+                        emit('resolved', entity);
                     }
                 }
             } catch (e) {
@@ -98,9 +102,15 @@ export default defineComponent({
         });
 
         const init = () => {
-            if (!entityId.value) return;
+            if (props.entity) {
+                form.master_image_id = props.entity.id;
+                masterImageEntity.value = props.entity;
+                return;
+            }
 
-            form.master_image_id = entityId.value;
+            if (entityId.value) {
+                form.master_image_id = entityId.value;
+            }
         };
 
         watch(entityId, (val, oldValue) => {

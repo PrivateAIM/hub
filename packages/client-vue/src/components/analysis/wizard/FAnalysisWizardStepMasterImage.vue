@@ -13,9 +13,11 @@ import {
 import FMasterImagePicker from '../../master-image/FMasterImagePicker';
 import { injectCoreHTTPClient } from '../../../core';
 import FAnalysisImageCommand from '../FAnalysisImageCommand';
+import FAnalysisImageCommandArguments from '../FAnalysisImageCommandArguments.vue';
 
 export default defineComponent({
     components: {
+        FAnalysisImageCommandArguments,
         FAnalysisImageCommand,
         FMasterImagePicker,
     },
@@ -27,11 +29,17 @@ export default defineComponent({
         entrypointEntity: {
             type: Object as PropType<AnalysisBucketFile>,
         },
+        masterImageEntity: {
+            type: Object as PropType<MasterImage>,
+        },
     },
-    emits: ['updated', 'failed'],
+    emits: ['updated', 'failed', 'masterImageChanged'],
     setup(props, { emit }) {
         const apiClient = injectCoreHTTPClient();
-        const handleMasterImageSelected = async (item: MasterImage) => {
+
+        const handleMasterImageChanged = async (item: MasterImage | null) => {
+            emit('masterImageChanged', item);
+
             try {
                 const response = await apiClient.analysis.update(props.entity.id, {
                     master_image_id: item ? item.id : null,
@@ -45,13 +53,18 @@ export default defineComponent({
             }
         };
 
+        const handleUpdated = (value: Analysis) => {
+            emit('updated', value);
+        };
+
         const handleFailed = (e: Error) => {
             emit('failed', e);
         };
 
         return {
             handleFailed,
-            handleMasterImageSelected,
+            handleUpdated,
+            handleMasterImageChanged,
         };
     },
 });
@@ -59,23 +72,42 @@ export default defineComponent({
 <template>
     <div class="d-flex flex-column gap-2">
         <div>
-            <h6><i class="fa fa-terminal" /> Command</h6>
-
-            <FAnalysisImageCommand
-                class="mt-2 mb-2"
-                :master-image-id="entity.master_image_id"
-                :analysis-file="entrypointEntity"
-                :analysis-id="entity.id"
-            />
-        </div>
-        <div>
             <h6><i class="fa fa-compact-disc" /> MasterImage</h6>
             <div class="mb-2">
                 <FMasterImagePicker
                     :entity-id="entity.master_image_id"
-                    @selected="handleMasterImageSelected"
+                    :entity="masterImageEntity"
+                    @selected="handleMasterImageChanged"
+                    @resolved="handleMasterImageChanged"
                 />
             </div>
+        </div>
+
+        <hr>
+
+        <div>
+            <h6><i class="fa fa-keyboard" /> Command-Arguments</h6>
+
+            <FAnalysisImageCommandArguments
+                :entity="entity"
+                :master-image-entity="masterImageEntity"
+                @updated="handleUpdated"
+            />
+        </div>
+
+        <hr>
+
+        <div>
+            <h6><i class="fa fa-terminal" /> Command</h6>
+
+            <FAnalysisImageCommand
+                class="mt-2 mb-2"
+                :master-image="masterImageEntity"
+                :master-image-id="entity.master_image_id"
+                :analysis-file="entrypointEntity"
+                :analysis="entity"
+                :analysis-id="entity.id"
+            />
         </div>
     </div>
 </template>

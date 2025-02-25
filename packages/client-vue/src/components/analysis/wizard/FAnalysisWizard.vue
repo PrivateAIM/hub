@@ -16,7 +16,7 @@ import {
     toRef,
     watch,
 } from 'vue';
-import type { Analysis, AnalysisBucketFile } from '@privateaim/core-kit';
+import type { Analysis, AnalysisBucketFile, MasterImage } from '@privateaim/core-kit';
 import { AnalysisBucketType, AnalysisConfigurationStatus } from '@privateaim/core-kit';
 import { useModalController } from 'bootstrap-vue-next';
 import { initFormAttributesFromSource, injectCoreHTTPClient, wrapFnWithBusyState } from '../../../core';
@@ -48,8 +48,9 @@ export default defineComponent({
         const entity = toRef(props, 'entity');
 
         const entrypointFile = ref(null) as Ref<AnalysisBucketFile | null>;
+        const masterImage = ref(null) as Ref<MasterImage | null>;
 
-        const resolveEntrypointFile = async () => {
+        const resolveRelations = async () => {
             const { data: buckets } = await apiClient.analysisBucket.getMany({
                 filters: {
                     type: AnalysisBucketType.CODE,
@@ -57,23 +58,30 @@ export default defineComponent({
                 },
             });
             const [bucket] = buckets;
-            if (!bucket) {
+            if (bucket) {
+                const { data } = await apiClient.analysisBucketFile.getMany({
+                    filter: {
+                        root: true,
+                        bucket_id: bucket.id,
+                    },
+                });
+
+                if (data.length > 0) {
+                    [entrypointFile.value] = data;
+                }
+            }
+
+            if (entity.value.master_image) {
+                masterImage.value = entity.value.master_image;
                 return;
             }
 
-            const { data } = await apiClient.analysisBucketFile.getMany({
-                filter: {
-                    root: true,
-                    bucket_id: bucket.id,
-                },
-            });
-
-            if (data.length > 0) {
-                [entrypointFile.value] = data;
+            if (entity.value.master_image_id) {
+                masterImage.value = await apiClient.masterImage.getOne(entity.value.master_image_id);
             }
         };
 
-        await resolveEntrypointFile();
+        await resolveRelations();
 
         const form = reactive({
             query: null,
@@ -221,14 +229,6 @@ export default defineComponent({
             }
         };
 
-        const setEntrypointFile = (item?: AnalysisBucketFile) => {
-            if (item) {
-                entrypointFile.value = item;
-            } else {
-                entrypointFile.value = null;
-            }
-        };
-
         const handleWizardChangedEvent = (prevIndex: number, nextIndex: number) => {
             index.value = nextIndex;
             valid.value = true;
@@ -271,6 +271,14 @@ export default defineComponent({
             }
         });
 
+        const handleEntrypointFileChanged = (value: AnalysisBucketFile | null) => {
+            entrypointFile.value = value || null;
+        };
+
+        const handleMasterImageChanged = (value: MasterImage | null) => {
+            masterImage.value = value || null;
+        };
+
         return {
             isBusy,
 
@@ -285,11 +293,14 @@ export default defineComponent({
             prevWizardStep,
             nextWizardStep,
             passWizardStep,
-
-            entrypointFile,
-            setEntrypointFile,
+            masterImage,
 
             wizardNode,
+
+            entrypointFile,
+            handleEntrypointFileChanged,
+
+            handleMasterImageChanged,
         };
     },
 });
@@ -364,19 +375,21 @@ export default defineComponent({
             <FAnalysisWizardStepFiles
                 :entity="entity"
                 :entrypoint-entity="entrypointFile"
-                @entrypointChanged="setEntrypointFile"
+                @entrypointChanged="handleEntrypointFileChanged"
                 @failed="handleFailed"
             />
         </TabContent>
 
         <TabContent
-            title="MasterImage"
+            title="Image"
             :before-change="passWizardStep"
         >
             <FAnalysisWizardStepMasterImage
+                :master-image-entity="masterImage"
                 :entrypoint-entity="entrypointFile"
                 :entity="entity"
                 @updated="handleUpdated"
+                @master-image-changed="handleMasterImageChanged"
             />
         </TabContent>
     </FormWizard>

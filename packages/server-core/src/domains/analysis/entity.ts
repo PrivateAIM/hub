@@ -9,7 +9,7 @@ import type { Realm, User } from '@authup/core-kit';
 import type {
     Analysis,
     AnalysisRunStatus,
-    MasterImage,
+    MasterImage, MasterImageCommandArgument,
     Project,
     Registry,
 } from '@privateaim/core-kit';
@@ -26,6 +26,7 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
+import { deserialize, serialize } from '@authup/kit';
 import { MasterImageEntity } from '../master-image/entity';
 import { ProjectEntity } from '../project/entity';
 import { RegistryEntity } from '../registry/entity';
@@ -65,6 +66,22 @@ export class AnalysisEntity implements Analysis {
         type: 'varchar', length: 64, nullable: true, default: null,
     })
         run_status: AnalysisRunStatus | null;
+
+    // ------------------------------------------------------------------
+
+    @Column({
+        type: 'text',
+        nullable: true,
+        transformer: {
+            to(value: any): any {
+                return serialize(value);
+            },
+            from(value: any): any {
+                return deserialize(value);
+            },
+        },
+    })
+        image_command_arguments: MasterImageCommandArgument[] | null;
 
     // ------------------------------------------------------------------
 
