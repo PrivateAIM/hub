@@ -29,7 +29,7 @@ export default defineComponent({
             type: Object as PropType<MasterImage>,
         },
     },
-    emits: ['updated'],
+    emits: ['failed', 'updated'],
     setup(props, { emit }) {
         const httpClient = injectCoreHTTPClient();
 
@@ -97,13 +97,14 @@ export default defineComponent({
         const handleItemsBeforeChanged = wrapFnWithBusyState(isBusy, async (
             names: string[],
         ) => {
-            const next = [
-                ...names.map((value) => ({
-                    position: 'before',
-                    value,
-                } satisfies MasterImageCommandArgument)),
+            const next : MasterImageCommandArgument[] = [
+                ...names,
                 ...itemsAfter.value,
-            ];
+            ].map((value) => ({
+                position: 'before',
+                value,
+            } satisfies MasterImageCommandArgument));
+
             const prev = [...items.value];
 
             items.value = next;
@@ -125,13 +126,14 @@ export default defineComponent({
         const handleItemsAfterChanged = wrapFnWithBusyState(isBusy, async (
             names: string[],
         ) => {
-            const next = [
+            const next : MasterImageCommandArgument[] = [
                 ...itemsBefore.value,
-                ...names.map((value) => ({
-                    position: 'after',
-                    value,
-                } satisfies MasterImageCommandArgument)),
-            ];
+                ...names,
+            ].map((value) => ({
+                position: 'after',
+                value,
+            } satisfies MasterImageCommandArgument));
+
             const prev = [...items.value];
 
             items.value = next;
