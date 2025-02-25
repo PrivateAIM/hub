@@ -116,19 +116,25 @@ export default defineComponent({
     <div class="d-flex flex-column gap-2">
         <div class="d-flex flex-row">
             <div class="align-self-end">
-                <slot name="label">
+                <slot name="headerLabel">
                     Names
                 </slot>
             </div>
             <div class="ms-auto">
-                <button
-                    class="btn btn-xs btn-primary"
-                    type="button"
-                    :disabled="!canAdd"
-                    @click.prevent="add()"
+                <slot
+                    name="headerActions"
+                    :add="add"
+                    :can-add="canAdd"
                 >
-                    <i class="fa fa-plus" /> <FTranslationDefault :name="'add'" />
-                </button>
+                    <button
+                        class="btn btn-xs btn-primary"
+                        type="button"
+                        :disabled="!canAdd"
+                        @click.prevent="add()"
+                    >
+                        <i class="fa fa-plus" /> <FTranslationDefault :name="'add'" />
+                    </button>
+                </slot>
             </div>
         </div>
         <div class="d-flex flex-column gap-1">

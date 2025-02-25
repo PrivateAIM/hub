@@ -381,7 +381,7 @@ export default defineComponent({
         </TabContent>
 
         <TabContent
-            title="MasterImage"
+            title="Image"
             :before-change="passWizardStep"
         >
             <FAnalysisWizardStepMasterImage

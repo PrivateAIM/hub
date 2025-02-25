@@ -53,12 +53,17 @@ export default defineComponent({
             }
         };
 
+        const handleUpdated = (value: Analysis) => {
+            emit('updated', value);
+        };
+
         const handleFailed = (e: Error) => {
             emit('failed', e);
         };
 
         return {
             handleFailed,
+            handleUpdated,
             handleMasterImageChanged,
         };
     },
@@ -77,6 +82,21 @@ export default defineComponent({
                 />
             </div>
         </div>
+
+        <hr>
+
+        <div>
+            <h6><i class="fa fa-keyboard" /> Command-Arguments</h6>
+
+            <FAnalysisImageCommandArguments
+                :entity="entity"
+                :master-image-entity="masterImageEntity"
+                @updated="handleUpdated"
+            />
+        </div>
+
+        <hr>
+
         <div>
             <h6><i class="fa fa-terminal" /> Command</h6>
 
@@ -87,15 +107,6 @@ export default defineComponent({
                 :analysis-file="entrypointEntity"
                 :analysis="entity"
                 :analysis-id="entity.id"
-            />
-        </div>
-
-        <div>
-            <h6><i class="fa fa-keyboard" /> Command-Arguments</h6>
-
-            <FAnalysisImageCommandArguments
-                :entity="entity"
-                :master-image-entity="masterImageEntity"
             />
         </div>
     </div>

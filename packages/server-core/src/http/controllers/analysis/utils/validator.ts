@@ -7,8 +7,9 @@
 
 import { Container } from 'validup';
 import { createValidationChain, createValidator } from '@validup/adapter-validator';
-import type { Analysis } from '@privateaim/core-kit';
+import type { Analysis, MasterImageCommandArgument } from '@privateaim/core-kit';
 import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
+import { ImageAttributeCommandArgumentsValidator } from './validator-image-command-argument';
 
 export class AnalysisValidator extends Container<Analysis> {
     protected initialize() {
@@ -71,5 +72,32 @@ export class AnalysisValidator extends Container<Analysis> {
                     .optional({ values: 'null' });
             }),
         );
+
+        const commandArgumentValidator = new ImageAttributeCommandArgumentsValidator();
+        // image_command_executable
+        this.mount('image_command_arguments', { optional: true }, (ctx) => {
+            if (!Array.isArray(ctx.value)) {
+                // todo: throw error
+                return undefined;
+            }
+
+            const value : unknown[] = ctx.value.map((child) => {
+                if (typeof child === 'string') {
+                    return {
+                        value: child,
+                    } satisfies MasterImageCommandArgument;
+                }
+
+                return child;
+            });
+
+            const promises = value.map((child) => commandArgumentValidator.run(child, {
+                group: ctx.group,
+                flat: false,
+                path: ctx.pathAbsolute,
+            }));
+
+            return Promise.all(promises);
+        });
     }
 }

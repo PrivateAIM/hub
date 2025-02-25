@@ -9,14 +9,17 @@
 import type { PropType, Ref } from 'vue';
 import {
     computed,
-    defineComponent, nextTick, ref, watch,
+    defineComponent, nextTick, ref, toRef, watch,
 } from 'vue';
 import type { Analysis, MasterImage } from '@privateaim/core-kit';
 import type { MasterImageCommandArgument } from '@privateaim/core-kit/src';
 import FFormInputList from '../utility/form-input-list/FFormInputList.vue';
+import { injectCoreHTTPClient, wrapFnWithBusyState } from '../../core';
+import { useUpdatedAt } from '../../composables';
+import { FTranslationDefault } from '../utility';
 
 export default defineComponent({
-    components: { FFormInputList },
+    components: { FTranslationDefault, FFormInputList },
     props: {
         entity: {
             type: Object as PropType<Analysis>,
@@ -27,18 +30,37 @@ export default defineComponent({
         },
     },
     emits: ['updated'],
-    setup(props) {
-        const items = computed<MasterImageCommandArgument[]>(() => {
-            if (props.entity.image_command_arguments) {
-                return props.entity.image_command_arguments;
+    setup(props, { emit }) {
+        const httpClient = injectCoreHTTPClient();
+
+        const items = ref<MasterImageCommandArgument[]>([]);
+
+        const entity = toRef(props, 'entity');
+        const entityUpdatedAt = useUpdatedAt(entity);
+
+        const masterImageEntity = toRef(props, 'masterImageEntity');
+        const masterImageEntityId = computed(() => {
+            if (masterImageEntity.value) {
+                return masterImageEntity.value.id;
             }
 
-            if (props.masterImageEntity && props.masterImageEntity.command_arguments) {
-                return props.masterImageEntity.command_arguments;
-            }
-
-            return [];
+            return undefined;
         });
+
+        const setItems = () => {
+            if (props.entity.image_command_arguments) {
+                items.value = [...props.entity.image_command_arguments];
+            } else if (props.masterImageEntity && props.masterImageEntity.command_arguments) {
+                items.value = [...props.masterImageEntity.command_arguments];
+            } else {
+                items.value = [];
+            }
+        };
+
+        setItems();
+
+        watch(entityUpdatedAt, () => setItems());
+        watch(masterImageEntityId, () => setItems());
 
         const itemsBeforeVNode = ref(null) as Ref<typeof FFormInputList | null>;
         const itemsBefore = computed(
@@ -71,7 +93,68 @@ export default defineComponent({
             });
         });
 
+        const isBusy = ref(false);
+        const handleItemsBeforeChanged = wrapFnWithBusyState(isBusy, async (
+            names: string[],
+        ) => {
+            const next = [
+                ...names.map((value) => ({
+                    position: 'before',
+                    value,
+                } satisfies MasterImageCommandArgument)),
+                ...itemsAfter.value,
+            ];
+            const prev = [...items.value];
+
+            items.value = next;
+
+            try {
+                const response = await httpClient.analysis.update(props.entity.id, {
+                    image_command_arguments: next,
+                });
+
+                // todo: remove after upgrade
+                response.image_command_arguments = next;
+
+                emit('updated', response);
+            } catch (e) {
+                items.value = prev;
+                emit('failed', e);
+            }
+        });
+        const handleItemsAfterChanged = wrapFnWithBusyState(isBusy, async (
+            names: string[],
+        ) => {
+            const next = [
+                ...itemsBefore.value,
+                ...names.map((value) => ({
+                    position: 'after',
+                    value,
+                } satisfies MasterImageCommandArgument)),
+            ];
+            const prev = [...items.value];
+
+            items.value = next;
+
+            try {
+                const response = await httpClient.analysis.update(props.entity.id, {
+                    image_command_arguments: next,
+                });
+
+                // todo: remove after upgrade
+                response.image_command_arguments = next;
+
+                emit('updated', response);
+            } catch (e) {
+                items.value = prev;
+                emit('failed', e);
+            }
+        });
+
         return {
+            handleItemsBeforeChanged,
+            handleItemsAfterChanged,
+
             items,
 
             itemsBefore,
@@ -89,10 +172,21 @@ export default defineComponent({
             <FFormInputList
                 ref="itemsBeforeVNode"
                 :names="itemsBefore"
-                :min-items="1"
+                :min-items="0"
+                @changed="handleItemsBeforeChanged"
             >
-                <template #label>
+                <template #headerLabel>
                     Before
+                </template>
+                <template #headerActions="props">
+                    <button
+                        class="btn btn-xs btn-primary"
+                        type="button"
+                        :disabled="!props.canAdd"
+                        @click.prevent="props.add()"
+                    >
+                        <i class="fa fa-plus" /> <FTranslationDefault :name="'add'" />
+                    </button>
                 </template>
                 <template #noItems>
                     <div class="alert alert-sm alert-info">
@@ -106,8 +200,9 @@ export default defineComponent({
                 ref="itemsAfterVNode"
                 :names="itemsAfter"
                 :min-items="0"
+                @changed="handleItemsAfterChanged"
             >
-                <template #label>
+                <template #headerLabel>
                     After
                 </template>
                 <template #noItems>
