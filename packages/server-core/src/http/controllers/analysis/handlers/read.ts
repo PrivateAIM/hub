@@ -68,6 +68,7 @@ export async function getManyAnalysisRouteHandler(req: Request, res: Response) :
                 'build_status',
                 'run_status',
                 'configuration_locked',
+                'image_command_arguments',
             ],
         },
         pagination: {

@@ -53,7 +53,6 @@ export default defineComponent({
         }, form);
 
         const masterImageEntity = ref<MasterImage | null>(null);
-        const masterImageGroupEntity = ref<MasterImageGroup | null>(null);
 
         const isVirtualGroupPathDefined = computed(() => !!form.group_virtual_path &&
                 form.group_virtual_path.length > 0);
@@ -80,22 +79,6 @@ export default defineComponent({
             try {
                 masterImageEntity.value = await apiClient.masterImage.getOne(form.master_image_id);
                 form.group_virtual_path = masterImageEntity.value.group_virtual_path;
-
-                if (!masterImageGroupEntity.value || form.group_virtual_path !== masterImageGroupEntity.value.virtual_path) {
-                    const { data } = await apiClient.masterImageGroup.getMany({
-                        filters: {
-                            virtual_path: form.group_virtual_path,
-                        },
-                    });
-
-                    const entity = data.pop();
-
-                    if (entity) {
-                        masterImageGroupEntity.value = entity;
-
-                        emit('resolved', entity);
-                    }
-                }
             } catch (e) {
                 // ...
             }
@@ -104,6 +87,8 @@ export default defineComponent({
         const init = () => {
             if (props.entity) {
                 form.master_image_id = props.entity.id;
+                form.group_virtual_path = props.entity.group_virtual_path;
+
                 masterImageEntity.value = props.entity;
                 return;
             }
@@ -131,8 +116,9 @@ export default defineComponent({
 
         const selectGroup = (input: MasterImageGroup | null) => {
             if (!input) {
+                form.master_image_id = '';
                 form.group_virtual_path = '';
-                masterImageGroupEntity.value = null;
+
                 emit('selected', null); // todo: check
                 return;
             }
@@ -140,7 +126,6 @@ export default defineComponent({
             const changed = input.virtual_path !== form.group_virtual_path;
 
             form.group_virtual_path = input.virtual_path;
-            masterImageGroupEntity.value = input;
 
             if (changed) {
                 form.master_image_id = '';

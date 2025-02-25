@@ -7,7 +7,7 @@
 
 import { Container } from 'validup';
 import { createValidationChain, createValidator } from '@validup/adapter-validator';
-import type { Analysis, MasterImageCommandArgument } from '@privateaim/core-kit';
+import type { Analysis } from '@privateaim/core-kit';
 import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
 import { ImageAttributeCommandArgumentsValidator } from './validator-image-command-argument';
 
@@ -81,17 +81,7 @@ export class AnalysisValidator extends Container<Analysis> {
                 return undefined;
             }
 
-            const value : unknown[] = ctx.value.map((child) => {
-                if (typeof child === 'string') {
-                    return {
-                        value: child,
-                    } satisfies MasterImageCommandArgument;
-                }
-
-                return child;
-            });
-
-            const promises = value.map((child) => commandArgumentValidator.run(child, {
+            const promises = ctx.value.map((child) => commandArgumentValidator.run(child, {
                 group: ctx.group,
                 flat: false,
                 path: ctx.pathAbsolute,

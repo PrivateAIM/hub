@@ -62,7 +62,7 @@ export async function updateAnalysisRouteHandler(req: Request, res: Response) : 
         throw new BadRequestError('The registry can not be changed after it is specified.');
     }
 
-    if (isPropertySet(data, 'image_command_arguments')) {
+    if (isPropertySet(data, 'master_image_id')) {
         if (data.master_image_id !== entity.master_image_id) {
             data.image_command_arguments = null;
         }
