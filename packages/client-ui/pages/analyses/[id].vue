@@ -17,9 +17,10 @@ import {
 } from '#app';
 import DomainEntityNav from '../../components/DomainEntityNav';
 import { LayoutKey, LayoutNavigationID } from '../../config/layout';
+import { DomainEntityNavItem } from '../../core';
 
 export default defineComponent({
-    components: { DomainEntityNav, FAnalysisName },
+    components: { DomainEntityNav, DomainEntityNavItem, FAnalysisName },
     async setup() {
         definePageMeta({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
@@ -53,9 +54,9 @@ export default defineComponent({
         }
 
         const tabs = [
-            { name: 'Overview', icon: 'fas fa-bars', urlSuffix: '' },
-            { name: 'Configuration', icon: 'fa fa-wrench', urlSuffix: '/setup' },
-            { name: 'Results', icon: 'fas fa-chart-bar', urlSuffix: '/results' },
+            { name: 'Overview', icon: 'fas fa-bars', path: '' },
+            { name: 'Configuration', icon: 'fa fa-wrench', path: '/setup' },
+            { name: 'Results', icon: 'fas fa-chart-bar', path: '/results' },
         ];
 
         return {
@@ -92,10 +93,16 @@ export default defineComponent({
                 <div class="panel-card-body">
                     <div class="flex-wrap flex-row d-flex align-items-center">
                         <DomainEntityNav
-                            :prev-link="true"
                             :items="tabs"
                             :path="'/analyses/' + entity.id"
-                        />
+                        >
+                            <template #before>
+                                <DomainEntityNavItem
+                                    :path="'/projects/'+entity.project_id+'/analyses'"
+                                    :icon="'fa fa-arrow-left'"
+                                />
+                            </template>
+                        </DomainEntityNav>
                     </div>
                 </div>
             </div>

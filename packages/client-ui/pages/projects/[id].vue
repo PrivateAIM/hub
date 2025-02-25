@@ -103,19 +103,19 @@ export default defineComponent({
 
         const tabs = computed(() => {
             const items = [
-                { name: 'Overview', icon: 'fas fa-bars', urlSuffix: '' },
+                { name: 'Overview', icon: 'fas fa-bars', path: '' },
 
             ];
 
             if (isProjectOwner.value || isNodeAuthority.value) {
-                items.push({ name: 'Analyses', icon: 'fas fa-microscope', urlSuffix: '/analyses' });
+                items.push({ name: 'Analyses', icon: 'fas fa-microscope', path: '/analyses' });
             }
 
             if (
                 isProjectOwner.value &&
                 canEdit.value
             ) {
-                items.push({ name: 'Settings', icon: 'fa fa-cog', urlSuffix: '/settings' });
+                items.push({ name: 'Settings', icon: 'fa fa-cog', path: '/settings' });
             }
 
             return items;
