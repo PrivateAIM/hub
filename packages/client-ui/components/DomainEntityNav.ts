@@ -31,8 +31,8 @@ export default defineComponent({
         },
     },
     slots: Object as SlotsType<{
-        before: null,
-        after: null
+        before: undefined,
+        after: undefined
     }>,
     setup(props, { slots }) {
         const lastIndex = props.path.lastIndexOf('/');

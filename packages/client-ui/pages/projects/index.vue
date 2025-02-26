@@ -20,17 +20,17 @@ export default defineNuxtComponent({
         const tabs = [
             {
                 name: 'Create',
-                urlSuffix: '/add',
+                path: '/add',
                 icon: 'fa fa-plus',
             },
             {
                 name: 'Outgoing',
-                urlSuffix: '',
+                path: '',
                 icon: 'fa fa-file-export',
             },
             {
                 name: 'Incoming',
-                urlSuffix: '/in',
+                path: '/in',
                 icon: 'fa fa-file-import',
             },
         ];

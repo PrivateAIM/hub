@@ -22,16 +22,31 @@ export type NavItem = {
 
 export type NavItems = NavItem[];
 
-export function buildNavItemLink(path: string, link: string) {
-    if (link.length === 0) {
-        return path;
+export function buildNavItemLink(...items: unknown[]) {
+    let output = '';
+    for (let i = 0; i < items.length; i++) {
+        if (typeof items[i] !== 'string') {
+            continue;
+        }
+
+        if (output.substring(output.length - 1) === '/') {
+            if (items[i].substring(0, 1) === '/') {
+                output += items[i].substring(1);
+            } else {
+                output += items[i];
+            }
+        } else if (items[i].substring(0, 1) === '/') {
+            output += items[i];
+        } else {
+            output += `/${items[i]}`;
+        }
     }
 
-    if (link.substring(0, 1) === '/') {
-        return `${path}${link}`;
+    if (output.substring(output.length - 1) === '/') {
+        return output.substring(0, output.length - 1);
     }
 
-    return `${path}/${link}`;
+    return output;
 }
 
 export const DomainEntityNavItem = defineComponent({
@@ -58,7 +73,7 @@ export const DomainEntityNavItem = defineComponent({
                 },
                 {
                     default: () => {
-                        const items : VnodeChild = [];
+                        const items : VNodeChild = [];
                         if (props.icon) {
                             items.push(h('i', { class: `${props.icon}` }));
                         }
@@ -140,7 +155,6 @@ export const DomainEntityNavSub = defineComponent({
                         path: buildNavItemLink(props.path, child.path),
                         name: child.name,
                         icon: child.icon,
-                        class: 'dropdown-item',
                     })),
                 ]),
             ]);

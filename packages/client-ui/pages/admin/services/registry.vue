@@ -16,9 +16,9 @@ export default defineNuxtComponent({
         });
 
         const tabs = [
-            { name: 'Overview', icon: 'fas fa-bars', urlSuffix: '' },
-            { name: 'Robot', icon: 'fa fa-robot', urlSuffix: '/robot' },
-            { name: 'Master-Images', icon: 'fa-solid fa-sd-card', urlSuffix: '/master-images' },
+            { name: 'Overview', icon: 'fas fa-bars', path: '' },
+            { name: 'Robot', icon: 'fa fa-robot', path: '/robot' },
+            { name: 'Master-Images', icon: 'fa-solid fa-sd-card', path: '/master-images' },
         ];
 
         return {

@@ -17,7 +17,7 @@ export default {
         const tabs = [
             {
                 name: 'overview',
-                urlSuffix: '',
+                path: '',
                 icon: 'fa fa-bars',
             },
         ];

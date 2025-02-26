@@ -35,7 +35,7 @@ export default defineComponent({
 
         const items = [
             {
-                name: 'General', icon: 'fas fa-bars', urlSuffix: '',
+                name: 'General', icon: 'fas fa-bars', path: '',
             },
         ];
 

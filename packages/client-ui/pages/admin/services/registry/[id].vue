@@ -15,6 +15,7 @@ import {
     navigateTo, useRoute, useToast,
 } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
+import type { NavItems } from '../../../../core';
 
 export default defineComponent({
     async setup() {
@@ -68,37 +69,37 @@ export default defineComponent({
 
         const tabs = computed(() => [
             {
-                name: 'General', icon: 'fas fa-bars', urlSuffix: '',
+                name: 'General', icon: 'fas fa-bars', path: '',
             },
             ...(
                 manager.data.value ?
                     [
                         {
-                            name: 'Cleanup', icon: 'fa-solid fa-hands-bubbles', urlSuffix: 'cleanup',
+                            name: 'Cleanup', icon: 'fa-solid fa-hands-bubbles', path: 'cleanup',
                         },
                         {
-                            name: 'Setup', icon: 'fa-solid fa-cog', urlSuffix: 'setup',
+                            name: 'Setup', icon: 'fa-solid fa-cog', path: 'setup',
                         },
                     ] : []
             ),
             {
                 name: 'Projects',
                 icon: 'fa-solid fa-diagram-project',
-                urlSuffix: 'projects',
-                components: [
+                path: 'projects',
+                children: [
                     {
                         name: 'overview',
-                        urlSuffix: '',
+                        path: '',
                         icon: 'fa fa-bars',
                     },
                     {
                         name: 'add',
-                        urlSuffix: '/add',
+                        path: '/add',
                         icon: 'fa fa-plus',
                     },
                 ],
             },
-        ]);
+        ] satisfies NavItems);
 
         return {
             handleUpdated: manager.updated,
