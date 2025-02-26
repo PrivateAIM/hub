@@ -34,14 +34,14 @@ export default defineNuxtComponent({
 
         const tabs = computed(() => [
             {
-                name: 'Outgoing', icon: 'fa fa-file-export', urlSuffix: '',
+                name: 'Outgoing', icon: 'fa fa-file-export', path: '',
             },
             {
-                name: 'Incoming', icon: 'fa fa-file-import', urlSuffix: '/in',
+                name: 'Incoming', icon: 'fa fa-file-import', path: '/in',
             },
             ...(isOwner.value ? [
                 {
-                    name: 'Add', routeName: 'settings-id-security', icon: 'fa fa-plus', urlSuffix: '/add',
+                    name: 'Add', routeName: 'settings-id-security', icon: 'fa fa-plus', path: '/add',
                 },
             ] : []),
         ]);

@@ -5,10 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { PropType } from 'vue';
-import { defineComponent, toRef } from 'vue';
-import type { NavItems } from '../core/nav';
-import { createNavRenderFn } from '../core/nav';
+import type { PropType, SlotsType, VNodeChild } from 'vue';
+import { defineComponent } from 'vue';
+import { hasNormalizedSlot, normalizeSlot } from '@privateaim/client-vue';
+import {
+    DomainEntityNavItem, DomainEntityNavSub, type NavItems, buildNavItemLink,
+} from '../core/nav';
+import { NuxtLink } from '#components';
 
 export default defineComponent({
     props: {
@@ -27,15 +30,76 @@ export default defineComponent({
             type: Boolean,
         },
     },
-    setup(props) {
-        const items = toRef(props, 'items');
-        const direction = toRef(props, 'direction');
+    slots: Object as SlotsType<{
+        before: null,
+        after: null
+    }>,
+    setup(props, { slots }) {
+        const lastIndex = props.path.lastIndexOf('/');
+        const basePath = props.path.substring(0, lastIndex);
 
-        const render = createNavRenderFn(props.path, items.value, {
-            direction: direction.value,
-            prevLink: props.prevLink,
+        const clazz = computed(() => {
+            const output = ['nav nav-pills'];
+            if (props.direction === 'vertical') {
+                output.push('flex-column');
+            }
+
+            return output;
         });
 
-        return () => render();
+        return () => {
+            let prevLink : VNodeChild = [];
+            if (props.prevLink) {
+                prevLink = h('li', { class: 'nav-item' }, [
+                    h(
+                        NuxtLink,
+                        {
+                            class: 'nav-link',
+                            to: basePath,
+                        },
+                        {
+                            default: () => [
+                                h('i', { class: 'fa fa-arrow-left' }),
+                            ],
+                        },
+                    ),
+                ]);
+            }
+
+            let before : VNodeChild = [];
+            if (hasNormalizedSlot('before', slots)) {
+                before = normalizeSlot('before', {}, slots);
+            }
+            let after : VNodeChild = [];
+            if (hasNormalizedSlot('after', slots)) {
+                after = normalizeSlot('after', {}, slots);
+            }
+
+            return h(
+                'ul',
+                { class: clazz.value },
+                [
+                    prevLink,
+                    before,
+                    ...props.items.map((item) => {
+                        if (item.children) {
+                            return h(DomainEntityNavSub, {
+                                name: `${item.name}`,
+                                icon: item.icon,
+                                path: buildNavItemLink(props.path, item.path),
+                                children: item.children,
+                            });
+                        }
+
+                        return h(DomainEntityNavItem, {
+                            name: `${item.name}`,
+                            icon: item.icon,
+                            path: buildNavItemLink(props.path, item.path),
+                        });
+                    }),
+                    after,
+                ],
+            );
+        };
     },
 });

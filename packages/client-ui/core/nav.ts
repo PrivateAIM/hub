@@ -5,26 +5,24 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type {
+    PropType,
+    VNodeChild,
+} from 'vue';
 import { defineComponent, ref } from 'vue';
-import type { MaybeRef, PropType, VNodeChild } from 'vue';
 import { onClickOutside } from '@vueuse/core';
 import { NuxtLink } from '#components';
 
 export type NavItem = {
-    name: string,
-    icon: string,
-    urlSuffix: string,
-    components?: NavItem[]
+    name?: string,
+    icon?: string,
+    path: string,
+    children?: NavItem[]
 };
 
 export type NavItems = NavItem[];
 
-export type NavOptions = {
-    direction?: MaybeRef<'vertical' | 'horizontal'>,
-    prevLink?: MaybeRef<boolean>
-};
-
-function buildLink(path: string, link: string) {
+export function buildNavItemLink(path: string, link: string) {
     if (link.length === 0) {
         return path;
     }
@@ -36,49 +34,69 @@ function buildLink(path: string, link: string) {
     return `${path}/${link}`;
 }
 
-type LinkNodeOptions = {
-    clazz?: string
-};
-function buildLinkNode(
-    item: NavItem,
-    path: string,
-    options: LinkNodeOptions = {},
-) {
-    const to = buildLink(path, item.urlSuffix);
-
-    return h(
-        NuxtLink,
-        {
-            class: [unref(options.clazz) || 'nav-link'],
-            to,
-        },
-        {
-            default: () => [
-                h('i', { class: `${item.icon}` }),
-                ' ',
-                item.name,
-            ],
-        },
-    );
-}
-
-const dropdown = defineComponent({
+export const DomainEntityNavItem = defineComponent({
     props: {
-        item: {
-            type: Object as PropType<NavItem>,
+        name: {
+            type: String,
             required: true,
         },
         path: {
             type: String,
             required: true,
         },
+        icon: {
+            type: String,
+        },
     },
     setup(props) {
-        const refs = toRefs(props);
+        return () => h('li', { class: 'nav-item' }, [
+            h(
+                NuxtLink,
+                {
+                    class: ['nav-link'],
+                    to: props.path,
+                },
+                {
+                    default: () => {
+                        const items : VnodeChild = [];
+                        if (props.icon) {
+                            items.push(h('i', { class: `${props.icon}` }));
+                        }
 
+                        if (props.icon && props.name) {
+                            items.push(' ');
+                        }
+
+                        if (props.name) {
+                            items.push(props.name);
+                        }
+
+                        return items;
+                    },
+
+                },
+            ),
+        ]);
+    },
+});
+export const DomainEntityNavSub = defineComponent({
+    props: {
+        name: {
+            type: String,
+        },
+        icon: {
+            type: String,
+        },
+        path: {
+            type: String,
+            required: true,
+        },
+        children: {
+            type: Array as PropType<NavItem[]>,
+        },
+    },
+    setup(props) {
         const expand = ref(false);
-
-        const components = refs.item.value.components || [];
 
         const linkRef = ref(null);
 
@@ -86,107 +104,46 @@ const dropdown = defineComponent({
             expand.value = false;
         });
 
-        return () => h('li', {
-            class: 'nav-item dropdown',
-        }, [
-            h('a', {
-                ref: linkRef,
-                class: [
-                    'nav-link dropdown-toggle',
-                    {
-                        show: expand.value,
-                    },
-                ],
-                href: '#',
-                onClick($event: any) {
-                    $event.preventDefault();
+        return () => {
+            let icon : VNodeChild = [];
+            if (props.icon) {
+                icon = h('i', { class: `${props.icon} pe-1` });
+            }
 
-                    expand.value = !expand.value;
-                },
+            return h('li', {
+                class: 'nav-item dropdown',
             }, [
-                h('i', { class: `${refs.item.value.icon} pe-1` }),
-                refs.item.value.name,
-            ]),
-            h('ul', {
-                class: ['dropdown-menu', {
-                    show: expand.value,
-                }],
-            }, [
-                ...components.map((component) => h('li', [
-                    buildLinkNode(
-                        component,
-                        buildLink(
-                            refs.path.value,
-                            refs.item.value.urlSuffix,
-                        ),
+                h('a', {
+                    ref: linkRef,
+                    class: [
+                        'nav-link dropdown-toggle',
                         {
-                            clazz: 'dropdown-item',
+                            show: expand.value,
                         },
-                    ),
-                ])),
-            ]),
-        ]);
+                    ],
+                    href: '#',
+                    onClick($event: any) {
+                        $event.preventDefault();
+
+                        expand.value = !expand.value;
+                    },
+                }, [
+                    icon,
+                    props.name,
+                ]),
+                h('ul', {
+                    class: ['dropdown-menu', {
+                        show: expand.value,
+                    }],
+                }, [
+                    ...(props.children || []).map((child) => h(DomainEntityNavItem, {
+                        path: buildNavItemLink(props.path, child.path),
+                        name: child.name,
+                        icon: child.icon,
+                        class: 'dropdown-item',
+                    })),
+                ]),
+            ]);
+        };
     },
 });
-
-type RenderFn = () => VNodeChild;
-export function createNavRenderFn(
-    path: string,
-    items: NavItem[],
-    options?: NavOptions,
-) : RenderFn {
-    const lastIndex = path.lastIndexOf('/');
-    const basePath = path.substring(0, lastIndex);
-
-    options = options || {};
-
-    const clazz = computed(() => {
-        const output = ['nav nav-pills'];
-        const direction = unref(options?.direction);
-        if (direction === 'vertical') {
-            output.push('flex-column');
-        }
-
-        return output;
-    });
-
-    const prevLinkEnabled = unref(options.prevLink);
-
-    let prevLink : VNodeChild = [];
-    if (prevLinkEnabled) {
-        prevLink = h('li', { class: 'nav-item' }, [
-            h(
-                NuxtLink,
-                {
-                    class: 'nav-link',
-                    to: basePath,
-                },
-                {
-                    default: () => [
-                        h('i', { class: 'fa fa-arrow-left' }),
-                    ],
-                },
-            ),
-        ]);
-    }
-
-    return () => h(
-        'ul',
-        { class: clazz.value },
-        [
-            prevLink,
-            ...items.map((item) => {
-                if (item.components) {
-                    return h(dropdown, {
-                        item,
-                        path,
-                    });
-                }
-
-                return h('li', { class: 'nav-item' }, [
-                    buildLinkNode(item, path, {}),
-                ]);
-            }),
-        ],
-    );
-}

@@ -36,13 +36,13 @@ export default defineComponent({
 
         const items = [
             {
-                name: 'General', icon: 'fas fa-bars', urlSuffix: '',
+                name: 'General', icon: 'fas fa-bars', path: '',
             },
             {
-                name: 'Permissions', icon: 'fas fa-user-secret', urlSuffix: 'permissions',
+                name: 'Permissions', icon: 'fas fa-user-secret', path: 'permissions',
             },
             {
-                name: 'Roles', icon: 'fa-solid fa-user-group', urlSuffix: 'roles',
+                name: 'Roles', icon: 'fa-solid fa-user-group', path: 'roles',
             },
         ];
 

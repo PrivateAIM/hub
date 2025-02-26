@@ -41,7 +41,7 @@ export default defineNuxtComponent({
 
         const tabs = [
             {
-                name: 'General', routeName: 'users-id', icon: 'fas fa-bars', urlSuffix: '',
+                name: 'General', routeName: 'users-id', icon: 'fas fa-bars', path: '',
             },
         ];
 
