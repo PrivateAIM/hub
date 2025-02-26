@@ -36,7 +36,7 @@ export default defineComponent({
             { id: 'rsa', value: 'RSA' },
             { id: 'ecdh', value: 'ECDH' },
         ];
-        const keyType = ref<string>('rsa');
+        const keyType = ref<string>('ecdh');
 
         const privateKey = ref<string | null>(null);
         const publicKey = ref<string | null>(null);
@@ -102,7 +102,7 @@ export default defineComponent({
                 if (keyType.value === 'ecdh') {
                     algorithmOptions = {
                         name: 'ECDH',
-                        namedCurve: 'P-384',
+                        namedCurve: 'P-256',
                     };
                 } else {
                     algorithmOptions = {
@@ -208,7 +208,8 @@ export default defineComponent({
                     </VCFormGroup>
 
                     <template v-if="privateKey">
-                        <div class="alert alert-sm alert-warning">
+                        <div class="alert alert-sm alert-danger">
+                            <i class="fa fa-warning" />
                             Please copy the key to a safe location, as it is not stored remotely.
                         </div>
                     </template>
