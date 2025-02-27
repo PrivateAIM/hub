@@ -80,7 +80,7 @@ export default defineComponent({
                         <button
                             :disabled="disabled"
                             type="button"
-                            class="btn btn-xs btn-warning"
+                            class="btn btn-xs btn-dark"
                             @click.prevent="handleDeleted"
                         >
                             <i class="fa fa-minus" />

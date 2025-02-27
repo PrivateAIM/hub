@@ -11,15 +11,13 @@ import {
     computed,
     defineComponent, nextTick, ref, toRef, watch,
 } from 'vue';
-import type { Analysis, MasterImage } from '@privateaim/core-kit';
-import type { MasterImageCommandArgument } from '@privateaim/core-kit/src';
+import type { Analysis, MasterImage, MasterImageCommandArgument } from '@privateaim/core-kit';
 import FFormInputList from '../utility/form-input-list/FFormInputList.vue';
 import { injectCoreHTTPClient, wrapFnWithBusyState } from '../../core';
 import { useUpdatedAt } from '../../composables';
-import { FTranslationDefault } from '../utility';
 
 export default defineComponent({
-    components: { FTranslationDefault, FFormInputList },
+    components: { FFormInputList },
     props: {
         entity: {
             type: Object as PropType<Analysis>,
@@ -35,33 +33,6 @@ export default defineComponent({
 
         const items = ref<MasterImageCommandArgument[]>([]);
 
-        const entity = toRef(props, 'entity');
-        const entityUpdatedAt = useUpdatedAt(entity);
-
-        const masterImageEntity = toRef(props, 'masterImageEntity');
-        const masterImageEntityId = computed(() => {
-            if (masterImageEntity.value) {
-                return masterImageEntity.value.id;
-            }
-
-            return undefined;
-        });
-
-        const setItems = () => {
-            if (props.entity.image_command_arguments) {
-                items.value = [...props.entity.image_command_arguments];
-            } else if (props.masterImageEntity && props.masterImageEntity.command_arguments) {
-                items.value = [...props.masterImageEntity.command_arguments];
-            } else {
-                items.value = [];
-            }
-        };
-
-        setItems();
-
-        watch(entityUpdatedAt, () => setItems());
-        watch(masterImageEntityId, () => setItems());
-
         const itemsBeforeVNode = ref(null) as Ref<typeof FFormInputList | null>;
         const itemsBefore = computed(
             () => items.value
@@ -76,12 +47,19 @@ export default defineComponent({
                 .map((item) => item.value),
         );
 
-        const masterImageId = computed(() => (props.masterImageEntity ? props.masterImageEntity.id : null));
-        watch(masterImageId, (val, oldValue) => {
-            if (val === oldValue) {
-                return;
+        const entity = toRef(props, 'entity');
+        const entityUpdatedAt = useUpdatedAt(entity);
+
+        const masterImageEntity = toRef(props, 'masterImageEntity');
+        const masterImageEntityId = computed(() => {
+            if (masterImageEntity.value) {
+                return masterImageEntity.value.id;
             }
 
+            return undefined;
+        });
+
+        const updateVNodes = () => {
             nextTick(() => {
                 if (itemsBeforeVNode.value) {
                     itemsBeforeVNode.value.assign(itemsBefore.value);
@@ -91,75 +69,113 @@ export default defineComponent({
                     itemsAfterVNode.value.assign(itemsAfter.value);
                 }
             });
-        });
+        };
+
+        const setItems = (value: MasterImageCommandArgument[]) => {
+            items.value = value;
+
+            updateVNodes();
+        };
+
+        const loadItemsByProps = () => {
+            if (props.entity.image_command_arguments) {
+                setItems([...props.entity.image_command_arguments]);
+            } else if (props.masterImageEntity && props.masterImageEntity.command_arguments) {
+                setItems([...props.masterImageEntity.command_arguments]);
+            } else {
+                setItems([]);
+            }
+        };
+
+        loadItemsByProps();
+
+        watch(entityUpdatedAt, () => loadItemsByProps());
+        watch(masterImageEntityId, () => loadItemsByProps());
+
+        const extractItemsByPosition = (
+            items: MasterImageCommandArgument[],
+            position: 'before' | 'after',
+        ) => {
+            if (position === 'before') {
+                return items
+                    .filter((item) => item.position === 'before' || !item.position);
+            }
+
+            return items
+                .filter((item) => item.position === 'after');
+        };
 
         const isBusy = ref(false);
-        const handleItemsBeforeChanged = wrapFnWithBusyState(isBusy, async (
-            names: string[],
-        ) => {
-            const next : MasterImageCommandArgument[] = [
-                ...names.map((value) => ({
-                    position: 'before',
-                    value,
-                } satisfies MasterImageCommandArgument)),
-                ...itemsAfter.value.map((value) => ({
-                    position: 'after',
-                    value,
-                } satisfies MasterImageCommandArgument)),
-            ];
-
+        const submit = wrapFnWithBusyState(isBusy, async (value: MasterImageCommandArgument[]) => {
             const prev = [...items.value];
-
-            items.value = next;
+            setItems(value);
 
             try {
                 const response = await httpClient.analysis.update(props.entity.id, {
-                    image_command_arguments: next,
+                    image_command_arguments: value,
                 });
-
-                // todo: remove after upgrade
-                response.image_command_arguments = next;
 
                 emit('updated', response);
             } catch (e) {
-                items.value = prev;
+                setItems(prev);
                 emit('failed', e);
             }
         });
-        const handleItemsAfterChanged = wrapFnWithBusyState(isBusy, async (
+
+        const handleItemsBeforeChanged = async (
             names: string[],
-        ) => {
-            const next : MasterImageCommandArgument[] = [
-                ...itemsBefore.value.map((value) => ({
-                    position: 'before',
-                    value,
-                } satisfies MasterImageCommandArgument)),
-                ...names.map((value) => ({
-                    position: 'after',
-                    value,
-                } satisfies MasterImageCommandArgument)),
-            ];
+        ) => submit([
+            ...names.map((value) => ({
+                position: 'before',
+                value,
+            } satisfies MasterImageCommandArgument)),
+            ...itemsAfter.value.map((value) => ({
+                position: 'after',
+                value,
+            } satisfies MasterImageCommandArgument)),
+        ]);
+        const handleItemsAfterChanged = async (
+            names: string[],
+        ) => submit([
+            ...itemsBefore.value.map((value) => ({
+                position: 'before',
+                value,
+            } satisfies MasterImageCommandArgument)),
+            ...names.map((value) => ({
+                position: 'after',
+                value,
+            } satisfies MasterImageCommandArgument)),
+        ]);
 
-            const prev = [...items.value];
-
-            items.value = next;
-
-            try {
-                const response = await httpClient.analysis.update(props.entity.id, {
-                    image_command_arguments: next,
-                });
-
-                // todo: remove after upgrade
-                response.image_command_arguments = next;
-
-                emit('updated', response);
-            } catch (e) {
-                items.value = prev;
-                emit('failed', e);
+        const resetItemsForPosition = async (position: 'before' | 'after') => {
+            if (
+                !props.entity.image_command_arguments ||
+                !props.masterImageEntity ||
+                !props.masterImageEntity.command_arguments
+            ) {
+                // nothing to do.
+                return Promise.resolve();
             }
-        });
+
+            let next : MasterImageCommandArgument[];
+            if (position === 'before') {
+                next = [
+                    ...extractItemsByPosition(props.masterImageEntity.command_arguments, 'before'),
+                    ...itemsAfter.value.map((value) => ({ position: 'after', value })),
+                ];
+            } else {
+                next = [
+                    ...itemsBefore.value.map((value) => ({ position: 'before', value })),
+                    ...extractItemsByPosition(props.masterImageEntity.command_arguments, 'after'),
+                ];
+            }
+
+            return submit(next);
+        };
 
         return {
+            isBusy,
+
             handleItemsBeforeChanged,
             handleItemsAfterChanged,
 
@@ -170,6 +186,8 @@ export default defineComponent({
 
             itemsAfter,
             itemsAfterVNode,
+
+            resetItemsForPosition,
         };
     },
 });
@@ -188,12 +206,19 @@ export default defineComponent({
                 </template>
                 <template #headerActions="props">
                     <button
+                        :disabled="isBusy"
+                        class="btn btn-xs btn-danger me-1"
+                        @click.prevent="resetItemsForPosition('before')"
+                    >
+                        <i class="fa fa-undo" />
+                    </button>
+                    <button
                         class="btn btn-xs btn-primary"
                         type="button"
-                        :disabled="!props.canAdd"
+                        :disabled="!props.canAdd || isBusy"
                         @click.prevent="props.add()"
                     >
-                        <i class="fa fa-plus" /> <FTranslationDefault :name="'add'" />
+                        <i class="fa fa-plus" />
                     </button>
                 </template>
                 <template #noItems>
@@ -212,6 +237,23 @@ export default defineComponent({
             >
                 <template #headerLabel>
                     After
+                </template>
+                <template #headerActions="props">
+                    <button
+                        :disabled="isBusy"
+                        class="btn btn-xs btn-danger me-1"
+                        @click.prevent="resetItemsForPosition('after')"
+                    >
+                        <i class="fa fa-undo" />
+                    </button>
+                    <button
+                        class="btn btn-xs btn-primary"
+                        type="button"
+                        :disabled="!props.canAdd || isBusy"
+                        @click.prevent="props.add()"
+                    >
+                        <i class="fa fa-plus" />
+                    </button>
                 </template>
                 <template #noItems>
                     <div class="alert alert-sm alert-info">
