@@ -161,11 +161,11 @@ export default defineComponent({
             if (position === 'before') {
                 next = [
                     ...extractItemsByPosition(props.masterImageEntity.command_arguments, 'before'),
-                    ...itemsAfter.value.map((value) => ({ position: 'after', value })),
+                    ...itemsAfter.value.map((value) => ({ position: 'after', value } satisfies MasterImageCommandArgument)),
                 ];
             } else {
                 next = [
-                    ...itemsBefore.value.map((value) => ({ position: 'before', value })),
+                    ...itemsBefore.value.map((value) => ({ position: 'before', value } satisfies MasterImageCommandArgument)),
                     ...extractItemsByPosition(props.masterImageEntity.command_arguments, 'after'),
                 ];
             }
