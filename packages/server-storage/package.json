@@ -35,7 +35,7 @@
         "singa": "^1.0.0",
         "tar-stream": "^3.1.6",
         "typeorm": "^0.3.20",
-        "typeorm-extension": "^3.6.3",
+        "typeorm-extension": "^3.7.0",
         "validup": "^0.1.8"
     },
     "devDependencies": {
