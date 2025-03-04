@@ -1,5 +1,45 @@
 # Changelog
 
+## [0.8.6](https://github.com/PrivateAIM/hub/compare/v0.8.5...v0.8.6) (2025-03-04)
+
+
+### Features
+
+* add analysis incoming view on project page ([488303a](https://github.com/PrivateAIM/hub/commit/488303a2d3c77b1af978090ed7bc34d6d3dc6e2e))
+* command-arguments editor in analysis wizard ([#994](https://github.com/PrivateAIM/hub/issues/994)) ([e8e450f](https://github.com/PrivateAIM/hub/commit/e8e450f5e14e108cedf17844f258d898c44cbdcc))
+* enable sorting {analysis,project}-node by analysis name ([6e0f243](https://github.com/PrivateAIM/hub/commit/6e0f2438282ba4561d3c3a6ebf0c5bdd1c2b85d6))
+* enable sorting {analysis,project}-node by node name ([5cd32c0](https://github.com/PrivateAIM/hub/commit/5cd32c040ff7b1c16ed76c0b73f07403b2666aa2))
+* master-images command arguments extension ([#991](https://github.com/PrivateAIM/hub/issues/991)) ([7b8d860](https://github.com/PrivateAIM/hub/commit/7b8d86086af5afcc450833f8b07301346ce32a80))
+* refactor command precondition + change order in build_start command ([#981](https://github.com/PrivateAIM/hub/issues/981)) ([85aa834](https://github.com/PrivateAIM/hub/commit/85aa8348dd91a4394ed700d5f57f5de28f80f827))
+
+
+### Bug Fixes
+
+* analysis update handler ([41a5b86](https://github.com/PrivateAIM/hub/commit/41a5b86438c5f56ac4fd50e4a7f40c8353006e52))
+* change unique constraint for master_image virtual_path field ([c87fa19](https://github.com/PrivateAIM/hub/commit/c87fa19e991e1c685bac5a4321e2c7a62905473d))
+* change unique constraint for master_image_group virtual_path field ([24e8667](https://github.com/PrivateAIM/hub/commit/24e866731e0fb92b11151641f64918c895b3f437))
+* clean master image logs before synchronization ([76f1a69](https://github.com/PrivateAIM/hub/commit/76f1a6941db485b11a03519330571771f7170289))
+* **deps:** bump the minorandpatch group across 1 directory with 11 updates ([#973](https://github.com/PrivateAIM/hub/issues/973)) ([6c3b98e](https://github.com/PrivateAIM/hub/commit/6c3b98e665d641005d223e348ff0970b453dbf0e))
+* **deps:** bump the minorandpatch group across 1 directory with 4 updates ([#997](https://github.com/PrivateAIM/hub/issues/997)) ([949ba29](https://github.com/PrivateAIM/hub/commit/949ba29f66ef6840b9e92b2504b26b7a7a7036e0))
+* **deps:** bump the minorandpatch group across 1 directory with 8 updates ([#985](https://github.com/PrivateAIM/hub/issues/985)) ([ad6992c](https://github.com/PrivateAIM/hub/commit/ad6992c95cc0cf79a88abb5d47f5fdd62c0d4222))
+* read handler ([2292a1b](https://github.com/PrivateAIM/hub/commit/2292a1b524fe9c31c4d99a0a667b90d8f55c891a))
+* reset image_command_arguments after master image change ([c904823](https://github.com/PrivateAIM/hub/commit/c904823cea8a6269259e60a29b9c1e2192aef4dd))
+* sorting of nodes (in admin view) ([8205c44](https://github.com/PrivateAIM/hub/commit/8205c449866f0e61f4b1a39ec3c21b41656749bd))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.8.5 to ^0.8.6
+    * @privateaim/kit bumped from ^0.8.5 to ^0.8.6
+    * @privateaim/server-kit bumped from ^0.8.5 to ^0.8.6
+    * @privateaim/server-core-realtime bumped from ^0.8.5 to ^0.8.6
+    * @privateaim/server-http-kit bumped from ^0.8.5 to ^0.8.6
+    * @privateaim/server-analysis-manager-kit bumped from ^0.7.6 to ^0.7.7
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.8.5 to ^0.8.6
+
 ## [0.8.5](https://github.com/PrivateAIM/hub/compare/v0.8.4...v0.8.5) (2025-01-22)
 
 

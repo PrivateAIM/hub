@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.8.6](https://github.com/PrivateAIM/hub/compare/v0.8.5...v0.8.6) (2025-03-04)
+
+
+### Features
+
+* redesigned station picker ([#977](https://github.com/PrivateAIM/hub/issues/977)) ([d9b967b](https://github.com/PrivateAIM/hub/commit/d9b967b4cdb15cdcb1085e662b55600dc1073b37))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core-kit bumped from ^0.8.5 to ^0.8.6
+  * peerDependencies
+    * @privateaim/core-kit bumped from ^0.8.5 to ^0.8.6
+
 ## [0.8.5](https://github.com/PrivateAIM/hub/compare/v0.8.4...v0.8.5) (2025-01-22)
 
 
