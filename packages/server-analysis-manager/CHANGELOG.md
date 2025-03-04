@@ -1,5 +1,32 @@
 # Changelog
 
+## [0.8.6](https://github.com/PrivateAIM/hub/compare/v0.8.5...v0.8.6) (2025-03-04)
+
+
+### Features
+
+* master-images command arguments extension ([#991](https://github.com/PrivateAIM/hub/issues/991)) ([7b8d860](https://github.com/PrivateAIM/hub/commit/7b8d86086af5afcc450833f8b07301346ce32a80))
+
+
+### Bug Fixes
+
+* **deps:** bump the minorandpatch group across 1 directory with 4 updates ([#997](https://github.com/PrivateAIM/hub/issues/997)) ([949ba29](https://github.com/PrivateAIM/hub/commit/949ba29f66ef6840b9e92b2504b26b7a7a7036e0))
+* don't use inherited name from group for image name ([0f9850d](https://github.com/PrivateAIM/hub/commit/0f9850dbab971d93b8913702c55036acac30d270))
+* synchronizing master image groups ([2599491](https://github.com/PrivateAIM/hub/commit/2599491bbf032a4e17b6e0cc8d9cc7785b77f157))
+* use image_command_arguments of analysis if defined ([f571e9e](https://github.com/PrivateAIM/hub/commit/f571e9e6c2263c22bd2580ba97d9158ac703df7e))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.8.5 to ^0.8.6
+    * @privateaim/kit bumped from ^0.8.5 to ^0.8.6
+    * @privateaim/core-http-kit bumped from ^0.8.5 to ^0.8.6
+    * @privateaim/server-kit bumped from ^0.8.5 to ^0.8.6
+    * @privateaim/server-analysis-manager-kit bumped from ^0.7.6 to ^0.7.7
+    * @privateaim/storage-kit bumped from ^0.8.5 to ^0.8.6
+
 ## [0.8.5](https://github.com/PrivateAIM/hub/compare/v0.8.4...v0.8.5) (2025-01-22)
 
 

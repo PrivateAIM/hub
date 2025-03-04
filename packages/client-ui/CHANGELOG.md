@@ -1,5 +1,38 @@
 # Changelog
 
+## [0.8.6](https://github.com/PrivateAIM/hub/compare/v0.8.5...v0.8.6) (2025-03-04)
+
+
+### Features
+
+* add analysis incoming view on project page ([488303a](https://github.com/PrivateAIM/hub/commit/488303a2d3c77b1af978090ed7bc34d6d3dc6e2e))
+* avoid displaying uuids when meaningful ([0a4a13f](https://github.com/PrivateAIM/hub/commit/0a4a13f28a2a488eacdba78e5961d24f15c0bce2))
+* redesigned station picker ([#977](https://github.com/PrivateAIM/hub/issues/977)) ([d9b967b](https://github.com/PrivateAIM/hub/commit/d9b967b4cdb15cdcb1085e662b55600dc1073b37))
+* refactored domain entity nav component(s) ([#995](https://github.com/PrivateAIM/hub/issues/995)) ([3042767](https://github.com/PrivateAIM/hub/commit/30427675a4265f11780207795e4c97eb5ada3dca))
+* remove uuids in admin area tables ([a62ebe7](https://github.com/PrivateAIM/hub/commit/a62ebe76214551c0f6a7f02db92afb4b0e88d037))
+* reorganized analysis wizard steps ([#978](https://github.com/PrivateAIM/hub/issues/978)) ([9e1913e](https://github.com/PrivateAIM/hub/commit/9e1913e2dbbd98f1fc018ed621d37b78261446eb))
+
+
+### Bug Fixes
+
+* better ux for analysis wizard, when no entries are selected ([f3e562c](https://github.com/PrivateAIM/hub/commit/f3e562c47b77a341fc50bb0103fe987ffd240cd1))
+* **deps:** bump the minorandpatch group across 1 directory with 11 updates ([#973](https://github.com/PrivateAIM/hub/issues/973)) ([6c3b98e](https://github.com/PrivateAIM/hub/commit/6c3b98e665d641005d223e348ff0970b453dbf0e))
+* **deps:** bump the minorandpatch group across 1 directory with 8 updates ([#985](https://github.com/PrivateAIM/hub/issues/985)) ([ad6992c](https://github.com/PrivateAIM/hub/commit/ad6992c95cc0cf79a88abb5d47f5fdd62c0d4222))
+* domain entity nav usage ([54188ed](https://github.com/PrivateAIM/hub/commit/54188ed71cb55d6cb04bb82ca1638c36562d27e8))
+* remove explicit dependency @pinia/nuxt ([0312149](https://github.com/PrivateAIM/hub/commit/031214963f2ecf6f2321a7e3046eb83e79f053ef))
+* remove explicit pinia dependency ([61d8b72](https://github.com/PrivateAIM/hub/commit/61d8b723a2b178ad2cd4095a7ba8342c23b46050))
+* sorting of nodes (in admin view) ([8205c44](https://github.com/PrivateAIM/hub/commit/8205c449866f0e61f4b1a39ec3c21b41656749bd))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/client-vue bumped from ^0.8.5 to ^0.8.6
+    * @privateaim/core-kit bumped from ^0.8.5 to ^0.8.6
+    * @privateaim/kit bumped from ^0.8.5 to ^0.8.6
+    * @privateaim/storage-kit bumped from ^0.8.5 to ^0.8.6
+
 ## [0.8.5](https://github.com/PrivateAIM/hub/compare/v0.8.4...v0.8.5) (2025-01-22)
 
 
