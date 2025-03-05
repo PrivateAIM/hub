@@ -1,5 +1,51 @@
 # Changelog
 
+## [0.8.6](https://github.com/PrivateAIM/hub/compare/v0.8.5...v0.8.6) (2025-03-04)
+
+
+### Features
+
+* add analysis incoming view on project page ([488303a](https://github.com/PrivateAIM/hub/commit/488303a2d3c77b1af978090ed7bc34d6d3dc6e2e))
+* avoid displaying uuids when meaningful ([0a4a13f](https://github.com/PrivateAIM/hub/commit/0a4a13f28a2a488eacdba78e5961d24f15c0bce2))
+* command-arguments editor in analysis wizard ([#994](https://github.com/PrivateAIM/hub/issues/994)) ([e8e450f](https://github.com/PrivateAIM/hub/commit/e8e450f5e14e108cedf17844f258d898c44cbdcc))
+* emit updated analysis object ([b5724b0](https://github.com/PrivateAIM/hub/commit/b5724b0b51df229fed85a17f37e9f385371d4e0b))
+* enable resetting image command arguments in wizard ([d080301](https://github.com/PrivateAIM/hub/commit/d080301333e161e70c22517d886d20fb038f7375))
+* enable sorting {analysis,project}-node by analysis name ([6e0f243](https://github.com/PrivateAIM/hub/commit/6e0f2438282ba4561d3c3a6ebf0c5bdd1c2b85d6))
+* enable sorting {analysis,project}-node by node name ([5cd32c0](https://github.com/PrivateAIM/hub/commit/5cd32c040ff7b1c16ed76c0b73f07403b2666aa2))
+* master-images command arguments extension ([#991](https://github.com/PrivateAIM/hub/issues/991)) ([7b8d860](https://github.com/PrivateAIM/hub/commit/7b8d86086af5afcc450833f8b07301346ce32a80))
+* move analysis image command to master image analysis wizard step ([8058362](https://github.com/PrivateAIM/hub/commit/80583621594f50749ce4d6894d55461683ef4d84))
+* redesigned station picker ([#977](https://github.com/PrivateAIM/hub/issues/977)) ([d9b967b](https://github.com/PrivateAIM/hub/commit/d9b967b4cdb15cdcb1085e662b55600dc1073b37))
+* refactor command precondition + change order in build_start command ([#981](https://github.com/PrivateAIM/hub/issues/981)) ([85aa834](https://github.com/PrivateAIM/hub/commit/85aa8348dd91a4394ed700d5f57f5de28f80f827))
+* refactored domain entity nav component(s) ([#995](https://github.com/PrivateAIM/hub/issues/995)) ([3042767](https://github.com/PrivateAIM/hub/commit/30427675a4265f11780207795e4c97eb5ada3dca))
+* remove uuids in admin area tables ([a62ebe7](https://github.com/PrivateAIM/hub/commit/a62ebe76214551c0f6a7f02db92afb4b0e88d037))
+* reorganized analysis wizard steps ([#978](https://github.com/PrivateAIM/hub/issues/978)) ([9e1913e](https://github.com/PrivateAIM/hub/commit/9e1913e2dbbd98f1fc018ed621d37b78261446eb))
+* unify assign action for relational components ([775120a](https://github.com/PrivateAIM/hub/commit/775120a1b24b6f1f409fd003b4d5b23f00adde4d))
+* use p-256 for ecdh algorithm ([ec9f241](https://github.com/PrivateAIM/hub/commit/ec9f241b693c8fca0275802aec3e5487711bba69))
+* validate client-to-server messaging message ([a37cbc4](https://github.com/PrivateAIM/hub/commit/a37cbc4582ac66190aa4aad9a78aca58d34526f4))
+
+
+### Bug Fixes
+
+* add missing pagination to project node selection ([b9e6a4d](https://github.com/PrivateAIM/hub/commit/b9e6a4de22473521937d25a718233c08d5c369fd))
+* analysis update handler ([41a5b86](https://github.com/PrivateAIM/hub/commit/41a5b86438c5f56ac4fd50e4a7f40c8353006e52))
+* better ux for analysis wizard, when no entries are selected ([f3e562c](https://github.com/PrivateAIM/hub/commit/f3e562c47b77a341fc50bb0103fe987ffd240cd1))
+* change unique constraint for master_image virtual_path field ([c87fa19](https://github.com/PrivateAIM/hub/commit/c87fa19e991e1c685bac5a4321e2c7a62905473d))
+* change unique constraint for master_image_group virtual_path field ([24e8667](https://github.com/PrivateAIM/hub/commit/24e866731e0fb92b11151641f64918c895b3f437))
+* clean master image logs before synchronization ([76f1a69](https://github.com/PrivateAIM/hub/commit/76f1a6941db485b11a03519330571771f7170289))
+* **deps:** bump the minorandpatch group across 1 directory with 11 updates ([#973](https://github.com/PrivateAIM/hub/issues/973)) ([6c3b98e](https://github.com/PrivateAIM/hub/commit/6c3b98e665d641005d223e348ff0970b453dbf0e))
+* **deps:** bump the minorandpatch group across 1 directory with 4 updates ([#997](https://github.com/PrivateAIM/hub/issues/997)) ([949ba29](https://github.com/PrivateAIM/hub/commit/949ba29f66ef6840b9e92b2504b26b7a7a7036e0))
+* **deps:** bump the minorandpatch group across 1 directory with 8 updates ([#985](https://github.com/PrivateAIM/hub/issues/985)) ([ad6992c](https://github.com/PrivateAIM/hub/commit/ad6992c95cc0cf79a88abb5d47f5fdd62c0d4222))
+* domain entity nav usage ([54188ed](https://github.com/PrivateAIM/hub/commit/54188ed71cb55d6cb04bb82ca1638c36562d27e8))
+* don't use inherited name from group for image name ([0f9850d](https://github.com/PrivateAIM/hub/commit/0f9850dbab971d93b8913702c55036acac30d270))
+* minor ui adjustments ([894b988](https://github.com/PrivateAIM/hub/commit/894b9886ae7a04373ce7d8501816ee5ca1ff38bc))
+* read handler ([2292a1b](https://github.com/PrivateAIM/hub/commit/2292a1b524fe9c31c4d99a0a667b90d8f55c891a))
+* remove explicit dependency @pinia/nuxt ([0312149](https://github.com/PrivateAIM/hub/commit/031214963f2ecf6f2321a7e3046eb83e79f053ef))
+* remove explicit pinia dependency ([61d8b72](https://github.com/PrivateAIM/hub/commit/61d8b723a2b178ad2cd4095a7ba8342c23b46050))
+* reset image_command_arguments after master image change ([c904823](https://github.com/PrivateAIM/hub/commit/c904823cea8a6269259e60a29b9c1e2192aef4dd))
+* sorting of nodes (in admin view) ([8205c44](https://github.com/PrivateAIM/hub/commit/8205c449866f0e61f4b1a39ec3c21b41656749bd))
+* synchronizing master image groups ([2599491](https://github.com/PrivateAIM/hub/commit/2599491bbf032a4e17b6e0cc8d9cc7785b77f157))
+* use image_command_arguments of analysis if defined ([f571e9e](https://github.com/PrivateAIM/hub/commit/f571e9e6c2263c22bd2580ba97d9158ac703df7e))
+
 ## [0.8.5](https://github.com/PrivateAIM/hub/compare/v0.8.4...v0.8.5) (2025-01-22)
 
 
