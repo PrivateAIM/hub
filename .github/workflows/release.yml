@@ -31,10 +31,14 @@ jobs:
                     token: ${{ secrets.GITHUB_TOKEN }}
 
             -   name: Checkout
-                if: steps.release.outputs.releases_created == 'true'
                 uses: actions/checkout@v4
                 with:
                     fetch-depth: 0
+
+            -   name: Configure Git
+                run: |
+                    git config user.name "$GITHUB_ACTOR"
+                    git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
             -   name: Install
                 if: steps.release.outputs.releases_created == 'true'
