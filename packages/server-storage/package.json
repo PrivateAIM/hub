@@ -29,7 +29,7 @@
         "hapic": "^2.5.2",
         "locter": "^2.1.6",
         "minio": "^8.0.4",
-        "mysql2": "^3.12.0",
+        "mysql2": "^3.13.0",
         "redis-extension": "^2.0.1",
         "routup": "^4.0.1",
         "singa": "^1.0.0",
