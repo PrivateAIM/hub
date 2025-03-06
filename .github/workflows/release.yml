@@ -64,6 +64,7 @@ jobs:
                         latest
                         ${{ steps.release.outputs['major'] }}.${{ steps.release.outputs['minor'] }}.${{ steps.release.outputs['patch'] }}
             -   name: Run chart-releaser
+                if: steps.release.outputs.releases_created == 'true'
                 uses: helm/chart-releaser-action@v1.7.0
                 env:
                     CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
