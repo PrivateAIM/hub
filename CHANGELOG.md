@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.7](https://github.com/PrivateAIM/hub/compare/v0.8.6...v0.8.7) (2025-03-06)
+
+
+### Bug Fixes
+
+* skip git config step in github action ([7dd491b](https://github.com/PrivateAIM/hub/commit/7dd491bfbed26598bb2d64a341a12cb585ba4883))
+
 ## [0.8.6](https://github.com/PrivateAIM/hub/compare/v0.8.5...v0.8.6) (2025-03-04)
 
 
