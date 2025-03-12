@@ -14,18 +14,18 @@ import {
     useDataSource,
 } from 'typeorm-extension';
 import { NotFoundError } from '@ebec/http';
-import { AnalysisLogEntity } from '../../../../domains';
+import { AnalysisNodeLogEntity } from '../../../../domains';
 
-export async function getOneAnalysisLogRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function getOneAnalysisNodeLogRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(AnalysisLogEntity);
+    const repository = dataSource.getRepository(AnalysisNodeLogEntity);
     const query = repository.createQueryBuilder('log')
         .where('log.id = :id', { id });
 
     applyRelations(query, useRequestQuery(req, 'include'), {
-        allowed: ['analysis'],
+        allowed: ['analysis', 'node'],
         defaultAlias: 'log',
     });
 
@@ -40,7 +40,7 @@ export async function getOneAnalysisLogRouteHandler(req: Request, res: Response)
 
 export async function getManyAnalysisLogRouteHandler(req: Request, res: Response) : Promise<any> {
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(AnalysisLogEntity);
+    const repository = dataSource.getRepository(AnalysisNodeLogEntity);
     const query = repository.createQueryBuilder('log');
     query.distinctOn(['log.id']);
 
@@ -48,20 +48,20 @@ export async function getManyAnalysisLogRouteHandler(req: Request, res: Response
         defaultAlias: 'log',
         filters: {
             allowed: [
-                'command',
                 'error',
                 'status',
                 'analysis_id',
+                'node_id',
             ],
         },
         pagination: {
             maxLimit: 50,
         },
         relations: {
-            allowed: ['analysis'],
+            allowed: ['analysis', 'node'],
         },
         sort: {
-            allowed: ['command', 'status', 'created_at', 'updated_at'],
+            allowed: ['status', 'created_at', 'updated_at'],
         },
     });
 

@@ -6,6 +6,7 @@
  */
 
 import type { AnalysisBucket } from './analysis-bucket';
+import type { AnalysisNodeLog } from './analysis-node-log';
 import type {
     DomainEventName, DomainEventSubscriptionName, DomainSubType, DomainType,
 } from './constants';
@@ -38,6 +39,7 @@ type DomainTypeMapRaw = {
     [DomainType.ANALYSIS_BUCKET_FILE]: AnalysisBucketFile,
     [DomainType.ANALYSIS_LOG]: AnalysisLog,
     [DomainType.ANALYSIS_NODE]: AnalysisNode,
+    [DomainType.ANALYSIS_NODE_LOG]: AnalysisNodeLog,
     [DomainSubType.ANALYSIS_NODE_IN]: AnalysisNode,
     [DomainSubType.ANALYSIS_NODE_OUT]: AnalysisNode,
 };
