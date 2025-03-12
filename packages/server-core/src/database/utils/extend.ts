@@ -11,7 +11,7 @@ import {
     AnalysisBucketFileEntity,
     AnalysisEntity,
     AnalysisLogEntity,
-    AnalysisNodeEntity,
+    AnalysisNodeEntity, AnalysisNodeLogEntity,
     AnalysisPermissionEntity,
     MasterImageEntity,
     MasterImageEventLogEntity, MasterImageGroupEntity,
@@ -22,17 +22,19 @@ import {
     RegistryProjectEntity,
 } from '../../domains';
 import { DatabaseQueryResultCache } from '../cache';
-import { MasterImageSubscriber } from '../subscribers/master-image';
-import { MasterImageGroupSubscriber } from '../subscribers/master-image-group';
-import { ProjectSubscriber } from '../subscribers/project';
-import { ProjectNodeSubscriber } from '../subscribers/project-node';
-import { RegistrySubscriber } from '../subscribers/registry';
-import { RegistryProjectSubscriber } from '../subscribers/registry-project';
-import { NodeSubscriber } from '../subscribers/node';
-import { AnalysisSubscriber } from '../subscribers/analysis';
-import { AnalysisFileSubscriber } from '../subscribers/analysis-file';
-import { AnalysisLogSubscriber } from '../subscribers/analysis-log';
-import { AnalysisNodeSubscriber } from '../subscribers/analysis-node';
+import {
+    AnalysisFileSubscriber,
+    AnalysisLogSubscriber, AnalysisNodeLogSubscriber,
+    AnalysisNodeSubscriber,
+    AnalysisSubscriber,
+    MasterImageGroupSubscriber,
+    MasterImageSubscriber,
+    NodeSubscriber,
+    ProjectNodeSubscriber,
+    ProjectSubscriber,
+    RegistryProjectSubscriber,
+    RegistrySubscriber,
+} from '../subscribers';
 
 export async function extendDataSourceOptions(options: DataSourceOptions) : Promise<DataSourceOptions> {
     options = {
@@ -53,6 +55,7 @@ export async function extendDataSourceOptions(options: DataSourceOptions) : Prom
             AnalysisLogEntity,
             AnalysisBucketFileEntity,
             AnalysisNodeEntity,
+            AnalysisNodeLogEntity,
             AnalysisPermissionEntity,
         ],
         migrations: [],
@@ -67,6 +70,7 @@ export async function extendDataSourceOptions(options: DataSourceOptions) : Prom
             MasterImageGroupSubscriber,
             ProjectSubscriber,
             ProjectNodeSubscriber,
+            AnalysisNodeLogSubscriber,
             RegistrySubscriber,
             RegistryProjectSubscriber,
             NodeSubscriber,
