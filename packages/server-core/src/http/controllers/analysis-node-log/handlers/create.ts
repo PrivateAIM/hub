@@ -5,14 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { NotFoundError } from '@ebec/http';
+import { isRealmResourceWritable } from '@authup/core-kit';
+import { BadRequestError, ForbiddenError } from '@ebec/http';
+import { AnalysisNodeRunStatus } from '@privateaim/core-kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
-import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
+import { HTTPHandlerOperation, useRequestIdentityRealm } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import {
-    AnalysisNodeEntity, AnalysisNodeLogEntity, ProjectNodeEntity,
+    AnalysisNodeEntity, AnalysisNodeLogEntity,
 } from '../../../../domains';
 import { AnalysisNodeLogValidator } from '../utils';
 
@@ -35,22 +37,33 @@ export async function createAnalysisNodeLogRouteHandler(req: Request, res: Respo
     data.analysis_realm_id = data.analysis.realm_id;
     data.node_realm_id = data.node.realm_id;
 
-    const projectNodeRepository = dataSource.getRepository(ProjectNodeEntity);
-    const projectNode = await projectNodeRepository.findOneBy({
-        project_id: data.analysis.project_id,
-        node_id: data.node_id,
-    });
-
-    if (!projectNode) {
-        throw new NotFoundError('The referenced node is not part of the analysis project.');
+    const isAuthorityOfNode = isRealmResourceWritable(useRequestIdentityRealm(req), data.node_realm_id);
+    if (!isAuthorityOfNode) {
+        throw new ForbiddenError('You are not an actor of to the node realm.');
     }
 
-    const repository = dataSource.getRepository(AnalysisNodeEntity);
-    let entity = repository.create(data);
+    const entity = await dataSource.transaction(async (entityManager) => {
+        const analysisNodeRepository = entityManager.getRepository(AnalysisNodeEntity);
+        const analysisNode = await analysisNodeRepository.findOneBy({
+            analysis_id: data.analysis_id,
+            node_id: data.node_id,
+        });
 
-    entity = await repository.save(entity);
+        if (analysisNode) {
+            const runStatus = Object.values(AnalysisNodeRunStatus) as string[];
+            if (runStatus.indexOf(data.status) !== -1) {
+                analysisNode.run_status = data.status as AnalysisNodeRunStatus;
 
-    // todo update: analysisNode run_status if (status === AnalysisNodeRunStatus)
+                await analysisNodeRepository.save(analysisNode);
+            }
+        } else {
+            throw new BadRequestError('A relation between analysis and node must exist to create logs.');
+        }
+
+        const repository = entityManager.getRepository(AnalysisNodeLogEntity);
+        const entity = repository.create(data);
+        return repository.save(entity);
+    });
 
     return sendCreated(res, entity);
 }

@@ -49,7 +49,5 @@ export async function updateAnalysisNodeLogRouteHandler(req: Request, res: Respo
 
     entity = await repository.save(entity);
 
-    // todo update: analysisNode run_status if (status === AnalysisNodeRunStatus)
-
     return sendAccepted(res, entity);
 }
