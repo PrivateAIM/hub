@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.8.7](https://github.com/PrivateAIM/hub/compare/v0.8.6...v0.8.7) (2025-03-12)
+
+
+### Features
+
+* entity, interface, subscriber, ... for analysis-node-log object ([#1004](https://github.com/PrivateAIM/hub/issues/1004)) ([5f261e3](https://github.com/PrivateAIM/hub/commit/5f261e3d7ea701644d92df3ab98c346baaefead8))
+
+
+### Bug Fixes
+
+* remove step property in analysis logs ([6737e26](https://github.com/PrivateAIM/hub/commit/6737e263a6f9fb019568fc51a77af6c7ace5452a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.8.6 to ^0.8.7
+  * peerDependencies
+    * @privateaim/kit bumped from ^0.8.6 to ^0.8.7
+
 ## [0.8.6](https://github.com/PrivateAIM/hub/compare/v0.8.5...v0.8.6) (2025-03-04)
 
 
