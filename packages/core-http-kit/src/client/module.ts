@@ -11,6 +11,7 @@ import {
     AnalysisAPI,
     AnalysisBucketFileAPI,
     AnalysisLogAPI,
+    AnalysisNodeLogAPI,
     AnalysisPermissionAPI,
     MasterImageAPI,
     MasterImageEventLogAPI,
@@ -52,6 +53,8 @@ export class Client extends BaseClient {
 
     public readonly analysisNode : TrainStationAPI;
 
+    public readonly analysisNodeLog: AnalysisNodeLogAPI;
+
     public readonly analysisPermission : AnalysisPermissionAPI;
 
     public readonly service : ServiceAPI;
@@ -72,6 +75,7 @@ export class Client extends BaseClient {
         this.analysisBucketFile = new AnalysisBucketFileAPI({ client: this });
         this.analysisLog = new AnalysisLogAPI({ client: this });
         this.analysisNode = new TrainStationAPI({ client: this });
+        this.analysisNodeLog = new AnalysisNodeLogAPI({ client: this });
         this.analysisPermission = new AnalysisPermissionAPI({ client: this });
         this.service = new ServiceAPI({ client: this });
 
