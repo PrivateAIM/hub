@@ -29,6 +29,9 @@ export interface Analysis {
 
     // ------------------------------------------------------------------
 
+    /**
+     * todo: rename to distribution_status
+     */
     build_status: AnalysisBuildStatus | null;
 
     // ------------------------------------------------------------------

@@ -6,16 +6,12 @@
  */
 
 import type {
-    Analysis,
-} from '@privateaim/core-kit';
-
-import type {
     ComponentName,
 } from '@privateaim/server-analysis-manager-kit';
 
 export type AnalysisLogSaveContext = {
-    entity: Pick<Analysis, 'id'> &
-    Partial<Pick<Analysis, 'realm_id'>>,
+    analysisId: string,
+    realmId: string,
 
     error?: boolean,
     errorCode?: string,
@@ -23,7 +19,6 @@ export type AnalysisLogSaveContext = {
     component?: `${ComponentName}`,
     command?: string,
     event?: string,
-    step?: string,
 
     status?: string,
     statusMessage?: string

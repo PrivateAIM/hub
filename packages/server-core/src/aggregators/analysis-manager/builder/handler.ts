@@ -36,7 +36,8 @@ export async function handleAnalysisManagerBuilderBaseEvent(
     }
 
     let logCtx : AnalysisLogSaveContext = {
-        entity,
+        analysisId: entity.id,
+        realmId: entity.realm_id,
         component: ComponentName.BUILDER,
         event,
     };

@@ -37,10 +37,6 @@ export class AnalysisLogEntity implements AnalysisLog {
     @Column({ type: 'varchar', length: 64, nullable: true })
         event: string | null;
 
-    @Index()
-    @Column({ type: 'varchar', length: 64, nullable: true })
-        step: string | null;
-
     @Column({ type: 'boolean', default: false })
         error: boolean;
 

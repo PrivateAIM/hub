@@ -36,12 +36,6 @@ export default defineComponent({
                 parts.push(' ');
             }
 
-            if (refs.entity.value.step) {
-                parts.push('during the step ');
-                parts.push(h('strong', refs.entity.value.step));
-                parts.push(' ');
-            }
-
             parts.push('occurred');
 
             message = h('span', parts);

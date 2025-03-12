@@ -49,7 +49,6 @@ export async function getManyAnalysisLogRouteHandler(req: Request, res: Response
         filters: {
             allowed: [
                 'command',
-                'step',
                 'error',
                 'status',
                 'analysis_id',
@@ -62,7 +61,7 @@ export async function getManyAnalysisLogRouteHandler(req: Request, res: Response
             allowed: ['analysis'],
         },
         sort: {
-            allowed: ['command', 'step', 'status', 'created_at', 'updated_at'],
+            allowed: ['command', 'status', 'created_at', 'updated_at'],
         },
     });
 

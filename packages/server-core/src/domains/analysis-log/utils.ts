@@ -14,13 +14,12 @@ export async function saveAnalysisLog(context: AnalysisLogSaveContext) {
     const repository = dataSource.getRepository(AnalysisLogEntity);
 
     const entity = repository.create({
-        analysis_id: context.entity.id,
-        realm_id: context.entity.realm_id,
+        analysis_id: context.analysisId,
+        realm_id: context.realmId,
 
         component: context.component,
         command: context.command,
         event: context.event,
-        step: context.step,
 
         error: context.error,
 

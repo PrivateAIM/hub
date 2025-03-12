@@ -29,10 +29,8 @@ export interface AnalysisLog {
     event: string | null;
 
     /**
-     * e.g: init, ...
+     * is it an error log?
      */
-    step: string | null;
-
     error: boolean;
 
     /**
