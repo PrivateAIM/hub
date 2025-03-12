@@ -21,8 +21,6 @@ export interface AnalysisNode {
 
     run_status: AnalysisNodeRunStatus | null;
 
-    run_status_message: string | null;
-
     // ------------------------------------------------------------------
 
     comment: string;

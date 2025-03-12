@@ -23,6 +23,7 @@ import { AnalysisBucketController } from './controllers/analysis-bucket';
 import { AnalysisBucketFileController } from './controllers/analysis-bucket-file';
 import { AnalysisLogController } from './controllers/analysis-log';
 import { AnalysisNodeController } from './controllers/analysis-node';
+import { AnalysisNodeLogController } from './controllers/analysis-node-log';
 import { AnalysisPermissionController } from './controllers/analysis-permission';
 import { MasterImageController } from './controllers/master-image';
 import { MasterImageEventLogController } from './controllers/master-image-event-log';
@@ -83,6 +84,7 @@ export function createRouter() : Router {
                 AnalysisBucketFileController,
                 AnalysisLogController,
                 AnalysisNodeController,
+                AnalysisNodeLogController,
                 AnalysisPermissionController,
 
                 RootController,

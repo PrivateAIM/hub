@@ -53,24 +53,25 @@ export class AnalysisNodeLogEntity implements AnalysisNodeLog {
 
     // ------------------------------------------------------------------
 
-    @Column()
-        analysis_id: Analysis['id'];
-
     @ManyToOne(() => AnalysisEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'analysis_id' })
         analysis: AnalysisEntity;
 
-    // ------------------------------------------------------------------
-
     @Column()
-        node_id: Node['id'];
+        analysis_id: Analysis['id'];
+
+    @Column({ type: 'uuid' })
+        analysis_realm_id: Realm['id'];
+
+    // ------------------------------------------------------------------
 
     @ManyToOne(() => NodeEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'node_id' })
         node: NodeEntity;
 
-    // ------------------------------------------------------------------
+    @Column()
+        node_id: Node['id'];
 
     @Column({ type: 'uuid' })
-        realm_id: Realm['id'];
+        node_realm_id: Realm['id'];
 }

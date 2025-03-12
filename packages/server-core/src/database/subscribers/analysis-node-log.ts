@@ -38,7 +38,11 @@ async function publishEvent(
             },
             {
                 channel: (id) => buildDomainChannelName(DomainType.ANALYSIS_NODE_LOG, id),
-                namespace: buildDomainNamespaceName(data.realm_id),
+                namespace: buildDomainNamespaceName(data.analysis_realm_id),
+            },
+            {
+                channel: (id) => buildDomainChannelName(DomainType.ANALYSIS_NODE_LOG, id),
+                namespace: buildDomainNamespaceName(data.node_realm_id),
             },
         ],
     );
