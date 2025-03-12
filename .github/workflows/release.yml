@@ -70,7 +70,7 @@ jobs:
                 with:
                     commit: TRUE
                     push: TRUE
-                    directory: charts
+                    directory: helm
                     version: ${{ steps.release.outputs['major'] }}.${{ steps.release.outputs['minor'] }}.${{ steps.release.outputs['patch'] }}
 
             -   name: Run chart-releaser
