@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.8.7](https://github.com/PrivateAIM/hub/compare/v0.8.6...v0.8.7) (2025-03-12)
+
+
+### Bug Fixes
+
+* **deps:** bump the minorandpatch group across 1 directory with 2 updates ([#1003](https://github.com/PrivateAIM/hub/issues/1003)) ([3bb511a](https://github.com/PrivateAIM/hub/commit/3bb511a285a0a5cff086a1b7ee2d5acf7e487a26))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.8.6 to ^0.8.7
+    * @privateaim/server-kit bumped from ^0.8.6 to ^0.8.7
+    * @privateaim/server-http-kit bumped from ^0.8.6 to ^0.8.7
+    * @privateaim/storage-kit bumped from ^0.8.6 to ^0.8.7
+
 ## [0.8.6](https://github.com/PrivateAIM/hub/compare/v0.8.5...v0.8.6) (2025-03-04)
 
 

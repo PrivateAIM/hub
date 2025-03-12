@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.8.7](https://github.com/PrivateAIM/hub/compare/v0.8.6...v0.8.7) (2025-03-12)
+
+
+### Bug Fixes
+
+* remove step property in analysis logs ([6737e26](https://github.com/PrivateAIM/hub/commit/6737e263a6f9fb019568fc51a77af6c7ace5452a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core-kit bumped from ^0.8.6 to ^0.8.7
+    * @privateaim/kit bumped from ^0.8.6 to ^0.8.7
+    * @privateaim/core-http-kit bumped from ^0.8.6 to ^0.8.7
+    * @privateaim/storage-kit bumped from ^0.8.6 to ^0.8.7
+  * peerDependencies
+    * @privateaim/core-kit bumped from ^0.8.6 to ^0.8.7
+    * @privateaim/storage-kit bumped from ^0.8.6 to ^0.8.7
+
 ## [0.8.6](https://github.com/PrivateAIM/hub/compare/v0.8.5...v0.8.6) (2025-03-04)
 
 
