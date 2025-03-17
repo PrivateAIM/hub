@@ -58,21 +58,35 @@ export function createSocketServer(httpServer: HTTPServer) : Server {
     });
 
     server.use((socket, next) => {
-        useLogger().info(`${socket.nsp.name}: ${socket.id} connected.`);
+        useLogger().info(`${socket.nsp.name}: Socket connected.`, { socketId: socket.id });
 
         socket.on('disconnect', () => {
-            useLogger().info(`${socket.nsp.name}: ${socket.id} disconnected.`);
+            useLogger().info(`${socket.nsp.name}: Socket disconnected.`, { socketId: socket.id });
         });
 
         next();
     });
-    server.use(authupMiddleware);
-    server.use((socket, next) => {
-        if (!socket.data.userId && !socket.data.robotId) {
-            useLogger().error('Socket is not authenticated.');
 
+    server.use(authupMiddleware);
+
+    server.use((socket, next) => {
+        if (socket.data.userId) {
+            useLogger().info(`${socket.nsp.name}: User connected.`, { userId: socket.data.userId, socketId: socket.id });
+        } else if (socket.data.robotId) {
+            useLogger().info(`${socket.nsp.name}: Robot connected.`, { robotId: socket.data.robotId, socketId: socket.id });
+        } else {
+            useLogger().error(`${socket.nsp.name}: Socket is not authenticated.`, { socketId: socket.id });
             next(new UnauthorizedError());
+            return;
         }
+
+        socket.on('disconnect', () => {
+            if (socket.data.userId) {
+                useLogger().info('User disconnected', { userId: socket.data.userId, socketId: socket.id });
+            } else if (socket.data.robotId) {
+                useLogger().info('Robot disconnected', { robotId: socket.data.robotId, socketId: socket.id });
+            }
+        });
 
         next();
     });
