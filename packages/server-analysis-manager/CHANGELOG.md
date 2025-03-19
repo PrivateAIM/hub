@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.8.8](https://github.com/PrivateAIM/hub/compare/v0.8.7...v0.8.8) (2025-03-19)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.8.7 to ^0.8.8
+    * @privateaim/kit bumped from ^0.8.7 to ^0.8.8
+    * @privateaim/core-http-kit bumped from ^0.8.7 to ^0.8.8
+    * @privateaim/server-kit bumped from ^0.8.7 to ^0.8.8
+    * @privateaim/server-analysis-manager-kit bumped from ^0.7.8 to ^0.7.9
+    * @privateaim/storage-kit bumped from ^0.8.7 to ^0.8.8
+
 ## [0.8.7](https://github.com/PrivateAIM/hub/compare/v0.8.6...v0.8.7) (2025-03-12)
 
 
