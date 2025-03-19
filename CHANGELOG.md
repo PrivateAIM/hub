@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.8](https://github.com/PrivateAIM/hub/compare/v0.8.7...v0.8.8) (2025-03-19)
+
+
+### Features
+
+* enhance logging in messenger service ([ac4304b](https://github.com/PrivateAIM/hub/commit/ac4304bc5bf1f456b48605bf21a80f584c930341))
+
 ## [0.8.7](https://github.com/PrivateAIM/hub/compare/v0.8.6...v0.8.7) (2025-03-12)
 
 
