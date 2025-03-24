@@ -14,11 +14,10 @@ import {
 import type { BuildInput } from 'rapiq';
 import type { PropType } from 'vue';
 import { computed, defineComponent, toRef } from 'vue';
-import FAnalysisNodeRunStatus from './FAnalysisNodeRunStatus';
 import FAnalysisNodes from './FAnalysisNodes';
 
 export default defineComponent({
-    components: { FAnalysisNodes, FAnalysisNodeRunStatus },
+    components: { FAnalysisNodes },
     props: {
         entity: {
             type: Object as PropType<Analysis>,
@@ -65,7 +64,7 @@ export default defineComponent({
 <template>
     <div>
         <template v-if="elementType === 'steps'">
-            <div class="train-stations-progress">
+            <div class="analysis-nodes">
                 <FAnalysisNodes
                     :header="false"
                     :query="query"
@@ -79,8 +78,11 @@ export default defineComponent({
                             :key="item.id"
                         >
                             <div
-                                class="d-flex flex-column progress-step"
+                                class="d-flex flex-column progress-step flex-grow-1"
                             >
+                                <div class="text-left">
+                                    <h6>{{ item.node.name }}</h6>
+                                </div>
                                 <div
                                     class="d-flex justify-content-center icon-circle text-light p-1"
                                     :class="{
@@ -94,13 +96,9 @@ export default defineComponent({
                                         'bg-danger': item.run_status === analysisNodeRunStatus.FAILED
                                     }"
                                 >
-                                    <span class="icon">{{ item.node.name }}</span>
-                                </div>
-                                <div class="mt-1">
-                                    <strong>Status</strong>
-                                </div>
-                                <div>
-                                    <FAnalysisNodeRunStatus :status="item.run_status" />
+                                    <span class="icon">
+                                        {{ item.run_status || 'none' }}
+                                    </span>
                                 </div>
                             </div>
                         </template>
@@ -125,3 +123,57 @@ export default defineComponent({
         </template>
     </div>
 </template>
+<style>
+.analysis-nodes .list-body {
+    flex-direction: row;
+    /*
+    justify-content: space-between;
+     */
+    display: flex;
+    gap: 1rem;
+}
+
+.progress-with-circle {
+    position: relative;
+    top: 40px;
+    height: 4px;
+}
+
+.progress-with-circle .progress-bar {
+    box-shadow: none;
+    -webkit-transition: width .3s ease;
+    -o-transition: width .3s ease;
+    transition: width .3s ease;
+    height: 100%;
+}
+
+.progress-step {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    min-width: 100px;
+}
+
+.icon-circle {
+    font-weight: 600;
+    height: 50px;
+    background-color: #ececec;
+    position: relative;
+    border-radius: 5px;
+    opacity: 0.9;
+}
+
+.icon-circle .icon {
+    text-transform: capitalize;
+    font-size: 1.25rem;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+}
+</style>

@@ -136,52 +136,6 @@
     color: #f79483;
 }
 
-/**
-TrainStationProgress
- */
-
-.progress-with-circle {
-    position: relative;
-    top: 40px;
-    height: 4px;
-}
-
-.progress-with-circle .progress-bar {
-    box-shadow: none;
-    -webkit-transition: width .3s ease;
-    -o-transition: width .3s ease;
-    transition: width .3s ease;
-    height: 100%;
-}
-
-.progress-step {
-    display: flex;
-    justify-content: center;
-    align-content: center;
-    text-align: center;
-    min-width: 100px;
-}
-
-.icon-circle {
-    font-weight: 600;
-    height: 70px;
-    background-color: #ececec;
-    position: relative;
-    border-radius: 5px;
-}
-
-.icon-circle .icon {
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-box-align: center;
-    -ms-flex-align: center;
-    align-items: center;
-    -webkit-box-pack: center;
-    -ms-flex-pack: center;
-    justify-content: center;
-}
-
 .command-box {
     background-color: rgb(43, 43, 43);
     border: 1px solid #dedede;
@@ -196,11 +150,4 @@ TrainStationProgress
 
 .command-box .shell-sign {
     color: rgb(166, 89, 45);
-}
-
-.train-stations-progress .list-body {
-    flex-direction: row;
-    justify-content: space-between;
-    display: flex;
-    margin-bottom: 1rem;
 }
