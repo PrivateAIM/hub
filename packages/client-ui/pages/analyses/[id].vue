@@ -89,22 +89,18 @@ export default defineComponent({
             v-if="entity"
             class="m-b-20 m-t-10"
         >
-            <div class="panel-card">
-                <div class="panel-card-body">
-                    <div class="flex-wrap flex-row d-flex align-items-center">
-                        <DomainEntityNav
-                            :items="tabs"
-                            :path="'/analyses/' + entity.id"
-                        >
-                            <template #before>
-                                <DomainEntityNavItem
-                                    :path="'/projects/'+entity.project_id+'/analyses'"
-                                    :icon="'fa fa-arrow-left'"
-                                />
-                            </template>
-                        </DomainEntityNav>
-                    </div>
-                </div>
+            <div class="flex-wrap flex-row d-flex align-items-center">
+                <DomainEntityNav
+                    :items="tabs"
+                    :path="'/analyses/' + entity.id"
+                >
+                    <template #before>
+                        <DomainEntityNavItem
+                            :path="'/projects/'+entity.project_id+'/analyses'"
+                            :icon="'fa fa-arrow-left'"
+                        />
+                    </template>
+                </DomainEntityNav>
             </div>
         </div>
 
