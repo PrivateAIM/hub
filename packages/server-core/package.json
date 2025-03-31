@@ -45,7 +45,7 @@
         "pg": "^8.14.1",
         "prom-client": "^14.2.0",
         "rapiq": "^0.9.0",
-        "redis-extension": "^2.0.1",
+        "redis-extension": "^2.0.2",
         "reflect-metadata": "^0.2.2",
         "routup": "^4.0.1",
         "singa": "^1.0.0",

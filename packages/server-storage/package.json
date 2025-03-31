@@ -30,7 +30,7 @@
         "locter": "^2.1.6",
         "minio": "^8.0.5",
         "mysql2": "^3.14.0",
-        "redis-extension": "^2.0.1",
+        "redis-extension": "^2.0.2",
         "routup": "^4.0.1",
         "singa": "^1.0.0",
         "tar-stream": "^3.1.6",
