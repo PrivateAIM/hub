@@ -30,11 +30,11 @@
         "locter": "^2.1.6",
         "minio": "^8.0.5",
         "mysql2": "^3.14.0",
-        "redis-extension": "^2.0.1",
+        "redis-extension": "^2.0.2",
         "routup": "^4.0.1",
         "singa": "^1.0.0",
         "tar-stream": "^3.1.6",
-        "typeorm": "^0.3.21",
+        "typeorm": "^0.3.22",
         "typeorm-extension": "^3.7.0",
         "validup": "^0.1.8"
     },
