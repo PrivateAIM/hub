@@ -31,7 +31,7 @@
         "@privateaim/server-analysis-manager-kit": "^0.7.8",
         "@privateaim/storage-kit": "^0.8.7",
         "@validup/adapter-zod": "^0.1.8",
-        "amqp-extension": "^4.0.0-beta.3",
+        "amqp-extension": "^4.0.0",
         "dockerode": "^4.0.4",
         "docken": "^1.1.1",
         "dotenv": "^16.4.5",
