@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.8.8](https://github.com/PrivateAIM/hub/compare/v0.8.7...v0.8.8) (2025-04-04)
+
+
+### Bug Fixes
+
+* **deps:** bump amqp-extension from 4.0.0-beta.3 to 4.0.0 ([#1018](https://github.com/PrivateAIM/hub/issues/1018)) ([6f969f1](https://github.com/PrivateAIM/hub/commit/6f969f17c64f61da85799fd1193d7343d0130ac5))
+* **deps:** bump the minorandpatch group across 1 directory with 3 updates ([#1012](https://github.com/PrivateAIM/hub/issues/1012)) ([81c35b2](https://github.com/PrivateAIM/hub/commit/81c35b2f93816245deecd81df242604b6e096b44))
+* **deps:** bump the minorandpatch group across 1 directory with 3 updates ([#1019](https://github.com/PrivateAIM/hub/issues/1019)) ([a82d65d](https://github.com/PrivateAIM/hub/commit/a82d65da5e08edce3d97e7432c22d8a028853217))
+* negation in project-node update handler ([f685c88](https://github.com/PrivateAIM/hub/commit/f685c88599c77768d2c41049c20dba56455acaaf))
+* use the right validation group in update handler routes ([a56d41e](https://github.com/PrivateAIM/hub/commit/a56d41e606f1e08f40f32e6b98799bb9cc55153f))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.8.7 to ^0.8.8
+    * @privateaim/kit bumped from ^0.8.7 to ^0.8.8
+    * @privateaim/server-kit bumped from ^0.8.7 to ^0.8.8
+    * @privateaim/server-core-realtime bumped from ^0.8.7 to ^0.8.8
+    * @privateaim/server-http-kit bumped from ^0.8.7 to ^0.8.8
+    * @privateaim/server-analysis-manager-kit bumped from ^0.7.8 to ^0.7.9
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.8.7 to ^0.8.8
+
 ## [0.8.7](https://github.com/PrivateAIM/hub/compare/v0.8.6...v0.8.7) (2025-03-12)
 
 

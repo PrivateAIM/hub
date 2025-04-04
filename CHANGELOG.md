@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.8.8](https://github.com/PrivateAIM/hub/compare/v0.8.7...v0.8.8) (2025-04-04)
+
+
+### Features
+
+* enhance logging in messenger service ([ac4304b](https://github.com/PrivateAIM/hub/commit/ac4304bc5bf1f456b48605bf21a80f584c930341))
+* minor redesign to analysis-nodes rendering in analysis view ([23224f5](https://github.com/PrivateAIM/hub/commit/23224f564b8749d8848c5c1f815f11dde290e9e1))
+* remove head navigation wrapper ([d236ce6](https://github.com/PrivateAIM/hub/commit/d236ce6246c57f061745631d9c616925ff8aef82))
+
+
+### Bug Fixes
+
+* **deps:** bump amqp-extension from 4.0.0-beta.3 to 4.0.0 ([#1018](https://github.com/PrivateAIM/hub/issues/1018)) ([6f969f1](https://github.com/PrivateAIM/hub/commit/6f969f17c64f61da85799fd1193d7343d0130ac5))
+* **deps:** bump the minorandpatch group across 1 directory with 3 updates ([#1012](https://github.com/PrivateAIM/hub/issues/1012)) ([81c35b2](https://github.com/PrivateAIM/hub/commit/81c35b2f93816245deecd81df242604b6e096b44))
+* **deps:** bump the minorandpatch group across 1 directory with 3 updates ([#1019](https://github.com/PrivateAIM/hub/issues/1019)) ([a82d65d](https://github.com/PrivateAIM/hub/commit/a82d65da5e08edce3d97e7432c22d8a028853217))
+* negation in project-node update handler ([f685c88](https://github.com/PrivateAIM/hub/commit/f685c88599c77768d2c41049c20dba56455acaaf))
+* use the right validation group in update handler routes ([a56d41e](https://github.com/PrivateAIM/hub/commit/a56d41e606f1e08f40f32e6b98799bb9cc55153f))
+
 ## [0.8.7](https://github.com/PrivateAIM/hub/compare/v0.8.6...v0.8.7) (2025-03-12)
 
 

@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.8.8](https://github.com/PrivateAIM/hub/compare/v0.8.7...v0.8.8) (2025-04-04)
+
+
+### Features
+
+* minor redesign to analysis-nodes rendering in analysis view ([23224f5](https://github.com/PrivateAIM/hub/commit/23224f564b8749d8848c5c1f815f11dde290e9e1))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core-kit bumped from ^0.8.7 to ^0.8.8
+    * @privateaim/kit bumped from ^0.8.7 to ^0.8.8
+    * @privateaim/core-http-kit bumped from ^0.8.7 to ^0.8.8
+    * @privateaim/storage-kit bumped from ^0.8.7 to ^0.8.8
+  * peerDependencies
+    * @privateaim/core-kit bumped from ^0.8.7 to ^0.8.8
+    * @privateaim/storage-kit bumped from ^0.8.7 to ^0.8.8
+
 ## [0.8.7](https://github.com/PrivateAIM/hub/compare/v0.8.6...v0.8.7) (2025-03-12)
 
 
