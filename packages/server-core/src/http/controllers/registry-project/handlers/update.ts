@@ -27,7 +27,7 @@ export async function updateRegistryProjectRouteHandler(req: Request, res: Respo
     const validator = new RegistryProjectValidator();
     const validatorAdapter = new RoutupContainerAdapter(validator);
     const data = await validatorAdapter.run(req, {
-        group: HTTPHandlerOperation.CREATE,
+        group: HTTPHandlerOperation.UPDATE,
     });
 
     const dataSource = await useDataSource();

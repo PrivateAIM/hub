@@ -20,7 +20,7 @@ export async function updateProjectNodeRouteHandler(req: Request, res: Response)
     const validator = new ProjectNodeValidator();
     const validatorAdapter = new RoutupContainerAdapter(validator);
     const data = await validatorAdapter.run(req, {
-        group: HTTPHandlerOperation.CREATE,
+        group: HTTPHandlerOperation.UPDATE,
     });
 
     const id = useRequestParam(req, 'id');
