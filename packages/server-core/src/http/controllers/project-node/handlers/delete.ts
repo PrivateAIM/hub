@@ -45,7 +45,7 @@ export async function deleteProjectNodeRouteHandler(req: Request, res: Response)
         !isRealmResourceWritable(useRequestIdentityRealm(req), entity.node_realm_id) &&
         !isRealmResourceWritable(useRequestIdentityRealm(req), entity.project_realm_id)
     ) {
-        throw new ForbiddenError('You are not authorized to drop this project node.');
+        throw new ForbiddenError('You are not authorized to drop this relation object.');
     }
 
     // -------------------------------------------

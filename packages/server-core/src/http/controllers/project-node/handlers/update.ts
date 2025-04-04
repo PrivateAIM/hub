@@ -34,8 +34,9 @@ export async function updateProjectNodeRouteHandler(req: Request, res: Response)
 
     const permissionChecker = useRequestPermissionChecker(req);
 
+    // todo: ensure only approval_status & comment is updated.
     const isAuthorityOfNode = isRealmResourceWritable(useRequestIdentityRealm(req), entity.node_realm_id);
-    if (isAuthorityOfNode) {
+    if (!isAuthorityOfNode) {
         throw new ForbiddenError('You are not permitted to update this object.');
     }
 
