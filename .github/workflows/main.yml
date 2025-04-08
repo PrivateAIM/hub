@@ -29,6 +29,7 @@ jobs:
                 env:
                     DB_TYPE: "better-sqlite3"
                     DB_DATABASE: ":memory:"
+                    NODE_ENV: "development"
 
         runs-on: ubuntu-latest
 
