@@ -42,7 +42,7 @@
     "homepage": "https://github.com/PrivateAim/hub#readme",
     "devDependencies": {
         "@authup/client-web-kit": "^1.0.0-beta.24",
-        "@authup/core-kit": "^1.0.0-beta.24",
+        "@authup/core-kit": "^1.0.0-beta.25",
         "@authup/core-http-kit": "^1.0.0-beta.24",
         "@authup/core-realtime-kit": "^1.0.0-beta.24",
         "@authup/kit": "^1.0.0-beta.24",
@@ -74,7 +74,7 @@
     },
     "peerDependencies": {
         "@authup/client-web-kit": "^1.0.0-beta.24",
-        "@authup/core-kit": "^1.0.0-beta.24",
+        "@authup/core-kit": "^1.0.0-beta.25",
         "@authup/core-http-kit": "^1.0.0-beta.24",
         "@authup/core-realtime-kit": "^1.0.0-beta.24",
         "@authup/kit": "^1.0.0-beta.24",

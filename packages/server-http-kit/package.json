@@ -13,7 +13,7 @@
     "dependencies": {
         "@authup/access": "^1.0.0-beta.24",
         "@authup/kit": "^1.0.0-beta.24",
-        "@authup/core-kit": "^1.0.0-beta.24",
+        "@authup/core-kit": "^1.0.0-beta.25",
         "@authup/core-http-kit": "^1.0.0-beta.24",
         "@authup/server-adapter-kit": "^1.0.0-beta.24",
         "@authup/server-adapter-http": "^1.0.0-beta.24",
