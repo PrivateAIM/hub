@@ -22,6 +22,7 @@ import type { Analysis } from './analysis';
 import type { AnalysisBucketFile } from './analysis-bucket-file';
 import type { AnalysisLog } from './analysis-log';
 import type { AnalysisNode } from './analysis-node';
+import type { AnalysisPermission } from './analysis-permission';
 
 type DomainTypeMapRaw = {
     [DomainType.MASTER_IMAGE]: MasterImage,
@@ -40,6 +41,7 @@ type DomainTypeMapRaw = {
     [DomainType.ANALYSIS_LOG]: AnalysisLog,
     [DomainType.ANALYSIS_NODE]: AnalysisNode,
     [DomainType.ANALYSIS_NODE_LOG]: AnalysisNodeLog,
+    [DomainType.ANALYSIS_PERMISSION]: AnalysisPermission,
     [DomainSubType.ANALYSIS_NODE_IN]: AnalysisNode,
     [DomainSubType.ANALYSIS_NODE_OUT]: AnalysisNode,
 };
