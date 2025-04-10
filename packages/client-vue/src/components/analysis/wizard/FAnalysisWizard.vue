@@ -24,9 +24,11 @@ import FAnalysisWizardStepNodes from './FAnalysisWizardStepNodes.vue';
 import FAnalysisWizardStepMasterImage from './FAnalysisWizardStepImage.vue';
 import FAnalysisWizardStepFiles from './FAnalysisWizardStepFiles.vue';
 import FAnalysisWizardLockModal from './FAnalysisWizardLockModal.vue';
+import FAnalysisWizardStepSecurity from './FAnalysisWizardStepSecurity.vue';
 
 export default defineComponent({
     components: {
+        FAnalysisWizardStepSecurity,
         FAnalysisWizardStepFiles,
         FormWizard,
         WizardButton,
@@ -390,6 +392,16 @@ export default defineComponent({
                 :entity="entity"
                 @updated="handleUpdated"
                 @master-image-changed="handleMasterImageChanged"
+            />
+        </TabContent>
+
+        <TabContent
+            title="Security"
+            :before-change="passWizardStep"
+        >
+            <FAnalysisWizardStepSecurity
+                :entity="entity"
+                @failed="handleFailed"
             />
         </TabContent>
     </FormWizard>
