@@ -8,9 +8,10 @@
 import {
     RegistryProjectType,
 } from '@privateaim/core-kit';
-import { PermissionName, createNanoID, isHex } from '@privateaim/kit';
+import {
+    PermissionName, createNanoID, isHex, isRealmResourceWritable,
+} from '@privateaim/kit';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
-import { isRealmResourceWritable } from '@authup/core-kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';

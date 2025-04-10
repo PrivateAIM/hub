@@ -8,12 +8,13 @@
 <script lang="ts">
 import { VCTimeago } from '@vuecs/timeago';
 import { BTable } from 'bootstrap-vue-next';
-import type { Realm } from '@authup/core-kit';
-import { PermissionName, isRealmResourceWritable } from '@authup/core-kit';
+import { REALM_MASTER_NAME, type Realm } from '@authup/core-kit';
+import { PermissionName } from '@authup/core-kit';
 import {
     AEntityDelete, APagination, ARealms, ASearch, ATitle, injectStore, storeToRefs,
     usePermissionCheck,
 } from '@authup/client-web-kit';
+import { computed } from 'vue';
 import { defineNuxtComponent } from '#imports';
 
 export default defineNuxtComponent({
@@ -38,12 +39,10 @@ export default defineNuxtComponent({
             emit('deleted', e);
         };
 
-        const isResourceWritable = (
-            entity: Realm,
-        ) => isRealmResourceWritable(realm.value, entity.id);
-
         const hasEditPermission = usePermissionCheck({ name: PermissionName.REALM_UPDATE });
         const hasDropPermission = usePermissionCheck({ name: PermissionName.REALM_DELETE });
+
+        const isMaster = computed(() => realm.value && realm.value.name === REALM_MASTER_NAME);
 
         const fields = [
             {
@@ -59,8 +58,8 @@ export default defineNuxtComponent({
         ];
 
         return {
+            isMaster,
             fields,
-            isResourceWritable,
             hasEditPermission,
             hasDropPermission,
             handleDeleted,
@@ -103,13 +102,15 @@ export default defineNuxtComponent({
                     <VCTimeago :datetime="data.item.created_at" />
                 </template>
                 <template #cell(options)="data">
-                    <button
-                        v-if="realmManagementId !== data.item.id"
-                        class="btn btn-xs btn-primary me-1"
-                        @click.prevent="setRealmManagement(data.item)"
-                    >
-                        <i class="fa-solid fa-check" />
-                    </button>
+                    <template v-if="isMaster">
+                        <button
+                            v-if="realmManagementId !== data.item.id"
+                            class="btn btn-xs btn-primary me-1"
+                            @click.prevent="setRealmManagement(data.item)"
+                        >
+                            <i class="fa-solid fa-check" />
+                        </button>
+                    </template>
                     <NuxtLink
                         :to="'/admin/realms/'+ data.item.id"
                         class="btn btn-xs btn-outline-primary me-1"

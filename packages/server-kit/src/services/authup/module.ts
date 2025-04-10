@@ -7,15 +7,10 @@
 
 import type { ClientResponseErrorTokenHookOptions } from '@authup/core-http-kit';
 import {
-    Client, mountClientResponseErrorTokenHook as mountAuthupClientResponseErrorTokenHook,
-    mountClientResponseErrorTokenHook,
+    Client, ClientResponseErrorTokenHook,
 } from '@authup/core-http-kit';
 import { guessAuthupTokenCreatorOptions } from './helpers';
 import type { AuthupClientOptions } from './types';
-
-export {
-    mountAuthupClientResponseErrorTokenHook,
-};
 
 export class AuthupClient extends Client {
     constructor(options: AuthupClientOptions = {}) {
@@ -33,6 +28,7 @@ export class AuthupClient extends Client {
             };
         }
 
-        mountClientResponseErrorTokenHook(this, tokenHook);
+        const token = new ClientResponseErrorTokenHook(tokenHook);
+        token.mount(this);
     }
 }

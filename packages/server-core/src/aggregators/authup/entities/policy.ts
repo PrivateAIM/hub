@@ -5,13 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import type {
-    DomainType, EventRecord, Policy,
+    EntityType, EventRecord, Policy,
 } from '@authup/core-kit';
 import { useDataSource } from 'typeorm-extension';
 import { AnalysisPermissionEntity } from '../../../domains';
 
 export async function handleAuthupPolicyEvent(
-    context: EventRecord<DomainType.POLICY, Policy>,
+    context: EventRecord<EntityType.POLICY, Policy>,
 ) {
     if (context.event !== 'deleted') {
         return;

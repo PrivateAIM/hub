@@ -4,11 +4,11 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import type { DomainType, EventRecord, User } from '@authup/core-kit';
+import type { EntityType, EventRecord, User } from '@authup/core-kit';
 import { useDataSource } from 'typeorm-extension';
 import { AnalysisEntity, ProjectEntity } from '../../../domains';
 
-export async function handleAuthupUserEvent(context: EventRecord<DomainType.USER, User>) {
+export async function handleAuthupUserEvent(context: EventRecord<EntityType.USER, User>) {
     if (context.event === 'deleted') {
         const dataSource = await useDataSource();
 

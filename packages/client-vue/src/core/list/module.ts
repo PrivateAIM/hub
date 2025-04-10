@@ -6,7 +6,7 @@
  */
 
 import { hasOwnProperty } from '@privateaim/kit';
-import type { DomainAPI } from '@authup/core-http-kit';
+import type { EntityAPI } from '@authup/core-http-kit';
 import type { DomainTypeMap } from '@privateaim/core-kit';
 import type {
     ListFooterBuildOptionsInput, ListHeaderBuildOptionsInput,
@@ -78,7 +78,7 @@ export function createList<
 
     const client = injectCoreHTTPClient();
 
-    let domainAPI : DomainAPI<Entity<RECORD>> | undefined;
+    let domainAPI : EntityAPI<Entity<RECORD>> | undefined;
     if (hasOwnProperty(client, context.type)) {
         domainAPI = client[context.type] as any;
     }

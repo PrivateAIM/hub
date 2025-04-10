@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { DomainEventName, REALM_MASTER_NAME } from '@authup/core-kit';
+import { EntityDefaultEventName, REALM_MASTER_NAME } from '@authup/core-kit';
 import type {
     DomainEventSubscriptionFullName,
     DomainTypeMap,
@@ -158,21 +158,21 @@ export function createEntitySocket<
         if (ctx.onCreated) {
             socket.on<any>(buildDomainEventFullName(
                 ctx.type,
-                DomainEventName.CREATED,
+                EntityDefaultEventName.CREATED,
             ), handleCreated);
         }
 
         if (ctx.onUpdated) {
             socket.on<any>(buildDomainEventFullName(
                 ctx.type,
-                DomainEventName.UPDATED,
+                EntityDefaultEventName.UPDATED,
             ), handleUpdated);
         }
 
         if (ctx.onDeleted) {
             socket.on<any>(buildDomainEventFullName(
                 ctx.type,
-                DomainEventName.DELETED,
+                EntityDefaultEventName.DELETED,
             ), handleDeleted);
         }
     };
@@ -204,21 +204,21 @@ export function createEntitySocket<
         if (ctx.onCreated) {
             socket.off<any>(buildDomainEventFullName(
                 ctx.type,
-                DomainEventName.UPDATED,
+                EntityDefaultEventName.UPDATED,
             ), handleCreated);
         }
 
         if (ctx.onUpdated) {
             socket.off<any>(buildDomainEventFullName(
                 ctx.type,
-                DomainEventName.UPDATED,
+                EntityDefaultEventName.UPDATED,
             ), handleUpdated);
         }
 
         if (ctx.onDeleted) {
             socket.off<any>(buildDomainEventFullName(
                 ctx.type,
-                DomainEventName.DELETED,
+                EntityDefaultEventName.DELETED,
             ), handleDeleted);
         }
     };

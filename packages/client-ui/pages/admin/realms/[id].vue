@@ -6,9 +6,9 @@
   -->
 
 <script lang="ts">
-import { injectHTTPClient, injectStore, storeToRefs } from '@authup/client-web-kit';
+import { injectHTTPClient } from '@authup/client-web-kit';
 import type { Realm } from '@authup/core-kit';
-import { PermissionName, isRealmResourceWritable } from '@authup/core-kit';
+import { PermissionName } from '@authup/core-kit';
 
 import { defineComponent, ref } from 'vue';
 import type { Ref } from 'vue';
@@ -41,7 +41,6 @@ export default defineComponent({
 
         const toast = useToast();
         const route = useRoute();
-        const store = injectStore();
 
         const entity: Ref<Realm> = ref(null) as any;
 
@@ -50,13 +49,6 @@ export default defineComponent({
                 .realm
                 .getOne(route.params.id as string);
         } catch (e) {
-            await navigateTo({ path: '/admin/realms' });
-            throw createError({});
-        }
-
-        const { realmManagement } = storeToRefs(store);
-
-        if (!isRealmResourceWritable(realmManagement.value, entity.value.id)) {
             await navigateTo({ path: '/admin/realms' });
             throw createError({});
         }

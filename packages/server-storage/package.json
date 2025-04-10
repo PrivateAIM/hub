@@ -10,8 +10,8 @@
     "license": "Apache-2.0",
     "description": "",
     "dependencies": {
-        "@authup/kit": "^1.0.0-beta.24",
-        "@authup/core-kit": "^1.0.0-beta.24",
+        "@authup/kit": "^1.0.0-beta.25",
+        "@authup/core-kit": "^1.0.0-beta.25",
         "@ebec/http": "^2.3.0",
         "@hapic/vault": "^2.3.5",
         "@privateaim/kit": "^0.8.7",

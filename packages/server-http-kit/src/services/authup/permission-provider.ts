@@ -11,7 +11,7 @@ export class FakePermissionProvider implements PermissionProvider {
     async get(criteria: PermissionGetOptions): Promise<PermissionItem | undefined> {
         return {
             name: criteria.name,
-            realm_id: criteria.realmId,
+            realmId: criteria.realmId,
             policy: null,
         };
     }

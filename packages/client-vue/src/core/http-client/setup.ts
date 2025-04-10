@@ -13,18 +13,17 @@ import {
     injectStoreFactory,
     storeToRefs,
 } from '@authup/client-web-kit';
-import { ClientResponseErrorTokenHook } from '@authup/core-http-kit';
+import { ClientResponseErrorTokenHook, ClientResponseTokenHookEventName } from '@authup/core-http-kit';
 import type { App } from 'vue';
 
 export function setupBaseHTTPClient(app: App, client: BaseClient) {
     const storeCreator = injectStoreFactory(app);
     const store = storeCreator();
-    const { refreshToken } = storeToRefs(store);
+    const { refreshToken, accessToken } = storeToRefs(store);
 
     const authupClient = injectHTTPClient(app);
 
     const tokenHook = new ClientResponseErrorTokenHook(
-        client,
         {
             baseURL: authupClient.getBaseURL(),
             tokenCreator: () => {
@@ -36,15 +35,21 @@ export function setupBaseHTTPClient(app: App, client: BaseClient) {
                     refresh_token: refreshToken.value,
                 });
             },
-            tokenCreated: (response) => {
-                store.applyTokenGrantResponse(response);
-            },
-            tokenFailed: () => {
-                store.logout();
-            },
             timer: false,
         },
     );
+
+    tokenHook.on(ClientResponseTokenHookEventName.REFRESH_FINISHED, (response) => {
+        store.applyTokenGrantResponse(response);
+    });
+
+    tokenHook.on(ClientResponseTokenHookEventName.REFRESH_FAILED, () => {
+        store.logout();
+    });
+
+    if (accessToken.value) {
+        tokenHook.mount(client);
+    }
 
     const handleAccessTokenEvent = (token: string | null) => {
         if (token) {
@@ -53,11 +58,11 @@ export function setupBaseHTTPClient(app: App, client: BaseClient) {
                 token,
             });
 
-            tokenHook.mount();
+            tokenHook.mount(client);
         } else {
             client.unsetAuthorizationHeader();
 
-            tokenHook.unmount();
+            tokenHook.unmount(client);
         }
     };
 

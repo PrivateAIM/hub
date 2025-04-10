@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { isRealmResourceWritable } from '@authup/core-kit';
+import { isRealmResourceWritable } from '@privateaim/kit';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { AnalysisAPICommand } from '@privateaim/core-kit';
 import { HTTPHandlerOperation, useRequestIdentityRealm } from '@privateaim/server-http-kit';

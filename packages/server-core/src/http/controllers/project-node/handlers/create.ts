@@ -6,12 +6,11 @@
  */
 
 import { NodeType, ProjectNodeApprovalStatus } from '@privateaim/core-kit';
-import { PermissionName } from '@privateaim/kit';
+import { PermissionName, isRealmResourceWritable } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
 import { HTTPHandlerOperation, useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
-import { isRealmResourceWritable } from '@authup/core-kit';
 import { NotFoundError } from '@ebec/http';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { ProjectEntity, ProjectNodeEntity } from '../../../../domains';

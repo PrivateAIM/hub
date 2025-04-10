@@ -6,11 +6,10 @@
  */
 
 import { ForbiddenError, NotFoundError } from '@ebec/http';
-import { PermissionName } from '@privateaim/kit';
+import { PermissionName, isRealmResourceWritable } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { isRealmResourceWritable } from '@authup/core-kit';
 import { HTTPHandlerOperation, useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';

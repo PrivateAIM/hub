@@ -6,9 +6,8 @@
  */
 
 import { isUUID } from '@authup/kit';
-import { PermissionName } from '@privateaim/kit';
+import { PermissionName, isRealmResourceWritable } from '@privateaim/kit';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
-import { isRealmResourceWritable } from '@authup/core-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';

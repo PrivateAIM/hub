@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { DomainType } from '@authup/core-kit';
+import { EntityType } from '@authup/core-kit';
 import { isRedisClientUsable, useLogger, useRedisSubscribeClient } from '@privateaim/server-kit';
 import type { Aggregator } from '@privateaim/server-kit';
 import { EnvironmentName, useEnv } from '../../config';
@@ -41,23 +41,23 @@ export function createAuthupAggregator() : Aggregator {
                 const event = JSON.parse(message);
 
                 switch (event.type) {
-                    case DomainType.POLICY: {
+                    case EntityType.POLICY: {
                         await handleAuthupPolicyEvent(event);
                         break;
                     }
-                    case DomainType.PERMISSION: {
+                    case EntityType.PERMISSION: {
                         await handleAuthupPermissionEvent(event);
                         break;
                     }
-                    case DomainType.REALM: {
+                    case EntityType.REALM: {
                         await handleAuthupRealmEvent(event);
                         break;
                     }
-                    case DomainType.ROBOT: {
+                    case EntityType.ROBOT: {
                         await handleAuthupRobotEvent(event);
                         break;
                     }
-                    case DomainType.USER: {
+                    case EntityType.USER: {
                         await handleAuthupUserEvent(event);
                         break;
                     }

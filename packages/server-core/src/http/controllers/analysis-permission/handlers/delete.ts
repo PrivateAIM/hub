@@ -6,10 +6,9 @@
  */
 
 import { ForbiddenError, NotFoundError } from '@ebec/http';
-import { PermissionName } from '@privateaim/kit';
+import { PermissionName, isRealmResourceWritable } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
-import { isRealmResourceWritable } from '@authup/core-kit';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { AnalysisPermissionEntity } from '../../../../domains';

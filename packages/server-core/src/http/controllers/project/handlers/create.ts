@@ -7,7 +7,7 @@
 
 import { isEntityUnique, useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
 import { BadRequestError, ForbiddenError } from '@ebec/http';
-import { PermissionName } from '@privateaim/kit';
+import { PermissionName, isRealmResourceWritable } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import {
@@ -16,7 +16,6 @@ import {
     useRequestIdentityRealm,
     useRequestPermissionChecker,
 } from '@privateaim/server-http-kit';
-import { isRealmResourceWritable } from '@authup/core-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { DatabaseConflictError } from '../../../../database';
 import { ProjectEntity } from '../../../../domains';

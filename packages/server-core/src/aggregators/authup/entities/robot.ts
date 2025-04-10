@@ -6,7 +6,7 @@
  */
 
 import type {
-    DomainType, EventRecord, Robot,
+    EntityType, EventRecord, Robot,
 } from '@authup/core-kit';
 import { ServiceID } from '@privateaim/core-kit';
 import { useDataSource } from 'typeorm-extension';
@@ -14,7 +14,7 @@ import { useQueueRouter } from '@privateaim/server-kit';
 import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../../components';
 import { RegistryProjectEntity } from '../../../domains';
 
-export async function handleAuthupRobotEvent(context: EventRecord<DomainType.ROBOT, Robot>) {
+export async function handleAuthupRobotEvent(context: EventRecord<EntityType.ROBOT, Robot>) {
     if (
         context.event !== 'created' &&
         context.event !== 'updated'

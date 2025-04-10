@@ -5,14 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { isRealmResourceWritable } from '@authup/core-kit';
+import { PermissionName, isRealmResourceWritable } from '@privateaim/kit';
 import {
     HTTPHandlerOperation,
     useRequestIdentityOrFail,
     useRequestIdentityRealm,
     useRequestPermissionChecker,
 } from '@privateaim/server-http-kit';
-import { PermissionName } from '@privateaim/kit';
 import { ForbiddenError } from '@ebec/http';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import type { Request, Response } from 'routup';

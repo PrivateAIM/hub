@@ -12,7 +12,7 @@ import {
     applyQuery, applyRelations, useDataSource,
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
-import { isRealmResourceReadable } from '@authup/core-kit';
+import { isRealmResourceReadable } from '@privateaim/kit';
 import { useRequestIdentityRealm } from '@privateaim/server-http-kit';
 import { AnalysisNodeEntity, onlyRealmWritableQueryResources } from '../../../../domains';
 

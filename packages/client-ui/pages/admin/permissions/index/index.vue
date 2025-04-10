@@ -13,7 +13,7 @@ import {
     usePermissionCheck,
 } from '@authup/client-web-kit';
 import type { Permission } from '@authup/core-kit';
-import { PermissionName, isRealmResourceWritable } from '@authup/core-kit';
+import { PermissionName } from '@authup/core-kit';
 
 import type { BuildInput } from 'rapiq';
 import { defineNuxtComponent } from '#app';
@@ -35,17 +35,13 @@ export default defineNuxtComponent({
         };
 
         const store = injectStore();
-        const { realm, realmManagementId } = storeToRefs(store);
+        const { realmManagementId } = storeToRefs(store);
 
         const query : BuildInput<Permission> = {
             filters: {
                 realm_id: [realmManagementId.value, null],
             },
         };
-
-        const isResourceWritable = (
-            resource: Permission,
-        ) => isRealmResourceWritable(realm.value, resource.realm_id);
 
         const hasEditPermission = usePermissionCheck({ name: PermissionName.PERMISSION_UPDATE });
         const hasDropPermission = usePermissionCheck({ name: PermissionName.PERMISSION_DELETE });
@@ -65,7 +61,6 @@ export default defineNuxtComponent({
 
         return {
             fields,
-            isResourceWritable,
             hasEditPermission,
             hasDropPermission,
             handleDeleted,
@@ -111,7 +106,7 @@ export default defineNuxtComponent({
                     <NuxtLink
                         :to="'/admin/permissions/'+ data.item.id"
                         class="btn btn-xs btn-outline-primary me-1"
-                        :disabled="!hasEditPermission || !isResourceWritable(data.item)"
+                        :disabled="!hasEditPermission"
                     >
                         <i class="fa-solid fa-bars" />
                     </NuxtLink>
@@ -120,7 +115,7 @@ export default defineNuxtComponent({
                         :entity-id="data.item.id"
                         entity-type="permission"
                         :with-text="false"
-                        :disabled="data.item.built_in || !hasDropPermission || !isResourceWritable(data.item)"
+                        :disabled="data.item.built_in || !hasDropPermission"
                         @deleted="props.deleted"
                     />
                 </template>

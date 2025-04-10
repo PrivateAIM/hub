@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ResourceVSlotProps } from '@authup/client-web-kit';
+import type { EntityVSlotProps } from '@authup/client-web-kit';
 import {
     ARobot,
     ARobotForm,
@@ -33,7 +33,7 @@ export default defineComponent({
                 id: props.entity.robot_id,
             },
         }, {
-            default: (slotProps: ResourceVSlotProps<Robot>) => {
+            default: (slotProps: EntityVSlotProps<Robot>) => {
                 if (!slotProps.data) {
                     return h(
                         'div',
