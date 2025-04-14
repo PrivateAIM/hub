@@ -26,7 +26,10 @@ export async function updateRegistryRouteHandler(req: Request, res: Response) : 
     const data = await validatorAdapter.run(req, {
         group: HTTPHandlerOperation.UPDATE,
     });
-    data.host = getHostNameFromString(data.host);
+
+    if (data.host) {
+        data.host = getHostNameFromString(data.host);
+    }
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(RegistryEntity);

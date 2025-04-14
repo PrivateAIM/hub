@@ -48,7 +48,7 @@ export class RegistryValidator extends Container<RegistryEntity> {
 
         this.mount(
             'host',
-            { group: HTTPHandlerOperation.CREATE, optional: true },
+            { group: HTTPHandlerOperation.UPDATE, optional: true },
             hostValidator,
         );
 
