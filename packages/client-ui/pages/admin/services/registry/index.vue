@@ -35,6 +35,12 @@ export default defineNuxtComponent({
                 path: '/add',
                 icon: 'fa fa-plus',
             },
+
+            {
+                name: 'robot',
+                path: '/robot',
+                icon: 'fa fa-robot',
+            },
         ];
 
         const handleDeleted = (item: Registry) => {
@@ -50,6 +56,10 @@ export default defineNuxtComponent({
 </script>
 <template>
     <div>
+        <h1 class="title no-border mb-3">
+            <i class="fab fa-docker me-1" /> Registry
+            <span class="sub-title ms-1">Management</span>
+        </h1>
         <div class="content-wrapper">
             <div class="content-sidebar flex-column">
                 <DomainEntityNav

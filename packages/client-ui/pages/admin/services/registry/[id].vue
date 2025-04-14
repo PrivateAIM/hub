@@ -111,32 +111,26 @@ export default defineComponent({
 });
 </script>
 <template>
-    <div class="container">
-        <div class="text-center">
-            <h3 class="title no-border mb-3">
-                {{ entity.name }}
-            </h3>
+    <div>
+        <h1 class="title no-border mb-3">
+            <i class="fab fa-docker me-1" /> {{ entity.name }}
+            <span class="sub-title ms-1">Details</span>
+        </h1>
 
-            <hr>
+        <div class="mb-2">
+            <DomainEntityNav
+                :prev-link="true"
+                :items="tabs"
+                :path="'/admin/services/registry/' + entity.id "
+            />
         </div>
 
         <div>
-            <div class="content-wrapper">
-                <div class="content-sidebar flex-column">
-                    <DomainEntityNav
-                        :items="tabs"
-                        :direction="'vertical'"
-                        :path="'/admin/services/registry/' + entity.id "
-                    />
-                </div>
-                <div class="content-container">
-                    <NuxtPage
-                        :entity="entity"
-                        @updated="handleUpdated"
-                        @deleted="handleDeleted"
-                    />
-                </div>
-            </div>
+            <NuxtPage
+                :entity="entity"
+                @updated="handleUpdated"
+                @deleted="handleDeleted"
+            />
         </div>
     </div>
 </template>

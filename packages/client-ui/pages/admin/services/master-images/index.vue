@@ -38,18 +38,14 @@ export default {
 <template>
     <div class="d-flex flex-column gap-3">
         <h1 class="title no-border mb-0">
-            <i class="fa-brands fa-docker" /> Master Images <span class="sub-title">Management</span>
+            <i class="fa-solid fa-atom" /> Master Images <span class="sub-title">Management</span>
         </h1>
-        <div class="panel-card">
-            <div class="panel-card-body">
-                <div class="flex-wrap flex-row d-flex">
-                    <DomainEntityNav
-                        :items="tabs"
-                        :prev-link="true"
-                        :path="'/admin/services/master-images'"
-                    />
-                </div>
-            </div>
+        <div class="mb-2">
+            <DomainEntityNav
+                :items="tabs"
+                :prev-link="true"
+                :path="'/admin/services/master-images'"
+            />
         </div>
         <div>
             <p>
