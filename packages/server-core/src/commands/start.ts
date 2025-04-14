@@ -31,13 +31,13 @@ export async function startCommand() {
     logger.info(`WritableDirectoryPath: ${getWritableDirPath()}`);
     logger.info(`Port: ${useEnv('port')}`);
     logger.info(`Public-URL: ${useEnv('publicURL')}`);
-    logger.info(`Authup-URL: ${useEnv('authupApiURL')}`);
+    logger.info(`Authup-URL: ${useEnv('authupURL')}`);
     logger.info(`Docs-URL: ${new URL('docs/', useEnv('publicURL')).href}`);
 
     logger.info('Generating documentation...');
 
     await generateSwagger({
-        authupURL: useEnv('authupApiURL'),
+        authupURL: useEnv('authupURL'),
         baseURL: useEnv('publicURL'),
         cwd: getRootDirPath(),
         controllerBasePath: path.join(getRootDirPath(), 'src', 'http', 'controllers'),
@@ -92,7 +92,7 @@ export async function startCommand() {
     const httpServer = createHttpServer({ router });
 
     createSocketServer(httpServer, {
-        authupURL: useEnv('authupApiURL'),
+        authupURL: useEnv('authupURL'),
     });
 
     config.components.forEach((c) => c.start());

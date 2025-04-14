@@ -55,7 +55,7 @@ export function useEnv(key?: string) : any {
         harborURL: read('HARBOR_URL'),
 
         publicURL: read('PUBLIC_URL', `http://127.0.0.1:${port}/`),
-        authupApiURL: read('AUTHUP_URL'),
+        authupURL: read('AUTHUP_URL'),
         appURL: read('APP_URL', 'http://127.0.0.1:3000/'),
 
         masterImagesOwner: read('MASTER_IMAGES_OWNER', ConfigDefaults.MASTER_IMAGES_OWNER),

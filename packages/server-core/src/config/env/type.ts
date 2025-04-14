@@ -19,7 +19,7 @@ export interface Environment {
     harborURL?: string,
 
     publicURL: string,
-    authupApiURL?: string,
+    authupURL?: string,
     appURL: string,
 
     masterImagesRepository: string,

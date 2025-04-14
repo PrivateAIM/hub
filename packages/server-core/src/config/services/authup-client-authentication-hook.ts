@@ -14,7 +14,7 @@ import {
 import { useEnv } from '../env';
 
 export function configureAuthupClientAuthenticationHook() {
-    const baseURL = useEnv('authupApiURL');
+    const baseURL = useEnv('authupURL');
     if (!baseURL) {
         useLogger().debug('Authup service url is not set.');
         return;
