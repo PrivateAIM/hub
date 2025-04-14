@@ -7,6 +7,7 @@
 
 export * from './amqp';
 export * from './authup';
+export * from './authup-client-authentication-hook';
 export * from './cache';
 export * from './logger';
 export * from './redis';

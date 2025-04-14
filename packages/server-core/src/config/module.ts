@@ -16,7 +16,12 @@ import {
 } from '../components';
 import { getWritableDirPath } from './paths';
 import {
-    configureAmqp, configureAuthup, configureRedis, configureVault, setupLogger,
+    configureAmqp,
+    configureAuthup,
+    configureAuthupClientAuthenticationHook,
+    configureRedis,
+    configureVault,
+    setupLogger,
 } from './services';
 
 export type Config = {
@@ -28,6 +33,8 @@ export function createConfig() : Config {
     setupLogger({
         directory: getWritableDirPath(),
     });
+
+    configureAuthupClientAuthenticationHook();
 
     configureVault();
 

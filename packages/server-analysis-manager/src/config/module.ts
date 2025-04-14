@@ -6,13 +6,13 @@
  */
 
 import type { Aggregator, Component } from '@privateaim/server-kit';
-import { guessAuthupTokenCreatorOptions } from '@privateaim/server-kit';
 import {
     createBuilderComponent, createCoreComponent, createMasterImagesComponent,
 } from '../components';
 import {
     configureAMQP, configureCoreService, configureStorageService, setupLogger, setupVault,
 } from './services';
+import { configureAuthupClientAuthenticationHook } from './services/authup-client-authentication-hook';
 import type { Config } from './types';
 
 export function createConfig() : Config {
@@ -20,9 +20,10 @@ export function createConfig() : Config {
     setupVault();
     configureAMQP();
 
-    const tokenCreator = guessAuthupTokenCreatorOptions();
-    configureStorageService({ tokenCreator });
-    configureCoreService({ tokenCreator });
+    configureAuthupClientAuthenticationHook();
+
+    configureStorageService();
+    configureCoreService();
 
     const aggregators : Aggregator[] = [];
 

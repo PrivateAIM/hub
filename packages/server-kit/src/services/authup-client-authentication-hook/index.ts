@@ -5,9 +5,4 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './amqp';
-export * from './authup';
-export * from './authup-client-authentication-hook';
-export * from './logger';
-export * from './redis';
-export * from './vault';
+export * from './singleton';

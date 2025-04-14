@@ -5,27 +5,21 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ClientResponseErrorTokenHook } from '@authup/core-http-kit';
-import type { TokenCreator, TokenCreatorOptions } from '@authup/core-http-kit';
+import { isClientAuthenticationHookUsable, useClientAuthenticationHook } from '@privateaim/server-kit';
 import { APIClient } from '@privateaim/storage-kit';
 import { setStorageFactory } from '../../core';
 import { useEnv } from '../env';
 
-type StorageServiceConfigurationContext = {
-    tokenCreator: TokenCreatorOptions | TokenCreator
-};
-export function configureStorageService(context: StorageServiceConfigurationContext) {
+export function configureStorageService() {
     setStorageFactory(() => {
         const client = new APIClient({
             baseURL: useEnv('storageURL'),
         });
 
-        const hook = new ClientResponseErrorTokenHook({
-            tokenCreator: context.tokenCreator,
-            baseURL: useEnv('authupURL'),
-        });
-
-        hook.mount(client);
+        if (isClientAuthenticationHookUsable()) {
+            const hook = useClientAuthenticationHook();
+            hook.attach(client);
+        }
 
         return client;
     });
