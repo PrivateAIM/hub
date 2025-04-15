@@ -47,42 +47,6 @@ export default defineComponent({
         const apiClient = injectCoreHTTPClient();
         const entity = toRef(props, 'entity');
 
-        const entrypointFile = ref(null) as Ref<AnalysisBucketFile | null>;
-        const masterImage = ref(null) as Ref<MasterImage | null>;
-
-        const resolveRelations = async () => {
-            const { data: buckets } = await apiClient.analysisBucket.getMany({
-                filters: {
-                    type: AnalysisBucketType.CODE,
-                    analysis_id: entity.value.id,
-                },
-            });
-            const [bucket] = buckets;
-            if (bucket) {
-                const { data } = await apiClient.analysisBucketFile.getMany({
-                    filter: {
-                        root: true,
-                        bucket_id: bucket.id,
-                    },
-                });
-
-                if (data.length > 0) {
-                    [entrypointFile.value] = data;
-                }
-            }
-
-            if (entity.value.master_image) {
-                masterImage.value = entity.value.master_image;
-                return;
-            }
-
-            if (entity.value.master_image_id) {
-                masterImage.value = await apiClient.masterImage.getOne(entity.value.master_image_id);
-            }
-        };
-
-        await resolveRelations();
-
         const form = reactive({
             query: null,
             master_image_id: null,
@@ -122,6 +86,42 @@ export default defineComponent({
                 updateForm(entity.value);
             }
         });
+
+        const entrypointFile = ref(null) as Ref<AnalysisBucketFile | null>;
+        const masterImage = ref(null) as Ref<MasterImage | null>;
+
+        const resolveRelations = async () => {
+            const { data: buckets } = await apiClient.analysisBucket.getMany({
+                filters: {
+                    type: AnalysisBucketType.CODE,
+                    analysis_id: entity.value.id,
+                },
+            });
+            const [bucket] = buckets;
+            if (bucket) {
+                const { data } = await apiClient.analysisBucketFile.getMany({
+                    filter: {
+                        root: true,
+                        bucket_id: bucket.id,
+                    },
+                });
+
+                if (data.length > 0) {
+                    [entrypointFile.value] = data;
+                }
+            }
+
+            if (entity.value.master_image) {
+                masterImage.value = entity.value.master_image;
+                return;
+            }
+
+            if (entity.value.master_image_id) {
+                masterImage.value = await apiClient.masterImage.getOne(entity.value.master_image_id);
+            }
+        };
+
+        await resolveRelations();
 
         const handleUpdated = (entity: Analysis) => {
             updateForm(entity);
@@ -330,7 +330,7 @@ export default defineComponent({
                     v-if="props.activeTabIndex > 0"
                     :disabled="isBusy"
                     :style="props.fillButtonStyle"
-                    @click.native="prevWizardStep"
+                    @click="prevWizardStep"
                 >
                     Back
                 </WizardButton>
@@ -341,7 +341,7 @@ export default defineComponent({
                     :disabled="isBusy"
                     class="wizard-footer-right"
                     :style="props.fillButtonStyle"
-                    @click.native="nextWizardStep"
+                    @click="nextWizardStep"
                 >
                     Next
                 </WizardButton>
@@ -351,7 +351,7 @@ export default defineComponent({
                     :disabled="isBusy"
                     class="wizard-footer-right finish-button"
                     :style="props.fillButtonStyle"
-                    @click.native="handleWizardFinishedEvent"
+                    @click="handleWizardFinishedEvent"
                 >
                     Finish
                 </WizardButton>
@@ -375,7 +375,7 @@ export default defineComponent({
             <FAnalysisWizardStepFiles
                 :entity="entity"
                 :entrypoint-entity="entrypointFile"
-                @entrypointChanged="handleEntrypointFileChanged"
+                @entrypoint-changed="handleEntrypointFileChanged"
                 @failed="handleFailed"
             />
         </TabContent>

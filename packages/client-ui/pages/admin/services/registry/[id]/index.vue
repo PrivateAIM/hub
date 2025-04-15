@@ -5,8 +5,6 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-
-import { toRefs } from 'vue';
 import type { PropType } from 'vue';
 import type { Registry } from '@privateaim/core-kit';
 import { RegistryForm } from '@privateaim/client-vue';
@@ -22,8 +20,6 @@ export default defineNuxtComponent({
     },
     emits: ['updated', 'deleted', 'failed'],
     setup(props, { emit }) {
-        const refs = toRefs(props);
-
         const handleUpdated = (e: Registry) => {
             emit('updated', e);
         };
@@ -37,7 +33,6 @@ export default defineNuxtComponent({
         };
 
         return {
-            entity: refs.entity,
             handleUpdated,
             handleDeleted,
             handleFailed,

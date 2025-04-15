@@ -19,11 +19,6 @@ export default defineNuxtComponent({
         },
     },
     emits: ['failed', 'updated'],
-    methods: {
-        handleFailed(e: Error) {
-            this.$emit('failed', e);
-        },
-    },
     setup(props, { emit }) {
         const handleFailed = (e: Error) => {
             emit('failed', e);

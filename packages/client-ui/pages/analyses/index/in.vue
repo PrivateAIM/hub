@@ -7,9 +7,7 @@
 <script lang="ts">
 import { injectStore, storeToRefs, usePermissionCheck } from '@authup/client-web-kit';
 import { PermissionName } from '@privateaim/kit';
-import { VCTimeago } from '@vuecs/timeago';
 import type { AnalysisNode } from '@privateaim/core-kit';
-import { BDropdown, BTable } from 'bootstrap-vue-next';
 import type { BuildInput } from 'rapiq';
 import { ref } from 'vue';
 import {
@@ -29,10 +27,7 @@ export default defineNuxtComponent({
         ListSearch: FSearch,
         ListTitle: FTitle,
         FAnalysisNodeInCard,
-        BDropdown,
-        BTable,
         FAnalysisNodes,
-        VCTimeago,
     },
     setup() {
         definePageMeta({
@@ -82,7 +77,10 @@ export default defineNuxtComponent({
         };
 
         const download = (item: AnalysisNode) => {
-            window.open(api.analysis.getFileDownloadURL(item.analysis_id), '_blank');
+            if (typeof window !== 'undefined') {
+                // eslint-disable-next-line no-undef
+                window.open(api.analysis.getFileDownloadURL(item.analysis_id), '_blank');
+            }
         };
 
         const listNode = ref<null | typeof FAnalysisNodes>(null);

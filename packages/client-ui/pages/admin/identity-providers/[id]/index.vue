@@ -44,7 +44,6 @@ export default defineNuxtComponent({
 
         return {
             apiUrl: runtimeConfig.public.authupApiUrl as string,
-            entity: props.entity,
             handleUpdated,
             handleFailed,
         };

@@ -41,7 +41,6 @@ export default defineNuxtComponent({
         };
 
         return {
-            entity: props.entity,
             handleUpdated,
             handleFailed,
         };

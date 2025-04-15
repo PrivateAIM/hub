@@ -7,12 +7,12 @@
 <script lang="ts">
 import type { Registry } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
-import { RegistryCleanup, RegistrySetup } from '@privateaim/client-vue';
+import { RegistrySetup } from '@privateaim/client-vue';
 import { useToast } from '#imports';
 import { defineNuxtComponent } from '#app';
 
 export default defineNuxtComponent({
-    components: { RegistryCleanup, RegistrySetup },
+    components: { RegistrySetup },
     props: {
         entity: {
             type: Object as PropType<Registry>,

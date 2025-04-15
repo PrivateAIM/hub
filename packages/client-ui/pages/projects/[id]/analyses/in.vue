@@ -91,7 +91,10 @@ export default defineComponent({
         };
 
         const download = (item: AnalysisNode) => {
-            window.open(api.analysis.getFileDownloadURL(item.analysis_id), '_blank');
+            if (typeof window !== 'undefined') {
+                // eslint-disable-next-line no-undef
+                window.open(api.analysis.getFileDownloadURL(item.analysis_id), '_blank');
+            }
         };
 
         const listNode = ref<null | typeof FAnalysisNodes>(null);

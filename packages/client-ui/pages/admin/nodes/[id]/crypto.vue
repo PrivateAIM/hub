@@ -20,11 +20,6 @@ export default defineNuxtComponent({
         },
     },
     emits: ['failed', 'updated'],
-    methods: {
-        handleFailed(e: Error) {
-            this.$emit('failed', e);
-        },
-    },
     setup(props, { emit }) {
         const toast = useToast();
 
@@ -64,8 +59,8 @@ export default defineNuxtComponent({
         v-if="entity"
         :entity="entity"
         :realm-id="entity.realm_id"
-        @keyCopied="handleKeyCopied"
-        @keyPairGenerated="handleKeyPairGenerated"
+        @key-copied="handleKeyCopied"
+        @key-pair-generated="handleKeyPairGenerated"
         @failed="handleFailed"
         @updated="handleUpdated"
     />
