@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.8.8](https://github.com/PrivateAIM/hub/compare/v0.8.7...v0.8.8) (2025-04-15)
+
+
+### Features
+
+* align service page views ([69ce42e](https://github.com/PrivateAIM/hub/commit/69ce42e458d97ab87eec833788f85406be224b0f))
+* enhance logging in messenger service ([ac4304b](https://github.com/PrivateAIM/hub/commit/ac4304bc5bf1f456b48605bf21a80f584c930341))
+* migrated to authup v1.0.0-beta.25 ([a5f6b65](https://github.com/PrivateAIM/hub/commit/a5f6b65499ee3a8c4b4bbdcda47979fa73ee5c48))
+* minor redesign to analysis-nodes rendering in analysis view ([23224f5](https://github.com/PrivateAIM/hub/commit/23224f564b8749d8848c5c1f815f11dde290e9e1))
+* remove head navigation wrapper ([d236ce6](https://github.com/PrivateAIM/hub/commit/d236ce6246c57f061745631d9c616925ff8aef82))
+* reusable client authentication hook ([0a608cd](https://github.com/PrivateAIM/hub/commit/0a608cd94984314166c15fa11684e022b5ceb53e))
+
+
+### Bug Fixes
+
+* **deps:** bump amqp-extension from 4.0.0-beta.3 to 4.0.0 ([#1018](https://github.com/PrivateAIM/hub/issues/1018)) ([6f969f1](https://github.com/PrivateAIM/hub/commit/6f969f17c64f61da85799fd1193d7343d0130ac5))
+* **deps:** bump dotenv from 16.4.7 to 16.5.0 in the minorandpatch group ([#1028](https://github.com/PrivateAIM/hub/issues/1028)) ([181ae0f](https://github.com/PrivateAIM/hub/commit/181ae0f6cfab14df972f0ab4a6cfb41afe244038))
+* **deps:** bump the minorandpatch group across 1 directory with 3 updates ([#1012](https://github.com/PrivateAIM/hub/issues/1012)) ([81c35b2](https://github.com/PrivateAIM/hub/commit/81c35b2f93816245deecd81df242604b6e096b44))
+* **deps:** bump the minorandpatch group across 1 directory with 3 updates ([#1019](https://github.com/PrivateAIM/hub/issues/1019)) ([a82d65d](https://github.com/PrivateAIM/hub/commit/a82d65da5e08edce3d97e7432c22d8a028853217))
+* navigation generation ([ab863bf](https://github.com/PrivateAIM/hub/commit/ab863bf716118a10a8bcafdc60d60effb8e341db))
+* negation in project-node update handler ([f685c88](https://github.com/PrivateAIM/hub/commit/f685c88599c77768d2c41049c20dba56455acaaf))
+* rename env record authupApiURL to authupURL ([de8e390](https://github.com/PrivateAIM/hub/commit/de8e390c8e0bd92bc44b700b4a344173fa6f8083))
+* use the right validation group in update handler routes ([a56d41e](https://github.com/PrivateAIM/hub/commit/a56d41e606f1e08f40f32e6b98799bb9cc55153f))
+* validation group in registry validator ([4f87227](https://github.com/PrivateAIM/hub/commit/4f87227f423e98dfa83049028849bf86324ad4a2))
+
 ## [0.8.7](https://github.com/PrivateAIM/hub/compare/v0.8.6...v0.8.7) (2025-03-12)
 
 
