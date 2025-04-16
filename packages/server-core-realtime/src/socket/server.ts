@@ -43,6 +43,8 @@ export function createSocketServer(httpServer: HTTPServer, options: SocketServer
             useRedisPublishClient(),
             useRedisSubscribeClient(),
         );
+    } else {
+        useLogger().warn('[socket] Redis is not configured and can not be used as an adapter.');
     }
 
     const server = new Server<
@@ -66,32 +68,51 @@ export function createSocketServer(httpServer: HTTPServer, options: SocketServer
     };
     if (isRedisClientUsable()) {
         authupMiddlewareOptions.redis = useRedisClient();
+    } else {
+        useLogger().warn('[socket] Redis is not configured and can not be used for the authup middleware.');
     }
+
     if (isVaultClientUsable()) {
         authupMiddlewareOptions.vault = useVaultClient();
+    } else {
+        useLogger().warn('[socket] Redis is not configured and can not be used for the authup middleware.');
     }
 
     const authupMiddleware = createAuthupMiddleware(authupMiddlewareOptions);
 
-    const nsp = server.of(/^\/resources(?:#[a-z0-9A-Z-_]+)?$/);
+    server.on('error', (err) => {
+        useLogger().error(err);
+    });
+
+    const pattern = /^\/resources(?::[a-z0-9A-Z-_]+)?$/;
+    const nsp = server.of(pattern);
     nsp.use((socket, next) => {
-        useLogger().info(`${socket.nsp.name}: ${socket.id} connected.`);
+        useLogger().info(`[socket] ${socket.nsp.name}: ${socket.id} connected.`);
+
+        socket.on('disconnect', () => {
+            useLogger().info(`[socket] ${socket.nsp.name}: Socket disconnected.`, { socketId: socket.id });
+        });
+
         next();
     });
+
     nsp.use(authupMiddleware);
 
     nsp.use((socket: Socket, next) => {
-        if (!socket.data.userId && !socket.data.robotId) {
-            useLogger().error('Socket is not authenticated.');
-
+        if (socket.data.userId) {
+            useLogger().info(`[socket] ${socket.nsp.name}: User connected.`, { userId: socket.data.userId, socketId: socket.id });
+        } else if (socket.data.robotId) {
+            useLogger().info(`[socket] ${socket.nsp.name}: Robot connected.`, { robotId: socket.data.robotId, socketId: socket.id });
+        } else {
+            useLogger().error(`${socket.nsp.name}: Socket is not authenticated.`, { socketId: socket.id });
             next(new UnauthorizedError());
             return;
         }
 
-        const matches = socket.nsp.name.match(/^\/resources(?:#([a-z0-9A-Z-_]+))?$/);
+        const matches = socket.nsp.name.match(pattern);
         if (typeof matches[1] === 'undefined') {
             if (socket.data.realmName !== REALM_MASTER_NAME) {
-                useLogger().error(`Realm ${socket.data.realmName} is not permitted for the global scope.`);
+                useLogger().error(`[socket] Realm ${socket.data.realmName} is not permitted for the global scope.`);
                 next(new ForbiddenError());
 
                 return;
@@ -100,15 +121,28 @@ export function createSocketServer(httpServer: HTTPServer, options: SocketServer
             [, socket.data.namespaceId] = matches;
 
             if (matches[1] !== socket.data.realmId && socket.data.realmName !== REALM_MASTER_NAME) {
-                useLogger().error(`Realm ${socket.data.realmName} is not permitted for the realm ${matches[1]}.`);
+                useLogger().error(`[socket] Realm ${socket.data.realmName} is not permitted for the realm ${matches[1]}.`);
                 next(new ForbiddenError());
                 return;
             }
         }
 
-        useLogger().debug(`Socket ${socket.id} connected.`);
+        socket.on('disconnect', () => {
+            if (socket.data.userId) {
+                useLogger().info('[socket]User disconnected', { userId: socket.data.userId, socketId: socket.id });
+            } else if (socket.data.robotId) {
+                useLogger().info('[socket] Robot disconnected', { robotId: socket.data.robotId, socketId: socket.id });
+            }
+        });
 
         next();
+    });
+
+    nsp.adapter.on('create-room', (room) => {
+        useLogger().info(`[socket] room ${room} was created`);
+    });
+    nsp.adapter.on('delete-room', (room) => {
+        useLogger().info(`[socket] room ${room} was deleted`);
     });
 
     registerControllers(nsp);

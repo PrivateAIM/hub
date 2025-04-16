@@ -23,7 +23,7 @@
         }],
 
         "@typescript-eslint/no-this-alias": "off",
-
+        "@typescript-eslint/no-throw-literal": "off",
         "vue/no-v-for-template-key": "off",
         "vue/no-multiple-template-root": "off"
     },

@@ -33,6 +33,6 @@ export type EntitySocketContext<
 };
 
 export type EntitySocket = {
-    mount() : void;
-    unmount() : void;
+    subscribe() : void;
+    unsubscribe() : void;
 };

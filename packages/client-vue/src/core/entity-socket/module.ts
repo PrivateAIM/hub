@@ -36,10 +36,10 @@ export function createEntitySocket<
 ) : EntitySocket {
     if (!isSocketManagerUsable()) {
         return {
-            mount() {
+            subscribe() {
 
             },
-            unmount() {
+            unsubscribe() {
 
             },
         };
@@ -127,16 +127,42 @@ export function createEntitySocket<
         }
     };
 
-    let mounted = false;
-    const mount = async () => {
-        if ((ctx.target && !targetId.value) || mounted) {
+    let emitEventRetryCount = 0;
+    const emitEvent = async (
+        socket: Awaited<ReturnType<typeof socketManager.connect>>,
+        event: DomainEventSubscriptionFullName<TYPE> | undefined,
+    ) => {
+        try {
+            await socket.emitWithAck<any>(
+                event,
+                targetId.value as EventTarget,
+                (err: any) => {
+                    console.log(err);
+                    // todo: handle error!
+                },
+            );
+        } catch (e) {
+            if (emitEventRetryCount > 3) {
+                throw e;
+            }
+
+            emitEventRetryCount += 1;
+
+            await new Promise((resolve) => { setTimeout(resolve, 0); });
+
+            await emitEvent(socket, event);
+        }
+    };
+
+    let isActive = false;
+    const subscribe = async () => {
+        if ((ctx.target && !targetId.value) || isActive) {
             return;
         }
 
-        mounted = true;
+        isActive = true;
 
         const socket = await socketManager.connect(buildDomainNamespaceName(realmId.value));
-
         let event : DomainEventSubscriptionFullName<TYPE> | undefined;
         if (ctx.buildSubscribeEventName) {
             event = ctx.buildSubscribeEventName();
@@ -146,14 +172,6 @@ export function createEntitySocket<
                 DomainEventSubscriptionName.SUBSCRIBE,
             );
         }
-
-        socket.emit<any>(
-            event,
-            targetId.value as EventTarget,
-            () => {
-                // todo: handle error!
-            },
-        );
 
         if (ctx.onCreated) {
             socket.on<any>(buildDomainEventFullName(
@@ -175,14 +193,16 @@ export function createEntitySocket<
                 EntityDefaultEventName.DELETED,
             ), handleDeleted);
         }
+
+        await emitEvent(socket, event);
     };
 
-    const unmount = async () => {
-        if ((ctx.target && !targetId.value) || !mounted) {
+    const unsubscribe = async () => {
+        if ((ctx.target && !targetId.value) || !isActive) {
             return;
         }
 
-        mounted = false;
+        isActive = false;
 
         const socket = await socketManager.connect(buildDomainNamespaceName(realmId.value));
 
@@ -192,14 +212,9 @@ export function createEntitySocket<
         } else {
             event = buildDomainEventSubscriptionFullName(
                 ctx.type,
-                DomainEventSubscriptionName.SUBSCRIBE,
+                DomainEventSubscriptionName.UNSUBSCRIBE,
             );
         }
-
-        socket.emit<any>(
-            event,
-            targetId.value as EventTarget,
-        );
 
         if (ctx.onCreated) {
             socket.off<any>(buildDomainEventFullName(
@@ -221,21 +236,30 @@ export function createEntitySocket<
                 EntityDefaultEventName.DELETED,
             ), handleDeleted);
         }
+
+        await emitEvent(socket, event);
     };
 
-    onMounted(() => mount());
-    onUnmounted(() => unmount());
+    let isMounted : boolean = false;
+    onMounted(() => {
+        isMounted = true;
+        return subscribe();
+    });
+    onUnmounted(() => {
+        isMounted = false;
+        return unsubscribe();
+    });
 
     watch(targetId, (val, oldValue) => {
-        if (val !== oldValue) {
+        if (val !== oldValue && isMounted) {
             Promise.resolve()
-                .then(() => unmount())
-                .then(() => mount());
+                .then(() => unsubscribe())
+                .then(() => subscribe());
         }
     });
 
     return {
-        mount,
-        unmount,
+        subscribe,
+        unsubscribe,
     };
 }

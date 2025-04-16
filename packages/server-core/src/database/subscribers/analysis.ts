@@ -5,7 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { publishDomainEvent, useLogger, useRedisPublishClient } from '@privateaim/server-kit';
+import {
+    useDomainEventPublisher, useLogger,
+} from '@privateaim/server-kit';
 import type {
     EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
@@ -26,14 +28,14 @@ async function publishEvent(
     event: `${DomainEventName}`,
     data: Analysis,
 ) {
-    await publishDomainEvent(
-        useRedisPublishClient(),
-        {
+    const publisher = useDomainEventPublisher();
+    await publisher.publish({
+        data: {
             type: DomainType.ANALYSIS,
             event,
             data,
         },
-        [
+        destinations: [
             {
                 channel: (id) => buildDomainChannelName(DomainType.ANALYSIS, id),
             },
@@ -42,7 +44,7 @@ async function publishEvent(
                 namespace: buildDomainNamespaceName(data.realm_id),
             },
         ],
-    );
+    });
 }
 @EventSubscriber()
 export class AnalysisSubscriber implements EntitySubscriberInterface<AnalysisEntity> {

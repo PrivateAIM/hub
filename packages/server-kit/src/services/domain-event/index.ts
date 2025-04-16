@@ -5,7 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './publish';
+export * from './module';
 export * from './redis';
+export * from './singleton';
 export * from './socket';
 export * from './type';

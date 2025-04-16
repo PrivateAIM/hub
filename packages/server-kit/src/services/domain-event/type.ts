@@ -5,6 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { EventRecord } from '@privateaim/core-kit';
+
 export type DomainEventChannelName = string | ((id?: string | number) => string);
 export type DomainEventDestination = {
     namespace?: string,
@@ -12,3 +14,14 @@ export type DomainEventDestination = {
 };
 
 export type DomainEventDestinations = DomainEventDestination[];
+
+export type DomainEventPublishContext<
+    T extends EventRecord = EventRecord,
+> = {
+    data: T,
+    destinations: DomainEventDestinations
+};
+
+export interface IDomainEventPublisher {
+    publish(ctx: DomainEventPublishContext) : Promise<void>;
+}
