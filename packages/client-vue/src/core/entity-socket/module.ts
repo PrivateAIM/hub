@@ -127,6 +127,33 @@ export function createEntitySocket<
         }
     };
 
+    let emitEventRetryCount = 0;
+    const emitEvent = async (
+        socket: Awaited<ReturnType<typeof socketManager.connect>>,
+        event: DomainEventSubscriptionFullName<TYPE> | undefined,
+    ) => {
+        try {
+            await socket.emitWithAck<any>(
+                event,
+                targetId.value as EventTarget,
+                (err: any) => {
+                    console.log(err);
+                    // todo: handle error!
+                },
+            );
+        } catch (e) {
+            if (emitEventRetryCount > 3) {
+                throw e;
+            }
+
+            emitEventRetryCount += 1;
+
+            await new Promise((resolve) => { setTimeout(resolve, 0); });
+
+            await emitEvent(socket, event);
+        }
+    };
+
     let mounted = false;
     const mount = async () => {
         if ((ctx.target && !targetId.value) || mounted) {
@@ -136,10 +163,8 @@ export function createEntitySocket<
         mounted = true;
 
         const socket = await socketManager.connect(buildDomainNamespaceName(realmId.value));
-
-        socket.on<any>('authenticated', (val) => {
-            console.log(val);
-        });
+        socket.on('connect_error', (err) => console.log(err));
+        socket.on('disconnect', (err) => console.log(err));
         let event : DomainEventSubscriptionFullName<TYPE> | undefined;
         if (ctx.buildSubscribeEventName) {
             event = ctx.buildSubscribeEventName();
@@ -149,14 +174,6 @@ export function createEntitySocket<
                 DomainEventSubscriptionName.SUBSCRIBE,
             );
         }
-
-        socket.emit<any>(
-            event,
-            targetId.value as EventTarget,
-            () => {
-                // todo: handle error!
-            },
-        );
 
         if (ctx.onCreated) {
             socket.on<any>(buildDomainEventFullName(
@@ -178,6 +195,8 @@ export function createEntitySocket<
                 EntityDefaultEventName.DELETED,
             ), handleDeleted);
         }
+
+        await emitEvent(socket, event);
     };
 
     const unmount = async () => {
@@ -199,11 +218,6 @@ export function createEntitySocket<
             );
         }
 
-        socket.emit<any>(
-            event,
-            targetId.value as EventTarget,
-        );
-
         if (ctx.onCreated) {
             socket.off<any>(buildDomainEventFullName(
                 ctx.type,
@@ -224,6 +238,8 @@ export function createEntitySocket<
                 EntityDefaultEventName.DELETED,
             ), handleDeleted);
         }
+
+        await emitEvent(socket, event);
     };
 
     onMounted(() => mount());

@@ -80,6 +80,10 @@ export function createSocketServer(httpServer: HTTPServer, options: SocketServer
 
     const authupMiddleware = createAuthupMiddleware(authupMiddlewareOptions);
 
+    server.on('error', (err) => {
+        useLogger().warn(err);
+    });
+
     const pattern = /^\/resources(?::[a-z0-9A-Z-_]+)?$/;
     const nsp = server.of(pattern);
     nsp.use((socket, next) => {

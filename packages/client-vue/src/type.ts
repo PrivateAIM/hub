@@ -15,4 +15,6 @@ export type Options = {
     storeManager?: StoreManagerOptions,
 
     translatorLocale?: string,
+
+    isServer?: boolean
 };
