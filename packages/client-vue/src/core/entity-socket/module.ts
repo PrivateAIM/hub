@@ -36,10 +36,10 @@ export function createEntitySocket<
 ) : EntitySocket {
     if (!isSocketManagerUsable()) {
         return {
-            mount() {
+            subscribe() {
 
             },
-            unmount() {
+            unsubscribe() {
 
             },
         };
@@ -154,17 +154,15 @@ export function createEntitySocket<
         }
     };
 
-    let mounted = false;
-    const mount = async () => {
-        if ((ctx.target && !targetId.value) || mounted) {
+    let isActive = false;
+    const subscribe = async () => {
+        if ((ctx.target && !targetId.value) || isActive) {
             return;
         }
 
-        mounted = true;
+        isActive = true;
 
         const socket = await socketManager.connect(buildDomainNamespaceName(realmId.value));
-        socket.on('connect_error', (err) => console.log(err));
-        socket.on('disconnect', (err) => console.log(err));
         let event : DomainEventSubscriptionFullName<TYPE> | undefined;
         if (ctx.buildSubscribeEventName) {
             event = ctx.buildSubscribeEventName();
@@ -199,12 +197,12 @@ export function createEntitySocket<
         await emitEvent(socket, event);
     };
 
-    const unmount = async () => {
-        if ((ctx.target && !targetId.value) || !mounted) {
+    const unsubscribe = async () => {
+        if ((ctx.target && !targetId.value) || !isActive) {
             return;
         }
 
-        mounted = false;
+        isActive = false;
 
         const socket = await socketManager.connect(buildDomainNamespaceName(realmId.value));
 
@@ -214,7 +212,7 @@ export function createEntitySocket<
         } else {
             event = buildDomainEventSubscriptionFullName(
                 ctx.type,
-                DomainEventSubscriptionName.SUBSCRIBE,
+                DomainEventSubscriptionName.UNSUBSCRIBE,
             );
         }
 
@@ -242,19 +240,26 @@ export function createEntitySocket<
         await emitEvent(socket, event);
     };
 
-    onMounted(() => mount());
-    onUnmounted(() => unmount());
+    let isMounted : boolean = false;
+    onMounted(() => {
+        isMounted = true;
+        return subscribe();
+    });
+    onUnmounted(() => {
+        isMounted = false;
+        return unsubscribe();
+    });
 
     watch(targetId, (val, oldValue) => {
-        if (val !== oldValue) {
+        if (val !== oldValue && isMounted) {
             Promise.resolve()
-                .then(() => unmount())
-                .then(() => mount());
+                .then(() => unsubscribe())
+                .then(() => subscribe());
         }
     });
 
     return {
-        mount,
-        unmount,
+        subscribe,
+        unsubscribe,
     };
 }

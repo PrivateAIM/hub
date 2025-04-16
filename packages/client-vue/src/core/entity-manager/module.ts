@@ -257,7 +257,7 @@ export function createEntityManager<
             entity.value = ctx.props.entity;
 
             if (socket) {
-                socket.mount();
+                socket.subscribe();
             }
 
             resolved(entity.value);
@@ -276,10 +276,10 @@ export function createEntityManager<
 
             if (val) {
                 if (socket) {
-                    socket.mount();
+                    socket.subscribe();
                 }
             } else if (socket) {
-                socket.unmount();
+                socket.unsubscribe();
             }
         });
     }
@@ -307,7 +307,7 @@ export function createEntityManager<
                 entity.value = ctx.props.entity;
 
                 if (socket) {
-                    socket.mount();
+                    socket.subscribe();
                 }
 
                 resolved(entity.value);
@@ -343,7 +343,7 @@ export function createEntityManager<
                 entity.value = await domainAPI.getOne(id, query as BuildInput<any>);
 
                 if (socket) {
-                    socket.mount();
+                    socket.subscribe();
                 }
 
                 resolved(entity.value);
@@ -369,7 +369,7 @@ export function createEntityManager<
                     [entity.value] = response.data;
 
                     if (socket) {
-                        socket.mount();
+                        socket.subscribe();
                     }
                 }
 

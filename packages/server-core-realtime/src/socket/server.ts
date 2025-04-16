@@ -81,7 +81,7 @@ export function createSocketServer(httpServer: HTTPServer, options: SocketServer
     const authupMiddleware = createAuthupMiddleware(authupMiddlewareOptions);
 
     server.on('error', (err) => {
-        useLogger().warn(err);
+        useLogger().error(err);
     });
 
     const pattern = /^\/resources(?::[a-z0-9A-Z-_]+)?$/;
