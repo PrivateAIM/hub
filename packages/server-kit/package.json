@@ -42,14 +42,14 @@
         "@hapic/vault": "^2.3.5",
         "amqp-extension": "^4.0.0",
         "redis-extension": "^2.0.2",
-        "typeorm-extension": "^3.7.0"
+        "typeorm-extension": "^3.7.1"
     },
     "peerDependencies": {
         "@authup/core-http-kit": "^1.0.0-beta.26",
         "@hapic/vault": "^2.3.5",
         "amqp-extension": "^4.0.0",
         "redis-extension": "^2.0.2",
-        "typeorm-extension": "^3.7.0"
+        "typeorm-extension": "^3.7.1"
     },
     "publishConfig": {
         "access": "public"
