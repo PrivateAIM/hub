@@ -49,8 +49,8 @@ export type DomainTypeMap = {
 };
 
 export type EventRecord<
-    T extends string,
-    D extends Record<string, any>,
+    T extends string = string,
+    D extends Record<string, any> = Record<string, any>,
 > = {
     type: T,
     data: D,

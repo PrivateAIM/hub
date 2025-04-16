@@ -141,6 +141,7 @@ services:
             vault:
                 condition: service_healthy
         environment:
+            DEBUG: "*"
             REDIS_CONNECTION_STRING: redis://redis
             VAULT_CONNECTION_STRING: start123@http://vault:8090/v1/
             RABBITMQ_CONNECTION_STRING: ${MQ_CONNECTION_URL:-amqp://root:start123@172.40.1.1}

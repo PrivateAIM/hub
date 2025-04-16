@@ -91,7 +91,7 @@ export async function startCommand() {
     const router = createRouter();
     const httpServer = createHttpServer({ router });
 
-    createSocketServer(httpServer, {
+    const socketServer = createSocketServer(httpServer, {
         authupURL: useEnv('authupURL'),
     });
 
@@ -100,5 +100,6 @@ export async function startCommand() {
 
     httpServer.listen(useEnv('port'), '0.0.0.0', () => {
         logger.info('Started http server.');
+        logger.info(`Socket.io server mounted on path: ${socketServer.path()}`);
     });
 }

@@ -137,6 +137,9 @@ export function createEntitySocket<
 
         const socket = await socketManager.connect(buildDomainNamespaceName(realmId.value));
 
+        socket.on<any>('authenticated', (val) => {
+            console.log(val);
+        });
         let event : DomainEventSubscriptionFullName<TYPE> | undefined;
         if (ctx.buildSubscribeEventName) {
             event = ctx.buildSubscribeEventName();

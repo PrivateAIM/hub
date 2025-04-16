@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { publishDomainEvent, useRedisPublishClient } from '@privateaim/server-kit';
+import { useDomainEventPublisher } from '@privateaim/server-kit';
 import type {
     EntitySubscriberInterface,
     InsertEvent,
@@ -31,14 +31,14 @@ async function publishEvent(
     event: `${DomainEventName}`,
     data: ProjectNode,
 ) {
-    await publishDomainEvent(
-        useRedisPublishClient(),
-        {
+    const publisher = useDomainEventPublisher();
+    await publisher.publish({
+        data: {
             type: DomainType.PROJECT_NODE,
             event,
             data,
         },
-        [
+        destinations: [
             {
                 channel: (id) => buildDomainChannelName(DomainSubType.PROJECT_NODE_IN, id),
                 namespace: buildDomainNamespaceName(data.node_realm_id),
@@ -57,7 +57,7 @@ async function publishEvent(
                 channel: (id) => buildDomainChannelName(DomainSubType.PROJECT_NODE_OUT, id),
             },
         ],
-    );
+    });
 }
 
 @EventSubscriber()

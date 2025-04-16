@@ -33,11 +33,18 @@ export function buildDomainEventSubscriptionFullName<
 }
 
 export function buildDomainChannelName(type: string, id?: string | number) {
-    return `${type}${id ? `:${id}` : ''}`;
+    if (id) {
+        const idSerialized = `${id}`;
+        if (idSerialized.length > 0) {
+            return `${type}:${idSerialized}`;
+        }
+    }
+
+    return type;
 }
 
 export function buildDomainNamespaceName(id?: string) {
     return id ?
-        `/resources#${id}` :
+        `/resources:${id}` :
         '/resources';
 }

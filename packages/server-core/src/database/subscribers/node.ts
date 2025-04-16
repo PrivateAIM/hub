@@ -12,7 +12,7 @@ import {
     buildDomainChannelName,
     buildDomainNamespaceName,
 } from '@privateaim/core-kit';
-import { publishDomainEvent, useRedisPublishClient } from '@privateaim/server-kit';
+import { useDomainEventPublisher } from '@privateaim/server-kit';
 import type {
     EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
@@ -23,14 +23,14 @@ async function publishEvent(
     event: `${DomainEventName}`,
     data: Node,
 ) {
-    await publishDomainEvent(
-        useRedisPublishClient(),
-        {
+    const publisher = useDomainEventPublisher();
+    await publisher.publish({
+        data: {
             type: DomainType.NODE,
             event,
             data,
         },
-        [
+        destinations: [
             {
                 channel: (id) => buildDomainChannelName(DomainType.NODE, id),
             },
@@ -39,7 +39,7 @@ async function publishEvent(
                 namespace: buildDomainNamespaceName(data.realm_id),
             },
         ],
-    );
+    });
 }
 
 @EventSubscriber()
