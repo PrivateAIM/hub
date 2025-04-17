@@ -23,7 +23,7 @@ async function publishEvent(
     data: RegistryProject,
 ) {
     const publisher = useDomainEventPublisher();
-    await publisher.publish({
+    await publisher.safePublish({
         data: {
             type: DomainType.REGISTRY_PROJECT,
             event,
@@ -53,6 +53,8 @@ export class RegistryProjectSubscriber implements EntitySubscriberInterface<Regi
     }
 
     async beforeRemove(event: RemoveEvent<RegistryProjectEntity>): Promise<any> {
-        await publishEvent(DomainEventName.DELETED, event.entity);
+        if (event.entity) {
+            await publishEvent(DomainEventName.DELETED, event.entity);
+        }
     }
 }

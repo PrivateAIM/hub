@@ -6,7 +6,7 @@
  */
 
 import {
-    useDomainEventPublisher, useLogger,
+    useDomainEventPublisher,
 } from '@privateaim/server-kit';
 import type {
     EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,
@@ -29,7 +29,7 @@ async function publishEvent(
     data: Analysis,
 ) {
     const publisher = useDomainEventPublisher();
-    await publisher.publish({
+    await publisher.safePublish({
         data: {
             type: DomainType.ANALYSIS,
             event,
@@ -54,29 +54,16 @@ export class AnalysisSubscriber implements EntitySubscriberInterface<AnalysisEnt
     }
 
     async afterInsert(event: InsertEvent<AnalysisEntity>): Promise<any> {
-        try {
-            await publishEvent(DomainEventName.CREATED, event.entity);
-        } catch (e) {
-            useLogger().error(e);
-            throw e;
-        }
+        await publishEvent(DomainEventName.CREATED, event.entity);
     }
 
     async afterUpdate(event: UpdateEvent<AnalysisEntity>): Promise<any> {
-        try {
-            await publishEvent(DomainEventName.UPDATED, event.entity as AnalysisEntity);
-        } catch (e) {
-            useLogger().error(e);
-            throw e;
-        }
+        await publishEvent(DomainEventName.UPDATED, event.entity as AnalysisEntity);
     }
 
     async beforeRemove(event: RemoveEvent<AnalysisEntity>): Promise<any> {
-        try {
+        if (event.entity) {
             await publishEvent(DomainEventName.DELETED, event.entity);
-        } catch (e) {
-            useLogger().error(e);
-            throw e;
         }
     }
 }

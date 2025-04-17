@@ -26,7 +26,7 @@ async function publishEvent(
     data: Project,
 ) {
     const publisher = useDomainEventPublisher();
-    await publisher.publish({
+    await publisher.safePublish({
         data: {
             type: DomainType.PROJECT,
             event,
@@ -60,6 +60,8 @@ export class ProjectSubscriber implements EntitySubscriberInterface<ProjectEntit
     }
 
     async beforeRemove(event: RemoveEvent<ProjectEntity>): Promise<any> {
-        await publishEvent(DomainEventName.DELETED, event.entity);
+        if (event.entity) {
+            await publishEvent(DomainEventName.DELETED, event.entity);
+        }
     }
 }

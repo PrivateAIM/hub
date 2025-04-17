@@ -6,6 +6,7 @@
  */
 
 import type { DomainEventRecord } from '@privateaim/kit';
+import { buildDomainEventFullName } from '@privateaim/kit';
 import { isLoggerUsable, useLogger } from '../logger';
 import type { DomainEventPublishContext, IDomainEventPublisher } from './type';
 
@@ -20,11 +21,24 @@ export class DomainEventPublisher implements IDomainEventPublisher {
         this.publishers.add(publisher);
     }
 
+    async safePublish<T extends DomainEventRecord>(
+        ctx: DomainEventPublishContext<T>,
+    ) : Promise<void> {
+        try {
+            await this.publish(ctx);
+        } catch (e) {
+            if (isLoggerUsable()) {
+                useLogger().error(`Publishing event ${buildDomainEventFullName(ctx.data.type, ctx.data.event)} failed`);
+                useLogger().error(e);
+            }
+        }
+    }
+
     async publish<T extends DomainEventRecord>(
         ctx: DomainEventPublishContext<T>,
     ) : Promise<void> {
         if (isLoggerUsable()) {
-            useLogger().info(`Publishing event ${ctx.data.event} for ${ctx.data.type}`);
+            useLogger().info(`Publishing event ${buildDomainEventFullName(ctx.data.type, ctx.data.event)}`);
         }
 
         const publishers = this.publishers.values();

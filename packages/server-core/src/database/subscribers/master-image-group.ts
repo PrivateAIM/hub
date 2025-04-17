@@ -25,7 +25,7 @@ async function publishEvent(
     data: MasterImageGroup,
 ) {
     const publisher = useDomainEventPublisher();
-    await publisher.publish({
+    await publisher.safePublish({
         data: {
             type: DomainType.MASTER_IMAGE_GROUP,
             event,
@@ -55,6 +55,8 @@ export class MasterImageGroupSubscriber implements EntitySubscriberInterface<Mas
     }
 
     async beforeRemove(event: RemoveEvent<MasterImageGroupEntity>): Promise<any> {
-        await publishEvent(DomainEventName.DELETED, event.entity);
+        if (event.entity) {
+            await publishEvent(DomainEventName.DELETED, event.entity);
+        }
     }
 }

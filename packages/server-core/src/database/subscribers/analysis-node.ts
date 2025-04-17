@@ -32,7 +32,7 @@ async function publishEvent(
     data: AnalysisNode,
 ) {
     const publisher = useDomainEventPublisher();
-    await publisher.publish({
+    await publisher.safePublish({
         data: {
             type: DomainType.ANALYSIS_NODE,
             event,
@@ -78,6 +78,8 @@ export class AnalysisNodeSubscriber implements EntitySubscriberInterface<Analysi
     }
 
     async beforeRemove(event: RemoveEvent<AnalysisNodeEntity>): Promise<any> {
-        await publishEvent(DomainEventName.DELETED, event.entity);
+        if (event.entity) {
+            await publishEvent(DomainEventName.DELETED, event.entity);
+        }
     }
 }
