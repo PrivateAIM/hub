@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.8.10](https://github.com/PrivateAIM/hub/compare/v0.8.9...v0.8.10) (2025-04-17)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core-kit bumped from ^0.8.9 to ^0.8.10
+    * @privateaim/kit bumped from ^0.8.9 to ^0.8.10
+    * @privateaim/core-http-kit bumped from ^0.8.9 to ^0.8.10
+    * @privateaim/storage-kit bumped from ^0.8.9 to ^0.8.10
+  * peerDependencies
+    * @privateaim/core-kit bumped from ^0.8.9 to ^0.8.10
+    * @privateaim/storage-kit bumped from ^0.8.9 to ^0.8.10
+
 ## [0.8.9](https://github.com/PrivateAIM/hub/compare/v0.8.8...v0.8.9) (2025-04-17)
 
 

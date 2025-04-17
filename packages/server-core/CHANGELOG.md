@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.8.10](https://github.com/PrivateAIM/hub/compare/v0.8.9...v0.8.10) (2025-04-17)
+
+
+### Features
+
+* introduce safe publish method for domain-event-publisher ([cff0b35](https://github.com/PrivateAIM/hub/commit/cff0b3567ad11fb4a8ee42c58082122185c50c6c))
+
+
+### Bug Fixes
+
+* use remove for deleting master image event logs ([3548c23](https://github.com/PrivateAIM/hub/commit/3548c239734811039bc1b6590f3313f1d11a9e7f))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.8.9 to ^0.8.10
+    * @privateaim/kit bumped from ^0.8.9 to ^0.8.10
+    * @privateaim/server-kit bumped from ^0.8.9 to ^0.8.10
+    * @privateaim/server-core-realtime bumped from ^0.8.9 to ^0.8.10
+    * @privateaim/server-http-kit bumped from ^0.8.9 to ^0.8.10
+    * @privateaim/server-analysis-manager-kit bumped from ^0.7.10 to ^0.7.11
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.8.9 to ^0.8.10
+
 ## [0.8.9](https://github.com/PrivateAIM/hub/compare/v0.8.8...v0.8.9) (2025-04-17)
 
 
