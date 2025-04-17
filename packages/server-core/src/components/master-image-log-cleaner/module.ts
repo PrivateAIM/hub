@@ -20,10 +20,14 @@ export function createMasterImageLogCleanerComponent() : Component {
             const execute = async () => {
                 const isoDate = new Date().toISOString();
 
-                await repository
-                    .delete({
+                const entities = await repository.find({
+                    where: {
                         expires_at: LessThan(isoDate),
-                    });
+                    },
+                });
+
+                await repository
+                    .remove(entities);
             };
 
             await execute();
