@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.8.9](https://github.com/PrivateAIM/hub/compare/v0.8.8...v0.8.9) (2025-04-17)
+
+
+### Features
+
+* master-image-log-cleaner component ([bd5ec72](https://github.com/PrivateAIM/hub/commit/bd5ec722f5c35a3168c5ad01a12066651c1f901f))
+* restructure domain event handling ([2ad7318](https://github.com/PrivateAIM/hub/commit/2ad7318930bd342d571105982fc92996443326fa))
+
+
+### Bug Fixes
+
+* **deps:** bump the minorandpatch group across 1 directory with 2 updates ([#1033](https://github.com/PrivateAIM/hub/issues/1033)) ([b228557](https://github.com/PrivateAIM/hub/commit/b228557eb213761ab97d2d9f8e618b86c50ab155))
+* remove ping emit ([1f78ceb](https://github.com/PrivateAIM/hub/commit/1f78ceb447746415c8ed5787affa3d3d3fad0b40))
+
 ## [0.8.8](https://github.com/PrivateAIM/hub/compare/v0.8.7...v0.8.8) (2025-04-15)
 
 
