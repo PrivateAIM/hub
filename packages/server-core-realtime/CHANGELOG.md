@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.8.9](https://github.com/PrivateAIM/hub/compare/v0.8.8...v0.8.9) (2025-04-17)
+
+
+### Features
+
+* restructure domain event handling ([2ad7318](https://github.com/PrivateAIM/hub/commit/2ad7318930bd342d571105982fc92996443326fa))
+
+
+### Bug Fixes
+
+* remove ping emit ([1f78ceb](https://github.com/PrivateAIM/hub/commit/1f78ceb447746415c8ed5787affa3d3d3fad0b40))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.8.8 to ^0.8.9
+    * @privateaim/core-kit bumped from ^0.8.8 to ^0.8.9
+    * @privateaim/core-realtime-kit bumped from ^0.7.9 to ^0.7.10
+    * @privateaim/server-kit bumped from ^0.8.8 to ^0.8.9
+    * @privateaim/server-realtime-kit bumped from ^0.8.8 to ^0.8.9
+
 ## [0.8.8](https://github.com/PrivateAIM/hub/compare/v0.8.7...v0.8.8) (2025-04-15)
 
 
