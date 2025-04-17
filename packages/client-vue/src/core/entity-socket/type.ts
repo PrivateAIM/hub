@@ -5,13 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type {
-    DomainEntityID,
-    DomainEventSubscriptionFullName,
-} from '@privateaim/core-kit';
+import type { DomainEntityID, DomainEventSubscriptionName } from '@privateaim/core-kit';
 import type {
     STCEventRecord,
 } from '@privateaim/core-realtime-kit';
+import type { DomainEventFullName } from '@privateaim/kit';
 import type { MaybeRef } from 'vue';
 
 export type EntitySocketContext<
@@ -28,8 +26,8 @@ export type EntitySocketContext<
     onDeleted?(entity: T): any,
     processEvent?(event: STCEventRecord<A, T>, realmId?: string) : boolean;
     buildChannelName?(entityId?: DomainEntityID<T>) : string;
-    buildSubscribeEventName?(): DomainEventSubscriptionFullName<any>;
-    buildUnsubscribeEventName?(): DomainEventSubscriptionFullName<any>;
+    buildSubscribeEventName?(): DomainEventFullName<string, DomainEventSubscriptionName>;
+    buildUnsubscribeEventName?(): DomainEventFullName<string, DomainEventSubscriptionName>;
 };
 
 export type EntitySocket = {

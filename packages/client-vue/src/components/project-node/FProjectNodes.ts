@@ -14,9 +14,8 @@ import {
     DomainSubType,
     DomainType,
     buildDomainChannelName,
-    buildDomainEventSubscriptionFullName,
 } from '@privateaim/core-kit';
-import { hasOwnProperty } from '@privateaim/kit';
+import { buildDomainEventFullName, hasOwnProperty } from '@privateaim/kit';
 import type { RelationsBuildInput } from 'rapiq';
 
 import type { PropType, SlotsType, VNodeChild } from 'vue';
@@ -116,19 +115,19 @@ export default defineComponent({
                 buildSubscribeEventName() {
                     if (props.realmId) {
                         if (props.direction === Direction.IN) {
-                            return buildDomainEventSubscriptionFullName(
+                            return buildDomainEventFullName(
                                 DomainSubType.PROJECT_NODE_IN,
                                 DomainEventSubscriptionName.SUBSCRIBE,
                             );
                         }
 
-                        return buildDomainEventSubscriptionFullName(
+                        return buildDomainEventFullName(
                             DomainSubType.PROJECT_NODE_OUT,
                             DomainEventSubscriptionName.SUBSCRIBE,
                         );
                     }
 
-                    return buildDomainEventSubscriptionFullName(
+                    return buildDomainEventFullName(
                         DomainType.PROJECT_NODE,
                         DomainEventSubscriptionName.SUBSCRIBE,
                     );
@@ -136,19 +135,19 @@ export default defineComponent({
                 buildUnsubscribeEventName() {
                     if (props.realmId) {
                         if (props.direction === Direction.IN) {
-                            return buildDomainEventSubscriptionFullName(
+                            return buildDomainEventFullName(
                                 DomainSubType.PROJECT_NODE_IN,
                                 DomainEventSubscriptionName.UNSUBSCRIBE,
                             );
                         }
 
-                        return buildDomainEventSubscriptionFullName(
+                        return buildDomainEventFullName(
                             DomainSubType.PROJECT_NODE_OUT,
                             DomainEventSubscriptionName.UNSUBSCRIBE,
                         );
                     }
 
-                    return buildDomainEventSubscriptionFullName(
+                    return buildDomainEventFullName(
                         DomainType.PROJECT_NODE,
                         DomainEventSubscriptionName.UNSUBSCRIBE,
                     );

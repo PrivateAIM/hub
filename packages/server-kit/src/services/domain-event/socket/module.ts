@@ -5,11 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { buildDomainEventFullName, buildDomainNamespaceName } from '@privateaim/core-kit';
+import { buildDomainEventFullName } from '@privateaim/kit';
 import { Emitter } from '@socket.io/redis-emitter';
 import type { Client } from 'redis-extension';
 import type { DomainEventPublishContext, IDomainEventPublisher } from '../type';
-import { buildDomainEventChannelName, transformDomainEventData } from '../utils';
+import { buildEventChannelName, transformEventData } from '../utils';
 
 export class DomainEventSocketPublisher implements IDomainEventPublisher {
     protected client : Client;
@@ -19,15 +19,14 @@ export class DomainEventSocketPublisher implements IDomainEventPublisher {
     }
 
     async publish(ctx: DomainEventPublishContext) : Promise<void> {
-        ctx.data = transformDomainEventData(ctx.data);
+        ctx.data = transformEventData(ctx.data);
 
         for (let i = 0; i < ctx.destinations.length; i++) {
             let namespace : string;
             if (ctx.destinations[i].namespace) {
                 namespace = ctx.destinations[i].namespace;
             } else {
-                // todo: buildDomainNamespaceName maybe move to subscribers
-                namespace = buildDomainNamespaceName();
+                namespace = '/';
             }
 
             const emitter = new Emitter(this.client, {}, namespace);
@@ -35,11 +34,11 @@ export class DomainEventSocketPublisher implements IDomainEventPublisher {
             const fullEventName = buildDomainEventFullName(ctx.data.type, ctx.data.event);
 
             const rooms : string[] = [
-                buildDomainEventChannelName(ctx.destinations[i].channel),
+                buildEventChannelName(ctx.destinations[i].channel),
             ];
 
             if (typeof ctx.destinations[i].channel === 'function') {
-                rooms.push(buildDomainEventChannelName(ctx.destinations[i].channel, ctx.data.data.id));
+                rooms.push(buildEventChannelName(ctx.destinations[i].channel, ctx.data.data.id));
             }
 
             for (let j = 0; j < rooms.length; j++) {

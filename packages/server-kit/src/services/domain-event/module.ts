@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { EventRecord } from '@privateaim/core-kit';
+import type { DomainEventRecord } from '@privateaim/kit';
 import { isLoggerUsable, useLogger } from '../logger';
 import type { DomainEventPublishContext, IDomainEventPublisher } from './type';
 
@@ -20,7 +20,7 @@ export class DomainEventPublisher implements IDomainEventPublisher {
         this.publishers.add(publisher);
     }
 
-    async publish<T extends EventRecord>(
+    async publish<T extends DomainEventRecord>(
         ctx: DomainEventPublishContext<T>,
     ) : Promise<void> {
         if (isLoggerUsable()) {

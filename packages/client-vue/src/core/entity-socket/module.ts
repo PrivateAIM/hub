@@ -5,16 +5,15 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { DomainEventFullName } from '@privateaim/kit';
+import { buildDomainEventFullName } from '@privateaim/kit';
 import { EntityDefaultEventName, REALM_MASTER_NAME } from '@authup/core-kit';
 import type {
-    DomainEventSubscriptionFullName,
     DomainTypeMap,
 } from '@privateaim/core-kit';
 import {
     DomainEventSubscriptionName,
     buildDomainChannelName,
-    buildDomainEventFullName,
-    buildDomainEventSubscriptionFullName,
     buildDomainNamespaceName,
 } from '@privateaim/core-kit';
 import type {
@@ -130,7 +129,7 @@ export function createEntitySocket<
     let emitEventRetryCount = 0;
     const emitEvent = async (
         socket: Awaited<ReturnType<typeof socketManager.connect>>,
-        event: DomainEventSubscriptionFullName<TYPE> | undefined,
+        event: DomainEventFullName<string, DomainEventSubscriptionName> | undefined,
     ) => {
         try {
             await socket.emitWithAck<any>(
@@ -163,11 +162,11 @@ export function createEntitySocket<
         isActive = true;
 
         const socket = await socketManager.connect(buildDomainNamespaceName(realmId.value));
-        let event : DomainEventSubscriptionFullName<TYPE> | undefined;
+        let event : DomainEventFullName<string, DomainEventSubscriptionName> | undefined;
         if (ctx.buildSubscribeEventName) {
             event = ctx.buildSubscribeEventName();
         } else {
-            event = buildDomainEventSubscriptionFullName(
+            event = buildDomainEventFullName(
                 ctx.type,
                 DomainEventSubscriptionName.SUBSCRIBE,
             );
@@ -206,11 +205,11 @@ export function createEntitySocket<
 
         const socket = await socketManager.connect(buildDomainNamespaceName(realmId.value));
 
-        let event : DomainEventSubscriptionFullName<TYPE>;
+        let event : DomainEventFullName<string, DomainEventSubscriptionName>;
         if (ctx.buildUnsubscribeEventName) {
             event = ctx.buildUnsubscribeEventName();
         } else {
-            event = buildDomainEventSubscriptionFullName(
+            event = buildDomainEventFullName(
                 ctx.type,
                 DomainEventSubscriptionName.UNSUBSCRIBE,
             );

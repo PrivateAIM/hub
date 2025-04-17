@@ -35,6 +35,7 @@ async function publishEvent(
         destinations: [
             {
                 channel: (id) => buildDomainChannelName(DomainType.ANALYSIS_NODE_LOG, id),
+                namespace: buildDomainNamespaceName(),
             },
             {
                 channel: (id) => buildDomainChannelName(DomainType.ANALYSIS_NODE_LOG, id),

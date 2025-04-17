@@ -7,7 +7,7 @@
 
 import type { Client } from 'redis-extension';
 import type { DomainEventPublishContext, IDomainEventPublisher } from '../type';
-import { buildDomainEventChannelName, transformDomainEventData } from '../utils';
+import { buildEventChannelName, transformEventData } from '../utils';
 
 export class DomainEventRedisPublisher implements IDomainEventPublisher {
     protected driver : Client;
@@ -17,17 +17,17 @@ export class DomainEventRedisPublisher implements IDomainEventPublisher {
     }
 
     async publish(ctx: DomainEventPublishContext) : Promise<void> {
-        const data = JSON.stringify(transformDomainEventData(ctx.data));
+        const data = JSON.stringify(transformEventData(ctx.data));
 
         const pipeline = this.driver.pipeline();
         for (let i = 0; i < ctx.destinations.length; i++) {
             const keyPrefix = (ctx.destinations[i].namespace ? `${ctx.destinations[i].namespace}:` : '');
 
-            let key = keyPrefix + buildDomainEventChannelName(ctx.destinations[i].channel);
+            let key = keyPrefix + buildEventChannelName(ctx.destinations[i].channel);
             pipeline.publish(key, data);
 
             if (typeof ctx.destinations[i].channel === 'function') {
-                key = keyPrefix + buildDomainEventChannelName(ctx.destinations[i].channel, ctx.data.data.id);
+                key = keyPrefix + buildEventChannelName(ctx.destinations[i].channel, ctx.data.data.id);
                 pipeline.publish(key, data);
             }
         }

@@ -5,17 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { DomainEventFullName, DomainEventRecord } from '@privateaim/kit';
 import type {
-    DomainEventFullName,
-    DomainEventSubscriptionFullName,
+    DomainEventName,
+    DomainEventSubscriptionName,
     DomainTypeMap,
-    EventRecord,
 } from '@privateaim/core-kit';
 
 export type STCEventRecord<
     TYPE extends string,
     RECORD extends Record<string, any>,
-> = EventRecord<TYPE, RECORD> & {
+> = DomainEventRecord<TYPE, `${DomainEventName}`, RECORD> & {
     meta: {
         roomName?: string,
         roomId?: string | number
@@ -39,13 +39,14 @@ export type STCEventHandler<
     data: STCEventRecord<TYPE, RECORD>
 ) => void;
 export type STCEvents = {
-    [K in keyof DomainTypeMap as DomainEventFullName<K>]: STCEventHandler<K, DomainTypeMap[K]>
+    [K in keyof DomainTypeMap as DomainEventFullName<K, DomainEventName>]: STCEventHandler<K, DomainTypeMap[K]>
 };
 
 export type CTSEventHandler = (
     target: EventTarget,
     cb: EventCallback
 ) => void;
+
 export type CTSEvents = {
-    [K in keyof DomainTypeMap as DomainEventSubscriptionFullName<K>]: CTSEventHandler
+    [K in keyof DomainTypeMap as DomainEventFullName<K, DomainEventSubscriptionName>]: CTSEventHandler
 };

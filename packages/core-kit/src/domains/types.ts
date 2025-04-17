@@ -7,9 +7,7 @@
 
 import type { AnalysisBucket } from './analysis-bucket';
 import type { AnalysisNodeLog } from './analysis-node-log';
-import type {
-    DomainEventName, DomainEventSubscriptionName, DomainSubType, DomainType,
-} from './constants';
+import type { DomainSubType, DomainType } from './constants';
 import type { MasterImage } from './master-image';
 import type { MasterImageEventLog } from './master-image-event-log';
 import type { MasterImageGroup } from './master-image-group';
@@ -47,24 +45,3 @@ type DomainTypeMapRaw = {
 export type DomainTypeMap = {
     [K in keyof DomainTypeMapRaw as `${K}`]: DomainTypeMapRaw[K]
 };
-
-export type EventRecord<
-    T extends string = string,
-    D extends Record<string, any> = Record<string, any>,
-> = {
-    type: T,
-    data: D,
-    event: `${DomainEventName}`,
-};
-
-export type DomainsEvents = {
-    [T in keyof DomainTypeMap]: EventRecord<T, DomainTypeMap[T]>
-}[keyof DomainTypeMap];
-
-export type DomainEventFullName<
-    T extends string,
-> = `${T}${Capitalize<`${DomainEventName}`>}`;
-
-export type DomainEventSubscriptionFullName<
-    T extends string,
-> = `${T}${Capitalize<`${DomainEventSubscriptionName}`>}`;

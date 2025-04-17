@@ -10,13 +10,12 @@ import {
     DomainSubType,
     DomainType,
     buildDomainChannelName,
-    buildDomainEventSubscriptionFullName,
 } from '@privateaim/core-kit';
+import { PermissionName, buildDomainEventFullName } from '@privateaim/kit';
 import {
     isEventCallback,
 } from '@privateaim/core-realtime-kit';
 import { UnauthorizedError } from '@ebec/http';
-import { PermissionName } from '@privateaim/kit';
 import {
     subscribeSocketRoom,
     unsubscribeSocketRoom,
@@ -31,7 +30,7 @@ export function registerAnalysisNodeSocketHandlers(socket: Socket) {
     // ------------------------------------------------------------
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainType.ANALYSIS_NODE, DomainEventSubscriptionName.SUBSCRIBE),
+        buildDomainEventFullName(DomainType.ANALYSIS_NODE, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             try {
                 await socket.data.permissionChecker.preCheckOneOf({
@@ -56,7 +55,7 @@ export function registerAnalysisNodeSocketHandlers(socket: Socket) {
     );
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainType.ANALYSIS_NODE, DomainEventSubscriptionName.SUBSCRIBE),
+        buildDomainEventFullName(DomainType.ANALYSIS_NODE, DomainEventSubscriptionName.SUBSCRIBE),
         (target) => {
             unsubscribeSocketRoom(socket, buildDomainChannelName(DomainType.ANALYSIS_NODE, target));
         },
@@ -69,7 +68,7 @@ export function registerAnalysisNodeForRealmSocketHandlers(socket: Socket) {
     // ------------------------------------------------------------
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainSubType.ANALYSIS_NODE_IN, DomainEventSubscriptionName.SUBSCRIBE),
+        buildDomainEventFullName(DomainSubType.ANALYSIS_NODE_IN, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             try {
                 await socket.data.permissionChecker.preCheckOneOf({
@@ -94,7 +93,7 @@ export function registerAnalysisNodeForRealmSocketHandlers(socket: Socket) {
     );
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainSubType.ANALYSIS_NODE_IN, DomainEventSubscriptionName.UNSUBSCRIBE),
+        buildDomainEventFullName(DomainSubType.ANALYSIS_NODE_IN, DomainEventSubscriptionName.UNSUBSCRIBE),
         (target) => {
             unsubscribeSocketRoom(socket, buildDomainChannelName(DomainSubType.ANALYSIS_NODE_IN, target));
         },
@@ -103,7 +102,7 @@ export function registerAnalysisNodeForRealmSocketHandlers(socket: Socket) {
     // ----------------------------------------------------------
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainSubType.ANALYSIS_NODE_OUT, DomainEventSubscriptionName.SUBSCRIBE),
+        buildDomainEventFullName(DomainSubType.ANALYSIS_NODE_OUT, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             try {
                 await socket.data.permissionChecker.preCheckOneOf({
@@ -128,7 +127,7 @@ export function registerAnalysisNodeForRealmSocketHandlers(socket: Socket) {
     );
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainSubType.ANALYSIS_NODE_OUT, DomainEventSubscriptionName.UNSUBSCRIBE),
+        buildDomainEventFullName(DomainSubType.ANALYSIS_NODE_OUT, DomainEventSubscriptionName.UNSUBSCRIBE),
         (target) => {
             unsubscribeSocketRoom(socket, buildDomainChannelName(DomainSubType.ANALYSIS_NODE_OUT, target));
         },

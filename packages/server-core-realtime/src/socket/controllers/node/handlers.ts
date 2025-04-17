@@ -5,17 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { PermissionName, buildDomainEventFullName } from '@privateaim/kit';
 import {
     DomainEventSubscriptionName,
     DomainType,
     buildDomainChannelName,
-    buildDomainEventSubscriptionFullName,
 } from '@privateaim/core-kit';
 import {
     isEventCallback,
 } from '@privateaim/core-realtime-kit';
 import { UnauthorizedError } from '@ebec/http';
-import { PermissionName } from '@privateaim/kit';
 import {
     subscribeSocketRoom,
     unsubscribeSocketRoom,
@@ -26,7 +25,7 @@ export function registerNodeSocketHandlers(socket: Socket) {
     if (!socket.data.userId && !socket.data.robotId) return;
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainType.NODE, DomainEventSubscriptionName.SUBSCRIBE),
+        buildDomainEventFullName(DomainType.NODE, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             try {
                 await socket.data.permissionChecker.preCheckOneOf({
@@ -51,7 +50,7 @@ export function registerNodeSocketHandlers(socket: Socket) {
     );
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainType.NODE, DomainEventSubscriptionName.UNSUBSCRIBE),
+        buildDomainEventFullName(DomainType.NODE, DomainEventSubscriptionName.UNSUBSCRIBE),
         (target) => {
             unsubscribeSocketRoom(socket, buildDomainChannelName(DomainType.NODE, target));
         },

@@ -49,12 +49,15 @@ async function publishEvent(
             },
             {
                 channel: (id) => buildDomainChannelName(DomainType.PROJECT_NODE, id),
+                namespace: buildDomainNamespaceName(),
             },
             {
                 channel: (id) => buildDomainChannelName(DomainSubType.PROJECT_NODE_IN, id),
+                namespace: buildDomainNamespaceName(),
             },
             {
                 channel: (id) => buildDomainChannelName(DomainSubType.PROJECT_NODE_OUT, id),
+                namespace: buildDomainNamespaceName(),
             },
         ],
     });

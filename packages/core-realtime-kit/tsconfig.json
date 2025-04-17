@@ -2,6 +2,9 @@
     "extends": "../../tsconfig.json",
     "compilerOptions": {
         "paths": {
+            "@privateaim/kit": [
+                "./packages/kit/src"
+            ],
             "@privateaim/core-kit": [
                 "./packages/core-kit/src"
             ]

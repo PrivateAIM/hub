@@ -39,6 +39,7 @@ async function publishEvent(
             },
             {
                 channel: (id) => buildDomainChannelName(DomainType.PROJECT, id),
+                namespace: buildDomainNamespaceName(),
             },
         ],
     });

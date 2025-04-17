@@ -14,9 +14,8 @@ import {
     DomainSubType,
     DomainType,
     buildDomainChannelName,
-    buildDomainEventSubscriptionFullName,
 } from '@privateaim/core-kit';
-import { hasOwnProperty } from '@privateaim/kit';
+import { buildDomainEventFullName, hasOwnProperty } from '@privateaim/kit';
 import type { PropType, SlotsType, VNodeChild } from 'vue';
 import { computed, defineComponent, h } from 'vue';
 import type { ListSlotsType } from '../../core';
@@ -50,8 +49,8 @@ export default defineComponent({
             default: `${Direction.OUT}`,
         },
     },
-    slots: Object as SlotsType<ListSlotsType<AnalysisNode>>,
     emits: defineListEvents<AnalysisNode>(),
+    slots: Object as SlotsType<ListSlotsType<AnalysisNode>>,
     async setup(props, ctx) {
         const source = computed(() => (props.target === DomainType.NODE ?
             DomainType.ANALYSIS :
@@ -106,19 +105,19 @@ export default defineComponent({
                 buildSubscribeEventName() {
                     if (props.realmId) {
                         if (props.direction === Direction.IN) {
-                            return buildDomainEventSubscriptionFullName(
+                            return buildDomainEventFullName(
                                 DomainSubType.ANALYSIS_NODE_IN,
                                 DomainEventSubscriptionName.SUBSCRIBE,
                             );
                         }
 
-                        return buildDomainEventSubscriptionFullName(
+                        return buildDomainEventFullName(
                             DomainSubType.ANALYSIS_NODE_OUT,
                             DomainEventSubscriptionName.SUBSCRIBE,
                         );
                     }
 
-                    return buildDomainEventSubscriptionFullName(
+                    return buildDomainEventFullName(
                         DomainType.ANALYSIS_NODE,
                         DomainEventSubscriptionName.SUBSCRIBE,
                     );
@@ -126,19 +125,19 @@ export default defineComponent({
                 buildUnsubscribeEventName() {
                     if (props.realmId) {
                         if (props.direction === Direction.IN) {
-                            return buildDomainEventSubscriptionFullName(
+                            return buildDomainEventFullName(
                                 DomainSubType.ANALYSIS_NODE_IN,
                                 DomainEventSubscriptionName.UNSUBSCRIBE,
                             );
                         }
 
-                        return buildDomainEventSubscriptionFullName(
+                        return buildDomainEventFullName(
                             DomainSubType.ANALYSIS_NODE_OUT,
                             DomainEventSubscriptionName.UNSUBSCRIBE,
                         );
                     }
 
-                    return buildDomainEventSubscriptionFullName(
+                    return buildDomainEventFullName(
                         DomainType.ANALYSIS_NODE,
                         DomainEventSubscriptionName.UNSUBSCRIBE,
                     );

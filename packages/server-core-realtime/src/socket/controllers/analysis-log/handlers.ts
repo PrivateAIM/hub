@@ -9,13 +9,12 @@ import {
     DomainEventSubscriptionName,
     DomainType,
     buildDomainChannelName,
-    buildDomainEventSubscriptionFullName,
 } from '@privateaim/core-kit';
 import {
     isEventCallback,
 } from '@privateaim/core-realtime-kit';
 import { UnauthorizedError } from '@ebec/http';
-import { PermissionName } from '@privateaim/kit';
+import { PermissionName, buildDomainEventFullName } from '@privateaim/kit';
 import {
     subscribeSocketRoom,
     unsubscribeSocketRoom,
@@ -28,7 +27,7 @@ export function registerAnalysisLogSocketHandlers(socket: Socket) {
     if (!socket.data.userId && !socket.data.robotId) return;
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainType.ANALYSIS_LOG, DomainEventSubscriptionName.SUBSCRIBE),
+        buildDomainEventFullName(DomainType.ANALYSIS_LOG, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             try {
                 await socket.data.permissionChecker.preCheckOneOf({
@@ -53,7 +52,7 @@ export function registerAnalysisLogSocketHandlers(socket: Socket) {
     );
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainType.ANALYSIS_LOG, DomainEventSubscriptionName.UNSUBSCRIBE),
+        buildDomainEventFullName(DomainType.ANALYSIS_LOG, DomainEventSubscriptionName.UNSUBSCRIBE),
         (target) => {
             unsubscribeSocketRoom(socket, buildDomainChannelName(DomainType.ANALYSIS_LOG, target));
         },

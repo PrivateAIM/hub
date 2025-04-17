@@ -26,9 +26,11 @@
         "build-watch": "rimraf ./dist && tsc -p tsconfig.build.json --watch"
     },
     "devDependencies": {
+        "@privateaim/kit": "^0.8.8",
         "@privateaim/core-kit": "^0.8.8"
     },
     "peerDependencies": {
+        "@privateaim/kit": "^0.8.8",
         "@privateaim/core-kit": "^0.8.8"
     },
     "publishConfig": {

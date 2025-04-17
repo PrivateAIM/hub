@@ -9,13 +9,12 @@ import {
     DomainEventSubscriptionName,
     DomainType,
     buildDomainChannelName,
-    buildDomainEventSubscriptionFullName,
 } from '@privateaim/core-kit';
 import {
     isEventCallback,
 } from '@privateaim/core-realtime-kit';
 import { UnauthorizedError } from '@ebec/http';
-import { PermissionName } from '@privateaim/kit';
+import { PermissionName, buildDomainEventFullName } from '@privateaim/kit';
 import {
     subscribeSocketRoom,
     unsubscribeSocketRoom,
@@ -28,7 +27,7 @@ export function registerRegistryProjectSocketHandlers(socket: Socket) {
     if (!socket.data.userId && !socket.data.robotId) return;
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainType.REGISTRY_PROJECT, DomainEventSubscriptionName.SUBSCRIBE),
+        buildDomainEventFullName(DomainType.REGISTRY_PROJECT, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             try {
                 await socket.data.permissionChecker.preCheckOneOf({
@@ -54,7 +53,7 @@ export function registerRegistryProjectSocketHandlers(socket: Socket) {
     );
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainType.REGISTRY_PROJECT, DomainEventSubscriptionName.UNSUBSCRIBE),
+        buildDomainEventFullName(DomainType.REGISTRY_PROJECT, DomainEventSubscriptionName.UNSUBSCRIBE),
         (target) => {
             unsubscribeSocketRoom(socket, buildDomainChannelName(DomainType.REGISTRY_PROJECT, target));
         },

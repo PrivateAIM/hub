@@ -5,11 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { buildDomainEventFullName } from '@privateaim/kit';
 import {
     DomainEventSubscriptionName,
     DomainType,
     buildDomainChannelName,
-    buildDomainEventSubscriptionFullName,
 } from '@privateaim/core-kit';
 import {
     isEventCallback,
@@ -26,7 +26,7 @@ export function registerMasterImageEventLogSocketHandlers(socket: Socket) {
     if (!socket.data.userId && !socket.data.robotId) return;
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainType.MASTER_IMAGE_EVENT_LOG, DomainEventSubscriptionName.SUBSCRIBE),
+        buildDomainEventFullName(DomainType.MASTER_IMAGE_EVENT_LOG, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             subscribeSocketRoom(socket, buildDomainChannelName(DomainType.MASTER_IMAGE_EVENT_LOG, target));
 
@@ -37,7 +37,7 @@ export function registerMasterImageEventLogSocketHandlers(socket: Socket) {
     );
 
     socket.on(
-        buildDomainEventSubscriptionFullName(DomainType.MASTER_IMAGE_EVENT_LOG, DomainEventSubscriptionName.UNSUBSCRIBE),
+        buildDomainEventFullName(DomainType.MASTER_IMAGE_EVENT_LOG, DomainEventSubscriptionName.UNSUBSCRIBE),
         (target) => {
             unsubscribeSocketRoom(socket, buildDomainChannelName(DomainType.MASTER_IMAGE_EVENT_LOG, target));
         },

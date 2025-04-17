@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { EventRecord } from '@privateaim/core-kit';
+import type { DomainEventRecord } from '@privateaim/kit';
 
 export type DomainEventChannelName = string | ((id?: string | number) => string);
 export type DomainEventDestination = {
@@ -16,7 +16,7 @@ export type DomainEventDestination = {
 export type DomainEventDestinations = DomainEventDestination[];
 
 export type DomainEventPublishContext<
-    T extends EventRecord = EventRecord,
+    T extends DomainEventRecord = DomainEventRecord,
 > = {
     data: T,
     destinations: DomainEventDestinations

@@ -5,44 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type {
-    DomainEventName, DomainEventSubscriptionName,
-} from './constants';
-import type {
-    DomainEventFullName, DomainEventSubscriptionFullName,
-} from './types';
-
-export function buildDomainEventFullName<T extends string>(
-    type: T,
-    event: `${DomainEventName}`,
-) : DomainEventFullName<T> {
-    const eventCapitalized = event.substring(0, 1).toUpperCase() + event.substring(1);
-
-    return type + eventCapitalized as DomainEventFullName<T>;
-}
-
-export function buildDomainEventSubscriptionFullName<
-    T extends string,
->(
-    type: T,
-    event: `${DomainEventSubscriptionName}`,
-) : DomainEventSubscriptionFullName<T> {
-    const eventCapitalized = event.substring(0, 1).toUpperCase() + event.substring(1);
-
-    return type + eventCapitalized as DomainEventSubscriptionFullName<T>;
-}
-
-export function buildDomainChannelName(type: string, id?: string | number) {
-    if (id) {
-        const idSerialized = `${id}`;
-        if (idSerialized.length > 0) {
-            return `${type}:${idSerialized}`;
-        }
+// todo: rename to buildEntityChannelName
+export function buildDomainChannelName(domain: string, id?: string | number) {
+    if (typeof id === 'string' || typeof id === 'number') {
+        return `${domain}:${id}`;
     }
 
-    return type;
+    return domain;
 }
 
+// todo: rename to buildEntityNamespaceName
 export function buildDomainNamespaceName(id?: string) {
     return id ?
         `/resources:${id}` :

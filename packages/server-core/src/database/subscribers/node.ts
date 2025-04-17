@@ -33,6 +33,7 @@ async function publishEvent(
         destinations: [
             {
                 channel: (id) => buildDomainChannelName(DomainType.NODE, id),
+                namespace: buildDomainNamespaceName(),
             },
             {
                 channel: (id) => buildDomainChannelName(DomainType.NODE, id),

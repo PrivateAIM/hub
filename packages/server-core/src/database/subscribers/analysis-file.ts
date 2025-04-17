@@ -37,6 +37,7 @@ async function publishEvent(
         destinations: [
             {
                 channel: (id) => buildDomainChannelName(DomainType.ANALYSIS_BUCKET_FILE, id),
+                namespace: buildDomainNamespaceName(),
             },
             {
                 channel: (id) => buildDomainChannelName(DomainType.ANALYSIS_BUCKET_FILE, id),

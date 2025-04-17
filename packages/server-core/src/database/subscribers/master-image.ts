@@ -10,13 +10,13 @@ import type {
     EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
 import { EventSubscriber } from 'typeorm';
-import type {
-    MasterImage,
-} from '@privateaim/core-kit';
 import {
     DomainEventName,
     DomainType,
+
+    MasterImage,
     buildDomainChannelName,
+    buildDomainNamespaceName,
 } from '@privateaim/core-kit';
 import { MasterImageEntity } from '../../domains';
 
@@ -34,6 +34,7 @@ async function publishEvent(
         destinations: [
             {
                 channel: (id) => buildDomainChannelName(DomainType.MASTER_IMAGE, id),
+                namespace: buildDomainNamespaceName(),
             },
         ],
     });
