@@ -46,8 +46,11 @@ export class MasterImageEventLogEntity implements MasterImageEventLog {
     @Column({ type: 'boolean', default: false })
         expiring: boolean;
 
-    @CreateDateColumn()
-        expires_at: Date;
+    @Column({
+        type: 'varchar',
+        length: 28,
+    })
+        expires_at: string;
 
     // ------------------------------------------------------------------
 

@@ -7,7 +7,7 @@
 
 import { useDataSource } from 'typeorm-extension';
 import type { MasterImageGroupSyncData, MasterImageSyncData } from '@privateaim/server-analysis-manager-kit';
-import { MasterImageEntity, MasterImageEventLogEntity, MasterImageGroupEntity } from '../../../domains';
+import { MasterImageEntity, MasterImageGroupEntity } from '../../../domains';
 
 export type MasterImageSynchronizerExecuteContext = {
     images: MasterImageSyncData[],
@@ -29,10 +29,6 @@ export class MasterImageSynchronizerService {
     async sync(
         input: MasterImageSynchronizerExecuteContext,
     ) : Promise<MasterImageSynchronizerExecuteResult> {
-        const dataSource = await useDataSource();
-        const repository = dataSource.getRepository(MasterImageEventLogEntity);
-        await repository.clear();
-
         const groups = await this.syncGroups(input.groups);
         const images = await this.syncImages(input.images);
 

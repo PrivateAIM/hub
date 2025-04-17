@@ -18,7 +18,7 @@ export interface MasterImageEventLog {
 
     expiring: boolean;
 
-    expires_at: Date;
+    expires_at: string;
 
     // ------------------------------------------------------------------
 

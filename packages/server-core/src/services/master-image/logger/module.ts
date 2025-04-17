@@ -16,8 +16,8 @@ export class MasterImageLoggerService {
         const dataSource = await useDataSource();
         const repository = dataSource.getRepository(MasterImageEventLogEntity);
 
-        // expires in 1 Week
-        const expiresAtMs = Date.now() + (1000 * 60 * 60 * 24 * 7);
+        // expires in 3 Days
+        const expiresAtMs = Date.now() + (1000 * 60 * 60 * 24 * 3);
 
         // todo: add data if error
 

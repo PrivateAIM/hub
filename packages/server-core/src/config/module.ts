@@ -12,6 +12,7 @@ import {
     createAnalysisManagerMasterImagesAggregator,
 } from '../aggregators/analysis-manager';
 import {
+    createMasterImageLogCleanerComponent,
     createRegistryComponent,
 } from '../components';
 import { getWritableDirPath } from './paths';
@@ -56,6 +57,7 @@ export function createConfig() : Config {
     // ---------------------------------------------
 
     const components : Component[] = [
+        createMasterImageLogCleanerComponent(),
         createRegistryComponent(),
     ];
 
