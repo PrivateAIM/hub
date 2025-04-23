@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.7.11](https://github.com/PrivateAIM/hub/compare/v0.7.10...v0.7.11) (2025-04-23)
+
+
+### Features
+
+* realtime library/service split ([#474](https://github.com/PrivateAIM/hub/issues/474)) ([43c2dfa](https://github.com/PrivateAIM/hub/commit/43c2dfad654cc61ca9784914cbad56c684434088))
+* validate client-to-server messaging message ([a37cbc4](https://github.com/PrivateAIM/hub/commit/a37cbc4582ac66190aa4aad9a78aca58d34526f4))
+
+
+### Bug Fixes
+
+* **deps:** bump the minorandpatch group across 1 directory with 4 updates ([#1036](https://github.com/PrivateAIM/hub/issues/1036)) ([e52ea50](https://github.com/PrivateAIM/hub/commit/e52ea50288486db487ce0c5f4d2cd0b027c18861))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core-kit bumped from ^0.8.9 to ^0.8.10
+  * peerDependencies
+    * @privateaim/core-kit bumped from ^0.8.9 to ^0.8.10
+
 ## [0.7.10](https://github.com/PrivateAIM/hub/compare/v0.7.9...v0.7.10) (2025-04-17)
 
 
