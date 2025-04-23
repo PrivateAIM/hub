@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 import type { PropType } from 'vue';
-import type { Project } from '@privateaim/core-kit';
+import type { Analysis, Project } from '@privateaim/core-kit';
 import { FAnalysisBasicForm } from '@privateaim/client-vue';
 import { defineNuxtComponent, navigateTo } from '#app';
 
@@ -18,9 +18,9 @@ export default defineNuxtComponent({
             required: true,
         },
     },
-    setup(props) {
-        const handleCreated = async () => {
-            await navigateTo(`/projects/${props.entity.id}/analyses`);
+    setup() {
+        const handleCreated = async (entity: Analysis) => {
+            await navigateTo(`/analyses/${entity.id}/setup`);
         };
 
         return {
