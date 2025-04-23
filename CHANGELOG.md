@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.8.10](https://github.com/PrivateAIM/hub/compare/v0.8.9...v0.8.10) (2025-04-23)
+
+
+### Features
+
+* introduce safe publish method for domain-event-publisher ([cff0b35](https://github.com/PrivateAIM/hub/commit/cff0b3567ad11fb4a8ee42c58082122185c50c6c))
+
+
+### Bug Fixes
+
+* better typing for slot props ([58d514b](https://github.com/PrivateAIM/hub/commit/58d514b96d759eab9356431876cd15d9ed592f4f))
+* **deps:** bump the minorandpatch group across 1 directory with 4 updates ([#1036](https://github.com/PrivateAIM/hub/issues/1036)) ([e52ea50](https://github.com/PrivateAIM/hub/commit/e52ea50288486db487ce0c5f4d2cd0b027c18861))
+* redirect to analysis setup page after creation ([a8556d3](https://github.com/PrivateAIM/hub/commit/a8556d3edb0adbad730e11c38734efd88858fe8f))
+* use remove for deleting master image event logs ([3548c23](https://github.com/PrivateAIM/hub/commit/3548c239734811039bc1b6590f3313f1d11a9e7f))
+
 ## [0.8.9](https://github.com/PrivateAIM/hub/compare/v0.8.8...v0.8.9) (2025-04-17)
 
 

@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.8.10](https://github.com/PrivateAIM/hub/compare/v0.8.9...v0.8.10) (2025-04-23)
+
+
+### Bug Fixes
+
+* redirect to analysis setup page after creation ([a8556d3](https://github.com/PrivateAIM/hub/commit/a8556d3edb0adbad730e11c38734efd88858fe8f))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/client-vue bumped from ^0.8.9 to ^0.8.10
+    * @privateaim/core-kit bumped from ^0.8.9 to ^0.8.10
+    * @privateaim/kit bumped from ^0.8.9 to ^0.8.10
+    * @privateaim/storage-kit bumped from ^0.8.9 to ^0.8.10
+
 ## [0.8.9](https://github.com/PrivateAIM/hub/compare/v0.8.8...v0.8.9) (2025-04-17)
 
 
