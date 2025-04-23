@@ -103,6 +103,9 @@ export default defineComponent({
                             </div>
                         </template>
                     </template>
+                    <template #noMore>
+                        No nodes selected for the analysis.
+                    </template>
                 </FAnalysisNodes>
             </div>
         </template>

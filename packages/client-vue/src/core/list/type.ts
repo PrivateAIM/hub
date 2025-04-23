@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { ObjectLiteralKeys } from '@privateaim/kit';
 import type {
     ListBodyBuildOptionsInput,
     ListBodySlotProps,
@@ -34,7 +35,7 @@ import type { EntityListSlotName } from './constants';
 
 type Entity<T> = T extends Record<string, any> ? T : never;
 
-export type ListMeta<T> = {
+export type ListMeta<T> = ObjectLiteralKeys<{
     total?: number,
     busy?: boolean,
     [Parameter.PAGINATION]?: PaginationBuildInput,
@@ -42,7 +43,7 @@ export type ListMeta<T> = {
     [Parameter.SORT]?: SortBuildInput<T extends ObjectLiteral ? T : never>,
     [Parameter.FIELDS]?: FieldsBuildInput<T extends ObjectLiteral ? T : never>,
     [Parameter.RELATIONS]?: RelationsBuildInput<T extends ObjectLiteral ? T : never>
-};
+}>;
 
 export type ListHeaderOptions<T> = {
     content?: ListHeaderBuildOptionsInput<T>['content'],
@@ -92,7 +93,7 @@ export type List<T> = {
     total: Ref<number>,
 };
 
-export type ListSlotsType<T> = {
+export type ListSlotsType<T> = ObjectLiteralKeys<{
     [EntityListSlotName.BODY]: ListBodySlotProps<T, ListMeta<T>>,
     [EntityListSlotName.DEFAULT]: ListSlotProps<T, ListMeta<T>>,
     [EntityListSlotName.ITEM]: ListItemSlotProps<T>, // todo: add generic
@@ -102,7 +103,7 @@ export type ListSlotsType<T> = {
     [EntityListSlotName.FOOTER]: ListFooterSlotProps<T, ListMeta<T>>,
     [EntityListSlotName.NO_MORE]: undefined,
     [EntityListSlotName.LOADING]: undefined
-};
+}>;
 
 export type ListEventsType<T> = {
     created: (item: T) => true,

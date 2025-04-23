@@ -79,15 +79,13 @@ export default defineComponent({
                     }
 
                     return props.sourceId === item.node_id;
-                case DomainType.ANALYSIS:
+                default:
                     if (typeof props.sourceId === 'undefined') {
                         return props.realmId === item.analysis_realm_id;
                     }
 
                     return props.sourceId === item.analysis_id;
             }
-
-            return false;
         };
 
         const {
