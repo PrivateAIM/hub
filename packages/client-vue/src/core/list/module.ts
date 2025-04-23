@@ -47,7 +47,7 @@ const merger = createMerger({
     priority: 'left',
 });
 
-export function createList<
+export function createListRaw<
     TYPE extends keyof DomainTypeMap,
     RECORD extends DomainTypeMap[TYPE],
 >(
@@ -313,4 +313,12 @@ export function createList<
         load,
         setDefaults,
     };
+}
+
+export function createList<
+    A extends keyof DomainTypeMap,
+>(
+    context: ListCreateContext<A, DomainTypeMap[A]>,
+) : List<DomainTypeMap[A]> {
+    return createListRaw(context);
 }
