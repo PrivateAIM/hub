@@ -55,7 +55,9 @@ export function buildListUpdatedHandler<T>(
                 items.value[index][keys[i]] = item[keys[i]];
             }
 
-            cb(items.value[index]);
+            if (cb) {
+                cb(items.value[index]);
+            }
         }
     };
 }
@@ -64,20 +66,20 @@ export function buildListDeletedHandler<T>(
     items: Ref<T[]>,
     cb?: (entity: T) => void | Promise<void>,
 ) {
-    return (item: T) : T | undefined => {
+    return (item: T) => {
         if (!isObject(item)) {
-            return undefined;
+            return;
         }
 
         const index = items.value.findIndex((el: T) => (el as Record<string, any>).id === (item as Record<string, any>).id);
         if (index !== -1) {
+            const output = items.value[index];
+
+            items.value.splice(index, 1);
+
             if (cb) {
-                cb(items.value[index]);
+                cb(output);
             }
-
-            return items.value.splice(index, 1).pop();
         }
-
-        return undefined;
     };
 }

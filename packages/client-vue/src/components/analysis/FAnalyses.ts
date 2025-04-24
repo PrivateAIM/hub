@@ -38,6 +38,7 @@ export default defineComponent({
             item: {
                 content(item) {
                     return h(FAnalysisItem, {
+                        key: item.id,
                         entity: item,
                         onDeleted: handleDeleted,
                         onUpdated: handleUpdated,
