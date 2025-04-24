@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.8.11](https://github.com/PrivateAIM/hub/compare/v0.8.10...v0.8.11) (2025-04-24)
+
+
+### Features
+
+* initial permission assignment ui component ([#1027](https://github.com/PrivateAIM/hub/issues/1027)) ([6ec6a87](https://github.com/PrivateAIM/hub/commit/6ec6a876b368f6cb373976a1d126f9119bed429e))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.8.10 to ^0.8.11
+  * peerDependencies
+    * @privateaim/kit bumped from ^0.8.10 to ^0.8.11
+
 ## [0.8.10](https://github.com/PrivateAIM/hub/compare/v0.8.9...v0.8.10) (2025-04-23)
 
 
