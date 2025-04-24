@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.8.11](https://github.com/PrivateAIM/hub/compare/v0.8.10...v0.8.11) (2025-04-24)
+
+
+### Bug Fixes
+
+* **deps:** bump the minorandpatch group with 4 updates ([#1039](https://github.com/PrivateAIM/hub/issues/1039)) ([c2f6c6e](https://github.com/PrivateAIM/hub/commit/c2f6c6e0803044d7a024560d4e41b9e2119c415e))
+* realtime updates & simplified analysis wizard file event management ([6c4521e](https://github.com/PrivateAIM/hub/commit/6c4521ea33908002c246e16bef8833f51828e07f))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.8.10 to ^0.8.11
+    * @privateaim/kit bumped from ^0.8.10 to ^0.8.11
+    * @privateaim/server-kit bumped from ^0.8.10 to ^0.8.11
+    * @privateaim/server-core-realtime bumped from ^0.8.10 to ^0.8.11
+    * @privateaim/server-http-kit bumped from ^0.8.10 to ^0.8.11
+    * @privateaim/server-analysis-manager-kit bumped from ^0.7.11 to ^0.7.12
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.8.10 to ^0.8.11
+
 ## [0.8.10](https://github.com/PrivateAIM/hub/compare/v0.8.9...v0.8.10) (2025-04-23)
 
 
