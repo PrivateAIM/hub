@@ -224,6 +224,21 @@ export const LayoutSideAdminNavigation: NavigationItem<NavigationItemMeta>[] = [
                 },
             },
             {
+                name: 'Policies',
+                type: 'link',
+                url: '/admin/policies',
+                icon: 'fa fa-balance-scale',
+                meta: {
+                    [LayoutKey.REQUIRED_LOGGED_IN]: true,
+                    [LayoutKey.REQUIRED_PERMISSIONS]: [
+                        AuthupPermissionName.PERMISSION_READ,
+                        AuthupPermissionName.PERMISSION_CREATE,
+                        AuthupPermissionName.PERMISSION_UPDATE,
+                        AuthupPermissionName.PERMISSION_DELETE,
+                    ],
+                },
+            },
+            {
                 name: 'Permissions',
                 type: 'link',
                 url: '/admin/permissions',
