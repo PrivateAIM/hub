@@ -30,6 +30,9 @@ export enum PermissionName {
     ANALYSIS_DELETE = 'analysis_delete',
     ANALYSIS_RESULT_READ = 'analysis_result_read', // todo: this is maybe not required anymore
 
+    ANALYSIS_SELF_MESSAGE_BROKER_USE = 'analysis_self_message_broker_use',
+    ANALYSIS_SELF_STORAGE_USE = 'analysis_self_storage_use',
+
     MASTER_IMAGE_MANAGE = 'master_image_manage',
     MASTER_IMAGE_GROUP_MANAGE = 'master_image_group_manage',
 

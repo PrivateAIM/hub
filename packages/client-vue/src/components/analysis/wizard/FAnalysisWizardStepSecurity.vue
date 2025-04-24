@@ -14,7 +14,7 @@ import {
 import { FAnalysisPermissionAssignments } from '../../analysis-permission/FAnalysisPermissionAssignments';
 import { FPagination, FSearch } from '../../utility';
 
-const NAME_PREFIX = '~analysis_';
+const NAME_PREFIX = '~analysis_self_';
 
 export default defineComponent({
     components: { FPagination, FSearch, FAnalysisPermissionAssignments },
@@ -56,6 +56,9 @@ export default defineComponent({
         <h6>
             <i class="fa fa-key" /> Permissions
         </h6>
+    </div>
+    <div class="alert alert-sm alert-danger">
+        <i class="fa fa-info pe-1" /> The selection of permissions does not <b>yet</b> have any implications.<br>
     </div>
     <FAnalysisPermissionAssignments
         ref="vNode"
