@@ -38,6 +38,15 @@ export async function updateAnalysisBucketFileRouteHandler(req: Request, res: Re
 
     entity = repository.merge(entity, data);
 
+    if (entity.root) {
+        await repository.update({
+            bucket_id: entity.bucket_id,
+            analysis_id: entity.analysis_id,
+        }, {
+            root: false,
+        });
+    }
+
     entity = await repository.save(entity);
 
     return sendAccepted(res, entity);

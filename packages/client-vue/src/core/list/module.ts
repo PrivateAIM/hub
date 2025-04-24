@@ -183,11 +183,23 @@ export function createListRaw<
         if (context.onCreated) {
             context.onCreated(cbEntity, meta.value);
         }
+
+        if (context.setup && typeof context.setup.emit === 'function') {
+            context.setup.emit('created', cbEntity);
+        }
     });
-    const handleDeleted = buildListDeletedHandler(data, () => {
+    const handleDeleted = buildListDeletedHandler(data, (cbEntity) => {
         total.value--;
+
+        if (context.setup && typeof context.setup.emit === 'function') {
+            context.setup.emit('deleted', cbEntity);
+        }
     });
-    const handleUpdated = buildListUpdatedHandler(data);
+    const handleUpdated = buildListUpdatedHandler(data, (cbEntity) => {
+        if (context.setup && typeof context.setup.emit === 'function') {
+            context.setup.emit('updated', cbEntity);
+        }
+    });
 
     let options : ListRenderOptions<RECORD> = context.props;
 
@@ -292,7 +304,7 @@ export function createListRaw<
             handleDeleted(entity);
         };
         socketContext.onUpdated = (entity: RECORD) => {
-            handleDeleted(entity);
+            handleUpdated(entity);
         };
         socketContext.realmId = realmId;
 

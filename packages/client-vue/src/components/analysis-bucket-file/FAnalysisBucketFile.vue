@@ -13,7 +13,10 @@ import type {
 } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
 import {
-    computed, defineComponent, ref,
+    computed,
+    defineComponent,
+    ref,
+    watch,
 } from 'vue';
 import { createEntityManager, defineEntityManagerEvents } from '../../core';
 
@@ -27,14 +30,9 @@ export default defineComponent({
             type: Array,
             required: true,
         },
-        fileSelectedId: {
-            type: String,
-        },
     },
     emits: {
         ...defineEntityManagerEvents<AnalysisBucketFile>(),
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        toggle: (_entity?: AnalysisBucketFile) => true,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         check: (_entity?: AnalysisBucketFile) => true,
     },
@@ -45,8 +43,6 @@ export default defineComponent({
             setup,
         });
 
-        const busy = ref(false);
-
         const marked = computed(() => {
             if (!props.filesSelected) {
                 return false;
@@ -55,10 +51,25 @@ export default defineComponent({
             return props.filesSelected.findIndex((file) => manager.data.value && file === manager.data.value.id) !== -1;
         });
 
-        const isMatch = computed(() => manager.data.value && props.fileSelectedId === manager.data.value.id);
+        const isMatchRaw = computed(() => manager.data.value && manager.data.value.root);
+        const isMatch = ref(false);
 
-        const toggle = () => {
-            setup.emit('toggle', manager.data.value);
+        watch(isMatchRaw, (val) => {
+            isMatch.value = val;
+        });
+
+        if (manager.data.value) {
+            isMatch.value = manager.data.value.root;
+        }
+
+        const toggle = async () => {
+            if (manager.busy.value || !manager.data.value) {
+                return;
+            }
+
+            await manager.update({
+                root: !isMatch.value,
+            });
         };
 
         const markToggle = () => {
@@ -71,7 +82,7 @@ export default defineComponent({
             markToggle,
             isMatch,
             toggle,
-            busy,
+            busy: manager.busy,
         };
     },
 });
@@ -92,9 +103,9 @@ export default defineComponent({
         <div class="ms-auto d-flex flex-row me-1">
             <div>
                 <button
-                    v-if="!fileSelectedId || isMatch"
                     type="button"
                     class="btn btn-xs"
+                    :disabled="busy"
                     :class="{
                         'btn-success': !isMatch,
                         'btn-warning': isMatch

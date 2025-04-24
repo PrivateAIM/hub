@@ -52,17 +52,26 @@ export async function createAnalysisBucketFileRouteHandler(req: Request, res: Re
 
     let entity = repository.create(data);
 
-    if (data.bucket.type === AnalysisBucketType.CODE) {
+    if (entity.bucket.type === AnalysisBucketType.CODE) {
         const analysisRepository = dataSource.getRepository(AnalysisEntity);
         const analysis = await analysisRepository.findOne({
             where: {
-                id: data.analysis_id,
+                id: entity.analysis_id,
             },
         });
 
         if (analysis.configuration_locked) {
             throw new BadRequestError('The analysis has already been locked and can therefore no longer be modified.');
         }
+    }
+
+    if (entity.root) {
+        await repository.update({
+            bucket_id: entity.bucket_id,
+            analysis_id: entity.analysis_id,
+        }, {
+            root: false,
+        });
     }
 
     entity = await repository.save(entity);

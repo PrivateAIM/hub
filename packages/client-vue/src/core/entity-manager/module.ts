@@ -100,7 +100,7 @@ export function createEntityManager<
             extendObjectProperties(entity.value, value);
         }
 
-        if (ctx.setup && ctx.setup.emit) {
+        if (ctx.setup && typeof ctx.setup.emit === 'function') {
             ctx.setup.emit('updated', (entity.value || value) as RECORD);
         }
 

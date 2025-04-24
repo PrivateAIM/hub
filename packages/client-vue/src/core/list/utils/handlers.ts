@@ -38,7 +38,10 @@ export function buildListCreatedHandler<T>(
     };
 }
 
-export function buildListUpdatedHandler<T>(items: Ref<T[]>) {
+export function buildListUpdatedHandler<T>(
+    items: Ref<T[]>,
+    cb?: (entity: T) => void | Promise<void>,
+) {
     return (item: T) => {
         if (!isObject(item)) {
             return;
@@ -51,6 +54,8 @@ export function buildListUpdatedHandler<T>(items: Ref<T[]>) {
             for (let i = 0; i < keys.length; i++) {
                 items.value[index][keys[i]] = item[keys[i]];
             }
+
+            cb(items.value[index]);
         }
     };
 }

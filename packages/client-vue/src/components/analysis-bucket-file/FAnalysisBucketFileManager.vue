@@ -11,9 +11,10 @@ import type {
     AnalysisBucketFile,
 } from '@privateaim/core-kit';
 import { BModal } from 'bootstrap-vue-next';
-import type { PropType, Ref } from 'vue';
+import type { PropType } from 'vue';
 import {
-    computed, defineComponent, ref,
+    computed,
+    defineComponent, ref, toRef,
 } from 'vue';
 import type { BuildInput } from 'rapiq';
 import { injectCoreHTTPClient, wrapFnWithBusyState } from '../../core';
@@ -41,17 +42,7 @@ export default defineComponent({
     setup(props, { emit }) {
         const coreClient = injectCoreHTTPClient();
 
-        const entrypointFile = ref(null) as Ref<AnalysisBucketFile | null>;
-        if (props.fileEntity) {
-            entrypointFile.value = props.fileEntity;
-        }
-        const entrypointFileId = computed(() => {
-            if (entrypointFile.value) {
-                return entrypointFile.value.id;
-            }
-
-            return undefined;
-        });
+        const entrypointFile = toRef(props, 'fileEntity');
 
         const modal = ref(false);
         const toggleModal = () => {
@@ -70,32 +61,42 @@ export default defineComponent({
             },
         }));
 
-        const handleCreated = (entity: AnalysisBucketFile) => {
-            if (fileListNode.value) {
-                fileListNode.value.handleCreated(entity);
+        const updateEntrypointFile = (entity: AnalysisBucketFile) => {
+            if (entity.root) {
+                emit('setEntrypointFile', entity);
+
+                return;
             }
 
-            emit('created', entity);
+            if (
+                entrypointFile.value &&
+                entrypointFile.value.id === entity.id
+            ) {
+                emit('setEntrypointFile', null);
+            }
         };
-        const handleDeleted = (entity: AnalysisBucketFile) => {
-            if (fileListNode.value) {
-                fileListNode.value.handleDeleted(entity);
-            }
 
+        const handleCreated = (entity: AnalysisBucketFile) => {
+            emit('created', entity);
+
+            updateEntrypointFile(entity);
+        };
+
+        const handleDeleted = (entity: AnalysisBucketFile) => {
             const selectedIndex = selected.value.indexOf(entity.id);
             if (selectedIndex !== -1) {
                 selected.value.splice(selectedIndex, 1);
             }
 
             emit('deleted', entity);
+
+            updateEntrypointFile(entity);
         };
 
         const handleUpdated = (entity: AnalysisBucketFile) => {
-            if (fileListNode.value) {
-                fileListNode.value.handleUpdated(entity);
-            }
-
             emit('updated', entity);
+
+            updateEntrypointFile(entity);
         };
 
         const handleFailed = (e: Error) => {
@@ -147,40 +148,6 @@ export default defineComponent({
             }
         };
 
-        const changeEntryPointFile = async (file: AnalysisBucketFile) => {
-            if (entrypointFile.value) {
-                if (entrypointFile.value.id === file.id) {
-                    await coreClient.analysisBucketFile.update(file.id, {
-                        root: false,
-                    });
-
-                    entrypointFile.value = null;
-
-                    emit('setEntrypointFile', null);
-                } else {
-                    await coreClient.analysisBucketFile.update(entrypointFile.value.id, {
-                        root: false,
-                    });
-
-                    await coreClient.analysisBucketFile.update(file.id, {
-                        root: true,
-                    });
-
-                    entrypointFile.value = file;
-
-                    emit('setEntrypointFile', file);
-                }
-            } else {
-                await coreClient.analysisBucketFile.update(file.id, {
-                    root: true,
-                });
-
-                entrypointFile.value = file;
-
-                emit('setEntrypointFile', file);
-            }
-        };
-
         return {
             busy,
 
@@ -198,15 +165,13 @@ export default defineComponent({
 
             toggleFile,
 
-            entrypointFile,
-            entrypointFileId,
-            changeEntryPointFile,
-
             fileListNode,
             fileListQuery,
 
             modal,
             toggleModal,
+
+            entrypointFile,
         };
     },
 });
@@ -271,11 +236,9 @@ export default defineComponent({
                                 class="me-1"
                                 :entity="file"
                                 :files-selected="selected"
-                                :file-selected-id="entrypointFileId"
                                 @check="toggleFile"
                                 @updated="props.updated"
                                 @deleted="props.deleted"
-                                @toggle="changeEntryPointFile"
                             />
                         </template>
                     </div>
