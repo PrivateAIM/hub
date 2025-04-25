@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.8.12](https://github.com/PrivateAIM/hub/compare/v0.8.11...v0.8.12) (2025-04-25)
+
+
+### Features
+
+* add verison number to footer ([e5d8c86](https://github.com/PrivateAIM/hub/commit/e5d8c863ebfd6589510591bc9699def9ba5010e7))
+* initial design adjustments ([7b0681b](https://github.com/PrivateAIM/hub/commit/7b0681b481c8c022173c7e0d72f1f573c0ed2783))
+
+
+### Bug Fixes
+
+* add missing css file ([2159f32](https://github.com/PrivateAIM/hub/commit/2159f32313be6b7782bf6ccd367542dac02824a2))
+* handling entity delete handler ([8ded64f](https://github.com/PrivateAIM/hub/commit/8ded64f100e99da481190bfe0db30921721f2bbc))
+
 ## [0.8.11](https://github.com/PrivateAIM/hub/compare/v0.8.10...v0.8.11) (2025-04-24)
 
 
