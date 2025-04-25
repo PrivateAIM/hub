@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.8.12](https://github.com/PrivateAIM/hub/compare/v0.8.11...v0.8.12) (2025-04-25)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.8.11 to ^0.8.12
+    * @privateaim/kit bumped from ^0.8.11 to ^0.8.12
+    * @privateaim/core-http-kit bumped from ^0.8.11 to ^0.8.12
+    * @privateaim/server-kit bumped from ^0.8.11 to ^0.8.12
+    * @privateaim/server-analysis-manager-kit bumped from ^0.7.12 to ^0.7.13
+    * @privateaim/storage-kit bumped from ^0.8.11 to ^0.8.12
+
 ## [0.8.11](https://github.com/PrivateAIM/hub/compare/v0.8.10...v0.8.11) (2025-04-24)
 
 
