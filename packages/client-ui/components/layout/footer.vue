@@ -68,6 +68,7 @@ export default defineComponent({
     text-align: center;
     color: #aeb2b7;
     gap: 0.5rem;
+    line-height: 1.25rem;
 }
 
 .page-footer > div:not(:first-child):before {

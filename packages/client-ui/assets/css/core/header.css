@@ -19,10 +19,10 @@
 }
 
 .page-header .header-title {
-    flex: none;
     min-height: 50px;
     display: flex;
     align-items: center;
+    justify-content: center;
 }
 
 .page-header .header-title > div {
@@ -52,7 +52,7 @@
 }
 
 .page-header .logo {
-    font-size: 24px;
+    font-size: 1.8rem;
     color: #f2f2f2;
     flex: none;
 }
@@ -62,16 +62,22 @@
 }
 
 .page-header .logo .info-text {
-    font-size:15px;
+    font-size:0.875em;
 }
 
 .page-header .logo .info-text:before {
     content: "-";
-    margin-right:5px;
+    margin-left: 0.25rem;
+    margin-right: 0.25rem;
 }
 
 @media (min-width: 768px) {
-    .toggle-box .toggle-trigger {
-        display: none;
+    .page-header .header-title {
+        min-width:270px;
+        text-align: center;
+    }
+
+    .page-header .toggle-box .toggle-trigger {
+        display: none
     }
 }

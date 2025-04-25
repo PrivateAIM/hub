@@ -14,10 +14,9 @@ html, body {
 }
 
 body {
-    font-family: Nunito,sans-serif;
-    font-size: 13px;
+    font-family: 'Nunito', sans-serif;
     color: #30373E;
-    font-weight: 300;
+    font-weight: 400;
     background: #D5D8DA none repeat scroll 0% 0%;
 }
 
@@ -65,8 +64,13 @@ General
  */
 .h1, .h2, .h3, .h4, .h5, .h6,
 h1, h2, h3, h4, h5, h6 {
-    font-family: Asap,sans-serif;
+    font-family: 'Asap', sans-serif;
     font-weight: 700;
+}
+
+.h1,
+h1 {
+    font-size: 2.75rem;
 }
 
 h1.title,

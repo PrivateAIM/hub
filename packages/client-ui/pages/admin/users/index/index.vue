@@ -90,6 +90,12 @@ export default defineNuxtComponent({
                 head-variant="'dark'"
                 outlined
             >
+                <template #cell(created_at)="data">
+                    <VCTimeago :datetime="data.item.created_at" />
+                </template>
+                <template #cell(updated_at)="data">
+                    <VCTimeago :datetime="data.item.created_at" />
+                </template>
                 <template #cell(options)="data">
                     <NuxtLink
                         :to="'/admin/users/'+ data.item.id"

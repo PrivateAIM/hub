@@ -81,6 +81,10 @@
     border-radius: var(--bs-border-radius) !important;
 }
 
+.nav-pills .nav-link {
+    font-size: 0.875rem;
+}
+
 .nav-pills .nav-link:hover,
 .nav-pills .nav-link.active,
 .nav-pills .nav-link.router-link-exact-active,

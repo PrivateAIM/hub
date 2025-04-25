@@ -101,7 +101,6 @@ Card
 
 .card .card-header span {
     display: block;
-    font-size: 13px;
     margin-top: 5px;
 }
 
@@ -111,7 +110,6 @@ Card
 
 .card .card-header .title {
     color: #37474f;
-    font-size: 1rem;
     position: relative;
     margin: 0 0 0 1rem;
 }
@@ -122,9 +120,13 @@ Card
     left: -1rem;
     top: 0;
     content: "\f054";
-    font-family: var(--fa-style-family, "Font Awesome 6 Free");
+    font-family: var(--fa-style-family, "Font Awesome 6 Free"), serif;
     font-weight: 900;
     font-style: normal;
+}
+
+.card .card-body {
+    font-size: .875em;
 }
 
 .card .card-block {

@@ -22,10 +22,15 @@ export default defineNuxtComponent({
 </script>
 <template>
     <div class="">
-        <h1 class="title no-border mb-5 text-center">
-            FLAME <span class="sub-title">HUB</span>
+        <h1 class="landing-title no-border mb-5 text-center">
+            FLAME
         </h1>
 
         <WorldSvg width="100%" />
     </div>
 </template>
+<style scoped>
+.landing-title {
+    font-size: 5rem;
+}
+</style>

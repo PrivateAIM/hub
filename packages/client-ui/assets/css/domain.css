@@ -81,9 +81,11 @@
 }
 
 .log-body .line {
-    line-height: 20px;
     color: #d0d7de;
     width: 100%;
+
+    line-height: 1.3rem;
+    font-size: .875rem;
 }
 
 .log-body .line-status-message {
@@ -100,7 +102,6 @@
     white-space: nowrap;
     -webkit-user-select: none;
     user-select: none;
-    font-size: 0.75rem;
     font-weight: 400;
 }
 

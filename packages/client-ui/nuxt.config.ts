@@ -84,8 +84,8 @@ export default defineNuxtConfig({
         [
             '@nuxtjs/google-fonts', {
                 families: {
-                    Asap: true,
-                    Nunito: true,
+                    Asap: [400, 700],
+                    Nunito: [400, 700],
                 },
                 download: true,
             },
