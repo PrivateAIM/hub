@@ -30,6 +30,7 @@ export default defineNuxtConfig({
             storageUrl: process.env.STORAGE_URL,
             authupUrl: process.env.AUTHUP_URL,
             cookieDomain: process.env.COOKIE_DOMAIN,
+            version: process.env.npm_package_version,
         },
     },
 
@@ -61,7 +62,6 @@ export default defineNuxtConfig({
         '@/assets/css/core/navbar.css',
         '@/assets/css/core/body.css',
         '@/assets/css/core/sidebar.css',
-        '@/assets/css/core/footer.css',
         '@/assets/css/domain.css',
         '@/assets/css/card.css',
         '@/assets/css/colors.css',
