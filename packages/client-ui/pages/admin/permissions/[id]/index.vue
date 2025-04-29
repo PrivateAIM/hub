@@ -6,10 +6,8 @@
   -->
 
 <script lang="ts">
-
 import { APermissionForm } from '@authup/client-web-kit';
 import type { Permission } from '@authup/core-kit';
-import { PermissionName } from '@authup/core-kit';
 import type { PropType } from 'vue';
 import { defineNuxtComponent, definePageMeta } from '#imports';
 import { LayoutKey } from '~/config/layout';
@@ -28,9 +26,6 @@ export default defineNuxtComponent({
     setup(props, { emit }) {
         definePageMeta({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
-            [LayoutKey.REQUIRED_PERMISSIONS]: [
-                PermissionName.PERMISSION_EDIT,
-            ],
         });
 
         const handleUpdated = (e: Permission) => {
