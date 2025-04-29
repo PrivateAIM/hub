@@ -6,10 +6,9 @@
   -->
 
 <script lang="ts">
-import { AIdentityProviderOAuth2Form, injectStore, storeToRefs } from '@authup/client-web-kit';
+import { AIdentityProviderForm, injectStore, storeToRefs } from '@authup/client-web-kit';
 import type { IdentityProvider } from '@authup/core-kit';
 import { IdentityProviderProtocol, PermissionName } from '@authup/core-kit';
-import { VCFormSelect } from '@vuecs/form-controls';
 import { ref } from 'vue';
 import { defineNuxtComponent, navigateTo } from '#app';
 import { definePageMeta } from '#imports';
@@ -17,8 +16,7 @@ import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
 
 export default defineNuxtComponent({
     components: {
-        VCFormSelect,
-        AIdentityProviderOAuth2Form,
+        AIdentityProviderForm,
     },
     emits: ['failed', 'created'],
     setup(props, { emit }) {
@@ -61,22 +59,9 @@ export default defineNuxtComponent({
 </script>
 <template>
     <div>
-        <VCFormGroup
-            :label="true"
-            :label-content="'Protocol'"
-        >
-            <VCFormSelect
-                v-model="protocol"
-                :options="options"
-            />
-        </VCFormGroup>
-        <template v-if="protocol === 'oauth2'">
-            <hr>
-            <AIdentityProviderOAuth2Form
-                :realm-id="realmManagementId"
-                @created="handleCreated"
-                @failed="handleFailed"
-            />
-        </template>
+        <AIdentityProviderForm
+            @created="handleCreated"
+            @failed="handleFailed"
+        />
     </div>
 </template>
