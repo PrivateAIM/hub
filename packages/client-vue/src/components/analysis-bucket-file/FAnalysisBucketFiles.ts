@@ -8,8 +8,9 @@ import { DomainType } from '@privateaim/core-kit';
 import type {
     AnalysisBucketFile,
 } from '@privateaim/core-kit';
+import type { FiltersBuildInput } from 'rapiq';
 import type { SlotsType } from 'vue';
-import { defineComponent } from 'vue';
+import { computed, defineComponent } from 'vue';
 import type { ListSlotsType } from '../../core';
 import { createList, defineListEvents, defineListProps } from '../../core';
 
@@ -21,10 +22,36 @@ const FAnalysisBucketFiles = defineComponent({
             default: undefined,
         },
     },
-    slots: Object as SlotsType<ListSlotsType<AnalysisBucketFile>>,
     emits: defineListEvents<AnalysisBucketFile>(),
+    slots: Object as SlotsType<ListSlotsType<AnalysisBucketFile>>,
     setup(props, setup) {
         // todo: include sort
+
+        const filters = computed<FiltersBuildInput<AnalysisBucketFile>>(
+            () => {
+                if (props.query) {
+                    return props.query.filters;
+                }
+
+                return {} as FiltersBuildInput<AnalysisBucketFile>;
+            },
+        );
+
+        const canHandleEventData = (item: AnalysisBucketFile) => {
+            if (filters.value.bucket_id) {
+                return item.bucket_id === filters.value.bucket_id;
+            }
+
+            if (filters.value.analysis_id) {
+                return item.analysis_id === filters.value.analysis_id;
+            }
+
+            if (filters.value.realm_id) {
+                return item.realm_id === filters.value.realm_id;
+            }
+
+            return true;
+        };
 
         const {
             render,
@@ -33,6 +60,11 @@ const FAnalysisBucketFiles = defineComponent({
             type: `${DomainType.ANALYSIS_BUCKET_FILE}`,
             props,
             setup,
+            socket: {
+                processEvent(event) {
+                    return canHandleEventData(event.data);
+                },
+            },
         });
 
         setDefaults({
