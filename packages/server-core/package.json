@@ -45,7 +45,7 @@
         "pascal-case": "^4.0.0",
         "pg": "^8.15.6",
         "prom-client": "^14.2.0",
-        "rapiq": "^0.9.0",
+        "rapiq": "^1.0.0",
         "redis-extension": "^2.0.2",
         "reflect-metadata": "^0.2.2",
         "routup": "^4.0.1",
