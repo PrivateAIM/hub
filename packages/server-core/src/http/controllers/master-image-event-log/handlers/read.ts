@@ -20,11 +20,19 @@ export async function getOneMasterImageEventLogRouteHandler(req: Request, res: R
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(MasterImageEventLogEntity);
-    const entity = await repository.findOne({
-        where: {
-            id,
+    const query = repository.createQueryBuilder('log')
+        .where('log.id = :id', { id });
+
+    applyQuery(query, useRequestQuery(req), {
+        defaultAlias: 'log',
+        relations: {
+            allowed: [
+                'master_image',
+            ],
         },
     });
+
+    const entity = await query.getOne();
 
     if (!entity) {
         throw new NotFoundError();
