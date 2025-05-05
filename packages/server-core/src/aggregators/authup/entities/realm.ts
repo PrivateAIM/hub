@@ -8,11 +8,20 @@ import type {
     EntityType, EventRecord, Realm,
 } from '@authup/core-kit';
 import { useDataSource } from 'typeorm-extension';
+import { useLogger } from '@privateaim/server-kit';
 import {
-    AnalysisEntity, NodeEntity, ProjectEntity, ProjectNodeEntity, RegistryProjectEntity,
+    AnalysisEntity,
+    NodeEntity,
+    ProjectEntity,
+    RegistryProjectEntity,
 } from '../../../domains';
 
 export async function handleAuthupRealmEvent(context: EventRecord<EntityType.REALM, Realm>) {
+    if (!context.data.id) {
+        useLogger().warn('ID in authup realm event handler is missing.');
+        return;
+    }
+
     if (context.event === 'deleted') {
         const dataSource = await useDataSource();
 
@@ -24,14 +33,6 @@ export async function handleAuthupRealmEvent(context: EventRecord<EntityType.REA
         });
 
         await projectRepository.remove(projects);
-
-        const projectNodeRepository = dataSource.getRepository(ProjectNodeEntity);
-        const projectNodes = await projectNodeRepository.createQueryBuilder()
-            .where('project_realm_id = :realmId', { realmId: context.data.id })
-            .orWhere('node_realm_id = :realmId', { realmId: context.data.id })
-            .getMany();
-
-        await projectNodeRepository.remove(projectNodes);
 
         const registryProjectRepository = dataSource.getRepository(RegistryProjectEntity);
         const registryProjects = await registryProjectRepository.find({
@@ -59,31 +60,5 @@ export async function handleAuthupRealmEvent(context: EventRecord<EntityType.REA
         });
 
         await analysisRepository.remove(analyses);
-
-        const analysisFileRepository = dataSource.getRepository(AnalysisEntity);
-        const analysisFiles = await analysisFileRepository.find({
-            where: {
-                realm_id: context.data.id,
-            },
-        });
-
-        await analysisRepository.remove(analysisFiles);
-
-        const analysisLogRepository = dataSource.getRepository(AnalysisEntity);
-        const analysisLogs = await analysisLogRepository.find({
-            where: {
-                realm_id: context.data.id,
-            },
-        });
-
-        await analysisLogRepository.remove(analysisLogs);
-
-        const analyseNodeRepository = dataSource.getRepository(ProjectNodeEntity);
-        const analyseNodes = await analyseNodeRepository.createQueryBuilder()
-            .where('node_realm_id = :realmId', { realmId: context.data.id })
-            .orWhere('project_realm_id = :realmId', { realmId: context.data.id })
-            .getMany();
-
-        await projectNodeRepository.remove(analyseNodes);
     }
 }
