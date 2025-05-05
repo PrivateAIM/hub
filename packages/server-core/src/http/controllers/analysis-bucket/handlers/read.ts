@@ -31,12 +31,12 @@ export async function getOneAnalysisBucketRouteHandler(req: Request, res: Respon
 
     const entity = await query.getOne();
 
-    if (!isRealmResourceReadable(useRequestIdentityRealm(req), entity.realm_id)) {
-        throw new ForbiddenError();
-    }
-
     if (!entity) {
         throw new NotFoundError();
+    }
+
+    if (!isRealmResourceReadable(useRequestIdentityRealm(req), entity.realm_id)) {
+        throw new ForbiddenError();
     }
 
     return send(res, entity);
