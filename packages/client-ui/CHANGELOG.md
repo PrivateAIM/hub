@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.8.13](https://github.com/PrivateAIM/hub/compare/v0.8.12...v0.8.13) (2025-05-05)
+
+
+### Features
+
+* support a wider range of identity-providers ([7c3359b](https://github.com/PrivateAIM/hub/commit/7c3359b87d8216cae03097d215e070ab5717b9c0))
+
+
+### Bug Fixes
+
+* **deps:** bump the minorandpatch group across 1 directory with 9 updates ([#1052](https://github.com/PrivateAIM/hub/issues/1052)) ([d29805f](https://github.com/PrivateAIM/hub/commit/d29805f3b0306b97a56cdd9882ac90e5d66800a6))
+* remove invalid permission enum key access ([9955bce](https://github.com/PrivateAIM/hub/commit/9955bce52ba14eabbcf5918a8f22f39793e7c1b5))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/client-vue bumped from ^0.8.12 to ^0.8.13
+    * @privateaim/core-kit bumped from ^0.8.12 to ^0.8.13
+    * @privateaim/kit bumped from ^0.8.12 to ^0.8.13
+    * @privateaim/storage-kit bumped from ^0.8.12 to ^0.8.13
+
 ## [0.8.12](https://github.com/PrivateAIM/hub/compare/v0.8.11...v0.8.12) (2025-04-25)
 
 

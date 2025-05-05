@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.8.13](https://github.com/PrivateAIM/hub/compare/v0.8.12...v0.8.13) (2025-05-05)
+
+
+### Features
+
+* allow including master_image relation in master_image_event_logs endpoint ([#1058](https://github.com/PrivateAIM/hub/issues/1058)) ([f84e278](https://github.com/PrivateAIM/hub/commit/f84e278bd8169bcacaa06d5ce3ddba51649d09c5))
+* cleanup authup aggregator handlers ([#1059](https://github.com/PrivateAIM/hub/issues/1059)) ([14682ed](https://github.com/PrivateAIM/hub/commit/14682ed4f52b7ea259d2cc8e214f4348073b9a10))
+
+
+### Bug Fixes
+
+* **deps:** bump the minorandpatch group across 1 directory with 9 updates ([#1052](https://github.com/PrivateAIM/hub/issues/1052)) ([d29805f](https://github.com/PrivateAIM/hub/commit/d29805f3b0306b97a56cdd9882ac90e5d66800a6))
+* response for non existent analysis-bucket(-file) ([#1057](https://github.com/PrivateAIM/hub/issues/1057)) ([ebe143e](https://github.com/PrivateAIM/hub/commit/ebe143e70e1b8e4541bf9ef280c4c92cd9eee365))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.8.12 to ^0.8.13
+    * @privateaim/kit bumped from ^0.8.12 to ^0.8.13
+    * @privateaim/server-kit bumped from ^0.8.12 to ^0.8.13
+    * @privateaim/server-core-realtime bumped from ^0.8.12 to ^0.8.13
+    * @privateaim/server-http-kit bumped from ^0.8.12 to ^0.8.13
+    * @privateaim/server-analysis-manager-kit bumped from ^0.7.13 to ^0.7.14
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.8.12 to ^0.8.13
+
 ## [0.8.12](https://github.com/PrivateAIM/hub/compare/v0.8.11...v0.8.12) (2025-04-25)
 
 
