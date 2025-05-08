@@ -50,21 +50,21 @@
         "reflect-metadata": "^0.2.2",
         "routup": "^4.0.1",
         "singa": "^1.0.0",
-        "typeorm": "^0.3.22",
+        "typeorm": "^0.3.23",
         "typeorm-extension": "^3.7.1",
         "validup": "^0.1.8",
         "yargs": "^17.7.1",
-        "zod": "^3.24.3"
+        "zod": "^3.24.4"
     },
     "devDependencies": {
         "@privateaim/core-http-kit": "^0.8.13",
         "@types/busboy": "^1.5.3",
-        "@types/cors": "^2.8.17",
+        "@types/cors": "^2.8.18",
         "@types/module-alias": "^2.0.4",
         "@types/node-cron": "^3.0.11",
         "@types/supertest": "^6.0.3",
         "@types/yargs": "^17.0.32",
-        "better-sqlite3": "^11.9.1",
+        "better-sqlite3": "^11.10.0",
         "cross-env": "^7.0.3",
         "supertest": "^7.1.0",
         "ts-node": "^10.9.2"
