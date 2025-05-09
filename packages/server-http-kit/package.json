@@ -31,7 +31,7 @@
         "validup": "^0.1.8"
     },
     "devDependencies": {
-        "@types/cors": "^2.8.17",
+        "@types/cors": "^2.8.18",
         "redis-extension": "^2.0.2",
         "routup": "^4.0.1",
         "typeorm-extension": "^3.7.1"
