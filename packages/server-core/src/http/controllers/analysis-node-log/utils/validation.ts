@@ -42,7 +42,8 @@ export class AnalysisNodeLogValidator extends Container<AnalysisNodeLogEntity> {
         const statusValidator = createValidator(() => {
             const chain = createValidationChain();
             return chain
-                .isString();
+                .isString()
+                .isLength({ min: 3, max: 64 });
         });
         this.mount(
             'status',
@@ -63,6 +64,18 @@ export class AnalysisNodeLogValidator extends Container<AnalysisNodeLogEntity> {
                 return chain
                     .optional({ nullable: true })
                     .isString();
+            }),
+        );
+
+        this.mount(
+            'code',
+            { optional: true },
+            createValidator(() => {
+                const chain = createValidationChain();
+                return chain
+                    .optional({ nullable: true })
+                    .isString()
+                    .isLength({ min: 3, max: 64 });
             }),
         );
 
