@@ -61,6 +61,7 @@ export default defineNuxtComponent({
         ];
 
         const api = injectCoreHTTPClient();
+
         const store = injectStore();
         const { realmId } = storeToRefs(store);
 

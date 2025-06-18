@@ -7,6 +7,7 @@
 
 import { AnalysisNodeRunStatus } from '@privateaim/core-kit';
 import type { Analysis, AnalysisNodeLog, Node } from '@privateaim/core-kit';
+import { LogLevel } from '@privateaim/kit';
 import {
     createTestSuite,
     expectPropertiesEqualToSrc, removeDateProperties,
@@ -61,14 +62,16 @@ describe('controllers > analysis-node-log', () => {
             analysis_id: analysis!.id,
             node_id: node!.id,
             status: AnalysisNodeRunStatus.FAILED,
-            status_message: 'Analysis has been forcefully terminated.',
+            level: LogLevel.ERROR,
+            message: 'Analysis has been forcefully terminated.',
         });
 
         delete analysisNodeLog.analysis;
         delete analysisNodeLog.node;
 
         expect(analysisNodeLog.status).toEqual(AnalysisNodeRunStatus.FAILED);
-        expect(analysisNodeLog.status_message).toEqual('Analysis has been forcefully terminated.');
+        expect(analysisNodeLog.level).toEqual(LogLevel.ERROR);
+        expect(analysisNodeLog.message).toEqual('Analysis has been forcefully terminated.');
 
         details = removeDateProperties(analysisNodeLog);
     });

@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { LogLevel } from '@privateaim/kit';
 import { Container } from 'validup';
 import { createValidationChain, createValidator } from '@validup/adapter-validator';
 import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
@@ -41,7 +42,8 @@ export class AnalysisNodeLogValidator extends Container<AnalysisNodeLogEntity> {
         const statusValidator = createValidator(() => {
             const chain = createValidationChain();
             return chain
-                .isString();
+                .isString()
+                .isLength({ min: 3, max: 64 });
         });
         this.mount(
             'status',
@@ -55,13 +57,36 @@ export class AnalysisNodeLogValidator extends Container<AnalysisNodeLogEntity> {
         );
 
         this.mount(
-            'status_message',
+            'message',
             { optional: true },
             createValidator(() => {
                 const chain = createValidationChain();
                 return chain
                     .optional({ nullable: true })
                     .isString();
+            }),
+        );
+
+        this.mount(
+            'code',
+            { optional: true },
+            createValidator(() => {
+                const chain = createValidationChain();
+                return chain
+                    .optional({ nullable: true })
+                    .isString()
+                    .isLength({ min: 3, max: 64 });
+            }),
+        );
+
+        this.mount(
+            'level',
+            { optional: true },
+            createValidator(() => {
+                const chain = createValidationChain();
+                return chain
+                    .optional({ nullable: true })
+                    .isIn(Object.values(LogLevel));
             }),
         );
     }
