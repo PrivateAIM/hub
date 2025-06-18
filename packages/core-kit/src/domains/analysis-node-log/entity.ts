@@ -6,6 +6,7 @@
  */
 
 import type { Realm } from '@authup/core-kit';
+import type { LogLevel } from '@privateaim/kit';
 import type {
     Analysis,
 } from '../analysis';
@@ -15,14 +16,9 @@ export interface AnalysisNodeLog {
     id: string;
 
     /**
-     * is it an error log?
+     * e.g: entrypointNotFound, ...
      */
-    error: boolean;
-
-    /**
-     * e.g: trainNotBuild, entrypointNotFound, ...
-     */
-    error_code: string | null;
+    code: string | null;
 
     /**
      * e.g. started, finished, failed, ...
@@ -30,9 +26,11 @@ export interface AnalysisNodeLog {
     status: string | null;
 
     /**
-     * e.g: error_message
+     * unix log level
      */
-    status_message: string | null;
+    level: `${LogLevel}`;
+
+    message: string | null;
 
     // ------------------------------------------------------------------
 

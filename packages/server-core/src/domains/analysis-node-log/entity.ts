@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { LogLevel } from '@privateaim/kit';
 import {
     Column,
     CreateDateColumn,
@@ -28,11 +29,9 @@ export class AnalysisNodeLogEntity implements AnalysisNodeLog {
     @PrimaryGeneratedColumn('uuid')
         id: string;
 
-    @Column({ type: 'boolean', default: false })
-        error: boolean;
-
+    @Index()
     @Column({ type: 'varchar', length: 64, nullable: true })
-        error_code: string | null;
+        code: string | null;
 
     @Index()
     @Column({
@@ -41,7 +40,13 @@ export class AnalysisNodeLogEntity implements AnalysisNodeLog {
         status: string | null;
 
     @Column({ type: 'text', nullable: true })
-        status_message: string | null;
+        message: string | null;
+
+    @Index()
+    @Column({
+        type: 'varchar', length: 64, default: 'warn',
+    })
+        level: `${LogLevel}`;
 
     // ------------------------------------------------------------------
 

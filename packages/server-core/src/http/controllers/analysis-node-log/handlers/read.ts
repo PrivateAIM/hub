@@ -48,7 +48,8 @@ export async function getManyAnalysisLogRouteHandler(req: Request, res: Response
         defaultAlias: 'log',
         filters: {
             allowed: [
-                'error',
+                'level',
+                'code',
                 'status',
                 'analysis_id',
                 'node_id',
