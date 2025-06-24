@@ -39,9 +39,6 @@ export default defineComponent({
             filters: {
                 analysis_id: entity.value.id,
             },
-            sort: {
-                index: 'ASC',
-            },
         };
 
         const progressPercentage = computed(() => {
