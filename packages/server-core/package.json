@@ -64,7 +64,7 @@
         "@types/node-cron": "^3.0.11",
         "@types/supertest": "^6.0.3",
         "@types/yargs": "^17.0.32",
-        "better-sqlite3": "^11.10.0",
+        "better-sqlite3": "^12.1.0",
         "cross-env": "^7.0.3",
         "supertest": "^7.1.1",
         "ts-node": "^10.9.2"
