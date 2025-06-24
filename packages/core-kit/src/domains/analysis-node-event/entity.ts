@@ -8,28 +8,11 @@
 import type { Realm } from '@authup/core-kit';
 import type { Node } from '../node';
 import type { Analysis } from '../analysis';
-import type { AnalysisNodeApprovalStatus, AnalysisNodeRunStatus } from './constants';
 
-export interface AnalysisNode {
+export interface AnalysisNodeEvent {
     id: string;
 
-    // ------------------------------------------------------------------
-
-    approval_status: AnalysisNodeApprovalStatus | null;
-
-    // ------------------------------------------------------------------
-
-    run_status: AnalysisNodeRunStatus | null;
-
-    // ------------------------------------------------------------------
-
-    comment: string;
-
-    // ------------------------------------------------------------------
-
-    artifact_tag: string | null;
-
-    artifact_digest: string | null;
+    status: string;
 
     // ------------------------------------------------------------------
 

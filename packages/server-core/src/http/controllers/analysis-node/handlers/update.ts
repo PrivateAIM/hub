@@ -13,7 +13,7 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { HTTPHandlerOperation, useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
-import { AnalysisNodeEntity } from '../../../../domains';
+import { AnalysisNodeEntity, AnalysisNodeEventEntity } from '../../../../domains';
 import { AnalysisNodeValidator } from '../utils';
 
 export async function updateAnalysisNodeRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -91,17 +91,23 @@ export async function updateAnalysisNodeRouteHandler(req: Request, res: Response
         }
     }
 
-    if (!isAuthorityOfAnalysis || !canUpdate) {
-        if (data.index) {
-            throw new BadRequestError(
-                'You are either no authority of the analysis or you don\'t have the required permissions.',
-            );
+    entity = await dataSource.transaction(async (entityManager) => {
+        if (
+            entity.run_status !== data.run_status &&
+            data.run_status
+        ) {
+            const analysisNodeEventRepository = entityManager.getRepository(AnalysisNodeEventEntity);
+            await analysisNodeEventRepository.save({
+                status: entity.run_status,
+                analysis_id: entity.analysis_id,
+                node_id: entity.node_id,
+            });
         }
-    }
 
-    entity = repository.merge(entity, data);
-
-    entity = await repository.save(entity);
+        const repository = entityManager.getRepository(AnalysisNodeEntity);
+        entity = repository.merge(entity, data);
+        return repository.save(entity);
+    });
 
     return sendAccepted(res, entity);
 }

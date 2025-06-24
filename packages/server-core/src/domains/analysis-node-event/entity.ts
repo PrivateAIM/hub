@@ -8,51 +8,31 @@
 import {
     Column,
     CreateDateColumn,
-    Entity,
+    Entity, Index,
     JoinColumn,
     ManyToOne,
     PrimaryGeneratedColumn,
-    Unique,
     UpdateDateColumn,
 } from 'typeorm';
 import type {
     Analysis,
-    AnalysisNode,
-    AnalysisNodeApprovalStatus,
-    AnalysisNodeRunStatus,
+    AnalysisNodeEvent,
     Node,
 } from '@privateaim/core-kit';
 import type { Realm } from '@authup/core-kit';
 import { AnalysisEntity } from '../analysis';
 import { NodeEntity } from '../node';
 
-@Unique(['node_id', 'analysis_id'])
-@Entity({ name: 'analysis_nodes' })
-export class AnalysisNodeEntity implements AnalysisNode {
+@Entity({ name: 'analysis_node_logs' })
+export class AnalysisNodeEventEntity implements AnalysisNodeEvent {
     @PrimaryGeneratedColumn('uuid')
         id: string;
 
-    // ------------------------------------------------------------------
-
-    @Column({ default: null })
-        approval_status: AnalysisNodeApprovalStatus | null;
-
-    @Column({ type: 'varchar', nullable: true, default: null })
-        run_status: AnalysisNodeRunStatus | null;
-
-    // ------------------------------------------------------------------
-
-    @Column({ type: 'text', nullable: true })
-        comment: string;
-
-    @Column({ type: 'int', unsigned: true, nullable: true })
-        index: number;
-
-    @Column({ type: 'varchar', length: 32, nullable: true })
-        artifact_tag: string | null;
-
-    @Column({ type: 'varchar', length: 512, nullable: true })
-        artifact_digest: string | null;
+    @Index()
+    @Column({
+        type: 'varchar', length: 64,
+    })
+        status: string;
 
     // ------------------------------------------------------------------
 
@@ -64,22 +44,24 @@ export class AnalysisNodeEntity implements AnalysisNode {
 
     // ------------------------------------------------------------------
 
-    @Column()
-        analysis_id: Analysis['id'];
-
     @ManyToOne(() => AnalysisEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'analysis_id' })
         analysis: AnalysisEntity;
 
+    @Column()
+        analysis_id: Analysis['id'];
+
     @Column({ type: 'uuid' })
         analysis_realm_id: Realm['id'];
 
-    @Column()
-        node_id: Node['id'];
+    // ------------------------------------------------------------------
 
     @ManyToOne(() => NodeEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'node_id' })
         node: NodeEntity;
+
+    @Column()
+        node_id: Node['id'];
 
     @Column({ type: 'uuid' })
         node_realm_id: Realm['id'];
