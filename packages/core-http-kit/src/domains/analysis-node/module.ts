@@ -11,7 +11,7 @@ import type { AnalysisNode } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
 
-export class TrainStationAPI extends BaseAPI {
+export class AnalysisNodeAPI extends BaseAPI {
     async getMany(options?: BuildInput<AnalysisNode>): Promise<CollectionResourceResponse<AnalysisNode>> {
         const { data: response } = await this.client.get(`analysis-nodes${buildQuery(options)}`);
         return response;

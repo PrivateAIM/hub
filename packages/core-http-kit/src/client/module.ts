@@ -10,7 +10,8 @@ import { Client as BaseClient, HookName, isClientError } from 'hapic';
 import {
     AnalysisAPI,
     AnalysisBucketFileAPI,
-    AnalysisLogAPI,
+    AnalysisLogAPI, AnalysisNodeAPI,
+    AnalysisNodeEventAPI,
     AnalysisNodeLogAPI,
     AnalysisPermissionAPI,
     MasterImageAPI,
@@ -22,7 +23,6 @@ import {
     RegistryAPI,
     RegistryProjectAPI,
     ServiceAPI,
-    TrainStationAPI,
 } from '../domains';
 import { AnalysisBucketAPI } from '../domains/analysis-bucket';
 
@@ -51,7 +51,9 @@ export class Client extends BaseClient {
 
     public readonly analysisLog: AnalysisLogAPI;
 
-    public readonly analysisNode : TrainStationAPI;
+    public readonly analysisNode : AnalysisNodeAPI;
+
+    public readonly analysisNodeEvent: AnalysisNodeEventAPI;
 
     public readonly analysisNodeLog: AnalysisNodeLogAPI;
 
@@ -74,7 +76,8 @@ export class Client extends BaseClient {
         this.analysisBucket = new AnalysisBucketAPI({ client: this });
         this.analysisBucketFile = new AnalysisBucketFileAPI({ client: this });
         this.analysisLog = new AnalysisLogAPI({ client: this });
-        this.analysisNode = new TrainStationAPI({ client: this });
+        this.analysisNode = new AnalysisNodeAPI({ client: this });
+        this.analysisNodeEvent = new AnalysisNodeEventAPI({ client: this });
         this.analysisNodeLog = new AnalysisNodeLogAPI({ client: this });
         this.analysisPermission = new AnalysisPermissionAPI({ client: this });
         this.service = new ServiceAPI({ client: this });
