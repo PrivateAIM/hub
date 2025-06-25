@@ -11,7 +11,7 @@ import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
-import { AnalysisEntity, AnalysisNodeEntity } from '../../../../domains';
+import { AnalysisEntity, AnalysisNodeEntity, AnalysisNodeEventEntity } from '../../../../domains';
 
 export async function deleteAnalysisNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -47,10 +47,18 @@ export async function deleteAnalysisNodeRouteHandler(req: Request, res: Response
         await analysisRepository.createQueryBuilder()
             .update()
             .where({
-                id: entity.analysis.id,
+                id: entity.analysis_id,
             })
             .set({
                 nodes: () => '`nodes` - 1',
+            })
+            .execute();
+
+        const analysisNodeEventRepository = entityManager.getRepository(AnalysisNodeEventEntity);
+        await analysisNodeEventRepository.createQueryBuilder()
+            .delete()
+            .where({
+                id: entity.analysis_id,
             })
             .execute();
 
