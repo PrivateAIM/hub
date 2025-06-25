@@ -27,9 +27,12 @@ import {
 import { DatabaseQueryResultCache } from '../cache';
 import {
     AnalysisFileSubscriber,
-    AnalysisLogSubscriber, AnalysisNodeLogSubscriber,
+    AnalysisLogSubscriber,
+    AnalysisNodeEventSubscriber,
+    AnalysisNodeLogSubscriber,
     AnalysisNodeSubscriber,
-    AnalysisSubscriber, MasterImageEventLogSubscriber,
+    AnalysisSubscriber,
+    MasterImageEventLogSubscriber,
     MasterImageGroupSubscriber,
     MasterImageSubscriber,
     NodeSubscriber,
@@ -70,6 +73,7 @@ export async function extendDataSourceOptions(options: DataSourceOptions) : Prom
             AnalysisFileSubscriber,
             AnalysisLogSubscriber,
             AnalysisNodeSubscriber,
+            AnalysisNodeEventSubscriber,
             AnalysisNodeLogSubscriber,
             MasterImageSubscriber,
             MasterImageEventLogSubscriber,
