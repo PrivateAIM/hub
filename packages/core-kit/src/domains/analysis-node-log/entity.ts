@@ -30,6 +30,9 @@ export interface AnalysisNodeLog {
      */
     level: `${LogLevel}`;
 
+    /**
+     * message
+     */
     message: string | null;
 
     // ------------------------------------------------------------------

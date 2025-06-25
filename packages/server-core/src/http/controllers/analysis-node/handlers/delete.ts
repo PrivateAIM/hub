@@ -9,10 +9,9 @@ import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { PermissionName, isRealmResourceWritable } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
-import { MoreThan } from 'typeorm';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
-import { AnalysisEntity, AnalysisNodeEntity } from '../../../../domains';
+import { AnalysisEntity, AnalysisNodeEntity, AnalysisNodeEventEntity } from '../../../../domains';
 
 export async function deleteAnalysisNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -41,34 +40,33 @@ export async function deleteAnalysisNodeRouteHandler(req: Request, res: Response
         throw new ForbiddenError();
     }
 
-    const { id: entityId } = entity;
+    await dataSource.transaction(async (entityManager) => {
+        const { id: entityId } = entity;
 
-    await repository.remove(entity);
+        const analysisRepository = entityManager.getRepository(AnalysisEntity);
+        await analysisRepository.createQueryBuilder()
+            .update()
+            .where({
+                id: entity.analysis_id,
+            })
+            .set({
+                nodes: () => '`nodes` - 1',
+            })
+            .execute();
 
-    entity.id = entityId;
+        const analysisNodeEventRepository = entityManager.getRepository(AnalysisNodeEventEntity);
+        await analysisNodeEventRepository.createQueryBuilder()
+            .delete()
+            .where({
+                id: entity.analysis_id,
+            })
+            .execute();
 
-    // -------------------------------------------
+        const repository = entityManager.getRepository(AnalysisNodeEntity);
+        await repository.remove(entity);
 
-    await repository.createQueryBuilder()
-        .update()
-        .where({
-            index: MoreThan(entity.index),
-            analysis_id: entity.analysis_id,
-        })
-        .set({
-            index: () => '`index` - 1',
-        })
-        .execute();
-
-    // -------------------------------------------
-
-    const analysisRepository = dataSource.getRepository(AnalysisEntity);
-    const analysis = await analysisRepository.findOneBy({ id: entity.analysis_id });
-
-    analysis.nodes -= 1;
-    await analysisRepository.save(analysis);
-
-    entity.analysis = analysis;
+        entity.id = entityId;
+    });
 
     // -------------------------------------------
 

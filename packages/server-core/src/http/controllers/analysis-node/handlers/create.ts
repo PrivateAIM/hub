@@ -14,7 +14,9 @@ import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
 import { HTTPHandlerOperation, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { useEnv } from '../../../../config';
-import { AnalysisEntity, AnalysisNodeEntity, ProjectNodeEntity } from '../../../../domains';
+import {
+    AnalysisEntity, AnalysisNodeEntity, AnalysisNodeEventEntity, ProjectNodeEntity,
+} from '../../../../domains';
 import { AnalysisNodeValidator } from '../utils';
 
 export async function createAnalysisNodeRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -56,22 +58,35 @@ export async function createAnalysisNodeRouteHandler(req: Request, res: Response
 
     if (
         useEnv('skipAnalysisApproval') ||
-        data.node.type === NodeType.AGGREGATOR
+        entity.node.type === NodeType.AGGREGATOR
     ) {
         entity.approval_status = AnalysisNodeApprovalStatus.APPROVED;
     }
 
-    if (!entity.index) {
-        entity.index = await repository.countBy({
-            analysis_id: entity.analysis_id,
-        });
-    }
+    entity = await dataSource.transaction(async (entityManager) => {
+        if (entity.run_status) {
+            const analysisNodeEventRepository = entityManager.getRepository(AnalysisNodeEventEntity);
+            await analysisNodeEventRepository.save({
+                status: entity.run_status,
+                analysis_id: entity.analysis_id,
+                node_id: entity.node_id,
+            });
+        }
 
-    entity = await repository.save(entity);
+        const analysisRepository = entityManager.getRepository(AnalysisEntity);
+        await analysisRepository.createQueryBuilder()
+            .update()
+            .where({
+                id: entity.analysis.id,
+            })
+            .set({
+                nodes: () => '`nodes` + 1',
+            })
+            .execute();
 
-    data.analysis.nodes += 1;
-    const analysisRepository = dataSource.getRepository(AnalysisEntity);
-    await analysisRepository.save(data.analysis);
+        const repository = entityManager.getRepository(AnalysisNodeEntity);
+        return repository.save(entity);
+    });
 
     return sendCreated(res, entity);
 }

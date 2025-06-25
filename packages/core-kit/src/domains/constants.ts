@@ -19,6 +19,7 @@ export enum DomainType {
     ANALYSIS_BUCKET_FILE = 'analysisBucketFile',
     ANALYSIS_LOG = 'analysisLog',
     ANALYSIS_NODE = 'analysisNode',
+    ANALYSIS_NODE_EVENT = 'analysisNodeEvent',
     ANALYSIS_NODE_LOG = 'analysisNodeLog',
     ANALYSIS_PERMISSION = 'analysisPermission',
 }

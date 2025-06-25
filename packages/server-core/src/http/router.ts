@@ -35,6 +35,7 @@ import { RegistryController } from './controllers/registry';
 import { RegistryProjectController } from './controllers/registry-project';
 import { RootController } from './controllers/root';
 import { ServiceController } from './controllers/service';
+import { AnalysisNodeEventController } from './controllers/analysis-node-event';
 
 export function createRouter() : Router {
     const router = new Router();
@@ -84,6 +85,7 @@ export function createRouter() : Router {
                 AnalysisBucketFileController,
                 AnalysisLogController,
                 AnalysisNodeController,
+                AnalysisNodeEventController,
                 AnalysisNodeLogController,
                 AnalysisPermissionController,
 

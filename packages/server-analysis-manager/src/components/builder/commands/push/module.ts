@@ -45,9 +45,6 @@ export async function executePushCommand(
         filter: {
             analysis_id: data.entity.id,
         },
-        sort: {
-            index: 'ASC',
-        },
     });
 
     if (analysisNodes.length === 0) {
