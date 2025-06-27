@@ -39,7 +39,7 @@
         "gunzip-maybe": "^1.4.2",
         "hapic": "^2.7.0",
         "routup": "^4.0.2",
-        "rapiq": "^0.9.0",
+        "rapiq": "^1.0.0",
         "redis-extension": "^2.0.2",
         "singa": "^1.0.0",
         "tar": "^7.4.3",
