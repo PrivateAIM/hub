@@ -10,6 +10,7 @@ export * from './authup';
 export * from './authup-client-authentication-hook';
 export * from './cache';
 export * from './domain-event';
+export * from './loki';
 export * from './logger';
 export * from './redis';
 export * from './vault';
