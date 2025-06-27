@@ -6,25 +6,31 @@
  */
 
 import {
-    AnalysisNode,
     AnalysisNodeLog,
 } from '@privateaim/core-kit';
 
 import {
     DBody,
-    DController, DDelete, DGet, DPath, DPost, DRequest, DResponse, DTags,
+    DController, DDelete, DGet, DPost, DRequest, DResponse, DTags,
 } from '@routup/decorators';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import {
     createAnalysisNodeLogRouteHandler,
     deleteAnalysisNodeLogRouteHandler,
-    getManyAnalysisLogRouteHandler,
-    getOneAnalysisNodeLogRouteHandler,
-    updateAnalysisNodeLogRouteHandler,
+    getManyAnalysisNodeLogRouteHandler,
 } from './handlers';
 
 type PartialAnalysisLog = Partial<AnalysisNodeLog>;
 
+/**
+ * /analysis-node/<analysisNodeId>/logs POST
+ * /analysis-node/<analysisNodeId>/logs GET
+ * /analysis-node/<analysisNodeId>/logs DELETE
+ *
+ * /analysis-node-logs POST
+ * /analysis-node-logs/?filters[analysis_id]=xxx&filters[node_id]=xxx GET
+ * /analysis-node-logs/?filters[analysis_id]=xxx&filters[node_id]=xxx DELETE
+ */
 @DTags('analysis')
 @DController('/analysis-node-logs')
 export class AnalysisNodeLogController {
@@ -32,27 +38,8 @@ export class AnalysisNodeLogController {
     async getMany(
         @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<PartialAnalysisLog[]> {
-        return await getManyAnalysisLogRouteHandler(req, res) as PartialAnalysisLog[];
-    }
-
-    @DGet('/:id', [ForceLoggedInMiddleware])
-    async getOne(
-        @DPath('id') id: string,
-            @DRequest() req: any,
-            @DResponse() res: any,
     ): Promise<PartialAnalysisLog | undefined> {
-        return await getOneAnalysisNodeLogRouteHandler(req, res) as PartialAnalysisLog | undefined;
-    }
-
-    @DPost('/:id', [ForceLoggedInMiddleware])
-    async edit(
-        @DPath('id') id: string,
-            @DBody() data: AnalysisNode,
-            @DRequest() req: any,
-            @DResponse() res: any,
-    ): Promise<PartialAnalysisLog | undefined> {
-        return await updateAnalysisNodeLogRouteHandler(req, res) as PartialAnalysisLog | undefined;
+        return await getManyAnalysisNodeLogRouteHandler(req, res) as PartialAnalysisLog | undefined;
     }
 
     @DPost('', [ForceLoggedInMiddleware])
@@ -64,10 +51,9 @@ export class AnalysisNodeLogController {
         return await createAnalysisNodeLogRouteHandler(req, res) as PartialAnalysisLog | undefined;
     }
 
-    @DDelete('/:id', [ForceLoggedInMiddleware])
+    @DDelete('', [ForceLoggedInMiddleware])
     async drop(
-        @DPath('id') id: string,
-            @DRequest() req: any,
+        @DRequest() req: any,
             @DResponse() res: any,
     ): Promise<PartialAnalysisLog | undefined> {
         return await deleteAnalysisNodeLogRouteHandler(req, res) as PartialAnalysisLog | undefined;
