@@ -20,25 +20,25 @@
         "@ebec/http": "^2.3.0",
         "@privateaim/kit": "^0.8.13",
         "@privateaim/server-kit": "^0.8.13",
-        "@routup/basic": "^1.4.1",
-        "@routup/decorators": "^3.4.1",
-        "@routup/prometheus": "^2.4.0",
-        "@routup/rate-limit": "^2.4.0",
-        "@routup/swagger": "^2.4.1",
+        "@routup/basic": "^1.4.2",
+        "@routup/decorators": "^3.4.2",
+        "@routup/prometheus": "^2.4.1",
+        "@routup/rate-limit": "^2.4.1",
+        "@routup/swagger": "^2.4.2",
         "cors": "^2.8.5",
-        "hapic": "^2.6.0",
+        "hapic": "^2.7.0",
         "locter": "^2.1.6",
         "validup": "^0.1.8"
     },
     "devDependencies": {
         "@types/cors": "^2.8.19",
         "redis-extension": "^2.0.2",
-        "routup": "^4.0.1",
+        "routup": "^4.0.2",
         "typeorm-extension": "^3.7.1"
     },
     "peerDependencies": {
         "redis-extension": "^2.0.2",
-        "routup": "^4.0.1",
+        "routup": "^4.0.2",
         "typeorm-extension": "^3.7.1"
     },
     "scripts": {
