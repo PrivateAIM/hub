@@ -16,14 +16,13 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 import type {
-    Analysis, AnalysisNode,
+    Analysis,
     AnalysisNodeLog,
     Node,
 } from '@privateaim/core-kit';
 import type { Realm } from '@authup/core-kit';
 import { AnalysisEntity } from '../analysis';
 import { NodeEntity } from '../node';
-import { AnalysisNodeEntity } from '../anaylsis-node';
 
 @Entity({ name: 'analysis_node_logs' })
 export class AnalysisNodeLogEntity implements AnalysisNodeLog {
@@ -56,15 +55,6 @@ export class AnalysisNodeLogEntity implements AnalysisNodeLog {
 
     @UpdateDateColumn()
         updated_at: Date;
-
-    // ------------------------------------------------------------------
-
-    @ManyToOne(() => AnalysisNodeEntity, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'analysis_node_id' })
-        analysis_node: AnalysisNodeEntity;
-
-    @Column()
-        analysis_node_id: AnalysisNode['id'];
 
     // ------------------------------------------------------------------
 
