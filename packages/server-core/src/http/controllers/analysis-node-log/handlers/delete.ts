@@ -8,11 +8,15 @@
 import { BadRequestError } from '@ebec/http';
 import type { Request, Response } from 'routup';
 import { sendAccepted } from 'routup';
-import { useDataSource } from 'typeorm-extension';
 import { type FiltersParseOutputElement, parseQueryFilters } from 'rapiq';
 import { useRequestQuery } from '@routup/basic/query';
 import type { AnalysisNodeLog } from '@privateaim/core-kit';
-import { type LokiQuerierQueryRangeOptions, isLokiClientUsable, useLokiClient } from '@privateaim/server-kit';
+import {
+    type LokiCompactorDeletionRequestCreate,
+    isLokiClientUsable,
+    useLokiClient,
+} from '@privateaim/server-kit';
+import { useDataSource } from 'typeorm-extension';
 import { AnalysisNodeLogEntity } from '../../../../domains';
 import { buildLokiLabelsForAnalysisNodeLog, buildLokiQueryForLabels } from '../../../../domains/analysis-node-log/loki';
 
@@ -46,11 +50,12 @@ export async function deleteAnalysisNodeLogRouteHandler(req: Request, res: Respo
             node_id: filters.node_id.value as string,
         });
 
-        const options : LokiQuerierQueryRangeOptions = {
+        const options : LokiCompactorDeletionRequestCreate = {
+            start: Math.floor(Date.now() / 1000) - (60 * 60 * 24 * 31 * 12 * 10),
             query: buildLokiQueryForLabels(labels),
         };
 
-        // todo: pass to delete clietn api method
+        await client.compactor.createDeletionRequest(options);
     } else {
         const dataSource = await useDataSource();
         const repository = dataSource.getRepository(AnalysisNodeLogEntity);
