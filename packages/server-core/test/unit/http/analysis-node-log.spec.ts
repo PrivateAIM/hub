@@ -10,7 +10,7 @@ import type { Analysis, AnalysisNodeLog, Node } from '@privateaim/core-kit';
 import { LogLevel } from '@privateaim/kit';
 import {
     createTestSuite,
-    expectPropertiesEqualToSrc, removeDateProperties,
+    removeDateProperties,
 } from '../../utils';
 import {
     createTestNode,
@@ -79,20 +79,23 @@ describe('controllers > analysis-node-log', () => {
     it('should read collection', async () => {
         const client = suite.client();
 
-        const { data } = await client.analysisNodeLog.getMany();
+        const { data } = await client.analysisNodeLog.getMany({
+            filters: {
+                node_id: details.node_id,
+                analysis_id: details.analysis_id,
+            },
+        });
         expect(data.length).toBeGreaterThanOrEqual(1);
-    });
-
-    it('should read resource', async () => {
-        const client = suite.client();
-
-        const data = await client.analysisNodeLog.getOne(details.id);
-        expectPropertiesEqualToSrc(details, data);
     });
 
     it('should delete resource', async () => {
         const client = suite.client();
 
-        await client.analysisNodeLog.delete(details.id);
+        await client.analysisNodeLog.delete({
+            filters: {
+                node_id: details.node_id,
+                analysis_id: details.analysis_id,
+            },
+        });
     });
 });

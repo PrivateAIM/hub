@@ -12,32 +12,17 @@ import { BaseAPI } from '../base';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
 
 export class AnalysisNodeLogAPI extends BaseAPI {
-    async getMany(options?: BuildInput<AnalysisNodeLog>): Promise<CollectionResourceResponse<AnalysisNodeLog>> {
+    async getMany(options: BuildInput<AnalysisNodeLog> = {}): Promise<CollectionResourceResponse<AnalysisNodeLog>> {
         const { data: response } = await this.client.get(`analysis-node-logs${buildQuery(options)}`);
         return response;
     }
 
-    async getOne(id: AnalysisNodeLog['id']): Promise<SingleResourceResponse<AnalysisNodeLog>> {
-        const { data: response } = await this.client.get(`analysis-node-logs/${id}`);
-
-        return response;
-    }
-
-    async delete(id: AnalysisNodeLog['id']): Promise<SingleResourceResponse<AnalysisNodeLog>> {
-        const { data: response } = await this.client.delete(`analysis-node-logs/${id}`);
-
-        return response;
-    }
-
-    async update(id: AnalysisNodeLog['id'], data: Partial<AnalysisNodeLog>): Promise<SingleResourceResponse<AnalysisNodeLog>> {
-        const { data: response } = await this.client.post(`analysis-node-logs/${id}`, data);
-
-        return response;
+    async delete(options: BuildInput<AnalysisNodeLog> = {}): Promise<void> {
+        await this.client.delete(`analysis-node-logs${buildQuery(options)}`);
     }
 
     async create(data: Partial<AnalysisNodeLog>): Promise<SingleResourceResponse<AnalysisNodeLog>> {
         const { data: response } = await this.client.post('analysis-node-logs', data);
-
         return response;
     }
 }

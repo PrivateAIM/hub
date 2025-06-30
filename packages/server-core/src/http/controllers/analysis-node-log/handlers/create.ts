@@ -8,7 +8,7 @@
 import { isRealmResourceWritable } from '@privateaim/kit';
 import { ForbiddenError } from '@ebec/http';
 import type { Request, Response } from 'routup';
-import { sendAccepted } from 'routup';
+import { send } from 'routup';
 import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
 import { HTTPHandlerOperation, useRequestIdentityRealm } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
@@ -40,15 +40,18 @@ export async function createAnalysisNodeLogRouteHandler(req: Request, res: Respo
         throw new ForbiddenError('You are not an actor of to the node realm.');
     }
 
+    const repository = dataSource.getRepository(AnalysisNodeLogEntity);
+    let entity : AnalysisNodeLogEntity;
+
     if (isLokiClientUsable()) {
+        entity = repository.create(data);
         const client = useLokiClient();
 
         await client.distributor.push(transformAnalysisNodeLogToLokiStream(data));
     } else {
-        const repository = dataSource.getRepository(AnalysisNodeLogEntity);
-        const entity = repository.create(data);
+        entity = repository.create(data);
         return repository.save(entity);
     }
 
-    return sendAccepted(res);
+    return send(res, entity);
 }
