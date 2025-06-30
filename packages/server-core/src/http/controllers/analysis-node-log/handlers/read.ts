@@ -90,14 +90,14 @@ export async function getManyAnalysisNodeLogRouteHandler(req: Request, res: Resp
                 filters.created_at.operator === FilterComparisonOperator.LESS_THAN ||
                 filters.created_at.operator === FilterComparisonOperator.LESS_THAN_EQUAL
             ) {
-                options.end = (BigInt(new Date(`${filters.created_at.value}`).getTime()) * 1_000_000n).toString();
+                options.end = BigInt(new Date(`${filters.created_at.value}`).getTime()) * 1_000_000n;
             }
 
             if (
                 filters.created_at.operator === FilterComparisonOperator.GREATER_THAN ||
                 filters.created_at.operator === FilterComparisonOperator.GREATER_THAN_EQUAL
             ) {
-                options.start = (BigInt(new Date(`${filters.created_at.value}`).getTime()) * 1_000_000n).toString();
+                options.start = BigInt(new Date(`${filters.created_at.value}`).getTime()) * 1_000_000n;
             }
         }
 
