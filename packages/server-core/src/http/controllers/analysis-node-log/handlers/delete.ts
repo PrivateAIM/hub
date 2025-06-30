@@ -11,14 +11,8 @@ import { sendAccepted } from 'routup';
 import { type FiltersParseOutputElement, parseQueryFilters } from 'rapiq';
 import { useRequestQuery } from '@routup/basic/query';
 import type { AnalysisNodeLog } from '@privateaim/core-kit';
-import {
-    type LokiCompactorDeletionRequestCreate,
-    isLokiClientUsable,
-    useLokiClient,
-} from '@privateaim/server-kit';
-import { useDataSource } from 'typeorm-extension';
-import { AnalysisNodeLogEntity } from '../../../../domains';
-import { buildLokiLabelsForAnalysisNodeLog, buildLokiQueryForLabels } from '../../../../domains/analysis-node-log/loki';
+import type { AnalysisNodeLogEntity } from '../../../../domains';
+import { useAnalysisNodeLogStore } from '../../../../services';
 
 export async function deleteAnalysisNodeLogRouteHandler(req: Request, res: Response) : Promise<any> {
     const output = parseQueryFilters<AnalysisNodeLogEntity>(useRequestQuery(req, 'filter'), {
@@ -42,32 +36,12 @@ export async function deleteAnalysisNodeLogRouteHandler(req: Request, res: Respo
 
     // todo: check permissions
 
-    if (isLokiClientUsable()) {
-        const client = useLokiClient();
-
-        const labels = buildLokiLabelsForAnalysisNodeLog({
-            analysis_id: filters.analysis_id.value as string,
-            node_id: filters.node_id.value as string,
-        });
-
-        const options : LokiCompactorDeletionRequestCreate = {
-            start: Math.floor(Date.now() / 1000) - (60 * 60 * 24 * 31 * 12 * 10),
-            query: buildLokiQueryForLabels(labels),
-        };
-
-        await client.compactor.createDeletionRequest(options);
-    } else {
-        const dataSource = await useDataSource();
-        const repository = dataSource.getRepository(AnalysisNodeLogEntity);
-
-        await repository.createQueryBuilder()
-            .delete()
-            .where({
-                analysis_id: filters.analysis_id,
-                node_id: `${filters.node_id.value}`,
-            })
-            .execute();
-    }
+    const store = useAnalysisNodeLogStore();
+    await store.delete({
+        analysis_id: `${filters.analysis_id.value}`,
+        node_id: `${filters.node_id.value}`,
+        start: Math.floor(Date.now() / 1000) - (60 * 60 * 24 * 31 * 12 * 10),
+    });
 
     return sendAccepted(res);
 }
