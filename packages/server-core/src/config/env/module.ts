@@ -53,6 +53,7 @@ export function useEnv(key?: string) : any {
             read('VAULT_CONNECTION_STRING'),
         ]),
         harborURL: read('HARBOR_URL'),
+        lokiURL: read('LOKI_URL'),
 
         publicURL: read('PUBLIC_URL', `http://127.0.0.1:${port}/`),
         authupURL: read('AUTHUP_URL'),

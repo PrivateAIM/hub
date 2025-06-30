@@ -6,22 +6,20 @@
  */
 
 import { isRealmResourceWritable } from '@privateaim/kit';
-import { BadRequestError, ForbiddenError } from '@ebec/http';
-import { AnalysisNodeRunStatus } from '@privateaim/core-kit';
+import { ForbiddenError } from '@ebec/http';
 import type { Request, Response } from 'routup';
-import { sendCreated } from 'routup';
+import { send } from 'routup';
 import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
 import { HTTPHandlerOperation, useRequestIdentityRealm } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
+import { isLokiClientUsable, useLokiClient } from '@privateaim/server-kit';
 import {
-    AnalysisNodeEntity, AnalysisNodeLogEntity,
+    AnalysisNodeLogEntity,
 } from '../../../../domains';
 import { AnalysisNodeLogValidator } from '../utils';
+import { transformAnalysisNodeLogToLokiStream } from '../../../../domains/analysis-node-log/loki';
 
 export async function createAnalysisNodeLogRouteHandler(req: Request, res: Response) : Promise<any> {
-    // const permissionChecker = useRequestPermissionChecker(req);
-    // await permissionChecker.preCheck({ name: PermissionName.ANALYSIS_UPDATE });
-
     const validator = new AnalysisNodeLogValidator();
     const validatorAdapter = new RoutupContainerAdapter(validator);
     const data = await validatorAdapter.run(req, {
@@ -42,28 +40,18 @@ export async function createAnalysisNodeLogRouteHandler(req: Request, res: Respo
         throw new ForbiddenError('You are not an actor of to the node realm.');
     }
 
-    const entity = await dataSource.transaction(async (entityManager) => {
-        const analysisNodeRepository = entityManager.getRepository(AnalysisNodeEntity);
-        const analysisNode = await analysisNodeRepository.findOneBy({
-            analysis_id: data.analysis_id,
-            node_id: data.node_id,
-        });
+    const repository = dataSource.getRepository(AnalysisNodeLogEntity);
+    let entity : AnalysisNodeLogEntity;
 
-        if (analysisNode) {
-            const runStatus = Object.values(AnalysisNodeRunStatus) as string[];
-            if (runStatus.indexOf(data.status) !== -1) {
-                analysisNode.run_status = data.status as AnalysisNodeRunStatus;
+    if (isLokiClientUsable()) {
+        entity = repository.create(data);
+        const client = useLokiClient();
 
-                await analysisNodeRepository.save(analysisNode);
-            }
-        } else {
-            throw new BadRequestError('A relation between analysis and node must exist to create logs.');
-        }
-
-        const repository = entityManager.getRepository(AnalysisNodeLogEntity);
-        const entity = repository.create(data);
+        await client.distributor.push(transformAnalysisNodeLogToLokiStream(data));
+    } else {
+        entity = repository.create(data);
         return repository.save(entity);
-    });
+    }
 
-    return sendCreated(res, entity);
+    return send(res, entity);
 }

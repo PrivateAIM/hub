@@ -5,36 +5,69 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { NotFoundError } from '@ebec/http';
-import { PermissionName } from '@privateaim/kit';
+import { BadRequestError } from '@ebec/http';
 import type { Request, Response } from 'routup';
-import { sendAccepted, useRequestParam } from 'routup';
+import { sendAccepted } from 'routup';
+import { type FiltersParseOutputElement, parseQueryFilters } from 'rapiq';
+import { useRequestQuery } from '@routup/basic/query';
+import type { AnalysisNodeLog } from '@privateaim/core-kit';
+import {
+    type LokiCompactorDeletionRequestCreate,
+    isLokiClientUsable,
+    useLokiClient,
+} from '@privateaim/server-kit';
 import { useDataSource } from 'typeorm-extension';
-import { useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { AnalysisNodeLogEntity } from '../../../../domains';
+import { buildLokiLabelsForAnalysisNodeLog, buildLokiQueryForLabels } from '../../../../domains/analysis-node-log/loki';
 
 export async function deleteAnalysisNodeLogRouteHandler(req: Request, res: Response) : Promise<any> {
-    const id = useRequestParam(req, 'id');
+    const output = parseQueryFilters<AnalysisNodeLogEntity>(useRequestQuery(req, 'filter'), {
+        allowed: [
+            'analysis_id',
+            'node_id',
+        ],
+    });
 
-    const permissionChecker = useRequestPermissionChecker(req);
-    await permissionChecker.preCheck({ name: PermissionName.ANALYSIS_UPDATE });
+    const filters : Partial<Record<keyof AnalysisNodeLog, FiltersParseOutputElement>> = {};
 
-    const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(AnalysisNodeLogEntity);
-
-    const entity = await repository.findOneBy({ id });
-
-    if (!entity) {
-        throw new NotFoundError();
+    if (output) {
+        for (let i = 0; i < output.length; i++) {
+            filters[output[i].key as keyof AnalysisNodeLog] = output[i];
+        }
     }
 
-    const { id: entityId } = entity;
+    if (!filters.analysis_id || !filters.node_id) {
+        throw new BadRequestError('The filters node_id and analysis_id must be defined.');
+    }
 
-    await repository.remove(entity);
+    // todo: check permissions
 
-    entity.id = entityId;
+    if (isLokiClientUsable()) {
+        const client = useLokiClient();
 
-    // -------------------------------------------
+        const labels = buildLokiLabelsForAnalysisNodeLog({
+            analysis_id: filters.analysis_id.value as string,
+            node_id: filters.node_id.value as string,
+        });
 
-    return sendAccepted(res, entity);
+        const options : LokiCompactorDeletionRequestCreate = {
+            start: Math.floor(Date.now() / 1000) - (60 * 60 * 24 * 31 * 12 * 10),
+            query: buildLokiQueryForLabels(labels),
+        };
+
+        await client.compactor.createDeletionRequest(options);
+    } else {
+        const dataSource = await useDataSource();
+        const repository = dataSource.getRepository(AnalysisNodeLogEntity);
+
+        await repository.createQueryBuilder()
+            .delete()
+            .where({
+                analysis_id: filters.analysis_id,
+                node_id: `${filters.node_id.value}`,
+            })
+            .execute();
+    }
+
+    return sendAccepted(res);
 }

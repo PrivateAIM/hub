@@ -9,5 +9,6 @@ export * from './amqp';
 export * from './authup';
 export * from './authup-client-authentication-hook';
 export * from './logger';
+export * from './loki';
 export * from './redis';
 export * from './vault';
