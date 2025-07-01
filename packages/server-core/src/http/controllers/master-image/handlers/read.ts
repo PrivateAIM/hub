@@ -12,7 +12,7 @@ import { send, useRequestParam } from 'routup';
 import {
     applyQuery, useDataSource,
 } from 'typeorm-extension';
-import { MasterImageEntity } from '../../../../domains';
+import { MasterImageEntity } from '../../../../database/domains';
 
 export async function getOneMasterImageRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');

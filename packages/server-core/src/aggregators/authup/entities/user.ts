@@ -7,7 +7,7 @@
 import type { EntityType, EventRecord, User } from '@authup/core-kit';
 import { useDataSource } from 'typeorm-extension';
 import { useLogger } from '@privateaim/server-kit';
-import { AnalysisEntity, ProjectEntity } from '../../../domains';
+import { AnalysisEntity, ProjectEntity } from '../../../database/domains';
 
 export async function handleAuthupUserEvent(context: EventRecord<EntityType.USER, User>) {
     if (!context.data.id) {

@@ -13,7 +13,7 @@ import { useDataSource } from 'typeorm-extension';
 import { useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
 import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../../../components';
-import { RegistryProjectEntity } from '../../../../domains';
+import { RegistryProjectEntity } from '../../../../database/domains';
 
 export async function deleteRegistryProjectRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');

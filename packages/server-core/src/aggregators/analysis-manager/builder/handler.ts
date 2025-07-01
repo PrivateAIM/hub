@@ -20,8 +20,8 @@ import {
 } from '@privateaim/core-kit';
 import { isComponentError } from '@privateaim/server-kit';
 import { useDataSource } from 'typeorm-extension';
-import type { AnalysisLogSaveContext } from '../../../domains';
-import { AnalysisEntity, saveAnalysisLog } from '../../../domains';
+import type { AnalysisLogSaveContext } from '../../../database';
+import { AnalysisEntity, AnalysisLogEntity } from '../../../database';
 
 export async function handleAnalysisManagerBuilderBaseEvent(
     event: BuilderEvent,
@@ -100,5 +100,32 @@ export async function handleAnalysisManagerBuilderBaseEvent(
 
     await repository.save(entity);
 
-    await saveAnalysisLog(logCtx);
+    const analysisLogRepository = dataSource.getRepository(AnalysisLogEntity);
+
+    const analysisLog = analysisLogRepository.create({
+        analysis_id: logCtx.analysisId,
+        realm_id: logCtx.realmId,
+
+        component: logCtx.component,
+        command: logCtx.command,
+        event: logCtx.event,
+
+        error: logCtx.error,
+
+        status: logCtx.status,
+        status_message: logCtx.statusMessage,
+    });
+
+    if (logCtx.errorCode) {
+        analysisLog.error_code = logCtx.errorCode;
+        analysisLog.error = true;
+    }
+
+    // todo: previous station_run_id, station_run_index
+
+    const meta : Record<string, any> = {};
+
+    analysisLog.meta = JSON.stringify(meta);
+
+    await repository.save(entity);
 }

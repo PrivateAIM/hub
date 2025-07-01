@@ -18,7 +18,7 @@ import {
     buildDomainChannelName,
     buildDomainNamespaceName,
 } from '@privateaim/core-kit';
-import { MasterImageGroupEntity } from '../../domains';
+import { MasterImageGroupEntity } from '../domains';
 
 async function publishEvent(
     event: `${DomainEventName}`,

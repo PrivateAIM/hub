@@ -21,7 +21,7 @@ import {
     buildDomainChannelName,
     buildDomainNamespaceName,
 } from '@privateaim/core-kit';
-import { AnalysisBucketFileEntity } from '../../domains';
+import { AnalysisBucketFileEntity } from '../domains';
 
 async function publishEvent(
     event: `${DomainEventName}`,

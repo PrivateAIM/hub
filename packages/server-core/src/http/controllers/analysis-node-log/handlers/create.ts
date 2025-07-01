@@ -14,7 +14,7 @@ import { HTTPHandlerOperation, useRequestIdentityRealm } from '@privateaim/serve
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import {
     AnalysisNodeLogEntity,
-} from '../../../../domains';
+} from '../../../../database/domains';
 import { AnalysisNodeLogValidator } from '../utils';
 import { useAnalysisNodeLogStore } from '../../../../services';
 

@@ -16,7 +16,7 @@ import type { Permission } from '@authup/core-kit';
 import { isClientErrorWithStatusCode } from '@hapic/harbor';
 import { BadRequestError, ForbiddenError } from '@ebec/http';
 import { buildErrorMessageForAttributes } from 'validup';
-import { AnalysisPermissionEntity } from '../../../../domains';
+import { AnalysisPermissionEntity } from '../../../../database/domains';
 import { AnalysisPermissionValidator } from '../utils';
 
 export async function createAnalysisPermissionRouteHandler(req: Request, res: Response) : Promise<any> {

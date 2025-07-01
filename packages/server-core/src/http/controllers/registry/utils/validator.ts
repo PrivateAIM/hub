@@ -8,7 +8,7 @@
 import { Container } from 'validup';
 import { createValidationChain, createValidator } from '@validup/adapter-validator';
 import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
-import type { RegistryEntity } from '../../../../domains';
+import type { RegistryEntity } from '../../../../database/domains';
 
 export class RegistryValidator extends Container<RegistryEntity> {
     protected initialize() {

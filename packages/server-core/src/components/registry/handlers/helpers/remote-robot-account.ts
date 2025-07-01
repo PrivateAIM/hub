@@ -7,8 +7,8 @@
 
 import { RobotPermissionAction, RobotPermissionResource, isClientErrorWithStatusCode } from '@hapic/harbor';
 import type { HarborClient, Robot } from '@hapic/harbor';
-import type { RegistryProjectVaultPayload } from '../../../../domains';
-import { findRegistryProjectInVault, saveRegistryProjectToVault } from '../../../../domains';
+import type { RegistryProjectVaultPayload } from '../../../../database/domains';
+import { findRegistryProjectInVault, saveRegistryProjectToVault } from '../../../../database/domains';
 
 export async function ensureRemoteRegistryProjectAccount(
     httpClient: HarborClient,

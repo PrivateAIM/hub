@@ -7,7 +7,7 @@
 
 import type { DataSourceOptions } from 'typeorm';
 import { readDataSourceOptionsFromEnv } from 'typeorm-extension';
-import { EnvironmentName, useEnv } from '../../config';
+import { EnvironmentName, useEnv } from '../../../config';
 import { extendDataSourceOptions } from './extend';
 
 export async function buildDataSourceOptions() : Promise<DataSourceOptions> {

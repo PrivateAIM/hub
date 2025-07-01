@@ -9,7 +9,7 @@ import { NotFoundError } from '@ebec/http';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { AnalysisBucketEntity } from '../../../../domains';
+import { AnalysisBucketEntity } from '../../../../database/domains';
 
 export async function deleteAnalysisBucketRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');

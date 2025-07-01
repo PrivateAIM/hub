@@ -9,7 +9,7 @@ import { NodeType } from '@privateaim/core-kit';
 import { Container } from 'validup';
 import { createValidationChain, createValidator } from '@validup/adapter-validator';
 import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
-import type { NodeEntity } from '../../../../domains';
+import type { NodeEntity } from '../../../../database/domains';
 
 export class NodeValidator extends Container<NodeEntity> {
     protected initialize() {

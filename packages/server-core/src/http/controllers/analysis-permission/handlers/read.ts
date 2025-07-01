@@ -18,7 +18,7 @@ import { ForbiddenError, NotFoundError } from '@ebec/http';
 import type { Permission, Policy } from '@authup/core-kit';
 import { isRealmResourceReadable } from '@privateaim/kit';
 import { useRequestIdentityRealm } from '@privateaim/server-http-kit';
-import { AnalysisPermissionEntity, onlyRealmWritableQueryResources } from '../../../../domains';
+import { AnalysisPermissionEntity, onlyRealmWritableQueryResources } from '../../../../database/domains';
 
 type RelationMapKey = 'analysis' | 'permission' | 'policy';
 type RelationsMap = {

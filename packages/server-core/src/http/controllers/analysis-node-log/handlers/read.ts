@@ -11,7 +11,7 @@ import { send } from 'routup';
 import { FilterComparisonOperator, parseQuery } from 'rapiq';
 import type { AnalysisNodeLog } from '@privateaim/core-kit';
 import { BadRequestError } from '@ebec/http';
-import type { AnalysisNodeLogEntity } from '../../../../domains';
+import type { AnalysisNodeLogEntity } from '../../../../database/domains';
 import type { AnalysisNodeLogQueryOptions } from '../../../../services';
 import { useAnalysisNodeLogStore } from '../../../../services';
 

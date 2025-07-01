@@ -9,7 +9,7 @@ import { ProjectNodeApprovalStatus } from '@privateaim/core-kit';
 import { Container } from 'validup';
 import { createValidationChain, createValidator } from '@validup/adapter-validator';
 import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
-import type { ProjectNodeEntity } from '../../../../domains';
+import type { ProjectNodeEntity } from '../../../../database/domains';
 
 export class ProjectNodeValidator extends Container<ProjectNodeEntity> {
     protected initialize() {

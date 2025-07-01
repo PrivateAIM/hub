@@ -23,7 +23,7 @@ import { isNodeRobotServiceUsable, useNodeRobotService } from '../../../../servi
 import { NodeValidator } from '../utils';
 import {
     NodeEntity, RegistryEntity, RegistryProjectEntity,
-} from '../../../../domains';
+} from '../../../../database/domains';
 
 export async function createNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const permissionChecker = useRequestPermissionChecker(req);

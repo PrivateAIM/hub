@@ -9,7 +9,7 @@ import cron from 'node-cron';
 import type { Component } from '@privateaim/server-kit';
 import { LessThan } from 'typeorm';
 import { useDataSource } from 'typeorm-extension';
-import { MasterImageEventLogEntity } from '../../domains';
+import { MasterImageEventLogEntity } from '../../database/domains';
 
 export function createMasterImageLogCleanerComponent() : Component {
     return {

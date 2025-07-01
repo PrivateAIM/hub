@@ -18,7 +18,7 @@ import {
     buildDomainChannelName,
     buildDomainNamespaceName,
 } from '@privateaim/core-kit';
-import { RegistryEntity } from '../../domains';
+import { RegistryEntity } from '../domains';
 
 async function publishEvent(
     event: `${DomainEventName}`,

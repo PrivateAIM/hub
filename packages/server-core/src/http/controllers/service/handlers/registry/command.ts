@@ -23,7 +23,7 @@ import {
     RegistryCommand,
     buildRegistryTaskQueueRouterPayload,
 } from '../../../../../components';
-import { RegistryEntity, RegistryProjectEntity } from '../../../../../domains';
+import { RegistryEntity, RegistryProjectEntity } from '../../../../../database/domains';
 import { ServiceRegistryValidator } from '../../utils/validation';
 
 export async function handleRegistryCommandRouteHandler(req: Request, res: Response) : Promise<any> {

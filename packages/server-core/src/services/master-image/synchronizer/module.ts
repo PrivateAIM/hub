@@ -7,7 +7,7 @@
 
 import { useDataSource } from 'typeorm-extension';
 import type { MasterImageGroupSyncData, MasterImageSyncData } from '@privateaim/server-analysis-manager-kit';
-import { MasterImageEntity, MasterImageGroupEntity } from '../../../domains';
+import { MasterImageEntity, MasterImageGroupEntity } from '../../../database/domains';
 
 export type MasterImageSynchronizerExecuteContext = {
     images: MasterImageSyncData[],

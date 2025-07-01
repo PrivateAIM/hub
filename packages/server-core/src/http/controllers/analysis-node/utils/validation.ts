@@ -9,7 +9,7 @@ import { AnalysisNodeApprovalStatus, AnalysisNodeRunStatus } from '@privateaim/c
 import { Container } from 'validup';
 import { createValidationChain, createValidator } from '@validup/adapter-validator';
 import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
-import type { AnalysisNodeEntity } from '../../../../domains';
+import type { AnalysisNodeEntity } from '../../../../database/domains';
 
 export class AnalysisNodeValidator extends Container<AnalysisNodeEntity> {
     protected initialize() {

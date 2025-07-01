@@ -8,7 +8,7 @@
 import type { DataSource } from 'typeorm';
 import {
     AnalysisEntity, AnalysisNodeEntity, ProjectEntity, ProjectNodeEntity,
-} from '../../domains';
+} from '../../database/domains';
 
 export class DatabaseIntegrityService {
     protected dataSource : DataSource;

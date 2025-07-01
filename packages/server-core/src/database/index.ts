@@ -6,5 +6,6 @@
  */
 
 export * from './cache';
+export * from './data-source';
+export * from './domains';
 export * from './error';
-export * from './utils';

@@ -14,8 +14,8 @@ import {
 } from '@privateaim/core-kit';
 import { isAuthupClientUsable, useAuthupClient, useLogger } from '@privateaim/server-kit';
 import { useEnv } from '../../../../config';
-import { findRobotCredentialsInVault } from '../../../../domains';
 import { buildRegistryWebhookTarget } from '../utils';
+import { findRobotCredentialsInVault } from '../../../../domains';
 
 export async function saveRemoteRegistryProjectWebhook(
     httpClient: HarborClient,

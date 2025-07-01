@@ -7,7 +7,7 @@
 import { buildRegistryClientConnectionStringFromRegistry } from '@privateaim/core-kit';
 import { useDataSource } from 'typeorm-extension';
 import { useLogger } from '@privateaim/server-kit';
-import { RegistryEntity, RegistryProjectEntity } from '../../../../domains';
+import { RegistryEntity, RegistryProjectEntity } from '../../../../database/domains';
 import { RegistryCommand } from '../../constants';
 import type { RegistryProjectLinkPayload } from '../../type';
 import { ensureRemoteRegistryProject } from '../helpers/remote';

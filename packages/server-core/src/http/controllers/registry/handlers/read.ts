@@ -17,7 +17,7 @@ import { NotFoundError } from '@ebec/http';
 import type { ParseAllowedOption } from 'rapiq';
 import { parseQueryFields } from 'rapiq';
 import { useRequestPermissionChecker } from '@privateaim/server-http-kit';
-import { RegistryEntity } from '../../../../domains';
+import { RegistryEntity } from '../../../../database/domains';
 
 async function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>) {
     const protectedFields : ParseAllowedOption<RegistryEntity> = [

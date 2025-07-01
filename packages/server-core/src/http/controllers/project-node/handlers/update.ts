@@ -12,7 +12,7 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { HTTPHandlerOperation, useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
-import { ProjectNodeEntity } from '../../../../domains';
+import { ProjectNodeEntity } from '../../../../database/domains';
 import { ProjectNodeValidator } from '../utils';
 
 export async function updateProjectNodeRouteHandler(req: Request, res: Response) : Promise<any> {

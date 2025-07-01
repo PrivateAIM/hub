@@ -9,7 +9,7 @@ import type { AnalysisNodeLog } from '@privateaim/core-kit';
 import { useDataSource } from 'typeorm-extension';
 import type { SelectQueryBuilder } from 'typeorm';
 import type { AnalysisNodeLogDeleteOptions, AnalysisNodeLogQueryOptions, AnalysisNodeLogStore } from '../types';
-import { AnalysisNodeLogEntity } from '../../../domains';
+import { AnalysisNodeLogEntity } from '../../../database/domains';
 
 export class AnalysisNodeLogDatabaseStore implements AnalysisNodeLogStore {
     async write(event: AnalysisNodeLog): Promise<AnalysisNodeLog> {

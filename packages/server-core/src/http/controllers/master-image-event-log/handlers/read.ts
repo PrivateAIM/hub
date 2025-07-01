@@ -13,7 +13,7 @@ import {
     useDataSource,
 } from 'typeorm-extension';
 import { NotFoundError } from '@ebec/http';
-import { MasterImageEventLogEntity } from '../../../../domains';
+import { MasterImageEventLogEntity } from '../../../../database/domains';
 
 export async function getOneMasterImageEventLogRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');

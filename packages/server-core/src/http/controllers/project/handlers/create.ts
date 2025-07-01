@@ -18,7 +18,7 @@ import {
 } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { DatabaseConflictError } from '../../../../database';
-import { ProjectEntity } from '../../../../domains';
+import { ProjectEntity } from '../../../../database/domains';
 import { ProjectValidator } from '../utils/validator';
 
 export async function createProjectRouteHandler(req: Request, res: Response) : Promise<any> {

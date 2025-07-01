@@ -11,7 +11,7 @@ import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
-import { AnalysisEntity, AnalysisNodeEntity, AnalysisNodeEventEntity } from '../../../../domains';
+import { AnalysisEntity, AnalysisNodeEntity, AnalysisNodeEventEntity } from '../../../../database/domains';
 
 export async function deleteAnalysisNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');

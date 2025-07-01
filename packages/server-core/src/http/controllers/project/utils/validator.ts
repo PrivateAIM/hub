@@ -8,7 +8,7 @@
 import { Container } from 'validup';
 import { createValidationChain, createValidator } from '@validup/adapter-validator';
 import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
-import type { ProjectEntity } from '../../../../domains';
+import type { ProjectEntity } from '../../../../database/domains';
 
 export class ProjectValidator extends Container<ProjectEntity> {
     protected initialize() {

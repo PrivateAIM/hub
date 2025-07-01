@@ -9,7 +9,7 @@ import { hasOwnProperty, isObject } from '@privateaim/kit';
 import type { MasterImagesEventContext } from '@privateaim/server-analysis-manager-kit';
 import { MasterImagesEvent } from '@privateaim/server-analysis-manager-kit';
 import { useDataSource } from 'typeorm-extension';
-import { MasterImageEntity, MasterImageEventLogEntity } from '../../../domains';
+import { MasterImageEntity, MasterImageEventLogEntity } from '../../../database/domains';
 
 export class MasterImageLoggerService {
     async logEvent(input: MasterImagesEventContext) {

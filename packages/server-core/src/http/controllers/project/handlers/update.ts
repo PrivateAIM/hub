@@ -13,7 +13,7 @@ import { isEntityUnique, useDataSource } from 'typeorm-extension';
 import { HTTPHandlerOperation, useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { DatabaseConflictError } from '../../../../database';
-import { ProjectEntity } from '../../../../domains';
+import { ProjectEntity } from '../../../../database/domains';
 import { ProjectValidator } from '../utils/validator';
 
 export async function updateProjectRouteHandler(req: Request, res: Response) : Promise<any> {
