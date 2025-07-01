@@ -23,8 +23,8 @@ import {
     ProjectNodeEntity,
     RegistryEntity,
     RegistryProjectEntity,
-} from '../domains';
-import { DatabaseQueryResultCache } from '../cache';
+} from '../../domains';
+import { DatabaseQueryResultCache } from '../../cache';
 import {
     AnalysisFileSubscriber,
     AnalysisLogSubscriber,
@@ -40,7 +40,7 @@ import {
     ProjectSubscriber,
     RegistryProjectSubscriber,
     RegistrySubscriber,
-} from '../subscribers';
+} from '../../subscribers';
 
 export async function extendDataSourceOptions(options: DataSourceOptions) : Promise<DataSourceOptions> {
     options = {

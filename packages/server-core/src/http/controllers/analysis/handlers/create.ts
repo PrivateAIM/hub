@@ -18,7 +18,8 @@ import {
 } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { AnalysisValidator } from '../utils';
-import { AnalysisEntity, ProjectEntity, runAnalysisSpinUpCommand } from '../../../../database/domains';
+import { AnalysisEntity, ProjectEntity } from '../../../../database';
+import { isAnalysisManagerUsable, useAnalysisManager } from '../../../../services';
 
 export async function createAnalysisRouteHandler(req: Request, res: Response) : Promise<any> {
     const permissionChecker = useRequestPermissionChecker(req);
@@ -73,7 +74,10 @@ export async function createAnalysisRouteHandler(req: Request, res: Response) : 
     const proposalRepository = dataSource.getRepository(ProjectEntity);
     await proposalRepository.save(entity.project);
 
-    await runAnalysisSpinUpCommand(entity);
+    if (isAnalysisManagerUsable()) {
+        const analysisManager = useAnalysisManager();
+        await analysisManager.spinUp(entity);
+    }
 
     return sendCreated(res, entity);
 }

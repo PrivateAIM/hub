@@ -17,7 +17,7 @@ import {
     createConfig, getRootDirPath, getWritableDirPath, useEnv,
 } from '../config';
 import { setupAuthupService, setupHarborService } from '../core';
-import { buildDataSourceOptions } from '../database';
+import { buildDataSourceOptions, setDataSourceSync } from '../database';
 import { createRouter } from '../http/router';
 import { createHttpServer } from '../http/server';
 import { DatabaseIntegrityService } from '../services';
@@ -64,6 +64,7 @@ export async function startCommand() {
     await dataSource.initialize();
 
     setDataSource(dataSource);
+    setDataSourceSync(dataSource);
 
     logger.info('Established database connection.');
 

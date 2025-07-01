@@ -15,14 +15,9 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import {
     AnalysisEntity,
-    detectAnalysisBuildStatus,
-    lockAnalysisConfiguration, runAnalysisSpinUpCommand,
-    startAnalysisBuild,
-    stopAnalysisBuild,
-    unlockAnalysisConfiguration,
-} from '../../../../database/domains';
-import { runAnalysisTearDownCommand } from '../../../../database/domains/analysis/commands/tear-down';
+} from '../../../../database';
 import { AnalysisCommandValidator } from '../utils';
+import { useAnalysisManager } from '../../../../services';
 
 /**
  * Execute a analysis command (start, stop, build).
@@ -56,34 +51,36 @@ export async function handleAnalysisCommandRouteHandler(req: Request, res: Respo
         throw new ForbiddenError();
     }
 
+    const manager = useAnalysisManager();
+
     switch (data.command) {
         // General
         case AnalysisAPICommand.SPIN_UP: {
-            entity = await runAnalysisSpinUpCommand(entity);
+            entity = await manager.spinUp(entity);
             break;
         }
         case AnalysisAPICommand.TEAR_DOWN: {
-            entity = await runAnalysisTearDownCommand(entity);
+            entity = await manager.tearDown(entity);
             break;
         }
 
         // Build Commands
         case AnalysisAPICommand.BUILD_STATUS:
-            entity = await detectAnalysisBuildStatus(entity);
+            entity = await manager.checkDistribution(entity);
             break;
         case AnalysisAPICommand.BUILD_START:
-            entity = await startAnalysisBuild(entity);
+            entity = await manager.startDistribution(entity);
             break;
         case AnalysisAPICommand.BUILD_STOP:
-            entity = await stopAnalysisBuild(entity);
+            entity = await manager.stopDistribution(entity);
             break;
 
         // Configuration
         case AnalysisAPICommand.CONFIGURATION_LOCK:
-            entity = await lockAnalysisConfiguration(entity);
+            entity = await manager.lock(entity);
             break;
         case AnalysisAPICommand.CONFIGURATION_UNLOCK:
-            entity = await unlockAnalysisConfiguration(entity);
+            entity = await manager.unlock(entity);
             break;
     }
 

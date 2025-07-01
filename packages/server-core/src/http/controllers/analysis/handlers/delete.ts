@@ -11,8 +11,8 @@ import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
-import { AnalysisEntity, ProjectEntity } from '../../../../database/domains';
-import { runAnalysisTearDownCommand } from '../../../../database/domains/analysis/commands/tear-down';
+import { AnalysisEntity, ProjectEntity } from '../../../../database';
+import { isAnalysisManagerUsable, useAnalysisManager } from '../../../../services';
 
 export async function deleteAnalysisRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -52,7 +52,10 @@ export async function deleteAnalysisRouteHandler(req: Request, res: Response) : 
     const proposalRepository = dataSource.getRepository(ProjectEntity);
     await proposalRepository.save(project);
 
-    await runAnalysisTearDownCommand(entity);
+    if (isAnalysisManagerUsable()) {
+        const analysisManager = useAnalysisManager();
+        await analysisManager.tearDown(entity);
+    }
 
     entity.project = project;
 
