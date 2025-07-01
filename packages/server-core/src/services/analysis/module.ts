@@ -26,7 +26,7 @@ import {
     AnalysisNodeEntity,
     RegistryEntity, useDataSourceSync,
 } from '../../database';
-import { useEnv } from '../../config';
+import type { AnalysisManagerLockOptions, AnalysisManagerUnlockOptions } from './types';
 
 export class AnalysisManagerService {
     protected repository: Repository<AnalysisEntity>;
@@ -140,7 +140,7 @@ export class AnalysisManagerService {
         return entity;
     }
 
-    async lock(input: string | AnalysisEntity): Promise<AnalysisEntity> {
+    async lock(input: string | AnalysisEntity, options: AnalysisManagerLockOptions = {}): Promise<AnalysisEntity> {
         const entity = await this.resolve(input);
         const check = isAnalysisAPICommandExecutable(entity, AnalysisAPICommand.CONFIGURATION_LOCK);
         if (!check.success) {
@@ -173,7 +173,10 @@ export class AnalysisManagerService {
         let aggregatorNodes = 0;
 
         for (let i = 0; i < analysisNodes.length; i++) {
-            if (analysisNodes[i].approval_status !== AnalysisNodeApprovalStatus.APPROVED) {
+            if (
+                !options.ignoreApproval &&
+                analysisNodes[i].approval_status !== AnalysisNodeApprovalStatus.APPROVED
+            ) {
                 throw new BadRequestError('At least one node has not approved the analysis.');
             }
 
@@ -199,7 +202,7 @@ export class AnalysisManagerService {
         return entity;
     }
 
-    async unlock(input: string | AnalysisEntity): Promise<AnalysisEntity> {
+    async unlock(input: string | AnalysisEntity, options : AnalysisManagerUnlockOptions = {}): Promise<AnalysisEntity> {
         const entity = await this.resolve(input);
 
         const check = isAnalysisAPICommandExecutable(entity, AnalysisAPICommand.CONFIGURATION_UNLOCK);
@@ -214,7 +217,6 @@ export class AnalysisManagerService {
             relations: ['node'],
         });
 
-        const skipAnalysisApproval = useEnv('skipAnalysisApproval');
         for (let i = 0; i < analysisNodes.length; i++) {
             if (
                 analysisNodes[i].node &&
@@ -223,7 +225,7 @@ export class AnalysisManagerService {
                 continue;
             }
 
-            if (!skipAnalysisApproval) {
+            if (!options.ignoreApproval) {
                 analysisNodes[i].approval_status = null;
             }
 

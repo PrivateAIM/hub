@@ -18,6 +18,7 @@ import {
 } from '../../../../database';
 import { AnalysisCommandValidator } from '../utils';
 import { useAnalysisManager } from '../../../../services';
+import { useEnv } from '../../../../config';
 
 /**
  * Execute a analysis command (start, stop, build).
@@ -50,7 +51,7 @@ export async function handleAnalysisCommandRouteHandler(req: Request, res: Respo
     if (!isRealmResourceWritable(useRequestIdentityRealm(req), entity.realm_id)) {
         throw new ForbiddenError();
     }
-
+    const ignoreApproval = useEnv('skipAnalysisApproval');
     const manager = useAnalysisManager();
 
     switch (data.command) {
@@ -77,10 +78,14 @@ export async function handleAnalysisCommandRouteHandler(req: Request, res: Respo
 
         // Configuration
         case AnalysisAPICommand.CONFIGURATION_LOCK:
-            entity = await manager.lock(entity);
+            entity = await manager.lock(entity, {
+                ignoreApproval,
+            });
             break;
         case AnalysisAPICommand.CONFIGURATION_UNLOCK:
-            entity = await manager.unlock(entity);
+            entity = await manager.unlock(entity, {
+                ignoreApproval,
+            });
             break;
     }
 
