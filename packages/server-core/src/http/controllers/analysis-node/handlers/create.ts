@@ -16,7 +16,7 @@ import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { useEnv } from '../../../../config';
 import {
     AnalysisEntity, AnalysisNodeEntity, AnalysisNodeEventEntity, ProjectNodeEntity,
-} from '../../../../domains';
+} from '../../../../database/domains';
 import { AnalysisNodeValidator } from '../utils';
 
 export async function createAnalysisNodeRouteHandler(req: Request, res: Response) : Promise<any> {

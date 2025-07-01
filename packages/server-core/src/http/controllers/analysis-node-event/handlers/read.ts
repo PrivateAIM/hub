@@ -14,7 +14,7 @@ import {
     useDataSource,
 } from 'typeorm-extension';
 import { NotFoundError } from '@ebec/http';
-import { AnalysisNodeEventEntity } from '../../../../domains';
+import { AnalysisNodeEventEntity } from '../../../../database/domains';
 
 export async function getOneAnalysisNodeEventRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');

@@ -11,7 +11,7 @@ import { sendAccepted } from 'routup';
 import { type FiltersParseOutputElement, parseQueryFilters } from 'rapiq';
 import { useRequestQuery } from '@routup/basic/query';
 import type { AnalysisNodeLog } from '@privateaim/core-kit';
-import type { AnalysisNodeLogEntity } from '../../../../domains';
+import type { AnalysisNodeLogEntity } from '../../../../database/domains';
 import { useAnalysisNodeLogStore } from '../../../../services';
 
 export async function deleteAnalysisNodeLogRouteHandler(req: Request, res: Response) : Promise<any> {

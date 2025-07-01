@@ -13,7 +13,7 @@ import {
     useDataSource,
 } from 'typeorm-extension';
 import { NotFoundError } from '@ebec/http';
-import { ProjectEntity } from '../../../../domains';
+import { ProjectEntity } from '../../../../database/domains';
 
 export async function getOneProjectRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');

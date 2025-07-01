@@ -20,8 +20,8 @@ import {
     startAnalysisBuild,
     stopAnalysisBuild,
     unlockAnalysisConfiguration,
-} from '../../../../domains';
-import { runAnalysisTearDownCommand } from '../../../../domains/analysis/commands/tear-down';
+} from '../../../../database/domains';
+import { runAnalysisTearDownCommand } from '../../../../database/domains/analysis/commands/tear-down';
 import { AnalysisCommandValidator } from '../utils';
 
 /**

@@ -13,7 +13,7 @@ import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
 import { HTTPHandlerOperation, useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { isPropertySet } from '@authup/kit';
-import { AnalysisEntity } from '../../../../domains';
+import { AnalysisEntity } from '../../../../database/domains';
 import { AnalysisValidator } from '../utils';
 
 export async function updateAnalysisRouteHandler(req: Request, res: Response) : Promise<any> {

@@ -11,7 +11,7 @@ import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestPermissionChecker } from '@privateaim/server-http-kit';
-import { MasterImageGroupEntity } from '../../../../domains';
+import { MasterImageGroupEntity } from '../../../../database/domains';
 
 export async function deleteMasterImageGroupRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');

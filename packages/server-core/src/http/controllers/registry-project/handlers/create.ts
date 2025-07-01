@@ -14,7 +14,7 @@ import { isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../../../components';
 import { RegistryProjectValidator } from '../utils';
-import { RegistryProjectEntity } from '../../../../domains';
+import { RegistryProjectEntity } from '../../../../database/domains';
 
 export async function createRegistryProjectRouteHandler(req: Request, res: Response) : Promise<any> {
     const permissionChecker = useRequestPermissionChecker(req);

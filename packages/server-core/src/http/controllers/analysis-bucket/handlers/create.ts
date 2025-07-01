@@ -9,7 +9,7 @@ import { sendCreated } from 'routup';
 import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
-import { AnalysisBucketEntity } from '../../../../domains';
+import { AnalysisBucketEntity } from '../../../../database/domains';
 import { AnalysisBucketValidator } from '../utils';
 
 export async function createAnalysisBucketRouteHandler(req: Request, res: Response) : Promise<any> {

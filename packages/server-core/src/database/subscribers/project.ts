@@ -19,7 +19,7 @@ import {
     buildDomainChannelName,
     buildDomainNamespaceName,
 } from '@privateaim/core-kit';
-import { ProjectEntity } from '../../domains';
+import { ProjectEntity } from '../domains';
 
 async function publishEvent(
     event: `${DomainEventName}`,

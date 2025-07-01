@@ -21,7 +21,7 @@ import {
 } from 'typeorm-extension';
 import { NotFoundError } from '@ebec/http';
 import { useRequestIdentityRealm } from '@privateaim/server-http-kit';
-import { RegistryProjectEntity, onlyRealmWritableQueryResources } from '../../../../domains';
+import { RegistryProjectEntity, onlyRealmWritableQueryResources } from '../../../../database/domains';
 
 function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>, fields: any) {
     const protectedFields : ParseAllowedOption<RegistryProjectEntity> = [

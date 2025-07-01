@@ -21,7 +21,7 @@ import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../../../components';
 import { isNodeRobotServiceUsable, useNodeRobotService } from '../../../../services';
 import { NodeValidator } from '../utils';
-import { NodeEntity, RegistryProjectEntity } from '../../../../domains';
+import { NodeEntity, RegistryProjectEntity } from '../../../../database/domains';
 
 export async function updateNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');

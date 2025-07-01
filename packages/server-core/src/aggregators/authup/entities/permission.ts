@@ -7,7 +7,7 @@
 import type { EntityType, EventRecord, Permission } from '@authup/core-kit';
 import { useDataSource } from 'typeorm-extension';
 import { useLogger } from '@privateaim/server-kit';
-import { AnalysisPermissionEntity } from '../../../domains';
+import { AnalysisPermissionEntity } from '../../../database/domains';
 
 export async function handleAuthupPermissionEvent(
     context: EventRecord<EntityType.PERMISSION, Permission>,

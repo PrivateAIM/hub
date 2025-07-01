@@ -13,7 +13,7 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { HTTPHandlerOperation, useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
-import { AnalysisNodeEntity, AnalysisNodeEventEntity } from '../../../../domains';
+import { AnalysisNodeEntity, AnalysisNodeEventEntity } from '../../../../database/domains';
 import { AnalysisNodeValidator } from '../utils';
 
 export async function updateAnalysisNodeRouteHandler(req: Request, res: Response) : Promise<any> {

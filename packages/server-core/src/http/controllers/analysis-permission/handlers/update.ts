@@ -19,7 +19,7 @@ import { isAuthupClientUsable, useAuthupClient } from '@privateaim/server-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { isClientErrorWithStatusCode } from '@hapic/harbor';
 import { buildErrorMessageForAttributes } from 'validup';
-import { AnalysisPermissionEntity } from '../../../../domains';
+import { AnalysisPermissionEntity } from '../../../../database/domains';
 import { AnalysisPermissionValidator } from '../utils';
 
 export async function updateAnalysisPermissionRouteHandler(req: Request, res: Response) : Promise<any> {

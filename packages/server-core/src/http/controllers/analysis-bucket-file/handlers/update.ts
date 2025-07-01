@@ -12,7 +12,7 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { HTTPHandlerOperation, useRequestIdentityRealm } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
-import { AnalysisBucketFileEntity } from '../../../../domains';
+import { AnalysisBucketFileEntity } from '../../../../database/domains';
 import { AnalysisBucketFileValidator } from '../utils';
 
 export async function updateAnalysisBucketFileRouteHandler(req: Request, res: Response) : Promise<any> {

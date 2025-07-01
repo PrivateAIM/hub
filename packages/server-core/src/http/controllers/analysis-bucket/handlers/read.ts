@@ -14,7 +14,7 @@ import {
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceReadable } from '@privateaim/kit';
 import { useRequestIdentityRealm } from '@privateaim/server-http-kit';
-import { AnalysisBucketEntity, onlyRealmWritableQueryResources } from '../../../../domains';
+import { AnalysisBucketEntity, onlyRealmWritableQueryResources } from '../../../../database/domains';
 
 export async function getOneAnalysisBucketRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');

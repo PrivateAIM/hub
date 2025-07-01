@@ -13,7 +13,7 @@ import {
 } from '@privateaim/core-kit';
 import { useDataSource } from 'typeorm-extension';
 import { useLogger, useQueueRouter } from '@privateaim/server-kit';
-import { RegistryEntity, RegistryProjectEntity } from '../../../domains';
+import { RegistryEntity, RegistryProjectEntity } from '../../../database/domains';
 import { RegistryCommand } from '../constants';
 import type { RegistrySetupPayload } from '../type';
 import { buildRegistryTaskQueueRouterPayload } from '../utils';

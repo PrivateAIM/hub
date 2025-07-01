@@ -18,7 +18,7 @@ import {
     AnalysisNodeEntity,
     ProjectEntity,
     ProjectNodeEntity,
-} from '../../../../domains';
+} from '../../../../database/domains';
 
 export async function deleteProjectNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');

@@ -13,7 +13,7 @@ import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
 import { HTTPHandlerOperation, useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { NotFoundError } from '@ebec/http';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
-import { ProjectEntity, ProjectNodeEntity } from '../../../../domains';
+import { ProjectEntity, ProjectNodeEntity } from '../../../../database/domains';
 import { ProjectNodeValidator } from '../utils';
 import { useEnv } from '../../../../config';
 

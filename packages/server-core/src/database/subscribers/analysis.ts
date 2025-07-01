@@ -22,7 +22,7 @@ import {
 
     buildDomainNamespaceName,
 } from '@privateaim/core-kit';
-import { AnalysisEntity } from '../../domains';
+import { AnalysisEntity } from '../domains';
 
 async function publishEvent(
     event: `${DomainEventName}`,

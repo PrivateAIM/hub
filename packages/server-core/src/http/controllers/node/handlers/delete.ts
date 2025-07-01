@@ -13,7 +13,7 @@ import { useDataSource } from 'typeorm-extension';
 import { useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { isAmqpClientUsable, useQueueRouter } from '@privateaim/server-kit';
 import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../../../components';
-import { NodeEntity, RegistryProjectEntity } from '../../../../domains';
+import { NodeEntity, RegistryProjectEntity } from '../../../../database/domains';
 import { isNodeRobotServiceUsable, useNodeRobotService } from '../../../../services';
 
 export async function deleteNodeRouteHandler(req: Request, res: Response) : Promise<any> {

@@ -8,7 +8,7 @@
 import { BadRequestError } from '@ebec/http';
 import { AnalysisAPICommand, NodeType, isAnalysisAPICommandExecutable } from '@privateaim/core-kit';
 import { useDataSource } from 'typeorm-extension';
-import { useEnv } from '../../../config';
+import { useEnv } from '../../../../config';
 import { AnalysisNodeEntity } from '../../anaylsis-node';
 import { AnalysisEntity } from '../entity';
 

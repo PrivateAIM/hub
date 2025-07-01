@@ -8,7 +8,7 @@
 import { Container } from 'validup';
 import { createValidationChain, createValidator } from '@validup/adapter-validator';
 import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
-import type { AnalysisPermissionEntity } from '../../../../domains';
+import type { AnalysisPermissionEntity } from '../../../../database/domains';
 
 export class AnalysisPermissionValidator extends Container<AnalysisPermissionEntity> {
     protected initialize() {

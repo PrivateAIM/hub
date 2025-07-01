@@ -9,7 +9,7 @@ import { RegistryProjectType } from '@privateaim/core-kit';
 import { Container } from 'validup';
 import { createValidationChain, createValidator } from '@validup/adapter-validator';
 import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
-import type { RegistryProjectEntity } from '../../../../domains';
+import type { RegistryProjectEntity } from '../../../../database/domains';
 
 export class RegistryProjectValidator extends Container<RegistryProjectEntity> {
     protected initialize() {

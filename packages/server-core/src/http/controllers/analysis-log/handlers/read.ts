@@ -14,7 +14,7 @@ import {
     useDataSource,
 } from 'typeorm-extension';
 import { NotFoundError } from '@ebec/http';
-import { AnalysisLogEntity } from '../../../../domains';
+import { AnalysisLogEntity } from '../../../../database/domains';
 
 export async function getOneAnalysisLogRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');

@@ -14,7 +14,7 @@ import {
 } from '@privateaim/core-kit';
 import { isAuthupClientUsable, useAuthupClient, useLogger } from '@privateaim/server-kit';
 import { useEnv } from '../../../../config';
-import { findRobotCredentialsInVault } from '../../../../domains';
+import { findRobotCredentialsInVault } from '../../../../database/domains';
 import { buildRegistryWebhookTarget } from '../utils';
 
 export async function saveRemoteRegistryProjectWebhook(

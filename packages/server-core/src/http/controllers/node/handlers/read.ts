@@ -16,7 +16,7 @@ import {
     applyFilters, applyPagination, applyQueryFieldsParseOutput, applyRelations, applySort, useDataSource,
 } from 'typeorm-extension';
 import { NotFoundError } from '@ebec/http';
-import { NodeEntity } from '../../../../domains';
+import { NodeEntity } from '../../../../database/domains';
 
 async function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>, fields: any) {
     const fieldsParsed = parseQueryFields<NodeEntity>(fields, {

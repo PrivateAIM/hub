@@ -18,7 +18,7 @@ import {
 } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { AnalysisValidator } from '../utils';
-import { AnalysisEntity, ProjectEntity, runAnalysisSpinUpCommand } from '../../../../domains';
+import { AnalysisEntity, ProjectEntity, runAnalysisSpinUpCommand } from '../../../../database/domains';
 
 export async function createAnalysisRouteHandler(req: Request, res: Response) : Promise<any> {
     const permissionChecker = useRequestPermissionChecker(req);

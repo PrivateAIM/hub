@@ -23,7 +23,7 @@ import {
     ProjectNodeEntity,
     RegistryEntity,
     RegistryProjectEntity,
-} from '../../domains';
+} from '../domains';
 import { DatabaseQueryResultCache } from '../cache';
 import {
     AnalysisFileSubscriber,

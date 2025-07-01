@@ -7,7 +7,7 @@
 import { buildRegistryClientConnectionStringFromRegistry } from '@privateaim/core-kit';
 import { useDataSource } from 'typeorm-extension';
 import { useLogger } from '@privateaim/server-kit';
-import { RegistryEntity, RegistryProjectEntity, removeRegistryProjectFromVault } from '../../../../domains';
+import { RegistryEntity, RegistryProjectEntity, removeRegistryProjectFromVault } from '../../../../database/domains';
 import { RegistryCommand } from '../../constants';
 import type { RegistryProjectUnlinkPayload } from '../../type';
 import { createBasicHarborAPIClient } from '../utils';

@@ -17,7 +17,7 @@ import type {
     EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
 import { EventSubscriber } from 'typeorm';
-import { NodeEntity } from '../../domains';
+import { NodeEntity } from '../domains';
 
 async function publishEvent(
     event: `${DomainEventName}`,
