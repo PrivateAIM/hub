@@ -47,7 +47,7 @@
         "tar-stream": "^3.1.6",
         "uuid": "^11.1.0",
         "validup": "^0.1.8",
-        "zod": "^3.25.67"
+        "zod": "^3.25.71"
     },
     "devDependencies": {
         "@types/dockerode": "^3.3.42",
