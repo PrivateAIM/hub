@@ -54,7 +54,7 @@
         "typeorm-extension": "^3.7.1",
         "validup": "^0.1.8",
         "yargs": "^17.7.1",
-        "zod": "^3.25.67"
+        "zod": "^3.25.75"
     },
     "devDependencies": {
         "@privateaim/core-http-kit": "^0.8.13",
