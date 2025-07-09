@@ -14,9 +14,12 @@ import { mountDecoratorsMiddleware } from './decorators';
 import { mountPrometheusMiddleware } from './prometheus';
 import { mountRateLimiterMiddleware } from './rate-limit';
 import { mountSwaggerMiddleware } from './swagger';
-import type { MiddlewareRegistrationContext } from './types';
+import type { MiddlewareMountOptions } from './types';
 
-export function mountMiddlewares(router: Router, ctx: MiddlewareRegistrationContext) {
+export function mountMiddlewares(
+    router: Router,
+    ctx: MiddlewareMountOptions = {},
+) {
     ctx.basic ??= true;
     ctx.cors ??= true;
     ctx.prometheus ??= true;

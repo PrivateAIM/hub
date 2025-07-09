@@ -17,7 +17,7 @@ export type MiddlewareDecoratorsOptions = {
     controllers: (ClassType | Record<string, any>)[]
 };
 
-export type MiddlewareRegistrationContext = {
+export type MiddlewareMountOptions = {
     options?: MiddlewareSwaggerOptions,
 
     authup?: AuthupMiddlewareRegistrationOptions,

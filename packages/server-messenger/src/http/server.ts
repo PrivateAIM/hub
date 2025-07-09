@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { mountMiddlewares } from '@privateaim/server-http-kit';
 import type { Server } from 'node:http';
 import http from 'node:http';
 import { Router, coreHandler, createNodeDispatcher } from 'routup';
@@ -15,6 +16,8 @@ export function createHttpServer() : Server {
     router.get('/', coreHandler(() => ({
         timestamp: Date.now(),
     })));
+
+    mountMiddlewares(router);
 
     return new http.Server(createNodeDispatcher(router));
 }
