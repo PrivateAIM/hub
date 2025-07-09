@@ -8,6 +8,8 @@
 import {
     LokiClient,
     CompactorDeletionRequestCreate as LokiCompactorDeletionRequestCreate,
+    Config as LokiConfig,
+    ConfigInput as LokiConfigInput,
     DistributorPushStream as LokiDistributorPushStream,
     QuerierQueryRangeOptions as LokiQuerierQueryRangeOptions,
     QuerierQueryResult as LokiQuerierQueryResult,
@@ -17,6 +19,8 @@ import {
 
 export {
     LokiClient,
+    LokiConfig,
+    LokiConfigInput,
     LokiCompactorDeletionRequestCreate,
     LokiDistributorPushStream,
     LokiQuerierQueryRangeOptions,

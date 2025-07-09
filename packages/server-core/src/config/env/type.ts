@@ -17,6 +17,8 @@ export interface Environment {
     rabbitMqConnectionString?: string | boolean,
     vaultConnectionString: string | boolean,
     lokiURL?: string,
+    lokiCompactorURL?: string,
+    lokiQuerierURL?: string,
     harborURL?: string,
 
     publicURL: string,
