@@ -1,6 +1,6 @@
 {
     "name": "@privateaim/server-analysis-manager-kit",
-    "version": "0.7.15",
+    "version": "0.7.16",
     "license": "Apache-2.0",
     "description": "",
     "exports": {
@@ -26,9 +26,9 @@
         "build-watch": "rimraf ./dist && tsc -p tsconfig.build.json --watch"
     },
     "dependencies": {
-        "@privateaim/core-kit": "^0.8.14",
-        "@privateaim/kit": "^0.8.14",
-        "@privateaim/server-kit": "^0.8.14",
+        "@privateaim/core-kit": "^0.8.15",
+        "@privateaim/kit": "^0.8.15",
+        "@privateaim/server-kit": "^0.8.15",
         "singa": "^1.0.0"
     },
     "devDependencies": {
