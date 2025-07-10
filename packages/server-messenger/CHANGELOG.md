@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.8.14](https://github.com/PrivateAIM/hub/compare/v0.8.13...v0.8.14) (2025-07-10)
+
+
+### Features
+
+* **messenger:** mount default middlewares ([d7ede75](https://github.com/PrivateAIM/hub/commit/d7ede752688b73a43bb9ca99557ffb17e9594cc1))
+
+
+### Bug Fixes
+
+* **deps:** bump the minorandpatch group across 1 directory with 19 updates ([#1099](https://github.com/PrivateAIM/hub/issues/1099)) ([30b0ab6](https://github.com/PrivateAIM/hub/commit/30b0ab6b748b287380eb84ac0c8aae4ee22e0be7))
+* **deps:** bump the minorandpatch group across 1 directory with 24 updates ([#1084](https://github.com/PrivateAIM/hub/issues/1084)) ([92a3f43](https://github.com/PrivateAIM/hub/commit/92a3f43eb47795a7fff756939a036f2e771bd3cd))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/messenger-kit bumped from ^0.7.14 to ^0.7.15
+    * @privateaim/server-kit bumped from ^0.8.13 to ^0.8.14
+    * @privateaim/server-http-kit bumped from ^0.8.13 to ^0.8.14
+    * @privateaim/server-realtime-kit bumped from ^0.8.13 to ^0.8.14
+
 ## [0.8.13](https://github.com/PrivateAIM/hub/compare/v0.8.12...v0.8.13) (2025-05-05)
 
 
