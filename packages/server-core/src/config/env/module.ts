@@ -54,6 +54,8 @@ export function useEnv(key?: string) : any {
         ]),
         harborURL: read('HARBOR_URL'),
         lokiURL: read('LOKI_URL'),
+        lokiCompactorURL: read('LOKI_COMPACTOR_URL'),
+        lokiQuerierURL: read('LOKI_QUERIER_URL'),
 
         publicURL: read('PUBLIC_URL', `http://127.0.0.1:${port}/`),
         authupURL: read('AUTHUP_URL'),
