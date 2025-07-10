@@ -11,11 +11,12 @@ import {
     Column,
     CreateDateColumn,
     Entity, JoinColumn, ManyToOne,
-    PrimaryGeneratedColumn,
+    PrimaryGeneratedColumn, Unique,
     UpdateDateColumn,
 } from 'typeorm';
 import { BucketEntity } from '../bucket';
 
+@Unique(['bucket_id', 'path'])
 @Entity({ name: 'bucket_files' })
 export class BucketFileEntity implements BucketFile {
     @PrimaryGeneratedColumn('uuid')
