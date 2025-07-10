@@ -7,7 +7,7 @@
         "url": "https://tada5hi.net"
     },
     "license": "Apache-2.0",
-    "version": "0.8.13",
+    "version": "0.8.14",
     "description": "This package contains the server core service.",
     "main": "./dist/cli/index.js",
     "dependencies": {
@@ -18,12 +18,12 @@
         "@ebec/http": "^2.3.0",
         "@hapic/harbor": "^2.5.4",
         "@hapic/vault": "^2.3.9",
-        "@privateaim/core-kit": "^0.8.13",
-        "@privateaim/kit": "^0.8.13",
-        "@privateaim/server-kit": "^0.8.13",
-        "@privateaim/server-core-realtime": "^0.8.13",
-        "@privateaim/server-http-kit": "^0.8.13",
-        "@privateaim/server-analysis-manager-kit": "^0.7.14",
+        "@privateaim/core-kit": "^0.8.14",
+        "@privateaim/kit": "^0.8.14",
+        "@privateaim/server-kit": "^0.8.14",
+        "@privateaim/server-core-realtime": "^0.8.14",
+        "@privateaim/server-http-kit": "^0.8.14",
+        "@privateaim/server-analysis-manager-kit": "^0.7.15",
         "@routup/basic": "^1.4.2",
         "@routup/decorators": "^3.4.2",
         "@routup/prometheus": "^2.4.1",
@@ -57,7 +57,7 @@
         "zod": "^3.25.76"
     },
     "devDependencies": {
-        "@privateaim/core-http-kit": "^0.8.13",
+        "@privateaim/core-http-kit": "^0.8.14",
         "@types/busboy": "^1.5.3",
         "@types/cors": "^2.8.19",
         "@types/module-alias": "^2.0.4",
