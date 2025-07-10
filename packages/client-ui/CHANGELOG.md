@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.8.15](https://github.com/PrivateAIM/hub/compare/v0.8.14...v0.8.15) (2025-07-10)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/client-vue bumped from ^0.8.14 to ^0.8.15
+    * @privateaim/core-kit bumped from ^0.8.14 to ^0.8.15
+    * @privateaim/kit bumped from ^0.8.14 to ^0.8.15
+    * @privateaim/storage-kit bumped from ^0.8.14 to ^0.8.15
+
 ## [0.8.14](https://github.com/PrivateAIM/hub/compare/v0.8.13...v0.8.14) (2025-07-10)
 
 
