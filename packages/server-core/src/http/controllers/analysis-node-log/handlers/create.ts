@@ -14,9 +14,9 @@ import { HTTPHandlerOperation, useRequestIdentityRealm } from '@privateaim/serve
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import {
     AnalysisNodeLogEntity,
-} from '../../../../database/domains';
+} from '../../../../database';
 import { AnalysisNodeLogValidator } from '../utils';
-import { useAnalysisNodeLogStore } from '../../../../services';
+import { useAnalysisNodeLogStore } from '../../../../domains';
 
 export async function createAnalysisNodeLogRouteHandler(req: Request, res: Response) : Promise<any> {
     const validator = new AnalysisNodeLogValidator();

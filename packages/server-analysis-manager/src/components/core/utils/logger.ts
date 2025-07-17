@@ -24,6 +24,9 @@ export function useCoreLogger() : Logger {
                 component: ComponentName.CORE,
             },
         },
+        labels: {
+            component: ComponentName.CORE,
+        },
         // todo: allow specifying custom path
         directory: WRITABLE_DIRECTORY_PATH,
     });

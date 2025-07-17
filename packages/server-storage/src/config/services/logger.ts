@@ -7,7 +7,15 @@
 
 import type { LoggerCreateContext } from '@privateaim/server-kit';
 import { createLogger, setLoggerFactory } from '@privateaim/server-kit';
+import { useEnv } from '../env';
 
-export function setupLogger(ctx: LoggerCreateContext): void {
-    setLoggerFactory(() => createLogger(ctx));
+export function setupLogging(ctx: LoggerCreateContext): void {
+    setLoggerFactory(() => createLogger({
+        ...ctx,
+        labels: {
+            service: 'hub-server-storage',
+            namespace: useEnv('env'),
+            type: 'system',
+        },
+    }));
 }

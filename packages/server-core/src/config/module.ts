@@ -22,7 +22,7 @@ import {
     configureAuthupClientAuthenticationHook, configureLoki,
     configureRedis,
     configureVault,
-    setupLogger,
+    setupLogging,
 } from './services';
 
 export type Config = {
@@ -31,7 +31,9 @@ export type Config = {
 };
 
 export function createConfig() : Config {
-    setupLogger({
+    configureLoki();
+
+    setupLogging({
         directory: getWritableDirPath(),
     });
 
@@ -44,8 +46,6 @@ export function createConfig() : Config {
     configureRedis();
 
     configureAmqp();
-
-    configureLoki();
 
     // ---------------------------------------------
 

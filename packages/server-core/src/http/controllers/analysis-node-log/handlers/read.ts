@@ -11,9 +11,9 @@ import { send } from 'routup';
 import { FilterComparisonOperator, parseQuery } from 'rapiq';
 import type { AnalysisNodeLog } from '@privateaim/core-kit';
 import { BadRequestError } from '@ebec/http';
-import type { AnalysisNodeLogEntity } from '../../../../database/domains';
-import type { AnalysisNodeLogQueryOptions } from '../../../../services';
-import { useAnalysisNodeLogStore } from '../../../../services';
+import type { AnalysisNodeLogEntity } from '../../../../database';
+import type { AnalysisNodeLogQueryOptions } from '../../../../domains';
+import { useAnalysisNodeLogStore } from '../../../../domains';
 
 export async function getManyAnalysisNodeLogRouteHandler(req: Request, res: Response) : Promise<any> {
     const output = parseQuery<AnalysisNodeLogEntity>(useRequestQuery(req), {

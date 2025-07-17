@@ -5,5 +5,8 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-export * from './analysis-node-log';
-export * from './robot';
+export async function wait(ms: number): Promise<void> {
+    return new Promise<void>((resolve) => {
+        setTimeout(resolve, ms);
+    });
+}

@@ -12,7 +12,7 @@ import { type FiltersParseOutputElement, parseQueryFilters } from 'rapiq';
 import { useRequestQuery } from '@routup/basic/query';
 import type { AnalysisNodeLog } from '@privateaim/core-kit';
 import type { AnalysisNodeLogEntity } from '../../../../database';
-import { useAnalysisNodeLogStore } from '../../../../services';
+import { useAnalysisNodeLogStore } from '../../../../domains';
 
 export async function deleteAnalysisNodeLogRouteHandler(req: Request, res: Response) : Promise<any> {
     const output = parseQueryFilters<AnalysisNodeLogEntity>(useRequestQuery(req, 'filter'), {

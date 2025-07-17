@@ -12,11 +12,11 @@ import {
     configureMinio,
     configureRedis,
     configureVault,
-    setupLogger,
+    setupLogging,
 } from './services';
 
 export function configure() {
-    setupLogger({
+    setupLogging({
         directory: path.join(process.cwd(), 'writable'),
     });
 

@@ -6,13 +6,17 @@
  */
 
 import type { LoggerCreateContext } from '@privateaim/server-kit';
-import { createLogger, setLoggerFactory, useLogStore } from '@privateaim/server-kit';
+import {
+    createLogger,
+    setLoggerFactory,
+    useLogStore,
+} from '@privateaim/server-kit';
 import { useEnv } from '../env';
 
-export function setupLogger(ctx: LoggerCreateContext): void {
+export function setupLogging(ctx: LoggerCreateContext): void {
     const store = useLogStore();
     store.setLabels({
-        service: 'hub-server-messenger',
+        service: 'hub-server-core',
         namespace: useEnv('env'),
         type: 'system',
     });

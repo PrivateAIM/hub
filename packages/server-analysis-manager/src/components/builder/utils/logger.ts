@@ -24,6 +24,9 @@ export function useBuilderLogger() : Logger {
                 component: ComponentName.BUILDER,
             },
         },
+        labels: {
+            component: ComponentName.BUILDER,
+        },
         // todo: allow customizing specific path
         directory: WRITABLE_DIRECTORY_PATH,
     });
