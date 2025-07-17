@@ -6,7 +6,7 @@
  */
 
 import {
-    isAuthupClientUsable, useLogStore,
+    useLogStore,
 } from '@privateaim/server-kit';
 import { singa } from 'singa';
 import { AnalysisNodeLogStore } from './module';
@@ -19,10 +19,6 @@ const instance = singa<AnalysisNodeLogStore>({
         return new AnalysisNodeLogStore(store);
     },
 });
-
-export function isAnalysisNodeLogStoreUsable() {
-    return isAuthupClientUsable();
-}
 
 export function useAnalysisNodeLogStore(): AnalysisNodeLogStore {
     return instance.use();
