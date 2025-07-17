@@ -17,7 +17,12 @@ export function createHttpServer() : Server {
         timestamp: Date.now(),
     })));
 
-    mountMiddlewares(router);
+    mountMiddlewares(router, {
+        basic: true,
+        cors: true,
+        prometheus: true,
+        rateLimit: true,
+    });
 
     return new http.Server(createNodeDispatcher(router));
 }
