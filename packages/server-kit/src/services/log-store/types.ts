@@ -26,6 +26,12 @@ export type LogMessage = {
 };
 
 export interface LogStore {
+    setLabels(labels: Record<string, string>): void;
+
+    getLabels() : Record<string, string>;
+
+    extendLabels(labels: Record<string, string>): void;
+
     write(message: string | LogMessage, labels?: Record<string, string>) : Promise<void>;
 
     query(options?: LogStoreQueryOptions) : Promise<[LogMessage[], number]>;

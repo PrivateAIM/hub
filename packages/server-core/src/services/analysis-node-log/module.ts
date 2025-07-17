@@ -88,8 +88,8 @@ export class AnalysisNodeLogStore {
             ...(entity.level ? { level: entity.level } : {}),
             ...(entity.code ? { code: entity.code } : {}),
             entity: 'analysisNode',
-            ...(entity.node_id ? { entity_node_id: entity.node_id } : {}),
-            ...(entity.analysis_id ? { entity_analysis_id: entity.analysis_id } : {}),
+            ...(entity.node_id ? { node_id: entity.node_id } : {}),
+            ...(entity.analysis_id ? { analysis_id: entity.analysis_id } : {}),
         };
     }
 }

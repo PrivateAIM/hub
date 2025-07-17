@@ -10,13 +10,14 @@ import { nanoSeconds } from '../../loki';
 import type {
     LogMessage, LogStore, LogStoreDeleteOptions, LogStoreQueryOptions,
 } from '../types';
+import { BaseLogStore } from './base';
 
-export class LokiLogStore implements LogStore {
+export class LokiLogStore extends BaseLogStore implements LogStore {
     protected instance : LokiClient;
 
-    protected labels: Record<string, string>;
-
     constructor(instance: LokiClient, labels?: Record<string, string>) {
+        super();
+
         this.instance = instance;
         this.labels = labels || {};
     }

@@ -9,13 +9,14 @@ import type {
     LogMessage, LogStore, LogStoreQueryOptions,
 } from '../types';
 import { nanoSeconds } from '../../loki';
+import { BaseLogStore } from './base';
 
-export class MemoryLogStore implements LogStore {
+export class MemoryLogStore extends BaseLogStore implements LogStore {
     public readonly items : LogMessage[];
 
-    public readonly labels : Record<string, string>;
-
     constructor(labels?: Record<string, string>) {
+        super();
+
         this.items = [];
         this.labels = labels;
     }

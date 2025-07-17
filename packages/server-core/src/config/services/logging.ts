@@ -7,26 +7,18 @@
 
 import type { LoggerCreateContext } from '@privateaim/server-kit';
 import {
-    LokiLogStore,
-    MemoryLogStore,
-    createLogger, isLokiClientUsable, setLogStoreFactory, setLoggerFactory, useLokiClient,
+    createLogger,
+    setLoggerFactory,
+    useLogStore,
 } from '@privateaim/server-kit';
 import { useEnv } from '../env';
 
 export function setupLogging(ctx: LoggerCreateContext): void {
-    const labels : Record<string, string> = {
+    const store = useLogStore();
+    store.setLabels({
         service: 'hub-server-core',
         namespace: useEnv('env'),
         type: 'system',
-    };
-
-    setLogStoreFactory(() => {
-        if (isLokiClientUsable()) {
-            const loki = useLokiClient();
-            return new LokiLogStore(loki, labels);
-        }
-
-        return new MemoryLogStore(labels);
     });
 
     setLoggerFactory(() => createLogger(ctx));

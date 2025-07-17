@@ -80,8 +80,8 @@ describe('controllers > analysis-node-log', () => {
         const [data] = await store.query({
             labels: {
                 entity: 'analysisNode',
-                entity_node_id: node.id,
-                entity_analysis_id: analysis.id,
+                node_id: node.id,
+                analysis_id: analysis.id,
             },
         });
 

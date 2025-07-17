@@ -11,11 +11,10 @@ import { MemoryLogStore, createLogger } from '../../src';
 describe('logger', () => {
     it('should work with store', async () => {
         const store = new MemoryLogStore();
+        store.setLabels({ app: 'app' });
+
         const logger = createLogger({
             store,
-            labels: {
-                app: 'app',
-            },
         });
 
         logger.info('foo', { meta: 'bar' });
