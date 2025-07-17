@@ -11,9 +11,11 @@ import { EnvironmentName } from 'typeorm-extension';
 import type { Logger } from 'winston';
 import { createLogger as create, format, transports } from 'winston';
 import type { LoggerCreateContext, LoggerTransports } from './types';
+import { LogStoreTransport } from './store';
+import { useLogStore } from '../log-store';
 
 export function createLogger(ctx: LoggerCreateContext = {}) : Logger {
-    const { directory, options = {} } = ctx;
+    const store = ctx.store || useLogStore();
 
     let loggerTransports : LoggerTransports;
     if (read('env') === EnvironmentName.PRODUCTION) {
@@ -22,23 +24,37 @@ export function createLogger(ctx: LoggerCreateContext = {}) : Logger {
                 level: 'info',
             }),
             new transports.File({
-                filename: path.join(directory || process.cwd(), 'access.log'),
+                filename: path.join(ctx.directory || process.cwd(), 'access.log'),
                 level: 'http',
                 maxsize: 10 * 1024 * 1024, // 10MB
                 maxFiles: 5,
             }),
             new transports.File({
-                filename: path.join(directory || process.cwd(), 'error.log'),
+                filename: path.join(ctx.directory || process.cwd(), 'error.log'),
                 level: 'warn',
                 maxsize: 10 * 1024 * 1024, // 10MB
                 maxFiles: 5,
             }),
+            new LogStoreTransport(
+                store,
+                {
+                    level: 'http',
+                    labels: ctx.labels,
+                },
+            ),
         ];
     } else {
         loggerTransports = [
             new transports.Console({
                 level: 'debug',
             }),
+            new LogStoreTransport(
+                store,
+                {
+                    level: 'http',
+                    labels: ctx.labels,
+                },
+            ),
         ];
     }
 
@@ -46,12 +62,11 @@ export function createLogger(ctx: LoggerCreateContext = {}) : Logger {
         format: format.combine(
             format.errors({ stack: true }),
             format.timestamp(),
-            format.colorize(),
             format.simple(),
         ),
         level: 'debug',
         transports: loggerTransports,
         // todo: deeply merge options
-        ...(options || {}),
+        ...(ctx.options || {}),
     });
 }

@@ -140,6 +140,13 @@ export class AnalysisManagerService {
         return entity;
     }
 
+    /**
+     * Lock the analysis configuration.
+     * The analysis and related resources become immutable and can not be changed.
+     *
+     * @param input
+     * @param options
+     */
     async lock(input: string | AnalysisEntity, options: AnalysisManagerLockOptions = {}): Promise<AnalysisEntity> {
         const entity = await this.resolve(input);
         const check = isAnalysisAPICommandExecutable(entity, AnalysisAPICommand.CONFIGURATION_LOCK);
@@ -202,6 +209,13 @@ export class AnalysisManagerService {
         return entity;
     }
 
+    /**
+     * Un the analysis configuration.
+     * The analysis and related resources become mutable and can be changed again.
+     *
+     * @param input
+     * @param options
+     */
     async unlock(input: string | AnalysisEntity, options : AnalysisManagerUnlockOptions = {}): Promise<AnalysisEntity> {
         const entity = await this.resolve(input);
 

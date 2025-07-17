@@ -5,19 +5,18 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { isAuthupClientUsable, isLokiClientUsable, useLokiClient } from '@privateaim/server-kit';
+import {
+    isAuthupClientUsable, useLogStore,
+} from '@privateaim/server-kit';
 import { singa } from 'singa';
-import type { AnalysisNodeLogStore } from './types';
-import { AnalysisNodeLogDatabaseStore, AnalysisNodeLogLokiStore } from './entities';
+import { AnalysisNodeLogStore } from './module';
 
 const instance = singa<AnalysisNodeLogStore>({
     name: 'analysisNodeLogStore',
     factory: () : AnalysisNodeLogStore => {
-        if (isLokiClientUsable()) {
-            return new AnalysisNodeLogLokiStore(useLokiClient());
-        }
+        const store = useLogStore();
 
-        return new AnalysisNodeLogDatabaseStore();
+        return new AnalysisNodeLogStore(store);
     },
 });
 

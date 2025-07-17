@@ -7,7 +7,8 @@
 
 import { AnalysisNodeRunStatus } from '@privateaim/core-kit';
 import type { Analysis, AnalysisNodeLog, Node } from '@privateaim/core-kit';
-import { LogLevel } from '@privateaim/kit';
+import { LogLevel, wait } from '@privateaim/kit';
+import { useLogStore } from '@privateaim/server-kit';
 import {
     createTestSuite,
     removeDateProperties,
@@ -72,6 +73,19 @@ describe('controllers > analysis-node-log', () => {
         expect(analysisNodeLog.status).toEqual(AnalysisNodeRunStatus.FAILED);
         expect(analysisNodeLog.level).toEqual(LogLevel.ERROR);
         expect(analysisNodeLog.message).toEqual('Analysis has been forcefully terminated.');
+
+        await wait(0);
+
+        const store = useLogStore();
+        const [data] = await store.query({
+            labels: {
+                entity: 'analysisNode',
+                entity_node_id: node.id,
+                entity_analysis_id: analysis.id,
+            },
+        });
+
+        expect(data.length).toEqual(1);
 
         details = removeDateProperties(analysisNodeLog);
     });
