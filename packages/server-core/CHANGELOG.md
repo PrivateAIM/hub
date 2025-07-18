@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.8.15](https://github.com/PrivateAIM/hub/compare/v0.8.14...v0.8.15) (2025-07-18)
+
+
+### Bug Fixes
+
+* return missing properties in analysis-node-log create process ([3c997da](https://github.com/PrivateAIM/hub/commit/3c997dadead2b8cb472f8d8685d27766b4bbc0c7))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.8.14 to ^0.8.15
+    * @privateaim/kit bumped from ^0.8.14 to ^0.8.15
+    * @privateaim/server-kit bumped from ^0.8.14 to ^0.8.15
+    * @privateaim/server-core-realtime bumped from ^0.8.14 to ^0.8.15
+    * @privateaim/server-http-kit bumped from ^0.8.14 to ^0.8.15
+    * @privateaim/server-analysis-manager-kit bumped from ^0.7.15 to ^0.7.16
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.8.14 to ^0.8.15
+
 ## [0.8.14](https://github.com/PrivateAIM/hub/compare/v0.8.13...v0.8.14) (2025-07-10)
 
 
