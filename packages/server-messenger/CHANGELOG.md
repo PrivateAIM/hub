@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.8.15](https://github.com/PrivateAIM/hub/compare/v0.8.14...v0.8.15) (2025-07-18)
+
+
+### Features
+
+* explicitly enable middlewares ([dcb95e1](https://github.com/PrivateAIM/hub/commit/dcb95e1c5750f4119977d12fb4a0a74c1a8424c8))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/messenger-kit bumped from ^0.7.15 to ^0.7.16
+    * @privateaim/server-kit bumped from ^0.8.14 to ^0.8.15
+    * @privateaim/server-http-kit bumped from ^0.8.14 to ^0.8.15
+    * @privateaim/server-realtime-kit bumped from ^0.8.14 to ^0.8.15
+
 ## [0.8.14](https://github.com/PrivateAIM/hub/compare/v0.8.13...v0.8.14) (2025-07-10)
 
 

@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.8.15](https://github.com/PrivateAIM/hub/compare/v0.8.14...v0.8.15) (2025-07-18)
+
+
+### Features
+
+* explicitly enable middlewares ([dcb95e1](https://github.com/PrivateAIM/hub/commit/dcb95e1c5750f4119977d12fb4a0a74c1a8424c8))
+
+
+### Bug Fixes
+
+* add unique constraint for bucket_id + path ([2b6e000](https://github.com/PrivateAIM/hub/commit/2b6e0003aba99f80d4e6106b491ad918e2f19b38))
+* return missing properties in analysis-node-log create process ([3c997da](https://github.com/PrivateAIM/hub/commit/3c997dadead2b8cb472f8d8685d27766b4bbc0c7))
+
 ## [0.8.14](https://github.com/PrivateAIM/hub/compare/v0.8.13...v0.8.14) (2025-07-10)
 
 
