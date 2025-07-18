@@ -8,13 +8,13 @@
 import { isRealmResourceWritable } from '@privateaim/kit';
 import { ForbiddenError } from '@ebec/http';
 import type { Request, Response } from 'routup';
-import { send } from 'routup';
+import { sendCreated } from 'routup';
 import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
 import { HTTPHandlerOperation, useRequestIdentityRealm } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import {
     AnalysisNodeLogEntity,
-} from '../../../../database/domains';
+} from '../../../../database';
 import { AnalysisNodeLogValidator } from '../utils';
 import { useAnalysisNodeLogStore } from '../../../../services';
 
@@ -40,7 +40,7 @@ export async function createAnalysisNodeLogRouteHandler(req: Request, res: Respo
     }
 
     const store = useAnalysisNodeLogStore();
-    await store.write(data);
+    const entity = await store.write(data);
 
-    return send(res, data);
+    return sendCreated(res, entity);
 }

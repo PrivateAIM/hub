@@ -17,9 +17,7 @@ export class AnalysisNodeLogDatabaseStore implements AnalysisNodeLogStore {
         const repository = dataSource.getRepository(AnalysisNodeLogEntity);
 
         const entity = repository.create(event as AnalysisNodeLogEntity);
-        await repository.save(entity);
-
-        return entity;
+        return repository.save(entity);
     }
 
     async delete(options: AnalysisNodeLogDeleteOptions): Promise<void> {
