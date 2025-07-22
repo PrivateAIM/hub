@@ -7,13 +7,14 @@
 
 export * from './master-image-group';
 export * from './master-image';
-export * from './master-image-event-log';
+export * from './master-image-event';
 export * from './project';
 export * from './project-node';
 export * from './registry';
 export * from './registry-project';
 export * from './node';
 export * from './analysis';
+export * from './analysis-bucket';
 export * from './analysis-bucket-file';
 export * from './analysis-log';
 export * from './analysis-node';

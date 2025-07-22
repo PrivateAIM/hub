@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+export * from './log';
 export * from './login';
 export * from './master-image';
 export * from './master-image-event';

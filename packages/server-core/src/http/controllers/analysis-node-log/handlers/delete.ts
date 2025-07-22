@@ -14,12 +14,15 @@ import type { AnalysisNodeLog } from '@privateaim/core-kit';
 import { useAnalysisNodeLogStore } from '../../../../domains';
 
 export async function deleteAnalysisNodeLogRouteHandler(req: Request, res: Response) : Promise<any> {
-    const output = parseQueryFilters<AnalysisNodeLog>(useRequestQuery(req, 'filter'), {
-        allowed: [
-            'analysis_id',
-            'node_id',
-        ],
-    });
+    const output = parseQueryFilters<AnalysisNodeLog>(
+        useRequestQuery(req, 'filter'),
+        {
+            allowed: [
+                'analysis_id',
+                'node_id',
+            ],
+        },
+    );
 
     const filters : Partial<Record<keyof AnalysisNodeLog, FiltersParseOutputElement>> = {};
 

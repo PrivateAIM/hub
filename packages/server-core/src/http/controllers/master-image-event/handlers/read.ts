@@ -13,18 +13,18 @@ import {
     useDataSource,
 } from 'typeorm-extension';
 import { NotFoundError } from '@ebec/http';
-import { MasterImageEventEntity } from '../../../../database/domains';
+import { MasterImageEventEntity } from '../../../../database';
 
 export async function getOneMasterImageEventLogRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(MasterImageEventEntity);
-    const query = repository.createQueryBuilder('log')
-        .where('log.id = :id', { id });
+    const query = repository.createQueryBuilder('event')
+        .where('event.id = :id', { id });
 
     applyQuery(query, useRequestQuery(req), {
-        defaultAlias: 'log',
+        defaultAlias: 'event',
         relations: {
             allowed: [
                 'master_image',
@@ -44,11 +44,11 @@ export async function getOneMasterImageEventLogRouteHandler(req: Request, res: R
 export async function getManyMasterImageEventLogRouteHandler(req: Request, res: Response) : Promise<any> {
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(MasterImageEventEntity);
-    const query = repository.createQueryBuilder('log');
-    query.distinctOn(['log.id']);
+    const query = repository.createQueryBuilder('event');
+    query.distinctOn(['event.id']);
 
     const { pagination } = applyQuery(query, useRequestQuery(req), {
-        defaultAlias: 'log',
+        defaultAlias: 'event',
         filters: {
             allowed: [
                 'name',

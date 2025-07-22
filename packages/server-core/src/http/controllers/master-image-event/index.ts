@@ -14,7 +14,7 @@ import {
 } from '@routup/decorators';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import {
-    deleteAnalysisLogRouteHandler,
+    deleteMasterImageEventRouteHandler,
     getManyMasterImageEventLogRouteHandler,
     getOneMasterImageEventLogRouteHandler,
 } from './handlers';
@@ -22,7 +22,7 @@ import {
 type PartialAnalysisLog = Partial<AnalysisLog>;
 
 @DTags('masterImage')
-@DController('/master-image-event-logs')
+@DController('/master-image-events')
 export class MasterImageEventLogController {
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
@@ -47,6 +47,6 @@ export class MasterImageEventLogController {
             @DRequest() req: any,
             @DResponse() res: any,
     ): Promise<PartialAnalysisLog | undefined> {
-        return await deleteAnalysisLogRouteHandler(req, res) as PartialAnalysisLog | undefined;
+        return await deleteMasterImageEventRouteHandler(req, res) as PartialAnalysisLog | undefined;
     }
 }

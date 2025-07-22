@@ -8,7 +8,6 @@
 export * from './analysis';
 export * from './analysis-bucket';
 export * from './analysis-bucket-file';
-export * from './analysis-log';
 export * from './anaylsis-node';
 export * from './analysis-node-event';
 export * from './analysis-permission';

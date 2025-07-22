@@ -9,7 +9,7 @@ import type { BuildInput } from 'rapiq';
 import { buildQuery } from 'rapiq';
 import type { AnalysisLog } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
-import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
+import type { CollectionResourceResponse } from '../types-base';
 
 export class AnalysisLogAPI extends BaseAPI {
     async getMany(options?: BuildInput<AnalysisLog>): Promise<CollectionResourceResponse<AnalysisLog>> {
@@ -17,27 +17,7 @@ export class AnalysisLogAPI extends BaseAPI {
         return response;
     }
 
-    async getOne(id: AnalysisLog['id']): Promise<SingleResourceResponse<AnalysisLog>> {
-        const { data: response } = await this.client.get(`analysis-logs/${id}`);
-
-        return response;
-    }
-
-    async delete(id: AnalysisLog['id']): Promise<SingleResourceResponse<AnalysisLog>> {
-        const { data: response } = await this.client.delete(`analysis-logs/${id}`);
-
-        return response;
-    }
-
-    async update(id: AnalysisLog['id'], data: Partial<AnalysisLog>): Promise<SingleResourceResponse<AnalysisLog>> {
-        const { data: response } = await this.client.post(`analysis-logs/${id}`, data);
-
-        return response;
-    }
-
-    async create(data: Partial<AnalysisLog>): Promise<SingleResourceResponse<AnalysisLog>> {
-        const { data: response } = await this.client.post('analysis-logs', data);
-
-        return response;
+    async delete(options: BuildInput<AnalysisLog>): Promise<void> {
+        await this.client.delete(`analysis-logs${buildQuery(options)}`);
     }
 }

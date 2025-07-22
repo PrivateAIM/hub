@@ -9,13 +9,14 @@ import type { RequestBaseOptions } from 'hapic';
 import { Client as BaseClient, HookName, isClientError } from 'hapic';
 import {
     AnalysisAPI,
-    AnalysisBucketFileAPI,
-    AnalysisLogAPI, AnalysisNodeAPI,
+    AnalysisBucketAPI,
+    AnalysisBucketFileAPI, AnalysisLogAPI,
+    AnalysisNodeAPI,
     AnalysisNodeEventAPI,
     AnalysisNodeLogAPI,
     AnalysisPermissionAPI,
     MasterImageAPI,
-    MasterImageEventLogAPI,
+    MasterImageEventAPI,
     MasterImageGroupAPI,
     NodeAPI,
     ProjectAPI,
@@ -24,14 +25,13 @@ import {
     RegistryProjectAPI,
     ServiceAPI,
 } from '../domains';
-import { AnalysisBucketAPI } from '../domains/analysis-bucket';
 
 export class Client extends BaseClient {
     public readonly masterImage : MasterImageAPI;
 
     public readonly masterImageGroup : MasterImageGroupAPI;
 
-    public readonly masterImageEventLog : MasterImageEventLogAPI;
+    public readonly masterImageEvent : MasterImageEventAPI;
 
     public readonly project : ProjectAPI;
 
@@ -66,7 +66,7 @@ export class Client extends BaseClient {
 
         this.masterImage = new MasterImageAPI({ client: this });
         this.masterImageGroup = new MasterImageGroupAPI({ client: this });
-        this.masterImageEventLog = new MasterImageEventLogAPI({ client: this });
+        this.masterImageEvent = new MasterImageEventAPI({ client: this });
         this.project = new ProjectAPI({ client: this });
         this.projectNode = new ProjectNodeAPI({ client: this });
         this.registry = new RegistryAPI({ client: this });

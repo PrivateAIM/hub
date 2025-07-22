@@ -6,64 +6,14 @@
  */
 
 import type { Realm } from '@authup/core-kit';
+import type { Log } from '@privateaim/kit';
 import type {
     Analysis,
 } from '../analysis';
 
-export interface AnalysisLog {
-    id: string;
-
-    /**
-     * e.g: building, routing, ...
-     */
-    component: string | null;
-
-    /**
-     * e.g: process, check, stop, ...
-     */
-    command: string | null;
-
-    /**
-     * e.g checking, checked
-     */
-    event: string | null;
-
-    /**
-     * is it an error log?
-     */
-    error: boolean;
-
-    /**
-     * e.g: trainNotBuild, entrypointNotFound, ...
-     */
-    error_code: string | null;
-
-    /**
-     * e.g. started, finished, failed, ...
-     */
-    status: string | null;
-
-    /**
-     * e.g: error_message
-     */
-    status_message: string | null;
-
-    /**
-     * e.g: {station_id: xxx, station_index: 0}
-     */
-    meta: string | null;
-
-    // ------------------------------------------------------------------
-
-    created_at: Date;
-
-    updated_at: Date;
-
-    // ------------------------------------------------------------------
+export interface AnalysisLog extends Log {
 
     analysis_id: Analysis['id'];
-
-    analysis: Analysis;
 
     realm_id: Realm['id'];
 }

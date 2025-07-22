@@ -7,16 +7,14 @@
 import type {
     AnalysisLog,
 } from '@privateaim/core-kit';
-import {
-    DomainType,
-    buildDomainChannelName,
-} from '@privateaim/core-kit';
 import type { ListItemSlotProps } from '@vuecs/list-controls';
+import { buildList } from '@vuecs/list-controls';
+import type { Ref } from 'vue';
 import {
-    defineComponent, h, ref,
+    defineComponent,
+    h, nextTick, ref,
 } from 'vue';
-import type { ListMeta } from '../../core';
-import { createList } from '../../core';
+import { injectCoreHTTPClient } from '../../core';
 import FAnalysisLog from './FAnalysisLog';
 
 export default defineComponent({
@@ -33,71 +31,51 @@ export default defineComponent({
     setup(props, setup) {
         const rootNode = ref<null | HTMLElement>(null);
 
-        const scrollToLastLine = (meta: ListMeta<AnalysisLog>) => {
+        const scrollToLastLine = (total: number) => {
             if (!rootNode.value) {
                 return;
             }
 
-            const el = rootNode.value.getElementsByClassName(`line-${meta.total}`)[0];
+            const el = rootNode.value.getElementsByClassName(`line-${total}`)[0];
 
             if (el) {
                 el.scrollIntoView({ behavior: 'smooth' });
             }
         };
 
-        const {
-            render,
-            setDefaults,
-        } = createList({
-            type: `${DomainType.ANALYSIS_LOG}`,
-            onCreated(_entity, meta) {
-                scrollToLastLine(meta);
-            },
-            socket: {
-                processEvent(event) {
-                    return event.meta.roomName !== buildDomainChannelName(DomainType.ANALYSIS_LOG) ||
-                        event.data.analysis_id !== props.entityId;
-                },
-            },
-            props,
-            setup,
-            loadAll: true,
-            query: {
-                filters: {
-                    analysis_id: props.entityId,
-                },
-                sort: {
-                    created_at: 'ASC',
-                },
-            },
-        });
+        const httpClient = injectCoreHTTPClient();
 
-        setDefaults({
-            noMore: {
-                content: 'No more logs available...',
-            },
-            item: {
-                content(item: AnalysisLog, slotProps: ListItemSlotProps<AnalysisLog>) {
-                    return h(
-                        FAnalysisLog,
-                        {
-                            entity: item,
-                            index: slotProps.index,
-                            onDeleted() {
-                                if (slotProps && slotProps.deleted) {
-                                    slotProps.deleted(item);
-                                }
-                            },
-                            onUpdated: (e: AnalysisLog) => {
-                                if (slotProps && slotProps.updated) {
-                                    slotProps.updated(e);
-                                }
-                            },
-                        },
-                    );
+        const busy = ref(false);
+        const total = ref(0);
+        const items : Ref<AnalysisLog[]> = ref([]);
+
+        const load = async (time?: string | bigint) => {
+            const response = await httpClient.analysisLog.getMany({
+                filter: {
+                    analysis_id: props.entityId,
+                    ...(time ? { time: `>${time}` } : {}),
                 },
-            },
-        });
+            });
+
+            items.value.push(...response.data);
+
+            if (response.meta.total > items.value.length) {
+                return load(items.value[items.value.length - 1].time);
+            }
+
+            total.value = response.meta.total;
+
+            nextTick(() => {
+                scrollToLastLine(items.value.length);
+            });
+
+            return Promise.resolve();
+        };
+
+        Promise.resolve()
+            .then(() => { busy.value = true; })
+            .then(() => load())
+            .then(() => { busy.value = false; });
 
         return () => h('div', {
             ref: rootNode,
@@ -106,7 +84,41 @@ export default defineComponent({
             h('div', {
                 class: 'log-body',
             }, [
-                render(),
+                buildList({
+                    busy: busy.value,
+                    data: items.value,
+                    slotItems: setup.slots,
+                    noMore: {
+                        content: 'No more logs available...',
+                    },
+                    total: total.value,
+                    meta: {
+                        total: total.value,
+                    },
+                    body: {
+                        item: {
+                            content(item: AnalysisLog, slotProps: ListItemSlotProps<AnalysisLog>) {
+                                return h(
+                                    FAnalysisLog,
+                                    {
+                                        entity: item,
+                                        index: slotProps.index,
+                                        onDeleted() {
+                                            if (slotProps && slotProps.deleted) {
+                                                slotProps.deleted(item);
+                                            }
+                                        },
+                                        onUpdated: (e: AnalysisLog) => {
+                                            if (slotProps && slotProps.updated) {
+                                                slotProps.updated(e);
+                                            }
+                                        },
+                                    },
+                                );
+                            },
+                        },
+                    },
+                }),
             ]),
         ]);
     },

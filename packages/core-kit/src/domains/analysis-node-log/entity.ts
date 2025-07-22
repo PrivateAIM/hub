@@ -6,15 +6,13 @@
  */
 
 import type { Realm } from '@authup/core-kit';
-import type { LogLevel } from '@privateaim/kit';
+import type { Log } from '@privateaim/kit';
 import type {
     Analysis,
 } from '../analysis';
 import type { Node } from '../node';
 
-export interface AnalysisNodeLog {
-    id: string;
-
+export interface AnalysisNodeLog extends Log {
     /**
      * e.g: entrypointNotFound, ...
      */
@@ -25,28 +23,9 @@ export interface AnalysisNodeLog {
      */
     status: string | null;
 
-    /**
-     * unix log level
-     */
-    level: `${LogLevel}`;
-
-    /**
-     * message
-     */
-    message: string | null;
-
-    /**
-     *
-     */
-    time: string | bigint,
-
-    // ------------------------------------------------------------------
-
     analysis_realm_id: Realm['id'];
 
     analysis_id: Analysis['id'];
-
-    // ------------------------------------------------------------------
 
     node_id: Node['id'];
 

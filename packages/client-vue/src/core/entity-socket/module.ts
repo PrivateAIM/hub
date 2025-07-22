@@ -6,7 +6,7 @@
  */
 
 import type { DomainEventFullName } from '@privateaim/kit';
-import { buildDomainEventFullName } from '@privateaim/kit';
+import { buildDomainEventFullName, hasOwnProperty } from '@privateaim/kit';
 import { EntityDefaultEventName, REALM_MASTER_NAME } from '@authup/core-kit';
 import type {
     DomainTypeMap,
@@ -84,11 +84,28 @@ export function createEntitySocket<
             return false;
         }
 
-        if (ctx.target && (!targetId.value || targetId.value !== event.data.id)) {
+        if (
+            ctx.target &&
+            !targetId.value
+        ) {
             return false;
         }
 
-        return event.data.id !== lockId.value;
+        if (ctx.target) {
+            if (hasOwnProperty(event.data, 'id')) {
+                if (targetId.value !== event.data.id) {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+
+        if (hasOwnProperty(event.data, 'id')) {
+            return event.data.id !== lockId.value;
+        }
+
+        return true;
     };
 
     const handleCreated : STCEventHandler<TYPE, RECORD> = (

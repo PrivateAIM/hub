@@ -11,16 +11,16 @@ import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestPermissionChecker } from '@privateaim/server-http-kit';
-import { AnalysisLogEntity } from '../../../../database/domains';
+import { MasterImageEventEntity } from '../../../../database';
 
-export async function deleteAnalysisLogRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function deleteMasterImageEventRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
     const permissionChecker = useRequestPermissionChecker(req);
     await permissionChecker.preCheck({ name: PermissionName.ANALYSIS_UPDATE });
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(AnalysisLogEntity);
+    const repository = dataSource.getRepository(MasterImageEventEntity);
 
     const entity = await repository.findOneBy({ id });
 

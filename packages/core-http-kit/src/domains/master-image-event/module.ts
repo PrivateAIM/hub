@@ -11,32 +11,32 @@ import type { MasterImageEvent } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
 
-export class MasterImageEventLogAPI extends BaseAPI {
+export class MasterImageEventAPI extends BaseAPI {
     async getMany(options?: BuildInput<MasterImageEvent>): Promise<CollectionResourceResponse<MasterImageEvent>> {
-        const { data: response } = await this.client.get(`master-image-event-logs${buildQuery(options)}`);
+        const { data: response } = await this.client.get(`master-image-events${buildQuery(options)}`);
         return response;
     }
 
     async getOne(id: MasterImageEvent['id']): Promise<SingleResourceResponse<MasterImageEvent>> {
-        const { data: response } = await this.client.get(`master-image-event-logs/${id}`);
+        const { data: response } = await this.client.get(`master-image-events/${id}`);
 
         return response;
     }
 
     async delete(id: MasterImageEvent['id']): Promise<SingleResourceResponse<MasterImageEvent>> {
-        const { data: response } = await this.client.delete(`master-image-event-logs/${id}`);
+        const { data: response } = await this.client.delete(`master-image-events/${id}`);
 
         return response;
     }
 
     async update(id: MasterImageEvent['id'], data: Partial<MasterImageEvent>): Promise<SingleResourceResponse<MasterImageEvent>> {
-        const { data: response } = await this.client.post(`master-image-event-logs/${id}`, data);
+        const { data: response } = await this.client.post(`master-image-events/${id}`, data);
 
         return response;
     }
 
     async create(data: Partial<MasterImageEvent>): Promise<SingleResourceResponse<MasterImageEvent>> {
-        const { data: response } = await this.client.post('master-image-event-logs', data);
+        const { data: response } = await this.client.post('master-image-events', data);
 
         return response;
     }

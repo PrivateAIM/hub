@@ -10,13 +10,12 @@ import type {
 } from '@privateaim/core-kit';
 
 import {
-    DController, DDelete, DGet, DPath, DRequest, DResponse, DTags,
+    DController, DDelete, DGet, DRequest, DResponse, DTags,
 } from '@routup/decorators';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import {
     deleteAnalysisLogRouteHandler,
     getManyAnalysisLogRouteHandler,
-    getOneAnalysisLogRouteHandler,
 } from './handlers';
 
 type PartialAnalysisLog = Partial<AnalysisLog>;
@@ -32,19 +31,9 @@ export class AnalysisLogController {
         return await getManyAnalysisLogRouteHandler(req, res) as PartialAnalysisLog[];
     }
 
-    @DGet('/:id', [ForceLoggedInMiddleware])
-    async getOne(
-        @DPath('id') id: string,
-            @DRequest() req: any,
-            @DResponse() res: any,
-    ): Promise<PartialAnalysisLog | undefined> {
-        return await getOneAnalysisLogRouteHandler(req, res) as PartialAnalysisLog | undefined;
-    }
-
-    @DDelete('/:id', [ForceLoggedInMiddleware])
+    @DDelete('', [ForceLoggedInMiddleware])
     async drop(
-        @DPath('id') id: string,
-            @DRequest() req: any,
+        @DRequest() req: any,
             @DResponse() res: any,
     ): Promise<PartialAnalysisLog | undefined> {
         return await deleteAnalysisLogRouteHandler(req, res) as PartialAnalysisLog | undefined;

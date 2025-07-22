@@ -10,7 +10,6 @@ import {
     AnalysisBucketEntity,
     AnalysisBucketFileEntity,
     AnalysisEntity,
-    AnalysisLogEntity,
     AnalysisNodeEntity,
     AnalysisNodeEventEntity,
     AnalysisPermissionEntity,
@@ -26,7 +25,6 @@ import {
 import { DatabaseQueryResultCache } from '../../cache';
 import {
     AnalysisFileSubscriber,
-    AnalysisLogSubscriber,
     AnalysisNodeEventSubscriber,
     AnalysisNodeSubscriber,
     AnalysisSubscriber,
@@ -56,7 +54,6 @@ export async function extendDataSourceOptions(options: DataSourceOptions) : Prom
             NodeEntity,
             AnalysisEntity,
             AnalysisBucketEntity,
-            AnalysisLogEntity,
             AnalysisBucketFileEntity,
             AnalysisNodeEntity,
             AnalysisNodeEventEntity,
@@ -68,7 +65,6 @@ export async function extendDataSourceOptions(options: DataSourceOptions) : Prom
             ...(options.subscribers ? options.subscribers : []) as string[],
             AnalysisSubscriber,
             AnalysisFileSubscriber,
-            AnalysisLogSubscriber,
             AnalysisNodeSubscriber,
             AnalysisNodeEventSubscriber,
             MasterImageSubscriber,
