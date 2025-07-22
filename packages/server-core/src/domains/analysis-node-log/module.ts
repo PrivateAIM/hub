@@ -11,7 +11,6 @@ import type {
     LogStore,
 } from '@privateaim/server-kit';
 import type { Log } from '@privateaim/kit';
-import { omitRecord } from '@authup/kit';
 import type { AnalysisNodeLogDeleteOptions, AnalysisNodeLogQueryOptions } from './types';
 
 export class AnalysisNodeLogStore {
@@ -71,9 +70,15 @@ export class AnalysisNodeLogStore {
     protected buildLabels(
         entity: Partial<AnalysisNodeLog>,
     ) : Record<string, string> {
-        return {
-            ...omitRecord(entity, ['level', 'message']),
+        const output : Record<string, string> = {
             entity: 'analysisNode',
         };
+        const keys = Object.keys(entity);
+
+        for (let i = 0, { length } = keys; i < length; i++) {
+            output[keys[i]] = entity[keys[i]];
+        }
+
+        return output;
     }
 }

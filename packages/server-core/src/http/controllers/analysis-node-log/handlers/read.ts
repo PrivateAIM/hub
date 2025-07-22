@@ -22,14 +22,14 @@ export async function getManyAnalysisNodeLogRouteHandler(req: Request, res: Resp
                 'level',
                 'analysis_id',
                 'node_id',
-                'created_at',
+                'time',
             ],
         },
         pagination: {
             maxLimit: 50,
         },
         sort: {
-            allowed: ['created_at'],
+            allowed: ['time'],
         },
     });
 
@@ -42,7 +42,7 @@ export async function getManyAnalysisNodeLogRouteHandler(req: Request, res: Resp
                 options.analysis_id = `${output.filters[i].value}`;
             } else if (key === 'node_id') {
                 options.node_id = `${output.filters[i].value}`;
-            } else if (key === 'created_at') {
+            } else if (key === 'time') {
                 if (
                     output.filters[i].operator === FilterComparisonOperator.LESS_THAN ||
                     output.filters[i].operator === FilterComparisonOperator.LESS_THAN_EQUAL

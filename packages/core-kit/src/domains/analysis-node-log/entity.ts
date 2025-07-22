@@ -35,6 +35,11 @@ export interface AnalysisNodeLog {
      */
     message: string | null;
 
+    /**
+     *
+     */
+    time: string | bigint,
+
     // ------------------------------------------------------------------
 
     analysis_realm_id: Realm['id'];
