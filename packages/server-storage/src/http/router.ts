@@ -37,6 +37,8 @@ export function createHTTPRouter() : Router {
     mountMiddlewares(router, {
         basic: true,
         cors: true,
+        prometheus: true,
+        rateLimit: true,
         authup: {
             client: isAuthupClientUsable() ?
                 useAuthupClient() :

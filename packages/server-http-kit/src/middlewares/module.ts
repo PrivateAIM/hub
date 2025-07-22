@@ -18,39 +18,33 @@ import type { MiddlewareMountOptions } from './types';
 
 export function mountMiddlewares(
     router: Router,
-    ctx: MiddlewareMountOptions = {},
+    options: MiddlewareMountOptions = {},
 ) {
-    ctx.basic ??= true;
-    ctx.cors ??= true;
-    ctx.prometheus ??= true;
-    ctx.rateLimit ??= true;
-    ctx.swagger ??= true;
-
-    if (ctx.cors) {
+    if (options.cors) {
         mountCorsMiddleware(router);
     }
 
-    if (ctx.basic) {
+    if (options.basic) {
         mountBasicMiddleware(router);
     }
 
-    if (ctx.authup) {
-        mountAuthupMiddleware(router, ctx.authup);
+    if (options.authup) {
+        mountAuthupMiddleware(router, options.authup);
     }
 
-    if (ctx.prometheus) {
+    if (options.prometheus) {
         mountPrometheusMiddleware(router);
     }
 
-    if (ctx.rateLimit) {
+    if (options.rateLimit) {
         mountRateLimiterMiddleware(router);
     }
 
-    if (ctx.swagger) {
-        mountSwaggerMiddleware(router, boolableToObject(ctx.swagger));
+    if (options.swagger) {
+        mountSwaggerMiddleware(router, boolableToObject(options.swagger));
     }
 
-    if (ctx.decorators) {
-        mountDecoratorsMiddleware(router, ctx.decorators);
+    if (options.decorators) {
+        mountDecoratorsMiddleware(router, options.decorators);
     }
 }
