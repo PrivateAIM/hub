@@ -11,7 +11,7 @@ export interface Log {
     /**
      * Time in micro seconds
      */
-    time: bigint,
+    time: string | bigint,
 
     /**
      *  message
@@ -21,7 +21,7 @@ export interface Log {
     /**
      * level
      */
-    level: LogLevel,
+    level: `${LogLevel}`,
 
     /**
      * additional labels

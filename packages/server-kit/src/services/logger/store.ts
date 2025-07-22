@@ -7,7 +7,7 @@
 
 import type { TransportStreamOptions } from 'winston-transport';
 import WinstonTransport from 'winston-transport';
-import type { LogMessage, LogStore } from '../log-store';
+import type { LogInput, LogStore } from '../log-store';
 
 type LogStoreTransportOptions = TransportStreamOptions & {
     labels?: Record<string, string>
@@ -30,7 +30,9 @@ export class LogStoreTransport extends WinstonTransport {
             message, timestamp, stack, ...data
         } = info;
 
-        const labels : Record<string, string> = {};
+        const labels : Record<string, string> = {
+            ...this.labels,
+        };
         const keys = Object.keys(data);
         for (let i = 0; i < keys.length; i++) {
             if (typeof keys[i] !== 'string') {
@@ -55,13 +57,10 @@ export class LogStoreTransport extends WinstonTransport {
             date = new Date();
         }
 
-        const payload : LogMessage = {
+        const payload : LogInput = {
             message: stack || message,
             time: BigInt(date.getTime()) * 1_000_000n,
-            labels: {
-                ...this.labels,
-                ...labels,
-            },
+            labels,
         };
 
         Promise.resolve()

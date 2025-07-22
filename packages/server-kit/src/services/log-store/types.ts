@@ -5,6 +5,8 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
+import type { Log, LogLevel } from '@privateaim/kit';
+
 export type LogStoreQueryOptions = {
     labels?: Record<string, string>
     start?: number,
@@ -19,9 +21,9 @@ export type LogStoreDeleteOptions = {
     end?: number,
 };
 
-export type LogMessage = {
+export type LogInput = Omit<Log, 'labels' | 'time' | 'level'> & {
     time?: bigint,
-    message: string,
+    level?: `${LogLevel}`,
     labels?: Record<string, string>
 };
 
@@ -32,9 +34,9 @@ export interface LogStore {
 
     extendLabels(labels: Record<string, string>): void;
 
-    write(message: string | LogMessage, labels?: Record<string, string>) : Promise<void>;
+    write(message: string | LogInput, labels?: Record<string, string>) : Promise<Log>;
 
-    query(options?: LogStoreQueryOptions) : Promise<[LogMessage[], number]>;
+    query(options?: LogStoreQueryOptions) : Promise<[Log[], number]>;
 
     delete(options?: LogStoreDeleteOptions) : Promise<void>;
 }

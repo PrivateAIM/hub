@@ -37,12 +37,6 @@ export interface AnalysisNodeLog {
 
     // ------------------------------------------------------------------
 
-    created_at: Date;
-
-    updated_at: Date;
-
-    // ------------------------------------------------------------------
-
     analysis_realm_id: Realm['id'];
 
     analysis_id: Analysis['id'];

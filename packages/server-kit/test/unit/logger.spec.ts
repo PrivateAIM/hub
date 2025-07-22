@@ -25,10 +25,10 @@ describe('logger', () => {
 
         const [item] = store.items;
 
+        expect(item.level).toEqual('info');
         expect(item.message).toEqual('foo');
         expect(item.labels).toEqual({
             app: 'app',
-            level: 'info',
             meta: 'bar',
         });
         expect(item.time).toBeDefined();

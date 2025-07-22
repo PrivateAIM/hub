@@ -5,14 +5,16 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
+import type { Log } from '@privateaim/kit';
+import { LogLevel } from '@privateaim/kit';
 import type {
-    LogMessage, LogStore, LogStoreQueryOptions,
+    LogInput, LogStore, LogStoreQueryOptions,
 } from '../types';
 import { nanoSeconds } from '../../loki';
 import { BaseLogStore } from './base';
 
 export class MemoryLogStore extends BaseLogStore implements LogStore {
-    public readonly items : LogMessage[];
+    public readonly items : Log[];
 
     constructor(labels?: Record<string, string>) {
         super();
@@ -26,7 +28,7 @@ export class MemoryLogStore extends BaseLogStore implements LogStore {
         return Promise.resolve();
     }
 
-    async query(options: LogStoreQueryOptions = {}): Promise<[LogMessage[], number]> {
+    async query(options: LogStoreQueryOptions = {}): Promise<[Log[], number]> {
         // todo: apply all query options
 
         const data = this.items.filter((item) => {
@@ -50,27 +52,49 @@ export class MemoryLogStore extends BaseLogStore implements LogStore {
             return true;
         });
 
-        return [data, data.length];
+        return [
+            data,
+            data.length,
+        ];
     }
 
-    write(message: string | LogMessage, labels?: Record<string, string>): Promise<void> {
+    async write(message: string | LogInput, labels?: Record<string, string>): Promise<Log> {
+        let data : Log;
+
         if (typeof message === 'string') {
-            this.items.push({ message, time: nanoSeconds(), ...(labels ? { labels } : {}) });
-            return Promise.resolve();
+            const labelsNormalized = {
+                ...this.labels,
+                ...(labels || {}),
+            };
+            const level = (labelsNormalized.level || LogLevel.DEBUG) as LogLevel;
+            delete labelsNormalized.level;
+
+            data = {
+                message,
+                level,
+                time: nanoSeconds(),
+                labels: labelsNormalized,
+            };
+        } else {
+            const labelsNormalized = {
+                ...this.labels,
+                ...(message.labels || {}),
+                ...(labels || {}),
+            };
+
+            const level = (message.level || labelsNormalized.level || LogLevel.DEBUG) as LogLevel;
+            delete labelsNormalized.level;
+
+            data = {
+                ...message,
+                level,
+                time: message.time || nanoSeconds(),
+                labels: labelsNormalized,
+            };
         }
 
-        const data : Record<string, string> = {
-            ...this.labels,
-            ...(labels || {}),
-            ...(message.labels ? message.labels : {}),
-        };
+        this.items.push(data);
 
-        this.items.push({
-            message: message.message,
-            time: message.time || nanoSeconds(),
-            ...(data ? { labels: data } : {}),
-        });
-
-        return Promise.resolve();
+        return data;
     }
 }

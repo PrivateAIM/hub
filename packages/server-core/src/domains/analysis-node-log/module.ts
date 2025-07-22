@@ -7,8 +7,11 @@
 
 import type { AnalysisNodeLog } from '@privateaim/core-kit';
 import type {
+    LogInput,
     LogStore,
 } from '@privateaim/server-kit';
+import type { Log } from '@privateaim/kit';
+import { omitRecord } from '@authup/kit';
 import type { AnalysisNodeLogDeleteOptions, AnalysisNodeLogQueryOptions } from './types';
 
 export class AnalysisNodeLogStore {
@@ -18,17 +21,17 @@ export class AnalysisNodeLogStore {
         this.instance = instance;
     }
 
-    async write(event: AnalysisNodeLog): Promise<void> {
-        let time : bigint | undefined;
-        if (event.created_at) {
-            time = BigInt(new Date(`${event.created_at}`).getTime()) * 1_000_000n;
-        }
-
-        await this.instance.write({
+    async write(event: AnalysisNodeLog): Promise<Log> {
+        const data : LogInput = {
             labels: this.buildLabels(event),
             message: event.message,
-            time,
-        });
+            level: event.level,
+        };
+
+        const output = await this.instance.write(data);
+        output.time = typeof output.time === 'bigint' ? output.time.toString() : output.time;
+
+        return output;
     }
 
     async delete(options: AnalysisNodeLogDeleteOptions): Promise<void> {
@@ -43,40 +46,24 @@ export class AnalysisNodeLogStore {
         });
     }
 
-    async query(input: AnalysisNodeLogQueryOptions): Promise<[AnalysisNodeLog[], number]> {
+    async query(input: AnalysisNodeLogQueryOptions): Promise<[Log[], number]> {
         const labels = this.buildLabels({
             analysis_id: input.analysis_id,
             node_id: input.node_id,
         });
 
-        const [data, total] = await this.instance.query({
+        const output = await this.instance.query({
             ...input,
-            labels: {
-                ...labels,
-            },
+            labels,
         });
 
-        const output : AnalysisNodeLog[] = [];
-
-        for (let i = 0; i < data.length; i++) {
-            let date : Date;
-            if (data[i].time) {
-                date = new Date(Number(data[i].time / 1_000_000n));
-            } else {
-                date = new Date(Date.now() + i);
-            }
-
-            output.push({
-                id: `${date.getTime()}`,
-                message: data[i].message,
-                created_at: date.toISOString() as unknown as Date,
-                updated_at: date.toISOString() as unknown as Date,
-                analysis_id: input.analysis_id,
-                node_id: input.node_id,
-            } satisfies Partial<AnalysisNodeLog> as AnalysisNodeLog);
-        }
-
-        return [output, total];
+        return [
+            output[0].map((el) => {
+                el.time = typeof el.time === 'bigint' ? el.time.toString() : el.time;
+                return el;
+            }),
+            output[1],
+        ];
     }
 
     // ----------------------------------------------
@@ -85,11 +72,8 @@ export class AnalysisNodeLogStore {
         entity: Partial<AnalysisNodeLog>,
     ) : Record<string, string> {
         return {
-            ...(entity.level ? { level: entity.level } : {}),
-            ...(entity.code ? { code: entity.code } : {}),
+            ...omitRecord(entity, ['level', 'message']),
             entity: 'analysisNode',
-            ...(entity.node_id ? { node_id: entity.node_id } : {}),
-            ...(entity.analysis_id ? { analysis_id: entity.analysis_id } : {}),
         };
     }
 }

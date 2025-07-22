@@ -5,10 +5,12 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
+import type { Log } from '@privateaim/kit';
+import { LogLevel } from '@privateaim/kit';
 import type { LokiClient, LokiDistributorPushStream, LokiQuerierQueryRangeOptions } from '../../loki';
 import { nanoSeconds } from '../../loki';
 import type {
-    LogMessage, LogStore, LogStoreDeleteOptions, LogStoreQueryOptions,
+    LogInput, LogStore, LogStoreDeleteOptions, LogStoreQueryOptions,
 } from '../types';
 import { BaseLogStore } from './base';
 
@@ -22,24 +24,51 @@ export class LokiLogStore extends BaseLogStore implements LogStore {
         this.labels = labels || {};
     }
 
-    async write(message: string | LogMessage, labels?: Record<string, string>): Promise<void> {
-        const stream : LokiDistributorPushStream = {
-            stream: {
-                ...this.labels,
-                ...(labels || {}),
-            },
-            values: [],
-        };
+    async write(message: string | LogInput, labels?: Record<string, string>): Promise<Log> {
+        let data : Log;
 
         if (typeof message === 'string') {
-            stream.values.push([nanoSeconds(), message]);
-        } else if (message.labels) {
-            stream.values.push([message.time, message.message, message.labels]);
+            const labelsNormalized = {
+                ...this.labels,
+                ...(labels || {}),
+            };
+            const level = (labelsNormalized.level || LogLevel.DEBUG) as LogLevel;
+            delete labelsNormalized.level;
+
+            data = {
+                message,
+                level,
+                time: nanoSeconds(),
+                labels: labelsNormalized,
+            };
         } else {
-            stream.values.push([message.time, message.message]);
+            const labelsNormalized = {
+                ...this.labels,
+                ...(message.labels || {}),
+                ...(labels || {}),
+            };
+
+            const level = (message.level || labelsNormalized.level || LogLevel.DEBUG) as LogLevel;
+            delete labelsNormalized.level;
+
+            data = {
+                ...message,
+                level,
+                time: message.time || nanoSeconds(),
+                labels: labelsNormalized,
+            };
         }
 
+        const stream : LokiDistributorPushStream = {
+            stream: data.labels,
+            values: [
+                [data.time, data.message, { level: data.level }],
+            ],
+        };
+
         await this.instance.distributor.push(stream);
+
+        return data;
     }
 
     async delete(options: LogStoreDeleteOptions): Promise<void> {
@@ -53,7 +82,7 @@ export class LokiLogStore extends BaseLogStore implements LogStore {
         });
     }
 
-    async query(input: LogStoreQueryOptions): Promise<[LogMessage[], number]> {
+    async query(input: LogStoreQueryOptions): Promise<[Log[], number]> {
         const options : LokiQuerierQueryRangeOptions = {
             query: this.buildQuery({
                 ...this.labels,
@@ -77,18 +106,36 @@ export class LokiLogStore extends BaseLogStore implements LogStore {
             options.end = BigInt(new Date(`${input.end}`).getTime()) * 1_000_000n;
         }
 
-        const output : LogMessage[] = [];
+        const output : Log[] = [];
 
         const response = await this.instance.querier.queryRange(options);
         if (response.data.resultType === 'streams') {
             for (let i = 0; i < response.data.result.length; i++) {
                 const set = response.data.result[i];
 
-                for (let j = 0; j < set.value.length; j++) {
+                const labels = set.stream;
+                let level : LogLevel;
+
+                if (labels.level) {
+                    level = labels.level as LogLevel;
+                } else {
+                    level = labels.detected_level as LogLevel;
+                }
+                delete labels.level;
+                delete labels.detected_level;
+
+                if (!labels.service) {
+                    labels.service = labels.service_name;
+                }
+                delete labels.service_name;
+
+                for (let j = 0; j < set.values.length; j++) {
                     output.push({
-                        time: BigInt(set.value[j][0]),
-                        message: set.value[j][1],
-                    } satisfies LogMessage);
+                        time: BigInt(set.values[j][0]),
+                        message: set.values[j][1],
+                        level,
+                        labels,
+                    } satisfies Log);
                 }
             }
         }

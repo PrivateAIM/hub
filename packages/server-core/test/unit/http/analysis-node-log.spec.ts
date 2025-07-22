@@ -6,17 +6,15 @@
  */
 
 import { AnalysisNodeRunStatus } from '@privateaim/core-kit';
-import type { Analysis, AnalysisNodeLog, Node } from '@privateaim/core-kit';
+import type { Analysis, Node } from '@privateaim/core-kit';
+import type { Log } from '@privateaim/kit';
 import { LogLevel, wait } from '@privateaim/kit';
 import { useLogStore } from '@privateaim/server-kit';
-import {
-    createTestSuite,
-    removeDateProperties,
-} from '../../utils';
 import {
     createTestNode,
     createTestProject,
 } from '../../utils/domains';
+import { createTestSuite } from '../../utils';
 
 describe('controllers > analysis-node-log', () => {
     const suite = createTestSuite();
@@ -54,7 +52,7 @@ describe('controllers > analysis-node-log', () => {
         node = undefined;
     });
 
-    let details : AnalysisNodeLog;
+    let details : Log;
 
     it('should create resource', async () => {
         const client = suite.client();
@@ -67,7 +65,6 @@ describe('controllers > analysis-node-log', () => {
             message: 'Analysis has been forcefully terminated.',
         });
 
-        expect(analysisNodeLog.status).toEqual(AnalysisNodeRunStatus.FAILED);
         expect(analysisNodeLog.level).toEqual(LogLevel.ERROR);
         expect(analysisNodeLog.message).toEqual('Analysis has been forcefully terminated.');
 
@@ -84,7 +81,7 @@ describe('controllers > analysis-node-log', () => {
 
         expect(data.length).toEqual(1);
 
-        details = removeDateProperties(analysisNodeLog);
+        details = analysisNodeLog;
     });
 
     it('should read collection', async () => {
@@ -92,8 +89,8 @@ describe('controllers > analysis-node-log', () => {
 
         const { data } = await client.analysisNodeLog.getMany({
             filters: {
-                node_id: details.node_id,
-                analysis_id: details.analysis_id,
+                node_id: details.labels.node_id,
+                analysis_id: details.labels.analysis_id,
             },
         });
         expect(data.length).toBeGreaterThanOrEqual(1);
@@ -104,8 +101,8 @@ describe('controllers > analysis-node-log', () => {
 
         await client.analysisNodeLog.delete({
             filters: {
-                node_id: details.node_id,
-                analysis_id: details.analysis_id,
+                node_id: details.labels.node_id,
+                analysis_id: details.labels.analysis_id,
             },
         });
     });

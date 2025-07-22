@@ -7,6 +7,21 @@ volumes:
     vault:
         driver: local
 services:
+    loki:
+        image: grafana/loki:latest
+        ports:
+            - "3100:3100"
+        networks:
+            hub:
+    grafana:
+        image: grafana/grafana:latest
+        environment:
+            - GF_SECURITY_ADMIN_PASSWORD=admin
+        networks:
+            hub:
+        depends_on:
+            loki:
+                condition: service_healthy
     mysql:
         image: mysql:latest
         container_name: mysql
