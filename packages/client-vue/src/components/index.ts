@@ -7,7 +7,7 @@
 
 export * from './login';
 export * from './master-image';
-export * from './master-image-event-log';
+export * from './master-image-event';
 export * from './master-image-group';
 export * from './project';
 export * from './project-node';

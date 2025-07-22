@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import { VCTimeago } from '@vuecs/timeago';
-import type { MasterImageEventLog } from '@privateaim/core-kit';
+import type { MasterImageEvent } from '@privateaim/core-kit';
 import {
     defineComponent, h, toRef,
 } from 'vue';
@@ -20,7 +20,7 @@ export default defineComponent({
             default: 0,
         },
         entity: {
-            type: Object as PropType<MasterImageEventLog>,
+            type: Object as PropType<MasterImageEvent>,
             required: true,
         },
     },

@@ -67,9 +67,6 @@ describe('controllers > analysis-node-log', () => {
             message: 'Analysis has been forcefully terminated.',
         });
 
-        delete analysisNodeLog.analysis;
-        delete analysisNodeLog.node;
-
         expect(analysisNodeLog.status).toEqual(AnalysisNodeRunStatus.FAILED);
         expect(analysisNodeLog.level).toEqual(LogLevel.ERROR);
         expect(analysisNodeLog.message).toEqual('Analysis has been forcefully terminated.');

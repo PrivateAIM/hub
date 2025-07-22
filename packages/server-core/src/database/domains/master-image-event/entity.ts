@@ -15,12 +15,12 @@ import {
 } from 'typeorm';
 import type {
     MasterImage,
-    MasterImageEventLog,
+    MasterImageEvent,
 } from '@privateaim/core-kit';
 import { MasterImageEntity } from '../master-image';
 
-@Entity({ name: 'master_image_event_logs' })
-export class MasterImageEventLogEntity implements MasterImageEventLog {
+@Entity({ name: 'master_image_events' })
+export class MasterImageEventEntity implements MasterImageEvent {
     @PrimaryGeneratedColumn('uuid')
         id: string;
 

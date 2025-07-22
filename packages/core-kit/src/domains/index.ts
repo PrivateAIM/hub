@@ -16,7 +16,7 @@ export * from './analysis-permission';
 export * from './realm';
 export * from './master-image-group';
 export * from './master-image';
-export * from './master-image-event-log';
+export * from './master-image-event';
 export * from './project';
 export * from './project-node';
 export * from './registry';

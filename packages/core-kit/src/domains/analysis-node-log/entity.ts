@@ -47,13 +47,9 @@ export interface AnalysisNodeLog {
 
     analysis_id: Analysis['id'];
 
-    analysis: Analysis;
-
     // ------------------------------------------------------------------
 
     node_id: Node['id'];
 
     node_realm_id: Realm['id'];
-
-    node: Node;
 }
