@@ -11,7 +11,7 @@ import {
 } from '@privateaim/server-analysis-manager-kit';
 import { type QueueRouterHandlers } from '@privateaim/server-kit';
 import { useDataSource } from 'typeorm-extension';
-import { AnalysisBucketEntity, AnalysisEntity } from '../../../database/domains';
+import { AnalysisBucketEntity, AnalysisEntity } from '../../../database';
 
 export function createAnalysisManagerCoreHandlers(): QueueRouterHandlers<{
     [CoreEvent.BUCKET_CREATED]: CoreBucketEventPayload,

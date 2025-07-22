@@ -6,10 +6,14 @@
  */
 
 import { useQueueRouter } from '@privateaim/server-kit';
-import { CoreEvent, buildCoreEventQueueRouterPayload } from '@privateaim/server-analysis-manager-kit';
+import {
+    CoreCommand,
+    CoreEvent, buildCoreEventQueueRouterPayload,
+} from '@privateaim/server-analysis-manager-kit';
 import type {
     CoreBucketEventPayload,
 } from '@privateaim/server-analysis-manager-kit';
+import { useCoreLogger } from '../utils';
 
 export async function writeBucketCreatedEvent(
     data: CoreBucketEventPayload,
@@ -19,4 +23,13 @@ export async function writeBucketCreatedEvent(
         event: CoreEvent.BUCKET_CREATED,
         data,
     }));
+
+    useCoreLogger().info({
+        message: `${data.bucketType} bucket ${data.bucketId} created for analysis ${data.id}`,
+        command: CoreCommand.CONFIGURE,
+        analysis_id: data.id,
+        bucket_id: data.bucketId,
+        bucket_type: data.bucketType,
+        event: CoreEvent.BUCKET_CREATED,
+    });
 }

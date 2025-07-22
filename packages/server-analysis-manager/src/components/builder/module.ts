@@ -31,7 +31,6 @@ import {
     writePushFailedEvent,
     writePushedEvent, writePushingEvent,
 } from './queue';
-import { useBuilderLogger } from './utils';
 
 function createHandlers() : QueueRouterHandlers<{
     [BuilderCommand.BUILD]: BuilderBuildPayload,
@@ -47,8 +46,6 @@ function createHandlers() : QueueRouterHandlers<{
                 .then((data) => writeBuiltEvent(data))
                 .then((data) => writePushCommand(data))
                 .catch((err: Error) => {
-                    useBuilderLogger().error(err);
-
                     message.data.error = err;
                     return cleanupDockerImage(message.data.id)
                         .finally(() => writeBuildFailedEvent(message.data));
@@ -60,8 +57,6 @@ function createHandlers() : QueueRouterHandlers<{
                 .then(executePushCommand)
                 .then((data) => writePushedEvent(data))
                 .catch((err: Error) => {
-                    useBuilderLogger().error(err);
-
                     message.data.error = err;
                     return writePushFailedEvent(message.data);
                 });
@@ -73,8 +68,6 @@ function createHandlers() : QueueRouterHandlers<{
                 .then(executeBuilderCheckCommand)
                 .then((data) => writeCheckedEvent(data))
                 .catch((err: Error) => {
-                    useBuilderLogger().error(err);
-
                     message.data.error = err;
                     return writeCheckFailedEvent(message.data);
                 });

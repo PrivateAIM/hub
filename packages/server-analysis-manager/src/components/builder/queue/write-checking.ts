@@ -6,8 +6,13 @@
  */
 
 import { useQueueRouter } from '@privateaim/server-kit';
-import { BuilderEvent, buildBuilderEventQueueRouterPayload } from '@privateaim/server-analysis-manager-kit';
+import {
+    BuilderCommand,
+    BuilderEvent,
+    buildBuilderEventQueueRouterPayload,
+} from '@privateaim/server-analysis-manager-kit';
 import type { BuilderCheckPayload } from '@privateaim/server-analysis-manager-kit';
+import { useBuilderLogger } from '../utils';
 
 export async function writeCheckingEvent(
     data: BuilderCheckPayload,
@@ -17,6 +22,13 @@ export async function writeCheckingEvent(
         event: BuilderEvent.CHECKING,
         data, //  { id: 'xxx' }
     }));
+
+    useBuilderLogger().info({
+        message: `Checking analysis ${data.id}`,
+        command: BuilderCommand.CHECK,
+        analysis_id: data.id,
+        event: BuilderEvent.CHECKING,
+    });
 
     return data;
 }

@@ -7,7 +7,8 @@
 
 import { useQueueRouter } from '@privateaim/server-kit';
 import type { BuilderBuildPayload } from '@privateaim/server-analysis-manager-kit';
-import { BuilderEvent, buildBuilderEventQueueRouterPayload } from '@privateaim/server-analysis-manager-kit';
+import { BuilderCommand, BuilderEvent, buildBuilderEventQueueRouterPayload } from '@privateaim/server-analysis-manager-kit';
+import { useBuilderLogger } from '../utils';
 
 export async function writeBuildFailedEvent(
     data: BuilderBuildPayload,
@@ -17,4 +18,12 @@ export async function writeBuildFailedEvent(
         event: BuilderEvent.BUILD_FAILED,
         data,
     }));
+
+    useBuilderLogger().error({
+        message: `Build failed for analysis ${data.id}`,
+        ...(data.error ? data.error : {}),
+        command: BuilderCommand.BUILD,
+        analysis_id: data.id,
+        event: BuilderEvent.BUILD_FAILED,
+    });
 }

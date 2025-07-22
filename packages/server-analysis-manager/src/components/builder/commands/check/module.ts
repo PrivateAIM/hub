@@ -10,11 +10,13 @@ import {
 } from '@privateaim/core-kit';
 import { isClientErrorWithStatusCode } from 'hapic';
 import type { BuilderCheckPayload } from '@privateaim/server-analysis-manager-kit';
+import { BuilderCommand } from '@privateaim/server-analysis-manager-kit';
 import { createBasicHarborAPIClient, useCoreClient } from '../../../../core';
 import type { ComponentPayloadExtended } from '../../../type';
 import { extendPayload } from '../../../utils';
 import { BuilderError } from '../../error';
-import { writeBuiltEvent, writeNoneEvent } from '../../queue';
+import { writeNoneEvent } from '../../queue';
+import { useBuilderLogger } from '../../utils';
 
 export async function executeBuilderCheckCommand(
     input: BuilderCheckPayload,
@@ -64,6 +66,12 @@ export async function executeBuilderCheckCommand(
         return data;
     }
 
+    useBuilderLogger().info({
+        message: `Checking docker registry ${data.registry.host}}`,
+        command: BuilderCommand.CHECK,
+        analysis_id: data.id,
+    });
+
     const connectionString = buildRegistryClientConnectionStringFromRegistry(data.registry);
     const harborClient = createBasicHarborAPIClient(connectionString);
 
@@ -78,9 +86,12 @@ export async function executeBuilderCheckCommand(
             harborRepository &&
             harborRepository.artifact_count > 0
         ) {
-            await writeBuiltEvent(data);
-
-            return data;
+            useBuilderLogger().info({
+                message: `Found docker image ${data.id} in ${node.registry_project.external_name} of registry ${data.registry.name}}`,
+                command: BuilderCommand.CHECK,
+                analysis_id: data.id,
+                node_id: node.id,
+            });
         }
     } catch (e) {
         if (!isClientErrorWithStatusCode(e, 404)) {

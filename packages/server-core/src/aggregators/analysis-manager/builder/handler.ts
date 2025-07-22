@@ -6,10 +6,7 @@
  */
 
 import {
-    BuilderCommand,
-    BuilderErrorCode,
     BuilderEvent,
-    ComponentName,
 } from '@privateaim/server-analysis-manager-kit';
 import type {
     BuilderBasePayload,
@@ -18,10 +15,8 @@ import {
 
     AnalysisBuildStatus,
 } from '@privateaim/core-kit';
-import { isComponentError } from '@privateaim/server-kit';
 import { useDataSource } from 'typeorm-extension';
-import type { AnalysisLogSaveContext } from '../../../database';
-import { AnalysisEntity, AnalysisLogEntity } from '../../../database';
+import { AnalysisEntity } from '../../../database';
 
 export async function handleAnalysisManagerBuilderBaseEvent(
     event: BuilderEvent,
@@ -35,27 +30,15 @@ export async function handleAnalysisManagerBuilderBaseEvent(
         return;
     }
 
-    let logCtx : AnalysisLogSaveContext = {
-        analysisId: entity.id,
-        realmId: entity.realm_id,
-        component: ComponentName.BUILDER,
-        event,
-    };
-
     switch (event) {
         case BuilderEvent.NONE: {
             if (!entity.run_status) {
                 entity.build_status = null;
             }
-
-            logCtx.command = BuilderCommand.CHECK;
             break;
         }
         case BuilderEvent.BUILDING: {
             entity.build_status = AnalysisBuildStatus.STARTED;
-
-            logCtx.command = BuilderCommand.BUILD;
-            logCtx.status = AnalysisBuildStatus.STARTED;
             break;
         }
         case BuilderEvent.BUILD_FAILED:
@@ -65,67 +48,14 @@ export async function handleAnalysisManagerBuilderBaseEvent(
                 entity.build_status = AnalysisBuildStatus.FAILED;
             }
 
-            if (isComponentError(data.error)) {
-                logCtx = {
-                    ...logCtx,
-                    status: AnalysisBuildStatus.FAILED,
-                    statusMessage: data.error.message,
-
-                    error: true,
-                    errorCode: data.error.code ?? BuilderErrorCode.UNKNOWN,
-                };
-            }
-
-            switch (event) {
-                case BuilderEvent.BUILD_FAILED:
-                    logCtx.command = BuilderCommand.BUILD;
-                    break;
-                case BuilderEvent.CHECK_FAILED:
-                    logCtx.command = BuilderCommand.CHECK;
-                    break;
-                case BuilderEvent.PUSH_FAILED:
-                    logCtx.command = BuilderCommand.PUSH;
-                    break;
-            }
-
             break;
         }
         case BuilderEvent.PUSHED:
             entity.build_status = AnalysisBuildStatus.FINISHED;
-
-            logCtx.status = AnalysisBuildStatus.FINISHED;
-            logCtx.command = BuilderCommand.PUSH;
             break;
     }
 
     await repository.save(entity);
-
-    const analysisLogRepository = dataSource.getRepository(AnalysisLogEntity);
-
-    const analysisLog = analysisLogRepository.create({
-        analysis_id: logCtx.analysisId,
-        realm_id: logCtx.realmId,
-
-        component: logCtx.component,
-        command: logCtx.command,
-        event: logCtx.event,
-
-        error: logCtx.error,
-
-        status: logCtx.status,
-        status_message: logCtx.statusMessage,
-    });
-
-    if (logCtx.errorCode) {
-        analysisLog.error_code = logCtx.errorCode;
-        analysisLog.error = true;
-    }
-
-    // todo: previous station_run_id, station_run_index
-
-    const meta : Record<string, any> = {};
-
-    analysisLog.meta = JSON.stringify(meta);
 
     await repository.save(entity);
 }
