@@ -9,9 +9,9 @@ import { LogLevel } from '@privateaim/kit';
 import { Container } from 'validup';
 import { createValidationChain, createValidator } from '@validup/adapter-validator';
 import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
-import type { AnalysisNodeLogEntity } from '../../../../database/domains';
+import type { AnalysisNodeLog } from '@privateaim/core-kit';
 
-export class AnalysisNodeLogValidator extends Container<AnalysisNodeLogEntity> {
+export class AnalysisNodeLogValidator extends Container<AnalysisNodeLog> {
     protected initialize() {
         super.initialize();
 

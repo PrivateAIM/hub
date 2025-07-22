@@ -6,11 +6,11 @@
   -->
 
 <script lang="ts">
-import { FMasterImageEventLogs, MasterImagesSync } from '@privateaim/client-vue';
+import { FMasterImageEvents, MasterImagesSync } from '@privateaim/client-vue';
 import { useToast } from '../../../../composables/toast';
 
 export default {
-    components: { FMasterImageEventLogs, MasterImagesSync },
+    components: { FMasterImageEvents, MasterImagesSync },
     setup() {
         const toast = useToast();
 
@@ -60,7 +60,7 @@ export default {
                 <MasterImagesSync @failed="handleFailed" />
             </div>
             <div class="col-6">
-                <FMasterImageEventLogs />
+                <FMasterImageEvents />
             </div>
         </div>
     </div>

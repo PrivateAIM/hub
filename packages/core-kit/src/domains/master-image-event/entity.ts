@@ -7,7 +7,7 @@
 
 import type { MasterImage } from '../master-image';
 
-export interface MasterImageEventLog {
+export interface MasterImageEvent {
     id: string;
 
     name: string;

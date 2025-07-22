@@ -6,18 +6,32 @@
  */
 
 import { useQueueRouter } from '@privateaim/server-kit';
-import { CoreEvent, buildCoreEventQueueRouterPayload } from '@privateaim/server-analysis-manager-kit';
-import type { CoreConfigureCommandContext } from '@privateaim/server-analysis-manager-kit';
+import {
+    CoreCommand,
+    CoreEvent,
+    buildCoreEventQueueRouterPayload,
+} from '@privateaim/server-analysis-manager-kit';
+import type {
+    CoreConfigurePayload,
+} from '@privateaim/server-analysis-manager-kit';
+import { useCoreLogger } from '../utils';
 
 export async function writeConfiguringEvent(
-    context: CoreConfigureCommandContext,
+    data: CoreConfigurePayload,
 ) {
     const client = useQueueRouter();
     await client.publish(buildCoreEventQueueRouterPayload({
         event: CoreEvent.CONFIGURING,
-        command: context.command,
-        data: context.data,
+        command: CoreCommand.CONFIGURE,
+        data,
     }));
 
-    return context.data;
+    useCoreLogger().info({
+        message: `Configured analysis ${data.id}`,
+        command: CoreCommand.CONFIGURE,
+        analysis_id: data.id,
+        event: CoreEvent.CONFIGURING,
+    });
+
+    return data;
 }

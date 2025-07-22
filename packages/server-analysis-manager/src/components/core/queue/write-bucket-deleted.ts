@@ -7,11 +7,12 @@
 
 import { useQueueRouter } from '@privateaim/server-kit';
 import {
-    CoreEvent, buildCoreEventQueueRouterPayload,
+    CoreCommand, CoreEvent, buildCoreEventQueueRouterPayload,
 } from '@privateaim/server-analysis-manager-kit';
 import type {
     CoreBucketEventPayload,
 } from '@privateaim/server-analysis-manager-kit';
+import { useCoreLogger } from '../utils';
 
 export async function writeBucketDeletedEvent(
     data: CoreBucketEventPayload,
@@ -21,4 +22,13 @@ export async function writeBucketDeletedEvent(
         event: CoreEvent.BUCKET_DELETED,
         data,
     }));
+
+    useCoreLogger().info({
+        message: `${data.bucketType} bucket ${data.bucketId} destroyed for analysis ${data.id}`,
+        command: CoreCommand.DESTROY,
+        analysis_id: data.id,
+        bucket_id: data.bucketId,
+        bucket_type: data.bucketType,
+        event: CoreEvent.BUCKET_DELETED,
+    });
 }

@@ -8,7 +8,6 @@
 export * from './crypto';
 export * from './domains';
 export * from './domain-event';
-export * from './log';
 export * from './utils';
 export * from './constants';
 export * from './types';

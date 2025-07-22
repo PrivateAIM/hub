@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import type {
-    MasterImageEventLog,
+    MasterImageEvent,
 } from '@privateaim/core-kit';
 import {
     DomainType,
@@ -17,13 +17,13 @@ import {
 } from 'vue';
 import type { ListMeta } from '../../core';
 import { createList } from '../../core';
-import FMasterImageEventLog from './FMasterImageEventLog';
+import FMasterImageEvent from './FMasterImageEvent';
 
 export default defineComponent({
     setup(props, setup) {
         const rootNode = ref<null | HTMLElement>(null);
 
-        const scrollToLastLine = (meta: ListMeta<MasterImageEventLog>) => {
+        const scrollToLastLine = (meta: ListMeta<MasterImageEvent>) => {
             if (!rootNode.value) {
                 return;
             }
@@ -39,7 +39,7 @@ export default defineComponent({
             render,
             setDefaults,
         } = createList({
-            type: `${DomainType.MASTER_IMAGE_EVENT_LOG}`,
+            type: `${DomainType.MASTER_IMAGE_EVENT}`,
             onCreated(_entity, meta) {
                 scrollToLastLine(meta);
             },
@@ -50,7 +50,7 @@ export default defineComponent({
             },
             socket: {
                 processEvent(event) {
-                    return event.meta.roomName !== buildDomainChannelName(DomainType.MASTER_IMAGE_EVENT_LOG);
+                    return event.meta.roomName !== buildDomainChannelName(DomainType.MASTER_IMAGE_EVENT);
                 },
             },
             props,
@@ -68,12 +68,12 @@ export default defineComponent({
 
         setDefaults({
             noMore: {
-                content: 'No more logs available...',
+                content: 'No more events available...',
             },
             item: {
-                content(item: MasterImageEventLog, slotProps: ListItemSlotProps<MasterImageEventLog>) {
+                content(item: MasterImageEvent, slotProps: ListItemSlotProps<MasterImageEvent>) {
                     return h(
-                        FMasterImageEventLog,
+                        FMasterImageEvent,
                         {
                             entity: item,
                             index: slotProps.index,
@@ -82,7 +82,7 @@ export default defineComponent({
                                     slotProps.deleted(item);
                                 }
                             },
-                            onUpdated: (e: MasterImageEventLog) => {
+                            onUpdated: (e: MasterImageEvent) => {
                                 if (slotProps && slotProps.updated) {
                                     slotProps.updated(e);
                                 }

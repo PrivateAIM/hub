@@ -35,11 +35,10 @@ export interface AnalysisNodeLog {
      */
     message: string | null;
 
-    // ------------------------------------------------------------------
-
-    created_at: Date;
-
-    updated_at: Date;
+    /**
+     *
+     */
+    time: string | bigint,
 
     // ------------------------------------------------------------------
 
@@ -47,13 +46,9 @@ export interface AnalysisNodeLog {
 
     analysis_id: Analysis['id'];
 
-    analysis: Analysis;
-
     // ------------------------------------------------------------------
 
     node_id: Node['id'];
 
     node_realm_id: Realm['id'];
-
-    node: Node;
 }

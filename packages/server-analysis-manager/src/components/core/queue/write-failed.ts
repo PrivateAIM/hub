@@ -7,8 +7,12 @@
 
 import type { ComponentContextWithError } from '@privateaim/server-kit';
 import { useQueueRouter } from '@privateaim/server-kit';
-import { CoreEvent, buildCoreEventQueueRouterPayload } from '@privateaim/server-analysis-manager-kit';
+import {
+    CoreEvent,
+    buildCoreEventQueueRouterPayload,
+} from '@privateaim/server-analysis-manager-kit';
 import type { CoreCommandContext } from '@privateaim/server-analysis-manager-kit';
+import { useCoreLogger } from '../utils';
 
 export async function writeFailedEvent(
     context: ComponentContextWithError<CoreCommandContext>,
@@ -21,6 +25,14 @@ export async function writeFailedEvent(
         command: context.command,
         data: context.data,
     }));
+
+    useCoreLogger().error({
+        message: `${context.command} failed for analysis ${context.data.id}`,
+        ...(context.data.error ? context.data.error : {}),
+        command: context.command,
+        analysis_id: context.data.id,
+        event: CoreEvent.FAILED,
+    });
 
     return context.data;
 }

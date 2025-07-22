@@ -6,10 +6,12 @@
  */
 
 import { useQueueRouter } from '@privateaim/server-kit';
-import type {
-    BuilderBuildPayload,
+import type { BuilderBuildPayload } from '@privateaim/server-analysis-manager-kit';
+import {
+    BuilderCommand,
+    BuilderEvent, buildBuilderEventQueueRouterPayload,
 } from '@privateaim/server-analysis-manager-kit';
-import { BuilderEvent, buildBuilderEventQueueRouterPayload } from '@privateaim/server-analysis-manager-kit';
+import { useBuilderLogger } from '../utils';
 
 export async function writePushingEvent(
     data: BuilderBuildPayload,
@@ -19,6 +21,13 @@ export async function writePushingEvent(
         event: BuilderEvent.PUSHING,
         data, //  { id: 'xxx' }
     }));
+
+    useBuilderLogger().info({
+        message: `Pushing analysis ${data.id}`,
+        command: BuilderCommand.PUSH,
+        analysis_id: data.id,
+        event: BuilderEvent.PUSHING,
+    });
 
     return data;
 }

@@ -11,26 +11,25 @@ import { send } from 'routup';
 import { FilterComparisonOperator, parseQuery } from 'rapiq';
 import type { AnalysisNodeLog } from '@privateaim/core-kit';
 import { BadRequestError } from '@ebec/http';
-import type { AnalysisNodeLogEntity } from '../../../../database/domains';
-import type { AnalysisNodeLogQueryOptions } from '../../../../services';
-import { useAnalysisNodeLogStore } from '../../../../services';
+import type { AnalysisNodeLogQueryOptions } from '../../../../domains';
+import { useAnalysisNodeLogStore } from '../../../../domains';
 
 export async function getManyAnalysisNodeLogRouteHandler(req: Request, res: Response) : Promise<any> {
-    const output = parseQuery<AnalysisNodeLogEntity>(useRequestQuery(req), {
+    const output = parseQuery<AnalysisNodeLog>(useRequestQuery(req), {
         defaultPath: 'log',
         filters: {
             allowed: [
                 'level',
                 'analysis_id',
                 'node_id',
-                'created_at',
+                'time',
             ],
         },
         pagination: {
             maxLimit: 50,
         },
         sort: {
-            allowed: ['created_at'],
+            allowed: ['time'],
         },
     });
 
@@ -43,7 +42,7 @@ export async function getManyAnalysisNodeLogRouteHandler(req: Request, res: Resp
                 options.analysis_id = `${output.filters[i].value}`;
             } else if (key === 'node_id') {
                 options.node_id = `${output.filters[i].value}`;
-            } else if (key === 'created_at') {
+            } else if (key === 'time') {
                 if (
                     output.filters[i].operator === FilterComparisonOperator.LESS_THAN ||
                     output.filters[i].operator === FilterComparisonOperator.LESS_THAN_EQUAL

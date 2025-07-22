@@ -6,4 +6,4 @@
  */
 
 export * from './loki';
-export * from './db';
+export * from './memory';

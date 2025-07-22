@@ -24,7 +24,7 @@ export function createAnalysisManagerMasterImagesHandlers() : QueueRouterHandler
 
     return {
         $any: async (message) => {
-            await logger.logEvent({
+            await logger.store({
                 event: message.type,
                 data: message.data,
             } as MasterImagesEventContext);

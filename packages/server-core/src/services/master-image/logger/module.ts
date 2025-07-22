@@ -9,12 +9,12 @@ import { hasOwnProperty, isObject } from '@privateaim/kit';
 import type { MasterImagesEventContext } from '@privateaim/server-analysis-manager-kit';
 import { MasterImagesEvent } from '@privateaim/server-analysis-manager-kit';
 import { useDataSource } from 'typeorm-extension';
-import { MasterImageEntity, MasterImageEventLogEntity } from '../../../database/domains';
+import { MasterImageEntity, MasterImageEventEntity } from '../../../database';
 
-export class MasterImageLoggerService {
-    async logEvent(input: MasterImagesEventContext) {
+export class MasterImageEventService {
+    async store(input: MasterImagesEventContext) {
         const dataSource = await useDataSource();
-        const repository = dataSource.getRepository(MasterImageEventLogEntity);
+        const repository = dataSource.getRepository(MasterImageEventEntity);
 
         // expires in 3 Days
         const expiresAtMs = Date.now() + (1000 * 60 * 60 * 24 * 3);

@@ -43,17 +43,20 @@ export async function executeBuilderBuildCommand(
 
     // -----------------------------------------------------------------------------------
 
-    useBuilderLogger().debug('Pulling image...', {
+    useBuilderLogger().info({
+        message: `Pulling docker image ${masterImagePath}:latest`,
         command: BuilderCommand.BUILD,
-        image: `${masterImagePath}:latest`,
+        analysis_id: data.id,
     });
 
-    await pullDockerImage(`${masterImagePath}:latest`);
+    await pullDockerImage(`${masterImagePath}:${REGISTRY_ARTIFACT_TAG_LATEST}`);
 
     // -----------------------------------------------------------------------------------
 
-    useBuilderLogger().debug('Building image...', {
+    useBuilderLogger().info({
+        message: 'Building docker image.',
         command: BuilderCommand.BUILD,
+        analysis_id: data.id,
     });
 
     const imageURL = data.entity.id;
@@ -65,9 +68,10 @@ export async function executeBuilderBuildCommand(
 
     // -----------------------------------------------------------------------------------
 
-    useBuilderLogger().debug('Creating container...', {
+    useBuilderLogger().info({
+        message: `Creating docker container ${imageURL}:${REGISTRY_ARTIFACT_TAG_LATEST}`,
         command: BuilderCommand.BUILD,
-        imageURL,
+        analysis_id: data.id,
     });
 
     const container = await useDocker()
@@ -83,8 +87,10 @@ export async function executeBuilderBuildCommand(
 
         // -----------------------------------------------------------------------------------
 
-        useBuilderLogger().debug('Committing container', {
+        useBuilderLogger().info({
+            message: `Commiting docker container ${imageURL}:${REGISTRY_ARTIFACT_TAG_LATEST}`,
             command: BuilderCommand.BUILD,
+            analysis_id: data.id,
         });
 
         await container.commit({

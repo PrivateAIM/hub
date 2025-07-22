@@ -63,11 +63,13 @@ export async function executePushCommand(
 
     // -----------------------------------------------------------------------------------
 
-    useBuilderLogger().debug('Tagging image for nodes', {
-        command: BuilderCommand.BUILD,
-    });
-
     const localImageUrl = `${data.id}:${REGISTRY_ARTIFACT_TAG_LATEST}`;
+
+    useBuilderLogger().info({
+        message: `Tagging ${localImageUrl} docker image for nodes`,
+        command: BuilderCommand.BUILD,
+        analysis_id: data.id,
+    });
 
     const image = useDocker()
         .getImage(localImageUrl);
@@ -103,14 +105,18 @@ export async function executePushCommand(
         });
     }
 
-    useBuilderLogger().debug('Tagged image for nodes', {
-        command: BuilderCommand.BUILD,
+    useBuilderLogger().info({
+        message: `Tagged ${localImageUrl} docker image for nodes`,
+        command: BuilderCommand.PUSH,
+        analysis_id: data.id,
     });
 
     // -----------------------------------------------------------------------------------
 
-    useBuilderLogger().debug('Pushing image for nodes', {
-        command: BuilderCommand.BUILD,
+    useBuilderLogger().info({
+        message: `Pushing ${localImageUrl} docker image for nodes`,
+        command: BuilderCommand.PUSH,
+        analysis_id: data.id,
     });
 
     try {
@@ -123,8 +129,10 @@ export async function executePushCommand(
         throw e;
     }
 
-    useBuilderLogger().debug('Pushed image for nodes', {
-        command: BuilderCommand.BUILD,
+    useBuilderLogger().info({
+        message: `Pushed ${localImageUrl} docker image for nodes`,
+        command: BuilderCommand.PUSH,
+        analysis_id: data.id,
     });
 
     return data;

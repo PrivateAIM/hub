@@ -6,13 +6,12 @@
  */
 
 import { useQueueRouter } from '@privateaim/server-kit';
-import type {
-    BuilderBuildPayload, BuilderPushPayload,
-} from '@privateaim/server-analysis-manager-kit';
+import type { BuilderBuildPayload, BuilderPushPayload } from '@privateaim/server-analysis-manager-kit';
 import {
     BuilderCommand,
     buildBuilderTaskQueueRouterPayload,
 } from '@privateaim/server-analysis-manager-kit';
+import { useBuilderLogger } from '../utils';
 
 export async function writePushCommand(
     data: BuilderPushPayload,
@@ -22,6 +21,12 @@ export async function writePushCommand(
         command: BuilderCommand.PUSH,
         data,
     }));
+
+    useBuilderLogger().info({
+        message: `Push analysis ${data.id}`,
+        command: BuilderCommand.PUSH,
+        analysis_id: data.id,
+    });
 
     return data;
 }

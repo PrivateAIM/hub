@@ -24,7 +24,6 @@ import {
     writeDestroyingEvent,
     writeFailedEvent,
 } from './queue';
-import { useCoreLogger } from './utils';
 
 function createHandlers() : QueueRouterHandlers<{
     [CoreCommand.CONFIGURE]: CoreConfigurePayload,
@@ -33,33 +32,25 @@ function createHandlers() : QueueRouterHandlers<{
     return {
         [CoreCommand.CONFIGURE]: async (message) => {
             await Promise.resolve(message.data)
-                .then((data) => writeConfiguringEvent({ data, command: CoreCommand.CONFIGURE }))
+                .then((data) => writeConfiguringEvent(data))
                 .then(executeCoreConfigureCommand)
-                .then((data) => writeConfiguredEvent({ data, command: CoreCommand.CONFIGURE }))
-                .catch((err: Error) => {
-                    useCoreLogger().error(err);
-
-                    return writeFailedEvent({
-                        data: message.data,
-                        command: CoreCommand.CONFIGURE,
-                        error: err,
-                    });
-                });
+                .then((data) => writeConfiguredEvent(data))
+                .catch((err: Error) => writeFailedEvent({
+                    data: message.data,
+                    command: CoreCommand.CONFIGURE,
+                    error: err,
+                }));
         },
         [CoreCommand.DESTROY]: async (message) => {
             await Promise.resolve(message.data)
-                .then((data) => writeDestroyingEvent({ data, command: CoreCommand.DESTROY }))
+                .then((data) => writeDestroyingEvent(data))
                 .then(executeCoreDestroyCommand)
-                .then((data) => writeDestroyedEvent({ data, command: CoreCommand.DESTROY }))
-                .catch((err: Error) => {
-                    useCoreLogger().error(err);
-
-                    return writeFailedEvent({
-                        data: message.data,
-                        command: CoreCommand.DESTROY,
-                        error: err,
-                    });
-                });
+                .then((data) => writeDestroyedEvent(data))
+                .catch((err: Error) => writeFailedEvent({
+                    data: message.data,
+                    command: CoreCommand.DESTROY,
+                    error: err,
+                }));
         },
     };
 }

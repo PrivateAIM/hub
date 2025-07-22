@@ -9,13 +9,13 @@ import cron from 'node-cron';
 import type { Component } from '@privateaim/server-kit';
 import { LessThan } from 'typeorm';
 import { useDataSource } from 'typeorm-extension';
-import { MasterImageEventLogEntity } from '../../database/domains';
+import { MasterImageEventEntity } from '../../database/domains';
 
 export function createMasterImageLogCleanerComponent() : Component {
     return {
         async start() {
             const dataSource = await useDataSource();
-            const repository = dataSource.getRepository(MasterImageEventLogEntity);
+            const repository = dataSource.getRepository(MasterImageEventEntity);
 
             const execute = async () => {
                 const isoDate = new Date().toISOString();

@@ -6,18 +6,32 @@
  */
 
 import { useQueueRouter } from '@privateaim/server-kit';
-import { CoreEvent, buildCoreEventQueueRouterPayload } from '@privateaim/server-analysis-manager-kit';
-import type { CoreDestroyCommandContext } from '@privateaim/server-analysis-manager-kit';
+import {
+    CoreCommand,
+    CoreEvent,
+    buildCoreEventQueueRouterPayload,
+} from '@privateaim/server-analysis-manager-kit';
+import type {
+    CoreDestroyPayload,
+} from '@privateaim/server-analysis-manager-kit';
+import { useCoreLogger } from '../utils';
 
 export async function writeDestroyedEvent(
-    context: CoreDestroyCommandContext,
+    data: CoreDestroyPayload,
 ) {
     const client = useQueueRouter();
     await client.publish(buildCoreEventQueueRouterPayload({
         event: CoreEvent.DESTROYED,
-        command: context.command,
-        data: context.data,
+        command: CoreCommand.DESTROY,
+        data,
     }));
 
-    return context.data;
+    useCoreLogger().info({
+        message: `Destroyed analysis ${data.id}`,
+        command: CoreCommand.DESTROY,
+        analysis_id: data.id,
+        event: CoreEvent.DESTROYED,
+    });
+
+    return data;
 }

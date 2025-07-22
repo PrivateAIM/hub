@@ -13,13 +13,13 @@ import {
     useDataSource,
 } from 'typeorm-extension';
 import { NotFoundError } from '@ebec/http';
-import { MasterImageEventLogEntity } from '../../../../database/domains';
+import { MasterImageEventEntity } from '../../../../database/domains';
 
 export async function getOneMasterImageEventLogRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(MasterImageEventLogEntity);
+    const repository = dataSource.getRepository(MasterImageEventEntity);
     const query = repository.createQueryBuilder('log')
         .where('log.id = :id', { id });
 
@@ -43,7 +43,7 @@ export async function getOneMasterImageEventLogRouteHandler(req: Request, res: R
 
 export async function getManyMasterImageEventLogRouteHandler(req: Request, res: Response) : Promise<any> {
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(MasterImageEventLogEntity);
+    const repository = dataSource.getRepository(MasterImageEventEntity);
     const query = repository.createQueryBuilder('log');
     query.distinctOn(['log.id']);
 
