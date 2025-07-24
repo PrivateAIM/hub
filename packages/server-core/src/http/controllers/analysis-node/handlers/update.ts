@@ -98,7 +98,7 @@ export async function updateAnalysisNodeRouteHandler(req: Request, res: Response
         ) {
             const analysisNodeEventRepository = entityManager.getRepository(AnalysisNodeEventEntity);
             await analysisNodeEventRepository.save({
-                status: entity.run_status,
+                name: entity.run_status,
                 analysis_id: entity.analysis_id,
                 node_id: entity.node_id,
             });

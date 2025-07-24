@@ -13,6 +13,7 @@ export * from './analysis-node';
 export * from './analysis-node-event';
 export * from './analysis-node-log';
 export * from './analysis-permission';
+export * from './event';
 export * from './realm';
 export * from './master-image-group';
 export * from './master-image';

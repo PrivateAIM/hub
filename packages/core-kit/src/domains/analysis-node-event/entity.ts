@@ -12,7 +12,11 @@ import type { Analysis } from '../analysis';
 export interface AnalysisNodeEvent {
     id: string;
 
-    status: string;
+    name: string;
+
+    expires: Date;
+
+    expiring: boolean;
 
     // ------------------------------------------------------------------
 

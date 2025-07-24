@@ -23,16 +23,14 @@ import type { Realm } from '@authup/core-kit';
 import { AnalysisEntity } from '../analysis';
 import { NodeEntity } from '../node';
 
-@Entity({ name: 'analysis_node_logs' })
+@Entity({ name: 'analysis_node_events' })
 export class AnalysisNodeEventEntity implements AnalysisNodeEvent {
     @PrimaryGeneratedColumn('uuid')
         id: string;
 
     @Index()
-    @Column({
-        type: 'varchar', length: 64,
-    })
-        status: string;
+    @Column({ type: 'varchar', length: 64 })
+        name: string;
 
     // ------------------------------------------------------------------
 

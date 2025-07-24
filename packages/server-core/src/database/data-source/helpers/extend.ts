@@ -11,10 +11,8 @@ import {
     AnalysisBucketFileEntity,
     AnalysisEntity,
     AnalysisNodeEntity,
-    AnalysisNodeEventEntity,
     AnalysisPermissionEntity,
     MasterImageEntity,
-    MasterImageEventEntity,
     MasterImageGroupEntity,
     NodeEntity,
     ProjectEntity,
@@ -23,6 +21,7 @@ import {
     RegistryProjectEntity,
 } from '../../domains';
 import { DatabaseQueryResultCache } from '../../cache';
+import { EventEntity } from '../../domains/event';
 import {
     AnalysisFileSubscriber,
     AnalysisNodeEventSubscriber,
@@ -44,8 +43,8 @@ export async function extendDataSourceOptions(options: DataSourceOptions) : Prom
         logging: false,
         entities: [
             ...(options.entities ? options.entities : []) as string[],
+            EventEntity,
             MasterImageEntity,
-            MasterImageEventEntity,
             MasterImageGroupEntity,
             ProjectEntity,
             ProjectNodeEntity,
@@ -56,7 +55,6 @@ export async function extendDataSourceOptions(options: DataSourceOptions) : Prom
             AnalysisBucketEntity,
             AnalysisBucketFileEntity,
             AnalysisNodeEntity,
-            AnalysisNodeEventEntity,
             AnalysisPermissionEntity,
         ],
         migrations: [],

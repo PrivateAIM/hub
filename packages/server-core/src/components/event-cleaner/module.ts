@@ -9,19 +9,20 @@ import cron from 'node-cron';
 import type { Component } from '@privateaim/server-kit';
 import { LessThan } from 'typeorm';
 import { useDataSource } from 'typeorm-extension';
-import { MasterImageEventEntity } from '../../database/domains';
+import { EventEntity } from '../../database/domains/event';
 
-export function createMasterImageLogCleanerComponent() : Component {
+export function createEventCleanerComponent() : Component {
     return {
         async start() {
             const dataSource = await useDataSource();
-            const repository = dataSource.getRepository(MasterImageEventEntity);
+            const repository = dataSource.getRepository(EventEntity);
 
             const execute = async () => {
                 const isoDate = new Date().toISOString();
 
                 const entities = await repository.find({
                     where: {
+                        expiring: true,
                         expires_at: LessThan(isoDate),
                     },
                 });
