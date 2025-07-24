@@ -44,7 +44,7 @@ export async function updateAnalysisRouteHandler(req: Request, res: Response) : 
 
     await permissionChecker.check({
         name: PermissionName.ANALYSIS_UPDATE,
-        data: {
+        input: {
             attributes: entity,
         },
     });

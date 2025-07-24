@@ -31,7 +31,7 @@ export async function deleteAnalysisRouteHandler(req: Request, res: Response) : 
 
     await permissionChecker.check({
         name: PermissionName.ANALYSIS_DELETE,
-        data: {
+        input: {
             attributes: entity,
         },
     });

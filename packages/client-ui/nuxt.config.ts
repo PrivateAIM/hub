@@ -75,6 +75,7 @@ export default defineNuxtConfig({
  ** Nuxt.js modules
  */
     modules: [
+        '@pinia/nuxt',
         [
             // ../client-web-nuxt/src/module
             '@authup/client-web-nuxt', {

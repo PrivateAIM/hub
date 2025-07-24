@@ -120,7 +120,7 @@ Card
     left: -1rem;
     top: 0;
     content: "\f054";
-    font-family: var(--fa-style-family, "Font Awesome 6 Free"), serif;
+    font-family: var(--fa-style-family, "Font Awesome 7 Free"), serif;
     font-weight: 900;
     font-style: normal;
 }

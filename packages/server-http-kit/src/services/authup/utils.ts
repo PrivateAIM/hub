@@ -5,9 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { unwrapOAuth2Scope } from '@authup/specs';
 import type { PermissionProvider } from '@authup/access';
 import { PermissionChecker, PermissionMemoryProvider } from '@authup/access';
-import { REALM_MASTER_NAME, transformOAuth2ScopeToArray } from '@authup/core-kit';
+import { REALM_MASTER_NAME } from '@authup/core-kit';
 import type { TokenVerificationData } from '@authup/server-adapter-kit';
 import type { Request } from 'routup';
 import { RequestPermissionChecker, setRequestEnv } from '../../request';
@@ -66,5 +67,5 @@ export function applyTokenVerificationData(
         },
     });
 
-    setRequestEnv(req, 'scopes', transformOAuth2ScopeToArray(data.scope));
+    setRequestEnv(req, 'scopes', unwrapOAuth2Scope(data.scope));
 }

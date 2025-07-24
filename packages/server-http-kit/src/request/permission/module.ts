@@ -49,8 +49,8 @@ export class RequestPermissionChecker {
     protected extendCheckContext(ctx: PermissionCheckerCheckContext) {
         const scopes = useRequestEnv(this.req, 'scopes') || [];
         if (scopes.indexOf(ScopeName.GLOBAL) !== -1) {
-            ctx.data = {
-                ...ctx.data || {},
+            ctx.input = {
+                ...ctx.input || {},
                 identity: useRequestIdentity(this.req),
             };
         }

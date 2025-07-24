@@ -63,7 +63,7 @@ export async function createAnalysisRouteHandler(req: Request, res: Response) : 
 
     await permissionChecker.check({
         name: PermissionName.ANALYSIS_CREATE,
-        data: {
+        input: {
             attributes: entity,
         },
     });
