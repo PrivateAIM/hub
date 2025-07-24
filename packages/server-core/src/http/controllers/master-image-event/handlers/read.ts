@@ -13,24 +13,15 @@ import {
     useDataSource,
 } from 'typeorm-extension';
 import { NotFoundError } from '@ebec/http';
-import { MasterImageEventEntity } from '../../../../database';
+import { EventEntity } from '../../../../database';
 
-export async function getOneMasterImageEventLogRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function getOneEventLogRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(MasterImageEventEntity);
+    const repository = dataSource.getRepository(EventEntity);
     const query = repository.createQueryBuilder('event')
         .where('event.id = :id', { id });
-
-    applyQuery(query, useRequestQuery(req), {
-        defaultAlias: 'event',
-        relations: {
-            allowed: [
-                'master_image',
-            ],
-        },
-    });
 
     const entity = await query.getOne();
 
@@ -41,9 +32,9 @@ export async function getOneMasterImageEventLogRouteHandler(req: Request, res: R
     return send(res, entity);
 }
 
-export async function getManyMasterImageEventLogRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function getManyEventLogRouteHandler(req: Request, res: Response) : Promise<any> {
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(MasterImageEventEntity);
+    const repository = dataSource.getRepository(EventEntity);
     const query = repository.createQueryBuilder('event');
     query.distinctOn(['event.id']);
 
@@ -51,8 +42,10 @@ export async function getManyMasterImageEventLogRouteHandler(req: Request, res: 
         defaultAlias: 'event',
         filters: {
             allowed: [
+                'scope',
                 'name',
-                'master_image_id',
+                'ref_type',
+                'ref_id',
                 'created_at',
                 'updated_at',
             ],
@@ -61,9 +54,7 @@ export async function getManyMasterImageEventLogRouteHandler(req: Request, res: 
             maxLimit: 50,
         },
         relations: {
-            allowed: [
-                'master_image',
-            ],
+            allowed: [],
         },
         sort: {
             allowed: [

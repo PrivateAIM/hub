@@ -12,6 +12,7 @@ import {
     AnalysisEntity,
     AnalysisNodeEntity,
     AnalysisPermissionEntity,
+    EventEntity,
     MasterImageEntity,
     MasterImageGroupEntity,
     NodeEntity,
@@ -21,13 +22,12 @@ import {
     RegistryProjectEntity,
 } from '../../domains';
 import { DatabaseQueryResultCache } from '../../cache';
-import { EventEntity } from '../../domains/event';
 import {
     AnalysisFileSubscriber,
     AnalysisNodeEventSubscriber,
     AnalysisNodeSubscriber,
     AnalysisSubscriber,
-    MasterImageEventSubscriber,
+    EventSubscriber,
     MasterImageGroupSubscriber,
     MasterImageSubscriber,
     NodeSubscriber,
@@ -66,7 +66,7 @@ export async function extendDataSourceOptions(options: DataSourceOptions) : Prom
             AnalysisNodeSubscriber,
             AnalysisNodeEventSubscriber,
             MasterImageSubscriber,
-            MasterImageEventSubscriber,
+            EventSubscriber,
             MasterImageGroupSubscriber,
             NodeSubscriber,
             ProjectSubscriber,

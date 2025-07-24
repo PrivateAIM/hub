@@ -7,7 +7,7 @@
 
 export enum DomainType {
     MASTER_IMAGE = 'masterImage',
-    MASTER_IMAGE_EVENT = 'masterImageEvent',
+    EVENT = 'event',
     MASTER_IMAGE_GROUP = 'masterImageGroup',
     PROJECT = 'project',
     PROJECT_NODE = 'projectNode',

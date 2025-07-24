@@ -5,31 +5,28 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type {
-    AnalysisLog,
-} from '@privateaim/core-kit';
-
+import { Event } from '@privateaim/core-kit';
 import {
     DController, DDelete, DGet, DPath, DRequest, DResponse, DTags,
 } from '@routup/decorators';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import {
-    deleteMasterImageEventRouteHandler,
-    getManyMasterImageEventLogRouteHandler,
-    getOneMasterImageEventLogRouteHandler,
+    deleteEventRouteHandler,
+    getManyEventLogRouteHandler,
+    getOneEventLogRouteHandler,
 } from './handlers';
 
-type PartialAnalysisLog = Partial<AnalysisLog>;
+type PartialEvent = Partial<Event>;
 
-@DTags('masterImage')
-@DController('/master-image-events')
-export class MasterImageEventLogController {
+@DTags('events')
+@DController('/events')
+export class EventController {
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
         @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<PartialAnalysisLog[]> {
-        return await getManyMasterImageEventLogRouteHandler(req, res) as PartialAnalysisLog[];
+    ): Promise<PartialEvent[]> {
+        return await getManyEventLogRouteHandler(req, res) as PartialEvent[];
     }
 
     @DGet('/:id', [ForceLoggedInMiddleware])
@@ -37,8 +34,8 @@ export class MasterImageEventLogController {
         @DPath('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<PartialAnalysisLog | undefined> {
-        return await getOneMasterImageEventLogRouteHandler(req, res) as PartialAnalysisLog | undefined;
+    ): Promise<PartialEvent | undefined> {
+        return await getOneEventLogRouteHandler(req, res) as PartialEvent | undefined;
     }
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
@@ -46,7 +43,7 @@ export class MasterImageEventLogController {
         @DPath('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<PartialAnalysisLog | undefined> {
-        return await deleteMasterImageEventRouteHandler(req, res) as PartialAnalysisLog | undefined;
+    ): Promise<PartialEvent | undefined> {
+        return await deleteEventRouteHandler(req, res) as PartialEvent | undefined;
     }
 }

@@ -5,5 +5,5 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export { default as FMasterImageEvent } from './FMasterImageEvent';
-export { default as FMasterImageEvents } from './FMasterImageEvents';
+export { default as FEvent } from './FEvent';
+export { default as FEvents } from './FEvents';

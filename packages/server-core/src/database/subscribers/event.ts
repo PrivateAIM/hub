@@ -9,52 +9,51 @@ import { useDomainEventPublisher } from '@privateaim/server-kit';
 import type {
     EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
-import { EventSubscriber } from 'typeorm';
+import { EventSubscriber as TEventSubscriber } from 'typeorm';
 import {
     DomainEventName,
     DomainType,
-
-    MasterImageEvent,
+    Event,
     buildDomainChannelName,
     buildDomainNamespaceName,
 } from '@privateaim/core-kit';
-import { MasterImageEventEntity } from '../domains';
+import { EventEntity } from '../domains';
 
 async function publishEvent(
     event: `${DomainEventName}`,
-    data: MasterImageEvent,
+    data: Event,
 ) {
     const publisher = useDomainEventPublisher();
     await publisher.safePublish({
         data: {
-            type: DomainType.MASTER_IMAGE_EVENT,
+            type: DomainType.EVENT,
             event,
             data,
         },
         destinations: [
             {
-                channel: (id) => buildDomainChannelName(DomainType.MASTER_IMAGE_EVENT, id),
+                channel: (id) => buildDomainChannelName(DomainType.EVENT, id),
                 namespace: buildDomainNamespaceName(),
             },
         ],
     });
 }
 
-@EventSubscriber()
-export class MasterImageEventSubscriber implements EntitySubscriberInterface<MasterImageEventEntity> {
+@TEventSubscriber()
+export class EventSubscriber implements EntitySubscriberInterface<EventEntity> {
     listenTo(): CallableFunction | string {
-        return MasterImageEventEntity;
+        return EventEntity;
     }
 
-    async afterInsert(event: InsertEvent<MasterImageEventEntity>): Promise<any> {
+    async afterInsert(event: InsertEvent<EventEntity>): Promise<any> {
         await publishEvent(DomainEventName.CREATED, event.entity);
     }
 
-    async afterUpdate(event: UpdateEvent<MasterImageEventEntity>): Promise<any> {
-        await publishEvent(DomainEventName.UPDATED, event.entity as MasterImageEventEntity);
+    async afterUpdate(event: UpdateEvent<EventEntity>): Promise<any> {
+        await publishEvent(DomainEventName.UPDATED, event.entity as EventEntity);
     }
 
-    async beforeRemove(event: RemoveEvent<MasterImageEventEntity>): Promise<any> {
+    async beforeRemove(event: RemoveEvent<EventEntity>): Promise<any> {
         if (event.entity) {
             await publishEvent(DomainEventName.DELETED, event.entity);
         }

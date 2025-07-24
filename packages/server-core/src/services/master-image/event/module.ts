@@ -5,16 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { DomainType } from '@privateaim/core-kit';
 import { hasOwnProperty, isObject } from '@privateaim/kit';
 import type { MasterImagesEventContext } from '@privateaim/server-analysis-manager-kit';
 import { MasterImagesEvent } from '@privateaim/server-analysis-manager-kit';
 import { useDataSource } from 'typeorm-extension';
-import { MasterImageEntity, MasterImageEventEntity } from '../../../database';
+import { EventEntity } from '../../../database';
 
 export class MasterImageEventService {
     async store(input: MasterImagesEventContext) {
         const dataSource = await useDataSource();
-        const repository = dataSource.getRepository(MasterImageEventEntity);
+        const repository = dataSource.getRepository(EventEntity);
 
         // expires in 3 Days
         const expiresAtMs = Date.now() + (1000 * 60 * 60 * 24 * 3);
@@ -25,6 +26,7 @@ export class MasterImageEventService {
             expiring: true,
             expires_at: new Date(expiresAtMs).toISOString(),
             name: `${input.event}`,
+            ref_type: DomainType.MASTER_IMAGE,
             data: this.buildEventData(input),
         });
 
@@ -33,20 +35,13 @@ export class MasterImageEventService {
             hasOwnProperty(input.data, 'id') &&
             typeof input.data.id === 'string'
         ) {
-            entity.master_image_id = input.data.id;
-
-            const masterImageRepository = dataSource.getRepository(MasterImageEntity);
-            entity.master_image = await masterImageRepository.findOne({
-                where: {
-                    id: entity.master_image_id,
-                },
-            });
+            entity.ref_id = input.data.id;
         }
 
         await repository.save(entity);
     }
 
-    buildEventData(input: MasterImagesEventContext) {
+    protected buildEventData(input: MasterImagesEventContext) {
         if (
             input.event === MasterImagesEvent.BUILD_FAILED ||
             input.event === MasterImagesEvent.PUSH_FAILED ||

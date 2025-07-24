@@ -10,7 +10,7 @@ export * from './analysis-file';
 export * from './analysis-node';
 export * from './analysis-node-event';
 export * from './master-image';
-export * from './master-image-event';
+export * from './event';
 export * from './master-image-group';
 export * from './node';
 export * from './project';

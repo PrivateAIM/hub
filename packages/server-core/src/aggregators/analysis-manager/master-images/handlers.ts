@@ -15,16 +15,16 @@ import {
     useMasterImageQueueService,
 } from '@privateaim/server-analysis-manager-kit';
 import type { QueueRouterHandlers } from '@privateaim/server-kit';
-import { MasterImageSynchronizerService, useMasterImageService } from '../../../services';
+import { MasterImageEventService, MasterImageSynchronizerService } from '../../../services';
 
 export function createAnalysisManagerMasterImagesHandlers() : QueueRouterHandlers<Partial<MasterImagesEventMap>> {
-    const logger = useMasterImageService();
+    const event = new MasterImageEventService();
     const synchronizer = new MasterImageSynchronizerService();
     const queue = useMasterImageQueueService();
 
     return {
         $any: async (message) => {
-            await logger.store({
+            await event.store({
                 event: message.type,
                 data: message.data,
             } as MasterImagesEventContext);
