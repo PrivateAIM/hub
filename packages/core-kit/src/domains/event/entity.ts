@@ -11,16 +11,8 @@ export interface Event<T extends ObjectLiteral = ObjectLiteral> {
     id: string;
 
     /**
-     * eg. build, push, ...
-     */
-    scope: string;
-
-    /**
-     * eg. started, starting, finished, ...
-     */
-    name: string;
-
-    /**
+     * domaine
+     *
      * eg. analysis, node, analysisNode, ....
      */
     ref_type: string;
@@ -30,13 +22,36 @@ export interface Event<T extends ObjectLiteral = ObjectLiteral> {
      */
     ref_id: string | null;
 
+    /**
+     * component, prozess,
+     *
+     * eg. build, push, modelChanges, ...
+     */
+    scope: string;
+
+    /**
+     * eg. started, starting, finished, ...
+     */
+    name: string;
+
+    /**
+     *
+     * { description: { new_value: "xxx", prev_value: "yyy" }, name {}}
+     */
     data: T;
 
+    /**
+     * default: false
+     */
     expiring: boolean;
 
-    expires_at: string;
+    // 2. actor_type - enum(user, robot,...) | null (optional)
+    //    actor_id - string | null (optional)
+    //    actor_ip_address - string | null (optional)
+    //    actor_name - string | null (optional)
+    expires_at: string | null;
 
-    created_at: Date;
+    created_at: string;
 
-    updated_at: Date;
+    updated_at: string;
 }

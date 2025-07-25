@@ -6,17 +6,12 @@
  */
 
 import type { Realm } from '@authup/core-kit';
+import type { Event } from '../event';
 import type { Node } from '../node';
 import type { Analysis } from '../analysis';
 
 export interface AnalysisNodeEvent {
     id: string;
-
-    name: string;
-
-    expires: Date;
-
-    expiring: boolean;
 
     // ------------------------------------------------------------------
 
@@ -25,6 +20,10 @@ export interface AnalysisNodeEvent {
     updated_at: Date;
 
     // ------------------------------------------------------------------
+
+    event_id: Event['id'];
+
+    event: Event;
 
     analysis_id: Analysis['id'];
 

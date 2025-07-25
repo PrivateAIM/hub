@@ -1,47 +1,34 @@
 /*
- * Copyright (c) 2024.
+ * Copyright (c) 2024-2025.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { DomainType } from '@privateaim/core-kit';
 import { hasOwnProperty, isObject } from '@privateaim/kit';
 import type { MasterImagesEventContext } from '@privateaim/server-analysis-manager-kit';
 import { MasterImagesEvent } from '@privateaim/server-analysis-manager-kit';
-import { useDataSource } from 'typeorm-extension';
-import { EventEntity } from '../../../database';
+import type { EventEntity } from '../../../database';
+import type { EventServiceHook } from '../types';
 
-export class MasterImageEventService {
-    async store(input: MasterImagesEventContext) {
-        const dataSource = await useDataSource();
-        const repository = dataSource.getRepository(EventEntity);
-
-        // expires in 3 Days
-        const expiresAtMs = Date.now() + (1000 * 60 * 60 * 24 * 3);
-
-        // todo: add data if error
-
-        const entity = repository.create({
-            expiring: true,
-            expires_at: new Date(expiresAtMs).toISOString(),
-            name: `${input.event}`,
-            ref_type: DomainType.MASTER_IMAGE,
-            data: this.buildEventData(input),
-        });
-
+export class EventServiceMasterImageHook implements EventServiceHook {
+    async pre(input: EventEntity): Promise<void> {
         if (
             isObject(input.data) &&
             hasOwnProperty(input.data, 'id') &&
             typeof input.data.id === 'string'
         ) {
-            entity.ref_id = input.data.id;
+            input.ref_id = input.data.id;
         }
 
-        await repository.save(entity);
+        input.data = this.buildData(input.data as MasterImagesEventContext);
     }
 
-    protected buildEventData(input: MasterImagesEventContext) {
+    async post(): Promise<void> {
+        // todo: save to master image repository
+    }
+
+    protected buildData(input: MasterImagesEventContext) {
         if (
             input.event === MasterImagesEvent.BUILD_FAILED ||
             input.event === MasterImagesEvent.PUSH_FAILED ||

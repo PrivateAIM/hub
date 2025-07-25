@@ -9,7 +9,7 @@ import cron from 'node-cron';
 import type { Component } from '@privateaim/server-kit';
 import { LessThan } from 'typeorm';
 import { useDataSource } from 'typeorm-extension';
-import { EventEntity } from '../../database/domains/event';
+import { EventEntity } from '../../database';
 
 export function createEventCleanerComponent() : Component {
     return {

@@ -22,9 +22,13 @@ export class DomainEventSocketPublisher implements IDomainEventPublisher {
         ctx.data = transformEventData(ctx.data);
 
         for (let i = 0; i < ctx.destinations.length; i++) {
+            const destination = ctx.destinations[i];
+
             let namespace : string;
-            if (ctx.destinations[i].namespace) {
-                namespace = ctx.destinations[i].namespace;
+            if (destination.namespace) {
+                namespace = typeof destination.namespace === 'function' ?
+                    destination.namespace(ctx.data.data) :
+                    destination.namespace;
             } else {
                 namespace = '/';
             }
@@ -34,11 +38,11 @@ export class DomainEventSocketPublisher implements IDomainEventPublisher {
             const fullEventName = buildDomainEventFullName(ctx.data.type, ctx.data.event);
 
             const rooms : string[] = [
-                buildEventChannelName(ctx.destinations[i].channel),
+                buildEventChannelName(destination.channel),
             ];
 
-            if (typeof ctx.destinations[i].channel === 'function') {
-                rooms.push(buildEventChannelName(ctx.destinations[i].channel, ctx.data.data.id));
+            if (typeof destination.channel === 'function') {
+                rooms.push(buildEventChannelName(destination.channel, ctx.data.data.id));
             }
 
             for (let j = 0; j < rooms.length; j++) {

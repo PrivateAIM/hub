@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { DomainType } from '@privateaim/core-kit';
 import type {
     MasterImagesEventContext,
     MasterImagesEventMap,
@@ -15,19 +16,22 @@ import {
     useMasterImageQueueService,
 } from '@privateaim/server-analysis-manager-kit';
 import type { QueueRouterHandlers } from '@privateaim/server-kit';
-import { MasterImageEventService, MasterImageSynchronizerService } from '../../../services';
+import { MasterImageSynchronizerService } from '../../../services';
+import { useEventService } from '../../../services/event/singleton';
 
 export function createAnalysisManagerMasterImagesHandlers() : QueueRouterHandlers<Partial<MasterImagesEventMap>> {
-    const event = new MasterImageEventService();
+    const event = useEventService();
     const synchronizer = new MasterImageSynchronizerService();
     const queue = useMasterImageQueueService();
 
     return {
         $any: async (message) => {
+            const data = message.data as MasterImagesEventContext;
             await event.store({
-                event: message.type,
-                data: message.data,
-            } as MasterImagesEventContext);
+                name: data.event,
+                data,
+                ref_type: DomainType.MASTER_IMAGE,
+            });
         },
         [MasterImagesEvent.SYNCHRONIZED]: async (
             message,

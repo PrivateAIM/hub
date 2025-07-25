@@ -5,15 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { isPropertySet } from '@authup/kit';
+import { isPropertySet, pickRecord } from '@authup/kit';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
+import { DomainType } from '@privateaim/core-kit';
 import { PermissionName, isRealmResourceWritable } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { HTTPHandlerOperation, useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
-import { AnalysisNodeEntity, AnalysisNodeEventEntity } from '../../../../database/domains';
+import { AnalysisNodeEntity } from '../../../../database';
+import { useEventService } from '../../../../services/event/singleton';
 import { AnalysisNodeValidator } from '../utils';
 
 export async function updateAnalysisNodeRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -96,17 +98,30 @@ export async function updateAnalysisNodeRouteHandler(req: Request, res: Response
             entity.run_status !== data.run_status &&
             data.run_status
         ) {
-            const analysisNodeEventRepository = entityManager.getRepository(AnalysisNodeEventEntity);
-            await analysisNodeEventRepository.save({
-                name: entity.run_status,
-                analysis_id: entity.analysis_id,
-                node_id: entity.node_id,
+            const eventService = useEventService();
+            await eventService.store({
+                ref_type: DomainType.ANALYSIS_NODE,
+                ref_id: entity.id,
+                name: data.run_status,
+                scope: 'run',
+                data: pickRecord(entity, [
+                    'analysis_id',
+                    'analysis_realm_id',
+                    'node_id',
+                    'node_realm_id',
+                ]),
+            }, {
+                entityManager,
             });
         }
 
         const repository = entityManager.getRepository(AnalysisNodeEntity);
         entity = repository.merge(entity, data);
-        return repository.save(entity);
+        return repository.save(entity, {
+            data: {
+                ip_address: '127.0.0.1',
+            },
+        });
     });
 
     return sendAccepted(res, entity);

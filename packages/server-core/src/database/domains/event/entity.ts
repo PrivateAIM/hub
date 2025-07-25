@@ -6,6 +6,7 @@
  */
 
 import { deserialize, serialize } from '@authup/kit';
+import { ObjectLiteral } from '@privateaim/server-kit';
 import {
     Column,
     CreateDateColumn,
@@ -18,7 +19,7 @@ import type {
 } from '@privateaim/core-kit';
 
 @Entity({ name: 'events' })
-export class EventEntity implements Event {
+export class EventEntity<T extends ObjectLiteral = ObjectLiteral> implements Event<T> {
     @PrimaryGeneratedColumn('uuid')
         id: string;
 
@@ -46,7 +47,7 @@ export class EventEntity implements Event {
             },
         },
     })
-        data: unknown | null;
+        data: T | null;
 
     @Column({ type: 'boolean', default: false })
         expiring: boolean;
@@ -56,12 +57,13 @@ export class EventEntity implements Event {
     @Column({
         type: 'varchar',
         length: 28,
+        nullable: true,
     })
-        expires_at: string;
+        expires_at: string | null;
 
     @CreateDateColumn()
-        created_at: Date;
+        created_at: string;
 
     @UpdateDateColumn()
-        updated_at: Date;
+        updated_at: string;
 }

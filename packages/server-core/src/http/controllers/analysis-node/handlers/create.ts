@@ -6,7 +6,7 @@
  */
 
 import { BadRequestError, NotFoundError } from '@ebec/http';
-import { AnalysisNodeApprovalStatus, NodeType } from '@privateaim/core-kit';
+import { AnalysisNodeApprovalStatus, DomainType, NodeType } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
@@ -15,8 +15,9 @@ import { HTTPHandlerOperation, useRequestPermissionChecker } from '@privateaim/s
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { useEnv } from '../../../../config';
 import {
-    AnalysisEntity, AnalysisNodeEntity, AnalysisNodeEventEntity, ProjectNodeEntity,
-} from '../../../../database/domains';
+    AnalysisEntity, AnalysisNodeEntity, ProjectNodeEntity,
+} from '../../../../database';
+import { useEventService } from '../../../../services/event/singleton';
 import { AnalysisNodeValidator } from '../utils';
 
 export async function createAnalysisNodeRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -63,16 +64,7 @@ export async function createAnalysisNodeRouteHandler(req: Request, res: Response
         entity.approval_status = AnalysisNodeApprovalStatus.APPROVED;
     }
 
-    entity = await dataSource.transaction(async (entityManager) => {
-        if (entity.run_status) {
-            const analysisNodeEventRepository = entityManager.getRepository(AnalysisNodeEventEntity);
-            await analysisNodeEventRepository.save({
-                name: entity.run_status,
-                analysis_id: entity.analysis_id,
-                node_id: entity.node_id,
-            });
-        }
-
+    await dataSource.transaction(async (entityManager) => {
         const analysisRepository = entityManager.getRepository(AnalysisEntity);
         await analysisRepository.createQueryBuilder()
             .update()
@@ -85,7 +77,23 @@ export async function createAnalysisNodeRouteHandler(req: Request, res: Response
             .execute();
 
         const repository = entityManager.getRepository(AnalysisNodeEntity);
-        return repository.save(entity);
+        entity = await repository.save(entity);
+
+        if (entity.run_status) {
+            const eventService = useEventService();
+            await eventService.store({
+                ref_type: DomainType.ANALYSIS_NODE,
+                ref_id: entity.id,
+                name: entity.run_status,
+                scope: 'run',
+                data: {
+                    analysis: data.analysis,
+                    node: data.node,
+                },
+            }, {
+                entityManager,
+            });
+        }
     });
 
     return sendCreated(res, entity);
