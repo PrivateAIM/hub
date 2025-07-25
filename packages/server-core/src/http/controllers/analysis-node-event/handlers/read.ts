@@ -14,7 +14,7 @@ import {
     useDataSource,
 } from 'typeorm-extension';
 import { NotFoundError } from '@ebec/http';
-import { AnalysisNodeEventEntity } from '../../../../database/domains';
+import { AnalysisNodeEventEntity } from '../../../../database';
 
 export async function getOneAnalysisNodeEventRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -41,14 +41,15 @@ export async function getOneAnalysisNodeEventRouteHandler(req: Request, res: Res
 export async function getManyAnalysisNodeEventRouteHandler(req: Request, res: Response) : Promise<any> {
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisNodeEventEntity);
-    const query = repository.createQueryBuilder('event');
-    query.distinctOn(['event.id']);
+    const query = repository.createQueryBuilder('e');
+    query.distinctOn(['e.id']);
 
     const { pagination } = applyQuery(query, useRequestQuery(req), {
-        defaultAlias: 'event',
+        defaultAlias: 'e',
         filters: {
             allowed: [
-                'status',
+                'event.scope',
+                'event.name',
                 'analysis_id',
                 'node_id',
             ],
@@ -57,10 +58,13 @@ export async function getManyAnalysisNodeEventRouteHandler(req: Request, res: Re
             maxLimit: 50,
         },
         relations: {
-            allowed: ['analysis', 'node'],
+            allowed: ['event', 'analysis', 'node'],
         },
         sort: {
-            allowed: ['status', 'created_at', 'updated_at'],
+            allowed: [
+                'created_at',
+                'updated_at',
+            ],
         },
     });
 

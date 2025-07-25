@@ -24,7 +24,7 @@ export function transformEventData<T>(input: T) : T {
 
 export function buildEventChannelName(
     input: DomainEventChannelName,
-    id?: string | number,
+    id?: string,
 ) : string {
     if (typeof input === 'string') {
         return input;

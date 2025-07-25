@@ -26,9 +26,9 @@ export function registerMasterImageEventLogSocketHandlers(socket: Socket) {
     if (!socket.data.userId && !socket.data.robotId) return;
 
     socket.on(
-        buildDomainEventFullName(DomainType.MASTER_IMAGE_EVENT, DomainEventSubscriptionName.SUBSCRIBE),
+        buildDomainEventFullName(DomainType.EVENT, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
-            subscribeSocketRoom(socket, buildDomainChannelName(DomainType.MASTER_IMAGE_EVENT, target));
+            subscribeSocketRoom(socket, buildDomainChannelName(DomainType.EVENT, target));
 
             if (isEventCallback(cb)) {
                 cb(null);
@@ -37,9 +37,9 @@ export function registerMasterImageEventLogSocketHandlers(socket: Socket) {
     );
 
     socket.on(
-        buildDomainEventFullName(DomainType.MASTER_IMAGE_EVENT, DomainEventSubscriptionName.UNSUBSCRIBE),
+        buildDomainEventFullName(DomainType.EVENT, DomainEventSubscriptionName.UNSUBSCRIBE),
         (target) => {
-            unsubscribeSocketRoom(socket, buildDomainChannelName(DomainType.MASTER_IMAGE_EVENT, target));
+            unsubscribeSocketRoom(socket, buildDomainChannelName(DomainType.EVENT, target));
         },
     );
 }

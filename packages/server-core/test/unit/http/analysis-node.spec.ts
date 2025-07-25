@@ -5,15 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { extendObject } from '@authup/kit';
 import type { AnalysisNode } from '@privateaim/core-kit';
-import {
-    createTestSuite,
-    expectPropertiesEqualToSrc, removeDateProperties,
-} from '../../utils';
-import {
-    createTestNode,
-    createTestProject,
-} from '../../utils/domains';
+import { AnalysisNodeRunStatus } from '@privateaim/core-kit';
+import { createTestSuite, expectPropertiesEqualToSrc, removeDateProperties } from '../../utils';
+import { createTestNode, createTestProject } from '../../utils/domains';
 
 describe('src/controllers/core/analysis-node', () => {
     const suite = createTestSuite();
@@ -50,12 +46,26 @@ describe('src/controllers/core/analysis-node', () => {
         const analysisNode = await client.analysisNode.create({
             analysis_id: analysis.id,
             node_id: node.id,
+            run_status: AnalysisNodeRunStatus.STARTING,
         });
 
         delete analysisNode.analysis;
         delete analysisNode.node;
 
         details = removeDateProperties(analysisNode);
+    });
+
+    it('should update record', async () => {
+        const client = suite.client();
+
+        const data = await client.analysisNode.update(details.id, {
+            ...details,
+            run_status: AnalysisNodeRunStatus.STARTED,
+        });
+
+        expect(data.run_status).toEqual(AnalysisNodeRunStatus.STARTED);
+
+        extendObject(details, data);
     });
 
     it('should read collection', async () => {

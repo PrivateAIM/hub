@@ -5,25 +5,32 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import type {
-    MasterImageEvent,
+    Event,
 } from '@privateaim/core-kit';
 import {
     DomainType,
     buildDomainChannelName,
 } from '@privateaim/core-kit';
 import type { ListItemSlotProps } from '@vuecs/list-controls';
+import type { BuildInput } from 'rapiq';
+import type { PropType } from 'vue';
 import {
     defineComponent, h, nextTick, ref,
 } from 'vue';
 import type { ListMeta } from '../../core';
 import { createList } from '../../core';
-import FMasterImageEvent from './FMasterImageEvent';
+import FEvent from './FEvent';
 
 export default defineComponent({
+    props: {
+        query: {
+            type: Object as PropType<BuildInput<Event>>,
+        },
+    },
     setup(props, setup) {
         const rootNode = ref<null | HTMLElement>(null);
 
-        const scrollToLastLine = (meta: ListMeta<MasterImageEvent>) => {
+        const scrollToLastLine = (meta: ListMeta<Event>) => {
             if (!rootNode.value) {
                 return;
             }
@@ -39,7 +46,7 @@ export default defineComponent({
             render,
             setDefaults,
         } = createList({
-            type: `${DomainType.MASTER_IMAGE_EVENT}`,
+            type: `${DomainType.EVENT}`,
             onCreated(_entity, meta) {
                 scrollToLastLine(meta);
             },
@@ -50,20 +57,18 @@ export default defineComponent({
             },
             socket: {
                 processEvent(event) {
-                    return event.meta.roomName !== buildDomainChannelName(DomainType.MASTER_IMAGE_EVENT);
+                    return event.meta.roomName !== buildDomainChannelName(DomainType.EVENT);
                 },
             },
             props,
             setup,
             loadAll: true,
-            query: {
+            query: () => ({
+                ...props.query,
                 sort: {
                     created_at: 'ASC',
                 },
-                relations: {
-                    master_image: true,
-                },
-            },
+            } satisfies BuildInput<Event>),
         });
 
         setDefaults({
@@ -71,9 +76,9 @@ export default defineComponent({
                 content: 'No more events available...',
             },
             item: {
-                content(item: MasterImageEvent, slotProps: ListItemSlotProps<MasterImageEvent>) {
+                content(item: Event, slotProps: ListItemSlotProps<Event>) {
                     return h(
-                        FMasterImageEvent,
+                        FEvent,
                         {
                             entity: item,
                             index: slotProps.index,
@@ -82,7 +87,7 @@ export default defineComponent({
                                     slotProps.deleted(item);
                                 }
                             },
-                            onUpdated: (e: MasterImageEvent) => {
+                            onUpdated: (e: Event) => {
                                 if (slotProps && slotProps.updated) {
                                     slotProps.updated(e);
                                 }

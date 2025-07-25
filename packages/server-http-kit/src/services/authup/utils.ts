@@ -67,5 +67,5 @@ export function applyTokenVerificationData(
         },
     });
 
-    setRequestEnv(req, 'scopes', unwrapOAuth2Scope(data.scope));
+    setRequestEnv(req, 'scopes', unwrapOAuth2Scope(data.scope || []));
 }

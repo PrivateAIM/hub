@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import { VCTimeago } from '@vuecs/timeago';
-import type { MasterImageEvent } from '@privateaim/core-kit';
+import type { Event } from '@privateaim/core-kit';
 import {
     defineComponent, h, toRef,
 } from 'vue';
@@ -20,7 +20,7 @@ export default defineComponent({
             default: 0,
         },
         entity: {
-            type: Object as PropType<MasterImageEvent>,
+            type: Object as PropType<Event>,
             required: true,
         },
     },
@@ -31,10 +31,12 @@ export default defineComponent({
             'Event ',
         ];
 
-        message.push(h('strong', `${entity.value.name}`));
+        message.push(
+            h('strong', `${entity.value.name} (${entity.value.scope})`),
+        );
 
-        if (entity.value.master_image) {
-            message.push(h('span', { class: 'ms-1' }, [`(${entity.value.master_image.virtual_path})`]));
+        if (entity.value.ref_id) {
+            message.push(h('span', { class: 'ms-1' }, [`(${entity.value.ref_id})`]));
         }
 
         message.push(' triggered.');
