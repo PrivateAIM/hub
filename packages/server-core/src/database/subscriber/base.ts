@@ -10,14 +10,16 @@ import { DomainEventName } from '@privateaim/core-kit';
 import type { ObjectLiteral } from '@privateaim/kit';
 import type { DomainEventDestinations, DomainEventPublisher } from '@privateaim/server-kit';
 import { useDomainEventPublisher } from '@privateaim/server-kit';
-import type { InsertEvent, RemoveEvent, UpdateEvent } from 'typeorm';
+import type {
+    EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,
+} from 'typeorm';
 
 export type SubscriberPublishPayload<T> = {
     type: `${DomainEventName}`,
     data: T
 };
 
-export class BaseSubscriber<T extends ObjectLiteral> {
+export class BaseSubscriber<T extends ObjectLiteral> implements EntitySubscriberInterface<T> {
     protected publisher: DomainEventPublisher;
 
     protected destinations : DomainEventDestinations<T>;

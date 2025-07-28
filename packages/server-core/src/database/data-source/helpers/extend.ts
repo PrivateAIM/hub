@@ -9,33 +9,33 @@ import { isRedisClientUsable } from '@privateaim/server-kit';
 import {
     AnalysisBucketEntity,
     AnalysisBucketFileEntity,
-    AnalysisEntity,
-    AnalysisNodeEntity, AnalysisNodeEventEntity,
-    AnalysisPermissionEntity,
-    EventEntity,
-    MasterImageEntity,
-    MasterImageGroupEntity,
-    NodeEntity,
-    ProjectEntity,
-    ProjectNodeEntity,
-    RegistryEntity,
-    RegistryProjectEntity,
-} from '../../domains';
-import { DatabaseQueryResultCache } from '../../cache';
-import {
-    AnalysisFileSubscriber,
+    AnalysisBucketFileSubscriber,
+    AnalysisBucketSubscriber,
+    AnalysisEntity, AnalysisNodeEntity,
+    AnalysisNodeEventEntity,
     AnalysisNodeEventSubscriber,
     AnalysisNodeSubscriber,
+    AnalysisPermissionEntity,
+    AnalysisPermissionSubscriber,
     AnalysisSubscriber,
+    EventEntity,
     EventSubscriber,
+    MasterImageEntity,
+    MasterImageGroupEntity,
     MasterImageGroupSubscriber,
     MasterImageSubscriber,
+    NodeEntity,
     NodeSubscriber,
+    ProjectEntity,
+    ProjectNodeEntity,
     ProjectNodeSubscriber,
     ProjectSubscriber,
+    RegistryEntity,
+    RegistryProjectEntity,
     RegistryProjectSubscriber,
     RegistrySubscriber,
-} from '../../subscribers';
+} from '../../domains';
+import { DatabaseQueryResultCache } from '../../cache';
 
 export async function extendDataSourceOptions(options: DataSourceOptions) : Promise<DataSourceOptions> {
     options = {
@@ -63,9 +63,11 @@ export async function extendDataSourceOptions(options: DataSourceOptions) : Prom
         subscribers: [
             ...(options.subscribers ? options.subscribers : []) as string[],
             AnalysisSubscriber,
-            AnalysisFileSubscriber,
+            AnalysisBucketSubscriber,
+            AnalysisBucketFileSubscriber,
             AnalysisNodeSubscriber,
             AnalysisNodeEventSubscriber,
+            AnalysisPermissionSubscriber,
             MasterImageSubscriber,
             EventSubscriber,
             MasterImageGroupSubscriber,
