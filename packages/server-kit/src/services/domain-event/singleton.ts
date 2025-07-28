@@ -11,7 +11,7 @@ import { DomainEventPublisher } from './module';
 import { DomainEventRedisPublisher } from './redis';
 import { DomainEventSocketPublisher } from './socket';
 
-const instance = singa<DomainEventPublisher>({
+const singaInstance = singa<DomainEventPublisher>({
     name: 'domainEventPublisher',
     factory: () => {
         const publisher = new DomainEventPublisher();
@@ -27,6 +27,10 @@ const instance = singa<DomainEventPublisher>({
     },
 });
 
+export function useDomainEventPublisherSinga() {
+    return singaInstance;
+}
+
 export function useDomainEventPublisher() {
-    return instance.use();
+    return singaInstance.use();
 }

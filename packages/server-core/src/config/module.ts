@@ -19,9 +19,10 @@ import { getWritableDirPath } from './paths';
 import {
     configureAmqp,
     configureAuthup,
-    configureAuthupClientAuthenticationHook, configureLoki,
-    configureRedis,
-    configureVault,
+    configureAuthupClientAuthenticationHook,
+    configureDomainEventPublisher,
+    configureLoki,
+    configureRedis, configureVault,
     setupLogging,
 } from './services';
 
@@ -46,6 +47,8 @@ export function createConfig() : Config {
     configureRedis();
 
     configureAmqp();
+
+    configureDomainEventPublisher();
 
     // ---------------------------------------------
 

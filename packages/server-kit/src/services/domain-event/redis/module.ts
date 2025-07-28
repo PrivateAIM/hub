@@ -6,7 +6,8 @@
  */
 
 import type { Client } from 'redis-extension';
-import type { DomainEventPublishContext, IDomainEventPublisher } from '../type';
+import type { DomainEventRecord } from '@privateaim/kit';
+import type { DomainEventPublishOptions, IDomainEventPublisher } from '../type';
 import { buildEventChannelName, transformEventData } from '../utils';
 
 export class DomainEventRedisPublisher implements IDomainEventPublisher {
@@ -16,8 +17,13 @@ export class DomainEventRedisPublisher implements IDomainEventPublisher {
         this.driver = client;
     }
 
-    async publish(ctx: DomainEventPublishContext) : Promise<void> {
-        const data = JSON.stringify(transformEventData(ctx.data));
+    async publish(ctx: DomainEventPublishOptions) : Promise<void> {
+        const payload : DomainEventRecord = {
+            type: ctx.metadata.domain,
+            event: ctx.metadata.event,
+            data: transformEventData(ctx.data),
+        };
+        const payloadSerialized = JSON.stringify(payload);
 
         const pipeline = this.driver.pipeline();
         for (let i = 0; i < ctx.destinations.length; i++) {
@@ -26,7 +32,7 @@ export class DomainEventRedisPublisher implements IDomainEventPublisher {
             let keyPrefix : string | undefined;
             if (ctx.destinations[i].namespace) {
                 keyPrefix = typeof destination.namespace === 'function' ?
-                    destination.namespace(ctx.data.data) :
+                    destination.namespace(ctx.data) :
                     destination.namespace;
             }
 
@@ -37,11 +43,11 @@ export class DomainEventRedisPublisher implements IDomainEventPublisher {
                 key = buildEventChannelName(destination.channel);
             }
 
-            pipeline.publish(key, data);
+            pipeline.publish(key, payloadSerialized);
 
             if (typeof ctx.destinations[i].channel === 'function') {
-                key = keyPrefix + buildEventChannelName(ctx.destinations[i].channel, ctx.data.data.id);
-                pipeline.publish(key, data);
+                key = keyPrefix + buildEventChannelName(ctx.destinations[i].channel, ctx.data.id);
+                pipeline.publish(key, payloadSerialized);
             }
         }
 

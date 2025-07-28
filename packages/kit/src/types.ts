@@ -6,6 +6,13 @@
  */
 
 export type ObjectLiteral = Record<string, any>;
-export type ObjectLiteralKeys<T extends ObjectLiteral> = {
+export type ObjectLiteralKeys<T extends ObjectLiteral = ObjectLiteral> = {
     [K in keyof T as `${K & (string | number)}`]: T[K];
+};
+
+export type ObjectDiff<T extends ObjectLiteral = ObjectLiteral> = {
+    [K in keyof T]: {
+        current: T[K],
+        previous?: T[K]
+    }
 };

@@ -8,7 +8,7 @@
 import { buildDomainEventFullName } from '@privateaim/kit';
 import { Emitter } from '@socket.io/redis-emitter';
 import type { Client } from 'redis-extension';
-import type { DomainEventPublishContext, IDomainEventPublisher } from '../type';
+import type { DomainEventPublishOptions, IDomainEventPublisher } from '../type';
 import { buildEventChannelName, transformEventData } from '../utils';
 
 export class DomainEventSocketPublisher implements IDomainEventPublisher {
@@ -18,7 +18,7 @@ export class DomainEventSocketPublisher implements IDomainEventPublisher {
         this.client = client;
     }
 
-    async publish(ctx: DomainEventPublishContext) : Promise<void> {
+    async publish(ctx: DomainEventPublishOptions) : Promise<void> {
         ctx.data = transformEventData(ctx.data);
 
         for (let i = 0; i < ctx.destinations.length; i++) {
@@ -27,7 +27,7 @@ export class DomainEventSocketPublisher implements IDomainEventPublisher {
             let namespace : string;
             if (destination.namespace) {
                 namespace = typeof destination.namespace === 'function' ?
-                    destination.namespace(ctx.data.data) :
+                    destination.namespace(ctx.data) :
                     destination.namespace;
             } else {
                 namespace = '/';
@@ -35,21 +35,28 @@ export class DomainEventSocketPublisher implements IDomainEventPublisher {
 
             const emitter = new Emitter(this.client, {}, namespace);
 
-            const fullEventName = buildDomainEventFullName(ctx.data.type, ctx.data.event);
+            const fullEventName = buildDomainEventFullName(
+                ctx.metadata.domain,
+                ctx.metadata.event,
+            );
 
             const rooms : string[] = [
                 buildEventChannelName(destination.channel),
             ];
 
             if (typeof destination.channel === 'function') {
-                rooms.push(buildEventChannelName(destination.channel, ctx.data.data.id));
+                rooms.push(buildEventChannelName(destination.channel, ctx.data.id));
             }
 
             for (let j = 0; j < rooms.length; j++) {
                 emitter
                     .in(rooms[j])
                     .emit(fullEventName, {
-                        ...ctx.data,
+                        data: {
+                            data: ctx.data,
+                            type: ctx.metadata.domain,
+                            event: ctx.metadata.event,
+                        },
                         meta: {
                             namespace,
                             roomName: rooms[j],

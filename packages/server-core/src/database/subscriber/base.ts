@@ -16,7 +16,8 @@ import type {
 
 export type SubscriberPublishPayload<T> = {
     type: `${DomainEventName}`,
-    data: T
+    data: T,
+    dataPrevious?: T
 };
 
 export class BaseSubscriber<T extends ObjectLiteral> implements EntitySubscriberInterface<T> {
@@ -49,6 +50,7 @@ export class BaseSubscriber<T extends ObjectLiteral> implements EntitySubscriber
         await this.publish({
             type: DomainEventName.UPDATED,
             data: event.entity as T,
+            dataPrevious: event.databaseEntity,
         });
     }
 
@@ -61,12 +63,13 @@ export class BaseSubscriber<T extends ObjectLiteral> implements EntitySubscriber
         }
     }
 
-    async publish(data: SubscriberPublishPayload<T>) {
+    async publish(payload: SubscriberPublishPayload<T>) {
         await this.publisher.safePublish({
-            data: {
-                ...data,
-                event: data.type,
-                type: this.type,
+            data: payload.data,
+            dataPrevious: payload.dataPrevious,
+            metadata: {
+                domain: this.type,
+                event: payload.type,
             },
             destinations: this.destinations,
         });

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { DomainEventRecord, ObjectLiteral } from '@privateaim/kit';
+import type { ObjectLiteral } from '@privateaim/kit';
 
 export type DomainEventChannelName = string | ((id?: string) => string);
 export type DomainEventNamespaceName<
@@ -23,13 +23,28 @@ export type DomainEventDestinations<
 T extends ObjectLiteral =ObjectLiteral,
 > = DomainEventDestination<T>[];
 
-export type DomainEventPublishContext<
-    T extends DomainEventRecord = DomainEventRecord,
+export type DomainEventIdentity = {
+    id?: string,
+    name?: string,
+    type?: string,
+    ipAddress?: string,
+};
+
+export type DomainEventMetadata = {
+    domain: string,
+    event: string,
+    identity?: DomainEventIdentity,
+};
+
+export type DomainEventPublishOptions<
+    T extends ObjectLiteral = ObjectLiteral,
 > = {
     data: T,
+    dataPrevious?: T,
+    metadata: DomainEventMetadata,
     destinations: DomainEventDestinations<T['data']>
 };
 
 export interface IDomainEventPublisher {
-    publish(ctx: DomainEventPublishContext) : Promise<void>;
+    publish(ctx: DomainEventPublishOptions) : Promise<void>;
 }

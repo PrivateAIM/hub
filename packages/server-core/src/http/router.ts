@@ -26,7 +26,7 @@ import { AnalysisNodeController } from './controllers/analysis-node';
 import { AnalysisNodeLogController } from './controllers/analysis-node-log';
 import { AnalysisPermissionController } from './controllers/analysis-permission';
 import { MasterImageController } from './controllers/master-image';
-import { EventController } from './controllers/master-image-event';
+import { EventController } from './controllers/event';
 import { MasterImageGroupController } from './controllers/master-image-group';
 import { NodeController } from './controllers/node';
 import { ProposalController } from './controllers/project';
