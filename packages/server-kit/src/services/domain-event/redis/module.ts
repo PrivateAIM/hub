@@ -7,7 +7,7 @@
 
 import type { Client } from 'redis-extension';
 import type { DomainEventRecord } from '@privateaim/kit';
-import type { DomainEventPublishOptions, IDomainEventPublisher } from '../type';
+import type { DomainEventPublishOptions, IDomainEventPublisher } from '../types';
 import { buildEventChannelName, transformEventData } from '../utils';
 
 export class DomainEventRedisPublisher implements IDomainEventPublisher {
@@ -30,7 +30,7 @@ export class DomainEventRedisPublisher implements IDomainEventPublisher {
             const destination = ctx.destinations[i];
 
             let keyPrefix : string | undefined;
-            if (ctx.destinations[i].namespace) {
+            if (destination.namespace) {
                 keyPrefix = typeof destination.namespace === 'function' ?
                     destination.namespace(ctx.data) :
                     destination.namespace;
@@ -45,8 +45,8 @@ export class DomainEventRedisPublisher implements IDomainEventPublisher {
 
             pipeline.publish(key, payloadSerialized);
 
-            if (typeof ctx.destinations[i].channel === 'function') {
-                key = keyPrefix + buildEventChannelName(ctx.destinations[i].channel, ctx.data.id);
+            if (typeof destination.channel === 'function') {
+                key = keyPrefix + buildEventChannelName(destination.channel, ctx.data.id);
                 pipeline.publish(key, payloadSerialized);
             }
         }

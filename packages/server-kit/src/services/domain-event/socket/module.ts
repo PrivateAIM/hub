@@ -8,7 +8,7 @@
 import { buildDomainEventFullName } from '@privateaim/kit';
 import { Emitter } from '@socket.io/redis-emitter';
 import type { Client } from 'redis-extension';
-import type { DomainEventPublishOptions, IDomainEventPublisher } from '../type';
+import type { DomainEventPublishOptions, IDomainEventPublisher } from '../types';
 import { buildEventChannelName, transformEventData } from '../utils';
 
 export class DomainEventSocketPublisher implements IDomainEventPublisher {

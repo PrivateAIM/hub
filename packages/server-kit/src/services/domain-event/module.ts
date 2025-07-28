@@ -8,7 +8,7 @@
 import type { ObjectLiteral } from '@privateaim/kit';
 import { buildDomainEventFullName } from '@privateaim/kit';
 import { isLoggerUsable, useLogger } from '../logger';
-import type { DomainEventPublishOptions, IDomainEventPublisher } from './type';
+import type { DomainEventPublishOptions, IDomainEventPublisher } from './types';
 
 export class DomainEventPublisher implements IDomainEventPublisher {
     protected publishers : Set<IDomainEventPublisher>;
