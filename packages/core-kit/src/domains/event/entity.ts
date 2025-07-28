@@ -45,10 +45,18 @@ export interface Event<T extends ObjectLiteral = ObjectLiteral> {
      */
     expiring: boolean;
 
-    // 2. actor_type - enum(user, robot,...) | null (optional)
-    //    actor_id - string | null (optional)
-    //    actor_ip_address - string | null (optional)
-    //    actor_name - string | null (optional)
+    // ------------------------------------------------------------------
+
+    actor_type: string | null;
+
+    actor_id: string | null;
+
+    actor_name: string | null;
+
+    actor_ip_address: string | null;
+
+    // ------------------------------------------------------------------
+
     expires_at: string | null;
 
     created_at: string;

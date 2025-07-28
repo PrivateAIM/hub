@@ -54,6 +54,20 @@ export class EventEntity<T extends ObjectLiteral = ObjectLiteral> implements Eve
 
     // ------------------------------------------------------------------
 
+    @Column({ type: 'varchar', length: 64, nullable: true })
+        actor_type: string | null;
+
+    @Column({ type: 'uuid', nullable: true })
+        actor_id: string | null;
+
+    @Column({ type: 'varchar', length: 64, nullable: true })
+        actor_name: string | null;
+
+    @Column({ type: 'varchar', length: 15, nullable: true })
+        actor_ip_address: string | null;
+
+    // ------------------------------------------------------------------
+
     @Column({
         type: 'varchar',
         length: 28,
