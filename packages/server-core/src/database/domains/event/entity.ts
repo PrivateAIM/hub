@@ -10,7 +10,7 @@ import { ObjectLiteral } from '@privateaim/server-kit';
 import {
     Column,
     CreateDateColumn,
-    Entity,
+    Entity, Index,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
@@ -18,20 +18,26 @@ import type {
     Event,
 } from '@privateaim/core-kit';
 
+@Index(['name', 'scope'])
+@Index(['ref_type', 'ref_id'])
 @Entity({ name: 'events' })
 export class EventEntity<T extends ObjectLiteral = ObjectLiteral> implements Event<T> {
     @PrimaryGeneratedColumn('uuid')
         id: string;
 
+    @Index()
     @Column({ type: 'varchar', length: 64 })
         scope: string;
 
+    @Index()
     @Column({ type: 'varchar', length: 64 })
         name: string;
 
+    @Index()
     @Column({ type: 'varchar', length: 64 })
         ref_type: string;
 
+    @Index()
     @Column({ type: 'varchar', length: 64, nullable: true })
         ref_id: string | null;
 
@@ -49,20 +55,25 @@ export class EventEntity<T extends ObjectLiteral = ObjectLiteral> implements Eve
     })
         data: T | null;
 
+    @Index()
     @Column({ type: 'boolean', default: false })
         expiring: boolean;
 
     // ------------------------------------------------------------------
 
+    @Index()
     @Column({ type: 'varchar', length: 64, nullable: true })
         actor_type: string | null;
 
+    @Index()
     @Column({ type: 'uuid', nullable: true })
         actor_id: string | null;
 
+    @Index()
     @Column({ type: 'varchar', length: 64, nullable: true })
         actor_name: string | null;
 
+    @Index()
     @Column({ type: 'varchar', length: 15, nullable: true })
         actor_ip_address: string | null;
 
