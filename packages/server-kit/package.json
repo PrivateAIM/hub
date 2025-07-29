@@ -34,7 +34,7 @@
         "@socket.io/redis-emitter": "^5.1.0",
         "envix": "^1.5.0",
         "hapic": "^2.7.0",
-        "singa": "^1.0.0",
+        "singa": "^1.1.0",
         "triple-beam": "^1.4.1",
         "winston": "^3.17.0",
         "winston-transport": "^4.9.0"
