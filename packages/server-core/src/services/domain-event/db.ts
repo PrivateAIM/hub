@@ -8,6 +8,7 @@
 import { isEqual } from 'smob';
 import type { DomainEventPublishOptions, IDomainEventPublisher } from '@privateaim/server-kit';
 import { useDataSource } from 'typeorm-extension';
+import type { EventData } from '@privateaim/core-kit';
 import { DomainEventName, DomainType } from '@privateaim/core-kit';
 import type { ObjectDiff } from '@privateaim/kit';
 import { isObject } from '@privateaim/kit';
@@ -47,29 +48,38 @@ export class DomainEventDatabasePublisher implements IDomainEventPublisher {
             }
         }
 
+        const data : EventData = {};
+
         if (
             ctx.metadata.event === DomainEventName.UPDATED &&
             ctx.dataPrevious
         ) {
-            const data : ObjectDiff = {};
+            const diff : ObjectDiff = {};
             const keys = Object.keys(ctx.data);
             for (let i = 0; i < keys.length; i++) {
                 const key = keys[i];
 
-                if (isObject(data[key]) || Array.isArray(data[key])) {
+                // skip date changes
+                if (key.endsWith('_at')) {
+                    continue;
+                }
+
+                if (isObject(diff[key]) || Array.isArray(diff[key])) {
                     continue;
                 }
 
                 if (!isEqual(ctx.data[key], ctx.dataPrevious[key])) {
-                    data[key] = {
-                        current: ctx.data[key],
+                    diff[key] = {
+                        next: ctx.data[key],
                         previous: ctx.dataPrevious[key],
                     };
                 }
             }
 
-            entity.data = data;
+            data.diff = diff;
         }
+
+        entity.data = data;
 
         await repository.save(entity);
     }

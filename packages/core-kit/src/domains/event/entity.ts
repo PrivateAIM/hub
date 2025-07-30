@@ -5,6 +5,20 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { ObjectDiff } from '@privateaim/kit';
+
+export type EventDataRequest = {
+    path: string,
+    method: string,
+    trace: string,
+    user_agent: string,
+};
+
+export type EventData = {
+    diff?: ObjectDiff,
+    request?: EventDataRequest
+};
+
 export interface Event {
     id: string;
 

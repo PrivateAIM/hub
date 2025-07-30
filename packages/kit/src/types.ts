@@ -12,7 +12,7 @@ export type ObjectLiteralKeys<T extends ObjectLiteral = ObjectLiteral> = {
 
 export type ObjectDiff<T extends ObjectLiteral = ObjectLiteral> = {
     [K in keyof T]: {
-        current: T[K],
+        next: T[K],
         previous?: T[K]
     }
 };
