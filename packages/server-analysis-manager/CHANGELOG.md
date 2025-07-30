@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.8.15](https://github.com/PrivateAIM/hub/compare/v0.8.14...v0.8.15) (2025-07-30)
+
+
+### Features
+
+* migrated to authup v1.0.0-beta.27 ([f96db78](https://github.com/PrivateAIM/hub/commit/f96db782a5b74e3aa8ab1ada270af770f3c92631))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.8.14 to ^0.8.15
+    * @privateaim/kit bumped from ^0.8.14 to ^0.8.15
+    * @privateaim/core-http-kit bumped from ^0.8.14 to ^0.8.15
+    * @privateaim/server-kit bumped from ^0.8.14 to ^0.8.15
+    * @privateaim/server-analysis-manager-kit bumped from ^0.7.15 to ^0.7.16
+    * @privateaim/storage-kit bumped from ^0.8.14 to ^0.8.15
+
 ## [0.8.14](https://github.com/PrivateAIM/hub/compare/v0.8.13...v0.8.14) (2025-07-10)
 
 

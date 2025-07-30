@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.8.15](https://github.com/PrivateAIM/hub/compare/v0.8.14...v0.8.15) (2025-07-30)
+
+
+### Features
+
+* align analysis-logs & initital log render view ([5fd2365](https://github.com/PrivateAIM/hub/commit/5fd236552dd8489d7ab00bf6f59751824ce554fd))
+* event (re-) modelling ([#1125](https://github.com/PrivateAIM/hub/issues/1125)) ([621f704](https://github.com/PrivateAIM/hub/commit/621f7041794d0bf6d530445a9c3e7c9b66a373ba))
+* explicitly enable middlewares ([dcb95e1](https://github.com/PrivateAIM/hub/commit/dcb95e1c5750f4119977d12fb4a0a74c1a8424c8))
+* migrated to authup v1.0.0-beta.27 ([f96db78](https://github.com/PrivateAIM/hub/commit/f96db782a5b74e3aa8ab1ada270af770f3c92631))
+
+
+### Bug Fixes
+
+* add unique constraint for bucket_id + path ([2b6e000](https://github.com/PrivateAIM/hub/commit/2b6e0003aba99f80d4e6106b491ad918e2f19b38))
+* return missing properties in analysis-node-log create process ([3c997da](https://github.com/PrivateAIM/hub/commit/3c997dadead2b8cb472f8d8685d27766b4bbc0c7))
+
 ## [0.8.14](https://github.com/PrivateAIM/hub/compare/v0.8.13...v0.8.14) (2025-07-10)
 
 
