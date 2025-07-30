@@ -5,6 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { PermissionName } from '@privateaim/kit';
+import { useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { useRequestQuery } from '@routup/basic/query';
 import type { Request, Response } from 'routup';
 import { send, useRequestParam } from 'routup';
@@ -16,6 +18,14 @@ import { NotFoundError } from '@ebec/http';
 import { EventEntity } from '../../../../database';
 
 export async function getOneEventLogRouteHandler(req: Request, res: Response) : Promise<any> {
+    const permissionChecker = useRequestPermissionChecker(req);
+    await permissionChecker.preCheckOneOf({
+        name: [
+            PermissionName.EVENT_READ,
+            PermissionName.EVENT_DELETE,
+        ],
+    });
+
     const id = useRequestParam(req, 'id');
 
     const dataSource = await useDataSource();
@@ -33,6 +43,14 @@ export async function getOneEventLogRouteHandler(req: Request, res: Response) : 
 }
 
 export async function getManyEventLogRouteHandler(req: Request, res: Response) : Promise<any> {
+    const permissionChecker = useRequestPermissionChecker(req);
+    await permissionChecker.preCheckOneOf({
+        name: [
+            PermissionName.EVENT_READ,
+            PermissionName.EVENT_DELETE,
+        ],
+    });
+
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(EventEntity);
     const query = repository.createQueryBuilder('event');

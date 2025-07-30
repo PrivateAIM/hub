@@ -6,6 +6,9 @@
  */
 
 export enum PermissionName {
+    EVENT_READ = 'event_read',
+    EVENT_DELETE = 'event_delete',
+
     BUCKET_CREATE = 'bucket_create',
     BUCKET_UPDATE = 'bucket_update',
     BUCKET_DELETE = 'bucket_delete',

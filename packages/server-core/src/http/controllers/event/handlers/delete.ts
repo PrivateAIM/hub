@@ -17,7 +17,9 @@ export async function deleteEventRouteHandler(req: Request, res: Response) : Pro
     const id = useRequestParam(req, 'id');
 
     const permissionChecker = useRequestPermissionChecker(req);
-    await permissionChecker.preCheck({ name: PermissionName.SERVICE_MANAGE });
+    await permissionChecker.preCheck({
+        name: PermissionName.EVENT_DELETE,
+    });
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(EventEntity);
