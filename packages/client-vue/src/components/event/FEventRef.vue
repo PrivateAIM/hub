@@ -25,7 +25,7 @@ export default defineComponent({
 <template>
     <slot v-bind="entity">
         <div
-            class="d-flex gap-1"
+            class="d-flex gap-1 justify-content-center"
             :class="{
                 'flex-row': direction === 'row',
                 'flex-column': direction === 'column'

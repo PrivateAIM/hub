@@ -13,6 +13,12 @@ services:
             - "3100:3100"
         networks:
             hub:
+        healthcheck:
+            test: wget --quiet --tries=1 --output-document=- http://localhost:3100/ready | grep -q -w ready || exit 1
+            start_period: 20s
+            interval: 3s
+            timeout: 5s
+            retries: 5
     grafana:
         image: grafana/grafana:latest
         environment:
@@ -152,6 +158,8 @@ services:
             redis:
                 condition: service_healthy
             vault:
+                condition: service_healthy
+            loki:
                 condition: service_healthy
         environment:
             REDIS_CONNECTION_STRING: redis://redis

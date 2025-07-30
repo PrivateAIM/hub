@@ -133,7 +133,10 @@ export default defineComponent({
                     <FEventActor :entity="data.item" />
                 </template>
                 <template #cell(expiring)="data">
-                    <FEventExpiring :entity="data.item" />
+                    <FEventExpiring
+                        :entity="data.item"
+                        :direction="'row'"
+                    />
                 </template>
                 <template #cell(options)="data">
                     <nuxt-link

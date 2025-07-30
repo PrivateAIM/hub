@@ -15,21 +15,38 @@ export default defineComponent({
             type: Object as PropType<Event>,
             required: true,
         },
+        direction: {
+            type: String as PropType<'column' | 'row'>,
+            default: 'column',
+        },
     },
 });
 </script>
 <template>
     <slot v-bind="entity">
-        <i
-            class="fa"
+        <div
+            class="d-flex justify-content-center gap-1"
             :class="{
-                'fa-check text-danger': entity.expiring,
-                'fa-times': !entity.expiring
+                'flex-row': direction === 'row',
+                'flex-column': direction === 'column'
             }"
-        />
-        <template v-if="entity.expiring">
-            <br>
-            <VCTimeago :datetime="entity.expires_at" />
-        </template>
+        >
+            <div>
+                <i
+                    class="fa"
+                    :class="{
+                        'fa-check text-success': entity.expiring,
+                        'fa-times text-danger': !entity.expiring
+                    }"
+                />
+            </div>
+            <template v-if="entity.expiring">
+                <div>
+                    <small>
+                        (<VCTimeago :datetime="entity.expires_at" />)
+                    </small>
+                </div>
+            </template>
+        </div>
     </slot>
 </template>

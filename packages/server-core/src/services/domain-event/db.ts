@@ -28,6 +28,10 @@ export class DomainEventDatabasePublisher implements IDomainEventPublisher {
             ref_id: ctx.data.id,
             name: ctx.metadata.event,
             scope: 'model',
+            expiring: true,
+            expires_at: new Date(
+                Date.now() + (1000 * 60 * 60 * 24 * 7),
+            ).toISOString(),
         });
 
         if (ctx.metadata.identity) {

@@ -93,7 +93,10 @@ export default defineNuxtComponent({
                                 <strong>Expiring?</strong>
                             </div>
                             <div class="">
-                                <FEventExpiring :entity="entity" />
+                                <FEventExpiring
+                                    :entity="entity"
+                                    :direction="'row'"
+                                />
                             </div>
                         </div>
                     </div>
