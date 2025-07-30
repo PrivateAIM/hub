@@ -5,6 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './master-image-log-cleaner';
+export * from './event-cleaner';
 export * from './constants';
 export * from './registry';

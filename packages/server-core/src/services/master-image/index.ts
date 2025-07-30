@@ -6,4 +6,3 @@
  */
 
 export * from './synchronizer';
-export * from './logger';

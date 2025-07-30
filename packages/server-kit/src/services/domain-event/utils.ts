@@ -6,7 +6,7 @@
  */
 
 import { isObject } from '@privateaim/kit';
-import type { DomainEventChannelName } from './type';
+import type { DomainEventChannelName } from './types';
 
 export function transformEventData<T>(input: T) : T {
     if (isObject(input)) {
@@ -24,7 +24,7 @@ export function transformEventData<T>(input: T) : T {
 
 export function buildEventChannelName(
     input: DomainEventChannelName,
-    id?: string | number,
+    id?: string,
 ) : string {
     if (typeof input === 'string') {
         return input;

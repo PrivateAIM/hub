@@ -9,34 +9,33 @@ import { isRedisClientUsable } from '@privateaim/server-kit';
 import {
     AnalysisBucketEntity,
     AnalysisBucketFileEntity,
-    AnalysisEntity,
-    AnalysisNodeEntity,
+    AnalysisBucketFileSubscriber,
+    AnalysisBucketSubscriber,
+    AnalysisEntity, AnalysisNodeEntity,
     AnalysisNodeEventEntity,
-    AnalysisPermissionEntity,
-    MasterImageEntity,
-    MasterImageEventEntity,
-    MasterImageGroupEntity,
-    NodeEntity,
-    ProjectEntity,
-    ProjectNodeEntity,
-    RegistryEntity,
-    RegistryProjectEntity,
-} from '../../domains';
-import { DatabaseQueryResultCache } from '../../cache';
-import {
-    AnalysisFileSubscriber,
     AnalysisNodeEventSubscriber,
     AnalysisNodeSubscriber,
+    AnalysisPermissionEntity,
+    AnalysisPermissionSubscriber,
     AnalysisSubscriber,
-    MasterImageEventSubscriber,
+    EventEntity,
+    EventSubscriber,
+    MasterImageEntity,
+    MasterImageGroupEntity,
     MasterImageGroupSubscriber,
     MasterImageSubscriber,
+    NodeEntity,
     NodeSubscriber,
+    ProjectEntity,
+    ProjectNodeEntity,
     ProjectNodeSubscriber,
     ProjectSubscriber,
+    RegistryEntity,
+    RegistryProjectEntity,
     RegistryProjectSubscriber,
     RegistrySubscriber,
-} from '../../subscribers';
+} from '../../domains';
+import { DatabaseQueryResultCache } from '../../cache';
 
 export async function extendDataSourceOptions(options: DataSourceOptions) : Promise<DataSourceOptions> {
     options = {
@@ -44,8 +43,8 @@ export async function extendDataSourceOptions(options: DataSourceOptions) : Prom
         logging: false,
         entities: [
             ...(options.entities ? options.entities : []) as string[],
+            EventEntity,
             MasterImageEntity,
-            MasterImageEventEntity,
             MasterImageGroupEntity,
             ProjectEntity,
             ProjectNodeEntity,
@@ -64,11 +63,13 @@ export async function extendDataSourceOptions(options: DataSourceOptions) : Prom
         subscribers: [
             ...(options.subscribers ? options.subscribers : []) as string[],
             AnalysisSubscriber,
-            AnalysisFileSubscriber,
+            AnalysisBucketSubscriber,
+            AnalysisBucketFileSubscriber,
             AnalysisNodeSubscriber,
             AnalysisNodeEventSubscriber,
+            AnalysisPermissionSubscriber,
             MasterImageSubscriber,
-            MasterImageEventSubscriber,
+            EventSubscriber,
             MasterImageGroupSubscriber,
             NodeSubscriber,
             ProjectSubscriber,

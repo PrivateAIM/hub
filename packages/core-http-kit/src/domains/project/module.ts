@@ -24,7 +24,7 @@ export class ProjectAPI extends BaseAPI {
         return response.data;
     }
 
-    async create(data: Record<string, any>): Promise<SingleResourceResponse<Project>> {
+    async create(data: Partial<Project>): Promise<SingleResourceResponse<Project>> {
         const response = await this.client.post('projects', nullifyEmptyObjectProperties(data));
 
         return response.data;

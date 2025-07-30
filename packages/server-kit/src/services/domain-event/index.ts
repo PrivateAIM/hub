@@ -9,4 +9,4 @@ export * from './module';
 export * from './redis';
 export * from './singleton';
 export * from './socket';
-export * from './type';
+export * from './types';

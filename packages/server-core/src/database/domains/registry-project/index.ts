@@ -6,5 +6,6 @@
  */
 
 export * from './entity';
+export * from './subscriber';
 export * from './type';
 export * from './vault';

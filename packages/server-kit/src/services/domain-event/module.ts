@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { DomainEventRecord } from '@privateaim/kit';
+import type { ObjectLiteral } from '@privateaim/kit';
 import { buildDomainEventFullName } from '@privateaim/kit';
 import { isLoggerUsable, useLogger } from '../logger';
-import type { DomainEventPublishContext, IDomainEventPublisher } from './type';
+import type { DomainEventPublishOptions, IDomainEventPublisher } from './types';
 
 export class DomainEventPublisher implements IDomainEventPublisher {
     protected publishers : Set<IDomainEventPublisher>;
@@ -21,24 +21,24 @@ export class DomainEventPublisher implements IDomainEventPublisher {
         this.publishers.add(publisher);
     }
 
-    async safePublish<T extends DomainEventRecord>(
-        ctx: DomainEventPublishContext<T>,
+    async safePublish<T extends ObjectLiteral = ObjectLiteral>(
+        ctx: DomainEventPublishOptions<T>,
     ) : Promise<void> {
         try {
             await this.publish(ctx);
         } catch (e) {
             if (isLoggerUsable()) {
-                useLogger().error(`Publishing event ${buildDomainEventFullName(ctx.data.type, ctx.data.event)} failed`);
+                useLogger().error(`Publishing event ${buildDomainEventFullName(ctx.metadata.domain, ctx.metadata.event)} failed`);
                 useLogger().error(e);
             }
         }
     }
 
-    async publish<T extends DomainEventRecord>(
-        ctx: DomainEventPublishContext<T>,
+    async publish<T extends ObjectLiteral = ObjectLiteral>(
+        ctx: DomainEventPublishOptions<T>,
     ) : Promise<void> {
         if (isLoggerUsable()) {
-            useLogger().info(`Publishing event ${buildDomainEventFullName(ctx.data.type, ctx.data.event)}`);
+            useLogger().info(`Publishing event ${buildDomainEventFullName(ctx.metadata.domain, ctx.metadata.event)}`);
         }
 
         const publishers = this.publishers.values();

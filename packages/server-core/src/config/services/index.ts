@@ -8,6 +8,7 @@
 export * from './amqp';
 export * from './authup';
 export * from './authup-client-authentication-hook';
+export * from './domain-event';
 export * from './logging';
 export * from './loki';
 export * from './redis';

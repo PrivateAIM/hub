@@ -12,16 +12,17 @@ import {
     createAnalysisManagerMasterImagesAggregator,
 } from '../aggregators/analysis-manager';
 import {
-    createMasterImageLogCleanerComponent,
+    createEventCleanerComponent,
     createRegistryComponent,
 } from '../components';
 import { getWritableDirPath } from './paths';
 import {
     configureAmqp,
     configureAuthup,
-    configureAuthupClientAuthenticationHook, configureLoki,
-    configureRedis,
-    configureVault,
+    configureAuthupClientAuthenticationHook,
+    configureDomainEventPublisher,
+    configureLoki,
+    configureRedis, configureVault,
     setupLogging,
 } from './services';
 
@@ -47,6 +48,8 @@ export function createConfig() : Config {
 
     configureAmqp();
 
+    configureDomainEventPublisher();
+
     // ---------------------------------------------
 
     const aggregators : Aggregator[] = [
@@ -59,7 +62,7 @@ export function createConfig() : Config {
     // ---------------------------------------------
 
     const components : Component[] = [
-        createMasterImageLogCleanerComponent(),
+        createEventCleanerComponent(),
         createRegistryComponent(),
     ];
 

@@ -13,6 +13,12 @@ services:
             - "3100:3100"
         networks:
             hub:
+        healthcheck:
+            test: wget --quiet --tries=1 --output-document=- http://localhost:3100/ready | grep -q -w ready || exit 1
+            start_period: 20s
+            interval: 3s
+            timeout: 5s
+            retries: 5
     grafana:
         image: grafana/grafana:latest
         environment:
@@ -20,8 +26,7 @@ services:
         networks:
             hub:
         depends_on:
-            loki:
-                condition: service_healthy
+            - loki
     mysql:
         image: mysql:latest
         container_name: mysql
@@ -50,7 +55,7 @@ services:
         networks:
             hub:
     minio:
-        image: minio/minio
+        image: minio/minio:latest
         healthcheck:
             test: bash -c ':> /dev/tcp/127.0.0.1/9000' || exit 1
             interval: 3s
@@ -58,8 +63,6 @@ services:
             retries: 5
         volumes:
             -  minio:/data
-        ports:
-            - '9000:9000'
         environment:
             MINIO_ROOT_USER: admin
             MINIO_ROOT_PASSWORD: start123
@@ -99,7 +102,8 @@ services:
         networks:
             hub:
     nginx:
-        image: nginxproxy/nginx-proxy:alpine
+        #image: nginxproxy/nginx-proxy:alpine
+        image: nginx:latest
         depends_on:
             authup:
                 condition: service_healthy
@@ -155,6 +159,8 @@ services:
                 condition: service_healthy
             vault:
                 condition: service_healthy
+            loki:
+                condition: service_healthy
         environment:
             REDIS_CONNECTION_STRING: redis://redis
             VAULT_CONNECTION_STRING: start123@http://vault:8090/v1/
@@ -162,6 +168,7 @@ services:
             PUBLIC_URL: ${CORE_PUBLIC_URL:-http://localhost:3000/core/}
             HARBOR_URL: ${HARBOR_URL:-}
             AUTHUP_URL: http://authup:3000/
+            LOKI_URL: http://loki:3100/
             DB_TYPE: 'mysql'
             DB_HOST: 'mysql'
             DB_USERNAME: 'root'
@@ -187,6 +194,7 @@ services:
             REDIS_CONNECTION_STRING: redis://redis
             VAULT_CONNECTION_STRING: start123@http://vault:8090/v1/
             AUTHUP_URL: http://authup:3000/
+            LOKI_URL: http://loki:3100/
         networks:
             hub:
     analysis-manager:
@@ -208,6 +216,7 @@ services:
             AUTHUP_URL: http://authup:3000/
             CORE_URL: http://core:3000/
             STORAGE_URL: http://storage:3000/
+            LOKI_URL: http://loki:3100/
         networks:
             hub:
     storage:
@@ -234,6 +243,7 @@ services:
             MINIO_CONNECTION_STRING: http://admin:start123@minio:9000
             VAULT_CONNECTION_STRING: start123@http://vault:8090/v1/
             AUTHUP_URL: http://authup:3000/
+            LOKI_URL: http://loki:3100/
         networks:
             hub:
     ui:

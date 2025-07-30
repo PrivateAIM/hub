@@ -270,6 +270,19 @@ export const LayoutSideAdminNavigation: NavigationItem<NavigationItemMeta>[] = [
         },
         children: [
             {
+                name: 'Events',
+                type: 'link',
+                url: '/admin/events',
+                icon: 'fa-solid fa-bullhorn',
+                meta: {
+                    [LayoutKey.REQUIRED_LOGGED_IN]: true,
+                    [LayoutKey.REQUIRED_PERMISSIONS]: [
+                        PermissionName.EVENT_DELETE,
+                        PermissionName.EVENT_READ,
+                    ],
+                },
+            },
+            {
                 name: 'Nodes',
                 type: 'link',
                 url: '/admin/nodes',
