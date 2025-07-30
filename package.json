@@ -48,5 +48,8 @@
     },
     "lint-staged": {
         "*.{vue,js,ts}": "npm run lint:fix"
+    },
+    "dependencies": {
+        "@trapi/swagger": "^1.3.0"
     }
 }

@@ -21,7 +21,7 @@ import type {
 @Index(['name', 'scope'])
 @Index(['ref_type', 'ref_id'])
 @Entity({ name: 'events' })
-export class EventEntity<T extends ObjectLiteral = ObjectLiteral> implements Event<T> {
+export class EventEntity<T extends ObjectLiteral = ObjectLiteral> implements Event {
     @PrimaryGeneratedColumn('uuid')
         id: string;
 

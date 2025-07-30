@@ -5,9 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ObjectLiteral } from '@privateaim/kit';
-
-export interface Event<T extends ObjectLiteral = ObjectLiteral> {
+export interface Event {
     id: string;
 
     /**
@@ -38,7 +36,7 @@ export interface Event<T extends ObjectLiteral = ObjectLiteral> {
      *
      * { description: { new_value: "xxx", prev_value: "yyy" }, name {}}
      */
-    data: T;
+    data: Record<string, any>;
 
     /**
      * default: false
