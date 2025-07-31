@@ -11,8 +11,6 @@ export interface Environment {
     env: `${EnvironmentName}`,
     port: number,
 
-    jwtMaxAge: number,
-
     redisConnectionString?: string | boolean,
     rabbitMqConnectionString?: string | boolean,
     vaultConnectionString: string | boolean,
@@ -23,7 +21,6 @@ export interface Environment {
 
     publicURL: string,
     authupURL?: string,
-    appURL: string,
 
     masterImagesRepository: string,
     masterImagesOwner: string,

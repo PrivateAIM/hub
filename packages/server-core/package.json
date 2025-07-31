@@ -68,7 +68,8 @@
         "better-sqlite3": "^12.2.0",
         "cross-env": "^7.0.3",
         "supertest": "^7.1.4",
-        "ts-node": "^10.9.2"
+        "ts-node": "^10.9.2",
+        "testcontainers": "^11.4.0"
     },
     "scripts": {
         "dev": "npm run cli -- start",

@@ -13,7 +13,7 @@ import {
     readInt,
 } from 'envix';
 import { config } from 'dotenv';
-import { ConfigDefaults, EnvironmentName } from './constants';
+import { ConfigDefaults, EnvironmentInputKey, EnvironmentName } from './constants';
 import type { Environment } from './type';
 
 config({
@@ -34,39 +34,36 @@ export function useEnv(key?: string) : any {
         return instance;
     }
 
-    const port = readInt('PORT', 3000);
+    const port = readInt(EnvironmentInputKey.PORT, 3000);
     instance = {
-        env: read('NODE_ENV', EnvironmentName.DEVELOPMENT) as `${EnvironmentName}`,
+        env: read(EnvironmentInputKey.ENV, EnvironmentName.DEVELOPMENT) as `${EnvironmentName}`,
         port,
 
-        jwtMaxAge: readInt('JWT_MAX_AGE', 3600),
-
         redisConnectionString: oneOf([
-            readBool('REDIS_CONNECTION_STRING'),
-            read('REDIS_CONNECTION_STRING'),
+            readBool(EnvironmentInputKey.REDIS_CONNECTION_STRING),
+            read(EnvironmentInputKey.REDIS_CONNECTION_STRING),
         ]),
         rabbitMqConnectionString: oneOf([
             readBool('RABBITMQ_CONNECTION_STRING'),
             read('RABBITMQ_CONNECTION_STRING')]),
         vaultConnectionString: oneOf([
-            readBool('VAULT_CONNECTION_STRING'),
-            read('VAULT_CONNECTION_STRING'),
+            readBool(EnvironmentInputKey.VAULT_CONNECTION_STRING),
+            read(EnvironmentInputKey.VAULT_CONNECTION_STRING),
         ]),
-        harborURL: read('HARBOR_URL'),
-        lokiURL: read('LOKI_URL'),
-        lokiCompactorURL: read('LOKI_COMPACTOR_URL'),
-        lokiQuerierURL: read('LOKI_QUERIER_URL'),
+        harborURL: read(EnvironmentInputKey.HARBOR_URL),
+        lokiURL: read(EnvironmentInputKey.LOKI_URL),
+        lokiCompactorURL: read(EnvironmentInputKey.LOKI_COMPACTOR_URL),
+        lokiQuerierURL: read(EnvironmentInputKey.LOKI_QUERIER_URL),
+        authupURL: read(EnvironmentInputKey.AUTHUP_URL),
 
-        publicURL: read('PUBLIC_URL', `http://127.0.0.1:${port}/`),
-        authupURL: read('AUTHUP_URL'),
-        appURL: read('APP_URL', 'http://127.0.0.1:3000/'),
+        publicURL: read(EnvironmentInputKey.PUBLIC_URL, `http://127.0.0.1:${port}/`),
 
-        masterImagesOwner: read('MASTER_IMAGES_OWNER', ConfigDefaults.MASTER_IMAGES_OWNER),
-        masterImagesRepository: read('MASTER_IMAGES_REPOSITORY', ConfigDefaults.MASTER_IMAGES_REPOSITORY),
-        masterImagesBranch: read('MASTER_IMAGES_BRANCH', ConfigDefaults.MASTER_IMAGES_BRANCH),
+        masterImagesOwner: read(EnvironmentInputKey.MASTER_IMAGES_OWNER, ConfigDefaults.MASTER_IMAGES_OWNER),
+        masterImagesRepository: read(EnvironmentInputKey.MASTER_IMAGES_REPOSITORY, ConfigDefaults.MASTER_IMAGES_REPOSITORY),
+        masterImagesBranch: read(EnvironmentInputKey.MASTER_IMAGES_BRANCH, ConfigDefaults.MASTER_IMAGES_BRANCH),
 
-        skipProjectApproval: readBool('SKIP_PROJECT_APPROVAL'),
-        skipAnalysisApproval: readBool('SKIP_ANALYSIS_APPROVAL'),
+        skipProjectApproval: readBool(EnvironmentInputKey.SKIP_PROJECT_APPROVAL),
+        skipAnalysisApproval: readBool(EnvironmentInputKey.SKIP_ANALYSIS_APPROVAL),
     };
 
     if (typeof key === 'string') {

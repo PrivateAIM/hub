@@ -7,6 +7,7 @@
 
 import type { Log } from '@privateaim/kit';
 import { LogLevel } from '@privateaim/kit';
+import { isClientError } from 'hapic';
 import type { LokiClient, LokiDistributorPushStream, LokiQuerierQueryRangeOptions } from '../../loki';
 import { nanoSeconds } from '../../loki';
 import type {
@@ -72,14 +73,24 @@ export class LokiLogStore extends BaseLogStore implements LogStore {
     }
 
     async delete(options: LogStoreDeleteOptions): Promise<void> {
-        await this.instance.compactor.createDeletionRequest({
-            start: options.start,
-            ...(options.end ? { end: options.end } : {}),
-            query: this.buildQuery({
-                ...this.labels,
-                ...(options.labels || {}),
-            }),
-        });
+        try {
+            await this.instance.compactor.createDeletionRequest({
+                start: options.start,
+                ...(options.end ? { end: options.end } : {}),
+                query: this.buildQuery({
+                    ...this.labels,
+                    ...(options.labels || {}),
+                }),
+            });
+        } catch (e) {
+            if (isClientError(e)) {
+                if (e.response && e.response.status === 404) {
+                    return;
+                }
+            }
+
+            throw e;
+        }
     }
 
     async query(input: LogStoreQueryOptions): Promise<[Log[], number]> {
@@ -107,7 +118,6 @@ export class LokiLogStore extends BaseLogStore implements LogStore {
         }
 
         const output : Log[] = [];
-
         const response = await this.instance.querier.queryRange(options);
         if (response.data.resultType === 'streams') {
             for (let i = 0; i < response.data.result.length; i++) {

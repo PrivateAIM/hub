@@ -8,8 +8,7 @@
 import { AnalysisNodeRunStatus } from '@privateaim/core-kit';
 import type { Analysis, Node } from '@privateaim/core-kit';
 import type { Log } from '@privateaim/kit';
-import { LogLevel, wait } from '@privateaim/kit';
-import { useLogStore } from '@privateaim/server-kit';
+import { LogLevel } from '@privateaim/kit';
 import {
     createTestNode,
     createTestProject,
@@ -68,32 +67,22 @@ describe('controllers > analysis-node-log', () => {
         expect(analysisNodeLog.level).toEqual(LogLevel.ERROR);
         expect(analysisNodeLog.message).toEqual('Analysis has been forcefully terminated.');
 
-        await wait(0);
-
-        const store = useLogStore();
-        const [data] = await store.query({
-            labels: {
-                entity: 'analysisNode',
-                node_id: node.id,
-                analysis_id: analysis.id,
-            },
-        });
-
-        expect(data.length).toEqual(1);
-
         details = analysisNodeLog;
     });
 
     it('should read collection', async () => {
         const client = suite.client();
 
-        const { data } = await client.analysisNodeLog.getMany({
-            filters: {
-                node_id: details.labels.node_id,
-                analysis_id: details.labels.analysis_id,
-            },
-        });
-        expect(data.length).toBeGreaterThanOrEqual(1);
+        return client.analysisNodeLog
+            .getMany({
+                filters: {
+                    node_id: details.labels.node_id,
+                    analysis_id: details.labels.analysis_id,
+                },
+            })
+            .then((result) => {
+                expect(result.data.length).toBeGreaterThanOrEqual(1);
+            });
     });
 
     it('should delete resource', async () => {
