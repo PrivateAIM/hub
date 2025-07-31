@@ -30,6 +30,16 @@ jobs:
                     DB_TYPE: "better-sqlite3"
                     DB_DATABASE: ":memory:"
                     NODE_ENV: "development"
+            loki:
+                image: grafana/loki
+                ports:
+                    - 3100:3100
+                options: >-
+                    --health-cmd "wget --quiet --tries=1 --output-document=- http://localhost:3100/ready | grep -q -w ready || exit 1"
+                    --health-interval 30s
+                    --health-timeout 10s
+                    --health-retries 5
+                    --health-start-period 30s
 
         runs-on: ubuntu-latest
 
@@ -50,6 +60,7 @@ jobs:
                     SKIP_PROPOSAL_APPROVAL_OPERATION: true
                     SKIP_TRAIN_APPROVAL_OPERATION: true
                     AUTHUP_URL: http://localhost:3000/
+                    LOKI_URL: http://localhost:3100/
                 run: |
                     npm run test
     lint:
