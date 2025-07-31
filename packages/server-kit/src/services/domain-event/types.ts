@@ -6,7 +6,6 @@
  */
 
 import type { ObjectLiteral } from '@privateaim/kit';
-import type { EventActor, EventDataRequest } from '@privateaim/core-kit';
 
 export type DomainEventChannelName = string | ((id?: string) => string);
 export type DomainEventNamespaceName<
@@ -27,8 +26,15 @@ T extends ObjectLiteral =ObjectLiteral,
 export type DomainEventMetadata = {
     domain: string,
     event: string,
-    request?: EventDataRequest,
-    actor?: EventActor
+
+    request_path?: string | null,
+    request_method?: string | null;
+    request_ip_address?: string | null;
+    request_user_agent?: string | null;
+
+    actor_type: string | null;
+    actor_id: string | null;
+    actor_name: string | null;
 };
 
 export type DomainEventPublishOptions<

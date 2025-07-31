@@ -8,9 +8,9 @@
 import type { Request } from 'routup';
 import { getRequestHeader, getRequestIP, useRequestPath } from 'routup';
 import type { Repository, SaveOptions } from 'typeorm';
-import type { EventActor, EventDataRequest } from '@privateaim/core-kit';
 import { useRequestIdentity } from '@privateaim/server-http-kit';
 import type { RemoveOptions } from 'typeorm/repository/RemoveOptions';
+import type { DomainEventMetadata } from '@privateaim/server-kit';
 
 type RepositoryEntity<T> = T extends Repository<infer U> ? U : never;
 
@@ -42,30 +42,25 @@ export class RequestRepositoryAdapter<T extends Repository<any>> {
     }
 
     private extendOptionsData<F extends { data?: any, [key: string]: any }>(options: F) : F {
-        const request : EventDataRequest = {
-            path: useRequestPath(this.request),
-            method: this.request.method || 'GET',
-            user_agent: this.flattenString(
+        const metadata : Partial<DomainEventMetadata> = {
+            request_path: useRequestPath(this.request),
+            request_method: this.request.method || 'GET',
+            request_user_agent: this.flattenString(
                 getRequestHeader(this.request, 'user-agent'),
             ),
-            ip_address: getRequestIP(this.request, { trustProxy: true }),
+            request_ip_address: getRequestIP(this.request, { trustProxy: true }),
         };
-
-        let actor : EventActor | undefined;
 
         const identity = useRequestIdentity(this.request);
         if (identity) {
-            actor = {
-                id: identity.id,
-                type: identity.type,
-                name: identity.attributes?.name,
-            };
+            metadata.actor_id = identity.id;
+            metadata.actor_type = identity.type;
+            metadata.actor_name = identity.attributes?.name;
         }
 
         options.data = {
             ...(options.data),
-            request,
-            actor,
+            ...metadata,
         };
 
         return options;
