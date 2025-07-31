@@ -32,9 +32,9 @@ export type DomainEventMetadata = {
     request_ip_address?: string | null;
     request_user_agent?: string | null;
 
-    actor_type: string | null;
-    actor_id: string | null;
-    actor_name: string | null;
+    actor_type?: string | null;
+    actor_id?: string | null;
+    actor_name?: string | null;
 };
 
 export type DomainEventPublishOptions<
