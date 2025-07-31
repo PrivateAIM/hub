@@ -15,6 +15,7 @@ import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { DatabaseConflictError } from '../../../../database';
 import { ProjectEntity } from '../../../../database/domains';
 import { ProjectValidator } from '../utils/validator';
+import { RequestRepositoryAdapter } from '../../../request';
 
 export async function updateProjectRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -51,7 +52,12 @@ export async function updateProjectRouteHandler(req: Request, res: Response) : P
         throw new DatabaseConflictError();
     }
 
-    await repository.save(entity);
+    const requestRepository = new RequestRepositoryAdapter(
+        req,
+        repository,
+    );
+
+    await requestRepository.save(entity);
 
     return sendAccepted(res, entity);
 }

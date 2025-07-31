@@ -10,8 +10,15 @@ import type { ObjectDiff } from '@privateaim/kit';
 export type EventDataRequest = {
     path: string,
     method: string,
-    trace: string,
-    user_agent: string,
+    trace?: string,
+    user_agent?: string,
+    ip_address?: string
+};
+
+export type EventActor = {
+    id: string,
+    type: string,
+    name?: string
 };
 
 export type EventData = {

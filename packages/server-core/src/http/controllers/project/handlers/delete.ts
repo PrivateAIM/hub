@@ -11,7 +11,8 @@ import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
-import { ProjectEntity } from '../../../../database/domains';
+import { ProjectEntity } from '../../../../database';
+import { RequestRepositoryAdapter } from '../../../request';
 
 export async function deleteProjectRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -37,7 +38,11 @@ export async function deleteProjectRouteHandler(req: Request, res: Response) : P
 
     const { id: entityId } = entity;
 
-    await repository.remove(entity);
+    const requestRepository = new RequestRepositoryAdapter(
+        req,
+        repository,
+    );
+    await requestRepository.remove(entity);
 
     entity.id = entityId;
 

@@ -34,25 +34,25 @@ export class DomainEventDatabasePublisher implements IDomainEventPublisher {
             ).toISOString(),
         });
 
-        if (ctx.metadata.identity) {
-            if (ctx.metadata.identity.type) {
-                entity.actor_type = ctx.metadata.identity.type;
+        const data : EventData = {};
+
+        if (ctx.metadata.actor) {
+            if (ctx.metadata.actor.type) {
+                entity.actor_type = ctx.metadata.actor.type;
             }
 
-            if (ctx.metadata.identity.id) {
-                entity.actor_id = ctx.metadata.identity.id;
+            if (ctx.metadata.actor.id) {
+                entity.actor_id = ctx.metadata.actor.id;
             }
 
-            if (ctx.metadata.identity.name) {
-                entity.actor_name = ctx.metadata.identity.name;
-            }
-
-            if (ctx.metadata.identity.ipAddress) {
-                entity.actor_ip_address = ctx.metadata.identity.ipAddress;
+            if (ctx.metadata.actor.name) {
+                entity.actor_name = ctx.metadata.actor.name;
             }
         }
 
-        const data : EventData = {};
+        if (ctx.metadata.request) {
+            data.request = ctx.metadata.request;
+        }
 
         if (
             ctx.metadata.event === DomainEventName.UPDATED &&

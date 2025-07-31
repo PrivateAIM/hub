@@ -8,7 +8,7 @@
 import type { DomainType } from '@privateaim/core-kit';
 import { DomainEventName } from '@privateaim/core-kit';
 import type { ObjectLiteral } from '@privateaim/kit';
-import type { DomainEventDestinations, DomainEventPublisher } from '@privateaim/server-kit';
+import type { DomainEventDestinations, DomainEventMetadata, DomainEventPublisher } from '@privateaim/server-kit';
 import { useDomainEventPublisher } from '@privateaim/server-kit';
 import type {
     EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,
@@ -17,7 +17,8 @@ import type {
 export type SubscriberPublishPayload<T> = {
     type: `${DomainEventName}`,
     data: T,
-    dataPrevious?: T
+    dataPrevious?: T,
+    metadata?: Partial<DomainEventMetadata>,
 };
 
 export class BaseSubscriber<T extends ObjectLiteral> implements EntitySubscriberInterface<T> {
@@ -40,17 +41,16 @@ export class BaseSubscriber<T extends ObjectLiteral> implements EntitySubscriber
         await this.publish({
             data: event.entity,
             type: DomainEventName.CREATED,
+            metadata: event.queryRunner.data,
         });
     }
 
     async afterUpdate(event: UpdateEvent<T>): Promise<any> {
-        // console.log(event.entity, event.databaseEntity);
-        // todo: data contains ip_address etc. repository.save(..., { ip_address: xxx });
-        // console.log(event.queryRunner.data);
         await this.publish({
             type: DomainEventName.UPDATED,
             data: event.entity as T,
             dataPrevious: event.databaseEntity,
+            metadata: event.queryRunner.data,
         });
     }
 
@@ -59,6 +59,7 @@ export class BaseSubscriber<T extends ObjectLiteral> implements EntitySubscriber
             await this.publish({
                 type: DomainEventName.DELETED,
                 data: event.entity as T,
+                metadata: event.queryRunner.data,
             });
         }
     }
@@ -70,6 +71,7 @@ export class BaseSubscriber<T extends ObjectLiteral> implements EntitySubscriber
             metadata: {
                 domain: this.type,
                 event: payload.type,
+                ...(payload.metadata ? payload.metadata : {}),
             },
             destinations: this.destinations,
         });
