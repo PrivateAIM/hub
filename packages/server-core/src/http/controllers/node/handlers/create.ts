@@ -20,6 +20,7 @@ import { ForbiddenError } from '@ebec/http';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../../../components';
 import { isNodeRobotServiceUsable, useNodeRobotService } from '../../../../services';
+import { RequestRepositoryAdapter } from '../../../request';
 import { NodeValidator } from '../utils';
 import {
     NodeEntity, RegistryEntity, RegistryProjectEntity,
@@ -120,7 +121,12 @@ export async function createNodeRouteHandler(req: Request, res: Response) : Prom
 
     // -----------------------------------------------------
 
-    await repository.save(entity);
+    const requestRepository = new RequestRepositoryAdapter(
+        req,
+        repository,
+    );
+
+    await requestRepository.save(entity);
 
     return sendCreated(res, entity);
 }

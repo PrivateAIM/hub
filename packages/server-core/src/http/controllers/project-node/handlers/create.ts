@@ -14,6 +14,7 @@ import { HTTPHandlerOperation, useRequestIdentityRealm, useRequestPermissionChec
 import { NotFoundError } from '@ebec/http';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { ProjectEntity, ProjectNodeEntity } from '../../../../database/domains';
+import { RequestRepositoryAdapter } from '../../../request';
 import { ProjectNodeValidator } from '../utils';
 import { useEnv } from '../../../../config';
 
@@ -55,7 +56,12 @@ export async function createProjectNodeRouteHandler(req: Request, res: Response)
         entity.approval_status = ProjectNodeApprovalStatus.APPROVED;
     }
 
-    entity = await repository.save(entity);
+    const requestRepository = new RequestRepositoryAdapter(
+        req,
+        repository,
+    );
+
+    entity = await requestRepository.save(entity);
 
     data.project.nodes += 1;
     const projectRepository = dataSource.getRepository(ProjectEntity);

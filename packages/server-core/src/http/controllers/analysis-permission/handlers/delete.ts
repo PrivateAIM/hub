@@ -12,6 +12,7 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { AnalysisPermissionEntity } from '../../../../database/domains';
+import { RequestRepositoryAdapter } from '../../../request';
 
 export async function deleteAnalysisPermissionRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -34,7 +35,12 @@ export async function deleteAnalysisPermissionRouteHandler(req: Request, res: Re
 
     const { id: entityId } = entity;
 
-    await repository.remove(entity);
+    const requestRepository = new RequestRepositoryAdapter(
+        req,
+        repository,
+    );
+
+    await requestRepository.remove(entity);
 
     entity.id = entityId;
 

@@ -20,6 +20,7 @@ import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { isClientErrorWithStatusCode } from '@hapic/harbor';
 import { buildErrorMessageForAttributes } from 'validup';
 import { AnalysisPermissionEntity } from '../../../../database/domains';
+import { RequestRepositoryAdapter } from '../../../request';
 import { AnalysisPermissionValidator } from '../utils';
 
 export async function updateAnalysisPermissionRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -66,7 +67,12 @@ export async function updateAnalysisPermissionRouteHandler(req: Request, res: Re
 
     entity = repository.merge(entity, data);
 
-    entity = await repository.save(entity);
+    const requestRepository = new RequestRepositoryAdapter(
+        req,
+        repository,
+    );
+
+    entity = await requestRepository.save(entity);
 
     return sendAccepted(res, entity);
 }

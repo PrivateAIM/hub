@@ -20,6 +20,7 @@ import { isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../../../components';
 import { isNodeRobotServiceUsable, useNodeRobotService } from '../../../../services';
+import { RequestRepositoryAdapter } from '../../../request';
 import { NodeValidator } from '../utils';
 import { NodeEntity, RegistryProjectEntity } from '../../../../database/domains';
 
@@ -136,7 +137,12 @@ export async function updateNodeRouteHandler(req: Request, res: Response) : Prom
 
     // -----------------------------------------------------
 
-    await repository.save(entity);
+    const requestRepository = new RequestRepositoryAdapter(
+        req,
+        repository,
+    );
+
+    await requestRepository.save(entity);
 
     return sendAccepted(res, entity);
 }

@@ -12,6 +12,7 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { AnalysisEntity, AnalysisNodeEntity } from '../../../../database';
+import { RequestRepositoryAdapter } from '../../../request';
 
 export async function deleteAnalysisNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -55,7 +56,12 @@ export async function deleteAnalysisNodeRouteHandler(req: Request, res: Response
             .execute();
 
         const repository = entityManager.getRepository(AnalysisNodeEntity);
-        await repository.remove(entity);
+
+        const requestRepository = new RequestRepositoryAdapter(
+            req,
+            repository,
+        );
+        await requestRepository.remove(entity);
 
         entity.id = entityId;
     });

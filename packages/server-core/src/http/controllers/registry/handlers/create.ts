@@ -11,6 +11,7 @@ import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { HTTPHandlerOperation, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
+import { RequestRepositoryAdapter } from '../../../request';
 import { RegistryValidator } from '../utils';
 import { RegistryEntity } from '../../../../database/domains';
 
@@ -30,7 +31,12 @@ export async function createRegistryRouteHandler(req: Request, res: Response) : 
     const repository = dataSource.getRepository(RegistryEntity);
     const entity = repository.create(data);
 
-    await repository.save(entity);
+    const requestRepository = new RequestRepositoryAdapter(
+        req,
+        repository,
+    );
+
+    await requestRepository.save(entity);
 
     return sendCreated(res, entity);
 }

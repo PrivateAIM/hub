@@ -12,6 +12,7 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { EventEntity } from '../../../../database';
+import { RequestRepositoryAdapter } from '../../../request';
 
 export async function deleteEventRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -32,7 +33,12 @@ export async function deleteEventRouteHandler(req: Request, res: Response) : Pro
 
     const { id: entityId } = entity;
 
-    await repository.remove(entity);
+    const requestRepository = new RequestRepositoryAdapter(
+        req,
+        repository,
+    );
+
+    await requestRepository.remove(entity);
 
     entity.id = entityId;
 

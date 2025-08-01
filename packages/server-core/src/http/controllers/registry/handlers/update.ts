@@ -12,6 +12,7 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { HTTPHandlerOperation, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
+import { RequestRepositoryAdapter } from '../../../request';
 import { RegistryValidator } from '../utils';
 import { RegistryEntity } from '../../../../database/domains';
 
@@ -41,7 +42,12 @@ export async function updateRegistryRouteHandler(req: Request, res: Response) : 
 
     entity = repository.merge(entity, data);
 
-    await repository.save(entity);
+    const requestRepository = new RequestRepositoryAdapter(
+        req,
+        repository,
+    );
+
+    await requestRepository.save(entity);
 
     return sendAccepted(res, entity);
 }

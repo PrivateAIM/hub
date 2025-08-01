@@ -17,6 +17,7 @@ import { isClientErrorWithStatusCode } from '@hapic/harbor';
 import { BadRequestError, ForbiddenError } from '@ebec/http';
 import { buildErrorMessageForAttributes } from 'validup';
 import { AnalysisPermissionEntity } from '../../../../database/domains';
+import { RequestRepositoryAdapter } from '../../../request';
 import { AnalysisPermissionValidator } from '../utils';
 
 export async function createAnalysisPermissionRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -82,6 +83,11 @@ export async function createAnalysisPermissionRouteHandler(req: Request, res: Re
 
     let entity = repository.create(data);
 
-    entity = await repository.save(entity);
+    const requestRepository = new RequestRepositoryAdapter(
+        req,
+        repository,
+    );
+
+    entity = await requestRepository.save(entity);
     return sendCreated(res, entity);
 }

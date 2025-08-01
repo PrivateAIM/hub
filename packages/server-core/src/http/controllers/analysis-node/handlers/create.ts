@@ -18,6 +18,7 @@ import {
     AnalysisEntity, AnalysisNodeEntity, ProjectNodeEntity,
 } from '../../../../database';
 import { useEventService } from '../../../../services/event/singleton';
+import { RequestRepositoryAdapter } from '../../../request';
 import { AnalysisNodeValidator } from '../utils';
 
 export async function createAnalysisNodeRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -77,7 +78,12 @@ export async function createAnalysisNodeRouteHandler(req: Request, res: Response
             .execute();
 
         const repository = entityManager.getRepository(AnalysisNodeEntity);
-        entity = await repository.save(entity);
+        const requestRepository = new RequestRepositoryAdapter(
+            req,
+            repository,
+        );
+
+        entity = await requestRepository.save(entity);
 
         if (entity.run_status) {
             const eventService = useEventService();

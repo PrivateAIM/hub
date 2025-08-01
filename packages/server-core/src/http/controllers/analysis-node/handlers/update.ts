@@ -16,6 +16,7 @@ import { HTTPHandlerOperation, useRequestIdentityRealm, useRequestPermissionChec
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { AnalysisNodeEntity } from '../../../../database';
 import { useEventService } from '../../../../services/event/singleton';
+import { RequestRepositoryAdapter } from '../../../request';
 import { AnalysisNodeValidator } from '../utils';
 
 export async function updateAnalysisNodeRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -117,11 +118,13 @@ export async function updateAnalysisNodeRouteHandler(req: Request, res: Response
 
         const repository = entityManager.getRepository(AnalysisNodeEntity);
         entity = repository.merge(entity, data);
-        return repository.save(entity, {
-            data: {
-                ip_address: '127.0.0.1',
-            },
-        });
+
+        const requestRepository = new RequestRepositoryAdapter(
+            req,
+            repository,
+        );
+
+        return requestRepository.save(entity);
     });
 
     return sendAccepted(res, entity);

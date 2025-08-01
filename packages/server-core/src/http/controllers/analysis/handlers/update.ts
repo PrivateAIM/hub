@@ -14,6 +14,7 @@ import { HTTPHandlerOperation, useRequestIdentityRealm, useRequestPermissionChec
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { isPropertySet } from '@authup/kit';
 import { AnalysisEntity } from '../../../../database/domains';
+import { RequestRepositoryAdapter } from '../../../request';
 import { AnalysisValidator } from '../utils';
 
 export async function updateAnalysisRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -69,7 +70,12 @@ export async function updateAnalysisRouteHandler(req: Request, res: Response) : 
 
     entity = repository.merge(entity, data);
 
-    await repository.save(entity);
+    const requestRepository = new RequestRepositoryAdapter(
+        req,
+        repository,
+    );
+
+    await requestRepository.save(entity);
 
     return sendAccepted(res, entity);
 }

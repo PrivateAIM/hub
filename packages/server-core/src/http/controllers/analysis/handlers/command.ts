@@ -70,21 +70,23 @@ export async function handleAnalysisCommandRouteHandler(req: Request, res: Respo
             entity = await manager.checkDistribution(entity);
             break;
         case AnalysisAPICommand.BUILD_START:
-            entity = await manager.startDistribution(entity);
+            entity = await manager.startDistribution(entity, req);
             break;
         case AnalysisAPICommand.BUILD_STOP:
-            entity = await manager.stopDistribution(entity);
+            entity = await manager.stopDistribution(entity, req);
             break;
 
         // Configuration
         case AnalysisAPICommand.CONFIGURATION_LOCK:
             entity = await manager.lock(entity, {
                 ignoreApproval,
+                request: req,
             });
             break;
         case AnalysisAPICommand.CONFIGURATION_UNLOCK:
             entity = await manager.unlock(entity, {
                 ignoreApproval,
+                request: req,
             });
             break;
     }

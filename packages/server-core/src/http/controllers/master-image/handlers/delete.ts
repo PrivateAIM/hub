@@ -11,7 +11,8 @@ import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestPermissionChecker } from '@privateaim/server-http-kit';
-import { MasterImageEntity } from '../../../../database/domains';
+import { MasterImageEntity } from '../../../../database';
+import { RequestRepositoryAdapter } from '../../../request';
 
 export async function deleteMasterImageRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -30,7 +31,12 @@ export async function deleteMasterImageRouteHandler(req: Request, res: Response)
 
     const { id: entityId } = entity;
 
-    await repository.delete(entity.id);
+    const requestRepository = new RequestRepositoryAdapter(
+        req,
+        repository,
+    );
+
+    await requestRepository.remove(entity);
 
     entity.id = entityId;
 

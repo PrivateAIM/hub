@@ -13,6 +13,7 @@ import { useDataSource } from 'typeorm-extension';
 import { HTTPHandlerOperation, useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { ProjectNodeEntity } from '../../../../database/domains';
+import { RequestRepositoryAdapter } from '../../../request';
 import { ProjectNodeValidator } from '../utils';
 
 export async function updateProjectNodeRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -43,7 +44,12 @@ export async function updateProjectNodeRouteHandler(req: Request, res: Response)
 
     entity = repository.merge(entity, data);
 
-    entity = await repository.save(entity);
+    const requestRepository = new RequestRepositoryAdapter(
+        req,
+        repository,
+    );
+
+    entity = await requestRepository.save(entity);
 
     return sendAccepted(res, entity);
 }
