@@ -5,13 +5,13 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { FEventActor, FEventExpiring } from '@privateaim/client-vue';
+import { FEventExpiring } from '@privateaim/client-vue';
 import type { Event } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
 import { defineNuxtComponent } from '#app';
 
 export default defineNuxtComponent({
-    components: { FEventExpiring, FEventActor },
+    components: { FEventExpiring },
     props: {
         entity: {
             type: Object as PropType<Event>,
@@ -30,89 +30,163 @@ export default defineNuxtComponent({
 });
 </script>
 <template>
-    <div class="row">
-        <div class="col-4">
-            <div class="card-grey card">
-                <div class="card-header">
-                    <span class="title">
-                        Info
-                    </span>
+    <div class="d-flex flex-column gap-3">
+        <div class="row">
+            <div class="col-4">
+                <div class="card-grey card">
+                    <div class="card-header">
+                        <span class="title">
+                            General
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex flex-column gap-3">
+                            <div class="d-flex flex-row gap-3">
+                                <div class="flex-grow-1">
+                                    <strong>Name</strong>
+                                </div>
+                                <div class="">
+                                    {{ entity.name }}
+                                </div>
+                            </div>
+                            <div class="d-flex flex-row gap-3">
+                                <div class="flex-grow-1">
+                                    <strong>Scope</strong>
+                                </div>
+                                <div class="">
+                                    {{ entity.scope }}
+                                </div>
+                            </div>
+                            <div class="d-flex flex-row gap-3">
+                                <div class="flex-grow-1">
+                                    <strong>Ref Type</strong>
+                                </div>
+                                <div class="">
+                                    {{ entity.ref_type }}
+                                </div>
+                            </div>
+                            <div class="d-flex flex-row gap-3">
+                                <div class="flex-grow-1">
+                                    <strong>Ref ID</strong>
+                                </div>
+                                <div class="">
+                                    {{ entity.ref_id }}
+                                </div>
+                            </div>
+                            <div class="d-flex flex-row gap-3">
+                                <div class="flex-grow-1">
+                                    <strong>Created</strong>
+                                </div>
+                                <div class="">
+                                    <VCTimeago :datetime="entity.created_at" />
+                                </div>
+                            </div>
+                            <div class="d-flex flex-row gap-3">
+                                <div class="flex-grow-1">
+                                    <strong>Expiring?</strong>
+                                </div>
+                                <div class="">
+                                    <FEventExpiring
+                                        :entity="entity"
+                                        :direction="'row'"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="d-flex flex-column gap-3">
-                        <div class="d-flex flex-row gap-3">
-                            <div class="flex-grow-1">
-                                <strong>Name</strong>
+            </div>
+            <div class="col-4">
+                <div class="card-grey card">
+                    <div class="card-header">
+                        <span class="title">
+                            Actor
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex flex-column gap-3">
+                            <div class="d-flex flex-row gap-3">
+                                <div class="flex-grow-1">
+                                    <strong>Type</strong>
+                                </div>
+                                <div class="">
+                                    {{ entity.actor_type }}
+                                </div>
                             </div>
-                            <div class="">
-                                {{ entity.name }}
+                            <div class="d-flex flex-row gap-3">
+                                <div class="flex-grow-1">
+                                    <strong>ID</strong>
+                                </div>
+                                <div class="">
+                                    {{ entity.actor_id }}
+                                </div>
                             </div>
-                        </div>
-                        <div class="d-flex flex-row gap-3">
-                            <div class="flex-grow-1">
-                                <strong>Scope</strong>
-                            </div>
-                            <div class="">
-                                {{ entity.scope }}
-                            </div>
-                        </div>
-                        <div class="d-flex flex-row gap-3">
-                            <div class="flex-grow-1">
-                                <strong>Ref Type</strong>
-                            </div>
-                            <div class="">
-                                {{ entity.ref_type }}
-                            </div>
-                        </div>
-                        <div class="d-flex flex-row gap-3">
-                            <div class="flex-grow-1">
-                                <strong>Ref ID</strong>
-                            </div>
-                            <div class="">
-                                {{ entity.ref_id }}
-                            </div>
-                        </div>
-                        <div class="d-flex flex-row gap-3">
-                            <div class="flex-grow-1">
-                                <strong>Actor</strong>
-                            </div>
-                            <div class="">
-                                <FEventActor :entity="entity" />
+                            <div class="d-flex flex-row gap-3">
+                                <div class="flex-grow-1">
+                                    <strong>Name</strong>
+                                </div>
+                                <div class="">
+                                    {{ entity.actor_name }}
+                                </div>
                             </div>
                         </div>
-                        <div class="d-flex flex-row gap-3">
-                            <div class="flex-grow-1">
-                                <strong>Created</strong>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="card-grey card">
+                    <div class="card-header">
+                        <span class="title">
+                            Request
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex flex-column gap-3">
+                            <div class="d-flex flex-row gap-3">
+                                <div class="flex-grow-1">
+                                    <strong>Path</strong>
+                                </div>
+                                <div class="">
+                                    {{ entity.request_path }}
+                                </div>
                             </div>
-                            <div class="">
-                                <VCTimeago :datetime="entity.created_at" />
+                            <div class="d-flex flex-row gap-3">
+                                <div class="flex-grow-1">
+                                    <strong>Method</strong>
+                                </div>
+                                <div class="">
+                                    {{ entity.request_method }}
+                                </div>
                             </div>
-                        </div>
-                        <div class="d-flex flex-row gap-3">
-                            <div class="flex-grow-1">
-                                <strong>Expiring?</strong>
+                            <div class="d-flex flex-row gap-3">
+                                <div class="flex-grow-1">
+                                    <strong>IP Address</strong>
+                                </div>
+                                <div class="">
+                                    {{ entity.request_ip_address }}
+                                </div>
                             </div>
-                            <div class="">
-                                <FEventExpiring
-                                    :entity="entity"
-                                    :direction="'row'"
-                                />
+                            <div class="d-flex flex-row gap-3">
+                                <div class="flex-grow-1">
+                                    <strong>User Agent</strong>
+                                </div>
+                                <div class="">
+                                    {{ entity.request_user_agent }}
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-8">
-            <div class="card-grey card">
-                <div class="card-header">
-                    <span class="title">
-                        Data
-                    </span>
-                </div>
-                <div class="card-body">
-                    <pre>{{ entity.data }}</pre>
-                </div>
+        <div class="card-grey card">
+            <div class="card-header">
+                <span class="title">
+                    Data
+                </span>
+            </div>
+            <div class="card-body">
+                <pre>{{ entity.data }}</pre>
             </div>
         </div>
     </div>

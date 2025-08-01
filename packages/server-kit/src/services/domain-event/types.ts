@@ -23,17 +23,18 @@ export type DomainEventDestinations<
 T extends ObjectLiteral =ObjectLiteral,
 > = DomainEventDestination<T>[];
 
-export type DomainEventIdentity = {
-    id?: string,
-    name?: string,
-    type?: string,
-    ipAddress?: string,
-};
-
 export type DomainEventMetadata = {
     domain: string,
     event: string,
-    identity?: DomainEventIdentity,
+
+    request_path?: string | null,
+    request_method?: string | null;
+    request_ip_address?: string | null;
+    request_user_agent?: string | null;
+
+    actor_type?: string | null;
+    actor_id?: string | null;
+    actor_name?: string | null;
 };
 
 export type DomainEventPublishOptions<

@@ -14,6 +14,7 @@ import { sendCreated } from 'routup';
 import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { AnalysisBucketFileEntity, AnalysisEntity } from '../../../../database/domains';
+import { RequestRepositoryAdapter } from '../../../request';
 import { AnalysisBucketFileValidator } from '../utils';
 
 export async function createAnalysisBucketFileRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -74,7 +75,12 @@ export async function createAnalysisBucketFileRouteHandler(req: Request, res: Re
         });
     }
 
-    entity = await repository.save(entity);
+    const requestRepository = new RequestRepositoryAdapter(
+        req,
+        repository,
+    );
+
+    entity = await requestRepository.save(entity);
 
     return sendCreated(res, entity);
 }

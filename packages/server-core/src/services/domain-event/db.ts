@@ -8,9 +8,9 @@
 import { isEqual } from 'smob';
 import type { DomainEventPublishOptions, IDomainEventPublisher } from '@privateaim/server-kit';
 import { useDataSource } from 'typeorm-extension';
-import type { EventData } from '@privateaim/core-kit';
+import type { Event, EventData } from '@privateaim/core-kit';
 import { DomainEventName, DomainType } from '@privateaim/core-kit';
-import type { ObjectDiff } from '@privateaim/kit';
+import type { ObjectDiff, ObjectLiteral } from '@privateaim/kit';
 import { isObject } from '@privateaim/kit';
 import { EventEntity } from '../../database';
 
@@ -34,21 +34,19 @@ export class DomainEventDatabasePublisher implements IDomainEventPublisher {
             ).toISOString(),
         });
 
-        if (ctx.metadata.identity) {
-            if (ctx.metadata.identity.type) {
-                entity.actor_type = ctx.metadata.identity.type;
-            }
+        const keys : (keyof Event)[] = [
+            'actor_id',
+            'actor_type',
+            'actor_name',
+            'request_path',
+            'request_method',
+            'request_ip_address',
+            'request_user_agent',
+        ];
 
-            if (ctx.metadata.identity.id) {
-                entity.actor_id = ctx.metadata.identity.id;
-            }
-
-            if (ctx.metadata.identity.name) {
-                entity.actor_name = ctx.metadata.identity.name;
-            }
-
-            if (ctx.metadata.identity.ipAddress) {
-                entity.actor_ip_address = ctx.metadata.identity.ipAddress;
+        for (let i = 0; i < keys.length; i++) {
+            if (ctx.metadata[keys[i]]) {
+                (entity as ObjectLiteral)[keys[i]] = ctx.metadata[keys[i]];
             }
         }
 

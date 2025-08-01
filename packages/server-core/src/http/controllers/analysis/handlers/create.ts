@@ -17,6 +17,7 @@ import {
     useRequestPermissionChecker,
 } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
+import { RequestRepositoryAdapter } from '../../../request';
 import { AnalysisValidator } from '../utils';
 import { AnalysisEntity, ProjectEntity } from '../../../../database';
 import { isAnalysisManagerUsable, useAnalysisManager } from '../../../../services';
@@ -68,7 +69,11 @@ export async function createAnalysisRouteHandler(req: Request, res: Response) : 
         },
     });
 
-    await repository.save(entity);
+    const requestRepository = new RequestRepositoryAdapter(
+        req,
+        repository,
+    );
+    await requestRepository.save(entity);
 
     entity.project.analyses++;
     const proposalRepository = dataSource.getRepository(ProjectEntity);

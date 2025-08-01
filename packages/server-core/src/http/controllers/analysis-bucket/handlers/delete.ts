@@ -10,6 +10,7 @@ import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { AnalysisBucketEntity } from '../../../../database/domains';
+import { RequestRepositoryAdapter } from '../../../request';
 
 export async function deleteAnalysisBucketRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -25,7 +26,12 @@ export async function deleteAnalysisBucketRouteHandler(req: Request, res: Respon
 
     const { id: entityId } = entity;
 
-    await repository.remove(entity);
+    const requestRepository = new RequestRepositoryAdapter(
+        req,
+        repository,
+    );
+
+    await requestRepository.remove(entity);
 
     entity.id = entityId;
 

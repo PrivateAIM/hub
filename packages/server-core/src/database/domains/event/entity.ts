@@ -62,6 +62,24 @@ export class EventEntity<T extends ObjectLiteral = ObjectLiteral> implements Eve
     // ------------------------------------------------------------------
 
     @Index()
+    @Column({ type: 'varchar', length: 256, nullable: true })
+        request_path: string | null;
+
+    @Index()
+    @Column({ type: 'varchar', length: 10, nullable: true })
+        request_method: string | null;
+
+    @Index()
+    @Column({ type: 'varchar', length: 15, nullable: true })
+        request_ip_address: string | null;
+
+    @Index()
+    @Column({ type: 'varchar', length: 512, nullable: true })
+        request_user_agent: string | null;
+
+    // ------------------------------------------------------------------
+
+    @Index()
     @Column({ type: 'varchar', length: 64, nullable: true })
         actor_type: string | null;
 
@@ -72,10 +90,6 @@ export class EventEntity<T extends ObjectLiteral = ObjectLiteral> implements Eve
     @Index()
     @Column({ type: 'varchar', length: 64, nullable: true })
         actor_name: string | null;
-
-    @Index()
-    @Column({ type: 'varchar', length: 15, nullable: true })
-        actor_ip_address: string | null;
 
     // ------------------------------------------------------------------
 

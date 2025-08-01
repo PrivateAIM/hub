@@ -7,17 +7,12 @@
 
 import type { ObjectDiff } from '@privateaim/kit';
 
-export type EventDataRequest = {
-    path: string,
-    method: string,
-    trace: string,
-    user_agent: string,
-};
-
 export type EventData = {
     diff?: ObjectDiff,
-    request?: EventDataRequest
+    [key: string]: any
 };
+
+// todo: add service, trace ?
 
 export interface Event {
     id: string;
@@ -48,7 +43,7 @@ export interface Event {
 
     /**
      *
-     * { description: { new_value: "xxx", prev_value: "yyy" }, name {}}
+     * { diff: { description: { next: "xxx", previous: "yyy" }, name {}}}
      */
     data: Record<string, any>;
 
@@ -59,13 +54,21 @@ export interface Event {
 
     // ------------------------------------------------------------------
 
+    request_path?: string | null;
+
+    request_method?: string | null;
+
+    request_ip_address?: string | null;
+
+    request_user_agent?: string | null;
+
+    // ------------------------------------------------------------------
+
     actor_type: string | null;
 
     actor_id: string | null;
 
     actor_name: string | null;
-
-    actor_ip_address: string | null;
 
     // ------------------------------------------------------------------
 

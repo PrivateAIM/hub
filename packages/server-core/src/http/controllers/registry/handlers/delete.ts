@@ -11,7 +11,8 @@ import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestPermissionChecker } from '@privateaim/server-http-kit';
-import { RegistryEntity } from '../../../../database/domains';
+import { RegistryEntity } from '../../../../database';
+import { RequestRepositoryAdapter } from '../../../request';
 
 export async function deleteRegistryRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -29,7 +30,12 @@ export async function deleteRegistryRouteHandler(req: Request, res: Response) : 
 
     const { id: entityId } = entity;
 
-    await repository.remove(entity);
+    const requestRepository = new RequestRepositoryAdapter(
+        req,
+        repository,
+    );
+
+    await requestRepository.remove(entity);
 
     entity.id = entityId;
 

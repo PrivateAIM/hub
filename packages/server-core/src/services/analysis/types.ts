@@ -5,10 +5,14 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
+import type { Request } from 'routup';
+
 export type AnalysisManagerUnlockOptions = {
-    ignoreApproval?: boolean;
+    ignoreApproval?: boolean,
+    request?: Request
 };
 
 export type AnalysisManagerLockOptions = {
-    ignoreApproval?: boolean;
+    ignoreApproval?: boolean,
+    request?: Request
 };

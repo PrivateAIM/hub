@@ -19,6 +19,7 @@ import {
     ProjectEntity,
     ProjectNodeEntity,
 } from '../../../../database/domains';
+import { RequestRepositoryAdapter } from '../../../request';
 
 export async function deleteProjectNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -99,7 +100,12 @@ export async function deleteProjectNodeRouteHandler(req: Request, res: Response)
 
     const { id: entityId } = entity;
 
-    await repository.remove(entity);
+    const requestRepository = new RequestRepositoryAdapter(
+        req,
+        repository,
+    );
+
+    await requestRepository.remove(entity);
 
     entity.id = entityId;
 

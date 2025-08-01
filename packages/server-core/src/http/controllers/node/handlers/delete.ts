@@ -15,6 +15,7 @@ import { isAmqpClientUsable, useQueueRouter } from '@privateaim/server-kit';
 import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../../../components';
 import { NodeEntity, RegistryProjectEntity } from '../../../../database/domains';
 import { isNodeRobotServiceUsable, useNodeRobotService } from '../../../../services';
+import { RequestRepositoryAdapter } from '../../../request';
 
 export async function deleteNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -65,7 +66,12 @@ export async function deleteNodeRouteHandler(req: Request, res: Response) : Prom
         await nodeRobotservice.delete(entity);
     }
 
-    await repository.remove(entity);
+    const requestRepository = new RequestRepositoryAdapter(
+        req,
+        repository,
+    );
+
+    await requestRepository.remove(entity);
 
     entity.id = entityId;
 

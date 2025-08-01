@@ -10,6 +10,7 @@ import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
 import { AnalysisBucketEntity } from '../../../../database/domains';
+import { RequestRepositoryAdapter } from '../../../request';
 import { AnalysisBucketValidator } from '../utils';
 
 export async function createAnalysisBucketRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -31,7 +32,12 @@ export async function createAnalysisBucketRouteHandler(req: Request, res: Respon
 
     let entity = repository.create(data);
 
-    entity = await repository.save(entity);
+    const requestRepository = new RequestRepositoryAdapter(
+        req,
+        repository,
+    );
+
+    entity = await requestRepository.save(entity);
 
     return sendCreated(res, entity);
 }

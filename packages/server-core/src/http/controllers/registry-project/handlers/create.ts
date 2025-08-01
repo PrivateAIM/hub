@@ -13,6 +13,7 @@ import { HTTPHandlerOperation, useRequestPermissionChecker } from '@privateaim/s
 import { isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../../../components';
+import { RequestRepositoryAdapter } from '../../../request';
 import { RegistryProjectValidator } from '../utils';
 import { RegistryProjectEntity } from '../../../../database/domains';
 
@@ -35,7 +36,12 @@ export async function createRegistryProjectRouteHandler(req: Request, res: Respo
     const repository = dataSource.getRepository(RegistryProjectEntity);
     const entity = repository.create(data);
 
-    await repository.save(entity);
+    const requestRepository = new RequestRepositoryAdapter(
+        req,
+        repository,
+    );
+
+    await requestRepository.save(entity);
 
     if (isQueueRouterUsable()) {
         const client = useQueueRouter();

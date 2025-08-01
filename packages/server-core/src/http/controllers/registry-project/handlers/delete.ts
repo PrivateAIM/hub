@@ -14,6 +14,7 @@ import { useRequestIdentityRealm, useRequestPermissionChecker } from '@privateai
 import { isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
 import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../../../components';
 import { RegistryProjectEntity } from '../../../../database/domains';
+import { RequestRepositoryAdapter } from '../../../request';
 
 export async function deleteRegistryProjectRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -36,7 +37,12 @@ export async function deleteRegistryProjectRouteHandler(req: Request, res: Respo
 
     const { id: entityId } = entity;
 
-    await repository.remove(entity);
+    const requestRepository = new RequestRepositoryAdapter(
+        req,
+        repository,
+    );
+
+    await requestRepository.remove(entity);
 
     entity.id = entityId;
 

@@ -15,6 +15,7 @@ import {
     CoreCommand,
     buildBuilderTaskQueueRouterPayload, buildCoreTaskQueueRouterPayload,
 } from '@privateaim/server-analysis-manager-kit';
+import type { Request } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import type { QueueRouter } from '@privateaim/server-kit';
 import { useQueueRouter } from '@privateaim/server-kit';
@@ -26,6 +27,7 @@ import {
     AnalysisNodeEntity,
     RegistryEntity, useDataSourceSync,
 } from '../../database';
+import { RequestRepositoryAdapter } from '../../http/request';
 import type { AnalysisManagerLockOptions, AnalysisManagerUnlockOptions } from './types';
 
 export class AnalysisManagerService {
@@ -53,7 +55,10 @@ export class AnalysisManagerService {
         this.queueRouter = useQueueRouter();
     }
 
-    async startDistribution(input: string | AnalysisEntity): Promise<AnalysisEntity> {
+    async startDistribution(
+        input: string | AnalysisEntity,
+        request?: Request,
+    ): Promise<AnalysisEntity> {
         const entity = await this.resolve(input);
 
         const check = isAnalysisAPICommandExecutable(entity, AnalysisAPICommand.BUILD_START);
@@ -95,7 +100,16 @@ export class AnalysisManagerService {
 
         entity.build_status = AnalysisBuildStatus.STARTING;
 
-        await this.repository.save(entity);
+        if (request) {
+            const requestRepository = new RequestRepositoryAdapter(
+                request,
+                this.repository,
+            );
+
+            await requestRepository.save(entity);
+        } else {
+            await this.repository.save(entity);
+        }
         await this.queueRouter.publish(buildBuilderTaskQueueRouterPayload({
             command: BuilderCommand.BUILD,
             data: {
@@ -106,7 +120,9 @@ export class AnalysisManagerService {
         return entity;
     }
 
-    async checkDistribution(input: string | AnalysisEntity): Promise<AnalysisEntity> {
+    async checkDistribution(
+        input: string | AnalysisEntity,
+    ): Promise<AnalysisEntity> {
         const entity = await this.resolve(input);
         const check = isAnalysisAPICommandExecutable(entity, AnalysisAPICommand.BUILD_STATUS);
         if (!check.success) {
@@ -123,7 +139,10 @@ export class AnalysisManagerService {
         return entity;
     }
 
-    async stopDistribution(input: string | AnalysisEntity): Promise<AnalysisEntity> {
+    async stopDistribution(
+        input: string | AnalysisEntity,
+        request?: Request,
+    ): Promise<AnalysisEntity> {
         const entity = await this.resolve(input);
 
         const check = isAnalysisAPICommandExecutable(entity, AnalysisAPICommand.BUILD_STOP);
@@ -135,7 +154,16 @@ export class AnalysisManagerService {
             AnalysisBuildStatus.STOPPING :
             AnalysisBuildStatus.STOPPED;
 
-        await this.repository.save(entity);
+        if (request) {
+            const requestRepository = new RequestRepositoryAdapter(
+                request,
+                this.repository,
+            );
+
+            await requestRepository.save(entity);
+        } else {
+            await this.repository.save(entity);
+        }
 
         return entity;
     }
@@ -147,7 +175,10 @@ export class AnalysisManagerService {
      * @param input
      * @param options
      */
-    async lock(input: string | AnalysisEntity, options: AnalysisManagerLockOptions = {}): Promise<AnalysisEntity> {
+    async lock(
+        input: string | AnalysisEntity,
+        options: AnalysisManagerLockOptions = {},
+    ): Promise<AnalysisEntity> {
         const entity = await this.resolve(input);
         const check = isAnalysisAPICommandExecutable(entity, AnalysisAPICommand.CONFIGURATION_LOCK);
         if (!check.success) {
@@ -204,7 +235,17 @@ export class AnalysisManagerService {
         }
 
         entity.configuration_locked = true;
-        await this.repository.save(entity);
+
+        if (options.request) {
+            const requestRepository = new RequestRepositoryAdapter(
+                options.request,
+                this.repository,
+            );
+
+            await requestRepository.save(entity);
+        } else {
+            await this.repository.save(entity);
+        }
 
         return entity;
     }
@@ -216,7 +257,10 @@ export class AnalysisManagerService {
      * @param input
      * @param options
      */
-    async unlock(input: string | AnalysisEntity, options : AnalysisManagerUnlockOptions = {}): Promise<AnalysisEntity> {
+    async unlock(
+        input: string | AnalysisEntity,
+        options : AnalysisManagerUnlockOptions = {},
+    ): Promise<AnalysisEntity> {
         const entity = await this.resolve(input);
 
         const check = isAnalysisAPICommandExecutable(entity, AnalysisAPICommand.CONFIGURATION_UNLOCK);
@@ -249,12 +293,23 @@ export class AnalysisManagerService {
         entity.configuration_locked = false;
         entity.build_status = null;
 
-        await this.repository.save(entity);
+        if (options.request) {
+            const requestRepository = new RequestRepositoryAdapter(
+                options.request,
+                this.repository,
+            );
+
+            await requestRepository.save(entity);
+        } else {
+            await this.repository.save(entity);
+        }
 
         return entity;
     }
 
-    async spinUp(input: string | AnalysisEntity): Promise<AnalysisEntity> {
+    async spinUp(
+        input: string | AnalysisEntity,
+    ): Promise<AnalysisEntity> {
         const entity = await this.resolve(input);
 
         const message = buildCoreTaskQueueRouterPayload({
@@ -269,7 +324,9 @@ export class AnalysisManagerService {
         return entity;
     }
 
-    async tearDown(input: string | AnalysisEntity): Promise<AnalysisEntity> {
+    async tearDown(
+        input: string | AnalysisEntity,
+    ): Promise<AnalysisEntity> {
         const entity = await this.resolve(input);
 
         const message = buildCoreTaskQueueRouterPayload({

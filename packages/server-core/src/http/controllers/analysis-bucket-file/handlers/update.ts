@@ -13,6 +13,7 @@ import { useDataSource } from 'typeorm-extension';
 import { HTTPHandlerOperation, useRequestIdentityRealm } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { AnalysisBucketFileEntity } from '../../../../database/domains';
+import { RequestRepositoryAdapter } from '../../../request';
 import { AnalysisBucketFileValidator } from '../utils';
 
 export async function updateAnalysisBucketFileRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -47,7 +48,12 @@ export async function updateAnalysisBucketFileRouteHandler(req: Request, res: Re
         });
     }
 
-    entity = await repository.save(entity);
+    const requestRepository = new RequestRepositoryAdapter(
+        req,
+        repository,
+    );
+
+    entity = await requestRepository.save(entity);
 
     return sendAccepted(res, entity);
 }
