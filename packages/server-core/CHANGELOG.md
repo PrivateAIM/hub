@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.8.16](https://github.com/PrivateAIM/hub/compare/v0.8.15...v0.8.16) (2025-08-01)
+
+
+### Features
+
+* store actor & request with event ([#1133](https://github.com/PrivateAIM/hub/issues/1133)) ([7310c8c](https://github.com/PrivateAIM/hub/commit/7310c8c48058734510fba08413ddf5a9fcb8137c))
+
+
+### Bug Fixes
+
+* **deps:** bump the minorandpatch group across 1 directory with 16 updates ([#1132](https://github.com/PrivateAIM/hub/issues/1132)) ([f1d5add](https://github.com/PrivateAIM/hub/commit/f1d5adddfef56889d1c6aab8cefd4bfd6993eb2a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.8.15 to ^0.8.16
+    * @privateaim/kit bumped from ^0.8.15 to ^0.8.16
+    * @privateaim/server-kit bumped from ^0.8.15 to ^0.8.16
+    * @privateaim/server-core-realtime bumped from ^0.8.15 to ^0.8.16
+    * @privateaim/server-http-kit bumped from ^0.8.15 to ^0.8.16
+    * @privateaim/server-analysis-manager-kit bumped from ^0.7.16 to ^0.7.17
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.8.15 to ^0.8.16
+
 ## [0.8.15](https://github.com/PrivateAIM/hub/compare/v0.8.14...v0.8.15) (2025-07-30)
 
 
