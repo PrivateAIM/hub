@@ -36,18 +36,21 @@ export type QueueRouterPayload<
     metadata: QueueRouterPayloadMetadata
 };
 
-export type QueueRouterPayloadInput<T = string, D = Record<string, any>> = {
+export type QueueRouterPayloadInput<
+    KEY = string,
+    VALUE = Record<string, any>,
+> = {
     id?: string,
-    type: T,
-    data?: D,
+    type: KEY,
+    data?: VALUE,
     metadata: Partial<Pick<QueueRouterPayloadMetadata, 'timestamp'>> &
     Omit<QueueRouterPayloadMetadata, 'timestamp'>
 };
 
 export type QueueRouterHandler<
-    T = string,
+    KEY = string,
     D = Record<string, any>,
-> = (message: QueueRouterPayload<T, D>) => Promise<void> | void;
+> = (message: QueueRouterPayload<KEY, D>) => Promise<void> | void;
 
 export type QueueRouterHandlers<
     R extends Record<string, Record<string, any>> = Record<string, Record<string, any>>,

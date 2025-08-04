@@ -12,7 +12,6 @@ import {
     createAnalysisManagerMasterImagesAggregator,
 } from '../aggregators/analysis-manager';
 import {
-    createEventCleanerComponent,
     createRegistryComponent,
 } from '../components';
 import { getWritableDirPath } from './paths';
@@ -22,7 +21,8 @@ import {
     configureAuthupClientAuthenticationHook,
     configureDomainEventPublisher,
     configureLoki,
-    configureRedis, configureVault,
+    configureRedis,
+    configureVault,
     setupLogging,
 } from './services';
 
@@ -62,7 +62,6 @@ export function createConfig() : Config {
     // ---------------------------------------------
 
     const components : Component[] = [
-        createEventCleanerComponent(),
         createRegistryComponent(),
     ];
 

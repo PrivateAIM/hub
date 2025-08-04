@@ -6,9 +6,12 @@
  */
 
 import { generateSwagger } from '@privateaim/server-http-kit';
-import { config } from 'dotenv';
+import type { Component } from '@privateaim/server-kit';
+import { useLogger } from '@privateaim/server-kit';
+import dotenv from 'dotenv';
 import path from 'node:path';
 import process from 'node:process';
+import { defineEventComponent } from './components';
 import { configure, useEnv } from './config';
 import { setupDatabase } from './config/services';
 import {
@@ -16,10 +19,18 @@ import {
 } from './http';
 
 (async () => {
-    config();
+    dotenv.config({
+        debug: false,
+        quiet: true,
+    });
 
     await setupDatabase();
+
     configure();
+
+    const components : Component[] = [
+        defineEventComponent(),
+    ];
 
     await generateSwagger({
         authupURL: useEnv('authupURL'),
@@ -30,10 +41,12 @@ import {
     const httpServer = createHttpServer();
 
     function start() {
+        components.forEach((c) => c.start());
+
         const port = useEnv('port');
         httpServer.listen(port);
 
-        console.log(`Listening on 0.0.0.0:${port}`);
+        useLogger().info(`Listening on 0.0.0.0:${port}`);
     }
 
     start();
