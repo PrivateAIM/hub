@@ -1,20 +1,20 @@
 /*
- * Copyright (c) 2024.
+ * Copyright (c) 2025.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
 
-export type TelemetryEventCreateCommandPayload = {
+export type EventCreateCommandPayload = {
     [key: string]: any,
     // todo: domain type of event :)
 };
 
-export type TelemetryEventCreateFailedEventPayload = {
+export type EventCreateFailedEventPayload = {
     id: string,
     error: Error
 };
 
-export type TelemetryEventCreatePayload = {
+export type EventCreateEventPayload = {
     [key: string]: any,
 };

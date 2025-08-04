@@ -54,6 +54,15 @@ export class QueueRouter {
         });
     }
 
+    consumeAny(
+        routing: QueueRouterRouting,
+        fn: (payload: QueueRouterPayload) => Promise<void> | void,
+    ) {
+        return this.consume(routing, {
+            $any: (payload) => fn(payload),
+        });
+    }
+
     consume(routing: QueueRouterRouting, handlers: QueueRouterHandlers) : Promise<void> {
         let exchange : Client;
         if (routing.type === 'work') {

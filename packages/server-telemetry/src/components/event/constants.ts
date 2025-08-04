@@ -7,23 +7,24 @@
 
 import { QueueRouterRoutingType } from '@privateaim/server-kit';
 
-export enum TelemetryEventEvent {
+export enum EventEvent {
     STARTING = 'starting',
     STARTED = 'started',
     FINISHED = 'finished',
     FAILED = 'failed',
 }
 
-export enum TelemetryEventCommand {
+export enum EventCommand {
     CREATE = 'create',
+    CLEAN = 'clean',
 }
 
-export const TelemetryEventEventQueueRouterRouting = {
+export const EventEventQueueRouterRouting = {
     type: QueueRouterRoutingType.PUB_SUB,
     key: 'telemetryEventEvents',
 };
 
-export const TelemetryEventTaskQueueRouterRouting = {
+export const EventTaskQueueRouterRouting = {
     type: QueueRouterRoutingType.WORK,
     key: 'telemetryEventTasks',
 };
