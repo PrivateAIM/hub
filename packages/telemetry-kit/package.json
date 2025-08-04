@@ -19,6 +19,11 @@
         "email": "admin@tada5hi.net",
         "url": "https://github.com/tada5hi"
     },
+    "dependencies": {
+        "@validup/adapter-zod": "^0.1.11",
+        "validup": "^0.1.9",
+        "zod": "^4.0.14"
+    },
     "devDependencies": {
         "@authup/core-kit": "^1.0.0-beta.27",
         "@privateaim/kit": "^0.8.15",

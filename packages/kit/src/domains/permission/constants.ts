@@ -6,6 +6,7 @@
  */
 
 export enum PermissionName {
+    EVENT_CREATE = 'event_create',
     EVENT_READ = 'event_read',
     EVENT_DELETE = 'event_delete',
 
