@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { Realm } from '@authup/core-kit';
 import type { ObjectDiff } from '@privateaim/kit';
 
 export type EventData = {
@@ -54,13 +55,13 @@ export interface Event {
 
     // ------------------------------------------------------------------
 
-    request_path?: string | null;
+    request_path: string | null;
 
-    request_method?: string | null;
+    request_method: string | null;
 
-    request_ip_address?: string | null;
+    request_ip_address: string | null;
 
-    request_user_agent?: string | null;
+    request_user_agent: string | null;
 
     // ------------------------------------------------------------------
 
@@ -69,6 +70,10 @@ export interface Event {
     actor_id: string | null;
 
     actor_name: string | null;
+
+    // ------------------------------------------------------------------
+
+    realm_id: Realm['id'] | null;
 
     // ------------------------------------------------------------------
 

@@ -7,6 +7,8 @@
 
 // todo: add service, trace ?
 
+import type { Realm } from '@authup/core-kit';
+
 export interface Event {
     id: string;
 
@@ -47,13 +49,13 @@ export interface Event {
 
     // ------------------------------------------------------------------
 
-    request_path?: string | null;
+    request_path: string | null;
 
-    request_method?: string | null;
+    request_method: string | null;
 
-    request_ip_address?: string | null;
+    request_ip_address: string | null;
 
-    request_user_agent?: string | null;
+    request_user_agent: string | null;
 
     // ------------------------------------------------------------------
 
@@ -62,6 +64,10 @@ export interface Event {
     actor_id: string | null;
 
     actor_name: string | null;
+
+    // ------------------------------------------------------------------
+
+    realm_id: Realm['id'] | null;
 
     // ------------------------------------------------------------------
 
