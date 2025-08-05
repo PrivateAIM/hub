@@ -7,7 +7,6 @@
 
 import type { DataSourceOptions } from 'typeorm';
 import { readDataSourceOptionsFromEnv } from 'typeorm-extension';
-import { EnvironmentName, useEnv } from '../config';
 import { EventEntity } from './domains';
 
 export async function extendDataSourceOptions(options: DataSourceOptions): Promise<DataSourceOptions> {
@@ -55,18 +54,6 @@ export async function buildDataSourceOptions() : Promise<DataSourceOptions> {
         options.type !== 'better-sqlite3'
     ) {
         throw new Error(`The database type ${options.type} is not supported.`);
-    }
-
-    if (useEnv('env') === EnvironmentName.TEST) {
-        if (options.type === 'better-sqlite3') {
-            Object.assign(options, {
-                database: ':memory:',
-            } satisfies Partial<DataSourceOptions>);
-        } else {
-            Object.assign(options, {
-                database: 'test',
-            } satisfies Partial<DataSourceOptions>);
-        }
     }
 
     return extendDataSourceOptions(options);
