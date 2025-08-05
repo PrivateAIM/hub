@@ -9,8 +9,9 @@
         ],
         "strict": true,
         "paths": {
-            "@privateaim/core-kit": ["./packages/core-kit/src"],
             "@privateaim/kit": ["./packages/kit/src"],
+            "@privateaim/core-kit": ["./packages/core-kit/src"],
+            "@privateaim/telemetry-kit": ["./packages/telemetry-kit/src"],
             "@privateaim/core-realtime-kit": ["./packages/core-realtime-kit/src"],
             "@privateaim/core-http-kit": ["./packages/core-http-kit/src"],
         }

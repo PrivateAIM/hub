@@ -5,7 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Event } from '@privateaim/core-kit';
+import type { Event } from '@privateaim/telemetry-kit';
 import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
 

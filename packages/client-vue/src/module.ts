@@ -12,6 +12,7 @@ import {
     installCoreHTTPClient,
     installSocketManager,
     installStorageHTTPClient,
+    installTelemetryHTTPClient,
     installTranslator,
 } from './core';
 import type { Options } from './type';
@@ -23,6 +24,10 @@ export function install(app: App, options: Options): void {
 
     installStorageHTTPClient(app, {
         baseURL: options.storageURL,
+    });
+
+    installTelemetryHTTPClient(app, {
+        baseURL: options.telemetryURL,
     });
 
     installSocketManager(app, {

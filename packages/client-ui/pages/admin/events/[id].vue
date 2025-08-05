@@ -8,7 +8,7 @@
 import { createEntityManager } from '@privateaim/client-vue';
 import type {
     Event,
-} from '@privateaim/core-kit';
+} from '@privateaim/telemetry-kit';
 import {
     DomainType,
 } from '@privateaim/core-kit';

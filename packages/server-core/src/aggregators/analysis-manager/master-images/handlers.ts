@@ -16,21 +16,65 @@ import {
     useMasterImageQueueService,
 } from '@privateaim/server-analysis-manager-kit';
 import type { QueueRouterHandlers } from '@privateaim/server-kit';
+import type { Event } from '@privateaim/telemetry-kit';
+import { useEventComponentService } from '@privateaim/server-telemetry';
+import { hasOwnProperty } from '@privateaim/kit';
 import { MasterImageSynchronizerService } from '../../../services';
-import { useEventService } from '../../../services/event/singleton';
 
 export function createAnalysisManagerMasterImagesHandlers() : QueueRouterHandlers<Partial<MasterImagesEventMap>> {
-    const event = useEventService();
+    const event = useEventComponentService();
     const synchronizer = new MasterImageSynchronizerService();
     const queue = useMasterImageQueueService();
 
     return {
         $any: async (message) => {
             const data = message.data as MasterImagesEventContext;
-            await event.store({
+
+            const entity : Partial<Event> = {
                 name: data.event,
                 data,
                 ref_type: DomainType.MASTER_IMAGE,
+            };
+
+            if (
+                hasOwnProperty(data, 'id') &&
+                typeof data.id === 'string'
+            ) {
+                entity.ref_id = data.id;
+            }
+
+            if (
+                data.event === MasterImagesEvent.BUILD_FAILED ||
+                data.event === MasterImagesEvent.PUSH_FAILED ||
+                data.event === MasterImagesEvent.SYNCHRONIZATION_FAILED
+            ) {
+                entity.data = {
+                    error: data.data.error,
+                };
+            }
+
+            if (
+                data.event === MasterImagesEvent.BUILT ||
+                data.event === MasterImagesEvent.PUSHING ||
+                data.event === MasterImagesEvent.PUSHED
+            ) {
+                entity.data = {
+                    tags: data.data.tags,
+                };
+            }
+
+            if (
+                entity.expiring &&
+                !entity.expires_at
+            ) {
+                entity.expires_at = new Date(
+                    Date.now() + (1000 * 60 * 60 * 24),
+                ).toISOString();
+            }
+
+            await event.command({
+                command: 'create',
+                data: entity,
             });
         },
         [MasterImagesEvent.SYNCHRONIZED]: async (

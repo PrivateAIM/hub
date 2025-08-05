@@ -31,6 +31,7 @@
         "@privateaim/core-kit": "^0.8.15",
         "@privateaim/kit": "^0.8.15",
         "@privateaim/storage-kit": "^0.8.15",
+        "@privateaim/telemetry-kit": "^0.8.15",
         "@vuecs/countdown": "^1.0.0",
         "@vuecs/form-controls": "^2.4.3",
         "@vuecs/gravatar": "^1.0.1",

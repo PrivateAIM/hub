@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 import { FEventExpiring } from '@privateaim/client-vue';
-import type { Event } from '@privateaim/core-kit';
+import type { Event } from '@privateaim/telemetry-kit';
 import type { PropType } from 'vue';
 import { defineNuxtComponent } from '#app';
 

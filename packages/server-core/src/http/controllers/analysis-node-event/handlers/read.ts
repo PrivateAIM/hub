@@ -48,8 +48,6 @@ export async function getManyAnalysisNodeEventRouteHandler(req: Request, res: Re
         defaultAlias: 'e',
         filters: {
             allowed: [
-                'event.scope',
-                'event.name',
                 'analysis_id',
                 'node_id',
             ],
@@ -58,7 +56,7 @@ export async function getManyAnalysisNodeEventRouteHandler(req: Request, res: Re
             maxLimit: 50,
         },
         relations: {
-            allowed: ['event', 'analysis', 'node'],
+            allowed: ['analysis', 'node'],
         },
         sort: {
             allowed: [

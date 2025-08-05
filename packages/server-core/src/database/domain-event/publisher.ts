@@ -7,23 +7,15 @@
 
 import { isEqual } from 'smob';
 import type { DomainEventPublishOptions, IDomainEventPublisher } from '@privateaim/server-kit';
-import { useDataSource } from 'typeorm-extension';
-import type { Event, EventData } from '@privateaim/core-kit';
-import { DomainEventName, DomainType } from '@privateaim/core-kit';
+import type { Event, EventData } from '@privateaim/telemetry-kit';
+import { DomainEventName } from '@privateaim/core-kit';
 import type { ObjectDiff, ObjectLiteral } from '@privateaim/kit';
 import { isObject } from '@privateaim/kit';
-import { EventEntity } from '../../database';
+import { useEventComponentService } from '@privateaim/server-telemetry';
 
-export class DomainEventDatabasePublisher implements IDomainEventPublisher {
+export class DatabaseDomainEventPublisher implements IDomainEventPublisher {
     async publish(ctx: DomainEventPublishOptions): Promise<void> {
-        if (ctx.metadata.domain === DomainType.EVENT) {
-            return;
-        }
-
-        const dataSource = await useDataSource();
-        const repository = dataSource.getRepository(EventEntity);
-
-        const entity = repository.create({
+        const entity : Partial<Event> = {
             ref_type: ctx.metadata.domain,
             ref_id: ctx.data.id,
             name: ctx.metadata.event,
@@ -32,7 +24,7 @@ export class DomainEventDatabasePublisher implements IDomainEventPublisher {
             expires_at: new Date(
                 Date.now() + (1000 * 60 * 60 * 24 * 7),
             ).toISOString(),
-        });
+        };
 
         const keys : (keyof Event)[] = [
             'actor_id',
@@ -83,6 +75,10 @@ export class DomainEventDatabasePublisher implements IDomainEventPublisher {
 
         entity.data = data;
 
-        await repository.save(entity);
+        const eventService = useEventComponentService();
+        await eventService.command({
+            command: 'create',
+            data: entity,
+        });
     }
 }
