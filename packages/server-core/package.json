@@ -69,7 +69,7 @@
         "cross-env": "^10.0.0",
         "supertest": "^7.1.4",
         "ts-node": "^10.9.2",
-        "testcontainers": "^11.4.0"
+        "testcontainers": "^11.5.0"
     },
     "scripts": {
         "dev": "npm run cli -- start",
