@@ -17,12 +17,11 @@ import {
 import type {
     Analysis,
     AnalysisNodeEvent,
-    Event,
     Node,
 } from '@privateaim/core-kit';
 import type { Realm } from '@authup/core-kit';
+import type { Event } from '@privateaim/telemetry-kit';
 import { AnalysisEntity } from '../analysis';
-import { EventEntity } from '../event';
 import { NodeEntity } from '../node';
 
 @Entity({ name: 'analysis_node_events' })
@@ -40,11 +39,7 @@ export class AnalysisNodeEventEntity implements AnalysisNodeEvent {
 
     // ------------------------------------------------------------------
 
-    @ManyToOne(() => EventEntity, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'event_id' })
-        event: EventEntity;
-
-    @Column()
+    @Column({ type: 'uuid', nullable: true })
         event_id: Event['id'];
 
     // ------------------------------------------------------------------

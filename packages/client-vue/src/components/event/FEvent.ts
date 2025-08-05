@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import { VCTimeago } from '@vuecs/timeago';
-import type { Event } from '@privateaim/core-kit';
+import type { Event } from '@privateaim/telemetry-kit';
 import {
     defineComponent, h, toRef,
 } from 'vue';

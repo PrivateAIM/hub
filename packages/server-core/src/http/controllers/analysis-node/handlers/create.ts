@@ -13,11 +13,11 @@ import { sendCreated } from 'routup';
 import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
 import { HTTPHandlerOperation, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
+import { useEventComponentService } from '@privateaim/server-telemetry';
 import { useEnv } from '../../../../config';
 import {
     AnalysisEntity, AnalysisNodeEntity, ProjectNodeEntity,
 } from '../../../../database';
-import { useEventService } from '../../../../services/event/singleton';
 import { RequestRepositoryAdapter } from '../../../request';
 import { AnalysisNodeValidator } from '../utils';
 
@@ -86,18 +86,21 @@ export async function createAnalysisNodeRouteHandler(req: Request, res: Response
         entity = await requestRepository.save(entity);
 
         if (entity.run_status) {
-            const eventService = useEventService();
-            await eventService.store({
-                ref_type: DomainType.ANALYSIS_NODE,
-                ref_id: entity.id,
-                name: entity.run_status,
-                scope: 'run',
+            const eventService = useEventComponentService();
+            await eventService.command({
+                command: 'create',
                 data: {
-                    analysis: data.analysis,
-                    node: data.node,
+                    ref_type: DomainType.ANALYSIS_NODE,
+                    ref_id: entity.id,
+                    name: entity.run_status,
+                    scope: 'run',
+                    data: {
+                        analysis_id: data.analysis.id,
+                        analysis_realm_id: data.analysis.realm_id,
+                        node_id: data.node.id,
+                        node_realm_id: data.node.realm_id,
+                    },
                 },
-            }, {
-                entityManager,
             });
         }
     });

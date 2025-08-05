@@ -6,7 +6,7 @@
  */
 
 import type { Realm } from '@authup/core-kit';
-import type { Event } from '../event';
+import type { Event } from '@privateaim/telemetry-kit';
 import type { Node } from '../node';
 import type { Analysis } from '../analysis';
 
@@ -22,8 +22,6 @@ export interface AnalysisNodeEvent {
     // ------------------------------------------------------------------
 
     event_id: Event['id'];
-
-    event: Event;
 
     analysis_id: Analysis['id'];
 

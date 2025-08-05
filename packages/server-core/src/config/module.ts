@@ -6,7 +6,11 @@
  */
 
 import type { Aggregator, Component } from '@privateaim/server-kit';
-import { createAnalysisManagerBuilderAggregator, createAuthupAggregator } from '../aggregators';
+import {
+    createAnalysisManagerBuilderAggregator,
+    createAuthupAggregator,
+    createTelemetryAggregator,
+} from '../aggregators';
 import {
     createAnalysisManagerCoreAggregator,
     createAnalysisManagerMasterImagesAggregator,
@@ -57,6 +61,7 @@ export function createConfig() : Config {
         createAnalysisManagerBuilderAggregator(),
         createAnalysisManagerCoreAggregator(),
         createAnalysisManagerMasterImagesAggregator(),
+        createTelemetryAggregator(),
     ];
 
     // ---------------------------------------------

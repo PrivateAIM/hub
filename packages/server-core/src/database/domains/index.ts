@@ -11,7 +11,6 @@ export * from './analysis-bucket-file';
 export * from './anaylsis-node';
 export * from './analysis-node-event';
 export * from './analysis-permission';
-export * from './event';
 export * from './master-image';
 export * from './master-image-group';
 export * from './node';

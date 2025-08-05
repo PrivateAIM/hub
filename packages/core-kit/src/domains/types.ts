@@ -10,7 +10,6 @@ import type { AnalysisNodeEvent } from './analysis-node-event';
 import type { AnalysisNodeLog } from './analysis-node-log';
 import type { DomainSubType, DomainType } from './constants';
 import type { MasterImage } from './master-image';
-import type { Event } from './event';
 import type { MasterImageGroup } from './master-image-group';
 import type { Project } from './project';
 import type { ProjectNode } from './project-node';
@@ -25,7 +24,7 @@ import type { AnalysisPermission } from './analysis-permission';
 
 type DomainTypeMapRaw = {
     [DomainType.MASTER_IMAGE]: MasterImage,
-    [DomainType.EVENT]: Event,
+    [DomainType.EVENT]: never,
     [DomainType.MASTER_IMAGE_GROUP]: MasterImageGroup,
     [DomainType.PROJECT]: Project,
     [DomainType.PROJECT_NODE]: ProjectNode,

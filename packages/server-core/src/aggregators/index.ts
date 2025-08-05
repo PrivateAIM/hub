@@ -7,3 +7,4 @@
 
 export * from './authup';
 export * from './analysis-manager/builder';
+export * from './telemetry';

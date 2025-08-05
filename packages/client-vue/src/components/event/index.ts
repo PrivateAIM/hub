@@ -9,4 +9,4 @@ export { default as FEventActor } from './FEventActor.vue';
 export { default as FEventRef } from './FEventRef.vue';
 export { default as FEventExpiring } from './FEventExpiring.vue';
 export { default as FEvent } from './FEvent';
-export { default as FEvents } from './FEvents';
+export { default as FEvents } from './FEvents.vue';

@@ -8,6 +8,12 @@
 // todo: add service, trace ?
 
 import type { Realm } from '@authup/core-kit';
+import type { ObjectDiff } from '@privateaim/kit';
+
+export type EventData = {
+    diff?: ObjectDiff,
+    [key: string]: any
+};
 
 export interface Event {
     id: string;
