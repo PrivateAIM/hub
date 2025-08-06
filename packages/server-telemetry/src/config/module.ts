@@ -8,6 +8,7 @@
 import path from 'node:path';
 import process from 'node:process';
 import {
+    configureAMQP,
     configureAuthup,
     configureRedis,
     configureVault,
@@ -19,6 +20,7 @@ export function configure() {
         directory: path.join(process.cwd(), 'writable'),
     });
 
+    configureAMQP();
     configureRedis();
     configureAuthup();
     configureVault();

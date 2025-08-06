@@ -26,7 +26,10 @@ export default defineComponent({
     setup(props) {
         const httpClient = injectTelemetryHTTPClient();
 
-        const meta = ref<ListMeta<Event>>({});
+        const meta = ref<ListMeta<Event>>({
+            limit: 50,
+            offset: 0,
+        });
         const busy = ref(false);
         const data = ref<Event[]>([]);
 
@@ -36,7 +39,10 @@ export default defineComponent({
             const response = await httpClient.event.getMany(props.query);
 
             data.value = response.data;
-            meta.value = response.meta;
+            meta.value = {
+                ...meta.value,
+                ...response.meta,
+            };
 
             busy.value = false;
         };

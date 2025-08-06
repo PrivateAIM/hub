@@ -13,6 +13,7 @@ export interface Environment {
 
     publicURL: string,
 
+    rabbitMqConnectionString?: string | null,
     redisConnectionString?: string | null,
     vaultConnectionString?: string | null,
     authupURL?: string | null,
