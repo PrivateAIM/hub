@@ -27,32 +27,45 @@ export default defineComponent({
         const httpClient = injectTelemetryHTTPClient();
 
         const meta = ref<ListMeta<Event>>({
-            limit: 50,
-            offset: 0,
+            pagination: {
+                limit: 50,
+                offset: 0,
+            },
         });
         const busy = ref(false);
         const data = ref<Event[]>([]);
 
-        const resolve = async () => {
+        const resolve = async (query?: BuildInput<Event>) => {
             busy.value = true;
 
-            const response = await httpClient.event.getMany(props.query);
+            const response = await httpClient.event.getMany(query);
 
             data.value = response.data;
             meta.value = {
                 ...meta.value,
-                ...response.meta,
+                pagination: {
+                    ...meta.value.pagination,
+                    ...response.meta,
+                },
             };
 
             busy.value = false;
         };
 
-        const load = async () => {
-            // todo: load more items :) ^^
-        };
+        const load = (input: ListMeta<Event>) => resolve({
+            ...props.query,
+            pagination: {
+                ...(props.query.pagination),
+                ...(input.pagination || {}),
+            },
+            filters: {
+                ...(props.query.filters || {}),
+                ...(input.filters || {}),
+            },
+        });
 
         Promise.resolve()
-            .then(() => resolve());
+            .then(() => resolve(props.query));
 
         return {
             busy,
@@ -64,18 +77,20 @@ export default defineComponent({
 });
 </script>
 <template>
-    <slot name="default">
-        <slot
-            name="header"
-            v-bind="{busy, data, meta, load}"
-        />
-        <slot
-            name="body"
-            v-bind="{busy, data, meta, load}"
-        />
-        <slot
-            name="footer"
-            v-bind="{busy, data, meta, load}"
-        />
-    </slot>
+    <div class="d-flex flex-column gap-1">
+        <slot name="default">
+            <slot
+                name="header"
+                v-bind="{busy, data, meta, load}"
+            />
+            <slot
+                name="body"
+                v-bind="{busy, data, meta, load}"
+            />
+            <slot
+                name="footer"
+                v-bind="{busy, data, meta, load}"
+            />
+        </slot>
+    </div>
 </template>
