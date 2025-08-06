@@ -7,7 +7,7 @@
 
 import type { DataSourceOptions } from 'typeorm';
 import { readDataSourceOptionsFromEnv } from 'typeorm-extension';
-import { EventEntity } from './domains';
+import { EventEntity, EventSubscriber } from './domains';
 
 export async function extendDataSourceOptions(options: DataSourceOptions): Promise<DataSourceOptions> {
     options = {
@@ -19,7 +19,10 @@ export async function extendDataSourceOptions(options: DataSourceOptions): Promi
         ],
         migrations: [],
         migrationsTransactionMode: 'each',
-        subscribers: [],
+        subscribers: [
+            ...(options.subscribers || []) as string[],
+            EventSubscriber,
+        ],
     };
 
     const migrations: string[] = [];

@@ -5,20 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { DomainEventName } from '@privateaim/core-kit';
 import type { ObjectLiteral } from '@privateaim/kit';
-import type { DomainEventDestinations, DomainEventMetadata, DomainEventPublisher } from '@privateaim/server-kit';
+import { DomainEventName } from '@privateaim/kit';
+import type {
+    DomainEventDestinations,
+    DomainEventPublisher,
+} from '@privateaim/server-kit';
 import { useDomainEventPublisher } from '@privateaim/server-kit';
 import type {
     EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
-
-export type SubscriberPublishPayload<T> = {
-    type: `${DomainEventName}`,
-    data: T,
-    dataPrevious?: T,
-    metadata?: Partial<DomainEventMetadata>,
-};
+import type { SubscriberPublishPayload } from './types';
 
 export class BaseSubscriber<
     RECORD extends ObjectLiteral,

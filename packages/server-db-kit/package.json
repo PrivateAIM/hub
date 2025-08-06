@@ -1,0 +1,28 @@
+{
+    "name": "@privateaim/server-db-kit",
+    "version": "0.8.15",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "author": {
+        "name": "Peter Placzek",
+        "email": "contact@tada5hi.net",
+        "url": "https://tada5hi.net"
+    },
+    "license": "Apache-2.0",
+    "description": "This package contains server side db helpers & utilities.",
+    "dependencies": {
+        "@privateaim/kit": "^0.8.15",
+        "@privateaim/server-kit": "^0.8.15"
+    },
+    "devDependencies": {
+        "typeorm": "^0.3.25",
+        "typeorm-extension": "^3.7.1"
+    },
+    "peerDependencies": {
+        "typeorm": "^0.3.25",
+        "typeorm-extension": "^3.7.1"
+    },
+    "scripts": {
+        "build": "rimraf dist && tsc -p tsconfig.build.json"
+    }
+}
