@@ -73,7 +73,7 @@ export default defineComponent({
 
         const query = computed<BuildInput<Node>>(() => ({
             filters: {
-                realm_id: realmManagementId.value,
+                realm_id: [realmManagementId.value, null],
             },
             sort: {
                 updated_at: 'DESC',

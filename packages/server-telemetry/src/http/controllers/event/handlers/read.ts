@@ -64,6 +64,7 @@ export async function getManyEventLogRouteHandler(req: Request, res: Response) :
                 'name',
                 'ref_type',
                 'ref_id',
+                'realm_id',
                 'created_at',
                 'updated_at',
             ],
