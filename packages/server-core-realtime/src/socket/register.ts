@@ -11,7 +11,6 @@ import {
     registerAnalysisNodeForRealmSocketHandlers,
     registerAnalysisNodeSocketHandlers,
     registerAnalysisSocketHandlers,
-    registerMasterImageEventLogSocketHandlers,
     registerNodeSocketHandlers,
     registerProjectNodeForRealmSocketHandlers,
     registerProjectNodeSocketHandlers,
@@ -41,8 +40,6 @@ export function registerControllers(nsp: Namespace) {
         registerAnalysisSocketHandlers(socket);
         registerAnalysisFileSocketHandlers(socket);
         registerAnalysisLogSocketHandlers(socket);
-
-        registerMasterImageEventLogSocketHandlers(socket);
 
         if (socket.data.namespaceId) {
             registerAnalysisNodeForRealmSocketHandlers(socket);
