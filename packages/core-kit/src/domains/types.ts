@@ -24,7 +24,6 @@ import type { AnalysisPermission } from './analysis-permission';
 
 type DomainTypeMapRaw = {
     [DomainType.MASTER_IMAGE]: MasterImage,
-    [DomainType.EVENT]: never,
     [DomainType.MASTER_IMAGE_GROUP]: MasterImageGroup,
     [DomainType.PROJECT]: Project,
     [DomainType.PROJECT_NODE]: ProjectNode,
