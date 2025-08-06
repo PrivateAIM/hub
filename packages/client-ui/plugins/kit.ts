@@ -25,8 +25,16 @@ export default defineNuxtPlugin((ctx) => {
         storageURL = runtimeConfig.public.storageUrl;
     }
 
+    let telemetryURL : string | undefined;
+    if (runtimeConfig.coreUrl) {
+        telemetryURL = runtimeConfig.telemetryUrl as string;
+    } else {
+        telemetryURL = runtimeConfig.public.telemetryUrl;
+    }
+
     ctx.vueApp.use(install, {
         coreURL,
         storageURL,
+        telemetryURL,
     });
 });
