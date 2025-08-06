@@ -6,7 +6,7 @@
  */
 
 import type { Component } from '@privateaim/server-kit';
-import { isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
+import { isQueueRouterUsable, useLogger, useQueueRouter } from '@privateaim/server-kit';
 import { EventTaskQueueRouterRouting } from './constants';
 import { EnvironmentName, useEnv } from '../../config';
 import { definEventComponentHandlers } from './handlers';
@@ -33,6 +33,8 @@ export function defineEventComponent() : Component {
                         payload.metadata,
                     ),
                 );
+            } else {
+                useLogger().warn('Event component can not consume tasks.');
             }
         },
     };

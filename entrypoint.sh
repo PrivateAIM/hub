@@ -19,7 +19,7 @@ case "${1}" in
     messenger) PACKAGE=messenger;;
     analysis-manager) PACKAGE=analysis-manager;;
     storage) PACKAGE=storage;;
-    cli) PACKAGE=cli;;
+    telemetry) PACKAGE=telemetry;;
     *) echo "Unknown package: ${1}";;
 esac
 
@@ -27,34 +27,43 @@ shift
 
 if [[ -z "${PACKAGE}" ]]; then
     printf 'Usage:\n'
-    printf '  core <command>\n    Start or run the core service in dev mode.\n'
-    printf '  ui <command>\n    Start or run the ui in dev mode.\n'
-    printf '  messenger <command>\n    Start or run the messenger service in dev mode.\n'
-    printf '  analysis-manager <command>\n    Start or run the analysis-manager service in dev mode.\n'
-    printf '  cli <command>\n    Run a CLI command.\n'
-    exit 0
+    printf '  core <command>\n    Execute a core service command.\n'
+    printf '  ui <command>\n    Execute a ui app command.\n'
+    printf '  messenger <command>\n    Execute a messenger service command.\n'
+    printf '  storage <command>\n    Execute a storage service command.\n'
+    printf '  analysis-manager <command>\n    Execute a core worker service command.\n'
+    printf '  telemetry <command>\n    Execute a telemetry service command.\n'
+    exit 1
+fi
+
+COMMAND=${1}
+shift
+
+if [[ -z "${COMMAND}" ]]; then
+    printf "A ${PACKAGE} command must be specified.\n"
+    exit 1
 fi
 
 case "${PACKAGE}" in
     core)
-        exec npm run "$1" --workspace=packages/server-core
+        exec npm run "${COMMAND}" --workspace=packages/server-core -- "${@}"
         ;;
     ui)
         export NUXT_HOST=0.0.0.0
         export NUXT_PORT=3000
-        exec npm run "$1" --workspace=packages/client-ui
+        exec npm run "${COMMAND}" --workspace=packages/client-ui -- "${@}"
         ;;
     messenger)
-        exec npm run "$1" --workspace=packages/server-messenger
+        exec npm run "${COMMAND}" --workspace=packages/server-messenger -- "${@}"
         ;;
     analysis-manager)
-        exec npm run "$1" --workspace=packages/server-analysis-manager
+        exec npm run "${COMMAND}" --workspace=packages/server-analysis-manager -- "${@}"
         ;;
     storage)
-        exec npm run "$1" --workspace=packages/server-storage
+        exec npm run "${COMMAND}" --workspace=packages/server-storage -- "${@}"
         ;;
-    cli)
-        exec npm run cli --workspace=packages/server-core -- "$@"
+    telemetry)
+        exec npm run "${COMMAND}" --workspace=packages/server-telemetry -- "${@}"
         ;;
 esac
 

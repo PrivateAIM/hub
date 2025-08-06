@@ -148,6 +148,7 @@ services:
     core:
         build: '.'
         restart: always
+        command: core cli start
         depends_on:
             authup:
                 condition: service_healthy
@@ -249,13 +250,11 @@ services:
     telemetry:
         build: '.'
         restart: always
-        command: telemetry start
+        command: telemetry cli start
         depends_on:
             authup:
                 condition: service_healthy
             redis:
-                condition: service_healthy
-            minio:
                 condition: service_healthy
             vault:
                 condition: service_healthy
@@ -265,7 +264,8 @@ services:
             DB_USERNAME: 'root'
             DB_PASSWORD: 'start123'
             DB_DATABASE: 'telemetry'
-            PUBLIC_URL: ${STORAGE_PUBLIC_URL:-http://localhost:3000/storage/}
+            PUBLIC_URL: ${STORAGE_PUBLIC_URL:-http://localhost:3000/telemetry/}
+            RABBITMQ_CONNECTION_STRING: ${MQ_CONNECTION_URL:-amqp://root:start123@172.40.1.1}
             REDIS_CONNECTION_STRING: redis://redis
             VAULT_CONNECTION_STRING: start123@http://vault:8090/v1/
             AUTHUP_URL: http://authup:3000/
