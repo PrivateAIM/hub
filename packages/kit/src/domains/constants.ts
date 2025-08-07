@@ -10,3 +10,5 @@ export enum DomainEventName {
     DELETED = 'deleted',
     UPDATED = 'updated',
 }
+
+export const DomainEventNamespace = 'resources';

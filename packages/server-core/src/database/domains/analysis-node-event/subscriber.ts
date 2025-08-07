@@ -11,31 +11,59 @@ import type {
 import { EventSubscriber } from 'typeorm';
 import {
     DomainType,
-    buildDomainChannelName,
-    buildDomainNamespaceName,
 } from '@privateaim/core-kit';
+import { BaseSubscriber } from '@privateaim/server-db-kit';
+import { DomainEventDestination } from '@privateaim/server-kit';
+import { DomainEventNamespace } from '@privateaim/kit';
 import { AnalysisNodeEventEntity } from './entity';
-import { BaseSubscriber } from '../../subscriber/base';
 
 @EventSubscriber()
 export class AnalysisNodeEventSubscriber extends BaseSubscriber<
 AnalysisNodeEventEntity
 > implements EntitySubscriberInterface<AnalysisNodeEventEntity> {
     constructor() {
-        super(DomainType.ANALYSIS_NODE_EVENT, [
-            {
-                channel: (id) => buildDomainChannelName(DomainType.ANALYSIS_NODE_EVENT, id),
-                namespace: buildDomainNamespaceName(),
+        super({
+            domain: DomainType.ANALYSIS_NODE_EVENT,
+            destinations: (data) => {
+                const destinations: DomainEventDestination[] = [
+                    {
+                        namespace: DomainEventNamespace,
+                        channel: DomainType.ANALYSIS_NODE_EVENT,
+                    },
+                    {
+
+                        namespace: DomainEventNamespace,
+                        channel: [DomainType.ANALYSIS_NODE_EVENT, data.id],
+                    },
+                ];
+
+                if (data.analysis_realm_id) {
+                    destinations.push({
+                        namespace: [DomainEventNamespace, data.analysis_realm_id],
+                        channel: DomainType.ANALYSIS_NODE_EVENT,
+                    });
+
+                    destinations.push({
+                        namespace: [DomainEventNamespace, data.analysis_realm_id],
+                        channel: [DomainType.ANALYSIS_NODE_EVENT, data.id],
+                    });
+                }
+
+                if (data.node_realm_id) {
+                    destinations.push({
+                        namespace: [DomainEventNamespace, data.node_realm_id],
+                        channel: DomainType.ANALYSIS_NODE_EVENT,
+                    });
+
+                    destinations.push({
+                        namespace: [DomainEventNamespace, data.node_realm_id],
+                        channel: [DomainType.ANALYSIS_NODE_EVENT, data.id],
+                    });
+                }
+
+                return destinations;
             },
-            {
-                channel: (id) => buildDomainChannelName(DomainType.ANALYSIS_NODE_EVENT, id),
-                namespace: (data) => buildDomainNamespaceName(data.analysis_realm_id),
-            },
-            {
-                channel: (id) => buildDomainChannelName(DomainType.ANALYSIS_NODE_EVENT, id),
-                namespace: (data) => buildDomainNamespaceName(data.node_realm_id),
-            },
-        ]);
+        });
     }
 
     listenTo(): CallableFunction | string {

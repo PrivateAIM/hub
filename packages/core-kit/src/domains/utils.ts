@@ -6,17 +6,19 @@
  */
 
 // todo: rename to buildEntityChannelName
+import { DomainEventNamespace } from '@privateaim/kit';
+
 export function buildDomainChannelName(domain: string, id?: string | number) {
     if (typeof id === 'string' || typeof id === 'number') {
-        return `${domain}:${id}`;
+        return `${domain}/${id}`;
     }
 
     return domain;
 }
 
 // todo: rename to buildEntityNamespaceName
-export function buildDomainNamespaceName(id?: string) {
+export function buildDomainNamespaceName(id?: string | number) {
     return id ?
-        `/resources:${id}` :
-        '/resources';
+        `/${DomainEventNamespace}/${id}` :
+        `/${DomainEventNamespace}`;
 }

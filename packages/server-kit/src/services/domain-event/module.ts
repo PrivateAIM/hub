@@ -8,17 +8,22 @@
 import type { ObjectLiteral } from '@privateaim/kit';
 import { buildDomainEventFullName } from '@privateaim/kit';
 import { isLoggerUsable, useLogger } from '../logger';
-import type { DomainEventPublishOptions, IDomainEventPublisher } from './types';
+import type {
+    DomainEventConsumeOptions, DomainEventDestination,
+    DomainEventPublishOptions,
+    IDomainEventConsumer,
+    IDomainEventPublisher,
+} from './types';
 
 export class DomainEventPublisher implements IDomainEventPublisher {
-    protected publishers : Set<IDomainEventPublisher>;
+    protected consumers : Set<IDomainEventConsumer>;
 
     constructor() {
-        this.publishers = new Set<IDomainEventPublisher>();
+        this.consumers = new Set<IDomainEventConsumer>();
     }
 
-    addPublisher(publisher: IDomainEventPublisher) {
-        this.publishers.add(publisher);
+    addConsumer(consumer: IDomainEventConsumer) {
+        this.consumers.add(consumer);
     }
 
     async safePublish<T extends ObjectLiteral = ObjectLiteral>(
@@ -41,14 +46,26 @@ export class DomainEventPublisher implements IDomainEventPublisher {
             useLogger().info(`Publishing event ${buildDomainEventFullName(ctx.metadata.domain, ctx.metadata.event)}`);
         }
 
-        const publishers = this.publishers.values();
+        let destinations : DomainEventDestination[] = [];
+        if (typeof ctx.destinations === 'function') {
+            destinations = ctx.destinations(ctx.data);
+        } else {
+            destinations = ctx.destinations;
+        }
+
+        const consumeContext : DomainEventConsumeOptions = {
+            ...ctx,
+            destinations,
+        };
+
+        const consumers = this.consumers.values();
         while (true) {
-            const it = publishers.next();
+            const it = consumers.next();
             if (it.done) {
                 return;
             }
 
-            await it.value.publish(ctx);
+            await it.value.consume(consumeContext);
         }
     }
 }

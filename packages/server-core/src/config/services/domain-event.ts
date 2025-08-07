@@ -6,7 +6,7 @@
  */
 
 import { useDomainEventPublisherSinga } from '@privateaim/server-kit';
-import { DatabaseDomainEventPublisher } from '../../database/domain-event';
+import { DatabaseDomainEventConsumer } from '../../database/domain-event';
 
 export function configureDomainEventPublisher() {
     const singa = useDomainEventPublisherSinga();
@@ -16,7 +16,7 @@ export function configureDomainEventPublisher() {
     singa.setFactory(() => {
         const instance = factory();
 
-        instance.addPublisher(new DatabaseDomainEventPublisher());
+        instance.addConsumer(new DatabaseDomainEventConsumer());
 
         return instance;
     });
