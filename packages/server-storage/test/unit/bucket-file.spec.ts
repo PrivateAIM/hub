@@ -42,7 +42,7 @@ describe('controllers/bucket-file', () => {
         const file = await fs.promises.readFile(filePath);
 
         const formData = new FormData();
-        formData.append('file[0]', new Blob([file]), 'file.json');
+        formData.append('file[0]', new Blob([file as BlobPart]), 'file.json');
 
         const bucketFiles = await client.bucket.upload(bucket.id, formData);
         expect(bucketFiles.data.length).toBeGreaterThanOrEqual(1);
