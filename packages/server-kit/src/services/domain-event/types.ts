@@ -7,21 +7,16 @@
 
 import type { ObjectLiteral } from '@privateaim/kit';
 
-export type DomainEventChannelName = string | ((id?: string) => string);
-export type DomainEventNamespaceName<
-    T extends ObjectLiteral = ObjectLiteral,
-> = string | ((data: T) => string);
-
-export type DomainEventDestination<
-    T extends ObjectLiteral = ObjectLiteral,
-> = {
-    namespace?: DomainEventNamespaceName<T>,
-    channel: DomainEventChannelName
+export type DomainEventDestination = {
+    namespace?: string | string[],
+    channel: string | string[]
 };
 
-export type DomainEventDestinations<
-T extends ObjectLiteral =ObjectLiteral,
-> = DomainEventDestination<T>[];
+export type DomainEventDestinations = DomainEventDestination[];
+
+export type DomainEventDestinationsFn<
+    T extends ObjectLiteral =ObjectLiteral,
+> = (data: T) => DomainEventDestination[];
 
 export type DomainEventMetadata = {
     domain: string,
@@ -43,9 +38,22 @@ export type DomainEventPublishOptions<
     data: T,
     dataPrevious?: T,
     metadata: DomainEventMetadata,
-    destinations: DomainEventDestinations<T['data']>
+    destinations: DomainEventDestinations | DomainEventDestinationsFn<T>
 };
 
 export interface IDomainEventPublisher {
     publish(ctx: DomainEventPublishOptions) : Promise<void>;
+}
+
+export type DomainEventConsumeOptions<
+    T extends ObjectLiteral = ObjectLiteral,
+> = {
+    data: T,
+    dataPrevious?: T,
+    metadata: DomainEventMetadata,
+    destinations: DomainEventDestinations
+};
+
+export interface IDomainEventConsumer {
+    consume(ctx: DomainEventConsumeOptions) : Promise<void>;
 }

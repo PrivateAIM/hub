@@ -11,26 +11,47 @@ import type {
 import { EventSubscriber } from 'typeorm';
 import {
     DomainType,
-    buildDomainChannelName,
-
-    buildDomainNamespaceName,
 } from '@privateaim/core-kit';
+import { BaseSubscriber } from '@privateaim/server-db-kit';
+import { DomainEventDestination } from '@privateaim/server-kit';
+import { DomainEventNamespace } from '@privateaim/kit';
 import { AnalysisBucketEntity } from './entity';
-import { BaseSubscriber } from '../../subscriber/base';
 
 @EventSubscriber()
-export class AnalysisBucketSubscriber extends BaseSubscriber<AnalysisBucketEntity> implements EntitySubscriberInterface<AnalysisBucketEntity> {
+export class AnalysisBucketSubscriber extends BaseSubscriber<
+AnalysisBucketEntity
+> implements EntitySubscriberInterface<AnalysisBucketEntity> {
     constructor() {
-        super(DomainType.ANALYSIS_BUCKET, [
-            {
-                channel: (id) => buildDomainChannelName(DomainType.ANALYSIS_BUCKET, id),
-                namespace: buildDomainNamespaceName(),
+        super({
+            domain: DomainType.ANALYSIS_BUCKET,
+            destinations: (data) => {
+                const destinations: DomainEventDestination[] = [
+                    {
+                        namespace: DomainEventNamespace,
+                        channel: DomainType.ANALYSIS_BUCKET,
+                    },
+                    {
+
+                        namespace: DomainEventNamespace,
+                        channel: [DomainType.ANALYSIS_BUCKET, data.id],
+                    },
+                ];
+
+                if (data.realm_id) {
+                    destinations.push({
+                        namespace: [DomainEventNamespace, data.realm_id],
+                        channel: DomainType.ANALYSIS_BUCKET,
+                    });
+
+                    destinations.push({
+                        namespace: [DomainEventNamespace, data.realm_id],
+                        channel: [DomainType.ANALYSIS_BUCKET, data.id],
+                    });
+                }
+
+                return destinations;
             },
-            {
-                channel: (id) => buildDomainChannelName(DomainType.ANALYSIS_BUCKET, id),
-                namespace: (data) => buildDomainNamespaceName(data.realm_id),
-            },
-        ]);
+        });
     }
 
     listenTo() {

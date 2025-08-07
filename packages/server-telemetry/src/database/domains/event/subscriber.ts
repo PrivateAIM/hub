@@ -13,10 +13,10 @@ import type {
 } from 'typeorm';
 import { DomainType } from '@privateaim/telemetry-kit';
 import {
-    buildDomainChannelName,
-    buildDomainNamespaceName,
+    DomainEventNamespace,
 } from '@privateaim/kit';
 import { BaseSubscriber } from '@privateaim/server-db-kit';
+import { DomainEventDestination } from '@privateaim/server-kit';
 import { EventEntity } from './entity';
 
 @TypeormEventSubscriber()
@@ -24,16 +24,36 @@ export class EventSubscriber extends BaseSubscriber<
 EventEntity
 > implements EntitySubscriberInterface<EventEntity> {
     constructor() {
-        super(DomainType.EVENT, [
-            {
-                channel: (id) => buildDomainChannelName(DomainType.EVENT, id),
-                namespace: buildDomainNamespaceName(),
+        super({
+            domain: DomainType.EVENT,
+            destinations: (data) => {
+                const destinations: DomainEventDestination[] = [
+                    {
+                        namespace: DomainEventNamespace,
+                        channel: DomainType.EVENT,
+                    },
+                    {
+
+                        namespace: DomainEventNamespace,
+                        channel: [DomainType.EVENT, data.id],
+                    },
+                ];
+
+                if (data.realm_id) {
+                    destinations.push({
+                        namespace: [DomainEventNamespace, data.realm_id],
+                        channel: DomainType.EVENT,
+                    });
+
+                    destinations.push({
+                        namespace: [DomainEventNamespace, data.realm_id],
+                        channel: [DomainType.EVENT, data.id],
+                    });
+                }
+
+                return destinations;
             },
-            {
-                channel: (id) => buildDomainChannelName(DomainType.EVENT, id),
-                namespace: (data) => buildDomainNamespaceName(data.realm_id),
-            },
-        ]);
+        });
     }
 
     listenTo() {

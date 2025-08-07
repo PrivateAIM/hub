@@ -11,23 +11,30 @@ import type {
 import { EventSubscriber } from 'typeorm';
 import {
     DomainType,
-    buildDomainChannelName,
-    buildDomainNamespaceName,
 } from '@privateaim/core-kit';
+import { BaseSubscriber } from '@privateaim/server-db-kit';
+import { DomainEventNamespace } from '@privateaim/kit';
 import { MasterImageEntity } from './entity';
-import { BaseSubscriber } from '../../subscriber/base';
 
 @EventSubscriber()
 export class MasterImageSubscriber extends BaseSubscriber<
 MasterImageEntity
 > implements EntitySubscriberInterface<MasterImageEntity> {
     constructor() {
-        super(DomainType.MASTER_IMAGE, [
-            {
-                channel: (id) => buildDomainChannelName(DomainType.MASTER_IMAGE, id),
-                namespace: buildDomainNamespaceName(),
-            },
-        ]);
+        super({
+            domain: DomainType.MASTER_IMAGE,
+            destinations: (data) => [
+                {
+                    namespace: DomainEventNamespace,
+                    channel: DomainType.MASTER_IMAGE,
+                },
+                {
+
+                    namespace: DomainEventNamespace,
+                    channel: [DomainType.MASTER_IMAGE, data.id],
+                },
+            ],
+        });
     }
 
     listenTo(): CallableFunction | string {

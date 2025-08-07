@@ -6,15 +6,15 @@
  */
 
 import { isEqual } from 'smob';
-import type { DomainEventPublishOptions, IDomainEventPublisher } from '@privateaim/server-kit';
+import type { DomainEventPublishOptions, IDomainEventConsumer } from '@privateaim/server-kit';
 import type { Event, EventData } from '@privateaim/telemetry-kit';
 import { DomainEventName } from '@privateaim/core-kit';
 import type { ObjectDiff, ObjectLiteral } from '@privateaim/kit';
 import { isObject } from '@privateaim/kit';
 import { useEventComponentService } from '@privateaim/server-telemetry';
 
-export class DatabaseDomainEventPublisher implements IDomainEventPublisher {
-    async publish(ctx: DomainEventPublishOptions): Promise<void> {
+export class DatabaseDomainEventConsumer implements IDomainEventConsumer {
+    async consume(ctx: DomainEventPublishOptions): Promise<void> {
         const entity : Partial<Event> = {
             ref_type: ctx.metadata.domain,
             ref_id: ctx.data.id,

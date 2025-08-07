@@ -8,31 +8,28 @@
 import type { ObjectLiteral } from '@privateaim/kit';
 import { DomainEventName } from '@privateaim/kit';
 import type {
-    DomainEventDestinations,
+    DomainEventDestinations, DomainEventDestinationsFn,
     DomainEventPublisher,
 } from '@privateaim/server-kit';
 import { useDomainEventPublisher } from '@privateaim/server-kit';
 import type {
     EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
-import type { SubscriberPublishPayload } from './types';
+import type { BaseSubscriberContext, SubscriberPublishPayload } from './types';
 
 export class BaseSubscriber<
     RECORD extends ObjectLiteral,
 > implements EntitySubscriberInterface<RECORD> {
     protected publisher: DomainEventPublisher;
 
-    protected destinations : DomainEventDestinations<RECORD>;
+    protected destinations : DomainEventDestinations | DomainEventDestinationsFn<RECORD>;
 
-    protected type: string;
+    protected domain: string;
 
-    constructor(
-        type: string,
-        destinations: DomainEventDestinations<RECORD> = [],
-    ) {
-        this.type = type;
+    constructor(ctx: BaseSubscriberContext<RECORD>) {
+        this.domain = ctx.domain;
         this.publisher = useDomainEventPublisher();
-        this.destinations = destinations;
+        this.destinations = ctx.destinations;
     }
 
     async afterInsert(event: InsertEvent<RECORD>): Promise<any> {
@@ -67,7 +64,7 @@ export class BaseSubscriber<
             data: payload.data,
             dataPrevious: payload.dataPrevious,
             metadata: {
-                domain: this.type,
+                domain: this.domain,
                 event: payload.type,
                 ...(payload.metadata ? payload.metadata : {}),
             },

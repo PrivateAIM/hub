@@ -12,41 +12,60 @@ import {
     EventSubscriber,
 } from 'typeorm';
 import {
-    DomainSubType,
     DomainType,
-    buildDomainChannelName,
-    buildDomainNamespaceName,
 } from '@privateaim/core-kit';
+import { BaseSubscriber } from '@privateaim/server-db-kit';
+import { DomainEventDestination } from '@privateaim/server-kit';
+import { DomainEventNamespace } from '@privateaim/kit';
 import { AnalysisNodeEntity } from './entity';
-import { BaseSubscriber } from '../../subscriber/base';
 
 @EventSubscriber()
 export class AnalysisNodeSubscriber extends BaseSubscriber<
 AnalysisNodeEntity
 > implements EntitySubscriberInterface<AnalysisNodeEntity> {
     constructor() {
-        super(DomainType.ANALYSIS_NODE, [
-            {
-                channel: (id) => buildDomainChannelName(DomainSubType.ANALYSIS_NODE_IN, id),
-                namespace: (data) => buildDomainNamespaceName(data.node_realm_id),
+        super({
+            domain: DomainType.ANALYSIS_NODE,
+            destinations: (data) => {
+                const destinations: DomainEventDestination[] = [
+                    {
+                        namespace: DomainEventNamespace,
+                        channel: DomainType.ANALYSIS_NODE,
+                    },
+                    {
+
+                        namespace: DomainEventNamespace,
+                        channel: [DomainType.ANALYSIS_NODE, data.id],
+                    },
+                ];
+
+                if (data.analysis_realm_id) {
+                    destinations.push({
+                        namespace: [DomainEventNamespace, data.analysis_realm_id],
+                        channel: DomainType.ANALYSIS_NODE,
+                    });
+
+                    destinations.push({
+                        namespace: [DomainEventNamespace, data.analysis_realm_id],
+                        channel: [DomainType.ANALYSIS_NODE, data.id],
+                    });
+                }
+
+                if (data.node_realm_id) {
+                    destinations.push({
+                        namespace: [DomainEventNamespace, data.node_realm_id],
+                        channel: DomainType.ANALYSIS_NODE,
+                    });
+
+                    destinations.push({
+                        namespace: [DomainEventNamespace, data.node_realm_id],
+                        channel: [DomainType.ANALYSIS_NODE, data.id],
+                    });
+                }
+
+                return destinations;
             },
-            {
-                channel: (id) => buildDomainChannelName(DomainSubType.ANALYSIS_NODE_OUT, id),
-                namespace: (data) => buildDomainNamespaceName(data.analysis_realm_id),
-            },
-            {
-                channel: (id) => buildDomainChannelName(DomainType.ANALYSIS_NODE, id),
-                namespace: buildDomainNamespaceName(),
-            },
-            {
-                channel: (id) => buildDomainChannelName(DomainSubType.ANALYSIS_NODE_IN, id),
-                namespace: buildDomainNamespaceName(),
-            },
-            {
-                channel: (id) => buildDomainChannelName(DomainSubType.ANALYSIS_NODE_OUT, id),
-                namespace: buildDomainNamespaceName(),
-            },
-        ]);
+        });
     }
 
     listenTo(): CallableFunction | string {

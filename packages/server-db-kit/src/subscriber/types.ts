@@ -5,11 +5,23 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { DomainEventMetadata } from '@privateaim/server-kit';
+import type {
+    DomainEventDestinations,
+    DomainEventDestinationsFn,
+    DomainEventMetadata,
+    ObjectLiteral,
+} from '@privateaim/server-kit';
 
 export type SubscriberPublishPayload<T> = {
     type: string,
     data: T,
     dataPrevious?: T,
     metadata?: Partial<DomainEventMetadata>,
+};
+
+export type BaseSubscriberContext<
+    RECORD extends ObjectLiteral = ObjectLiteral,
+> = {
+    domain: string,
+    destinations: DomainEventDestinations | DomainEventDestinationsFn<RECORD>,
 };

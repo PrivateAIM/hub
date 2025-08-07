@@ -11,23 +11,35 @@ import type {
 import { EventSubscriber } from 'typeorm';
 import {
     DomainType,
-    buildDomainChannelName,
-    buildDomainNamespaceName,
 } from '@privateaim/core-kit';
+import { BaseSubscriber } from '@privateaim/server-db-kit';
+import { DomainEventDestination } from '@privateaim/server-kit';
+import { DomainEventNamespace } from '@privateaim/kit';
 import { RegistryProjectEntity } from './entity';
-import { BaseSubscriber } from '../../subscriber/base';
 
 @EventSubscriber()
 export class RegistryProjectSubscriber extends BaseSubscriber<
 RegistryProjectEntity
 > implements EntitySubscriberInterface<RegistryProjectEntity> {
     constructor() {
-        super(DomainType.REGISTRY_PROJECT, [
-            {
-                channel: (id) => buildDomainChannelName(DomainType.REGISTRY_PROJECT, id),
-                namespace: buildDomainNamespaceName(),
+        super({
+            domain: DomainType.REGISTRY_PROJECT,
+            destinations: (data) => {
+                const destinations: DomainEventDestination[] = [
+                    {
+                        namespace: DomainEventNamespace,
+                        channel: DomainType.REGISTRY_PROJECT,
+                    },
+                    {
+
+                        namespace: DomainEventNamespace,
+                        channel: [DomainType.REGISTRY_PROJECT, data.id],
+                    },
+                ];
+
+                return destinations;
             },
-        ]);
+        });
     }
 
     listenTo(): CallableFunction | string {

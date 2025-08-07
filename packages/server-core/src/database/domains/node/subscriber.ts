@@ -7,29 +7,49 @@
 
 import {
     DomainType,
-    buildDomainChannelName,
-    buildDomainNamespaceName,
 } from '@privateaim/core-kit';
 import type {
     EntitySubscriberInterface,
 } from 'typeorm';
 import { EventSubscriber } from 'typeorm';
+import { BaseSubscriber } from '@privateaim/server-db-kit';
+import { DomainEventDestination } from '@privateaim/server-kit';
+import { DomainEventNamespace } from '@privateaim/kit';
 import { NodeEntity } from './entity';
-import { BaseSubscriber } from '../../subscriber/base';
 
 @EventSubscriber()
 export class NodeSubscriber extends BaseSubscriber<NodeEntity> implements EntitySubscriberInterface<NodeEntity> {
     constructor() {
-        super(DomainType.NODE, [
-            {
-                channel: (id) => buildDomainChannelName(DomainType.NODE, id),
-                namespace: buildDomainNamespaceName(),
+        super({
+            domain: DomainType.NODE,
+            destinations: (data) => {
+                const destinations: DomainEventDestination[] = [
+                    {
+                        namespace: DomainEventNamespace,
+                        channel: DomainType.NODE,
+                    },
+                    {
+
+                        namespace: DomainEventNamespace,
+                        channel: [DomainType.NODE, data.id],
+                    },
+                ];
+
+                if (data.realm_id) {
+                    destinations.push({
+                        namespace: [DomainEventNamespace, data.realm_id],
+                        channel: DomainType.NODE,
+                    });
+
+                    destinations.push({
+                        namespace: [DomainEventNamespace, data.realm_id],
+                        channel: [DomainType.NODE, data.id],
+                    });
+                }
+
+                return destinations;
             },
-            {
-                channel: (id) => buildDomainChannelName(DomainType.NODE, id),
-                namespace: (data) => buildDomainNamespaceName(data.realm_id),
-            },
-        ]);
+        });
     }
 
     listenTo(): CallableFunction | string {

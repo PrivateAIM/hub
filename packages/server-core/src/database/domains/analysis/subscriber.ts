@@ -11,26 +11,47 @@ import type {
 import { EventSubscriber } from 'typeorm';
 import {
     DomainType,
-    buildDomainChannelName,
-
-    buildDomainNamespaceName,
 } from '@privateaim/core-kit';
+import { BaseSubscriber } from '@privateaim/server-db-kit';
+import { DomainEventDestination } from '@privateaim/server-kit';
+import { DomainEventNamespace } from '@privateaim/kit';
 import { AnalysisEntity } from './entity';
-import { BaseSubscriber } from '../../subscriber/base';
 
 @EventSubscriber()
-export class AnalysisSubscriber extends BaseSubscriber<AnalysisEntity> implements EntitySubscriberInterface<AnalysisEntity> {
+export class AnalysisSubscriber extends BaseSubscriber<
+AnalysisEntity
+> implements EntitySubscriberInterface<AnalysisEntity> {
     constructor() {
-        super(DomainType.ANALYSIS, [
-            {
-                channel: (id) => buildDomainChannelName(DomainType.ANALYSIS, id),
-                namespace: buildDomainNamespaceName(),
+        super({
+            domain: DomainType.ANALYSIS,
+            destinations: (data) => {
+                const destinations: DomainEventDestination[] = [
+                    {
+                        namespace: DomainEventNamespace,
+                        channel: DomainType.ANALYSIS,
+                    },
+                    {
+
+                        namespace: DomainEventNamespace,
+                        channel: [DomainType.ANALYSIS, data.id],
+                    },
+                ];
+
+                if (data.realm_id) {
+                    destinations.push({
+                        namespace: [DomainEventNamespace, data.realm_id],
+                        channel: DomainType.ANALYSIS,
+                    });
+
+                    destinations.push({
+                        namespace: [DomainEventNamespace, data.realm_id],
+                        channel: [DomainType.ANALYSIS, data.id],
+                    });
+                }
+
+                return destinations;
             },
-            {
-                channel: (id) => buildDomainChannelName(DomainType.ANALYSIS, id),
-                namespace: (data) => buildDomainNamespaceName(data.realm_id),
-            },
-        ]);
+        });
     }
 
     listenTo() {

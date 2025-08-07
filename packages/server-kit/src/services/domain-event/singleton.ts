@@ -9,7 +9,7 @@ import { singa } from 'singa';
 import { isRedisClientUsable, useRedisClient } from '../redis';
 import { DomainEventPublisher } from './module';
 import { DomainEventRedisPublisher } from './redis';
-import { DomainEventSocketPublisher } from './socket';
+import { DomainEventSocketConsumer } from './socket';
 
 const singaInstance = singa<DomainEventPublisher>({
     name: 'domainEventPublisher',
@@ -19,8 +19,8 @@ const singaInstance = singa<DomainEventPublisher>({
         if (isRedisClientUsable()) {
             const client = useRedisClient();
 
-            publisher.addPublisher(new DomainEventRedisPublisher(client));
-            publisher.addPublisher(new DomainEventSocketPublisher(client));
+            publisher.addConsumer(new DomainEventRedisPublisher(client));
+            publisher.addConsumer(new DomainEventSocketConsumer(client));
         }
 
         return publisher;

@@ -12,41 +12,60 @@ import {
     EventSubscriber,
 } from 'typeorm';
 import {
-    DomainSubType,
     DomainType,
-    buildDomainChannelName,
-    buildDomainNamespaceName,
 } from '@privateaim/core-kit';
+import { BaseSubscriber } from '@privateaim/server-db-kit';
+import { DomainEventDestination } from '@privateaim/server-kit';
+import { DomainEventNamespace } from '@privateaim/kit';
 import { ProjectNodeEntity } from './entity';
-import { BaseSubscriber } from '../../subscriber/base';
 
 @EventSubscriber()
 export class ProjectNodeSubscriber extends BaseSubscriber<
 ProjectNodeEntity
 > implements EntitySubscriberInterface<ProjectNodeEntity> {
     constructor() {
-        super(DomainType.PROJECT_NODE, [
-            {
-                channel: (id) => buildDomainChannelName(DomainSubType.PROJECT_NODE_IN, id),
-                namespace: (data) => buildDomainNamespaceName(data.node_realm_id),
+        super({
+            domain: DomainType.PROJECT_NODE,
+            destinations: (data) => {
+                const destinations: DomainEventDestination[] = [
+                    {
+                        namespace: DomainEventNamespace,
+                        channel: DomainType.PROJECT_NODE,
+                    },
+                    {
+
+                        namespace: DomainEventNamespace,
+                        channel: [DomainType.PROJECT_NODE, data.id],
+                    },
+                ];
+
+                if (data.project_realm_id) {
+                    destinations.push({
+                        namespace: [DomainEventNamespace, data.project_realm_id],
+                        channel: DomainType.PROJECT_NODE,
+                    });
+
+                    destinations.push({
+                        namespace: [DomainEventNamespace, data.project_realm_id],
+                        channel: [DomainType.PROJECT_NODE, data.id],
+                    });
+                }
+
+                if (data.node_realm_id) {
+                    destinations.push({
+                        namespace: [DomainEventNamespace, data.node_realm_id],
+                        channel: DomainType.PROJECT_NODE,
+                    });
+
+                    destinations.push({
+                        namespace: [DomainEventNamespace, data.node_realm_id],
+                        channel: [DomainType.PROJECT_NODE, data.id],
+                    });
+                }
+
+                return destinations;
             },
-            {
-                channel: (id) => buildDomainChannelName(DomainSubType.PROJECT_NODE_OUT, id),
-                namespace: (data) => buildDomainNamespaceName(data.project_realm_id),
-            },
-            {
-                channel: (id) => buildDomainChannelName(DomainType.PROJECT_NODE, id),
-                namespace: buildDomainNamespaceName(),
-            },
-            {
-                channel: (id) => buildDomainChannelName(DomainSubType.PROJECT_NODE_IN, id),
-                namespace: buildDomainNamespaceName(),
-            },
-            {
-                channel: (id) => buildDomainChannelName(DomainSubType.PROJECT_NODE_OUT, id),
-                namespace: buildDomainNamespaceName(),
-            },
-        ]);
+        });
     }
 
     listenTo(): CallableFunction | string {

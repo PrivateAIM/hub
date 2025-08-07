@@ -11,32 +11,59 @@ import type {
 import { EventSubscriber } from 'typeorm';
 import {
     DomainType,
-    buildDomainChannelName,
-
-    buildDomainNamespaceName,
 } from '@privateaim/core-kit';
+import { BaseSubscriber } from '@privateaim/server-db-kit';
+import { DomainEventDestination } from '@privateaim/server-kit';
+import { DomainEventNamespace } from '@privateaim/kit';
 import { AnalysisPermissionEntity } from './entity';
-import { BaseSubscriber } from '../../subscriber/base';
 
 @EventSubscriber()
 export class AnalysisPermissionSubscriber extends BaseSubscriber<
 AnalysisPermissionEntity
 > implements EntitySubscriberInterface<AnalysisPermissionEntity> {
     constructor() {
-        super(DomainType.ANALYSIS_PERMISSION, [
-            {
-                channel: (id) => buildDomainChannelName(DomainType.ANALYSIS_PERMISSION, id),
-                namespace: buildDomainNamespaceName(),
+        super({
+            domain: DomainType.ANALYSIS_NODE,
+            destinations: (data) => {
+                const destinations: DomainEventDestination[] = [
+                    {
+                        namespace: DomainEventNamespace,
+                        channel: DomainType.ANALYSIS_PERMISSION,
+                    },
+                    {
+
+                        namespace: DomainEventNamespace,
+                        channel: [DomainType.ANALYSIS_PERMISSION, data.id],
+                    },
+                ];
+
+                if (data.analysis_realm_id) {
+                    destinations.push({
+                        namespace: [DomainEventNamespace, data.analysis_realm_id],
+                        channel: DomainType.ANALYSIS_PERMISSION,
+                    });
+
+                    destinations.push({
+                        namespace: [DomainEventNamespace, data.analysis_realm_id],
+                        channel: [DomainType.ANALYSIS_PERMISSION, data.id],
+                    });
+                }
+
+                if (data.permission_realm_id) {
+                    destinations.push({
+                        namespace: [DomainEventNamespace, data.permission_realm_id],
+                        channel: DomainType.ANALYSIS_PERMISSION,
+                    });
+
+                    destinations.push({
+                        namespace: [DomainEventNamespace, data.permission_realm_id],
+                        channel: [DomainType.ANALYSIS_PERMISSION, data.id],
+                    });
+                }
+
+                return destinations;
             },
-            {
-                channel: (id) => buildDomainChannelName(DomainType.ANALYSIS_PERMISSION, id),
-                namespace: (data) => buildDomainNamespaceName(data.permission_realm_id),
-            },
-            {
-                channel: (id) => buildDomainChannelName(DomainType.ANALYSIS_PERMISSION, id),
-                namespace: (data) => buildDomainNamespaceName(data.analysis_realm_id),
-            },
-        ]);
+        });
     }
 
     listenTo() {
