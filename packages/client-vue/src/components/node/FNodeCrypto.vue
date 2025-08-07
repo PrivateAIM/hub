@@ -7,7 +7,6 @@
 <script lang="ts">
 import type { Node } from '@privateaim/core-kit';
 import {
-    type AsymmetricAlgorithmParams,
     CryptoAsymmetricAlgorithm,
     exportAsymmetricPrivateKey,
     exportAsymmetricPublicKey,
@@ -18,7 +17,6 @@ import { useClipboard } from '@vueuse/core';
 import {
     type PropType, defineComponent, ref,
 } from 'vue';
-import type { FormSelectOption } from '@vuecs/form-controls';
 import { injectCoreHTTPClient } from '../../core';
 
 export default defineComponent({
@@ -31,12 +29,6 @@ export default defineComponent({
     emits: ['updated', 'failed', 'keyCopied', 'keyPairGenerated'],
     setup(props, { emit }) {
         const httpClient = injectCoreHTTPClient();
-
-        const keyTypeOptions : FormSelectOption[] = [
-            { id: 'rsa', value: 'RSA' },
-            { id: 'ecdh', value: 'ECDH' },
-        ];
-        const keyType = ref<string>('ecdh');
 
         const privateKey = ref<string | null>(null);
         const publicKey = ref<string | null>(null);
@@ -98,22 +90,11 @@ export default defineComponent({
             busy.value = true;
 
             try {
-                let algorithmOptions : AsymmetricAlgorithmParams;
-                if (keyType.value === 'ecdh') {
-                    algorithmOptions = {
-                        name: 'ECDH',
-                        namedCurve: 'P-256',
-                    };
-                } else {
-                    algorithmOptions = {
-                        name: 'RSA-OAEP',
-                        modulusLength: 2048,
-                        hash: 'SHA-256',
-                        publicExponent: new Uint8Array([1, 0, 1]),
-                    };
-                }
+                const algorithm = new CryptoAsymmetricAlgorithm({
+                    name: 'ECDH',
+                    namedCurve: 'P-256',
+                });
 
-                const algorithm = new CryptoAsymmetricAlgorithm(algorithmOptions);
                 const keyPair = await algorithm.generateKeyPair();
 
                 publicKey.value = await exportAsymmetricPublicKey(keyPair.publicKey);
@@ -126,9 +107,6 @@ export default defineComponent({
         };
 
         return {
-            keyType,
-            keyTypeOptions,
-
             busy,
 
             copy,
@@ -214,18 +192,6 @@ export default defineComponent({
                         </div>
                     </template>
                 </div>
-            </div>
-            <div>
-                <VCFormGroup>
-                    <template #label>
-                        KeyType
-                    </template>
-
-                    <VCFormSelect
-                        v-model="keyType"
-                        :options="keyTypeOptions"
-                    />
-                </VCFormGroup>
             </div>
             <div class="d-flex flex-row gap-1">
                 <div>

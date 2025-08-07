@@ -5,8 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { AsymmetricAlgorithmImportParams } from './types';
-
 function arrayBufferToBase64(arrayBuffer: ArrayBuffer): string {
     return btoa(String.fromCharCode.apply(null, new Uint8Array(arrayBuffer)));
 }
@@ -27,32 +25,4 @@ export async function exportAsymmetricPrivateKey(key: CryptoKey): Promise<string
     );
 
     return `-----BEGIN PRIVATE KEY-----\n${arrayBufferToBase64(exported)}\n-----END PRIVATE KEY-----`;
-}
-
-export async function importAsymmetricPublicKey(
-    pem: string,
-    params: AsymmetricAlgorithmImportParams,
-): Promise<CryptoKey> {
-    const pemHeader = '-----BEGIN PUBLIC KEY-----';
-    const pemFooter = '-----END PUBLIC KEY-----';
-    const pemContents = pem.substring(pemHeader.length, pem.length - pemFooter.length);
-    const buffer = Buffer.from(pemContents, 'base64');
-
-    if (params.name === 'ECDH') {
-        return crypto.subtle.importKey(
-            'spki',
-            buffer,
-            params,
-            true,
-            ['deriveKey'],
-        );
-    }
-
-    return crypto.subtle.importKey(
-        'spki',
-        buffer,
-        params,
-        true,
-        ['encrypt'],
-    );
 }
