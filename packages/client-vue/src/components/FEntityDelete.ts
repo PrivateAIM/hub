@@ -8,7 +8,6 @@
 import { TranslatorTranslationDefaultKey, TranslatorTranslationGroup, useTranslation } from '@authup/client-web-kit';
 import type { EntityAPISlim } from '@authup/core-http-kit';
 import type { DomainType } from '@privateaim/core-kit';
-import { isObject } from '@privateaim/kit';
 import type {
     Component,
     PropType,
@@ -18,12 +17,17 @@ import type {
 import {
     defineComponent, getCurrentInstance, h, mergeProps, ref, resolveDynamicComponent,
 } from 'vue';
-import { injectCoreHTTPClient } from '../core';
+import type { DomainAPISlim } from '@privateaim/core-http-kit';
+import { injectCoreHTTPClient, injectStorageHTTPClient, injectTelemetryHTTPClient } from '../core';
 import { ElementType } from './constants';
 
 export default defineComponent({
     name: 'FEntityDelete',
     props: {
+        service: {
+            type: String as PropType<'core' | 'storage' | 'telemetry'>,
+            default: 'core',
+        },
         elementIcon: {
             type: String,
             default: 'fa-solid fa-trash',
@@ -55,16 +59,35 @@ export default defineComponent({
             default: undefined,
         },
     },
+    emits: ['deleted', 'failed'],
     setup(props, ctx) {
-        const apiClient = injectCoreHTTPClient();
+        const coreClient = injectCoreHTTPClient();
+        const telemetryClient = injectTelemetryHTTPClient();
+        const storageClient = injectStorageHTTPClient();
+
         const instance = getCurrentInstance();
         const busy = ref(false);
 
         const submit = async () => {
             if (busy.value) return;
 
-            const domainAPI = (apiClient as Record<string, any>)[props.entityType] as EntityAPISlim<any> | undefined;
-            if (!isObject(domainAPI)) {
+            let domainAPI : DomainAPISlim<any> | undefined;
+            switch (props.service) {
+                case 'core': {
+                    domainAPI = (coreClient as Record<string, any>)[props.entityType] as EntityAPISlim<any> | undefined;
+                    break;
+                }
+                case 'storage': {
+                    domainAPI = (storageClient as Record<string, any>)[props.entityType] as EntityAPISlim<any> | undefined;
+                    break;
+                }
+                case 'telemetry': {
+                    domainAPI = (telemetryClient as Record<string, any>)[props.entityType] as EntityAPISlim<any> | undefined;
+                    break;
+                }
+            }
+
+            if (!domainAPI) {
                 return;
             }
 

@@ -148,6 +148,7 @@ export default defineComponent({
                     </nuxt-link>
                     <FEntityDelete
                         v-if="canDrop"
+                        service="telemetry"
                         class="btn btn-xs btn-outline-danger ms-1"
                         :entity-id="data.item.id"
                         :entity-type="'event'"

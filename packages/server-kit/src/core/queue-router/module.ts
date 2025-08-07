@@ -122,7 +122,16 @@ export class QueueRouter {
                     return;
                 }
 
-                await handler(payload);
+                try {
+                    await handler(payload);
+                } catch (e) {
+                    if (isLoggerUsable()) {
+                        useLogger()
+                            .error(e);
+                    }
+
+                    throw e;
+                }
             },
         });
     }

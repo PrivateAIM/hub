@@ -55,19 +55,27 @@ export default defineComponent({
         const load = (input: ListMeta<Event>) => resolve({
             ...props.query,
             pagination: {
-                ...(props.query.pagination),
+                ...(props.query?.pagination || {}),
                 ...(input.pagination || {}),
             },
             filters: {
-                ...(props.query.filters || {}),
+                ...(props.query?.filters || {}),
                 ...(input.filters || {}),
             },
         });
+
+        const handleDeleted = (input: Event) => {
+            const index = data.value.findIndex((el) => el.id === input.id);
+            if (index !== -1) {
+                data.value.splice(index, 1);
+            }
+        };
 
         Promise.resolve()
             .then(() => resolve(props.query));
 
         return {
+            handleDeleted,
             busy,
             data,
             meta,
@@ -81,15 +89,15 @@ export default defineComponent({
         <slot name="default">
             <slot
                 name="header"
-                v-bind="{busy, data, meta, load}"
+                v-bind="{ busy, data, meta, load, deleted: handleDeleted }"
             />
             <slot
                 name="body"
-                v-bind="{busy, data, meta, load}"
+                v-bind="{ busy, data, meta, load, deleted: handleDeleted }"
             />
             <slot
                 name="footer"
-                v-bind="{busy, data, meta, load}"
+                v-bind="{ busy, data, meta, load, deleted: handleDeleted }"
             />
         </slot>
     </div>

@@ -7,7 +7,6 @@
 
 import { DomainType } from '@privateaim/core-kit';
 import type {
-    MasterImagesEventContext,
     MasterImagesEventMap,
 } from '@privateaim/server-analysis-manager-kit';
 import {
@@ -26,50 +25,45 @@ export function createAnalysisManagerMasterImagesHandlers() : QueueRouterHandler
     const synchronizer = new MasterImageSynchronizerService();
     const queue = useMasterImageQueueService();
 
+    // todo: refactor
     return {
         $any: async (message) => {
-            const data = message.data as MasterImagesEventContext;
-
             const entity : Partial<Event> = {
-                name: data.event,
-                data,
+                name: message.type,
+                data: {},
                 ref_type: DomainType.MASTER_IMAGE,
+                scope: 'synchronization',
+                expiring: true,
+                expires_at: new Date(
+                    Date.now() + (1000 * 60 * 60 * 24),
+                ).toISOString(),
             };
 
             if (
-                hasOwnProperty(data, 'id') &&
-                typeof data.id === 'string'
+                hasOwnProperty(message.data, 'id') &&
+                typeof message.data.id === 'string'
             ) {
-                entity.ref_id = data.id;
+                entity.ref_id = message.data.id;
             }
 
             if (
-                data.event === MasterImagesEvent.BUILD_FAILED ||
-                data.event === MasterImagesEvent.PUSH_FAILED ||
-                data.event === MasterImagesEvent.SYNCHRONIZATION_FAILED
+                message.type === MasterImagesEvent.BUILD_FAILED ||
+                message.type === MasterImagesEvent.PUSH_FAILED ||
+                message.type === MasterImagesEvent.SYNCHRONIZATION_FAILED
             ) {
                 entity.data = {
-                    error: data.data.error,
+                    error: message.data.error,
                 };
             }
 
             if (
-                data.event === MasterImagesEvent.BUILT ||
-                data.event === MasterImagesEvent.PUSHING ||
-                data.event === MasterImagesEvent.PUSHED
+                message.type === MasterImagesEvent.BUILT ||
+                message.type === MasterImagesEvent.PUSHING ||
+                message.type === MasterImagesEvent.PUSHED
             ) {
                 entity.data = {
-                    tags: data.data.tags,
+                    tags: message.data.tags,
                 };
-            }
-
-            if (
-                entity.expiring &&
-                !entity.expires_at
-            ) {
-                entity.expires_at = new Date(
-                    Date.now() + (1000 * 60 * 60 * 24),
-                ).toISOString();
             }
 
             await event.command({
