@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.8.16](https://github.com/PrivateAIM/hub/compare/v0.8.15...v0.8.16) (2025-08-07)
+
+
+### Features
+
+* initial server-telmetry package with http api & db ([31dbfdc](https://github.com/PrivateAIM/hub/commit/31dbfdcd7c5a0d833aa5021c44da00fb8685e55e))
+
+
+### Bug Fixes
+
+* **deps:** bump the minorandpatch group across 1 directory with 5 updates ([#1149](https://github.com/PrivateAIM/hub/issues/1149)) ([6ad2f9a](https://github.com/PrivateAIM/hub/commit/6ad2f9aa8f9a9e93e3624ec8d6bf2517c122822a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.8.15 to ^0.8.16
+    * @privateaim/kit bumped from ^0.8.15 to ^0.8.16
+    * @privateaim/core-http-kit bumped from ^0.8.15 to ^0.8.16
+    * @privateaim/server-kit bumped from ^0.8.15 to ^0.8.16
+    * @privateaim/server-analysis-manager-kit bumped from ^0.7.16 to ^0.7.17
+    * @privateaim/storage-kit bumped from ^0.8.15 to ^0.8.16
+
 ## [0.8.15](https://github.com/PrivateAIM/hub/compare/v0.8.14...v0.8.15) (2025-07-30)
 
 

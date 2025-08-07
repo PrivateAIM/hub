@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.8.16](https://github.com/PrivateAIM/hub/compare/v0.8.15...v0.8.16) (2025-08-07)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/messenger-kit bumped from ^0.7.16 to ^0.7.17
+    * @privateaim/server-kit bumped from ^0.8.15 to ^0.8.16
+    * @privateaim/server-http-kit bumped from ^0.8.15 to ^0.8.16
+    * @privateaim/server-realtime-kit bumped from ^0.8.15 to ^0.8.16
+
 ## [0.8.15](https://github.com/PrivateAIM/hub/compare/v0.8.14...v0.8.15) (2025-07-30)
 
 
