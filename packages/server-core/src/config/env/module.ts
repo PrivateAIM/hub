@@ -44,8 +44,8 @@ export function useEnv(key?: string) : any {
             read(EnvironmentInputKey.REDIS_CONNECTION_STRING),
         ]),
         rabbitMqConnectionString: oneOf([
-            readBool('RABBITMQ_CONNECTION_STRING'),
-            read('RABBITMQ_CONNECTION_STRING')]),
+            readBool(EnvironmentInputKey.RABBITMQ_CONNECTION_STRING),
+            read(EnvironmentInputKey.RABBITMQ_CONNECTION_STRING)]),
         vaultConnectionString: oneOf([
             readBool(EnvironmentInputKey.VAULT_CONNECTION_STRING),
             read(EnvironmentInputKey.VAULT_CONNECTION_STRING),

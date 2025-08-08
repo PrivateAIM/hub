@@ -10,12 +10,15 @@ import process from 'node:process';
 import {
     configureAMQP,
     configureAuthup,
+    configureLoki,
     configureRedis,
     configureVault,
     setupLogging,
 } from './services';
 
 export function configure() {
+    configureLoki();
+
     setupLogging({
         directory: path.join(process.cwd(), 'writable'),
     });

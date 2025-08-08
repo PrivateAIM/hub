@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { EnvironmentName } from '@privateaim/kit';
 import type { MiddlewareSwaggerOptions } from '@privateaim/server-http-kit';
 import {
     mountErrorMiddleware,
@@ -19,7 +20,7 @@ import {
     useVaultClient,
 } from '@privateaim/server-kit';
 import { Router, coreHandler } from 'routup';
-import { EnvironmentName, useEnv } from '../config';
+import { useEnv } from '../config';
 import { EventController } from './controllers';
 
 export function createHTTPRouter() : Router {
