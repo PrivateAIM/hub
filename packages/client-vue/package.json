@@ -52,7 +52,7 @@
         "@privateaim/telemetry-kit": "^0.8.15",
         "@privateaim/core-http-kit": "^0.8.15",
         "@privateaim/storage-kit": "^0.8.15",
-        "@types/node": "^24.2.0",
+        "@types/node": "^24.2.1",
         "@vitejs/plugin-vue": "^6.0.0",
         "@vuecs/form-controls": "^2.4.3",
         "@vuecs/link": "^1.0.0",
