@@ -8,9 +8,11 @@
 import type { ComponentHandler } from '@privateaim/server-kit';
 import { EventValidator } from '@privateaim/telemetry-kit';
 import { useDataSource } from 'typeorm-extension';
-import type { EventCommand } from '../../constants';
+import type {
+    EventCommand,
+    EventCreateCommandPayload,
+} from '@privateaim/server-telemetry-kit';
 import { EventEntity } from '../../../../database';
-import type { EventCreateCommandPayload } from './types';
 
 export class EventComponentCreateHandler implements ComponentHandler<
 EventCommand.CREATE,

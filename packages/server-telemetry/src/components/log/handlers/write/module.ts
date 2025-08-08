@@ -7,9 +7,8 @@
 
 import type { ComponentHandler } from '@privateaim/server-kit';
 import { LogValidator } from '@privateaim/telemetry-kit';
+import type { LogCommand, LogWriteCommandPayload } from '@privateaim/server-telemetry-kit';
 import { useLogStore } from '../../../../services';
-import type { LogCommand } from '../../constants';
-import type { LogWriteCommandPayload } from './types';
 
 export class LogComponentWriteHandler implements ComponentHandler<
 LogCommand.WRITE,

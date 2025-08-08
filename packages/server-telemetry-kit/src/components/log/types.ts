@@ -8,7 +8,7 @@
 import type { LogCommand } from './constants';
 import type {
     LogWriteCommandPayload,
-} from './handlers/write';
+} from './handlers';
 
 //-----------------------------------------------------------------------
 

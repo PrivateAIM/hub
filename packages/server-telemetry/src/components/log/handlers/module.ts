@@ -6,7 +6,7 @@
  */
 
 import { ComponentHandlers } from '@privateaim/server-kit';
-import { LogCommand } from '../constants';
+import { LogCommand } from '@privateaim/server-telemetry-kit';
 import { LogComponentWriteHandler } from './write';
 
 export function definLogComponentHandlers() : ComponentHandlers {

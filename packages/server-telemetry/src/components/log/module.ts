@@ -8,7 +8,7 @@
 import { EnvironmentName } from '@privateaim/kit';
 import type { Component } from '@privateaim/server-kit';
 import { isQueueRouterUsable, useLogger, useQueueRouter } from '@privateaim/server-kit';
-import { LogTaskQueueRouterRouting } from './constants';
+import { LogTaskQueueRouterRouting } from '@privateaim/server-telemetry-kit';
 import { useEnv } from '../../config';
 import { definLogComponentHandlers } from './handlers';
 

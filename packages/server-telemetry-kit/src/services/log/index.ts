@@ -5,7 +5,5 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-export * from './event';
-export * from '@privateaim/server-telemetry-kit/src/services/log/log';
-export * from './loki';
-export * from './log-store';
+export * from './module';
+export * from './singleton';

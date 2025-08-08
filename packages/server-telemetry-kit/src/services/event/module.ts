@@ -6,11 +6,11 @@
  */
 
 import { buildQueueRouterPublishPayload, isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
-import { LogEventQueueRouterRouting, LogTaskQueueRouterRouting } from '../../components/log/constants';
-import type { LogCommandContext, LogEventContext } from '../../components/log/types';
+import type { EventCommandContext, EventEventContext } from '../../components';
+import { EventEventQueueRouterRouting, EventTaskQueueRouterRouting } from '../../components';
 
-export class LogComponentService {
-    async command(ctx: LogCommandContext) {
+export class EventComponentService {
+    async command(ctx: EventCommandContext) {
         if (isQueueRouterUsable()) {
             const queueRouter = useQueueRouter();
 
@@ -18,17 +18,19 @@ export class LogComponentService {
                 type: ctx.command,
                 data: ctx.data,
                 metadata: {
-                    routing: LogTaskQueueRouterRouting,
+                    routing: EventTaskQueueRouterRouting,
                 },
             });
 
             await queueRouter.publish(queueRouterPayload);
         }
 
+        throw new Error(`Event command ${ctx.command} can not be executed.`);
+
         // todo: execute component directly
     }
 
-    async event(ctx: LogEventContext) {
+    async event(ctx: EventEventContext) {
         if (isQueueRouterUsable()) {
             const queueRouter = useQueueRouter();
 
@@ -36,12 +38,14 @@ export class LogComponentService {
                 type: ctx.event,
                 data: ctx.data,
                 metadata: {
-                    routing: LogEventQueueRouterRouting,
+                    routing: EventEventQueueRouterRouting,
                 },
             });
 
             await queueRouter.publish(queueRouterPayload);
         }
+
+        throw new Error(`Event event ${ctx.event} can not be transmitted.`);
 
         // todo: execute component directly
     }

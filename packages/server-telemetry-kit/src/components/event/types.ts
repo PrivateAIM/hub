@@ -10,7 +10,7 @@ import type {
     EventCreateCommandPayload,
     EventCreateEventPayload,
     EventCreateFailedEventPayload,
-} from './handlers/create';
+} from './handlers';
 
 //-----------------------------------------------------------------------
 

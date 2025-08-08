@@ -9,7 +9,7 @@ import type { ComponentHandler } from '@privateaim/server-kit';
 import cron from 'node-cron';
 import { LessThan } from 'typeorm';
 import { useDataSource } from 'typeorm-extension';
-import type { EventCommand } from '../../constants';
+import type { EventCommand } from '@privateaim/server-telemetry-kit';
 import { EventEntity } from '../../../../database';
 
 export class EventComponentCleanerHandler implements ComponentHandler<
