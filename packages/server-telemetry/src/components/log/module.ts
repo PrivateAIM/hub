@@ -8,14 +8,14 @@
 import { EnvironmentName } from '@privateaim/kit';
 import type { Component } from '@privateaim/server-kit';
 import { isQueueRouterUsable, useLogger, useQueueRouter } from '@privateaim/server-kit';
-import { EventTaskQueueRouterRouting } from './constants';
+import { LogTaskQueueRouterRouting } from './constants';
 import { useEnv } from '../../config';
-import { definEventComponentHandlers } from './handlers';
+import { definLogComponentHandlers } from './handlers';
 
-export function defineEventComponent() : Component {
+export function defineLogComponent() : Component {
     return {
         async start() {
-            const handlers = definEventComponentHandlers();
+            const handlers = definLogComponentHandlers();
             await handlers.setup();
 
             if (
@@ -25,7 +25,7 @@ export function defineEventComponent() : Component {
                 const queueRouter = useQueueRouter();
 
                 await queueRouter.consumeAny(
-                    EventTaskQueueRouterRouting,
+                    LogTaskQueueRouterRouting,
                     async (
                         payload,
                     ) => handlers.execute(
@@ -35,7 +35,7 @@ export function defineEventComponent() : Component {
                     ),
                 );
             } else {
-                useLogger().warn('Event component can not consume tasks.');
+                useLogger().warn('Log component can not consume tasks.');
             }
         },
     };

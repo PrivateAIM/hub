@@ -5,16 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import path from 'node:path';
 import { read, readInt } from 'envix';
-import { config } from 'dotenv';
-import type { EnvironmentName } from './constants';
+import { EnvironmentName } from '@privateaim/kit';
+import { EnvironmentInputKey } from './constants';
 import type { Environment } from './types';
-
-config({
-    debug: false,
-    path: path.resolve(__dirname, '..', '..', '..', '.env'),
-});
 
 let instance : Environment | undefined;
 
@@ -30,14 +24,18 @@ export function useEnv(key?: string) : any {
     }
 
     instance = {
-        env: read('NODE_ENV', 'development') as `${EnvironmentName}`,
-        port: readInt('PORT', 3000),
-        publicURL: read('PUBLIC_URL', 'http://localhost:3000'),
+        env: read(EnvironmentInputKey.ENV, EnvironmentName.DEVELOPMENT) as `${EnvironmentName}`,
+        port: readInt(EnvironmentInputKey.PORT, 3000),
+        publicURL: read(EnvironmentInputKey.PUBLIC_URL, 'http://localhost:3000'),
 
-        rabbitMqConnectionString: read('RABBITMQ_CONNECTION_STRING'),
-        redisConnectionString: read('REDIS_CONNECTION_STRING'),
-        vaultConnectionString: read('VAULT_CONNECTION_STRING'),
-        authupURL: read('AUTHUP_URL'),
+        rabbitMqConnectionString: read(EnvironmentInputKey.RABBITMQ_CONNECTION_STRING),
+        redisConnectionString: read(EnvironmentInputKey.REDIS_CONNECTION_STRING),
+        vaultConnectionString: read(EnvironmentInputKey.VAULT_CONNECTION_STRING),
+        authupURL: read(EnvironmentInputKey.AUTHUP_URL),
+
+        lokiURL: read(EnvironmentInputKey.LOKI_URL),
+        lokiCompactorURL: read(EnvironmentInputKey.LOKI_COMPACTOR_URL),
+        lokiQuerierURL: read(EnvironmentInputKey.LOKI_QUERIER_URL),
     };
 
     if (typeof key === 'string') {

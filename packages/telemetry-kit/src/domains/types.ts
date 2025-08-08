@@ -7,9 +7,11 @@
 
 import type { DomainType } from './constants';
 import type { Event } from './event';
+import type { Log } from './log';
 
 type DomainTypeMapRaw = {
     [DomainType.EVENT]: Event,
+    [DomainType.LOG]: Log,
 };
 
 export type DomainTypeMap = {
