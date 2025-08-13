@@ -22,7 +22,7 @@
     "dependencies": {
         "@validup/adapter-zod": "^0.1.11",
         "validup": "^0.1.9",
-        "zod": "^4.0.15"
+        "zod": "^4.0.17"
     },
     "devDependencies": {
         "@authup/core-kit": "^1.0.0-beta.27",
