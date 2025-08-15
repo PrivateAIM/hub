@@ -28,7 +28,7 @@
         "@routup/swagger": "^2.4.2",
         "cors": "^2.8.5",
         "hapic": "^2.7.0",
-        "locter": "^2.1.6",
+        "locter": "^2.2.0",
         "validup": "^0.1.8"
     },
     "devDependencies": {
