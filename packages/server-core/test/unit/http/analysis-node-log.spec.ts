@@ -7,8 +7,8 @@
 
 import { AnalysisNodeRunStatus } from '@privateaim/core-kit';
 import type { Analysis, Node } from '@privateaim/core-kit';
-import type { Log } from '@privateaim/kit';
-import { LogLevel } from '@privateaim/kit';
+import type { Log } from '@privateaim/telemetry-kit';
+import { LogLevel } from '@privateaim/telemetry-kit';
 import {
     createTestNode,
     createTestProject,

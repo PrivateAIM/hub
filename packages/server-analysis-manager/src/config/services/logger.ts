@@ -8,20 +8,24 @@
 import {
     createLogger,
     setLoggerFactory,
-    useLogStore,
 } from '@privateaim/server-kit';
+import { LoggerTransport } from '@privateaim/server-telemetry-kit';
 import { WRITABLE_DIRECTORY_PATH } from '../../constants';
 import { useEnv } from '../env';
 
 export function setupLogger(): void {
-    const store = useLogStore();
-    store.setLabels({
-        service: 'hub-server-analysis-manager',
-        namespace: useEnv('env'),
-        type: 'system',
-    });
+    setLoggerFactory(() => {
+        const transport = new LoggerTransport({
+            labels: {
+                service: 'hub-server-worker',
+                namespace: useEnv('env'),
+                type: 'system',
+            },
+        });
 
-    setLoggerFactory(() => createLogger({
-        directory: WRITABLE_DIRECTORY_PATH,
-    }));
+        return createLogger({
+            directory: WRITABLE_DIRECTORY_PATH,
+            transports: [transport],
+        });
+    });
 }

@@ -17,10 +17,8 @@ export class LogAPI extends BaseAPI {
         return response;
     }
 
-    async deleteMany(options?: BuildInput<Log>): Promise<SingleResourceResponse<Log>> {
-        const { data: response } = await this.client.delete(`logs${buildQuery(options)}`);
-
-        return response;
+    async deleteMany(options?: BuildInput<Log>): Promise<void> {
+        await this.client.delete(`logs${buildQuery(options)}`);
     }
 
     async create(data: Partial<Log>): Promise<SingleResourceResponse<Log>> {

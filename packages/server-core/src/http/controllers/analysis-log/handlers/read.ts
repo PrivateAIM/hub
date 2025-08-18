@@ -5,14 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { Log, LogLevel } from '@privateaim/telemetry-kit';
 import { useRequestQuery } from '@routup/basic/query';
 import type { Request, Response } from 'routup';
 import { send } from 'routup';
 import { BadRequestError } from '@ebec/http';
-import { FilterComparisonOperator, parseQuery } from 'rapiq';
+import { type FiltersBuildInput, parseQuery } from 'rapiq';
 import type { AnalysisLog } from '@privateaim/core-kit';
-import type { AnalysisLogQueryOptions } from '../../../../domains';
-import { useAnalysisLogStore } from '../../../../domains';
+import { isTelemetryClientUsable, useTelemetryClient } from '../../../../services';
 
 export async function getManyAnalysisLogRouteHandler(req: Request, res: Response) : Promise<any> {
     const output = parseQuery<AnalysisLog>(
@@ -35,57 +35,50 @@ export async function getManyAnalysisLogRouteHandler(req: Request, res: Response
         },
     );
 
-    const options : AnalysisLogQueryOptions = {};
+    if (!isTelemetryClientUsable()) {
+        throw new BadRequestError('The telemetry service is not configured, therefore logs can not be read.');
+    }
 
-    if (output.filters) {
-        for (let i = 0; i < output.filters.length; i++) {
-            const key = output.filters[i].key as keyof AnalysisLog;
-            if (key === 'analysis_id') {
-                options.analysis_id = `${output.filters[i].value}`;
-            } else if (key === 'time') {
-                if (
-                    output.filters[i].operator === FilterComparisonOperator.LESS_THAN ||
-                    output.filters[i].operator === FilterComparisonOperator.LESS_THAN_EQUAL
-                ) {
-                    options.end = new Date(`${output.filters[i].value}`).getTime();
-                }
+    const telemetryClient = useTelemetryClient();
 
-                if (
-                    output.filters[i].operator === FilterComparisonOperator.GREATER_THAN ||
-                    output.filters[i].operator === FilterComparisonOperator.GREATER_THAN_EQUAL
-                ) {
-                    options.start = new Date(`${output.filters[i].value}`).getTime();
-                }
-            }
+    const filters : FiltersBuildInput<Log> = {
+        labels: {
+            entity: 'analysis',
+        },
+    };
+
+    // todo: clean up this
+
+    for (let i = 0; i < output.filters.length; i++) {
+        const filter = output.filters[i];
+
+        if (filter.key === 'analysis_id') {
+            filters.labels = filters.labels || {};
+            filters.labels[filter.key] = `${filter.value}`;
+
+            continue;
+        }
+
+        if (filter.key === 'level') {
+            filters.level = `${filter.value}` as LogLevel;
+        }
+
+        if (filter.key === 'time') {
+            // todo: respect operator
+            filters.time = `>${filter.value}`;
         }
     }
 
-    if (!options.analysis_id) {
+    if (!filters?.labels?.analysis_id) {
         throw new BadRequestError('The filter analysis_id must be defined.');
     }
 
-    // todo: check permissions
+    // todo: sort missing
 
-    if (output.sort) {
-        for (let i = 0; i < output.sort.length; i++) {
-            if (output.sort[i].key === 'created_at') {
-                options.sort = output.sort[i].value;
-            }
-        }
-    }
-
-    if (output.pagination && output.pagination.limit) {
-        options.limit = output.pagination.limit;
-    }
-
-    const store = useAnalysisLogStore();
-    const [data, total] = await store.query(options);
-
-    return send(res, {
-        data,
-        meta: {
-            total,
-            pagination: output.pagination,
-        },
+    const response = await telemetryClient.log.getMany({
+        filters,
+        pagination: output.pagination,
     });
+
+    return send(res, response);
 }

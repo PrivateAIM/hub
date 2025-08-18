@@ -9,3 +9,4 @@ export * from './analysis';
 export * from './database-integrity';
 export * from './master-image';
 export * from './node-robot';
+export * from './telemetry';

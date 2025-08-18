@@ -11,12 +11,12 @@ import { EnvironmentName } from 'typeorm-extension';
 import type { Logger } from 'winston';
 import { createLogger as create, format, transports } from 'winston';
 import type { LoggerCreateContext, LoggerTransports } from './types';
-import { LogStoreTransport } from './store';
-import { useLogStore } from '../log-store';
+
+function toTransports(input: LoggerTransports) {
+    return Array.isArray(input) ? input : [input];
+}
 
 export function createLogger(ctx: LoggerCreateContext = {}) : Logger {
-    const store = ctx.store || useLogStore();
-
     let loggerTransports : LoggerTransports;
     if (read('env') === EnvironmentName.PRODUCTION) {
         loggerTransports = [
@@ -35,26 +35,14 @@ export function createLogger(ctx: LoggerCreateContext = {}) : Logger {
                 maxsize: 10 * 1024 * 1024, // 10MB
                 maxFiles: 5,
             }),
-            new LogStoreTransport(
-                store,
-                {
-                    level: 'http',
-                    labels: ctx.labels,
-                },
-            ),
+            ...(ctx.transports ? toTransports(ctx.transports) : []),
         ];
     } else {
         loggerTransports = [
             new transports.Console({
                 level: 'debug',
             }),
-            new LogStoreTransport(
-                store,
-                {
-                    level: 'http',
-                    labels: ctx.labels,
-                },
-            ),
+            ...(ctx.transports ? toTransports(ctx.transports) : []),
         ];
     }
 

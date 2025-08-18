@@ -6,12 +6,18 @@
  */
 
 import type { Realm } from '@authup/core-kit';
-import type { Log } from '@privateaim/kit';
 import type {
     Analysis,
 } from '../analysis';
 
-export interface AnalysisLog extends Log {
+export interface AnalysisLog {
+    message: string,
+
+    level: string,
+
+    labels: Record<string, string>,
+
+    time: string | bigint | null,
 
     analysis_id: Analysis['id'];
 

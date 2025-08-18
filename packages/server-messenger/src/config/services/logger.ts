@@ -6,16 +6,23 @@
  */
 
 import type { LoggerCreateContext } from '@privateaim/server-kit';
-import { createLogger, setLoggerFactory, useLogStore } from '@privateaim/server-kit';
+import { createLogger, setLoggerFactory } from '@privateaim/server-kit';
+import { LoggerTransport } from '@privateaim/server-telemetry-kit';
 import { useEnv } from '../env';
 
 export function setupLogger(ctx: LoggerCreateContext): void {
-    const store = useLogStore();
-    store.setLabels({
-        service: 'hub-server-messenger',
-        namespace: useEnv('env'),
-        type: 'system',
-    });
+    setLoggerFactory(() => {
+        const transport = new LoggerTransport({
+            labels: {
+                service: 'hub-server-messenger',
+                namespace: useEnv('env'),
+                type: 'system',
+            },
+        });
 
-    setLoggerFactory(() => createLogger(ctx));
+        return createLogger({
+            ...ctx,
+            transports: [transport],
+        });
+    });
 }

@@ -6,18 +6,16 @@
  */
 
 import { wait } from '@privateaim/kit';
-import { MemoryLogStore, createLogger } from '../../src';
+import { MemoryLogStore } from '../../src';
 
 describe('logger', () => {
     it('should work with store', async () => {
         const store = new MemoryLogStore();
         store.setLabels({ app: 'app' });
 
-        const logger = createLogger({
-            store,
+        await store.write('foo', {
+            meta: 'bar',
         });
-
-        logger.info('foo', { meta: 'bar' });
 
         await wait(0);
 

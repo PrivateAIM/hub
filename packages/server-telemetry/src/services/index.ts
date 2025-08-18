@@ -6,6 +6,5 @@
  */
 
 export * from './event';
-export * from '@privateaim/server-telemetry-kit/src/services/log/log';
 export * from './loki';
 export * from './log-store';

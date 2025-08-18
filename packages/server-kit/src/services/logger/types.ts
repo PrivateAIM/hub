@@ -6,16 +6,15 @@
  */
 
 import type { Logger, LoggerOptions } from 'winston';
-import type { LogStore } from '../log-store';
+
+export type LoggerTransports = LoggerOptions['transports'];
 
 export type LoggerCreateContext = {
     directory?: string,
     options?: Partial<LoggerOptions>,
-    store?: LogStore,
     labels?: Record<string, string>,
+    transports?: LoggerTransports
 };
-
-export type LoggerTransports = LoggerOptions['transports'];
 
 export type {
     Logger,

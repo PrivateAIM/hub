@@ -4,9 +4,7 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import type {
-    AnalysisLog,
-} from '@privateaim/core-kit';
+import type { Log } from '@privateaim/telemetry-kit';
 import type { ListItemSlotProps } from '@vuecs/list-controls';
 import { buildList } from '@vuecs/list-controls';
 import type { Ref } from 'vue';
@@ -14,8 +12,8 @@ import {
     defineComponent,
     h, nextTick, ref,
 } from 'vue';
-import { injectCoreHTTPClient } from '../../core';
-import FAnalysisLog from './FAnalysisLog';
+import { injectTelemetryHTTPClient } from '../../core';
+import { FLog } from '../log';
 
 export default defineComponent({
     props: {
@@ -43,16 +41,19 @@ export default defineComponent({
             }
         };
 
-        const httpClient = injectCoreHTTPClient();
+        const httpClient = injectTelemetryHTTPClient();
 
         const busy = ref(false);
         const total = ref(0);
-        const items : Ref<AnalysisLog[]> = ref([]);
+        const items : Ref<Log[]> = ref([]);
 
         const load = async (time?: string | bigint) => {
-            const response = await httpClient.analysisLog.getMany({
+            const response = await httpClient.log.getMany({
                 filter: {
-                    analysis_id: props.entityId,
+                    labels: {
+                        entity: 'analysis',
+                        analysis_id: props.entityId,
+                    },
                     ...(time ? { time: `>${time}` } : {}),
                 },
             });
@@ -97,22 +98,12 @@ export default defineComponent({
                     },
                     body: {
                         item: {
-                            content(item: AnalysisLog, slotProps: ListItemSlotProps<AnalysisLog>) {
+                            content(item: Log, slotProps: ListItemSlotProps<Log>) {
                                 return h(
-                                    FAnalysisLog,
+                                    FLog,
                                     {
                                         entity: item,
                                         index: slotProps.index,
-                                        onDeleted() {
-                                            if (slotProps && slotProps.deleted) {
-                                                slotProps.deleted(item);
-                                            }
-                                        },
-                                        onUpdated: (e: AnalysisLog) => {
-                                            if (slotProps && slotProps.updated) {
-                                                slotProps.updated(e);
-                                            }
-                                        },
                                     },
                                 );
                             },

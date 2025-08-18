@@ -6,6 +6,7 @@
             "@privateaim/kit": ["./packages/kit/src"],
             "@privateaim/core-http-kit": ["./packages/core-http-kit/src"],
             "@privateaim/server-kit": ["./packages/server-kit/src"],
+            "@privateaim/server-telemetry-kit": ["./packages/server-telemetry-kit/src"],
             "@privateaim/storage-kit": ["./packages/storage-kit/src"],
             "@privateaim/server-analysis-manager-kit": ["./packages/server-analysis-manager-kit/src"]
         }
