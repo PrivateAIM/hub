@@ -12,7 +12,7 @@ import {
     defineComponent,
     h, nextTick, ref,
 } from 'vue';
-import { injectTelemetryHTTPClient } from '../../core';
+import { injectCoreHTTPClient } from '../../core';
 import { FLog } from '../log';
 
 export default defineComponent({
@@ -41,19 +41,16 @@ export default defineComponent({
             }
         };
 
-        const httpClient = injectTelemetryHTTPClient();
+        const httpClient = injectCoreHTTPClient();
 
         const busy = ref(false);
         const total = ref(0);
         const items : Ref<Log[]> = ref([]);
 
         const load = async (time?: string | bigint) => {
-            const response = await httpClient.log.getMany({
+            const response = await httpClient.analysisLog.getMany({
                 filter: {
-                    labels: {
-                        entity: 'analysis',
-                        analysis_id: props.entityId,
-                    },
+                    analysis_id: props.entityId,
                     ...(time ? { time: `>${time}` } : {}),
                 },
             });
@@ -66,11 +63,10 @@ export default defineComponent({
 
             total.value = response.meta.total;
 
-            nextTick(() => {
-                scrollToLastLine(items.value.length);
-            });
-
-            return Promise.resolve();
+            return Promise.resolve()
+                .then(() => nextTick(() => {
+                    scrollToLastLine(items.value.length);
+                }));
         };
 
         Promise.resolve()
