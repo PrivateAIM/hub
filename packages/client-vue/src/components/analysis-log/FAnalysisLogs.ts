@@ -63,10 +63,11 @@ export default defineComponent({
 
             total.value = response.meta.total;
 
-            return Promise.resolve()
-                .then(() => nextTick(() => {
-                    scrollToLastLine(items.value.length);
-                }));
+            nextTick(() => {
+                scrollToLastLine(items.value.length);
+            });
+
+            return Promise.resolve();
         };
 
         Promise.resolve()
