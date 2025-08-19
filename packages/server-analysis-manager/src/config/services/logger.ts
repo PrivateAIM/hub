@@ -9,7 +9,7 @@ import {
     createLogger,
     setLoggerFactory,
 } from '@privateaim/server-kit';
-import { LoggerTransport } from '@privateaim/server-telemetry-kit';
+import { LoggerTransport, isLogComponentServiceUsable, useLogComponentService } from '@privateaim/server-telemetry-kit';
 import { WRITABLE_DIRECTORY_PATH } from '../../constants';
 import { useEnv } from '../env';
 
@@ -20,6 +20,15 @@ export function setupLogger(): void {
                 service: 'hub-server-worker',
                 namespace: useEnv('env'),
                 type: 'system',
+            },
+            save: async (data) => {
+                if (isLogComponentServiceUsable()) {
+                    const logComponent = useLogComponentService();
+                    await logComponent.command({
+                        command: 'write',
+                        data,
+                    });
+                }
             },
         });
 

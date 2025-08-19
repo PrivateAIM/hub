@@ -6,7 +6,10 @@
  */
 
 import type { TransportStreamOptions } from 'winston-transport';
+import type { LogInput } from '@privateaim/telemetry-kit';
 
+export type LoggerTransportSaveFn = (value: LogInput) => Promise<void> | void;
 export type LoggerTransportOptions = TransportStreamOptions & {
-    labels?: Record<string, string>
+    labels?: Record<string, string>,
+    save: LoggerTransportSaveFn
 };

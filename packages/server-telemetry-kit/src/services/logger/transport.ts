@@ -6,31 +6,26 @@
  */
 import type { LogInput } from '@privateaim/telemetry-kit';
 import WinstonTransport from 'winston-transport';
-import { isLogComponentServiceUsable, useLogComponentService } from '../log';
-import type { LoggerTransportOptions } from './type';
+import type { LoggerTransportOptions, LoggerTransportSaveFn } from './type';
 
 export class LoggerTransport extends WinstonTransport {
     protected labels: Record<string, string>;
 
-    constructor(options: LoggerTransportOptions = {}) {
+    protected save : LoggerTransportSaveFn;
+
+    constructor(options: LoggerTransportOptions) {
         super(options);
 
         this.labels = options.labels || {};
+        this.save = options.save;
     }
 
     log(info: Record<PropertyKey, any>, next: () => void): any {
         const payload = this.normalizeInput(info);
 
-        if (isLogComponentServiceUsable()) {
-            const component = useLogComponentService();
-
-            Promise.resolve()
-                .then(() => component.command({
-                    command: 'write',
-                    data: payload,
-                }))
-                .then(() => next());
-        }
+        Promise.resolve()
+            .then(() => this.save(payload))
+            .then(() => next());
     }
 
     protected normalizeInput(info: Record<PropertyKey, any>) : LogInput {

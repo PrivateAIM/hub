@@ -6,6 +6,7 @@
  */
 
 import { singa } from 'singa';
+import { isQueueRouterUsable } from '@privateaim/server-kit';
 import { EventComponentService } from './module';
 
 const instance = singa<EventComponentService>({
@@ -14,7 +15,7 @@ const instance = singa<EventComponentService>({
 });
 
 export function isEventComponentServiceUsable() {
-    return instance.has() || instance.hasFactory();
+    return isQueueRouterUsable();
 }
 
 export function useEventComponentService(): EventComponentService {

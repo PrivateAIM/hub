@@ -6,6 +6,7 @@
  */
 
 import { wait } from '@privateaim/kit';
+import { LogLevel } from '@privateaim/telemetry-kit';
 import { MemoryLogStore } from '../../src';
 
 describe('logger', () => {
@@ -23,7 +24,7 @@ describe('logger', () => {
 
         const [item] = store.items;
 
-        expect(item.level).toEqual('info');
+        expect(item.level).toEqual(LogLevel.DEBUG);
         expect(item.message).toEqual('foo');
         expect(item.labels).toEqual({
             app: 'app',

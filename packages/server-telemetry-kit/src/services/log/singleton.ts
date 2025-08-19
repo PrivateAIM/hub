@@ -6,6 +6,7 @@
  */
 
 import { singa } from 'singa';
+import { isQueueRouterUsable } from '@privateaim/server-kit';
 import { LogComponentService } from './module';
 
 const instance = singa<LogComponentService>({
@@ -14,7 +15,7 @@ const instance = singa<LogComponentService>({
 });
 
 export function isLogComponentServiceUsable() {
-    return instance.has() || instance.hasFactory();
+    return isQueueRouterUsable();
 }
 
 export function useLogComponentService(): LogComponentService {

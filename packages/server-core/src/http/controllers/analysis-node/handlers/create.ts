@@ -13,7 +13,7 @@ import { sendCreated } from 'routup';
 import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
 import { HTTPHandlerOperation, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
-import { useEventComponentService } from '@privateaim/server-telemetry';
+import { isEventComponentServiceUsable, useEventComponentService } from '@privateaim/server-telemetry-kit';
 import { useEnv } from '../../../../config';
 import {
     AnalysisEntity, AnalysisNodeEntity, ProjectNodeEntity,
@@ -86,22 +86,24 @@ export async function createAnalysisNodeRouteHandler(req: Request, res: Response
         entity = await requestRepository.save(entity);
 
         if (entity.run_status) {
-            const eventService = useEventComponentService();
-            await eventService.command({
-                command: 'create',
-                data: {
-                    ref_type: DomainType.ANALYSIS_NODE,
-                    ref_id: entity.id,
-                    name: entity.run_status,
-                    scope: 'run',
+            if (isEventComponentServiceUsable()) {
+                const eventService = useEventComponentService();
+                await eventService.command({
+                    command: 'create',
                     data: {
-                        analysis_id: data.analysis.id,
-                        analysis_realm_id: data.analysis.realm_id,
-                        node_id: data.node.id,
-                        node_realm_id: data.node.realm_id,
+                        ref_type: DomainType.ANALYSIS_NODE,
+                        ref_id: entity.id,
+                        name: entity.run_status,
+                        scope: 'run',
+                        data: {
+                            analysis_id: data.analysis.id,
+                            analysis_realm_id: data.analysis.realm_id,
+                            node_id: data.node.id,
+                            node_realm_id: data.node.realm_id,
+                        },
                     },
-                },
-            });
+                });
+            }
         }
     });
 
