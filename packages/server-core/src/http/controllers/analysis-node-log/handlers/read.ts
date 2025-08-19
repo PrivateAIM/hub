@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BadRequestError } from '@ebec/http';
 import type { Log, LogLevel } from '@privateaim/telemetry-kit';
 import { useRequestQuery } from '@routup/basic/query';
 import type { Request, Response } from 'routup';
@@ -32,12 +31,6 @@ export async function getManyAnalysisNodeLogRouteHandler(req: Request, res: Resp
             allowed: ['time'],
         },
     });
-
-    if (!isTelemetryClientUsable()) {
-        throw new BadRequestError('The telemetry service is not configured, therefore logs can not be read.');
-    }
-
-    const telemetryClient = useTelemetryClient();
 
     const filters : FiltersBuildInput<Log> = {
         labels: {
@@ -68,10 +61,25 @@ export async function getManyAnalysisNodeLogRouteHandler(req: Request, res: Resp
 
     // todo: sort missing
 
-    const response = await telemetryClient.log.getMany({
-        filters,
-        pagination: output.pagination,
-    });
+    if (isTelemetryClientUsable()) {
+        const telemetryClient = useTelemetryClient();
 
-    return send(res, response);
+        const response = await telemetryClient.log.getMany({
+            filters,
+            pagination: output.pagination,
+        });
+
+        return send(res, response);
+    }
+
+    return send(res, {
+        data: [],
+        meta: {
+            total: 0,
+            pagination: {
+                limit: 50,
+                offset: 0,
+            },
+        },
+    });
 }

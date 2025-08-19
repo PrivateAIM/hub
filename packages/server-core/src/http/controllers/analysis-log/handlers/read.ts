@@ -35,12 +35,6 @@ export async function getManyAnalysisLogRouteHandler(req: Request, res: Response
         },
     );
 
-    if (!isTelemetryClientUsable()) {
-        throw new BadRequestError('The telemetry service is not configured, therefore logs can not be read.');
-    }
-
-    const telemetryClient = useTelemetryClient();
-
     const filters : FiltersBuildInput<Log> = {
         labels: {
             entity: 'analysis',
@@ -75,10 +69,25 @@ export async function getManyAnalysisLogRouteHandler(req: Request, res: Response
 
     // todo: sort missing
 
-    const response = await telemetryClient.log.getMany({
-        filters,
-        pagination: output.pagination,
-    });
+    if (isTelemetryClientUsable()) {
+        const telemetryClient = useTelemetryClient();
 
-    return send(res, response);
+        const response = await telemetryClient.log.getMany({
+            filters,
+            pagination: output.pagination,
+        });
+
+        return send(res, response);
+    }
+
+    return send(res, {
+        data: [],
+        meta: {
+            total: 0,
+            pagination: {
+                limit: 50,
+                offset: 0,
+            },
+        },
+    });
 }

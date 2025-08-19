@@ -24,10 +24,6 @@ export async function deleteAnalysisLogRouteHandler(req: Request, res: Response)
         },
     );
 
-    if (!isTelemetryClientUsable()) {
-        throw new BadRequestError('The telemetry service is not configured, therefore logs can not be deleted.');
-    }
-
     const filters : FiltersBuildInput<Log> = {
         labels: {
             entity: 'analysis',
@@ -48,10 +44,12 @@ export async function deleteAnalysisLogRouteHandler(req: Request, res: Response)
 
     // todo: check permissions
 
-    const telemetryClient = useTelemetryClient();
-    await telemetryClient.log.deleteMany({
-        filters,
-    });
+    if (isTelemetryClientUsable()) {
+        const telemetryClient = useTelemetryClient();
+        await telemetryClient.log.deleteMany({
+            filters,
+        });
+    }
 
     return sendAccepted(res);
 }

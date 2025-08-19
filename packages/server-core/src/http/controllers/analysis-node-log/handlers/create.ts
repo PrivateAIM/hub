@@ -7,10 +7,10 @@
 
 import { pickRecord } from '@authup/kit';
 import { isRealmResourceWritable } from '@privateaim/kit';
-import { BadRequestError, ForbiddenError } from '@ebec/http';
+import { ForbiddenError } from '@ebec/http';
 import type { LogLevel } from '@privateaim/telemetry-kit';
 import type { Request, Response } from 'routup';
-import { sendCreated } from 'routup';
+import { sendAccepted } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { HTTPHandlerOperation, useRequestIdentityRealm } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
@@ -58,9 +58,7 @@ export async function createAnalysisNodeLogRouteHandler(req: Request, res: Respo
     }
 
     if (!isTelemetryClientUsable()) {
-        throw new BadRequestError(
-            'The telemetry service is not configured, therefore logs can not be persisted.',
-        );
+        return sendAccepted(res);
     }
 
     const telemetry = useTelemetryClient();
@@ -87,11 +85,11 @@ export async function createAnalysisNodeLogRouteHandler(req: Request, res: Respo
         }
     }
 
-    const output = await telemetry.log.create({
+    await telemetry.log.create({
         level: data.level as LogLevel,
         message: data.message,
         labels,
     });
 
-    return sendCreated(res, output);
+    return sendAccepted(res);
 }
