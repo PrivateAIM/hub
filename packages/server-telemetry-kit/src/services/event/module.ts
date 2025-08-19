@@ -23,6 +23,8 @@ export class EventComponentService {
             });
 
             await queueRouter.publish(queueRouterPayload);
+
+            return;
         }
 
         throw new Error(`Event command ${ctx.command} can not be executed.`);
@@ -43,6 +45,8 @@ export class EventComponentService {
             });
 
             await queueRouter.publish(queueRouterPayload);
+
+            return;
         }
 
         throw new Error(`Event event ${ctx.event} can not be transmitted.`);

@@ -169,7 +169,7 @@ services:
             PUBLIC_URL: ${CORE_PUBLIC_URL:-http://localhost:3000/core/}
             HARBOR_URL: ${HARBOR_URL:-}
             AUTHUP_URL: http://authup:3000/
-            TELEMETRY_URL: ${TELEMETRY_PUBLIC_URL:-http://localhost:3000/telemetry/}
+            TELEMETRY_URL: http://telemetry:3000/
             DB_TYPE: 'mysql'
             DB_HOST: 'mysql'
             DB_USERNAME: 'root'
@@ -195,7 +195,6 @@ services:
             REDIS_CONNECTION_STRING: redis://redis
             VAULT_CONNECTION_STRING: start123@http://vault:8090/v1/
             AUTHUP_URL: http://authup:3000/
-            TELEMETRY_URL: ${TELEMETRY_PUBLIC_URL:-http://localhost:3000/telemetry/}
         networks:
             hub:
     analysis-manager:
@@ -217,7 +216,6 @@ services:
             AUTHUP_URL: http://authup:3000/
             CORE_URL: http://core:3000/
             STORAGE_URL: http://storage:3000/
-            TELEMETRY_URL: ${TELEMETRY_PUBLIC_URL:-http://localhost:3000/telemetry/}
         networks:
             hub:
     storage:
@@ -244,7 +242,6 @@ services:
             MINIO_CONNECTION_STRING: http://admin:start123@minio:9000
             VAULT_CONNECTION_STRING: start123@http://vault:8090/v1/
             AUTHUP_URL: http://authup:3000/
-            TELEMETRY_URL: ${TELEMETRY_PUBLIC_URL:-http://localhost:3000/telemetry/}
         networks:
             hub:
     telemetry:

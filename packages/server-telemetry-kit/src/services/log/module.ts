@@ -23,6 +23,8 @@ export class LogComponentService {
             });
 
             await queueRouter.publish(queueRouterPayload);
+
+            return;
         }
 
         // todo: use http api client if possible
@@ -45,6 +47,8 @@ export class LogComponentService {
             });
 
             await queueRouter.publish(queueRouterPayload);
+
+            return;
         }
 
         throw new Error(`Log event ${ctx.event} can not be transmitted.`);
