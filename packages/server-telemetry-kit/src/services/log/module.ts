@@ -22,7 +22,9 @@ export class LogComponentService {
                 },
             });
 
-            await queueRouter.publish(queueRouterPayload);
+            await queueRouter.publish(queueRouterPayload, {
+                logging: false,
+            });
 
             return;
         }
