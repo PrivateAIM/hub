@@ -19,7 +19,7 @@ import {
 } from './controllers';
 import type { Namespace } from './types';
 
-export function registerControllers(nsp: Namespace) {
+export function registerSocketControllers(nsp: Namespace) {
     nsp.on('connection', (socket) => {
         // project-node
 

@@ -73,6 +73,7 @@ export async function getManyLogLogRouteHandler(req: Request, res: Response) : P
         end,
         labels,
         limit: 1_000,
+        sort: 'DESC',
     });
 
     return send(res, {

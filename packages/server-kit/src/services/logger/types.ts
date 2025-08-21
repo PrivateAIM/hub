@@ -10,7 +10,6 @@ import type { Logger, LoggerOptions } from 'winston';
 export type LoggerTransports = LoggerOptions['transports'];
 
 export type LoggerCreateContext = {
-    directory?: string,
     options?: Partial<LoggerOptions>,
     transports?: LoggerTransports
 };

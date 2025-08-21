@@ -4,8 +4,8 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import type { Log, LogInput } from '@privateaim/telemetry-kit';
-import { LogLevel } from '@privateaim/telemetry-kit';
+import type { LogInput } from '@privateaim/telemetry-kit';
+import { LogChannel, LogFlag, LogLevel } from '@privateaim/telemetry-kit';
 import WinstonTransport from 'winston-transport';
 import type { LoggerTransportOptions, LoggerTransportSaveFn } from './type';
 
@@ -41,12 +41,16 @@ export class LoggerTransport extends WinstonTransport {
             date = new Date();
         }
 
-        const output : Log = {
-            level: LogLevel.DEBUG,
+        const output : LogInput = {
             message: stack || message,
             time: (BigInt(date.getTime()) * 1_000_000n).toString(),
             labels: this.labels,
+            level: LogLevel.DEBUG,
+            service: 'unknown',
+            channel: LogChannel.SYSTEM,
         };
+
+        const flags = Object.values(LogFlag) as string[];
 
         const keys = Object.keys(data);
         for (let i = 0; i < keys.length; i++) {
@@ -64,10 +68,11 @@ export class LoggerTransport extends WinstonTransport {
                 continue;
             }
 
-            if (keys[i] === 'level') {
-                output.level = `${value}` as LogLevel;
-            } else {
+            const index = flags.indexOf(keys[i]);
+            if (index === -1) {
                 output.labels[keys[i]] = `${value}`;
+            } else {
+                output[keys[i]] = `${value}`;
             }
         }
 

@@ -10,16 +10,14 @@ import {
     setLoggerFactory,
 } from '@privateaim/server-kit';
 import { LoggerTransport, isLogComponentServiceUsable, useLogComponentService } from '@privateaim/server-telemetry-kit';
-import { WRITABLE_DIRECTORY_PATH } from '../../constants';
-import { useEnv } from '../env';
+import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 
 export function setupLogger(): void {
     setLoggerFactory(() => {
         const transport = new LoggerTransport({
             labels: {
-                service: 'hub-server-worker',
-                namespace: useEnv('env'),
-                type: 'system',
+                [LogFlag.SERVICE]: 'hub-server-worker',
+                [LogFlag.CHANNEL]: LogChannel.SYSTEM,
             },
             save: async (data) => {
                 if (isLogComponentServiceUsable()) {
@@ -33,7 +31,6 @@ export function setupLogger(): void {
         });
 
         return createLogger({
-            directory: WRITABLE_DIRECTORY_PATH,
             transports: [transport],
         });
     });

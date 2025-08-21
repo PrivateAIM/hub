@@ -18,7 +18,6 @@ import {
 import {
     createRegistryComponent,
 } from '../components';
-import { getWritableDirPath } from './paths';
 import {
     configureAmqp,
     configureAuthup,
@@ -36,9 +35,7 @@ export type Config = {
 };
 
 export function createConfig() : Config {
-    setupLogging({
-        directory: getWritableDirPath(),
-    });
+    setupLogging();
 
     configureTelemetryClient();
 

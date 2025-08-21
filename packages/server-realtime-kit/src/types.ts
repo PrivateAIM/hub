@@ -5,7 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Realm, Robot, User } from '@authup/core-kit';
+import type {
+    Client, Realm, Robot, User,
+} from '@authup/core-kit';
 import type { PermissionChecker } from '@authup/access';
 import type {
     Namespace as _Namespace,
@@ -24,6 +26,9 @@ export type SocketData = {
 
     robotId?: Robot['id'],
     robotName?: Robot['name'],
+
+    clientId?: Client['id'],
+    clientName?: Client['name'],
 
     namespaceId?: string,
     roomSubscriptions: Record<string, number>,

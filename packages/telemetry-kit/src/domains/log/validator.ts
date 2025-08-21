@@ -8,10 +8,10 @@
 import { createValidator } from '@validup/adapter-zod';
 import { Container } from 'validup';
 import zod from 'zod';
-import { LogLevel } from './constants';
-import type { Log } from './entity';
+import { LogChannel, LogLevel } from './constants';
+import type { LogInput } from './entity';
 
-export class LogValidator extends Container<Log> {
+export class LogValidator extends Container<LogInput> {
     protected initialize() {
         super.initialize();
 
@@ -38,15 +38,31 @@ export class LogValidator extends Container<Log> {
             ),
         );
 
+        this.mount(
+            'service',
+            createValidator(
+                zod
+                    .string()
+                    .min(3)
+                    .max(64),
+            ),
+        );
+
         // ----------------------------------------------
 
         this.mount(
             'level',
-            { optional: true },
             createValidator(
                 zod
-                    .enum(Object.values(LogLevel))
-                    .optional(),
+                    .enum(Object.values(LogLevel)),
+            ),
+        );
+
+        this.mount(
+            'channel',
+            createValidator(
+                zod
+                    .enum(Object.values(LogChannel)),
             ),
         );
 

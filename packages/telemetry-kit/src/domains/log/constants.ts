@@ -54,3 +54,20 @@ export enum LogLevel {
      */
     DEBUG = 'debug',
 }
+
+export enum LogFlag {
+    CHANNEL = 'channel',
+
+    COMPONENT = 'component',
+
+    SERVICE = 'service',
+
+    LEVEL = 'level',
+}
+
+export enum LogChannel {
+    HTTP = 'http',
+    WEBSOCKET = 'websocket',
+    BACKGROUND = 'background',
+    SYSTEM = 'system',
+}
