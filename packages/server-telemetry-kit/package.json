@@ -1,0 +1,29 @@
+{
+    "name": "@privateaim/server-telemetry-kit",
+    "version": "0.8.15",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "author": {
+        "name": "Peter Placzek",
+        "email": "contact@tada5hi.net",
+        "url": "https://tada5hi.net"
+    },
+    "license": "Apache-2.0",
+    "description": "This package contains server side db helpers & utilities.",
+    "dependencies": {
+        "winston-transport": "^4.9.0"
+    },
+    "devDependencies": {
+        "@privateaim/server-kit": "^0.8.15",
+        "@privateaim/telemetry-kit": "^0.8.15",
+        "singa": "^1.1.0"
+    },
+    "peerDependencies": {
+        "@privateaim/server-kit": "^0.8.15",
+        "@privateaim/telemetry-kit": "^0.8.15",
+        "singa": "^1.1.0"
+    },
+    "scripts": {
+        "build": "rimraf dist && tsc -p tsconfig.build.json"
+    }
+}

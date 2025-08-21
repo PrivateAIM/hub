@@ -5,10 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { pickRecord } from '@authup/kit';
 import { isRealmResourceWritable } from '@privateaim/kit';
 import { ForbiddenError } from '@ebec/http';
+import type { LogLevel } from '@privateaim/telemetry-kit';
 import type { Request, Response } from 'routup';
-import { sendCreated } from 'routup';
+import { sendAccepted } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { HTTPHandlerOperation, useRequestIdentityRealm } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
@@ -17,8 +19,8 @@ import {
     AnalysisEntity,
     NodeEntity,
 } from '../../../../database';
+import { isTelemetryClientUsable, useTelemetryClient } from '../../../../services';
 import { AnalysisNodeLogValidator } from '../utils';
-import { useAnalysisNodeLogStore } from '../../../../domains';
 
 export async function createAnalysisNodeLogRouteHandler(req: Request, res: Response) : Promise<any> {
     const validator = new AnalysisNodeLogValidator();
@@ -55,8 +57,39 @@ export async function createAnalysisNodeLogRouteHandler(req: Request, res: Respo
         throw new ForbiddenError('You are not an actor of to the node realm.');
     }
 
-    const store = useAnalysisNodeLogStore();
-    const entity = await store.write(data);
+    if (!isTelemetryClientUsable()) {
+        return sendAccepted(res);
+    }
 
-    return sendCreated(res, entity);
+    const telemetry = useTelemetryClient();
+
+    const labels : Record<string, string> = {};
+    const labelsRaw = {
+        entity: 'analysisNode',
+        ...(data.labels || {}),
+        ...pickRecord(data, [
+            'analysis_id',
+            'analysis_realm_id',
+            'node_id',
+            'node_realm_id',
+            'code',
+            'status',
+        ]),
+    };
+
+    const keys = Object.keys(labelsRaw);
+    for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
+        if (typeof labelsRaw[key] === 'string') {
+            labels[key] = labelsRaw[key];
+        }
+    }
+
+    await telemetry.log.create({
+        level: data.level as LogLevel,
+        message: data.message,
+        labels,
+    });
+
+    return sendAccepted(res);
 }

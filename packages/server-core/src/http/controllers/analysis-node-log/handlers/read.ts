@@ -5,18 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { Log, LogLevel } from '@privateaim/telemetry-kit';
 import { useRequestQuery } from '@routup/basic/query';
 import type { Request, Response } from 'routup';
 import { send } from 'routup';
-import { FilterComparisonOperator, parseQuery } from 'rapiq';
+import type { FiltersBuildInput } from 'rapiq';
+import { parseQuery } from 'rapiq';
 import type { AnalysisNodeLog } from '@privateaim/core-kit';
-import { BadRequestError } from '@ebec/http';
-import type { AnalysisNodeLogQueryOptions } from '../../../../domains';
-import { useAnalysisNodeLogStore } from '../../../../domains';
+import { isTelemetryClientUsable, useTelemetryClient } from '../../../../services';
 
 export async function getManyAnalysisNodeLogRouteHandler(req: Request, res: Response) : Promise<any> {
     const output = parseQuery<AnalysisNodeLog>(useRequestQuery(req), {
-        defaultPath: 'log',
         filters: {
             allowed: [
                 'level',
@@ -33,59 +32,54 @@ export async function getManyAnalysisNodeLogRouteHandler(req: Request, res: Resp
         },
     });
 
-    const options : AnalysisNodeLogQueryOptions = {};
+    const filters : FiltersBuildInput<Log> = {
+        labels: {
+            entity: 'analysisNode',
+        },
+    };
 
-    if (output.filters) {
-        for (let i = 0; i < output.filters.length; i++) {
-            const key = output.filters[i].key as keyof AnalysisNodeLog;
-            if (key === 'analysis_id') {
-                options.analysis_id = `${output.filters[i].value}`;
-            } else if (key === 'node_id') {
-                options.node_id = `${output.filters[i].value}`;
-            } else if (key === 'time') {
-                if (
-                    output.filters[i].operator === FilterComparisonOperator.LESS_THAN ||
-                    output.filters[i].operator === FilterComparisonOperator.LESS_THAN_EQUAL
-                ) {
-                    options.end = new Date(`${output.filters[i].value}`).getTime();
-                }
+    // todo: clean up this
 
-                if (
-                    output.filters[i].operator === FilterComparisonOperator.GREATER_THAN ||
-                    output.filters[i].operator === FilterComparisonOperator.GREATER_THAN_EQUAL
-                ) {
-                    options.start = new Date(`${output.filters[i].value}`).getTime();
-                }
-            }
+    for (let i = 0; i < output.filters.length; i++) {
+        const filter = output.filters[i];
+        if (filter.key === 'analysis_id' || filter.key === 'node_id') {
+            filters.labels = filters.labels || {};
+            filters.labels[filter.key] = `${filter.value}`;
+
+            continue;
+        }
+
+        if (filter.key === 'level') {
+            filters.level = `${filter.value}` as LogLevel;
+        }
+
+        if (filter.key === 'time') {
+            // todo: respect operator
+            filters.time = `>${filter.value}`;
         }
     }
 
-    if (!options.analysis_id || !options.node_id) {
-        throw new BadRequestError('The filters node_id and analysis_id must be defined.');
+    // todo: sort missing
+
+    if (isTelemetryClientUsable()) {
+        const telemetryClient = useTelemetryClient();
+
+        const response = await telemetryClient.log.getMany({
+            filters,
+            pagination: output.pagination,
+        });
+
+        return send(res, response);
     }
-
-    // todo: check permissions
-
-    if (output.sort) {
-        for (let i = 0; i < output.sort.length; i++) {
-            if (output.sort[i].key === 'created_at') {
-                options.sort = output.sort[i].value;
-            }
-        }
-    }
-
-    if (output.pagination && output.pagination.limit) {
-        options.limit = output.pagination.limit;
-    }
-
-    const store = useAnalysisNodeLogStore();
-    const [data, total] = await store.query(options);
 
     return send(res, {
-        data,
+        data: [],
         meta: {
-            total,
-            pagination: output.pagination,
+            total: 0,
+            pagination: {
+                limit: 50,
+                offset: 0,
+            },
         },
     });
 }

@@ -27,6 +27,7 @@
         "@privateaim/server-http-kit": "^0.8.15",
         "@privateaim/server-analysis-manager-kit": "^0.7.16",
         "@privateaim/server-telemetry": "^0.8.15",
+        "@privateaim/server-telemetry-kit": "^0.8.15",
         "@routup/basic": "^1.4.2",
         "@routup/decorators": "^3.4.2",
         "@routup/prometheus": "^2.4.1",

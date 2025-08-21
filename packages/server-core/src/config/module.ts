@@ -24,8 +24,8 @@ import {
     configureAuthup,
     configureAuthupClientAuthenticationHook,
     configureDomainEventPublisher,
-    configureLoki,
     configureRedis,
+    configureTelemetryClient,
     configureVault,
     setupLogging,
 } from './services';
@@ -36,11 +36,11 @@ export type Config = {
 };
 
 export function createConfig() : Config {
-    configureLoki();
-
     setupLogging({
         directory: getWritableDirPath(),
     });
+
+    configureTelemetryClient();
 
     configureAuthupClientAuthenticationHook();
 

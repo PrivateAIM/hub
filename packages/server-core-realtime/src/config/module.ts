@@ -5,14 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { WRITABLE_DIR_PATH } from './constants';
-import { setupLogger, setupRedis, setupVault } from './services';
+import { setupRedis, setupVault } from './services';
 
 export function setupConfig() {
-    setupLogger({
-        directory: WRITABLE_DIR_PATH,
-    });
-
     setupRedis();
 
     setupVault();

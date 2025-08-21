@@ -8,6 +8,8 @@
 import type { Logger } from '@privateaim/server-kit';
 import { createLogger } from '@privateaim/server-kit';
 import { ComponentName } from '@privateaim/server-analysis-manager-kit';
+import { LoggerTransport, isLogComponentServiceUsable, useLogComponentService } from '@privateaim/server-telemetry-kit';
+import { useEnv } from '../../../config';
 
 import { WRITABLE_DIRECTORY_PATH } from '../../../constants';
 
@@ -18,15 +20,31 @@ export function useCoreLogger() : Logger {
         return instance;
     }
 
+    const transport = new LoggerTransport({
+        labels: {
+            service: 'hub-server-worker',
+            namespace: useEnv('env'),
+            type: 'system',
+            component: ComponentName.CORE,
+        },
+        save: async (data) => {
+            if (isLogComponentServiceUsable()) {
+                const logComponent = useLogComponentService();
+                await logComponent.command({
+                    command: 'write',
+                    data,
+                });
+            }
+        },
+    });
+
     instance = createLogger({
         options: {
             defaultMeta: {
                 component: ComponentName.CORE,
             },
         },
-        labels: {
-            component: ComponentName.CORE,
-        },
+        transports: [transport],
         // todo: allow specifying custom path
         directory: WRITABLE_DIRECTORY_PATH,
     });

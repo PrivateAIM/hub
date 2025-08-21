@@ -6,7 +6,7 @@
  */
 
 import { ComponentHandlers } from '@privateaim/server-kit';
-import { EventCommand } from '../constants';
+import { EventCommand } from '@privateaim/server-telemetry-kit';
 import { EventComponentCleanerHandler } from './cleaner';
 import { EventComponentCreateHandler } from './create';
 

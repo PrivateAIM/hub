@@ -6,13 +6,20 @@
  */
 
 import type { Realm } from '@authup/core-kit';
-import type { Log } from '@privateaim/kit';
 import type {
     Analysis,
 } from '../analysis';
 import type { Node } from '../node';
 
-export interface AnalysisNodeLog extends Log {
+export interface AnalysisNodeLog {
+    message: string,
+
+    level: string,
+
+    labels: Record<string, string>,
+
+    time: string | bigint | null,
+
     /**
      * e.g: entrypointNotFound, ...
      */

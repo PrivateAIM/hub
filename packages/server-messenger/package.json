@@ -15,6 +15,7 @@
         "@ebec/http": "^2.3.0",
         "@privateaim/messenger-kit": "^0.7.16",
         "@privateaim/server-kit": "^0.8.15",
+        "@privateaim/server-telemetry-kit": "^0.8.15",
         "@privateaim/server-http-kit": "^0.8.15",
         "@privateaim/server-realtime-kit": "^0.8.15",
         "@socket.io/redis-adapter": "^8.3.0",

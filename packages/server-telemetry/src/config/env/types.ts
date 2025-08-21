@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { EnvironmentName } from './constants';
+import type { EnvironmentName } from '@privateaim/kit';
 
 export interface Environment {
     env: `${EnvironmentName}`,
@@ -17,4 +17,7 @@ export interface Environment {
     redisConnectionString?: string | null,
     vaultConnectionString?: string | null,
     authupURL?: string | null,
+    lokiURL?: string | null,
+    lokiCompactorURL?: string | null,
+    lokiQuerierURL?: string | null
 }

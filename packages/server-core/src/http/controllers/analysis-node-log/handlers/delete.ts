@@ -6,12 +6,14 @@
  */
 
 import { BadRequestError } from '@ebec/http';
+import type { Log } from '@privateaim/telemetry-kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted } from 'routup';
-import { type FiltersParseOutputElement, parseQueryFilters } from 'rapiq';
+import type { FiltersBuildInput } from 'rapiq';
+import { parseQueryFilters } from 'rapiq';
 import { useRequestQuery } from '@routup/basic/query';
 import type { AnalysisNodeLog } from '@privateaim/core-kit';
-import { useAnalysisNodeLogStore } from '../../../../domains';
+import { isTelemetryClientUsable, useTelemetryClient } from '../../../../services';
 
 export async function deleteAnalysisNodeLogRouteHandler(req: Request, res: Response) : Promise<any> {
     const output = parseQueryFilters<AnalysisNodeLog>(
@@ -24,26 +26,32 @@ export async function deleteAnalysisNodeLogRouteHandler(req: Request, res: Respo
         },
     );
 
-    const filters : Partial<Record<keyof AnalysisNodeLog, FiltersParseOutputElement>> = {};
+    const filters : FiltersBuildInput<Log> = {
+        labels: {
+            entity: 'analysisNode',
+        },
+        time: `>${((BigInt(Math.floor(Date.now() / 1000) - (60 * 60 * 24 * 31 * 12 * 10))) * 1_000_000n).toString()}`,
+    };
 
     if (output) {
         for (let i = 0; i < output.length; i++) {
-            filters[output[i].key as keyof AnalysisNodeLog] = output[i];
+            filters.labels = filters.labels || {};
+            filters.labels[output[i].key] = `${output[i].value}`;
         }
     }
 
-    if (!filters.analysis_id || !filters.node_id) {
+    if (!filters.labels?.analysis_id || !filters.labels?.node_id) {
         throw new BadRequestError('The filters node_id and analysis_id must be defined.');
     }
 
     // todo: check permissions
 
-    const store = useAnalysisNodeLogStore();
-    await store.delete({
-        analysis_id: `${filters.analysis_id.value}`,
-        node_id: `${filters.node_id.value}`,
-        start: Math.floor(Date.now() / 1000) - (60 * 60 * 24 * 31 * 12 * 10),
-    });
+    if (isTelemetryClientUsable()) {
+        const telemetryClient = useTelemetryClient();
+        await telemetryClient.log.deleteMany({
+            filters,
+        });
+    }
 
     return sendAccepted(res);
 }

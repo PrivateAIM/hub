@@ -26,6 +26,10 @@ export type QueueRouterPayloadMetadata = {
     routing: QueueRouterRouting
 };
 
+export type QueueRouterPublishOptions = {
+    logging?: boolean
+};
+
 export type QueueRouterPayload<
     T = string,
     D = Record<string, any>,

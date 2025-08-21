@@ -16,12 +16,11 @@ import {
 } from '@privateaim/server-analysis-manager-kit';
 import type { QueueRouterHandlers } from '@privateaim/server-kit';
 import type { Event } from '@privateaim/telemetry-kit';
-import { useEventComponentService } from '@privateaim/server-telemetry';
 import { hasOwnProperty } from '@privateaim/kit';
+import { isEventComponentServiceUsable, useEventComponentService } from '@privateaim/server-telemetry-kit';
 import { MasterImageSynchronizerService } from '../../../services';
 
 export function createAnalysisManagerMasterImagesHandlers() : QueueRouterHandlers<Partial<MasterImagesEventMap>> {
-    const event = useEventComponentService();
     const synchronizer = new MasterImageSynchronizerService();
     const queue = useMasterImageQueueService();
 
@@ -66,10 +65,13 @@ export function createAnalysisManagerMasterImagesHandlers() : QueueRouterHandler
                 };
             }
 
-            await event.command({
-                command: 'create',
-                data: entity,
-            });
+            if (isEventComponentServiceUsable()) {
+                const event = useEventComponentService();
+                await event.command({
+                    command: 'create',
+                    data: entity,
+                });
+            }
         },
         [MasterImagesEvent.SYNCHRONIZED]: async (
             message,

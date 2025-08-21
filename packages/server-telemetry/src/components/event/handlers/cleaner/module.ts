@@ -9,21 +9,21 @@ import type { ComponentHandler } from '@privateaim/server-kit';
 import cron from 'node-cron';
 import { LessThan } from 'typeorm';
 import { useDataSource } from 'typeorm-extension';
-import type { EventCommand } from '../../constants';
+import type { EventCommand } from '@privateaim/server-telemetry-kit';
 import { EventEntity } from '../../../../database';
 
 export class EventComponentCleanerHandler implements ComponentHandler<
 EventCommand.CLEAN
 > {
     async setup() : Promise<void> {
-        await this.execute();
+        await this.handle();
 
         cron.schedule('0 1 * * *', async () => {
-            await this.execute();
+            await this.handle();
         });
     }
 
-    async execute(): Promise<void> {
+    async handle(): Promise<void> {
         const dataSource = await useDataSource();
         const repository = dataSource.getRepository(EventEntity);
 

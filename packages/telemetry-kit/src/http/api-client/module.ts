@@ -9,15 +9,19 @@ import type { RequestBaseOptions } from 'hapic';
 import { Client, HookName, isClientError } from 'hapic';
 import {
     EventAPI,
+    LogAPI,
 } from '../../domains';
 
 export class APIClient extends Client {
     public readonly event : EventAPI;
 
+    public readonly log : LogAPI;
+
     constructor(config: RequestBaseOptions) {
         super(config);
 
         this.event = new EventAPI({ client: this });
+        this.log = new LogAPI({ client: this });
 
         this.on(HookName.RESPONSE_ERROR, ((error) => {
             if (

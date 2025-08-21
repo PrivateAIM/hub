@@ -5,13 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import
-type { BuildInput } from 'rapiq';
+import type { BuildInput } from 'rapiq';
 import { buildQuery } from 'rapiq';
 import type { AnalysisNodeLog } from '@privateaim/core-kit';
-import type { Log } from '@privateaim/kit/src';
+import type { Log } from '@privateaim/telemetry-kit';
 import { BaseAPI } from '../base';
-import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
+import type { CollectionResourceResponse } from '../types-base';
 
 export class AnalysisNodeLogAPI extends BaseAPI {
     async getMany(options: BuildInput<AnalysisNodeLog> = {}): Promise<CollectionResourceResponse<Log>> {
@@ -23,8 +22,7 @@ export class AnalysisNodeLogAPI extends BaseAPI {
         await this.client.delete(`analysis-node-logs${buildQuery(options)}`);
     }
 
-    async create(data: Partial<AnalysisNodeLog>): Promise<SingleResourceResponse<Log>> {
-        const { data: response } = await this.client.post('analysis-node-logs', data);
-        return response;
+    async create(data: Partial<AnalysisNodeLog>): Promise<void> {
+        await this.client.post('analysis-node-logs', data);
     }
 }

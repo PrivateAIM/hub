@@ -12,6 +12,7 @@
             "@privateaim/server-http-kit": ["./packages/server-http-kit/src"],
             "@privateaim/server-analysis-manager-kit": ["./packages/server-analysis-manager-kit/src"],
             "@privateaim/server-telemetry": ["./packages/server-telemetry/src"],
+            "@privateaim/server-telemetry-kit": ["./packages/server-telemetry-kit/src"],
         }
     }
 }

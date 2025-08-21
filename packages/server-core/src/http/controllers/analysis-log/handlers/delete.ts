@@ -6,12 +6,13 @@
  */
 
 import { BadRequestError } from '@ebec/http';
+import type { Log } from '@privateaim/telemetry-kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted } from 'routup';
-import { type FiltersParseOutputElement, parseQueryFilters } from 'rapiq';
+import { type FiltersBuildInput, parseQueryFilters } from 'rapiq';
 import type { AnalysisLog } from '@privateaim/core-kit';
 import { useRequestQuery } from '@routup/basic/query';
-import { useAnalysisLogStore } from '../../../../domains';
+import { isTelemetryClientUsable, useTelemetryClient } from '../../../../services';
 
 export async function deleteAnalysisLogRouteHandler(req: Request, res: Response) : Promise<any> {
     const output = parseQueryFilters<AnalysisLog>(
@@ -23,23 +24,32 @@ export async function deleteAnalysisLogRouteHandler(req: Request, res: Response)
         },
     );
 
-    const filters : Partial<Record<keyof AnalysisLog, FiltersParseOutputElement>> = {};
+    const filters : FiltersBuildInput<Log> = {
+        labels: {
+            entity: 'analysis',
+        },
+        time: `>${((BigInt(Math.floor(Date.now() / 1000) - (60 * 60 * 24 * 31 * 12 * 10))) * 1_000_000n).toString()}`,
+    };
 
     if (output) {
         for (let i = 0; i < output.length; i++) {
-            filters[output[i].key as keyof AnalysisLog] = output[i];
+            filters.labels = filters.labels || {};
+            filters.labels[output[i].key] = `${output[i].value}`;
         }
     }
 
-    if (!filters.analysis_id) {
+    if (!filters.labels?.analysis_id) {
         throw new BadRequestError('The filter analysis_id must be defined.');
     }
 
-    const store = useAnalysisLogStore();
-    await store.delete({
-        analysis_id: `${filters.analysis_id.value}`,
-        start: Math.floor(Date.now() / 1000) - (60 * 60 * 24 * 31 * 12 * 10),
-    });
+    // todo: check permissions
+
+    if (isTelemetryClientUsable()) {
+        const telemetryClient = useTelemetryClient();
+        await telemetryClient.log.deleteMany({
+            filters,
+        });
+    }
 
     return sendAccepted(res);
 }

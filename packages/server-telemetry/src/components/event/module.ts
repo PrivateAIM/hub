@@ -5,10 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { EnvironmentName } from '@privateaim/kit';
 import type { Component } from '@privateaim/server-kit';
 import { isQueueRouterUsable, useLogger, useQueueRouter } from '@privateaim/server-kit';
-import { EventTaskQueueRouterRouting } from './constants';
-import { EnvironmentName, useEnv } from '../../config';
+import { EventTaskQueueRouterRouting } from '@privateaim/server-telemetry-kit';
+import { useEnv } from '../../config';
 import { definEventComponentHandlers } from './handlers';
 
 export function defineEventComponent() : Component {

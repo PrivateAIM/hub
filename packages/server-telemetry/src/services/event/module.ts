@@ -5,44 +5,35 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import { buildQueueRouterPublishPayload, isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
-import type { EventCommandContext, EventEventContext } from '../../components/event/types';
-import { EventEventQueueRouterRouting, EventTaskQueueRouterRouting } from '../../components/event/constants';
+import type { ComponentHandlers } from '@privateaim/server-kit';
+import type { EventCommandContext, EventEventContext } from '@privateaim/server-telemetry-kit';
+import {
+    EventComponentService as BaseEventComponentService,
+} from '@privateaim/server-telemetry-kit';
+import { definEventComponentHandlers } from '../../components/event/handlers';
 
-export class EventComponentService {
+export class EventComponentService extends BaseEventComponentService {
+    protected eventHandlers: ComponentHandlers;
+
+    constructor() {
+        super();
+
+        this.eventHandlers = definEventComponentHandlers();
+    }
+
     async command(ctx: EventCommandContext) {
-        if (isQueueRouterUsable()) {
-            const queueRouter = useQueueRouter();
-
-            const queueRouterPayload = buildQueueRouterPublishPayload({
-                type: ctx.command,
-                data: ctx.data,
-                metadata: {
-                    routing: EventTaskQueueRouterRouting,
-                },
-            });
-
-            await queueRouter.publish(queueRouterPayload);
+        try {
+            await super.command(ctx);
+        } catch (e) {
+            await this.eventHandlers.execute(ctx.command, ctx.data, {});
         }
-
-        // todo: execute component directly
     }
 
     async event(ctx: EventEventContext) {
-        if (isQueueRouterUsable()) {
-            const queueRouter = useQueueRouter();
-
-            const queueRouterPayload = buildQueueRouterPublishPayload({
-                type: ctx.event,
-                data: ctx.data,
-                metadata: {
-                    routing: EventEventQueueRouterRouting,
-                },
-            });
-
-            await queueRouter.publish(queueRouterPayload);
+        try {
+            await super.event(ctx);
+        } catch (e) {
+            await this.eventHandlers.execute(ctx.event, ctx.data, { });
         }
-
-        // todo: execute component directly
     }
 }

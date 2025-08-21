@@ -51,7 +51,7 @@ export class ComponentHandlers {
         if (isComponentHandlerFn(handler)) {
             await handler(value, { key, metadata });
         } else {
-            await handler.execute(value, { key, metadata });
+            await handler.handle(value, { key, metadata });
         }
     }
 }

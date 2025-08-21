@@ -13,7 +13,7 @@ import { isQueueRouterPayload } from './helpers';
 import type {
     QueueRouterHandler,
     QueueRouterHandlers,
-    QueueRouterPayload, QueueRouterRouting,
+    QueueRouterPayload, QueueRouterPublishOptions, QueueRouterRouting,
 } from './types';
 
 export class QueueRouter {
@@ -27,7 +27,12 @@ export class QueueRouter {
 
     //----------------------------------------------------------------
 
-    publish(message: QueueRouterPayload) : Promise<boolean> {
+    publish(
+        message: QueueRouterPayload,
+        options: QueueRouterPublishOptions = {},
+    ) : Promise<boolean> {
+        options.logging ??= true;
+
         let exchange : Client;
         if (message.metadata.routing.type === 'work') {
             exchange = this.driver.of({
@@ -41,7 +46,10 @@ export class QueueRouter {
             });
         }
 
-        if (isLoggerUsable()) {
+        if (
+            options.logging &&
+            isLoggerUsable()
+        ) {
             useLogger()
                 .debug(`Publishing queue message ${message.type} in ${message.metadata.routing.key}`);
         }

@@ -11,7 +11,7 @@ import type { Event, EventData } from '@privateaim/telemetry-kit';
 import { DomainEventName } from '@privateaim/core-kit';
 import type { ObjectDiff, ObjectLiteral } from '@privateaim/kit';
 import { isObject } from '@privateaim/kit';
-import { useEventComponentService } from '@privateaim/server-telemetry';
+import { isEventComponentServiceUsable, useEventComponentService } from '@privateaim/server-telemetry-kit';
 
 export class DatabaseDomainEventConsumer implements IDomainEventConsumer {
     async consume(ctx: DomainEventConsumeOptions): Promise<void> {
@@ -40,6 +40,13 @@ export class DatabaseDomainEventConsumer implements IDomainEventConsumer {
             if (ctx.metadata[keys[i]]) {
                 (entity as ObjectLiteral)[keys[i]] = ctx.metadata[keys[i]];
             }
+        }
+
+        if (
+            entity.request_ip_address &&
+            entity.request_ip_address === '::1'
+        ) {
+            entity.request_ip_address = '127.0.0.1';
         }
 
         const data : EventData = {};
@@ -75,10 +82,12 @@ export class DatabaseDomainEventConsumer implements IDomainEventConsumer {
 
         entity.data = data;
 
-        const eventService = useEventComponentService();
-        await eventService.command({
-            command: 'create',
-            data: entity,
-        });
+        if (isEventComponentServiceUsable()) {
+            const eventService = useEventComponentService();
+            await eventService.command({
+                command: 'create',
+                data: entity,
+            });
+        }
     }
 }

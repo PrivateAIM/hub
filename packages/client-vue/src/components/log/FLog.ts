@@ -12,8 +12,8 @@ import {
 import type {
     PropType,
 } from 'vue';
-import type { Log } from '@privateaim/kit';
-import { LogLevel } from '@privateaim/kit';
+import type { Log } from '@privateaim/telemetry-kit';
+import { LogLevel } from '@privateaim/telemetry-kit';
 
 export default defineComponent({
     props: {

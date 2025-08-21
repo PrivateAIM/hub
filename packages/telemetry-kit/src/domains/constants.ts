@@ -7,4 +7,5 @@
 
 export enum DomainType {
     EVENT = 'event',
+    LOG = 'log',
 }
