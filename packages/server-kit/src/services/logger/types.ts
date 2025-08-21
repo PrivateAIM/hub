@@ -12,7 +12,6 @@ export type LoggerTransports = LoggerOptions['transports'];
 export type LoggerCreateContext = {
     directory?: string,
     options?: Partial<LoggerOptions>,
-    labels?: Record<string, string>,
     transports?: LoggerTransports
 };
 

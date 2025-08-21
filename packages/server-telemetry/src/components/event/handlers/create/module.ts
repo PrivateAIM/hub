@@ -24,7 +24,7 @@ EventCreateCommandPayload
         this.validator = new EventValidator();
     }
 
-    async execute(
+    async handle(
         input: EventCreateCommandPayload,
     ): Promise<void> {
         const data = await this.validator.run(input);

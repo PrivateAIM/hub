@@ -21,7 +21,7 @@ import {
 } from '@privateaim/server-kit';
 import { Router, coreHandler } from 'routup';
 import { useEnv } from '../config';
-import { EventController } from './controllers';
+import { EventController, LogController } from './controllers';
 
 export function createHTTPRouter() : Router {
     const router = new Router();
@@ -56,6 +56,7 @@ export function createHTTPRouter() : Router {
         decorators: {
             controllers: [
                 EventController,
+                LogController,
             ],
         },
     });

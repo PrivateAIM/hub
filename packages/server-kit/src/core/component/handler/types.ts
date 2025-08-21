@@ -24,5 +24,5 @@ export type ComponentHandler<
     VALUE extends ObjectLiteral = ObjectLiteral,
 > = {
     setup?: () => Promise<void> | void;
-    execute: ComponentHandlerFn<KEY, VALUE>
+    handle: ComponentHandlerFn<KEY, VALUE>
 };

@@ -7,15 +7,36 @@
 
 import type { LoggerCreateContext } from '@privateaim/server-kit';
 import { createLogger, setLoggerFactory } from '@privateaim/server-kit';
+import {
+    LoggerTransport,
+    isLogComponentServiceUsable,
+    useLogComponentService,
+} from '@privateaim/server-telemetry-kit';
 import { useEnv } from '../env';
 
 export function setupLogging(ctx: LoggerCreateContext): void {
-    setLoggerFactory(() => createLogger({
-        ...ctx,
-        labels: {
-            service: 'hub-server-storage',
-            namespace: useEnv('env'),
-            type: 'system',
-        },
-    }));
+    setLoggerFactory(() => {
+        const transport = new LoggerTransport({
+            labels: {
+                service: 'hub-server-storage',
+                namespace: useEnv('env'),
+                type: 'system',
+            },
+            save: async (data) => {
+                if (isLogComponentServiceUsable()) {
+                    const component = useLogComponentService();
+
+                    await component.command({
+                        command: 'write',
+                        data,
+                    });
+                }
+            },
+        });
+
+        return createLogger({
+            ...ctx,
+            transports: [transport],
+        });
+    });
 }

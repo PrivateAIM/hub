@@ -43,6 +43,7 @@
         "locter": "^2.1.6",
         "mysql2": "^3.14.3",
         "node-cron": "^4.2.1",
+        "rapiq": "0.9.0",
         "redis-extension": "^2.0.2",
         "routup": "^4.0.2",
         "singa": "^1.1.0",

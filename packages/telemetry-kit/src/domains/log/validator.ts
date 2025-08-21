@@ -21,8 +21,8 @@ export class LogValidator extends Container<Log> {
             createValidator(
                 zod
                     .string()
-                    .min(10)
-                    .max(12)
+                    .min(0)
+                    .max(20)
                     .or(zod.bigint())
                     .optional(),
             ),

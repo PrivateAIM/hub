@@ -6,8 +6,6 @@
  */
 
 module.exports = {
-    globalSetup: './test/setup.js',
-    globalTeardown: './test/teardown.js',
     testSequencer: './test/utils/test-sequencer.js',
     testEnvironment: 'node',
     transform: {

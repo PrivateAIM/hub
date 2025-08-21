@@ -17,6 +17,7 @@
         "@privateaim/kit": "^0.8.15",
         "@privateaim/server-kit": "^0.8.15",
         "@privateaim/server-http-kit": "^0.8.15",
+        "@privateaim/server-telemetry-kit": "^0.8.15",
         "@privateaim/storage-kit": "^0.8.15",
         "@routup/basic": "^1.4.2",
         "@routup/decorators": "^3.4.2",

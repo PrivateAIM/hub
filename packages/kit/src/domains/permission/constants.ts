@@ -14,6 +14,10 @@ export enum PermissionName {
     BUCKET_UPDATE = 'bucket_update',
     BUCKET_DELETE = 'bucket_delete',
 
+    LOG_CREATE = 'log_create',
+    LOG_DELETE = 'log_delete',
+    LOG_READ = 'log_read',
+
     PROJECT_CREATE = 'project_create',
     PROJECT_DELETE = 'project_delete',
     PROJECT_UPDATE = 'project_update',

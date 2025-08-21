@@ -110,11 +110,11 @@ export class LokiLogStore extends BaseLogStore implements LogStore {
         }
 
         if (input.start) {
-            options.start = BigInt(new Date(`${input.start}`).getTime()) * 1_000_000n;
+            options.start = BigInt(input.start) * 1_000_000n;
         }
 
         if (input.end) {
-            options.end = BigInt(new Date(`${input.end}`).getTime()) * 1_000_000n;
+            options.end = BigInt(input.end) * 1_000_000n;
         }
 
         const output : Log[] = [];
