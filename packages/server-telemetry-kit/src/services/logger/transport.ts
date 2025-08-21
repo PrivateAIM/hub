@@ -44,7 +44,7 @@ export class LoggerTransport extends WinstonTransport {
         const output : LogInput = {
             message: stack || message,
             time: (BigInt(date.getTime()) * 1_000_000n).toString(),
-            labels: this.labels,
+            labels: { ...this.labels },
             level: LogLevel.DEBUG,
             service: 'unknown',
             channel: LogChannel.SYSTEM,
@@ -52,7 +52,16 @@ export class LoggerTransport extends WinstonTransport {
 
         const flags = Object.values(LogFlag) as string[];
 
-        const keys = Object.keys(data);
+        let keys = Object.keys(output.labels);
+        for (let i = 0; i < keys.length; i++) {
+            const index = flags.indexOf(keys[i]);
+            if (index !== -1) {
+                output[keys[i]] = output.labels[keys[i]];
+                delete output.labels[keys[i]];
+            }
+        }
+
+        keys = Object.keys(data);
         for (let i = 0; i < keys.length; i++) {
             if (typeof keys[i] !== 'string') {
                 continue;

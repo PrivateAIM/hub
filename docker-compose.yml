@@ -19,6 +19,9 @@ services:
             interval: 3s
             timeout: 5s
             retries: 5
+        volumes:
+            - './loki-config.yaml:/loki-config.yaml'
+        command: --config.file=/loki-config.yaml
     grafana:
         image: grafana/grafana:latest
         environment:
