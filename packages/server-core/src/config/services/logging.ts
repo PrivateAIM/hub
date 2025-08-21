@@ -5,21 +5,19 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { LoggerCreateContext } from '@privateaim/server-kit';
 import {
     createLogger,
     setLoggerFactory,
 } from '@privateaim/server-kit';
 import { LoggerTransport, isLogComponentServiceUsable, useLogComponentService } from '@privateaim/server-telemetry-kit';
-import { useEnv } from '../env';
+import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 
-export function setupLogging(ctx: LoggerCreateContext): void {
+export function setupLogging(): void {
     setLoggerFactory(() => {
         const transport = new LoggerTransport({
             labels: {
-                service: 'hub-server-core',
-                namespace: useEnv('env'),
-                type: 'system',
+                [LogFlag.SERVICE]: 'hub-server-core',
+                [LogFlag.CHANNEL]: LogChannel.SYSTEM,
             },
             save: async (data) => {
                 if (isLogComponentServiceUsable()) {
@@ -33,7 +31,6 @@ export function setupLogging(ctx: LoggerCreateContext): void {
         });
 
         return createLogger({
-            ...ctx,
             transports: [transport],
         });
     });

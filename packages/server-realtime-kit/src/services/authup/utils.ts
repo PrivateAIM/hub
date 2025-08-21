@@ -75,5 +75,10 @@ export function applyTokenVerificationData(
             socket.data.robotName = data.sub_name;
             break;
         }
+        case OAuth2SubKind.CLIENT: {
+            socket.data.clientId = data.sub;
+            socket.data.clientName = data.sub_name;
+            break;
+        }
     }
 }

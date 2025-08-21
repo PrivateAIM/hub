@@ -27,6 +27,7 @@
         "@privateaim/core-kit": "^0.8.15",
         "@privateaim/kit": "^0.8.15",
         "@privateaim/core-http-kit": "^0.8.15",
+        "@privateaim/telemetry-kit": "^0.8.15",
         "@privateaim/server-kit": "^0.8.15",
         "@privateaim/server-telemetry-kit": "^0.8.15",
         "@privateaim/server-analysis-manager-kit": "^0.7.16",

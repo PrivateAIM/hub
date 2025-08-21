@@ -6,8 +6,6 @@
  */
 
 import type { Log, LogInput } from '@privateaim/telemetry-kit';
-import { LogLevel } from '@privateaim/telemetry-kit';
-import { nanoSeconds } from '@hapic/loki';
 import type {
     LogStore, LogStoreQueryOptions,
 } from '../types';
@@ -59,42 +57,10 @@ export class MemoryLogStore extends BaseLogStore implements LogStore {
     }
 
     async write(message: string | LogInput, labels?: Record<string, string>): Promise<Log> {
-        let data : Log;
+        const output = this.normalizeInput(message, labels);
 
-        if (typeof message === 'string') {
-            const labelsNormalized = {
-                ...this.labels,
-                ...(labels || {}),
-            };
-            const level = (labelsNormalized.level || LogLevel.DEBUG) as LogLevel;
-            delete labelsNormalized.level;
+        this.items.push(output);
 
-            data = {
-                message,
-                level,
-                time: nanoSeconds(),
-                labels: labelsNormalized,
-            };
-        } else {
-            const labelsNormalized = {
-                ...this.labels,
-                ...(message.labels || {}),
-                ...(labels || {}),
-            };
-
-            const level = (message.level || labelsNormalized.level || LogLevel.DEBUG) as LogLevel;
-            delete labelsNormalized.level;
-
-            data = {
-                ...message,
-                level,
-                time: message.time || nanoSeconds(),
-                labels: labelsNormalized,
-            };
-        }
-
-        this.items.push(data);
-
-        return data;
+        return output;
     }
 }

@@ -6,8 +6,8 @@
  */
 
 import type { ComponentHandler } from '@privateaim/server-kit';
-import type { Log } from '@privateaim/telemetry-kit';
-import { LogLevel, LogValidator } from '@privateaim/telemetry-kit';
+import type { Log, LogInput } from '@privateaim/telemetry-kit';
+import { LogValidator } from '@privateaim/telemetry-kit';
 import type { LogCommand, LogWriteCommandPayload } from '@privateaim/server-telemetry-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import type { Request } from 'routup';
@@ -30,29 +30,27 @@ LogWriteCommandPayload
     async handle(
         input: LogWriteCommandPayload,
     ): Promise<void> {
-        const data = await this.validate(input);
+        try {
+            const data = await this.validate(input);
 
-        await this.write(data);
+            await this.write(data);
+        } catch (e) {
+            console.log(input);
+
+            throw e;
+        }
     }
 
-    async validate(input: LogWriteCommandPayload) : Promise<Log> {
+    async validate(input: LogWriteCommandPayload) : Promise<LogInput> {
         return this.validator.run(input);
     }
 
-    async validateWithRequest(request: Request) : Promise<Log> {
+    async validateWithRequest(request: Request) : Promise<LogInput> {
         const validatorAdapter = new RoutupContainerAdapter(this.validator);
         return validatorAdapter.run(request);
     }
 
-    async write(value: Log) : Promise<Log> {
-        if (
-            value.level &&
-            value.level !== LogLevel.DEBUG
-        ) {
-            return this.store.write(value);
-        }
-
-        value.level = LogLevel.DEBUG;
-        return value;
+    async write(value: LogInput) : Promise<Log> {
+        return this.store.write(value);
     }
 }

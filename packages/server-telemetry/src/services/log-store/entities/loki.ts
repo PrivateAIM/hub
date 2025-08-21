@@ -5,14 +5,11 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import type { Log, LogInput } from '@privateaim/telemetry-kit';
-import { LogLevel } from '@privateaim/telemetry-kit';
-import { isClientError } from 'hapic';
 import type { DistributorPushStream, LokiClient, QuerierQueryRangeOptions } from '@hapic/loki';
-import { nanoSeconds } from '@hapic/loki';
-import type {
-    LogStore, LogStoreDeleteOptions, LogStoreQueryOptions,
-} from '../types';
+import type { Log, LogInput, LogLevel } from '@privateaim/telemetry-kit';
+import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
+import { isClientError } from 'hapic';
+import type { LogStore, LogStoreDeleteOptions, LogStoreQueryOptions } from '../types';
 import { BaseLogStore } from './base';
 
 export class LokiLogStore extends BaseLogStore implements LogStore {
@@ -25,51 +22,27 @@ export class LokiLogStore extends BaseLogStore implements LogStore {
         this.labels = labels || {};
     }
 
-    async write(message: string | LogInput, labels?: Record<string, string>): Promise<Log> {
-        let data : Log;
-
-        if (typeof message === 'string') {
-            const labelsNormalized = {
-                ...this.labels,
-                ...(labels || {}),
-            };
-            const level = (labelsNormalized.level || LogLevel.DEBUG) as LogLevel;
-            delete labelsNormalized.level;
-
-            data = {
-                message,
-                level,
-                time: nanoSeconds(),
-                labels: labelsNormalized,
-            };
-        } else {
-            const labelsNormalized = {
-                ...this.labels,
-                ...(message.labels || {}),
-                ...(labels || {}),
-            };
-
-            const level = (message.level || labelsNormalized.level || LogLevel.DEBUG) as LogLevel;
-            delete labelsNormalized.level;
-
-            data = {
-                ...message,
-                level,
-                time: message.time || nanoSeconds(),
-                labels: labelsNormalized,
-            };
-        }
+    async write(input: string | LogInput, labels?: Record<string, string>): Promise<Log> {
+        const output = this.normalizeInput(input, labels);
 
         const stream : DistributorPushStream = {
-            stream: data.labels,
+            stream: {
+                ...output.labels,
+                [LogFlag.CHANNEL]: output.channel,
+                [LogFlag.LEVEL]: output.level,
+                [LogFlag.SERVICE]: output.service,
+            },
             values: [
-                [data.time, data.message, { level: data.level }],
+                [
+                    output.time,
+                    output.message,
+                ],
             ],
         };
 
         await this.instance.distributor.push(stream);
 
-        return data;
+        return output;
     }
 
     async delete(options: LogStoreDeleteOptions): Promise<void> {
@@ -102,7 +75,7 @@ export class LokiLogStore extends BaseLogStore implements LogStore {
         };
 
         if (input.sort) {
-            options.direction = input.sort === 'DESC' ? 'forward' : 'backward';
+            options.direction = input.sort === 'ASC' ? 'forward' : 'backward';
         }
 
         if (input.limit) {
@@ -123,28 +96,45 @@ export class LokiLogStore extends BaseLogStore implements LogStore {
             for (let i = 0; i < response.data.result.length; i++) {
                 const set = response.data.result[i];
 
-                const labels = set.stream;
-                let level : LogLevel;
-
-                if (labels.level) {
-                    level = labels.level as LogLevel;
+                // channel
+                let channel : LogChannel;
+                if (set.stream[LogFlag.CHANNEL]) {
+                    channel = set.stream[LogFlag.CHANNEL] as LogChannel;
+                    delete set.stream[LogFlag.CHANNEL];
                 } else {
-                    level = labels.detected_level as LogLevel;
+                    channel = LogChannel.SYSTEM;
                 }
-                delete labels.level;
-                delete labels.detected_level;
 
-                if (!labels.service) {
-                    labels.service = labels.service_name;
+                // level
+                let level : LogLevel;
+                if (set.stream[LogFlag.LEVEL]) {
+                    level = set.stream[LogFlag.LEVEL] as LogLevel;
+                    delete set.stream[LogFlag.LEVEL];
+                } else {
+                    level = set.stream.detected_level as LogLevel;
                 }
-                delete labels.service_name;
+                delete set.stream.detected_level;
+
+                // service
+                let service : string;
+                if (set.stream[LogFlag.SERVICE]) {
+                    service = set.stream[LogFlag.SERVICE];
+                    delete set.stream[LogFlag.SERVICE];
+                } else if (set.stream.service_name) {
+                    service = set.stream.service_name;
+                } else {
+                    service = 'unknown';
+                }
+                delete set.stream.service_name;
 
                 for (let j = 0; j < set.values.length; j++) {
                     output.push({
+                        channel,
+                        service,
                         time: BigInt(set.values[j][0]),
                         message: set.values[j][1],
                         level,
-                        labels,
+                        labels: set.stream,
                     } satisfies Log);
                 }
             }

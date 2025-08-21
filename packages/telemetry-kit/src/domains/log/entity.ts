@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { LogLevel } from './constants';
+import type { LogChannel, LogLevel } from './constants';
 
 export interface Log {
     /**
@@ -24,13 +24,21 @@ export interface Log {
     level: `${LogLevel}`,
 
     /**
+     * service
+     */
+    service: string,
+
+    /**
+     * channel
+     */
+    channel: `${LogChannel}`,
+
+    /**
      * additional labels
      */
     labels: Record<string, string>
 }
 
-export type LogInput = Pick<Log, 'message'> & Partial<Pick<
-Log,
-'time' | 'level' | 'labels'
->
->;
+type RequiredTypes = ('message' | 'level' | 'service' | 'channel');
+
+export type LogInput = Pick<Log, RequiredTypes & keyof Log> & Partial<Omit<Log, RequiredTypes & keyof Log>>;

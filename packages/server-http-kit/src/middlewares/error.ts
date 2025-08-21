@@ -7,6 +7,7 @@
 
 import { BuiltInPolicyType, PermissionError } from '@authup/access';
 import { isObject } from '@privateaim/kit';
+import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import type { Router } from 'routup';
 import { errorHandler } from 'routup';
 import { useLogger } from '@privateaim/server-kit';
@@ -20,9 +21,15 @@ export function mountErrorMiddleware(router: Router) {
 
         if (isServerError || error.logMessage) {
             if (error.cause) {
-                useLogger().error(error.cause);
+                useLogger().error({
+                    ...(isObject(error.cause) ? error.cause : {}),
+                    [LogFlag.CHANNEL]: LogChannel.HTTP,
+                });
             } else {
-                useLogger().error(error);
+                useLogger().error({
+                    ...error,
+                    [LogFlag.CHANNEL]: LogChannel.HTTP,
+                });
             }
         }
 

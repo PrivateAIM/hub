@@ -3,7 +3,8 @@
     "compilerOptions": {
         "paths": {
             "@privateaim/kit": ["./packages/kit/src"],
-            "@privateaim/server-kit": ["./packages/server-kit/src"]
+            "@privateaim/server-kit": ["./packages/server-kit/src"],
+            "@privateaim/telemetry-kit": ["./packages/telemetry-kit/src"]
         }
     }
 }

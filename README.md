@@ -35,7 +35,6 @@ The repository contains the following packages:
 | [server-analysis-manager](packages/server-analysis-manager)         | Service         | This package contains the analysis manager, which is responsible to build and distribute an analysis. |
 | [server-analysis-manager-kit](packages/server-analysis-manager-kit) | Library         | This package contains helpers/utilities for the analysis-manager service.                             |
 | [server-core](packages/server-core)                                 | Service         | This package contains the core service.                                                               |
-| [server-core-realtime](packages/server-core-realtime)               | Library/Service | This package contains the core realtime service.                                                      |
 | [server-db-kit](packages/server-db-kit)                             | Library         | This package contains helpers/utilities for all db services.                                          |
 | [server-http-kit](packages/server-http-kit)                         | Library         | This package contains helpers/utilities for all http services.                                        |
 | [server-kit](packages/server-kit)                                   | Library         | This package contains helpers/utilities for all services.                                             |

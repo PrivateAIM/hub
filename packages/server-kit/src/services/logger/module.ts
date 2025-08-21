@@ -6,7 +6,6 @@
  */
 
 import { read } from 'envix';
-import path from 'node:path';
 import { EnvironmentName } from 'typeorm-extension';
 import type { Logger } from 'winston';
 import { createLogger as create, format, transports } from 'winston';
@@ -22,18 +21,6 @@ export function createLogger(ctx: LoggerCreateContext = {}) : Logger {
         loggerTransports = [
             new transports.Console({
                 level: 'info',
-            }),
-            new transports.File({
-                filename: path.join(ctx.directory || process.cwd(), 'access.log'),
-                level: 'http',
-                maxsize: 10 * 1024 * 1024, // 10MB
-                maxFiles: 5,
-            }),
-            new transports.File({
-                filename: path.join(ctx.directory || process.cwd(), 'error.log'),
-                level: 'warn',
-                maxsize: 10 * 1024 * 1024, // 10MB
-                maxFiles: 5,
             }),
             ...(ctx.transports ? toTransports(ctx.transports) : []),
         ];

@@ -15,7 +15,6 @@
         "packages/server-analysis-manager": {"component": "server-analysis-manager" },
         "packages/server-analysis-manager-kit": {"component": "server-analysis-manager-kit" },
         "packages/server-core": {"component": "server-core" },
-        "packages/server-core-realtime": {"component": "server-core-realtime" },
         "packages/server-db-kit": {"component": "server-db-kit" },
         "packages/server-http-kit": {"component": "server-http-kit" },
         "packages/server-kit": {"component": "server-kit" },
@@ -24,6 +23,7 @@
         "packages/server-storage": {"component": "server-storage"},
         "packages/storage-kit": {"component": "storage-kit"},
         "packages/server-telemetry": {"component": "server-telemetry"},
+        "packages/server-telemetry-kit": {"component": "server-telemetry-kit"},
         "packages/telemetry-kit": {"component": "telemetry-kit"}
     },
     "plugins": [

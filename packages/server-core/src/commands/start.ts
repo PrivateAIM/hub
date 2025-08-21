@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { createSocketServer } from '@privateaim/server-core-realtime';
 import { generateSwagger } from '@privateaim/server-http-kit';
 import { useLogger } from '@privateaim/server-kit';
 import path from 'node:path';
@@ -13,6 +12,7 @@ import { DataSource } from 'typeorm';
 import {
     checkDatabase, createDatabase, setDataSource, synchronizeDatabaseSchema,
 } from 'typeorm-extension';
+import { createSocketServer } from '../socket';
 import {
     createConfig, getRootDirPath, getWritableDirPath, useEnv,
 } from '../config';
@@ -27,14 +27,14 @@ export async function startCommand() {
 
     const logger = useLogger();
 
-    logger.info(`Environment: ${useEnv('env')}`);
-    logger.info(`WritableDirectoryPath: ${getWritableDirPath()}`);
-    logger.info(`Port: ${useEnv('port')}`);
-    logger.info(`Public-URL: ${useEnv('publicURL')}`);
-    logger.info(`Authup-URL: ${useEnv('authupURL')}`);
-    logger.info(`Docs-URL: ${new URL('docs/', useEnv('publicURL')).href}`);
+    logger.debug(`Environment: ${useEnv('env')}`);
+    logger.debug(`WritableDirectoryPath: ${getWritableDirPath()}`);
+    logger.debug(`Port: ${useEnv('port')}`);
+    logger.debug(`Public-URL: ${useEnv('publicURL')}`);
+    logger.debug(`Authup-URL: ${useEnv('authupURL')}`);
+    logger.debug(`Docs-URL: ${new URL('docs/', useEnv('publicURL')).href}`);
 
-    logger.info('Generating documentation...');
+    logger.debug('Generating documentation...');
 
     await generateSwagger({
         authupURL: useEnv('authupURL'),
@@ -43,11 +43,11 @@ export async function startCommand() {
         controllerBasePath: path.join(getRootDirPath(), 'src', 'http', 'controllers'),
     });
 
-    logger.info('Generated documentation.');
+    logger.debug('Generated documentation.');
 
     const options = await buildDataSourceOptions();
 
-    logger.info(`Database: ${options.type}`);
+    logger.debug(`Database: ${options.type}`);
 
     const check = await checkDatabase({
         options,
@@ -58,7 +58,7 @@ export async function startCommand() {
         await createDatabase({ options, synchronize: false, ifNotExist: true });
     }
 
-    logger.info('Establishing database connection...');
+    logger.debug('Establishing database connection...');
 
     const dataSource = new DataSource(options);
     await dataSource.initialize();
@@ -66,41 +66,38 @@ export async function startCommand() {
     setDataSource(dataSource);
     setDataSourceSync(dataSource);
 
-    logger.info('Established database connection.');
+    logger.debug('Established database connection.');
 
     if (!check.schema) {
-        logger.info('Applying database schema...');
+        logger.debug('Applying database schema...');
 
         await synchronizeDatabaseSchema(dataSource);
 
-        logger.info('Applied database schema.');
+        logger.debug('Applied database schema.');
     }
 
     const databaseIntegrity = new DatabaseIntegrityService(dataSource);
     await databaseIntegrity.check();
 
     // if (!check.schema) {
-    logger.info('Executing authup service setup...');
+    logger.debug('Executing authup service setup...');
     await setupAuthupService();
-    logger.info('Executed authup service setup.');
+    logger.debug('Executed authup service setup.');
     // }
 
-    logger.info('Executing harbor service setup...');
+    logger.debug('Executing harbor service setup...');
     await setupHarborService();
-    logger.info('Executed harbor service setup.');
+    logger.debug('Executed harbor service setup.');
 
     const router = createRouter();
     const httpServer = createHttpServer({ router });
 
-    const socketServer = createSocketServer(httpServer, {
-        authupURL: useEnv('authupURL'),
-    });
+    createSocketServer(httpServer);
 
     config.components.forEach((c) => c.start());
     config.aggregators.forEach((a) => a.start());
 
     httpServer.listen(useEnv('port'), '0.0.0.0', () => {
-        logger.info('Started http server.');
-        logger.info(`Socket.io server mounted on path: ${socketServer.path()}`);
+        logger.debug(`Listening on port ${useEnv('port')}.`);
     });
 }

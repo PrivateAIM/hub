@@ -4,6 +4,7 @@
         "paths": {
             "@privateaim/messenger-kit": ["./packages/messenger-kit/src"],
             "@privateaim/server-kit": ["./packages/server-kit/src"],
+            "@privateaim/telemetry-kit": ["./packages/telemetry-kit/src"],
             "@privateaim/server-telemetry-kit": ["./packages/server-telemetry-kit/src"],
             "@privateaim/server-http-kit": ["./packages/server-http-kit/src"],
             "@privateaim/server-realtime-kit": ["./packages/server-realtime-kit/src"]

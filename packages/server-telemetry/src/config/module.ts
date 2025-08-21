@@ -5,8 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import path from 'node:path';
-import process from 'node:process';
 import {
     configureAMQP,
     configureAuthup,
@@ -19,9 +17,7 @@ import {
 export function configure() {
     configureLoki();
 
-    setupLogging({
-        directory: path.join(process.cwd(), 'writable'),
-    });
+    setupLogging();
 
     configureAMQP();
     configureRedis();

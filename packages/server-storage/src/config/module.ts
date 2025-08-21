@@ -5,8 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import path from 'node:path';
-import process from 'node:process';
 import {
     configureAuthup,
     configureMinio,
@@ -16,9 +14,7 @@ import {
 } from './services';
 
 export function configure() {
-    setupLogging({
-        directory: path.join(process.cwd(), 'writable'),
-    });
+    setupLogging();
 
     configureRedis();
     configureMinio();

@@ -6,4 +6,3 @@
  */
 
 export * from './start';
-export * from './type';

@@ -23,19 +23,19 @@ import {
 } from '@privateaim/server-kit';
 import type { AuthupMiddlewareRegistrationOptions, Socket, SocketData } from '@privateaim/server-realtime-kit';
 import { createAuthupMiddleware } from '@privateaim/server-realtime-kit';
+import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import type { Server as HTTPServer } from 'node:http';
 import type { ServerOptions } from 'socket.io';
 import { Server } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
-import { registerControllers } from './register';
+import { useEnv } from '../config';
+import { registerSocketControllers } from './register';
 
 type Adapter = ServerOptions['adapter'];
 
-export type SocketServerCreateOptions = {
-    authupURL?: string
-};
-
-export function createSocketServer(httpServer: HTTPServer, options: SocketServerCreateOptions) : Server {
+export function createSocketServer(
+    httpServer: HTTPServer,
+) : Server {
     let adapter : Adapter | undefined;
 
     if (isRedisClientUsable()) {
@@ -64,33 +64,37 @@ export function createSocketServer(httpServer: HTTPServer, options: SocketServer
     });
 
     const authupMiddlewareOptions : AuthupMiddlewareRegistrationOptions = {
-        baseURL: options.authupURL,
+        baseURL: useEnv('authupURL'),
     };
     if (isRedisClientUsable()) {
         authupMiddlewareOptions.redis = useRedisClient();
-    } else {
-        useLogger().warn('[socket] Redis is not configured and can not be used for the authup middleware.');
     }
 
     if (isVaultClientUsable()) {
         authupMiddlewareOptions.vault = useVaultClient();
-    } else {
-        useLogger().warn('[socket] Redis is not configured and can not be used for the authup middleware.');
     }
 
     const authupMiddleware = createAuthupMiddleware(authupMiddlewareOptions);
 
     server.on('error', (err) => {
-        useLogger().error(err);
+        useLogger().error(err, {
+            [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
+        });
     });
 
     const pattern = /^\/resources(?::[a-z0-9A-Z-_]+)?$/;
     const nsp = server.of(pattern);
     nsp.use((socket, next) => {
-        useLogger().info(`[socket] ${socket.nsp.name}: ${socket.id} connected.`);
+        useLogger().info(`Socket/${socket.id}: Connected.`, {
+            namespace: socket.nsp.name,
+            [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
+        });
 
         socket.on('disconnect', () => {
-            useLogger().info(`[socket] ${socket.nsp.name}: Socket disconnected.`, { socketId: socket.id });
+            useLogger().info(`Socket/${socket.id}: Disconnected.`, {
+                namespace: socket.nsp.name,
+                [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
+            });
         });
 
         next();
@@ -100,11 +104,28 @@ export function createSocketServer(httpServer: HTTPServer, options: SocketServer
 
     nsp.use((socket: Socket, next) => {
         if (socket.data.userId) {
-            useLogger().info(`[socket] ${socket.nsp.name}: User connected.`, { userId: socket.data.userId, socketId: socket.id });
+            useLogger().info(`Socket/${socket.id}: Authenticated as user.`, {
+                [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
+                actor_type: 'user',
+                actor_id: socket.data.userId,
+            });
         } else if (socket.data.robotId) {
-            useLogger().info(`[socket] ${socket.nsp.name}: Robot connected.`, { robotId: socket.data.robotId, socketId: socket.id });
+            useLogger().info(`Socket/${socket.id}: Authenticated as robot.`, {
+                [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
+                actor_type: 'robot',
+                actor_id: socket.data.robotId,
+            });
+        } else if (socket.data.clientId) {
+            useLogger().info(`Socket/${socket.id}: Authenticated as client.`, {
+                [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
+                actor_type: 'client',
+                actor_id: socket.data.clientId,
+            });
         } else {
-            useLogger().error(`${socket.nsp.name}: Socket is not authenticated.`, { socketId: socket.id });
+            useLogger().warn(`Socket/${socket.id}: Not authenticated.`, {
+                [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
+            });
+
             next(new UnauthorizedError());
             return;
         }
@@ -112,7 +133,10 @@ export function createSocketServer(httpServer: HTTPServer, options: SocketServer
         const matches = socket.nsp.name.match(pattern);
         if (typeof matches[1] === 'undefined') {
             if (socket.data.realmName !== REALM_MASTER_NAME) {
-                useLogger().error(`[socket] Realm ${socket.data.realmName} is not permitted for the global scope.`);
+                useLogger()
+                    .error(`Socket/${socket.id}: Realm ${socket.data.realmName} is not permitted for the global scope.`, {
+                        [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
+                    });
                 next(new ForbiddenError());
 
                 return;
@@ -121,7 +145,11 @@ export function createSocketServer(httpServer: HTTPServer, options: SocketServer
             [, socket.data.namespaceId] = matches;
 
             if (matches[1] !== socket.data.realmId && socket.data.realmName !== REALM_MASTER_NAME) {
-                useLogger().error(`[socket] Realm ${socket.data.realmName} is not permitted for the realm ${matches[1]}.`);
+                useLogger()
+                    .error(`Socket/${socket.id}: Realm ${socket.data.realmName} is not permitted for the realm ${matches[1]}.`, {
+                        [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
+                    });
+
                 next(new ForbiddenError());
                 return;
             }
@@ -129,9 +157,23 @@ export function createSocketServer(httpServer: HTTPServer, options: SocketServer
 
         socket.on('disconnect', () => {
             if (socket.data.userId) {
-                useLogger().info('[socket]User disconnected', { userId: socket.data.userId, socketId: socket.id });
+                useLogger().info(`Socket/${socket.id}: User disconnected`, {
+                    [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
+                    actor_type: 'user',
+                    actor_id: socket.data.userId,
+                });
             } else if (socket.data.robotId) {
-                useLogger().info('[socket] Robot disconnected', { robotId: socket.data.robotId, socketId: socket.id });
+                useLogger().info(`Socket/${socket.id}: Robot disconnected`, {
+                    [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
+                    actor_type: 'robot',
+                    actor_id: socket.data.userId,
+                });
+            } else if (socket.data.clientId) {
+                useLogger().info(`Socket/${socket.id}: Client disconnected`, {
+                    [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
+                    actor_type: 'client',
+                    actor_id: socket.data.clientId,
+                });
             }
         });
 
@@ -145,7 +187,7 @@ export function createSocketServer(httpServer: HTTPServer, options: SocketServer
         useLogger().info(`[socket] room ${room} was deleted`);
     });
 
-    registerControllers(nsp);
+    registerSocketControllers(nsp);
 
     return server;
 }

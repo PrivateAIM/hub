@@ -10,7 +10,6 @@
     "packages/server-analysis-manager": "0.8.15",
     "packages/server-analysis-manager-kit": "0.7.16",
     "packages/server-core": "0.8.15",
-    "packages/server-core-realtime": "0.8.15",
     "packages/server-db-kit": "0.8.15",
     "packages/server-http-kit": "0.8.15",
     "packages/server-kit": "0.8.15",
@@ -19,5 +18,6 @@
     "packages/server-storage": "0.8.15",
     "packages/storage-kit": "0.8.15",
     "packages/server-telemetry": "0.8.15",
+    "packages/server-telemetry-kit": "0.8.15",
     "packages/telemetry-kit": "0.8.15"
 }
