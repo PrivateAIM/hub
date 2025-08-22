@@ -6,16 +6,21 @@
  */
 
 import { wait } from '@privateaim/kit';
-import { LogLevel } from '@privateaim/telemetry-kit';
+import { LogChannel, LogLevel } from '@privateaim/telemetry-kit';
 import { MemoryLogStore } from '../../src';
 
 describe('logger', () => {
     it('should work with store', async () => {
         const store = new MemoryLogStore();
-        store.setLabels({ app: 'app' });
 
-        await store.write('foo', {
-            meta: 'bar',
+        await store.write({
+            channel: LogChannel.SYSTEM,
+            level: LogLevel.ERROR,
+            service: 'unknown',
+            message: 'foo',
+            labels: {
+                foo: 'bar',
+            },
         });
 
         await wait(0);
@@ -24,11 +29,12 @@ describe('logger', () => {
 
         const [item] = store.items;
 
-        expect(item.level).toEqual(LogLevel.DEBUG);
+        expect(item.channel).toBe(LogChannel.SYSTEM);
+        expect(item.level).toEqual(LogLevel.ERROR);
+        expect(item.service).toEqual('unknown');
         expect(item.message).toEqual('foo');
         expect(item.labels).toEqual({
-            app: 'app',
-            meta: 'bar',
+            foo: 'bar',
         });
         expect(item.time).toBeDefined();
     });

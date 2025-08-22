@@ -7,23 +7,19 @@
 
 import type { DistributorPushStream, LokiClient, QuerierQueryRangeOptions } from '@hapic/loki';
 import type { Log, LogInput, LogLevel } from '@privateaim/telemetry-kit';
-import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
+import { LogChannel, LogFlag, normalizeLogInput } from '@privateaim/telemetry-kit';
 import { isClientError } from 'hapic';
 import type { LogStore, LogStoreDeleteOptions, LogStoreQueryOptions } from '../types';
-import { BaseLogStore } from './base';
 
-export class LokiLogStore extends BaseLogStore implements LogStore {
+export class LokiLogStore implements LogStore {
     protected instance : LokiClient;
 
-    constructor(instance: LokiClient, labels?: Record<string, string>) {
-        super();
-
+    constructor(instance: LokiClient) {
         this.instance = instance;
-        this.labels = labels || {};
     }
 
-    async write(input: string | LogInput, labels?: Record<string, string>): Promise<Log> {
-        const output = this.normalizeInput(input, labels);
+    async write(input: LogInput): Promise<Log> {
+        const output = normalizeLogInput(input);
 
         const stream : DistributorPushStream = {
             stream: {
@@ -51,7 +47,6 @@ export class LokiLogStore extends BaseLogStore implements LogStore {
                 start: options.start,
                 ...(options.end ? { end: options.end } : {}),
                 query: this.buildQuery({
-                    ...this.labels,
                     ...(options.labels || {}),
                 }),
             });
@@ -69,7 +64,6 @@ export class LokiLogStore extends BaseLogStore implements LogStore {
     async query(input: LogStoreQueryOptions): Promise<[Log[], number]> {
         const options : QuerierQueryRangeOptions = {
             query: this.buildQuery({
-                ...this.labels,
                 ...(input.labels || {}),
             }),
         };

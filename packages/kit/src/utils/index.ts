@@ -12,6 +12,7 @@ export * from './hex-checker';
 export * from './hostname';
 export * from './is-object';
 export * from './nanoid';
+export * from './nanoseconds';
 export * from './object-properties';
 export * from './proxy-connection-string';
 export * from './regex-patterns';

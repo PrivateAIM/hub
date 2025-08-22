@@ -6,19 +6,16 @@
  */
 
 import type { Log, LogInput } from '@privateaim/telemetry-kit';
+import { normalizeLogInput } from '@privateaim/telemetry-kit';
 import type {
     LogStore, LogStoreQueryOptions,
 } from '../types';
-import { BaseLogStore } from './base';
 
-export class MemoryLogStore extends BaseLogStore implements LogStore {
+export class MemoryLogStore implements LogStore {
     public readonly items : Log[];
 
-    constructor(labels?: Record<string, string>) {
-        super();
-
+    constructor() {
         this.items = [];
-        this.labels = labels;
     }
 
     // todo: apply query options
@@ -56,8 +53,8 @@ export class MemoryLogStore extends BaseLogStore implements LogStore {
         ];
     }
 
-    async write(message: string | LogInput, labels?: Record<string, string>): Promise<Log> {
-        const output = this.normalizeInput(message, labels);
+    async write(message: LogInput): Promise<Log> {
+        const output = normalizeLogInput(message);
 
         this.items.push(output);
 
