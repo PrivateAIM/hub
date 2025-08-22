@@ -51,6 +51,7 @@
         "@privateaim/core-kit": "^0.8.15",
         "@privateaim/telemetry-kit": "^0.8.15",
         "@privateaim/core-http-kit": "^0.8.15",
+        "@privateaim/core-realtime-kit": "^0.7.16",
         "@privateaim/storage-kit": "^0.8.15",
         "@types/node": "^24.3.0",
         "@vitejs/plugin-vue": "^6.0.0",
