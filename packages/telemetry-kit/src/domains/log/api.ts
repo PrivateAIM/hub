@@ -7,7 +7,7 @@
 
 import type { BuildInput } from 'rapiq';
 import { buildQuery } from 'rapiq';
-import type { Log } from './entity';
+import type { Log, LogInput } from './entity';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
 import { BaseAPI } from '../base';
 
@@ -21,7 +21,7 @@ export class LogAPI extends BaseAPI {
         await this.client.delete(`logs${buildQuery(options)}`);
     }
 
-    async create(data: Partial<Log>): Promise<SingleResourceResponse<Log>> {
+    async create(data: Partial<LogInput>): Promise<SingleResourceResponse<Log>> {
         const { data: response } = await this.client.post('logs', data);
 
         return response;

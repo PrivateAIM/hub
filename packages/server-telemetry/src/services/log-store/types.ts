@@ -22,13 +22,7 @@ export type LogStoreDeleteOptions = {
 };
 
 export interface LogStore {
-    setLabels(labels: Record<string, string>): void;
-
-    getLabels() : Record<string, string>;
-
-    extendLabels(labels: Record<string, string>): void;
-
-    write(message: string | LogInput, labels?: Record<string, string>) : Promise<Log>;
+    write(message: LogInput) : Promise<Log>;
 
     query(options?: LogStoreQueryOptions) : Promise<[Log[], number]>;
 

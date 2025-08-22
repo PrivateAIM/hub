@@ -12,7 +12,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { LogLevel } from '@privateaim/telemetry-kit';
+import { LogChannel, LogLevel } from '@privateaim/telemetry-kit';
 import { createTestSuite } from '../../utils';
 
 describe('controllers > analysis-node-log', () => {
@@ -30,6 +30,8 @@ describe('controllers > analysis-node-log', () => {
         const client = suite.client();
 
         const response = await client.log.create({
+            channel: LogChannel.SYSTEM,
+            service: 'unknown',
             level: LogLevel.ERROR,
             message: 'An unknown error occurred.',
             labels: {
@@ -37,6 +39,7 @@ describe('controllers > analysis-node-log', () => {
             },
         });
 
+        expect(response.channel).toEqual(LogChannel.SYSTEM);
         expect(response.time).toBeDefined();
         expect(response.level).toEqual(LogLevel.ERROR);
         expect(response.message).toEqual('An unknown error occurred.');

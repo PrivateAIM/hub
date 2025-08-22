@@ -30,15 +30,9 @@ LogWriteCommandPayload
     async handle(
         input: LogWriteCommandPayload,
     ): Promise<void> {
-        try {
-            const data = await this.validate(input);
+        const data = await this.validate(input);
 
-            await this.write(data);
-        } catch (e) {
-            console.log(input);
-
-            throw e;
-        }
+        await this.write(data);
     }
 
     async validate(input: LogWriteCommandPayload) : Promise<LogInput> {
