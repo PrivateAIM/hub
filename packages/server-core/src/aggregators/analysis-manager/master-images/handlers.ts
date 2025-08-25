@@ -8,12 +8,12 @@
 import { DomainType } from '@privateaim/core-kit';
 import type {
     MasterImagesEventMap,
-} from '@privateaim/server-analysis-manager-kit';
+} from '@privateaim/server-core-worker-kit';
 import {
     MasterImagesCommand,
     MasterImagesEvent,
     useMasterImageQueueService,
-} from '@privateaim/server-analysis-manager-kit';
+} from '@privateaim/server-core-worker-kit';
 import type { QueueRouterHandlers } from '@privateaim/server-kit';
 import type { Event } from '@privateaim/telemetry-kit';
 import { hasOwnProperty } from '@privateaim/kit';
