@@ -31,11 +31,13 @@ export async function getManyLogLogRouteHandler(req: Request, res: Response) : P
             const key = keys[i];
 
             const index = key.indexOf('.');
-            if (index === -1) {
-                continue;
-            }
 
-            const nextKey = key.substring(index + 1);
+            let nextKey : string;
+            if (index !== -1) {
+                nextKey = key.substring(index + 1);
+            } else {
+                nextKey = key;
+            }
 
             if (typeof filtersRaw[key] === 'string') {
                 labels[nextKey] = filtersRaw[key];

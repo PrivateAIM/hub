@@ -37,9 +37,9 @@ export type Config = {
 export function createConfig() : Config {
     setupLogging();
 
-    configureTelemetryClient();
-
     configureAuthupClientAuthenticationHook();
+
+    configureTelemetryClient();
 
     configureVault();
 
