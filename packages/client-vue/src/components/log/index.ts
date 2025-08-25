@@ -6,3 +6,4 @@
  */
 
 export { default as FLog } from './FLog';
+export { default as FLogs } from './FLogs.vue';

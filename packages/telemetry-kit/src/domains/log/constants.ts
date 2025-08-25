@@ -55,6 +55,17 @@ export enum LogLevel {
     DEBUG = 'debug',
 }
 
+export enum LogLevelColor {
+    EMERGENCE = '#8B0000',
+    ALERT = '#FF0000',
+    CRITICAL = '#FF4500',
+    ERROR = '#FF6347',
+    WARNING = '#FFD700',
+    NOTICE = '#1E90FF',
+    INFORMATIONAL = '#228B22',
+    DEBUG = '#A9A9A9',
+}
+
 export enum LogFlag {
     CHANNEL = 'channel',
 

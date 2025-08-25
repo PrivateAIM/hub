@@ -13,7 +13,7 @@ import type {
     PropType,
 } from 'vue';
 import type { Log } from '@privateaim/telemetry-kit';
-import { LogLevel } from '@privateaim/telemetry-kit';
+import { LogLevel, LogLevelColor } from '@privateaim/telemetry-kit';
 
 export default defineComponent({
     props: {
@@ -49,6 +49,38 @@ export default defineComponent({
             return date.toISOString();
         });
 
+        const color = computed(() => {
+            switch (entity.value.level) {
+                case LogLevel.EMERGENCE: {
+                    return LogLevelColor.EMERGENCE;
+                }
+                case LogLevel.ALERT: {
+                    return LogLevelColor.ALERT;
+                }
+                case LogLevel.CRITICAL: {
+                    return LogLevelColor.CRITICAL;
+                }
+                case LogLevel.ERROR: {
+                    return LogLevelColor.ERROR;
+                }
+                case LogLevel.WARNING: {
+                    return LogLevelColor.WARNING;
+                }
+                case LogLevel.NOTICE: {
+                    return LogLevelColor.NOTICE;
+                }
+                case LogLevel.INFORMATIONAL: {
+                    return LogLevelColor.INFORMATIONAL;
+                }
+                case LogLevel.DEBUG: {
+                    return LogLevelColor.DEBUG;
+                }
+                default: {
+                    return null;
+                }
+            }
+        });
+
         return () => h(
             'div',
             {
@@ -58,8 +90,8 @@ export default defineComponent({
                 h('div', { class: 'd-flex flex-row' }, [
                     h('div', { class: 'line-number' }, [index.value + 1]),
                     h('div', { class: 'line-content d-flex flex-row' }, [
-                        h('div', { class: 'line-component' }, [
-                            `[${entity.value.level}]`,
+                        h('div', { class: 'line-component', style: `color: ${color.value}` }, [
+                            `${entity.value.level}`,
                         ]),
                         h('div', { class: ['line-message', { error: isError.value }] }, [
                             entity.value.message,

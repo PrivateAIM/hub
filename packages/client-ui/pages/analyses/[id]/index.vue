@@ -7,11 +7,15 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import type { Analysis } from '@privateaim/core-kit';
-import { FAnalysisLogs, FAnalysisNodeProgress, FAnalysisPipeline } from '@privateaim/client-vue';
+import {
+    FAnalysisLogs, FAnalysisNodeProgress, FAnalysisPipeline,
+} from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
 
 export default defineNuxtComponent({
-    components: { FAnalysisLogs, FAnalysisPipeline, FAnalysisNodeProgress },
+    components: {
+        FAnalysisLogs, FAnalysisPipeline, FAnalysisNodeProgress,
+    },
     props: {
         entity: {
             type: Object as PropType<Analysis>,
