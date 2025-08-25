@@ -10,3 +10,11 @@ export enum EnvironmentName {
     DEVELOPMENT = 'development',
     PRODUCTION = 'production',
 }
+
+export enum ProcessEvent {
+    STARTING = 'starting',
+    STARTED = 'started',
+    RUNNING = 'running',
+    FAILED = 'failed',
+    FINISHED = 'finished',
+}
