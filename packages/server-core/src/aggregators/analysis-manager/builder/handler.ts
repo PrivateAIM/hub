@@ -7,10 +7,10 @@
 
 import {
     BuilderEvent,
-} from '@privateaim/server-analysis-manager-kit';
+} from '@privateaim/server-core-worker-kit';
 import type {
     BuilderBasePayload,
-} from '@privateaim/server-analysis-manager-kit';
+} from '@privateaim/server-core-worker-kit';
 import {
 
     AnalysisBuildStatus,

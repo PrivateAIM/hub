@@ -7,7 +7,7 @@
 
 import { BadRequestError, NotFoundError } from '@ebec/http';
 import { MasterImageCommand } from '@privateaim/core-kit';
-import { MasterImagesCommand, useMasterImageQueueService } from '@privateaim/server-analysis-manager-kit';
+import { MasterImagesCommand, useMasterImageQueueService } from '@privateaim/server-core-worker-kit';
 import { useRequestBody } from '@routup/basic/body';
 import type { Request, Response } from 'routup';
 import { sendAccepted } from 'routup';

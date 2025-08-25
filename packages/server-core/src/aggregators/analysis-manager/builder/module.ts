@@ -8,11 +8,11 @@
 import {
     isQueueRouterUsable, useLogger, useQueueRouter,
 } from '@privateaim/server-kit';
-import type { BuilderBasePayload } from '@privateaim/server-analysis-manager-kit';
+import type { BuilderBasePayload } from '@privateaim/server-core-worker-kit';
 import {
     BuilderEvent,
     BuilderEventQueueRouterRouting,
-} from '@privateaim/server-analysis-manager-kit';
+} from '@privateaim/server-core-worker-kit';
 import type { Aggregator, QueueRouterHandlers } from '@privateaim/server-kit';
 import { EnvironmentName, useEnv } from '../../../config';
 import { handleAnalysisManagerBuilderBaseEvent } from './handler';

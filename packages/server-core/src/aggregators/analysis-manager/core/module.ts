@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { CoreEventQueueRouterRouting } from '@privateaim/server-analysis-manager-kit';
+import { CoreEventQueueRouterRouting } from '@privateaim/server-core-worker-kit';
 import type { Aggregator } from '@privateaim/server-kit';
 import { isQueueRouterUsable, useLogger, useQueueRouter } from '@privateaim/server-kit';
 import { EnvironmentName, useEnv } from '../../../config';

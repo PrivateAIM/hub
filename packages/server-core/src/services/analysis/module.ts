@@ -14,7 +14,7 @@ import {
     BuilderCommand,
     CoreCommand,
     buildBuilderTaskQueueRouterPayload, buildCoreTaskQueueRouterPayload,
-} from '@privateaim/server-analysis-manager-kit';
+} from '@privateaim/server-core-worker-kit';
 import type { Request } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import type { QueueRouter } from '@privateaim/server-kit';

@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { CoreBucketEventPayload } from '@privateaim/server-analysis-manager-kit';
+import type { CoreBucketEventPayload } from '@privateaim/server-core-worker-kit';
 import {
     CoreEvent,
-} from '@privateaim/server-analysis-manager-kit';
+} from '@privateaim/server-core-worker-kit';
 import { type QueueRouterHandlers } from '@privateaim/server-kit';
 import { useDataSource } from 'typeorm-extension';
 import { AnalysisBucketEntity, AnalysisEntity } from '../../../database';

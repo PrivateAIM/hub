@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { useMasterImageQueueService } from '@privateaim/server-analysis-manager-kit';
+import { useMasterImageQueueService } from '@privateaim/server-core-worker-kit';
 import { isQueueRouterUsable, useLogger } from '@privateaim/server-kit';
 import type { Aggregator } from '@privateaim/server-kit';
 import { EnvironmentName, useEnv } from '../../../config';
