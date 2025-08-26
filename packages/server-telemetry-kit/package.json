@@ -1,6 +1,6 @@
 {
     "name": "@privateaim/server-telemetry-kit",
-    "version": "0.8.15",
+    "version": "0.8.16",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "author": {
@@ -14,13 +14,13 @@
         "winston-transport": "^4.9.0"
     },
     "devDependencies": {
-        "@privateaim/server-kit": "^0.8.15",
-        "@privateaim/telemetry-kit": "^0.8.15",
+        "@privateaim/server-kit": "^0.8.16",
+        "@privateaim/telemetry-kit": "^0.8.16",
         "singa": "^1.1.0"
     },
     "peerDependencies": {
-        "@privateaim/server-kit": "^0.8.15",
-        "@privateaim/telemetry-kit": "^0.8.15",
+        "@privateaim/server-kit": "^0.8.16",
+        "@privateaim/telemetry-kit": "^0.8.16",
         "singa": "^1.1.0"
     },
     "scripts": {

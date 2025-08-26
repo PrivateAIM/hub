@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.7.17](https://github.com/PrivateAIM/hub/compare/v0.7.16...v0.7.17) (2025-08-26)
+
+
+### Features
+
+* adjusted code references for core -&gt; core-kit package renaming ([321b8ac](https://github.com/PrivateAIM/hub/commit/321b8acb33e4fdd93252c72da34fac34cc86cd9f))
+* enhance typing for doamin entities ([9d7c516](https://github.com/PrivateAIM/hub/commit/9d7c51644b66c9361e5436e2c43f463f4f219f90))
+* initial core -&gt; core-kit package renaming ([9ac9709](https://github.com/PrivateAIM/hub/commit/9ac970999922bc76e3f88381f4d3351a51147a46))
+* realtime library/service split ([#474](https://github.com/PrivateAIM/hub/issues/474)) ([43c2dfa](https://github.com/PrivateAIM/hub/commit/43c2dfad654cc61ca9784914cbad56c684434088))
+* restructure domain event handling ([2ad7318](https://github.com/PrivateAIM/hub/commit/2ad7318930bd342d571105982fc92996443326fa))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.8.15 to ^0.8.16
+    * @privateaim/core-kit bumped from ^0.8.15 to ^0.8.16
+  * peerDependencies
+    * @privateaim/kit bumped from ^0.8.15 to ^0.8.16
+    * @privateaim/core-kit bumped from ^0.8.15 to ^0.8.16
+
 ## [0.7.16](https://github.com/PrivateAIM/hub/compare/v0.7.15...v0.7.16) (2025-07-30)
 
 
