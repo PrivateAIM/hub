@@ -200,10 +200,10 @@ services:
             AUTHUP_URL: http://authup:3000/
         networks:
             hub:
-    analysis-manager:
+    core-worker:
         build: '.'
         restart: always
-        command: analysis-manager start
+        command: core-worker start
         depends_on:
             authup:
                 condition: service_healthy
