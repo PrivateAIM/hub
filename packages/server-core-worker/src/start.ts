@@ -19,7 +19,7 @@ function start() {
     const port = useEnv('port');
     server.listen(port);
 
-    useLogger().info(`Listening on 0.0.0.0:${port}`);
+    useLogger().debug(`Listening on 0.0.0.0:${port}`);
 }
 
 start();
