@@ -5,32 +5,18 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { Factory } from 'singa';
 import { singa } from 'singa';
-import { isRedisClientUsable, useRedisClient } from '../redis';
-import { DomainEventPublisher } from './module';
-import { DomainEventRedisPublisher } from './redis';
-import { DomainEventSocketConsumer } from './socket';
+import type { DomainEventPublisher } from './module';
 
-const singaInstance = singa<DomainEventPublisher>({
+const instance = singa<DomainEventPublisher>({
     name: 'domainEventPublisher',
-    factory: () => {
-        const publisher = new DomainEventPublisher();
-
-        if (isRedisClientUsable()) {
-            const client = useRedisClient();
-
-            publisher.addConsumer(new DomainEventRedisPublisher(client));
-            publisher.addConsumer(new DomainEventSocketConsumer(client));
-        }
-
-        return publisher;
-    },
 });
 
-export function useDomainEventPublisherSinga() {
-    return singaInstance;
+export function setDomainEventPublisherFactory(factory: Factory<DomainEventPublisher>) {
+    instance.setFactory(factory);
 }
 
 export function useDomainEventPublisher() {
-    return singaInstance.use();
+    return instance.use();
 }

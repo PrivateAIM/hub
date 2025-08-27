@@ -7,6 +7,7 @@
 
 import { isEqual } from 'smob';
 import type { DomainEventConsumeOptions, IDomainEventConsumer } from '@privateaim/server-kit';
+import { useLogger } from '@privateaim/server-kit';
 import type { Event, EventData } from '@privateaim/telemetry-kit';
 import { DomainEventName } from '@privateaim/core-kit';
 import type { ObjectDiff, ObjectLiteral } from '@privateaim/kit';
@@ -88,6 +89,10 @@ export class DatabaseDomainEventConsumer implements IDomainEventConsumer {
                 command: 'create',
                 data: entity,
             });
+
+            return;
         }
+
+        useLogger().debug('Event service is not available to publish domain events.');
     }
 }

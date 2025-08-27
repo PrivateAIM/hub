@@ -24,7 +24,7 @@ import { RequestRepositoryAdapter } from '../../../request';
 import { NodeValidator } from '../utils';
 import {
     NodeEntity, RegistryEntity, RegistryProjectEntity,
-} from '../../../../database/domains';
+} from '../../../../database';
 
 export async function createNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const permissionChecker = useRequestPermissionChecker(req);

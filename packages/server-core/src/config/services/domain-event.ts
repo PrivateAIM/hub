@@ -5,19 +5,29 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import { useDomainEventPublisherSinga } from '@privateaim/server-kit';
+import {
+    DomainEventPublisher,
+    DomainEventRedisPublisher,
+    DomainEventSocketConsumer,
+    isRedisClientUsable,
+    setDomainEventPublisherFactory,
+    useRedisClient,
+} from '@privateaim/server-kit';
 import { DatabaseDomainEventConsumer } from '../../database/domain-event';
 
 export function configureDomainEventPublisher() {
-    const singa = useDomainEventPublisherSinga();
+    setDomainEventPublisherFactory(() => {
+        const publisher = new DomainEventPublisher();
 
-    const factory = singa.getFactory();
+        if (isRedisClientUsable()) {
+            const client = useRedisClient();
 
-    singa.setFactory(() => {
-        const instance = factory();
+            publisher.addConsumer(new DomainEventRedisPublisher(client));
+            publisher.addConsumer(new DomainEventSocketConsumer(client));
+        }
 
-        instance.addConsumer(new DatabaseDomainEventConsumer());
+        publisher.addConsumer(new DatabaseDomainEventConsumer());
 
-        return instance;
+        return publisher;
     });
 }
