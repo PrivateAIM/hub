@@ -27,10 +27,12 @@ export function configureLoki() {
     }
 
     if (compactorURL) {
+        config.options = config.options || {};
         config.options.compactorURL = compactorURL;
     }
 
     if (querierURL) {
+        config.options = config.options || {};
         config.options.querierURL = querierURL;
     }
 
