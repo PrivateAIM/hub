@@ -55,7 +55,7 @@ export function createAnalysisManagerBuilderAggregator() : Aggregator {
     if (!isQueueRouterUsable() || useEnv('env') === EnvironmentName.TEST) {
         return {
             start() {
-                useLogger().warn('Analysis worker builder component could not been initialized');
+                useLogger().debug('Analysis worker builder component could not been initialized');
             },
         };
     }

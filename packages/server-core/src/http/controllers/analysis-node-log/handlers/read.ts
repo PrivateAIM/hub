@@ -5,13 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { BadRequestError } from '@ebec/http';
 import type { Log, LogLevel } from '@privateaim/telemetry-kit';
+import { LogFlag } from '@privateaim/telemetry-kit';
 import { useRequestQuery } from '@routup/basic/query';
 import type { Request, Response } from 'routup';
 import { send } from 'routup';
 import type { FiltersBuildInput } from 'rapiq';
 import { parseQuery } from 'rapiq';
 import type { AnalysisNodeLog } from '@privateaim/core-kit';
+import { DomainType } from '@privateaim/core-kit';
 import { isTelemetryClientUsable, useTelemetryClient } from '../../../../services';
 
 export async function getManyAnalysisNodeLogRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -21,7 +24,6 @@ export async function getManyAnalysisNodeLogRouteHandler(req: Request, res: Resp
                 'level',
                 'analysis_id',
                 'node_id',
-                'time',
             ],
         },
         pagination: {
@@ -32,31 +34,29 @@ export async function getManyAnalysisNodeLogRouteHandler(req: Request, res: Resp
         },
     });
 
+    // todo: clean up this
+
+    const filtersNormalized : Partial<Record<keyof AnalysisNodeLog, string>> = {};
+    if (output.filters) {
+        for (let i = 0; i < output.filters.length; i++) {
+            filtersNormalized[output.filters[i].key] = `${output.filters[i].value}`;
+        }
+    }
+
+    if (!filtersNormalized.analysis_id || !filtersNormalized.node_id) {
+        throw new BadRequestError('The filters node_id and analysis_id must be defined.');
+    }
+
     const filters : FiltersBuildInput<Log> = {
         labels: {
-            entity: 'analysisNode',
+            [LogFlag.REF_TYPE]: DomainType.ANALYSIS_NODE,
+            analysis_id: filtersNormalized.analysis_id,
+            node_id: filtersNormalized.node_id,
         },
     };
 
-    // todo: clean up this
-
-    for (let i = 0; i < output.filters.length; i++) {
-        const filter = output.filters[i];
-        if (filter.key === 'analysis_id' || filter.key === 'node_id') {
-            filters.labels = filters.labels || {};
-            filters.labels[filter.key] = `${filter.value}`;
-
-            continue;
-        }
-
-        if (filter.key === 'level') {
-            filters.level = `${filter.value}` as LogLevel;
-        }
-
-        if (filter.key === 'time') {
-            // todo: respect operator
-            filters.time = `>${filter.value}`;
-        }
+    if (filtersNormalized.level) {
+        filters.level = filtersNormalized.level as LogLevel;
     }
 
     // todo: sort missing

@@ -13,6 +13,7 @@ import {
 import type {
     CoreBucketEventPayload,
 } from '@privateaim/server-core-worker-kit';
+import { LogFlag } from '@privateaim/telemetry-kit';
 import { useCoreLogger } from '../utils';
 
 export async function writeBucketCreatedEvent(
@@ -28,6 +29,7 @@ export async function writeBucketCreatedEvent(
         message: `${data.bucketType} bucket ${data.bucketId} created for analysis ${data.id}`,
         command: CoreCommand.CONFIGURE,
         analysis_id: data.id,
+        [LogFlag.REF_ID]: data.id,
         bucket_id: data.bucketId,
         bucket_type: data.bucketType,
         event: CoreEvent.BUCKET_CREATED,

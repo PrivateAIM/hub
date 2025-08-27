@@ -17,7 +17,9 @@ export interface Environment {
     redisConnectionString?: string | null,
     vaultConnectionString?: string | null,
     authupURL?: string | null,
+
     lokiURL?: string | null,
     lokiCompactorURL?: string | null,
+    lokiDistributorURL?: string | null,
     lokiQuerierURL?: string | null
 }

@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { LogFlag } from '@privateaim/telemetry-kit';
 import stream from 'node:stream';
 import {
     AnalysisBucketType,
@@ -28,6 +29,8 @@ export async function packContainerWithAnalysis(container: Container, context: C
     useBuilderLogger()
         .debug('Writing files to container', {
             command: BuilderCommand.BUILD,
+            analysis_id: context.entity.id,
+            [LogFlag.REF_ID]: context.entity.id,
         });
 
     const core = useCoreClient();
@@ -58,6 +61,8 @@ export async function packContainerWithAnalysis(container: Container, context: C
                             useBuilderLogger()
                                 .debug(`Extracting analysis file ${header.name} (${header.size} bytes).`, {
                                     command: BuilderCommand.BUILD,
+                                    analysis_id: context.entity.id,
+                                    [LogFlag.REF_ID]: context.entity.id,
                                 });
 
                             files.push([header.name, buff]);
@@ -68,6 +73,8 @@ export async function packContainerWithAnalysis(container: Container, context: C
                             useBuilderLogger()
                                 .error(`Extracting analysis file ${header.name} (${header.size} bytes) failed.`, {
                                     command: BuilderCommand.BUILD,
+                                    analysis_id: context.entity.id,
+                                    [LogFlag.REF_ID]: context.entity.id,
                                 });
                             callback(e);
                         });
@@ -84,6 +91,8 @@ export async function packContainerWithAnalysis(container: Container, context: C
                         useBuilderLogger()
                             .debug(`Encrypting/Packing analysis file ${files[i][0]}.`, {
                                 command: BuilderCommand.BUILD,
+                                analysis_id: context.entity.id,
+                                [LogFlag.REF_ID]: context.entity.id,
                             });
 
                         pack.entry({ name: files[i][0] }, files[i][1]);
@@ -91,6 +100,8 @@ export async function packContainerWithAnalysis(container: Container, context: C
                         useBuilderLogger()
                             .debug(`Encrypted/Packed analysis file ${files[i][0]}.`, {
                                 command: BuilderCommand.BUILD,
+                                analysis_id: context.entity.id,
+                                [LogFlag.REF_ID]: context.entity.id,
                             });
                     }
 

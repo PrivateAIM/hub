@@ -12,6 +12,7 @@ import {
 import type {
     CoreBucketEventPayload,
 } from '@privateaim/server-core-worker-kit';
+import { LogFlag } from '@privateaim/telemetry-kit';
 import { useCoreLogger } from '../utils';
 
 export async function writeBucketDeletedEvent(
@@ -27,6 +28,7 @@ export async function writeBucketDeletedEvent(
         message: `${data.bucketType} bucket ${data.bucketId} destroyed for analysis ${data.id}`,
         command: CoreCommand.DESTROY,
         analysis_id: data.id,
+        [LogFlag.REF_ID]: data.id,
         bucket_id: data.bucketId,
         bucket_type: data.bucketType,
         event: CoreEvent.BUCKET_DELETED,

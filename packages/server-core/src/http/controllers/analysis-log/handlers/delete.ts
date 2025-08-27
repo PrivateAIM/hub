@@ -6,11 +6,13 @@
  */
 
 import { BadRequestError } from '@ebec/http';
-import type { Log } from '@privateaim/telemetry-kit';
+import type { Log, LogLevel } from '@privateaim/telemetry-kit';
+import { LogFlag } from '@privateaim/telemetry-kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted } from 'routup';
 import { type FiltersBuildInput, parseQueryFilters } from 'rapiq';
 import type { AnalysisLog } from '@privateaim/core-kit';
+import { DomainType } from '@privateaim/core-kit';
 import { useRequestQuery } from '@routup/basic/query';
 import { isTelemetryClientUsable, useTelemetryClient } from '../../../../services';
 
@@ -20,26 +22,32 @@ export async function deleteAnalysisLogRouteHandler(req: Request, res: Response)
         {
             allowed: [
                 'analysis_id',
+                'level',
             ],
         },
     );
 
-    const filters : FiltersBuildInput<Log> = {
-        labels: {
-            entity: 'analysis',
-        },
-        time: `>${((BigInt(Math.floor(Date.now() / 1000) - (60 * 60 * 24 * 31 * 12 * 10))) * 1_000_000n).toString()}`,
-    };
-
+    const filtersNormalized : Partial<Record<keyof AnalysisLog, string>> = {};
     if (output) {
         for (let i = 0; i < output.length; i++) {
-            filters.labels = filters.labels || {};
-            filters.labels[output[i].key] = `${output[i].value}`;
+            filtersNormalized[output[i].key] = `${output[i].value}`;
         }
     }
 
-    if (!filters.labels?.analysis_id) {
+    if (!filtersNormalized.analysis_id) {
         throw new BadRequestError('The filter analysis_id must be defined.');
+    }
+
+    const filters : FiltersBuildInput<Log> = {
+        labels: {
+            [LogFlag.REF_TYPE]: DomainType.ANALYSIS,
+            [LogFlag.REF_ID]: filtersNormalized.analysis_id,
+        },
+        time: `${((BigInt(Math.floor(Date.now() / 1000) - (60 * 60 * 24 * 31 * 12 * 10))) * 1_000_000n).toString()}`,
+    };
+
+    if (filtersNormalized.level) {
+        filters.level = filtersNormalized.level as LogLevel;
     }
 
     // todo: check permissions

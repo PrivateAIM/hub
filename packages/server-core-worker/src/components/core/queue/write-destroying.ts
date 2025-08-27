@@ -14,6 +14,7 @@ import {
 import type {
     CoreDestroyPayload,
 } from '@privateaim/server-core-worker-kit';
+import { LogFlag } from '@privateaim/telemetry-kit';
 import { useCoreLogger } from '../utils';
 
 export async function writeDestroyingEvent(
@@ -30,6 +31,7 @@ export async function writeDestroyingEvent(
         message: `Destroying analysis ${data.id}`,
         command: CoreCommand.DESTROY,
         analysis_id: data.id,
+        [LogFlag.REF_ID]: data.id,
         event: CoreEvent.DESTROYING,
     });
 

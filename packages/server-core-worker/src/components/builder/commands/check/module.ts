@@ -8,6 +8,7 @@
 import {
     buildRegistryClientConnectionStringFromRegistry,
 } from '@privateaim/core-kit';
+import { LogFlag } from '@privateaim/telemetry-kit';
 import { isClientErrorWithStatusCode } from 'hapic';
 import type { BuilderCheckPayload } from '@privateaim/server-core-worker-kit';
 import { BuilderCommand } from '@privateaim/server-core-worker-kit';
@@ -70,6 +71,7 @@ export async function executeBuilderCheckCommand(
         message: `Checking docker registry ${data.registry.host}}`,
         command: BuilderCommand.CHECK,
         analysis_id: data.id,
+        [LogFlag.REF_ID]: data.id,
     });
 
     const connectionString = buildRegistryClientConnectionStringFromRegistry(data.registry);
@@ -91,6 +93,7 @@ export async function executeBuilderCheckCommand(
                 command: BuilderCommand.CHECK,
                 analysis_id: data.id,
                 node_id: node.id,
+                [LogFlag.REF_ID]: data.id,
             });
         }
     } catch (e) {

@@ -6,9 +6,11 @@
  */
 
 import { pickRecord } from '@authup/kit';
+import { DomainType } from '@privateaim/core-kit';
 import { isRealmResourceWritable } from '@privateaim/kit';
 import { ForbiddenError } from '@ebec/http';
 import type { LogLevel } from '@privateaim/telemetry-kit';
+import { LogFlag } from '@privateaim/telemetry-kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted } from 'routup';
 import { useDataSource } from 'typeorm-extension';
@@ -65,7 +67,7 @@ export async function createAnalysisNodeLogRouteHandler(req: Request, res: Respo
 
     const labels : Record<string, string> = {};
     const labelsRaw = {
-        entity: 'analysisNode',
+        [LogFlag.REF_TYPE]: DomainType.ANALYSIS_NODE,
         ...(data.labels || {}),
         ...pickRecord(data, [
             'analysis_id',

@@ -14,6 +14,7 @@ import {
 import type {
     CoreConfigurePayload,
 } from '@privateaim/server-core-worker-kit';
+import { LogFlag } from '@privateaim/telemetry-kit';
 import { useCoreLogger } from '../utils';
 
 export async function writeConfiguredEvent(
@@ -30,6 +31,7 @@ export async function writeConfiguredEvent(
         message: `Configured analysis ${data.id}`,
         command: CoreCommand.CONFIGURE,
         analysis_id: data.id,
+        [LogFlag.REF_ID]: data.id,
         event: CoreEvent.CONFIGURED,
     });
 

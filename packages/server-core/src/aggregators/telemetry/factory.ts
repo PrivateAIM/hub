@@ -14,7 +14,7 @@ export function createTelemetryAggregator() : Aggregator {
     if (!isRedisClientUsable() || useEnv('env') === EnvironmentName.TEST) {
         return {
             start() {
-                useLogger().warn('Telemetry aggregator has not been initialized');
+                useLogger().debug('Telemetry aggregator has not been initialized');
             },
         };
     }

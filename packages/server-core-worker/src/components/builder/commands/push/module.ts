@@ -10,6 +10,7 @@ import {
 } from '@privateaim/core-kit';
 import { BuilderCommand } from '@privateaim/server-core-worker-kit';
 import type { BuilderBuildPayload } from '@privateaim/server-core-worker-kit';
+import { LogFlag } from '@privateaim/telemetry-kit';
 import {
     buildDockerAuthConfigFromRegistry,
     buildRemoteDockerImageURL,
@@ -69,6 +70,7 @@ export async function executePushCommand(
         message: `Tagging ${localImageUrl} docker image for nodes`,
         command: BuilderCommand.BUILD,
         analysis_id: data.id,
+        [LogFlag.REF_ID]: data.id,
     });
 
     const image = useDocker()
@@ -109,6 +111,7 @@ export async function executePushCommand(
         message: `Tagged ${localImageUrl} docker image for nodes`,
         command: BuilderCommand.PUSH,
         analysis_id: data.id,
+        [LogFlag.REF_ID]: data.id,
     });
 
     // -----------------------------------------------------------------------------------
@@ -117,6 +120,7 @@ export async function executePushCommand(
         message: `Pushing ${localImageUrl} docker image for nodes`,
         command: BuilderCommand.PUSH,
         analysis_id: data.id,
+        [LogFlag.REF_ID]: data.id,
     });
 
     try {
@@ -133,6 +137,7 @@ export async function executePushCommand(
         message: `Pushed ${localImageUrl} docker image for nodes`,
         command: BuilderCommand.PUSH,
         analysis_id: data.id,
+        [LogFlag.REF_ID]: data.id,
     });
 
     return data;

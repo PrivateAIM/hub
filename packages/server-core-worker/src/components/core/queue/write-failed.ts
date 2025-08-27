@@ -12,6 +12,7 @@ import {
     buildCoreEventQueueRouterPayload,
 } from '@privateaim/server-core-worker-kit';
 import type { CoreCommandContext } from '@privateaim/server-core-worker-kit';
+import { LogFlag } from '@privateaim/telemetry-kit';
 import { useCoreLogger } from '../utils';
 
 export async function writeFailedEvent(
@@ -31,6 +32,7 @@ export async function writeFailedEvent(
         ...(context.data.error ? context.data.error : {}),
         command: context.command,
         analysis_id: context.data.id,
+        [LogFlag.REF_ID]: context.data.id,
         event: CoreEvent.FAILED,
     });
 

@@ -11,6 +11,7 @@ import {
     BuilderCommand,
     buildBuilderTaskQueueRouterPayload,
 } from '@privateaim/server-core-worker-kit';
+import { LogFlag } from '@privateaim/telemetry-kit';
 import { useBuilderLogger } from '../utils';
 
 export async function writePushCommand(
@@ -26,6 +27,7 @@ export async function writePushCommand(
         message: `Push analysis ${data.id}`,
         command: BuilderCommand.PUSH,
         analysis_id: data.id,
+        [LogFlag.REF_ID]: data.id,
     });
 
     return data;

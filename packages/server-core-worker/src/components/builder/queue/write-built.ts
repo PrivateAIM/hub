@@ -11,6 +11,7 @@ import {
     BuilderCommand,
     BuilderEvent, buildBuilderEventQueueRouterPayload,
 } from '@privateaim/server-core-worker-kit';
+import { LogFlag } from '@privateaim/telemetry-kit';
 import { useBuilderLogger } from '../utils';
 
 export async function writeBuiltEvent(
@@ -26,6 +27,7 @@ export async function writeBuiltEvent(
         message: `Built analysis ${data.id}`,
         command: BuilderCommand.BUILD,
         analysis_id: data.id,
+        [LogFlag.REF_ID]: data.id,
         event: BuilderEvent.BUILT,
     });
 

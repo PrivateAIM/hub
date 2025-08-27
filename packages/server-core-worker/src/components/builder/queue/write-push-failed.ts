@@ -8,6 +8,7 @@
 import { useQueueRouter } from '@privateaim/server-kit';
 import type { BuilderPushPayload } from '@privateaim/server-core-worker-kit';
 import { BuilderCommand, BuilderEvent, buildBuilderEventQueueRouterPayload } from '@privateaim/server-core-worker-kit';
+import { LogFlag } from '@privateaim/telemetry-kit';
 import { useBuilderLogger } from '../utils';
 
 export async function writePushFailedEvent(
@@ -24,6 +25,7 @@ export async function writePushFailedEvent(
         ...(data.error ? data.error : {}),
         command: BuilderCommand.PUSH,
         analysis_id: data.id,
+        [LogFlag.REF_ID]: data.id,
         event: BuilderEvent.PUSH_FAILED,
     });
 }

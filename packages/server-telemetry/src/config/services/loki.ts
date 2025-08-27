@@ -14,8 +14,14 @@ export function configureLoki() {
     const baseURL = useEnv('lokiURL');
     const compactorURL = useEnv('lokiCompactorURL');
     const querierURL = useEnv('lokiQuerierURL');
+    const distributorURL = useEnv('lokiDistributorURL');
 
-    if (!baseURL && !compactorURL && !querierURL) {
+    if (
+        !baseURL &&
+        !compactorURL &&
+        !querierURL &&
+        !distributorURL
+    ) {
         return;
     }
 
@@ -29,6 +35,11 @@ export function configureLoki() {
     if (compactorURL) {
         config.options = config.options || {};
         config.options.compactorURL = compactorURL;
+    }
+
+    if (distributorURL) {
+        config.options = config.options || {};
+        config.options.distributorURL = distributorURL;
     }
 
     if (querierURL) {

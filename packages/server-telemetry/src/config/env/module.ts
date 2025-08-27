@@ -35,6 +35,7 @@ export function useEnv(key?: string) : any {
 
         lokiURL: read(EnvironmentInputKey.LOKI_URL),
         lokiCompactorURL: read(EnvironmentInputKey.LOKI_COMPACTOR_URL),
+        lokiDistributorURL: read(EnvironmentInputKey.LOKI_DISTRIBUTOR_URL),
         lokiQuerierURL: read(EnvironmentInputKey.LOKI_QUERIER_URL),
     };
 

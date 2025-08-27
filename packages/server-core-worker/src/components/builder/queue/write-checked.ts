@@ -12,6 +12,7 @@ import {
     buildBuilderEventQueueRouterPayload,
 } from '@privateaim/server-core-worker-kit';
 import type { BuilderCheckPayload } from '@privateaim/server-core-worker-kit';
+import { LogFlag } from '@privateaim/telemetry-kit';
 import { useBuilderLogger } from '../utils';
 
 export async function writeCheckedEvent(
@@ -27,6 +28,7 @@ export async function writeCheckedEvent(
         message: `Checked analysis ${data.id}`,
         command: BuilderCommand.CHECK,
         analysis_id: data.id,
+        [LogFlag.REF_ID]: data.id,
         event: BuilderEvent.CHECKED,
     });
 

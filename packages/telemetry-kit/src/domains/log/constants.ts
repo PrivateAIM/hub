@@ -74,6 +74,10 @@ export enum LogFlag {
     SERVICE = 'service',
 
     LEVEL = 'level',
+
+    REF_TYPE = 'ref_type',
+
+    REF_ID = 'ref_id',
 }
 
 export enum LogChannel {

@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { DomainType } from '@privateaim/core-kit';
 import type { Logger } from '@privateaim/server-kit';
 import { createLogger } from '@privateaim/server-kit';
 import { ComponentName } from '@privateaim/server-core-worker-kit';
@@ -23,6 +24,7 @@ export function useCoreLogger() : Logger {
             [LogFlag.SERVICE]: 'hub-server-worker',
             [LogFlag.CHANNEL]: LogChannel.SYSTEM,
             [LogFlag.COMPONENT]: ComponentName.CORE,
+            [LogFlag.REF_TYPE]: DomainType.ANALYSIS,
         },
         save: async (data) => {
             if (isLogComponentServiceUsable()) {

@@ -6,12 +6,14 @@
  */
 
 import type { Log, LogLevel } from '@privateaim/telemetry-kit';
+import { LogFlag } from '@privateaim/telemetry-kit';
 import { useRequestQuery } from '@routup/basic/query';
 import type { Request, Response } from 'routup';
 import { send } from 'routup';
 import { BadRequestError } from '@ebec/http';
 import { type FiltersBuildInput, parseQuery } from 'rapiq';
 import type { AnalysisLog } from '@privateaim/core-kit';
+import { DomainType } from '@privateaim/core-kit';
 import { isTelemetryClientUsable, useTelemetryClient } from '../../../../services';
 
 export async function getManyAnalysisLogRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -23,7 +25,6 @@ export async function getManyAnalysisLogRouteHandler(req: Request, res: Response
                 allowed: [
                     'level',
                     'analysis_id',
-                    'time',
                 ],
             },
             pagination: {
@@ -35,36 +36,28 @@ export async function getManyAnalysisLogRouteHandler(req: Request, res: Response
         },
     );
 
-    const filters : FiltersBuildInput<Log> = {
-        labels: {
-            entity: 'analysis',
-        },
-    };
-
     // todo: clean up this
 
-    for (let i = 0; i < output.filters.length; i++) {
-        const filter = output.filters[i];
-
-        if (filter.key === 'analysis_id') {
-            filters.labels = filters.labels || {};
-            filters.labels[filter.key] = `${filter.value}`;
-
-            continue;
-        }
-
-        if (filter.key === 'level') {
-            filters.level = `${filter.value}` as LogLevel;
-        }
-
-        if (filter.key === 'time') {
-            // todo: respect operator
-            filters.time = `>${filter.value}`;
+    const filtersNormalized : Partial<Record<keyof AnalysisLog, string>> = {};
+    if (output.filters) {
+        for (let i = 0; i < output.filters.length; i++) {
+            filtersNormalized[output.filters[i].key] = `${output.filters[i].value}`;
         }
     }
 
-    if (!filters?.labels?.analysis_id) {
+    if (!filtersNormalized.analysis_id) {
         throw new BadRequestError('The filter analysis_id must be defined.');
+    }
+
+    const filters : FiltersBuildInput<Log> = {
+        labels: {
+            [LogFlag.REF_TYPE]: DomainType.ANALYSIS,
+            [LogFlag.REF_ID]: filtersNormalized.analysis_id,
+        },
+    };
+
+    if (filtersNormalized.level) {
+        filters.level = filtersNormalized.level as LogLevel;
     }
 
     // todo: sort missing
