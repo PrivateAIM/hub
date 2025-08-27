@@ -44,7 +44,7 @@ export function createSocketServer(
             useRedisSubscribeClient(),
         );
     } else {
-        useLogger().warn('[socket] Redis is not configured and can not be used as an adapter.');
+        useLogger().debug('Redis is not configured and can not be used as an adapter.');
     }
 
     const server = new Server<
@@ -85,13 +85,13 @@ export function createSocketServer(
     const pattern = /^\/resources(?::[a-z0-9A-Z-_]+)?$/;
     const nsp = server.of(pattern);
     nsp.use((socket, next) => {
-        useLogger().info(`Socket/${socket.id}: Connected.`, {
+        useLogger().debug(`Socket/${socket.id}: Connected.`, {
             namespace: socket.nsp.name,
             [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
         });
 
         socket.on('disconnect', () => {
-            useLogger().info(`Socket/${socket.id}: Disconnected.`, {
+            useLogger().debug(`Socket/${socket.id}: Disconnected.`, {
                 namespace: socket.nsp.name,
                 [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
             });
@@ -104,19 +104,19 @@ export function createSocketServer(
 
     nsp.use((socket: Socket, next) => {
         if (socket.data.userId) {
-            useLogger().info(`Socket/${socket.id}: Authenticated as user.`, {
+            useLogger().info(`Socket/${socket.id}: User connected.`, {
                 [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
                 actor_type: 'user',
                 actor_id: socket.data.userId,
             });
         } else if (socket.data.robotId) {
-            useLogger().info(`Socket/${socket.id}: Authenticated as robot.`, {
+            useLogger().info(`Socket/${socket.id}: Robot connected.`, {
                 [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
                 actor_type: 'robot',
                 actor_id: socket.data.robotId,
             });
         } else if (socket.data.clientId) {
-            useLogger().info(`Socket/${socket.id}: Authenticated as client.`, {
+            useLogger().info(`Socket/${socket.id}: Client connected.`, {
                 [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
                 actor_type: 'client',
                 actor_id: socket.data.clientId,
@@ -181,10 +181,14 @@ export function createSocketServer(
     });
 
     nsp.adapter.on('create-room', (room) => {
-        useLogger().info(`[socket] room ${room} was created`);
+        useLogger().info(`Room ${room} was created.`, {
+            [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
+        });
     });
     nsp.adapter.on('delete-room', (room) => {
-        useLogger().info(`[socket] room ${room} was deleted`);
+        useLogger().info(`Room ${room} was deleted.`, {
+            [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
+        });
     });
 
     registerSocketControllers(nsp);
