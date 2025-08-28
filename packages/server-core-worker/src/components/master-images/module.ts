@@ -13,9 +13,9 @@ import {
     MasterImagesEvent,
     useMasterImageQueueService,
 } from '@privateaim/server-core-worker-kit';
+import { EnvironmentName, isQueueRouterUsable, useLogger } from '@privateaim/server-kit';
 import type { Component, QueueRouterHandlers } from '@privateaim/server-kit';
-import { isQueueRouterUsable, useLogger } from '@privateaim/server-kit';
-import { EnvironmentName, useEnv } from '../../config';
+import { useEnv } from '../../config';
 import {
     executeMasterImagesBuildCommand,
     executeMasterImagesPushCommand,

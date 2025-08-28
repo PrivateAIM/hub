@@ -11,8 +11,10 @@ import {
 } from '@privateaim/server-core-worker-kit';
 import type { CoreConfigurePayload, CoreDestroyPayload } from '@privateaim/server-core-worker-kit';
 import type { Component, QueueRouterHandlers } from '@privateaim/server-kit';
-import { isQueueRouterUsable, useLogger, useQueueRouter } from '@privateaim/server-kit';
-import { EnvironmentName, useEnv } from '../../config';
+import {
+    EnvironmentName, isQueueRouterUsable, useLogger, useQueueRouter,
+} from '@privateaim/server-kit';
+import { useEnv } from '../../config';
 import {
     executeCoreConfigureCommand, executeCoreDestroyCommand,
 

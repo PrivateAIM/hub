@@ -8,7 +8,7 @@
 import path from 'node:path';
 import { orFail, read, readInt } from 'envix';
 import { config } from 'dotenv';
-import type { EnvironmentName } from './constants';
+import { EnvironmentName } from '@privateaim/server-kit';
 import type { Environment } from './type';
 
 config({
@@ -30,7 +30,7 @@ export function useEnv(key?: string) : any {
     }
 
     instance = {
-        env: read('NODE_ENV', 'development') as `${EnvironmentName}`,
+        env: read('NODE_ENV', EnvironmentName.DEVELOPMENT) as `${EnvironmentName}`,
         port: readInt('PORT', 3000),
 
         rabbitMqConnectionString: read('RABBITMQ_CONNECTION_STRING', 'amqp://root:start123@127.0.0.1'),
