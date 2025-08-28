@@ -6,7 +6,7 @@
  */
 
 import { type Factory, singa } from 'singa';
-import type { Logger } from 'winston';
+import type { Logger } from './types';
 
 const instance = singa<Logger>({
     name: 'logger',

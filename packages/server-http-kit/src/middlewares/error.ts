@@ -20,9 +20,10 @@ export function mountErrorMiddleware(router: Router) {
             error.statusCode < 600;
 
         if (isServerError || error.logMessage) {
-            if (error.cause) {
+            if (error.cause && isObject(error.cause)) {
                 useLogger().error({
-                    ...(isObject(error.cause) ? error.cause : {}),
+                    ...error.cause,
+                    message: error.cause?.message || error.message,
                     [LogFlag.CHANNEL]: LogChannel.HTTP,
                 });
             } else {
