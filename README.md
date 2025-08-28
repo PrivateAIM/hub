@@ -11,6 +11,12 @@ This repository contains the HUB ecosystem of FLAME.
 >
 > The HUB ecosystem is currently under active development and is not yet ready for production.
 
+<div align="center">
+
+[![Architecture](./.github/assets/architecture.png)]()
+
+</div>
+
 
 **Table of Contents**
 
