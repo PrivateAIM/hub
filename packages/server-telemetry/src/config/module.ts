@@ -8,6 +8,7 @@
 import {
     configureAMQP,
     configureAuthup,
+    configureDomainEventPublisher,
     configureLoki,
     configureRedis,
     configureVault,
@@ -23,4 +24,6 @@ export function configure() {
     configureRedis();
     configureAuthup();
     configureVault();
+
+    configureDomainEventPublisher();
 }

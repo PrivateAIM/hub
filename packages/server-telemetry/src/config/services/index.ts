@@ -8,6 +8,7 @@
 export * from './amqp';
 export * from './authup';
 export * from './database';
+export * from './domain-event';
 export * from './logger';
 export * from './loki';
 export * from './redis';
