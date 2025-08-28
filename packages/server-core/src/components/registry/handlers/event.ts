@@ -20,7 +20,7 @@ export async function dispatchRegistryEventToTrainManager(
         case RegistryHookEvent.SCANNING_COMPLETED:
         case RegistryHookEvent.SCANNING_FAILED: {
             useLogger()
-                .info(`skipping registry event: ${data.event}`);
+                .debug(`skipping registry event: ${data.event}`);
             break;
         }
     }

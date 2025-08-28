@@ -43,7 +43,7 @@ export class DomainEventPublisher implements IDomainEventPublisher {
         ctx: DomainEventPublishOptions<T>,
     ) : Promise<void> {
         if (isLoggerUsable()) {
-            useLogger().info(`Publishing event ${buildDomainEventFullName(ctx.metadata.domain, ctx.metadata.event)}`);
+            useLogger().debug(`Publishing event ${buildDomainEventFullName(ctx.metadata.domain, ctx.metadata.event)}`);
         }
 
         let destinations : DomainEventDestination[] = [];

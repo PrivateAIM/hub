@@ -29,10 +29,10 @@ export class ResetCommand implements CommandModule {
     async handler(_args: ResetArguments) {
         const spinner = useLogger();
 
-        spinner.info('Executing database reset...');
+        spinner.debug('Executing database reset...');
         const options = await buildDataSourceOptions();
         await dropDatabase({ options });
-        spinner.info('executed database reset.');
+        spinner.debug('executed database reset.');
 
         process.exit(0);
     }

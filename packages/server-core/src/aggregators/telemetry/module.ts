@@ -26,7 +26,7 @@ export class TelemetryAggregator implements Aggregator {
         );
 
         redisSub.on('message', async (channel, message) => {
-            useLogger().info(`Received event from channel ${channel}`);
+            useLogger().debug(`Received event from channel ${channel}`);
             const event = JSON.parse(message);
 
             switch (event.type) {

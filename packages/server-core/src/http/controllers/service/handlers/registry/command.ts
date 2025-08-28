@@ -55,7 +55,7 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
                 .getOne();
 
             if (result.command === RegistryAPICommand.SETUP) {
-                useLogger().info('Submitting setup registry command.');
+                useLogger().debug('Submitting setup registry command.');
 
                 const queueMessage = buildRegistryTaskQueueRouterPayload({
                     command: RegistryCommand.SETUP,
@@ -66,7 +66,7 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
 
                 await client.publish(queueMessage);
             } else if (result.command === RegistryAPICommand.DELETE) {
-                useLogger().info('Submitting delete registry command.');
+                useLogger().debug('Submitting delete registry command.');
 
                 const queueMessage = buildRegistryTaskQueueRouterPayload({
                     command: RegistryCommand.DELETE,
@@ -77,7 +77,7 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
 
                 await client.publish(queueMessage);
             } else {
-                useLogger().info('Submitting cleanup registry command.');
+                useLogger().debug('Submitting cleanup registry command.');
 
                 const queueMessage = buildRegistryTaskQueueRouterPayload({
                     command: RegistryCommand.CLEANUP,
