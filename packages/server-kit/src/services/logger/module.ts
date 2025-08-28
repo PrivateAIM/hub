@@ -6,10 +6,9 @@
  */
 
 import { read } from 'envix';
-import type { Logger } from 'winston';
 import { createLogger as create, format, transports } from 'winston';
+import type { Logger, LoggerCreateContext, LoggerTransports } from './types';
 import { EnvironmentName } from '../../constants';
-import type { LoggerCreateContext, LoggerTransports } from './types';
 
 function toTransports(input: LoggerTransports) {
     return Array.isArray(input) ? input : [input];

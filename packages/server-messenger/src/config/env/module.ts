@@ -8,7 +8,7 @@
 import {
     orFail, read, readInt,
 } from 'envix';
-import type { EnvironmentName } from '@privateaim/server-kit';
+import { EnvironmentName } from '@privateaim/server-kit';
 import type { Environment } from './types';
 
 let instance : Environment | undefined;
@@ -25,7 +25,7 @@ export function useEnv(key?: string) : any {
     }
 
     instance = {
-        env: read('NODE_ENV', 'development') as `${EnvironmentName}`,
+        env: read('NODE_ENV', EnvironmentName.DEVELOPMENT) as `${EnvironmentName}`,
         port: readInt('PORT', 3000),
 
         rabbitMqConnectionString: read('RABBIT_MQ_CONNECTION_STRING'),
