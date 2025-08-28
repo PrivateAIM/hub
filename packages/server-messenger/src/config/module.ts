@@ -5,12 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { setupLogger, setupRedis, setupVault } from './services';
+import {
+    configureAMQP,
+    setupLogger,
+    setupRedis,
+    setupVault,
+} from './services';
 
 export function configure() {
     setupLogger();
 
+    configureAMQP();
     setupRedis();
-
     setupVault();
 }

@@ -6,7 +6,7 @@
  */
 
 import type { Aggregator } from '@privateaim/server-kit';
-import { buildDomainEventRedisChannel, useLogger, useRedisSubscribeClient } from '@privateaim/server-kit';
+import { buildEntityEventRedisChannel, useLogger, useRedisSubscribeClient } from '@privateaim/server-kit';
 import type { Event } from '@privateaim/telemetry-kit';
 import { DomainType as TelemetryDomainType } from '@privateaim/telemetry-kit';
 import { useDataSource } from 'typeorm-extension';
@@ -19,7 +19,7 @@ export class TelemetryAggregator implements Aggregator {
         const redisSub = useRedisSubscribeClient();
 
         redisSub.subscribe(
-            buildDomainEventRedisChannel(
+            buildEntityEventRedisChannel(
                 TelemetryDomainType.EVENT,
                 DomainEventNamespace,
             ),

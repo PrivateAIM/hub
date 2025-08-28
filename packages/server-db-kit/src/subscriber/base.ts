@@ -8,10 +8,10 @@
 import type { ObjectLiteral } from '@privateaim/kit';
 import { DomainEventName } from '@privateaim/kit';
 import type {
-    DomainEventDestinations, DomainEventDestinationsFn,
-    DomainEventPublisher,
+    EntityEventDestinations, EntityEventDestinationsFn,
+    EntityEventPublisher,
 } from '@privateaim/server-kit';
-import { useDomainEventPublisher } from '@privateaim/server-kit';
+import { useEntityEventPublisher } from '@privateaim/server-kit';
 import type {
     EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
@@ -20,15 +20,15 @@ import type { BaseSubscriberContext, SubscriberPublishPayload } from './types';
 export class BaseSubscriber<
     RECORD extends ObjectLiteral,
 > implements EntitySubscriberInterface<RECORD> {
-    protected publisher: DomainEventPublisher;
+    protected publisher: EntityEventPublisher;
 
-    protected destinations : DomainEventDestinations | DomainEventDestinationsFn<RECORD>;
+    protected destinations : EntityEventDestinations | EntityEventDestinationsFn<RECORD>;
 
     protected domain: string;
 
     constructor(ctx: BaseSubscriberContext<RECORD>) {
         this.domain = ctx.domain;
-        this.publisher = useDomainEventPublisher();
+        this.publisher = useEntityEventPublisher();
         this.destinations = ctx.destinations;
     }
 
@@ -64,7 +64,9 @@ export class BaseSubscriber<
             data: payload.data,
             dataPrevious: payload.dataPrevious,
             metadata: {
-                domain: this.domain,
+                ref_type: this.domain,
+                ref_id: payload.data.id,
+
                 event: payload.type,
                 ...(payload.metadata ? payload.metadata : {}),
             },

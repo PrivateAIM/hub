@@ -9,7 +9,7 @@ export * from './amqp';
 export * from './authup';
 export * from './authup-client-authentication-hook';
 export * from './cache';
-export * from './domain-event';
+export * from './entity-event';
 export * from './logger';
 export * from './redis';
 export * from './vault';

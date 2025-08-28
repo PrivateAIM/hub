@@ -8,7 +8,7 @@
 import {
     orFail, read, readInt,
 } from 'envix';
-import type { EnvironmentName } from './constants';
+import type { EnvironmentName } from '@privateaim/server-kit';
 import type { Environment } from './type';
 
 let instance : Environment | undefined;
@@ -27,9 +27,10 @@ export function useEnv(key?: string) : any {
     instance = {
         env: read('NODE_ENV', 'development') as `${EnvironmentName}`,
         port: readInt('PORT', 3000),
+
+        rabbitMqConnectionString: read('RABBIT_MQ_CONNECTION_STRING'),
         redisConnectionString: orFail(read('REDIS_CONNECTION_STRING')),
         vaultConnectionString: read('VAULT_CONNECTION_STRING'),
-
         authupURL: read('AUTHUP_URL', 'http://127.0.0.1:3010/'),
     };
 

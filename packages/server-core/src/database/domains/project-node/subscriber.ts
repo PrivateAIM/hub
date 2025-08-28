@@ -15,7 +15,7 @@ import {
     DomainType,
 } from '@privateaim/core-kit';
 import { BaseSubscriber } from '@privateaim/server-db-kit';
-import { DomainEventDestination } from '@privateaim/server-kit';
+import { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
 import { ProjectNodeEntity } from './entity';
 
@@ -27,7 +27,7 @@ ProjectNodeEntity
         super({
             domain: DomainType.PROJECT_NODE,
             destinations: (data) => {
-                const destinations: DomainEventDestination[] = [
+                const destinations: EntityEventDestination[] = [
                     {
                         namespace: DomainEventNamespace,
                         channel: DomainType.PROJECT_NODE,

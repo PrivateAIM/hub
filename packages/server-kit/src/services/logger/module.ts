@@ -6,9 +6,9 @@
  */
 
 import { read } from 'envix';
-import { EnvironmentName } from 'typeorm-extension';
 import type { Logger } from 'winston';
 import { createLogger as create, format, transports } from 'winston';
+import { EnvironmentName } from '../../constants';
 import type { LoggerCreateContext, LoggerTransports } from './types';
 
 function toTransports(input: LoggerTransports) {

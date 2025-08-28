@@ -16,6 +16,7 @@
         "@hapic/vault": "^2.3.9",
         "@privateaim/kit": "^0.8.16",
         "@privateaim/server-kit": "^0.8.16",
+        "@privateaim/server-db-kit": "^0.8.16",
         "@privateaim/server-http-kit": "^0.8.16",
         "@privateaim/server-telemetry-kit": "^0.8.16",
         "@privateaim/storage-kit": "^0.8.16",

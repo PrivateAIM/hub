@@ -7,22 +7,22 @@
 
 import type { Client } from 'redis-extension';
 import type { DomainEventRecord } from '@privateaim/kit';
-import type { DomainEventPublishOptions, IDomainEventConsumer } from '../types';
-import { transformEventData } from '../utils';
-import { buildDomainEventRedisChannel } from './helpers';
+import type { EntityEventHandleOptions, IEntityEventHandler } from '../../types';
+import { transformEntityEventData } from '../../utils';
+import { buildEntityEventRedisChannel } from './helpers';
 
-export class DomainEventRedisPublisher implements IDomainEventConsumer {
+export class EntityEventRedisHandler implements IEntityEventHandler {
     protected driver : Client;
 
     constructor(client: Client) {
         this.driver = client;
     }
 
-    async consume(ctx: DomainEventPublishOptions) : Promise<void> {
+    async handle(ctx: EntityEventHandleOptions) : Promise<void> {
         const payload : DomainEventRecord = {
-            type: ctx.metadata.domain,
+            type: ctx.metadata.ref_type,
             event: ctx.metadata.event,
-            data: transformEventData(ctx.data),
+            data: transformEntityEventData(ctx.data),
         };
 
         const payloadSerialized = JSON.stringify(payload);
@@ -31,7 +31,7 @@ export class DomainEventRedisPublisher implements IDomainEventConsumer {
         for (let i = 0; i < ctx.destinations.length; i++) {
             const destination = ctx.destinations[i];
 
-            const key = buildDomainEventRedisChannel(
+            const key = buildEntityEventRedisChannel(
                 destination.channel,
                 destination.namespace,
             );

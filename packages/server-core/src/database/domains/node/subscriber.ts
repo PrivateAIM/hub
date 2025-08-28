@@ -13,7 +13,7 @@ import type {
 } from 'typeorm';
 import { EventSubscriber } from 'typeorm';
 import { BaseSubscriber } from '@privateaim/server-db-kit';
-import { DomainEventDestination } from '@privateaim/server-kit';
+import { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
 import { NodeEntity } from './entity';
 
@@ -23,7 +23,7 @@ export class NodeSubscriber extends BaseSubscriber<NodeEntity> implements Entity
         super({
             domain: DomainType.NODE,
             destinations: (data) => {
-                const destinations: DomainEventDestination[] = [
+                const destinations: EntityEventDestination[] = [
                     {
                         namespace: DomainEventNamespace,
                         channel: DomainType.NODE,

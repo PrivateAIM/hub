@@ -6,4 +6,6 @@
  */
 
 export * from './module';
-export * from './type';
+export * from './handlers';
+export * from './singleton';
+export * from './types';

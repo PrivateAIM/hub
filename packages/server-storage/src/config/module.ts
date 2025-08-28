@@ -6,7 +6,9 @@
  */
 
 import {
+    configureAMQP,
     configureAuthup,
+    configureEventPublisher,
     configureMinio,
     configureRedis,
     configureVault,
@@ -16,8 +18,11 @@ import {
 export function configure() {
     setupLogging();
 
+    configureAMQP();
     configureRedis();
     configureMinio();
     configureAuthup();
     configureVault();
+
+    configureEventPublisher();
 }

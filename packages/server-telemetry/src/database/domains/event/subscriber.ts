@@ -16,7 +16,7 @@ import {
     DomainEventNamespace,
 } from '@privateaim/kit';
 import { BaseSubscriber } from '@privateaim/server-db-kit';
-import { DomainEventDestination } from '@privateaim/server-kit';
+import { EntityEventDestination } from '@privateaim/server-kit';
 import { EventEntity } from './entity';
 
 @TypeormEventSubscriber()
@@ -27,7 +27,7 @@ EventEntity
         super({
             domain: DomainType.EVENT,
             destinations: (data) => {
-                const destinations: DomainEventDestination[] = [
+                const destinations: EntityEventDestination[] = [
                     {
                         namespace: DomainEventNamespace,
                         channel: DomainType.EVENT,

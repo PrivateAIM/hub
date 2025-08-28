@@ -5,9 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { EnvironmentName } from '@privateaim/server-kit';
 import type { DataSourceOptions } from 'typeorm';
 import { readDataSourceOptionsFromEnv } from 'typeorm-extension';
-import { EnvironmentName, useEnv } from '../config';
+import { useEnv } from '../config';
 import { BucketEntity, BucketFileEntity } from '../domains';
 
 export async function extendDataSourceOptions(options: DataSourceOptions): Promise<DataSourceOptions> {

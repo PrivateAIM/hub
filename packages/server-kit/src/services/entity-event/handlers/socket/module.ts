@@ -8,28 +8,27 @@
 import { buildDomainEventFullName } from '@privateaim/kit';
 import { Emitter } from '@socket.io/redis-emitter';
 import type { Client } from 'redis-extension';
-import type { DomainEventPublishOptions, IDomainEventConsumer } from '../types';
-import { transformEventData } from '../utils';
-import { buildDomainEventSocketChannel, buildDomainEventSocketNamespace } from './helpers';
+import type { EntityEventHandleOptions, IEntityEventHandler } from '../../types';
+import { transformEntityEventData } from '../../utils';
 
-export class DomainEventSocketConsumer implements IDomainEventConsumer {
+export class EntityEventSocketHandler implements IEntityEventHandler {
     protected client : Client;
 
     constructor(client: Client) {
         this.client = client;
     }
 
-    async consume(ctx: DomainEventPublishOptions) : Promise<void> {
-        ctx.data = transformEventData(ctx.data);
+    async handle(ctx: EntityEventHandleOptions) : Promise<void> {
+        ctx.data = transformEntityEventData(ctx.data);
 
         for (let i = 0; i < ctx.destinations.length; i++) {
             const destination = ctx.destinations[i];
 
-            const namespace = buildDomainEventSocketNamespace(destination.namespace);
-            const roomName = buildDomainEventSocketChannel(destination.channel);
+            const namespace = this.buildNamespace(destination.namespace);
+            const roomName = this.buildChannel(destination.channel);
 
             const fullEventName = buildDomainEventFullName(
-                ctx.metadata.domain,
+                ctx.metadata.ref_type,
                 ctx.metadata.event,
             );
 
@@ -40,7 +39,7 @@ export class DomainEventSocketConsumer implements IDomainEventConsumer {
                 .emit(fullEventName, {
                     data: {
                         data: ctx.data,
-                        type: ctx.metadata.domain,
+                        type: ctx.metadata.ref_type,
                         event: ctx.metadata.event,
                     },
                     meta: {
@@ -49,5 +48,25 @@ export class DomainEventSocketConsumer implements IDomainEventConsumer {
                     },
                 });
         }
+    }
+
+    protected buildNamespace(namespace?: string | string[]) {
+        if (typeof namespace === 'undefined') {
+            return '/';
+        }
+
+        if (typeof namespace === 'string') {
+            return namespace.startsWith('/') ? namespace : `/${namespace}`;
+        }
+
+        return `/${namespace.join('/')}`;
+    }
+
+    protected buildChannel(channel: string | string[]) {
+        if (typeof channel === 'string') {
+            return channel;
+        }
+
+        return channel.join('/');
     }
 }

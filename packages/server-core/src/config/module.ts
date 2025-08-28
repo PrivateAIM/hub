@@ -22,7 +22,7 @@ import {
     configureAmqp,
     configureAuthup,
     configureAuthupClientAuthenticationHook,
-    configureDomainEventPublisher,
+    configureEventPublisher,
     configureRedis,
     configureTelemetryClient,
     configureVault,
@@ -49,7 +49,7 @@ export function createConfig() : Config {
 
     configureAmqp();
 
-    configureDomainEventPublisher();
+    configureEventPublisher();
 
     // ---------------------------------------------
 

@@ -7,16 +7,16 @@
 
 import type { Factory } from 'singa';
 import { singa } from 'singa';
-import type { DomainEventPublisher } from './module';
+import type { EntityEventPublisher } from './module';
 
-const instance = singa<DomainEventPublisher>({
-    name: 'domainEventPublisher',
+const instance = singa<EntityEventPublisher>({
+    name: 'entityEventPublisher',
 });
 
-export function setDomainEventPublisherFactory(factory: Factory<DomainEventPublisher>) {
+export function setEntityEventPublisherFactory(factory: Factory<EntityEventPublisher>) {
     instance.setFactory(factory);
 }
 
-export function useDomainEventPublisher() {
+export function useEntityEventPublisher() {
     return instance.use();
 }

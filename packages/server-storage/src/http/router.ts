@@ -11,6 +11,7 @@ import {
     mountMiddlewares,
 } from '@privateaim/server-http-kit';
 import {
+    EnvironmentName,
     isAuthupClientUsable,
     isRedisClientUsable,
     isVaultClientUsable,
@@ -19,7 +20,7 @@ import {
     useVaultClient,
 } from '@privateaim/server-kit';
 import { Router, coreHandler } from 'routup';
-import { EnvironmentName, useEnv } from '../config';
+import { useEnv } from '../config';
 import { BucketController, BucketFileController } from './controllers';
 
 export function createHTTPRouter() : Router {

@@ -13,7 +13,7 @@ import {
     DomainType,
 } from '@privateaim/core-kit';
 import { BaseSubscriber } from '@privateaim/server-db-kit';
-import { DomainEventDestination } from '@privateaim/server-kit';
+import { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
 import { AnalysisPermissionEntity } from './entity';
 
@@ -25,7 +25,7 @@ AnalysisPermissionEntity
         super({
             domain: DomainType.ANALYSIS_PERMISSION,
             destinations: (data) => {
-                const destinations: DomainEventDestination[] = [
+                const destinations: EntityEventDestination[] = [
                     {
                         namespace: DomainEventNamespace,
                         channel: DomainType.ANALYSIS_PERMISSION,

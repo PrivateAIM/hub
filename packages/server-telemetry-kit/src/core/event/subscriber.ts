@@ -6,26 +6,35 @@
  */
 
 import { isEqual } from 'smob';
-import type { DomainEventConsumeOptions, IDomainEventConsumer } from '@privateaim/server-kit';
+import type { EntityEventHandleOptions, IEntityEventHandler } from '@privateaim/server-kit';
 import { useLogger } from '@privateaim/server-kit';
 import type { Event, EventData } from '@privateaim/telemetry-kit';
-import { DomainEventName } from '@privateaim/core-kit';
+import { DomainType } from '@privateaim/telemetry-kit';
 import type { ObjectDiff, ObjectLiteral } from '@privateaim/kit';
 import { isObject } from '@privateaim/kit';
-import { isEventComponentServiceUsable, useEventComponentService } from '@privateaim/server-telemetry-kit';
+import { isEventComponentServiceUsable, useEventComponentService } from '../../services';
 
-export class DatabaseDomainEventConsumer implements IDomainEventConsumer {
-    async consume(ctx: DomainEventConsumeOptions): Promise<void> {
+export class EntityEventHandler implements IEntityEventHandler {
+    async handle(ctx: EntityEventHandleOptions): Promise<void> {
+        if (ctx.metadata.ref_type === DomainType.EVENT) {
+            return;
+        }
+
         const entity : Partial<Event> = {
-            ref_type: ctx.metadata.domain,
-            ref_id: ctx.data.id,
+            ref_type: ctx.metadata.ref_type,
+
             name: ctx.metadata.event,
-            scope: 'model',
+            scope: 'entity',
+
             expiring: true,
             expires_at: new Date(
                 Date.now() + (1000 * 60 * 60 * 24 * 7),
             ).toISOString(),
         };
+
+        if (ctx.metadata.ref_id) {
+            entity.ref_id = ctx.metadata.ref_id;
+        }
 
         const keys : (keyof Event)[] = [
             'actor_id',
@@ -53,7 +62,8 @@ export class DatabaseDomainEventConsumer implements IDomainEventConsumer {
         const data : EventData = {};
 
         if (
-            ctx.metadata.event === DomainEventName.UPDATED &&
+            // todo: use enum
+            ctx.metadata.event === 'updated' &&
             ctx.dataPrevious
         ) {
             const diff : ObjectDiff = {};
@@ -93,6 +103,6 @@ export class DatabaseDomainEventConsumer implements IDomainEventConsumer {
             return;
         }
 
-        useLogger().debug('Event service is not available to publish domain events.');
+        useLogger().debug('Event service is not available to publish events.');
     }
 }

@@ -7,19 +7,21 @@
 
 import type { ObjectLiteral } from '@privateaim/kit';
 
-export type DomainEventDestination = {
+export type EntityEventDestination = {
     namespace?: string | string[],
     channel: string | string[]
 };
 
-export type DomainEventDestinations = DomainEventDestination[];
+export type EntityEventDestinations = EntityEventDestination[];
 
-export type DomainEventDestinationsFn<
+export type EntityEventDestinationsFn<
     T extends ObjectLiteral =ObjectLiteral,
-> = (data: T) => DomainEventDestination[];
+> = (data: T) => EntityEventDestination[];
 
-export type DomainEventMetadata = {
-    domain: string,
+export type EntityEventMetadata = {
+    ref_type: string,
+    ref_id?: string,
+
     event: string,
 
     request_path?: string | null,
@@ -32,28 +34,28 @@ export type DomainEventMetadata = {
     actor_name?: string | null;
 };
 
-export type DomainEventPublishOptions<
+export type EntityEventPublishOptions<
     T extends ObjectLiteral = ObjectLiteral,
 > = {
     data: T,
     dataPrevious?: T,
-    metadata: DomainEventMetadata,
-    destinations: DomainEventDestinations | DomainEventDestinationsFn<T>
+    metadata: EntityEventMetadata,
+    destinations: EntityEventDestinations | EntityEventDestinationsFn<T>
 };
 
-export interface IDomainEventPublisher {
-    publish(ctx: DomainEventPublishOptions) : Promise<void>;
+export interface IEntityEventPublisher {
+    publish(ctx: EntityEventPublishOptions) : Promise<void>;
 }
 
-export type DomainEventConsumeOptions<
+export type EntityEventHandleOptions<
     T extends ObjectLiteral = ObjectLiteral,
 > = {
     data: T,
     dataPrevious?: T,
-    metadata: DomainEventMetadata,
-    destinations: DomainEventDestinations
+    metadata: EntityEventMetadata,
+    destinations: EntityEventDestinations
 };
 
-export interface IDomainEventConsumer {
-    consume(ctx: DomainEventConsumeOptions) : Promise<void>;
+export interface IEntityEventHandler {
+    handle(ctx: EntityEventHandleOptions) : Promise<void>;
 }
