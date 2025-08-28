@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.8.17](https://github.com/PrivateAIM/hub/compare/v0.8.16...v0.8.17) (2025-08-28)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/core-kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/telemetry-kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/core-http-kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/core-realtime-kit bumped from ^0.7.17 to ^0.7.18
+    * @privateaim/storage-kit bumped from ^0.8.16 to ^0.8.17
+  * peerDependencies
+    * @privateaim/core-kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/storage-kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/telemetry-kit bumped from ^0.8.16 to ^0.8.17
+
 ## [0.8.16](https://github.com/PrivateAIM/hub/compare/v0.8.15...v0.8.16) (2025-08-26)
 
 
