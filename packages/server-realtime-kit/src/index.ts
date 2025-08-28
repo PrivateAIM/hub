@@ -7,5 +7,5 @@
 
 export * from './helpers';
 export * from './middlewares';
-export * from './services';
+export * from './server';
 export * from './types';

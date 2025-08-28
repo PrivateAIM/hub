@@ -5,90 +5,19 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { UnauthorizedError } from '@ebec/http';
-import type { CTSEvents, STCEvents } from '@privateaim/messenger-kit';
-import {
-    isRedisClientUsable,
-    isVaultClientUsable,
-    useLogger,
-    useRedisClient,
-    useRedisPublishClient,
-    useRedisSubscribeClient,
-    useVaultClient,
-} from '@privateaim/server-kit';
-import { createAuthupMiddleware } from '@privateaim/server-realtime-kit';
+import { createServer, mountAuthupMiddleware, mountLoggingMiddleware } from '@privateaim/server-realtime-kit';
 import type { Server as HTTPServer } from 'node:http';
-import type { ServerOptions } from 'socket.io';
-import { Server } from 'socket.io';
-import { createAdapter } from '@socket.io/redis-adapter';
+import type { Server } from 'socket.io';
 import { useEnv } from '../config';
 import { registerControllers } from './register';
 
 export function createSocketServer(httpServer: HTTPServer) : Server {
-    let adapter : ServerOptions['adapter'] | undefined;
-    if (isRedisClientUsable()) {
-        adapter = createAdapter(
-            useRedisPublishClient(),
-            useRedisSubscribeClient(),
-        );
-    }
+    const server = createServer(httpServer);
 
-    const server = new Server<
-    CTSEvents,
-    STCEvents
-    >(httpServer, {
-        adapter,
-        cors: {
-            origin(origin, callback) {
-                callback(null, true);
-            },
-            credentials: true,
-        },
-        transports: ['websocket', 'polling'],
-    });
+    mountLoggingMiddleware(server);
 
-    const authupMiddleware = createAuthupMiddleware({
+    mountAuthupMiddleware(server, {
         baseURL: useEnv('authupURL'),
-        redis: isRedisClientUsable() ?
-            useRedisClient() :
-            undefined,
-        vault: isVaultClientUsable() ?
-            useVaultClient() :
-            undefined,
-    });
-
-    server.use((socket, next) => {
-        useLogger().info(`${socket.nsp.name}: Socket connected.`, { socketId: socket.id });
-
-        socket.on('disconnect', () => {
-            useLogger().info(`${socket.nsp.name}: Socket disconnected.`, { socketId: socket.id });
-        });
-
-        next();
-    });
-
-    server.use(authupMiddleware);
-
-    server.use((socket, next) => {
-        if (socket.data.userId) {
-            useLogger().info(`${socket.nsp.name}: User connected.`, { userId: socket.data.userId, socketId: socket.id });
-        } else if (socket.data.robotId) {
-            useLogger().info(`${socket.nsp.name}: Robot connected.`, { robotId: socket.data.robotId, socketId: socket.id });
-        } else {
-            useLogger().error(`${socket.nsp.name}: Socket is not authenticated.`, { socketId: socket.id });
-            next(new UnauthorizedError());
-            return;
-        }
-
-        socket.on('disconnect', () => {
-            if (socket.data.userId) {
-                useLogger().info('User disconnected', { userId: socket.data.userId, socketId: socket.id });
-            } else if (socket.data.robotId) {
-                useLogger().info('Robot disconnected', { robotId: socket.data.robotId, socketId: socket.id });
-            }
-        });
-
-        next();
     });
 
     registerControllers(server);
