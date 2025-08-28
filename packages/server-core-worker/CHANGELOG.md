@@ -1,5 +1,32 @@
 # Changelog
 
+## [0.8.17](https://github.com/PrivateAIM/hub/compare/v0.8.16...v0.8.17) (2025-08-28)
+
+
+### Features
+
+* add log flags ref_type + ref_id & support loki distributor url reading ([e34f7bf](https://github.com/PrivateAIM/hub/commit/e34f7bf6ed24347ba46a439f5382db6b0c89a9df))
+
+
+### Bug Fixes
+
+* **server-core-worker:** cleanup env creation/usage ([47dbe6f](https://github.com/PrivateAIM/hub/commit/47dbe6facaea7b822166e487779cf0b043879c68))
+* set startup logs as debug message ([ba8895b](https://github.com/PrivateAIM/hub/commit/ba8895b9cf627cbaaf70ab5d1856e02da53854aa))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/core-http-kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/telemetry-kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/server-kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/server-telemetry-kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/server-core-worker-kit bumped from ^0.7.17 to ^0.7.18
+    * @privateaim/storage-kit bumped from ^0.8.16 to ^0.8.17
+
 ## [0.8.16](https://github.com/PrivateAIM/hub/compare/v0.8.15...v0.8.16) (2025-08-26)
 
 
