@@ -19,7 +19,6 @@
         "@privateaim/server-http-kit": "^0.8.16",
         "@privateaim/server-realtime-kit": "^0.8.16",
         "@privateaim/telemetry-kit": "^0.8.16",
-        "@socket.io/redis-adapter": "^8.3.0",
         "dotenv": "^16.5.0",
         "envix": "^1.3.0",
         "hapic": "^2.7.0",

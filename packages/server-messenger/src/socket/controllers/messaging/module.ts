@@ -15,6 +15,7 @@ import type {
     CTSMessagingParty,
 } from '@privateaim/messenger-kit';
 import { useLogger } from '@privateaim/server-kit';
+import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import type { Socket } from '../../types';
 import { buildConnectionRobotRoom, buildConnectionUserRoom } from '../connection';
 
@@ -58,7 +59,11 @@ export function mountMessagingController(socket: Socket) {
             const to = data.to[i];
 
             useLogger()
-                .info(`Sending message from ${from.id} (${from.type}) to ${to.id} (${to.type})`);
+                .info(`Sending message from ${from.id} (${from.type}) to ${to.id} (${to.type})`, {
+                    [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
+                    actor_type: from.type,
+                    actor_id: from.id,
+                });
 
             if (to.type === 'user') {
                 socket.in(buildConnectionUserRoom(to.id))
