@@ -5,7 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { isRedisClientUsable, useRedisPublishClient, useRedisSubscribeClient } from '@privateaim/server-kit';
+import {
+    isRedisClientUsable, useLogger, useRedisPublishClient, useRedisSubscribeClient,
+} from '@privateaim/server-kit';
+import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import { createAdapter } from '@socket.io/redis-adapter';
 import type { Server as HTTPServer } from 'node:http';
 import type { DefaultEventsMap, ServerOptions } from 'socket.io';
@@ -27,7 +30,7 @@ export function createServer<
         );
     }
 
-    return new Server<
+    const server = new Server<
     ListenEvents,
     EmitEvents,
     ServerSideEvents,
@@ -42,4 +45,14 @@ export function createServer<
         },
         transports: ['websocket', 'polling'],
     });
+
+    server.engine.on('connection_error', (err) => {
+        useLogger().error({
+            message: err.message,
+            code: err.code,
+            [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
+        });
+    });
+
+    return server;
 }

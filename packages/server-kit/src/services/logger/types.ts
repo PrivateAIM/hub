@@ -18,7 +18,7 @@ type LogEntry = {
     /**
      * Log message.
      */
-    message: string,
+    message: string | Error,
     [key: string]: any
 };
 

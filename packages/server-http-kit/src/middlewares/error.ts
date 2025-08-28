@@ -22,13 +22,12 @@ export function mountErrorMiddleware(router: Router) {
         if (isServerError || error.logMessage) {
             if (error.cause && isObject(error.cause)) {
                 useLogger().error({
-                    ...error.cause,
-                    message: error.cause?.message || error.message,
+                    message: error.cause as Error,
                     [LogFlag.CHANNEL]: LogChannel.HTTP,
                 });
             } else {
                 useLogger().error({
-                    ...error,
+                    message: error,
                     [LogFlag.CHANNEL]: LogChannel.HTTP,
                 });
             }
