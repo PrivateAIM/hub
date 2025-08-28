@@ -7,8 +7,10 @@
 
 import { CoreEventQueueRouterRouting } from '@privateaim/server-core-worker-kit';
 import type { Aggregator } from '@privateaim/server-kit';
-import { isQueueRouterUsable, useLogger, useQueueRouter } from '@privateaim/server-kit';
-import { EnvironmentName, useEnv } from '../../../config';
+import {
+    EnvironmentName, isQueueRouterUsable, useLogger, useQueueRouter,
+} from '@privateaim/server-kit';
+import { useEnv } from '../../../config';
 import { createAnalysisManagerCoreHandlers } from './handler';
 
 export function createAnalysisManagerCoreAggregator() : Aggregator {

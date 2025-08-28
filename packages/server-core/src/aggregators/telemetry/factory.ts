@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { isRedisClientUsable, useLogger } from '@privateaim/server-kit';
+import { EnvironmentName, isRedisClientUsable, useLogger } from '@privateaim/server-kit';
 import type { Aggregator } from '@privateaim/server-kit';
-import { EnvironmentName, useEnv } from '../../config';
+import { useEnv } from '../../config';
 import { TelemetryAggregator } from './module';
 
 export function createTelemetryAggregator() : Aggregator {

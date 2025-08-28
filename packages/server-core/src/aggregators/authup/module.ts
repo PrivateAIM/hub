@@ -6,12 +6,16 @@
  */
 
 import { EntityType } from '@authup/core-kit';
-import { isRedisClientUsable, useLogger, useRedisSubscribeClient } from '@privateaim/server-kit';
-import type { Aggregator } from '@privateaim/server-kit';
-import { EnvironmentName, useEnv } from '../../config';
 import {
-    handleAuthupPermissionEvent, handleAuthupPolicyEvent,
-    handleAuthupRealmEvent, handleAuthupRobotEvent,
+    EnvironmentName, isRedisClientUsable, useLogger, useRedisSubscribeClient,
+} from '@privateaim/server-kit';
+import type { Aggregator } from '@privateaim/server-kit';
+import { useEnv } from '../../config';
+import {
+    handleAuthupPermissionEvent,
+    handleAuthupPolicyEvent,
+    handleAuthupRealmEvent,
+    handleAuthupRobotEvent,
     handleAuthupUserEvent,
 } from './entities';
 

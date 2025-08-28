@@ -5,20 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { isBoolFalse, isBoolTrue } from '@privateaim/kit';
 import { createRedisClient, setRedisFactory } from '@privateaim/server-kit';
-import { ConfigDefaults, useEnv } from '../env';
+import { useEnv } from '../env';
 
 export function configureRedis() {
     const connectionString = useEnv('redisConnectionString');
-    if (
-        typeof connectionString !== 'undefined' &&
-        !isBoolFalse(connectionString)
-    ) {
+    if (connectionString) {
         setRedisFactory(() => createRedisClient({
-            connectionString: isBoolTrue(connectionString) ?
-                ConfigDefaults.REDIS :
-                connectionString,
+            connectionString,
         }));
     }
 }

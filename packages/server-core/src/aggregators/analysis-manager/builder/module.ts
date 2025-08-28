@@ -6,7 +6,8 @@
  */
 
 import {
-    isQueueRouterUsable, useLogger, useQueueRouter,
+    EnvironmentName, isQueueRouterUsable, useLogger,
+    useQueueRouter,
 } from '@privateaim/server-kit';
 import type { BuilderBasePayload } from '@privateaim/server-core-worker-kit';
 import {
@@ -14,7 +15,7 @@ import {
     BuilderEventQueueRouterRouting,
 } from '@privateaim/server-core-worker-kit';
 import type { Aggregator, QueueRouterHandlers } from '@privateaim/server-kit';
-import { EnvironmentName, useEnv } from '../../../config';
+import { useEnv } from '../../../config';
 import { handleAnalysisManagerBuilderBaseEvent } from './handler';
 
 export function createAnalysisManagerBuilderHandlers() : QueueRouterHandlers<{

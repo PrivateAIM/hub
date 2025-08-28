@@ -7,11 +7,12 @@
 
 import type { Component, QueueRouterHandlers } from '@privateaim/server-kit';
 import {
+    EnvironmentName,
     isQueueRouterUsable,
     useLogger,
     useQueueRouter,
 } from '@privateaim/server-kit';
-import { EnvironmentName, useEnv } from '../../config';
+import { useEnv } from '../../config';
 import { RegistryCommand, RegistryTaskQueueRouterRouting } from './constants';
 import {
     dispatchRegistryEventToTrainManager,

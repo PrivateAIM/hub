@@ -5,6 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { isBoolTrue } from '@privateaim/kit';
+import { EnvironmentName } from '@privateaim/server-kit';
 import path from 'node:path';
 import {
     oneOf,
@@ -13,8 +15,8 @@ import {
     readInt,
 } from 'envix';
 import { config } from 'dotenv';
-import { ConfigDefaults, EnvironmentInputKey, EnvironmentName } from './constants';
-import type { Environment } from './type';
+import { EnvironmentDefaults, EnvironmentInputKey } from './constants';
+import type { Environment } from './types';
 
 config({
     debug: false,
@@ -39,30 +41,55 @@ export function useEnv(key?: string) : any {
         env: read(EnvironmentInputKey.ENV, EnvironmentName.DEVELOPMENT) as `${EnvironmentName}`,
         port,
 
-        redisConnectionString: oneOf([
-            readBool(EnvironmentInputKey.REDIS_CONNECTION_STRING),
-            read(EnvironmentInputKey.REDIS_CONNECTION_STRING),
-        ]),
-        rabbitMqConnectionString: oneOf([
-            readBool(EnvironmentInputKey.RABBITMQ_CONNECTION_STRING),
-            read(EnvironmentInputKey.RABBITMQ_CONNECTION_STRING)]),
-        vaultConnectionString: oneOf([
-            readBool(EnvironmentInputKey.VAULT_CONNECTION_STRING),
-            read(EnvironmentInputKey.VAULT_CONNECTION_STRING),
-        ]),
         harborURL: read(EnvironmentInputKey.HARBOR_URL),
 
         authupURL: read(EnvironmentInputKey.AUTHUP_URL),
         telemetryURL: read(EnvironmentInputKey.TELEMETRY_URL),
         publicURL: read(EnvironmentInputKey.PUBLIC_URL, `http://127.0.0.1:${port}/`),
 
-        masterImagesOwner: read(EnvironmentInputKey.MASTER_IMAGES_OWNER, ConfigDefaults.MASTER_IMAGES_OWNER),
-        masterImagesRepository: read(EnvironmentInputKey.MASTER_IMAGES_REPOSITORY, ConfigDefaults.MASTER_IMAGES_REPOSITORY),
-        masterImagesBranch: read(EnvironmentInputKey.MASTER_IMAGES_BRANCH, ConfigDefaults.MASTER_IMAGES_BRANCH),
+        masterImagesOwner: read(EnvironmentInputKey.MASTER_IMAGES_OWNER, EnvironmentDefaults.MASTER_IMAGES_OWNER),
+        masterImagesRepository: read(EnvironmentInputKey.MASTER_IMAGES_REPOSITORY, EnvironmentDefaults.MASTER_IMAGES_REPOSITORY),
+        masterImagesBranch: read(EnvironmentInputKey.MASTER_IMAGES_BRANCH, EnvironmentDefaults.MASTER_IMAGES_BRANCH),
 
         skipProjectApproval: readBool(EnvironmentInputKey.SKIP_PROJECT_APPROVAL),
         skipAnalysisApproval: readBool(EnvironmentInputKey.SKIP_ANALYSIS_APPROVAL),
     };
+
+    // RabbitMQ
+    const rabbitMqConnectionString = oneOf([
+        readBool(EnvironmentInputKey.RABBITMQ_CONNECTION_STRING),
+        read(EnvironmentInputKey.RABBITMQ_CONNECTION_STRING),
+    ]);
+
+    if (typeof rabbitMqConnectionString === 'string') {
+        instance.rabbitMqConnectionString = rabbitMqConnectionString;
+    } else if (isBoolTrue(rabbitMqConnectionString)) {
+        instance.rabbitMqConnectionString = EnvironmentDefaults.RABBITMQ;
+    }
+
+    // Redis
+    const redisConnectionString = oneOf([
+        readBool(EnvironmentInputKey.REDIS_CONNECTION_STRING),
+        read(EnvironmentInputKey.REDIS_CONNECTION_STRING),
+    ]);
+
+    if (typeof redisConnectionString === 'string') {
+        instance.redisConnectionString = redisConnectionString;
+    } else if (isBoolTrue(redisConnectionString)) {
+        instance.redisConnectionString = EnvironmentDefaults.REDIS;
+    }
+
+    // Vault
+    const vaultConnectionString = oneOf([
+        readBool(EnvironmentInputKey.VAULT_CONNECTION_STRING),
+        read(EnvironmentInputKey.VAULT_CONNECTION_STRING),
+    ]);
+
+    if (typeof vaultConnectionString === 'string') {
+        instance.vaultConnectionString = vaultConnectionString;
+    } else if (isBoolTrue(redisConnectionString)) {
+        instance.vaultConnectionString = EnvironmentDefaults.VAULT;
+    }
 
     if (typeof key === 'string') {
         return instance[key];

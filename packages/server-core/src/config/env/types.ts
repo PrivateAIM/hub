@@ -5,15 +5,15 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { EnvironmentName } from './constants';
+import type { EnvironmentName } from '@privateaim/server-kit';
 
 export interface Environment {
     env: `${EnvironmentName}`,
     port: number,
 
-    redisConnectionString?: string | boolean,
-    rabbitMqConnectionString?: string | boolean,
-    vaultConnectionString: string | boolean,
+    redisConnectionString?: string,
+    rabbitMqConnectionString?: string,
+    vaultConnectionString?: string,
     harborURL?: string,
 
     publicURL: string,

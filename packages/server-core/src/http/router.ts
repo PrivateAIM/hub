@@ -6,6 +6,7 @@
  */
 
 import {
+    EnvironmentName,
     isAuthupClientUsable,
     isRedisClientUsable,
     isVaultClientUsable,
@@ -16,7 +17,7 @@ import {
 import { mountErrorMiddleware, mountMiddlewares } from '@privateaim/server-http-kit';
 import type { MiddlewareSwaggerOptions } from '@privateaim/server-http-kit';
 import { Router } from 'routup';
-import { EnvironmentName, useEnv } from '../config';
+import { useEnv } from '../config';
 
 import { AnalysisController } from './controllers/analysis';
 import { AnalysisBucketController } from './controllers/analysis-bucket';

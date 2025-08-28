@@ -6,18 +6,14 @@
  */
 
 import { Client } from 'amqp-extension';
-import { isBoolFalse, isBoolTrue } from '@privateaim/kit';
 import { setAmqpClientFactory } from '@privateaim/server-kit';
-import { ConfigDefaults, useEnv } from '../env';
+import { useEnv } from '../env';
 
 export function configureAmqp() {
     const connectionString = useEnv('rabbitMqConnectionString');
-    if (
-        typeof connectionString !== 'undefined' &&
-        !isBoolFalse(connectionString)
-    ) {
+    if (connectionString) {
         setAmqpClientFactory(() => new Client({
-            connectionOptions: isBoolTrue(connectionString) ? ConfigDefaults.RABBITMQ : connectionString,
+            connectionOptions: connectionString,
         }));
     }
 }
