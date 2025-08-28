@@ -9,7 +9,7 @@ import {
     orFail, read, readInt,
 } from 'envix';
 import type { EnvironmentName } from '@privateaim/server-kit';
-import type { Environment } from './type';
+import type { Environment } from './types';
 
 let instance : Environment | undefined;
 
