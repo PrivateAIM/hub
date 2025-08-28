@@ -9,7 +9,8 @@ import type { ObjectLiteral } from '@privateaim/kit';
 import { buildDomainEventFullName } from '@privateaim/kit';
 import { isLoggerUsable, useLogger } from '../logger';
 import type {
-    EntityEventDestination, EntityEventHandleOptions,
+    EntityEventDestination,
+    EntityEventHandleOptions,
     EntityEventPublishOptions,
     IEntityEventHandler,
     IEntityEventPublisher,
@@ -61,14 +62,14 @@ export class EntityEventPublisher implements IEntityEventPublisher {
             destinations,
         };
 
-        const consumers = this.handlers.values();
+        const handlers = this.handlers.values();
         while (true) {
-            const it = consumers.next();
-            if (it.done) {
+            const handler = handlers.next();
+            if (handler.done) {
                 return;
             }
 
-            await it.value.consume(consumeContext);
+            await (handler.value as IEntityEventHandler).handle(consumeContext);
         }
     }
 }
