@@ -23,7 +23,7 @@ AnalysisNodeEventEntity
 > implements EntitySubscriberInterface<AnalysisNodeEventEntity> {
     constructor() {
         super({
-            domain: DomainType.ANALYSIS_NODE_EVENT,
+            refType: DomainType.ANALYSIS_NODE_EVENT,
             destinations: (data) => {
                 const destinations: EntityEventDestination[] = [
                     {

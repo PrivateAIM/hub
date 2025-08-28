@@ -23,7 +23,7 @@ AnalysisPermissionEntity
 > implements EntitySubscriberInterface<AnalysisPermissionEntity> {
     constructor() {
         super({
-            domain: DomainType.ANALYSIS_PERMISSION,
+            refType: DomainType.ANALYSIS_PERMISSION,
             destinations: (data) => {
                 const destinations: EntityEventDestination[] = [
                     {

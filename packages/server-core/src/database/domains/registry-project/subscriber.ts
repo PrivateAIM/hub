@@ -23,7 +23,7 @@ RegistryProjectEntity
 > implements EntitySubscriberInterface<RegistryProjectEntity> {
     constructor() {
         super({
-            domain: DomainType.REGISTRY_PROJECT,
+            refType: DomainType.REGISTRY_PROJECT,
             destinations: (data) => {
                 const destinations: EntityEventDestination[] = [
                     {

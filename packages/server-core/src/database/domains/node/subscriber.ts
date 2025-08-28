@@ -21,7 +21,7 @@ import { NodeEntity } from './entity';
 export class NodeSubscriber extends BaseSubscriber<NodeEntity> implements EntitySubscriberInterface<NodeEntity> {
     constructor() {
         super({
-            domain: DomainType.NODE,
+            refType: DomainType.NODE,
             destinations: (data) => {
                 const destinations: EntityEventDestination[] = [
                     {

@@ -25,7 +25,7 @@ EventEntity
 > implements EntitySubscriberInterface<EventEntity> {
     constructor() {
         super({
-            domain: DomainType.EVENT,
+            refType: DomainType.EVENT,
             destinations: (data) => {
                 const destinations: EntityEventDestination[] = [
                     {

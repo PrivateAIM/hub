@@ -25,7 +25,7 @@ ProjectNodeEntity
 > implements EntitySubscriberInterface<ProjectNodeEntity> {
     constructor() {
         super({
-            domain: DomainType.PROJECT_NODE,
+            refType: DomainType.PROJECT_NODE,
             destinations: (data) => {
                 const destinations: EntityEventDestination[] = [
                     {

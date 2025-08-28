@@ -20,14 +20,14 @@ import type { BaseSubscriberContext, SubscriberPublishPayload } from './types';
 export class BaseSubscriber<
     RECORD extends ObjectLiteral,
 > implements EntitySubscriberInterface<RECORD> {
-    protected publisher: EntityEventPublisher;
+    private readonly publisher: EntityEventPublisher;
 
-    protected destinations : EntityEventDestinations | EntityEventDestinationsFn<RECORD>;
+    private readonly destinations : EntityEventDestinations | EntityEventDestinationsFn<RECORD>;
 
-    protected domain: string;
+    private readonly refType: string;
 
     constructor(ctx: BaseSubscriberContext<RECORD>) {
-        this.domain = ctx.domain;
+        this.refType = ctx.refType;
         this.publisher = useEntityEventPublisher();
         this.destinations = ctx.destinations;
     }
@@ -64,7 +64,7 @@ export class BaseSubscriber<
             data: payload.data,
             dataPrevious: payload.dataPrevious,
             metadata: {
-                ref_type: this.domain,
+                ref_type: this.refType,
                 ref_id: payload.data.id,
 
                 event: payload.type,

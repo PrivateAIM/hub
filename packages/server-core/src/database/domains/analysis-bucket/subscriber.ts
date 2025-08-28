@@ -23,7 +23,7 @@ AnalysisBucketEntity
 > implements EntitySubscriberInterface<AnalysisBucketEntity> {
     constructor() {
         super({
-            domain: DomainType.ANALYSIS_BUCKET,
+            refType: DomainType.ANALYSIS_BUCKET,
             destinations: (data) => {
                 const destinations: EntityEventDestination[] = [
                     {

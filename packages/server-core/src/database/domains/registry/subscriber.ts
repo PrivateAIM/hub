@@ -23,7 +23,7 @@ RegistryEntity
 > implements EntitySubscriberInterface<RegistryEntity> {
     constructor() {
         super({
-            domain: DomainType.REGISTRY,
+            refType: DomainType.REGISTRY,
             destinations: (data) => {
                 const destinations: EntityEventDestination[] = [
                     {

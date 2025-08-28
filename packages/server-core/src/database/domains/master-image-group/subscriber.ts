@@ -22,7 +22,7 @@ MasterImageGroupEntity
 > implements EntitySubscriberInterface<MasterImageGroupEntity> {
     constructor() {
         super({
-            domain: DomainType.MASTER_IMAGE_GROUP,
+            refType: DomainType.MASTER_IMAGE_GROUP,
             destinations: (data) => [
                 {
                     namespace: DomainEventNamespace,

@@ -6,9 +6,9 @@
  */
 
 import type {
-    DomainEventDestinations,
-    DomainEventDestinationsFn,
-    DomainEventMetadata,
+    EntityEventDestinations,
+    EntityEventDestinationsFn,
+    EntityEventMetadata,
     ObjectLiteral,
 } from '@privateaim/server-kit';
 
@@ -16,12 +16,12 @@ export type SubscriberPublishPayload<T> = {
     type: string,
     data: T,
     dataPrevious?: T,
-    metadata?: Partial<DomainEventMetadata>,
+    metadata?: Partial<EntityEventMetadata>,
 };
 
 export type BaseSubscriberContext<
     RECORD extends ObjectLiteral = ObjectLiteral,
 > = {
-    domain: string,
-    destinations: DomainEventDestinations | DomainEventDestinationsFn<RECORD>,
+    refType: string,
+    destinations: EntityEventDestinations | EntityEventDestinationsFn<RECORD>,
 };
