@@ -1,5 +1,42 @@
 # Changelog
 
+## [0.8.17](https://github.com/PrivateAIM/hub/compare/v0.8.16...v0.8.17) (2025-08-28)
+
+
+### Features
+
+* add log flags ref_type + ref_id & support loki distributor url reading ([e34f7bf](https://github.com/PrivateAIM/hub/commit/e34f7bf6ed24347ba46a439f5382db6b0c89a9df))
+* enhance debugging domain event publisher ([ae294a6](https://github.com/PrivateAIM/hub/commit/ae294a6151c830ae710b07c081cd3b4112631730))
+* refactor domain event publisher & register amqp ([0f98ecf](https://github.com/PrivateAIM/hub/commit/0f98ecf3c24239d9050fd4a7c2e0bd6843cb3dc8))
+* unified socket server creation flow ([#1172](https://github.com/PrivateAIM/hub/issues/1172)) ([1ae9835](https://github.com/PrivateAIM/hub/commit/1ae9835fcc45897347ac4bd255cce6cbf077b284))
+
+
+### Bug Fixes
+
+* change info log messages to debug ([c24d5ee](https://github.com/PrivateAIM/hub/commit/c24d5ee682fb6cc17e64b13f5a4bb58dfd0f2713))
+* database base subscriber types ([f30c44e](https://github.com/PrivateAIM/hub/commit/f30c44eb7f891400de96104c2ea95b6d8fc5a438))
+* **server-core:** align socket connect & disconnect messages ([dcbca9a](https://github.com/PrivateAIM/hub/commit/dcbca9a524a45ea1c57f3b80c53a93ea0f03d417))
+* **server-core:** cleanup env creation/usage ([a54896a](https://github.com/PrivateAIM/hub/commit/a54896a2606a5bd8fa146831c0fed65a233a8dd2))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/core-realtime-kit bumped from ^0.7.17 to ^0.7.18
+    * @privateaim/kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/telemetry-kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/server-kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/server-db-kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/server-http-kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/server-core-worker-kit bumped from ^0.7.17 to ^0.7.18
+    * @privateaim/server-realtime-kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/server-telemetry bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/server-telemetry-kit bumped from ^0.8.16 to ^0.8.17
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.8.16 to ^0.8.17
+
 ## [0.8.16](https://github.com/PrivateAIM/hub/compare/v0.8.15...v0.8.16) (2025-08-26)
 
 
