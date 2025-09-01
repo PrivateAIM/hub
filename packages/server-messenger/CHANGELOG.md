@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.8.17](https://github.com/PrivateAIM/hub/compare/v0.8.16...v0.8.17) (2025-09-01)
+
+
+### Features
+
+* enhance logger abstraction ([d3fdca6](https://github.com/PrivateAIM/hub/commit/d3fdca6c1c18daffb76cc053be2420560999ce52))
+* explicit logger abstraction type ([3f25a77](https://github.com/PrivateAIM/hub/commit/3f25a77671304dc6102f4e35cc84b2d5ea773dcd))
+* refactor domain event publisher & register amqp ([0f98ecf](https://github.com/PrivateAIM/hub/commit/0f98ecf3c24239d9050fd4a7c2e0bd6843cb3dc8))
+* unified socket server creation flow ([#1172](https://github.com/PrivateAIM/hub/issues/1172)) ([1ae9835](https://github.com/PrivateAIM/hub/commit/1ae9835fcc45897347ac4bd255cce6cbf077b284))
+
+
+### Bug Fixes
+
+* check if amqp connection string is defined ([f6611c8](https://github.com/PrivateAIM/hub/commit/f6611c870f5f24fb1ff7e5ca539bbcff7884093b))
+* set startup logs as debug message ([ba8895b](https://github.com/PrivateAIM/hub/commit/ba8895b9cf627cbaaf70ab5d1856e02da53854aa))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/messenger-kit bumped from ^0.7.17 to ^0.7.18
+    * @privateaim/server-kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/server-telemetry-kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/server-http-kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/server-realtime-kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/telemetry-kit bumped from ^0.8.16 to ^0.8.17
+
 ## [0.8.16](https://github.com/PrivateAIM/hub/compare/v0.8.15...v0.8.16) (2025-08-26)
 
 
