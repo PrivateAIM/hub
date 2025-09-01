@@ -71,9 +71,7 @@ export async function createAnalysisNodeLogRouteHandler(req: Request, res: Respo
         ...(data.labels || {}),
         ...pickRecord(data, [
             'analysis_id',
-            'analysis_realm_id',
             'node_id',
-            'node_realm_id',
             'code',
             'status',
         ]),

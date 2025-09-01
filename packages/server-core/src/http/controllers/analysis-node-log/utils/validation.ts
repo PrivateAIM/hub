@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import zod from 'zod';
 import { LogLevel } from '@privateaim/telemetry-kit';
 import { Container } from 'validup';
-import { createValidationChain, createValidator } from '@validup/adapter-validator';
-import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
+import { createValidator } from '@validup/adapter-zod';
 import type { AnalysisNodeLog } from '@privateaim/core-kit';
 
 export class AnalysisNodeLogValidator extends Container<AnalysisNodeLog> {
@@ -17,77 +17,62 @@ export class AnalysisNodeLogValidator extends Container<AnalysisNodeLog> {
 
         this.mount(
             'node_id',
-            { group: HTTPHandlerOperation.CREATE },
-            createValidator(() => {
-                const chain = createValidationChain();
-                return chain
-                    .exists()
-                    .notEmpty()
-                    .isUUID();
-            }),
+            createValidator(
+                zod
+                    .uuidv4(),
+            ),
         );
 
         this.mount(
             'analysis_id',
-            { group: HTTPHandlerOperation.CREATE },
-            createValidator(() => {
-                const chain = createValidationChain();
-                return chain
-                    .exists()
-                    .notEmpty()
-                    .isUUID();
-            }),
+            createValidator(
+                zod
+                    .uuidv4(),
+            ),
         );
 
-        const statusValidator = createValidator(() => {
-            const chain = createValidationChain();
-            return chain
-                .isString()
-                .isLength({ min: 3, max: 64 });
-        });
         this.mount(
             'status',
-            { optional: true, group: HTTPHandlerOperation.UPDATE },
-            statusValidator,
-        );
-        this.mount(
-            'status',
-            { group: HTTPHandlerOperation.CREATE },
-            statusValidator,
+            { optional: true },
+            createValidator(
+                zod
+                    .string()
+                    .min(3)
+                    .max(64)
+                    .optional()
+                    .nullable(),
+            ),
         );
 
         this.mount(
             'message',
-            { optional: true },
-            createValidator(() => {
-                const chain = createValidationChain();
-                return chain
-                    .optional({ nullable: true })
-                    .isString();
-            }),
+            createValidator(
+                zod
+                    .string()
+                    .min(3)
+                    .max(2048),
+            ),
         );
 
         this.mount(
             'code',
             { optional: true },
-            createValidator(() => {
-                const chain = createValidationChain();
-                return chain
-                    .optional({ nullable: true })
-                    .isString()
-                    .isLength({ min: 3, max: 64 });
-            }),
+            createValidator(
+                zod
+                    .string()
+                    .min(3)
+                    .max(64)
+                    .optional()
+                    .nullable(),
+            ),
         );
 
         this.mount(
             'level',
-            { optional: true },
-            createValidator(() => {
-                const chain = createValidationChain();
-                return chain
-                    .optional({ nullable: true })
-                    .isIn(Object.values(LogLevel));
-            }),
+            createValidator(
+                zod
+                    .enum(Object.values(LogLevel)),
+            ),
         );
     }
 }
