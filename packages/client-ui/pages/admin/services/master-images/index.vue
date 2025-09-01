@@ -60,7 +60,7 @@ export default {
                 <MasterImagesSync @failed="handleFailed" />
             </div>
             <div class="col-6">
-                <FEvents :query="{filters: {ref_type: 'masterImage'}}" />
+                <FEvents :query="{ filters: {ref_type: 'masterImage'} }" />
             </div>
         </div>
     </div>

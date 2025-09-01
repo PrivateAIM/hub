@@ -78,6 +78,9 @@ export default defineComponent({
             sort: {
                 updated_at: 'DESC',
             },
+            pagination: {
+                limit: 50,
+            },
         }));
 
         const handleDeleted = async (item: Node) => {

@@ -53,11 +53,11 @@ export async function getManyEventLogRouteHandler(req: Request, res: Response) :
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(EventEntity);
-    const query = repository.createQueryBuilder('event');
-    query.distinctOn(['event.id']);
+    const query = repository.createQueryBuilder('ev');
+    query.distinctOn(['ev.id']);
 
     const { pagination } = applyQuery(query, useRequestQuery(req), {
-        defaultAlias: 'event',
+        defaultAlias: 'ev',
         filters: {
             allowed: [
                 'scope',
