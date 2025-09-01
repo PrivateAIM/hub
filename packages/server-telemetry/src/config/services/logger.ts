@@ -23,7 +23,11 @@ export function setupLogging(): void {
                         [LogFlag.CHANNEL]: LogChannel.SYSTEM,
                     },
                     save: async (value) => {
-                        await component.handle(value);
+                        try {
+                            await component.handle(value);
+                        } catch (e) {
+                            console.log(e);
+                        }
                     },
                 }),
             ],

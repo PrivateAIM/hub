@@ -10,7 +10,10 @@ import { setAmqpClientFactory } from '@privateaim/server-kit';
 import { useEnv } from '../env';
 
 export function configureAMQP() {
-    setAmqpClientFactory(() => new Client({
-        connectionOptions: useEnv('rabbitMqConnectionString'),
-    }));
+    const connectionString = useEnv('rabbitMqConnectionString');
+    if (connectionString) {
+        setAmqpClientFactory(() => new Client({
+            connectionOptions: connectionString,
+        }));
+    }
 }
