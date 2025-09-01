@@ -35,7 +35,8 @@
         "hapic": "^2.7.0",
         "singa": "^1.1.0",
         "triple-beam": "^1.4.1",
-        "winston": "^3.17.0"
+        "winston": "^3.17.0",
+        "winston-transport": "^4.9.0"
     },
     "devDependencies": {
         "@authup/core-http-kit": "^1.0.0-beta.27",

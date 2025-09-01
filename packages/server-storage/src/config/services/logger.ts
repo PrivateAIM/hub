@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { createLogger, setLoggerFactory } from '@privateaim/server-kit';
+import { LoggerConsoleTransport, createLogger, setLoggerFactory } from '@privateaim/server-kit';
 import {
     LoggerTransport,
     isLogComponentServiceUsable,
@@ -14,26 +14,25 @@ import {
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 
 export function setupLogging(): void {
-    setLoggerFactory(() => {
-        const transport = new LoggerTransport({
-            labels: {
-                [LogFlag.SERVICE]: 'hub-server-storage',
-                [LogFlag.CHANNEL]: LogChannel.SYSTEM,
-            },
-            save: async (data) => {
-                if (isLogComponentServiceUsable()) {
-                    const component = useLogComponentService();
+    setLoggerFactory(() => createLogger({
+        transports: [
+            new LoggerConsoleTransport(),
+            new LoggerTransport({
+                labels: {
+                    [LogFlag.SERVICE]: 'hub-server-storage',
+                    [LogFlag.CHANNEL]: LogChannel.SYSTEM,
+                },
+                save: async (data) => {
+                    if (isLogComponentServiceUsable()) {
+                        const component = useLogComponentService();
 
-                    await component.command({
-                        command: 'write',
-                        data,
-                    });
-                }
-            },
-        });
-
-        return createLogger({
-            transports: [transport],
-        });
-    });
+                        await component.command({
+                            command: 'write',
+                            data,
+                        });
+                    }
+                },
+            }),
+        ],
+    }));
 }

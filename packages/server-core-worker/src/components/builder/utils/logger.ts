@@ -7,7 +7,7 @@
 
 import { DomainType } from '@privateaim/core-kit';
 import type { Logger } from '@privateaim/server-kit';
-import { createLogger } from '@privateaim/server-kit';
+import { LoggerConsoleTransport, createLogger } from '@privateaim/server-kit';
 import { ComponentName } from '@privateaim/server-core-worker-kit';
 import { LoggerTransport, isLogComponentServiceUsable, useLogComponentService } from '@privateaim/server-telemetry-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
@@ -19,31 +19,32 @@ export function useBuilderLogger() : Logger {
         return instance;
     }
 
-    const transport = new LoggerTransport({
-        labels: {
-            [LogFlag.SERVICE]: 'hub-server-worker',
-            [LogFlag.CHANNEL]: LogChannel.SYSTEM,
-            [LogFlag.COMPONENT]: ComponentName.BUILDER,
-            [LogFlag.REF_TYPE]: DomainType.ANALYSIS,
-        },
-        save: async (data) => {
-            if (isLogComponentServiceUsable()) {
-                const logComponent = useLogComponentService();
-                await logComponent.command({
-                    command: 'write',
-                    data,
-                });
-            }
-        },
-    });
-
     instance = createLogger({
         options: {
             defaultMeta: {
                 component: ComponentName.BUILDER,
             },
         },
-        transports: [transport],
+        transports: [
+            new LoggerConsoleTransport(),
+            new LoggerTransport({
+                labels: {
+                    [LogFlag.SERVICE]: 'hub-server-worker',
+                    [LogFlag.CHANNEL]: LogChannel.SYSTEM,
+                    [LogFlag.COMPONENT]: ComponentName.BUILDER,
+                    [LogFlag.REF_TYPE]: DomainType.ANALYSIS,
+                },
+                save: async (data) => {
+                    if (isLogComponentServiceUsable()) {
+                        const logComponent = useLogComponentService();
+                        await logComponent.command({
+                            command: 'write',
+                            data,
+                        });
+                    }
+                },
+            }),
+        ],
     });
 
     return instance;

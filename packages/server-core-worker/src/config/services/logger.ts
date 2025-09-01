@@ -6,6 +6,7 @@
  */
 
 import {
+    LoggerConsoleTransport,
     createLogger,
     setLoggerFactory,
 } from '@privateaim/server-kit';
@@ -13,25 +14,24 @@ import { LoggerTransport, isLogComponentServiceUsable, useLogComponentService } 
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 
 export function setupLogger(): void {
-    setLoggerFactory(() => {
-        const transport = new LoggerTransport({
-            labels: {
-                [LogFlag.SERVICE]: 'hub-server-worker',
-                [LogFlag.CHANNEL]: LogChannel.SYSTEM,
-            },
-            save: async (data) => {
-                if (isLogComponentServiceUsable()) {
-                    const logComponent = useLogComponentService();
-                    await logComponent.command({
-                        command: 'write',
-                        data,
-                    });
-                }
-            },
-        });
-
-        return createLogger({
-            transports: [transport],
-        });
-    });
+    setLoggerFactory(() => createLogger({
+        transports: [
+            new LoggerConsoleTransport(),
+            new LoggerTransport({
+                labels: {
+                    [LogFlag.SERVICE]: 'hub-server-worker',
+                    [LogFlag.CHANNEL]: LogChannel.SYSTEM,
+                },
+                save: async (data) => {
+                    if (isLogComponentServiceUsable()) {
+                        const logComponent = useLogComponentService();
+                        await logComponent.command({
+                            command: 'write',
+                            data,
+                        });
+                    }
+                },
+            }),
+        ],
+    }));
 }

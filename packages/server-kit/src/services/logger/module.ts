@@ -5,31 +5,19 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { read } from 'envix';
-import { createLogger as create, format, transports } from 'winston';
-import type { Logger, LoggerCreateContext, LoggerTransports } from './types';
-import { EnvironmentName } from '../../constants';
-
-function toTransports(input: LoggerTransports) {
-    return Array.isArray(input) ? input : [input];
-}
+import { createLogger as create, format } from 'winston';
+import { createLoggerConsoleTransport } from './transports';
+import type {
+    Logger, LoggerCreateContext, LoggerTransport,
+} from './types';
 
 export function createLogger(ctx: LoggerCreateContext = {}) : Logger {
-    let loggerTransports : LoggerTransports;
-    if (read('env') === EnvironmentName.PRODUCTION) {
-        loggerTransports = [
-            new transports.Console({
-                level: 'info',
-            }),
-            ...(ctx.transports ? toTransports(ctx.transports) : []),
-        ];
-    } else {
-        loggerTransports = [
-            new transports.Console({
-                level: 'debug',
-            }),
-            ...(ctx.transports ? toTransports(ctx.transports) : []),
-        ];
+    const transports : LoggerTransport[] = [
+        ...(ctx.transports || []),
+    ];
+
+    if (transports.length === 0) {
+        transports.push(createLoggerConsoleTransport());
     }
 
     return create({
@@ -39,7 +27,7 @@ export function createLogger(ctx: LoggerCreateContext = {}) : Logger {
             format.simple(),
         ),
         level: 'debug',
-        transports: loggerTransports,
+        transports,
         // todo: deeply merge options
         ...(ctx.options || {}),
     });

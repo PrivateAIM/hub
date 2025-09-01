@@ -5,13 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type Transport from 'winston-transport';
 import type { LoggerOptions } from 'winston';
 
-export type LoggerTransports = LoggerOptions['transports'];
+export type LoggerTransport = Transport;
 
 export type LoggerCreateContext = {
     options?: Partial<LoggerOptions>,
-    transports?: LoggerTransports
+    transports?: LoggerTransport[]
 };
 
 type LogEntry = {
