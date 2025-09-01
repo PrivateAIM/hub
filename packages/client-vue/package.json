@@ -72,7 +72,7 @@
         "socket.io-client": "^4.8.1",
         "vue": "^3.5.20",
         "vue-tsc": "^3.0.6",
-        "vue3-form-wizard": "^0.2.9"
+        "vue3-form-wizard": "0.2.4"
     },
     "peerDependencies": {
         "@authup/client-web-kit": "^1.0.0-beta.26",

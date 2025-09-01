@@ -10,7 +10,7 @@ import { DomainType } from '@privateaim/core-kit';
 import { isRealmResourceWritable } from '@privateaim/kit';
 import { ForbiddenError } from '@ebec/http';
 import type { LogLevel } from '@privateaim/telemetry-kit';
-import { LogFlag } from '@privateaim/telemetry-kit';
+import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted } from 'routup';
 import { useDataSource } from 'typeorm-extension';
@@ -89,6 +89,8 @@ export async function createAnalysisNodeLogRouteHandler(req: Request, res: Respo
 
     await telemetry.log.create({
         level: data.level as LogLevel,
+        channel: LogChannel.HTTP,
+        service: 'hub-server-core',
         message: data.message,
         labels,
     });

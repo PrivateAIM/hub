@@ -360,49 +360,52 @@ export default defineComponent({
             </div>
         </template>
 
-        <TabContent
-            title="Nodes"
-            :before-change="passWizardStep"
-        >
-            <FAnalysisWizardStepNodes
-                :entity="entity"
-                @updated="handleUpdated"
-            />
-        </TabContent>
+        <template #default>
+            <TabContent
+                title="Nodes"
+                :before-change="passWizardStep"
+            >
+                fooo
+                <FAnalysisWizardStepNodes
+                    :entity="entity"
+                    @updated="handleUpdated"
+                />
+            </TabContent>
 
-        <TabContent
-            title="Files"
-            :before-change="passWizardStep"
-        >
-            <FAnalysisWizardStepFiles
-                :entity="entity"
-                :entrypoint-entity="entrypointFile"
-                @entrypoint-changed="handleEntrypointFileChanged"
-                @failed="handleFailed"
-            />
-        </TabContent>
+            <TabContent
+                title="Files"
+                :before-change="passWizardStep"
+            >
+                <FAnalysisWizardStepFiles
+                    :entity="entity"
+                    :entrypoint-entity="entrypointFile"
+                    @entrypoint-changed="handleEntrypointFileChanged"
+                    @failed="handleFailed"
+                />
+            </TabContent>
 
-        <TabContent
-            title="Image"
-            :before-change="passWizardStep"
-        >
-            <FAnalysisWizardStepMasterImage
-                :master-image-entity="masterImage"
-                :entrypoint-entity="entrypointFile"
-                :entity="entity"
-                @updated="handleUpdated"
-                @master-image-changed="handleMasterImageChanged"
-            />
-        </TabContent>
+            <TabContent
+                title="Image"
+                :before-change="passWizardStep"
+            >
+                <FAnalysisWizardStepMasterImage
+                    :master-image-entity="masterImage"
+                    :entrypoint-entity="entrypointFile"
+                    :entity="entity"
+                    @updated="handleUpdated"
+                    @master-image-changed="handleMasterImageChanged"
+                />
+            </TabContent>
 
-        <TabContent
-            title="Security"
-            :before-change="passWizardStep"
-        >
-            <FAnalysisWizardStepSecurity
-                :entity="entity"
-                @failed="handleFailed"
-            />
-        </TabContent>
+            <TabContent
+                title="Security"
+                :before-change="passWizardStep"
+            >
+                <FAnalysisWizardStepSecurity
+                    :entity="entity"
+                    @failed="handleFailed"
+                />
+            </TabContent>
+        </template>
     </FormWizard>
 </template>

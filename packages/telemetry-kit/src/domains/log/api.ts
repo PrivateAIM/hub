@@ -21,7 +21,7 @@ export class LogAPI extends BaseAPI {
         await this.client.delete(`logs${buildQuery(options)}`);
     }
 
-    async create(data: Partial<LogInput>): Promise<SingleResourceResponse<Log>> {
+    async create(data: LogInput): Promise<SingleResourceResponse<Log>> {
         const { data: response } = await this.client.post('logs', data);
 
         return response;

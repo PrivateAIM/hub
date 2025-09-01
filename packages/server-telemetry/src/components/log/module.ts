@@ -26,7 +26,7 @@ export function defineLogComponent() : Component {
 
                 await queueRouter.consumeAny(
                     LogTaskQueueRouterRouting,
-                    async (
+                    (
                         payload,
                     ) => handlers.execute(
                         payload.type,
