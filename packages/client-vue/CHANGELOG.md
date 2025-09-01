@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.8.17](https://github.com/PrivateAIM/hub/compare/v0.8.16...v0.8.17) (2025-09-01)
+
+
+### Bug Fixes
+
+* add missing attributes for analysis-node-log submission ([b0ddabd](https://github.com/PrivateAIM/hub/commit/b0ddabd4fd8a744ad15cac877454988958319261))
+* **deps:** bump the minorandpatch group across 1 directory with 6 updates ([#1173](https://github.com/PrivateAIM/hub/issues/1173)) ([47fa968](https://github.com/PrivateAIM/hub/commit/47fa968c35135638d3c55a6e58cd94ca8a0079b9))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/core-kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/telemetry-kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/core-http-kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/core-realtime-kit bumped from ^0.7.17 to ^0.7.18
+    * @privateaim/storage-kit bumped from ^0.8.16 to ^0.8.17
+  * peerDependencies
+    * @privateaim/core-kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/storage-kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/telemetry-kit bumped from ^0.8.16 to ^0.8.17
+
 ## [0.8.16](https://github.com/PrivateAIM/hub/compare/v0.8.15...v0.8.16) (2025-08-26)
 
 

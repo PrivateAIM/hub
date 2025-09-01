@@ -1,5 +1,39 @@
 # Changelog
 
+## [0.8.17](https://github.com/PrivateAIM/hub/compare/v0.8.16...v0.8.17) (2025-09-01)
+
+
+### Features
+
+* add log flags ref_type + ref_id & support loki distributor url reading ([e34f7bf](https://github.com/PrivateAIM/hub/commit/e34f7bf6ed24347ba46a439f5382db6b0c89a9df))
+* enhance debugging domain event publisher ([ae294a6](https://github.com/PrivateAIM/hub/commit/ae294a6151c830ae710b07c081cd3b4112631730))
+* enhance logger abstraction ([d3fdca6](https://github.com/PrivateAIM/hub/commit/d3fdca6c1c18daffb76cc053be2420560999ce52))
+* explicit logger abstraction type ([3f25a77](https://github.com/PrivateAIM/hub/commit/3f25a77671304dc6102f4e35cc84b2d5ea773dcd))
+* refactor domain event publisher & register amqp ([0f98ecf](https://github.com/PrivateAIM/hub/commit/0f98ecf3c24239d9050fd4a7c2e0bd6843cb3dc8))
+* remove analysis-node index property ([75110f4](https://github.com/PrivateAIM/hub/commit/75110f40a59237f8116245a08fdf39f03d1c7562))
+* track socket engine errors ([39771e4](https://github.com/PrivateAIM/hub/commit/39771e4c7d1eb2f14d2dad968b293d3bd513397c))
+* unified socket server creation flow ([#1172](https://github.com/PrivateAIM/hub/issues/1172)) ([1ae9835](https://github.com/PrivateAIM/hub/commit/1ae9835fcc45897347ac4bd255cce6cbf077b284))
+* use zod for analysis-node-logs validation ([7ab535e](https://github.com/PrivateAIM/hub/commit/7ab535e86c636de153ac66d72862200e966c8904))
+
+
+### Bug Fixes
+
+* add missing attributes for analysis-node-log submission ([b0ddabd](https://github.com/PrivateAIM/hub/commit/b0ddabd4fd8a744ad15cac877454988958319261))
+* change info log messages to debug ([c24d5ee](https://github.com/PrivateAIM/hub/commit/c24d5ee682fb6cc17e64b13f5a4bb58dfd0f2713))
+* check if amqp connection string is defined ([f6611c8](https://github.com/PrivateAIM/hub/commit/f6611c870f5f24fb1ff7e5ca539bbcff7884093b))
+* database base subscriber types ([f30c44e](https://github.com/PrivateAIM/hub/commit/f30c44eb7f891400de96104c2ea95b6d8fc5a438))
+* **deps:** bump the minorandpatch group across 1 directory with 6 updates ([#1173](https://github.com/PrivateAIM/hub/issues/1173)) ([47fa968](https://github.com/PrivateAIM/hub/commit/47fa968c35135638d3c55a6e58cd94ca8a0079b9))
+* entity event publish method ([03b312e](https://github.com/PrivateAIM/hub/commit/03b312e425d3cdfcf65add5274a792b082ea22e9))
+* logger usage in http mount error middleware ([de41d68](https://github.com/PrivateAIM/hub/commit/de41d689292eccba9ec2b324bc1e8c0d9fe0bf85))
+* logging max length message ([b5d7286](https://github.com/PrivateAIM/hub/commit/b5d72865376658df2501f78444d44906de1d5eb6))
+* **server-core-worker:** cleanup env creation/usage ([47dbe6f](https://github.com/PrivateAIM/hub/commit/47dbe6facaea7b822166e487779cf0b043879c68))
+* **server-core:** align socket connect & disconnect messages ([dcbca9a](https://github.com/PrivateAIM/hub/commit/dcbca9a524a45ea1c57f3b80c53a93ea0f03d417))
+* **server-core:** cleanup env creation/usage ([a54896a](https://github.com/PrivateAIM/hub/commit/a54896a2606a5bd8fa146831c0fed65a233a8dd2))
+* **server-telemetry:** configure domain envent publisher ([b12f240](https://github.com/PrivateAIM/hub/commit/b12f240387e8add51233c0de685eb5a65466d708))
+* set startup logs as debug message ([ba8895b](https://github.com/PrivateAIM/hub/commit/ba8895b9cf627cbaaf70ab5d1856e02da53854aa))
+* setting compactor & querier url ([00953b2](https://github.com/PrivateAIM/hub/commit/00953b262ecd73c1ddca2704e62c927dcf799c40))
+* use alternative alias for event db query ([a07e45e](https://github.com/PrivateAIM/hub/commit/a07e45eced809ba4be8b8b356038fb88b9712a53))
+
 ## [0.8.16](https://github.com/PrivateAIM/hub/compare/v0.8.15...v0.8.16) (2025-08-26)
 
 

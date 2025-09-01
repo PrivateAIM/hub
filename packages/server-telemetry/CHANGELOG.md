@@ -1,5 +1,36 @@
 # Changelog
 
+## [0.8.17](https://github.com/PrivateAIM/hub/compare/v0.8.16...v0.8.17) (2025-09-01)
+
+
+### Features
+
+* add log flags ref_type + ref_id & support loki distributor url reading ([e34f7bf](https://github.com/PrivateAIM/hub/commit/e34f7bf6ed24347ba46a439f5382db6b0c89a9df))
+* enhance logger abstraction ([d3fdca6](https://github.com/PrivateAIM/hub/commit/d3fdca6c1c18daffb76cc053be2420560999ce52))
+* refactor domain event publisher & register amqp ([0f98ecf](https://github.com/PrivateAIM/hub/commit/0f98ecf3c24239d9050fd4a7c2e0bd6843cb3dc8))
+
+
+### Bug Fixes
+
+* add missing attributes for analysis-node-log submission ([b0ddabd](https://github.com/PrivateAIM/hub/commit/b0ddabd4fd8a744ad15cac877454988958319261))
+* database base subscriber types ([f30c44e](https://github.com/PrivateAIM/hub/commit/f30c44eb7f891400de96104c2ea95b6d8fc5a438))
+* logging max length message ([b5d7286](https://github.com/PrivateAIM/hub/commit/b5d72865376658df2501f78444d44906de1d5eb6))
+* **server-telemetry:** configure domain envent publisher ([b12f240](https://github.com/PrivateAIM/hub/commit/b12f240387e8add51233c0de685eb5a65466d708))
+* setting compactor & querier url ([00953b2](https://github.com/PrivateAIM/hub/commit/00953b262ecd73c1ddca2704e62c927dcf799c40))
+* use alternative alias for event db query ([a07e45e](https://github.com/PrivateAIM/hub/commit/a07e45eced809ba4be8b8b356038fb88b9712a53))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/server-kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/server-db-kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/server-http-kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/telemetry-kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/server-telemetry-kit bumped from ^0.8.16 to ^0.8.17
+
 ## [0.8.16](https://github.com/PrivateAIM/hub/compare/v0.8.15...v0.8.16) (2025-08-26)
 
 

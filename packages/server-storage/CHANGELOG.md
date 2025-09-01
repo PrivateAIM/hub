@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.8.17](https://github.com/PrivateAIM/hub/compare/v0.8.16...v0.8.17) (2025-09-01)
+
+
+### Features
+
+* enhance logger abstraction ([d3fdca6](https://github.com/PrivateAIM/hub/commit/d3fdca6c1c18daffb76cc053be2420560999ce52))
+* refactor domain event publisher & register amqp ([0f98ecf](https://github.com/PrivateAIM/hub/commit/0f98ecf3c24239d9050fd4a7c2e0bd6843cb3dc8))
+
+
+### Bug Fixes
+
+* check if amqp connection string is defined ([f6611c8](https://github.com/PrivateAIM/hub/commit/f6611c870f5f24fb1ff7e5ca539bbcff7884093b))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/server-kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/server-db-kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/server-http-kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/server-telemetry-kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/storage-kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/telemetry-kit bumped from ^0.8.16 to ^0.8.17
+
 ## [0.8.16](https://github.com/PrivateAIM/hub/compare/v0.8.15...v0.8.16) (2025-08-26)
 
 

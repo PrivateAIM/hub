@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.7.18](https://github.com/PrivateAIM/hub/compare/v0.7.17...v0.7.18) (2025-09-01)
+
+
+### Features
+
+* enhance typing for doamin entities ([9d7c516](https://github.com/PrivateAIM/hub/commit/9d7c51644b66c9361e5436e2c43f463f4f219f90))
+* restructure domain event handling ([2ad7318](https://github.com/PrivateAIM/hub/commit/2ad7318930bd342d571105982fc92996443326fa))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/core-kit bumped from ^0.8.16 to ^0.8.17
+  * peerDependencies
+    * @privateaim/kit bumped from ^0.8.16 to ^0.8.17
+    * @privateaim/core-kit bumped from ^0.8.16 to ^0.8.17
+
 ## [0.7.17](https://github.com/PrivateAIM/hub/compare/v0.7.16...v0.7.17) (2025-08-26)
 
 
