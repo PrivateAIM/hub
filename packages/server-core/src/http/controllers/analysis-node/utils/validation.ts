@@ -9,7 +9,7 @@ import { AnalysisNodeApprovalStatus, AnalysisNodeRunStatus } from '@privateaim/c
 import { Container } from 'validup';
 import { createValidationChain, createValidator } from '@validup/adapter-validator';
 import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
-import type { AnalysisNodeEntity } from '../../../../database/domains';
+import type { AnalysisNodeEntity } from '../../../../database';
 
 export class AnalysisNodeValidator extends Container<AnalysisNodeEntity> {
     protected initialize() {
@@ -46,18 +46,6 @@ export class AnalysisNodeValidator extends Container<AnalysisNodeEntity> {
                 const chain = createValidationChain();
                 return chain
                     .isIn(Object.values(AnalysisNodeRunStatus))
-                    .optional({ values: 'null' });
-            }),
-        );
-
-        this.mount(
-            'index',
-            { optional: true },
-            createValidator(() => {
-                const chain = createValidationChain();
-                return chain
-                    .exists()
-                    .isInt()
                     .optional({ values: 'null' });
             }),
         );

@@ -45,9 +45,6 @@ export class AnalysisNodeEntity implements AnalysisNode {
     @Column({ type: 'text', nullable: true })
         comment: string;
 
-    @Column({ type: 'int', unsigned: true, nullable: true })
-        index: number;
-
     @Column({ type: 'varchar', length: 32, nullable: true })
         artifact_tag: string | null;
 

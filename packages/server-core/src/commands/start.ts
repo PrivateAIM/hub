@@ -68,13 +68,13 @@ export async function startCommand() {
 
     logger.debug('Established database connection.');
 
-    if (!check.schema) {
-        logger.debug('Applying database schema...');
+    // if (!check.schema) {
+    logger.debug('Applying database schema...');
 
-        await synchronizeDatabaseSchema(dataSource);
+    await synchronizeDatabaseSchema(dataSource);
 
-        logger.debug('Applied database schema.');
-    }
+    logger.debug('Applied database schema.');
+    // }
 
     const databaseIntegrity = new DatabaseIntegrityService(dataSource);
     await databaseIntegrity.check();
