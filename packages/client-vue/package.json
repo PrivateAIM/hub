@@ -62,7 +62,7 @@
         "@vuecs/timeago": "^1.1.1",
         "@vuelidate/core": "^2.0.3",
         "@vuelidate/validators": "^2.0.4",
-        "@vueuse/core": "^13.7.0",
+        "@vueuse/core": "^13.8.0",
         "bootstrap-vue-next": "^0.30.5",
         "cross-env": "^10.0.0",
         "pinia": "^3.0.3",
@@ -72,7 +72,7 @@
         "socket.io-client": "^4.8.1",
         "vue": "^3.5.20",
         "vue-tsc": "^3.0.6",
-        "vue3-form-wizard": "^0.2.4"
+        "vue3-form-wizard": "^0.2.9"
     },
     "peerDependencies": {
         "@authup/client-web-kit": "^1.0.0-beta.26",
@@ -97,7 +97,7 @@
         "smob": "^1.4.x",
         "socket.io-client": "^4.8.1",
         "vue": "^3.5.20",
-        "vue3-form-wizard": "^0.2.4"
+        "vue3-form-wizard": "^0.2.9"
     },
     "publishConfig": {
         "access": "public"
