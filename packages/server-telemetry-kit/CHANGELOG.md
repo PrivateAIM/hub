@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.8.18](https://github.com/PrivateAIM/hub/compare/v0.8.17...v0.8.18) (2025-09-02)
+
+
+### Bug Fixes
+
+* enum to string conversion ([95272f8](https://github.com/PrivateAIM/hub/commit/95272f8252f326f8112d7192975c143e68244826))
+* setting top level log attributes ([f74439b](https://github.com/PrivateAIM/hub/commit/f74439ba31c6a30f3ed0e530671fea5d4321181c))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.8.17 to ^0.8.18
+    * @privateaim/server-kit bumped from ^0.8.17 to ^0.8.18
+    * @privateaim/telemetry-kit bumped from ^0.8.17 to ^0.8.18
+  * peerDependencies
+    * @privateaim/kit bumped from ^0.8.17 to ^0.8.18
+    * @privateaim/server-kit bumped from ^0.8.17 to ^0.8.18
+    * @privateaim/telemetry-kit bumped from ^0.8.17 to ^0.8.18
+
 ## [0.8.17](https://github.com/PrivateAIM/hub/compare/v0.8.16...v0.8.17) (2025-09-01)
 
 
