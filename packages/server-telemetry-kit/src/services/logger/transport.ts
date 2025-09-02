@@ -54,7 +54,7 @@ export class LoggerTransport extends WinstonTransport {
             LogFlag.LEVEL,
             LogFlag.CHANNEL,
             LogFlag.SERVICE,
-        ]) as string;
+        ]) as string[];
 
         let keys = Object.keys(output.labels);
         for (let i = 0; i < keys.length; i++) {
