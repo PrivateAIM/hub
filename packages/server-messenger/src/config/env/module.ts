@@ -28,7 +28,7 @@ export function useEnv(key?: string) : any {
         env: read('NODE_ENV', EnvironmentName.DEVELOPMENT) as `${EnvironmentName}`,
         port: readInt('PORT', 3000),
 
-        rabbitMqConnectionString: read('RABBIT_MQ_CONNECTION_STRING'),
+        rabbitMqConnectionString: read('RABBITMQ_CONNECTION_STRING'),
         redisConnectionString: orFail(read('REDIS_CONNECTION_STRING')),
         vaultConnectionString: read('VAULT_CONNECTION_STRING'),
         authupURL: read('AUTHUP_URL', 'http://127.0.0.1:3010/'),

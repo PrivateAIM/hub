@@ -142,5 +142,7 @@ export function mountAuthupMiddleware(
                 });
             }
         });
+
+        next();
     });
 }

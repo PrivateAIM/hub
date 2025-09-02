@@ -34,7 +34,7 @@ export function useEnv(key?: string) : any {
         port: readInt('PORT', 3000),
         publicURL: read('PUBLIC_URL', 'http://localhost:3000'),
 
-        rabbitMqConnectionString: read('RABBIT_MQ_CONNECTION_STRING'),
+        rabbitMqConnectionString: read('RABBITMQ_CONNECTION_STRING'),
         redisConnectionString: read('REDIS_CONNECTION_STRING'),
         minioConnectionString: read('MINIO_CONNECTION_STRING', 'http://admin:start123@127.0.0.1:9000'),
         vaultConnectionString: read('VAULT_CONNECTION_STRING'),

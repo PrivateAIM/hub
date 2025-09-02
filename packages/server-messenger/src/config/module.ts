@@ -13,9 +13,9 @@ import {
 } from './services';
 
 export function configure() {
-    setupLogger();
-
     configureAMQP();
     setupRedis();
     setupVault();
+
+    setupLogger();
 }
