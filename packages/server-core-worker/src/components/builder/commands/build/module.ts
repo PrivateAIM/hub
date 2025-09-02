@@ -92,7 +92,7 @@ export async function executeBuilderBuildCommand(
         // -----------------------------------------------------------------------------------
 
         useBuilderLogger().info({
-            message: `Commiting docker container ${imageURL}:${REGISTRY_ARTIFACT_TAG_LATEST}`,
+            message: `Committing docker container ${imageURL}:${REGISTRY_ARTIFACT_TAG_LATEST}`,
             command: BuilderCommand.BUILD,
             analysis_id: data.id,
             [LogFlag.REF_ID]: data.id,
