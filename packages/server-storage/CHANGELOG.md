@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.8.18](https://github.com/PrivateAIM/hub/compare/v0.8.17...v0.8.18) (2025-09-02)
+
+
+### Features
+
+* use correct env name ([a4dd44d](https://github.com/PrivateAIM/hub/commit/a4dd44d5855788244518345455ba486c71861bae))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.8.17 to ^0.8.18
+    * @privateaim/server-kit bumped from ^0.8.17 to ^0.8.18
+    * @privateaim/server-db-kit bumped from ^0.8.17 to ^0.8.18
+    * @privateaim/server-http-kit bumped from ^0.8.17 to ^0.8.18
+    * @privateaim/server-telemetry-kit bumped from ^0.8.17 to ^0.8.18
+    * @privateaim/storage-kit bumped from ^0.8.17 to ^0.8.18
+    * @privateaim/telemetry-kit bumped from ^0.8.17 to ^0.8.18
+
 ## [0.8.17](https://github.com/PrivateAIM/hub/compare/v0.8.16...v0.8.17) (2025-09-01)
 
 

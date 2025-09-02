@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.8.18](https://github.com/PrivateAIM/hub/compare/v0.8.17...v0.8.18) (2025-09-02)
+
+
+### Bug Fixes
+
+* setting top level log attributes ([f74439b](https://github.com/PrivateAIM/hub/commit/f74439ba31c6a30f3ed0e530671fea5d4321181c))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.8.17 to ^0.8.18
+  * peerDependencies
+    * @privateaim/kit bumped from ^0.8.17 to ^0.8.18
+
 ## [0.8.17](https://github.com/PrivateAIM/hub/compare/v0.8.16...v0.8.17) (2025-09-01)
 
 

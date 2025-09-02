@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.8.18](https://github.com/PrivateAIM/hub/compare/v0.8.17...v0.8.18) (2025-09-02)
+
+
+### Features
+
+* use correct env name ([a4dd44d](https://github.com/PrivateAIM/hub/commit/a4dd44d5855788244518345455ba486c71861bae))
+
+
+### Bug Fixes
+
+* enum to string conversion ([95272f8](https://github.com/PrivateAIM/hub/commit/95272f8252f326f8112d7192975c143e68244826))
+* expose validup validator error ([7f81aca](https://github.com/PrivateAIM/hub/commit/7f81aca88b539c6547afa6fb0aaf645d3dbb80dd))
+* setting top level log attributes ([f74439b](https://github.com/PrivateAIM/hub/commit/f74439ba31c6a30f3ed0e530671fea5d4321181c))
+
 ## [0.8.17](https://github.com/PrivateAIM/hub/compare/v0.8.16...v0.8.17) (2025-09-01)
 
 
