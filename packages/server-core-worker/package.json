@@ -34,7 +34,7 @@
         "@privateaim/storage-kit": "^0.8.17",
         "@validup/adapter-zod": "^0.1.11",
         "amqp-extension": "^4.0.0",
-        "dockerode": "^4.0.7",
+        "dockerode": "^4.0.8",
         "docken": "^1.1.1",
         "dotenv": "^16.5.0",
         "envix": "^1.3.0",
