@@ -365,7 +365,6 @@ export default defineComponent({
                 title="Nodes"
                 :before-change="passWizardStep"
             >
-                fooo
                 <FAnalysisWizardStepNodes
                     :entity="entity"
                     @updated="handleUpdated"
