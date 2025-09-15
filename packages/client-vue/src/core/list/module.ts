@@ -277,6 +277,7 @@ export function createListRaw<
         const socketContext : EntitySocketContext<TYPE, RECORD> = {
             type: context.type,
             ...(isObject(context.socket) ? context.socket : {}),
+            target: false,
         };
 
         socketContext.onCreated = (entity) => {

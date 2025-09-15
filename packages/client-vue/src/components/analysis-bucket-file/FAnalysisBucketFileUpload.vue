@@ -40,6 +40,8 @@ export default defineComponent({
             if (vNode.value) {
                 vNode.value = '';
             }
+
+            $event.target.value = '';
         };
 
         const dropTempFile = ($event: any) => {

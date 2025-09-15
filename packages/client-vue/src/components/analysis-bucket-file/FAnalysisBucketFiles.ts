@@ -38,10 +38,15 @@ const FAnalysisBucketFiles = defineComponent({
         );
 
         const canHandleEventData = (item: AnalysisBucketFile) => {
+            console.log('bucket_id check', item, filters.value.bucket_id);
+            console.log(item.bucket_id === filters.value.bucket_id);
             if (filters.value.bucket_id) {
+                console.log('bucket_id check');
                 return item.bucket_id === filters.value.bucket_id;
             }
 
+            console.log('analysis_id check', item.analysis_id, filters.value.analysis_id);
+            console.log(item.analysis_id === filters.value.analysis_id);
             if (filters.value.analysis_id) {
                 return item.analysis_id === filters.value.analysis_id;
             }
@@ -62,7 +67,9 @@ const FAnalysisBucketFiles = defineComponent({
             setup,
             socket: {
                 processEvent(event) {
-                    return canHandleEventData(event.data);
+                    const outcome = canHandleEventData(event.data);
+                    console.log(outcome);
+                    return outcome;
                 },
             },
         });

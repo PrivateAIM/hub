@@ -5,6 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import { isClientError } from '@privateaim/core-http-kit';
 import {
     DomainType,
 } from '@privateaim/core-kit';
@@ -18,7 +19,7 @@ import {
     ref,
     watch,
 } from 'vue';
-import { createEntityManager, defineEntityManagerEvents } from '../../core';
+import { createEntityManager, defineEntityManagerEvents, injectStorageHTTPClient } from '../../core';
 
 export default defineComponent({
     props: {
@@ -37,6 +38,8 @@ export default defineComponent({
         check: (_entity?: AnalysisBucketFile) => true,
     },
     setup(props, setup) {
+        const storage = injectStorageHTTPClient();
+
         const manager = createEntityManager({
             type: `${DomainType.ANALYSIS_BUCKET_FILE}`,
             props,
@@ -76,8 +79,28 @@ export default defineComponent({
             setup.emit('check', manager.data.value);
         };
 
+        const drop = async () => {
+            if (manager.busy.value) return;
+
+            manager.busy.value = true;
+
+            try {
+                await storage.bucketFile.delete(manager.data.value!.external_id);
+            } catch (e) {
+                setup.emit('failed', e);
+
+                if (!isClientError(e) || e.response.status !== 404) {
+                    return;
+                }
+            } finally {
+                manager.busy.value = false;
+            }
+
+            await manager.delete();
+        };
+
         return {
-            drop: manager.delete,
+            drop,
             marked,
             markToggle,
             isMatch,
