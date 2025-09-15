@@ -5,6 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import { ref } from 'vue';
 import type { PropType } from 'vue';
 import type { Analysis } from '@privateaim/core-kit';
 import {
@@ -24,6 +25,17 @@ export default defineNuxtComponent({
     },
     emits: ['failed', 'executed', 'updated'],
     setup(props, { emit }) {
+        const logVNode = ref<typeof FAnalysisLogs | null>(null);
+        const logVNodeBusy = ref(false);
+
+        const reload = async () => {
+            if (logVNode.value) {
+                logVNodeBusy.value = true;
+                await logVNode.value.reload();
+                logVNodeBusy.value = false;
+            }
+        };
+
         const handleUpdated = (entity: Analysis) => {
             emit('updated', entity);
         };
@@ -37,6 +49,10 @@ export default defineNuxtComponent({
         };
 
         return {
+            logVNode,
+            logVNodeBusy,
+            reload,
+
             handleUpdated,
             handleFailed,
             handleExecuted,
@@ -75,10 +91,25 @@ export default defineNuxtComponent({
             <div class="col-8">
                 <div class="card-grey card">
                     <div class="card-header">
-                        <span class="title">Logs</span>
+                        <div class="title">
+                            Logs
+                        </div>
+                        <div class="ms-auto">
+                            <button
+                                type="button"
+                                :disabled="logVNodeBusy"
+                                class="btn btn-xs btn-primary"
+                                @click.prevent="reload"
+                            >
+                                <i class="fa fa-refresh" />
+                            </button>
+                        </div>
                     </div>
                     <div class="card-body">
-                        <FAnalysisLogs :entity-id="entity.id" />
+                        <FAnalysisLogs
+                            ref="logVNode"
+                            :entity-id="entity.id"
+                        />
                     </div>
                 </div>
             </div>
