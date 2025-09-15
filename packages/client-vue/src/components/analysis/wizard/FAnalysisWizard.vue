@@ -261,7 +261,7 @@ export default defineComponent({
                             handleFailed(e);
                         },
                     }),
-                });
+                }).show();
 
                 if (finished) {
                     emit('finished');

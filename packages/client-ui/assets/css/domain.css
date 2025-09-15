@@ -133,6 +133,14 @@
     color: #C490D1;
 }
 
+.log-body .line-content {
+    width: 100%;
+}
+
+.log-body .line-date {
+    min-width: 120px;
+}
+
 .line-message.error {
     color: #f79483;
 }

@@ -134,7 +134,7 @@ export default defineComponent({
                         class="btn btn-secondary btn-xs"
                         @click.prevent="props.cancel()"
                     >
-                        <i class="fa fa-abort" /> Cancel
+                        Cancel
                     </button>
                 </div>
                 <div class="ms-auto">

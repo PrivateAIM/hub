@@ -55,8 +55,8 @@ export default defineNuxtComponent({
                 <FAnalysisNodeProgress :entity="entity" />
             </div>
         </div>
-        <div class="d-flex flex-row gap-3">
-            <div class="flex-grow-1">
+        <div class="row">
+            <div class="col-4">
                 <div class="card-grey card">
                     <div class="card-header">
                         <span class="title">Pipeline</span>
@@ -72,7 +72,7 @@ export default defineNuxtComponent({
                     </div>
                 </div>
             </div>
-            <div class="flex-grow-1">
+            <div class="col-8">
                 <div class="card-grey card">
                     <div class="card-header">
                         <span class="title">Logs</span>

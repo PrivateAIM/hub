@@ -96,7 +96,7 @@ export default defineComponent({
                         h('div', { class: ['line-message', { error: isError.value }] }, [
                             entity.value.message,
                         ]),
-                        h('div', { class: 'ms-auto' }, [
+                        h('div', { class: 'line-date ms-auto' }, [
                             h(VCTimeago, { datetime: isoDate.value }),
                         ]),
                     ]),
