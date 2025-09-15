@@ -41,14 +41,13 @@ export async function unlinkRegistryProject(
 
         await Promise.all(promises);
     } catch (e) {
+        // 'Project repositories could not be deleted.'
         useLogger()
-            .warn('Project repositories could not be deleted.', {
+            .error({
+                message: e,
                 component: 'registry',
                 command: RegistryCommand.PROJECT_UNLINK,
             });
-
-        useLogger()
-            .error(e);
 
         throw e;
     }
@@ -57,14 +56,13 @@ export async function unlinkRegistryProject(
         await httpClient.project
             .delete(payload.externalName, true);
     } catch (e) {
+        // 'Project could not be deleted.'
         useLogger()
-            .warn('Project could not be deleted.', {
+            .warn({
+                message: e,
                 component: 'registry',
                 command: RegistryCommand.PROJECT_UNLINK,
             });
-
-        useLogger()
-            .error(e);
 
         throw e;
     }
@@ -74,22 +72,26 @@ export async function unlinkRegistryProject(
             await httpClient.robot
                 .delete(parseInt(payload.accountId, 10));
         } catch (e) {
+            // 'Robot Account could not be deleted.'
             useLogger()
-                .warn('Robot Account could not be deleted.', {
+                .warn({
+                    message: e,
                     component: 'registry',
                     command: RegistryCommand.PROJECT_UNLINK,
-                }, e);
+                });
         }
     }
 
     try {
         await removeRegistryProjectFromVault(payload.externalName);
     } catch (e) {
+        // 'Vault project representation could not be deleted.'
         useLogger()
-            .warn('Vault project representation could not be deleted.', {
+            .error({
+                message: e,
                 component: 'registry',
                 command: RegistryCommand.PROJECT_UNLINK,
-            }, e);
+            });
 
         throw e;
     }

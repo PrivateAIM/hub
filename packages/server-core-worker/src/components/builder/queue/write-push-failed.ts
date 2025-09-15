@@ -21,8 +21,7 @@ export async function writePushFailedEvent(
     }));
 
     useBuilderLogger().error({
-        message: `Push failed for analysis ${data.id}`,
-        ...(data.error ? data.error : {}),
+        message: data.error || `Push failed for analysis ${data.id}`,
         command: BuilderCommand.PUSH,
         analysis_id: data.id,
         [LogFlag.REF_ID]: data.id,

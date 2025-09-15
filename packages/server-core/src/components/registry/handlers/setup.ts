@@ -35,7 +35,8 @@ export async function setupRegistry(payload: RegistrySetupPayload) {
     const entity = await repository.findOneBy({ id: payload.id });
     if (!entity) {
         useLogger()
-            .error('Registry not found.', {
+            .error({
+                message: 'Registry not found.',
                 component: 'registry',
                 command: RegistryCommand.SETUP,
             });

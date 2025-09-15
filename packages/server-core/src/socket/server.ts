@@ -51,7 +51,8 @@ export function createSocketServer(
         if (typeof matches[1] === 'undefined') {
             if (socket.data.realmName !== REALM_MASTER_NAME) {
                 useLogger()
-                    .error(`Socket/${socket.id}: Realm ${socket.data.realmName} is not permitted for the global scope.`, {
+                    .error({
+                        message: `Socket/${socket.id}: Realm ${socket.data.realmName} is not permitted for the global scope.`,
                         [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
                     });
                 next(new ForbiddenError());
@@ -63,7 +64,8 @@ export function createSocketServer(
 
             if (matches[1] !== socket.data.realmId && socket.data.realmName !== REALM_MASTER_NAME) {
                 useLogger()
-                    .error(`Socket/${socket.id}: Realm ${socket.data.realmName} is not permitted for the realm ${matches[1]}.`, {
+                    .error({
+                        message: `Socket/${socket.id}: Realm ${socket.data.realmName} is not permitted for the realm ${matches[1]}.`,
                         [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
                     });
 

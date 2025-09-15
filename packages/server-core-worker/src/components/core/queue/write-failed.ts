@@ -28,8 +28,7 @@ export async function writeFailedEvent(
     }));
 
     useCoreLogger().error({
-        message: `${context.command} failed for analysis ${context.data.id}`,
-        ...(context.data.error ? context.data.error : {}),
+        message: context.data.error || `${context.command} failed for analysis ${context.data.id}`,
         command: context.command,
         analysis_id: context.data.id,
         [LogFlag.REF_ID]: context.data.id,

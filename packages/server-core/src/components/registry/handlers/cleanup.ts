@@ -40,7 +40,8 @@ export async function cleanupRegistry(payload: RegistryCleanupPayload) {
 
     if (!entity) {
         useLogger()
-            .error('Registry not found.', {
+            .error({
+                message: 'Registry not found.',
                 component: ComponentName.REGISTRY,
                 command: RegistryCommand.CLEANUP,
             });

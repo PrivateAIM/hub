@@ -21,8 +21,7 @@ export async function writeCheckFailedEvent(
     }));
 
     useBuilderLogger().error({
-        message: `Check failed for analysis ${data.id}`,
-        ...(data.error ? data.error : {}),
+        message: data.error || `Check failed for analysis ${data.id}`,
         command: BuilderCommand.CHECK,
         analysis_id: data.id,
         [LogFlag.REF_ID]: data.id,

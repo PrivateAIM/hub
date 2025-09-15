@@ -7,7 +7,7 @@
 import { buildRegistryClientConnectionStringFromRegistry } from '@privateaim/core-kit';
 import { useDataSource } from 'typeorm-extension';
 import { useLogger } from '@privateaim/server-kit';
-import { RegistryEntity, RegistryProjectEntity } from '../../../../database/domains';
+import { RegistryEntity, RegistryProjectEntity } from '../../../../database';
 import { RegistryCommand } from '../../constants';
 import type { RegistryProjectLinkPayload } from '../../type';
 import { ensureRemoteRegistryProject } from '../helpers/remote';
@@ -69,14 +69,13 @@ export async function linkRegistryProject(
 
         entity.external_id = `${project.project_id}`;
     } catch (e) {
+        // `Project ${entity.external_name} could not be created.`
         useLogger()
-            .warn('Project could not be created.', {
+            .error({
+                message: e,
                 component: 'registry',
                 command: RegistryCommand.PROJECT_LINK,
             });
-
-        useLogger()
-            .error(e);
 
         throw e;
     }
@@ -103,14 +102,13 @@ export async function linkRegistryProject(
             entity.account_secret = null;
         }
     } catch (e) {
+        // 'Robot account could not be created.'
         useLogger()
-            .warn('Robot account could not be created.', {
+            .error({
+                message: e,
                 component: 'registry',
                 command: RegistryCommand.PROJECT_LINK,
             });
-
-        useLogger()
-            .error(e);
 
         throw e;
     }
@@ -130,14 +128,13 @@ export async function linkRegistryProject(
         entity.webhook_name = `${webhook.id}`;
         entity.webhook_exists = true;
     } catch (e) {
+        // 'Webhook could not be created.'
         useLogger()
-            .warn('Webhook could not be created.', {
+            .error({
+                message: e,
                 component: 'registry',
                 command: RegistryCommand.PROJECT_LINK,
             });
-
-        useLogger()
-            .error(e);
 
         throw e;
     }

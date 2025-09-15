@@ -21,8 +21,7 @@ export async function writeBuildFailedEvent(
     }));
 
     useBuilderLogger().error({
-        message: `Build failed for analysis ${data.id}`,
-        ...(data.error ? data.error : {}),
+        message: data.error || `Build failed for analysis ${data.id}`,
         command: BuilderCommand.BUILD,
         analysis_id: data.id,
         [LogFlag.REF_ID]: data.id,
