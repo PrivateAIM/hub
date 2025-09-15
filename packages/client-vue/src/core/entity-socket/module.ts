@@ -6,7 +6,7 @@
  */
 
 import type { DomainEventFullName } from '@privateaim/kit';
-import { buildDomainEventFullName, hasOwnProperty } from '@privateaim/kit';
+import { buildDomainEventFullName } from '@privateaim/kit';
 import { EntityDefaultEventName, REALM_MASTER_NAME } from '@authup/core-kit';
 import type {
     DomainTypeMap,
@@ -84,25 +84,18 @@ export function createEntitySocket<
             return false;
         }
 
-        if (
-            ctx.target &&
-            !targetId.value
-        ) {
-            return false;
-        }
-
         if (ctx.target) {
-            if (hasOwnProperty(event.data, 'id')) {
-                if (targetId.value !== event.data.id) {
-                    return false;
-                }
-            } else {
+            if (!targetId.value || !event.meta.refId) {
+                return false;
+            }
+
+            if (targetId.value !== event.meta.refId) {
                 return false;
             }
         }
 
-        if (hasOwnProperty(event.data, 'id')) {
-            return event.data.id !== lockId.value;
+        if (event.meta.refId) {
+            return event.meta.refId !== lockId.value;
         }
 
         return true;

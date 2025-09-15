@@ -37,12 +37,11 @@ export class EntityEventSocketHandler implements IEntityEventHandler {
             emitter
                 .in(roomName)
                 .emit(fullEventName, {
-                    data: {
-                        data: ctx.data,
-                        type: ctx.metadata.ref_type,
-                        event: ctx.metadata.event,
-                    },
+                    data: ctx.data,
                     meta: {
+                        refType: ctx.metadata.ref_type,
+                        refId: ctx.metadata.ref_id,
+                        event: ctx.metadata.event,
                         namespace,
                         roomName,
                     },

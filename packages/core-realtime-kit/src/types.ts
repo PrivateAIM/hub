@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { DomainEventFullName, DomainEventRecord } from '@privateaim/kit';
+import type { DomainEventFullName } from '@privateaim/kit';
 import type {
     DomainEventName,
     DomainEventSubscriptionName,
@@ -15,8 +15,12 @@ import type {
 export type STCEventRecord<
     TYPE extends string,
     RECORD extends Record<string, any>,
-> = DomainEventRecord<TYPE, `${DomainEventName}`, RECORD> & {
+> = {
+    data: RECORD,
     meta: {
+        event: `${DomainEventName}`,
+        refType: TYPE,
+        refId?: string,
         roomName?: string,
         roomId?: string | number
     }
