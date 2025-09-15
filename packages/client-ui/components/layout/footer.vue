@@ -5,14 +5,13 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { BModalOrchestrator, BToastOrchestrator } from 'bootstrap-vue-next';
+import { BOrchestrator } from 'bootstrap-vue-next';
 import { computed, defineComponent } from 'vue';
 import { useRuntimeConfig } from '#imports';
 
 export default defineComponent({
     components: {
-        BModalOrchestrator,
-        BToastOrchestrator,
+        BOrchestrator,
     },
     setup() {
         const runtimeConfig = useRuntimeConfig();
@@ -52,8 +51,7 @@ export default defineComponent({
                 &copy; {{ year }}
             </div>
         </div>
-        <BToastOrchestrator />
-        <BModalOrchestrator />
+        <BOrchestrator />
     </div>
 </template>
 <style>

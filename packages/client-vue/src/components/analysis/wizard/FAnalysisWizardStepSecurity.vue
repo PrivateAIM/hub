@@ -24,6 +24,7 @@ export default defineComponent({
             required: true,
         },
     },
+    emits: ['failed'],
     setup() {
         const vNode = ref<typeof FAnalysisPermissionAssignments | null>(null);
         const filters : Record<string, unknown> = {

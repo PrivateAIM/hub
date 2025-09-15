@@ -18,7 +18,7 @@ import {
 } from 'vue';
 import type { Analysis, AnalysisBucketFile, MasterImage } from '@privateaim/core-kit';
 import { AnalysisBucketType, AnalysisConfigurationStatus } from '@privateaim/core-kit';
-import { useModalController } from 'bootstrap-vue-next';
+import { useModal } from 'bootstrap-vue-next';
 import { initFormAttributesFromSource, injectCoreHTTPClient, wrapFnWithBusyState } from '../../../core';
 import FAnalysisWizardStepNodes from './FAnalysisWizardStepNodes.vue';
 import FAnalysisWizardStepMasterImage from './FAnalysisWizardStepImage.vue';
@@ -45,7 +45,7 @@ export default defineComponent({
     },
     emits: ['finished', 'failed', 'updated'],
     async setup(props, { emit }) {
-        const { confirm } = useModalController();
+        const { create } = useModal();
         const apiClient = injectCoreHTTPClient();
         const entity = toRef(props, 'entity');
 
@@ -246,12 +246,12 @@ export default defineComponent({
             try {
                 await canPassFilesWizardStep();
 
-                if (typeof confirm === 'undefined') {
+                if (typeof create === 'undefined') {
                     emit('finished');
                     return;
                 }
 
-                const finished = await confirm({
+                const finished = await create({
                     component: h(FAnalysisWizardLockModal, {
                         entity: entity.value,
                         onUpdated: (el) => {
