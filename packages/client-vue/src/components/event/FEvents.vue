@@ -16,8 +16,10 @@ import {
 } from 'vue';
 import type { ListMeta } from '../../core';
 import { injectTelemetryHTTPClient } from '../../core';
+import FEvent from './FEvent';
 
 export default defineComponent({
+    components: { FEvent },
     props: {
         query: {
             type: Object as PropType<BuildInput<Event>>,
@@ -94,7 +96,22 @@ export default defineComponent({
             <slot
                 name="body"
                 v-bind="{ busy, data, meta, load, deleted: handleDeleted }"
-            />
+            >
+                <div class="log-container">
+                    <div class="log-body">
+                        <div class="d-flex flex-column gap-2">
+                            <template
+                                v-for="(item, key) in data"
+                                :key="key"
+                            >
+                                <FEvent
+                                    :entity="item"
+                                />
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </slot>
             <slot
                 name="footer"
                 v-bind="{ busy, data, meta, load, deleted: handleDeleted }"

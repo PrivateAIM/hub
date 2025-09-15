@@ -60,7 +60,17 @@ export default {
                 <MasterImagesSync @failed="handleFailed" />
             </div>
             <div class="col-6">
-                <FEvents :query="{ filters: {ref_type: 'masterImage'} }" />
+                <h6><i class="fa-solid fa-bullhorn" /> Events</h6>
+                <FEvents
+                    :query="{
+                        filters: {
+                            ref_type: 'masterImage'
+                        },
+                        sort: {
+                            created_at: 'DESC'
+                        }
+                    }"
+                />
             </div>
         </div>
     </div>

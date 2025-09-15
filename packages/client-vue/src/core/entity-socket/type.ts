@@ -25,6 +25,9 @@ export type EntitySocketContext<
     onUpdated?(entity: Partial<T>): any,
     onDeleted?(entity: T): any,
     processEvent?(event: STCEventRecord<A, T>, realmId?: string) : boolean;
+
+    refType?: () => string,
+
     buildChannelName?(entityId?: DomainEntityID<T>) : string;
     buildSubscribeEventName?(): DomainEventFullName<string, DomainEventSubscriptionName>;
     buildUnsubscribeEventName?(): DomainEventFullName<string, DomainEventSubscriptionName>;
