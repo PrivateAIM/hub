@@ -80,6 +80,10 @@ export default defineComponent({
             emit('created', entity);
 
             updateEntrypointFile(entity);
+
+            if (fileListNode.value) {
+                fileListNode.value.handleCreated(entity);
+            }
         };
 
         const handleDeleted = (entity: AnalysisBucketFile) => {
@@ -91,6 +95,10 @@ export default defineComponent({
             emit('deleted', entity);
 
             updateEntrypointFile(entity);
+
+            if (fileListNode.value) {
+                fileListNode.value.handleDeleted(entity);
+            }
         };
 
         const handleUpdated = (entity: AnalysisBucketFile) => {
@@ -118,6 +126,7 @@ export default defineComponent({
 
             try {
                 for (let i = 0; i < selected.value.length; i++) {
+                    // todo: storage client delete files
                     const file = await coreClient.analysisBucketFile.delete(selected.value[i]);
                     handleDeleted(file);
                 }

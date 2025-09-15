@@ -50,6 +50,7 @@ export class ListHandlers<T extends ObjectLiteral> {
 
         const item = this.stack.shift();
         if (!item) {
+            this.stackProcessing = false;
             return;
         }
 
