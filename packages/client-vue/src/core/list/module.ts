@@ -33,9 +33,7 @@ import type {
     ListRenderOptions,
 } from './type';
 import {
-    buildListCreatedHandler,
-    buildListDeletedHandler,
-    buildListUpdatedHandler,
+    ListHandlers,
     mergeListOptions,
 } from './utils';
 
@@ -177,28 +175,30 @@ export function createListRaw<
         }
     }
 
-    const handleCreated = buildListCreatedHandler(data, (cbEntity) => {
-        total.value++;
+    const handlers = new ListHandlers<RECORD>(data, {
+        created: (cbEntity) => {
+            total.value++;
 
-        if (context.onCreated) {
-            context.onCreated(cbEntity, meta.value);
-        }
+            if (context.onCreated) {
+                context.onCreated(cbEntity, meta.value);
+            }
 
-        if (context.setup && typeof context.setup.emit === 'function') {
-            context.setup.emit('created', cbEntity);
-        }
-    });
-    const handleDeleted = buildListDeletedHandler(data, (cbEntity) => {
-        total.value--;
+            if (context.setup && typeof context.setup.emit === 'function') {
+                context.setup.emit('created', cbEntity);
+            }
+        },
+        deleted: (cbEntity) => {
+            total.value--;
 
-        if (context.setup && typeof context.setup.emit === 'function') {
-            context.setup.emit('deleted', cbEntity);
-        }
-    });
-    const handleUpdated = buildListUpdatedHandler(data, (cbEntity) => {
-        if (context.setup && typeof context.setup.emit === 'function') {
-            context.setup.emit('updated', cbEntity);
-        }
+            if (context.setup && typeof context.setup.emit === 'function') {
+                context.setup.emit('deleted', cbEntity);
+            }
+        },
+        updated: (cbEntity) => {
+            if (context.setup && typeof context.setup.emit === 'function') {
+                context.setup.emit('updated', cbEntity);
+            }
+        },
     });
 
     let options : ListRenderOptions<RECORD> = context.props;
@@ -250,9 +250,9 @@ export function createListRaw<
     }
 
     context.setup.expose({
-        handleCreated,
-        handleDeleted,
-        handleUpdated,
+        handleCreated: (data) => handlers.created(data),
+        handleDeleted: (data) => handlers.deleted(data),
+        handleUpdated: (data) => handlers.updated(data),
         load,
         data,
     });
@@ -283,12 +283,12 @@ export function createListRaw<
         socketContext.onCreated = (entity) => {
             const limit = meta.value?.pagination?.limit;
             if (typeof limit !== 'number') {
-                handleCreated(entity);
+                handlers.created(entity);
                 return;
             }
 
             if (total.value < limit) {
-                handleCreated(entity);
+                handlers.created(entity);
                 return;
             }
 
@@ -298,14 +298,14 @@ export function createListRaw<
                 meta.value?.pagination?.offset === 0;
 
             if (isSorted) {
-                handleCreated(entity);
+                handlers.created(entity);
             }
         };
         socketContext.onDeleted = (entity: RECORD) => {
-            handleDeleted(entity);
+            handlers.deleted(entity);
         };
         socketContext.onUpdated = (entity: RECORD) => {
-            handleUpdated(entity);
+            handlers.updated(entity);
         };
         socketContext.realmId = realmId;
 
@@ -318,9 +318,15 @@ export function createListRaw<
         meta,
         total,
 
-        handleCreated,
-        handleUpdated,
-        handleDeleted,
+        handleCreated: (entity: RECORD) => {
+            handlers.updated(entity);
+        },
+        handleDeleted: (entity: RECORD) => {
+            handlers.deleted(entity);
+        },
+        handleUpdated: (entity: RECORD) => {
+            handlers.updated(entity);
+        },
 
         render,
         load,
