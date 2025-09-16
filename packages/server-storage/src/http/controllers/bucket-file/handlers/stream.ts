@@ -17,6 +17,20 @@ import {
     BucketFileEntity, toBucketName,
 } from '../../../../domains';
 
+function encodeContentDispositionFilename(input: string) {
+    return input
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/ä/g, 'ae')
+        .replace(/ö/g, 'oe')
+        .replace(/ü/g, 'ue')
+        .replace(/Ä/g, 'Ae')
+        .replace(/Ö/g, 'Oe')
+        .replace(/Ü/g, 'Ue')
+        .replace(/ß/g, 'ss')
+        .replace(/[^a-zA-Z0-9._-]/g, '_');
+}
+
 export async function executeBucketFileRouteStreamHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
@@ -43,7 +57,8 @@ export async function executeBucketFileRouteStreamHandler(req: Request, res: Res
         });
     }
 
-    setResponseHeaderAttachment(res, entity.name);
+    // todo: use should be done in setResponseHeaderAttachment or as helper fn
+    setResponseHeaderAttachment(res, encodeContentDispositionFilename(entity.name));
 
     const bucketName = toBucketName(entity.bucket_id);
 
