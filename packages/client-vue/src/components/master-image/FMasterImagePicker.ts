@@ -50,7 +50,9 @@ export default defineComponent({
             master_image_id: {
                 required,
             },
-        }, form);
+        }, form, {
+            $scope: false,
+        });
 
         const masterImageEntity = ref<MasterImage | null>(null);
 

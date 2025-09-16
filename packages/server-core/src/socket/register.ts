@@ -21,8 +21,11 @@ import type { Namespace } from './types';
 
 export function registerSocketControllers(nsp: Namespace) {
     nsp.on('connection', (socket) => {
-        // project-node
+        socket.on('ping', () => {
+            socket.emit('pong');
+        });
 
+        // project-node
         registerProjectSocketHandlers(socket);
         if (socket.data.namespaceId) {
             registerProjectNodeForRealmSocketHandlers(socket);

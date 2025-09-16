@@ -44,6 +44,8 @@ export type STCEventHandler<
 ) => void;
 export type STCEvents = {
     [K in keyof DomainTypeMap as DomainEventFullName<K, DomainEventName>]: STCEventHandler<K, DomainTypeMap[K]>
+} & {
+    pong: () => void
 };
 
 export type CTSEventHandler = (
@@ -53,4 +55,6 @@ export type CTSEventHandler = (
 
 export type CTSEvents = {
     [K in keyof DomainTypeMap as DomainEventFullName<K, DomainEventSubscriptionName>]: CTSEventHandler
+} & {
+    ping: () => void
 };

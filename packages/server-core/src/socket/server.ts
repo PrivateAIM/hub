@@ -37,7 +37,7 @@ export function createSocketServer(
     SocketData
     >(httpServer);
 
-    const pattern = /^\/resources(?::[a-z0-9A-Z-_]+)?$/;
+    const pattern = /^\/resources(?:\/[a-z0-9A-Z-_]+)?$/;
     const nsp = server.of(pattern);
 
     mountLoggingMiddleware(nsp);
@@ -62,7 +62,10 @@ export function createSocketServer(
         } else {
             [, socket.data.namespaceId] = matches;
 
-            if (matches[1] !== socket.data.realmId && socket.data.realmName !== REALM_MASTER_NAME) {
+            if (
+                matches[1] !== socket.data.realmId &&
+                socket.data.realmName !== REALM_MASTER_NAME
+            ) {
                 useLogger()
                     .error({
                         message: `Socket/${socket.id}: Realm ${socket.data.realmName} is not permitted for the realm ${matches[1]}.`,

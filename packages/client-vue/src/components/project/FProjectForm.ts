@@ -68,7 +68,6 @@ const FProjectForm = defineComponent({
                 maxLength: maxLength(4096),
             },
             master_image_id: {
-                required,
             },
         }, form);
 
