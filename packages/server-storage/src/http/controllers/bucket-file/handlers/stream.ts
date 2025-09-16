@@ -5,15 +5,31 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { createGzip } from 'node:zlib';
 import { NotFoundError } from '@ebec/http';
 import { useLogger } from '@privateaim/server-kit';
 import type { Request, Response } from 'routup';
-import { useRequestParam } from 'routup';
+import { getRequestAcceptableEncoding, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useMinio } from '../../../../core';
 import {
     BucketFileEntity, toBucketName,
 } from '../../../../domains';
+
+/*
+function encodeContentDispositionFilename(input: string) {
+    return input
+        .replace(/ä/g, 'ae')
+        .replace(/ö/g, 'oe')
+        .replace(/ü/g, 'ue')
+        .replace(/Ä/g, 'Ae')
+        .replace(/Ö/g, 'Oe')
+        .replace(/Ü/g, 'Ue')
+        .replace(/ß/g, 'ss')
+        .replace(/[^a-zA-Z0-9._-]/g, '_');
+}
+
+ */
 
 export async function executeBucketFileRouteStreamHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -28,12 +44,21 @@ export async function executeBucketFileRouteStreamHandler(req: Request, res: Res
         throw new NotFoundError();
     }
 
-    res.writeHead(200, {
-        'Content-Type': 'application/gzip',
-    });
+    const gzipSupported = getRequestAcceptableEncoding(req, 'gzip');
+    if (gzipSupported) {
+        res.writeHead(200, {
+            'Content-Type': 'application/octet-stream',
+            'Content-Encoding': 'gzip',
+        });
+    } else {
+        res.writeHead(200, {
+            'Content-Type': 'application/octet-stream',
+            'Content-Encoding': 'identity',
+        });
+    }
 
-    // todo: this should work
-    // setResponseHeaderAttachment(res, entity.path);
+    // todo: use should be done in setResponseHeaderAttachment or as helper fn
+    // setResponseHeaderAttachment(res, encodeContentDispositionFilename(entity.name));
 
     const bucketName = toBucketName(entity.bucket_id);
 
@@ -47,5 +72,12 @@ export async function executeBucketFileRouteStreamHandler(req: Request, res: Res
     stream.on('error', (err) => {
         useLogger().error(err);
     });
-    stream.pipe(res);
+
+    if (gzipSupported) {
+        stream
+            .pipe(createGzip())
+            .pipe(res);
+    } else {
+        stream.pipe(res);
+    }
 }
