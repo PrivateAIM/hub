@@ -8,7 +8,7 @@
 import { isPropertySet, pickRecord } from '@authup/kit';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
 import { DomainType } from '@privateaim/core-kit';
-import { PermissionName, isRealmResourceWritable } from '@privateaim/kit';
+import { MONTH_IN_MS, PermissionName, isRealmResourceWritable } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
@@ -114,6 +114,8 @@ export async function updateAnalysisNodeRouteHandler(req: Request, res: Response
                             'node_id',
                             'node_realm_id',
                         ]),
+                        expiring: true,
+                        expires_at: new Date(Date.now() + MONTH_IN_MS).toISOString(),
                     },
                 });
             }

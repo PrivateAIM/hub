@@ -11,7 +11,7 @@ import { useLogger } from '@privateaim/server-kit';
 import type { Event, EventData } from '@privateaim/telemetry-kit';
 import { DomainType } from '@privateaim/telemetry-kit';
 import type { ObjectDiff, ObjectLiteral } from '@privateaim/kit';
-import { isObject } from '@privateaim/kit';
+import { WEEK_IN_MS, isObject } from '@privateaim/kit';
 import { isEventComponentServiceUsable, useEventComponentService } from '../../services';
 
 export class EntityEventHandler implements IEntityEventHandler {
@@ -28,7 +28,7 @@ export class EntityEventHandler implements IEntityEventHandler {
 
             expiring: true,
             expires_at: new Date(
-                Date.now() + (1000 * 60 * 60 * 24 * 7),
+                Date.now() + WEEK_IN_MS,
             ).toISOString(),
         };
 

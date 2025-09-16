@@ -5,10 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export type EventCreateCommandPayload = {
-    [key: string]: any,
-    // todo: domain type of event :)
-};
+import type { Event } from '@privateaim/telemetry-kit';
+
+export type EventCreateCommandPayload = Partial<Event>;
 
 export type EventCreateFailedEventPayload = {
     id: string,
