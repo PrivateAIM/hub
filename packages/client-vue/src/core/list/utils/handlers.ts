@@ -50,6 +50,7 @@ export class ListHandlers<T extends ObjectLiteral> {
 
         const item = this.stack.shift();
         if (!item) {
+            this.stackProcessing = false;
             return;
         }
 
@@ -72,7 +73,7 @@ export class ListHandlers<T extends ObjectLiteral> {
                 if (index !== -1) {
                     const keys = Object.keys(item) as (keyof T)[];
                     for (let i = 0; i < keys.length; i++) {
-                        this.data.value[index][keys[i]] = item[keys[i]];
+                        this.data.value[index][keys[i]] = item.data[keys[i]];
                     }
 
                     if (this.options.updated) {

@@ -237,13 +237,13 @@ export function createListRaw<
                 total: total.value,
             },
             onCreated(value: RECORD) {
-                handleCreated(value);
+                handlers.created(value);
             },
             onDeleted(value: RECORD) {
-                handleDeleted(value);
+                handlers.deleted(value);
             },
             onUpdated: (value: RECORD) => {
-                handleUpdated(value);
+                handlers.updated(value);
             },
             slotItems: context.setup.slots || {},
         });
