@@ -1,5 +1,42 @@
 # Changelog
 
+## [0.8.18](https://github.com/PrivateAIM/hub/compare/v0.8.17...v0.8.18) (2025-09-16)
+
+
+### Features
+
+* list handler class with stack (fifo) processing ([0281360](https://github.com/PrivateAIM/hub/commit/0281360bc0ff1a549e3ca08510c6e6be8abfed1b))
+* reload button for analysis logs ([bcb8e61](https://github.com/PrivateAIM/hub/commit/bcb8e61e65dc77ce26bafcf26c8a004d12013fbc))
+
+
+### Bug Fixes
+
+* bootstrap-vue-next useModal,orchestrator,... usage ([5a929ae](https://github.com/PrivateAIM/hub/commit/5a929aed655c5ab6bd625c3d75eb3155e8512a14))
+* bucket file deletion ([c96febb](https://github.com/PrivateAIM/hub/commit/c96febb91051efbc141ac14a9182e5a19dd9a28a))
+* change analysis bucket file list without socket events ([#1196](https://github.com/PrivateAIM/hub/issues/1196)) ([369193c](https://github.com/PrivateAIM/hub/commit/369193c9d30aa36ecbc2bf0c7a5dabdc2c1ea7d6))
+* **deps:** bump the minorandpatch group across 1 directory with 16 updates ([#1194](https://github.com/PrivateAIM/hub/issues/1194)) ([46336b8](https://github.com/PrivateAIM/hub/commit/46336b8d8f320705bf216bab81ed61d940ff2895))
+* remove fooo keyword in analysis-wizard ([#1195](https://github.com/PrivateAIM/hub/issues/1195)) ([b9834da](https://github.com/PrivateAIM/hub/commit/b9834da89bb77048bb39bd6322c805b6b400e3bb))
+* rendering analysis wizard modal ([9c28b0c](https://github.com/PrivateAIM/hub/commit/9c28b0c50c9ee9d27934af991fcf1765d16493d8))
+* rendering master image events ([ff5d016](https://github.com/PrivateAIM/hub/commit/ff5d0169e44bba7713be7738848f40dd095033ad))
+* socket resources nsp pattern + project master-image requirement ([2d7be7f](https://github.com/PrivateAIM/hub/commit/2d7be7f333e6c06074f2ba9c5489f6685a6ab2ec))
+* submit and process socket events ([0240664](https://github.com/PrivateAIM/hub/commit/02406645a5171a235845935b03f189517c0331cb))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.8.17 to ^0.8.18
+    * @privateaim/core-kit bumped from ^0.8.17 to ^0.8.18
+    * @privateaim/telemetry-kit bumped from ^0.8.17 to ^0.8.18
+    * @privateaim/core-http-kit bumped from ^0.8.17 to ^0.8.18
+    * @privateaim/core-realtime-kit bumped from ^0.7.18 to ^0.7.19
+    * @privateaim/storage-kit bumped from ^0.8.17 to ^0.8.18
+  * peerDependencies
+    * @privateaim/core-kit bumped from ^0.8.17 to ^0.8.18
+    * @privateaim/storage-kit bumped from ^0.8.17 to ^0.8.18
+    * @privateaim/telemetry-kit bumped from ^0.8.17 to ^0.8.18
+
 ## [0.8.17](https://github.com/PrivateAIM/hub/compare/v0.8.16...v0.8.17) (2025-09-01)
 
 

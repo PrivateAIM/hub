@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.8.18](https://github.com/PrivateAIM/hub/compare/v0.8.17...v0.8.18) (2025-09-16)
+
+
+### Features
+
+* encode file stream with gzip if supported ([#1201](https://github.com/PrivateAIM/hub/issues/1201)) ([dd4731d](https://github.com/PrivateAIM/hub/commit/dd4731deb1d8447b55032c09b727dc73869d46af))
+* use correct env name ([a4dd44d](https://github.com/PrivateAIM/hub/commit/a4dd44d5855788244518345455ba486c71861bae))
+
+
+### Bug Fixes
+
+* **deps:** bump the minorandpatch group across 1 directory with 16 updates ([#1194](https://github.com/PrivateAIM/hub/issues/1194)) ([46336b8](https://github.com/PrivateAIM/hub/commit/46336b8d8f320705bf216bab81ed61d940ff2895))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.8.17 to ^0.8.18
+    * @privateaim/server-kit bumped from ^0.8.17 to ^0.8.18
+    * @privateaim/server-db-kit bumped from ^0.8.17 to ^0.8.18
+    * @privateaim/server-http-kit bumped from ^0.8.17 to ^0.8.18
+    * @privateaim/server-telemetry-kit bumped from ^0.8.17 to ^0.8.18
+    * @privateaim/storage-kit bumped from ^0.8.17 to ^0.8.18
+    * @privateaim/telemetry-kit bumped from ^0.8.17 to ^0.8.18
+
 ## [0.8.17](https://github.com/PrivateAIM/hub/compare/v0.8.16...v0.8.17) (2025-09-01)
 
 
