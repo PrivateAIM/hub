@@ -7,7 +7,7 @@
 
 import { BadRequestError, NotFoundError } from '@ebec/http';
 import { AnalysisNodeApprovalStatus, DomainType, NodeType } from '@privateaim/core-kit';
-import { PermissionName } from '@privateaim/kit';
+import { MONTH_IN_MS, PermissionName } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
@@ -101,6 +101,8 @@ export async function createAnalysisNodeRouteHandler(req: Request, res: Response
                             node_id: data.node.id,
                             node_realm_id: data.node.realm_id,
                         },
+                        expiring: true,
+                        expires_at: new Date(Date.now() + MONTH_IN_MS).toISOString(),
                     },
                 });
             }
