@@ -5,22 +5,20 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { pipeline } from 'node:stream';
 import { createGzip } from 'node:zlib';
 import { NotFoundError } from '@ebec/http';
 import { useLogger } from '@privateaim/server-kit';
 import type { Request, Response } from 'routup';
-import { getRequestAcceptableEncoding, setResponseHeaderAttachment, useRequestParam } from 'routup';
+import { getRequestAcceptableEncoding, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useMinio } from '../../../../core';
 import {
     BucketFileEntity, toBucketName,
 } from '../../../../domains';
 
+/*
 function encodeContentDispositionFilename(input: string) {
     return input
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
         .replace(/ä/g, 'ae')
         .replace(/ö/g, 'oe')
         .replace(/ü/g, 'ue')
@@ -30,6 +28,8 @@ function encodeContentDispositionFilename(input: string) {
         .replace(/ß/g, 'ss')
         .replace(/[^a-zA-Z0-9._-]/g, '_');
 }
+
+ */
 
 export async function executeBucketFileRouteStreamHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -58,7 +58,7 @@ export async function executeBucketFileRouteStreamHandler(req: Request, res: Res
     }
 
     // todo: use should be done in setResponseHeaderAttachment or as helper fn
-    setResponseHeaderAttachment(res, encodeContentDispositionFilename(entity.name));
+    // setResponseHeaderAttachment(res, encodeContentDispositionFilename(entity.name));
 
     const bucketName = toBucketName(entity.bucket_id);
 
@@ -74,8 +74,9 @@ export async function executeBucketFileRouteStreamHandler(req: Request, res: Res
     });
 
     if (gzipSupported) {
-        const gzip = createGzip();
-        pipeline(stream, gzip, res);
+        stream
+            .pipe(createGzip())
+            .pipe(res);
     } else {
         stream.pipe(res);
     }
