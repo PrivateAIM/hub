@@ -5,10 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { pipeline } from 'node:stream';
+import { createGzip } from 'node:zlib';
 import { NotFoundError } from '@ebec/http';
 import { useLogger } from '@privateaim/server-kit';
 import type { Request, Response } from 'routup';
-import { useRequestParam } from 'routup';
+import { getRequestAcceptableEncoding, setResponseHeaderAttachment, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useMinio } from '../../../../core';
 import {
@@ -28,12 +30,20 @@ export async function executeBucketFileRouteStreamHandler(req: Request, res: Res
         throw new NotFoundError();
     }
 
-    res.writeHead(200, {
-        'Content-Type': 'application/gzip',
-    });
+    const gzipSupported = getRequestAcceptableEncoding(req, 'gzip');
+    if (gzipSupported) {
+        res.writeHead(200, {
+            'Content-Type': 'application/octet-stream',
+            'Content-Encoding': 'gzip',
+        });
+    } else {
+        res.writeHead(200, {
+            'Content-Type': 'application/octet-stream',
+            'Content-Encoding': 'identity',
+        });
+    }
 
-    // todo: this should work
-    // setResponseHeaderAttachment(res, entity.path);
+    setResponseHeaderAttachment(res, entity.name);
 
     const bucketName = toBucketName(entity.bucket_id);
 
@@ -47,5 +57,11 @@ export async function executeBucketFileRouteStreamHandler(req: Request, res: Res
     stream.on('error', (err) => {
         useLogger().error(err);
     });
-    stream.pipe(res);
+
+    if (gzipSupported) {
+        const gzip = createGzip();
+        pipeline(stream, gzip, res);
+    } else {
+        stream.pipe(res);
+    }
 }
