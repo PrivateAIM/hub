@@ -76,7 +76,7 @@ export class EntityEventHandler implements IEntityEventHandler {
                     continue;
                 }
 
-                if (isObject(diff[key]) || Array.isArray(diff[key])) {
+                if (isObject(ctx.data[key]) || Array.isArray(ctx.data[key])) {
                     continue;
                 }
 
