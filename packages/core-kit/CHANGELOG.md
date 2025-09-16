@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.8.18](https://github.com/PrivateAIM/hub/compare/v0.8.17...v0.8.18) (2025-09-16)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.8.17 to ^0.8.18
+    * @privateaim/telemetry-kit bumped from ^0.8.17 to ^0.8.18
+  * peerDependencies
+    * @privateaim/kit bumped from ^0.8.17 to ^0.8.18
+    * @privateaim/telemetry-kit bumped from ^0.8.17 to ^0.8.18
+
 ## [0.8.17](https://github.com/PrivateAIM/hub/compare/v0.8.16...v0.8.17) (2025-09-01)
 
 

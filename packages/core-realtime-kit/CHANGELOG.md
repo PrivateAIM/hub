@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.7.19](https://github.com/PrivateAIM/hub/compare/v0.7.18...v0.7.19) (2025-09-16)
+
+
+### Features
+
+* enhance typing for doamin entities ([9d7c516](https://github.com/PrivateAIM/hub/commit/9d7c51644b66c9361e5436e2c43f463f4f219f90))
+* restructure domain event handling ([2ad7318](https://github.com/PrivateAIM/hub/commit/2ad7318930bd342d571105982fc92996443326fa))
+
+
+### Bug Fixes
+
+* socket resources nsp pattern + project master-image requirement ([2d7be7f](https://github.com/PrivateAIM/hub/commit/2d7be7f333e6c06074f2ba9c5489f6685a6ab2ec))
+* submit and process socket events ([0240664](https://github.com/PrivateAIM/hub/commit/02406645a5171a235845935b03f189517c0331cb))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.8.17 to ^0.8.18
+    * @privateaim/core-kit bumped from ^0.8.17 to ^0.8.18
+  * peerDependencies
+    * @privateaim/kit bumped from ^0.8.17 to ^0.8.18
+    * @privateaim/core-kit bumped from ^0.8.17 to ^0.8.18
+
 ## [0.7.18](https://github.com/PrivateAIM/hub/compare/v0.7.17...v0.7.18) (2025-09-01)
 
 

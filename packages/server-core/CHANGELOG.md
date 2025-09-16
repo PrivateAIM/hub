@@ -1,5 +1,39 @@
 # Changelog
 
+## [0.8.18](https://github.com/PrivateAIM/hub/compare/v0.8.17...v0.8.18) (2025-09-16)
+
+
+### Features
+
+* set expire date for analysis-node run events ([5f6d3b3](https://github.com/PrivateAIM/hub/commit/5f6d3b3ed06dfb23d66042b61696f6140978a22c))
+
+
+### Bug Fixes
+
+* **deps:** bump the minorandpatch group across 1 directory with 16 updates ([#1194](https://github.com/PrivateAIM/hub/issues/1194)) ([46336b8](https://github.com/PrivateAIM/hub/commit/46336b8d8f320705bf216bab81ed61d940ff2895))
+* do not transmit nested event payload ([#1200](https://github.com/PrivateAIM/hub/issues/1200)) ([8180ddc](https://github.com/PrivateAIM/hub/commit/8180ddc6440963e32ce83769ed4c007d36b9533c))
+* minor adjustment to pass error objects for logging ([d2083b3](https://github.com/PrivateAIM/hub/commit/d2083b3157b5a81e2fa771cbe0d2034517a4e97c))
+* socket resources nsp pattern + project master-image requirement ([2d7be7f](https://github.com/PrivateAIM/hub/commit/2d7be7f333e6c06074f2ba9c5489f6685a6ab2ec))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.8.17 to ^0.8.18
+    * @privateaim/core-realtime-kit bumped from ^0.7.18 to ^0.7.19
+    * @privateaim/kit bumped from ^0.8.17 to ^0.8.18
+    * @privateaim/telemetry-kit bumped from ^0.8.17 to ^0.8.18
+    * @privateaim/server-kit bumped from ^0.8.17 to ^0.8.18
+    * @privateaim/server-db-kit bumped from ^0.8.17 to ^0.8.18
+    * @privateaim/server-http-kit bumped from ^0.8.17 to ^0.8.18
+    * @privateaim/server-core-worker-kit bumped from ^0.7.18 to ^0.7.19
+    * @privateaim/server-realtime-kit bumped from ^0.8.17 to ^0.8.18
+    * @privateaim/server-telemetry bumped from ^0.8.17 to ^0.8.18
+    * @privateaim/server-telemetry-kit bumped from ^0.8.17 to ^0.8.18
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.8.17 to ^0.8.18
+
 ## [0.8.17](https://github.com/PrivateAIM/hub/compare/v0.8.16...v0.8.17) (2025-09-01)
 
 

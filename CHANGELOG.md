@@ -1,5 +1,34 @@
 # Changelog
 
+## [0.8.18](https://github.com/PrivateAIM/hub/compare/v0.8.17...v0.8.18) (2025-09-16)
+
+
+### Features
+
+* encode file stream with gzip if supported ([#1201](https://github.com/PrivateAIM/hub/issues/1201)) ([dd4731d](https://github.com/PrivateAIM/hub/commit/dd4731deb1d8447b55032c09b727dc73869d46af))
+* list handler class with stack (fifo) processing ([0281360](https://github.com/PrivateAIM/hub/commit/0281360bc0ff1a549e3ca08510c6e6be8abfed1b))
+* reload button for analysis logs ([bcb8e61](https://github.com/PrivateAIM/hub/commit/bcb8e61e65dc77ce26bafcf26c8a004d12013fbc))
+* set expire date for analysis-node run events ([5f6d3b3](https://github.com/PrivateAIM/hub/commit/5f6d3b3ed06dfb23d66042b61696f6140978a22c))
+* use correct env name ([a4dd44d](https://github.com/PrivateAIM/hub/commit/a4dd44d5855788244518345455ba486c71861bae))
+
+
+### Bug Fixes
+
+* bootstrap-vue-next useModal,orchestrator,... usage ([5a929ae](https://github.com/PrivateAIM/hub/commit/5a929aed655c5ab6bd625c3d75eb3155e8512a14))
+* bucket file deletion ([c96febb](https://github.com/PrivateAIM/hub/commit/c96febb91051efbc141ac14a9182e5a19dd9a28a))
+* change analysis bucket file list without socket events ([#1196](https://github.com/PrivateAIM/hub/issues/1196)) ([369193c](https://github.com/PrivateAIM/hub/commit/369193c9d30aa36ecbc2bf0c7a5dabdc2c1ea7d6))
+* **deps:** bump the minorandpatch group across 1 directory with 16 updates ([#1194](https://github.com/PrivateAIM/hub/issues/1194)) ([46336b8](https://github.com/PrivateAIM/hub/commit/46336b8d8f320705bf216bab81ed61d940ff2895))
+* do not transmit nested event payload ([#1200](https://github.com/PrivateAIM/hub/issues/1200)) ([8180ddc](https://github.com/PrivateAIM/hub/commit/8180ddc6440963e32ce83769ed4c007d36b9533c))
+* enum to string conversion ([95272f8](https://github.com/PrivateAIM/hub/commit/95272f8252f326f8112d7192975c143e68244826))
+* expose validup validator error ([7f81aca](https://github.com/PrivateAIM/hub/commit/7f81aca88b539c6547afa6fb0aaf645d3dbb80dd))
+* minor adjustment to pass error objects for logging ([d2083b3](https://github.com/PrivateAIM/hub/commit/d2083b3157b5a81e2fa771cbe0d2034517a4e97c))
+* remove fooo keyword in analysis-wizard ([#1195](https://github.com/PrivateAIM/hub/issues/1195)) ([b9834da](https://github.com/PrivateAIM/hub/commit/b9834da89bb77048bb39bd6322c805b6b400e3bb))
+* rendering analysis wizard modal ([9c28b0c](https://github.com/PrivateAIM/hub/commit/9c28b0c50c9ee9d27934af991fcf1765d16493d8))
+* rendering master image events ([ff5d016](https://github.com/PrivateAIM/hub/commit/ff5d0169e44bba7713be7738848f40dd095033ad))
+* setting top level log attributes ([f74439b](https://github.com/PrivateAIM/hub/commit/f74439ba31c6a30f3ed0e530671fea5d4321181c))
+* socket resources nsp pattern + project master-image requirement ([2d7be7f](https://github.com/PrivateAIM/hub/commit/2d7be7f333e6c06074f2ba9c5489f6685a6ab2ec))
+* submit and process socket events ([0240664](https://github.com/PrivateAIM/hub/commit/02406645a5171a235845935b03f189517c0331cb))
+
 ## [0.8.17](https://github.com/PrivateAIM/hub/compare/v0.8.16...v0.8.17) (2025-09-01)
 
 
