@@ -80,10 +80,6 @@ export default defineComponent({
             emit('created', entity);
 
             updateEntrypointFile(entity);
-
-            if (fileListNode.value) {
-                fileListNode.value.handleCreated(entity);
-            }
         };
 
         const handleDeleted = (entity: AnalysisBucketFile) => {
@@ -95,10 +91,6 @@ export default defineComponent({
             emit('deleted', entity);
 
             updateEntrypointFile(entity);
-
-            if (fileListNode.value) {
-                fileListNode.value.handleDeleted(entity);
-            }
         };
 
         const handleUpdated = (entity: AnalysisBucketFile) => {
@@ -118,6 +110,10 @@ export default defineComponent({
         };
 
         const handleFileUploaded = (entity: AnalysisBucketFile) => {
+            if (fileListNode.value) {
+                fileListNode.value.handleCreated(entity);
+            }
+
             handleCreated(entity);
         };
 
