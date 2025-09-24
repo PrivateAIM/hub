@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.19](https://github.com/PrivateAIM/hub/compare/v0.8.18...v0.8.19) (2025-09-24)
+
+
+### Bug Fixes
+
+* **deps:** bump the minorandpatch group across 1 directory with 10 updates ([#1204](https://github.com/PrivateAIM/hub/issues/1204)) ([72923d8](https://github.com/PrivateAIM/hub/commit/72923d81911880e176907e893c62241fe7f849f3))
+* list handlers processing queue ([#1221](https://github.com/PrivateAIM/hub/issues/1221)) ([74df4b8](https://github.com/PrivateAIM/hub/commit/74df4b8adf78a1d912cfd87c541e060703b3889a))
+
 ## [0.8.18](https://github.com/PrivateAIM/hub/compare/v0.8.17...v0.8.18) (2025-09-16)
 
 

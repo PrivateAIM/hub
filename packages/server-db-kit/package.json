@@ -1,6 +1,6 @@
 {
     "name": "@privateaim/server-db-kit",
-    "version": "0.8.18",
+    "version": "0.8.19",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "author": {
@@ -11,8 +11,8 @@
     "license": "Apache-2.0",
     "description": "This package contains server side db helpers & utilities.",
     "dependencies": {
-        "@privateaim/kit": "^0.8.18",
-        "@privateaim/server-kit": "^0.8.18"
+        "@privateaim/kit": "^0.8.19",
+        "@privateaim/server-kit": "^0.8.19"
     },
     "devDependencies": {
         "typeorm": "^0.3.26",
