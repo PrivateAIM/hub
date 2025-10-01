@@ -15,11 +15,11 @@
         "@privateaim/server-kit": "^0.8.19"
     },
     "devDependencies": {
-        "typeorm": "^0.3.26",
+        "typeorm": "^0.3.27",
         "typeorm-extension": "^3.7.1"
     },
     "peerDependencies": {
-        "typeorm": "^0.3.26",
+        "typeorm": "^0.3.27",
         "typeorm-extension": "^3.7.1"
     },
     "scripts": {
