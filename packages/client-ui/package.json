@@ -24,7 +24,7 @@
         "@authup/core-http-kit": "^1.0.0-beta.27",
         "@authup/core-kit": "^1.0.0-beta.27",
         "@ilingo/vuelidate": "^5.0.4",
-        "@fortawesome/fontawesome-free": "^7.0.1",
+        "@fortawesome/fontawesome-free": "^7.1.0",
         "@nuxtjs/google-fonts": "^3.2.0",
         "@pinia/nuxt": "^0.11.2",
         "@privateaim/client-vue": "^0.8.19",
@@ -45,13 +45,13 @@
         "@vuelidate/validators": "^2.0.4",
         "@vueuse/core": "^13.9.0",
         "bootstrap": "^5.3.8",
-        "bootstrap-vue-next": "^0.40.4",
+        "bootstrap-vue-next": "^0.40.5",
         "events": "^3.3.0",
         "hapic": "^2.7.0",
         "nuxt": "4.1.2",
         "rapiq": "^0.9.0",
         "smob": "^1.5.0",
-        "vue": "^3.5.21"
+        "vue": "^3.5.22"
     },
     "gitHead": "8881a3d4b427c45ac4b81ac4b31bf3d719463ef7"
 }
