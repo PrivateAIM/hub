@@ -47,7 +47,7 @@ services:
         networks:
             hub:
     redis:
-        image: bitnami/redis
+        image: bitnamilegacy/redis:8.2.1-debian-12-r0
         healthcheck:
             test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
             interval: 3s
