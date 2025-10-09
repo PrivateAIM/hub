@@ -6,7 +6,6 @@
   -->
 <script lang="ts">
 import { injectStore, storeToRefs } from '@authup/client-web-kit';
-import { injectCoreHTTPClient } from '@privateaim/client-vue';
 import { VCCountdown } from '@vuecs/countdown';
 import { VCNavItems } from '@vuecs/navigation';
 import { defineNuxtComponent } from '#app';
@@ -15,7 +14,6 @@ import { computed } from '#imports';
 export default defineNuxtComponent({
     components: { VCCountdown, VCNavItems },
     setup() {
-        const api = injectCoreHTTPClient();
         const store = injectStore();
 
         const { loggedIn, accessTokenExpireDate: tokenExpireDate, realmManagement } = storeToRefs(store);
@@ -28,15 +26,9 @@ export default defineNuxtComponent({
             return tokenExpireDate.value.getTime() - Date.now();
         });
 
-        const docsURL = computed(() => new URL('docs/', api.getBaseURL()).href);
-
-        const metricsURL = computed(() => new URL('metrics', api.getBaseURL()).href);
-
         return {
             loggedIn,
             tokenExpiresIn,
-            docsURL,
-            metricsURL,
             realmManagement,
         };
     },
@@ -68,26 +60,19 @@ export default defineNuxtComponent({
                 </small>
             </div>
 
+            <!--
             <ul class="sidebar-menu vc-nav-items navbar-nav">
                 <li class="vc-nav-item">
                     <a
                         class="vc-nav-link"
-                        :href="docsURL"
+                        :href="'javascript:void(0)'"
                         target="_blank"
                     >
                         <i class="fa fa-file" /> <span class="vc-nav-link-text">Documentation</span>
                     </a>
                 </li>
-                <li class="vc-nav-item">
-                    <a
-                        class="vc-nav-link"
-                        :href="metricsURL"
-                        target="_blank"
-                    >
-                        <i class="fa fa-chart-bar" /> <span class="vc-nav-link-text">Metrics</span>
-                    </a>
-                </li>
             </ul>
+            -->
         </div>
     </div>
 </template>
