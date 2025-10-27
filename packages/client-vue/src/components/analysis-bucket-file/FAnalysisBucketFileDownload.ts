@@ -50,6 +50,7 @@ const FAnalysisBucketFileDownload = defineComponent({
             iconClass: 'fas fa-download',
             isAllowed: true, // todo: maybe bind to permission
             commandText: 'download',
+            commandTooltip: 'Download',
             classSuffix: 'dark',
             slots,
         });

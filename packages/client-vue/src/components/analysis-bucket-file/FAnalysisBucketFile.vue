@@ -106,11 +106,11 @@ export default defineComponent({
         };
 
         return {
+            toggle,
             drop,
             marked,
             markToggle,
             isMatch,
-            toggle,
             busy: manager.busy,
         };
     },
@@ -140,6 +140,27 @@ export default defineComponent({
             <template v-if="!readonly">
                 <div>
                     <button
+                        type="button"
+                        class="btn btn-xs"
+                        :disabled="busy"
+                        :class="{
+                            'btn-success': !isMatch,
+                            'btn-warning': isMatch
+                        }"
+                        @click.prevent="toggle"
+                    >
+                        <i
+                            :class="{
+                                'fa fa-check': !isMatch,
+                                'fa fa-times': isMatch
+                            }"
+                        />
+                    </button>
+                </div>
+                <div>
+                    <button
+                        v-b-tooltip.hover.top
+                        title="Delete"
                         type="button"
                         class="btn btn-danger btn-xs"
                         :disabled="busy"

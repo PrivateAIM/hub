@@ -5,8 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { Directives } from 'bootstrap-vue-next';
 import { isObject } from 'smob';
-import { h, resolveDynamicComponent } from 'vue';
+import { h, resolveDynamicComponent, withDirectives } from 'vue';
 import type {
     Component, Slots, VNodeArrayChildren,
     VNodeChild, VNodeProps,
@@ -21,6 +22,7 @@ type Context = {
     isAllowed: boolean,
     isDisabled: boolean,
     commandText: string,
+    commandTooltip?: string,
     iconClass: string,
     classSuffix: string,
     slots: Slots
@@ -87,5 +89,22 @@ export function renderActionCommand(ctx: Context) : VNodeChild {
         }, ctx.slots);
     }
 
-    return h(tag as string, attributes, text);
+    const vNode = h(tag as string, attributes, text);
+    if (ctx.commandTooltip) {
+        return withDirectives(
+            vNode,
+            [
+                [
+                    Directives.vBTooltip,
+                    ctx.commandTooltip,
+                    undefined,
+                    {
+                        hover: true,
+                        top: true,
+                    },
+                ],
+            ],
+        );
+    }
+    return vNode;
 }
