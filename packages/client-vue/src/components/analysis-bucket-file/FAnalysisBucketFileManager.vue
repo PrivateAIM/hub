@@ -220,7 +220,7 @@ export default defineComponent({
                 <template #noMore>
                     <div class="d-flex flex-column gap-1">
                         <div>
-                            No files available in analysis {{ entity.type.toLowerCase() }} storage.
+                            No files available in analysis {{ entity.type.toLowerCase() }} bucket.
                         </div>
                         <template v-if="!readonly">
                             <div>

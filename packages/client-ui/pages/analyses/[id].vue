@@ -58,10 +58,9 @@ export default defineComponent({
         const tabs = [
             { name: 'Overview', icon: 'fas fa-bars', path: '' },
             { name: 'Nodes', icon: 'fa fa-city', path: '/nodes' },
+            { name: 'Master Image', icon: 'fa fa-compact-disc', path: '/master-image' },
+            { name: 'Security', icon: 'fa fa-lock', path: '/security' },
             { name: 'Code', icon: 'fa fa-code', path: '/code-files' },
-            { name: 'Master Image', icon: 'fa fa-file', path: '/master-image' },
-            { name: 'Permissions', icon: 'fa fa-key', path: '/permissions' },
-            { name: 'Configuration', icon: 'fa fa-wrench', path: '/setup' },
             { name: 'Results', icon: 'fas fa-chart-bar', path: '/result-files' },
         ];
 

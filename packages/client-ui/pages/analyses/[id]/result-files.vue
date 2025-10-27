@@ -5,7 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { FAnalysisBucket, FAnalysisBucketFileManager, FAnalysisCodeFiles } from '@privateaim/client-vue';
+import { FAnalysisBucket, FAnalysisBucketFileManager } from '@privateaim/client-vue';
 import { computed } from 'vue';
 import type { BuildInput } from 'rapiq';
 import type { PropType } from 'vue';
@@ -13,7 +13,7 @@ import { type Analysis, type AnalysisBucket, AnalysisBucketType } from '@private
 import { defineNuxtComponent } from '#app';
 
 export default defineNuxtComponent({
-    components: { FAnalysisCodeFiles, FAnalysisBucketFileManager, FAnalysisBucket },
+    components: { FAnalysisBucketFileManager, FAnalysisBucket },
     props: {
         entity: {
             type: Object as PropType<Analysis>,

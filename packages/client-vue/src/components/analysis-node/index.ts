@@ -12,4 +12,3 @@ export { default as FAnalysisNode } from './FAnalysisNode';
 export { default as FAnalysisNodes } from './FAnalysisNodes';
 export { default as FAnalysisNodesManager } from './FAnalysisNodesManager.vue';
 export { default as FAnalysisNodeInCard } from './FAnalysisNodeInCard.vue';
-export { default as FAnalysisNodeManager } from './FAnalysisNodeManager.vue';

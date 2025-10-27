@@ -23,12 +23,18 @@ export default defineComponent({
 });
 </script>
 <template>
-    <div class="card-grey card mb-3">
+    <div
+        v-if="entity"
+        class="card-grey card mb-3"
+    >
         <div class="card-header">
             <span class="title">Master Image</span>
         </div>
         <div class="card-body">
-            <FAnalysisMasterImage :entity="entity" />
+            <FAnalysisMasterImage
+                :readonly="entity.configuration_locked"
+                :entity="entity"
+            />
         </div>
     </div>
 </template>

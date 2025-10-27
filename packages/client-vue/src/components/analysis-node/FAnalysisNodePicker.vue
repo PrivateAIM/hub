@@ -47,7 +47,7 @@ export default defineComponent({
             emit('deleted', input);
         };
 
-        const failed = (input: AnalysisNode) => {
+        const failed = (input: Error) => {
             emit('failed', input);
         };
 

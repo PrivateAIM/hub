@@ -32,6 +32,10 @@ export default defineComponent({
         masterImageEntity: {
             type: Object as PropType<MasterImage>,
         },
+        readonly: {
+            type: Boolean,
+            default: false,
+        },
     },
     emits: ['updated', 'failed', 'masterImageChanged'],
     setup(props, { emit }) {
@@ -75,6 +79,7 @@ export default defineComponent({
             <h6><i class="fa fa-compact-disc" /> Base</h6>
             <div class="mb-2">
                 <FMasterImagePicker
+                    :readonly="readonly"
                     :entity-id="entity.master_image_id"
                     :entity="masterImageEntity"
                     @selected="handleMasterImageChanged"

@@ -10,11 +10,11 @@ import type { PropType } from 'vue';
 import {
     defineComponent,
 } from 'vue';
-import FAnalysisNodeManager from '../../analysis-node/FAnalysisNodeManager.vue';
+import { FAnalysisNodesManager } from '../../analysis-node';
 
 export default defineComponent({
     components: {
-        FAnalysisNodeManager,
+        FAnalysisNodesManager,
     },
     props: {
         entity: {
@@ -42,31 +42,11 @@ export default defineComponent({
 <template>
     <div class="d-flex flex-column">
         <div>
-            <FAnalysisNodeManager
+            <FAnalysisNodesManager
                 :entity="entity"
                 @failed="handleFailed"
                 @analysis-updated="handleUpdated"
-            >
-                <template #header="props">
-                    <div class="d-flex flex-row">
-                        <div>
-                            <h6>
-                                <i class="fa fa-city" /> Nodes
-                            </h6>
-                        </div>
-                        <div class="ms-auto">
-                            <button
-                                type="button"
-                                style="width:120px"
-                                class="btn btn-primary btn-xs"
-                                @click.prevent="props.add"
-                            >
-                                <i class="fa fa-plus me-1" /> Add
-                            </button>
-                        </div>
-                    </div>
-                </template>
-            </FAnalysisNodeManager>
+            />
         </div>
     </div>
 </template>

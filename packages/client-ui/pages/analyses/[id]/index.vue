@@ -88,6 +88,26 @@ export default defineNuxtComponent({
                 </div>
             </div>
         </div>
+        <div v-else>
+            <div class="card-grey card">
+                <div class="card-header">
+                    <div class="title">
+                        Info
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-row gap-2 align-items-center alert alert-sm alert-info mb-0">
+                        <div>
+                            <i class="fa fa-info" />
+                        </div>
+                        <div>
+                            The analysis is not configured yet!<br>
+                            Therefore follow the Pipeline Steps to be able to submit your analysis.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 <style>

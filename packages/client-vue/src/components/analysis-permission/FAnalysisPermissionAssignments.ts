@@ -22,6 +22,10 @@ export const FAnalysisPermissionAssignments = defineComponent({
             type: String,
             required: true,
         },
+        readonly: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { slots, attrs, expose }) {
         const vNodeRef = ref<typeof APermissions | null>(null);
@@ -38,6 +42,7 @@ export const FAnalysisPermissionAssignments = defineComponent({
             [SlotName.ITEM_ACTIONS]: (slotProps: { data: Permission }) => h(
                 FAnalysisPermissionAssignment,
                 {
+                    readonly: props.readonly,
                     analysisId: props.entityId,
                     permissionId: slotProps.data.id,
                     key: slotProps.data.id,
