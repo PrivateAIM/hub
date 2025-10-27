@@ -18,9 +18,11 @@ import { defineComponent } from 'vue';
 import { FAnalysisCommand } from './FAnalysisCommand';
 import FAnalysisBuildStatusText from './FAnalysisBuildStatusText.vue';
 import FAnalysisConfigurationStatusText from './FAnalysisConfigurationStatusText.vue';
+import FAnalysisRunStatusText from './FAnalysisRunStatusText.vue';
 
 export default defineComponent({
     components: {
+        FAnalysisRunStatusText,
         FAnalysisBuildStatusText,
         FAnalysisConfigurationStatusText,
         FAnalysisCommand,
@@ -160,6 +162,21 @@ export default defineComponent({
                         @failed="handleFailed"
                     />
                 </div>
+            </div>
+        </div>
+        <div
+            class="d-flex flex-grow-1 align-items-center"
+            style="flex-basis: 0"
+            :class="{
+                'mb-2 flex-row': listDirection === 'column',
+                'flex-column': listDirection === 'row'
+            }"
+        >
+            <div class="me-1">
+                <strong>3. Run</strong>
+            </div>
+            <div>
+                <FAnalysisRunStatusText :status="entity.run_status" />
             </div>
         </div>
     </div>

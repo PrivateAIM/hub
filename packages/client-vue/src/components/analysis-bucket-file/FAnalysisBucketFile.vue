@@ -20,8 +20,10 @@ import {
     watch,
 } from 'vue';
 import { createEntityManager, defineEntityManagerEvents, injectStorageHTTPClient } from '../../core';
+import { FAnalysisBucketFileDownload } from './FAnalysisBucketFileDownload';
 
 export default defineComponent({
+    components: { FAnalysisBucketFileDownload },
     props: {
         entity: {
             type: Object as PropType<AnalysisBucketFile>,
@@ -30,6 +32,10 @@ export default defineComponent({
         filesSelected: {
             type: Array,
             required: true,
+        },
+        readonly: {
+            type: Boolean,
+            default: false,
         },
     },
     emits: {
@@ -123,36 +129,26 @@ export default defineComponent({
                 {{ entity.name }}
             </span>
         </div>
-        <div class="ms-auto d-flex flex-row me-1">
+        <div class="ms-auto d-flex flex-row gap-2">
             <div>
-                <button
-                    type="button"
-                    class="btn btn-xs"
-                    :disabled="busy"
-                    :class="{
-                        'btn-success': !isMatch,
-                        'btn-warning': isMatch
-                    }"
-                    @click.prevent="toggle"
-                >
-                    <i
-                        :class="{
-                            'fa fa-check': !isMatch,
-                            'fa fa-times': isMatch
-                        }"
-                    />
-                </button>
+                <FAnalysisBucketFileDownload
+                    :with-text="false"
+                    :with-icon="true"
+                    :entity="entity"
+                />
             </div>
-            <div class="ms-1">
-                <button
-                    type="button"
-                    class="btn btn-danger btn-xs"
-                    :disabled="busy"
-                    @click.prevent="drop"
-                >
-                    <i class="fa fa-trash" />
-                </button>
-            </div>
+            <template v-if="!readonly">
+                <div>
+                    <button
+                        type="button"
+                        class="btn btn-danger btn-xs"
+                        :disabled="busy"
+                        @click.prevent="drop"
+                    >
+                        <i class="fa fa-trash" />
+                    </button>
+                </div>
+            </template>
         </div>
     </div>
 </template>

@@ -8,7 +8,7 @@
 import {
     DomainType,
 } from '@privateaim/core-kit';
-import { FAnalysisName, createEntityManager } from '@privateaim/client-vue';
+import { FAnalysisName, FAnalysisPipeline, createEntityManager } from '@privateaim/client-vue';
 import { isClientErrorWithStatusCode } from 'hapic';
 import { defineComponent } from 'vue';
 import { definePageMeta, useToast } from '#imports';
@@ -20,7 +20,9 @@ import { LayoutKey, LayoutNavigationID } from '../../config/layout';
 import { DomainEntityNavItem } from '../../core';
 
 export default defineComponent({
-    components: { DomainEntityNav, DomainEntityNavItem, FAnalysisName },
+    components: {
+        FAnalysisPipeline, DomainEntityNav, DomainEntityNavItem, FAnalysisName,
+    },
     async setup() {
         definePageMeta({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
@@ -55,8 +57,12 @@ export default defineComponent({
 
         const tabs = [
             { name: 'Overview', icon: 'fas fa-bars', path: '' },
+            { name: 'Nodes', icon: 'fa fa-city', path: '/nodes' },
+            { name: 'Code', icon: 'fa fa-code', path: '/code-files' },
+            { name: 'Master Image', icon: 'fa fa-file', path: '/master-image' },
+            { name: 'Permissions', icon: 'fa fa-key', path: '/permissions' },
             { name: 'Configuration', icon: 'fa fa-wrench', path: '/setup' },
-            { name: 'Results', icon: 'fas fa-chart-bar', path: '/results' },
+            { name: 'Results', icon: 'fas fa-chart-bar', path: '/result-files' },
         ];
 
         return {
@@ -105,11 +111,30 @@ export default defineComponent({
         </div>
 
         <template v-if="entity">
-            <NuxtPage
-                :entity="entity"
-                @updated="handleUpdated"
-                @failed="handleFailed"
-            />
+            <div class="row">
+                <div class="col-8">
+                    <NuxtPage
+                        :entity="entity"
+                        @updated="handleUpdated"
+                        @failed="handleFailed"
+                    />
+                </div>
+                <div class="col-4">
+                    <div class="card-grey card">
+                        <div class="card-header">
+                            <span class="title">Pipeline</span>
+                        </div>
+                        <div class="card-body">
+                            <FAnalysisPipeline
+                                :list-direction="'column'"
+                                :entity="entity"
+                                @updated="handleUpdated"
+                                @failed="handleFailed"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
         </template>
         <template v-else>
             Not found...
