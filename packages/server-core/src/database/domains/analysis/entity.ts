@@ -52,19 +52,19 @@ export class AnalysisEntity implements Analysis {
         configuration_locked: boolean;
 
     @Column({ type: 'boolean', default: false })
-        configuration_entrypoint: boolean;
+        configuration_entrypoint_valid: boolean;
 
     @Column({ type: 'boolean', default: false })
-        configuration_image: boolean;
+        configuration_image_valid: boolean;
 
     @Column({ type: 'boolean', default: false })
-        configuration_node_aggregator: boolean;
+        configuration_node_aggregator_valid: boolean;
 
     @Column({ type: 'boolean', default: false })
-        configuration_node_default: boolean;
+        configuration_node_default_valid: boolean;
 
     @Column({ type: 'boolean', default: false })
-        configuration_nodes: boolean;
+        configuration_nodes_valid: boolean;
 
     // ------------------------------------------------------------------
 

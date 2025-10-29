@@ -59,11 +59,11 @@ AnalysisConfigurationRecalcPayload> {
             relations: ['bucket'],
         });
 
-        entity.configuration_entrypoint = !!rootFile;
+        entity.configuration_entrypoint_valid = !!rootFile;
     }
 
     async setConfigurationImageStatus(entity: AnalysisEntity) : Promise<void> {
-        entity.configuration_image = !!entity.master_image_id;
+        entity.configuration_image_valid = !!entity.master_image_id;
     }
 
     async setConfigurationNodesStatus(entity: AnalysisEntity) : Promise<void> {
@@ -100,8 +100,8 @@ AnalysisConfigurationRecalcPayload> {
             }
         }
 
-        entity.configuration_node_aggregator = hasAggregator;
-        entity.configuration_node_default = hasDefault;
-        entity.configuration_nodes = hasAggregator && hasDefault;
+        entity.configuration_node_aggregator_valid = hasAggregator;
+        entity.configuration_node_default_valid = hasDefault;
+        entity.configuration_nodes_valid = hasAggregator && hasDefault;
     }
 }

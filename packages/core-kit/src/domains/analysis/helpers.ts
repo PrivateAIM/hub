@@ -107,19 +107,19 @@ export function isAnalysisAPICommandExecutable(
                 return output;
             }
 
-            if (!entity.configuration_node_default) {
+            if (!entity.configuration_node_default_valid) {
                 const error = AnalysisError.defaultNodeRequired();
                 output.message = error.message;
                 return output;
             }
 
-            if (!entity.configuration_node_aggregator) {
+            if (!entity.configuration_node_aggregator_valid) {
                 const error = AnalysisError.aggregatorNodeRequired();
                 output.message = error.message;
                 return output;
             }
 
-            if (!entity.configuration_image) {
+            if (!entity.configuration_image_valid) {
                 const error = AnalysisError.imageAssignmentRequired();
                 output.message = error.message;
                 return output;

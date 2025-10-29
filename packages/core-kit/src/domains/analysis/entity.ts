@@ -27,15 +27,30 @@ export interface Analysis {
 
     configuration_locked: boolean;
 
-    configuration_entrypoint : boolean;
+    /**
+     * A root code bucket file is linked for the analysis.
+     */
+    configuration_entrypoint_valid : boolean;
 
-    configuration_image: boolean;
+    /**
+     * Master image is assigned.
+     */
+    configuration_image_valid: boolean;
 
-    configuration_node_default: boolean;
+    /**
+     * One or more default nodes are assigned.
+     */
+    configuration_node_default_valid: boolean;
 
-    configuration_node_aggregator: boolean;
+    /**
+     * An aggregator is assigned.
+     */
+    configuration_node_aggregator_valid: boolean;
 
-    configuration_nodes: boolean;
+    /**
+     * A default node as well an aggregator node is assigned.
+     */
+    configuration_nodes_valid: boolean;
 
     // ------------------------------------------------------------------
 
