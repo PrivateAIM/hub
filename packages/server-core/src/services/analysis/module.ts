@@ -7,8 +7,11 @@
 
 import { BadRequestError } from '@ebec/http';
 import {
-    AnalysisAPICommand, AnalysisBucketType, AnalysisBuildStatus,
-    AnalysisNodeApprovalStatus, NodeType, isAnalysisAPICommandExecutable,
+    AnalysisAPICommand,
+    AnalysisBuildStatus,
+    AnalysisNodeApprovalStatus,
+    NodeType,
+    isAnalysisAPICommandExecutable,
 } from '@privateaim/core-kit';
 import {
     BuilderCommand,
@@ -183,55 +186,6 @@ export class AnalysisManagerService {
         const check = isAnalysisAPICommandExecutable(entity, AnalysisAPICommand.CONFIGURATION_LOCK);
         if (!check.success) {
             throw new BadRequestError(check.message);
-        }
-
-        const analysisBucket = await this.analysisBucketRepository.findOneBy({
-            type: AnalysisBucketType.CODE,
-            analysis_id: entity.id,
-        });
-        if (!analysisBucket) {
-            throw new BadRequestError('The analysis bucket for code files does not exist.');
-        }
-
-        const analysisFile = await this.analysisBucketFileRepository.findOneBy({
-            root: true,
-            bucket_id: analysisBucket.id,
-        });
-        if (!analysisFile) {
-            throw new BadRequestError('At least one code file must be uploaded and at least one entrypoint file is required.');
-        }
-
-        const analysisNodes = await this.analysisNodeRepository.find({
-            where: {
-                analysis_id: entity.id,
-            },
-            relations: ['node'],
-        });
-
-        let aggregatorNodes = 0;
-
-        for (let i = 0; i < analysisNodes.length; i++) {
-            if (
-                !options.ignoreApproval &&
-                analysisNodes[i].approval_status !== AnalysisNodeApprovalStatus.APPROVED
-            ) {
-                throw new BadRequestError('At least one node has not approved the analysis.');
-            }
-
-            if (
-                analysisNodes[i].node &&
-                analysisNodes[i].node.type === NodeType.AGGREGATOR
-            ) {
-                aggregatorNodes++;
-            }
-        }
-
-        if (aggregatorNodes > 1) {
-            throw new BadRequestError('Only one aggregator node can be part of the analysis.');
-        }
-
-        if (aggregatorNodes === 0) {
-            throw new BadRequestError('At least one aggregator node has to be part of the analysis.');
         }
 
         entity.configuration_locked = true;

@@ -23,7 +23,7 @@ export function createAnalysisConfigurationComponent(): Component {
 
     return {
         async start() {
-            await manager.setup();
+            await manager.initialize();
 
             if (
                 isQueueRouterUsable() &&

@@ -104,13 +104,17 @@ export function isAnalysisAPICommandExecutable(
                 return output;
             }
 
-            // todo: unknown if one of them is an aggregator.
-            if (entity.nodes < 2) {
-                output.message = 'The analysis requires at least two nodes.';
+            if (!entity.configuration_node_default) {
+                output.message = 'At least one default node must be selected.';
                 return output;
             }
 
-            if (!entity.master_image_id) {
+            if (!entity.configuration_node_aggregator) {
+                output.message = 'An aggregator node node must be selected.';
+                return output;
+            }
+
+            if (!entity.configuration_image) {
                 output.message = 'A master image must be assigned to the analysis.';
                 return output;
             }

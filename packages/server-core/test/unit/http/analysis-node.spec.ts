@@ -41,6 +41,7 @@ describe('src/controllers/core/analysis-node', () => {
         const analysis = await client.analysis.create({
             project_id: project.id,
         });
+
         expect(analysis.id).toBeDefined();
 
         const analysisNode = await client.analysisNode.create({

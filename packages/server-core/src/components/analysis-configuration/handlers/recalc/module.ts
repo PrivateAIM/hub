@@ -5,10 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { AnalysisBucketType, NodeType } from '@privateaim/core-kit';
+import { AnalysisBucketType, AnalysisNodeApprovalStatus, NodeType } from '@privateaim/core-kit';
 import type { ComponentHandler } from '@privateaim/server-kit';
 import type { DataSource, Repository } from 'typeorm';
 import { useDataSource } from 'typeorm-extension';
+import { useEnv } from '../../../../config';
 import { AnalysisBucketFileEntity, AnalysisEntity, AnalysisNodeEntity } from '../../../../database';
 import type { AnalysisConfigurationCommand } from '../../constants';
 import type { AnalysisConfigurationRecalcPayload } from '../../types';
@@ -72,11 +73,20 @@ AnalysisConfigurationRecalcPayload> {
             relations: ['node'],
         });
 
+        const ignoreApproval = useEnv('skipAnalysisApproval');
+
         let hasAggregator : boolean = false;
         let hasDefault : boolean = false;
 
         for (let i = 0; i < analysisNodes.length; i++) {
             const { node } = analysisNodes[i];
+
+            if (
+                !ignoreApproval &&
+                analysisNodes[i].approval_status !== AnalysisNodeApprovalStatus.APPROVED
+            ) {
+                continue;
+            }
 
             if (node.type === NodeType.AGGREGATOR) {
                 hasAggregator = true;
