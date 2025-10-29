@@ -100,8 +100,6 @@ AnalysisConfigurationRecalcPayload> {
             }
         }
 
-        console.log(hasAggregator, hasDefault);
-
         entity.configuration_node_aggregator = hasAggregator;
         entity.configuration_node_default = hasDefault;
         entity.configuration_nodes = hasAggregator && hasDefault;

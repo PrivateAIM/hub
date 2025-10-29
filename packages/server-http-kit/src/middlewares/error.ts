@@ -19,8 +19,6 @@ export function mountErrorMiddleware(router: Router) {
         const isServerError = error.statusCode >= 500 &&
             error.statusCode < 600;
 
-        console.log(error);
-
         if (isServerError || error.logMessage) {
             if (error.cause && isObject(error.cause)) {
                 useLogger().error({
