@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.8.20](https://github.com/PrivateAIM/hub/compare/v0.8.19...v0.8.20) (2025-10-29)
+
+
+### Bug Fixes
+
+* **deps:** bump the minorandpatch group across 1 directory with 13 updates ([#1246](https://github.com/PrivateAIM/hub/issues/1246)) ([bc898f9](https://github.com/PrivateAIM/hub/commit/bc898f9e40b52d6a93b815f9a07fb517219d051f))
+* **deps:** bump the minorandpatch group across 1 directory with 20 updates ([#1231](https://github.com/PrivateAIM/hub/issues/1231)) ([dddccd3](https://github.com/PrivateAIM/hub/commit/dddccd358e8caa9512bd8945dd8f1efc7155b20e))
+* remove links to metrics & docs ([#1242](https://github.com/PrivateAIM/hub/issues/1242)) ([6872329](https://github.com/PrivateAIM/hub/commit/68723292f86c81006ce52f1a69ce58a10a71d669))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/client-vue bumped from ^0.8.19 to ^0.8.20
+    * @privateaim/core-kit bumped from ^0.8.19 to ^0.8.20
+    * @privateaim/kit bumped from ^0.8.19 to ^0.8.20
+    * @privateaim/storage-kit bumped from ^0.8.19 to ^0.8.20
+    * @privateaim/telemetry-kit bumped from ^0.8.19 to ^0.8.20
+
 ## [0.8.19](https://github.com/PrivateAIM/hub/compare/v0.8.18...v0.8.19) (2025-09-24)
 
 
