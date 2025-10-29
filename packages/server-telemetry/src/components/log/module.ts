@@ -16,7 +16,7 @@ export function defineLogComponent() : Component {
     return {
         async start() {
             const handlers = definLogComponentHandlers();
-            await handlers.setup();
+            await handlers.initialize();
 
             if (
                 isQueueRouterUsable() &&

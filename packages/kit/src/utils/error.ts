@@ -10,3 +10,7 @@ import { hasOwnProperty } from './has-own-property';
 export function isError(e: unknown) {
     return typeof e === 'object' && e && hasOwnProperty(e, 'message');
 }
+
+export function extractErrorMessage(e: Error) {
+    return e.message;
+}

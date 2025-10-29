@@ -6,7 +6,7 @@
  */
 
 import type {
-    EntitySubscriberInterface,
+    EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
 import { EventSubscriber } from 'typeorm';
 import {
@@ -15,6 +15,7 @@ import {
 import { BaseSubscriber } from '@privateaim/server-db-kit';
 import { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
+import { AnalysisConfigurationCommand, useAnalysisConfigurationComponent } from '../../../components';
 import { AnalysisBucketFileEntity } from './entity';
 
 @EventSubscriber()
@@ -52,6 +53,50 @@ AnalysisBucketFileEntity
                 return destinations;
             },
         });
+    }
+
+    async afterInsert(event: InsertEvent<AnalysisBucketFileEntity>): Promise<any> {
+        await super.afterInsert(event);
+
+        if (event.entity.root) {
+            const analysisConfiguration = useAnalysisConfigurationComponent();
+            analysisConfiguration.trigger(
+                AnalysisConfigurationCommand.RECALC,
+                {
+                    analysisId: event.entity.analysis_id,
+                },
+            );
+        }
+    }
+
+    async afterUpdate(event: UpdateEvent<AnalysisBucketFileEntity>): Promise<any> {
+        await super.afterUpdate(event);
+
+        const analysisConfiguration = useAnalysisConfigurationComponent();
+        analysisConfiguration.trigger(
+            AnalysisConfigurationCommand.RECALC,
+            {
+                analysisId: event.entity.analysis_id,
+            },
+        );
+    }
+
+    async beforeRemove(event: RemoveEvent<AnalysisBucketFileEntity>): Promise<any> {
+        if (!event.entity) {
+            return;
+        }
+
+        await super.beforeRemove(event);
+
+        if (event.entity.root) {
+            const analysisConfiguration = useAnalysisConfigurationComponent();
+            analysisConfiguration.trigger(
+                AnalysisConfigurationCommand.RECALC,
+                {
+                    analysisId: event.entity.analysis_id,
+                },
+            );
+        }
     }
 
     listenTo() {

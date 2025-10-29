@@ -10,9 +10,15 @@ import { isComponentHandlerFn } from './check';
 import type { ComponentHandler, ComponentHandlerFn } from './types';
 
 export class ComponentHandlers {
+    protected initializing : boolean;
+
+    protected initialized : boolean;
+
     protected handlers: Record<string, ComponentHandlerFn | ComponentHandler>;
 
     constructor() {
+        this.initializing = false;
+        this.initialized = false;
         this.handlers = {};
     }
 
@@ -24,7 +30,13 @@ export class ComponentHandlers {
         delete this.handlers[key];
     }
 
-    async setup() : Promise<void> {
+    async initialize() : Promise<void> {
+        if (this.initializing || this.initialized) {
+            return;
+        }
+
+        this.initializing = true;
+
         const keys = Object.keys(this.handlers);
         for (let i = 0; i < keys.length; i++) {
             const handler = this.handlers[keys[i]];
@@ -36,6 +48,9 @@ export class ComponentHandlers {
                 await handler.setup();
             }
         }
+
+        this.initialized = true;
+        this.initializing = false;
     }
 
     async execute(
@@ -43,6 +58,8 @@ export class ComponentHandlers {
         value: ObjectLiteral = {},
         metadata: ObjectLiteral = {},
     ) : Promise<void> {
+        await this.initialize();
+
         const handler = this.handlers[key];
         if (!handler) {
             return;

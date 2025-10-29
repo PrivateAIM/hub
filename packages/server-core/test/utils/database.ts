@@ -15,7 +15,7 @@ import {
 import {
     DataSource,
 } from 'typeorm';
-import { extendDataSourceOptions } from '../../src/database';
+import { extendDataSourceOptions, setDataSourceSync, unsetDataSourceSync } from '../../src/database';
 
 export async function useTestDatabase() {
     const options = await extendDataSourceOptions({
@@ -37,6 +37,7 @@ export async function useTestDatabase() {
     await dataSource.synchronize();
 
     setDataSource(dataSource);
+    setDataSourceSync(dataSource);
 
     return dataSource;
 }
@@ -48,6 +49,7 @@ export async function dropTestDatabase() {
     const { options } = dataSource;
 
     unsetDataSource();
+    unsetDataSourceSync();
 
     await dropDatabase({ ifExist: true, options });
 }

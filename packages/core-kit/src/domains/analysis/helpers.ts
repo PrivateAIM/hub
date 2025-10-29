@@ -7,6 +7,7 @@
 
 import { AnalysisAPICommand, AnalysisBuildStatus } from './constants';
 import type { Analysis } from './entity';
+import { AnalysisError } from './error';
 
 type CanResult = {
     success: boolean,
@@ -95,23 +96,32 @@ export function isAnalysisAPICommandExecutable(
         }
         case AnalysisAPICommand.CONFIGURATION_LOCK: {
             if (entity.configuration_locked) {
-                output.message = 'The analysis configuration is already locked.';
+                const error = AnalysisError.configurationLocked();
+                output.message = error.message;
                 return output;
             }
 
             if (entity.build_status) {
-                output.message = 'The analysis build process has already been initialized.';
+                const error = AnalysisError.buildInitialized();
+                output.message = error.message;
                 return output;
             }
 
-            // todo: unknown if one of them is an aggregator.
-            if (entity.nodes < 2) {
-                output.message = 'The analysis requires at least two nodes.';
+            if (!entity.configuration_node_default_valid) {
+                const error = AnalysisError.defaultNodeRequired();
+                output.message = error.message;
                 return output;
             }
 
-            if (!entity.master_image_id) {
-                output.message = 'A master image must be assigned to the analysis.';
+            if (!entity.configuration_node_aggregator_valid) {
+                const error = AnalysisError.aggregatorNodeRequired();
+                output.message = error.message;
+                return output;
+            }
+
+            if (!entity.configuration_image_valid) {
+                const error = AnalysisError.imageAssignmentRequired();
+                output.message = error.message;
                 return output;
             }
 

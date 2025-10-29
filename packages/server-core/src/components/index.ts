@@ -6,4 +6,6 @@
  */
 
 export * from './constants';
+
+export * from './analysis-configuration';
 export * from './registry';
