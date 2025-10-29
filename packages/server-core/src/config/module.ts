@@ -16,7 +16,8 @@ import {
     createAnalysisManagerMasterImagesAggregator,
 } from '../aggregators/analysis-manager';
 import {
-    createAnalysisConfigurationComponent, createRegistryComponent,
+    createRegistryComponent,
+    useAnalysisConfigurationComponent,
 } from '../components';
 import {
     configureAmqp,
@@ -65,7 +66,7 @@ export function createConfig() : Config {
 
     const components : Component[] = [
         createRegistryComponent(),
-        createAnalysisConfigurationComponent(),
+        useAnalysisConfigurationComponent(),
     ];
 
     return {

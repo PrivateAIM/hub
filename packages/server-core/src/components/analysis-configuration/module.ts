@@ -8,19 +8,21 @@
 import { EnvironmentName } from '@privateaim/kit';
 import type { Component } from '@privateaim/server-kit';
 import {
-    ComponentHandlers, isQueueRouterUsable, useLogger, useQueueRouter,
+    ComponentHandlers,
+    buildQueueRouterPublishPayload, isQueueRouterUsable, useLogger, useQueueRouter,
 } from '@privateaim/server-kit';
 import { useEnv } from '@privateaim/server-telemetry';
+import type { ObjectLiteral } from 'rapiq';
 import { AnalysisConfigurationCommand, AnalysisConfigurationTaskQueue } from './constants';
 import { AnalysisConfigurationRecalcHandler } from './handlers';
 
 export function createAnalysisConfigurationComponent(): Component {
+    const manager = new ComponentHandlers();
+
+    manager.mount(AnalysisConfigurationCommand.RECALC, new AnalysisConfigurationRecalcHandler());
+
     return {
         async start() {
-            const manager = new ComponentHandlers();
-
-            manager.mount(AnalysisConfigurationCommand.RECALC, new AnalysisConfigurationRecalcHandler());
-
             await manager.setup();
 
             if (
@@ -41,6 +43,30 @@ export function createAnalysisConfigurationComponent(): Component {
                 );
             } else {
                 useLogger().warn('Analysis configuration component can not consume tasks.');
+            }
+        },
+        async trigger(
+            key: string,
+            value?: ObjectLiteral,
+            metadata: ObjectLiteral = {},
+        ) {
+            if (
+                isQueueRouterUsable() &&
+                useEnv('env') !== EnvironmentName.TEST
+            ) {
+                const payload = buildQueueRouterPublishPayload({
+                    type: key,
+                    data: value,
+                    metadata: {
+                        routing: AnalysisConfigurationTaskQueue,
+                        ...metadata,
+                    },
+                });
+
+                const queueRouter = useQueueRouter();
+                await queueRouter.publish(payload);
+            } else {
+                await manager.execute(key, value, metadata);
             }
         },
     };

@@ -6,7 +6,7 @@
  */
 
 import type {
-    EntitySubscriberInterface,
+    EntitySubscriberInterface, InsertEvent, RemoveEvent,
 } from 'typeorm';
 import {
     EventSubscriber,
@@ -17,6 +17,7 @@ import {
 import { BaseSubscriber } from '@privateaim/server-db-kit';
 import { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
+import { AnalysisConfigurationCommand, useAnalysisConfigurationComponent } from '../../../components';
 import { AnalysisNodeEntity } from './entity';
 
 @EventSubscriber()
@@ -66,6 +67,34 @@ AnalysisNodeEntity
                 return destinations;
             },
         });
+    }
+
+    async afterInsert(event: InsertEvent<AnalysisNodeEntity>): Promise<any> {
+        await super.afterInsert(event);
+
+        const analysisConfiguration = useAnalysisConfigurationComponent();
+        analysisConfiguration.trigger(
+            AnalysisConfigurationCommand.RECALC,
+            {
+                analysisId: event.entity.analysis_id,
+            },
+        );
+    }
+
+    async beforeRemove(event: RemoveEvent<AnalysisNodeEntity>): Promise<any> {
+        if (!event.entity) {
+            return;
+        }
+
+        await super.beforeRemove(event);
+
+        const analysisConfiguration = useAnalysisConfigurationComponent();
+        analysisConfiguration.trigger(
+            AnalysisConfigurationCommand.RECALC,
+            {
+                analysisId: event.entity.analysis_id,
+            },
+        );
     }
 
     listenTo(): CallableFunction | string {
