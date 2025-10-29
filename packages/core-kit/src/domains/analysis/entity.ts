@@ -27,15 +27,30 @@ export interface Analysis {
 
     configuration_locked: boolean;
 
+    configuration_entrypoint : boolean;
+
+    configuration_image: boolean;
+
+    configuration_node_default: boolean;
+
+    configuration_node_aggregator: boolean;
+
+    configuration_nodes: boolean;
+
     // ------------------------------------------------------------------
 
-    /**
-     * todo: rename to distribution_status
-     */
     build_status: AnalysisBuildStatus | null;
 
     // ------------------------------------------------------------------
 
+    /**
+     * todo: add distribution_status
+     */
+
+    // ------------------------------------------------------------------
+    /**
+     * todo: rename to execution_status
+     */
     run_status: AnalysisRunStatus | null;
 
     // ------------------------------------------------------------------

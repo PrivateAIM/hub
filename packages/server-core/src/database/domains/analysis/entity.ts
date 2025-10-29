@@ -51,6 +51,21 @@ export class AnalysisEntity implements Analysis {
     @Column({ type: 'boolean', default: false })
         configuration_locked: boolean;
 
+    @Column({ type: 'boolean', default: false })
+        configuration_entrypoint: boolean;
+
+    @Column({ type: 'boolean', default: false })
+        configuration_image: boolean;
+
+    @Column({ type: 'boolean', default: false })
+        configuration_node_aggregator: boolean;
+
+    @Column({ type: 'boolean', default: false })
+        configuration_node_default: boolean;
+
+    @Column({ type: 'boolean', default: false })
+        configuration_nodes: boolean;
+
     // ------------------------------------------------------------------
 
     @Index()
