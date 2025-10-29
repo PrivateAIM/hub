@@ -5,7 +5,7 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import { BadRequestError } from '@ebec/http';
+import { BadRequestError, ServerError } from '@ebec/http';
 import {
     AnalysisAPICommand,
     AnalysisBuildStatus,
@@ -20,15 +20,15 @@ import {
 } from '@privateaim/server-core-worker-kit';
 import type { Request } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import type { QueueRouter } from '@privateaim/server-kit';
-import { useQueueRouter } from '@privateaim/server-kit';
+import { isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
 import type { Repository } from 'typeorm';
 import {
     AnalysisBucketEntity,
     AnalysisBucketFileEntity,
     AnalysisEntity,
     AnalysisNodeEntity,
-    RegistryEntity, useDataSourceSync,
+    RegistryEntity,
+    useDataSourceSync,
 } from '../../database';
 import { RequestRepositoryAdapter } from '../../http/request';
 import type { AnalysisManagerLockOptions, AnalysisManagerUnlockOptions } from './types';
@@ -44,8 +44,6 @@ export class AnalysisManagerService {
 
     protected registryRepository: Repository<RegistryEntity>;
 
-    protected queueRouter: QueueRouter;
-
     constructor() {
         const dataSource = useDataSourceSync();
 
@@ -55,13 +53,16 @@ export class AnalysisManagerService {
         this.analysisBucketFileRepository = dataSource.getRepository(AnalysisBucketFileEntity);
 
         this.registryRepository = dataSource.getRepository(RegistryEntity);
-        this.queueRouter = useQueueRouter();
     }
 
     async startDistribution(
         input: string | AnalysisEntity,
         request?: Request,
     ): Promise<AnalysisEntity> {
+        if (!isQueueRouterUsable()) {
+            throw new ServerError('The queue router is not available.');
+        }
+
         const entity = await this.resolve(input);
 
         const check = isAnalysisAPICommandExecutable(entity, AnalysisAPICommand.BUILD_START);
@@ -113,7 +114,9 @@ export class AnalysisManagerService {
         } else {
             await this.repository.save(entity);
         }
-        await this.queueRouter.publish(buildBuilderTaskQueueRouterPayload({
+
+        const queueRouter = useQueueRouter();
+        await queueRouter.publish(buildBuilderTaskQueueRouterPayload({
             command: BuilderCommand.BUILD,
             data: {
                 id: entity.id,
@@ -126,13 +129,18 @@ export class AnalysisManagerService {
     async checkDistribution(
         input: string | AnalysisEntity,
     ): Promise<AnalysisEntity> {
+        if (!isQueueRouterUsable()) {
+            throw new ServerError('The queue router is not available.');
+        }
+
         const entity = await this.resolve(input);
         const check = isAnalysisAPICommandExecutable(entity, AnalysisAPICommand.BUILD_STATUS);
         if (!check.success) {
             throw new BadRequestError(check.message);
         }
 
-        await this.queueRouter.publish(buildBuilderTaskQueueRouterPayload({
+        const queueRouter = useQueueRouter();
+        await queueRouter.publish(buildBuilderTaskQueueRouterPayload({
             command: BuilderCommand.CHECK,
             data: {
                 id: entity.id,
@@ -264,6 +272,10 @@ export class AnalysisManagerService {
     async spinUp(
         input: string | AnalysisEntity,
     ): Promise<AnalysisEntity> {
+        if (!isQueueRouterUsable()) {
+            throw new ServerError('The queue router is not available.');
+        }
+
         const entity = await this.resolve(input);
 
         const message = buildCoreTaskQueueRouterPayload({
@@ -273,7 +285,8 @@ export class AnalysisManagerService {
             },
         });
 
-        await this.queueRouter.publish(message);
+        const queueRouter = useQueueRouter();
+        await queueRouter.publish(message);
 
         return entity;
     }
@@ -281,6 +294,10 @@ export class AnalysisManagerService {
     async tearDown(
         input: string | AnalysisEntity,
     ): Promise<AnalysisEntity> {
+        if (!isQueueRouterUsable()) {
+            throw new ServerError('The queue router is not available.');
+        }
+
         const entity = await this.resolve(input);
 
         const message = buildCoreTaskQueueRouterPayload({
@@ -290,7 +307,8 @@ export class AnalysisManagerService {
             },
         });
 
-        await this.queueRouter.publish(message);
+        const queueRouter = useQueueRouter();
+        await queueRouter.publish(message);
 
         return entity;
     }

@@ -19,3 +19,7 @@ export function setDataSourceSync(dataSource: DataSource) {
 export function useDataSourceSync() {
     return instance.use();
 }
+
+export function unsetDataSourceSync() {
+    instance.unset();
+}

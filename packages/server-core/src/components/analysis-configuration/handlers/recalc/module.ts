@@ -6,6 +6,7 @@
  */
 
 import { AnalysisBucketType, AnalysisNodeApprovalStatus, NodeType } from '@privateaim/core-kit';
+import { EnvironmentName } from '@privateaim/kit';
 import type { ComponentHandler } from '@privateaim/server-kit';
 import type { DataSource, Repository } from 'typeorm';
 import { useDataSource } from 'typeorm-extension';
@@ -73,7 +74,8 @@ AnalysisConfigurationRecalcPayload> {
             relations: ['node'],
         });
 
-        const ignoreApproval = useEnv('skipAnalysisApproval');
+        const ignoreApproval = useEnv('skipAnalysisApproval') ||
+            useEnv('env') === EnvironmentName.TEST;
 
         let hasAggregator : boolean = false;
         let hasDefault : boolean = false;
@@ -97,6 +99,8 @@ AnalysisConfigurationRecalcPayload> {
                 hasDefault = true;
             }
         }
+
+        console.log(hasAggregator, hasDefault);
 
         entity.configuration_node_aggregator = hasAggregator;
         entity.configuration_node_default = hasDefault;

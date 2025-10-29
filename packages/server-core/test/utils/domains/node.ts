@@ -13,10 +13,11 @@ export const TEST_DEFAULT_NODE : Partial<Node> = {
     external_name: 'test',
 };
 
-export function createTestNode() : Partial<Node> {
+export function createTestNode(entity: Partial<Node> = {}) : Partial<Node> {
     return {
         name: 'foo-bar-baz',
         external_name: 'test',
+        ...entity,
     };
 }
 
