@@ -26,7 +26,7 @@ AnalysisConfigurationRecalcPayload> {
 
     protected analysisNodesRepository!: Repository<AnalysisNodeEntity>;
 
-    async setup(): Promise<void> {
+    async initialize(): Promise<void> {
         this.dataSource = await useDataSource();
         this.analysisRepository = this.dataSource.getRepository(AnalysisEntity);
         this.analysisBucketFileRepository = this.dataSource.getRepository(AnalysisBucketFileEntity);

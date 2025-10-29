@@ -43,9 +43,9 @@ export class ComponentHandlers {
 
             if (
                 !isComponentHandlerFn(handler) &&
-                handler.setup
+                handler.initialize
             ) {
-                await handler.setup();
+                await handler.initialize();
             }
         }
 
