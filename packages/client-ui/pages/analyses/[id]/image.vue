@@ -8,10 +8,7 @@
 import type { Analysis } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
-import FMasterImagePicker from '@privateaim/client-vue/components/master-image/FMasterImagePicker';
-import FAnalysisImageCommandArguments
-    from '@privateaim/client-vue/components/analysis/FAnalysisImageCommandArguments.vue';
-import FAnalysisImageCommand from '@privateaim/client-vue/components/analysis/FAnalysisImageCommand';
+import { FAnalysisImageCommand, FAnalysisImageCommandArguments, FMasterImagePicker } from '@privateaim/client-vue';
 
 export default defineComponent({
     components: {

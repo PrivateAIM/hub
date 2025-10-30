@@ -7,7 +7,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, ref } from 'vue';
-import type { AnalyseNode } from '@privateaim/core-kit';
+import type { AnalysisNode } from '@privateaim/core-kit';
 import { NodeType } from '@privateaim/core-kit';
 import { injectCoreHTTPClient } from '../../../core';
 
@@ -28,7 +28,7 @@ export default defineComponent({
         const resolved = ref(false);
         const busy = ref(false);
 
-        const nodes = ref<AnalyseNode[]>([]);
+        const nodes = ref<AnalysisNode[]>([]);
         const hasDefault = computed(() => nodes.value
             .filter((analysisNode) => analysisNode.node.type === NodeType.DEFAULT)
             .length > 0);
