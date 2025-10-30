@@ -5,31 +5,73 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Analysis } from '@privateaim/core-kit';
+import type { Analysis, AnalysisBucketFile, MasterImage } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
-import { defineComponent } from 'vue';
-import { FAnalysisImageCommand, FAnalysisImageCommandArguments, FMasterImagePicker } from '@privateaim/client-vue';
+import { defineComponent, ref, useTemplateRef } from 'vue';
+import {
+    FAnalysisBucketFileRootToggler,
+    FAnalysisCodeFiles,
+    FAnalysisImageCommand,
+    FAnalysisImageCommandArguments,
+    FMasterImagePicker,
+} from '@privateaim/client-vue';
 
 export default defineComponent({
     components: {
-        FAnalysisImageCommand, FAnalysisImageCommandArguments, FMasterImagePicker,
+        FAnalysisBucketFileRootToggler,
+        FAnalysisCodeFiles,
+        FAnalysisImageCommand,
+        FAnalysisImageCommandArguments,
+        FMasterImagePicker,
     },
     props: {
         entity: {
             type: Object as PropType<Analysis>,
         },
     },
+    emits: ['updated'],
     setup() {
-        const handleUpdated = () => {
+        const lastRootFileId = ref<string | null>(null);
+        const lastMasterImage = ref<MasterImage | null>(null);
 
+        const imageCommand = useTemplateRef<typeof FAnalysisImageCommand>('imageCommand');
+
+        const handleMasterImageResolved = (entity: MasterImage | null) => {
+            lastMasterImage.value = entity;
         };
-        const handleMasterImageChanged = async () => {
+        const handleMasterImageToggled = (entity: MasterImage | null) => {
+            if (imageCommand.value) {
+                imageCommand.value.setMasterImage(entity);
+            }
 
+            lastMasterImage.value = entity;
+        };
+
+        const handAnalysisBucketFileUpdated = (entity: AnalysisBucketFile) => {
+            if (entity.root) {
+                lastRootFileId.value = entity.id;
+
+                if (imageCommand.value) {
+                    imageCommand.value.setAnalysisBucketFile(entity);
+                }
+
+                return;
+            }
+
+            if (lastRootFileId.value === entity.id) {
+                if (imageCommand.value) {
+                    imageCommand.value.setAnalysisBucketFile(null);
+                }
+            }
         };
 
         return {
-            handleUpdated,
-            handleMasterImageChanged,
+            handleMasterImageResolved,
+            handleMasterImageToggled,
+
+            lastMasterImage,
+
+            handAnalysisBucketFileUpdated,
         };
     },
 });
@@ -63,8 +105,8 @@ export default defineComponent({
                     <FMasterImagePicker
                         :readonly="entity.configuration_locked"
                         :entity-id="entity.master_image_id"
-                        @selected="handleMasterImageChanged"
-                        @resolved="handleMasterImageChanged"
+                        @selected="handleMasterImageToggled"
+                        @resolved="handleMasterImageResolved"
                     />
                 </div>
             </div>
@@ -73,9 +115,12 @@ export default defineComponent({
                     <span class="title"><i class="fa fa-keyboard" /> Command-Arguments</span>
                 </div>
                 <div class="card-body">
+                    {{ lastMasterImage }}
                     <FAnalysisImageCommandArguments
+                        :master-image-entity="lastMasterImage"
+                        :readonly="entity.configuration_locked"
                         :entity="entity"
-                        @updated="handleUpdated"
+                        @updated="(data) => $emit('updated', data)"
                     />
                 </div>
             </div>
@@ -100,6 +145,22 @@ export default defineComponent({
                             An entrypoint file must be selected.
                         </div>
                     </div>
+
+                    <FAnalysisCodeFiles
+                        ref="analysisCodeFiles"
+                        :entity="entity"
+                        :readonly="true"
+                        @updated="handAnalysisBucketFileUpdated"
+                    >
+                        <template #itemActions="props">
+                            <template v-if="!entity.configuration_locked">
+                                <FAnalysisBucketFileRootToggler
+                                    :entity="props.data"
+                                    @updated="(entity) => props.update(entity)"
+                                />
+                            </template>
+                        </template>
+                    </FAnalysisCodeFiles>
                 </div>
             </div>
             <div class="card-grey card mb-3">
@@ -108,6 +169,7 @@ export default defineComponent({
                 </div>
                 <div class="card-body">
                     <FAnalysisImageCommand
+                        ref="imageCommand"
                         class="mt-2 mb-2"
                         :master-image-id="entity.master_image_id"
                         :analysis="entity"

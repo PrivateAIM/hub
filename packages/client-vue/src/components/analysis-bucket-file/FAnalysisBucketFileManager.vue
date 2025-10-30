@@ -34,19 +34,14 @@ export default defineComponent({
             type: Object as PropType<AnalysisBucket>,
             required: true,
         },
-        fileEntity: {
-            type: Object as PropType<AnalysisBucketFile>,
-        },
         readonly: {
             type: Boolean,
             default: false,
         },
     },
-    emits: ['created', 'updated', 'deleted', 'uploaded', 'failed', 'setEntrypointFile'],
+    emits: ['created', 'updated', 'deleted', 'uploaded', 'failed'],
     setup(props, { emit, expose }) {
         const coreClient = injectCoreHTTPClient();
-
-        const entrypointFile = toRef(props, 'fileEntity');
 
         const modal = ref(false);
         const toggleModal = () => {
@@ -71,25 +66,22 @@ export default defineComponent({
             },
         }));
 
-        const updateEntrypointFile = (entity: AnalysisBucketFile) => {
-            if (entity.root) {
-                emit('setEntrypointFile', entity);
+        const updateAll = (entity: AnalysisBucketFile) => {
+            if (!entity.root || !fileListNode.value) return;
 
-                return;
-            }
+            const data = fileListNode.value.data as AnalysisBucketFile[];
 
-            if (
-                entrypointFile.value &&
-                entrypointFile.value.id === entity.id
-            ) {
-                emit('setEntrypointFile', null);
+            for (let i = 0; i < data.length; i++) {
+                if (data[i].id === entity.id) continue;
+
+                data[i].root = false;
             }
         };
 
         const handleCreated = (entity: AnalysisBucketFile) => {
             emit('created', entity);
 
-            updateEntrypointFile(entity);
+            updateAll(entity);
         };
 
         const handleDeleted = (entity: AnalysisBucketFile) => {
@@ -100,13 +92,13 @@ export default defineComponent({
 
             emit('deleted', entity);
 
-            updateEntrypointFile(entity);
+            updateAll(entity);
         };
 
         const handleUpdated = (entity: AnalysisBucketFile) => {
             emit('updated', entity);
 
-            updateEntrypointFile(entity);
+            updateAll(entity);
         };
 
         const handleFailed = (e: Error) => {
@@ -185,8 +177,6 @@ export default defineComponent({
 
             modal,
             toggleModal,
-
-            entrypointFile,
         };
     },
 });
@@ -249,7 +239,14 @@ export default defineComponent({
                                 @check="toggleFile"
                                 @updated="props.updated"
                                 @deleted="props.deleted"
-                            />
+                            >
+                                <template #actions="actionProps">
+                                    <slot
+                                        name="itemActions"
+                                        v-bind="actionProps"
+                                    />
+                                </template>
+                            </FAnalysisFile>
                         </template>
                     </div>
                 </template>

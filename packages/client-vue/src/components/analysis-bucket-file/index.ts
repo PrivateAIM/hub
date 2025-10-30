@@ -11,3 +11,4 @@ export { default as FAnalysisBucketFileManager } from './FAnalysisBucketFileMana
 export { FAnalysisBucketFiles } from './FAnalysisBucketFiles';
 export { default as FAnalysisFileManager } from './FAnalysisBucketFileManager.vue';
 export { default as FAnalysisFormFile } from './FAnalysisFormFile.vue';
+export { default as FAnalysisBucketFileRootToggler } from './FAnalysisBucketFileRootToggler.vue';

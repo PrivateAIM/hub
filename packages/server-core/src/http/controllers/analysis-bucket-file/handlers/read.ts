@@ -64,6 +64,8 @@ export async function getManyAnalysisBucketFileRouteHandler(req: Request, res: R
                 'analysis_id',
                 'analysis.id',
                 'analysis.name',
+
+                'bucket.type',
             ],
         },
         pagination: {

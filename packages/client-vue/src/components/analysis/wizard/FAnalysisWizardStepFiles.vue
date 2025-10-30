@@ -91,6 +91,12 @@ export default defineComponent({
                             </div>
                         </div>
                     </template>
+                    <template #actions="props">
+                        <slot
+                            name="actions"
+                            v-bind="props"
+                        />
+                    </template>
                 </FAnalysisBucketFileManager>
             </template>
             <template #error>

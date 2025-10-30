@@ -102,6 +102,8 @@ export default defineComponent({
             if (entityId.value) {
                 form.master_image_id = entityId.value;
             }
+
+            emit('resolved', masterImageEntity.value);
         };
 
         watch(entityId, (val, oldValue) => {
@@ -153,6 +155,7 @@ export default defineComponent({
             }
 
             emit('selected', null);
+            emit('resolved', entity);
         };
 
         const buildMasterImageVNode = () : VNodeArrayChildren => {

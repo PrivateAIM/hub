@@ -24,11 +24,12 @@ export default defineComponent({
             type: Object as PropType<Analysis>,
             required: true,
         },
-        entrypointEntity: {
-            type: Object as PropType<AnalysisBucketFile>,
+        readonly: {
+            type: Boolean,
+            default: false,
         },
     },
-    emits: ['failed', 'entrypointChanged'],
+    emits: ['failed', 'updated'],
     setup(props, { emit, expose }) {
         const bucketFileManager = useTemplateRef<typeof FAnalysisBucketFileManager | null>('bucketFileManager');
         const analysisBucketNode = ref<typeof FAnalysisBucket | null>(null);
@@ -52,12 +53,12 @@ export default defineComponent({
             add,
         });
 
-        const handleFailed = (e: Error) => {
-            emit('failed', e);
+        const handleUpdated = (entity: AnalysisBucketFile) => {
+            emit('updated', entity);
         };
 
-        const handleEntrypointChanged = (e: AnalysisBucketFile) => {
-            emit('entrypointChanged', e);
+        const handleFailed = (e: Error) => {
+            emit('failed', e);
         };
 
         const retry = () => {
@@ -69,8 +70,9 @@ export default defineComponent({
         return {
             add,
 
+            handleUpdated,
             handleFailed,
-            handleEntrypointChanged,
+
             queryFilters,
 
             analysisBucketNode,
@@ -88,12 +90,18 @@ export default defineComponent({
             <template #default="{ data: bucket }">
                 <FAnalysisBucketFileManager
                     ref="bucketFileManager"
-                    :readonly="entity.configuration_locked"
+                    :readonly="entity.configuration_locked || readonly"
                     :entity="bucket"
-                    :file-entity="entrypointEntity"
-                    @set-entrypoint-file="handleEntrypointChanged"
                     @failed="handleFailed"
-                />
+                    @updated="handleUpdated"
+                >
+                    <template #itemActions="props">
+                        <slot
+                            name="itemActions"
+                            v-bind="props"
+                        />
+                    </template>
+                </FAnalysisBucketFileManager>
             </template>
             <template #error>
                 <div class="alert alert-sm alert-warning">

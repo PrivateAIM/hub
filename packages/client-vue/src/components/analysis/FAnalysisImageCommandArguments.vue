@@ -26,6 +26,10 @@ export default defineComponent({
         masterImageEntity: {
             type: Object as PropType<MasterImage>,
         },
+        readonly: {
+            type: Boolean,
+            default: false,
+        },
     },
     emits: ['failed', 'updated'],
     setup(props, { emit }) {
@@ -206,7 +210,7 @@ export default defineComponent({
                 </template>
                 <template #headerActions="props">
                     <button
-                        :disabled="isBusy"
+                        :disabled="isBusy|| readonly"
                         class="btn btn-xs btn-danger me-1"
                         @click.prevent="resetItemsForPosition('before')"
                     >
@@ -215,7 +219,7 @@ export default defineComponent({
                     <button
                         class="btn btn-xs btn-primary"
                         type="button"
-                        :disabled="!props.canAdd || isBusy"
+                        :disabled="isBusy|| readonly"
                         @click.prevent="props.add()"
                     >
                         <i class="fa fa-plus" />
@@ -240,7 +244,7 @@ export default defineComponent({
                 </template>
                 <template #headerActions="props">
                     <button
-                        :disabled="isBusy"
+                        :disabled="isBusy|| readonly"
                         class="btn btn-xs btn-danger me-1"
                         @click.prevent="resetItemsForPosition('after')"
                     >
@@ -249,7 +253,7 @@ export default defineComponent({
                     <button
                         class="btn btn-xs btn-primary"
                         type="button"
-                        :disabled="!props.canAdd || isBusy"
+                        :disabled="isBusy || readonly"
                         @click.prevent="props.add()"
                     >
                         <i class="fa fa-plus" />

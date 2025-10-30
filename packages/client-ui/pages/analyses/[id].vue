@@ -127,6 +127,18 @@ export default defineComponent({
                             <span class="title">Steps</span>
                         </div>
                         <div class="card-body">
+                            <div
+                                class="d-flex flex-row gap-2 align-items-center alert alert-sm alert-info"
+                            >
+                                <div>
+                                    <i class="fa fa-info" />
+                                </div>
+                                <div>
+                                    Since it is necessary to continuously check whether the conditions for the steps are met,
+                                    it may take a few seconds for the view to update.
+                                </div>
+                            </div>
+
                             <FAnalysisSteps
                                 :list-direction="'column'"
                                 :entity="entity"

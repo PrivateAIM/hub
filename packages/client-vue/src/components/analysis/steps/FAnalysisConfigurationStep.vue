@@ -37,9 +37,6 @@ export default defineComponent({
         nodesLink: {
             type: String,
         },
-        codeLink: {
-            type: String,
-        },
         imageLink: {
             type: String,
         },
@@ -61,21 +58,12 @@ export default defineComponent({
                 props.entity.configuration_image_valid &&
                 props.entity.configuration_nodes_valid);
 
-        const message = computed(() => {
-            if (passed.value) {
-                return null;
-            }
-
-            return 'The configuration is not completed yet.';
-        });
-
         return {
             handleUpdated,
             handleFailed,
             handleExecuted,
 
             passed,
-            message,
         };
     },
 });
@@ -96,7 +84,6 @@ export default defineComponent({
                     <span class="text-danger">
                         <i class="fa fa-times" />
                     </span>
-                    <small>( {{ message }} )</small>
                 </template>
             </div>
         </div>
@@ -130,64 +117,66 @@ export default defineComponent({
                     </FAnalysisConfigurationNodesStep>
                 </div>
             </div>
-            <div class="d-flex flex-row gap-1">
-                <div>
+            <div>
+                <strong>
                     <strong>
-                        <template v-if="codeLink">
-                            <VCLink :to="codeLink">
-                                1.2 Code
+                        <template v-if="imageLink">
+                            <VCLink :to="imageLink">
+                                1.2 Image
                             </VCLink>
                         </template>
                         <template v-else>
-                            1.2 Code
+                            1.2 Image
                         </template>
                     </strong>
-                </div>
-                <div>
-                    <FAnalysisConfigurationEntrypointStep :entity="entity">
-                        <template #valid>
-                            <span class="text-success">
-                                <i class="fa fa-check" />
-                            </span>
-                        </template>
-                        <template #invalid="{ message }">
-                            <span class="text-danger">
-                                <i class="fa fa-times" />
-                            </span>
-                            <small>( {{ message }} )</small>
-                        </template>
-                    </FAnalysisConfigurationEntrypointStep>
-                </div>
+                </strong>
             </div>
-            <div class="d-flex flex-row gap-1">
-                <div>
-                    <strong>
-                        <template v-if="codeLink">
-                            <VCLink :to="codeLink">
-                                1.3 Image
-                            </VCLink>
-                        </template>
-                        <template v-else>
-                            1.3 Image
-                        </template>
-                    </strong>
+            <div class="d-flex flex-column ms-4">
+                <div class="d-flex flex-row gap-1">
+                    <div>
+                        <strong>
+                            1.2.2 Base
+                        </strong>
+                    </div>
+                    <div>
+                        <FAnalysisConfigurationImageStep
+                            :entity="entity"
+                        >
+                            <template #valid>
+                                <span class="text-success">
+                                    <i class="fa fa-check" />
+                                </span>
+                            </template>
+                            <template #invalid="{ message }">
+                                <span class="text-danger">
+                                    <i class="fa fa-times" />
+                                </span>
+                                <small>( {{ message }} )</small>
+                            </template>
+                        </FAnalysisConfigurationImageStep>
+                    </div>
                 </div>
-                <div>
-                    <FAnalysisConfigurationImageStep
-                        :entity="entity"
-                    >
-                        <template #valid>
-                            <span class="text-success">
-                                <i class="fa fa-check" />
-                            </span>
-                        </template>
-                        <template #invalid="{ message }">
-                            <span class="text-danger">
-                                <i class="fa fa-times" />
-                            </span>
-                            <small>( {{ message }} )</small>
-                        </template>
-                    </FAnalysisConfigurationImageStep>
+                <div class="d-flex flex-row gap-1">
+                    <div>
+                        <strong>
+                            1.2.1 Entrypoint
+                        </strong>
+                    </div>
+                    <div>
+                        <FAnalysisConfigurationEntrypointStep :entity="entity">
+                            <template #valid>
+                                <span class="text-success">
+                                    <i class="fa fa-check" />
+                                </span>
+                            </template>
+                            <template #invalid="{ message }">
+                                <span class="text-danger">
+                                    <i class="fa fa-times" />
+                                </span>
+                                <small>( {{ message }} )</small>
+                            </template>
+                        </FAnalysisConfigurationEntrypointStep>
+                    </div>
                 </div>
             </div>
         </div>

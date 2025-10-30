@@ -8,13 +8,13 @@
 import type {
     Analysis, AnalysisBucketFile, MasterImage, MasterImageCommandArgument,
 } from '@privateaim/core-kit';
+import { AnalysisBucketType } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
 import {
     computed,
-    defineComponent, h, ref, toRef, watch,
+    defineComponent, h, ref,
 } from 'vue';
 import { injectCoreHTTPClient, wrapFnWithBusyState } from '../../core';
-import { useUpdatedAt } from '../../composables';
 
 const filterImageCommandArgumentsForPosition = (
     input: MasterImageCommandArgument[],
@@ -49,10 +49,32 @@ export default defineComponent({
         },
     },
     emits: ['failed'],
-    async setup(props, { emit }) {
+    setup(props, { emit, expose }) {
         const apiClient = injectCoreHTTPClient();
 
         const analysis = ref<null | Analysis>(null);
+        const analysisImageCommandArguments = computed(() => {
+            if (
+                analysis.value &&
+                analysis.value.image_command_arguments &&
+                analysis.value.image_command_arguments.length > 0
+            ) {
+                return analysis.value.image_command_arguments;
+            }
+
+            return null;
+        });
+        const analysisId = computed(() => {
+            if (props.analysisId) {
+                return props.analysisId;
+            }
+
+            if (props.analysis) {
+                return props.analysis.id;
+            }
+
+            return null;
+        });
         const analysisBusy = ref(false);
 
         const resolveAnalysis = wrapFnWithBusyState(analysisBusy, async () => {
@@ -61,16 +83,13 @@ export default defineComponent({
                 return;
             }
 
-            if (props.analysisId) {
-                if (
-                    analysis.value &&
-                    analysis.value.id === props.analysisId
-                ) {
-                    return;
-                }
+            if (analysis.value) {
+                return;
+            }
 
+            if (analysisId.value) {
                 try {
-                    analysis.value = await apiClient.analysis.getOne(props.analysisId);
+                    analysis.value = await apiClient.analysis.getOne(analysisId.value);
                 } catch (e) {
                     if (e instanceof Error) {
                         emit('failed', e);
@@ -81,36 +100,82 @@ export default defineComponent({
             analysis.value = null;
         });
 
-        const analysisFile = ref<null | AnalysisBucketFile>(null);
-        const analysisFileBusy = ref(false);
+        const analysisBucketFile = ref<null | AnalysisBucketFile>(null);
+        const analysisBucketFileBusy = ref(false);
 
-        const resolveAnalysisFile = wrapFnWithBusyState(analysisFileBusy, async () => {
+        const resolveAnalysisFile = wrapFnWithBusyState(analysisBucketFileBusy, async () => {
             if (props.analysisFile) {
-                analysisFile.value = props.analysisFile;
+                analysisBucketFile.value = props.analysisFile;
                 return;
             }
 
             if (props.analysisFileId) {
                 if (
-                    analysisFile.value &&
-                    analysisFile.value.id === props.analysisFileId
+                    analysisBucketFile.value &&
+                    analysisBucketFile.value.id === props.analysisFileId
                 ) {
                     return;
                 }
 
                 try {
-                    analysisFile.value = await apiClient.analysisBucketFile.getOne(props.analysisFileId);
+                    analysisBucketFile.value = await apiClient.analysisBucketFile.getOne(props.analysisFileId);
                 } catch (e) {
                     if (e instanceof Error) {
                         emit('failed', e);
                     }
                 }
+
+                return;
             }
 
-            analysisFile.value = null;
+            // todo: optimize branch!
+            if (analysisId.value) {
+                const response = await apiClient.analysisBucket.getMany({
+                    filters: {
+                        type: AnalysisBucketType.CODE,
+                        analysis_id: analysisId.value,
+                    },
+                });
+
+                if (response.data.length === 0) {
+                    return;
+                }
+
+                const [bucket] = response.data;
+                const fileResponse = await apiClient.analysisBucketFile.getMany({
+                    filters: {
+                        bucket_id: bucket.id,
+                        root: true,
+                    },
+                });
+
+                if (fileResponse.data.length === 0) {
+                    return;
+                }
+
+                [analysisBucketFile.value] = fileResponse.data;
+                return;
+            }
+
+            analysisBucketFile.value = null;
         });
 
+        const setAnalysisBucketFile = (entity: AnalysisBucketFile | null) => {
+            analysisBucketFile.value = entity;
+        };
+
         const masterImage = ref<null | MasterImage>(null);
+        const masterImageCommandArguments = computed(() => {
+            if (
+                masterImage.value &&
+                    masterImage.value.command_arguments &&
+                    masterImage.value.command_arguments.length > 0
+            ) {
+                return masterImage.value.command_arguments;
+            }
+
+            return null;
+        });
         const masterImageBusy = ref(false);
         const resolveMasterImage = wrapFnWithBusyState(
             masterImageBusy,
@@ -132,42 +197,35 @@ export default defineComponent({
             },
         );
 
-        const masterImageProp = toRef(props, 'masterImage');
-        const masterImagePropUpdated = useUpdatedAt(masterImageProp);
-        watch(
-            masterImagePropUpdated,
-            (val, oldVal) => {
-                if (val !== oldVal) {
-                    resolveMasterImage();
-                }
-            },
-        );
+        const setMasterImage = (entity: MasterImage | null) => {
+            masterImage.value = entity;
+        };
 
-        const masterImageIdProp = toRef(props, 'masterImageId');
-        watch(
-            masterImageIdProp,
-            (val, oldVal) => {
-                if (val !== oldVal) {
-                    resolveMasterImage();
-                }
-            },
-        );
+        expose({
+            setAnalysisBucketFile,
+            setMasterImage,
+        });
 
-        await Promise.all([
-            resolveAnalysis(),
-            resolveAnalysisFile(),
-            resolveMasterImage(),
-        ]);
+        Promise.resolve()
+            .then(() => Promise.all([
+                resolveAnalysis(),
+                resolveAnalysisFile(),
+                resolveMasterImage(),
+            ]));
 
-        const command = computed(() => {
-            if (
-                !analysis.value &&
-                !analysisFile.value &&
-                !masterImage.value
-            ) {
-                return '<Command> <File>';
+        const imageCommandArguments = computed(() => {
+            if (analysisImageCommandArguments.value) {
+                return analysisImageCommandArguments.value;
             }
 
+            if (masterImageCommandArguments.value) {
+                return masterImageCommandArguments.value;
+            }
+
+            return [];
+        });
+
+        const command = computed(() => {
             const parts: string[] = [];
 
             // 1. Command
@@ -182,46 +240,24 @@ export default defineComponent({
             }
 
             // 2. Command Arguments (before)
-            if (
-                analysis.value &&
-                analysis.value.image_command_arguments
-            ) {
+            if (imageCommandArguments.value) {
                 parts.push(
-                    ...filterImageCommandArgumentsForPosition(analysis.value.image_command_arguments, 'before')
-                        .map((item) => item.value),
-                );
-            } else if (
-                masterImage.value &&
-                masterImage.value.command_arguments
-            ) {
-                parts.push(
-                    ...filterImageCommandArgumentsForPosition(masterImage.value.command_arguments, 'before')
+                    ...filterImageCommandArgumentsForPosition(imageCommandArguments.value, 'before')
                         .map((item) => item.value),
                 );
             }
 
             // 3. Entrypoint
-            if (analysisFile.value) {
-                parts.push(analysisFile.value.name);
+            if (analysisBucketFile.value) {
+                parts.push(analysisBucketFile.value.name);
             } else {
                 parts.push('<File>');
             }
 
             // 4. Command Arguments (after)
-            if (
-                analysis.value &&
-                analysis.value.image_command_arguments
-            ) {
+            if (imageCommandArguments.value) {
                 parts.push(
-                    ...filterImageCommandArgumentsForPosition(analysis.value.image_command_arguments, 'after')
-                        .map((item) => item.value),
-                );
-            } else if (
-                masterImage.value &&
-                masterImage.value.command_arguments
-            ) {
-                parts.push(
-                    ...filterImageCommandArgumentsForPosition(masterImage.value.command_arguments, 'after')
+                    ...filterImageCommandArgumentsForPosition(imageCommandArguments.value, 'after')
                         .map((item) => item.value),
                 );
             }
