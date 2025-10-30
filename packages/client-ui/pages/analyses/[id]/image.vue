@@ -45,7 +45,13 @@ export default defineComponent({
                     <span class="title"><i class="fa fa-compact-disc" /> Base</span>
                 </div>
                 <div class="card-body">
-                    <div class="d-flex flex-row gap-2 align-items-center alert alert-sm alert-warning">
+                    <div
+                        class="d-flex flex-row gap-2 align-items-center alert alert-sm"
+                        :class="{
+                            'alert-warning': entity.configuration_image_valid,
+                            'alert-danger': !entity.configuration_image_valid,
+                        }"
+                    >
                         <div>
                             <i class="fa fa-info" />
                         </div>
@@ -79,7 +85,22 @@ export default defineComponent({
                 <div class="card-header">
                     <span class="title"><i class="fa fa-file" /> Entrypoint</span>
                 </div>
-                <div class="card-body" />
+                <div class="card-body">
+                    <div
+                        class="d-flex flex-row gap-2 align-items-center alert alert-sm"
+                        :class="{
+                            'alert-warning': entity.configuration_entrypoint_valid,
+                            'alert-danger': !entity.configuration_entrypoint_valid,
+                        }"
+                    >
+                        <div>
+                            <i class="fa fa-info" />
+                        </div>
+                        <div>
+                            An entrypoint file must be selected.
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="card-grey card mb-3">
                 <div class="card-header">

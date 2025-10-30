@@ -12,197 +12,202 @@
   -->
 
 <script lang="ts">
+import { VCLink } from '@vuecs/link';
 import type { PropType } from 'vue';
-import { computed, defineComponent, ref } from 'vue';
-import type { Analysis, AnalysisBucketFile } from '@privateaim/core-kit';
-import { AnalysisBucketType } from '@privateaim/core-kit';
-import { injectCoreHTTPClient } from '../../../core';
-import FAnalysis from '../FAnalysis';
+import { computed, defineComponent } from 'vue';
+import type { Analysis } from '@privateaim/core-kit';
 import FAnalysisConfigurationImageStep from './FAnalysisConfigurationImageStep.vue';
-import FAnalysisConfigurationFilesStep from './FAnalysisConfigurationFilesStep.vue';
+import FAnalysisConfigurationEntrypointStep from './FAnalysisConfigurationEntrypointStep.vue';
 import FAnalysisConfigurationNodesStep from './FAnalysisConfigurationNodesStep.vue';
+import { FAnalysisCommand } from '../FAnalysisCommand';
 
 export default defineComponent({
     components: {
+        FAnalysisCommand,
         FAnalysisConfigurationNodesStep,
-        FAnalysisConfigurationFilesStep,
+        FAnalysisConfigurationEntrypointStep,
         FAnalysisConfigurationImageStep,
-        FAnalysis,
+        VCLink,
     },
     props: {
-        entityId: {
-            type: String,
-            required: true,
-        },
         entity: {
             type: Object as PropType<Analysis>,
+            required: true,
+        },
+        nodesLink: {
+            type: String,
+        },
+        codeLink: {
+            type: String,
+        },
+        imageLink: {
+            type: String,
         },
     },
-    setup(props) {
-        const httpClient = injectCoreHTTPClient();
+    emits: ['updated', 'executed', 'failed', 'jumpTo'],
+    setup(props, { emit }) {
+        const handleExecuted = (type: string, command: string) => {
+            emit('executed', type, command);
+        };
+        const handleUpdated = (item: Analysis) => {
+            emit('updated', item);
+        };
+        const handleFailed = (e: Error) => {
+            emit('failed', e);
+        };
 
-        const resolved = ref(false);
-        const busy = ref(false);
-
-        const files = ref<AnalysisBucketFile[]>([]);
-        const hasEntrypoint = computed(() => files.value
-            .filter((analysisBucketFile) => analysisBucketFile.root &&
-                analysisBucketFile.bucket.type === AnalysisBucketType.CODE)
-            .length > 0);
+        const passed = computed(() => props.entity &&
+            props.entity.configuration_entrypoint_valid &&
+                props.entity.configuration_image_valid &&
+                props.entity.configuration_nodes_valid);
 
         const message = computed(() => {
-            if (busy.value || !resolved.value) {
+            if (passed.value) {
                 return null;
             }
 
-            if (!hasEntrypoint.value) {
-                return 'An entrypoint file must be selected.';
-            }
-
-            return null;
+            return 'The configuration is not completed yet.';
         });
 
-        const passed = computed(() => !busy.value && hasEntrypoint.value);
-
-        const resolve = async () => {
-            if (busy.value) return;
-
-            busy.value = true;
-
-            try {
-                const { data } = await httpClient.analysisBucketFile.getMany({
-                    filters: {
-                        analysis_id: props.entityId,
-                        root: true,
-                    },
-                    relations: {
-                        bucket: true,
-                    },
-                });
-
-                files.value = data;
-                // todo: get all nodes + check if a aggregator node is one of them
-            } finally {
-                resolved.value = true;
-                busy.value = false;
-            }
-        };
-
-        Promise
-            .resolve()
-            .then(() => resolve());
-
         return {
-            resolved,
+            handleUpdated,
+            handleFailed,
+            handleExecuted,
+
             passed,
             message,
-            hasEntrypoint,
         };
     },
 });
 </script>
 <template>
-    <FAnalysis :entity-id="entityId">
-        <template #default="{data }">
+    <div>
+        <div class="d-flex flex-row gap-1">
             <div>
-                <div class="d-flex flex-row gap-1">
-                    <div>
-                        <strong>1. Configuration</strong>
-                    </div>
-                    <div>
-                        <template v-if="!resolved">
-                            <i class="fa fa-rotate fa-spin" />
+                <strong>1. Configuration</strong>
+            </div>
+            <div>
+                <template v-if="passed">
+                    <span class="text-success">
+                        <i class="fa fa-check" />
+                    </span>
+                </template>
+                <template v-else>
+                    <span class="text-danger">
+                        <i class="fa fa-times" />
+                    </span>
+                    <small>( {{ message }} )</small>
+                </template>
+            </div>
+        </div>
+        <div class="d-flex flex-column ms-3">
+            <div class="d-flex flex-row gap-1">
+                <div>
+                    <strong>
+                        <template v-if="nodesLink">
+                            <VCLink :to="nodesLink">
+                                1.1 Nodes
+                            </VCLink>
                         </template>
                         <template v-else>
-                            <template v-if="passed">
-                                <span class="text-success">
-                                    <i class="fa fa-check" />
-                                </span>
-                            </template>
-                            <template v-else>
-                                <span class="text-danger">
-                                    <i class="fa fa-times" />
-                                </span>
-                                <small>( {{ message }} )</small>
-                            </template>
+                            1.1 Nodes
                         </template>
-                    </div>
+                    </strong>
                 </div>
-                <div class="d-flex flex-column ms-3">
-                    <div class="d-flex flex-row gap-1">
-                        <div>
-                            <strong>1.1 Nodes</strong>
-                        </div>
-                        <div>
-                            <FAnalysisConfigurationNodesStep :entity-id="data.id">
-                                <template #unresolved>
-                                    <i class="fa fa-rotate fa-spin" />
-                                </template>
-                                <template #valid>
-                                    <span class="text-success">
-                                        <i class="fa fa-check" />
-                                    </span>
-                                </template>
-                                <template #invalid="{ message }">
-                                    <span class="text-danger">
-                                        <i class="fa fa-times" />
-                                    </span>
-                                    <small>( {{ message }} )</small>
-                                </template>
-                            </FAnalysisConfigurationNodesStep>
-                        </div>
-                    </div>
-                    <div class="d-flex flex-row gap-1">
-                        <div>
-                            <strong>1.2 Code</strong>
-                        </div>
-                        <div>
-                            <FAnalysisConfigurationFilesStep :entity-id="data.id">
-                                <template #unresolved>
-                                    <i class="fa fa-rotate fa-spin" />
-                                </template>
-                                <template #valid>
-                                    <span class="text-success">
-                                        <i class="fa fa-check" />
-                                    </span>
-                                </template>
-                                <template #invalid="{ message }">
-                                    <span class="text-danger">
-                                        <i class="fa fa-times" />
-                                    </span>
-                                    <small>( {{ message }} )</small>
-                                </template>
-                            </FAnalysisConfigurationFilesStep>
-                        </div>
-                    </div>
-                    <div class="d-flex flex-row gap-1">
-                        <div>
-                            <strong>1.3 Image</strong>
-                        </div>
-                        <div>
-                            <FAnalysisConfigurationImageStep
-                                :entity-id="data.id"
-                                :entity="data"
-                            >
-                                <template #unresolved>
-                                    <i class="fa fa-rotate fa-spin" />
-                                </template>
-                                <template #valid>
-                                    <span class="text-success">
-                                        <i class="fa fa-check" />
-                                    </span>
-                                </template>
-                                <template #invalid="{ message }">
-                                    <span class="text-danger">
-                                        <i class="fa fa-times" />
-                                    </span>
-                                    <small>( {{ message }} )</small>
-                                </template>
-                            </FAnalysisConfigurationImageStep>
-                        </div>
-                    </div>
+                <div>
+                    <FAnalysisConfigurationNodesStep :entity="entity">
+                        <template #valid>
+                            <span class="text-success">
+                                <i class="fa fa-check" />
+                            </span>
+                        </template>
+                        <template #invalid="{ message }">
+                            <span class="text-danger">
+                                <i class="fa fa-times" />
+                            </span>
+                            <small>( {{ message }} )</small>
+                        </template>
+                    </FAnalysisConfigurationNodesStep>
                 </div>
             </div>
-        </template>
-    </FAnalysis>
+            <div class="d-flex flex-row gap-1">
+                <div>
+                    <strong>
+                        <template v-if="codeLink">
+                            <VCLink :to="codeLink">
+                                1.2 Code
+                            </VCLink>
+                        </template>
+                        <template v-else>
+                            1.2 Code
+                        </template>
+                    </strong>
+                </div>
+                <div>
+                    <FAnalysisConfigurationEntrypointStep :entity="entity">
+                        <template #valid>
+                            <span class="text-success">
+                                <i class="fa fa-check" />
+                            </span>
+                        </template>
+                        <template #invalid="{ message }">
+                            <span class="text-danger">
+                                <i class="fa fa-times" />
+                            </span>
+                            <small>( {{ message }} )</small>
+                        </template>
+                    </FAnalysisConfigurationEntrypointStep>
+                </div>
+            </div>
+            <div class="d-flex flex-row gap-1">
+                <div>
+                    <strong>
+                        <template v-if="codeLink">
+                            <VCLink :to="codeLink">
+                                1.3 Image
+                            </VCLink>
+                        </template>
+                        <template v-else>
+                            1.3 Image
+                        </template>
+                    </strong>
+                </div>
+                <div>
+                    <FAnalysisConfigurationImageStep
+                        :entity="entity"
+                    >
+                        <template #valid>
+                            <span class="text-success">
+                                <i class="fa fa-check" />
+                            </span>
+                        </template>
+                        <template #invalid="{ message }">
+                            <span class="text-danger">
+                                <i class="fa fa-times" />
+                            </span>
+                            <small>( {{ message }} )</small>
+                        </template>
+                    </FAnalysisConfigurationImageStep>
+                </div>
+            </div>
+        </div>
+        <div class="mt-1">
+            <FAnalysisCommand
+                :command="'configurationLock'"
+                :with-icon="true"
+                :entity="entity"
+                @executed="(command: string) => handleExecuted('configuration', command)"
+                @updated="handleUpdated"
+                @failed="handleFailed"
+            />
+            <FAnalysisCommand
+                :command="'configurationUnlock'"
+                :with-icon="true"
+                :entity="entity"
+                @executed="(command: string) => handleExecuted('configuration', command)"
+                @updated="handleUpdated"
+                @failed="handleFailed"
+            />
+        </div>
+    </div>
 </template>

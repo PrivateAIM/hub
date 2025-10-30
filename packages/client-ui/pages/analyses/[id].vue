@@ -130,6 +130,9 @@ export default defineComponent({
                             <FAnalysisSteps
                                 :list-direction="'column'"
                                 :entity="entity"
+                                :configuration-code-link="'/analyses/' + entity.id + '/image'"
+                                :configuration-nodes-link="'/analyses/' + entity.id + '/nodes'"
+                                :configuration-image-link="'/analyses/' + entity.id + '/image'"
                                 @updated="handleUpdated"
                                 @failed="handleFailed"
                             />

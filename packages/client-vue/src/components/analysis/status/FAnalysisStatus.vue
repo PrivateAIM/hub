@@ -1,8 +1,8 @@
 <!--
-  - Copyright (c) 2021-2024.
-  - Author Peter Placzek (tada5hi)
-  - For the full copyright and license information,
-  - view the LICENSE file that was distributed with this source code.
+  - Copyright (c) 2021-2025.
+  -  Author Peter Placzek (tada5hi)
+  -  For the full copyright and license information,
+  -  view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
 import type { Analysis } from '@privateaim/core-kit';
@@ -15,17 +15,15 @@ import {
 } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
-import { FAnalysisCommand } from './FAnalysisCommand';
-import FAnalysisBuildStatusText from './FAnalysisBuildStatusText.vue';
-import FAnalysisConfigurationStatusText from './FAnalysisConfigurationStatusText.vue';
-import FAnalysisRunStatusText from './FAnalysisRunStatusText.vue';
+import FAnalysisBuildStatus from './FAnalysisBuildStatus.vue';
+import FAnalysisConfigurationStatus from './FAnalysisConfigurationStatus.vue';
+import FAnalysisRunStatus from './FAnalysisRunStatus.vue';
 
 export default defineComponent({
     components: {
-        FAnalysisRunStatusText,
-        FAnalysisBuildStatusText,
-        FAnalysisConfigurationStatusText,
-        FAnalysisCommand,
+        FAnalysisRunStatus,
+        FAnalysisBuildStatus,
+        FAnalysisConfigurationStatusText: FAnalysisConfigurationStatus,
     },
     props: {
         listDirection: {
@@ -71,7 +69,7 @@ export default defineComponent({
 </script>
 <template>
     <div
-        class="d-flex justify-content-between"
+        class="d-flex justify-content-around"
         :class="{
             'flex-column': listDirection === 'column',
             'flex-row': listDirection === 'row'
@@ -95,27 +93,6 @@ export default defineComponent({
                 </div>
                 <div>
                     <FAnalysisConfigurationStatusText :locked="entity.configuration_locked" />
-                </div>
-                <div
-                    v-if="withCommand"
-                    class="ms-auto"
-                >
-                    <FAnalysisCommand
-                        :command="trainCommand.CONFIGURATION_LOCK"
-                        :with-icon="true"
-                        :entity="entity"
-                        @executed="(command: string) => handleExecuted('configuration', command)"
-                        @updated="handleUpdated"
-                        @failed="handleFailed"
-                    />
-                    <FAnalysisCommand
-                        :command="trainCommand.CONFIGURATION_UNLOCK"
-                        :with-icon="true"
-                        :entity="entity"
-                        @executed="(command: string) => handleExecuted('configuration', command)"
-                        @updated="handleUpdated"
-                        @failed="handleFailed"
-                    />
                 </div>
             </div>
 
@@ -143,42 +120,7 @@ export default defineComponent({
                     <strong>Build</strong>
                 </div>
                 <div>
-                    <FAnalysisBuildStatusText :status="entity.build_status" />
-                </div>
-                <div
-                    v-if="withCommand"
-                    class="ms-auto flex-row d-flex justify-between gap-1"
-                >
-                    <div>
-                        <FAnalysisCommand
-                            :command="trainCommand.BUILD_START"
-                            :with-icon="true"
-                            :entity="entity"
-                            @executed="(command) => handleExecuted('build', command)"
-                            @updated="handleUpdated"
-                            @failed="handleFailed"
-                        />
-                    </div>
-                    <div>
-                        <FAnalysisCommand
-                            :command="trainCommand.BUILD_STATUS"
-                            :with-icon="true"
-                            :entity="entity"
-                            @executed="(command) => handleExecuted('build', command)"
-                            @updated="handleUpdated"
-                            @failed="handleFailed"
-                        />
-                    </div>
-                    <div>
-                        <FAnalysisCommand
-                            :command="trainCommand.BUILD_STOP"
-                            :with-icon="true"
-                            :entity="entity"
-                            @executed="(command) => handleExecuted('build', command)"
-                            @updated="handleUpdated"
-                            @failed="handleFailed"
-                        />
-                    </div>
+                    <FAnalysisBuildStatus :status="entity.build_status" />
                 </div>
             </div>
 
@@ -206,7 +148,7 @@ export default defineComponent({
                     <strong>Run</strong>
                 </div>
                 <div>
-                    <FAnalysisRunStatusText :status="entity.run_status" />
+                    <FAnalysisRunStatus :status="entity.run_status" />
                 </div>
             </div>
 

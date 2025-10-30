@@ -9,15 +9,28 @@ import type { Analysis } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
 import FAnalysisConfigurationStep from './FAnalysisConfigurationStep.vue';
+import FAnalysisBuildStep from './FAnalysisBuildStep.vue';
+import FAnalysisRunStep from './FAnalysisRunStep.vue';
 
 export default defineComponent({
     components: {
+        FAnalysisRunStep,
+        FAnalysisBuildStep,
         FAnalysisConfigurationStep,
     },
     props: {
         entity: {
             type: Object as PropType<Analysis>,
             required: true,
+        },
+        configurationNodesLink: {
+            type: String,
+        },
+        configurationCodeLink: {
+            type: String,
+        },
+        configurationImageLink: {
+            type: String,
         },
     },
     emits: ['updated', 'executed', 'failed'],
@@ -30,9 +43,17 @@ export default defineComponent({
     <div>
         <FAnalysisConfigurationStep
             :entity="entity"
-            :entity-id="entity.id"
+            :image-link="configurationImageLink"
+            :nodes-link="configurationNodesLink"
+            :code-link="configurationCodeLink"
         />
 
         <hr>
+
+        <FAnalysisBuildStep :entity="entity" />
+
+        <hr>
+
+        <FAnalysisRunStep :entity="entity" />
     </div>
 </template>

@@ -6,15 +6,16 @@
   -->
 
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue';
-import type { AnalysisNode } from '@privateaim/core-kit';
-import { NodeType } from '@privateaim/core-kit';
-import { injectCoreHTTPClient } from '../../../core';
+import type { PropType } from 'vue';
+import { computed, defineComponent } from 'vue';
+import type { Analysis } from '@privateaim/core-kit';
+import { AnalysisError } from '@privateaim/core-kit';
+import { extractErrorMessage } from '@privateaim/kit';
 
 export default defineComponent({
     props: {
-        entityId: {
-            type: String,
+        entity: {
+            type: Object as PropType<Analysis>,
             required: true,
         },
         tag: {
@@ -23,71 +24,31 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const httpClient = injectCoreHTTPClient();
-
-        const resolved = ref(false);
-        const busy = ref(false);
-
-        const nodes = ref<AnalysisNode[]>([]);
-        const hasDefault = computed(() => nodes.value
-            .filter((analysisNode) => analysisNode.node.type === NodeType.DEFAULT)
-            .length > 0);
-        const hasAggregator = computed(() => nodes.value
-            .filter((analysisNode) => analysisNode.node.type === NodeType.AGGREGATOR)
-            .length > 0);
+        const hasAggregator = computed(() => props.entity.configuration_node_aggregator_valid);
+        const hasDefault = computed(() => props.entity.configuration_node_default_valid);
+        const passed = computed(() => hasAggregator.value && hasDefault.value);
 
         const message = computed(() => {
-            if (busy.value || !resolved.value) {
+            if (passed.value) {
                 return null;
             }
 
             if (!hasDefault.value) {
-                return 'One or more default nodes must be selected.';
+                return extractErrorMessage(AnalysisError.defaultNodeRequired());
             }
 
             if (!hasAggregator.value) {
-                return 'An aggregator node must be selected.';
+                return extractErrorMessage(AnalysisError.aggregatorNodeRequired());
             }
 
             return null;
         });
 
-        const passed = computed(() => !busy.value && hasDefault.value && hasAggregator.value);
-
-        const resolve = async () => {
-            if (busy.value) return;
-
-            busy.value = true;
-
-            try {
-                const { data } = await httpClient.analysisNode.getMany({
-                    filters: {
-                        analysis_id: props.entityId,
-                    },
-                    relations: {
-                        node: true,
-                    },
-                });
-
-                nodes.value = data;
-                // todo: get all nodes + check if a aggregator node is one of them
-            } finally {
-                resolved.value = true;
-                busy.value = false;
-            }
-        };
-
-        Promise
-            .resolve()
-            .then(() => resolve());
-
         return {
-            busy,
             passed,
-            message,
-            hasDefault,
             hasAggregator,
-            resolved,
+            hasDefault,
+            message,
         };
     },
 });
@@ -95,28 +56,20 @@ export default defineComponent({
 <template>
     <slot
         name="default"
-        v-bind="{ resolved, passed, message, hasDefault, hasAggregator }"
+        v-bind="{ passed, message }"
     >
         <component :is="tag">
-            <template v-if="!resolved">
+            <template v-if="passed">
                 <slot
-                    name="unresolved"
-                    v-bind="{ busy, passed, message, hasDefault, hasAggregator }"
+                    name="valid"
+                    v-bind="{ passed, message, hasDefault, hasAggregator }"
                 />
             </template>
             <template v-else>
-                <template v-if="passed">
-                    <slot
-                        name="valid"
-                        v-bind="{ busy, passed, message, hasDefault, hasAggregator }"
-                    />
-                </template>
-                <template v-else>
-                    <slot
-                        name="invalid"
-                        v-bind="{ busy, passed, message, hasDefault, hasAggregator }"
-                    />
-                </template>
+                <slot
+                    name="invalid"
+                    v-bind="{ passed, message, hasDefault, hasAggregator }"
+                />
             </template>
         </component>
     </slot>

@@ -1,14 +1,14 @@
 <!--
-  - Copyright (c) 2021-2024.
-  - Author Peter Placzek (tada5hi)
-  - For the full copyright and license information,
-  - view the LICENSE file that was distributed with this source code.
+  - Copyright (c) 2021-2025.
+  -  Author Peter Placzek (tada5hi)
+  -  For the full copyright and license information,
+  -  view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
 
 import { AnalysisRunStatus } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
-import { defineComponent } from 'vue';
+import { computed, defineComponent } from 'vue';
 
 export default defineComponent({
     props: {
@@ -17,9 +17,9 @@ export default defineComponent({
             default: null,
         },
     },
-    computed: {
-        statusText() {
-            switch (this.status) {
+    setup(props) {
+        const statusText = computed(() => {
+            switch (props.status) {
                 case AnalysisRunStatus.STARTING:
                     return 'starting...';
                 case AnalysisRunStatus.STOPPING:
@@ -37,9 +37,10 @@ export default defineComponent({
                 default:
                     return 'none';
             }
-        },
-        classSuffix() {
-            switch (this.status) {
+        });
+
+        const classSuffix = computed(() => {
+            switch (props.status) {
                 case AnalysisRunStatus.STARTING:
                 case AnalysisRunStatus.STARTED:
                 case AnalysisRunStatus.STOPPED:
@@ -53,15 +54,36 @@ export default defineComponent({
                 default:
                     return 'info';
             }
-        },
+        });
+
+        const iconClass = computed(() => {
+            switch (props.status) {
+                case AnalysisRunStatus.STARTING:
+                case AnalysisRunStatus.STARTED:
+                case AnalysisRunStatus.STOPPING:
+                    return 'fa fa-rotate fa-spin';
+                case AnalysisRunStatus.FINISHED:
+                    return 'fa fa-check';
+                case AnalysisRunStatus.FAILED:
+                case AnalysisRunStatus.STOPPED:
+                    return 'fa fa-times';
+                default:
+                    return 'fa fa-circle';
+            }
+        });
+
+        return {
+            classSuffix,
+            statusText,
+            iconClass,
+        };
     },
 });
 </script>
 <template>
     <span>
         <slot
-            :class-suffix="classSuffix"
-            :status-text="statusText"
+            v-bind="{classSuffix, statusText, iconClass}"
         >
             <span :class="'text-'+classSuffix">{{ statusText }}</span>
         </slot>

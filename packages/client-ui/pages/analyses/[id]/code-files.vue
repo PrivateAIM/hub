@@ -57,7 +57,13 @@ export default defineComponent({
                 </div>
             </div>
             <div class="card-body">
-                <div class="d-flex flex-row gap-2 align-items-center alert alert-sm alert-warning">
+                <div
+                    class="d-flex flex-row gap-2 align-items-center alert alert-sm"
+                    :class="{
+                        'alert-warning': entity.configuration_entrypoint_valid,
+                        'alert-danger': !entity.configuration_entrypoint_valid,
+                    }"
+                >
                     <div>
                         <i class="fa fa-upload" />
                     </div>

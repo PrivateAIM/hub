@@ -24,16 +24,17 @@ export default defineComponent({
         },
     },
     setup(props) {
+        const passed = computed(() => props.entity.configuration_entrypoint_valid);
         const message = computed(() => {
-            if (props.entity.configuration_image_valid) {
+            if (passed.value) {
                 return null;
             }
 
-            return extractErrorMessage(AnalysisError.imageAssignmentRequired());
+            return extractErrorMessage(AnalysisError.entrypointRequired());
         });
 
         return {
-            passed: props.entity.configuration_image_valid,
+            passed,
             message,
         };
     },
@@ -48,13 +49,12 @@ export default defineComponent({
             <template v-if="passed">
                 <slot
                     name="valid"
-                    v-bind="{ passed, message }"
                 />
             </template>
             <template v-else>
                 <slot
                     name="invalid"
-                    v-bind="{ passed, message }"
+                    v-bind="{ message }"
                 />
             </template>
         </component>

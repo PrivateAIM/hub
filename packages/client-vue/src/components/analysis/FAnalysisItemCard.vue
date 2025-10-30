@@ -16,13 +16,13 @@ import { defineComponent, ref } from 'vue';
 import type { EntityListSlotName } from '../../core';
 import FEntityDelete from '../FEntityDelete';
 import FAnalysisName from './FAnalysisName';
-import FAnalysisPipeline from './FAnalysisPipeline.vue';
+import FAnalysisStatus from './status/FAnalysisStatus.vue';
 import FAnalysisProgressBar from './FAnalysisProgressBar.vue';
 
 export default defineComponent({
     components: {
         FAnalysisProgressBar,
-        FAnalysisPipeline,
+        FAnalysisPipeline: FAnalysisStatus,
         FAnalysisName,
         FEntityDelete,
         VCLink,
@@ -45,7 +45,7 @@ export default defineComponent({
         }
     }>,
     setup(_props, { emit }) {
-        const extendedView = ref(false);
+        const extendedView = ref(true);
         const toggleView = () => {
             extendedView.value = !extendedView.value;
         };

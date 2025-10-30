@@ -119,6 +119,12 @@ export function isAnalysisAPICommandExecutable(
                 return output;
             }
 
+            if (!entity.configuration_entrypoint_valid) {
+                const error = AnalysisError.entrypointRequired();
+                output.message = error.message;
+                return output;
+            }
+
             if (!entity.configuration_image_valid) {
                 const error = AnalysisError.imageAssignmentRequired();
                 output.message = error.message;

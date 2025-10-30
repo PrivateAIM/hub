@@ -17,5 +17,5 @@ export { default as FAnalysisMasterImage } from './FAnalysisMasterImage.vue';
 export { default as FAnalyses } from './FAnalyses';
 export { default as FAnalysisCodeFiles } from './FAnalysisCodeFiles.vue';
 export { default as FAnalysisName } from './FAnalysisName';
-export { default as FAnalysisPipeline } from './FAnalysisPipeline.vue';
+export { default as FAnalysisStatus } from './status/FAnalysisStatus.vue';
 export { default as FAnalysisProgressBar } from './FAnalysisProgressBar.vue';
