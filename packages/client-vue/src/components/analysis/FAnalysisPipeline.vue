@@ -71,113 +71,149 @@ export default defineComponent({
 </script>
 <template>
     <div
-        class="d-flex justify-content-between mb-2 mt-2"
+        class="d-flex justify-content-between"
         :class="{
             'flex-column': listDirection === 'column',
             'flex-row': listDirection === 'row'
         }"
     >
-        <div
-            class="d-flex flex-grow-1 align-items-center"
-            style="flex-basis: 0"
-            :class="{
-                'mb-2 flex-row': listDirection === 'column',
-                'flex-column': listDirection === 'row'
-            }"
-        >
-            <div class="me-1">
-                <strong>1. Configuration</strong>
-            </div>
-            <div>
-                <FAnalysisConfigurationStatusText :locked="entity.configuration_locked" />
-            </div>
+        <div>
+            <slot
+                name="beforeConfiguration"
+                v-bind="entity"
+            />
             <div
-                v-if="withCommand"
-                class="ms-auto"
+                class="d-flex flex-grow-1 align-items-center"
+                style="flex-basis: 0"
+                :class="{
+                    'flex-row': listDirection === 'column',
+                    'flex-column': listDirection === 'row'
+                }"
             >
-                <FAnalysisCommand
-                    :command="trainCommand.CONFIGURATION_LOCK"
-                    :with-icon="true"
-                    :entity="entity"
-                    @executed="(command: string) => handleExecuted('configuration', command)"
-                    @updated="handleUpdated"
-                    @failed="handleFailed"
-                />
-                <FAnalysisCommand
-                    :command="trainCommand.CONFIGURATION_UNLOCK"
-                    :with-icon="true"
-                    :entity="entity"
-                    @executed="(command: string) => handleExecuted('configuration', command)"
-                    @updated="handleUpdated"
-                    @failed="handleFailed"
-                />
+                <div class="me-1">
+                    <strong>Configuration</strong>
+                </div>
+                <div>
+                    <FAnalysisConfigurationStatusText :locked="entity.configuration_locked" />
+                </div>
+                <div
+                    v-if="withCommand"
+                    class="ms-auto"
+                >
+                    <FAnalysisCommand
+                        :command="trainCommand.CONFIGURATION_LOCK"
+                        :with-icon="true"
+                        :entity="entity"
+                        @executed="(command: string) => handleExecuted('configuration', command)"
+                        @updated="handleUpdated"
+                        @failed="handleFailed"
+                    />
+                    <FAnalysisCommand
+                        :command="trainCommand.CONFIGURATION_UNLOCK"
+                        :with-icon="true"
+                        :entity="entity"
+                        @executed="(command: string) => handleExecuted('configuration', command)"
+                        @updated="handleUpdated"
+                        @failed="handleFailed"
+                    />
+                </div>
             </div>
+
+            <slot
+                name="afterConfiguration"
+                v-bind="entity"
+            />
         </div>
 
-        <div
-            class="d-flex flex-grow-1 align-items-center"
-            style="flex-basis: 0"
-            :class="{
-                'mb-2 flex-row': listDirection === 'column',
-                'flex-column': listDirection === 'row'
-            }"
-        >
-            <div class="me-1">
-                <strong>2. Build</strong>
-            </div>
-            <div>
-                <FAnalysisBuildStatusText :status="entity.build_status" />
-            </div>
+        <div>
+            <slot
+                name="beforeBuild"
+                v-bind="entity"
+            />
+
             <div
-                v-if="withCommand"
-                class="ms-auto flex-row d-flex justify-between gap-1"
+                class="d-flex flex-grow-1 align-items-center"
+                style="flex-basis: 0"
+                :class="{
+                    'flex-row': listDirection === 'column',
+                    'flex-column': listDirection === 'row'
+                }"
             >
-                <div>
-                    <FAnalysisCommand
-                        :command="trainCommand.BUILD_START"
-                        :with-icon="true"
-                        :entity="entity"
-                        @executed="(command) => handleExecuted('build', command)"
-                        @updated="handleUpdated"
-                        @failed="handleFailed"
-                    />
+                <div class="me-1">
+                    <strong>Build</strong>
                 </div>
                 <div>
-                    <FAnalysisCommand
-                        :command="trainCommand.BUILD_STATUS"
-                        :with-icon="true"
-                        :entity="entity"
-                        @executed="(command) => handleExecuted('build', command)"
-                        @updated="handleUpdated"
-                        @failed="handleFailed"
-                    />
+                    <FAnalysisBuildStatusText :status="entity.build_status" />
                 </div>
-                <div>
-                    <FAnalysisCommand
-                        :command="trainCommand.BUILD_STOP"
-                        :with-icon="true"
-                        :entity="entity"
-                        @executed="(command) => handleExecuted('build', command)"
-                        @updated="handleUpdated"
-                        @failed="handleFailed"
-                    />
+                <div
+                    v-if="withCommand"
+                    class="ms-auto flex-row d-flex justify-between gap-1"
+                >
+                    <div>
+                        <FAnalysisCommand
+                            :command="trainCommand.BUILD_START"
+                            :with-icon="true"
+                            :entity="entity"
+                            @executed="(command) => handleExecuted('build', command)"
+                            @updated="handleUpdated"
+                            @failed="handleFailed"
+                        />
+                    </div>
+                    <div>
+                        <FAnalysisCommand
+                            :command="trainCommand.BUILD_STATUS"
+                            :with-icon="true"
+                            :entity="entity"
+                            @executed="(command) => handleExecuted('build', command)"
+                            @updated="handleUpdated"
+                            @failed="handleFailed"
+                        />
+                    </div>
+                    <div>
+                        <FAnalysisCommand
+                            :command="trainCommand.BUILD_STOP"
+                            :with-icon="true"
+                            :entity="entity"
+                            @executed="(command) => handleExecuted('build', command)"
+                            @updated="handleUpdated"
+                            @failed="handleFailed"
+                        />
+                    </div>
                 </div>
             </div>
+
+            <slot
+                name="afterBuild"
+                v-bind="entity"
+            />
         </div>
-        <div
-            class="d-flex flex-grow-1 align-items-center"
-            style="flex-basis: 0"
-            :class="{
-                'mb-2 flex-row': listDirection === 'column',
-                'flex-column': listDirection === 'row'
-            }"
-        >
-            <div class="me-1">
-                <strong>3. Run</strong>
+
+        <div>
+            <slot
+                name="beforeRun"
+                v-bind="entity"
+            />
+
+            <div
+                class="d-flex flex-grow-1 align-items-center"
+                style="flex-basis: 0"
+                :class="{
+                    'flex-row': listDirection === 'column',
+                    'flex-column': listDirection === 'row'
+                }"
+            >
+                <div class="me-1">
+                    <strong>Run</strong>
+                </div>
+                <div>
+                    <FAnalysisRunStatusText :status="entity.run_status" />
+                </div>
             </div>
-            <div>
-                <FAnalysisRunStatusText :status="entity.run_status" />
-            </div>
+
+            <slot
+                name="afterRun"
+                v-bind="entity"
+            />
         </div>
     </div>
 </template>

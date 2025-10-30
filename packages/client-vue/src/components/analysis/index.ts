@@ -5,7 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+export * from './steps';
 export * from './wizard';
+
 export { default as FAnalysisBasicForm } from './FAnalysisBasicForm.vue';
 export { default as FAnalysis } from './FAnalysis';
 export { FAnalysisItem } from './FAnalysisItem';

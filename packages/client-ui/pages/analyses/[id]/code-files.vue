@@ -57,6 +57,16 @@ export default defineComponent({
                 </div>
             </div>
             <div class="card-body">
+                <div class="d-flex flex-row gap-2 align-items-center alert alert-sm alert-warning">
+                    <div>
+                        <i class="fa fa-upload" />
+                    </div>
+                    <div>
+                        Upload one or more code files that define the logic of your analysis.
+                        These files will later be packaged and distributed as part of the analysis image.
+                    </div>
+                </div>
+
                 <FAnalysisCodeFiles
                     ref="analysisCodeFiles"
                     :entity="entity"

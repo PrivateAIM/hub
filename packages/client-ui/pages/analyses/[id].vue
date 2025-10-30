@@ -8,7 +8,7 @@
 import {
     DomainType,
 } from '@privateaim/core-kit';
-import { FAnalysisName, FAnalysisPipeline, createEntityManager } from '@privateaim/client-vue';
+import { FAnalysisName, FAnalysisSteps, createEntityManager } from '@privateaim/client-vue';
 import { isClientErrorWithStatusCode } from 'hapic';
 import { defineComponent } from 'vue';
 import { definePageMeta, useToast } from '#imports';
@@ -21,7 +21,10 @@ import { DomainEntityNavItem } from '../../core';
 
 export default defineComponent({
     components: {
-        FAnalysisPipeline, DomainEntityNav, DomainEntityNavItem, FAnalysisName,
+        FAnalysisSteps,
+        DomainEntityNav,
+        DomainEntityNavItem,
+        FAnalysisName,
     },
     async setup() {
         definePageMeta({
@@ -58,9 +61,9 @@ export default defineComponent({
         const tabs = [
             { name: 'Overview', icon: 'fas fa-bars', path: '' },
             { name: 'Nodes', icon: 'fa fa-city', path: '/nodes' },
-            { name: 'Master Image', icon: 'fa fa-compact-disc', path: '/master-image' },
-            { name: 'Security', icon: 'fa fa-lock', path: '/security' },
             { name: 'Code', icon: 'fa fa-code', path: '/code-files' },
+            { name: 'Image', icon: 'fa fa-compact-disc', path: '/image' },
+            { name: 'Security', icon: 'fa fa-lock', path: '/security' },
             { name: 'Results', icon: 'fas fa-chart-bar', path: '/result-files' },
         ];
 
@@ -121,10 +124,10 @@ export default defineComponent({
                 <div class="col-4">
                     <div class="card-grey card">
                         <div class="card-header">
-                            <span class="title">Pipeline</span>
+                            <span class="title">Steps</span>
                         </div>
                         <div class="card-body">
-                            <FAnalysisPipeline
+                            <FAnalysisSteps
                                 :list-direction="'column'"
                                 :entity="entity"
                                 @updated="handleUpdated"
