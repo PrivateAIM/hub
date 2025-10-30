@@ -27,15 +27,45 @@ export interface Analysis {
 
     configuration_locked: boolean;
 
-    // ------------------------------------------------------------------
+    /**
+     * A root code bucket file is linked for the analysis.
+     */
+    configuration_entrypoint_valid : boolean;
 
     /**
-     * todo: rename to distribution_status
+     * Master image is assigned.
      */
+    configuration_image_valid: boolean;
+
+    /**
+     * One or more default nodes are assigned.
+     */
+    configuration_node_default_valid: boolean;
+
+    /**
+     * An aggregator is assigned.
+     */
+    configuration_node_aggregator_valid: boolean;
+
+    /**
+     * A default node as well an aggregator node is assigned.
+     */
+    configuration_nodes_valid: boolean;
+
+    // ------------------------------------------------------------------
+
     build_status: AnalysisBuildStatus | null;
 
     // ------------------------------------------------------------------
 
+    /**
+     * todo: add distribution_status
+     */
+
+    // ------------------------------------------------------------------
+    /**
+     * todo: rename to execution_status
+     */
     run_status: AnalysisRunStatus | null;
 
     // ------------------------------------------------------------------

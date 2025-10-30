@@ -16,7 +16,7 @@ export function defineEventComponent() : Component {
     return {
         async start() {
             const handlers = definEventComponentHandlers();
-            await handlers.setup();
+            await handlers.initialize();
 
             if (
                 isQueueRouterUsable() &&

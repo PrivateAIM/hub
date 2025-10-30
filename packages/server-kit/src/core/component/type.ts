@@ -9,7 +9,12 @@ import type { ObjectLiteral } from '../../type';
 import type { ComponentError } from './error';
 
 export type Component = {
-    start: () => void
+    start: () => void,
+    trigger?: (
+        key: string,
+        value?: ObjectLiteral,
+        metadata?: ObjectLiteral
+    ) => void
 };
 
 export type ComponentErrorOptions = {

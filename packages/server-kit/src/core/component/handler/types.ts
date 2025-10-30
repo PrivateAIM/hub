@@ -23,6 +23,6 @@ export type ComponentHandler<
     KEY extends string = string,
     VALUE extends ObjectLiteral = ObjectLiteral,
 > = {
-    setup?: () => Promise<void> | void;
+    initialize?: () => Promise<void> | void;
     handle: ComponentHandlerFn<KEY, VALUE>
 };
