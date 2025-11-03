@@ -61,7 +61,8 @@ export default defineComponent({
                         ) {
                             update({
                                 master_image_id: value ? value.id : null,
-                                master_image: value
+                                master_image: value,
+                                image_command_arguments: null
                             })
                         } else {
                             updated({

@@ -32,29 +32,11 @@ export default defineComponent({
     emits: ['updated'],
     setup(_props, { emit }) {
         const lastRootFileId = ref<string | null>(null);
-        const lastMasterImage = ref<MasterImage | null>(null);
 
         const imageCommand = useTemplateRef<typeof FAnalysisImageCommand>('imageCommand');
 
         const handleUpdated = (entity: Analysis) => {
-            if (entity.master_image) {
-                lastMasterImage.value = entity.master_image;
-            }
-
             emit('updated', entity);
-        };
-
-        const handleMasterImageResolved = (entity: MasterImage | null) => {
-            console.log(entity);
-
-            lastMasterImage.value = entity;
-        };
-        const handleMasterImageToggled = (entity: MasterImage | null) => {
-            if (imageCommand.value) {
-                imageCommand.value.setMasterImage(entity);
-            }
-
-            lastMasterImage.value = entity;
         };
 
         const handAnalysisBucketFileUpdated = (entity: AnalysisBucketFile) => {
@@ -77,11 +59,6 @@ export default defineComponent({
 
         return {
             handleUpdated,
-
-            handleMasterImageResolved,
-            handleMasterImageToggled,
-
-            lastMasterImage,
 
             handAnalysisBucketFileUpdated,
         };
@@ -128,10 +105,9 @@ export default defineComponent({
                 </div>
                 <div class="card-body">
                     <FAnalysisImageCommandArguments
-                        :master-image-entity="lastMasterImage"
                         :readonly="entity.configuration_locked"
                         :entity="entity"
-                        @updated="(data) => $emit('updated', data)"
+                        @updated="handleUpdated"
                     />
                 </div>
             </div>
