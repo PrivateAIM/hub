@@ -14,7 +14,8 @@ import { BModal } from 'bootstrap-vue-next';
 import type { PropType } from 'vue';
 import {
     computed,
-    defineComponent, ref, toRef,
+    defineComponent,
+    ref,
 } from 'vue';
 import type { BuildInput } from 'rapiq';
 import { injectCoreHTTPClient, wrapFnWithBusyState } from '../../core';
@@ -69,7 +70,7 @@ export default defineComponent({
         const updateAll = (entity: AnalysisBucketFile) => {
             if (!entity.root || !fileListNode.value) return;
 
-            const data = fileListNode.value.data as AnalysisBucketFile[];
+            const data = fileListNode.value.data as unknown as AnalysisBucketFile[];
 
             for (let i = 0; i < data.length; i++) {
                 if (data[i].id === entity.id) continue;

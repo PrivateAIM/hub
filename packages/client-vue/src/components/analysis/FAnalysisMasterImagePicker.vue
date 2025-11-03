@@ -66,6 +66,7 @@ export default defineComponent({
                             })
                         } else {
                             updated({
+                                ...data,
                                 master_image_id: value ? value.id : null,
                                 master_image: value
                             })
