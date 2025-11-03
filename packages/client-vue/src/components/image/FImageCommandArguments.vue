@@ -112,13 +112,13 @@ export default defineComponent({
             let next : MasterImageCommandArgument[];
             if (position === 'before') {
                 next = [
-                    ...extractItemsByPosition(itemsPropRef.value, 'before'),
+                    ...extractItemsByPosition(itemsPropRef.value || [], 'before'),
                     ...itemsAfter.value.map((value) => ({ position: 'after', value } satisfies MasterImageCommandArgument)),
                 ];
             } else {
                 next = [
                     ...itemsBefore.value.map((value) => ({ position: 'before', value } satisfies MasterImageCommandArgument)),
-                    ...extractItemsByPosition(itemsPropRef.value, 'after'),
+                    ...extractItemsByPosition(itemsPropRef.value || [], 'after'),
                 ];
             }
 

@@ -6,12 +6,11 @@
  */
 
 export * from './steps';
-export * from './wizard';
 
 export { default as FAnalysisBasicForm } from './FAnalysisBasicForm.vue';
 export { default as FAnalysis } from './FAnalysis';
 export { FAnalysisItem } from './FAnalysisItem';
-export { default as FAnalysisImageCommand } from './FAnalysisImageCommand';
+export { default as FAnalysisImageCommand } from './FAnalysisImageCommand.vue';
 export { default as FAnalysisImageCommandArguments } from './FAnalysisImageCommandArguments.vue';
 export { default as FAnalyses } from './FAnalyses';
 export { default as FAnalysisCodeFiles } from './FAnalysisCodeFiles.vue';

@@ -10,6 +10,7 @@ import type {
 } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
 import {
+    computed,
     defineComponent,
     ref,
     watch,
@@ -20,6 +21,9 @@ export default defineComponent({
         entity: {
             type: Object as PropType<AnalysisBucketFile>,
             required: true,
+        },
+        readonly: {
+            type: Boolean,
         },
     },
     emits: ['updated'],
@@ -55,7 +59,7 @@ export default defineComponent({
     <button
         type="button"
         class="btn btn-xs"
-        :disabled="busy"
+        :disabled="readonly"
         :class="{
             'btn-success': !isRoot,
             'btn-warning': isRoot

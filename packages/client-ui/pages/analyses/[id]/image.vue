@@ -5,7 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Analysis, AnalysisBucketFile, MasterImage } from '@privateaim/core-kit';
+import type { Analysis, AnalysisBucketFile } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
 import { defineComponent, ref, useTemplateRef } from 'vue';
 import {
@@ -32,11 +32,24 @@ export default defineComponent({
     emits: ['updated'],
     setup(_props, { emit }) {
         const lastRootFileId = ref<string | null>(null);
+        const setLastRootFile = (entity: AnalysisBucketFile | null) => {
+            if (entity) {
+                lastRootFileId.value = entity.id;
+            } else {
+                lastRootFileId.value = null;
+            }
+        };
 
         const imageCommand = useTemplateRef<typeof FAnalysisImageCommand>('imageCommand');
 
         const handleUpdated = (entity: Analysis) => {
             emit('updated', entity);
+        };
+
+        const handAnalysisBucketFileDeleted = (entity: AnalysisBucketFile) => {
+            if (entity.root) {
+                lastRootFileId.value = null;
+            }
         };
 
         const handAnalysisBucketFileUpdated = (entity: AnalysisBucketFile) => {
@@ -60,7 +73,10 @@ export default defineComponent({
         return {
             handleUpdated,
 
+            handAnalysisBucketFileDeleted,
             handAnalysisBucketFileUpdated,
+
+            setLastRootFile,
         };
     },
 });
@@ -138,6 +154,7 @@ export default defineComponent({
                         :entity="entity"
                         :readonly="true"
                         @updated="handAnalysisBucketFileUpdated"
+                        @deleted="handAnalysisBucketFileDeleted"
                     >
                         <template #itemActions="props">
                             <template v-if="!entity.configuration_locked">
@@ -157,10 +174,11 @@ export default defineComponent({
                 <div class="card-body">
                     <FAnalysisImageCommand
                         ref="imageCommand"
-                        class="mt-2 mb-2"
+                        :master-image="entity.master_image"
                         :master-image-id="entity.master_image_id"
-                        :analysis="entity"
-                        :analysis-id="entity.id"
+                        :entity="entity"
+                        :entity-id="entity.id"
+                        @analysis-bucket-file-resolved="setLastRootFile"
                     />
                 </div>
             </div>
