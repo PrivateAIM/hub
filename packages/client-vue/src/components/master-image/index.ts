@@ -7,5 +7,5 @@
 
 export { FMasterImage } from './FMasterImage';
 export { default as FMasterImages } from './FMasterImages';
-export { default as FMasterImagePicker } from './FMasterImagePicker';
+export { default as FMasterImagePicker } from './FMasterImagePicker.vue';
 export { default as FMasterImagesSync } from './FMasterImagesSync';
