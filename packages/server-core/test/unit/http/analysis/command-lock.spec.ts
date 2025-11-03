@@ -120,7 +120,7 @@ describe('analysis/command-lock', () => {
             );
         } catch (e) {
             if (isClientError(e)) {
-                expect(e.response.data.message).toEqual(extractErrorMessage(AnalysisError.imageAssignmentRequired()));
+                expect(e.response.data.message).toEqual(extractErrorMessage(AnalysisError.entrypointRequired()));
                 return;
             }
 
