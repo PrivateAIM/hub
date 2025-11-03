@@ -20,6 +20,7 @@ export * from './analysis-bucket';
 export * from './analysis-bucket-file';
 export * from './analysis-log';
 export * from './analysis-node';
+export * from './analysis-node-log';
 export * from './analysis-permission';
 export { default as FEntityDelete } from './FEntityDelete';
 export * from './constants';

@@ -14,6 +14,10 @@ export class AnalysisError extends Error {
         return new AnalysisError('An aggregator node node must be selected.');
     }
 
+    static entrypointRequired() {
+        return new AnalysisError('An entrypoint must be selected.');
+    }
+
     static imageAssignmentRequired() {
         return new AnalysisError('A master image must be assigned to the analysis.');
     }

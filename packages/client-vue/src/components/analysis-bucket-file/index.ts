@@ -7,6 +7,8 @@
 
 export { default as FAnalysisFile } from './FAnalysisBucketFile.vue';
 export { FAnalysisBucketFileDownload } from './FAnalysisBucketFileDownload';
+export { default as FAnalysisBucketFileManager } from './FAnalysisBucketFileManager.vue';
 export { FAnalysisBucketFiles } from './FAnalysisBucketFiles';
 export { default as FAnalysisFileManager } from './FAnalysisBucketFileManager.vue';
 export { default as FAnalysisFormFile } from './FAnalysisFormFile.vue';
+export { default as FAnalysisBucketFileRootToggler } from './FAnalysisBucketFileRootToggler.vue';

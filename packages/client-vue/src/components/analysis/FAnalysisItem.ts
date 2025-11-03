@@ -13,18 +13,10 @@ import type {
     Analysis,
 } from '@privateaim/core-kit';
 import TrainEntity from './FAnalysis';
-import TrainPipeline from './FAnalysisPipeline.vue';
-import FAnalysisNodesProgress from '../analysis-node/FAnalysisNodesProgress.vue';
-import TrainName from './FAnalysisName';
 import type { EntityManagerSlotProps } from '../../core';
 import FAnalysisItemCard from './FAnalysisItemCard.vue';
 
 const FAnalysisItem = defineComponent({
-    components: {
-        TrainName,
-        FAnalysisNodesProgress,
-        TrainPipeline,
-    },
     props: {
         entity: {
             type: Object as PropType<Analysis>,

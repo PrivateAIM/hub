@@ -9,10 +9,10 @@ import { AnalysisBucketType } from '@privateaim/core-kit';
 import type { Analysis, AnalysisBucket, AnalysisBucketFile } from '@privateaim/core-kit';
 import type { FiltersBuildInput } from 'rapiq';
 import {
-    type PropType, computed, defineComponent, ref,
+    type PropType, computed, defineComponent, ref, useTemplateRef,
 } from 'vue';
-import FAnalysisBucketFileManager from '../../analysis-bucket-file/FAnalysisBucketFileManager.vue';
-import FAnalysisBucket from '../../analysis-bucket/FAnalysisBucket';
+import FAnalysisBucketFileManager from '../analysis-bucket-file/FAnalysisBucketFileManager.vue';
+import FAnalysisBucket from '../analysis-bucket/FAnalysisBucket';
 
 export default defineComponent({
     components: {
@@ -24,24 +24,41 @@ export default defineComponent({
             type: Object as PropType<Analysis>,
             required: true,
         },
-        entrypointEntity: {
-            type: Object as PropType<AnalysisBucketFile>,
+        readonly: {
+            type: Boolean,
+            default: false,
         },
     },
-    emits: ['failed', 'entrypointChanged'],
-    setup(props, { emit }) {
+    emits: ['failed', 'updated'],
+    setup(props, { emit, expose }) {
+        const bucketFileManager = useTemplateRef<typeof FAnalysisBucketFileManager | null>('bucketFileManager');
         const analysisBucketNode = ref<typeof FAnalysisBucket | null>(null);
+
         const queryFilters = computed(() => ({
             analysis_id: props.entity.id,
             type: AnalysisBucketType.CODE,
         } satisfies FiltersBuildInput<AnalysisBucket>));
 
-        const handleFailed = (e: Error) => {
-            emit('failed', e);
+        const add = () => {
+            if (props.entity.configuration_locked) {
+                return;
+            }
+
+            if (bucketFileManager.value) {
+                bucketFileManager.value.add();
+            }
         };
 
-        const handleEntrypointChanged = (e: AnalysisBucketFile) => {
-            emit('entrypointChanged', e);
+        expose({
+            add,
+        });
+
+        const handleUpdated = (entity: AnalysisBucketFile) => {
+            emit('updated', entity);
+        };
+
+        const handleFailed = (e: Error) => {
+            emit('failed', e);
         };
 
         const retry = () => {
@@ -51,8 +68,11 @@ export default defineComponent({
         };
 
         return {
+            add,
+
+            handleUpdated,
             handleFailed,
-            handleEntrypointChanged,
+
             queryFilters,
 
             analysisBucketNode,
@@ -69,27 +89,17 @@ export default defineComponent({
         >
             <template #default="{ data: bucket }">
                 <FAnalysisBucketFileManager
+                    ref="bucketFileManager"
+                    :readonly="entity.configuration_locked || readonly"
                     :entity="bucket"
-                    :file-entity="entrypointEntity"
-                    @set-entrypoint-file="handleEntrypointChanged"
                     @failed="handleFailed"
+                    @updated="handleUpdated"
                 >
-                    <template #header="props">
-                        <div class="d-flex flex-row">
-                            <div>
-                                <h6><i class="fa fa-file" /> Files</h6>
-                            </div>
-                            <div class="ms-auto">
-                                <button
-                                    style="width: 120px"
-                                    type="button"
-                                    class="btn btn-primary btn-xs"
-                                    @click.prevent="props.add"
-                                >
-                                    <i class="fa fa-plus me-1" /> Add
-                                </button>
-                            </div>
-                        </div>
+                    <template #itemActions="props">
+                        <slot
+                            name="itemActions"
+                            v-bind="props"
+                        />
                     </template>
                 </FAnalysisBucketFileManager>
             </template>

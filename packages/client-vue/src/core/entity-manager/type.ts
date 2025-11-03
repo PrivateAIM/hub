@@ -24,14 +24,14 @@ type EntityID<T> = T extends EntityWithID ?
 export type EntityManagerRenderFn = () => VNodeChild;
 
 export type EntityManagerResolveContext<T> = {
-    id?: EntityID<T>,
+    id?: EntityID<T> | null,
     reset?: boolean,
     query?: T extends Record<string, any> ? BuildInput<T> : never
 };
 
 export type EntityManager<T> = {
     busy: Ref<boolean>,
-    data: Ref<T | undefined>,
+    data: Ref<T | null>,
     error: Ref<Error | undefined>,
     lockId: Ref<EntityID<T> | undefined>,
     create(entity: Partial<T>): Promise<void>,
@@ -42,7 +42,8 @@ export type EntityManager<T> = {
     delete() : Promise<void>,
     deleted(entity?: T) : void;
     failed(e: Error) : void;
-    resolve(ctx?: EntityManagerResolveContext<T>) : Promise<void>;
+    resolve(ctx?: EntityManagerResolveContext<T>) : Promise<T | null>,
+    resolveByRest(ctx?: EntityManagerResolveContext<T>) : Promise<T | null>,
     render(content?: VNodeChild | EntityManagerRenderFn) : VNodeChild;
 };
 

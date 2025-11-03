@@ -15,6 +15,10 @@ export const FAnalysisPermissionAssignment = defineComponent({
     props: {
         analysisId: String,
         permissionId: String,
+        readonly: {
+            type: Boolean,
+            default: false,
+        },
     },
     emits: defineEntityManagerEvents<AnalysisPermission>(),
     async setup(props, setup) {
@@ -38,20 +42,31 @@ export const FAnalysisPermissionAssignment = defineComponent({
             },
         });
 
-        return () => renderToggleButton({
-            changed: (value) => {
-                if (value) {
-                    return manager.create({
-                        analysis_id: props.analysisId,
-                        permission_id: props.permissionId,
-                    });
-                }
+        return () => {
+            const vNode = renderToggleButton({
+                changed: (value) => {
+                    if (props.readonly) {
+                        return Promise.resolve();
+                    }
 
-                return manager.delete();
-            },
-            value: !!manager.data.value,
-            isBusy: manager.busy.value,
-        });
+                    if (value) {
+                        return manager.create({
+                            analysis_id: props.analysisId,
+                            permission_id: props.permissionId,
+                        });
+                    }
+
+                    return manager.delete();
+                },
+                value: !!manager.data.value,
+                isBusy: manager.busy.value,
+            });
+
+            vNode.props ||= {};
+            vNode.props.disabled = props.readonly;
+
+            return vNode;
+        };
     },
 });
 

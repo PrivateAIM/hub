@@ -19,10 +19,10 @@ export default defineComponent({
         const locked = toRef(props, 'locked');
         const statusText = computed(() => {
             if (locked.value) {
-                return 'locked';
+                return 'finished';
             }
 
-            return 'not locked';
+            return 'none';
         });
 
         const iconClass = computed(() => {
@@ -38,7 +38,7 @@ export default defineComponent({
                 return 'success';
             }
 
-            return 'danger';
+            return 'info';
         });
 
         return {
@@ -52,8 +52,7 @@ export default defineComponent({
 <template>
     <span>
         <slot
-            :class-suffix="classSuffix"
-            :status-text="statusText"
+            v-bind="{ classSuffix, statusText }"
         >
             <span :class="'text-'+classSuffix"> {{ statusText }}</span>
         </slot>

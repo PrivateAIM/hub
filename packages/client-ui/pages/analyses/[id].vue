@@ -8,7 +8,7 @@
 import {
     DomainType,
 } from '@privateaim/core-kit';
-import { FAnalysisName, createEntityManager } from '@privateaim/client-vue';
+import { FAnalysisName, FAnalysisSteps, createEntityManager } from '@privateaim/client-vue';
 import { isClientErrorWithStatusCode } from 'hapic';
 import { defineComponent } from 'vue';
 import { definePageMeta, useToast } from '#imports';
@@ -20,7 +20,12 @@ import { LayoutKey, LayoutNavigationID } from '../../config/layout';
 import { DomainEntityNavItem } from '../../core';
 
 export default defineComponent({
-    components: { DomainEntityNav, DomainEntityNavItem, FAnalysisName },
+    components: {
+        FAnalysisSteps,
+        DomainEntityNav,
+        DomainEntityNavItem,
+        FAnalysisName,
+    },
     async setup() {
         definePageMeta({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
@@ -55,8 +60,11 @@ export default defineComponent({
 
         const tabs = [
             { name: 'Overview', icon: 'fas fa-bars', path: '' },
-            { name: 'Configuration', icon: 'fa fa-wrench', path: '/setup' },
-            { name: 'Results', icon: 'fas fa-chart-bar', path: '/results' },
+            { name: 'Nodes', icon: 'fa fa-city', path: '/nodes' },
+            { name: 'Code', icon: 'fa fa-code', path: '/code-files' },
+            { name: 'Image', icon: 'fa fa-compact-disc', path: '/image' },
+            { name: 'Security', icon: 'fa fa-lock', path: '/security' },
+            { name: 'Results', icon: 'fas fa-chart-bar', path: '/result-files' },
         ];
 
         return {
@@ -105,11 +113,45 @@ export default defineComponent({
         </div>
 
         <template v-if="entity">
-            <NuxtPage
-                :entity="entity"
-                @updated="handleUpdated"
-                @failed="handleFailed"
-            />
+            <div class="row">
+                <div class="col-8">
+                    <NuxtPage
+                        :entity="entity"
+                        @updated="handleUpdated"
+                        @failed="handleFailed"
+                    />
+                </div>
+                <div class="col-4">
+                    <div class="card-grey card">
+                        <div class="card-header">
+                            <span class="title">Steps</span>
+                        </div>
+                        <div class="card-body">
+                            <div
+                                class="d-flex flex-row gap-2 align-items-center alert alert-sm alert-info"
+                            >
+                                <div>
+                                    <i class="fa fa-info" />
+                                </div>
+                                <div>
+                                    Since it is necessary to continuously check whether the conditions for the steps are met,
+                                    it may take a few seconds for the view to update.
+                                </div>
+                            </div>
+
+                            <FAnalysisSteps
+                                :list-direction="'column'"
+                                :entity="entity"
+                                :configuration-code-link="'/analyses/' + entity.id + '/image'"
+                                :configuration-nodes-link="'/analyses/' + entity.id + '/nodes'"
+                                :configuration-image-link="'/analyses/' + entity.id + '/image'"
+                                @updated="handleUpdated"
+                                @failed="handleFailed"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
         </template>
         <template v-else>
             Not found...

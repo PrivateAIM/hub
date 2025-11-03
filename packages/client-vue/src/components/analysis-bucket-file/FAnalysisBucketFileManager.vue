@@ -14,7 +14,8 @@ import { BModal } from 'bootstrap-vue-next';
 import type { PropType } from 'vue';
 import {
     computed,
-    defineComponent, ref, toRef,
+    defineComponent,
+    ref,
 } from 'vue';
 import type { BuildInput } from 'rapiq';
 import { injectCoreHTTPClient, wrapFnWithBusyState } from '../../core';
@@ -34,20 +35,25 @@ export default defineComponent({
             type: Object as PropType<AnalysisBucket>,
             required: true,
         },
-        fileEntity: {
-            type: Object as PropType<AnalysisBucketFile>,
+        readonly: {
+            type: Boolean,
+            default: false,
         },
     },
-    emits: ['created', 'updated', 'deleted', 'uploaded', 'failed', 'setEntrypointFile'],
-    setup(props, { emit }) {
+    emits: ['created', 'updated', 'deleted', 'uploaded', 'failed'],
+    setup(props, { emit, expose }) {
         const coreClient = injectCoreHTTPClient();
-
-        const entrypointFile = toRef(props, 'fileEntity');
 
         const modal = ref(false);
         const toggleModal = () => {
             modal.value = !modal.value;
         };
+
+        const add = () => toggleModal();
+
+        expose({
+            add,
+        });
 
         const selected = ref<string[]>([]);
         const selectAll = ref<boolean>(false);
@@ -61,25 +67,22 @@ export default defineComponent({
             },
         }));
 
-        const updateEntrypointFile = (entity: AnalysisBucketFile) => {
-            if (entity.root) {
-                emit('setEntrypointFile', entity);
+        const updateAll = (entity: AnalysisBucketFile) => {
+            if (!entity.root || !fileListNode.value) return;
 
-                return;
-            }
+            const data = fileListNode.value.data as unknown as AnalysisBucketFile[];
 
-            if (
-                entrypointFile.value &&
-                entrypointFile.value.id === entity.id
-            ) {
-                emit('setEntrypointFile', null);
+            for (let i = 0; i < data.length; i++) {
+                if (data[i].id === entity.id) continue;
+
+                data[i].root = false;
             }
         };
 
         const handleCreated = (entity: AnalysisBucketFile) => {
             emit('created', entity);
 
-            updateEntrypointFile(entity);
+            updateAll(entity);
         };
 
         const handleDeleted = (entity: AnalysisBucketFile) => {
@@ -90,13 +93,13 @@ export default defineComponent({
 
             emit('deleted', entity);
 
-            updateEntrypointFile(entity);
+            updateAll(entity);
         };
 
         const handleUpdated = (entity: AnalysisBucketFile) => {
             emit('updated', entity);
 
-            updateEntrypointFile(entity);
+            updateAll(entity);
         };
 
         const handleFailed = (e: Error) => {
@@ -175,39 +178,25 @@ export default defineComponent({
 
             modal,
             toggleModal,
-
-            entrypointFile,
         };
     },
 });
 </script>
 <template>
-    <div class="d-flex flex-column gap-1">
-        <div>
-            <slot
-                name="header"
-                :add="toggleModal"
-            >
-                <button
-                    type="button"
-                    class="btn btn-primary btn-block"
-                    @click.prevent="toggleModal"
-                >
-                    <i class="fa fa-upload" /> Upload
-                </button>
-            </slot>
-        </div>
-        <div>
-            <div class="form-check">
-                <input
-                    id="selectAllFiles"
-                    v-model="selectAll"
-                    type="checkbox"
-                    class="form-check-input"
-                    @change="selectAllFiles"
-                >
-                <label for="selectAllFiles">Select all</label>
-            </div>
+    <div>
+        <div class="d-flex flex-column gap-1">
+            <template v-if="!readonly">
+                <div class="form-check mb-0">
+                    <input
+                        id="selectAllFiles"
+                        v-model="selectAll"
+                        type="checkbox"
+                        class="form-check-input"
+                        @change="selectAllFiles"
+                    >
+                    <label for="selectAllFiles">Select all</label>
+                </div>
+            </template>
 
             <FAnalysisBucketFiles
                 ref="fileListNode"
@@ -220,16 +209,22 @@ export default defineComponent({
                 @deleted="handleDeleted"
             >
                 <template #noMore>
-                    <p class="mb-2">
-                        No files are selected for the analysis yet.
-                    </p>
-                    <button
-                        type="button"
-                        class="btn btn-xs btn-dark"
-                        @click.prevent="toggleModal"
-                    >
-                        <i class="fa fa-add" /> Add
-                    </button>
+                    <div class="d-flex flex-column gap-1">
+                        <div>
+                            No files available in analysis {{ entity.type.toLowerCase() }} bucket.
+                        </div>
+                        <template v-if="!readonly">
+                            <div>
+                                <button
+                                    type="button"
+                                    class="btn btn-xs btn-dark"
+                                    @click.prevent="toggleModal"
+                                >
+                                    <i class="fa fa-add" /> Add
+                                </button>
+                            </div>
+                        </template>
+                    </div>
                 </template>
                 <template #body="props">
                     <div class="d-flex flex-column">
@@ -238,28 +233,38 @@ export default defineComponent({
                             :key="file.id"
                         >
                             <FAnalysisFile
+                                :readonly="readonly"
                                 class="me-1"
                                 :entity="file"
                                 :files-selected="selected"
                                 @check="toggleFile"
                                 @updated="props.updated"
                                 @deleted="props.deleted"
-                            />
+                            >
+                                <template #actions="actionProps">
+                                    <slot
+                                        name="itemActions"
+                                        v-bind="actionProps"
+                                    />
+                                </template>
+                            </FAnalysisFile>
                         </template>
                     </div>
                 </template>
             </FAnalysisBucketFiles>
 
-            <div class="form-group">
-                <button
-                    type="button"
-                    class="btn btn-warning btn-xs"
-                    :disabled="busy || selected.length === 0"
-                    @click.prevent="dropSelected"
-                >
-                    <i class="fa fa-trash" /> Delete
-                </button>
-            </div>
+            <template v-if="!readonly">
+                <div>
+                    <button
+                        type="button"
+                        class="btn btn-warning btn-xs"
+                        :disabled="busy || selected.length === 0"
+                        @click.prevent="dropSelected"
+                    >
+                        <i class="fa fa-trash" /> Delete
+                    </button>
+                </div>
+            </template>
         </div>
         <div>
             <BModal

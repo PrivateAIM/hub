@@ -16,12 +16,12 @@ import type { PropType } from 'vue';
 import {
     computed,
     defineComponent,
-    ref,
-    watch,
 } from 'vue';
 import { createEntityManager, defineEntityManagerEvents, injectStorageHTTPClient } from '../../core';
+import { FAnalysisBucketFileDownload } from './FAnalysisBucketFileDownload';
 
 export default defineComponent({
+    components: { FAnalysisBucketFileDownload },
     props: {
         entity: {
             type: Object as PropType<AnalysisBucketFile>,
@@ -30,6 +30,10 @@ export default defineComponent({
         filesSelected: {
             type: Array,
             required: true,
+        },
+        readonly: {
+            type: Boolean,
+            default: false,
         },
     },
     emits: {
@@ -54,28 +58,7 @@ export default defineComponent({
             return props.filesSelected.findIndex((file) => manager.data.value && file === manager.data.value.id) !== -1;
         });
 
-        const isMatchRaw = computed(() => manager.data.value && manager.data.value.root);
-        const isMatch = ref(false);
-
-        watch(isMatchRaw, (val) => {
-            isMatch.value = val;
-        });
-
-        if (manager.data.value) {
-            isMatch.value = manager.data.value.root;
-        }
-
-        const toggle = async () => {
-            if (manager.busy.value || !manager.data.value) {
-                return;
-            }
-
-            await manager.update({
-                root: !isMatch.value,
-            });
-        };
-
-        const markToggle = () => {
+        const mark = () => {
             setup.emit('check', manager.data.value);
         };
 
@@ -99,13 +82,17 @@ export default defineComponent({
             await manager.delete();
         };
 
+        const update = async (entity: Partial<AnalysisBucketFile>) => {
+            await manager.update(entity);
+        };
+
         return {
             drop,
             marked,
-            markToggle,
-            isMatch,
-            toggle,
+            mark,
             busy: manager.busy,
+
+            update,
         };
     },
 });
@@ -117,42 +104,39 @@ export default defineComponent({
     >
         <div
             class="card-heading align-items-center d-flex flex-row"
-            @click.prevent="markToggle"
+            @click.prevent="mark"
         >
             <span class="title">
                 {{ entity.name }}
             </span>
         </div>
-        <div class="ms-auto d-flex flex-row me-1">
-            <div>
-                <button
-                    type="button"
-                    class="btn btn-xs"
-                    :disabled="busy"
-                    :class="{
-                        'btn-success': !isMatch,
-                        'btn-warning': isMatch
-                    }"
-                    @click.prevent="toggle"
-                >
-                    <i
-                        :class="{
-                            'fa fa-check': !isMatch,
-                            'fa fa-times': isMatch
-                        }"
+        <div class="ms-auto d-flex flex-row gap-2">
+            <slot
+                name="actions"
+                v-bind="{ data: entity, update }"
+            >
+                <div>
+                    <FAnalysisBucketFileDownload
+                        :with-text="false"
+                        :with-icon="true"
+                        :entity="entity"
                     />
-                </button>
-            </div>
-            <div class="ms-1">
-                <button
-                    type="button"
-                    class="btn btn-danger btn-xs"
-                    :disabled="busy"
-                    @click.prevent="drop"
-                >
-                    <i class="fa fa-trash" />
-                </button>
-            </div>
+                </div>
+                <template v-if="!readonly">
+                    <div>
+                        <button
+                            v-b-tooltip.hover.top
+                            title="Delete"
+                            type="button"
+                            class="btn btn-danger btn-xs"
+                            :disabled="busy"
+                            @click.prevent="drop"
+                        >
+                            <i class="fa fa-trash" />
+                        </button>
+                    </div>
+                </template>
+            </slot>
         </div>
     </div>
 </template>

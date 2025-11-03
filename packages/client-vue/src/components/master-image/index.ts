@@ -6,6 +6,6 @@
  */
 
 export { FMasterImage } from './FMasterImage';
-export { default as MasterImageList } from './FMasterImages';
-export { default as MasterImagePicker } from './FMasterImagePicker';
-export { default as MasterImagesSync } from './FMasterImagesSync';
+export { default as FMasterImages } from './FMasterImages';
+export { default as FMasterImagePicker } from './FMasterImagePicker.vue';
+export { default as FMasterImagesSync } from './FMasterImagesSync';

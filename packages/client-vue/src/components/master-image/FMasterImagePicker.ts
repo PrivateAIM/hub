@@ -31,6 +31,10 @@ export default defineComponent({
         entity: {
             type: Object as PropType<MasterImage>,
         },
+        readonly: {
+            type: Boolean,
+            default: false,
+        },
     },
     emits: ['selected', 'resolved'],
     async setup(props, { emit }) {
@@ -98,6 +102,8 @@ export default defineComponent({
             if (entityId.value) {
                 form.master_image_id = entityId.value;
             }
+
+            emit('resolved', masterImageEntity.value);
         };
 
         watch(entityId, (val, oldValue) => {
@@ -149,6 +155,7 @@ export default defineComponent({
             }
 
             emit('selected', null);
+            emit('resolved', entity);
         };
 
         const buildMasterImageVNode = () : VNodeArrayChildren => {
@@ -164,8 +171,8 @@ export default defineComponent({
                         ref: itemListNode,
                         query: imageQuery.value,
                     }, {
-                        [EntityListSlotName.BODY]: (props: ListBodySlotProps<MasterImage>) => {
-                            const options: FormSelectOption[] = props.data.map((entity) => ({
+                        [EntityListSlotName.BODY]: (bodyProps: ListBodySlotProps<MasterImage>) => {
+                            const options: FormSelectOption[] = bodyProps.data.map((entity) => ({
                                 id: entity.id,
                                 value: entity.name,
                             }));
@@ -184,11 +191,14 @@ export default defineComponent({
                                         h(''),
                                 ],
                                 content: buildFormSelect({
+                                    props: {
+                                        disabled: props.readonly,
+                                    },
                                     value: form.master_image_id,
                                     onChange(input) {
-                                        const index = props.data.findIndex((el) => el.id === input);
+                                        const index = bodyProps.data.findIndex((el) => el.id === input);
                                         if (index !== -1) {
-                                            selectImage(props.data[index]);
+                                            selectImage(bodyProps.data[index]);
                                             return;
                                         }
 
@@ -212,8 +222,8 @@ export default defineComponent({
                     { class: 'col' },
                     [
                         h(MasterImageGroupList, { }, {
-                            [EntityListSlotName.BODY]: (props: ListBodySlotProps<MasterImageGroup>) => {
-                                const options : FormSelectOption[] = props.data.map((entity) => ({
+                            [EntityListSlotName.BODY]: (bodyProps: ListBodySlotProps<MasterImageGroup>) => {
+                                const options : FormSelectOption[] = bodyProps.data.map((entity) => ({
                                     id: entity.virtual_path,
                                     value: entity.virtual_path,
                                 }));
@@ -229,11 +239,14 @@ export default defineComponent({
                                             h(''),
                                     ],
                                     content: buildFormSelect({
+                                        props: {
+                                            disabled: props.readonly,
+                                        },
                                         value: form.group_virtual_path,
                                         onChange(input) {
-                                            const index = props.data.findIndex((el) => el.virtual_path === input);
+                                            const index = bodyProps.data.findIndex((el) => el.virtual_path === input);
                                             if (index > -1) {
-                                                selectGroup(props.data[index]);
+                                                selectGroup(bodyProps.data[index]);
                                                 return;
                                             }
 

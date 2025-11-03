@@ -55,6 +55,7 @@
     margin: 0;
     border: 0;
     background-color: inherit;
+    max-width: 100%;
 }
 
 .log-container .log-header {
@@ -86,6 +87,8 @@
 
     line-height: 1.3rem;
     font-size: .875rem;
+
+    text-align: left;
 }
 
 .log-body .line-status-message {
@@ -111,7 +114,6 @@
 }
 
 .log-body .line-content {
-    overflow-x: auto;
     display: inline-block;
     width: 100%;
     margin-right: 1rem;

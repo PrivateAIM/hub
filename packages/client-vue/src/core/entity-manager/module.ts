@@ -38,7 +38,7 @@ export function createEntityManager<
         domainAPI = client[ctx.type] as any;
     }
 
-    const entity : Ref<RECORD | undefined> = ref(undefined);
+    const entity : Ref<RECORD | null> = ref(null);
     const entityId = computed<DomainEntityID<RECORD> | undefined>(
         () => (
             entity.value ? (entity.value as any).id : undefined),
@@ -145,9 +145,12 @@ export function createEntityManager<
                 data,
             );
 
-            entity.value = response;
+            entity.value = {
+                ...data,
+                ...response,
+            };
 
-            updated(response);
+            updated(entity.value as RECORD);
         } catch (e) {
             if (e instanceof Error) {
                 failed(e);
@@ -248,9 +251,82 @@ export function createEntityManager<
 
     const error = ref<Error | undefined>(undefined);
 
-    const resolveByProps = () : boolean => {
+    const resolveByRest = async (
+        resolveCtx: EntityManagerResolveContext<RECORD> = {},
+    ) : Promise<RECORD | null> => {
+        if (entity.value && !resolveCtx.reset) {
+            resolved(entity.value);
+            return null;
+        }
+
+        entity.value = null;
+
+        if (!domainAPI) {
+            resolved();
+
+            return null;
+        }
+
+        if (resolveCtx.id) {
+            try {
+                entity.value = await domainAPI.getOne(resolveCtx.id, resolveCtx.query as BuildInput<any>);
+
+                if (socket) {
+                    socket.subscribe();
+                }
+
+                resolved(entity.value);
+
+                return entity.value;
+            } catch (e) {
+                if (e instanceof Error) {
+                    error.value = e;
+                }
+            }
+        }
+
+        if (resolveCtx.query) {
+            try {
+                const response = await domainAPI.getMany({
+                    ...resolveCtx.query as BuildInput<any>,
+                    pagination: {
+                        limit: 1,
+                    },
+                } as any);
+
+                if (response.data.length === 1) {
+                    [entity.value] = response.data;
+
+                    if (socket) {
+                        socket.subscribe();
+                    }
+                }
+
+                resolved(entity.value as RECORD);
+
+                return entity.value;
+            } catch (e) {
+                if (e instanceof Error) {
+                    error.value = e;
+                }
+            }
+        }
+
+        return null;
+    };
+    const resolveByProps = (
+        resolveCtx: EntityManagerResolveContext<RECORD> = {},
+    ) : RECORD | null => {
+        if (entity.value && !resolveCtx.reset) {
+            resolved(entity.value);
+
+            return entity.value;
+        }
+
+        entity.value = null;
+
         if (!ctx.props) {
-            return false;
+            return null;
         }
 
         if (ctx.props.entity) {
@@ -262,10 +338,10 @@ export function createEntityManager<
 
             resolved(entity.value);
 
-            return true;
+            return entity.value;
         }
 
-        return false;
+        return null;
     };
 
     if (ctx.props) {
@@ -286,10 +362,16 @@ export function createEntityManager<
 
     resolveByProps();
 
-    const resolve = async (resolveCtx: EntityManagerResolveContext<RECORD> = {}) => {
+    const resolve = async (
+        resolveCtx: EntityManagerResolveContext<RECORD> = {},
+    ): Promise<RECORD | null> => {
         if (entity.value && !resolveCtx.reset) {
-            return;
+            resolved(entity.value);
+
+            return entity.value;
         }
+
+        entity.value = null;
 
         let query : (RECORD extends Record<string, any> ? BuildInput<RECORD> : never) | undefined;
         if (resolveCtx.query) {
@@ -299,20 +381,9 @@ export function createEntityManager<
         let { id } = resolveCtx;
 
         if (ctx.props) {
-            if (resolveByProps()) {
-                return;
-            }
-
-            if (ctx.props.entity) {
-                entity.value = ctx.props.entity;
-
-                if (socket) {
-                    socket.subscribe();
-                }
-
-                resolved(entity.value);
-
-                return;
+            const propsResult = resolveByProps(resolveCtx);
+            if (propsResult) {
+                return propsResult;
             }
 
             if (
@@ -332,58 +403,16 @@ export function createEntityManager<
             }
         }
 
-        if (!domainAPI) {
-            resolved();
-
-            return;
-        }
-
-        if (id) {
-            try {
-                entity.value = await domainAPI.getOne(id, query as BuildInput<any>);
-
-                if (socket) {
-                    socket.subscribe();
-                }
-
-                resolved(entity.value);
-
-                return;
-            } catch (e) {
-                if (e instanceof Error) {
-                    error.value = e;
-                }
-            }
-        }
-
-        if (query) {
-            try {
-                const response = await domainAPI.getMany({
-                    ...query,
-                    pagination: {
-                        limit: 1,
-                    },
-                } as any);
-
-                if (response.data.length === 1) {
-                    [entity.value] = response.data;
-
-                    if (socket) {
-                        socket.subscribe();
-                    }
-                }
-
-                resolved(entity.value);
-            } catch (e) {
-                if (e instanceof Error) {
-                    error.value = e;
-                }
-            }
-        }
+        return resolveByRest({
+            query,
+            id,
+        });
     };
 
     const manager : EntityManager<RECORD> = {
         resolve,
+        resolveByRest,
+
         lockId,
         busy,
         data: entity,
