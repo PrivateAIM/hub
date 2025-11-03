@@ -15,6 +15,7 @@ export { default as FAnalysisImageCommand } from './FAnalysisImageCommand';
 export { default as FAnalysisImageCommandArguments } from './FAnalysisImageCommandArguments.vue';
 export { default as FAnalyses } from './FAnalyses';
 export { default as FAnalysisCodeFiles } from './FAnalysisCodeFiles.vue';
+export { default as FAnalysisMasterImagePicker } from './FAnalysisMasterImagePicker.vue';
 export { default as FAnalysisName } from './FAnalysisName';
 export { default as FAnalysisStatus } from './status/FAnalysisStatus.vue';
 export { default as FAnalysisProgressBar } from './FAnalysisProgressBar.vue';

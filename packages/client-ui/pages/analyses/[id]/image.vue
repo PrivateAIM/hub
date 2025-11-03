@@ -13,16 +13,16 @@ import {
     FAnalysisCodeFiles,
     FAnalysisImageCommand,
     FAnalysisImageCommandArguments,
-    FMasterImagePicker,
+    FAnalysisMasterImagePicker,
 } from '@privateaim/client-vue';
 
 export default defineComponent({
     components: {
+        FAnalysisMasterImagePicker,
         FAnalysisBucketFileRootToggler,
         FAnalysisCodeFiles,
         FAnalysisImageCommand,
         FAnalysisImageCommandArguments,
-        FMasterImagePicker,
     },
     props: {
         entity: {
@@ -30,13 +30,23 @@ export default defineComponent({
         },
     },
     emits: ['updated'],
-    setup() {
+    setup(_props, { emit }) {
         const lastRootFileId = ref<string | null>(null);
         const lastMasterImage = ref<MasterImage | null>(null);
 
         const imageCommand = useTemplateRef<typeof FAnalysisImageCommand>('imageCommand');
 
+        const handleUpdated = (entity: Analysis) => {
+            if (entity.master_image) {
+                lastMasterImage.value = entity.master_image;
+            }
+
+            emit('updated', entity);
+        };
+
         const handleMasterImageResolved = (entity: MasterImage | null) => {
+            console.log(entity);
+
             lastMasterImage.value = entity;
         };
         const handleMasterImageToggled = (entity: MasterImage | null) => {
@@ -66,6 +76,8 @@ export default defineComponent({
         };
 
         return {
+            handleUpdated,
+
             handleMasterImageResolved,
             handleMasterImageToggled,
 
@@ -102,11 +114,11 @@ export default defineComponent({
                             Your uploaded code will be embedded into this image before distribution.
                         </div>
                     </div>
-                    <FMasterImagePicker
+                    <FAnalysisMasterImagePicker
                         :readonly="entity.configuration_locked"
-                        :entity-id="entity.master_image_id"
-                        @selected="handleMasterImageToggled"
-                        @resolved="handleMasterImageResolved"
+                        :entity-id="entity.id"
+                        :entity="entity"
+                        @updated="handleUpdated"
                     />
                 </div>
             </div>
@@ -115,7 +127,6 @@ export default defineComponent({
                     <span class="title"><i class="fa fa-keyboard" /> Command-Arguments</span>
                 </div>
                 <div class="card-body">
-                    {{ lastMasterImage }}
                     <FAnalysisImageCommandArguments
                         :master-image-entity="lastMasterImage"
                         :readonly="entity.configuration_locked"

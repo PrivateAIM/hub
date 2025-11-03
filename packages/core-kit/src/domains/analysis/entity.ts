@@ -68,6 +68,10 @@ export interface Analysis {
      */
     run_status: AnalysisRunStatus | null;
 
+    /**
+     * todo: add execution_progress
+     */
+
     // ------------------------------------------------------------------
 
     created_at: Date;

@@ -38,7 +38,7 @@ export function createEntityManager<
         domainAPI = client[ctx.type] as any;
     }
 
-    const entity : Ref<RECORD | undefined> = ref(undefined);
+    const entity : Ref<RECORD | null> = ref(null);
     const entityId = computed<DomainEntityID<RECORD> | undefined>(
         () => (
             entity.value ? (entity.value as any).id : undefined),
@@ -145,9 +145,12 @@ export function createEntityManager<
                 data,
             );
 
-            entity.value = response;
+            entity.value = {
+                ...data,
+                ...response,
+            };
 
-            updated(response);
+            updated(entity.value as RECORD);
         } catch (e) {
             if (e instanceof Error) {
                 failed(e);
@@ -251,6 +254,13 @@ export function createEntityManager<
     const resolveByRest = async (
         resolveCtx: EntityManagerResolveContext<RECORD> = {},
     ) : Promise<RECORD | null> => {
+        if (entity.value && !resolveCtx.reset) {
+            resolved(entity.value);
+            return null;
+        }
+
+        entity.value = null;
+
         if (!domainAPI) {
             resolved();
 
@@ -292,7 +302,7 @@ export function createEntityManager<
                     }
                 }
 
-                resolved(entity.value);
+                resolved(entity.value as RECORD);
 
                 return entity.value;
             } catch (e) {
@@ -304,7 +314,17 @@ export function createEntityManager<
 
         return null;
     };
-    const resolveByProps = () : RECORD | null => {
+    const resolveByProps = (
+        resolveCtx: EntityManagerResolveContext<RECORD> = {},
+    ) : RECORD | null => {
+        if (entity.value && !resolveCtx.reset) {
+            resolved(entity.value);
+
+            return entity.value;
+        }
+
+        entity.value = null;
+
         if (!ctx.props) {
             return null;
         }
@@ -346,8 +366,12 @@ export function createEntityManager<
         resolveCtx: EntityManagerResolveContext<RECORD> = {},
     ): Promise<RECORD | null> => {
         if (entity.value && !resolveCtx.reset) {
-            return null;
+            resolved(entity.value);
+
+            return entity.value;
         }
+
+        entity.value = null;
 
         let query : (RECORD extends Record<string, any> ? BuildInput<RECORD> : never) | undefined;
         if (resolveCtx.query) {
@@ -357,7 +381,7 @@ export function createEntityManager<
         let { id } = resolveCtx;
 
         if (ctx.props) {
-            const propsResult = resolveByProps();
+            const propsResult = resolveByProps(resolveCtx);
             if (propsResult) {
                 return propsResult;
             }

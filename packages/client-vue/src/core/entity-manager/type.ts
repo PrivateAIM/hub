@@ -24,7 +24,7 @@ type EntityID<T> = T extends EntityWithID ?
 export type EntityManagerRenderFn = () => VNodeChild;
 
 export type EntityManagerResolveContext<T> = {
-    id?: EntityID<T>,
+    id?: EntityID<T> | null,
     reset?: boolean,
     query?: T extends Record<string, any> ? BuildInput<T> : never
 };

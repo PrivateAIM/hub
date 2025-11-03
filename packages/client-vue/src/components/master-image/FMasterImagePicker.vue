@@ -11,7 +11,7 @@ import { DomainType } from '@privateaim/core-kit';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import {
-    type PropType, computed, defineComponent, nextTick, reactive, toRef, useTemplateRef, watch,
+    type PropType, computed, defineComponent, nextTick, reactive, ref, toRef, useTemplateRef, watch,
 } from 'vue';
 import { IVuelidate } from '@ilingo/vuelidate';
 import FMasterImageGroups from '../master-image-group/FMasterImageGroups';
@@ -21,7 +21,6 @@ import { createEntityManager, defineEntityManagerEvents } from '../../core';
 export default defineComponent({
     components: { FMasterImages, FMasterImageGroups, IVuelidate },
     props: {
-
         entityId: {
             type: String,
         },
@@ -35,8 +34,6 @@ export default defineComponent({
     },
     emits: {
         ...defineEntityManagerEvents<MasterImage>(),
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        selected: (_entity: MasterImage | null) => true,
     },
     setup(props, setup) {
         const entityId = toRef(props, 'entityId');
@@ -47,8 +44,20 @@ export default defineComponent({
             master_image_id: '',
         });
 
+        const imageQuery = computed(() => ({
+            filters: {
+                ...(form.group_virtual_path !== '' ? {
+                    group_virtual_path: form.group_virtual_path,
+                } : {}),
+            },
+        }));
+
+        const resolved = ref(false);
+
         const manager = createEntityManager({
             type: DomainType.MASTER_IMAGE,
+            props,
+            setup,
             onResolved: (entity) => {
                 if (entity) {
                     form.group_virtual_path = entity.group_virtual_path;
@@ -57,8 +66,18 @@ export default defineComponent({
                     form.group_virtual_path = '';
                     form.master_image_id = '';
                 }
+
+                resolved.value = true;
             },
         });
+
+        if (props.entityId) {
+            form.master_image_id = props.entityId;
+        }
+
+        if (props.entity) {
+            form.master_image_id = props.entity.id;
+        }
 
         Promise.resolve()
             .then(() => manager.resolve());
@@ -77,17 +96,19 @@ export default defineComponent({
         const isVirtualGroupPathDefined = computed(() => !!form.group_virtual_path &&
             form.group_virtual_path.length > 0);
 
-        const imageQuery = computed(() => ({
-            filters: {
-                ...(form.group_virtual_path !== '' ? {
-                    group_virtual_path: form.group_virtual_path,
-                } : {}),
-            },
-        }));
-
         watch(entityId, (val, oldValue) => {
             if (val && val !== oldValue) {
                 manager.resolveByRest({ id: val, reset: true });
+            }
+        });
+
+        watch(imageQuery, (val, oldValue) => {
+            if (val && val !== oldValue) {
+                nextTick(async () => {
+                    if (vMasterImages.value) {
+                        await vMasterImages.value.load();
+                    }
+                });
             }
         });
 
@@ -95,25 +116,17 @@ export default defineComponent({
             if (!input) {
                 form.master_image_id = '';
                 form.group_virtual_path = '';
-
-                setup.emit('selected', null); // todo: check
                 return;
             }
             form.group_virtual_path = input;
 
             form.master_image_id = '';
-
-            nextTick(async () => {
-                if (vMasterImages.value) {
-                    await vMasterImages.value.load();
-                }
-            });
         };
 
         const selectImage = (id: string | null) => {
             manager.data.value = null;
 
-            manager.resolve({ reset: true, id });
+            manager.resolveByRest({ reset: true, id });
         };
 
         return {
@@ -127,6 +140,9 @@ export default defineComponent({
             v$,
 
             busy: manager.busy,
+            data: manager.data,
+
+            resolved,
         };
     },
 });
@@ -170,6 +186,7 @@ export default defineComponent({
         </div>
         <div class="col">
             <FMasterImages
+                v-if="resolved"
                 ref="masterImages"
                 :query="imageQuery"
             >
@@ -182,7 +199,6 @@ export default defineComponent({
                             >
                                 <template #label>
                                     Image
-
                                     <template v-if="v$.master_image_id.$model">
                                         <i class="fa fa-check text-success" />
                                     </template>
