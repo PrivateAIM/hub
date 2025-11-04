@@ -12,9 +12,8 @@ import type {
     BuilderBasePayload,
 } from '@privateaim/server-core-worker-kit';
 import {
-
-    AnalysisBuildStatus,
-} from '@privateaim/core-kit';
+    ProcessStatus,
+} from '@privateaim/kit';
 import { useDataSource } from 'typeorm-extension';
 import { AnalysisEntity } from '../../../database';
 
@@ -38,20 +37,20 @@ export async function handleAnalysisManagerBuilderBaseEvent(
             break;
         }
         case BuilderEvent.BUILDING: {
-            entity.build_status = AnalysisBuildStatus.STARTED;
+            entity.build_status = ProcessStatus.STARTED;
             break;
         }
         case BuilderEvent.BUILD_FAILED:
         case BuilderEvent.CHECK_FAILED:
         case BuilderEvent.PUSH_FAILED: {
             if (event !== BuilderEvent.CHECK_FAILED) {
-                entity.build_status = AnalysisBuildStatus.FAILED;
+                entity.build_status = ProcessStatus.FAILED;
             }
 
             break;
         }
         case BuilderEvent.PUSHED:
-            entity.build_status = AnalysisBuildStatus.FINISHED;
+            entity.build_status = ProcessStatus.FINISHED;
             break;
     }
 

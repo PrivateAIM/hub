@@ -5,33 +5,33 @@
   -  view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { AnalysisBuildStatus } from '@privateaim/core-kit';
+import { ProcessStatus } from '@privateaim/kit';
 import type { PropType } from 'vue';
 import { computed, defineComponent } from 'vue';
 
 export default defineComponent({
     props: {
         status: {
-            type: String as PropType<`${AnalysisBuildStatus}`>,
+            type: String as PropType<`${ProcessStatus}`>,
             default: null,
         },
     },
     setup(props) {
         const statusText = computed(() => {
             switch (props.status) {
-                case AnalysisBuildStatus.STARTING:
+                case ProcessStatus.STARTING:
                     return 'starting...';
-                case AnalysisBuildStatus.STOPPING:
+                case ProcessStatus.STOPPING:
                     return 'stopping...';
 
-                case AnalysisBuildStatus.STARTED:
+                case ProcessStatus.STARTED:
                     return 'started';
-                case AnalysisBuildStatus.STOPPED:
+                case ProcessStatus.STOPPED:
                     return 'stopped';
 
-                case AnalysisBuildStatus.FINISHED:
+                case ProcessStatus.FINISHED:
                     return 'finished';
-                case AnalysisBuildStatus.FAILED:
+                case ProcessStatus.FAILED:
                     return 'failed';
                 default:
                     return 'none';
@@ -40,15 +40,15 @@ export default defineComponent({
 
         const classSuffix = computed(() => {
             switch (props.status) {
-                case AnalysisBuildStatus.STARTING:
-                case AnalysisBuildStatus.STARTED:
-                case AnalysisBuildStatus.STOPPED:
+                case ProcessStatus.STARTING:
+                case ProcessStatus.STARTED:
+                case ProcessStatus.STOPPED:
                     return 'primary';
-                case AnalysisBuildStatus.FINISHED:
+                case ProcessStatus.FINISHED:
                     return 'success';
-                case AnalysisBuildStatus.STOPPING:
+                case ProcessStatus.STOPPING:
                     return 'warning';
-                case AnalysisBuildStatus.FAILED:
+                case ProcessStatus.FAILED:
                     return 'danger';
                 default:
                     return 'info';
@@ -57,14 +57,14 @@ export default defineComponent({
 
         const iconClass = computed(() => {
             switch (props.status) {
-                case AnalysisBuildStatus.STARTING:
-                case AnalysisBuildStatus.STARTED:
-                case AnalysisBuildStatus.STOPPING:
+                case ProcessStatus.STARTING:
+                case ProcessStatus.STARTED:
+                case ProcessStatus.STOPPING:
                     return 'fa fa-rotate fa-spin';
-                case AnalysisBuildStatus.FINISHED:
+                case ProcessStatus.FINISHED:
                     return 'fa fa-check';
-                case AnalysisBuildStatus.FAILED:
-                case AnalysisBuildStatus.STOPPED:
+                case ProcessStatus.FAILED:
+                case ProcessStatus.STOPPED:
                     return 'fa fa-times';
                 default:
                     return 'fa fa-circle';

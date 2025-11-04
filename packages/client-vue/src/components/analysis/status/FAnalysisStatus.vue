@@ -6,13 +6,6 @@
   -->
 <script lang="ts">
 import type { Analysis } from '@privateaim/core-kit';
-import {
-    AnalysisAPICommand,
-    AnalysisBuildStatus,
-    AnalysisConfigurationStatus,
-    AnalysisResultStatus,
-    AnalysisRunStatus,
-} from '@privateaim/core-kit';
 import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
 import FAnalysisBuildStatus from './FAnalysisBuildStatus.vue';
@@ -52,14 +45,6 @@ export default defineComponent({
         };
 
         return {
-            trainBuildStatus: AnalysisBuildStatus,
-            trainConfigurationStatus: AnalysisConfigurationStatus,
-            trainRunStatus: AnalysisRunStatus,
-            trainResultStatus: AnalysisResultStatus,
-            trainCommand: AnalysisAPICommand,
-
-            busy: false,
-
             handleUpdated,
             handleFailed,
             handleExecuted,

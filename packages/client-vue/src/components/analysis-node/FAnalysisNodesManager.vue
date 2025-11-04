@@ -7,10 +7,6 @@
 <script lang="ts">
 import { isClientErrorWithStatusCode } from '@privateaim/core-http-kit';
 import type { Analysis, AnalysisNode } from '@privateaim/core-kit';
-import {
-    AnalysisNodeRunStatus,
-    AnalysisRunStatus,
-} from '@privateaim/core-kit';
 import { BModal } from 'bootstrap-vue-next';
 import type { BuildInput } from 'rapiq';
 import type { PropType } from 'vue';
@@ -129,8 +125,6 @@ export default defineComponent({
 
             modal,
             vNodesQuery,
-            analysisRunStatus: AnalysisRunStatus,
-            analysisNodeRunStatus: AnalysisNodeRunStatus,
 
             drop,
 
