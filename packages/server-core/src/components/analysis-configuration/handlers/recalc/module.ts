@@ -40,14 +40,16 @@ AnalysisConfigurationRecalcPayload> {
             id: value.analysisId,
         });
 
-        await this.setConfigurationEntrypointStatus(entity);
-        await this.setConfigurationImageStatus(entity);
-        await this.setConfigurationNodesStatus(entity);
+        const entrypointStatusChanged = await this.setConfigurationEntrypointStatus(entity);
+        const imageStatusChanged = await this.setConfigurationImageStatus(entity);
+        const nodesChanged = await this.setConfigurationNodesStatus(entity);
 
-        await this.analysisRepository.save(entity);
+        if (entrypointStatusChanged || imageStatusChanged || nodesChanged) {
+            await this.analysisRepository.save(entity);
+        }
     }
 
-    async setConfigurationEntrypointStatus(entity: AnalysisEntity) : Promise<void> {
+    async setConfigurationEntrypointStatus(entity: AnalysisEntity) : Promise<boolean> {
         const rootFile = await this.analysisBucketFileRepository.findOne({
             where: {
                 analysis_id: entity.id,
@@ -59,14 +61,24 @@ AnalysisConfigurationRecalcPayload> {
             relations: ['bucket'],
         });
 
-        entity.configuration_entrypoint_valid = !!rootFile;
+        if (this.hasChanged(entity.configuration_entrypoint_valid, !!rootFile)) {
+            entity.configuration_entrypoint_valid = !!rootFile;
+            return true;
+        }
+
+        return false;
     }
 
-    async setConfigurationImageStatus(entity: AnalysisEntity) : Promise<void> {
-        entity.configuration_image_valid = !!entity.master_image_id;
+    async setConfigurationImageStatus(entity: AnalysisEntity) : Promise<boolean> {
+        if (this.hasChanged(entity.configuration_image_valid, !!entity.master_image_id)) {
+            entity.configuration_image_valid = !!entity.master_image_id;
+            return true;
+        }
+
+        return false;
     }
 
-    async setConfigurationNodesStatus(entity: AnalysisEntity) : Promise<void> {
+    async setConfigurationNodesStatus(entity: AnalysisEntity) : Promise<boolean> {
         const analysisNodes = await this.analysisNodesRepository.find({
             where: {
                 analysis_id: entity.id,
@@ -100,8 +112,28 @@ AnalysisConfigurationRecalcPayload> {
             }
         }
 
-        entity.configuration_node_aggregator_valid = hasAggregator;
-        entity.configuration_node_default_valid = hasDefault;
-        entity.configuration_nodes_valid = hasAggregator && hasDefault;
+        let hasAggregatorChanged = false;
+        if (this.hasChanged(entity.configuration_node_aggregator_valid, hasAggregator)) {
+            entity.configuration_node_aggregator_valid = hasAggregator;
+            hasAggregatorChanged = true;
+        }
+
+        let hasDefaultChanged = false;
+        if (this.hasChanged(entity.configuration_node_default_valid, hasDefault)) {
+            entity.configuration_node_default_valid = hasDefault;
+            hasDefaultChanged = true;
+        }
+
+        if (hasAggregatorChanged || hasDefaultChanged) {
+            entity.configuration_nodes_valid = entity.configuration_node_aggregator_valid &&
+            entity.configuration_node_default_valid;
+        }
+
+        return hasAggregatorChanged || hasDefaultChanged;
+    }
+
+    private hasChanged(a: unknown, b: unknown) {
+        return a !== b;
+        // todo: deep object equality check
     }
 }
