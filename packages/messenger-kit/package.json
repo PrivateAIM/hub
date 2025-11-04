@@ -1,6 +1,6 @@
 {
     "name": "@privateaim/messenger-kit",
-    "version": "0.7.21",
+    "version": "0.7.22",
     "license": "Apache-2.0",
     "description": "",
     "exports": {
@@ -33,10 +33,10 @@
         "zod": "^4.1.12"
     },
     "devDependencies": {
-        "@privateaim/core-kit": "^0.8.20"
+        "@privateaim/core-kit": "^0.8.21"
     },
     "peerDependencies": {
-        "@privateaim/core-kit": "^0.8.20"
+        "@privateaim/core-kit": "^0.8.21"
     },
     "publishConfig": {
         "access": "public"

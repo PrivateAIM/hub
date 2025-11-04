@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.8.21](https://github.com/PrivateAIM/hub/compare/v0.8.20...v0.8.21) (2025-11-04)
+
+
+### Features
+
+* redesign analysis view and configuration ([#1254](https://github.com/PrivateAIM/hub/issues/1254)) ([b06fb94](https://github.com/PrivateAIM/hub/commit/b06fb945739afd1a82c1afc77ef493c318f243ac))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/client-vue bumped from ^0.8.20 to ^0.8.21
+    * @privateaim/core-kit bumped from ^0.8.20 to ^0.8.21
+    * @privateaim/kit bumped from ^0.8.20 to ^0.8.21
+    * @privateaim/storage-kit bumped from ^0.8.20 to ^0.8.21
+    * @privateaim/telemetry-kit bumped from ^0.8.20 to ^0.8.21
+
 ## [0.8.20](https://github.com/PrivateAIM/hub/compare/v0.8.19...v0.8.20) (2025-10-29)
 
 

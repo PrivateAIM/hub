@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.8.21](https://github.com/PrivateAIM/hub/compare/v0.8.20...v0.8.21) (2025-11-04)
+
+
+### Features
+
+* clean event entities in batches ([a4ea62d](https://github.com/PrivateAIM/hub/commit/a4ea62d81ffad5b0c862ce8407ce9e5360375615))
+* redesign analysis view and configuration ([#1254](https://github.com/PrivateAIM/hub/issues/1254)) ([b06fb94](https://github.com/PrivateAIM/hub/commit/b06fb945739afd1a82c1afc77ef493c318f243ac))
+
+
+### Bug Fixes
+
+* remove distinct on clumn in event reader ([556354d](https://github.com/PrivateAIM/hub/commit/556354d407ab49b9466a964361a0428724773607))
+
 ## [0.8.20](https://github.com/PrivateAIM/hub/compare/v0.8.19...v0.8.20) (2025-10-29)
 
 
