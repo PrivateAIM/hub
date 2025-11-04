@@ -6,6 +6,7 @@
  */
 
 import type { ComponentHandler } from '@privateaim/server-kit';
+import { useLogger } from '@privateaim/server-kit';
 import cron from 'node-cron';
 import { LessThan } from 'typeorm';
 import { useDataSource } from 'typeorm-extension';
@@ -15,7 +16,7 @@ import { EventEntity } from '../../../../database';
 export class EventComponentCleanerHandler implements ComponentHandler<
 EventCommand.CLEAN
 > {
-    async setup() : Promise<void> {
+    async initialize() : Promise<void> {
         await this.handle();
 
         cron.schedule('0 1 * * *', async () => {
@@ -29,14 +30,33 @@ EventCommand.CLEAN
 
         const isoDate = new Date().toISOString();
 
-        const entities = await repository.find({
-            where: {
-                expiring: true,
-                expires_at: LessThan(isoDate),
-            },
-        });
+        useLogger().info(`Removing expired event entities before ${isoDate}`);
 
-        await repository
-            .remove(entities);
+        const handleBatch = async (
+            limit: number,
+            offset: number = 0,
+        ) : Promise<void> => {
+            const [entities, total] = await repository.findAndCount({
+                where: {
+                    expiring: true,
+                    expires_at: LessThan(isoDate),
+                },
+                take: limit,
+                skip: offset,
+            });
+
+            await repository
+                .remove(entities);
+
+            const currentTotal = limit + offset;
+
+            if (total > currentTotal) {
+                return handleBatch(limit, currentTotal);
+            }
+
+            return Promise.resolve();
+        };
+
+        return handleBatch(100);
     }
 }
