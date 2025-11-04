@@ -14,7 +14,7 @@ import {
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceReadable } from '@privateaim/kit';
 import { useRequestIdentityRealm } from '@privateaim/server-http-kit';
-import { AnalysisNodeEntity, onlyRealmWritableQueryResources } from '../../../../database/domains';
+import { AnalysisNodeEntity, onlyRealmWritableQueryResources } from '../../../../database';
 
 export async function getOneAnalysisNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -61,6 +61,7 @@ export async function getManyAnalysisNodeRouteHandler(req: Request, res: Respons
         filters: {
             allowed: [
                 'execution_status',
+
                 'approval_status',
 
                 'analysis_id',

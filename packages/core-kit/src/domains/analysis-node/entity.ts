@@ -22,6 +22,8 @@ export interface AnalysisNode {
 
     execution_status: ProcessStatus | null;
 
+    execution_progress: number | null;
+
     // ------------------------------------------------------------------
 
     comment: string;
