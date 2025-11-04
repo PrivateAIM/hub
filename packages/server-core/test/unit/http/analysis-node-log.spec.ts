@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { AnalysisNodeRunStatus } from '@privateaim/core-kit';
+import { ProcessStatus } from '@privateaim/kit';
 import type { Analysis, Node } from '@privateaim/core-kit';
 import { LogLevel } from '@privateaim/telemetry-kit';
 import {
@@ -56,7 +56,7 @@ describe('controllers > analysis-node-log', () => {
         await client.analysisNodeLog.create({
             analysis_id: analysis!.id,
             node_id: node!.id,
-            status: AnalysisNodeRunStatus.FAILED,
+            status: ProcessStatus.FAILED,
             level: LogLevel.ERROR,
             message: 'Analysis has been forcefully terminated.',
         });
