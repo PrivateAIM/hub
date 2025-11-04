@@ -40,6 +40,9 @@ export type QueueRouterPayload<
     metadata: QueueRouterPayloadMetadata
 };
 
+export type QueueRouterPayloadMetadataInput = Partial<Pick<QueueRouterPayloadMetadata, 'timestamp'>> &
+Omit<QueueRouterPayloadMetadata, 'timestamp'>;
+
 export type QueueRouterPayloadInput<
     KEY = string,
     VALUE = Record<string, any>,
@@ -47,8 +50,7 @@ export type QueueRouterPayloadInput<
     id?: string,
     type: KEY,
     data?: VALUE,
-    metadata: Partial<Pick<QueueRouterPayloadMetadata, 'timestamp'>> &
-    Omit<QueueRouterPayloadMetadata, 'timestamp'>
+    metadata: QueueRouterPayloadMetadataInput
 };
 
 export type QueueRouterHandler<

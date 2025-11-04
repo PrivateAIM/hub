@@ -7,5 +7,4 @@
 
 export * from './aggregator';
 export * from './component';
-export * from './queue';
 export * from './queue-router';

@@ -7,7 +7,9 @@
 
 import type { ObjectLiteral } from '../../../type';
 import { isComponentHandlerFn } from './check';
-import type { ComponentHandler, ComponentHandlerFn } from './types';
+import type { ComponentHandler, ComponentHandlerFn, ComponentHandlersOptions } from './types';
+import type { ComponentEmitter } from '../emitter';
+import { ComponentVoidEmitter } from '../emitter';
 
 export class ComponentHandlers {
     protected initializing : boolean;
@@ -16,10 +18,13 @@ export class ComponentHandlers {
 
     protected handlers: Record<string, ComponentHandlerFn | ComponentHandler>;
 
-    constructor() {
+    protected emitter : ComponentEmitter;
+
+    constructor(options: ComponentHandlersOptions = {}) {
         this.initializing = false;
         this.initialized = false;
         this.handlers = {};
+        this.emitter = options.emitter || new ComponentVoidEmitter();
     }
 
     mount<K extends string>(key: K, fn: ComponentHandler<K, any> | ComponentHandlerFn<K, any>) {
@@ -66,9 +71,9 @@ export class ComponentHandlers {
         }
 
         if (isComponentHandlerFn(handler)) {
-            await handler(value, { key, metadata });
+            await handler(value, { key, metadata, emitter: this.emitter });
         } else {
-            await handler.handle(value, { key, metadata });
+            await handler.handle(value, { key, metadata, emitter: this.emitter });
         }
     }
 }
