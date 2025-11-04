@@ -21,7 +21,7 @@ import {
     useCoreClient,
     useDocker,
 } from '../../../../core';
-import { BuilderError } from '../../../builder';
+import { BuilderError } from '../../../analysis-builder';
 import { useAnalysisDistributorLogger } from '../../helpers';
 
 export class AnalysisDistributorExecuteHandler implements ComponentHandler<

@@ -6,10 +6,10 @@
  */
 
 import {
-    BuilderEvent,
+    AnalysisBuilderEvent,
 } from '@privateaim/server-core-worker-kit';
 import type {
-    BuilderBasePayload,
+    AnalysisBuilderBasePayload,
 } from '@privateaim/server-core-worker-kit';
 import {
     ProcessStatus,
@@ -18,8 +18,8 @@ import { useDataSource } from 'typeorm-extension';
 import { AnalysisEntity } from '../../../database';
 
 export async function handleAnalysisManagerBuilderBaseEvent(
-    event: BuilderEvent,
-    data: BuilderBasePayload,
+    event: AnalysisBuilderEvent,
+    data: AnalysisBuilderBasePayload,
 ) {
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisEntity);
@@ -30,26 +30,26 @@ export async function handleAnalysisManagerBuilderBaseEvent(
     }
 
     switch (event) {
-        case BuilderEvent.NONE: {
+        case AnalysisBuilderEvent.NONE: {
             if (!entity.execution_status) {
                 entity.build_status = null;
             }
             break;
         }
-        case BuilderEvent.BUILDING: {
+        case AnalysisBuilderEvent.EXECUTION_STARTED: {
             entity.build_status = ProcessStatus.STARTED;
             break;
         }
-        case BuilderEvent.BUILD_FAILED:
-        case BuilderEvent.CHECK_FAILED:
-        case BuilderEvent.PUSH_FAILED: {
-            if (event !== BuilderEvent.CHECK_FAILED) {
+        case AnalysisBuilderEvent.EXECUTION_FAILED:
+        case AnalysisBuilderEvent.CHECK_FAILED:
+        case AnalysisBuilderEvent.PUSH_FAILED: {
+            if (event !== AnalysisBuilderEvent.CHECK_FAILED) {
                 entity.build_status = ProcessStatus.FAILED;
             }
 
             break;
         }
-        case BuilderEvent.PUSHED:
+        case AnalysisBuilderEvent.PUSHED:
             entity.build_status = ProcessStatus.FINISHED;
             break;
     }

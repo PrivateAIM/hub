@@ -5,15 +5,12 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import { ComponentHandlers } from '@privateaim/server-kit';
+import { ComponentHandlers, type ComponentHandlersOptions } from '@privateaim/server-kit';
 import { AnalysisDistributorCommand } from '@privateaim/server-core-worker-kit';
-import { QueueRouterComponentEmitter } from '@privateaim/server-kit/src/core/component/emitter';
 import { AnalysisDistributorExecuteHandler } from './execute';
 
-export function defineAnalysisDistributorHandlers() : ComponentHandlers {
-    const manager = new ComponentHandlers({
-        emitter: new QueueRouterComponentEmitter(),
-    });
+export function defineAnalysisDistributorHandlers(options: ComponentHandlersOptions = {}) : ComponentHandlers {
+    const manager = new ComponentHandlers(options);
 
     manager.mount(AnalysisDistributorCommand.EXECUTE, new AnalysisDistributorExecuteHandler());
 

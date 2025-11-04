@@ -9,8 +9,8 @@ import type { QueueRouterPayload } from '@privateaim/server-kit';
 import { buildQueueRouterPublishPayload } from '@privateaim/server-kit';
 import { cleanupPayload } from '../../utils';
 import {
-    BuilderEventQueueRouterRouting,
-    BuilderTaskQueueRouterRouting,
+    AnalysisBuilderEventQueueRouterRouting,
+    AnalysisBuilderTaskQueueRouterRouting,
 } from './constants';
 import type { BuilderCommandContext, BuilderEventContext } from './types';
 
@@ -21,7 +21,7 @@ export function buildBuilderTaskQueueRouterPayload(
         type: context.command,
         data: cleanupPayload(context.data),
         metadata: {
-            routing: BuilderTaskQueueRouterRouting,
+            routing: AnalysisBuilderTaskQueueRouterRouting,
         },
     });
 }
@@ -33,7 +33,7 @@ export function buildBuilderEventQueueRouterPayload(
         type: context.event,
         data: cleanupPayload(context.data),
         metadata: {
-            routing: BuilderEventQueueRouterRouting,
+            routing: AnalysisBuilderEventQueueRouterRouting,
         },
     });
 }

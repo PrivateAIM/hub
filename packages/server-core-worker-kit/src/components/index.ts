@@ -6,6 +6,6 @@
  */
 
 export * from './analysis-distributor';
-export * from './builder';
+export * from './analysis-builder';
 export * from './core';
 export * from './master-images';

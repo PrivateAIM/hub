@@ -13,12 +13,12 @@ import {
 } from '@privateaim/core-kit';
 import type { Container } from 'dockerode';
 import tar from 'tar-stream';
-import { BuilderCommand } from '@privateaim/server-core-worker-kit';
+import { AnalysisBuilderCommand } from '@privateaim/server-core-worker-kit';
 import {
     streamToBuffer, useCoreClient, useStorageClient,
 } from '../../../core';
 import { BuilderError } from '../error';
-import { useBuilderLogger } from '../utils';
+import { useAnalysisBuilderLogger } from '../utils';
 import type { ContainerPackContext } from './type';
 
 export async function packContainerWithAnalysis(container: Container, context: ContainerPackContext) {
@@ -26,9 +26,9 @@ export async function packContainerWithAnalysis(container: Container, context: C
 
     // -----------------------------------------------------------------------------------
 
-    useBuilderLogger()
+    useAnalysisBuilderLogger()
         .debug('Writing files to container', {
-            command: BuilderCommand.BUILD,
+            command: AnalysisBuilderCommand.EXECUTE,
             analysis_id: context.entity.id,
             [LogFlag.REF_ID]: context.entity.id,
         });
@@ -58,9 +58,9 @@ export async function packContainerWithAnalysis(container: Container, context: C
                 extract.on('entry', (header, stream, callback) => {
                     streamToBuffer(stream)
                         .then((buff) => {
-                            useBuilderLogger()
+                            useAnalysisBuilderLogger()
                                 .debug(`Extracting analysis file ${header.name} (${header.size} bytes).`, {
-                                    command: BuilderCommand.BUILD,
+                                    command: AnalysisBuilderCommand.EXECUTE,
                                     analysis_id: context.entity.id,
                                     [LogFlag.REF_ID]: context.entity.id,
                                 });
@@ -70,9 +70,9 @@ export async function packContainerWithAnalysis(container: Container, context: C
                             callback();
                         })
                         .catch((e) => {
-                            useBuilderLogger()
+                            useAnalysisBuilderLogger()
                                 .error(`Extracting analysis file ${header.name} (${header.size} bytes) failed.`, {
-                                    command: BuilderCommand.BUILD,
+                                    command: AnalysisBuilderCommand.EXECUTE,
                                     analysis_id: context.entity.id,
                                     [LogFlag.REF_ID]: context.entity.id,
                                 });
@@ -88,18 +88,18 @@ export async function packContainerWithAnalysis(container: Container, context: C
 
                 extract.on('finish', () => {
                     for (let i = 0; i < files.length; i++) {
-                        useBuilderLogger()
+                        useAnalysisBuilderLogger()
                             .debug(`Encrypting/Packing analysis file ${files[i][0]}.`, {
-                                command: BuilderCommand.BUILD,
+                                command: AnalysisBuilderCommand.EXECUTE,
                                 analysis_id: context.entity.id,
                                 [LogFlag.REF_ID]: context.entity.id,
                             });
 
                         pack.entry({ name: files[i][0] }, files[i][1]);
 
-                        useBuilderLogger()
+                        useAnalysisBuilderLogger()
                             .debug(`Encrypted/Packed analysis file ${files[i][0]}.`, {
-                                command: BuilderCommand.BUILD,
+                                command: AnalysisBuilderCommand.EXECUTE,
                                 analysis_id: context.entity.id,
                                 [LogFlag.REF_ID]: context.entity.id,
                             });

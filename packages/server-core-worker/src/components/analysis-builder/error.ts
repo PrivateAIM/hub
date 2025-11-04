@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BuilderErrorCode } from '@privateaim/server-core-worker-kit';
+import { AnalysisBuilderErrorCode } from '@privateaim/server-core-worker-kit';
 import type { ComponentErrorOptions } from '@privateaim/server-kit';
 import { BaseError } from '../error';
 
@@ -20,14 +20,14 @@ export class BuilderError extends BaseError {
 
     static entrypointNotFound(message?: string) {
         return new BuilderError({
-            code: BuilderErrorCode.ENTRYPOINT_NOT_FOUND,
+            code: AnalysisBuilderErrorCode.ENTRYPOINT_NOT_FOUND,
             message,
         });
     }
 
     static masterImageNotFound(message?: string) {
         return new BuilderError({
-            code: BuilderErrorCode.MASTER_IMAGE_NOT_FOUND,
+            code: AnalysisBuilderErrorCode.MASTER_IMAGE_NOT_FOUND,
             message,
         });
     }

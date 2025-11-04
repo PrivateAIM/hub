@@ -14,7 +14,7 @@ import {
     isAnalysisAPICommandExecutable,
 } from '@privateaim/core-kit';
 import {
-    BuilderCommand,
+    AnalysisBuilderCommand,
     CoreCommand,
     buildBuilderTaskQueueRouterPayload, buildCoreTaskQueueRouterPayload,
 } from '@privateaim/server-core-worker-kit';
@@ -117,7 +117,7 @@ export class AnalysisManagerService {
 
         const queueRouter = useQueueRouter();
         await queueRouter.publish(buildBuilderTaskQueueRouterPayload({
-            command: BuilderCommand.BUILD,
+            command: AnalysisBuilderCommand.EXECUTE,
             data: {
                 id: entity.id,
             },
@@ -141,7 +141,7 @@ export class AnalysisManagerService {
 
         const queueRouter = useQueueRouter();
         await queueRouter.publish(buildBuilderTaskQueueRouterPayload({
-            command: BuilderCommand.CHECK,
+            command: AnalysisBuilderCommand.CHECK,
             data: {
                 id: entity.id,
             },

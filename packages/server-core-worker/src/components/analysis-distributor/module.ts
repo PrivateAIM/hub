@@ -6,14 +6,18 @@
  */
 
 import type { Component } from '@privateaim/server-kit';
-import { isQueueRouterUsable, useLogger, useQueueRouter } from '@privateaim/server-kit';
+import {
+    QueueRouterComponentEmitter, isQueueRouterUsable, useLogger, useQueueRouter,
+} from '@privateaim/server-kit';
 import { useEnv } from '@privateaim/server-telemetry/src';
 import { EnvironmentName } from '@privateaim/kit';
 import { AnalysisDistributorTaskQueueRouterRouting } from '@privateaim/server-core-worker-kit';
 import { defineAnalysisDistributorHandlers } from './handlers';
 
 export function createAnalysisDistributorComponent() : Component {
-    const handlers = defineAnalysisDistributorHandlers();
+    const handlers = defineAnalysisDistributorHandlers({
+        emitter: new QueueRouterComponentEmitter(),
+    });
 
     return {
         async start() {

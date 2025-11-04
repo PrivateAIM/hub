@@ -7,40 +7,40 @@
 
 import { QueueRouterRoutingType } from '@privateaim/server-kit';
 
-export enum BuilderEvent {
-    BUILD_FAILED = 'buildFailed',
-    BUILDING = 'building',
-    BUILT = 'built',
+export enum AnalysisBuilderEvent {
+    EXECUTION_FAILED = 'executionFailed',
+    EXECUTION_STARTED = 'executionStarted',
+    EXECUTION_FINISHED = 'executionFinished',
 
     PUSH_FAILED = 'pushFailed',
     PUSHING = 'pushing',
     PUSHED = 'pushed',
 
     CHECK_FAILED = 'checkFailed',
-    CHECKING = 'checking',
-    CHECKED = 'checked',
+    CHECK_STARTED = 'checking',
+    CHECK_FINISHED = 'checked',
 
     NONE = 'none',
 }
 
-export enum BuilderCommand {
-    BUILD = 'build',
+export enum AnalysisBuilderCommand {
+    EXECUTE = 'execute',
     CHECK = 'check',
     PUSH = 'push',
 }
 
-export enum BuilderErrorCode {
+export enum AnalysisBuilderErrorCode {
     ENTRYPOINT_NOT_FOUND = 'entrypointNotFound',
     MASTER_IMAGE_NOT_FOUND = 'masterImageNotFound',
     UNKNOWN = 'unknown',
 }
 
-export const BuilderEventQueueRouterRouting = {
+export const AnalysisBuilderEventQueueRouterRouting = {
     type: QueueRouterRoutingType.PUB_SUB,
     key: 'analysisBuilderEvents',
 };
 
-export const BuilderTaskQueueRouterRouting = {
+export const AnalysisBuilderTaskQueueRouterRouting = {
     type: QueueRouterRoutingType.WORK,
     key: 'analysisBuilderCommands',
 };

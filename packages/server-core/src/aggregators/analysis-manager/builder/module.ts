@@ -9,45 +9,45 @@ import {
     EnvironmentName, isQueueRouterUsable, useLogger,
     useQueueRouter,
 } from '@privateaim/server-kit';
-import type { BuilderBasePayload } from '@privateaim/server-core-worker-kit';
+import type { AnalysisBuilderBasePayload } from '@privateaim/server-core-worker-kit';
 import {
-    BuilderEvent,
-    BuilderEventQueueRouterRouting,
+    AnalysisBuilderEvent,
+    AnalysisBuilderEventQueueRouterRouting,
 } from '@privateaim/server-core-worker-kit';
 import type { Aggregator, QueueRouterHandlers } from '@privateaim/server-kit';
 import { useEnv } from '../../../config';
 import { handleAnalysisManagerBuilderBaseEvent } from './handler';
 
 export function createAnalysisManagerBuilderHandlers() : QueueRouterHandlers<{
-    [BuilderEvent.BUILDING]: BuilderBasePayload,
-    [BuilderEvent.BUILT]: BuilderBasePayload,
-    [BuilderEvent.CHECKING]: BuilderBasePayload,
-    [BuilderEvent.CHECKED]: BuilderBasePayload,
-    [BuilderEvent.PUSHING]: BuilderBasePayload,
-    [BuilderEvent.PUSHED]: BuilderBasePayload,
-    [BuilderEvent.NONE]: BuilderBasePayload,
+    [AnalysisBuilderEvent.EXECUTION_STARTED]: AnalysisBuilderBasePayload,
+    [AnalysisBuilderEvent.EXECUTION_FINISHED]: AnalysisBuilderBasePayload,
+    [AnalysisBuilderEvent.CHECK_STARTED]: AnalysisBuilderBasePayload,
+    [AnalysisBuilderEvent.CHECK_FINISHED]: AnalysisBuilderBasePayload,
+    [AnalysisBuilderEvent.PUSHING]: AnalysisBuilderBasePayload,
+    [AnalysisBuilderEvent.PUSHED]: AnalysisBuilderBasePayload,
+    [AnalysisBuilderEvent.NONE]: AnalysisBuilderBasePayload,
 }> {
     return {
-        [BuilderEvent.BUILDING]: async (message) => {
-            await handleAnalysisManagerBuilderBaseEvent(BuilderEvent.BUILDING, message.data);
+        [AnalysisBuilderEvent.EXECUTION_STARTED]: async (message) => {
+            await handleAnalysisManagerBuilderBaseEvent(AnalysisBuilderEvent.EXECUTION_STARTED, message.data);
         },
-        [BuilderEvent.BUILT]: async (message) => {
-            await handleAnalysisManagerBuilderBaseEvent(BuilderEvent.BUILT, message.data);
+        [AnalysisBuilderEvent.EXECUTION_FINISHED]: async (message) => {
+            await handleAnalysisManagerBuilderBaseEvent(AnalysisBuilderEvent.EXECUTION_FINISHED, message.data);
         },
-        [BuilderEvent.CHECKING]: async (message) => {
-            await handleAnalysisManagerBuilderBaseEvent(BuilderEvent.CHECKING, message.data);
+        [AnalysisBuilderEvent.CHECK_STARTED]: async (message) => {
+            await handleAnalysisManagerBuilderBaseEvent(AnalysisBuilderEvent.CHECK_STARTED, message.data);
         },
-        [BuilderEvent.CHECKED]: async (message) => {
-            await handleAnalysisManagerBuilderBaseEvent(BuilderEvent.CHECKED, message.data);
+        [AnalysisBuilderEvent.CHECK_FINISHED]: async (message) => {
+            await handleAnalysisManagerBuilderBaseEvent(AnalysisBuilderEvent.CHECK_FINISHED, message.data);
         },
-        [BuilderEvent.PUSHING]: async (message) => {
-            await handleAnalysisManagerBuilderBaseEvent(BuilderEvent.PUSHING, message.data);
+        [AnalysisBuilderEvent.PUSHING]: async (message) => {
+            await handleAnalysisManagerBuilderBaseEvent(AnalysisBuilderEvent.PUSHING, message.data);
         },
-        [BuilderEvent.PUSHED]: async (message) => {
-            await handleAnalysisManagerBuilderBaseEvent(BuilderEvent.PUSHED, message.data);
+        [AnalysisBuilderEvent.PUSHED]: async (message) => {
+            await handleAnalysisManagerBuilderBaseEvent(AnalysisBuilderEvent.PUSHED, message.data);
         },
-        [BuilderEvent.NONE]: async (message) => {
-            await handleAnalysisManagerBuilderBaseEvent(BuilderEvent.NONE, message.data);
+        [AnalysisBuilderEvent.NONE]: async (message) => {
+            await handleAnalysisManagerBuilderBaseEvent(AnalysisBuilderEvent.NONE, message.data);
         },
     };
 }
@@ -65,7 +65,7 @@ export function createAnalysisManagerBuilderAggregator() : Aggregator {
 
     return {
         start: () => queueRouter.consume(
-            BuilderEventQueueRouterRouting,
+            AnalysisBuilderEventQueueRouterRouting,
             createAnalysisManagerBuilderHandlers(),
         ),
     };

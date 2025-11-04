@@ -22,7 +22,7 @@ export function useCoreLogger() : Logger {
     instance = createLogger({
         options: {
             defaultMeta: {
-                component: ComponentName.CORE,
+                component: ComponentName.ANALYSIS_CORE,
             },
         },
         transports: [
@@ -31,7 +31,7 @@ export function useCoreLogger() : Logger {
                 labels: {
                     [LogFlag.SERVICE]: 'hub-server-worker',
                     [LogFlag.CHANNEL]: LogChannel.SYSTEM,
-                    [LogFlag.COMPONENT]: ComponentName.CORE,
+                    [LogFlag.COMPONENT]: ComponentName.ANALYSIS_CORE,
                     [LogFlag.REF_TYPE]: DomainType.ANALYSIS,
                 },
                 save: async (data) => {

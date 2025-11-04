@@ -14,7 +14,7 @@ import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 
 let instance : Logger | undefined;
 
-export function useBuilderLogger() : Logger {
+export function useAnalysisBuilderLogger() : Logger {
     if (typeof instance !== 'undefined') {
         return instance;
     }
@@ -22,7 +22,7 @@ export function useBuilderLogger() : Logger {
     instance = createLogger({
         options: {
             defaultMeta: {
-                component: ComponentName.BUILDER,
+                component: ComponentName.ANALYSIS_BUILDER,
             },
         },
         transports: [
@@ -31,7 +31,7 @@ export function useBuilderLogger() : Logger {
                 labels: {
                     [LogFlag.SERVICE]: 'hub-server-worker',
                     [LogFlag.CHANNEL]: LogChannel.SYSTEM,
-                    [LogFlag.COMPONENT]: ComponentName.BUILDER,
+                    [LogFlag.COMPONENT]: ComponentName.ANALYSIS_BUILDER,
                     [LogFlag.REF_TYPE]: DomainType.ANALYSIS,
                 },
                 save: async (data) => {
