@@ -7,11 +7,11 @@
 
 import { QueueRouterRoutingType } from '@privateaim/server-kit';
 
-export enum AnalysisConfigurationCommand {
+export enum AnalysisMetadataCommand {
     RECALC = 'recalc',
 }
 
-export const AnalysisConfigurationTaskQueue = {
+export const AnalysisMetadataTaskQueue = {
     type: QueueRouterRoutingType.WORK,
-    key: 'analysisConfigurationTasks',
+    key: 'analysisMetadataTasks',
 };

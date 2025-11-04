@@ -10,12 +10,12 @@ import type { ComponentHandler } from '@privateaim/server-kit';
 import type { DataSource, Repository } from 'typeorm';
 import { useDataSource } from 'typeorm-extension';
 import { AnalysisBucketFileEntity, AnalysisEntity, AnalysisNodeEntity } from '../../../../database';
-import type { AnalysisConfigurationCommand } from '../../constants';
-import type { AnalysisConfigurationRecalcPayload } from '../../types';
+import type { AnalysisMetadataCommand } from '../../constants';
+import type { AnalysisMetadataRecalcPayload } from '../../types';
 
-export class AnalysisConfigurationRecalcHandler implements ComponentHandler<
-AnalysisConfigurationCommand.RECALC,
-AnalysisConfigurationRecalcPayload> {
+export class AnalysisMetadataRecalcHandler implements ComponentHandler<
+AnalysisMetadataCommand.RECALC,
+AnalysisMetadataRecalcPayload> {
     protected dataSource!: DataSource;
 
     protected analysisRepository!: Repository<AnalysisEntity>;
@@ -32,7 +32,7 @@ AnalysisConfigurationRecalcPayload> {
     }
 
     async handle(
-        value: AnalysisConfigurationRecalcPayload,
+        value: AnalysisMetadataRecalcPayload,
     ): Promise<void> {
         const entity = await this.analysisRepository.findOneBy({
             id: value.analysisId,
