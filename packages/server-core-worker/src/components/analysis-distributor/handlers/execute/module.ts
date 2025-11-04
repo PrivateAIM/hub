@@ -5,10 +5,12 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentHandler } from '@privateaim/server-kit';
+import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
 import type { AnalysisDistributorExecutePayload } from '@privateaim/server-core-worker-kit';
 import {
     AnalysisDistributorCommand,
+    AnalysisDistributorEvent,
+    AnalysisDistributorEventQueueRouterRouting,
 } from '@privateaim/server-core-worker-kit';
 import { REGISTRY_ARTIFACT_TAG_LATEST } from '@privateaim/core-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
@@ -25,7 +27,33 @@ import { useAnalysisDistributorLogger } from '../../helpers';
 export class AnalysisDistributorExecuteHandler implements ComponentHandler<
 AnalysisDistributorCommand.EXECUTE,
 AnalysisDistributorExecutePayload> {
-    async handle(value: AnalysisDistributorExecutePayload): Promise<void> {
+    async handle(value: AnalysisDistributorExecutePayload, context: ComponentHandlerContext): Promise<void> {
+        try {
+            // todo: check if image exists, otherwise local queue task
+            await this.handleInternal(value, context);
+        } catch (e) {
+            await context.emitter.emit(
+                AnalysisDistributorEvent.EXECUTION_FAILED,
+                {
+                    ...value,
+                    error: e,
+                },
+                {
+                    routing: AnalysisDistributorEventQueueRouterRouting,
+                },
+            );
+        }
+    }
+
+    async handleInternal(value: AnalysisDistributorExecutePayload, context: ComponentHandlerContext): Promise<void> {
+        await context.emitter.emit(
+            AnalysisDistributorEvent.EXECUTION_STARTED,
+            value,
+            {
+                routing: AnalysisDistributorEventQueueRouterRouting,
+            },
+        );
+
         const client = useCoreClient();
 
         const analysis = await client.analysis.getOne(value.id);
@@ -132,5 +160,13 @@ AnalysisDistributorExecutePayload> {
 
             throw e;
         }
+
+        await context.emitter.emit(
+            AnalysisDistributorEvent.EXECUTION_FINISHED,
+            value,
+            {
+                routing: AnalysisDistributorEventQueueRouterRouting,
+            },
+        );
     }
 }

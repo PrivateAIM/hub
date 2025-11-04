@@ -7,6 +7,12 @@
 
 import { QueueRouterRoutingType } from '@privateaim/server-kit';
 
+export enum AnalysisDistributorEvent {
+    EXECUTION_STARTED = 'executionStarted',
+    EXECUTION_FINISHED = 'executionFinished',
+    EXECUTION_FAILED = 'executionFailed',
+}
+
 export enum AnalysisDistributorCommand {
     EXECUTE = 'execute',
 }

@@ -14,3 +14,5 @@ export interface ComponentEmitter {
         metadata?: ObjectLiteral
     ) : Promise<void> | void;
 }
+
+// todo: metadata should contain { target: { service: 'xxx', component: 'xxx }
