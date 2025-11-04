@@ -6,6 +6,7 @@
  */
 
 export enum ComponentName {
+    ANALYSIS_DISTRIBUTOR = 'analysisDistributor',
     BUILDER = 'builder',
     CORE = 'core',
     MASTER_IMAGES = 'masterImages',
