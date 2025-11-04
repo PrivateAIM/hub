@@ -6,9 +6,10 @@
  */
 
 import type { Realm } from '@authup/core-kit';
+import type { ProcessStatus } from '@privateaim/kit';
 import type { Node } from '../node';
 import type { Analysis } from '../analysis';
-import type { AnalysisNodeApprovalStatus, AnalysisNodeRunStatus } from './constants';
+import type { AnalysisNodeApprovalStatus } from './constants';
 
 export interface AnalysisNode {
     id: string;
@@ -19,7 +20,7 @@ export interface AnalysisNode {
 
     // ------------------------------------------------------------------
 
-    run_status: AnalysisNodeRunStatus | null;
+    run_status: ProcessStatus | null;
 
     // ------------------------------------------------------------------
 

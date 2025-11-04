@@ -8,13 +8,10 @@
 import type { Realm, User } from '@authup/core-kit';
 import type {
     Analysis,
-    AnalysisRunStatus,
-    MasterImage, MasterImageCommandArgument,
+    MasterImage,
+    MasterImageCommandArgument,
     Project,
     Registry,
-} from '@privateaim/core-kit';
-import {
-    AnalysisBuildStatus,
 } from '@privateaim/core-kit';
 import {
     Column,
@@ -27,6 +24,7 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 import { deserialize, serialize } from '@authup/kit';
+import { ProcessStatus } from '@privateaim/kit';
 import { MasterImageEntity } from '../master-image/entity';
 import { ProjectEntity } from '../project/entity';
 import { RegistryEntity } from '../registry/entity';
@@ -72,7 +70,7 @@ export class AnalysisEntity implements Analysis {
     @Column({
         type: 'varchar', length: 64, nullable: true, default: null,
     })
-        build_status: AnalysisBuildStatus | null;
+        build_status: ProcessStatus | null;
 
     // ------------------------------------------------------------------
 
@@ -80,7 +78,7 @@ export class AnalysisEntity implements Analysis {
     @Column({
         type: 'varchar', length: 64, nullable: true, default: null,
     })
-        run_status: AnalysisRunStatus | null;
+        run_status: ProcessStatus | null;
 
     // ------------------------------------------------------------------
 

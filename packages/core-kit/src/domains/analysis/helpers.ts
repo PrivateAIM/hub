@@ -5,7 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { AnalysisAPICommand, AnalysisBuildStatus } from './constants';
+import { ProcessStatus } from '@privateaim/kit';
+import { AnalysisAPICommand } from './constants';
 import type { Analysis } from './entity';
 import { AnalysisError } from './error';
 
@@ -43,8 +44,8 @@ export function isAnalysisAPICommandExecutable(
             }
 
             if (
-                entity.build_status === AnalysisBuildStatus.FAILED ||
-                entity.build_status === AnalysisBuildStatus.STOPPED
+                entity.build_status === ProcessStatus.FAILED ||
+                entity.build_status === ProcessStatus.STOPPED
             ) {
                 output.success = true;
                 return output;
@@ -64,9 +65,9 @@ export function isAnalysisAPICommandExecutable(
                 return output;
             }
 
-            if (entity.build_status === AnalysisBuildStatus.STOPPING ||
-                entity.build_status === AnalysisBuildStatus.STARTED ||
-                entity.build_status === AnalysisBuildStatus.STARTING
+            if (entity.build_status === ProcessStatus.STOPPING ||
+                entity.build_status === ProcessStatus.STARTED ||
+                entity.build_status === ProcessStatus.STARTING
             ) {
                 output.success = true;
                 return output;
@@ -86,7 +87,7 @@ export function isAnalysisAPICommandExecutable(
                 return output;
             }
 
-            if (entity.build_status === AnalysisBuildStatus.FINISHED) {
+            if (entity.build_status === ProcessStatus.FINISHED) {
                 output.message = 'The analysis build process has already been successfully completed.';
                 return output;
             }
@@ -146,9 +147,9 @@ export function isAnalysisAPICommandExecutable(
             }
 
             if (
-                entity.build_status === AnalysisBuildStatus.FAILED ||
-                entity.build_status === AnalysisBuildStatus.STOPPED ||
-                entity.build_status === AnalysisBuildStatus.STOPPING
+                entity.build_status === ProcessStatus.FAILED ||
+                entity.build_status === ProcessStatus.STOPPED ||
+                entity.build_status === ProcessStatus.STOPPING
             ) {
                 output.success = true;
                 return output;

@@ -6,12 +6,9 @@
  */
 
 import type { Realm, User } from '@authup/core-kit';
+import type { ProcessStatus } from '@privateaim/kit';
 import type { MasterImage, MasterImageCommandArgument } from '../master-image';
 import type { Project } from '../project';
-import type {
-    AnalysisBuildStatus,
-    AnalysisRunStatus,
-} from './constants';
 import type { Registry } from '../registry';
 
 export interface Analysis {
@@ -54,7 +51,7 @@ export interface Analysis {
 
     // ------------------------------------------------------------------
 
-    build_status: AnalysisBuildStatus | null;
+    build_status: ProcessStatus | null;
 
     // ------------------------------------------------------------------
 
@@ -66,7 +63,7 @@ export interface Analysis {
     /**
      * todo: rename to execution_status
      */
-    run_status: AnalysisRunStatus | null;
+    run_status: ProcessStatus | null;
 
     /**
      * todo: add execution_progress

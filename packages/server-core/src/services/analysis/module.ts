@@ -6,9 +6,9 @@
  */
 
 import { BadRequestError, ServerError } from '@ebec/http';
+import { ProcessStatus } from '@privateaim/kit';
 import {
     AnalysisAPICommand,
-    AnalysisBuildStatus,
     AnalysisNodeApprovalStatus,
     NodeType,
     isAnalysisAPICommandExecutable,
@@ -102,7 +102,7 @@ export class AnalysisManagerService {
             entity.registry_id = registry.id;
         }
 
-        entity.build_status = AnalysisBuildStatus.STARTING;
+        entity.build_status = ProcessStatus.STARTING;
 
         if (request) {
             const requestRepository = new RequestRepositoryAdapter(
@@ -161,9 +161,9 @@ export class AnalysisManagerService {
             throw new BadRequestError(check.message);
         }
 
-        entity.build_status = entity.build_status !== AnalysisBuildStatus.STOPPING ?
-            AnalysisBuildStatus.STOPPING :
-            AnalysisBuildStatus.STOPPED;
+        entity.build_status = entity.build_status !== ProcessStatus.STOPPING ?
+            ProcessStatus.STOPPING :
+            ProcessStatus.STOPPED;
 
         if (request) {
             const requestRepository = new RequestRepositoryAdapter(

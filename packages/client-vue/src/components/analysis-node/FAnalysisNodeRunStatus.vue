@@ -5,14 +5,14 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { AnalysisNodeRunStatus } from '@privateaim/core-kit';
+import { ProcessStatus } from '@privateaim/kit';
 import type { PropType } from 'vue';
 import { computed, defineComponent } from 'vue';
 
 export default defineComponent({
     props: {
         status: {
-            type: String as PropType<`${AnalysisNodeRunStatus}` | null>,
+            type: String as PropType<`${ProcessStatus}` | null>,
             default: null,
         },
         tag: {
@@ -30,17 +30,16 @@ export default defineComponent({
 
         const classSuffix = computed(() => {
             switch (props.status) {
-                case AnalysisNodeRunStatus.STARTING:
-                case AnalysisNodeRunStatus.STARTED:
+                case ProcessStatus.STARTING:
                     return 'primary';
-                case AnalysisNodeRunStatus.FINISHED:
+                case ProcessStatus.FINISHED:
                     return 'success';
-                case AnalysisNodeRunStatus.RUNNING:
+                case ProcessStatus.STARTED:
                     return 'dark';
-                case AnalysisNodeRunStatus.STOPPED:
-                case AnalysisNodeRunStatus.STOPPING:
+                case ProcessStatus.STOPPED:
+                case ProcessStatus.STOPPING:
                     return 'warning';
-                case AnalysisNodeRunStatus.FAILED:
+                case ProcessStatus.FAILED:
                     return 'danger';
                 default:
                     return 'secondary';

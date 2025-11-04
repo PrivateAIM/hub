@@ -14,18 +14,3 @@ export enum AnalysisNodeApprovalStatus {
     REJECTED = 'rejected',
     APPROVED = 'approved',
 }
-
-// -------------------------------------------------------------------------
-
-export enum AnalysisNodeRunStatus {
-    STARTING = 'starting',
-    STARTED = 'started',
-
-    STOPPING = 'stopping',
-    STOPPED = 'stopped',
-
-    RUNNING = 'running',
-    FINISHED = 'finished',
-
-    FAILED = 'failed',
-}
