@@ -41,7 +41,7 @@ export default defineNuxtComponent({
         const handleCreated = async (entity: Analysis) => {
             toast.show({ variant: 'success', body: 'The analysis was successfully created.' });
 
-            await navigateTo(`/analyses/${entity.id}/setup`);
+            await navigateTo(`/analyses/${entity.id}`);
         };
 
         return {
