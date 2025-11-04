@@ -71,8 +71,8 @@ export async function deleteProjectNodeRouteHandler(req: Request, res: Response)
             let nodeIsActivelyUsed: boolean = false;
             for (let i = 0; i < analysisNodes.length; i++) {
                 if (
-                    analysisNodes[i].run_status &&
-                    analysisNodes[i].run_status !== ProcessStatus.FAILED
+                    analysisNodes[i].execution_status &&
+                    analysisNodes[i].execution_status !== ProcessStatus.FAILED
                 ) {
                     nodeIsActivelyUsed = true;
                     break;

@@ -60,10 +60,7 @@ export interface Analysis {
      */
 
     // ------------------------------------------------------------------
-    /**
-     * todo: rename to execution_status
-     */
-    run_status: ProcessStatus | null;
+    execution_status: ProcessStatus | null;
 
     /**
      * todo: add execution_progress

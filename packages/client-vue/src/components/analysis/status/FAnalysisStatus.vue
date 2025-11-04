@@ -10,13 +10,13 @@ import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
 import FAnalysisBuildStatus from './FAnalysisBuildStatus.vue';
 import FAnalysisConfigurationStatus from './FAnalysisConfigurationStatus.vue';
-import FAnalysisRunStatus from './FAnalysisRunStatus.vue';
+import FAnalysisExecutionStatus from './FAnalysisExecutionStatus.vue';
 
 export default defineComponent({
     components: {
-        FAnalysisRunStatus,
+        FAnalysisExecutionStatus,
         FAnalysisBuildStatus,
-        FAnalysisConfigurationStatusText: FAnalysisConfigurationStatus,
+        FAnalysisConfigurationStatus,
     },
     props: {
         listDirection: {
@@ -77,7 +77,7 @@ export default defineComponent({
                     <strong>Configuration</strong>
                 </div>
                 <div>
-                    <FAnalysisConfigurationStatusText :locked="entity.configuration_locked" />
+                    <FAnalysisConfigurationStatus :locked="entity.configuration_locked" />
                 </div>
             </div>
 
@@ -133,7 +133,7 @@ export default defineComponent({
                     <strong>Run</strong>
                 </div>
                 <div>
-                    <FAnalysisRunStatus :status="entity.run_status" />
+                    <FAnalysisExecutionStatus :status="entity.execution_status" />
                 </div>
             </div>
 

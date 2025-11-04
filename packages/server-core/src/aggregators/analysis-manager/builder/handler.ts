@@ -31,7 +31,7 @@ export async function handleAnalysisManagerBuilderBaseEvent(
 
     switch (event) {
         case BuilderEvent.NONE: {
-            if (!entity.run_status) {
+            if (!entity.execution_status) {
                 entity.build_status = null;
             }
             break;

@@ -78,7 +78,7 @@ export class AnalysisEntity implements Analysis {
     @Column({
         type: 'varchar', length: 64, nullable: true, default: null,
     })
-        run_status: ProcessStatus | null;
+        execution_status: ProcessStatus | null;
 
     // ------------------------------------------------------------------
 

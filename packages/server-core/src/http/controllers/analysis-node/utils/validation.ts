@@ -41,7 +41,7 @@ export class AnalysisNodeValidator extends Container<AnalysisNodeEntity> {
         );
 
         this.mount(
-            'run_status',
+            'execution_status',
             { optional: true },
             createValidator(() => {
                 const chain = createValidationChain();

@@ -20,7 +20,7 @@ export interface AnalysisNode {
 
     // ------------------------------------------------------------------
 
-    run_status: ProcessStatus | null;
+    execution_status: ProcessStatus | null;
 
     // ------------------------------------------------------------------
 

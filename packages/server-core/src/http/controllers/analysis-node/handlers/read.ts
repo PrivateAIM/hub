@@ -60,7 +60,7 @@ export async function getManyAnalysisNodeRouteHandler(req: Request, res: Respons
         defaultAlias: 'analysisNode',
         filters: {
             allowed: [
-                'run_status',
+                'execution_status',
                 'approval_status',
 
                 'analysis_id',

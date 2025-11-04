@@ -38,7 +38,7 @@ export class AnalysisNodeEntity implements AnalysisNode {
         approval_status: AnalysisNodeApprovalStatus | null;
 
     @Column({ type: 'varchar', nullable: true, default: null })
-        run_status: ProcessStatus | null;
+        execution_status: ProcessStatus | null;
 
     // ------------------------------------------------------------------
 

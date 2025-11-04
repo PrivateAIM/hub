@@ -17,11 +17,11 @@ import { injectCoreHTTPClient, wrapFnWithBusyState } from '../../core';
 import FAnalysisNodeLogs from '../analysis-node-log/FAnalysisNodeLogs.vue';
 import FAnalysisNodePicker from './FAnalysisNodePicker.vue';
 import FAnalysisNodes from './FAnalysisNodes';
-import FAnalysisNodeRunStatus from './FAnalysisNodeRunStatus.vue';
+import FAnalysisNodeExecutionStatus from './FAnalysisNodeExecutionStatus.vue';
 
 export default defineComponent({
     components: {
-        FAnalysisNodePicker, BModal, FAnalysisNodeRunStatus, FAnalysisNodes, FAnalysisNodeLogs,
+        FAnalysisNodePicker, BModal, FAnalysisNodeExecutionStatus, FAnalysisNodes, FAnalysisNodeLogs,
     },
     props: {
         entity: {
@@ -186,9 +186,9 @@ export default defineComponent({
                                                 </button>
                                             </div>
                                         </div>
-                                        <template v-if="item.run_status">
-                                            <FAnalysisNodeRunStatus
-                                                :status="item.run_status"
+                                        <template v-if="item.execution_status">
+                                            <FAnalysisNodeExecutionStatus
+                                                :status="item.execution_status"
                                                 :tag="'div'"
                                             >
                                                 <template #default="data">
@@ -201,11 +201,11 @@ export default defineComponent({
                                                         </span>
                                                     </div>
                                                 </template>
-                                            </FAnalysisNodeRunStatus>
+                                            </FAnalysisNodeExecutionStatus>
                                         </template>
                                     </div>
 
-                                    <template v-if="item.run_status">
+                                    <template v-if="item.execution_status">
                                         <div>
                                             <FAnalysisNodeLogs
                                                 :analysis-id="item.analysis_id"
