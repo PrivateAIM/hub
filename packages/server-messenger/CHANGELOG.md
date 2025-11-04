@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.8.21](https://github.com/PrivateAIM/hub/compare/v0.8.20...v0.8.21) (2025-11-04)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/messenger-kit bumped from ^0.7.21 to ^0.7.22
+    * @privateaim/server-kit bumped from ^0.8.20 to ^0.8.21
+    * @privateaim/server-telemetry-kit bumped from ^0.8.20 to ^0.8.21
+    * @privateaim/server-http-kit bumped from ^0.8.20 to ^0.8.21
+    * @privateaim/server-realtime-kit bumped from ^0.8.20 to ^0.8.21
+    * @privateaim/telemetry-kit bumped from ^0.8.20 to ^0.8.21
+
 ## [0.8.20](https://github.com/PrivateAIM/hub/compare/v0.8.19...v0.8.20) (2025-10-29)
 
 

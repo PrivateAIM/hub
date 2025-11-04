@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.7.22](https://github.com/PrivateAIM/hub/compare/v0.7.21...v0.7.22) (2025-11-04)
+
+
+### Features
+
+* rename server-analysis-manager to server-core-worker service ([#1166](https://github.com/PrivateAIM/hub/issues/1166)) ([fd5aa52](https://github.com/PrivateAIM/hub/commit/fd5aa52083d77c4083017b4447043818ea18a200))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.8.20 to ^0.8.21
+    * @privateaim/kit bumped from ^0.8.20 to ^0.8.21
+    * @privateaim/server-kit bumped from ^0.8.20 to ^0.8.21
+
 ## [0.7.21](https://github.com/PrivateAIM/hub/compare/v0.7.20...v0.7.21) (2025-10-29)
 
 
