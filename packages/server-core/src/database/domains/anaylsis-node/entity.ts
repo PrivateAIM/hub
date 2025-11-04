@@ -40,6 +40,11 @@ export class AnalysisNodeEntity implements AnalysisNode {
     @Column({ type: 'varchar', nullable: true, default: null })
         execution_status: ProcessStatus | null;
 
+    @Column({
+        type: 'int', unsigned: true, nullable: true, default: null,
+    })
+        execution_progress: number | null;
+
     // ------------------------------------------------------------------
 
     @Column({ type: 'text', nullable: true })

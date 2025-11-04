@@ -17,7 +17,7 @@ import {
 } from '../aggregators/analysis-manager';
 import {
     createRegistryComponent,
-    useAnalysisConfigurationComponent,
+    useAnalysisMetadataComponent,
 } from '../components';
 import {
     configureAmqp,
@@ -66,7 +66,7 @@ export function createConfig() : Config {
 
     const components : Component[] = [
         createRegistryComponent(),
-        useAnalysisConfigurationComponent(),
+        useAnalysisMetadataComponent(),
     ];
 
     return {

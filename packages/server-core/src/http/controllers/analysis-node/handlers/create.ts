@@ -100,6 +100,7 @@ export async function createAnalysisNodeRouteHandler(req: Request, res: Response
                             analysis_realm_id: data.analysis.realm_id,
                             node_id: data.node.id,
                             node_realm_id: data.node.realm_id,
+                            execution_progress: data.execution_progress,
                         },
                         expiring: true,
                         expires_at: new Date(Date.now() + MONTH_IN_MS).toISOString(),

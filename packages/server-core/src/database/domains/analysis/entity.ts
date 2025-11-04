@@ -80,6 +80,11 @@ export class AnalysisEntity implements Analysis {
     })
         execution_status: ProcessStatus | null;
 
+    @Column({
+        type: 'int', unsigned: true, nullable: true, default: null,
+    })
+        execution_progress: number | null;
+
     // ------------------------------------------------------------------
 
     @Column({

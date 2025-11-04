@@ -15,7 +15,7 @@ import {
 import { BaseSubscriber } from '@privateaim/server-db-kit';
 import { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
-import { AnalysisConfigurationCommand, useAnalysisConfigurationComponent } from '../../../components';
+import { AnalysisMetadataCommand, useAnalysisMetadataComponent } from '../../../components';
 import { AnalysisBucketFileEntity } from './entity';
 
 @EventSubscriber()
@@ -59,9 +59,9 @@ AnalysisBucketFileEntity
         await super.afterInsert(event);
 
         if (event.entity.root) {
-            const analysisConfiguration = useAnalysisConfigurationComponent();
+            const analysisConfiguration = useAnalysisMetadataComponent();
             analysisConfiguration.trigger(
-                AnalysisConfigurationCommand.RECALC,
+                AnalysisMetadataCommand.RECALC,
                 {
                     analysisId: event.entity.analysis_id,
                 },
@@ -72,9 +72,9 @@ AnalysisBucketFileEntity
     async afterUpdate(event: UpdateEvent<AnalysisBucketFileEntity>): Promise<any> {
         await super.afterUpdate(event);
 
-        const analysisConfiguration = useAnalysisConfigurationComponent();
+        const analysisConfiguration = useAnalysisMetadataComponent();
         analysisConfiguration.trigger(
-            AnalysisConfigurationCommand.RECALC,
+            AnalysisMetadataCommand.RECALC,
             {
                 analysisId: event.entity.analysis_id,
             },
@@ -89,9 +89,9 @@ AnalysisBucketFileEntity
         await super.beforeRemove(event);
 
         if (event.entity.root) {
-            const analysisConfiguration = useAnalysisConfigurationComponent();
+            const analysisConfiguration = useAnalysisMetadataComponent();
             analysisConfiguration.trigger(
-                AnalysisConfigurationCommand.RECALC,
+                AnalysisMetadataCommand.RECALC,
                 {
                     analysisId: event.entity.analysis_id,
                 },

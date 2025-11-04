@@ -62,6 +62,7 @@ describe('src/controllers/core/analysis-node', () => {
         const data = await client.analysisNode.update(details.id, {
             ...details,
             execution_status: ProcessStatus.STARTED,
+            execution_progress: 10,
         });
 
         expect(data.execution_status).toEqual(ProcessStatus.STARTED);

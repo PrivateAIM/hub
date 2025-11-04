@@ -5,19 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { AnalysisBucketType, AnalysisNodeApprovalStatus, NodeType } from '@privateaim/core-kit';
-import { EnvironmentName } from '@privateaim/kit';
+import { AnalysisBucketType, NodeType } from '@privateaim/core-kit';
 import type { ComponentHandler } from '@privateaim/server-kit';
 import type { DataSource, Repository } from 'typeorm';
 import { useDataSource } from 'typeorm-extension';
-import { useEnv } from '../../../../config';
 import { AnalysisBucketFileEntity, AnalysisEntity, AnalysisNodeEntity } from '../../../../database';
-import type { AnalysisConfigurationCommand } from '../../constants';
-import type { AnalysisConfigurationRecalcPayload } from '../../types';
+import type { AnalysisMetadataCommand } from '../../constants';
+import type { AnalysisMetadataRecalcPayload } from '../../types';
 
-export class AnalysisConfigurationRecalcHandler implements ComponentHandler<
-AnalysisConfigurationCommand.RECALC,
-AnalysisConfigurationRecalcPayload> {
+export class AnalysisMetadataRecalcHandler implements ComponentHandler<
+AnalysisMetadataCommand.RECALC,
+AnalysisMetadataRecalcPayload> {
     protected dataSource!: DataSource;
 
     protected analysisRepository!: Repository<AnalysisEntity>;
@@ -34,20 +32,24 @@ AnalysisConfigurationRecalcPayload> {
     }
 
     async handle(
-        value: AnalysisConfigurationRecalcPayload,
+        value: AnalysisMetadataRecalcPayload,
     ): Promise<void> {
         const entity = await this.analysisRepository.findOneBy({
             id: value.analysisId,
         });
 
-        await this.setConfigurationEntrypointStatus(entity);
-        await this.setConfigurationImageStatus(entity);
-        await this.setConfigurationNodesStatus(entity);
+        await this.querySelf(entity);
+        await this.queryAnalysisFiles(entity);
+        await this.queryAnalysisNodes(entity);
 
         await this.analysisRepository.save(entity);
     }
 
-    async setConfigurationEntrypointStatus(entity: AnalysisEntity) : Promise<void> {
+    async querySelf(entity: AnalysisEntity) : Promise<void> {
+        entity.configuration_image_valid = !!entity.master_image_id;
+    }
+
+    async queryAnalysisFiles(entity: AnalysisEntity) : Promise<void> {
         const rootFile = await this.analysisBucketFileRepository.findOne({
             where: {
                 analysis_id: entity.id,
@@ -62,11 +64,7 @@ AnalysisConfigurationRecalcPayload> {
         entity.configuration_entrypoint_valid = !!rootFile;
     }
 
-    async setConfigurationImageStatus(entity: AnalysisEntity) : Promise<void> {
-        entity.configuration_image_valid = !!entity.master_image_id;
-    }
-
-    async setConfigurationNodesStatus(entity: AnalysisEntity) : Promise<void> {
+    async queryAnalysisNodes(entity: AnalysisEntity) : Promise<void> {
         const analysisNodes = await this.analysisNodesRepository.find({
             where: {
                 analysis_id: entity.id,
@@ -74,31 +72,56 @@ AnalysisConfigurationRecalcPayload> {
             relations: ['node'],
         });
 
-        const ignoreApproval = useEnv('skipAnalysisApproval') ||
-            useEnv('env') === EnvironmentName.TEST;
+        let nodes : number = 0;
+        let executionProgress : number = 0;
 
         let hasAggregator : boolean = false;
         let hasDefault : boolean = false;
 
         for (let i = 0; i < analysisNodes.length; i++) {
-            const { node } = analysisNodes[i];
+            const analysisNode = analysisNodes[i];
 
+            nodes++;
+
+            executionProgress += analysisNode.execution_progress || 0;
+
+            /**
+             * todo: check on build
+             * const ignoreApproval = useEnv('skipAnalysisApproval') ||
+             *             useEnv('env') === EnvironmentName.TEST;
+             *
             if (
                 !ignoreApproval &&
                 analysisNodes[i].approval_status !== AnalysisNodeApprovalStatus.APPROVED
             ) {
                 continue;
             }
+                */
 
-            if (node.type === NodeType.AGGREGATOR) {
+            switch (analysisNode.node.type) {
+                case NodeType.AGGREGATOR: {
+                    hasAggregator = true;
+                    break;
+                }
+                default: {
+                    hasDefault = true;
+                    break;
+                }
+            }
+
+            if (analysisNode.node.type === NodeType.AGGREGATOR) {
                 hasAggregator = true;
                 continue;
             }
 
-            if (node.type === NodeType.DEFAULT) {
+            if (analysisNode.node.type === NodeType.DEFAULT) {
                 hasDefault = true;
             }
         }
+
+        entity.nodes = nodes;
+        entity.execution_progress = executionProgress > 0 && nodes > 0 ?
+            Math.floor(executionProgress / nodes) : 0;
 
         entity.configuration_node_aggregator_valid = hasAggregator;
         entity.configuration_node_default_valid = hasDefault;

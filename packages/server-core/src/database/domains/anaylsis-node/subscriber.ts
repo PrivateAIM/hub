@@ -17,7 +17,7 @@ import {
 import { BaseSubscriber } from '@privateaim/server-db-kit';
 import { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
-import { AnalysisConfigurationCommand, useAnalysisConfigurationComponent } from '../../../components';
+import { AnalysisMetadataCommand, useAnalysisMetadataComponent } from '../../../components';
 import { AnalysisNodeEntity } from './entity';
 
 @EventSubscriber()
@@ -72,9 +72,9 @@ AnalysisNodeEntity
     async afterInsert(event: InsertEvent<AnalysisNodeEntity>): Promise<any> {
         await super.afterInsert(event);
 
-        const analysisConfiguration = useAnalysisConfigurationComponent();
+        const analysisConfiguration = useAnalysisMetadataComponent();
         analysisConfiguration.trigger(
-            AnalysisConfigurationCommand.RECALC,
+            AnalysisMetadataCommand.RECALC,
             {
                 analysisId: event.entity.analysis_id,
             },
@@ -88,9 +88,9 @@ AnalysisNodeEntity
 
         await super.beforeRemove(event);
 
-        const analysisConfiguration = useAnalysisConfigurationComponent();
+        const analysisConfiguration = useAnalysisMetadataComponent();
         analysisConfiguration.trigger(
-            AnalysisConfigurationCommand.RECALC,
+            AnalysisMetadataCommand.RECALC,
             {
                 analysisId: event.entity.analysis_id,
             },
