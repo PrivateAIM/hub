@@ -62,7 +62,7 @@ AnalysisEntity
         analysisConfiguration.trigger(
             AnalysisConfigurationCommand.RECALC,
             {
-                analysisId: event.entity.analysis_id,
+                analysisId: event.databaseEntity.id,
             },
         );
     }

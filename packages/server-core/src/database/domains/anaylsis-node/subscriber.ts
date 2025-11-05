@@ -72,33 +72,23 @@ AnalysisNodeEntity
     async afterInsert(event: InsertEvent<AnalysisNodeEntity>): Promise<any> {
         await super.afterInsert(event);
 
-        wait(0)
-            .then(() => {
-                const analysisConfiguration = useAnalysisConfigurationComponent();
-                analysisConfiguration.trigger(
-                    AnalysisConfigurationCommand.RECALC,
-                    {
-                        analysisId: event.entity.analysis_id,
-                    },
-                );
-            });
+        const analysisConfiguration = useAnalysisConfigurationComponent();
+        analysisConfiguration.trigger(
+            AnalysisConfigurationCommand.RECALC,
+            {
+                analysisId: event.entity.analysis_id,
+            },
+        );
     }
 
     async afterRemove(event: RemoveEvent<AnalysisNodeEntity>): Promise<any> {
-        if (!event.entity) {
-            return;
-        }
-
-        wait(0)
-            .then(() => {
-                const analysisConfiguration = useAnalysisConfigurationComponent();
-                analysisConfiguration.trigger(
-                    AnalysisConfigurationCommand.RECALC,
-                    {
-                        analysisId: event.entity.analysis_id,
-                    },
-                );
-            });
+        const analysisConfiguration = useAnalysisConfigurationComponent();
+        analysisConfiguration.trigger(
+            AnalysisConfigurationCommand.RECALC,
+            {
+                analysisId: event.databaseEntity.analysis_id,
+            },
+        );
     }
 
     listenTo(): CallableFunction | string {
