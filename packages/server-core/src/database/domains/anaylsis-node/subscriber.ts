@@ -16,7 +16,7 @@ import {
 } from '@privateaim/core-kit';
 import { BaseSubscriber } from '@privateaim/server-db-kit';
 import { EntityEventDestination } from '@privateaim/server-kit';
-import { DomainEventNamespace, wait } from '@privateaim/kit';
+import { DomainEventNamespace } from '@privateaim/kit';
 import { AnalysisConfigurationCommand, useAnalysisConfigurationComponent } from '../../../components';
 import { AnalysisNodeEntity } from './entity';
 
