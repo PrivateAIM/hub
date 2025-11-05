@@ -46,7 +46,7 @@
         "@types/cors": "^2.8.19",
         "@types/supertest": "^6.0.3",
         "@types/tar-stream": "^3.1.4",
-        "testcontainers": "^11.7.2"
+        "testcontainers": "^11.8.0"
     },
     "scripts": {
         "dev": "ts-node src/index.ts",
