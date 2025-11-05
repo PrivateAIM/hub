@@ -5,12 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { AnalysisBucketType, AnalysisNodeApprovalStatus, NodeType } from '@privateaim/core-kit';
-import { EnvironmentName } from '@privateaim/kit';
+import type { Analysis } from '@privateaim/core-kit';
+import { AnalysisBucketType, NodeType } from '@privateaim/core-kit';
 import type { ComponentHandler } from '@privateaim/server-kit';
+import { clone, isEqual } from 'smob';
 import type { DataSource, Repository } from 'typeorm';
 import { useDataSource } from 'typeorm-extension';
-import { useEnv } from '../../../../config';
 import { AnalysisBucketFileEntity, AnalysisEntity, AnalysisNodeEntity } from '../../../../database';
 import type { AnalysisConfigurationCommand } from '../../constants';
 import type { AnalysisConfigurationRecalcPayload } from '../../types';
@@ -40,16 +40,18 @@ AnalysisConfigurationRecalcPayload> {
             id: value.analysisId,
         });
 
-        const entrypointStatusChanged = await this.setConfigurationEntrypointStatus(entity);
-        const imageStatusChanged = await this.setConfigurationImageStatus(entity);
-        const nodesChanged = await this.setConfigurationNodesStatus(entity);
+        const cloned = clone(entity);
 
-        if (entrypointStatusChanged || imageStatusChanged || nodesChanged) {
+        await this.setConfigurationEntrypointStatus(entity);
+        await this.setConfigurationImageStatus(entity);
+        await this.setConfigurationNodesStatus(entity);
+
+        if (this.hasChanged(cloned, entity)) {
             await this.analysisRepository.save(entity);
         }
     }
 
-    async setConfigurationEntrypointStatus(entity: AnalysisEntity) : Promise<boolean> {
+    async setConfigurationEntrypointStatus(entity: AnalysisEntity) : Promise<void> {
         const rootFile = await this.analysisBucketFileRepository.findOne({
             where: {
                 analysis_id: entity.id,
@@ -61,24 +63,14 @@ AnalysisConfigurationRecalcPayload> {
             relations: ['bucket'],
         });
 
-        if (this.hasChanged(entity.configuration_entrypoint_valid, !!rootFile)) {
-            entity.configuration_entrypoint_valid = !!rootFile;
-            return true;
-        }
-
-        return false;
+        entity.configuration_entrypoint_valid = !!rootFile;
     }
 
-    async setConfigurationImageStatus(entity: AnalysisEntity) : Promise<boolean> {
-        if (this.hasChanged(entity.configuration_image_valid, !!entity.master_image_id)) {
-            entity.configuration_image_valid = !!entity.master_image_id;
-            return true;
-        }
-
-        return false;
+    async setConfigurationImageStatus(entity: AnalysisEntity) : Promise<void> {
+        entity.configuration_image_valid = !!entity.master_image_id;
     }
 
-    async setConfigurationNodesStatus(entity: AnalysisEntity) : Promise<boolean> {
+    async setConfigurationNodesStatus(entity: AnalysisEntity) : Promise<void> {
         const analysisNodes = await this.analysisNodesRepository.find({
             where: {
                 analysis_id: entity.id,
@@ -86,54 +78,46 @@ AnalysisConfigurationRecalcPayload> {
             relations: ['node'],
         });
 
-        const ignoreApproval = useEnv('skipAnalysisApproval') ||
-            useEnv('env') === EnvironmentName.TEST;
-
         let hasAggregator : boolean = false;
         let hasDefault : boolean = false;
 
         for (let i = 0; i < analysisNodes.length; i++) {
             const { node } = analysisNodes[i];
 
-            if (
-                !ignoreApproval &&
-                analysisNodes[i].approval_status !== AnalysisNodeApprovalStatus.APPROVED
-            ) {
-                continue;
-            }
-
-            if (node.type === NodeType.AGGREGATOR) {
-                hasAggregator = true;
-                continue;
-            }
-
-            if (node.type === NodeType.DEFAULT) {
-                hasDefault = true;
+            switch (node.type) {
+                case NodeType.AGGREGATOR: {
+                    hasAggregator = true;
+                    break;
+                }
+                default: {
+                    hasDefault = true;
+                    break;
+                }
             }
         }
 
-        let hasAggregatorChanged = false;
-        if (this.hasChanged(entity.configuration_node_aggregator_valid, hasAggregator)) {
-            entity.configuration_node_aggregator_valid = hasAggregator;
-            hasAggregatorChanged = true;
-        }
-
-        let hasDefaultChanged = false;
-        if (this.hasChanged(entity.configuration_node_default_valid, hasDefault)) {
-            entity.configuration_node_default_valid = hasDefault;
-            hasDefaultChanged = true;
-        }
-
-        if (hasAggregatorChanged || hasDefaultChanged) {
-            entity.configuration_nodes_valid = entity.configuration_node_aggregator_valid &&
-            entity.configuration_node_default_valid;
-        }
-
-        return hasAggregatorChanged || hasDefaultChanged;
+        entity.configuration_node_aggregator_valid = hasAggregator;
+        entity.configuration_node_default_valid = hasDefault;
+        entity.configuration_nodes_valid = hasAggregator && hasDefault;
     }
 
-    private hasChanged(a: unknown, b: unknown) {
-        return a !== b;
-        // todo: deep object equality check
+    private hasChanged(a: Analysis, b: Analysis) {
+        const keys : (keyof Analysis)[] = [
+            'configuration_entrypoint_valid',
+
+            'configuration_image_valid',
+
+            'configuration_node_default_valid',
+            'configuration_node_aggregator_valid',
+            'configuration_nodes_valid',
+        ];
+
+        for (let i = 0; i < keys.length; i++) {
+            if (!isEqual(a[keys[i]], b[keys[i]])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
