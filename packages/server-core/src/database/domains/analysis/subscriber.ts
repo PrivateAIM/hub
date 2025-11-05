@@ -6,7 +6,7 @@
  */
 
 import type {
-    EntitySubscriberInterface, InsertEvent, UpdateEvent,
+    EntitySubscriberInterface, UpdateEvent,
 } from 'typeorm';
 import { EventSubscriber } from 'typeorm';
 import {
@@ -53,20 +53,6 @@ AnalysisEntity
                 return destinations;
             },
         });
-    }
-
-    async afterInsert(event: InsertEvent<AnalysisEntity>): Promise<any> {
-        await super.afterInsert(event);
-
-        if (event.entity.master_image_id) {
-            const analysisConfiguration = useAnalysisConfigurationComponent();
-            analysisConfiguration.trigger(
-                AnalysisConfigurationCommand.RECALC,
-                {
-                    analysisId: event.entity.id,
-                },
-            );
-        }
     }
 
     async afterUpdate(event: UpdateEvent<AnalysisEntity>): Promise<any> {

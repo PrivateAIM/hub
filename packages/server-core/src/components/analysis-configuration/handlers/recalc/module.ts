@@ -78,11 +78,14 @@ AnalysisConfigurationRecalcPayload> {
             relations: ['node'],
         });
 
+        let nodes = 0;
         let hasAggregator : boolean = false;
         let hasDefault : boolean = false;
 
         for (let i = 0; i < analysisNodes.length; i++) {
             const { node } = analysisNodes[i];
+
+            nodes++;
 
             switch (node.type) {
                 case NodeType.AGGREGATOR: {
@@ -96,6 +99,7 @@ AnalysisConfigurationRecalcPayload> {
             }
         }
 
+        entity.nodes = nodes;
         entity.configuration_node_aggregator_valid = hasAggregator;
         entity.configuration_node_default_valid = hasDefault;
         entity.configuration_nodes_valid = hasAggregator && hasDefault;
@@ -103,6 +107,8 @@ AnalysisConfigurationRecalcPayload> {
 
     private hasChanged(a: Analysis, b: Analysis) {
         const keys : (keyof Analysis)[] = [
+            'nodes',
+
             'configuration_entrypoint_valid',
 
             'configuration_image_valid',

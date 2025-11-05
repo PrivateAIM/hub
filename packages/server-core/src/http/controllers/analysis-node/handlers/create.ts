@@ -16,7 +16,7 @@ import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { isEventComponentServiceUsable, useEventComponentService } from '@privateaim/server-telemetry-kit';
 import { useEnv } from '../../../../config';
 import {
-    AnalysisEntity, AnalysisNodeEntity, ProjectNodeEntity,
+    AnalysisNodeEntity, ProjectNodeEntity,
 } from '../../../../database';
 import { RequestRepositoryAdapter } from '../../../request';
 import { AnalysisNodeValidator } from '../utils';
@@ -66,17 +66,6 @@ export async function createAnalysisNodeRouteHandler(req: Request, res: Response
     }
 
     await dataSource.transaction(async (entityManager) => {
-        const analysisRepository = entityManager.getRepository(AnalysisEntity);
-        await analysisRepository.createQueryBuilder()
-            .update()
-            .where({
-                id: entity.analysis.id,
-            })
-            .set({
-                nodes: () => '`nodes` + 1',
-            })
-            .execute();
-
         const repository = entityManager.getRepository(AnalysisNodeEntity);
         const requestRepository = new RequestRepositoryAdapter(
             req,
