@@ -7,7 +7,7 @@
 
 import { extendObject } from '@authup/kit';
 import type { AnalysisNode } from '@privateaim/core-kit';
-import { AnalysisNodeRunStatus } from '@privateaim/core-kit';
+import { AnalysisNodeRunStatus, NodeType } from '@privateaim/core-kit';
 import { createTestSuite, expectPropertiesEqualToSrc, removeDateProperties } from '../../utils';
 import { createTestNode, createTestProject } from '../../utils/domains';
 
@@ -30,7 +30,9 @@ describe('src/controllers/core/analysis-node', () => {
         const project = await client.project.create(createTestProject());
         expect(project.id).toBeDefined();
 
-        const node = await client.node.create(createTestNode());
+        const node = await client.node.create(createTestNode({
+            type: NodeType.AGGREGATOR,
+        }));
         expect(node.id).toBeDefined();
 
         await client.projectNode.create({

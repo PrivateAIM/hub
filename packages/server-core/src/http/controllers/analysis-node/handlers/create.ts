@@ -65,38 +65,35 @@ export async function createAnalysisNodeRouteHandler(req: Request, res: Response
         entity.approval_status = AnalysisNodeApprovalStatus.APPROVED;
     }
 
-    await dataSource.transaction(async (entityManager) => {
-        const repository = entityManager.getRepository(AnalysisNodeEntity);
-        const requestRepository = new RequestRepositoryAdapter(
-            req,
-            repository,
-        );
+    const requestRepository = new RequestRepositoryAdapter(
+        req,
+        repository,
+    );
 
-        entity = await requestRepository.save(entity);
+    entity = await requestRepository.save(entity);
 
-        if (entity.run_status) {
-            if (isEventComponentServiceUsable()) {
-                const eventService = useEventComponentService();
-                await eventService.command({
-                    command: 'create',
+    if (entity.run_status) {
+        if (isEventComponentServiceUsable()) {
+            const eventService = useEventComponentService();
+            await eventService.command({
+                command: 'create',
+                data: {
+                    ref_type: DomainType.ANALYSIS_NODE,
+                    ref_id: entity.id,
+                    name: entity.run_status,
+                    scope: 'run',
                     data: {
-                        ref_type: DomainType.ANALYSIS_NODE,
-                        ref_id: entity.id,
-                        name: entity.run_status,
-                        scope: 'run',
-                        data: {
-                            analysis_id: data.analysis.id,
-                            analysis_realm_id: data.analysis.realm_id,
-                            node_id: data.node.id,
-                            node_realm_id: data.node.realm_id,
-                        },
-                        expiring: true,
-                        expires_at: new Date(Date.now() + MONTH_IN_MS).toISOString(),
+                        analysis_id: data.analysis.id,
+                        analysis_realm_id: data.analysis.realm_id,
+                        node_id: data.node.id,
+                        node_realm_id: data.node.realm_id,
                     },
-                });
-            }
+                    expiring: true,
+                    expires_at: new Date(Date.now() + MONTH_IN_MS).toISOString(),
+                },
+            });
         }
-    });
+    }
 
     return sendCreated(res, entity);
 }

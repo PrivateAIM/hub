@@ -58,11 +58,17 @@ AnalysisEntity
     async afterUpdate(event: UpdateEvent<AnalysisEntity>): Promise<any> {
         await super.afterUpdate(event);
 
+        const analysisId = event.entity?.id ??
+            event.databaseEntity?.id;
+        if (!analysisId) {
+            return;
+        }
+
         const analysisConfiguration = useAnalysisConfigurationComponent();
         analysisConfiguration.trigger(
             AnalysisConfigurationCommand.RECALC,
             {
-                analysisId: event.databaseEntity.id,
+                analysisId,
             },
         );
     }

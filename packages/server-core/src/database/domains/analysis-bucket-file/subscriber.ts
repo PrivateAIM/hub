@@ -72,22 +72,25 @@ AnalysisBucketFileEntity
     async afterUpdate(event: UpdateEvent<AnalysisBucketFileEntity>): Promise<any> {
         await super.afterUpdate(event);
 
+        const analysisId = event.entity?.analysis_id ??
+            event.databaseEntity?.analysis_id;
+
         const analysisConfiguration = useAnalysisConfigurationComponent();
         analysisConfiguration.trigger(
             AnalysisConfigurationCommand.RECALC,
             {
-                analysisId: event.databaseEntity.analysis_id,
+                analysisId,
             },
         );
     }
 
     async afterRemove(event: RemoveEvent<AnalysisBucketFileEntity>): Promise<any> {
-        if (event.databaseEntity.root) {
+        if (event.entity.root) {
             const analysisConfiguration = useAnalysisConfigurationComponent();
             analysisConfiguration.trigger(
                 AnalysisConfigurationCommand.RECALC,
                 {
-                    analysisId: event.databaseEntity.analysis_id,
+                    analysisId: event.entity.analysis_id,
                 },
             );
         }

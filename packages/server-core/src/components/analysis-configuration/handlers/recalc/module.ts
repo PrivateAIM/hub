@@ -8,7 +8,7 @@
 import type { Analysis } from '@privateaim/core-kit';
 import { AnalysisBucketType, NodeType } from '@privateaim/core-kit';
 import type { ComponentHandler } from '@privateaim/server-kit';
-import { clone, isEqual } from 'smob';
+import { isEqual } from 'smob';
 import type { DataSource, Repository } from 'typeorm';
 import { useDataSource } from 'typeorm-extension';
 import { AnalysisBucketFileEntity, AnalysisEntity, AnalysisNodeEntity } from '../../../../database';
@@ -40,7 +40,13 @@ AnalysisConfigurationRecalcPayload> {
             id: value.analysisId,
         });
 
-        const cloned = clone(entity);
+        if (!entity) {
+            return;
+        }
+
+        const cloned = {
+            ...entity,
+        };
 
         await this.setConfigurationEntrypointStatus(entity);
         await this.setConfigurationImageStatus(entity);
@@ -106,19 +112,20 @@ AnalysisConfigurationRecalcPayload> {
     }
 
     private hasChanged(a: Analysis, b: Analysis) {
-        const keys : (keyof Analysis)[] = [
-            'nodes',
-
-            'configuration_entrypoint_valid',
-
-            'configuration_image_valid',
-
-            'configuration_node_default_valid',
-            'configuration_node_aggregator_valid',
-            'configuration_nodes_valid',
+        const excludeKeys : (keyof Analysis)[] = [
+            'updated_at',
+            'created_at',
         ];
 
+        const keys = Object.keys(a);
+        let index : number;
+
         for (let i = 0; i < keys.length; i++) {
+            index = excludeKeys.indexOf(keys[i] as keyof Analysis);
+            if (index !== -1) {
+                continue;
+            }
+
             if (!isEqual(a[keys[i]], b[keys[i]])) {
                 return true;
             }

@@ -41,19 +41,15 @@ export async function deleteAnalysisNodeRouteHandler(req: Request, res: Response
         throw new ForbiddenError();
     }
 
-    await dataSource.transaction(async (entityManager) => {
-        const { id: entityId } = entity;
+    const { id: entityId } = entity;
 
-        const repository = entityManager.getRepository(AnalysisNodeEntity);
+    const requestRepository = new RequestRepositoryAdapter(
+        req,
+        repository,
+    );
+    await requestRepository.remove(entity);
 
-        const requestRepository = new RequestRepositoryAdapter(
-            req,
-            repository,
-        );
-        await requestRepository.remove(entity);
-
-        entity.id = entityId;
-    });
+    entity.id = entityId;
 
     // -------------------------------------------
 
