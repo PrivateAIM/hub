@@ -72,7 +72,7 @@ export async function createAnalysisNodeRouteHandler(req: Request, res: Response
 
     entity = await requestRepository.save(entity);
 
-    if (entity.run_status) {
+    if (entity.execution_status) {
         if (isEventComponentServiceUsable()) {
             const eventService = useEventComponentService();
             await eventService.command({
@@ -80,13 +80,15 @@ export async function createAnalysisNodeRouteHandler(req: Request, res: Response
                 data: {
                     ref_type: DomainType.ANALYSIS_NODE,
                     ref_id: entity.id,
-                    name: entity.run_status,
+                    name: entity.execution_status,
                     scope: 'run',
                     data: {
+
                         analysis_id: data.analysis.id,
                         analysis_realm_id: data.analysis.realm_id,
                         node_id: data.node.id,
                         node_realm_id: data.node.realm_id,
+                        execution_progress: data.execution_progress,
                     },
                     expiring: true,
                     expires_at: new Date(Date.now() + MONTH_IN_MS).toISOString(),

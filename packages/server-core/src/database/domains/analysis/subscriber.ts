@@ -15,7 +15,7 @@ import {
 import { BaseSubscriber } from '@privateaim/server-db-kit';
 import { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
-import { AnalysisConfigurationCommand, useAnalysisConfigurationComponent } from '../../../components';
+import { AnalysisMetadataCommand, useAnalysisMetadataComponent } from '../../../components';
 import { AnalysisEntity } from './entity';
 
 @EventSubscriber()
@@ -64,9 +64,9 @@ AnalysisEntity
             return;
         }
 
-        const analysisConfiguration = useAnalysisConfigurationComponent();
+        const analysisConfiguration = useAnalysisMetadataComponent();
         analysisConfiguration.trigger(
-            AnalysisConfigurationCommand.RECALC,
+            AnalysisMetadataCommand.RECALC,
             {
                 analysisId,
             },

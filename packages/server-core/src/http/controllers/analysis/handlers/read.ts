@@ -66,7 +66,7 @@ export async function getManyAnalysisRouteHandler(req: Request, res: Response) :
                 'project_id',
                 'realm_id',
                 'build_status',
-                'run_status',
+                'execution_status',
                 'configuration_locked',
             ],
         },

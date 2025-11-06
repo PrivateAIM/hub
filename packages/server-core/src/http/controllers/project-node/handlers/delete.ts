@@ -5,9 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionName, isRealmResourceWritable } from '@privateaim/kit';
+import { PermissionName, ProcessStatus, isRealmResourceWritable } from '@privateaim/kit';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
-import { AnalysisNodeRunStatus } from '@privateaim/core-kit';
 import { useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
@@ -72,8 +71,8 @@ export async function deleteProjectNodeRouteHandler(req: Request, res: Response)
             let nodeIsActivelyUsed: boolean = false;
             for (let i = 0; i < analysisNodes.length; i++) {
                 if (
-                    analysisNodes[i].run_status &&
-                    analysisNodes[i].run_status !== AnalysisNodeRunStatus.FAILED
+                    analysisNodes[i].execution_status &&
+                    analysisNodes[i].execution_status !== ProcessStatus.FAILED
                 ) {
                     nodeIsActivelyUsed = true;
                     break;

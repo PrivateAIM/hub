@@ -10,11 +10,11 @@ import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
 import FAnalysisConfigurationStep from './FAnalysisConfigurationStep.vue';
 import FAnalysisBuildStep from './FAnalysisBuildStep.vue';
-import FAnalysisRunStep from './FAnalysisRunStep.vue';
+import FAnalysisExecutionStep from './FAnalysisExecutionStep.vue';
 
 export default defineComponent({
     components: {
-        FAnalysisRunStep,
+        FAnalysisRunStep: FAnalysisExecutionStep,
         FAnalysisBuildStep,
         FAnalysisConfigurationStep,
     },

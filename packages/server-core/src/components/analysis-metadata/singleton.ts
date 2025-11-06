@@ -7,13 +7,13 @@
 
 import type { Component } from '@privateaim/server-kit';
 import { singa } from 'singa';
-import { createAnalysisConfigurationComponent } from './module';
+import { createAnalysisMetadataComponent } from './module';
 
 const instance = singa<Component>({
-    name: 'analysisConfigurationComponent',
-    factory: () => createAnalysisConfigurationComponent(),
+    name: 'analysisMetadata',
+    factory: () => createAnalysisMetadataComponent(),
 });
 
-export function useAnalysisConfigurationComponent(): Component {
+export function useAnalysisMetadataComponent(): Component {
     return instance.use();
 }

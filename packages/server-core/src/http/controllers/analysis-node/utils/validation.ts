@@ -5,10 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { AnalysisNodeApprovalStatus, AnalysisNodeRunStatus } from '@privateaim/core-kit';
+import { AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
 import { Container } from 'validup';
 import { createValidationChain, createValidator } from '@validup/adapter-validator';
 import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
+import { ProcessStatus } from '@privateaim/kit';
 import type { AnalysisNodeEntity } from '../../../../database';
 
 export class AnalysisNodeValidator extends Container<AnalysisNodeEntity> {
@@ -40,12 +41,23 @@ export class AnalysisNodeValidator extends Container<AnalysisNodeEntity> {
         );
 
         this.mount(
-            'run_status',
+            'execution_status',
             { optional: true },
             createValidator(() => {
                 const chain = createValidationChain();
                 return chain
-                    .isIn(Object.values(AnalysisNodeRunStatus))
+                    .isIn(Object.values(ProcessStatus))
+                    .optional({ values: 'null' });
+            }),
+        );
+
+        this.mount(
+            'execution_progress',
+            { optional: true },
+            createValidator(() => {
+                const chain = createValidationChain();
+                return chain
+                    .isInt({ gt: -1 })
                     .optional({ values: 'null' });
             }),
         );

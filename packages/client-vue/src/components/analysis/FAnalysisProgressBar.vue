@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 import type { Analysis } from '@privateaim/core-kit';
-import { AnalysisBuildStatus, AnalysisRunStatus } from '@privateaim/core-kit';
+import { ProcessStatus } from '@privateaim/kit';
 import type { PropType } from 'vue';
 import { computed, defineComponent, toRef } from 'vue';
 
@@ -37,36 +37,32 @@ export default defineComponent({
         });
 
         const buildProgress = computed(() => {
-            if (entity.value.build_status === AnalysisBuildStatus.FINISHED) {
+            if (entity.value.build_status === ProcessStatus.FINISHED) {
                 return 100;
             }
 
-            if (entity.value.build_status === AnalysisBuildStatus.STARTED) {
-                return 66.33;
+            if (entity.value.build_status === ProcessStatus.STARTED) {
+                return 20;
             }
 
-            if (entity.value.build_status === AnalysisBuildStatus.STARTING) {
-                return 33.33;
+            if (entity.value.build_status === ProcessStatus.STARTING) {
+                return 10;
             }
 
             return 0;
         });
 
         const runProgress = computed(() => {
-            if (entity.value.run_status === AnalysisRunStatus.FINISHED) {
+            if (entity.value.execution_status === ProcessStatus.FINISHED) {
                 return 100;
             }
 
-            if (entity.value.run_status === AnalysisRunStatus.RUNNING) {
-                return 70;
-            }
-
-            if (entity.value.run_status === AnalysisRunStatus.STARTED) {
-                return 40;
-            }
-
-            if (entity.value.run_status === AnalysisRunStatus.STARTING) {
+            if (entity.value.execution_status === ProcessStatus.STARTED) {
                 return 20;
+            }
+
+            if (entity.value.execution_status === ProcessStatus.STARTING) {
+                return 10;
             }
 
             return 0;
@@ -85,7 +81,7 @@ export default defineComponent({
         });
 
         const bgClazz = computed(() => {
-            if (entity.value.run_status === AnalysisRunStatus.FINISHED) {
+            if (entity.value.execution_status === ProcessStatus.FINISHED) {
                 return 'bg-success';
             }
 

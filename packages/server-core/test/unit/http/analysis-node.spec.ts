@@ -7,7 +7,11 @@
 
 import { extendObject } from '@authup/kit';
 import type { AnalysisNode } from '@privateaim/core-kit';
+<<<<<<< HEAD
 import { AnalysisNodeRunStatus, NodeType } from '@privateaim/core-kit';
+=======
+import { ProcessStatus } from '@privateaim/kit';
+>>>>>>> master
 import { createTestSuite, expectPropertiesEqualToSrc, removeDateProperties } from '../../utils';
 import { createTestNode, createTestProject } from '../../utils/domains';
 
@@ -49,7 +53,7 @@ describe('src/controllers/core/analysis-node', () => {
         const analysisNode = await client.analysisNode.create({
             analysis_id: analysis.id,
             node_id: node.id,
-            run_status: AnalysisNodeRunStatus.STARTING,
+            execution_status: ProcessStatus.STARTING,
         });
 
         delete analysisNode.analysis;
@@ -63,10 +67,11 @@ describe('src/controllers/core/analysis-node', () => {
 
         const data = await client.analysisNode.update(details.id, {
             ...details,
-            run_status: AnalysisNodeRunStatus.STARTED,
+            execution_status: ProcessStatus.STARTED,
+            execution_progress: 10,
         });
 
-        expect(data.run_status).toEqual(AnalysisNodeRunStatus.STARTED);
+        expect(data.execution_status).toEqual(ProcessStatus.STARTED);
 
         extendObject(details, data);
     });

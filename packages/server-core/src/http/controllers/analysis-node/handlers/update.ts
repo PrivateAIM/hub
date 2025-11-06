@@ -87,7 +87,7 @@ export async function updateAnalysisNodeRouteHandler(req: Request, res: Response
     }
 
     if (!isAuthorityOfNode || !canUpdate) {
-        if (isPropertySet(data, 'run_status')) {
+        if (isPropertySet(data, 'execution_status')) {
             throw new BadRequestError(
                 'You are either no authority of the node or you don\'t have the required permissions.',
             );
@@ -96,8 +96,8 @@ export async function updateAnalysisNodeRouteHandler(req: Request, res: Response
 
     entity = await dataSource.transaction(async (entityManager) => {
         if (
-            entity.run_status !== data.run_status &&
-            data.run_status
+            entity.execution_status !== data.execution_status &&
+            data.execution_status
         ) {
             if (isEventComponentServiceUsable()) {
                 const eventService = useEventComponentService();
@@ -106,7 +106,7 @@ export async function updateAnalysisNodeRouteHandler(req: Request, res: Response
                     data: {
                         ref_type: DomainType.ANALYSIS_NODE,
                         ref_id: entity.id,
-                        name: data.run_status,
+                        name: data.execution_status,
                         scope: 'run',
                         data: pickRecord(entity, [
                             'analysis_id',

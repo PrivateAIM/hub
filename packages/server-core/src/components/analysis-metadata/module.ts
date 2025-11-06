@@ -13,13 +13,13 @@ import {
 } from '@privateaim/server-kit';
 import { useEnv } from '@privateaim/server-telemetry';
 import type { ObjectLiteral } from 'rapiq';
-import { AnalysisConfigurationCommand, AnalysisConfigurationTaskQueue } from './constants';
-import { AnalysisConfigurationRecalcHandler } from './handlers';
+import { AnalysisMetadataCommand, AnalysisMetadataTaskQueue } from './constants';
+import { AnalysisMetadataRecalcHandler } from './handlers';
 
-export function createAnalysisConfigurationComponent(): Component {
+export function createAnalysisMetadataComponent(): Component {
     const manager = new ComponentHandlers();
 
-    manager.mount(AnalysisConfigurationCommand.RECALC, new AnalysisConfigurationRecalcHandler());
+    manager.mount(AnalysisMetadataCommand.RECALC, new AnalysisMetadataRecalcHandler());
 
     return {
         async start() {
@@ -32,7 +32,7 @@ export function createAnalysisConfigurationComponent(): Component {
                 const queueRouter = useQueueRouter();
 
                 await queueRouter.consumeAny(
-                    AnalysisConfigurationTaskQueue,
+                    AnalysisMetadataTaskQueue,
                     (
                         payload,
                     ) => manager.execute(
@@ -42,7 +42,7 @@ export function createAnalysisConfigurationComponent(): Component {
                     ),
                 );
             } else {
-                useLogger().warn('Analysis configuration component can not consume tasks.');
+                useLogger().warn('Analysis metadata component can not consume tasks.');
             }
         },
         async trigger(
@@ -58,7 +58,7 @@ export function createAnalysisConfigurationComponent(): Component {
                     type: key,
                     data: value,
                     metadata: {
-                        routing: AnalysisConfigurationTaskQueue,
+                        routing: AnalysisMetadataTaskQueue,
                         ...metadata,
                     },
                 });

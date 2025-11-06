@@ -19,10 +19,10 @@ import type {
     Analysis,
     AnalysisNode,
     AnalysisNodeApprovalStatus,
-    AnalysisNodeRunStatus,
     Node,
 } from '@privateaim/core-kit';
 import type { Realm } from '@authup/core-kit';
+import { ProcessStatus } from '@privateaim/kit';
 import { AnalysisEntity } from '../analysis';
 import { NodeEntity } from '../node';
 
@@ -38,7 +38,12 @@ export class AnalysisNodeEntity implements AnalysisNode {
         approval_status: AnalysisNodeApprovalStatus | null;
 
     @Column({ type: 'varchar', nullable: true, default: null })
-        run_status: AnalysisNodeRunStatus | null;
+        execution_status: ProcessStatus | null;
+
+    @Column({
+        type: 'int', unsigned: true, nullable: true, default: null,
+    })
+        execution_progress: number | null;
 
     // ------------------------------------------------------------------
 

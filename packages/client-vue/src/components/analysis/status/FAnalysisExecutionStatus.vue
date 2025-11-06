@@ -6,33 +6,33 @@
   -->
 <script lang="ts">
 
-import { AnalysisRunStatus } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
 import { computed, defineComponent } from 'vue';
+import { ProcessStatus } from '@privateaim/kit';
 
 export default defineComponent({
     props: {
         status: {
-            type: String as PropType<`${AnalysisRunStatus}`>,
+            type: String as PropType<`${ProcessStatus}`>,
             default: null,
         },
     },
     setup(props) {
         const statusText = computed(() => {
             switch (props.status) {
-                case AnalysisRunStatus.STARTING:
+                case ProcessStatus.STARTING:
                     return 'starting...';
-                case AnalysisRunStatus.STOPPING:
+                case ProcessStatus.STOPPING:
                     return 'stopping...';
 
-                case AnalysisRunStatus.STARTED:
+                case ProcessStatus.STARTED:
                     return 'started';
-                case AnalysisRunStatus.STOPPED:
+                case ProcessStatus.STOPPED:
                     return 'stopped';
 
-                case AnalysisRunStatus.FINISHED:
+                case ProcessStatus.FINISHED:
                     return 'finished';
-                case AnalysisRunStatus.FAILED:
+                case ProcessStatus.FAILED:
                     return 'failed';
                 default:
                     return 'none';
@@ -41,15 +41,15 @@ export default defineComponent({
 
         const classSuffix = computed(() => {
             switch (props.status) {
-                case AnalysisRunStatus.STARTING:
-                case AnalysisRunStatus.STARTED:
-                case AnalysisRunStatus.STOPPED:
+                case ProcessStatus.STARTING:
+                case ProcessStatus.STARTED:
+                case ProcessStatus.STOPPED:
                     return 'primary';
-                case AnalysisRunStatus.FINISHED:
+                case ProcessStatus.FINISHED:
                     return 'success';
-                case AnalysisRunStatus.STOPPING:
+                case ProcessStatus.STOPPING:
                     return 'warning';
-                case AnalysisRunStatus.FAILED:
+                case ProcessStatus.FAILED:
                     return 'danger';
                 default:
                     return 'info';
@@ -58,14 +58,14 @@ export default defineComponent({
 
         const iconClass = computed(() => {
             switch (props.status) {
-                case AnalysisRunStatus.STARTING:
-                case AnalysisRunStatus.STARTED:
-                case AnalysisRunStatus.STOPPING:
+                case ProcessStatus.STARTING:
+                case ProcessStatus.STARTED:
+                case ProcessStatus.STOPPING:
                     return 'fa fa-rotate fa-spin';
-                case AnalysisRunStatus.FINISHED:
+                case ProcessStatus.FINISHED:
                     return 'fa fa-check';
-                case AnalysisRunStatus.FAILED:
-                case AnalysisRunStatus.STOPPED:
+                case ProcessStatus.FAILED:
+                case ProcessStatus.STOPPED:
                     return 'fa fa-times';
                 default:
                     return 'fa fa-circle';
