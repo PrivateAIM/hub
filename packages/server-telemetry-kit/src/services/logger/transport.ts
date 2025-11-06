@@ -26,7 +26,7 @@ export class LoggerTransport extends WinstonTransport {
 
         Promise.resolve()
             .then(() => this.save(payload))
-            .then(() => next());
+            .finally(() => next());
     }
 
     protected normalizeInput(info: Record<PropertyKey, any>) : LogInput {

@@ -34,7 +34,7 @@ export class LogValidator extends Container<LogInput> {
                 zod
                     .string()
                     .min(3)
-                    .max(2048),
+                    .max(4096),
             ),
         );
 

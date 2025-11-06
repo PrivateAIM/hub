@@ -6,7 +6,7 @@
  */
 
 import type {
-    EntitySubscriberInterface, InsertEvent, UpdateEvent,
+    EntitySubscriberInterface, UpdateEvent,
 } from 'typeorm';
 import { EventSubscriber } from 'typeorm';
 import {
@@ -55,28 +55,20 @@ AnalysisEntity
         });
     }
 
-    async afterInsert(event: InsertEvent<AnalysisEntity>): Promise<any> {
-        await super.afterInsert(event);
-
-        if (event.entity.master_image_id) {
-            const analysisConfiguration = useAnalysisMetadataComponent();
-            analysisConfiguration.trigger(
-                AnalysisMetadataCommand.RECALC,
-                {
-                    analysisId: event.entity.id,
-                },
-            );
-        }
-    }
-
     async afterUpdate(event: UpdateEvent<AnalysisEntity>): Promise<any> {
         await super.afterUpdate(event);
+
+        const analysisId = event.entity?.id ??
+            event.databaseEntity?.id;
+        if (!analysisId) {
+            return;
+        }
 
         const analysisConfiguration = useAnalysisMetadataComponent();
         analysisConfiguration.trigger(
             AnalysisMetadataCommand.RECALC,
             {
-                analysisId: event.entity.analysis_id,
+                analysisId,
             },
         );
     }

@@ -72,22 +72,19 @@ AnalysisBucketFileEntity
     async afterUpdate(event: UpdateEvent<AnalysisBucketFileEntity>): Promise<any> {
         await super.afterUpdate(event);
 
+        const analysisId = event.entity?.analysis_id ??
+            event.databaseEntity?.analysis_id;
+
         const analysisConfiguration = useAnalysisMetadataComponent();
         analysisConfiguration.trigger(
             AnalysisMetadataCommand.RECALC,
             {
-                analysisId: event.entity.analysis_id,
+                analysisId,
             },
         );
     }
 
-    async beforeRemove(event: RemoveEvent<AnalysisBucketFileEntity>): Promise<any> {
-        if (!event.entity) {
-            return;
-        }
-
-        await super.beforeRemove(event);
-
+    async afterRemove(event: RemoveEvent<AnalysisBucketFileEntity>): Promise<any> {
         if (event.entity.root) {
             const analysisConfiguration = useAnalysisMetadataComponent();
             analysisConfiguration.trigger(

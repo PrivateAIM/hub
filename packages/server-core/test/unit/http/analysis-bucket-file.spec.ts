@@ -56,18 +56,27 @@ describe('controllers/analysis-bucket-file', () => {
         details = removeDateProperties(analysisBucketFile);
     });
 
-    it('should read collection', async () => {
-        const client = suite.client();
-
-        const { data } = await client.analysisBucketFile.getMany();
-        expect(data.length).toEqual(1);
-    });
-
     it('should read resource', async () => {
         const client = suite.client();
 
         const data = await client.analysisBucketFile.getOne(details.id);
         expectPropertiesEqualToSrc(details, data);
+    });
+
+    it('should update resource', async () => {
+        const client = suite.client();
+        const data = await client.analysisBucketFile.update(details.id, {
+            root: true,
+        });
+
+        expect(data.root).toBeTruthy();
+    });
+
+    it('should read collection', async () => {
+        const client = suite.client();
+
+        const { data } = await client.analysisBucketFile.getMany();
+        expect(data.length).toEqual(1);
     });
 
     it('should delete resource', async () => {

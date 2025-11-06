@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { EnvironmentName } from '@privateaim/kit';
+import { EnvironmentName, wait } from '@privateaim/kit';
 import type { Component } from '@privateaim/server-kit';
 import {
     ComponentHandlers,
@@ -64,7 +64,8 @@ export function createAnalysisMetadataComponent(): Component {
                 });
 
                 const queueRouter = useQueueRouter();
-                await queueRouter.publish(payload);
+                await wait(500)
+                    .then(() => queueRouter.publish(payload));
             } else {
                 await manager.execute(key, value, metadata);
             }

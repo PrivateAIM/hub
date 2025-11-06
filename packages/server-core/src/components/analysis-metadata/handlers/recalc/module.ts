@@ -5,8 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { Analysis } from '@privateaim/core-kit';
 import { AnalysisBucketType, NodeType } from '@privateaim/core-kit';
 import type { ComponentHandler } from '@privateaim/server-kit';
+import { isEqual } from 'smob';
 import type { DataSource, Repository } from 'typeorm';
 import { useDataSource } from 'typeorm-extension';
 import { AnalysisBucketFileEntity, AnalysisEntity, AnalysisNodeEntity } from '../../../../database';
@@ -38,11 +40,21 @@ AnalysisMetadataRecalcPayload> {
             id: value.analysisId,
         });
 
+        if (!entity) {
+            return;
+        }
+
+        const cloned = {
+            ...entity,
+        };
+
         await this.querySelf(entity);
         await this.queryAnalysisFiles(entity);
         await this.queryAnalysisNodes(entity);
 
-        await this.analysisRepository.save(entity);
+        if (this.hasChanged(cloned, entity)) {
+            await this.analysisRepository.save(entity);
+        }
     }
 
     async querySelf(entity: AnalysisEntity) : Promise<void> {
@@ -98,17 +110,6 @@ AnalysisMetadataRecalcPayload> {
             }
                 */
 
-            switch (analysisNode.node.type) {
-                case NodeType.AGGREGATOR: {
-                    hasAggregator = true;
-                    break;
-                }
-                default: {
-                    hasDefault = true;
-                    break;
-                }
-            }
-
             if (analysisNode.node.type === NodeType.AGGREGATOR) {
                 hasAggregator = true;
                 continue;
@@ -126,5 +127,28 @@ AnalysisMetadataRecalcPayload> {
         entity.configuration_node_aggregator_valid = hasAggregator;
         entity.configuration_node_default_valid = hasDefault;
         entity.configuration_nodes_valid = hasAggregator && hasDefault;
+    }
+
+    private hasChanged(a: Analysis, b: Analysis) {
+        const excludeKeys : (keyof Analysis)[] = [
+            'updated_at',
+            'created_at',
+        ];
+
+        const keys = Object.keys(a);
+        let index : number;
+
+        for (let i = 0; i < keys.length; i++) {
+            index = excludeKeys.indexOf(keys[i] as keyof Analysis);
+            if (index !== -1) {
+                continue;
+            }
+
+            if (!isEqual(a[keys[i]], b[keys[i]])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
