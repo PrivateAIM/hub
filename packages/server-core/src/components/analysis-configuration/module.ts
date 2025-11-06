@@ -64,7 +64,7 @@ export function createAnalysisConfigurationComponent(): Component {
                 });
 
                 const queueRouter = useQueueRouter();
-                await wait(100)
+                await wait(500)
                     .then(() => queueRouter.publish(payload));
             } else {
                 await manager.execute(key, value, metadata);
