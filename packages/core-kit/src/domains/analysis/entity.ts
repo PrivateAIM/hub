@@ -55,9 +55,7 @@ export interface Analysis {
 
     // ------------------------------------------------------------------
 
-    /**
-     * todo: add distribution_status
-     */
+    distribution_status: ProcessStatus | null;
 
     // ------------------------------------------------------------------
     execution_status: ProcessStatus | null;

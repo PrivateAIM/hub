@@ -11,7 +11,7 @@ import type { Aggregator } from '@privateaim/server-kit';
 import { useEnv } from '../../../config';
 import { createAnalysisManagerMasterImagesHandlers } from './handlers';
 
-export function createAnalysisManagerMasterImagesAggregator() : Aggregator {
+export function createMasterImagesAggregator() : Aggregator {
     if (!isQueueRouterUsable() || useEnv('env') === EnvironmentName.TEST) {
         return {
             start() {

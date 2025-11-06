@@ -1,0 +1,85 @@
+/*
+ * Copyright (c) 2022-2024.
+ * Author Peter Placzek (tada5hi)
+ * For the full copyright and license information,
+ * view the LICENSE file that was distributed with this source code.
+ */
+
+import type {
+    CoreBucketEventPayload,
+} from '@privateaim/server-core-worker-kit';
+import {
+    CoreEvent,
+} from '@privateaim/server-core-worker-kit';
+import {
+    ComponentHandlers,
+    type ComponentHandlersOptions,
+} from '@privateaim/server-kit';
+import { AnalysisBucketEntity, AnalysisEntity, useDataSourceSync } from '../../../database';
+
+export function defineAnalysisCoreHandlers(
+    options: ComponentHandlersOptions = {},
+) {
+    const manager = new ComponentHandlers(options);
+
+    const dataSource = useDataSourceSync();
+    const repository = dataSource.getRepository(AnalysisEntity);
+
+    manager.mount(CoreEvent.BUCKET_CREATED, async (
+        value: CoreBucketEventPayload,
+    ) : Promise<void> => {
+        const entity = await repository.findOneBy({
+            id: value.id,
+        });
+
+        if (!entity) {
+            return;
+        }
+
+        const bucketRepository = dataSource.getRepository(AnalysisBucketEntity);
+        let bucket = await bucketRepository.findOneBy({
+            analysis_id: value.id,
+            type: value.bucketType,
+        });
+
+        if (bucket) {
+            bucket = bucketRepository.merge(bucket, {
+                external_id: value.bucketId,
+            });
+        } else {
+            bucket = bucketRepository.create({
+                analysis_id: value.id,
+                type: value.bucketType,
+                external_id: value.bucketId,
+                realm_id: entity.realm_id,
+            });
+        }
+
+        await bucketRepository.save(bucket);
+    });
+
+    manager.mount(CoreEvent.BUCKET_DELETED, async (
+        value: CoreBucketEventPayload,
+    ) : Promise<void> => {
+        const entity = await repository.findOneBy({
+            id: value.id,
+        });
+
+        if (!entity) {
+            return;
+        }
+
+        const bucketRepository = dataSource.getRepository(AnalysisBucketEntity);
+        const bucket = await bucketRepository.findOneBy({
+            type: value.bucketType,
+            analysis_id: entity.id,
+            // todo: maybe by external_id too
+        });
+
+        if (bucket) {
+            await bucketRepository.remove(bucket);
+        }
+    });
+
+    return manager;
+}
