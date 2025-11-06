@@ -22,6 +22,16 @@ import {
 } from './handlers';
 
 export function createAnalysisDistributorAggregator() : Aggregator {
+    if (!isQueueRouterUsable()) {
+        useLogger().warn('Analysis distributor aggregator can not consume events.');
+        return { start: () => Promise.resolve() };
+    }
+
+    if (useEnv('env') === EnvironmentName.TEST) {
+        useLogger().warn('Analysis distributor aggregator is disabled in test environment.');
+        return { start: () => Promise.resolve() };
+    }
+
     const handlers = defineAnalysisDistributorHandlers({
         emitter: new QueueRouterComponentEmitter(),
     });
@@ -30,25 +40,18 @@ export function createAnalysisDistributorAggregator() : Aggregator {
         async start() {
             await handlers.initialize();
 
-            if (
-                isQueueRouterUsable() &&
-                useEnv('env') !== EnvironmentName.TEST
-            ) {
-                const queueRouter = useQueueRouter();
+            const queueRouter = useQueueRouter();
 
-                await queueRouter.consumeAny(
-                    AnalysisDistributorEventQueueRouterRouting,
-                    async (
-                        payload,
-                    ) => handlers.execute(
-                        payload.type,
-                        payload.data,
-                        payload.metadata,
-                    ),
-                );
-            } else {
-                useLogger().warn('Analysis distributor aggregator can not consume events.');
-            }
+            await queueRouter.consumeAny(
+                AnalysisDistributorEventQueueRouterRouting,
+                async (
+                    payload,
+                ) => handlers.execute(
+                    payload.type,
+                    payload.data,
+                    payload.metadata,
+                ),
+            );
         },
     };
 }
