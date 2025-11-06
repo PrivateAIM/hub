@@ -6,7 +6,8 @@
  */
 
 import { extendObject } from '@authup/kit';
-import {AnalysisNode, NodeType} from '@privateaim/core-kit';
+import type { AnalysisNode } from '@privateaim/core-kit';
+import { NodeType } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
 import { createTestSuite, expectPropertiesEqualToSrc, removeDateProperties } from '../../utils';
 import { createTestNode, createTestProject } from '../../utils/domains';
