@@ -9,7 +9,7 @@ import type {
     CoreBucketEventPayload,
 } from '@privateaim/server-core-worker-kit';
 import {
-    CoreEvent,
+    AnalysisCoreEvent,
 } from '@privateaim/server-core-worker-kit';
 import {
     ComponentHandlers,
@@ -25,7 +25,7 @@ export function defineAnalysisCoreHandlers(
     const dataSource = useDataSourceSync();
     const repository = dataSource.getRepository(AnalysisEntity);
 
-    manager.mount(CoreEvent.BUCKET_CREATED, async (
+    manager.mount(AnalysisCoreEvent.BUCKET_CREATED, async (
         value: CoreBucketEventPayload,
     ) : Promise<void> => {
         const entity = await repository.findOneBy({
@@ -58,7 +58,7 @@ export function defineAnalysisCoreHandlers(
         await bucketRepository.save(bucket);
     });
 
-    manager.mount(CoreEvent.BUCKET_DELETED, async (
+    manager.mount(AnalysisCoreEvent.BUCKET_DELETED, async (
         value: CoreBucketEventPayload,
     ) : Promise<void> => {
         const entity = await repository.findOneBy({

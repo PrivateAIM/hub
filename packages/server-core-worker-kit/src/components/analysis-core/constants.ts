@@ -7,7 +7,7 @@
 
 import { QueueRouterRoutingType } from '@privateaim/server-kit';
 
-export enum CoreEvent {
+export enum AnalysisCoreEvent {
     BUCKET_CREATED = 'bucketCreated',
     BUCKET_DELETED = 'bucketDeleted',
 
@@ -22,17 +22,17 @@ export enum CoreEvent {
     NONE = 'none',
 }
 
-export enum CoreCommand {
+export enum AnalysisCoreCommand {
     CONFIGURE = 'configure',
     DESTROY = 'destroy',
 }
 
-export const CoreEventQueueRouterRouting = {
+export const AnalysisCoreEventQueueRouterRouting = {
     type: QueueRouterRoutingType.PUB_SUB,
     key: 'analysisCoreEvents',
 };
 
-export const CoreTaskQueueRouterRouting = {
+export const AnalysisCoreTaskQueueRouterRouting = {
     type: QueueRouterRoutingType.WORK,
     key: 'analysisCoreCommands',
 };

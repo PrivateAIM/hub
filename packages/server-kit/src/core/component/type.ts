@@ -6,32 +6,26 @@
  */
 
 import type { ObjectLiteral } from '../../type';
-import type { ComponentError } from './error';
+
+export type ComponentStartFn = () => Promise<void> | void;
+
+export type ComponentTriggerFn = (
+    key: string,
+    value?: ObjectLiteral,
+    metadata?: ObjectLiteral
+) => Promise<void> | void;
+
+export interface ComponentWithTrigger {
+    trigger: ComponentTriggerFn
+}
 
 export type Component = {
-    start: () => void,
-    trigger?: (
-        key: string,
-        value?: ObjectLiteral,
-        metadata?: ObjectLiteral
-    ) => void
+    start: ComponentStartFn,
+    trigger?: ComponentTriggerFn,
 };
 
 export type ComponentErrorOptions = {
     code?: string | null,
     message?: string
     cause?: unknown
-};
-
-export type ComponentContextWithError<
-    T extends ObjectLiteral = ObjectLiteral,
-> = T & {
-    error: ComponentError | Error
-};
-
-export type ComponentContextWithCommand<
-    T extends ObjectLiteral = ObjectLiteral,
-    C extends string = string,
-> = Omit<T, 'command'> & {
-    command: C
 };

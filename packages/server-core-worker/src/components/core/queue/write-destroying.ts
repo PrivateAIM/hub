@@ -7,32 +7,32 @@
 
 import { useQueueRouter } from '@privateaim/server-kit';
 import {
-    CoreCommand,
-    CoreEvent,
+    AnalysisCoreCommand,
+    AnalysisCoreEvent,
     buildCoreEventQueueRouterPayload,
 } from '@privateaim/server-core-worker-kit';
 import type {
-    CoreDestroyPayload,
+    AnalysisCoreDestroyPayload,
 } from '@privateaim/server-core-worker-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import { useCoreLogger } from '../utils';
 
 export async function writeDestroyingEvent(
-    data: CoreDestroyPayload,
+    data: AnalysisCoreDestroyPayload,
 ) {
     const client = useQueueRouter();
     await client.publish(buildCoreEventQueueRouterPayload({
-        event: CoreEvent.DESTROYING,
-        command: CoreCommand.DESTROY,
+        event: AnalysisCoreEvent.DESTROYING,
+        command: AnalysisCoreCommand.DESTROY,
         data,
     }));
 
     useCoreLogger().info({
         message: `Destroying analysis ${data.id}`,
-        command: CoreCommand.DESTROY,
+        command: AnalysisCoreCommand.DESTROY,
         analysis_id: data.id,
         [LogFlag.REF_ID]: data.id,
-        event: CoreEvent.DESTROYING,
+        event: AnalysisCoreEvent.DESTROYING,
     });
 
     return data;

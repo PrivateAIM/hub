@@ -6,13 +6,13 @@
  */
 
 import { isClientErrorWithStatusCode } from 'hapic';
-import type { CoreDestroyPayload } from '@privateaim/server-core-worker-kit';
+import type { AnalysisCoreDestroyPayload } from '@privateaim/server-core-worker-kit';
 import { useCoreClient, useStorageClient } from '../../../../core';
 import { writeBucketDeletedEvent } from '../../queue';
 
 export async function executeCoreDestroyCommand(
-    payload: CoreDestroyPayload,
-) : Promise<CoreDestroyPayload> {
+    payload: AnalysisCoreDestroyPayload,
+) : Promise<AnalysisCoreDestroyPayload> {
     const core = useCoreClient();
     const storage = useStorageClient();
 

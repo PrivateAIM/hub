@@ -5,45 +5,65 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { ObjectLiteral } from '@privateaim/kit';
 import {
+    AnalysisBuilderBaseComponent,
     AnalysisBuilderTaskQueueRouterRouting,
 } from '@privateaim/server-core-worker-kit';
-import {
-    EnvironmentName, QueueRouterComponentEmitter, isQueueRouterUsable, useLogger, useQueueRouter,
+import type {
+    Component,
+    ComponentHandlers,
 } from '@privateaim/server-kit';
-import type { Component } from '@privateaim/server-kit';
-import { useEnv } from '../../config';
+import {
+    ComponentVoidEmitter,
+    QueueRouterComponentEmitter,
+    isQueueRouterUsable,
+    useQueueRouter,
+} from '@privateaim/server-kit';
 
 import { defineAnalysisBuilderHandlers } from './handlers';
 
-export function createAnalysisBuilderComponent() : Component {
-    const handlers = defineAnalysisBuilderHandlers({
-        emitter: new QueueRouterComponentEmitter(),
-    });
+export class AnalysisBuilderComponent extends AnalysisBuilderBaseComponent implements Component {
+    protected handlers: ComponentHandlers;
 
-    return {
-        async start() {
-            await handlers.initialize();
+    constructor() {
+        super();
 
-            if (
-                isQueueRouterUsable() &&
-                useEnv('env') !== EnvironmentName.TEST
-            ) {
-                const queueRouter = useQueueRouter();
+        this.handlers = defineAnalysisBuilderHandlers({
+            emitter: isQueueRouterUsable() ?
+                new QueueRouterComponentEmitter() :
+                new ComponentVoidEmitter(),
+        });
+    }
 
-                await queueRouter.consumeAny(
-                    AnalysisBuilderTaskQueueRouterRouting,
-                    async (
-                        payload,
-                    ) => handlers.execute(
-                        payload.type,
-                        payload.data,
-                        payload.metadata,
-                    ),
-                );
-            } else {
-                useLogger().warn('Analysis builder component can not consume tasks.');
-            }
-        },
-    };
+    async start() {
+        await this.handlers.initialize();
+
+        if (isQueueRouterUsable()) {
+            const queueRouter = useQueueRouter();
+
+            await queueRouter.consumeAny(
+                AnalysisBuilderTaskQueueRouterRouting,
+                async (
+                    payload,
+                ) => this.handlers.execute(
+                    payload.type,
+                    payload.data,
+                    payload.metadata,
+                ),
+            );
+        }
+    }
+
+    async trigger(
+        key: string,
+        value: ObjectLiteral = {},
+        metadata: ObjectLiteral = {},
+    ): Promise<void> {
+        await this.handlers.execute(
+            key,
+            value,
+            metadata,
+        );
+    }
 }

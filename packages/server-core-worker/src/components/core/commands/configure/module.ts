@@ -9,13 +9,13 @@ import {
     AnalysisBucketType,
     buildAnalysisBucketName,
 } from '@privateaim/core-kit';
-import type { CoreConfigurePayload } from '@privateaim/server-core-worker-kit';
+import type { AnalysisCoreConfigurePayload } from '@privateaim/server-core-worker-kit';
 import { useCoreClient, useStorageClient } from '../../../../core';
 import { writeBucketCreatedEvent } from '../../queue';
 
 export async function executeCoreConfigureCommand(
-    payload: CoreConfigurePayload,
-) : Promise<CoreConfigurePayload> {
+    payload: AnalysisCoreConfigurePayload,
+) : Promise<AnalysisCoreConfigurePayload> {
     const coreClient = useCoreClient();
 
     const bucketTypes = Object.values(AnalysisBucketType);

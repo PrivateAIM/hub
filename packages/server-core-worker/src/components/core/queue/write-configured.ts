@@ -7,32 +7,32 @@
 
 import { useQueueRouter } from '@privateaim/server-kit';
 import {
-    CoreCommand,
-    CoreEvent,
+    AnalysisCoreCommand,
+    AnalysisCoreEvent,
     buildCoreEventQueueRouterPayload,
 } from '@privateaim/server-core-worker-kit';
 import type {
-    CoreConfigurePayload,
+    AnalysisCoreConfigurePayload,
 } from '@privateaim/server-core-worker-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import { useCoreLogger } from '../utils';
 
 export async function writeConfiguredEvent(
-    data: CoreConfigurePayload,
+    data: AnalysisCoreConfigurePayload,
 ) {
     const client = useQueueRouter();
     await client.publish(buildCoreEventQueueRouterPayload({
-        event: CoreEvent.CONFIGURED,
-        command: CoreCommand.CONFIGURE,
+        event: AnalysisCoreEvent.CONFIGURED,
+        command: AnalysisCoreCommand.CONFIGURE,
         data,
     }));
 
     useCoreLogger().info({
         message: `Configured analysis ${data.id}`,
-        command: CoreCommand.CONFIGURE,
+        command: AnalysisCoreCommand.CONFIGURE,
         analysis_id: data.id,
         [LogFlag.REF_ID]: data.id,
-        event: CoreEvent.CONFIGURED,
+        event: AnalysisCoreEvent.CONFIGURED,
     });
 
     return data;

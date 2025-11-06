@@ -6,5 +6,5 @@
  */
 
 export * from './constants';
-export * from './queue';
+export * from './module';
 export * from './types';

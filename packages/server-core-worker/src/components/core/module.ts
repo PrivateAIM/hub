@@ -6,10 +6,10 @@
  */
 
 import {
-    CoreCommand,
-    CoreTaskQueueRouterRouting,
+    AnalysisCoreCommand,
+    AnalysisCoreTaskQueueRouterRouting,
 } from '@privateaim/server-core-worker-kit';
-import type { CoreConfigurePayload, CoreDestroyPayload } from '@privateaim/server-core-worker-kit';
+import type { AnalysisCoreConfigurePayload, AnalysisCoreDestroyPayload } from '@privateaim/server-core-worker-kit';
 import type { Component, QueueRouterHandlers } from '@privateaim/server-kit';
 import {
     EnvironmentName, isQueueRouterUsable, useLogger, useQueueRouter,
@@ -28,29 +28,29 @@ import {
 } from './queue';
 
 function createHandlers() : QueueRouterHandlers<{
-    [CoreCommand.CONFIGURE]: CoreConfigurePayload,
-    [CoreCommand.DESTROY]: CoreDestroyPayload
+    [AnalysisCoreCommand.CONFIGURE]: AnalysisCoreConfigurePayload,
+    [AnalysisCoreCommand.DESTROY]: AnalysisCoreDestroyPayload
 }> {
     return {
-        [CoreCommand.CONFIGURE]: async (message) => {
+        [AnalysisCoreCommand.CONFIGURE]: async (message) => {
             await Promise.resolve(message.data)
                 .then((data) => writeConfiguringEvent(data))
                 .then(executeCoreConfigureCommand)
                 .then((data) => writeConfiguredEvent(data))
                 .catch((err: Error) => writeFailedEvent({
                     data: message.data,
-                    command: CoreCommand.CONFIGURE,
+                    command: AnalysisCoreCommand.CONFIGURE,
                     error: err,
                 }));
         },
-        [CoreCommand.DESTROY]: async (message) => {
+        [AnalysisCoreCommand.DESTROY]: async (message) => {
             await Promise.resolve(message.data)
                 .then((data) => writeDestroyingEvent(data))
                 .then(executeCoreDestroyCommand)
                 .then((data) => writeDestroyedEvent(data))
                 .catch((err: Error) => writeFailedEvent({
                     data: message.data,
-                    command: CoreCommand.DESTROY,
+                    command: AnalysisCoreCommand.DESTROY,
                     error: err,
                 }));
         },
@@ -71,7 +71,7 @@ export function createCoreComponent() : Component {
 
     return {
         start() {
-            return queueRouter.consume(CoreTaskQueueRouterRouting, createHandlers());
+            return queueRouter.consume(AnalysisCoreTaskQueueRouterRouting, createHandlers());
         },
     };
 }

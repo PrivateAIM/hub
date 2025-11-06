@@ -5,20 +5,18 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { isRealmResourceWritable } from '@privateaim/kit';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { AnalysisAPICommand } from '@privateaim/core-kit';
+import { isRealmResourceWritable } from '@privateaim/kit';
 import { HTTPHandlerOperation, useRequestIdentityRealm } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import {
-    AnalysisEntity,
-} from '../../../../database';
-import { AnalysisCommandValidator } from '../utils';
-import { useAnalysisManager } from '../../../../services';
 import { useEnv } from '../../../../config';
+import { AnalysisEntity } from '../../../../database';
+import { useAnalysisManager } from '../../../../services';
+import { AnalysisCommandValidator } from '../utils';
 
 /**
  * Execute a analysis command (start, stop, build).
@@ -67,13 +65,17 @@ export async function handleAnalysisCommandRouteHandler(req: Request, res: Respo
 
         // Build Commands
         case AnalysisAPICommand.BUILD_STATUS:
-            entity = await manager.checkDistribution(entity);
+            entity = await manager.checkBuild(entity);
             break;
         case AnalysisAPICommand.BUILD_START:
-            entity = await manager.startDistribution(entity, req);
+            entity = await manager.startBuild(entity, req);
             break;
         case AnalysisAPICommand.BUILD_STOP:
-            entity = await manager.stopDistribution(entity, req);
+            entity = await manager.stopBuild(entity, req);
+            break;
+
+        case AnalysisAPICommand.DISTRIBUTION_START:
+            entity = await manager.startDistribution(entity, req);
             break;
 
         // Configuration

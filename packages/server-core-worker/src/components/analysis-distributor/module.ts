@@ -5,43 +5,64 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import type { Component } from '@privateaim/server-kit';
+import type { ObjectLiteral } from '@privateaim/kit';
+import type { Component, ComponentHandlers } from '@privateaim/server-kit';
 import {
-    QueueRouterComponentEmitter, isQueueRouterUsable, useLogger, useQueueRouter,
+    ComponentVoidEmitter,
+    QueueRouterComponentEmitter,
+    isQueueRouterUsable,
+    useLogger,
+    useQueueRouter,
 } from '@privateaim/server-kit';
-import { useEnv } from '@privateaim/server-telemetry/src';
-import { EnvironmentName } from '@privateaim/kit';
-import { AnalysisDistributorTaskQueueRouterRouting } from '@privateaim/server-core-worker-kit';
+import {
+    AnalysisDistributorBaseComponent,
+    AnalysisDistributorTaskQueueRouterRouting,
+} from '@privateaim/server-core-worker-kit';
 import { defineAnalysisDistributorHandlers } from './handlers';
 
-export function createAnalysisDistributorComponent() : Component {
-    const handlers = defineAnalysisDistributorHandlers({
-        emitter: new QueueRouterComponentEmitter(),
-    });
+export class AnalysisDistributorComponent extends AnalysisDistributorBaseComponent implements Component {
+    protected handlers : ComponentHandlers;
 
-    return {
-        async start() {
-            await handlers.initialize();
+    constructor() {
+        super();
 
-            if (
-                isQueueRouterUsable() &&
-                useEnv('env') !== EnvironmentName.TEST
-            ) {
-                const queueRouter = useQueueRouter();
+        this.handlers = defineAnalysisDistributorHandlers({
+            emitter: isQueueRouterUsable() ?
+                new QueueRouterComponentEmitter() :
+                new ComponentVoidEmitter(),
+        });
+    }
 
-                await queueRouter.consumeAny(
-                    AnalysisDistributorTaskQueueRouterRouting,
-                    async (
-                        payload,
-                    ) => handlers.execute(
-                        payload.type,
-                        payload.data,
-                        payload.metadata,
-                    ),
-                );
-            } else {
-                useLogger().warn('Analysis distributor component can not consume tasks.');
-            }
-        },
-    };
+    async start() {
+        await this.handlers.initialize();
+
+        if (isQueueRouterUsable()) {
+            const queueRouter = useQueueRouter();
+
+            await queueRouter.consumeAny(
+                AnalysisDistributorTaskQueueRouterRouting,
+                async (
+                    payload,
+                ) => this.trigger(
+                    payload.type,
+                    payload.data,
+                    payload.metadata,
+                ),
+            );
+        } else {
+            useLogger().warn('Analysis distributor component can not consume tasks.');
+        }
+    }
+
+    async trigger(
+        key: string,
+        value: ObjectLiteral = {},
+        metadata: ObjectLiteral = {},
+    ): Promise<void> {
+        await this.handlers.execute(
+            key,
+            value,
+            metadata,
+        );
+    }
 }

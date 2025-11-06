@@ -6,41 +6,41 @@
  */
 
 import type { AnalysisBucketType } from '@privateaim/core-kit';
-import type { CoreCommand, CoreEvent } from './constants';
+import type { AnalysisCoreCommand, AnalysisCoreEvent } from './constants';
 
-export type CoreBasePayload = {
+export type AnalysisCoreBasePayload = {
     error?: Error
 };
 
-export type CoreConfigurePayload = CoreBasePayload & {
+export type AnalysisCoreConfigurePayload = AnalysisCoreBasePayload & {
     id: string
 };
 
-export type CoreDestroyPayload = CoreBasePayload & {
+export type AnalysisCoreDestroyPayload = AnalysisCoreBasePayload & {
     id: string
 };
 
 export type CoreConfigureCommandContext = {
-    command: `${CoreCommand.CONFIGURE}`,
-    data: CoreConfigurePayload,
+    command: `${AnalysisCoreCommand.CONFIGURE}`,
+    data: AnalysisCoreConfigurePayload,
 };
 
 export type CoreDestroyCommandContext = {
-    command: `${CoreCommand.DESTROY}`,
-    data: CoreDestroyPayload
+    command: `${AnalysisCoreCommand.DESTROY}`,
+    data: AnalysisCoreDestroyPayload
 };
 
 export type CoreConfigureEventContext = CoreConfigureCommandContext & {
-    event: `${CoreEvent.FAILED}` |
-        `${CoreEvent.CONFIGURED}` |
-        `${CoreEvent.CONFIGURING}`;
+    event: `${AnalysisCoreEvent.FAILED}` |
+        `${AnalysisCoreEvent.CONFIGURED}` |
+        `${AnalysisCoreEvent.CONFIGURING}`;
 };
 
 export type CoreDestroyEventContext = CoreDestroyCommandContext & {
-    event: `${CoreEvent.FAILED}` |
-        `${CoreEvent.DESTROYED}` |
-        `${CoreEvent.DESTROYING}` |
-        `${CoreEvent.NONE}`;
+    event: `${AnalysisCoreEvent.FAILED}` |
+        `${AnalysisCoreEvent.DESTROYED}` |
+        `${AnalysisCoreEvent.DESTROYING}` |
+        `${AnalysisCoreEvent.NONE}`;
 };
 
 export type CoreBucketEventPayload = {
@@ -50,12 +50,12 @@ export type CoreBucketEventPayload = {
 };
 
 export type CoreBucketCreatedEventContext = {
-    event: `${CoreEvent.BUCKET_CREATED}`,
+    event: `${AnalysisCoreEvent.BUCKET_CREATED}`,
     data: CoreBucketEventPayload
 };
 
 export type CoreBucketDeletedEventContext = {
-    event: `${CoreEvent.BUCKET_DELETED}`,
+    event: `${AnalysisCoreEvent.BUCKET_DELETED}`,
     data: CoreBucketEventPayload
 };
 

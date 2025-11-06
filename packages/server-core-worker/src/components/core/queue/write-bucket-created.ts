@@ -7,8 +7,8 @@
 
 import { useQueueRouter } from '@privateaim/server-kit';
 import {
-    CoreCommand,
-    CoreEvent, buildCoreEventQueueRouterPayload,
+    AnalysisCoreCommand,
+    AnalysisCoreEvent, buildCoreEventQueueRouterPayload,
 } from '@privateaim/server-core-worker-kit';
 import type {
     CoreBucketEventPayload,
@@ -21,17 +21,17 @@ export async function writeBucketCreatedEvent(
 ) {
     const client = useQueueRouter();
     await client.publish(buildCoreEventQueueRouterPayload({
-        event: CoreEvent.BUCKET_CREATED,
+        event: AnalysisCoreEvent.BUCKET_CREATED,
         data,
     }));
 
     useCoreLogger().info({
         message: `${data.bucketType} bucket ${data.bucketId} created for analysis ${data.id}`,
-        command: CoreCommand.CONFIGURE,
+        command: AnalysisCoreCommand.CONFIGURE,
         analysis_id: data.id,
         [LogFlag.REF_ID]: data.id,
         bucket_id: data.bucketId,
         bucket_type: data.bucketType,
-        event: CoreEvent.BUCKET_CREATED,
+        event: AnalysisCoreEvent.BUCKET_CREATED,
     });
 }

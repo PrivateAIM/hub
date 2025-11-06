@@ -7,7 +7,7 @@
 
 import { EnvironmentName } from '@privateaim/kit';
 import {
-    CoreEventQueueRouterRouting,
+    AnalysisCoreEventQueueRouterRouting,
 } from '@privateaim/server-core-worker-kit';
 import type { Aggregator } from '@privateaim/server-kit';
 import {
@@ -43,7 +43,7 @@ export function createAnalysisCoreAggregator() : Aggregator {
             const queueRouter = useQueueRouter();
 
             await queueRouter.consumeAny(
-                CoreEventQueueRouterRouting,
+                AnalysisCoreEventQueueRouterRouting,
                 async (
                     payload,
                 ) => handlers.execute(

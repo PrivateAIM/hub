@@ -7,7 +7,7 @@
 
 import { useQueueRouter } from '@privateaim/server-kit';
 import {
-    CoreCommand, CoreEvent, buildCoreEventQueueRouterPayload,
+    AnalysisCoreCommand, AnalysisCoreEvent, buildCoreEventQueueRouterPayload,
 } from '@privateaim/server-core-worker-kit';
 import type {
     CoreBucketEventPayload,
@@ -20,17 +20,17 @@ export async function writeBucketDeletedEvent(
 ) {
     const client = useQueueRouter();
     await client.publish(buildCoreEventQueueRouterPayload({
-        event: CoreEvent.BUCKET_DELETED,
+        event: AnalysisCoreEvent.BUCKET_DELETED,
         data,
     }));
 
     useCoreLogger().info({
         message: `${data.bucketType} bucket ${data.bucketId} destroyed for analysis ${data.id}`,
-        command: CoreCommand.DESTROY,
+        command: AnalysisCoreCommand.DESTROY,
         analysis_id: data.id,
         [LogFlag.REF_ID]: data.id,
         bucket_id: data.bucketId,
         bucket_type: data.bucketType,
-        event: CoreEvent.BUCKET_DELETED,
+        event: AnalysisCoreEvent.BUCKET_DELETED,
     });
 }
