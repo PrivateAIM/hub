@@ -20,7 +20,7 @@ export default defineNuxtComponent({
     },
     setup() {
         const handleCreated = async (entity: Analysis) => {
-            await navigateTo(`/analyses/${entity.id}/setup`);
+            await navigateTo(`/analyses/${entity.id}`);
         };
 
         return {

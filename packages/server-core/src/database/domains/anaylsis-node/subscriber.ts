@@ -81,13 +81,7 @@ AnalysisNodeEntity
         );
     }
 
-    async beforeRemove(event: RemoveEvent<AnalysisNodeEntity>): Promise<any> {
-        if (!event.entity) {
-            return;
-        }
-
-        await super.beforeRemove(event);
-
+    async afterRemove(event: RemoveEvent<AnalysisNodeEntity>): Promise<any> {
         const analysisConfiguration = useAnalysisMetadataComponent();
         analysisConfiguration.trigger(
             AnalysisMetadataCommand.RECALC,
