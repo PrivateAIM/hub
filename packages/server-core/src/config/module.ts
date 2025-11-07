@@ -15,7 +15,7 @@ import {
     createAnalysisCoreAggregator,
     createAnalysisDistributorAggregator,
     createMasterImagesAggregator,
-} from '../aggregators/analysis-manager';
+} from '../aggregators/worker';
 import {
     createRegistryComponent,
     useAnalysisMetadataComponent,

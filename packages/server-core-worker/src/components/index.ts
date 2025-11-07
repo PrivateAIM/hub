@@ -7,7 +7,7 @@
 
 export * from './analysis-distributor';
 export * from './analysis-builder';
-export * from './core';
+export * from './analysis-core';
 export * from './master-images';
 export * from './type';
 export * from './utils';

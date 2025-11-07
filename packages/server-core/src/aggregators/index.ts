@@ -6,5 +6,5 @@
  */
 
 export * from './authup';
-export * from './analysis-manager';
+export * from './worker';
 export * from './telemetry';
