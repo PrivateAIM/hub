@@ -19,13 +19,13 @@ export function defineAnalysisBuilderHandlers(
 ) {
     const manager = new ComponentHandlers(options);
 
-    const dataSource = useDataSourceSync();
-    const repository = dataSource.getRepository(AnalysisEntity);
-
     const handleEvent = async (
         value: AnalysisBuilderBasePayload,
         context: ComponentHandlerContext<`${AnalysisBuilderEvent}`>,
     ) => {
+        const dataSource = useDataSourceSync();
+        const repository = dataSource.getRepository(AnalysisEntity);
+
         const entity = await repository.findOneBy({
             id: value.id,
         });

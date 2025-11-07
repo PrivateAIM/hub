@@ -23,5 +23,6 @@ export * from './analysis-node';
 export * from './analysis-node-log';
 export * from './analysis-permission';
 export { default as FEntityDelete } from './FEntityDelete';
+export { default as FProcessStatus } from './FProcessStatus.vue';
 export * from './constants';
 export * from './utility';

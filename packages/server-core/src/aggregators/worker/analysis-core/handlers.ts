@@ -22,12 +22,11 @@ export function defineAnalysisCoreHandlers(
 ) {
     const manager = new ComponentHandlers(options);
 
-    const dataSource = useDataSourceSync();
-    const repository = dataSource.getRepository(AnalysisEntity);
-
     manager.mount(AnalysisCoreEvent.BUCKET_CREATED, async (
         value: CoreBucketEventPayload,
     ) : Promise<void> => {
+        const dataSource = useDataSourceSync();
+        const repository = dataSource.getRepository(AnalysisEntity);
         const entity = await repository.findOneBy({
             id: value.id,
         });
@@ -61,6 +60,8 @@ export function defineAnalysisCoreHandlers(
     manager.mount(AnalysisCoreEvent.BUCKET_DELETED, async (
         value: CoreBucketEventPayload,
     ) : Promise<void> => {
+        const dataSource = useDataSourceSync();
+        const repository = dataSource.getRepository(AnalysisEntity);
         const entity = await repository.findOneBy({
             id: value.id,
         });

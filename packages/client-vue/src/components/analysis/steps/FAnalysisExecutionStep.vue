@@ -15,11 +15,11 @@
 import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
 import type { Analysis } from '@privateaim/core-kit';
-import FAnalysisExecutionStatus from '../status/FAnalysisExecutionStatus.vue';
+import FProcessStatus from '../../FProcessStatus.vue';
 
 export default defineComponent({
     components: {
-        FAnalysisExecutionStatus,
+        FProcessStatus,
     },
     props: {
         entity: {
@@ -51,14 +51,14 @@ export default defineComponent({
     <div>
         <div class="d-flex flex-row gap-1">
             <div>
-                <strong>3. Run</strong>
+                <strong>4. Execution</strong>
             </div>
             <div>
-                <FAnalysisExecutionStatus :status="entity.execution_status">
+                <FProcessStatus :value="entity.execution_status">
                     <template #default=" { iconClass, classSuffix }">
                         <i :class="iconClass + ' text-'+ classSuffix" />
                     </template>
-                </FAnalysisExecutionStatus>
+                </FProcessStatus>
             </div>
         </div>
     </div>

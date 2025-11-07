@@ -50,10 +50,10 @@ export default defineComponent({
 });
 </script>
 <template>
-    <div>
+    <div class="d-flex flex-column gap-1">
         <div class="d-flex flex-row gap-1">
             <div>
-                <strong>2. Build</strong>
+                <strong>3. Distribution</strong>
             </div>
             <div>
                 <FProcessStatus :value="entity.build_status">
@@ -63,33 +63,12 @@ export default defineComponent({
                 </FProcessStatus>
             </div>
         </div>
-        <div class="mt-1">
+        <div>
             <div>
                 <FAnalysisCommand
-                    :command="'buildStart'"
+                    :command="'distributionStart'"
                     :with-icon="true"
                     :entity="entity"
-                    @executed="(command) => handleExecuted('build', command)"
-                    @updated="handleUpdated"
-                    @failed="handleFailed"
-                />
-            </div>
-            <div>
-                <FAnalysisCommand
-                    :command="'buildStatus'"
-                    :with-icon="true"
-                    :entity="entity"
-                    @executed="(command) => handleExecuted('build', command)"
-                    @updated="handleUpdated"
-                    @failed="handleFailed"
-                />
-            </div>
-            <div>
-                <FAnalysisCommand
-                    :command="'buildStop'"
-                    :with-icon="true"
-                    :entity="entity"
-                    @executed="(command) => handleExecuted('build', command)"
                     @updated="handleUpdated"
                     @failed="handleFailed"
                 />

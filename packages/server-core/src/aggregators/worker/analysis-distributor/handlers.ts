@@ -17,13 +17,12 @@ export function defineAnalysisDistributorHandlers(
 ) {
     const manager = new ComponentHandlers(options);
 
-    const dataSource = useDataSourceSync();
-    const repository = dataSource.getRepository(AnalysisEntity);
-
     const handleEvent = async (
         value: AnalysisDistributorPayload,
         context: ComponentHandlerContext<`${AnalysisDistributorEvent}`>,
     ) => {
+        const dataSource = useDataSourceSync();
+        const repository = dataSource.getRepository(AnalysisEntity);
         const entity = await repository.findOneBy({
             id: value.id,
         });

@@ -5,42 +5,27 @@
   -  view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-
+import { ProcessStatus } from '@privateaim/kit';
 import type { PropType } from 'vue';
 import { computed, defineComponent } from 'vue';
-import { ProcessStatus } from '@privateaim/kit';
 
 export default defineComponent({
     props: {
-        status: {
-            type: String as PropType<`${ProcessStatus}`>,
-            default: null,
+        value: {
+            type: String as PropType<`${ProcessStatus}` | null>,
+        },
+        defaultValue: {
+            type: String,
+            default: 'none',
+        },
+        tag: {
+            type: String,
+            default: 'span',
         },
     },
     setup(props) {
-        const statusText = computed(() => {
-            switch (props.status) {
-                case ProcessStatus.STARTING:
-                    return 'starting...';
-                case ProcessStatus.STOPPING:
-                    return 'stopping...';
-
-                case ProcessStatus.STARTED:
-                    return 'started';
-                case ProcessStatus.STOPPED:
-                    return 'stopped';
-
-                case ProcessStatus.FINISHED:
-                    return 'finished';
-                case ProcessStatus.FAILED:
-                    return 'failed';
-                default:
-                    return 'none';
-            }
-        });
-
         const classSuffix = computed(() => {
-            switch (props.status) {
+            switch (props.value) {
                 case ProcessStatus.STARTING:
                 case ProcessStatus.STARTED:
                 case ProcessStatus.STOPPED:
@@ -52,12 +37,12 @@ export default defineComponent({
                 case ProcessStatus.FAILED:
                     return 'danger';
                 default:
-                    return 'info';
+                    return 'primary';
             }
         });
 
         const iconClass = computed(() => {
-            switch (props.status) {
+            switch (props.value) {
                 case ProcessStatus.STARTING:
                 case ProcessStatus.STARTED:
                 case ProcessStatus.STOPPING:
@@ -66,26 +51,29 @@ export default defineComponent({
                     return 'fa fa-check';
                 case ProcessStatus.FAILED:
                 case ProcessStatus.STOPPED:
-                    return 'fa fa-times';
+                    return 'fa fa-sm fa-times';
                 default:
-                    return 'fa fa-circle';
+                    return 'fa fa-sm fa-question';
             }
         });
 
         return {
             classSuffix,
-            statusText,
             iconClass,
         };
     },
 });
 </script>
 <template>
-    <span>
-        <slot
-            v-bind="{classSuffix, statusText, iconClass}"
+    <slot
+        name="default"
+        v-bind="{ iconClass, value: value || defaultValue, classSuffix }"
+    >
+        <component
+            :is="tag"
+            :class="'text-'+classSuffix"
         >
-            <span :class="'text-'+classSuffix">{{ statusText }}</span>
-        </slot>
-    </span>
+            {{ value || defaultValue }}
+        </component>
+    </slot>
 </template>

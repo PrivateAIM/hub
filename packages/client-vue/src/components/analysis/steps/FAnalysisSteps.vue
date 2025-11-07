@@ -10,10 +10,12 @@ import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
 import FAnalysisConfigurationStep from './FAnalysisConfigurationStep.vue';
 import FAnalysisBuildStep from './FAnalysisBuildStep.vue';
+import FAnalysisDistributionStep from './FAnalysisDistributionStep.vue';
 import FAnalysisExecutionStep from './FAnalysisExecutionStep.vue';
 
 export default defineComponent({
     components: {
+        FAnalysisDistributionStep,
         FAnalysisRunStep: FAnalysisExecutionStep,
         FAnalysisBuildStep,
         FAnalysisConfigurationStep,
@@ -51,6 +53,10 @@ export default defineComponent({
         <hr>
 
         <FAnalysisBuildStep :entity="entity" />
+
+        <hr>
+
+        <FAnalysisDistributionStep :entity="entity" />
 
         <hr>
 

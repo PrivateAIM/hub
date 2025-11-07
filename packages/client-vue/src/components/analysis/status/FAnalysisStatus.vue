@@ -8,14 +8,12 @@
 import type { Analysis } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
-import FAnalysisBuildStatus from './FAnalysisBuildStatus.vue';
+import FProcessStatus from '../../FProcessStatus.vue';
 import FAnalysisConfigurationStatus from './FAnalysisConfigurationStatus.vue';
-import FAnalysisExecutionStatus from './FAnalysisExecutionStatus.vue';
 
 export default defineComponent({
     components: {
-        FAnalysisExecutionStatus,
-        FAnalysisBuildStatus,
+        FProcessStatus,
         FAnalysisConfigurationStatus,
     },
     props: {
@@ -105,12 +103,40 @@ export default defineComponent({
                     <strong>Build</strong>
                 </div>
                 <div>
-                    <FAnalysisBuildStatus :status="entity.build_status" />
+                    <FProcessStatus :value="entity.build_status" />
                 </div>
             </div>
 
             <slot
                 name="afterBuild"
+                v-bind="entity"
+            />
+        </div>
+
+        <div>
+            <slot
+                name="beforeDistribution"
+                v-bind="entity"
+            />
+
+            <div
+                class="d-flex flex-grow-1 align-items-center"
+                style="flex-basis: 0"
+                :class="{
+                    'flex-row': listDirection === 'column',
+                    'flex-column': listDirection === 'row'
+                }"
+            >
+                <div class="me-1">
+                    <strong>Distribution</strong>
+                </div>
+                <div>
+                    <FProcessStatus :value="entity.distribution_status" />
+                </div>
+            </div>
+
+            <slot
+                name="afterDistribution"
                 v-bind="entity"
             />
         </div>
@@ -130,10 +156,10 @@ export default defineComponent({
                 }"
             >
                 <div class="me-1">
-                    <strong>Run</strong>
+                    <strong>Execution</strong>
                 </div>
                 <div>
-                    <FAnalysisExecutionStatus :status="entity.execution_status" />
+                    <FProcessStatus :value="entity.execution_status" />
                 </div>
             </div>
 
