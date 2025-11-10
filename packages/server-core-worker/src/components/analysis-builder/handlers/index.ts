@@ -7,5 +7,3 @@
 
 export * from './execute';
 export * from './check';
-
-export * from './module';

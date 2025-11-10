@@ -5,17 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { EventEmitter } from '../../event-emitter';
-import type { ObjectLiteral } from '../../../type';
-import type { IComponent } from '../type';
-import { isComponentHandlerFn } from './check';
+import { EventEmitter } from '../event-emitter';
+import type { ObjectLiteral } from '../../type';
+import type { Component, ComponentEvents } from './type';
+import { isComponentHandlerFn } from './handler';
 import type {
-    ComponentHandler, ComponentHandlerContext, ComponentHandlerEvents, ComponentHandlerFn,
-} from './types';
+    ComponentHandler, ComponentHandlerContext, ComponentHandlerFn,
+} from './handler';
 
-export abstract class Component<
-    EventMap extends ComponentHandlerEvents = ComponentHandlerEvents,
-> extends EventEmitter<EventMap> implements IComponent {
+export abstract class BaseComponent<
+    EventMap extends ComponentEvents = ComponentEvents,
+> extends EventEmitter<EventMap> implements Component {
     protected initializing : boolean;
 
     protected initialized : boolean;
@@ -61,7 +61,14 @@ export abstract class Component<
         this.initializing = false;
     }
 
-    async execute(
+    /**
+     * Handle specific component event.
+     *
+     * @param key
+     * @param value
+     * @param metadata
+     */
+    async handle(
         key: string,
         value: ObjectLiteral = {},
         metadata: ObjectLiteral = {},

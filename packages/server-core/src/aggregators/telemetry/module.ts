@@ -5,7 +5,7 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import type { Aggregator } from '@privateaim/server-kit';
+import type { Component } from '@privateaim/server-kit';
 import { buildEntityEventRedisChannel, useLogger, useRedisSubscribeClient } from '@privateaim/server-kit';
 import type { Event } from '@privateaim/telemetry-kit';
 import { DomainType as TelemetryDomainType } from '@privateaim/telemetry-kit';
@@ -14,7 +14,7 @@ import { DomainType } from '@privateaim/core-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
 import { AnalysisNodeEventEntity } from '../../database';
 
-export class TelemetryAggregator implements Aggregator {
+export class TelemetryAggregator implements Component {
     start() {
         const redisSub = useRedisSubscribeClient();
 

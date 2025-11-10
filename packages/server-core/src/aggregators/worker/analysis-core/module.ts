@@ -9,9 +9,8 @@ import { EnvironmentName } from '@privateaim/kit';
 import {
     AnalysisCoreEventQueueRouterRouting,
 } from '@privateaim/server-core-worker-kit';
-import type { Aggregator } from '@privateaim/server-kit';
+import type { Component } from '@privateaim/server-kit';
 import {
-    QueueRouterComponentEmitter,
     isQueueRouterUsable,
     useLogger,
     useQueueRouter,
@@ -21,7 +20,7 @@ import {
     defineAnalysisCoreHandlers,
 } from './handlers';
 
-export function createAnalysisCoreAggregator() : Aggregator {
+export function createAnalysisCoreAggregator() : Component {
     if (!isQueueRouterUsable()) {
         useLogger().warn('Analysis core aggregator can not consume events.');
         return { start: () => Promise.resolve() };
@@ -32,9 +31,7 @@ export function createAnalysisCoreAggregator() : Aggregator {
         return { start: () => Promise.resolve() };
     }
 
-    const handlers = defineAnalysisCoreHandlers({
-        emitter: new QueueRouterComponentEmitter(),
-    });
+    const handlers = defineAnalysisCoreHandlers();
 
     return {
         async start() {
@@ -46,7 +43,7 @@ export function createAnalysisCoreAggregator() : Aggregator {
                 AnalysisCoreEventQueueRouterRouting,
                 async (
                     payload,
-                ) => handlers.execute(
+                ) => handlers.handle(
                     payload.type,
                     payload.data,
                     payload.metadata,

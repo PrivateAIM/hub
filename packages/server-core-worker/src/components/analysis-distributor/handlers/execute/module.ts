@@ -43,7 +43,7 @@ AnalysisDistributorExecutePayload> {
                 event: AnalysisCoreEvent.FAILED,
             });
 
-            await context.emitter.emit(
+            await context.emit(
                 AnalysisDistributorEvent.EXECUTION_FAILED,
                 {
                     ...value,
@@ -57,7 +57,7 @@ AnalysisDistributorExecutePayload> {
     }
 
     async handleInternal(value: AnalysisDistributorExecutePayload, context: ComponentHandlerContext): Promise<void> {
-        await context.emitter.emit(
+        await context.emit(
             AnalysisDistributorEvent.EXECUTION_STARTED,
             value,
             {
@@ -172,7 +172,7 @@ AnalysisDistributorExecutePayload> {
             throw e;
         }
 
-        await context.emitter.emit(
+        await context.emit(
             AnalysisDistributorEvent.EXECUTION_FINISHED,
             value,
             {

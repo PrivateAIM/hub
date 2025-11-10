@@ -42,7 +42,7 @@ AnalysisBuilderExecutePayload> {
                 event: AnalysisCoreEvent.FAILED,
             });
 
-            await context.emitter.emit(
+            await context.emit(
                 AnalysisBuilderEvent.EXECUTION_FAILED,
                 {
                     ...value,
@@ -61,7 +61,7 @@ AnalysisBuilderExecutePayload> {
         value: AnalysisBuilderExecutePayload,
         context: ComponentHandlerContext<AnalysisBuilderCommand.EXECUTE>,
     ): Promise<void> {
-        await context.emitter.emit(
+        await context.emit(
             AnalysisBuilderEvent.EXECUTION_STARTED,
             value,
             {
@@ -156,7 +156,7 @@ AnalysisBuilderExecutePayload> {
             });
         }
 
-        await context.emitter.emit(
+        await context.emit(
             AnalysisBuilderEvent.EXECUTION_FINISHED,
             value,
             {

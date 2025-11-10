@@ -23,7 +23,7 @@ export interface ComponentWithTrigger {
     trigger: ComponentTriggerFn
 }
 
-export type IComponent = {
+export type Component = {
     start: ComponentStartFn,
     trigger?: ComponentTriggerFn,
 };
@@ -32,4 +32,7 @@ export type ComponentErrorOptions = {
     code?: string | null,
     message?: string
     cause?: unknown
+};
+export type ComponentEvents = {
+    [key: string]: [ComponentData, ComponentMetadata]
 };

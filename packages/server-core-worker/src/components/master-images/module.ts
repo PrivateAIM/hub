@@ -14,7 +14,7 @@ import {
     useMasterImageQueueService,
 } from '@privateaim/server-core-worker-kit';
 import { EnvironmentName, isQueueRouterUsable, useLogger } from '@privateaim/server-kit';
-import type { IComponent, QueueRouterHandlers } from '@privateaim/server-kit';
+import type { Component, QueueRouterHandlers } from '@privateaim/server-kit';
 import { useEnv } from '../../config';
 import {
     executeMasterImagesBuildCommand,
@@ -83,7 +83,7 @@ function createHandlers() : QueueRouterHandlers<MasterImagesCommandMap> {
     };
 }
 
-export function createMasterImagesComponent() : IComponent {
+export function createMasterImagesComponent() : Component {
     if (!isQueueRouterUsable() || useEnv('env') === EnvironmentName.TEST) {
         // todo: maybe log
         return {

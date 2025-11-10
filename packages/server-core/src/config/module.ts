@@ -5,17 +5,15 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Aggregator, IComponent } from '@privateaim/server-kit';
+import type { Component } from '@privateaim/server-kit';
 import {
+    AnalysisBuilderAggregator,
+    AnalysisDistributorAggregator,
+    createAnalysisCoreAggregator,
     createAuthupAggregator,
+    createMasterImagesAggregator,
     createTelemetryAggregator,
 } from '../aggregators';
-import {
-    createAnalysisBuilderAggregator,
-    createAnalysisCoreAggregator,
-    createAnalysisDistributorAggregator,
-    createMasterImagesAggregator,
-} from '../aggregators/worker';
 import {
     createRegistryComponent,
     useAnalysisMetadataComponent,
@@ -32,8 +30,8 @@ import {
 } from './services';
 
 export type Config = {
-    aggregators: Aggregator[]
-    components: IComponent[]
+    aggregators: Component[]
+    components: Component[]
 };
 
 export function createConfig() : Config {
@@ -55,11 +53,11 @@ export function createConfig() : Config {
 
     // ---------------------------------------------
 
-    const aggregators : Aggregator[] = [
+    const aggregators : Component[] = [
         createAuthupAggregator(),
 
-        createAnalysisBuilderAggregator(),
-        createAnalysisDistributorAggregator(),
+        new AnalysisBuilderAggregator(),
+        new AnalysisDistributorAggregator(),
         createAnalysisCoreAggregator(),
 
         createMasterImagesAggregator(),
@@ -68,7 +66,7 @@ export function createConfig() : Config {
 
     // ---------------------------------------------
 
-    const components : IComponent[] = [
+    const components : Component[] = [
         createRegistryComponent(),
         useAnalysisMetadataComponent(),
     ];

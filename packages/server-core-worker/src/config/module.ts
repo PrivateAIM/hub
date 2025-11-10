@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Aggregator, IComponent } from '@privateaim/server-kit';
+import type { Component } from '@privateaim/server-kit';
 import {
     createCoreComponent,
     createMasterImagesComponent,
@@ -28,9 +28,9 @@ export function createConfig() : Config {
     configureStorageService();
     configureCoreService();
 
-    const aggregators : Aggregator[] = [];
+    const aggregators : Component[] = [];
 
-    const components : IComponent[] = [
+    const components : Component[] = [
         useAnalysisDistributorComponent(),
         useAnalysisBuilderComponent(),
 

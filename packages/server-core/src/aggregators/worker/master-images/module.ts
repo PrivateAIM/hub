@@ -6,12 +6,14 @@
  */
 
 import { useMasterImageQueueService } from '@privateaim/server-core-worker-kit';
-import { EnvironmentName, isQueueRouterUsable, useLogger } from '@privateaim/server-kit';
-import type { Aggregator } from '@privateaim/server-kit';
+import {
+    Aggregator, type Component, EnvironmentName, isQueueRouterUsable,
+    useLogger,
+} from '@privateaim/server-kit';
 import { useEnv } from '../../../config';
 import { createAnalysisManagerMasterImagesHandlers } from './handlers';
 
-export function createMasterImagesAggregator() : Aggregator {
+export function createMasterImagesAggregator() : Component {
     if (!isQueueRouterUsable() || useEnv('env') === EnvironmentName.TEST) {
         return {
             start() {

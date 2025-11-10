@@ -8,5 +8,6 @@
 export * from './emitter';
 export * from './error';
 export * from './handler';
+export * from './module';
 export * from './helper';
 export * from './type';

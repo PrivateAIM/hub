@@ -12,15 +12,23 @@ import {
     AnalysisCoreEvent,
 } from '@privateaim/server-core-worker-kit';
 import {
-    Component,
-    type ComponentHandlersOptions,
+    BaseComponent,
 } from '@privateaim/server-kit';
 import { AnalysisBucketEntity, AnalysisEntity, useDataSourceSync } from '../../../database';
 
-export function defineAnalysisCoreHandlers(
-    options: ComponentHandlersOptions = {},
-) {
-    const manager = new Component(options);
+class FakeComponent extends BaseComponent {
+    // eslint-disable-next-line no-useless-constructor,@typescript-eslint/no-useless-constructor
+    constructor() {
+        super();
+    }
+
+    start(): Promise<void> | void {
+        throw new Error('Not implemented.');
+    }
+}
+
+export function defineAnalysisCoreHandlers() {
+    const manager = new FakeComponent();
 
     manager.mount(AnalysisCoreEvent.BUCKET_CREATED, async (
         value: CoreBucketEventPayload,

@@ -7,7 +7,8 @@
 
 import type { ObjectLiteral } from '../../../type';
 import type { ToTuple } from '../../event-emitter';
-import type { ComponentHandlerEvents } from '../handler';
+
+import type { ComponentEvents } from '../type';
 
 export type ComponentEmitFn = (
     type: string,
@@ -16,7 +17,7 @@ export type ComponentEmitFn = (
 ) => Promise<void> | void;
 
 export interface ComponentSubscriber<
-    EventMap extends ComponentHandlerEvents = ComponentHandlerEvents,
+    EventMap extends ComponentEvents = ComponentEvents,
 > {
     emit<Key extends keyof EventMap>(
         type: Key,

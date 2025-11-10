@@ -6,13 +6,14 @@
  */
 
 import type { ToTuple } from '../../event-emitter';
-import type { ComponentHandlerEvents } from '../handler';
+
+import type { ComponentEvents } from '../type';
 import type { ComponentSubscriber } from './types';
 import type { QueueRouter } from '../../queue-router';
 import { buildQueueRouterPublishPayload, useQueueRouter } from '../../queue-router';
 
 export class QueueRouterComponentEmitter<
-    EventMap extends ComponentHandlerEvents = ComponentHandlerEvents,
+    EventMap extends ComponentEvents = ComponentEvents,
 > implements ComponentSubscriber<EventMap> {
     protected client : QueueRouter;
 

@@ -7,7 +7,7 @@
 
 import type { ComponentMetadata } from '@privateaim/server-kit';
 import {
-    Component,
+    BaseComponent,
     buildQueueRouterPublishPayload,
     isQueueRouterUsable,
     useLogger, useQueueRouter,
@@ -15,7 +15,8 @@ import {
 import type {
     BucketCreateCommandPayload,
     BucketCreationFailedEventPayload,
-    BucketCreationFinishedEventPayload, BucketDeleteCommandPayload,
+    BucketCreationFinishedEventPayload,
+    BucketDeleteCommandPayload,
     BucketDeletionFailedEventPayload,
     BucketDeletionFinishedEventPayload,
     BucketEvent,
@@ -26,7 +27,7 @@ import {
 } from '@privateaim/server-storage-kit';
 import { BucketCreateHandler, BucketDeleteHandler } from './handlers';
 
-export class BucketComponent extends Component<{
+export class BucketComponent extends BaseComponent<{
     [BucketEvent.CREATION_FAILED]: [BucketCreationFailedEventPayload, ComponentMetadata],
     [BucketEvent.CREATION_FINISHED]: [BucketCreationFinishedEventPayload, ComponentMetadata],
 
@@ -64,7 +65,7 @@ export class BucketComponent extends Component<{
                 BucketTaskQueueRouterRouting,
                 async (
                     payload,
-                ) => this.execute(
+                ) => this.handle(
                     payload.type,
                     payload.data,
                     payload.metadata,
@@ -76,10 +77,10 @@ export class BucketComponent extends Component<{
     }
 
     async executeCreate(payload: BucketCreateCommandPayload) {
-        return this.execute(BucketCommand.CREATE, payload);
+        return this.handle(BucketCommand.CREATE, payload);
     }
 
     async executeDelete(payload: BucketDeleteCommandPayload) {
-        return this.execute(BucketCommand.DELETE, payload);
+        return this.handle(BucketCommand.DELETE, payload);
     }
 }

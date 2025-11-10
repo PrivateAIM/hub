@@ -10,7 +10,7 @@ import {
     AnalysisCoreTaskQueueRouterRouting,
 } from '@privateaim/server-core-worker-kit';
 import type { AnalysisCoreConfigurePayload, AnalysisCoreDestroyPayload } from '@privateaim/server-core-worker-kit';
-import type { IComponent, QueueRouterHandlers } from '@privateaim/server-kit';
+import type { Component, QueueRouterHandlers } from '@privateaim/server-kit';
 import {
     EnvironmentName, isQueueRouterUsable, useLogger, useQueueRouter,
 } from '@privateaim/server-kit';
@@ -57,7 +57,7 @@ function createHandlers() : QueueRouterHandlers<{
     };
 }
 
-export function createCoreComponent() : IComponent {
+export function createCoreComponent() : Component {
     if (!isQueueRouterUsable() || useEnv('env') === EnvironmentName.TEST) {
         // todo: maybe log
         return {

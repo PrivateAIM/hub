@@ -32,7 +32,7 @@ AnalysisBuilderExecutePayload> {
             // todo: check if image exists, otherwise local queue task
             await this.handleInternal(value, context);
         } catch (e) {
-            await context.emitter.emit(
+            await context.emit(
                 AnalysisBuilderEvent.CHECK_FAILED,
                 {
                     ...value,
@@ -49,7 +49,7 @@ AnalysisBuilderExecutePayload> {
         value: AnalysisBuilderExecutePayload,
         context: ComponentHandlerContext<AnalysisBuilderCommand.CHECK>,
     ): Promise<void> {
-        await context.emitter.emit(
+        await context.emit(
             AnalysisBuilderEvent.CHECK_STARTED,
             value,
             {
@@ -76,7 +76,7 @@ AnalysisBuilderExecutePayload> {
         });
 
         if (analysisNodes.length === 0) {
-            await context.emitter.emit(
+            await context.emit(
                 AnalysisBuilderEvent.CHECK_FINISHED,
                 value,
                 {
@@ -99,7 +99,7 @@ AnalysisBuilderExecutePayload> {
         const [node] = nodes;
 
         if (typeof node === 'undefined') {
-            await context.emitter.emit(
+            await context.emit(
                 AnalysisBuilderEvent.CHECK_FINISHED,
                 value,
                 {
@@ -147,7 +147,7 @@ AnalysisBuilderExecutePayload> {
 
         // -----------------------------------------------------------------------------------
 
-        await context.emitter.emit(
+        await context.emit(
             AnalysisBuilderEvent.CHECK_FINISHED,
             value,
             {

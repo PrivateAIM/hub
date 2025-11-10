@@ -6,7 +6,7 @@
  */
 
 import { generateSwagger } from '@privateaim/server-http-kit';
-import type { IComponent } from '@privateaim/server-kit';
+import type { Component } from '@privateaim/server-kit';
 import { config } from 'dotenv';
 import path from 'node:path';
 import process from 'node:process';
@@ -31,7 +31,7 @@ import {
 
     const httpServer = createHttpServer();
 
-    const components : IComponent[] = [
+    const components : Component[] = [
         useBucketComponent(),
     ];
 
