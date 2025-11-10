@@ -70,6 +70,14 @@ export class AnalysisEntity implements Analysis {
     @Column({
         type: 'varchar', length: 64, nullable: true, default: null,
     })
+        distribution_status: ProcessStatus | null;
+
+    // ------------------------------------------------------------------
+
+    @Index()
+    @Column({
+        type: 'varchar', length: 64, nullable: true, default: null,
+    })
         build_status: ProcessStatus | null;
 
     // ------------------------------------------------------------------

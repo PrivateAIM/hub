@@ -7,7 +7,10 @@
 
 import type { Aggregator, Component } from '@privateaim/server-kit';
 import {
-    createBuilderComponent, createCoreComponent, createMasterImagesComponent,
+    createCoreComponent,
+    createMasterImagesComponent,
+    useAnalysisBuilderComponent,
+    useAnalysisDistributorComponent,
 } from '../components';
 import {
     configureAMQP, configureCoreService, configureStorageService, setupLogger, setupVault,
@@ -28,7 +31,9 @@ export function createConfig() : Config {
     const aggregators : Aggregator[] = [];
 
     const components : Component[] = [
-        createBuilderComponent(),
+        useAnalysisDistributorComponent(),
+        useAnalysisBuilderComponent(),
+
         createCoreComponent(),
         createMasterImagesComponent(),
     ];

@@ -5,7 +5,7 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import { BadRequestError, ServerError } from '@ebec/http';
+import { BadRequestError } from '@ebec/http';
 import { ProcessStatus } from '@privateaim/kit';
 import {
     AnalysisAPICommand,
@@ -14,13 +14,12 @@ import {
     isAnalysisAPICommandExecutable,
 } from '@privateaim/core-kit';
 import {
-    BuilderCommand,
-    CoreCommand,
-    buildBuilderTaskQueueRouterPayload, buildCoreTaskQueueRouterPayload,
+    AnalysisBuilderBaseComponent,
+    AnalysisCoreBaseComponent,
+    AnalysisDistributorBaseComponent,
 } from '@privateaim/server-core-worker-kit';
 import type { Request } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
 import type { Repository } from 'typeorm';
 import {
     AnalysisBucketEntity,
@@ -44,6 +43,12 @@ export class AnalysisManagerService {
 
     protected registryRepository: Repository<RegistryEntity>;
 
+    protected builderComponent : AnalysisBuilderBaseComponent;
+
+    protected coreComponent: AnalysisCoreBaseComponent;
+
+    protected distributorComponent : AnalysisDistributorBaseComponent;
+
     constructor() {
         const dataSource = useDataSourceSync();
 
@@ -53,41 +58,21 @@ export class AnalysisManagerService {
         this.analysisBucketFileRepository = dataSource.getRepository(AnalysisBucketFileEntity);
 
         this.registryRepository = dataSource.getRepository(RegistryEntity);
+
+        this.builderComponent = new AnalysisBuilderBaseComponent();
+        this.coreComponent = new AnalysisCoreBaseComponent();
+        this.distributorComponent = new AnalysisDistributorBaseComponent();
     }
 
-    async startDistribution(
+    async startBuild(
         input: string | AnalysisEntity,
         request?: Request,
     ): Promise<AnalysisEntity> {
-        if (!isQueueRouterUsable()) {
-            throw new ServerError('The queue router is not available.');
-        }
-
         const entity = await this.resolve(input);
 
         const check = isAnalysisAPICommandExecutable(entity, AnalysisAPICommand.BUILD_START);
         if (!check.success) {
             throw new BadRequestError(check.message);
-        }
-
-        const analysisNodes = await this.analysisNodeRepository.find({
-            where: {
-                analysis_id: entity.id,
-            },
-            relations: ['node'],
-        });
-
-        for (let i = 0; i < analysisNodes.length; i++) {
-            if (analysisNodes[i].approval_status !== AnalysisNodeApprovalStatus.APPROVED) {
-                throw new BadRequestError('Not all nodes have approved the analysis yet.');
-            }
-
-            if (
-                analysisNodes[i].node &&
-                !analysisNodes[i].node.registry_id
-            ) {
-                throw new BadRequestError(`The node ${analysisNodes[i].node.name} is not assigned to a registry yet.`);
-            }
         }
 
         if (!entity.registry_id) {
@@ -115,42 +100,81 @@ export class AnalysisManagerService {
             await this.repository.save(entity);
         }
 
-        const queueRouter = useQueueRouter();
-        await queueRouter.publish(buildBuilderTaskQueueRouterPayload({
-            command: BuilderCommand.BUILD,
-            data: {
-                id: entity.id,
-            },
-        }));
+        await this.builderComponent.triggerExecute({
+            id: entity.id,
+        });
 
         return entity;
     }
 
-    async checkDistribution(
+    async startDistribution(
         input: string | AnalysisEntity,
-    ): Promise<AnalysisEntity> {
-        if (!isQueueRouterUsable()) {
-            throw new ServerError('The queue router is not available.');
+        request?: Request,
+    ) {
+        const entity = await this.resolve(input);
+
+        const check = isAnalysisAPICommandExecutable(entity, AnalysisAPICommand.DISTRIBUTION_START);
+        if (!check.success) {
+            throw new BadRequestError(check.message);
         }
 
+        const analysisNodes = await this.analysisNodeRepository.find({
+            where: {
+                analysis_id: entity.id,
+            },
+            relations: ['node'],
+        });
+
+        for (let i = 0; i < analysisNodes.length; i++) {
+            if (analysisNodes[i].approval_status !== AnalysisNodeApprovalStatus.APPROVED) {
+                throw new BadRequestError('Not all nodes have approved the analysis yet.');
+            }
+
+            if (
+                analysisNodes[i].node &&
+                !analysisNodes[i].node.registry_id
+            ) {
+                throw new BadRequestError(`The node ${analysisNodes[i].node.name} is not assigned to a registry yet.`);
+            }
+        }
+
+        entity.distribution_status = ProcessStatus.STARTING;
+
+        if (request) {
+            const requestRepository = new RequestRepositoryAdapter(
+                request,
+                this.repository,
+            );
+
+            await requestRepository.save(entity);
+        } else {
+            await this.repository.save(entity);
+        }
+
+        await this.distributorComponent.triggerExecute({
+            id: entity.id,
+        });
+
+        return entity;
+    }
+
+    async checkBuild(
+        input: string | AnalysisEntity,
+    ): Promise<AnalysisEntity> {
         const entity = await this.resolve(input);
         const check = isAnalysisAPICommandExecutable(entity, AnalysisAPICommand.BUILD_STATUS);
         if (!check.success) {
             throw new BadRequestError(check.message);
         }
 
-        const queueRouter = useQueueRouter();
-        await queueRouter.publish(buildBuilderTaskQueueRouterPayload({
-            command: BuilderCommand.CHECK,
-            data: {
-                id: entity.id,
-            },
-        }));
+        await this.builderComponent.triggerCheck({
+            id: entity.id,
+        });
 
         return entity;
     }
 
-    async stopDistribution(
+    async stopBuild(
         input: string | AnalysisEntity,
         request?: Request,
     ): Promise<AnalysisEntity> {
@@ -272,21 +296,11 @@ export class AnalysisManagerService {
     async spinUp(
         input: string | AnalysisEntity,
     ): Promise<AnalysisEntity> {
-        if (!isQueueRouterUsable()) {
-            throw new ServerError('The queue router is not available.');
-        }
-
         const entity = await this.resolve(input);
 
-        const message = buildCoreTaskQueueRouterPayload({
-            command: CoreCommand.CONFIGURE,
-            data: {
-                id: entity.id,
-            },
+        await this.coreComponent.triggerConfigure({
+            id: entity.id,
         });
-
-        const queueRouter = useQueueRouter();
-        await queueRouter.publish(message);
 
         return entity;
     }
@@ -294,21 +308,11 @@ export class AnalysisManagerService {
     async tearDown(
         input: string | AnalysisEntity,
     ): Promise<AnalysisEntity> {
-        if (!isQueueRouterUsable()) {
-            throw new ServerError('The queue router is not available.');
-        }
-
         const entity = await this.resolve(input);
 
-        const message = buildCoreTaskQueueRouterPayload({
-            command: CoreCommand.DESTROY,
-            data: {
-                id: entity.id,
-            },
+        await this.coreComponent.triggerDestroy({
+            id: entity.id,
         });
-
-        const queueRouter = useQueueRouter();
-        await queueRouter.publish(message);
 
         return entity;
     }

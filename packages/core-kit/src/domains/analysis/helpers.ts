@@ -141,7 +141,7 @@ export function isAnalysisAPICommandExecutable(
                 return output;
             }
 
-            if (!entity.build_status) {
+            if (!entity.build_status && !entity.distribution_status) {
                 output.success = true;
                 return output;
             }
@@ -156,6 +156,16 @@ export function isAnalysisAPICommandExecutable(
             }
 
             output.message = `The current analysis build status "${entity.build_status}" does not allow unlocking the configuration.`;
+            return output;
+        }
+        case AnalysisAPICommand.DISTRIBUTION_START: {
+            if (!entity.build_status || entity.build_status !== ProcessStatus.FINISHED) {
+                output.message = 'The analysis is not built yet.';
+                return output;
+            }
+
+            output.success = true;
+
             return output;
         }
     }

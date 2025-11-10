@@ -13,6 +13,8 @@ export enum AnalysisAPICommand {
     BUILD_STOP = 'buildStop',
     BUILD_STATUS = 'buildStatus',
 
+    DISTRIBUTION_START = 'distributionStart',
+
     CONFIGURATION_LOCK = 'configurationLock',
     CONFIGURATION_UNLOCK = 'configurationUnlock',
 }

@@ -5,8 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './builder';
-export * from './core';
+export * from './analysis-distributor';
+export * from './analysis-builder';
+export * from './analysis-core';
 export * from './master-images';
 export * from './type';
 export * from './utils';

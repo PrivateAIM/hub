@@ -7,14 +7,15 @@
 
 import type { Aggregator, Component } from '@privateaim/server-kit';
 import {
-    createAnalysisManagerBuilderAggregator,
     createAuthupAggregator,
     createTelemetryAggregator,
 } from '../aggregators';
 import {
-    createAnalysisManagerCoreAggregator,
-    createAnalysisManagerMasterImagesAggregator,
-} from '../aggregators/analysis-manager';
+    createAnalysisBuilderAggregator,
+    createAnalysisCoreAggregator,
+    createAnalysisDistributorAggregator,
+    createMasterImagesAggregator,
+} from '../aggregators/worker';
 import {
     createRegistryComponent,
     useAnalysisMetadataComponent,
@@ -56,9 +57,12 @@ export function createConfig() : Config {
 
     const aggregators : Aggregator[] = [
         createAuthupAggregator(),
-        createAnalysisManagerBuilderAggregator(),
-        createAnalysisManagerCoreAggregator(),
-        createAnalysisManagerMasterImagesAggregator(),
+
+        createAnalysisBuilderAggregator(),
+        createAnalysisDistributorAggregator(),
+        createAnalysisCoreAggregator(),
+
+        createMasterImagesAggregator(),
         createTelemetryAggregator(),
     ];
 

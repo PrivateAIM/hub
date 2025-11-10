@@ -38,7 +38,7 @@ export default defineComponent({
                 return 'success';
             }
 
-            return 'info';
+            return 'primary';
         });
 
         return {
