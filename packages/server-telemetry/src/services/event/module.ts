@@ -5,7 +5,7 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentHandlers } from '@privateaim/server-kit';
+import type { Component } from '@privateaim/server-kit';
 import type { EventCommandContext, EventEventContext } from '@privateaim/server-telemetry-kit';
 import {
     EventComponentService as BaseEventComponentService,
@@ -13,7 +13,7 @@ import {
 import { definEventComponentHandlers } from '../../components/event/handlers';
 
 export class EventComponentService extends BaseEventComponentService {
-    protected eventHandlers: ComponentHandlers;
+    protected eventHandlers: Component;
 
     constructor() {
         super();

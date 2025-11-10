@@ -11,13 +11,13 @@ import {
     AnalysisBuilderEvent,
 } from '@privateaim/server-core-worker-kit';
 import type { ComponentHandlerContext, ComponentHandlersOptions } from '@privateaim/server-kit';
-import { ComponentHandlers } from '@privateaim/server-kit';
+import { Component } from '@privateaim/server-kit';
 import { AnalysisEntity, useDataSourceSync } from '../../../database';
 
 export function defineAnalysisBuilderHandlers(
     options: ComponentHandlersOptions = {},
 ) {
-    const manager = new ComponentHandlers(options);
+    const manager = new Component(options);
 
     const handleEvent = async (
         value: AnalysisBuilderBasePayload,

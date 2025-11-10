@@ -5,26 +5,29 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { EventEmitter } from '../../event-emitter';
 import type { ObjectLiteral } from '../../../type';
+import type { IComponent } from '../type';
 import { isComponentHandlerFn } from './check';
-import type { ComponentHandler, ComponentHandlerFn, ComponentHandlersOptions } from './types';
-import type { ComponentEmitter } from '../emitter';
-import { ComponentVoidEmitter } from '../emitter';
+import type {
+    ComponentHandler, ComponentHandlerContext, ComponentHandlerEvents, ComponentHandlerFn,
+} from './types';
 
-export class ComponentHandlers {
+export abstract class Component<
+    EventMap extends ComponentHandlerEvents = ComponentHandlerEvents,
+> extends EventEmitter<EventMap> implements IComponent {
     protected initializing : boolean;
 
     protected initialized : boolean;
 
     protected handlers: Record<string, ComponentHandlerFn | ComponentHandler>;
 
-    protected emitter : ComponentEmitter;
+    protected constructor() {
+        super();
 
-    constructor(options: ComponentHandlersOptions = {}) {
         this.initializing = false;
         this.initialized = false;
         this.handlers = {};
-        this.emitter = options.emitter || new ComponentVoidEmitter();
     }
 
     mount<K extends string>(key: K, fn: ComponentHandler<K, any> | ComponentHandlerFn<K, any>) {
@@ -70,10 +73,25 @@ export class ComponentHandlers {
             return;
         }
 
+        const context : ComponentHandlerContext = {
+            key,
+            metadata,
+            emit: (childKey, childValue, childMetadata) => {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
+                this.emit(childKey, childValue, {
+                    ...metadata,
+                    ...childMetadata,
+                });
+            },
+        };
+
         if (isComponentHandlerFn(handler)) {
-            await handler(value, { key, metadata, emitter: this.emitter });
+            await handler(value, context);
         } else {
-            await handler.handle(value, { key, metadata, emitter: this.emitter });
+            await handler.handle(value, context);
         }
     }
+
+    abstract start() : Promise<void> | void;
 }

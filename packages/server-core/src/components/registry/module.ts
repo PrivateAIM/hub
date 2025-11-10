@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Component, QueueRouterHandlers } from '@privateaim/server-kit';
+import type { IComponent, QueueRouterHandlers } from '@privateaim/server-kit';
 import {
     EnvironmentName,
     isQueueRouterUsable,
@@ -65,7 +65,7 @@ function createRegistryQueueHandlers() : QueueRouterHandlers<{
     };
 }
 
-export function createRegistryComponent() : Component {
+export function createRegistryComponent() : IComponent {
     if (!isQueueRouterUsable() || useEnv('env') === EnvironmentName.TEST) {
         // todo: maybe log
         return {

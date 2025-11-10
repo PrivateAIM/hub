@@ -6,13 +6,13 @@
  */
 
 import { EnvironmentName } from '@privateaim/kit';
-import type { Component } from '@privateaim/server-kit';
+import type { IComponent } from '@privateaim/server-kit';
 import { isQueueRouterUsable, useLogger, useQueueRouter } from '@privateaim/server-kit';
 import { EventTaskQueueRouterRouting } from '@privateaim/server-telemetry-kit';
 import { useEnv } from '../../config';
 import { definEventComponentHandlers } from './handlers';
 
-export function defineEventComponent() : Component {
+export function defineEventComponent() : IComponent {
     return {
         async start() {
             const handlers = definEventComponentHandlers();

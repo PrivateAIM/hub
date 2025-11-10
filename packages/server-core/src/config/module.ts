@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Aggregator, Component } from '@privateaim/server-kit';
+import type { Aggregator, IComponent } from '@privateaim/server-kit';
 import {
     createAuthupAggregator,
     createTelemetryAggregator,
@@ -33,7 +33,7 @@ import {
 
 export type Config = {
     aggregators: Aggregator[]
-    components: Component[]
+    components: IComponent[]
 };
 
 export function createConfig() : Config {
@@ -68,7 +68,7 @@ export function createConfig() : Config {
 
     // ---------------------------------------------
 
-    const components : Component[] = [
+    const components : IComponent[] = [
         createRegistryComponent(),
         useAnalysisMetadataComponent(),
     ];

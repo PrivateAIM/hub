@@ -8,6 +8,8 @@
 import { isUUID } from '@authup/kit';
 import { PermissionName, isRealmResourceWritable } from '@privateaim/kit';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
+import { BucketEvent } from '@privateaim/server-storage-kit';
+import type { Bucket } from '@privateaim/storage-kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
@@ -16,9 +18,9 @@ import {
     useRequestIdentityRealm,
     useRequestPermissionChecker,
 } from '@privateaim/server-http-kit';
-import { useMinio } from '../../../../core';
+import { useBucketComponent } from '../../../../components';
 import {
-    BucketEntity, isBucketOwnedByIdentity, toBucketName,
+    BucketEntity, isBucketOwnedByIdentity,
 } from '../../../../domains';
 
 export async function executeBucketRouteDeleteHandler(req: Request, res: Response) : Promise<any> {
@@ -48,14 +50,23 @@ export async function executeBucketRouteDeleteHandler(req: Request, res: Respons
         }
     }
 
-    const { id: entityId } = entity;
+    const component = useBucketComponent();
+    await new Promise<Bucket>(
+        (
+            resolve,
+            reject,
+        ) => {
+            component.on(BucketEvent.DELETION_FINISHED, (data) => {
+                resolve(data);
+            });
 
-    const minio = useMinio();
-    await minio.removeBucket(toBucketName(entityId));
+            component.once(BucketEvent.DELETION_FAILED, (data) => {
+                reject(data.error);
+            });
 
-    await repository.remove(entity);
-
-    entity.id = entityId;
+            component.executeDelete({ id: entity.id });
+        },
+    );
 
     return sendAccepted(res, entity);
 }

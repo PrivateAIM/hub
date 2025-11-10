@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { ForbiddenError } from '@ebec/http';
 import { PermissionName, isRealmResourceWritable } from '@privateaim/kit';
 import {
     HTTPHandlerOperation,
@@ -12,13 +13,12 @@ import {
     useRequestIdentityRealm,
     useRequestPermissionChecker,
 } from '@privateaim/server-http-kit';
-import { ForbiddenError } from '@ebec/http';
+import { BucketEvent } from '@privateaim/server-storage-kit';
+import type { Bucket } from '@privateaim/storage-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
-import { useDataSource } from 'typeorm-extension';
-import { useMinio } from '../../../../core';
-import { BucketEntity, toBucketName } from '../../../../domains';
+import { useBucketComponent } from '../../../../components';
 import { BucketValidator } from '../utils/validation';
 
 export async function executeBucketRouteCreateHandler(req: Request, res: Response) : Promise<any> {
@@ -45,22 +45,28 @@ export async function executeBucketRouteCreateHandler(req: Request, res: Respons
         data.realm_id = realm.id;
     }
 
-    const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(BucketEntity);
-    const entity = repository.create({
-        actor_id: actor.id,
-        actor_type: actor.type,
-        ...data,
-    });
+    const component = useBucketComponent();
 
-    await repository.save(entity);
+    const entity = await new Promise<Bucket>(
+        (
+            resolve,
+            reject,
+        ) => {
+            component.on(BucketEvent.CREATION_FINISHED, (data) => {
+                resolve(data);
+            });
 
-    const minio = useMinio();
-    if (entity.region) {
-        await minio.makeBucket(toBucketName(entity.id), entity.region);
-    } else {
-        await minio.makeBucket(toBucketName(entity.id));
-    }
+            component.once(BucketEvent.CREATION_FAILED, (data) => {
+                reject(data.error);
+            });
+
+            component.executeCreate({
+                actor_id: actor.id,
+                actor_type: actor.type,
+                ...data,
+            });
+        },
+    );
 
     return sendCreated(res, entity);
 }

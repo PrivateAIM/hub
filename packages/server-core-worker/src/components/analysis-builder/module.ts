@@ -12,7 +12,7 @@ import {
 } from '@privateaim/server-core-worker-kit';
 import type {
     Component,
-    ComponentHandlers,
+    Component,
 } from '@privateaim/server-kit';
 import {
     ComponentVoidEmitter,
@@ -24,7 +24,7 @@ import {
 import { defineAnalysisBuilderHandlers } from './handlers';
 
 export class AnalysisBuilderComponent extends AnalysisBuilderBaseComponent implements Component {
-    protected handlers: ComponentHandlers;
+    protected handlers: Component;
 
     constructor() {
         super();

@@ -1,0 +1,11 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "paths": {
+            "@privateaim/kit": ["./packages/kit/src"],
+            "@privateaim/server-kit": ["./packages/server-kit/src"],
+            "@privateaim/storage-kit": ["./packages/storage-kit/src"],
+            "@privateaim/telemetry-kit": ["./packages/telemetry-kit/src"]
+        }
+    }
+}

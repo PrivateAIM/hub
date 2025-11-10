@@ -6,7 +6,7 @@
  */
 
 import { EnvironmentName, wait } from '@privateaim/kit';
-import type { Component } from '@privateaim/server-kit';
+import type { IComponent } from '@privateaim/server-kit';
 import {
     ComponentHandlers,
     buildQueueRouterPublishPayload, isQueueRouterUsable, useLogger, useQueueRouter,
@@ -16,7 +16,7 @@ import type { ObjectLiteral } from 'rapiq';
 import { AnalysisMetadataCommand, AnalysisMetadataTaskQueue } from './constants';
 import { AnalysisMetadataRecalcHandler } from './handlers';
 
-export function createAnalysisMetadataComponent(): Component {
+export function createAnalysisMetadataComponent(): IComponent {
     const manager = new ComponentHandlers();
 
     manager.mount(AnalysisMetadataCommand.RECALC, new AnalysisMetadataRecalcHandler());

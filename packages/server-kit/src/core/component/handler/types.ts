@@ -6,17 +6,22 @@
  */
 
 import type { ObjectLiteral } from '../../../type';
-import type { ComponentEmitter } from '../emitter';
+import type { ComponentEmitFn, ComponentSubscriber } from '../emitter';
+import type { ComponentData, ComponentMetadata } from '../type';
+
+export type ComponentHandlerEvents = {
+    [key: string]: [ComponentData, ComponentMetadata]
+};
 
 export type ComponentHandlersOptions = {
-    emitter?: ComponentEmitter
+    emitter?: ComponentSubscriber
 };
 export type ComponentHandlerContext<
     KEY extends string = string,
 > = {
     key: KEY,
     metadata: ObjectLiteral,
-    emitter: ComponentEmitter,
+    emit: ComponentEmitFn,
 };
 
 export type ComponentHandlerFn<

@@ -5,25 +5,28 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentEmitter } from './types';
-import type { QueueRouter, QueueRouterPayloadMetadataInput } from '../../queue-router';
+import type { ToTuple } from '../../event-emitter';
+import type { ComponentHandlerEvents } from '../handler';
+import type { ComponentSubscriber } from './types';
+import type { QueueRouter } from '../../queue-router';
 import { buildQueueRouterPublishPayload, useQueueRouter } from '../../queue-router';
-import type { ObjectLiteral } from '../../../type';
 
-export class QueueRouterComponentEmitter implements ComponentEmitter {
+export class QueueRouterComponentEmitter<
+    EventMap extends ComponentHandlerEvents = ComponentHandlerEvents,
+> implements ComponentSubscriber<EventMap> {
     protected client : QueueRouter;
 
     constructor() {
         this.client = useQueueRouter();
     }
 
-    async emit(
-        type: string,
-        data: ObjectLiteral,
-        metadata: QueueRouterPayloadMetadataInput,
+    async emit<Key extends keyof EventMap>(
+        type: Key,
+        ...input: ToTuple<EventMap[Key]>
     ): Promise<void> {
+        const [data, metadata] = input;
         const payload = buildQueueRouterPublishPayload({
-            type,
+            type: type as string,
             data,
             metadata,
         });

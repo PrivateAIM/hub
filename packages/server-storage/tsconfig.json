@@ -8,6 +8,7 @@
             "@privateaim/server-http-kit": ["./packages/server-http-kit/src"],
             "@privateaim/server-telemetry-kit": ["./packages/server-telemetry-kit/src"],
             "@privateaim/server-kit": ["./packages/server-kit/src"],
+            "@privateaim/server-storage-kit": ["./packages/server-storage-kit/src"],
             "@privateaim/telemetry-kit": ["./packages/telemetry-kit/src"]
         }
     }

@@ -18,6 +18,7 @@
         "@privateaim/server-kit": "^0.8.21",
         "@privateaim/server-db-kit": "^0.8.21",
         "@privateaim/server-http-kit": "^0.8.21",
+        "@privateaim/server-storage-kit": "^0.8.21",
         "@privateaim/server-telemetry-kit": "^0.8.21",
         "@privateaim/storage-kit": "^0.8.21",
         "@privateaim/telemetry-kit": "^0.8.21",

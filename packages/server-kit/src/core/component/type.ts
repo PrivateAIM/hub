@@ -6,6 +6,10 @@
  */
 
 import type { ObjectLiteral } from '../../type';
+import type { QueueRouterPayloadMetadataInput } from '../queue-router';
+
+export type ComponentData = ObjectLiteral;
+export type ComponentMetadata = QueueRouterPayloadMetadataInput;
 
 export type ComponentStartFn = () => Promise<void> | void;
 
@@ -19,7 +23,7 @@ export interface ComponentWithTrigger {
     trigger: ComponentTriggerFn
 }
 
-export type Component = {
+export type IComponent = {
     start: ComponentStartFn,
     trigger?: ComponentTriggerFn,
 };

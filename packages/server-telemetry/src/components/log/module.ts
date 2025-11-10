@@ -6,13 +6,13 @@
  */
 
 import { EnvironmentName } from '@privateaim/kit';
-import type { Component } from '@privateaim/server-kit';
+import type { IComponent } from '@privateaim/server-kit';
 import { isQueueRouterUsable, useLogger, useQueueRouter } from '@privateaim/server-kit';
 import { LogTaskQueueRouterRouting } from '@privateaim/server-telemetry-kit';
 import { useEnv } from '../../config';
 import { definLogComponentHandlers } from './handlers';
 
-export function defineLogComponent() : Component {
+export function defineLogComponent() : IComponent {
     return {
         async start() {
             const handlers = definLogComponentHandlers();

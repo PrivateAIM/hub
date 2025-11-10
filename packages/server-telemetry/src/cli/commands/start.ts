@@ -6,7 +6,7 @@
  */
 
 import { generateSwagger } from '@privateaim/server-http-kit';
-import type { Component } from '@privateaim/server-kit';
+import type { IComponent } from '@privateaim/server-kit';
 import { useLogger } from '@privateaim/server-kit';
 import { defineCommand } from 'citty';
 import path from 'node:path';
@@ -28,7 +28,7 @@ export function defineCLIStartCommand() {
 
             configure();
 
-            const components : Component[] = [
+            const components : IComponent[] = [
                 defineEventComponent(),
                 defineLogComponent(),
             ];

@@ -6,7 +6,7 @@
  */
 
 import type { ObjectLiteral } from '@privateaim/kit';
-import type { Component, ComponentHandlers } from '@privateaim/server-kit';
+import type { Component, Component } from '@privateaim/server-kit';
 import {
     ComponentVoidEmitter,
     QueueRouterComponentEmitter,
@@ -21,7 +21,7 @@ import {
 import { defineAnalysisDistributorHandlers } from './handlers';
 
 export class AnalysisDistributorComponent extends AnalysisDistributorBaseComponent implements Component {
-    protected handlers : ComponentHandlers;
+    protected handlers : Component;
 
     constructor() {
         super();

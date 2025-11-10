@@ -12,7 +12,7 @@ import {
     AnalysisCoreEvent,
 } from '@privateaim/server-core-worker-kit';
 import {
-    ComponentHandlers,
+    Component,
     type ComponentHandlersOptions,
 } from '@privateaim/server-kit';
 import { AnalysisBucketEntity, AnalysisEntity, useDataSourceSync } from '../../../database';
@@ -20,7 +20,7 @@ import { AnalysisBucketEntity, AnalysisEntity, useDataSourceSync } from '../../.
 export function defineAnalysisCoreHandlers(
     options: ComponentHandlersOptions = {},
 ) {
-    const manager = new ComponentHandlers(options);
+    const manager = new Component(options);
 
     manager.mount(AnalysisCoreEvent.BUCKET_CREATED, async (
         value: CoreBucketEventPayload,
