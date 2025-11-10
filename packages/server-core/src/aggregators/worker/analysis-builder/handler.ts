@@ -15,7 +15,7 @@ import { AnalysisEntity, useDataSourceSync } from '../../../database';
 
 export async function handleAnalysisBuilderEvent(
     value: AnalysisBuilderBasePayload,
-    context: ComponentHandlerContext<`${AnalysisBuilderEvent}`>,
+    context: ComponentHandlerContext,
 ) {
     const dataSource = useDataSourceSync();
     const repository = dataSource.getRepository(AnalysisEntity);

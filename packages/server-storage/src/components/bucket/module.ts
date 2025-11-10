@@ -5,35 +5,26 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentMetadata } from '@privateaim/server-kit';
 import {
     BaseComponent,
-    buildQueueRouterPublishPayload,
+    QueueRouterComponentEmitter,
     isQueueRouterUsable,
     useLogger, useQueueRouter,
 } from '@privateaim/server-kit';
 import type {
+    BucketComponentEventMap,
     BucketCreateCommandPayload,
-    BucketCreationFailedEventPayload,
-    BucketCreationFinishedEventPayload,
     BucketDeleteCommandPayload,
-    BucketDeletionFailedEventPayload,
-    BucketDeletionFinishedEventPayload,
-    BucketEvent,
 } from '@privateaim/server-storage-kit';
 import {
     BucketCommand,
+
+    BucketEventQueueRouterRouting,
     BucketTaskQueueRouterRouting,
 } from '@privateaim/server-storage-kit';
 import { BucketCreateHandler, BucketDeleteHandler } from './handlers';
 
-export class BucketComponent extends BaseComponent<{
-    [BucketEvent.CREATION_FAILED]: [BucketCreationFailedEventPayload, ComponentMetadata],
-    [BucketEvent.CREATION_FINISHED]: [BucketCreationFinishedEventPayload, ComponentMetadata],
-
-    [BucketEvent.DELETION_FAILED]: [BucketDeletionFailedEventPayload, ComponentMetadata],
-    [BucketEvent.DELETION_FINISHED]: [BucketDeletionFinishedEventPayload, ComponentMetadata],
-}> {
+export class BucketComponent extends BaseComponent<BucketComponentEventMap> {
     constructor() {
         super();
 
@@ -41,16 +32,15 @@ export class BucketComponent extends BaseComponent<{
         this.mount(BucketCommand.DELETE, new BucketDeleteHandler());
 
         if (isQueueRouterUsable()) {
-            this.on('*', async (type, value) => {
-                const [data, metadata] = value;
-                const payload = buildQueueRouterPublishPayload({
-                    type,
-                    data,
-                    metadata,
+            this.mount('*', async (
+                value,
+                context,
+            ) => {
+                const emitter = new QueueRouterComponentEmitter();
+                await emitter.emit(context.key, value, {
+                    ...context.metadata,
+                    routing: BucketEventQueueRouterRouting,
                 });
-
-                const queueRouter = useQueueRouter();
-                await queueRouter.publish(payload);
             });
         }
     }
@@ -66,7 +56,7 @@ export class BucketComponent extends BaseComponent<{
                 async (
                     payload,
                 ) => this.handle(
-                    payload.type,
+                    payload.type as keyof BucketComponentEventMap,
                     payload.data,
                     payload.metadata,
                 ),
@@ -77,10 +67,10 @@ export class BucketComponent extends BaseComponent<{
     }
 
     async executeCreate(payload: BucketCreateCommandPayload) {
-        return this.handle(BucketCommand.CREATE, payload);
+        return this.handle(BucketCommand.CREATE, payload, {});
     }
 
     async executeDelete(payload: BucketDeleteCommandPayload) {
-        return this.handle(BucketCommand.DELETE, payload);
+        return this.handle(BucketCommand.DELETE, payload, {});
     }
 }

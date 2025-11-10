@@ -8,11 +8,10 @@
 import { NotFoundError } from '@ebec/http';
 import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
 import { useLogger } from '@privateaim/server-kit';
-import type { BucketDeleteCommandPayload } from '@privateaim/server-storage-kit';
+import type { BucketComponentEventMap, BucketDeleteCommandPayload } from '@privateaim/server-storage-kit';
 import {
     BucketCommand,
     BucketEvent,
-    BucketEventQueueRouterRouting,
 } from '@privateaim/server-storage-kit';
 import { DomainType } from '@privateaim/storage-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
@@ -21,9 +20,13 @@ import { useMinio } from '../../../../core';
 import { BucketEntity, toBucketName } from '../../../../domains';
 
 export class BucketDeleteHandler implements ComponentHandler<
-BucketCommand.DELETE,
-BucketDeleteCommandPayload> {
-    async handle(value: BucketDeleteCommandPayload, context: ComponentHandlerContext): Promise<void> {
+BucketComponentEventMap,
+BucketCommand.DELETE
+> {
+    async handle(
+        value: BucketDeleteCommandPayload,
+        context: ComponentHandlerContext<BucketComponentEventMap, BucketCommand.DELETE>,
+    ): Promise<void> {
         try {
             // todo: check if image exists, otherwise local queue task
             await this.process(value, context);
@@ -36,28 +39,23 @@ BucketDeleteCommandPayload> {
                 [LogFlag.REF_TYPE]: DomainType.BUCKET,
             });
 
-            await context.emit(
+            await context.handle(
                 BucketEvent.DELETION_FAILED,
                 {
                     ...value,
                     error: e,
                 },
-                {
-                    ...context.metadata,
-                    routing: BucketEventQueueRouterRouting,
-                },
             );
         }
     }
 
-    protected async process(value: BucketDeleteCommandPayload, context: ComponentHandlerContext): Promise<void> {
-        await context.emit(
+    protected async process(
+        value: BucketDeleteCommandPayload,
+        context: ComponentHandlerContext<BucketComponentEventMap, BucketCommand.DELETE>,
+    ): Promise<void> {
+        await context.handle(
             BucketEvent.DELETION_STARTED,
             value,
-            {
-                ...context.metadata,
-                routing: BucketEventQueueRouterRouting,
-            },
         );
 
         const dataSource = await useDataSource();
@@ -77,15 +75,11 @@ BucketDeleteCommandPayload> {
         const minio = useMinio();
         await minio.removeBucket(toBucketName(entityId));
 
-        await context.emit(
+        await context.handle(
             BucketEvent.DELETION_FINISHED,
             {
                 ...entity,
                 id: entityId,
-            },
-            {
-                ...context.metadata,
-                routing: BucketEventQueueRouterRouting,
             },
         );
     }

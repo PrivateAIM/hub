@@ -11,7 +11,6 @@ import {
 } from '@privateaim/server-storage-kit';
 import {
     BaseComponent,
-    QueueRouterComponentEmitter,
     isQueueRouterUsable,
     useLogger,
     useQueueRouter,
@@ -25,14 +24,6 @@ export class StorageBucketAggregator extends BaseComponent {
 
         this.mount(BucketEvent.CREATION_FINISHED, new StorageBucketCreationFinishedHandler());
         this.mount(BucketEvent.DELETION_FINISHED, new StorageBucketDeletionFinishedHandler());
-
-        if (isQueueRouterUsable()) {
-            this.on('*', async (type, payload) => {
-                const [data, metadata] = payload;
-                const emitter = new QueueRouterComponentEmitter();
-                await emitter.emit(type, data, metadata);
-            });
-        }
     }
 
     async start() : Promise<void> {

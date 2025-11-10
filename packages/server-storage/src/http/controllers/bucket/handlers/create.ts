@@ -13,12 +13,12 @@ import {
     useRequestIdentityRealm,
     useRequestPermissionChecker,
 } from '@privateaim/server-http-kit';
-import { BucketEvent } from '@privateaim/server-storage-kit';
-import type { Bucket } from '@privateaim/storage-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
-import { useBucketComponent } from '../../../../components';
+import { useDataSource } from 'typeorm-extension';
+import { useMinio } from '../../../../core';
+import { BucketEntity, toBucketName } from '../../../../domains';
 import { BucketValidator } from '../utils/validation';
 
 export async function executeBucketRouteCreateHandler(req: Request, res: Response) : Promise<any> {
@@ -45,28 +45,22 @@ export async function executeBucketRouteCreateHandler(req: Request, res: Respons
         data.realm_id = realm.id;
     }
 
-    const component = useBucketComponent();
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository(BucketEntity);
+    const entity = repository.create({
+        actor_id: actor.id,
+        actor_type: actor.type,
+        ...data,
+    });
 
-    const entity = await new Promise<Bucket>(
-        (
-            resolve,
-            reject,
-        ) => {
-            component.on(BucketEvent.CREATION_FINISHED, (data) => {
-                resolve(data);
-            });
+    await repository.save(entity);
 
-            component.once(BucketEvent.CREATION_FAILED, (data) => {
-                reject(data.error);
-            });
-
-            component.executeCreate({
-                actor_id: actor.id,
-                actor_type: actor.type,
-                ...data,
-            });
-        },
-    );
+    const minio = useMinio();
+    if (entity.region) {
+        await minio.makeBucket(toBucketName(entity.id), entity.region);
+    } else {
+        await minio.makeBucket(toBucketName(entity.id));
+    }
 
     return sendCreated(res, entity);
 }

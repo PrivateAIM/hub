@@ -7,7 +7,7 @@
 
 import { useMasterImageQueueService } from '@privateaim/server-core-worker-kit';
 import {
-    Aggregator, type Component, EnvironmentName, isQueueRouterUsable,
+    type Component, EnvironmentName, isQueueRouterUsable,
     useLogger,
 } from '@privateaim/server-kit';
 import { useEnv } from '../../../config';

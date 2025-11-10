@@ -13,6 +13,7 @@ import {
 } from '@privateaim/server-kit';
 import {
     AnalysisDistributorCommand,
+    AnalysisDistributorEventQueueRouterRouting,
     AnalysisDistributorTaskQueueRouterRouting,
 } from '@privateaim/server-core-worker-kit';
 import { AnalysisDistributorExecuteHandler } from './handlers';
@@ -24,10 +25,15 @@ export class AnalysisDistributorComponent extends BaseComponent {
         this.mount(AnalysisDistributorCommand.EXECUTE, new AnalysisDistributorExecuteHandler());
 
         if (isQueueRouterUsable()) {
-            this.on('*', async (type, payload) => {
-                const [data, metadata] = payload;
+            this.mount('*', async (
+                value,
+                context,
+            ) => {
                 const emitter = new QueueRouterComponentEmitter();
-                await emitter.emit(type, data, metadata);
+                await emitter.emit(context.key, value, {
+                    ...context.metadata,
+                    routing: AnalysisDistributorEventQueueRouterRouting,
+                });
             });
         }
     }

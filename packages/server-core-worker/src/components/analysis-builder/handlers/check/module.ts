@@ -14,8 +14,8 @@ import type {
     AnalysisBuilderExecutePayload,
 } from '@privateaim/server-core-worker-kit';
 import {
-    AnalysisBuilderCommand, AnalysisBuilderEvent,
-    AnalysisBuilderEventQueueRouterRouting,
+    AnalysisBuilderCommand,
+    AnalysisBuilderEvent,
 } from '@privateaim/server-core-worker-kit';
 import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
 import {
@@ -24,22 +24,17 @@ import {
 } from '../../../../core';
 import { useAnalysisBuilderLogger } from '../../utils';
 
-export class AnalysisBuilderCheckHandler implements ComponentHandler<
-AnalysisBuilderCommand.CHECK,
-AnalysisBuilderExecutePayload> {
-    async handle(value: AnalysisBuilderExecutePayload, context: ComponentHandlerContext<AnalysisBuilderCommand.CHECK>): Promise<void> {
+export class AnalysisBuilderCheckHandler implements ComponentHandler {
+    async handle(value: AnalysisBuilderExecutePayload, context: ComponentHandlerContext): Promise<void> {
         try {
             // todo: check if image exists, otherwise local queue task
             await this.handleInternal(value, context);
         } catch (e) {
-            await context.emit(
+            await context.handle(
                 AnalysisBuilderEvent.CHECK_FAILED,
                 {
                     ...value,
                     error: e,
-                },
-                {
-                    routing: AnalysisBuilderEventQueueRouterRouting,
                 },
             );
         }
@@ -47,14 +42,11 @@ AnalysisBuilderExecutePayload> {
 
     async handleInternal(
         value: AnalysisBuilderExecutePayload,
-        context: ComponentHandlerContext<AnalysisBuilderCommand.CHECK>,
+        context: ComponentHandlerContext,
     ): Promise<void> {
-        await context.emit(
+        await context.handle(
             AnalysisBuilderEvent.CHECK_STARTED,
             value,
-            {
-                routing: AnalysisBuilderEventQueueRouterRouting,
-            },
         );
 
         const client = useCoreClient();
@@ -76,12 +68,9 @@ AnalysisBuilderExecutePayload> {
         });
 
         if (analysisNodes.length === 0) {
-            await context.emit(
+            await context.handle(
                 AnalysisBuilderEvent.CHECK_FINISHED,
                 value,
-                {
-                    routing: AnalysisBuilderEventQueueRouterRouting,
-                },
             );
 
             return;
@@ -99,12 +88,9 @@ AnalysisBuilderExecutePayload> {
         const [node] = nodes;
 
         if (typeof node === 'undefined') {
-            await context.emit(
+            await context.handle(
                 AnalysisBuilderEvent.CHECK_FINISHED,
                 value,
-                {
-                    routing: AnalysisBuilderEventQueueRouterRouting,
-                },
             );
 
             return;
@@ -147,12 +133,9 @@ AnalysisBuilderExecutePayload> {
 
         // -----------------------------------------------------------------------------------
 
-        await context.emit(
+        await context.handle(
             AnalysisBuilderEvent.CHECK_FINISHED,
             value,
-            {
-                routing: AnalysisBuilderEventQueueRouterRouting,
-            },
         );
     }
 }

@@ -5,19 +5,12 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import type { ObjectLiteral } from '../../../type';
 import type { ToTuple } from '../../event-emitter';
 
-import type { ComponentEvents } from '../type';
-
-export type ComponentEmitFn = (
-    type: string,
-    data?: ObjectLiteral,
-    metadata?: ObjectLiteral
-) => Promise<void> | void;
+import type { ComponentEventMap } from '../type';
 
 export interface ComponentSubscriber<
-    EventMap extends ComponentEvents = ComponentEvents,
+    EventMap extends ComponentEventMap = ComponentEventMap,
 > {
     emit<Key extends keyof EventMap>(
         type: Key,

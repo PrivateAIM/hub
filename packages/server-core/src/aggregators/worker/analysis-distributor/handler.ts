@@ -13,7 +13,7 @@ import { AnalysisEntity, useDataSourceSync } from '../../../database';
 
 export async function handleAnalysisDistributorEvent(
     value: AnalysisDistributorPayload,
-    context: ComponentHandlerContext<`${AnalysisDistributorEvent}`>,
+    context: ComponentHandlerContext,
 ) {
     const dataSource = useDataSourceSync();
     const repository = dataSource.getRepository(AnalysisEntity);

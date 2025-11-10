@@ -8,7 +8,6 @@
 import { EnvironmentName, wait } from '@privateaim/kit';
 import {
     BaseComponent,
-    QueueRouterComponentEmitter,
     buildQueueRouterPublishPayload, isQueueRouterUsable, useQueueRouter,
 } from '@privateaim/server-kit';
 import { useEnv } from '@privateaim/server-telemetry';
@@ -21,14 +20,6 @@ export class AnalysisMetadataComponent extends BaseComponent {
         super();
 
         this.mount(AnalysisMetadataCommand.RECALC, new AnalysisMetadataRecalcHandler());
-
-        if (isQueueRouterUsable()) {
-            this.on('*', async (type, payload) => {
-                const [data, metadata] = payload;
-                const emitter = new QueueRouterComponentEmitter();
-                await emitter.emit(type, data, metadata);
-            });
-        }
     }
 
     async start() {

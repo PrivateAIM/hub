@@ -5,26 +5,26 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ObjectLiteral } from '../../../type';
-import type { ComponentEmitFn } from '../emitter';
+import type { ComponentEventMap, ComponentHandleFn } from '../type';
 
 export type ComponentHandlerContext<
-    KEY extends string = string,
+    EventMap extends ComponentEventMap = ComponentEventMap,
+    Key extends keyof EventMap = keyof EventMap,
 > = {
-    key: KEY,
-    metadata: ObjectLiteral,
-    emit: ComponentEmitFn,
+    key: Key & string,
+    metadata: EventMap[Key][1],
+    handle: ComponentHandleFn<EventMap>
 };
 
 export type ComponentHandlerFn<
-    KEY extends string = string,
-    VALUE extends ObjectLiteral = ObjectLiteral,
-> = (value: VALUE, context: ComponentHandlerContext<KEY>) => Promise<void> | void;
+    EventMap extends ComponentEventMap = ComponentEventMap,
+    Key extends keyof EventMap = keyof EventMap,
+> = (value: EventMap[Key][0], context: ComponentHandlerContext<EventMap, Key>) => Promise<void> | void;
 
 export type ComponentHandler<
-    KEY extends string = string,
-    VALUE extends ObjectLiteral = ObjectLiteral,
+    EventMap extends ComponentEventMap = ComponentEventMap,
+    Key extends keyof EventMap = keyof EventMap,
 > = {
     initialize?: () => Promise<void> | void;
-    handle: ComponentHandlerFn<KEY, VALUE>
+    handle: ComponentHandlerFn<EventMap, Key>
 };

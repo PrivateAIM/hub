@@ -5,37 +5,48 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { EventEmitter } from '../event-emitter';
-import type { ObjectLiteral } from '../../type';
-import type { Component, ComponentEvents } from './type';
+import type {
+    Component, ComponentEventMap, ComponentHandlers,
+} from './type';
 import { isComponentHandlerFn } from './handler';
 import type {
     ComponentHandler, ComponentHandlerContext, ComponentHandlerFn,
 } from './handler';
 
 export abstract class BaseComponent<
-    EventMap extends ComponentEvents = ComponentEvents,
-> extends EventEmitter<EventMap> implements Component {
+    EventMap extends ComponentEventMap = ComponentEventMap,
+> implements Component {
     protected initializing : boolean;
 
     protected initialized : boolean;
 
-    protected handlers: Record<string, ComponentHandlerFn | ComponentHandler>;
+    protected handlers: ComponentHandlers<EventMap>;
 
     protected constructor() {
-        super();
-
         this.initializing = false;
         this.initialized = false;
-        this.handlers = {};
+        this.handlers = new Map();
     }
 
-    mount<K extends string>(key: K, fn: ComponentHandler<K, any> | ComponentHandlerFn<K, any>) {
-        this.handlers[key] = fn;
+    mount<Key extends keyof EventMap>(
+        key: Key,
+        fn: ComponentHandler<EventMap, Key> | ComponentHandlerFn<EventMap, Key>
+    ) : void;
+
+    mount(
+        key: '*',
+        fn: ComponentHandler<EventMap> | ComponentHandlerFn<EventMap>
+    ) : void;
+
+    mount(
+        key: PropertyKey,
+        fn: ComponentHandler<EventMap> | ComponentHandlerFn<EventMap>,
+    ) : void {
+        this.handlers.set(key as keyof EventMap, fn);
     }
 
-    unmount(key: string) {
-        delete this.handlers[key];
+    unmount<Key extends keyof EventMap>(key: Key) {
+        this.handlers.delete(key);
     }
 
     async initialize() : Promise<void> {
@@ -66,38 +77,57 @@ export abstract class BaseComponent<
      *
      * @param key
      * @param value
-     * @param metadata
      */
-    async handle(
-        key: string,
-        value: ObjectLiteral = {},
-        metadata: ObjectLiteral = {},
+    async handle<Key extends keyof EventMap>(
+        key: Key & string,
+        ...value: EventMap[Key]
     ) : Promise<void> {
         await this.initialize();
 
-        const handler = this.handlers[key];
+        const handler = this.handlers.get(key) as ComponentHandler<EventMap, Key> |
+        ComponentHandlerFn<EventMap, Key>;
+
         if (!handler) {
-            return;
+            if (key === '*') {
+                throw new Error(`${key as string} key could not be handled.`);
+            }
+
+            return this.handle(
+                '*' as Key & string,
+                ...value as EventMap[Key],
+            );
         }
 
-        const context : ComponentHandlerContext = {
+        const [data, metadata] = value;
+
+        const context : ComponentHandlerContext<EventMap, Key> = {
             key,
             metadata,
-            emit: (childKey, childValue, childMetadata) => {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-expect-error
-                this.emit(childKey, childValue, {
-                    ...metadata,
-                    ...childMetadata,
-                });
+            handle: (
+                childKey,
+                childData,
+                childMetadata,
+            ) => {
+                const childPayload = [
+                    childData,
+                    {
+                        ...metadata,
+                        ...(childMetadata || {}),
+                    },
+                ];
+
+                this.handle(
+                    childKey as Key & string,
+                    ...childPayload as EventMap[Key],
+                );
             },
         };
 
-        if (isComponentHandlerFn(handler)) {
-            await handler(value, context);
-        } else {
-            await handler.handle(value, context);
+        if (typeof handler === 'function') {
+            return handler(data, context);
         }
+
+        return handler.handle(data, context);
     }
 
     abstract start() : Promise<void> | void;

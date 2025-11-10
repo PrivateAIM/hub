@@ -9,7 +9,7 @@ import {
     BaseComponent, QueueRouterComponentEmitter, isQueueRouterUsable, useQueueRouter,
 } from '@privateaim/server-kit';
 import {
-    EventCommand,
+    EventCommand, EventEventQueueRouterRouting,
     EventTaskQueueRouterRouting,
 } from '@privateaim/server-telemetry-kit';
 import { EventComponentCleanerHandler, EventComponentCreateHandler } from './handlers';
@@ -22,10 +22,15 @@ export class EventComponent extends BaseComponent {
         this.mount(EventCommand.CLEAN, new EventComponentCleanerHandler());
 
         if (isQueueRouterUsable()) {
-            this.on('*', async (type, payload) => {
-                const [data, metadata] = payload;
+            this.mount('*', async (
+                value,
+                context,
+            ) => {
                 const emitter = new QueueRouterComponentEmitter();
-                await emitter.emit(type, data, metadata);
+                await emitter.emit(context.key, value, {
+                    ...context.metadata,
+                    routing: EventEventQueueRouterRouting,
+                });
             });
         }
     }

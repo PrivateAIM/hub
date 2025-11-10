@@ -7,11 +7,10 @@
 
 import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
 import { useLogger } from '@privateaim/server-kit';
-import type { BucketCreateCommandPayload } from '@privateaim/server-storage-kit';
+import type { BucketComponentEventMap, BucketCreateCommandPayload } from '@privateaim/server-storage-kit';
 import {
     BucketCommand,
     BucketEvent,
-    BucketEventQueueRouterRouting,
 } from '@privateaim/server-storage-kit';
 import { DomainType } from '@privateaim/storage-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
@@ -21,15 +20,19 @@ import { BucketEntity, toBucketName } from '../../../../domains';
 import { BucketValidator } from '../../../../http/controllers/bucket/utils/validation';
 
 export class BucketCreateHandler implements ComponentHandler<
-BucketCommand.CREATE,
-BucketCreateCommandPayload> {
+BucketComponentEventMap,
+BucketCommand.CREATE
+> {
     protected validator : BucketValidator;
 
     constructor() {
         this.validator = new BucketValidator();
     }
 
-    async handle(value: BucketCreateCommandPayload, context: ComponentHandlerContext): Promise<void> {
+    async handle(
+        value: BucketCreateCommandPayload,
+        context: ComponentHandlerContext<BucketComponentEventMap, BucketCommand.CREATE>,
+    ): Promise<void> {
         try {
             // todo: check if image exists, otherwise local queue task
             await this.process(value, context);
@@ -42,28 +45,23 @@ BucketCreateCommandPayload> {
                 [LogFlag.REF_TYPE]: DomainType.BUCKET,
             });
 
-            await context.emit(
+            await context.handle(
                 BucketEvent.CREATION_FAILED,
                 {
-                    ...value,
+                    id: value.id,
                     error: e,
-                },
-                {
-                    ...context.metadata,
-                    routing: BucketEventQueueRouterRouting,
                 },
             );
         }
     }
 
-    protected async process(value: BucketCreateCommandPayload, context: ComponentHandlerContext): Promise<void> {
-        await context.emit(
+    protected async process(
+        value: BucketCreateCommandPayload,
+        context: ComponentHandlerContext<BucketComponentEventMap, BucketCommand.CREATE>,
+    ): Promise<void> {
+        await context.handle(
             BucketEvent.CREATION_STARTED,
             value,
-            {
-                ...context.metadata,
-                routing: BucketEventQueueRouterRouting,
-            },
         );
 
         const data = await this.validator.run(value);
@@ -81,14 +79,10 @@ BucketCreateCommandPayload> {
             await minio.makeBucket(toBucketName(entity.id));
         }
 
-        await context.emit(
+        await context.handle(
             BucketEvent.CREATION_FINISHED,
             {
                 ...entity,
-            },
-            {
-                ...context.metadata,
-                routing: BucketEventQueueRouterRouting,
             },
         );
     }

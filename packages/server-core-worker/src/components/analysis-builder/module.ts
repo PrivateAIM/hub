@@ -6,7 +6,7 @@
  */
 
 import {
-    AnalysisBuilderCommand,
+    AnalysisBuilderCommand, AnalysisBuilderEventQueueRouterRouting,
     AnalysisBuilderTaskQueueRouterRouting,
 } from '@privateaim/server-core-worker-kit';
 import {
@@ -26,10 +26,15 @@ export class AnalysisBuilderComponent extends BaseComponent {
         this.mount(AnalysisBuilderCommand.EXECUTE, new AnalysisBuilderExecuteHandler());
 
         if (isQueueRouterUsable()) {
-            this.on('*', async (type, payload) => {
-                const [data, metadata] = payload;
+            this.mount('*', async (
+                value,
+                context,
+            ) => {
                 const emitter = new QueueRouterComponentEmitter();
-                await emitter.emit(type, data, metadata);
+                await emitter.emit(context.key, value, {
+                    ...context.metadata,
+                    routing: AnalysisBuilderEventQueueRouterRouting,
+                });
             });
         }
     }

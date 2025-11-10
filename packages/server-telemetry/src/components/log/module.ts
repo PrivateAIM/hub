@@ -8,7 +8,7 @@
 import {
     BaseComponent, QueueRouterComponentEmitter, isQueueRouterUsable, useQueueRouter,
 } from '@privateaim/server-kit';
-import { LogCommand, LogTaskQueueRouterRouting } from '@privateaim/server-telemetry-kit';
+import { LogCommand, LogEventQueueRouterRouting, LogTaskQueueRouterRouting } from '@privateaim/server-telemetry-kit';
 import { LogComponentWriteHandler } from './handlers';
 
 export class LogComponent extends BaseComponent {
@@ -18,10 +18,15 @@ export class LogComponent extends BaseComponent {
         this.mount(LogCommand.WRITE, new LogComponentWriteHandler());
 
         if (isQueueRouterUsable()) {
-            this.on('*', async (type, payload) => {
-                const [data, metadata] = payload;
+            this.mount('*', async (
+                value,
+                context,
+            ) => {
                 const emitter = new QueueRouterComponentEmitter();
-                await emitter.emit(type, data, metadata);
+                await emitter.emit(context.key, value, {
+                    ...context.metadata,
+                    routing: LogEventQueueRouterRouting,
+                });
             });
         }
     }

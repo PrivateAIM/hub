@@ -5,14 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
-import type { BucketCreationFinishedEventPayload, BucketEvent } from '@privateaim/server-storage-kit';
 import type { Bucket } from '@privateaim/storage-kit/src';
 import { AnalysisBucketEntity, useDataSourceSync } from '../../../../database';
 
-export class StorageBucketCreationFinishedHandler implements ComponentHandler<
-BucketEvent.CREATION_FINISHED,
-BucketCreationFinishedEventPayload> {
-    async handle(bucket: Bucket, context: ComponentHandlerContext<BucketEvent.CREATION_FINISHED>): Promise<void> {
+export class StorageBucketCreationFinishedHandler implements ComponentHandler {
+    async handle(bucket: Bucket, context: ComponentHandlerContext): Promise<void> {
         const { analysisBucketId } = context.metadata;
         if (!analysisBucketId) {
             return;

@@ -12,7 +12,6 @@ import {
 } from '@privateaim/server-core-worker-kit';
 import {
     BaseComponent,
-    QueueRouterComponentEmitter,
     isQueueRouterUsable,
     useLogger,
     useQueueRouter,
@@ -29,14 +28,6 @@ export class AnalysisDistributorAggregator extends BaseComponent {
         this.mount(AnalysisDistributorEvent.EXECUTION_STARTED, handleAnalysisDistributorEvent);
         this.mount(AnalysisDistributorEvent.EXECUTION_FAILED, handleAnalysisDistributorEvent);
         this.mount(AnalysisDistributorEvent.EXECUTION_FINISHED, handleAnalysisDistributorEvent);
-
-        if (isQueueRouterUsable()) {
-            this.on('*', async (type, payload) => {
-                const [data, metadata] = payload;
-                const emitter = new QueueRouterComponentEmitter();
-                await emitter.emit(type, data, metadata);
-            });
-        }
     }
 
     async start() : Promise<void> {

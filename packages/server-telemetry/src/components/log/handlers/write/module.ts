@@ -8,16 +8,13 @@
 import type { ComponentHandler } from '@privateaim/server-kit';
 import type { Log, LogInput } from '@privateaim/telemetry-kit';
 import { LogValidator } from '@privateaim/telemetry-kit';
-import type { LogCommand, LogWriteCommandPayload } from '@privateaim/server-telemetry-kit';
+import type { LogWriteCommandPayload } from '@privateaim/server-telemetry-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import type { Request } from 'routup';
 import type { LogStore } from '../../../../services';
 import { useLogStore } from '../../../../services';
 
-export class LogComponentWriteHandler implements ComponentHandler<
-LogCommand.WRITE,
-LogWriteCommandPayload
-> {
+export class LogComponentWriteHandler implements ComponentHandler {
     protected validator : LogValidator;
 
     protected store : LogStore;

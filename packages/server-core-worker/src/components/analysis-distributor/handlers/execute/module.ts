@@ -12,7 +12,6 @@ import type {
 import {
     AnalysisDistributorCommand,
     AnalysisDistributorEvent,
-    AnalysisDistributorEventQueueRouterRouting,
 } from '@privateaim/server-core-worker-kit';
 import { REGISTRY_ARTIFACT_TAG_LATEST } from '@privateaim/core-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
@@ -26,9 +25,7 @@ import {
 import { BuilderError } from '../../../analysis-builder/error';
 import { useAnalysisDistributorLogger } from '../../helpers';
 
-export class AnalysisDistributorExecuteHandler implements ComponentHandler<
-AnalysisDistributorCommand.EXECUTE,
-AnalysisDistributorExecutePayload> {
+export class AnalysisDistributorExecuteHandler implements ComponentHandler {
     async handle(value: AnalysisDistributorExecutePayload, context: ComponentHandlerContext): Promise<void> {
         try {
             // todo: check if image exists, otherwise local queue task
@@ -42,26 +39,20 @@ AnalysisDistributorExecutePayload> {
                 event: AnalysisDistributorEvent.EXECUTION_FAILED,
             });
 
-            await context.emit(
+            await context.handle(
                 AnalysisDistributorEvent.EXECUTION_FAILED,
                 {
                     ...value,
                     error: e,
-                },
-                {
-                    routing: AnalysisDistributorEventQueueRouterRouting,
                 },
             );
         }
     }
 
     async handleInternal(value: AnalysisDistributorExecutePayload, context: ComponentHandlerContext): Promise<void> {
-        await context.emit(
+        await context.handle(
             AnalysisDistributorEvent.EXECUTION_STARTED,
             value,
-            {
-                routing: AnalysisDistributorEventQueueRouterRouting,
-            },
         );
 
         const client = useCoreClient();
@@ -171,12 +162,9 @@ AnalysisDistributorExecutePayload> {
             throw e;
         }
 
-        await context.emit(
+        await context.handle(
             AnalysisDistributorEvent.EXECUTION_FINISHED,
             value,
-            {
-                routing: AnalysisDistributorEventQueueRouterRouting,
-            },
         );
     }
 }

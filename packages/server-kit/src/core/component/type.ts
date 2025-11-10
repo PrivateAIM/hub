@@ -6,10 +6,10 @@
  */
 
 import type { ObjectLiteral } from '../../type';
-import type { QueueRouterPayloadMetadataInput } from '../queue-router';
+import type { ComponentHandler, ComponentHandlerFn } from './handler';
 
 export type ComponentData = ObjectLiteral;
-export type ComponentMetadata = QueueRouterPayloadMetadataInput;
+export type ComponentMetadata = ObjectLiteral;
 
 export type ComponentStartFn = () => Promise<void> | void;
 
@@ -33,6 +33,26 @@ export type ComponentErrorOptions = {
     message?: string
     cause?: unknown
 };
-export type ComponentEvents = {
+
+export type ComponentEventMap = {
     [key: string]: [ComponentData, ComponentMetadata]
 };
+
+export type ComponentHandleFnArgs<
+    EventMap extends ComponentEventMap = ComponentEventMap,
+> = {
+    [K in keyof EventMap]: [key: K, data: EventMap[K][0], metadata?: EventMap[K][1] | undefined]
+}[keyof EventMap];
+
+export type ComponentHandleFn<
+    EventMap extends ComponentEventMap = ComponentEventMap,
+> = (
+    ...input: ComponentHandleFnArgs<EventMap>
+) => Promise<void> | void;
+
+export type ComponentHandlers<EventMap extends ComponentEventMap> = Map<
+keyof EventMap | '*',
+{
+    [Key in keyof EventMap]?: ComponentHandler<EventMap, Key> | ComponentHandlerFn<EventMap, Key>
+}[keyof EventMap]
+>;
