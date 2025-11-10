@@ -5,8 +5,6 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import type { ToTuple } from '../../event-emitter';
-
 import type { ComponentEventMap } from '../type';
 
 export interface ComponentSubscriber<
@@ -14,7 +12,7 @@ export interface ComponentSubscriber<
 > {
     emit<Key extends keyof EventMap>(
         type: Key,
-        ...payload: ToTuple<EventMap[Key]>
+        ...payload: EventMap[Key]
     ) : Promise<void> | void;
 }
 
