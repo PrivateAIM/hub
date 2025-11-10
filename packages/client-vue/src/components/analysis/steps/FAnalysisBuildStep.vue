@@ -63,7 +63,7 @@ export default defineComponent({
                 </FProcessStatus>
             </div>
         </div>
-        <div class="mt-1">
+        <div class="d-flex flex-row gap-1">
             <div>
                 <FAnalysisCommand
                     :command="'buildStart'"

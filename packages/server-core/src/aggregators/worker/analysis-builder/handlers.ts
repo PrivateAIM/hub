@@ -47,6 +47,8 @@ export function defineAnalysisBuilderHandlers(
                 entity.build_status = ProcessStatus.FINISHED;
             }
         }
+
+        await repository.save(entity);
     };
 
     manager.mount(AnalysisBuilderEvent.EXECUTION_STARTED, handleEvent);

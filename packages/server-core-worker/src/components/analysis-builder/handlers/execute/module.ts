@@ -13,6 +13,7 @@ import {
     AnalysisBuilderCommand,
     AnalysisBuilderEvent,
     AnalysisBuilderEventQueueRouterRouting,
+    AnalysisCoreEvent,
 } from '@privateaim/server-core-worker-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
@@ -33,6 +34,14 @@ AnalysisBuilderExecutePayload> {
             // todo: check if image exists, otherwise local queue task
             await this.handleInternal(value, context);
         } catch (e) {
+            useAnalysisBuilderLogger().error({
+                message: e,
+                command: AnalysisBuilderCommand.EXECUTE,
+                analysis_id: value.id,
+                [LogFlag.REF_ID]: value.id,
+                event: AnalysisCoreEvent.FAILED,
+            });
+
             await context.emitter.emit(
                 AnalysisBuilderEvent.EXECUTION_FAILED,
                 {

@@ -75,6 +75,18 @@ export class AnalysisManagerService {
             throw new BadRequestError(check.message);
         }
 
+        if (!entity.registry_id) {
+            const [registry] = await this.registryRepository.find({
+                take: 1,
+            });
+
+            if (!registry) {
+                throw new BadRequestError('No registry is registered.');
+            }
+
+            entity.registry_id = registry.id;
+        }
+
         entity.build_status = ProcessStatus.STARTING;
 
         if (request) {
@@ -124,18 +136,6 @@ export class AnalysisManagerService {
             ) {
                 throw new BadRequestError(`The node ${analysisNodes[i].node.name} is not assigned to a registry yet.`);
             }
-        }
-
-        if (!entity.registry_id) {
-            const [registry] = await this.registryRepository.find({
-                take: 1,
-            });
-
-            if (!registry) {
-                throw new BadRequestError('No registry is registered.');
-            }
-
-            entity.registry_id = registry.id;
         }
 
         entity.distribution_status = ProcessStatus.STARTING;

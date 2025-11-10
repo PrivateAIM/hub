@@ -44,6 +44,8 @@ export function defineAnalysisDistributorHandlers(
                 entity.distribution_status = ProcessStatus.FINISHED;
             }
         }
+
+        await repository.save(entity);
     };
 
     manager.mount(AnalysisDistributorEvent.EXECUTION_STARTED, handleEvent);

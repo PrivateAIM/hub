@@ -6,8 +6,11 @@
  */
 
 import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
-import type { AnalysisDistributorExecutePayload } from '@privateaim/server-core-worker-kit';
+import type {
+    AnalysisDistributorExecutePayload,
+} from '@privateaim/server-core-worker-kit';
 import {
+    AnalysisCoreEvent,
     AnalysisDistributorCommand,
     AnalysisDistributorEvent,
     AnalysisDistributorEventQueueRouterRouting,
@@ -32,6 +35,14 @@ AnalysisDistributorExecutePayload> {
             // todo: check if image exists, otherwise local queue task
             await this.handleInternal(value, context);
         } catch (e) {
+            useAnalysisDistributorLogger().error({
+                message: e,
+                command: AnalysisDistributorCommand.EXECUTE,
+                analysis_id: value.id,
+                [LogFlag.REF_ID]: value.id,
+                event: AnalysisCoreEvent.FAILED,
+            });
+
             await context.emitter.emit(
                 AnalysisDistributorEvent.EXECUTION_FAILED,
                 {

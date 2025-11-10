@@ -56,7 +56,7 @@ export default defineComponent({
                 <strong>3. Distribution</strong>
             </div>
             <div>
-                <FProcessStatus :value="entity.build_status">
+                <FProcessStatus :value="entity.distribution_status">
                     <template #default=" { iconClass, classSuffix }">
                         <i :class="iconClass + ' text-'+ classSuffix" />
                     </template>
