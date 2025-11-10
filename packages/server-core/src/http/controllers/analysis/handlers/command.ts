@@ -53,16 +53,6 @@ export async function handleAnalysisCommandRouteHandler(req: Request, res: Respo
     const manager = useAnalysisManager();
 
     switch (data.command) {
-        // General
-        case AnalysisAPICommand.SPIN_UP: {
-            entity = await manager.spinUp(entity);
-            break;
-        }
-        case AnalysisAPICommand.TEAR_DOWN: {
-            entity = await manager.tearDown(entity);
-            break;
-        }
-
         // Build Commands
         case AnalysisAPICommand.BUILD_STATUS:
             entity = await manager.checkBuild(entity);

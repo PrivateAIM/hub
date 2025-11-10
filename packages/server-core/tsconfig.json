@@ -12,6 +12,7 @@
             "@privateaim/server-http-kit": ["./packages/server-http-kit/src"],
             "@privateaim/server-realtime-kit": ["./packages/server-realtime-kit/src"],
             "@privateaim/server-core-worker-kit": ["./packages/server-core-worker-kit/src"],
+            "@privateaim/server-storage-kit": ["./packages/server-storage-kit/src"],
             "@privateaim/server-telemetry": ["./packages/server-telemetry/src"],
             "@privateaim/server-telemetry-kit": ["./packages/server-telemetry-kit/src"],
         }

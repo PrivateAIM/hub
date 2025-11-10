@@ -9,7 +9,7 @@ import type { Component } from '@privateaim/server-kit';
 import {
     AnalysisBuilderAggregator,
     AnalysisDistributorAggregator,
-    createAnalysisCoreAggregator,
+    StorageBucketAggregator,
     createAuthupAggregator,
     createMasterImagesAggregator,
     createTelemetryAggregator,
@@ -58,7 +58,8 @@ export function createConfig() : Config {
 
         new AnalysisBuilderAggregator(),
         new AnalysisDistributorAggregator(),
-        createAnalysisCoreAggregator(),
+
+        new StorageBucketAggregator(),
 
         createMasterImagesAggregator(),
         createTelemetryAggregator(),

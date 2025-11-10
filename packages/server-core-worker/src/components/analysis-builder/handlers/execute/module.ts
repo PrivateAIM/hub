@@ -13,7 +13,6 @@ import {
     AnalysisBuilderCommand,
     AnalysisBuilderEvent,
     AnalysisBuilderEventQueueRouterRouting,
-    AnalysisCoreEvent,
 } from '@privateaim/server-core-worker-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
@@ -39,7 +38,7 @@ AnalysisBuilderExecutePayload> {
                 command: AnalysisBuilderCommand.EXECUTE,
                 analysis_id: value.id,
                 [LogFlag.REF_ID]: value.id,
-                event: AnalysisCoreEvent.FAILED,
+                event: AnalysisBuilderEvent.EXECUTION_FAILED,
             });
 
             await context.emit(

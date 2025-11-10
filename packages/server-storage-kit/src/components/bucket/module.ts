@@ -35,11 +35,11 @@ export class BucketBaseComponent implements ComponentWithTrigger {
         }
     }
 
-    async triggerCreate(payload: BucketCreateCommandPayload) {
-        return this.trigger(BucketCommand.CREATE, payload);
+    async triggerCreate(payload: BucketCreateCommandPayload, metadata: ObjectLiteral = {}) {
+        return this.trigger(BucketCommand.CREATE, payload, metadata);
     }
 
-    async triggerDelete(payload: BucketDeleteCommandPayload) {
-        return this.trigger(BucketCommand.DELETE, payload);
+    async triggerDelete(payload: BucketDeleteCommandPayload, metadata: ObjectLiteral = {}) {
+        return this.trigger(BucketCommand.DELETE, payload, metadata);
     }
 }

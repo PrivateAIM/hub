@@ -10,7 +10,6 @@ import type {
     AnalysisDistributorExecutePayload,
 } from '@privateaim/server-core-worker-kit';
 import {
-    AnalysisCoreEvent,
     AnalysisDistributorCommand,
     AnalysisDistributorEvent,
     AnalysisDistributorEventQueueRouterRouting,
@@ -40,7 +39,7 @@ AnalysisDistributorExecutePayload> {
                 command: AnalysisDistributorCommand.EXECUTE,
                 analysis_id: value.id,
                 [LogFlag.REF_ID]: value.id,
-                event: AnalysisCoreEvent.FAILED,
+                event: AnalysisDistributorEvent.EXECUTION_FAILED,
             });
 
             await context.emit(

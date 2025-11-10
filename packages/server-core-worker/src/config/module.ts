@@ -7,7 +7,6 @@
 
 import type { Component } from '@privateaim/server-kit';
 import {
-    createCoreComponent,
     createMasterImagesComponent,
     useAnalysisBuilderComponent,
     useAnalysisDistributorComponent,
@@ -34,7 +33,6 @@ export function createConfig() : Config {
         useAnalysisDistributorComponent(),
         useAnalysisBuilderComponent(),
 
-        createCoreComponent(),
         createMasterImagesComponent(),
     ];
 
