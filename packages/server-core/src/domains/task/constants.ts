@@ -5,5 +5,7 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-export * from './task';
-export * from './robot';
+export enum TaskType {
+    ANALYSIS_BUCKET_CREATE = 'analysisBucketCreate',
+    ANALYSIS_BUCKET_DELETE = 'analysisBucketDelete',
+}

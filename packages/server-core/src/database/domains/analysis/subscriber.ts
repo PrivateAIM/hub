@@ -20,6 +20,7 @@ import { DomainEventNamespace } from '@privateaim/kit';
 import { AnalysisMetadataCommand, useAnalysisMetadataComponent } from '../../../components';
 import { AnalysisBucketEntity } from '../analysis-bucket';
 import { AnalysisEntity } from './entity';
+import { TaskType, useTaskManager } from '../../../domains';
 
 @EventSubscriber()
 export class AnalysisSubscriber extends BaseSubscriber<
@@ -61,14 +62,23 @@ AnalysisEntity
     async afterInsert(event: InsertEvent<AnalysisEntity>): Promise<any> {
         await super.afterInsert(event);
 
+        const taskManager = useTaskManager();
+
         const bucketComponent = new BucketBaseComponent();
         const bucketTypes = Object.values(AnalysisBucketType);
         for (let i = 0; i < bucketTypes.length; i++) {
+            const jobId = await taskManager.create(
+                TaskType.ANALYSIS_BUCKET_CREATE,
+                {
+                    analysisId: event.entity.id,
+                    bucketType: bucketTypes[i],
+                },
+            );
+
             await bucketComponent.triggerCreate({
                 name: buildAnalysisBucketName(bucketTypes[i], event.entity.id),
             }, {
-                analysisId: event.entity.id,
-                bucketType: bucketTypes[i],
+                jobId,
             });
         }
     }
@@ -76,6 +86,7 @@ AnalysisEntity
     async beforeRemove(event: RemoveEvent<AnalysisEntity>): Promise<any> {
         await super.beforeRemove(event);
 
+        const taskManager = useTaskManager();
         const bucketComponent = new BucketBaseComponent();
 
         const analysisBucketRepository = event.manager.getRepository(AnalysisBucketEntity);
@@ -92,10 +103,17 @@ AnalysisEntity
                 continue;
             }
 
+            const jobId = await taskManager.create(
+                TaskType.ANALYSIS_BUCKET_DELETE,
+                {
+                    analysisId: analysisBucket.analysis_id,
+                },
+            );
+
             await bucketComponent.triggerDelete({
                 id: analysisBucket.external_id,
             }, {
-                analysisId: analysisBucket.analysis_id,
+                jobId,
             });
         }
     }
