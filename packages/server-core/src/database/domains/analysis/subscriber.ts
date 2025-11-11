@@ -62,21 +62,13 @@ AnalysisEntity
         await super.afterInsert(event);
 
         const bucketComponent = new BucketBaseComponent();
-
-        const analysisBucketRepository = event.manager.getRepository(AnalysisBucketEntity);
         const bucketTypes = Object.values(AnalysisBucketType);
         for (let i = 0; i < bucketTypes.length; i++) {
-            const analysisBucket = analysisBucketRepository.create({
-                analysis_id: event.entity.id,
-                type: bucketTypes[i],
-            });
-
-            await analysisBucketRepository.save(analysisBucket);
-
             await bucketComponent.triggerCreate({
                 name: buildAnalysisBucketName(bucketTypes[i], event.entity.id),
             }, {
-                analysisBucketId: analysisBucket.id,
+                analysisId: event.entity.id,
+                bucketType: bucketTypes[i],
             });
         }
     }
@@ -95,6 +87,7 @@ AnalysisEntity
 
         for (let i = 0; i < analysisBuckets.length; i++) {
             const analysisBucket = analysisBuckets[i];
+            // todo: remove condition
             if (!analysisBucket.external_id) {
                 continue;
             }
@@ -102,7 +95,7 @@ AnalysisEntity
             await bucketComponent.triggerDelete({
                 id: analysisBucket.external_id,
             }, {
-                analysisBucketId: analysisBucket.id,
+                analysisId: analysisBucket.analysis_id,
             });
         }
     }

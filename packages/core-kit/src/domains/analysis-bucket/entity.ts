@@ -14,13 +14,14 @@ export interface AnalysisBucket {
 
     type: `${AnalysisBucketType}`;
 
-    external_id: string | null;
-
     // ------------------------------------------------------------------
 
-    created_at: Date;
-
-    updated_at: Date;
+    /**
+     * @deprecated
+     *
+     * rename to bucket_id + uuid type
+     */
+    external_id: string | null;
 
     // ------------------------------------------------------------------
 
@@ -31,4 +32,10 @@ export interface AnalysisBucket {
     // ------------------------------------------------------------------
 
     realm_id: Realm['id'];
+
+    // ------------------------------------------------------------------
+
+    created_at: Date;
+
+    updated_at: Date;
 }

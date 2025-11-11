@@ -10,15 +10,16 @@ import { AnalysisBucketEntity, useDataSourceSync } from '../../../../database';
 
 export class StorageBucketDeletionFinishedHandler implements ComponentHandler {
     async handle(bucket: Bucket, context: ComponentHandlerContext): Promise<void> {
-        const { analysisBucketId } = context.metadata;
-        if (!analysisBucketId) {
+        const { analysisId } = context.metadata;
+        if (!analysisId) {
             return;
         }
 
         const dataSource = useDataSourceSync();
         const analysisBucketRepository = dataSource.getRepository(AnalysisBucketEntity);
         const analysisBucket = await analysisBucketRepository.findOneBy({
-            id: analysisBucketId,
+            analysis_id: analysisId,
+            external_id: bucket.id,
         });
 
         if (!analysisBucket) {

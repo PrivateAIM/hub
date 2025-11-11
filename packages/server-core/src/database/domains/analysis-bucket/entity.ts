@@ -29,6 +29,7 @@ export class AnalysisBucketEntity implements AnalysisBucket {
     @Column({ type: 'varchar', length: 64 })
         type: `${AnalysisBucketType}`;
 
+    // todo: rename to bucket_id + uuid type
     @Column({
         type: 'varchar',
         length: 64,
@@ -38,11 +39,12 @@ export class AnalysisBucketEntity implements AnalysisBucket {
 
     // ------------------------------------------------------------------
 
-    @CreateDateColumn()
-        created_at: Date;
+    @Column()
+        analysis_id: Analysis['id'];
 
-    @UpdateDateColumn()
-        updated_at: Date;
+    @ManyToOne(() => AnalysisEntity, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'analysis_id' })
+        analysis: AnalysisEntity;
 
     // ------------------------------------------------------------------
 
@@ -51,10 +53,9 @@ export class AnalysisBucketEntity implements AnalysisBucket {
 
     // ------------------------------------------------------------------
 
-    @Column()
-        analysis_id: Analysis['id'];
+    @CreateDateColumn()
+        created_at: Date;
 
-    @ManyToOne(() => AnalysisEntity, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'analysis_id' })
-        analysis: AnalysisEntity;
+    @UpdateDateColumn()
+        updated_at: Date;
 }
