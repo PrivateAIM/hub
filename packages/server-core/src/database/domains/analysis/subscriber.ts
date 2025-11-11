@@ -67,6 +67,7 @@ AnalysisEntity
         const bucketComponent = new BucketBaseComponent();
         const bucketTypes = Object.values(AnalysisBucketType);
         for (let i = 0; i < bucketTypes.length; i++) {
+            // todo: maybe extract actor_id, actor_type from event.queryRunner.data
             const jobId = await taskManager.create(
                 TaskType.ANALYSIS_BUCKET_CREATE,
                 {
@@ -77,6 +78,7 @@ AnalysisEntity
 
             await bucketComponent.triggerCreate({
                 name: buildAnalysisBucketName(bucketTypes[i], event.entity.id),
+                realm_id: event.entity.realm_id,
             }, {
                 jobId,
             });

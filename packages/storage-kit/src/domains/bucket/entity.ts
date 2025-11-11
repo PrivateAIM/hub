@@ -22,12 +22,12 @@ export interface Bucket {
 
     // ------------------------------------------------------------------
 
-    actor_id: string;
+    actor_id: string | null;
 
-    actor_type: string;
+    actor_type: string | null;
 
     // ------------------------------------------------------------------
 
-    realm_id: Realm['id'];
+    realm_id: Realm['id'] | null;
 
 }

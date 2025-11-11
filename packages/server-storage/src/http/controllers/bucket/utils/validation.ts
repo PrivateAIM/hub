@@ -6,7 +6,8 @@
  */
 
 import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
-import { createValidationChain, createValidator } from '@validup/adapter-validator';
+import { createValidator } from '@validup/adapter-zod';
+import zod from 'zod';
 import { Container } from 'validup';
 import type { BucketEntity } from '../../../../domains';
 
@@ -18,10 +19,9 @@ export class BucketValidator extends Container<BucketEntity> {
             'name',
             { group: HTTPHandlerOperation.CREATE },
             createValidator(
-                () => {
-                    const chain = createValidationChain();
-                    return chain.isLength({ min: 3, max: 256 });
-                },
+                zod.string()
+                    .min(3)
+                    .max(256),
             ),
         );
 
@@ -29,12 +29,10 @@ export class BucketValidator extends Container<BucketEntity> {
             'region',
             { group: HTTPHandlerOperation.CREATE, optional: true },
             createValidator(
-                () => {
-                    const chain = createValidationChain();
-                    return chain
-                        .isLength({ min: 3, max: 256 })
-                        .optional({ values: 'null' });
-                },
+                zod.string()
+                    .min(3)
+                    .max(256)
+                    .nullable(),
             ),
         );
     }
