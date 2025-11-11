@@ -8,7 +8,6 @@
 import type {
     Component, ComponentEventMap, ComponentHandlers,
 } from './type';
-import { isComponentHandlerFn } from './handler';
 import type {
     ComponentHandler, ComponentHandlerContext, ComponentHandlerFn,
 } from './handler';
@@ -16,14 +15,14 @@ import type {
 export abstract class BaseComponent<
     EventMap extends ComponentEventMap = ComponentEventMap,
 > implements Component {
-    protected initializing : boolean;
+    private initializePromise : Promise<void> | undefined;
 
     protected initialized : boolean;
 
     protected handlers: ComponentHandlers<EventMap>;
 
     protected constructor() {
-        this.initializing = false;
+        this.initializePromise = undefined;
         this.initialized = false;
         this.handlers = new Map();
     }
@@ -50,26 +49,41 @@ export abstract class BaseComponent<
     }
 
     async initialize() : Promise<void> {
-        if (this.initializing || this.initialized) {
-            return;
+        if (this.initialized) {
+            return Promise.resolve();
         }
 
-        this.initializing = true;
+        if (this.initializePromise) {
+            return this.initializePromise;
+        }
 
+        const promises: Promise<void>[] = [];
         const keys = Object.keys(this.handlers);
         for (let i = 0; i < keys.length; i++) {
             const handler = this.handlers[keys[i]];
 
             if (
-                !isComponentHandlerFn(handler) &&
+                typeof handler !== 'function' &&
                 handler.initialize
             ) {
-                await handler.initialize();
+                promises.push(handler.initialize());
             }
         }
 
-        this.initialized = true;
-        this.initializing = false;
+        this.initializePromise = new Promise<void>((resolve, reject) => {
+            Promise.all(promises)
+                .then(() => resolve())
+                .catch((err) => reject(err));
+        });
+
+        this.initializePromise.finally(() => {
+            setTimeout(() => {
+                this.initialized = true;
+                this.initializePromise = undefined;
+            }, 0);
+        });
+
+        return this.initializePromise;
     }
 
     /**
