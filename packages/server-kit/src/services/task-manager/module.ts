@@ -51,12 +51,14 @@ export class TaskManager<
      *
      * @param type
      * @param id
+     * @param autoDelete
      */
     async get<Key extends keyof EntityMap>(
         type: Key & string,
         id: string,
+        autoDelete: boolean = true,
     ) : Promise<EntityMap[Key]> {
-        const entity = await this.resolve(id);
+        const entity = await this.resolve(id, autoDelete);
         if (!entity) {
             throw new Error(`Job with id ${id} could not be found.`);
         }
@@ -72,11 +74,19 @@ export class TaskManager<
      * Find a random job.
      *
      * @param id
+     * @param autoDelete
      */
-    async resolve(id: string) : Promise<TaskEntryResolved<EntityMap> | undefined> {
+    async resolve(
+        id: string,
+        autoDelete: boolean = true,
+    ) : Promise<TaskEntryResolved<EntityMap> | undefined> {
         const entity : TaskEntry | undefined = await this.driver.get(id);
         if (!entity || !isTaskEntry(entity)) {
             return undefined;
+        }
+
+        if (autoDelete) {
+            await this.driver.drop(id);
         }
 
         return entity as TaskEntryResolved<EntityMap>;
