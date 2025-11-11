@@ -5,17 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { EnvironmentName, wait } from '@privateaim/kit';
 import {
     BaseComponent,
-    buildQueueRouterPublishPayload, isQueueRouterUsable, useQueueRouter,
 } from '@privateaim/server-kit';
-import { useEnv } from '@privateaim/server-telemetry';
-import type { ObjectLiteral } from 'rapiq';
-import { AnalysisMetadataCommand, AnalysisMetadataTaskQueue } from './constants';
+import { AnalysisMetadataCommand } from './constants';
 import { AnalysisMetadataRecalcHandler } from './handlers';
+import type { AnalysisMetadataTaskMap } from './types';
 
-export class AnalysisMetadataComponent extends BaseComponent {
+export class AnalysisMetadataComponent extends BaseComponent<AnalysisMetadataTaskMap> {
     constructor() {
         super();
 
@@ -24,46 +21,5 @@ export class AnalysisMetadataComponent extends BaseComponent {
 
     async start() {
         await this.initialize();
-
-        if (isQueueRouterUsable()) {
-            const queueRouter = useQueueRouter();
-
-            await queueRouter.consumeAny(
-                AnalysisMetadataTaskQueue,
-                async (
-                    payload,
-                ) => this.handle(
-                    payload.type,
-                    payload.data,
-                    payload.metadata,
-                ),
-            );
-        }
-    }
-
-    async trigger(
-        key: string,
-        value?: ObjectLiteral,
-        metadata: ObjectLiteral = {},
-    ) {
-        if (
-            isQueueRouterUsable() &&
-            useEnv('env') !== EnvironmentName.TEST
-        ) {
-            const payload = buildQueueRouterPublishPayload({
-                type: key,
-                data: value,
-                metadata: {
-                    routing: AnalysisMetadataTaskQueue,
-                    ...metadata,
-                },
-            });
-
-            const queueRouter = useQueueRouter();
-            await wait(500)
-                .then(() => queueRouter.publish(payload));
-        } else {
-            await this.handle(key, value, metadata);
-        }
     }
 }

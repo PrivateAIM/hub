@@ -10,14 +10,14 @@ import type {
     EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
 import { EventSubscriber } from 'typeorm';
-import {
-    AnalysisBucketType, DomainType,
-    buildAnalysisBucketName,
-} from '@privateaim/core-kit';
+import { AnalysisBucketType, DomainType, buildAnalysisBucketName } from '@privateaim/core-kit';
 import { BaseSubscriber } from '@privateaim/server-db-kit';
 import { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
-import { AnalysisMetadataCommand, useAnalysisMetadataComponent } from '../../../components';
+import {
+    AnalysisMetadataCommand,
+    AnalysisMetadataComponentCaller,
+} from '../../../components';
 import { AnalysisBucketEntity } from '../analysis-bucket';
 import { AnalysisEntity } from './entity';
 import { TaskType, useTaskManager } from '../../../domains';
@@ -129,12 +129,13 @@ AnalysisEntity
             return;
         }
 
-        const analysisConfiguration = useAnalysisMetadataComponent();
-        analysisConfiguration.trigger(
+        const caller = new AnalysisMetadataComponentCaller();
+        caller.call(
             AnalysisMetadataCommand.RECALC,
             {
                 analysisId,
             },
+            {},
         );
     }
 
