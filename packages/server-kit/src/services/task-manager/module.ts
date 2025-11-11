@@ -8,7 +8,7 @@
 import { WEEK_IN_MS, createNanoID } from '@privateaim/kit';
 import type { Cache } from '../cache';
 import type { TaskEntry, TaskEntryResolved, TaskTypeMap } from './types';
-import { isCorrelationEntity } from './helpers';
+import { isTaskEntry } from './helpers';
 
 export class TaskManager<
     EntityMap extends TaskTypeMap = TaskTypeMap,
@@ -19,7 +19,7 @@ export class TaskManager<
 
     constructor(driver: Cache) {
         this.driver = driver;
-        this.prefix = 'job';
+        this.prefix = 'task';
     }
 
     /**
@@ -32,14 +32,14 @@ export class TaskManager<
         type: Key & string,
         data: EntityMap[Key],
     ) : Promise<string> {
-        const id = createNanoID();
+        const id = `${this.prefix}:${createNanoID()}`;
 
         const entity : TaskEntry = {
             data,
             type,
         };
 
-        await this.driver.set(`${this.prefix}:${id}`, entity, {
+        await this.driver.set(id, entity, {
             ttl: WEEK_IN_MS,
         });
 
@@ -74,8 +74,8 @@ export class TaskManager<
      * @param id
      */
     async resolve(id: string) : Promise<TaskEntryResolved<EntityMap> | undefined> {
-        const entity : TaskEntry | undefined = await this.driver.get(`${this.prefix}:${id}`);
-        if (!entity || !isCorrelationEntity(entity)) {
+        const entity : TaskEntry | undefined = await this.driver.get(id);
+        if (!entity || !isTaskEntry(entity)) {
             return undefined;
         }
 

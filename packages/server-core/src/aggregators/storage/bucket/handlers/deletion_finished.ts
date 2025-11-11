@@ -20,7 +20,7 @@ export class StorageBucketDeletionFinishedHandler implements ComponentHandler {
         const task = await taskManager.resolve(correlationId);
         if (
             task &&
-            task.type === TaskType.ANALYSIS_STORAGE_DELETE
+            task.type === TaskType.ANALYSIS_BUCKET_DELETE
         ) {
             const dataSource = useDataSourceSync();
             const analysisBucketRepository = dataSource.getRepository(AnalysisBucketEntity);

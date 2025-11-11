@@ -6,7 +6,6 @@
  */
 
 export enum TaskType {
-    ANALYSIS_Bucket_CREATE = 'analysisStorageCrate',
-    ANALYSIS_STORAGE_DELETE = 'analysisStorageDelete',
-
+    ANALYSIS_BUCKET_CREATE = 'analysisBucketCreate',
+    ANALYSIS_BUCKET_DELETE = 'analysisBucketDelete',
 }

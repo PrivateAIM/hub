@@ -8,7 +8,7 @@
 import { isObject } from '@privateaim/kit';
 import type { TaskEntry } from './types';
 
-export function isCorrelationEntity(input: unknown) : input is TaskEntry {
+export function isTaskEntry(input: unknown) : input is TaskEntry {
     return isObject(input) &&
         typeof (input as TaskEntry).type === 'string' &&
         isObject((input as TaskEntry).data);

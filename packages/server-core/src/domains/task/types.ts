@@ -19,6 +19,6 @@ export type AnalysisBucketDeleteTask = {
 };
 
 export type TaskMap = ObjectLiteralKeys<{
-    [TaskType.ANALYSIS_Bucket_CREATE]: AnalysisBucketCreateTask,
-    [TaskType.ANALYSIS_STORAGE_DELETE]: AnalysisBucketDeleteTask
+    [TaskType.ANALYSIS_BUCKET_CREATE]: AnalysisBucketCreateTask,
+    [TaskType.ANALYSIS_BUCKET_DELETE]: AnalysisBucketDeleteTask
 }>;

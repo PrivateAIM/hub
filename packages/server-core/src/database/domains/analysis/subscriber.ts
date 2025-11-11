@@ -68,7 +68,7 @@ AnalysisEntity
         const bucketTypes = Object.values(AnalysisBucketType);
         for (let i = 0; i < bucketTypes.length; i++) {
             const jobId = await taskManager.create(
-                TaskType.ANALYSIS_Bucket_CREATE,
+                TaskType.ANALYSIS_BUCKET_CREATE,
                 {
                     analysisId: event.entity.id,
                     bucketType: bucketTypes[i],
@@ -104,7 +104,7 @@ AnalysisEntity
             }
 
             const jobId = await taskManager.create(
-                TaskType.ANALYSIS_STORAGE_DELETE,
+                TaskType.ANALYSIS_BUCKET_DELETE,
                 {
                     analysisId: analysisBucket.analysis_id,
                 },

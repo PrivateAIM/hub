@@ -21,7 +21,7 @@ export class StorageBucketCreationFinishedHandler implements ComponentHandler {
         const task = await taskManager.resolve(correlationId);
         if (
             task &&
-            task.type === TaskType.ANALYSIS_Bucket_CREATE
+            task.type === TaskType.ANALYSIS_BUCKET_CREATE
         ) {
             const dataSource = useDataSourceSync();
             const analysisBucketRepository = dataSource.getRepository(AnalysisBucketEntity);
