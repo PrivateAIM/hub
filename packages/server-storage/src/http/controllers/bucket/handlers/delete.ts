@@ -7,7 +7,7 @@
 
 import { isUUID } from '@authup/kit';
 import { PermissionName, isRealmResourceWritable } from '@privateaim/kit';
-import { ForbiddenError, NotFoundError } from '@ebec/http';
+import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
@@ -16,10 +16,12 @@ import {
     useRequestIdentityRealm,
     useRequestPermissionChecker,
 } from '@privateaim/server-http-kit';
-import { useMinio } from '../../../../core';
+import { DirectComponentCaller } from '@privateaim/server-kit';
+import { BucketCommand } from '@privateaim/server-storage-kit';
 import {
-    BucketEntity, isBucketOwnedByIdentity, toBucketName,
+    BucketEntity, isBucketOwnedByIdentity,
 } from '../../../../domains';
+import { useBucketComponent } from '../../../../components';
 
 export async function executeBucketRouteDeleteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -48,14 +50,28 @@ export async function executeBucketRouteDeleteHandler(req: Request, res: Respons
         }
     }
 
-    const { id: entityId } = entity;
+    const component = useBucketComponent();
+    const caller = new DirectComponentCaller(component);
 
-    const minio = useMinio();
-    await minio.removeBucket(toBucketName(entityId));
+    const output = await caller.call(
+        BucketCommand.DELETE,
+        {
+            id: entity.id,
+        },
+        {},
+    );
 
-    await repository.remove(entity);
+    if (output.deletionFinished) {
+        return sendAccepted(res, output.creationFinished);
+    }
 
-    entity.id = entityId;
+    let error : Error;
 
-    return sendAccepted(res, entity);
+    if (output.deletionFailed) {
+        error = output.creationFailed.error;
+    } else {
+        error = new BadRequestError('Bucket could not be created.');
+    }
+
+    throw error;
 }

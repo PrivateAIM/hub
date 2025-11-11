@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentEventMap, ComponentHandleFn } from '../type';
+import type { ComponentEventMap, ComponentHandlerCallFnForMap } from '../type';
 
 export type ComponentHandlerContext<
     EventMap extends ComponentEventMap = ComponentEventMap,
@@ -13,7 +13,7 @@ export type ComponentHandlerContext<
 > = {
     key: Key & string,
     metadata: EventMap[Key][1],
-    handle: ComponentHandleFn<EventMap>
+    handle: ComponentHandlerCallFnForMap<EventMap>
 };
 
 export type ComponentHandlerFn<

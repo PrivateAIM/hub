@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ForbiddenError } from '@ebec/http';
+import { BadRequestError, ForbiddenError } from '@ebec/http';
 import { PermissionName, isRealmResourceWritable } from '@privateaim/kit';
 import {
     HTTPHandlerOperation,
@@ -16,10 +16,10 @@ import {
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
-import { useDataSource } from 'typeorm-extension';
-import { useMinio } from '../../../../core';
-import { BucketEntity, toBucketName } from '../../../../domains';
+import { DirectComponentCaller } from '@privateaim/server-kit';
+import { BucketCommand } from '@privateaim/server-storage-kit';
 import { BucketValidator } from '../utils/validation';
+import { useBucketComponent } from '../../../../components';
 
 export async function executeBucketRouteCreateHandler(req: Request, res: Response) : Promise<any> {
     const permissionChecker = useRequestPermissionChecker(req);
@@ -45,22 +45,30 @@ export async function executeBucketRouteCreateHandler(req: Request, res: Respons
         data.realm_id = realm.id;
     }
 
-    const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(BucketEntity);
-    const entity = repository.create({
-        actor_id: actor.id,
-        actor_type: actor.type,
-        ...data,
-    });
+    const component = useBucketComponent();
+    const caller = new DirectComponentCaller(component);
 
-    await repository.save(entity);
+    const output = await caller.call(
+        BucketCommand.CREATE,
+        {
+            actor_id: actor.id,
+            actor_type: actor.type,
+            ...data,
+        },
+        {},
+    );
 
-    const minio = useMinio();
-    if (entity.region) {
-        await minio.makeBucket(toBucketName(entity.id), entity.region);
-    } else {
-        await minio.makeBucket(toBucketName(entity.id));
+    if (output.creationFinished) {
+        return sendCreated(res, output.creationFinished);
     }
 
-    return sendCreated(res, entity);
+    let error : Error;
+
+    if (output.creationFailed) {
+        error = output.creationFailed.error;
+    } else {
+        error = new BadRequestError('Bucket could not be created.');
+    }
+
+    throw error;
 }
