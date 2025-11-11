@@ -7,9 +7,9 @@
 
 import { EntityType } from '@authup/core-kit';
 import {
-    EnvironmentName, isRedisClientUsable, useLogger, useRedisSubscribeClient,
+    type Component, EnvironmentName, isRedisClientUsable, useLogger,
+    useRedisSubscribeClient,
 } from '@privateaim/server-kit';
-import type { Aggregator } from '@privateaim/server-kit';
 import { useEnv } from '../../config';
 import {
     handleAuthupPermissionEvent,
@@ -19,7 +19,7 @@ import {
     handleAuthupUserEvent,
 } from './entities';
 
-export function createAuthupAggregator() : Aggregator {
+export function createAuthupAggregator() : Component {
     if (!isRedisClientUsable() || useEnv('env') === EnvironmentName.TEST) {
         return {
             start() {

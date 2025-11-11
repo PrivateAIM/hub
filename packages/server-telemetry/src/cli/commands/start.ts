@@ -11,7 +11,7 @@ import { useLogger } from '@privateaim/server-kit';
 import { defineCommand } from 'citty';
 import path from 'node:path';
 import process from 'node:process';
-import { defineEventComponent, defineLogComponent } from '../../components';
+import { EventComponent, LogComponent } from '../../components';
 import {
     configure, useEnv,
 } from '../../config';
@@ -29,8 +29,8 @@ export function defineCLIStartCommand() {
             configure();
 
             const components : Component[] = [
-                defineEventComponent(),
-                defineLogComponent(),
+                new EventComponent(),
+                new LogComponent(),
             ];
 
             await generateSwagger({

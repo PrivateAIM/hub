@@ -5,12 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { EnvironmentName, isRedisClientUsable, useLogger } from '@privateaim/server-kit';
-import type { Aggregator } from '@privateaim/server-kit';
+import {
+    type Component, EnvironmentName, isRedisClientUsable,
+    useLogger,
+} from '@privateaim/server-kit';
 import { useEnv } from '../../config';
 import { TelemetryAggregator } from './module';
 
-export function createTelemetryAggregator() : Aggregator {
+export function createTelemetryAggregator() : Component {
     if (!isRedisClientUsable() || useEnv('env') === EnvironmentName.TEST) {
         return {
             start() {

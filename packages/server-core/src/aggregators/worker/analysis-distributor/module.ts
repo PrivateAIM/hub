@@ -7,51 +7,53 @@
 
 import { EnvironmentName } from '@privateaim/kit';
 import {
+    AnalysisDistributorEvent,
     AnalysisDistributorEventQueueRouterRouting,
 } from '@privateaim/server-core-worker-kit';
-import type { Aggregator } from '@privateaim/server-kit';
 import {
-    QueueRouterComponentEmitter,
+    BaseComponent,
     isQueueRouterUsable,
     useLogger,
     useQueueRouter,
 } from '@privateaim/server-kit';
 import { useEnv } from '../../../config';
 import {
-    defineAnalysisDistributorHandlers,
-} from './handlers';
+    handleAnalysisDistributorEvent,
+} from './handler';
 
-export function createAnalysisDistributorAggregator() : Aggregator {
-    if (!isQueueRouterUsable()) {
-        useLogger().warn('Analysis distributor aggregator can not consume events.');
-        return { start: () => Promise.resolve() };
+export class AnalysisDistributorAggregator extends BaseComponent {
+    constructor() {
+        super();
+
+        this.mount(AnalysisDistributorEvent.EXECUTION_STARTED, handleAnalysisDistributorEvent);
+        this.mount(AnalysisDistributorEvent.EXECUTION_FAILED, handleAnalysisDistributorEvent);
+        this.mount(AnalysisDistributorEvent.EXECUTION_FINISHED, handleAnalysisDistributorEvent);
     }
 
-    if (useEnv('env') === EnvironmentName.TEST) {
-        useLogger().warn('Analysis distributor aggregator is disabled in test environment.');
-        return { start: () => Promise.resolve() };
+    async start() : Promise<void> {
+        if (!isQueueRouterUsable()) {
+            useLogger().warn('Analysis distributor aggregator can not consume events.');
+            return;
+        }
+
+        if (useEnv('env') === EnvironmentName.TEST) {
+            useLogger().warn('Analysis distributor aggregator is disabled in test environment.');
+            return;
+        }
+
+        await this.initialize();
+
+        const queueRouter = useQueueRouter();
+
+        await queueRouter.consumeAny(
+            AnalysisDistributorEventQueueRouterRouting,
+            async (
+                payload,
+            ) => this.handle(
+                payload.type,
+                payload.data,
+                payload.metadata,
+            ),
+        );
     }
-
-    const handlers = defineAnalysisDistributorHandlers({
-        emitter: new QueueRouterComponentEmitter(),
-    });
-
-    return {
-        async start() {
-            await handlers.initialize();
-
-            const queueRouter = useQueueRouter();
-
-            await queueRouter.consumeAny(
-                AnalysisDistributorEventQueueRouterRouting,
-                async (
-                    payload,
-                ) => handlers.execute(
-                    payload.type,
-                    payload.data,
-                    payload.metadata,
-                ),
-            );
-        },
-    };
 }

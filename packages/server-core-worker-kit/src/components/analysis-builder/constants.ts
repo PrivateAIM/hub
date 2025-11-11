@@ -12,21 +12,14 @@ export enum AnalysisBuilderEvent {
     EXECUTION_STARTED = 'executionStarted',
     EXECUTION_FINISHED = 'executionFinished',
 
-    PUSH_FAILED = 'pushFailed',
-    PUSHING = 'pushing',
-    PUSHED = 'pushed',
-
     CHECK_FAILED = 'checkFailed',
-    CHECK_STARTED = 'checking',
-    CHECK_FINISHED = 'checked',
-
-    NONE = 'none',
+    CHECK_STARTED = 'checkStarted',
+    CHECK_FINISHED = 'checkFinished',
 }
 
 export enum AnalysisBuilderCommand {
     EXECUTE = 'execute',
     CHECK = 'check',
-    PUSH = 'push',
 }
 
 export enum AnalysisBuilderErrorCode {

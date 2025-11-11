@@ -6,9 +6,11 @@
  */
 
 import { generateSwagger } from '@privateaim/server-http-kit';
+import type { Component } from '@privateaim/server-kit';
 import { config } from 'dotenv';
 import path from 'node:path';
 import process from 'node:process';
+import { useBucketComponent } from './components';
 import { configure, useEnv } from './config';
 import { setupDatabase } from './config/services';
 import {
@@ -29,9 +31,15 @@ import {
 
     const httpServer = createHttpServer();
 
+    const components : Component[] = [
+        useBucketComponent(),
+    ];
+
     function start() {
         const port = useEnv('port');
         httpServer.listen(port);
+
+        components.map((component) => component.start());
 
         console.log(`Listening on 0.0.0.0:${port}`);
     }

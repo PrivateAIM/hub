@@ -5,38 +5,52 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { EnvironmentName } from '@privateaim/kit';
-import type { Component } from '@privateaim/server-kit';
-import { isQueueRouterUsable, useLogger, useQueueRouter } from '@privateaim/server-kit';
-import { EventTaskQueueRouterRouting } from '@privateaim/server-telemetry-kit';
-import { useEnv } from '../../config';
-import { definEventComponentHandlers } from './handlers';
+import {
+    BaseComponent, QueueRouterComponentEmitter, isQueueRouterUsable, useQueueRouter,
+} from '@privateaim/server-kit';
+import {
+    EventCommand, EventEventQueueRouterRouting,
+    EventTaskQueueRouterRouting,
+} from '@privateaim/server-telemetry-kit';
+import { EventComponentCleanerHandler, EventComponentCreateHandler } from './handlers';
 
-export function defineEventComponent() : Component {
-    return {
-        async start() {
-            const handlers = definEventComponentHandlers();
-            await handlers.initialize();
+export class EventComponent extends BaseComponent {
+    constructor() {
+        super();
 
-            if (
-                isQueueRouterUsable() &&
-                useEnv('env') !== EnvironmentName.TEST
-            ) {
-                const queueRouter = useQueueRouter();
+        this.mount(EventCommand.CREATE, new EventComponentCreateHandler());
+        this.mount(EventCommand.CLEAN, new EventComponentCleanerHandler());
 
-                await queueRouter.consumeAny(
-                    EventTaskQueueRouterRouting,
-                    async (
-                        payload,
-                    ) => handlers.execute(
-                        payload.type,
-                        payload.data,
-                        payload.metadata,
-                    ),
-                );
-            } else {
-                useLogger().warn('Event component can not consume tasks.');
-            }
-        },
-    };
+        if (isQueueRouterUsable()) {
+            this.mount('*', async (
+                value,
+                context,
+            ) => {
+                const emitter = new QueueRouterComponentEmitter();
+                await emitter.emit(context.key, value, {
+                    ...context.metadata,
+                    routing: EventEventQueueRouterRouting,
+                });
+            });
+        }
+    }
+
+    async start() {
+        await this.initialize();
+
+        if (isQueueRouterUsable()) {
+            const queueRouter = useQueueRouter();
+
+            await queueRouter.consumeAny(
+                EventTaskQueueRouterRouting,
+                async (
+                    payload,
+                ) => this.handle(
+                    payload.type,
+                    payload.data,
+                    payload.metadata,
+                ),
+            );
+        }
+    }
 }

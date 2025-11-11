@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { ForbiddenError } from '@ebec/http';
 import { PermissionName, isRealmResourceWritable } from '@privateaim/kit';
 import {
     HTTPHandlerOperation,
@@ -12,7 +13,6 @@ import {
     useRequestIdentityRealm,
     useRequestPermissionChecker,
 } from '@privateaim/server-http-kit';
-import { ForbiddenError } from '@ebec/http';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';

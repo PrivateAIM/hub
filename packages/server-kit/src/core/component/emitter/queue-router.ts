@@ -5,12 +5,11 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentEmitter } from './types';
+import type { ObjectLiteral } from '../../../type';
 import type { QueueRouter, QueueRouterPayloadMetadataInput } from '../../queue-router';
 import { buildQueueRouterPublishPayload, useQueueRouter } from '../../queue-router';
-import type { ObjectLiteral } from '../../../type';
 
-export class QueueRouterComponentEmitter implements ComponentEmitter {
+export class QueueRouterComponentEmitter {
     protected client : QueueRouter;
 
     constructor() {
@@ -23,7 +22,7 @@ export class QueueRouterComponentEmitter implements ComponentEmitter {
         metadata: QueueRouterPayloadMetadataInput,
     ): Promise<void> {
         const payload = buildQueueRouterPublishPayload({
-            type,
+            type: type as string,
             data,
             metadata,
         });

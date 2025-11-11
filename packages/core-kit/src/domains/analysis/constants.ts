@@ -6,9 +6,6 @@
  */
 
 export enum AnalysisAPICommand {
-    SPIN_UP = 'spinUp',
-    TEAR_DOWN = 'tearDown',
-
     BUILD_START = 'buildStart',
     BUILD_STOP = 'buildStop',
     BUILD_STATUS = 'buildStatus',

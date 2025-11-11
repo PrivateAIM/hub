@@ -20,7 +20,6 @@ import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { RequestRepositoryAdapter } from '../../../request';
 import { AnalysisValidator } from '../utils';
 import { AnalysisEntity, ProjectEntity } from '../../../../database';
-import { isAnalysisManagerUsable, useAnalysisManager } from '../../../../services';
 
 export async function createAnalysisRouteHandler(req: Request, res: Response) : Promise<any> {
     const permissionChecker = useRequestPermissionChecker(req);
@@ -78,11 +77,6 @@ export async function createAnalysisRouteHandler(req: Request, res: Response) : 
     entity.project.analyses++;
     const proposalRepository = dataSource.getRepository(ProjectEntity);
     await proposalRepository.save(entity.project);
-
-    if (isAnalysisManagerUsable()) {
-        const analysisManager = useAnalysisManager();
-        await analysisManager.spinUp(entity);
-    }
 
     return sendCreated(res, entity);
 }

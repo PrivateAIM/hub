@@ -12,12 +12,9 @@ import { isEqual } from 'smob';
 import type { DataSource, Repository } from 'typeorm';
 import { useDataSource } from 'typeorm-extension';
 import { AnalysisBucketFileEntity, AnalysisEntity, AnalysisNodeEntity } from '../../../../database';
-import type { AnalysisMetadataCommand } from '../../constants';
 import type { AnalysisMetadataRecalcPayload } from '../../types';
 
-export class AnalysisMetadataRecalcHandler implements ComponentHandler<
-AnalysisMetadataCommand.RECALC,
-AnalysisMetadataRecalcPayload> {
+export class AnalysisMetadataRecalcHandler implements ComponentHandler {
     protected dataSource!: DataSource;
 
     protected analysisRepository!: Repository<AnalysisEntity>;

@@ -5,15 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Component } from '@privateaim/server-kit';
 import { singa } from 'singa';
-import { createAnalysisMetadataComponent } from './module';
+import { AnalysisMetadataComponent } from './module';
 
-const instance = singa<Component>({
+const instance = singa<AnalysisMetadataComponent>({
     name: 'analysisMetadata',
-    factory: () => createAnalysisMetadataComponent(),
+    factory: () => new AnalysisMetadataComponent(),
 });
 
-export function useAnalysisMetadataComponent(): Component {
+export function useAnalysisMetadataComponent(): AnalysisMetadataComponent {
     return instance.use();
 }

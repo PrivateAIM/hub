@@ -15,14 +15,12 @@ import {
 } from '@privateaim/core-kit';
 import {
     AnalysisBuilderBaseComponent,
-    AnalysisCoreBaseComponent,
     AnalysisDistributorBaseComponent,
 } from '@privateaim/server-core-worker-kit';
 import type { Request } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import type { Repository } from 'typeorm';
 import {
-    AnalysisBucketEntity,
     AnalysisBucketFileEntity,
     AnalysisEntity,
     AnalysisNodeEntity,
@@ -37,15 +35,11 @@ export class AnalysisManagerService {
 
     protected analysisNodeRepository: Repository<AnalysisNodeEntity>;
 
-    protected analysisBucketRepository: Repository<AnalysisBucketEntity>;
-
     protected analysisBucketFileRepository: Repository<AnalysisBucketFileEntity>;
 
     protected registryRepository: Repository<RegistryEntity>;
 
     protected builderComponent : AnalysisBuilderBaseComponent;
-
-    protected coreComponent: AnalysisCoreBaseComponent;
 
     protected distributorComponent : AnalysisDistributorBaseComponent;
 
@@ -54,13 +48,11 @@ export class AnalysisManagerService {
 
         this.repository = dataSource.getRepository(AnalysisEntity);
         this.analysisNodeRepository = dataSource.getRepository(AnalysisNodeEntity);
-        this.analysisBucketRepository = dataSource.getRepository(AnalysisBucketEntity);
         this.analysisBucketFileRepository = dataSource.getRepository(AnalysisBucketFileEntity);
 
         this.registryRepository = dataSource.getRepository(RegistryEntity);
 
         this.builderComponent = new AnalysisBuilderBaseComponent();
-        this.coreComponent = new AnalysisCoreBaseComponent();
         this.distributorComponent = new AnalysisDistributorBaseComponent();
     }
 
@@ -289,30 +281,6 @@ export class AnalysisManagerService {
         } else {
             await this.repository.save(entity);
         }
-
-        return entity;
-    }
-
-    async spinUp(
-        input: string | AnalysisEntity,
-    ): Promise<AnalysisEntity> {
-        const entity = await this.resolve(input);
-
-        await this.coreComponent.triggerConfigure({
-            id: entity.id,
-        });
-
-        return entity;
-    }
-
-    async tearDown(
-        input: string | AnalysisEntity,
-    ): Promise<AnalysisEntity> {
-        const entity = await this.resolve(input);
-
-        await this.coreComponent.triggerDestroy({
-            id: entity.id,
-        });
 
         return entity;
     }

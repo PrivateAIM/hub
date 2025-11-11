@@ -7,51 +7,53 @@
 
 import { EnvironmentName } from '@privateaim/kit';
 import {
+    AnalysisBuilderEvent,
     AnalysisBuilderEventQueueRouterRouting,
 } from '@privateaim/server-core-worker-kit';
-import type { Aggregator } from '@privateaim/server-kit';
 import {
-    QueueRouterComponentEmitter,
+    BaseComponent,
     isQueueRouterUsable,
     useLogger,
     useQueueRouter,
 } from '@privateaim/server-kit';
 import { useEnv } from '../../../config';
 import {
-    defineAnalysisBuilderHandlers,
-} from './handlers';
+    handleAnalysisBuilderEvent,
+} from './handler';
 
-export function createAnalysisBuilderAggregator() : Aggregator {
-    if (!isQueueRouterUsable()) {
-        useLogger().warn('Analysis builder aggregator can not consume events.');
-        return { start: () => Promise.resolve() };
+export class AnalysisBuilderAggregator extends BaseComponent {
+    constructor() {
+        super();
+
+        this.mount(AnalysisBuilderEvent.EXECUTION_STARTED, handleAnalysisBuilderEvent);
+        this.mount(AnalysisBuilderEvent.EXECUTION_FAILED, handleAnalysisBuilderEvent);
+        this.mount(AnalysisBuilderEvent.EXECUTION_FINISHED, handleAnalysisBuilderEvent);
     }
 
-    if (useEnv('env') === EnvironmentName.TEST) {
-        useLogger().warn('Analysis builder aggregator is disabled in test environment.');
-        return { start: () => Promise.resolve() };
+    async start() : Promise<void> {
+        if (!isQueueRouterUsable()) {
+            useLogger().warn('Analysis builder aggregator can not consume events.');
+            return;
+        }
+
+        if (useEnv('env') === EnvironmentName.TEST) {
+            useLogger().warn('Analysis builder aggregator is disabled in test environment.');
+            return;
+        }
+
+        await this.initialize();
+
+        const queueRouter = useQueueRouter();
+
+        await queueRouter.consumeAny(
+            AnalysisBuilderEventQueueRouterRouting,
+            async (
+                payload,
+            ) => this.handle(
+                payload.type,
+                payload.data,
+                payload.metadata,
+            ),
+        );
     }
-
-    const handlers = defineAnalysisBuilderHandlers({
-        emitter: new QueueRouterComponentEmitter(),
-    });
-
-    return {
-        async start() {
-            await handlers.initialize();
-
-            const queueRouter = useQueueRouter();
-
-            await queueRouter.consumeAny(
-                AnalysisBuilderEventQueueRouterRouting,
-                async (
-                    payload,
-                ) => handlers.execute(
-                    payload.type,
-                    payload.data,
-                    payload.metadata,
-                ),
-            );
-        },
-    };
 }

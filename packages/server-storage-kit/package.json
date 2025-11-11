@@ -1,0 +1,28 @@
+{
+    "name": "@privateaim/server-storage-kit",
+    "version": "0.8.21",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "author": {
+        "name": "Peter Placzek",
+        "email": "contact@tada5hi.net",
+        "url": "https://tada5hi.net"
+    },
+    "license": "Apache-2.0",
+    "description": "This package contains server side db helpers & utilities.",
+    "devDependencies": {
+        "@privateaim/kit": "^0.8.21",
+        "@privateaim/server-kit": "^0.8.21",
+        "@privateaim/storage-kit": "^0.8.21",
+        "singa": "^1.1.0"
+    },
+    "peerDependencies": {
+        "@privateaim/kit": "^0.8.21",
+        "@privateaim/server-kit": "^0.8.21",
+        "@privateaim/storage-kit": "^0.8.21",
+        "singa": "^1.1.0"
+    },
+    "scripts": {
+        "build": "rimraf dist && tsc -p tsconfig.build.json"
+    }
+}

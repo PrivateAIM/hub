@@ -5,38 +5,48 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { EnvironmentName } from '@privateaim/kit';
-import type { Component } from '@privateaim/server-kit';
-import { isQueueRouterUsable, useLogger, useQueueRouter } from '@privateaim/server-kit';
-import { LogTaskQueueRouterRouting } from '@privateaim/server-telemetry-kit';
-import { useEnv } from '../../config';
-import { definLogComponentHandlers } from './handlers';
+import {
+    BaseComponent, QueueRouterComponentEmitter, isQueueRouterUsable, useQueueRouter,
+} from '@privateaim/server-kit';
+import { LogCommand, LogEventQueueRouterRouting, LogTaskQueueRouterRouting } from '@privateaim/server-telemetry-kit';
+import { LogComponentWriteHandler } from './handlers';
 
-export function defineLogComponent() : Component {
-    return {
-        async start() {
-            const handlers = definLogComponentHandlers();
-            await handlers.initialize();
+export class LogComponent extends BaseComponent {
+    constructor() {
+        super();
 
-            if (
-                isQueueRouterUsable() &&
-                useEnv('env') !== EnvironmentName.TEST
-            ) {
-                const queueRouter = useQueueRouter();
+        this.mount(LogCommand.WRITE, new LogComponentWriteHandler());
 
-                await queueRouter.consumeAny(
-                    LogTaskQueueRouterRouting,
-                    (
-                        payload,
-                    ) => handlers.execute(
-                        payload.type,
-                        payload.data,
-                        payload.metadata,
-                    ),
-                );
-            } else {
-                useLogger().warn('Log component can not consume tasks.');
-            }
-        },
-    };
+        if (isQueueRouterUsable()) {
+            this.mount('*', async (
+                value,
+                context,
+            ) => {
+                const emitter = new QueueRouterComponentEmitter();
+                await emitter.emit(context.key, value, {
+                    ...context.metadata,
+                    routing: LogEventQueueRouterRouting,
+                });
+            });
+        }
+    }
+
+    async start() {
+        await this.initialize();
+
+        if (isQueueRouterUsable()) {
+            const queueRouter = useQueueRouter();
+
+            await queueRouter.consumeAny(
+                LogTaskQueueRouterRouting,
+                async (
+                    payload,
+                ) => this.handle(
+                    payload.type,
+                    payload.data,
+                    payload.metadata,
+                ),
+            );
+        }
+    }
 }

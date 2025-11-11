@@ -5,9 +5,9 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentEmitter } from './types';
+import type { ComponentSubscriber } from './types';
 
-export class ComponentVoidEmitter implements ComponentEmitter {
+export class ComponentVoidEmitter implements ComponentSubscriber {
     emit(): Promise<void> | void {
         // todo: do nothing
     }

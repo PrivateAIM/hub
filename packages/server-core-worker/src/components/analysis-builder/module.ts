@@ -5,39 +5,42 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ObjectLiteral } from '@privateaim/kit';
 import {
-    AnalysisBuilderBaseComponent,
+    AnalysisBuilderCommand, AnalysisBuilderEventQueueRouterRouting,
     AnalysisBuilderTaskQueueRouterRouting,
 } from '@privateaim/server-core-worker-kit';
-import type {
-    Component,
-    ComponentHandlers,
-} from '@privateaim/server-kit';
 import {
-    ComponentVoidEmitter,
+    BaseComponent,
     QueueRouterComponentEmitter,
     isQueueRouterUsable,
     useQueueRouter,
 } from '@privateaim/server-kit';
 
-import { defineAnalysisBuilderHandlers } from './handlers';
+import { AnalysisBuilderCheckHandler, AnalysisBuilderExecuteHandler } from './handlers';
 
-export class AnalysisBuilderComponent extends AnalysisBuilderBaseComponent implements Component {
-    protected handlers: ComponentHandlers;
-
+export class AnalysisBuilderComponent extends BaseComponent {
     constructor() {
         super();
 
-        this.handlers = defineAnalysisBuilderHandlers({
-            emitter: isQueueRouterUsable() ?
-                new QueueRouterComponentEmitter() :
-                new ComponentVoidEmitter(),
-        });
+        this.mount(AnalysisBuilderCommand.CHECK, new AnalysisBuilderCheckHandler());
+        this.mount(AnalysisBuilderCommand.EXECUTE, new AnalysisBuilderExecuteHandler());
+
+        if (isQueueRouterUsable()) {
+            this.mount('*', async (
+                value,
+                context,
+            ) => {
+                const emitter = new QueueRouterComponentEmitter();
+                await emitter.emit(context.key, value, {
+                    ...context.metadata,
+                    routing: AnalysisBuilderEventQueueRouterRouting,
+                });
+            });
+        }
     }
 
     async start() {
-        await this.handlers.initialize();
+        await this.initialize();
 
         if (isQueueRouterUsable()) {
             const queueRouter = useQueueRouter();
@@ -46,24 +49,12 @@ export class AnalysisBuilderComponent extends AnalysisBuilderBaseComponent imple
                 AnalysisBuilderTaskQueueRouterRouting,
                 async (
                     payload,
-                ) => this.handlers.execute(
+                ) => this.handle(
                     payload.type,
                     payload.data,
                     payload.metadata,
                 ),
             );
         }
-    }
-
-    async trigger(
-        key: string,
-        value: ObjectLiteral = {},
-        metadata: ObjectLiteral = {},
-    ): Promise<void> {
-        await this.handlers.execute(
-            key,
-            value,
-            metadata,
-        );
     }
 }

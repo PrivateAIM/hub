@@ -13,7 +13,6 @@ import {
     AnalysisBuilderCommand,
     AnalysisBuilderEvent,
     AnalysisBuilderEventQueueRouterRouting,
-    AnalysisCoreEvent,
 } from '@privateaim/server-core-worker-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
@@ -26,10 +25,8 @@ import { bundleDockerFile, packContainerWithAnalysis } from '../../helpers';
 import { buildDockerImage } from '../../../../core/docker/image-build';
 import { useAnalysisBuilderLogger } from '../../utils';
 
-export class AnalysisBuilderExecuteHandler implements ComponentHandler<
-AnalysisBuilderCommand.EXECUTE,
-AnalysisBuilderExecutePayload> {
-    async handle(value: AnalysisBuilderExecutePayload, context: ComponentHandlerContext<AnalysisBuilderCommand.EXECUTE>): Promise<void> {
+export class AnalysisBuilderExecuteHandler implements ComponentHandler {
+    async handle(value: AnalysisBuilderExecutePayload, context: ComponentHandlerContext): Promise<void> {
         try {
             // todo: check if image exists, otherwise local queue task
             await this.handleInternal(value, context);
@@ -39,10 +36,10 @@ AnalysisBuilderExecutePayload> {
                 command: AnalysisBuilderCommand.EXECUTE,
                 analysis_id: value.id,
                 [LogFlag.REF_ID]: value.id,
-                event: AnalysisCoreEvent.FAILED,
+                event: AnalysisBuilderEvent.EXECUTION_FAILED,
             });
 
-            await context.emitter.emit(
+            await context.handle(
                 AnalysisBuilderEvent.EXECUTION_FAILED,
                 {
                     ...value,
@@ -59,14 +56,11 @@ AnalysisBuilderExecutePayload> {
 
     async handleInternal(
         value: AnalysisBuilderExecutePayload,
-        context: ComponentHandlerContext<AnalysisBuilderCommand.EXECUTE>,
+        context: ComponentHandlerContext,
     ): Promise<void> {
-        await context.emitter.emit(
+        await context.handle(
             AnalysisBuilderEvent.EXECUTION_STARTED,
             value,
-            {
-                routing: AnalysisBuilderEventQueueRouterRouting,
-            },
         );
 
         const client = useCoreClient();
@@ -156,12 +150,9 @@ AnalysisBuilderExecutePayload> {
             });
         }
 
-        await context.emitter.emit(
+        await context.handle(
             AnalysisBuilderEvent.EXECUTION_FINISHED,
             value,
-            {
-                routing: AnalysisBuilderEventQueueRouterRouting,
-            },
         );
     }
 }

@@ -5,17 +5,20 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
+import { BucketBaseComponent } from '@privateaim/server-storage-kit';
 import type {
-    EntitySubscriberInterface, UpdateEvent,
+    EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
 import { EventSubscriber } from 'typeorm';
 import {
-    DomainType,
+    AnalysisBucketType, DomainType,
+    buildAnalysisBucketName,
 } from '@privateaim/core-kit';
 import { BaseSubscriber } from '@privateaim/server-db-kit';
 import { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
 import { AnalysisMetadataCommand, useAnalysisMetadataComponent } from '../../../components';
+import { AnalysisBucketEntity } from '../analysis-bucket';
 import { AnalysisEntity } from './entity';
 
 @EventSubscriber()
@@ -53,6 +56,48 @@ AnalysisEntity
                 return destinations;
             },
         });
+    }
+
+    async afterInsert(event: InsertEvent<AnalysisEntity>): Promise<any> {
+        await super.afterInsert(event);
+
+        const bucketComponent = new BucketBaseComponent();
+        const bucketTypes = Object.values(AnalysisBucketType);
+        for (let i = 0; i < bucketTypes.length; i++) {
+            await bucketComponent.triggerCreate({
+                name: buildAnalysisBucketName(bucketTypes[i], event.entity.id),
+            }, {
+                analysisId: event.entity.id,
+                bucketType: bucketTypes[i],
+            });
+        }
+    }
+
+    async beforeRemove(event: RemoveEvent<AnalysisEntity>): Promise<any> {
+        await super.beforeRemove(event);
+
+        const bucketComponent = new BucketBaseComponent();
+
+        const analysisBucketRepository = event.manager.getRepository(AnalysisBucketEntity);
+        const analysisBuckets = await analysisBucketRepository.find({
+            where: {
+                analysis_id: event.entity.id,
+            },
+        });
+
+        for (let i = 0; i < analysisBuckets.length; i++) {
+            const analysisBucket = analysisBuckets[i];
+            // todo: remove condition
+            if (!analysisBucket.external_id) {
+                continue;
+            }
+
+            await bucketComponent.triggerDelete({
+                id: analysisBucket.external_id,
+            }, {
+                analysisId: analysisBucket.analysis_id,
+            });
+        }
     }
 
     async afterUpdate(event: UpdateEvent<AnalysisEntity>): Promise<any> {

@@ -5,13 +5,14 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import type { ObjectLiteral } from '../../../type';
+import type { ComponentEventMap } from '../type';
 
-export interface ComponentEmitter {
-    emit(
-        type: string,
-        data?: ObjectLiteral,
-        metadata?: ObjectLiteral
+export interface ComponentSubscriber<
+    EventMap extends ComponentEventMap = ComponentEventMap,
+> {
+    emit<Key extends keyof EventMap>(
+        type: Key,
+        ...payload: EventMap[Key]
     ) : Promise<void> | void;
 }
 

@@ -6,69 +6,64 @@
  */
 
 import { EnvironmentName, wait } from '@privateaim/kit';
-import type { Component } from '@privateaim/server-kit';
 import {
-    ComponentHandlers,
-    buildQueueRouterPublishPayload, isQueueRouterUsable, useLogger, useQueueRouter,
+    BaseComponent,
+    buildQueueRouterPublishPayload, isQueueRouterUsable, useQueueRouter,
 } from '@privateaim/server-kit';
 import { useEnv } from '@privateaim/server-telemetry';
 import type { ObjectLiteral } from 'rapiq';
 import { AnalysisMetadataCommand, AnalysisMetadataTaskQueue } from './constants';
 import { AnalysisMetadataRecalcHandler } from './handlers';
 
-export function createAnalysisMetadataComponent(): Component {
-    const manager = new ComponentHandlers();
+export class AnalysisMetadataComponent extends BaseComponent {
+    constructor() {
+        super();
 
-    manager.mount(AnalysisMetadataCommand.RECALC, new AnalysisMetadataRecalcHandler());
+        this.mount(AnalysisMetadataCommand.RECALC, new AnalysisMetadataRecalcHandler());
+    }
 
-    return {
-        async start() {
-            await manager.initialize();
+    async start() {
+        await this.initialize();
 
-            if (
-                isQueueRouterUsable() &&
-                useEnv('env') !== EnvironmentName.TEST
-            ) {
-                const queueRouter = useQueueRouter();
+        if (isQueueRouterUsable()) {
+            const queueRouter = useQueueRouter();
 
-                await queueRouter.consumeAny(
-                    AnalysisMetadataTaskQueue,
-                    (
-                        payload,
-                    ) => manager.execute(
-                        payload.type,
-                        payload.data,
-                        payload.metadata,
-                    ),
-                );
-            } else {
-                useLogger().warn('Analysis metadata component can not consume tasks.');
-            }
-        },
-        async trigger(
-            key: string,
-            value?: ObjectLiteral,
-            metadata: ObjectLiteral = {},
+            await queueRouter.consumeAny(
+                AnalysisMetadataTaskQueue,
+                async (
+                    payload,
+                ) => this.handle(
+                    payload.type,
+                    payload.data,
+                    payload.metadata,
+                ),
+            );
+        }
+    }
+
+    async trigger(
+        key: string,
+        value?: ObjectLiteral,
+        metadata: ObjectLiteral = {},
+    ) {
+        if (
+            isQueueRouterUsable() &&
+            useEnv('env') !== EnvironmentName.TEST
         ) {
-            if (
-                isQueueRouterUsable() &&
-                useEnv('env') !== EnvironmentName.TEST
-            ) {
-                const payload = buildQueueRouterPublishPayload({
-                    type: key,
-                    data: value,
-                    metadata: {
-                        routing: AnalysisMetadataTaskQueue,
-                        ...metadata,
-                    },
-                });
+            const payload = buildQueueRouterPublishPayload({
+                type: key,
+                data: value,
+                metadata: {
+                    routing: AnalysisMetadataTaskQueue,
+                    ...metadata,
+                },
+            });
 
-                const queueRouter = useQueueRouter();
-                await wait(500)
-                    .then(() => queueRouter.publish(payload));
-            } else {
-                await manager.execute(key, value, metadata);
-            }
-        },
-    };
+            const queueRouter = useQueueRouter();
+            await wait(500)
+                .then(() => queueRouter.publish(payload));
+        } else {
+            await this.handle(key, value, metadata);
+        }
+    }
 }

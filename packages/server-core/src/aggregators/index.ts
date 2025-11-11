@@ -7,4 +7,5 @@
 
 export * from './authup';
 export * from './worker';
+export * from './storage';
 export * from './telemetry';

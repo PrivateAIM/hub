@@ -6,4 +6,3 @@
  */
 
 export * from './write';
-export * from './module';
