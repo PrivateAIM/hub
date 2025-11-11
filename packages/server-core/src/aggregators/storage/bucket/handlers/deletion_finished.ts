@@ -7,25 +7,33 @@
 import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
 import type { Bucket } from '@privateaim/storage-kit/src';
 import { AnalysisBucketEntity, useDataSourceSync } from '../../../../database';
+import { TaskType, useTaskManager } from '../../../../domains';
 
 export class StorageBucketDeletionFinishedHandler implements ComponentHandler {
     async handle(bucket: Bucket, context: ComponentHandlerContext): Promise<void> {
-        const { analysisId } = context.metadata;
-        if (!analysisId) {
+        const { correlationId } = context.metadata;
+        if (!correlationId) {
             return;
         }
 
-        const dataSource = useDataSourceSync();
-        const analysisBucketRepository = dataSource.getRepository(AnalysisBucketEntity);
-        const analysisBucket = await analysisBucketRepository.findOneBy({
-            analysis_id: analysisId,
-            external_id: bucket.id,
-        });
+        const taskManager = useTaskManager();
+        const task = await taskManager.resolve(correlationId);
+        if (
+            task &&
+            task.type === TaskType.ANALYSIS_STORAGE_DELETE
+        ) {
+            const dataSource = useDataSourceSync();
+            const analysisBucketRepository = dataSource.getRepository(AnalysisBucketEntity);
+            const analysisBucket = await analysisBucketRepository.findOneBy({
+                analysis_id: task.data.analysisId,
+                external_id: bucket.id,
+            });
 
-        if (!analysisBucket) {
-            return;
+            if (!analysisBucket) {
+                return;
+            }
+
+            await analysisBucketRepository.remove(analysisBucket);
         }
-
-        await analysisBucketRepository.remove(analysisBucket);
     }
 }

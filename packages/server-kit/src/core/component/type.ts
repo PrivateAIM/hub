@@ -9,7 +9,10 @@ import type { ObjectLiteral } from '../../type';
 import type { ComponentHandler, ComponentHandlerFn } from './handler';
 
 export type ComponentData = ObjectLiteral;
-export type ComponentMetadata = ObjectLiteral;
+export type ComponentMetadata = {
+    correlationId?: string,
+    [key: string]: any
+};
 
 export type ComponentStartFn = () => Promise<void> | void;
 
