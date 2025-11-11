@@ -7,10 +7,15 @@
 
 import { generateSwagger } from '@privateaim/server-http-kit';
 import type { Component } from '@privateaim/server-kit';
-import { useLogger } from '@privateaim/server-kit';
+import { QueueWorkerComponentCaller, useLogger } from '@privateaim/server-kit';
 import { defineCommand } from 'citty';
 import path from 'node:path';
 import process from 'node:process';
+import {
+    EventEventQueueRouterRouting,
+    EventTaskQueueRouterRouting, LogEventQueueRouterRouting,
+    LogTaskQueueRouterRouting,
+} from '@privateaim/server-telemetry-kit';
 import { EventComponent, LogComponent } from '../../components';
 import {
     configure, useEnv,
@@ -28,9 +33,21 @@ export function defineCLIStartCommand() {
 
             configure();
 
-            const components : Component[] = [
-                new EventComponent(),
-                new LogComponent(),
+            const components : Component<any>[] = [
+                new QueueWorkerComponentCaller(
+                    new EventComponent(),
+                    {
+                        consumeQueue: EventTaskQueueRouterRouting,
+                        publishQueue: EventEventQueueRouterRouting,
+                    },
+                ),
+                new QueueWorkerComponentCaller(
+                    new LogComponent(),
+                    {
+                        consumeQueue: LogTaskQueueRouterRouting,
+                        publishQueue: LogEventQueueRouterRouting,
+                    },
+                ),
             ];
 
             await generateSwagger({

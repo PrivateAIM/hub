@@ -7,30 +7,32 @@
 
 import { createNanoID } from '@privateaim/kit';
 import type { Component, ComponentEventMap, ComponentHandleOptions } from '../../type';
-import type { QueueRouter } from '../../../queue-router';
-import { buildQueueRouterPublishPayload, useQueueRouter } from '../../../queue-router';
+import { buildQueueRouterPublishPayload, isQueueRouterUsable, useQueueRouter } from '../../../queue-router';
 import type { ComponentCaller, ComponentCallerPayload, ComponentCallerResponse } from '../types';
 import type { QueueSelfComponentCallerOptions } from './types';
+import { useLogger } from '../../../../services';
 
 export class QueueWorkerComponentCaller<
     EventMap extends ComponentEventMap = ComponentEventMap,
-> implements ComponentCaller<EventMap> {
+> implements ComponentCaller<EventMap>, Component<EventMap> {
     protected component: Component<EventMap>;
 
     protected options: QueueSelfComponentCallerOptions;
 
-    protected client : QueueRouter;
-
     constructor(component: Component<EventMap>, options: QueueSelfComponentCallerOptions) {
         this.component = component;
         this.options = options;
-
-        this.client = useQueueRouter();
     }
 
     async start() {
-        await this.client.consumeAny(
-            this.options.consumeRouting,
+        if (!isQueueRouterUsable()) {
+            useLogger().warn(`Can not consume queue for component ${this.component.constructor.name}`);
+            return;
+        }
+
+        const client = useQueueRouter();
+        await client.consumeAny(
+            this.options.consumeQueue,
             async (payload) => {
                 await this.call(payload.type, payload.data, payload.metadata);
             },
@@ -54,19 +56,26 @@ export class QueueWorkerComponentCaller<
 
         metadata.correlationId = metadata.correlationId || createNanoID();
 
+        const client = useQueueRouter();
         const options : ComponentHandleOptions<EventMap> = {
             handle: async (
                 childValue,
                 childContext,
             ) => {
+                if (!this.options.publishQueue) {
+                    throw new Error(
+                        `Component ${this.component.constructor.name} event ${childContext.key} could not be handled.`,
+                    );
+                }
                 /**
+                 *
                  * publish unhandled requests to publish queue.
                  */
-                await this.client.publish(buildQueueRouterPublishPayload({
+                await client.publish(buildQueueRouterPublishPayload({
                     type: childContext.key,
                     data: childValue,
                     metadata: {
-                        routing: this.options.publishRouting,
+                        routing: this.options.publishQueue,
                         ...childContext.metadata,
                     },
                 }));

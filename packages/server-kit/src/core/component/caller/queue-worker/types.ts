@@ -8,6 +8,6 @@
 import type { QueueRouterRouting } from '../../../queue-router';
 
 export type QueueSelfComponentCallerOptions = {
-    publishRouting: QueueRouterRouting,
-    consumeRouting: QueueRouterRouting,
+    publishQueue?: QueueRouterRouting,
+    consumeQueue: QueueRouterRouting,
 };

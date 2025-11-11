@@ -45,7 +45,7 @@ export type ComponentHandleFnArgsForMap<
     EventMap extends ComponentEventMap = ComponentEventMap,
 > = {
     [K in keyof EventMap]: [
-        key: K,
+        key: K & string,
         data: EventMap[K][0],
         metadata?: EventMap[K][1] | undefined,
         options?: ComponentHandleOptions<EventMap>,

@@ -6,7 +6,6 @@
  */
 
 export * from './caller';
-export * from './emitter';
 export * from './error';
 export * from './handler';
 export * from './module';
