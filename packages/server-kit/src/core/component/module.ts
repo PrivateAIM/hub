@@ -58,15 +58,15 @@ export abstract class BaseComponent<
         }
 
         const promises: Promise<void>[] = [];
-        const keys = Object.keys(this.handlers);
+        const keys = Array.from(this.handlers.keys());
         for (let i = 0; i < keys.length; i++) {
-            const handler = this.handlers[keys[i]];
+            const handler = this.handlers.get(keys[i]);
 
             if (
                 typeof handler !== 'function' &&
                 handler.initialize
             ) {
-                promises.push(handler.initialize());
+                promises.push(Promise.resolve().then(() => handler.initialize()));
             }
         }
 
