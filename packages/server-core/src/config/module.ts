@@ -21,9 +21,9 @@ import {
     createTelemetryAggregator,
 } from '../aggregators';
 import {
-    AnalysisMetadataComponent,
     AnalysisMetadataTaskQueue,
     createRegistryComponent,
+    useAnalysisMetadataComponent,
 } from '../components';
 import {
     configureAmqp,
@@ -91,7 +91,7 @@ export function createConfig() : Config {
     const components : Component[] = [
         createRegistryComponent(),
         new QueueWorkerComponentCaller(
-            new AnalysisMetadataComponent(),
+            useAnalysisMetadataComponent(),
             {
                 consumeQueue: AnalysisMetadataTaskQueue,
             },

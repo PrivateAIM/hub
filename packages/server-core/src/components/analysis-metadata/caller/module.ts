@@ -5,22 +5,46 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentCallerPayload, ComponentCallerResponse } from '@privateaim/server-kit';
-import { QueueDispatchComponentCaller } from '@privateaim/server-kit';
+import type {
+    ComponentCaller,
+    ComponentCallerPayload,
+    ComponentCallerResponse,
+} from '@privateaim/server-kit';
+import {
+    DirectComponentCaller,
+
+    QueueDispatchComponentCaller,
+    isQueueRouterUsable,
+} from '@privateaim/server-kit';
 import { wait } from '@privateaim/kit';
+import { useAnalysisMetadataComponent } from '../singleton';
 import type { AnalysisMetadataTaskMap } from '../types';
 import { AnalysisMetadataTaskQueue } from '../constants';
 
-export class AnalysisMetadataComponentCaller extends QueueDispatchComponentCaller<AnalysisMetadataTaskMap> {
+export class AnalysisMetadataComponentCaller implements ComponentCaller<AnalysisMetadataTaskMap> {
+    protected directCaller : DirectComponentCaller<AnalysisMetadataTaskMap>;
+
+    protected queueDispatchCaller : QueueDispatchComponentCaller<AnalysisMetadataTaskMap>;
+
+    constructor() {
+        this.directCaller = new DirectComponentCaller<AnalysisMetadataTaskMap>(useAnalysisMetadataComponent());
+        this.queueDispatchCaller = new QueueDispatchComponentCaller<AnalysisMetadataTaskMap>();
+    }
+
     async call<Key extends keyof AnalysisMetadataTaskMap>(
         key: Key & string,
         ...payload: ComponentCallerPayload<AnalysisMetadataTaskMap[Key]>
     ): Promise<ComponentCallerResponse<AnalysisMetadataTaskMap>> {
         const [data, metadata] = payload;
-        return wait(500)
-            .then(() => super.call(key, data, {
-                ...metadata,
-                routing: AnalysisMetadataTaskQueue,
-            }));
+
+        if (isQueueRouterUsable()) {
+            return wait(500)
+                .then(() => this.queueDispatchCaller.call(key, data, {
+                    ...metadata,
+                    routing: AnalysisMetadataTaskQueue,
+                }));
+        }
+
+        return this.directCaller.call(key, data, metadata);
     }
 }

@@ -16,7 +16,7 @@ import { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
 import {
     AnalysisMetadataCommand,
-    AnalysisMetadataComponentCaller,
+    useAnalysisMetadataComponentCaller,
 } from '../../../components';
 import { AnalysisBucketEntity } from '../analysis-bucket';
 import { AnalysisEntity } from './entity';
@@ -129,8 +129,8 @@ AnalysisEntity
             return;
         }
 
-        const caller = new AnalysisMetadataComponentCaller();
-        caller.call(
+        const caller = useAnalysisMetadataComponentCaller();
+        await caller.call(
             AnalysisMetadataCommand.RECALC,
             {
                 analysisId,

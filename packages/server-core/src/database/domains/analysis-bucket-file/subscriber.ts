@@ -17,7 +17,7 @@ import { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
 import {
     AnalysisMetadataCommand,
-    AnalysisMetadataComponentCaller,
+    useAnalysisMetadataComponentCaller,
 } from '../../../components';
 import { AnalysisBucketFileEntity } from './entity';
 
@@ -62,8 +62,8 @@ AnalysisBucketFileEntity
         await super.afterInsert(event);
 
         if (event.entity.root) {
-            const caller = new AnalysisMetadataComponentCaller();
-            caller.call(
+            const caller = useAnalysisMetadataComponentCaller();
+            await caller.call(
                 AnalysisMetadataCommand.RECALC,
                 {
                     analysisId: event.entity.analysis_id,
@@ -79,8 +79,8 @@ AnalysisBucketFileEntity
         const analysisId = event.entity?.analysis_id ??
             event.databaseEntity?.analysis_id;
 
-        const caller = new AnalysisMetadataComponentCaller();
-        caller.call(
+        const caller = useAnalysisMetadataComponentCaller();
+        await caller.call(
             AnalysisMetadataCommand.RECALC,
             {
                 analysisId,
@@ -91,8 +91,8 @@ AnalysisBucketFileEntity
 
     async afterRemove(event: RemoveEvent<AnalysisBucketFileEntity>): Promise<any> {
         if (event.entity.root) {
-            const caller = new AnalysisMetadataComponentCaller();
-            caller.call(
+            const caller = useAnalysisMetadataComponentCaller();
+            await caller.call(
                 AnalysisMetadataCommand.RECALC,
                 {
                     analysisId: event.entity.analysis_id,
