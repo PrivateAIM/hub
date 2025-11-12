@@ -7,16 +7,22 @@
 
 import type { ComponentEventMap } from '../../type';
 import type { ComponentCaller, ComponentCallerPayload, ComponentCallerResponse } from '../types';
-import type { QueueRouterRouting } from '../../../queue-router';
 import { buildQueueRouterPublishPayload, isQueueRouterUsable, useQueueRouter } from '../../../queue-router';
 import { useLogger } from '../../../../services';
+import type { QueueDispatchComponentCallerOptions } from './types';
 
 export class QueueDispatchComponentCaller<
     EventMap extends ComponentEventMap = ComponentEventMap,
-> implements ComponentCaller<EventMap, { routing: QueueRouterRouting}> {
+> implements ComponentCaller<EventMap> {
+    protected options : QueueDispatchComponentCallerOptions;
+
+    constructor(options: QueueDispatchComponentCallerOptions) {
+        this.options = options;
+    }
+
     async call<K extends keyof EventMap>(
         type: K & string,
-        ...payload: ComponentCallerPayload<EventMap[K], {routing: QueueRouterRouting }>
+        ...payload: ComponentCallerPayload<EventMap[K]>
     ): Promise<ComponentCallerResponse<EventMap>> {
         const [data, metadata] = payload;
 
@@ -29,7 +35,10 @@ export class QueueDispatchComponentCaller<
         await client.publish(buildQueueRouterPublishPayload({
             type,
             data,
-            metadata,
+            metadata: {
+                ...metadata,
+                routing: this.options.queue,
+            },
         }));
 
         return {};

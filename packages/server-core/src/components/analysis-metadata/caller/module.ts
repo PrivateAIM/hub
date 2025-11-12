@@ -28,7 +28,9 @@ export class AnalysisMetadataComponentCaller implements ComponentCaller<Analysis
 
     constructor() {
         this.directCaller = new DirectComponentCaller<AnalysisMetadataTaskMap>(useAnalysisMetadataComponent());
-        this.queueDispatchCaller = new QueueDispatchComponentCaller<AnalysisMetadataTaskMap>();
+        this.queueDispatchCaller = new QueueDispatchComponentCaller<AnalysisMetadataTaskMap>({
+            queue: AnalysisMetadataTaskQueue,
+        });
     }
 
     async call<Key extends keyof AnalysisMetadataTaskMap>(
@@ -39,10 +41,7 @@ export class AnalysisMetadataComponentCaller implements ComponentCaller<Analysis
 
         if (isQueueRouterUsable()) {
             return wait(500)
-                .then(() => this.queueDispatchCaller.call(key, data, {
-                    ...metadata,
-                    routing: AnalysisMetadataTaskQueue,
-                }));
+                .then(() => this.queueDispatchCaller.call(key, data, metadata));
         }
 
         return this.directCaller.call(key, data, metadata);
