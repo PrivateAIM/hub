@@ -9,7 +9,7 @@ import { DomainType } from '@privateaim/core-kit';
 import type { Logger } from '@privateaim/server-kit';
 import { LoggerConsoleTransport, createLogger } from '@privateaim/server-kit';
 import { ComponentName } from '@privateaim/server-core-worker-kit';
-import { LoggerTransport, isLogComponentServiceUsable, useLogComponentService } from '@privateaim/server-telemetry-kit';
+import { LoggerTransport, isLogComponentCallerUsable, useLogComponentCaller } from '@privateaim/server-telemetry-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 
 let instance : Logger | undefined;
@@ -35,12 +35,9 @@ export function useAnalysisBuilderLogger() : Logger {
                     [LogFlag.REF_TYPE]: DomainType.ANALYSIS,
                 },
                 save: async (data) => {
-                    if (isLogComponentServiceUsable()) {
-                        const logComponent = useLogComponentService();
-                        await logComponent.command({
-                            command: 'write',
-                            data,
-                        });
+                    if (isLogComponentCallerUsable()) {
+                        const logComponent = useLogComponentCaller();
+                        await logComponent.callWrite(data);
                     }
                 },
             }),

@@ -5,34 +5,21 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ObjectLiteral } from '@privateaim/kit';
-import type { ComponentWithTrigger } from '@privateaim/server-kit';
-import { buildQueueRouterPublishPayload, isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
+import type { ComponentMetadata } from '@privateaim/server-kit';
+import {
+    QueueDispatchComponentCaller,
+} from '@privateaim/server-kit';
 import { AnalysisDistributorCommand, AnalysisDistributorTaskQueueRouterRouting } from './constants';
 import type { AnalysisDistributorExecutePayload } from './types';
 
-export class AnalysisDistributorBaseComponent implements ComponentWithTrigger {
-    async trigger(
-        key: string,
-        value: ObjectLiteral = {},
-        metadata: ObjectLiteral = {},
-    ): Promise<void> {
-        if (isQueueRouterUsable()) {
-            const payload = buildQueueRouterPublishPayload({
-                type: key,
-                data: value,
-                metadata: {
-                    routing: AnalysisDistributorTaskQueueRouterRouting,
-                    ...metadata,
-                },
-            });
-
-            const queueRouter = useQueueRouter();
-            await queueRouter.publish(payload);
-        }
+export class AnalysisDistributorComponentCaller extends QueueDispatchComponentCaller {
+    constructor() {
+        super({
+            queue: AnalysisDistributorTaskQueueRouterRouting,
+        });
     }
 
-    async triggerExecute(payload: AnalysisDistributorExecutePayload) {
-        return this.trigger(AnalysisDistributorCommand.EXECUTE, payload);
+    async callExecute(payload: AnalysisDistributorExecutePayload, metadata: ComponentMetadata = {}) {
+        return this.call(AnalysisDistributorCommand.EXECUTE, payload, metadata);
     }
 }

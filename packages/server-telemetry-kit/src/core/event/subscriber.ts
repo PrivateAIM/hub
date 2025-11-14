@@ -12,7 +12,7 @@ import type { Event, EventData } from '@privateaim/telemetry-kit';
 import { DomainType } from '@privateaim/telemetry-kit';
 import type { ObjectDiff, ObjectLiteral } from '@privateaim/kit';
 import { WEEK_IN_MS, isObject } from '@privateaim/kit';
-import { isEventComponentServiceUsable, useEventComponentService } from '../../services';
+import { isEventComponentCallerUsable, useEventComponentCaller } from '../../components';
 
 export class EntityEventHandler implements IEntityEventHandler {
     async handle(ctx: EntityEventHandleOptions): Promise<void> {
@@ -93,12 +93,9 @@ export class EntityEventHandler implements IEntityEventHandler {
 
         entity.data = data;
 
-        if (isEventComponentServiceUsable()) {
-            const eventService = useEventComponentService();
-            await eventService.command({
-                command: 'create',
-                data: entity,
-            });
+        if (isEventComponentCallerUsable()) {
+            const eventService = useEventComponentCaller();
+            await eventService.callCreate(entity);
 
             return;
         }

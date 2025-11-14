@@ -9,7 +9,7 @@ import { singa } from 'singa';
 import { AnalysisMetadataComponent } from './module';
 
 const instance = singa<AnalysisMetadataComponent>({
-    name: 'analysisMetadata',
+    name: 'analysisMetadataComponent',
     factory: () => new AnalysisMetadataComponent(),
 });
 

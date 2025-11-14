@@ -6,7 +6,7 @@
  */
 
 import type {
-    Component, ComponentEventMap, ComponentHandlers,
+    Component, ComponentEventMap, ComponentHandleOptions, ComponentHandlers,
 } from './type';
 import type {
     ComponentHandler, ComponentHandlerContext, ComponentHandlerFn,
@@ -14,7 +14,7 @@ import type {
 
 export abstract class BaseComponent<
     EventMap extends ComponentEventMap = ComponentEventMap,
-> implements Component {
+> implements Component<EventMap> {
     private initializePromise : Promise<void> | undefined;
 
     protected initialized : boolean;
@@ -90,29 +90,17 @@ export abstract class BaseComponent<
      * Handle specific component event.
      *
      * @param key
-     * @param value
+     * @param data
+     * @param metadata
+     * @param options
      */
     async handle<Key extends keyof EventMap>(
         key: Key & string,
-        ...value: EventMap[Key]
+        data: EventMap[Key][0],
+        metadata: EventMap[Key][1] = {},
+        options: ComponentHandleOptions<EventMap> = {},
     ) : Promise<void> {
         await this.initialize();
-
-        const handler = this.handlers.get(key) as ComponentHandler<EventMap, Key> |
-        ComponentHandlerFn<EventMap, Key>;
-
-        if (!handler) {
-            if (key === '*') {
-                throw new Error(`${key as string} key could not be handled.`);
-            }
-
-            return this.handle(
-                '*' as Key & string,
-                ...value as EventMap[Key],
-            );
-        }
-
-        const [data, metadata] = value;
 
         const context : ComponentHandlerContext<EventMap, Key> = {
             key,
@@ -122,26 +110,48 @@ export abstract class BaseComponent<
                 childData,
                 childMetadata,
             ) => {
-                const childPayload = [
-                    childData,
+                this.handle(
+                    childKey as Key & string,
+                    childData as EventMap[Key][0],
                     {
                         ...metadata,
                         ...(childMetadata || {}),
+                    } as EventMap[Key][1],
+                    {
+                        ...options,
+                        ...(options || {}),
                     },
-                ];
-
-                this.handle(
-                    childKey as Key & string,
-                    ...childPayload as EventMap[Key],
                 );
             },
         };
 
-        if (typeof handler === 'function') {
-            return handler(data, context);
+        let handler = this.handlers.get(key) as ComponentHandler<EventMap, Key> |
+        ComponentHandlerFn<EventMap, Key>;
+
+        if (handler) {
+            if (typeof handler === 'function') {
+                return handler(data, context);
+            }
+
+            return handler.handle(data, context);
         }
 
-        return handler.handle(data, context);
+        handler = this.handlers.get('*') as ComponentHandler<EventMap, Key> |
+        ComponentHandlerFn<EventMap, Key>;
+
+        if (handler) {
+            if (typeof handler === 'function') {
+                return handler(data, context);
+            }
+
+            return handler.handle(data, context);
+        }
+
+        if (options.handle) {
+            return options.handle(data, context);
+        }
+
+        throw new Error(`${key as string} key could not be handled.`);
     }
 
     abstract start() : Promise<void> | void;

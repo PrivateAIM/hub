@@ -8,8 +8,7 @@
 import { LoggerConsoleTransport, createLogger, setLoggerFactory } from '@privateaim/server-kit';
 import {
     LoggerTransport,
-    isLogComponentServiceUsable,
-    useLogComponentService,
+    isLogComponentCallerUsable, useLogComponentCaller,
 } from '@privateaim/server-telemetry-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 
@@ -23,13 +22,10 @@ export function setupLogging(): void {
                     [LogFlag.CHANNEL]: LogChannel.SYSTEM,
                 },
                 save: async (data) => {
-                    if (isLogComponentServiceUsable()) {
-                        const component = useLogComponentService();
+                    if (isLogComponentCallerUsable()) {
+                        const component = useLogComponentCaller();
 
-                        await component.command({
-                            command: 'write',
-                            data,
-                        });
+                        await component.callWrite(data);
                     }
                 },
             }),

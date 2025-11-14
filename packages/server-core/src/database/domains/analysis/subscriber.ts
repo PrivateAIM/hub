@@ -5,19 +5,19 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import { BucketBaseComponent } from '@privateaim/server-storage-kit';
+import { BucketComponentCaller } from '@privateaim/server-storage-kit';
 import type {
     EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
 import { EventSubscriber } from 'typeorm';
-import {
-    AnalysisBucketType, DomainType,
-    buildAnalysisBucketName,
-} from '@privateaim/core-kit';
+import { AnalysisBucketType, DomainType, buildAnalysisBucketName } from '@privateaim/core-kit';
 import { BaseSubscriber } from '@privateaim/server-db-kit';
 import { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
-import { AnalysisMetadataCommand, useAnalysisMetadataComponent } from '../../../components';
+import {
+    AnalysisMetadataCommand,
+    useAnalysisMetadataComponentCaller,
+} from '../../../components';
 import { AnalysisBucketEntity } from '../analysis-bucket';
 import { AnalysisEntity } from './entity';
 import { TaskType, useTaskManager } from '../../../domains';
@@ -64,10 +64,11 @@ AnalysisEntity
 
         const taskManager = useTaskManager();
 
-        const bucketComponent = new BucketBaseComponent();
+        const bucketComponentCaller = new BucketComponentCaller();
         const bucketTypes = Object.values(AnalysisBucketType);
         for (let i = 0; i < bucketTypes.length; i++) {
-            const jobId = await taskManager.create(
+            // todo: maybe extract actor_id, actor_type from event.queryRunner.data
+            const correlationId = await taskManager.create(
                 TaskType.ANALYSIS_BUCKET_CREATE,
                 {
                     analysisId: event.entity.id,
@@ -75,10 +76,11 @@ AnalysisEntity
                 },
             );
 
-            await bucketComponent.triggerCreate({
+            await bucketComponentCaller.callCreate({
                 name: buildAnalysisBucketName(bucketTypes[i], event.entity.id),
+                realm_id: event.entity.realm_id,
             }, {
-                jobId,
+                correlationId,
             });
         }
     }
@@ -87,7 +89,7 @@ AnalysisEntity
         await super.beforeRemove(event);
 
         const taskManager = useTaskManager();
-        const bucketComponent = new BucketBaseComponent();
+        const bucketComponentCaller = new BucketComponentCaller();
 
         const analysisBucketRepository = event.manager.getRepository(AnalysisBucketEntity);
         const analysisBuckets = await analysisBucketRepository.find({
@@ -103,17 +105,17 @@ AnalysisEntity
                 continue;
             }
 
-            const jobId = await taskManager.create(
+            const correlationId = await taskManager.create(
                 TaskType.ANALYSIS_BUCKET_DELETE,
                 {
                     analysisId: analysisBucket.analysis_id,
                 },
             );
 
-            await bucketComponent.triggerDelete({
+            await bucketComponentCaller.callDelete({
                 id: analysisBucket.external_id,
             }, {
-                jobId,
+                correlationId,
             });
         }
     }
@@ -127,12 +129,13 @@ AnalysisEntity
             return;
         }
 
-        const analysisConfiguration = useAnalysisMetadataComponent();
-        analysisConfiguration.trigger(
+        const caller = useAnalysisMetadataComponentCaller();
+        await caller.call(
             AnalysisMetadataCommand.RECALC,
             {
                 analysisId,
             },
+            {},
         );
     }
 

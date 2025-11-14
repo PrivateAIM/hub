@@ -15,6 +15,7 @@ import {
 import { DomainType } from '@privateaim/storage-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import { useDataSource } from 'typeorm-extension';
+import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
 import { useMinio } from '../../../../core';
 import { BucketEntity, toBucketName } from '../../../../domains';
 import { BucketValidator } from '../../../../http/controllers/bucket/utils/validation';
@@ -64,7 +65,9 @@ BucketCommand.CREATE
             value,
         );
 
-        const data = await this.validator.run(value);
+        const data = await this.validator.run(value, {
+            group: HTTPHandlerOperation.CREATE,
+        });
 
         const dataSource = await useDataSource();
         const repository = dataSource.getRepository(BucketEntity);

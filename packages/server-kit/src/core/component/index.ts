@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './emitter';
+export * from './caller';
 export * from './error';
 export * from './handler';
 export * from './module';

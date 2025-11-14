@@ -15,7 +15,10 @@ import {
 import { BaseSubscriber } from '@privateaim/server-db-kit';
 import { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
-import { AnalysisMetadataCommand, useAnalysisMetadataComponent } from '../../../components';
+import {
+    AnalysisMetadataCommand,
+    useAnalysisMetadataComponentCaller,
+} from '../../../components';
 import { AnalysisBucketFileEntity } from './entity';
 
 @EventSubscriber()
@@ -59,12 +62,13 @@ AnalysisBucketFileEntity
         await super.afterInsert(event);
 
         if (event.entity.root) {
-            const analysisConfiguration = useAnalysisMetadataComponent();
-            analysisConfiguration.trigger(
+            const caller = useAnalysisMetadataComponentCaller();
+            await caller.call(
                 AnalysisMetadataCommand.RECALC,
                 {
                     analysisId: event.entity.analysis_id,
                 },
+                {},
             );
         }
     }
@@ -75,23 +79,25 @@ AnalysisBucketFileEntity
         const analysisId = event.entity?.analysis_id ??
             event.databaseEntity?.analysis_id;
 
-        const analysisConfiguration = useAnalysisMetadataComponent();
-        analysisConfiguration.trigger(
+        const caller = useAnalysisMetadataComponentCaller();
+        await caller.call(
             AnalysisMetadataCommand.RECALC,
             {
                 analysisId,
             },
+            {},
         );
     }
 
     async afterRemove(event: RemoveEvent<AnalysisBucketFileEntity>): Promise<any> {
         if (event.entity.root) {
-            const analysisConfiguration = useAnalysisMetadataComponent();
-            analysisConfiguration.trigger(
+            const caller = useAnalysisMetadataComponentCaller();
+            await caller.call(
                 AnalysisMetadataCommand.RECALC,
                 {
                     analysisId: event.entity.analysis_id,
                 },
+                {},
             );
         }
     }

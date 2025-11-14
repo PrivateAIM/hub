@@ -6,6 +6,13 @@
  */
 
 import type { Component } from '@privateaim/server-kit';
+import { QueueWorkerComponentCaller } from '@privateaim/server-kit';
+import {
+    AnalysisBuilderEventQueueRouterRouting,
+    AnalysisBuilderTaskQueueRouterRouting,
+    AnalysisDistributorEventQueueRouterRouting,
+    AnalysisDistributorTaskQueueRouterRouting,
+} from '@privateaim/server-core-worker-kit';
 import {
     createMasterImagesComponent,
     useAnalysisBuilderComponent,
@@ -30,8 +37,20 @@ export function createConfig() : Config {
     const aggregators : Component[] = [];
 
     const components : Component[] = [
-        useAnalysisDistributorComponent(),
-        useAnalysisBuilderComponent(),
+        new QueueWorkerComponentCaller(
+            useAnalysisBuilderComponent(),
+            {
+                publishQueue: AnalysisBuilderEventQueueRouterRouting,
+                consumeQueue: AnalysisBuilderTaskQueueRouterRouting,
+            },
+        ),
+        new QueueWorkerComponentCaller(
+            useAnalysisDistributorComponent(),
+            {
+                publishQueue: AnalysisDistributorEventQueueRouterRouting,
+                consumeQueue: AnalysisDistributorTaskQueueRouterRouting,
+            },
+        ),
 
         createMasterImagesComponent(),
     ];

@@ -36,11 +36,11 @@ export class BucketEntity implements Bucket {
 
     // ------------------------------------------------------------------
 
-    @Column({ type: 'uuid' })
-        actor_id: string;
+    @Column({ type: 'uuid', nullable: true })
+        actor_id: string | null;
 
-    @Column({ type: 'varchar', length: 64 })
-        actor_type: string;
+    @Column({ type: 'varchar', length: 64, nullable: true })
+        actor_type: string | null;
 
     // ------------------------------------------------------------------
 

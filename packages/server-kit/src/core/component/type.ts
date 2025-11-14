@@ -16,41 +16,36 @@ export type ComponentMetadata = {
 
 export type ComponentStartFn = () => Promise<void> | void;
 
-export type ComponentTriggerFn = (
-    key: string,
-    value?: ObjectLiteral,
-    metadata?: ObjectLiteral
-) => Promise<void> | void;
-
-export interface ComponentWithTrigger {
-    trigger: ComponentTriggerFn
-}
-
-export type Component = {
-    start: ComponentStartFn,
-    trigger?: ComponentTriggerFn,
-};
-
 export type ComponentErrorOptions = {
     code?: string | null,
     message?: string
     cause?: unknown
 };
 
-export type ComponentEventMap = {
-    [key: string]: [ComponentData, ComponentMetadata]
-};
+export type ComponentEventMapValue = [ComponentData, ComponentMetadata];
+export type ComponentEventMap = Record<string, ComponentEventMapValue>;
 
-export type ComponentHandleFnArgs<
+export type ComponentHandleOptions<
     EventMap extends ComponentEventMap = ComponentEventMap,
 > = {
-    [K in keyof EventMap]: [key: K, data: EventMap[K][0], metadata?: EventMap[K][1] | undefined]
+    handle?: ComponentHandlerFn<EventMap>
+};
+
+export type ComponentHandleFnArgsForMap<
+    EventMap extends ComponentEventMap = ComponentEventMap,
+> = {
+    [K in keyof EventMap]: [
+        key: K & string,
+        data: EventMap[K][0],
+        metadata?: EventMap[K][1] | undefined,
+        options?: ComponentHandleOptions<EventMap>,
+    ]
 }[keyof EventMap];
 
-export type ComponentHandleFn<
+export type ComponentHandlerCallFnForMap<
     EventMap extends ComponentEventMap = ComponentEventMap,
 > = (
-    ...input: ComponentHandleFnArgs<EventMap>
+    ...input: ComponentHandleFnArgsForMap<EventMap>
 ) => Promise<void> | void;
 
 export type ComponentHandlers<EventMap extends ComponentEventMap> = Map<
@@ -59,3 +54,10 @@ keyof EventMap | '*',
     [Key in keyof EventMap]?: ComponentHandler<EventMap, Key> | ComponentHandlerFn<EventMap, Key>
 }[keyof EventMap]
 >;
+
+export interface Component<
+    EventMap extends ComponentEventMap = ComponentEventMap,
+> {
+    start: ComponentStartFn,
+    handle?: ComponentHandlerCallFnForMap<EventMap>
+}

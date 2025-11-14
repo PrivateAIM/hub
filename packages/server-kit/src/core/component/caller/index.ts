@@ -5,6 +5,9 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
+export * from './compound';
+export * from './direct';
+export * from './queue-dispatch';
+export * from './queue-worker';
+
 export * from './types';
-export * from './queue-router';
-export * from './void';
