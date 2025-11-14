@@ -12,7 +12,6 @@ import type {
 } from '@privateaim/server-kit';
 import {
     DirectComponentCaller,
-
     QueueDispatchComponentCaller,
     isQueueRouterUsable,
 } from '@privateaim/server-kit';
@@ -40,10 +39,28 @@ export class AnalysisMetadataComponentCaller implements ComponentCaller<Analysis
         const [data, metadata] = payload;
 
         if (isQueueRouterUsable()) {
-            return wait(500)
-                .then(() => this.queueDispatchCaller.call(key, data, metadata));
+            return this.callWithQueue(key, data, metadata);
         }
 
+        return this.callDirect(key, data, metadata);
+    }
+
+    async callDirect<Key extends keyof AnalysisMetadataTaskMap>(
+        key: Key & string,
+        ...payload: ComponentCallerPayload<AnalysisMetadataTaskMap[Key]>
+    ): Promise<ComponentCallerResponse<AnalysisMetadataTaskMap>> {
+        const [data, metadata] = payload;
+
         return this.directCaller.call(key, data, metadata);
+    }
+
+    async callWithQueue<Key extends keyof AnalysisMetadataTaskMap>(
+        key: Key & string,
+        ...payload: ComponentCallerPayload<AnalysisMetadataTaskMap[Key]>
+    ): Promise<ComponentCallerResponse<AnalysisMetadataTaskMap>> {
+        const [data, metadata] = payload;
+
+        return wait(500)
+            .then(() => this.queueDispatchCaller.call(key, data, metadata));
     }
 }
