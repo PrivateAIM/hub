@@ -5,7 +5,6 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import { createNanoID } from '@privateaim/kit';
 import type { Component, ComponentEventMap, ComponentHandleOptions } from '../../type';
 import { buildQueueRouterPublishPayload, isQueueRouterUsable, useQueueRouter } from '../../../queue-router';
 import type { ComponentCaller, ComponentCallerPayload, ComponentCallerResponse } from '../types';
@@ -54,8 +53,6 @@ export class QueueWorkerComponentCaller<
             throw new Error(`Component ${this.component.constructor.name} can not be called.`);
         }
 
-        metadata.correlationId = metadata.correlationId || createNanoID();
-
         const client = useQueueRouter();
         const options : ComponentHandleOptions<EventMap> = {
             handle: async (
@@ -75,8 +72,9 @@ export class QueueWorkerComponentCaller<
                     type: childContext.key,
                     data: childValue,
                     metadata: {
-                        routing: this.options.publishQueue,
+                        ...(metadata || {}),
                         ...childContext.metadata,
+                        routing: this.options.publishQueue,
                     },
                 }));
             },

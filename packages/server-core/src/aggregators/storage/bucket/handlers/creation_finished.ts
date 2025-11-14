@@ -4,25 +4,25 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
+import type { ComponentHandlerContext } from '@privateaim/server-kit';
 import { useLogger } from '@privateaim/server-kit';
+import type { BucketComponentEventMap, BucketEvent } from '@privateaim/server-storage-kit';
 import type { Bucket } from '@privateaim/storage-kit/src';
 import { AnalysisBucketEntity, AnalysisEntity, useDataSourceSync } from '../../../../database';
-import { TaskType, useTaskManager } from '../../../../domains';
+import { TaskType } from '../../../../domains';
+import { BaseAggregatorHandler } from '../../../base';
 
-export class StorageBucketCreationFinishedHandler implements ComponentHandler {
-    async handle(bucket: Bucket, context: ComponentHandlerContext): Promise<void> {
-        const { correlationId } = context.metadata;
-        if (!correlationId) {
+export class StorageBucketCreationFinishedHandler extends BaseAggregatorHandler<
+BucketComponentEventMap,
+BucketEvent.CREATION_FINISHED
+> {
+    async handle(bucket: Bucket, context: ComponentHandlerContext<BucketComponentEventMap, BucketEvent.CREATION_FINISHED>): Promise<void> {
+        const task = await this.resolveTask(context);
+        if (!task) {
             return;
         }
 
-        const taskManager = useTaskManager();
-        const task = await taskManager.resolve(correlationId);
-        if (
-            task &&
-            task.type === TaskType.ANALYSIS_BUCKET_CREATE
-        ) {
+        if (task.type === TaskType.ANALYSIS_BUCKET_CREATE) {
             const dataSource = useDataSourceSync();
             const analysisBucketRepository = dataSource.getRepository(AnalysisBucketEntity);
             let analysisBucket = await analysisBucketRepository.findOneBy({

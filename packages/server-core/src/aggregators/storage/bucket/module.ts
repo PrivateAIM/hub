@@ -6,6 +6,7 @@
  */
 
 import {
+    type BucketComponentEventMap,
     BucketEvent,
 } from '@privateaim/server-storage-kit';
 import {
@@ -13,7 +14,9 @@ import {
 } from '@privateaim/server-kit';
 import { StorageBucketCreationFinishedHandler, StorageBucketDeletionFinishedHandler } from './handlers';
 
-export class StorageBucketAggregator extends BaseComponent {
+export class StorageBucketAggregator extends BaseComponent<
+BucketComponentEventMap
+> {
     constructor() {
         super();
 

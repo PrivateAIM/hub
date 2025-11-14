@@ -113,8 +113,14 @@ export abstract class BaseComponent<
                 this.handle(
                     childKey as Key & string,
                     childData as EventMap[Key][0],
-                    childMetadata as EventMap[Key][1],
-                    options,
+                    {
+                        ...metadata,
+                        ...(childMetadata || {}),
+                    } as EventMap[Key][1],
+                    {
+                        ...options,
+                        ...(options || {}),
+                    },
                 );
             },
         };
