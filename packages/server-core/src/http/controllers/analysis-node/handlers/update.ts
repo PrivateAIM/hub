@@ -14,7 +14,7 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { HTTPHandlerOperation, useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
-import { isEventComponentServiceUsable, useEventComponentService } from '@privateaim/server-telemetry-kit';
+import { isEventComponentCallerUsable, useEventComponentCaller } from '@privateaim/server-telemetry-kit';
 import { AnalysisNodeEntity } from '../../../../database';
 import { RequestRepositoryAdapter } from '../../../request';
 import { AnalysisNodeValidator } from '../utils';
@@ -99,24 +99,21 @@ export async function updateAnalysisNodeRouteHandler(req: Request, res: Response
             entity.execution_status !== data.execution_status &&
             data.execution_status
         ) {
-            if (isEventComponentServiceUsable()) {
-                const eventService = useEventComponentService();
-                await eventService.command({
-                    command: 'create',
-                    data: {
-                        ref_type: DomainType.ANALYSIS_NODE,
-                        ref_id: entity.id,
-                        name: data.execution_status,
-                        scope: 'run',
-                        data: pickRecord(entity, [
-                            'analysis_id',
-                            'analysis_realm_id',
-                            'node_id',
-                            'node_realm_id',
-                        ]),
-                        expiring: true,
-                        expires_at: new Date(Date.now() + MONTH_IN_MS).toISOString(),
-                    },
+            if (isEventComponentCallerUsable()) {
+                const eventService = useEventComponentCaller();
+                await eventService.callCreate({
+                    ref_type: DomainType.ANALYSIS_NODE,
+                    ref_id: entity.id,
+                    name: data.execution_status,
+                    scope: 'run',
+                    data: pickRecord(entity, [
+                        'analysis_id',
+                        'analysis_realm_id',
+                        'node_id',
+                        'node_realm_id',
+                    ]),
+                    expiring: true,
+                    expires_at: new Date(Date.now() + MONTH_IN_MS).toISOString(),
                 });
             }
         }

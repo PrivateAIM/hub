@@ -14,8 +14,8 @@ import {
     isAnalysisAPICommandExecutable,
 } from '@privateaim/core-kit';
 import {
-    AnalysisBuilderBaseComponent,
-    AnalysisDistributorBaseComponent,
+    AnalysisBuilderComponentCaller,
+    AnalysisDistributorComponentCaller,
 } from '@privateaim/server-core-worker-kit';
 import type { Request } from 'routup';
 import { useDataSource } from 'typeorm-extension';
@@ -39,9 +39,9 @@ export class AnalysisManagerService {
 
     protected registryRepository: Repository<RegistryEntity>;
 
-    protected builderComponent : AnalysisBuilderBaseComponent;
+    protected builderCaller : AnalysisBuilderComponentCaller;
 
-    protected distributorComponent : AnalysisDistributorBaseComponent;
+    protected distributorCaller : AnalysisDistributorComponentCaller;
 
     constructor() {
         const dataSource = useDataSourceSync();
@@ -52,8 +52,8 @@ export class AnalysisManagerService {
 
         this.registryRepository = dataSource.getRepository(RegistryEntity);
 
-        this.builderComponent = new AnalysisBuilderBaseComponent();
-        this.distributorComponent = new AnalysisDistributorBaseComponent();
+        this.builderCaller = new AnalysisBuilderComponentCaller();
+        this.distributorCaller = new AnalysisDistributorComponentCaller();
     }
 
     async startBuild(
@@ -92,7 +92,7 @@ export class AnalysisManagerService {
             await this.repository.save(entity);
         }
 
-        await this.builderComponent.triggerExecute({
+        await this.builderCaller.callExecute({
             id: entity.id,
         });
 
@@ -143,7 +143,7 @@ export class AnalysisManagerService {
             await this.repository.save(entity);
         }
 
-        await this.distributorComponent.triggerExecute({
+        await this.distributorCaller.callExecute({
             id: entity.id,
         });
 
@@ -159,7 +159,7 @@ export class AnalysisManagerService {
             throw new BadRequestError(check.message);
         }
 
-        await this.builderComponent.triggerCheck({
+        await this.builderCaller.callCheck({
             id: entity.id,
         });
 

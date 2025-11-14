@@ -9,4 +9,5 @@ import type { QueueRouterRouting } from '../../../queue-router';
 
 export type QueueDispatchComponentCallerOptions = {
     queue: QueueRouterRouting,
+    logging?: boolean
 };

@@ -5,38 +5,25 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ObjectLiteral } from '@privateaim/kit';
-import type { ComponentWithTrigger } from '@privateaim/server-kit';
-import { buildQueueRouterPublishPayload, isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
+import type { ComponentMetadata } from '@privateaim/server-kit';
+import {
+    QueueDispatchComponentCaller,
+} from '@privateaim/server-kit';
 import { AnalysisBuilderCommand, AnalysisBuilderTaskQueueRouterRouting } from './constants';
 import type { AnalysisBuilderBasePayload, AnalysisBuilderExecutePayload } from './types';
 
-export class AnalysisBuilderBaseComponent implements ComponentWithTrigger {
-    async trigger(
-        key: string,
-        value: ObjectLiteral = {},
-        metadata: ObjectLiteral = {},
-    ): Promise<void> {
-        if (isQueueRouterUsable()) {
-            const payload = buildQueueRouterPublishPayload({
-                type: key,
-                data: value,
-                metadata: {
-                    routing: AnalysisBuilderTaskQueueRouterRouting,
-                    ...metadata,
-                },
-            });
-
-            const queueRouter = useQueueRouter();
-            await queueRouter.publish(payload);
-        }
+export class AnalysisBuilderComponentCaller extends QueueDispatchComponentCaller {
+    constructor() {
+        super({
+            queue: AnalysisBuilderTaskQueueRouterRouting,
+        });
     }
 
-    async triggerExecute(payload: AnalysisBuilderExecutePayload) {
-        return this.trigger(AnalysisBuilderCommand.EXECUTE, payload);
+    async callExecute(payload: AnalysisBuilderExecutePayload, metadata: ComponentMetadata = {}) {
+        return this.call(AnalysisBuilderCommand.EXECUTE, payload, metadata);
     }
 
-    async triggerCheck(payload: AnalysisBuilderBasePayload) {
-        return this.trigger(AnalysisBuilderCommand.CHECK, payload);
+    async callCheck(payload: AnalysisBuilderBasePayload, metadata: ComponentMetadata = {}) {
+        return this.call(AnalysisBuilderCommand.CHECK, payload, metadata);
     }
 }

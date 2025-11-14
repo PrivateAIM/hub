@@ -5,6 +5,4 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './event';
-export * from './log';
 export * from './logger';

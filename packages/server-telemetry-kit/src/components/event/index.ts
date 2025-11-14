@@ -7,4 +7,6 @@
 
 export * from './handlers';
 export * from './constants';
+export * from './module';
+export * from './singleton';
 export * from './types';

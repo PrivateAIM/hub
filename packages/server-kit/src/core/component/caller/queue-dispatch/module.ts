@@ -32,14 +32,19 @@ export class QueueDispatchComponentCaller<
         }
 
         const client = useQueueRouter();
-        await client.publish(buildQueueRouterPublishPayload({
-            type,
-            data,
-            metadata: {
-                ...metadata,
-                routing: this.options.queue,
+        await client.publish(
+            buildQueueRouterPublishPayload({
+                type,
+                data,
+                metadata: {
+                    ...metadata,
+                    routing: this.options.queue,
+                },
+            }),
+            {
+                logging: this.options.logging ?? true,
             },
-        }));
+        );
 
         return {};
     }

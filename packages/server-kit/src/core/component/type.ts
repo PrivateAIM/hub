@@ -16,16 +16,6 @@ export type ComponentMetadata = {
 
 export type ComponentStartFn = () => Promise<void> | void;
 
-export type ComponentTriggerFn = (
-    key: string,
-    value?: ObjectLiteral,
-    metadata?: ObjectLiteral
-) => Promise<void> | void;
-
-export interface ComponentWithTrigger {
-    trigger: ComponentTriggerFn
-}
-
 export type ComponentErrorOptions = {
     code?: string | null,
     message?: string
