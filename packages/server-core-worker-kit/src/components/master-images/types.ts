@@ -6,6 +6,11 @@
  */
 
 import type {
+    MasterImagesSynchronizerExecutePayload,
+    MasterImagesSynchronizerFailedEventPayload,
+    MaterImagesSynchronizerExecutionFinishedEventPayload,
+} from '../master-image-synchronizer';
+import type {
     MasterImagesBuildCommandPayload, MasterImagesBuildFailedEventPayload,
     MasterImagesBuildingEventPayload,
     MasterImagesBuiltEventPayload,
@@ -15,17 +20,13 @@ import type {
     MasterImagesPushCommandPayload,
     MasterImagesPushEventPayload, MasterImagesPushFailedEventPayload,
 } from './push';
-import type {
-    MasterImagesSynchronizationFailedEventPayload, MasterImagesSynchronizeCommandPayload,
-    MaterImagesSynchronizedEventPayload,
-} from './synchronize';
 
 //-----------------------------------------------------------------------
 
 type MasterImagesCommandMapRaw = {
     [MasterImagesCommand.BUILD]: MasterImagesBuildCommandPayload,
     [MasterImagesCommand.PUSH]: MasterImagesPushCommandPayload,
-    [MasterImagesCommand.SYNCHRONIZE]: MasterImagesSynchronizeCommandPayload,
+    [MasterImagesCommand.SYNCHRONIZE]: MasterImagesSynchronizerExecutePayload,
 };
 
 export type MasterImagesCommandMap = {
@@ -51,8 +52,8 @@ type MasterImagesEventMapRaw = {
     [MasterImagesEvent.PUSH_FAILED]: MasterImagesPushFailedEventPayload,
 
     [MasterImagesEvent.SYNCHRONIZING]: Record<string, any>,
-    [MasterImagesEvent.SYNCHRONIZED]: MaterImagesSynchronizedEventPayload,
-    [MasterImagesEvent.SYNCHRONIZATION_FAILED]: MasterImagesSynchronizationFailedEventPayload
+    [MasterImagesEvent.SYNCHRONIZED]: MaterImagesSynchronizerExecutionFinishedEventPayload,
+    [MasterImagesEvent.SYNCHRONIZATION_FAILED]: MasterImagesSynchronizerFailedEventPayload
 };
 
 export type MasterImagesEventMap = {

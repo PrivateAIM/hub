@@ -60,7 +60,7 @@ export class GitHubClient extends Client {
         return response.data;
     }
 
-    async cloneRepository(options: GitHubRepositoryCloneOptions) {
+    async cloneRepository(options: GitHubRepositoryCloneOptions) : Promise<string> {
         const tmpFilePath = path.join(tmpdir(), `${createNanoID()}.tar.gz`);
 
         await fs.promises.rm(options.destination, { force: true, recursive: true });
@@ -70,7 +70,7 @@ export class GitHubClient extends Client {
 
         const writable = fs.createWriteStream(tmpFilePath);
 
-        return new Promise<void>((resolve, reject) => {
+        return new Promise<string>((resolve, reject) => {
             writable.on('error', (err) => {
                 reject(err);
             });
@@ -85,7 +85,7 @@ export class GitHubClient extends Client {
                         },
                     }))
                     .then(() => fs.promises.rm(tmpFilePath))
-                    .then(() => resolve())
+                    .then(() => resolve(options.destination))
                     .catch((e) => reject(e));
             });
 
