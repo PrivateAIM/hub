@@ -1,5 +1,35 @@
 # Changelog
 
+## [0.8.22](https://github.com/PrivateAIM/hub/compare/v0.8.21...v0.8.22) (2025-11-14)
+
+
+### Features
+
+* analysis-distributor  ([#1285](https://github.com/PrivateAIM/hub/issues/1285)) ([5da60be](https://github.com/PrivateAIM/hub/commit/5da60be91c4ae27ea16369b5d7e3d09782118826))
+* rename run_status to execution_status ([e039cb7](https://github.com/PrivateAIM/hub/commit/e039cb7a6c436e279053b08c8de933d126637608))
+* replace AnalysisXXXStatus with ProcessStatus ([#1276](https://github.com/PrivateAIM/hub/issues/1276)) ([f4826cf](https://github.com/PrivateAIM/hub/commit/f4826cf0938d0171565a1aae880c5d724fbc107b))
+
+
+### Bug Fixes
+
+* **deps:** bump the minorandpatch group across 1 directory with 13 updates ([#1292](https://github.com/PrivateAIM/hub/issues/1292)) ([acdc7cb](https://github.com/PrivateAIM/hub/commit/acdc7cb8aa12e85818d69638c29ab79c74fbcbb6))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.8.21 to ^0.8.22
+    * @privateaim/core-kit bumped from ^0.8.21 to ^0.8.22
+    * @privateaim/telemetry-kit bumped from ^0.8.21 to ^0.8.22
+    * @privateaim/core-http-kit bumped from ^0.8.21 to ^0.8.22
+    * @privateaim/core-realtime-kit bumped from ^0.7.22 to ^0.7.23
+    * @privateaim/storage-kit bumped from ^0.8.21 to ^0.8.22
+  * peerDependencies
+    * @privateaim/core-kit bumped from ^0.8.21 to ^0.8.22
+    * @privateaim/storage-kit bumped from ^0.8.21 to ^0.8.22
+    * @privateaim/telemetry-kit bumped from ^0.8.21 to ^0.8.22
+
 ## [0.8.21](https://github.com/PrivateAIM/hub/compare/v0.8.20...v0.8.21) (2025-11-04)
 
 
