@@ -7,7 +7,6 @@
 
 export * from './build';
 export * from './push';
-export * from './synchronize';
 export * from './service';
 
 export * from './constants';

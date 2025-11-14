@@ -17,12 +17,13 @@ import {
 import { LogFlag } from '@privateaim/telemetry-kit';
 import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
 import {
+    buildDockerImage,
     cleanupDockerImage,
-    pullDockerImage, useCoreClient,
+    pullDockerImage,
+    useCoreClient,
     useDocker,
 } from '../../../../core';
 import { bundleDockerFile, packContainerWithAnalysis } from '../../helpers';
-import { buildDockerImage } from '../../../../core/docker/image-build';
 import { useAnalysisBuilderLogger } from '../../utils';
 
 export class AnalysisBuilderExecuteHandler implements ComponentHandler {

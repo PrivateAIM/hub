@@ -19,29 +19,10 @@ import { useEnv } from '../../config';
 import {
     executeMasterImagesBuildCommand,
     executeMasterImagesPushCommand,
-    executeMasterImagesSynchronizeCommand,
 } from './commands';
 
 function createHandlers() : QueueRouterHandlers<MasterImagesCommandMap> {
     return {
-        [MasterImagesCommand.SYNCHRONIZE]: async (
-            message,
-        ) => {
-            await Promise.resolve(message.data)
-                .then((data) => executeMasterImagesSynchronizeCommand(data))
-                .catch((err: Error) => {
-                    // todo: use logger
-                    console.error(err);
-
-                    const queue = useMasterImageQueueService();
-                    return queue.publishEvent({
-                        event: MasterImagesEvent.SYNCHRONIZATION_FAILED,
-                        data: {
-                            error: err,
-                        },
-                    });
-                });
-        },
         [MasterImagesCommand.BUILD]: async (
             message,
         ) => {

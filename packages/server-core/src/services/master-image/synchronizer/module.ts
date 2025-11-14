@@ -6,12 +6,11 @@
  */
 
 import { useDataSource } from 'typeorm-extension';
-import type { MasterImageGroupSyncData, MasterImageSyncData } from '@privateaim/server-core-worker-kit';
 import { MasterImageEntity, MasterImageGroupEntity } from '../../../database/domains';
 
 export type MasterImageSynchronizerExecuteContext = {
-    images: MasterImageSyncData[],
-    groups: MasterImageGroupSyncData[]
+    images: MasterImageSynchronizerImage[],
+    groups: MasterImageSynchronizerGroup[]
 };
 
 export type MasterImageSynchronizerResult<T> = {
@@ -39,7 +38,7 @@ export class MasterImageSynchronizerService {
     }
 
     protected async syncImages(
-        input: MasterImageSyncData[],
+        input: MasterImageSynchronizerImage[],
     ) : Promise<MasterImageSynchronizerResult<MasterImageEntity>> {
         const dataSource = await useDataSource();
 
@@ -98,7 +97,7 @@ export class MasterImageSynchronizerService {
     }
 
     protected async syncGroups(
-        input: MasterImageGroupSyncData[],
+        input: MasterImageSynchronizerGroup[],
     ) : Promise<MasterImageSynchronizerResult<MasterImageGroupEntity>> {
         const dataSource = await useDataSource();
 
