@@ -74,7 +74,7 @@
         "cross-env": "^10.1.0",
         "supertest": "^7.1.4",
         "ts-node": "^10.9.2",
-        "testcontainers": "^11.8.0"
+        "testcontainers": "^11.8.1"
     },
     "scripts": {
         "dev": "npm run cli -- start",
