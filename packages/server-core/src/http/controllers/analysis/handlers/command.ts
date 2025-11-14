@@ -15,7 +15,7 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useEnv } from '../../../../config';
 import { AnalysisEntity } from '../../../../database';
-import { useAnalysisManager } from '../../../../services';
+import { AnalysisBuilder, AnalysisConfigurator, AnalysisDistributor } from '../../../../services';
 import { AnalysisCommandValidator } from '../utils';
 
 /**
@@ -50,33 +50,36 @@ export async function handleAnalysisCommandRouteHandler(req: Request, res: Respo
         throw new ForbiddenError();
     }
     const ignoreApproval = useEnv('skipAnalysisApproval');
-    const manager = useAnalysisManager();
+
+    const distributor = new AnalysisDistributor();
+    const builder = new AnalysisBuilder();
+    const configurator = new AnalysisConfigurator();
 
     switch (data.command) {
         // Build Commands
         case AnalysisAPICommand.BUILD_STATUS:
-            entity = await manager.checkBuild(entity);
+            entity = await builder.check(entity);
             break;
         case AnalysisAPICommand.BUILD_START:
-            entity = await manager.startBuild(entity, req);
+            entity = await builder.start(entity, req);
             break;
         case AnalysisAPICommand.BUILD_STOP:
-            entity = await manager.stopBuild(entity, req);
+            entity = await builder.stop(entity, req);
             break;
 
         case AnalysisAPICommand.DISTRIBUTION_START:
-            entity = await manager.startDistribution(entity, req);
+            entity = await distributor.startDistribution(entity, req);
             break;
 
         // Configuration
         case AnalysisAPICommand.CONFIGURATION_LOCK:
-            entity = await manager.lock(entity, {
+            entity = await configurator.lock(entity, {
                 ignoreApproval,
                 request: req,
             });
             break;
         case AnalysisAPICommand.CONFIGURATION_UNLOCK:
-            entity = await manager.unlock(entity, {
+            entity = await configurator.unlock(entity, {
                 ignoreApproval,
                 request: req,
             });

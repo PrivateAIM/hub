@@ -17,25 +17,25 @@ import {
 } from '@privateaim/server-kit';
 import { wait } from '@privateaim/kit';
 import { useAnalysisMetadataComponent } from '../singleton';
-import type { AnalysisMetadataTaskMap } from '../types';
+import type { AnalysisMetadataEventMap } from '../types';
 import { AnalysisMetadataTaskQueue } from '../constants';
 
-export class AnalysisMetadataComponentCaller implements ComponentCaller<AnalysisMetadataTaskMap> {
-    protected directCaller : DirectComponentCaller<AnalysisMetadataTaskMap>;
+export class AnalysisMetadataComponentCaller implements ComponentCaller<AnalysisMetadataEventMap> {
+    protected directCaller : DirectComponentCaller<AnalysisMetadataEventMap>;
 
-    protected queueDispatchCaller : QueueDispatchComponentCaller<AnalysisMetadataTaskMap>;
+    protected queueDispatchCaller : QueueDispatchComponentCaller<AnalysisMetadataEventMap>;
 
     constructor() {
-        this.directCaller = new DirectComponentCaller<AnalysisMetadataTaskMap>(useAnalysisMetadataComponent());
-        this.queueDispatchCaller = new QueueDispatchComponentCaller<AnalysisMetadataTaskMap>({
+        this.directCaller = new DirectComponentCaller<AnalysisMetadataEventMap>(useAnalysisMetadataComponent());
+        this.queueDispatchCaller = new QueueDispatchComponentCaller<AnalysisMetadataEventMap>({
             queue: AnalysisMetadataTaskQueue,
         });
     }
 
-    async call<Key extends keyof AnalysisMetadataTaskMap>(
+    async call<Key extends keyof AnalysisMetadataEventMap>(
         key: Key & string,
-        ...payload: ComponentCallerPayload<AnalysisMetadataTaskMap[Key]>
-    ): Promise<ComponentCallerResponse<AnalysisMetadataTaskMap>> {
+        ...payload: ComponentCallerPayload<AnalysisMetadataEventMap[Key]>
+    ): Promise<ComponentCallerResponse<AnalysisMetadataEventMap>> {
         const [data, metadata] = payload;
 
         if (isQueueRouterUsable()) {
@@ -45,19 +45,19 @@ export class AnalysisMetadataComponentCaller implements ComponentCaller<Analysis
         return this.callDirect(key, data, metadata);
     }
 
-    async callDirect<Key extends keyof AnalysisMetadataTaskMap>(
+    async callDirect<Key extends keyof AnalysisMetadataEventMap>(
         key: Key & string,
-        ...payload: ComponentCallerPayload<AnalysisMetadataTaskMap[Key]>
-    ): Promise<ComponentCallerResponse<AnalysisMetadataTaskMap>> {
+        ...payload: ComponentCallerPayload<AnalysisMetadataEventMap[Key]>
+    ): Promise<ComponentCallerResponse<AnalysisMetadataEventMap>> {
         const [data, metadata] = payload;
 
         return this.directCaller.call(key, data, metadata);
     }
 
-    async callWithQueue<Key extends keyof AnalysisMetadataTaskMap>(
+    async callWithQueue<Key extends keyof AnalysisMetadataEventMap>(
         key: Key & string,
-        ...payload: ComponentCallerPayload<AnalysisMetadataTaskMap[Key]>
-    ): Promise<ComponentCallerResponse<AnalysisMetadataTaskMap>> {
+        ...payload: ComponentCallerPayload<AnalysisMetadataEventMap[Key]>
+    ): Promise<ComponentCallerResponse<AnalysisMetadataEventMap>> {
         const [data, metadata] = payload;
 
         return wait(500)

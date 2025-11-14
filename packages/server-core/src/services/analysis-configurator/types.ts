@@ -7,12 +7,12 @@
 
 import type { Request } from 'routup';
 
-export type AnalysisManagerUnlockOptions = {
+export type AnalysisConfiguratorUnlockOptions = {
     ignoreApproval?: boolean,
     request?: Request
 };
 
-export type AnalysisManagerLockOptions = {
+export type AnalysisConfiguratorLockOptions = {
     ignoreApproval?: boolean,
     request?: Request
 };

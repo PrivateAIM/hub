@@ -11,6 +11,10 @@ export enum AnalysisMetadataCommand {
     RECALC = 'recalc',
 }
 
+export enum AnalysisMetadataEvent {
+    RECALC_FINISHED = 'recalcFinished',
+}
+
 export const AnalysisMetadataTaskQueue = {
     type: QueueRouterRoutingType.WORK,
     key: 'analysisMetadataTasks',

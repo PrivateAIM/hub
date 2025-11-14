@@ -7,17 +7,17 @@
 
 import { isQueueRouterUsable } from '@privateaim/server-kit';
 import { singa } from 'singa';
-import { AnalysisManagerService } from './module';
+import { AnalysisDistributor } from './module';
 
-const instance = singa<AnalysisManagerService>({
+const instance = singa<AnalysisDistributor>({
     name: 'analysisManager',
-    factory: () => new AnalysisManagerService(),
+    factory: () => new AnalysisDistributor(),
 });
 
 export function isAnalysisManagerUsable() {
     return isQueueRouterUsable();
 }
 
-export function useAnalysisManager(): AnalysisManagerService {
+export function useAnalysisManager(): AnalysisDistributor {
     return instance.use();
 }

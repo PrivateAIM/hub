@@ -7,12 +7,16 @@
 
 import type { ObjectLiteralKeys } from '@privateaim/kit';
 import type { ComponentMetadata } from '@privateaim/server-kit';
-import type { AnalysisMetadataCommand } from './constants';
+import type { AnalysisEntity } from '../../database';
+import type { AnalysisMetadataCommand, AnalysisMetadataEvent } from './constants';
 
 export type AnalysisMetadataRecalcPayload = {
     analysisId: string
 };
 
-export type AnalysisMetadataTaskMap = ObjectLiteralKeys<{
-    [AnalysisMetadataCommand.RECALC]: [AnalysisMetadataRecalcPayload, ComponentMetadata]
+export type AnalysisMetadataRecalcExecutedPayload = AnalysisEntity;
+
+export type AnalysisMetadataEventMap = ObjectLiteralKeys<{
+    [AnalysisMetadataCommand.RECALC]: [AnalysisMetadataRecalcPayload, ComponentMetadata],
+    [AnalysisMetadataEvent.RECALC_FINISHED]: [AnalysisMetadataRecalcExecutedPayload, ComponentMetadata]
 }>;

@@ -7,14 +7,18 @@
 
 import type { Analysis } from '@privateaim/core-kit';
 import { AnalysisBucketType, NodeType } from '@privateaim/core-kit';
-import type { ComponentHandler } from '@privateaim/server-kit';
+import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
 import { isEqual } from 'smob';
 import type { DataSource, Repository } from 'typeorm';
 import { useDataSource } from 'typeorm-extension';
 import { AnalysisBucketFileEntity, AnalysisEntity, AnalysisNodeEntity } from '../../../../database';
-import type { AnalysisMetadataRecalcPayload } from '../../types';
+import type { AnalysisMetadataCommand } from '../../constants';
+import { AnalysisMetadataEvent } from '../../constants';
+import type { AnalysisMetadataEventMap, AnalysisMetadataRecalcPayload } from '../../types';
 
-export class AnalysisMetadataRecalcHandler implements ComponentHandler {
+export class AnalysisMetadataRecalcHandler implements ComponentHandler<
+AnalysisMetadataEventMap
+> {
     protected dataSource!: DataSource;
 
     protected analysisRepository!: Repository<AnalysisEntity>;
@@ -32,6 +36,7 @@ export class AnalysisMetadataRecalcHandler implements ComponentHandler {
 
     async handle(
         value: AnalysisMetadataRecalcPayload,
+        context: ComponentHandlerContext<AnalysisMetadataEventMap, AnalysisMetadataCommand.RECALC>,
     ): Promise<void> {
         const entity = await this.analysisRepository.findOneBy({
             id: value.analysisId,
@@ -52,6 +57,8 @@ export class AnalysisMetadataRecalcHandler implements ComponentHandler {
         if (this.hasChanged(cloned, entity)) {
             await this.analysisRepository.save(entity);
         }
+
+        context.handle(AnalysisMetadataEvent.RECALC_FINISHED, entity);
     }
 
     async querySelf(entity: AnalysisEntity) : Promise<void> {

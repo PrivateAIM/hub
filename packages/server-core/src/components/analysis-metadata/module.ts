@@ -10,9 +10,9 @@ import {
 } from '@privateaim/server-kit';
 import { AnalysisMetadataCommand } from './constants';
 import { AnalysisMetadataRecalcHandler } from './handlers';
-import type { AnalysisMetadataTaskMap } from './types';
+import type { AnalysisMetadataEventMap } from './types';
 
-export class AnalysisMetadataComponent extends BaseComponent<AnalysisMetadataTaskMap> {
+export class AnalysisMetadataComponent extends BaseComponent<AnalysisMetadataEventMap> {
     constructor() {
         super();
 
