@@ -5,19 +5,13 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentEventMap, ComponentEventMapValue } from '../type';
 import type { ObjectLiteral } from '../../../type';
+import type { ComponentEventMap, ComponentEventMapValue } from '../type';
 
 export type ComponentCallerPayload<
     EventMapValue extends ComponentEventMapValue = ComponentEventMapValue,
     Metadata extends ObjectLiteral = ObjectLiteral,
 > = [data: EventMapValue[0], metadata: EventMapValue[1] & Metadata];
-
-export type ComponentCallerResponse<
-    EventMap extends ComponentEventMap = ComponentEventMap,
-> = {
-    [K in keyof EventMap]?: EventMap[K][0]
-};
 
 export type ComponentCallerFnArgsForMap<
     EventMap extends ComponentEventMap = ComponentEventMap,
@@ -35,5 +29,5 @@ export interface ComponentCaller<
 > {
     call(
         ...input: ComponentCallerFnArgsForMap<EventMap, Metadata>
-    ) : Promise<ComponentCallerResponse<EventMap>>;
+    ) : Promise<void>;
 }

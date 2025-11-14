@@ -6,8 +6,9 @@
  */
 
 import { createNanoID } from '@privateaim/kit';
-import type { ComponentCaller, ComponentCallerPayload, ComponentCallerResponse } from '../types';
+import type { ComponentCaller, ComponentCallerPayload } from '../types';
 import type { Component, ComponentEventMap, ComponentHandleOptions } from '../../type';
+import type { ComponentDirectCallerResponse } from './types';
 
 export class DirectComponentCaller<
     EventMap extends ComponentEventMap = ComponentEventMap,
@@ -27,7 +28,22 @@ export class DirectComponentCaller<
     async call<Key extends keyof EventMap>(
         key: Key & string,
         ...payload: ComponentCallerPayload<EventMap[Key]>
-    ): Promise<ComponentCallerResponse<EventMap>> {
+    ): Promise<void> {
+        const [data, metadata] = payload;
+
+        await this.callWithResponse(key, data, metadata);
+    }
+
+    /**
+     * Call a specific handler and collect all unhandled events.
+     *
+     * @param key
+     * @param payload
+     */
+    async callWithResponse<Key extends keyof EventMap>(
+        key: Key & string,
+        ...payload: ComponentCallerPayload<EventMap[Key]>
+    ): Promise<ComponentDirectCallerResponse<EventMap>> {
         const [data, metadata] = payload;
         if (!this.component.handle) {
             throw new Error(`Component ${this.component.constructor.name} can not be called.`);
@@ -35,7 +51,7 @@ export class DirectComponentCaller<
 
         metadata.correlationId = metadata.correlationId || createNanoID();
 
-        const events : ComponentCallerResponse<EventMap> = {};
+        const events : ComponentDirectCallerResponse<EventMap> = {};
 
         const options : ComponentHandleOptions<EventMap> = {
             handle: (childValue, childContext) => {

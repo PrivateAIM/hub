@@ -8,7 +8,7 @@
 import type {
     ComponentCaller,
     ComponentCallerPayload,
-    ComponentCallerResponse,
+    ComponentDirectCallerResponse,
 } from '@privateaim/server-kit';
 import {
     DirectComponentCaller,
@@ -35,29 +35,30 @@ export class AnalysisMetadataComponentCaller implements ComponentCaller<Analysis
     async call<Key extends keyof AnalysisMetadataEventMap>(
         key: Key & string,
         ...payload: ComponentCallerPayload<AnalysisMetadataEventMap[Key]>
-    ): Promise<ComponentCallerResponse<AnalysisMetadataEventMap>> {
+    ): Promise<void> {
         const [data, metadata] = payload;
 
         if (isQueueRouterUsable()) {
-            return this.callWithQueue(key, data, metadata);
+            await this.callWithQueue(key, data, metadata);
+            return;
         }
 
-        return this.callDirect(key, data, metadata);
+        await this.callDirect(key, data, metadata);
     }
 
     async callDirect<Key extends keyof AnalysisMetadataEventMap>(
         key: Key & string,
         ...payload: ComponentCallerPayload<AnalysisMetadataEventMap[Key]>
-    ): Promise<ComponentCallerResponse<AnalysisMetadataEventMap>> {
+    ): Promise<ComponentDirectCallerResponse<AnalysisMetadataEventMap>> {
         const [data, metadata] = payload;
 
-        return this.directCaller.call(key, data, metadata);
+        return this.directCaller.callWithResponse(key, data, metadata);
     }
 
     async callWithQueue<Key extends keyof AnalysisMetadataEventMap>(
         key: Key & string,
         ...payload: ComponentCallerPayload<AnalysisMetadataEventMap[Key]>
-    ): Promise<ComponentCallerResponse<AnalysisMetadataEventMap>> {
+    ): Promise<void> {
         const [data, metadata] = payload;
 
         return wait(500)

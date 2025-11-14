@@ -53,7 +53,7 @@ export async function executeBucketRouteDeleteHandler(req: Request, res: Respons
     const component = useBucketComponent();
     const caller = new DirectComponentCaller(component);
 
-    const output = await caller.call(
+    const output = await caller.callWithResponse(
         BucketCommand.DELETE,
         {
             id: entity.id,

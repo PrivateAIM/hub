@@ -7,7 +7,7 @@
 
 import type { Component, ComponentEventMap, ComponentHandleOptions } from '../../type';
 import { buildQueueRouterPublishPayload, isQueueRouterUsable, useQueueRouter } from '../../../queue-router';
-import type { ComponentCaller, ComponentCallerPayload, ComponentCallerResponse } from '../types';
+import type { ComponentCaller, ComponentCallerPayload } from '../types';
 import type { QueueSelfComponentCallerOptions } from './types';
 import { useLogger } from '../../../../services';
 
@@ -47,7 +47,7 @@ export class QueueWorkerComponentCaller<
     async call<Key extends keyof EventMap>(
         key: Key & string,
         ...payload: ComponentCallerPayload<EventMap[Key]>
-    ): Promise<ComponentCallerResponse<EventMap>> {
+    ): Promise<void> {
         const [data, metadata] = payload;
         if (!this.component.handle) {
             throw new Error(`Component ${this.component.constructor.name} can not be called.`);
@@ -86,7 +86,5 @@ export class QueueWorkerComponentCaller<
             metadata,
             options,
         );
-
-        return {};
     }
 }

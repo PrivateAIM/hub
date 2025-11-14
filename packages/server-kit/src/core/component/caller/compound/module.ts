@@ -7,7 +7,7 @@
 
 import type { ObjectLiteral } from '../../../../type';
 import type { ComponentEventMap } from '../../type';
-import type { ComponentCaller, ComponentCallerPayload, ComponentCallerResponse } from '../types';
+import type { ComponentCaller, ComponentCallerPayload } from '../types';
 
 export class CompoundComponentCaller<
     EventMap extends ComponentEventMap = ComponentEventMap,
@@ -22,14 +22,16 @@ export class CompoundComponentCaller<
     async call<Key extends keyof ComponentEventMap>(
         key: Key & string,
         ...payload: ComponentCallerPayload<ComponentEventMap[Key], Metadata>
-    ): Promise<ComponentCallerResponse<ComponentEventMap>> {
+    ): Promise<void> {
         const [data, metadata] = payload;
 
         for (let i = 0; i < this.callers.length; i++) {
             const caller = this.callers[i];
 
             try {
-                return await caller.call(key, data, metadata);
+                await caller.call(key, data, metadata);
+
+                return;
             } catch (e) {
                 // continue;
             }

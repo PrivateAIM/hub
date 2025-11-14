@@ -8,7 +8,7 @@
 import type { ComponentErrorOptions } from './type';
 
 export class ComponentError extends Error {
-    public code?: string | null;
+    public readonly code?: string | null;
 
     constructor(input: ComponentErrorOptions) {
         super(input.message, { cause: input.cause });

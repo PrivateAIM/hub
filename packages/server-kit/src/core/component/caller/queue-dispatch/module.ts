@@ -6,7 +6,7 @@
  */
 
 import type { ComponentEventMap } from '../../type';
-import type { ComponentCaller, ComponentCallerPayload, ComponentCallerResponse } from '../types';
+import type { ComponentCaller, ComponentCallerPayload } from '../types';
 import { buildQueueRouterPublishPayload, isQueueRouterUsable, useQueueRouter } from '../../../queue-router';
 import { useLogger } from '../../../../services';
 import type { QueueDispatchComponentCallerOptions } from './types';
@@ -23,12 +23,12 @@ export class QueueDispatchComponentCaller<
     async call<K extends keyof EventMap>(
         type: K & string,
         ...payload: ComponentCallerPayload<EventMap[K]>
-    ): Promise<ComponentCallerResponse<EventMap>> {
+    ): Promise<void> {
         const [data, metadata] = payload;
 
         if (!isQueueRouterUsable()) {
             useLogger().warn(`Can not publish ${type} event.`);
-            return {};
+            return;
         }
 
         const client = useQueueRouter();
@@ -45,7 +45,5 @@ export class QueueDispatchComponentCaller<
                 logging: this.options.logging ?? true,
             },
         );
-
-        return {};
     }
 }

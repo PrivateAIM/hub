@@ -48,7 +48,7 @@ export async function executeBucketRouteCreateHandler(req: Request, res: Respons
     const component = useBucketComponent();
     const caller = new DirectComponentCaller(component);
 
-    const output = await caller.call(
+    const output = await caller.callWithResponse(
         BucketCommand.CREATE,
         {
             actor_id: actor.id,
