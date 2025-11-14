@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.8.22](https://github.com/PrivateAIM/hub/compare/v0.8.21...v0.8.22) (2025-11-14)
+
+
+### Features
+
+* analysis-distributor  ([#1285](https://github.com/PrivateAIM/hub/issues/1285)) ([5da60be](https://github.com/PrivateAIM/hub/commit/5da60be91c4ae27ea16369b5d7e3d09782118826))
+* component caller(s) implementation ([#1295](https://github.com/PrivateAIM/hub/issues/1295)) ([3b21fe1](https://github.com/PrivateAIM/hub/commit/3b21fe1b2cf3d47332722578cff67359442d84eb))
+* storage components + component/handler refactoring ([#1289](https://github.com/PrivateAIM/hub/issues/1289)) ([c22db47](https://github.com/PrivateAIM/hub/commit/c22db471bb2a7e71f33a299926f38fde551efc39))
+
+
+### Bug Fixes
+
+* **deps:** bump the minorandpatch group across 1 directory with 13 updates ([#1292](https://github.com/PrivateAIM/hub/issues/1292)) ([acdc7cb](https://github.com/PrivateAIM/hub/commit/acdc7cb8aa12e85818d69638c29ab79c74fbcbb6))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.8.21 to ^0.8.22
+    * @privateaim/kit bumped from ^0.8.21 to ^0.8.22
+    * @privateaim/core-http-kit bumped from ^0.8.21 to ^0.8.22
+    * @privateaim/telemetry-kit bumped from ^0.8.21 to ^0.8.22
+    * @privateaim/server-kit bumped from ^0.8.21 to ^0.8.22
+    * @privateaim/server-telemetry-kit bumped from ^0.8.21 to ^0.8.22
+    * @privateaim/server-core-worker-kit bumped from ^0.7.22 to ^0.7.23
+    * @privateaim/storage-kit bumped from ^0.8.21 to ^0.8.22
+
 ## [0.8.21](https://github.com/PrivateAIM/hub/compare/v0.8.20...v0.8.21) (2025-11-04)
 
 
