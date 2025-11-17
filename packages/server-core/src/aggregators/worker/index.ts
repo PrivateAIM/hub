@@ -7,4 +7,5 @@
 
 export * from './analysis-builder';
 export * from './analysis-distributor';
-export * from './master-images';
+export * from './master-image-builder';
+export * from './master-image-synchronizer';

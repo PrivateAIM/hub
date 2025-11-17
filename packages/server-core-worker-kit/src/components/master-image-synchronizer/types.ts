@@ -22,23 +22,24 @@ export type MasterImageSynchronizerGroup = {
     path: string,
     virtualPath: string,
 };
-export type MasterImagesSynchronizerExecutePayload = {
+export type MasterImageSynchronizerExecutePayload = {
     owner: string,
     repository: string,
     branch: string
 };
-export type MasterImagesSynchronizerFailedEventPayload = {
+
+export type MasterImageSynchronizerFailedEventPayload = {
     error: Error
 };
 
-export type MaterImagesSynchronizerExecutionFinishedEventPayload = {
+export type MasterImageSynchronizerExecutionFinishedPayload = {
     images: MasterImageSynchronizerImage[],
     groups: MasterImageSynchronizerGroup[]
 };
 
 export type MasterImageSynchronizerEventMap = ObjectLiteralKeys<{
-    [MasterImageSynchronizerCommand.EXECUTE]: [MasterImagesSynchronizerExecutePayload, ComponentMetadata],
-    [MasterImageSynchronizerEvent.EXECUTION_STARTED]: [MasterImagesSynchronizerExecutePayload, ComponentMetadata],
-    [MasterImageSynchronizerEvent.EXECUTION_FAILED]: [MasterImagesSynchronizerFailedEventPayload, ComponentMetadata],
-    [MasterImageSynchronizerEvent.EXECUTION_FINISHED]: [MaterImagesSynchronizerExecutionFinishedEventPayload, ComponentMetadata],
+    [MasterImageSynchronizerCommand.EXECUTE]: [MasterImageSynchronizerExecutePayload, ComponentMetadata],
+    [MasterImageSynchronizerEvent.EXECUTION_STARTED]: [MasterImageSynchronizerExecutePayload, ComponentMetadata],
+    [MasterImageSynchronizerEvent.EXECUTION_FAILED]: [MasterImageSynchronizerFailedEventPayload, ComponentMetadata],
+    [MasterImageSynchronizerEvent.EXECUTION_FINISHED]: [MasterImageSynchronizerExecutionFinishedPayload, ComponentMetadata],
 }>;

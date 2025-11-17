@@ -6,6 +6,7 @@
  */
 
 import { deserialize, serialize } from '@authup/kit';
+import { ProcessStatus } from '@privateaim/kit';
 import {
     Column,
     CreateDateColumn,
@@ -21,6 +22,12 @@ import { MasterImageCommandArgument } from '@privateaim/core-kit';
 export class MasterImageEntity implements MasterImage {
     @PrimaryGeneratedColumn('uuid')
         id: string;
+
+    @Index()
+    @Column({
+        type: 'varchar', length: 64, nullable: true, default: null,
+    })
+        build_status: `${ProcessStatus}` | null;
 
     @Column({ type: 'varchar', nullable: true, length: 512 })
         path: string | null;

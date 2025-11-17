@@ -5,21 +5,20 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import { WEEK_IN_MS, createNanoID } from '@privateaim/kit';
+import { HOUR_IN_MS, WEEK_IN_MS, createNanoID } from '@privateaim/kit';
 import type { Cache } from '../cache';
-import type { TaskEntry, TaskEntryResolved, TaskTypeMap } from './types';
+import type {
+    TaskEntry, TaskEntryResolved, TaskManagerCreateOptions, TaskTypeMap,
+} from './types';
 import { isTaskEntry } from './helpers';
 
 export class TaskManager<
     EntityMap extends TaskTypeMap = TaskTypeMap,
 > {
-    protected prefix : string;
-
     protected driver : Cache;
 
     constructor(driver: Cache) {
         this.driver = driver;
-        this.prefix = 'task';
     }
 
     /**
@@ -27,12 +26,26 @@ export class TaskManager<
      *
      * @param type
      * @param data
+     * @param options
      */
     async create<Key extends keyof EntityMap>(
         type: Key & string,
         data: EntityMap[Key],
+        options: TaskManagerCreateOptions<EntityMap, Key> = {},
     ) : Promise<string> {
-        const id = `${this.prefix}:${createNanoID()}`;
+        let id : string;
+        if (options.key) {
+            id = `task:${options.key(type, data)}`;
+        } else {
+            id = `task:${createNanoID()}`;
+        }
+
+        if (options.lock) {
+            const isLocked = await this.isLocked(id);
+            if (isLocked) {
+                return id;
+            }
+        }
 
         const entity : TaskEntry = {
             data,
@@ -42,6 +55,10 @@ export class TaskManager<
         await this.driver.set(id, entity, {
             ttl: WEEK_IN_MS,
         });
+
+        if (options.lock) {
+            await this.createLock(id);
+        }
 
         return id;
     }
@@ -85,10 +102,30 @@ export class TaskManager<
             return undefined;
         }
 
+        await this.clearLock(id);
+
         if (autoDelete) {
             await this.driver.drop(id);
         }
 
         return entity as TaskEntryResolved<EntityMap>;
+    }
+
+    // -------------------------------------------------
+
+    protected async createLock(id: string) {
+        await this.driver.set(`taskLock:${id}`, true, {
+            ttl: HOUR_IN_MS,
+        });
+    }
+
+    protected async clearLock(id: string) {
+        await this.driver.drop(`taskLock:${id}`);
+    }
+
+    protected async isLocked(id: string) : Promise<boolean> {
+        const isActive = await this.driver.get(`taskLock:${id}`);
+
+        return !!isActive;
     }
 }

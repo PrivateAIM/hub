@@ -5,10 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { ProcessStatus } from '@privateaim/kit';
 import type { MasterImageCommandArgument } from './types';
 
 export interface MasterImage {
     id: string;
+
+    build_status: `${ProcessStatus}` | null;
 
     path: string | null;
 

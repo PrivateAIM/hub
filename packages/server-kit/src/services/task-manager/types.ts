@@ -22,3 +22,11 @@ export type TaskTypeMap = {
 export type TaskEntryResolved<EntityMap extends TaskTypeMap = TaskTypeMap> = {
     [Key in keyof EntityMap]?: TaskEntry<EntityMap[Key], Key & string>;
 }[keyof EntityMap];
+
+export type TaskManagerCreateOptions<
+    EntityMap extends ObjectLiteral = ObjectLiteral,
+    Key extends keyof EntityMap = keyof EntityMap,
+> = {
+    lock?: boolean;
+    key?: (type: Key & string, data: EntityMap[Key]) => string
+};

@@ -13,16 +13,16 @@ import {
     MasterImageSynchronizerCommand,
     MasterImageSynchronizerTaskQueueRouterRouting,
 } from './constants';
-import type { MasterImagesSynchronizerExecutePayload } from './types';
+import type { MasterImageSynchronizerEventMap, MasterImageSynchronizerExecutePayload } from './types';
 
-export class MasterImageSynchronizerComponentCaller extends QueueDispatchComponentCaller {
+export class MasterImageSynchronizerComponentCaller extends QueueDispatchComponentCaller<MasterImageSynchronizerEventMap> {
     constructor() {
         super({
             queue: MasterImageSynchronizerTaskQueueRouterRouting,
         });
     }
 
-    async callExecute(payload: MasterImagesSynchronizerExecutePayload, metadata: ComponentMetadata = {}) {
+    async callExecute(payload: MasterImageSynchronizerExecutePayload, metadata: ComponentMetadata = {}) {
         return this.call(MasterImageSynchronizerCommand.EXECUTE, payload, metadata);
     }
 }

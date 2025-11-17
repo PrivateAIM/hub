@@ -7,8 +7,8 @@
 
 import type {
     MasterImageSynchronizerEventMap,
-    MasterImagesSynchronizerExecutePayload,
-    MaterImagesSynchronizerExecutionFinishedEventPayload,
+    MasterImageSynchronizerExecutePayload,
+    MasterImageSynchronizerExecutionFinishedPayload,
 } from '@privateaim/server-core-worker-kit';
 import {
     MasterImageSynchronizerCommand,
@@ -38,7 +38,7 @@ MasterImageSynchronizerCommand.EXECUTE
     }
 
     async handle(
-        payload: MasterImagesSynchronizerExecutePayload,
+        payload: MasterImageSynchronizerExecutePayload,
         context: ComponentHandlerContext<MasterImageSynchronizerEventMap, MasterImageSynchronizerCommand.EXECUTE>,
     ) {
         try {
@@ -62,7 +62,7 @@ MasterImageSynchronizerCommand.EXECUTE
     }
 
     async handleInternal(
-        payload: MasterImagesSynchronizerExecutePayload,
+        payload: MasterImageSynchronizerExecutePayload,
         context: ComponentHandlerContext<MasterImageSynchronizerEventMap, MasterImageSynchronizerCommand.EXECUTE>,
     ) {
         await context.handle(
@@ -86,8 +86,8 @@ MasterImageSynchronizerCommand.EXECUTE
         );
     }
 
-    protected async scanDirectory(directoryPath : string) : Promise<MaterImagesSynchronizerExecutionFinishedEventPayload> {
-        const output : MaterImagesSynchronizerExecutionFinishedEventPayload = {
+    protected async scanDirectory(directoryPath : string) : Promise<MasterImageSynchronizerExecutionFinishedPayload> {
+        const output : MasterImageSynchronizerExecutionFinishedPayload = {
             images: [],
             groups: [],
         };

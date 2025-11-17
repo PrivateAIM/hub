@@ -11,11 +11,16 @@ import {
     AnalysisBuilderEventQueueRouterRouting,
     AnalysisBuilderTaskQueueRouterRouting,
     AnalysisDistributorEventQueueRouterRouting,
-    AnalysisDistributorTaskQueueRouterRouting, MasterImageSynchronizerEventQueueRouterRouting,
+    AnalysisDistributorTaskQueueRouterRouting,
+    MasterImageBuilderEventQueueRouterRouting,
+    MasterImageBuilderTaskQueueRouterRouting,
+    MasterImageSynchronizerEventQueueRouterRouting,
     MasterImageSynchronizerTaskQueueRouterRouting,
 } from '@privateaim/server-core-worker-kit';
 import {
-    createMasterImagesComponent, MasterImageSynchronizerComponent,
+    MasterImageBuilderComponent,
+    MasterImageSynchronizerComponent,
+
     useAnalysisBuilderComponent,
     useAnalysisDistributorComponent,
 } from '../components';
@@ -54,14 +59,19 @@ export function createConfig() : Config {
         ),
 
         new QueueWorkerComponentCaller(
+            new MasterImageBuilderComponent(),
+            {
+                publishQueue: MasterImageBuilderEventQueueRouterRouting,
+                consumeQueue: MasterImageBuilderTaskQueueRouterRouting,
+            },
+        ),
+        new QueueWorkerComponentCaller(
             new MasterImageSynchronizerComponent(),
             {
                 publishQueue: MasterImageSynchronizerEventQueueRouterRouting,
-                consumeQueue: MasterImageSynchronizerTaskQueueRouterRouting
-            }
+                consumeQueue: MasterImageSynchronizerTaskQueueRouterRouting,
+            },
         ),
-
-        createMasterImagesComponent(),
     ];
 
     return {
