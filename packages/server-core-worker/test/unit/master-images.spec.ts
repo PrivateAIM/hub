@@ -4,25 +4,33 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { scanMasterImagesDirectory } from '../../src/components/master-images/commands';
-import { GitHubClient } from '../../src/core';
-import { MASTER_IMAGES_DIRECTORY_PATH } from '../../src/constants';
+import type { MasterImageSynchronizerEventMap } from '@privateaim/server-core-worker-kit';
+import {
+    MasterImageSynchronizerCommand,
+} from '@privateaim/server-core-worker-kit';
+import { DirectComponentCaller } from '@privateaim/server-kit';
+import { MasterImageSynchronizerComponent } from '../../src';
 
 describe('components > master-images', () => {
     it('should clone master images to directory', async () => {
-        const gitHubClient = new GitHubClient();
-        await gitHubClient.cloneRepository({
-            owner: 'PrivateAim',
-            repository: 'master-images',
-            branch: 'develop',
-            destination: MASTER_IMAGES_DIRECTORY_PATH,
-        });
-    });
+        const caller = new DirectComponentCaller<MasterImageSynchronizerEventMap>(
+            new MasterImageSynchronizerComponent(),
+        );
 
-    it('should sync master images from directory', async () => {
-        const { images, groups } = await scanMasterImagesDirectory();
+        const output = await caller.callWithResponse(
+            MasterImageSynchronizerCommand.EXECUTE,
+            {
+                owner: 'PrivateAim',
+                repository: 'master-images',
+                branch: 'develop',
+            },
+            {},
+        );
+        expect(output.executionFinished).toBeDefined();
 
-        expect(images.length).toBeGreaterThan(0);
-        expect(groups.length).toBeGreaterThan(0);
+        const { executionFinished: data } = output;
+
+        expect(data.images.length).toBeGreaterThan(0);
+        expect(data.groups.length).toBeGreaterThan(0);
     });
 });
