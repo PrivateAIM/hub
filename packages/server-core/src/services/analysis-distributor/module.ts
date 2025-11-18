@@ -20,7 +20,7 @@ import { useDataSource } from 'typeorm-extension';
 import type { Repository } from 'typeorm';
 import {
     AnalysisEntity,
-    AnalysisNodeEntity,
+    AnalysisNodeEntity, RegistryEntity,
     useDataSourceSync,
 } from '../../database';
 import { RequestRepositoryAdapter } from '../../http/request';
@@ -30,6 +30,8 @@ export class AnalysisDistributor {
 
     protected analysisNodeRepository: Repository<AnalysisNodeEntity>;
 
+    protected registryRepository: Repository<RegistryEntity>;
+
     protected caller : AnalysisDistributorComponentCaller;
 
     constructor() {
@@ -37,6 +39,7 @@ export class AnalysisDistributor {
 
         this.repository = dataSource.getRepository(AnalysisEntity);
         this.analysisNodeRepository = dataSource.getRepository(AnalysisNodeEntity);
+        this.registryRepository = dataSource.getRepository(RegistryEntity);
 
         this.caller = new AnalysisDistributorComponentCaller();
     }
@@ -52,25 +55,9 @@ export class AnalysisDistributor {
             throw new BadRequestError(check.message);
         }
 
-        const analysisNodes = await this.analysisNodeRepository.find({
-            where: {
-                analysis_id: entity.id,
-            },
-            relations: ['node'],
-        });
+        await this.assignRegistry(entity);
 
-        for (let i = 0; i < analysisNodes.length; i++) {
-            if (analysisNodes[i].approval_status !== AnalysisNodeApprovalStatus.APPROVED) {
-                throw new BadRequestError('Not all nodes have approved the analysis yet.');
-            }
-
-            if (
-                analysisNodes[i].node &&
-                !analysisNodes[i].node.registry_id
-            ) {
-                throw new BadRequestError(`The node ${analysisNodes[i].node.name} is not assigned to a registry yet.`);
-            }
-        }
+        await this.checkNodes(entity);
 
         entity.distribution_status = ProcessStatus.STARTING;
 
@@ -90,6 +77,52 @@ export class AnalysisDistributor {
         });
 
         return entity;
+    }
+
+    // ---------------------------------------------------------------
+
+    protected async assignRegistry(entity: AnalysisEntity) {
+        if (!entity.registry_id) {
+            const [registry] = await this.registryRepository.find({
+                take: 1,
+            });
+
+            if (!registry) {
+                throw new BadRequestError('No registry is registered.');
+            }
+
+            entity.registry_id = registry.id;
+        }
+
+        return entity;
+    }
+
+    /**
+     * todo: move this to metadata component.
+     *
+     * @param entity
+     * @protected
+     */
+    protected async checkNodes(entity: AnalysisEntity) {
+        const analysisNodes = await this.analysisNodeRepository.find({
+            where: {
+                analysis_id: entity.id,
+            },
+            relations: ['node'],
+        });
+
+        for (let i = 0; i < analysisNodes.length; i++) {
+            if (analysisNodes[i].approval_status !== AnalysisNodeApprovalStatus.APPROVED) {
+                throw new BadRequestError('Not all nodes have approved the analysis yet.');
+            }
+
+            if (
+                analysisNodes[i].node &&
+                !analysisNodes[i].node.registry_id
+            ) {
+                throw new BadRequestError(`The node ${analysisNodes[i].node.name} is not assigned to a registry yet.`);
+            }
+        }
     }
 
     // ---------------------------------------------------------------

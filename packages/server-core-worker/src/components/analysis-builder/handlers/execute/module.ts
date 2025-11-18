@@ -19,11 +19,10 @@ import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/serv
 import {
     buildDockerImage,
     cleanupDockerImage,
-    pullDockerImage,
     useCoreClient,
     useDocker,
 } from '../../../../core';
-import { bundleDockerFile, packContainerWithAnalysis } from '../../helpers';
+import { generateDockerFileContent, packContainerWithAnalysis } from '../../helpers';
 import { useAnalysisBuilderLogger } from '../../utils';
 
 export class AnalysisBuilderExecuteHandler implements ComponentHandler {
@@ -67,27 +66,17 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler {
         const client = useCoreClient();
 
         const analysis = await client.analysis.getOne(value.id);
-        const registry = await client.registry.getOne(analysis.registry_id, {
-            fields: ['+account_secret'],
-        });
-
-        // -----------------------------------------------------------------------------------
-
-        const { content: dockerFile, masterImagePath } = await bundleDockerFile({
-            entity: analysis,
-            hostname: registry.host,
-        });
 
         // -----------------------------------------------------------------------------------
 
         useAnalysisBuilderLogger().info({
-            message: `Pulling docker image ${masterImagePath}:latest`,
+            message: 'Generating docker image.',
             command: AnalysisBuilderCommand.EXECUTE,
             analysis_id: analysis.id,
             [LogFlag.REF_ID]: analysis.id,
         });
 
-        await pullDockerImage(`${masterImagePath}:${REGISTRY_ARTIFACT_TAG_LATEST}`);
+        const content = await generateDockerFileContent(analysis);
 
         // -----------------------------------------------------------------------------------
 
@@ -101,7 +90,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler {
         const imageURL = analysis.id;
 
         await buildDockerImage({
-            content: dockerFile,
+            content,
             imageName: imageURL,
         });
 
@@ -120,10 +109,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler {
         try {
             // -----------------------------------------------------------------------------------
 
-            await packContainerWithAnalysis(container, {
-                entity: analysis,
-                masterImagePath,
-            });
+            await packContainerWithAnalysis(container, analysis);
 
             // -----------------------------------------------------------------------------------
 

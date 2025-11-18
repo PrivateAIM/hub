@@ -11,20 +11,17 @@ import { ProcessStatus } from '@privateaim/kit';
 import type { AnalysisBuilderComponentCaller } from '@privateaim/server-core-worker-kit';
 import type { Request } from 'routup';
 import type { Repository } from 'typeorm';
-import { AnalysisEntity, RegistryEntity, useDataSourceSync } from '../../database';
+import { AnalysisEntity, useDataSourceSync } from '../../database';
 import { RequestRepositoryAdapter } from '../../http/request';
 
 export class AnalysisBuilder {
     protected repository : Repository<AnalysisEntity>;
-
-    protected registryRepository: Repository<RegistryEntity>;
 
     protected caller : AnalysisBuilderComponentCaller;
 
     constructor() {
         const dataSource = useDataSourceSync();
         this.repository = dataSource.getRepository(AnalysisEntity);
-        this.registryRepository = dataSource.getRepository(RegistryEntity);
     }
 
     async start(
@@ -38,18 +35,6 @@ export class AnalysisBuilder {
         const check = isAnalysisAPICommandExecutable(entity, AnalysisAPICommand.BUILD_START);
         if (!check.success) {
             throw new BadRequestError(check.message);
-        }
-
-        if (!entity.registry_id) {
-            const [registry] = await this.registryRepository.find({
-                take: 1,
-            });
-
-            if (!registry) {
-                throw new BadRequestError('No registry is registered.');
-            }
-
-            entity.registry_id = registry.id;
         }
 
         entity.build_status = ProcessStatus.STARTING;

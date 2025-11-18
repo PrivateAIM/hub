@@ -5,33 +5,20 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { getHostNameFromString } from '@privateaim/kit';
+import type { Analysis, MasterImage, MasterImageCommandArgument } from '@privateaim/core-kit';
 import { AnalysisBucketType, AnalysisContainerPath } from '@privateaim/core-kit';
 import type { BucketFile } from '@privateaim/storage-kit';
 import path from 'node:path';
-import type {
-    Analysis,
-    MasterImage,
-    MasterImageCommandArgument,
-} from '@privateaim/core-kit';
 import { useCoreClient, useStorageClient } from '../../../core';
 import { BuilderError } from '../error';
 
-type DockerFileBuildContext = {
-    entity: Pick<Analysis, 'id' | 'master_image_id' | 'image_command_arguments'>,
-    hostname: string
-};
-
-export async function bundleDockerFile(context: DockerFileBuildContext) : Promise<{
-    content: string,
-    masterImagePath: string
-}> {
+export async function generateDockerFileContent(entity: Analysis) : Promise<string> {
     const storageClient = useStorageClient();
     const coreClient = useCoreClient();
 
     const { data: analysisBuckets } = await coreClient.analysisBucket.getMany({
         filter: {
-            analysis_id: context.entity.id,
+            analysis_id: entity.id,
             type: AnalysisBucketType.CODE,
         },
     });
@@ -62,7 +49,7 @@ export async function bundleDockerFile(context: DockerFileBuildContext) : Promis
     let masterImage : MasterImage;
 
     try {
-        masterImage = await coreClient.masterImage.getOne(context.entity.master_image_id);
+        masterImage = await coreClient.masterImage.getOne(entity.master_image_id);
     } catch (e) {
         throw BuilderError.masterImageNotFound();
     }
@@ -73,8 +60,8 @@ export async function bundleDockerFile(context: DockerFileBuildContext) : Promis
     );
 
     let commandArguments : MasterImageCommandArgument[];
-    if (context.entity.image_command_arguments) {
-        commandArguments = context.entity.image_command_arguments;
+    if (entity.image_command_arguments) {
+        commandArguments = entity.image_command_arguments;
     } else if (masterImage.command_arguments) {
         commandArguments = masterImage.command_arguments;
     } else {
@@ -109,17 +96,11 @@ export async function bundleDockerFile(context: DockerFileBuildContext) : Promis
         }
     }
 
-    const masterImagePath = `${getHostNameFromString(context.hostname)}/master/${masterImage.virtual_path}`;
-    const content = `
-    FROM ${masterImagePath}
+    return `
+    FROM master/${masterImage.virtual_path}
     RUN mkdir -p ${AnalysisContainerPath.CODE}
     RUN chmod -R +x ${AnalysisContainerPath.CODE}
 
     CMD [${cmdParts.join(', ')}]
     `;
-
-    return {
-        content,
-        masterImagePath,
-    };
 }

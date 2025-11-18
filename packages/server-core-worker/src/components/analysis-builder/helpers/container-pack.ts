@@ -7,6 +7,7 @@
 
 import { LogFlag } from '@privateaim/telemetry-kit';
 import stream from 'node:stream';
+import type { Analysis } from '@privateaim/core-kit';
 import {
     AnalysisBucketType,
     AnalysisContainerPath,
@@ -19,9 +20,8 @@ import {
 } from '../../../core';
 import { BuilderError } from '../error';
 import { useAnalysisBuilderLogger } from '../utils';
-import type { ContainerPackContext } from './type';
 
-export async function packContainerWithAnalysis(container: Container, context: ContainerPackContext) {
+export async function packContainerWithAnalysis(container: Container, entity: Analysis) {
     const pack = tar.pack();
 
     // -----------------------------------------------------------------------------------
@@ -29,8 +29,8 @@ export async function packContainerWithAnalysis(container: Container, context: C
     useAnalysisBuilderLogger()
         .debug('Writing files to container', {
             command: AnalysisBuilderCommand.EXECUTE,
-            analysis_id: context.entity.id,
-            [LogFlag.REF_ID]: context.entity.id,
+            analysis_id: entity.id,
+            [LogFlag.REF_ID]: entity.id,
         });
 
     const core = useCoreClient();
@@ -38,7 +38,7 @@ export async function packContainerWithAnalysis(container: Container, context: C
     const { data: analysisBuckets } = await core.analysisBucket.getMany({
         filters: {
             type: AnalysisBucketType.CODE,
-            analysis_id: context.entity.id,
+            analysis_id: entity.id,
         },
     });
 
@@ -61,8 +61,8 @@ export async function packContainerWithAnalysis(container: Container, context: C
                             useAnalysisBuilderLogger()
                                 .debug(`Extracting analysis file ${header.name} (${header.size} bytes).`, {
                                     command: AnalysisBuilderCommand.EXECUTE,
-                                    analysis_id: context.entity.id,
-                                    [LogFlag.REF_ID]: context.entity.id,
+                                    analysis_id: entity.id,
+                                    [LogFlag.REF_ID]: entity.id,
                                 });
 
                             files.push([header.name, buff]);
@@ -73,8 +73,8 @@ export async function packContainerWithAnalysis(container: Container, context: C
                             useAnalysisBuilderLogger()
                                 .error(`Extracting analysis file ${header.name} (${header.size} bytes) failed.`, {
                                     command: AnalysisBuilderCommand.EXECUTE,
-                                    analysis_id: context.entity.id,
-                                    [LogFlag.REF_ID]: context.entity.id,
+                                    analysis_id: entity.id,
+                                    [LogFlag.REF_ID]: entity.id,
                                 });
                             callback(e);
                         });
@@ -91,8 +91,8 @@ export async function packContainerWithAnalysis(container: Container, context: C
                         useAnalysisBuilderLogger()
                             .debug(`Encrypting/Packing analysis file ${files[i][0]}.`, {
                                 command: AnalysisBuilderCommand.EXECUTE,
-                                analysis_id: context.entity.id,
-                                [LogFlag.REF_ID]: context.entity.id,
+                                analysis_id: entity.id,
+                                [LogFlag.REF_ID]: entity.id,
                             });
 
                         pack.entry({ name: files[i][0] }, files[i][1]);
@@ -100,8 +100,8 @@ export async function packContainerWithAnalysis(container: Container, context: C
                         useAnalysisBuilderLogger()
                             .debug(`Encrypted/Packed analysis file ${files[i][0]}.`, {
                                 command: AnalysisBuilderCommand.EXECUTE,
-                                analysis_id: context.entity.id,
-                                [LogFlag.REF_ID]: context.entity.id,
+                                analysis_id: entity.id,
+                                [LogFlag.REF_ID]: entity.id,
                             });
                     }
 
