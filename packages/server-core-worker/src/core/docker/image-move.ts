@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { buildRemoteDockerImageURL } from './registry';
+import { buildDockerImageURL } from './registry';
 import { pushDockerImage } from './image-push';
 import type { DockerAuthConfig } from './index';
 import { pullDockerImage, removeDockerImage, useDocker } from './index';
@@ -24,7 +24,7 @@ type DockerBaseImageBuildContext = {
 };
 
 export async function moveDockerImage(context: DockerBaseImageBuildContext) {
-    const sourceImageURL = buildRemoteDockerImageURL({
+    const sourceImageURL = buildDockerImageURL({
         hostname: context.sourceAuthConfig.serveraddress,
         projectName: context.sourceProjectName,
         repositoryName: context.sourceRepositoryName,
@@ -38,7 +38,7 @@ export async function moveDockerImage(context: DockerBaseImageBuildContext) {
     const destinationAuthConfig = context.destinationAuthConfig || context.sourceAuthConfig;
     const destinationTag = context.destinationTag || context.sourceTag;
 
-    const destinationImageURL = buildRemoteDockerImageURL({
+    const destinationImageURL = buildDockerImageURL({
         hostname: destinationAuthConfig.serveraddress,
         projectName: context.destinationProjectName || context.sourceProjectName,
         repositoryName: context.destinationRepositoryName || context.sourceRepositoryName,

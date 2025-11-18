@@ -7,7 +7,9 @@
 
 import { BadRequestError, NotFoundError } from '@ebec/http';
 import { MasterImageCommand } from '@privateaim/core-kit';
-import { MasterImagesCommand, useMasterImageQueueService } from '@privateaim/server-core-worker-kit';
+import {
+    MasterImageSynchronizerComponentCaller,
+} from '@privateaim/server-core-worker-kit';
 import { useRequestBody } from '@routup/basic/body';
 import type { Request, Response } from 'routup';
 import { sendAccepted } from 'routup';
@@ -23,20 +25,16 @@ export async function commandMasterImageRouteHandler(req: Request, res: Response
         throw new BadRequestError('The master image command is not valid.');
     }
 
-    const queue = useMasterImageQueueService();
-
     const { command } = body;
 
     switch (command) {
         case MasterImageCommand.SYNC: {
             try {
-                await queue.publishCommand({
-                    command: MasterImagesCommand.SYNCHRONIZE,
-                    data: {
-                        owner: useEnv('masterImagesOwner'),
-                        repository: useEnv('masterImagesRepository'),
-                        branch: useEnv('masterImagesBranch'),
-                    },
+                const caller = new MasterImageSynchronizerComponentCaller();
+                await caller.callExecute({
+                    owner: useEnv('masterImagesOwner'),
+                    repository: useEnv('masterImagesRepository'),
+                    branch: useEnv('masterImagesBranch'),
                 });
             } catch (e) {
                 if (e instanceof Error) {

@@ -1,0 +1,89 @@
+/*
+ * Copyright (c) 2025.
+ * Author Peter Placzek (tada5hi)
+ * For the full copyright and license information,
+ * view the LICENSE file that was distributed with this source code.
+ */
+
+import { REGISTRY_MASTER_IMAGE_PROJECT_NAME } from '@privateaim/core-kit';
+import type {
+    MasterImageBuilderEventMap,
+    MasterImageBuilderExecutePayload,
+} from '@privateaim/server-core-worker-kit';
+import {
+    MasterImageBuilderCommand,
+    MasterImageBuilderEvent,
+} from '@privateaim/server-core-worker-kit';
+import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
+import path from 'node:path';
+import tar from 'tar-fs';
+import { MASTER_IMAGES_DATA_DIRECTORY_PATH } from '../../../../constants';
+import {
+    buildDockerImageURL, useCoreClient, useDocker, waitForDockerActionStream,
+} from '../../../../core';
+import { useAnalysisBuilderLogger } from '../../../analysis-builder/utils';
+
+export class MasterImageBuilderExecuteHandler implements ComponentHandler<
+MasterImageBuilderEventMap,
+MasterImageBuilderCommand.EXECUTE
+> {
+    async handle(
+        payload: MasterImageBuilderExecutePayload,
+        context: ComponentHandlerContext<MasterImageBuilderEventMap, MasterImageBuilderCommand.EXECUTE>,
+    ) {
+        try {
+            // todo: check if image exists, otherwise local queue task
+            await this.handleInternal(payload, context);
+        } catch (e) {
+            useAnalysisBuilderLogger().error({
+                message: e,
+                command: MasterImageBuilderCommand.EXECUTE,
+                event: MasterImageBuilderEvent.EXECUTION_FAILED,
+            });
+
+            await context.handle(
+                MasterImageBuilderEvent.EXECUTION_FAILED,
+                {
+                    ...payload,
+                    error: e,
+                },
+            );
+        }
+    }
+
+    async handleInternal(
+        payload: MasterImageBuilderExecutePayload,
+        context: ComponentHandlerContext<MasterImageBuilderEventMap, MasterImageBuilderCommand.EXECUTE>,
+    ) {
+        await context.handle(
+            MasterImageBuilderEvent.EXECUTION_STARTED,
+            payload,
+        );
+
+        const coreClient = useCoreClient();
+        const docker = useDocker();
+
+        const masterImage = await coreClient.masterImage.getOne(payload.id);
+
+        const imageTag = buildDockerImageURL({
+            projectName: REGISTRY_MASTER_IMAGE_PROJECT_NAME,
+            repositoryName: masterImage.virtual_path,
+            tagOrDigest: 'latest',
+        });
+
+        const imageFilePath = path.join(MASTER_IMAGES_DATA_DIRECTORY_PATH, masterImage.path);
+
+        const pack = tar.pack(imageFilePath);
+        const stream = await docker
+            .buildImage(pack, {
+                t: imageTag,
+            });
+
+        await waitForDockerActionStream(stream);
+
+        await context.handle(
+            MasterImageBuilderEvent.EXECUTION_FINISHED,
+            payload,
+        );
+    }
+}

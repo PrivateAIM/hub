@@ -17,7 +17,7 @@ import { REGISTRY_ARTIFACT_TAG_LATEST } from '@privateaim/core-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import {
     buildDockerAuthConfigFromRegistry,
-    buildRemoteDockerImageURL,
+    buildDockerImageURL,
     cleanupDockerImages, pushDockerImage,
     useCoreClient,
     useDocker,
@@ -93,7 +93,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler {
 
         const imageURLs : string[] = [];
         for (let i = 0; i < nodes.length; i++) {
-            const nodeImageURL = buildRemoteDockerImageURL({
+            const nodeImageURL = buildDockerImageURL({
                 hostname: registry.host,
                 projectName: nodes[i].registry_project.external_name,
                 repositoryName: analysis.id,

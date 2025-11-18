@@ -9,6 +9,7 @@ export * from './auth-config';
 export * from './container-read';
 export * from './container-save';
 export * from './image-clenaup';
+export * from './image-build';
 export * from './image-pull';
 export * from './image-push';
 export * from './image-remove';

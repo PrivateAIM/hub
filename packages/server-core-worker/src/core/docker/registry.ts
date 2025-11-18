@@ -7,20 +7,26 @@
 
 import { getHostNameFromString } from '@privateaim/kit';
 
-type RemoteDockerImageURLBuildContext = {
+type DockerImageURLBuildContext = {
     projectName: string,
     repositoryName: string,
     tagOrDigest?: string,
 
-    hostname: string
+    hostname?: string
 };
 
-export function buildRemoteDockerImageURL(context: RemoteDockerImageURLBuildContext): string {
-    let basePath = [
-        getHostNameFromString(context.hostname),
+export function buildDockerImageURL(context: DockerImageURLBuildContext): string {
+    const parts : string[] = [];
+    if (context.hostname) {
+        parts.push(getHostNameFromString(context.hostname));
+    }
+    parts.push(...[
+
         context.projectName,
         context.repositoryName,
-    ].join('/');
+    ]);
+
+    let basePath = parts.join('/');
 
     if (context.tagOrDigest) {
         basePath += context.tagOrDigest.startsWith('sha') ?

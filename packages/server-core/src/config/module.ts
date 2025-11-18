@@ -9,15 +9,16 @@ import type { Component } from '@privateaim/server-kit';
 import { QueueWorkerComponentCaller } from '@privateaim/server-kit';
 import {
     AnalysisBuilderEventQueueRouterRouting,
-    AnalysisDistributorEventQueueRouterRouting,
+    AnalysisDistributorEventQueueRouterRouting, MasterImageBuilderEventQueueRouterRouting,
+    MasterImageSynchronizerEventQueueRouterRouting,
 } from '@privateaim/server-core-worker-kit';
 import { BucketEventQueueRouterRouting } from '@privateaim/server-storage-kit';
 import {
     AnalysisBuilderAggregator,
     AnalysisDistributorAggregator,
+    MasterImageBuilderAggregator,
     StorageBucketAggregator,
     createAuthupAggregator,
-    createMasterImagesAggregator,
     createTelemetryAggregator,
 } from '../aggregators';
 import {
@@ -82,7 +83,19 @@ export function createConfig() : Config {
             },
         ),
 
-        createMasterImagesAggregator(),
+        new QueueWorkerComponentCaller(
+            new MasterImageBuilderAggregator(),
+            {
+                consumeQueue: MasterImageBuilderEventQueueRouterRouting,
+            },
+        ),
+        new QueueWorkerComponentCaller(
+            new MasterImageBuilderAggregator(),
+            {
+                consumeQueue: MasterImageSynchronizerEventQueueRouterRouting,
+            },
+        ),
+
         createTelemetryAggregator(),
     ];
 
