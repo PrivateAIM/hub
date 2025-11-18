@@ -63,13 +63,16 @@ AnalysisBucketFileEntity
 
         if (event.entity.root) {
             const caller = useAnalysisMetadataComponentCaller();
-            await caller.call(
-                AnalysisMetadataCommand.RECALC,
-                {
-                    analysisId: event.entity.analysis_id,
-                },
-                {},
-            );
+            Promise.resolve()
+                .then(() => caller.call(
+                    AnalysisMetadataCommand.RECALC,
+                    {
+                        analysisId: event.entity.analysis_id,
+                        queryNodes: false,
+                        querySelf: false,
+                    },
+                    {},
+                ));
         }
     }
 
@@ -80,25 +83,31 @@ AnalysisBucketFileEntity
             event.databaseEntity?.analysis_id;
 
         const caller = useAnalysisMetadataComponentCaller();
-        await caller.call(
-            AnalysisMetadataCommand.RECALC,
-            {
-                analysisId,
-            },
-            {},
-        );
+        Promise.resolve()
+            .then(() => caller.call(
+                AnalysisMetadataCommand.RECALC,
+                {
+                    analysisId,
+                    queryNodes: false,
+                    querySelf: false,
+                },
+                {},
+            ));
     }
 
     async afterRemove(event: RemoveEvent<AnalysisBucketFileEntity>): Promise<any> {
         if (event.entity.root) {
             const caller = useAnalysisMetadataComponentCaller();
-            await caller.call(
-                AnalysisMetadataCommand.RECALC,
-                {
-                    analysisId: event.entity.analysis_id,
-                },
-                {},
-            );
+            Promise.resolve()
+                .then(() => caller.call(
+                    AnalysisMetadataCommand.RECALC,
+                    {
+                        analysisId: event.entity.analysis_id,
+                        queryNodes: false,
+                        querySelf: false,
+                    },
+                    {},
+                ));
         }
     }
 

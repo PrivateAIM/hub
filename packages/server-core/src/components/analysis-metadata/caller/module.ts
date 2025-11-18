@@ -38,6 +38,8 @@ export class AnalysisMetadataComponentCaller implements ComponentCaller<Analysis
     ): Promise<void> {
         const [data, metadata] = payload;
 
+        await wait(500);
+
         if (isQueueRouterUsable()) {
             await this.callWithQueue(key, data, metadata);
             return;
@@ -61,7 +63,6 @@ export class AnalysisMetadataComponentCaller implements ComponentCaller<Analysis
     ): Promise<void> {
         const [data, metadata] = payload;
 
-        return wait(500)
-            .then(() => this.queueDispatchCaller.call(key, data, metadata));
+        return this.queueDispatchCaller.call(key, data, metadata);
     }
 }

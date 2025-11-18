@@ -151,7 +151,7 @@ export abstract class BaseComponent<
             return options.handle(data, context);
         }
 
-        throw new Error(`${key as string} key could not be handled.`);
+        return Promise.resolve();
     }
 
     abstract start() : Promise<void> | void;

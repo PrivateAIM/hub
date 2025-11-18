@@ -9,7 +9,6 @@ import type { Analysis } from '@privateaim/core-kit';
 import { AnalysisBucketType, NodeType } from '@privateaim/core-kit';
 import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
 import { isEqual } from 'smob';
-import type { DataSource, Repository } from 'typeorm';
 import { useDataSource } from 'typeorm-extension';
 import { AnalysisBucketFileEntity, AnalysisEntity, AnalysisNodeEntity } from '../../../../database';
 import type { AnalysisMetadataCommand } from '../../constants';
@@ -19,26 +18,13 @@ import type { AnalysisMetadataEventMap, AnalysisMetadataRecalcPayload } from '..
 export class AnalysisMetadataRecalcHandler implements ComponentHandler<
 AnalysisMetadataEventMap
 > {
-    protected dataSource!: DataSource;
-
-    protected analysisRepository!: Repository<AnalysisEntity>;
-
-    protected analysisBucketFileRepository!: Repository<AnalysisBucketFileEntity>;
-
-    protected analysisNodesRepository!: Repository<AnalysisNodeEntity>;
-
-    async initialize(): Promise<void> {
-        this.dataSource = await useDataSource();
-        this.analysisRepository = this.dataSource.getRepository(AnalysisEntity);
-        this.analysisBucketFileRepository = this.dataSource.getRepository(AnalysisBucketFileEntity);
-        this.analysisNodesRepository = this.dataSource.getRepository(AnalysisNodeEntity);
-    }
-
     async handle(
         value: AnalysisMetadataRecalcPayload,
         context: ComponentHandlerContext<AnalysisMetadataEventMap, AnalysisMetadataCommand.RECALC>,
     ): Promise<void> {
-        const entity = await this.analysisRepository.findOneBy({
+        const dataSource = await useDataSource();
+        const analysisRepository = dataSource.getRepository(AnalysisEntity);
+        const entity = await analysisRepository.findOneBy({
             id: value.analysisId,
         });
 
@@ -50,12 +36,23 @@ AnalysisMetadataEventMap
             ...entity,
         };
 
-        await this.querySelf(entity);
-        await this.queryAnalysisFiles(entity);
-        await this.queryAnalysisNodes(entity);
+        const querySelf = value.querySelf ?? true;
+        if (querySelf) {
+            await this.querySelf(entity);
+        }
+
+        const queryFiles = value.queryFiles ?? true;
+        if (queryFiles) {
+            await this.queryAnalysisFiles(entity);
+        }
+
+        const queryNodes = value.queryNodes ?? true;
+        if (queryNodes) {
+            await this.queryAnalysisNodes(entity);
+        }
 
         if (this.hasChanged(cloned, entity)) {
-            await this.analysisRepository.save(entity);
+            await analysisRepository.save(entity);
         }
 
         context.handle(AnalysisMetadataEvent.RECALC_FINISHED, entity);
@@ -66,7 +63,9 @@ AnalysisMetadataEventMap
     }
 
     async queryAnalysisFiles(entity: AnalysisEntity) : Promise<void> {
-        const rootFile = await this.analysisBucketFileRepository.findOne({
+        const dataSource = await useDataSource();
+        const analysisBuckerFileRepository = dataSource.getRepository(AnalysisBucketFileEntity);
+        const rootFile = await analysisBuckerFileRepository.findOne({
             where: {
                 analysis_id: entity.id,
                 root: true,
@@ -81,11 +80,14 @@ AnalysisMetadataEventMap
     }
 
     async queryAnalysisNodes(entity: AnalysisEntity) : Promise<void> {
-        const analysisNodes = await this.analysisNodesRepository.find({
+        const dataSource = await useDataSource();
+        const analysisNodesRepository = dataSource.getRepository(AnalysisNodeEntity);
+        const analysisNodes = await analysisNodesRepository.find({
             where: {
                 analysis_id: entity.id,
             },
             relations: ['node'],
+            cache: false,
         });
 
         let nodes : number = 0;

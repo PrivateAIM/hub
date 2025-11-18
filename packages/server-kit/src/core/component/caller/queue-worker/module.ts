@@ -59,24 +59,25 @@ export class QueueWorkerComponentCaller<
                 childValue,
                 childContext,
             ) => {
-                if (!this.options.publishQueue) {
-                    throw new Error(
+                if (this.options.publishQueue) {
+                    /**
+                     *
+                     * publish unhandled requests to publish queue.
+                     */
+                    await client.publish(buildQueueRouterPublishPayload({
+                        type: childContext.key,
+                        data: childValue,
+                        metadata: {
+                            ...(metadata || {}),
+                            ...childContext.metadata,
+                            routing: this.options.publishQueue,
+                        },
+                    }));
+                } else {
+                    useLogger().warn(
                         `Component ${this.component.constructor.name} event ${childContext.key} could not be handled.`,
                     );
                 }
-                /**
-                 *
-                 * publish unhandled requests to publish queue.
-                 */
-                await client.publish(buildQueueRouterPublishPayload({
-                    type: childContext.key,
-                    data: childValue,
-                    metadata: {
-                        ...(metadata || {}),
-                        ...childContext.metadata,
-                        routing: this.options.publishQueue,
-                    },
-                }));
             },
         };
 

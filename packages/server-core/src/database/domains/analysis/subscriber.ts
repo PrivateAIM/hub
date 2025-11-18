@@ -14,10 +14,7 @@ import { AnalysisBucketType, DomainType, buildAnalysisBucketName } from '@privat
 import { BaseSubscriber } from '@privateaim/server-db-kit';
 import { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
-import {
-    AnalysisMetadataCommand,
-    useAnalysisMetadataComponentCaller,
-} from '../../../components';
+import { AnalysisMetadataCommand, useAnalysisMetadataComponentCaller } from '../../../components';
 import { AnalysisBucketEntity } from '../analysis-bucket';
 import { AnalysisEntity } from './entity';
 import { TaskType, useTaskManager } from '../../../domains';
@@ -130,13 +127,16 @@ AnalysisEntity
         }
 
         const caller = useAnalysisMetadataComponentCaller();
-        await caller.call(
-            AnalysisMetadataCommand.RECALC,
-            {
-                analysisId,
-            },
-            {},
-        );
+        Promise.resolve()
+            .then(() => caller.call(
+                AnalysisMetadataCommand.RECALC,
+                {
+                    analysisId,
+                    queryNodes: false,
+                    queryFiles: false,
+                },
+                {},
+            ));
     }
 
     listenTo() {

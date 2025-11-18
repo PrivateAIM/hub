@@ -11,7 +11,22 @@ import type { AnalysisEntity } from '../../database';
 import type { AnalysisMetadataCommand, AnalysisMetadataEvent } from './constants';
 
 export type AnalysisMetadataRecalcPayload = {
-    analysisId: string
+    analysisId: string,
+
+    /**
+     * default: true
+     */
+    queryNodes?: boolean,
+
+    /**
+     * default: true
+     */
+    querySelf?: boolean,
+
+    /**
+     * default: true
+     */
+    queryFiles?: boolean
 };
 
 export type AnalysisMetadataRecalcExecutedPayload = AnalysisEntity;
