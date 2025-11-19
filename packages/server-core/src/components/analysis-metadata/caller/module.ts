@@ -40,9 +40,8 @@ export class AnalysisMetadataComponentCaller implements ComponentCaller<Analysis
     ): Promise<void> {
         const [data, metadata] = payload;
 
-        await wait(500);
-
         if (isQueueRouterUsable()) {
+            await wait(500);
             await this.callWithQueue(key, data, metadata);
             return;
         }
