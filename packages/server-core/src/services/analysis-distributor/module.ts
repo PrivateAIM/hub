@@ -94,7 +94,7 @@ export class AnalysisDistributor {
             });
 
             if (!registry) {
-                throw new BadRequestError('No registry is registered.');
+                throw new BadRequestError('No docker registry is defined.');
             }
 
             entity.registry_id = registry.id;
