@@ -148,7 +148,7 @@ export function isAnalysisAPICommandExecutable(
                 return output;
             }
 
-            if (!entity.build_status && !entity.distribution_status) {
+            if (!entity.distribution_status) {
                 output.success = true;
                 return output;
             }
