@@ -6,10 +6,12 @@
  */
 
 import { BadRequestError, NotFoundError } from '@ebec/http';
-import { AnalysisAPICommand, NodeType, isAnalysisAPICommandExecutable } from '@privateaim/core-kit';
+import {
+    AnalysisAPICommand, NodeType, isAnalysisAPICommandExecutable,
+} from '@privateaim/core-kit';
 import type { Repository } from 'typeorm';
 import type { AnalysisMetadataComponentCaller } from '../../components';
-import { AnalysisMetadataCommand, AnalysisMetadataEvent, useAnalysisMetadataComponentCaller } from '../../components';
+import { useAnalysisMetadataComponentCaller } from '../../components';
 import {
     AnalysisEntity, AnalysisNodeEntity, useDataSourceSync,
 } from '../../database';
@@ -45,22 +47,9 @@ export class AnalysisConfigurator {
         options: AnalysisConfiguratorLockOptions = {},
     ): Promise<AnalysisEntity> {
         const entityId = typeof input === 'string' ? input : input.id;
-
-        const {
-            [AnalysisMetadataEvent.RECALC_FINISHED]: entity,
-        } = await this.metadataCaller.callDirect(
-            AnalysisMetadataCommand.RECALC,
-            {
-                analysisId: entityId,
-            },
-            {
-
-            },
-        );
-
-        if (!entity) {
-            throw new NotFoundError('Analysis could not be found.');
-        }
+        const entity = await this.metadataCaller.callRecalcDirect({
+            analysisId: entityId,
+        });
 
         const check = isAnalysisAPICommandExecutable(entity, AnalysisAPICommand.CONFIGURATION_LOCK);
         if (!check.success) {

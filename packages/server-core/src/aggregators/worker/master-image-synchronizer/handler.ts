@@ -11,6 +11,7 @@ import type {
 } from '@privateaim/server-core-worker-kit';
 import { MasterImageBuilderComponentCaller } from '@privateaim/server-core-worker-kit';
 import { useDataSource } from 'typeorm-extension';
+import { useLogger } from '@privateaim/server-kit';
 import { MasterImageEntity } from '../../../database';
 import { MasterImageSynchronizerService } from '../../../services';
 
@@ -19,6 +20,10 @@ export async function handleMasterImageSynchronizerExecutionFinishedEvent(value:
 
     const output = await synchronizer
         .sync(value);
+
+    useLogger().info(`Created ${output.images.created.length} master images.`);
+    useLogger().info(`Deleted ${output.images.deleted.length} master images.`);
+    useLogger().info(`Updated ${output.images.updated.length} master images.`);
 
     const entities = [
         ...output.images.created,
@@ -33,6 +38,8 @@ export async function handleMasterImageSynchronizerExecutionFinishedEvent(value:
     for (let i = 0; i < entities.length; i++) {
         const entity = entities[i];
         entity.build_status = ProcessStatus.STARTING;
+
+        useLogger().info(`Building ${entity.virtual_path} master image.`);
 
         await repository.save(entity);
         await caller.callExecute({ id: entity.id });

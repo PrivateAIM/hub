@@ -17,9 +17,9 @@ import {
     AnalysisBuilderAggregator,
     AnalysisDistributorAggregator,
     MasterImageBuilderAggregator,
+    MasterImageSynchronizerAggregator,
     StorageBucketAggregator,
-    createAuthupAggregator,
-    createTelemetryAggregator,
+    createAuthupAggregator, createTelemetryAggregator,
 } from '../aggregators';
 import {
     AnalysisMetadataTaskQueue,
@@ -90,7 +90,7 @@ export function createConfig() : Config {
             },
         ),
         new QueueWorkerComponentCaller(
-            new MasterImageBuilderAggregator(),
+            new MasterImageSynchronizerAggregator(),
             {
                 consumeQueue: MasterImageSynchronizerEventQueueRouterRouting,
             },

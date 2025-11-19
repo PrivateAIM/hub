@@ -9,7 +9,6 @@ import { BadRequestError } from '@ebec/http';
 import { ProcessStatus } from '@privateaim/kit';
 import {
     AnalysisAPICommand,
-    AnalysisNodeApprovalStatus,
     isAnalysisAPICommandExecutable,
 } from '@privateaim/core-kit';
 import {
@@ -24,6 +23,7 @@ import {
     useDataSourceSync,
 } from '../../database';
 import { RequestRepositoryAdapter } from '../../http/request';
+import { type AnalysisMetadataComponentCaller, useAnalysisMetadataComponentCaller } from '../../components';
 
 export class AnalysisDistributor {
     protected repository: Repository<AnalysisEntity>;
@@ -34,6 +34,8 @@ export class AnalysisDistributor {
 
     protected caller : AnalysisDistributorComponentCaller;
 
+    protected metadataCaller : AnalysisMetadataComponentCaller;
+
     constructor() {
         const dataSource = useDataSourceSync();
 
@@ -42,13 +44,17 @@ export class AnalysisDistributor {
         this.registryRepository = dataSource.getRepository(RegistryEntity);
 
         this.caller = new AnalysisDistributorComponentCaller();
+        this.metadataCaller = useAnalysisMetadataComponentCaller();
     }
 
     async startDistribution(
         input: string | AnalysisEntity,
         request?: Request,
     ) {
-        const entity = await this.resolve(input);
+        const entityId = typeof input === 'string' ? input : input.id;
+        const entity = await this.metadataCaller.callRecalcDirect({
+            analysisId: entityId,
+        });
 
         const check = isAnalysisAPICommandExecutable(entity, AnalysisAPICommand.DISTRIBUTION_START);
         if (!check.success) {
@@ -88,7 +94,7 @@ export class AnalysisDistributor {
             });
 
             if (!registry) {
-                throw new BadRequestError('No registry is registered.');
+                throw new BadRequestError('No docker registry is defined.');
             }
 
             entity.registry_id = registry.id;
@@ -112,10 +118,6 @@ export class AnalysisDistributor {
         });
 
         for (let i = 0; i < analysisNodes.length; i++) {
-            if (analysisNodes[i].approval_status !== AnalysisNodeApprovalStatus.APPROVED) {
-                throw new BadRequestError('Not all nodes have approved the analysis yet.');
-            }
-
             if (
                 analysisNodes[i].node &&
                 !analysisNodes[i].node.registry_id

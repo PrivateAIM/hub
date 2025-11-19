@@ -76,6 +76,7 @@ const FAnalysisCommand = defineComponent({
         const commandText = computed(() => {
             switch (props.command) {
                 case AnalysisAPICommand.BUILD_START:
+                case AnalysisAPICommand.DISTRIBUTION_START:
                     return 'start';
                 case AnalysisAPICommand.BUILD_STOP:
                     return 'stop';
@@ -93,6 +94,7 @@ const FAnalysisCommand = defineComponent({
         const iconClass = computed(() => {
             switch (props.command) {
                 case AnalysisAPICommand.BUILD_START:
+                case AnalysisAPICommand.DISTRIBUTION_START:
                     return 'fa fa-play';
                 case AnalysisAPICommand.BUILD_STOP:
                     return 'fa fa-stop';
@@ -111,6 +113,7 @@ const FAnalysisCommand = defineComponent({
             switch (props.command) {
                 case AnalysisAPICommand.BUILD_START:
                 case AnalysisAPICommand.CONFIGURATION_LOCK:
+                case AnalysisAPICommand.DISTRIBUTION_START:
                     return 'success';
                 case AnalysisAPICommand.BUILD_STOP:
                 case AnalysisAPICommand.CONFIGURATION_UNLOCK:

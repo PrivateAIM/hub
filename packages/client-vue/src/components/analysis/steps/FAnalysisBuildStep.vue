@@ -17,9 +17,11 @@ import { defineComponent } from 'vue';
 import type { Analysis } from '@privateaim/core-kit';
 import FProcessStatus from '../../FProcessStatus.vue';
 import { FAnalysisCommand } from '../FAnalysisCommand';
+import FAnalysisBuildNodesStep from './FAnalysisBuildNodesStep.vue';
 
 export default defineComponent({
     components: {
+        FAnalysisBuildNodesStep,
         FProcessStatus,
         FAnalysisCommand,
     },
@@ -61,6 +63,30 @@ export default defineComponent({
                         <i :class="iconClass + ' text-'+ classSuffix" />
                     </template>
                 </FProcessStatus>
+            </div>
+        </div>
+        <div class="d-flex flex-column ms-3">
+            <div class="d-flex flex-row gap-1">
+                <div>
+                    <strong>
+                        2.1 Node(s) Approval
+                    </strong>
+                </div>
+                <div>
+                    <FAnalysisBuildNodesStep :entity="entity">
+                        <template #valid>
+                            <span class="text-success">
+                                <i class="fa fa-check" />
+                            </span>
+                        </template>
+                        <template #invalid="{ message }">
+                            <span class="text-danger">
+                                <i class="fa fa-times" />
+                            </span>
+                            <small>( {{ message }} )</small>
+                        </template>
+                    </FAnalysisBuildNodesStep>
+                </div>
             </div>
         </div>
         <div class="d-flex flex-row gap-1">

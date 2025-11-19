@@ -6,12 +6,20 @@
  */
 
 export class AnalysisError extends Error {
+    static notFound() {
+        return new AnalysisError('The Analysis could not be found.');
+    }
+
     static defaultNodeRequired() {
         return new AnalysisError('At least one default node must be selected.');
     }
 
     static aggregatorNodeRequired() {
         return new AnalysisError('An aggregator node node must be selected.');
+    }
+
+    static nodesApprovalRequired() {
+        return new AnalysisError('All assigned nodes have to approve the analysis.');
     }
 
     static entrypointRequired() {

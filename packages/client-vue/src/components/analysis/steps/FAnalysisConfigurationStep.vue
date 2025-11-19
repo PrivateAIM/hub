@@ -93,11 +93,11 @@ export default defineComponent({
                     <strong>
                         <template v-if="nodesLink">
                             <VCLink :to="nodesLink">
-                                1.1 Nodes
+                                1.1 Node(s) Assignment
                             </VCLink>
                         </template>
                         <template v-else>
-                            1.1 Nodes
+                            1.1 Node(s) Assignment
                         </template>
                     </strong>
                 </div>

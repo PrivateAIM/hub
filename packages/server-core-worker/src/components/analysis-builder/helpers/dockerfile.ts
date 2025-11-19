@@ -5,8 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Analysis, MasterImage, MasterImageCommandArgument } from '@privateaim/core-kit';
-import { AnalysisBucketType, AnalysisContainerPath } from '@privateaim/core-kit';
+import type {
+    Analysis,
+    MasterImage,
+    MasterImageCommandArgument,
+} from '@privateaim/core-kit';
+import {
+    AnalysisBucketType,
+    AnalysisContainerPath,
+    REGISTRY_MASTER_IMAGE_PROJECT_NAME,
+} from '@privateaim/core-kit';
 import type { BucketFile } from '@privateaim/storage-kit';
 import path from 'node:path';
 import { useCoreClient, useStorageClient } from '../../../core';
@@ -97,7 +105,7 @@ export async function generateDockerFileContent(entity: Analysis) : Promise<stri
     }
 
     return `
-    FROM master/${masterImage.virtual_path}
+    FROM ${REGISTRY_MASTER_IMAGE_PROJECT_NAME}/${masterImage.virtual_path}
     RUN mkdir -p ${AnalysisContainerPath.CODE}
     RUN chmod -R +x ${AnalysisContainerPath.CODE}
 

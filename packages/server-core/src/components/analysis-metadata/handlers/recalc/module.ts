@@ -6,14 +6,16 @@
  */
 
 import type { Analysis } from '@privateaim/core-kit';
-import { AnalysisBucketType, NodeType } from '@privateaim/core-kit';
+import { AnalysisBucketType, AnalysisNodeApprovalStatus, NodeType } from '@privateaim/core-kit';
 import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
 import { isEqual } from 'smob';
 import { useDataSource } from 'typeorm-extension';
+import { EnvironmentName } from '@privateaim/kit';
 import { AnalysisBucketFileEntity, AnalysisEntity, AnalysisNodeEntity } from '../../../../database';
 import type { AnalysisMetadataCommand } from '../../constants';
 import { AnalysisMetadataEvent } from '../../constants';
 import type { AnalysisMetadataEventMap, AnalysisMetadataRecalcPayload } from '../../types';
+import { useEnv } from '../../../../config';
 
 export class AnalysisMetadataRecalcHandler implements ComponentHandler<
 AnalysisMetadataEventMap
@@ -91,6 +93,7 @@ AnalysisMetadataEventMap
         });
 
         let nodes : number = 0;
+        let nodesApproved : number = 0;
         let executionProgress : number = 0;
 
         let hasAggregator : boolean = false;
@@ -100,21 +103,11 @@ AnalysisMetadataEventMap
             const analysisNode = analysisNodes[i];
 
             nodes++;
+            if (analysisNode.approval_status === AnalysisNodeApprovalStatus.APPROVED) {
+                nodesApproved += 1;
+            }
 
             executionProgress += analysisNode.execution_progress || 0;
-
-            /**
-             * todo: check on build
-             * const ignoreApproval = useEnv('skipAnalysisApproval') ||
-             *             useEnv('env') === EnvironmentName.TEST;
-             *
-            if (
-                !ignoreApproval &&
-                analysisNodes[i].approval_status !== AnalysisNodeApprovalStatus.APPROVED
-            ) {
-                continue;
-            }
-                */
 
             if (analysisNode.node.type === NodeType.AGGREGATOR) {
                 hasAggregator = true;
@@ -127,6 +120,13 @@ AnalysisMetadataEventMap
         }
 
         entity.nodes = nodes;
+        entity.nodes_approved = nodesApproved;
+
+        const ignoreApproval = useEnv('skipAnalysisApproval') ||
+            useEnv('env') === EnvironmentName.TEST;
+
+        entity.build_nodes_valid = ignoreApproval ? true : entity.nodes === entity.nodes_approved;
+
         entity.execution_progress = executionProgress > 0 && nodes > 0 ?
             Math.floor(executionProgress / nodes) : 0;
 

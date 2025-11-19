@@ -8,7 +8,7 @@
 import type {
     ComponentCaller,
     ComponentCallerPayload,
-    ComponentDirectCallerResponse,
+    ComponentDirectCallerResponse, ComponentMetadata,
 } from '@privateaim/server-kit';
 import {
     DirectComponentCaller,
@@ -16,9 +16,11 @@ import {
     isQueueRouterUsable,
 } from '@privateaim/server-kit';
 import { wait } from '@privateaim/kit';
+import { AnalysisError } from '@privateaim/core-kit';
 import { useAnalysisMetadataComponent } from '../singleton';
-import type { AnalysisMetadataEventMap } from '../types';
-import { AnalysisMetadataTaskQueue } from '../constants';
+import type { AnalysisMetadataEventMap, AnalysisMetadataRecalcPayload } from '../types';
+import { AnalysisMetadataCommand, AnalysisMetadataEvent, AnalysisMetadataTaskQueue } from '../constants';
+import type { AnalysisEntity } from '../../../database';
 
 export class AnalysisMetadataComponentCaller implements ComponentCaller<AnalysisMetadataEventMap> {
     protected directCaller : DirectComponentCaller<AnalysisMetadataEventMap>;
@@ -64,5 +66,24 @@ export class AnalysisMetadataComponentCaller implements ComponentCaller<Analysis
         const [data, metadata] = payload;
 
         return this.queueDispatchCaller.call(key, data, metadata);
+    }
+
+    async callRecalcDirect(
+        payload: AnalysisMetadataRecalcPayload,
+        metadata: ComponentMetadata = {},
+    ) : Promise<AnalysisEntity> {
+        const {
+            [AnalysisMetadataEvent.RECALC_FINISHED]: entity,
+        } = await this.callDirect(
+            AnalysisMetadataCommand.RECALC,
+            payload,
+            metadata,
+        );
+
+        if (entity) {
+            return entity;
+        }
+
+        throw AnalysisError.notFound();
     }
 }
