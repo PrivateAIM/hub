@@ -16,7 +16,7 @@ export enum RegistryCommand {
     PROJECT_RELINK = 'PROJECT_RELINK',
     PROJECT_UNLINK = 'PROJECT_UNLINK',
 
-    HOOK_HANDLE = 'HOOK_HANDLE',
+    HOOK_PROCESS = 'HOOK_PROCESS',
 }
 
 export enum RegistryHookEvent {

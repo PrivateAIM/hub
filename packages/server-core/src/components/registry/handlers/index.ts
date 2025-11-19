@@ -7,5 +7,5 @@
 
 export * from './cleanup';
 export * from './setup';
-export * from './hook';
+export * from './hook-processor';
 export * from './project';

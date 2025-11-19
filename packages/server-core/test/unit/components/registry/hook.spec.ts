@@ -5,20 +5,22 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { RegistryHookSchema } from '../../../../src/components';
+import { RegistryHookValidator } from '../../../../src/components';
 
 describe('src/components/registry/hook', () => {
-    it('should validate hook schema', () => {
+    it('should validate hook schema', async () => {
         const payload = {
             type: 'PUSH_ARTIFACT',
             occur_at: 1586922308,
             operator: 'admin',
             event_data: {
-                resources: [{
-                    digest: 'sha256:8a9e9863dbb6e10edb5adfe917c00da84e1700fa76e7ed02476aa6e6fb8ee0d8',
-                    tag: 'latest',
-                    resource_url: 'hub.harbor.com/test-webhook/debian:latest',
-                }],
+                resources: [
+                    {
+                        digest: 'sha256:8a9e9863dbb6e10edb5adfe917c00da84e1700fa76e7ed02476aa6e6fb8ee0d8',
+                        tag: 'latest',
+                        resource_url: 'hub.harbor.com/test-webhook/debian:latest',
+                    },
+                ],
                 repository: {
                     date_created: 1586922308,
                     name: 'debian',
@@ -29,12 +31,11 @@ describe('src/components/registry/hook', () => {
             },
         };
 
-        const validation = RegistryHookSchema.safeParse(payload);
-        expect(validation.success).toBeTruthy();
-        if (validation.success) {
-            expect(validation.data).toBeDefined();
-            expect(validation.data.type).toEqual('PUSH_ARTIFACT');
-            expect(validation.data.operator).toEqual('admin');
-        }
+        const validator = new RegistryHookValidator();
+
+        const output = await validator.run(payload);
+        expect(output.type).toEqual('PUSH_ARTIFACT');
+        expect(output.operator).toEqual('admin');
+        expect(output.event_data.repository.name).toEqual('debian');
     });
 });

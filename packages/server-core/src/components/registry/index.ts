@@ -11,4 +11,3 @@ export * from './module';
 export * from './constants';
 export * from './singleton';
 export * from './type';
-export * from './utils';

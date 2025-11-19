@@ -24,7 +24,7 @@ export class RegistryComponent extends BaseComponent<RegistryEventMap> {
         this.mount(RegistryCommand.SETUP, new RegistrySetupHandler());
         this.mount(RegistryCommand.CLEANUP, new RegistryCleanupHandler());
 
-        this.mount(RegistryCommand.HOOK_HANDLE, new RegistryHookHandler());
+        this.mount(RegistryCommand.HOOK_PROCESS, new RegistryHookHandler());
 
         this.mount(RegistryCommand.PROJECT_LINK, new RegistryProjectLinkHandler());
         this.mount(RegistryCommand.PROJECT_UNLINK, new RegistryProjectUnlinkHandler());
