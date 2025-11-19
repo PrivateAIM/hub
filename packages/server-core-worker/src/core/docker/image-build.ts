@@ -37,6 +37,7 @@ export async function buildDockerImage(
 
     const options : ImageBuildOptions = {
         t: context.imageName,
+        //  platform: 'linux/amd64',
         // nocache: true,
     };
 

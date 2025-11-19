@@ -8,7 +8,7 @@
 import { BadRequestError, NotFoundError } from '@ebec/http';
 import { AnalysisAPICommand, isAnalysisAPICommandExecutable } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
-import type { AnalysisBuilderComponentCaller } from '@privateaim/server-core-worker-kit';
+import { AnalysisBuilderComponentCaller } from '@privateaim/server-core-worker-kit';
 import type { Request } from 'routup';
 import type { Repository } from 'typeorm';
 import { AnalysisEntity, useDataSourceSync } from '../../database';
@@ -22,6 +22,7 @@ export class AnalysisBuilder {
     constructor() {
         const dataSource = useDataSourceSync();
         this.repository = dataSource.getRepository(AnalysisEntity);
+        this.caller = new AnalysisBuilderComponentCaller();
     }
 
     async start(

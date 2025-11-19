@@ -48,18 +48,32 @@ export default defineComponent({
             :image-link="configurationImageLink"
             :nodes-link="configurationNodesLink"
             :code-link="configurationCodeLink"
+            @failed="(e) => $emit('failed', e)"
+            @updated="(e) => $emit('updated', e)"
         />
 
         <hr>
 
-        <FAnalysisBuildStep :entity="entity" />
+        <FAnalysisBuildStep
+            :entity="entity"
+            @failed="(e) => $emit('failed', e)"
+            @updated="(e) => $emit('updated', e)"
+        />
 
         <hr>
 
-        <FAnalysisDistributionStep :entity="entity" />
+        <FAnalysisDistributionStep
+            :entity="entity"
+            @failed="(e) => $emit('failed', e)"
+            @updated="(e) => $emit('updated', e)"
+        />
 
         <hr>
 
-        <FAnalysisRunStep :entity="entity" />
+        <FAnalysisRunStep
+            :entity="entity"
+            @failed="(e) => $emit('failed', e)"
+            @updated="(e) => $emit('updated', e)"
+        />
     </div>
 </template>

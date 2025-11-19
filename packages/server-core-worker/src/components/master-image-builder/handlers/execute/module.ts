@@ -17,7 +17,7 @@ import {
 import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
 import path from 'node:path';
 import tar from 'tar-fs';
-import { MASTER_IMAGES_DATA_DIRECTORY_PATH } from '../../../../constants';
+import { MASTER_IMAGES_DIRECTORY_PATH } from '../../../../constants';
 import {
     buildDockerImageURL, useCoreClient, useDocker, waitForDockerActionStream,
 } from '../../../../core';
@@ -71,7 +71,7 @@ MasterImageBuilderCommand.EXECUTE
             tagOrDigest: 'latest',
         });
 
-        const imageFilePath = path.join(MASTER_IMAGES_DATA_DIRECTORY_PATH, masterImage.path);
+        const imageFilePath = path.join(MASTER_IMAGES_DIRECTORY_PATH, masterImage.path);
 
         const pack = tar.pack(imageFilePath);
         const stream = await docker

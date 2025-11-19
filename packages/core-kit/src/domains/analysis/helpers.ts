@@ -38,6 +38,13 @@ export function isAnalysisAPICommandExecutable(
                 return output;
             }
 
+            if (!entity.build_nodes_valid) {
+                const error = AnalysisError.nodesApprovalRequired();
+                output.message = error.message;
+
+                return output;
+            }
+
             if (!entity.build_status) {
                 output.success = true;
                 return output;

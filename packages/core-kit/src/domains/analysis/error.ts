@@ -14,6 +14,10 @@ export class AnalysisError extends Error {
         return new AnalysisError('An aggregator node node must be selected.');
     }
 
+    static nodesApprovalRequired() {
+        return new AnalysisError('All assigned nodes have to approve the analysis.');
+    }
+
     static entrypointRequired() {
         return new AnalysisError('An entrypoint must be selected.');
     }
