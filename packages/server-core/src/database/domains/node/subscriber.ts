@@ -9,13 +9,14 @@ import {
     DomainType,
 } from '@privateaim/core-kit';
 import type {
-    EntitySubscriberInterface,
+    EntitySubscriberInterface, InsertEvent, RemoveEvent,
 } from 'typeorm';
 import { EventSubscriber } from 'typeorm';
 import { BaseSubscriber } from '@privateaim/server-db-kit';
 import { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
 import { NodeEntity } from './entity';
+import { isNodeRobotServiceUsable, useNodeRobotService } from '../../../services';
 
 @EventSubscriber()
 export class NodeSubscriber extends BaseSubscriber<NodeEntity> implements EntitySubscriberInterface<NodeEntity> {
@@ -50,6 +51,23 @@ export class NodeSubscriber extends BaseSubscriber<NodeEntity> implements Entity
                 return destinations;
             },
         });
+    }
+
+    async afterInsert(event: InsertEvent<NodeEntity>): Promise<any> {
+        await super.afterInsert(event);
+
+        if (isNodeRobotServiceUsable()) {
+            const nodeRobotService = useNodeRobotService();
+            const robot = await nodeRobotService.save(event.entity);
+            await nodeRobotService.assignPermissions(robot);
+        }
+    }
+
+    async afterRemove(event: RemoveEvent<NodeEntity>): Promise<any> {
+        if (isNodeRobotServiceUsable()) {
+            const nodeRobotService = useNodeRobotService();
+            await nodeRobotService.delete(event.entity || event.databaseEntity);
+        }
     }
 
     listenTo(): CallableFunction | string {

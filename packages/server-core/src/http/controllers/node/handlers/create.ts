@@ -19,7 +19,6 @@ import { isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
 import { ForbiddenError } from '@ebec/http';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../../../components';
-import { isNodeRobotServiceUsable, useNodeRobotService } from '../../../../services';
 import { RequestRepositoryAdapter } from '../../../request';
 import { NodeValidator } from '../utils';
 import {
@@ -109,14 +108,6 @@ export async function createNodeRouteHandler(req: Request, res: Response) : Prom
                 },
             }));
         }
-    }
-
-    // -----------------------------------------------------
-
-    if (isNodeRobotServiceUsable()) {
-        const nodeRobotService = useNodeRobotService();
-        const robot = await nodeRobotService.save(entity);
-        await nodeRobotService.assignPermissions(robot);
     }
 
     // -----------------------------------------------------

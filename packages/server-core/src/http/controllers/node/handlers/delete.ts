@@ -13,8 +13,7 @@ import { useDataSource } from 'typeorm-extension';
 import { useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { isAmqpClientUsable, useQueueRouter } from '@privateaim/server-kit';
 import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../../../components';
-import { NodeEntity, RegistryProjectEntity } from '../../../../database/domains';
-import { isNodeRobotServiceUsable, useNodeRobotService } from '../../../../services';
+import { NodeEntity, RegistryProjectEntity } from '../../../../database';
 import { RequestRepositoryAdapter } from '../../../request';
 
 export async function deleteNodeRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -60,11 +59,6 @@ export async function deleteNodeRouteHandler(req: Request, res: Response) : Prom
     }
 
     const { id: entityId } = entity;
-
-    if (isNodeRobotServiceUsable()) {
-        const nodeRobotservice = useNodeRobotService();
-        await nodeRobotservice.delete(entity);
-    }
 
     const requestRepository = new RequestRepositoryAdapter(
         req,
