@@ -6,6 +6,10 @@
  */
 
 export class AnalysisError extends Error {
+    static notFound() {
+        return new AnalysisError('The Analysis could not be found.');
+    }
+
     static defaultNodeRequired() {
         return new AnalysisError('At least one default node must be selected.');
     }

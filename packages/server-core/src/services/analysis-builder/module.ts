@@ -13,25 +13,33 @@ import type { Request } from 'routup';
 import type { Repository } from 'typeorm';
 import { AnalysisEntity, useDataSourceSync } from '../../database';
 import { RequestRepositoryAdapter } from '../../http/request';
+import type { AnalysisMetadataComponentCaller } from '../../components';
+import {
+    useAnalysisMetadataComponentCaller,
+} from '../../components';
 
 export class AnalysisBuilder {
     protected repository : Repository<AnalysisEntity>;
 
     protected caller : AnalysisBuilderComponentCaller;
 
+    protected metadataCaller : AnalysisMetadataComponentCaller;
+
     constructor() {
         const dataSource = useDataSourceSync();
         this.repository = dataSource.getRepository(AnalysisEntity);
         this.caller = new AnalysisBuilderComponentCaller();
+        this.metadataCaller = useAnalysisMetadataComponentCaller();
     }
 
     async start(
         input: string | AnalysisEntity,
         request?: Request,
     ) {
-        const entity = await this.resolve(input);
-
-        // todo: call analysis-metadata component
+        const entityId = typeof input === 'string' ? input : input.id;
+        const entity = await this.metadataCaller.callRecalcDirect({
+            analysisId: entityId,
+        });
 
         const check = isAnalysisAPICommandExecutable(entity, AnalysisAPICommand.BUILD_START);
         if (!check.success) {
