@@ -44,6 +44,9 @@ export class AnalysisEntity implements Analysis {
     @Column({ type: 'int', unsigned: true, default: 0 })
         nodes: number;
 
+    @Column({ type: 'int', unsigned: true, default: 0 })
+        nodes_approved: number;
+
     // ------------------------------------------------------------------
 
     @Column({ type: 'boolean', default: false })
@@ -73,6 +76,9 @@ export class AnalysisEntity implements Analysis {
         distribution_status: ProcessStatus | null;
 
     // ------------------------------------------------------------------
+
+    @Column({ type: 'boolean', default: false })
+        build_nodes_valid: boolean;
 
     @Index()
     @Column({

@@ -18,7 +18,17 @@ export interface Analysis {
 
     description: string | null;
 
+    // ------------------------------------------------------------------
+
+    /**
+     * Amount of nodes assigned to the analysis.
+     */
     nodes: number;
+
+    /**
+     * Amount of nodes which approved the analysis.
+     */
+    nodes_approved: number;
 
     // ------------------------------------------------------------------
 
@@ -52,6 +62,11 @@ export interface Analysis {
     // ------------------------------------------------------------------
 
     build_status: ProcessStatus | null;
+
+    /**
+     * Define if the node constraints are satisfied for the build process.
+     */
+    build_nodes_valid: boolean;
 
     // ------------------------------------------------------------------
 
