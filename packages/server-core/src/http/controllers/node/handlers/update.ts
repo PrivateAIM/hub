@@ -16,13 +16,11 @@ import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
 import { HTTPHandlerOperation, useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
-import { isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
-import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../../../components';
-import { isNodeRobotServiceUsable, useNodeRobotService } from '../../../../services';
+import { RegistryCommand, useRegistryComponentCaller } from '../../../../components';
 import { RequestRepositoryAdapter } from '../../../request';
 import { NodeValidator } from '../utils';
-import { NodeEntity, RegistryProjectEntity } from '../../../../database/domains';
+import { NodeEntity, RegistryProjectEntity } from '../../../../database';
 
 export async function updateNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -104,35 +102,27 @@ export async function updateNodeRouteHandler(req: Request, res: Response) : Prom
         entity.registry_project_id = registryProject.id;
         entity.external_name = registryProjectExternalName;
 
-        if (isQueueRouterUsable()) {
-            const queueRouter = useQueueRouter();
-            if (registryOperation === 'link') {
-                await queueRouter.publish(buildRegistryTaskQueueRouterPayload({
-                    command: RegistryCommand.PROJECT_LINK,
-                    data: {
-                        id: registryProject.id,
-                    },
-                }));
-            } else {
-                await queueRouter.publish(buildRegistryTaskQueueRouterPayload({
-                    command: RegistryCommand.PROJECT_RELINK,
-                    data: {
-                        id: registryProject.id,
-                        registryId: registryProject.registry_id,
-                        externalName: registryProject.external_name,
-                        accountId: registryProject.account_id,
-                    },
-                }));
-            }
+        const caller = useRegistryComponentCaller();
+        if (registryOperation === 'link') {
+            await caller.call(
+                RegistryCommand.PROJECT_LINK,
+                {
+                    id: registryProject.id,
+                },
+                {},
+            );
+        } else {
+            await caller.call(
+                RegistryCommand.PROJECT_RELINK,
+                {
+                    id: registryProject.id,
+                    registryId: registryProject.registry_id,
+                    externalName: registryProject.external_name,
+                    accountId: registryProject.account_id,
+                },
+                {},
+            );
         }
-    }
-
-    // -----------------------------------------------------
-
-    if (isNodeRobotServiceUsable()) {
-        const nodeRobotService = useNodeRobotService();
-        const robot = await nodeRobotService.save(entity);
-        await nodeRobotService.assignPermissions(robot);
     }
 
     // -----------------------------------------------------

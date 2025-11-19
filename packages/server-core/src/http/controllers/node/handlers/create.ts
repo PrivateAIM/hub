@@ -15,10 +15,9 @@ import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
 import { HTTPHandlerOperation, useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
-import { isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
 import { ForbiddenError } from '@ebec/http';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
-import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../../../components';
+import { RegistryCommand, useRegistryComponentCaller } from '../../../../components';
 import { RequestRepositoryAdapter } from '../../../request';
 import { NodeValidator } from '../utils';
 import {
@@ -99,15 +98,14 @@ export async function createNodeRouteHandler(req: Request, res: Response) : Prom
 
         entity.registry_project_id = registryProject.id;
 
-        if (isQueueRouterUsable()) {
-            const queueRouter = useQueueRouter();
-            await queueRouter.publish(buildRegistryTaskQueueRouterPayload({
-                command: RegistryCommand.PROJECT_LINK,
-                data: {
-                    id: registryProject.id,
-                },
-            }));
-        }
+        const caller = useRegistryComponentCaller();
+        await caller.call(
+            RegistryCommand.PROJECT_LINK,
+            {
+                id: registryProject.id,
+            },
+            {},
+        );
     }
 
     // -----------------------------------------------------

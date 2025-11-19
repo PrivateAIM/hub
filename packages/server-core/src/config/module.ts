@@ -23,8 +23,9 @@ import {
 } from '../aggregators';
 import {
     AnalysisMetadataTaskQueue,
-    createRegistryComponent,
+    RegistryTaskQueueRouterRouting,
     useAnalysisMetadataComponent,
+    useRegistryComponent,
 } from '../components';
 import {
     configureAmqp,
@@ -102,7 +103,12 @@ export function createConfig() : Config {
     // ---------------------------------------------
 
     const components : Component[] = [
-        createRegistryComponent(),
+        new QueueWorkerComponentCaller(
+            useRegistryComponent(),
+            {
+                consumeQueue: RegistryTaskQueueRouterRouting,
+            },
+        ),
         new QueueWorkerComponentCaller(
             useAnalysisMetadataComponent(),
             {

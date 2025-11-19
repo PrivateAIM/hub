@@ -10,9 +10,12 @@ import type {
 } from '@authup/core-kit';
 import { ServiceID } from '@privateaim/core-kit';
 import { useDataSource } from 'typeorm-extension';
-import { useLogger, useQueueRouter } from '@privateaim/server-kit';
-import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../../components';
-import { RegistryProjectEntity } from '../../../database/domains';
+import { useLogger } from '@privateaim/server-kit';
+import {
+    RegistryCommand,
+    useRegistryComponentCaller,
+} from '../../../components';
+import { RegistryProjectEntity } from '../../../database';
 
 export async function handleAuthupRobotEvent(context: EventRecord<EntityType.ROBOT, Robot>) {
     if (!context.data.id) {
@@ -37,15 +40,15 @@ export async function handleAuthupRobotEvent(context: EventRecord<EntityType.ROB
         select: ['id'],
     });
 
+    const caller = useRegistryComponentCaller();
+
     for (let i = 0; i < projects.length; i++) {
-        const queueMessage = buildRegistryTaskQueueRouterPayload({
-            command: RegistryCommand.PROJECT_LINK,
-            data: {
+        await caller.call(
+            RegistryCommand.PROJECT_LINK,
+            {
                 id: projects[i].id,
             },
-        });
-
-        const queueRouter = useQueueRouter();
-        await queueRouter.publish(queueMessage);
+            {},
+        );
     }
 }

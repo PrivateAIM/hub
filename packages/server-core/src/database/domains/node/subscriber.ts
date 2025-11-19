@@ -9,7 +9,10 @@ import {
     DomainType,
 } from '@privateaim/core-kit';
 import type {
-    EntitySubscriberInterface, InsertEvent, RemoveEvent,
+    EntitySubscriberInterface,
+    InsertEvent,
+    RemoveEvent,
+    UpdateEvent,
 } from 'typeorm';
 import { EventSubscriber } from 'typeorm';
 import { BaseSubscriber } from '@privateaim/server-db-kit';
@@ -59,6 +62,19 @@ export class NodeSubscriber extends BaseSubscriber<NodeEntity> implements Entity
         if (isNodeRobotServiceUsable()) {
             const nodeRobotService = useNodeRobotService();
             const robot = await nodeRobotService.save(event.entity);
+            await nodeRobotService.assignPermissions(robot);
+        }
+    }
+
+    async afterUpdate(event: UpdateEvent<NodeEntity>): Promise<any> {
+        await super.afterUpdate(event);
+
+        if (isNodeRobotServiceUsable()) {
+            const nodeRobotService = useNodeRobotService();
+            const robot = await nodeRobotService.save({
+                ...(event.databaseEntity || {}),
+                ...event.entity,
+            } as NodeEntity);
             await nodeRobotService.assignPermissions(robot);
         }
     }

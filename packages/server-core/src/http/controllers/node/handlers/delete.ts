@@ -11,8 +11,7 @@ import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
-import { isAmqpClientUsable, useQueueRouter } from '@privateaim/server-kit';
-import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../../../components';
+import { RegistryCommand, useRegistryComponentCaller } from '../../../../components';
 import { NodeEntity, RegistryProjectEntity } from '../../../../database';
 import { RequestRepositoryAdapter } from '../../../request';
 
@@ -35,26 +34,24 @@ export async function deleteNodeRouteHandler(req: Request, res: Response) : Prom
         throw new ForbiddenError('You are not permitted to delete this station.');
     }
 
-    if (isAmqpClientUsable()) {
-        if (entity.registry_project_id) {
-            const registryProjectRepository = dataSource.getRepository(RegistryProjectEntity);
+    if (entity.registry_project_id) {
+        const registryProjectRepository = dataSource.getRepository(RegistryProjectEntity);
 
-            const registryProject = await registryProjectRepository.findOneBy({ id: entity.registry_project_id });
-            if (registryProject) {
-                const queueMessage = buildRegistryTaskQueueRouterPayload({
-                    command: RegistryCommand.PROJECT_UNLINK,
-                    data: {
-                        id: registryProject.id,
-                        registryId: registryProject.registry_id,
-                        externalName: registryProject.external_name,
-                        accountId: registryProject.account_id,
-                    },
-                });
+        const registryProject = await registryProjectRepository.findOneBy({ id: entity.registry_project_id });
+        if (registryProject) {
+            const caller = useRegistryComponentCaller();
+            await caller.call(
+                RegistryCommand.PROJECT_UNLINK,
+                {
+                    id: registryProject.id,
+                    registryId: registryProject.registry_id,
+                    externalName: registryProject.external_name,
+                    accountId: registryProject.account_id,
+                },
+                {},
+            );
 
-                const queueRouter = useQueueRouter();
-                await queueRouter.publish(queueMessage);
-                await registryProjectRepository.remove(registryProject);
-            }
+            await registryProjectRepository.remove(registryProject);
         }
     }
 

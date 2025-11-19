@@ -11,12 +11,11 @@ import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { HTTPHandlerOperation, useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
-import { isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
-import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../../../components';
+import { RegistryCommand, useRegistryComponentCaller } from '../../../../components';
 import { RequestRepositoryAdapter } from '../../../request';
 import { RegistryProjectValidator } from '../utils';
-import { RegistryProjectEntity } from '../../../../database/domains';
+import { RegistryProjectEntity } from '../../../../database';
 
 export async function updateRegistryProjectRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -51,32 +50,32 @@ export async function updateRegistryProjectRouteHandler(req: Request, res: Respo
 
     await requestRepository.save(entity);
 
-    if (isQueueRouterUsable()) {
-        const client = useQueueRouter();
+    const caller = useRegistryComponentCaller();
 
-        if (
-            entity.external_name &&
-            data.external_name &&
-            entity.external_name !== data.external_name
-        ) {
-            await client.publish(buildRegistryTaskQueueRouterPayload({
-                command: RegistryCommand.PROJECT_UNLINK,
-                data: {
-                    id: entity.id,
-                    registryId: entity.registry_id,
-                    externalName: data.external_name,
-                    accountId: data.account_id,
-                },
-            }));
-        }
-
-        await client.publish(buildRegistryTaskQueueRouterPayload({
-            command: RegistryCommand.PROJECT_LINK,
-            data: {
+    if (
+        entity.external_name &&
+        data.external_name &&
+        entity.external_name !== data.external_name
+    ) {
+        await caller.call(
+            RegistryCommand.PROJECT_UNLINK,
+            {
                 id: entity.id,
+                registryId: entity.registry_id,
+                externalName: data.external_name,
+                accountId: data.account_id,
             },
-        }));
+            {},
+        );
     }
+
+    await caller.call(
+        RegistryCommand.PROJECT_LINK,
+        {
+            id: entity.id,
+        },
+        {},
+    );
 
     return sendAccepted(res, entity);
 }

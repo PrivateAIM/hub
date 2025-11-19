@@ -6,6 +6,8 @@
  */
 
 import type { Registry, RegistryProject } from '@privateaim/core-kit';
+import type { ObjectLiteralKeys } from '@privateaim/kit';
+import type { ComponentMetadata } from '@privateaim/server-kit';
 import type { RegistryCommand } from './constants';
 
 type RegistryHookEventData = {
@@ -64,13 +66,23 @@ export type RegistryEventPayload = {
     artifactDigest?: string,
 };
 
+export type RegistryEventMap = ObjectLiteralKeys<{
+    [RegistryCommand.SETUP]: [RegistrySetupPayload, ComponentMetadata],
+    [RegistryCommand.HOOK_HANDLE]: [RegistryEventPayload, ComponentMetadata],
+    [RegistryCommand.DELETE]: [RegistrySetupPayload, ComponentMetadata],
+    [RegistryCommand.CLEANUP]: [RegistryCleanupPayload, ComponentMetadata],
+    [RegistryCommand.PROJECT_LINK]: [RegistryProjectLinkPayload, ComponentMetadata],
+    [RegistryCommand.PROJECT_UNLINK]: [RegistryProjectUnlinkPayload, ComponentMetadata],
+    [RegistryCommand.PROJECT_RELINK]: [RegistryProjectRelinkPayload, ComponentMetadata],
+}>;
+
 export type RegistrySetupCommandContext = {
     command: `${RegistryCommand.SETUP}`,
     data: RegistrySetupPayload
 };
 
 export type RegistryEventCommandContext = {
-    command: `${RegistryCommand.EVENT_HANDLE}`,
+    command: `${RegistryCommand.HOOK_HANDLE}`,
     data: RegistryEventPayload
 };
 
