@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.8.22](https://github.com/PrivateAIM/hub/compare/v0.8.21...v0.8.22) (2025-11-20)
+
+
+### Features
+
+* component caller(s) implementation ([#1295](https://github.com/PrivateAIM/hub/issues/1295)) ([3b21fe1](https://github.com/PrivateAIM/hub/commit/3b21fe1b2cf3d47332722578cff67359442d84eb))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/messenger-kit bumped from ^0.7.22 to ^0.7.23
+    * @privateaim/server-kit bumped from ^0.8.21 to ^0.8.22
+    * @privateaim/server-telemetry-kit bumped from ^0.8.21 to ^0.8.22
+    * @privateaim/server-http-kit bumped from ^0.8.21 to ^0.8.22
+    * @privateaim/server-realtime-kit bumped from ^0.8.21 to ^0.8.22
+    * @privateaim/telemetry-kit bumped from ^0.8.21 to ^0.8.22
+
 ## [0.8.21](https://github.com/PrivateAIM/hub/compare/v0.8.20...v0.8.21) (2025-11-04)
 
 

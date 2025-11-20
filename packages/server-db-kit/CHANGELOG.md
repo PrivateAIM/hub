@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.8.22](https://github.com/PrivateAIM/hub/compare/v0.8.21...v0.8.22) (2025-11-20)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.8.21 to ^0.8.22
+    * @privateaim/server-kit bumped from ^0.8.21 to ^0.8.22
+
 ## [0.8.21](https://github.com/PrivateAIM/hub/compare/v0.8.20...v0.8.21) (2025-11-04)
 
 

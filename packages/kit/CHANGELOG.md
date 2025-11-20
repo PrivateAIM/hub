@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.22](https://github.com/PrivateAIM/hub/compare/v0.8.21...v0.8.22) (2025-11-20)
+
+
+### Features
+
+* replace AnalysisXXXStatus with ProcessStatus ([#1276](https://github.com/PrivateAIM/hub/issues/1276)) ([f4826cf](https://github.com/PrivateAIM/hub/commit/f4826cf0938d0171565a1aae880c5d724fbc107b))
+
 ## [0.8.21](https://github.com/PrivateAIM/hub/compare/v0.8.20...v0.8.21) (2025-11-04)
 
 ## [0.8.20](https://github.com/PrivateAIM/hub/compare/v0.8.19...v0.8.20) (2025-10-29)
