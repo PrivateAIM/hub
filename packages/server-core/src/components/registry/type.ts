@@ -6,29 +6,9 @@
  */
 
 import type { Registry, RegistryProject } from '@privateaim/core-kit';
+import type { ObjectLiteralKeys } from '@privateaim/kit';
+import type { ComponentData, ComponentMetadata } from '@privateaim/server-kit';
 import type { RegistryCommand } from './constants';
-
-type RegistryHookEventData = {
-    repository: {
-        name: string,
-        repo_full_name: string,
-        date_created: string | undefined,
-        namespace: string
-    },
-    resources: {
-        digest: string,
-        tag: string,
-        resource_url: string
-    }[],
-    [key: string]: any
-};
-
-export type RegistryHook = {
-    type: string,
-    occur_at?: string,
-    operator: string,
-    event_data: RegistryHookEventData
-};
 
 export type RegistrySetupPayload = {
     id: Registry['id']
@@ -54,55 +34,12 @@ export type RegistryProjectRelinkPayload = RegistryProjectUnlinkPayload & {
     id: RegistryProject['id']
 };
 
-export type RegistryEventPayload = {
-    event: string,
-    operator: string,
-    namespace: string,
-    repositoryName: string,
-    repositoryFullName: string,
-    artifactTag?: string,
-    artifactDigest?: string,
-};
-
-export type RegistrySetupCommandContext = {
-    command: `${RegistryCommand.SETUP}`,
-    data: RegistrySetupPayload
-};
-
-export type RegistryEventCommandContext = {
-    command: `${RegistryCommand.EVENT_HANDLE}`,
-    data: RegistryEventPayload
-};
-
-export type RegistryDeleteCommandContext = {
-    command: `${RegistryCommand.DELETE}`,
-    data: RegistrySetupPayload
-};
-
-export type RegistryCleanupCommandContext = {
-    command: `${RegistryCommand.CLEANUP}`,
-    data: RegistryCleanupPayload
-};
-
-export type RegistryProjectLinkCommandContext = {
-    command: `${RegistryCommand.PROJECT_LINK}`,
-    data: RegistryProjectLinkPayload
-};
-
-export type RegistryProjectUnlinkCommandContext = {
-    command: `${RegistryCommand.PROJECT_UNLINK}`,
-    data: RegistryProjectUnlinkPayload
-};
-
-export type RegistryProjectRelinkCommandContext = {
-    command: `${RegistryCommand.PROJECT_RELINK}`,
-    data: RegistryProjectRelinkPayload
-};
-
-export type RegistryCommandContext = RegistryEventCommandContext |
-RegistrySetupCommandContext |
-RegistryDeleteCommandContext |
-RegistryCleanupCommandContext |
-RegistryProjectLinkCommandContext |
-RegistryProjectUnlinkCommandContext |
-RegistryProjectRelinkCommandContext;
+export type RegistryEventMap = ObjectLiteralKeys<{
+    [RegistryCommand.SETUP]: [RegistrySetupPayload, ComponentMetadata],
+    [RegistryCommand.HOOK_PROCESS]: [ComponentData, ComponentMetadata],
+    [RegistryCommand.DELETE]: [RegistrySetupPayload, ComponentMetadata],
+    [RegistryCommand.CLEANUP]: [RegistryCleanupPayload, ComponentMetadata],
+    [RegistryCommand.PROJECT_LINK]: [RegistryProjectLinkPayload, ComponentMetadata],
+    [RegistryCommand.PROJECT_UNLINK]: [RegistryProjectUnlinkPayload, ComponentMetadata],
+    [RegistryCommand.PROJECT_RELINK]: [RegistryProjectRelinkPayload, ComponentMetadata],
+}>;

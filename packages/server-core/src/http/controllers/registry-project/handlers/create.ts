@@ -10,12 +10,11 @@ import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
 import { HTTPHandlerOperation, useRequestPermissionChecker } from '@privateaim/server-http-kit';
-import { isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
-import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../../../components';
+import { RegistryCommand, useRegistryComponentCaller } from '../../../../components';
 import { RequestRepositoryAdapter } from '../../../request';
 import { RegistryProjectValidator } from '../utils';
-import { RegistryProjectEntity } from '../../../../database/domains';
+import { RegistryProjectEntity } from '../../../../database';
 
 export async function createRegistryProjectRouteHandler(req: Request, res: Response) : Promise<any> {
     const permissionChecker = useRequestPermissionChecker(req);
@@ -43,15 +42,14 @@ export async function createRegistryProjectRouteHandler(req: Request, res: Respo
 
     await requestRepository.save(entity);
 
-    if (isQueueRouterUsable()) {
-        const client = useQueueRouter();
-        await client.publish(buildRegistryTaskQueueRouterPayload({
-            command: RegistryCommand.PROJECT_LINK,
-            data: {
-                id: entity.id,
-            },
-        }));
-    }
+    const caller = useRegistryComponentCaller();
+    await caller.call(
+        RegistryCommand.PROJECT_LINK,
+        {
+            id: entity.id,
+        },
+        {},
+    );
 
     return sendCreated(res, entity);
 }

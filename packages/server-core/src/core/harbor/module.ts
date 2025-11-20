@@ -8,9 +8,9 @@
 import { parseConnectionString } from '@hapic/harbor';
 import { getHostNameFromString } from '@privateaim/kit';
 import { useDataSource } from 'typeorm-extension';
-import { isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
-import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../components';
-import { RegistryEntity } from '../../database/domains';
+import { isQueueRouterUsable } from '@privateaim/server-kit';
+import { RegistryCommand, useRegistryComponentCaller } from '../../components';
+import { RegistryEntity } from '../../database';
 import { useEnv } from '../../config';
 
 export async function setupHarborService() {
@@ -44,15 +44,12 @@ export async function setupHarborService() {
     if (!isQueueRouterUsable()) {
         return;
     }
-
-    const queueRouter = useQueueRouter();
-
-    const queueMessage = buildRegistryTaskQueueRouterPayload({
-        command: RegistryCommand.SETUP,
-        data: {
+    const caller = useRegistryComponentCaller();
+    await caller.call(
+        RegistryCommand.SETUP,
+        {
             id: entity.id,
         },
-    });
-
-    await queueRouter.publish(queueMessage);
+        {},
+    );
 }

@@ -15,15 +15,10 @@ import { sendAccepted } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import {
-    isQueueRouterUsable,
-    useLogger,
-    useQueueRouter,
-} from '@privateaim/server-kit';
-import {
     RegistryCommand,
-    buildRegistryTaskQueueRouterPayload,
+    useRegistryComponentCaller,
 } from '../../../../../components';
-import { RegistryEntity, RegistryProjectEntity } from '../../../../../database/domains';
+import { RegistryEntity, RegistryProjectEntity } from '../../../../../database';
 import { ServiceRegistryValidator } from '../../utils/validation';
 
 export async function handleRegistryCommandRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -34,13 +29,8 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
     const validatorAdapter = new RoutupContainerAdapter(validator);
     const result = await validatorAdapter.run(req);
 
-    if (!isQueueRouterUsable()) {
-        return sendAccepted(res);
-    }
-
-    const client = useQueueRouter();
-
     const dataSource = await useDataSource();
+    const caller = useRegistryComponentCaller();
 
     switch (result.command) {
         case RegistryAPICommand.SETUP:
@@ -55,38 +45,29 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
                 .getOne();
 
             if (result.command === RegistryAPICommand.SETUP) {
-                useLogger().debug('Submitting setup registry command.');
-
-                const queueMessage = buildRegistryTaskQueueRouterPayload({
-                    command: RegistryCommand.SETUP,
-                    data: {
+                await caller.call(
+                    RegistryCommand.SETUP,
+                    {
                         id: entity.id,
                     },
-                });
-
-                await client.publish(queueMessage);
+                    {},
+                );
             } else if (result.command === RegistryAPICommand.DELETE) {
-                useLogger().debug('Submitting delete registry command.');
-
-                const queueMessage = buildRegistryTaskQueueRouterPayload({
-                    command: RegistryCommand.DELETE,
-                    data: {
+                await caller.call(
+                    RegistryCommand.DELETE,
+                    {
                         id: entity.id,
                     },
-                });
-
-                await client.publish(queueMessage);
+                    {},
+                );
             } else {
-                useLogger().debug('Submitting cleanup registry command.');
-
-                const queueMessage = buildRegistryTaskQueueRouterPayload({
-                    command: RegistryCommand.CLEANUP,
-                    data: {
+                await caller.call(
+                    RegistryCommand.CLEANUP,
+                    {
                         id: entity.id,
                     },
-                });
-
-                await client.publish(queueMessage);
+                    {},
+                );
             }
             break;
         }
@@ -101,25 +82,25 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
                 .getOne();
 
             if (result.command === RegistryAPICommand.PROJECT_LINK) {
-                const queueMessage = buildRegistryTaskQueueRouterPayload({
-                    command: RegistryCommand.PROJECT_LINK,
-                    data: {
+                await caller.call(
+                    RegistryCommand.PROJECT_LINK,
+                    {
                         id: entity.id,
                         secret: result.secret,
                     },
-                });
-                await client.publish(queueMessage);
+                    {},
+                );
             } else {
-                const queueMessage = buildRegistryTaskQueueRouterPayload({
-                    command: RegistryCommand.PROJECT_UNLINK,
-                    data: {
+                await caller.call(
+                    RegistryCommand.PROJECT_UNLINK,
+                    {
                         id: entity.id,
                         registryId: entity.registry_id,
                         externalName: entity.external_name,
                         accountId: entity.account_id,
                     },
-                });
-                await client.publish(queueMessage);
+                    {},
+                );
             }
             break;
         }

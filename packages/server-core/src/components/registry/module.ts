@@ -1,85 +1,37 @@
 /*
- * Copyright (c) 2021-2024.
+ * Copyright (c) 2025.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Component, QueueRouterHandlers } from '@privateaim/server-kit';
+import { BaseComponent } from '@privateaim/server-kit';
+import { RegistryCommand } from './constants';
 import {
-    EnvironmentName,
-    isQueueRouterUsable,
-    useLogger,
-    useQueueRouter,
-} from '@privateaim/server-kit';
-import { useEnv } from '../../config';
-import { RegistryCommand, RegistryTaskQueueRouterRouting } from './constants';
-import {
-    dispatchRegistryEventToTrainManager,
-    linkRegistryProject,
-    relinkRegistryProject,
-    setupRegistry,
-    unlinkRegistryProject,
+    RegistryCleanupHandler,
+    RegistryHookHandler,
+    RegistryProjectLinkHandler,
+    RegistryProjectRelinkHandler,
+    RegistryProjectUnlinkHandler,
+    RegistrySetupHandler,
 } from './handlers';
-import { cleanupRegistry } from './handlers/cleanup';
-import type {
-    RegistryCleanupPayload,
-    RegistryEventPayload,
-    RegistryProjectLinkPayload,
-    RegistryProjectRelinkPayload,
-    RegistryProjectUnlinkPayload,
-    RegistrySetupPayload,
-} from './type';
+import type { RegistryEventMap } from './type';
 
-function createRegistryQueueHandlers() : QueueRouterHandlers<{
-    [RegistryCommand.SETUP]: RegistrySetupPayload,
-    [RegistryCommand.EVENT_HANDLE]: RegistryEventPayload,
-    [RegistryCommand.DELETE]: RegistrySetupPayload,
-    [RegistryCommand.CLEANUP]: RegistryCleanupPayload,
-    [RegistryCommand.PROJECT_LINK]: RegistryProjectLinkPayload,
-    [RegistryCommand.PROJECT_UNLINK]: RegistryProjectUnlinkPayload,
-    [RegistryCommand.PROJECT_RELINK]: RegistryProjectRelinkPayload,
-}> {
-    return {
-        [RegistryCommand.SETUP]: async (message) => {
-            await setupRegistry(message.data);
-        },
-        [RegistryCommand.EVENT_HANDLE]: async (message) => {
-            await dispatchRegistryEventToTrainManager(message.data);
-        },
-        [RegistryCommand.DELETE]: async () => {
+export class RegistryComponent extends BaseComponent<RegistryEventMap> {
+    constructor() {
+        super();
 
-        },
-        [RegistryCommand.CLEANUP]: async (message) => {
-            await cleanupRegistry(message.data);
-        },
-        [RegistryCommand.PROJECT_LINK]: async (message) => {
-            await linkRegistryProject(message.data);
-        },
-        [RegistryCommand.PROJECT_UNLINK]: async (message) => {
-            await unlinkRegistryProject(message.data);
-        },
-        [RegistryCommand.PROJECT_RELINK]: async (message) => {
-            await relinkRegistryProject(message.data);
-        },
-    };
-}
+        this.mount(RegistryCommand.SETUP, new RegistrySetupHandler());
+        this.mount(RegistryCommand.CLEANUP, new RegistryCleanupHandler());
 
-export function createRegistryComponent() : Component {
-    if (!isQueueRouterUsable() || useEnv('env') === EnvironmentName.TEST) {
-        // todo: maybe log
-        return {
-            start() {
-                useLogger().warn('Registry component has not been initialized');
-            },
-        };
+        this.mount(RegistryCommand.HOOK_PROCESS, new RegistryHookHandler());
+
+        this.mount(RegistryCommand.PROJECT_LINK, new RegistryProjectLinkHandler());
+        this.mount(RegistryCommand.PROJECT_UNLINK, new RegistryProjectUnlinkHandler());
+        this.mount(RegistryCommand.PROJECT_RELINK, new RegistryProjectRelinkHandler());
     }
 
-    const queueRouter = useQueueRouter();
-
-    return {
-        start() {
-            return queueRouter.consume(RegistryTaskQueueRouterRouting, createRegistryQueueHandlers());
-        },
-    };
+    async start() {
+        await this.initialize();
+    }
 }

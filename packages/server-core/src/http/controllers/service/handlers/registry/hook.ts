@@ -9,36 +9,19 @@ import { useRequestBody } from '@routup/basic/body';
 import type { Request, Response } from 'routup';
 import { sendAccepted } from 'routup';
 import {
-    isQueueRouterUsable,
-    useLogger,
-    useQueueRouter,
-} from '@privateaim/server-kit';
-import { RegistryCommand, RegistryHookSchema, buildRegistryTaskQueueRouterPayload } from '../../../../../components';
+    RegistryCommand,
+    useRegistryComponentCaller,
+} from '../../../../../components';
 
 export async function postHarborHookRouteHandler(req: Request, res: Response) : Promise<any> {
     const body = useRequestBody(req);
 
-    const validation = await RegistryHookSchema.safeParseAsync(body);
-    if (validation.success === false) {
-        useLogger().warn('The registry hook has a malformed shape.', { error: validation.error });
-        return sendAccepted(res);
-    }
-
-    if (isQueueRouterUsable()) {
-        const client = useQueueRouter();
-        await client.publish(buildRegistryTaskQueueRouterPayload({
-            command: RegistryCommand.EVENT_HANDLE,
-            data: {
-                event: validation.data.type,
-                operator: validation.data.operator,
-                namespace: validation.data.event_data.repository.namespace,
-                repositoryName: validation.data.event_data.repository.name,
-                repositoryFullName: validation.data.event_data.repository.repo_full_name,
-                artifactTag: validation.data.event_data.resources[0]?.tag,
-                artifactDigest: validation.data.event_data.resources[0]?.digest,
-            },
-        }));
-    }
+    const caller = useRegistryComponentCaller();
+    await caller.call(
+        RegistryCommand.HOOK_PROCESS,
+        body,
+        {},
+    );
 
     return sendAccepted(res);
 }

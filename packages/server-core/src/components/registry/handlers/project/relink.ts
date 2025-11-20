@@ -5,14 +5,19 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { RegistryProjectRelinkPayload } from '../../type';
-import { linkRegistryProject } from './link';
-import { unlinkRegistryProject } from './unlink';
+import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
+import type { RegistryEventMap, RegistryProjectRelinkPayload } from '../../type';
+import { RegistryCommand } from '../../constants';
 
-export async function relinkRegistryProject(
-    payload: RegistryProjectRelinkPayload,
-) {
-    await unlinkRegistryProject(payload);
-
-    await linkRegistryProject(payload);
+export class RegistryProjectRelinkHandler implements ComponentHandler<
+RegistryEventMap,
+RegistryCommand.PROJECT_RELINK
+> {
+    async handle(
+        value: RegistryProjectRelinkPayload,
+        context: ComponentHandlerContext<RegistryEventMap, RegistryCommand.PROJECT_RELINK>,
+    ): Promise<void> {
+        await context.handle(RegistryCommand.PROJECT_UNLINK, value);
+        await context.handle(RegistryCommand.PROJECT_LINK, value);
+    }
 }

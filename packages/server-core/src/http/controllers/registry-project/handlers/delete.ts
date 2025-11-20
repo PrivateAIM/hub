@@ -11,8 +11,7 @@ import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
-import { isQueueRouterUsable, useQueueRouter } from '@privateaim/server-kit';
-import { RegistryCommand, buildRegistryTaskQueueRouterPayload } from '../../../../components';
+import { RegistryCommand, useRegistryComponentCaller } from '../../../../components';
 import { RegistryProjectEntity } from '../../../../database/domains';
 import { RequestRepositoryAdapter } from '../../../request';
 
@@ -45,19 +44,17 @@ export async function deleteRegistryProjectRouteHandler(req: Request, res: Respo
     await requestRepository.remove(entity);
 
     entity.id = entityId;
-
-    if (isQueueRouterUsable()) {
-        const client = useQueueRouter();
-        await client.publish(buildRegistryTaskQueueRouterPayload({
-            command: RegistryCommand.PROJECT_UNLINK,
-            data: {
-                id: entity.id,
-                registryId: entity.registry_id,
-                externalName: entity.external_name,
-                accountId: entity.account_id,
-            },
-        }));
-    }
+    const caller = useRegistryComponentCaller();
+    await caller.call(
+        RegistryCommand.PROJECT_UNLINK,
+        {
+            id: entity.id,
+            registryId: entity.registry_id,
+            externalName: entity.external_name,
+            accountId: entity.account_id,
+        },
+        {},
+    );
 
     return sendAccepted(res, entity);
 }
