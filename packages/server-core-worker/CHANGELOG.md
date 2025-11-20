@@ -1,5 +1,36 @@
 # Changelog
 
+## [0.8.22](https://github.com/PrivateAIM/hub/compare/v0.8.21...v0.8.22) (2025-11-20)
+
+
+### Features
+
+* add aggregation column nodes_approved + build_nodes_valid ([#1308](https://github.com/PrivateAIM/hub/issues/1308)) ([2ef0d57](https://github.com/PrivateAIM/hub/commit/2ef0d5701c66b6f4b45a162c7b9413efd8764d1f))
+* analysis builds with local base images  ([#1304](https://github.com/PrivateAIM/hub/issues/1304)) ([44acb7e](https://github.com/PrivateAIM/hub/commit/44acb7eb3624ea4a7230ddd1bc2ce46884bf8d08))
+* analysis-distributor  ([#1285](https://github.com/PrivateAIM/hub/issues/1285)) ([5da60be](https://github.com/PrivateAIM/hub/commit/5da60be91c4ae27ea16369b5d7e3d09782118826))
+* component caller(s) implementation ([#1295](https://github.com/PrivateAIM/hub/issues/1295)) ([3b21fe1](https://github.com/PrivateAIM/hub/commit/3b21fe1b2cf3d47332722578cff67359442d84eb))
+* master-image component(s) ([#1300](https://github.com/PrivateAIM/hub/issues/1300)) ([94cd580](https://github.com/PrivateAIM/hub/commit/94cd58057082ba9c48dae52346bfe5a8cabb28d8))
+* storage components + component/handler refactoring ([#1289](https://github.com/PrivateAIM/hub/issues/1289)) ([c22db47](https://github.com/PrivateAIM/hub/commit/c22db471bb2a7e71f33a299926f38fde551efc39))
+
+
+### Bug Fixes
+
+* **deps:** bump the minorandpatch group across 1 directory with 13 updates ([#1292](https://github.com/PrivateAIM/hub/issues/1292)) ([acdc7cb](https://github.com/PrivateAIM/hub/commit/acdc7cb8aa12e85818d69638c29ab79c74fbcbb6))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.8.21 to ^0.8.22
+    * @privateaim/kit bumped from ^0.8.21 to ^0.8.22
+    * @privateaim/core-http-kit bumped from ^0.8.21 to ^0.8.22
+    * @privateaim/telemetry-kit bumped from ^0.8.21 to ^0.8.22
+    * @privateaim/server-kit bumped from ^0.8.21 to ^0.8.22
+    * @privateaim/server-telemetry-kit bumped from ^0.8.21 to ^0.8.22
+    * @privateaim/server-core-worker-kit bumped from ^0.7.22 to ^0.7.23
+    * @privateaim/storage-kit bumped from ^0.8.21 to ^0.8.22
+
 ## [0.8.21](https://github.com/PrivateAIM/hub/compare/v0.8.20...v0.8.21) (2025-11-04)
 
 
