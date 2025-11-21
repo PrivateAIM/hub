@@ -11,10 +11,15 @@ export enum AnalysisDistributorEvent {
     EXECUTION_STARTED = 'executionStarted',
     EXECUTION_FINISHED = 'executionFinished',
     EXECUTION_FAILED = 'executionFailed',
+
+    CHECK_STARTED = 'checkStarted',
+    CHECK_FINISHED = 'checkFinished',
+    CHECK_FAILED = 'checkFailed',
 }
 
 export enum AnalysisDistributorCommand {
     EXECUTE = 'execute',
+    CHECK = 'check',
 }
 
 export const AnalysisDistributorEventQueueRouterRouting = {

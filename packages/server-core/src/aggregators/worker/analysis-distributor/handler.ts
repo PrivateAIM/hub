@@ -6,13 +6,13 @@
  */
 
 import { ProcessStatus } from '@privateaim/kit';
-import type { AnalysisDistributorPayload } from '@privateaim/server-core-worker-kit';
+import type { AnalysisDistributorBasePayload } from '@privateaim/server-core-worker-kit';
 import { AnalysisDistributorEvent } from '@privateaim/server-core-worker-kit';
 import type { ComponentHandlerContext } from '@privateaim/server-kit';
 import { AnalysisEntity, useDataSourceSync } from '../../../database';
 
 export async function handleAnalysisDistributorEvent(
-    value: AnalysisDistributorPayload,
+    value: AnalysisDistributorBasePayload,
     context: ComponentHandlerContext,
 ) {
     const dataSource = useDataSourceSync();
