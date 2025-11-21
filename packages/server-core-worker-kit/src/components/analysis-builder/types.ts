@@ -5,9 +5,31 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { ObjectLiteralKeys, ProcessStatus } from '@privateaim/kit';
+import type { ComponentMetadata } from '@privateaim/server-kit';
+import type { AnalysisBuilderCommand, AnalysisBuilderEvent } from './constants';
+
 export type AnalysisBuilderBasePayload = {
     id: string,
     error?: Error
 };
 
 export type AnalysisBuilderExecutePayload = AnalysisBuilderBasePayload;
+
+export type AnalysisBuilderCheckPayload = AnalysisBuilderBasePayload;
+
+export type AnalysisBuilderCheckFinishedPayload = AnalysisBuilderBasePayload & {
+    status?: `${ProcessStatus}`
+};
+
+export type AnalysisBuilderEventMap = ObjectLiteralKeys<{
+    [AnalysisBuilderCommand.EXECUTE]: [AnalysisBuilderExecutePayload, ComponentMetadata],
+    [AnalysisBuilderEvent.EXECUTION_FAILED]: [AnalysisBuilderExecutePayload, ComponentMetadata],
+    [AnalysisBuilderEvent.EXECUTION_STARTED]: [AnalysisBuilderExecutePayload, ComponentMetadata],
+    [AnalysisBuilderEvent.EXECUTION_FINISHED]: [AnalysisBuilderExecutePayload, ComponentMetadata],
+
+    [AnalysisBuilderCommand.CHECK]: [AnalysisBuilderCheckPayload, ComponentMetadata],
+    [AnalysisBuilderEvent.CHECK_STARTED]: [AnalysisBuilderCheckPayload, ComponentMetadata],
+    [AnalysisBuilderEvent.CHECK_FAILED]: [AnalysisBuilderCheckPayload, ComponentMetadata],
+    [AnalysisBuilderEvent.CHECK_FINISHED]: [AnalysisBuilderCheckFinishedPayload, ComponentMetadata],
+}>;

@@ -8,7 +8,7 @@
 import {
     REGISTRY_ARTIFACT_TAG_LATEST,
 } from '@privateaim/core-kit';
-import type { AnalysisBuilderExecutePayload } from '@privateaim/server-core-worker-kit';
+import type { AnalysisBuilderEventMap, AnalysisBuilderExecutePayload } from '@privateaim/server-core-worker-kit';
 import {
     AnalysisBuilderCommand,
     AnalysisBuilderEvent,
@@ -25,8 +25,11 @@ import {
 import { generateDockerFileContent, packContainerWithAnalysis } from '../../helpers';
 import { useAnalysisBuilderLogger } from '../../utils';
 
-export class AnalysisBuilderExecuteHandler implements ComponentHandler {
-    async handle(value: AnalysisBuilderExecutePayload, context: ComponentHandlerContext): Promise<void> {
+export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisBuilderEventMap, AnalysisBuilderCommand.EXECUTE> {
+    async handle(
+        value: AnalysisBuilderExecutePayload,
+        context: ComponentHandlerContext<AnalysisBuilderEventMap, AnalysisBuilderCommand.EXECUTE>,
+    ): Promise<void> {
         try {
             // todo: check if image exists, otherwise local queue task
             await this.handleInternal(value, context);
@@ -56,7 +59,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler {
 
     async handleInternal(
         value: AnalysisBuilderExecutePayload,
-        context: ComponentHandlerContext,
+        context: ComponentHandlerContext<AnalysisBuilderEventMap, AnalysisBuilderCommand.EXECUTE>,
     ): Promise<void> {
         await context.handle(
             AnalysisBuilderEvent.EXECUTION_STARTED,

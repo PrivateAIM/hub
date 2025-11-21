@@ -10,9 +10,9 @@ import {
     QueueDispatchComponentCaller,
 } from '@privateaim/server-kit';
 import { AnalysisBuilderCommand, AnalysisBuilderTaskQueueRouterRouting } from './constants';
-import type { AnalysisBuilderBasePayload, AnalysisBuilderExecutePayload } from './types';
+import type { AnalysisBuilderBasePayload, AnalysisBuilderEventMap, AnalysisBuilderExecutePayload } from './types';
 
-export class AnalysisBuilderComponentCaller extends QueueDispatchComponentCaller {
+export class AnalysisBuilderComponentCaller extends QueueDispatchComponentCaller<AnalysisBuilderEventMap> {
     constructor() {
         super({
             queue: AnalysisBuilderTaskQueueRouterRouting,

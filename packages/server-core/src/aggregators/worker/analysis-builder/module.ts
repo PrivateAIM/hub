@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { AnalysisBuilderEventMap } from '@privateaim/server-core-worker-kit';
 import {
     AnalysisBuilderEvent,
 } from '@privateaim/server-core-worker-kit';
@@ -15,13 +16,16 @@ import {
     handleAnalysisBuilderEvent,
 } from './handler';
 
-export class AnalysisBuilderAggregator extends BaseComponent {
+export class AnalysisBuilderAggregator extends BaseComponent<AnalysisBuilderEventMap> {
     constructor() {
         super();
 
         this.mount(AnalysisBuilderEvent.EXECUTION_STARTED, handleAnalysisBuilderEvent);
         this.mount(AnalysisBuilderEvent.EXECUTION_FAILED, handleAnalysisBuilderEvent);
         this.mount(AnalysisBuilderEvent.EXECUTION_FINISHED, handleAnalysisBuilderEvent);
+
+        this.mount(AnalysisBuilderEvent.CHECK_FAILED, handleAnalysisBuilderEvent);
+        this.mount(AnalysisBuilderEvent.CHECK_FINISHED, handleAnalysisBuilderEvent);
     }
 
     async start() : Promise<void> {

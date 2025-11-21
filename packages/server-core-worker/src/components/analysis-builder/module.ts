@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { AnalysisBuilderEventMap } from '@privateaim/server-core-worker-kit';
 import {
     AnalysisBuilderCommand,
 } from '@privateaim/server-core-worker-kit';
@@ -14,7 +15,7 @@ import {
 
 import { AnalysisBuilderCheckHandler, AnalysisBuilderExecuteHandler } from './handlers';
 
-export class AnalysisBuilderComponent extends BaseComponent {
+export class AnalysisBuilderComponent extends BaseComponent<AnalysisBuilderEventMap> {
     constructor() {
         super();
 

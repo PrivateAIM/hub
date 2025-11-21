@@ -7,6 +7,7 @@
 
 import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
 import type {
+    AnalysisDistributorEventMap,
     AnalysisDistributorExecutePayload,
 } from '@privateaim/server-core-worker-kit';
 import {
@@ -25,8 +26,11 @@ import {
 import { BuilderError } from '../../../analysis-builder/error';
 import { useAnalysisDistributorLogger } from '../../helpers';
 
-export class AnalysisDistributorExecuteHandler implements ComponentHandler {
-    async handle(value: AnalysisDistributorExecutePayload, context: ComponentHandlerContext): Promise<void> {
+export class AnalysisDistributorExecuteHandler implements ComponentHandler<AnalysisDistributorEventMap, AnalysisDistributorCommand.EXECUTE> {
+    async handle(
+        value: AnalysisDistributorExecutePayload,
+        context: ComponentHandlerContext<AnalysisDistributorEventMap, AnalysisDistributorCommand.EXECUTE>,
+    ): Promise<void> {
         try {
             // todo: check if image exists, otherwise local queue task
             await this.handleInternal(value, context);
@@ -49,7 +53,10 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler {
         }
     }
 
-    async handleInternal(value: AnalysisDistributorExecutePayload, context: ComponentHandlerContext): Promise<void> {
+    async handleInternal(
+        value: AnalysisDistributorExecutePayload,
+        context: ComponentHandlerContext<AnalysisDistributorEventMap, AnalysisDistributorCommand.EXECUTE>,
+    ): Promise<void> {
         await context.handle(
             AnalysisDistributorEvent.EXECUTION_STARTED,
             value,

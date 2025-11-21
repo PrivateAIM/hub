@@ -61,7 +61,7 @@ export interface Analysis {
 
     // ------------------------------------------------------------------
 
-    build_status: ProcessStatus | null;
+    build_status: `${ProcessStatus}` | null;
 
     /**
      * Define if the node constraints are satisfied for the build process.
@@ -70,10 +70,10 @@ export interface Analysis {
 
     // ------------------------------------------------------------------
 
-    distribution_status: ProcessStatus | null;
+    distribution_status: `${ProcessStatus}` | null;
 
     // ------------------------------------------------------------------
-    execution_status: ProcessStatus | null;
+    execution_status: `${ProcessStatus}` | null;
 
     execution_progress: number | null;
 
