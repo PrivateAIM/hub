@@ -78,9 +78,8 @@ const FAnalysisCommand = defineComponent({
                 case AnalysisAPICommand.BUILD_START:
                 case AnalysisAPICommand.DISTRIBUTION_START:
                     return 'start';
-                case AnalysisAPICommand.BUILD_STOP:
-                    return 'stop';
                 case AnalysisAPICommand.BUILD_STATUS:
+                case AnalysisAPICommand.DISTRIBUTION_CHECK:
                     return 'check';
                 case AnalysisAPICommand.CONFIGURATION_LOCK:
                     return 'lock';
@@ -96,9 +95,8 @@ const FAnalysisCommand = defineComponent({
                 case AnalysisAPICommand.BUILD_START:
                 case AnalysisAPICommand.DISTRIBUTION_START:
                     return 'fa fa-play';
-                case AnalysisAPICommand.BUILD_STOP:
-                    return 'fa fa-stop';
                 case AnalysisAPICommand.BUILD_STATUS:
+                case AnalysisAPICommand.DISTRIBUTION_CHECK:
                     return 'fas fa-shield-alt';
                 case AnalysisAPICommand.CONFIGURATION_LOCK:
                     return 'fas fa-lock';
@@ -115,10 +113,10 @@ const FAnalysisCommand = defineComponent({
                 case AnalysisAPICommand.CONFIGURATION_LOCK:
                 case AnalysisAPICommand.DISTRIBUTION_START:
                     return 'success';
-                case AnalysisAPICommand.BUILD_STOP:
                 case AnalysisAPICommand.CONFIGURATION_UNLOCK:
                     return 'danger';
                 case AnalysisAPICommand.BUILD_STATUS:
+                case AnalysisAPICommand.DISTRIBUTION_CHECK:
                     return 'primary';
                 default:
                     return 'info';

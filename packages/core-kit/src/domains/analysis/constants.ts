@@ -7,17 +7,11 @@
 
 export enum AnalysisAPICommand {
     BUILD_START = 'buildStart',
-    BUILD_STOP = 'buildStop',
-    BUILD_STATUS = 'buildStatus',
+    BUILD_STATUS = 'buildCheck',
 
     DISTRIBUTION_START = 'distributionStart',
+    DISTRIBUTION_CHECK = 'distributionCheck',
 
     CONFIGURATION_LOCK = 'configurationLock',
     CONFIGURATION_UNLOCK = 'configurationUnlock',
-}
-
-// -------------------------------------------------------------------------
-
-export enum AnalysisContainerPath {
-    CODE = '/opt/code/',
 }

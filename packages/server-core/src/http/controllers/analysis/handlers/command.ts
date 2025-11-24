@@ -56,19 +56,20 @@ export async function handleAnalysisCommandRouteHandler(req: Request, res: Respo
     const configurator = new AnalysisConfigurator();
 
     switch (data.command) {
-        // Build Commands
+        // Build
         case AnalysisAPICommand.BUILD_STATUS:
             entity = await builder.check(entity);
             break;
         case AnalysisAPICommand.BUILD_START:
             entity = await builder.start(entity, req);
             break;
-        case AnalysisAPICommand.BUILD_STOP:
-            entity = await builder.stop(entity, req);
-            break;
 
+        // Distribution
+        case AnalysisAPICommand.DISTRIBUTION_CHECK:
+            entity = await distributor.check(entity);
+            break;
         case AnalysisAPICommand.DISTRIBUTION_START:
-            entity = await distributor.startDistribution(entity, req);
+            entity = await distributor.start(entity, req);
             break;
 
         // Configuration

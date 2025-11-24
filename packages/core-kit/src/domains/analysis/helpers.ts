@@ -61,28 +61,6 @@ export function isAnalysisAPICommandExecutable(
             output.message = `The current analysis build status "${entity.build_status}" does not allow a build start.`;
             return output;
         }
-        case AnalysisAPICommand.BUILD_STOP: {
-            if (!entity.configuration_locked) {
-                output.message = 'The analysis configuration must be locked before stopping the build.';
-                return output;
-            }
-
-            if (!entity.build_status) {
-                output.message = 'The analysis build process has not been initialized.';
-                return output;
-            }
-
-            if (entity.build_status === ProcessStatus.STOPPING ||
-                entity.build_status === ProcessStatus.STARTED ||
-                entity.build_status === ProcessStatus.STARTING
-            ) {
-                output.success = true;
-                return output;
-            }
-
-            output.message = `The current analysis build status "${entity.build_status}" does not allow a build stop.`;
-            return output;
-        }
         case AnalysisAPICommand.BUILD_STATUS: {
             if (!entity.configuration_locked) {
                 output.message = 'The analysis configuration must be locked before checking the build status.';

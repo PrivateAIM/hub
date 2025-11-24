@@ -66,35 +66,6 @@ export class AnalysisBuilder {
         return entity;
     }
 
-    async stop(
-        input: string | AnalysisEntity,
-        request?: Request,
-    ) {
-        const entity = await this.resolve(input);
-
-        const check = isAnalysisAPICommandExecutable(entity, AnalysisAPICommand.BUILD_STOP);
-        if (!check.success) {
-            throw new BadRequestError(check.message);
-        }
-
-        entity.build_status = entity.build_status !== ProcessStatus.STOPPING ?
-            ProcessStatus.STOPPING :
-            ProcessStatus.STOPPED;
-
-        if (request) {
-            const requestRepository = new RequestRepositoryAdapter(
-                request,
-                this.repository,
-            );
-
-            await requestRepository.save(entity);
-        } else {
-            await this.repository.save(entity);
-        }
-
-        return entity;
-    }
-
     async check(input: string | AnalysisEntity) {
         const entity = await this.resolve(input);
         const check = isAnalysisAPICommandExecutable(entity, AnalysisAPICommand.BUILD_STATUS);

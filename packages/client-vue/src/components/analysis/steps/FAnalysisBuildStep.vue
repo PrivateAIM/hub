@@ -95,27 +95,17 @@ export default defineComponent({
                     :command="'buildStart'"
                     :with-icon="true"
                     :entity="entity"
-                    @executed="(command) => handleExecuted('build', command)"
+                    @executed="(command) => handleExecuted('start', command)"
                     @updated="handleUpdated"
                     @failed="handleFailed"
                 />
             </div>
             <div>
                 <FAnalysisCommand
-                    :command="'buildStatus'"
+                    :command="'buildCheck'"
                     :with-icon="true"
                     :entity="entity"
-                    @executed="(command) => handleExecuted('build', command)"
-                    @updated="handleUpdated"
-                    @failed="handleFailed"
-                />
-            </div>
-            <div>
-                <FAnalysisCommand
-                    :command="'buildStop'"
-                    :with-icon="true"
-                    :entity="entity"
-                    @executed="(command) => handleExecuted('build', command)"
+                    @executed="(command) => handleExecuted('check', command)"
                     @updated="handleUpdated"
                     @failed="handleFailed"
                 />

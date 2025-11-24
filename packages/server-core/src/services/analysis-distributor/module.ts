@@ -47,7 +47,7 @@ export class AnalysisDistributor {
         this.metadataCaller = useAnalysisMetadataComponentCaller();
     }
 
-    async startDistribution(
+    async start(
         input: string | AnalysisEntity,
         request?: Request,
     ) {
@@ -79,6 +79,22 @@ export class AnalysisDistributor {
         }
 
         await this.caller.callExecute({
+            id: entity.id,
+        });
+
+        return entity;
+    }
+
+    async check(
+        input: string | AnalysisEntity,
+    ) {
+        const entity = await this.resolve(input);
+        const check = isAnalysisAPICommandExecutable(entity, AnalysisAPICommand.BUILD_STATUS);
+        if (!check.success) {
+            throw new BadRequestError(check.message);
+        }
+
+        await this.caller.callCheck({
             id: entity.id,
         });
 
