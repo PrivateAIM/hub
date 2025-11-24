@@ -30,7 +30,7 @@ export function expectProperties<T extends ObjectLiteral = ObjectLiteral>(
 
         if (options.keysExcluded) {
             const index = options.keysExcluded.indexOf(key);
-            if (index === -1) {
+            if (index !== -1) {
                 continue;
             }
         }
@@ -39,6 +39,6 @@ export function expectProperties<T extends ObjectLiteral = ObjectLiteral>(
             continue;
         }
 
-        expect(raw[keys[i]]).toEqual(properties[keys[i]]);
+        expect(raw[key]).toEqual(properties[key]);
     }
 }
