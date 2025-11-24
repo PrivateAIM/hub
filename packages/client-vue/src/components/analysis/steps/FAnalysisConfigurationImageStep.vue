@@ -24,8 +24,10 @@ export default defineComponent({
         },
     },
     setup(props) {
+        const passed = computed(() => props.entity.configuration_image_valid);
+
         const message = computed(() => {
-            if (props.entity.configuration_image_valid) {
+            if (passed.value) {
                 return null;
             }
 
@@ -33,7 +35,7 @@ export default defineComponent({
         });
 
         return {
-            passed: props.entity.configuration_image_valid,
+            passed,
             message,
         };
     },
