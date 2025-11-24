@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BadRequestError, NotFoundError } from '@ebec/http';
-import { AnalysisAPICommand, isAnalysisAPICommandExecutable } from '@privateaim/core-kit';
+import { NotFoundError } from '@ebec/http';
+import { AnalysisBuilderCommandChecker } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
 import { AnalysisBuilderComponentCaller } from '@privateaim/server-core-worker-kit';
 import type { Request } from 'routup';
@@ -41,10 +41,7 @@ export class AnalysisBuilder {
             analysisId: entityId,
         });
 
-        const check = isAnalysisAPICommandExecutable(entity, AnalysisAPICommand.BUILD_START);
-        if (!check.success) {
-            throw new BadRequestError(check.message);
-        }
+        AnalysisBuilderCommandChecker.canStart(entity);
 
         entity.build_status = ProcessStatus.STARTING;
 
@@ -66,41 +63,10 @@ export class AnalysisBuilder {
         return entity;
     }
 
-    async stop(
-        input: string | AnalysisEntity,
-        request?: Request,
-    ) {
-        const entity = await this.resolve(input);
-
-        const check = isAnalysisAPICommandExecutable(entity, AnalysisAPICommand.BUILD_STOP);
-        if (!check.success) {
-            throw new BadRequestError(check.message);
-        }
-
-        entity.build_status = entity.build_status !== ProcessStatus.STOPPING ?
-            ProcessStatus.STOPPING :
-            ProcessStatus.STOPPED;
-
-        if (request) {
-            const requestRepository = new RequestRepositoryAdapter(
-                request,
-                this.repository,
-            );
-
-            await requestRepository.save(entity);
-        } else {
-            await this.repository.save(entity);
-        }
-
-        return entity;
-    }
-
     async check(input: string | AnalysisEntity) {
         const entity = await this.resolve(input);
-        const check = isAnalysisAPICommandExecutable(entity, AnalysisAPICommand.BUILD_STATUS);
-        if (!check.success) {
-            throw new BadRequestError(check.message);
-        }
+
+        AnalysisBuilderCommandChecker.canCheck(entity);
 
         await this.caller.callCheck({
             id: entity.id,

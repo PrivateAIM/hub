@@ -6,14 +6,18 @@
  */
 
 import { ProcessStatus } from '@privateaim/kit';
-import type { AnalysisDistributorPayload } from '@privateaim/server-core-worker-kit';
+import type {
+    AnalysisBuilderEventMap,
+    AnalysisDistributorBasePayload,
+    AnalysisDistributorCheckFinishedPayload,
+} from '@privateaim/server-core-worker-kit';
 import { AnalysisDistributorEvent } from '@privateaim/server-core-worker-kit';
 import type { ComponentHandlerContext } from '@privateaim/server-kit';
 import { AnalysisEntity, useDataSourceSync } from '../../../database';
 
 export async function handleAnalysisDistributorEvent(
-    value: AnalysisDistributorPayload,
-    context: ComponentHandlerContext,
+    value: AnalysisDistributorBasePayload,
+    context: ComponentHandlerContext<AnalysisBuilderEventMap>,
 ) {
     const dataSource = useDataSourceSync();
     const repository = dataSource.getRepository(AnalysisEntity);
@@ -30,12 +34,19 @@ export async function handleAnalysisDistributorEvent(
             entity.distribution_status = ProcessStatus.STARTED;
             break;
         }
+        case AnalysisDistributorEvent.CHECK_FAILED:
         case AnalysisDistributorEvent.EXECUTION_FAILED: {
             entity.distribution_status = ProcessStatus.FAILED;
             break;
         }
         case AnalysisDistributorEvent.EXECUTION_FINISHED: {
             entity.distribution_status = ProcessStatus.FINISHED;
+            break;
+        }
+        case AnalysisDistributorEvent.CHECK_FINISHED: {
+            const temp = value as AnalysisDistributorCheckFinishedPayload;
+
+            entity.distribution_status = temp.status || null;
         }
     }
 

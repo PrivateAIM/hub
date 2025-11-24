@@ -63,12 +63,23 @@ export default defineComponent({
                 </FProcessStatus>
             </div>
         </div>
-        <div>
+        <div class="d-flex flex-row gap-1">
             <div>
                 <FAnalysisCommand
                     :command="'distributionStart'"
                     :with-icon="true"
                     :entity="entity"
+                    @executed="(command) => handleExecuted('start', command)"
+                    @updated="handleUpdated"
+                    @failed="handleFailed"
+                />
+            </div>
+            <div>
+                <FAnalysisCommand
+                    :command="'distributionCheck'"
+                    :with-icon="true"
+                    :entity="entity"
+                    @executed="(command) => handleExecuted('check', command)"
                     @updated="handleUpdated"
                     @failed="handleFailed"
                 />

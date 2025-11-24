@@ -10,9 +10,13 @@ import {
     QueueDispatchComponentCaller,
 } from '@privateaim/server-kit';
 import { AnalysisDistributorCommand, AnalysisDistributorTaskQueueRouterRouting } from './constants';
-import type { AnalysisDistributorExecutePayload } from './types';
+import type {
+    AnalysisDistributorCheckPayload,
+    AnalysisDistributorEventMap,
+    AnalysisDistributorExecutePayload,
+} from './types';
 
-export class AnalysisDistributorComponentCaller extends QueueDispatchComponentCaller {
+export class AnalysisDistributorComponentCaller extends QueueDispatchComponentCaller<AnalysisDistributorEventMap> {
     constructor() {
         super({
             queue: AnalysisDistributorTaskQueueRouterRouting,
@@ -21,5 +25,9 @@ export class AnalysisDistributorComponentCaller extends QueueDispatchComponentCa
 
     async callExecute(payload: AnalysisDistributorExecutePayload, metadata: ComponentMetadata = {}) {
         return this.call(AnalysisDistributorCommand.EXECUTE, payload, metadata);
+    }
+
+    async callCheck(payload: AnalysisDistributorCheckPayload, metadata: ComponentMetadata = {}) {
+        return this.call(AnalysisDistributorCommand.CHECK, payload, metadata);
     }
 }

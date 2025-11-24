@@ -8,7 +8,7 @@
 import type { Project } from '@privateaim/core-kit';
 import {
     createTestSuite,
-    expectPropertiesEqualToSrc,
+    expectProperties,
     removeDateProperties,
 } from '../../utils';
 import { createTestProject } from '../../utils/domains';
@@ -46,7 +46,7 @@ describe('src/controllers/core/project', () => {
         const client = suite.client();
 
         const data = await client.project.getOne(details.id);
-        expectPropertiesEqualToSrc(details, data);
+        expectProperties(details, data);
     });
 
     it('should update resource', async () => {
@@ -55,7 +55,7 @@ describe('src/controllers/core/project', () => {
         details.name = 'TestA';
 
         const data = await client.project.update(details.id, details);
-        expectPropertiesEqualToSrc(details, data);
+        expectProperties(details, data);
     });
 
     it('should delete resource', async () => {

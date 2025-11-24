@@ -5,27 +5,22 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
-    buildRegistryClientConnectionStringFromRegistry,
-} from '@privateaim/core-kit';
-import { LogFlag } from '@privateaim/telemetry-kit';
-import { isClientErrorWithStatusCode } from 'hapic';
+import { ProcessStatus } from '@privateaim/kit';
 import type {
+    AnalysisBuilderCheckPayload,
+    AnalysisBuilderCommand,
+    AnalysisBuilderEventMap,
     AnalysisBuilderExecutePayload,
 } from '@privateaim/server-core-worker-kit';
-import {
-    AnalysisBuilderCommand,
-    AnalysisBuilderEvent,
-} from '@privateaim/server-core-worker-kit';
+import { AnalysisBuilderEvent } from '@privateaim/server-core-worker-kit';
 import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
-import {
-    createBasicHarborAPIClient,
-    useCoreClient,
-} from '../../../../core';
-import { useAnalysisBuilderLogger } from '../../utils';
+import { useCoreClient, useDocker } from '../../../../core';
 
-export class AnalysisBuilderCheckHandler implements ComponentHandler {
-    async handle(value: AnalysisBuilderExecutePayload, context: ComponentHandlerContext): Promise<void> {
+export class AnalysisBuilderCheckHandler implements ComponentHandler<AnalysisBuilderEventMap, AnalysisBuilderCommand.CHECK> {
+    async handle(
+        value: AnalysisBuilderCheckPayload,
+        context: ComponentHandlerContext<AnalysisBuilderEventMap, AnalysisBuilderCommand.CHECK>,
+    ): Promise<void> {
         try {
             // todo: check if image exists, otherwise local queue task
             await this.handleInternal(value, context);
@@ -42,7 +37,7 @@ export class AnalysisBuilderCheckHandler implements ComponentHandler {
 
     async handleInternal(
         value: AnalysisBuilderExecutePayload,
-        context: ComponentHandlerContext,
+        context: ComponentHandlerContext<AnalysisBuilderEventMap, AnalysisBuilderCommand.CHECK>,
     ): Promise<void> {
         await context.handle(
             AnalysisBuilderEvent.CHECK_STARTED,
@@ -50,92 +45,41 @@ export class AnalysisBuilderCheckHandler implements ComponentHandler {
         );
 
         const client = useCoreClient();
-
         const analysis = await client.analysis.getOne(value.id);
-        const registry = await client.registry.getOne(analysis.registry_id, {
-            fields: ['+account_secret'],
-        });
 
-        // -----------------------------------------------------------------------------------
-
-        const { data: analysisNodes } = await client.analysisNode.getMany({
-            filter: {
-                analysis_id: analysis.id,
-            },
-            page: {
-                limit: 1,
-            },
-        });
-
-        if (analysisNodes.length === 0) {
-            await context.handle(
-                AnalysisBuilderEvent.CHECK_FINISHED,
-                value,
-            );
-
-            return;
-        }
-
-        const { data: nodes } = await client.node.getMany({
-            filter: {
-                id: analysisNodes.map((analysisNode) => analysisNode.node_id),
-            },
-            relations: {
-                registry_project: true,
-            },
-        });
-
-        const [node] = nodes;
-
-        if (typeof node === 'undefined') {
-            await context.handle(
-                AnalysisBuilderEvent.CHECK_FINISHED,
-                value,
-            );
-
-            return;
-        }
-
-        useAnalysisBuilderLogger().info({
-            message: `Checking docker registry ${registry.host}}`,
-            command: AnalysisBuilderCommand.CHECK,
-            analysis_id: analysis.id,
-            [LogFlag.REF_ID]: analysis.id,
-        });
-
-        const connectionString = buildRegistryClientConnectionStringFromRegistry(registry);
-        const harborClient = createBasicHarborAPIClient(connectionString);
+        const docker = useDocker();
+        const image = docker.getImage(`${value.id}:latest`);
 
         try {
-            const harborRepository = await harborClient.projectRepository
-                .getOne({
-                    projectName: node.registry_project.external_name,
-                    repositoryName: analysis.id,
-                });
+            await image.inspect();
+
+            await context.handle(
+                AnalysisBuilderEvent.CHECK_FINISHED,
+                {
+                    ...value,
+                    status: ProcessStatus.FINISHED,
+                },
+            );
+        } catch (e) {
+            let status: `${ProcessStatus}`;
 
             if (
-                harborRepository &&
-                harborRepository.artifact_count > 0
+                analysis.build_status === ProcessStatus.STARTED ||
+                analysis.build_status === ProcessStatus.STARTING
             ) {
-                useAnalysisBuilderLogger().info({
-                    message: `Found docker image ${analysis.id} in ${node.registry_project.external_name} of registry ${registry.name}}`,
-                    command: AnalysisBuilderCommand.CHECK,
-                    analysis_id: analysis.id,
-                    node_id: node.id,
-                    [LogFlag.REF_ID]: analysis.id,
-                });
+                // todo: if started & starting trigger is to far back in time, status should also be failed.
+                status = analysis.build_status;
+            } else {
+                status = ProcessStatus.FAILED;
             }
-        } catch (e) {
-            if (!isClientErrorWithStatusCode(e, 404)) {
-                throw e;
-            }
+
+            await context.handle(
+                AnalysisBuilderEvent.CHECK_FINISHED,
+                {
+                    ...value,
+                    status,
+                },
+            );
         }
-
-        // -----------------------------------------------------------------------------------
-
-        await context.handle(
-            AnalysisBuilderEvent.CHECK_FINISHED,
-            value,
-        );
     }
 }

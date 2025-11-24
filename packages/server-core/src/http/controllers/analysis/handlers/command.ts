@@ -6,7 +6,7 @@
  */
 
 import { ForbiddenError, NotFoundError } from '@ebec/http';
-import { AnalysisAPICommand } from '@privateaim/core-kit';
+import { AnalysisCommand } from '@privateaim/core-kit';
 import { isRealmResourceWritable } from '@privateaim/kit';
 import { HTTPHandlerOperation, useRequestIdentityRealm } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
@@ -56,33 +56,34 @@ export async function handleAnalysisCommandRouteHandler(req: Request, res: Respo
     const configurator = new AnalysisConfigurator();
 
     switch (data.command) {
-        // Build Commands
-        case AnalysisAPICommand.BUILD_STATUS:
+        // Build
+        case AnalysisCommand.BUILD_CHECK:
             entity = await builder.check(entity);
             break;
-        case AnalysisAPICommand.BUILD_START:
+        case AnalysisCommand.BUILD_START:
             entity = await builder.start(entity, req);
-            break;
-        case AnalysisAPICommand.BUILD_STOP:
-            entity = await builder.stop(entity, req);
-            break;
-
-        case AnalysisAPICommand.DISTRIBUTION_START:
-            entity = await distributor.startDistribution(entity, req);
             break;
 
         // Configuration
-        case AnalysisAPICommand.CONFIGURATION_LOCK:
+        case AnalysisCommand.CONFIGURATION_LOCK:
             entity = await configurator.lock(entity, {
                 ignoreApproval,
                 request: req,
             });
             break;
-        case AnalysisAPICommand.CONFIGURATION_UNLOCK:
+        case AnalysisCommand.CONFIGURATION_UNLOCK:
             entity = await configurator.unlock(entity, {
                 ignoreApproval,
                 request: req,
             });
+            break;
+
+        // Distribution
+        case AnalysisCommand.DISTRIBUTION_CHECK:
+            entity = await distributor.check(entity);
+            break;
+        case AnalysisCommand.DISTRIBUTION_START:
+            entity = await distributor.start(entity, req);
             break;
     }
 

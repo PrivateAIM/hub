@@ -6,8 +6,8 @@
   -->
 
 <script lang="ts">
-import type { Analysis } from '@privateaim/core-kit/src';
-import { AnalysisAPICommand } from '@privateaim/core-kit/src';
+import type { Analysis } from '@privateaim/core-kit';
+import { AnalysisCommand } from '@privateaim/core-kit';
 import { BModal } from 'bootstrap-vue-next';
 import type { PropType } from 'vue';
 import { defineComponent, ref } from 'vue';
@@ -44,14 +44,14 @@ export default defineComponent({
                 let entity: Analysis;
                 if (lockIt.value) {
                     entity = await apiClient
-                        .analysis.runCommand(props.entity.id, AnalysisAPICommand.CONFIGURATION_LOCK);
+                        .analysis.runCommand(props.entity.id, AnalysisCommand.CONFIGURATION_LOCK);
 
                     emit('updated', entity);
                 }
 
                 if (buildIt.value) {
                     entity = await apiClient
-                        .analysis.runCommand(props.entity.id, AnalysisAPICommand.BUILD_START);
+                        .analysis.runCommand(props.entity.id, AnalysisCommand.BUILD_START);
 
                     emit('updated', entity);
                 }

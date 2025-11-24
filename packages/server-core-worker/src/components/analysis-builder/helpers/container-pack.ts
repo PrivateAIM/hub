@@ -10,7 +10,6 @@ import stream from 'node:stream';
 import type { Analysis } from '@privateaim/core-kit';
 import {
     AnalysisBucketType,
-    AnalysisContainerPath,
 } from '@privateaim/core-kit';
 import type { Container } from 'dockerode';
 import tar from 'tar-stream';
@@ -18,6 +17,7 @@ import { AnalysisBuilderCommand } from '@privateaim/server-core-worker-kit';
 import {
     streamToBuffer, useCoreClient, useStorageClient,
 } from '../../../core';
+import { AnalysisContainerPath } from '../constants';
 import { BuilderError } from '../error';
 import { useAnalysisBuilderLogger } from '../utils';
 

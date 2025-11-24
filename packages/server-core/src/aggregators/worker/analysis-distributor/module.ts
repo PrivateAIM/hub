@@ -5,23 +5,21 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
-    AnalysisDistributorEvent,
-} from '@privateaim/server-core-worker-kit';
-import {
-    BaseComponent,
-} from '@privateaim/server-kit';
-import {
-    handleAnalysisDistributorEvent,
-} from './handler';
+import type { AnalysisDistributorEventMap } from '@privateaim/server-core-worker-kit';
+import { AnalysisDistributorEvent } from '@privateaim/server-core-worker-kit';
+import { BaseComponent } from '@privateaim/server-kit';
+import { handleAnalysisDistributorEvent } from './handler';
 
-export class AnalysisDistributorAggregator extends BaseComponent {
+export class AnalysisDistributorAggregator extends BaseComponent<AnalysisDistributorEventMap> {
     constructor() {
         super();
 
         this.mount(AnalysisDistributorEvent.EXECUTION_STARTED, handleAnalysisDistributorEvent);
         this.mount(AnalysisDistributorEvent.EXECUTION_FAILED, handleAnalysisDistributorEvent);
         this.mount(AnalysisDistributorEvent.EXECUTION_FINISHED, handleAnalysisDistributorEvent);
+
+        this.mount(AnalysisDistributorEvent.CHECK_FAILED, handleAnalysisDistributorEvent);
+        this.mount(AnalysisDistributorEvent.CHECK_FINISHED, handleAnalysisDistributorEvent);
     }
 
     async start() : Promise<void> {

@@ -5,19 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export enum AnalysisAPICommand {
+export enum AnalysisCommand {
     BUILD_START = 'buildStart',
-    BUILD_STOP = 'buildStop',
-    BUILD_STATUS = 'buildStatus',
-
-    DISTRIBUTION_START = 'distributionStart',
+    BUILD_CHECK = 'buildCheck',
 
     CONFIGURATION_LOCK = 'configurationLock',
     CONFIGURATION_UNLOCK = 'configurationUnlock',
-}
 
-// -------------------------------------------------------------------------
-
-export enum AnalysisContainerPath {
-    CODE = '/opt/code/',
+    DISTRIBUTION_START = 'distributionStart',
+    DISTRIBUTION_CHECK = 'distributionCheck',
 }

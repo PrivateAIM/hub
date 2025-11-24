@@ -63,6 +63,8 @@ export class NodeSubscriber extends BaseSubscriber<NodeEntity> implements Entity
             const nodeRobotService = useNodeRobotService();
             const robot = await nodeRobotService.save(event.entity);
             await nodeRobotService.assignPermissions(robot);
+
+            // todo: event entity might need to be saved again.
         }
     }
 
@@ -76,6 +78,8 @@ export class NodeSubscriber extends BaseSubscriber<NodeEntity> implements Entity
                 ...event.entity,
             } as NodeEntity);
             await nodeRobotService.assignPermissions(robot);
+
+            // todo: event entity might need to be saved again.
         }
     }
 
@@ -83,6 +87,8 @@ export class NodeSubscriber extends BaseSubscriber<NodeEntity> implements Entity
         if (isNodeRobotServiceUsable()) {
             const nodeRobotService = useNodeRobotService();
             await nodeRobotService.delete(event.entity || event.databaseEntity);
+
+            // todo: event entity might need to be saved again.
         }
     }
 

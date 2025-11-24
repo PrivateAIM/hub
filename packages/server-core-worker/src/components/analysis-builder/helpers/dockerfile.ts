@@ -12,12 +12,12 @@ import type {
 } from '@privateaim/core-kit';
 import {
     AnalysisBucketType,
-    AnalysisContainerPath,
     REGISTRY_MASTER_IMAGE_PROJECT_NAME,
 } from '@privateaim/core-kit';
 import type { BucketFile } from '@privateaim/storage-kit';
 import path from 'node:path';
 import { useCoreClient, useStorageClient } from '../../../core';
+import { AnalysisContainerPath } from '../constants';
 import { BuilderError } from '../error';
 
 export async function generateDockerFileContent(entity: Analysis) : Promise<string> {

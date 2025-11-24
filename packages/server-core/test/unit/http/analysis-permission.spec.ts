@@ -10,7 +10,7 @@ import type { AnalysisPermission } from '@privateaim/core-kit';
 import { isAuthupClientUsable, useAuthupClient } from '@privateaim/server-kit';
 import {
     createTestSuite,
-    expectPropertiesEqualToSrc,
+    expectProperties,
     removeDateProperties,
 } from '../../utils';
 import {
@@ -72,7 +72,7 @@ describe('src/controllers/core/analysis-permission', () => {
         const client = suite.client();
 
         const data = await client.analysisPermission.getOne(attributes.id);
-        expectPropertiesEqualToSrc(attributes, data);
+        expectProperties(attributes, data);
     });
 
     it('should delete resource', async () => {

@@ -8,15 +8,17 @@
 import {
     BaseComponent,
 } from '@privateaim/server-kit';
+import type { AnalysisDistributorEventMap } from '@privateaim/server-core-worker-kit';
 import {
     AnalysisDistributorCommand,
 } from '@privateaim/server-core-worker-kit';
-import { AnalysisDistributorExecuteHandler } from './handlers';
+import { AnalysisDistributorCheckHandler, AnalysisDistributorExecuteHandler } from './handlers';
 
-export class AnalysisDistributorComponent extends BaseComponent {
+export class AnalysisDistributorComponent extends BaseComponent<AnalysisDistributorEventMap> {
     constructor() {
         super();
 
+        this.mount(AnalysisDistributorCommand.CHECK, new AnalysisDistributorCheckHandler());
         this.mount(AnalysisDistributorCommand.EXECUTE, new AnalysisDistributorExecuteHandler());
     }
 
