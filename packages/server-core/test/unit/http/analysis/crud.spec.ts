@@ -11,7 +11,7 @@ import { isClientError } from 'hapic';
 import { EntityRelationLookupError } from 'typeorm-extension';
 import {
     createTestSuite,
-    expectSrcProperties,
+    expectProperties,
     removeDateProperties,
 } from '../../../utils';
 import { TEST_DEFAULT_ANALYSIS } from '../../../utils/domains';
@@ -56,7 +56,7 @@ describe('src/controllers/core/analysis', () => {
         const client = suite.client();
         const data = await client.analysis.getOne(details.id);
 
-        expectSrcProperties(details, data);
+        expectProperties(details, data);
     });
 
     it('should update resource', async () => {
@@ -65,7 +65,7 @@ describe('src/controllers/core/analysis', () => {
 
         const data = await client.analysis.update(details.id, details);
 
-        expectSrcProperties(details, data);
+        expectProperties(details, data);
     });
 
     it('should delete resource', async () => {

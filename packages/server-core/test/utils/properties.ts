@@ -5,18 +5,40 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { ObjectLiteral } from '@privateaim/kit';
 import { hasOwnProperty } from '@privateaim/kit';
 
-export function expectSrcProperties(
-    src: Record<string, any>,
-    dest: Record<string, any>,
+type ExpectPropertiesOptions<T extends ObjectLiteral = ObjectLiteral> = {
+    /**
+     * default: undefined
+     */
+    keysExcluded?: (keyof T)[],
+    /**
+     * default: false
+     */
+    strict?: boolean,
+};
+
+export function expectProperties<T extends ObjectLiteral = ObjectLiteral>(
+    properties: T,
+    raw: Record<string, any>,
+    options: ExpectPropertiesOptions<T> = {},
 ) {
-    const keys = Object.keys(src);
+    const keys = Object.keys(properties);
     for (let i = 0; i < keys.length; i++) {
-        if (!hasOwnProperty(dest, keys[i])) {
+        const key = keys[i];
+
+        if (options.keysExcluded) {
+            const index = options.keysExcluded.indexOf(key);
+            if (index === -1) {
+                continue;
+            }
+        }
+
+        if (!options.strict && !hasOwnProperty(raw, key)) {
             continue;
         }
 
-        expect(dest[keys[i]]).toEqual(src[keys[i]]);
+        expect(raw[keys[i]]).toEqual(properties[keys[i]]);
     }
 }

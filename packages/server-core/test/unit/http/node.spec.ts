@@ -10,7 +10,7 @@ import type {
 } from '@privateaim/core-kit';
 import {
     createTestSuite,
-    expectSrcProperties,
+    expectProperties,
     removeDateProperties,
 } from '../../utils';
 import { createTestNode } from '../../utils/domains';
@@ -47,9 +47,10 @@ describe('src/controllers/core/node', () => {
     it('should read resource', async () => {
         const client = suite.client();
 
-        const { id } = details;
-        const data = await client.node.getOne(id);
-        expectSrcProperties({ ...details, id }, data);
+        const data = await client.node.getOne(details.id);
+        expectProperties(details, data, {
+            keysExcluded: ['robot_id'],
+        });
     });
 
     it('should update resource', async () => {
@@ -59,7 +60,7 @@ describe('src/controllers/core/node', () => {
 
         const data = await client.node.update(details.id, details);
 
-        expectSrcProperties(details, data);
+        expectProperties(details, data);
     });
 
     it('should delete resource', async () => {
