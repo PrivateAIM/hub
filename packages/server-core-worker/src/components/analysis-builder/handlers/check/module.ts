@@ -10,14 +10,11 @@ import type {
     AnalysisBuilderCheckPayload,
     AnalysisBuilderCommand,
     AnalysisBuilderEventMap,
-
     AnalysisBuilderExecutePayload,
 } from '@privateaim/server-core-worker-kit';
-import {
-    AnalysisBuilderEvent,
-} from '@privateaim/server-core-worker-kit';
+import { AnalysisBuilderEvent } from '@privateaim/server-core-worker-kit';
 import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
-import { useDocker } from '../../../../core';
+import { useCoreClient, useDocker } from '../../../../core';
 
 export class AnalysisBuilderCheckHandler implements ComponentHandler<AnalysisBuilderEventMap, AnalysisBuilderCommand.CHECK> {
     async handle(
@@ -47,10 +44,10 @@ export class AnalysisBuilderCheckHandler implements ComponentHandler<AnalysisBui
             value,
         );
 
-        // -----------------------------------------------------------------------------------
+        const client = useCoreClient();
+        const analysis = await client.analysis.getOne(value.id);
 
         const docker = useDocker();
-
         const image = docker.getImage(`${value.id}:latest`);
 
         try {
@@ -64,11 +61,23 @@ export class AnalysisBuilderCheckHandler implements ComponentHandler<AnalysisBui
                 },
             );
         } catch (e) {
+            let status: `${ProcessStatus}`;
+
+            if (
+                analysis.build_status === ProcessStatus.STARTED ||
+                analysis.build_status === ProcessStatus.STARTING
+            ) {
+                // todo: if started & starting trigger is to far back in time, status should also be failed.
+                status = analysis.build_status;
+            } else {
+                status = ProcessStatus.FAILED;
+            }
+
             await context.handle(
                 AnalysisBuilderEvent.CHECK_FINISHED,
                 {
                     ...value,
-                    error: e,
+                    status,
                 },
             );
         }

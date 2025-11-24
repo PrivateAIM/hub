@@ -47,9 +47,7 @@ export async function handleAnalysisBuilderEvent(
         }
         case AnalysisBuilderEvent.CHECK_FINISHED: {
             const temp = value as AnalysisBuilderCheckFinishedPayload;
-            if (temp.status) {
-                entity.build_status = temp.status;
-            }
+            entity.build_status = temp.status || null;
         }
     }
 

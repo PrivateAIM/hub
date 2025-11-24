@@ -16,7 +16,6 @@ import type {
     AnalysisDistributorEventMap,
 } from '@privateaim/server-core-worker-kit';
 import {
-    AnalysisBuilderEvent,
     AnalysisDistributorCommand,
     AnalysisDistributorEvent,
 } from '@privateaim/server-core-worker-kit';
@@ -57,11 +56,7 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
         );
 
         const client = useCoreClient();
-
         const analysis = await client.analysis.getOne(value.id);
-        const registry = await client.registry.getOne(analysis.registry_id, {
-            fields: ['+account_secret'],
-        });
 
         // -----------------------------------------------------------------------------------
 
@@ -76,7 +71,7 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
 
         if (analysisNodes.length === 0) {
             await context.handle(
-                AnalysisBuilderEvent.CHECK_FINISHED,
+                AnalysisDistributorEvent.CHECK_FINISHED,
                 value,
             );
 
@@ -94,35 +89,65 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
 
         if (nodes.length === 0) {
             await context.handle(
-                AnalysisBuilderEvent.CHECK_FINISHED,
+                AnalysisDistributorEvent.CHECK_FINISHED,
                 value,
             );
 
             return;
         }
 
+        // -----------------------------------------------------------------------------------
+
+        const registry = await client.registry.getOne(analysis.registry_id, {
+            fields: ['+account_secret'],
+        });
+
         const docker = useDocker();
         const authConfig = buildDockerAuthConfigFromRegistry(registry);
 
-        for (let i = 0; i < nodes.length; i++) {
-            useAnalysisDistributorLogger().info({
-                message: `Checking analysis image of node ${nodes[i].name}}`,
-                command: AnalysisDistributorCommand.CHECK,
-                analysis_id: analysis.id,
-                [LogFlag.REF_ID]: analysis.id,
-            });
+        try {
+            for (let i = 0; i < nodes.length; i++) {
+                useAnalysisDistributorLogger().info({
+                    message: `Checking analysis image of node ${nodes[i].name}}`,
+                    command: AnalysisDistributorCommand.CHECK,
+                    analysis_id: analysis.id,
+                    [LogFlag.REF_ID]: analysis.id,
+                });
 
-            const nodeImageURL = buildDockerImageURL({
-                hostname: registry.host,
-                projectName: nodes[i].registry_project.external_name,
-                repositoryName: analysis.id,
-                tagOrDigest: REGISTRY_ARTIFACT_TAG_LATEST,
-            });
+                const nodeImageURL = buildDockerImageURL({
+                    hostname: registry.host,
+                    projectName: nodes[i].registry_project.external_name,
+                    repositoryName: analysis.id,
+                    tagOrDigest: REGISTRY_ARTIFACT_TAG_LATEST,
+                });
 
-            const stream = await docker.pull(nodeImageURL, {
-                authconfig: authConfig,
-            });
-            await waitForModemStream(docker.modem, stream);
+                const stream = await docker.pull(nodeImageURL, {
+                    authconfig: authConfig,
+                });
+                await waitForModemStream(docker.modem, stream);
+            }
+        } catch (e) {
+            let status: `${ProcessStatus}`;
+
+            if (
+                analysis.distribution_status === ProcessStatus.STARTED ||
+                analysis.distribution_status === ProcessStatus.STARTING
+            ) {
+                // todo: if started & starting trigger is to far back in time, status should also be failed.
+                status = analysis.build_status;
+            } else {
+                status = ProcessStatus.FAILED;
+            }
+
+            await context.handle(
+                AnalysisDistributorEvent.CHECK_FINISHED,
+                {
+                    ...value,
+                    status,
+                },
+            );
+
+            return;
         }
 
         // -----------------------------------------------------------------------------------

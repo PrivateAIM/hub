@@ -45,9 +45,8 @@ export async function handleAnalysisDistributorEvent(
         }
         case AnalysisDistributorEvent.CHECK_FINISHED: {
             const temp = value as AnalysisDistributorCheckFinishedPayload;
-            if (temp.status) {
-                entity.distribution_status = temp.status;
-            }
+
+            entity.distribution_status = temp.status || null;
         }
     }
 
