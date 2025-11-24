@@ -70,8 +70,8 @@
         "rollup-plugin-css-only": "^4.5.5",
         "smob": "^1.5.0",
         "socket.io-client": "^4.8.1",
-        "vue": "^3.5.22",
-        "vue-tsc": "^3.1.4",
+        "vue": "^3.5.25",
+        "vue-tsc": "^3.1.5",
         "vue3-form-wizard": "0.3.5"
     },
     "peerDependencies": {
@@ -96,7 +96,7 @@
         "rapiq": ">=0.8.0 <1.0.0",
         "smob": "^1.4.x",
         "socket.io-client": "^4.8.1",
-        "vue": "^3.5.22",
+        "vue": "^3.5.25",
         "vue3-form-wizard": "^0.2.9"
     },
     "publishConfig": {
