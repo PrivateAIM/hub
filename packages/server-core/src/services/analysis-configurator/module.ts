@@ -7,7 +7,7 @@
 
 import { BadRequestError, NotFoundError } from '@ebec/http';
 import {
-    AnalysisAPICommand, NodeType, isAnalysisAPICommandExecutable,
+    AnalysisCommand, NodeType, isAnalysisAPICommandExecutable,
 } from '@privateaim/core-kit';
 import type { Repository } from 'typeorm';
 import type { AnalysisMetadataComponentCaller } from '../../components';
@@ -51,7 +51,7 @@ export class AnalysisConfigurator {
             analysisId: entityId,
         });
 
-        const check = isAnalysisAPICommandExecutable(entity, AnalysisAPICommand.CONFIGURATION_LOCK);
+        const check = isAnalysisAPICommandExecutable(entity, AnalysisCommand.CONFIGURATION_LOCK);
         if (!check.success) {
             throw new BadRequestError(check.message);
         }
@@ -85,7 +85,7 @@ export class AnalysisConfigurator {
     ): Promise<AnalysisEntity> {
         const entity = await this.resolve(input);
 
-        const check = isAnalysisAPICommandExecutable(entity, AnalysisAPICommand.CONFIGURATION_UNLOCK);
+        const check = isAnalysisAPICommandExecutable(entity, AnalysisCommand.CONFIGURATION_UNLOCK);
         if (!check.success) {
             throw new BadRequestError(check.message);
         }

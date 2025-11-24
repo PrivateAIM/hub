@@ -8,7 +8,7 @@
 import { BadRequestError } from '@ebec/http';
 import { ProcessStatus } from '@privateaim/kit';
 import {
-    AnalysisAPICommand,
+    AnalysisCommand,
     isAnalysisAPICommandExecutable,
 } from '@privateaim/core-kit';
 import {
@@ -56,7 +56,7 @@ export class AnalysisDistributor {
             analysisId: entityId,
         });
 
-        const check = isAnalysisAPICommandExecutable(entity, AnalysisAPICommand.DISTRIBUTION_START);
+        const check = isAnalysisAPICommandExecutable(entity, AnalysisCommand.DISTRIBUTION_START);
         if (!check.success) {
             throw new BadRequestError(check.message);
         }
@@ -89,7 +89,7 @@ export class AnalysisDistributor {
         input: string | AnalysisEntity,
     ) {
         const entity = await this.resolve(input);
-        const check = isAnalysisAPICommandExecutable(entity, AnalysisAPICommand.BUILD_STATUS);
+        const check = isAnalysisAPICommandExecutable(entity, AnalysisCommand.BUILD_CHECK);
         if (!check.success) {
             throw new BadRequestError(check.message);
         }

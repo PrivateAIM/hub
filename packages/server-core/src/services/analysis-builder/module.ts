@@ -6,7 +6,7 @@
  */
 
 import { BadRequestError, NotFoundError } from '@ebec/http';
-import { AnalysisAPICommand, isAnalysisAPICommandExecutable } from '@privateaim/core-kit';
+import { AnalysisCommand, isAnalysisAPICommandExecutable } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
 import { AnalysisBuilderComponentCaller } from '@privateaim/server-core-worker-kit';
 import type { Request } from 'routup';
@@ -41,7 +41,7 @@ export class AnalysisBuilder {
             analysisId: entityId,
         });
 
-        const check = isAnalysisAPICommandExecutable(entity, AnalysisAPICommand.BUILD_START);
+        const check = isAnalysisAPICommandExecutable(entity, AnalysisCommand.BUILD_START);
         if (!check.success) {
             throw new BadRequestError(check.message);
         }
@@ -68,7 +68,7 @@ export class AnalysisBuilder {
 
     async check(input: string | AnalysisEntity) {
         const entity = await this.resolve(input);
-        const check = isAnalysisAPICommandExecutable(entity, AnalysisAPICommand.BUILD_STATUS);
+        const check = isAnalysisAPICommandExecutable(entity, AnalysisCommand.BUILD_CHECK);
         if (!check.success) {
             throw new BadRequestError(check.message);
         }

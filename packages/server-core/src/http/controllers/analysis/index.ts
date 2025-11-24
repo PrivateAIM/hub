@@ -7,7 +7,7 @@
 
 import type {
     Analysis,
-    AnalysisAPICommand,
+    AnalysisCommand,
 } from '@privateaim/core-kit';
 import {
     DBody, DController, DDelete, DGet, DPath, DPost, DRequest, DResponse, DTags,
@@ -67,7 +67,7 @@ export class AnalysisController {
     async doTask(
         @DPath('id') id: string,
             @DBody() data: {
-                command: AnalysisAPICommand
+                command: AnalysisCommand
             },
             @DRequest() req: any,
             @DResponse() res: any,

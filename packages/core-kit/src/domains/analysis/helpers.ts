@@ -6,7 +6,7 @@
  */
 
 import { ProcessStatus } from '@privateaim/kit';
-import { AnalysisAPICommand } from './constants';
+import { AnalysisCommand } from './constants';
 import type { Analysis } from './entity';
 import { AnalysisError } from './error';
 
@@ -23,7 +23,7 @@ type CanResult = {
  */
 export function isAnalysisAPICommandExecutable(
     entity: Analysis,
-    command: `${AnalysisAPICommand}`,
+    command: `${AnalysisCommand}`,
 ) : CanResult {
     const output : CanResult = {
         success: false,
@@ -31,7 +31,7 @@ export function isAnalysisAPICommandExecutable(
     };
 
     switch (command) {
-        case AnalysisAPICommand.BUILD_START: {
+        case AnalysisCommand.BUILD_START: {
             if (!entity.configuration_locked) {
                 output.success = false;
                 output.message = 'The analysis configuration must be locked before starting the build.';
@@ -61,7 +61,7 @@ export function isAnalysisAPICommandExecutable(
             output.message = `The current analysis build status "${entity.build_status}" does not allow a build start.`;
             return output;
         }
-        case AnalysisAPICommand.BUILD_STATUS: {
+        case AnalysisCommand.BUILD_CHECK: {
             if (!entity.configuration_locked) {
                 output.message = 'The analysis configuration must be locked before checking the build status.';
                 return output;
@@ -80,7 +80,7 @@ export function isAnalysisAPICommandExecutable(
             output.success = true;
             return output;
         }
-        case AnalysisAPICommand.CONFIGURATION_LOCK: {
+        case AnalysisCommand.CONFIGURATION_LOCK: {
             if (entity.configuration_locked) {
                 const error = AnalysisError.configurationLocked();
                 output.message = error.message;
@@ -120,7 +120,7 @@ export function isAnalysisAPICommandExecutable(
             output.success = true;
             return output;
         }
-        case AnalysisAPICommand.CONFIGURATION_UNLOCK: {
+        case AnalysisCommand.CONFIGURATION_UNLOCK: {
             if (!entity.configuration_locked) {
                 output.message = 'The analysis configuration is already unlocked.';
                 return output;
@@ -143,7 +143,7 @@ export function isAnalysisAPICommandExecutable(
             output.message = `The current analysis build status "${entity.build_status}" does not allow unlocking the configuration.`;
             return output;
         }
-        case AnalysisAPICommand.DISTRIBUTION_START: {
+        case AnalysisCommand.DISTRIBUTION_START: {
             if (!entity.build_status || entity.build_status !== ProcessStatus.FINISHED) {
                 output.message = 'The analysis is not built yet.';
                 return output;

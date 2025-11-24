@@ -7,7 +7,7 @@
 
 import { usePermissionCheck } from '@authup/client-web-kit';
 import type { Analysis } from '@privateaim/core-kit';
-import { AnalysisAPICommand, isAnalysisAPICommandExecutable } from '@privateaim/core-kit';
+import { AnalysisCommand, isAnalysisAPICommandExecutable } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { PropType } from 'vue';
 import {
@@ -24,7 +24,7 @@ const FAnalysisCommand = defineComponent({
             required: true,
         },
         command: {
-            type: String as PropType<`${AnalysisAPICommand}`>,
+            type: String as PropType<`${AnalysisCommand}`>,
             required: true,
         },
 
@@ -75,15 +75,15 @@ const FAnalysisCommand = defineComponent({
 
         const commandText = computed(() => {
             switch (props.command) {
-                case AnalysisAPICommand.BUILD_START:
-                case AnalysisAPICommand.DISTRIBUTION_START:
+                case AnalysisCommand.BUILD_START:
+                case AnalysisCommand.DISTRIBUTION_START:
                     return 'start';
-                case AnalysisAPICommand.BUILD_STATUS:
-                case AnalysisAPICommand.DISTRIBUTION_CHECK:
+                case AnalysisCommand.BUILD_CHECK:
+                case AnalysisCommand.DISTRIBUTION_CHECK:
                     return 'check';
-                case AnalysisAPICommand.CONFIGURATION_LOCK:
+                case AnalysisCommand.CONFIGURATION_LOCK:
                     return 'lock';
-                case AnalysisAPICommand.CONFIGURATION_UNLOCK:
+                case AnalysisCommand.CONFIGURATION_UNLOCK:
                     return 'unlock';
                 default:
                     return '';
@@ -92,15 +92,15 @@ const FAnalysisCommand = defineComponent({
 
         const iconClass = computed(() => {
             switch (props.command) {
-                case AnalysisAPICommand.BUILD_START:
-                case AnalysisAPICommand.DISTRIBUTION_START:
+                case AnalysisCommand.BUILD_START:
+                case AnalysisCommand.DISTRIBUTION_START:
                     return 'fa fa-play';
-                case AnalysisAPICommand.BUILD_STATUS:
-                case AnalysisAPICommand.DISTRIBUTION_CHECK:
+                case AnalysisCommand.BUILD_CHECK:
+                case AnalysisCommand.DISTRIBUTION_CHECK:
                     return 'fas fa-shield-alt';
-                case AnalysisAPICommand.CONFIGURATION_LOCK:
+                case AnalysisCommand.CONFIGURATION_LOCK:
                     return 'fas fa-lock';
-                case AnalysisAPICommand.CONFIGURATION_UNLOCK:
+                case AnalysisCommand.CONFIGURATION_UNLOCK:
                     return 'fas fa-unlock';
                 default:
                     return '';
@@ -109,14 +109,14 @@ const FAnalysisCommand = defineComponent({
 
         const classSuffix = computed(() => {
             switch (props.command) {
-                case AnalysisAPICommand.BUILD_START:
-                case AnalysisAPICommand.CONFIGURATION_LOCK:
-                case AnalysisAPICommand.DISTRIBUTION_START:
+                case AnalysisCommand.BUILD_START:
+                case AnalysisCommand.CONFIGURATION_LOCK:
+                case AnalysisCommand.DISTRIBUTION_START:
                     return 'success';
-                case AnalysisAPICommand.CONFIGURATION_UNLOCK:
+                case AnalysisCommand.CONFIGURATION_UNLOCK:
                     return 'danger';
-                case AnalysisAPICommand.BUILD_STATUS:
-                case AnalysisAPICommand.DISTRIBUTION_CHECK:
+                case AnalysisCommand.BUILD_CHECK:
+                case AnalysisCommand.DISTRIBUTION_CHECK:
                     return 'primary';
                 default:
                     return 'info';

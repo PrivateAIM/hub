@@ -5,11 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { AnalysisAPICommand } from '@privateaim/core-kit';
+import { AnalysisCommand } from '@privateaim/core-kit';
 import { createValidationChain, createValidator } from '@validup/adapter-validator';
 import { Container } from 'validup';
 
-export class AnalysisCommandValidator extends Container<{ command: AnalysisAPICommand }> {
+export class AnalysisCommandValidator extends Container<{ command: AnalysisCommand }> {
     protected initialize() {
         super.initialize();
 
@@ -19,7 +19,7 @@ export class AnalysisCommandValidator extends Container<{ command: AnalysisAPICo
                 const chain = createValidationChain();
                 return chain
                     .exists()
-                    .custom((command) => Object.values(AnalysisAPICommand).includes(command));
+                    .custom((command) => Object.values(AnalysisCommand).includes(command));
             }),
         );
     }

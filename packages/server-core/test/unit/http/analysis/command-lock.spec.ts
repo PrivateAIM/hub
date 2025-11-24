@@ -6,7 +6,7 @@
  */
 
 import type { Analysis, Node } from '@privateaim/core-kit';
-import { AnalysisAPICommand, AnalysisError, NodeType } from '@privateaim/core-kit';
+import { AnalysisCommand, AnalysisError, NodeType } from '@privateaim/core-kit';
 import { extractErrorMessage } from '@privateaim/kit';
 import { isClientError } from 'hapic';
 import { createTestSuite } from '../../../utils';
@@ -66,7 +66,7 @@ describe('analysis/command-lock', () => {
         try {
             await client.analysis.runCommand(
                 analysis.id,
-                AnalysisAPICommand.CONFIGURATION_LOCK,
+                AnalysisCommand.CONFIGURATION_LOCK,
             );
         } catch (e) {
             if (isClientError(e)) {
@@ -91,7 +91,7 @@ describe('analysis/command-lock', () => {
         try {
             await client.analysis.runCommand(
                 analysis.id,
-                AnalysisAPICommand.CONFIGURATION_LOCK,
+                AnalysisCommand.CONFIGURATION_LOCK,
             );
         } catch (e) {
             if (isClientError(e)) {
@@ -116,7 +116,7 @@ describe('analysis/command-lock', () => {
         try {
             await client.analysis.runCommand(
                 analysis.id,
-                AnalysisAPICommand.CONFIGURATION_LOCK,
+                AnalysisCommand.CONFIGURATION_LOCK,
             );
         } catch (e) {
             if (isClientError(e)) {

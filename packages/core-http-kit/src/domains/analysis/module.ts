@@ -8,7 +8,7 @@
 import type { RequestBaseOptions } from 'hapic';
 import type { BuildInput } from 'rapiq';
 import { buildQuery } from 'rapiq';
-import type { Analysis, AnalysisAPICommand } from '@privateaim/core-kit';
+import type { Analysis, AnalysisCommand } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
 import { nullifyEmptyObjectProperties } from '../../utils';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
@@ -75,16 +75,14 @@ export class AnalysisAPI extends BaseAPI {
 
     async runCommand(
         id: Analysis['id'],
-        command: `${AnalysisAPICommand}` | AnalysisAPICommand,
+        command: `${AnalysisCommand}`,
         data: Record<string, any> = {},
     ): Promise<SingleResourceResponse<Analysis>> {
-        const actionData = {
-            command,
-            ...data,
-        };
-
         const { data: response } = await this.client
-            .post(`analyses/${id}/command`, actionData);
+            .post(`analyses/${id}/command`, {
+                command,
+                ...data,
+            });
 
         return response;
     }
