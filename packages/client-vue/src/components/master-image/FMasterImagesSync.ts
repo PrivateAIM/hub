@@ -76,16 +76,18 @@ export default defineComponent({
                 }, {
                     [EntityListSlotName.ITEM_ACTIONS]: (
                         props : { data: MasterImage },
-                    ) => h(EntityDelete, {
-                        class: 'btn btn-xs btn-danger',
-                        elementType: 'button',
-                        entityId: props.data.id,
-                        entityType: DomainType.MASTER_IMAGE,
-                        withText: false,
-                        onDeleted(item: MasterImage) {
-                            return handleDeleted(item);
-                        },
-                    }),
+                    ) => [
+                        h(EntityDelete, {
+                            class: 'btn btn-xs btn-danger',
+                            elementType: 'button',
+                            entityId: props.data.id,
+                            entityType: DomainType.MASTER_IMAGE,
+                            withText: false,
+                            onDeleted(item: MasterImage) {
+                                return handleDeleted(item);
+                            },
+                        }),
+                    ],
                     [EntityListSlotName.FOOTER]: (
                         props: ListFooterSlotProps<Node>,
                     ) => h(FPagination, {

@@ -7,7 +7,12 @@
 
 import { usePermissionCheck } from '@authup/client-web-kit';
 import type { Analysis } from '@privateaim/core-kit';
-import { AnalysisCommand, isAnalysisAPICommandExecutable } from '@privateaim/core-kit';
+import {
+    AnalysisBuilderCommandChecker,
+    AnalysisCommand,
+    AnalysisConfiguratorCommandChecker,
+    AnalysisDistributorCommandChecker,
+} from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { PropType } from 'vue';
 import {
@@ -68,8 +73,37 @@ const FAnalysisCommand = defineComponent({
 
         const shouldDisplay = computed<boolean>(
             () => {
-                const check = isAnalysisAPICommandExecutable(entity.value, props.command);
-                return check.success;
+                try {
+                    switch (props.command) {
+                        case AnalysisCommand.BUILD_START:
+                            AnalysisBuilderCommandChecker.canStart(entity.value);
+                            return true;
+
+                        case AnalysisCommand.BUILD_CHECK:
+                            AnalysisBuilderCommandChecker.canCheck(entity.value);
+                            return true;
+
+                        case AnalysisCommand.DISTRIBUTION_START:
+                            AnalysisDistributorCommandChecker.canStart(entity.value);
+                            return true;
+
+                        case AnalysisCommand.DISTRIBUTION_CHECK:
+                            AnalysisDistributorCommandChecker.canCheck(entity.value);
+                            return true;
+
+                        case AnalysisCommand.CONFIGURATION_LOCK:
+                            AnalysisConfiguratorCommandChecker.canLock(entity.value);
+                            return true;
+
+                        case AnalysisCommand.CONFIGURATION_UNLOCK:
+                            AnalysisConfiguratorCommandChecker.canUnlock(entity.value);
+                            return true;
+                    }
+                } catch (e) {
+                    // do nothing
+                }
+
+                return false;
             },
         );
 

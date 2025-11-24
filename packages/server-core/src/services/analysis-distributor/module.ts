@@ -8,8 +8,7 @@
 import { BadRequestError } from '@ebec/http';
 import { ProcessStatus } from '@privateaim/kit';
 import {
-    AnalysisCommand,
-    isAnalysisAPICommandExecutable,
+    AnalysisDistributorCommandChecker,
 } from '@privateaim/core-kit';
 import {
     AnalysisDistributorComponentCaller,
@@ -56,10 +55,7 @@ export class AnalysisDistributor {
             analysisId: entityId,
         });
 
-        const check = isAnalysisAPICommandExecutable(entity, AnalysisCommand.DISTRIBUTION_START);
-        if (!check.success) {
-            throw new BadRequestError(check.message);
-        }
+        AnalysisDistributorCommandChecker.canStart(entity);
 
         await this.assignRegistry(entity);
 
@@ -89,10 +85,8 @@ export class AnalysisDistributor {
         input: string | AnalysisEntity,
     ) {
         const entity = await this.resolve(input);
-        const check = isAnalysisAPICommandExecutable(entity, AnalysisCommand.BUILD_CHECK);
-        if (!check.success) {
-            throw new BadRequestError(check.message);
-        }
+
+        AnalysisDistributorCommandChecker.canCheck(entity);
 
         await this.caller.callCheck({
             id: entity.id,

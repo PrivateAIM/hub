@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BadRequestError, NotFoundError } from '@ebec/http';
-import { AnalysisCommand, isAnalysisAPICommandExecutable } from '@privateaim/core-kit';
+import { NotFoundError } from '@ebec/http';
+import { AnalysisBuilderCommandChecker } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
 import { AnalysisBuilderComponentCaller } from '@privateaim/server-core-worker-kit';
 import type { Request } from 'routup';
@@ -41,10 +41,7 @@ export class AnalysisBuilder {
             analysisId: entityId,
         });
 
-        const check = isAnalysisAPICommandExecutable(entity, AnalysisCommand.BUILD_START);
-        if (!check.success) {
-            throw new BadRequestError(check.message);
-        }
+        AnalysisBuilderCommandChecker.canStart(entity);
 
         entity.build_status = ProcessStatus.STARTING;
 
@@ -68,10 +65,8 @@ export class AnalysisBuilder {
 
     async check(input: string | AnalysisEntity) {
         const entity = await this.resolve(input);
-        const check = isAnalysisAPICommandExecutable(entity, AnalysisCommand.BUILD_CHECK);
-        if (!check.success) {
-            throw new BadRequestError(check.message);
-        }
+
+        AnalysisBuilderCommandChecker.canCheck(entity);
 
         await this.caller.callCheck({
             id: entity.id,

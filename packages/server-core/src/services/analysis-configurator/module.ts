@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BadRequestError, NotFoundError } from '@ebec/http';
+import { NotFoundError } from '@ebec/http';
 import {
-    AnalysisCommand, NodeType, isAnalysisAPICommandExecutable,
+    AnalysisConfiguratorCommandChecker, NodeType,
 } from '@privateaim/core-kit';
 import type { Repository } from 'typeorm';
 import type { AnalysisMetadataComponentCaller } from '../../components';
@@ -51,10 +51,7 @@ export class AnalysisConfigurator {
             analysisId: entityId,
         });
 
-        const check = isAnalysisAPICommandExecutable(entity, AnalysisCommand.CONFIGURATION_LOCK);
-        if (!check.success) {
-            throw new BadRequestError(check.message);
-        }
+        AnalysisConfiguratorCommandChecker.canLock(entity);
 
         entity.configuration_locked = true;
 
@@ -85,10 +82,7 @@ export class AnalysisConfigurator {
     ): Promise<AnalysisEntity> {
         const entity = await this.resolve(input);
 
-        const check = isAnalysisAPICommandExecutable(entity, AnalysisCommand.CONFIGURATION_UNLOCK);
-        if (!check.success) {
-            throw new BadRequestError(check.message);
-        }
+        AnalysisConfiguratorCommandChecker.canUnlock(entity);
 
         const analysisNodes = await this.analysisNodeRepository.find({
             where: {

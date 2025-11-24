@@ -34,6 +34,10 @@ export class AnalysisError extends Error {
         return new AnalysisError('The analysis configuration is locked.');
     }
 
+    static configurationNotLocked() {
+        return new AnalysisError('The analysis configuration is not locked.');
+    }
+
     static buildInitialized() {
         return new AnalysisError('The analysis build process has already been initialized.');
     }
