@@ -7,7 +7,7 @@
 
 import { hasOwnProperty } from '@privateaim/kit';
 
-export function expectPropertiesEqualToSrc(
+export function expectSrcProperties(
     src: Record<string, any>,
     dest: Record<string, any>,
 ) {

@@ -9,7 +9,7 @@ import type { AnalysisBucket } from '@privateaim/core-kit';
 import { AnalysisBucketType } from '@privateaim/core-kit';
 import {
     createTestSuite,
-    expectPropertiesEqualToSrc,
+    expectSrcProperties,
     removeDateProperties,
 } from '../../utils';
 import {
@@ -59,7 +59,7 @@ describe('controllers/analysis-file', () => {
         const client = suite.client();
 
         const data = await client.analysisBucket.getOne(details.id);
-        expectPropertiesEqualToSrc(details, data);
+        expectSrcProperties(details, data);
     });
 
     it('should delete resource', async () => {

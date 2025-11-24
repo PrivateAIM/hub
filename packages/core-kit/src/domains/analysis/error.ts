@@ -5,7 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export class AnalysisError extends Error {
+import { HubError } from '@privateaim/kit';
+
+export class AnalysisError extends HubError {
     static notFound() {
         return new AnalysisError('The Analysis could not be found.');
     }

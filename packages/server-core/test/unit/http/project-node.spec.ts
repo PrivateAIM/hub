@@ -6,7 +6,7 @@
  */
 
 import type { ProjectNode } from '@privateaim/core-kit';
-import { createTestSuite, expectPropertiesEqualToSrc } from '../../utils';
+import { createTestSuite, expectSrcProperties } from '../../utils';
 import { createTestNode, createTestProject } from '../../utils/domains';
 
 describe('src/controllers/core/project-node', () => {
@@ -48,7 +48,7 @@ describe('src/controllers/core/project-node', () => {
         const client = suite.client();
 
         const data = await client.projectNode.getOne(details.id);
-        expectPropertiesEqualToSrc(details, data);
+        expectSrcProperties(details, data);
     });
 
     it('should delete resource', async () => {

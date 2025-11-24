@@ -9,7 +9,7 @@ import { extendObject } from '@authup/kit';
 import type { AnalysisNode } from '@privateaim/core-kit';
 import { NodeType } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
-import { createTestSuite, expectPropertiesEqualToSrc, removeDateProperties } from '../../utils';
+import { createTestSuite, expectSrcProperties, removeDateProperties } from '../../utils';
 import { createTestNode, createTestProject } from '../../utils/domains';
 
 describe('src/controllers/core/analysis-node', () => {
@@ -84,7 +84,7 @@ describe('src/controllers/core/analysis-node', () => {
         const client = suite.client();
 
         const data = await client.analysisNode.getOne(details.id);
-        expectPropertiesEqualToSrc(details, data);
+        expectSrcProperties(details, data);
     });
 
     it('should delete resource', async () => {

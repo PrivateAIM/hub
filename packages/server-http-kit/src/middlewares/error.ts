@@ -6,7 +6,7 @@
  */
 
 import { BuiltInPolicyType, PermissionError } from '@authup/access';
-import { isObject } from '@privateaim/kit';
+import { HubError, isObject } from '@privateaim/kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import type { Router } from 'routup';
 import { errorHandler } from 'routup';
@@ -31,6 +31,11 @@ export function mountErrorMiddleware(router: Router) {
                     [LogFlag.CHANNEL]: LogChannel.HTTP,
                 });
             }
+        }
+
+        if (error.cause instanceof HubError) {
+            error.expose = true;
+            error.statusCode = 400;
         }
 
         if (error.cause instanceof PermissionError) {
