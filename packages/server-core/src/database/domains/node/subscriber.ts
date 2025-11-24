@@ -8,13 +8,14 @@
 import {
     DomainType,
 } from '@privateaim/core-kit';
-import type {
+import {
+    EntityManager,
     EntitySubscriberInterface,
+    EventSubscriber,
     InsertEvent,
     RemoveEvent,
     UpdateEvent,
 } from 'typeorm';
-import { EventSubscriber } from 'typeorm';
 import { BaseSubscriber } from '@privateaim/server-db-kit';
 import { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
@@ -59,37 +60,41 @@ export class NodeSubscriber extends BaseSubscriber<NodeEntity> implements Entity
     async afterInsert(event: InsertEvent<NodeEntity>): Promise<any> {
         await super.afterInsert(event);
 
-        if (isNodeRobotServiceUsable()) {
-            const nodeRobotService = useNodeRobotService();
-            const robot = await nodeRobotService.save(event.entity);
-            await nodeRobotService.assignPermissions(robot);
-
-            // todo: event entity might need to be saved again.
-        }
+        await this.assignRobot(event.entity, event.manager);
     }
 
     async afterUpdate(event: UpdateEvent<NodeEntity>): Promise<any> {
         await super.afterUpdate(event);
 
-        if (isNodeRobotServiceUsable()) {
-            const nodeRobotService = useNodeRobotService();
-            const robot = await nodeRobotService.save({
+        await this.assignRobot(
+            {
                 ...(event.databaseEntity || {}),
                 ...event.entity,
-            } as NodeEntity);
-            await nodeRobotService.assignPermissions(robot);
-
-            // todo: event entity might need to be saved again.
-        }
+            } as NodeEntity,
+            event.manager,
+        );
     }
 
     async afterRemove(event: RemoveEvent<NodeEntity>): Promise<any> {
-        if (isNodeRobotServiceUsable()) {
-            const nodeRobotService = useNodeRobotService();
-            await nodeRobotService.delete(event.entity || event.databaseEntity);
+        if (!isNodeRobotServiceUsable()) return;
 
-            // todo: event entity might need to be saved again.
+        const nodeRobotService = useNodeRobotService();
+        await nodeRobotService.delete(event.entity || event.databaseEntity);
+    }
+
+    protected async assignRobot(entity: NodeEntity, manager: EntityManager) : Promise<void> {
+        if (!isNodeRobotServiceUsable()) return;
+
+        const nodeRobotService = useNodeRobotService();
+        const robotPrevId = entity.robot_id;
+
+        const robot = await nodeRobotService.assign(entity);
+        if (robot.id !== robotPrevId) {
+            const repository = manager.getRepository(NodeEntity);
+            await repository.save(entity);
         }
+
+        await nodeRobotService.assignPermissions(robot);
     }
 
     listenTo(): CallableFunction | string {

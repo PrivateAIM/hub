@@ -35,7 +35,7 @@ export class NodeRobotService {
         entity.robot_id = null;
     }
 
-    async save(entity: NodeEntity) : Promise<Robot> {
+    async assign(entity: NodeEntity) : Promise<Robot> {
         let robot : Robot | undefined;
 
         if (entity.robot_id) {
