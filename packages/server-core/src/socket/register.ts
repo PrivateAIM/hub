@@ -11,6 +11,8 @@ import {
     registerAnalysisNodeForRealmSocketHandlers,
     registerAnalysisNodeSocketHandlers,
     registerAnalysisSocketHandlers,
+    registerMasterImageGroupSocketHandlers,
+    registerMasterImageSocketHandlers,
     registerNodeSocketHandlers,
     registerProjectNodeForRealmSocketHandlers,
     registerProjectNodeSocketHandlers,
@@ -25,20 +27,6 @@ export function registerSocketControllers(nsp: Namespace) {
             socket.emit('pong');
         });
 
-        // project-node
-        registerProjectSocketHandlers(socket);
-        if (socket.data.namespaceId) {
-            registerProjectNodeForRealmSocketHandlers(socket);
-        } else {
-            registerProjectNodeSocketHandlers(socket);
-        }
-
-        // registry-project
-        registerRegistryProjectSocketHandlers(socket);
-
-        // node
-        registerNodeSocketHandlers(socket);
-
         // analysis
         registerAnalysisSocketHandlers(socket);
         registerAnalysisFileSocketHandlers(socket);
@@ -49,5 +37,23 @@ export function registerSocketControllers(nsp: Namespace) {
         } else {
             registerAnalysisNodeSocketHandlers(socket);
         }
+
+        // master-image
+        registerMasterImageSocketHandlers(socket);
+        registerMasterImageGroupSocketHandlers(socket);
+
+        // node
+        registerNodeSocketHandlers(socket);
+
+        // project
+        registerProjectSocketHandlers(socket);
+        if (socket.data.namespaceId) {
+            registerProjectNodeForRealmSocketHandlers(socket);
+        } else {
+            registerProjectNodeSocketHandlers(socket);
+        }
+
+        // registry
+        registerRegistryProjectSocketHandlers(socket);
     });
 }
