@@ -131,7 +131,7 @@ const FAnalysisCommand = defineComponent({
                     return 'fa fa-play';
                 case AnalysisCommand.BUILD_CHECK:
                 case AnalysisCommand.DISTRIBUTION_CHECK:
-                    return 'fas fa-shield-alt';
+                    return 'fas fa-search';
                 case AnalysisCommand.CONFIGURATION_LOCK:
                     return 'fas fa-lock';
                 case AnalysisCommand.CONFIGURATION_UNLOCK:
