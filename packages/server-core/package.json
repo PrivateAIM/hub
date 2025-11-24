@@ -70,11 +70,11 @@
         "@types/module-alias": "^2.0.4",
         "@types/supertest": "^6.0.3",
         "@types/yargs": "^17.0.32",
-        "better-sqlite3": "^12.4.1",
+        "better-sqlite3": "^12.4.5",
         "cross-env": "^10.1.0",
         "supertest": "^7.1.4",
         "ts-node": "^10.9.2",
-        "testcontainers": "^11.8.0"
+        "testcontainers": "^11.8.1"
     },
     "scripts": {
         "dev": "npm run cli -- start",
