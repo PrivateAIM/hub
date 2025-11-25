@@ -141,6 +141,7 @@ export default defineComponent({
         <div class="col">
             <FFormInputList
                 ref="itemsBefore"
+                :readonly="readonly"
                 :names="itemsBefore"
                 :min-items="0"
                 @changed="handleItemsBeforeChanged"
@@ -175,6 +176,7 @@ export default defineComponent({
         <div class="col">
             <FFormInputList
                 ref="itemsAfter"
+                :readonly="readonly"
                 :names="itemsAfter"
                 :min-items="0"
                 @changed="handleItemsAfterChanged"

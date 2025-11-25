@@ -30,7 +30,11 @@ export default defineComponent({
             type: String,
             default: undefined,
         },
-        disabled: {
+        canDrop: {
+            type: Boolean,
+            default: false,
+        },
+        readonly: {
             type: Boolean,
             default: false,
         },
@@ -74,11 +78,12 @@ export default defineComponent({
             >
                 <VCFormInput
                     v-model="vuelidate.name.$model"
+                    :disabled="readonly"
                     @change="handleUpdated"
                 >
                     <template #groupAppend>
                         <button
-                            :disabled="disabled"
+                            :disabled="!canDrop || readonly"
                             type="button"
                             class="btn btn-xs btn-dark"
                             @click.prevent="handleDeleted"

@@ -33,6 +33,10 @@ export default defineComponent({
             type: Number,
             default: 100,
         },
+        readonly: {
+            type: Boolean,
+            default: false,
+        },
     },
     emits: ['changed'],
     setup(props, setup) {
@@ -124,12 +128,12 @@ export default defineComponent({
                 <slot
                     name="headerActions"
                     :add="add"
-                    :can-add="canAdd"
+                    :can-add="canAdd && !readonly"
                 >
                     <button
                         class="btn btn-xs btn-primary"
                         type="button"
-                        :disabled="!canAdd"
+                        :disabled="!canAdd || readonly"
                         @click.prevent="add()"
                     >
                         <i class="fa fa-plus" /> <FTranslationDefault :name="'add'" />
@@ -157,7 +161,8 @@ export default defineComponent({
                 >
                     <FFormInputListItem
                         :key="item.id"
-                        :disabled="!canDrop"
+                        :can-drop="canDrop"
+                        :readonly="readonly"
                         :name="item.value"
                         @updated="(input) => { handleUpdated(item.id, input) }"
                         @deleted="() => { handleDeleted(item.id) }"
