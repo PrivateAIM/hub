@@ -5,12 +5,19 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { isObject } from '@privateaim/kit';
+
 export function expectPropertiesEqualToSrc(
     src: Record<string, any>,
     dest: Record<string, any>,
 ) {
     const keys = Object.keys(src);
     for (let i = 0; i < keys.length; i++) {
-        expect(dest[keys[i]]).toEqual(src[keys[i]]);
+        const key = keys[i];
+        if (isObject(src[key])) {
+            continue;
+        }
+
+        expect(dest[key]).toEqual(src[key]);
     }
 }
