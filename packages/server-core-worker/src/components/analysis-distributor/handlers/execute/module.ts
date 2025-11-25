@@ -113,7 +113,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
         try {
             for (let i = 0; i < imageURLs.length; i++) {
                 useAnalysisDistributorLogger().info({
-                    message: `Tagging node docker image ${imageURLs[i]}`,
+                    message: `Tagging image ${imageURLs[i]}`,
                     command: AnalysisDistributorCommand.EXECUTE,
                     analysis_id: analysis.id,
                     [LogFlag.REF_ID]: analysis.id,
@@ -125,7 +125,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
                 });
 
                 useAnalysisDistributorLogger().info({
-                    message: `Tagged node docker image ${imageURLs[i]}`,
+                    message: `Tagged image ${imageURLs[i]}`,
                     command: AnalysisDistributorCommand.EXECUTE,
                     analysis_id: analysis.id,
                     [LogFlag.REF_ID]: analysis.id,
@@ -148,7 +148,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
         try {
             for (let i = 0; i < imageURLs.length; i++) {
                 useAnalysisDistributorLogger().info({
-                    message: `Pushing node docker image ${imageURLs[i]}`,
+                    message: `Pushing image ${imageURLs[i]}`,
                     command: AnalysisDistributorCommand.EXECUTE,
                     analysis_id: analysis.id,
                     [LogFlag.REF_ID]: analysis.id,
@@ -157,7 +157,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
                 await pushDockerImage(imageURLs[i], authConfig);
 
                 useAnalysisDistributorLogger().info({
-                    message: `Pushed node docker image ${imageURLs[i]}`,
+                    message: `Pushed image ${imageURLs[i]}`,
                     command: AnalysisDistributorCommand.EXECUTE,
                     analysis_id: analysis.id,
                     [LogFlag.REF_ID]: analysis.id,

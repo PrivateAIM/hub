@@ -6,5 +6,4 @@
  */
 
 export * from './dockerfile';
-export * from './container-pack';
 export * from './type';

@@ -6,6 +6,7 @@
  */
 
 export * from './auth-config';
+export * from './container-pack';
 export * from './container-read';
 export * from './container-save';
 export * from './image-clenaup';
