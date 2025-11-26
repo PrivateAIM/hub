@@ -8,10 +8,9 @@
 import { QueueRouterRoutingType } from '@privateaim/server-kit';
 
 export enum EventEvent {
-    STARTING = 'starting',
-    STARTED = 'started',
-    FINISHED = 'finished',
-    FAILED = 'failed',
+    CREATION_STARTED = 'creationStarted',
+    CREATION_FINISHED = 'creationFinished',
+    CREATION_FAILED = 'creationFailed',
 }
 
 export enum EventCommand {
