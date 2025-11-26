@@ -10,9 +10,13 @@ import { useLogger } from '@privateaim/server-kit';
 import cron from 'node-cron';
 import { LessThan } from 'typeorm';
 import { useDataSource } from 'typeorm-extension';
+import type { EventCommand, EventComponentEventMap } from '@privateaim/server-telemetry-kit';
 import { EventEntity } from '../../../../database';
 
-export class EventComponentCleanerHandler implements ComponentHandler {
+export class EventComponentCleanerHandler implements ComponentHandler<
+EventComponentEventMap,
+EventCommand.CLEAN
+> {
     async initialize() : Promise<void> {
         await this.handle();
 

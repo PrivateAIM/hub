@@ -5,4 +5,5 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-export * from './event';
+export { default as FBucketFiles } from './FBucketFiles.vue';
+export { default as FBucketFileManager } from './FBucketFileManager.vue';

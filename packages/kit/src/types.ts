@@ -16,3 +16,5 @@ export type ObjectDiff<T extends ObjectLiteral = ObjectLiteral> = {
         previous?: T[K]
     }
 };
+
+export type ToTuple<T> = T extends [unknown, ...unknown[]] | [] ? T : [T];

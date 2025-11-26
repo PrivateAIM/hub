@@ -53,11 +53,13 @@ describe('controllers/bucket-file', () => {
     it('should get collection', async () => {
         const client = suite.client();
         const { data } = await client.bucketFile.getMany();
+
         expect(data.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should read resource', async () => {
         const client = suite.client();
+
         const data = await client.bucketFile.getOne(details.id);
 
         expectPropertiesEqualToSrc(details, data);

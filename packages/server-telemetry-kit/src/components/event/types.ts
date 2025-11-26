@@ -5,6 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { ObjectLiteralKeys } from '@privateaim/kit';
+import type { ComponentMetadata } from '@privateaim/server-kit';
+import type { Event } from '@privateaim/telemetry-kit';
 import type { EventCommand, EventEvent } from './constants';
 import type {
     EventCreateCommandPayload,
@@ -14,37 +17,11 @@ import type {
 
 //-----------------------------------------------------------------------
 
-type TelemetryEventCommandMapRaw = {
-    [EventCommand.CREATE]: EventCreateCommandPayload,
-    [EventCommand.CLEAN]: EventCreateCommandPayload,
-};
+export type EventComponentEventMap = ObjectLiteralKeys<{
+    [EventCommand.CREATE]: [EventCreateCommandPayload, ComponentMetadata],
+    [EventCommand.CLEAN]: [EventCreateCommandPayload, ComponentMetadata],
 
-export type EventCommandMap = {
-    [K in keyof TelemetryEventCommandMapRaw as `${K}`]: TelemetryEventCommandMapRaw[K]
-};
-
-export type EventCommandContext = {
-    [K in keyof EventCommandMap]: {
-        command: K,
-        data: EventCommandMap[K]
-    }
-}[keyof EventCommandMap];
-
-//-----------------------------------------------------------------------
-
-type EventEventMapRaw = {
-    [EventEvent.STARTING]: EventCreateEventPayload,
-    [EventEvent.STARTED]: EventCreateEventPayload,
-    [EventEvent.FAILED]: EventCreateFailedEventPayload,
-};
-
-export type EventEventMap = {
-    [K in keyof EventEventMapRaw as `${K}`]: EventEventMapRaw[K]
-};
-
-export type EventEventContext = {
-    [K in keyof EventEventMap]: {
-        event: K,
-        data: EventEventMap[K]
-    }
-}[keyof EventEventMap];
+    [EventEvent.CREATION_STARTED]: [EventCreateEventPayload, ComponentMetadata],
+    [EventEvent.CREATION_FINISHED]: [Event, ComponentMetadata],
+    [EventEvent.CREATION_FAILED]: [EventCreateFailedEventPayload, ComponentMetadata],
+}>;

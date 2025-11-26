@@ -6,17 +6,17 @@
   -->
 <script lang="ts">
 import { AnalysisBucketType } from '@privateaim/core-kit';
-import type { Analysis, AnalysisBucket, AnalysisBucketFile } from '@privateaim/core-kit';
+import type { Analysis, AnalysisBucket } from '@privateaim/core-kit';
 import type { FiltersBuildInput } from 'rapiq';
 import {
     type PropType, computed, defineComponent, ref, useTemplateRef,
 } from 'vue';
-import FAnalysisBucketFileManager from '../analysis-bucket-file/FAnalysisBucketFileManager.vue';
 import FAnalysisBucket from '../analysis-bucket/FAnalysisBucket';
+import { FBucketFileManager } from '../bucket-file';
 
 export default defineComponent({
     components: {
-        FAnalysisBucketFileManager,
+        FBucketFileManager,
         FAnalysisBucket,
     },
     props: {
@@ -29,9 +29,9 @@ export default defineComponent({
             default: false,
         },
     },
-    emits: ['failed', 'updated'],
+    emits: ['failed'],
     setup(props, { emit, expose }) {
-        const bucketFileManager = useTemplateRef<typeof FAnalysisBucketFileManager | null>('bucketFileManager');
+        const bucketFileManager = useTemplateRef<typeof FBucketFileManager | null>('bucketFileManager');
         const analysisBucketNode = ref<typeof FAnalysisBucket | null>(null);
 
         const queryFilters = computed(() => ({
@@ -53,10 +53,6 @@ export default defineComponent({
             add,
         });
 
-        const handleUpdated = (entity: AnalysisBucketFile) => {
-            emit('updated', entity);
-        };
-
         const handleFailed = (e: Error) => {
             emit('failed', e);
         };
@@ -70,7 +66,6 @@ export default defineComponent({
         return {
             add,
 
-            handleUpdated,
             handleFailed,
 
             queryFilters,
@@ -88,12 +83,11 @@ export default defineComponent({
             :query-filters="queryFilters"
         >
             <template #default="{ data: bucket }">
-                <FAnalysisBucketFileManager
+                <FBucketFileManager
                     ref="bucketFileManager"
                     :readonly="entity.configuration_locked || readonly"
-                    :entity="bucket"
+                    :entity-id="bucket.external_id"
                     @failed="handleFailed"
-                    @updated="handleUpdated"
                 >
                     <template #itemActions="props">
                         <slot
@@ -101,7 +95,7 @@ export default defineComponent({
                             v-bind="props"
                         />
                     </template>
-                </FAnalysisBucketFileManager>
+                </FBucketFileManager>
             </template>
             <template #error>
                 <div class="alert alert-sm alert-warning">
