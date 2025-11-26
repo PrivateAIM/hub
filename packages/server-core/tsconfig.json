@@ -15,6 +15,7 @@
             "@privateaim/server-storage-kit": ["./packages/server-storage-kit/src"],
             "@privateaim/server-telemetry": ["./packages/server-telemetry/src"],
             "@privateaim/server-telemetry-kit": ["./packages/server-telemetry-kit/src"],
+            "@privateaim/storage-kit": ["./packages/storage-kit/src"],
         }
     }
 }

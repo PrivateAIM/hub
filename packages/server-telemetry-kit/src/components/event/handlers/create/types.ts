@@ -14,6 +14,8 @@ export type EventCreateFailedEventPayload = {
     error: Error
 };
 
+export type EventCreationFinishedEventPayload = Event;
+
 export type EventCreateEventPayload = {
     [key: string]: any,
 };

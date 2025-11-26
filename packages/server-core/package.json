@@ -30,6 +30,7 @@
         "@privateaim/server-storage-kit": "^0.8.21",
         "@privateaim/server-telemetry": "^0.8.21",
         "@privateaim/server-telemetry-kit": "^0.8.21",
+        "@privateaim/storage-kit": "^0.8.21",
         "@routup/basic": "^1.4.2",
         "@routup/decorators": "^3.4.2",
         "@routup/prometheus": "^2.4.1",
