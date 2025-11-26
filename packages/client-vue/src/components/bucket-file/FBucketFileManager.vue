@@ -6,33 +6,30 @@
   -->
 
 <script lang="ts">
-import type {
-    AnalysisBucket,
-    AnalysisBucketFile,
-} from '@privateaim/core-kit';
 import { BModal } from 'bootstrap-vue-next';
-import type { PropType } from 'vue';
 import {
     computed,
     defineComponent,
     ref,
+    useTemplateRef,
 } from 'vue';
 import type { BuildInput } from 'rapiq';
-import { injectCoreHTTPClient, wrapFnWithBusyState } from '../../core';
-import FAnalysisFile from './FAnalysisBucketFile.vue';
-import { FAnalysisBucketFiles } from './FAnalysisBucketFiles';
-import FAnalysisBucketFileUpload from './FAnalysisBucketFileUpload.vue';
+import type { BucketFile } from '@privateaim/storage-kit';
+import { injectStorageHTTPClient, wrapFnWithBusyState } from '../../core';
+import FBucketFile from './FBucketFile.vue';
+import FBucketFilesUpload from './FBucketFilesUpload.vue';
+import FBucketFiles from './FBucketFiles.vue';
 
 export default defineComponent({
     components: {
+        FBucketFiles,
         BModal,
-        FAnalysisBucketFileUpload,
-        FAnalysisBucketFiles,
-        FAnalysisFile,
+        FBucketFilesUpload,
+        FBucketFile,
     },
     props: {
-        entity: {
-            type: Object as PropType<AnalysisBucket>,
+        entityId: {
+            type: String,
             required: true,
         },
         readonly: {
@@ -42,7 +39,7 @@ export default defineComponent({
     },
     emits: ['created', 'updated', 'deleted', 'uploaded', 'failed'],
     setup(props, { emit, expose }) {
-        const coreClient = injectCoreHTTPClient();
+        const storageClient = injectStorageHTTPClient();
 
         const modal = ref(false);
         const toggleModal = () => {
@@ -59,47 +56,28 @@ export default defineComponent({
         const selectAll = ref<boolean>(false);
         const busy = ref<boolean>(false);
 
-        const fileListNode = ref<null | typeof FAnalysisBucketFiles>(null);
-        const fileListQuery = computed<BuildInput<AnalysisBucketFile>>(() => ({
+        const vNode = useTemplateRef<typeof FBucketFiles>('bucketFiles');
+        const query = computed<BuildInput<BucketFile>>(() => ({
             filters: {
-                analysis_id: props.entity.analysis_id,
-                bucket_id: props.entity.id,
+                bucket_id: props.entityId,
             },
         }));
 
-        const updateAll = (entity: AnalysisBucketFile) => {
-            if (!entity.root || !fileListNode.value) return;
-
-            const data = fileListNode.value.data as unknown as AnalysisBucketFile[];
-
-            for (let i = 0; i < data.length; i++) {
-                if (data[i].id === entity.id) continue;
-
-                data[i].root = false;
-            }
-        };
-
-        const handleCreated = (entity: AnalysisBucketFile) => {
+        const handleCreated = (entity: BucketFile) => {
             emit('created', entity);
-
-            updateAll(entity);
         };
 
-        const handleDeleted = (entity: AnalysisBucketFile) => {
+        const handleDeleted = (entity: BucketFile) => {
             const selectedIndex = selected.value.indexOf(entity.id);
             if (selectedIndex !== -1) {
                 selected.value.splice(selectedIndex, 1);
             }
 
             emit('deleted', entity);
-
-            updateAll(entity);
         };
 
-        const handleUpdated = (entity: AnalysisBucketFile) => {
+        const handleUpdated = (entity: BucketFile) => {
             emit('updated', entity);
-
-            updateAll(entity);
         };
 
         const handleFailed = (e: Error) => {
@@ -112,21 +90,12 @@ export default defineComponent({
             toggleModal();
         };
 
-        const handleFileUploaded = (entity: AnalysisBucketFile) => {
-            if (fileListNode.value) {
-                fileListNode.value.handleCreated(entity);
-            }
-
-            handleCreated(entity);
-        };
-
         const dropSelected = wrapFnWithBusyState(busy, async () => {
             if (selected.value.length === 0) return;
 
             try {
                 for (let i = 0; i < selected.value.length; i++) {
-                    // todo: storage client delete files
-                    const file = await coreClient.analysisBucketFile.delete(selected.value[i]);
+                    const file = await storageClient.bucketFile.delete(selected.value[i]);
                     handleDeleted(file);
                 }
             } catch (e) {
@@ -138,8 +107,8 @@ export default defineComponent({
 
         const selectAllFiles = () => {
             if (selectAll.value) {
-                if (fileListNode.value) {
-                    selected.value = (fileListNode.value.data as unknown as AnalysisBucketFile[])
+                if (vNode.value) {
+                    selected.value = (vNode.value.data as unknown as BucketFile[])
                         .map((file) => file.id);
                 }
             } else {
@@ -147,7 +116,7 @@ export default defineComponent({
             }
         };
 
-        const toggleFile = (file: AnalysisBucketFile) => {
+        const toggleFile = (file: BucketFile) => {
             const index = selected.value.findIndex((el) => el === file.id);
             if (index === -1) {
                 selected.value.push(file.id);
@@ -169,12 +138,10 @@ export default defineComponent({
             handleUpdated,
             handleFailed,
             handleUploaded,
-            handleFileUploaded,
 
             toggleFile,
 
-            fileListNode,
-            fileListQuery,
+            query,
 
             modal,
             toggleModal,
@@ -198,60 +165,54 @@ export default defineComponent({
                 </div>
             </template>
 
-            <FAnalysisBucketFiles
-                ref="fileListNode"
-                :query="fileListQuery"
-                :header-search="false"
-                :header-title="false"
-                :footer-pagination="false"
-                @created="handleCreated"
-                @updated="handleUpdated"
-                @deleted="handleDeleted"
+            <FBucketFiles
+                ref="bucketFiles"
+                :query="query"
             >
-                <template #noMore>
-                    <div class="d-flex flex-column gap-1">
-                        <div>
-                            No files available in analysis {{ entity.type.toLowerCase() }} bucket.
-                        </div>
-                        <template v-if="!readonly">
+                <template #body="{ data, resolved }">
+                    <template v-if="resolved && data.length === 0">
+                        <div class="d-flex flex-column gap-1">
                             <div>
-                                <button
-                                    type="button"
-                                    class="btn btn-xs btn-dark"
-                                    @click.prevent="toggleModal"
-                                >
-                                    <i class="fa fa-add" /> Add
-                                </button>
+                                No files in bucket.
                             </div>
-                        </template>
-                    </div>
-                </template>
-                <template #body="props">
-                    <div class="d-flex flex-column">
-                        <template
-                            v-for="file in props.data"
-                            :key="file.id"
-                        >
-                            <FAnalysisFile
-                                :readonly="readonly"
-                                class="me-1"
-                                :entity="file"
-                                :files-selected="selected"
-                                @check="toggleFile"
-                                @updated="props.updated"
-                                @deleted="props.deleted"
+                            <template v-if="!readonly">
+                                <div>
+                                    <button
+                                        type="button"
+                                        class="btn btn-xs btn-dark"
+                                        @click.prevent="toggleModal"
+                                    >
+                                        <i class="fa fa-add" /> Add
+                                    </button>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                    <template v-else>
+                        <div class="d-flex flex-column">
+                            <template
+                                v-for="file in data"
+                                :key="file.id"
                             >
-                                <template #actions="actionProps">
-                                    <slot
-                                        name="itemActions"
-                                        v-bind="actionProps"
-                                    />
-                                </template>
-                            </FAnalysisFile>
-                        </template>
-                    </div>
+                                <FBucketFile
+                                    :readonly="readonly"
+                                    class="me-1"
+                                    :entity="file"
+                                    :files-selected="selected"
+                                    @check="toggleFile"
+                                >
+                                    <template #actions="actionProps">
+                                        <slot
+                                            name="itemActions"
+                                            v-bind="actionProps"
+                                        />
+                                    </template>
+                                </FBucketFile>
+                            </template>
+                        </div>
+                    </template>
                 </template>
-            </FAnalysisBucketFiles>
+            </FBucketFiles>
 
             <template v-if="!readonly">
                 <div>
@@ -291,9 +252,8 @@ export default defineComponent({
                     </div>
                 </template>
 
-                <FAnalysisBucketFileUpload
-                    :entity="entity"
-                    @file-uploaded="handleFileUploaded"
+                <FBucketFilesUpload
+                    :bucket-id="entityId"
                     @uploaded="handleUploaded"
                     @failed="handleFailed"
                 />

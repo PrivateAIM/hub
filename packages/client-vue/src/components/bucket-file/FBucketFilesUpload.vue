@@ -1,28 +1,25 @@
 <!--
   - Copyright (c) 2025.
-  - Author Peter Placzek (tada5hi)
-  - For the full copyright and license information,
-  - view the LICENSE file that was distributed with this source code.
+  -  Author Peter Placzek (tada5hi)
+  -  For the full copyright and license information,
+  -  view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { AnalysisBucket } from '@privateaim/core-kit';
 import { hasOwnProperty } from '@privateaim/kit';
-import type { PropType } from 'vue';
 import { defineComponent, ref } from 'vue';
-import { injectCoreHTTPClient, injectStorageHTTPClient, wrapFnWithBusyState } from '../../core';
-import FAnalysisFormFile from './FAnalysisFormFile.vue';
+import { injectStorageHTTPClient, wrapFnWithBusyState } from '../../core';
+import FBucketFileForm from './FBucketFileForm.vue';
 
 export default defineComponent({
-    components: { FAnalysisFormFile },
+    components: { FBucketFileForm },
     props: {
-        entity: {
-            type: Object as PropType<AnalysisBucket>,
+        bucketId: {
+            type: String,
             required: true,
         },
     },
-    emits: ['fileUploaded', 'uploaded', 'failed'],
+    emits: ['uploaded', 'failed'],
     setup(props, { emit }) {
-        const coreClient = injectCoreHTTPClient();
         const storageClient = injectStorageHTTPClient();
 
         const busy = ref(false);
@@ -63,11 +60,6 @@ export default defineComponent({
         const upload = wrapFnWithBusyState(busy, async () => {
             if (tempFiles.value.length === 0) return;
 
-            if (!props.entity.external_id) {
-                emit('failed', new Error('The analysis bucket has not created yet.'));
-                return;
-            }
-
             try {
                 const formData = new FormData();
                 for (let i = 0; i < tempFiles.value.length; i++) {
@@ -77,24 +69,13 @@ export default defineComponent({
                 const {
                     data: bucketFiles,
                 } = await storageClient.bucket.upload(
-                    props.entity.external_id,
+                    props.bucketId,
                     formData,
                 );
 
-                for (let i = 0; i < bucketFiles.length; i++) {
-                    const file = await coreClient.analysisBucketFile.create({
-                        external_id: bucketFiles[i].id,
-                        bucket_id: props.entity.id,
-                        analysis_id: props.entity.analysis_id,
-                        name: bucketFiles[i].path,
-                    });
-
-                    emit('fileUploaded', file);
-                }
-
                 tempFiles.value = [];
 
-                emit('uploaded');
+                emit('uploaded', bucketFiles);
             } catch (e) {
                 emit('failed', e);
             }
@@ -156,7 +137,7 @@ export default defineComponent({
                     v-for="(file,key) in tempFiles"
                     :key="key"
                 >
-                    <FAnalysisFormFile
+                    <FBucketFileForm
                         class="me-1"
                         :file="file"
                         @drop="dropTempFile"

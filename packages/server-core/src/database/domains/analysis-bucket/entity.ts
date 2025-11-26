@@ -37,6 +37,13 @@ export class AnalysisBucketEntity implements AnalysisBucket {
     })
         external_id: string | null;
 
+    @Column({
+        type: 'varchar',
+        length: 64,
+        nullable: true,
+    })
+        entrypoint_bucket_file_id: string | null;
+
     // ------------------------------------------------------------------
 
     @Column()

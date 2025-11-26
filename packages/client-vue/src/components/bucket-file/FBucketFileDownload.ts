@@ -5,15 +5,15 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { AnalysisBucketFile } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
+import type { BucketFile } from '@privateaim/storage-kit';
 import { ActionCommandElementType, injectStorageHTTPClient, renderActionCommand } from '../../core';
 
-const FAnalysisBucketFileDownload = defineComponent({
+const FBucketFileDownload = defineComponent({
     props: {
         entity: {
-            type: Object as PropType<AnalysisBucketFile>,
+            type: Object as PropType<BucketFile>,
             required: true,
         },
         elementType: {
@@ -33,7 +33,7 @@ const FAnalysisBucketFileDownload = defineComponent({
         const storageClient = injectStorageHTTPClient();
 
         const execute = async () => {
-            const url = storageClient.bucketFile.getStreamURL(props.entity.external_id);
+            const url = storageClient.bucketFile.getStreamURL(props.entity.id);
 
             window.open(
                 url,
@@ -58,5 +58,5 @@ const FAnalysisBucketFileDownload = defineComponent({
 });
 
 export {
-    FAnalysisBucketFileDownload,
+    FBucketFileDownload,
 };

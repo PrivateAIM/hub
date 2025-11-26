@@ -5,26 +5,21 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { isClientError } from '@privateaim/core-http-kit';
-import {
-    DomainType,
-} from '@privateaim/core-kit';
-import type {
-    AnalysisBucketFile,
-} from '@privateaim/core-kit';
 import type { PropType } from 'vue';
 import {
     computed,
     defineComponent,
+    ref,
 } from 'vue';
-import { createEntityManager, defineEntityManagerEvents, injectStorageHTTPClient } from '../../core';
-import { FAnalysisBucketFileDownload } from './FAnalysisBucketFileDownload';
+import type { BucketFile } from '@privateaim/storage-kit';
+import { injectStorageHTTPClient } from '../../core';
+import { FBucketFileDownload } from './FBucketFileDownload';
 
 export default defineComponent({
-    components: { FAnalysisBucketFileDownload },
+    components: { FBucketFileDownload },
     props: {
         entity: {
-            type: Object as PropType<AnalysisBucketFile>,
+            type: Object as PropType<BucketFile>,
             required: true,
         },
         filesSelected: {
@@ -36,63 +31,43 @@ export default defineComponent({
             default: false,
         },
     },
-    emits: {
-        ...defineEntityManagerEvents<AnalysisBucketFile>(),
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        check: (_entity?: AnalysisBucketFile) => true,
-    },
-    setup(props, setup) {
+    emits: ['check', 'deleted', 'failed'],
+    setup(props, { emit }) {
         const storage = injectStorageHTTPClient();
 
-        const manager = createEntityManager({
-            type: `${DomainType.ANALYSIS_BUCKET_FILE}`,
-            props,
-            setup,
-        });
+        const busy = ref(false);
+        const drop = async () => {
+            if (busy.value) return;
+
+            try {
+                await storage.bucketFile.delete(props.entity.id);
+
+                emit('deleted', props.entity);
+            } catch (e) {
+                emit('failed', e);
+            } finally {
+                busy.value = false;
+            }
+        };
 
         const marked = computed(() => {
             if (!props.filesSelected) {
                 return false;
             }
 
-            return props.filesSelected.findIndex((file) => manager.data.value && file === manager.data.value.id) !== -1;
+            return props.filesSelected.findIndex((file) => props.entity && file === props.entity.id) !== -1;
         });
 
         const mark = () => {
-            setup.emit('check', manager.data.value);
-        };
-
-        const drop = async () => {
-            if (manager.busy.value) return;
-
-            manager.busy.value = true;
-
-            try {
-                await storage.bucketFile.delete(manager.data.value!.external_id);
-            } catch (e) {
-                setup.emit('failed', e);
-
-                if (!isClientError(e) || e.response.status !== 404) {
-                    return;
-                }
-            } finally {
-                manager.busy.value = false;
-            }
-
-            await manager.delete();
-        };
-
-        const update = async (entity: Partial<AnalysisBucketFile>) => {
-            await manager.update(entity);
+            emit('check', props.entity);
         };
 
         return {
             drop,
-            marked,
-            mark,
-            busy: manager.busy,
+            busy,
 
-            update,
+            mark,
+            marked,
         };
     },
 });
@@ -113,10 +88,10 @@ export default defineComponent({
         <div class="ms-auto d-flex flex-row gap-2">
             <slot
                 name="actions"
-                v-bind="{ data: entity, update }"
+                v-bind="{ data: entity }"
             >
                 <div>
-                    <FAnalysisBucketFileDownload
+                    <FBucketFileDownload
                         :with-text="false"
                         :with-icon="true"
                         :entity="entity"

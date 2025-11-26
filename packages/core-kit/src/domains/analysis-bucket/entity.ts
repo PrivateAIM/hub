@@ -23,6 +23,11 @@ export interface AnalysisBucket {
      */
     external_id: string | null;
 
+    /**
+     * bucket file id
+     */
+    entrypoint_bucket_file_id: string | null;
+
     // ------------------------------------------------------------------
 
     analysis_id: Analysis['id'];
