@@ -15,12 +15,12 @@
         "@privateaim/server-kit": "^0.8.21"
     },
     "devDependencies": {
-        "typeorm": "^0.3.27",
-        "typeorm-extension": "^3.7.1"
+        "typeorm": "^0.3.28",
+        "typeorm-extension": "^3.7.2"
     },
     "peerDependencies": {
-        "typeorm": "^0.3.27",
-        "typeorm-extension": "^3.7.1"
+        "typeorm": "^0.3.28",
+        "typeorm-extension": "^3.7.2"
     },
     "scripts": {
         "build": "rimraf dist && tsc -p tsconfig.build.json"
