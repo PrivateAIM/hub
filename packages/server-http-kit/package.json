@@ -22,26 +22,26 @@
         "@privateaim/kit": "^0.8.21",
         "@privateaim/server-kit": "^0.8.21",
         "@privateaim/telemetry-kit": "^0.8.21",
-        "@routup/basic": "^1.4.2",
-        "@routup/decorators": "^3.4.2",
-        "@routup/prometheus": "^2.4.1",
-        "@routup/rate-limit": "^2.4.1",
-        "@routup/swagger": "^2.4.2",
+        "@routup/basic": "^1.4.3",
+        "@routup/decorators": "^3.4.3",
+        "@routup/prometheus": "^2.4.2",
+        "@routup/rate-limit": "^2.4.2",
+        "@routup/swagger": "^2.4.3",
         "cors": "^2.8.5",
         "hapic": "^2.7.0",
-        "locter": "^2.2.0",
+        "locter": "^2.2.1",
         "validup": "^0.1.8"
     },
     "devDependencies": {
         "@types/cors": "^2.8.19",
-        "redis-extension": "^2.0.2",
+        "redis-extension": "^2.0.4",
         "routup": "^4.0.2",
-        "typeorm-extension": "^3.7.1"
+        "typeorm-extension": "^3.7.2"
     },
     "peerDependencies": {
-        "redis-extension": "^2.0.2",
+        "redis-extension": "^2.0.4",
         "routup": "^4.0.2",
-        "typeorm-extension": "^3.7.1"
+        "typeorm-extension": "^3.7.2"
     },
     "scripts": {
         "dev": "ts-node src/index.ts",
