@@ -53,7 +53,7 @@
         "@privateaim/core-http-kit": "^0.8.21",
         "@privateaim/core-realtime-kit": "^0.7.22",
         "@privateaim/storage-kit": "^0.8.21",
-        "@types/node": "^24.10.1",
+        "@types/node": "^24.10.2",
         "@vitejs/plugin-vue": "^6.0.2",
         "@vuecs/form-controls": "^2.4.3",
         "@vuecs/link": "^1.0.0",
@@ -71,7 +71,7 @@
         "smob": "^1.5.0",
         "socket.io-client": "^4.8.1",
         "vue": "^3.5.25",
-        "vue-tsc": "^3.1.5",
+        "vue-tsc": "^3.1.8",
         "vue3-form-wizard": "0.3.5"
     },
     "peerDependencies": {
