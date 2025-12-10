@@ -32,7 +32,7 @@
         "@privateaim/server-telemetry-kit": "^0.8.21",
         "@privateaim/server-core-worker-kit": "^0.7.22",
         "@privateaim/storage-kit": "^0.8.21",
-        "@validup/adapter-zod": "^0.1.11",
+        "@validup/adapter-zod": "^0.1.12",
         "amqp-extension": "^4.0.0",
         "dockerode": "^4.0.9",
         "docken": "^1.1.1",
