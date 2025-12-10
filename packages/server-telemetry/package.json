@@ -54,7 +54,7 @@
     "devDependencies": {
         "@types/cors": "^2.8.19",
         "@types/supertest": "^6.0.3",
-        "testcontainers": "^11.9.0"
+        "testcontainers": "^11.10.0"
     },
     "scripts": {
         "cli-dev": "ts-node src/cli/index.ts",
