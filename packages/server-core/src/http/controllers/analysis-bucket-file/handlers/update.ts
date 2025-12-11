@@ -41,7 +41,7 @@ export async function updateAnalysisBucketFileRouteHandler(req: Request, res: Re
 
     if (entity.root) {
         await repository.update({
-            bucket_id: entity.bucket_id,
+            analysis_bucket_id: entity.analysis_bucket_id,
             analysis_id: entity.analysis_id,
         }, {
             root: false,

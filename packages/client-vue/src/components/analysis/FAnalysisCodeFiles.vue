@@ -82,11 +82,11 @@ export default defineComponent({
             ref="analysisBucketNode"
             :query-filters="queryFilters"
         >
-            <template #default="{ data: bucket }">
+            <template #default="{ data: analysisBucket }">
                 <FBucketFileManager
                     ref="bucketFileManager"
                     :readonly="entity.configuration_locked || readonly"
-                    :entity-id="bucket.external_id"
+                    :entity-id="analysisBucket.bucket_id"
                     @failed="handleFailed"
                 >
                     <template #itemActions="props">

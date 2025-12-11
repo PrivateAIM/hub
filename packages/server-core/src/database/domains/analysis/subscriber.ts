@@ -97,10 +97,6 @@ AnalysisEntity
 
         for (let i = 0; i < analysisBuckets.length; i++) {
             const analysisBucket = analysisBuckets[i];
-            // todo: remove condition
-            if (!analysisBucket.external_id) {
-                continue;
-            }
 
             const correlationId = await taskManager.create(
                 TaskType.ANALYSIS_BUCKET_DELETE,
@@ -110,7 +106,7 @@ AnalysisEntity
             );
 
             await bucketComponentCaller.callDelete({
-                id: analysisBucket.external_id,
+                id: analysisBucket.bucket_id,
             }, {
                 correlationId,
             });

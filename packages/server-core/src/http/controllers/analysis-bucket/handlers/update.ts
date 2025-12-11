@@ -12,7 +12,7 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { HTTPHandlerOperation, useRequestIdentityRealm } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
-import { AnalysisBucketEntity } from '../../../../database/domains';
+import { AnalysisBucketEntity } from '../../../../database';
 import { RequestRepositoryAdapter } from '../../../request';
 import { AnalysisBucketValidator } from '../utils';
 

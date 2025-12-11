@@ -47,8 +47,8 @@ describe('controllers/analysis-bucket-file', () => {
         expect(analysisBucket.id).toBeDefined();
 
         const analysisBucketFile = await client.analysisBucketFile.create({
-            bucket_id: analysisBucket.id,
-            external_id: '28eb7728-c78d-4c2f-ab99-dc4bcee78da9',
+            analysis_bucket_id: analysisBucket.id,
+            bucket_file_id: '28eb7728-c78d-4c2f-ab99-dc4bcee78da9',
             name: 'foo.bar',
             root: false,
         });

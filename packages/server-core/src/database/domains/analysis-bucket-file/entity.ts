@@ -18,8 +18,7 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 import type { Realm, User } from '@authup/core-kit';
-// eslint-disable-next-line import/no-cycle
-import { AnalysisEntity } from '../analysis';
+import { AnalysisEntity } from '../analysis/entity';
 import { AnalysisBucketEntity } from '../analysis-bucket';
 
 @Entity({ name: 'analysis_bucket_files' })
@@ -33,16 +32,10 @@ export class AnalysisBucketFileEntity implements AnalysisBucketFile {
     @Column({ type: 'boolean', default: false })
         root: boolean;
 
-    @Column({ type: 'uuid' })
-        external_id: string;
-
     // ------------------------------------------------------------------
 
-    @CreateDateColumn()
-        created_at: Date;
-
-    @UpdateDateColumn()
-        updated_at: Date;
+    @Column({ type: 'uuid' })
+        bucket_file_id: string;
 
     // ------------------------------------------------------------------
 
@@ -58,11 +51,11 @@ export class AnalysisBucketFileEntity implements AnalysisBucketFile {
     // ------------------------------------------------------------------
 
     @Column()
-        bucket_id: AnalysisBucket['id'];
+        analysis_bucket_id: AnalysisBucket['id'];
 
     @ManyToOne(() => AnalysisBucketEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'bucket_id' })
-        bucket: AnalysisBucketEntity;
+        analysis_bucket: AnalysisBucketEntity;
 
     // ------------------------------------------------------------------
 
@@ -72,6 +65,14 @@ export class AnalysisBucketFileEntity implements AnalysisBucketFile {
     @ManyToOne(() => AnalysisEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'analysis_id' })
         analysis: AnalysisEntity;
+
+    // ------------------------------------------------------------------
+
+    @CreateDateColumn()
+        created_at: Date;
+
+    @UpdateDateColumn()
+        updated_at: Date;
 
     // ------------------------------------------------------------------
 }

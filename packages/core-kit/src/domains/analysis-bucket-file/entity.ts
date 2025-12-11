@@ -24,13 +24,13 @@ export interface AnalysisBucketFile {
 
     // ------------------------------------------------------------------
 
-    external_id: string;
+    bucket_file_id: string;
 
     // ------------------------------------------------------------------
 
-    bucket_id: AnalysisBucket['id'];
+    analysis_bucket_id: AnalysisBucket['id'];
 
-    bucket: AnalysisBucket;
+    analysis_bucket: AnalysisBucket;
 
     // ------------------------------------------------------------------
 

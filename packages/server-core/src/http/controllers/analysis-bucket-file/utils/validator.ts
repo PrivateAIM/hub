@@ -15,7 +15,7 @@ export class AnalysisBucketFileValidator extends Container<AnalysisBucketFile> {
         super.initialize();
 
         this.mount(
-            'bucket_id',
+            'analysis_bucket_id',
             { group: HTTPHandlerOperation.CREATE },
             createValidator(() => {
                 const chain = createValidationChain();
@@ -46,7 +46,7 @@ export class AnalysisBucketFileValidator extends Container<AnalysisBucketFile> {
         );
 
         this.mount(
-            'external_id',
+            'bucket_file_id',
             { group: HTTPHandlerOperation.CREATE },
             createValidator(() => {
                 const chain = createValidationChain();

@@ -38,7 +38,7 @@ export async function generateDockerFileContent(entity: Analysis) : Promise<stri
     const { data: analysisBucketFiles } = await coreClient.analysisBucketFile.getMany({
         filter: {
             root: true,
-            bucket_id: analysisBucket.id,
+            analysis_bucket_id: analysisBucket.id,
         },
     });
 
@@ -49,7 +49,7 @@ export async function generateDockerFileContent(entity: Analysis) : Promise<stri
 
     let entryPoint : BucketFile;
     try {
-        entryPoint = await storageClient.bucketFile.getOne(analysisBucketFile.external_id);
+        entryPoint = await storageClient.bucketFile.getOne(analysisBucketFile.bucket_file_id);
     } catch (e) {
         throw BuilderError.entrypointNotFound();
     }

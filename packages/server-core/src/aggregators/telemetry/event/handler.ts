@@ -76,7 +76,7 @@ EventEvent.CREATION_FINISHED
 
         const analysisBucket = await analysisBucketRepository.findOne({
             where: {
-                external_id: data.bucket_id,
+                bucket_id: data.bucket_id,
             },
             relations: {
                 analysis: true,
@@ -102,10 +102,10 @@ EventEvent.CREATION_FINISHED
             case DomainEventName.CREATED: {
                 const analysisBucketFile = analysisBucketFileRepository.create({
                     name: data.path,
-                    bucket_id: analysisBucket.id,
+                    analysis_bucket_id: analysisBucket.id,
                     analysis_id: analysisBucket.analysis_id,
                     realm_id: analysisBucket.realm_id,
-                    external_id: data.id,
+                    bucket_file_id: data.id,
                 });
 
                 switch (data.actor_type) {
@@ -124,7 +124,7 @@ EventEvent.CREATION_FINISHED
             }
             case DomainEventName.DELETED: {
                 const analysisBucketFile = await analysisBucketFileRepository.findOneBy({
-                    external_id: data.id,
+                    bucket_file_id: data.id,
                 });
 
                 if (analysisBucketFile) {

@@ -77,13 +77,13 @@ export default defineComponent({
                         query: {
                             filters: {
                                 analysis_id: entity.id,
-                                root: true,
-                                bucket: {
+                                analysis_bucket: {
                                     type: AnalysisBucketType.CODE,
                                 },
+                                root: true,
                             },
                             relations: {
-                                bucket: true,
+                                analysis_bucket: true,
                             },
                         },
                     });

@@ -29,7 +29,7 @@ export class AnalysisBucketValidator extends Container<AnalysisBucket> {
         );
 
         this.mount(
-            'entrypoint_bucket_file_id',
+            'bucket_entrypoint_file_id',
             { optional: true },
             createValidator(() => {
                 const chain = createValidationChain();

@@ -209,7 +209,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
         }
 
         const storage = useStorageClient();
-        const webStream = await storage.bucket.stream(analysisBucket.external_id);
+        const webStream = await storage.bucket.stream(analysisBucket.bucket_id);
         const nodeStream = stream.Readable.fromWeb(webStream as any);
 
         await packDockerContainerWithTarStream(

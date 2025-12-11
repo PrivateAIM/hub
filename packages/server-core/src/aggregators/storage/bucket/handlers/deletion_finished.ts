@@ -26,7 +26,7 @@ BucketEvent.DELETION_FINISHED
             const analysisBucketRepository = dataSource.getRepository(AnalysisBucketEntity);
             const analysisBucket = await analysisBucketRepository.findOneBy({
                 analysis_id: task.data.analysisId,
-                external_id: bucket.id,
+                bucket_id: bucket.id,
             });
 
             if (!analysisBucket) {

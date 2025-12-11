@@ -16,17 +16,12 @@ export interface AnalysisBucket {
 
     // ------------------------------------------------------------------
 
-    /**
-     * @deprecated
-     *
-     * rename to bucket_id + uuid type
-     */
-    external_id: string | null;
+    bucket_id: string;
 
     /**
      * bucket file id
      */
-    entrypoint_bucket_file_id: string | null;
+    bucket_entrypoint_file_id: string | null;
 
     // ------------------------------------------------------------------
 

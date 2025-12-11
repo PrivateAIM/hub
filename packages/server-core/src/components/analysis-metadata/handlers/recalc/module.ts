@@ -71,7 +71,7 @@ AnalysisMetadataEventMap
             where: {
                 analysis_id: entity.id,
                 root: true,
-                bucket: {
+                analysis_bucket: {
                     type: AnalysisBucketType.CODE,
                 },
             },

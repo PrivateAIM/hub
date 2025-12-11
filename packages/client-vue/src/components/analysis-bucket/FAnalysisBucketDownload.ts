@@ -33,11 +33,11 @@ const FAnalysisBucketDownload = defineComponent({
         const storageClient = injectStorageHTTPClient();
 
         const execute = async () => {
-            if (!props.entity.external_id) {
+            if (!props.entity.bucket_id) {
                 return;
             }
 
-            const url = storageClient.bucket.getStreamURL(props.entity.external_id);
+            const url = storageClient.bucket.getStreamURL(props.entity.bucket_id);
 
             window.open(
                 url,
