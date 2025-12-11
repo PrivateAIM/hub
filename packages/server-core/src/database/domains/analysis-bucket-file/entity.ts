@@ -19,7 +19,7 @@ import {
 } from 'typeorm';
 import type { Realm, User } from '@authup/core-kit';
 import { AnalysisEntity } from '../analysis/entity';
-import { AnalysisBucketEntity } from '../analysis-bucket';
+import { AnalysisBucketEntity } from '../analysis-bucket/entity';
 
 @Entity({ name: 'analysis_bucket_files' })
 export class AnalysisBucketFileEntity implements AnalysisBucketFile {
@@ -51,20 +51,20 @@ export class AnalysisBucketFileEntity implements AnalysisBucketFile {
     // ------------------------------------------------------------------
 
     @Column()
-        analysis_bucket_id: AnalysisBucket['id'];
-
-    @ManyToOne(() => AnalysisBucketEntity, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'analysis_bucket_id' })
-        analysis_bucket: AnalysisBucketEntity;
-
-    // ------------------------------------------------------------------
-
-    @Column()
         analysis_id: Analysis['id'];
 
     @ManyToOne(() => AnalysisEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'analysis_id' })
         analysis: AnalysisEntity;
+
+    // ------------------------------------------------------------------
+
+    @Column()
+        analysis_bucket_id: AnalysisBucket['id'];
+
+    @ManyToOne(() => AnalysisBucketEntity, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'analysis_bucket_id' })
+        analysis_bucket: AnalysisBucketEntity;
 
     // ------------------------------------------------------------------
 
