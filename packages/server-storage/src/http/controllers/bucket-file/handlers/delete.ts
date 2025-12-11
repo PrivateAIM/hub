@@ -5,23 +5,26 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionName, isRealmResourceWritable } from '@privateaim/kit';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
-import type { Request, Response } from 'routup';
-import { sendAccepted, useRequestParam } from 'routup';
-import { useDataSource } from 'typeorm-extension';
+import { PermissionName, isRealmResourceWritable } from '@privateaim/kit';
 import {
     useRequestIdentityOrFail,
     useRequestIdentityRealm,
     useRequestPermissionChecker,
 } from '@privateaim/server-http-kit';
-import { useMinio } from '../../../../core';
-import { BucketFileEntity } from '../../../../database';
+import { DirectComponentCaller } from '@privateaim/server-kit';
+import type { BucketFileDeletionFinishedEventPayload } from '@privateaim/server-storage-kit';
 import {
-    isBucketFileOwnedByIdentity,
-    isBucketOwnedByIdentity,
-    toBucketName,
-} from '../../../../domains';
+    BucketFileCommand,
+    BucketFileEvent,
+    BucketFileEventCaller,
+} from '@privateaim/server-storage-kit';
+import type { Request, Response } from 'routup';
+import { sendAccepted, useRequestParam } from 'routup';
+import { useDataSource } from 'typeorm-extension';
+import { useBucketFileComponent } from '../../../../components';
+import { BucketFileEntity } from '../../../../database';
+import { isBucketFileOwnedByIdentity, isBucketOwnedByIdentity } from '../../../../domains';
 
 export async function executeBucketFileRouteDeleteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -52,8 +55,36 @@ export async function executeBucketFileRouteDeleteHandler(req: Request, res: Res
         }
     }
 
-    const minio = useMinio();
-    await minio.removeObject(toBucketName(entity.bucket.id), entity.hash);
+    const component = useBucketFileComponent();
+    const caller = new DirectComponentCaller(component);
+    const responseCaller = new BucketFileEventCaller();
+
+    await new Promise((resolve, reject) => {
+        caller.callWith(
+            BucketFileCommand.DELETE,
+            {
+                id: entity.id,
+            },
+            {},
+            {
+                handle: async (childValue, childContext) => {
+                    await responseCaller.call(
+                        childContext.key,
+                        childValue,
+                        childContext.metadata,
+                    );
+
+                    if (childContext.key === BucketFileEvent.DELETION_FINISHED) {
+                        resolve(childValue as BucketFileDeletionFinishedEventPayload);
+                    }
+
+                    if (childContext.key === BucketFileEvent.DELETION_FAILED) {
+                        reject(childValue);
+                    }
+                },
+            },
+        );
+    });
 
     const { id: entityId } = entity;
 

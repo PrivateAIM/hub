@@ -7,5 +7,5 @@
 
 export * from './handlers';
 export * from './constants';
-export * from './module';
+export * from './caller';
 export * from './types';

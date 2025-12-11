@@ -12,10 +12,10 @@ import {
 import {
     BucketFileCommand,
     BucketFileTaskQueueRouterRouting,
-} from './constants';
-import type { BucketFileCreateCommandPayload, BucketFileDeleteCommandPayload } from './handlers';
+} from '../constants';
+import type { BucketFileCreateCommandPayload, BucketFileDeleteCommandPayload } from '../handlers';
 
-export class BucketFileComponentCaller extends QueueDispatchComponentCaller {
+export class BucketFileTaskCaller extends QueueDispatchComponentCaller {
     constructor() {
         super({
             queue: BucketFileTaskQueueRouterRouting,

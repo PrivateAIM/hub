@@ -7,7 +7,11 @@
 import { isUUID } from '@authup/kit';
 import { NotFoundError } from '@ebec/http';
 import { DirectComponentCaller } from '@privateaim/server-kit';
-import { BucketFileCommand } from '@privateaim/server-storage-kit';
+import type { BucketFileCreationFinishedEventPayload } from '@privateaim/server-storage-kit';
+import {
+    BucketFileCommand, BucketFileEvent,
+    BucketFileEventCaller,
+} from '@privateaim/server-storage-kit';
 import Busboy from 'busboy';
 import path from 'node:path';
 import { sendCreated, useRequestParam } from 'routup';
@@ -31,6 +35,7 @@ export async function uploadRequestFilesToBucket(req: Request, bucket: BucketEnt
 
     const component = useBucketFileComponent();
     const caller = new DirectComponentCaller(component);
+    const responseCaller = new BucketFileEventCaller();
 
     const identity = useRequestIdentityOrFail(req);
 
@@ -49,7 +54,7 @@ export async function uploadRequestFilesToBucket(req: Request, bucket: BucketEnt
                 ) => {
                     streamToBuffer(file)
                         .then((buffer) => {
-                            caller.callWithResponse(
+                            caller.callWith(
                                 BucketFileCommand.CREATE,
                                 {
                                     meta: {
@@ -68,20 +73,24 @@ export async function uploadRequestFilesToBucket(req: Request, bucket: BucketEnt
                                 {
 
                                 },
+                                {
+                                    handle: async (childValue, childContext) => {
+                                        await responseCaller.call(
+                                            childContext.key,
+                                            childValue,
+                                            childContext.metadata,
+                                        );
+
+                                        if (childContext.key === BucketFileEvent.CREATION_FINISHED) {
+                                            fileResolve(childValue as BucketFileCreationFinishedEventPayload);
+                                        }
+
+                                        if (childContext.key === BucketFileEvent.CREATION_FAILED) {
+                                            fileReject(childValue);
+                                        }
+                                    },
+                                },
                             )
-                                .then((callerResponse) => {
-                                    if (callerResponse.creationFinished) {
-                                        fileResolve(callerResponse.creationFinished);
-                                        return;
-                                    }
-
-                                    if (callerResponse.creationFailed) {
-                                        fileReject(callerResponse.creationFailed);
-                                        return;
-                                    }
-
-                                    fileReject(new Error('Component could not process file upload.'));
-                                })
                                 .catch((e) => fileReject(e));
                         })
                         .catch((e) => fileReject(e));

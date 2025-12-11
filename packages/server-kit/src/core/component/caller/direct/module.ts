@@ -31,7 +31,27 @@ export class DirectComponentCaller<
     ): Promise<void> {
         const [data, metadata] = payload;
 
-        await this.callWithResponse(key, data, metadata);
+        await this.callAndWait(key, data, metadata);
+    }
+
+    async callWith<Key extends keyof EventMap>(
+        key: Key & string,
+        data: ComponentCallerPayload<EventMap[Key]>[0],
+        metadata: ComponentCallerPayload<EventMap[Key]>[1],
+        options: ComponentHandleOptions<EventMap>,
+    ) {
+        if (!this.component.handle) {
+            throw new Error(`Component ${this.component.constructor.name} can not be called.`);
+        }
+
+        metadata.correlationId = metadata.correlationId || createNanoID();
+
+        await this.component.handle(
+            key,
+            data,
+            metadata,
+            options,
+        );
     }
 
     /**
@@ -40,7 +60,7 @@ export class DirectComponentCaller<
      * @param key
      * @param payload
      */
-    async callWithResponse<Key extends keyof EventMap>(
+    async callAndWait<Key extends keyof EventMap>(
         key: Key & string,
         ...payload: ComponentCallerPayload<EventMap[Key]>
     ): Promise<ComponentDirectCallerResponse<EventMap>> {
@@ -48,8 +68,6 @@ export class DirectComponentCaller<
         if (!this.component.handle) {
             throw new Error(`Component ${this.component.constructor.name} can not be called.`);
         }
-
-        metadata.correlationId = metadata.correlationId || createNanoID();
 
         const events : ComponentDirectCallerResponse<EventMap> = {};
 
@@ -59,12 +77,7 @@ export class DirectComponentCaller<
             },
         };
 
-        await this.component.handle(
-            key,
-            data,
-            metadata,
-            options,
-        );
+        await this.callWith(key, data, metadata, options);
 
         return events;
     }

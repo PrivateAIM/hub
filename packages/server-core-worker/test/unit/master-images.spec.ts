@@ -17,7 +17,7 @@ describe('components > master-images', () => {
             new MasterImageSynchronizerComponent(),
         );
 
-        const output = await caller.callWithResponse(
+        const output = await caller.callAndWait(
             MasterImageSynchronizerCommand.EXECUTE,
             {
                 owner: 'PrivateAim',

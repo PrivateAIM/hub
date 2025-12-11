@@ -20,7 +20,9 @@ import {
 import { DomainType } from '@privateaim/storage-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import { useDataSource } from 'typeorm-extension';
+import { useMinio } from '../../../../core';
 import { BucketFileEntity } from '../../../../database';
+import { toBucketName } from '../../../../domains';
 
 export class BucketFileDeleteHandler implements ComponentHandler<
 BucketFileComponentEventMap,
@@ -63,19 +65,23 @@ BucketFileCommand.DELETE
 
         const dataSource = await useDataSource();
         const repository = dataSource.getRepository(BucketFileEntity);
-        const entity = await repository.findOneBy({
-            id: value.id,
+        const entity = await repository.findOne({
+            where: {
+                id: value.id,
+            },
+            relations: ['bucket'],
         });
 
         if (!entity) {
             throw new NotFoundError();
         }
 
+        const minio = useMinio();
+        await minio.removeObject(toBucketName(entity.bucket.id), entity.hash);
+
         const entityId = entity.id;
 
         await repository.remove(entity);
-
-        // todo: delete minio file
 
         await context.handle(
             BucketFileEvent.DELETION_FINISHED,
