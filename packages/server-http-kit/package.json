@@ -36,12 +36,12 @@
         "@types/cors": "^2.8.19",
         "redis-extension": "^2.0.4",
         "routup": "^4.0.2",
-        "typeorm-extension": "^3.7.2"
+        "typeorm-extension": "^3.7.3"
     },
     "peerDependencies": {
         "redis-extension": "^2.0.4",
         "routup": "^4.0.2",
-        "typeorm-extension": "^3.7.2"
+        "typeorm-extension": "^3.7.3"
     },
     "scripts": {
         "dev": "ts-node src/index.ts",

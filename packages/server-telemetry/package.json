@@ -48,13 +48,13 @@
         "routup": "^4.0.2",
         "singa": "^1.1.0",
         "typeorm": "^0.3.28",
-        "typeorm-extension": "^3.7.2",
+        "typeorm-extension": "^3.7.3",
         "validup": "^0.1.9"
     },
     "devDependencies": {
         "@types/cors": "^2.8.19",
         "@types/supertest": "^6.0.3",
-        "testcontainers": "^11.9.0"
+        "testcontainers": "^11.10.0"
     },
     "scripts": {
         "cli-dev": "ts-node src/cli/index.ts",
