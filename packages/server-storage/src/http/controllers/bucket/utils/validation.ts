@@ -9,7 +9,7 @@ import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
 import { createValidator } from '@validup/adapter-zod';
 import zod from 'zod';
 import { Container } from 'validup';
-import type { BucketEntity } from '../../../../domains';
+import type { BucketEntity } from '../../../../database';
 
 export class BucketValidator extends Container<BucketEntity> {
     protected initialize() {

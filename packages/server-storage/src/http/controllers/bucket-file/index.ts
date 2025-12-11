@@ -9,7 +9,7 @@ import {
     DController, DDelete, DGet, DPath, DRequest, DResponse, DTags,
 } from '@routup/decorators';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
-import type { BucketFileEntity } from '../../../domains';
+import type { BucketFileEntity } from '../../../database';
 import {
     executeBucketFileRouteDeleteHandler,
     executeBucketFileRouteGetManyHandler,

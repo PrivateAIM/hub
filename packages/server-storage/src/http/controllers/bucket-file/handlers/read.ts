@@ -13,7 +13,7 @@ import {
     useDataSource,
 } from 'typeorm-extension';
 import { NotFoundError } from '@ebec/http';
-import { BucketFileEntity } from '../../../../domains';
+import { BucketFileEntity } from '../../../../database';
 
 export async function executeBucketFileRouteGetOneHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');

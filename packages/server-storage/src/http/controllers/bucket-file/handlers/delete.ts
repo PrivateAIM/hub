@@ -16,10 +16,11 @@ import {
     useRequestPermissionChecker,
 } from '@privateaim/server-http-kit';
 import { useMinio } from '../../../../core';
+import { BucketFileEntity } from '../../../../database';
 import {
-    BucketFileEntity,
     isBucketFileOwnedByIdentity,
-    isBucketOwnedByIdentity, toBucketName,
+    isBucketOwnedByIdentity,
+    toBucketName,
 } from '../../../../domains';
 
 export async function executeBucketFileRouteDeleteHandler(req: Request, res: Response) : Promise<any> {

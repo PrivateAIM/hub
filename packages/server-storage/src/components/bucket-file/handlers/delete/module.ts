@@ -20,7 +20,7 @@ import {
 import { DomainType } from '@privateaim/storage-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import { useDataSource } from 'typeorm-extension';
-import { BucketFileEntity } from '../../../../domains';
+import { BucketFileEntity } from '../../../../database';
 
 export class BucketFileDeleteHandler implements ComponentHandler<
 BucketFileComponentEventMap,

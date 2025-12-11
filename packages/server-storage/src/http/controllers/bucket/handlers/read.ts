@@ -14,7 +14,7 @@ import {
     useDataSource,
 } from 'typeorm-extension';
 import { NotFoundError } from '@ebec/http';
-import { BucketEntity } from '../../../../domains';
+import { BucketEntity } from '../../../../database';
 
 export async function executeBucketRouteGetOneHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');

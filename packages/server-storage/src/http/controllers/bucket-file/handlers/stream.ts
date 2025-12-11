@@ -12,8 +12,9 @@ import type { Request, Response } from 'routup';
 import { getRequestAcceptableEncoding, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useMinio } from '../../../../core';
+import { BucketFileEntity } from '../../../../database';
 import {
-    BucketFileEntity, toBucketName,
+    toBucketName,
 } from '../../../../domains';
 
 /*

@@ -21,7 +21,8 @@ import { LogFlag } from '@privateaim/telemetry-kit';
 import crypto from 'node:crypto';
 import { useDataSource } from 'typeorm-extension';
 import { useMinio } from '../../../../core';
-import { BucketEntity, BucketFileEntity, toBucketName } from '../../../../domains';
+import { BucketEntity, BucketFileEntity } from '../../../../database';
+import { toBucketName } from '../../../../domains';
 import { BucketValidator } from '../../../../http/controllers/bucket/utils/validation';
 
 export class BucketFileCreateHandler implements ComponentHandler<

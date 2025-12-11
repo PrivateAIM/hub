@@ -16,10 +16,10 @@ import { useDataSource } from 'typeorm-extension';
 import { useRequestIdentityOrFail } from '@privateaim/server-http-kit';
 import { useBucketFileComponent } from '../../../../components';
 import { streamToBuffer } from '../../../../core';
-import type { BucketFileEntity } from '../../../../domains';
+import type { BucketFileEntity } from '../../../../database';
 import {
     BucketEntity,
-} from '../../../../domains';
+} from '../../../../database';
 
 export async function uploadRequestFilesToBucket(req: Request, bucket: BucketEntity) {
     const instance = Busboy({
