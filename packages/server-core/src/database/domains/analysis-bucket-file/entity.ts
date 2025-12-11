@@ -54,7 +54,7 @@ export class AnalysisBucketFileEntity implements AnalysisBucketFile {
         analysis_bucket_id: AnalysisBucket['id'];
 
     @ManyToOne(() => AnalysisBucketEntity, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'bucket_id' })
+    @JoinColumn({ name: 'analysis_bucket_id' })
         analysis_bucket: AnalysisBucketEntity;
 
     // ------------------------------------------------------------------
