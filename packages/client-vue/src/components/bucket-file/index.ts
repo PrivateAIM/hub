@@ -6,4 +6,4 @@
  */
 
 export { default as FBucketFiles } from './FBucketFiles.vue';
-export { default as FBucketFileManager } from './FBucketFileManager.vue';
+export { default as FBucketFilesManager } from './FBucketFilesManager.vue';

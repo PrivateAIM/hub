@@ -23,7 +23,8 @@ export default defineComponent({
             type: Object as PropType<BuildInput<BucketFile>>,
         },
     },
-    setup(props) {
+    emits: ['deleted', 'failed', 'created'],
+    setup(props, { emit, expose }) {
         const httpClient = injectStorageHTTPClient();
 
         const meta = ref<ListMeta<BucketFile>>({
@@ -67,12 +68,46 @@ export default defineComponent({
             },
         });
 
+        const handleCreated = (input: BucketFile) => {
+            const index = data.value.findIndex((el) => el.id === input.id);
+            if (index === -1) {
+                data.value.push(input);
+            }
+
+            emit('created', input);
+        };
+
         const handleDeleted = (input: BucketFile) => {
             const index = data.value.findIndex((el) => el.id === input.id);
             if (index !== -1) {
                 data.value.splice(index, 1);
             }
+
+            emit('deleted', input);
         };
+
+        const remove = async (id: string) => {
+            if (busy.value) return;
+
+            busy.value = true;
+
+            try {
+                const entity = await httpClient.bucketFile.delete(id);
+                handleDeleted(entity);
+            } catch (e) {
+                emit('failed', e);
+            } finally {
+                busy.value = false;
+            }
+        };
+
+        expose({
+            data,
+            delete: remove,
+
+            handleCreated,
+            handleDeleted,
+        });
 
         Promise.resolve()
             .then(() => resolve(props.query));

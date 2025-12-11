@@ -5,18 +5,21 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { PropType } from 'vue';
+import { inject } from '@authup/client-web-kit';
+import { VCFormInputCheckbox } from '@vuecs/form-controls';
+import type { PropType, Ref } from 'vue';
 import {
     computed,
     defineComponent,
     ref,
+    watch,
 } from 'vue';
 import type { BucketFile } from '@privateaim/storage-kit';
 import { injectStorageHTTPClient } from '../../core';
 import { FBucketFileDownload } from './FBucketFileDownload';
 
 export default defineComponent({
-    components: { FBucketFileDownload },
+    components: { FBucketFileDownload, VCFormInputCheckbox },
     props: {
         entity: {
             type: Object as PropType<BucketFile>,
@@ -24,17 +27,13 @@ export default defineComponent({
         entityId: {
             type: String,
         },
-        filesSelected: {
-            type: Array,
-            required: true,
-        },
         readonly: {
             type: Boolean,
             default: false,
         },
     },
-    emits: ['check', 'deleted', 'failed'],
-    setup(props, { emit }) {
+    emits: ['toggle', 'deleted', 'failed'],
+    setup(props, { emit, expose }) {
         const storage = injectStorageHTTPClient();
 
         const data = ref<BucketFile | null>(null);
@@ -79,22 +78,37 @@ export default defineComponent({
             }
         };
 
-        const marked = computed(() => {
-            if (!props.filesSelected || !data.value) {
+        expose({
+            data: data.value,
+            delete: drop,
+        });
+
+        const isActive = ref(false);
+
+        const files = inject<Ref<string[]>>('files');
+        const isInFileList = computed(() => {
+            if (!data.value || !files) {
                 return false;
             }
 
-            return props.filesSelected.findIndex(
+            return files.value.findIndex(
                 (file) => file === data.value!.id,
             ) !== -1;
         });
 
-        const mark = () => {
-            if (!data.value) {
+        watch(isInFileList, (val, oldValue) => {
+            if (val === oldValue) {
                 return;
             }
 
-            emit('check', data.value);
+            setTimeout(() => {
+                isActive.value = val;
+            });
+        });
+
+        const toggleIsActive = () => {
+            isActive.value = !isActive.value;
+            emit('toggle', data.value);
         };
 
         return {
@@ -104,22 +118,30 @@ export default defineComponent({
             busy,
             resolved,
 
-            mark,
-            marked,
+            toggleIsActive,
+            isActive,
+
+            isInFileList,
         };
     },
 });
 </script>
 <template>
     <div
-        class="card card-file d-flex flex-row align-items-center p-1"
-        :class="{'checked': marked}"
+        class="bucket-file d-flex flex-row align-items-center gap-1 p-2"
+        :class="{'checked': isActive}"
     >
+        <div class="d-flex align-items-center">
+            <VCFormInputCheckbox
+                :model-value="isActive"
+                @change="toggleIsActive"
+            />
+        </div>
         <div
-            class="card-heading align-items-center d-flex flex-row"
-            @click.prevent="mark"
+            class="d-flex align-items-center bucket-file-text"
+            @click.prevent="toggleIsActive"
         >
-            <span class="title">
+            <span>
                 <template v-if="data">
                     {{ data.name }}
                 </template>
@@ -129,7 +151,12 @@ export default defineComponent({
             </span>
         </div>
         <template v-if="data">
-            <div class="ms-auto d-flex flex-row gap-2">
+            <div class="bucket-file-size">
+                {{ data.size }} Bytes
+            </div>
+        </template>
+        <template v-if="data">
+            <div class="ms-auto d-flex flex-row gap-1">
                 <slot
                     name="actions"
                     v-bind="{ data }"
@@ -160,3 +187,31 @@ export default defineComponent({
         </template>
     </div>
 </template>
+<style scoped>
+.bucket-file {
+    display: flex;
+    align-items: center;
+}
+
+.bucket-file.checked {
+    background: #c5d7e7;
+}
+
+.form-check-input {
+    margin-top: -2px;
+}
+
+.bucket-file-text {
+    font-weight: bold;
+}
+
+.bucket-file-size {
+    font-size: 0.75rem;
+}
+
+.bucket-file-text {
+    cursor: pointer;
+    font-size: 0.85rem;
+    line-height: 0.85rem;
+}
+</style>

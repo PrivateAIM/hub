@@ -112,6 +112,10 @@ h5.title:before {
     margin-left: -15px;
 }
 
+hr.small {
+    margin: 0.5rem 0;
+}
+
 /*
 header
  */

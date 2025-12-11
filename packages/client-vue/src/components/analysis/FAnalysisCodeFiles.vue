@@ -12,11 +12,11 @@ import {
     type PropType, computed, defineComponent, ref, useTemplateRef,
 } from 'vue';
 import FAnalysisBucket from '../analysis-bucket/FAnalysisBucket';
-import { FBucketFileManager } from '../bucket-file';
+import { FBucketFilesManager } from '../bucket-file';
 
 export default defineComponent({
     components: {
-        FBucketFileManager,
+        FBucketFileManager: FBucketFilesManager,
         FAnalysisBucket,
     },
     props: {
@@ -31,7 +31,7 @@ export default defineComponent({
     },
     emits: ['failed'],
     setup(props, { emit, expose }) {
-        const bucketFileManager = useTemplateRef<typeof FBucketFileManager | null>('bucketFileManager');
+        const bucketFileManager = useTemplateRef<typeof FBucketFilesManager | null>('bucketFileManager');
         const analysisBucketNode = ref<typeof FAnalysisBucket | null>(null);
 
         const queryFilters = computed(() => ({

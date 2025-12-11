@@ -63,6 +63,7 @@ AnalysisEntity
 
         const bucketComponentCaller = new BucketComponentCaller();
         const bucketTypes = Object.values(AnalysisBucketType);
+
         for (let i = 0; i < bucketTypes.length; i++) {
             // todo: maybe extract actor_id, actor_type from event.queryRunner.data
             const correlationId = await taskManager.create(

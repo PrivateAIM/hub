@@ -6,16 +6,19 @@
   -->
 
 <script lang="ts">
+import { provide } from '@authup/client-web-kit';
+import { VCFormInputCheckbox } from '@vuecs/form-controls';
 import { BModal } from 'bootstrap-vue-next';
 import {
     computed,
     defineComponent,
     ref,
     useTemplateRef,
+    watch,
 } from 'vue';
 import type { BuildInput } from 'rapiq';
 import type { BucketFile } from '@privateaim/storage-kit';
-import { injectStorageHTTPClient, wrapFnWithBusyState } from '../../core';
+import { wrapFnWithBusyState } from '../../core';
 import FBucketFile from './FBucketFile.vue';
 import FBucketFilesUpload from './FBucketFilesUpload.vue';
 import FBucketFiles from './FBucketFiles.vue';
@@ -26,6 +29,7 @@ export default defineComponent({
         BModal,
         FBucketFilesUpload,
         FBucketFile,
+        VCFormInputCheckbox,
     },
     props: {
         entityId: {
@@ -39,8 +43,6 @@ export default defineComponent({
     },
     emits: ['created', 'updated', 'deleted', 'uploaded', 'failed'],
     setup(props, { emit, expose }) {
-        const storageClient = injectStorageHTTPClient();
-
         const modal = ref(false);
         const toggleModal = () => {
             modal.value = !modal.value;
@@ -53,8 +55,10 @@ export default defineComponent({
         });
 
         const selected = ref<string[]>([]);
-        const selectAll = ref<boolean>(false);
+        const allSelected = ref<boolean>(false);
         const busy = ref<boolean>(false);
+
+        provide('files', selected);
 
         const vNode = useTemplateRef<typeof FBucketFiles>('bucketFiles');
         const query = computed<BuildInput<BucketFile>>(() => ({
@@ -84,37 +88,58 @@ export default defineComponent({
             emit('failed', e);
         };
 
-        const handleUploaded = () => {
-            emit('uploaded');
+        const handleUploaded = (files: BucketFile[]) => {
+            emit('uploaded', files);
 
             toggleModal();
+
+            if (!vNode.value) {
+                return;
+            }
+
+            for (let i = 0; i < files.length; i++) {
+                vNode.value.handleCreated(files[i]);
+            }
+        };
+
+        const selectAll = () => {
+            if (!vNode.value) return;
+
+            const ids = (vNode.value.data as unknown as BucketFile[])
+                .map((file) => file.id);
+
+            selected.value.push(...ids);
+        };
+
+        const unselectAll = () => {
+            selected.value.splice(0, selected.value.length);
         };
 
         const dropSelected = wrapFnWithBusyState(busy, async () => {
-            if (selected.value.length === 0) return;
+            if (selected.value.length === 0 || !vNode.value) return;
+
+            const promises = selected.value.map((item) => vNode.value!.delete(item));
 
             try {
-                for (let i = 0; i < selected.value.length; i++) {
-                    const file = await storageClient.bucketFile.delete(selected.value[i]);
-                    handleDeleted(file);
-                }
+                await Promise.all(promises);
             } catch (e) {
-                if (e instanceof Error) {
-                    emit('failed', e);
-                }
+                emit('failed', e);
+            } finally {
+                allSelected.value = false;
             }
         });
 
-        const selectAllFiles = () => {
-            if (selectAll.value) {
-                if (vNode.value) {
-                    selected.value = (vNode.value.data as unknown as BucketFile[])
-                        .map((file) => file.id);
-                }
-            } else {
-                selected.value = [];
+        watch(allSelected, (value, oldValue) => {
+            if (value === oldValue) {
+                return;
             }
-        };
+
+            unselectAll();
+
+            if (value) {
+                selectAll();
+            }
+        });
 
         const toggleFile = (file: BucketFile) => {
             const index = selected.value.findIndex((el) => el === file.id);
@@ -122,6 +147,8 @@ export default defineComponent({
                 selected.value.push(file.id);
             } else {
                 selected.value.splice(index, 1);
+
+                allSelected.value = false;
             }
         };
 
@@ -129,9 +156,8 @@ export default defineComponent({
             busy,
 
             selected,
-            selectAll,
+            allSelected,
             dropSelected,
-            selectAllFiles,
 
             handleCreated,
             handleDeleted,
@@ -151,41 +177,38 @@ export default defineComponent({
 </script>
 <template>
     <div>
-        <div class="d-flex flex-column gap-1">
+        <div class="d-flex flex-column gap-2">
             <template v-if="!readonly">
-                <div class="form-check mb-0">
-                    <input
-                        id="selectAllFiles"
-                        v-model="selectAll"
-                        type="checkbox"
-                        class="form-check-input"
-                        @change="selectAllFiles"
-                    >
-                    <label for="selectAllFiles">Select all</label>
-                </div>
+                <VCFormInputCheckbox
+                    v-model="allSelected"
+                    :disabled="busy"
+                    :label="true"
+                    :group-class="'form-switch mb-0'"
+                >
+                    <template #label="props">
+                        <label :for="props.id">
+                            Select all?
+                        </label>
+                    </template>
+                </VCFormInputCheckbox>
             </template>
+
+            <hr
+                v-if="!readonly"
+                class="small"
+            >
 
             <FBucketFiles
                 ref="bucketFiles"
                 :query="query"
+                @deleted="handleDeleted"
             >
-                <template #body="{ data, resolved }">
+                <template #body="{ data, resolved, deleted }">
                     <template v-if="resolved && data.length === 0">
                         <div class="d-flex flex-column gap-1">
-                            <div>
-                                No files in bucket.
+                            <div class="alert alert-sm alert-dark mb-0">
+                                <i class="fa fa-info" /> No files found in bucket
                             </div>
-                            <template v-if="!readonly">
-                                <div>
-                                    <button
-                                        type="button"
-                                        class="btn btn-xs btn-dark"
-                                        @click.prevent="toggleModal"
-                                    >
-                                        <i class="fa fa-add" /> Add
-                                    </button>
-                                </div>
-                            </template>
                         </div>
                     </template>
                     <template v-else>
@@ -199,7 +222,8 @@ export default defineComponent({
                                     class="me-1"
                                     :entity="file"
                                     :files-selected="selected"
-                                    @check="toggleFile"
+                                    @toggle="toggleFile"
+                                    @deleted="deleted"
                                 >
                                     <template #actions="actionProps">
                                         <slot
@@ -214,18 +238,41 @@ export default defineComponent({
                 </template>
             </FBucketFiles>
 
-            <template v-if="!readonly">
+            <hr
+                v-if="!readonly"
+                class="small"
+            >
+
+            <div
+                v-if="!readonly"
+                class="d-flex flex-row"
+            >
                 <div>
                     <button
+                        v-b-tooltip.hover.top
+                        title="Delete Files"
                         type="button"
-                        class="btn btn-warning btn-xs"
+                        class="btn btn-danger btn-xs"
                         :disabled="busy || selected.length === 0"
                         @click.prevent="dropSelected"
                     >
-                        <i class="fa fa-trash" /> Delete
+                        <i class="fa fa-trash" />
                     </button>
                 </div>
-            </template>
+                <template v-if="!readonly">
+                    <div class="ms-auto">
+                        <button
+                            v-b-tooltip.hover.top
+                            title="Add File"
+                            type="button"
+                            class="btn btn-xs btn-dark"
+                            @click.prevent="toggleModal"
+                        >
+                            <i class="fa fa-add" />
+                        </button>
+                    </div>
+                </template>
+            </div>
         </div>
         <div>
             <BModal
