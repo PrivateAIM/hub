@@ -160,7 +160,6 @@ export default defineComponent({
                             <template v-if="!entity.configuration_locked">
                                 <FAnalysisBucketFileRootToggler
                                     :entity="props.data"
-                                    @updated="(entity) => props.update(entity)"
                                 />
                             </template>
                         </template>

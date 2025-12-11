@@ -33,8 +33,7 @@ export class AnalysisBucketEntity implements AnalysisBucket {
         bucket_id: string;
 
     @Column({
-        type: 'varchar',
-        length: 64,
+        type: 'uuid',
         nullable: true,
     })
         bucket_entrypoint_file_id: string | null;

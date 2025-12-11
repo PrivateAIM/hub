@@ -7,6 +7,7 @@
 
 import type { AnalysisBucketFile } from '@privateaim/core-kit';
 import { AnalysisBucketType } from '@privateaim/core-kit';
+import { randomUUID } from 'node:crypto';
 import {
     createTestSuite,
     expectProperties,
@@ -41,6 +42,7 @@ describe('controllers/analysis-bucket-file', () => {
         expect(analysis.id).toBeDefined();
 
         const analysisBucket = await client.analysisBucket.create({
+            bucket_id: randomUUID(),
             analysis_id: analysis.id,
             type: AnalysisBucketType.CODE,
         });

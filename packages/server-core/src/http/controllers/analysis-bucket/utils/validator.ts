@@ -29,6 +29,19 @@ export class AnalysisBucketValidator extends Container<AnalysisBucket> {
         );
 
         this.mount(
+            'bucket_id',
+            { group: HTTPHandlerOperation.CREATE },
+            createValidator(() => {
+                const chain = createValidationChain();
+
+                return chain
+                    .exists()
+                    .notEmpty()
+                    .isUUID();
+            }),
+        );
+
+        this.mount(
             'bucket_entrypoint_file_id',
             { optional: true },
             createValidator(() => {

@@ -75,7 +75,7 @@ AnalysisMetadataEventMap
                     type: AnalysisBucketType.CODE,
                 },
             },
-            relations: ['bucket'],
+            relations: ['analysis_bucket'],
         });
 
         entity.configuration_entrypoint_valid = !!rootFile;
