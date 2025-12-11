@@ -25,11 +25,11 @@
         "@ebec/http": "^2.3.0"
     },
     "devDependencies": {
-        "redis-extension": "^2.0.2",
+        "redis-extension": "^2.0.4",
         "socket.io": "^4.8.1"
     },
     "peerDependencies": {
-        "redis-extension": "^2.0.2",
+        "redis-extension": "^2.0.4",
         "socket.io": "^4.8.1"
     },
     "scripts": {
