@@ -20,7 +20,9 @@ export default defineComponent({
     props: {
         entity: {
             type: Object as PropType<BucketFile>,
-            required: true,
+        },
+        entityId: {
+            type: String,
         },
         filesSelected: {
             type: Array,
@@ -35,14 +37,41 @@ export default defineComponent({
     setup(props, { emit }) {
         const storage = injectStorageHTTPClient();
 
+        const data = ref<BucketFile | null>(null);
+
+        const resolved = ref(false);
         const busy = ref(false);
-        const drop = async () => {
-            if (busy.value) return;
+
+        const resolve = async () => {
+            busy.value = true;
 
             try {
-                await storage.bucketFile.delete(props.entity.id);
+                if (props.entity) {
+                    data.value = props.entity;
+                    return;
+                }
 
-                emit('deleted', props.entity);
+                if (props.entityId) {
+                    data.value = await storage.bucketFile.getOne(props.entityId);
+                }
+            } catch (e) {
+                emit('failed', e);
+            } finally {
+                busy.value = false;
+                resolved.value = true;
+            }
+        };
+
+        Promise.resolve()
+            .then(() => resolve());
+
+        const drop = async () => {
+            if (busy.value || !data.value) return;
+
+            try {
+                await storage.bucketFile.delete(data.value.id);
+
+                emit('deleted', data.value);
             } catch (e) {
                 emit('failed', e);
             } finally {
@@ -51,20 +80,29 @@ export default defineComponent({
         };
 
         const marked = computed(() => {
-            if (!props.filesSelected) {
+            if (!props.filesSelected || !data.value) {
                 return false;
             }
 
-            return props.filesSelected.findIndex((file) => props.entity && file === props.entity.id) !== -1;
+            return props.filesSelected.findIndex(
+                (file) => file === data.value!.id,
+            ) !== -1;
         });
 
         const mark = () => {
-            emit('check', props.entity);
+            if (!data.value) {
+                return;
+            }
+
+            emit('check', data.value);
         };
 
         return {
+            data,
+
             drop,
             busy,
+            resolved,
 
             mark,
             marked,
@@ -82,36 +120,43 @@ export default defineComponent({
             @click.prevent="mark"
         >
             <span class="title">
-                {{ entity.name }}
+                <template v-if="data">
+                    {{ data.name }}
+                </template>
+                <template v-else>
+                    ...
+                </template>
             </span>
         </div>
-        <div class="ms-auto d-flex flex-row gap-2">
-            <slot
-                name="actions"
-                v-bind="{ data: entity }"
-            >
-                <div>
-                    <FBucketFileDownload
-                        :with-text="false"
-                        :with-icon="true"
-                        :entity="entity"
-                    />
-                </div>
-                <template v-if="!readonly">
+        <template v-if="data">
+            <div class="ms-auto d-flex flex-row gap-2">
+                <slot
+                    name="actions"
+                    v-bind="{ data }"
+                >
                     <div>
-                        <button
-                            v-b-tooltip.hover.top
-                            title="Delete"
-                            type="button"
-                            class="btn btn-danger btn-xs"
-                            :disabled="busy"
-                            @click.prevent="drop"
-                        >
-                            <i class="fa fa-trash" />
-                        </button>
+                        <FBucketFileDownload
+                            :with-text="false"
+                            :with-icon="true"
+                            :entity="data"
+                        />
                     </div>
-                </template>
-            </slot>
-        </div>
+                    <template v-if="!readonly">
+                        <div>
+                            <button
+                                v-b-tooltip.hover.top
+                                title="Delete"
+                                type="button"
+                                class="btn btn-danger btn-xs"
+                                :disabled="busy"
+                                @click.prevent="drop"
+                            >
+                                <i class="fa fa-trash" />
+                            </button>
+                        </div>
+                    </template>
+                </slot>
+            </div>
+        </template>
     </div>
 </template>
