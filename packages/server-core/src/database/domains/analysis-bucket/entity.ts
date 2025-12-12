@@ -32,12 +32,6 @@ export class AnalysisBucketEntity implements AnalysisBucket {
     @Column({ type: 'uuid' })
         bucket_id: string;
 
-    @Column({
-        type: 'uuid',
-        nullable: true,
-    })
-        bucket_entrypoint_file_id: string | null;
-
     // ------------------------------------------------------------------
 
     @Column()

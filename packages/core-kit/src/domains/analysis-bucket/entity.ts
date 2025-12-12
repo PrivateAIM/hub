@@ -18,11 +18,6 @@ export interface AnalysisBucket {
 
     bucket_id: string;
 
-    /**
-     * bucket file id
-     */
-    bucket_entrypoint_file_id: string | null;
-
     // ------------------------------------------------------------------
 
     analysis_id: Analysis['id'];
