@@ -29,9 +29,9 @@ export function defineCLIStartCommand() {
             name: 'start',
         },
         async setup() {
-            await setupDatabase();
-
             configure();
+
+            await setupDatabase();
 
             const components : Component<any>[] = [
                 new QueueWorkerComponentCaller(
