@@ -36,6 +36,9 @@ export class AnalysisBucketFileEntity implements AnalysisBucketFile {
     // ------------------------------------------------------------------
 
     @Column({ type: 'uuid' })
+        bucket_id: string;
+
+    @Column({ type: 'uuid' })
         bucket_file_id: string;
 
     // ------------------------------------------------------------------

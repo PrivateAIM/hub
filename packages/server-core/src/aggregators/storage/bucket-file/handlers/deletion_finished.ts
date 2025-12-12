@@ -14,11 +14,11 @@ export class StorageBucketFileDeletionFinishedHandler extends BaseAggregatorHand
 BucketFileComponentEventMap,
 BucketFileEvent.DELETION_FINISHED
 > {
-    async handle(bucket: BucketFile): Promise<void> {
+    async handle(data: BucketFile): Promise<void> {
         const dataSource = useDataSourceSync();
         const analysisBucketFileRepository = dataSource.getRepository(AnalysisBucketFileEntity);
         const analysisBucketFile = await analysisBucketFileRepository.findOneBy({
-            bucket_file_id: bucket.id,
+            bucket_file_id: data.id,
         });
 
         if (!analysisBucketFile) {

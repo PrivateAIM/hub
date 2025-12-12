@@ -24,7 +24,7 @@ BucketFileEvent.CREATION_FINISHED
         });
 
         if (!analysisBucket) {
-            useLogger().debug(`Can not associate ${data.name} to an analysis bucket`);
+            useLogger().debug(`Can not associate ${data.path} to an analysis bucket`);
             return;
         }
 
@@ -37,6 +37,7 @@ BucketFileEvent.CREATION_FINISHED
             analysis_id: analysisBucket.analysis_id,
             realm_id: analysisBucket.realm_id,
             bucket_file_id: data.id,
+            bucket_id: data.bucket_id,
         });
 
         switch (data.actor_type) {
@@ -51,7 +52,5 @@ BucketFileEvent.CREATION_FINISHED
         }
 
         await analysisBucketFileRepository.save(analysisBucketFile);
-
-        useLogger().debug(`Assigned analysis bucket file ${analysisBucketFile.name}`);
     }
 }
