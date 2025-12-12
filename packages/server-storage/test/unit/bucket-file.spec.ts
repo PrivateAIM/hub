@@ -10,7 +10,7 @@ import { Readable } from 'node:stream';
 import path from 'node:path';
 import tar from 'tar-stream';
 import { streamToBuffer } from '../../src/core';
-import type { BucketFileEntity } from '../../src/domains';
+import type { BucketFileEntity } from '../../src/database';
 import {
     createTestSuite,
     expectPropertiesEqualToSrc,
