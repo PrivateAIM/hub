@@ -7,3 +7,4 @@
 
 export { default as FAnalysisBucket } from './FAnalysisBucket';
 export { FAnalysisBucketDownload } from './FAnalysisBucketDownload';
+export { default as FAnalysisTypeBucket } from './FAnalysisTypeBucket.vue';

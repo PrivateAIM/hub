@@ -5,7 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { BucketFile } from '@privateaim/storage-kit';
+import type { AnalysisBucketFile } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
 import {
     computed,
@@ -17,11 +17,8 @@ import {
 export default defineComponent({
     props: {
         entity: {
-            type: Object as PropType<BucketFile>,
+            type: Object as PropType<AnalysisBucketFile>,
             required: true,
-        },
-        current: {
-            type: String as PropType<string | null>,
         },
         readonly: {
             type: Boolean,
@@ -31,7 +28,7 @@ export default defineComponent({
     setup(props, { emit }) {
         const isBlocked = ref(false);
 
-        const isRoot = computed(() => props.entity.id === props.current);
+        const isRoot = computed(() => props.entity.root);
 
         watch(isRoot, (newVal, oldVal) => {
             if (newVal !== oldVal) {
@@ -44,7 +41,10 @@ export default defineComponent({
 
             isBlocked.value = true;
 
-            emit('updated', isRoot.value ? null : props.entity.id);
+            emit('updated', {
+                ...props.entity,
+                root: isRoot.value ? null : props.entity.id,
+            });
         };
         return {
             isRoot,

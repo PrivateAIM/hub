@@ -5,22 +5,26 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Analysis, AnalysisBucketFile } from '@privateaim/core-kit';
-import type { PropType } from 'vue';
-import { defineComponent, ref, useTemplateRef } from 'vue';
 import {
+    FAnalysisBucketFile,
     FAnalysisBucketFileRootToggler,
-    FAnalysisCodeFiles,
+    FAnalysisBucketFiles,
     FAnalysisImageCommand,
     FAnalysisImageCommandArguments,
     FAnalysisMasterImagePicker,
+    FAnalysisTypeBucket,
 } from '@privateaim/client-vue';
+import type { Analysis, AnalysisBucketFile } from '@privateaim/core-kit';
+import type { PropType } from 'vue';
+import { defineComponent, ref, useTemplateRef } from 'vue';
 
 export default defineComponent({
     components: {
+        FAnalysisBucketFile,
+        FAnalysisBucketFiles,
         FAnalysisMasterImagePicker,
         FAnalysisBucketFileRootToggler,
-        FAnalysisCodeFiles,
+        FAnalysisTypeBucket,
         FAnalysisImageCommand,
         FAnalysisImageCommandArguments,
     },
@@ -149,21 +153,36 @@ export default defineComponent({
                         </div>
                     </div>
 
-                    <FAnalysisCodeFiles
-                        ref="analysisCodeFiles"
-                        :entity="entity"
-                        :readonly="true"
-                        @updated="handAnalysisBucketFileUpdated"
-                        @deleted="handAnalysisBucketFileDeleted"
+                    <FAnalysisTypeBucket
+                        :entity-id="entity.id"
+                        :type="'CODE'"
                     >
-                        <template #itemActions="props">
-                            <template v-if="!entity.configuration_locked">
-                                <FAnalysisBucketFileRootToggler
-                                    :entity="props.data"
-                                />
-                            </template>
+                        <template #default="{ data: bucket }">
+                            <FAnalysisBucketFiles
+                                :query-filters="{ bucket_id: bucket.id }"
+                                @updated="handAnalysisBucketFileUpdated"
+                                @deleted="handAnalysisBucketFileDeleted"
+                            >
+                                <template #itemActions="bucketFilesProps">
+                                    <FAnalysisBucketFile
+                                        :entity="bucketFilesProps.data"
+                                        @updated="bucketFilesProps.updated"
+                                        @deleted="bucketFilesProps.deleted"
+                                        @failed="bucketFilesProps.failed"
+                                    >
+                                        <template #default="bucketFileProps">
+                                            <template v-if="!entity.configuration_locked">
+                                                <FAnalysisBucketFileRootToggler
+                                                    :entity="bucketFileProps!.data!"
+                                                    @updated="(value) => bucketFileProps!.update(value)"
+                                                />
+                                            </template>
+                                        </template>
+                                    </FAnalysisBucketFile>
+                                </template>
+                            </FAnalysisBucketFiles>
                         </template>
-                    </FAnalysisCodeFiles>
+                    </FAnalysisTypeBucket>
                 </div>
             </div>
             <div class="card-grey card mb-3">
