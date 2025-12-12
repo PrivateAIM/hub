@@ -50,6 +50,7 @@ describe('controllers/analysis-bucket-file', () => {
 
         const analysisBucketFile = await client.analysisBucketFile.create({
             analysis_bucket_id: analysisBucket.id,
+            bucket_id: analysisBucket.bucket_id,
             bucket_file_id: '28eb7728-c78d-4c2f-ab99-dc4bcee78da9',
             path: 'foo.bar',
             root: false,

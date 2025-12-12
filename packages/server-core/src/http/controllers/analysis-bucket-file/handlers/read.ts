@@ -56,7 +56,7 @@ export async function getManyAnalysisBucketFileRouteHandler(req: Request, res: R
         defaultAlias: 'analysisFile',
         filters: {
             allowed: [
-                'name',
+                'path',
                 'root',
                 'analysis_bucket_id',
                 'analysis_id',
@@ -75,7 +75,7 @@ export async function getManyAnalysisBucketFileRouteHandler(req: Request, res: R
             allowed: ['analysis', 'analysis_bucket'],
         },
         sort: {
-            allowed: ['name', 'created_at', 'updated_at'],
+            allowed: ['path', 'created_at', 'updated_at'],
         },
     });
 

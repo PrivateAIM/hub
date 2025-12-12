@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { Client } from '@authup/core-kit';
 import type {
     Analysis, AnalysisBucket, AnalysisBucketFile,
 } from '@privateaim/core-kit';
@@ -17,7 +18,7 @@ import {
     PrimaryGeneratedColumn, Unique,
     UpdateDateColumn,
 } from 'typeorm';
-import type { Realm, User } from '@authup/core-kit';
+import type { Realm, Robot, User } from '@authup/core-kit';
 import { AnalysisEntity } from '../analysis/entity';
 import { AnalysisBucketEntity } from '../analysis-bucket/entity';
 
@@ -44,7 +45,10 @@ export class AnalysisBucketFileEntity implements AnalysisBucketFile {
     // ------------------------------------------------------------------
 
     @Column({ type: 'uuid', nullable: true })
-        robot_id: string | null;
+        client_id: Client['id'] | null;
+
+    @Column({ type: 'uuid', nullable: true })
+        robot_id: Robot['id'] | null;
 
     @Column({ type: 'uuid', nullable: true })
         user_id: User['id'] | null;

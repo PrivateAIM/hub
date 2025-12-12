@@ -163,7 +163,7 @@ export default defineComponent({
                                 @updated="handAnalysisBucketFileUpdated"
                                 @deleted="handAnalysisBucketFileDeleted"
                             >
-                                <template #itemActions="bucketFilesProps">
+                                <template #item="bucketFilesProps">
                                     <FAnalysisBucketFile
                                         :entity="bucketFilesProps.data"
                                         @updated="bucketFilesProps.updated"
@@ -171,12 +171,20 @@ export default defineComponent({
                                         @failed="bucketFilesProps.failed"
                                     >
                                         <template #default="bucketFileProps">
-                                            <template v-if="!entity.configuration_locked">
-                                                <FAnalysisBucketFileRootToggler
-                                                    :entity="bucketFileProps!.data!"
-                                                    @updated="(value) => bucketFileProps!.update(value)"
-                                                />
-                                            </template>
+                                            <div class="d-flex flex-row align-items-center">
+                                                <div class="pr-2">
+                                                    {{ bucketFileProps.data.path }}
+                                                </div>
+
+                                                <div class="ms-auto">
+                                                    <template v-if="!entity.configuration_locked">
+                                                        <FAnalysisBucketFileRootToggler
+                                                            :entity="bucketFileProps!.data!"
+                                                            @updated="(value) => bucketFileProps!.update(value)"
+                                                        />
+                                                    </template>
+                                                </div>
+                                            </div>
                                         </template>
                                     </FAnalysisBucketFile>
                                 </template>

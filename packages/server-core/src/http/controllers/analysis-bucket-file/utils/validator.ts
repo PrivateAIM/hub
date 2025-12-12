@@ -34,13 +34,13 @@ export class AnalysisBucketFileValidator extends Container<AnalysisBucketFile> {
                 .isString();
         });
         this.mount(
-            'name',
+            'path',
             { group: HTTPHandlerOperation.CREATE },
             nameValidator,
         );
 
         this.mount(
-            'name',
+            'path',
             { group: HTTPHandlerOperation.UPDATE, optional: true },
             nameValidator,
         );
