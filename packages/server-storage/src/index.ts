@@ -22,8 +22,8 @@ import {
 (async () => {
     config();
 
-    await setupDatabase();
     configure();
+    await setupDatabase();
 
     await generateSwagger({
         authupURL: useEnv('authupURL'),

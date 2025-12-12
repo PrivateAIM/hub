@@ -23,14 +23,8 @@ export async function useTestDatabase() {
         database: ':memory:',
     });
 
-    const subscribers = [...options.subscribers as string[]];
-
     await dropDatabase({ options, ifExist: true });
     await createDatabase({ options, synchronize: false });
-
-    Object.assign(options, {
-        subscribers,
-    });
 
     const dataSource = new DataSource(options);
     await dataSource.initialize();

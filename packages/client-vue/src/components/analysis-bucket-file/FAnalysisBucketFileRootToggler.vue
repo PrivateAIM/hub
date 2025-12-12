@@ -5,9 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type {
-    AnalysisBucketFile,
-} from '@privateaim/core-kit';
+import type { AnalysisBucketFile } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
 import {
     computed,
@@ -45,7 +43,7 @@ export default defineComponent({
 
             emit('updated', {
                 ...props.entity,
-                root: !isRoot.value,
+                root: isRoot.value ? null : props.entity.id,
             });
         };
         return {

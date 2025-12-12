@@ -19,8 +19,9 @@ import {
     useRequestPermissionChecker,
 } from '@privateaim/server-http-kit';
 import { useMinio } from '../../../../core';
+import { BucketEntity } from '../../../../database';
 import {
-    BucketEntity, isBucketOwnedByIdentity, toBucketName,
+    isBucketOwnedByIdentity, toBucketName,
 } from '../../../../domains';
 import { BucketValidator } from '../utils/validation';
 

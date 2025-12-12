@@ -5,14 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Realm, Robot, User } from '@authup/core-kit';
+import type {
+    Client, Realm, Robot, User,
+} from '@authup/core-kit';
 import type { AnalysisBucket } from '../analysis-bucket';
 import type { Analysis } from '../analysis';
 
 export interface AnalysisBucketFile {
     id: string;
 
-    name: string;
+    path: string;
 
     root: boolean;
 
@@ -24,13 +26,15 @@ export interface AnalysisBucketFile {
 
     // ------------------------------------------------------------------
 
-    external_id: string;
+    bucket_id: string;
+
+    bucket_file_id: string;
 
     // ------------------------------------------------------------------
 
-    bucket_id: AnalysisBucket['id'];
+    analysis_bucket_id: AnalysisBucket['id'];
 
-    bucket: AnalysisBucket;
+    analysis_bucket: AnalysisBucket;
 
     // ------------------------------------------------------------------
 
@@ -41,6 +45,8 @@ export interface AnalysisBucketFile {
     // ------------------------------------------------------------------
 
     realm_id: Realm['id'];
+
+    client_id: Client['id'] | null;
 
     user_id: User['id'] | null;
 

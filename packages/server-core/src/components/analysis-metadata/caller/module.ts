@@ -55,7 +55,7 @@ export class AnalysisMetadataComponentCaller implements ComponentCaller<Analysis
     ): Promise<ComponentDirectCallerResponse<AnalysisMetadataEventMap>> {
         const [data, metadata] = payload;
 
-        return this.directCaller.callWithResponse(key, data, metadata);
+        return this.directCaller.callAndWait(key, data, metadata);
     }
 
     async callWithQueue<Key extends keyof AnalysisMetadataEventMap>(

@@ -6,68 +6,98 @@
  */
 import { isUUID } from '@authup/kit';
 import { NotFoundError } from '@ebec/http';
+import { DirectComponentCaller } from '@privateaim/server-kit';
+import type { BucketFileCreationFinishedEventPayload } from '@privateaim/server-storage-kit';
+import {
+    BucketFileCommand, BucketFileEvent,
+    BucketFileEventCaller,
+} from '@privateaim/server-storage-kit';
 import Busboy from 'busboy';
-import crypto from 'node:crypto';
 import path from 'node:path';
 import { sendCreated, useRequestParam } from 'routup';
 import type { Request, Response } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestIdentityOrFail } from '@privateaim/server-http-kit';
-import { streamToBuffer, useMinio } from '../../../../core';
+import { useBucketFileComponent } from '../../../../components';
+import { streamToBuffer } from '../../../../core';
+import type { BucketFileEntity } from '../../../../database';
 import {
-    BucketEntity, BucketFileEntity, toBucketName,
-} from '../../../../domains';
+    BucketEntity,
+} from '../../../../database';
 
-export async function uploadRequestFiles(req: Request, bucketName: string) {
-    const minio = useMinio();
-
+export async function uploadRequestFilesToBucket(req: Request, bucket: BucketEntity) {
     const instance = Busboy({
         headers: req.headers,
         preservePath: true,
     });
 
+    const actor = useRequestIdentityOrFail(req);
+
+    const component = useBucketFileComponent();
+    const caller = new DirectComponentCaller(component);
+    const responseCaller = new BucketFileEventCaller();
+
     const identity = useRequestIdentityOrFail(req);
 
     return new Promise<BucketFileEntity[]>((resolve, reject) => {
-        const files : BucketFileEntity[] = [];
-        const promises : Promise<void>[] = [];
+        const entries : Promise<BucketFileEntity>[] = [];
+
         instance.on('file', (_, file, info) => {
             if (typeof info.filename === 'undefined') {
                 return;
             }
 
-            const promise = new Promise<void>((fileResolve, fileReject) => {
-                const hashBuilder = crypto.createHash('sha256');
-                hashBuilder.update(info.filename);
+            const promise = new Promise<BucketFileEntity>(
+                (
+                    fileResolve,
+                    fileReject,
+                ) => {
+                    streamToBuffer(file)
+                        .then((buffer) => {
+                            caller.callWith(
+                                BucketFileCommand.CREATE,
+                                {
+                                    meta: {
+                                        actor_type: actor.type,
+                                        actor_id: actor.id,
+                                        name: path.basename(info.filename),
+                                        path: info.filename,
+                                        size: buffer.length,
+                                        directory: path.dirname(info.filename),
+                                        realm_id: identity.realmId,
+                                        bucket_id: bucket.id,
+                                        bucket,
+                                    },
+                                    data: buffer,
+                                },
+                                {
 
-                const hash = hashBuilder.digest('hex');
+                                },
+                                {
+                                    handle: async (childValue, childContext) => {
+                                        await responseCaller.call(
+                                            childContext.key,
+                                            childValue,
+                                            childContext.metadata,
+                                        );
 
-                streamToBuffer(file)
-                    .then((buffer) => {
-                        minio.putObject(
-                            bucketName,
-                            hash,
-                            buffer,
-                            buffer.length,
-                        )
-                            .then(() => {
-                                files.push({
-                                    name: path.basename(info.filename),
-                                    path: info.filename,
-                                    hash,
-                                    size: buffer.length,
-                                    directory: path.dirname(info.filename),
-                                    realm_id: identity.realmId,
-                                } satisfies Partial<BucketFileEntity> as BucketFileEntity);
+                                        if (childContext.key === BucketFileEvent.CREATION_FINISHED) {
+                                            fileResolve(childValue as BucketFileCreationFinishedEventPayload);
+                                        }
 
-                                fileResolve();
-                            })
-                            .catch((e) => fileReject(e));
-                    })
-                    .catch((e) => fileReject(e));
-            });
+                                        if (childContext.key === BucketFileEvent.CREATION_FAILED) {
+                                            fileReject(childValue);
+                                        }
+                                    },
+                                },
+                            )
+                                .catch((e) => fileReject(e));
+                        })
+                        .catch((e) => fileReject(e));
+                },
+            );
 
-            promises.push(promise);
+            entries.push(promise);
         });
 
         instance.on('error', (err) => {
@@ -77,8 +107,8 @@ export async function uploadRequestFiles(req: Request, bucketName: string) {
         });
 
         instance.on('finish', async () => {
-            Promise.all(promises)
-                .then(() => resolve(files))
+            Promise.all(entries)
+                .then((value) => resolve(value))
                 .catch((e) => reject(e));
         });
 
@@ -87,8 +117,6 @@ export async function uploadRequestFiles(req: Request, bucketName: string) {
 }
 
 export async function executeBucketRouteUploadHandler(req: Request, res: Response) : Promise<any> {
-    const actor = useRequestIdentityOrFail(req);
-
     // todo: check permissions by membership
     const id = useRequestParam(req, 'id');
 
@@ -105,19 +133,7 @@ export async function executeBucketRouteUploadHandler(req: Request, res: Respons
         throw new NotFoundError();
     }
 
-    let files = await uploadRequestFiles(req, toBucketName(entity.id));
-
-    if (files.length > 0) {
-        files = files.map((file) => ({
-            ...file,
-            actor_type: actor.type,
-            actor_id: actor.id,
-            bucket_id: entity.id,
-        }));
-
-        const fileRepository = dataSource.getRepository(BucketFileEntity);
-        await fileRepository.save(files, { listeners: true });
-    }
+    const files = await uploadRequestFilesToBucket(req, entity);
 
     return sendCreated(res, {
         data: files,

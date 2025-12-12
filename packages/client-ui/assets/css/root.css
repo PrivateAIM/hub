@@ -27,6 +27,15 @@ b, strong {
 /*
 Generics
  */
+
+.pr-1 {
+    padding-right: 0.25rem !important
+}
+
+.pr-2 {
+    padding-right: 0.5rem !important
+}
+
 .m-b-0 {
     margin-bottom: 0px;
 }
@@ -110,6 +119,10 @@ h5.title:before {
 .form-horizontal .form-group {
     margin-right: -15px;
     margin-left: -15px;
+}
+
+hr.small {
+    margin: 0.5rem 0;
 }
 
 /*

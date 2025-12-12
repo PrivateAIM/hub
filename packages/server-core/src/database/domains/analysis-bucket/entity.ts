@@ -20,7 +20,7 @@ import {
 import type { Realm } from '@authup/core-kit';
 import { AnalysisEntity } from '../analysis/entity';
 
-@Unique(['type', 'analysis_id'])
+@Unique(['bucket_id', 'analysis_id'])
 @Entity({ name: 'analysis_buckets' })
 export class AnalysisBucketEntity implements AnalysisBucket {
     @PrimaryGeneratedColumn('uuid')
@@ -29,13 +29,8 @@ export class AnalysisBucketEntity implements AnalysisBucket {
     @Column({ type: 'varchar', length: 64 })
         type: `${AnalysisBucketType}`;
 
-    // todo: rename to bucket_id + uuid type
-    @Column({
-        type: 'varchar',
-        length: 64,
-        nullable: true,
-    })
-        external_id: string | null;
+    @Column({ type: 'uuid' })
+        bucket_id: string;
 
     // ------------------------------------------------------------------
 

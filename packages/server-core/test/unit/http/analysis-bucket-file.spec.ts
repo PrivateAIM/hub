@@ -7,6 +7,7 @@
 
 import type { AnalysisBucketFile } from '@privateaim/core-kit';
 import { AnalysisBucketType } from '@privateaim/core-kit';
+import { randomUUID } from 'node:crypto';
 import {
     createTestSuite,
     expectProperties,
@@ -41,15 +42,17 @@ describe('controllers/analysis-bucket-file', () => {
         expect(analysis.id).toBeDefined();
 
         const analysisBucket = await client.analysisBucket.create({
+            bucket_id: randomUUID(),
             analysis_id: analysis.id,
             type: AnalysisBucketType.CODE,
         });
         expect(analysisBucket.id).toBeDefined();
 
         const analysisBucketFile = await client.analysisBucketFile.create({
-            bucket_id: analysisBucket.id,
-            external_id: '28eb7728-c78d-4c2f-ab99-dc4bcee78da9',
-            name: 'foo.bar',
+            analysis_bucket_id: analysisBucket.id,
+            bucket_id: analysisBucket.bucket_id,
+            bucket_file_id: '28eb7728-c78d-4c2f-ab99-dc4bcee78da9',
+            path: 'foo.bar',
             root: false,
         });
 

@@ -5,15 +5,13 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { FAnalysisBucket, FAnalysisBucketFileManager } from '@privateaim/client-vue';
-import { computed } from 'vue';
-import type { BuildInput } from 'rapiq';
+import { FAnalysisTypeBucket, FBucketFilesManager } from '@privateaim/client-vue';
 import type { PropType } from 'vue';
-import { type Analysis, type AnalysisBucket, AnalysisBucketType } from '@privateaim/core-kit';
+import { type Analysis } from '@privateaim/core-kit';
 import { defineNuxtComponent } from '#app';
 
 export default defineNuxtComponent({
-    components: { FAnalysisBucketFileManager, FAnalysisBucket },
+    components: { FAnalysisTypeBucket, FBucketFilesManager },
     props: {
         entity: {
             type: Object as PropType<Analysis>,
@@ -21,18 +19,6 @@ export default defineNuxtComponent({
         },
     },
     emits: ['updated', 'failed'],
-    setup(props) {
-        const query = computed<BuildInput<AnalysisBucket>>(() => ({
-            filter: {
-                type: AnalysisBucketType.RESULT,
-                analysis_id: props.entity.id,
-            },
-        } satisfies BuildInput<AnalysisBucket>));
-
-        return {
-            query,
-        };
-    },
 });
 </script>
 <template>
@@ -46,19 +32,18 @@ export default defineNuxtComponent({
                 </div>
             </div>
             <div class="card-body">
-                <FAnalysisBucket :query="query">
-                    <template #default="{ data: bucket }">
-                        <FAnalysisBucketFileManager
+                <FAnalysisTypeBucket
+                    :entity-id="entity.id"
+                    :type="'RESULT'"
+                >
+                    <template #default="props">
+                        <FBucketFilesManager
+                            ref="bucketFiles"
+                            :entity-id="props.data.bucket_id"
                             :readonly="true"
-                            :entity="bucket"
                         />
                     </template>
-                    <template #error>
-                        <div class="alert alert-sm alert-warning">
-                            The result storage for the analysis does not exist. Therefore, no files can be downloaded.
-                        </div>
-                    </template>
-                </FAnalysisBucket>
+                </FAnalysisTypeBucket>
             </div>
         </div>
     </div>

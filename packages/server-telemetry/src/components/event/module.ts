@@ -8,12 +8,13 @@
 import {
     BaseComponent,
 } from '@privateaim/server-kit';
+import type { EventComponentEventMap } from '@privateaim/server-telemetry-kit';
 import {
     EventCommand,
 } from '@privateaim/server-telemetry-kit';
 import { EventComponentCleanerHandler, EventComponentCreateHandler } from './handlers';
 
-export class EventComponent extends BaseComponent {
+export class EventComponent extends BaseComponent<EventComponentEventMap> {
     constructor() {
         super();
 

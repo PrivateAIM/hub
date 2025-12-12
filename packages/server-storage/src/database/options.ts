@@ -9,7 +9,12 @@ import { EnvironmentName } from '@privateaim/server-kit';
 import type { DataSourceOptions } from 'typeorm';
 import { readDataSourceOptionsFromEnv } from 'typeorm-extension';
 import { useEnv } from '../config';
-import { BucketEntity, BucketFileEntity } from '../domains';
+import {
+    BucketEntity,
+    BucketFileEntity,
+    BucketFileSubscriber,
+    BucketSubscriber,
+} from './domains';
 
 export async function extendDataSourceOptions(options: DataSourceOptions): Promise<DataSourceOptions> {
     options = {
@@ -22,7 +27,10 @@ export async function extendDataSourceOptions(options: DataSourceOptions): Promi
         ],
         migrations: [],
         migrationsTransactionMode: 'each',
-        subscribers: [],
+        subscribers: [
+            BucketSubscriber,
+            BucketFileSubscriber,
+        ],
     };
 
     const migrations: string[] = [];

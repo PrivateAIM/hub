@@ -10,7 +10,7 @@ import { Readable } from 'node:stream';
 import path from 'node:path';
 import tar from 'tar-stream';
 import { streamToBuffer } from '../../src/core';
-import type { BucketFileEntity } from '../../src/domains';
+import type { BucketFileEntity } from '../../src/database';
 import {
     createTestSuite,
     expectPropertiesEqualToSrc,
@@ -53,11 +53,13 @@ describe('controllers/bucket-file', () => {
     it('should get collection', async () => {
         const client = suite.client();
         const { data } = await client.bucketFile.getMany();
+
         expect(data.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should read resource', async () => {
         const client = suite.client();
+
         const data = await client.bucketFile.getOne(details.id);
 
         expectPropertiesEqualToSrc(details, data);

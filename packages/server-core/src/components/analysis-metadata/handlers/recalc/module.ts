@@ -71,11 +71,11 @@ AnalysisMetadataEventMap
             where: {
                 analysis_id: entity.id,
                 root: true,
-                bucket: {
+                analysis_bucket: {
                     type: AnalysisBucketType.CODE,
                 },
             },
-            relations: ['bucket'],
+            relations: ['analysis_bucket'],
         });
 
         entity.configuration_entrypoint_valid = !!rootFile;

@@ -13,7 +13,7 @@ import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource, validateEntityJoinColumns } from 'typeorm-extension';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
-import { AnalysisBucketFileEntity, AnalysisEntity } from '../../../../database/domains';
+import { AnalysisBucketFileEntity, AnalysisEntity } from '../../../../database';
 import { RequestRepositoryAdapter } from '../../../request';
 import { AnalysisBucketFileValidator } from '../utils';
 
@@ -30,7 +30,7 @@ export async function createAnalysisBucketFileRouteHandler(req: Request, res: Re
         entityTarget: AnalysisBucketFileEntity,
     });
 
-    data.analysis_id = data.bucket.analysis_id;
+    data.analysis_id = data.analysis_bucket.analysis_id;
 
     const repository = dataSource.getRepository(AnalysisBucketFileEntity);
 
@@ -53,7 +53,7 @@ export async function createAnalysisBucketFileRouteHandler(req: Request, res: Re
 
     let entity = repository.create(data);
 
-    if (entity.bucket.type === AnalysisBucketType.CODE) {
+    if (entity.analysis_bucket.type === AnalysisBucketType.CODE) {
         const analysisRepository = dataSource.getRepository(AnalysisEntity);
         const analysis = await analysisRepository.findOne({
             where: {
@@ -68,7 +68,7 @@ export async function createAnalysisBucketFileRouteHandler(req: Request, res: Re
 
     if (entity.root) {
         await repository.update({
-            bucket_id: entity.bucket_id,
+            analysis_bucket_id: entity.analysis_bucket_id,
             analysis_id: entity.analysis_id,
         }, {
             root: false,

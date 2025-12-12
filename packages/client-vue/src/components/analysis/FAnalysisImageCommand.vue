@@ -77,13 +77,13 @@ export default defineComponent({
                         query: {
                             filters: {
                                 analysis_id: entity.id,
-                                root: true,
-                                bucket: {
+                                analysis_bucket: {
                                     type: AnalysisBucketType.CODE,
                                 },
+                                root: true,
                             },
                             relations: {
-                                bucket: true,
+                                analysis_bucket: true,
                             },
                         },
                     });
@@ -157,7 +157,7 @@ export default defineComponent({
 
         const file = computed(() => {
             if (analysisBucketFileManager.data.value) {
-                return analysisBucketFileManager.data.value.name;
+                return analysisBucketFileManager.data.value.path;
             }
 
             return null;

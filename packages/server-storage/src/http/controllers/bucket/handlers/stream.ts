@@ -15,8 +15,9 @@ import tar from 'tar-stream';
 import { useDataSource } from 'typeorm-extension';
 import { streamToBuffer, useMinio } from '../../../../core';
 import {
-    BucketEntity, BucketFileEntity, toBucketName,
+    toBucketName,
 } from '../../../../domains';
+import { BucketEntity, BucketFileEntity } from '../../../../database';
 
 async function packFile(
     pack: Pack,

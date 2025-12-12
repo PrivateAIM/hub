@@ -47,7 +47,7 @@ BucketEvent.CREATION_FINISHED
 
             analysisBucket = analysisBucketRepository.create({
                 type: task.data.bucketType,
-                external_id: bucket.id,
+                bucket_id: bucket.id,
                 analysis_id: analysis.id,
                 realm_id: analysis.realm_id,
             });

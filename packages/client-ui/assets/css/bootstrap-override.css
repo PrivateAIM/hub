@@ -39,6 +39,12 @@
     font-size: .7rem;
 }
 
+.alert-dark {
+    color: #dfe4eb;
+    background-color: rgb(64, 67, 78);
+    border-color: #171a1d;
+}
+
 .alert-sm {
   padding: .4rem .7rem;
 }

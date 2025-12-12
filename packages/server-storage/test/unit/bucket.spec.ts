@@ -10,7 +10,7 @@ import {
     expectPropertiesEqualToSrc,
     removeDateProperties,
 } from '../utils';
-import type { BucketEntity } from '../../src/domains';
+import type { BucketEntity } from '../../src/database';
 
 describe('controllers/bucket', () => {
     const suite = createTestSuite();

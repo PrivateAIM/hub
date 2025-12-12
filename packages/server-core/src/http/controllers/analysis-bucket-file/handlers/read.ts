@@ -14,7 +14,7 @@ import {
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceReadable } from '@privateaim/kit';
 import { useRequestIdentityRealm } from '@privateaim/server-http-kit';
-import { AnalysisBucketFileEntity, onlyRealmWritableQueryResources } from '../../../../database/domains';
+import { AnalysisBucketFileEntity, onlyRealmWritableQueryResources } from '../../../../database';
 
 export async function getOneAnalysisBucketFileRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -25,7 +25,7 @@ export async function getOneAnalysisBucketFileRouteHandler(req: Request, res: Re
         .where('analysisFile.id = :id', { id });
 
     applyRelations(query, useRequestQuery(req, 'include'), {
-        allowed: ['analysis', 'bucket'],
+        allowed: ['analysis', 'analysis_bucket'],
         defaultAlias: 'analysisFile',
     });
 
@@ -56,26 +56,26 @@ export async function getManyAnalysisBucketFileRouteHandler(req: Request, res: R
         defaultAlias: 'analysisFile',
         filters: {
             allowed: [
-                'name',
+                'path',
                 'root',
-                'bucket_id',
+                'analysis_bucket_id',
                 'analysis_id',
 
                 'analysis_id',
                 'analysis.id',
                 'analysis.name',
 
-                'bucket.type',
+                'analysis_bucket.type',
             ],
         },
         pagination: {
             maxLimit: 50,
         },
         relations: {
-            allowed: ['analysis', 'bucket'],
+            allowed: ['analysis', 'analysis_bucket'],
         },
         sort: {
-            allowed: ['name', 'created_at', 'updated_at'],
+            allowed: ['path', 'created_at', 'updated_at'],
         },
     });
 

@@ -5,13 +5,13 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { FAnalysisCodeFiles } from '@privateaim/client-vue';
+import { FAnalysisTypeBucket, FBucketFilesManager } from '@privateaim/client-vue';
 import type { Analysis } from '@privateaim/core-kit';
 import { type PropType, useTemplateRef } from 'vue';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-    components: { FAnalysisCodeFiles },
+    components: { FBucketFilesManager, FAnalysisTypeBucket },
     props: {
         entity: {
             type: Object as PropType<Analysis>,
@@ -19,8 +19,8 @@ export default defineComponent({
     },
     setup() {
         const analysisCodeFiles = useTemplateRef<
-        typeof FAnalysisCodeFiles | null
-        >('analysisCodeFiles');
+        typeof FBucketFilesManager | null
+        >('bucketFiles');
 
         const add = () => {
             if (analysisCodeFiles.value) {
@@ -69,10 +69,18 @@ export default defineComponent({
                     </div>
                 </div>
 
-                <FAnalysisCodeFiles
-                    ref="analysisCodeFiles"
-                    :entity="entity"
-                />
+                <FAnalysisTypeBucket
+                    :entity-id="entity.id"
+                    :type="'CODE'"
+                >
+                    <template #default="props">
+                        <FBucketFilesManager
+                            ref="bucketFiles"
+                            :entity-id="props.data.bucket_id"
+                            :readonly="entity.configuration_locked"
+                        />
+                    </template>
+                </FAnalysisTypeBucket>
             </div>
         </div>
     </div>

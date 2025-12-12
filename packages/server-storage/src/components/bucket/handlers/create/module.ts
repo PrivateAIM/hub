@@ -17,7 +17,8 @@ import { LogFlag } from '@privateaim/telemetry-kit';
 import { useDataSource } from 'typeorm-extension';
 import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
 import { useMinio } from '../../../../core';
-import { BucketEntity, toBucketName } from '../../../../domains';
+import { BucketEntity } from '../../../../database';
+import { toBucketName } from '../../../../domains';
 import { BucketValidator } from '../../../../http/controllers/bucket/utils/validation';
 
 export class BucketCreateHandler implements ComponentHandler<

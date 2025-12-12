@@ -18,8 +18,9 @@ import {
 } from '@privateaim/server-http-kit';
 import { DirectComponentCaller } from '@privateaim/server-kit';
 import { BucketCommand } from '@privateaim/server-storage-kit';
+import { BucketEntity } from '../../../../database';
 import {
-    BucketEntity, isBucketOwnedByIdentity,
+    isBucketOwnedByIdentity,
 } from '../../../../domains';
 import { useBucketComponent } from '../../../../components';
 
@@ -53,7 +54,7 @@ export async function executeBucketRouteDeleteHandler(req: Request, res: Respons
     const component = useBucketComponent();
     const caller = new DirectComponentCaller(component);
 
-    const output = await caller.callWithResponse(
+    const output = await caller.callAndWait(
         BucketCommand.DELETE,
         {
             id: entity.id,
