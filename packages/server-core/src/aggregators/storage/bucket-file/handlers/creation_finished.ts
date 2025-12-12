@@ -32,7 +32,7 @@ BucketFileEvent.CREATION_FINISHED
 
         const analysisBucketFileRepository = dataSource.getRepository(AnalysisBucketFileEntity);
         const analysisBucketFile = analysisBucketFileRepository.create({
-            name: data.path,
+            path: data.path,
             analysis_bucket_id: analysisBucket.id,
             analysis_id: analysisBucket.analysis_id,
             realm_id: analysisBucket.realm_id,

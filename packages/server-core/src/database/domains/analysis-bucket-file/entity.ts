@@ -21,14 +21,14 @@ import type { Realm, User } from '@authup/core-kit';
 import { AnalysisEntity } from '../analysis/entity';
 import { AnalysisBucketEntity } from '../analysis-bucket/entity';
 
-@Unique(['analysis_id', 'bucket_file_id'])
+@Unique(['analysis_id', 'path'])
 @Entity({ name: 'analysis_bucket_files' })
 export class AnalysisBucketFileEntity implements AnalysisBucketFile {
     @PrimaryGeneratedColumn('uuid')
         id: string;
 
     @Column({ type: 'varchar', length: 256 })
-        name: string;
+        path: string;
 
     @Column({ type: 'boolean', default: false })
         root: boolean;

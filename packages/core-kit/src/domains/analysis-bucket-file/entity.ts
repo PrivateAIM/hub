@@ -12,7 +12,7 @@ import type { Analysis } from '../analysis';
 export interface AnalysisBucketFile {
     id: string;
 
-    name: string;
+    path: string;
 
     root: boolean;
 

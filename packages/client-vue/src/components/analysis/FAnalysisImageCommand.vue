@@ -157,7 +157,7 @@ export default defineComponent({
 
         const file = computed(() => {
             if (analysisBucketFileManager.data.value) {
-                return analysisBucketFileManager.data.value.name;
+                return analysisBucketFileManager.data.value.path;
             }
 
             return null;

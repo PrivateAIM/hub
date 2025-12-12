@@ -27,6 +27,6 @@ BucketFileEvent.DELETION_FINISHED
 
         await analysisBucketFileRepository.remove(analysisBucketFile);
 
-        useLogger().debug(`Removed analysis bucket file ${analysisBucketFile.name}`);
+        useLogger().debug(`Removed analysis bucket file ${analysisBucketFile.path}`);
     }
 }
