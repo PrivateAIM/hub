@@ -41,7 +41,7 @@
         "typeorm": "^0.3.28",
         "typeorm-extension": "^3.7.3",
         "validup": "^0.1.9",
-        "zod": "^4.1.13"
+        "zod": "^4.2.1"
     },
     "devDependencies": {
         "@types/busboy": "^1.5.3",
