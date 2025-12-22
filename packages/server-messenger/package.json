@@ -24,7 +24,7 @@
         "hapic": "^2.7.0",
         "redis-extension": "^2.0.4",
         "routup": "^4.0.2",
-        "socket.io": "^4.8.1"
+        "socket.io": "^4.8.2"
     },
     "scripts": {
         "dev": "ts-node src/index.ts",

@@ -26,11 +26,11 @@
     },
     "devDependencies": {
         "redis-extension": "^2.0.4",
-        "socket.io": "^4.8.1"
+        "socket.io": "^4.8.2"
     },
     "peerDependencies": {
         "redis-extension": "^2.0.4",
-        "socket.io": "^4.8.1"
+        "socket.io": "^4.8.2"
     },
     "scripts": {
         "dev": "ts-node src/index.ts",
