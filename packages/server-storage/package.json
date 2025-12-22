@@ -33,7 +33,7 @@
         "hapic": "^2.7.0",
         "locter": "^2.2.1",
         "minio": "^8.0.6",
-        "mysql2": "^3.15.3",
+        "mysql2": "^3.16.0",
         "redis-extension": "^2.0.4",
         "routup": "^4.0.2",
         "singa": "^1.1.0",
@@ -41,7 +41,7 @@
         "typeorm": "^0.3.28",
         "typeorm-extension": "^3.7.3",
         "validup": "^0.1.9",
-        "zod": "^4.1.13"
+        "zod": "^4.2.1"
     },
     "devDependencies": {
         "@types/busboy": "^1.5.3",
