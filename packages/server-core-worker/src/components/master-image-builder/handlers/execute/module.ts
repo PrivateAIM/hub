@@ -5,7 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { LogFlag } from '@privateaim/telemetry-kit';
+import type { ModemStreamWaitOptions } from 'docken';
 import { waitForStream } from 'docken';
+import type { MasterImage } from '@privateaim/core-kit';
 import { REGISTRY_MASTER_IMAGE_PROJECT_NAME } from '@privateaim/core-kit';
 import type {
     MasterImageBuilderEventMap,
@@ -22,7 +25,7 @@ import { MASTER_IMAGES_DIRECTORY_PATH } from '../../../../constants';
 import {
     buildDockerImageURL, useCoreClient, useDocker,
 } from '../../../../core';
-import { useAnalysisBuilderLogger } from '../../../analysis-builder/utils';
+import { useMasterImageBuilderLogger } from '../../utils';
 
 export class MasterImageBuilderExecuteHandler implements ComponentHandler<
 MasterImageBuilderEventMap,
@@ -36,7 +39,7 @@ MasterImageBuilderCommand.EXECUTE
             // todo: check if image exists, otherwise local queue task
             await this.handleInternal(payload, context);
         } catch (e) {
-            useAnalysisBuilderLogger().error({
+            useMasterImageBuilderLogger().error({
                 message: e,
                 command: MasterImageBuilderCommand.EXECUTE,
                 event: MasterImageBuilderEvent.EXECUTION_FAILED,
@@ -62,10 +65,47 @@ MasterImageBuilderCommand.EXECUTE
         );
 
         const coreClient = useCoreClient();
-        const docker = useDocker();
-
         const masterImage = await coreClient.masterImage.getOne(payload.id);
 
+        try {
+            await this.buildImage(masterImage, {
+                onBuilding: async (progress) => {
+                    await context.handle(
+                        MasterImageBuilderEvent.EXECUTION_PROGRESS,
+                        {
+                            progress,
+                            id: masterImage.id,
+                        },
+                    );
+                },
+            });
+        } catch (e) {
+            useMasterImageBuilderLogger().info({
+                message: 'Building image failed',
+                command: MasterImageBuilderCommand.EXECUTE,
+                master_image_id: masterImage.id,
+                [LogFlag.REF_ID]: masterImage.id,
+            });
+        }
+
+        await context.handle(
+            MasterImageBuilderEvent.EXECUTION_FINISHED,
+            payload,
+        );
+    }
+
+    protected async buildImage(
+        masterImage: MasterImage,
+        options: ModemStreamWaitOptions = {},
+    ) {
+        useMasterImageBuilderLogger().info({
+            message: 'Building image',
+            command: MasterImageBuilderCommand.EXECUTE,
+            master_image_id: masterImage.id,
+            [LogFlag.REF_ID]: masterImage.id,
+        });
+
+        const docker = useDocker();
         const imageTag = buildDockerImageURL({
             projectName: REGISTRY_MASTER_IMAGE_PROJECT_NAME,
             repositoryName: masterImage.virtual_path,
@@ -78,13 +118,19 @@ MasterImageBuilderCommand.EXECUTE
         const stream = await docker
             .buildImage(pack, {
                 t: imageTag,
+                platform: 'linux/amd64',
             });
 
-        await waitForStream(docker, stream);
-
-        await context.handle(
-            MasterImageBuilderEvent.EXECUTION_FINISHED,
-            payload,
-        );
+        await waitForStream(docker, stream, {
+            onFinished: () => {
+                useMasterImageBuilderLogger().info({
+                    message: 'Built image',
+                    command: MasterImageBuilderCommand.EXECUTE,
+                    master_image_id: masterImage.id,
+                    [LogFlag.REF_ID]: masterImage.id,
+                });
+            },
+            ...options,
+        });
     }
 }
