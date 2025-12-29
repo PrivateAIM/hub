@@ -7,9 +7,9 @@
 
 import { ProcessStatus } from '@privateaim/kit';
 import type {
-    AnalysisBuilderEventMap,
     AnalysisDistributorBasePayload,
     AnalysisDistributorCheckFinishedPayload,
+    AnalysisDistributorEventMap,
 } from '@privateaim/server-core-worker-kit';
 import { AnalysisDistributorEvent } from '@privateaim/server-core-worker-kit';
 import type { ComponentHandlerContext } from '@privateaim/server-kit';
@@ -17,7 +17,7 @@ import { AnalysisEntity, useDataSourceSync } from '../../../database';
 
 export async function handleAnalysisDistributorEvent(
     value: AnalysisDistributorBasePayload,
-    context: ComponentHandlerContext<AnalysisBuilderEventMap>,
+    context: ComponentHandlerContext<AnalysisDistributorEventMap>,
 ) {
     const dataSource = useDataSourceSync();
     const repository = dataSource.getRepository(AnalysisEntity);
