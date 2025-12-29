@@ -105,9 +105,9 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
 
         const imageURL = analysis.id;
 
-        await buildDockerImage({
-            content,
-            imageName: imageURL,
+        await buildDockerImage(content, {
+            t: imageURL,
+            platform: 'linux/amd64',
         });
 
         useAnalysisBuilderLogger().info({

@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { waitForStream } from 'docken';
 import { REGISTRY_MASTER_IMAGE_PROJECT_NAME } from '@privateaim/core-kit';
 import type {
     MasterImageBuilderEventMap,
@@ -19,7 +20,7 @@ import path from 'node:path';
 import tar from 'tar-fs';
 import { MASTER_IMAGES_DIRECTORY_PATH } from '../../../../constants';
 import {
-    buildDockerImageURL, useCoreClient, useDocker, waitForDockerActionStream,
+    buildDockerImageURL, useCoreClient, useDocker,
 } from '../../../../core';
 import { useAnalysisBuilderLogger } from '../../../analysis-builder/utils';
 
@@ -79,7 +80,7 @@ MasterImageBuilderCommand.EXECUTE
                 t: imageTag,
             });
 
-        await waitForDockerActionStream(stream);
+        await waitForStream(docker, stream);
 
         await context.handle(
             MasterImageBuilderEvent.EXECUTION_FINISHED,

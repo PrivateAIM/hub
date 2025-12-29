@@ -5,25 +5,21 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { waitForStream } from 'docken';
 import type { ImageBuildOptions } from 'dockerode';
 import { createGzip } from 'node:zlib';
 import tar from 'tar-stream';
 import { useDocker } from './instance';
-import { findErrorInDockerModemResponse } from './modem-response';
-import type { DockerAuthConfig } from './type';
 
 export async function buildDockerImage(
-    context: {
-        content: string,
-        imageName: string,
-        authConfig?: DockerAuthConfig
-    },
+    content: string,
+    options: ImageBuildOptions,
 ) {
     const pack = tar.pack();
     const entry = pack.entry({
         name: 'Dockerfile',
         type: 'file',
-        size: context.content.length,
+        size: content.length,
     }, (err) => {
         if (err) {
             pack.destroy(err);
@@ -32,31 +28,12 @@ export async function buildDockerImage(
         pack.finalize();
     });
 
-    entry.write(context.content);
+    entry.write(content);
     entry.end();
 
-    const options : ImageBuildOptions = {
-        t: context.imageName,
-        //  platform: 'linux/amd64',
-        // nocache: true,
-    };
-
-    if (context.authConfig) {
-        options.authconfig = context.authConfig;
-    }
-
-    const stream = await useDocker()
+    const client = useDocker();
+    const stream = await client
         .buildImage(pack.pipe(createGzip()), options);
 
-    return new Promise<any>(((resolve, reject) => {
-        useDocker().modem.followProgress(stream as any, (error: Error, output: any[]) => {
-            error = error || findErrorInDockerModemResponse(output);
-            if (error) {
-                reject(error);
-                return;
-            }
-
-            resolve(output);
-        }, (e: any) => e);
-    }));
+    return waitForStream(client, stream);
 }

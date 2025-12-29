@@ -5,15 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import Docker from 'dockerode';
+import type { Client } from 'docken';
+import { createClient } from 'docken';
 
-let dockerInstance : Docker | undefined;
+let dockerInstance : Client | undefined;
 
-export function useDocker(): Docker {
+export function useDocker(): Client {
     if (typeof dockerInstance !== 'undefined') {
         return dockerInstance;
     }
 
-    dockerInstance = new Docker();
+    dockerInstance = createClient();
     return dockerInstance;
 }
