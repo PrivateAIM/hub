@@ -20,6 +20,7 @@ export class AnalysisBuilderAggregator extends BaseComponent<AnalysisBuilderEven
     constructor() {
         super();
 
+        this.mount(AnalysisBuilderEvent.EXECUTION_PROGRESS, handleAnalysisBuilderEvent);
         this.mount(AnalysisBuilderEvent.EXECUTION_STARTED, handleAnalysisBuilderEvent);
         this.mount(AnalysisBuilderEvent.EXECUTION_FAILED, handleAnalysisBuilderEvent);
         this.mount(AnalysisBuilderEvent.EXECUTION_FINISHED, handleAnalysisBuilderEvent);
