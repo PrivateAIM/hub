@@ -18,10 +18,13 @@ import {
 } from '@privateaim/server-core-worker-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
+import type { ModemStreamWaitOptions } from 'docken';
+import { waitForStream } from 'docken';
 import type { Container } from 'dockerode';
 import stream from 'node:stream';
+import { createGzip } from 'node:zlib';
+import tar from 'tar-stream';
 import {
-    buildDockerImage,
     cleanupDockerImage,
     packDockerContainerWithTarStream,
     useCoreClient,
@@ -78,63 +81,45 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
 
         // -----------------------------------------------------------------------------------
 
-        useAnalysisBuilderLogger().info({
-            message: 'Generating Dockerfile',
-            command: AnalysisBuilderCommand.EXECUTE,
-            analysis_id: analysis.id,
-            [LogFlag.REF_ID]: analysis.id,
-        });
+        try {
+            await this.buildImage(analysis, {
+                onBuilding: async (progress) => {
+                    await context.handle(
+                        AnalysisBuilderEvent.EXECUTION_PROGRESS,
+                        {
+                            progress,
+                            id: analysis.id,
+                        },
+                    );
+                },
+            });
+        } catch (e) {
+            useAnalysisBuilderLogger()
+                .error('Building image failed', {
+                    command: AnalysisBuilderCommand.EXECUTE,
+                    analysis_id: analysis.id,
+                    [LogFlag.REF_ID]: analysis.id,
+                });
 
-        const content = await generateDockerFileContent(analysis);
-
-        useAnalysisBuilderLogger().info({
-            message: 'Generated Dockerfile',
-            command: AnalysisBuilderCommand.EXECUTE,
-            analysis_id: analysis.id,
-            [LogFlag.REF_ID]: analysis.id,
-        });
-
-        // -----------------------------------------------------------------------------------
-
-        useAnalysisBuilderLogger().info({
-            message: 'Building image',
-            command: AnalysisBuilderCommand.EXECUTE,
-            analysis_id: analysis.id,
-            [LogFlag.REF_ID]: analysis.id,
-        });
-
-        const imageURL = analysis.id;
-
-        await buildDockerImage(content, {
-            t: imageURL,
-            platform: 'linux/amd64',
-        });
-
-        useAnalysisBuilderLogger().info({
-            message: 'Built image',
-            command: AnalysisBuilderCommand.EXECUTE,
-            analysis_id: analysis.id,
-            [LogFlag.REF_ID]: analysis.id,
-        });
+            throw e;
+        }
 
         // -----------------------------------------------------------------------------------
 
-        useAnalysisBuilderLogger().info({
-            message: 'Creating container',
-            command: AnalysisBuilderCommand.EXECUTE,
-            analysis_id: analysis.id,
-            [LogFlag.REF_ID]: analysis.id,
-        });
+        let container : Container;
 
-        const container = await useDocker()
-            .createContainer({ Image: imageURL });
+        try {
+            container = await this.createContainer(analysis);
+        } catch (e) {
+            useAnalysisBuilderLogger()
+                .error('Creating container failed', {
+                    command: AnalysisBuilderCommand.EXECUTE,
+                    analysis_id: analysis.id,
+                    [LogFlag.REF_ID]: analysis.id,
+                });
 
-        useAnalysisBuilderLogger().info({
-            message: 'Created container',
-            command: AnalysisBuilderCommand.EXECUTE,
-            analysis_id: analysis.id,
-            [LogFlag.REF_ID]: analysis.id,
-        });
+            throw e;
+        }
 
         // -----------------------------------------------------------------------------------
 
@@ -182,6 +167,76 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
             AnalysisBuilderEvent.EXECUTION_FINISHED,
             value,
         );
+    }
+
+    protected async buildImage(
+        analysis: Analysis,
+        options: ModemStreamWaitOptions = {},
+    ) {
+        useAnalysisBuilderLogger().info({
+            message: 'Building image',
+            command: AnalysisBuilderCommand.EXECUTE,
+            analysis_id: analysis.id,
+            [LogFlag.REF_ID]: analysis.id,
+        });
+
+        const content = await generateDockerFileContent(analysis);
+
+        const pack = tar.pack();
+        const entry = pack.entry({
+            name: 'Dockerfile',
+            type: 'file',
+            size: content.length,
+        }, (err) => {
+            if (err) {
+                pack.destroy(err);
+            }
+
+            pack.finalize();
+        });
+
+        entry.write(content);
+        entry.end();
+
+        const client = useDocker();
+        const stream = await client
+            .buildImage(pack.pipe(createGzip()), {
+                t: analysis.id,
+                platform: 'linux/amd64',
+            });
+
+        return waitForStream(client, stream, {
+            onFinished: () => {
+                useAnalysisBuilderLogger().info({
+                    message: 'Built image',
+                    command: AnalysisBuilderCommand.EXECUTE,
+                    analysis_id: analysis.id,
+                    [LogFlag.REF_ID]: analysis.id,
+                });
+            },
+            ...options,
+        });
+    }
+
+    protected async createContainer(analysis: Analysis) : Promise<Container> {
+        useAnalysisBuilderLogger().info({
+            message: 'Creating container',
+            command: AnalysisBuilderCommand.EXECUTE,
+            analysis_id: analysis.id,
+            [LogFlag.REF_ID]: analysis.id,
+        });
+
+        const container = await useDocker()
+            .createContainer({ Image: analysis.id });
+
+        useAnalysisBuilderLogger().info({
+            message: 'Created container',
+            command: AnalysisBuilderCommand.EXECUTE,
+            analysis_id: analysis.id,
+            [LogFlag.REF_ID]: analysis.id,
+        });
+
+        return container;
     }
 
     protected async packContainer(

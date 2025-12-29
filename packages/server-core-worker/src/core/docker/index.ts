@@ -8,7 +8,6 @@
 export * from './auth-config';
 export * from './container-pack';
 export * from './image-clenaup';
-export * from './image-build';
 export * from './image-push';
 export * from './instance';
 export * from './registry';
