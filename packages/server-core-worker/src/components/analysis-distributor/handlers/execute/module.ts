@@ -14,7 +14,7 @@ import {
     AnalysisDistributorCommand,
     AnalysisDistributorEvent,
 } from '@privateaim/server-core-worker-kit';
-import { REGISTRY_ARTIFACT_TAG_LATEST } from '@privateaim/core-kit';
+import { type Analysis, REGISTRY_ARTIFACT_TAG_LATEST } from '@privateaim/core-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import {
     buildDockerAuthConfigFromRegistry,
@@ -91,10 +91,8 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
 
         // -----------------------------------------------------------------------------------
 
-        const localImageUrl = `${analysis.id}:${REGISTRY_ARTIFACT_TAG_LATEST}`;
-
         const image = useDocker()
-            .getImage(localImageUrl);
+            .getImage(this.buildImageTag(analysis));
 
         await image.inspect();
 
@@ -173,5 +171,9 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
             AnalysisDistributorEvent.EXECUTION_FINISHED,
             value,
         );
+    }
+
+    protected buildImageTag(analysis: Analysis): string {
+        return `${analysis.id}:${REGISTRY_ARTIFACT_TAG_LATEST}`;
     }
 }

@@ -169,6 +169,10 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
         );
     }
 
+    protected buildImageTag(analysis: Analysis): string {
+        return `${analysis.id}:${REGISTRY_ARTIFACT_TAG_LATEST}`;
+    }
+
     protected async buildImage(
         analysis: Analysis,
         options: ModemStreamWaitOptions = {},
@@ -201,7 +205,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
         const client = useDocker();
         const stream = await client
             .buildImage(pack.pipe(createGzip()), {
-                t: analysis.id,
+                t: this.buildImageTag(analysis),
                 platform: 'linux/amd64',
             });
 
@@ -227,7 +231,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
         });
 
         const container = await useDocker()
-            .createContainer({ Image: analysis.id });
+            .createContainer({ Image: this.buildImageTag(analysis) });
 
         useAnalysisBuilderLogger().info({
             message: 'Created container',
@@ -320,7 +324,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
         });
 
         await container.commit({
-            tag: REGISTRY_ARTIFACT_TAG_LATEST,
+            tag: this.buildImageTag(analysis),
         });
 
         useAnalysisBuilderLogger().info({
