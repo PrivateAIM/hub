@@ -16,7 +16,7 @@ export type AnalysisBuilderBasePayload = {
 };
 
 export type AnalysisBuilderExecutePayload = AnalysisBuilderBasePayload;
-export type AnalysisBuilderExecutionFinishedPayload = AnalysisBuilderBasePayload & {
+export type AnalysisBuilderExecutionProgressPayload = AnalysisBuilderBasePayload & {
     progress: Progress
 };
 
@@ -30,7 +30,7 @@ export type AnalysisBuilderEventMap = ObjectLiteralKeys<{
     [AnalysisBuilderCommand.EXECUTE]: [AnalysisBuilderExecutePayload, ComponentMetadata],
     [AnalysisBuilderEvent.EXECUTION_FAILED]: [AnalysisBuilderExecutePayload, ComponentMetadata],
     [AnalysisBuilderEvent.EXECUTION_STARTED]: [AnalysisBuilderExecutePayload, ComponentMetadata],
-    [AnalysisBuilderEvent.EXECUTION_PROGRESS]: [AnalysisBuilderExecutionFinishedPayload, ComponentMetadata],
+    [AnalysisBuilderEvent.EXECUTION_PROGRESS]: [AnalysisBuilderExecutionProgressPayload, ComponentMetadata],
     [AnalysisBuilderEvent.EXECUTION_FINISHED]: [AnalysisBuilderExecutePayload, ComponentMetadata],
 
     [AnalysisBuilderCommand.CHECK]: [AnalysisBuilderCheckPayload, ComponentMetadata],

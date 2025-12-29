@@ -64,6 +64,11 @@ export interface Analysis {
     build_status: `${ProcessStatus}` | null;
 
     /**
+     * Percentage for building image
+     */
+    build_progress: number | null;
+
+    /**
      * Define if the node constraints are satisfied for the build process.
      */
     build_nodes_valid: boolean;
@@ -73,6 +78,7 @@ export interface Analysis {
     distribution_status: `${ProcessStatus}` | null;
 
     // ------------------------------------------------------------------
+
     execution_status: `${ProcessStatus}` | null;
 
     execution_progress: number | null;

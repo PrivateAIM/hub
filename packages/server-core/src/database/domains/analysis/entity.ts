@@ -86,6 +86,11 @@ export class AnalysisEntity implements Analysis {
     })
         build_status: `${ProcessStatus}` | null;
 
+    @Column({
+        type: 'int', unsigned: true, nullable: true, default: null,
+    })
+        build_progress: number | null;
+
     // ------------------------------------------------------------------
 
     @Index()
