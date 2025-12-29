@@ -42,7 +42,7 @@ export default defineComponent({
 });
 </script>
 <template>
-    <div>
+    <div class="d-flex flex-row gap-3 w-100">
         <FAnalysisConfigurationStep
             :entity="entity"
             :image-link="configurationImageLink"
@@ -52,23 +52,17 @@ export default defineComponent({
             @updated="(e) => $emit('updated', e)"
         />
 
-        <hr>
-
         <FAnalysisBuildStep
             :entity="entity"
             @failed="(e) => $emit('failed', e)"
             @updated="(e) => $emit('updated', e)"
         />
 
-        <hr>
-
         <FAnalysisDistributionStep
             :entity="entity"
             @failed="(e) => $emit('failed', e)"
             @updated="(e) => $emit('updated', e)"
         />
-
-        <hr>
 
         <FAnalysisRunStep
             :entity="entity"

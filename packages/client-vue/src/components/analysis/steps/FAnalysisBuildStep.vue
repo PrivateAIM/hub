@@ -13,7 +13,7 @@
 
 <script lang="ts">
 import type { PropType } from 'vue';
-import { defineComponent } from 'vue';
+import { computed, defineComponent } from 'vue';
 import type { Analysis } from '@privateaim/core-kit';
 import FProcessStatus from '../../FProcessStatus.vue';
 import { FAnalysisCommand } from '../FAnalysisCommand';
@@ -33,6 +33,8 @@ export default defineComponent({
     },
     emits: ['updated', 'executed', 'failed'],
     setup(props, { emit }) {
+        const progress = computed(() => props.entity.build_progress || 0);
+
         const handleExecuted = (type: string, command: string) => {
             emit('executed', type, command);
         };
@@ -44,6 +46,7 @@ export default defineComponent({
         };
 
         return {
+            progress,
             handleUpdated,
             handleFailed,
             handleExecuted,
@@ -52,63 +55,89 @@ export default defineComponent({
 });
 </script>
 <template>
-    <div>
-        <div class="d-flex flex-row gap-1">
-            <div>
-                <strong>2. Build</strong>
-            </div>
-            <div>
-                <FProcessStatus :value="entity.build_status">
-                    <template #default=" { iconClass, classSuffix }">
-                        <i :class="iconClass + ' text-'+ classSuffix" />
-                    </template>
-                </FProcessStatus>
-            </div>
-        </div>
-        <div class="d-flex flex-column ms-3">
-            <div class="d-flex flex-row gap-1">
+    <div class="card-grey card flex-grow-1">
+        <div class="card-header">
+            <div class="title d-flex flex-row">
                 <div>
-                    <strong>
-                        2.1 Node(s) Approval
-                    </strong>
+                    2. Build
                 </div>
-                <div>
-                    <FAnalysisBuildNodesStep :entity="entity">
-                        <template #valid>
-                            <span class="text-success">
-                                <i class="fa fa-check" />
-                            </span>
+                <div class="ms-auto">
+                    <FProcessStatus :value="entity.build_status">
+                        <template #default=" { iconClass, classSuffix }">
+                            <i :class="iconClass + ' text-'+ classSuffix" />
                         </template>
-                        <template #invalid="{ message }">
-                            <span class="text-danger">
-                                <i class="fa fa-times" />
-                            </span>
-                            <small>( {{ message }} )</small>
-                        </template>
-                    </FAnalysisBuildNodesStep>
+                    </FProcessStatus>
                 </div>
             </div>
         </div>
-        <div class="d-flex flex-row gap-1">
-            <div>
-                <FAnalysisCommand
-                    :command="'buildStart'"
-                    :with-icon="true"
-                    :entity="entity"
-                    @executed="(command) => handleExecuted('start', command)"
-                    @updated="handleUpdated"
-                    @failed="handleFailed"
-                />
-            </div>
-            <div>
-                <FAnalysisCommand
-                    :command="'buildCheck'"
-                    :with-icon="true"
-                    :entity="entity"
-                    @executed="(command) => handleExecuted('check', command)"
-                    @updated="handleUpdated"
-                    @failed="handleFailed"
-                />
+        <div class="card-body">
+            <div class="d-flex flex-column h-100">
+                <div class="text-center mb-3">
+                    <i class="fas fa-hammer fa-4x" />
+                </div>
+                <div class="progress bg-white">
+                    <div
+                        class="progress-bar"
+                        :class="'bg-success'"
+                        :style="{width: progress + '%'}"
+                        :aria-valuenow="progress"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                    >
+                        {{ progress }}%
+                    </div>
+                </div>
+
+                <hr>
+
+                <h6>Requirements</h6>
+                <div class="d-flex flex-row gap-1">
+                    <div>
+                        <strong>
+                            2.1 Node(s) Approval
+                        </strong>
+                    </div>
+                    <div>
+                        <FAnalysisBuildNodesStep :entity="entity">
+                            <template #valid>
+                                <span class="text-success">
+                                    <i class="fa fa-check" />
+                                </span>
+                            </template>
+                            <template #invalid="{ message }">
+                                <span class="text-danger">
+                                    <i class="fa fa-times" />
+                                </span>
+                                <small>( {{ message }} )</small>
+                            </template>
+                        </FAnalysisBuildNodesStep>
+                    </div>
+                </div>
+
+                <div class="mt-auto">
+                    <div class="d-flex flex-row gap-1 ">
+                        <div>
+                            <FAnalysisCommand
+                                :command="'buildStart'"
+                                :with-icon="true"
+                                :entity="entity"
+                                @executed="(command) => handleExecuted('start', command)"
+                                @updated="handleUpdated"
+                                @failed="handleFailed"
+                            />
+                        </div>
+                        <div>
+                            <FAnalysisCommand
+                                :command="'buildCheck'"
+                                :with-icon="true"
+                                :entity="entity"
+                                @executed="(command) => handleExecuted('check', command)"
+                                @updated="handleUpdated"
+                                @failed="handleFailed"
+                            />
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
