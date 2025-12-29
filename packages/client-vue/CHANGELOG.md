@@ -1,5 +1,42 @@
 # Changelog
 
+## [0.8.22](https://github.com/PrivateAIM/hub/compare/v0.8.21...v0.8.22) (2025-12-29)
+
+
+### Features
+
+* add aggregation column nodes_approved + build_nodes_valid ([#1308](https://github.com/PrivateAIM/hub/issues/1308)) ([2ef0d57](https://github.com/PrivateAIM/hub/commit/2ef0d5701c66b6f4b45a162c7b9413efd8764d1f))
+* analysis-distributor  ([#1285](https://github.com/PrivateAIM/hub/issues/1285)) ([5da60be](https://github.com/PrivateAIM/hub/commit/5da60be91c4ae27ea16369b5d7e3d09782118826))
+* bucket-file aggregation with analysis-bucket-file management ([#1324](https://github.com/PrivateAIM/hub/issues/1324)) ([00d5aa8](https://github.com/PrivateAIM/hub/commit/00d5aa8bc16a66d7a761ef60b2b4ec27983e5c9a))
+* check handlers for analysis building and distribution ([#1318](https://github.com/PrivateAIM/hub/issues/1318)) ([a43ba20](https://github.com/PrivateAIM/hub/commit/a43ba203223ee5ffc00e63c3ff1d8829970590b2))
+* rename run_status to execution_status ([e039cb7](https://github.com/PrivateAIM/hub/commit/e039cb7a6c436e279053b08c8de933d126637608))
+* replace AnalysisXXXStatus with ProcessStatus ([#1276](https://github.com/PrivateAIM/hub/issues/1276)) ([f4826cf](https://github.com/PrivateAIM/hub/commit/f4826cf0938d0171565a1aae880c5d724fbc107b))
+
+
+### Bug Fixes
+
+* **deps:** bump the minorandpatch group across 1 directory with 12 updates ([#1343](https://github.com/PrivateAIM/hub/issues/1343)) ([015daa8](https://github.com/PrivateAIM/hub/commit/015daa8d7403b906eeb175d7ab83dd9df665dc6a))
+* **deps:** bump the minorandpatch group across 1 directory with 13 updates ([#1292](https://github.com/PrivateAIM/hub/issues/1292)) ([acdc7cb](https://github.com/PrivateAIM/hub/commit/acdc7cb8aa12e85818d69638c29ab79c74fbcbb6))
+* **deps:** bump the minorandpatch group across 1 directory with 16 updates ([#1329](https://github.com/PrivateAIM/hub/issues/1329)) ([7b394da](https://github.com/PrivateAIM/hub/commit/7b394da159d8e52cc37fe489832307a234f3ddb0))
+* **deps:** bump the minorandpatch group across 1 directory with 9 updates ([#1331](https://github.com/PrivateAIM/hub/issues/1331)) ([2802bc3](https://github.com/PrivateAIM/hub/commit/2802bc319b84453f8bb351ba1723d9a58bba9830))
+* disable image command arguments if analysis is locked ([fac0d48](https://github.com/PrivateAIM/hub/commit/fac0d482c207bfba527b3e1692fd8dfefa189187))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.8.21 to ^0.8.22
+    * @privateaim/core-kit bumped from ^0.8.21 to ^0.8.22
+    * @privateaim/telemetry-kit bumped from ^0.8.21 to ^0.8.22
+    * @privateaim/core-http-kit bumped from ^0.8.21 to ^0.8.22
+    * @privateaim/core-realtime-kit bumped from ^0.7.22 to ^0.7.23
+    * @privateaim/storage-kit bumped from ^0.8.21 to ^0.8.22
+  * peerDependencies
+    * @privateaim/core-kit bumped from ^0.8.21 to ^0.8.22
+    * @privateaim/storage-kit bumped from ^0.8.21 to ^0.8.22
+    * @privateaim/telemetry-kit bumped from ^0.8.21 to ^0.8.22
+
 ## [0.8.21](https://github.com/PrivateAIM/hub/compare/v0.8.20...v0.8.21) (2025-11-04)
 
 
