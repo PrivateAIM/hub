@@ -146,7 +146,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
             await this.commitContainer(container, analysis);
         } catch (e) {
             useAnalysisBuilderLogger()
-                .info('Commiting container failed', {
+                .error('Commiting container failed', {
                     command: AnalysisBuilderCommand.EXECUTE,
                     analysis_id: analysis.id,
                     [LogFlag.REF_ID]: analysis.id,

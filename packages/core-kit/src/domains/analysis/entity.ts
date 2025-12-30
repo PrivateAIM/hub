@@ -77,6 +77,11 @@ export interface Analysis {
 
     distribution_status: `${ProcessStatus}` | null;
 
+    /**
+     * Percentage for distributing image
+     */
+    distribution_progress: number | null;
+
     // ------------------------------------------------------------------
 
     execution_status: `${ProcessStatus}` | null;

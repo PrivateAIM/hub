@@ -75,6 +75,11 @@ export class AnalysisEntity implements Analysis {
     })
         distribution_status: `${ProcessStatus}` | null;
 
+    @Column({
+        type: 'int', unsigned: true, nullable: true, default: null,
+    })
+        distribution_progress: number | null;
+
     // ------------------------------------------------------------------
 
     @Column({ type: 'boolean', default: false })
