@@ -96,7 +96,7 @@ export default defineComponent({
         <div class="card-header">
             <div class="title d-flex flex-row">
                 <div>
-                    1. Configuration
+                    Configuration
                 </div>
                 <div class="ms-auto">
                     <template v-if="passed">
@@ -136,11 +136,11 @@ export default defineComponent({
                         <strong>
                             <template v-if="nodesLink">
                                 <VCLink :to="nodesLink">
-                                    1.1 Node(s) Assignment
+                                    Node(s) Assignment
                                 </VCLink>
                             </template>
                             <template v-else>
-                                1.1 Node(s) Assignment
+                                Node(s) Assignment
                             </template>
                         </strong>
                     </div>
@@ -165,11 +165,11 @@ export default defineComponent({
                         <strong>
                             <template v-if="imageLink">
                                 <VCLink :to="imageLink">
-                                    1.2 Image
+                                    Image
                                 </VCLink>
                             </template>
                             <template v-else>
-                                1.2 Image
+                                Image
                             </template>
                         </strong>
                     </strong>
@@ -178,7 +178,7 @@ export default defineComponent({
                     <div class="d-flex flex-row gap-1">
                         <div>
                             <strong>
-                                1.2.2 Base
+                                Base
                             </strong>
                         </div>
                         <div>
@@ -202,7 +202,7 @@ export default defineComponent({
                     <div class="d-flex flex-row gap-1">
                         <div>
                             <strong>
-                                1.2.1 Entrypoint
+                                Entrypoint
                             </strong>
                         </div>
                         <div>

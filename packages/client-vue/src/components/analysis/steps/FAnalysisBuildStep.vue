@@ -59,7 +59,7 @@ export default defineComponent({
         <div class="card-header">
             <div class="title d-flex flex-row">
                 <div>
-                    2. Build
+                    Build
                 </div>
                 <div class="ms-auto">
                     <FProcessStatus :value="entity.build_status">
@@ -94,7 +94,7 @@ export default defineComponent({
                 <div class="d-flex flex-row gap-1">
                     <div>
                         <strong>
-                            2.1 Node(s) Approval
+                            Node(s) Approval
                         </strong>
                     </div>
                     <div>
