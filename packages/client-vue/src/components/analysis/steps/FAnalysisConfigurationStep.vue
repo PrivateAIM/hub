@@ -92,7 +92,7 @@ export default defineComponent({
 });
 </script>
 <template>
-    <div class="card-grey card flex-grow-1">
+    <div class="card-grey card">
         <div class="card-header">
             <div class="title d-flex flex-row">
                 <div>
