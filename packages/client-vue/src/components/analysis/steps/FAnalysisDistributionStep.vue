@@ -41,8 +41,7 @@ export default defineComponent({
             emit('failed', e);
         };
 
-        // todo: use distribution_progress column
-        const progress = computed(() => 0);
+        const progress = computed(() => props.entity.distribution_progress || 0);
 
         return {
             handleUpdated,
