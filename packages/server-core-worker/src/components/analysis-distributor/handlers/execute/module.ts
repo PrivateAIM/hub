@@ -233,28 +233,28 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
             return Math.floor(current / tags.length);
         };
 
-        for (let i = 0; i < tags.length; i++) {
-            const tag = tags[i];
+        try {
+            for (let i = 0; i < tags.length; i++) {
+                const tag = tags[i];
 
-            const image = docker.getImage(tag);
+                const image = docker.getImage(tag);
 
-            const stream = await image.push(options.push);
+                const stream = await image.push(options.push);
 
-            await waitForStream(docker, stream, {
-                onPushing: async (process) => {
-                    if (!options.stream.onPushing) return;
+                await waitForStream(docker, stream, {
+                    onPushing: async (process) => {
+                        if (!options.stream.onPushing) return;
 
-                    await options.stream.onPushing({
-                        percent: calcForIndex(process.percent, i),
-                        current: calcForIndex(process.current, i),
-                        total: calcForIndex(process.total, i),
-                    });
-                },
-            });
-
-            await image.remove({
-                force: true,
-            });
+                        await options.stream.onPushing({
+                            percent: calcForIndex(process.percent, i),
+                            current: calcForIndex(process.current, i),
+                            total: calcForIndex(process.total, i),
+                        });
+                    },
+                });
+            }
+        } finally {
+            await cleanupDockerImages(tags);
         }
 
         useAnalysisDistributorLogger().info({
