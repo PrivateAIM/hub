@@ -10,6 +10,7 @@ import { QueueRouterRoutingType } from '@privateaim/server-kit';
 export enum MasterImageBuilderEvent {
     EXECUTION_FAILED = 'executionFailed',
     EXECUTION_STARTED = 'executionStarted',
+    EXECUTION_PROGRESS = 'executionProgress',
     EXECUTION_FINISHED = 'executionFinished',
 }
 

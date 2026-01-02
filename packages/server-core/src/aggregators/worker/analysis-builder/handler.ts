@@ -7,8 +7,9 @@
 
 import { ProcessStatus } from '@privateaim/kit';
 import type {
-    AnalysisBuilderBasePayload, AnalysisBuilderCheckFinishedPayload,
-    AnalysisBuilderEventMap,
+    AnalysisBuilderBasePayload,
+    AnalysisBuilderCheckFinishedPayload,
+    AnalysisBuilderEventMap, AnalysisBuilderExecutionProgressPayload,
 } from '@privateaim/server-core-worker-kit';
 import {
     AnalysisBuilderEvent,
@@ -34,6 +35,11 @@ export async function handleAnalysisBuilderEvent(
     switch (context.key) {
         case AnalysisBuilderEvent.EXECUTION_STARTED: {
             entity.build_status = ProcessStatus.STARTED;
+            break;
+        }
+        case AnalysisBuilderEvent.EXECUTION_PROGRESS: {
+            const temp = value as AnalysisBuilderExecutionProgressPayload;
+            entity.build_progress = temp.progress.percent;
             break;
         }
         case AnalysisBuilderEvent.CHECK_FAILED:

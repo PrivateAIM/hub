@@ -93,10 +93,7 @@ export default defineComponent({
             </span>
         </h1>
 
-        <div
-            v-if="entity"
-            class="m-b-20 m-t-10"
-        >
+        <div v-if="entity">
             <div class="flex-wrap flex-row d-flex align-items-center">
                 <DomainEntityNav
                     :items="tabs"
@@ -113,43 +110,28 @@ export default defineComponent({
         </div>
 
         <template v-if="entity">
-            <div class="row">
-                <div class="col-8">
+            <div class="d-flex flex-column gap-1">
+                <hr>
+
+                <div>
+                    <FAnalysisSteps
+                        :entity="entity"
+                        :configuration-code-link="'/analyses/' + entity.id + '/image'"
+                        :configuration-nodes-link="'/analyses/' + entity.id + '/nodes'"
+                        :configuration-image-link="'/analyses/' + entity.id + '/image'"
+                        @updated="handleUpdated"
+                        @failed="handleFailed"
+                    />
+                </div>
+
+                <hr>
+
+                <div>
                     <NuxtPage
                         :entity="entity"
                         @updated="handleUpdated"
                         @failed="handleFailed"
                     />
-                </div>
-                <div class="col-4">
-                    <div class="card-grey card">
-                        <div class="card-header">
-                            <span class="title">Steps</span>
-                        </div>
-                        <div class="card-body">
-                            <div
-                                class="d-flex flex-row gap-2 align-items-center alert alert-sm alert-info"
-                            >
-                                <div>
-                                    <i class="fa fa-info" />
-                                </div>
-                                <div>
-                                    Since it is necessary to continuously check whether the conditions for the steps are met,
-                                    it may take a few seconds for the view to update.
-                                </div>
-                            </div>
-
-                            <FAnalysisSteps
-                                :list-direction="'column'"
-                                :entity="entity"
-                                :configuration-code-link="'/analyses/' + entity.id + '/image'"
-                                :configuration-nodes-link="'/analyses/' + entity.id + '/nodes'"
-                                :configuration-image-link="'/analyses/' + entity.id + '/image'"
-                                @updated="handleUpdated"
-                                @failed="handleFailed"
-                            />
-                        </div>
-                    </div>
                 </div>
             </div>
         </template>

@@ -20,6 +20,7 @@ export class MasterImageBuilderAggregator extends BaseComponent<MasterImageBuild
     constructor() {
         super();
 
+        this.mount(MasterImageBuilderEvent.EXECUTION_PROGRESS, handleMasterImageBuilderEvent);
         this.mount(MasterImageBuilderEvent.EXECUTION_STARTED, handleMasterImageBuilderEvent);
         this.mount(MasterImageBuilderEvent.EXECUTION_FAILED, handleMasterImageBuilderEvent);
         this.mount(MasterImageBuilderEvent.EXECUTION_FINISHED, handleMasterImageBuilderEvent);

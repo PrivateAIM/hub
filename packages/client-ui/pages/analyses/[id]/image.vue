@@ -171,8 +171,8 @@ export default defineComponent({
                                         @failed="bucketFilesProps.failed"
                                     >
                                         <template #default="bucketFileProps">
-                                            <div class="d-flex flex-row align-items-center">
-                                                <div class="pr-2">
+                                            <div class="d-flex flex-row align-items-center gap-2 p-1 w-100">
+                                                <div>
                                                     {{ bucketFileProps.data.path }}
                                                 </div>
 

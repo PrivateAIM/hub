@@ -8,9 +8,8 @@
 export enum ComponentName {
     ANALYSIS_DISTRIBUTOR = 'analysisDistributor',
     ANALYSIS_BUILDER = 'analysisBuilder',
-    ANALYSIS_CORE = 'analysisCore',
 
-    MASTER_IMAGES = 'masterImages',
+    MASTER_IMAGE_BUILDER = 'masterImageBuilder',
 }
 
 export enum ErrorCode {

@@ -14,12 +14,16 @@ import {
     AnalysisDistributorCommand,
     AnalysisDistributorEvent,
 } from '@privateaim/server-core-worker-kit';
+import type { Analysis, Node, Registry } from '@privateaim/core-kit';
 import { REGISTRY_ARTIFACT_TAG_LATEST } from '@privateaim/core-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
+import type { ImagePushOptions } from 'dockerode';
+import type { ModemStreamWaitOptions } from 'docken';
+import { waitForStream } from 'docken';
 import {
     buildDockerAuthConfigFromRegistry,
     buildDockerImageURL,
-    cleanupDockerImages, pushDockerImage,
+    cleanupDockerImages,
     useCoreClient,
     useDocker,
 } from '../../../../core';
@@ -91,80 +95,55 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
 
         // -----------------------------------------------------------------------------------
 
-        const localImageUrl = `${analysis.id}:${REGISTRY_ARTIFACT_TAG_LATEST}`;
-
-        const image = useDocker()
-            .getImage(localImageUrl);
-
-        await image.inspect();
-
-        const imageURLs : string[] = [];
-        for (let i = 0; i < nodes.length; i++) {
-            const nodeImageURL = buildDockerImageURL({
-                hostname: registry.host,
-                projectName: nodes[i].registry_project.external_name,
-                repositoryName: analysis.id,
-                tagOrDigest: REGISTRY_ARTIFACT_TAG_LATEST,
-            });
-
-            imageURLs.push(nodeImageURL);
-        }
+        let tags : string[];
 
         try {
-            for (let i = 0; i < imageURLs.length; i++) {
-                useAnalysisDistributorLogger().info({
-                    message: `Tagging image ${imageURLs[i]}`,
-                    command: AnalysisDistributorCommand.EXECUTE,
-                    analysis_id: analysis.id,
-                    [LogFlag.REF_ID]: analysis.id,
-                });
-
-                await image.tag({
-                    repo: imageURLs[i],
-                    tag: REGISTRY_ARTIFACT_TAG_LATEST,
-                });
-
-                useAnalysisDistributorLogger().info({
-                    message: `Tagged image ${imageURLs[i]}`,
-                    command: AnalysisDistributorCommand.EXECUTE,
-                    analysis_id: analysis.id,
-                    [LogFlag.REF_ID]: analysis.id,
-                });
-            }
+            tags = await this.tagImage(
+                analysis,
+                nodes,
+                registry,
+            );
         } catch (e) {
-            await cleanupDockerImages(imageURLs);
+            useAnalysisDistributorLogger().error({
+                message: 'Tagging images failed',
+                command: AnalysisDistributorCommand.EXECUTE,
+                analysis_id: analysis.id,
+                [LogFlag.REF_ID]: analysis.id,
+            });
 
             throw e;
-        } finally {
-            await image.remove({
-                force: true,
-            });
         }
 
         // -----------------------------------------------------------------------------------
 
-        const authConfig = buildDockerAuthConfigFromRegistry(registry);
-
         try {
-            for (let i = 0; i < imageURLs.length; i++) {
-                useAnalysisDistributorLogger().info({
-                    message: `Pushing image ${imageURLs[i]}`,
-                    command: AnalysisDistributorCommand.EXECUTE,
-                    analysis_id: analysis.id,
-                    [LogFlag.REF_ID]: analysis.id,
-                });
-
-                await pushDockerImage(imageURLs[i], authConfig);
-
-                useAnalysisDistributorLogger().info({
-                    message: `Pushed image ${imageURLs[i]}`,
-                    command: AnalysisDistributorCommand.EXECUTE,
-                    analysis_id: analysis.id,
-                    [LogFlag.REF_ID]: analysis.id,
-                });
-            }
+            await this.pushImages(
+                analysis,
+                tags,
+                {
+                    push: {
+                        authconfig: buildDockerAuthConfigFromRegistry(registry),
+                    },
+                    stream: {
+                        onPushing: async (progress) => {
+                            await context.handle(
+                                AnalysisDistributorEvent.EXECUTION_PROGRESS,
+                                {
+                                    progress,
+                                    id: analysis.id,
+                                },
+                            );
+                        },
+                    },
+                },
+            );
         } catch (e) {
-            await cleanupDockerImages(imageURLs);
+            useAnalysisDistributorLogger().error({
+                message: 'Pushing images failed',
+                command: AnalysisDistributorCommand.EXECUTE,
+                analysis_id: analysis.id,
+                [LogFlag.REF_ID]: analysis.id,
+            });
 
             throw e;
         }
@@ -173,5 +152,120 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
             AnalysisDistributorEvent.EXECUTION_FINISHED,
             value,
         );
+    }
+
+    protected async tagImage(
+        analysis: Analysis,
+        nodes: Node[],
+        registry: Registry,
+    ) : Promise<string[]> {
+        useAnalysisDistributorLogger().info({
+            message: 'Tagging images',
+            command: AnalysisDistributorCommand.EXECUTE,
+            analysis_id: analysis.id,
+            [LogFlag.REF_ID]: analysis.id,
+        });
+
+        const image = useDocker()
+            .getImage(this.buildImageTag(analysis));
+
+        await image.inspect();
+
+        const tags : string[] = [];
+        for (let i = 0; i < nodes.length; i++) {
+            const nodeImageURL = buildDockerImageURL({
+                hostname: registry.host,
+                projectName: nodes[i].registry_project.external_name,
+                repositoryName: analysis.id,
+                tagOrDigest: REGISTRY_ARTIFACT_TAG_LATEST,
+            });
+
+            tags.push(nodeImageURL);
+        }
+
+        try {
+            for (let i = 0; i < tags.length; i++) {
+                await image.tag({
+                    repo: tags[i],
+                    tag: REGISTRY_ARTIFACT_TAG_LATEST,
+                });
+            }
+        } catch (e) {
+            await cleanupDockerImages(tags);
+
+            throw e;
+        } finally {
+            await image.remove({
+                force: true,
+            });
+        }
+
+        useAnalysisDistributorLogger().info({
+            message: 'Tagged images',
+            command: AnalysisDistributorCommand.EXECUTE,
+            analysis_id: analysis.id,
+            [LogFlag.REF_ID]: analysis.id,
+        });
+
+        return tags;
+    }
+
+    protected async pushImages(
+        analysis: Analysis,
+        tags: string[],
+        options: { push: ImagePushOptions, stream: ModemStreamWaitOptions },
+    ) {
+        useAnalysisDistributorLogger().info({
+            message: 'Pushing images',
+            command: AnalysisDistributorCommand.EXECUTE,
+            analysis_id: analysis.id,
+            [LogFlag.REF_ID]: analysis.id,
+        });
+
+        const docker = useDocker();
+
+        const calcForIndex = (value: number, index: number) => {
+            const current = (index + 1) * value;
+            if (current === 0) {
+                return 0;
+            }
+
+            return Math.floor(current / tags.length);
+        };
+
+        try {
+            for (let i = 0; i < tags.length; i++) {
+                const tag = tags[i];
+
+                const image = docker.getImage(tag);
+
+                const stream = await image.push(options.push);
+
+                await waitForStream(docker, stream, {
+                    onPushing: async (process) => {
+                        if (!options.stream.onPushing) return;
+
+                        await options.stream.onPushing({
+                            percent: calcForIndex(process.percent, i),
+                            current: calcForIndex(process.current, i),
+                            total: calcForIndex(process.total, i),
+                        });
+                    },
+                });
+            }
+        } finally {
+            await cleanupDockerImages(tags);
+        }
+
+        useAnalysisDistributorLogger().info({
+            message: 'Pushed images',
+            command: AnalysisDistributorCommand.EXECUTE,
+            analysis_id: analysis.id,
+            [LogFlag.REF_ID]: analysis.id,
+        });
+    }
+
+    protected buildImageTag(analysis: Analysis): string {
+        return `${analysis.id}:${REGISTRY_ARTIFACT_TAG_LATEST}`;
     }
 }

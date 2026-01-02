@@ -7,7 +7,10 @@
 
 import { DomainType } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
-import type { MasterImageBuilderBasePayload, MasterImageBuilderEventMap } from '@privateaim/server-core-worker-kit';
+import type {
+    MasterImageBuilderBasePayload,
+    MasterImageBuilderEventMap, MasterImageBuilderExecutionProgressPayload,
+} from '@privateaim/server-core-worker-kit';
 import {
     MasterImageBuilderEvent,
 } from '@privateaim/server-core-worker-kit';
@@ -33,6 +36,11 @@ export async function handleMasterImageBuilderEvent(
     switch (context.key) {
         case MasterImageBuilderEvent.EXECUTION_STARTED: {
             entity.build_status = ProcessStatus.STARTED;
+            break;
+        }
+        case MasterImageBuilderEvent.EXECUTION_PROGRESS: {
+            const temp = value as MasterImageBuilderExecutionProgressPayload;
+            entity.build_progress = temp.progress.percent;
             break;
         }
         case MasterImageBuilderEvent.EXECUTION_FAILED: {

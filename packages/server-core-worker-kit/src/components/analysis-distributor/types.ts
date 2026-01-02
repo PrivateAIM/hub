@@ -7,6 +7,7 @@
 
 import type { ObjectLiteralKeys, ProcessStatus } from '@privateaim/kit';
 import type { ComponentMetadata } from '@privateaim/server-kit';
+import type { Progress } from 'docken';
 import type { AnalysisDistributorCommand, AnalysisDistributorEvent } from './constants';
 
 export type AnalysisDistributorBasePayload = {
@@ -15,6 +16,11 @@ export type AnalysisDistributorBasePayload = {
 };
 
 export type AnalysisDistributorExecutePayload = AnalysisDistributorBasePayload;
+
+export type AnalysisDistributorExecutionProgressPayload = AnalysisDistributorBasePayload & {
+    progress: Progress
+};
+
 export type AnalysisDistributorCheckPayload = AnalysisDistributorBasePayload;
 
 export type AnalysisDistributorCheckFinishedPayload = AnalysisDistributorBasePayload & {
@@ -25,6 +31,7 @@ export type AnalysisDistributorEventMap = ObjectLiteralKeys<{
     [AnalysisDistributorCommand.EXECUTE]: [AnalysisDistributorExecutePayload, ComponentMetadata],
     [AnalysisDistributorEvent.EXECUTION_FAILED]: [AnalysisDistributorExecutePayload, ComponentMetadata],
     [AnalysisDistributorEvent.EXECUTION_STARTED]: [AnalysisDistributorExecutePayload, ComponentMetadata],
+    [AnalysisDistributorEvent.EXECUTION_PROGRESS]: [AnalysisDistributorExecutionProgressPayload, ComponentMetadata],
     [AnalysisDistributorEvent.EXECUTION_FINISHED]: [AnalysisDistributorExecutePayload, ComponentMetadata],
 
     [AnalysisDistributorCommand.CHECK]: [AnalysisDistributorCheckPayload, ComponentMetadata],

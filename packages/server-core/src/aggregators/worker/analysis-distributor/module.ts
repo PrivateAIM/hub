@@ -15,6 +15,7 @@ export class AnalysisDistributorAggregator extends BaseComponent<AnalysisDistrib
         super();
 
         this.mount(AnalysisDistributorEvent.EXECUTION_STARTED, handleAnalysisDistributorEvent);
+        this.mount(AnalysisDistributorEvent.EXECUTION_PROGRESS, handleAnalysisDistributorEvent);
         this.mount(AnalysisDistributorEvent.EXECUTION_FAILED, handleAnalysisDistributorEvent);
         this.mount(AnalysisDistributorEvent.EXECUTION_FINISHED, handleAnalysisDistributorEvent);
 

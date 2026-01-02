@@ -29,6 +29,11 @@ export class MasterImageEntity implements MasterImage {
     })
         build_status: `${ProcessStatus}` | null;
 
+    @Column({
+        type: 'int', unsigned: true, nullable: true, default: null,
+    })
+        build_progress: number | null;
+
     @Column({ type: 'varchar', nullable: true, length: 512 })
         path: string | null;
 

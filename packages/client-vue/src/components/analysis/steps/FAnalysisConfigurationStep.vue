@@ -58,90 +58,94 @@ export default defineComponent({
                 props.entity.configuration_image_valid &&
                 props.entity.configuration_nodes_valid);
 
+        const progress = computed(() => {
+            let current = 0;
+
+            if (props.entity.configuration_entrypoint_valid) {
+                current++;
+            }
+
+            if (props.entity.configuration_image_valid) {
+                current++;
+            }
+
+            if (props.entity.configuration_nodes_valid) {
+                current++;
+            }
+
+            if (current === 0) {
+                return 0;
+            }
+
+            return Math.floor((current / 3) * 100);
+        });
+
         return {
             handleUpdated,
             handleFailed,
             handleExecuted,
 
             passed,
+            progress,
         };
     },
 });
 </script>
 <template>
-    <div>
-        <div class="d-flex flex-row gap-1">
-            <div>
-                <strong>1. Configuration</strong>
-            </div>
-            <div>
-                <template v-if="passed">
-                    <span class="text-success">
-                        <i class="fa fa-check" />
-                    </span>
-                </template>
-                <template v-else>
-                    <span class="text-danger">
-                        <i class="fa fa-times" />
-                    </span>
-                </template>
+    <div class="card-grey card">
+        <div class="card-header">
+            <div class="title d-flex flex-row">
+                <div>
+                    Configuration
+                </div>
+                <div class="ms-auto">
+                    <template v-if="passed">
+                        <span class="text-success">
+                            <i class="fa fa-check" />
+                        </span>
+                    </template>
+                    <template v-else>
+                        <span class="text-danger">
+                            <i class="fa fa-times" />
+                        </span>
+                    </template>
+                </div>
             </div>
         </div>
-        <div class="d-flex flex-column ms-3">
-            <div class="d-flex flex-row gap-1">
-                <div>
-                    <strong>
-                        <template v-if="nodesLink">
-                            <VCLink :to="nodesLink">
-                                1.1 Node(s) Assignment
-                            </VCLink>
-                        </template>
-                        <template v-else>
-                            1.1 Node(s) Assignment
-                        </template>
-                    </strong>
+        <div class="card-body">
+            <div class="d-flex flex-column">
+                <div class="text-center mb-3">
+                    <i class="fas fa-gear fa-4x" />
                 </div>
-                <div>
-                    <FAnalysisConfigurationNodesStep :entity="entity">
-                        <template #valid>
-                            <span class="text-success">
-                                <i class="fa fa-check" />
-                            </span>
-                        </template>
-                        <template #invalid="{ message }">
-                            <span class="text-danger">
-                                <i class="fa fa-times" />
-                            </span>
-                            <small>( {{ message }} )</small>
-                        </template>
-                    </FAnalysisConfigurationNodesStep>
+                <div class="progress bg-white">
+                    <div
+                        class="progress-bar"
+                        :class="'bg-success'"
+                        :style="{width: progress + '%'}"
+                        :aria-valuenow="progress"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                    >
+                        {{ progress }}%
+                    </div>
                 </div>
-            </div>
-            <div>
-                <strong>
-                    <strong>
-                        <template v-if="imageLink">
-                            <VCLink :to="imageLink">
-                                1.2 Image
-                            </VCLink>
-                        </template>
-                        <template v-else>
-                            1.2 Image
-                        </template>
-                    </strong>
-                </strong>
-            </div>
-            <div class="d-flex flex-column ms-4">
+                <hr>
+                <h6>Requirements</h6>
                 <div class="d-flex flex-row gap-1">
                     <div>
                         <strong>
-                            1.2.2 Base
+                            <template v-if="nodesLink">
+                                <VCLink :to="nodesLink">
+                                    Node(s) Assignment
+                                </VCLink>
+                            </template>
+                            <template v-else>
+                                Node(s) Assignment
+                            </template>
                         </strong>
                     </div>
                     <div>
-                        <FAnalysisConfigurationImageStep
-                            :entity="entity"
-                        >
+                        <FAnalysisConfigurationNodesStep :entity="entity">
                             <template #valid>
                                 <span class="text-success">
                                     <i class="fa fa-check" />
@@ -153,50 +157,97 @@ export default defineComponent({
                                 </span>
                                 <small>( {{ message }} )</small>
                             </template>
-                        </FAnalysisConfigurationImageStep>
+                        </FAnalysisConfigurationNodesStep>
                     </div>
                 </div>
-                <div class="d-flex flex-row gap-1">
-                    <div>
+                <div>
+                    <strong>
                         <strong>
-                            1.2.1 Entrypoint
+                            <template v-if="imageLink">
+                                <VCLink :to="imageLink">
+                                    Image
+                                </VCLink>
+                            </template>
+                            <template v-else>
+                                Image
+                            </template>
                         </strong>
+                    </strong>
+                </div>
+                <div class="d-flex flex-column ms-4">
+                    <div class="d-flex flex-row gap-1">
+                        <div>
+                            <strong>
+                                Base
+                            </strong>
+                        </div>
+                        <div>
+                            <FAnalysisConfigurationImageStep
+                                :entity="entity"
+                            >
+                                <template #valid>
+                                    <span class="text-success">
+                                        <i class="fa fa-check" />
+                                    </span>
+                                </template>
+                                <template #invalid="{ message }">
+                                    <span class="text-danger">
+                                        <i class="fa fa-times" />
+                                    </span>
+                                    <small>( {{ message }} )</small>
+                                </template>
+                            </FAnalysisConfigurationImageStep>
+                        </div>
                     </div>
-                    <div>
-                        <FAnalysisConfigurationEntrypointStep :entity="entity">
-                            <template #valid>
-                                <span class="text-success">
-                                    <i class="fa fa-check" />
-                                </span>
-                            </template>
-                            <template #invalid="{ message }">
-                                <span class="text-danger">
-                                    <i class="fa fa-times" />
-                                </span>
-                                <small>( {{ message }} )</small>
-                            </template>
-                        </FAnalysisConfigurationEntrypointStep>
+                    <div class="d-flex flex-row gap-1">
+                        <div>
+                            <strong>
+                                Entrypoint
+                            </strong>
+                        </div>
+                        <div>
+                            <FAnalysisConfigurationEntrypointStep :entity="entity">
+                                <template #valid>
+                                    <span class="text-success">
+                                        <i class="fa fa-check" />
+                                    </span>
+                                </template>
+                                <template #invalid="{ message }">
+                                    <span class="text-danger">
+                                        <i class="fa fa-times" />
+                                    </span>
+                                    <small>( {{ message }} )</small>
+                                </template>
+                            </FAnalysisConfigurationEntrypointStep>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-auto">
+                    <div class="d-flex flex-column gap-1">
+                        <div>
+                            <FAnalysisCommand
+                                :command="'configurationLock'"
+                                :with-icon="true"
+                                :entity="entity"
+                                @executed="(command: string) => handleExecuted('configuration', command)"
+                                @updated="handleUpdated"
+                                @failed="handleFailed"
+                            />
+                        </div>
+                        <div>
+                            <FAnalysisCommand
+                                :command="'configurationUnlock'"
+                                :with-icon="true"
+                                :entity="entity"
+                                @executed="(command: string) => handleExecuted('configuration', command)"
+                                @updated="handleUpdated"
+                                @failed="handleFailed"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="mt-1">
-            <FAnalysisCommand
-                :command="'configurationLock'"
-                :with-icon="true"
-                :entity="entity"
-                @executed="(command: string) => handleExecuted('configuration', command)"
-                @updated="handleUpdated"
-                @failed="handleFailed"
-            />
-            <FAnalysisCommand
-                :command="'configurationUnlock'"
-                :with-icon="true"
-                :entity="entity"
-                @executed="(command: string) => handleExecuted('configuration', command)"
-                @updated="handleUpdated"
-                @failed="handleFailed"
-            />
         </div>
     </div>
 </template>
