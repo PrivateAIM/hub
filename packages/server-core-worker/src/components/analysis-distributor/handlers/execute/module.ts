@@ -125,7 +125,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
                         authconfig: buildDockerAuthConfigFromRegistry(registry),
                     },
                     stream: {
-                        onBuilding: async (progress) => {
+                        onPushing: async (progress) => {
                             await context.handle(
                                 AnalysisDistributorEvent.EXECUTION_PROGRESS,
                                 {
@@ -224,7 +224,14 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
 
         const docker = useDocker();
 
-        const forIndex = (value: number, index: number) => Math.floor(((index + 1) * value) / tags.length);
+        const calcForIndex = (value: number, index: number) => {
+            const current = (index + 1) * value;
+            if (current === 0) {
+                return 0;
+            }
+
+            return Math.floor(current / tags.length);
+        };
 
         for (let i = 0; i < tags.length; i++) {
             const tag = tags[i];
@@ -234,13 +241,13 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
             const stream = await image.push(options.push);
 
             await waitForStream(docker, stream, {
-                onBuilding: async (process) => {
-                    if (!options.stream.onBuilding) return;
+                onPushing: async (process) => {
+                    if (!options.stream.onPushing) return;
 
-                    await options.stream.onBuilding({
-                        percent: forIndex(process.percent, i),
-                        current: forIndex(process.current, i),
-                        total: forIndex(process.total, i),
+                    await options.stream.onPushing({
+                        percent: calcForIndex(process.percent, i),
+                        current: calcForIndex(process.current, i),
+                        total: calcForIndex(process.total, i),
                     });
                 },
             });
