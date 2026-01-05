@@ -22,9 +22,6 @@ export async function createLogRouteHandler(req: Request, res: Response) : Promi
     const data = await component.validateWithRequest(req);
 
     const entity = await component.write(data);
-    if (typeof entity.time === 'bigint') {
-        entity.time = `${entity.time}`;
-    }
 
     return sendCreated(res, entity);
 }

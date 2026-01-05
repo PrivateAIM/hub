@@ -50,17 +50,16 @@ describe('controllers > analysis-node-log', () => {
     it('should read collection', async () => {
         const client = suite.client();
 
-        return client.log
+        const result = await client.log
             .getMany({
                 filters: {
                     labels: {
                         foo: 'bar',
                     },
                 },
-            })
-            .then((result) => {
-                expect(result.data.length).toBeGreaterThanOrEqual(1);
             });
+
+        expect(result.data.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should delete resource', async () => {

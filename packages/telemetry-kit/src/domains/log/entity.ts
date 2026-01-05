@@ -10,9 +10,9 @@ import type { LogChannel, LogLevel } from './constants';
 // todo: update logger-transport on new top level log flags
 export interface Log {
     /**
-     * Time in micro seconds
+     * ISO String
      */
-    time: string | bigint,
+    time: string,
 
     /**
      *  message

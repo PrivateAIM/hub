@@ -7,8 +7,8 @@
 
 module.exports = async () => {
     // eslint-disable-next-line no-undef
-    if (globalThis.LOKI_CONTAINER) {
+    if (globalThis.VL_CONTAINER) {
         // eslint-disable-next-line no-undef
-        await globalThis.LOKI_CONTAINER.stop();
+        await globalThis.VL_CONTAINER.stop();
     }
 };

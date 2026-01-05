@@ -10,6 +10,6 @@ export * from './authup';
 export * from './database';
 export * from './entity-event-publisher';
 export * from './logger';
-export * from './loki';
+export * from './victoria-logs';
 export * from './redis';
 export * from './vault';
