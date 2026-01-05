@@ -13,7 +13,7 @@
 
 <script lang="ts">
 import type { PropType } from 'vue';
-import { defineComponent } from 'vue';
+import { computed, defineComponent } from 'vue';
 import type { Analysis } from '@privateaim/core-kit';
 import FProcessStatus from '../../FProcessStatus.vue';
 import { FAnalysisCommand } from '../FAnalysisCommand';
@@ -41,48 +41,76 @@ export default defineComponent({
             emit('failed', e);
         };
 
+        const progress = computed(() => props.entity.distribution_progress || 0);
+
         return {
             handleUpdated,
             handleFailed,
             handleExecuted,
+
+            progress,
         };
     },
 });
 </script>
 <template>
-    <div class="d-flex flex-column gap-1">
-        <div class="d-flex flex-row gap-1">
-            <div>
-                <strong>3. Distribution</strong>
-            </div>
-            <div>
-                <FProcessStatus :value="entity.distribution_status">
-                    <template #default=" { iconClass, classSuffix }">
-                        <i :class="iconClass + ' text-'+ classSuffix" />
-                    </template>
-                </FProcessStatus>
+    <div class="card-grey card flex-grow-1">
+        <div class="card-header">
+            <div class="title d-flex flex-row">
+                <div>
+                    3. Distribution
+                </div>
+                <div class="ms-auto">
+                    <FProcessStatus :value="entity.distribution_status">
+                        <template #default=" { iconClass, classSuffix }">
+                            <i :class="iconClass + ' text-'+ classSuffix" />
+                        </template>
+                    </FProcessStatus>
+                </div>
             </div>
         </div>
-        <div class="d-flex flex-row gap-1">
-            <div>
-                <FAnalysisCommand
-                    :command="'distributionStart'"
-                    :with-icon="true"
-                    :entity="entity"
-                    @executed="(command) => handleExecuted('start', command)"
-                    @updated="handleUpdated"
-                    @failed="handleFailed"
-                />
-            </div>
-            <div>
-                <FAnalysisCommand
-                    :command="'distributionCheck'"
-                    :with-icon="true"
-                    :entity="entity"
-                    @executed="(command) => handleExecuted('check', command)"
-                    @updated="handleUpdated"
-                    @failed="handleFailed"
-                />
+        <div class="card-body">
+            <div class="d-flex flex-column h-100">
+                <div class="text-center mb-3">
+                    <i class="fas fa-sitemap fa-4x" />
+                </div>
+
+                <div class="progress bg-white">
+                    <div
+                        class="progress-bar"
+                        :class="'bg-success'"
+                        :style="{width: progress + '%'}"
+                        :aria-valuenow="progress"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                    >
+                        {{ progress }}%
+                    </div>
+                </div>
+                <div class="mt-auto">
+                    <div class="d-flex flex-row gap-1">
+                        <div>
+                            <FAnalysisCommand
+                                :command="'distributionStart'"
+                                :with-icon="true"
+                                :entity="entity"
+                                @executed="(command) => handleExecuted('start', command)"
+                                @updated="handleUpdated"
+                                @failed="handleFailed"
+                            />
+                        </div>
+                        <div>
+                            <FAnalysisCommand
+                                :command="'distributionCheck'"
+                                :with-icon="true"
+                                :entity="entity"
+                                @executed="(command) => handleExecuted('check', command)"
+                                @updated="handleUpdated"
+                                @failed="handleFailed"
+                            />
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

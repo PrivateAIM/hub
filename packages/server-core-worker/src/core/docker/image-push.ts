@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { waitForStream } from 'docken';
 import type { AuthConfig, Image } from 'dockerode';
 import { useDocker } from './instance';
-import { waitForDockerActionStream } from './modem-wait';
 
 export async function pushDockerImage(
     input: Image | string,
@@ -26,7 +26,7 @@ export async function pushDockerImage(
         authconfig: authConfig,
     });
 
-    await waitForDockerActionStream(stream);
+    await waitForStream(docker, stream);
 
     await imageLatest.remove({
         force: true,

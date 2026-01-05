@@ -101,11 +101,6 @@ Card
     line-height: 2;
 }
 
-.card .card-header span {
-    display: block;
-    margin-top: 5px;
-}
-
 .card a {
     text-decoration: none;
 }
@@ -114,6 +109,7 @@ Card
     color: #37474f;
     position: relative;
     margin: 0 0 0 1rem;
+    width: 100%;
 }
 
 .card .card-header .title:after {

@@ -13,7 +13,7 @@
 
 <script lang="ts">
 import type { PropType } from 'vue';
-import { defineComponent } from 'vue';
+import { computed, defineComponent } from 'vue';
 import type { Analysis } from '@privateaim/core-kit';
 import FProcessStatus from '../../FProcessStatus.vue';
 
@@ -29,6 +29,8 @@ export default defineComponent({
     },
     emits: ['updated', 'executed', 'failed'],
     setup(props, { emit }) {
+        const progress = computed(() => props.entity.execution_progress || 0);
+
         const handleExecuted = (type: string, command: string) => {
             emit('executed', type, command);
         };
@@ -40,6 +42,7 @@ export default defineComponent({
         };
 
         return {
+            progress,
             handleUpdated,
             handleFailed,
             handleExecuted,
@@ -48,17 +51,37 @@ export default defineComponent({
 });
 </script>
 <template>
-    <div>
-        <div class="d-flex flex-row gap-1">
-            <div>
-                <strong>4. Execution</strong>
+    <div class="card-grey card flex-grow-1">
+        <div class="card-header">
+            <div class="title d-flex flex-row">
+                <div>
+                    4. Execution
+                </div>
+                <div class="ms-auto">
+                    <FProcessStatus :value="entity.execution_status">
+                        <template #default=" { iconClass, classSuffix }">
+                            <i :class="iconClass + ' text-'+ classSuffix" />
+                        </template>
+                    </FProcessStatus>
+                </div>
             </div>
-            <div>
-                <FProcessStatus :value="entity.execution_status">
-                    <template #default=" { iconClass, classSuffix }">
-                        <i :class="iconClass + ' text-'+ classSuffix" />
-                    </template>
-                </FProcessStatus>
+        </div>
+        <div class="card-body">
+            <div class="text-center mb-3">
+                <i class="fas fa-microchip fa-4x" />
+            </div>
+
+            <div class="progress bg-white">
+                <div
+                    class="progress-bar"
+                    :class="'bg-success'"
+                    :style="{width: progress + '%'}"
+                    :aria-valuenow="progress"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                >
+                    {{ progress }}%
+                </div>
             </div>
         </div>
     </div>

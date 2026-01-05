@@ -13,6 +13,8 @@ export interface MasterImage {
 
     build_status: `${ProcessStatus}` | null;
 
+    build_progress: number | null;
+
     path: string | null;
 
     virtual_path: string;

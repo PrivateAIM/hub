@@ -75,6 +75,11 @@ export class AnalysisEntity implements Analysis {
     })
         distribution_status: `${ProcessStatus}` | null;
 
+    @Column({
+        type: 'int', unsigned: true, nullable: true, default: null,
+    })
+        distribution_progress: number | null;
+
     // ------------------------------------------------------------------
 
     @Column({ type: 'boolean', default: false })
@@ -85,6 +90,11 @@ export class AnalysisEntity implements Analysis {
         type: 'varchar', length: 64, nullable: true, default: null,
     })
         build_status: `${ProcessStatus}` | null;
+
+    @Column({
+        type: 'int', unsigned: true, nullable: true, default: null,
+    })
+        build_progress: number | null;
 
     // ------------------------------------------------------------------
 
