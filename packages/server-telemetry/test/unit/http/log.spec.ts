@@ -63,8 +63,6 @@ describe('controllers > analysis-node-log', () => {
                 },
             });
 
-        console.log(result);
-
         expect(result.data.length).toBeGreaterThanOrEqual(1);
     });
 
