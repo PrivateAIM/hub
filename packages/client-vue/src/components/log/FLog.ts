@@ -38,16 +38,7 @@ export default defineComponent({
             LogLevel.WARNING,
         ] as `${LogLevel}`[]).indexOf(entity.value.level) !== -1);
 
-        const isoDate = computed(() => {
-            let date : Date;
-            if (typeof entity.value.time === 'string') {
-                date = new Date(Math.floor(Number(BigInt(entity.value.time) / 1_000_000n)));
-            } else {
-                date = new Date(Math.floor(Number(entity.value.time / 1_000_000n)));
-            }
-
-            return date.toISOString();
-        });
+        const isoDate = computed(() => new Date(entity.value.time).toISOString());
 
         const color = computed(() => {
             switch (entity.value.level) {
