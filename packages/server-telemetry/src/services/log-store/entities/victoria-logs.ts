@@ -33,6 +33,23 @@ export class VictoriaLogsLogStore implements LogStore {
 
         await this.instance.ingestor.insert(stream);
 
+        await this.instance.post('insert/loki/api/v1/push', {
+            streams: [
+                {
+                    stream: {
+
+                        ...output.labels,
+                        [LogFlag.CHANNEL]: output.channel,
+                        [LogFlag.LEVEL]: output.level,
+                        [LogFlag.SERVICE]: output.service,
+                    },
+                    values: [
+                        ['0', output.message],
+                    ],
+                },
+            ],
+        });
+
         return output;
     }
 
@@ -67,8 +84,9 @@ export class VictoriaLogsLogStore implements LogStore {
         }
 
         const output : Log[] = [];
+
         const data = await this.instance.querier.query({
-            query: '*',
+            query: options.query,
         });
 
         for (let i = 0; i < data.length; i++) {
@@ -78,8 +96,18 @@ export class VictoriaLogsLogStore implements LogStore {
                 [LogFlag.CHANNEL]: channel,
                 [LogFlag.LEVEL]: level,
                 [LogFlag.SERVICE]: service,
-                ...labels
+                ...labelsRaw
             } = data[i];
+
+            const labels : Record<string, string> = {};
+            const keys = Object.keys(labelsRaw);
+            for (let i = 0; i < keys.length; i++) {
+                if (keys[i].startsWith('_')) {
+                    continue;
+                }
+
+                labels[keys[i]] = labelsRaw[keys[i]];
+            }
 
             output.push({
                 channel: (channel) as LogChannel || LogChannel.SYSTEM,

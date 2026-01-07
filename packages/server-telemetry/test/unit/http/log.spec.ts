@@ -12,6 +12,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { wait } from '@privateaim/kit';
 import { LogChannel, LogLevel } from '@privateaim/telemetry-kit';
 import { createTestSuite } from '../../utils';
 
@@ -33,7 +34,7 @@ describe('controllers > analysis-node-log', () => {
             channel: LogChannel.SYSTEM,
             service: 'unknown',
             level: LogLevel.ERROR,
-            message: 'An unknown error occurred.',
+            message: 'An test error occurred.',
             labels: {
                 foo: 'bar',
             },
@@ -42,13 +43,16 @@ describe('controllers > analysis-node-log', () => {
         expect(response.channel).toEqual(LogChannel.SYSTEM);
         expect(response.time).toBeDefined();
         expect(response.level).toEqual(LogLevel.ERROR);
-        expect(response.message).toEqual('An unknown error occurred.');
+        expect(response.message).toEqual('An test error occurred.');
         expect(response.labels).toBeDefined();
         expect(response.labels.foo).toEqual('bar');
     });
 
     it('should read collection', async () => {
         const client = suite.client();
+
+        // VL safes log to buffer first before writing to disk.
+        await wait(1_000);
 
         const result = await client.log
             .getMany({
