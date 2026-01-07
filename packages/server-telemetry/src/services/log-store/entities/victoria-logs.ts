@@ -33,23 +33,6 @@ export class VictoriaLogsLogStore implements LogStore {
 
         await this.instance.ingestor.insert(stream);
 
-        await this.instance.post('insert/loki/api/v1/push', {
-            streams: [
-                {
-                    stream: {
-
-                        ...output.labels,
-                        [LogFlag.CHANNEL]: output.channel,
-                        [LogFlag.LEVEL]: output.level,
-                        [LogFlag.SERVICE]: output.service,
-                    },
-                    values: [
-                        ['0', output.message],
-                    ],
-                },
-            ],
-        });
-
         return output;
     }
 
