@@ -24,7 +24,7 @@
         "@authup/kit": "^1.0.0-beta.27",
         "@authup/core-kit": "^1.0.0-beta.27",
         "@ebec/http": "^2.3.0",
-        "@hapic/loki": "^1.2.0",
+        "@hapic/victorialogs": "^1.0.2",
         "@hapic/vault": "^2.3.9",
         "@privateaim/kit": "^0.8.21",
         "@privateaim/server-kit": "^0.8.21",

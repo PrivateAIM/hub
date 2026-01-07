@@ -7,20 +7,20 @@
 
 import type { Factory } from 'singa';
 import { singa } from 'singa';
-import type { LokiClient } from '@hapic/loki';
+import type { VictoriaLogsClient } from '@hapic/victorialogs';
 
-const instance = singa<LokiClient>({
-    name: 'loki',
+const instance = singa<VictoriaLogsClient>({
+    name: 'victoriaLogs',
 });
 
-export function setLokiFactory(factory: Factory<LokiClient>) {
+export function setVictoriaLogsClientFactory(factory: Factory<VictoriaLogsClient>) {
     instance.setFactory(factory);
 }
 
-export function isLokiClientUsable() {
+export function isVictoriaLogsClientUsable() {
     return instance.has() || instance.hasFactory();
 }
 
-export function useLokiClient() {
+export function useVictoriaLogsClient() {
     return instance.use();
 }

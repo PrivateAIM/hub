@@ -18,8 +18,7 @@ export interface Environment {
     vaultConnectionString?: string | null,
     authupURL?: string | null,
 
-    lokiURL?: string | null,
-    lokiCompactorURL?: string | null,
-    lokiDistributorURL?: string | null,
-    lokiQuerierURL?: string | null
+    victoriaLogsURL?: string | null,
+    victoriaLogsIngestorURL?: string | null,
+    victoriaLogsQuerierURL?: string | null,
 }

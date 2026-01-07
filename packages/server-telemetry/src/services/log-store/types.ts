@@ -8,11 +8,15 @@
 import type { Log, LogInput } from '@privateaim/telemetry-kit';
 
 export type LogStoreQueryOptions = {
-    labels?: Record<string, string>
+    labels?: Record<string, string>,
+
     start?: number,
     end?: number,
+
     sort?: 'DESC' | 'ASC',
-    limit?: number
+
+    limit?: number,
+    offset?: number,
 };
 
 export type LogStoreDeleteOptions = {

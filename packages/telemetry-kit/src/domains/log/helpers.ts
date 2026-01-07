@@ -5,13 +5,12 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import { nanoSeconds } from '@privateaim/kit';
 import type { Log, LogInput } from './entity';
 
 export function normalizeLogInput(input: LogInput) : Log {
     return {
         ...input,
-        time: input.time || nanoSeconds(),
+        time: input.time || new Date().toISOString(),
         labels: input.labels || {},
     };
 }

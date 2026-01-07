@@ -8,15 +8,15 @@
 import type { Factory } from 'singa';
 import { singa } from 'singa';
 import type { LogStore } from './types';
-import { LokiLogStore, MemoryLogStore } from './entities';
-import { isLokiClientUsable, useLokiClient } from '../loki';
+import { MemoryLogStore, VictoriaLogsLogStore } from './entities';
+import { isVictoriaLogsClientUsable, useVictoriaLogsClient } from '../victoria-logs';
 
 const instance = singa<LogStore>({
     name: 'logStore',
     factory: () => {
-        if (isLokiClientUsable()) {
-            const loki = useLokiClient();
-            return new LokiLogStore(loki);
+        if (isVictoriaLogsClientUsable()) {
+            const loki = useVictoriaLogsClient();
+            return new VictoriaLogsLogStore(loki);
         }
 
         return new MemoryLogStore();

@@ -9,14 +9,14 @@ import {
     configureAMQP,
     configureAuthup,
     configureEntityEventPublisher,
-    configureLoki,
     configureRedis,
     configureVault,
+    configureVictoriaLogs,
     setupLogging,
 } from './services';
 
 export function configure() {
-    configureLoki();
+    configureVictoriaLogs();
 
     setupLogging();
 

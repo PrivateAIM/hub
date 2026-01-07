@@ -60,32 +60,16 @@ export async function getManyLogLogRouteHandler(req: Request, res: Response) : P
     const limit = pagination.limit || 100;
     const offset = pagination.offset || 0;
 
-    const factor = Math.floor(Math.max(offset, limit) / limit);
-
-    const dayInMs = 1_000 * 60 * 60 * 24;
-    const start = Date.now() - (factor * dayInMs);
-    const end = Date.now() - ((factor - 1) * dayInMs);
-
-    // todo: there can be more than 100 log lines in one day ...
-
-    // todo: get all entries in start/end range...
     const store = useLogStore();
     const [entities, total] = await store.query({
-        start,
-        end,
         labels,
-        limit: 1_000,
+        limit,
+        offset,
         sort: 'DESC',
     });
 
     return send(res, {
-        data: entities.map((entity) => {
-            if (typeof entity.time === 'bigint') {
-                entity.time = `${entity.time}`;
-            }
-
-            return entity;
-        }),
+        data: entities,
         meta: {
             total,
             limit,

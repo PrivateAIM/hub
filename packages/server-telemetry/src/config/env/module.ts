@@ -33,10 +33,10 @@ export function useEnv(key?: string) : any {
         vaultConnectionString: read(EnvironmentInputKey.VAULT_CONNECTION_STRING),
         authupURL: read(EnvironmentInputKey.AUTHUP_URL),
 
-        lokiURL: read(EnvironmentInputKey.LOKI_URL),
-        lokiCompactorURL: read(EnvironmentInputKey.LOKI_COMPACTOR_URL),
-        lokiDistributorURL: read(EnvironmentInputKey.LOKI_DISTRIBUTOR_URL),
-        lokiQuerierURL: read(EnvironmentInputKey.LOKI_QUERIER_URL),
+        victoriaLogsURL: read(EnvironmentInputKey.VICTORIA_LOGS_URL),
+        victoriaLogsIngestorURL: read(EnvironmentInputKey.VICTORIA_LOGS_INGESTOR_URL),
+        victoriaLogsQuerierURL: read(EnvironmentInputKey.VICTORIA_LOGS_QUERIER_URL),
+
     };
 
     if (typeof key === 'string') {
