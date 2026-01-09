@@ -15,7 +15,7 @@ import { useDataSource } from 'typeorm-extension';
 import {
     type ComponentHandler, type ComponentHandlerContext,
 } from '@privateaim/server-kit';
-import { RegistryEntity, RegistryProjectEntity } from '../../../database/domains';
+import { RegistryEntity, RegistryProjectEntity } from '../../../database';
 import { RegistryCommand } from '../constants';
 import type { RegistryEventMap, RegistrySetupPayload } from '../type';
 

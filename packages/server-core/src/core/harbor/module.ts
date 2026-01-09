@@ -25,7 +25,7 @@ export async function setupHarborService() {
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(RegistryEntity);
     let entity = await repository.findOneBy({
-        host,
+        name: 'default',
     });
     if (entity) {
         entity.account_name = connection.user;
@@ -44,6 +44,7 @@ export async function setupHarborService() {
     if (!isQueueRouterUsable()) {
         return;
     }
+
     const caller = useRegistryComponentCaller();
     await caller.call(
         RegistryCommand.SETUP,

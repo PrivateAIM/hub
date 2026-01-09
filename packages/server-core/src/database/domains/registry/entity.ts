@@ -9,11 +9,13 @@ import {
     Column,
     CreateDateColumn,
     Entity,
-    PrimaryGeneratedColumn,
+    PrimaryGeneratedColumn, Unique,
     UpdateDateColumn,
 } from 'typeorm';
 import type { Registry } from '@privateaim/core-kit';
 
+@Unique(['name'])
+@Unique(['host'])
 @Entity({ name: 'registries' })
 export class RegistryEntity implements Registry {
     @PrimaryGeneratedColumn('uuid')
