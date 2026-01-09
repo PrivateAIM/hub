@@ -32,24 +32,24 @@ export async function setupAuthupService(): Promise<any> {
     // -------------------------------------------------
 
     /**
-     * Create registry robot account.
+     * Create registry client account.
      */
-    const { data: robots } = await authupClient.robot.getMany({
+    const { data: clients } = await authupClient.client.getMany({
         filter: {
             realm_id: realm.id,
             name: ServiceID.REGISTRY,
         },
     });
 
-    if (robots.length === 0) {
-        await authupClient.robot.create({
+    if (clients.length === 0) {
+        await authupClient.client.create({
             name: ServiceID.REGISTRY,
             realm_id: realm.id,
         });
 
-        useLogger().debug(`Robot ${ServiceID.REGISTRY} created.`);
+        useLogger().debug(`Client ${ServiceID.REGISTRY} created.`);
     } else {
-        useLogger().debug(`Robot ${ServiceID.REGISTRY} already exists.`);
+        useLogger().debug(`Client ${ServiceID.REGISTRY} already exists.`);
     }
 
     // -------------------------------------------------

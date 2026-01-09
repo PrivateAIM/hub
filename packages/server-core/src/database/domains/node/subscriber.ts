@@ -60,13 +60,13 @@ export class NodeSubscriber extends BaseSubscriber<NodeEntity> implements Entity
     async afterInsert(event: InsertEvent<NodeEntity>): Promise<any> {
         await super.afterInsert(event);
 
-        await this.assignRobot(event.entity, event.manager);
+        await this.assignClient(event.entity, event.manager);
     }
 
     async afterUpdate(event: UpdateEvent<NodeEntity>): Promise<any> {
         await super.afterUpdate(event);
 
-        await this.assignRobot(
+        await this.assignClient(
             {
                 ...(event.databaseEntity || {}),
                 ...event.entity,
@@ -82,7 +82,7 @@ export class NodeSubscriber extends BaseSubscriber<NodeEntity> implements Entity
         await nodeClientService.dismiss(event.entity || event.databaseEntity);
     }
 
-    protected async assignRobot(entity: NodeEntity, manager: EntityManager) : Promise<void> {
+    protected async assignClient(entity: NodeEntity, manager: EntityManager) : Promise<void> {
         if (!isNodeClientServiceUsable()) return;
 
         const nodeClientService = useNodeClientService();

@@ -12,10 +12,9 @@ import type {
 import {
     ServiceID,
 } from '@privateaim/core-kit';
-import { isAuthupClientUsable, useAuthupClient, useLogger } from '@privateaim/server-kit';
+import { isAuthupClientUsable, useAuthupClient } from '@privateaim/server-kit';
+import { stringifyAuthorizationHeader } from 'hapic';
 import { useEnv } from '../../../../config';
-import { buildRegistryWebhookTarget } from '../utils';
-import { findRobotCredentialsInVault } from '../../../../domains';
 
 export async function saveRemoteRegistryProjectWebhook(
     httpClient: HarborClient,
@@ -24,29 +23,33 @@ export async function saveRemoteRegistryProjectWebhook(
         isProjectName?: boolean
     },
 ) : Promise<{ id: number } | undefined> {
-    if (isAuthupClientUsable()) {
-        await useAuthupClient().robot.integrity(ServiceID.REGISTRY);
+    if (!isAuthupClientUsable()) {
+        throw new Error('Authup client is not available');
     }
 
-    const engineData = await findRobotCredentialsInVault(ServiceID.REGISTRY);
+    const authupClient = useAuthupClient();
 
-    if (!engineData) {
-        useLogger().warn('No robot credentials could be found in vault for the registry project.');
-        return undefined;
-    }
+    const client = await authupClient.client.getOne(ServiceID.REGISTRY, {
+        fields: ['+secret'],
+    });
+
+    // todo: check if client.secret is not hashed or encrypted
 
     const webhookData: ProjectWebhookPolicyCreateContext = {
         data: {
             enabled: true,
             name: 'api',
             targets: [
-                buildRegistryWebhookTarget({
-                    url: useEnv('publicURL'),
-                    robot: {
-                        id: engineData.id,
-                        secret: engineData.secret,
-                    },
-                }),
+                {
+                    auth_header: stringifyAuthorizationHeader({
+                        type: 'Basic',
+                        username: client.id,
+                        password: client.secret,
+                    }),
+                    skip_cert_verify: true,
+                    address: `${useEnv('publicURL')}services/${ServiceID.REGISTRY}/hook`,
+                    type: 'http',
+                },
             ],
         },
         projectIdOrName: context.projectIdOrName,
