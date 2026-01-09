@@ -20,7 +20,7 @@ import { BaseSubscriber } from '@privateaim/server-db-kit';
 import { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
 import { NodeEntity } from './entity';
-import { isNodeRobotServiceUsable, useNodeRobotService } from '../../../services';
+import { isNodeClientServiceUsable, useNodeClientService } from '../../../services';
 
 @EventSubscriber()
 export class NodeSubscriber extends BaseSubscriber<NodeEntity> implements EntitySubscriberInterface<NodeEntity> {
@@ -76,25 +76,25 @@ export class NodeSubscriber extends BaseSubscriber<NodeEntity> implements Entity
     }
 
     async afterRemove(event: RemoveEvent<NodeEntity>): Promise<any> {
-        if (!isNodeRobotServiceUsable()) return;
+        if (!isNodeClientServiceUsable()) return;
 
-        const nodeRobotService = useNodeRobotService();
-        await nodeRobotService.delete(event.entity || event.databaseEntity);
+        const nodeClientService = useNodeClientService();
+        await nodeClientService.dismiss(event.entity || event.databaseEntity);
     }
 
     protected async assignRobot(entity: NodeEntity, manager: EntityManager) : Promise<void> {
-        if (!isNodeRobotServiceUsable()) return;
+        if (!isNodeClientServiceUsable()) return;
 
-        const nodeRobotService = useNodeRobotService();
-        const robotPrevId = entity.robot_id;
+        const nodeClientService = useNodeClientService();
+        const prevId = entity.client_id;
 
-        const robot = await nodeRobotService.assign(entity);
-        if (robot.id !== robotPrevId) {
+        const client = await nodeClientService.assign(entity);
+        if (client.id !== prevId) {
             const repository = manager.getRepository(NodeEntity);
             await repository.save(entity);
         }
 
-        await nodeRobotService.assignPermissions(robot);
+        await nodeClientService.assignPermissions(client);
     }
 
     listenTo(): CallableFunction | string {

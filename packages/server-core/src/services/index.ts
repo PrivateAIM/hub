@@ -10,5 +10,5 @@ export * from './analysis-configurator';
 export * from './analysis-distributor';
 export * from './database-integrity';
 export * from './master-image';
-export * from './node-robot';
+export * from './node-client';
 export * from './telemetry';

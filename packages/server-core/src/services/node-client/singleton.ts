@@ -7,17 +7,17 @@
 
 import { isAuthupClientUsable } from '@privateaim/server-kit';
 import { singa } from 'singa';
-import { NodeRobotService } from './module';
+import { NodeClientService } from './module';
 
-const instance = singa<NodeRobotService>({
-    name: 'nodeRobot',
-    factory: () => new NodeRobotService(),
+const instance = singa<NodeClientService>({
+    name: 'nodeClient',
+    factory: () => new NodeClientService(),
 });
 
-export function isNodeRobotServiceUsable() {
+export function isNodeClientServiceUsable() {
     return isAuthupClientUsable();
 }
 
-export function useNodeRobotService(): NodeRobotService {
+export function useNodeClientService(): NodeClientService {
     return instance.use();
 }

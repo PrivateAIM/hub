@@ -5,42 +5,42 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Permission, Robot } from '@authup/core-kit';
+import type { Client, Permission } from '@authup/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { AuthupClient } from '@privateaim/server-kit';
 import { useAuthupClient, useLogger } from '@privateaim/server-kit';
 import { isClientErrorWithStatusCode } from 'hapic';
 import type { NodeEntity } from '../../database';
 
-export class NodeRobotService {
+export class NodeClientService {
     protected authup : AuthupClient;
 
     constructor() {
         this.authup = useAuthupClient();
     }
 
-    async delete(entity: NodeEntity) : Promise<void> {
-        if (!entity.robot_id) {
+    async dismiss(entity: NodeEntity) : Promise<void> {
+        if (!entity.client_id) {
             return;
         }
 
         try {
-            await this.authup.robot.delete(entity.robot_id);
+            await this.authup.client.delete(entity.client_id);
         } catch (e) {
             if (!isClientErrorWithStatusCode(e, 404)) {
                 throw e;
             }
         }
 
-        entity.robot_id = null;
+        entity.client_id = null;
     }
 
-    async assign(entity: NodeEntity) : Promise<Robot> {
-        let robot : Robot | undefined;
+    async assign(entity: NodeEntity) : Promise<Client> {
+        let client : Client | undefined;
 
-        if (entity.robot_id) {
+        if (entity.client_id) {
             try {
-                robot = await this.authup.robot.getOne(entity.robot_id);
+                client = await this.authup.client.getOne(entity.client_id);
             } catch (e) {
                 if (!isClientErrorWithStatusCode(e, 404)) {
                     throw e;
@@ -48,26 +48,26 @@ export class NodeRobotService {
             }
         }
 
-        if (!robot) {
-            robot = await this.authup.robot.create({
+        if (!client) {
+            client = await this.authup.client.create({
                 name: entity.id,
                 realm_id: entity.realm_id,
             });
 
-            entity.robot_id = robot.id;
+            entity.client_id = client.id;
         }
 
-        return robot;
+        return client;
     }
 
-    async assignPermissions(robot: Robot) {
-        const { data: robotPermissions } = await this.authup
-            .robotPermission.getMany({
+    async assignPermissions(client: Client) {
+        const { data: clientPermissions } = await this.authup
+            .clientPermission.getMany({
                 relations: {
                     permission: true,
                 },
                 filter: {
-                    robot_id: robot.id,
+                    client_id: client.id,
                 },
             });
 
@@ -79,18 +79,18 @@ export class NodeRobotService {
         const permissionNamesAssigned : string[] = [];
 
         const relationsToDelete : string[] = [];
-        for (let i = 0; i < robotPermissions.length; i++) {
-            const index = permissionNames.indexOf(robotPermissions[i].permission.name);
+        for (let i = 0; i < clientPermissions.length; i++) {
+            const index = permissionNames.indexOf(clientPermissions[i].permission.name);
             if (index === -1) {
-                relationsToDelete.push(robotPermissions[i].id);
+                relationsToDelete.push(clientPermissions[i].id);
             }
 
-            permissionNamesAssigned.push(robotPermissions[i].permission.name);
+            permissionNamesAssigned.push(clientPermissions[i].permission.name);
         }
 
         if (relationsToDelete.length > 0) {
             for (let i = 0; i < relationsToDelete.length; i++) {
-                await this.authup.robotPermission.delete(relationsToDelete[i]);
+                await this.authup.clientPermission.delete(relationsToDelete[i]);
             }
         }
 
@@ -110,12 +110,12 @@ export class NodeRobotService {
                 }
 
                 useLogger()
-                    .warn(`The node-robot permission could not be created, due non existing permission ${permissionNames[i]}.`);
+                    .warn(`The node-client permission could not be created, due non existing permission ${permissionNames[i]}.`);
             }
 
             if (permission) {
-                await this.authup.robotPermission.create({
-                    robot_id: robot.id,
+                await this.authup.clientPermission.create({
+                    client_id: client.id,
                     permission_id: permission.id,
                 });
             }
