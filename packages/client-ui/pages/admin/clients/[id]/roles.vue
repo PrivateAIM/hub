@@ -1,32 +1,31 @@
-<!--
-  - Copyright (c) 2024.
-  - Author Peter Placzek (tada5hi)
-  - For the full copyright and license information,
-  - view the LICENSE file that was distributed with this source code.
-  -->
-
 <script lang="ts">
-
-import { APagination, ARobotRoleAssignments } from '@authup/client-web-kit';
-import type { Robot } from '@authup/core-kit';
+import { AClientRoleAssignments, APagination, ASearch } from '@authup/client-web-kit';
+import type { Client } from '@authup/core-kit';
 import type { PropType } from 'vue';
 import { defineNuxtComponent } from '#imports';
 
 export default defineNuxtComponent({
     components: {
+        ASearch,
         APagination,
-        ARobotRoleAssignments,
+        AClientRoleAssignments,
     },
     props: {
         entity: {
-            type: Object as PropType<Robot>,
+            type: Object as PropType<Client>,
             required: true,
         },
     },
 });
 </script>
 <template>
-    <ARobotRoleAssignments :entity-id="entity.id">
+    <AClientRoleAssignments :entity-id="entity.id">
+        <template #header="props">
+            <ASearch
+                :load="props.load"
+                :meta="props.meta"
+            />
+        </template>
         <template #footer="props">
             <APagination
                 :busy="props.busy"
@@ -34,5 +33,5 @@ export default defineNuxtComponent({
                 :load="props.load"
             />
         </template>
-    </ARobotRoleAssignments>
+    </AClientRoleAssignments>
 </template>

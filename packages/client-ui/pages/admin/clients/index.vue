@@ -1,28 +1,23 @@
-<!--
-  - Copyright (c) 2024.
-  - Author Peter Placzek (tada5hi)
-  - For the full copyright and license information,
-  - view the LICENSE file that was distributed with this source code.
-  -->
-
 <script lang="ts">
-import type { Robot } from '@authup/core-kit';
+import type { Client } from '@authup/core-kit';
 import { PermissionName } from '@authup/core-kit';
-import { definePageMeta, useToast } from '#imports';
 import { defineNuxtComponent } from '#app';
-import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
+import { definePageMeta, useToast } from '#imports';
+import { LayoutKey } from '../../../config/layout';
 
 export default defineNuxtComponent({
     setup() {
         definePageMeta({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
-            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
             [LayoutKey.REQUIRED_PERMISSIONS]: [
-                PermissionName.ROBOT_UPDATE,
-                PermissionName.ROBOT_DELETE,
-                PermissionName.ROBOT_CREATE,
+                PermissionName.CLIENT_READ,
+                PermissionName.CLIENT_UPDATE,
+                PermissionName.CLIENT_DELETE,
+                PermissionName.CLIENT_CREATE,
             ],
         });
+
+        const toast = useToast();
 
         const items = [
             {
@@ -37,14 +32,16 @@ export default defineNuxtComponent({
             },
         ];
 
-        const handleDeleted = (e: Robot) => {
-            const toast = useToast();
-            toast.show({ variant: 'success', body: `The robot ${e.name} was successfully deleted.` });
+        const handleDeleted = (e: Client) => {
+            if (toast) {
+                toast.show({ variant: 'success', body: `The client ${e.name} was successfully deleted.` });
+            }
         };
 
         const handleFailed = (e: Error) => {
-            const toast = useToast();
-            toast.show({ variant: 'warning', body: e.message });
+            if (toast) {
+                toast.show({ variant: 'warning', body: e.message });
+            }
         };
 
         return {
@@ -58,14 +55,14 @@ export default defineNuxtComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            <i class="fa-solid fa-robot me-1" /> Robot
+            <i class="fa-solid fa-ghost me-1" /> Client
             <span class="sub-title ms-1">Management</span>
         </h1>
         <div class="content-wrapper">
             <div class="content-sidebar flex-column">
                 <DomainEntityNav
                     :items="items"
-                    path="/admin/robots"
+                    path="/admin/clients"
                     direction="vertical"
                 />
             </div>

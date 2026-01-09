@@ -31,6 +31,9 @@ export async function setupAuthupService(): Promise<any> {
 
     // -------------------------------------------------
 
+    // todo: remove this
+    await authupClient.robot.getOne(ServiceID.SYSTEM);
+
     /**
      * Create registry client account.
      */

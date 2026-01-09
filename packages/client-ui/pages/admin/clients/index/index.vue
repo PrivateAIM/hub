@@ -1,57 +1,56 @@
-<!--
-  - Copyright (c) 2024.
-  - Author Peter Placzek (tada5hi)
-  - For the full copyright and license information,
-  - view the LICENSE file that was distributed with this source code.
-  -->
-
 <script lang="ts">
-import { BTable } from 'bootstrap-vue-next';
-import type { Robot } from '@authup/core-kit';
-import { PermissionName } from '@authup/core-kit';
-import {
-    AEntityDelete, APagination, ARobots, ASearch, ATitle, injectStore, storeToRefs,
-    usePermissionCheck,
-} from '@authup/client-web-kit';
-import type { BuildInput } from 'rapiq';
-import { defineNuxtComponent } from '#app';
 
-export default defineNuxtComponent({
+import { BTable } from 'bootstrap-vue-next';
+import {
+    AClients,
+    AEntityDelete, APagination, ASearch, ATitle, AUser, injectStore, storeToRefs, usePermissionCheck,
+} from '@authup/client-web-kit';
+import type { Client } from '@authup/core-kit';
+import { PermissionName } from '@authup/core-kit';
+
+import type { BuildInput } from 'rapiq';
+import { defineComponent } from 'vue';
+
+export default defineComponent({
     components: {
-        ATitle,
         APagination,
         ASearch,
+        ATitle,
         BTable,
-        ARobots,
         AEntityDelete,
+        AClients,
+        AUser,
     },
     emits: ['deleted'],
     setup(props, { emit }) {
-        const handleDeleted = (e: Robot) => {
+        const handleDeleted = (e: Client) => {
             emit('deleted', e);
         };
 
         const store = injectStore();
         const { realmManagementId } = storeToRefs(store);
 
-        const query : BuildInput<Robot> = {
-            filter: {
+        const query : BuildInput<Client> = {
+            filters: {
                 realm_id: [realmManagementId.value, null],
             },
         };
 
-        const hasEditPermission = usePermissionCheck({ name: PermissionName.ROBOT_UPDATE });
-        const hasDropPermission = usePermissionCheck({ name: PermissionName.ROBOT_DELETE });
+        const hasEditPermission = usePermissionCheck({ name: PermissionName.CLIENT_UPDATE });
+        const hasDropPermission = usePermissionCheck({ name: PermissionName.CLIENT_DELETE });
 
         const fields = [
             {
                 key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
             },
             {
-                key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center',
+                key: 'built_in', label: 'Built in?', thClass: 'text-center', tdClass: 'text-center',
             },
             {
-                key: 'updated_at', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left',
+                key: 'created_at', label: 'Created at', thClass: 'text-center', tdClass: 'text-center',
+            },
+            {
+                key: 'updated_at', label: 'Updated at', thClass: 'text-left', tdClass: 'text-left',
             },
             { key: 'options', label: '', tdClass: 'text-left' },
         ];
@@ -67,7 +66,7 @@ export default defineNuxtComponent({
 });
 </script>
 <template>
-    <ARobots
+    <AClients
         :query="query"
         @deleted="handleDeleted"
     >
@@ -93,15 +92,38 @@ export default defineNuxtComponent({
                 head-variant="'dark'"
                 outlined
             >
+                <template #cell(built_in)="data">
+                    <i
+                        :class="{
+                            'fa fa-times text-danger': !data.item.built_in,
+                            'fa fa-check text-success': data.item.built_in,
+                        }"
+                    />
+                </template>
                 <template #cell(created_at)="data">
                     <VCTimeago :datetime="data.item.created_at" />
                 </template>
                 <template #cell(updated_at)="data">
                     <VCTimeago :datetime="data.item.created_at" />
                 </template>
+                <template #cell(user_id)="data">
+                    <template v-if="data.item.user_id">
+                        <AUser :entity-id="data.item.user_id">
+                            <template #default="user">
+                                {{ user.data.name }}
+                            </template>
+                            <template #error>
+                                -
+                            </template>
+                        </AUser>
+                    </template>
+                    <template v-else>
+                        -
+                    </template>
+                </template>
                 <template #cell(options)="data">
                     <NuxtLink
-                        :to="'/admin/robots/'+ data.item.id"
+                        :to="'/admin/clients/'+ data.item.id"
                         class="btn btn-xs btn-outline-primary me-1"
                         :disabled="!hasEditPermission"
                     >
@@ -110,7 +132,7 @@ export default defineNuxtComponent({
                     <AEntityDelete
                         class="btn btn-xs btn-outline-danger"
                         :entity-id="data.item.id"
-                        entity-type="robot"
+                        entity-type="client"
                         :with-text="false"
                         :disabled="!hasDropPermission"
                         @deleted="props.deleted"
@@ -118,5 +140,5 @@ export default defineNuxtComponent({
                 </template>
             </BTable>
         </template>
-    </ARobots>
+    </AClients>
 </template>

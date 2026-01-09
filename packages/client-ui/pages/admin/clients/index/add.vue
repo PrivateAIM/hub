@@ -1,41 +1,38 @@
-<!--
-  - Copyright (c) 2024.
-  - Author Peter Placzek (tada5hi)
-  - For the full copyright and license information,
-  - view the LICENSE file that was distributed with this source code.
-  -->
-
 <script lang="ts">
-import { ARobotForm } from '@authup/client-web-kit';
-import type { Robot } from '@authup/core-kit';
+
+import { AClientForm, injectStore, storeToRefs } from '@authup/client-web-kit';
+import type { Client } from '@authup/core-kit';
 import { PermissionName } from '@authup/core-kit';
 import { defineNuxtComponent, navigateTo } from '#app';
 import { definePageMeta } from '#imports';
-import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
+import { LayoutKey } from '../../../../config/layout';
 
 export default defineNuxtComponent({
     components: {
-        ARobotForm,
+        AClientForm,
     },
     emits: ['failed', 'created'],
     setup(props, { emit }) {
         definePageMeta({
-            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.REQUIRED_PERMISSIONS]: [
-                PermissionName.ROBOT_CREATE,
+                PermissionName.CLIENT_CREATE,
             ],
         });
 
-        const handleCreated = (e: Robot) => {
-            navigateTo({ path: `/admin/robots/${e.id}` });
+        const handleCreated = (e: Client) => {
+            navigateTo({ path: `/admin/clients/${e.id}` });
         };
 
         const handleFailed = (e: Error) => {
             emit('failed', e);
         };
 
+        const store = injectStore();
+        const { realmManagementId } = storeToRefs(store);
+
         return {
+            realmManagementId,
             handleCreated,
             handleFailed,
         };
@@ -43,7 +40,8 @@ export default defineNuxtComponent({
 });
 </script>
 <template>
-    <ARobotForm
+    <AClientForm
+        :realm-id="realmManagementId"
         @created="handleCreated"
         @failed="handleFailed"
     />
