@@ -39,7 +39,7 @@ export default defineNuxtComponent({
             {
                 name: 'client',
                 path: '/client',
-                icon: 'fa fa-robot',
+                icon: 'fa fa-ghost',
             },
         ];
 
