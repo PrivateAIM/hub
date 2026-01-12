@@ -37,9 +37,9 @@ export default defineNuxtComponent({
             },
 
             {
-                name: 'robot',
-                path: '/robot',
-                icon: 'fa fa-robot',
+                name: 'client',
+                path: '/client',
+                icon: 'fa fa-ghost',
             },
         ];
 

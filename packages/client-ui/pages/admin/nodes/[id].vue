@@ -60,7 +60,7 @@ export default defineComponent({
         const tabs = [
             { name: 'Overview', icon: 'fas fa-bars', path: '' },
             { name: 'Crypto', icon: 'fas fa-shield-alt', path: 'crypto' },
-            { name: 'Robot', icon: 'fas fa-robot', path: 'robot' },
+            { name: 'Client', icon: 'fa-solid fa-ghost', path: 'client' },
             { name: 'Registry', icon: 'fab fa-docker', path: 'registry' },
         ];
 

@@ -1,36 +1,25 @@
-<!--
-  - Copyright (c) 2024.
-  - Author Peter Placzek (tada5hi)
-  - For the full copyright and license information,
-  - view the LICENSE file that was distributed with this source code.
-  -->
-
 <script lang="ts">
 import { injectHTTPClient } from '@authup/client-web-kit';
-import type { Robot } from '@authup/core-kit';
+import type { Client } from '@authup/core-kit';
 import { PermissionName } from '@authup/core-kit';
-import { defineComponent, ref } from 'vue';
-import type { Ref } from 'vue';
+import { extendObject } from '@authup/kit';
+import { type Ref, defineComponent } from 'vue';
+import { ref } from 'vue';
 import {
+    createError,
     definePageMeta,
+    navigateTo,
+    useRoute,
     useToast,
 } from '#imports';
-import {
-    createError, navigateTo, useRoute,
-} from '#app';
-import { LayoutKey, LayoutNavigationID } from '~/config/layout';
-import { updateObjectProperties } from '../../../utils';
+import { LayoutKey } from '../../../config/layout';
 
 export default defineComponent({
     async setup() {
         definePageMeta({
-            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.REQUIRED_PERMISSIONS]: [
-                PermissionName.ROBOT_UPDATE,
-                PermissionName.ROBOT_ROLE_CREATE,
-                PermissionName.ROBOT_ROLE_UPDATE,
-                PermissionName.ROBOT_ROLE_DELETE,
+                PermissionName.CLIENT_UPDATE,
             ],
         });
 
@@ -39,35 +28,45 @@ export default defineComponent({
                 name: 'General', icon: 'fas fa-bars', path: '',
             },
             {
-                name: 'Permissions', icon: 'fas fa-user-secret', path: 'permissions',
+                name: 'Scopes', icon: 'fa-solid fa-meteor', path: '/scopes',
             },
             {
-                name: 'Roles', icon: 'fa-solid fa-user-group', path: 'roles',
+                name: 'URL', icon: 'fa-solid fa-link', path: '/url',
+            },
+            {
+                name: 'Permissions', icon: 'fas fa-user-secret', path: '/permissions',
+            },
+            {
+                name: 'Roles', icon: 'fa-solid fa-user-group', path: '/roles',
             },
         ];
 
         const toast = useToast();
         const route = useRoute();
 
-        const entity: Ref<Robot> = ref(null) as any;
+        const entity: Ref<Client> = ref(null) as any;
 
         try {
             entity.value = await injectHTTPClient()
-                .robot
+                .client
                 .getOne(route.params.id as string, { fields: ['+secret'] });
         } catch (e) {
-            await navigateTo({ path: '/admin/robots' });
-            createError({});
+            await navigateTo({ path: '/admin/clients' });
+            throw createError({});
         }
 
-        const handleUpdated = (e: Robot) => {
-            toast.show({ variant: 'success', body: 'The robot was successfully updated.' });
+        const handleUpdated = (e: Client) => {
+            if (toast) {
+                toast.show({ variant: 'success', body: 'The client was successfully updated.' });
+            }
 
-            updateObjectProperties(entity, e);
+            extendObject(entity, e);
         };
 
         const handleFailed = (e: Error) => {
-            toast.show({ variant: 'warning', body: e.message });
+            if (toast) {
+                toast.show({ variant: 'success', body: e.message });
+            }
         };
 
         return {
@@ -82,12 +81,12 @@ export default defineComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            <i class="fa-solid fa-robot me-1" /> {{ entity.name }}
+            <i class="fa-solid fa-ghost me-1" /> {{ entity.name }}
             <span class="sub-title ms-1">Details</span>
         </h1>
         <div class="mb-2">
             <DomainEntityNav
-                :path="'/admin/robots/'+entity.id"
+                :path="'/admin/clients/'+entity.id"
                 :items="items"
                 :prev-link="true"
             />

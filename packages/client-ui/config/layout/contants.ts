@@ -160,7 +160,21 @@ export const LayoutSideAdminNavigation: NavigationItem<NavigationItemMeta>[] = [
 
                         AuthupPermissionName.IDENTITY_PROVIDER_CREATE,
                         AuthupPermissionName.IDENTITY_PROVIDER_DELETE,
-                        PermissionName.PROJECT_UPDATE,
+                    ],
+                },
+            },
+            {
+                name: 'Clients',
+                type: 'link',
+                url: '/admin/clients',
+                icon: 'fa-solid fa-ghost',
+                meta: {
+                    [LayoutKey.REQUIRED_LOGGED_IN]: true,
+                    [LayoutKey.REQUIRED_PERMISSIONS]: [
+                        AuthupPermissionName.CLIENT_READ,
+                        AuthupPermissionName.CLIENT_CREATE,
+                        AuthupPermissionName.CLIENT_UPDATE,
+                        AuthupPermissionName.CLIENT_DELETE,
                     ],
                 },
             },
@@ -175,20 +189,6 @@ export const LayoutSideAdminNavigation: NavigationItem<NavigationItemMeta>[] = [
                         AuthupPermissionName.IDENTITY_PROVIDER_CREATE,
                         AuthupPermissionName.IDENTITY_PROVIDER_UPDATE,
                         AuthupPermissionName.IDENTITY_PROVIDER_DELETE,
-                    ],
-                },
-            },
-            {
-                name: 'Robots',
-                type: 'link',
-                url: '/admin/robots',
-                icon: 'fas fa-robot',
-                meta: {
-                    [LayoutKey.REQUIRED_LOGGED_IN]: true,
-                    [LayoutKey.REQUIRED_PERMISSIONS]: [
-                        AuthupPermissionName.ROBOT_CREATE,
-                        AuthupPermissionName.ROBOT_UPDATE,
-                        AuthupPermissionName.ROBOT_DELETE,
                     ],
                 },
             },

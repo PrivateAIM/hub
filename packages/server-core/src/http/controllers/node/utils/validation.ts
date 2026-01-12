@@ -98,7 +98,7 @@ export class NodeValidator extends Container<NodeEntity> {
         );
 
         this.mount(
-            'robot_id',
+            'client_id',
             { optional: true },
             createValidator(() => {
                 const chain = createValidationChain();

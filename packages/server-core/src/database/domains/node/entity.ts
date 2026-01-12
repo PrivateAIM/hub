@@ -19,11 +19,11 @@ import {
     NodeType,
     RegistryProject,
 } from '@privateaim/core-kit';
-import type { Realm, Robot } from '@authup/core-kit';
+import type { Client, Realm, Robot } from '@authup/core-kit';
 import { RegistryProjectEntity } from '../registry-project';
 import { RegistryEntity } from '../registry';
 
-@Unique('node_external_name_index', ['external_name'])
+@Unique(['external_name', 'registry_id'])
 @Unique(['name', 'realm_id'])
 @Entity({ name: 'nodes' })
 export class NodeEntity implements Node {
@@ -71,6 +71,9 @@ export class NodeEntity implements Node {
     @ManyToOne(() => RegistryProjectEntity, { onDelete: 'CASCADE', nullable: true })
     @JoinColumn({ name: 'registry_project_id' })
         registry_project: RegistryProject;
+
+    @Column({ type: 'uuid', nullable: true })
+        client_id: Client['id'] | null;
 
     @Column({ type: 'uuid', nullable: true })
         robot_id: Robot['id'] | null;
