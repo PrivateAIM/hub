@@ -29,14 +29,14 @@
         "@authup/core-kit": "^1.0.0-beta.27",
         "@privateaim/kit": "^0.8.21",
         "hapic": "^2.7.0",
-        "rapiq": "^0.9.0"
+        "rapiq": "^1.0.0"
     },
     "peerDependencies": {
         "@authup/kit": "^1.0.0-beta.27",
         "@authup/core-kit": "^1.0.0-beta.27",
         "@privateaim/kit": "^0.8.21",
         "hapic": "^2.7.0",
-        "rapiq": "^0.9.0"
+        "rapiq": "^1.0.0"
     },
     "scripts": {
         "build:types": "tsc --emitDeclarationOnly -p tsconfig.build.json",
