@@ -12,8 +12,8 @@ import type {
     TaskEntryResolved,
 } from '@privateaim/server-kit';
 import { useLogger } from '@privateaim/server-kit';
-import type { TaskMap } from '../domains';
-import { useTaskManager } from '../domains';
+import type { TaskMap } from '../domains/index.ts';
+import { useTaskManager } from '../domains/index.ts';
 
 export abstract class BaseAggregatorHandler<
     EventMap extends ComponentEventMap = ComponentEventMap,

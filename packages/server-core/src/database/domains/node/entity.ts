@@ -20,8 +20,8 @@ import {
     RegistryProject,
 } from '@privateaim/core-kit';
 import type { Client, Realm, Robot } from '@authup/core-kit';
-import { RegistryProjectEntity } from '../registry-project';
-import { RegistryEntity } from '../registry';
+import { RegistryProjectEntity } from '../registry-project/index.ts';
+import { RegistryEntity } from '../registry/index.ts';
 
 @Unique(['external_name', 'registry_id'])
 @Unique(['name', 'realm_id'])
@@ -49,7 +49,7 @@ export class NodeEntity implements Node {
     @Column({
         type: 'varchar', length: 64, default: NodeType.DEFAULT,
     })
-        type: NodeType;
+        type: `${NodeType}`;
 
     @Column({
         type: 'boolean', default: false,

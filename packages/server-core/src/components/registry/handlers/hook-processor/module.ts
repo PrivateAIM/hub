@@ -7,9 +7,9 @@
 
 import type { ComponentData, ComponentHandler } from '@privateaim/server-kit';
 import { useLogger } from '@privateaim/server-kit';
-import type { RegistryCommand } from '../../constants';
-import type { RegistryEventMap } from '../../type';
-import { RegistryHookValidator } from './validator';
+import type { RegistryCommand } from '../../constants.ts';
+import type { RegistryEventMap } from '../../type.ts';
+import { RegistryHookValidator } from './validator.ts';
 
 export class RegistryHookHandler implements ComponentHandler<
 RegistryEventMap,

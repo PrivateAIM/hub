@@ -14,7 +14,7 @@ import {
 } from '@privateaim/server-kit';
 import {
     handleMasterImageBuilderEvent,
-} from './handler';
+} from './handler.ts';
 
 export class MasterImageBuilderAggregator extends BaseComponent<MasterImageBuilderEventMap> {
     constructor() {

@@ -12,8 +12,8 @@ import {
 import type { CommandModule } from 'yargs';
 import type { DataSourceOptions } from 'typeorm';
 import { DataSource } from 'typeorm';
-import { extendDataSourceOptions } from '../../database';
-import { createConfig } from '../../config';
+import { extendDataSourceOptions } from '../../database/index.ts';
+import { createConfig } from '../../config/index.ts';
 
 export class MigrationGenerateCommand implements CommandModule {
     command = 'migration:generate';

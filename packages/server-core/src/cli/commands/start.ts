@@ -6,7 +6,7 @@
  */
 
 import type { CommandModule } from 'yargs';
-import { startCommand } from '../../commands';
+import { startCommand } from '../../commands/index.ts';
 
 export class StartCommand implements CommandModule {
     command = 'start';

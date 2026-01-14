@@ -33,8 +33,8 @@ import {
     RegistryProjectEntity,
     RegistryProjectSubscriber,
     RegistrySubscriber,
-} from '../../domains';
-import { DatabaseQueryResultCache } from '../../cache';
+} from '../../domains/index.ts';
+import { DatabaseQueryResultCache } from '../../cache/index.ts';
 
 export async function extendDataSourceOptions(options: DataSourceOptions) : Promise<DataSourceOptions> {
     options = {

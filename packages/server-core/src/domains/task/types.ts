@@ -7,7 +7,7 @@
 
 import type { AnalysisBucketType } from '@privateaim/core-kit';
 import type { ObjectLiteralKeys } from '@privateaim/kit';
-import type { TaskType } from './constants';
+import type { TaskType } from './constants.ts';
 
 export type AnalysisBucketCreateTask = {
     analysisId: string,

@@ -5,17 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './analysis';
-export * from './analysis-bucket';
-export * from './analysis-bucket-file';
-export * from './anaylsis-node';
-export * from './analysis-node-event';
-export * from './analysis-permission';
-export * from './master-image';
-export * from './master-image-group';
-export * from './node';
-export * from './project';
-export * from './project-node';
-export * from './realm';
-export * from './registry';
-export * from './registry-project';
+export * from './analysis/index.ts';
+export * from './analysis-bucket/index.ts';
+export * from './analysis-bucket-file/index.ts';
+export * from './anaylsis-node/index.ts';
+export * from './analysis-node-event/index.ts';
+export * from './analysis-permission/index.ts';
+export * from './master-image/index.ts';
+export * from './master-image-group/index.ts';
+export * from './node/index.ts';
+export * from './project/index.ts';
+export * from './project-node/index.ts';
+export * from './realm/index.ts';
+export * from './registry/index.ts';
+export * from './registry-project/index.ts';

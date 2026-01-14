@@ -5,16 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './analysis';
-export * from './analysis-file';
-export * from './analysis-log';
-export * from './analysis-node';
+export * from './analysis/index.ts';
+export * from './analysis-file/index.ts';
+export * from './analysis-log/index.ts';
+export * from './analysis-node/index.ts';
 
-export * from './master-image';
-export * from './master-image-group';
+export * from './master-image/index.ts';
+export * from './master-image-group/index.ts';
 
-export * from './node';
+export * from './node/index.ts';
 
-export * from './project';
-export * from './project-node';
-export * from './registry-project';
+export * from './project/index.ts';
+export * from './project-node/index.ts';
+export * from './registry-project/index.ts';

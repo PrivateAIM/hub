@@ -15,7 +15,7 @@ import {
 import { BaseSubscriber } from '@privateaim/server-db-kit';
 import { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
-import { AnalysisPermissionEntity } from './entity';
+import { AnalysisPermissionEntity } from './entity.ts';
 
 @EventSubscriber()
 export class AnalysisPermissionSubscriber extends BaseSubscriber<

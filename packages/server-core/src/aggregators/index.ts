@@ -5,6 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './authup';
-export * from './worker';
-export * from './storage';
+export * from './authup/index.ts';
+export * from './worker/index.ts';
+export * from './storage/index.ts';

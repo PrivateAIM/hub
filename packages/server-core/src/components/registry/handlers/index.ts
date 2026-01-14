@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './cleanup';
-export * from './setup';
-export * from './hook-processor';
-export * from './project';
+export * from './cleanup.ts';
+export * from './setup.ts';
+export * from './hook-processor/index.ts';
+export * from './project/index.ts';

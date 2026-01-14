@@ -9,7 +9,7 @@ import type {
 } from '@authup/core-kit';
 import { useDataSource } from 'typeorm-extension';
 import { useLogger } from '@privateaim/server-kit';
-import { AnalysisPermissionEntity } from '../../../database/domains';
+import { AnalysisPermissionEntity } from '../../../database/domains/index.ts';
 
 export async function handleAuthupPolicyEvent(
     context: EventRecord<EntityType.POLICY, Policy>,

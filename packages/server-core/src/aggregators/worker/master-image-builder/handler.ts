@@ -16,7 +16,7 @@ import {
 } from '@privateaim/server-core-worker-kit';
 import type { ComponentHandlerContext } from '@privateaim/server-kit';
 import { isEventComponentCallerUsable, useEventComponentCaller } from '@privateaim/server-telemetry-kit';
-import { MasterImageEntity, useDataSourceSync } from '../../../database';
+import { MasterImageEntity, useDataSourceSync } from '../../../database/index.ts';
 
 export async function handleMasterImageBuilderEvent(
     value: MasterImageBuilderBasePayload,

@@ -17,25 +17,26 @@ import {
 import { mountErrorMiddleware, mountMiddlewares } from '@privateaim/server-http-kit';
 import type { MiddlewareSwaggerOptions } from '@privateaim/server-http-kit';
 import { Router } from 'routup';
-import { useEnv } from '../config';
-
-import { AnalysisController } from './controllers/analysis';
-import { AnalysisBucketController } from './controllers/analysis-bucket';
-import { AnalysisBucketFileController } from './controllers/analysis-bucket-file';
-import { AnalysisLogController } from './controllers/analysis-log';
-import { AnalysisNodeController } from './controllers/analysis-node';
-import { AnalysisNodeLogController } from './controllers/analysis-node-log';
-import { AnalysisPermissionController } from './controllers/analysis-permission';
-import { MasterImageController } from './controllers/master-image';
-import { MasterImageGroupController } from './controllers/master-image-group';
-import { NodeController } from './controllers/node';
-import { ProposalController } from './controllers/project';
-import { ProposalStationController } from './controllers/project-node';
-import { RegistryController } from './controllers/registry';
-import { RegistryProjectController } from './controllers/registry-project';
-import { RootController } from './controllers/root';
-import { ServiceController } from './controllers/service';
-import { AnalysisNodeEventController } from './controllers/analysis-node-event';
+import { useEnv } from '../config/index.ts';
+import {
+    AnalysisBucketController,
+    AnalysisBucketFileController,
+    AnalysisController,
+    AnalysisLogController,
+    AnalysisNodeController,
+    AnalysisNodeEventController,
+    AnalysisNodeLogController,
+    AnalysisPermissionController,
+    MasterImageController,
+    MasterImageGroupController,
+    NodeController,
+    ProposalController,
+    ProposalStationController,
+    RegistryController,
+    RegistryProjectController,
+    RootController,
+    ServiceController,
+} from './controllers/index.ts';
 
 export function createRouter() : Router {
     const router = new Router();
@@ -88,9 +89,8 @@ export function createRouter() : Router {
                 AnalysisNodeLogController,
                 AnalysisPermissionController,
 
+                // Workflows
                 RootController,
-
-                // Extra
                 ServiceController,
             ],
         },

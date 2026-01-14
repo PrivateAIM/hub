@@ -10,7 +10,7 @@ import { PermissionName } from '@privateaim/kit';
 import type { AuthupClient } from '@privateaim/server-kit';
 import { useAuthupClient, useLogger } from '@privateaim/server-kit';
 import { isClientErrorWithStatusCode } from 'hapic';
-import type { NodeEntity } from '../../database';
+import type { NodeEntity } from '../../database/index.ts';
 
 export class NodeClientService {
     protected authup : AuthupClient;

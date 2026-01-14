@@ -8,7 +8,7 @@
 import type { Registry, RegistryProject } from '@privateaim/core-kit';
 import type { ObjectLiteralKeys } from '@privateaim/kit';
 import type { ComponentData, ComponentMetadata } from '@privateaim/server-kit';
-import type { RegistryCommand } from './constants';
+import type { RegistryCommand } from './constants.ts';
 
 export type RegistrySetupPayload = {
     id: Registry['id']

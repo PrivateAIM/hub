@@ -20,9 +20,9 @@ import {
     AnalysisEntity,
     AnalysisNodeEntity, RegistryEntity,
     useDataSourceSync,
-} from '../../database';
-import { RequestRepositoryAdapter } from '../../http/request';
-import { type AnalysisMetadataComponentCaller, useAnalysisMetadataComponentCaller } from '../../components';
+} from '../../database/index.ts';
+import { RequestRepositoryAdapter } from '../../http/request/index.ts';
+import { type AnalysisMetadataComponentCaller, useAnalysisMetadataComponentCaller } from '../../components/index.ts';
 
 export class AnalysisDistributor {
     protected repository: Repository<AnalysisEntity>;

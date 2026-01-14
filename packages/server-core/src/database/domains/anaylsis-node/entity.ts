@@ -23,8 +23,8 @@ import type {
 } from '@privateaim/core-kit';
 import type { Realm } from '@authup/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
-import { AnalysisEntity } from '../analysis';
-import { NodeEntity } from '../node';
+import { AnalysisEntity } from '../analysis/index.ts';
+import { NodeEntity } from '../node/index.ts';
 
 @Unique(['node_id', 'analysis_id'])
 @Entity({ name: 'analysis_nodes' })

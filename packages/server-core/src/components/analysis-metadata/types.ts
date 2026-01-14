@@ -7,8 +7,8 @@
 
 import type { ObjectLiteralKeys } from '@privateaim/kit';
 import type { ComponentMetadata } from '@privateaim/server-kit';
-import type { AnalysisEntity } from '../../database';
-import type { AnalysisMetadataCommand, AnalysisMetadataEvent } from './constants';
+import type { Analysis } from '@privateaim/core-kit';
+import type { AnalysisMetadataCommand, AnalysisMetadataEvent } from './constants.ts';
 
 export type AnalysisMetadataRecalcPayload = {
     analysisId: string,
@@ -29,7 +29,7 @@ export type AnalysisMetadataRecalcPayload = {
     queryFiles?: boolean
 };
 
-export type AnalysisMetadataRecalcExecutedPayload = AnalysisEntity;
+export type AnalysisMetadataRecalcExecutedPayload = Analysis;
 
 export type AnalysisMetadataEventMap = ObjectLiteralKeys<{
     [AnalysisMetadataCommand.RECALC]: [AnalysisMetadataRecalcPayload, ComponentMetadata],

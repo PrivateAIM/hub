@@ -24,8 +24,8 @@ import {
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import type { Server as HTTPServer } from 'node:http';
 import type { Server } from 'socket.io';
-import { registerSocketControllers } from './register';
-import { useEnv } from '../config';
+import { registerSocketControllers } from './register.ts';
+import { useEnv } from '../config/index.ts';
 
 export function createSocketServer(
     httpServer: HTTPServer,

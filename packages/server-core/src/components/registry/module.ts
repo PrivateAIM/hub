@@ -6,7 +6,7 @@
  */
 
 import { BaseComponent } from '@privateaim/server-kit';
-import { RegistryCommand } from './constants';
+import { RegistryCommand } from './constants.ts';
 import {
     RegistryCleanupHandler,
     RegistryHookHandler,
@@ -14,8 +14,8 @@ import {
     RegistryProjectRelinkHandler,
     RegistryProjectUnlinkHandler,
     RegistrySetupHandler,
-} from './handlers';
-import type { RegistryEventMap } from './type';
+} from './handlers/index.ts';
+import type { RegistryEventMap } from './type.ts';
 
 export class RegistryComponent extends BaseComponent<RegistryEventMap> {
     constructor() {

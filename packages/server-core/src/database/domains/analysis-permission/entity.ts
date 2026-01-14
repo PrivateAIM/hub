@@ -19,7 +19,7 @@ import type {
     AnalysisPermission,
 } from '@privateaim/core-kit';
 import type { Permission, Policy, Realm } from '@authup/core-kit';
-import { AnalysisEntity } from '../analysis';
+import { AnalysisEntity } from '../analysis/index.ts';
 
 @Entity({ name: 'analysis_permissions' })
 export class AnalysisPermissionEntity implements AnalysisPermission {
@@ -29,10 +29,10 @@ export class AnalysisPermissionEntity implements AnalysisPermission {
     // ------------------------------------------------------------------
 
     @CreateDateColumn()
-        created_at: Date;
+        created_at: string;
 
     @UpdateDateColumn()
-        updated_at: Date;
+        updated_at: string;
 
     // ------------------------------------------------------------------
 

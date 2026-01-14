@@ -5,6 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './authup';
-export * from './harbor';
-export * from './utils';
+export * from './authup/index.ts';
+export * from './harbor/index.ts';
+export * from './utils/index.ts';

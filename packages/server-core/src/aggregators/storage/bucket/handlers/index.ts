@@ -5,5 +5,5 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './creation_finished';
-export * from './deletion_finished';
+export * from './creation_finished.ts';
+export * from './deletion_finished.ts';

@@ -19,8 +19,8 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 import type { Realm, Robot, User } from '@authup/core-kit';
-import { AnalysisEntity } from '../analysis/entity';
-import { AnalysisBucketEntity } from '../analysis-bucket/entity';
+import { AnalysisEntity } from '../analysis/entity.ts';
+import { AnalysisBucketEntity } from '../analysis-bucket/entity.ts';
 
 @Unique(['analysis_id', 'path'])
 @Entity({ name: 'analysis_bucket_files' })

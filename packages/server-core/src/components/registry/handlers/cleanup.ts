@@ -14,10 +14,10 @@ import type {
     ComponentHandler,
     ComponentHandlerContext,
 } from '@privateaim/server-kit';
-import { RegistryEntity, RegistryProjectEntity } from '../../../database';
-import { RegistryCommand } from '../constants';
-import type { RegistryCleanupPayload, RegistryEventMap } from '../type';
-import { createBasicHarborAPIClient } from './utils';
+import { RegistryEntity, RegistryProjectEntity } from '../../../database/index.ts';
+import { RegistryCommand } from '../constants.ts';
+import type { RegistryCleanupPayload, RegistryEventMap } from '../type.ts';
+import { createBasicHarborAPIClient } from './utils.ts';
 
 export class RegistryCleanupHandler implements ComponentHandler<
 RegistryEventMap,

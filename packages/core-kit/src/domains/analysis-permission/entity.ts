@@ -25,7 +25,7 @@ export interface AnalysisPermission extends PermissionRelation {
 
     // ------------------------------------------------------------------
 
-    created_at: Date | string;
+    created_at: string;
 
-    updated_at: Date | string;
+    updated_at: string;
 }

@@ -14,7 +14,7 @@ import {
 } from '@privateaim/core-kit';
 import { BaseSubscriber } from '@privateaim/server-db-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
-import { MasterImageEntity } from './entity';
+import { MasterImageEntity } from './entity.ts';
 
 @EventSubscriber()
 export class MasterImageSubscriber extends BaseSubscriber<

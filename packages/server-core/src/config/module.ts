@@ -25,13 +25,13 @@ import {
     StorageBucketAggregator,
     StorageBucketFileAggregator,
     createAuthupAggregator,
-} from '../aggregators';
+} from '../aggregators/index.ts';
 import {
     AnalysisMetadataTaskQueue,
     RegistryTaskQueueRouterRouting,
     useAnalysisMetadataComponent,
     useRegistryComponent,
-} from '../components';
+} from '../components/index.ts';
 import {
     configureAmqp,
     configureAuthup,
@@ -41,7 +41,7 @@ import {
     configureTelemetryClient,
     configureVault,
     setupLogging,
-} from './services';
+} from './services/index.ts';
 
 export type Config = {
     aggregators: Component[]

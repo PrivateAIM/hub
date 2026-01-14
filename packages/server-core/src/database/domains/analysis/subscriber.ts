@@ -14,10 +14,10 @@ import { AnalysisBucketType, DomainType, buildAnalysisBucketName } from '@privat
 import { BaseSubscriber } from '@privateaim/server-db-kit';
 import { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
-import { AnalysisMetadataCommand, useAnalysisMetadataComponentCaller } from '../../../components';
-import { AnalysisBucketEntity } from '../analysis-bucket';
-import { AnalysisEntity } from './entity';
-import { TaskType, useTaskManager } from '../../../domains';
+import { AnalysisMetadataCommand, useAnalysisMetadataComponentCaller } from '../../../components/index.ts';
+import { AnalysisBucketEntity } from '../analysis-bucket/index.ts';
+import { AnalysisEntity } from './entity.ts';
+import { TaskType, useTaskManager } from '../../../domains/index.ts';
 
 @EventSubscriber()
 export class AnalysisSubscriber extends BaseSubscriber<

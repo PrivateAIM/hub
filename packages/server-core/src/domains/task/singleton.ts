@@ -7,7 +7,7 @@
 
 import { Cache, TaskManager, createCacheAdapter } from '@privateaim/server-kit';
 import { singa } from 'singa';
-import type { TaskMap } from './types';
+import type { TaskMap } from './types.ts';
 
 const instance = singa<TaskManager<TaskMap>>({
     name: 'taskManager',

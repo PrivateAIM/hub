@@ -8,10 +8,10 @@
 import { buildRegistryClientConnectionStringFromRegistry } from '@privateaim/core-kit';
 import { useDataSource } from 'typeorm-extension';
 import { type ComponentHandler, useLogger } from '@privateaim/server-kit';
-import { RegistryEntity, RegistryProjectEntity, removeRegistryProjectFromVault } from '../../../../database';
-import { RegistryCommand } from '../../constants';
-import type { RegistryEventMap, RegistryProjectUnlinkPayload } from '../../type';
-import { createBasicHarborAPIClient } from '../utils';
+import { RegistryEntity, RegistryProjectEntity, removeRegistryProjectFromVault } from '../../../../database/index.ts';
+import { RegistryCommand } from '../../constants.ts';
+import type { RegistryEventMap, RegistryProjectUnlinkPayload } from '../../type.ts';
+import { createBasicHarborAPIClient } from '../utils.ts';
 
 export class RegistryProjectUnlinkHandler implements ComponentHandler<
 RegistryEventMap,

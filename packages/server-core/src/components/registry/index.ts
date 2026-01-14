@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './caller';
-export * from './handlers';
-export * from './module';
-export * from './constants';
-export * from './singleton';
-export * from './type';
+export * from './caller/index.ts';
+export * from './handlers/index.ts';
+export * from './module.ts';
+export * from './constants.ts';
+export * from './singleton.ts';
+export * from './type.ts';

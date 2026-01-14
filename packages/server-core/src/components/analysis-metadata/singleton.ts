@@ -6,7 +6,7 @@
  */
 
 import { singa } from 'singa';
-import { AnalysisMetadataComponent } from './module';
+import { AnalysisMetadataComponent } from './module.ts';
 
 const instance = singa<AnalysisMetadataComponent>({
     name: 'analysisMetadataComponent',

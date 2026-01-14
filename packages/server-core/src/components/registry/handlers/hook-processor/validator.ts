@@ -14,7 +14,7 @@ import type {
     RegistryHookEventData,
     RegistryHookRepository,
     RegistryHookResource,
-} from './types';
+} from './types.ts';
 
 class RegistryHookResourceValidator extends Container<RegistryHookResource> {
     protected initialize() {

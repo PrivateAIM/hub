@@ -7,10 +7,10 @@
 import type { ComponentHandlerContext } from '@privateaim/server-kit';
 import { useLogger } from '@privateaim/server-kit';
 import type { BucketComponentEventMap, BucketEvent } from '@privateaim/server-storage-kit';
-import type { Bucket } from '@privateaim/storage-kit/src';
-import { AnalysisBucketEntity, AnalysisEntity, useDataSourceSync } from '../../../../database';
-import { TaskType } from '../../../../domains';
-import { BaseAggregatorHandler } from '../../../base';
+import type { Bucket } from '@privateaim/storage-kit';
+import { AnalysisBucketEntity, AnalysisEntity, useDataSourceSync } from '../../../../database/index.ts';
+import { TaskType } from '../../../../domains/index.ts';
+import { BaseAggregatorHandler } from '../../../base.ts';
 
 export class StorageBucketCreationFinishedHandler extends BaseAggregatorHandler<
 BucketComponentEventMap,

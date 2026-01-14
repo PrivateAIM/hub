@@ -5,6 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './relink';
-export * from './link';
-export * from './unlink';
+export * from './relink.ts';
+export * from './link.ts';
+export * from './unlink.ts';

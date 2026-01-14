@@ -13,8 +13,8 @@ import type {
     Node, Project, ProjectNode, ProjectNodeApprovalStatus,
 } from '@privateaim/core-kit';
 import type { Realm } from '@authup/core-kit';
-import { ProjectEntity } from '../project/entity';
-import { NodeEntity } from '../node/entity';
+import { ProjectEntity } from '../project/entity.ts';
+import { NodeEntity } from '../node/entity.ts';
 
 @Unique(['project_id', 'node_id'])
 @Entity({ name: 'project_nodes' })

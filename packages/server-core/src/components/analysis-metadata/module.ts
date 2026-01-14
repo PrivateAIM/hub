@@ -8,9 +8,9 @@
 import {
     BaseComponent,
 } from '@privateaim/server-kit';
-import { AnalysisMetadataCommand } from './constants';
-import { AnalysisMetadataRecalcHandler } from './handlers';
-import type { AnalysisMetadataEventMap } from './types';
+import { AnalysisMetadataCommand } from './constants.ts';
+import { AnalysisMetadataRecalcHandler } from './handlers/index.ts';
+import type { AnalysisMetadataEventMap } from './types.ts';
 
 export class AnalysisMetadataComponent extends BaseComponent<AnalysisMetadataEventMap> {
     constructor() {

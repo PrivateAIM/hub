@@ -25,9 +25,9 @@ import {
 } from 'typeorm';
 import { deserialize, serialize } from '@authup/kit';
 import { ProcessStatus } from '@privateaim/kit';
-import { MasterImageEntity } from '../master-image/entity';
-import { ProjectEntity } from '../project/entity';
-import { RegistryEntity } from '../registry/entity';
+import { MasterImageEntity } from '../master-image/entity.ts';
+import { ProjectEntity } from '../project/entity.ts';
+import { RegistryEntity } from '../registry/entity.ts';
 
 @Entity()
 export class AnalysisEntity implements Analysis {

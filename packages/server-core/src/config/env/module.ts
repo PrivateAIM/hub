@@ -15,8 +15,8 @@ import {
     readInt,
 } from 'envix';
 import { config } from 'dotenv';
-import { EnvironmentDefaults, EnvironmentInputKey } from './constants';
-import type { Environment } from './types';
+import { EnvironmentDefaults, EnvironmentInputKey } from './constants.ts';
+import type { Environment } from './types.ts';
 
 config({
     debug: false,

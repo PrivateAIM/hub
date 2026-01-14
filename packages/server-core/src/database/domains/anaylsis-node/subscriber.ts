@@ -20,8 +20,8 @@ import { DomainEventNamespace } from '@privateaim/kit';
 import {
     AnalysisMetadataCommand,
     useAnalysisMetadataComponentCaller,
-} from '../../../components';
-import { AnalysisNodeEntity } from './entity';
+} from '../../../components/index.ts';
+import { AnalysisNodeEntity } from './entity.ts';
 
 @EventSubscriber()
 export class AnalysisNodeSubscriber extends BaseSubscriber<

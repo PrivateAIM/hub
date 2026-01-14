@@ -18,8 +18,8 @@ import {
     registerProjectNodeSocketHandlers,
     registerProjectSocketHandlers,
     registerRegistryProjectSocketHandlers,
-} from './controllers';
-import type { Namespace } from './types';
+} from './controllers/index.ts';
+import type { Namespace } from './types.ts';
 
 export function registerSocketControllers(nsp: Namespace) {
     nsp.on('connection', (socket) => {

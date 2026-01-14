@@ -10,7 +10,7 @@ import {
     dropDatabase,
 } from 'typeorm-extension';
 import { useLogger } from '@privateaim/server-kit';
-import { buildDataSourceOptions } from '../../database';
+import { buildDataSourceOptions } from '../../database/index.ts';
 
 interface ResetArguments extends Arguments {
 
