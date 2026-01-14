@@ -25,6 +25,7 @@ updates:
               exclude-patterns:
                   - "prom-client"
                   - "nanoid"
+                  - "rapiq"
               update-types:
                   - "major"
           majorDev:
