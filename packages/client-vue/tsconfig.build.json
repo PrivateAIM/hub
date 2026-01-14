@@ -2,14 +2,13 @@
     "extends": "../../tsconfig.build.json",
 
     "compilerOptions": {
-        "outDir": "./dist"
+        "outDir": "./dist",
+
+        "isolatedModules": true,
+        "skipLibCheck": true
     },
-    "exclude": [
-        "node_modules",
-        "dist"
-    ],
     "include": [
-        "types/**/*.d.ts",
-        "src/**/*.ts"
+        "./src/**/*.{vue.ts}",
+        "./types/*.d.ts"
     ]
 }

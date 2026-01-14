@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Directives } from 'bootstrap-vue-next';
+import { vBTooltip } from 'bootstrap-vue-next';
 import { isObject } from 'smob';
 import { h, resolveDynamicComponent, withDirectives } from 'vue';
 import type {
@@ -95,7 +95,7 @@ export function renderActionCommand(ctx: Context) : VNodeChild {
             vNode,
             [
                 [
-                    Directives.vBTooltip,
+                    vBTooltip,
                     ctx.commandTooltip,
                     undefined,
                     {

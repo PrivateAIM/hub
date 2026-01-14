@@ -1,13 +1,6 @@
 {
     "extends": "../../tsconfig.json",
     "compilerOptions": {
-        "esModuleInterop": true,
-        "lib": [
-            "ESNext",
-            "DOM",
-            "DOM.Iterable"
-        ],
-        "strict": true,
         "paths": {
             "@privateaim/kit": ["./packages/kit/src"],
             "@privateaim/core-kit": ["./packages/core-kit/src"],
