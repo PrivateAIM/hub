@@ -26,11 +26,11 @@
         "build-watch": "rimraf ./dist && tsc -p tsconfig.build.json --watch"
     },
     "devDependencies": {
-        "@authup/kit": "^1.0.0-beta.27",
+        "@authup/kit": "^1.0.0-beta.28",
         "@authup/core-kit": "^1.0.0-beta.27"
     },
     "peerDependencies": {
-        "@authup/kit": "^1.0.0-beta.27",
+        "@authup/kit": "^1.0.0-beta.28",
         "@authup/core-kit": "^1.0.0-beta.27"
     },
     "dependencies": {
