@@ -23,7 +23,7 @@
     "dependencies": {
         "@authup/core-http-kit": "^1.0.0-beta.27",
         "@ebec/http": "^2.3.0",
-        "@hapic/harbor": "^2.5.4",
+        "@hapic/harbor": "^2.5.5",
         "@privateaim/core-kit": "^0.8.21",
         "@privateaim/kit": "^0.8.21",
         "@privateaim/core-http-kit": "^0.8.21",
@@ -49,7 +49,7 @@
         "tar-stream": "^3.1.6",
         "uuid": "^11.1.0",
         "validup": "^0.1.9",
-        "zod": "^4.2.1"
+        "zod": "^4.3.5"
     },
     "devDependencies": {
         "@types/dockerode": "^3.3.47",

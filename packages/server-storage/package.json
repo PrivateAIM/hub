@@ -13,7 +13,7 @@
         "@authup/kit": "^1.0.0-beta.27",
         "@authup/core-kit": "^1.0.0-beta.27",
         "@ebec/http": "^2.3.0",
-        "@hapic/vault": "^2.3.9",
+        "@hapic/vault": "^2.3.10",
         "@privateaim/kit": "^0.8.21",
         "@privateaim/server-kit": "^0.8.21",
         "@privateaim/server-db-kit": "^0.8.21",
@@ -41,14 +41,14 @@
         "typeorm": "^0.3.28",
         "typeorm-extension": "^3.7.3",
         "validup": "^0.1.9",
-        "zod": "^4.2.1"
+        "zod": "^4.3.5"
     },
     "devDependencies": {
         "@types/busboy": "^1.5.3",
         "@types/cors": "^2.8.19",
         "@types/supertest": "^6.0.3",
         "@types/tar-stream": "^3.1.4",
-        "testcontainers": "^11.10.0"
+        "testcontainers": "^11.11.0"
     },
     "scripts": {
         "dev": "ts-node src/index.ts",

@@ -16,8 +16,8 @@
         "@authup/core-http-kit": "^1.0.0-beta.27",
         "@authup/server-adapter-http": "^1.0.0-beta.27",
         "@ebec/http": "^2.3.0",
-        "@hapic/harbor": "^2.5.4",
-        "@hapic/vault": "^2.3.9",
+        "@hapic/harbor": "^2.5.5",
+        "@hapic/vault": "^2.3.10",
         "@privateaim/core-kit": "^0.8.21",
         "@privateaim/core-realtime-kit": "^0.7.22",
         "@privateaim/kit": "^0.8.21",
@@ -56,13 +56,13 @@
         "reflect-metadata": "^0.2.2",
         "routup": "^4.0.2",
         "singa": "^1.1.0",
-        "socket.io": "^4.8.2",
+        "socket.io": "^4.8.3",
         "smob": "^1.5.0",
         "typeorm": "^0.3.28",
         "typeorm-extension": "^3.7.3",
         "validup": "^0.1.9",
         "yargs": "^17.7.1",
-        "zod": "^4.2.1"
+        "zod": "^4.3.5"
     },
     "devDependencies": {
         "@privateaim/core-http-kit": "^0.8.21",
@@ -71,11 +71,11 @@
         "@types/module-alias": "^2.0.4",
         "@types/supertest": "^6.0.3",
         "@types/yargs": "^17.0.32",
-        "better-sqlite3": "^12.5.0",
+        "better-sqlite3": "^12.6.0",
         "cross-env": "^10.1.0",
-        "supertest": "^7.1.4",
+        "supertest": "^7.2.2",
         "ts-node": "^10.9.2",
-        "testcontainers": "^11.10.0"
+        "testcontainers": "^11.11.0"
     },
     "scripts": {
         "dev": "npm run cli -- start",
