@@ -8,7 +8,7 @@
 import { LoggerConsoleTransport, createLogger, setLoggerFactory } from '@privateaim/server-kit';
 import { LoggerTransport } from '@privateaim/server-telemetry-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
-import { LogComponentWriteHandler } from '../../components/log/handlers';
+import { LogComponentWriteHandler } from '../../components/log/handlers/index.ts';
 
 export function setupLogging(): void {
     setLoggerFactory(() => {

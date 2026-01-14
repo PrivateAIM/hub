@@ -7,9 +7,9 @@
 
 import type { Factory } from 'singa';
 import { singa } from 'singa';
-import type { LogStore } from './types';
-import { MemoryLogStore, VictoriaLogsLogStore } from './entities';
-import { isVictoriaLogsClientUsable, useVictoriaLogsClient } from '../victoria-logs';
+import type { LogStore } from './types.ts';
+import { MemoryLogStore, VictoriaLogsLogStore } from './entities/index.ts';
+import { isVictoriaLogsClientUsable, useVictoriaLogsClient } from '../victoria-logs/index.ts';
 
 const instance = singa<LogStore>({
     name: 'logStore',

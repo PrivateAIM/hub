@@ -11,7 +11,7 @@ import { useRequestQuery } from '@routup/basic/query';
 import type { Request, Response } from 'routup';
 import { sendAccepted } from 'routup';
 import { useRequestPermissionChecker } from '@privateaim/server-http-kit';
-import { useLogStore } from '../../../../services';
+import { useLogStore } from '../../../../services/index.ts';
 
 export async function deleteManyLogRouteHandler(req: Request, res: Response) : Promise<any> {
     const permissionChecker = useRequestPermissionChecker(req);

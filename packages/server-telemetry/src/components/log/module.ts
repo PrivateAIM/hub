@@ -9,7 +9,7 @@ import {
     BaseComponent,
 } from '@privateaim/server-kit';
 import { LogCommand } from '@privateaim/server-telemetry-kit';
-import { LogComponentWriteHandler } from './handlers';
+import { LogComponentWriteHandler } from './handlers/index.ts';
 
 export class LogComponent extends BaseComponent {
     constructor() {

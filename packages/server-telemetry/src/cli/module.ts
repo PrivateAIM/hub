@@ -11,7 +11,7 @@ import path from 'node:path';
 import process from 'node:process';
 import {
     defineCLIStartCommand,
-} from './commands';
+} from './commands/index.ts';
 
 export async function createCLIEntryPointCommand() {
     const pkgRaw = await fs.promises.readFile(

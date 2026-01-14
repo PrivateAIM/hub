@@ -5,7 +5,8 @@
         "outDir": "./dist",
         "resolveJsonModule": true,
         "strictPropertyInitialization": false,
-        "rewriteRelativeImportExtensions": true
+        "rewriteRelativeImportExtensions": true,
+        "allowImportingTsExtensions": true
     },
 
     "include": [

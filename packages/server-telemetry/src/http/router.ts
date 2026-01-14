@@ -20,8 +20,8 @@ import {
     useVaultClient,
 } from '@privateaim/server-kit';
 import { Router, coreHandler } from 'routup';
-import { useEnv } from '../config';
-import { EventController, LogController } from './controllers';
+import { useEnv } from '../config/index.ts';
+import { EventController, LogController } from './controllers/index.ts';
 
 export function createHTTPRouter() : Router {
     const router = new Router();

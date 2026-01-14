@@ -13,7 +13,7 @@ import {
     configureVault,
     configureVictoriaLogs,
     setupLogging,
-} from './services';
+} from './services/index.ts';
 
 export function configure() {
     configureVictoriaLogs();

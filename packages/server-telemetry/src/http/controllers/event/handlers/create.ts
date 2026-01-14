@@ -17,7 +17,7 @@ import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { EventValidator } from '@privateaim/telemetry-kit';
 import {
     EventEntity,
-} from '../../../../database';
+} from '../../../../database/index.ts';
 
 export async function createEventRouteHandler(req: Request, res: Response) : Promise<any> {
     const permissionChecker = useRequestPermissionChecker(req);

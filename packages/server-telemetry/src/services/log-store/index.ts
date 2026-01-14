@@ -5,6 +5,6 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-export * from './entities';
-export * from './singleton';
-export * from './types';
+export * from './entities/index.ts';
+export * from './singleton.ts';
+export * from './types.ts';

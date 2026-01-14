@@ -15,7 +15,7 @@ import {
     useDataSource,
 } from 'typeorm-extension';
 import { NotFoundError } from '@ebec/http';
-import { EventEntity } from '../../../../database';
+import { EventEntity } from '../../../../database/index.ts';
 
 export async function getOneEventLogRouteHandler(req: Request, res: Response) : Promise<any> {
     const permissionChecker = useRequestPermissionChecker(req);

@@ -5,5 +5,5 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './router';
-export * from './server';
+export * from './router.ts';
+export * from './server.ts';

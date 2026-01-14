@@ -11,7 +11,7 @@ import {
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useRequestPermissionChecker } from '@privateaim/server-http-kit';
-import { LogComponentWriteHandler } from '../../../../components/log/handlers';
+import { LogComponentWriteHandler } from '../../../../components/log/handlers/index.ts';
 
 export async function createLogRouteHandler(req: Request, res: Response) : Promise<any> {
     const permissionChecker = useRequestPermissionChecker(req);

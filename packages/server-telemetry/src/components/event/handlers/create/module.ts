@@ -16,7 +16,7 @@ import type {
 import {
     EventCommand, EventEvent,
 } from '@privateaim/server-telemetry-kit';
-import { EventEntity } from '../../../../database';
+import { EventEntity } from '../../../../database/index.ts';
 
 export class EventComponentCreateHandler implements ComponentHandler<
 EventComponentEventMap,

@@ -12,7 +12,7 @@ import { useRequestQuery } from '@routup/basic/query';
 import { parseQueryPagination } from 'rapiq';
 import type { Request, Response } from 'routup';
 import { send } from 'routup';
-import { useLogStore } from '../../../../services';
+import { useLogStore } from '../../../../services/index.ts';
 
 export async function getManyLogLogRouteHandler(req: Request, res: Response) : Promise<any> {
     const permissionChecker = useRequestPermissionChecker(req);
