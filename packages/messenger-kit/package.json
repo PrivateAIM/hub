@@ -30,7 +30,7 @@
     "dependencies": {
         "@validup/adapter-zod": "^0.1.12",
         "validup": "^0.1.9",
-        "zod": "^4.2.1"
+        "zod": "^4.3.5"
     },
     "devDependencies": {
         "@privateaim/core-kit": "^0.8.21"
