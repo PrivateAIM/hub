@@ -13,7 +13,8 @@ import {
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import type { Client as RedisClient } from 'redis-extension';
 import type { TokenCreatorOptions } from '@authup/core-http-kit';
-import type { TokenVerifierRedisCacheOptions } from '@authup/server-adapter-kit';
+import type { ITokenVerifierCache } from '@authup/server-adapter-kit';
+import { MemoryTokenVerifierCache, RedisTokenVerifierCache, TokenVerifier } from '@authup/server-adapter-kit';
 import { createMiddleware } from '@authup/server-adapter-socket-io';
 import type {
     Middleware, Namespace, Server, Socket,
@@ -65,20 +66,19 @@ export function createAuthupMiddleware(
         };
     }
 
-    let tokenCache : TokenVerifierRedisCacheOptions | undefined;
+    let cache : ITokenVerifierCache;
     if (redis) {
-        tokenCache = {
-            type: 'redis',
-            client: redis,
-        };
+        cache = new RedisTokenVerifierCache(redis);
+    } else {
+        cache = new MemoryTokenVerifierCache();
     }
 
     return createMiddleware({
-        tokenVerifier: {
+        tokenVerifier: new TokenVerifier({
             baseURL,
             creator: tokenCreator,
-            cache: tokenCache,
-        },
+            cache,
+        }),
         tokenVerifierHandler: (
             socket: Socket,
             data,

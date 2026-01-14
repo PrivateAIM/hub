@@ -2,21 +2,7 @@
     "extends": "../../tsconfig.build.json",
 
     "compilerOptions": {
-        "outDir": "./dist",
-        "lib": [
-            "dom",
-            "ESNext"
-        ],
-        "importHelpers": true,
-        "allowSyntheticDefaultImports": true,
-        "sourceMap": false,
-        "module": "ESNext",
-        "jsx": "preserve",
-
-        "declaration": true,
-        "declarationDir": "dist",
-        "isolatedModules": true,
-        "noEmitOnError": false
+        "outDir": "./dist"
     },
     "exclude": [
         "node_modules",

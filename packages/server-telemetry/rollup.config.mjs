@@ -10,25 +10,38 @@ import fs from 'node:fs';
 import { createConfig } from '../../rollup.config.mjs';
 
 const entrypoint = createConfig({
-    pkg: JSON.parse(fs.readFileSync(new URL('./package.json', import.meta.url), {encoding: 'utf-8'})),
+    pkg: JSON.parse(fs.readFileSync(new URL('./package.json', import.meta.url), { encoding: 'utf-8' })),
 });
 
 const entrypoints = [
-    entrypoint,
+    {
+        ...entrypoint,
+        external: [
+            'body-parser',
+            'qs',
+            'ioredis',
+            'winston',
+            'winston-transport',
+        ],
+    },
     {
         ...entrypoint,
         input: 'src/cli/index.ts',
         external: [
             ...entrypoint.external,
-            'qs'
+            'body-parser',
+            'qs',
+            'ioredis',
+            'winston',
+            'winston-transport',
         ],
         output: [
             {
-                format: 'cjs',
-                file: 'dist/cli/index.js'
-            }
-        ]
-    }
-]
+                format: 'mjs',
+                file: 'dist/cli/index.mjs',
+            },
+        ],
+    },
+];
 
 export default entrypoints;

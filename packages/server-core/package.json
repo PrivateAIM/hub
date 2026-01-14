@@ -1,5 +1,6 @@
 {
     "name": "@privateaim/server-core",
+    "type": "module",
     "private": true,
     "author": {
         "name": "Peter Placzek",
@@ -11,10 +12,10 @@
     "description": "This package contains the server core service.",
     "main": "./dist/cli/index.js",
     "dependencies": {
-        "@authup/kit": "^1.0.0-beta.27",
-        "@authup/core-kit": "^1.0.0-beta.27",
-        "@authup/core-http-kit": "^1.0.0-beta.27",
-        "@authup/server-adapter-http": "^1.0.0-beta.27",
+        "@authup/kit": "^1.0.0-beta.28",
+        "@authup/core-kit": "^1.0.0-beta.28",
+        "@authup/core-http-kit": "^1.0.0-beta.28",
+        "@authup/server-adapter-http": "^1.0.0-beta.28",
         "@ebec/http": "^2.3.0",
         "@hapic/harbor": "^2.5.4",
         "@hapic/vault": "^2.3.9",

@@ -1,6 +1,9 @@
 {
     "name": "@privateaim/server-kit",
+    "type": "module",
     "version": "0.8.21",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
     "exports": {
         "./package.json": "./package.json",
         ".": {
@@ -9,9 +12,6 @@
             "require": "./dist/index.cjs"
         }
     },
-    "main": "./dist/index.cjs",
-    "module": "./dist/index.mjs",
-    "types": "./dist/index.d.ts",
     "author": {
         "name": "Peter Placzek",
         "email": "contact@tada5hi.net",
@@ -28,7 +28,7 @@
     },
     "dependencies": {
         "@ebec/http": "^2.3.0",
-        "@isaacs/ttlcache": "^1.4.1",
+        "@isaacs/ttlcache": "^2.1.4",
         "@privateaim/kit": "^0.8.21",
         "@socket.io/redis-emitter": "^5.1.0",
         "envix": "^1.5.0",
@@ -39,14 +39,14 @@
         "winston-transport": "^4.9.0"
     },
     "devDependencies": {
-        "@authup/core-http-kit": "^1.0.0-beta.27",
+        "@authup/core-http-kit": "^1.0.0-beta.28",
         "@hapic/vault": "^2.3.9",
         "amqp-extension": "^4.0.0",
         "redis-extension": "^2.0.4",
         "typeorm-extension": "^3.7.2"
     },
     "peerDependencies": {
-        "@authup/core-http-kit": "^1.0.0-beta.27",
+        "@authup/core-http-kit": "^1.0.0-beta.28",
         "@hapic/vault": "^2.3.9",
         "amqp-extension": "^4.0.0",
         "redis-extension": "^2.0.4",

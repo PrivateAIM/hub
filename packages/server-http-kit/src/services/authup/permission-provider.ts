@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { PermissionGetOptions, PermissionItem, PermissionProvider } from '@authup/access';
+import type { IPermissionProvider, PermissionGetOptions, PermissionItem } from '@authup/access';
 
-export class FakePermissionProvider implements PermissionProvider {
+export class FakePermissionProvider implements IPermissionProvider {
     async get(criteria: PermissionGetOptions): Promise<PermissionItem | undefined> {
         return {
             name: criteria.name,

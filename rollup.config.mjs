@@ -6,30 +6,14 @@
  */
 
 import resolve from '@rollup/plugin-node-resolve';
-
-import { merge } from 'smob';
-
+import commonjs from '@rollup/plugin-commonjs';
+import esmShim from '@rollup/plugin-esm-shim';
 import { builtinModules } from 'node:module';
-import { transform } from "@swc/core";
+import swc from 'unplugin-swc';
 
 const extensions = [
-    '.js', '.mjs', '.cjs', '.ts', '.vue'
+    '.js', '.mjs', '.cjs', '.ts', '.vue',
 ];
-
-const swcOptions = {
-    jsc: {
-        target: 'es2020',
-        parser: {
-            syntax: 'typescript',
-            decorators: true
-        },
-        transform: {
-            decoratorMetadata: true,
-            legacyDecorator: true
-        }
-    },
-    sourceMaps: true
-}
 
 export function createConfig(
     {
@@ -37,9 +21,7 @@ export function createConfig(
         pluginsPre = [],
         pluginsPost = [],
         external = [],
-        defaultExport = false,
-        swc = {}
-    }
+    },
 ) {
     external = Object.keys(pkg.dependencies || {})
         .concat(Object.keys(pkg.peerDependencies || {}))
@@ -51,33 +33,24 @@ export function createConfig(
         external,
         output: [
             {
-                format: 'cjs',
-                file: pkg.main,
-                exports: 'named',
-                ...(defaultExport ? { footer: 'module.exports = Object.assign(exports.default, exports);' } : {}),
-                sourcemap: true
-            },
-            {
                 format: 'es',
                 file: pkg.module,
-                sourcemap: true
-            }
+                sourcemap: true,
+            },
         ],
         plugins: [
             ...pluginsPre,
 
+            commonjs(),
             // Allows node_modules resolution
             resolve({ extensions }),
 
-            ...pluginsPost,
+            esmShim(),
 
             // Compile TypeScript/JavaScript files
-            {
-                name: 'swc',
-                transform(code) {
-                    return transform(code, merge({}, swc, swcOptions));
-                }
-            },
-        ]
+            swc.rollup(),
+
+            ...pluginsPost,
+        ],
     };
 }

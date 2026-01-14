@@ -1,8 +1,11 @@
 {
     "name": "@privateaim/server-core-worker-kit",
+    "type": "module",
     "version": "0.7.22",
     "license": "Apache-2.0",
     "description": "",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
     "exports": {
         "./package.json": "./package.json",
         ".": {
@@ -11,9 +14,6 @@
             "require": "./dist/index.cjs"
         }
     },
-    "main": "./dist/index.cjs",
-    "module": "./dist/index.mjs",
-    "types": "./dist/index.d.ts",
     "author": {
         "name": "Peter Placzek",
         "email": "admin@tada5hi.net",

@@ -1,19 +1,18 @@
 {
     "name": "@privateaim/messenger-kit",
+    "type": "module",
     "version": "0.7.22",
     "license": "Apache-2.0",
     "description": "",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
     "exports": {
         "./package.json": "./package.json",
         ".": {
             "types": "./dist/index.d.ts",
-            "import": "./dist/index.mjs",
-            "require": "./dist/index.cjs"
+            "import": "./dist/index.mjs"
         }
     },
-    "main": "./dist/index.cjs",
-    "module": "./dist/index.mjs",
-    "types": "./dist/index.d.ts",
     "author": {
         "name": "Peter Placzek",
         "email": "admin@tada5hi.net",
