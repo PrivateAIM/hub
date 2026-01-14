@@ -5,5 +5,5 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './domains';
-export * from './options';
+export * from './domains/index.ts';
+export * from './options.ts';

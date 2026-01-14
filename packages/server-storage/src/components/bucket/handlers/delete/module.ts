@@ -16,9 +16,9 @@ import {
 import { DomainType } from '@privateaim/storage-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import { useDataSource } from 'typeorm-extension';
-import { useMinio } from '../../../../core';
-import { BucketEntity } from '../../../../database';
-import { toBucketName } from '../../../../domains';
+import { useMinio } from '../../../../core/index.ts';
+import { BucketEntity } from '../../../../database/index.ts';
+import { toBucketName } from '../../../../domains/index.ts';
 
 export class BucketDeleteHandler implements ComponentHandler<
 BucketComponentEventMap,

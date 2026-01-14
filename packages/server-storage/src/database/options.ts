@@ -8,13 +8,13 @@
 import { EnvironmentName } from '@privateaim/server-kit';
 import type { DataSourceOptions } from 'typeorm';
 import { readDataSourceOptionsFromEnv } from 'typeorm-extension';
-import { useEnv } from '../config';
+import { useEnv } from '../config/index.ts';
 import {
     BucketEntity,
     BucketFileEntity,
     BucketFileSubscriber,
     BucketSubscriber,
-} from './domains';
+} from './domains/index.ts';
 
 export async function extendDataSourceOptions(options: DataSourceOptions): Promise<DataSourceOptions> {
     options = {

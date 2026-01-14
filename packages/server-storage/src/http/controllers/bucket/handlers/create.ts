@@ -18,8 +18,8 @@ import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { DirectComponentCaller } from '@privateaim/server-kit';
 import { BucketCommand } from '@privateaim/server-storage-kit';
-import { BucketValidator } from '../utils/validation';
-import { useBucketComponent } from '../../../../components';
+import { BucketValidator } from '../utils/validation.ts';
+import { useBucketComponent } from '../../../../components/index.ts';
 
 export async function executeBucketRouteCreateHandler(req: Request, res: Response) : Promise<any> {
     const permissionChecker = useRequestPermissionChecker(req);

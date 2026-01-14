@@ -6,7 +6,7 @@
  */
 
 import { singa } from 'singa';
-import { BucketComponent } from './module';
+import { BucketComponent } from './module.ts';
 
 const instance = singa<BucketComponent>({
     name: 'bucket',

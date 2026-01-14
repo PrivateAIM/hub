@@ -5,5 +5,5 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './minio';
-export * from './utils';
+export * from './minio/index.ts';
+export * from './utils/index.ts';

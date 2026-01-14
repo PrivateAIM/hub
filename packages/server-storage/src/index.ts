@@ -12,12 +12,12 @@ import { config } from 'dotenv';
 import path from 'node:path';
 import process from 'node:process';
 import { BucketEventQueueRouterRouting, BucketTaskQueueRouterRouting } from '@privateaim/server-storage-kit';
-import { useBucketComponent } from './components';
-import { configure, useEnv } from './config';
-import { setupDatabase } from './config/services';
+import { useBucketComponent } from './components/index.ts';
+import { configure, useEnv } from './config/index.ts';
+import { setupDatabase } from './config/services/index.ts';
 import {
     createHttpServer,
-} from './http';
+} from './http/index.ts';
 
 (async () => {
     config();

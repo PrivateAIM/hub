@@ -10,7 +10,7 @@ import {
     DBody, DController, DDelete, DGet, DPath, DPost, DRequest, DResponse, DTags,
 } from '@routup/decorators';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
-import type { BucketFileEntity } from '../../../database';
+import type { BucketFileEntity } from '../../../database/index.ts';
 import {
     executeBucketRouteCreateHandler,
     executeBucketRouteDeleteHandler,
@@ -19,7 +19,7 @@ import {
     executeBucketRouteStreamHandler,
     executeBucketRouteUpdateHandler,
     executeBucketRouteUploadHandler,
-} from './handlers';
+} from './handlers/index.ts';
 
 type BucketCreate = Pick<Bucket, 'name' | 'region'>;
 type BucketUpdate = BucketCreate;

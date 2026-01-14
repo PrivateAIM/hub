@@ -9,13 +9,13 @@ import {
     DController, DDelete, DGet, DPath, DRequest, DResponse, DTags,
 } from '@routup/decorators';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
-import type { BucketFileEntity } from '../../../database';
+import type { BucketFileEntity } from '../../../database/index.ts';
 import {
     executeBucketFileRouteDeleteHandler,
     executeBucketFileRouteGetManyHandler,
     executeBucketFileRouteGetOneHandler,
     executeBucketFileRouteStreamHandler,
-} from './handlers';
+} from './handlers/index.ts';
 
 type PartialBucketFile = Partial<BucketFileEntity>;
 
