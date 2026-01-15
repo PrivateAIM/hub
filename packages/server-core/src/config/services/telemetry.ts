@@ -10,8 +10,8 @@ import {
     useLogger,
 } from '@privateaim/server-kit';
 import { APIClient } from '@privateaim/telemetry-kit';
-import { setTelemetryClientFactory } from '../../services';
-import { useEnv } from '../env';
+import { setTelemetryClientFactory } from '../../services/index.ts';
+import { useEnv } from '../env/index.ts';
 
 export function configureTelemetryClient() {
     const baseURL = useEnv('telemetryURL');

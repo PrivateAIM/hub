@@ -1,7 +1,17 @@
 {
     "name": "@privateaim/server-core-worker",
+    "type": "module",
     "version": "0.8.21",
     "private": true,
+    "module": "dist/index.mjs",
+    "types": "dist/index.d.ts",
+    "exports": {
+        "./package.json": "./package.json",
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.mjs"
+        }
+    },
     "author": {
         "name": "Peter Placzek",
         "email": "tadashi@animesu.net",
@@ -9,19 +19,20 @@
     },
     "license": "Apache-2.0",
     "description": "This project contains the core worker service.",
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
+
     "scripts": {
         "lint": "eslint --ext .ts src/",
         "lint:fix": "npm run lint -- --fix",
         "start": "node dist/start.js",
         "dev": "ts-node src/start.ts",
-        "build": "rimraf ./dist && tsc -p tsconfig.build.json",
-        "test": "cross-env NODE_ENV=test jest --config ./test/jest.config.js",
-        "test:coverage": "npm run test -- --coverage"
+        "build:types": "tsc --emitDeclarationOnly -p tsconfig.build.json",
+        "build:js": "rollup -c",
+        "build": "rimraf ./dist && cross-env NODE_ENV=production npm run build:js && npm run build:types",
+        "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts",
+        "test:coverage": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts --coverage"
     },
     "dependencies": {
-        "@authup/core-http-kit": "^1.0.0-beta.27",
+        "@authup/core-http-kit": "^1.0.0-beta.28",
         "@ebec/http": "^2.3.0",
         "@hapic/harbor": "^2.5.4",
         "@privateaim/core-kit": "^0.8.21",
@@ -56,7 +67,8 @@
         "@types/tar-fs": "^2.0.4",
         "@types/tar-stream": "^3.1.4",
         "@types/uuid": "^10.0.0",
-        "ts-node": "^10.9.2"
+        "ts-node": "^10.9.2",
+        "vitest": "^4.0.14"
     },
     "publishConfig": {
         "access": "public"

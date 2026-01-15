@@ -18,12 +18,12 @@ import {
     useRequestIdentityRealm,
     useRequestPermissionChecker,
 } from '@privateaim/server-http-kit';
-import { useMinio } from '../../../../core';
-import { BucketEntity } from '../../../../database';
+import { useMinio } from '../../../../core/index.ts';
+import { BucketEntity } from '../../../../database/index.ts';
 import {
     isBucketOwnedByIdentity, toBucketName,
-} from '../../../../domains';
-import { BucketValidator } from '../utils/validation';
+} from '../../../../domains/index.ts';
+import { BucketValidator } from '../utils/validation.ts';
 
 export async function executeBucketRouteUpdateHandler(req: Request, res: Response) : Promise<any> {
     const validator = new BucketValidator();

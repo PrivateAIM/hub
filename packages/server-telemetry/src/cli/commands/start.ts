@@ -16,12 +16,12 @@ import {
     EventTaskQueueRouterRouting, LogEventQueueRouterRouting,
     LogTaskQueueRouterRouting,
 } from '@privateaim/server-telemetry-kit';
-import { EventComponent, LogComponent } from '../../components';
+import { EventComponent, LogComponent } from '../../components/index.ts';
 import {
     configure, useEnv,
-} from '../../config';
-import { setupDatabase } from '../../config/services';
-import { createHttpServer } from '../../http';
+} from '../../config/index.ts';
+import { setupDatabase } from '../../config/services/index.ts';
+import { createHttpServer } from '../../http/index.ts';
 
 export function defineCLIStartCommand() {
     return defineCommand({

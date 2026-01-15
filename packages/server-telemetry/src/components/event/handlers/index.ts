@@ -5,5 +5,5 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './cleaner';
-export * from './create';
+export * from './cleaner/index.ts';
+export * from './create/index.ts';

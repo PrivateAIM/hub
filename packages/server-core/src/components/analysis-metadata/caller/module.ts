@@ -17,10 +17,10 @@ import {
 } from '@privateaim/server-kit';
 import { wait } from '@privateaim/kit';
 import { AnalysisError } from '@privateaim/core-kit';
-import { useAnalysisMetadataComponent } from '../singleton';
-import type { AnalysisMetadataEventMap, AnalysisMetadataRecalcPayload } from '../types';
-import { AnalysisMetadataCommand, AnalysisMetadataEvent, AnalysisMetadataTaskQueue } from '../constants';
-import type { AnalysisEntity } from '../../../database';
+import { useAnalysisMetadataComponent } from '../singleton.ts';
+import type { AnalysisMetadataEventMap, AnalysisMetadataRecalcPayload } from '../types.ts';
+import { AnalysisMetadataCommand, AnalysisMetadataEvent, AnalysisMetadataTaskQueue } from '../constants.ts';
+import type { AnalysisEntity } from '../../../database/index.ts';
 
 export class AnalysisMetadataComponentCaller implements ComponentCaller<AnalysisMetadataEventMap> {
     protected directCaller : DirectComponentCaller<AnalysisMetadataEventMap>;

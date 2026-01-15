@@ -14,7 +14,7 @@ import {
     NodeEntity,
     ProjectEntity,
     RegistryProjectEntity,
-} from '../../../database/domains';
+} from '../../../database/domains/index.ts';
 
 export async function handleAuthupRealmEvent(context: EventRecord<EntityType.REALM, Realm>) {
     if (!context.data.id) {

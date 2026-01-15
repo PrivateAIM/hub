@@ -21,8 +21,8 @@ import type {
 } from '@privateaim/core-kit';
 import type { Realm } from '@authup/core-kit';
 import type { Event } from '@privateaim/telemetry-kit';
-import { AnalysisEntity } from '../analysis';
-import { NodeEntity } from '../node';
+import { AnalysisEntity } from '../analysis/index.ts';
+import { NodeEntity } from '../node/index.ts';
 
 @Entity({ name: 'analysis_node_events' })
 export class AnalysisNodeEventEntity implements AnalysisNodeEvent {

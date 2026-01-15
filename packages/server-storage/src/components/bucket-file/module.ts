@@ -12,7 +12,7 @@ import type { BucketFileComponentEventMap } from '@privateaim/server-storage-kit
 import {
     BucketFileCommand,
 } from '@privateaim/server-storage-kit';
-import { BucketFileCreateHandler, BucketFileDeleteHandler } from './handlers';
+import { BucketFileCreateHandler, BucketFileDeleteHandler } from './handlers/index.ts';
 
 export class BucketFileComponent extends BaseComponent<BucketFileComponentEventMap> {
     constructor() {

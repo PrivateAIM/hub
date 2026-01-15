@@ -11,7 +11,7 @@ import cron from 'node-cron';
 import { LessThan } from 'typeorm';
 import { useDataSource } from 'typeorm-extension';
 import type { EventCommand, EventComponentEventMap } from '@privateaim/server-telemetry-kit';
-import { EventEntity } from '../../../../database';
+import { EventEntity } from '../../../../database/index.ts';
 
 export class EventComponentCleanerHandler implements ComponentHandler<
 EventComponentEventMap,

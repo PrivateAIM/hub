@@ -15,7 +15,7 @@ import {
     AnalysisBuilderEvent,
 } from '@privateaim/server-core-worker-kit';
 import type { ComponentHandlerContext } from '@privateaim/server-kit';
-import { AnalysisEntity, useDataSourceSync } from '../../../database';
+import { AnalysisEntity, useDataSourceSync } from '../../../database/index.ts';
 
 export async function handleAnalysisBuilderEvent(
     value: AnalysisBuilderBasePayload,

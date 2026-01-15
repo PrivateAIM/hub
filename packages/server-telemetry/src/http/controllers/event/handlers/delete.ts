@@ -11,7 +11,7 @@ import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestPermissionChecker } from '@privateaim/server-http-kit';
-import { EventEntity } from '../../../../database';
+import { EventEntity } from '../../../../database/index.ts';
 
 export async function deleteEventRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');

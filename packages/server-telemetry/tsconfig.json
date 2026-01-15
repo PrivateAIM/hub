@@ -1,6 +1,7 @@
 {
     "extends": "../../tsconfig.json",
     "compilerOptions": {
+        "strictPropertyInitialization": false,
         "paths": {
             "@privateaim/kit": ["./packages/kit/src"],
             "@privateaim/telemetry-kit": ["./packages/telemetry-kit/src"],

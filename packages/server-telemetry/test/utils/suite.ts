@@ -6,11 +6,13 @@
  */
 
 import { APIClient } from '@privateaim/telemetry-kit';
+import { write } from 'envix';
 import { createServer } from 'node:http';
 import type { Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { createNodeDispatcher } from 'routup';
-import { configure } from '../../src/config';
+import { inject } from 'vitest';
+import { EnvironmentInputKey, configure } from '../../src';
 import { createHTTPRouter } from '../../src/http';
 import { dropTestDatabase, useTestDatabase } from './database';
 
@@ -20,6 +22,11 @@ class TestSuite {
     protected _server : Server | undefined;
 
     constructor() {
+        write(
+            EnvironmentInputKey.VICTORIA_LOGS_URL,
+            `http://${inject('VL_CONTAINER_HOST')}:${inject('VL_CONTAINER_PORT')}`,
+        );
+
         configure();
     }
 

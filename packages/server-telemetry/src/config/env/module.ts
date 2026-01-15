@@ -7,8 +7,8 @@
 
 import { read, readInt } from 'envix';
 import { EnvironmentName } from '@privateaim/kit';
-import { EnvironmentInputKey } from './constants';
-import type { Environment } from './types';
+import { EnvironmentInputKey } from './constants.ts';
+import type { Environment } from './types.ts';
 
 let instance : Environment | undefined;
 

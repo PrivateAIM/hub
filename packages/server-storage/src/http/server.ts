@@ -8,7 +8,7 @@
 import type { Server } from 'node:http';
 import http from 'node:http';
 import { createNodeDispatcher } from 'routup';
-import { createHTTPRouter } from './router';
+import { createHTTPRouter } from './router.ts';
 
 export function createHttpServer() : Server {
     const router = createHTTPRouter();

@@ -1,19 +1,18 @@
 {
     "name": "@privateaim/core-kit",
+    "type": "module",
     "version": "0.8.21",
     "license": "Apache-2.0",
     "description": "",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
     "exports": {
         "./package.json": "./package.json",
         ".": {
             "types": "./dist/index.d.ts",
-            "import": "./dist/index.mjs",
-            "require": "./dist/index.cjs"
+            "import": "./dist/index.mjs"
         }
     },
-    "main": "./dist/index.cjs",
-    "module": "./dist/index.mjs",
-    "types": "./dist/index.d.ts",
     "author": {
         "name": "Peter Placzek",
         "email": "admin@tada5hi.net",
@@ -26,12 +25,12 @@
         "build-watch": "rimraf ./dist && tsc -p tsconfig.build.json --watch"
     },
     "devDependencies": {
-        "@authup/core-kit": "^1.0.0-beta.27",
+        "@authup/core-kit": "^1.0.0-beta.28",
         "@privateaim/kit": "^0.8.21",
         "@privateaim/telemetry-kit": "^0.8.21"
     },
     "peerDependencies": {
-        "@authup/core-kit": "^1.0.0-beta.27",
+        "@authup/core-kit": "^1.0.0-beta.28",
         "@privateaim/kit": "^0.8.21",
         "@privateaim/telemetry-kit": "^0.8.21"
     },

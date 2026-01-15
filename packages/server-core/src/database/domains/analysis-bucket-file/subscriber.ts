@@ -18,8 +18,8 @@ import { DomainEventNamespace } from '@privateaim/kit';
 import {
     AnalysisMetadataCommand,
     useAnalysisMetadataComponentCaller,
-} from '../../../components';
-import { AnalysisBucketFileEntity } from './entity';
+} from '../../../components/index.ts';
+import { AnalysisBucketFileEntity } from './entity.ts';
 
 @EventSubscriber()
 export class AnalysisBucketFileSubscriber extends BaseSubscriber<

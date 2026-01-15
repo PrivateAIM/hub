@@ -10,9 +10,9 @@ import {
     DirectComponentCaller,
     QueueDispatchComponentCaller,
 } from '@privateaim/server-kit';
-import type { RegistryEventMap } from '../type';
-import { RegistryTaskQueueRouterRouting } from '../constants';
-import { useRegistryComponent } from '../singleton';
+import type { RegistryEventMap } from '../type.ts';
+import { RegistryTaskQueueRouterRouting } from '../constants.ts';
+import { useRegistryComponent } from '../singleton.ts';
 
 export class RegistryComponentCaller extends CompoundComponentCaller<RegistryEventMap> {
     constructor() {

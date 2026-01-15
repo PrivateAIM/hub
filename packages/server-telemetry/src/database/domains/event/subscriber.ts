@@ -17,7 +17,7 @@ import {
 } from '@privateaim/kit';
 import { BaseSubscriber } from '@privateaim/server-db-kit';
 import { EntityEventDestination } from '@privateaim/server-kit';
-import { EventEntity } from './entity';
+import { EventEntity } from './entity.ts';
 
 @TypeormEventSubscriber()
 export class EventSubscriber extends BaseSubscriber<

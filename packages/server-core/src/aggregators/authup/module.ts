@@ -10,14 +10,14 @@ import {
     type Component, EnvironmentName, isRedisClientUsable, useLogger,
     useRedisSubscribeClient,
 } from '@privateaim/server-kit';
-import { useEnv } from '../../config';
+import { useEnv } from '../../config/index.ts';
 import {
     handleAuthupPermissionEvent,
     handleAuthupPolicyEvent,
     handleAuthupRealmEvent,
     handleAuthupRobotEvent,
     handleAuthupUserEvent,
-} from './entities';
+} from './entities/index.ts';
 
 export function createAuthupAggregator() : Component {
     if (!isRedisClientUsable() || useEnv('env') === EnvironmentName.TEST) {

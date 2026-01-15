@@ -1,8 +1,16 @@
 {
     "name": "@privateaim/server-db-kit",
+    "type": "module",
     "version": "0.8.21",
-    "main": "dist/index.js",
+    "module": "dist/index.mjs",
     "types": "dist/index.d.ts",
+    "exports": {
+        "./package.json": "./package.json",
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.mjs"
+        }
+    },
     "author": {
         "name": "Peter Placzek",
         "email": "contact@tada5hi.net",
@@ -23,6 +31,8 @@
         "typeorm-extension": "^3.7.2"
     },
     "scripts": {
-        "build": "rimraf dist && tsc -p tsconfig.build.json"
+        "build:types": "tsc --emitDeclarationOnly -p tsconfig.build.json",
+        "build:js": "rollup -c",
+        "build": "rimraf ./dist && cross-env NODE_ENV=production npm run build:js && npm run build:types"
     }
 }

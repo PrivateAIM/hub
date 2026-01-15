@@ -7,13 +7,13 @@
 import { buildRegistryClientConnectionStringFromRegistry } from '@privateaim/core-kit';
 import { useDataSource } from 'typeorm-extension';
 import { type ComponentHandler, useLogger } from '@privateaim/server-kit';
-import { RegistryEntity, RegistryProjectEntity } from '../../../../database';
-import { RegistryCommand } from '../../constants';
-import type { RegistryEventMap, RegistryProjectLinkPayload } from '../../type';
-import { ensureRemoteRegistryProject } from '../helpers/remote';
-import { ensureRemoteRegistryProjectAccount } from '../helpers/remote-robot-account';
-import { saveRemoteRegistryProjectWebhook } from '../helpers/remote-webhook';
-import { createBasicHarborAPIClient } from '../utils';
+import { RegistryEntity, RegistryProjectEntity } from '../../../../database/index.ts';
+import { RegistryCommand } from '../../constants.ts';
+import type { RegistryEventMap, RegistryProjectLinkPayload } from '../../type.ts';
+import { ensureRemoteRegistryProject } from '../helpers/remote.ts';
+import { ensureRemoteRegistryProjectAccount } from '../helpers/remote-robot-account.ts';
+import { saveRemoteRegistryProjectWebhook } from '../helpers/remote-webhook.ts';
+import { createBasicHarborAPIClient } from '../utils.ts';
 
 export class RegistryProjectLinkHandler implements ComponentHandler<
 RegistryEventMap,

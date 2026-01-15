@@ -9,7 +9,7 @@ import type { Request } from 'routup';
 import { getRequestHeader, getRequestIP, useRequestPath } from 'routup';
 import type { Repository, SaveOptions } from 'typeorm';
 import { useRequestIdentity } from '@privateaim/server-http-kit';
-import type { RemoveOptions } from 'typeorm/repository/RemoveOptions';
+import type { RemoveOptions } from 'typeorm/repository/RemoveOptions.js';
 import type { EntityEventMetadata } from '@privateaim/server-kit';
 
 type RepositoryEntity<T> = T extends Repository<infer U> ? U : never;

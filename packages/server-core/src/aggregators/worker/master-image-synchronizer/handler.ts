@@ -12,8 +12,8 @@ import type {
 import { MasterImageBuilderComponentCaller } from '@privateaim/server-core-worker-kit';
 import { useDataSource } from 'typeorm-extension';
 import { useLogger } from '@privateaim/server-kit';
-import { MasterImageEntity } from '../../../database';
-import { MasterImageSynchronizerService } from '../../../services';
+import { MasterImageEntity } from '../../../database/index.ts';
+import { MasterImageSynchronizerService } from '../../../services/index.ts';
 
 export async function handleMasterImageSynchronizerExecutionFinishedEvent(value: MasterImageSynchronizerExecutionFinishedPayload) {
     const synchronizer = new MasterImageSynchronizerService();

@@ -8,8 +8,8 @@
 import { EnvironmentName } from '@privateaim/server-kit';
 import type { DataSourceOptions } from 'typeorm';
 import { readDataSourceOptionsFromEnv } from 'typeorm-extension';
-import { useEnv } from '../../../config';
-import { extendDataSourceOptions } from './extend';
+import { useEnv } from '../../../config/index.ts';
+import { extendDataSourceOptions } from './extend.ts';
 
 export async function buildDataSourceOptions() : Promise<DataSourceOptions> {
     const options = readDataSourceOptionsFromEnv();

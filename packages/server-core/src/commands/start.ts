@@ -12,15 +12,15 @@ import { DataSource } from 'typeorm';
 import {
     checkDatabase, createDatabase, setDataSource, synchronizeDatabaseSchema,
 } from 'typeorm-extension';
-import { createSocketServer } from '../socket';
+import { createSocketServer } from '../socket/index.ts';
 import {
     createConfig, getRootDirPath, getWritableDirPath, useEnv,
-} from '../config';
-import { setupAuthupService, setupHarborService } from '../core';
-import { buildDataSourceOptions, setDataSourceSync } from '../database';
-import { createRouter } from '../http/router';
-import { createHttpServer } from '../http/server';
-import { DatabaseIntegrityService } from '../services';
+} from '../config/index.ts';
+import { setupAuthupService, setupHarborService } from '../core/index.ts';
+import { buildDataSourceOptions, setDataSourceSync } from '../database/index.ts';
+import { createRouter } from '../http/router.ts';
+import { createHttpServer } from '../http/server.ts';
+import { DatabaseIntegrityService } from '../services/index.ts';
 
 export async function startCommand() {
     const config = createConfig();

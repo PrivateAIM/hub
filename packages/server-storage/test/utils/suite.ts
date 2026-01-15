@@ -6,10 +6,12 @@
  */
 
 import { APIClient } from '@privateaim/storage-kit';
+import { write } from 'envix';
 import { createServer } from 'node:http';
 import type { Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { createNodeDispatcher } from 'routup';
+import { inject } from 'vitest';
 import { configure } from '../../src/config';
 import { createHTTPRouter } from '../../src/http';
 import { dropTestDatabase, useTestDatabase } from './database';
@@ -20,6 +22,10 @@ class TestSuite {
     protected _server : Server | undefined;
 
     constructor() {
+        write(
+            'MINIO_CONNECTION_STRING',
+            `http://admin:start123@${inject('MINIO_CONTAINER_HOST')}:${inject('MINIO_CONTAINER_PORT')}`,
+        );
         configure();
     }
 

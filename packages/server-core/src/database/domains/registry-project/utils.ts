@@ -6,7 +6,7 @@
  */
 
 import { isObject } from '@privateaim/kit';
-import type { RegistryProjectVaultPayload } from './type';
+import type { RegistryProjectVaultPayload } from './type.ts';
 
 export function isRegistryProjectVaultPayload(
     input: unknown,

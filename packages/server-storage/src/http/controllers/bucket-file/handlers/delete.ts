@@ -22,9 +22,9 @@ import {
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { useBucketFileComponent } from '../../../../components';
-import { BucketFileEntity } from '../../../../database';
-import { isBucketFileOwnedByIdentity, isBucketOwnedByIdentity } from '../../../../domains';
+import { useBucketFileComponent } from '../../../../components/index.ts';
+import { BucketFileEntity } from '../../../../database/index.ts';
+import { isBucketFileOwnedByIdentity, isBucketOwnedByIdentity } from '../../../../domains/index.ts';
 
 export async function executeBucketFileRouteDeleteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');

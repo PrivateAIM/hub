@@ -9,9 +9,9 @@ import { parseConnectionString } from '@hapic/harbor';
 import { getHostNameFromString } from '@privateaim/kit';
 import { useDataSource } from 'typeorm-extension';
 import { isQueueRouterUsable } from '@privateaim/server-kit';
-import { RegistryCommand, useRegistryComponentCaller } from '../../components';
-import { RegistryEntity } from '../../database';
-import { useEnv } from '../../config';
+import { RegistryCommand, useRegistryComponentCaller } from '../../components/index.ts';
+import { RegistryEntity } from '../../database/index.ts';
+import { useEnv } from '../../config/index.ts';
 
 export async function setupHarborService() {
     const harborURL = useEnv('harborURL');

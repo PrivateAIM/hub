@@ -9,7 +9,7 @@ import type { Log, LogInput } from '@privateaim/telemetry-kit';
 import { normalizeLogInput } from '@privateaim/telemetry-kit';
 import type {
     LogStore, LogStoreQueryOptions,
-} from '../types';
+} from '../types.ts';
 
 export class MemoryLogStore implements LogStore {
     public readonly items : Log[];

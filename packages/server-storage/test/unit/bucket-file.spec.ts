@@ -5,6 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import {
+    afterAll, beforeAll, describe, expect, it,
+} from 'vitest';
 import fs from 'node:fs';
 import { Readable } from 'node:stream';
 import path from 'node:path';
@@ -73,29 +76,34 @@ describe('controllers/bucket-file', () => {
         expect(buffer.byteLength).toBeGreaterThan(0);
     });
 
-    it('should stream resource collection', (done) => {
+    it('should stream resource collection', async () => {
         const client = suite.client();
         const extract = tar.extract();
 
         const headers : Record<string, any>[] = [];
 
-        extract.on('entry', async (header, stream, callback) => {
-            headers.push(header);
+        const count = await new Promise<number>(
+            (resolve) => {
+                extract.on('entry', async (header, stream, callback) => {
+                    headers.push(header);
 
-            callback();
-        });
+                    callback();
+                });
 
-        extract.on('finish', () => {
-            expect(headers.length).toBeGreaterThanOrEqual(1);
-            done();
-        });
+                extract.on('finish', () => {
+                    resolve(headers.length);
+                });
 
-        client.bucket.stream(details.bucket_id)
-            .then((data) => Readable.fromWeb(data as any))
-            .then((data) => {
-                data.pipe(extract);
-            })
-            .catch((e) => done(e));
+                client.bucket.stream(details.bucket_id)
+                    .then((data) => Readable.fromWeb(data as any))
+                    .then((data) => {
+                        data.pipe(extract);
+                    })
+                    .catch(() => resolve(0));
+            },
+        );
+
+        expect(count).toBeGreaterThanOrEqual(1);
     });
 
     it('should delete resource', async () => {

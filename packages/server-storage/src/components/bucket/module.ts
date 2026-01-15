@@ -14,7 +14,7 @@ import type {
 import {
     BucketCommand,
 } from '@privateaim/server-storage-kit';
-import { BucketCreateHandler, BucketDeleteHandler } from './handlers';
+import { BucketCreateHandler, BucketDeleteHandler } from './handlers/index.ts';
 
 export class BucketComponent extends BaseComponent<BucketComponentEventMap> {
     constructor() {

@@ -19,8 +19,8 @@ import {
 import { BaseSubscriber } from '@privateaim/server-db-kit';
 import { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
-import { NodeEntity } from './entity';
-import { isNodeClientServiceUsable, useNodeClientService } from '../../../services';
+import { NodeEntity } from './entity.ts';
+import { isNodeClientServiceUsable, useNodeClientService } from '../../../services/index.ts';
 
 @EventSubscriber()
 export class NodeSubscriber extends BaseSubscriber<NodeEntity> implements EntitySubscriberInterface<NodeEntity> {

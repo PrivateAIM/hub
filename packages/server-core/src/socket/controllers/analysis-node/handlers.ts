@@ -22,7 +22,7 @@ import {
 } from '@privateaim/server-realtime-kit';
 import type {
     Socket,
-} from '../../types';
+} from '../../types.ts';
 
 export function registerAnalysisNodeSocketHandlers(socket: Socket) {
     if (!socket.data.userId && !socket.data.robotId) return;

@@ -6,8 +6,8 @@
  */
 
 import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
-import type { RegistryEventMap, RegistryProjectRelinkPayload } from '../../type';
-import { RegistryCommand } from '../../constants';
+import type { RegistryEventMap, RegistryProjectRelinkPayload } from '../../type.ts';
+import { RegistryCommand } from '../../constants.ts';
 
 export class RegistryProjectRelinkHandler implements ComponentHandler<
 RegistryEventMap,

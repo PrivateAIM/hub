@@ -18,12 +18,12 @@ import { sendCreated, useRequestParam } from 'routup';
 import type { Request, Response } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestIdentityOrFail } from '@privateaim/server-http-kit';
-import { useBucketFileComponent } from '../../../../components';
-import { streamToBuffer } from '../../../../core';
-import type { BucketFileEntity } from '../../../../database';
+import { useBucketFileComponent } from '../../../../components/index.ts';
+import { streamToBuffer } from '../../../../core/index.ts';
+import type { BucketFileEntity } from '../../../../database/index.ts';
 import {
     BucketEntity,
-} from '../../../../database';
+} from '../../../../database/index.ts';
 
 export async function uploadRequestFilesToBucket(req: Request, bucket: BucketEntity) {
     const instance = Busboy({

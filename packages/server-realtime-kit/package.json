@@ -1,8 +1,16 @@
 {
     "name": "@privateaim/server-realtime-kit",
+    "type": "module",
     "version": "0.8.21",
-    "main": "dist/index.js",
+    "module": "dist/index.mjs",
     "types": "dist/index.d.ts",
+    "exports": {
+        "./package.json": "./package.json",
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.mjs"
+        }
+    },
     "author": {
         "name": "Peter Placzek",
         "email": "contact@tada5hi.net",
@@ -11,13 +19,13 @@
     "license": "Apache-2.0",
     "description": "This package contains the realtime application which connects the API with socket based clients.",
     "dependencies": {
-        "@authup/access": "^1.0.0-beta.27",
-        "@authup/specs": "^1.0.0-beta.27",
-        "@authup/kit": "^1.0.0-beta.27",
-        "@authup/core-kit": "^1.0.0-beta.27",
-        "@authup/core-realtime-kit": "^1.0.0-beta.27",
-        "@authup/server-adapter-kit": "^1.0.0-beta.27",
-        "@authup/server-adapter-socket-io": "^1.0.0-beta.27",
+        "@authup/access": "^1.0.0-beta.28",
+        "@authup/specs": "^1.0.0-beta.28",
+        "@authup/kit": "^1.0.0-beta.28",
+        "@authup/core-kit": "^1.0.0-beta.28",
+        "@authup/core-realtime-kit": "^1.0.0-beta.28",
+        "@authup/server-adapter-kit": "^1.0.0-beta.28",
+        "@authup/server-adapter-socket-io": "^1.0.0-beta.28",
         "@socket.io/redis-adapter": "^8.3.0",
         "@privateaim/kit": "^0.8.21",
         "@privateaim/telemetry-kit": "^0.8.21",
@@ -34,7 +42,9 @@
     },
     "scripts": {
         "dev": "ts-node src/index.ts",
-        "build": "rimraf dist && tsc -p tsconfig.build.json",
+        "build:types": "tsc --emitDeclarationOnly -p tsconfig.build.json",
+        "build:js": "rollup -c",
+        "build": "rimraf ./dist && cross-env NODE_ENV=production npm run build:js && npm run build:types",
         "start": "node dist/index.js"
     }
 }

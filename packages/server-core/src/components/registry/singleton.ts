@@ -6,7 +6,7 @@
  */
 
 import { singa } from 'singa';
-import { RegistryComponent } from './module';
+import { RegistryComponent } from './module.ts';
 
 const instance = singa<RegistryComponent>({
     name: 'registryComponent',

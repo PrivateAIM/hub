@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import type { MasterImage, Project } from '@privateaim/core-kit';
 import type { Realm, Robot, User } from '@authup/core-kit';
-import { MasterImageEntity } from '../master-image';
+import { MasterImageEntity } from '../master-image/index.ts';
 
 @Entity({ name: 'projects' })
 export class ProjectEntity implements Project {

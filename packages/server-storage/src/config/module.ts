@@ -13,7 +13,7 @@ import {
     configureRedis,
     configureVault,
     setupLogging,
-} from './services';
+} from './services/index.ts';
 
 export function configure() {
     setupLogging();

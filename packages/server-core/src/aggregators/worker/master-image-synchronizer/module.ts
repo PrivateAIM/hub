@@ -16,7 +16,7 @@ import {
 import { isEventComponentCallerUsable, useEventComponentCaller } from '@privateaim/server-telemetry-kit';
 import {
     handleMasterImageSynchronizerExecutionFinishedEvent,
-} from './handler';
+} from './handler.ts';
 
 export class MasterImageSynchronizerAggregator extends BaseComponent<MasterImageSynchronizerEventMap> {
     constructor() {

@@ -13,7 +13,7 @@ import { DomainType } from '@privateaim/storage-kit';
 import { BaseSubscriber } from '@privateaim/server-db-kit';
 import { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
-import { BucketEntity } from './entity';
+import { BucketEntity } from './entity.ts';
 
 @EventSubscriber()
 export class BucketSubscriber extends BaseSubscriber<

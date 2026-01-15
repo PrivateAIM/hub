@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 import { AnalysisBucketType, DomainType } from '@privateaim/core-kit';
-import type { Analysis, AnalysisBucketFile, MasterImage } from '@privateaim/core-kit/src';
+import type { Analysis, AnalysisBucketFile, MasterImage } from '@privateaim/core-kit';
 import {
     type PropType, computed, defineComponent, watch,
 } from 'vue';

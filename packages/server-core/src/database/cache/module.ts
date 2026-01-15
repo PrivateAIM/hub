@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { QueryResultCache } from 'typeorm/cache/QueryResultCache';
-import type { QueryResultCacheOptions } from 'typeorm/cache/QueryResultCacheOptions';
+import type { QueryResultCache } from 'typeorm/cache/QueryResultCache.js';
+import type { QueryResultCacheOptions } from 'typeorm/cache/QueryResultCacheOptions.js';
 import { isRedisClientUsable, useRedisClient } from '@privateaim/server-kit';
 
 type DatabaseQueryResultCacheOptions = {

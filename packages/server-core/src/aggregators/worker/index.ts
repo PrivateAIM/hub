@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './analysis-builder';
-export * from './analysis-distributor';
-export * from './master-image-builder';
-export * from './master-image-synchronizer';
+export * from './analysis-builder/index.ts';
+export * from './analysis-distributor/index.ts';
+export * from './master-image-builder/index.ts';
+export * from './master-image-synchronizer/index.ts';

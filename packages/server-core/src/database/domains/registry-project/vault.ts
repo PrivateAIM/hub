@@ -7,8 +7,8 @@
 
 import { isClientErrorWithStatusCode } from '@hapic/harbor';
 import { isVaultClientUsable, useVaultClient } from '@privateaim/server-kit';
-import type { RegistryProjectVaultPayload } from './type';
-import { isRegistryProjectVaultPayload } from './utils';
+import type { RegistryProjectVaultPayload } from './type.ts';
+import { isRegistryProjectVaultPayload } from './utils.ts';
 
 export async function creteRegistryProjectVaultEngine() {
     if (!isVaultClientUsable()) {

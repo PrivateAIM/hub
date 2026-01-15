@@ -14,7 +14,7 @@ import {
 } from '@privateaim/server-kit';
 import {
     handleAnalysisBuilderEvent,
-} from './handler';
+} from './handler.ts';
 
 export class AnalysisBuilderAggregator extends BaseComponent<AnalysisBuilderEventMap> {
     constructor() {

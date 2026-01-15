@@ -16,10 +16,10 @@ import { DomainType } from '@privateaim/storage-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import { useDataSource } from 'typeorm-extension';
 import { HTTPHandlerOperation } from '@privateaim/server-http-kit';
-import { useMinio } from '../../../../core';
-import { BucketEntity } from '../../../../database';
-import { toBucketName } from '../../../../domains';
-import { BucketValidator } from '../../../../http/controllers/bucket/utils/validation';
+import { useMinio } from '../../../../core/index.ts';
+import { BucketEntity } from '../../../../database/index.ts';
+import { toBucketName } from '../../../../domains/index.ts';
+import { BucketValidator } from '../../../../http/controllers/bucket/utils/validation.ts';
 
 export class BucketCreateHandler implements ComponentHandler<
 BucketComponentEventMap,

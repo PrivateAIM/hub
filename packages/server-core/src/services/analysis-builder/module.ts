@@ -11,12 +11,12 @@ import { ProcessStatus } from '@privateaim/kit';
 import { AnalysisBuilderComponentCaller } from '@privateaim/server-core-worker-kit';
 import type { Request } from 'routup';
 import type { Repository } from 'typeorm';
-import { AnalysisEntity, useDataSourceSync } from '../../database';
-import { RequestRepositoryAdapter } from '../../http/request';
-import type { AnalysisMetadataComponentCaller } from '../../components';
+import { AnalysisEntity, useDataSourceSync } from '../../database/index.ts';
+import { RequestRepositoryAdapter } from '../../http/request/index.ts';
+import type { AnalysisMetadataComponentCaller } from '../../components/index.ts';
 import {
     useAnalysisMetadataComponentCaller,
-} from '../../components';
+} from '../../components/index.ts';
 
 export class AnalysisBuilder {
     protected repository : Repository<AnalysisEntity>;

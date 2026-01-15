@@ -1,7 +1,17 @@
 {
     "name": "@privateaim/server-messenger",
+    "type": "module",
     "version": "0.8.21",
     "private": true,
+    "module": "dist/index.mjs",
+    "types": "dist/index.d.ts",
+    "exports": {
+        "./package.json": "./package.json",
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.mjs"
+        }
+    },
     "author": {
         "name": "Peter Placzek",
         "email": "contact@tada5hi.net",
@@ -10,8 +20,8 @@
     "license": "Apache-2.0",
     "description": "This package contains the realtime application which connects the API with socket based clients.",
     "dependencies": {
-        "@authup/kit": "^1.0.0-beta.27",
-        "@authup/core-kit": "^1.0.0-beta.27",
+        "@authup/kit": "^1.0.0-beta.28",
+        "@authup/core-kit": "^1.0.0-beta.28",
         "@ebec/http": "^2.3.0",
         "@privateaim/messenger-kit": "^0.7.22",
         "@privateaim/server-kit": "^0.8.21",
@@ -28,7 +38,9 @@
     },
     "scripts": {
         "dev": "ts-node src/index.ts",
-        "build": "rimraf dist && tsc -p tsconfig.build.json",
-        "start": "node dist/index.js"
+        "build:types": "tsc --emitDeclarationOnly -p tsconfig.build.json",
+        "build:js": "rollup -c",
+        "build": "rimraf ./dist && cross-env NODE_ENV=production npm run build:js && npm run build:types",
+        "start": "node dist/index.mjs"
     }
 }

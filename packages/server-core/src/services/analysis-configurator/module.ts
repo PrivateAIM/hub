@@ -10,13 +10,13 @@ import {
     AnalysisConfiguratorCommandChecker, NodeType,
 } from '@privateaim/core-kit';
 import type { Repository } from 'typeorm';
-import type { AnalysisMetadataComponentCaller } from '../../components';
-import { useAnalysisMetadataComponentCaller } from '../../components';
+import type { AnalysisMetadataComponentCaller } from '../../components/index.ts';
+import { useAnalysisMetadataComponentCaller } from '../../components/index.ts';
 import {
     AnalysisEntity, AnalysisNodeEntity, useDataSourceSync,
-} from '../../database';
-import { RequestRepositoryAdapter } from '../../http/request';
-import type { AnalysisConfiguratorLockOptions, AnalysisConfiguratorUnlockOptions } from './types';
+} from '../../database/index.ts';
+import { RequestRepositoryAdapter } from '../../http/request/index.ts';
+import type { AnalysisConfiguratorLockOptions, AnalysisConfiguratorUnlockOptions } from './types.ts';
 
 export class AnalysisConfigurator {
     protected repository : Repository<AnalysisEntity>;

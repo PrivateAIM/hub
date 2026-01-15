@@ -6,9 +6,9 @@
  */
 import { useLogger } from '@privateaim/server-kit';
 import type { BucketFileComponentEventMap, BucketFileEvent } from '@privateaim/server-storage-kit';
-import type { BucketFile } from '@privateaim/storage-kit/src';
-import { AnalysisBucketFileEntity, useDataSourceSync } from '../../../../database';
-import { BaseAggregatorHandler } from '../../../base';
+import type { BucketFile } from '@privateaim/storage-kit';
+import { AnalysisBucketFileEntity, useDataSourceSync } from '../../../../database/index.ts';
+import { BaseAggregatorHandler } from '../../../base.ts';
 
 export class StorageBucketFileDeletionFinishedHandler extends BaseAggregatorHandler<
 BucketFileComponentEventMap,

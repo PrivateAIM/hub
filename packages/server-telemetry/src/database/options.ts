@@ -7,7 +7,7 @@
 
 import type { DataSourceOptions } from 'typeorm';
 import { readDataSourceOptionsFromEnv } from 'typeorm-extension';
-import { EventEntity, EventSubscriber } from './domains';
+import { EventEntity, EventSubscriber } from './domains/index.ts';
 
 export async function extendDataSourceOptions(options: DataSourceOptions): Promise<DataSourceOptions> {
     options = {

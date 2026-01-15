@@ -15,9 +15,9 @@ import { useDataSource } from 'typeorm-extension';
 import {
     type ComponentHandler, type ComponentHandlerContext,
 } from '@privateaim/server-kit';
-import { RegistryEntity, RegistryProjectEntity } from '../../../database';
-import { RegistryCommand } from '../constants';
-import type { RegistryEventMap, RegistrySetupPayload } from '../type';
+import { RegistryEntity, RegistryProjectEntity } from '../../../database/index.ts';
+import { RegistryCommand } from '../constants.ts';
+import type { RegistryEventMap, RegistrySetupPayload } from '../type.ts';
 
 export class RegistrySetupHandler implements ComponentHandler<
 RegistryEventMap,

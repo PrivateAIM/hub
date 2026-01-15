@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './commands';
-// export * from './components';
-export * from './config';
-// export * from './core';
-// export * from './database';
-// export * from './domains';
-// export * from './http';
+export * from './commands/index.ts';
+// export * from './components.ts';
+export * from './config/index.ts';
+// export * from './core.ts';
+// export * from './database.ts';
+// export * from './domains.ts';
+// export * from './http.ts';

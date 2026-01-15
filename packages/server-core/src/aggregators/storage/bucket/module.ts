@@ -12,7 +12,7 @@ import {
 import {
     BaseComponent,
 } from '@privateaim/server-kit';
-import { StorageBucketCreationFinishedHandler, StorageBucketDeletionFinishedHandler } from './handlers';
+import { StorageBucketCreationFinishedHandler, StorageBucketDeletionFinishedHandler } from './handlers/index.ts';
 
 export class StorageBucketAggregator extends BaseComponent<
 BucketComponentEventMap

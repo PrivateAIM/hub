@@ -14,7 +14,7 @@ import {
     PrimaryGeneratedColumn, Unique,
     UpdateDateColumn,
 } from 'typeorm';
-import { BucketEntity } from '../bucket';
+import { BucketEntity } from '../bucket/index.ts';
 
 @Unique(['bucket_id', 'path'])
 @Entity({ name: 'bucket_files' })

@@ -8,7 +8,7 @@
 import type { AnalysisDistributorEventMap } from '@privateaim/server-core-worker-kit';
 import { AnalysisDistributorEvent } from '@privateaim/server-core-worker-kit';
 import { BaseComponent } from '@privateaim/server-kit';
-import { handleAnalysisDistributorEvent } from './handler';
+import { handleAnalysisDistributorEvent } from './handler.ts';
 
 export class AnalysisDistributorAggregator extends BaseComponent<AnalysisDistributorEventMap> {
     constructor() {

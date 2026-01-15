@@ -15,7 +15,7 @@ import {
     deleteEventRouteHandler,
     getManyEventLogRouteHandler,
     getOneEventLogRouteHandler,
-} from './handlers';
+} from './handlers/index.ts';
 
 type PartialEvent = Partial<Event>;
 

@@ -11,8 +11,8 @@ import { LogValidator } from '@privateaim/telemetry-kit';
 import type { LogWriteCommandPayload } from '@privateaim/server-telemetry-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import type { Request } from 'routup';
-import type { LogStore } from '../../../../services';
-import { useLogStore } from '../../../../services';
+import type { LogStore } from '../../../../services/index.ts';
+import { useLogStore } from '../../../../services/index.ts';
 
 export class LogComponentWriteHandler implements ComponentHandler {
     protected validator : LogValidator;

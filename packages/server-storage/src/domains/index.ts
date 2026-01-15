@@ -5,5 +5,5 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './bucket';
-export * from './bucket-file';
+export * from './bucket/index.ts';
+export * from './bucket-file/index.ts';

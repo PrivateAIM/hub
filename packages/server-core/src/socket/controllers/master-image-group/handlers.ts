@@ -18,7 +18,7 @@ import {
     subscribeSocketRoom,
     unsubscribeSocketRoom,
 } from '@privateaim/server-realtime-kit';
-import type { Socket } from '../../types';
+import type { Socket } from '../../types.ts';
 
 export function registerMasterImageGroupSocketHandlers(socket: Socket) {
     socket.on(

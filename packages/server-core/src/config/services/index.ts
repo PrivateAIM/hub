@@ -5,11 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './amqp';
-export * from './authup';
-export * from './authup-client-authentication-hook';
-export * from './event-publisher';
-export * from './logging';
-export * from './redis';
-export * from './telemetry';
-export * from './vault';
+export * from './amqp.ts';
+export * from './authup.ts';
+export * from './authup-client-authentication-hook.ts';
+export * from './event-publisher.ts';
+export * from './logging.ts';
+export * from './redis.ts';
+export * from './telemetry.ts';
+export * from './vault.ts';

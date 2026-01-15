@@ -13,11 +13,11 @@ import { useRequestParam } from 'routup';
 import type { Pack } from 'tar-stream';
 import tar from 'tar-stream';
 import { useDataSource } from 'typeorm-extension';
-import { streamToBuffer, useMinio } from '../../../../core';
+import { streamToBuffer, useMinio } from '../../../../core/index.ts';
 import {
     toBucketName,
-} from '../../../../domains';
-import { BucketEntity, BucketFileEntity } from '../../../../database';
+} from '../../../../domains/index.ts';
+import { BucketEntity, BucketFileEntity } from '../../../../database/index.ts';
 
 async function packFile(
     pack: Pack,

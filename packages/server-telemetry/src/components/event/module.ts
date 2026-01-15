@@ -12,7 +12,7 @@ import type { EventComponentEventMap } from '@privateaim/server-telemetry-kit';
 import {
     EventCommand,
 } from '@privateaim/server-telemetry-kit';
-import { EventComponentCleanerHandler, EventComponentCreateHandler } from './handlers';
+import { EventComponentCleanerHandler, EventComponentCreateHandler } from './handlers/index.ts';
 
 export class EventComponent extends BaseComponent<EventComponentEventMap> {
     constructor() {

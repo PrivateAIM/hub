@@ -67,7 +67,7 @@ export default defineComponent({
         };
 
         const handleFailed = (e: Error) => {
-            toast.show({ variant: 'success', body: e.message });
+            toast.show({ variant: 'warning', body: e.message });
         };
 
         return {

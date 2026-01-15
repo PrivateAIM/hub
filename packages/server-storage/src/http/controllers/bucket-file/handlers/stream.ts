@@ -11,11 +11,11 @@ import { useLogger } from '@privateaim/server-kit';
 import type { Request, Response } from 'routup';
 import { getRequestAcceptableEncoding, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { useMinio } from '../../../../core';
-import { BucketFileEntity } from '../../../../database';
+import { useMinio } from '../../../../core/index.ts';
+import { BucketFileEntity } from '../../../../database/index.ts';
 import {
     toBucketName,
-} from '../../../../domains';
+} from '../../../../domains/index.ts';
 
 /*
 function encodeContentDispositionFilename(input: string) {

@@ -7,7 +7,7 @@
 
 import { isAuthupClientUsable } from '@privateaim/server-kit';
 import { singa } from 'singa';
-import { NodeClientService } from './module';
+import { NodeClientService } from './module.ts';
 
 const instance = singa<NodeClientService>({
     name: 'nodeClient',

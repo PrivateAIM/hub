@@ -5,5 +5,5 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-export * from './victoria-logs';
-export * from './log-store';
+export * from './victoria-logs/index.ts';
+export * from './log-store/index.ts';

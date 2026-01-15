@@ -8,8 +8,8 @@
 import { parseProxyConnectionString } from '@privateaim/kit';
 import type { ClientOptions } from 'minio';
 import { Client } from 'minio';
-import { setMinioFactory } from '../../core';
-import { useEnv } from '../env';
+import { setMinioFactory } from '../../core/index.ts';
+import { useEnv } from '../env/index.ts';
 
 export function configureMinio() {
     const connectionString = useEnv('minioConnectionString');

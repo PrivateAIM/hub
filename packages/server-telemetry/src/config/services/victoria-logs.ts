@@ -7,8 +7,8 @@
 
 import type { ConfigInput } from '@hapic/victorialogs';
 import { VictoriaLogsClient } from '@hapic/victorialogs';
-import { setVictoriaLogsClientFactory } from '../../services';
-import { useEnv } from '../env';
+import { setVictoriaLogsClientFactory } from '../../services/index.ts';
+import { useEnv } from '../env/index.ts';
 
 export function configureVictoriaLogs() {
     const baseURL = useEnv('victoriaLogsURL');

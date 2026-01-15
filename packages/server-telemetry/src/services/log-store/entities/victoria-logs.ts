@@ -10,7 +10,7 @@ import type { Log, LogInput } from '@privateaim/telemetry-kit';
 import {
     LogChannel, LogFlag, LogLevel, normalizeLogInput,
 } from '@privateaim/telemetry-kit';
-import type { LogStore, LogStoreQueryOptions } from '../types';
+import type { LogStore, LogStoreQueryOptions } from '../types.ts';
 
 export class VictoriaLogsLogStore implements LogStore {
     protected instance : VictoriaLogsClient;

@@ -6,7 +6,7 @@
  */
 
 import { unwrapOAuth2Scope } from '@authup/specs';
-import type { PermissionProvider } from '@authup/access';
+import type { IPermissionProvider } from '@authup/access';
 import { PermissionChecker, PermissionMemoryProvider } from '@authup/access';
 import { REALM_MASTER_NAME } from '@authup/core-kit';
 import type { TokenVerificationData } from '@authup/server-adapter-kit';
@@ -43,7 +43,7 @@ export function applyTokenVerificationData(
     data: TokenVerificationDataMinimal,
     fakeAbilities?: boolean,
 ) {
-    let provider : PermissionProvider;
+    let provider : IPermissionProvider;
     if (fakeAbilities) {
         provider = new FakePermissionProvider();
     } else {

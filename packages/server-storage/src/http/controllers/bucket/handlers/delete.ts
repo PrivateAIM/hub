@@ -18,11 +18,11 @@ import {
 } from '@privateaim/server-http-kit';
 import { DirectComponentCaller } from '@privateaim/server-kit';
 import { BucketCommand } from '@privateaim/server-storage-kit';
-import { BucketEntity } from '../../../../database';
+import { BucketEntity } from '../../../../database/index.ts';
 import {
     isBucketOwnedByIdentity,
-} from '../../../../domains';
-import { useBucketComponent } from '../../../../components';
+} from '../../../../domains/index.ts';
+import { useBucketComponent } from '../../../../components/index.ts';
 
 export async function executeBucketRouteDeleteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');

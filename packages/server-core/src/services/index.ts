@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './analysis-builder';
-export * from './analysis-configurator';
-export * from './analysis-distributor';
-export * from './database-integrity';
-export * from './master-image';
-export * from './node-client';
-export * from './telemetry';
+export * from './analysis-builder/index.ts';
+export * from './analysis-configurator/index.ts';
+export * from './analysis-distributor/index.ts';
+export * from './database-integrity/index.ts';
+export * from './master-image/index.ts';
+export * from './node-client/index.ts';
+export * from './telemetry/index.ts';

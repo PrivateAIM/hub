@@ -15,7 +15,7 @@ import {
 import { BaseSubscriber } from '@privateaim/server-db-kit';
 import { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
-import { RegistryEntity } from './entity';
+import { RegistryEntity } from './entity.ts';
 
 @EventSubscriber()
 export class RegistrySubscriber extends BaseSubscriber<

@@ -9,7 +9,7 @@ import path from 'node:path';
 import { read, readInt } from 'envix';
 import { config } from 'dotenv';
 import type { EnvironmentName } from '@privateaim/server-kit';
-import type { Environment } from './types';
+import type { Environment } from './types.ts';
 
 config({
     debug: false,

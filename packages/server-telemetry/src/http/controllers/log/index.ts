@@ -14,7 +14,7 @@ import {
     createLogRouteHandler,
     deleteManyLogRouteHandler,
     getManyLogLogRouteHandler,
-} from './handlers';
+} from './handlers/index.ts';
 
 type PartialLog = Partial<Log>;
 
