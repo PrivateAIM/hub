@@ -6,6 +6,7 @@
  */
 
 import path from 'node:path';
+import { CODE_PATH } from '../paths.ts';
 
 let writableDirPath : string | undefined;
 let rootDirPath : string | undefined;
@@ -15,7 +16,7 @@ export function getWritableDirPath() {
         return writableDirPath;
     }
 
-    writableDirPath = path.resolve(`${__dirname}../../../writable`);
+    writableDirPath = path.join(CODE_PATH, '..', 'writable');
     return writableDirPath;
 }
 
@@ -24,6 +25,6 @@ export function getRootDirPath() {
         return rootDirPath;
     }
 
-    rootDirPath = path.resolve(`${__dirname}../../../`);
+    rootDirPath = path.join(CODE_PATH, '..');
     return rootDirPath;
 }

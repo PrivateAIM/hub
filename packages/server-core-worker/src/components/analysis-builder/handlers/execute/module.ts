@@ -33,7 +33,7 @@ import {
 import { AnalysisContainerPath } from '../../constants';
 import { BuilderError } from '../../error';
 import { generateDockerFileContent } from '../../helpers';
-import { useAnalysisBuilderLogger } from '../../utils';
+import { removeStringPrefix, useAnalysisBuilderLogger } from '../../utils';
 
 export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisBuilderEventMap, AnalysisBuilderCommand.EXECUTE> {
     async handle(
@@ -159,13 +159,20 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
             throw e;
         }
 
-        await container.remove({
-            force: true,
-        });
+        const containerInfo = await container.inspect();
+
+        const docker = useDocker();
+        const image = docker.getImage(containerInfo.Image);
+        const imageInfo = await image.inspect();
 
         await context.handle(
             AnalysisBuilderEvent.EXECUTION_FINISHED,
-            value,
+            {
+                ...value,
+                hash: removeStringPrefix(imageInfo.Id, 'sha256:'),
+                os: imageInfo.Os,
+                size: imageInfo.Size,
+            },
         );
     }
 

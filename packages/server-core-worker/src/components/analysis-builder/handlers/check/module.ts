@@ -15,6 +15,7 @@ import type {
 import { AnalysisBuilderEvent } from '@privateaim/server-core-worker-kit';
 import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
 import { useCoreClient, useDocker } from '../../../../core';
+import { removeStringPrefix } from '../../utils';
 
 export class AnalysisBuilderCheckHandler implements ComponentHandler<AnalysisBuilderEventMap, AnalysisBuilderCommand.CHECK> {
     async handle(
@@ -51,13 +52,16 @@ export class AnalysisBuilderCheckHandler implements ComponentHandler<AnalysisBui
         const image = docker.getImage(`${value.id}:latest`);
 
         try {
-            await image.inspect();
+            const imageInfo = await image.inspect();
 
             await context.handle(
                 AnalysisBuilderEvent.CHECK_FINISHED,
                 {
                     ...value,
                     status: ProcessStatus.FINISHED,
+                    hash: removeStringPrefix(imageInfo.Id, 'sha256:'),
+                    os: imageInfo.Os,
+                    size: imageInfo.Size,
                 },
             );
         } catch (e) {

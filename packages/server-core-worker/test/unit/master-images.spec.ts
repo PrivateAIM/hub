@@ -11,7 +11,7 @@ import {
     MasterImageSynchronizerCommand,
 } from '@privateaim/server-core-worker-kit';
 import { DirectComponentCaller } from '@privateaim/server-kit';
-import { MasterImageSynchronizerComponent } from '../../src';
+import { MasterImageSynchronizerComponent } from '../../src/components';
 
 describe('components > master-images', () => {
     it('should clone master images to directory', async () => {

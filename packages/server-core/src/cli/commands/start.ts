@@ -5,16 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { CommandModule } from 'yargs';
+import { defineCommand } from 'citty';
 import { startCommand } from '../../commands/index.ts';
 
-export class StartCommand implements CommandModule {
-    command = 'start';
-
-    describe = 'Start the backend server.';
-
-    // eslint-disable-next-line class-methods-use-this
-    async handler() {
-        await startCommand();
-    }
+export function defineCLIStartCommand() {
+    return defineCommand({
+        meta: {
+            name: 'start',
+        },
+        async setup() {
+            await startCommand();
+        },
+    });
 }

@@ -64,14 +64,29 @@ export interface Analysis {
     build_status: `${ProcessStatus}` | null;
 
     /**
+     * Define if the node constraints are satisfied for the build process.
+     */
+    build_nodes_valid: boolean;
+
+    /**
      * Percentage for building image
      */
     build_progress: number | null;
 
     /**
-     * Define if the node constraints are satisfied for the build process.
+     * Hash for build process.
      */
-    build_nodes_valid: boolean;
+    build_hash: string | null;
+
+    /**
+     * Operating system
+     */
+    build_os: string | null;
+
+    /**
+     * Size in bytes
+     */
+    build_size: number | null;
 
     // ------------------------------------------------------------------
 
