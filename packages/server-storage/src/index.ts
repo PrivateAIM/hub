@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import 'reflect-metadata';
 import { generateSwagger } from '@privateaim/server-http-kit';
 import type { Component } from '@privateaim/server-kit';
 import { QueueWorkerComponentCaller } from '@privateaim/server-kit';

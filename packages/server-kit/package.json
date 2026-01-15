@@ -23,8 +23,8 @@
         "build:types": "tsc --emitDeclarationOnly -p tsconfig.build.json",
         "build:js": "rollup -c",
         "build": "rimraf ./dist && cross-env NODE_ENV=production npm run build:js && npm run build:types",
-        "test": "cross-env NODE_ENV=test jest --config ./test/jest.config.js",
-        "test:coverage": "npm run test -- --coverage"
+        "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts",
+        "test:coverage": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts --coverage"
     },
     "dependencies": {
         "@ebec/http": "^2.3.0",
@@ -43,7 +43,8 @@
         "@hapic/vault": "^2.3.9",
         "amqp-extension": "^4.0.0",
         "redis-extension": "^2.0.4",
-        "typeorm-extension": "^3.7.2"
+        "typeorm-extension": "^3.7.2",
+        "vitest": "^4.0.14"
     },
     "peerDependencies": {
         "@authup/core-http-kit": "^1.0.0-beta.28",

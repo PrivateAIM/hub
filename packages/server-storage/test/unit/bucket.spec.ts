@@ -6,6 +6,9 @@
  */
 
 import {
+    afterAll, beforeAll, describe, expect, it,
+} from 'vitest';
+import {
     createTestSuite,
     expectPropertiesEqualToSrc,
     removeDateProperties,

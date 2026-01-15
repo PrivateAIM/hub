@@ -22,7 +22,7 @@ export class ProjectNodeEntity implements ProjectNode {
     @PrimaryGeneratedColumn('uuid')
         id: string;
 
-    @Column({ default: null })
+    @Column({ type: 'varchar', length: 32, default: null })
         approval_status: ProjectNodeApprovalStatus | null;
 
     @Column({ type: 'text', nullable: true })

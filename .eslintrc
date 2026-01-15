@@ -18,11 +18,20 @@
         }],
         "import/no-relative-packages": "off",
         "import/extensions": "off",
-        "import/no-extraneous-dependencies": ["error", {
-            "devDependencies": true,
-            "optionalDependencies": false,
-            "peerDependencies": false
-        }],
+        "import/no-extraneous-dependencies": [
+            "error", {
+                "devDependencies": [
+                    "**/test/*.ts",
+                    "**/test/**/*.js",
+                    "**/test/**/*.ts",
+                    "**/test/**/*.spec.js",
+                    "**/test/**/*.spec.ts",
+                    "**/rollup.config.mjs",
+                    "packages/client-ui/**/*.vue",
+                    "packages/client-ui/**/*.ts"
+                ]
+            }
+        ],
 
         "@typescript-eslint/no-this-alias": "off",
         "@typescript-eslint/no-throw-literal": "off",

@@ -76,7 +76,8 @@
         "cross-env": "^10.1.0",
         "supertest": "^7.1.4",
         "ts-node": "^10.9.2",
-        "testcontainers": "^11.10.0"
+        "testcontainers": "^11.10.0",
+        "vitest": "^4.0.14"
     },
     "scripts": {
         "dev": "npm run cli -- start",
@@ -84,8 +85,8 @@
         "build": "rimraf dist/ && tsc -p tsconfig.build.json",
         "cli": "node dist/cli/index.js",
         "cli-dev": "ts-node src/cli/index.ts",
-        "test": "cross-env NODE_ENV=test jest --config ./test/jest.config.js --forceExit --detectOpenHandles",
-        "test:coverage": "npm run test -- --coverage"
+        "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts",
+        "test:coverage": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts --coverage"
     },
     "gitHead": "8881a3d4b427c45ac4b81ac4b31bf3d719463ef7",
     "publishConfig": {

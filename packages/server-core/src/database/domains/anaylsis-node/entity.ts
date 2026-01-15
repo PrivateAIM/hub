@@ -34,10 +34,12 @@ export class AnalysisNodeEntity implements AnalysisNode {
 
     // ------------------------------------------------------------------
 
-    @Column({ default: null })
+    @Column({ type: 'varchar', length: 32, default: null })
         approval_status: AnalysisNodeApprovalStatus | null;
 
-    @Column({ type: 'varchar', nullable: true, default: null })
+    @Column({
+        type: 'varchar', length: 32, nullable: true, default: null,
+    })
         execution_status: ProcessStatus | null;
 
     @Column({

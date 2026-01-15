@@ -45,6 +45,7 @@
         "minio": "^8.0.6",
         "mysql2": "^3.16.0",
         "redis-extension": "^2.0.4",
+        "reflect-metadata": "^0.2.2",
         "routup": "^4.0.2",
         "singa": "^1.1.0",
         "tar-stream": "^3.1.6",
@@ -58,13 +59,14 @@
         "@types/cors": "^2.8.19",
         "@types/supertest": "^6.0.3",
         "@types/tar-stream": "^3.1.4",
-        "testcontainers": "^11.10.0"
+        "testcontainers": "^11.10.0",
+        "vitest": "^4.0.14"
     },
     "scripts": {
         "dev": "ts-node src/index.ts",
         "build": "rimraf ./dist && cross-env NODE_ENV=production tsc -p tsconfig.build.json",
         "start": "node dist/index.js",
-        "test": "cross-env NODE_ENV=test jest --config ./test/jest.config.js --runInBand --testTimeout=120000 --forceExit",
-        "test:coverage": "npm run test -- --coverage"
+        "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts",
+        "test:coverage": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts --coverage"
     }
 }

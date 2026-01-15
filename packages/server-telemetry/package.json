@@ -44,6 +44,7 @@
         "node-cron": "^4.2.1",
         "rapiq": "0.9.0",
         "redis-extension": "^2.0.4",
+        "reflect-metadata": "^0.2.2",
         "routup": "^4.0.2",
         "singa": "^1.1.0",
         "typeorm": "^0.3.28",
@@ -53,13 +54,14 @@
     "devDependencies": {
         "@types/cors": "^2.8.19",
         "@types/supertest": "^6.0.3",
-        "testcontainers": "^11.10.0"
+        "testcontainers": "^11.10.0",
+        "vitest": "^4.0.14"
     },
     "scripts": {
         "cli-dev": "ts-node src/cli/index.ts",
         "build": "rimraf ./dist && cross-env NODE_ENV=production tsc -p tsconfig.build.json",
         "cli": "node dist/cli/index.js",
-        "test": "cross-env NODE_ENV=test jest --config ./test/jest.config.js",
-        "test:coverage": "npm run test -- --coverage"
+        "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts",
+        "test:coverage": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts --coverage"
     }
 }
