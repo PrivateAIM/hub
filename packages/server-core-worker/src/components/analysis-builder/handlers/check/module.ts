@@ -51,13 +51,16 @@ export class AnalysisBuilderCheckHandler implements ComponentHandler<AnalysisBui
         const image = docker.getImage(`${value.id}:latest`);
 
         try {
-            await image.inspect();
+            const imageInfo = await image.inspect();
 
             await context.handle(
                 AnalysisBuilderEvent.CHECK_FINISHED,
                 {
                     ...value,
                     status: ProcessStatus.FINISHED,
+                    hash: imageInfo.Id,
+                    os: imageInfo.Os,
+                    size: imageInfo.Size,
                 },
             );
         } catch (e) {

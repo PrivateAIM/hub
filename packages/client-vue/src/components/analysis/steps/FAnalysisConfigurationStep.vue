@@ -113,7 +113,7 @@ export default defineComponent({
             </div>
         </div>
         <div class="card-body">
-            <div class="d-flex flex-column">
+            <div class="d-flex flex-column h-100">
                 <div class="text-center mb-3">
                     <i class="fas fa-gear fa-4x" />
                 </div>
@@ -130,7 +130,9 @@ export default defineComponent({
                     </div>
                 </div>
                 <hr>
-                <h6>Requirements</h6>
+                <h6 class="mb-0">
+                    Requirements
+                </h6>
                 <div class="d-flex flex-row gap-1">
                     <div>
                         <strong>

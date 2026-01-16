@@ -159,13 +159,20 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
             throw e;
         }
 
-        await container.remove({
-            force: true,
-        });
+        const containerInfo = await container.inspect();
+
+        const docker = useDocker();
+        const image = docker.getImage(containerInfo.Image);
+        const imageInfo = await image.inspect();
 
         await context.handle(
             AnalysisBuilderEvent.EXECUTION_FINISHED,
-            value,
+            {
+                ...value,
+                hash: imageInfo.Id,
+                os: imageInfo.Os,
+                size: imageInfo.Size,
+            },
         );
     }
 

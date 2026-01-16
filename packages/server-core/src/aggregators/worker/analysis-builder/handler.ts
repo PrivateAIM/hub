@@ -9,7 +9,7 @@ import { ProcessStatus } from '@privateaim/kit';
 import type {
     AnalysisBuilderBasePayload,
     AnalysisBuilderCheckFinishedPayload,
-    AnalysisBuilderEventMap, AnalysisBuilderExecutionProgressPayload,
+    AnalysisBuilderEventMap, AnalysisBuilderExecutionFinishedPayload, AnalysisBuilderExecutionProgressPayload,
 } from '@privateaim/server-core-worker-kit';
 import {
     AnalysisBuilderEvent,
@@ -48,11 +48,20 @@ export async function handleAnalysisBuilderEvent(
             break;
         }
         case AnalysisBuilderEvent.EXECUTION_FINISHED: {
+            const temp = value as AnalysisBuilderExecutionFinishedPayload;
+
+            entity.build_hash = temp.hash ?? null;
+            entity.build_os = temp.os ?? null;
+            entity.build_size = temp.size ?? null;
             entity.build_status = ProcessStatus.FINISHED;
             break;
         }
         case AnalysisBuilderEvent.CHECK_FINISHED: {
             const temp = value as AnalysisBuilderCheckFinishedPayload;
+
+            entity.build_hash = temp.hash ?? null;
+            entity.build_os = temp.os ?? null;
+            entity.build_size = temp.size ?? null;
             entity.build_status = temp.status || null;
         }
     }

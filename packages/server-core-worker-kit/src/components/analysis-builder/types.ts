@@ -16,6 +16,22 @@ export type AnalysisBuilderBasePayload = {
 };
 
 export type AnalysisBuilderExecutePayload = AnalysisBuilderBasePayload;
+
+export type AnalysisBuilderExecutionFinishedPayload = AnalysisBuilderBasePayload & {
+    /**
+     * sha
+     */
+    hash?: string,
+    /**
+     * image size in bytes
+     */
+    size?: number,
+    /**
+     * operating system (windows, linux, ...)
+     */
+    os?: string
+};
+
 export type AnalysisBuilderExecutionProgressPayload = AnalysisBuilderBasePayload & {
     progress: Progress
 };
@@ -23,7 +39,19 @@ export type AnalysisBuilderExecutionProgressPayload = AnalysisBuilderBasePayload
 export type AnalysisBuilderCheckPayload = AnalysisBuilderBasePayload;
 
 export type AnalysisBuilderCheckFinishedPayload = AnalysisBuilderBasePayload & {
-    status?: `${ProcessStatus}`
+    status?: `${ProcessStatus}`,
+    /**
+     * sha
+     */
+    hash?: string,
+    /**
+     * image size in bytes
+     */
+    size?: number,
+    /**
+     * operating system (windows, linux, ...)
+     */
+    os?: string
 };
 
 export type AnalysisBuilderEventMap = ObjectLiteralKeys<{
@@ -31,7 +59,7 @@ export type AnalysisBuilderEventMap = ObjectLiteralKeys<{
     [AnalysisBuilderEvent.EXECUTION_FAILED]: [AnalysisBuilderExecutePayload, ComponentMetadata],
     [AnalysisBuilderEvent.EXECUTION_STARTED]: [AnalysisBuilderExecutePayload, ComponentMetadata],
     [AnalysisBuilderEvent.EXECUTION_PROGRESS]: [AnalysisBuilderExecutionProgressPayload, ComponentMetadata],
-    [AnalysisBuilderEvent.EXECUTION_FINISHED]: [AnalysisBuilderExecutePayload, ComponentMetadata],
+    [AnalysisBuilderEvent.EXECUTION_FINISHED]: [AnalysisBuilderExecutionFinishedPayload, ComponentMetadata],
 
     [AnalysisBuilderCommand.CHECK]: [AnalysisBuilderCheckPayload, ComponentMetadata],
     [AnalysisBuilderEvent.CHECK_STARTED]: [AnalysisBuilderCheckPayload, ComponentMetadata],

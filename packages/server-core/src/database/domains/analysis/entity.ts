@@ -96,6 +96,27 @@ export class AnalysisEntity implements Analysis {
     })
         build_progress: number | null;
 
+    @Column({
+        type: 'varchar',
+        length: 128,
+        nullable: true,
+        default: null,
+    })
+        build_hash: string | null;
+
+    @Column({
+        type: 'varchar',
+        length: 10,
+        nullable: true,
+        default: null,
+    })
+        build_os: string | null;
+
+    @Column({
+        type: 'int', unsigned: true, nullable: true, default: null,
+    })
+        build_size: number | null;
+
     // ------------------------------------------------------------------
 
     @Index()

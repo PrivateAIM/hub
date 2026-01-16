@@ -7,6 +7,7 @@
 
 export * from './boolean';
 export * from './error';
+export * from './file-size';
 export * from './has-own-property';
 export * from './hex-checker';
 export * from './hostname';

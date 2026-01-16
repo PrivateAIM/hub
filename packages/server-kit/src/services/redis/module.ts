@@ -5,14 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { ClientOptions as RedisClientOptions } from 'redis-extension';
 import {
     Client as RedisClient,
-    ClientOptions as RedisClientOptions,
     createClient as createRedisClient,
 } from 'redis-extension';
 
 export {
     createRedisClient,
     RedisClient,
+};
+
+export type {
     RedisClientOptions,
 };

@@ -15,12 +15,13 @@ import {
     readInt,
 } from 'envix';
 import { config } from 'dotenv';
+import { CODE_PATH } from '../../paths.ts';
 import { EnvironmentDefaults, EnvironmentInputKey } from './constants.ts';
 import type { Environment } from './types.ts';
 
 config({
     debug: false,
-    path: path.resolve(__dirname, '..', '..', '..', '.env'),
+    path: path.resolve(CODE_PATH, '..', '.env'),
 });
 
 let instance : Environment | undefined;
