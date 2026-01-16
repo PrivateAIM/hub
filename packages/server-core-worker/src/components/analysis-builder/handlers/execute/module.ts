@@ -33,7 +33,7 @@ import {
 import { AnalysisContainerPath } from '../../constants';
 import { BuilderError } from '../../error';
 import { generateDockerFileContent } from '../../helpers';
-import { removeStringPrefix, useAnalysisBuilderLogger } from '../../utils';
+import { useAnalysisBuilderLogger } from '../../utils';
 
 export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisBuilderEventMap, AnalysisBuilderCommand.EXECUTE> {
     async handle(
@@ -169,7 +169,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
             AnalysisBuilderEvent.EXECUTION_FINISHED,
             {
                 ...value,
-                hash: removeStringPrefix(imageInfo.Id, 'sha256:'),
+                hash: imageInfo.Id,
                 os: imageInfo.Os,
                 size: imageInfo.Size,
             },

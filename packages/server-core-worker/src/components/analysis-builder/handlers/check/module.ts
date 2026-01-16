@@ -15,7 +15,6 @@ import type {
 import { AnalysisBuilderEvent } from '@privateaim/server-core-worker-kit';
 import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
 import { useCoreClient, useDocker } from '../../../../core';
-import { removeStringPrefix } from '../../utils';
 
 export class AnalysisBuilderCheckHandler implements ComponentHandler<AnalysisBuilderEventMap, AnalysisBuilderCommand.CHECK> {
     async handle(
@@ -59,7 +58,7 @@ export class AnalysisBuilderCheckHandler implements ComponentHandler<AnalysisBui
                 {
                     ...value,
                     status: ProcessStatus.FINISHED,
-                    hash: removeStringPrefix(imageInfo.Id, 'sha256:'),
+                    hash: imageInfo.Id,
                     os: imageInfo.Os,
                     size: imageInfo.Size,
                 },
