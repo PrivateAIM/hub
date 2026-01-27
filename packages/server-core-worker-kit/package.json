@@ -1,7 +1,7 @@
 {
     "name": "@privateaim/server-core-worker-kit",
     "type": "module",
-    "version": "0.7.22",
+    "version": "0.7.23",
     "license": "Apache-2.0",
     "description": "",
     "module": "./dist/index.mjs",
@@ -26,9 +26,9 @@
         "build-watch": "rimraf ./dist && tsc -p tsconfig.build.json --watch"
     },
     "dependencies": {
-        "@privateaim/core-kit": "^0.8.21",
-        "@privateaim/kit": "^0.8.21",
-        "@privateaim/server-kit": "^0.8.21",
+        "@privateaim/core-kit": "^0.8.22",
+        "@privateaim/kit": "^0.8.22",
+        "@privateaim/server-kit": "^0.8.22",
         "singa": "^1.0.0"
     },
     "devDependencies": {
