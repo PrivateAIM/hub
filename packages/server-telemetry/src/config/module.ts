@@ -22,8 +22,8 @@ export function configure() {
 
     configureAMQP();
     configureRedis();
-    configureAuthup();
     configureVault();
+    configureAuthup();
 
     configureEntityEventPublisher();
 }

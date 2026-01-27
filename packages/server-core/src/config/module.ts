@@ -51,11 +51,11 @@ export type Config = {
 export function createConfig() : Config {
     setupLogging();
 
+    configureVault();
+
     configureAuthupClientAuthenticationHook();
 
     configureTelemetryClient();
-
-    configureVault();
 
     configureAuthup();
 

@@ -100,7 +100,7 @@ export default defineComponent({
 
                 <hr>
 
-                <div class="d-flex flex-column gap-2">
+                <div class="d-flex flex-column">
                     <div>
                         <h6 class="mb-0">
                             Requirements
@@ -128,6 +128,9 @@ export default defineComponent({
                             </div>
                         </div>
                     </div>
+
+                    <hr>
+
                     <div>
                         <h6 class="mb-0">
                             Info
