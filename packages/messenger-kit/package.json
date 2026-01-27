@@ -1,7 +1,7 @@
 {
     "name": "@privateaim/messenger-kit",
     "type": "module",
-    "version": "0.7.22",
+    "version": "0.7.23",
     "license": "Apache-2.0",
     "description": "",
     "module": "./dist/index.mjs",
@@ -32,11 +32,11 @@
         "zod": "^4.2.1"
     },
     "devDependencies": {
-        "@privateaim/core-kit": "^0.8.21",
+        "@privateaim/core-kit": "^0.8.22",
         "vitest": "^4.0.14"
     },
     "peerDependencies": {
-        "@privateaim/core-kit": "^0.8.21"
+        "@privateaim/core-kit": "^0.8.22"
     },
     "publishConfig": {
         "access": "public"
