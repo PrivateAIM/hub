@@ -24,7 +24,7 @@ export class VictoriaLogsLogStore implements LogStore {
 
         const stream : IngestorData = {
             _msg: output.message,
-            _time: '0',
+            _time: output.time || '0',
             ...output.labels,
             [LogFlag.CHANNEL]: output.channel,
             [LogFlag.LEVEL]: output.level,

@@ -22,7 +22,8 @@ export class AnalysisNodeLogAPI extends BaseAPI {
         await this.client.delete(`analysis-node-logs${buildQuery(options)}`);
     }
 
-    async create(data: Partial<AnalysisNodeLog>): Promise<void> {
-        await this.client.post('analysis-node-logs', data);
+    async create(data: Partial<AnalysisNodeLog>): Promise<Log> {
+        const { data: response } = await this.client.post('analysis-node-logs', data);
+        return response;
     }
 }

@@ -9,7 +9,7 @@ import { pickRecord } from '@authup/kit';
 import { DomainType } from '@privateaim/core-kit';
 import { isRealmResourceWritable } from '@privateaim/kit';
 import { ForbiddenError } from '@ebec/http';
-import type { LogLevel } from '@privateaim/telemetry-kit';
+import type { Log, LogLevel } from '@privateaim/telemetry-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted } from 'routup';
@@ -59,16 +59,10 @@ export async function createAnalysisNodeLogRouteHandler(req: Request, res: Respo
         throw new ForbiddenError('You are not an actor of to the node realm.');
     }
 
-    if (!isTelemetryClientUsable()) {
-        return sendAccepted(res);
-    }
-
-    const telemetry = useTelemetryClient();
-
     const labels : Record<string, string> = {};
     const labelsRaw = {
-        [LogFlag.REF_TYPE]: DomainType.ANALYSIS_NODE,
         ...(data.labels || {}),
+        [LogFlag.REF_TYPE]: DomainType.ANALYSIS_NODE,
         ...pickRecord(data, [
             'analysis_id',
             'node_id',
@@ -85,13 +79,19 @@ export async function createAnalysisNodeLogRouteHandler(req: Request, res: Respo
         }
     }
 
-    await telemetry.log.create({
+    const entity : Log = {
+        time: new Date().toISOString(),
         level: data.level as LogLevel,
         channel: LogChannel.HTTP,
         service: 'hub-server-core',
         message: data.message,
         labels,
-    });
+    };
 
-    return sendAccepted(res);
+    if (isTelemetryClientUsable()) {
+        const telemetry = useTelemetryClient();
+        await telemetry.log.create(entity);
+    }
+
+    return sendAccepted(res, entity);
 }
