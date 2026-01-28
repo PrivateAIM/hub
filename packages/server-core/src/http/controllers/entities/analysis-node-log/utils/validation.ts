@@ -74,5 +74,14 @@ export class AnalysisNodeLogValidator extends Container<AnalysisNodeLog> {
                     .enum(Object.values(LogLevel)),
             ),
         );
+
+        this.mount(
+            'labels',
+            { optional: true },
+            createValidator(
+                zod
+                    .record(zod.string(), zod.string()),
+            ),
+        );
     }
 }

@@ -56,15 +56,20 @@ describe('controllers > analysis-node-log', () => {
     it('should create resource', async () => {
         const client = suite.client();
 
-        await client.analysisNodeLog.create({
+        const entity = await client.analysisNodeLog.create({
             analysis_id: analysis!.id,
             node_id: node!.id,
             status: ProcessStatus.FAILED,
             level: LogLevel.ERROR,
             message: 'Analysis has been forcefully terminated.',
+            labels: {
+                foo: 'bar',
+            },
         });
 
-        expect(true).toBeTruthy();
+        expect(entity).toBeDefined();
+        expect(entity.labels).toBeDefined();
+        expect(entity.labels.foo).toEqual('bar');
     });
 
     it('should read collection', async () => {
