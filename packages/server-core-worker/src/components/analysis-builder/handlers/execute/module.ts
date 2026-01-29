@@ -274,6 +274,12 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
             throw BuilderError.entrypointNotFound();
         }
 
+        const { data: analysisBucketFiles } = await core.analysisBucketFile.getMany({
+            filters: {
+                analysis_bucket_id: analysisBucket.id,
+            },
+        });
+
         const storage = useStorageClient();
         const webStream = await storage.bucket.stream(analysisBucket.bucket_id);
         const nodeStream = stream.Readable.fromWeb(webStream as any);
@@ -283,6 +289,17 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
             nodeStream,
             {
                 path: AnalysisContainerPath.CODE,
+
+                onEntry: (entry) => {
+                    if (entry.type && entry.type !== 'file') {
+                        return;
+                    }
+
+                    const index = analysisBucketFiles.findIndex((analysisBucketFile) => analysisBucketFile.path === entry.name);
+                    if (index === -1) {
+                        throw new Error(`Bucket file ${entry.name} is not a valid analysis bucket file.`);
+                    }
+                },
 
                 onEntryPackStarted: (entry) => {
                     useAnalysisBuilderLogger()

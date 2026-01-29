@@ -14,6 +14,7 @@ import { streamToBuffer } from '../utils';
 export type DockerContainerPackOptions = {
     path: string,
 
+    onEntry?: (entry: Headers) => Promise<void> | void,
     onEntryPackStarted?: (entry: Headers) => Promise<void> | void,
     onEntryPackFinished?: (entry: Headers) => Promise<void> | void,
     onEntryPackFailed?: (error: Error, entry: Headers) => Promise<void> | void,
@@ -28,20 +29,28 @@ export async function packDockerContainerWithTarStream(
         const pack = tar.pack();
         const extract = tar.extract();
 
-        extract.on('entry', (header, stream, callback) => {
+        extract.on('entry', (headers, stream, callback) => {
             if (options.onEntryPackStarted) {
-                options.onEntryPackStarted(header);
+                options.onEntryPackStarted(headers);
             }
 
-            streamToBuffer(stream)
+            Promise.resolve()
+                .then(() => {
+                    if (options.onEntry) {
+                        return options.onEntry(headers);
+                    }
+
+                    return Promise.resolve();
+                })
+                .then(() => streamToBuffer(stream))
                 .then((buff) => {
                     pack.entry(
-                        header,
+                        headers,
                         buff,
                         (err) => {
                             if (err) {
                                 if (options.onEntryPackFailed) {
-                                    options.onEntryPackFailed(err, header);
+                                    options.onEntryPackFailed(err, headers);
                                 }
 
                                 callback(err);
@@ -49,7 +58,7 @@ export async function packDockerContainerWithTarStream(
                             }
 
                             if (options.onEntryPackFinished) {
-                                options.onEntryPackFinished(header);
+                                options.onEntryPackFinished(headers);
                             }
 
                             callback();
@@ -58,7 +67,7 @@ export async function packDockerContainerWithTarStream(
                 })
                 .catch((e) => {
                     if (options.onEntryPackFailed) {
-                        options.onEntryPackFailed(e, header);
+                        options.onEntryPackFailed(e, headers);
                     }
 
                     callback(e);
