@@ -65,9 +65,6 @@ export class DirectComponentCaller<
         ...payload: ComponentCallerPayload<EventMap[Key]>
     ): Promise<ComponentDirectCallerResponse<EventMap>> {
         const [data, metadata] = payload;
-        if (!this.component.handle) {
-            throw new Error(`Component ${this.component.constructor.name} can not be called.`);
-        }
 
         const events : ComponentDirectCallerResponse<EventMap> = {};
 

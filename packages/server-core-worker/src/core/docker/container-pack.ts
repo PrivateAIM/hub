@@ -14,7 +14,8 @@ import { streamToBuffer } from '../utils';
 export type DockerContainerPackOptions = {
     path: string,
 
-    onEntry?: (entry: Headers) => Promise<void> | void,
+    validateEntry?: (entry: Headers) => Promise<void> | void,
+
     onEntryPackStarted?: (entry: Headers) => Promise<void> | void,
     onEntryPackFinished?: (entry: Headers) => Promise<void> | void,
     onEntryPackFailed?: (error: Error, entry: Headers) => Promise<void> | void,
@@ -36,8 +37,8 @@ export async function packDockerContainerWithTarStream(
 
             Promise.resolve()
                 .then(() => {
-                    if (options.onEntry) {
-                        return options.onEntry(headers);
+                    if (options.validateEntry) {
+                        return options.validateEntry(headers);
                     }
 
                     return Promise.resolve();

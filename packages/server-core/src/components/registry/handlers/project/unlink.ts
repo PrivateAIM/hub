@@ -52,7 +52,7 @@ RegistryCommand.PROJECT_UNLINK
                     command: RegistryCommand.PROJECT_UNLINK,
                 });
 
-            throw e;
+            return;
         }
 
         try {
@@ -67,7 +67,7 @@ RegistryCommand.PROJECT_UNLINK
                     command: RegistryCommand.PROJECT_UNLINK,
                 });
 
-            throw e;
+            return;
         }
 
         if (value.accountId) {
@@ -96,7 +96,7 @@ RegistryCommand.PROJECT_UNLINK
                     command: RegistryCommand.PROJECT_UNLINK,
                 });
 
-            throw e;
+            return;
         }
 
         if (value.id) {

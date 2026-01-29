@@ -81,7 +81,7 @@ RegistryCommand.PROJECT_LINK
                     command: RegistryCommand.PROJECT_LINK,
                 });
 
-            throw e;
+            return;
         }
 
         await repository.save(entity);
@@ -114,7 +114,7 @@ RegistryCommand.PROJECT_LINK
                     command: RegistryCommand.PROJECT_LINK,
                 });
 
-            throw e;
+            return;
         }
 
         await repository.save(entity);
@@ -140,7 +140,7 @@ RegistryCommand.PROJECT_LINK
                     command: RegistryCommand.PROJECT_LINK,
                 });
 
-            throw e;
+            return;
         }
 
         await repository.save(entity);

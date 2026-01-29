@@ -290,7 +290,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
             {
                 path: AnalysisContainerPath.CODE,
 
-                onEntry: (entry) => {
+                validateEntry: (entry) => {
                     if (entry.type && entry.type !== 'file') {
                         return;
                     }

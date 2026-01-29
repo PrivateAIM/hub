@@ -141,10 +141,12 @@ export abstract class BaseComponent<
 
         if (handler) {
             if (typeof handler === 'function') {
-                return handler(data, context);
+                return Promise.resolve()
+                    .then(() => handler(data, context));
             }
 
-            return handler.handle(data, context);
+            return Promise.resolve()
+                .then(() => handler.handle(data, context));
         }
 
         if (options.handle) {
