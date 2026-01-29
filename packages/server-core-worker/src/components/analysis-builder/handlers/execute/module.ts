@@ -291,9 +291,13 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
                 path: AnalysisContainerPath.CODE,
 
                 onEntry: (entry) => {
+                    if (entry.type && entry.type !== 'file') {
+                        return;
+                    }
+
                     const index = analysisBucketFiles.findIndex((analysisBucketFile) => analysisBucketFile.path === entry.name);
                     if (index === -1) {
-                        throw new Error(`Bucket file ${entry.name} is not a valid analysis bucekt file.`);
+                        throw new Error(`Bucket file ${entry.name} is not a valid analysis bucket file.`);
                     }
                 },
 

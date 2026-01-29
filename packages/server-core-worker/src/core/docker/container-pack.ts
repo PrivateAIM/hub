@@ -36,7 +36,7 @@ export async function packDockerContainerWithTarStream(
 
             Promise.resolve()
                 .then(() => {
-                    if (options.onEntry(headers)) {
+                    if (options.onEntry) {
                         return options.onEntry(headers);
                     }
 
