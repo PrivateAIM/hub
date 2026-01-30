@@ -7,31 +7,26 @@ volumes:
     vault:
         driver: local
 services:
-    loki:
-        image: grafana/loki:latest
+    vl:
+        image: victoriametrics/victoria-logs:v1.43.1
         ports:
-            - "3100:3100"
+            - "9428:9428"
         networks:
             hub:
         healthcheck:
-            test: wget --quiet --tries=1 --output-document=- http://localhost:3100/ready | grep -q -w ready || exit 1
+            test: [ "CMD", "wget", "--spider", "--proxy", "off", "http://127.0.0.1:9428/health" ]
             start_period: 20s
             interval: 3s
             timeout: 5s
             retries: 5
-        volumes:
-            - './loki-config.yaml:/loki-config.yaml'
-        command: --config.file=/loki-config.yaml
     grafana:
         image: grafana/grafana:latest
         environment:
             - GF_SECURITY_ADMIN_PASSWORD=admin
         networks:
             hub:
-        depends_on:
-            - loki
     mysql:
-        image: mysql:latest
+        image: mysql:9
         container_name: mysql
         restart: always
         healthcheck:
@@ -163,7 +158,7 @@ services:
                 condition: service_healthy
             vault:
                 condition: service_healthy
-            loki:
+            vl:
                 condition: service_healthy
         environment:
             REDIS_CONNECTION_STRING: redis://redis
@@ -269,7 +264,7 @@ services:
             REDIS_CONNECTION_STRING: redis://redis
             VAULT_CONNECTION_STRING: start123@http://vault:8090/v1/
             AUTHUP_URL: http://authup:3000/
-            LOKI_URL: http://loki:3100/
+            VICTORIA_LOGS_URL: http://vl:9428/
         networks:
             hub:
     ui:
