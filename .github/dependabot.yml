@@ -40,3 +40,5 @@ updates:
               update-types:
                   - "patch"
                   - "minor"
+              exclude-patterns:
+                  - "eslint-plugin-vue"

@@ -24,11 +24,11 @@
     },
     "devDependencies": {
         "typeorm": "^0.3.28",
-        "typeorm-extension": "^3.7.4"
+        "typeorm-extension": "^3.8.0"
     },
     "peerDependencies": {
         "typeorm": "^0.3.28",
-        "typeorm-extension": "^3.7.4"
+        "typeorm-extension": "^3.8.0"
     },
     "scripts": {
         "build:types": "tsc --emitDeclarationOnly -p tsconfig.build.json",

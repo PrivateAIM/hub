@@ -61,7 +61,7 @@
         "smob": "^1.5.0",
         "socket.io": "^4.8.2",
         "typeorm": "^0.3.28",
-        "typeorm-extension": "^3.7.4",
+        "typeorm-extension": "^3.8.0",
         "validup": "^0.1.9",
         "zod": "^4.3.6"
     },

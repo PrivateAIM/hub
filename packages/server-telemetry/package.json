@@ -48,7 +48,7 @@
         "routup": "^4.1.0",
         "singa": "^1.1.0",
         "typeorm": "^0.3.28",
-        "typeorm-extension": "^3.7.4",
+        "typeorm-extension": "^3.8.0",
         "validup": "^0.1.9"
     },
     "devDependencies": {

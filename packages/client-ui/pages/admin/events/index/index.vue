@@ -113,6 +113,7 @@ export default defineComponent({
         </template>
         <template #footer="props">
             <FPagination
+                :total="props.meta.pagination?.total"
                 :load="props.load"
                 :meta="props.meta"
             />

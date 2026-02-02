@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { wait } from '@privateaim/kit';
 import type { ComponentHandler } from '@privateaim/server-kit';
 import { useLogger } from '@privateaim/server-kit';
 import cron from 'node-cron';
@@ -35,27 +36,25 @@ EventCommand.CLEAN
 
         const handleBatch = async (
             limit: number,
-            offset: number = 0,
         ) : Promise<void> => {
-            const [entities, total] = await repository.findAndCount({
+            const entities = await repository.find({
                 where: {
                     expiring: true,
                     expires_at: LessThan(isoDate),
                 },
                 take: limit,
-                skip: offset,
             });
 
             await repository
                 .remove(entities);
 
-            const currentTotal = limit + offset;
-
-            if (total > currentTotal) {
-                return handleBatch(limit, currentTotal);
+            if (entities.length < limit) {
+                return Promise.resolve();
             }
 
-            return Promise.resolve();
+            return Promise.resolve()
+                .then(() => wait(0))
+                .then(() => handleBatch(limit));
         };
 
         return handleBatch(100);

@@ -43,12 +43,10 @@ export default defineComponent({
             const response = await httpClient.event.getMany(query);
 
             data.value = response.data;
-            meta.value = {
-                ...meta.value,
-                pagination: {
-                    ...meta.value.pagination,
-                    ...response.meta,
-                },
+
+            meta.value.pagination = {
+                ...meta.value.pagination,
+                ...response.meta,
             };
 
             busy.value = false;

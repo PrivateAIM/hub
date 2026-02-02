@@ -5,13 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
-    BaseComponent,
-} from '@privateaim/server-kit';
+import { BaseComponent } from '@privateaim/server-kit';
 import type { EventComponentEventMap } from '@privateaim/server-telemetry-kit';
-import {
-    EventCommand,
-} from '@privateaim/server-telemetry-kit';
+import { EventCommand } from '@privateaim/server-telemetry-kit';
 import { EventComponentCleanerHandler, EventComponentCreateHandler } from './handlers/index.ts';
 
 export class EventComponent extends BaseComponent<EventComponentEventMap> {

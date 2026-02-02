@@ -24,6 +24,8 @@ export class QueueWorkerComponentCaller<
     }
 
     async start() {
+        await this.component.start();
+
         if (!isQueueRouterUsable()) {
             useLogger().warn(`Can not consume queue for component ${this.component.constructor.name}`);
             return;
