@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.8.23](https://github.com/PrivateAIM/hub/compare/v0.8.22...v0.8.23) (2026-02-02)
+
+
+### Features
+
+* check if bucket-file is a valid analysis bucket file ([#1389](https://github.com/PrivateAIM/hub/issues/1389)) ([62e33ea](https://github.com/PrivateAIM/hub/commit/62e33ea845ab1b4f46f519df4c31caa1cffecbdb))
+* support additional labels for analysis-node-logs creation ([#1388](https://github.com/PrivateAIM/hub/issues/1388)) ([5d6ffb5](https://github.com/PrivateAIM/hub/commit/5d6ffb5ac9acafc18260ef36945f73ac65fcf3ff))
+
+
+### Bug Fixes
+
+* **deps:** bump the minorandpatch group across 1 directory with 19 updates ([#1392](https://github.com/PrivateAIM/hub/issues/1392)) ([23060bf](https://github.com/PrivateAIM/hub/commit/23060bfce24100d17d4d83c7ee45ed6d85073c6b))
+* don't throw in registry component ([78a638b](https://github.com/PrivateAIM/hub/commit/78a638bcf17884a88e2f0df6ea0aaf0f3ea41742))
+* initializing event component + reading event batches ([482e9e6](https://github.com/PrivateAIM/hub/commit/482e9e65f2aba1811bec26c4fcebe4d4bc91234b))
+
 ## [0.8.22](https://github.com/PrivateAIM/hub/compare/v0.8.21...v0.8.22) (2026-01-27)
 
 

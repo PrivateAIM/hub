@@ -1,5 +1,32 @@
 # Changelog
 
+## [0.8.23](https://github.com/PrivateAIM/hub/compare/v0.8.22...v0.8.23) (2026-02-02)
+
+
+### Features
+
+* check if bucket-file is a valid analysis bucket file ([#1389](https://github.com/PrivateAIM/hub/issues/1389)) ([62e33ea](https://github.com/PrivateAIM/hub/commit/62e33ea845ab1b4f46f519df4c31caa1cffecbdb))
+
+
+### Bug Fixes
+
+* **deps:** bump the minorandpatch group across 1 directory with 19 updates ([#1392](https://github.com/PrivateAIM/hub/issues/1392)) ([23060bf](https://github.com/PrivateAIM/hub/commit/23060bfce24100d17d4d83c7ee45ed6d85073c6b))
+* don't throw in registry component ([78a638b](https://github.com/PrivateAIM/hub/commit/78a638bcf17884a88e2f0df6ea0aaf0f3ea41742))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.8.22 to ^0.8.23
+    * @privateaim/kit bumped from ^0.8.22 to ^0.8.23
+    * @privateaim/core-http-kit bumped from ^0.8.22 to ^0.8.23
+    * @privateaim/telemetry-kit bumped from ^0.8.22 to ^0.8.23
+    * @privateaim/server-kit bumped from ^0.8.22 to ^0.8.23
+    * @privateaim/server-telemetry-kit bumped from ^0.8.22 to ^0.8.23
+    * @privateaim/server-core-worker-kit bumped from ^0.7.23 to ^0.7.24
+    * @privateaim/storage-kit bumped from ^0.8.22 to ^0.8.23
+
 ## [0.8.22](https://github.com/PrivateAIM/hub/compare/v0.8.21...v0.8.22) (2026-01-27)
 
 
