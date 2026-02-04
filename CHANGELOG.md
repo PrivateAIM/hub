@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.24](https://github.com/PrivateAIM/hub/compare/v0.8.23...v0.8.24) (2026-02-04)
+
+
+### Bug Fixes
+
+* add missing client_id in node read response(s) ([07f2eff](https://github.com/PrivateAIM/hub/commit/07f2eff1099c803672933b78d2454a787aad5b10))
+* time property in log validator ([3f54557](https://github.com/PrivateAIM/hub/commit/3f54557e9f444e29ec4a65a660ebfd0f7e76a909))
+
 ## [0.8.23](https://github.com/PrivateAIM/hub/compare/v0.8.22...v0.8.23) (2026-02-02)
 
 
