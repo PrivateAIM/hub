@@ -20,10 +20,8 @@ export class LogValidator extends Container<LogInput> {
             { optional: true },
             createValidator(
                 zod
-                    .string()
-                    .min(0)
-                    .max(20)
-                    .or(zod.bigint())
+                    .iso
+                    .datetime()
                     .optional(),
             ),
         );
