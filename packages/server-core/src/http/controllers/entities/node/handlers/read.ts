@@ -23,6 +23,7 @@ async function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>,
         default: [
             'id',
             'name',
+            'client_id',
             'external_name',
             'hidden',
             'type',
