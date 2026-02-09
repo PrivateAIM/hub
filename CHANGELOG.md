@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.8.24](https://github.com/PrivateAIM/hub/compare/v0.8.23...v0.8.24) (2026-02-09)
+
+
+### Features
+
+* analysis storage manager component + http endpoint integration ([#1401](https://github.com/PrivateAIM/hub/issues/1401)) ([3ee2e02](https://github.com/PrivateAIM/hub/commit/3ee2e025c725fdafe3359fe502bc05a1757b81f2))
+
+
+### Bug Fixes
+
+* add missing client_id in node read response(s) ([07f2eff](https://github.com/PrivateAIM/hub/commit/07f2eff1099c803672933b78d2454a787aad5b10))
+* **deps:** bump the minorandpatch group across 1 directory with 8 updates ([#1399](https://github.com/PrivateAIM/hub/issues/1399)) ([e14f030](https://github.com/PrivateAIM/hub/commit/e14f03035b67cdb0058ac6194a312ea24bbfb038))
+* time property in log validator ([3f54557](https://github.com/PrivateAIM/hub/commit/3f54557e9f444e29ec4a65a660ebfd0f7e76a909))
+
 ## [0.8.23](https://github.com/PrivateAIM/hub/compare/v0.8.22...v0.8.23) (2026-02-02)
 
 
