@@ -19,6 +19,7 @@ export default defineComponent({
     props: {
         entityId: {
             type: String,
+            required: true,
         },
         type: {
             type: String as PropType<`${AnalysisBucketType}`>,
