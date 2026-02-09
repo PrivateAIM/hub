@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.8.24](https://github.com/PrivateAIM/hub/compare/v0.8.23...v0.8.24) (2026-02-09)
+
+
+### Features
+
+* analysis storage manager component + http endpoint integration ([#1401](https://github.com/PrivateAIM/hub/issues/1401)) ([3ee2e02](https://github.com/PrivateAIM/hub/commit/3ee2e025c725fdafe3359fe502bc05a1757b81f2))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.8.23 to ^0.8.24
+    * @privateaim/telemetry-kit bumped from ^0.8.23 to ^0.8.24
+  * peerDependencies
+    * @privateaim/kit bumped from ^0.8.23 to ^0.8.24
+    * @privateaim/telemetry-kit bumped from ^0.8.23 to ^0.8.24
+
 ## [0.8.23](https://github.com/PrivateAIM/hub/compare/v0.8.22...v0.8.23) (2026-02-02)
 
 
