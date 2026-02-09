@@ -14,8 +14,13 @@ import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useEnv } from '../../../../../config/index.ts';
-import { AnalysisEntity } from '../../../../../database/index.ts';
-import { AnalysisBuilder, AnalysisConfigurator, AnalysisDistributor } from '../../../../../services/index.ts';
+import { AnalysisBucketEntity, AnalysisEntity } from '../../../../../database/index.ts';
+import {
+    AnalysisBuilder,
+    AnalysisConfigurator,
+    AnalysisDistributor,
+    AnalysisStorageManager,
+} from '../../../../../services/index.ts';
 import { AnalysisCommandValidator } from '../utils/index.ts';
 
 /**
@@ -55,6 +60,12 @@ export async function handleAnalysisCommandRouteHandler(req: Request, res: Respo
     const builder = new AnalysisBuilder();
     const configurator = new AnalysisConfigurator();
 
+    const bucketRepository = dataSource.getRepository(AnalysisBucketEntity);
+    const analysisStorageManager = new AnalysisStorageManager({
+        repository,
+        bucketRepository,
+    });
+
     switch (data.command) {
         // Build
         case AnalysisCommand.BUILD_CHECK:
@@ -84,6 +95,11 @@ export async function handleAnalysisCommandRouteHandler(req: Request, res: Respo
             break;
         case AnalysisCommand.DISTRIBUTION_START:
             entity = await distributor.start(entity, req);
+            break;
+
+            // Storage
+        case AnalysisCommand.STORAGE_CHECK:
+            entity = await analysisStorageManager.check(entity);
             break;
     }
 

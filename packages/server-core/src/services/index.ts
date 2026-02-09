@@ -8,6 +8,7 @@
 export * from './analysis-builder/index.ts';
 export * from './analysis-configurator/index.ts';
 export * from './analysis-distributor/index.ts';
+export * from './analysis-storage-manager/index.ts';
 export * from './database-integrity/index.ts';
 export * from './master-image/index.ts';
 export * from './node-client/index.ts';

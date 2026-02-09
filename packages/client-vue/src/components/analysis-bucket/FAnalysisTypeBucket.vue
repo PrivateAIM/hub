@@ -5,9 +5,13 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { AnalysisBucketType } from '@privateaim/core-kit';
+import type { AnalysisBucket, AnalysisBucketType } from '@privateaim/core-kit';
+import { AnalysisCommand } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
-import { defineComponent, useTemplateRef } from 'vue';
+import {
+    defineComponent, ref, useTemplateRef,
+} from 'vue';
+import { type EntityManagerResolveContext, injectCoreHTTPClient, wrapFnWithBusyState } from '../../core';
 import FAnalysisBucket from './FAnalysisBucket';
 
 export default defineComponent({
@@ -15,26 +19,54 @@ export default defineComponent({
     props: {
         entityId: {
             type: String,
+            required: true,
         },
         type: {
             type: String as PropType<`${AnalysisBucketType}`>,
         },
     },
-    setup(_, { emit }) {
+    emits: ['updated', 'executed', 'failed'],
+    setup(props, { emit }) {
         const vNode = useTemplateRef<typeof FAnalysisBucket>('analysisBucket');
+        const httpClient = injectCoreHTTPClient();
 
         const forward = (name: string, ...args: unknown[]) => {
-            emit(name, ...args);
+            emit(name as 'updated' | 'executed', ...args);
+        };
+
+        const isBusy = ref(false);
+
+        const execute = wrapFnWithBusyState(isBusy, async () => {
+            try {
+                const response = await httpClient
+                    .analysis.runCommand(props.entityId, AnalysisCommand.STORAGE_CHECK);
+
+                emit('executed', AnalysisCommand.STORAGE_CHECK);
+                emit('updated', response);
+            } catch (e) {
+                if (e instanceof Error) {
+                    emit('failed', e);
+                }
+            }
+        });
+
+        const refresh = () => {
+            if (vNode.value) {
+                vNode.value.resolve({
+                    reset: true,
+                } satisfies EntityManagerResolveContext<AnalysisBucket>);
+            }
         };
 
         const retry = () => {
-            if (vNode.value) {
-                vNode.value.resolve({ reset: true });
-            }
+            Promise.resolve()
+                .then(() => execute())
+                .then(() => refresh());
         };
 
         return {
             forward,
+            refresh,
             retry,
         };
     },
@@ -42,13 +74,13 @@ export default defineComponent({
 
 </script>
 <template>
+    <!-- v-bind="$props" -->
     <FAnalysisBucket
         ref="analysisBucket"
         :query-filters="{
             analysis_id: entityId,
             type,
         }"
-        v-bind="$props"
         v-on="forward"
     >
         <template #default="props">
