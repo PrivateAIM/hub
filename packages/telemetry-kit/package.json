@@ -1,7 +1,7 @@
 {
     "name": "@privateaim/telemetry-kit",
     "type": "module",
-    "version": "0.8.24",
+    "version": "0.8.25",
     "license": "Apache-2.0",
     "description": "",
     "module": "./dist/index.mjs",
@@ -26,14 +26,14 @@
     "devDependencies": {
         "@authup/kit": "^1.0.0-beta.28",
         "@authup/core-kit": "^1.0.0-beta.28",
-        "@privateaim/kit": "^0.8.24",
+        "@privateaim/kit": "^0.8.25",
         "hapic": "^2.7.0",
         "rapiq": "^0.9.0"
     },
     "peerDependencies": {
         "@authup/kit": "^1.0.0-beta.28",
         "@authup/core-kit": "^1.0.0-beta.28",
-        "@privateaim/kit": "^0.8.24",
+        "@privateaim/kit": "^0.8.25",
         "hapic": "^2.7.0",
         "rapiq": "^0.9.0"
     },
