@@ -49,11 +49,11 @@ const FAnalysisCommand = defineComponent({
     emits: ['updated', 'executed', 'failed'],
     setup(props, { emit, slots }) {
         const apiClient = injectCoreHTTPClient();
-        const busy = ref(false);
+        const isBusy = ref(false);
 
         const entity = toRef(props, 'entity');
 
-        const execute = wrapFnWithBusyState(busy, async () => {
+        const execute = wrapFnWithBusyState(isBusy, async () => {
             try {
                 const response = await apiClient
                     .analysis.runCommand(entity.value.id, props.command);
