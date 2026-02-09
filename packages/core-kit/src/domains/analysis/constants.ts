@@ -14,4 +14,6 @@ export enum AnalysisCommand {
 
     DISTRIBUTION_START = 'distributionStart',
     DISTRIBUTION_CHECK = 'distributionCheck',
+
+    STORAGE_CHECK = 'storageCheck',
 }
