@@ -92,7 +92,7 @@ export class AnalysisStorageManager {
                 analysis_id: entity.id,
                 type: bucketTypes[i],
             });
-            if (analysisBucket) {
+            if (!analysisBucket) {
                 continue;
             }
 
