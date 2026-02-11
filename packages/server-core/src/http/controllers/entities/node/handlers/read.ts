@@ -89,7 +89,7 @@ export async function getManyNodeRouteHandler(req: Request, res: Response) : Pro
     });
 
     applyFilters(query, filter, {
-        allowed: ['id', 'name', 'online', 'hidden', 'realm_id', 'robot_id'],
+        allowed: ['id', 'name', 'online', 'hidden', 'client_id', 'realm_id', 'robot_id'],
         defaultAlias: 'node',
     });
 
