@@ -57,8 +57,12 @@ export async function createProjectRouteHandler(req: Request, res: Response) : P
             data.robot_id = identity.id;
             break;
         }
+        case 'client': {
+            data.client_id = identity.id;
+            break;
+        }
         default: {
-            throw new BadRequestError('Only user-/robot-accounts are permitted to create a project');
+            throw new BadRequestError('Only client-, user- or robot-accounts are permitted to create a project');
         }
     }
 

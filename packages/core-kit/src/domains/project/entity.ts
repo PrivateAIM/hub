@@ -5,7 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Realm, Robot, User } from '@authup/core-kit';
+import type {
+    Client, Realm, Robot, User,
+} from '@authup/core-kit';
 import type { MasterImage } from '../master-image';
 
 export interface Project {
@@ -30,6 +32,8 @@ export interface Project {
     // ------------------------------------------------------------------
 
     realm_id: Realm['id'];
+
+    client_id: Client['id'] | null;
 
     robot_id: Robot['id'] | null;
 

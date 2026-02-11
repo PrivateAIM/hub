@@ -27,7 +27,7 @@ export async function executeBucketRouteCreateHandler(req: Request, res: Respons
 
     const actor = useRequestIdentityOrFail(req);
     if (!actor) {
-        throw new ForbiddenError('Only users and robots are permitted to create a bucket.');
+        throw new ForbiddenError('Only clients, users & robots are permitted to create a bucket.');
     }
 
     const validator = new BucketValidator();

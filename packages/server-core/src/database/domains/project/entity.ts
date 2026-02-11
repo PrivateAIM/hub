@@ -9,7 +9,9 @@ import {
     Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn,
 } from 'typeorm';
 import type { MasterImage, Project } from '@privateaim/core-kit';
-import type { Realm, Robot, User } from '@authup/core-kit';
+import type {
+    Client, Realm, Robot, User,
+} from '@authup/core-kit';
 import { MasterImageEntity } from '../master-image/index.ts';
 
 @Entity({ name: 'projects' })
@@ -43,6 +45,9 @@ export class ProjectEntity implements Project {
 
     @Column({ type: 'uuid' })
         realm_id: Realm['id'];
+
+    @Column({ type: 'uuid', nullable: true })
+        client_id: Client['id'] | null;
 
     @Column({ type: 'uuid', nullable: true })
         user_id: User['id'] | null;
