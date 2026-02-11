@@ -52,6 +52,7 @@ export class NodeClientService {
             client = await this.authup.client.create({
                 name: entity.id,
                 realm_id: entity.realm_id,
+                is_confidential: true,
             });
 
             entity.client_id = client.id;
