@@ -1,5 +1,34 @@
 # Changelog
 
+## [0.8.26](https://github.com/PrivateAIM/hub/compare/v0.8.25...v0.8.26) (2026-02-11)
+
+
+### Bug Fixes
+
+* allow filtering nodes by client_id ([65f0ad3](https://github.com/PrivateAIM/hub/commit/65f0ad30da1d6dfc42ae131db5d68b9d0bce5e3f))
+* permit client for project & analysis-bucket-file creation ([c203c48](https://github.com/PrivateAIM/hub/commit/c203c481c80b7117542a57412b082de9f64f39c3))
+* set node default client to confidential ([0dd5c24](https://github.com/PrivateAIM/hub/commit/0dd5c2424d2eb0e954ee316893f4c029f69b692b))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.8.25 to ^0.8.26
+    * @privateaim/core-realtime-kit bumped from ^0.7.26 to ^0.7.27
+    * @privateaim/kit bumped from ^0.8.25 to ^0.8.26
+    * @privateaim/server-core-worker-kit bumped from ^0.7.26 to ^0.7.27
+    * @privateaim/server-db-kit bumped from ^0.8.25 to ^0.8.26
+    * @privateaim/server-http-kit bumped from ^0.8.25 to ^0.8.26
+    * @privateaim/server-kit bumped from ^0.8.25 to ^0.8.26
+    * @privateaim/server-realtime-kit bumped from ^0.8.25 to ^0.8.26
+    * @privateaim/server-telemetry bumped from ^0.8.25 to ^0.8.26
+    * @privateaim/server-telemetry-kit bumped from ^0.8.25 to ^0.8.26
+    * @privateaim/storage-kit bumped from ^0.8.25 to ^0.8.26
+    * @privateaim/telemetry-kit bumped from ^0.8.25 to ^0.8.26
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.8.25 to ^0.8.26
+
 ## [0.8.25](https://github.com/PrivateAIM/hub/compare/v0.8.24...v0.8.25) (2026-02-09)
 
 

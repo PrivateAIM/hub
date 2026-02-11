@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.8.26](https://github.com/PrivateAIM/hub/compare/v0.8.25...v0.8.26) (2026-02-11)
+
+
+### Bug Fixes
+
+* permit client for project & analysis-bucket-file creation ([c203c48](https://github.com/PrivateAIM/hub/commit/c203c481c80b7117542a57412b082de9f64f39c3))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.8.25 to ^0.8.26
+    * @privateaim/telemetry-kit bumped from ^0.8.25 to ^0.8.26
+  * peerDependencies
+    * @privateaim/kit bumped from ^0.8.25 to ^0.8.26
+    * @privateaim/telemetry-kit bumped from ^0.8.25 to ^0.8.26
+
 ## [0.8.25](https://github.com/PrivateAIM/hub/compare/v0.8.24...v0.8.25) (2026-02-09)
 
 
