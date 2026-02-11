@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.8.26](https://github.com/PrivateAIM/hub/compare/v0.8.25...v0.8.26) (2026-02-11)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/client-vue bumped from ^0.8.25 to ^0.8.26
+    * @privateaim/core-kit bumped from ^0.8.25 to ^0.8.26
+    * @privateaim/kit bumped from ^0.8.25 to ^0.8.26
+    * @privateaim/storage-kit bumped from ^0.8.25 to ^0.8.26
+    * @privateaim/telemetry-kit bumped from ^0.8.25 to ^0.8.26
+
 ## [0.8.25](https://github.com/PrivateAIM/hub/compare/v0.8.24...v0.8.25) (2026-02-09)
 
 

@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.8.26](https://github.com/PrivateAIM/hub/compare/v0.8.25...v0.8.26) (2026-02-11)
+
+
+### Bug Fixes
+
+* allow filtering nodes by client_id ([65f0ad3](https://github.com/PrivateAIM/hub/commit/65f0ad30da1d6dfc42ae131db5d68b9d0bce5e3f))
+* permit client for project & analysis-bucket-file creation ([c203c48](https://github.com/PrivateAIM/hub/commit/c203c481c80b7117542a57412b082de9f64f39c3))
+* set node default client to confidential ([0dd5c24](https://github.com/PrivateAIM/hub/commit/0dd5c2424d2eb0e954ee316893f4c029f69b692b))
+
 ## [0.8.25](https://github.com/PrivateAIM/hub/compare/v0.8.24...v0.8.25) (2026-02-09)
 
 ## [0.8.24](https://github.com/PrivateAIM/hub/compare/v0.8.23...v0.8.24) (2026-02-09)

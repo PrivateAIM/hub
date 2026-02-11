@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.8.26](https://github.com/PrivateAIM/hub/compare/v0.8.25...v0.8.26) (2026-02-11)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.8.25 to ^0.8.26
+    * @privateaim/server-kit bumped from ^0.8.25 to ^0.8.26
+    * @privateaim/server-db-kit bumped from ^0.8.25 to ^0.8.26
+    * @privateaim/server-http-kit bumped from ^0.8.25 to ^0.8.26
+    * @privateaim/telemetry-kit bumped from ^0.8.25 to ^0.8.26
+    * @privateaim/server-telemetry-kit bumped from ^0.8.25 to ^0.8.26
+
 ## [0.8.25](https://github.com/PrivateAIM/hub/compare/v0.8.24...v0.8.25) (2026-02-09)
 
 
