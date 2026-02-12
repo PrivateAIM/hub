@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.27](https://github.com/PrivateAIM/hub/compare/v0.8.26...v0.8.27) (2026-02-12)
+
+
+### Features
+
+* refactor process-status enums ([#1410](https://github.com/PrivateAIM/hub/issues/1410)) ([cf7a594](https://github.com/PrivateAIM/hub/commit/cf7a5947c06fbf1d6afbe1412a2e8dd992023ef4))
+
 ## [0.8.26](https://github.com/PrivateAIM/hub/compare/v0.8.25...v0.8.26) (2026-02-11)
 
 ## [0.8.25](https://github.com/PrivateAIM/hub/compare/v0.8.24...v0.8.25) (2026-02-09)

@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.8.27](https://github.com/PrivateAIM/hub/compare/v0.8.26...v0.8.27) (2026-02-12)
+
+
+### Features
+
+* refactor process-status enums ([#1410](https://github.com/PrivateAIM/hub/issues/1410)) ([cf7a594](https://github.com/PrivateAIM/hub/commit/cf7a5947c06fbf1d6afbe1412a2e8dd992023ef4))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.8.26 to ^0.8.27
+    * @privateaim/telemetry-kit bumped from ^0.8.26 to ^0.8.27
+  * peerDependencies
+    * @privateaim/kit bumped from ^0.8.26 to ^0.8.27
+    * @privateaim/telemetry-kit bumped from ^0.8.26 to ^0.8.27
+
 ## [0.8.26](https://github.com/PrivateAIM/hub/compare/v0.8.25...v0.8.26) (2026-02-11)
 
 
