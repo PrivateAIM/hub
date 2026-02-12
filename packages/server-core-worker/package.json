@@ -41,7 +41,7 @@
         "@privateaim/server-telemetry-kit": "^0.8.27",
         "@privateaim/server-core-worker-kit": "^0.7.28",
         "@privateaim/storage-kit": "^0.8.27",
-        "@validup/adapter-zod": "^0.1.12",
+        "@validup/adapter-zod": "^0.2.1",
         "amqp-extension": "^4.0.0",
         "dockerode": "^4.0.9",
         "docken": "^2.0.2",
@@ -57,7 +57,7 @@
         "tar-fs": "^3.1.1",
         "tar-stream": "^3.1.6",
         "uuid": "^13.0.0",
-        "validup": "^0.1.9",
+        "validup": "^0.2.1",
         "zod": "^4.3.6"
     },
     "devDependencies": {

@@ -19,7 +19,7 @@
     "license": "Apache-2.0",
     "description": "This package contains server side db helpers & utilities.",
     "dependencies": {
-        "smob": "^1.5.0",
+        "smob": "^1.6.1",
         "winston-transport": "^4.9.0"
     },
     "devDependencies": {
