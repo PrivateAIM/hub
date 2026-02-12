@@ -64,7 +64,7 @@
         "bootstrap-vue-next": "^0.43.1",
         "cross-env": "^10.1.0",
         "pinia": "^3.0.3",
-        "rapiq": "^0.9.0",
+        "rapiq": "^1.0.0",
         "rollup-plugin-css-only": "^4.5.5",
         "smob": "^1.5.0",
         "socket.io-client": "^4.8.2",

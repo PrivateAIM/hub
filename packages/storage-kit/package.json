@@ -22,13 +22,13 @@
         "@authup/core-kit": "^1.0.0-beta.28",
         "@privateaim/kit": "^0.8.27",
         "hapic": "^2.7.0",
-        "rapiq": "^0.9.0"
+        "rapiq": "^1.0.0"
     },
     "peerDependencies": {
         "@authup/core-kit": "^1.0.0-beta.28",
         "@privateaim/kit": "^0.8.27",
         "hapic": "^2.7.0",
-        "rapiq": "^0.9.0"
+        "rapiq": "^1.0.0"
     },
     "scripts": {
         "build:types": "tsc --emitDeclarationOnly -p tsconfig.build.json",
