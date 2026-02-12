@@ -156,7 +156,7 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
             AnalysisDistributorEvent.CHECK_FINISHED,
             {
                 ...value,
-                status: ProcessStatus.FINISHED,
+                status: ProcessStatus.EXECUTED,
             },
         );
     }

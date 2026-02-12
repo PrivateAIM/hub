@@ -57,7 +57,7 @@ export class AnalysisBuilderCheckHandler implements ComponentHandler<AnalysisBui
                 AnalysisBuilderEvent.CHECK_FINISHED,
                 {
                     ...value,
-                    status: ProcessStatus.FINISHED,
+                    status: ProcessStatus.EXECUTED,
                     hash: imageInfo.Id,
                     os: imageInfo.Os,
                     size: imageInfo.Size,

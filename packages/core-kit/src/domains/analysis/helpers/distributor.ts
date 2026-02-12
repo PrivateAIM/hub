@@ -16,7 +16,7 @@ export class AnalysisDistributorCommandChecker {
      * @param entity
      */
     static canStart(entity: Analysis) {
-        if (!entity.build_status || entity.build_status !== ProcessStatus.FINISHED) {
+        if (!entity.build_status || entity.build_status !== ProcessStatus.EXECUTED) {
             throw new AnalysisError('The analysis is not built yet.');
         }
     }
@@ -31,7 +31,7 @@ export class AnalysisDistributorCommandChecker {
             throw new AnalysisError('The analysis build process has not been initialized.');
         }
 
-        if (entity.build_status !== ProcessStatus.FINISHED) {
+        if (entity.build_status !== ProcessStatus.EXECUTED) {
             throw new AnalysisError('The analysis build process has not been finished.');
         }
 
