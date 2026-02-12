@@ -53,7 +53,7 @@ export async function handleAnalysisBuilderEvent(
             entity.build_hash = temp.hash ?? null;
             entity.build_os = temp.os ?? null;
             entity.build_size = temp.size ?? null;
-            entity.build_status = ProcessStatus.FINISHED;
+            entity.build_status = ProcessStatus.EXECUTED;
             break;
         }
         case AnalysisBuilderEvent.CHECK_FINISHED: {

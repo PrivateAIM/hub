@@ -47,7 +47,7 @@ export async function handleAnalysisDistributorEvent(
             break;
         }
         case AnalysisDistributorEvent.EXECUTION_FINISHED: {
-            entity.distribution_status = ProcessStatus.FINISHED;
+            entity.distribution_status = ProcessStatus.EXECUTED;
             break;
         }
         case AnalysisDistributorEvent.CHECK_FINISHED: {

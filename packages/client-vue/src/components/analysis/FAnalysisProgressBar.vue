@@ -37,7 +37,7 @@ export default defineComponent({
         });
 
         const buildProgress = computed(() => {
-            if (entity.value.build_status === ProcessStatus.FINISHED) {
+            if (entity.value.build_status === ProcessStatus.EXECUTED) {
                 return 100;
             }
 
@@ -53,7 +53,7 @@ export default defineComponent({
         });
 
         const runProgress = computed(() => {
-            if (entity.value.execution_status === ProcessStatus.FINISHED) {
+            if (entity.value.execution_status === ProcessStatus.EXECUTED) {
                 return 100;
             }
 
@@ -81,7 +81,7 @@ export default defineComponent({
         });
 
         const bgClazz = computed(() => {
-            if (entity.value.execution_status === ProcessStatus.FINISHED) {
+            if (entity.value.execution_status === ProcessStatus.EXECUTED) {
                 return 'bg-success';
             }
 

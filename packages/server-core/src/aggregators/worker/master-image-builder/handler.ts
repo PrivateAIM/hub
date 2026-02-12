@@ -48,7 +48,7 @@ export async function handleMasterImageBuilderEvent(
             break;
         }
         case MasterImageBuilderEvent.EXECUTION_FINISHED: {
-            entity.build_status = ProcessStatus.FINISHED;
+            entity.build_status = ProcessStatus.EXECUTED;
         }
     }
 

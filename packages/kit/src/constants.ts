@@ -16,7 +16,8 @@ export enum ProcessStatus {
     STARTED = 'started',
     STOPPING = 'stopping',
     STOPPED = 'stopped',
-    FINISHED = 'finished',
+    EXECUTING = 'executing',
+    EXECUTED = 'executed',
     FAILED = 'failed',
 }
 
