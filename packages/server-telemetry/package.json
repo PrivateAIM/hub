@@ -42,7 +42,7 @@
         "locter": "^2.2.1",
         "mysql2": "^3.16.3",
         "node-cron": "^4.2.1",
-        "rapiq": "0.9.0",
+        "rapiq": "1.0.0",
         "redis-extension": "^2.0.4",
         "reflect-metadata": "^0.2.2",
         "routup": "^4.1.0",
