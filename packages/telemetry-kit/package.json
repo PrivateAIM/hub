@@ -19,8 +19,8 @@
         "url": "https://github.com/tada5hi"
     },
     "dependencies": {
-        "@validup/adapter-zod": "^0.1.12",
-        "validup": "^0.1.9",
+        "@validup/adapter-zod": "^0.2.3",
+        "validup": "^0.2.1",
         "zod": "^4.3.6"
     },
     "devDependencies": {
