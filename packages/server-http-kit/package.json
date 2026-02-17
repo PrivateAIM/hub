@@ -23,7 +23,7 @@
         "@authup/kit": "^1.0.0-beta.28",
         "@authup/core-kit": "^1.0.0-beta.28",
         "@authup/core-http-kit": "^1.0.0-beta.28",
-        "@authup/specs": "^1.0.0-beta.28",
+        "@authup/specs": "^1.0.0-beta.29",
         "@authup/server-adapter-kit": "^1.0.0-beta.28",
         "@authup/server-adapter-http": "^1.0.0-beta.28",
         "@ebec/http": "^2.3.0",
