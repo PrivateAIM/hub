@@ -25,15 +25,17 @@
         "build-watch": "rimraf ./dist && tsc -p tsconfig.build.json --watch"
     },
     "devDependencies": {
-        "@authup/kit": "^1.0.0-beta.27",
-        "@authup/core-kit": "^1.0.0-beta.28"
+        "@authup/kit": "^1.0.0-beta.29",
+        "@authup/core-kit": "^1.0.0-beta.29"
     },
     "peerDependencies": {
-        "@authup/kit": "^1.0.0-beta.28",
-        "@authup/core-kit": "^1.0.0-beta.28"
+        "@authup/kit": "^1.0.0-beta.29",
+        "@authup/core-kit": "^1.0.0-beta.29"
     },
     "dependencies": {
-        "nanoid": "^3.3.8"
+        "@ebec/http": "^2.3.0",
+        "nanoid": "^3.3.8",
+        "validup": "^0.2.2"
     },
     "gitHead": "5d3b6f4ce1edf2383bdfbf66e913a08c8a3a2e40",
     "publishConfig": {
