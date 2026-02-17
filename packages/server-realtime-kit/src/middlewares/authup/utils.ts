@@ -7,8 +7,8 @@
 
 import { PermissionName as AuthupPermissionName, REALM_MASTER_NAME } from '@authup/core-kit';
 import type { PermissionItem } from '@authup/access';
+import { PermissionChecker, PermissionMemoryRepository } from '@authup/access';
 import { OAuth2SubKind } from '@authup/specs';
-import { PermissionChecker, PermissionMemoryProvider } from '@authup/access';
 import type { TokenVerificationData } from '@authup/server-adapter-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { Socket } from '../../types';
@@ -61,7 +61,7 @@ export function applyTokenVerificationData(
     socket.data.realmName = data.realm_name;
 
     socket.data.permissionChecker = new PermissionChecker({
-        provider: new PermissionMemoryProvider(abilities),
+        repository: new PermissionMemoryRepository(abilities),
     });
 
     switch (data.sub_kind) {

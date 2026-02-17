@@ -68,7 +68,7 @@ class RegistryHookEventDataValidator extends Container<RegistryHookEventData> {
                 ctx.value.map((value) => resourceValidator.run(value, {
                     group: ctx.group,
                     flat: false,
-                    path: ctx.pathAbsolute,
+                    path: ctx.path,
                 })),
             );
         });

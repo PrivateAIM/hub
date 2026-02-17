@@ -84,7 +84,7 @@ export class AnalysisValidator extends Container<Analysis> {
             const promises = ctx.value.map((child) => commandArgumentValidator.run(child, {
                 group: ctx.group,
                 flat: false,
-                path: ctx.pathAbsolute,
+                path: ctx.path,
             }));
 
             return Promise.all(promises);

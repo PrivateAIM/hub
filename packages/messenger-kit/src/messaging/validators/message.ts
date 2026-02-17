@@ -30,7 +30,7 @@ export class CTSMessagingMessageValidator extends Container<CTSMessagingMessage>
         this.mount(
             'metadata',
             createValidator(
-                z.object({}).passthrough()
+                z.looseObject({})
                     .or(z.null())
                     .or(z.undefined())
                     .optional(),
@@ -41,12 +41,12 @@ export class CTSMessagingMessageValidator extends Container<CTSMessagingMessage>
 
         this.mount('to', async (ctx) => {
             const validator = createValidator(
-                z.array(z.object({}).passthrough()),
+                z.array(z.looseObject({})),
             );
 
             const output = (await validator(ctx)) as unknown[];
             return Promise.all(output.map((el) => partyValidator.run(el, {
-                path: ctx.pathAbsolute,
+                path: ctx.path,
                 group: ctx.group,
             })));
         });

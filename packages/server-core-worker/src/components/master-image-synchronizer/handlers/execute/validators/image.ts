@@ -65,7 +65,7 @@ export class DockenImageAttributesValidator extends Container<DockenImageAttribu
             const promises = value.map((child) => commandArgumentValidator.run(child, {
                 group: ctx.group,
                 flat: false,
-                path: ctx.pathAbsolute,
+                path: ctx.path,
             }));
 
             return Promise.all(promises);

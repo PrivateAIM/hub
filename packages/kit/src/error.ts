@@ -5,6 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export class HubError extends Error {
+import type { Issue } from 'validup';
+import type { Input } from '@ebec/http';
+import { BadRequestError } from '@ebec/http';
 
+export class HubError extends BadRequestError {
+    public readonly issues : Issue[];
+
+    constructor(...input: Input[]) {
+        super(...input);
+
+        this.issues = [];
+    }
 }

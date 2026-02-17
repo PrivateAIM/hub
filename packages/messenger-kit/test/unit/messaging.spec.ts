@@ -49,7 +49,7 @@ describe('messaging > validator', () => {
             ],
         };
 
-        await expect(validator.run(message)).rejects.toThrow(buildErrorMessageForAttribute('to'));
+        await expect(validator.run(message)).rejects.toThrow(buildErrorMessageForAttribute('to.type'));
     });
 
     it('should not validate message due invalid recipient format (id)', async () => {
@@ -62,6 +62,6 @@ describe('messaging > validator', () => {
             ],
         };
 
-        await expect(validator.run(message)).rejects.toThrow(buildErrorMessageForAttribute('to'));
+        await expect(validator.run(message)).rejects.toThrow(buildErrorMessageForAttribute('to.id'));
     });
 });

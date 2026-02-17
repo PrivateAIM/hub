@@ -16,7 +16,7 @@ import { sendAccepted } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { HTTPHandlerOperation, useRequestIdentityRealm } from '@privateaim/server-http-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
-import { ValidupValidatorError, buildErrorMessageForAttribute } from 'validup';
+import { ValidupError, buildErrorMessageForAttribute, defineIssueItem } from 'validup';
 import {
     AnalysisEntity,
     NodeEntity,
@@ -35,10 +35,12 @@ export async function createAnalysisNodeLogRouteHandler(req: Request, res: Respo
     const nodeRepository = dataSource.getRepository(NodeEntity);
     const node = await nodeRepository.findOneBy({ id: data.node_id });
     if (!node) {
-        throw new ValidupValidatorError({
-            path: 'node_id',
-            message: buildErrorMessageForAttribute('node_id'),
-        });
+        throw new ValidupError([
+            defineIssueItem({
+                path: ['node_id'],
+                message: buildErrorMessageForAttribute('node_id'),
+            }),
+        ]);
     }
 
     data.node_realm_id = node.realm_id;
@@ -46,10 +48,12 @@ export async function createAnalysisNodeLogRouteHandler(req: Request, res: Respo
     const analysisRepository = dataSource.getRepository(AnalysisEntity);
     const analysis = await analysisRepository.findOneBy({ id: data.analysis_id });
     if (!analysis) {
-        throw new ValidupValidatorError({
-            path: 'analysis_id',
-            message: buildErrorMessageForAttribute('analysis_id'),
-        });
+        throw new ValidupError([
+            defineIssueItem({
+                path: ['analysis_id'],
+                message: buildErrorMessageForAttribute('analysis_id'),
+            }),
+        ]);
     }
 
     data.analysis_realm_id = analysis.realm_id;
