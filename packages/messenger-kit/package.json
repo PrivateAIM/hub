@@ -27,8 +27,8 @@
         "test:coverage": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts --coverage"
     },
     "dependencies": {
-        "@validup/adapter-zod": "^0.2.3",
-        "validup": "^0.2.1",
+        "@validup/adapter-zod": "^0.2.4",
+        "validup": "^0.2.2",
         "zod": "^4.3.6"
     },
     "devDependencies": {
