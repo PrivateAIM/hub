@@ -134,33 +134,40 @@ export default defineComponent({
                     Requirements
                 </h6>
                 <div class="d-flex flex-row gap-1">
-                    <div>
-                        <strong>
-                            <template v-if="nodesLink">
-                                <VCLink :to="nodesLink">
-                                    Node(s) Assignment
-                                </VCLink>
-                            </template>
-                            <template v-else>
-                                Node(s) Assignment
-                            </template>
-                        </strong>
-                    </div>
-                    <div>
-                        <FAnalysisConfigurationNodesStep :entity="entity">
-                            <template #valid>
-                                <span class="text-success">
-                                    <i class="fa fa-check" />
-                                </span>
-                            </template>
-                            <template #invalid="{ message }">
-                                <span class="text-danger">
-                                    <i class="fa fa-times" />
-                                </span>
-                                <small>( {{ message }} )</small>
-                            </template>
-                        </FAnalysisConfigurationNodesStep>
-                    </div>
+                    <FAnalysisConfigurationNodesStep :entity="entity">
+                        <template #default="{passed, message}">
+                            <div>
+                                <strong
+                                    v-b-tooltip.hover.top
+                                    :title="message"
+                                >
+                                    <template v-if="nodesLink">
+                                        <VCLink :to="nodesLink">
+                                            Node(s) Assignment
+                                        </VCLink>
+                                    </template>
+                                    <template v-else>
+                                        Node(s) Assignment
+                                    </template>
+                                </strong>
+                            </div>
+                            <span
+                                class="text-success"
+                                :class="{
+                                    'text-success': passed,
+                                    'text-danger': !passed,
+                                }"
+                            >
+                                <i
+                                    class="fa"
+                                    :class="{
+                                        'fa-check': passed,
+                                        'fa-times': !passed,
+                                    }"
+                                />
+                            </span>
+                        </template>
+                    </FAnalysisConfigurationNodesStep>
                 </div>
                 <div>
                     <strong>
@@ -177,52 +184,71 @@ export default defineComponent({
                     </strong>
                 </div>
                 <div class="d-flex flex-column ms-4">
-                    <div class="d-flex flex-row gap-1">
-                        <div>
-                            <strong>
-                                Base
-                            </strong>
-                        </div>
-                        <div>
-                            <FAnalysisConfigurationImageStep
-                                :entity="entity"
-                            >
-                                <template #valid>
-                                    <span class="text-success">
-                                        <i class="fa fa-check" />
+                    <FAnalysisConfigurationImageStep
+                        :entity="entity"
+                    >
+                        <template #default="{passed, message}">
+                            <div class="d-flex flex-row gap-1">
+                                <div>
+                                    <strong
+                                        v-b-tooltip.hover.top
+                                        :title="message"
+                                    >
+                                        Base
+                                    </strong>
+                                </div>
+                                <div>
+                                    <span
+                                        class="text-success"
+                                        :class="{
+                                            'text-success': passed,
+                                            'text-danger': !passed,
+                                        }"
+                                    >
+                                        <i
+                                            class="fa"
+                                            :class="{
+                                                'fa-check': passed,
+                                                'fa-times': !passed,
+                                            }"
+                                        />
                                     </span>
-                                </template>
-                                <template #invalid="{ message }">
-                                    <span class="text-danger">
-                                        <i class="fa fa-times" />
+                                </div>
+                            </div>
+                        </template>
+                    </FAnalysisConfigurationImageStep>
+
+                    <FAnalysisConfigurationEntrypointStep :entity="entity">
+                        <template #default="{passed, message}">
+                            <div class="d-flex flex-row gap-1">
+                                <div>
+                                    <strong
+                                        v-b-tooltip.hover.top
+                                        :title="message"
+                                    >
+                                        Entrypoint
+                                    </strong>
+                                </div>
+                                <div>
+                                    <span
+                                        class="text-success"
+                                        :class="{
+                                            'text-success': passed,
+                                            'text-danger': !passed,
+                                        }"
+                                    >
+                                        <i
+                                            class="fa"
+                                            :class="{
+                                                'fa-check': passed,
+                                                'fa-times': !passed,
+                                            }"
+                                        />
                                     </span>
-                                    <small>( {{ message }} )</small>
-                                </template>
-                            </FAnalysisConfigurationImageStep>
-                        </div>
-                    </div>
-                    <div class="d-flex flex-row gap-1">
-                        <div>
-                            <strong>
-                                Entrypoint
-                            </strong>
-                        </div>
-                        <div>
-                            <FAnalysisConfigurationEntrypointStep :entity="entity">
-                                <template #valid>
-                                    <span class="text-success">
-                                        <i class="fa fa-check" />
-                                    </span>
-                                </template>
-                                <template #invalid="{ message }">
-                                    <span class="text-danger">
-                                        <i class="fa fa-times" />
-                                    </span>
-                                    <small>( {{ message }} )</small>
-                                </template>
-                            </FAnalysisConfigurationEntrypointStep>
-                        </div>
-                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </FAnalysisConfigurationEntrypointStep>
                 </div>
 
                 <div class="mt-auto">

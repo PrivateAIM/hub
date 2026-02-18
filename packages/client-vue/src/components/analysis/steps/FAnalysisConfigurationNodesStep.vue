@@ -57,20 +57,5 @@ export default defineComponent({
     <slot
         name="default"
         v-bind="{ passed, message }"
-    >
-        <component :is="tag">
-            <template v-if="passed">
-                <slot
-                    name="valid"
-                    v-bind="{ passed, message, hasDefault, hasAggregator }"
-                />
-            </template>
-            <template v-else>
-                <slot
-                    name="invalid"
-                    v-bind="{ passed, message, hasDefault, hasAggregator }"
-                />
-            </template>
-        </component>
-    </slot>
+    />
 </template>
