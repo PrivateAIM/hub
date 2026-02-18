@@ -44,19 +44,5 @@ export default defineComponent({
     <slot
         name="default"
         v-bind="{ passed, message }"
-    >
-        <component :is="tag">
-            <template v-if="passed">
-                <slot
-                    name="valid"
-                />
-            </template>
-            <template v-else>
-                <slot
-                    name="invalid"
-                    v-bind="{ message }"
-                />
-            </template>
-        </component>
-    </slot>
+    />
 </template>

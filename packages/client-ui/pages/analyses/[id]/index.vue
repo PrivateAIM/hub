@@ -9,12 +9,13 @@ import { ref } from 'vue';
 import type { PropType } from 'vue';
 import type { Analysis } from '@privateaim/core-kit';
 import {
-    FAnalysisLogs,
+    FAnalysisLogs, FAnalysisSteps,
 } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
 
 export default defineNuxtComponent({
     components: {
+        FAnalysisSteps,
         FAnalysisLogs,
     },
     props: {
@@ -63,46 +64,59 @@ export default defineNuxtComponent({
 
 <template>
     <div v-if="entity">
-        <div v-if="entity.configuration_locked">
-            <div class="card-grey card">
-                <div class="card-header">
-                    <div class="title">
-                        Logs
+        <div class="d-flex flex-column gap-3">
+            <div>
+                <FAnalysisSteps
+                    :entity="entity"
+                    :configuration-code-link="'/analyses/' + entity.id + '/image'"
+                    :configuration-nodes-link="'/analyses/' + entity.id + '/nodes'"
+                    :configuration-image-link="'/analyses/' + entity.id + '/image'"
+                    @updated="handleUpdated"
+                    @failed="handleFailed"
+                />
+            </div>
+
+            <div v-if="entity.configuration_locked">
+                <div class="card-grey card">
+                    <div class="card-header">
+                        <div class="title">
+                            Logs
+                        </div>
+                        <div class="ms-auto">
+                            <button
+                                type="button"
+                                :disabled="logVNodeBusy"
+                                class="btn btn-xs btn-primary"
+                                @click.prevent="reload"
+                            >
+                                <i class="fa fa-refresh" />
+                            </button>
+                        </div>
                     </div>
-                    <div class="ms-auto">
-                        <button
-                            type="button"
-                            :disabled="logVNodeBusy"
-                            class="btn btn-xs btn-primary"
-                            @click.prevent="reload"
-                        >
-                            <i class="fa fa-refresh" />
-                        </button>
+                    <div class="card-body">
+                        <FAnalysisLogs
+                            ref="logVNode"
+                            :entity-id="entity.id"
+                        />
                     </div>
-                </div>
-                <div class="card-body">
-                    <FAnalysisLogs
-                        ref="logVNode"
-                        :entity-id="entity.id"
-                    />
                 </div>
             </div>
-        </div>
-        <div v-else>
-            <div class="card-grey card">
-                <div class="card-header">
-                    <div class="title">
-                        Info
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="d-flex flex-row gap-2 align-items-center alert alert-sm alert-danger mb-0">
-                        <div>
-                            <i class="fa fa-info" />
+            <div v-else>
+                <div class="card-grey card">
+                    <div class="card-header">
+                        <div class="title">
+                            Info
                         </div>
-                        <div>
-                            The analysis is not configured yet!<br>
-                            Therefore follow the Pipeline Steps on the right to be able to submit your analysis.
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex flex-row gap-2 align-items-center alert alert-sm alert-danger mb-0">
+                            <div>
+                                <i class="fa fa-info" />
+                            </div>
+                            <div>
+                                The analysis is not configured yet!<br>
+                                Therefore follow the Pipeline Steps on the right to be able to submit your analysis.
+                            </div>
                         </div>
                     </div>
                 </div>

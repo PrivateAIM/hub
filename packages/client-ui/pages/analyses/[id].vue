@@ -8,7 +8,7 @@
 import {
     DomainType,
 } from '@privateaim/core-kit';
-import { FAnalysisName, FAnalysisSteps, createEntityManager } from '@privateaim/client-vue';
+import { FAnalysisName, createEntityManager } from '@privateaim/client-vue';
 import { isClientErrorWithStatusCode } from 'hapic';
 import { defineComponent } from 'vue';
 import { definePageMeta, useToast } from '#imports';
@@ -21,7 +21,6 @@ import { DomainEntityNavItem } from '../../core';
 
 export default defineComponent({
     components: {
-        FAnalysisSteps,
         DomainEntityNav,
         DomainEntityNavItem,
         FAnalysisName,
@@ -111,19 +110,6 @@ export default defineComponent({
 
         <template v-if="entity">
             <div class="d-flex flex-column gap-1">
-                <hr>
-
-                <div>
-                    <FAnalysisSteps
-                        :entity="entity"
-                        :configuration-code-link="'/analyses/' + entity.id + '/image'"
-                        :configuration-nodes-link="'/analyses/' + entity.id + '/nodes'"
-                        :configuration-image-link="'/analyses/' + entity.id + '/image'"
-                        @updated="handleUpdated"
-                        @failed="handleFailed"
-                    />
-                </div>
-
                 <hr>
 
                 <div>

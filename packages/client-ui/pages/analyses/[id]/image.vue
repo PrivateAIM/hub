@@ -91,121 +91,125 @@ export default defineComponent({
         class="row"
     >
         <div class="col-12 col-md-6">
-            <div class="card-grey card mb-3">
-                <div class="card-header">
-                    <span class="title"><i class="fa fa-compact-disc" /> Base</span>
-                </div>
-                <div class="card-body">
-                    <div
-                        class="d-flex flex-row gap-2 align-items-center alert alert-sm"
-                        :class="{
-                            'alert-warning': entity.configuration_image_valid,
-                            'alert-danger': !entity.configuration_image_valid,
-                        }"
-                    >
-                        <div>
-                            <i class="fa fa-info" />
-                        </div>
-                        <div>
-                            Pick a Docker-based master image that provides the runtime environment for your analysis.<br>
-                            Your uploaded code will be embedded into this image before distribution.
-                        </div>
+            <div class="d-flex flex-column gap-3">
+                <div class="card-grey card">
+                    <div class="card-header">
+                        <span class="title"><i class="fa fa-compact-disc" /> Base</span>
                     </div>
-                    <FAnalysisMasterImagePicker
-                        :readonly="entity.configuration_locked"
-                        :entity-id="entity.id"
-                        :entity="entity"
-                        @updated="handleUpdated"
-                    />
+                    <div class="card-body">
+                        <div
+                            class="d-flex flex-row gap-2 align-items-center alert alert-sm"
+                            :class="{
+                                'alert-warning': entity.configuration_image_valid,
+                                'alert-danger': !entity.configuration_image_valid,
+                            }"
+                        >
+                            <div>
+                                <i class="fa fa-info" />
+                            </div>
+                            <div>
+                                Pick a Docker-based master image that provides the runtime environment for your analysis.<br>
+                                Your uploaded code will be embedded into this image before distribution.
+                            </div>
+                        </div>
+                        <FAnalysisMasterImagePicker
+                            :readonly="entity.configuration_locked"
+                            :entity-id="entity.id"
+                            :entity="entity"
+                            @updated="handleUpdated"
+                        />
+                    </div>
                 </div>
-            </div>
-            <div class="card-grey card mb-3">
-                <div class="card-header">
-                    <span class="title"><i class="fa fa-keyboard" /> Command-Arguments</span>
-                </div>
-                <div class="card-body">
-                    <FAnalysisImageCommandArguments
-                        :readonly="entity.configuration_locked"
-                        :entity="entity"
-                        @updated="handleUpdated"
-                    />
+                <div class="card-grey card">
+                    <div class="card-header">
+                        <span class="title"><i class="fa fa-keyboard" /> Command-Arguments</span>
+                    </div>
+                    <div class="card-body">
+                        <FAnalysisImageCommandArguments
+                            :readonly="entity.configuration_locked"
+                            :entity="entity"
+                            @updated="handleUpdated"
+                        />
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-12 col-md-6">
-            <div class="card-grey card mb-3">
-                <div class="card-header">
-                    <span class="title"><i class="fa fa-file" /> Entrypoint</span>
-                </div>
-                <div class="card-body">
-                    <div
-                        class="d-flex flex-row gap-2 align-items-center alert alert-sm"
-                        :class="{
-                            'alert-warning': entity.configuration_entrypoint_valid,
-                            'alert-danger': !entity.configuration_entrypoint_valid,
-                        }"
-                    >
-                        <div>
-                            <i class="fa fa-info" />
-                        </div>
-                        <div>
-                            An entrypoint file must be selected.
-                        </div>
+            <div class="d-flex flex-column gap-3">
+                <div class="card-grey card">
+                    <div class="card-header">
+                        <span class="title"><i class="fa fa-file" /> Entrypoint</span>
                     </div>
+                    <div class="card-body">
+                        <div
+                            class="d-flex flex-row gap-2 align-items-center alert alert-sm"
+                            :class="{
+                                'alert-warning': entity.configuration_entrypoint_valid,
+                                'alert-danger': !entity.configuration_entrypoint_valid,
+                            }"
+                        >
+                            <div>
+                                <i class="fa fa-info" />
+                            </div>
+                            <div>
+                                An entrypoint file must be selected.
+                            </div>
+                        </div>
 
-                    <FAnalysisTypeBucket
-                        :entity-id="entity.id"
-                        :type="'CODE'"
-                    >
-                        <template #default="{ data: bucket }">
-                            <FAnalysisBucketFiles
-                                :query="{ filters: { analysis_bucket_id: bucket.id } }"
-                                @updated="handAnalysisBucketFileUpdated"
-                                @deleted="handAnalysisBucketFileDeleted"
-                            >
-                                <template #item="bucketFilesProps">
-                                    <FAnalysisBucketFile
-                                        :entity="bucketFilesProps.data"
-                                        @updated="bucketFilesProps.updated"
-                                        @deleted="bucketFilesProps.deleted"
-                                        @failed="bucketFilesProps.failed"
-                                    >
-                                        <template #default="bucketFileProps">
-                                            <div class="d-flex flex-row align-items-center gap-2 p-1 w-100">
-                                                <div>
-                                                    {{ bucketFileProps.data.path }}
-                                                </div>
+                        <FAnalysisTypeBucket
+                            :entity-id="entity.id"
+                            :type="'CODE'"
+                        >
+                            <template #default="{ data: bucket }">
+                                <FAnalysisBucketFiles
+                                    :query="{ filters: { analysis_bucket_id: bucket.id } }"
+                                    @updated="handAnalysisBucketFileUpdated"
+                                    @deleted="handAnalysisBucketFileDeleted"
+                                >
+                                    <template #item="bucketFilesProps">
+                                        <FAnalysisBucketFile
+                                            :entity="bucketFilesProps.data"
+                                            @updated="bucketFilesProps.updated"
+                                            @deleted="bucketFilesProps.deleted"
+                                            @failed="bucketFilesProps.failed"
+                                        >
+                                            <template #default="bucketFileProps">
+                                                <div class="d-flex flex-row align-items-center gap-2 p-1 w-100">
+                                                    <div>
+                                                        {{ bucketFileProps.data.path }}
+                                                    </div>
 
-                                                <div class="ms-auto">
-                                                    <template v-if="!entity.configuration_locked">
-                                                        <FAnalysisBucketFileRootToggler
-                                                            :entity="bucketFileProps!.data!"
-                                                            @updated="(value) => bucketFileProps!.update(value)"
-                                                        />
-                                                    </template>
+                                                    <div class="ms-auto">
+                                                        <template v-if="!entity.configuration_locked">
+                                                            <FAnalysisBucketFileRootToggler
+                                                                :entity="bucketFileProps!.data!"
+                                                                @updated="(value) => bucketFileProps!.update(value)"
+                                                            />
+                                                        </template>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </template>
-                                    </FAnalysisBucketFile>
-                                </template>
-                            </FAnalysisBucketFiles>
-                        </template>
-                    </FAnalysisTypeBucket>
+                                            </template>
+                                        </FAnalysisBucketFile>
+                                    </template>
+                                </FAnalysisBucketFiles>
+                            </template>
+                        </FAnalysisTypeBucket>
+                    </div>
                 </div>
-            </div>
-            <div class="card-grey card mb-3">
-                <div class="card-header">
-                    <span class="title"><i class="fa fa-bolt" /> Command</span>
-                </div>
-                <div class="card-body">
-                    <FAnalysisImageCommand
-                        ref="imageCommand"
-                        :master-image="entity.master_image"
-                        :master-image-id="entity.master_image_id"
-                        :entity="entity"
-                        :entity-id="entity.id"
-                        @analysis-bucket-file-resolved="setLastRootFile"
-                    />
+                <div class="card-grey card">
+                    <div class="card-header">
+                        <span class="title"><i class="fa fa-bolt" /> Command</span>
+                    </div>
+                    <div class="card-body">
+                        <FAnalysisImageCommand
+                            ref="imageCommand"
+                            :master-image="entity.master_image"
+                            :master-image-id="entity.master_image_id"
+                            :entity="entity"
+                            :entity-id="entity.id"
+                            @analysis-bucket-file-resolved="setLastRootFile"
+                        />
+                    </div>
                 </div>
             </div>
         </div>

@@ -105,73 +105,87 @@ export default defineComponent({
                         <h6 class="mb-0">
                             Requirements
                         </h6>
-                        <div class="d-flex flex-row gap-1">
-                            <div>
-                                <strong>
-                                    Node(s) Approval
-                                </strong>
-                            </div>
-                            <div>
-                                <FAnalysisBuildNodesStep :entity="entity">
-                                    <template #valid>
-                                        <span class="text-success">
-                                            <i class="fa fa-check" />
+                        <FAnalysisBuildNodesStep :entity="entity">
+                            <template #default="{passed, message}">
+                                <div class="d-flex flex-row gap-1">
+                                    <div>
+                                        <strong
+                                            v-b-tooltip.hover.top
+                                            :title="message"
+                                        >
+                                            Node(s) Approval
+                                        </strong>
+                                    </div>
+                                    <div>
+                                        <span
+                                            class="text-success"
+                                            :class="{
+                                                'text-success': passed,
+                                                'text-danger': !passed,
+                                            }"
+                                        >
+                                            <i
+                                                class="fa"
+                                                :class="{
+                                                    'fa-check': passed,
+                                                    'fa-times': !passed,
+                                                }"
+                                            />
                                         </span>
-                                    </template>
-                                    <template #invalid="{ message }">
-                                        <span class="text-danger">
-                                            <i class="fa fa-times" />
-                                        </span>
-                                        <small>( {{ message }} )</small>
-                                    </template>
-                                </FAnalysisBuildNodesStep>
-                            </div>
-                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </FAnalysisBuildNodesStep>
                     </div>
 
-                    <hr>
+                    <template v-if="entity.build_os || entity.build_hash || size">
+                        <hr>
 
-                    <div>
-                        <h6 class="mb-0">
-                            Info
-                        </h6>
-                        <div class="d-flex flex-column">
-                            <div class="d-flex flex-row gap-1">
-                                <div>
-                                    <strong>OS</strong>
-                                </div>
-                                <div>
-                                    <template v-if="entity.build_os">
+                        <div>
+                            <h6 class="mb-0">
+                                Info
+                            </h6>
+                            <div class="d-flex flex-column">
+                                <div
+                                    v-if="entity.build_os"
+                                    class="d-flex flex-row gap-1"
+                                >
+                                    <div>
+                                        <strong>OS</strong>
+                                    </div>
+                                    <div>
                                         {{ entity.build_os }}
                                         <i
                                             class="fa-brands"
                                             :class="'fa-' + entity.build_os"
                                         />
-                                    </template>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="d-flex flex-row gap-1">
-                                <div>
-                                    <strong>Hash</strong>
-                                </div>
-                                <div style="word-break: break-all;">
-                                    <template v-if="entity.build_hash">
+                                <div
+                                    v-if="entity.build_hash"
+                                    class="d-flex flex-row gap-1"
+                                >
+                                    <div>
+                                        <strong>Hash</strong>
+                                    </div>
+                                    <div style="word-break: break-all;">
                                         {{ entity.build_hash }}
-                                    </template>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="d-flex flex-row gap-1">
-                                <div>
-                                    <strong>Size</strong>
-                                </div>
-                                <div>
-                                    <template v-if="size">
+                                <div
+                                    v-if="size"
+                                    class="d-flex flex-row gap-1"
+                                >
+                                    <div>
+                                        <strong>Size</strong>
+                                    </div>
+                                    <div>
                                         {{ size }}
-                                    </template>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </template>
                 </div>
 
                 <div class="mt-auto">
