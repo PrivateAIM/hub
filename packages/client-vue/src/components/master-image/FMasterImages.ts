@@ -19,8 +19,8 @@ import {
 
 export default defineComponent({
     props: defineListProps<MasterImage>(),
-    slots: Object as SlotsType<ListSlotsType<MasterImage>>,
     emits: defineListEvents<MasterImage>(),
+    slots: Object as SlotsType<ListSlotsType<MasterImage>>,
     setup(props, ctx) {
         const { render, setDefaults } = createList({
             type: `${DomainType.MASTER_IMAGE}`,
@@ -32,14 +32,14 @@ export default defineComponent({
                     typeof filters.name === 'string' &&
                     filters.name.length > 0
                 ) {
-                    filters.path = filters.name;
+                    filters.virtual_path = filters.name;
 
                     delete filters.name;
                 }
             },
             query: {
                 sort: {
-                    path: 'ASC',
+                    virtual_path: 'ASC',
                 },
             },
         });

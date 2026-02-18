@@ -6,11 +6,21 @@
   -->
 
 <script lang="ts">
-import { FEvents, FMasterImagesSync } from '@privateaim/client-vue';
+import { FEvents, FMasterImageCard, FMasterImagesSync } from '@privateaim/client-vue';
+import FMasterImages from '@privateaim/client-vue/components/master-image/FMasterImages';
+import { APagination, ASearch, ATitle } from '@authup/client-web-kit';
 import { useToast } from '../../../../composables/toast';
 
 export default {
-    components: { FEvents, FMasterImagesSync },
+    components: {
+        FMasterImageCard,
+        ATitle,
+        APagination,
+        ASearch,
+        FMasterImages,
+        FEvents,
+        FMasterImagesSync,
+    },
     setup() {
         const toast = useToast();
 
@@ -57,6 +67,34 @@ export default {
         </div>
         <div class="row">
             <div class="col-6">
+                <FMasterImages>
+                    <template #header="props">
+                        <ATitle />
+                        <ASearch
+                            :load="props.load"
+                            :busy="props.busy"
+                        />
+                    </template>
+                    <template #footer="props">
+                        <APagination
+                            :busy="props.busy"
+                            :meta="props.meta"
+                            :load="props.load"
+                        />
+                    </template>
+                    <template #body="{ data }">
+                        <div class="d-flex flex-column mt-2 mb-2 gap-3">
+                            <template
+                                v-for="item in data"
+                                :key="item.id"
+                            >
+                                <FMasterImageCard
+                                    :entity="item"
+                                />
+                            </template>
+                        </div>
+                    </template>
+                </FMasterImages>
                 <FMasterImagesSync @failed="handleFailed" />
             </div>
             <div class="col-6">
