@@ -35,7 +35,7 @@ import {
     renderEntityAssignAction,
     wrapFnWithBusyState,
 } from '../../core';
-import MasterImagePicker from '../master-image/FMasterImagePicker';
+import { FMasterImagePicker } from '../master-image';
 import FNodes from '../node/FNodes';
 import { FProjectNodeAssignAction } from '../project-node';
 import { FPagination, FSearch } from '../utility';
@@ -97,7 +97,7 @@ const FProjectForm = defineComponent({
             }
         });
 
-        const handleMasterImagePicker = (item: MasterImage) => {
+        const handleMasterImagePicker = (item: MasterImage | null) => {
             if (item) {
                 form.master_image_id = item.id;
             } else {
@@ -163,9 +163,9 @@ const FProjectForm = defineComponent({
                 }),
             });
 
-            const masterImagePicker = h(MasterImagePicker, {
+            const masterImagePicker = h(FMasterImagePicker, {
                 entityId: form.master_image_id,
-                onSelected(value: MasterImage) {
+                onResolved(value: MasterImage | null) {
                     handleMasterImagePicker(value);
                 },
             });

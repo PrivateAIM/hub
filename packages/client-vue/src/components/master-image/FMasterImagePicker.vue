@@ -34,6 +34,7 @@ export default defineComponent({
     },
     emits: {
         ...defineEntityManagerEvents<MasterImage>(),
+        reset: (() => Promise.resolve()),
     },
     setup(props, setup) {
         const entityId = toRef(props, 'entityId');
@@ -68,6 +69,8 @@ export default defineComponent({
                 }
 
                 resolved.value = true;
+
+                setup.emit('resolved', entity);
             },
         });
 
@@ -97,7 +100,11 @@ export default defineComponent({
             form.group_virtual_path.length > 0);
 
         watch(entityId, (val, oldValue) => {
-            if (val && val !== oldValue) {
+            if (
+                val &&
+                val !== oldValue &&
+                manager.data.value?.id !== val
+            ) {
                 manager.resolveByRest({ id: val, reset: true });
             }
         });
@@ -186,7 +193,7 @@ export default defineComponent({
         </div>
         <div class="col">
             <FMasterImages
-                v-if="resolved"
+                v-if="isVirtualGroupPathDefined"
                 ref="masterImages"
                 :query="imageQuery"
             >
@@ -209,7 +216,8 @@ export default defineComponent({
                                         :options="data.map((el) => {
                                             return {
                                                 id: el.id,
-                                                value: el.name
+                                                value: el.name,
+                                                disabled: el.build_status !== 'executed',
                                             }
                                         })"
                                         :disabled="readonly || busy"
