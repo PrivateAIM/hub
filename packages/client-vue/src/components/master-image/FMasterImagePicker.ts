@@ -16,6 +16,7 @@ import type { PropType, VNodeArrayChildren } from 'vue';
 import {
     computed, defineComponent, h, nextTick, reactive, ref, toRef, watch,
 } from 'vue';
+import { ProcessStatus } from '@privateaim/kit';
 import {
     EntityListSlotName, injectCoreHTTPClient, wrapFnWithBusyState,
 } from '../../core';
@@ -175,6 +176,7 @@ export default defineComponent({
                             const options: FormSelectOption[] = bodyProps.data.map((entity) => ({
                                 id: entity.id,
                                 value: entity.name,
+                                disabled: entity.build_status !== ProcessStatus.EXECUTED,
                             }));
 
                             return buildFormGroup({
