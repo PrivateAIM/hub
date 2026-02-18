@@ -8,6 +8,7 @@
 import type { PropType } from 'vue';
 import { computed, defineComponent } from 'vue';
 import type { MasterImage } from '@privateaim/core-kit';
+import { ProcessStatus } from '@privateaim/kit';
 import FProcessStatus from '../FProcessStatus.vue';
 
 export default defineComponent({
@@ -18,7 +19,13 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const progress = computed(() => props.entity.build_progress || 0);
+        const progress = computed(() => {
+            if (props.entity.build_status === ProcessStatus.EXECUTED) {
+                return 100;
+            }
+
+            return props.entity.build_progress || 0;
+        });
 
         return {
             progress,

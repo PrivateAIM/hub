@@ -15,6 +15,7 @@
 import type { PropType } from 'vue';
 import { computed, defineComponent } from 'vue';
 import type { Analysis } from '@privateaim/core-kit';
+import { ProcessStatus } from '@privateaim/kit';
 import FProcessStatus from '../../FProcessStatus.vue';
 
 export default defineComponent({
@@ -29,7 +30,13 @@ export default defineComponent({
     },
     emits: ['updated', 'executed', 'failed'],
     setup(props, { emit }) {
-        const progress = computed(() => props.entity.execution_progress || 0);
+        const progress = computed(() => {
+            if (props.entity.execution_status === ProcessStatus.EXECUTED) {
+                return 100;
+            }
+
+            return props.entity.execution_progress || 0;
+        });
 
         const handleExecuted = (type: string, command: string) => {
             emit('executed', type, command);

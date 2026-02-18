@@ -12,7 +12,7 @@
   -->
 
 <script lang="ts">
-import { humanFileSize } from '@privateaim/kit';
+import { ProcessStatus, humanFileSize } from '@privateaim/kit';
 import type { PropType } from 'vue';
 import { computed, defineComponent } from 'vue';
 import type { Analysis } from '@privateaim/core-kit';
@@ -34,7 +34,13 @@ export default defineComponent({
     },
     emits: ['updated', 'executed', 'failed'],
     setup(props, { emit }) {
-        const progress = computed(() => props.entity.build_progress || 0);
+        const progress = computed(() => {
+            if (props.entity.build_status === ProcessStatus.EXECUTED) {
+                return 100;
+            }
+
+            return props.entity.build_progress || 0;
+        });
 
         const handleExecuted = (type: string, command: string) => {
             emit('executed', type, command);

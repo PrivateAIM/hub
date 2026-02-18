@@ -52,6 +52,8 @@ export async function handleMasterImageBuilderEvent(
         }
     }
 
+    await repository.save(entity);
+
     if (isEventComponentCallerUsable()) {
         const eventCaller = useEventComponentCaller();
         await eventCaller.callCreate({
@@ -66,6 +68,4 @@ export async function handleMasterImageBuilderEvent(
             ).toISOString(),
         });
     }
-
-    await repository.save(entity);
 }
