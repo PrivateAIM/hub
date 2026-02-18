@@ -159,7 +159,7 @@ export default defineComponent({
                     >
                         <template #default="{ data: bucket }">
                             <FAnalysisBucketFiles
-                                :query-filters="{ bucket_id: bucket.id }"
+                                :query="{ filters: { analysis_bucket_id: bucket.id } }"
                                 @updated="handAnalysisBucketFileUpdated"
                                 @deleted="handAnalysisBucketFileDeleted"
                             >
