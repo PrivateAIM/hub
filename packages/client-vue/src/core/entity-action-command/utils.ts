@@ -33,7 +33,7 @@ export type ActionCommandSlotsType = {
         commandText: string,
         isDisabled: boolean,
         isAllowed: boolean,
-        iconClass: string,
+        iconClass: string[],
         execute: () => Promise<any>
     }
 };

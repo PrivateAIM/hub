@@ -16,6 +16,7 @@ export default defineComponent({
     props: {
         entity: {
             type: Object as PropType<MasterImage>,
+            required: true,
         },
     },
     setup(props) {

@@ -70,7 +70,10 @@ export default {
             <div class="col-6">
                 <div class="d-flex flex-column gap-3">
                     <div>
-                        <FMasterImageCommand :command="'sync'">
+                        <FMasterImageCommand
+                            :command="'sync'"
+                            @failed="handleFailed"
+                        >
                             <template #default="props">
                                 <button
                                     type="button"
