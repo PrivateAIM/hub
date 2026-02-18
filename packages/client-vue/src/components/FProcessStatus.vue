@@ -30,7 +30,7 @@ export default defineComponent({
                 case ProcessStatus.STARTED:
                 case ProcessStatus.STOPPED:
                     return 'primary';
-                case ProcessStatus.FINISHED:
+                case ProcessStatus.EXECUTED:
                     return 'success';
                 case ProcessStatus.STOPPING:
                     return 'warning';
@@ -47,7 +47,7 @@ export default defineComponent({
                 case ProcessStatus.STARTED:
                 case ProcessStatus.STOPPING:
                     return 'fa fa-rotate fa-spin';
-                case ProcessStatus.FINISHED:
+                case ProcessStatus.EXECUTED:
                     return 'fa fa-check';
                 case ProcessStatus.FAILED:
                 case ProcessStatus.STOPPED:

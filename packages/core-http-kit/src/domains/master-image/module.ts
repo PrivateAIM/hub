@@ -32,7 +32,7 @@ export class MasterImageAPI extends BaseAPI {
     }
 
     async runCommand(
-        command: MasterImageCommand,
+        command: `${MasterImageCommand}`,
         data: Record<string, any> = {},
     ): Promise<SingleResourceResponse<Record<string, any>>> {
         const actionData = {
