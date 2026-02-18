@@ -28,6 +28,16 @@ type Context = {
     slots: Slots
 };
 
+export type ActionCommandSlotsType = {
+    default: {
+        commandText: string,
+        isDisabled: boolean,
+        isAllowed: boolean,
+        iconClass: string,
+        execute: () => Promise<any>
+    }
+};
+
 export function renderActionCommand(ctx: Context) : VNodeChild {
     if (!ctx.isAllowed) {
         return h('span', {}, ['']);
@@ -86,6 +96,7 @@ export function renderActionCommand(ctx: Context) : VNodeChild {
             isDisabled: ctx.isDisabled,
             isAllowed: ctx.isAllowed,
             iconClass: iconClasses,
+            execute: () => ctx.execute(),
         }, ctx.slots);
     }
 
