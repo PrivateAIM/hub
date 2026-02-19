@@ -15,8 +15,8 @@ import {
 import type { DataSourceOptions } from 'typeorm';
 import { DataSource } from 'typeorm';
 import { setupLogging } from '../../config/services/index.ts';
+import { SRC_PATH } from '../../constants.ts';
 import { DataSourceOptionsBuilder } from '../../database/index.ts';
-import { CODE_PATH } from '../../constants.ts';
 
 enum MigrationOperation {
     GENERATE = 'generate',
@@ -110,7 +110,7 @@ export function defineCLIMigrationCommand() {
                 },
             ];
 
-            const baseDirectory = path.join(CODE_PATH, 'database', 'migrations');
+            const baseDirectory = path.join(SRC_PATH, 'database', 'migrations');
             const timestamp = Date.now();
 
             for (let i = 0; i < connections.length; i++) {
