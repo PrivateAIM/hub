@@ -111,11 +111,11 @@ export function createEntityManager<
 
     const resolved = (value: RECORD | null) => {
         if (ctx.setup && ctx.setup.emit) {
-            ctx.setup.emit('resolved', { ...value });
+            ctx.setup.emit('resolved', value ? { ...value } : null);
         }
 
         if (ctx.onResolved) {
-            ctx.onResolved({ ...value });
+            ctx.onResolved(value ? { ...value } : null);
         }
     };
 

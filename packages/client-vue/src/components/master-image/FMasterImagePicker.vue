@@ -34,7 +34,6 @@ export default defineComponent({
     },
     emits: {
         ...defineEntityManagerEvents<MasterImage>(),
-        reset: (() => Promise.resolve()),
     },
     setup(props, setup) {
         const entityId = toRef(props, 'entityId');
