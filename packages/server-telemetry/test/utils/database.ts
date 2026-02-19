@@ -15,10 +15,12 @@ import {
 import {
     DataSource,
 } from 'typeorm';
-import { extendDataSourceOptions } from '../../src/database';
+import { DataSourceOptionsBuilder } from '../../src/database';
 
 export async function useTestDatabase() {
-    const options = await extendDataSourceOptions({
+    const optionsBuilder = new DataSourceOptionsBuilder();
+
+    const options = optionsBuilder.buildWith({
         type: 'better-sqlite3',
         database: ':memory:',
     });

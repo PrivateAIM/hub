@@ -15,7 +15,7 @@ import {
 import type { DataSourceOptions } from 'typeorm';
 import { DataSource } from 'typeorm';
 import { setupLogging } from '../../config/services/index.ts';
-import { buildDataSourceOptions, extendDataSourceOptions } from '../../database/index.ts';
+import { DataSourceOptionsBuilder } from '../../database/index.ts';
 import { CODE_PATH } from '../../constants.ts';
 
 enum MigrationOperation {
@@ -42,13 +42,14 @@ export function defineCLIMigrationCommand() {
             setupLogging();
 
             const logger = useLogger();
+            const optionsBuilder = new DataSourceOptionsBuilder();
 
             if (
                 context.args.operation === MigrationOperation.REVERT ||
                 context.args.operation === MigrationOperation.STATUS ||
                 context.args.operation === MigrationOperation.RUN
             ) {
-                const options = await buildDataSourceOptions();
+                const options = optionsBuilder.buildWithEnv();
 
                 logger.debug(`Type: ${options.type}`);
                 logger.debug(`Database: ${options.database}`);
@@ -113,7 +114,7 @@ export function defineCLIMigrationCommand() {
             const timestamp = Date.now();
 
             for (let i = 0; i < connections.length; i++) {
-                const dataSourceOptions = await extendDataSourceOptions(connections[i]);
+                const dataSourceOptions = optionsBuilder.buildWith(connections[i]);
                 const directoryPath = path.join(baseDirectory, dataSourceOptions.type);
 
                 await dropDatabase({ options: dataSourceOptions });

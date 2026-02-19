@@ -5,4 +5,5 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './subscriber';
+export * from './data-source/inex.ts';
+export * from './subscriber/index.ts';

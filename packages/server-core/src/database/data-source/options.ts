@@ -1,11 +1,10 @@
 /*
- * Copyright (c) 2023-2024.
+ * Copyright (c) 2025.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import type { DataSourceOptions } from 'typeorm';
-import { isRedisClientUsable } from '@privateaim/server-kit';
+import { DataSourceOptionsBuilder as BaseBuilder } from '@privateaim/server-db-kit';
 import {
     AnalysisBucketEntity,
     AnalysisBucketFileEntity,
@@ -33,15 +32,13 @@ import {
     RegistryProjectEntity,
     RegistryProjectSubscriber,
     RegistrySubscriber,
-} from '../../domains/index.ts';
-import { DatabaseQueryResultCache } from '../../cache/index.ts';
+} from '../domains/index.ts';
 
-export async function extendDataSourceOptions(options: DataSourceOptions) : Promise<DataSourceOptions> {
-    options = {
-        ...options,
-        logging: false,
-        entities: [
-            ...(options.entities ? options.entities : []) as string[],
+export class DataSourceOptionsBuilder extends BaseBuilder {
+    constructor() {
+        super();
+
+        this.setEntities([
             MasterImageEntity,
             MasterImageGroupEntity,
             ProjectEntity,
@@ -55,11 +52,9 @@ export async function extendDataSourceOptions(options: DataSourceOptions) : Prom
             AnalysisNodeEntity,
             AnalysisNodeEventEntity,
             AnalysisPermissionEntity,
-        ],
-        migrations: [],
-        migrationsTransactionMode: 'each',
-        subscribers: [
-            ...(options.subscribers ? options.subscribers : []) as string[],
+        ]);
+
+        this.setSubscribers([
             AnalysisSubscriber,
             AnalysisBucketSubscriber,
             AnalysisBucketFileSubscriber,
@@ -73,35 +68,6 @@ export async function extendDataSourceOptions(options: DataSourceOptions) : Prom
             ProjectNodeSubscriber,
             RegistrySubscriber,
             RegistryProjectSubscriber,
-        ],
-    };
-
-    const migrations : string[] = [];
-    // const migration = await adjustFilePath(
-    //     `src/database/migrations/${options.type}/*.{ts,js}`,
-    // );
-
-    // migrations.push(migration);
-
-    Object.assign(options, {
-        migrations,
-    } as DataSourceOptions);
-
-    if (isRedisClientUsable()) {
-        Object.assign(options, {
-            cache: {
-                provider() {
-                    return new DatabaseQueryResultCache();
-                },
-            },
-        } as Partial<DataSourceOptions>);
+        ]);
     }
-
-    if (options.type === 'mysql') {
-        Object.assign(options, {
-            connectorPackage: 'mysql2',
-        } satisfies Partial<DataSourceOptions>);
-    }
-
-    return options;
 }
