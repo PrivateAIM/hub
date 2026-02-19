@@ -109,13 +109,13 @@ export function createEntityManager<
         }
     };
 
-    const resolved = (value?: RECORD) => {
+    const resolved = (value: RECORD | null) => {
         if (ctx.setup && ctx.setup.emit) {
-            ctx.setup.emit('resolved', value);
+            ctx.setup.emit('resolved', value ? { ...value } : null);
         }
 
         if (ctx.onResolved) {
-            ctx.onResolved(value);
+            ctx.onResolved(value ? { ...value } : null);
         }
     };
 
@@ -262,7 +262,7 @@ export function createEntityManager<
         entity.value = null;
 
         if (!domainAPI) {
-            resolved();
+            resolved(null);
 
             return null;
         }
@@ -311,6 +311,8 @@ export function createEntityManager<
                 }
             }
         }
+
+        resolved(null);
 
         return null;
     };

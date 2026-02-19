@@ -82,7 +82,7 @@ export type EntityManagerContext<
     setup?: Partial<SetupContext<EntityManagerEventsType<T>, SlotsType<EntityManagerSlotsType<T>>>>,
     props?: EntityManagerProps<T>,
     realmId?: MaybeRef<string> | ((entity: T | undefined) => string | undefined),
-    onResolved?(entity?: T) : any,
+    onResolved?(entity: T | null) : any,
     onCreated?(entity: T): any,
     onUpdated?(entity: Partial<T>): any,
     onDeleted?(entity: T): any,
