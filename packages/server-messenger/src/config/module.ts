@@ -10,7 +10,7 @@ import {
     setupLogger,
     setupRedis,
     setupVault,
-} from './services';
+} from './services/index.ts';
 
 export function configure() {
     configureAMQP();

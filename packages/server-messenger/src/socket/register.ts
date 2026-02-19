@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { mountConnectionController, mountMessagingController } from './controllers';
-import type { Server, Socket } from './types';
+import { mountConnectionController, mountMessagingController } from './controllers/index.ts';
+import type { Server, Socket } from './types.ts';
 
 export function registerControllers(server: Server) {
     server.on('connection', (socket: Socket) => {

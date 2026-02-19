@@ -6,13 +6,13 @@
  */
 
 import { STCConnectionEventName } from '@privateaim/messenger-kit';
-import type { Socket } from '../../../types';
+import type { Socket } from '../../../types.ts';
 import {
     buildConnectionRobotRoom,
     buildConnectionRobotSubscriptionRoom,
     buildConnectionUserRoom,
     buildConnectionUserSubscriptionRoom,
-} from '../utils';
+} from '../utils.ts';
 
 export function mountConnectionConnectHandler(socket: Socket) {
     if (!socket.data.userId && !socket.data.robotId) {

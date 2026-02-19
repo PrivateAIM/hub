@@ -5,5 +5,5 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './connection';
-export * from './messaging';
+export * from './connection/index.ts';
+export * from './messaging/index.ts';

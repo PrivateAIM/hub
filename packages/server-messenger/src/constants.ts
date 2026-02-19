@@ -6,6 +6,8 @@
  */
 
 import path from 'node:path';
-import process from 'node:process';
+import { fileURLToPath } from 'node:url';
 
-export const WRITABLE_DIR_PATH = path.join(process.cwd(), 'writable');
+export const CODE_PATH = path.dirname(fileURLToPath(import.meta.url));
+
+export const PACKAGE_PATH = path.join(CODE_PATH, '..');
