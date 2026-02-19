@@ -34,7 +34,7 @@
         "@privateaim/telemetry-kit": "^0.8.27",
         "@routup/basic": "^1.4.3",
         "@routup/decorators": "^3.4.3",
-        "@validup/adapter-routup": "^0.2.1",
+        "@validup/adapter-routup": "^0.2.2",
         "@validup/adapter-zod": "^0.2.3",
         "busboy": "^1.6.0",
         "cors": "^2.8.6",
@@ -43,7 +43,7 @@
         "hapic": "^2.7.0",
         "locter": "^2.2.1",
         "minio": "^8.0.6",
-        "mysql2": "^3.17.2",
+        "mysql2": "^3.17.3",
         "redis-extension": "^2.0.4",
         "reflect-metadata": "^0.2.2",
         "routup": "^4.1.0",
@@ -59,7 +59,7 @@
         "@types/cors": "^2.8.19",
         "@types/supertest": "^6.0.3",
         "@types/tar-stream": "^3.1.4",
-        "testcontainers": "^11.10.0",
+        "testcontainers": "^11.12.0",
         "vitest": "^4.0.18"
     },
     "scripts": {
