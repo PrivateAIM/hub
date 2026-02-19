@@ -6,7 +6,7 @@
  */
 
 import path from 'node:path';
-import { CODE_PATH } from '../paths.ts';
+import { CODE_PATH } from '../constants.ts';
 
 let writableDirPath : string | undefined;
 let rootDirPath : string | undefined;

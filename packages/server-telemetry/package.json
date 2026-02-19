@@ -58,9 +58,9 @@
         "vitest": "^4.0.18"
     },
     "scripts": {
+        "cli": "node dist/cli/index.js",
         "cli-dev": "ts-node src/cli/index.ts",
         "build": "rimraf ./dist && cross-env NODE_ENV=production tsc -p tsconfig.build.json",
-        "cli": "node dist/cli/index.js",
         "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts",
         "test:coverage": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts --coverage"
     }

@@ -15,7 +15,7 @@ import {
     readInt,
 } from 'envix';
 import { config } from 'dotenv';
-import { CODE_PATH } from '../../paths.ts';
+import { CODE_PATH } from '../../constants.ts';
 import { EnvironmentDefaults, EnvironmentInputKey } from './constants.ts';
 import type { Environment } from './types.ts';
 
