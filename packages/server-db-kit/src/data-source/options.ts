@@ -80,14 +80,17 @@ export class DataSourceOptionsBuilder {
             ],
         };
 
-        let migrationPath = `src/database/migrations/${options.type}/*.{ts,js}`;
-        if (!isCodeTransformation(CodeTransformation.JUST_IN_TIME)) {
-            migrationPath = transformFilePath(migrationPath, './dist', './src');
-        }
+        if (options.type === 'mysql' || options.type === 'postgres') {
+            let migrationPath = `src/database/migrations/${options.type}/*.{ts,js}`;
+            if (!isCodeTransformation(CodeTransformation.JUST_IN_TIME)) {
+                migrationPath = transformFilePath(migrationPath, './dist', './src');
+            }
 
-        Object.assign(options, {
-            migrations: [migrationPath],
-        } as DataSourceOptions);
+            Object.assign(options, {
+                migrations: [migrationPath],
+                migrationsTransactionMode: 'all',
+            } as DataSourceOptions);
+        }
 
         if (options.type === 'mysql') {
             Object.assign(options, {
