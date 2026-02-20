@@ -82,7 +82,7 @@
     "scripts": {
         "cli": "node dist/cli/index.js",
         "cli-dev": "ts-node src/cli/index.ts",
-        "build": "rimraf dist/ &&  cross-env NODE_ENV=production tsc -p tsconfig.build.json",
+        "build": "rimraf dist/ && cross-env NODE_ENV=production tsc -p tsconfig.build.json",
         "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts",
         "test:coverage": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts --coverage"
     },

@@ -21,10 +21,14 @@ export class DataSourceOptionsBuilder {
 
     protected subscribers : DataSourceOptionsSubscribers;
 
+    // ------------------------------------------------------------------
+
     constructor() {
         this.entities = [];
         this.subscribers = [];
     }
+
+    // ------------------------------------------------------------------
 
     buildWithEnv() {
         const options = readDataSourceOptionsFromEnv();
@@ -40,6 +44,8 @@ export class DataSourceOptionsBuilder {
         return this.normalize(options);
     }
 
+    // ------------------------------------------------------------------
+
     setEntities(entities: DataSourceOptionsEntities) {
         this.entities = entities;
     }
@@ -48,7 +54,9 @@ export class DataSourceOptionsBuilder {
         this.subscribers = subscribers;
     }
 
-    normalize(options: DataSourceOptions) : DataSourceOptions {
+    // ------------------------------------------------------------------
+
+    protected normalize(options: DataSourceOptions) : DataSourceOptions {
         if (
             options.type !== 'mysql' &&
             options.type !== 'postgres' &&

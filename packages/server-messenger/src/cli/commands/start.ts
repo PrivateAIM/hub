@@ -25,7 +25,7 @@ export function defineCLIStartCommand() {
             const socketServer = createSocketServer(httpServer);
 
             httpServer.on('error', (err) => {
-                logger.error(`HTTP server error: ${err.message}`);
+                logger.error(err);
                 process.exit(1);
             });
 

@@ -7,7 +7,7 @@
 
 import { generateSwagger } from '@privateaim/server-http-kit';
 import type { Component } from '@privateaim/server-kit';
-import { QueueWorkerComponentCaller } from '@privateaim/server-kit';
+import { QueueWorkerComponentCaller, useLogger } from '@privateaim/server-kit';
 import { BucketEventQueueRouterRouting, BucketTaskQueueRouterRouting } from '@privateaim/server-storage-kit';
 import { defineCommand } from 'citty';
 import path from 'node:path';
@@ -42,16 +42,21 @@ export function defineCLIStartCommand() {
                 }),
             ];
 
-            function start() {
-                const port = useEnv('port');
-                httpServer.listen(port);
+            const promises = components.map(
+                (component) => component.start(),
+            );
+            await Promise.all(promises);
 
-                components.map((component) => component.start());
+            const logger = useLogger();
+            httpServer.on('error', (err) => {
+                logger.error(err);
+                process.exit(1);
+            });
 
-                console.log(`Listening on 0.0.0.0:${port}`);
-            }
-
-            start();
+            const port = useEnv('port');
+            httpServer.listen(port, () => {
+                logger.debug(`Listening on 0.0.0.0:${port}`);
+            });
         },
     });
 }

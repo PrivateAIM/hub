@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { DataSourceOptionsBuilder } from '@privateaim/server-db-kit';
 import {
     createDatabase,
     dropDatabase,
@@ -16,6 +15,7 @@ import {
 import {
     DataSource,
 } from 'typeorm';
+import { DataSourceOptionsBuilder } from '../../src/database/index.ts';
 
 export async function useTestDatabase() {
     const optionsBuilder = new DataSourceOptionsBuilder();
