@@ -5,29 +5,43 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { wait } from '@privateaim/kit';
 import {
     createDatabase,
-    dropDatabase,
     setDataSource,
+    synchronizeDatabaseSchema,
     unsetDataSource,
     useDataSource,
 } from 'typeorm-extension';
 import {
     DataSource,
+    type DataSourceOptions,
 } from 'typeorm';
-import { extendDataSourceOptions, setDataSourceSync, unsetDataSourceSync } from '../../src/database';
+import {
+    DataSourceOptionsBuilder,
+    setDataSourceSync,
+    unsetDataSourceSync,
+} from '../../src/database/index.ts';
 
 export async function useTestDatabase() {
-    const options = await extendDataSourceOptions({
-        type: 'better-sqlite3',
-        database: ':memory:',
-    });
+    const optionsBuilder = new DataSourceOptionsBuilder();
+    let options : DataSourceOptions;
+    try {
+        options = optionsBuilder.buildWithEnv();
+    } catch (e) {
+        options = optionsBuilder.buildWith({
+            type: 'better-sqlite3',
+            database: ':memory:',
+        });
+    }
 
-    await dropDatabase({ options, ifExist: true });
     await createDatabase({ options, synchronize: false });
 
     const dataSource = new DataSource(options);
     await dataSource.initialize();
+
+    await synchronizeDatabaseSchema(dataSource);
+
     await dataSource.synchronize();
 
     setDataSource(dataSource);
@@ -38,12 +52,9 @@ export async function useTestDatabase() {
 
 export async function dropTestDatabase() {
     const dataSource = await useDataSource();
+    await wait(0);
     await dataSource.destroy();
-
-    const { options } = dataSource;
 
     unsetDataSource();
     unsetDataSourceSync();
-
-    await dropDatabase({ ifExist: true, options });
 }

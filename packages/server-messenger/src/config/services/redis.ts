@@ -6,7 +6,7 @@
  */
 
 import { createRedisClient, setRedisFactory } from '@privateaim/server-kit';
-import { useEnv } from '../env';
+import { useEnv } from '../env/index.ts';
 
 export function setupRedis() {
     const connectionString = useEnv('redisConnectionString');

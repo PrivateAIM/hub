@@ -5,43 +5,80 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { wait } from '@privateaim/kit';
 import {
     createDatabase,
-    dropDatabase,
     setDataSource,
+    synchronizeDatabaseSchema,
     unsetDataSource,
-    useDataSource,
 } from 'typeorm-extension';
+import type { DataSourceOptions } from 'typeorm';
 import {
     DataSource,
 } from 'typeorm';
-import { extendDataSourceOptions } from '../../src/database';
+import { DataSourceOptionsBuilder } from '../../src/database/index.ts';
 
-export async function useTestDatabase() {
-    const options = await extendDataSourceOptions({
-        type: 'better-sqlite3',
-        database: ':memory:',
-    });
+export class TestDatabase {
+    protected options : DataSourceOptions | undefined;
 
-    await dropDatabase({ options, ifExist: true });
-    await createDatabase({ options, synchronize: false });
+    protected instance : DataSource | undefined;
 
-    const dataSource = new DataSource(options);
-    await dataSource.initialize();
-    await dataSource.synchronize();
+    protected async getOptions() : Promise<DataSourceOptions> {
+        if (this.options) {
+            return this.options;
+        }
 
-    setDataSource(dataSource);
+        const optionsBuilder = new DataSourceOptionsBuilder();
 
-    return dataSource;
-}
+        let options : DataSourceOptions;
+        try {
+            options = optionsBuilder.buildWithEnv();
+        } catch (e) {
+            options = optionsBuilder.buildWith({
+                type: 'better-sqlite3',
+                database: ':memory:',
+            });
+        }
 
-export async function dropTestDatabase() {
-    const dataSource = await useDataSource();
-    await dataSource.destroy();
+        this.options = options;
+        return this.options;
+    }
 
-    const { options } = dataSource;
+    protected async getDatSource() : Promise<DataSource> {
+        if (this.instance) {
+            return this.instance;
+        }
 
-    unsetDataSource();
+        const options = await this.getOptions();
+        await createDatabase({ options, ifNotExist: true, synchronize: false });
 
-    await dropDatabase({ ifExist: true, options });
+        const dataSource = new DataSource(options);
+        await dataSource.initialize();
+
+        this.instance = dataSource;
+        return this.instance;
+    }
+
+    async setup() {
+        const dataSource = await this.getDatSource();
+        await synchronizeDatabaseSchema(dataSource);
+
+        await dataSource.synchronize();
+        await dataSource.destroy();
+    }
+
+    async up() {
+        const dataSource = await this.getDatSource();
+        await dataSource.synchronize();
+
+        setDataSource(dataSource);
+    }
+
+    async down() {
+        const dataSource = await this.getDatSource();
+        await wait(0);
+        await dataSource.destroy();
+
+        unsetDataSource();
+    }
 }

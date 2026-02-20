@@ -14,12 +14,14 @@ import { createNodeDispatcher } from 'routup';
 import { inject } from 'vitest';
 import { configure } from '../../src/config';
 import { createHTTPRouter } from '../../src/http';
-import { dropTestDatabase, useTestDatabase } from './database';
+import { TestDatabase } from './database';
 
 class TestSuite {
     protected _client : APIClient | undefined;
 
     protected _server : Server | undefined;
+
+    protected database : TestDatabase;
 
     constructor() {
         write(
@@ -27,6 +29,8 @@ class TestSuite {
             `http://admin:start123@${inject('MINIO_CONTAINER_HOST')}:${inject('MINIO_CONTAINER_PORT')}`,
         );
         configure();
+
+        this.database = new TestDatabase();
     }
 
     client() : APIClient {
@@ -38,13 +42,13 @@ class TestSuite {
     }
 
     async up() {
-        await useTestDatabase();
+        await this.database.up();
 
         await this.startServer();
     }
 
     async down() {
-        await dropTestDatabase();
+        await this.database.down();
 
         this.stopServer();
     }

@@ -17,7 +17,7 @@ import {
     expectProperties,
     removeDateProperties,
 } from '../../../utils';
-import { TEST_DEFAULT_ANALYSIS } from '../../../utils/domains';
+import { createTestAnalysis, createTestProject } from '../../../utils/domains/index.ts';
 
 describe('src/controllers/core/analysis', () => {
     const suite = createTestSuite();
@@ -35,13 +35,10 @@ describe('src/controllers/core/analysis', () => {
     it('should create resource', async () => {
         const client = suite.client();
 
-        const project = await client.project.create({
-            name: 'development',
-        });
-        const analysis = await client.analysis.create({
-            ...TEST_DEFAULT_ANALYSIS,
+        const project = await client.project.create(createTestProject());
+        const analysis = await client.analysis.create(createTestAnalysis({
             project_id: project.id,
-        });
+        }));
 
         expect(analysis.project_id).toEqual(project.id);
 
@@ -52,7 +49,7 @@ describe('src/controllers/core/analysis', () => {
         const client = suite.client();
         const { data } = await client.analysis.getMany();
 
-        expect(data.length).toEqual(1);
+        expect(data.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should read resource', async () => {

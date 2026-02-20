@@ -56,18 +56,20 @@ export function defineCLIStartCommand() {
                 controllerBasePath: path.join(process.cwd(), 'src', 'http', 'controllers'),
             });
 
+            const promises = components.map((c) => c.start());
+            await Promise.all(promises);
+
+            const logger = useLogger();
             const httpServer = createHttpServer();
+            httpServer.on('error', (err) => {
+                logger.error(err);
+                process.exit(1);
+            });
 
-            function start() {
-                components.forEach((c) => c.start());
-
-                const port = useEnv('port');
-                httpServer.listen(port);
-
-                useLogger().info(`Listening on 0.0.0.0:${port}`);
-            }
-
-            start();
+            const port = useEnv('port');
+            httpServer.listen(port, () => {
+                logger.debug(`Listening on 0.0.0.0:${port}`);
+            });
         },
     });
 }

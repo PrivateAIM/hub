@@ -11,7 +11,10 @@ import type {
     EntityEventDestinations, EntityEventDestinationsFn,
     EntityEventPublisher,
 } from '@privateaim/server-kit';
-import { useEntityEventPublisher } from '@privateaim/server-kit';
+import {
+    isEntityEventPublisherUsable,
+    useEntityEventPublisher,
+} from '@privateaim/server-kit';
 import type {
     EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
@@ -20,7 +23,7 @@ import type { BaseSubscriberContext, SubscriberPublishPayload } from './types';
 export class BaseSubscriber<
     RECORD extends ObjectLiteral,
 > implements EntitySubscriberInterface<RECORD> {
-    private readonly publisher: EntityEventPublisher;
+    private readonly publisher: EntityEventPublisher | undefined;
 
     private readonly destinations : EntityEventDestinations | EntityEventDestinationsFn<RECORD>;
 
@@ -28,7 +31,10 @@ export class BaseSubscriber<
 
     constructor(ctx: BaseSubscriberContext<RECORD>) {
         this.refType = ctx.refType;
-        this.publisher = useEntityEventPublisher();
+        if (isEntityEventPublisherUsable()) {
+            this.publisher = useEntityEventPublisher();
+        }
+
         this.destinations = ctx.destinations;
     }
 
@@ -60,6 +66,10 @@ export class BaseSubscriber<
     }
 
     async publish(payload: SubscriberPublishPayload<RECORD>) {
+        if (!this.publisher) {
+            return;
+        }
+
         await this.publisher.safePublish({
             data: payload.data,
             dataPrevious: payload.dataPrevious,

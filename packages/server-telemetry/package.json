@@ -52,15 +52,16 @@
         "validup": "^0.2.1"
     },
     "devDependencies": {
+        "@faker-js/faker": "^10.3.0",
         "@types/cors": "^2.8.19",
         "@types/supertest": "^6.0.3",
         "testcontainers": "^11.10.0",
         "vitest": "^4.0.18"
     },
     "scripts": {
+        "cli": "node dist/cli/index.js",
         "cli-dev": "ts-node src/cli/index.ts",
         "build": "rimraf ./dist && cross-env NODE_ENV=production tsc -p tsconfig.build.json",
-        "cli": "node dist/cli/index.js",
         "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts",
         "test:coverage": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts --coverage"
     }

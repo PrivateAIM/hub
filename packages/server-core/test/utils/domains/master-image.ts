@@ -5,21 +5,26 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { faker } from '@faker-js/faker';
 import type { MasterImage } from '@privateaim/core-kit';
 import type { TestAgent } from '../supertest';
 
-export const TEST_DEFAULT_MASTER_IMAGE : Partial<MasterImage> = {
-    group_virtual_path: 'python',
-    name: 'base',
-    path: 'data\\python\\base',
-    virtual_path: 'python/base',
-};
+export function createTestMasterImage() : Partial<MasterImage> {
+    const name = faker.string.alpha({ length: 16, casing: 'lower' });
+
+    return {
+        group_virtual_path: name,
+        name: 'base',
+        path: `data\\${name}\\base`,
+        virtual_path: `python/${name}`,
+    };
+}
 
 export async function createSuperTestMasterImage(superTest: TestAgent, entity?: Partial<MasterImage>) {
     return superTest
         .post('/master-images')
         .send({
-            ...TEST_DEFAULT_MASTER_IMAGE,
+            ...createTestMasterImage(),
             ...(entity || {}),
         })
         .auth('admin', 'start123');

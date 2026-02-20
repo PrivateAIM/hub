@@ -67,6 +67,7 @@
         "zod": "^4.3.6"
     },
     "devDependencies": {
+        "@faker-js/faker": "^10.3.0",
         "@privateaim/core-http-kit": "^0.8.27",
         "@types/busboy": "^1.5.3",
         "@types/cors": "^2.8.19",
@@ -80,11 +81,9 @@
         "vitest": "^4.0.18"
     },
     "scripts": {
-        "dev": "npm run cli -- start",
-        "start": "node dist/cli/index.js start",
-        "build": "rimraf dist/ && tsc -p tsconfig.build.json",
         "cli": "node dist/cli/index.js",
         "cli-dev": "ts-node src/cli/index.ts",
+        "build": "rimraf dist/ && cross-env NODE_ENV=production tsc -p tsconfig.build.json",
         "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts",
         "test:coverage": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts --coverage"
     },

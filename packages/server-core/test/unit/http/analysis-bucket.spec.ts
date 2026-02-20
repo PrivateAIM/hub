@@ -57,7 +57,7 @@ describe('controllers/analysis-file', () => {
         const client = suite.client();
 
         const { data } = await client.analysisBucket.getMany();
-        expect(data.length).toEqual(1);
+        expect(data.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should read resource', async () => {

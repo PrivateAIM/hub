@@ -17,7 +17,7 @@ import {
     createConfig, getRootDirPath, getWritableDirPath, useEnv,
 } from '../config/index.ts';
 import { setupAuthupService, setupHarborService } from '../core/index.ts';
-import { buildDataSourceOptions, setDataSourceSync } from '../database/index.ts';
+import { DataSourceOptionsBuilder, setDataSourceSync } from '../database/index.ts';
 import { createRouter } from '../http/router.ts';
 import { createHttpServer } from '../http/server.ts';
 import { DatabaseIntegrityService } from '../services/index.ts';
@@ -45,7 +45,8 @@ export async function startCommand() {
 
     logger.debug('Generated documentation.');
 
-    const options = await buildDataSourceOptions();
+    const optionsBuilder = new DataSourceOptionsBuilder();
+    const options = optionsBuilder.buildWithEnv();
 
     logger.debug(`Database: ${options.type}`);
 
