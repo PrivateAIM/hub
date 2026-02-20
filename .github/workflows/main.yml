@@ -35,7 +35,7 @@ jobs:
                 env:
                     DB_TYPE: "better-sqlite3"
                     DB_DATABASE: ":memory:"
-                    NODE_ENV: "production"
+                    NODE_ENV: "development"
             mysql:
                 image: mysql:9
                 env:
