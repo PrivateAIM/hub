@@ -67,6 +67,7 @@
         "zod": "^4.3.6"
     },
     "devDependencies": {
+        "@faker-js/faker": "^10.3.0",
         "@privateaim/core-http-kit": "^0.8.27",
         "@types/busboy": "^1.5.3",
         "@types/cors": "^2.8.19",

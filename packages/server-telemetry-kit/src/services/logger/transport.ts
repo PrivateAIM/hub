@@ -43,7 +43,7 @@ export class LoggerTransport extends WinstonTransport {
 
         const output : LogInput = {
             message: stack || message,
-            time: (BigInt(date.getTime()) * 1_000_000n).toString(),
+            time: date.toISOString(),
             labels: { ...this.labels },
             level: LogLevel.DEBUG,
             service: 'unknown',

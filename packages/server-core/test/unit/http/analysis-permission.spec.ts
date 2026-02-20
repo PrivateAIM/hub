@@ -17,6 +17,7 @@ import {
     removeDateProperties,
 } from '../../utils';
 import {
+    createTestAnalysis,
     createTestProject,
 } from '../../utils/domains';
 
@@ -41,10 +42,9 @@ describe('src/controllers/core/analysis-permission', () => {
         const project = await client.project.create(createTestProject());
         expect(project.id).toBeDefined();
 
-        const analysis = await client.analysis.create({
-            name: 'foo.bar.baz',
+        const analysis = await client.analysis.create(createTestAnalysis({
             project_id: project.id,
-        });
+        }));
         expect(analysis.id).toBeDefined();
 
         attributes.analysis_id = analysis.id;

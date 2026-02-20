@@ -14,6 +14,7 @@ import {
     removeDateProperties,
 } from '../utils';
 import type { BucketEntity } from '../../src/database';
+import { createTestBucket } from '../utils/domains/index.ts';
 
 describe('controllers/bucket', () => {
     const suite = createTestSuite();
@@ -30,12 +31,12 @@ describe('controllers/bucket', () => {
 
     it('should create resource', async () => {
         const client = suite.client();
-        const data = await client.bucket.create({
-            name: 'foo-bar-baz',
+        const input = createTestBucket({
             region: 'eu-west',
         });
+        const data = await client.bucket.create(input);
 
-        expect(data.name).toEqual('foo-bar-baz');
+        expect(data.name).toEqual(input.name);
         expect(data.region).toEqual('eu-west');
 
         details = removeDateProperties(data);

@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { wait } from '@privateaim/kit';
 import {
     createDatabase,
-    dropDatabase,
     setDataSource,
     synchronizeDatabaseSchema,
     unsetDataSource,
@@ -31,12 +31,14 @@ export async function useTestDatabase() {
         });
     }
 
-    await dropDatabase({ options, ifExist: true });
     await createDatabase({ options, synchronize: false });
-    await synchronizeDatabaseSchema(options);
 
     const dataSource = new DataSource(options);
     await dataSource.initialize();
+
+    await synchronizeDatabaseSchema(dataSource);
+
+    await dataSource.synchronize();
 
     setDataSource(dataSource);
 
@@ -45,11 +47,8 @@ export async function useTestDatabase() {
 
 export async function dropTestDatabase() {
     const dataSource = await useDataSource();
+    await wait(0);
     await dataSource.destroy();
 
-    const { options } = dataSource;
-
     unsetDataSource();
-
-    await dropDatabase({ ifExist: true, options });
 }

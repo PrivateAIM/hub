@@ -5,25 +5,20 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { faker } from '@faker-js/faker';
 import type { Project } from '@privateaim/core-kit';
 import type { TestAgent } from '../supertest';
 
-export const TEST_DEFAULT_PROJECT : Partial<Project> = {
-    name: 'development',
-};
-
-export function createTestProject() : Partial<Project> {
+export function createTestProject(input: Partial<Project> = {}) : Partial<Project> {
     return {
-        name: 'development',
+        name: faker.string.alpha({ length: 16, casing: 'lower' }),
+        ...input,
     };
 }
 
-export async function createSuperTestProject(superTest: TestAgent, proposal?: Partial<Project>) {
+export async function createSuperTestProject(superTest: TestAgent, input: Partial<Project> = {}) {
     return superTest
         .post('/projects')
-        .send({
-            ...TEST_DEFAULT_PROJECT,
-            ...(proposal || {}),
-        })
+        .send(createTestProject(input))
         .auth('admin', 'start123');
 }
