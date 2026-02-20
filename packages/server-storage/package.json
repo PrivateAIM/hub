@@ -70,6 +70,7 @@
         "cli-dev": "ts-node src/cli/index.ts",
         "build": "rimraf ./dist && cross-env NODE_ENV=production tsc -p tsconfig.build.json",
         "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts",
+        "test:mysql": "cross-env DB_TYPE=mysql DB_HOST=127.0.0.1 DB_USERNAME=root DB_PASSWORD=start123 DB_DATABASE=app vitest run --config test/vitest.config.ts",
         "test:coverage": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts --coverage"
     }
 }

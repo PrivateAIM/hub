@@ -8,6 +8,7 @@ import 'reflect-metadata';
 
 import type { TestProject } from 'vitest/node';
 import { GenericContainer } from 'testcontainers';
+import { TestDatabase } from './utils/index.ts';
 
 declare module 'vitest' {
     export interface ProvidedContext {
@@ -30,6 +31,9 @@ async function setup(project: TestProject) {
     project.provide('MINIO_CONTAINER_PORT', container.getFirstMappedPort());
 
     globalThis.MINIO_CONTAINER = container;
+
+    const database = new TestDatabase();
+    await database.setup();
 }
 
 async function teardown() {

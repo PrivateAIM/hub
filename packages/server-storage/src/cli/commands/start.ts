@@ -15,6 +15,7 @@ import process from 'node:process';
 import { useBucketComponent } from '../../components/index.ts';
 import { configure, useEnv } from '../../config/index.ts';
 import { setupDatabase } from '../../config/services/index.ts';
+import { CODE_PATH } from '../../constants.ts';
 import { createHttpServer } from '../../http/index.ts';
 
 export function defineCLIStartCommand() {
@@ -30,7 +31,7 @@ export function defineCLIStartCommand() {
             await generateSwagger({
                 authupURL: useEnv('authupURL'),
                 baseURL: useEnv('publicURL'),
-                controllerBasePath: path.join(process.cwd(), 'src', 'http', 'controllers'),
+                controllerBasePath: path.join(CODE_PATH, 'http', 'controllers'),
             });
 
             const httpServer = createHttpServer();
