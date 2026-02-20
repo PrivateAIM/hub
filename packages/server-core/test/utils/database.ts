@@ -8,7 +8,7 @@
 import {
     createDatabase,
     dropDatabase,
-    setDataSource,
+    setDataSource, synchronizeDatabaseSchema,
     unsetDataSource,
     useDataSource,
 } from 'typeorm-extension';
@@ -38,7 +38,8 @@ export async function useTestDatabase() {
 
     const dataSource = new DataSource(options);
     await dataSource.initialize();
-    await dataSource.synchronize();
+
+    await synchronizeDatabaseSchema(dataSource);
 
     setDataSource(dataSource);
     setDataSourceSync(dataSource);
