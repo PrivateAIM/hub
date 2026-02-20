@@ -12,6 +12,7 @@ import {
     unsetDataSource,
     useDataSource,
 } from 'typeorm-extension';
+import type { DataSourceOptions } from 'typeorm';
 import {
     DataSource,
 } from 'typeorm';
@@ -19,10 +20,16 @@ import { DataSourceOptionsBuilder } from '../../src/database/index.ts';
 
 export async function useTestDatabase() {
     const optionsBuilder = new DataSourceOptionsBuilder();
-    const options = optionsBuilder.buildWith({
-        type: 'better-sqlite3',
-        database: ':memory:',
-    });
+
+    let options : DataSourceOptions;
+    try {
+        options = optionsBuilder.buildWithEnv();
+    } catch (e) {
+        options = optionsBuilder.buildWith({
+            type: 'better-sqlite3',
+            database: ':memory:',
+        });
+    }
 
     await dropDatabase({ options, ifExist: true });
     await createDatabase({ options, synchronize: false });
