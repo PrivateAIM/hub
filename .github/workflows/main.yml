@@ -82,14 +82,14 @@ jobs:
                         echo "DB_HOST=127.0.0.1" >> $GITHUB_ENV
                         echo "DB_PORT=3306" >> $GITHUB_ENV
                         echo "DB_USERNAME=root" >> $GITHUB_ENV
-                        echo "DB_PASSWORD=root" >> $GITHUB_ENV
+                        echo "DB_PASSWORD=start123" >> $GITHUB_ENV
                         echo "DB_DATABASE=app" >> $GITHUB_ENV
                     else
                         echo "DB_TYPE=postgres" >> $GITHUB_ENV
                         echo "DB_HOST=127.0.0.1" >> $GITHUB_ENV
                         echo "DB_PORT=5432" >> $GITHUB_ENV
                         echo "DB_USERNAME=postgres" >> $GITHUB_ENV
-                        echo "DB_PASSWORD=postgres" >> $GITHUB_ENV
+                        echo "DB_PASSWORD=start123" >> $GITHUB_ENV
                         echo "DB_DATABASE=app" >> $GITHUB_ENV
                     fi
 
