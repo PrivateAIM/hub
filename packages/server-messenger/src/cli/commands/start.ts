@@ -19,18 +19,21 @@ export function defineCLIStartCommand() {
         async setup() {
             configure();
 
+            const logger = useLogger();
+
             const httpServer = createHttpServer();
             const socketServer = createSocketServer(httpServer);
 
-            function start() {
-                const port = useEnv('port');
-                httpServer.listen(port);
+            httpServer.on('error', (err) => {
+                logger.error(`HTTP server error: ${err.message}`);
+                process.exit(1);
+            });
 
-                useLogger().debug(`Listening on 0.0.0.0:${port}`);
-                useLogger().debug(`Socket.io server mounted on path: ${socketServer.path()}`);
-            }
-
-            start();
+            const port = useEnv('port');
+            httpServer.listen(port, () => {
+                logger.debug(`Listening on 0.0.0.0:${port}`);
+                logger.debug(`Socket.io server mounted on path: ${socketServer.path()}`);
+            });
         },
     });
 }
