@@ -14,7 +14,13 @@ env:
     NODE_REGISTRY: 'https://registry.npmjs.org'
 
 jobs:
-    main:
+    test:
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                db: [ mysql, postgres, sqlite ]
+
         services:
             authup:
                 image: authup/authup
@@ -29,20 +35,30 @@ jobs:
                 env:
                     DB_TYPE: "better-sqlite3"
                     DB_DATABASE: ":memory:"
-                    NODE_ENV: "development"
-#            loki:
-#                image: grafana/loki
-#                ports:
-#                    - 3100:3100
-#                options: >-
-#                    --health-cmd "wget --quiet --tries=1 --output-document=- http://localhost:3100/ready | grep -q -w ready || exit 1"
-#                    --health-interval 30s
-#                    --health-timeout 10s
-#                    --health-retries 5
-#                    --health-start-period 30s
+                    NODE_ENV: "production"
+            mysql:
+                image: mysql:9
+                env:
+                    MYSQL_ROOT_PASSWORD: start123
+                ports:
+                    - 3306:3306
+                options: >-
+                    --health-cmd="mysqladmin ping -h localhost -proot"
+                    --health-interval=10s
+                    --health-timeout=5s
+                    --health-retries=5
 
-        runs-on: ubuntu-latest
-
+            postgres:
+                image: postgres:18
+                env:
+                    POSTGRES_PASSWORD: start123
+                ports:
+                    - 5432:5432
+                options: >-
+                    --health-cmd="pg_isready -U postgres"
+                    --health-interval=10s
+                    --health-timeout=5s
+                    --health-retries=5
         steps:
             -   uses: actions/checkout@v6
 
@@ -54,15 +70,38 @@ jobs:
             -   name: Build
                 uses: ./.github/actions/build
 
+
+            -   name: Set DB Environment
+                run: |
+                    if [ "${{ matrix.db }}" = "sqlite" ]; then
+                        echo "DB_TYPE=better-sqlite3" >> $GITHUB_ENV
+                        echo "DB_DATABASE=:memory:" >> $GITHUB_ENV
+
+                    elif [ "${{ matrix.db }}" = "mysql" ]; then
+                        echo "DB_TYPE=mysql" >> $GITHUB_ENV
+                        echo "DB_HOST=127.0.0.1" >> $GITHUB_ENV
+                        echo "DB_PORT=3306" >> $GITHUB_ENV
+                        echo "DB_USERNAME=root" >> $GITHUB_ENV
+                        echo "DB_PASSWORD=root" >> $GITHUB_ENV
+                        echo "DB_DATABASE=app" >> $GITHUB_ENV
+                    else
+                        echo "DB_TYPE=postgres" >> $GITHUB_ENV
+                        echo "DB_HOST=127.0.0.1" >> $GITHUB_ENV
+                        echo "DB_PORT=5432" >> $GITHUB_ENV
+                        echo "DB_USERNAME=postgres" >> $GITHUB_ENV
+                        echo "DB_PASSWORD=postgres" >> $GITHUB_ENV
+                        echo "DB_DATABASE=app" >> $GITHUB_ENV
+                    fi
+
             -   name: Test
                 env:
                     PORT: 4000
                     SKIP_PROJECT_APPROVAL: true
                     SKIP_ANALYSIS_APPROVAL: true
                     AUTHUP_URL: http://localhost:3000/
-                    # LOKI_URL: http://localhost:3100/
                 run: |
                     npm run test
+
     lint:
         runs-on: ubuntu-latest
         steps:
