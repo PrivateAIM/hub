@@ -7,22 +7,14 @@
 
 import { isBoolTrue } from '@privateaim/kit';
 import { EnvironmentName } from '@privateaim/server-kit';
-import path from 'node:path';
 import {
     oneOf,
     read,
     readBool,
     readInt,
 } from 'envix';
-import { config } from 'dotenv';
-import { CODE_PATH } from '../../constants.ts';
 import { EnvironmentDefaults, EnvironmentInputKey } from './constants.ts';
 import type { Environment } from './types.ts';
-
-config({
-    debug: false,
-    path: path.resolve(CODE_PATH, '..', '.env'),
-});
 
 let instance : Environment | undefined;
 

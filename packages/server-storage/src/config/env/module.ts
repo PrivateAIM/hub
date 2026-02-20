@@ -5,17 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import path from 'node:path';
 import { read, readInt } from 'envix';
-import { config } from 'dotenv';
 import type { EnvironmentName } from '@privateaim/server-kit';
-import { CODE_PATH } from '../../constants.ts';
 import type { Environment } from './types.ts';
-
-config({
-    debug: false,
-    path: path.resolve(CODE_PATH, '..', '.env'),
-});
 
 let instance : Environment | undefined;
 

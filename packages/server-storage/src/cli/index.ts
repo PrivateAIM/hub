@@ -12,7 +12,10 @@ import dotenv from 'dotenv';
 import { runMain } from 'citty';
 import { createCLIEntryPointCommand } from './module.ts';
 
-dotenv.config();
+dotenv.config({
+    debug: false,
+    quiet: true,
+});
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
