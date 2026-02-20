@@ -15,6 +15,10 @@ export interface MasterImage {
 
     build_progress: number | null;
 
+    build_hash: string | null;
+
+    build_size: number | null;
+
     path: string | null;
 
     virtual_path: string;

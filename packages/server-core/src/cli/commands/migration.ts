@@ -16,7 +16,7 @@ import type { DataSourceOptions } from 'typeorm';
 import { DataSource } from 'typeorm';
 import { setupLogging } from '../../config/services/index.ts';
 import { DataSourceOptionsBuilder } from '../../database/index.ts';
-import { CODE_PATH } from '../../constants.ts';
+import { SRC_PATH } from '../../constants.ts';
 
 enum MigrationOperation {
     GENERATE = 'generate',
@@ -44,6 +44,21 @@ export function defineCLIMigrationCommand() {
             const logger = useLogger();
             const optionsBuilder = new DataSourceOptionsBuilder();
 
+            const logOptions = (input: DataSourceOptions) => {
+                logger.debug(`Type: ${input.type}`);
+                logger.debug(`Database: ${input.database}`);
+
+                if (Array.isArray(input.migrations)) {
+                    for (let i = 0; i < input.migrations.length; i++) {
+                        if (typeof input.migrations[i] === 'string') {
+                            logger.debug(`Migration-Directory: ${input.migrations[i]}`);
+                        }
+                    }
+                } else if (typeof input.migrations === 'string') {
+                    logger.debug(`Migration-Directory: ${input.migrations}`);
+                }
+            };
+
             if (
                 context.args.operation === MigrationOperation.REVERT ||
                 context.args.operation === MigrationOperation.STATUS ||
@@ -51,18 +66,7 @@ export function defineCLIMigrationCommand() {
             ) {
                 const options = optionsBuilder.buildWithEnv();
 
-                logger.debug(`Type: ${options.type}`);
-                logger.debug(`Database: ${options.database}`);
-
-                if (Array.isArray(options.migrations)) {
-                    for (let i = 0; i < options.migrations.length; i++) {
-                        if (typeof options.migrations[i] === 'string') {
-                            logger.debug(`Migration-Directory: ${options.migrations[i]}`);
-                        }
-                    }
-                } else if (typeof options.migrations === 'string') {
-                    logger.debug(`Migration-Directory: ${options.migrations}`);
-                }
+                logOptions(options);
 
                 const check = await checkDatabase({
                     options,
@@ -110,11 +114,13 @@ export function defineCLIMigrationCommand() {
                 },
             ];
 
-            const baseDirectory = path.join(CODE_PATH, 'database', 'migrations');
+            const baseDirectory = path.join(SRC_PATH, 'database', 'migrations');
             const timestamp = Date.now();
 
             for (let i = 0; i < connections.length; i++) {
                 const dataSourceOptions = optionsBuilder.buildWith(connections[i]);
+                logOptions(dataSourceOptions);
+
                 const directoryPath = path.join(baseDirectory, dataSourceOptions.type);
 
                 await dropDatabase({ options: dataSourceOptions });
