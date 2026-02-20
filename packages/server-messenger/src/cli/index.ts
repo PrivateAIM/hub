@@ -21,4 +21,8 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 Promise.resolve()
     .then(() => createCLIEntryPointCommand())
-    .then((command) => runMain(command));
+    .then((command) => runMain(command))
+    .catch((error) => {
+        console.error(error);
+        process.exit(1);
+    });

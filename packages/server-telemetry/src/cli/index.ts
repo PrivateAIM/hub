@@ -19,6 +19,6 @@ Promise.resolve()
     .then(() => createCLIEntryPointCommand())
     .then((command) => runMain(command))
     .catch((err) => {
-        console.log(err);
+        console.error(err);
         process.exit(1);
     });
