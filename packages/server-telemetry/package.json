@@ -33,14 +33,14 @@
         "@privateaim/server-telemetry-kit": "^0.8.27",
         "@routup/basic": "^1.4.3",
         "@routup/decorators": "^3.4.3",
-        "@validup/adapter-routup": "^0.2.1",
-        "@validup/adapter-validator": "^0.3.1",
+        "@validup/adapter-routup": "^0.2.2",
+        "@validup/adapter-validator": "^0.3.2",
         "citty": "^0.2.1",
         "dotenv": "^17.3.1",
         "envix": "^1.3.0",
         "hapic": "^2.7.0",
         "locter": "^2.2.1",
-        "mysql2": "^3.17.2",
+        "mysql2": "^3.17.4",
         "node-cron": "^4.2.1",
         "rapiq": "0.9.0",
         "redis-extension": "^2.0.4",
@@ -54,7 +54,7 @@
     "devDependencies": {
         "@types/cors": "^2.8.19",
         "@types/supertest": "^6.0.3",
-        "testcontainers": "^11.10.0",
+        "testcontainers": "^11.12.0",
         "vitest": "^4.0.18"
     },
     "scripts": {
