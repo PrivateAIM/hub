@@ -14,12 +14,14 @@ import { createNodeDispatcher } from 'routup';
 import { inject } from 'vitest';
 import { EnvironmentInputKey, configure } from '../../src';
 import { createHTTPRouter } from '../../src/http';
-import { dropTestDatabase, useTestDatabase } from './database';
+import { TestDatabase } from './database';
 
 class TestSuite {
     protected _client : APIClient | undefined;
 
     protected _server : Server | undefined;
+
+    protected _database : TestDatabase | undefined;
 
     constructor() {
         write(
@@ -28,6 +30,8 @@ class TestSuite {
         );
 
         configure();
+
+        this._database = new TestDatabase();
     }
 
     client() : APIClient {
@@ -39,13 +43,13 @@ class TestSuite {
     }
 
     async up() {
-        await useTestDatabase();
+        await this._database.up();
 
         await this.startServer();
     }
 
     async down() {
-        await dropTestDatabase();
+        await this._database.down();
 
         this.stopServer();
     }

@@ -12,15 +12,19 @@ import type { AddressInfo } from 'node:net';
 import { createNodeDispatcher } from 'routup';
 import { createConfig } from '../../src';
 import { createRouter } from '../../src/http/router';
-import { dropTestDatabase, useTestDatabase } from './database';
+import { TestDatabase } from './database';
 
 class TestSuite {
     protected _client : Client | undefined;
 
     protected _server : Server | undefined;
 
+    protected _database : TestDatabase;
+
     constructor() {
         createConfig();
+
+        this._database = new TestDatabase();
     }
 
     client() : Client {
@@ -32,13 +36,13 @@ class TestSuite {
     }
 
     async up() {
-        await useTestDatabase();
+        await this._database.up();
 
         await this.startServer();
     }
 
     async down() {
-        await dropTestDatabase();
+        await this._database.down();
 
         this.stopServer();
     }

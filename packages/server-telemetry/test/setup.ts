@@ -8,6 +8,7 @@ import 'reflect-metadata';
 
 import type { TestProject } from 'vitest/node';
 import { GenericContainer, Wait } from 'testcontainers';
+import { TestDatabase } from './utils';
 
 declare module 'vitest' {
     export interface ProvidedContext {
@@ -27,6 +28,9 @@ async function setup(project: TestProject) {
     project.provide('VL_CONTAINER_PORT', container.getFirstMappedPort());
 
     globalThis.VL_CONTAINER = container;
+
+    const database = new TestDatabase();
+    await database.setup();
 }
 
 async function teardown() {

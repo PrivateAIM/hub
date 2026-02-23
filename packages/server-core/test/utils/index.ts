@@ -9,4 +9,3 @@ export * from './database';
 export * from './date-properties';
 export * from './properties';
 export * from './suite';
-export * from './supertest';

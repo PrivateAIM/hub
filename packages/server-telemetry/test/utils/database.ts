@@ -11,44 +11,73 @@ import {
     setDataSource,
     synchronizeDatabaseSchema,
     unsetDataSource,
-    useDataSource,
 } from 'typeorm-extension';
 import {
     DataSource, type DataSourceOptions,
 } from 'typeorm';
 import { DataSourceOptionsBuilder } from '../../src/database';
 
-export async function useTestDatabase() {
-    const optionsBuilder = new DataSourceOptionsBuilder();
+export class TestDatabase {
+    protected options : DataSourceOptions | undefined;
 
-    let options : DataSourceOptions;
-    try {
-        options = optionsBuilder.buildWithEnv();
-    } catch (e) {
-        options = optionsBuilder.buildWith({
-            type: 'better-sqlite3',
-            database: ':memory:',
-        });
+    protected instance : DataSource | undefined;
+
+    protected async getOptions() : Promise<DataSourceOptions> {
+        if (this.options) {
+            return this.options;
+        }
+
+        const optionsBuilder = new DataSourceOptionsBuilder();
+
+        let options : DataSourceOptions;
+        try {
+            options = optionsBuilder.buildWithEnv();
+        } catch (e) {
+            options = optionsBuilder.buildWith({
+                type: 'better-sqlite3',
+                database: ':memory:',
+            });
+        }
+
+        this.options = options;
+        return this.options;
     }
 
-    await createDatabase({ options, synchronize: false });
+    protected async getDatSource() : Promise<DataSource> {
+        if (this.instance) {
+            return this.instance;
+        }
 
-    const dataSource = new DataSource(options);
-    await dataSource.initialize();
+        const options = await this.getOptions();
+        await createDatabase({ options, ifNotExist: true, synchronize: false });
 
-    await synchronizeDatabaseSchema(dataSource);
+        const dataSource = new DataSource(options);
+        await dataSource.initialize();
 
-    await dataSource.synchronize();
+        this.instance = dataSource;
+        return this.instance;
+    }
 
-    setDataSource(dataSource);
+    async setup() {
+        const dataSource = await this.getDatSource();
+        await synchronizeDatabaseSchema(dataSource);
 
-    return dataSource;
-}
+        await dataSource.synchronize();
+        await dataSource.destroy();
+    }
 
-export async function dropTestDatabase() {
-    const dataSource = await useDataSource();
-    await wait(0);
-    await dataSource.destroy();
+    async up() {
+        const dataSource = await this.getDatSource();
+        await dataSource.synchronize();
 
-    unsetDataSource();
+        setDataSource(dataSource);
+    }
+
+    async down() {
+        const dataSource = await this.getDatSource();
+        await wait(0);
+        await dataSource.destroy();
+
+        unsetDataSource();
+    }
 }
