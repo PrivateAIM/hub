@@ -45,7 +45,7 @@
         "@vuelidate/validators": "^2.0.4",
         "@vueuse/core": "^14.2.1",
         "bootstrap": "^5.3.8",
-        "bootstrap-vue-next": "^0.43.1",
+        "bootstrap-vue-next": "^0.43.6",
         "events": "^3.3.0",
         "hapic": "^2.7.0",
         "nuxt": "4.3.1",
