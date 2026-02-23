@@ -6,9 +6,11 @@
  */
 
 import 'reflect-metadata';
+import { TestDatabase } from './utils';
 
-function setup() {
-
+async function setup() {
+    const database = new TestDatabase();
+    await database.setup();
 }
 export {
     setup,
