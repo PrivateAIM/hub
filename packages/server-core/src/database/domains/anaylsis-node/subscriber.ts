@@ -90,11 +90,19 @@ AnalysisNodeEntity
     }
 
     async afterRemove(event: RemoveEvent<AnalysisNodeEntity>): Promise<any> {
+        if (
+            !event.entity?.analysis_id &&
+            !event.databaseEntity?.analysis_id
+        ) {
+            return;
+        }
+
         const caller = useAnalysisMetadataComponentCaller();
         await caller.call(
             AnalysisMetadataCommand.RECALC,
             {
-                analysisId: event.entity.analysis_id,
+                analysisId: event.entity?.analysis_id ||
+                event.databaseEntity?.analysis_id,
                 queryFiles: false,
                 querySelf: false,
             },

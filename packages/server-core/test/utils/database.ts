@@ -45,7 +45,7 @@ export class TestDatabase {
         return this.options;
     }
 
-    protected async getDatSource() : Promise<DataSource> {
+    protected async getDataSource() : Promise<DataSource> {
         if (this.instance) {
             return this.instance;
         }
@@ -61,7 +61,7 @@ export class TestDatabase {
     }
 
     async setup() {
-        const dataSource = await this.getDatSource();
+        const dataSource = await this.getDataSource();
         await synchronizeDatabaseSchema(dataSource);
 
         await dataSource.synchronize();
@@ -71,7 +71,7 @@ export class TestDatabase {
     }
 
     async up() {
-        const dataSource = await this.getDatSource();
+        const dataSource = await this.getDataSource();
         await dataSource.synchronize();
 
         setDataSource(dataSource);
@@ -79,7 +79,7 @@ export class TestDatabase {
     }
 
     async down() {
-        const dataSource = await this.getDatSource();
+        const dataSource = await this.getDataSource();
         await dataSource.destroy();
 
         unsetDataSource();
