@@ -26,6 +26,9 @@ AnalysisMetadataEventMap
     ): Promise<void> {
         const dataSource = await useDataSource();
         const analysisRepository = dataSource.getRepository(AnalysisEntity);
+        if (!dataSource.isInitialized) {
+            return;
+        }
         const entity = await analysisRepository.findOneBy({
             id: value.analysisId,
         });
@@ -54,7 +57,9 @@ AnalysisMetadataEventMap
         }
 
         if (this.hasChanged(cloned, entity)) {
-            await analysisRepository.save(entity);
+            if (dataSource.isInitialized) {
+                await analysisRepository.save(entity);
+            }
         }
 
         context.handle(AnalysisMetadataEvent.RECALC_FINISHED, entity);
@@ -66,6 +71,10 @@ AnalysisMetadataEventMap
 
     async queryAnalysisFiles(entity: AnalysisEntity) : Promise<void> {
         const dataSource = await useDataSource();
+        if (!dataSource.isInitialized) {
+            return;
+        }
+
         const analysisBuckerFileRepository = dataSource.getRepository(AnalysisBucketFileEntity);
         const rootFile = await analysisBuckerFileRepository.findOne({
             where: {
@@ -83,6 +92,10 @@ AnalysisMetadataEventMap
 
     async queryAnalysisNodes(entity: AnalysisEntity) : Promise<void> {
         const dataSource = await useDataSource();
+        if (!dataSource.isInitialized) {
+            return;
+        }
+
         const analysisNodesRepository = dataSource.getRepository(AnalysisNodeEntity);
         const analysisNodes = await analysisNodesRepository.find({
             where: {
