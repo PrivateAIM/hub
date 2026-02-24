@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { wait } from '@privateaim/kit';
 import {
     createDatabase,
     setDataSource,
@@ -64,6 +63,8 @@ export class TestDatabase {
 
         await dataSource.synchronize();
         await dataSource.destroy();
+
+        this.instance = undefined;
     }
 
     async up() {
@@ -75,9 +76,10 @@ export class TestDatabase {
 
     async down() {
         const dataSource = await this.getDataSource();
-        await wait(0);
         await dataSource.destroy();
 
         unsetDataSource();
+
+        this.instance = undefined;
     }
 }
