@@ -8,7 +8,7 @@
 import {
     afterAll, beforeAll, describe, expect, it,
 } from 'vitest';
-import { ProcessStatus } from '@privateaim/kit';
+import { ProcessStatus, wait } from '@privateaim/kit';
 import type { Analysis, Node } from '@privateaim/core-kit';
 import { LogLevel } from '@privateaim/telemetry-kit';
 import {
@@ -25,6 +25,7 @@ describe('controllers > analysis-node-log', () => {
 
     beforeAll(async () => {
         await suite.up();
+        await wait(0);
 
         const client = suite.client();
 
@@ -47,10 +48,11 @@ describe('controllers > analysis-node-log', () => {
     });
 
     afterAll(async () => {
-        await suite.down();
-
         analysis = undefined;
         node = undefined;
+
+        await wait(0);
+        await suite.down();
     });
 
     it('should create resource', async () => {
