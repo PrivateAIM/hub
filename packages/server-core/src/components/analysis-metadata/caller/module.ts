@@ -8,7 +8,8 @@
 import type {
     ComponentCaller,
     ComponentCallerPayload,
-    ComponentDirectCallerResponse, ComponentMetadata,
+    ComponentDirectCallerResponse,
+    ComponentMetadata,
 } from '@privateaim/server-kit';
 import {
     DirectComponentCaller,
@@ -72,15 +73,20 @@ export class AnalysisMetadataComponentCaller implements ComponentCaller<Analysis
         metadata: ComponentMetadata = {},
     ) : Promise<AnalysisEntity> {
         const {
-            [AnalysisMetadataEvent.RECALC_FINISHED]: entity,
+            [AnalysisMetadataEvent.RECALC_FINISHED]: finishedPayload,
+            [AnalysisMetadataEvent.RECALC_FAILED]: failedPayload,
         } = await this.callDirect(
             AnalysisMetadataCommand.RECALC,
             payload,
             metadata,
         );
 
-        if (entity) {
-            return entity;
+        if (finishedPayload) {
+            return finishedPayload;
+        }
+
+        if (failedPayload && failedPayload.error) {
+            throw failedPayload.error;
         }
 
         throw AnalysisError.notFound();

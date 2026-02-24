@@ -8,7 +8,7 @@
 import {
     afterAll, beforeAll, describe, expect, it,
 } from 'vitest';
-import { ProcessStatus, wait } from '@privateaim/kit';
+import { ProcessStatus } from '@privateaim/kit';
 import type { Analysis, Node } from '@privateaim/core-kit';
 import { LogLevel } from '@privateaim/telemetry-kit';
 import {
@@ -25,8 +25,16 @@ describe('controllers > analysis-node-log', () => {
 
     beforeAll(async () => {
         await suite.up();
-        await wait(0);
+    });
 
+    afterAll(async () => {
+        analysis = undefined;
+        node = undefined;
+
+        await suite.down();
+    });
+
+    it('should create resource', async () => {
         const client = suite.client();
 
         const project = await client.project.create(createTestProject());
@@ -45,18 +53,6 @@ describe('controllers > analysis-node-log', () => {
             analysis_id: analysis.id,
             node_id: node.id,
         });
-    });
-
-    afterAll(async () => {
-        analysis = undefined;
-        node = undefined;
-
-        await wait(0);
-        await suite.down();
-    });
-
-    it('should create resource', async () => {
-        const client = suite.client();
 
         const entity = await client.analysisNodeLog.create({
             analysis_id: analysis!.id,

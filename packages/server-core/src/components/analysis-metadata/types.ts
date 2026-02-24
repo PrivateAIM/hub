@@ -28,10 +28,14 @@ export type AnalysisMetadataRecalcPayload = {
      */
     queryFiles?: boolean
 };
-
-export type AnalysisMetadataRecalcExecutedPayload = Analysis;
+export type AnalysisMetadataRecalcFinishedPayload = Analysis;
+export type AnalysisMetadataRecalcFailedPayload = {
+    id: string,
+    error?: Error
+};
 
 export type AnalysisMetadataEventMap = ObjectLiteralKeys<{
     [AnalysisMetadataCommand.RECALC]: [AnalysisMetadataRecalcPayload, ComponentMetadata],
-    [AnalysisMetadataEvent.RECALC_FINISHED]: [AnalysisMetadataRecalcExecutedPayload, ComponentMetadata]
+    [AnalysisMetadataEvent.RECALC_FAILED]: [AnalysisMetadataRecalcFailedPayload, ComponentMetadata]
+    [AnalysisMetadataEvent.RECALC_FINISHED]: [AnalysisMetadataRecalcFinishedPayload, ComponentMetadata]
 }>;

@@ -63,16 +63,15 @@ AnalysisBucketFileEntity
 
         if (event.entity.root) {
             const caller = useAnalysisMetadataComponentCaller();
-            Promise.resolve()
-                .then(() => caller.call(
-                    AnalysisMetadataCommand.RECALC,
-                    {
-                        analysisId: event.entity.analysis_id,
-                        queryNodes: false,
-                        querySelf: false,
-                    },
-                    {},
-                ));
+            await caller.call(
+                AnalysisMetadataCommand.RECALC,
+                {
+                    analysisId: event.entity.analysis_id,
+                    queryNodes: false,
+                    querySelf: false,
+                },
+                {},
+            );
         }
     }
 

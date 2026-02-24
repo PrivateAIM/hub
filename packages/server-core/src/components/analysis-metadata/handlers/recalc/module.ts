@@ -5,13 +5,18 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { ServerError } from '@ebec/http';
 import type { Analysis } from '@privateaim/core-kit';
 import { AnalysisBucketType, AnalysisNodeApprovalStatus, NodeType } from '@privateaim/core-kit';
 import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
 import { isEqual } from 'smob';
-import { useDataSource } from 'typeorm-extension';
 import { EnvironmentName } from '@privateaim/kit';
-import { AnalysisBucketFileEntity, AnalysisEntity, AnalysisNodeEntity } from '../../../../database/index.ts';
+import {
+    AnalysisBucketFileEntity,
+    AnalysisEntity,
+    AnalysisNodeEntity,
+    useDataSourceSync,
+} from '../../../../database/index.ts';
 import type { AnalysisMetadataCommand } from '../../constants.ts';
 import { AnalysisMetadataEvent } from '../../constants.ts';
 import type { AnalysisMetadataEventMap, AnalysisMetadataRecalcPayload } from '../../types.ts';
@@ -24,11 +29,21 @@ AnalysisMetadataEventMap
         value: AnalysisMetadataRecalcPayload,
         context: ComponentHandlerContext<AnalysisMetadataEventMap, AnalysisMetadataCommand.RECALC>,
     ): Promise<void> {
-        const dataSource = await useDataSource();
+        const dataSource = useDataSourceSync();
         const analysisRepository = dataSource.getRepository(AnalysisEntity);
-        if (!dataSource.isInitialized) {
+
+        if (
+            dataSource.manager.queryRunner &&
+            dataSource.manager.queryRunner.isReleased
+        ) {
+            context.handle(AnalysisMetadataEvent.RECALC_FAILED, {
+                id: value.analysisId,
+                error: new ServerError('The database query runner is already released.'),
+            });
+
             return;
         }
+
         const entity = await analysisRepository.findOneBy({
             id: value.analysisId,
         });
@@ -57,7 +72,10 @@ AnalysisMetadataEventMap
         }
 
         if (this.hasChanged(cloned, entity)) {
-            if (dataSource.isInitialized) {
+            if (
+                dataSource.manager.queryRunner &&
+                dataSource.manager.queryRunner.isReleased
+            ) {
                 await analysisRepository.save(entity);
             }
         }
@@ -70,8 +88,11 @@ AnalysisMetadataEventMap
     }
 
     async queryAnalysisFiles(entity: AnalysisEntity) : Promise<void> {
-        const dataSource = await useDataSource();
-        if (!dataSource.isInitialized) {
+        const dataSource = useDataSourceSync();
+        if (
+            dataSource.manager.queryRunner &&
+            dataSource.manager.queryRunner.isReleased
+        ) {
             return;
         }
 
@@ -91,8 +112,11 @@ AnalysisMetadataEventMap
     }
 
     async queryAnalysisNodes(entity: AnalysisEntity) : Promise<void> {
-        const dataSource = await useDataSource();
-        if (!dataSource.isInitialized) {
+        const dataSource = useDataSourceSync();
+        if (
+            dataSource.manager.queryRunner &&
+            dataSource.manager.queryRunner.isReleased
+        ) {
             return;
         }
 
