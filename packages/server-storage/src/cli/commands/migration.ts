@@ -137,8 +137,6 @@ export function defineCLIMigrationCommand() {
                     timestamp,
                     prettify: true,
                 });
-
-                await dataSource.destroy();
             }
 
             process.exit(0);

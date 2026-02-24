@@ -18,12 +18,12 @@ import { setupLogging } from '../../config/services/index.ts';
 import { DataSourceOptionsBuilder } from '../../database/index.ts';
 import { SRC_PATH } from '../../constants.ts';
 
-enum MigrationOperation {
-    GENERATE = 'generate',
-    REVERT = 'revert',
-    STATUS = 'status',
-    RUN = 'run',
-}
+const MigrationOperation = {
+    GENERATE: 'generate',
+    REVERT: 'revert',
+    STATUS: 'status',
+    RUN: 'run',
+} as const;
 
 export function defineCLIMigrationCommand() {
     return defineCommand({
@@ -137,8 +137,6 @@ export function defineCLIMigrationCommand() {
                     timestamp,
                     prettify: true,
                 });
-
-                await dataSource.destroy();
             }
 
             process.exit(0);
