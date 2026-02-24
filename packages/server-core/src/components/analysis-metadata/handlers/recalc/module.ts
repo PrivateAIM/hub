@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ServerError } from '@ebec/http';
 import type { Analysis } from '@privateaim/core-kit';
 import { AnalysisBucketType, AnalysisNodeApprovalStatus, NodeType } from '@privateaim/core-kit';
 import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
@@ -30,6 +29,20 @@ AnalysisMetadataEventMap
         value: AnalysisMetadataRecalcPayload,
         context: ComponentHandlerContext<AnalysisMetadataEventMap, AnalysisMetadataCommand.RECALC>,
     ): Promise<void> {
+        try {
+            await this.handleInternal(value, context);
+        } catch (e) {
+            context.handle(AnalysisMetadataEvent.RECALC_FAILED, {
+                id: value.analysisId,
+                error: e as Error,
+            });
+        }
+    }
+
+    async handleInternal(
+        value: AnalysisMetadataRecalcPayload,
+        context: ComponentHandlerContext<AnalysisMetadataEventMap, AnalysisMetadataCommand.RECALC>,
+    ): Promise<void> {
         let entityManger : EntityManager;
         if (context.metadata.entityManager) {
             entityManger = context.metadata.entityManager;
@@ -37,19 +50,8 @@ AnalysisMetadataEventMap
             const dataSource = useDataSourceSync();
             entityManger = dataSource.manager;
         }
+
         const analysisRepository = entityManger.getRepository(AnalysisEntity);
-
-        if (
-            entityManger.queryRunner &&
-            entityManger.queryRunner.isReleased
-        ) {
-            context.handle(AnalysisMetadataEvent.RECALC_FAILED, {
-                id: value.analysisId,
-                error: new ServerError('The database query runner is already released.'),
-            });
-
-            return;
-        }
 
         const entity = await analysisRepository.findOneBy({
             id: value.analysisId,
@@ -79,18 +81,6 @@ AnalysisMetadataEventMap
         }
 
         if (this.hasChanged(cloned, entity)) {
-            if (
-                entityManger.queryRunner &&
-                entityManger.queryRunner.isReleased
-            ) {
-                context.handle(AnalysisMetadataEvent.RECALC_FAILED, {
-                    id: value.analysisId,
-                    error: new ServerError('The database query runner is already released.'),
-                });
-
-                return;
-            }
-
             await analysisRepository.save(entity);
         }
 
@@ -102,13 +92,6 @@ AnalysisMetadataEventMap
     }
 
     async queryAnalysisFiles(entity: AnalysisEntity, entityManger: EntityManager) : Promise<void> {
-        if (
-            entityManger.queryRunner &&
-            entityManger.queryRunner.isReleased
-        ) {
-            throw new new ServerError('The database query runner is already released.')();
-        }
-
         const analysisBuckerFileRepository = entityManger.getRepository(AnalysisBucketFileEntity);
         const rootFile = await analysisBuckerFileRepository.findOne({
             where: {
@@ -125,13 +108,6 @@ AnalysisMetadataEventMap
     }
 
     async queryAnalysisNodes(entity: AnalysisEntity, entityManger: EntityManager) : Promise<void> {
-        if (
-            entityManger.queryRunner &&
-            entityManger.queryRunner.isReleased
-        ) {
-            return;
-        }
-
         const analysisNodesRepository = entityManger.getRepository(AnalysisNodeEntity);
         const analysisNodes = await analysisNodesRepository.find({
             where: {
