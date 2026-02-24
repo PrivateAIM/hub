@@ -6,9 +6,13 @@
  */
 
 import 'reflect-metadata';
+import { wait } from '@privateaim/kit';
+import { TestDatabase } from './utils';
 
-function setup() {
-
+async function setup() {
+    const database = new TestDatabase();
+    await database.setup();
+    await wait(0);
 }
 export {
     setup,

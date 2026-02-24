@@ -5,19 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { faker } from '@faker-js/faker';
 import type { Analysis } from '@privateaim/core-kit';
-import type { TestAgent } from '../supertest';
 
-export const TEST_DEFAULT_ANALYSIS : Partial<Analysis> = {
-    name: 'development',
-};
-
-export async function createSuperTestAnalysis(superTest: TestAgent, entity?: Partial<Analysis>) {
-    return superTest
-        .post('/analyses')
-        .send({
-            ...TEST_DEFAULT_ANALYSIS,
-            ...(entity || {}),
-        })
-        .auth('admin', 'start123');
+export function createTestAnalysis(entity: Partial<Analysis> = {}) : Partial<Analysis> {
+    return {
+        name: faker.string.alpha({ length: 16, casing: 'lower' }),
+        ...entity,
+    };
 }

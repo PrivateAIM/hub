@@ -9,9 +9,14 @@ import type { Analysis } from '@privateaim/core-kit';
 import { AnalysisBucketType, AnalysisNodeApprovalStatus, NodeType } from '@privateaim/core-kit';
 import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
 import { isEqual } from 'smob';
-import { useDataSource } from 'typeorm-extension';
 import { EnvironmentName } from '@privateaim/kit';
-import { AnalysisBucketFileEntity, AnalysisEntity, AnalysisNodeEntity } from '../../../../database/index.ts';
+import type { EntityManager } from 'typeorm';
+import {
+    AnalysisBucketFileEntity,
+    AnalysisEntity,
+    AnalysisNodeEntity,
+    useDataSourceSync,
+} from '../../../../database/index.ts';
 import type { AnalysisMetadataCommand } from '../../constants.ts';
 import { AnalysisMetadataEvent } from '../../constants.ts';
 import type { AnalysisMetadataEventMap, AnalysisMetadataRecalcPayload } from '../../types.ts';
@@ -24,8 +29,30 @@ AnalysisMetadataEventMap
         value: AnalysisMetadataRecalcPayload,
         context: ComponentHandlerContext<AnalysisMetadataEventMap, AnalysisMetadataCommand.RECALC>,
     ): Promise<void> {
-        const dataSource = await useDataSource();
-        const analysisRepository = dataSource.getRepository(AnalysisEntity);
+        try {
+            await this.handleInternal(value, context);
+        } catch (e) {
+            context.handle(AnalysisMetadataEvent.RECALC_FAILED, {
+                id: value.analysisId,
+                error: e as Error,
+            });
+        }
+    }
+
+    async handleInternal(
+        value: AnalysisMetadataRecalcPayload,
+        context: ComponentHandlerContext<AnalysisMetadataEventMap, AnalysisMetadataCommand.RECALC>,
+    ): Promise<void> {
+        let entityManger : EntityManager;
+        if (context.metadata.entityManager) {
+            entityManger = context.metadata.entityManager;
+        } else {
+            const dataSource = useDataSourceSync();
+            entityManger = dataSource.manager;
+        }
+
+        const analysisRepository = entityManger.getRepository(AnalysisEntity);
+
         const entity = await analysisRepository.findOneBy({
             id: value.analysisId,
         });
@@ -45,12 +72,12 @@ AnalysisMetadataEventMap
 
         const queryFiles = value.queryFiles ?? true;
         if (queryFiles) {
-            await this.queryAnalysisFiles(entity);
+            await this.queryAnalysisFiles(entity, entityManger);
         }
 
         const queryNodes = value.queryNodes ?? true;
         if (queryNodes) {
-            await this.queryAnalysisNodes(entity);
+            await this.queryAnalysisNodes(entity, entityManger);
         }
 
         if (this.hasChanged(cloned, entity)) {
@@ -64,9 +91,8 @@ AnalysisMetadataEventMap
         entity.configuration_image_valid = !!entity.master_image_id;
     }
 
-    async queryAnalysisFiles(entity: AnalysisEntity) : Promise<void> {
-        const dataSource = await useDataSource();
-        const analysisBuckerFileRepository = dataSource.getRepository(AnalysisBucketFileEntity);
+    async queryAnalysisFiles(entity: AnalysisEntity, entityManger: EntityManager) : Promise<void> {
+        const analysisBuckerFileRepository = entityManger.getRepository(AnalysisBucketFileEntity);
         const rootFile = await analysisBuckerFileRepository.findOne({
             where: {
                 analysis_id: entity.id,
@@ -81,9 +107,8 @@ AnalysisMetadataEventMap
         entity.configuration_entrypoint_valid = !!rootFile;
     }
 
-    async queryAnalysisNodes(entity: AnalysisEntity) : Promise<void> {
-        const dataSource = await useDataSource();
-        const analysisNodesRepository = dataSource.getRepository(AnalysisNodeEntity);
+    async queryAnalysisNodes(entity: AnalysisEntity, entityManger: EntityManager) : Promise<void> {
+        const analysisNodesRepository = entityManger.getRepository(AnalysisNodeEntity);
         const analysisNodes = await analysisNodesRepository.find({
             where: {
                 analysis_id: entity.id,

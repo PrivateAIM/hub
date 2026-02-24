@@ -5,28 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { faker } from '@faker-js/faker';
 import type { Node } from '@privateaim/core-kit';
-import type { TestAgent } from '../supertest';
-
-export const TEST_DEFAULT_NODE : Partial<Node> = {
-    name: 'foo-bar-baz',
-    external_name: 'test',
-};
 
 export function createTestNode(entity: Partial<Node> = {}) : Partial<Node> {
     return {
-        name: 'foo-bar-baz',
-        external_name: 'test',
+        name: faker.string.alpha({ length: 16, casing: 'lower' }),
+        external_name: faker.string.alpha({ length: 16, casing: 'lower' }),
         ...entity,
     };
-}
-
-export async function createSuperTestNode(superTest: TestAgent, entity?: Partial<Node>) {
-    return superTest
-        .post('/nodes')
-        .send({
-            ...TEST_DEFAULT_NODE,
-            ...(entity || {}),
-        })
-        .auth('admin', 'start123');
 }

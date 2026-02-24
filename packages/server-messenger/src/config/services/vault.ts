@@ -6,7 +6,7 @@
  */
 
 import { createVaultClient, setVaultFactory } from '@privateaim/server-kit';
-import { useEnv } from '../env';
+import { useEnv } from '../env/index.ts';
 
 export function setupVault() {
     const connectionString = useEnv('vaultConnectionString');

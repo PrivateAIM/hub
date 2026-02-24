@@ -6,13 +6,13 @@
  */
 
 import { CTSConnectionEventName } from '@privateaim/messenger-kit';
-import type { Socket } from '../../../types';
+import type { Socket } from '../../../types.ts';
 import {
     buildConnectionRobotRoom,
     buildConnectionRobotSubscriptionRoom,
     buildConnectionUserRoom,
     buildConnectionUserSubscriptionRoom,
-} from '../utils';
+} from '../utils.ts';
 
 export function mountConnectionSubscriptionHandlers(socket: Socket) {
     socket.on(CTSConnectionEventName.USER_CONNECTIONS, (

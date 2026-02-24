@@ -17,4 +17,8 @@ dotenv.config({
 
 Promise.resolve()
     .then(() => createCLIEntryPointCommand())
-    .then((command) => runMain(command));
+    .then((command) => runMain(command))
+    .catch((err) => {
+        console.error(err);
+        process.exit(1);
+    });

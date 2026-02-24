@@ -8,6 +8,7 @@
 import type { ObjectLiteralKeys } from '@privateaim/kit';
 import type { ComponentMetadata } from '@privateaim/server-kit';
 import type { Analysis } from '@privateaim/core-kit';
+import type { EntityManager } from 'typeorm';
 import type { AnalysisMetadataCommand, AnalysisMetadataEvent } from './constants.ts';
 
 export type AnalysisMetadataRecalcPayload = {
@@ -28,10 +29,14 @@ export type AnalysisMetadataRecalcPayload = {
      */
     queryFiles?: boolean
 };
-
-export type AnalysisMetadataRecalcExecutedPayload = Analysis;
+export type AnalysisMetadataRecalcFinishedPayload = Analysis;
+export type AnalysisMetadataRecalcFailedPayload = {
+    id: string,
+    error?: Error
+};
 
 export type AnalysisMetadataEventMap = ObjectLiteralKeys<{
-    [AnalysisMetadataCommand.RECALC]: [AnalysisMetadataRecalcPayload, ComponentMetadata],
-    [AnalysisMetadataEvent.RECALC_FINISHED]: [AnalysisMetadataRecalcExecutedPayload, ComponentMetadata]
+    [AnalysisMetadataCommand.RECALC]: [AnalysisMetadataRecalcPayload, { entityManager?: EntityManager }],
+    [AnalysisMetadataEvent.RECALC_FAILED]: [AnalysisMetadataRecalcFailedPayload, ComponentMetadata],
+    [AnalysisMetadataEvent.RECALC_FINISHED]: [AnalysisMetadataRecalcFinishedPayload, ComponentMetadata]
 }>;

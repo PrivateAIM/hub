@@ -8,8 +8,8 @@
 import { createServer, mountAuthupMiddleware, mountLoggingMiddleware } from '@privateaim/server-realtime-kit';
 import type { Server as HTTPServer } from 'node:http';
 import type { Server } from 'socket.io';
-import { useEnv } from '../config';
-import { registerControllers } from './register';
+import { useEnv } from '../config/index.ts';
+import { registerControllers } from './register.ts';
 
 export function createSocketServer(httpServer: HTTPServer) : Server {
     const server = createServer(httpServer);

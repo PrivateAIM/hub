@@ -96,9 +96,10 @@ export class AnalysisEntity implements Analysis {
     })
         build_progress: number | null;
 
+    // sha512:<128 hex> = 135
     @Column({
         type: 'varchar',
-        length: 128,
+        length: 135,
         nullable: true,
         default: null,
     })

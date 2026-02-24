@@ -16,8 +16,8 @@ import type {
 } from '@privateaim/messenger-kit';
 import { useLogger } from '@privateaim/server-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
-import type { Socket } from '../../types';
-import { buildConnectionRobotRoom, buildConnectionUserRoom } from '../connection';
+import type { Socket } from '../../types.ts';
+import { buildConnectionRobotRoom, buildConnectionUserRoom } from '../connection/index.ts';
 
 export function mountMessagingController(socket: Socket) {
     const validator = new CTSMessagingMessageValidator();

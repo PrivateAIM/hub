@@ -5,12 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Socket } from '../../types';
+import type { Socket } from '../../types.ts';
 import {
     mountConnectionConnectHandler,
     mountConnectionSubscriptionHandlers,
     mountSocketConnectionDisconnectingHandler,
-} from './handlers';
+} from './handlers/index.ts';
 
 export function mountConnectionController(socket: Socket) {
     mountConnectionConnectHandler(socket);

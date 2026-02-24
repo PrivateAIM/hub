@@ -33,13 +33,9 @@ describe('analysis/command-lock', () => {
 
         nodeDefault = await client.node.create(createTestNode({
             type: NodeType.DEFAULT,
-            name: 'default',
-            external_name: 'default',
         }));
         nodeAggregator = await client.node.create(createTestNode({
             type: NodeType.AGGREGATOR,
-            name: 'aggregator',
-            external_name: 'aggregator',
         }));
 
         await client.projectNode.create({

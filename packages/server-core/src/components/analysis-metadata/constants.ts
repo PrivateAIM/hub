@@ -13,6 +13,7 @@ export enum AnalysisMetadataCommand {
 
 export enum AnalysisMetadataEvent {
     RECALC_FINISHED = 'recalcFinished',
+    RECALC_FAILED = 'recalcFailed',
 }
 
 export const AnalysisMetadataTaskQueue = {

@@ -20,3 +20,7 @@ export function setEntityEventPublisherFactory(factory: Factory<EntityEventPubli
 export function useEntityEventPublisher() {
     return instance.use();
 }
+
+export function isEntityEventPublisherUsable() {
+    return instance.has() || instance.hasFactory();
+}

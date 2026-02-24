@@ -9,10 +9,12 @@ import { DataSource } from 'typeorm';
 import {
     checkDatabase, createDatabase, setDataSource, synchronizeDatabaseSchema,
 } from 'typeorm-extension';
-import { buildDataSourceOptions } from '../../database/index.ts';
+import { DataSourceOptionsBuilder } from '../../database/index.ts';
 
 export async function setupDatabase() {
-    const options = await buildDataSourceOptions();
+    const optionsBuilder = new DataSourceOptionsBuilder();
+
+    const options = optionsBuilder.buildWithEnv();
     const check = await checkDatabase({
         options,
         dataSourceCleanup: true,

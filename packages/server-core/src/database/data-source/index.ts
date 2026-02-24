@@ -6,4 +6,4 @@
  */
 
 export * from './singleton.ts';
-export * from './helpers/index.ts';
+export * from './options.ts';

@@ -25,7 +25,16 @@ describe('controllers > analysis-node-log', () => {
 
     beforeAll(async () => {
         await suite.up();
+    });
 
+    afterAll(async () => {
+        analysis = undefined;
+        node = undefined;
+
+        await suite.down();
+    });
+
+    it('should create resource', async () => {
         const client = suite.client();
 
         const project = await client.project.create(createTestProject());
@@ -44,17 +53,6 @@ describe('controllers > analysis-node-log', () => {
             analysis_id: analysis.id,
             node_id: node.id,
         });
-    });
-
-    afterAll(async () => {
-        await suite.down();
-
-        analysis = undefined;
-        node = undefined;
-    });
-
-    it('should create resource', async () => {
-        const client = suite.client();
 
         const entity = await client.analysisNodeLog.create({
             analysis_id: analysis!.id,

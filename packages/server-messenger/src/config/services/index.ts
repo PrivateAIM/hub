@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './amqp';
-export * from './logger';
-export * from './redis';
-export * from './vault';
+export * from './amqp.ts';
+export * from './logger.ts';
+export * from './redis.ts';
+export * from './vault.ts';

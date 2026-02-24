@@ -8,6 +8,8 @@
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import esmShim from '@rollup/plugin-esm-shim';
+import json from '@rollup/plugin-json';
+
 import { builtinModules } from 'node:module';
 import swc from 'unplugin-swc';
 
@@ -46,6 +48,8 @@ export function createConfig(
             resolve({ extensions }),
 
             esmShim(),
+
+            json(),
 
             // Compile TypeScript/JavaScript files
             swc.rollup(),

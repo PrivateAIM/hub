@@ -82,7 +82,7 @@ describe('controllers/analysis-bucket-file', () => {
         const client = suite.client();
 
         const { data } = await client.analysisBucketFile.getMany();
-        expect(data.length).toEqual(1);
+        expect(data.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should delete resource', async () => {

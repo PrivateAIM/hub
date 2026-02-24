@@ -19,6 +19,7 @@ import {
     expectPropertiesEqualToSrc,
     removeDateProperties,
 } from '../utils';
+import { createTestBucket } from '../utils/domains/index.ts';
 
 describe('controllers/bucket-file', () => {
     const suite = createTestSuite();
@@ -36,10 +37,9 @@ describe('controllers/bucket-file', () => {
     it('should create resource', async () => {
         const client = suite.client();
 
-        const bucket = await client.bucket.create({
-            name: 'foo-bar-baz',
+        const bucket = await client.bucket.create(createTestBucket({
             region: 'eu-west',
-        });
+        }));
 
         const filePath = path.join(__dirname, '..', 'data', 'file.json');
         const file = await fs.promises.readFile(filePath);

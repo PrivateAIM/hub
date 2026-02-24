@@ -16,7 +16,7 @@ runs:
             run: echo ${{ github.ref }}
 
         -   name: Use Node.js ${{ inputs.node-version }}
-            uses: actions/setup-node@v3
+            uses: actions/setup-node@v6
             with:
                 node-version: ${{ inputs.node-version }}
                 registry-url: ${{ inputs.node-registry }}
@@ -26,10 +26,8 @@ runs:
             with:
                 path: |
                     node_modules
-                    */*/node_modules
+                    **/node_modules
                 key: ${{ runner.os }}-install-${{ hashFiles('**/package.json') }}
-                restore-keys: |
-                    ${{ runner.os }}-install-
 
         -   name: Install
             shell: bash
