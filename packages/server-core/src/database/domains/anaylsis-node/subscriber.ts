@@ -83,7 +83,9 @@ AnalysisNodeEntity
                 queryFiles: false,
                 querySelf: false,
             },
-            {},
+            {
+                entityManager: event.manager,
+            },
         );
     }
 
@@ -96,7 +98,9 @@ AnalysisNodeEntity
                 queryFiles: false,
                 querySelf: false,
             },
-            {},
+            {
+                entityManager: event.manager,
+            },
         );
     }
 

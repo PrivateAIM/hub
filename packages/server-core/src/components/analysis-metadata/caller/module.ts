@@ -9,7 +9,6 @@ import type {
     ComponentCaller,
     ComponentCallerPayload,
     ComponentDirectCallerResponse,
-    ComponentMetadata,
 } from '@privateaim/server-kit';
 import {
     DirectComponentCaller,
@@ -18,6 +17,7 @@ import {
 } from '@privateaim/server-kit';
 import { wait } from '@privateaim/kit';
 import { AnalysisError } from '@privateaim/core-kit';
+import type { EntityManager } from 'typeorm';
 import { useAnalysisMetadataComponent } from '../singleton.ts';
 import type { AnalysisMetadataEventMap, AnalysisMetadataRecalcPayload } from '../types.ts';
 import { AnalysisMetadataCommand, AnalysisMetadataEvent, AnalysisMetadataTaskQueue } from '../constants.ts';
@@ -42,6 +42,10 @@ export class AnalysisMetadataComponentCaller implements ComponentCaller<Analysis
         const [data, metadata] = payload;
 
         if (isQueueRouterUsable()) {
+            if (metadata.entityManager) {
+                delete metadata.entityManager;
+            }
+
             await wait(500);
             await this.callWithQueue(key, data, metadata);
             return;
@@ -70,7 +74,7 @@ export class AnalysisMetadataComponentCaller implements ComponentCaller<Analysis
 
     async callRecalcDirect(
         payload: AnalysisMetadataRecalcPayload,
-        metadata: ComponentMetadata = {},
+        metadata: { entityManager?: EntityManager } = {},
     ) : Promise<AnalysisEntity> {
         const {
             [AnalysisMetadataEvent.RECALC_FINISHED]: finishedPayload,

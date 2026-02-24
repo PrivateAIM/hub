@@ -11,6 +11,7 @@ import { AnalysisBucketType, AnalysisNodeApprovalStatus, NodeType } from '@priva
 import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
 import { isEqual } from 'smob';
 import { EnvironmentName } from '@privateaim/kit';
+import type { EntityManager } from 'typeorm';
 import {
     AnalysisBucketFileEntity,
     AnalysisEntity,
@@ -29,12 +30,18 @@ AnalysisMetadataEventMap
         value: AnalysisMetadataRecalcPayload,
         context: ComponentHandlerContext<AnalysisMetadataEventMap, AnalysisMetadataCommand.RECALC>,
     ): Promise<void> {
-        const dataSource = useDataSourceSync();
-        const analysisRepository = dataSource.getRepository(AnalysisEntity);
+        let entityManger : EntityManager;
+        if (context.metadata.entityManager) {
+            entityManger = context.metadata.entityManager;
+        } else {
+            const dataSource = useDataSourceSync();
+            entityManger = dataSource.manager;
+        }
+        const analysisRepository = entityManger.getRepository(AnalysisEntity);
 
         if (
-            dataSource.manager.queryRunner &&
-            dataSource.manager.queryRunner.isReleased
+            entityManger.queryRunner &&
+            entityManger.queryRunner.isReleased
         ) {
             context.handle(AnalysisMetadataEvent.RECALC_FAILED, {
                 id: value.analysisId,
@@ -63,21 +70,28 @@ AnalysisMetadataEventMap
 
         const queryFiles = value.queryFiles ?? true;
         if (queryFiles) {
-            await this.queryAnalysisFiles(entity);
+            await this.queryAnalysisFiles(entity, entityManger);
         }
 
         const queryNodes = value.queryNodes ?? true;
         if (queryNodes) {
-            await this.queryAnalysisNodes(entity);
+            await this.queryAnalysisNodes(entity, entityManger);
         }
 
         if (this.hasChanged(cloned, entity)) {
             if (
-                !dataSource.manager.queryRunner ||
-                !dataSource.manager.queryRunner.isReleased
+                entityManger.queryRunner &&
+                entityManger.queryRunner.isReleased
             ) {
-                await analysisRepository.save(entity);
+                context.handle(AnalysisMetadataEvent.RECALC_FAILED, {
+                    id: value.analysisId,
+                    error: new ServerError('The database query runner is already released.'),
+                });
+
+                return;
             }
+
+            await analysisRepository.save(entity);
         }
 
         context.handle(AnalysisMetadataEvent.RECALC_FINISHED, entity);
@@ -87,16 +101,15 @@ AnalysisMetadataEventMap
         entity.configuration_image_valid = !!entity.master_image_id;
     }
 
-    async queryAnalysisFiles(entity: AnalysisEntity) : Promise<void> {
-        const dataSource = useDataSourceSync();
+    async queryAnalysisFiles(entity: AnalysisEntity, entityManger: EntityManager) : Promise<void> {
         if (
-            dataSource.manager.queryRunner &&
-            dataSource.manager.queryRunner.isReleased
+            entityManger.queryRunner &&
+            entityManger.queryRunner.isReleased
         ) {
-            return;
+            throw new new ServerError('The database query runner is already released.')();
         }
 
-        const analysisBuckerFileRepository = dataSource.getRepository(AnalysisBucketFileEntity);
+        const analysisBuckerFileRepository = entityManger.getRepository(AnalysisBucketFileEntity);
         const rootFile = await analysisBuckerFileRepository.findOne({
             where: {
                 analysis_id: entity.id,
@@ -111,16 +124,15 @@ AnalysisMetadataEventMap
         entity.configuration_entrypoint_valid = !!rootFile;
     }
 
-    async queryAnalysisNodes(entity: AnalysisEntity) : Promise<void> {
-        const dataSource = useDataSourceSync();
+    async queryAnalysisNodes(entity: AnalysisEntity, entityManger: EntityManager) : Promise<void> {
         if (
-            dataSource.manager.queryRunner &&
-            dataSource.manager.queryRunner.isReleased
+            entityManger.queryRunner &&
+            entityManger.queryRunner.isReleased
         ) {
             return;
         }
 
-        const analysisNodesRepository = dataSource.getRepository(AnalysisNodeEntity);
+        const analysisNodesRepository = entityManger.getRepository(AnalysisNodeEntity);
         const analysisNodes = await analysisNodesRepository.find({
             where: {
                 analysis_id: entity.id,

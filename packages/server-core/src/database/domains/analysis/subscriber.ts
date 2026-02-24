@@ -94,7 +94,9 @@ AnalysisEntity
                 queryNodes: false,
                 queryFiles: false,
             },
-            {},
+            {
+                entityManager: event.manager,
+            },
         );
     }
 
