@@ -17,7 +17,7 @@ import {
     type DataSourceOptions,
 } from 'typeorm';
 import {
-    DataSourceOptionsBuilder,
+    DataSourceOptionsBuilder, setDataSourceSync, unsetDataSourceSync,
 } from '../../src/database/index.ts';
 
 export class TestDatabase {
@@ -74,6 +74,7 @@ export class TestDatabase {
         await dataSource.synchronize();
 
         setDataSource(dataSource);
+        setDataSourceSync(dataSource);
     }
 
     async down() {
@@ -82,5 +83,6 @@ export class TestDatabase {
         await dataSource.destroy();
 
         unsetDataSource();
+        unsetDataSourceSync();
     }
 }

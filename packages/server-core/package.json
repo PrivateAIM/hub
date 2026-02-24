@@ -11,6 +11,7 @@
     "version": "0.8.27",
     "description": "This package contains the server core service.",
     "main": "./dist/cli/index.js",
+    "module": "./dist/index.mjs",
     "dependencies": {
         "@authup/access": "^1.0.0-beta.29",
         "@authup/kit": "^1.0.0-beta.29",
@@ -85,6 +86,8 @@
         "cli-dev": "ts-node src/cli/index.ts",
         "build": "rimraf dist/ && cross-env NODE_ENV=production tsc -p tsconfig.build.json",
         "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts",
+        "test:mysql": "cross-env DB_TYPE=mysql DB_HOST=127.0.0.1 DB_USERNAME=root DB_PASSWORD=start123 DB_DATABASE=app vitest run --config test/vitest.config.ts",
+        "test:psql": "cross-env DB_TYPE=postgres DB_HOST=127.0.0.1 DB_USERNAME=postgres DB_PASSWORD=start123 DB_DATABASE=app vitest run --config test/vitest.config.ts",
         "test:coverage": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts --coverage"
     },
     "gitHead": "8881a3d4b427c45ac4b81ac4b31bf3d719463ef7",

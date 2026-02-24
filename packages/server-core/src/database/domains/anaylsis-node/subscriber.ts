@@ -76,30 +76,28 @@ AnalysisNodeEntity
         await super.afterInsert(event);
 
         const caller = useAnalysisMetadataComponentCaller();
-        Promise.resolve()
-            .then(() => caller.call(
-                AnalysisMetadataCommand.RECALC,
-                {
-                    analysisId: event.entity.analysis_id,
-                    queryFiles: false,
-                    querySelf: false,
-                },
-                {},
-            ));
+        await caller.call(
+            AnalysisMetadataCommand.RECALC,
+            {
+                analysisId: event.entity.analysis_id,
+                queryFiles: false,
+                querySelf: false,
+            },
+            {},
+        );
     }
 
     async afterRemove(event: RemoveEvent<AnalysisNodeEntity>): Promise<any> {
         const caller = useAnalysisMetadataComponentCaller();
-        Promise.resolve()
-            .then(() => caller.call(
-                AnalysisMetadataCommand.RECALC,
-                {
-                    analysisId: event.entity.analysis_id,
-                    queryFiles: false,
-                    querySelf: false,
-                },
-                {},
-            ));
+        await caller.call(
+            AnalysisMetadataCommand.RECALC,
+            {
+                analysisId: event.entity.analysis_id,
+                queryFiles: false,
+                querySelf: false,
+            },
+            {},
+        );
     }
 
     listenTo(): CallableFunction | string {

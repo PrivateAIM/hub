@@ -87,16 +87,15 @@ AnalysisEntity
         }
 
         const caller = useAnalysisMetadataComponentCaller();
-        Promise.resolve()
-            .then(() => caller.call(
-                AnalysisMetadataCommand.RECALC,
-                {
-                    analysisId,
-                    queryNodes: false,
-                    queryFiles: false,
-                },
-                {},
-            ));
+        await caller.call(
+            AnalysisMetadataCommand.RECALC,
+            {
+                analysisId,
+                queryNodes: false,
+                queryFiles: false,
+            },
+            {},
+        );
     }
 
     listenTo() {

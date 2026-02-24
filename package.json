@@ -15,6 +15,7 @@
     "devDependencies": {
         "@rollup/plugin-commonjs": "^29.0.0",
         "@rollup/plugin-esm-shim": "^0.1.8",
+        "@rollup/plugin-json": "^6.1.0",
         "@rollup/plugin-node-resolve": "^16.0.3",
         "@swc/core": "^1.15.8",
         "@tada5hi/commitlint-config": "^1.2.7",
