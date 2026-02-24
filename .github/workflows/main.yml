@@ -14,7 +14,38 @@ env:
     NODE_REGISTRY: 'https://registry.npmjs.org'
 
 jobs:
+    install:
+        name: Checkout and Install
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v6
+
+            - name: Install
+              uses: ./.github/actions/install
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+                  node-registry: ${{ env.NODE_REGISTRY }}
+
+    build:
+        name: Build Packages
+        needs: [install]
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v6
+
+            - name: Install
+              uses: ./.github/actions/install
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+                  node-registry: ${{ env.NODE_REGISTRY }}
+
+            - name: Build
+              uses: ./.github/actions/build
     test:
+        name: Test Packages
+        needs: [build]
         runs-on: ubuntu-latest
 
         strategy:
@@ -103,6 +134,7 @@ jobs:
                     npm run test
 
     lint:
+        needs: [build]
         runs-on: ubuntu-latest
         steps:
              -   uses: actions/checkout@v6
