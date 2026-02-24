@@ -6,6 +6,7 @@
  */
 
 import { Client } from '@privateaim/core-http-kit';
+import { wait } from '@privateaim/kit';
 import { createServer } from 'node:http';
 import type { Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
@@ -43,6 +44,7 @@ class TestSuite {
 
     async down() {
         await this._database.down();
+        await wait(0);
 
         this.stopServer();
     }
