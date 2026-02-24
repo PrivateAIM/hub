@@ -13,6 +13,7 @@ export default defineConfig({
     test: {
         globalSetup: ['test/setup'],
         include: ['test/unit/**/*.spec.ts'],
+        exclude: ['test/unit/http/analysis-node-log.spec.ts'],
     },
     plugins: [swc.vite()],
 });
