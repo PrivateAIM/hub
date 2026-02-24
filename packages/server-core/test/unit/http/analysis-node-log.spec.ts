@@ -8,7 +8,7 @@
 import {
     afterAll, beforeAll, describe, expect, it,
 } from 'vitest';
-import { ProcessStatus, wait } from '@privateaim/kit';
+import { ProcessStatus } from '@privateaim/kit';
 import type { Analysis, Node } from '@privateaim/core-kit';
 import { LogLevel } from '@privateaim/telemetry-kit';
 import {
@@ -24,7 +24,6 @@ describe('controllers > analysis-node-log', () => {
     let node : Node | undefined;
 
     beforeAll(async () => {
-        await wait(1000);
         await suite.up();
     });
 
@@ -69,7 +68,7 @@ describe('controllers > analysis-node-log', () => {
         expect(entity).toBeDefined();
         expect(entity.labels).toBeDefined();
         expect(entity.labels.foo).toEqual('bar');
-    }, 10_000);
+    });
 
     it('should read collection', async () => {
         const client = suite.client();
