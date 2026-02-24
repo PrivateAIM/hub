@@ -66,6 +66,8 @@ export class TestDatabase {
 
         await dataSource.synchronize();
         await dataSource.destroy();
+
+        this.instance = undefined;
     }
 
     async up() {
@@ -82,5 +84,7 @@ export class TestDatabase {
 
         unsetDataSource();
         unsetDataSourceSync();
+
+        this.instance = undefined;
     }
 }

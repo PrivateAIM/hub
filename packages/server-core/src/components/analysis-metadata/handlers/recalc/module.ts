@@ -73,8 +73,8 @@ AnalysisMetadataEventMap
 
         if (this.hasChanged(cloned, entity)) {
             if (
-                dataSource.manager.queryRunner &&
-                dataSource.manager.queryRunner.isReleased
+                !dataSource.manager.queryRunner ||
+                !dataSource.manager.queryRunner.isReleased
             ) {
                 await analysisRepository.save(entity);
             }

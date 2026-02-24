@@ -7,18 +7,10 @@
 
 import { faker } from '@faker-js/faker';
 import type { Analysis } from '@privateaim/core-kit';
-import type { TestAgent } from '../supertest';
 
 export function createTestAnalysis(entity: Partial<Analysis> = {}) : Partial<Analysis> {
     return {
         name: faker.string.alpha({ length: 16, casing: 'lower' }),
         ...entity,
     };
-}
-
-export async function createSuperTestAnalysis(superTest: TestAgent, entity: Partial<Analysis> = {}) {
-    return superTest
-        .post('/analyses')
-        .send(createTestAnalysis(entity))
-        .auth('admin', 'start123');
 }

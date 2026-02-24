@@ -36,6 +36,6 @@ export type AnalysisMetadataRecalcFailedPayload = {
 
 export type AnalysisMetadataEventMap = ObjectLiteralKeys<{
     [AnalysisMetadataCommand.RECALC]: [AnalysisMetadataRecalcPayload, ComponentMetadata],
-    [AnalysisMetadataEvent.RECALC_FAILED]: [AnalysisMetadataRecalcFailedPayload, ComponentMetadata]
+    [AnalysisMetadataEvent.RECALC_FAILED]: [AnalysisMetadataRecalcFailedPayload, ComponentMetadata],
     [AnalysisMetadataEvent.RECALC_FINISHED]: [AnalysisMetadataRecalcFinishedPayload, ComponentMetadata]
 }>;

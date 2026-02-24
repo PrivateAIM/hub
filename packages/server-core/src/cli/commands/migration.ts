@@ -123,7 +123,7 @@ export function defineCLIMigrationCommand() {
 
                 const directoryPath = path.join(baseDirectory, dataSourceOptions.type);
 
-                await dropDatabase({ options: dataSourceOptions });
+                await dropDatabase({ options: dataSourceOptions, ifExist: true });
                 await createDatabase({ options: dataSourceOptions, synchronize: false });
 
                 const dataSource = new DataSource(dataSourceOptions);

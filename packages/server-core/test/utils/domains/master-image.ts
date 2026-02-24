@@ -7,7 +7,6 @@
 
 import { faker } from '@faker-js/faker';
 import type { MasterImage } from '@privateaim/core-kit';
-import type { TestAgent } from '../supertest';
 
 export function createTestMasterImage() : Partial<MasterImage> {
     const name = faker.string.alpha({ length: 16, casing: 'lower' });
@@ -18,14 +17,4 @@ export function createTestMasterImage() : Partial<MasterImage> {
         path: `data\\${name}\\base`,
         virtual_path: `python/${name}`,
     };
-}
-
-export async function createSuperTestMasterImage(superTest: TestAgent, entity?: Partial<MasterImage>) {
-    return superTest
-        .post('/master-images')
-        .send({
-            ...createTestMasterImage(),
-            ...(entity || {}),
-        })
-        .auth('admin', 'start123');
 }

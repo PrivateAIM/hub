@@ -21,7 +21,7 @@ class TestSuite {
 
     protected _server : Server | undefined;
 
-    protected _database : TestDatabase | undefined;
+    protected _database : TestDatabase;
 
     constructor() {
         write(
