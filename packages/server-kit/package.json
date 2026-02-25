@@ -32,7 +32,7 @@
         "@privateaim/kit": "^0.8.27",
         "@socket.io/redis-emitter": "^5.1.0",
         "envix": "^1.5.0",
-        "hapic": "^2.7.0",
+        "hapic": "^2.8.2",
         "singa": "^1.1.0",
         "triple-beam": "^1.4.1",
         "winston": "^3.19.0",
@@ -40,7 +40,7 @@
     },
     "devDependencies": {
         "@authup/core-http-kit": "^1.0.0-beta.29",
-        "@hapic/vault": "^2.3.9",
+        "@hapic/vault": "^2.3.11",
         "amqp-extension": "^4.0.0",
         "redis-extension": "^2.0.4",
         "typeorm-extension": "^3.7.4",
@@ -48,7 +48,7 @@
     },
     "peerDependencies": {
         "@authup/core-http-kit": "^1.0.0-beta.29",
-        "@hapic/vault": "^2.3.9",
+        "@hapic/vault": "^2.3.11",
         "amqp-extension": "^4.0.0",
         "redis-extension": "^2.0.4",
         "typeorm-extension": "^3.7.4"
