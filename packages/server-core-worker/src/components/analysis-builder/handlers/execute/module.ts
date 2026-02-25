@@ -159,6 +159,14 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
             throw e;
         }
 
+        const exec = await container.exec({
+            Cmd: ['du', '-sh', AnalysisContainerPath.CODE],
+            AttachStdout: true,
+            AttachStderr: true,
+        });
+        const stream = await exec.start({ hijack: true, stdin: false });
+        stream.pipe(process.stdout);
+
         const containerInfo = await container.inspect();
 
         const docker = useDocker();
