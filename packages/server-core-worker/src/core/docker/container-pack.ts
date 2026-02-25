@@ -30,11 +30,7 @@ export async function packDockerContainerWithTarStream(
         const extract = tar.extract();
 
         container.putArchive(pack, { path: options.path })
-            .then((stream) => {
-                stream.on('end', () => resolve());
-                stream.on('error', (err) => reject(err));
-                stream.resume();
-            })
+            .then(() => resolve())
             .catch((err) => {
                 if (err) {
                     reject(err);
