@@ -54,7 +54,7 @@ export function renderActionCommand(ctx: Context) : VNodeChild {
 
     const iconClasses : string[] = [ctx.iconClass];
     if (ctx.withIcon && ctx.withText) {
-        iconClasses.push('pe-1');
+        iconClasses.push('me-1');
     }
 
     let tag : string | Component | undefined;
