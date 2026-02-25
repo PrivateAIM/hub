@@ -29,7 +29,6 @@ export async function packDockerContainerWithTarStream(
         readable.on('error', (err) => reject(err));
 
         const pack = tar.pack();
-        pack.on('error', (err) => reject(err));
 
         const extract = tar.extract();
         extract.on('error', (err) => reject(err));
