@@ -29,6 +29,20 @@ export async function packDockerContainerWithTarStream(
         const pack = tar.pack();
         const extract = tar.extract();
 
+        container.putArchive(pack, { path: options.path })
+            .then((stream) => {
+                stream.on('end', () => resolve());
+                stream.on('error', (err) => reject(err));
+                stream.resume();
+            })
+            .catch((err) => {
+                if (err) {
+                    reject(err);
+                }
+
+                reject(new Error('The pack stream could not be forwarded to the container'));
+            });
+
         extract.on('entry', (headers, stream, callback) => {
             if (options.onEntryPackStarted) {
                 options.onEntryPackStarted(headers);
@@ -47,8 +61,6 @@ export async function packDockerContainerWithTarStream(
             const entry = pack.entry(
                 headers,
                 (err) => {
-                    console.log(err);
-
                     if (err) {
                         if (options.onEntryPackFailed) {
                             options.onEntryPackFailed(err, headers);
@@ -95,18 +107,6 @@ export async function packDockerContainerWithTarStream(
 
         extract.on('finish', () => {
             pack.finalize();
-
-            console.log('Finalized packing');
-
-            container.putArchive(pack, { path: options.path })
-                .then(() => resolve())
-                .catch((err) => {
-                    if (err) {
-                        reject(err);
-                    }
-
-                    reject(new Error('The pack stream could not be forwarded to the container'));
-                });
         });
 
         readable.pipe(extract);
