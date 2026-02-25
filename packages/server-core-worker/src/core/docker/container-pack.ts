@@ -13,7 +13,7 @@ import tar from 'tar-stream';
 export type DockerContainerPackOptions = {
     path: string,
 
-    validateEntry?: (entry: Headers) => Promise<void> | void,
+    validateEntry?: (entry: Headers) => void,
 
     onEntryPackStarted?: (entry: Headers) => Promise<void> | void,
     onEntryPackFinished?: (entry: Headers) => Promise<void> | void,
@@ -47,6 +47,8 @@ export async function packDockerContainerWithTarStream(
             const entry = pack.entry(
                 headers,
                 (err) => {
+                    console.log(err);
+
                     if (err) {
                         if (options.onEntryPackFailed) {
                             options.onEntryPackFailed(err, headers);
@@ -66,12 +68,17 @@ export async function packDockerContainerWithTarStream(
 
             stream.on('data', (chunk) => entry.write(chunk));
 
-            stream.on('end', (err) => {
+            stream.on('end', () => {
+                entry.end();
+            });
+
+            stream.on('error', (err) => {
                 if (options.onEntryPackFailed) {
                     options.onEntryPackFailed(err, headers);
                 }
 
-                entry.end();
+                entry.destroy(err);
+                callback(err);
             });
 
             stream.resume();
