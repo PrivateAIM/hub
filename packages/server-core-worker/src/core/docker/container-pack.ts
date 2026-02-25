@@ -34,6 +34,7 @@ export async function packDockerContainerWithTarStream(
             .catch((err) => {
                 if (err) {
                     reject(err);
+                    return;
                 }
 
                 reject(new Error('The pack stream could not be forwarded to the container'));
@@ -86,7 +87,6 @@ export async function packDockerContainerWithTarStream(
                 }
 
                 entry.destroy(err);
-                callback(err);
             });
 
             stream.resume();
