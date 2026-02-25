@@ -17,7 +17,7 @@ import { sendAccepted } from 'routup';
 import { ValidupError, buildErrorMessageForAttribute, defineIssueItem } from 'validup';
 import { ProcessStatus } from '@privateaim/kit';
 import { useEnv } from '../../../../../config/index.ts';
-import { MasterImageEntity, useDataSourceSync } from '../../../../../database';
+import { MasterImageEntity, useDataSourceSync } from '../../../../../database/index.ts';
 
 export async function commandMasterImageRouteHandler(req: Request, res: Response) {
     const body = useRequestBody(req);

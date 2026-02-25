@@ -77,8 +77,10 @@ export default defineComponent({
             switch (props.command) {
                 case MasterImageCommand.SYNC:
                     return 'Synchronize';
+                case MasterImageCommand.BUILD:
+                    return 'Build';
                 default:
-                    return '';
+                    return props.command;
             }
         });
 
@@ -86,6 +88,8 @@ export default defineComponent({
             switch (props.command) {
                 case MasterImageCommand.SYNC:
                     return 'fa fa-sync';
+                case MasterImageCommand.BUILD:
+                    return 'fa fa-wrench';
                 default:
                     return '';
             }
@@ -95,6 +99,8 @@ export default defineComponent({
             switch (props.command) {
                 case MasterImageCommand.SYNC:
                     return 'success';
+                case MasterImageCommand.BUILD:
+                    return 'dark';
                 default:
                     return 'info';
             }
