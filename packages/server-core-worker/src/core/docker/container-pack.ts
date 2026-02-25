@@ -35,19 +35,26 @@ export async function packDockerContainerWithTarStream(
                 options.onEntryPackStarted(headers);
             }
 
-            Promise.resolve()
-                .then(() => {
+            Promise.resolve(stream)
+                .then((input) => {
                     if (options.validateEntry) {
-                        return options.validateEntry(headers);
+                        try {
+                            options.validateEntry(headers);
+
+                            return Promise.resolve(input);
+                        } catch (e) {
+                            return Promise.reject(e);
+                        }
                     }
 
-                    return Promise.resolve();
+                    return Promise.resolve(input);
                 })
-                .then(() => streamToBuffer(stream))
-                .then((buff) => {
-                    pack.entry(
+                .then((input) => streamToBuffer(input))
+                .then((input) => {
+                    console.log(headers, input.length);
+
+                    const entry = pack.entry(
                         headers,
-                        buff,
                         (err) => {
                             if (err) {
                                 if (options.onEntryPackFailed) {
@@ -65,6 +72,9 @@ export async function packDockerContainerWithTarStream(
                             callback();
                         },
                     );
+
+                    entry.write(input);
+                    entry.end();
                 })
                 .catch((e) => {
                     if (options.onEntryPackFailed) {
