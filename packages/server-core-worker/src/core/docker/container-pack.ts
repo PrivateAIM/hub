@@ -9,7 +9,6 @@ import type { Readable } from 'node:stream';
 import type { Container } from 'dockerode';
 import type { Headers } from 'tar-stream';
 import tar from 'tar-stream';
-import { streamToBuffer } from '../utils';
 
 export type DockerContainerPackOptions = {
     path: string,
@@ -35,54 +34,47 @@ export async function packDockerContainerWithTarStream(
                 options.onEntryPackStarted(headers);
             }
 
-            Promise.resolve(stream)
-                .then((input) => {
-                    if (options.validateEntry) {
-                        try {
-                            options.validateEntry(headers);
-
-                            return Promise.resolve(input);
-                        } catch (e) {
-                            return Promise.reject(e);
-                        }
-                    }
-
-                    return Promise.resolve(input);
-                })
-                .then((input) => streamToBuffer(input))
-                .then((input) => {
-                    console.log(headers, input.length);
-
-                    const entry = pack.entry(
-                        headers,
-                        (err) => {
-                            if (err) {
-                                if (options.onEntryPackFailed) {
-                                    options.onEntryPackFailed(err, headers);
-                                }
-
-                                callback(err);
-                                return;
-                            }
-
-                            if (options.onEntryPackFinished) {
-                                options.onEntryPackFinished(headers);
-                            }
-
-                            callback();
-                        },
-                    );
-
-                    entry.write(input);
-                    entry.end();
-                })
-                .catch((e) => {
-                    if (options.onEntryPackFailed) {
-                        options.onEntryPackFailed(e, headers);
-                    }
-
+            if (options.validateEntry) {
+                try {
+                    options.validateEntry(headers);
+                } catch (e) {
                     callback(e);
-                });
+
+                    return;
+                }
+            }
+
+            const entry = pack.entry(
+                headers,
+                (err) => {
+                    if (err) {
+                        if (options.onEntryPackFailed) {
+                            options.onEntryPackFailed(err, headers);
+                        }
+
+                        callback(err);
+                        return;
+                    }
+
+                    if (options.onEntryPackFinished) {
+                        options.onEntryPackFinished(headers);
+                    }
+
+                    callback();
+                },
+            );
+
+            stream.on('data', (chunk) => entry.write(chunk));
+
+            stream.on('end', (err) => {
+                if (options.onEntryPackFailed) {
+                    options.onEntryPackFailed(err, headers);
+                }
+
+                entry.end();
+            });
+
+            stream.resume();
         });
 
         extract.on('error', (err) => {
@@ -96,6 +88,8 @@ export async function packDockerContainerWithTarStream(
 
         extract.on('finish', () => {
             pack.finalize();
+
+            console.log('Finalized packing');
 
             container.putArchive(pack, { path: options.path })
                 .then(() => resolve())
