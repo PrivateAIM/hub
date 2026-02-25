@@ -15,9 +15,9 @@ export type DockerContainerPackOptions = {
 
     validateEntry?: (entry: Headers) => void,
 
-    onEntryPackStarted?: (entry: Headers) => Promise<void> | void,
-    onEntryPackFinished?: (entry: Headers) => Promise<void> | void,
-    onEntryPackFailed?: (error: Error, entry: Headers) => Promise<void> | void,
+    onEntryPackStarted?: (entry: Headers) => void,
+    onEntryPackFinished?: (entry: Headers) => void,
+    onEntryPackFailed?: (error: Error, entry: Headers) => void,
 };
 
 export async function packDockerContainerWithTarStream(
@@ -26,19 +26,13 @@ export async function packDockerContainerWithTarStream(
     options: DockerContainerPackOptions,
 ) {
     return new Promise<void>((resolve, reject) => {
+        readable.on('error', (err) => reject(err));
+
         const pack = tar.pack();
+        pack.on('error', (err) => reject(err));
+
         const extract = tar.extract();
-
-        container.putArchive(pack, { path: options.path })
-            .then(() => resolve())
-            .catch((err) => {
-                if (err) {
-                    reject(err);
-                    return;
-                }
-
-                reject(new Error('The pack stream could not be forwarded to the container'));
-            });
+        extract.on('error', (err) => reject(err));
 
         extract.on('entry', (headers, stream, callback) => {
             if (options.onEntryPackStarted) {
@@ -75,7 +69,13 @@ export async function packDockerContainerWithTarStream(
                 },
             );
 
-            stream.on('data', (chunk) => entry.write(chunk));
+            stream.on('data', (chunk) => {
+                const written = entry.write(chunk);
+                if (!written) {
+                    stream.pause();
+                    entry.once('drain', () => stream.resume());
+                }
+            });
 
             stream.on('end', () => {
                 entry.end();
@@ -92,18 +92,13 @@ export async function packDockerContainerWithTarStream(
             stream.resume();
         });
 
-        extract.on('error', (err) => {
-            if (err) {
-                reject(err);
-                return;
-            }
-
-            reject(new Error('The tar extraction stream failed'));
-        });
-
         extract.on('finish', () => {
             pack.finalize();
         });
+
+        container.putArchive(pack, { path: options.path })
+            .then(() => resolve())
+            .catch((err) => reject(err));
 
         readable.pipe(extract);
     });
