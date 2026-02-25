@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BadRequestError, NotFoundError } from '@ebec/http';
+import { NotFoundError } from '@ebec/http';
 import { MasterImageCommand } from '@privateaim/core-kit';
 import {
     MasterImageBuilderComponentCaller,
@@ -26,7 +26,13 @@ export async function commandMasterImageRouteHandler(req: Request, res: Response
         !body ||
         Object.values(MasterImageCommand).indexOf(body.command) === -1
     ) {
-        throw new BadRequestError('The master image command is not valid.');
+        throw new ValidupError([
+            defineIssueItem({
+                message: buildErrorMessageForAttribute('command'),
+                path: ['command'],
+                expected: Object.values(MasterImageCommand).join('|'),
+            }),
+        ]);
     }
 
     const { command, id } = body;
@@ -64,9 +70,10 @@ export async function commandMasterImageRouteHandler(req: Request, res: Response
 
             const caller = new MasterImageBuilderComponentCaller();
             entity.build_status = ProcessStatus.STARTING;
-            await repository.save(entity);
 
             await caller.callExecute({ id: entity.id });
+
+            await repository.save(entity);
 
             return sendAccepted(res, entity);
         }
