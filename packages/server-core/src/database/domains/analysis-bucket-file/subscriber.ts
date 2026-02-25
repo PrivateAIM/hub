@@ -70,7 +70,9 @@ AnalysisBucketFileEntity
                     queryNodes: false,
                     querySelf: false,
                 },
-                {},
+                {
+                    entityManager: event.manager,
+                },
             );
         }
     }
@@ -89,7 +91,9 @@ AnalysisBucketFileEntity
                 queryNodes: false,
                 querySelf: false,
             },
-            {},
+            {
+                entityManager: event.manager,
+            },
         );
     }
 
@@ -103,7 +107,9 @@ AnalysisBucketFileEntity
                     queryNodes: false,
                     querySelf: false,
                 },
-                {},
+                {
+                    entityManager: event.manager,
+                },
             );
         }
     }

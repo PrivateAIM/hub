@@ -13,9 +13,7 @@ import type {
 import {
     DirectComponentCaller,
     QueueDispatchComponentCaller,
-    isQueueRouterUsable,
 } from '@privateaim/server-kit';
-import { wait } from '@privateaim/kit';
 import { AnalysisError } from '@privateaim/core-kit';
 import type { EntityManager } from 'typeorm';
 import { useAnalysisMetadataComponent } from '../singleton.ts';
@@ -41,15 +39,20 @@ export class AnalysisMetadataComponentCaller implements ComponentCaller<Analysis
     ): Promise<void> {
         const [data, metadata] = payload;
 
+        /*
+        todo: re-enable queuing when split (core-worker)
         if (isQueueRouterUsable()) {
             if (metadata.entityManager) {
                 delete metadata.entityManager;
             }
 
-            await wait(500);
-            await this.callWithQueue(key, data, metadata);
+            Promise.resolve()
+                .then(() => wait(500))
+                .then(() => this.callWithQueue(key, data, metadata));
+
             return;
         }
+         */
 
         await this.callDirect(key, data, metadata);
     }
