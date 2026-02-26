@@ -44,7 +44,7 @@
         "hapic": "^2.8.2",
         "locter": "^2.2.1",
         "minio": "^8.0.6",
-        "mysql2": "^3.18.1",
+        "mysql2": "^3.18.2",
         "redis-extension": "^2.0.4",
         "reflect-metadata": "^0.2.2",
         "routup": "^4.1.0",
