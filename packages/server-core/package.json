@@ -13,7 +13,7 @@
     "main": "./dist/cli/index.js",
     "module": "./dist/index.mjs",
     "dependencies": {
-        "@authup/access": "^1.0.0-beta.29",
+        "@authup/access": "^1.0.0-beta.30",
         "@authup/kit": "^1.0.0-beta.29",
         "@authup/core-kit": "^1.0.0-beta.29",
         "@authup/core-http-kit": "^1.0.0-beta.29",
