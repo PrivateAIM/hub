@@ -1,5 +1,32 @@
 # Changelog
 
+## [0.8.28](https://github.com/PrivateAIM/hub/compare/v0.8.27...v0.8.28) (2026-02-26)
+
+
+### Features
+
+* master image card with progress & build_status ([#1431](https://github.com/PrivateAIM/hub/issues/1431)) ([f3b1b2d](https://github.com/PrivateAIM/hub/commit/f3b1b2d286064c1ddc8ee85b2b6b7dd8826179a3))
+
+
+### Bug Fixes
+
+* **deps:** bump the minorandpatch group across 1 directory with 11 updates ([#1441](https://github.com/PrivateAIM/hub/issues/1441)) ([57c0a94](https://github.com/PrivateAIM/hub/commit/57c0a94c2e93bb13493306333490fa43b92d73fc))
+* **deps:** bump the minorandpatch group across 1 directory with 15 updates ([#1415](https://github.com/PrivateAIM/hub/issues/1415)) ([ae2e03c](https://github.com/PrivateAIM/hub/commit/ae2e03cea61aa74820128bc22039d5f23f51466f))
+* **deps:** bump the minorandpatch group with 6 updates ([#1449](https://github.com/PrivateAIM/hub/issues/1449)) ([042a8f5](https://github.com/PrivateAIM/hub/commit/042a8f5444a826d4a2c450c3186e876c41cb5a2b))
+* disable master image item if not built ([#1433](https://github.com/PrivateAIM/hub/issues/1433)) ([6389577](https://github.com/PrivateAIM/hub/commit/6389577effa4d6130527351a2a4bef06100c6d5f))
+* entrypoint selection + refactor analysis steps ([#1428](https://github.com/PrivateAIM/hub/issues/1428)) ([d48e274](https://github.com/PrivateAIM/hub/commit/d48e2748abbf0793a0ad9dd41ff219b2ccce66ab))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/client-vue bumped from ^0.8.27 to ^0.8.28
+    * @privateaim/core-kit bumped from ^0.8.27 to ^0.8.28
+    * @privateaim/kit bumped from ^0.8.27 to ^0.8.28
+    * @privateaim/storage-kit bumped from ^0.8.27 to ^0.8.28
+    * @privateaim/telemetry-kit bumped from ^0.8.27 to ^0.8.28
+
 ## [0.8.27](https://github.com/PrivateAIM/hub/compare/v0.8.26...v0.8.27) (2026-02-12)
 
 

@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.8.28](https://github.com/PrivateAIM/hub/compare/v0.8.27...v0.8.28) (2026-02-26)
+
+
+### Features
+
+* database migration capabilities ([#1437](https://github.com/PrivateAIM/hub/issues/1437)) ([ada0c8c](https://github.com/PrivateAIM/hub/commit/ada0c8c82c50d7ff999c60d7d6b8a6aea10064f0))
+* explicit master image build trigger ([#1447](https://github.com/PrivateAIM/hub/issues/1447)) ([7909f52](https://github.com/PrivateAIM/hub/commit/7909f52ef32a3fc1345cea80f1e91938cdd7fe89))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.8.27 to ^0.8.28
+    * @privateaim/telemetry-kit bumped from ^0.8.27 to ^0.8.28
+  * peerDependencies
+    * @privateaim/kit bumped from ^0.8.27 to ^0.8.28
+    * @privateaim/telemetry-kit bumped from ^0.8.27 to ^0.8.28
+
 ## [0.8.27](https://github.com/PrivateAIM/hub/compare/v0.8.26...v0.8.27) (2026-02-12)
 
 

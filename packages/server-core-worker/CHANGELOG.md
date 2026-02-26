@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.8.28](https://github.com/PrivateAIM/hub/compare/v0.8.27...v0.8.28) (2026-02-26)
+
+
+### Bug Fixes
+
+* **deps:** bump the minorandpatch group across 1 directory with 15 updates ([#1415](https://github.com/PrivateAIM/hub/issues/1415)) ([ae2e03c](https://github.com/PrivateAIM/hub/commit/ae2e03cea61aa74820128bc22039d5f23f51466f))
+* **deps:** bump the minorandpatch group with 6 updates ([#1449](https://github.com/PrivateAIM/hub/issues/1449)) ([042a8f5](https://github.com/PrivateAIM/hub/commit/042a8f5444a826d4a2c450c3186e876c41cb5a2b))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.8.27 to ^0.8.28
+    * @privateaim/kit bumped from ^0.8.27 to ^0.8.28
+    * @privateaim/core-http-kit bumped from ^0.8.27 to ^0.8.28
+    * @privateaim/telemetry-kit bumped from ^0.8.27 to ^0.8.28
+    * @privateaim/server-kit bumped from ^0.8.27 to ^0.8.28
+    * @privateaim/server-telemetry-kit bumped from ^0.8.27 to ^0.8.28
+    * @privateaim/server-core-worker-kit bumped from ^0.7.28 to ^0.7.29
+    * @privateaim/storage-kit bumped from ^0.8.27 to ^0.8.28
+
 ## [0.8.27](https://github.com/PrivateAIM/hub/compare/v0.8.26...v0.8.27) (2026-02-12)
 
 
