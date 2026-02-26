@@ -71,9 +71,17 @@ describe('docker/pack', () => {
 
             expect(size.toString('utf-8')).toContain('4224');
         } finally {
-            await container.remove();
+            await container.remove({
+                force: true,
+            });
             await testContainer.stop();
-            await testContainer.remove();
+            await testContainer.remove({
+                force: true,
+            });
+
+            await image.remove({
+                force: true,
+            });
         }
     }, 30_000);
 });
