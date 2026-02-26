@@ -54,6 +54,7 @@ export async function getManyEventLogRouteHandler(req: Request, res: Response) :
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(EventEntity);
     const query = repository.createQueryBuilder('ev');
+    query.groupBy('ev.id');
 
     const { pagination } = applyQuery(query, useRequestQuery(req), {
         defaultAlias: 'ev',
@@ -73,6 +74,9 @@ export async function getManyEventLogRouteHandler(req: Request, res: Response) :
         },
         relations: {
             allowed: [],
+            onJoin: (_property, key, query) => {
+                query.addGroupBy(`${key}.id`);
+            },
         },
         sort: {
             allowed: [

@@ -104,6 +104,7 @@ export async function getManyRegistryProjectRouteHandler(req: Request, res: Resp
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(RegistryProjectEntity);
     const query = repository.createQueryBuilder('registryProject');
+    query.groupBy('registryProject.id');
 
     checkAndApplyFields(req, query, fields);
 
@@ -120,6 +121,9 @@ export async function getManyRegistryProjectRouteHandler(req: Request, res: Resp
     applyRelations(query, include, {
         defaultAlias: 'registryProject',
         allowed: ['registry'],
+        onJoin: (_property, key, query) => {
+            query.addGroupBy(`${key}.id`);
+        },
     });
 
     const pagination = applyPagination(query, page, { maxLimit: 50 });

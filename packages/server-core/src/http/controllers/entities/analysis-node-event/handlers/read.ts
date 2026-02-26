@@ -42,7 +42,7 @@ export async function getManyAnalysisNodeEventRouteHandler(req: Request, res: Re
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisNodeEventEntity);
     const query = repository.createQueryBuilder('e');
-    query.distinctOn(['e.id']);
+    query.groupBy('e.id');
 
     const { pagination } = applyQuery(query, useRequestQuery(req), {
         defaultAlias: 'e',
@@ -57,6 +57,9 @@ export async function getManyAnalysisNodeEventRouteHandler(req: Request, res: Re
         },
         relations: {
             allowed: ['analysis', 'node'],
+            onJoin: (_property, key, query) => {
+                query.addGroupBy(`${key}.id`);
+            },
         },
         sort: {
             allowed: [

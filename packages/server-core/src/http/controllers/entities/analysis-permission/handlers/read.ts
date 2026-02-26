@@ -96,7 +96,7 @@ export async function getManyAnalysisPermissionRouteHandler(req: Request, res: R
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisPermissionEntity);
     const query = repository.createQueryBuilder('analysisPermission');
-    query.distinctOn(['analysisPermission.id']);
+    query.groupBy('analysisPermission.id');
 
     onlyRealmWritableQueryResources(query, useRequestIdentityRealm(req), [
         'analysisPermission.analysis_realm_id',
@@ -120,6 +120,12 @@ export async function getManyAnalysisPermissionRouteHandler(req: Request, res: R
         },
         sort: {
             allowed: ['created_at', 'updated_at'],
+        },
+        relations: {
+            allowed: ['analysis'],
+            onJoin: (_property, key, query) => {
+                query.addGroupBy(`${key}.id`);
+            },
         },
     });
 

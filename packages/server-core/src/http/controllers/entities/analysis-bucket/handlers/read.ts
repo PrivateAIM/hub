@@ -46,7 +46,7 @@ export async function getManyAnalysisBucketRouteHandler(req: Request, res: Respo
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisBucketEntity);
     const query = repository.createQueryBuilder('analysisBucket');
-    query.distinctOn(['analysisBucket.id']);
+    query.groupBy('analysisBucket.id');
 
     onlyRealmWritableQueryResources(query, useRequestIdentityRealm(req), [
         'analysisBucket.realm_id',
@@ -69,6 +69,9 @@ export async function getManyAnalysisBucketRouteHandler(req: Request, res: Respo
         },
         relations: {
             allowed: ['analysis'],
+            onJoin: (_property, key, query) => {
+                query.addGroupBy(`${key}.id`);
+            },
         },
         sort: {
             allowed: ['type', 'created_at', 'updated_at'],
