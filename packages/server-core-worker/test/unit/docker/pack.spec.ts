@@ -13,6 +13,8 @@ describe('docker/pack', () => {
     it('should pack docker container with tar stream', async () => {
         const docker = useDocker();
 
+        await docker.pull('alpine:latest');
+
         const container = await docker
             .createContainer({ Image: 'alpine:latest' });
 
