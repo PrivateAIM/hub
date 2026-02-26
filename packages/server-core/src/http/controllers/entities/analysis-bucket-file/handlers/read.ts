@@ -22,11 +22,15 @@ export async function getOneAnalysisBucketFileRouteHandler(req: Request, res: Re
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisBucketFileEntity);
     const query = repository.createQueryBuilder('analysisFile')
-        .where('analysisFile.id = :id', { id });
+        .where('analysisFile.id = :id', { id })
+        .groupBy('analysisFile.id');
 
     applyRelations(query, useRequestQuery(req, 'include'), {
         allowed: ['analysis', 'analysis_bucket'],
         defaultAlias: 'analysisFile',
+        onJoin: (_property, key, query) => {
+            query.addGroupBy(`${key}.id`);
+        },
     });
 
     const entity = await query.getOne();
@@ -46,38 +50,45 @@ export async function getManyAnalysisBucketFileRouteHandler(req: Request, res: R
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisBucketFileEntity);
     const query = repository.createQueryBuilder('analysisFile');
-    query.distinctOn(['analysisFile.id']);
+    query.groupBy('analysisFile.id');
 
     onlyRealmWritableQueryResources(query, useRequestIdentityRealm(req), [
         'analysisFile.realm_id',
     ]);
 
-    const { pagination } = applyQuery(query, useRequestQuery(req), {
-        defaultAlias: 'analysisFile',
-        filters: {
-            allowed: [
-                'path',
-                'root',
-                'analysis_bucket_id',
-                'analysis_id',
+    const { pagination } = applyQuery(
+        query,
+        useRequestQuery(req),
+        {
+            defaultAlias: 'analysisFile',
+            filters: {
+                allowed: [
+                    'path',
+                    'root',
+                    'analysis_bucket_id',
+                    'analysis_id',
 
-                'analysis_id',
-                'analysis.id',
-                'analysis.name',
+                    'analysis_id',
+                    'analysis.id',
+                    'analysis.name',
 
-                'analysis_bucket.type',
-            ],
+                    'analysis_bucket.type',
+                ],
+            },
+            pagination: {
+                maxLimit: 50,
+            },
+            relations: {
+                allowed: ['analysis', 'analysis_bucket'],
+                onJoin: (_property, key, query) => {
+                    query.addGroupBy(`${key}.id`);
+                },
+            },
+            sort: {
+                allowed: ['path', 'created_at', 'updated_at'],
+            },
         },
-        pagination: {
-            maxLimit: 50,
-        },
-        relations: {
-            allowed: ['analysis', 'analysis_bucket'],
-        },
-        sort: {
-            allowed: ['path', 'created_at', 'updated_at'],
-        },
-    });
+    );
 
     const [entities, total] = await query.getManyAndCount();
 

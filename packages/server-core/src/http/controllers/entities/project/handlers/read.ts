@@ -60,6 +60,7 @@ export async function getManyProjectRouteHandler(req: Request, res: Response) : 
 
     const repository = dataSource.getRepository(ProjectEntity);
     const query = repository.createQueryBuilder('project');
+    query.groupBy('project.id');
 
     const { pagination } = applyQuery(query, useRequestQuery(req), {
         defaultAlias: 'project',
@@ -87,6 +88,9 @@ export async function getManyProjectRouteHandler(req: Request, res: Response) : 
         },
         relations: {
             allowed: ['master_image'],
+            onJoin: (_property, key, query) => {
+                query.addGroupBy(`${key}.id`);
+            },
         },
         sort: {
             allowed: ['id', 'updated_at', 'created_at'],

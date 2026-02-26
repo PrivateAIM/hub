@@ -83,6 +83,7 @@ export async function getManyRegistryRouteHandler(req: Request, res: Response) :
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(RegistryEntity);
     const query = repository.createQueryBuilder('registry');
+    query.groupBy('registry.id');
 
     await checkAndApplyFields(req, query);
 

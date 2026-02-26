@@ -60,6 +60,7 @@ export async function executeBucketFileRouteGetManyHandler(req: Request, res: Re
 
     const repository = dataSource.getRepository(BucketFileEntity);
     const query = repository.createQueryBuilder('bucketFile');
+    query.groupBy('bucketFile.id');
 
     const { pagination } = applyQuery(query, useRequestQuery(req), {
         defaultAlias: 'bucketFile',
@@ -81,6 +82,9 @@ export async function executeBucketFileRouteGetManyHandler(req: Request, res: Re
         },
         relations: {
             allowed: ['bucket'],
+            onJoin: (_property, key, query) => {
+                query.addGroupBy(`${key}.id`);
+            },
         },
         filters: {
             allowed: [

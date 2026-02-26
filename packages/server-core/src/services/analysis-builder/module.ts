@@ -44,6 +44,7 @@ export class AnalysisBuilder {
         AnalysisBuilderCommandChecker.canStart(entity);
 
         entity.build_status = ProcessStatus.STARTING;
+        entity.build_progress = null;
 
         if (request) {
             const requestRepository = new RequestRepositoryAdapter(

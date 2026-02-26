@@ -159,10 +159,8 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
             throw e;
         }
 
-        const containerInfo = await container.inspect();
-
         const docker = useDocker();
-        const image = docker.getImage(containerInfo.Image);
+        const image = docker.getImage(this.buildImageTag(analysis));
         const imageInfo = await image.inspect();
 
         await context.handle(
@@ -291,7 +289,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
                 path: AnalysisContainerPath.CODE,
 
                 validateEntry: (entry) => {
-                    if (entry.type && entry.type !== 'file') {
+                    if (!entry.type || entry.type !== 'file') {
                         return;
                     }
 
@@ -348,7 +346,8 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
         });
 
         await container.commit({
-            tag: this.buildImageTag(analysis),
+            repo: analysis.id,
+            tag: REGISTRY_ARTIFACT_TAG_LATEST,
         });
 
         useAnalysisBuilderLogger().info({

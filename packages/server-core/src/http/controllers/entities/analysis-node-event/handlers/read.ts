@@ -21,12 +21,16 @@ export async function getOneAnalysisNodeEventRouteHandler(req: Request, res: Res
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisNodeEventEntity);
-    const query = repository.createQueryBuilder('event')
-        .where('log.id = :id', { id });
+    const query = repository.createQueryBuilder('e')
+        .where('e.id = :id', { id })
+        .groupBy('e.id');
 
     applyRelations(query, useRequestQuery(req, 'include'), {
         allowed: ['analysis', 'node'],
-        defaultAlias: 'event',
+        defaultAlias: 'e',
+        onJoin: (_property, key, query) => {
+            query.addGroupBy(`${key}.id`);
+        },
     });
 
     const entity = await query.getOne();
@@ -42,7 +46,7 @@ export async function getManyAnalysisNodeEventRouteHandler(req: Request, res: Re
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisNodeEventEntity);
     const query = repository.createQueryBuilder('e');
-    query.distinctOn(['e.id']);
+    query.groupBy('e.id');
 
     const { pagination } = applyQuery(query, useRequestQuery(req), {
         defaultAlias: 'e',
@@ -57,6 +61,9 @@ export async function getManyAnalysisNodeEventRouteHandler(req: Request, res: Re
         },
         relations: {
             allowed: ['analysis', 'node'],
+            onJoin: (_property, key, query) => {
+                query.addGroupBy(`${key}.id`);
+            },
         },
         sort: {
             allowed: [

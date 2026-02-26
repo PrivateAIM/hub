@@ -24,12 +24,16 @@ export async function getOneProjectNodeRouteHandler(req: Request, res: Response)
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(ProjectNodeEntity);
-    const query = repository.createQueryBuilder('analysisNode')
-        .where('analysisNode.id = :id', { id });
+    const query = repository.createQueryBuilder('projectNode')
+        .where('projectNode.id = :id', { id })
+        .groupBy('projectNode.id');
 
     applyRelations(query, include, {
         allowed: ['node', 'project'],
-        defaultAlias: 'analysisNode',
+        defaultAlias: 'projectNode',
+        onJoin: (_property, key, query) => {
+            query.addGroupBy(`${key}.id`);
+        },
     });
 
     const entity = await query.getOne();
@@ -52,16 +56,16 @@ export async function getManyProjectNodeRouteHandler(req: Request, res: Response
     const dataSource = await useDataSource();
 
     const repository = dataSource.getRepository(ProjectNodeEntity);
-    const query = repository.createQueryBuilder('analysisNode');
-    query.distinctOn(['analysisNode.id']);
+    const query = repository.createQueryBuilder('projectNode');
+    query.groupBy('projectNode.id');
 
     onlyRealmWritableQueryResources(query, useRequestIdentityRealm(req), [
-        'analysisNode.node_realm_id',
-        'analysisNode.project_realm_id',
+        'projectNode.node_realm_id',
+        'projectNode.project_realm_id',
     ]);
 
     const { pagination } = applyQuery(query, useRequestQuery(req), {
-        defaultAlias: 'analysisNode',
+        defaultAlias: 'projectNode',
         filters: {
             allowed: [
                 'project_realm_id',
@@ -79,6 +83,9 @@ export async function getManyProjectNodeRouteHandler(req: Request, res: Response
         },
         relations: {
             allowed: ['node', 'project'],
+            onJoin: (_property, key, query) => {
+                query.addGroupBy(`${key}.id`);
+            },
         },
         sort: {
             allowed: [
