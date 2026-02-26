@@ -21,13 +21,13 @@
     "devDependencies": {
         "@authup/core-kit": "^1.0.0-beta.29",
         "@privateaim/kit": "^0.8.27",
-        "hapic": "^2.7.0",
+        "hapic": "^2.8.2",
         "rapiq": "^0.9.0"
     },
     "peerDependencies": {
         "@authup/core-kit": "^1.0.0-beta.29",
         "@privateaim/kit": "^0.8.27",
-        "hapic": "^2.7.0",
+        "hapic": "^2.8.2",
         "rapiq": "^0.9.0"
     },
     "scripts": {
