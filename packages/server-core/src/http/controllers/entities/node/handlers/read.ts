@@ -49,13 +49,17 @@ export async function getOneNodeRouteHandler(req: Request, res: Response) : Prom
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(NodeEntity);
     const query = repository.createQueryBuilder('node')
-        .where('node.id = :id', { id });
+        .where('node.id = :id', { id })
+        .groupBy('node.id');
 
     await checkAndApplyFields(req, query, fields);
 
     applyRelations(query, include, {
         defaultAlias: 'node',
         allowed: ['registry_project', 'registry'],
+        onJoin: (_property, key, query) => {
+            query.addGroupBy(`${key}.id`);
+        },
     });
 
     const entity = await query.getOne();

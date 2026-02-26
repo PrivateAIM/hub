@@ -22,11 +22,15 @@ export async function getOneAnalysisNodeEventRouteHandler(req: Request, res: Res
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisNodeEventEntity);
     const query = repository.createQueryBuilder('event')
-        .where('log.id = :id', { id });
+        .where('log.id = :id', { id })
+        .groupBy('log.id');
 
     applyRelations(query, useRequestQuery(req, 'include'), {
         allowed: ['analysis', 'node'],
         defaultAlias: 'event',
+        onJoin: (_property, key, query) => {
+            query.addGroupBy(`${key}.id`);
+        },
     });
 
     const entity = await query.getOne();

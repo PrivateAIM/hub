@@ -25,11 +25,15 @@ export async function getOneProjectNodeRouteHandler(req: Request, res: Response)
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(ProjectNodeEntity);
     const query = repository.createQueryBuilder('projectNode')
-        .where('projectNode.id = :id', { id });
+        .where('projectNode.id = :id', { id })
+        .groupBy('projectNode.id');
 
     applyRelations(query, include, {
         allowed: ['node', 'project'],
         defaultAlias: 'projectNode',
+        onJoin: (_property, key, query) => {
+            query.addGroupBy(`${key}.id`);
+        },
     });
 
     const entity = await query.getOne();

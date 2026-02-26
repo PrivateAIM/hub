@@ -78,13 +78,17 @@ export async function getOneRegistryProjectRouteHandler(req: Request, res: Respo
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(RegistryProjectEntity);
     const query = repository.createQueryBuilder('registryProject')
-        .where('registryProject.id = :id', { id });
+        .where('registryProject.id = :id', { id })
+        .groupBy('registryProject.id');
 
     checkAndApplyFields(req, query, fields);
 
     applyRelations(query, include, {
         defaultAlias: 'registryProject',
         allowed: ['registry'],
+        onJoin: (_property, key, query) => {
+            query.addGroupBy(`${key}.id`);
+        },
     });
 
     const entity = await query.getOne();

@@ -54,7 +54,8 @@ export async function getOneAnalysisPermissionRouteHandler(req: Request, res: Re
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisPermissionEntity);
     const query = repository.createQueryBuilder('analysisPermission')
-        .where('analysisPermission.id = :id', { id });
+        .where('analysisPermission.id = :id', { id })
+        .groupBy('analysisPermission.id');
 
     const relationsMap = getRelations(req);
 
@@ -63,6 +64,9 @@ export async function getOneAnalysisPermissionRouteHandler(req: Request, res: Re
             relationsMap.analysis,
         ], {
             defaultAlias: 'analysisPermission',
+            onJoin: (_property, key, query) => {
+                query.addGroupBy(`${key}.id`);
+            },
         });
     }
 

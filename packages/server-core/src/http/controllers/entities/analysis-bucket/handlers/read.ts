@@ -22,11 +22,15 @@ export async function getOneAnalysisBucketRouteHandler(req: Request, res: Respon
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisBucketEntity);
     const query = repository.createQueryBuilder('analysisBucket')
-        .where('analysisBucket.id = :id', { id });
+        .where('analysisBucket.id = :id', { id })
+        .groupBy('analysisBucket.id');
 
     applyRelations(query, useRequestQuery(req, 'include'), {
         allowed: ['analysis'],
         defaultAlias: 'analysisBucket',
+        onJoin: (_property, key, query) => {
+            query.addGroupBy(`${key}.id`);
+        },
     });
 
     const entity = await query.getOne();
