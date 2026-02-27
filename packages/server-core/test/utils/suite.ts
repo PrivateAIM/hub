@@ -90,7 +90,7 @@ class TestSuite {
 
         client.setAuthorizationHeader({
             type: 'Basic',
-            username: 'system',
+            username: 'admin',
             password: 'start123',
         });
 
