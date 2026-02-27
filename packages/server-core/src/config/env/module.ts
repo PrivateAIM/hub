@@ -37,7 +37,7 @@ export function useEnv(key?: string) : any {
         realm: read(EnvironmentInputKey.REALM, EnvironmentDefaults.REALM),
 
         clientId: read(EnvironmentInputKey.CLIENT_ID, EnvironmentDefaults.CLIENT_ID),
-        clientSecret: read(EnvironmentInputKey.CLIENT_ID, EnvironmentDefaults.CLIENT_SECRET),
+        clientSecret: read(EnvironmentInputKey.CLIENT_SECRET, EnvironmentDefaults.CLIENT_SECRET),
 
         harborURL: read(EnvironmentInputKey.HARBOR_URL),
 
