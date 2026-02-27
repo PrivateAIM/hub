@@ -7,7 +7,7 @@
 
 import { ClientAuthenticationHook } from '@authup/core-http-kit';
 import {
-    guessAuthupTokenCreatorOptions,
+    createAuthupTokenCreator,
     setClientAuthenticationHookFactory,
     useLogger,
 } from '@privateaim/server-kit';
@@ -22,6 +22,6 @@ export function configureAuthupClientAuthenticationHook() {
 
     setClientAuthenticationHookFactory(() => new ClientAuthenticationHook({
         baseURL,
-        tokenCreator: guessAuthupTokenCreatorOptions(),
+        tokenCreator: createAuthupTokenCreator(),
     }));
 }

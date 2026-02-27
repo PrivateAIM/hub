@@ -6,13 +6,12 @@
  */
 
 import { UnauthorizedError } from '@ebec/http';
-import type { VaultClient } from '@hapic/vault';
+import { createUserTokenCreator } from '@authup/core-http-kit';
 import {
-    isRedisClientUsable, isVaultClientUsable, useLogger, useRedisClient, useVaultClient,
+    isRedisClientUsable, useLogger, useRedisClient,
 } from '@privateaim/server-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import type { Client as RedisClient } from 'redis-extension';
-import type { TokenCreatorOptions } from '@authup/core-http-kit';
 import type { ITokenVerifierCache } from '@authup/server-adapter-kit';
 import { MemoryTokenVerifierCache, RedisTokenVerifierCache, TokenVerifier } from '@authup/server-adapter-kit';
 import { createMiddleware } from '@authup/server-adapter-socket-io';
@@ -35,11 +34,6 @@ export function createAuthupMiddleware(
         redis = useRedisClient();
     }
 
-    let vault : VaultClient | undefined;
-    if (isVaultClientUsable()) {
-        vault = useVaultClient();
-    }
-
     if (!baseURL) {
         const data = createFakeTokenVerificationData();
 
@@ -49,22 +43,15 @@ export function createAuthupMiddleware(
         };
     }
 
-    let tokenCreator : TokenCreatorOptions;
-    if (vault) {
-        tokenCreator = {
-            type: 'robotInVault',
-            name: 'system',
-            vault,
+    // todo: refactor this
+    const tokenCreator = createUserTokenCreator({
+        name: 'admin',
+        password: 'start123',
+    }, {
+        client: {
             baseURL,
-        };
-    } else {
-        tokenCreator = {
-            type: 'user',
-            name: 'admin',
-            password: 'start123',
-            baseURL,
-        };
-    }
+        },
+    });
 
     let cache : ITokenVerifierCache;
     if (redis) {

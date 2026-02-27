@@ -8,9 +8,8 @@
 import type {
     ClientOptions,
     TokenCreator,
-    TokenCreatorOptions,
 } from '@authup/core-http-kit';
 
 export type AuthupClientOptions = ClientOptions & {
-    tokenCreator?: TokenCreator | TokenCreatorOptions
+    tokenCreator?: TokenCreator
 };

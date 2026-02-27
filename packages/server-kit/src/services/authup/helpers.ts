@@ -5,24 +5,15 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { TokenCreatorOptions } from '@authup/core-http-kit';
-import { isVaultClientUsable, useVaultClient } from '../vault';
+import type { TokenCreator } from '@authup/core-http-kit';
+import { createUserTokenCreator } from '@authup/core-http-kit';
 
-export function guessAuthupTokenCreatorOptions() : TokenCreatorOptions {
-    let options : TokenCreatorOptions;
-    if (isVaultClientUsable()) {
-        options = {
-            type: 'robotInVault',
-            name: 'system',
-            vault: useVaultClient(),
-        };
-    } else {
-        options = {
-            type: 'user',
-            name: 'admin',
-            password: 'start123',
-        };
-    }
-
-    return options;
+/**
+ * todo: fix usage
+ */
+export function createAuthupTokenCreator() : TokenCreator {
+    return createUserTokenCreator({
+        name: 'admin',
+        password: 'start123',
+    });
 }

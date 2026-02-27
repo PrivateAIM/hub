@@ -14,7 +14,7 @@ import {
     setClientAuthenticationHookFactory,
     useClientAuthenticationHook,
 } from '../authup-client-authentication-hook';
-import { guessAuthupTokenCreatorOptions } from './helpers';
+import { createAuthupTokenCreator } from './helpers';
 import type { AuthupClientOptions } from './types';
 
 export class AuthupClient extends Client {
@@ -25,7 +25,7 @@ export class AuthupClient extends Client {
             setClientAuthenticationHookFactory(
                 () => new ClientAuthenticationHook({
                     baseURL: options.baseURL,
-                    tokenCreator: options.tokenCreator || guessAuthupTokenCreatorOptions(),
+                    tokenCreator: options.tokenCreator || createAuthupTokenCreator(),
                 }),
             );
         }
