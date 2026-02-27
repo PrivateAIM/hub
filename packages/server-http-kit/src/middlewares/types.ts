@@ -6,7 +6,7 @@
  */
 
 import type { ClassType } from '@routup/decorators';
-import type { AuthupMiddlewareRegistrationOptions } from '../services';
+import type { AuthorizationMiddlewareRegistrationOptions } from './authup';
 
 export type MiddlewareSwaggerOptions = {
     cwd?: string,
@@ -18,9 +18,7 @@ export type MiddlewareDecoratorsOptions = {
 };
 
 export type MiddlewareMountOptions = {
-    options?: MiddlewareSwaggerOptions,
-
-    authup?: AuthupMiddlewareRegistrationOptions,
+    authorization?: AuthorizationMiddlewareRegistrationOptions,
     basic?: boolean,
     cors?: boolean,
     decorators?: MiddlewareDecoratorsOptions,

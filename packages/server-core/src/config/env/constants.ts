@@ -6,8 +6,10 @@
  */
 
 export const EnvironmentInputKey = {
-    CLIENT_NAME: 'CLIENT_NAME',
+    CLIENT_ID: 'CLIENT_ID',
     CLIENT_SECRET: 'CLIENT_SECRET',
+
+    REALM: 'REALM',
 
     ENV: 'NODE_ENV',
     PORT: 'PORT',
@@ -31,7 +33,9 @@ export const EnvironmentInputKey = {
 } as const;
 
 export const EnvironmentDefaults = {
-    CLIENT_NAME: 'system',
+    REALM: 'master',
+
+    CLIENT_ID: 'system',
     CLIENT_SECRET: 'start123',
 
     REDIS: 'redis://127.0.0.1',

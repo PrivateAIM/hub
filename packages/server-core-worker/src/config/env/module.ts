@@ -33,8 +33,12 @@ export function useEnv(key?: string) : any {
         env: read('NODE_ENV', EnvironmentName.DEVELOPMENT) as `${EnvironmentName}`,
         port: readInt('PORT', 3000),
 
+        clientId: read('CLIENT_ID', 'system'),
+        clientSecret: read('CLIENT_SECRET', 'start123'),
+
+        realm: read('REALM', 'master'),
+
         rabbitMqConnectionString: read('RABBITMQ_CONNECTION_STRING', 'amqp://root:start123@127.0.0.1'),
-        vaultConnectionString: read('VAULT_CONNECTION_STRING', 'start123@http://127.0.0.1:8090/v1/'),
 
         coreURL: orFail(read('CORE_URL')),
         authupURL: orFail(read('AUTHUP_URL')),

@@ -7,14 +7,13 @@
 
 import {
     EnvironmentName,
+    createAuthupTokenCreator,
     isAuthupClientUsable,
     isRedisClientUsable,
-    isVaultClientUsable,
     useAuthupClient,
     useRedisClient,
-    useVaultClient,
 } from '@privateaim/server-kit';
-import { mountErrorMiddleware, mountMiddlewares } from '@privateaim/server-http-kit';
+import { createAuthupTokenVerifier, mountErrorMiddleware, mountMiddlewares } from '@privateaim/server-http-kit';
 import type { MiddlewareSwaggerOptions } from '@privateaim/server-http-kit';
 import { Router } from 'routup';
 import { useEnv } from '../config/index.ts';
@@ -57,17 +56,23 @@ export function createRouter() : Router {
         cors: true,
         prometheus: !isTestEnvironment,
         rateLimit: !isTestEnvironment,
-        authup: {
-            client: isAuthupClientUsable() ?
+        authorization: {
+            authupClient: isAuthupClientUsable() ?
                 useAuthupClient() :
-                undefined,
-            vaultClient: isVaultClientUsable() ?
-                useVaultClient() :
                 undefined,
             redisClient: isRedisClientUsable() ?
                 useRedisClient() :
                 undefined,
-            fakeAbilities: isTestEnvironment,
+            dryRun: isTestEnvironment,
+            tokenVerifier: createAuthupTokenVerifier({
+                baseURL: useEnv('authupURL'),
+                creator: createAuthupTokenCreator({
+                    baseURL: useEnv('authupURL'),
+                    clientId: useEnv('clientId'),
+                    clientSecret: useEnv('clientSecret'),
+                    realm: useEnv('realm'),
+                }),
+            }),
         },
         swagger,
         decorators: {

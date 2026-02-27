@@ -12,8 +12,12 @@ export interface Environment {
 
     port: number,
 
+    clientId: string,
+    clientSecret: string,
+
+    realm: string,
+
     rabbitMqConnectionString: string,
-    vaultConnectionString: string,
 
     coreURL: string,
     authupURL: string,

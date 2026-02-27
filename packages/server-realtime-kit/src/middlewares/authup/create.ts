@@ -6,35 +6,21 @@
  */
 
 import { UnauthorizedError } from '@ebec/http';
-import { createUserTokenCreator } from '@authup/core-http-kit';
 import {
-    isRedisClientUsable, useLogger, useRedisClient,
+    useLogger,
 } from '@privateaim/server-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
-import type { Client as RedisClient } from 'redis-extension';
-import type { ITokenVerifierCache } from '@authup/server-adapter-kit';
-import { MemoryTokenVerifierCache, RedisTokenVerifierCache, TokenVerifier } from '@authup/server-adapter-kit';
 import { createMiddleware } from '@authup/server-adapter-socket-io';
 import type {
     Middleware, Namespace, Server, Socket,
 } from '../../types';
-import type { AuthupMiddlewareRegistrationOptions } from './types';
+import type { AuthorizationMiddlewareRegistrationOptions } from './types';
 import { applyTokenVerificationData, createFakeTokenVerificationData } from './utils';
 
-export function createAuthupMiddleware(
-    options: AuthupMiddlewareRegistrationOptions,
+export function createAuthorizationMiddleware(
+    options: AuthorizationMiddlewareRegistrationOptions,
 ) : Middleware {
-    let baseURL : string | undefined;
-    if (options.baseURL) {
-        baseURL = options.baseURL;
-    }
-
-    let redis : RedisClient | undefined;
-    if (isRedisClientUsable()) {
-        redis = useRedisClient();
-    }
-
-    if (!baseURL) {
+    if (!options.baseURL) {
         const data = createFakeTokenVerificationData();
 
         return (socket, next) => {
@@ -43,29 +29,8 @@ export function createAuthupMiddleware(
         };
     }
 
-    // todo: refactor this
-    const tokenCreator = createUserTokenCreator({
-        name: 'admin',
-        password: 'start123',
-    }, {
-        client: {
-            baseURL,
-        },
-    });
-
-    let cache : ITokenVerifierCache;
-    if (redis) {
-        cache = new RedisTokenVerifierCache(redis);
-    } else {
-        cache = new MemoryTokenVerifierCache();
-    }
-
     return createMiddleware({
-        tokenVerifier: new TokenVerifier({
-            baseURL,
-            creator: tokenCreator,
-            cache,
-        }),
+        tokenVerifier: options.tokenVerifier,
         tokenVerifierHandler: (
             socket: Socket,
             data,
@@ -73,11 +38,11 @@ export function createAuthupMiddleware(
     });
 }
 
-export function mountAuthupMiddleware(
+export function mountAuthorizationMiddleware(
     nsp: Namespace | Server,
-    options: AuthupMiddlewareRegistrationOptions,
+    options: AuthorizationMiddlewareRegistrationOptions,
 ) {
-    const middleware = createAuthupMiddleware(options);
+    const middleware = createAuthorizationMiddleware(options);
     nsp.use(middleware);
 
     nsp.use((socket, next) => {

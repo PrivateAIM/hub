@@ -8,4 +8,3 @@
 export * from './entity.ts';
 export * from './subscriber.ts';
 export * from './type.ts';
-export * from './vault.ts';

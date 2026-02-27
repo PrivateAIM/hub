@@ -13,9 +13,13 @@ export interface Environment {
 
     publicURL: string,
 
+    clientId: string,
+    clientSecret: string,
+
+    realm: string,
+
     rabbitMqConnectionString?: string | null,
     redisConnectionString?: string | null,
-    vaultConnectionString?: string | null,
     authupURL?: string | null,
 
     victoriaLogsURL?: string | null,

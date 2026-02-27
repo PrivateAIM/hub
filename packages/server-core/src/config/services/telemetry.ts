@@ -6,7 +6,7 @@
  */
 
 import {
-    isClientAuthenticationHookUsable, useClientAuthenticationHook,
+    isAuthupClientAuthenticationHookUsable, useAuthupClientAuthenticationHook,
     useLogger,
 } from '@privateaim/server-kit';
 import { APIClient } from '@privateaim/telemetry-kit';
@@ -25,8 +25,8 @@ export function configureTelemetryClient() {
             baseURL,
         });
 
-        if (isClientAuthenticationHookUsable()) {
-            const hook = useClientAuthenticationHook();
+        if (isAuthupClientAuthenticationHookUsable()) {
+            const hook = useAuthupClientAuthenticationHook();
             hook.attach(client);
         }
 

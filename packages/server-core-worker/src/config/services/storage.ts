@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { isClientAuthenticationHookUsable, useClientAuthenticationHook } from '@privateaim/server-kit';
+import { isAuthupClientAuthenticationHookUsable, useAuthupClientAuthenticationHook } from '@privateaim/server-kit';
 import { APIClient } from '@privateaim/storage-kit';
 import { setStorageFactory } from '../../core';
 import { useEnv } from '../env';
@@ -16,8 +16,8 @@ export function configureStorageService() {
             baseURL: useEnv('storageURL'),
         });
 
-        if (isClientAuthenticationHookUsable()) {
-            const hook = useClientAuthenticationHook();
+        if (isAuthupClientAuthenticationHookUsable()) {
+            const hook = useAuthupClientAuthenticationHook();
             hook.attach(client);
         }
 

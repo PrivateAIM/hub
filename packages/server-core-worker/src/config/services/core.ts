@@ -6,7 +6,7 @@
  */
 
 import { Client } from '@privateaim/core-http-kit';
-import { isClientAuthenticationHookUsable, useClientAuthenticationHook } from '@privateaim/server-kit';
+import { isAuthupClientAuthenticationHookUsable, useAuthupClientAuthenticationHook } from '@privateaim/server-kit';
 import { setCoreFactory } from '../../core';
 import { useEnv } from '../env';
 
@@ -16,8 +16,8 @@ export function configureCoreService() {
             baseURL: useEnv('coreURL'),
         });
 
-        if (isClientAuthenticationHookUsable()) {
-            const hook = useClientAuthenticationHook();
+        if (isAuthupClientAuthenticationHookUsable()) {
+            const hook = useAuthupClientAuthenticationHook();
             hook.attach(client);
         }
 

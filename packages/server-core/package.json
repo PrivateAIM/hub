@@ -20,7 +20,7 @@
         "@authup/server-adapter-http": "^1.0.0-beta.30",
         "@ebec/http": "^2.3.0",
         "@hapic/harbor": "^2.5.6",
-        "@hapic/vault": "^2.3.11",
+        "@hapic/oauth2": "^3.2.0",
         "@privateaim/core-kit": "^0.8.28",
         "@privateaim/core-realtime-kit": "^0.7.29",
         "@privateaim/kit": "^0.8.28",

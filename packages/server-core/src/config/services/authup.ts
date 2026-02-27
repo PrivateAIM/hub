@@ -7,7 +7,9 @@
 
 import {
     AuthupClient,
+    isAuthupClientAuthenticationHookUsable,
     setAuthupClientFactory,
+    useAuthupClientAuthenticationHook,
     useLogger,
 } from '@privateaim/server-kit';
 import { useEnv } from '../env/index.ts';
@@ -15,11 +17,20 @@ import { useEnv } from '../env/index.ts';
 export function configureAuthup() {
     const baseURL = useEnv('authupURL');
     if (!baseURL) {
-        useLogger().debug('Authup service url is not set.');
+        useLogger().warn('Authup service URL is not set.');
         return;
     }
 
-    setAuthupClientFactory(() => new AuthupClient({
-        baseURL,
-    }));
+    setAuthupClientFactory(() => {
+        const client = new AuthupClient({
+            baseURL,
+        });
+
+        if (isAuthupClientAuthenticationHookUsable()) {
+            const hook = useAuthupClientAuthenticationHook();
+            hook.attach(client);
+        }
+
+        return client;
+    });
 }

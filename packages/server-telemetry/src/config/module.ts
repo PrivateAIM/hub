@@ -8,9 +8,9 @@
 import {
     configureAMQP,
     configureAuthup,
+    configureAuthupClientAuthenticationHook,
     configureEntityEventPublisher,
     configureRedis,
-    configureVault,
     configureVictoriaLogs,
     setupLogging,
 } from './services/index.ts';
@@ -20,9 +20,10 @@ export function configure() {
 
     setupLogging();
 
+    configureAuthupClientAuthenticationHook();
+
     configureAMQP();
     configureRedis();
-    configureVault();
     configureAuthup();
 
     configureEntityEventPublisher();

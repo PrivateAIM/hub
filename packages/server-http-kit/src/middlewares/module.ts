@@ -6,7 +6,7 @@
  */
 
 import type { Router } from 'routup';
-import { mountAuthupMiddleware } from '../services';
+import { mountAuthorizationMiddleware } from './authup';
 import { boolableToObject } from '../utils';
 import { mountBasicMiddleware } from './basic';
 import { mountCorsMiddleware } from './cors';
@@ -28,8 +28,8 @@ export function mountMiddlewares(
         mountBasicMiddleware(router);
     }
 
-    if (options.authup) {
-        mountAuthupMiddleware(router, options.authup);
+    if (options.authorization) {
+        mountAuthorizationMiddleware(router, options.authorization);
     }
 
     if (options.prometheus) {

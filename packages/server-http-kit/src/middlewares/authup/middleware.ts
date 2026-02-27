@@ -5,32 +5,23 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { createUserTokenCreator } from '@authup/core-http-kit';
-import type {
-    ITokenVerifierCache,
-} from '@authup/server-adapter-kit';
-import {
-    MemoryTokenVerifierCache,
-    RedisTokenVerifierCache,
-    TokenVerifier,
-} from '@authup/server-adapter-kit';
 import { createMiddleware } from '@authup/server-adapter-http';
 import { useRequestCookie } from '@routup/basic/cookie';
 import { parseAuthorizationHeader } from 'hapic';
 import type { Router } from 'routup';
 import { coreHandler, getRequestHeader } from 'routup';
-import type { AuthupMiddlewareRegistrationOptions } from './types';
-import { applyTokenVerificationData, createFakeTokenVerificationData } from './utils';
+import type { AuthorizationMiddlewareRegistrationOptions } from './types.ts';
+import { applyTokenVerificationData, createFakeTokenVerificationData } from './utils.ts';
 
-export function mountAuthupMiddleware(
+export function mountAuthorizationMiddleware(
     router: Router,
-    options: AuthupMiddlewareRegistrationOptions,
+    options: AuthorizationMiddlewareRegistrationOptions,
 ) {
-    if (!options.client) {
+    if (!options.authupClient) {
         const data = createFakeTokenVerificationData();
 
         router.use(coreHandler((req, res, next) => {
-            applyTokenVerificationData(req, data, options.fakeAbilities);
+            applyTokenVerificationData(req, data, options.dryRun);
             next();
         }));
 
@@ -57,9 +48,9 @@ export function mountAuthupMiddleware(
         const header = parseAuthorizationHeader(headerRaw);
 
         if (header.type === 'Basic') {
-            const token = await options.client.token.createWithPassword({
-                username: header.username,
-                password: header.password,
+            const token = await options.authupClient.token.createWithClientCredentials({
+                client_id: header.username,
+                client_secret: header.password,
             });
 
             req.headers.authorization = `Bearer ${token.access_token}`;
@@ -71,34 +62,13 @@ export function mountAuthupMiddleware(
         next();
     }));
 
-    // todo: refactor this
-    const tokenCreator = createUserTokenCreator({
-        name: 'admin',
-        password: 'start123',
-    }, {
-        client: {
-            baseURL: options.client.getBaseURL(),
-        },
-    });
-
-    let cache : ITokenVerifierCache;
-    if (options.redisClient) {
-        cache = new RedisTokenVerifierCache(options.redisClient);
-    } else {
-        cache = new MemoryTokenVerifierCache();
-    }
-
     const middleware = createMiddleware({
         tokenByCookie: (req, cookieName) => useRequestCookie(req, cookieName),
-        tokenVerifier: new TokenVerifier({
-            baseURL: options.client.getBaseURL(),
-            creator: tokenCreator,
-            cache,
-        }),
+        tokenVerifier: options.tokenVerifier,
         tokenVerifierHandler: (
             req,
             data,
-        ) => applyTokenVerificationData(req, data, options.fakeAbilities),
+        ) => applyTokenVerificationData(req, data, options.dryRun),
     });
 
     router.use(coreHandler((

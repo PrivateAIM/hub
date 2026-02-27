@@ -25,14 +25,13 @@ import {
     useAnalysisDistributorComponent,
 } from '../components';
 import {
-    configureAMQP, configureCoreService, configureStorageService, setupLogger, setupVault,
+    configureAMQP, configureCoreService, configureStorageService, setupLogger,
 } from './services';
 import { configureAuthupClientAuthenticationHook } from './services/authup-client-authentication-hook';
 import type { Config } from './types';
 
 export function createConfig() : Config {
     setupLogger();
-    setupVault();
     configureAMQP();
 
     configureAuthupClientAuthenticationHook();

@@ -12,4 +12,3 @@ export * from './event-publisher.ts';
 export * from './logging.ts';
 export * from './redis.ts';
 export * from './telemetry.ts';
-export * from './vault.ts';

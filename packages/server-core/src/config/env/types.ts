@@ -11,7 +11,9 @@ export interface Environment {
     env: `${EnvironmentName}`,
     port: number,
 
-    clientName: string,
+    realm: string,
+
+    clientId: string,
     clientSecret: string,
 
     redisConnectionString?: string,
