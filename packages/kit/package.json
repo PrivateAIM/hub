@@ -1,7 +1,7 @@
 {
     "name": "@privateaim/kit",
     "type": "module",
-    "version": "0.8.27",
+    "version": "0.8.28",
     "license": "Apache-2.0",
     "description": "",
     "module": "./dist/index.mjs",
@@ -25,12 +25,12 @@
         "build-watch": "rimraf ./dist && tsc -p tsconfig.build.json --watch"
     },
     "devDependencies": {
-        "@authup/kit": "^1.0.0-beta.29",
-        "@authup/core-kit": "^1.0.0-beta.29"
+        "@authup/kit": "^1.0.0-beta.30",
+        "@authup/core-kit": "^1.0.0-beta.30"
     },
     "peerDependencies": {
-        "@authup/kit": "^1.0.0-beta.29",
-        "@authup/core-kit": "^1.0.0-beta.29"
+        "@authup/kit": "^1.0.0-beta.30",
+        "@authup/core-kit": "^1.0.0-beta.30"
     },
     "dependencies": {
         "@ebec/http": "^2.3.0",

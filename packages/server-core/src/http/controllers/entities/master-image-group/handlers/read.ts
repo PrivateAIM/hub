@@ -34,6 +34,7 @@ export async function getManyMasterImageGroupRouteHandler(req: Request, res: Res
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(MasterImageGroupEntity);
     const query = repository.createQueryBuilder('imageGroup');
+    query.groupBy('imageGroup.id');
 
     const { pagination } = applyQuery(query, useRequestQuery(req), {
         defaultAlias: 'imageGroup',

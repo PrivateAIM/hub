@@ -59,6 +59,7 @@ export async function executeBucketRouteGetManyHandler(req: Request, res: Respon
 
     const repository = dataSource.getRepository(BucketEntity);
     const query = repository.createQueryBuilder('bucket');
+    query.groupBy('bucket.id');
 
     const { pagination } = applyQuery(query, useRequestQuery(req), {
         defaultAlias: 'bucket',

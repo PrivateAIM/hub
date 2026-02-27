@@ -29,13 +29,17 @@ export async function getOneAnalysisRouteHandler(req: Request, res: Response) : 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisEntity);
     const query = repository.createQueryBuilder('analysis')
-        .where('analysis.id = :id', { id });
+        .where('analysis.id = :id', { id })
+        .groupBy('analysis.id');
 
     onlyRealmWritableQueryResources(query, useRequestIdentityRealm(req), 'analysis.realm_id');
 
     applyRelations(query, include, {
         defaultAlias: 'analysis',
         allowed: ['project', 'master_image'],
+        onJoin: (_property, key, query) => {
+            query.addGroupBy(`${key}.id`);
+        },
     });
 
     const entity = await query.getOne();
@@ -55,6 +59,7 @@ export async function getManyAnalysisRouteHandler(req: Request, res: Response) :
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisEntity);
     const query = repository.createQueryBuilder('analysis');
+    query.groupBy('analysis.id');
 
     const { pagination, filters } = applyQuery(query, useRequestQuery(req), {
         defaultAlias: 'analysis',
@@ -75,6 +80,9 @@ export async function getManyAnalysisRouteHandler(req: Request, res: Response) :
         },
         relations: {
             allowed: ['project', 'master_image'],
+            onJoin: (_property, key, query) => {
+                query.addGroupBy(`${key}.id`);
+            },
         },
         sort: {
             allowed: ['created_at', 'updated_at'],

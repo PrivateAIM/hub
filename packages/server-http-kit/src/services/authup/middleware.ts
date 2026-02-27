@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { TokenCreatorOptions } from '@authup/core-http-kit';
+import { createUserTokenCreator } from '@authup/core-http-kit';
 import type {
     ITokenVerifierCache,
 } from '@authup/server-adapter-kit';
@@ -71,22 +71,15 @@ export function mountAuthupMiddleware(
         next();
     }));
 
-    let tokenCreator : TokenCreatorOptions;
-    if (options.vaultClient) {
-        tokenCreator = {
-            type: 'robotInVault',
-            name: 'system',
-            vault: options.vaultClient,
+    // todo: refactor this
+    const tokenCreator = createUserTokenCreator({
+        name: 'admin',
+        password: 'start123',
+    }, {
+        client: {
             baseURL: options.client.getBaseURL(),
-        };
-    } else {
-        tokenCreator = {
-            type: 'user',
-            name: 'admin',
-            password: 'start123',
-            baseURL: options.client.getBaseURL(),
-        };
-    }
+        },
+    });
 
     let cache : ITokenVerifierCache;
     if (options.redisClient) {

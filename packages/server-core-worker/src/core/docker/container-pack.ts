@@ -9,16 +9,15 @@ import type { Readable } from 'node:stream';
 import type { Container } from 'dockerode';
 import type { Headers } from 'tar-stream';
 import tar from 'tar-stream';
-import { streamToBuffer } from '../utils';
 
 export type DockerContainerPackOptions = {
     path: string,
 
-    validateEntry?: (entry: Headers) => Promise<void> | void,
+    validateEntry?: (entry: Headers) => void,
 
-    onEntryPackStarted?: (entry: Headers) => Promise<void> | void,
-    onEntryPackFinished?: (entry: Headers) => Promise<void> | void,
-    onEntryPackFailed?: (error: Error, entry: Headers) => Promise<void> | void,
+    onEntryPackStarted?: (entry: Headers) => void,
+    onEntryPackFinished?: (entry: Headers) => void,
+    onEntryPackFailed?: (error: Error, entry: Headers) => void,
 };
 
 export async function packDockerContainerWithTarStream(
@@ -27,76 +26,78 @@ export async function packDockerContainerWithTarStream(
     options: DockerContainerPackOptions,
 ) {
     return new Promise<void>((resolve, reject) => {
+        readable.on('error', (err) => reject(err));
+
         const pack = tar.pack();
+
         const extract = tar.extract();
+        extract.on('error', (err) => reject(err));
 
         extract.on('entry', (headers, stream, callback) => {
             if (options.onEntryPackStarted) {
                 options.onEntryPackStarted(headers);
             }
 
-            Promise.resolve()
-                .then(() => {
-                    if (options.validateEntry) {
-                        return options.validateEntry(headers);
-                    }
-
-                    return Promise.resolve();
-                })
-                .then(() => streamToBuffer(stream))
-                .then((buff) => {
-                    pack.entry(
-                        headers,
-                        buff,
-                        (err) => {
-                            if (err) {
-                                if (options.onEntryPackFailed) {
-                                    options.onEntryPackFailed(err, headers);
-                                }
-
-                                callback(err);
-                                return;
-                            }
-
-                            if (options.onEntryPackFinished) {
-                                options.onEntryPackFinished(headers);
-                            }
-
-                            callback();
-                        },
-                    );
-                })
-                .catch((e) => {
-                    if (options.onEntryPackFailed) {
-                        options.onEntryPackFailed(e, headers);
-                    }
-
+            if (options.validateEntry) {
+                try {
+                    options.validateEntry(headers);
+                } catch (e) {
                     callback(e);
-                });
-        });
 
-        extract.on('error', (err) => {
-            if (err) {
-                reject(err);
-                return;
+                    return;
+                }
             }
 
-            reject(new Error('The tar extraction stream failed'));
+            const entry = pack.entry(
+                headers,
+                (err) => {
+                    if (err) {
+                        if (options.onEntryPackFailed) {
+                            options.onEntryPackFailed(err, headers);
+                        }
+
+                        callback(err);
+                        return;
+                    }
+
+                    if (options.onEntryPackFinished) {
+                        options.onEntryPackFinished(headers);
+                    }
+
+                    callback();
+                },
+            );
+
+            stream.on('data', (chunk) => {
+                const written = entry.write(chunk);
+                if (!written) {
+                    stream.pause();
+                    entry.once('drain', () => stream.resume());
+                }
+            });
+
+            stream.on('end', () => {
+                entry.end();
+            });
+
+            stream.on('error', (err) => {
+                if (options.onEntryPackFailed) {
+                    options.onEntryPackFailed(err, headers);
+                }
+
+                entry.destroy(err);
+            });
+
+            stream.resume();
         });
 
         extract.on('finish', () => {
             pack.finalize();
-
-            container.putArchive(pack, { path: options.path })
-                .then(() => resolve())
-                .catch((err) => {
-                    if (err) {
-                        reject(err);
-                    }
-
-                    reject(new Error('The pack stream could not be forwarded to the container'));
-                });
         });
+
+        container.putArchive(pack, { path: options.path })
+            .then(() => resolve())
+            .catch((err) => reject(err));
 
         readable.pipe(extract);
     });

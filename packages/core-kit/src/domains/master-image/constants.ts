@@ -7,6 +7,7 @@
 
 export enum MasterImageCommand {
     SYNC = 'sync',
+    BUILD = 'build',
 }
 
 export enum MasterImageGroupType {
