@@ -67,6 +67,9 @@ jobs:
                     DB_TYPE: "better-sqlite3"
                     DB_DATABASE: ":memory:"
                     NODE_ENV: "development"
+                    CLIENT_SYSTEM_ENABLED: "true"
+                    CLIENT_SYSTEM_SECRET: "start123"
+                    CLIENT_SYSTEM_SECRET_RESET: "true"
             mysql:
                 image: mysql:9
                 env:
