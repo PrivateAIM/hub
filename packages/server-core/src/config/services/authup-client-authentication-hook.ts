@@ -6,7 +6,7 @@
  */
 
 import {
-    createAuthupTokenCreator,
+    createAuthupClientTokenCreator,
     setupAuthupClientAuthenticationHook,
     useLogger,
 } from '@privateaim/server-kit';
@@ -21,7 +21,7 @@ export function configureAuthupClientAuthenticationHook() {
 
     setupAuthupClientAuthenticationHook({
         baseURL,
-        creator: createAuthupTokenCreator({
+        creator: createAuthupClientTokenCreator({
             baseURL,
             clientId: useEnv('clientId'),
             clientSecret: useEnv('clientSecret'),

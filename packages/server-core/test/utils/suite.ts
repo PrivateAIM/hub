@@ -6,6 +6,10 @@
  */
 
 import { Client } from '@privateaim/core-http-kit';
+import {
+    createAuthupClientAuthenticationHook,
+    createAuthupUserTokenCreator,
+} from '@privateaim/server-kit';
 import { createServer } from 'node:http';
 import type { Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
@@ -88,11 +92,17 @@ class TestSuite {
             baseURL,
         });
 
-        client.setAuthorizationHeader({
-            type: 'Basic',
-            username: 'admin',
-            password: 'start123',
+        const hook = createAuthupClientAuthenticationHook({
+            baseURL,
+            tokenCreator: createAuthupUserTokenCreator({
+                baseURL,
+                name: 'admin',
+                password: 'start123',
+                realm: 'master',
+            }),
         });
+
+        hook.attach(client);
 
         this._client = client;
     }

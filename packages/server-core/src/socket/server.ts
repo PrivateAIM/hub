@@ -14,7 +14,7 @@ import type {
 } from '@privateaim/core-realtime-kit';
 import { createAuthupTokenVerifier } from '@privateaim/server-http-kit';
 import {
-    createAuthupTokenCreator,
+    createAuthupClientTokenCreator,
     useLogger,
 } from '@privateaim/server-kit';
 import type { Socket, SocketData } from '@privateaim/server-realtime-kit';
@@ -48,7 +48,7 @@ export function createSocketServer(
         baseURL: useEnv('authupURL'),
         tokenVerifier: createAuthupTokenVerifier({
             baseURL: useEnv('authupURL'),
-            creator: createAuthupTokenCreator({
+            creator: createAuthupClientTokenCreator({
                 baseURL: useEnv('authupURL'),
                 clientId: useEnv('clientId'),
                 clientSecret: useEnv('clientSecret'),

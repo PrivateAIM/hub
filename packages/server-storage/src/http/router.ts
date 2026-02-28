@@ -13,7 +13,7 @@ import {
 } from '@privateaim/server-http-kit';
 import {
     EnvironmentName,
-    createAuthupTokenCreator,
+    createAuthupClientTokenCreator,
     isAuthupClientUsable,
     isRedisClientUsable,
     useAuthupClient,
@@ -50,7 +50,7 @@ export function createHTTPRouter() : Router {
             dryRun: useEnv('env') === EnvironmentName.TEST,
             tokenVerifier: createAuthupTokenVerifier({
                 baseURL: useEnv('authupURL'),
-                creator: createAuthupTokenCreator({
+                creator: createAuthupClientTokenCreator({
                     baseURL: useEnv('authupURL'),
                     clientId: useEnv('clientId'),
                     clientSecret: useEnv('clientSecret'),

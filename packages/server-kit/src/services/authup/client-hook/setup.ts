@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { TokenCreator } from '@authup/core-http-kit';
+import type { ClientAuthenticationHookOptions, TokenCreator } from '@authup/core-http-kit';
 import { ClientAuthenticationHook } from '@authup/core-http-kit';
 import { setAuthupClientAuthenticationHookFactory } from './singleton.ts';
 
@@ -14,9 +14,13 @@ export type AuthupClientAuthenticationHookSetupContext = {
     creator: TokenCreator
 };
 
+export function createAuthupClientAuthenticationHook(options: ClientAuthenticationHookOptions) {
+    return new ClientAuthenticationHook(options);
+}
+
 export function setupAuthupClientAuthenticationHook(ctx: AuthupClientAuthenticationHookSetupContext) {
     setAuthupClientAuthenticationHookFactory(
-        () => new ClientAuthenticationHook({
+        () => createAuthupClientAuthenticationHook({
             baseURL: ctx.baseURL,
             tokenCreator: ctx.creator,
         }),
