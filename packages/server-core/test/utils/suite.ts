@@ -14,7 +14,7 @@ import { createServer } from 'node:http';
 import type { Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { createNodeDispatcher } from 'routup';
-import { createConfig } from '../../src';
+import { createConfig, useEnv } from '../../src';
 import { createRouter } from '../../src/http/router';
 import { TestDatabase } from './database';
 
@@ -92,10 +92,12 @@ class TestSuite {
             baseURL,
         });
 
+        const authupURL = useEnv('authupURL');
+
         const hook = createAuthupClientAuthenticationHook({
-            baseURL,
+            baseURL: authupURL,
             tokenCreator: createAuthupUserTokenCreator({
-                baseURL,
+                baseURL: authupURL,
                 name: 'admin',
                 password: 'start123',
                 realm: 'master',
