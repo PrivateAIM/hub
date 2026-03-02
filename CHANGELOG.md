@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.29](https://github.com/PrivateAIM/hub/compare/v0.8.28...v0.8.29) (2026-03-02)
+
+
+### Features
+
+* replace robot- with client-authentication/authorization ([#1445](https://github.com/PrivateAIM/hub/issues/1445)) ([f55dc66](https://github.com/PrivateAIM/hub/commit/f55dc668df66f6efa7a0bb2285c91b1d5f2ae9ef))
+
 ## [0.8.28](https://github.com/PrivateAIM/hub/compare/v0.8.27...v0.8.28) (2026-02-26)
 
 
