@@ -5,10 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { STCConnectionEventName } from '@privateaim/messenger-kit';
 import type { Socket } from '../../../types.ts';
 import {
-    buildConnectionRoomForIdentity,
+    buildConnectionRoomForIdentity, buildDisconnectedEventNameForIdentity,
     buildSubscriptionRoomForIdentity,
 } from '../helpers.ts';
 
@@ -27,7 +26,7 @@ export function mountSocketConnectionDisconnectingHandler(socket: Socket) {
         }
 
         socket.nsp.in(buildSubscriptionRoomForIdentity(socket.data.identity)).emit(
-            STCConnectionEventName.USER_DISCONNECTED,
+            buildDisconnectedEventNameForIdentity(socket.data.identity),
             {
                 id: socket.data.identity.id,
                 meta: {

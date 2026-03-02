@@ -5,7 +5,32 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { STCConnectionEventName } from '@privateaim/messenger-kit';
 import type { SocketIdentity } from '@privateaim/server-realtime-kit';
+
+export function buildConnectedEventNameForIdentity(socket: Pick<SocketIdentity, 'type' | 'id'>) {
+    switch (socket.type) {
+        case 'client':
+            return STCConnectionEventName.CLIENT_CONNECTED;
+        case 'robot':
+            return STCConnectionEventName.ROBOT_CONNECTED;
+        case 'user':
+        default:
+            return STCConnectionEventName.USER_CONNECTED;
+    }
+}
+
+export function buildDisconnectedEventNameForIdentity(socket: Pick<SocketIdentity, 'type' | 'id'>) {
+    switch (socket.type) {
+        case 'client':
+            return STCConnectionEventName.CLIENT_DISCONNECTED;
+        case 'robot':
+            return STCConnectionEventName.ROBOT_DISCONNECTED;
+        case 'user':
+        default:
+            return STCConnectionEventName.USER_DISCONNECTED;
+    }
+}
 
 export function buildSubscriptionRoomForIdentity(socket: Pick<SocketIdentity, 'type' | 'id'>) {
     switch (socket.type) {

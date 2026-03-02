@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { STCConnectionEventName } from '@privateaim/messenger-kit';
 import type { Socket } from '../../../types.ts';
 import {
+    buildConnectedEventNameForIdentity,
     buildConnectionRoomForIdentity,
     buildSubscriptionRoomForIdentity,
 } from '../helpers.ts';
@@ -26,7 +26,7 @@ export function mountConnectionConnectHandler(socket: Socket) {
     }
 
     socket.nsp.in(buildSubscriptionRoomForIdentity(socket.data.identity)).emit(
-        STCConnectionEventName.USER_CONNECTED,
+        buildConnectedEventNameForIdentity(socket.data.identity),
         {
             id: socket.data.identity.id,
             meta: {
