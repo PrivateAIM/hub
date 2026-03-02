@@ -58,12 +58,15 @@ export function createSocketServer(
     });
 
     nsp.use((socket: Socket, next) => {
+        if (!socket.data.identity) {
+            return;
+        }
         const matches = socket.nsp.name.match(pattern);
         if (typeof matches[1] === 'undefined') {
-            if (socket.data.realmName !== REALM_MASTER_NAME) {
+            if (socket.data.identity.realmName !== REALM_MASTER_NAME) {
                 useLogger()
                     .error({
-                        message: `Socket/${socket.id}: Realm ${socket.data.realmName} is not permitted for the global scope.`,
+                        message: `Socket/${socket.id}: Realm ${socket.data.identity.realmName} is not permitted for the global scope.`,
                         [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
                     });
                 next(new ForbiddenError());
@@ -74,12 +77,12 @@ export function createSocketServer(
             [, socket.data.namespaceId] = matches;
 
             if (
-                matches[1] !== socket.data.realmId &&
-                socket.data.realmName !== REALM_MASTER_NAME
+                matches[1] !== socket.data.identity.realmId &&
+                socket.data.identity.realmName !== REALM_MASTER_NAME
             ) {
                 useLogger()
                     .error({
-                        message: `Socket/${socket.id}: Realm ${socket.data.realmName} is not permitted for the realm ${matches[1]}.`,
+                        message: `Socket/${socket.id}: Realm ${socket.data.identity.realmName} is not permitted for the realm ${matches[1]}.`,
                         [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
                     });
 
