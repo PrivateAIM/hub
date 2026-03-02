@@ -12,18 +12,20 @@ import {
 } from '@privateaim/messenger-kit';
 import type {
     CTSMessagingMessage,
-    CTSMessagingParty,
 } from '@privateaim/messenger-kit';
 import { useLogger } from '@privateaim/server-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import type { Socket } from '../../types.ts';
-import { buildConnectionRobotRoom, buildConnectionUserRoom } from '../connection/index.ts';
+import {
+    buildConnectionRoomForIdentity,
+} from '../connection/index.ts';
 
 export function mountMessagingController(socket: Socket) {
     const validator = new CTSMessagingMessageValidator();
 
     socket.on(CTSMessagingEventName.SEND, async (raw, cb) => {
-        if (!socket.data.userId && !socket.data.robotId) {
+        if (!socket.data.identity) {
+            cb(new Error('You are not authenticated as client, robot or user.'));
             return;
         }
 
@@ -42,18 +44,7 @@ export function mountMessagingController(socket: Socket) {
             return;
         }
 
-        let from : CTSMessagingParty;
-        if (socket.data.userId) {
-            from = {
-                type: 'user',
-                id: socket.data.userId,
-            };
-        } else {
-            from = {
-                type: 'robot',
-                id: socket.data.robotId,
-            };
-        }
+        const from = socket.data.identity;
 
         for (let i = 0; i < data.to.length; i++) {
             const to = data.to[i];
@@ -65,18 +56,7 @@ export function mountMessagingController(socket: Socket) {
                     actor_id: from.id,
                 });
 
-            if (to.type === 'user') {
-                socket.in(buildConnectionUserRoom(to.id))
-                    .emit(STCMessagingEventName.SEND, {
-                        from,
-                        data: data.data,
-                        metadata: data.metadata,
-                    });
-
-                continue;
-            }
-
-            socket.in(buildConnectionRobotRoom(to.id))
+            socket.in(buildConnectionRoomForIdentity(to))
                 .emit(STCMessagingEventName.SEND, {
                     from,
                     data: data.data,

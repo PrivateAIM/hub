@@ -6,6 +6,9 @@
  */
 
 export enum STCConnectionEventName {
+    CLIENT_CONNECTED = 'clientConnected',
+    CLIENT_DISCONNECTED = 'clientDisconnected',
+
     USER_CONNECTED = 'userConnected',
     USER_DISCONNECTED = 'userDisconnected',
 
@@ -14,6 +17,10 @@ export enum STCConnectionEventName {
 }
 
 export enum CTSConnectionEventName {
+    CLIENT_CONNECTIONS = 'clientConnections',
+    CLIENT_CONNECTION_SUBSCRIBE = 'clientConnectionSubscribe',
+    CLIENT_CONNECTION_UNSUBSCRIBE = 'clientConnectionUnsubscribe',
+
     USER_CONNECTIONS = 'userConnections',
     USER_CONNECTION_SUBSCRIBE = 'userConnectionSubscribe',
     USER_CONNECTION_UNSUBSCRIBE = 'userConnectionUnsubscribe',

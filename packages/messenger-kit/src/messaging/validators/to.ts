@@ -17,7 +17,7 @@ export class CTSMessagingPartyValidator extends Container<CTSMessagingParty> {
         this.mount(
             'id',
             createValidator(
-                z.string().uuid(),
+                z.uuid(),
             ),
         );
 

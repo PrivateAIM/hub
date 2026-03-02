@@ -5,9 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type {
-    Client, Realm, Robot, User,
-} from '@authup/core-kit';
 import type { PermissionChecker } from '@authup/access';
 import type {
     Namespace as _Namespace,
@@ -15,20 +12,16 @@ import type {
     Socket as _Socket,
 } from 'socket.io';
 
+export type SocketIdentity = {
+    id: string;
+    type: 'user' | 'client' | 'robot',
+    realmId: string,
+    realmName: string
+};
 export type SocketData = {
     permissionChecker?: PermissionChecker,
 
-    realmId?: Realm['id'],
-    realmName?: Realm['name'],
-
-    userId?: User['id'],
-    userName?: User['name'],
-
-    robotId?: Robot['id'],
-    robotName?: Robot['name'],
-
-    clientId?: Client['id'],
-    clientName?: Client['name'],
+    identity?: SocketIdentity,
 
     namespaceId?: string,
     roomSubscriptions: Record<string, number>,

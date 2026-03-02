@@ -46,23 +46,11 @@ export function mountAuthorizationMiddleware(
     nsp.use(middleware);
 
     nsp.use((socket, next) => {
-        if (socket.data.userId) {
-            useLogger().info(`Socket/${socket.id}: User connected.`, {
+        if (socket.data.identity) {
+            useLogger().info(`Socket/${socket.id}: ${socket.data.identity.type} connected.`, {
                 [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
-                actor_type: 'user',
-                actor_id: socket.data.userId,
-            });
-        } else if (socket.data.robotId) {
-            useLogger().info(`Socket/${socket.id}: Robot connected.`, {
-                [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
-                actor_type: 'robot',
-                actor_id: socket.data.robotId,
-            });
-        } else if (socket.data.clientId) {
-            useLogger().info(`Socket/${socket.id}: Client connected.`, {
-                [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
-                actor_type: 'client',
-                actor_id: socket.data.clientId,
+                actor_type: socket.data.identity.type,
+                actor_id: socket.data.identity.id,
             });
         } else {
             useLogger().warn(`Socket/${socket.id}: Not authenticated.`, {
@@ -74,23 +62,11 @@ export function mountAuthorizationMiddleware(
         }
 
         socket.on('disconnect', () => {
-            if (socket.data.userId) {
-                useLogger().info(`Socket/${socket.id}: User disconnected`, {
+            if (socket.data.identity) {
+                useLogger().info(`Socket/${socket.id}: ${socket.data.identity.type} disconnected`, {
                     [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
-                    actor_type: 'user',
-                    actor_id: socket.data.userId,
-                });
-            } else if (socket.data.robotId) {
-                useLogger().info(`Socket/${socket.id}: Robot disconnected`, {
-                    [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
-                    actor_type: 'robot',
-                    actor_id: socket.data.userId,
-                });
-            } else if (socket.data.clientId) {
-                useLogger().info(`Socket/${socket.id}: Client disconnected`, {
-                    [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
-                    actor_type: 'client',
-                    actor_id: socket.data.clientId,
+                    actor_type: socket.data.identity.type,
+                    actor_id: socket.data.identity.id,
                 });
             }
         });
