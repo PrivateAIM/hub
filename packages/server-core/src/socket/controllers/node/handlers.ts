@@ -16,13 +16,14 @@ import {
 } from '@privateaim/core-realtime-kit';
 import { UnauthorizedError } from '@ebec/http';
 import {
+    isSocketAuthenticated,
     subscribeSocketRoom,
     unsubscribeSocketRoom,
 } from '@privateaim/server-realtime-kit';
 import type { Socket } from '../../types.ts';
 
 export function registerNodeSocketHandlers(socket: Socket) {
-    if (!socket.data.userId && !socket.data.robotId) return;
+    if (!isSocketAuthenticated(socket)) return;
 
     socket.on(
         buildDomainEventFullName(DomainType.NODE, DomainEventSubscriptionName.SUBSCRIBE),

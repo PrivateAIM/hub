@@ -6,11 +6,12 @@
  */
 
 import { UnauthorizedError } from '@ebec/http';
+import { isSocketAuthenticated } from '../helpers/index.ts';
 import type { Namespace, Server } from '../types';
 
 export function mountForceLoggedInMiddleware(input: Namespace | Server) {
     input.use((socket, next) => {
-        if (socket.data.userId || socket.data.robotId) {
+        if (!isSocketAuthenticated(socket)) {
             next();
             return;
         }

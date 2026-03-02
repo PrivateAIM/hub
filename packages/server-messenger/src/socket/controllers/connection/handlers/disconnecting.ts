@@ -5,28 +5,19 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { STCConnectionEventName } from '@privateaim/messenger-kit';
 import type { Socket } from '../../../types.ts';
 import {
-    buildConnectionRobotRoom,
-    buildConnectionRobotSubscriptionRoom,
-    buildConnectionUserRoom,
-    buildConnectionUserSubscriptionRoom,
-} from '../utils.ts';
+    buildConnectionRoomForIdentity, buildDisconnectedEventNameForIdentity,
+    buildSubscriptionRoomForIdentity,
+} from '../helpers.ts';
 
 export function mountSocketConnectionDisconnectingHandler(socket: Socket) {
     socket.on('disconnecting', () => {
-        if (!socket.data.userId && !socket.data.robotId) {
+        if (!socket.data.identity) {
             return;
         }
 
-        let roomName: string;
-        if (socket.data.userId) {
-            roomName = buildConnectionUserRoom(socket.data.userId);
-        } else {
-            roomName = buildConnectionRobotRoom(socket.data.robotId);
-        }
-
+        const roomName = buildConnectionRoomForIdentity(socket.data.identity);
         socket.leave(roomName);
 
         const sockets = socket.nsp.adapter.rooms.get(roomName);
@@ -34,30 +25,14 @@ export function mountSocketConnectionDisconnectingHandler(socket: Socket) {
             return;
         }
 
-        if (socket.data.userId) {
-            socket.nsp.in(buildConnectionUserSubscriptionRoom(socket.data.userId)).emit(
-                STCConnectionEventName.USER_DISCONNECTED,
-                {
-                    id: socket.data.userId,
-                    meta: {
-                        roomName: buildConnectionUserSubscriptionRoom(socket.data.userId),
-                    },
+        socket.nsp.in(buildSubscriptionRoomForIdentity(socket.data.identity)).emit(
+            buildDisconnectedEventNameForIdentity(socket.data.identity),
+            {
+                id: socket.data.identity.id,
+                meta: {
+                    roomName: buildConnectionRoomForIdentity(socket.data.identity),
                 },
-            );
-
-            return;
-        }
-
-        if (socket.data.robotId) {
-            socket.nsp.in(buildConnectionRobotSubscriptionRoom(socket.data.robotId)).emit(
-                STCConnectionEventName.ROBOT_DISCONNECTED,
-                {
-                    id: socket.data.robotId,
-                    meta: {
-                        roomName: buildConnectionRobotSubscriptionRoom(socket.data.robotId),
-                    },
-                },
-            );
-        }
+            },
+        );
     });
 }

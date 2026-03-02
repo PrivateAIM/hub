@@ -8,11 +8,9 @@
 import { CTSConnectionEventName } from '@privateaim/messenger-kit';
 import type { Socket } from '../../../types.ts';
 import {
-    buildConnectionRobotRoom,
-    buildConnectionRobotSubscriptionRoom,
-    buildConnectionUserRoom,
-    buildConnectionUserSubscriptionRoom,
-} from '../utils.ts';
+    buildConnectionRoomForIdentity,
+    buildSubscriptionRoomForIdentity,
+} from '../helpers.ts';
 
 export function mountConnectionSubscriptionHandlers(socket: Socket) {
     socket.on(CTSConnectionEventName.USER_CONNECTIONS, (
@@ -27,7 +25,7 @@ export function mountConnectionSubscriptionHandlers(socket: Socket) {
             return;
         }
 
-        const sockets = socket.nsp.adapter.rooms.get(buildConnectionUserRoom(target));
+        const sockets = socket.nsp.adapter.rooms.get(buildConnectionRoomForIdentity({ type: 'user', id: `${target}` }));
 
         if (typeof cb === 'function') {
             cb(null, sockets.size);
@@ -41,7 +39,7 @@ export function mountConnectionSubscriptionHandlers(socket: Socket) {
             return;
         }
 
-        socket.join(buildConnectionUserSubscriptionRoom(target));
+        socket.join(buildSubscriptionRoomForIdentity({ type: 'user', id: `${target}` }));
     });
 
     socket.on(CTSConnectionEventName.USER_CONNECTION_UNSUBSCRIBE, (
@@ -51,7 +49,7 @@ export function mountConnectionSubscriptionHandlers(socket: Socket) {
             return;
         }
 
-        socket.leave(buildConnectionUserSubscriptionRoom(target));
+        socket.leave(buildSubscriptionRoomForIdentity({ type: 'user', id: `${target}` }));
     });
 
     // ----------------------------------------------------------
@@ -68,7 +66,7 @@ export function mountConnectionSubscriptionHandlers(socket: Socket) {
             return;
         }
 
-        const sockets = socket.nsp.adapter.rooms.get(buildConnectionRobotRoom(target));
+        const sockets = socket.nsp.adapter.rooms.get(buildConnectionRoomForIdentity({ type: 'robot', id: `${target}` }));
 
         if (typeof cb === 'function') {
             cb(null, sockets.size);
@@ -82,7 +80,7 @@ export function mountConnectionSubscriptionHandlers(socket: Socket) {
             return;
         }
 
-        socket.join(buildConnectionRobotSubscriptionRoom(target));
+        socket.join(buildSubscriptionRoomForIdentity({ type: 'robot', id: `${target}` }));
     });
 
     socket.on(CTSConnectionEventName.ROBOT_CONNECTION_UNSUBSCRIBE, (
@@ -92,6 +90,6 @@ export function mountConnectionSubscriptionHandlers(socket: Socket) {
             return;
         }
 
-        socket.leave(buildConnectionRobotSubscriptionRoom(target));
+        socket.leave(buildSubscriptionRoomForIdentity({ type: 'robot', id: `${target}` }));
     });
 }

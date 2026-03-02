@@ -8,7 +8,6 @@
 import { PermissionName as AuthupPermissionName, REALM_MASTER_NAME } from '@authup/core-kit';
 import type { PermissionItem } from '@authup/access';
 import { PermissionChecker, PermissionMemoryRepository } from '@authup/access';
-import { OAuth2SubKind } from '@authup/specs';
 import type { TokenVerificationData } from '@authup/server-adapter-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { Socket } from '../../types';
@@ -57,28 +56,14 @@ export function applyTokenVerificationData(
         abilities = data.permissions;
     }
 
-    socket.data.realmId = data.realm_id;
-    socket.data.realmName = data.realm_name;
+    socket.data.identity = {
+        type: data.sub_kind,
+        id: data.sub,
+        realmId: data.realm_id,
+        realmName: data.realm_name,
+    };
 
     socket.data.permissionChecker = new PermissionChecker({
         repository: new PermissionMemoryRepository(abilities),
     });
-
-    switch (data.sub_kind) {
-        case OAuth2SubKind.USER: {
-            socket.data.userId = data.sub;
-            socket.data.userName = data.sub_name;
-            break;
-        }
-        case OAuth2SubKind.ROBOT: {
-            socket.data.robotId = data.sub;
-            socket.data.robotName = data.sub_name;
-            break;
-        }
-        case OAuth2SubKind.CLIENT: {
-            socket.data.clientId = data.sub;
-            socket.data.clientName = data.sub_name;
-            break;
-        }
-    }
 }

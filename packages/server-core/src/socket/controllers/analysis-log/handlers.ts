@@ -16,6 +16,7 @@ import {
 import { UnauthorizedError } from '@ebec/http';
 import { PermissionName, buildDomainEventFullName } from '@privateaim/kit';
 import {
+    isSocketAuthenticated,
     subscribeSocketRoom,
     unsubscribeSocketRoom,
 } from '@privateaim/server-realtime-kit';
@@ -24,7 +25,7 @@ import type {
 } from '../../types.ts';
 
 export function registerAnalysisLogSocketHandlers(socket: Socket) {
-    if (!socket.data.userId && !socket.data.robotId) return;
+    if (!isSocketAuthenticated(socket)) return;
 
     socket.on(
         buildDomainEventFullName(DomainType.ANALYSIS_LOG, DomainEventSubscriptionName.SUBSCRIBE),

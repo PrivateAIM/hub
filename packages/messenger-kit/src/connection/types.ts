@@ -11,13 +11,15 @@ import type { CTSConnectionEventName, STCConnectionEventName } from './constants
 export type CTSConnectionEvents = {
     [K in `${CTSConnectionEventName.USER_CONNECTION_SUBSCRIBE}` |
         `${CTSConnectionEventName.USER_CONNECTION_UNSUBSCRIBE}` |
+        `${CTSConnectionEventName.CLIENT_CONNECTION_SUBSCRIBE}` |
+        `${CTSConnectionEventName.CLIENT_CONNECTION_UNSUBSCRIBE}` |
         `${CTSConnectionEventName.ROBOT_CONNECTION_SUBSCRIBE}` |
         `${CTSConnectionEventName.ROBOT_CONNECTION_UNSUBSCRIBE}`]: (
         target: EventTarget,
         cb?: EventCallback<undefined>
     ) => void
 } & {
-    [K in `${CTSConnectionEventName.USER_CONNECTIONS}` | `${CTSConnectionEventName.ROBOT_CONNECTIONS}`]: (
+    [K in `${CTSConnectionEventName.USER_CONNECTIONS}` | `${CTSConnectionEventName.ROBOT_CONNECTIONS}` | `${CTSConnectionEventName.CLIENT_CONNECTIONS}`]: (
         target: EventTarget,
         cb?: EventCallback<number>
     ) => void

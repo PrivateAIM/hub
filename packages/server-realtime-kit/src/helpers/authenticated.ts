@@ -8,7 +8,5 @@
 import type { Socket } from '../types';
 
 export function isSocketAuthenticated(socket: Socket) : boolean {
-    return !!socket.data.userId ||
-        !!socket.data.clientId ||
-        !!socket.data.robotId;
+    return !!socket.data.identity;
 }

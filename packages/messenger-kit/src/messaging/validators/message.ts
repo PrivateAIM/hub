@@ -18,8 +18,7 @@ export class CTSMessagingMessageValidator extends Container<CTSMessagingMessage>
         this.mount(
             'data',
             createValidator(
-                z.object({})
-                    .passthrough()
+                z.looseObject({})
                     .or(z.string())
                     .or(z.null())
                     .or(z.undefined())

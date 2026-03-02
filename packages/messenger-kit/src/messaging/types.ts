@@ -2,7 +2,7 @@ import type { EventCallback } from '../types';
 import type { CTSMessagingEventName, STCMessagingEventName } from './constants';
 
 export type CTSMessagingParty = {
-    type: 'user' | 'robot',
+    type: 'user' | 'robot' | 'client',
     id: string
 };
 

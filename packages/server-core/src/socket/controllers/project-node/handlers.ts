@@ -17,6 +17,7 @@ import {
 import { UnauthorizedError } from '@ebec/http';
 import { PermissionName, buildDomainEventFullName } from '@privateaim/kit';
 import {
+    isSocketAuthenticated,
     subscribeSocketRoom,
     unsubscribeSocketRoom,
 } from '@privateaim/server-realtime-kit';
@@ -25,7 +26,7 @@ import type {
 } from '../../types.ts';
 
 export function registerProjectNodeSocketHandlers(socket: Socket) {
-    if (!socket.data.userId && !socket.data.robotId) return;
+    if (!isSocketAuthenticated(socket)) return;
 
     // ------------------------------------------------------------
 
@@ -63,7 +64,7 @@ export function registerProjectNodeSocketHandlers(socket: Socket) {
 }
 
 export function registerProjectNodeForRealmSocketHandlers(socket: Socket) {
-    if (!socket.data.userId && !socket.data.robotId) return;
+    if (!isSocketAuthenticated(socket)) return;
 
     // ------------------------------------------------------------
 
