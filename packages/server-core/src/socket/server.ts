@@ -59,8 +59,10 @@ export function createSocketServer(
 
     nsp.use((socket: Socket, next) => {
         if (!socket.data.identity) {
+            next();
             return;
         }
+
         const matches = socket.nsp.name.match(pattern);
         if (typeof matches[1] === 'undefined') {
             if (socket.data.identity.realmName !== REALM_MASTER_NAME) {

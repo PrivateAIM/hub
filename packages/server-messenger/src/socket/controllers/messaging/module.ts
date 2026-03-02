@@ -25,7 +25,9 @@ export function mountMessagingController(socket: Socket) {
 
     socket.on(CTSMessagingEventName.SEND, async (raw, cb) => {
         if (!socket.data.identity) {
-            cb(new Error('You are not authenticated as client, robot or user.'));
+            if (typeof cb === 'function') {
+                cb(new Error('You are not authenticated as client, robot or user.'));
+            }
             return;
         }
 
