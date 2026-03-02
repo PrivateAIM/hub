@@ -11,12 +11,16 @@ export interface Environment {
     env: `${EnvironmentName}`,
     port: number,
 
+    clientId: string,
+    clientSecret: string
+
+    realm: string,
+
     publicURL: string,
 
     rabbitMqConnectionString?: string,
     redisConnectionString?: string,
     minioConnectionString: string,
-    vaultConnectionString?: string,
 
     authupURL?: string,
 }

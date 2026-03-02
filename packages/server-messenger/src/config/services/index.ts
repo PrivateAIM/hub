@@ -8,4 +8,3 @@
 export * from './amqp.ts';
 export * from './logger.ts';
 export * from './redis.ts';
-export * from './vault.ts';

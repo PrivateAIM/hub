@@ -6,6 +6,11 @@
  */
 
 export const EnvironmentInputKey = {
+    CLIENT_ID: 'CLIENT_ID',
+    CLIENT_SECRET: 'CLIENT_SECRET',
+
+    REALM: 'REALM',
+
     ENV: 'NODE_ENV',
     PORT: 'PORT',
 
@@ -28,9 +33,17 @@ export const EnvironmentInputKey = {
 } as const;
 
 export const EnvironmentDefaults = {
+    REALM: 'master',
+
+    CLIENT_ID: 'system',
+    CLIENT_SECRET: 'start123',
+
     REDIS: 'redis://127.0.0.1',
+
     RABBITMQ: 'amqp://root:start123@127.0.0.1',
+
     VAULT: 'start123@http://127.0.0.1:8090/v1/',
+
     MASTER_IMAGES_OWNER: 'PrivateAim',
     MASTER_IMAGES_REPOSITORY: 'master-images',
     MASTER_IMAGES_BRANCH: 'master',

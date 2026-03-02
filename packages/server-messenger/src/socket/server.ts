@@ -5,7 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { createServer, mountAuthupMiddleware, mountLoggingMiddleware } from '@privateaim/server-realtime-kit';
+import {
+    createServer,
+    mountAuthorizationMiddleware,
+    mountLoggingMiddleware,
+} from '@privateaim/server-realtime-kit';
 import type { Server as HTTPServer } from 'node:http';
 import type { Server } from 'socket.io';
 import { useEnv } from '../config/index.ts';
@@ -16,7 +20,7 @@ export function createSocketServer(httpServer: HTTPServer) : Server {
 
     mountLoggingMiddleware(server);
 
-    mountAuthupMiddleware(server, {
+    mountAuthorizationMiddleware(server, {
         baseURL: useEnv('authupURL'),
     });
 

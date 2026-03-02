@@ -5,10 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ClientAuthenticationHook } from '@authup/core-http-kit';
 import {
-    createAuthupTokenCreator,
-    setClientAuthenticationHookFactory,
+    createAuthupClientTokenCreator,
+    setupAuthupClientAuthenticationHook,
     useLogger,
 } from '@privateaim/server-kit';
 import { useEnv } from '../env/index.ts';
@@ -16,12 +15,17 @@ import { useEnv } from '../env/index.ts';
 export function configureAuthupClientAuthenticationHook() {
     const baseURL = useEnv('authupURL');
     if (!baseURL) {
-        useLogger().debug('Authup service url is not set.');
+        useLogger().warn('Authup service URL is not set.');
         return;
     }
 
-    setClientAuthenticationHookFactory(() => new ClientAuthenticationHook({
+    setupAuthupClientAuthenticationHook({
         baseURL,
-        tokenCreator: createAuthupTokenCreator(),
-    }));
+        creator: createAuthupClientTokenCreator({
+            baseURL,
+            clientId: useEnv('clientId'),
+            clientSecret: useEnv('clientSecret'),
+            realm: useEnv('realm'),
+        }),
+    });
 }

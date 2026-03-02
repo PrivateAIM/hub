@@ -5,13 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { VaultClient } from '@hapic/vault';
+import type { TokenVerifier } from '@authup/server-adapter-kit';
 import type { Client as RedisClient } from 'redis-extension';
 import type { Client as AuthupClient } from '@authup/core-http-kit';
 
-export type AuthupMiddlewareRegistrationOptions = {
-    client?: AuthupClient,
-    vaultClient?: VaultClient,
+export type AuthorizationMiddlewareRegistrationOptions = {
+    authupClient?: AuthupClient,
     redisClient?: RedisClient,
-    fakeAbilities?: boolean
+    tokenVerifier?: TokenVerifier,
+
+    dryRun?: boolean,
 };

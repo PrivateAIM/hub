@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { createAuthupClientAuthenticationHook, createAuthupUserTokenCreator } from '@privateaim/server-kit';
 import { APIClient } from '@privateaim/telemetry-kit';
 import { write } from 'envix';
 import { createServer } from 'node:http';
@@ -12,7 +13,7 @@ import type { Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { createNodeDispatcher } from 'routup';
 import { inject } from 'vitest';
-import { EnvironmentInputKey, configure } from '../../src';
+import { EnvironmentInputKey, configure, useEnv } from '../../src';
 import { createHTTPRouter } from '../../src/http';
 import { TestDatabase } from './database';
 
@@ -95,11 +96,20 @@ class TestSuite {
             baseURL,
         });
 
-        client.setAuthorizationHeader({
-            type: 'Basic',
-            username: 'admin',
-            password: 'start123',
-        });
+        const authupURL = useEnv('authupURL');
+        if (authupURL) {
+            const hook = createAuthupClientAuthenticationHook({
+                baseURL: authupURL,
+                tokenCreator: createAuthupUserTokenCreator({
+                    baseURL: authupURL,
+                    name: 'admin',
+                    password: 'start123',
+                    realm: 'master',
+                }),
+            });
+
+            hook.attach(client);
+        }
 
         this._client = client;
     }

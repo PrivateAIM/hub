@@ -10,17 +10,17 @@ import type { Factory } from 'singa';
 import { singa } from 'singa';
 
 const instance = singa<ClientAuthenticationHook>({
-    name: 'clientAuthenticationHook',
+    name: 'authupClientAuthenticationHook',
 });
 
-export function setClientAuthenticationHookFactory(factory: Factory<ClientAuthenticationHook>) {
+export function setAuthupClientAuthenticationHookFactory(factory: Factory<ClientAuthenticationHook>) {
     instance.setFactory(factory);
 }
 
-export function isClientAuthenticationHookUsable() {
+export function isAuthupClientAuthenticationHookUsable() {
     return instance.has() || instance.hasFactory();
 }
 
-export function useClientAuthenticationHook() {
+export function useAuthupClientAuthenticationHook() {
     return instance.use();
 }

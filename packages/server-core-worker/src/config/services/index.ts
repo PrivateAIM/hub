@@ -9,4 +9,3 @@ export * from './amqp';
 export * from './core';
 export * from './logger';
 export * from './storage';
-export * from './vault';

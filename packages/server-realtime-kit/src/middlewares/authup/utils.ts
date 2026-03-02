@@ -39,7 +39,7 @@ export function createFakeTokenVerificationData(): TokenVerificationDataMinimal 
 
         sub_kind: 'user',
         sub: 'd94b2f28-29e3-4ced-b8f1-6923a01dc1ee',
-        sub_name: 'admin',
+        sub_name: 'system',
 
         permissions: generateAbilities(),
     };

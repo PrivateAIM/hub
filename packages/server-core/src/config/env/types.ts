@@ -11,6 +11,11 @@ export interface Environment {
     env: `${EnvironmentName}`,
     port: number,
 
+    realm: string,
+
+    clientId: string,
+    clientSecret: string,
+
     redisConnectionString?: string,
     rabbitMqConnectionString?: string,
     vaultConnectionString?: string,

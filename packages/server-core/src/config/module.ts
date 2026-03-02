@@ -39,7 +39,6 @@ import {
     configureEventPublisher,
     configureRedis,
     configureTelemetryClient,
-    configureVault,
     setupLogging,
 } from './services/index.ts';
 
@@ -50,8 +49,6 @@ export type Config = {
 
 export function createConfig() : Config {
     setupLogging();
-
-    configureVault();
 
     configureAuthupClientAuthenticationHook();
 

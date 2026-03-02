@@ -5,7 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { AuthupClient, setAuthupClientFactory } from '@privateaim/server-kit';
+import {
+    AuthupClient,
+    isAuthupClientAuthenticationHookUsable,
+    setAuthupClientFactory,
+    useAuthupClientAuthenticationHook,
+} from '@privateaim/server-kit';
 import { useEnv } from '../env/index.ts';
 
 export function configureAuthup() {
@@ -14,7 +19,16 @@ export function configureAuthup() {
         return;
     }
 
-    setAuthupClientFactory(() => new AuthupClient({
-        baseURL,
-    }));
+    setAuthupClientFactory(() => {
+        const client = new AuthupClient({
+            baseURL,
+        });
+
+        if (isAuthupClientAuthenticationHookUsable()) {
+            const hook = useAuthupClientAuthenticationHook();
+            hook.attach(client);
+        }
+
+        return client;
+    });
 }

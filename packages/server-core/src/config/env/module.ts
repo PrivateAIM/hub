@@ -34,6 +34,11 @@ export function useEnv(key?: string) : any {
         env: read(EnvironmentInputKey.ENV, EnvironmentName.DEVELOPMENT) as `${EnvironmentName}`,
         port,
 
+        realm: read(EnvironmentInputKey.REALM, EnvironmentDefaults.REALM),
+
+        clientId: read(EnvironmentInputKey.CLIENT_ID, EnvironmentDefaults.CLIENT_ID),
+        clientSecret: read(EnvironmentInputKey.CLIENT_SECRET, EnvironmentDefaults.CLIENT_SECRET),
+
         harborURL: read(EnvironmentInputKey.HARBOR_URL),
 
         authupURL: read(EnvironmentInputKey.AUTHUP_URL),

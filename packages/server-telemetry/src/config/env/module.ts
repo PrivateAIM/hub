@@ -28,9 +28,13 @@ export function useEnv(key?: string) : any {
         port: readInt(EnvironmentInputKey.PORT, 3000),
         publicURL: read(EnvironmentInputKey.PUBLIC_URL, 'http://localhost:3000'),
 
+        clientId: read(EnvironmentInputKey.CLIENT_ID, 'system'),
+        clientSecret: read(EnvironmentInputKey.CLIENT_SECRET, 'start123'),
+
+        realm: read(EnvironmentInputKey.REALM, 'master'),
+
         rabbitMqConnectionString: read(EnvironmentInputKey.RABBITMQ_CONNECTION_STRING),
         redisConnectionString: read(EnvironmentInputKey.REDIS_CONNECTION_STRING),
-        vaultConnectionString: read(EnvironmentInputKey.VAULT_CONNECTION_STRING),
         authupURL: read(EnvironmentInputKey.AUTHUP_URL),
 
         victoriaLogsURL: read(EnvironmentInputKey.VICTORIA_LOGS_URL),

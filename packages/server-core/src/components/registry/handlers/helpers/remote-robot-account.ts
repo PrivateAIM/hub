@@ -7,8 +7,6 @@
 
 import { RobotPermissionAction, RobotPermissionResource, isClientErrorWithStatusCode } from '@hapic/harbor';
 import type { HarborClient, Robot } from '@hapic/harbor';
-import type { RegistryProjectVaultPayload } from '../../../../database/domains/index.ts';
-import { findRegistryProjectInVault, saveRegistryProjectToVault } from '../../../../database/domains/index.ts';
 
 export async function ensureRemoteRegistryProjectAccount(
     httpClient: HarborClient,
@@ -18,8 +16,6 @@ export async function ensureRemoteRegistryProjectAccount(
     },
 ) : Promise<Robot> {
     let robotAccount : Robot | undefined;
-
-    let secretStorageData : RegistryProjectVaultPayload | undefined;
 
     if (
         !context.account.id ||
@@ -49,45 +45,24 @@ export async function ensureRemoteRegistryProjectAccount(
             });
         } catch (e) {
             if (isClientErrorWithStatusCode(e, 409)) {
-                secretStorageData = await findRegistryProjectInVault(context.name);
-
-                if (secretStorageData) {
-                    robotAccount = {
-                        id: parseInt(secretStorageData.account_id, 10),
-                        name: secretStorageData.account_name,
-                        secret: secretStorageData.account_secret,
-                    };
-
-                    await httpClient.robot.updateSecret(
-                        robotAccount.id,
-                        robotAccount.secret,
-                    );
-                } else {
-                    const response = await httpClient.robot
-                        .getMany({
-                            query: {
-                                q: {
-                                    name: '1',
-                                },
-                                page_size: 1,
+                const response = await httpClient.robot
+                    .getMany({
+                        query: {
+                            q: {
+                                name: context.name,
                             },
-                        });
+                            page_size: 1,
+                        },
+                    });
 
-                    const robotAccount = response.data.pop();
-                    if (robotAccount) {
-                        const { secret } = await httpClient.robot.updateSecret(
-                            robotAccount.id,
-                        );
+                [robotAccount] = response.data;
+                if (robotAccount) {
+                    const { secret } = await httpClient.robot.updateSecret(
+                        robotAccount.id,
+                    );
 
-                        secretStorageData = {
-                            account_id: `${robotAccount.id}`,
-                            account_name: robotAccount.name,
-                            account_secret: secret,
-                        };
-                    }
+                    robotAccount.secret = secret;
                 }
-
-                await saveRegistryProjectToVault(context.name, secretStorageData);
             } else {
                 throw e;
             }
@@ -110,14 +85,6 @@ export async function ensureRemoteRegistryProjectAccount(
                 robotAccount.id,
                 robotAccount.secret,
             );
-
-            secretStorageData = {
-                account_id: `${robotAccount.id}`,
-                account_name: robotAccount.name,
-                account_secret: robotAccount.secret,
-            };
-
-            await saveRegistryProjectToVault(context.name, secretStorageData);
         } catch (e) {
             if (isClientErrorWithStatusCode(e, 404)) {
                 return ensureRemoteRegistryProjectAccount(httpClient, {

@@ -11,8 +11,8 @@ import { PermissionChecker, PermissionMemoryRepository } from '@authup/access';
 import { REALM_MASTER_NAME } from '@authup/core-kit';
 import type { TokenVerificationData } from '@authup/server-adapter-kit';
 import type { Request } from 'routup';
-import { RequestPermissionChecker, setRequestEnv } from '../../request';
-import { FakePermissionProvider } from './permission-provider';
+import { RequestPermissionChecker, setRequestEnv } from '../../request/index.ts';
+import { FakePermissionProvider } from './permission-provider.ts';
 
 type TokenVerificationDataMinimal = Pick<
 TokenVerificationData,
@@ -32,7 +32,7 @@ export function createFakeTokenVerificationData(): TokenVerificationDataMinimal 
 
         sub_kind: 'user',
         sub: 'd94b2f28-29e3-4ced-b8f1-6923a01dc1ee',
-        sub_name: 'admin',
+        sub_name: 'start123',
 
         permissions: [],
     };

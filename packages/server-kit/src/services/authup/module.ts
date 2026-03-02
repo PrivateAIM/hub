@@ -7,30 +7,8 @@
 
 import {
     Client,
-    ClientAuthenticationHook,
 } from '@authup/core-http-kit';
-import {
-    isClientAuthenticationHookUsable,
-    setClientAuthenticationHookFactory,
-    useClientAuthenticationHook,
-} from '../authup-client-authentication-hook';
-import { createAuthupTokenCreator } from './helpers';
-import type { AuthupClientOptions } from './types';
 
 export class AuthupClient extends Client {
-    constructor(options: AuthupClientOptions = {}) {
-        super(options);
 
-        if (!isClientAuthenticationHookUsable()) {
-            setClientAuthenticationHookFactory(
-                () => new ClientAuthenticationHook({
-                    baseURL: options.baseURL,
-                    tokenCreator: options.tokenCreator || createAuthupTokenCreator(),
-                }),
-            );
-        }
-
-        const hook = useClientAuthenticationHook();
-        hook.attach(this);
-    }
 }

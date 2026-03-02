@@ -8,21 +8,22 @@
 import {
     configureAMQP,
     configureAuthup,
+    configureAuthupClientAuthenticationHook,
     configureEventPublisher,
     configureMinio,
     configureRedis,
-    configureVault,
     setupLogging,
 } from './services/index.ts';
 
 export function configure() {
     setupLogging();
 
+    configureAuthupClientAuthenticationHook();
+
     configureAMQP();
     configureRedis();
     configureMinio();
     configureAuthup();
-    configureVault();
 
     configureEventPublisher();
 }

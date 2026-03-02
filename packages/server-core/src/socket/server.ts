@@ -12,13 +12,15 @@ import type {
     STCEvents,
     STSEvents,
 } from '@privateaim/core-realtime-kit';
+import { createAuthupTokenVerifier } from '@privateaim/server-http-kit';
 import {
+    createAuthupClientTokenCreator,
     useLogger,
 } from '@privateaim/server-kit';
 import type { Socket, SocketData } from '@privateaim/server-realtime-kit';
 import {
     createServer,
-    mountAuthupMiddleware,
+    mountAuthorizationMiddleware,
     mountLoggingMiddleware,
 } from '@privateaim/server-realtime-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
@@ -42,8 +44,17 @@ export function createSocketServer(
 
     mountLoggingMiddleware(nsp);
 
-    mountAuthupMiddleware(nsp, {
+    mountAuthorizationMiddleware(nsp, {
         baseURL: useEnv('authupURL'),
+        tokenVerifier: createAuthupTokenVerifier({
+            baseURL: useEnv('authupURL'),
+            creator: createAuthupClientTokenCreator({
+                baseURL: useEnv('authupURL'),
+                clientId: useEnv('clientId'),
+                clientSecret: useEnv('clientSecret'),
+                realm: useEnv('realm'),
+            }),
+        }),
     });
 
     nsp.use((socket: Socket, next) => {

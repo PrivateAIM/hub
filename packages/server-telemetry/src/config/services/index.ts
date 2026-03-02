@@ -7,9 +7,9 @@
 
 export * from './amqp.ts';
 export * from './authup.ts';
+export * from './authup-client-authentication-hook.ts';
 export * from './database.ts';
 export * from './entity-event-publisher.ts';
 export * from './logger.ts';
 export * from './victoria-logs.ts';
 export * from './redis.ts';
-export * from './vault.ts';
