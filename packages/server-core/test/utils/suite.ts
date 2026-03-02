@@ -93,18 +93,19 @@ class TestSuite {
         });
 
         const authupURL = useEnv('authupURL');
-
-        const hook = createAuthupClientAuthenticationHook({
-            baseURL: authupURL,
-            tokenCreator: createAuthupUserTokenCreator({
+        if (authupURL) {
+            const hook = createAuthupClientAuthenticationHook({
                 baseURL: authupURL,
-                name: 'admin',
-                password: 'start123',
-                realm: 'master',
-            }),
-        });
+                tokenCreator: createAuthupUserTokenCreator({
+                    baseURL: authupURL,
+                    name: 'admin',
+                    password: 'start123',
+                    realm: 'master',
+                }),
+            });
 
-        hook.attach(client);
+            hook.attach(client);
+        }
 
         this._client = client;
     }
