@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.8.30](https://github.com/PrivateAIM/hub/compare/v0.8.29...v0.8.30) (2026-03-02)
+
+
+### Features
+
+* support client identity for messenger/realtime communication ([#1464](https://github.com/PrivateAIM/hub/issues/1464)) ([5987458](https://github.com/PrivateAIM/hub/commit/59874581dbbc1101b79dd728b5786d5350074866))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.8.29 to ^0.8.30
+    * @privateaim/telemetry-kit bumped from ^0.8.29 to ^0.8.30
+    * @privateaim/server-kit bumped from ^0.8.29 to ^0.8.30
+
 ## [0.8.29](https://github.com/PrivateAIM/hub/compare/v0.8.28...v0.8.29) (2026-03-02)
 
 

@@ -1,7 +1,7 @@
 {
     "name": "@privateaim/core-realtime-kit",
     "type": "module",
-    "version": "0.7.30",
+    "version": "0.7.31",
     "license": "Apache-2.0",
     "description": "",
     "module": "./dist/index.mjs",
@@ -25,12 +25,12 @@
         "build-watch": "rimraf ./dist && tsc -p tsconfig.build.json --watch"
     },
     "devDependencies": {
-        "@privateaim/kit": "^0.8.29",
-        "@privateaim/core-kit": "^0.8.29"
+        "@privateaim/kit": "^0.8.30",
+        "@privateaim/core-kit": "^0.8.30"
     },
     "peerDependencies": {
-        "@privateaim/kit": "^0.8.29",
-        "@privateaim/core-kit": "^0.8.29"
+        "@privateaim/kit": "^0.8.30",
+        "@privateaim/core-kit": "^0.8.30"
     },
     "publishConfig": {
         "access": "public"
