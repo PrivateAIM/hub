@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.31](https://github.com/PrivateAIM/hub/compare/v0.8.30...v0.8.31) (2026-03-03)
+
+
+### Bug Fixes
+
+* passing tokenCreator to authorization middleware ([2d0e15a](https://github.com/PrivateAIM/hub/commit/2d0e15a34c445a5e444c5d7ea3c4b29196f287d9))
+
 ## [0.8.30](https://github.com/PrivateAIM/hub/compare/v0.8.29...v0.8.30) (2026-03-02)
 
 ## [0.8.29](https://github.com/PrivateAIM/hub/compare/v0.8.28...v0.8.29) (2026-03-02)
