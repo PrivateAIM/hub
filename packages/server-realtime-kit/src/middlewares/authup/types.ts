@@ -8,7 +8,7 @@
 import type { TokenVerifier } from '@authup/server-adapter-kit';
 
 export type AuthorizationMiddlewareRegistrationOptions = {
-    tokenVerifier?: TokenVerifier,
+    tokenVerifier: TokenVerifier,
     baseURL?: string,
     fakeAbilities?: boolean
 };

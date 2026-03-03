@@ -28,7 +28,7 @@ export function mountConnectionSubscriptionHandlers(socket: Socket) {
         const sockets = socket.nsp.adapter.rooms.get(buildConnectionRoomForIdentity({ type: 'user', id: `${target}` }));
 
         if (typeof cb === 'function') {
-            cb(null, sockets.size);
+            cb(null, sockets?.size || 0);
         }
     });
 
@@ -69,7 +69,7 @@ export function mountConnectionSubscriptionHandlers(socket: Socket) {
         const sockets = socket.nsp.adapter.rooms.get(buildConnectionRoomForIdentity({ type: 'robot', id: `${target}` }));
 
         if (typeof cb === 'function') {
-            cb(null, sockets.size);
+            cb(null, sockets?.size || 0);
         }
     });
 

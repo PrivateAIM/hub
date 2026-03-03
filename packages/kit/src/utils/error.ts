@@ -6,9 +6,10 @@
  */
 
 import { hasOwnProperty } from './has-own-property';
+import { isObject } from './is-object.ts';
 
-export function isError(e: unknown) {
-    return typeof e === 'object' && e && hasOwnProperty(e, 'message');
+export function isError(e: unknown) : e is Error {
+    return isObject(e) && e && hasOwnProperty(e, 'message');
 }
 
 export function extractErrorMessage(e: Error) {

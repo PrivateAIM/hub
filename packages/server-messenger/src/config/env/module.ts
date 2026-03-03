@@ -15,7 +15,7 @@ let instance : Environment | undefined;
 
 export function useEnv() : Environment;
 export function useEnv<K extends keyof Environment>(key: K) : Environment[K];
-export function useEnv(key?: string) : any {
+export function useEnv<K extends keyof Environment>(key?: K) : any {
     if (typeof instance !== 'undefined') {
         if (typeof key === 'string') {
             return instance[key];
@@ -28,9 +28,13 @@ export function useEnv(key?: string) : any {
         env: read('NODE_ENV', EnvironmentName.DEVELOPMENT) as `${EnvironmentName}`,
         port: readInt('PORT', 3000),
 
+        clientId: read('CLIENT_ID', 'system'),
+        clientSecret: read('CLIENT_SECRET', 'start123'),
+
+        realm: read('REALM', 'master'),
+
         rabbitMqConnectionString: read('RABBITMQ_CONNECTION_STRING'),
         redisConnectionString: orFail(read('REDIS_CONNECTION_STRING')),
-        vaultConnectionString: read('VAULT_CONNECTION_STRING'),
         authupURL: read('AUTHUP_URL', 'http://127.0.0.1:3010/'),
     };
 

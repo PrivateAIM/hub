@@ -23,6 +23,7 @@
         "@authup/kit": "^1.0.0-beta.30",
         "@authup/core-kit": "^1.0.0-beta.30",
         "@ebec/http": "^2.3.0",
+        "@privateaim/kit": "^0.8.30",
         "@privateaim/messenger-kit": "^0.7.31",
         "@privateaim/server-kit": "^0.8.30",
         "@privateaim/server-telemetry-kit": "^0.8.30",

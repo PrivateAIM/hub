@@ -1,7 +1,9 @@
 {
     "extends": "../../tsconfig.json",
     "compilerOptions": {
+        "strict": true,
         "paths": {
+            "@privateaim/kit": ["./packages/kit/src"],
             "@privateaim/messenger-kit": ["./packages/messenger-kit/src"],
             "@privateaim/server-kit": ["./packages/server-kit/src"],
             "@privateaim/telemetry-kit": ["./packages/telemetry-kit/src"],

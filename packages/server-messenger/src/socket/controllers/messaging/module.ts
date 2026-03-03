@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { isError } from '@privateaim/kit';
 import {
     CTSMessagingEventName,
     CTSMessagingMessageValidator,
@@ -36,11 +37,13 @@ export function mountMessagingController(socket: Socket) {
         try {
             data = await validator.run(raw);
         } catch (e) {
-            useLogger()
-                .error(e);
+            if (isError(e)) {
+                useLogger()
+                    .error(e);
 
-            if (typeof cb === 'function') {
-                cb(e);
+                if (typeof cb === 'function') {
+                    cb(e);
+                }
             }
 
             return;

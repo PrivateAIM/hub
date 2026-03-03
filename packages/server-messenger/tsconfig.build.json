@@ -2,6 +2,7 @@
     "extends": "../../tsconfig.build.json",
 
     "compilerOptions": {
+        "strict": true,
         "outDir": "./dist",
 
         "allowImportingTsExtensions": true,

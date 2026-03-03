@@ -5,6 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { createAuthupTokenVerifier } from '@privateaim/server-http-kit';
+import { createAuthupClientTokenCreator } from '@privateaim/server-kit';
 import {
     createServer,
     mountAuthorizationMiddleware,
@@ -22,6 +24,15 @@ export function createSocketServer(httpServer: HTTPServer) : Server {
 
     mountAuthorizationMiddleware(server, {
         baseURL: useEnv('authupURL'),
+        tokenVerifier: createAuthupTokenVerifier({
+            baseURL: useEnv('authupURL'),
+            creator: createAuthupClientTokenCreator({
+                baseURL: useEnv('authupURL'),
+                clientId: useEnv('clientId'),
+                clientSecret: useEnv('clientSecret'),
+                realm: useEnv('realm'),
+            }),
+        }),
     });
 
     registerControllers(server);
