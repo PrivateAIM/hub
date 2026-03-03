@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.31](https://github.com/PrivateAIM/hub/compare/v0.8.30...v0.8.31) (2026-03-03)
+
+
+### Bug Fixes
+
+* **deps:** bump the minorandpatch group with 5 updates ([#1468](https://github.com/PrivateAIM/hub/issues/1468)) ([b419d03](https://github.com/PrivateAIM/hub/commit/b419d035469c2c789298c5214afb06278388d42c))
+* passing tokenCreator to authorization middleware ([2d0e15a](https://github.com/PrivateAIM/hub/commit/2d0e15a34c445a5e444c5d7ea3c4b29196f287d9))
+
 ## [0.8.30](https://github.com/PrivateAIM/hub/compare/v0.8.29...v0.8.30) (2026-03-02)
 
 

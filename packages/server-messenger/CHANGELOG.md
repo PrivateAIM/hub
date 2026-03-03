@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.8.31](https://github.com/PrivateAIM/hub/compare/v0.8.30...v0.8.31) (2026-03-03)
+
+
+### Bug Fixes
+
+* passing tokenCreator to authorization middleware ([2d0e15a](https://github.com/PrivateAIM/hub/commit/2d0e15a34c445a5e444c5d7ea3c4b29196f287d9))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.8.30 to ^0.8.31
+    * @privateaim/messenger-kit bumped from ^0.7.31 to ^0.7.32
+    * @privateaim/server-kit bumped from ^0.8.30 to ^0.8.31
+    * @privateaim/server-telemetry-kit bumped from ^0.8.30 to ^0.8.31
+    * @privateaim/server-http-kit bumped from ^0.8.30 to ^0.8.31
+    * @privateaim/server-realtime-kit bumped from ^0.8.30 to ^0.8.31
+    * @privateaim/telemetry-kit bumped from ^0.8.30 to ^0.8.31
+
 ## [0.8.30](https://github.com/PrivateAIM/hub/compare/v0.8.29...v0.8.30) (2026-03-02)
 
 

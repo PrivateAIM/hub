@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.8.31](https://github.com/PrivateAIM/hub/compare/v0.8.30...v0.8.31) (2026-03-03)
+
+
+### Bug Fixes
+
+* **deps:** bump the minorandpatch group with 5 updates ([#1468](https://github.com/PrivateAIM/hub/issues/1468)) ([b419d03](https://github.com/PrivateAIM/hub/commit/b419d035469c2c789298c5214afb06278388d42c))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.8.30 to ^0.8.31
+    * @privateaim/core-kit bumped from ^0.8.30 to ^0.8.31
+    * @privateaim/telemetry-kit bumped from ^0.8.30 to ^0.8.31
+    * @privateaim/core-http-kit bumped from ^0.8.30 to ^0.8.31
+    * @privateaim/core-realtime-kit bumped from ^0.7.31 to ^0.7.32
+    * @privateaim/storage-kit bumped from ^0.8.30 to ^0.8.31
+  * peerDependencies
+    * @privateaim/kit bumped from ^0.8.30 to ^0.8.31
+    * @privateaim/core-kit bumped from ^0.8.30 to ^0.8.31
+    * @privateaim/core-http-kit bumped from ^0.8.30 to ^0.8.31
+    * @privateaim/storage-kit bumped from ^0.8.30 to ^0.8.31
+    * @privateaim/telemetry-kit bumped from ^0.8.30 to ^0.8.31
+
 ## [0.8.30](https://github.com/PrivateAIM/hub/compare/v0.8.29...v0.8.30) (2026-03-02)
 
 
