@@ -16,7 +16,7 @@ export function mountAuthorizationMiddleware(
     router: Router,
     options: AuthorizationMiddlewareRegistrationOptions,
 ) {
-    if (!options.authupClient) {
+    if (!options.authupClient || !options.tokenVerifier) {
         const data = createFakeTokenVerificationData();
 
         router.use(coreHandler((req, res, next) => {
