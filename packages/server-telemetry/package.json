@@ -39,7 +39,7 @@
         "envix": "^1.3.0",
         "hapic": "^2.8.2",
         "locter": "^2.2.1",
-        "mysql2": "^3.18.1",
+        "mysql2": "^3.19.0",
         "node-cron": "^4.2.1",
         "rapiq": "0.9.0",
         "redis-extension": "^2.0.4",
