@@ -62,7 +62,7 @@
         "@types/tar-stream": "^3.1.4",
         "testcontainers": "^11.12.0",
         "ts-node": "^10.9.2",
-        "vitest": "^4.0.18"
+        "vitest": "^4.1.0"
     },
     "scripts": {
         "cli": "node dist/cli/index.js",
