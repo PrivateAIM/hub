@@ -44,7 +44,7 @@
         "hapic": "^2.8.2",
         "locter": "^2.2.1",
         "minio": "^8.0.7",
-        "mysql2": "^3.19.1",
+        "mysql2": "^3.20.0",
         "redis-extension": "^2.0.4",
         "reflect-metadata": "^0.2.2",
         "routup": "^4.1.0",
@@ -56,13 +56,13 @@
         "zod": "^4.3.6"
     },
     "devDependencies": {
-        "@faker-js/faker": "^10.3.0",
+        "@faker-js/faker": "^10.4.0",
         "@types/busboy": "^1.5.3",
         "@types/cors": "^2.8.19",
         "@types/tar-stream": "^3.1.4",
-        "testcontainers": "^11.12.0",
+        "testcontainers": "^11.13.0",
         "ts-node": "^10.9.2",
-        "vitest": "^4.0.18"
+        "vitest": "^4.1.1"
     },
     "scripts": {
         "cli": "node dist/cli/index.js",
