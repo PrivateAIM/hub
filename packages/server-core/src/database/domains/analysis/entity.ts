@@ -114,7 +114,7 @@ export class AnalysisEntity implements Analysis {
         build_os: string | null;
 
     @Column({
-        type: 'int', unsigned: true, nullable: true, default: null,
+        type: 'bigint', unsigned: true, nullable: true, default: null,
     })
         build_size: number | null;
 
