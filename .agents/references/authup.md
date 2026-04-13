@@ -7,18 +7,37 @@ Hub integrates [Authup](https://github.com/authup/authup) as its OAuth2 identity
 | | Version | Date | Commit |
 |---|---------|------|--------|
 | **Latest stable** | v1.0.0-beta.32 | 2026-03-30 | — |
-| **Hub pinned** | v1.0.0-beta.30 | 2026-02-26 | — |
+| **Hub pinned** | ^1.0.0-beta.31 | 2026-04-13 | — |
 | **Master HEAD** | — | 2026-04-13 | `b95589a06e8907cefcb8b1c704682928d513766e` |
 
 ### Hub Dependency Versions
 
 | Package | Pinned Version |
 |---------|---------------|
-| `@authup/kit` | 1.0.0-beta.30 |
-| `@authup/core-kit` | 1.0.0-beta.30 |
-| `@authup/server-adapter` | 1.0.0-beta.30 |
-| `@authup/client-web-nuxt` | 1.0.0-beta.30 |
-| `@authup/access` | 1.0.0-beta.30 |
+| `@authup/kit` | ^1.0.0-beta.31 |
+| `@authup/core-kit` | ^1.0.0-beta.31 |
+| `@authup/access` | ^1.0.0-beta.31 |
+| `@authup/server-adapter-*` | ^1.0.0-beta.31 |
+| `@authup/client-web-kit` | ^1.0.0-beta.31 |
+| `@authup/client-web-nuxt` | ^1.0.0-beta.31 |
+| `@authup/specs` | ^1.0.0-beta.31 |
+| `@authup/core-http-kit` | ^1.0.0-beta.31 |
+| `@authup/core-realtime-kit` | ^1.0.0-beta.31 |
+
+### Breaking Changes in beta.31
+
+| Old (`@authup/access`) | New | PR |
+|---|---|---|
+| `PermissionChecker` | `PermissionEvaluator` | #2943 |
+| `PermissionMemoryRepository` | `PermissionMemoryProvider` | #2943 |
+| `IPermissionRepository` | `IPermissionProvider` | #2943 |
+| `IPermissionChecker` | `IPermissionEvaluator` | #2943 |
+| `PermissionCheckerCheckContext` | `PermissionEvaluationContext` | #2943 |
+| `PermissionItem` (flat `{ name }`) | `PermissionBinding` (nested `{ permission: { name } }`) | #2950 |
+| `.check()` / `.preCheck()` | `.evaluate()` / `.preEvaluate()` | #2943 |
+| `.checkOneOf()` / `.preCheckOneOf()` | `.evaluateOneOf()` / `.preEvaluateOneOf()` | #2943 |
+| `PolicyIdentity` (`@authup/kit`) | `IdentityPolicyData` (`@authup/access`) | #2943 |
+| `store.permissionChecker` (`client-web-kit`) | `store.permissionEvaluator` | #2943 |
 
 ## Code Mapping (Authup → Hub)
 

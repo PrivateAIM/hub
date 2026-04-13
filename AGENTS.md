@@ -45,3 +45,13 @@ Apps are in `apps/` (currently empty), packages are in `packages/`. Libraries ex
 - **[Architecture](.agents/architecture.md)** — Routup HTTP framework, TypeORM entities, AMQP messaging, Authup auth integration
 - **[Testing](.agents/testing.md)** — Vitest with SWC, multi-database CI matrix (MySQL/Postgres/SQLite)
 - **[Conventions](.agents/conventions.md)** — Conventional Commits, Husky hooks, ESLint, Rollup bundling, Nx caching
+
+## Active Plans
+
+Modernization and refactoring plans (execute in order):
+
+1. **[Tooling Modernization](.agents/plans/001-tooling-modernization.md)** — ESLint 10, tsdown, monoship, ESM-only
+2. **[Monorepo Restructuring](.agents/plans/002-monorepo-restructuring.md)** — Move services to `apps/`, keep libraries in `packages/`
+3. **[Dependency Injection](.agents/plans/003-dependency-injection.md)** — Replace `singa` singletons with DI container + module system
+4. **[Hexagonal: server-core](.agents/plans/004-hexagonal-server-core.md)** — Core/adapters/app separation for the main service
+5. **[Hexagonal: remaining services](.agents/plans/005-hexagonal-remaining-services.md)** — Apply pattern to storage, telemetry, worker, messenger
