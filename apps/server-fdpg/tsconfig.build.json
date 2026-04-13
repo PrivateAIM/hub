@@ -1,0 +1,16 @@
+{
+    "extends": "../../tsconfig.build.json",
+
+    "compilerOptions": {
+        "strict": true,
+        "outDir": "./dist",
+        "resolveJsonModule": true,
+        "strictPropertyInitialization": false,
+        "allowImportingTsExtensions": true,
+        "rewriteRelativeImportExtensions": true
+    },
+
+    "include": [
+        "src/**/*.ts"
+    ]
+}

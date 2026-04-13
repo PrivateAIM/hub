@@ -7,7 +7,7 @@
 
 export type SwaggerGenerateOptions = {
     baseURL: string,
-    authupURL?: string,
+    authupURL?: string | null,
     cwd?: string,
     controllerBasePath: string,
 };

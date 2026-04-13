@@ -1,0 +1,29 @@
+/*
+ * Copyright (c) 2025.
+ * Author Peter Placzek (tada5hi)
+ * For the full copyright and license information,
+ * view the LICENSE file that was distributed with this source code.
+ */
+
+import {
+    configureAMQP,
+    configureAuthup,
+    configureAuthupClientAuthenticationHook,
+    configureEntityEventPublisher,
+    configureRedis,
+    setupLogging,
+} from './services/index.ts';
+
+export function configure() {
+    setupLogging();
+
+    setupLogging();
+
+    configureAuthupClientAuthenticationHook();
+
+    configureAMQP();
+    configureRedis();
+    configureAuthup();
+
+    configureEntityEventPublisher();
+}

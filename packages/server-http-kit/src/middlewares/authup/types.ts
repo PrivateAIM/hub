@@ -5,14 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { TokenVerifier } from '@authup/server-adapter-kit';
+import type { ITokenVerifier } from '@authup/server-adapter-kit';
 import type { Client as RedisClient } from 'redis-extension';
 import type { Client as AuthupClient } from '@authup/core-http-kit';
 
 export type AuthorizationMiddlewareRegistrationOptions = {
     authupClient?: AuthupClient,
     redisClient?: RedisClient,
-    tokenVerifier?: TokenVerifier,
+    tokenVerifier?: ITokenVerifier,
 
     dryRun?: boolean,
 };
