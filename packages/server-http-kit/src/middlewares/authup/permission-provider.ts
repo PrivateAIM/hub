@@ -5,14 +5,15 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { IPermissionRepository, PermissionGetOptions, PermissionItem } from '@authup/access';
+import type { IPermissionProvider, PermissionBinding, PermissionGetOptions } from '@authup/access';
 
-export class FakePermissionProvider implements IPermissionRepository {
-    async findOne(criteria: PermissionGetOptions): Promise<PermissionItem | null> {
+export class FakePermissionProvider implements IPermissionProvider {
+    async findOne(criteria: PermissionGetOptions): Promise<PermissionBinding | null> {
         return {
-            name: criteria.name,
-            realmId: criteria.realmId,
-            policy: null,
+            permission: {
+                name: criteria.name,
+                realm_id: criteria.realmId,
+            },
         };
     }
 }

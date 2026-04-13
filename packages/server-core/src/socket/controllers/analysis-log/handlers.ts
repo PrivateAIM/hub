@@ -31,7 +31,7 @@ export function registerAnalysisLogSocketHandlers(socket: Socket) {
         buildDomainEventFullName(DomainType.ANALYSIS_LOG, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             try {
-                await socket.data.permissionChecker.preCheckOneOf({
+                await socket.data.permissionChecker.preEvaluateOneOf({
                     name: [
                         PermissionName.ANALYSIS_UPDATE,
                     ],

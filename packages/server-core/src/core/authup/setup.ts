@@ -65,6 +65,8 @@ export async function setupAuthupService(): Promise<any> {
         try {
             await authupClient.permission.create({
                 name: permissionNames[i],
+                realm_id: null,
+                client_id: null,
             });
 
             useLogger().debug(`Created permission ${permissionNames[i]}`);

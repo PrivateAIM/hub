@@ -5,8 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { IdentityPolicyData } from '@authup/access';
+import { BuiltInPolicyType, PolicyData } from '@authup/access';
 import type { Store } from '@authup/client-web-kit';
-import type { PolicyIdentity } from '@authup/kit';
 import type {
     NavigationItem,
     NavigationItemNormalized,
@@ -80,7 +81,7 @@ export class Navigation {
         }
 
         const { loggedIn } = this.store;
-        let identity: PolicyIdentity | undefined;
+        let identity: IdentityPolicyData | undefined;
         if (this.store.userId) {
             identity = {
                 type: 'user',
@@ -116,11 +117,11 @@ export class Navigation {
 
             if (permissions.length > 0) {
                 try {
-                    await this.store.permissionChecker.preCheckOneOf({
+                    const input = new PolicyData();
+                    input.set(BuiltInPolicyType.IDENTITY, identity);
+                    await this.store.permissionEvaluator.preEvaluateOneOf({
                         name: permissions,
-                        data: {
-                            identity,
-                        },
+                        input,
                     });
                 } catch (e) {
                     canPass = false;

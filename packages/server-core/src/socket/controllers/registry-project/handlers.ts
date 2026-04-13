@@ -31,7 +31,7 @@ export function registerRegistryProjectSocketHandlers(socket: Socket) {
         buildDomainEventFullName(DomainType.REGISTRY_PROJECT, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             try {
-                await socket.data.permissionChecker.preCheckOneOf({
+                await socket.data.permissionChecker.preEvaluateOneOf({
                     name: [
                         PermissionName.REGISTRY_MANAGE,
                         PermissionName.REGISTRY_PROJECT_MANAGE,

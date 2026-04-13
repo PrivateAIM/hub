@@ -6,8 +6,8 @@
  */
 
 import { unwrapOAuth2Scope } from '@authup/specs';
-import type { IPermissionRepository } from '@authup/access';
-import { PermissionChecker, PermissionMemoryRepository } from '@authup/access';
+import type { IPermissionProvider } from '@authup/access';
+import { PermissionEvaluator, PermissionMemoryProvider } from '@authup/access';
 import { REALM_MASTER_NAME } from '@authup/core-kit';
 import type { TokenVerificationData } from '@authup/server-adapter-kit';
 import type { Request } from 'routup';
@@ -43,17 +43,23 @@ export function applyTokenVerificationData(
     data: TokenVerificationDataMinimal,
     fakeAbilities?: boolean,
 ) {
-    let repository : IPermissionRepository;
+    let repository : IPermissionProvider;
     if (fakeAbilities) {
         repository = new FakePermissionProvider();
     } else {
-        repository = new PermissionMemoryRepository(data.permissions);
+        repository = new PermissionMemoryProvider(data.permissions.map((p) => ({
+            permission: {
+                name: p.name,
+                realm_id: p.realm_id,
+                client_id: p.client_id,
+            },
+        })));
     }
 
-    const permissionChecker = new PermissionChecker({
+    const permissionEvaluator = new PermissionEvaluator({
         repository,
     });
-    const requestPermissionChecker = new RequestPermissionChecker(req, permissionChecker);
+    const requestPermissionChecker = new RequestPermissionChecker(req, permissionEvaluator);
     setRequestEnv(req, 'permissionChecker', requestPermissionChecker);
 
     setRequestEnv(req, 'identity', {

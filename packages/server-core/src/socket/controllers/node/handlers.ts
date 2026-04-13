@@ -29,7 +29,7 @@ export function registerNodeSocketHandlers(socket: Socket) {
         buildDomainEventFullName(DomainType.NODE, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             try {
-                await socket.data.permissionChecker.preCheckOneOf({
+                await socket.data.permissionChecker.preEvaluateOneOf({
                     name: [
                         PermissionName.NODE_UPDATE,
                     ],
