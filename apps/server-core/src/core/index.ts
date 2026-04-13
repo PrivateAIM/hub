@@ -6,5 +6,6 @@
  */
 
 export * from './authup/index.ts';
+export * from './entities/index.ts';
 export * from './harbor/index.ts';
 export * from './utils/index.ts';

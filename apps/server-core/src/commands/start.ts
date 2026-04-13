@@ -8,14 +8,9 @@
 import { generateSwagger } from '@privateaim/server-http-kit';
 import { useLogger } from '@privateaim/server-kit';
 import path from 'node:path';
-import { DataSource } from 'typeorm';
-import {
-    checkDatabase,
-    createDatabase,
-    setDataSource,
-    synchronizeDatabaseSchema,
-} from 'typeorm-extension';
 import { createApplication } from '../app/index.ts';
+import { DatabaseInjectionKey } from '../app/modules/database/index.ts';
+import { HTTPInjectionKey } from '../app/modules/http/index.ts';
 import { createSocketServer } from '../socket/index.ts';
 import {
     createConfig,
@@ -24,9 +19,6 @@ import {
     useEnv,
 } from '../config/index.ts';
 import { setupAuthupService, setupHarborService } from '../core/index.ts';
-import { DataSourceOptionsBuilder, setDataSourceSync } from '../database/index.ts';
-import { createRouter } from '../http/router.ts';
-import { createHttpServer } from '../http/server.ts';
 import { DatabaseIntegrityService } from '../services/index.ts';
 
 export async function startCommand() {
@@ -53,57 +45,24 @@ export async function startCommand() {
 
     logger.debug('Generated documentation.');
 
-    const optionsBuilder = new DataSourceOptionsBuilder();
-    const options = optionsBuilder.buildWithEnv();
+    // DataSource is created and registered by DatabaseModule
+    const dataSource = app.container.resolve(DatabaseInjectionKey.DataSource);
 
-    logger.debug(`Database: ${options.type}`);
-
-    const check = await checkDatabase({
-        options,
-        dataSourceCleanup: true,
-    });
-
-    if (!check.exists) {
-        await createDatabase({
-            options, 
-            synchronize: false, 
-            ifNotExist: true, 
-        });
-    }
-
-    logger.debug('Establishing database connection...');
-
-    const dataSource = new DataSource(options);
-    await dataSource.initialize();
-
-    setDataSource(dataSource);
-    setDataSourceSync(dataSource);
-
-    logger.debug('Established database connection.');
-
-    // if (!check.schema) {
-    logger.debug('Applying database schema...');
-
-    await synchronizeDatabaseSchema(dataSource);
-
-    logger.debug('Applied database schema.');
-    // }
+    logger.debug(`Database: ${dataSource.options.type}`);
 
     const databaseIntegrity = new DatabaseIntegrityService(dataSource);
     await databaseIntegrity.check();
 
-    // if (!check.schema) {
     logger.debug('Executing authup service setup...');
     await setupAuthupService();
     logger.debug('Executed authup service setup.');
-    // }
 
     logger.debug('Executing harbor service setup...');
     await setupHarborService();
     logger.debug('Executed harbor service setup.');
 
-    const router = createRouter();
-    const httpServer = createHttpServer({ router });
+    // HTTP server is created and registered by HTTPModule
+    const httpServer = app.container.resolve(HTTPInjectionKey.Server);
 
     createSocketServer(httpServer);
 

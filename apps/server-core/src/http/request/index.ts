@@ -5,4 +5,5 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
+export * from './helpers/index.ts';
 export * from './repository.ts';

@@ -8,31 +8,33 @@ import { DataSourceOptionsBuilder as BaseBuilder } from '@privateaim/server-db-k
 import {
     AnalysisBucketEntity,
     AnalysisBucketFileEntity,
-    AnalysisBucketFileSubscriber,
-    AnalysisBucketSubscriber,
     AnalysisEntity,
     AnalysisNodeEntity,
     AnalysisNodeEventEntity,
-    AnalysisNodeEventSubscriber,
-    AnalysisNodeSubscriber,
     AnalysisPermissionEntity,
-    AnalysisPermissionSubscriber,
-    AnalysisSubscriber,
     MasterImageEntity,
     MasterImageGroupEntity,
-    MasterImageGroupSubscriber,
-    MasterImageSubscriber,
     NodeEntity,
-    NodeSubscriber,
     ProjectEntity,
     ProjectNodeEntity,
-    ProjectNodeSubscriber,
-    ProjectSubscriber,
     RegistryEntity,
     RegistryProjectEntity,
+} from '../../adapters/database/entities/index.ts';
+import {
+    AnalysisBucketFileSubscriber,
+    AnalysisBucketSubscriber,
+    AnalysisNodeEventSubscriber,
+    AnalysisNodeSubscriber,
+    AnalysisPermissionSubscriber,
+    AnalysisSubscriber,
+    MasterImageGroupSubscriber,
+    MasterImageSubscriber,
+    NodeSubscriber,
+    ProjectNodeSubscriber,
+    ProjectSubscriber,
     RegistryProjectSubscriber,
     RegistrySubscriber,
-} from '../domains/index.ts';
+} from '../../adapters/database/subscribers/index.ts';
 
 export class DataSourceOptionsBuilder extends BaseBuilder {
     constructor() {

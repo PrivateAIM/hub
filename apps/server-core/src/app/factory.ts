@@ -6,7 +6,6 @@
  */
 
 import {
-    BaseApplicationBuilder,
     EntityEventRedisHandler,
     EntityEventSocketHandler,
     LoggerConsoleTransport,
@@ -21,12 +20,14 @@ import {
 } from '@privateaim/server-telemetry-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import { useEnv } from '../config/env/index.ts';
+import { ServerCoreApplicationBuilder } from './builder.ts';
 import { TelemetryClientModule } from './modules/telemetry-client/index.ts';
 
 export function createApplication() {
     const env = useEnv();
 
-    const builder = new BaseApplicationBuilder()
+    const builder = new ServerCoreApplicationBuilder()
+        .withConfig()
         .withAmqp({ connectionString: env.rabbitMqConnectionString })
         .withRedis({ connectionString: env.redisConnectionString });
 
@@ -76,6 +77,9 @@ export function createApplication() {
             }),
         ],
     });
+
+    builder.withDatabase();
+    builder.withHTTP();
 
     const app = builder.build();
 
