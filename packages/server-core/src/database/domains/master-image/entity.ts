@@ -44,7 +44,7 @@ export class MasterImageEntity implements MasterImage {
         build_hash: string | null;
 
     @Column({
-        type: 'int', unsigned: true, nullable: true, default: null,
+        type: 'bigint', unsigned: true, nullable: true, default: null,
     })
         build_size: number | null;
 
