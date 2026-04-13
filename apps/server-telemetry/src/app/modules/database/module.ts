@@ -42,10 +42,15 @@ export class DatabaseModule implements IModule {
         const dataSource = new DS(options);
         await dataSource.initialize();
 
-        setDataSource(dataSource);
+        try {
+            setDataSource(dataSource);
 
-        if (!check.schema) {
-            await synchronizeDatabaseSchema(dataSource);
+            if (!check.schema) {
+                await synchronizeDatabaseSchema(dataSource);
+            }
+        } catch (e) {
+            await dataSource.destroy();
+            throw e;
         }
 
         container.register(DataSourceInjectionKey, { useValue: dataSource });

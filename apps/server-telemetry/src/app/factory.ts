@@ -69,7 +69,7 @@ export function createApplication() {
                         const component = new LogComponentWriteHandler();
                         await component.handle(value);
                     } catch (e) {
-                        console.log(e);
+                        console.error(e);
                     }
                 },
             }),

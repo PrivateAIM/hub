@@ -13,18 +13,18 @@ import { AuthupClientInjectionKey } from './constants';
 import { AuthupClient } from './module';
 import { setAuthupClientFactory } from './singleton';
 
-export type AuthupModuleOptions = {
+export type AuthupClientModuleOptions = {
     baseURL: string;
 };
 
-export class AuthupModule implements IModule {
-    readonly name = ModuleName.AUTHUP;
+export class AuthupClientModule implements IModule {
+    readonly name = ModuleName.AUTHUP_CLIENT;
 
     readonly dependencies: (string | ModuleDependency)[] = [{ name: ModuleName.AUTHUP_HOOK, optional: true }];
 
-    private options: AuthupModuleOptions;
+    private options: AuthupClientModuleOptions;
 
-    constructor(options: AuthupModuleOptions) {
+    constructor(options: AuthupClientModuleOptions) {
         this.options = options;
     }
 

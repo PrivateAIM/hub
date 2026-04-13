@@ -11,8 +11,8 @@ import type { AmqpModuleOptions } from '../../services/amqp/di-module';
 import { AmqpModule } from '../../services/amqp/di-module';
 import type { AuthupHookModuleOptions } from '../../services/authup/client-hook/di-module';
 import { AuthupHookModule } from '../../services/authup/client-hook/di-module';
-import type { AuthupModuleOptions } from '../../services/authup/client/di-module';
-import { AuthupModule } from '../../services/authup/client/di-module';
+import type { AuthupClientModuleOptions } from '../../services/authup/client/di-module';
+import { AuthupClientModule } from '../../services/authup/client/di-module';
 import { CacheModule } from '../../services/cache/di-module';
 import type { EntityEventModuleOptions } from '../../services/entity-event/di-module';
 import { EntityEventModule } from '../../services/entity-event/di-module';
@@ -53,9 +53,9 @@ export class BaseApplicationBuilder {
         return this;
     }
 
-    withAuthup(options: AuthupModuleOptions | false): this {
+    withAuthup(options: AuthupClientModuleOptions | false): this {
         if (options !== false) {
-            this.modules.push(new AuthupModule(options));
+            this.modules.push(new AuthupClientModule(options));
         }
         return this;
     }

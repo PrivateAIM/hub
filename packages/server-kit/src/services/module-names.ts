@@ -9,7 +9,7 @@ export const ModuleName = {
     LOGGER: 'logger',
     REDIS: 'redis',
     AMQP: 'amqp',
-    AUTHUP: 'authup',
+    AUTHUP_CLIENT: 'authupClient',
     AUTHUP_HOOK: 'authupHook',
     ENTITY_EVENT: 'entityEvent',
     CACHE: 'cache',
