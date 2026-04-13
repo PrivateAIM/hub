@@ -6,59 +6,80 @@
  */
 
 import {
-    Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn,
+    Column, 
+    CreateDateColumn, 
+    Entity, 
+    JoinColumn, 
+    ManyToOne, 
+    PrimaryGeneratedColumn, 
+    UpdateDateColumn,
 } from 'typeorm';
 import type { MasterImage, Project } from '@privateaim/core-kit';
 import type {
-    Client, Realm, Robot, User,
+    Client, 
+    Realm, 
+    Robot, 
+    User,
 } from '@authup/core-kit';
 import { MasterImageEntity } from '../master-image/index.ts';
 
 @Entity({ name: 'projects' })
 export class ProjectEntity implements Project {
     @PrimaryGeneratedColumn('uuid')
-        id: string;
+    id: string;
 
-    @Column({ type: 'varchar', length: 256, unique: true })
-        name: string;
+    @Column({
+        type: 'varchar', 
+        length: 256, 
+        unique: true, 
+    })
+    name: string;
 
     @Column({ type: 'text', nullable: true })
-        description: string | null;
+    description: string | null;
 
     // ------------------------------------------------------------------
 
-    @Column({ type: 'int', unsigned: true, default: 0 })
-        analyses: number;
+    @Column({
+        type: 'int', 
+        unsigned: true, 
+        default: 0, 
+    })
+    analyses: number;
 
-    @Column({ type: 'int', unsigned: true, default: 0 })
-        nodes: number;
+    @Column({
+        type: 'int', 
+        unsigned: true, 
+        default: 0, 
+    })
+    nodes: number;
 
     // ------------------------------------------------------------------
 
     @CreateDateColumn()
-        created_at: Date;
+    created_at: Date;
 
     @UpdateDateColumn()
-        updated_at: Date;
+    updated_at: Date;
 
     // ------------------------------------------------------------------
 
     @Column({ type: 'uuid' })
-        realm_id: Realm['id'];
+    realm_id: Realm['id'];
 
     @Column({ type: 'uuid', nullable: true })
-        client_id: Client['id'] | null;
+    client_id: Client['id'] | null;
 
     @Column({ type: 'uuid', nullable: true })
-        user_id: User['id'] | null;
+    user_id: User['id'] | null;
 
     @Column({ type: 'uuid', nullable: true })
-        robot_id: Robot['id'] | null;
+    robot_id: Robot['id'] | null;
 
     @Column({ nullable: true, default: null })
-        master_image_id: MasterImage['id'] | null;
+    master_image_id: MasterImage['id'] | null;
 
     @ManyToOne(() => MasterImageEntity, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'master_image_id' })
-        master_image: MasterImageEntity | null;
+    master_image: MasterImageEntity | null;
 }

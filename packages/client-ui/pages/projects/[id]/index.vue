@@ -7,7 +7,10 @@
 <script lang="ts">
 import { ARealm } from '@authup/client-web-kit';
 import {
-    FMasterImage, FProjectCreator, FProjectNodeApprovalStatus, FProjectNodes,
+    FMasterImage, 
+    FProjectCreator, 
+    FProjectNodeApprovalStatus, 
+    FProjectNodes,
 } from '@privateaim/client-vue';
 import type { Project, ProjectNode } from '@privateaim/core-kit';
 import type { BuildInput } from 'rapiq';
@@ -35,19 +38,11 @@ export default defineNuxtComponent({
     },
     setup(props) {
         const projectNodeQuery : BuildInput<ProjectNode> = {
-            filter: {
-                project_id: props.entity.id,
-            },
-            sort: {
-                node: {
-                    name: 'ASC',
-                },
-            },
+            filter: { project_id: props.entity.id },
+            sort: { node: { name: 'ASC' } },
         };
 
-        return {
-            projectNodeQuery,
-        };
+        return { projectNodeQuery };
     },
 });
 </script>

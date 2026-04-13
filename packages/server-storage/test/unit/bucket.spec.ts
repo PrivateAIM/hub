@@ -6,7 +6,11 @@
  */
 
 import {
-    afterAll, beforeAll, describe, expect, it,
+    afterAll, 
+    beforeAll, 
+    describe, 
+    expect, 
+    it,
 } from 'vitest';
 import {
     createTestSuite,
@@ -31,9 +35,7 @@ describe('controllers/bucket', () => {
 
     it('should create resource', async () => {
         const client = suite.client();
-        const input = createTestBucket({
-            region: 'eu-west',
-        });
+        const input = createTestBucket({ region: 'eu-west' });
         const data = await client.bucket.create(input);
 
         expect(data.name).toEqual(input.name);

@@ -7,7 +7,15 @@
 import type { MasterImage, MasterImageCommand } from '@privateaim/core-kit';
 
 import {
-    DBody, DController, DDelete, DGet, DPath, DPost, DRequest, DResponse, DTags,
+    DBody, 
+    DController, 
+    DDelete, 
+    DGet, 
+    DPath, 
+    DPost, 
+    DRequest, 
+    DResponse, 
+    DTags,
 } from '@routup/decorators';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import {
@@ -25,7 +33,7 @@ export class MasterImageController {
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
         @DRequest() req: any,
-            @DResponse() res: any,
+        @DResponse() res: any,
     ): Promise<PartialMasterImage[]> {
         return await getManyMasterImageRouteHandler(req, res) as PartialMasterImage[];
     }
@@ -33,19 +41,19 @@ export class MasterImageController {
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<PartialMasterImage | undefined> {
         return await getOneMasterImageRouteHandler(req, res) as PartialMasterImage | undefined;
     }
 
     @DPost('/command', [ForceLoggedInMiddleware])
     async runCommand(
-    @DBody() data: {
-        command: MasterImageCommand
-    },
-    @DRequest() req: any,
-    @DResponse() res: any,
+        @DBody() data: {
+            command: MasterImageCommand
+        },
+        @DRequest() req: any,
+        @DResponse() res: any,
     ) {
         return commandMasterImageRouteHandler(req, res);
     }
@@ -53,8 +61,8 @@ export class MasterImageController {
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @DPath('id') id: string,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<PartialMasterImage | undefined> {
         return deleteMasterImageRouteHandler(req, res);
     }

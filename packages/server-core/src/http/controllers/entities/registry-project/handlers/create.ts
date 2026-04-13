@@ -22,9 +22,7 @@ export async function createRegistryProjectRouteHandler(req: Request, res: Respo
 
     const validator = new RegistryProjectValidator();
     const validatorAdapter = new RoutupContainerAdapter(validator);
-    const data = await validatorAdapter.run(req, {
-        group: HTTPHandlerOperation.CREATE,
-    });
+    const data = await validatorAdapter.run(req, { group: HTTPHandlerOperation.CREATE });
 
     const dataSource = await useDataSource();
     await validateEntityJoinColumns(data, {
@@ -45,9 +43,7 @@ export async function createRegistryProjectRouteHandler(req: Request, res: Respo
     const caller = useRegistryComponentCaller();
     await caller.call(
         RegistryCommand.PROJECT_LINK,
-        {
-            id: entity.id,
-        },
+        { id: entity.id },
         {},
     );
 

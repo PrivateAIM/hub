@@ -28,9 +28,7 @@ export function createHTTPRouter() : Router {
 
     let swagger : MiddlewareSwaggerOptions | boolean;
     if (useEnv('env') !== EnvironmentName.TEST) {
-        swagger = {
-            baseURL: useEnv('publicURL'),
-        };
+        swagger = { baseURL: useEnv('publicURL') };
     } else {
         swagger = false;
     }
@@ -69,9 +67,7 @@ export function createHTTPRouter() : Router {
 
     mountErrorMiddleware(router);
 
-    router.get('/', coreHandler(() => ({
-        timestamp: Date.now(),
-    })));
+    router.get('/', coreHandler(() => ({ timestamp: Date.now() })));
 
     return router;
 }

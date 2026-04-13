@@ -41,9 +41,7 @@ export async function executeBucketFileRouteGetOneHandler(req: Request, res: Res
                 'bucket_id',
             ],
         },
-        relations: {
-            allowed: ['bucket'],
-        },
+        relations: { allowed: ['bucket'] },
     });
 
     const entity = await query.getOne();
@@ -97,12 +95,8 @@ export async function executeBucketFileRouteGetManyHandler(req: Request, res: Re
                 'bucket_id',
             ],
         },
-        pagination: {
-            maxLimit: 50,
-        },
-        sort: {
-            allowed: ['id', 'directory', 'name', 'updated_at', 'created_at'],
-        },
+        pagination: { maxLimit: 50 },
+        sort: { allowed: ['id', 'directory', 'name', 'updated_at', 'created_at'] },
     });
 
     const [entities, total] = await query.getManyAndCount();

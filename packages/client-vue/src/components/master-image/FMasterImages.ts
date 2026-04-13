@@ -37,21 +37,13 @@ export default defineComponent({
                     delete filters.name;
                 }
             },
-            query: {
-                sort: {
-                    virtual_path: 'ASC',
-                },
-            },
+            query: { sort: { virtual_path: 'ASC' } },
         });
 
         setDefaults({
-            item: {
-                textPropName: 'virtual_path',
-            },
+            item: { textPropName: 'virtual_path' },
 
-            noMore: {
-                content: 'No more master-images available...',
-            },
+            noMore: { content: 'No more master-images available...' },
         });
 
         return () => render();

@@ -32,9 +32,7 @@ export default defineComponent({
             busy.value = true;
 
             try {
-                await apiClient.service.runRegistryCommand(RegistryAPICommand.CLEANUP, {
-                    id: props.entityId,
-                });
+                await apiClient.service.runRegistryCommand(RegistryAPICommand.CLEANUP, { id: props.entityId });
 
                 emit('executed');
             } catch (e) {

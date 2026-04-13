@@ -69,9 +69,7 @@ export async function getManyEventLogRouteHandler(req: Request, res: Response) :
                 'updated_at',
             ],
         },
-        pagination: {
-            maxLimit: 50,
-        },
+        pagination: { maxLimit: 50 },
         relations: {
             allowed: [],
             onJoin: (_property, key, query) => {

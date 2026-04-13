@@ -12,10 +12,14 @@ import { PermissionName } from '@authup/core-kit';
 import { defineComponent, ref } from 'vue';
 import type { Ref } from 'vue';
 import {
-    definePageMeta, updateObjectProperties, useToast,
+    definePageMeta, 
+    updateObjectProperties, 
+    useToast,
 } from '#imports';
 import {
-    createError, navigateTo, useRoute,
+    createError, 
+    navigateTo, 
+    useRoute,
 } from '#app';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
 import DomainEntityNav from '../../../components/DomainEntityNav';
@@ -36,13 +40,19 @@ export default defineComponent({
 
         const items = [
             {
-                name: 'General', icon: 'fas fa-bars', path: '',
+                name: 'General', 
+                icon: 'fas fa-bars', 
+                path: '',
             },
             {
-                name: 'Permissions', icon: 'fas fa-user-secret', path: 'permissions',
+                name: 'Permissions', 
+                icon: 'fas fa-user-secret', 
+                path: 'permissions',
             },
             {
-                name: 'Roles', icon: 'fa-solid fa-user-group', path: 'roles',
+                name: 'Roles', 
+                icon: 'fa-solid fa-user-group', 
+                path: 'roles',
             },
         ];
 
@@ -55,7 +65,7 @@ export default defineComponent({
             entity.value = await injectHTTPClient()
                 .user
                 .getOne(route.params.id as string, { fields: ['+email'] });
-        } catch (e) {
+        } catch {
             await navigateTo({ path: '/admin/users' });
             throw createError({});
         }

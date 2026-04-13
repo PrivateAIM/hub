@@ -15,15 +15,9 @@ export const FTitle = defineComponent({
             type: Boolean,
             default: true,
         },
-        iconPosition: {
-            type: String as PropType<'start' | 'end'>,
-        },
-        iconClass: {
-            type: String,
-        },
-        text: {
-            type: String,
-        },
+        iconPosition: { type: String as PropType<'start' | 'end'> },
+        iconClass: { type: String },
+        text: { type: String },
     },
     slots: Object as SlotsType<{
         default: Record<string, any>

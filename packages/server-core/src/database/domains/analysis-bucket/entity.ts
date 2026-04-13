@@ -6,7 +6,9 @@
  */
 
 import type {
-    Analysis, AnalysisBucket, AnalysisBucketType,
+    Analysis, 
+    AnalysisBucket, 
+    AnalysisBucketType,
 } from '@privateaim/core-kit';
 import {
     Column,
@@ -14,7 +16,8 @@ import {
     Entity,
     JoinColumn,
     ManyToOne,
-    PrimaryGeneratedColumn, Unique,
+    PrimaryGeneratedColumn, 
+    Unique,
     UpdateDateColumn,
 } from 'typeorm';
 import type { Realm } from '@authup/core-kit';
@@ -24,33 +27,33 @@ import { AnalysisEntity } from '../analysis/entity.ts';
 @Entity({ name: 'analysis_buckets' })
 export class AnalysisBucketEntity implements AnalysisBucket {
     @PrimaryGeneratedColumn('uuid')
-        id: string;
+    id: string;
 
     @Column({ type: 'varchar', length: 64 })
-        type: `${AnalysisBucketType}`;
+    type: `${AnalysisBucketType}`;
 
     @Column({ type: 'uuid' })
-        bucket_id: string;
+    bucket_id: string;
 
     // ------------------------------------------------------------------
 
     @Column()
-        analysis_id: Analysis['id'];
+    analysis_id: Analysis['id'];
 
     @ManyToOne(() => AnalysisEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'analysis_id' })
-        analysis: AnalysisEntity;
+    analysis: AnalysisEntity;
 
     // ------------------------------------------------------------------
 
     @Column({ type: 'uuid' })
-        realm_id: Realm['id'];
+    realm_id: Realm['id'];
 
     // ------------------------------------------------------------------
 
     @CreateDateColumn()
-        created_at: Date;
+    created_at: Date;
 
     @UpdateDateColumn()
-        updated_at: Date;
+    updated_at: Date;
 }

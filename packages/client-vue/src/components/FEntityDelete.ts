@@ -15,7 +15,12 @@ import type {
     VNodeProps,
 } from 'vue';
 import {
-    defineComponent, getCurrentInstance, h, mergeProps, ref, resolveDynamicComponent,
+    defineComponent, 
+    getCurrentInstance, 
+    h, 
+    mergeProps, 
+    ref, 
+    resolveDynamicComponent,
 } from 'vue';
 import type { DomainAPISlim } from '@privateaim/core-http-kit';
 import { injectCoreHTTPClient, injectStorageHTTPClient, injectTelemetryHTTPClient } from '../core';
@@ -134,11 +139,7 @@ export default defineComponent({
             let icon : VNodeArrayChildren = [];
             if (props.elementIcon) {
                 icon = [
-                    h('i', {
-                        class: [props.elementIcon, {
-                            'pe-1': props.withText,
-                        }],
-                    }),
+                    h('i', { class: [props.elementIcon, { 'pe-1': props.withText }] }),
                 ];
             }
 

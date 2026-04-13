@@ -13,7 +13,7 @@ import { PermissionName } from '@privateaim/kit';
 import type { Socket } from '../../types';
 
 type TokenVerificationDataMinimal = Pick<
-TokenVerificationData,
+    TokenVerificationData,
 'permissions' |
 'realm_id' |
 'realm_name' |
@@ -67,7 +67,5 @@ export function applyTokenVerificationData(
         realmName: data.realm_name,
     };
 
-    socket.data.permissionChecker = new PermissionEvaluator({
-        repository: new PermissionMemoryProvider(abilities),
-    });
+    socket.data.permissionChecker = new PermissionEvaluator({ repository: new PermissionMemoryProvider(abilities) });
 }

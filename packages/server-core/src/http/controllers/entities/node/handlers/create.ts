@@ -9,7 +9,10 @@ import {
     RegistryProjectType,
 } from '@privateaim/core-kit';
 import {
-    PermissionName, createNanoID, isHex, isRealmResourceWritable,
+    PermissionName, 
+    createNanoID, 
+    isHex, 
+    isRealmResourceWritable,
 } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
@@ -21,7 +24,9 @@ import { RegistryCommand, useRegistryComponentCaller } from '../../../../../comp
 import { RequestRepositoryAdapter } from '../../../../request/index.ts';
 import { NodeValidator } from '../utils/index.ts';
 import {
-    NodeEntity, RegistryEntity, RegistryProjectEntity,
+    NodeEntity, 
+    RegistryEntity, 
+    RegistryProjectEntity,
 } from '../../../../../database/index.ts';
 
 export async function createNodeRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -30,9 +35,7 @@ export async function createNodeRouteHandler(req: Request, res: Response) : Prom
 
     const validator = new NodeValidator();
     const validatorAdapter = new RoutupContainerAdapter(validator);
-    const data = await validatorAdapter.run(req, {
-        group: HTTPHandlerOperation.CREATE,
-    });
+    const data = await validatorAdapter.run(req, { group: HTTPHandlerOperation.CREATE });
 
     const dataSource = await useDataSource();
     await validateEntityJoinColumns(data, {
@@ -71,9 +74,7 @@ export async function createNodeRouteHandler(req: Request, res: Response) : Prom
     } else {
         const registryRepository = dataSource.getRepository(RegistryEntity);
         // todo: default registry should be selected by unique identifying attribute
-        const registries = await registryRepository.find({
-            take: 1,
-        });
+        const registries = await registryRepository.find({ take: 1 });
         const [registry] = registries;
         if (registry) {
             registryId = entity.registry_id;
@@ -101,9 +102,7 @@ export async function createNodeRouteHandler(req: Request, res: Response) : Prom
         const caller = useRegistryComponentCaller();
         await caller.call(
             RegistryCommand.PROJECT_LINK,
-            {
-                id: registryProject.id,
-            },
+            { id: registryProject.id },
             {},
         );
     }

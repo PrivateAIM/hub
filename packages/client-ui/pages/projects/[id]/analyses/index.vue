@@ -22,7 +22,10 @@ import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
 
 export default defineNuxtComponent({
     components: {
-        ListTitle, ListSearch, ListPagination, FAnalyses,
+        ListTitle, 
+        ListSearch, 
+        ListPagination, 
+        FAnalyses,
     },
     props: {
         entity: {
@@ -50,15 +53,9 @@ export default defineNuxtComponent({
             ],
         });
 
-        const query = computed<BuildInput<Analysis>>(() => ({
-            filter: {
-                project_id: props.entity.id,
-            },
-        }));
+        const query = computed<BuildInput<Analysis>>(() => ({ filter: { project_id: props.entity.id } }));
 
-        return {
-            query,
-        };
+        return { query };
     },
 });
 </script>

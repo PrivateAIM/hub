@@ -11,9 +11,7 @@ import { computed, defineComponent } from 'vue';
 
 export default defineComponent({
     props: {
-        value: {
-            type: String as PropType<`${ProcessStatus}` | null>,
-        },
+        value: { type: String as PropType<`${ProcessStatus}` | null> },
         defaultValue: {
             type: String,
             default: 'none',

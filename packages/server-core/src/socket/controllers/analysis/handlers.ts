@@ -36,7 +36,7 @@ export function registerAnalysisSocketHandlers(socket: Socket) {
                         PermissionName.ANALYSIS_EXECUTION_STOP,
                     ],
                 });
-            } catch (e) {
+            } catch {
                 if (isEventCallback(cb)) {
                     cb(new UnauthorizedError());
                 }

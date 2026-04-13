@@ -34,9 +34,7 @@ export default defineNuxtComponent({
             emit('updated', entity);
         };
 
-        return {
-            handleUpdated,
-        };
+        return { handleUpdated };
     },
 });
 </script>

@@ -10,11 +10,17 @@ import { useLogger } from '@privateaim/server-kit';
 import path from 'node:path';
 import { DataSource } from 'typeorm';
 import {
-    checkDatabase, createDatabase, setDataSource, synchronizeDatabaseSchema,
+    checkDatabase, 
+    createDatabase, 
+    setDataSource, 
+    synchronizeDatabaseSchema,
 } from 'typeorm-extension';
 import { createSocketServer } from '../socket/index.ts';
 import {
-    createConfig, getRootDirPath, getWritableDirPath, useEnv,
+    createConfig, 
+    getRootDirPath, 
+    getWritableDirPath, 
+    useEnv,
 } from '../config/index.ts';
 import { setupAuthupService, setupHarborService } from '../core/index.ts';
 import { DataSourceOptionsBuilder, setDataSourceSync } from '../database/index.ts';
@@ -56,7 +62,11 @@ export async function startCommand() {
     });
 
     if (!check.exists) {
-        await createDatabase({ options, synchronize: false, ifNotExist: true });
+        await createDatabase({
+            options, 
+            synchronize: false, 
+            ifNotExist: true, 
+        });
     }
 
     logger.debug('Establishing database connection...');

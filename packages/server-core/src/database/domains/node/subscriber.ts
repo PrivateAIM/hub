@@ -8,16 +8,18 @@
 import {
     DomainType,
 } from '@privateaim/core-kit';
+import type { 
+    EntityManager, 
+    EntitySubscriberInterface, 
+    InsertEvent, 
+    RemoveEvent, 
+    UpdateEvent, 
+} from 'typeorm';
 import {
-    EntityManager,
-    EntitySubscriberInterface,
     EventSubscriber,
-    InsertEvent,
-    RemoveEvent,
-    UpdateEvent,
 } from 'typeorm';
 import { BaseSubscriber } from '@privateaim/server-db-kit';
-import { EntityEventDestination } from '@privateaim/server-kit';
+import type { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
 import { NodeEntity } from './entity.ts';
 import { isNodeClientServiceUsable, useNodeClientService } from '../../../services/index.ts';

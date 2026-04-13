@@ -21,9 +21,7 @@ export async function createRegistryRouteHandler(req: Request, res: Response) : 
 
     const validator = new RegistryValidator();
     const validatorAdapter = new RoutupContainerAdapter(validator);
-    const data = await validatorAdapter.run(req, {
-        group: HTTPHandlerOperation.CREATE,
-    });
+    const data = await validatorAdapter.run(req, { group: HTTPHandlerOperation.CREATE });
 
     data.host = getHostNameFromString(data.host);
 

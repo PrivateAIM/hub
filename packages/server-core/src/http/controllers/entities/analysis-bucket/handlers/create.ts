@@ -16,9 +16,7 @@ import { AnalysisBucketValidator } from '../utils/index.ts';
 export async function createAnalysisBucketRouteHandler(req: Request, res: Response) : Promise<any> {
     const validator = new AnalysisBucketValidator();
     const validatorAdapter = new RoutupContainerAdapter(validator);
-    const data = await validatorAdapter.run(req, {
-        group: HTTPHandlerOperation.CREATE,
-    });
+    const data = await validatorAdapter.run(req, { group: HTTPHandlerOperation.CREATE });
 
     const dataSource = await useDataSource();
     await validateEntityJoinColumns(data, {

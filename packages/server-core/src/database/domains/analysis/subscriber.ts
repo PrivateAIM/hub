@@ -6,12 +6,15 @@
  */
 
 import type {
-    EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,
+    EntitySubscriberInterface, 
+    InsertEvent, 
+    RemoveEvent, 
+    UpdateEvent,
 } from 'typeorm';
 import { EventSubscriber } from 'typeorm';
 import { DomainType } from '@privateaim/core-kit';
 import { BaseSubscriber } from '@privateaim/server-db-kit';
-import { EntityEventDestination } from '@privateaim/server-kit';
+import type { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
 import { AnalysisMetadataCommand, useAnalysisMetadataComponentCaller } from '../../../components/index.ts';
 import { AnalysisStorageManager } from '../../../services/analysis-storage-manager/index.ts';
@@ -20,7 +23,7 @@ import { AnalysisEntity } from './entity.ts';
 
 @EventSubscriber()
 export class AnalysisSubscriber extends BaseSubscriber<
-AnalysisEntity
+    AnalysisEntity
 > implements EntitySubscriberInterface<AnalysisEntity> {
     constructor() {
         super({
@@ -94,9 +97,7 @@ AnalysisEntity
                 queryNodes: false,
                 queryFiles: false,
             },
-            {
-                entityManager: event.manager,
-            },
+            { entityManager: event.manager },
         );
     }
 

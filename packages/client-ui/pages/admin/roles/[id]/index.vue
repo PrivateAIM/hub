@@ -14,9 +14,7 @@ import { defineNuxtComponent, definePageMeta } from '#imports';
 import { LayoutKey } from '../../../../config/layout';
 
 export default defineNuxtComponent({
-    components: {
-        ARoleForm,
-    },
+    components: { ARoleForm },
     props: {
         entity: {
             type: Object as PropType<Role>,
@@ -25,9 +23,7 @@ export default defineNuxtComponent({
     },
     emits: ['updated', 'failed'],
     setup(props, { emit }) {
-        definePageMeta({
-            [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        });
+        definePageMeta({ [LayoutKey.REQUIRED_LOGGED_IN]: true });
 
         const handleUpdated = (e: Role) => {
             emit('updated', e);

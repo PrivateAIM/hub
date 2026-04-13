@@ -18,32 +18,40 @@ import {
 @Entity({ name: 'buckets' })
 export class BucketEntity implements Bucket {
     @PrimaryGeneratedColumn('uuid')
-        id: string;
+    id: string;
 
     @Column({ type: 'varchar', length: 256 })
-        name: string;
+    name: string;
 
-    @Column({ type: 'varchar', length: 256, nullable: true })
-        region: string | null;
+    @Column({
+        type: 'varchar', 
+        length: 256, 
+        nullable: true, 
+    })
+    region: string | null;
 
     // ------------------------------------------------------------------
 
     @CreateDateColumn()
-        created_at: Date;
+    created_at: Date;
 
     @UpdateDateColumn()
-        updated_at: Date;
+    updated_at: Date;
 
     // ------------------------------------------------------------------
 
     @Column({ type: 'uuid', nullable: true })
-        actor_id: string | null;
+    actor_id: string | null;
 
-    @Column({ type: 'varchar', length: 64, nullable: true })
-        actor_type: string | null;
+    @Column({
+        type: 'varchar', 
+        length: 64, 
+        nullable: true, 
+    })
+    actor_type: string | null;
 
     // ------------------------------------------------------------------
 
     @Column({ type: 'uuid', nullable: true })
-        realm_id: Realm['id'] | null;
+    realm_id: Realm['id'] | null;
 }

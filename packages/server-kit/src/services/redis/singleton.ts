@@ -9,9 +9,7 @@ import type { Client } from 'redis-extension';
 import type { Factory } from 'singa';
 import { singa } from 'singa';
 
-const instance = singa<Client>({
-    name: 'redis',
-});
+const instance = singa<Client>({ name: 'redis' });
 
 export function setRedisFactory(factory: Factory<Client>) {
     instance.setFactory(factory);

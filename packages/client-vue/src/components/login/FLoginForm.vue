@@ -11,7 +11,11 @@ import { IVuelidate } from '@ilingo/vuelidate';
 import useVuelidate from '@vuelidate/core';
 import { maxLength, minLength, required } from '@vuelidate/validators';
 import {
-    defineComponent, reactive, ref, toRef, watch,
+    defineComponent, 
+    reactive, 
+    ref, 
+    toRef, 
+    watch,
 } from 'vue';
 import { VCFormInput, VCFormSubmit } from '@vuecs/form-controls';
 
@@ -21,11 +25,7 @@ export default defineComponent({
         VCFormInput,
         VCFormSubmit,
     },
-    props: {
-        realmId: {
-            type: String,
-        },
-    },
+    props: { realmId: { type: String } },
     emits: ['done', 'failed'],
     setup(props, { emit }) {
         const store = injectStore();
@@ -57,9 +57,7 @@ export default defineComponent({
                 minLength: minLength(3),
                 maxLength: maxLength(255),
             },
-            realm_id: {
-
-            },
+            realm_id: {},
         }, form);
 
         const busy = ref(false);

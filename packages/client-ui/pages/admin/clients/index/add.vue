@@ -8,9 +8,7 @@ import { definePageMeta } from '#imports';
 import { LayoutKey } from '../../../../config/layout';
 
 export default defineNuxtComponent({
-    components: {
-        AClientForm,
-    },
+    components: { AClientForm },
     emits: ['failed', 'created'],
     setup(props, { emit }) {
         definePageMeta({

@@ -9,9 +9,7 @@ import type { Client } from '@authup/core-http-kit';
 import type { Factory } from 'singa';
 import { singa } from 'singa';
 
-const instance = singa<Client>({
-    name: 'authup',
-});
+const instance = singa<Client>({ name: 'authup' });
 
 export function useAuthupClient() {
     return instance.use();

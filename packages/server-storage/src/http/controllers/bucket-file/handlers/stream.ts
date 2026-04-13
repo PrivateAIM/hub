@@ -37,9 +37,7 @@ export async function executeBucketFileRouteStreamHandler(req: Request, res: Res
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(BucketFileEntity);
-    const entity = await repository.findOneBy({
-        id,
-    });
+    const entity = await repository.findOneBy({ id });
 
     if (!entity) {
         throw new NotFoundError();

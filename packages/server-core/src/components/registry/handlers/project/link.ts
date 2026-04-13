@@ -16,8 +16,8 @@ import { saveRemoteRegistryProjectWebhook } from '../helpers/remote-webhook.ts';
 import { createBasicHarborAPIClient } from '../utils.ts';
 
 export class RegistryProjectLinkHandler implements ComponentHandler<
-RegistryEventMap,
-RegistryCommand.PROJECT_LINK
+    RegistryEventMap,
+    RegistryCommand.PROJECT_LINK
 > {
     async handle(
         value: RegistryProjectLinkPayload,
@@ -66,9 +66,7 @@ RegistryCommand.PROJECT_LINK
             const project = await ensureRemoteRegistryProject(httpClient, {
                 remoteId: entity.external_id,
                 remoteName: entity.external_name,
-                remoteOptions: {
-                    public: entity.public,
-                },
+                remoteOptions: { public: entity.public },
             });
 
             entity.external_id = `${project.project_id}`;
@@ -90,7 +88,7 @@ RegistryCommand.PROJECT_LINK
             const robotAccount = await ensureRemoteRegistryProjectAccount(httpClient, {
                 name: entity.external_name,
                 account: {
-                    id: parseInt(entity.account_id, 10),
+                    id: Number.parseInt(entity.account_id, 10),
                     name: entity.account_name,
                     secret: value.secret || entity.account_secret,
                 },

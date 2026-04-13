@@ -6,7 +6,11 @@
  */
 
 import {
-    afterAll, beforeAll, describe, expect, it,
+    afterAll, 
+    beforeAll, 
+    describe, 
+    expect, 
+    it,
 } from 'vitest';
 import type { ProjectNode } from '@privateaim/core-kit';
 import { createTestSuite, expectProperties } from '../../utils';

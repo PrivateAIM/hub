@@ -10,7 +10,15 @@ import type {
     AnalysisCommand,
 } from '@privateaim/core-kit';
 import {
-    DBody, DController, DDelete, DGet, DPath, DPost, DRequest, DResponse, DTags,
+    DBody, 
+    DController, 
+    DDelete, 
+    DGet, 
+    DPath, 
+    DPost, 
+    DRequest, 
+    DResponse, 
+    DTags,
 } from '@routup/decorators';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import {
@@ -30,7 +38,7 @@ export class AnalysisController {
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
         @DRequest() req: any,
-            @DResponse() res: any,
+        @DResponse() res: any,
     ): Promise<PartialAnalysis[]> {
         return getManyAnalysisRouteHandler(req, res);
     }
@@ -38,8 +46,8 @@ export class AnalysisController {
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<PartialAnalysis | undefined> {
         return getOneAnalysisRouteHandler(req, res);
     }
@@ -47,9 +55,9 @@ export class AnalysisController {
     @DPost('/:id', [ForceLoggedInMiddleware])
     async edit(
         @DPath('id') id: string,
-            @DBody() data: PartialAnalysis,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DBody() data: PartialAnalysis,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<PartialAnalysis | undefined> {
         return updateAnalysisRouteHandler(req, res);
     }
@@ -57,8 +65,8 @@ export class AnalysisController {
     @DPost('', [ForceLoggedInMiddleware])
     async add(
         @DBody() data: PartialAnalysis,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<PartialAnalysis | undefined> {
         return createAnalysisRouteHandler(req, res);
     }
@@ -66,11 +74,11 @@ export class AnalysisController {
     @DPost('/:id/command', [ForceLoggedInMiddleware])
     async doTask(
         @DPath('id') id: string,
-            @DBody() data: {
-                command: AnalysisCommand
-            },
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DBody() data: {
+            command: AnalysisCommand
+        },
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<PartialAnalysis | undefined> {
         return handleAnalysisCommandRouteHandler(req, res);
     }
@@ -78,8 +86,8 @@ export class AnalysisController {
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @DPath('id') id: string,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<PartialAnalysis | undefined> {
         return deleteAnalysisRouteHandler(req, res);
     }

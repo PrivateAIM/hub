@@ -15,7 +15,5 @@ export function configureRedis() {
         return;
     }
 
-    setRedisFactory(() => createRedisClient({
-        connectionString,
-    }));
+    setRedisFactory(() => createRedisClient({ connectionString }));
 }

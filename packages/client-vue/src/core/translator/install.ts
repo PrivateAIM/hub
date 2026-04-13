@@ -11,9 +11,7 @@ import type { App } from 'vue';
 import type { TranslatorInstallOptions } from './types';
 
 export function installTranslator(app: App, options: TranslatorInstallOptions = {}) {
-    const store = new MemoryStore({
-        data: {},
-    });
+    const store = new MemoryStore({ data: {} });
 
     install(app, {
         store,

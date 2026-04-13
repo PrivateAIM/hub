@@ -7,10 +7,13 @@
 import { VCTimeago } from '@vuecs/timeago';
 import type { Event } from '@privateaim/telemetry-kit';
 import {
-    defineComponent, h, toRef,
+    defineComponent, 
+    h, 
+    toRef,
 } from 'vue';
 import type {
-    PropType, VNodeArrayChildren,
+    PropType, 
+    VNodeArrayChildren,
 } from 'vue';
 
 export default defineComponent({
@@ -45,9 +48,7 @@ export default defineComponent({
 
         return () => h(
             'div',
-            {
-                class: `line line-${props.index + 1}`,
-            },
+            { class: `line line-${props.index + 1}` },
             [
                 h('div', { class: 'd-flex flex-row' }, [
                     h('div', { class: 'line-number' }, [props.index + 1]),

@@ -6,7 +6,11 @@
  */
 
 import {
-    afterAll, beforeAll, describe, expect, it,
+    afterAll, 
+    beforeAll, 
+    describe, 
+    expect, 
+    it,
 } from 'vitest';
 import { extendObject } from '@authup/kit';
 import type { AnalysisNode } from '@privateaim/core-kit';
@@ -34,9 +38,7 @@ describe('src/controllers/core/analysis-node', () => {
         const project = await client.project.create(createTestProject());
         expect(project.id).toBeDefined();
 
-        const node = await client.node.create(createTestNode({
-            type: NodeType.AGGREGATOR,
-        }));
+        const node = await client.node.create(createTestNode({ type: NodeType.AGGREGATOR }));
         expect(node.id).toBeDefined();
 
         await client.projectNode.create({
@@ -44,9 +46,7 @@ describe('src/controllers/core/analysis-node', () => {
             project_id: project.id,
         });
 
-        const analysis = await client.analysis.create({
-            project_id: project.id,
-        });
+        const analysis = await client.analysis.create({ project_id: project.id });
 
         expect(analysis.id).toBeDefined();
 

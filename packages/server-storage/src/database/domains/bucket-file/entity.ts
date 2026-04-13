@@ -10,8 +10,11 @@ import type { BucketFile } from '@privateaim/storage-kit';
 import {
     Column,
     CreateDateColumn,
-    Entity, JoinColumn, ManyToOne,
-    PrimaryGeneratedColumn, Unique,
+    Entity, 
+    JoinColumn, 
+    ManyToOne,
+    PrimaryGeneratedColumn, 
+    Unique,
     UpdateDateColumn,
 } from 'typeorm';
 import { BucketEntity } from '../bucket/index.ts';
@@ -20,50 +23,54 @@ import { BucketEntity } from '../bucket/index.ts';
 @Entity({ name: 'bucket_files' })
 export class BucketFileEntity implements BucketFile {
     @PrimaryGeneratedColumn('uuid')
-        id: string;
+    id: string;
 
     @Column({ type: 'varchar', length: 256 })
-        name: string;
+    name: string;
 
     @Column({ type: 'varchar', length: 512 })
-        path: string;
+    path: string;
 
     @Column({ type: 'varchar', length: 4096 })
-        hash: string;
+    hash: string;
 
     @Column({ nullable: true })
-        directory: string;
+    directory: string;
 
-    @Column({ type: 'int', unsigned: true, nullable: true })
-        size: number | null;
+    @Column({
+        type: 'int', 
+        unsigned: true, 
+        nullable: true, 
+    })
+    size: number | null;
 
     // ------------------------------------------------------------------
 
     @CreateDateColumn()
-        created_at: Date;
+    created_at: Date;
 
     @UpdateDateColumn()
-        updated_at: Date;
+    updated_at: Date;
 
     // ------------------------------------------------------------------
 
     @Column({ type: 'varchar', length: 64 })
-        actor_type: string;
+    actor_type: string;
 
     @Column({ type: 'uuid' })
-        actor_id: string;
+    actor_id: string;
 
     // ------------------------------------------------------------------
 
     @Column({ type: 'uuid', nullable: true })
-        realm_id: Realm['id'] | null;
+    realm_id: Realm['id'] | null;
 
     // ------------------------------------------------------------------
 
     @Column()
-        bucket_id: BucketEntity['id'];
+    bucket_id: BucketEntity['id'];
 
     @ManyToOne(() => BucketEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'bucket_id' })
-        bucket: BucketEntity;
+    bucket: BucketEntity;
 }

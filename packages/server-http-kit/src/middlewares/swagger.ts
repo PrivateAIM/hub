@@ -20,7 +20,5 @@ export function mountSwaggerMiddleware(router: Router, options: MiddlewareSwagge
         document = loadSync(path.join(process.cwd(), 'writable', 'swagger.json'));
     }
 
-    router.use('/docs', swaggerUI(document, {
-        baseURL: options.baseURL,
-    }));
+    router.use('/docs', swaggerUI(document, { baseURL: options.baseURL }));
 }

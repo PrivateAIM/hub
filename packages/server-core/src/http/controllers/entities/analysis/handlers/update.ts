@@ -26,9 +26,7 @@ export async function updateAnalysisRouteHandler(req: Request, res: Response) : 
 
     const validator = new AnalysisValidator();
     const validatorAdapter = new RoutupContainerAdapter(validator);
-    const data = await validatorAdapter.run(req, {
-        group: HTTPHandlerOperation.UPDATE,
-    });
+    const data = await validatorAdapter.run(req, { group: HTTPHandlerOperation.UPDATE });
 
     const dataSource = await useDataSource();
 
@@ -46,9 +44,7 @@ export async function updateAnalysisRouteHandler(req: Request, res: Response) : 
 
     await permissionChecker.check({
         name: PermissionName.ANALYSIS_UPDATE,
-        input: new PolicyData({
-            [BuiltInPolicyType.ATTRIBUTES]: entity,
-        }),
+        input: new PolicyData({ [BuiltInPolicyType.ATTRIBUTES]: entity }),
     });
 
     if (!isRealmResourceWritable(useRequestIdentityRealm(req), entity.realm_id)) {

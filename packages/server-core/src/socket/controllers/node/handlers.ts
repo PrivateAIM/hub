@@ -34,7 +34,7 @@ export function registerNodeSocketHandlers(socket: Socket) {
                         PermissionName.NODE_UPDATE,
                     ],
                 });
-            } catch (e) {
+            } catch {
                 if (isEventCallback(cb)) {
                     cb(new UnauthorizedError());
                 }

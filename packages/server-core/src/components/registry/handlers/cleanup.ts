@@ -20,8 +20,8 @@ import type { RegistryCleanupPayload, RegistryEventMap } from '../type.ts';
 import { createBasicHarborAPIClient } from './utils.ts';
 
 export class RegistryCleanupHandler implements ComponentHandler<
-RegistryEventMap,
-RegistryCommand.CLEANUP
+    RegistryEventMap,
+    RegistryCommand.CLEANUP
 > {
     async handle(
         value: RegistryCleanupPayload,
@@ -49,19 +49,19 @@ RegistryCommand.CLEANUP
         const projectEntities = await projectRepository.find();
         const projectEntityExternalNames = projectEntities.map((item) => item.external_name);
 
-        for (let i = 0; i < projects.length; i++) {
-            const index = projectEntityExternalNames.indexOf(`${projects[i].name}`);
+        for (const project of projects) {
+            const index = projectEntityExternalNames.indexOf(`${project.name}`);
             if (index !== -1) {
                 continue;
             }
 
-            if (projects[i].name === REGISTRY_MASTER_IMAGE_PROJECT_NAME) {
+            if (project.name === REGISTRY_MASTER_IMAGE_PROJECT_NAME) {
                 continue;
             }
 
             await context.handle(RegistryCommand.PROJECT_UNLINK, {
                 registryId: entity.id,
-                externalName: projects[i].name,
+                externalName: project.name,
             });
         }
     }

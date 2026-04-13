@@ -2,7 +2,8 @@
 import { AClientScopes } from '@authup/client-web-kit';
 import type { Client, ClientScope } from '@authup/core-kit';
 import {
-    VCFormInput, VCFormInputCheckbox,
+    VCFormInput, 
+    VCFormInputCheckbox,
 } from '@vuecs/form-controls';
 import type { BuildInput } from 'rapiq';
 import type { PropType } from 'vue';
@@ -11,7 +12,11 @@ import { useRuntimeConfig } from '#app';
 import { defineNuxtComponent } from '#imports';
 
 export default defineNuxtComponent({
-    components: { VCFormInput, VCFormInputCheckbox, AClientScopes },
+    components: {
+        VCFormInput, 
+        VCFormInputCheckbox, 
+        AClientScopes, 
+    },
     props: {
         entity: {
             type: Object as PropType<Client>,
@@ -49,9 +54,7 @@ export default defineNuxtComponent({
         };
 
         const query : BuildInput<ClientScope> = {
-            filter: {
-                client_id: props.entity.id,
-            },
+            filter: { client_id: props.entity.id },
             relations: ['scope'],
         };
 
@@ -83,7 +86,7 @@ export default defineNuxtComponent({
                 <VCFormInputCheckbox
                     :label="true"
                     :group-class="'form-switch'"
-                    :model-value="scopes.indexOf(props.data.scope.name) !== -1"
+                    :model-value="scopes.includes(props.data.scope.name)"
                     @update:model-value="toggleScope(props.data.scope.name)"
                 >
                     <template #label="iProps">

@@ -44,9 +44,7 @@ export function createRouter() : Router {
 
     let swagger : MiddlewareSwaggerOptions | boolean;
     if (!isTestEnvironment) {
-        swagger = {
-            baseURL: useEnv('publicURL'),
-        };
+        swagger = { baseURL: useEnv('publicURL') };
     } else {
         swagger = false;
     }

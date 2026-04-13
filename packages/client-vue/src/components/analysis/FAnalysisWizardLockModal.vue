@@ -14,9 +14,7 @@ import { defineComponent, ref } from 'vue';
 import { injectCoreHTTPClient, wrapFnWithBusyState } from '../../core';
 
 export default defineComponent({
-    components: {
-        BModal,
-    },
+    components: { BModal },
     props: {
         entity: {
             type: Object as PropType<Analysis>,

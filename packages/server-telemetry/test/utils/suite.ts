@@ -92,9 +92,7 @@ class TestSuite {
         const address = this._server.address() as AddressInfo;
         const baseURL = `http://localhost:${address.port}`;
 
-        const client = new APIClient({
-            baseURL,
-        });
+        const client = new APIClient({ baseURL });
 
         const authupURL = useEnv('authupURL');
         if (authupURL) {

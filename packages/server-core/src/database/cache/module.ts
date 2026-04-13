@@ -45,8 +45,8 @@ export class DatabaseQueryResultCache implements QueryResultCache {
         const pipeline = client.pipeline();
 
         const keys = await client.keys(this.buildFullQualifiedId('*'));
-        for (let i = 0; i < keys.length; i++) {
-            pipeline.del(keys[i]);
+        for (const key of keys) {
+            pipeline.del(key);
         }
 
         await pipeline.exec();
@@ -101,8 +101,8 @@ export class DatabaseQueryResultCache implements QueryResultCache {
         const client = useRedisClient();
         const pipeline = client.pipeline();
 
-        for (let i = 0; i < identifiers.length; i++) {
-            pipeline.del(this.buildFullQualifiedId(identifiers[i]));
+        for (const identifier of identifiers) {
+            pipeline.del(this.buildFullQualifiedId(identifier));
         }
 
         await pipeline.exec();

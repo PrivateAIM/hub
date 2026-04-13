@@ -41,9 +41,7 @@ export async function getOneProjectRouteHandler(req: Request, res: Response) : P
                 'master_image_id',
             ],
         },
-        relations: {
-            allowed: ['master_image'],
-        },
+        relations: { allowed: ['master_image'] },
     });
 
     const entity = await query.getOne();
@@ -80,21 +78,15 @@ export async function getManyProjectRouteHandler(req: Request, res: Response) : 
                 'master_image_id',
             ],
         },
-        filters: {
-            allowed: ['id', 'name', 'realm_id', 'user_id'],
-        },
-        pagination: {
-            maxLimit: 50,
-        },
+        filters: { allowed: ['id', 'name', 'realm_id', 'user_id'] },
+        pagination: { maxLimit: 50 },
         relations: {
             allowed: ['master_image'],
             onJoin: (_property, key, query) => {
                 query.addGroupBy(`${key}.id`);
             },
         },
-        sort: {
-            allowed: ['id', 'updated_at', 'created_at'],
-        },
+        sort: { allowed: ['id', 'updated_at', 'created_at'] },
     });
 
     const [entities, total] = await query.getManyAndCount();

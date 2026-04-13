@@ -9,7 +9,9 @@ import { useRequestQuery } from '@routup/basic/query';
 import type { Request, Response } from 'routup';
 import { send, useRequestParam } from 'routup';
 import {
-    applyQuery, applyRelations, useDataSource,
+    applyQuery, 
+    applyRelations, 
+    useDataSource,
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceReadable } from '@privateaim/kit';
@@ -75,18 +77,14 @@ export async function getManyAnalysisBucketFileRouteHandler(req: Request, res: R
                     'analysis_bucket.type',
                 ],
             },
-            pagination: {
-                maxLimit: 50,
-            },
+            pagination: { maxLimit: 50 },
             relations: {
                 allowed: ['analysis', 'analysis_bucket'],
                 onJoin: (_property, key, query) => {
                     query.addGroupBy(`${key}.id`);
                 },
             },
-            sort: {
-                allowed: ['path', 'created_at', 'updated_at'],
-            },
+            sort: { allowed: ['path', 'created_at', 'updated_at'] },
         },
     );
 

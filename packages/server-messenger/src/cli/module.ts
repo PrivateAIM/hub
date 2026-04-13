@@ -26,8 +26,6 @@ export async function createCLIEntryPointCommand() {
             version: pkg.version,
             description: pkg.description,
         },
-        subCommands: {
-            start: defineCLIStartCommand(),
-        },
+        subCommands: { start: defineCLIStartCommand() },
     });
 }

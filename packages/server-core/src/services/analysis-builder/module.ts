@@ -37,9 +37,7 @@ export class AnalysisBuilder {
         request?: Request,
     ) {
         const entityId = typeof input === 'string' ? input : input.id;
-        const entity = await this.metadataCaller.callRecalcDirect({
-            analysisId: entityId,
-        });
+        const entity = await this.metadataCaller.callRecalcDirect({ analysisId: entityId });
 
         AnalysisBuilderCommandChecker.canStart(entity);
 
@@ -57,9 +55,7 @@ export class AnalysisBuilder {
             await this.repository.save(entity);
         }
 
-        await this.caller.callExecute({
-            id: entity.id,
-        });
+        await this.caller.callExecute({ id: entity.id });
 
         return entity;
     }
@@ -69,9 +65,7 @@ export class AnalysisBuilder {
 
         AnalysisBuilderCommandChecker.canCheck(entity);
 
-        await this.caller.callCheck({
-            id: entity.id,
-        });
+        await this.caller.callCheck({ id: entity.id });
 
         return entity;
     }

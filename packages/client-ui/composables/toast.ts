@@ -27,9 +27,7 @@ export function useToast() {
 
             if (isObject(el)) {
                 el.pos = el.pos || 'top-center';
-                return toast.show({
-                    props: el,
-                });
+                return toast.show({ props: el });
             }
 
             if (options) {

@@ -10,9 +10,7 @@ import { computed, defineComponent } from 'vue';
 import { useRuntimeConfig } from '#imports';
 
 export default defineComponent({
-    components: {
-        BOrchestrator,
-    },
+    components: { BOrchestrator },
     setup() {
         const runtimeConfig = useRuntimeConfig();
 

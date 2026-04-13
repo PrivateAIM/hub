@@ -1,26 +1,29 @@
 {
+    "extends": "@tada5hi/tsconfig",
     "compilerOptions": {
         "strict": false,
         "sourceMap": true,
-
-        "declaration": true,
         "declarationMap": true,
 
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
 
-        "skipLibCheck": true,
-
-        "esModuleInterop": true,
         "lib": ["ESNext", "DOM"],
-        // compiled code js version
         "target": "ES2022",
 
         "moduleResolution": "bundler",
-        // compiled code format (esm/cjs)
         "module": "ESNext",
 
-        "allowImportingTsExtensions": true
+        "allowImportingTsExtensions": true,
+        "verbatimModuleSyntax": false,
+
+        "noImplicitReturns": false,
+        "noImplicitOverride": false,
+        "noUnusedLocals": false,
+        "noUnusedParameters": false,
+        "noFallthroughCasesInSwitch": false,
+        "noUncheckedIndexedAccess": false,
+        "noEmitOnError": false
     },
     "exclude": [
         "node_modules",

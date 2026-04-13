@@ -9,7 +9,9 @@ import { useRequestQuery } from '@routup/basic/query';
 import type { Request, Response } from 'routup';
 import { send, useRequestParam } from 'routup';
 import {
-    applyQuery, applyRelations, useDataSource,
+    applyQuery, 
+    applyRelations, 
+    useDataSource,
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceReadable } from '@privateaim/kit';
@@ -80,9 +82,7 @@ export async function getManyAnalysisNodeRouteHandler(req: Request, res: Respons
                 'node.realm_id',
             ],
         },
-        pagination: {
-            maxLimit: 50,
-        },
+        pagination: { maxLimit: 50 },
         relations: {
             allowed: ['node', 'analysis'],
             onJoin: (_property, key, query) => {

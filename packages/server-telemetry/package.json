@@ -9,7 +9,7 @@
         "./package.json": "./package.json",
         ".": {
             "types": "./dist/index.d.ts",
-            "import": "./dist/index.js"
+            "import": "./dist/index.mjs"
         }
     },
     "author": {
@@ -57,9 +57,11 @@
         "vitest": "^4.1.4"
     },
     "scripts": {
-        "cli": "node dist/cli/index.js",
+        "cli": "node dist/cli/index.mjs",
         "cli-dev": "ts-node src/cli/index.ts",
-        "build": "rimraf ./dist && cross-env NODE_ENV=production tsc -p tsconfig.build.json",
+        "build:js": "tsdown",
+        "build:types": "tsc --emitDeclarationOnly -p tsconfig.build.json",
+        "build": "rimraf ./dist && npm run build:js && npm run build:types",
         "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts",
         "test:coverage": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts --coverage"
     }

@@ -8,7 +8,12 @@
 import type { RegistryAPICommand } from '@privateaim/core-kit';
 import { ServiceID } from '@privateaim/core-kit';
 import {
-    DBody, DController, DPost, DRequest, DResponse, DTags,
+    DBody, 
+    DController, 
+    DPost, 
+    DRequest, 
+    DResponse, 
+    DTags,
 } from '@routup/decorators';
 
 import { NotFoundError } from '@ebec/http';
@@ -24,7 +29,7 @@ import { handleRegistryCommandRouteHandler } from './handlers/registry/command.t
 export class ServiceController {
     @DPost('/:id/hook', [ForceLoggedInMiddleware])
     async handleHarborHook(
-    @DRequest() req: Request,
+        @DRequest() req: Request,
         @DResponse() res: Response,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         @DBody() _harborHook: RegistryHook,
@@ -41,7 +46,7 @@ export class ServiceController {
 
     @DPost('/:id/command', [ForceLoggedInMiddleware])
     async execHarborTask(
-    @DRequest() req: Request,
+        @DRequest() req: Request,
         @DResponse() res: Response,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         @DBody() _data: { command: RegistryAPICommand },

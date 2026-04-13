@@ -6,7 +6,11 @@
  */
 
 import {
-    afterAll, beforeAll, describe, expect, it,
+    afterAll, 
+    beforeAll, 
+    describe, 
+    expect, 
+    it,
 } from 'vitest';
 import { extendObject } from '@authup/kit';
 import type { AnalysisPermission } from '@privateaim/core-kit';
@@ -32,9 +36,7 @@ describe('src/controllers/core/analysis-permission', () => {
         await suite.down();
     });
 
-    const attributes : Partial<AnalysisPermission> = {
-        permission_id: '667672f6-1c6b-468f-947f-6370cf18454c',
-    };
+    const attributes : Partial<AnalysisPermission> = { permission_id: '667672f6-1c6b-468f-947f-6370cf18454c' };
 
     it('should create resource', async () => {
         const client = suite.client();
@@ -42,9 +44,7 @@ describe('src/controllers/core/analysis-permission', () => {
         const project = await client.project.create(createTestProject());
         expect(project.id).toBeDefined();
 
-        const analysis = await client.analysis.create(createTestAnalysis({
-            project_id: project.id,
-        }));
+        const analysis = await client.analysis.create(createTestAnalysis({ project_id: project.id }));
         expect(analysis.id).toBeDefined();
 
         attributes.analysis_id = analysis.id;

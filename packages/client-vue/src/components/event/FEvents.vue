@@ -20,11 +20,7 @@ import FEvent from './FEvent';
 
 export default defineComponent({
     components: { FEvent },
-    props: {
-        query: {
-            type: Object as PropType<BuildInput<Event>>,
-        },
-    },
+    props: { query: { type: Object as PropType<BuildInput<Event>> } },
     setup(props) {
         const httpClient = injectTelemetryHTTPClient();
 

@@ -7,7 +7,9 @@
 
 import { isClientErrorWithStatusCode } from '@hapic/harbor';
 import type {
-    HarborClient, Project, ProjectCreatePayload,
+    HarborClient, 
+    Project, 
+    ProjectCreatePayload,
 } from '@hapic/harbor';
 
 export async function ensureRemoteRegistryProject(

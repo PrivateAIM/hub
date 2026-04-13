@@ -15,7 +15,8 @@ import {
     FProjectNodeInCard,
     FProjectNodes,
     FSearch,
-    FTitle, injectCoreHTTPClient,
+    FTitle, 
+    injectCoreHTTPClient,
 } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
 import { definePageMeta } from '#imports';
@@ -47,17 +48,13 @@ export default defineNuxtComponent({
         const nodeId : Ref<string | null> = ref(null);
 
         try {
-            const response = await api.node.getMany({
-                filter: {
-                    realm_id: realmId.value,
-                },
-            });
+            const response = await api.node.getMany({ filter: { realm_id: realmId.value } });
 
             const node = response.data.pop();
             if (node) {
                 nodeId.value = node.id;
             }
-        } catch (e) {
+        } catch {
             // do nothing :)
         }
 

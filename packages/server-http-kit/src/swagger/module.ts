@@ -32,11 +32,7 @@ export async function generateSwagger(options: SwaggerGenerateOptions) {
     if (options.authupURL) {
         securityDefinitions.oauth2 = {
             type: 'oauth2',
-            flows: {
-                password: {
-                    tokenUrl: new URL('token', options.authupURL).href,
-                },
-            },
+            flows: { password: { tokenUrl: new URL('token', options.authupURL).href } },
         };
     }
 

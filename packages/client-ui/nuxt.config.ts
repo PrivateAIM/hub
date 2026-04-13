@@ -15,9 +15,7 @@ export default defineNuxtConfig({
         scanPageMeta: false,
     },
 
-    devtools: {
-        componentInspector: false,
-    },
+    devtools: { componentInspector: false },
 
     runtimeConfig: {
         authupUrl: process.env.AUTHUP_URL,
@@ -55,7 +53,7 @@ export default defineNuxtConfig({
         '@vuecs/pagination/dist/index.css',
         '@vuecs/navigation/dist/index.css',
         '@authup/client-web-kit/dist/index.css',
-        '@/../client-vue/dist/index.css',
+        '@/../client-vue/dist/style.css',
         '@fortawesome/fontawesome-free/css/all.css',
         'bootstrap/dist/css/bootstrap.css',
         '@/assets/css/vue-layout-navigation.css',
@@ -81,13 +79,15 @@ export default defineNuxtConfig({
         '@pinia/nuxt',
         [
             // ../client-web-nuxt/src/module
-            '@authup/client-web-nuxt', {
-                apiURLRuntimeKey: 'authupUrl',
-                cookieDomainRuntimeKey: 'cookieDomain',
-            } satisfies ModuleOptions,
+            '@authup/client-web-nuxt', 
+{
+    apiURLRuntimeKey: 'authupUrl',
+    cookieDomainRuntimeKey: 'cookieDomain',
+} satisfies ModuleOptions,
         ],
         [
-            '@nuxtjs/google-fonts', {
+            '@nuxtjs/google-fonts', 
+            {
                 families: {
                     Asap: [400, 700],
                     Nunito: [400, 700],

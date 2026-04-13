@@ -5,9 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Client } from '@authup/core-kit';
+import type { 
+    Client, 
+    Realm, 
+    Robot, 
+    User,  
+} from '@authup/core-kit';
 import type {
-    Analysis, AnalysisBucket, AnalysisBucketFile,
+    Analysis, 
+    AnalysisBucket, 
+    AnalysisBucketFile,
 } from '@privateaim/core-kit';
 import {
     Column,
@@ -15,10 +22,10 @@ import {
     Entity,
     JoinColumn,
     ManyToOne,
-    PrimaryGeneratedColumn, Unique,
+    PrimaryGeneratedColumn, 
+    Unique,
     UpdateDateColumn,
 } from 'typeorm';
-import type { Realm, Robot, User } from '@authup/core-kit';
 import { AnalysisEntity } from '../analysis/entity.ts';
 import { AnalysisBucketEntity } from '../analysis-bucket/entity.ts';
 
@@ -26,61 +33,61 @@ import { AnalysisBucketEntity } from '../analysis-bucket/entity.ts';
 @Entity({ name: 'analysis_bucket_files' })
 export class AnalysisBucketFileEntity implements AnalysisBucketFile {
     @PrimaryGeneratedColumn('uuid')
-        id: string;
+    id: string;
 
     @Column({ type: 'varchar', length: 256 })
-        path: string;
+    path: string;
 
     @Column({ type: 'boolean', default: false })
-        root: boolean;
+    root: boolean;
 
     // ------------------------------------------------------------------
 
     @Column({ type: 'uuid' })
-        bucket_id: string;
+    bucket_id: string;
 
     @Column({ type: 'uuid' })
-        bucket_file_id: string;
+    bucket_file_id: string;
 
     // ------------------------------------------------------------------
 
     @Column({ type: 'uuid', nullable: true })
-        client_id: Client['id'] | null;
+    client_id: Client['id'] | null;
 
     @Column({ type: 'uuid', nullable: true })
-        robot_id: Robot['id'] | null;
+    robot_id: Robot['id'] | null;
 
     @Column({ type: 'uuid', nullable: true })
-        user_id: User['id'] | null;
+    user_id: User['id'] | null;
 
     @Column({ type: 'uuid' })
-        realm_id: Realm['id'];
+    realm_id: Realm['id'];
 
     // ------------------------------------------------------------------
 
     @Column()
-        analysis_id: Analysis['id'];
+    analysis_id: Analysis['id'];
 
     @ManyToOne(() => AnalysisEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'analysis_id' })
-        analysis: AnalysisEntity;
+    analysis: AnalysisEntity;
 
     // ------------------------------------------------------------------
 
     @Column()
-        analysis_bucket_id: AnalysisBucket['id'];
+    analysis_bucket_id: AnalysisBucket['id'];
 
     @ManyToOne(() => AnalysisBucketEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'analysis_bucket_id' })
-        analysis_bucket: AnalysisBucketEntity;
+    analysis_bucket: AnalysisBucketEntity;
 
     // ------------------------------------------------------------------
 
     @CreateDateColumn()
-        created_at: Date;
+    created_at: Date;
 
     @UpdateDateColumn()
-        updated_at: Date;
+    updated_at: Date;
 
     // ------------------------------------------------------------------
 }

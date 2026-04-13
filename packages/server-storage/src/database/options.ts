@@ -7,7 +7,10 @@
 
 import { DataSourceOptionsBuilder as BaseBuilder } from '@privateaim/server-db-kit';
 import {
-    BucketEntity, BucketFileEntity, BucketFileSubscriber, BucketSubscriber,
+    BucketEntity, 
+    BucketFileEntity, 
+    BucketFileSubscriber, 
+    BucketSubscriber,
 } from './domains/index.ts';
 
 export class DataSourceOptionsBuilder extends BaseBuilder {

@@ -50,7 +50,7 @@ export async function generateDockerFileContent(entity: Analysis) : Promise<stri
     let entryPoint : BucketFile;
     try {
         entryPoint = await storageClient.bucketFile.getOne(analysisBucketFile.bucket_file_id);
-    } catch (e) {
+    } catch {
         throw BuilderError.entrypointNotFound();
     }
 
@@ -58,7 +58,7 @@ export async function generateDockerFileContent(entity: Analysis) : Promise<stri
 
     try {
         masterImage = await coreClient.masterImage.getOne(entity.master_image_id);
-    } catch (e) {
+    } catch {
         throw BuilderError.masterImageNotFound();
     }
 
@@ -82,12 +82,12 @@ export async function generateDockerFileContent(entity: Analysis) : Promise<stri
     cmdParts.push(`"${masterImage.command}"`);
 
     if (commandArguments) {
-        for (let i = 0; i < commandArguments.length; i++) {
+        for (const commandArgument of commandArguments) {
             if (
-                commandArguments[i].position === 'before' ||
-                !commandArguments[i].position
+                commandArgument.position === 'before' ||
+                !commandArgument.position
             ) {
-                cmdParts.push(`"${commandArguments[i].value}"`);
+                cmdParts.push(`"${commandArgument.value}"`);
             }
         }
     }
@@ -95,11 +95,11 @@ export async function generateDockerFileContent(entity: Analysis) : Promise<stri
     cmdParts.push(`"${path.posix.join(AnalysisContainerPath.CODE, entrypointPath)}"`);
 
     if (commandArguments) {
-        for (let i = 0; i < commandArguments.length; i++) {
+        for (const commandArgument of commandArguments) {
             if (
-                commandArguments[i].position === 'after'
+                commandArgument.position === 'after'
             ) {
-                cmdParts.push(`"${commandArguments[i].value}"`);
+                cmdParts.push(`"${commandArgument.value}"`);
             }
         }
     }

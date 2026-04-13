@@ -28,9 +28,7 @@ export class AnalysisMetadataComponentCaller implements ComponentCaller<Analysis
 
     constructor() {
         this.directCaller = new DirectComponentCaller<AnalysisMetadataEventMap>(useAnalysisMetadataComponent());
-        this.queueDispatchCaller = new QueueDispatchComponentCaller<AnalysisMetadataEventMap>({
-            queue: AnalysisMetadataTaskQueue,
-        });
+        this.queueDispatchCaller = new QueueDispatchComponentCaller<AnalysisMetadataEventMap>({ queue: AnalysisMetadataTaskQueue });
     }
 
     async call<Key extends keyof AnalysisMetadataEventMap>(

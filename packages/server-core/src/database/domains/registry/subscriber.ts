@@ -13,13 +13,13 @@ import {
     DomainType,
 } from '@privateaim/core-kit';
 import { BaseSubscriber } from '@privateaim/server-db-kit';
-import { EntityEventDestination } from '@privateaim/server-kit';
+import type { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
 import { RegistryEntity } from './entity.ts';
 
 @EventSubscriber()
 export class RegistrySubscriber extends BaseSubscriber<
-RegistryEntity
+    RegistryEntity
 > implements EntitySubscriberInterface<RegistryEntity> {
     constructor() {
         super({

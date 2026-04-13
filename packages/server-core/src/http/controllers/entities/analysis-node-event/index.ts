@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
+import type {
     AnalysisNodeEvent,
 } from '@privateaim/core-kit';
 
@@ -31,7 +31,7 @@ export class AnalysisNodeEventController {
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
         @DRequest() req: any,
-            @DResponse() res: any,
+        @DResponse() res: any,
     ): Promise<PartialEntity[]> {
         return await getManyAnalysisNodeEventRouteHandler(req, res) as PartialEntity[];
     }
@@ -39,8 +39,8 @@ export class AnalysisNodeEventController {
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<PartialEntity | undefined> {
         return await getOneAnalysisNodeEventRouteHandler(req, res) as PartialEntity | undefined;
     }

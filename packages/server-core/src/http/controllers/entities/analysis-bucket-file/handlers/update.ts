@@ -21,9 +21,7 @@ export async function updateAnalysisBucketFileRouteHandler(req: Request, res: Re
 
     const validator = new AnalysisBucketFileValidator();
     const validatorAdapter = new RoutupContainerAdapter(validator);
-    const data = await validatorAdapter.run(req, {
-        group: HTTPHandlerOperation.UPDATE,
-    });
+    const data = await validatorAdapter.run(req, { group: HTTPHandlerOperation.UPDATE });
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisBucketFileEntity);
@@ -43,9 +41,7 @@ export async function updateAnalysisBucketFileRouteHandler(req: Request, res: Re
         await repository.update({
             analysis_bucket_id: entity.analysis_bucket_id,
             analysis_id: entity.analysis_id,
-        }, {
-            root: false,
-        });
+        }, { root: false });
     }
 
     const requestRepository = new RequestRepositoryAdapter(

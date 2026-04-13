@@ -53,8 +53,8 @@ export function mountErrorMiddleware(router: Router) {
             }
         } else if (isObject(next.data)) {
             const keys = Object.keys(next.data);
-            for (let i = 0; i < keys.length; i++) {
-                payload[keys[i]] = next.data[keys[i]];
+            for (const key of keys) {
+                payload[key] = next.data[key];
             }
         }
 

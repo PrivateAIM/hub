@@ -18,11 +18,7 @@ import type { ListMeta } from '../../core';
 import { injectStorageHTTPClient } from '../../core';
 
 export default defineComponent({
-    props: {
-        query: {
-            type: Object as PropType<BuildInput<BucketFile>>,
-        },
-    },
+    props: { query: { type: Object as PropType<BuildInput<BucketFile>> } },
     emits: ['deleted', 'failed', 'created'],
     setup(props, { emit, expose }) {
         const httpClient = injectStorageHTTPClient();

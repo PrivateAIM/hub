@@ -9,7 +9,8 @@ import { DomainType } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
 import type {
     MasterImageBuilderBasePayload,
-    MasterImageBuilderEventMap, MasterImageBuilderExecutionProgressPayload,
+    MasterImageBuilderEventMap, 
+    MasterImageBuilderExecutionProgressPayload,
 } from '@privateaim/server-core-worker-kit';
 import {
     MasterImageBuilderEvent,
@@ -25,9 +26,7 @@ export async function handleMasterImageBuilderEvent(
     const dataSource = useDataSourceSync();
     const repository = dataSource.getRepository(MasterImageEntity);
 
-    const entity = await repository.findOneBy({
-        id: value.id,
-    });
+    const entity = await repository.findOneBy({ id: value.id });
 
     if (!entity) {
         return;

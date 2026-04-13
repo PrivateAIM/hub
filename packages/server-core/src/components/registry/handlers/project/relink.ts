@@ -10,8 +10,8 @@ import type { RegistryEventMap, RegistryProjectRelinkPayload } from '../../type.
 import { RegistryCommand } from '../../constants.ts';
 
 export class RegistryProjectRelinkHandler implements ComponentHandler<
-RegistryEventMap,
-RegistryCommand.PROJECT_RELINK
+    RegistryEventMap,
+    RegistryCommand.PROJECT_RELINK
 > {
     async handle(
         value: RegistryProjectRelinkPayload,

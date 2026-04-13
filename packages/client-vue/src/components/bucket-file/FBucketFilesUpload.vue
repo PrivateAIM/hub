@@ -66,9 +66,7 @@ export default defineComponent({
                     formData.append(`files[${i}]`, tempFiles.value[i]);
                 }
 
-                const {
-                    data: bucketFiles,
-                } = await storageClient.bucket.upload(
+                const { data: bucketFiles } = await storageClient.bucket.upload(
                     props.bucketId,
                     formData,
                 );

@@ -51,7 +51,7 @@ function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>, field
 
     const protectedSelected = fieldsParsed
         .filter((field) => field.path === 'registryProject' &&
-            protectedFields.indexOf(field.key as any) !== -1);
+            protectedFields.includes(field.key as any));
 
     if (protectedSelected.length > 0) {
         // todo: re enable this as soon as possible
@@ -102,7 +102,11 @@ export async function getOneRegistryProjectRouteHandler(req: Request, res: Respo
 
 export async function getManyRegistryProjectRouteHandler(req: Request, res: Response) : Promise<any> {
     const {
-        filter, page, sort, include, fields,
+        filter, 
+        page, 
+        sort, 
+        include, 
+        fields,
     } = useRequestQuery(req);
 
     const dataSource = await useDataSource();

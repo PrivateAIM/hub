@@ -10,7 +10,5 @@ import { createClient } from '@hapic/harbor';
 
 export function createBasicHarborAPIClient(connectionString: string) : HarborClient {
     // todo: use proxy config in the future...
-    return createClient({
-        connectionString,
-    });
+    return createClient({ connectionString });
 }

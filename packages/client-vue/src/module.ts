@@ -18,25 +18,15 @@ import {
 import type { Options } from './type';
 
 export function install(app: App, options: Options): void {
-    installCoreHTTPClient(app, {
-        baseURL: options.coreURL,
-    });
+    installCoreHTTPClient(app, { baseURL: options.coreURL });
 
-    installStorageHTTPClient(app, {
-        baseURL: options.storageURL,
-    });
+    installStorageHTTPClient(app, { baseURL: options.storageURL });
 
-    installTelemetryHTTPClient(app, {
-        baseURL: options.telemetryURL,
-    });
+    installTelemetryHTTPClient(app, { baseURL: options.telemetryURL });
 
-    installSocketManager(app, {
-        baseURL: options.coreURL,
-    });
+    installSocketManager(app, { baseURL: options.coreURL });
 
-    installTranslator(app, {
-        locale: options.translatorLocale,
-    });
+    installTranslator(app, { locale: options.translatorLocale });
 
     const storeManager = installStoreManager(app);
     if (options.storeManager) {
@@ -53,7 +43,7 @@ export function install(app: App, options: Options): void {
             .forEach(([componentName, component]) => {
                 if (
                     !Array.isArray(componentsSelected) ||
-                    componentsSelected.indexOf(componentName) !== -1
+                    componentsSelected.includes(componentName)
                 ) {
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-ignore

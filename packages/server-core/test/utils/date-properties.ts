@@ -8,7 +8,7 @@
 import { hasOwnProperty } from '@privateaim/kit';
 
 export function removeDateProperties<
-T extends Record<string, any>,
+    T extends Record<string, any>,
 >(input: T) : T {
     if (hasOwnProperty(input, 'created_at')) {
         delete input.created_at;

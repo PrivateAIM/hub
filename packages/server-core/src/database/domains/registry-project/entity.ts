@@ -10,7 +10,9 @@ import {
     CreateDateColumn,
     Entity,
     JoinColumn,
-    ManyToOne, PrimaryGeneratedColumn, Unique,
+    ManyToOne, 
+    PrimaryGeneratedColumn, 
+    Unique,
     UpdateDateColumn,
 } from 'typeorm';
 import type { Registry, RegistryProject } from '@privateaim/core-kit';
@@ -26,18 +28,21 @@ import { RegistryEntity } from '../registry/index.ts';
 @Entity({ name: 'registry_projects' })
 export class RegistryProjectEntity implements RegistryProject {
     @PrimaryGeneratedColumn('uuid')
-        id: string;
+    id: string;
 
     @Column({ type: 'varchar', length: 128 })
-        name: string;
+    name: string;
 
     @Column({
-        type: 'varchar', length: 64, nullable: true, default: RegistryProjectType.DEFAULT,
+        type: 'varchar', 
+        length: 64, 
+        nullable: true, 
+        default: RegistryProjectType.DEFAULT,
     })
-        type: `${RegistryProjectType}`;
+    type: `${RegistryProjectType}`;
 
     @Column({ type: 'boolean', default: true })
-        public: boolean;
+    public: boolean;
 
     // ------------------------------------------------------------------
 
@@ -45,7 +50,7 @@ export class RegistryProjectEntity implements RegistryProject {
         type: 'varchar',
         length: 64,
     })
-        external_name: string;
+    external_name: string;
 
     @Column({
         type: 'varchar',
@@ -53,54 +58,64 @@ export class RegistryProjectEntity implements RegistryProject {
         nullable: true,
         default: null,
     })
-        external_id: string | null;
+    external_id: string | null;
 
     // ------------------------------------------------------------------
 
     @Column({
-        type: 'varchar', length: 64, nullable: true,
+        type: 'varchar', 
+        length: 64, 
+        nullable: true,
     })
-        account_id: string | null;
+    account_id: string | null;
 
     @Column({
-        type: 'varchar', length: 256, nullable: true,
+        type: 'varchar', 
+        length: 256, 
+        nullable: true,
     })
-        account_name: string | null;
+    account_name: string | null;
 
     @Column({
-        type: 'varchar', length: 256, nullable: true, select: false,
+        type: 'varchar', 
+        length: 256, 
+        nullable: true, 
+        select: false,
     })
-        account_secret: string | null;
+    account_secret: string | null;
 
     // ------------------------------------------------------------------
 
     @Column({
-        type: 'varchar', length: 128, default: null, nullable: true,
+        type: 'varchar', 
+        length: 128, 
+        default: null, 
+        nullable: true,
     })
-        webhook_name: string | null;
+    webhook_name: string | null;
 
     @Column({ type: 'boolean', default: false })
-        webhook_exists: boolean;
+    webhook_exists: boolean;
 
     // ------------------------------------------------------------------
 
     @Column()
-        registry_id: Registry['id'];
+    registry_id: Registry['id'];
 
     @ManyToOne(() => RegistryEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'registry_id' })
-        registry: RegistryEntity;
+    registry: RegistryEntity;
 
     // ------------------------------------------------------------------
 
     @Column({ type: 'uuid', nullable: true })
-        realm_id: Realm['id'];
+    realm_id: Realm['id'];
 
     // ------------------------------------------------------------------
 
     @CreateDateColumn()
-        created_at: Date;
+    created_at: Date;
 
     @UpdateDateColumn()
-        updated_at: Date;
+    updated_at: Date;
 }

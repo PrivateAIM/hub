@@ -9,9 +9,7 @@ import type { APIClient } from '@privateaim/telemetry-kit';
 import type { Factory } from 'singa';
 import { singa } from 'singa';
 
-const instance = singa<APIClient>({
-    name: 'telemetryClient',
-});
+const instance = singa<APIClient>({ name: 'telemetryClient' });
 
 export function useTelemetryClient(): APIClient {
     return instance.use();

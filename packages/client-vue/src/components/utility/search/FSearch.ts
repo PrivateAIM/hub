@@ -14,24 +14,12 @@ import type { ListMeta } from '../../../core';
 export const FSearch = defineComponent({
     props: {
         // todo: add entity-key prop
-        icon: {
-            type: Boolean,
-        },
-        iconPosition: {
-            type: String as PropType<'start' | 'end'>,
-        },
-        iconClass: {
-            type: String,
-        },
-        busy: {
-            type: Boolean,
-        },
-        load: {
-            type: Function as PropType<ListLoadFn<ListMeta<any>>>,
-        },
-        meta: {
-            type: Object as PropType<ListMeta<any>>,
-        },
+        icon: { type: Boolean },
+        iconPosition: { type: String as PropType<'start' | 'end'> },
+        iconClass: { type: String },
+        busy: { type: Boolean },
+        load: { type: Function as PropType<ListLoadFn<ListMeta<any>>> },
+        meta: { type: Object as PropType<ListMeta<any>> },
     },
     slots: Object as SlotsType<{
         default: Record<string, any>

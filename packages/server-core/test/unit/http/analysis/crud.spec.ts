@@ -6,7 +6,11 @@
  */
 
 import {
-    afterAll, beforeAll, describe, expect, it,
+    afterAll, 
+    beforeAll, 
+    describe, 
+    expect, 
+    it,
 } from 'vitest';
 import type { Analysis } from '@privateaim/core-kit';
 import { createNanoID } from '@privateaim/kit';
@@ -36,9 +40,7 @@ describe('src/controllers/core/analysis', () => {
         const client = suite.client();
 
         const project = await client.project.create(createTestProject());
-        const analysis = await client.analysis.create(createTestAnalysis({
-            project_id: project.id,
-        }));
+        const analysis = await client.analysis.create(createTestAnalysis({ project_id: project.id }));
 
         expect(analysis.project_id).toEqual(project.id);
 
@@ -99,9 +101,7 @@ describe('src/controllers/core/analysis', () => {
 
         const client = suite.client();
 
-        const project = await client.project.create({
-            name: createNanoID(),
-        });
+        const project = await client.project.create({ name: createNanoID() });
 
         try {
             await client.analysis.create({

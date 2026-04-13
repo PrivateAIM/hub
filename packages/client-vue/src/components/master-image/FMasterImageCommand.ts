@@ -13,18 +13,21 @@ import {
 import { PermissionName } from '@privateaim/kit';
 import type { PropType, SlotsType } from 'vue';
 import {
-    computed, defineComponent, ref,
+    computed, 
+    defineComponent, 
+    ref,
 } from 'vue';
 import type { ActionCommandSlotsType } from '../../core';
 import {
-    ActionCommandElementType, injectCoreHTTPClient, renderActionCommand, wrapFnWithBusyState,
+    ActionCommandElementType, 
+    injectCoreHTTPClient, 
+    renderActionCommand, 
+    wrapFnWithBusyState,
 } from '../../core';
 
 export default defineComponent({
     props: {
-        entity: {
-            type: Object as PropType<MasterImage>,
-        },
+        entity: { type: Object as PropType<MasterImage> },
         command: {
             type: String as PropType<`${MasterImageCommand}`>,
             required: true,
@@ -52,9 +55,7 @@ export default defineComponent({
         const execute = wrapFnWithBusyState(isBusy, async () => {
             try {
                 const response = await apiClient
-                    .masterImage.runCommand(props.command, {
-                        ...(props.entity ? { id: props.entity.id } : {}),
-                    });
+                    .masterImage.runCommand(props.command, { ...(props.entity ? { id: props.entity.id } : {}) });
 
                 emit('executed', props.command);
                 emit('updated', response);
@@ -65,9 +66,7 @@ export default defineComponent({
             }
         });
 
-        const isAllowed = usePermissionCheck({
-            name: PermissionName.MASTER_IMAGE_MANAGE,
-        });
+        const isAllowed = usePermissionCheck({ name: PermissionName.MASTER_IMAGE_MANAGE });
 
         const shouldDisplay = computed<boolean>(
             () => isAllowed.value,

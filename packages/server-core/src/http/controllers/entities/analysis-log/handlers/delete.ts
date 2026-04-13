@@ -29,8 +29,8 @@ export async function deleteAnalysisLogRouteHandler(req: Request, res: Response)
 
     const filtersNormalized : Partial<Record<keyof AnalysisLog, string>> = {};
     if (output) {
-        for (let i = 0; i < output.length; i++) {
-            filtersNormalized[output[i].key] = `${output[i].value}`;
+        for (const element of output) {
+            filtersNormalized[element.key] = `${element.value}`;
         }
     }
 
@@ -54,9 +54,7 @@ export async function deleteAnalysisLogRouteHandler(req: Request, res: Response)
 
     if (isTelemetryClientUsable()) {
         const telemetryClient = useTelemetryClient();
-        await telemetryClient.log.deleteMany({
-            filters,
-        });
+        await telemetryClient.log.deleteMany({ filters });
     }
 
     return sendAccepted(res);

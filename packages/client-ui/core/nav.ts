@@ -24,21 +24,21 @@ export type NavItems = NavItem[];
 
 export function buildNavItemLink(...items: unknown[]) {
     let output = '';
-    for (let i = 0; i < items.length; i++) {
-        if (typeof items[i] !== 'string') {
+    for (const item of items) {
+        if (typeof item !== 'string') {
             continue;
         }
 
         if (output.substring(output.length - 1) === '/') {
-            if (items[i].substring(0, 1) === '/') {
-                output += items[i].substring(1);
+            if (item.substring(0, 1) === '/') {
+                output += item.substring(1);
             } else {
-                output += items[i];
+                output += item;
             }
-        } else if (items[i].substring(0, 1) === '/') {
-            output += items[i];
+        } else if (item.substring(0, 1) === '/') {
+            output += item;
         } else {
-            output += `/${items[i]}`;
+            output += `/${item}`;
         }
     }
 
@@ -59,9 +59,7 @@ export const DomainEntityNavItem = defineComponent({
             type: String,
             required: true,
         },
-        icon: {
-            type: String,
-        },
+        icon: { type: String },
     },
     setup(props) {
         return () => h('li', { class: 'nav-item' }, [
@@ -96,19 +94,13 @@ export const DomainEntityNavItem = defineComponent({
 });
 export const DomainEntityNavSub = defineComponent({
     props: {
-        name: {
-            type: String,
-        },
-        icon: {
-            type: String,
-        },
+        name: { type: String },
+        icon: { type: String },
         path: {
             type: String,
             required: true,
         },
-        children: {
-            type: Array as PropType<NavItem[]>,
-        },
+        children: { type: Array as PropType<NavItem[]> },
     },
     setup(props) {
         const expand = ref(false);
@@ -125,16 +117,12 @@ export const DomainEntityNavSub = defineComponent({
                 icon = h('i', { class: `${props.icon} pe-1` });
             }
 
-            return h('li', {
-                class: 'nav-item dropdown',
-            }, [
+            return h('li', { class: 'nav-item dropdown' }, [
                 h('a', {
                     ref: linkRef,
                     class: [
                         'nav-link dropdown-toggle',
-                        {
-                            show: expand.value,
-                        },
+                        { show: expand.value },
                     ],
                     href: '#',
                     onClick($event: any) {
@@ -146,11 +134,7 @@ export const DomainEntityNavSub = defineComponent({
                     icon,
                     props.name,
                 ]),
-                h('ul', {
-                    class: ['dropdown-menu', {
-                        show: expand.value,
-                    }],
-                }, [
+                h('ul', { class: ['dropdown-menu', { show: expand.value }] }, [
                     ...(props.children || []).map((child) => h(DomainEntityNavItem, {
                         path: buildNavItemLink(props.path, child.path),
                         name: child.name,

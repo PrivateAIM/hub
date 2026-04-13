@@ -6,14 +6,17 @@
  */
 
 import type {
-    EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,
+    EntitySubscriberInterface, 
+    InsertEvent, 
+    RemoveEvent, 
+    UpdateEvent,
 } from 'typeorm';
 import { EventSubscriber } from 'typeorm';
 import {
     DomainType,
 } from '@privateaim/core-kit';
 import { BaseSubscriber } from '@privateaim/server-db-kit';
-import { EntityEventDestination } from '@privateaim/server-kit';
+import type { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
 import {
     AnalysisMetadataCommand,
@@ -23,7 +26,7 @@ import { AnalysisBucketFileEntity } from './entity.ts';
 
 @EventSubscriber()
 export class AnalysisBucketFileSubscriber extends BaseSubscriber<
-AnalysisBucketFileEntity
+    AnalysisBucketFileEntity
 > implements EntitySubscriberInterface<AnalysisBucketFileEntity> {
     constructor() {
         super({
@@ -70,9 +73,7 @@ AnalysisBucketFileEntity
                     queryNodes: false,
                     querySelf: false,
                 },
-                {
-                    entityManager: event.manager,
-                },
+                { entityManager: event.manager },
             );
         }
     }
@@ -91,9 +92,7 @@ AnalysisBucketFileEntity
                 queryNodes: false,
                 querySelf: false,
             },
-            {
-                entityManager: event.manager,
-            },
+            { entityManager: event.manager },
         );
     }
 
@@ -107,9 +106,7 @@ AnalysisBucketFileEntity
                     queryNodes: false,
                     querySelf: false,
                 },
-                {
-                    entityManager: event.manager,
-                },
+                { entityManager: event.manager },
             );
         }
     }

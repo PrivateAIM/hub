@@ -3,7 +3,7 @@
     "type": "module",
     "version": "0.8.31",
     "private": true,
-    "module": "dist/index.mjs",
+    "module": "./dist/index.mjs",
     "types": "dist/index.d.ts",
     "exports": {
         "./package.json": "./package.json",
@@ -65,9 +65,11 @@
         "vitest": "^4.1.4"
     },
     "scripts": {
-        "cli": "node dist/cli/index.js",
+        "cli": "node dist/cli/index.mjs",
         "cli-dev": "ts-node src/cli/index.ts",
-        "build": "rimraf ./dist && cross-env NODE_ENV=production tsc -p tsconfig.build.json",
+        "build:js": "tsdown",
+        "build:types": "tsc --emitDeclarationOnly -p tsconfig.build.json",
+        "build": "rimraf ./dist && npm run build:js && npm run build:types",
         "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts",
         "test:mysql": "cross-env DB_TYPE=mysql DB_HOST=127.0.0.1 DB_USERNAME=root DB_PASSWORD=start123 DB_DATABASE=app vitest run --config test/vitest.config.ts",
         "test:coverage": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts --coverage"

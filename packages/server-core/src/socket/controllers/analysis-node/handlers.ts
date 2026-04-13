@@ -37,7 +37,7 @@ export function registerAnalysisNodeSocketHandlers(socket: Socket) {
                         PermissionName.ANALYSIS_APPROVE,
                     ],
                 });
-            } catch (e) {
+            } catch {
                 if (isEventCallback(cb)) {
                     cb(new UnauthorizedError());
                 }
@@ -73,7 +73,7 @@ export function registerAnalysisNodeForRealmSocketHandlers(socket: Socket) {
                         PermissionName.ANALYSIS_APPROVE,
                     ],
                 });
-            } catch (e) {
+            } catch {
                 if (isEventCallback(cb)) {
                     cb(new UnauthorizedError());
                 }
@@ -107,7 +107,7 @@ export function registerAnalysisNodeForRealmSocketHandlers(socket: Socket) {
                         PermissionName.ANALYSIS_UPDATE,
                     ],
                 });
-            } catch (e) {
+            } catch {
                 if (isEventCallback(cb)) {
                     cb(new UnauthorizedError());
                 }

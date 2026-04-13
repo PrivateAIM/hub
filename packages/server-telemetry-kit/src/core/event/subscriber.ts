@@ -46,9 +46,9 @@ export class EntityEventHandler implements IEntityEventHandler {
             'request_user_agent',
         ];
 
-        for (let i = 0; i < keys.length; i++) {
-            if (ctx.metadata[keys[i]]) {
-                (entity as ObjectLiteral)[keys[i]] = ctx.metadata[keys[i]];
+        for (const key of keys) {
+            if (ctx.metadata[key]) {
+                (entity as ObjectLiteral)[key] = ctx.metadata[key];
             }
         }
 
@@ -68,9 +68,7 @@ export class EntityEventHandler implements IEntityEventHandler {
         ) {
             const diff : ObjectDiff = {};
             const keys = Object.keys(ctx.data);
-            for (let i = 0; i < keys.length; i++) {
-                const key = keys[i];
-
+            for (const key of keys) {
                 // skip date changes
                 if (key.endsWith('_at')) {
                     continue;

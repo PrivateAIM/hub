@@ -11,8 +11,6 @@ import { useEnv } from '../env/index.ts';
 export function configureRedis() {
     const connectionString = useEnv('redisConnectionString');
     if (connectionString) {
-        setRedisFactory(() => createRedisClient({
-            connectionString,
-        }));
+        setRedisFactory(() => createRedisClient({ connectionString }));
     }
 }

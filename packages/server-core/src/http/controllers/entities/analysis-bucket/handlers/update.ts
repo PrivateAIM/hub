@@ -21,9 +21,7 @@ export async function updateAnalysisBucketRouteHandler(req: Request, res: Respon
 
     const validator = new AnalysisBucketValidator();
     const validatorAdapter = new RoutupContainerAdapter(validator);
-    const data = await validatorAdapter.run(req, {
-        group: HTTPHandlerOperation.UPDATE,
-    });
+    const data = await validatorAdapter.run(req, { group: HTTPHandlerOperation.UPDATE });
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisBucketEntity);

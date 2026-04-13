@@ -12,7 +12,9 @@ import {
 import { PermissionName } from '@privateaim/kit';
 import type { PropType } from 'vue';
 import {
-    computed, defineComponent, ref,
+    computed, 
+    defineComponent, 
+    ref,
 } from 'vue';
 import {
     injectCoreHTTPClient,
@@ -115,9 +117,7 @@ const FProjectNodeApprovalCommand = defineComponent({
             }
 
             try {
-                const item = await apiClient.projectNode.update(props.entityId, {
-                    approval_status: status,
-                });
+                const item = await apiClient.projectNode.update(props.entityId, { approval_status: status });
 
                 emit('updated', item);
             } catch (e) {

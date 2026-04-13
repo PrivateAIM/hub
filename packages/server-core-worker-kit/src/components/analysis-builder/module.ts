@@ -14,9 +14,7 @@ import type { AnalysisBuilderBasePayload, AnalysisBuilderEventMap, AnalysisBuild
 
 export class AnalysisBuilderComponentCaller extends QueueDispatchComponentCaller<AnalysisBuilderEventMap> {
     constructor() {
-        super({
-            queue: AnalysisBuilderTaskQueueRouterRouting,
-        });
+        super({ queue: AnalysisBuilderTaskQueueRouterRouting });
     }
 
     async callExecute(payload: AnalysisBuilderExecutePayload, metadata: ComponentMetadata = {}) {

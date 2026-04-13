@@ -36,7 +36,7 @@ export function registerAnalysisLogSocketHandlers(socket: Socket) {
                         PermissionName.ANALYSIS_UPDATE,
                     ],
                 });
-            } catch (e) {
+            } catch {
                 if (isEventCallback(cb)) {
                     cb(new UnauthorizedError());
                 }

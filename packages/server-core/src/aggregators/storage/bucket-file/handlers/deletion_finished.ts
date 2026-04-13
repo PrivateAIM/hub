@@ -11,15 +11,13 @@ import { AnalysisBucketFileEntity, useDataSourceSync } from '../../../../databas
 import { BaseAggregatorHandler } from '../../../base.ts';
 
 export class StorageBucketFileDeletionFinishedHandler extends BaseAggregatorHandler<
-BucketFileComponentEventMap,
-BucketFileEvent.DELETION_FINISHED
+    BucketFileComponentEventMap,
+    BucketFileEvent.DELETION_FINISHED
 > {
     async handle(data: BucketFile): Promise<void> {
         const dataSource = useDataSourceSync();
         const analysisBucketFileRepository = dataSource.getRepository(AnalysisBucketFileEntity);
-        const analysisBucketFile = await analysisBucketFileRepository.findOneBy({
-            bucket_file_id: data.id,
-        });
+        const analysisBucketFile = await analysisBucketFileRepository.findOneBy({ bucket_file_id: data.id });
 
         if (!analysisBucketFile) {
             return;

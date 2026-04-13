@@ -9,9 +9,7 @@ import type { ClientAuthenticationHook } from '@authup/core-http-kit';
 import type { Factory } from 'singa';
 import { singa } from 'singa';
 
-const instance = singa<ClientAuthenticationHook>({
-    name: 'authupClientAuthenticationHook',
-});
+const instance = singa<ClientAuthenticationHook>({ name: 'authupClientAuthenticationHook' });
 
 export function setAuthupClientAuthenticationHookFactory(factory: Factory<ClientAuthenticationHook>) {
     instance.setFactory(factory);

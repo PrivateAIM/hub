@@ -9,9 +9,7 @@ import type { Client } from 'minio';
 import type { Factory } from 'singa';
 import { singa } from 'singa';
 
-const singleton = singa<Client>({
-    name: 'redis',
-});
+const singleton = singa<Client>({ name: 'redis' });
 
 export function useMinio() {
     return singleton.use();

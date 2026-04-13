@@ -13,21 +13,21 @@ import path from 'node:path';
 import process from 'node:process';
 import {
     EventEventQueueRouterRouting,
-    EventTaskQueueRouterRouting, LogEventQueueRouterRouting,
+    EventTaskQueueRouterRouting, 
+    LogEventQueueRouterRouting,
     LogTaskQueueRouterRouting,
 } from '@privateaim/server-telemetry-kit';
 import { EventComponent, LogComponent } from '../../components/index.ts';
 import {
-    configure, useEnv,
+    configure, 
+    useEnv,
 } from '../../config/index.ts';
 import { setupDatabase } from '../../config/services/index.ts';
 import { createHttpServer } from '../../http/index.ts';
 
 export function defineCLIStartCommand() {
     return defineCommand({
-        meta: {
-            name: 'start',
-        },
+        meta: { name: 'start' },
         async setup() {
             configure();
 

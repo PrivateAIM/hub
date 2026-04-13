@@ -8,7 +8,8 @@
 import type { ObjectLiteral } from '@privateaim/kit';
 import { DomainEventName } from '@privateaim/kit';
 import type {
-    EntityEventDestinations, EntityEventDestinationsFn,
+    EntityEventDestinations, 
+    EntityEventDestinationsFn,
     EntityEventPublisher,
 } from '@privateaim/server-kit';
 import {
@@ -16,7 +17,10 @@ import {
     useEntityEventPublisher,
 } from '@privateaim/server-kit';
 import type {
-    EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,
+    EntitySubscriberInterface, 
+    InsertEvent, 
+    RemoveEvent, 
+    UpdateEvent,
 } from 'typeorm';
 import type { BaseSubscriberContext, SubscriberPublishPayload } from './types';
 

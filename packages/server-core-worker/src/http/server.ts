@@ -11,9 +11,7 @@ import { Router, coreHandler, createNodeDispatcher } from 'routup';
 
 export function createHttpServer() : Server {
     const router = new Router();
-    router.get('/', coreHandler(() => ({
-        timestamp: Date.now(),
-    })));
+    router.get('/', coreHandler(() => ({ timestamp: Date.now() })));
 
     return new http.Server(createNodeDispatcher(router));
 }

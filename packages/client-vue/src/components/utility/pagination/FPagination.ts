@@ -13,15 +13,9 @@ type PaginationLoadFn = (data?: any) => (Promise<void> | void);
 
 export const FPagination = defineComponent({
     props: {
-        total: {
-            type: Number,
-        },
-        meta: {
-            type: Object,
-        },
-        busy: {
-            type: Boolean,
-        },
+        total: { type: Number },
+        meta: { type: Object },
+        busy: { type: Boolean },
         load: {
             type: Function as PropType<PaginationLoadFn>,
             required: true,

@@ -30,15 +30,9 @@ export default defineNuxtPlugin({
                 fontAwesome,
             },
             defaults: {
-                list: {
-                    class: 'list',
-                },
-                listBody: {
-                    class: 'list-body',
-                },
-                listItem: {
-                    class: 'list-item',
-                },
+                list: { class: 'list' },
+                listBody: { class: 'list-body' },
+                listItem: { class: 'list-item' },
                 pagination: {
                     class: 'pagination',
                     itemClass: 'page-item',

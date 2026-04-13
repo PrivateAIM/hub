@@ -10,8 +10,11 @@ import type { ComponentMetadata } from '@privateaim/server-kit';
 import type { BucketCommand, BucketEvent } from './constants';
 import type {
     BucketCreateCommandPayload,
-    BucketCreationFailedEventPayload, BucketCreationFinishedEventPayload,
-    BucketDeleteCommandPayload, BucketDeletionFailedEventPayload, BucketDeletionFinishedEventPayload,
+    BucketCreationFailedEventPayload, 
+    BucketCreationFinishedEventPayload,
+    BucketDeleteCommandPayload, 
+    BucketDeletionFailedEventPayload, 
+    BucketDeletionFinishedEventPayload,
 } from './handlers';
 
 export type BucketComponentEventMap = ObjectLiteralKeys<{

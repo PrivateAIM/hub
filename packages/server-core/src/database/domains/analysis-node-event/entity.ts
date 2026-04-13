@@ -27,42 +27,42 @@ import { NodeEntity } from '../node/index.ts';
 @Entity({ name: 'analysis_node_events' })
 export class AnalysisNodeEventEntity implements AnalysisNodeEvent {
     @PrimaryGeneratedColumn('uuid')
-        id: string;
+    id: string;
 
     // ------------------------------------------------------------------
 
     @CreateDateColumn()
-        created_at: Date;
+    created_at: Date;
 
     @UpdateDateColumn()
-        updated_at: Date;
+    updated_at: Date;
 
     // ------------------------------------------------------------------
 
     @Column({ type: 'uuid', nullable: true })
-        event_id: Event['id'];
+    event_id: Event['id'];
 
     // ------------------------------------------------------------------
 
     @ManyToOne(() => AnalysisEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'analysis_id' })
-        analysis: AnalysisEntity;
+    analysis: AnalysisEntity;
 
     @Column()
-        analysis_id: Analysis['id'];
+    analysis_id: Analysis['id'];
 
     @Column({ type: 'uuid' })
-        analysis_realm_id: Realm['id'];
+    analysis_realm_id: Realm['id'];
 
     // ------------------------------------------------------------------
 
     @ManyToOne(() => NodeEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'node_id' })
-        node: NodeEntity;
+    node: NodeEntity;
 
     @Column()
-        node_id: Node['id'];
+    node_id: Node['id'];
 
     @Column({ type: 'uuid' })
-        node_realm_id: Realm['id'];
+    node_realm_id: Realm['id'];
 }

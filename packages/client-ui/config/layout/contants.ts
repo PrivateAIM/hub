@@ -45,9 +45,7 @@ export const LayoutSideDefaultNavigation: NavigationItem<NavigationItemMeta>[] =
         type: 'link',
         url: '/',
         icon: 'fas fa-info',
-        meta: {
-            [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        },
+        meta: { [LayoutKey.REQUIRED_LOGGED_IN]: true },
     },
     {
         name: 'Projects',
@@ -100,18 +98,14 @@ export const LayoutSideDefaultNavigation: NavigationItem<NavigationItemMeta>[] =
         type: 'link',
         url: '/login',
         icon: 'fas fa-sign',
-        meta: {
-            [LayoutKey.REQUIRED_LOGGED_OUT]: true,
-        },
+        meta: { [LayoutKey.REQUIRED_LOGGED_OUT]: true },
     },
     {
         name: 'Settings',
         type: 'link',
         url: '/settings',
         icon: 'fas fa-cog',
-        meta: {
-            [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        },
+        meta: { [LayoutKey.REQUIRED_LOGGED_IN]: true },
     },
 ];
 export const LayoutSideAdminNavigation: NavigationItem<NavigationItemMeta>[] = [

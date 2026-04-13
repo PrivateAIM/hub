@@ -10,7 +10,7 @@
     "license": "Apache-2.0",
     "version": "0.8.31",
     "description": "This package contains the server core service.",
-    "main": "./dist/cli/index.js",
+    "main": "./dist/cli/index.mjs",
     "module": "./dist/index.mjs",
     "dependencies": {
         "@authup/access": "^1.0.0-beta.31",
@@ -80,9 +80,11 @@
         "vitest": "^4.1.4"
     },
     "scripts": {
-        "cli": "node dist/cli/index.js",
+        "cli": "node dist/cli/index.mjs",
         "cli-dev": "ts-node src/cli/index.ts",
-        "build": "rimraf dist/ && cross-env NODE_ENV=production tsc -p tsconfig.build.json",
+        "build:js": "tsdown",
+        "build:types": "tsc --emitDeclarationOnly -p tsconfig.build.json",
+        "build": "rimraf dist/ && npm run build:js && npm run build:types",
         "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts",
         "test:mysql": "cross-env DB_TYPE=mysql DB_HOST=127.0.0.1 DB_USERNAME=root DB_PASSWORD=start123 DB_DATABASE=app vitest run --config test/vitest.config.ts",
         "test:psql": "cross-env DB_TYPE=postgres DB_HOST=127.0.0.1 DB_USERNAME=postgres DB_PASSWORD=start123 DB_DATABASE=app vitest run --config test/vitest.config.ts",

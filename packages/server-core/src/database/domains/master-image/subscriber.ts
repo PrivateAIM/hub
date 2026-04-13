@@ -18,7 +18,7 @@ import { MasterImageEntity } from './entity.ts';
 
 @EventSubscriber()
 export class MasterImageSubscriber extends BaseSubscriber<
-MasterImageEntity
+    MasterImageEntity
 > implements EntitySubscriberInterface<MasterImageEntity> {
     constructor() {
         super({

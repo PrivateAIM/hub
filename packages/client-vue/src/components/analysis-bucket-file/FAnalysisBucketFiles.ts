@@ -67,11 +67,7 @@ const FAnalysisBucketFiles = defineComponent({
             },
         });
 
-        setDefaults({
-            noMore: {
-                content: 'No more analysis bucket files available...',
-            },
-        });
+        setDefaults({ noMore: { content: 'No more analysis bucket files available...' } });
 
         return () => render();
     },

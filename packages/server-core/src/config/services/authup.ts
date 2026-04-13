@@ -22,9 +22,7 @@ export function configureAuthup() {
     }
 
     setAuthupClientFactory(() => {
-        const client = new AuthupClient({
-            baseURL,
-        });
+        const client = new AuthupClient({ baseURL });
 
         if (isAuthupClientAuthenticationHookUsable()) {
             const hook = useAuthupClientAuthenticationHook();

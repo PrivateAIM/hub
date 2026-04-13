@@ -26,9 +26,7 @@ export default defineComponent({
             src: World,
             width: refs.width.value,
             height: refs.height.value,
-            style: {
-                maxWidth: '100%',
-            },
+            style: { maxWidth: '100%' },
         });
     },
 });

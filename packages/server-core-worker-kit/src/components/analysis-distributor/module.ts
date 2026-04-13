@@ -18,9 +18,7 @@ import type {
 
 export class AnalysisDistributorComponentCaller extends QueueDispatchComponentCaller<AnalysisDistributorEventMap> {
     constructor() {
-        super({
-            queue: AnalysisDistributorTaskQueueRouterRouting,
-        });
+        super({ queue: AnalysisDistributorTaskQueueRouterRouting });
     }
 
     async callExecute(payload: AnalysisDistributorExecutePayload, metadata: ComponentMetadata = {}) {

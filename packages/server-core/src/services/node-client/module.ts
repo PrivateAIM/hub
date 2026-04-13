@@ -64,12 +64,8 @@ export class NodeClientService {
     async assignPermissions(client: Client) {
         const { data: clientPermissions } = await this.authup
             .clientPermission.getMany({
-                relations: {
-                    permission: true,
-                },
-                filter: {
-                    client_id: client.id,
-                },
+                relations: { permission: true },
+                filter: { client_id: client.id },
             });
 
         const permissionNames : string[] = [
@@ -80,23 +76,23 @@ export class NodeClientService {
         const permissionNamesAssigned : string[] = [];
 
         const relationsToDelete : string[] = [];
-        for (let i = 0; i < clientPermissions.length; i++) {
-            const index = permissionNames.indexOf(clientPermissions[i].permission.name);
+        for (const clientPermission of clientPermissions) {
+            const index = permissionNames.indexOf(clientPermission.permission.name);
             if (index === -1) {
-                relationsToDelete.push(clientPermissions[i].id);
+                relationsToDelete.push(clientPermission.id);
             }
 
-            permissionNamesAssigned.push(clientPermissions[i].permission.name);
+            permissionNamesAssigned.push(clientPermission.permission.name);
         }
 
         if (relationsToDelete.length > 0) {
-            for (let i = 0; i < relationsToDelete.length; i++) {
-                await this.authup.clientPermission.delete(relationsToDelete[i]);
+            for (const element of relationsToDelete) {
+                await this.authup.clientPermission.delete(element);
             }
         }
 
-        for (let i = 0; i < permissionNames.length; i++) {
-            const index = permissionNamesAssigned.indexOf(permissionNames[i]);
+        for (const permissionName of permissionNames) {
+            const index = permissionNamesAssigned.indexOf(permissionName);
             if (index !== -1) {
                 continue;
             }
@@ -104,14 +100,14 @@ export class NodeClientService {
             let permission : Permission;
 
             try {
-                permission = await this.authup.permission.getOne(permissionNames[i]);
+                permission = await this.authup.permission.getOne(permissionName);
             } catch (e) {
                 if (!isClientErrorWithStatusCode(e, 404)) {
                     throw e;
                 }
 
                 useLogger()
-                    .warn(`The node-client permission could not be created, due non existing permission ${permissionNames[i]}.`);
+                    .warn(`The node-client permission could not be created, due non existing permission ${permissionName}.`);
             }
 
             if (permission) {

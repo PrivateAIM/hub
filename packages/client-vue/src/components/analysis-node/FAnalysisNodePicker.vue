@@ -21,9 +21,7 @@ export default defineComponent({
         FAnalysisNodeAssignAction,
     },
     props: {
-        realmId: {
-            type: String,
-        },
+        realmId: { type: String },
         projectId: {
             type: String,
             required: true,

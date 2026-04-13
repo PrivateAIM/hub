@@ -6,7 +6,9 @@
  */
 
 import type {
-    EntityType, EventRecord, Robot,
+    EntityType, 
+    EventRecord, 
+    Robot,
 } from '@authup/core-kit';
 import { ServiceID } from '@privateaim/core-kit';
 import { useDataSource } from 'typeorm-extension';
@@ -36,18 +38,14 @@ export async function handleAuthupRobotEvent(context: EventRecord<EntityType.ROB
     const dataSource = await useDataSource();
 
     const projectRepository = dataSource.getRepository(RegistryProjectEntity);
-    const projects = await projectRepository.find({
-        select: ['id'],
-    });
+    const projects = await projectRepository.find({ select: ['id'] });
 
     const caller = useRegistryComponentCaller();
 
-    for (let i = 0; i < projects.length; i++) {
+    for (const project of projects) {
         await caller.call(
             RegistryCommand.PROJECT_LINK,
-            {
-                id: projects[i].id,
-            },
+            { id: project.id },
             {},
         );
     }

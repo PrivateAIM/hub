@@ -8,7 +8,8 @@
 import { LoggerConsoleTransport, createLogger, setLoggerFactory } from '@privateaim/server-kit';
 import {
     LoggerTransport,
-    isLogComponentCallerUsable, useLogComponentCaller,
+    isLogComponentCallerUsable, 
+    useLogComponentCaller,
 } from '@privateaim/server-telemetry-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 

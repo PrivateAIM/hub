@@ -78,9 +78,7 @@ export async function getManyProjectNodeRouteHandler(req: Request, res: Response
                 'node.name',
             ],
         },
-        pagination: {
-            maxLimit: 50,
-        },
+        pagination: { maxLimit: 50 },
         relations: {
             allowed: ['node', 'project'],
             onJoin: (_property, key, query) => {

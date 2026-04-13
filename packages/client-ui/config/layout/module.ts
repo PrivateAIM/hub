@@ -38,7 +38,7 @@ export class Navigation {
 
         try {
             await this.store.resolve();
-        } catch (e) {
+        } catch {
             // do nothing :)
         }
     }
@@ -108,12 +108,9 @@ export class Navigation {
         let canPass = true;
 
         if (item.meta.requirePermissions) {
-            let permissions : string[] = [];
-            if (Array.isArray(item.meta.requirePermissions)) {
-                permissions = item.meta.requirePermissions;
-            } else {
-                permissions = [item.meta.requirePermissions];
-            }
+            const permissions : string[] = Array.isArray(item.meta.requirePermissions) ?
+                item.meta.requirePermissions :
+                [item.meta.requirePermissions];
 
             if (permissions.length > 0) {
                 try {
@@ -123,7 +120,7 @@ export class Navigation {
                         name: permissions,
                         input,
                     });
-                } catch (e) {
+                } catch {
                     canPass = false;
                 }
             }

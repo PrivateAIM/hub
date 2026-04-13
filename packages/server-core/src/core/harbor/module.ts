@@ -24,9 +24,7 @@ export async function setupHarborService() {
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(RegistryEntity);
-    let entity = await repository.findOneBy({
-        name: 'default',
-    });
+    let entity = await repository.findOneBy({ name: 'default' });
     if (entity) {
         entity.account_name = connection.user;
         entity.account_secret = connection.password;
@@ -48,9 +46,7 @@ export async function setupHarborService() {
     const caller = useRegistryComponentCaller();
     await caller.call(
         RegistryCommand.SETUP,
-        {
-            id: entity.id,
-        },
+        { id: entity.id },
         {},
     );
 }

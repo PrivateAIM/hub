@@ -7,7 +7,10 @@
 
 import { DataSource } from 'typeorm';
 import {
-    checkDatabase, createDatabase, setDataSource, synchronizeDatabaseSchema,
+    checkDatabase, 
+    createDatabase, 
+    setDataSource, 
+    synchronizeDatabaseSchema,
 } from 'typeorm-extension';
 import { DataSourceOptionsBuilder } from '../../database/options.ts';
 
@@ -21,7 +24,11 @@ export async function setupDatabase() {
     });
 
     if (!check.exists) {
-        await createDatabase({ options, synchronize: false, ifNotExist: true });
+        await createDatabase({
+            options, 
+            synchronize: false, 
+            ifNotExist: true, 
+        });
     }
 
     const dataSource = new DataSource(options);

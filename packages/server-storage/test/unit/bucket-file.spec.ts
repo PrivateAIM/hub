@@ -6,7 +6,11 @@
  */
 
 import {
-    afterAll, beforeAll, describe, expect, it,
+    afterAll, 
+    beforeAll, 
+    describe, 
+    expect, 
+    it,
 } from 'vitest';
 import fs from 'node:fs';
 import { Readable } from 'node:stream';
@@ -37,9 +41,7 @@ describe('controllers/bucket-file', () => {
     it('should create resource', async () => {
         const client = suite.client();
 
-        const bucket = await client.bucket.create(createTestBucket({
-            region: 'eu-west',
-        }));
+        const bucket = await client.bucket.create(createTestBucket({ region: 'eu-west' }));
 
         const filePath = path.join(__dirname, '..', 'data', 'file.json');
         const file = await fs.promises.readFile(filePath);

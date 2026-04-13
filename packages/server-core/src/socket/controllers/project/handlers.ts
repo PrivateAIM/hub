@@ -37,7 +37,7 @@ export function registerProjectSocketHandlers(socket: Socket) {
                         PermissionName.PROJECT_UPDATE,
                     ],
                 });
-            } catch (e) {
+            } catch {
                 if (isEventCallback(cb)) {
                     cb(new UnauthorizedError());
                 }

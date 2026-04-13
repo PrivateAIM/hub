@@ -10,7 +10,13 @@ import { BTable } from 'bootstrap-vue-next';
 import type { Role } from '@authup/core-kit';
 import { PermissionName } from '@authup/core-kit';
 import {
-    AEntityDelete, APagination, ARoles, ASearch, ATitle, injectStore, storeToRefs,
+    AEntityDelete, 
+    APagination, 
+    ARoles, 
+    ASearch, 
+    ATitle, 
+    injectStore, 
+    storeToRefs,
     usePermissionCheck,
 } from '@authup/client-web-kit';
 import type { BuildInput } from 'rapiq';
@@ -34,26 +40,35 @@ export default defineNuxtComponent({
         const store = injectStore();
         const { realmManagementId } = storeToRefs(store);
 
-        const query : BuildInput<Role> = {
-            filter: {
-                realm_id: [realmManagementId.value, null],
-            },
-        };
+        const query : BuildInput<Role> = { filter: { realm_id: [realmManagementId.value, null] } };
 
         const hasEditPermission = usePermissionCheck({ name: PermissionName.ROLE_UPDATE });
         const hasDropPermission = usePermissionCheck({ name: PermissionName.ROLE_DELETE });
 
         const fields = [
             {
-                key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
+                key: 'name', 
+                label: 'Name', 
+                thClass: 'text-left', 
+                tdClass: 'text-left',
             },
             {
-                key: 'created_at', label: 'Created at', thClass: 'text-center', tdClass: 'text-center',
+                key: 'created_at', 
+                label: 'Created at', 
+                thClass: 'text-center', 
+                tdClass: 'text-center',
             },
             {
-                key: 'updated_at', label: 'Updated at', thClass: 'text-left', tdClass: 'text-left',
+                key: 'updated_at', 
+                label: 'Updated at', 
+                thClass: 'text-left', 
+                tdClass: 'text-left',
             },
-            { key: 'options', label: '', tdClass: 'text-left' },
+            {
+                key: 'options', 
+                label: '', 
+                tdClass: 'text-left', 
+            },
         ];
 
         return {

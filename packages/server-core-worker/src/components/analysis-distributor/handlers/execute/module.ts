@@ -69,15 +69,9 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
         const client = useCoreClient();
 
         const analysis = await client.analysis.getOne(value.id);
-        const registry = await client.registry.getOne(analysis.registry_id, {
-            fields: ['+account_secret'],
-        });
+        const registry = await client.registry.getOne(analysis.registry_id, { fields: ['+account_secret'] });
 
-        const { data: analysisNodes } = await client.analysisNode.getMany({
-            filter: {
-                analysis_id: analysis.id,
-            },
-        });
+        const { data: analysisNodes } = await client.analysisNode.getMany({ filter: { analysis_id: analysis.id } });
 
         if (analysisNodes.length === 0) {
             // todo: custom error
@@ -85,12 +79,8 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
         }
 
         const { data: nodes } = await client.node.getMany({
-            filter: {
-                id: analysisNodes.map((analysisNode) => analysisNode.node_id),
-            },
-            relations: {
-                registry_project: true,
-            },
+            filter: { id: analysisNodes.map((analysisNode) => analysisNode.node_id) },
+            relations: { registry_project: true },
         });
 
         // -----------------------------------------------------------------------------------
@@ -121,9 +111,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
                 analysis,
                 tags,
                 {
-                    push: {
-                        authconfig: buildDockerAuthConfigFromRegistry(registry),
-                    },
+                    push: { authconfig: buildDockerAuthConfigFromRegistry(registry) },
                     stream: {
                         onPushing: async (progress) => {
                             await context.handle(
@@ -172,10 +160,10 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
         await image.inspect();
 
         const tags : string[] = [];
-        for (let i = 0; i < nodes.length; i++) {
+        for (const node of nodes) {
             const nodeImageURL = buildDockerImageURL({
                 hostname: registry.host,
-                projectName: nodes[i].registry_project.external_name,
+                projectName: node.registry_project.external_name,
                 repositoryName: analysis.id,
                 tagOrDigest: REGISTRY_ARTIFACT_TAG_LATEST,
             });
@@ -184,9 +172,9 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
         }
 
         try {
-            for (let i = 0; i < tags.length; i++) {
+            for (const tag of tags) {
                 await image.tag({
-                    repo: tags[i],
+                    repo: tag,
                     tag: REGISTRY_ARTIFACT_TAG_LATEST,
                 });
             }
@@ -195,9 +183,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
 
             throw e;
         } finally {
-            await image.remove({
-                force: true,
-            });
+            await image.remove({ force: true });
         }
 
         useAnalysisDistributorLogger().info({
@@ -234,9 +220,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
         };
 
         try {
-            for (let i = 0; i < tags.length; i++) {
-                const tag = tags[i];
-
+            for (const [i, tag] of tags.entries()) {
                 const image = docker.getImage(tag);
 
                 const stream = await image.push(options.push);

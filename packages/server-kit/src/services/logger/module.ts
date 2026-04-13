@@ -8,7 +8,9 @@
 import { createLogger as create, format } from 'winston';
 import { createLoggerConsoleTransport } from './transports';
 import type {
-    Logger, LoggerCreateContext, LoggerTransport,
+    Logger, 
+    LoggerCreateContext, 
+    LoggerTransport,
 } from './types';
 
 export function createLogger(ctx: LoggerCreateContext = {}) : Logger {

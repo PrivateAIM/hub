@@ -26,9 +26,7 @@ export async function createAnalysisPermissionRouteHandler(req: Request, res: Re
 
     const validator = new AnalysisPermissionValidator();
     const validatorAdapter = new RoutupContainerAdapter(validator);
-    const data = await validatorAdapter.run(req, {
-        group: HTTPHandlerOperation.CREATE,
-    });
+    const data = await validatorAdapter.run(req, { group: HTTPHandlerOperation.CREATE });
 
     const dataSource = await useDataSource();
     await validateEntityJoinColumns(data, {
@@ -58,7 +56,7 @@ export async function createAnalysisPermissionRouteHandler(req: Request, res: Re
 
             try {
                 await permissionChecker.preCheck({ name: permission.name });
-            } catch (e) {
+            } catch {
                 throw new ForbiddenError(`You don't own the permission ${permission.name}`);
             }
         }

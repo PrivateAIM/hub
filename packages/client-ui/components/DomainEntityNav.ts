@@ -9,7 +9,10 @@ import type { PropType, SlotsType, VNodeChild } from 'vue';
 import { defineComponent } from 'vue';
 import { hasNormalizedSlot, normalizeSlot } from '@privateaim/client-vue';
 import {
-    DomainEntityNavItem, DomainEntityNavSub, type NavItems, buildNavItemLink,
+    DomainEntityNavItem, 
+    DomainEntityNavSub, 
+    type NavItems, 
+    buildNavItemLink,
 } from '../core/nav';
 import { NuxtLink } from '#components';
 
@@ -23,12 +26,8 @@ export default defineComponent({
             type: Array as PropType<NavItems>,
             required: true,
         },
-        direction: {
-            type: String as PropType<'vertical' | 'horizontal'>,
-        },
-        prevLink: {
-            type: Boolean,
-        },
+        direction: { type: String as PropType<'vertical' | 'horizontal'> },
+        prevLink: { type: Boolean },
     },
     slots: Object as SlotsType<{
         before: undefined,

@@ -14,13 +14,14 @@ import type {
     EventCreateCommandPayload,
 } from '@privateaim/server-telemetry-kit';
 import {
-    EventCommand, EventEvent,
+    EventCommand, 
+    EventEvent,
 } from '@privateaim/server-telemetry-kit';
 import { EventEntity } from '../../../../database/index.ts';
 
 export class EventComponentCreateHandler implements ComponentHandler<
-EventComponentEventMap,
-EventCommand.CREATE
+    EventComponentEventMap,
+    EventCommand.CREATE
 > {
     protected validator : EventValidator;
 

@@ -24,16 +24,12 @@ export async function updateAnalysisNodeRouteHandler(req: Request, res: Response
 
     const validator = new AnalysisNodeValidator();
     const validatorAdapter = new RoutupContainerAdapter(validator);
-    const data = await validatorAdapter.run(req, {
-        group: HTTPHandlerOperation.UPDATE,
-    });
+    const data = await validatorAdapter.run(req, { group: HTTPHandlerOperation.UPDATE });
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisNodeEntity);
     let entity = await repository.findOne({
-        where: {
-            id,
-        },
+        where: { id },
         relations: ['analysis'],
     });
 
@@ -54,14 +50,14 @@ export async function updateAnalysisNodeRouteHandler(req: Request, res: Response
     try {
         await permissionChecker.preCheck({ name: PermissionName.ANALYSIS_UPDATE });
         canUpdate = true;
-    } catch (e) {
+    } catch {
         // do nothing
     }
     let canApprove = false;
     try {
         await permissionChecker.preCheck({ name: PermissionName.ANALYSIS_APPROVE });
         canApprove = true;
-    } catch (e) {
+    } catch {
         // do nothing
     }
 

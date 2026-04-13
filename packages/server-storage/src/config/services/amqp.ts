@@ -11,8 +11,6 @@ import { useEnv } from '../env/index.ts';
 export function configureAMQP() {
     const connectionString = useEnv('rabbitMqConnectionString');
     if (connectionString) {
-        setAmqpClientFactory(() => new AmqpClient({
-            connectionOptions: connectionString,
-        }));
+        setAmqpClientFactory(() => new AmqpClient({ connectionOptions: connectionString }));
     }
 }

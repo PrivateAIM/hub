@@ -6,7 +6,11 @@
  */
 
 import {
-    afterAll, beforeAll, describe, expect, it,
+    afterAll, 
+    beforeAll, 
+    describe, 
+    expect, 
+    it,
 } from 'vitest';
 import { ProcessStatus } from '@privateaim/kit';
 import type { Analysis, Node } from '@privateaim/core-kit';
@@ -45,9 +49,7 @@ describe('controllers > analysis-node-log', () => {
             project_id: project.id,
         });
 
-        analysis = await client.analysis.create({
-            project_id: project.id,
-        });
+        analysis = await client.analysis.create({ project_id: project.id });
 
         await client.analysisNode.create({
             analysis_id: analysis.id,
@@ -60,9 +62,7 @@ describe('controllers > analysis-node-log', () => {
             status: ProcessStatus.FAILED,
             level: LogLevel.ERROR,
             message: 'Analysis has been forcefully terminated.',
-            labels: {
-                foo: 'bar',
-            },
+            labels: { foo: 'bar' },
         });
 
         expect(entity).toBeDefined();

@@ -13,7 +13,11 @@ import { BTable } from 'bootstrap-vue-next';
 import type { BuildInput } from 'rapiq';
 import { computed } from 'vue';
 import {
-    FEntityDelete, FNodes, FPagination, FSearch, FTitle,
+    FEntityDelete, 
+    FNodes, 
+    FPagination, 
+    FSearch, 
+    FTitle,
 } from '@privateaim/client-vue';
 import { definePageMeta } from '#imports';
 import { defineNuxtComponent } from '#app';
@@ -38,16 +42,27 @@ export default defineNuxtComponent({
 
         const fields = [
             {
-                key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
+                key: 'name', 
+                label: 'Name', 
+                thClass: 'text-left', 
+                tdClass: 'text-left',
             },
             {
-                key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center',
+                key: 'created_at', 
+                label: 'Created At', 
+                thClass: 'text-center', 
+                tdClass: 'text-center',
             },
             {
-                key: 'updated_at', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left',
+                key: 'updated_at', 
+                label: 'Updated At', 
+                thClass: 'text-left', 
+                tdClass: 'text-left',
             },
             {
-                key: 'options', label: '', tdClass: 'text-left',
+                key: 'options', 
+                label: '', 
+                tdClass: 'text-left',
             },
         ];
 
@@ -59,12 +74,8 @@ export default defineNuxtComponent({
         const canView = computed(() => canEdit.value || canDrop.value);
 
         const query = computed<BuildInput<Node>>(() => ({
-            filters: {
-                realm_id: realmManagementId.value,
-            },
-            sort: {
-                updated_at: 'DESC',
-            },
+            filters: { realm_id: realmManagementId.value },
+            sort: { updated_at: 'DESC' },
         }));
 
         const handleDeleted = async (item: Node) => {

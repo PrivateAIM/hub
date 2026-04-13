@@ -18,7 +18,9 @@ import {
     useToast,
 } from '#imports';
 import {
-    createError, navigateTo, useRoute,
+    createError, 
+    navigateTo, 
+    useRoute,
 } from '#app';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
 
@@ -34,16 +36,24 @@ export default defineComponent({
 
         const items = [
             {
-                name: 'General', icon: 'fas fa-bars', path: '',
+                name: 'General', 
+                icon: 'fas fa-bars', 
+                path: '',
             },
             {
-                name: 'Users', icon: 'fas fa-user', path: 'users',
+                name: 'Users', 
+                icon: 'fas fa-user', 
+                path: 'users',
             },
             {
-                name: 'Robots', icon: 'fas fa-robot', path: 'robots',
+                name: 'Robots', 
+                icon: 'fas fa-robot', 
+                path: 'robots',
             },
             {
-                name: 'Roles', icon: 'fas fa-user-group', path: 'roles',
+                name: 'Roles', 
+                icon: 'fas fa-user-group', 
+                path: 'roles',
             },
         ];
 
@@ -56,7 +66,7 @@ export default defineComponent({
             entity.value = await injectHTTPClient()
                 .permission
                 .getOne(route.params.id as string);
-        } catch (e) {
+        } catch {
             await navigateTo({ path: '/admin/permissions' });
             throw createError({});
         }

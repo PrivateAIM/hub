@@ -4,7 +4,13 @@ import { defineComponent } from 'vue';
 import { VCTimeago } from '@vuecs/timeago';
 import { BTable } from 'bootstrap-vue-next';
 import {
-    AEntityDelete, APagination, APolicies, ASearch, ATitle, injectStore, storeToRefs,
+    AEntityDelete, 
+    APagination, 
+    APolicies, 
+    ASearch, 
+    ATitle, 
+    injectStore, 
+    storeToRefs,
     usePermissionCheck,
 } from '@authup/client-web-kit';
 import type { Policy } from '@authup/core-kit';
@@ -30,27 +36,35 @@ export default defineComponent({
         const store = injectStore();
         const { realmManagementId } = storeToRefs(store);
 
-        const query : BuildInput<Policy> = {
-            filters: {
-                realm_id: [realmManagementId.value, null],
-            },
-        };
+        const query : BuildInput<Policy> = { filters: { realm_id: [realmManagementId.value, null] } };
 
         const hasEditPermission = usePermissionCheck({ name: PermissionName.PERMISSION_UPDATE });
         const hasDropPermission = usePermissionCheck({ name: PermissionName.PERMISSION_DELETE });
 
         const fields = [
             {
-                key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
+                key: 'name', 
+                label: 'Name', 
+                thClass: 'text-left', 
+                tdClass: 'text-left',
             },
             {
-                key: 'type', label: 'Type', thClass: 'text-left', tdClass: 'text-left',
+                key: 'type', 
+                label: 'Type', 
+                thClass: 'text-left', 
+                tdClass: 'text-left',
             },
             {
-                key: 'created_at', label: 'Created at', thClass: 'text-center', tdClass: 'text-center',
+                key: 'created_at', 
+                label: 'Created at', 
+                thClass: 'text-center', 
+                tdClass: 'text-center',
             },
             {
-                key: 'updated_at', label: 'Updated at', thClass: 'text-left', tdClass: 'text-left',
+                key: 'updated_at', 
+                label: 'Updated at', 
+                thClass: 'text-left', 
+                tdClass: 'text-left',
             },
             {
                 key: 'options',

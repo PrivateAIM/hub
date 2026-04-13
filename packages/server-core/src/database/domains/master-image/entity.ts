@@ -6,7 +6,7 @@
  */
 
 import { deserialize, serialize } from '@authup/kit';
-import { ProcessStatus } from '@privateaim/kit';
+import type { ProcessStatus } from '@privateaim/kit';
 import {
     Column,
     CreateDateColumn,
@@ -15,24 +15,29 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-import type { MasterImage } from '@privateaim/core-kit';
-import { MasterImageCommandArgument } from '@privateaim/core-kit';
+import type { MasterImage, MasterImageCommandArgument  } from '@privateaim/core-kit';
 
 @Entity({ name: 'master_images' })
 export class MasterImageEntity implements MasterImage {
     @PrimaryGeneratedColumn('uuid')
-        id: string;
+    id: string;
 
     @Index()
     @Column({
-        type: 'varchar', length: 64, nullable: true, default: null,
+        type: 'varchar', 
+        length: 64, 
+        nullable: true, 
+        default: null,
     })
-        build_status: `${ProcessStatus}` | null;
+    build_status: `${ProcessStatus}` | null;
 
     @Column({
-        type: 'int', unsigned: true, nullable: true, default: null,
+        type: 'int', 
+        unsigned: true, 
+        nullable: true, 
+        default: null,
     })
-        build_progress: number | null;
+    build_progress: number | null;
 
     // sha512:<128 hex> = 135
     @Column({
@@ -41,29 +46,36 @@ export class MasterImageEntity implements MasterImage {
         nullable: true,
         default: null,
     })
-        build_hash: string | null;
+    build_hash: string | null;
 
     @Column({
-        type: 'int', unsigned: true, nullable: true, default: null,
+        type: 'int', 
+        unsigned: true, 
+        nullable: true, 
+        default: null,
     })
-        build_size: number | null;
+    build_size: number | null;
 
-    @Column({ type: 'varchar', nullable: true, length: 512 })
-        path: string | null;
+    @Column({
+        type: 'varchar', 
+        nullable: true, 
+        length: 512, 
+    })
+    path: string | null;
 
     @Index()
     @Column({ type: 'varchar', length: 512 })
-        virtual_path: string;
+    virtual_path: string;
 
     @Index()
     @Column({ type: 'varchar', length: 512 })
-        group_virtual_path: string;
+    group_virtual_path: string;
 
     @Column({ type: 'varchar' })
-        name: string;
+    name: string;
 
     @Column({ type: 'text', nullable: true })
-        command: string | null;
+    command: string | null;
 
     @Column({
         type: 'text',
@@ -77,13 +89,13 @@ export class MasterImageEntity implements MasterImage {
             },
         },
     })
-        command_arguments: MasterImageCommandArgument[] | null;
+    command_arguments: MasterImageCommandArgument[] | null;
 
     // ------------------------------------------------------------------
 
     @CreateDateColumn()
-        created_at: Date;
+    created_at: Date;
 
     @UpdateDateColumn()
-        updated_at: Date;
+    updated_at: Date;
 }

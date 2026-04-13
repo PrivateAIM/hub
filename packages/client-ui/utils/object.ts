@@ -12,8 +12,8 @@ export function updateObjectProperties<T extends Record<string, any>>(
     input: Partial<T>,
 ) : Ref<T> {
     const keys : (keyof T)[] = Object.keys(input);
-    for (let i = 0; i < keys.length; i++) {
-        src.value[keys[i]] = input[keys[i]] as T[keyof T];
+    for (const key of keys) {
+        src.value[key] = input[key] as T[keyof T];
     }
 
     return src;
@@ -24,8 +24,8 @@ export function extendObjectProperties<T extends Record<string, any>>(
     input: Partial<T>,
 ) : T {
     const keys : (keyof T)[] = Object.keys(input);
-    for (let i = 0; i < keys.length; i++) {
-        src[keys[i]] = input[keys[i]] as T[keyof T];
+    for (const key of keys) {
+        src[key] = input[key] as T[keyof T];
     }
 
     return src;
@@ -40,9 +40,9 @@ export function initFormAttributesFromSource(
     }
 
     const keys = Object.keys(form);
-    for (let i = 0; i < keys.length; i++) {
-        if (Object.prototype.hasOwnProperty.call(source, keys[i])) {
-            form[keys[i]] = source[keys[i]] ?? '';
+    for (const key of keys) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+            form[key] = source[key] ?? '';
         }
     }
 }

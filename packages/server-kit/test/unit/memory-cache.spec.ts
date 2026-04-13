@@ -12,9 +12,7 @@ describe('memory-cache', () => {
     it('should support operations (set,get,has,del)', async () => {
         const adapter = new MemoryCacheAdapter();
         const cache = new Cache(adapter);
-        await cache.set('foo', { bar: 'baz' }, {
-            ttl: 1000 * 60 * 15,
-        });
+        await cache.set('foo', { bar: 'baz' }, { ttl: 1000 * 60 * 15 });
 
         expect(await cache.has('foo')).toBeTruthy();
 

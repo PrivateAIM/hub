@@ -9,8 +9,11 @@ import { vBTooltip } from 'bootstrap-vue-next';
 import { isObject } from 'smob';
 import { h, resolveDynamicComponent, withDirectives } from 'vue';
 import type {
-    Component, Slots, VNodeArrayChildren,
-    VNodeChild, VNodeProps,
+    Component, 
+    Slots, 
+    VNodeArrayChildren,
+    VNodeChild, 
+    VNodeProps,
 } from 'vue';
 import { hasNormalizedSlot, normalizeSlot } from '../slot';
 
@@ -85,9 +88,7 @@ export function renderActionCommand(ctx: Context) : VNodeChild {
     }
 
     if (ctx.withIcon) {
-        text.unshift(h('i', {
-            class: iconClasses,
-        }));
+        text.unshift(h('i', { class: iconClasses }));
     }
 
     if (hasNormalizedSlot('default', ctx.slots)) {

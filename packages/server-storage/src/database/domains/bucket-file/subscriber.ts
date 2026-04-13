@@ -11,13 +11,13 @@ import type {
 import { EventSubscriber } from 'typeorm';
 import { DomainType } from '@privateaim/storage-kit';
 import { BaseSubscriber } from '@privateaim/server-db-kit';
-import { EntityEventDestination } from '@privateaim/server-kit';
+import type { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
 import { BucketFileEntity } from './entity.ts';
 
 @EventSubscriber()
 export class BucketFileSubscriber extends BaseSubscriber<
-BucketFileEntity
+    BucketFileEntity
 > implements EntitySubscriberInterface<BucketFileEntity> {
     constructor() {
         super({

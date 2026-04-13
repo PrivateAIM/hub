@@ -12,9 +12,7 @@ import { useEnv } from '../env';
 
 export function configureCoreService() {
     setCoreFactory(() => {
-        const client = new Client({
-            baseURL: useEnv('coreURL'),
-        });
+        const client = new Client({ baseURL: useEnv('coreURL') });
 
         if (isAuthupClientAuthenticationHookUsable()) {
             const hook = useAuthupClientAuthenticationHook();

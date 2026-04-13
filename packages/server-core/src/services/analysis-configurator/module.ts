@@ -7,13 +7,16 @@
 
 import { NotFoundError } from '@ebec/http';
 import {
-    AnalysisConfiguratorCommandChecker, NodeType,
+    AnalysisConfiguratorCommandChecker, 
+    NodeType,
 } from '@privateaim/core-kit';
 import type { Repository } from 'typeorm';
 import type { AnalysisMetadataComponentCaller } from '../../components/index.ts';
 import { useAnalysisMetadataComponentCaller } from '../../components/index.ts';
 import {
-    AnalysisEntity, AnalysisNodeEntity, useDataSourceSync,
+    AnalysisEntity, 
+    AnalysisNodeEntity, 
+    useDataSourceSync,
 } from '../../database/index.ts';
 import { RequestRepositoryAdapter } from '../../http/request/index.ts';
 import type { AnalysisConfiguratorLockOptions, AnalysisConfiguratorUnlockOptions } from './types.ts';
@@ -47,9 +50,7 @@ export class AnalysisConfigurator {
         options: AnalysisConfiguratorLockOptions = {},
     ): Promise<AnalysisEntity> {
         const entityId = typeof input === 'string' ? input : input.id;
-        const entity = await this.metadataCaller.callRecalcDirect({
-            analysisId: entityId,
-        });
+        const entity = await this.metadataCaller.callRecalcDirect({ analysisId: entityId });
 
         AnalysisConfiguratorCommandChecker.canLock(entity);
 
@@ -85,25 +86,23 @@ export class AnalysisConfigurator {
         AnalysisConfiguratorCommandChecker.canUnlock(entity);
 
         const analysisNodes = await this.analysisNodeRepository.find({
-            where: {
-                analysis_id: entity.id,
-            },
+            where: { analysis_id: entity.id },
             relations: ['node'],
         });
 
-        for (let i = 0; i < analysisNodes.length; i++) {
+        for (const analysisNode of analysisNodes) {
             if (
-                analysisNodes[i].node &&
-                analysisNodes[i].node.type === NodeType.AGGREGATOR
+                analysisNode.node &&
+                analysisNode.node.type === NodeType.AGGREGATOR
             ) {
                 continue;
             }
 
             if (!options.ignoreApproval) {
-                analysisNodes[i].approval_status = null;
+                analysisNode.approval_status = null;
             }
 
-            await this.analysisNodeRepository.save(analysisNodes[i]);
+            await this.analysisNodeRepository.save(analysisNode);
         }
 
         entity.configuration_locked = false;

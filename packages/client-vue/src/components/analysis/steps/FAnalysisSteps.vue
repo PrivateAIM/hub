@@ -25,15 +25,9 @@ export default defineComponent({
             type: Object as PropType<Analysis>,
             required: true,
         },
-        configurationNodesLink: {
-            type: String,
-        },
-        configurationCodeLink: {
-            type: String,
-        },
-        configurationImageLink: {
-            type: String,
-        },
+        configurationNodesLink: { type: String },
+        configurationCodeLink: { type: String },
+        configurationImageLink: { type: String },
     },
     emits: ['updated', 'executed', 'failed'],
     setup() {

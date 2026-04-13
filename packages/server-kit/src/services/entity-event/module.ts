@@ -50,12 +50,9 @@ export class EntityEventPublisher implements IEntityEventPublisher {
                 );
         }
 
-        let destinations : EntityEventDestination[] = [];
-        if (typeof ctx.destinations === 'function') {
-            destinations = ctx.destinations(ctx.data);
-        } else {
-            destinations = ctx.destinations;
-        }
+        const destinations : EntityEventDestination[] = typeof ctx.destinations === 'function' ?
+            ctx.destinations(ctx.data) :
+            ctx.destinations;
 
         const consumeContext : EntityEventHandleOptions = {
             ...ctx,

@@ -63,5 +63,5 @@ export type Middleware<
     Data extends SocketData = SocketData,
 > = (
     socket: Socket<ListenEvents, EmitEvents, ServerSideEvents, Data>,
-    next: (err?: Error) => void
+    next: (err?: Error) => void,
 ) => void | Promise<void>;

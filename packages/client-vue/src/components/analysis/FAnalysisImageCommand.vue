@@ -8,7 +8,10 @@
 import { AnalysisBucketType, DomainType } from '@privateaim/core-kit';
 import type { Analysis, AnalysisBucketFile, MasterImage } from '@privateaim/core-kit';
 import {
-    type PropType, computed, defineComponent, watch,
+    type PropType, 
+    computed, 
+    defineComponent, 
+    watch,
 } from 'vue';
 import { useUpdatedAt } from '../../composables';
 import { createEntityManager, defineEntityManagerEvents } from '../../core';
@@ -17,24 +20,12 @@ import ImageCommand from '../image/ImageCommand.vue';
 export default defineComponent({
     components: { ImageCommand },
     props: {
-        entityId: {
-            type: String as PropType<string | null>,
-        },
-        entity: {
-            type: Object as PropType<Analysis | null>,
-        },
-        analysisFileId: {
-            type: String as PropType<string | null>,
-        },
-        analysisFile: {
-            type: Object as PropType<AnalysisBucketFile | null>,
-        },
-        masterImageId: {
-            type: String as PropType<string | null>,
-        },
-        masterImage: {
-            type: Object as PropType<MasterImage | null>,
-        },
+        entityId: { type: String as PropType<string | null> },
+        entity: { type: Object as PropType<Analysis | null> },
+        analysisFileId: { type: String as PropType<string | null> },
+        analysisFile: { type: Object as PropType<AnalysisBucketFile | null> },
+        masterImageId: { type: String as PropType<string | null> },
+        masterImage: { type: Object as PropType<MasterImage | null> },
     },
     emits: {
         ...defineEntityManagerEvents<Analysis>(),
@@ -77,14 +68,10 @@ export default defineComponent({
                         query: {
                             filters: {
                                 analysis_id: entity.id,
-                                analysis_bucket: {
-                                    type: AnalysisBucketType.CODE,
-                                },
+                                analysis_bucket: { type: AnalysisBucketType.CODE },
                                 root: true,
                             },
-                            relations: {
-                                analysis_bucket: true,
-                            },
+                            relations: { analysis_bucket: true },
                         },
                     });
                 } else {
@@ -101,9 +88,7 @@ export default defineComponent({
             analysisBucketFileManager.data.value = entity;
         };
 
-        setup.expose({
-            setAnalysisBucketFile,
-        });
+        setup.expose({ setAnalysisBucketFile });
 
         const entityId = computed(() => {
             if (props.entityId) {

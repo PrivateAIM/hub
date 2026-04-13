@@ -10,21 +10,34 @@ import { getSeverity, useTranslationsForNestedValidations } from '@ilingo/vuelid
 import type { Registry, RegistryProject } from '@privateaim/core-kit';
 import { DomainType, RegistryProjectType } from '@privateaim/core-kit';
 import {
-    buildFormGroup, buildFormInput, buildFormSelect,
+    buildFormGroup, 
+    buildFormInput, 
+    buildFormSelect,
 } from '@vuecs/form-controls';
 import { createNanoID } from '@privateaim/kit';
 import type { ListItemSlotProps } from '@vuecs/list-controls';
 import useVuelidate from '@vuelidate/core';
 import {
-    helpers, maxLength, minLength, required,
+    helpers, 
+    maxLength, 
+    minLength, 
+    required,
 } from '@vuelidate/validators';
 import type { PropType, VNodeArrayChildren } from 'vue';
 import {
-    computed, defineComponent, h, reactive, ref, watch,
+    computed, 
+    defineComponent, 
+    h, 
+    reactive, 
+    ref, 
+    watch,
 } from 'vue';
 import { useUpdatedAt } from '../../composables';
 import {
-    EntityListSlotName, createEntityManager, initFormAttributesFromSource, wrapFnWithBusyState,
+    EntityListSlotName, 
+    createEntityManager, 
+    initFormAttributesFromSource, 
+    wrapFnWithBusyState,
 } from '../../core';
 import RegistryList from '../registry/FRegistries';
 
@@ -66,12 +79,8 @@ export default defineComponent({
                 minLength: minLength(3),
                 maxLength: maxLength(64),
             },
-            type: {
-                required,
-            },
-            registry_id: {
-                required,
-            },
+            type: { required },
+            registry_id: { required },
         }, form);
 
         const manager = createEntityManager({
@@ -238,9 +247,7 @@ export default defineComponent({
                     h('hr'),
                     h(RegistryList, {
                         [EntityListSlotName.ITEM_ACTIONS]: (props: ListItemSlotProps<Registry>) => h('button', {
-                            attrs: {
-                                disabled: props.busy,
-                            },
+                            attrs: { disabled: props.busy },
                             class: ['btn btn-xs', {
                                 'btn-dark': form.registry_id !== props.data.id,
                                 'btn-warning': form.registry_id === props.data.id,

@@ -10,9 +10,7 @@ import './css';
 import { install } from './module';
 import type { Options } from './type';
 
-export default {
-    install,
-} satisfies Plugin<Options | undefined>;
+export default { install } satisfies Plugin<Options | undefined>;
 
 export * from './components';
 export * from './core';

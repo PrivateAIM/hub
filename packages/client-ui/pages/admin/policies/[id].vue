@@ -10,7 +10,9 @@ import {
     useToast,
 } from '#imports';
 import {
-    createError, navigateTo, useRoute,
+    createError, 
+    navigateTo, 
+    useRoute,
 } from '#app';
 import { LayoutKey } from '../../../config/layout';
 
@@ -25,7 +27,9 @@ export default defineComponent({
 
         const items = [
             {
-                name: 'General', icon: 'fas fa-bars', urlSuffix: '',
+                name: 'General', 
+                icon: 'fas fa-bars', 
+                urlSuffix: '',
             },
         ];
 
@@ -38,7 +42,7 @@ export default defineComponent({
             entity.value = await injectHTTPClient()
                 .policy
                 .getOne(route.params.id as string);
-        } catch (e) {
+        } catch {
             await navigateTo({ path: '/policies' });
             throw createError({});
         }

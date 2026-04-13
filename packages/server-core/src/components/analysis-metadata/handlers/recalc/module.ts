@@ -23,7 +23,7 @@ import type { AnalysisMetadataEventMap, AnalysisMetadataRecalcPayload } from '..
 import { useEnv } from '../../../../config/index.ts';
 
 export class AnalysisMetadataRecalcHandler implements ComponentHandler<
-AnalysisMetadataEventMap
+    AnalysisMetadataEventMap
 > {
     async handle(
         value: AnalysisMetadataRecalcPayload,
@@ -53,17 +53,13 @@ AnalysisMetadataEventMap
 
         const analysisRepository = entityManger.getRepository(AnalysisEntity);
 
-        const entity = await analysisRepository.findOneBy({
-            id: value.analysisId,
-        });
+        const entity = await analysisRepository.findOneBy({ id: value.analysisId });
 
         if (!entity) {
             return;
         }
 
-        const cloned = {
-            ...entity,
-        };
+        const cloned = { ...entity };
 
         const querySelf = value.querySelf ?? true;
         if (querySelf) {
@@ -97,9 +93,7 @@ AnalysisMetadataEventMap
             where: {
                 analysis_id: entity.id,
                 root: true,
-                analysis_bucket: {
-                    type: AnalysisBucketType.CODE,
-                },
+                analysis_bucket: { type: AnalysisBucketType.CODE },
             },
             relations: ['analysis_bucket'],
         });
@@ -110,9 +104,7 @@ AnalysisMetadataEventMap
     async queryAnalysisNodes(entity: AnalysisEntity, entityManger: EntityManager) : Promise<void> {
         const analysisNodesRepository = entityManger.getRepository(AnalysisNodeEntity);
         const analysisNodes = await analysisNodesRepository.find({
-            where: {
-                analysis_id: entity.id,
-            },
+            where: { analysis_id: entity.id },
             relations: ['node'],
             cache: false,
         });
@@ -124,9 +116,7 @@ AnalysisMetadataEventMap
         let hasAggregator : boolean = false;
         let hasDefault : boolean = false;
 
-        for (let i = 0; i < analysisNodes.length; i++) {
-            const analysisNode = analysisNodes[i];
-
+        for (const analysisNode of analysisNodes) {
             nodes++;
             if (analysisNode.approval_status === AnalysisNodeApprovalStatus.APPROVED) {
                 nodesApproved += 1;
@@ -169,13 +159,13 @@ AnalysisMetadataEventMap
         const keys = Object.keys(a);
         let index : number;
 
-        for (let i = 0; i < keys.length; i++) {
-            index = excludeKeys.indexOf(keys[i] as keyof Analysis);
+        for (const key of keys) {
+            index = excludeKeys.indexOf(key as keyof Analysis);
             if (index !== -1) {
                 continue;
             }
 
-            if (!isEqual(a[keys[i]], b[keys[i]])) {
+            if (!isEqual(a[key], b[key])) {
                 return true;
             }
         }

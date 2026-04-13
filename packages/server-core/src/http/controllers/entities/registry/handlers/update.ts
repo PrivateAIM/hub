@@ -24,9 +24,7 @@ export async function updateRegistryRouteHandler(req: Request, res: Response) : 
 
     const validator = new RegistryValidator();
     const validatorAdapter = new RoutupContainerAdapter(validator);
-    const data = await validatorAdapter.run(req, {
-        group: HTTPHandlerOperation.UPDATE,
-    });
+    const data = await validatorAdapter.run(req, { group: HTTPHandlerOperation.UPDATE });
 
     if (data.host) {
         data.host = getHostNameFromString(data.host);

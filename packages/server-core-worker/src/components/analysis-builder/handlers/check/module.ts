@@ -63,7 +63,7 @@ export class AnalysisBuilderCheckHandler implements ComponentHandler<AnalysisBui
                     size: imageInfo.Size,
                 },
             );
-        } catch (e) {
+        } catch {
             let status: `${ProcessStatus}`;
 
             if (

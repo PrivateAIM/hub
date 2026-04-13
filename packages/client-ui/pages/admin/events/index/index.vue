@@ -13,7 +13,13 @@ import { BTable } from 'bootstrap-vue-next';
 import type { BuildInput } from 'rapiq';
 import { computed, defineComponent } from 'vue';
 import {
-    FEntityDelete, FEventActor, FEventExpiring, FEvents, FPagination, FSearch, FTitle,
+    FEntityDelete, 
+    FEventActor, 
+    FEventExpiring, 
+    FEvents, 
+    FPagination, 
+    FSearch, 
+    FTitle,
 } from '@privateaim/client-vue';
 import { definePageMeta } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
@@ -39,28 +45,51 @@ export default defineComponent({
 
         const fields = [
             {
-                key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
+                key: 'name', 
+                label: 'Name', 
+                thClass: 'text-left', 
+                tdClass: 'text-left',
             },
             {
-                key: 'scope', label: 'Scope', thClass: 'text-left', tdClass: 'text-left',
+                key: 'scope', 
+                label: 'Scope', 
+                thClass: 'text-left', 
+                tdClass: 'text-left',
             },
             {
-                key: 'ref_type', label: 'Ref Type', thClass: 'text-left', tdClass: 'text-left',
+                key: 'ref_type', 
+                label: 'Ref Type', 
+                thClass: 'text-left', 
+                tdClass: 'text-left',
             },
             {
-                key: 'ref_id', label: 'Ref ID', thClass: 'text-left', tdClass: 'text-left',
+                key: 'ref_id', 
+                label: 'Ref ID', 
+                thClass: 'text-left', 
+                tdClass: 'text-left',
             },
             {
-                key: 'actor', label: 'Actor', thClass: 'text-center', tdClass: 'text-center',
+                key: 'actor', 
+                label: 'Actor', 
+                thClass: 'text-center', 
+                tdClass: 'text-center',
             },
             {
-                key: 'expiring', label: 'Expiring?', thClass: 'text-center', tdClass: 'text-center',
+                key: 'expiring', 
+                label: 'Expiring?', 
+                thClass: 'text-center', 
+                tdClass: 'text-center',
             },
             {
-                key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center',
+                key: 'created_at', 
+                label: 'Created At', 
+                thClass: 'text-center', 
+                tdClass: 'text-center',
             },
             {
-                key: 'options', label: '', tdClass: 'text-left',
+                key: 'options', 
+                label: '', 
+                tdClass: 'text-left',
             },
         ];
 
@@ -72,15 +101,9 @@ export default defineComponent({
         const canView = computed(() => canEdit.value || canDrop.value);
 
         const query = computed<BuildInput<Node>>(() => ({
-            filters: {
-                realm_id: [realmManagementId.value, null],
-            },
-            sort: {
-                updated_at: 'DESC',
-            },
-            pagination: {
-                limit: 50,
-            },
+            filters: { realm_id: [realmManagementId.value, null] },
+            sort: { updated_at: 'DESC' },
+            pagination: { limit: 50 },
         }));
 
         const handleDeleted = async (item: Node) => {

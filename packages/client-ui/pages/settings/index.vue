@@ -18,16 +18,18 @@ export default defineNuxtComponent({
 
         const items = [
             {
-                name: 'Account', icon: 'fas fa-bars', path: '',
+                name: 'Account', 
+                icon: 'fas fa-bars', 
+                path: '',
             },
             {
-                name: 'Security', icon: 'fa fa-lock', path: '/security',
+                name: 'Security', 
+                icon: 'fa fa-lock', 
+                path: '/security',
             },
         ];
 
-        return {
-            items,
-        };
+        return { items };
     },
 });
 </script>

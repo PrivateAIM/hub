@@ -7,7 +7,10 @@
 
 import { EntityType } from '@authup/core-kit';
 import {
-    type Component, EnvironmentName, isRedisClientUsable, useLogger,
+    type Component, 
+    EnvironmentName, 
+    isRedisClientUsable, 
+    useLogger,
     useRedisSubscribeClient,
 } from '@privateaim/server-kit';
 import { useEnv } from '../../config/index.ts';

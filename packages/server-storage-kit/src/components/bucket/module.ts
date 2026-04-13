@@ -17,9 +17,7 @@ import type { BucketCreateCommandPayload, BucketDeleteCommandPayload } from './h
 
 export class BucketComponentCaller extends QueueDispatchComponentCaller {
     constructor() {
-        super({
-            queue: BucketTaskQueueRouterRouting,
-        });
+        super({ queue: BucketTaskQueueRouterRouting });
     }
 
     async callCreate(payload: BucketCreateCommandPayload, metadata: ComponentMetadata = {}) {

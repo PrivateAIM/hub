@@ -9,7 +9,8 @@ import {
     Column,
     CreateDateColumn,
     Entity,
-    PrimaryGeneratedColumn, Unique,
+    PrimaryGeneratedColumn, 
+    Unique,
     UpdateDateColumn,
 } from 'typeorm';
 import type { Registry } from '@privateaim/core-kit';
@@ -19,31 +20,36 @@ import type { Registry } from '@privateaim/core-kit';
 @Entity({ name: 'registries' })
 export class RegistryEntity implements Registry {
     @PrimaryGeneratedColumn('uuid')
-        id: string;
+    id: string;
 
     @Column({ type: 'varchar', length: 128 })
-        name: string;
+    name: string;
 
     @Column({ type: 'varchar', length: 512 })
-        host: string;
+    host: string;
 
     // ------------------------------------------------------------------
 
     @Column({
-        type: 'varchar', length: 256, nullable: true,
+        type: 'varchar', 
+        length: 256, 
+        nullable: true,
     })
-        account_name: string | null;
+    account_name: string | null;
 
     @Column({
-        type: 'varchar', length: 256, nullable: true, select: false,
+        type: 'varchar', 
+        length: 256, 
+        nullable: true, 
+        select: false,
     })
-        account_secret: string | null;
+    account_secret: string | null;
 
     // ------------------------------------------------------------------
 
     @CreateDateColumn()
-        created_at: Date;
+    created_at: Date;
 
     @UpdateDateColumn()
-        updated_at: Date;
+    updated_at: Date;
 }

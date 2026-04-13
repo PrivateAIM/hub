@@ -19,7 +19,7 @@ export default defineComponent({
     },
     emits: ['toggle'],
     setup(props, setup) {
-        const active = computed(() => props.items.indexOf(props.current) !== -1);
+        const active = computed(() => props.items.includes(props.current));
 
         const toggle = () => {
             if (props.isBusy) {

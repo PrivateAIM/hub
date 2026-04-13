@@ -20,9 +20,7 @@ export default defineComponent({
             type: Object as PropType<AnalysisBucketFile>,
             required: true,
         },
-        readonly: {
-            type: Boolean,
-        },
+        readonly: { type: Boolean },
     },
     emits: ['updated'],
     setup(props, { emit }) {

@@ -16,14 +16,14 @@ export function expectPropertiesEqualToSrc<
     ignore?: (keyof T)[],
 ) {
     const keys = Object.keys(src);
-    for (let i = 0; i < keys.length; i++) {
+    for (const key of keys) {
         if (typeof ignore !== 'undefined') {
-            const index = ignore.indexOf(keys[i]);
+            const index = ignore.indexOf(key);
             if (index !== -1) {
                 continue;
             }
         }
 
-        expect(dest[keys[i]]).toEqual(src[keys[i]]);
+        expect(dest[key]).toEqual(src[key]);
     }
 }

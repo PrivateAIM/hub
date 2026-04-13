@@ -39,7 +39,7 @@ export function registerProjectNodeSocketHandlers(socket: Socket) {
                         PermissionName.PROJECT_APPROVE,
                     ],
                 });
-            } catch (e) {
+            } catch {
                 if (isEventCallback(cb)) {
                     cb(new UnauthorizedError());
                 }
@@ -77,7 +77,7 @@ export function registerProjectNodeForRealmSocketHandlers(socket: Socket) {
                         PermissionName.PROJECT_APPROVE,
                     ],
                 });
-            } catch (e) {
+            } catch {
                 if (isEventCallback(cb)) {
                     cb(new UnauthorizedError());
                 }
@@ -117,7 +117,7 @@ export function registerProjectNodeForRealmSocketHandlers(socket: Socket) {
                         PermissionName.PROJECT_UPDATE,
                     ],
                 });
-            } catch (e) {
+            } catch {
                 if (isEventCallback(cb)) {
                     cb(new UnauthorizedError());
                 }

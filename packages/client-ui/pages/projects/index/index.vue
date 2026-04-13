@@ -8,7 +8,11 @@
 import { computed } from 'vue';
 import { injectStore, storeToRefs } from '@authup/client-web-kit';
 import {
-    FPagination, FProjectItem, FProjects, FSearch, FTitle,
+    FPagination, 
+    FProjectItem, 
+    FProjects, 
+    FSearch, 
+    FTitle,
 } from '@privateaim/client-vue';
 import { PermissionName } from '@privateaim/kit';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
@@ -16,7 +20,11 @@ import { defineNuxtComponent, definePageMeta } from '#imports';
 
 export default defineNuxtComponent({
     components: {
-        ListPagination: FPagination, ListSearch: FSearch, ListTitle: FTitle, FProjects, FProjectItem,
+        ListPagination: FPagination, 
+        ListSearch: FSearch, 
+        ListTitle: FTitle, 
+        FProjects, 
+        FProjectItem,
     },
     setup() {
         definePageMeta({
@@ -42,17 +50,11 @@ export default defineNuxtComponent({
         const { realmId } = storeToRefs(store);
 
         const query = computed(() => ({
-            filter: {
-                realm_id: realmId.value,
-            },
-            sort: {
-                updated_at: 'DESC',
-            },
+            filter: { realm_id: realmId.value },
+            sort: { updated_at: 'DESC' },
         }));
 
-        return {
-            query,
-        };
+        return { query };
     },
 });
 </script>

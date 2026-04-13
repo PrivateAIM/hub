@@ -18,25 +18,13 @@ export default defineComponent({
         FAnalysis,
     },
     props: {
-        entity: {
-            type: Object as PropType<Analysis>,
-        },
-        entityId: {
-            type: String as PropType<string>,
-        },
-        masterImageEntity: {
-            type: Object as PropType<MasterImage>,
-        },
-        masterImageEntityId: {
-            type: String,
-        },
-        readonly: {
-            type: Boolean,
-        },
+        entity: { type: Object as PropType<Analysis> },
+        entityId: { type: String as PropType<string> },
+        masterImageEntity: { type: Object as PropType<MasterImage> },
+        masterImageEntityId: { type: String },
+        readonly: { type: Boolean },
     },
-    emits: {
-        ...defineEntityManagerEvents<Analysis>(),
-    },
+    emits: { ...defineEntityManagerEvents<Analysis>() },
 });
 </script>
 <template>

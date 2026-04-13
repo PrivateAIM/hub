@@ -14,18 +14,29 @@ import {
 import { alphaNumHyphenUnderscoreRegex } from '@privateaim/kit';
 import {
     buildFormGroup,
-    buildFormInput, buildFormInputCheckbox, buildFormSelect,
+    buildFormInput, 
+    buildFormInputCheckbox, 
+    buildFormSelect,
 } from '@vuecs/form-controls';
 import type { ListBodySlotProps, ListItemSlotProps } from '@vuecs/list-controls';
 import useVuelidate from '@vuelidate/core';
 import {
-    helpers, maxLength, minLength, required,
+    helpers, 
+    maxLength, 
+    minLength, 
+    required,
 } from '@vuelidate/validators';
 import type {
-    PropType, VNodeArrayChildren,
+    PropType, 
+    VNodeArrayChildren,
 } from 'vue';
 import {
-    computed, defineComponent, h, reactive, ref, watch,
+    computed, 
+    defineComponent, 
+    h, 
+    reactive, 
+    ref, 
+    watch,
 } from 'vue';
 import { useUpdatedAt } from '../../composables';
 import {
@@ -70,23 +81,15 @@ export default defineComponent({
                 minLength: minLength(3),
                 maxLength: maxLength(128),
             },
-            hidden: {
-
-            },
-            realm_id: {
-                required,
-            },
-            registry_id: {
-
-            },
+            hidden: {},
+            realm_id: { required },
+            registry_id: {},
             external_name: {
                 alphaNumHyphenUnderscore: helpers.regex(alphaNumHyphenUnderscoreRegex),
                 minLength: minLength(3),
                 maxLength: maxLength(64),
             },
-            type: {
-                required,
-            },
+            type: { required },
         }, form);
 
         const manager = createEntityManager({
@@ -266,9 +269,7 @@ export default defineComponent({
 
             return h('div', [
                 h('div', { class: 'row' }, [
-                    h('div', {
-                        class: 'col',
-                    }, [
+                    h('div', { class: 'col' }, [
                         realm,
                         name,
                         h('hr'),
@@ -277,9 +278,7 @@ export default defineComponent({
                         registry,
 
                     ]),
-                    h('div', {
-                        class: 'col',
-                    }, [
+                    h('div', { class: 'col' }, [
                         type,
                         h('hr'),
                         hidden,

@@ -41,9 +41,7 @@ export class QueueDispatchComponentCaller<
                     routing: this.options.queue,
                 },
             }),
-            {
-                logging: this.options.logging ?? true,
-            },
+            { logging: this.options.logging ?? true },
         );
     }
 }

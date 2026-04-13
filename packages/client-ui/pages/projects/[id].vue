@@ -17,14 +17,18 @@ import { createEntityManager, injectCoreHTTPClient } from '@privateaim/client-vu
 import { PermissionName } from '@privateaim/kit';
 import type { Ref } from 'vue';
 import {
-    computed, defineComponent, ref,
+    computed, 
+    defineComponent, 
+    ref,
 } from 'vue';
 import {
     definePageMeta,
     useToast,
 } from '#imports';
 import {
-    createError, navigateTo, useRoute,
+    createError, 
+    navigateTo, 
+    useRoute,
 } from '#app';
 import DomainEntityNav from '../../components/DomainEntityNav';
 import { LayoutKey, LayoutNavigationID } from '../../config/layout';
@@ -46,9 +50,7 @@ export default defineComponent({
 
         const manager = createEntityManager<`${DomainType.PROJECT}`>({
             type: `${DomainType.PROJECT}`,
-            props: {
-                entityId: useRoute().params.id as string,
-            },
+            props: { entityId: useRoute().params.id as string },
             onUpdated() {
                 if (toast) {
                     toast.show({ variant: 'success', body: 'The project was successfully updated.' });
@@ -103,19 +105,31 @@ export default defineComponent({
 
         const tabs = computed(() => {
             const items = [
-                { name: 'Overview', icon: 'fas fa-bars', path: '' },
+                {
+                    name: 'Overview', 
+                    icon: 'fas fa-bars', 
+                    path: '', 
+                },
 
             ];
 
             if (isProjectOwner.value || isNodeAuthority.value) {
-                items.push({ name: 'Analyses', icon: 'fas fa-microscope', path: '/analyses' });
+                items.push({
+                    name: 'Analyses', 
+                    icon: 'fas fa-microscope', 
+                    path: '/analyses', 
+                });
             }
 
             if (
                 isProjectOwner.value &&
                 canEdit.value
             ) {
-                items.push({ name: 'Settings', icon: 'fa fa-cog', path: '/settings' });
+                items.push({
+                    name: 'Settings', 
+                    icon: 'fa fa-cog', 
+                    path: '/settings', 
+                });
             }
 
             return items;

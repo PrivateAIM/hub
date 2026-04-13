@@ -9,7 +9,9 @@ import type { AnalysisBucket, AnalysisBucketType } from '@privateaim/core-kit';
 import { AnalysisCommand } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
 import {
-    defineComponent, ref, useTemplateRef,
+    defineComponent, 
+    ref, 
+    useTemplateRef,
 } from 'vue';
 import { type EntityManagerResolveContext, injectCoreHTTPClient, wrapFnWithBusyState } from '../../core';
 import FAnalysisBucket from './FAnalysisBucket';
@@ -21,9 +23,7 @@ export default defineComponent({
             type: String,
             required: true,
         },
-        type: {
-            type: String as PropType<`${AnalysisBucketType}`>,
-        },
+        type: { type: String as PropType<`${AnalysisBucketType}`> },
     },
     emits: ['updated', 'executed', 'failed'],
     setup(props, { emit }) {
@@ -52,9 +52,7 @@ export default defineComponent({
 
         const refresh = () => {
             if (vNode.value) {
-                vNode.value.resolve({
-                    reset: true,
-                } satisfies EntityManagerResolveContext<AnalysisBucket>);
+                vNode.value.resolve({ reset: true } satisfies EntityManagerResolveContext<AnalysisBucket>);
             }
         };
 

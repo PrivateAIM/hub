@@ -49,10 +49,10 @@ export class AnalysisStorageManager {
             [options.type] :
             Object.values(AnalysisBucketType);
 
-        for (let i = 0; i < bucketTypes.length; i++) {
+        for (const bucketType of bucketTypes) {
             const analysisBucket = await this.bucketRepository.findOneBy({
                 analysis_id: entity.id,
-                type: bucketTypes[i],
+                type: bucketType,
             });
             if (analysisBucket) {
                 continue;
@@ -63,16 +63,14 @@ export class AnalysisStorageManager {
                 TaskType.ANALYSIS_BUCKET_CREATE,
                 {
                     analysisId: entity.id,
-                    bucketType: bucketTypes[i],
+                    bucketType,
                 },
             );
 
             await this.caller.callCreate({
-                name: buildAnalysisBucketName(bucketTypes[i], entity.id),
+                name: buildAnalysisBucketName(bucketType, entity.id),
                 realm_id: entity.realm_id,
-            }, {
-                correlationId,
-            });
+            }, { correlationId });
         }
         return entity;
     }
@@ -87,10 +85,10 @@ export class AnalysisStorageManager {
             [options.type] :
             Object.values(AnalysisBucketType);
 
-        for (let i = 0; i < bucketTypes.length; i++) {
+        for (const bucketType of bucketTypes) {
             const analysisBucket = await this.bucketRepository.findOneBy({
                 analysis_id: entity.id,
-                type: bucketTypes[i],
+                type: bucketType,
             });
             if (!analysisBucket) {
                 continue;
@@ -98,16 +96,10 @@ export class AnalysisStorageManager {
 
             const correlationId = await this.taskManager.create(
                 TaskType.ANALYSIS_BUCKET_DELETE,
-                {
-                    analysisId: analysisBucket.analysis_id,
-                },
+                { analysisId: analysisBucket.analysis_id },
             );
 
-            await this.caller.callDelete({
-                id: analysisBucket.bucket_id,
-            }, {
-                correlationId,
-            });
+            await this.caller.callDelete({ id: analysisBucket.bucket_id }, { correlationId });
         }
 
         return entity;

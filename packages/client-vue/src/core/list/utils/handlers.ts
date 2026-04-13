@@ -72,8 +72,8 @@ export class ListHandlers<T extends ObjectLiteral> {
             case 'updated': {
                 if (index !== -1) {
                     const keys = Object.keys(item.data) as (keyof T)[];
-                    for (let i = 0; i < keys.length; i++) {
-                        this.data.value[index][keys[i]] = item.data[keys[i]];
+                    for (const key of keys) {
+                        this.data.value[index][key] = item.data[key];
                     }
 
                     if (this.options.updated) {

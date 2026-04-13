@@ -15,8 +15,8 @@ import type { EventCommand, EventComponentEventMap } from '@privateaim/server-te
 import { EventEntity } from '../../../../database/index.ts';
 
 export class EventComponentCleanerHandler implements ComponentHandler<
-EventComponentEventMap,
-EventCommand.CLEAN
+    EventComponentEventMap,
+    EventCommand.CLEAN
 > {
     async initialize() : Promise<void> {
         await this.handle();

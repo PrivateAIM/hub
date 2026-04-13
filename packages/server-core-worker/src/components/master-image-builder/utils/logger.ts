@@ -20,11 +20,7 @@ export function useMasterImageBuilderLogger() : Logger {
     }
 
     instance = createLogger({
-        options: {
-            defaultMeta: {
-                component: ComponentName.MASTER_IMAGE_BUILDER,
-            },
-        },
+        options: { defaultMeta: { component: ComponentName.MASTER_IMAGE_BUILDER } },
         transports: [
             new LoggerConsoleTransport(),
             new LoggerTransport({

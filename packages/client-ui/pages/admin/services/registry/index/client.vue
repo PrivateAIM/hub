@@ -21,9 +21,7 @@ export default defineNuxtComponent({
 
         try {
             const response = await injectHTTPClient().client.getMany({
-                filter: {
-                    name: ServiceID.REGISTRY,
-                },
+                filter: { name: ServiceID.REGISTRY },
                 fields: ['+secret'],
             });
 
@@ -33,7 +31,7 @@ export default defineNuxtComponent({
             }
 
             entity.value = client;
-        } catch (e) {
+        } catch {
             await navigateTo({ path: '/admin/services' });
             throw createError({});
         }

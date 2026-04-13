@@ -21,9 +21,7 @@ export default defineNuxtComponent({
 
         const router = useRouter();
 
-        const query = {
-            redirect: '',
-        };
+        const query = { redirect: '' };
 
         const { redirect } = router.currentRoute.value.query;
 

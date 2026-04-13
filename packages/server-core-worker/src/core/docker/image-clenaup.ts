@@ -20,7 +20,7 @@ export async function cleanupDockerImage(input: string | Image) : Promise<boolea
     try {
         await image.inspect();
         await image.remove({ force: true });
-    } catch (e) {
+    } catch {
         return false;
     }
 

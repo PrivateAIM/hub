@@ -37,7 +37,7 @@ export function registerRegistryProjectSocketHandlers(socket: Socket) {
                         PermissionName.REGISTRY_PROJECT_MANAGE,
                     ],
                 });
-            } catch (e) {
+            } catch {
                 if (isEventCallback(cb)) {
                     cb(new UnauthorizedError());
                 }

@@ -15,7 +15,7 @@ import { RequestPermissionChecker, setRequestEnv } from '../../request/index.ts'
 import { FakePermissionProvider } from './permission-provider.ts';
 
 type TokenVerificationDataMinimal = Pick<
-TokenVerificationData,
+    TokenVerificationData,
 'permissions' |
 'realm_id' |
 'realm_name' |
@@ -56,9 +56,7 @@ export function applyTokenVerificationData(
         })));
     }
 
-    const permissionEvaluator = new PermissionEvaluator({
-        repository,
-    });
+    const permissionEvaluator = new PermissionEvaluator({ repository });
     const requestPermissionChecker = new RequestPermissionChecker(req, permissionEvaluator);
     setRequestEnv(req, 'permissionChecker', requestPermissionChecker);
 

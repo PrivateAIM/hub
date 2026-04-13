@@ -6,10 +6,15 @@
  */
 
 import type {
-    Component, ComponentEventMap, ComponentHandleOptions, ComponentHandlers,
+    Component, 
+    ComponentEventMap, 
+    ComponentHandleOptions, 
+    ComponentHandlers,
 } from './type';
 import type {
-    ComponentHandler, ComponentHandlerContext, ComponentHandlerFn,
+    ComponentHandler, 
+    ComponentHandlerContext, 
+    ComponentHandlerFn,
 } from './handler';
 
 export abstract class BaseComponent<
@@ -59,8 +64,8 @@ export abstract class BaseComponent<
 
         const promises: Promise<void>[] = [];
         const keys = Array.from(this.handlers.keys());
-        for (let i = 0; i < keys.length; i++) {
-            const handler = this.handlers.get(keys[i]);
+        for (const key of keys) {
+            const handler = this.handlers.get(key);
 
             if (
                 typeof handler !== 'function' &&

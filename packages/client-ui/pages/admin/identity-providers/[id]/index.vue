@@ -15,9 +15,7 @@ import { defineNuxtComponent, definePageMeta, useRuntimeConfig } from '#imports'
 import { LayoutKey } from '~/config/layout';
 
 export default defineNuxtComponent({
-    components: {
-        AIdentityProviderOAuth2Form,
-    },
+    components: { AIdentityProviderOAuth2Form },
     props: {
         entity: {
             type: Object as PropType<IdentityProvider>,

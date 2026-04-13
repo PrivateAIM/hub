@@ -20,11 +20,7 @@ export function useAnalysisDistributorLogger() : Logger {
     }
 
     instance = createLogger({
-        options: {
-            defaultMeta: {
-                component: ComponentName.ANALYSIS_DISTRIBUTOR,
-            },
-        },
+        options: { defaultMeta: { component: ComponentName.ANALYSIS_DISTRIBUTOR } },
         transports: [
             new LoggerConsoleTransport(),
             new LoggerTransport({

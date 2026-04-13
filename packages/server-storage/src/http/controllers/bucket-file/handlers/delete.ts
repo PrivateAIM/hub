@@ -32,9 +32,7 @@ export async function executeBucketFileRouteDeleteHandler(req: Request, res: Res
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(BucketFileEntity);
     const entity = await repository.findOne({
-        where: {
-            id,
-        },
+        where: { id },
         relations: ['bucket'],
     });
 
@@ -62,9 +60,7 @@ export async function executeBucketFileRouteDeleteHandler(req: Request, res: Res
     await new Promise((resolve, reject) => {
         caller.callWith(
             BucketFileCommand.DELETE,
-            {
-                id: entity.id,
-            },
+            { id: entity.id },
             {},
             {
                 handle: async (childValue, childContext) => {

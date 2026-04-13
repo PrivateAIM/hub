@@ -8,7 +8,10 @@
 import type { IngestorData, QuerierQueryOptions, VictoriaLogsClient } from '@hapic/victorialogs';
 import type { Log, LogInput } from '@privateaim/telemetry-kit';
 import {
-    LogChannel, LogFlag, LogLevel, normalizeLogInput,
+    LogChannel, 
+    LogFlag, 
+    LogLevel, 
+    normalizeLogInput,
 } from '@privateaim/telemetry-kit';
 import type { LogStore, LogStoreQueryOptions } from '../types.ts';
 
@@ -43,9 +46,7 @@ export class VictoriaLogsLogStore implements LogStore {
     async query(input: LogStoreQueryOptions): Promise<[Log[], number]> {
         const options : QuerierQueryOptions = {
             query: this.buildQuery(
-                {
-                    ...input.labels || {},
-                },
+                { ...input.labels || {} },
                 input.sort,
             ),
         };
@@ -68,28 +69,24 @@ export class VictoriaLogsLogStore implements LogStore {
 
         const output : Log[] = [];
 
-        const data = await this.instance.querier.query({
-            query: options.query,
-        });
+        const data = await this.instance.querier.query({ query: options.query });
 
-        for (let i = 0; i < data.length; i++) {
-            const {
-                _time: time,
-                _msg: message,
-                [LogFlag.CHANNEL]: channel,
-                [LogFlag.LEVEL]: level,
-                [LogFlag.SERVICE]: service,
-                ...labelsRaw
-            } = data[i];
-
+        for (const {
+            _time: time,
+            _msg: message,
+            [LogFlag.CHANNEL]: channel,
+            [LogFlag.LEVEL]: level,
+            [LogFlag.SERVICE]: service,
+            ...labelsRaw
+        } of data) {
             const labels : Record<string, string> = {};
             const keys = Object.keys(labelsRaw);
-            for (let i = 0; i < keys.length; i++) {
-                if (keys[i].startsWith('_')) {
+            for (const key of keys) {
+                if (key.startsWith('_')) {
                     continue;
                 }
 
-                labels[keys[i]] = labelsRaw[keys[i]];
+                labels[key] = labelsRaw[key];
             }
 
             output.push({
@@ -112,8 +109,8 @@ export class VictoriaLogsLogStore implements LogStore {
 
         const keys = Object.keys(labels);
 
-        for (let i = 0; i < keys.length; i++) {
-            filters.push(`${keys[i]}:="${labels[keys[i]]}"`);
+        for (const key of keys) {
+            filters.push(`${key}:="${labels[key]}"`);
         }
 
         const query = filters.length > 0 ? filters.join(' AND ') : '*';

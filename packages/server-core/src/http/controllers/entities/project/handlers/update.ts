@@ -25,9 +25,7 @@ export async function updateProjectRouteHandler(req: Request, res: Response) : P
 
     const validator = new ProjectValidator();
     const validatorAdapter = new RoutupContainerAdapter(validator);
-    const data = await validatorAdapter.run(req, {
-        group: HTTPHandlerOperation.UPDATE,
-    });
+    const data = await validatorAdapter.run(req, { group: HTTPHandlerOperation.UPDATE });
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(ProjectEntity);

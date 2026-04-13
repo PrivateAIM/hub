@@ -7,11 +7,12 @@
 
 import type { Realm } from '@authup/core-kit';
 import { deserialize, serialize } from '@authup/kit';
-import { ObjectLiteral } from '@privateaim/kit';
+import type { ObjectLiteral } from '@privateaim/kit';
 import {
     Column,
     CreateDateColumn,
-    Entity, Index,
+    Entity, 
+    Index,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
@@ -24,23 +25,27 @@ import type {
 @Entity({ name: 'events' })
 export class EventEntity implements Event {
     @PrimaryGeneratedColumn('uuid')
-        id: string;
+    id: string;
 
     @Index()
     @Column({ type: 'varchar', length: 64 })
-        scope: string;
+    scope: string;
 
     @Index()
     @Column({ type: 'varchar', length: 64 })
-        name: string;
+    name: string;
 
     @Index()
     @Column({ type: 'varchar', length: 64 })
-        ref_type: string;
+    ref_type: string;
 
     @Index()
-    @Column({ type: 'varchar', length: 64, nullable: true })
-        ref_id: string | null;
+    @Column({
+        type: 'varchar', 
+        length: 64, 
+        nullable: true, 
+    })
+    ref_id: string | null;
 
     @Column({
         type: 'text',
@@ -54,50 +59,74 @@ export class EventEntity implements Event {
             },
         },
     })
-        data: ObjectLiteral | null;
+    data: ObjectLiteral | null;
 
     // ------------------------------------------------------------------
 
     @Index()
     @Column({ type: 'boolean', default: false })
-        expiring: boolean;
+    expiring: boolean;
 
     // ------------------------------------------------------------------
 
     @Index()
-    @Column({ type: 'varchar', length: 256, nullable: true })
-        request_path: string | null;
+    @Column({
+        type: 'varchar', 
+        length: 256, 
+        nullable: true, 
+    })
+    request_path: string | null;
 
     @Index()
-    @Column({ type: 'varchar', length: 10, nullable: true })
-        request_method: string | null;
+    @Column({
+        type: 'varchar', 
+        length: 10, 
+        nullable: true, 
+    })
+    request_method: string | null;
 
     @Index()
-    @Column({ type: 'varchar', length: 15, nullable: true })
-        request_ip_address: string | null;
+    @Column({
+        type: 'varchar', 
+        length: 15, 
+        nullable: true, 
+    })
+    request_ip_address: string | null;
 
     @Index()
-    @Column({ type: 'varchar', length: 512, nullable: true })
-        request_user_agent: string | null;
+    @Column({
+        type: 'varchar', 
+        length: 512, 
+        nullable: true, 
+    })
+    request_user_agent: string | null;
 
     // ------------------------------------------------------------------
 
     @Index()
-    @Column({ type: 'varchar', length: 64, nullable: true })
-        actor_type: string | null;
+    @Column({
+        type: 'varchar', 
+        length: 64, 
+        nullable: true, 
+    })
+    actor_type: string | null;
 
     @Index()
     @Column({ type: 'uuid', nullable: true })
-        actor_id: string | null;
+    actor_id: string | null;
 
     @Index()
-    @Column({ type: 'varchar', length: 64, nullable: true })
-        actor_name: string | null;
+    @Column({
+        type: 'varchar', 
+        length: 64, 
+        nullable: true, 
+    })
+    actor_name: string | null;
 
     // ------------------------------------------------------------------
 
     @Column({ type: 'uuid', nullable: true })
-        realm_id: Realm['id'] | null;
+    realm_id: Realm['id'] | null;
 
     // ------------------------------------------------------------------
 
@@ -106,11 +135,11 @@ export class EventEntity implements Event {
         length: 28,
         nullable: true,
     })
-        expires_at: string | null;
+    expires_at: string | null;
 
     @CreateDateColumn()
-        created_at: string;
+    created_at: string;
 
     @UpdateDateColumn()
-        updated_at: string;
+    updated_at: string;
 }

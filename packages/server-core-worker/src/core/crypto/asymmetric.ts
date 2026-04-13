@@ -7,7 +7,7 @@
 
 import crypto from 'node:crypto';
 
-export async function generateRSAKeyPair() : Promise<{privateKey: string, publicKey: string}> {
+export async function generateRSAKeyPair() : Promise<{ privateKey: string, publicKey: string }> {
     return new Promise((resolve, reject) => {
         crypto.generateKeyPair('rsa', {
             modulusLength: 2048,

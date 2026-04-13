@@ -5,7 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import type {
-    EntityType, EventRecord, Policy,
+    EntityType, 
+    EventRecord, 
+    Policy,
 } from '@authup/core-kit';
 import { useDataSource } from 'typeorm-extension';
 import { useLogger } from '@privateaim/server-kit';
@@ -25,9 +27,5 @@ export async function handleAuthupPolicyEvent(
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisPermissionEntity);
-    await repository.update({
-        policy_id: context.data.id,
-    }, {
-        policy_id: null,
-    });
+    await repository.update({ policy_id: context.data.id }, { policy_id: null });
 }

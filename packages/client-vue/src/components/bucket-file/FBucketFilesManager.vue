@@ -50,9 +50,7 @@ export default defineComponent({
 
         const add = () => toggleModal();
 
-        expose({
-            add,
-        });
+        expose({ add });
 
         const selected = ref<string[]>([]);
         const allSelected = ref<boolean>(false);
@@ -61,11 +59,7 @@ export default defineComponent({
         provide('files', selected);
 
         const vNode = useTemplateRef<typeof FBucketFiles>('bucketFiles');
-        const query = computed<BuildInput<BucketFile>>(() => ({
-            filters: {
-                bucket_id: props.entityId,
-            },
-        }));
+        const query = computed<BuildInput<BucketFile>>(() => ({ filters: { bucket_id: props.entityId } }));
 
         const handleCreated = (entity: BucketFile) => {
             emit('created', entity);
@@ -97,8 +91,8 @@ export default defineComponent({
                 return;
             }
 
-            for (let i = 0; i < files.length; i++) {
-                vNode.value.handleCreated(files[i]);
+            for (const file of files) {
+                vNode.value.handleCreated(file);
             }
         };
 

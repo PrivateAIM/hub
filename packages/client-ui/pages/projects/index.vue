@@ -40,9 +40,7 @@ export default defineNuxtComponent({
         const handleCreated = (entity: Project) => {
             toast.show({ variant: 'success', body: 'The project was successfully created.' });
 
-            navigateTo({
-                path: `/projects/${entity.id}`,
-            });
+            navigateTo({ path: `/projects/${entity.id}` });
         };
 
         return {

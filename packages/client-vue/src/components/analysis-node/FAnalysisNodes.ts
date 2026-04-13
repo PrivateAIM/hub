@@ -20,7 +20,9 @@ import type { PropType, SlotsType, VNodeChild } from 'vue';
 import { computed, defineComponent, h } from 'vue';
 import type { ListSlotsType } from '../../core';
 import {
-    createList, defineListEvents, defineListProps,
+    createList, 
+    defineListEvents, 
+    defineListProps,
 } from '../../core';
 import type { DomainDetailsSlotProps } from '../type';
 import FAnalysisNode from './FAnalysisNode';
@@ -33,9 +35,7 @@ enum Direction {
 export default defineComponent({
     props: {
         ...defineListProps<AnalysisNode>(),
-        realmId: {
-            type: String,
-        },
+        realmId: { type: String },
         sourceId: {
             type: String,
             default: undefined,
@@ -166,14 +166,10 @@ export default defineComponent({
             },
             query: () => {
                 if (props.target === DomainType.NODE) {
-                    return {
-                        include: ['node'],
-                    };
+                    return { include: ['node'] };
                 }
 
-                return {
-                    include: ['analysis'],
-                };
+                return { include: ['analysis'] };
             },
         });
 
@@ -234,9 +230,7 @@ export default defineComponent({
                 },
             },
 
-            noMore: {
-                content: `No more ${props.target} available...`,
-            },
+            noMore: { content: `No more ${props.target} available...` },
         });
 
         return () => render();
