@@ -31,7 +31,7 @@ export function registerProjectSocketHandlers(socket: Socket) {
         buildDomainEventFullName(DomainType.PROJECT, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             try {
-                await socket.data.permissionChecker.preCheckOneOf({
+                await socket.data.permissionChecker.preEvaluateOneOf({
                     name: [
                         PermissionName.PROJECT_DELETE,
                         PermissionName.PROJECT_UPDATE,

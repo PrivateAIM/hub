@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { PermissionChecker } from '@authup/access';
+import type { PermissionEvaluator } from '@authup/access';
 import type {
     Namespace as _Namespace,
     Server as _Server,
@@ -19,7 +19,7 @@ export type SocketIdentity = {
     realmName: string
 };
 export type SocketData = {
-    permissionChecker?: PermissionChecker,
+    permissionChecker?: PermissionEvaluator,
 
     identity?: SocketIdentity,
 

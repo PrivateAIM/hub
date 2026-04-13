@@ -6,8 +6,8 @@
  */
 
 import { PermissionName as AuthupPermissionName, REALM_MASTER_NAME } from '@authup/core-kit';
-import type { PermissionItem } from '@authup/access';
-import { PermissionChecker, PermissionMemoryRepository } from '@authup/access';
+import type { PermissionBinding } from '@authup/access';
+import { PermissionEvaluator, PermissionMemoryProvider } from '@authup/access';
 import type { TokenVerificationData } from '@authup/server-adapter-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { Socket } from '../../types';
@@ -22,13 +22,11 @@ TokenVerificationData,
 'sub_name'
 >;
 
-function generateAbilities(): PermissionItem[] {
+function generateAbilityNames(): string[] {
     return Object.values({
         ...PermissionName,
         ...AuthupPermissionName,
-    }).map((name) => ({
-        name,
-    } satisfies PermissionItem));
+    });
 }
 
 export function createFakeTokenVerificationData(): TokenVerificationDataMinimal {
@@ -40,7 +38,7 @@ export function createFakeTokenVerificationData(): TokenVerificationDataMinimal 
         sub: 'd94b2f28-29e3-4ced-b8f1-6923a01dc1ee',
         sub_name: 'system',
 
-        permissions: generateAbilities(),
+        permissions: generateAbilityNames().map((name) => ({ name })),
     };
 }
 
@@ -49,11 +47,17 @@ export function applyTokenVerificationData(
     data: TokenVerificationDataMinimal,
     fakeAbilities?: boolean,
 ) {
-    let abilities: PermissionItem[];
+    let abilities: PermissionBinding[];
     if (fakeAbilities) {
-        abilities = generateAbilities();
+        abilities = generateAbilityNames().map((name) => ({ permission: { name } }));
     } else {
-        abilities = data.permissions;
+        abilities = data.permissions.map((p) => ({
+            permission: {
+                name: p.name,
+                realm_id: p.realm_id,
+                client_id: p.client_id,
+            },
+        }));
     }
 
     socket.data.identity = {
@@ -63,7 +67,7 @@ export function applyTokenVerificationData(
         realmName: data.realm_name,
     };
 
-    socket.data.permissionChecker = new PermissionChecker({
-        repository: new PermissionMemoryRepository(abilities),
+    socket.data.permissionChecker = new PermissionEvaluator({
+        repository: new PermissionMemoryProvider(abilities),
     });
 }
