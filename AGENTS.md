@@ -50,7 +50,7 @@ Apps are in `apps/` (currently empty), packages are in `packages/`. Libraries ex
 
 Modernization and refactoring plans (execute in order):
 
-1. **[Tooling Modernization](.agents/plans/001-tooling-modernization.md)** — ESLint 10, tsdown, monoship, ESM-only
+1. ~~Tooling Modernization~~ — Complete (#1511)
 2. **[Monorepo Restructuring](.agents/plans/002-monorepo-restructuring.md)** — Move services to `apps/`, keep libraries in `packages/`
 3. **[Dependency Injection](.agents/plans/003-dependency-injection.md)** — Replace `singa` singletons with DI container + module system
 4. **[Hexagonal: server-core](.agents/plans/004-hexagonal-server-core.md)** — Core/adapters/app separation for the main service
