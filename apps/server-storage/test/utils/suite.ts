@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { createAuthupClientAuthenticationHook, createAuthupUserTokenCreator } from '@privateaim/server-kit';
+import { BaseApplicationBuilder, createAuthupClientAuthenticationHook, createAuthupUserTokenCreator  } from '@privateaim/server-kit';
 import { APIClient } from '@privateaim/storage-kit';
 import { write } from 'envix';
 import { createServer } from 'node:http';
@@ -13,7 +13,8 @@ import type { Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { createNodeDispatcher } from 'routup';
 import { inject } from 'vitest';
-import { configure, useEnv } from '../../src/config';
+import { useEnv } from '../../src/config';
+import { MinioModule } from '../../src/app/modules/minio';
 import { createHTTPRouter } from '../../src/http';
 import { TestDatabase } from './database';
 
@@ -29,8 +30,6 @@ class TestSuite {
             'MINIO_CONNECTION_STRING',
             `http://admin:start123@${inject('MINIO_CONTAINER_HOST')}:${inject('MINIO_CONTAINER_PORT')}`,
         );
-        configure();
-
         this.database = new TestDatabase();
     }
 
@@ -43,6 +42,13 @@ class TestSuite {
     }
 
     async up() {
+        const env = useEnv();
+        const app = new BaseApplicationBuilder()
+            .withLogger()
+            .build();
+        app.addModule(new MinioModule({ connectionString: env.minioConnectionString }));
+        await app.setup();
+
         await this.database.up();
 
         await this.startServer();

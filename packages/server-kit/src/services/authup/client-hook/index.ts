@@ -5,5 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+export * from './constants.ts';
+export * from './di-module.ts';
 export * from './setup.ts';
 export * from './singleton.ts';

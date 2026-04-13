@@ -14,6 +14,7 @@ import { createServer } from 'node:http';
 import type { Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { createNodeDispatcher } from 'routup';
+import { createApplication } from '../../src/app';
 import { createConfig, useEnv } from '../../src';
 import { createRouter } from '../../src/http/router';
 import { TestDatabase } from './database';
@@ -26,8 +27,6 @@ class TestSuite {
     protected _database : TestDatabase;
 
     constructor() {
-        createConfig();
-
         this._database = new TestDatabase();
     }
 
@@ -40,6 +39,11 @@ class TestSuite {
     }
 
     async up() {
+        const app = createApplication();
+        await app.setup();
+
+        createConfig();
+
         await this._database.up();
 
         await this.startServer();

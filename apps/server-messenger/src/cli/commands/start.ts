@@ -7,7 +7,8 @@
 
 import { useLogger } from '@privateaim/server-kit';
 import { defineCommand } from 'citty';
-import { configure, useEnv } from '../../config/index.ts';
+import { createApplication } from '../../app/index.ts';
+import { useEnv } from '../../config/index.ts';
 import { createHttpServer } from '../../http/index.ts';
 import { createSocketServer } from '../../socket/index.ts';
 
@@ -15,7 +16,8 @@ export function defineCLIStartCommand() {
     return defineCommand({
         meta: { name: 'start' },
         async setup() {
-            configure();
+            const app = createApplication();
+            await app.setup();
 
             const logger = useLogger();
 

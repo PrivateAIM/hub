@@ -5,17 +5,66 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { useLogger } from '@privateaim/server-kit';
-import { createConfig, useEnv } from './config';
+import type { Component } from '@privateaim/server-kit';
+import { QueueWorkerComponentCaller, useLogger } from '@privateaim/server-kit';
+import {
+    AnalysisBuilderEventQueueRouterRouting,
+    AnalysisBuilderTaskQueueRouterRouting,
+    AnalysisDistributorEventQueueRouterRouting,
+    AnalysisDistributorTaskQueueRouterRouting,
+    MasterImageBuilderEventQueueRouterRouting,
+    MasterImageBuilderTaskQueueRouterRouting,
+    MasterImageSynchronizerEventQueueRouterRouting,
+    MasterImageSynchronizerTaskQueueRouterRouting,
+} from '@privateaim/server-core-worker-kit';
+import {
+    MasterImageBuilderComponent,
+    MasterImageSynchronizerComponent,
+    useAnalysisBuilderComponent,
+    useAnalysisDistributorComponent,
+} from './components';
+import { useEnv } from './config';
 import { createHttpServer } from './http';
+import { createApplication } from './app';
 
-const config = createConfig();
-const server = createHttpServer();
+async function start() {
+    const app = createApplication();
+    await app.setup();
 
-function start() {
-    config.components.forEach((c) => c.start());
-    config.aggregators.forEach((a) => a.start());
+    const components: Component[] = [
+        new QueueWorkerComponentCaller(
+            useAnalysisBuilderComponent(),
+            {
+                publishQueue: AnalysisBuilderEventQueueRouterRouting,
+                consumeQueue: AnalysisBuilderTaskQueueRouterRouting,
+            },
+        ),
+        new QueueWorkerComponentCaller(
+            useAnalysisDistributorComponent(),
+            {
+                publishQueue: AnalysisDistributorEventQueueRouterRouting,
+                consumeQueue: AnalysisDistributorTaskQueueRouterRouting,
+            },
+        ),
+        new QueueWorkerComponentCaller(
+            new MasterImageBuilderComponent(),
+            {
+                publishQueue: MasterImageBuilderEventQueueRouterRouting,
+                consumeQueue: MasterImageBuilderTaskQueueRouterRouting,
+            },
+        ),
+        new QueueWorkerComponentCaller(
+            new MasterImageSynchronizerComponent(),
+            {
+                publishQueue: MasterImageSynchronizerEventQueueRouterRouting,
+                consumeQueue: MasterImageSynchronizerTaskQueueRouterRouting,
+            },
+        ),
+    ];
 
+    components.forEach((c) => c.start());
+
+    const server = createHttpServer();
     const port = useEnv('port');
     server.listen(port);
 

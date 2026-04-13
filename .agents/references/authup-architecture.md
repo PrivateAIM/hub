@@ -4,6 +4,19 @@ Reference: [authup/authup/.agents/architecture.md](https://github.com/authup/aut
 
 This documents the hexagonal architecture patterns Hub should adopt (see Plans 003-005).
 
+## DI and Module Libraries
+
+Authup uses two libraries (both by tada5hi) for dependency injection and module orchestration:
+
+| Library | Version | Purpose |
+|---------|---------|---------|
+| `eldin` | 1.1.0 | Type-safe DI container — `TypedToken<T>`, `IContainer`, `Provider` types |
+| `orkos` | 1.1.1 | Module orchestrator — `IModule`, `Application`, topological dependency resolution |
+
+**eldin API**: `TypedToken<T>` (typed injection keys), `IContainer.register(key, provider)`, `IContainer.resolve(key)`, `IContainer.tryResolve(key)`, provider types: `{ useValue }`, `{ useFactory }`, `{ useAsyncFactory }`. Supports singleton/transient/scoped lifetimes and parent-child containers.
+
+**orkos API**: `IModule` (name, dependencies, setup/teardown/onReady/onError), `Application` (accepts modules, topologically sorts by dependencies, calls setup in order and teardown in reverse).
+
 ## Hexagonal Architecture Layers
 
 Authup's `apps/server-core/src/` has three layers:

@@ -6,4 +6,3 @@
  */
 
 export * from './env/index.ts';
-export * from './module.ts';

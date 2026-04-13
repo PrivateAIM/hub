@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+export * from './client';
 export * from './client-hook';
-export * from './module';
-export * from './singleton';
 export * from './token-creator';
