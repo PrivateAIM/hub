@@ -9,7 +9,11 @@ import type { BuildInput } from 'rapiq';
 import type { PropType } from 'vue';
 import type {
     ListBodyOptions,
-    ListEventsType, ListFooterOptions, ListHeaderOptions, ListLoadingOptions, ListNoMoreOptions,
+    ListEventsType, 
+    ListFooterOptions, 
+    ListHeaderOptions, 
+    ListLoadingOptions, 
+    ListNoMoreOptions,
 } from '../type';
 
 export function defineListEvents<T>() : ListEventsType<T> {
@@ -54,8 +58,6 @@ export function defineListProps<T>() {
             type: [Boolean, Object] as PropType<boolean | ListHeaderOptions<T>>,
             default: true,
         },
-        body: {
-            type: Object as PropType<ListBodyOptions<T>>,
-        },
+        body: { type: Object as PropType<ListBodyOptions<T>> },
     };
 }

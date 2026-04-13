@@ -5,12 +5,20 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
+import type {
     AnalysisNode,
 } from '@privateaim/core-kit';
 
 import {
-    DBody, DController, DDelete, DGet, DPath, DPost, DRequest, DResponse, DTags,
+    DBody, 
+    DController, 
+    DDelete, 
+    DGet, 
+    DPath, 
+    DPost, 
+    DRequest, 
+    DResponse, 
+    DTags,
 } from '@routup/decorators';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import {
@@ -29,7 +37,7 @@ export class AnalysisNodeController {
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
         @DRequest() req: any,
-            @DResponse() res: any,
+        @DResponse() res: any,
     ): Promise<PartialAnalysisNode[]> {
         return await getManyAnalysisNodeRouteHandler(req, res) as PartialAnalysisNode[];
     }
@@ -37,8 +45,8 @@ export class AnalysisNodeController {
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<PartialAnalysisNode | undefined> {
         return await getOneAnalysisNodeRouteHandler(req, res) as PartialAnalysisNode | undefined;
     }
@@ -46,9 +54,9 @@ export class AnalysisNodeController {
     @DPost('/:id', [ForceLoggedInMiddleware])
     async edit(
         @DPath('id') id: string,
-            @DBody() data: AnalysisNode,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DBody() data: AnalysisNode,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<PartialAnalysisNode | undefined> {
         return await updateAnalysisNodeRouteHandler(req, res) as PartialAnalysisNode | undefined;
     }
@@ -56,8 +64,8 @@ export class AnalysisNodeController {
     @DPost('', [ForceLoggedInMiddleware])
     async add(
         @DBody() data: PartialAnalysisNode,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<PartialAnalysisNode | undefined> {
         return await createAnalysisNodeRouteHandler(req, res) as PartialAnalysisNode | undefined;
     }
@@ -65,8 +73,8 @@ export class AnalysisNodeController {
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @DPath('id') id: string,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<PartialAnalysisNode | undefined> {
         return await deleteAnalysisNodeRouteHandler(req, res) as PartialAnalysisNode | undefined;
     }

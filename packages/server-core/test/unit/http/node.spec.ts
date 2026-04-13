@@ -6,7 +6,11 @@
  */
 
 import {
-    afterAll, beforeAll, describe, expect, it,
+    afterAll, 
+    beforeAll, 
+    describe, 
+    expect, 
+    it,
 } from 'vitest';
 import type {
     Node,
@@ -51,9 +55,7 @@ describe('src/controllers/core/node', () => {
         const client = suite.client();
 
         const data = await client.node.getOne(details.id);
-        expectProperties(details, data, {
-            keysExcluded: ['robot_id'],
-        });
+        expectProperties(details, data, { keysExcluded: ['robot_id'] });
     });
 
     it('should update resource', async () => {

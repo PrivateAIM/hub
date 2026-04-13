@@ -9,7 +9,15 @@ import type {
     ProjectNode,
 } from '@privateaim/core-kit';
 import {
-    DBody, DController, DDelete, DGet, DPath, DPost, DRequest, DResponse, DTags,
+    DBody, 
+    DController, 
+    DDelete, 
+    DGet, 
+    DPath, 
+    DPost, 
+    DRequest, 
+    DResponse, 
+    DTags,
 } from '@routup/decorators';
 
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
@@ -29,7 +37,7 @@ export class ProposalStationController {
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
         @DRequest() req: any,
-            @DResponse() res: any,
+        @DResponse() res: any,
     ): Promise<PartialProjectNode[]> {
         return getManyProjectNodeRouteHandler(req, res);
     }
@@ -37,8 +45,8 @@ export class ProposalStationController {
     @DPost('', [ForceLoggedInMiddleware])
     async add(
         @DBody() data: Pick<ProjectNode, 'node_id' | 'project_id'>,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<PartialProjectNode | undefined> {
         return createProjectNodeRouteHandler(req, res);
     }
@@ -46,8 +54,8 @@ export class ProposalStationController {
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<PartialProjectNode | undefined> {
         return getOneProjectNodeRouteHandler(req, res);
     }
@@ -55,9 +63,9 @@ export class ProposalStationController {
     @DPost('/:id', [ForceLoggedInMiddleware])
     async edit(
         @DPath('id') id: string,
-            @DBody() data: Pick<ProjectNode, 'comment' | 'approval_status'>,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DBody() data: Pick<ProjectNode, 'comment' | 'approval_status'>,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<PartialProjectNode | undefined> {
         return updateProjectNodeRouteHandler(req, res);
     }
@@ -65,8 +73,8 @@ export class ProposalStationController {
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @DPath('id') id: string,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<PartialProjectNode | undefined> {
         return deleteProjectNodeRouteHandler(req, res);
     }

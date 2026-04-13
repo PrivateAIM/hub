@@ -9,7 +9,8 @@ import { ref } from 'vue';
 import type { PropType } from 'vue';
 import type { Analysis } from '@privateaim/core-kit';
 import {
-    FAnalysisLogs, FAnalysisSteps,
+    FAnalysisLogs, 
+    FAnalysisSteps,
 } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
 

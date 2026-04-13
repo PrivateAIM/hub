@@ -12,7 +12,9 @@ import { computed, defineComponent } from 'vue';
 import {
     createError,
     definePageMeta,
-    navigateTo, useRoute, useToast,
+    navigateTo, 
+    useRoute, 
+    useToast,
 } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
 import type { NavItems } from '../../../../core';
@@ -32,14 +34,10 @@ export default defineComponent({
 
         const manager = createEntityManager({
             type: `${DomainType.REGISTRY}`,
-            props: {
-                entityId: route.params.id as string,
-            },
+            props: { entityId: route.params.id as string },
             onFailed(e) {
                 if (toast) {
-                    toast.show({ body: e.message }, {
-                        pos: 'top-center',
-                    });
+                    toast.show({ body: e.message }, { pos: 'top-center' });
                 }
             },
             onUpdated() {
@@ -56,11 +54,7 @@ export default defineComponent({
             },
         });
 
-        await manager.resolve({
-            query: {
-                fields: ['+account_secret'],
-            },
-        });
+        await manager.resolve({ query: { fields: ['+account_secret'] } });
 
         if (!manager.data.value) {
             await navigateTo({ path: '/admin/services/registries' });
@@ -69,16 +63,22 @@ export default defineComponent({
 
         const tabs = computed(() => [
             {
-                name: 'General', icon: 'fas fa-bars', path: '',
+                name: 'General', 
+                icon: 'fas fa-bars', 
+                path: '',
             },
             ...(
                 manager.data.value ?
                     [
                         {
-                            name: 'Cleanup', icon: 'fa-solid fa-hands-bubbles', path: 'cleanup',
+                            name: 'Cleanup', 
+                            icon: 'fa-solid fa-hands-bubbles', 
+                            path: 'cleanup',
                         },
                         {
-                            name: 'Setup', icon: 'fa-solid fa-cog', path: 'setup',
+                            name: 'Setup', 
+                            icon: 'fa-solid fa-cog', 
+                            path: 'setup',
                         },
                     ] : []
             ),

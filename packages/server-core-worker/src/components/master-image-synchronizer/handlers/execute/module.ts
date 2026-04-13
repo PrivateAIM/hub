@@ -25,8 +25,8 @@ import {
 } from './validators';
 
 export class MasterImageSynchronizerExecuteHandler implements ComponentHandler<
-MasterImageSynchronizerEventMap,
-MasterImageSynchronizerCommand.EXECUTE
+    MasterImageSynchronizerEventMap,
+    MasterImageSynchronizerCommand.EXECUTE
 > {
     protected groupValidator : DockenGroupAttributesValidator;
 

@@ -26,15 +26,9 @@ export default defineComponent({
             type: String,
             default: 'div',
         },
-        command: {
-            type: String as PropType<string | null>,
-        },
-        commandArguments: {
-            type: Object as PropType<MasterImageCommandArgument[] | null>,
-        },
-        file: {
-            type: String as PropType<string | null>,
-        },
+        command: { type: String as PropType<string | null> },
+        commandArguments: { type: Object as PropType<MasterImageCommandArgument[] | null> },
+        file: { type: String as PropType<string | null> },
     },
     setup(props) {
         const commandArgumentsAfter = computed(() => {

@@ -7,10 +7,18 @@
 
 import type { PropType, VNodeChild } from 'vue';
 import {
-    computed, defineComponent, h, ref, toRef, watch,
+    computed, 
+    defineComponent, 
+    h, 
+    ref, 
+    toRef, 
+    watch,
 } from 'vue';
 import {
-    hasNormalizedSlot, injectCoreHTTPClient, normalizeSlot, wrapFnWithBusyState,
+    hasNormalizedSlot, 
+    injectCoreHTTPClient, 
+    normalizeSlot, 
+    wrapFnWithBusyState,
 } from '../../core';
 
 export default defineComponent({
@@ -63,9 +71,7 @@ export default defineComponent({
 
         const save = wrapFnWithBusyState(busy, async () => {
             try {
-                const train = await apiClient.analysis.update(props.entityId, {
-                    name: name.value,
-                });
+                const train = await apiClient.analysis.update(props.entityId, { name: name.value });
 
                 emit('updated', train);
 

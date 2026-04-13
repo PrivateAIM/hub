@@ -6,7 +6,10 @@
  */
 
 import {
-    StoreDispatcherEventName, injectStore, injectStoreDispatcher, storeToRefs,
+    StoreDispatcherEventName, 
+    injectStore, 
+    injectStoreDispatcher, 
+    storeToRefs,
 } from '@authup/client-web-kit';
 import { ClientManager } from '@authup/core-realtime-kit';
 import type { CTSEvents, STCEvents } from '@privateaim/core-realtime-kit';
@@ -19,8 +22,8 @@ export function installSocketManager(app: App, options: SocketManagerInstallOpti
     const { accessToken } = storeToRefs(store);
 
     const manager = new ClientManager<
-    STCEvents,
-    CTSEvents
+        STCEvents,
+        CTSEvents
     >({
         url: options.baseURL,
         token: () => accessToken.value,

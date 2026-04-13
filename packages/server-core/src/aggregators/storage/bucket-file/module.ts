@@ -15,7 +15,7 @@ import {
 import { StorageBucketFileCreationFinishedHandler, StorageBucketFileDeletionFinishedHandler } from './handlers/index.ts';
 
 export class StorageBucketFileAggregator extends BaseComponent<
-BucketFileComponentEventMap
+    BucketFileComponentEventMap
 > {
     constructor() {
         super();

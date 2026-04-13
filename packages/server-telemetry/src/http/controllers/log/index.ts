@@ -5,9 +5,15 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Log } from '@privateaim/telemetry-kit';
+import type { Log } from '@privateaim/telemetry-kit';
 import {
-    DController, DDelete, DGet, DPost, DRequest, DResponse, DTags,
+    DController, 
+    DDelete, 
+    DGet, 
+    DPost, 
+    DRequest, 
+    DResponse, 
+    DTags,
 } from '@routup/decorators';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import {
@@ -24,7 +30,7 @@ export class LogController {
     @DPost('', [ForceLoggedInMiddleware])
     async create(
         @DRequest() req: any,
-            @DResponse() res: any,
+        @DResponse() res: any,
     ): Promise<PartialLog> {
         return await createLogRouteHandler(req, res) as PartialLog;
     }
@@ -32,7 +38,7 @@ export class LogController {
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
         @DRequest() req: any,
-            @DResponse() res: any,
+        @DResponse() res: any,
     ): Promise<PartialLog[]> {
         return await getManyLogLogRouteHandler(req, res) as PartialLog[];
     }
@@ -40,7 +46,7 @@ export class LogController {
     @DDelete('', [ForceLoggedInMiddleware])
     async deleteMany(
         @DRequest() req: any,
-            @DResponse() res: any,
+        @DResponse() res: any,
     ): Promise<void> {
         await deleteManyLogRouteHandler(req, res);
     }

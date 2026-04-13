@@ -9,19 +9,21 @@ import {
     REGISTRY_INCOMING_PROJECT_NAME,
     REGISTRY_MASTER_IMAGE_PROJECT_NAME,
     REGISTRY_OUTGOING_PROJECT_NAME,
-    RegistryProjectType, generateRegistryProjectId,
+    RegistryProjectType, 
+    generateRegistryProjectId,
 } from '@privateaim/core-kit';
 import { useDataSource } from 'typeorm-extension';
 import {
-    type ComponentHandler, type ComponentHandlerContext,
+    type ComponentHandler, 
+    type ComponentHandlerContext,
 } from '@privateaim/server-kit';
 import { RegistryEntity, RegistryProjectEntity } from '../../../database/index.ts';
 import { RegistryCommand } from '../constants.ts';
 import type { RegistryEventMap, RegistrySetupPayload } from '../type.ts';
 
 export class RegistrySetupHandler implements ComponentHandler<
-RegistryEventMap,
-RegistryCommand.SETUP
+    RegistryEventMap,
+    RegistryCommand.SETUP
 > {
     async handle(
         value: RegistrySetupPayload,
@@ -52,9 +54,7 @@ RegistryCommand.SETUP
                 public: false,
             });
         } else {
-            incomingEntity = projectRepository.merge(incomingEntity, {
-                public: false,
-            });
+            incomingEntity = projectRepository.merge(incomingEntity, { public: false });
         }
         await projectRepository.save(incomingEntity);
 
@@ -74,9 +74,7 @@ RegistryCommand.SETUP
                 public: false,
             });
         } else {
-            outgoingEntity = projectRepository.merge(outgoingEntity, {
-                public: false,
-            });
+            outgoingEntity = projectRepository.merge(outgoingEntity, { public: false });
         }
         await projectRepository.save(outgoingEntity);
 
@@ -96,9 +94,7 @@ RegistryCommand.SETUP
                 public: true,
             });
         } else {
-            masterImagesEntity = projectRepository.merge(masterImagesEntity, {
-                public: false,
-            });
+            masterImagesEntity = projectRepository.merge(masterImagesEntity, { public: false });
         }
 
         await projectRepository.save(masterImagesEntity);
@@ -106,16 +102,12 @@ RegistryCommand.SETUP
         // -----------------------------------------------
 
         const entities = await projectRepository.find({
-            where: {
-                registry_id: entity.id,
-            },
+            where: { registry_id: entity.id },
             select: ['id'],
         });
 
-        for (let i = 0; i < entities.length; i++) {
-            await context.handle(RegistryCommand.PROJECT_LINK, {
-                id: entities[i].id,
-            });
+        for (const entity_ of entities) {
+            await context.handle(RegistryCommand.PROJECT_LINK, { id: entity_.id });
         }
     }
 }

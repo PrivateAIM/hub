@@ -10,7 +10,8 @@ import { useRequestQuery } from '@routup/basic/query';
 import type { Request, Response } from 'routup';
 import { send, useRequestParam } from 'routup';
 import {
-    applyQuery, useDataSource,
+    applyQuery, 
+    useDataSource,
 } from 'typeorm-extension';
 import { MasterImageEntity } from '../../../../../database/domains/index.ts';
 
@@ -38,17 +39,9 @@ export async function getManyMasterImageRouteHandler(req: Request, res: Response
 
     const { pagination } = applyQuery(query, useRequestQuery(req), {
         defaultAlias: 'image',
-        filters: {
-            allowed: ['id', 'name', 'path', 'virtual_path', 'group_virtual_path'],
-        },
-        sort: {
-            default: {
-                path: 'ASC',
-            },
-        },
-        pagination: {
-            maxLimit: 50,
-        },
+        filters: { allowed: ['id', 'name', 'path', 'virtual_path', 'group_virtual_path'] },
+        sort: { default: { path: 'ASC' } },
+        pagination: { maxLimit: 50 },
     });
 
     const [entities, total] = await query.getManyAndCount();

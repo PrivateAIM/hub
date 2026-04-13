@@ -11,7 +11,15 @@ import { DomainType } from '@privateaim/core-kit';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import {
-    type PropType, computed, defineComponent, nextTick, reactive, ref, toRef, useTemplateRef, watch,
+    type PropType, 
+    computed, 
+    defineComponent, 
+    nextTick, 
+    reactive, 
+    ref, 
+    toRef, 
+    useTemplateRef, 
+    watch,
 } from 'vue';
 import { IVuelidate } from '@ilingo/vuelidate';
 import FMasterImageGroups from '../master-image-group/FMasterImageGroups';
@@ -19,22 +27,20 @@ import FMasterImages from './FMasterImages';
 import { createEntityManager, defineEntityManagerEvents } from '../../core';
 
 export default defineComponent({
-    components: { FMasterImages, FMasterImageGroups, IVuelidate },
+    components: {
+        FMasterImages, 
+        FMasterImageGroups, 
+        IVuelidate, 
+    },
     props: {
-        entityId: {
-            type: String,
-        },
-        entity: {
-            type: Object as PropType<MasterImage>,
-        },
+        entityId: { type: String },
+        entity: { type: Object as PropType<MasterImage> },
         readonly: {
             type: Boolean,
             default: false,
         },
     },
-    emits: {
-        ...defineEntityManagerEvents<MasterImage>(),
-    },
+    emits: { ...defineEntityManagerEvents<MasterImage>() },
     setup(props, setup) {
         const entityId = toRef(props, 'entityId');
         const vMasterImages = useTemplateRef<typeof FMasterImages | null>('masterImages');
@@ -44,13 +50,7 @@ export default defineComponent({
             master_image_id: '',
         });
 
-        const imageQuery = computed(() => ({
-            filters: {
-                ...(form.group_virtual_path !== '' ? {
-                    group_virtual_path: form.group_virtual_path,
-                } : {}),
-            },
-        }));
+        const imageQuery = computed(() => ({ filters: { ...(form.group_virtual_path !== '' ? { group_virtual_path: form.group_virtual_path } : {}) } }));
 
         const resolved = ref(false);
 
@@ -85,15 +85,9 @@ export default defineComponent({
             .then(() => manager.resolve());
 
         const v$ = useVuelidate({
-            group_virtual_path: {
-                required,
-            },
-            master_image_id: {
-                required,
-            },
-        }, form, {
-            $scope: false,
-        });
+            group_virtual_path: { required },
+            master_image_id: { required },
+        }, form, { $scope: false });
 
         const isVirtualGroupPathDefined = computed(() => !!form.group_virtual_path &&
             form.group_virtual_path.length > 0);

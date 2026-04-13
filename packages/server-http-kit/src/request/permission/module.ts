@@ -11,7 +11,8 @@ import type {
     PermissionEvaluationContext,
 } from '@authup/access';
 import {
-    BuiltInPolicyType, PolicyData,
+    BuiltInPolicyType, 
+    PolicyData,
 } from '@authup/access';
 import type { Request } from 'routup';
 import { useRequestEnv } from '../env';
@@ -51,7 +52,7 @@ export class RequestPermissionChecker {
 
     protected extendCheckContext(ctx: PermissionEvaluationContext) {
         const scopes = useRequestEnv(this.req, 'scopes') || [];
-        if (scopes.indexOf(ScopeName.GLOBAL) !== -1) {
+        if (scopes.includes(ScopeName.GLOBAL)) {
             ctx.input = ctx.input || new PolicyData();
             ctx.input.set(BuiltInPolicyType.IDENTITY, useRequestIdentity(this.req));
         }

@@ -21,7 +21,11 @@ export default defineNuxtComponent({
     },
     setup() {
         const store = injectStore();
-        const { loggedIn, user, realmManagementName } = storeToRefs(store);
+        const {
+            loggedIn, 
+            user, 
+            realmManagementName, 
+        } = storeToRefs(store);
 
         const displayNav = ref(false);
 

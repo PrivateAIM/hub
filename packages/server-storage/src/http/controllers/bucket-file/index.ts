@@ -6,7 +6,13 @@
  */
 
 import {
-    DController, DDelete, DGet, DPath, DRequest, DResponse, DTags,
+    DController, 
+    DDelete, 
+    DGet, 
+    DPath, 
+    DRequest, 
+    DResponse, 
+    DTags,
 } from '@routup/decorators';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { BucketFileEntity } from '../../../database/index.ts';
@@ -25,7 +31,7 @@ export class BucketFileController {
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
         @DRequest() req: any,
-            @DResponse() res: any,
+        @DResponse() res: any,
     ): Promise<PartialBucketFile[]> {
         return await executeBucketFileRouteGetManyHandler(req, res) as PartialBucketFile[];
     }
@@ -33,8 +39,8 @@ export class BucketFileController {
     @DGet('/:id/stream', [ForceLoggedInMiddleware])
     async stream(
         @DPath('id') id: string,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<any> {
         return await executeBucketFileRouteStreamHandler(req, res) as any;
     }
@@ -42,8 +48,8 @@ export class BucketFileController {
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<PartialBucketFile | undefined> {
         return await executeBucketFileRouteGetOneHandler(req, res) as PartialBucketFile | undefined;
     }
@@ -51,8 +57,8 @@ export class BucketFileController {
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @DPath('id') id: string,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<PartialBucketFile | undefined> {
         return await executeBucketFileRouteDeleteHandler(req, res) as PartialBucketFile | undefined;
     }

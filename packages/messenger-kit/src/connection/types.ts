@@ -16,12 +16,12 @@ export type CTSConnectionEvents = {
         `${CTSConnectionEventName.ROBOT_CONNECTION_SUBSCRIBE}` |
         `${CTSConnectionEventName.ROBOT_CONNECTION_UNSUBSCRIBE}`]: (
         target: EventTarget,
-        cb?: EventCallback<undefined>
+        cb?: EventCallback<undefined>,
     ) => void
 } & {
     [K in `${CTSConnectionEventName.USER_CONNECTIONS}` | `${CTSConnectionEventName.ROBOT_CONNECTIONS}` | `${CTSConnectionEventName.CLIENT_CONNECTIONS}`]: (
         target: EventTarget,
-        cb?: EventCallback<number>
+        cb?: EventCallback<number>,
     ) => void
 };
 

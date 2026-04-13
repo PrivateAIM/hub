@@ -6,7 +6,8 @@
  */
 
 import {
-    PermissionName, isRealmResourceWritable,
+    PermissionName, 
+    isRealmResourceWritable,
 } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';

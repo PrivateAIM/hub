@@ -18,17 +18,11 @@ export default defineComponent({
         FPagination,
         FAnalysisPermissionAssignments,
     },
-    props: {
-        entity: {
-            type: Object as PropType<Analysis>,
-        },
-    },
+    props: { entity: { type: Object as PropType<Analysis> } },
     emits: ['failed'],
     setup() {
         const vNode = ref<typeof FAnalysisPermissionAssignments | null>(null);
-        const filters : Record<string, unknown> = {
-            name: NAME_PREFIX,
-        };
+        const filters : Record<string, unknown> = { name: NAME_PREFIX };
 
         const load = async (meta: any) => {
             if (vNode.value) {
@@ -36,9 +30,7 @@ export default defineComponent({
                 filters.name = name;
                 vNode.value.load({
                     ...meta,
-                    filters: {
-                        name,
-                    },
+                    filters: { name },
                 });
             }
         };

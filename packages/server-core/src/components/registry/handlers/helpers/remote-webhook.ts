@@ -7,7 +7,8 @@
 
 import { isClientErrorWithStatusCode } from '@hapic/harbor';
 import type {
-    HarborClient, ProjectWebhookPolicyCreateContext,
+    HarborClient, 
+    ProjectWebhookPolicyCreateContext,
 } from '@hapic/harbor';
 import {
     ServiceID,
@@ -29,9 +30,7 @@ export async function saveRemoteRegistryProjectWebhook(
 
     const authupClient = useAuthupClient();
 
-    const client = await authupClient.client.getOne(ServiceID.REGISTRY, {
-        fields: ['+secret'],
-    });
+    const client = await authupClient.client.getOne(ServiceID.REGISTRY, { fields: ['+secret'] });
 
     // todo: check if client.secret is not hashed or encrypted
 
@@ -61,9 +60,7 @@ export async function saveRemoteRegistryProjectWebhook(
             .projectWebhookPolicy
             .create(webhookData);
 
-        return {
-            id: response.id,
-        };
+        return { id: response.id };
     } catch (e) {
         if (isClientErrorWithStatusCode(e, 409)) {
             const webhook = await httpClient.projectWebhookPolicy.findOne({
@@ -77,9 +74,7 @@ export async function saveRemoteRegistryProjectWebhook(
                 id: webhook.id,
             });
 
-            return {
-                id: webhook.id,
-            };
+            return { id: webhook.id };
         }
 
         throw e;

@@ -6,7 +6,10 @@
  */
 
 import {
-    BDropdown, BDropdownItem, Directives, createBootstrap,
+    BDropdown, 
+    BDropdownItem, 
+    Directives, 
+    createBootstrap,
 } from 'bootstrap-vue-next';
 import { defineNuxtPlugin } from '#app';
 
@@ -14,9 +17,7 @@ export default defineNuxtPlugin((ctx) => {
     ctx.vueApp.use(createBootstrap());
 
     const keys = Object.keys(Directives);
-    for (let i = 0; i < keys.length; i++) {
-        const name = keys[i];
-
+    for (const name of keys) {
         if (name) {
             ctx.vueApp.directive(name.replace(/^v/, ''), Directives[name as keyof typeof Directives]);
         }

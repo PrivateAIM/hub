@@ -15,7 +15,8 @@ import {
     FAnalysisNodes,
     FPagination,
     FSearch,
-    FTitle, injectCoreHTTPClient,
+    FTitle, 
+    injectCoreHTTPClient,
 } from '@privateaim/client-vue';
 import { definePageMeta } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
@@ -49,24 +50,46 @@ export default defineComponent({
 
         const fields = [
             {
-                key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left',
+                key: 'id', 
+                label: 'ID', 
+                thClass: 'text-left', 
+                tdClass: 'text-left',
             },
             {
-                key: 'realm', label: 'Realm', thClass: 'text-left', tdClass: 'text-left',
+                key: 'realm', 
+                label: 'Realm', 
+                thClass: 'text-left', 
+                tdClass: 'text-left',
             },
             {
-                key: 'approval_status', label: 'Approval Status', thClass: 'text-center', tdClass: 'text-center',
+                key: 'approval_status', 
+                label: 'Approval Status', 
+                thClass: 'text-center', 
+                tdClass: 'text-center',
             },
             {
-                key: 'run_status', label: 'Run Status', thClass: 'text-center', tdClass: 'text-center',
+                key: 'run_status', 
+                label: 'Run Status', 
+                thClass: 'text-center', 
+                tdClass: 'text-center',
             },
             {
-                key: 'updated_at', label: 'Updated At', thClass: 'text-center', tdClass: 'text-center',
+                key: 'updated_at', 
+                label: 'Updated At', 
+                thClass: 'text-center', 
+                tdClass: 'text-center',
             },
             {
-                key: 'created_at', label: 'Created At', thClass: 'text-left', tdClass: 'text-left',
+                key: 'created_at', 
+                label: 'Created At', 
+                thClass: 'text-left', 
+                tdClass: 'text-left',
             },
-            { key: 'options', label: '', tdClass: 'text-left' },
+            {
+                key: 'options', 
+                label: '', 
+                tdClass: 'text-left', 
+            },
         ];
 
         const api = injectCoreHTTPClient();
@@ -80,14 +103,8 @@ export default defineComponent({
                 node: true,
                 analysis: true,
             },
-            filter: {
-                analysis: {
-                    project_id: props.entity.id,
-                },
-            },
-            sort: {
-                updated_at: 'DESC',
-            },
+            filter: { analysis: { project_id: props.entity.id } },
+            sort: { updated_at: 'DESC' },
         };
 
         const download = (item: AnalysisNode) => {

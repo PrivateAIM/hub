@@ -54,9 +54,7 @@ export class DockenImageAttributesValidator extends Container<DockenImageAttribu
              */
             const value : unknown[] = ctx.value.map((child) => {
                 if (typeof child === 'string') {
-                    return {
-                        value: child,
-                    } satisfies MasterImageCommandArgument;
+                    return { value: child } satisfies MasterImageCommandArgument;
                 }
 
                 return child;

@@ -3,12 +3,12 @@
     "type": "module",
     "version": "0.8.31",
     "private": true,
-    "module": "dist/index.mjs",
-    "types": "dist/index.d.ts",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.mts",
     "exports": {
         "./package.json": "./package.json",
         ".": {
-            "types": "./dist/index.d.ts",
+            "types": "./dist/index.d.mts",
             "import": "./dist/index.mjs"
         }
     },
@@ -23,9 +23,7 @@
         "lint": "eslint --ext .ts src/",
         "lint:fix": "npm run lint -- --fix",
         "start": "node dist/index.mjs",
-        "build:types": "tsc --emitDeclarationOnly -p tsconfig.build.json",
-        "build:js": "rollup -c",
-        "build": "rimraf ./dist && cross-env NODE_ENV=production npm run build:js && npm run build:types",
+        "build": "rimraf ./dist && tsdown",
         "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts",
         "test:coverage": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts --coverage"
     },

@@ -16,10 +16,16 @@ import {
 import { PermissionName } from '@privateaim/kit';
 import type { PropType } from 'vue';
 import {
-    computed, defineComponent, ref, toRef,
+    computed, 
+    defineComponent, 
+    ref, 
+    toRef,
 } from 'vue';
 import {
-    ActionCommandElementType, injectCoreHTTPClient, renderActionCommand, wrapFnWithBusyState,
+    ActionCommandElementType, 
+    injectCoreHTTPClient, 
+    renderActionCommand, 
+    wrapFnWithBusyState,
 } from '../../core';
 
 const FAnalysisCommand = defineComponent({
@@ -67,9 +73,7 @@ const FAnalysisCommand = defineComponent({
             }
         });
 
-        const isAllowed = usePermissionCheck({
-            name: PermissionName.ANALYSIS_UPDATE,
-        });
+        const isAllowed = usePermissionCheck({ name: PermissionName.ANALYSIS_UPDATE });
 
         const shouldDisplay = computed<boolean>(
             () => {
@@ -99,7 +103,7 @@ const FAnalysisCommand = defineComponent({
                             AnalysisConfiguratorCommandChecker.canUnlock(entity.value);
                             return true;
                     }
-                } catch (e) {
+                } catch {
                     // do nothing
                 }
 

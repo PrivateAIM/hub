@@ -7,7 +7,8 @@
 
 import type { PropType, VNodeChild } from 'vue';
 import {
-    defineComponent, h,
+    defineComponent, 
+    h,
 } from 'vue';
 import type {
     Analysis,

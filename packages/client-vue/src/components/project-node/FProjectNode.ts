@@ -15,7 +15,8 @@ import type {
 } from '@privateaim/core-kit';
 import type { FiltersBuildInput } from 'rapiq';
 import {
-    defineComponent, h,
+    defineComponent, 
+    h,
 } from 'vue';
 import type {
     PropType,
@@ -35,21 +36,11 @@ enum Target {
 
 export default defineComponent({
     props: {
-        entity: {
-            type: Object as PropType<ProjectNode>,
-        },
-        entityId: {
-            type: String,
-        },
-        queryFilters: {
-            type: Object as PropType<FiltersBuildInput<ProjectNode>>,
-        },
-        direction: {
-            type: String as PropType<`${Direction.IN}` | `${Direction.OUT}`>,
-        },
-        target: {
-            type: String as PropType<`${Target.NODE}` | `${Target.PROJECT}`>,
-        },
+        entity: { type: Object as PropType<ProjectNode> },
+        entityId: { type: String },
+        queryFilters: { type: Object as PropType<FiltersBuildInput<ProjectNode>> },
+        direction: { type: String as PropType<`${Direction.IN}` | `${Direction.OUT}`> },
+        target: { type: String as PropType<`${Target.NODE}` | `${Target.PROJECT}`> },
     },
     emits: defineEntityManagerEvents<ProjectNode>(),
     async setup(props, setup) {

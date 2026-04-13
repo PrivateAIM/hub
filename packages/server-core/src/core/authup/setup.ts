@@ -25,7 +25,7 @@ export async function setupAuthupService(): Promise<any> {
 
     try {
         realm = await authupClient.realm.getOne(REALM_MASTER_NAME);
-    } catch (e) {
+    } catch {
         throw new ServerError(`The ${REALM_MASTER_NAME} does not exist.`);
     }
 
@@ -61,18 +61,18 @@ export async function setupAuthupService(): Promise<any> {
      * Create permissions
      */
     const permissionNames = Object.values(PermissionName);
-    for (let i = 0; i < permissionNames.length; i++) {
+    for (const permissionName of permissionNames) {
         try {
             await authupClient.permission.create({
-                name: permissionNames[i],
+                name: permissionName,
                 realm_id: null,
                 client_id: null,
             });
 
-            useLogger().debug(`Created permission ${permissionNames[i]}`);
+            useLogger().debug(`Created permission ${permissionName}`);
         } catch (e) {
             if (isClientErrorWithStatusCode(e, 409)) {
-                useLogger().debug(`Permission ${permissionNames[i]} already exists`);
+                useLogger().debug(`Permission ${permissionName} already exists`);
             } else {
                 throw e;
             }

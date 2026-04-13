@@ -26,7 +26,7 @@ export function parseProxyConnectionString(connectionStr: string) : ProxyConnect
     return {
         protocol: match[1] as 'http' | 'https',
         host: match[4],
-        port: parseInt(match[5], 10),
+        port: Number.parseInt(match[5], 10),
         auth: {
             username: match[2],
             password: match[3],
@@ -44,8 +44,7 @@ export function detectProxyConnectionConfig() : ProxyConnectionConfig | undefine
 
     let result : string | undefined;
 
-    for (let i = 0; i < envKeys.length; i++) {
-        const envKey = envKeys[i];
+    for (const envKey of envKeys) {
         const envVal = process.env[envKey];
 
         if (

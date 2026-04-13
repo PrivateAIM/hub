@@ -14,7 +14,5 @@ export function configureAMQP() {
         return;
     }
 
-    setAmqpClientFactory(() => new AmqpClient({
-        connectionOptions: rabbitMqConnectionString,
-    }));
+    setAmqpClientFactory(() => new AmqpClient({ connectionOptions: rabbitMqConnectionString }));
 }

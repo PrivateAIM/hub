@@ -11,7 +11,9 @@ import { BModal } from 'bootstrap-vue-next';
 import type { BuildInput } from 'rapiq';
 import type { PropType } from 'vue';
 import {
-    defineComponent, ref, useTemplateRef,
+    defineComponent, 
+    ref, 
+    useTemplateRef,
 } from 'vue';
 import { injectCoreHTTPClient, wrapFnWithBusyState } from '../../core';
 import FAnalysisNodeLogs from '../analysis-node-log/FAnalysisNodeLogs.vue';
@@ -21,7 +23,11 @@ import FAnalysisNodeExecutionStatus from './FAnalysisNodeExecutionStatus.vue';
 
 export default defineComponent({
     components: {
-        FAnalysisNodePicker, BModal, FAnalysisNodeExecutionStatus, FAnalysisNodes, FAnalysisNodeLogs,
+        FAnalysisNodePicker, 
+        BModal, 
+        FAnalysisNodeExecutionStatus, 
+        FAnalysisNodes, 
+        FAnalysisNodeLogs,
     },
     props: {
         entity: {
@@ -49,21 +55,13 @@ export default defineComponent({
 
         const vNodes = useTemplateRef<typeof FAnalysisNodes>('analysisNodes');
         const vNodesQuery : BuildInput<AnalysisNode> = {
-            filters: {
-                analysis_id: props.entity.id,
-            },
-            sort: {
-                node: {
-                    name: 'ASC',
-                },
-            },
+            filters: { analysis_id: props.entity.id },
+            sort: { node: { name: 'ASC' } },
         };
 
         const add = () => toggleModal();
 
-        expose({
-            add,
-        });
+        expose({ add });
 
         const handleCreated = (entity: AnalysisNode) => {
             if (vNodes.value) {

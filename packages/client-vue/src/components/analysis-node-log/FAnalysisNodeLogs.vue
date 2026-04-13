@@ -17,12 +17,8 @@ import { FLog } from '../log';
 export default defineComponent({
     components: { FLog },
     props: {
-        analysisId: {
-            type: String,
-        },
-        nodeId: {
-            type: String,
-        },
+        analysisId: { type: String },
+        nodeId: { type: String },
         realmId: {
             type: String,
             default: undefined,
@@ -74,9 +70,7 @@ export default defineComponent({
         return {
             data,
             busy,
-            meta: {
-                total: total.value,
-            },
+            meta: { total: total.value },
             load,
             reload,
         };

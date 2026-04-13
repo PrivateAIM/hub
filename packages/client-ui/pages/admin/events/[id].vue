@@ -24,14 +24,12 @@ export default defineComponent({
         const httpClient = injectTelemetryHTTPClient();
         try {
             entity.value = await httpClient.event.getOne(route.params.id as string);
-        } catch (e) {
+        } catch {
             await navigateTo({ path: '/admin/events' });
             throw createError({});
         }
 
-        return {
-            entity: entity.value as Event,
-        };
+        return { entity: entity.value as Event };
     },
 });
 </script>

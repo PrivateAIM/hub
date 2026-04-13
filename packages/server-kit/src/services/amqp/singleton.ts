@@ -9,9 +9,7 @@ import type { Client } from 'amqp-extension';
 import type { Factory } from 'singa';
 import { singa } from 'singa';
 
-const instance = singa<Client>({
-    name: 'amqp',
-});
+const instance = singa<Client>({ name: 'amqp' });
 
 export function setAmqpClientFactory(factory: Factory<Client>) {
     instance.setFactory(factory);

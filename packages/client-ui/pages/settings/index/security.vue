@@ -12,13 +12,9 @@ import { defineNuxtComponent } from '#app';
 import { LayoutKey } from '~/config/layout';
 
 export default defineNuxtComponent({
-    components: {
-        AUserPasswordForm,
-    },
+    components: { AUserPasswordForm },
     setup() {
-        definePageMeta({
-            [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        });
+        definePageMeta({ [LayoutKey.REQUIRED_LOGGED_IN]: true });
 
         const toast = useToast();
 

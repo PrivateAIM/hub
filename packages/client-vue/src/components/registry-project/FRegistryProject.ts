@@ -21,7 +21,10 @@ import {
 } from '@vuelidate/validators';
 import type { SlotsType, VNodeChild } from 'vue';
 import {
-    defineComponent, h, reactive, ref,
+    defineComponent, 
+    h, 
+    reactive, 
+    ref,
 } from 'vue';
 import type { EntityManagerSlotsType } from '../../core';
 import {
@@ -40,15 +43,9 @@ export default defineComponent({
         const apiClient = injectCoreHTTPClient();
         const busy = ref(false);
 
-        const form = reactive({
-            secret: '',
-        });
+        const form = reactive({ secret: '' });
 
-        const vuelidate = useVuelidate({
-            secret: {
-                registryRobotSecret: helpers.regex(registryRobotSecretRegex),
-            },
-        }, form);
+        const vuelidate = useVuelidate({ secret: { registryRobotSecret: helpers.regex(registryRobotSecretRegex) } }, form);
 
         const translationsValidation = useTranslationsForNestedValidations(vuelidate.value);
 
@@ -107,9 +104,7 @@ export default defineComponent({
 
         return () => {
             const fallback = () : VNodeChild => h('div', [
-                h('div', {
-                    class: 'mb-2 d-flex flex-column',
-                }, [
+                h('div', { class: 'mb-2 d-flex flex-column' }, [
                     h('div', { class: 'form-group' }, [
                         h('label', { class: 'pe-1' }, 'Project'),
                         h('input', {
@@ -137,9 +132,7 @@ export default defineComponent({
                             validationMessages: translationsValidation.secret.value,
                             validationSeverity: getSeverity(vuelidate.value.secret),
                             content: buildFormInput({
-                                props: {
-                                    placeholder: '...',
-                                },
+                                props: { placeholder: '...' },
                                 value: form.secret,
                                 onChange(value) {
                                     form.secret = value;
@@ -161,9 +154,7 @@ export default defineComponent({
                 h('hr'),
                 h('div', { class: 'row' }, [
                     h('div', { class: 'col' }, [
-                        h('div', {
-                            class: 'alert alert-sm alert-info',
-                        }, [
+                        h('div', { class: 'alert alert-sm alert-info' }, [
                             'Connect the database entity to the registry.',
                         ]),
                         h('div', { class: 'text-center' }, [
@@ -183,9 +174,7 @@ export default defineComponent({
                         ]),
                     ]),
                     h('div', { class: 'col' }, [
-                        h('div', {
-                            class: 'alert alert-sm alert-warning',
-                        }, [
+                        h('div', { class: 'alert alert-sm alert-warning' }, [
                             'Disconnect the database entity of the registry.',
                         ]),
                         h('div', { class: 'text-center' }, [

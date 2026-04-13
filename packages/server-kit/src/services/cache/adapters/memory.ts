@@ -32,9 +32,7 @@ export class MemoryCacheAdapter<
     }
 
     async set(key: string, value: VALUE, options: CacheSetOptions): Promise<void> {
-        this.instance.set(key, value, {
-            ttl: options.ttl,
-        });
+        this.instance.set(key, value, { ttl: options.ttl });
     }
 
     async drop(key: string): Promise<void> {
@@ -42,8 +40,8 @@ export class MemoryCacheAdapter<
     }
 
     async dropMany(keys: string[]) : Promise<void> {
-        for (let i = 0; i < keys.length; i++) {
-            this.instance.delete(keys[i]);
+        for (const key of keys) {
+            this.instance.delete(key);
         }
     }
 

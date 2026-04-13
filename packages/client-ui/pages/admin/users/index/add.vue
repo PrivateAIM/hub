@@ -14,9 +14,7 @@ import { definePageMeta } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
 
 export default defineNuxtComponent({
-    components: {
-        AUserForm,
-    },
+    components: { AUserForm },
     emits: ['failed', 'created'],
     setup(props, { emit }) {
         definePageMeta({

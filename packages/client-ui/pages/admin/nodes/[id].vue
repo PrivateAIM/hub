@@ -27,9 +27,7 @@ export default defineComponent({
 
         const manager = createEntityManager({
             type: `${DomainType.NODE}`,
-            props: {
-                entityId: route.params.id as string,
-            },
+            props: { entityId: route.params.id as string },
             onFailed(e) {
                 if (toast) {
                     toast.show({ variant: 'warning', body: e.message });
@@ -58,10 +56,26 @@ export default defineComponent({
         }
 
         const tabs = [
-            { name: 'Overview', icon: 'fas fa-bars', path: '' },
-            { name: 'Crypto', icon: 'fas fa-shield-alt', path: 'crypto' },
-            { name: 'Client', icon: 'fa-solid fa-ghost', path: 'client' },
-            { name: 'Registry', icon: 'fab fa-docker', path: 'registry' },
+            {
+                name: 'Overview', 
+                icon: 'fas fa-bars', 
+                path: '', 
+            },
+            {
+                name: 'Crypto', 
+                icon: 'fas fa-shield-alt', 
+                path: 'crypto', 
+            },
+            {
+                name: 'Client', 
+                icon: 'fa-solid fa-ghost', 
+                path: 'client', 
+            },
+            {
+                name: 'Registry', 
+                icon: 'fab fa-docker', 
+                path: 'registry', 
+            },
         ];
 
         return {

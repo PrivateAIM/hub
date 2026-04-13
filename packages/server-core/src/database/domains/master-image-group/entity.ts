@@ -8,7 +8,8 @@
 import {
     Column,
     CreateDateColumn,
-    Entity, Index,
+    Entity, 
+    Index,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
@@ -17,23 +18,23 @@ import type { MasterImageGroup } from '@privateaim/core-kit';
 @Entity({ name: 'master_image_groups' })
 export class MasterImageGroupEntity implements MasterImageGroup {
     @PrimaryGeneratedColumn('uuid')
-        id: string;
+    id: string;
 
     @Column({ type: 'varchar', length: 128 })
-        name: string;
+    name: string;
 
     @Column({ type: 'varchar', length: 512 })
-        path: string;
+    path: string;
 
     @Index()
     @Column({ type: 'varchar', length: 512 })
-        virtual_path: string;
+    virtual_path: string;
 
     // ------------------------------------------------------------------
 
     @CreateDateColumn()
-        created_at: Date;
+    created_at: Date;
 
     @UpdateDateColumn()
-        updated_at: Date;
+    updated_at: Date;
 }

@@ -25,7 +25,10 @@ import {
     useAnalysisDistributorComponent,
 } from '../components';
 import {
-    configureAMQP, configureCoreService, configureStorageService, setupLogger,
+    configureAMQP, 
+    configureCoreService, 
+    configureStorageService, 
+    setupLogger,
 } from './services';
 import { configureAuthupClientAuthenticationHook } from './services/authup-client-authentication-hook';
 import type { Config } from './types';

@@ -10,12 +10,17 @@ import { getSeverity, useTranslationsForNestedValidations } from '@ilingo/vuelid
 import type { Registry } from '@privateaim/core-kit';
 import { DomainType } from '@privateaim/core-kit';
 import {
-    buildFormGroup, buildFormInput,
+    buildFormGroup, 
+    buildFormInput,
 } from '@vuecs/form-controls';
 import useVuelidate from '@vuelidate/core';
 import { maxLength, minLength, required } from '@vuelidate/validators';
 import {
-    defineComponent, h, reactive, ref, watch,
+    defineComponent, 
+    h, 
+    reactive, 
+    ref, 
+    watch,
 } from 'vue';
 import type {
     PropType,
@@ -108,9 +113,7 @@ export default defineComponent({
                 labelContent: 'Name',
                 content: buildFormInput({
                     value: form.name,
-                    props: {
-                        placeholder: '...',
-                    },
+                    props: { placeholder: '...' },
                     onChange(input) {
                         form.name = input;
                     },
@@ -127,9 +130,7 @@ export default defineComponent({
                     onChange(input) {
                         form.host = input;
                     },
-                    props: {
-                        placeholder: 'e.g. ghcr.io',
-                    },
+                    props: { placeholder: 'e.g. ghcr.io' },
                 }),
             });
 
@@ -140,9 +141,7 @@ export default defineComponent({
                 labelContent: 'Account Name',
                 content: buildFormInput({
                     value: form.account_name,
-                    props: {
-                        placeholder: '...',
-                    },
+                    props: { placeholder: '...' },
                     onChange(input) {
                         form.account_name = input;
                     },
@@ -156,9 +155,7 @@ export default defineComponent({
                 labelContent: 'Account Secret',
                 content: buildFormInput({
                     value: form.account_secret,
-                    props: {
-                        placeholder: '...',
-                    },
+                    props: { placeholder: '...' },
                     onChange(input) {
                         form.account_secret = input;
                     },

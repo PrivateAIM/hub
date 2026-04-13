@@ -11,7 +11,11 @@ import type { Request, Response } from 'routup';
 import { send, useRequestParam } from 'routup';
 import type { SelectQueryBuilder } from 'typeorm';
 import {
-    applyFilters, applyPagination, applyQueryFieldsParseOutput, applySort, useDataSource,
+    applyFilters, 
+    applyPagination, 
+    applyQueryFieldsParseOutput, 
+    applySort, 
+    useDataSource,
 } from 'typeorm-extension';
 import { NotFoundError } from '@ebec/http';
 import type { ParseAllowedOption } from 'rapiq';
@@ -39,7 +43,7 @@ async function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>)
 
     const protectedSelected = fieldsParsed
         .filter((field) => field.path === 'registry' &&
-            protectedFields.indexOf(field.key as any) !== -1);
+            protectedFields.includes(field.key as any));
 
     if (protectedSelected.length > 0) {
         const permissionChecker = useRequestPermissionChecker(req);
@@ -77,7 +81,9 @@ export async function getOneRegistryRouteHandler(req: Request, res: Response) : 
 
 export async function getManyRegistryRouteHandler(req: Request, res: Response) : Promise<any> {
     const {
-        filter, page, sort,
+        filter, 
+        page, 
+        sort,
     } = useRequestQuery(req);
 
     const dataSource = await useDataSource();

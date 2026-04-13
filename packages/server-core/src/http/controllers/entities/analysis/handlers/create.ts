@@ -28,9 +28,7 @@ export async function createAnalysisRouteHandler(req: Request, res: Response) : 
 
     const validator = new AnalysisValidator();
     const validatorAdapter = new RoutupContainerAdapter(validator);
-    const data = await validatorAdapter.run(req, {
-        group: HTTPHandlerOperation.CREATE,
-    });
+    const data = await validatorAdapter.run(req, { group: HTTPHandlerOperation.CREATE });
 
     const dataSource = await useDataSource();
     await validateEntityJoinColumns(data, {
@@ -64,9 +62,7 @@ export async function createAnalysisRouteHandler(req: Request, res: Response) : 
 
     await permissionChecker.check({
         name: PermissionName.ANALYSIS_CREATE,
-        input: new PolicyData({
-            [BuiltInPolicyType.ATTRIBUTES]: entity,
-        }),
+        input: new PolicyData({ [BuiltInPolicyType.ATTRIBUTES]: entity }),
     });
 
     const requestRepository = new RequestRepositoryAdapter(

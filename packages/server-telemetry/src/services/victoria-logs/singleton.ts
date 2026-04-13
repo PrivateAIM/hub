@@ -9,9 +9,7 @@ import type { Factory } from 'singa';
 import { singa } from 'singa';
 import type { VictoriaLogsClient } from '@hapic/victorialogs';
 
-const instance = singa<VictoriaLogsClient>({
-    name: 'victoriaLogs',
-});
+const instance = singa<VictoriaLogsClient>({ name: 'victoriaLogs' });
 
 export function setVictoriaLogsClientFactory(factory: Factory<VictoriaLogsClient>) {
     instance.setFactory(factory);

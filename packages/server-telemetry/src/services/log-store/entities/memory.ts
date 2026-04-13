@@ -8,7 +8,8 @@
 import type { Log, LogInput } from '@privateaim/telemetry-kit';
 import { normalizeLogInput } from '@privateaim/telemetry-kit';
 import type {
-    LogStore, LogStoreQueryOptions,
+    LogStore, 
+    LogStoreQueryOptions,
 } from '../types.ts';
 
 export class MemoryLogStore implements LogStore {
@@ -33,12 +34,12 @@ export class MemoryLogStore implements LogStore {
                 }
 
                 const labelKeys = Object.keys(options.labels);
-                for (let i = 0; i < labelKeys.length; i++) {
-                    if (!item.labels[labelKeys[i]]) {
+                for (const labelKey of labelKeys) {
+                    if (!item.labels[labelKey]) {
                         return false;
                     }
 
-                    if (item.labels[labelKeys[i]] !== options.labels[labelKeys[i]]) {
+                    if (item.labels[labelKey] !== options.labels[labelKey]) {
                         return false;
                     }
                 }

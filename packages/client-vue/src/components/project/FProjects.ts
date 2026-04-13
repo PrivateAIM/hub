@@ -32,11 +32,7 @@ const FProjects = defineComponent({
             setup,
         });
 
-        setDefaults({
-            noMore: {
-                content: 'No more projects available...',
-            },
-        });
+        setDefaults({ noMore: { content: 'No more projects available...' } });
 
         return () => render();
     },

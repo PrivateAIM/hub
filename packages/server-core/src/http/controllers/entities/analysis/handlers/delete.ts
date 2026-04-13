@@ -32,9 +32,7 @@ export async function deleteAnalysisRouteHandler(req: Request, res: Response) : 
 
     await permissionChecker.check({
         name: PermissionName.ANALYSIS_DELETE,
-        input: new PolicyData({
-            [BuiltInPolicyType.ATTRIBUTES]: entity,
-        }),
+        input: new PolicyData({ [BuiltInPolicyType.ATTRIBUTES]: entity }),
     });
 
     if (!isRealmResourceWritable(useRequestIdentityRealm(req), entity.realm_id)) {

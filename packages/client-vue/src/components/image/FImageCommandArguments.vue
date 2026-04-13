@@ -9,7 +9,11 @@ import type { MasterImageCommandArgument } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
 import {
     computed,
-    defineComponent, nextTick, ref, toRef, useTemplateRef,
+    defineComponent, 
+    nextTick, 
+    ref, 
+    toRef, 
+    useTemplateRef,
     watch,
 } from 'vue';
 import FFormInputList from '../utility/form-input-list/FFormInputList.vue';
@@ -30,9 +34,7 @@ const extractItemsByPosition = (
 export default defineComponent({
     components: { FFormInputList },
     props: {
-        items: {
-            type: Object as PropType<MasterImageCommandArgument[]>,
-        },
+        items: { type: Object as PropType<MasterImageCommandArgument[]> },
         readonly: {
             type: Boolean,
             default: false,

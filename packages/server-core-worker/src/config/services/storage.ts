@@ -12,9 +12,7 @@ import { useEnv } from '../env';
 
 export function configureStorageService() {
     setStorageFactory(() => {
-        const client = new APIClient({
-            baseURL: useEnv('storageURL'),
-        });
+        const client = new APIClient({ baseURL: useEnv('storageURL') });
 
         if (isAuthupClientAuthenticationHookUsable()) {
             const hook = useAuthupClientAuthenticationHook();

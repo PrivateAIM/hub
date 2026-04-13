@@ -9,9 +9,7 @@ import type { Factory } from 'singa';
 import { singa } from 'singa';
 import type { EntityEventPublisher } from './module';
 
-const instance = singa<EntityEventPublisher>({
-    name: 'entityEventPublisher',
-});
+const instance = singa<EntityEventPublisher>({ name: 'entityEventPublisher' });
 
 export function setEntityEventPublisherFactory(factory: Factory<EntityEventPublisher>) {
     instance.setFactory(factory);

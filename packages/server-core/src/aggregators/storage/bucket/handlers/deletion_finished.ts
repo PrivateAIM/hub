@@ -12,8 +12,8 @@ import { TaskType } from '../../../../domains/index.ts';
 import { BaseAggregatorHandler } from '../../../base.ts';
 
 export class StorageBucketDeletionFinishedHandler extends BaseAggregatorHandler<
-BucketComponentEventMap,
-BucketEvent.DELETION_FINISHED
+    BucketComponentEventMap,
+    BucketEvent.DELETION_FINISHED
 > {
     async handle(bucket: Bucket, context: ComponentHandlerContext<BucketComponentEventMap, BucketEvent.DELETION_FINISHED>): Promise<void> {
         const task = await this.resolveTask(context);

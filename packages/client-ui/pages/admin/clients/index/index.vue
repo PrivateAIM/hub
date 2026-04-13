@@ -3,7 +3,14 @@
 import { BTable } from 'bootstrap-vue-next';
 import {
     AClients,
-    AEntityDelete, APagination, ASearch, ATitle, AUser, injectStore, storeToRefs, usePermissionCheck,
+    AEntityDelete, 
+    APagination, 
+    ASearch, 
+    ATitle, 
+    AUser, 
+    injectStore, 
+    storeToRefs, 
+    usePermissionCheck,
 } from '@authup/client-web-kit';
 import type { Client } from '@authup/core-kit';
 import { PermissionName } from '@authup/core-kit';
@@ -30,29 +37,41 @@ export default defineComponent({
         const store = injectStore();
         const { realmManagementId } = storeToRefs(store);
 
-        const query : BuildInput<Client> = {
-            filters: {
-                realm_id: [realmManagementId.value, null],
-            },
-        };
+        const query : BuildInput<Client> = { filters: { realm_id: [realmManagementId.value, null] } };
 
         const hasEditPermission = usePermissionCheck({ name: PermissionName.CLIENT_UPDATE });
         const hasDropPermission = usePermissionCheck({ name: PermissionName.CLIENT_DELETE });
 
         const fields = [
             {
-                key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
+                key: 'name', 
+                label: 'Name', 
+                thClass: 'text-left', 
+                tdClass: 'text-left',
             },
             {
-                key: 'built_in', label: 'Built in?', thClass: 'text-center', tdClass: 'text-center',
+                key: 'built_in', 
+                label: 'Built in?', 
+                thClass: 'text-center', 
+                tdClass: 'text-center',
             },
             {
-                key: 'created_at', label: 'Created at', thClass: 'text-center', tdClass: 'text-center',
+                key: 'created_at', 
+                label: 'Created at', 
+                thClass: 'text-center', 
+                tdClass: 'text-center',
             },
             {
-                key: 'updated_at', label: 'Updated at', thClass: 'text-left', tdClass: 'text-left',
+                key: 'updated_at', 
+                label: 'Updated at', 
+                thClass: 'text-left', 
+                tdClass: 'text-left',
             },
-            { key: 'options', label: '', tdClass: 'text-left' },
+            {
+                key: 'options', 
+                label: '', 
+                tdClass: 'text-left', 
+            },
         ];
 
         return {

@@ -16,7 +16,9 @@ import {
     useToast,
 } from '#imports';
 import {
-    createError, navigateTo, useRoute,
+    createError, 
+    navigateTo, 
+    useRoute,
 } from '#app';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
 import { updateObjectProperties } from '../../../utils';
@@ -34,7 +36,9 @@ export default defineComponent({
 
         const items = [
             {
-                name: 'General', icon: 'fas fa-bars', path: '',
+                name: 'General', 
+                icon: 'fas fa-bars', 
+                path: '',
             },
         ];
 
@@ -47,7 +51,7 @@ export default defineComponent({
             entity.value = await injectHTTPClient()
                 .identityProvider
                 .getOne(route.params.id as string);
-        } catch (e) {
+        } catch {
             await navigateTo({ path: '/admin/identity-providers' });
             throw createError({});
         }

@@ -17,8 +17,8 @@ import { isPropertySet } from '../../utils';
  */
 export function isRealmResourceWritable(realm: Partial<Realm>, resourceRealmId: string | string[]) {
     if (Array.isArray(resourceRealmId)) {
-        for (let i = 0; i < resourceRealmId.length; i++) {
-            if (isRealmResourceWritable(realm, resourceRealmId[i])) {
+        for (const element of resourceRealmId) {
+            if (isRealmResourceWritable(realm, element)) {
                 return true;
             }
         }
@@ -50,8 +50,8 @@ export function isRealmResourceReadable(realm: Partial<Realm>, resourceRealmId: 
         if (resourceRealmId.length === 0) {
             return true;
         }
-        for (let i = 0; i < resourceRealmId.length; i++) {
-            if (isRealmResourceReadable(realm, resourceRealmId[i])) {
+        for (const element of resourceRealmId) {
+            if (isRealmResourceReadable(realm, element)) {
                 return true;
             }
         }

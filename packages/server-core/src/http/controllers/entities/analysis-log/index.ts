@@ -10,7 +10,12 @@ import type {
 } from '@privateaim/core-kit';
 
 import {
-    DController, DDelete, DGet, DRequest, DResponse, DTags,
+    DController, 
+    DDelete, 
+    DGet, 
+    DRequest, 
+    DResponse, 
+    DTags,
 } from '@routup/decorators';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import {
@@ -26,7 +31,7 @@ export class AnalysisLogController {
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
         @DRequest() req: any,
-            @DResponse() res: any,
+        @DResponse() res: any,
     ): Promise<PartialAnalysisLog[]> {
         return await getManyAnalysisLogRouteHandler(req, res) as PartialAnalysisLog[];
     }
@@ -34,7 +39,7 @@ export class AnalysisLogController {
     @DDelete('', [ForceLoggedInMiddleware])
     async drop(
         @DRequest() req: any,
-            @DResponse() res: any,
+        @DResponse() res: any,
     ): Promise<PartialAnalysisLog | undefined> {
         return await deleteAnalysisLogRouteHandler(req, res) as PartialAnalysisLog | undefined;
     }

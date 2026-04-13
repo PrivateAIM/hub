@@ -38,12 +38,8 @@ export async function getManyMasterImageGroupRouteHandler(req: Request, res: Res
 
     const { pagination } = applyQuery(query, useRequestQuery(req), {
         defaultAlias: 'imageGroup',
-        filters: {
-            allowed: ['id', 'name', 'path', 'virtual_path'],
-        },
-        pagination: {
-            maxLimit: 50,
-        },
+        filters: { allowed: ['id', 'name', 'path', 'virtual_path'] },
+        pagination: { maxLimit: 50 },
     });
 
     const [entities, total] = await query.getManyAndCount();

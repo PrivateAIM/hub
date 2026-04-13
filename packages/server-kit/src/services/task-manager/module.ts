@@ -8,7 +8,10 @@
 import { HOUR_IN_MS, WEEK_IN_MS, createNanoID } from '@privateaim/kit';
 import type { Cache } from '../cache';
 import type {
-    TaskEntry, TaskEntryResolved, TaskManagerCreateOptions, TaskTypeMap,
+    TaskEntry, 
+    TaskEntryResolved, 
+    TaskManagerCreateOptions, 
+    TaskTypeMap,
 } from './types';
 import { isTaskEntry } from './helpers';
 
@@ -52,9 +55,7 @@ export class TaskManager<
             type,
         };
 
-        await this.driver.set(id, entity, {
-            ttl: WEEK_IN_MS,
-        });
+        await this.driver.set(id, entity, { ttl: WEEK_IN_MS });
 
         if (options.lock) {
             await this.createLock(id);
@@ -114,9 +115,7 @@ export class TaskManager<
     // -------------------------------------------------
 
     protected async createLock(id: string) {
-        await this.driver.set(`taskLock:${id}`, true, {
-            ttl: HOUR_IN_MS,
-        });
+        await this.driver.set(`taskLock:${id}`, true, { ttl: HOUR_IN_MS });
     }
 
     protected async clearLock(id: string) {

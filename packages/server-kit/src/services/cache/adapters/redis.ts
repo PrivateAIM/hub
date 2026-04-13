@@ -32,9 +32,7 @@ export class RedisCacheAdapter implements CacheAdapter {
     }
 
     async set(key: string, value: any, options: CacheSetOptions): Promise<void> {
-        await this.instance.set(key, value, {
-            milliseconds: options.ttl,
-        });
+        await this.instance.set(key, value, { milliseconds: options.ttl });
     }
 
     async drop(key: string): Promise<void> {
@@ -44,8 +42,8 @@ export class RedisCacheAdapter implements CacheAdapter {
     async dropMany(keys: string[]) : Promise<void> {
         const pipeline = this.client.pipeline();
 
-        for (let i = 0; i < keys.length; i++) {
-            pipeline.del(keys[i]);
+        for (const key of keys) {
+            pipeline.del(key);
         }
 
         await pipeline.exec();
@@ -56,8 +54,8 @@ export class RedisCacheAdapter implements CacheAdapter {
             const pipeline = this.client.pipeline();
 
             const keys = await this.client.keys(`${options.prefix}*`);
-            for (let i = 0; i < keys.length; i++) {
-                pipeline.del(keys[i]);
+            for (const key of keys) {
+                pipeline.del(key);
             }
 
             await pipeline.exec();

@@ -28,11 +28,7 @@ export default defineComponent({
         FAnalysisImageCommand,
         FAnalysisImageCommandArguments,
     },
-    props: {
-        entity: {
-            type: Object as PropType<Analysis>,
-        },
-    },
+    props: { entity: { type: Object as PropType<Analysis> } },
     emits: ['updated'],
     setup(_props, { emit }) {
         const lastRootFileId = ref<string | null>(null);

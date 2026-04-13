@@ -69,40 +69,28 @@ export function createConfig() : Config {
 
         new QueueWorkerComponentCaller(
             new AnalysisBuilderAggregator(),
-            {
-                consumeQueue: AnalysisBuilderEventQueueRouterRouting,
-            },
+            { consumeQueue: AnalysisBuilderEventQueueRouterRouting },
         ),
         new QueueWorkerComponentCaller(
             new AnalysisDistributorAggregator(),
-            {
-                consumeQueue: AnalysisDistributorEventQueueRouterRouting,
-            },
+            { consumeQueue: AnalysisDistributorEventQueueRouterRouting },
         ),
         new QueueWorkerComponentCaller(
             new StorageBucketAggregator(),
-            {
-                consumeQueue: BucketEventQueueRouterRouting,
-            },
+            { consumeQueue: BucketEventQueueRouterRouting },
         ),
         new QueueWorkerComponentCaller(
             new StorageBucketFileAggregator(),
-            {
-                consumeQueue: BucketFileEventQueueRouterRouting,
-            },
+            { consumeQueue: BucketFileEventQueueRouterRouting },
         ),
 
         new QueueWorkerComponentCaller(
             new MasterImageBuilderAggregator(),
-            {
-                consumeQueue: MasterImageBuilderEventQueueRouterRouting,
-            },
+            { consumeQueue: MasterImageBuilderEventQueueRouterRouting },
         ),
         new QueueWorkerComponentCaller(
             new MasterImageSynchronizerAggregator(),
-            {
-                consumeQueue: MasterImageSynchronizerEventQueueRouterRouting,
-            },
+            { consumeQueue: MasterImageSynchronizerEventQueueRouterRouting },
         ),
 
     ];
@@ -112,15 +100,11 @@ export function createConfig() : Config {
     const components : Component[] = [
         new QueueWorkerComponentCaller(
             useRegistryComponent(),
-            {
-                consumeQueue: RegistryTaskQueueRouterRouting,
-            },
+            { consumeQueue: RegistryTaskQueueRouterRouting },
         ),
         new QueueWorkerComponentCaller(
             useAnalysisMetadataComponent(),
-            {
-                consumeQueue: AnalysisMetadataTaskQueue,
-            },
+            { consumeQueue: AnalysisMetadataTaskQueue },
         ),
     ];
 

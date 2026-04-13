@@ -13,9 +13,7 @@ import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
 
 export default defineNuxtComponent({
-    components: {
-        FProjectForm,
-    },
+    components: { FProjectForm },
     emits: ['created'],
     setup(props, { emit }) {
         definePageMeta({
@@ -29,9 +27,7 @@ export default defineNuxtComponent({
             emit('created', entity);
         };
 
-        return {
-            handleCreated,
-        };
+        return { handleCreated };
     },
 });
 </script>

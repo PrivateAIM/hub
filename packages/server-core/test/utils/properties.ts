@@ -26,9 +26,7 @@ export function expectProperties<T extends ObjectLiteral = ObjectLiteral>(
     options: ExpectPropertiesOptions<T> = {},
 ) {
     const keys = Object.keys(properties);
-    for (let i = 0; i < keys.length; i++) {
-        const key = keys[i];
-
+    for (const key of keys) {
         if (options.keysExcluded) {
             const index = options.keysExcluded.indexOf(key);
             if (index !== -1) {

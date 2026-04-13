@@ -54,22 +54,22 @@ export class MasterImageSynchronizerService {
 
         const virtualPaths = input.map((entity) => entity.virtualPath);
         result.deleted = entities
-            .filter((image) => virtualPaths.indexOf(image.virtual_path) === -1);
+            .filter((image) => !virtualPaths.includes(image.virtual_path));
 
-        for (let i = 0; i < input.length; i++) {
-            const parts = input[i].virtualPath.split('/');
+        for (const element of input) {
+            const parts = element.virtualPath.split('/');
             parts.pop();
 
             const data : Partial<MasterImageEntity> = {
-                name: input[i].name,
-                path: input[i].path,
+                name: element.name,
+                path: element.path,
                 group_virtual_path: parts.join('/'),
-                virtual_path: input[i].virtualPath,
-                command: input[i].command,
+                virtual_path: element.virtualPath,
+                command: element.command,
             };
 
-            if (input[i].commandArguments) {
-                data.command_arguments = input[i].commandArguments;
+            if (element.commandArguments) {
+                data.command_arguments = element.commandArguments;
             }
 
             const index = entities.findIndex(
@@ -113,19 +113,19 @@ export class MasterImageSynchronizerService {
 
         const dirVirtualPaths : string[] = input.map((entity) => entity.virtualPath);
         result.deleted = entities.filter(
-            (image) => dirVirtualPaths.indexOf(image.virtual_path) === -1,
+            (image) => !dirVirtualPaths.includes(image.virtual_path),
         );
 
-        for (let i = 0; i < input.length; i++) {
+        for (const element of input) {
             const data : Partial<MasterImageGroupEntity> = {
-                path: input[i].path,
-                name: input[i].name,
+                path: element.path,
+                name: element.name,
             };
 
-            const index = entities.findIndex((dbEntity) => dbEntity.virtual_path === input[i].virtualPath);
+            const index = entities.findIndex((dbEntity) => dbEntity.virtual_path === element.virtualPath);
             if (index === -1) {
                 result.created.push(repository.create({
-                    virtual_path: input[i].virtualPath,
+                    virtual_path: element.virtualPath,
                     ...data,
                 }));
             } else {

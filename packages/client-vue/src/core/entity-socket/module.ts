@@ -21,7 +21,11 @@ import type {
     STCEventRecord,
 } from '@privateaim/core-realtime-kit';
 import {
-    computed, isRef, onMounted, onUnmounted, watch,
+    computed, 
+    isRef, 
+    onMounted, 
+    onUnmounted, 
+    watch,
 } from 'vue';
 import { injectStore, storeToRefs } from '@authup/client-web-kit';
 import type { EntitySocket, EntitySocketContext } from './type';

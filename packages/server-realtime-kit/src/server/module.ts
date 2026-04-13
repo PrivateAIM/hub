@@ -6,7 +6,10 @@
  */
 
 import {
-    isRedisClientUsable, useLogger, useRedisPublishClient, useRedisSubscribeClient,
+    isRedisClientUsable, 
+    useLogger, 
+    useRedisPublishClient, 
+    useRedisSubscribeClient,
 } from '@privateaim/server-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import { createAdapter } from '@socket.io/redis-adapter';
@@ -31,10 +34,10 @@ export function createServer<
     }
 
     const server = new Server<
-    ListenEvents,
-    EmitEvents,
-    ServerSideEvents,
-    SocketData
+        ListenEvents,
+        EmitEvents,
+        ServerSideEvents,
+        SocketData
     >(httpServer, {
         adapter,
         cors: {

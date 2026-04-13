@@ -28,7 +28,8 @@ import {
     cleanupDockerImage,
     packDockerContainerWithTarStream,
     useCoreClient,
-    useDocker, useStorageClient,
+    useDocker, 
+    useStorageClient,
 } from '../../../../core';
 import { AnalysisContainerPath } from '../../constants';
 import { BuilderError } from '../../error';
@@ -58,9 +59,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
                     ...value,
                     error: e,
                 },
-                {
-                    routing: AnalysisBuilderEventQueueRouterRouting,
-                },
+                { routing: AnalysisBuilderEventQueueRouterRouting },
             );
 
             await cleanupDockerImage(value.id);
@@ -133,9 +132,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
                     [LogFlag.REF_ID]: analysis.id,
                 });
 
-            await container.remove({
-                force: true,
-            });
+            await container.remove({ force: true });
 
             throw e;
         }
@@ -152,9 +149,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
                     [LogFlag.REF_ID]: analysis.id,
                 });
 
-            await container.remove({
-                force: true,
-            });
+            await container.remove({ force: true });
 
             throw e;
         }
@@ -272,11 +267,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
             throw BuilderError.entrypointNotFound();
         }
 
-        const { data: analysisBucketFiles } = await core.analysisBucketFile.getMany({
-            filters: {
-                analysis_bucket_id: analysisBucket.id,
-            },
-        });
+        const { data: analysisBucketFiles } = await core.analysisBucketFile.getMany({ filters: { analysis_bucket_id: analysisBucket.id } });
 
         const storage = useStorageClient();
         const webStream = await storage.bucket.stream(analysisBucket.bucket_id);

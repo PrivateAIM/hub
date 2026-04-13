@@ -18,9 +18,7 @@ export class RegistryComponentCaller extends CompoundComponentCaller<RegistryEve
     constructor() {
         super([
             new DirectComponentCaller<RegistryEventMap>(useRegistryComponent()),
-            new QueueDispatchComponentCaller<RegistryEventMap>({
-                queue: RegistryTaskQueueRouterRouting,
-            }),
+            new QueueDispatchComponentCaller<RegistryEventMap>({ queue: RegistryTaskQueueRouterRouting }),
         ]);
     }
 }

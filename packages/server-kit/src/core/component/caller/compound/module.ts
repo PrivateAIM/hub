@@ -32,7 +32,7 @@ export class CompoundComponentCaller<
                 await caller.call(key, data, metadata);
 
                 return;
-            } catch (e) {
+            } catch {
                 // continue;
             }
         }

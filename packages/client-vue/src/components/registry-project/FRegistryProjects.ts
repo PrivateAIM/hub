@@ -22,11 +22,7 @@ export default defineComponent({
             setup,
         });
 
-        setDefaults({
-            noMore: {
-                content: 'No more registry projects available...',
-            },
-        });
+        setDefaults({ noMore: { content: 'No more registry projects available...' } });
 
         return () => render();
     },

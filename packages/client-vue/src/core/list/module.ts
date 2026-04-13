@@ -9,7 +9,8 @@ import { hasOwnProperty } from '@privateaim/kit';
 import type { EntityAPI } from '@authup/core-http-kit';
 import type { DomainTypeMap } from '@privateaim/core-kit';
 import type {
-    ListFooterBuildOptionsInput, ListHeaderBuildOptionsInput,
+    ListFooterBuildOptionsInput, 
+    ListHeaderBuildOptionsInput,
 } from '@vuecs/list-controls';
 import {
     buildList,
@@ -17,8 +18,10 @@ import {
 import type { BuildInput, FiltersBuildInput } from 'rapiq';
 import type { Ref, VNodeChild } from 'vue';
 import {
-    computed, isRef,
-    ref, unref,
+    computed, 
+    isRef,
+    ref, 
+    unref,
 } from 'vue';
 import { createMerger, isObject } from 'smob';
 import { boolableToObject } from '../../utils';
@@ -54,11 +57,7 @@ export function createListRaw<
     const data : Ref<RECORD[]> = ref([]);
     const busy = ref(false);
     const total = ref(0);
-    const meta = ref({
-        pagination: {
-            limit: 10,
-        },
-    }) as Ref<ListMeta<RECORD>>;
+    const meta = ref({ pagination: { limit: 10 } }) as Ref<ListMeta<RECORD>>;
 
     const realmId = computed<string | undefined>(
         () => {

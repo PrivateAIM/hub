@@ -12,7 +12,9 @@ import { useRequestQuery } from '@routup/basic/query';
 import type { Request, Response } from 'routup';
 import { send, useRequestParam } from 'routup';
 import {
-    applyQuery, applyQueryRelationsParseOutput, useDataSource,
+    applyQuery, 
+    applyQueryRelationsParseOutput, 
+    useDataSource,
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import type { Permission, Policy } from '@authup/core-kit';
@@ -26,13 +28,11 @@ type RelationsMap = {
 };
 
 function getRelations(req: Request) : RelationsMap {
-    const relations = parseQueryRelations(useRequestQuery(req, 'include'), {
-        allowed: ['analysis', 'permission', 'policy'],
-    });
+    const relations = parseQueryRelations(useRequestQuery(req, 'include'), { allowed: ['analysis', 'permission', 'policy'] });
 
     const output : Record<string, RelationsParseOutputElement> = {};
-    for (let i = 0; i < relations.length; i++) {
-        output[relations[i].value] = relations[i];
+    for (const relation of relations) {
+        output[relation.value] = relation;
     }
 
     return output;
@@ -41,8 +41,8 @@ function getRelations(req: Request) : RelationsMap {
 function groupById<T extends { id: string }>(input: T[]) : Record<string, T> {
     const output : Record<string, T> = {};
 
-    for (let i = 0; i < input.length; i++) {
-        output[input[i].id] = input[i];
+    for (const element of input) {
+        output[element.id] = element;
     }
 
     return output;
@@ -119,12 +119,8 @@ export async function getManyAnalysisPermissionRouteHandler(req: Request, res: R
                 'analysis.name',
             ],
         },
-        pagination: {
-            maxLimit: 50,
-        },
-        sort: {
-            allowed: ['created_at', 'updated_at'],
-        },
+        pagination: { maxLimit: 50 },
+        sort: { allowed: ['created_at', 'updated_at'] },
         relations: {
             allowed: ['analysis'],
             onJoin: (_property, key, query) => {
@@ -137,9 +133,7 @@ export async function getManyAnalysisPermissionRouteHandler(req: Request, res: R
     if (relationsMap.analysis) {
         applyQueryRelationsParseOutput(query, [
             relationsMap.analysis,
-        ], {
-            defaultAlias: 'analysisPermission',
-        });
+        ], { defaultAlias: 'analysisPermission' });
     }
 
     const [entities, total] = await query.getManyAndCount();
@@ -149,11 +143,7 @@ export async function getManyAnalysisPermissionRouteHandler(req: Request, res: R
 
         let permissionMap : Record<string, Permission> = {};
         if (relationsMap.permission) {
-            const { data: permissions } = await authupClient.permission.getMany({
-                filter: {
-                    id: entities.map((entity) => entity.permission_id),
-                },
-            });
+            const { data: permissions } = await authupClient.permission.getMany({ filter: { id: entities.map((entity) => entity.permission_id) } });
 
             permissionMap = groupById(permissions);
         }
@@ -164,29 +154,25 @@ export async function getManyAnalysisPermissionRouteHandler(req: Request, res: R
                 .map((entity) => entity.policy_id)
                 .filter(Boolean);
             if (id.length > 0) {
-                const { data: policies } = await authupClient.policy.getMany({
-                    filter: {
-                        id,
-                    },
-                });
+                const { data: policies } = await authupClient.policy.getMany({ filter: { id } });
 
                 policyMap = groupById(policies);
             }
         }
 
-        for (let i = 0; i < entities.length; i++) {
+        for (const entity of entities) {
             if (
-                entities[i].permission_id &&
-                typeof permissionMap[entities[i].permission_id] !== 'undefined'
+                entity.permission_id &&
+                typeof permissionMap[entity.permission_id] !== 'undefined'
             ) {
-                entities[i].permission = permissionMap[entities[i].permission_id];
+                entity.permission = permissionMap[entity.permission_id];
             }
 
             if (
-                entities[i].policy_id &&
-                typeof policyMap[entities[i].policy_id] !== 'undefined'
+                entity.policy_id &&
+                typeof policyMap[entity.policy_id] !== 'undefined'
             ) {
-                entities[i].policy = policyMap[entities[i].policy_id];
+                entity.policy = policyMap[entity.policy_id];
             }
         }
     }

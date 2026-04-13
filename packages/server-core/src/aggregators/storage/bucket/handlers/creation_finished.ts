@@ -13,8 +13,8 @@ import { TaskType } from '../../../../domains/index.ts';
 import { BaseAggregatorHandler } from '../../../base.ts';
 
 export class StorageBucketCreationFinishedHandler extends BaseAggregatorHandler<
-BucketComponentEventMap,
-BucketEvent.CREATION_FINISHED
+    BucketComponentEventMap,
+    BucketEvent.CREATION_FINISHED
 > {
     async handle(bucket: Bucket, context: ComponentHandlerContext<BucketComponentEventMap, BucketEvent.CREATION_FINISHED>): Promise<void> {
         const task = await this.resolveTask(context);
@@ -36,9 +36,7 @@ BucketEvent.CREATION_FINISHED
             }
 
             const analysisRepository = dataSource.getRepository(AnalysisEntity);
-            const analysis = await analysisRepository.findOneBy({
-                id: task.data.analysisId,
-            });
+            const analysis = await analysisRepository.findOneBy({ id: task.data.analysisId });
 
             if (!analysis) {
                 useLogger().info(`Analysis ${task.data.analysisId} does not exist. Therefore ${task.data.bucketType} bucket can not be created.`);

@@ -9,7 +9,15 @@ import type {
     Node,
 } from '@privateaim/core-kit';
 import {
-    DBody, DController, DDelete, DGet, DPath, DPost, DRequest, DResponse, DTags,
+    DBody, 
+    DController, 
+    DDelete, 
+    DGet, 
+    DPath, 
+    DPost, 
+    DRequest, 
+    DResponse, 
+    DTags,
 } from '@routup/decorators';
 
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
@@ -30,7 +38,7 @@ export class NodeController {
 
     async getMany(
         @DRequest() req: any,
-            @DResponse() res: any,
+        @DResponse() res: any,
     ): Promise<PartialNode[]> {
         return await getManyNodeRouteHandler(req, res) as PartialNode[];
     }
@@ -38,8 +46,8 @@ export class NodeController {
     @DPost('', [ForceLoggedInMiddleware])
     async add(
         @DBody() data: PartialNode,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<PartialNode | undefined> {
         return await createNodeRouteHandler(req, res) as PartialNode | undefined;
     }
@@ -47,8 +55,8 @@ export class NodeController {
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<PartialNode | undefined> {
         return await getOneNodeRouteHandler(req, res) as PartialNode | undefined;
     }
@@ -56,9 +64,9 @@ export class NodeController {
     @DPost('/:id', [ForceLoggedInMiddleware])
     async edit(
         @DPath('id') id: string,
-            @DBody() data: PartialNode,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DBody() data: PartialNode,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<PartialNode | undefined> {
         return await updateNodeRouteHandler(req, res) as PartialNode | undefined;
     }
@@ -66,8 +74,8 @@ export class NodeController {
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @DPath('id') id: string,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<PartialNode | undefined> {
         return await deleteNodeRouteHandler(req, res) as PartialNode | undefined;
     }

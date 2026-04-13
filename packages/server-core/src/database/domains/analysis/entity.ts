@@ -24,7 +24,7 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 import { deserialize, serialize } from '@authup/kit';
-import { ProcessStatus } from '@privateaim/kit';
+import type { ProcessStatus } from '@privateaim/kit';
 import { MasterImageEntity } from '../master-image/entity.ts';
 import { ProjectEntity } from '../project/entity.ts';
 import { RegistryEntity } from '../registry/entity.ts';
@@ -32,69 +32,93 @@ import { RegistryEntity } from '../registry/entity.ts';
 @Entity()
 export class AnalysisEntity implements Analysis {
     @PrimaryGeneratedColumn('uuid')
-        id: string;
+    id: string;
 
     @Index()
-    @Column({ type: 'varchar', length: 128, nullable: true })
-        name: string;
+    @Column({
+        type: 'varchar', 
+        length: 128, 
+        nullable: true, 
+    })
+    name: string;
 
     @Column({ type: 'text', nullable: true })
-        description: string | null;
+    description: string | null;
 
-    @Column({ type: 'int', unsigned: true, default: 0 })
-        nodes: number;
+    @Column({
+        type: 'int', 
+        unsigned: true, 
+        default: 0, 
+    })
+    nodes: number;
 
-    @Column({ type: 'int', unsigned: true, default: 0 })
-        nodes_approved: number;
+    @Column({
+        type: 'int', 
+        unsigned: true, 
+        default: 0, 
+    })
+    nodes_approved: number;
 
     // ------------------------------------------------------------------
 
     @Column({ type: 'boolean', default: false })
-        configuration_locked: boolean;
+    configuration_locked: boolean;
 
     @Column({ type: 'boolean', default: false })
-        configuration_entrypoint_valid: boolean;
+    configuration_entrypoint_valid: boolean;
 
     @Column({ type: 'boolean', default: false })
-        configuration_image_valid: boolean;
+    configuration_image_valid: boolean;
 
     @Column({ type: 'boolean', default: false })
-        configuration_node_aggregator_valid: boolean;
+    configuration_node_aggregator_valid: boolean;
 
     @Column({ type: 'boolean', default: false })
-        configuration_node_default_valid: boolean;
+    configuration_node_default_valid: boolean;
 
     @Column({ type: 'boolean', default: false })
-        configuration_nodes_valid: boolean;
+    configuration_nodes_valid: boolean;
 
     // ------------------------------------------------------------------
 
     @Index()
     @Column({
-        type: 'varchar', length: 64, nullable: true, default: null,
+        type: 'varchar', 
+        length: 64, 
+        nullable: true, 
+        default: null,
     })
-        distribution_status: `${ProcessStatus}` | null;
+    distribution_status: `${ProcessStatus}` | null;
 
     @Column({
-        type: 'int', unsigned: true, nullable: true, default: null,
+        type: 'int', 
+        unsigned: true, 
+        nullable: true, 
+        default: null,
     })
-        distribution_progress: number | null;
+    distribution_progress: number | null;
 
     // ------------------------------------------------------------------
 
     @Column({ type: 'boolean', default: false })
-        build_nodes_valid: boolean;
+    build_nodes_valid: boolean;
 
     @Index()
     @Column({
-        type: 'varchar', length: 64, nullable: true, default: null,
+        type: 'varchar', 
+        length: 64, 
+        nullable: true, 
+        default: null,
     })
-        build_status: `${ProcessStatus}` | null;
+    build_status: `${ProcessStatus}` | null;
 
     @Column({
-        type: 'int', unsigned: true, nullable: true, default: null,
+        type: 'int', 
+        unsigned: true, 
+        nullable: true, 
+        default: null,
     })
-        build_progress: number | null;
+    build_progress: number | null;
 
     // sha512:<128 hex> = 135
     @Column({
@@ -103,7 +127,7 @@ export class AnalysisEntity implements Analysis {
         nullable: true,
         default: null,
     })
-        build_hash: string | null;
+    build_hash: string | null;
 
     @Column({
         type: 'varchar',
@@ -111,25 +135,34 @@ export class AnalysisEntity implements Analysis {
         nullable: true,
         default: null,
     })
-        build_os: string | null;
+    build_os: string | null;
 
     @Column({
-        type: 'int', unsigned: true, nullable: true, default: null,
+        type: 'int', 
+        unsigned: true, 
+        nullable: true, 
+        default: null,
     })
-        build_size: number | null;
+    build_size: number | null;
 
     // ------------------------------------------------------------------
 
     @Index()
     @Column({
-        type: 'varchar', length: 64, nullable: true, default: null,
+        type: 'varchar', 
+        length: 64, 
+        nullable: true, 
+        default: null,
     })
-        execution_status: `${ProcessStatus}` | null;
+    execution_status: `${ProcessStatus}` | null;
 
     @Column({
-        type: 'int', unsigned: true, nullable: true, default: null,
+        type: 'int', 
+        unsigned: true, 
+        nullable: true, 
+        default: null,
     })
-        execution_progress: number | null;
+    execution_progress: number | null;
 
     // ------------------------------------------------------------------
 
@@ -145,49 +178,49 @@ export class AnalysisEntity implements Analysis {
             },
         },
     })
-        image_command_arguments: MasterImageCommandArgument[] | null;
+    image_command_arguments: MasterImageCommandArgument[] | null;
 
     // ------------------------------------------------------------------
 
     @CreateDateColumn()
-        created_at: Date;
+    created_at: Date;
 
     @UpdateDateColumn()
-        updated_at: Date;
+    updated_at: Date;
 
     // ------------------------------------------------------------------
 
     @Column({ nullable: true })
-        registry_id: Registry['id'] | null;
+    registry_id: Registry['id'] | null;
 
     @ManyToOne(() => RegistryEntity, { onDelete: 'CASCADE', nullable: true })
     @JoinColumn({ name: 'registry_id' })
-        registry: RegistryEntity | null;
+    registry: RegistryEntity | null;
 
     // ------------------------------------------------------------------
 
     @Column({ type: 'uuid' })
-        realm_id: Realm['id'];
+    realm_id: Realm['id'];
 
     // ------------------------------------------------------------------
 
     @Column({ nullable: true, type: 'uuid' })
-        user_id: User['id'];
+    user_id: User['id'];
 
     // ------------------------------------------------------------------
     @Column({ type: 'uuid' })
-        project_id: Project['id'];
+    project_id: Project['id'];
 
     @ManyToOne(() => ProjectEntity, (proposal) => proposal.analyses, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'project_id' })
-        project: ProjectEntity;
+    project: ProjectEntity;
 
     // ------------------------------------------------------------------
 
     @Column({ nullable: true, type: 'uuid' })
-        master_image_id: MasterImage['id'] | null;
+    master_image_id: MasterImage['id'] | null;
 
     @ManyToOne(() => MasterImageEntity, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'master_image_id' })
-        master_image: MasterImageEntity;
+    master_image: MasterImageEntity;
 }

@@ -13,9 +13,7 @@ export function mountLoggingMiddleware(
     nsp: Namespace | Server,
 ) {
     nsp.on('error', (err) => {
-        useLogger().error(err, {
-            [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
-        });
+        useLogger().error(err, { [LogFlag.CHANNEL]: LogChannel.WEBSOCKET });
     });
 
     nsp.use((socket, next) => {

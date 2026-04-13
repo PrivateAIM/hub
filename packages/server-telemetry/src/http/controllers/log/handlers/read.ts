@@ -27,9 +27,7 @@ export async function getManyLogLogRouteHandler(req: Request, res: Response) : P
     const filtersRaw = useRequestQuery(req, 'filter');
     if (isObject(filtersRaw)) {
         const keys = Object.keys(filtersRaw);
-        for (let i = 0; i < keys.length; i++) {
-            const key = keys[i];
-
+        for (const key of keys) {
             const index = key.indexOf('.');
 
             let nextKey : string;
@@ -53,9 +51,7 @@ export async function getManyLogLogRouteHandler(req: Request, res: Response) : P
     }
 
     const paginationRaw = useRequestQuery(req, 'pagination');
-    const pagination = parseQueryPagination(paginationRaw, {
-        maxLimit: 100,
-    });
+    const pagination = parseQueryPagination(paginationRaw, { maxLimit: 100 });
 
     const limit = pagination.limit || 100;
     const offset = pagination.offset || 0;

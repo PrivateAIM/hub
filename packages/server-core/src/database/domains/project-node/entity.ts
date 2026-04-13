@@ -7,10 +7,19 @@
 
 import {
     Column,
-    CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn,
+    CreateDateColumn, 
+    Entity, 
+    JoinColumn, 
+    ManyToOne, 
+    PrimaryGeneratedColumn, 
+    Unique, 
+    UpdateDateColumn,
 } from 'typeorm';
 import type {
-    Node, Project, ProjectNode, ProjectNodeApprovalStatus,
+    Node, 
+    Project, 
+    ProjectNode, 
+    ProjectNodeApprovalStatus,
 } from '@privateaim/core-kit';
 import type { Realm } from '@authup/core-kit';
 import { ProjectEntity } from '../project/entity.ts';
@@ -20,41 +29,45 @@ import { NodeEntity } from '../node/entity.ts';
 @Entity({ name: 'project_nodes' })
 export class ProjectNodeEntity implements ProjectNode {
     @PrimaryGeneratedColumn('uuid')
-        id: string;
+    id: string;
 
-    @Column({ type: 'varchar', length: 32, default: null })
-        approval_status: ProjectNodeApprovalStatus | null;
+    @Column({
+        type: 'varchar', 
+        length: 32, 
+        default: null, 
+    })
+    approval_status: ProjectNodeApprovalStatus | null;
 
     @Column({ type: 'text', nullable: true })
-        comment: string;
+    comment: string;
 
     // ------------------------------------------------------------------
 
     @CreateDateColumn()
-        created_at: Date;
+    created_at: Date;
 
     @UpdateDateColumn()
-        updated_at: Date;
+    updated_at: Date;
 
     // ------------------------------------------------------------------
 
     @Column()
-        project_id: Project['id'];
+    project_id: Project['id'];
 
     @ManyToOne(() => ProjectEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'project_id' })
-        project: ProjectEntity;
+    project: ProjectEntity;
 
     @Column({ type: 'uuid' })
-        project_realm_id: Realm['id'];
+    project_realm_id: Realm['id'];
 
     @Column()
-        node_id: Node['id'];
+    node_id: Node['id'];
 
     @ManyToOne(() => NodeEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'node_id' })
-        node: NodeEntity;
+    node: NodeEntity;
 
     @Column({ type: 'uuid' })
-        node_realm_id: string;
+    node_realm_id: string;
 }

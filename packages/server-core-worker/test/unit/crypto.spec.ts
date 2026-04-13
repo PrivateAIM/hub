@@ -22,7 +22,11 @@ describe('src/core/crypto', () => {
         const data = crypto.randomBytes(32);
         const signature = createSignature({ data, key });
 
-        const verified = verifySignature({ data, key, signature });
+        const verified = verifySignature({
+            data, 
+            key, 
+            signature, 
+        });
 
         expect(verified).toBeTruthy();
     });

@@ -22,8 +22,8 @@ import { toBucketName } from '../../../../domains/index.ts';
 import { BucketValidator } from '../../../../http/controllers/bucket/utils/validation.ts';
 
 export class BucketCreateHandler implements ComponentHandler<
-BucketComponentEventMap,
-BucketCommand.CREATE
+    BucketComponentEventMap,
+    BucketCommand.CREATE
 > {
     protected validator : BucketValidator;
 
@@ -66,9 +66,7 @@ BucketCommand.CREATE
             value,
         );
 
-        const data = await this.validator.run(value, {
-            group: HTTPHandlerOperation.CREATE,
-        });
+        const data = await this.validator.run(value, { group: HTTPHandlerOperation.CREATE });
 
         const dataSource = await useDataSource();
         const repository = dataSource.getRepository(BucketEntity);
@@ -85,9 +83,7 @@ BucketCommand.CREATE
 
         await context.handle(
             BucketEvent.CREATION_FINISHED,
-            {
-                ...entity,
-            },
+            { ...entity },
         );
     }
 }

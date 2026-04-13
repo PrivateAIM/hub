@@ -13,7 +13,11 @@
  */
 
 import {
-    afterAll, beforeAll, describe, expect, it,
+    afterAll, 
+    beforeAll, 
+    describe, 
+    expect, 
+    it,
 } from 'vitest';
 import { wait } from '@privateaim/kit';
 import { LogChannel, LogLevel } from '@privateaim/telemetry-kit';
@@ -38,9 +42,7 @@ describe('controllers > analysis-node-log', () => {
             service: 'unknown',
             level: LogLevel.ERROR,
             message: 'An test error occurred.',
-            labels: {
-                foo: 'bar',
-            },
+            labels: { foo: 'bar' },
         });
 
         expect(response.channel).toEqual(LogChannel.SYSTEM);
@@ -58,13 +60,7 @@ describe('controllers > analysis-node-log', () => {
         await wait(1_000);
 
         const result = await client.log
-            .getMany({
-                filters: {
-                    labels: {
-                        foo: 'bar',
-                    },
-                },
-            });
+            .getMany({ filters: { labels: { foo: 'bar' } } });
 
         expect(result.data.length).toBeGreaterThanOrEqual(1);
     });
@@ -72,12 +68,6 @@ describe('controllers > analysis-node-log', () => {
     it('should delete resource', async () => {
         const client = suite.client();
 
-        await client.log.deleteMany({
-            filters: {
-                labels: {
-                    foo: 'bar',
-                },
-            },
-        });
+        await client.log.deleteMany({ filters: { labels: { foo: 'bar' } } });
     });
 });

@@ -9,7 +9,5 @@ import type { HarborClient } from '@hapic/harbor';
 import { createClient } from '@hapic/harbor';
 
 export function createBasicHarborAPIClient(connectionString: string) : HarborClient {
-    return createClient({
-        connectionString,
-    });
+    return createClient({ connectionString });
 }

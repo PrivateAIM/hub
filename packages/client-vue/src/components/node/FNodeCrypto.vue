@@ -15,7 +15,9 @@ import {
 } from '@privateaim/kit';
 import { useClipboard } from '@vueuse/core';
 import {
-    type PropType, defineComponent, ref,
+    type PropType, 
+    defineComponent, 
+    ref,
 } from 'vue';
 import { injectCoreHTTPClient } from '../../core';
 
@@ -72,9 +74,7 @@ export default defineComponent({
             busy.value = true;
 
             try {
-                const response = await httpClient.node.update(props.entity.id, {
-                    public_key: publicKey.value,
-                });
+                const response = await httpClient.node.update(props.entity.id, { public_key: publicKey.value });
 
                 emit('updated', response);
             } catch (e) {

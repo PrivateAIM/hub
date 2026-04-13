@@ -7,7 +7,8 @@
 
 import type { Socket } from '../../../types.ts';
 import {
-    buildConnectionRoomForIdentity, buildDisconnectedEventNameForIdentity,
+    buildConnectionRoomForIdentity, 
+    buildDisconnectedEventNameForIdentity,
     buildSubscriptionRoomForIdentity,
 } from '../helpers.ts';
 
@@ -29,9 +30,7 @@ export function mountSocketConnectionDisconnectingHandler(socket: Socket) {
             buildDisconnectedEventNameForIdentity(socket.data.identity),
             {
                 id: socket.data.identity.id,
-                meta: {
-                    roomName: buildConnectionRoomForIdentity(socket.data.identity),
-                },
+                meta: { roomName: buildConnectionRoomForIdentity(socket.data.identity) },
             },
         );
     });

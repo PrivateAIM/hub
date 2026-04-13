@@ -25,9 +25,7 @@ export function configureVictoriaLogs() {
 
     const config : ConfigInput = {};
     if (baseURL) {
-        config.request = {
-            baseURL,
-        };
+        config.request = { baseURL };
     }
 
     if (ingestorURL) {

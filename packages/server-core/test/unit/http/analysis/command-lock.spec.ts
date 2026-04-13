@@ -6,7 +6,11 @@
  */
 
 import {
-    afterAll, beforeAll, describe, expect, it,
+    afterAll, 
+    beforeAll, 
+    describe, 
+    expect, 
+    it,
 } from 'vitest';
 import type { Analysis, Node } from '@privateaim/core-kit';
 import { AnalysisCommand, AnalysisError, NodeType } from '@privateaim/core-kit';
@@ -31,12 +35,8 @@ describe('analysis/command-lock', () => {
 
         const project = await client.project.create(createTestProject());
 
-        nodeDefault = await client.node.create(createTestNode({
-            type: NodeType.DEFAULT,
-        }));
-        nodeAggregator = await client.node.create(createTestNode({
-            type: NodeType.AGGREGATOR,
-        }));
+        nodeDefault = await client.node.create(createTestNode({ type: NodeType.DEFAULT }));
+        nodeAggregator = await client.node.create(createTestNode({ type: NodeType.AGGREGATOR }));
 
         await client.projectNode.create({
             node_id: nodeDefault.id,
@@ -48,9 +48,7 @@ describe('analysis/command-lock', () => {
             project_id: project.id,
         });
 
-        analysis = await client.analysis.create({
-            project_id: project.id,
-        });
+        analysis = await client.analysis.create({ project_id: project.id });
     });
 
     afterAll(async () => {

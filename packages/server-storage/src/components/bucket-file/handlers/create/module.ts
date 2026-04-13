@@ -26,8 +26,8 @@ import { toBucketName } from '../../../../domains/index.ts';
 import { BucketValidator } from '../../../../http/controllers/bucket/utils/validation.ts';
 
 export class BucketFileCreateHandler implements ComponentHandler<
-BucketFileComponentEventMap,
-BucketFileCommand.CREATE
+    BucketFileComponentEventMap,
+    BucketFileCommand.CREATE
 > {
     protected validator : BucketValidator;
 
@@ -82,9 +82,7 @@ BucketFileCommand.CREATE
         } else {
             const bucketRepository = dataSource.getRepository(BucketEntity);
 
-            bucket = await bucketRepository.findOneByOrFail({
-                id: meta.bucket_id,
-            });
+            bucket = await bucketRepository.findOneByOrFail({ id: meta.bucket_id });
         }
 
         // hash
@@ -112,9 +110,7 @@ BucketFileCommand.CREATE
 
         await context.handle(
             BucketFileEvent.CREATION_FINISHED,
-            {
-                ...entity,
-            },
+            { ...entity },
         );
     }
 }

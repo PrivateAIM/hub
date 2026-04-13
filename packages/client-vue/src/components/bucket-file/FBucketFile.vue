@@ -21,12 +21,8 @@ import { FBucketFileDownload } from './FBucketFileDownload';
 export default defineComponent({
     components: { FBucketFileDownload, VCFormInputCheckbox },
     props: {
-        entity: {
-            type: Object as PropType<BucketFile>,
-        },
-        entityId: {
-            type: String,
-        },
+        entity: { type: Object as PropType<BucketFile> },
+        entityId: { type: String },
         readonly: {
             type: Boolean,
             default: false,

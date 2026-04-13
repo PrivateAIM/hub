@@ -7,7 +7,9 @@
 
 import type { HandlerInterface } from '@routup/decorators';
 import type {
-    Next, Request, Response,
+    Next, 
+    Request, 
+    Response,
 } from 'routup';
 import { useRequestIdentityOrFail } from '../request';
 

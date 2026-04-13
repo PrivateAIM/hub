@@ -9,7 +9,10 @@ import {
     RegistryProjectType,
 } from '@privateaim/core-kit';
 import {
-    PermissionName, createNanoID, isHex, isRealmResourceWritable,
+    PermissionName, 
+    createNanoID, 
+    isHex, 
+    isRealmResourceWritable,
 } from '@privateaim/kit';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import type { Request, Response } from 'routup';
@@ -30,9 +33,7 @@ export async function updateNodeRouteHandler(req: Request, res: Response) : Prom
 
     const validator = new NodeValidator();
     const validatorAdapter = new RoutupContainerAdapter(validator);
-    const data = await validatorAdapter.run(req, {
-        group: HTTPHandlerOperation.UPDATE,
-    });
+    const data = await validatorAdapter.run(req, { group: HTTPHandlerOperation.UPDATE });
 
     const dataSource = await useDataSource();
     await validateEntityJoinColumns(data, {
@@ -106,9 +107,7 @@ export async function updateNodeRouteHandler(req: Request, res: Response) : Prom
         if (registryOperation === 'link') {
             await caller.call(
                 RegistryCommand.PROJECT_LINK,
-                {
-                    id: registryProject.id,
-                },
+                { id: registryProject.id },
                 {},
             );
         } else {

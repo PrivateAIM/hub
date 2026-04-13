@@ -14,9 +14,7 @@ import type { MasterImageBuilderExecutePayload } from './types';
 
 export class MasterImageBuilderComponentCaller extends QueueDispatchComponentCaller {
     constructor() {
-        super({
-            queue: MasterImageBuilderTaskQueueRouterRouting,
-        });
+        super({ queue: MasterImageBuilderTaskQueueRouterRouting });
     }
 
     async callExecute(payload: MasterImageBuilderExecutePayload, metadata: ComponentMetadata = {}) {

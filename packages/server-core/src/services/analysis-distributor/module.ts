@@ -18,7 +18,8 @@ import { useDataSource } from 'typeorm-extension';
 import type { Repository } from 'typeorm';
 import {
     AnalysisEntity,
-    AnalysisNodeEntity, RegistryEntity,
+    AnalysisNodeEntity, 
+    RegistryEntity,
     useDataSourceSync,
 } from '../../database/index.ts';
 import { RequestRepositoryAdapter } from '../../http/request/index.ts';
@@ -51,9 +52,7 @@ export class AnalysisDistributor {
         request?: Request,
     ) {
         const entityId = typeof input === 'string' ? input : input.id;
-        const entity = await this.metadataCaller.callRecalcDirect({
-            analysisId: entityId,
-        });
+        const entity = await this.metadataCaller.callRecalcDirect({ analysisId: entityId });
 
         AnalysisDistributorCommandChecker.canStart(entity);
 
@@ -74,9 +73,7 @@ export class AnalysisDistributor {
             await this.repository.save(entity);
         }
 
-        await this.caller.callExecute({
-            id: entity.id,
-        });
+        await this.caller.callExecute({ id: entity.id });
 
         return entity;
     }
@@ -88,9 +85,7 @@ export class AnalysisDistributor {
 
         AnalysisDistributorCommandChecker.canCheck(entity);
 
-        await this.caller.callCheck({
-            id: entity.id,
-        });
+        await this.caller.callCheck({ id: entity.id });
 
         return entity;
     }
@@ -99,9 +94,7 @@ export class AnalysisDistributor {
 
     protected async assignRegistry(entity: AnalysisEntity) {
         if (!entity.registry_id) {
-            const [registry] = await this.registryRepository.find({
-                take: 1,
-            });
+            const [registry] = await this.registryRepository.find({ take: 1 });
 
             if (!registry) {
                 throw new BadRequestError('No docker registry is defined.');
@@ -121,18 +114,16 @@ export class AnalysisDistributor {
      */
     protected async checkNodes(entity: AnalysisEntity) {
         const analysisNodes = await this.analysisNodeRepository.find({
-            where: {
-                analysis_id: entity.id,
-            },
+            where: { analysis_id: entity.id },
             relations: ['node'],
         });
 
-        for (let i = 0; i < analysisNodes.length; i++) {
+        for (const analysisNode of analysisNodes) {
             if (
-                analysisNodes[i].node &&
-                !analysisNodes[i].node.registry_id
+                analysisNode.node &&
+                !analysisNode.node.registry_id
             ) {
-                throw new BadRequestError(`The node ${analysisNodes[i].node.name} is not assigned to a registry yet.`);
+                throw new BadRequestError(`The node ${analysisNode.node.name} is not assigned to a registry yet.`);
             }
         }
     }

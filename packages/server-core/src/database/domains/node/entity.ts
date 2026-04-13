@@ -11,13 +11,13 @@ import {
     Entity,
     JoinColumn,
     ManyToOne,
-    PrimaryGeneratedColumn, Unique,
+    PrimaryGeneratedColumn, 
+    Unique,
     UpdateDateColumn,
 } from 'typeorm';
-import type { Node, Registry } from '@privateaim/core-kit';
+import type { Node, Registry, RegistryProject } from '@privateaim/core-kit';
 import {
     NodeType,
-    RegistryProject,
 } from '@privateaim/core-kit';
 import type { Client, Realm, Robot } from '@authup/core-kit';
 import { RegistryProjectEntity } from '../registry-project/index.ts';
@@ -28,64 +28,68 @@ import { RegistryEntity } from '../registry/index.ts';
 @Entity({ name: 'nodes' })
 export class NodeEntity implements Node {
     @PrimaryGeneratedColumn('uuid')
-        id: string;
+    id: string;
 
-    @Column({ type: 'varchar', length: 64, nullable: true })
-        external_name: string;
+    @Column({
+        type: 'varchar', 
+        length: 64, 
+        nullable: true, 
+    })
+    external_name: string;
 
     @Column({
         type: 'varchar',
         length: 4096,
         nullable: true,
     })
-        public_key: string;
+    public_key: string;
 
     @Column({ type: 'varchar', length: 128 })
-        name: string;
+    name: string;
 
     @Column({ type: 'boolean', default: false })
-        hidden: boolean;
+    hidden: boolean;
 
     @Column({
-        type: 'varchar', length: 64, default: NodeType.DEFAULT,
+        type: 'varchar', 
+        length: 64, 
+        default: NodeType.DEFAULT,
     })
-        type: `${NodeType}`;
+    type: `${NodeType}`;
 
-    @Column({
-        type: 'boolean', default: false,
-    })
-        online: boolean;
+    @Column({ type: 'boolean', default: false })
+    online: boolean;
 
     // ------------------------------------------------------------------
 
     @Column({ nullable: true })
-        registry_id: Registry['id'] | null;
+    registry_id: Registry['id'] | null;
 
     @ManyToOne(() => RegistryEntity, { onDelete: 'CASCADE', nullable: true })
     @JoinColumn({ name: 'registry_id' })
-        registry: Registry | null;
+    registry: Registry | null;
 
     @Column({ nullable: true })
-        registry_project_id: RegistryProject['id'];
+    registry_project_id: RegistryProject['id'];
 
     @ManyToOne(() => RegistryProjectEntity, { onDelete: 'CASCADE', nullable: true })
     @JoinColumn({ name: 'registry_project_id' })
-        registry_project: RegistryProject;
+    registry_project: RegistryProject;
 
     @Column({ type: 'uuid', nullable: true })
-        client_id: Client['id'] | null;
+    client_id: Client['id'] | null;
 
     @Column({ type: 'uuid', nullable: true })
-        robot_id: Robot['id'] | null;
+    robot_id: Robot['id'] | null;
 
     @Column({ type: 'uuid' })
-        realm_id: Realm['id'];
+    realm_id: Realm['id'];
 
     // ------------------------------------------------------------------
 
     @CreateDateColumn()
-        created_at: Date;
+    created_at: Date;
 
     @UpdateDateColumn()
-        updated_at: Date;
+    updated_at: Date;
 }

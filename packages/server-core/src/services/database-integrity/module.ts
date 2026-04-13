@@ -7,7 +7,10 @@
 
 import type { DataSource } from 'typeorm';
 import {
-    AnalysisEntity, AnalysisNodeEntity, ProjectEntity, ProjectNodeEntity,
+    AnalysisEntity, 
+    AnalysisNodeEntity, 
+    ProjectEntity, 
+    ProjectNodeEntity,
 } from '../../database/index.ts';
 
 export class DatabaseIntegrityService {
@@ -41,12 +44,8 @@ export class DatabaseIntegrityService {
 
         const analysisRepository = this.dataSource.getRepository(AnalysisEntity);
         const keys = Object.keys(nodeCountByAnalysisID);
-        for (let i = 0; i < keys.length; i++) {
-            await analysisRepository.update({
-                id: keys[i],
-            }, {
-                nodes: nodeCountByAnalysisID[keys[i]],
-            });
+        for (const key of keys) {
+            await analysisRepository.update({ id: key }, { nodes: nodeCountByAnalysisID[key] });
         }
     }
 
@@ -71,15 +70,11 @@ export class DatabaseIntegrityService {
         const analysisRepository = this.dataSource.getRepository(AnalysisEntity);
 
         const projects = await projectRepository.find();
-        for (let i = 0; i < projects.length; i++) {
-            const analyses = await analysisRepository.find({
-                where: {
-                    project_id: projects[i].id,
-                },
-            });
+        for (const project of projects) {
+            const analyses = await analysisRepository.find({ where: { project_id: project.id } });
 
-            projects[i].analyses = analyses.length;
-            projects[i].nodes = nodeCountByProjectID[projects[i].id] || 0;
+            project.analyses = analyses.length;
+            project.nodes = nodeCountByProjectID[project.id] || 0;
         }
 
         await projectRepository.save(projects);

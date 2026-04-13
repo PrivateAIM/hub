@@ -32,9 +32,7 @@ export async function executeBucketRouteCreateHandler(req: Request, res: Respons
 
     const validator = new BucketValidator();
     const validatorAdapter = new RoutupContainerAdapter(validator);
-    const data = await validatorAdapter.run(req, {
-        group: HTTPHandlerOperation.CREATE,
-    });
+    const data = await validatorAdapter.run(req, { group: HTTPHandlerOperation.CREATE });
 
     const realm = useRequestIdentityRealm(req);
     if (data.realm_id) {

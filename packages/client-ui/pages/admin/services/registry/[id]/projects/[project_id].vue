@@ -15,7 +15,10 @@ import type {
 import { RegistryProjectForm, createEntityManager } from '@privateaim/client-vue';
 import { useToast } from '#imports';
 import {
-    createError, defineNuxtComponent, navigateTo, useRoute,
+    createError, 
+    defineNuxtComponent, 
+    navigateTo, 
+    useRoute,
 } from '#app';
 
 export default defineNuxtComponent({
@@ -32,9 +35,7 @@ export default defineNuxtComponent({
 
         const manager = createEntityManager({
             type: `${DomainType.REGISTRY_PROJECT}`,
-            props: {
-                entityId: route.params.id as string,
-            },
+            props: { entityId: route.params.id as string },
             queryFields: [
                 '+account_id',
                 '+account_name',
@@ -44,9 +45,7 @@ export default defineNuxtComponent({
             ] as FieldsBuildInput<RegistryProject>,
             onFailed(e) {
                 if (toast) {
-                    toast.show({ body: e.message }, {
-                        pos: 'top-center',
-                    });
+                    toast.show({ body: e.message }, { pos: 'top-center' });
                 }
             },
             onUpdated() {

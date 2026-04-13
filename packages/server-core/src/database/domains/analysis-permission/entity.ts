@@ -24,50 +24,50 @@ import { AnalysisEntity } from '../analysis/index.ts';
 @Entity({ name: 'analysis_permissions' })
 export class AnalysisPermissionEntity implements AnalysisPermission {
     @PrimaryGeneratedColumn('uuid')
-        id: string;
+    id: string;
 
     // ------------------------------------------------------------------
 
     @CreateDateColumn()
-        created_at: string;
+    created_at: string;
 
     @UpdateDateColumn()
-        updated_at: string;
+    updated_at: string;
 
     // ------------------------------------------------------------------
 
     @Column()
-        analysis_id: Analysis['id'];
+    analysis_id: Analysis['id'];
 
     @ManyToOne(() => AnalysisEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'analysis_id' })
-        analysis: AnalysisEntity;
+    analysis: AnalysisEntity;
 
     // ------------------------------------------------------------------
 
     analysis_realm: Realm | null;
 
     @Column({ type: 'uuid', nullable: true })
-        analysis_realm_id: Realm['id'] | null;
+    analysis_realm_id: Realm['id'] | null;
 
     // ------------------------------------------------------------------
 
     @Column({ type: 'uuid' })
-        permission_id: Permission['id'];
+    permission_id: Permission['id'];
 
     permission: Permission;
 
     // ------------------------------------------------------------------
 
     @Column({ type: 'uuid', nullable: true })
-        policy_id: Policy['id'] | null;
+    policy_id: Policy['id'] | null;
 
     policy: Policy | null;
 
     // ------------------------------------------------------------------
 
     @Column({ type: 'uuid', nullable: true })
-        permission_realm_id: Realm['id'] | null;
+    permission_realm_id: Realm['id'] | null;
 
     permission_realm: Realm | null;
 }

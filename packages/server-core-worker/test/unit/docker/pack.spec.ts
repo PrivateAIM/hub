@@ -22,9 +22,7 @@ describe('docker/pack', () => {
 
         const fileStream = fs.createReadStream('test/data/stream.tar');
 
-        await packDockerContainerWithTarStream(container, fileStream, {
-            path: '/opt',
-        });
+        await packDockerContainerWithTarStream(container, fileStream, { path: '/opt' });
 
         await container.commit({
             repo: 'alpine',
@@ -71,17 +69,11 @@ describe('docker/pack', () => {
 
             expect(size.toString('utf-8')).toContain('4224');
         } finally {
-            await container.remove({
-                force: true,
-            });
+            await container.remove({ force: true });
             await testContainer.stop();
-            await testContainer.remove({
-                force: true,
-            });
+            await testContainer.remove({ force: true });
 
-            await image.remove({
-                force: true,
-            });
+            await image.remove({ force: true });
         }
     }, 30_000);
 });

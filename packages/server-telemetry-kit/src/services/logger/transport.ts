@@ -31,7 +31,10 @@ export class LoggerTransport extends WinstonTransport {
 
     protected normalizeInput(info: Record<PropertyKey, any>) : LogInput {
         const {
-            message, timestamp, stack, ...data
+            message, 
+            timestamp, 
+            stack, 
+            ...data
         } = info;
 
         let date : Date;
@@ -57,21 +60,21 @@ export class LoggerTransport extends WinstonTransport {
         ]) as string[];
 
         let keys = Object.keys(output.labels);
-        for (let i = 0; i < keys.length; i++) {
-            const index = flags.indexOf(keys[i]);
+        for (const key of keys) {
+            const index = flags.indexOf(key);
             if (index !== -1) {
-                output[keys[i]] = output.labels[keys[i]];
-                delete output.labels[keys[i]];
+                output[key] = output.labels[key];
+                delete output.labels[key];
             }
         }
 
         keys = Object.keys(data);
-        for (let i = 0; i < keys.length; i++) {
-            if (typeof keys[i] !== 'string') {
+        for (const key of keys) {
+            if (typeof key !== 'string') {
                 continue;
             }
 
-            const value = data[keys[i]];
+            const value = data[key];
 
             if (
                 typeof value !== 'string' &&
@@ -81,11 +84,11 @@ export class LoggerTransport extends WinstonTransport {
                 continue;
             }
 
-            const index = flags.indexOf(keys[i]);
+            const index = flags.indexOf(key);
             if (index === -1) {
-                output.labels[keys[i]] = `${value}`;
+                output.labels[key] = `${value}`;
             } else {
-                output[keys[i]] = `${value}`;
+                output[key] = `${value}`;
             }
         }
 

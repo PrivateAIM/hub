@@ -8,20 +8,20 @@ import { useLogger } from '@privateaim/server-kit';
 import type { BucketFileComponentEventMap, BucketFileEvent } from '@privateaim/server-storage-kit';
 import type { BucketFile } from '@privateaim/storage-kit';
 import {
-    AnalysisBucketEntity, AnalysisBucketFileEntity, useDataSourceSync,
+    AnalysisBucketEntity, 
+    AnalysisBucketFileEntity, 
+    useDataSourceSync,
 } from '../../../../database/index.ts';
 import { BaseAggregatorHandler } from '../../../base.ts';
 
 export class StorageBucketFileCreationFinishedHandler extends BaseAggregatorHandler<
-BucketFileComponentEventMap,
-BucketFileEvent.CREATION_FINISHED
+    BucketFileComponentEventMap,
+    BucketFileEvent.CREATION_FINISHED
 > {
     async handle(data: BucketFile): Promise<void> {
         const dataSource = useDataSourceSync();
         const analysisBucketRepository = dataSource.getRepository(AnalysisBucketEntity);
-        const analysisBucket = await analysisBucketRepository.findOneBy({
-            bucket_id: data.bucket_id,
-        });
+        const analysisBucket = await analysisBucketRepository.findOneBy({ bucket_id: data.bucket_id });
 
         if (!analysisBucket) {
             useLogger().debug(`Can not associate ${data.path} to an analysis bucket`);

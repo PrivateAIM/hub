@@ -75,9 +75,7 @@ export async function getManyAnalysisRouteHandler(req: Request, res: Response) :
                 'configuration_locked',
             ],
         },
-        pagination: {
-            maxLimit: 50,
-        },
+        pagination: { maxLimit: 50 },
         relations: {
             allowed: ['project', 'master_image'],
             onJoin: (_property, key, query) => {
@@ -86,21 +84,19 @@ export async function getManyAnalysisRouteHandler(req: Request, res: Response) :
         },
         sort: {
             allowed: ['created_at', 'updated_at'],
-            default: {
-                updated_at: 'DESC',
-            },
+            default: { updated_at: 'DESC' },
         },
     });
 
     let filterRealmId: string | undefined;
 
     if (filters) {
-        for (let i = 0; i < filters.length; i++) {
+        for (const filter of filters) {
             if (
-                filters[i].path === 'analysis' &&
-                filters[i].key === 'realm_id'
+                filter.path === 'analysis' &&
+                filter.key === 'realm_id'
             ) {
-                filterRealmId = filters[i].value as string;
+                filterRealmId = filter.value as string;
                 break;
             }
         }

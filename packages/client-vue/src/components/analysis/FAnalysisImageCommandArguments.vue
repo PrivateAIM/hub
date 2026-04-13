@@ -14,24 +14,16 @@ import { defineEntityManagerEvents } from '../../core';
 import FAnalysis from './FAnalysis';
 
 export default defineComponent({
-    components: {
-        FImageCommandArguments, FAnalysis,
-    },
+    components: { FImageCommandArguments, FAnalysis },
     props: {
-        entityId: {
-            type: String,
-        },
-        entity: {
-            type: Object as PropType<Analysis>,
-        },
+        entityId: { type: String },
+        entity: { type: Object as PropType<Analysis> },
         readonly: {
             type: Boolean,
             default: false,
         },
     },
-    emits: {
-        ...defineEntityManagerEvents<Analysis>(),
-    },
+    emits: { ...defineEntityManagerEvents<Analysis>() },
 });
 </script>
 <template>

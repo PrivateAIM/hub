@@ -13,7 +13,8 @@ import type { BuildInput } from 'rapiq';
 import { computed, ref, toRefs } from 'vue';
 import type { PropType, Ref } from 'vue';
 import {
-    FEntityDelete, FPagination,
+    FEntityDelete, 
+    FPagination,
     FSearch,
     FTitle,
     RegistryProjectDetails,
@@ -49,30 +50,45 @@ export default {
         const refs = toRefs(props);
 
         const query : BuildInput<RegistryProject> = {
-            filter: {
-                registry_id: refs.entity.value.id,
-            },
+            filter: { registry_id: refs.entity.value.id },
             fields: ['+account_id', '+account_name', '+account_secret'],
         };
 
         const fields = [
             {
-                key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left',
+                key: 'id', 
+                label: 'ID', 
+                thClass: 'text-left', 
+                tdClass: 'text-left',
             },
             {
-                key: 'type', label: 'Type', thClass: 'text-left', tdClass: 'text-left',
+                key: 'type', 
+                label: 'Type', 
+                thClass: 'text-left', 
+                tdClass: 'text-left',
             },
             {
-                key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
+                key: 'name', 
+                label: 'Name', 
+                thClass: 'text-left', 
+                tdClass: 'text-left',
             },
             {
-                key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center',
+                key: 'created_at', 
+                label: 'Created At', 
+                thClass: 'text-center', 
+                tdClass: 'text-center',
             },
             {
-                key: 'updated_at', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left',
+                key: 'updated_at', 
+                label: 'Updated At', 
+                thClass: 'text-left', 
+                tdClass: 'text-left',
             },
             {
-                key: 'options', label: '', tdClass: 'text-left',
+                key: 'options', 
+                label: '', 
+                tdClass: 'text-left',
             },
         ];
 

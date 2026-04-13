@@ -20,11 +20,7 @@ import FLog from './FLog';
 
 export default defineComponent({
     components: { FLog },
-    props: {
-        query: {
-            type: Object as PropType<BuildInput<Log>>,
-        },
-    },
+    props: { query: { type: Object as PropType<BuildInput<Log>> } },
     setup(props) {
         const httpClient = injectTelemetryHTTPClient();
 

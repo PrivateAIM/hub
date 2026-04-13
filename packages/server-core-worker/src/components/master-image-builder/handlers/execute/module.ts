@@ -23,13 +23,15 @@ import path from 'node:path';
 import tar from 'tar-fs';
 import { MASTER_IMAGES_DIRECTORY_PATH } from '../../../../constants';
 import {
-    buildDockerImageURL, useCoreClient, useDocker,
+    buildDockerImageURL, 
+    useCoreClient, 
+    useDocker,
 } from '../../../../core';
 import { useMasterImageBuilderLogger } from '../../utils';
 
 export class MasterImageBuilderExecuteHandler implements ComponentHandler<
-MasterImageBuilderEventMap,
-MasterImageBuilderCommand.EXECUTE
+    MasterImageBuilderEventMap,
+    MasterImageBuilderCommand.EXECUTE
 > {
     async handle(
         payload: MasterImageBuilderExecutePayload,
@@ -79,7 +81,7 @@ MasterImageBuilderCommand.EXECUTE
                     );
                 },
             });
-        } catch (e) {
+        } catch {
             useMasterImageBuilderLogger().info({
                 message: 'Building image failed',
                 command: MasterImageBuilderCommand.EXECUTE,

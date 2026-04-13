@@ -11,7 +11,10 @@ import { PermissionName } from '@privateaim/kit';
 import type { BuildInput } from 'rapiq';
 import { computed } from 'vue';
 import {
-    FAnalyses, FPagination, FSearch, FTitle,
+    FAnalyses, 
+    FPagination, 
+    FSearch, 
+    FTitle,
 } from '@privateaim/client-vue';
 import { definePageMeta } from '#imports';
 import { defineNuxtComponent } from '#app';
@@ -19,7 +22,10 @@ import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 
 export default defineNuxtComponent({
     components: {
-        ListPagination: FPagination, ListSearch: FSearch, ListTitle: FTitle, FAnalyses,
+        ListPagination: FPagination, 
+        ListSearch: FSearch, 
+        ListTitle: FTitle, 
+        FAnalyses,
     },
     setup() {
         definePageMeta({
@@ -40,15 +46,9 @@ export default defineNuxtComponent({
         const store = injectStore();
         const { realmId } = storeToRefs(store);
 
-        const query = computed<BuildInput<Analysis>>(() => ({
-            filter: {
-                realm_id: realmId.value,
-            },
-        }));
+        const query = computed<BuildInput<Analysis>>(() => ({ filter: { realm_id: realmId.value } }));
 
-        return {
-            query,
-        };
+        return { query };
     },
 });
 </script>

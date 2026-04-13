@@ -29,9 +29,7 @@ export class GitHubClient extends Client {
 
     async getRepositoryBranch(owner: string, repo: string, branch: string): Promise<GitHubRepositoryBranch> {
         const response = await this.get(`repos/${owner}/${repo}/branches/${branch}`, {
-            headers: {
-                Accept: 'application/vnd.github+json',
-            },
+            headers: { Accept: 'application/vnd.github+json' },
             responseType: 'json',
         });
 
@@ -40,9 +38,7 @@ export class GitHubClient extends Client {
 
     async getRepositoryBranches(owner: string, repo: string): Promise<GitHubRepositoryBranches> {
         const response = await this.get(`repos/${owner}/${repo}/branches`, {
-            headers: {
-                Accept: 'application/vnd.github+json',
-            },
+            headers: { Accept: 'application/vnd.github+json' },
             responseType: 'json',
         });
 
@@ -52,9 +48,7 @@ export class GitHubClient extends Client {
     async getRepositoryTarball(options: GitHubRepositoryTarballOptions): Promise<ReadableStream<any>> {
         const response = await this.get(
             `repos/${options.owner}/${options.repository}/tarball/${options.branch}`,
-            {
-                responseType: 'stream',
-            },
+            { responseType: 'stream' },
         );
 
         return response.data;

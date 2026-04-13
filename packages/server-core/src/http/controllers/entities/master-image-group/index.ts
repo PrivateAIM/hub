@@ -8,7 +8,13 @@
 import type { MasterImageGroup } from '@privateaim/core-kit';
 
 import {
-    DController, DDelete, DGet, DPath, DRequest, DResponse, DTags,
+    DController, 
+    DDelete, 
+    DGet, 
+    DPath, 
+    DRequest, 
+    DResponse, 
+    DTags,
 } from '@routup/decorators';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import {
@@ -25,7 +31,7 @@ export class MasterImageGroupController {
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
         @DRequest() req: any,
-            @DResponse() res: any,
+        @DResponse() res: any,
     ): Promise<PartialMasterImageGroup[]> {
         return await getManyMasterImageGroupRouteHandler(req, res) as PartialMasterImageGroup[];
     }
@@ -33,8 +39,8 @@ export class MasterImageGroupController {
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<PartialMasterImageGroup | undefined> {
         return await getOneMasterImageGroupRouteHandler(req, res) as PartialMasterImageGroup | undefined;
     }
@@ -42,8 +48,8 @@ export class MasterImageGroupController {
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @DPath('id') id: string,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<PartialMasterImageGroup | undefined> {
         return await deleteMasterImageGroupRouteHandler(req, res) as PartialMasterImageGroup | undefined;
     }

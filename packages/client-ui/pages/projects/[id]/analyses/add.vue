@@ -23,9 +23,7 @@ export default defineNuxtComponent({
             await navigateTo(`/analyses/${entity.id}`);
         };
 
-        return {
-            handleCreated,
-        };
+        return { handleCreated };
     },
 });
 </script>

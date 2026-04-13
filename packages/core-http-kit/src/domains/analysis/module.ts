@@ -88,17 +88,13 @@ export class AnalysisAPI extends BaseAPI {
     }
 
     async streamFiles(id: Analysis['id']) {
-        const response = await this.client.get(this.getFilesDownloadPath(id), {
-            responseType: 'stream',
-        });
+        const response = await this.client.get(this.getFilesDownloadPath(id), { responseType: 'stream' });
 
         return response.data;
     }
 
     async downloadResult(id: Analysis['id']) {
-        const response = await this.client.get(this.getResultDownloadPath(id), {
-            responseType: 'stream',
-        });
+        const response = await this.client.get(this.getResultDownloadPath(id), { responseType: 'stream' });
 
         return response.data;
     }

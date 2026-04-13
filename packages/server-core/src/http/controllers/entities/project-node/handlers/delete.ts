@@ -50,11 +50,7 @@ export async function deleteProjectNodeRouteHandler(req: Request, res: Response)
     // -------------------------------------------
 
     const analysisRepository = dataSource.getRepository(AnalysisEntity);
-    const analyses = await analysisRepository.find({
-        where: {
-            project_id: entity.project_id,
-        },
-    });
+    const analyses = await analysisRepository.find({ where: { project_id: entity.project_id } });
 
     if (analyses.length > 0) {
         const analysisIDs = analyses.map((analysis) => analysis.id);
@@ -69,16 +65,16 @@ export async function deleteProjectNodeRouteHandler(req: Request, res: Response)
 
         if (analysisNodes.length > 0) {
             let nodeIsActivelyUsed: boolean = false;
-            for (let i = 0; i < analysisNodes.length; i++) {
+            for (const [i, analysisNode] of analysisNodes.entries()) {
                 if (
-                    analysisNodes[i].execution_status &&
-                    analysisNodes[i].execution_status !== ProcessStatus.FAILED
+                    analysisNode.execution_status &&
+                    analysisNode.execution_status !== ProcessStatus.FAILED
                 ) {
                     nodeIsActivelyUsed = true;
                     break;
                 }
 
-                const index = analyses.findIndex((analysis) => analysis.id === analysisNodes[i].analysis_id);
+                const index = analyses.findIndex((analysis) => analysis.id === analysisNode.analysis_id);
                 if (index !== -1) {
                     analyses[i].nodes -= 1;
                 }

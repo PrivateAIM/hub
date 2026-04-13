@@ -12,8 +12,8 @@ import type { RegistryEventMap } from '../../type.ts';
 import { RegistryHookValidator } from './validator.ts';
 
 export class RegistryHookHandler implements ComponentHandler<
-RegistryEventMap,
-RegistryCommand.HOOK_PROCESS
+    RegistryEventMap,
+    RegistryCommand.HOOK_PROCESS
 > {
     protected validator : RegistryHookValidator;
 
@@ -29,7 +29,7 @@ RegistryCommand.HOOK_PROCESS
 
             useLogger()
                 .debug(`Registry event ${data.type} unhandled.`);
-        } catch (e) {
+        } catch {
             useLogger()
                 .warn(`Registry event ${value.t} malformed.`);
         }

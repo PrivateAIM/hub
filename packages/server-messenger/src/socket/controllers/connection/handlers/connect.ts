@@ -29,9 +29,7 @@ export function mountConnectionConnectHandler(socket: Socket) {
         buildConnectedEventNameForIdentity(socket.data.identity),
         {
             id: socket.data.identity.id,
-            meta: {
-                roomName: buildSubscriptionRoomForIdentity(socket.data.identity),
-            },
+            meta: { roomName: buildSubscriptionRoomForIdentity(socket.data.identity) },
         },
     );
 }

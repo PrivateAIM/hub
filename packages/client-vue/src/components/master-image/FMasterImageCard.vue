@@ -29,9 +29,7 @@ export default defineComponent({
             return props.entity.build_progress || 0;
         });
 
-        return {
-            progress,
-        };
+        return { progress };
     },
 });
 </script>

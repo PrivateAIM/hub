@@ -47,25 +47,19 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
             if (result.command === RegistryAPICommand.SETUP) {
                 await caller.call(
                     RegistryCommand.SETUP,
-                    {
-                        id: entity.id,
-                    },
+                    { id: entity.id },
                     {},
                 );
             } else if (result.command === RegistryAPICommand.DELETE) {
                 await caller.call(
                     RegistryCommand.DELETE,
-                    {
-                        id: entity.id,
-                    },
+                    { id: entity.id },
                     {},
                 );
             } else {
                 await caller.call(
                     RegistryCommand.CLEANUP,
-                    {
-                        id: entity.id,
-                    },
+                    { id: entity.id },
                     {},
                 );
             }

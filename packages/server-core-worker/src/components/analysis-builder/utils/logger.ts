@@ -20,11 +20,7 @@ export function useAnalysisBuilderLogger() : Logger {
     }
 
     instance = createLogger({
-        options: {
-            defaultMeta: {
-                component: ComponentName.ANALYSIS_BUILDER,
-            },
-        },
+        options: { defaultMeta: { component: ComponentName.ANALYSIS_BUILDER } },
         transports: [
             new LoggerConsoleTransport(),
             new LoggerTransport({

@@ -10,17 +10,25 @@ import { getSeverity, useTranslationsForNestedValidations } from '@ilingo/vuelid
 import type { ProjectNode } from '@privateaim/core-kit';
 import { DomainType, ProjectNodeApprovalStatus } from '@privateaim/core-kit';
 import {
-    buildFormGroup, buildFormSelect, buildFormTextarea,
+    buildFormGroup, 
+    buildFormSelect, 
+    buildFormTextarea,
 } from '@vuecs/form-controls';
 import useVuelidate from '@vuelidate/core';
 import { maxLength, minLength, required } from '@vuelidate/validators';
 import {
-    defineComponent, h, reactive, ref, watch,
+    defineComponent, 
+    h, 
+    reactive, 
+    ref, 
+    watch,
 } from 'vue';
 import type { PropType } from 'vue';
 import { useUpdatedAt } from '../../composables';
 import {
-    createEntityManager, initFormAttributesFromSource, wrapFnWithBusyState,
+    createEntityManager, 
+    initFormAttributesFromSource, 
+    wrapFnWithBusyState,
 } from '../../core';
 
 const FProjectInForm = defineComponent({
@@ -47,9 +55,7 @@ const FProjectInForm = defineComponent({
                 minLength: minLength(5),
                 maxLength: maxLength(2048),
             },
-            approval_status: {
-                required,
-            },
+            approval_status: { required },
         }, form);
 
         const updatedAt = useUpdatedAt(props.entity);

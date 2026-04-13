@@ -16,12 +16,12 @@ import {
     DomainEventNamespace,
 } from '@privateaim/kit';
 import { BaseSubscriber } from '@privateaim/server-db-kit';
-import { EntityEventDestination } from '@privateaim/server-kit';
+import type { EntityEventDestination } from '@privateaim/server-kit';
 import { EventEntity } from './entity.ts';
 
 @TypeormEventSubscriber()
 export class EventSubscriber extends BaseSubscriber<
-EventEntity
+    EventEntity
 > implements EntitySubscriberInterface<EventEntity> {
     constructor() {
         super({

@@ -25,8 +25,8 @@ import { BucketFileEntity } from '../../../../database/index.ts';
 import { toBucketName } from '../../../../domains/index.ts';
 
 export class BucketFileDeleteHandler implements ComponentHandler<
-BucketFileComponentEventMap,
-BucketFileCommand.DELETE
+    BucketFileComponentEventMap,
+    BucketFileCommand.DELETE
 > {
     async handle(
         value: BucketFileDeleteCommandPayload,
@@ -66,9 +66,7 @@ BucketFileCommand.DELETE
         const dataSource = await useDataSource();
         const repository = dataSource.getRepository(BucketFileEntity);
         const entity = await repository.findOne({
-            where: {
-                id: value.id,
-            },
+            where: { id: value.id },
             relations: ['bucket'],
         });
 

@@ -48,9 +48,7 @@ export async function ensureRemoteRegistryProjectAccount(
                 const response = await httpClient.robot
                     .getMany({
                         query: {
-                            q: {
-                                name: context.name,
-                            },
+                            q: { name: context.name },
                             page_size: 1,
                         },
                     });

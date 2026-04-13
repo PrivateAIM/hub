@@ -9,9 +9,7 @@ import type { Factory } from 'singa';
 import { singa } from 'singa';
 import type { APIClient } from '@privateaim/storage-kit';
 
-const instance = singa<APIClient>({
-    name: 'storage',
-});
+const instance = singa<APIClient>({ name: 'storage' });
 
 export function setStorageFactory(factory: Factory<APIClient>) {
     instance.setFactory(factory);

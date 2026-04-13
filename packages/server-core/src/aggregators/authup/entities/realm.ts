@@ -5,7 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import type {
-    EntityType, EventRecord, Realm,
+    EntityType, 
+    EventRecord, 
+    Realm,
 } from '@authup/core-kit';
 import { useDataSource } from 'typeorm-extension';
 import { useLogger } from '@privateaim/server-kit';
@@ -26,38 +28,22 @@ export async function handleAuthupRealmEvent(context: EventRecord<EntityType.REA
         const dataSource = await useDataSource();
 
         const projectRepository = dataSource.getRepository(ProjectEntity);
-        const projects = await projectRepository.find({
-            where: {
-                realm_id: context.data.id,
-            },
-        });
+        const projects = await projectRepository.find({ where: { realm_id: context.data.id } });
 
         await projectRepository.remove(projects);
 
         const registryProjectRepository = dataSource.getRepository(RegistryProjectEntity);
-        const registryProjects = await registryProjectRepository.find({
-            where: {
-                realm_id: context.data.id,
-            },
-        });
+        const registryProjects = await registryProjectRepository.find({ where: { realm_id: context.data.id } });
 
         await registryProjectRepository.remove(registryProjects);
 
         const nodeRepository = dataSource.getRepository(NodeEntity);
-        const nodes = await nodeRepository.find({
-            where: {
-                realm_id: context.data.id,
-            },
-        });
+        const nodes = await nodeRepository.find({ where: { realm_id: context.data.id } });
 
         await nodeRepository.remove(nodes);
 
         const analysisRepository = dataSource.getRepository(AnalysisEntity);
-        const analyses = await analysisRepository.find({
-            where: {
-                realm_id: context.data.id,
-            },
-        });
+        const analyses = await analysisRepository.find({ where: { realm_id: context.data.id } });
 
         await analysisRepository.remove(analyses);
     }

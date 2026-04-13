@@ -22,7 +22,7 @@ import type {
     Node,
 } from '@privateaim/core-kit';
 import type { Realm } from '@authup/core-kit';
-import { ProcessStatus } from '@privateaim/kit';
+import type { ProcessStatus } from '@privateaim/kit';
 import { AnalysisEntity } from '../analysis/index.ts';
 import { NodeEntity } from '../node/index.ts';
 
@@ -30,61 +30,79 @@ import { NodeEntity } from '../node/index.ts';
 @Entity({ name: 'analysis_nodes' })
 export class AnalysisNodeEntity implements AnalysisNode {
     @PrimaryGeneratedColumn('uuid')
-        id: string;
+    id: string;
 
     // ------------------------------------------------------------------
 
-    @Column({ type: 'varchar', length: 32, default: null })
-        approval_status: AnalysisNodeApprovalStatus | null;
+    @Column({
+        type: 'varchar', 
+        length: 32, 
+        default: null, 
+    })
+    approval_status: AnalysisNodeApprovalStatus | null;
 
     @Column({
-        type: 'varchar', length: 32, nullable: true, default: null,
+        type: 'varchar', 
+        length: 32, 
+        nullable: true, 
+        default: null,
     })
-        execution_status: ProcessStatus | null;
+    execution_status: ProcessStatus | null;
 
     @Column({
-        type: 'int', unsigned: true, nullable: true, default: null,
+        type: 'int', 
+        unsigned: true, 
+        nullable: true, 
+        default: null,
     })
-        execution_progress: number | null;
+    execution_progress: number | null;
 
     // ------------------------------------------------------------------
 
     @Column({ type: 'text', nullable: true })
-        comment: string;
+    comment: string;
 
-    @Column({ type: 'varchar', length: 32, nullable: true })
-        artifact_tag: string | null;
+    @Column({
+        type: 'varchar', 
+        length: 32, 
+        nullable: true, 
+    })
+    artifact_tag: string | null;
 
-    @Column({ type: 'varchar', length: 512, nullable: true })
-        artifact_digest: string | null;
+    @Column({
+        type: 'varchar', 
+        length: 512, 
+        nullable: true, 
+    })
+    artifact_digest: string | null;
 
     // ------------------------------------------------------------------
 
     @CreateDateColumn()
-        created_at: Date;
+    created_at: Date;
 
     @UpdateDateColumn()
-        updated_at: Date;
+    updated_at: Date;
 
     // ------------------------------------------------------------------
 
     @Column()
-        analysis_id: Analysis['id'];
+    analysis_id: Analysis['id'];
 
     @ManyToOne(() => AnalysisEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'analysis_id' })
-        analysis: AnalysisEntity;
+    analysis: AnalysisEntity;
 
     @Column({ type: 'uuid' })
-        analysis_realm_id: Realm['id'];
+    analysis_realm_id: Realm['id'];
 
     @Column()
-        node_id: Node['id'];
+    node_id: Node['id'];
 
     @ManyToOne(() => NodeEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'node_id' })
-        node: NodeEntity;
+    node: NodeEntity;
 
     @Column({ type: 'uuid' })
-        node_realm_id: Realm['id'];
+    node_realm_id: Realm['id'];
 }

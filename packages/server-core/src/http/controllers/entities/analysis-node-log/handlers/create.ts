@@ -27,9 +27,7 @@ import { AnalysisNodeLogValidator } from '../utils/index.ts';
 export async function createAnalysisNodeLogRouteHandler(req: Request, res: Response) : Promise<any> {
     const validator = new AnalysisNodeLogValidator();
     const validatorAdapter = new RoutupContainerAdapter(validator);
-    const data = await validatorAdapter.run(req, {
-        group: HTTPHandlerOperation.CREATE,
-    });
+    const data = await validatorAdapter.run(req, { group: HTTPHandlerOperation.CREATE });
 
     const dataSource = await useDataSource();
     const nodeRepository = dataSource.getRepository(NodeEntity);
@@ -76,8 +74,7 @@ export async function createAnalysisNodeLogRouteHandler(req: Request, res: Respo
     };
 
     const keys = Object.keys(labelsRaw);
-    for (let i = 0; i < keys.length; i++) {
-        const key = keys[i];
+    for (const key of keys) {
         if (typeof labelsRaw[key] === 'string') {
             labels[key] = labelsRaw[key];
         }

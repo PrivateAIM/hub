@@ -10,9 +10,7 @@ import { startCommand } from '../../commands/index.ts';
 
 export function defineCLIStartCommand() {
     return defineCommand({
-        meta: {
-            name: 'start',
-        },
+        meta: { name: 'start' },
         async setup() {
             await startCommand();
         },

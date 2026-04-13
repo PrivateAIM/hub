@@ -13,11 +13,16 @@ import type { BuildInput } from 'rapiq';
 import useVuelidate from '@vuelidate/core';
 import type { PropType } from 'vue';
 import {
-    computed, defineComponent, reactive, ref,
+    computed, 
+    defineComponent, 
+    reactive, 
+    ref,
 } from 'vue';
 import { VCFormInput } from '@vuecs/form-controls';
 import {
-    createEntityManager, defineEntityManagerEvents, wrapFnWithBusyState,
+    createEntityManager, 
+    defineEntityManagerEvents, 
+    wrapFnWithBusyState,
 } from '../../core';
 import { FProjects } from '../project';
 import { FSearch } from '../utility';
@@ -30,15 +35,9 @@ export default defineComponent({
         FProjects,
     },
     props: {
-        entity: {
-            type: Object as PropType<Analysis>,
-        },
-        projectId: {
-            type: String as PropType<string | undefined | null>,
-        },
-        realmId: {
-            type: String,
-        },
+        entity: { type: Object as PropType<Analysis> },
+        projectId: { type: String as PropType<string | undefined | null> },
+        realmId: { type: String },
     },
     emits: defineEntityManagerEvents<Analysis>(),
     setup(props, setup) {
@@ -50,9 +49,7 @@ export default defineComponent({
         });
 
         const $v = useVuelidate({
-            project_id: {
-                required,
-            },
+            project_id: { required },
             name: {
                 minLength: minLength(3),
                 maxLength: maxLength(128),
@@ -63,11 +60,7 @@ export default defineComponent({
             },
         }, form);
 
-        const proposalQuery = computed<BuildInput<Project>>(() => ({
-            filters: {
-                ...(props.realmId ? { realm_id: props.realmId } : {}),
-            },
-        }));
+        const proposalQuery = computed<BuildInput<Project>>(() => ({ filters: { ...(props.realmId ? { realm_id: props.realmId } : {}) } }));
 
         if (props.projectId) {
             form.project_id = props.projectId as string;

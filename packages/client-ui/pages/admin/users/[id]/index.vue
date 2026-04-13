@@ -11,7 +11,8 @@ import { AUserForm, AUserPasswordForm } from '@authup/client-web-kit';
 import type { User } from '@authup/core-kit';
 import type { PropType } from 'vue';
 import {
-    defineNuxtComponent, definePageMeta,
+    defineNuxtComponent, 
+    definePageMeta,
 } from '#imports';
 import { LayoutKey } from '~/config/layout';
 
@@ -28,9 +29,7 @@ export default defineNuxtComponent({
     },
     emits: ['updated', 'failed'],
     async setup(props, { emit }) {
-        definePageMeta({
-            [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        });
+        definePageMeta({ [LayoutKey.REQUIRED_LOGGED_IN]: true });
 
         const handleUpdated = (e: User) => {
             emit('updated', e);

@@ -16,7 +16,8 @@ import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { isEventComponentCallerUsable, useEventComponentCaller } from '@privateaim/server-telemetry-kit';
 import { useEnv } from '../../../../../config/index.ts';
 import {
-    AnalysisNodeEntity, ProjectNodeEntity,
+    AnalysisNodeEntity, 
+    ProjectNodeEntity,
 } from '../../../../../database/index.ts';
 import { RequestRepositoryAdapter } from '../../../../request/index.ts';
 import { AnalysisNodeValidator } from '../utils/index.ts';
@@ -27,9 +28,7 @@ export async function createAnalysisNodeRouteHandler(req: Request, res: Response
 
     const validator = new AnalysisNodeValidator();
     const validatorAdapter = new RoutupContainerAdapter(validator);
-    const data = await validatorAdapter.run(req, {
-        group: HTTPHandlerOperation.CREATE,
-    });
+    const data = await validatorAdapter.run(req, { group: HTTPHandlerOperation.CREATE });
 
     const dataSource = await useDataSource();
     await validateEntityJoinColumns(data, {

@@ -13,7 +13,9 @@ import { isClientErrorWithStatusCode } from 'hapic';
 import { defineComponent } from 'vue';
 import { definePageMeta, useToast } from '#imports';
 import {
-    createError, navigateTo, useRoute,
+    createError, 
+    navigateTo, 
+    useRoute,
 } from '#app';
 import DomainEntityNav from '../../components/DomainEntityNav';
 import { LayoutKey, LayoutNavigationID } from '../../config/layout';
@@ -35,9 +37,7 @@ export default defineComponent({
 
         const manager = createEntityManager({
             type: `${DomainType.ANALYSIS}`,
-            props: {
-                entityId: useRoute().params.id as string,
-            },
+            props: { entityId: useRoute().params.id as string },
             onFailed(e) {
                 if (toast) {
                     toast.show({ variant: 'warning', body: e.message });
@@ -49,21 +49,43 @@ export default defineComponent({
 
         if (!manager.data.value) {
             if (isClientErrorWithStatusCode(manager.error, 404)) {
-                await navigateTo({
-                    path: '/analyses',
-                });
+                await navigateTo({ path: '/analyses' });
             }
 
             throw createError({});
         }
 
         const tabs = [
-            { name: 'Overview', icon: 'fas fa-bars', path: '' },
-            { name: 'Nodes', icon: 'fa fa-city', path: '/nodes' },
-            { name: 'Code', icon: 'fa fa-code', path: '/code-files' },
-            { name: 'Image', icon: 'fa fa-compact-disc', path: '/image' },
-            { name: 'Security', icon: 'fa fa-lock', path: '/security' },
-            { name: 'Results', icon: 'fas fa-chart-bar', path: '/result-files' },
+            {
+                name: 'Overview', 
+                icon: 'fas fa-bars', 
+                path: '', 
+            },
+            {
+                name: 'Nodes', 
+                icon: 'fa fa-city', 
+                path: '/nodes', 
+            },
+            {
+                name: 'Code', 
+                icon: 'fa fa-code', 
+                path: '/code-files', 
+            },
+            {
+                name: 'Image', 
+                icon: 'fa fa-compact-disc', 
+                path: '/image', 
+            },
+            {
+                name: 'Security', 
+                icon: 'fa fa-lock', 
+                path: '/security', 
+            },
+            {
+                name: 'Results', 
+                icon: 'fas fa-chart-bar', 
+                path: '/result-files', 
+            },
         ];
 
         return {

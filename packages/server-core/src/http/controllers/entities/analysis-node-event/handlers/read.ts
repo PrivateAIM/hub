@@ -56,9 +56,7 @@ export async function getManyAnalysisNodeEventRouteHandler(req: Request, res: Re
                 'node_id',
             ],
         },
-        pagination: {
-            maxLimit: 50,
-        },
+        pagination: { maxLimit: 50 },
         relations: {
             allowed: ['analysis', 'node'],
             onJoin: (_property, key, query) => {

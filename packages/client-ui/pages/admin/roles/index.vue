@@ -14,9 +14,7 @@ import DomainEntityNav from '../../../components/DomainEntityNav';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 
 export default defineNuxtComponent({
-    components: {
-        DomainEntityNav,
-    },
+    components: { DomainEntityNav },
     setup() {
         definePageMeta({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,

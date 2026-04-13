@@ -6,7 +6,8 @@
  */
 import { DataSourceOptionsBuilder as BaseBuilder } from '@privateaim/server-db-kit';
 import {
-    EventEntity, EventSubscriber,
+    EventEntity, 
+    EventSubscriber,
 } from './domains/index.ts';
 
 export class DataSourceOptionsBuilder extends BaseBuilder {

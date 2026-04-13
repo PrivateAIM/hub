@@ -40,7 +40,7 @@ export type STCEventHandler<
     TYPE extends string,
     RECORD extends Record<string, any>,
 > = (
-    data: STCEventRecord<TYPE, RECORD>
+    data: STCEventRecord<TYPE, RECORD>,
 ) => void;
 export type STCEvents = {
     [K in keyof DomainTypeMap as DomainEventFullName<K, DomainEventName>]: STCEventHandler<K, DomainTypeMap[K]>
@@ -50,7 +50,7 @@ export type STCEvents = {
 
 export type CTSEventHandler = (
     target: EventTarget,
-    cb: EventCallback
+    cb: EventCallback,
 ) => void;
 
 export type CTSEvents = {

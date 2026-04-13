@@ -12,11 +12,7 @@ import { defineComponent, useTemplateRef } from 'vue';
 
 export default defineComponent({
     components: { FAnalysisNodesManager },
-    props: {
-        entity: {
-            type: Object as PropType<Analysis>,
-        },
-    },
+    props: { entity: { type: Object as PropType<Analysis> } },
     setup() {
         const analysisNodes = useTemplateRef<typeof FAnalysisNodesManager | null>('analysisNodes');
 
@@ -26,9 +22,7 @@ export default defineComponent({
             }
         };
 
-        return {
-            add,
-        };
+        return { add };
     },
 });
 </script>

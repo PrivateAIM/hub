@@ -21,16 +21,15 @@ import {
 import { useMinio } from '../../../../core/index.ts';
 import { BucketEntity } from '../../../../database/index.ts';
 import {
-    isBucketOwnedByIdentity, toBucketName,
+    isBucketOwnedByIdentity, 
+    toBucketName,
 } from '../../../../domains/index.ts';
 import { BucketValidator } from '../utils/validation.ts';
 
 export async function executeBucketRouteUpdateHandler(req: Request, res: Response) : Promise<any> {
     const validator = new BucketValidator();
     const validatorAdapter = new RoutupContainerAdapter(validator);
-    const data = await validatorAdapter.run(req, {
-        group: HTTPHandlerOperation.UPDATE,
-    });
+    const data = await validatorAdapter.run(req, { group: HTTPHandlerOperation.UPDATE });
 
     const id = useRequestParam(req, 'id');
 

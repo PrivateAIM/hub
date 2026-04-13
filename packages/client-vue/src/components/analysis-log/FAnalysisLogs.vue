@@ -71,9 +71,7 @@ export default defineComponent({
         return {
             data,
             busy,
-            meta: {
-                total: total.value,
-            },
+            meta: { total: total.value },
             load,
             reload,
         };

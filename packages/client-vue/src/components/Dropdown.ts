@@ -9,7 +9,10 @@ import type {
     Component,
 } from 'vue';
 import {
-    defineComponent, getCurrentInstance, h, resolveDynamicComponent,
+    defineComponent, 
+    getCurrentInstance, 
+    h, 
+    resolveDynamicComponent,
 } from 'vue';
 
 export default defineComponent({
@@ -32,9 +35,7 @@ export default defineComponent({
         return () => h(
             tag as string,
             { ...attrs },
-            {
-                default: () => (typeof slots.default === 'function' ? slots.default() : []),
-            },
+            { default: () => (typeof slots.default === 'function' ? slots.default() : []) },
         );
     },
 });

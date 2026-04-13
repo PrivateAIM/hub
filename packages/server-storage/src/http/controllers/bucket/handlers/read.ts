@@ -75,15 +75,9 @@ export async function executeBucketRouteGetManyHandler(req: Request, res: Respon
                 'actor_type',
             ],
         },
-        filters: {
-            allowed: ['id', 'name', 'realm_id', 'actor_type', 'actor_id'],
-        },
-        pagination: {
-            maxLimit: 50,
-        },
-        sort: {
-            allowed: ['id', 'updated_at', 'created_at'],
-        },
+        filters: { allowed: ['id', 'name', 'realm_id', 'actor_type', 'actor_id'] },
+        pagination: { maxLimit: 50 },
+        sort: { allowed: ['id', 'updated_at', 'created_at'] },
     });
 
     const [entities, total] = await query.getManyAndCount();

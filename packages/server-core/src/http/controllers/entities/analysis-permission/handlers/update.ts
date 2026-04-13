@@ -29,9 +29,7 @@ export async function updateAnalysisPermissionRouteHandler(req: Request, res: Re
 
     const validator = new AnalysisPermissionValidator();
     const validatorAdapter = new RoutupContainerAdapter(validator);
-    const data = await validatorAdapter.run(req, {
-        group: HTTPHandlerOperation.UPDATE,
-    });
+    const data = await validatorAdapter.run(req, { group: HTTPHandlerOperation.UPDATE });
 
     if (isAuthupClientUsable()) {
         const authup = useAuthupClient();

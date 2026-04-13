@@ -9,7 +9,8 @@ import { NotFoundError } from '@ebec/http';
 import { DirectComponentCaller } from '@privateaim/server-kit';
 import type { BucketFileCreationFinishedEventPayload } from '@privateaim/server-storage-kit';
 import {
-    BucketFileCommand, BucketFileEvent,
+    BucketFileCommand, 
+    BucketFileEvent,
     BucketFileEventCaller,
 } from '@privateaim/server-storage-kit';
 import Busboy from 'busboy';
@@ -70,9 +71,7 @@ export async function uploadRequestFilesToBucket(req: Request, bucket: BucketEnt
                                     },
                                     data: buffer,
                                 },
-                                {
-
-                                },
+                                {},
                                 {
                                     handle: async (childValue, childContext) => {
                                         await responseCaller.call(
@@ -137,8 +136,6 @@ export async function executeBucketRouteUploadHandler(req: Request, res: Respons
 
     return sendCreated(res, {
         data: files,
-        meta: {
-            total: files.length,
-        },
+        meta: { total: files.length },
     });
 }

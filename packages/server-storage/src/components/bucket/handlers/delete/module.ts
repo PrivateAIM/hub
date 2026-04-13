@@ -21,8 +21,8 @@ import { BucketEntity } from '../../../../database/index.ts';
 import { toBucketName } from '../../../../domains/index.ts';
 
 export class BucketDeleteHandler implements ComponentHandler<
-BucketComponentEventMap,
-BucketCommand.DELETE
+    BucketComponentEventMap,
+    BucketCommand.DELETE
 > {
     async handle(
         value: BucketDeleteCommandPayload,
@@ -61,9 +61,7 @@ BucketCommand.DELETE
 
         const dataSource = await useDataSource();
         const repository = dataSource.getRepository(BucketEntity);
-        const entity = await repository.findOneBy({
-            id: value.id,
-        });
+        const entity = await repository.findOneBy({ id: value.id });
 
         if (!entity) {
             throw new NotFoundError();

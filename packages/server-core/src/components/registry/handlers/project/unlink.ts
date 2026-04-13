@@ -14,8 +14,8 @@ import type { RegistryEventMap, RegistryProjectUnlinkPayload } from '../../type.
 import { createBasicHarborAPIClient } from '../utils.ts';
 
 export class RegistryProjectUnlinkHandler implements ComponentHandler<
-RegistryEventMap,
-RegistryCommand.PROJECT_UNLINK
+    RegistryEventMap,
+    RegistryCommand.PROJECT_UNLINK
 > {
     async handle(value: RegistryProjectUnlinkPayload): Promise<void> {
         const dataSource = await useDataSource();
@@ -31,15 +31,13 @@ RegistryCommand.PROJECT_UNLINK
         const httpClient = createBasicHarborAPIClient(connectionString);
 
         try {
-            const { data: repositories } = await httpClient.projectRepository.getAll({
-                projectName: value.externalName,
-            });
+            const { data: repositories } = await httpClient.projectRepository.getAll({ projectName: value.externalName });
 
             const promises: Promise<any>[] = [];
 
-            for (let i = 0; i < repositories.length; i++) {
-                useLogger().debug(`Deleting registry project repository ${repositories[i].name}`);
-                promises.push(httpClient.projectRepository.delete(repositories[i].name));
+            for (const repository of repositories) {
+                useLogger().debug(`Deleting registry project repository ${repository.name}`);
+                promises.push(httpClient.projectRepository.delete(repository.name));
             }
 
             await Promise.all(promises);
@@ -73,7 +71,7 @@ RegistryCommand.PROJECT_UNLINK
         if (value.accountId) {
             try {
                 await httpClient.robot
-                    .delete(parseInt(value.accountId, 10));
+                    .delete(Number.parseInt(value.accountId, 10));
             } catch (e) {
                 // 'Robot Account could not be deleted.'
                 useLogger()

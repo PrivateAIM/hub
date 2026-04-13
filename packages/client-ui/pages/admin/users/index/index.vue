@@ -12,7 +12,10 @@ import {
     PermissionName,
 } from '@authup/core-kit';
 import {
-    AEntityDelete, AUsers, injectStore, storeToRefs,
+    AEntityDelete, 
+    AUsers, 
+    injectStore, 
+    storeToRefs,
     usePermissionCheck,
 } from '@authup/client-web-kit';
 import type { BuildInput } from 'rapiq';
@@ -21,7 +24,12 @@ import { defineNuxtComponent } from '#app';
 
 export default defineNuxtComponent({
     components: {
-        FPagination, FSearch, FTitle, BTable, AUsers, AEntityDelete,
+        FPagination, 
+        FSearch, 
+        FTitle, 
+        BTable, 
+        AUsers, 
+        AEntityDelete,
     },
     emits: ['deleted'],
     setup(props, { emit }) {
@@ -32,26 +40,35 @@ export default defineNuxtComponent({
         const store = injectStore();
         const { realmManagementId } = storeToRefs(store);
 
-        const query : BuildInput<User> = {
-            filter: {
-                realm_id: [realmManagementId.value, null],
-            },
-        };
+        const query : BuildInput<User> = { filter: { realm_id: [realmManagementId.value, null] } };
 
         const hasEditPermission = usePermissionCheck({ name: PermissionName.USER_UPDATE });
         const hasDropPermission = usePermissionCheck({ name: PermissionName.USER_DELETE });
 
         const fields = [
             {
-                key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
+                key: 'name', 
+                label: 'Name', 
+                thClass: 'text-left', 
+                tdClass: 'text-left',
             },
             {
-                key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center',
+                key: 'created_at', 
+                label: 'Created At', 
+                thClass: 'text-center', 
+                tdClass: 'text-center',
             },
             {
-                key: 'updated_at', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left',
+                key: 'updated_at', 
+                label: 'Updated At', 
+                thClass: 'text-left', 
+                tdClass: 'text-left',
             },
-            { key: 'options', label: '', tdClass: 'text-left' },
+            {
+                key: 'options', 
+                label: '', 
+                tdClass: 'text-left', 
+            },
         ];
 
         return {

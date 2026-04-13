@@ -26,9 +26,7 @@ export default defineComponent({
             src: MedicineWorkerTemplate,
             width: refs.width.value,
             height: refs.height.value,
-            style: {
-                maxWidth: '100%',
-            },
+            style: { maxWidth: '100%' },
         });
     },
 });

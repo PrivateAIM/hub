@@ -88,9 +88,7 @@ class TestSuite {
         const address = this._server.address() as AddressInfo;
         const baseURL = `http://localhost:${address.port}`;
 
-        const client = new Client({
-            baseURL,
-        });
+        const client = new Client({ baseURL });
 
         const authupURL = useEnv('authupURL');
         if (authupURL) {

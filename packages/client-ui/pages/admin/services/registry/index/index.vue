@@ -13,7 +13,11 @@ import { BSpinner, BTable } from 'bootstrap-vue-next';
 import type { BuildInput } from 'rapiq';
 import { ref } from 'vue';
 import {
-    FEntityDelete, FPagination, FSearch, FTitle, RegistryList,
+    FEntityDelete, 
+    FPagination, 
+    FSearch, 
+    FTitle, 
+    RegistryList,
 } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
 import { definePageMeta } from '#imports';
@@ -38,22 +42,31 @@ export default defineNuxtComponent({
 
         const fields = [
             {
-                key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
+                key: 'name', 
+                label: 'Name', 
+                thClass: 'text-left', 
+                tdClass: 'text-left',
             },
             {
-                key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center',
+                key: 'created_at', 
+                label: 'Created At', 
+                thClass: 'text-center', 
+                tdClass: 'text-center',
             },
             {
-                key: 'updated_at', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left',
+                key: 'updated_at', 
+                label: 'Updated At', 
+                thClass: 'text-left', 
+                tdClass: 'text-left',
             },
-            { key: 'options', label: '', tdClass: 'text-left' },
+            {
+                key: 'options', 
+                label: '', 
+                tdClass: 'text-left', 
+            },
         ];
 
-        const query : BuildInput<Registry> = {
-            sort: {
-                updated_at: 'DESC',
-            },
-        };
+        const query : BuildInput<Registry> = { sort: { updated_at: 'DESC' } };
 
         const canManage = usePermissionCheck({ name: PermissionName.REGISTRY_MANAGE });
 

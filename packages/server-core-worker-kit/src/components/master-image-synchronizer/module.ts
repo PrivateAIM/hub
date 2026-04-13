@@ -17,9 +17,7 @@ import type { MasterImageSynchronizerEventMap, MasterImageSynchronizerExecutePay
 
 export class MasterImageSynchronizerComponentCaller extends QueueDispatchComponentCaller<MasterImageSynchronizerEventMap> {
     constructor() {
-        super({
-            queue: MasterImageSynchronizerTaskQueueRouterRouting,
-        });
+        super({ queue: MasterImageSynchronizerTaskQueueRouterRouting });
     }
 
     async callExecute(payload: MasterImageSynchronizerExecutePayload, metadata: ComponentMetadata = {}) {

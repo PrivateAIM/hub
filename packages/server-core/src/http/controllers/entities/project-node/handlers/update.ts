@@ -19,9 +19,7 @@ import { ProjectNodeValidator } from '../utils/index.ts';
 export async function updateProjectNodeRouteHandler(req: Request, res: Response) : Promise<any> {
     const validator = new ProjectNodeValidator();
     const validatorAdapter = new RoutupContainerAdapter(validator);
-    const data = await validatorAdapter.run(req, {
-        group: HTTPHandlerOperation.UPDATE,
-    });
+    const data = await validatorAdapter.run(req, { group: HTTPHandlerOperation.UPDATE });
 
     const id = useRequestParam(req, 'id');
 

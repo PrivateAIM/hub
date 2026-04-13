@@ -13,7 +13,9 @@ import { isQueueRouterPayload } from './helpers';
 import type {
     QueueRouterHandler,
     QueueRouterHandlers,
-    QueueRouterPayload, QueueRouterPublishOptions, QueueRouterRouting,
+    QueueRouterPayload, 
+    QueueRouterPublishOptions, 
+    QueueRouterRouting,
 } from './types';
 
 export class QueueRouter {
@@ -66,9 +68,7 @@ export class QueueRouter {
         routing: QueueRouterRouting,
         fn: (payload: QueueRouterPayload) => Promise<void> | void,
     ) {
-        return this.consume(routing, {
-            $any: (payload) => fn(payload),
-        });
+        return this.consume(routing, { $any: (payload) => fn(payload) });
     }
 
     consume(routing: QueueRouterRouting, handlers: QueueRouterHandlers) : Promise<void> {

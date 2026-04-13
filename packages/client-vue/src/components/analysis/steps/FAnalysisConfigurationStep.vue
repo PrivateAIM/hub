@@ -34,12 +34,8 @@ export default defineComponent({
             type: Object as PropType<Analysis>,
             required: true,
         },
-        nodesLink: {
-            type: String,
-        },
-        imageLink: {
-            type: String,
-        },
+        nodesLink: { type: String },
+        imageLink: { type: String },
     },
     emits: ['updated', 'executed', 'failed', 'jumpTo'],
     setup(props, { emit }) {

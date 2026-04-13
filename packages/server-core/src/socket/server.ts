@@ -33,10 +33,10 @@ export function createSocketServer(
     httpServer: HTTPServer,
 ) : Server {
     const server = createServer<
-    CTSEvents,
-    STCEvents,
-    STSEvents,
-    SocketData
+        CTSEvents,
+        STCEvents,
+        STSEvents,
+        SocketData
     >(httpServer);
 
     const pattern = /^\/resources(?:\/[a-z0-9A-Z-_]+)?$/;

@@ -7,18 +7,29 @@
 
 import { SlotName } from '@vuecs/list-controls';
 import type {
-    PropType, Ref, VNodeChild,
+    PropType, 
+    Ref, 
+    VNodeChild,
 } from 'vue';
 import {
-    computed, h, mergeProps, ref, toRef, watch,
+    computed, 
+    h, 
+    mergeProps, 
+    ref, 
+    toRef, 
+    watch,
 } from 'vue';
 import {
-    APagination, ASearch, defineEntityCollectionVEmitOptions, defineEntityCollectionVProps,
+    APagination, 
+    ASearch, 
+    defineEntityCollectionVEmitOptions, 
+    defineEntityCollectionVProps,
     renderToggleButton,
 } from '@authup/client-web-kit';
 import type { EntityCollectionVSlots } from '@authup/client-web-kit';
 import {
-    hasNormalizedSlot, normalizeSlot,
+    hasNormalizedSlot, 
+    normalizeSlot,
 } from '../slot';
 import type { EntityPickerContext, EntityPickerVEmitOptions, RecordWithID } from './types';
 
@@ -32,12 +43,8 @@ export function defineEntityPickerVEmitOptions<T>() : EntityPickerVEmitOptions<T
 
 export function defineEntityPickerVProps<T extends RecordWithID = RecordWithID>() {
     return {
-        value: {
-            type: [Array, String] as PropType<string[] | string | null>,
-        },
-        multiple: {
-            type: Boolean as PropType<boolean | undefined>,
-        },
+        value: { type: [Array, String] as PropType<string[] | string | null> },
+        multiple: { type: Boolean as PropType<boolean | undefined> },
         ...defineEntityCollectionVProps<T>(),
     };
 }
@@ -153,7 +160,7 @@ export function defineEntityPicker<T extends RecordWithID>({
                 }
 
                 return renderToggleButton({
-                    value: items.value.indexOf(slotProps.data.id) !== -1,
+                    value: items.value.includes(slotProps.data.id),
                     isBusy: slotProps.busy,
                     changed() {
                         toggle(slotProps.data.id);
@@ -163,7 +170,5 @@ export function defineEntityPicker<T extends RecordWithID>({
         },
     );
 
-    return {
-        render,
-    };
+    return { render };
 }

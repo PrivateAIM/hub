@@ -16,7 +16,9 @@ import {
     type DataSourceOptions,
 } from 'typeorm';
 import {
-    DataSourceOptionsBuilder, setDataSourceSync, unsetDataSourceSync,
+    DataSourceOptionsBuilder, 
+    setDataSourceSync, 
+    unsetDataSourceSync,
 } from '../../src/database/index.ts';
 
 export class TestDatabase {
@@ -34,7 +36,7 @@ export class TestDatabase {
         let options : DataSourceOptions;
         try {
             options = optionsBuilder.buildWithEnv();
-        } catch (e) {
+        } catch {
             options = optionsBuilder.buildWith({
                 type: 'better-sqlite3',
                 database: ':memory:',
@@ -51,7 +53,11 @@ export class TestDatabase {
         }
 
         const options = await this.getOptions();
-        await createDatabase({ options, ifNotExist: true, synchronize: false });
+        await createDatabase({
+            options, 
+            ifNotExist: true, 
+            synchronize: false, 
+        });
 
         const dataSource = new DataSource(options);
         await dataSource.initialize();

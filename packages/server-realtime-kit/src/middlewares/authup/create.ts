@@ -12,7 +12,10 @@ import {
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import { createMiddleware } from '@authup/server-adapter-socket-io';
 import type {
-    Middleware, Namespace, Server, Socket,
+    Middleware, 
+    Namespace, 
+    Server, 
+    Socket,
 } from '../../types';
 import type { AuthorizationMiddlewareRegistrationOptions } from './types';
 import { applyTokenVerificationData, createFakeTokenVerificationData } from './utils';
@@ -53,9 +56,7 @@ export function mountAuthorizationMiddleware(
                 actor_id: socket.data.identity.id,
             });
         } else {
-            useLogger().warn(`Socket/${socket.id}: Not authenticated.`, {
-                [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
-            });
+            useLogger().warn(`Socket/${socket.id}: Not authenticated.`, { [LogFlag.CHANNEL]: LogChannel.WEBSOCKET });
 
             next(new UnauthorizedError());
             return;

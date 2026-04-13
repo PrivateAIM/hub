@@ -26,12 +26,8 @@ export async function getManyAnalysisNodeLogRouteHandler(req: Request, res: Resp
                 'node_id',
             ],
         },
-        pagination: {
-            maxLimit: 50,
-        },
-        sort: {
-            allowed: ['time'],
-        },
+        pagination: { maxLimit: 50 },
+        sort: { allowed: ['time'] },
     });
 
     // todo: clean up this

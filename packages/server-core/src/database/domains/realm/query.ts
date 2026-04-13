@@ -47,9 +47,9 @@ export function onlyRealmReadableQueryResources<T>(
 
     query.andWhere(new Brackets((qb) => {
         if (Array.isArray(resourceField)) {
-            for (let i = 0; i < resourceField.length; i++) {
+            for (const [i, field] of resourceField.entries()) {
                 qb.orWhere(
-                    `(${resourceField[i]} = :realm${i} OR ${resourceField[i]} IS NULL)`,
+                    `(${field} = :realm${i} OR ${field} IS NULL)`,
                     { [`realm${i}`]: realm.id },
                 );
             }
@@ -74,9 +74,9 @@ export function onlyRealmWritableQueryResources<T>(
 
     query.andWhere(new Brackets((qb) => {
         if (Array.isArray(resourceField)) {
-            for (let i = 0; i < resourceField.length; i++) {
+            for (const [i, field] of resourceField.entries()) {
                 qb.orWhere(
-                    `${resourceField[i]} = :realm${i}`,
+                    `${field} = :realm${i}`,
                     { [`realm${i}`]: realm.id },
                 );
             }

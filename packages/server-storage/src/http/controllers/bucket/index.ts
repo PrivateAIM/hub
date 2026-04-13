@@ -7,7 +7,15 @@
 
 import type { Bucket } from '@privateaim/storage-kit';
 import {
-    DBody, DController, DDelete, DGet, DPath, DPost, DRequest, DResponse, DTags,
+    DBody, 
+    DController, 
+    DDelete, 
+    DGet, 
+    DPath, 
+    DPost, 
+    DRequest, 
+    DResponse, 
+    DTags,
 } from '@routup/decorators';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { BucketFileEntity } from '../../../database/index.ts';
@@ -30,7 +38,7 @@ export class BucketController {
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
         @DRequest() req: any,
-            @DResponse() res: any,
+        @DResponse() res: any,
     ): Promise<Bucket[]> {
         return await executeBucketRouteGetManyHandler(req, res) as Bucket[];
     }
@@ -38,8 +46,8 @@ export class BucketController {
     @DGet('/:id/stream', [ForceLoggedInMiddleware])
     async stream(
         @DPath('id') id: string,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<any> {
         return await executeBucketRouteStreamHandler(req, res) as any;
     }
@@ -47,8 +55,8 @@ export class BucketController {
     @DPost('/:id/upload', [ForceLoggedInMiddleware])
     async upload(
         @DPath('id') id: string,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<BucketFileEntity[]> {
         return await executeBucketRouteUploadHandler(req, res) as BucketFileEntity[];
     }
@@ -56,8 +64,8 @@ export class BucketController {
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<Bucket | undefined> {
         return await executeBucketRouteGetOneHandler(req, res) as Bucket | undefined;
     }
@@ -65,9 +73,9 @@ export class BucketController {
     @DPost('/:id', [ForceLoggedInMiddleware])
     async update(
         @DPath('id') id: string,
-            @DBody() data: BucketUpdate,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DBody() data: BucketUpdate,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<Bucket | undefined> {
         return await executeBucketRouteUpdateHandler(req, res) as Bucket | undefined;
     }
@@ -75,8 +83,8 @@ export class BucketController {
     @DPost('', [ForceLoggedInMiddleware])
     async add(
         @DBody() data: BucketCreate,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<Bucket | undefined> {
         return await executeBucketRouteCreateHandler(req, res) as Bucket | undefined;
     }
@@ -84,8 +92,8 @@ export class BucketController {
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @DPath('id') id: string,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<Bucket | undefined> {
         return await executeBucketRouteDeleteHandler(req, res) as Bucket | undefined;
     }

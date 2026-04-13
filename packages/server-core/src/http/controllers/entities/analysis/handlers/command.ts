@@ -38,9 +38,7 @@ export async function handleAnalysisCommandRouteHandler(req: Request, res: Respo
 
     const validator = new AnalysisCommandValidator();
     const validatorAdapter = new RoutupContainerAdapter(validator);
-    const data = await validatorAdapter.run(req, {
-        group: HTTPHandlerOperation.CREATE,
-    });
+    const data = await validatorAdapter.run(req, { group: HTTPHandlerOperation.CREATE });
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisEntity);

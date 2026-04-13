@@ -5,7 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import {
-    describe, expect, it,
+    describe, 
+    expect, 
+    it,
 } from 'vitest';
 import { toBucketName } from '../../src/domains';
 

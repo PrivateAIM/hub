@@ -17,15 +17,15 @@ import type {
 } from '@privateaim/messenger-kit';
 
 export type Socket = SocketBase<
-CTSEvents,
-STCEvents,
-STSEvents,
-SocketData
+    CTSEvents,
+    STCEvents,
+    STSEvents,
+    SocketData
 >;
 
 export type Server = ServerBase<
-CTSEvents,
-STCEvents,
-STSEvents,
-SocketData
+    CTSEvents,
+    STCEvents,
+    STSEvents,
+    SocketData
 >;

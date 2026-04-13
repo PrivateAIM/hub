@@ -23,7 +23,8 @@ import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/serv
 import {
     buildDockerAuthConfigFromRegistry,
     buildDockerImageURL,
-    useCoreClient, useDocker,
+    useCoreClient, 
+    useDocker,
 } from '../../../../core';
 import { useAnalysisDistributorLogger } from '../../helpers';
 
@@ -61,12 +62,8 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
         // -----------------------------------------------------------------------------------
 
         const { data: analysisNodes } = await client.analysisNode.getMany({
-            filter: {
-                analysis_id: analysis.id,
-            },
-            page: {
-                limit: 1,
-            },
+            filter: { analysis_id: analysis.id },
+            page: { limit: 1 },
         });
 
         if (analysisNodes.length === 0) {
@@ -79,12 +76,8 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
         }
 
         const { data: nodes } = await client.node.getMany({
-            filter: {
-                id: analysisNodes.map((analysisNode) => analysisNode.node_id),
-            },
-            relations: {
-                registry_project: true,
-            },
+            filter: { id: analysisNodes.map((analysisNode) => analysisNode.node_id) },
+            relations: { registry_project: true },
         });
 
         if (nodes.length === 0) {
@@ -98,17 +91,15 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
 
         // -----------------------------------------------------------------------------------
 
-        const registry = await client.registry.getOne(analysis.registry_id, {
-            fields: ['+account_secret'],
-        });
+        const registry = await client.registry.getOne(analysis.registry_id, { fields: ['+account_secret'] });
 
         const docker = useDocker();
         const authConfig = buildDockerAuthConfigFromRegistry(registry);
 
         try {
-            for (let i = 0; i < nodes.length; i++) {
+            for (const node of nodes) {
                 useAnalysisDistributorLogger().info({
-                    message: `Checking analysis image of node ${nodes[i].name}}`,
+                    message: `Checking analysis image of node ${node.name}}`,
                     command: AnalysisDistributorCommand.CHECK,
                     analysis_id: analysis.id,
                     [LogFlag.REF_ID]: analysis.id,
@@ -116,17 +107,15 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
 
                 const nodeImageURL = buildDockerImageURL({
                     hostname: registry.host,
-                    projectName: nodes[i].registry_project.external_name,
+                    projectName: node.registry_project.external_name,
                     repositoryName: analysis.id,
                     tagOrDigest: REGISTRY_ARTIFACT_TAG_LATEST,
                 });
 
-                const stream = await docker.pull(nodeImageURL, {
-                    authconfig: authConfig,
-                });
+                const stream = await docker.pull(nodeImageURL, { authconfig: authConfig });
                 await waitForModemStream(docker.modem, stream);
             }
-        } catch (e) {
+        } catch {
             let status: `${ProcessStatus}`;
 
             if (

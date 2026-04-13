@@ -10,7 +10,9 @@ import { defineCommand } from 'citty';
 import path from 'node:path';
 import {
     checkDatabase,
-    createDatabase, dropDatabase, generateMigration,
+    createDatabase, 
+    dropDatabase, 
+    generateMigration,
 } from 'typeorm-extension';
 import type { DataSourceOptions } from 'typeorm';
 import { DataSource } from 'typeorm';
@@ -27,9 +29,7 @@ enum MigrationOperation {
 
 export function defineCLIMigrationCommand() {
     return defineCommand({
-        meta: {
-            name: 'migration',
-        },
+        meta: { name: 'migration' },
         args: {
             operation: {
                 required: true,
@@ -64,12 +64,14 @@ export function defineCLIMigrationCommand() {
                     logger.debug(`Migration-Directory: ${options.migrations}`);
                 }
 
-                const check = await checkDatabase({
-                    options,
-                });
+                const check = await checkDatabase({ options });
 
                 if (!check.exists) {
-                    await createDatabase({ options, synchronize: false, ifNotExist: true });
+                    await createDatabase({
+                        options, 
+                        synchronize: false, 
+                        ifNotExist: true, 
+                    });
                 }
 
                 const dataSource = new DataSource({
@@ -113,8 +115,8 @@ export function defineCLIMigrationCommand() {
             const baseDirectory = path.join(SRC_PATH, 'database', 'migrations');
             const timestamp = Date.now();
 
-            for (let i = 0; i < connections.length; i++) {
-                const dataSourceOptions = optionsBuilder.buildWith(connections[i]);
+            for (const connection of connections) {
+                const dataSourceOptions = optionsBuilder.buildWith(connection);
                 const directoryPath = path.join(baseDirectory, dataSourceOptions.type);
 
                 await dropDatabase({ options: dataSourceOptions });

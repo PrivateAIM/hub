@@ -25,19 +25,29 @@ export default defineComponent({
 
         const items = [
             {
-                name: 'General', icon: 'fas fa-bars', path: '',
+                name: 'General', 
+                icon: 'fas fa-bars', 
+                path: '',
             },
             {
-                name: 'Scopes', icon: 'fa-solid fa-meteor', path: '/scopes',
+                name: 'Scopes', 
+                icon: 'fa-solid fa-meteor', 
+                path: '/scopes',
             },
             {
-                name: 'URL', icon: 'fa-solid fa-link', path: '/url',
+                name: 'URL', 
+                icon: 'fa-solid fa-link', 
+                path: '/url',
             },
             {
-                name: 'Permissions', icon: 'fas fa-user-secret', path: '/permissions',
+                name: 'Permissions', 
+                icon: 'fas fa-user-secret', 
+                path: '/permissions',
             },
             {
-                name: 'Roles', icon: 'fa-solid fa-user-group', path: '/roles',
+                name: 'Roles', 
+                icon: 'fa-solid fa-user-group', 
+                path: '/roles',
             },
         ];
 
@@ -50,7 +60,7 @@ export default defineComponent({
             entity.value = await injectHTTPClient()
                 .client
                 .getOne(route.params.id as string, { fields: ['+secret'] });
-        } catch (e) {
+        } catch {
             await navigateTo({ path: '/admin/clients' });
             throw createError({});
         }

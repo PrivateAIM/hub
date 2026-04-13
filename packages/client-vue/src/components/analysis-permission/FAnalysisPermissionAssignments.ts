@@ -6,7 +6,10 @@
  */
 
 import {
-    defineComponent, h, mergeProps, ref,
+    defineComponent, 
+    h, 
+    mergeProps, 
+    ref,
 } from 'vue';
 import type { Permission } from '@authup/core-kit';
 import { SlotName } from '@vuecs/list-controls';
@@ -27,7 +30,11 @@ export const FAnalysisPermissionAssignments = defineComponent({
             default: false,
         },
     },
-    setup(props, { slots, attrs, expose }) {
+    setup(props, {
+        slots, 
+        attrs, 
+        expose, 
+    }) {
         const vNodeRef = ref<typeof APermissions | null>(null);
 
         expose({

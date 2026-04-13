@@ -19,9 +19,7 @@ describe('logger', () => {
             level: LogLevel.ERROR,
             service: 'unknown',
             message: 'foo',
-            labels: {
-                foo: 'bar',
-            },
+            labels: { foo: 'bar' },
         });
 
         await wait(0);
@@ -34,9 +32,7 @@ describe('logger', () => {
         expect(item.level).toEqual(LogLevel.ERROR);
         expect(item.service).toEqual('unknown');
         expect(item.message).toEqual('foo');
-        expect(item.labels).toEqual({
-            foo: 'bar',
-        });
+        expect(item.labels).toEqual({ foo: 'bar' });
         expect(item.time).toBeDefined();
     });
 });

@@ -56,9 +56,7 @@ export async function executeBucketRouteDeleteHandler(req: Request, res: Respons
 
     const output = await caller.callAndWait(
         BucketCommand.DELETE,
-        {
-            id: entity.id,
-        },
+        { id: entity.id },
         {},
     );
 

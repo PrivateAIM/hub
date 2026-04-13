@@ -8,13 +8,18 @@
 import { hasOwnProperty } from '@privateaim/kit';
 import type { EntityAPI } from '@authup/core-http-kit';
 import type {
-    DomainEntityID, DomainTypeMap,
+    DomainEntityID, 
+    DomainTypeMap,
 } from '@privateaim/core-kit';
 import type { BuildInput } from 'rapiq';
 import { isObject } from 'smob';
 import type { Ref, VNodeChild } from 'vue';
 import {
-    computed, isRef, ref, toRef, watch,
+    computed, 
+    isRef, 
+    ref, 
+    toRef, 
+    watch,
 } from 'vue';
 import { injectCoreHTTPClient } from '../http-client';
 import type { EntitySocket, EntitySocketContext } from '../entity-socket';
@@ -22,7 +27,10 @@ import { createEntitySocket } from '../entity-socket';
 import { extendObjectProperties } from '../object';
 import { hasNormalizedSlot, normalizeSlot } from '../slot';
 import type {
-    EntityManager, EntityManagerContext, EntityManagerRenderFn, EntityManagerResolveContext,
+    EntityManager, 
+    EntityManagerContext, 
+    EntityManagerRenderFn, 
+    EntityManagerResolveContext,
 } from './type';
 import { buildEntityManagerSlotProps } from './utils';
 
@@ -228,9 +236,7 @@ export function createEntityManager<
         typeof ctx.socket === 'function' ||
         ctx.socket
     ) {
-        let socketContext : EntitySocketContext<TYPE, RECORD> = {
-            type: ctx.type,
-        };
+        let socketContext : EntitySocketContext<TYPE, RECORD> = { type: ctx.type };
 
         if (isObject(ctx.socket)) {
             socketContext = {
@@ -289,9 +295,7 @@ export function createEntityManager<
             try {
                 const response = await domainAPI.getMany({
                     ...resolveCtx.query as BuildInput<any>,
-                    pagination: {
-                        limit: 1,
-                    },
+                    pagination: { limit: 1 },
                 } as any);
 
                 if (response.data.length === 1) {

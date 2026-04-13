@@ -20,9 +20,7 @@ import { AnalysisBucketFileValidator } from '../utils/index.ts';
 export async function createAnalysisBucketFileRouteHandler(req: Request, res: Response) : Promise<any> {
     const validator = new AnalysisBucketFileValidator();
     const validatorAdapter = new RoutupContainerAdapter(validator);
-    const data = await validatorAdapter.run(req, {
-        group: HTTPHandlerOperation.CREATE,
-    });
+    const data = await validatorAdapter.run(req, { group: HTTPHandlerOperation.CREATE });
 
     const dataSource = await useDataSource();
     await validateEntityJoinColumns(data, {
@@ -59,11 +57,7 @@ export async function createAnalysisBucketFileRouteHandler(req: Request, res: Re
 
     if (entity.analysis_bucket.type === AnalysisBucketType.CODE) {
         const analysisRepository = dataSource.getRepository(AnalysisEntity);
-        const analysis = await analysisRepository.findOne({
-            where: {
-                id: entity.analysis_id,
-            },
-        });
+        const analysis = await analysisRepository.findOne({ where: { id: entity.analysis_id } });
 
         if (analysis.configuration_locked) {
             throw new BadRequestError('The analysis has already been locked and can therefore no longer be modified.');
@@ -74,9 +68,7 @@ export async function createAnalysisBucketFileRouteHandler(req: Request, res: Re
         await repository.update({
             analysis_bucket_id: entity.analysis_bucket_id,
             analysis_id: entity.analysis_id,
-        }, {
-            root: false,
-        });
+        }, { root: false });
     }
 
     const requestRepository = new RequestRepositoryAdapter(

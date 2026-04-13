@@ -25,9 +25,7 @@ export async function updateRegistryProjectRouteHandler(req: Request, res: Respo
 
     const validator = new RegistryProjectValidator();
     const validatorAdapter = new RoutupContainerAdapter(validator);
-    const data = await validatorAdapter.run(req, {
-        group: HTTPHandlerOperation.UPDATE,
-    });
+    const data = await validatorAdapter.run(req, { group: HTTPHandlerOperation.UPDATE });
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(RegistryProjectEntity);
@@ -71,9 +69,7 @@ export async function updateRegistryProjectRouteHandler(req: Request, res: Respo
 
     await caller.call(
         RegistryCommand.PROJECT_LINK,
-        {
-            id: entity.id,
-        },
+        { id: entity.id },
         {},
     );
 

@@ -23,9 +23,7 @@ export async function handleAuthupPermissionEvent(
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(AnalysisPermissionEntity);
-    const entities = await repository.findBy({
-        permission_id: context.data.id,
-    });
+    const entities = await repository.findBy({ permission_id: context.data.id });
 
     await repository.remove(entities);
 }

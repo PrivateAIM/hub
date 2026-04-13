@@ -5,12 +5,20 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
+import type {
     Registry,
 } from '@privateaim/core-kit';
 
 import {
-    DBody, DController, DDelete, DGet, DPath, DPost, DRequest, DResponse, DTags,
+    DBody, 
+    DController, 
+    DDelete, 
+    DGet, 
+    DPath, 
+    DPost, 
+    DRequest, 
+    DResponse, 
+    DTags,
 } from '@routup/decorators';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import {
@@ -29,7 +37,7 @@ export class RegistryController {
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
         @DRequest() req: any,
-            @DResponse() res: any,
+        @DResponse() res: any,
     ): Promise<PartialRegistry[]> {
         return await getManyRegistryRouteHandler(req, res) as PartialRegistry[];
     }
@@ -37,8 +45,8 @@ export class RegistryController {
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<PartialRegistry | undefined> {
         return await getOneRegistryRouteHandler(req, res) as PartialRegistry | undefined;
     }
@@ -46,9 +54,9 @@ export class RegistryController {
     @DPost('/:id', [ForceLoggedInMiddleware])
     async update(
         @DPath('id') id: string,
-            @DBody() data: Registry,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DBody() data: Registry,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<PartialRegistry | undefined> {
         return await updateRegistryRouteHandler(req, res) as PartialRegistry | undefined;
     }
@@ -56,8 +64,8 @@ export class RegistryController {
     @DPost('', [ForceLoggedInMiddleware])
     async add(
         @DBody() data: Registry,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<PartialRegistry | undefined> {
         return await createRegistryRouteHandler(req, res) as PartialRegistry | undefined;
     }
@@ -65,8 +73,8 @@ export class RegistryController {
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @DPath('id') id: string,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<PartialRegistry | undefined> {
         return await deleteRegistryRouteHandler(req, res) as PartialRegistry | undefined;
     }

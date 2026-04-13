@@ -5,13 +5,19 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
+import type {
     AnalysisNodeLog,
 } from '@privateaim/core-kit';
 
 import {
     DBody,
-    DController, DDelete, DGet, DPost, DRequest, DResponse, DTags,
+    DController, 
+    DDelete, 
+    DGet, 
+    DPost, 
+    DRequest, 
+    DResponse, 
+    DTags,
 } from '@routup/decorators';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import {
@@ -37,7 +43,7 @@ export class AnalysisNodeLogController {
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
         @DRequest() req: any,
-            @DResponse() res: any,
+        @DResponse() res: any,
     ): Promise<PartialAnalysisLog | undefined> {
         return await getManyAnalysisNodeLogRouteHandler(req, res) as PartialAnalysisLog | undefined;
     }
@@ -45,8 +51,8 @@ export class AnalysisNodeLogController {
     @DPost('', [ForceLoggedInMiddleware])
     async add(
         @DBody() data: PartialAnalysisLog,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<PartialAnalysisLog | undefined> {
         return await createAnalysisNodeLogRouteHandler(req, res) as PartialAnalysisLog | undefined;
     }
@@ -54,7 +60,7 @@ export class AnalysisNodeLogController {
     @DDelete('', [ForceLoggedInMiddleware])
     async drop(
         @DRequest() req: any,
-            @DResponse() res: any,
+        @DResponse() res: any,
     ): Promise<PartialAnalysisLog | undefined> {
         return await deleteAnalysisNodeLogRouteHandler(req, res) as PartialAnalysisLog | undefined;
     }

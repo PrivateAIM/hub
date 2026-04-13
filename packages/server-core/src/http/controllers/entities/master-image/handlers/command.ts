@@ -24,7 +24,7 @@ export async function commandMasterImageRouteHandler(req: Request, res: Response
 
     if (
         !body ||
-        Object.values(MasterImageCommand).indexOf(body.command) === -1
+        !Object.values(MasterImageCommand).includes(body.command)
     ) {
         throw new ValidupError([
             defineIssueItem({
@@ -60,9 +60,7 @@ export async function commandMasterImageRouteHandler(req: Request, res: Response
 
             const dataSource = useDataSourceSync();
             const repository = dataSource.getRepository(MasterImageEntity);
-            const entity = await repository.findOneBy({
-                id,
-            });
+            const entity = await repository.findOneBy({ id });
 
             if (!entity) {
                 throw new NotFoundError();

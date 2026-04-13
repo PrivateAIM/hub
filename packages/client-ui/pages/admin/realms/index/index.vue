@@ -11,7 +11,13 @@ import { BTable } from 'bootstrap-vue-next';
 import { REALM_MASTER_NAME, type Realm } from '@authup/core-kit';
 import { PermissionName } from '@authup/core-kit';
 import {
-    AEntityDelete, APagination, ARealms, ASearch, ATitle, injectStore, storeToRefs,
+    AEntityDelete, 
+    APagination, 
+    ARealms, 
+    ASearch, 
+    ATitle, 
+    injectStore, 
+    storeToRefs,
     usePermissionCheck,
 } from '@authup/client-web-kit';
 import { computed } from 'vue';
@@ -46,15 +52,28 @@ export default defineNuxtComponent({
 
         const fields = [
             {
-                key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
+                key: 'name', 
+                label: 'Name', 
+                thClass: 'text-left', 
+                tdClass: 'text-left',
             },
             {
-                key: 'updated_at', label: 'Updated At', thClass: 'text-center', tdClass: 'text-center',
+                key: 'updated_at', 
+                label: 'Updated At', 
+                thClass: 'text-center', 
+                tdClass: 'text-center',
             },
             {
-                key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center',
+                key: 'created_at', 
+                label: 'Created At', 
+                thClass: 'text-center', 
+                tdClass: 'text-center',
             },
-            { key: 'options', label: '', tdClass: 'text-left' },
+            {
+                key: 'options', 
+                label: '', 
+                tdClass: 'text-left', 
+            },
         ];
 
         return {

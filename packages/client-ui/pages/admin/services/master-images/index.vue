@@ -34,9 +34,7 @@ export default {
         ];
 
         const handleFailed = (e: Error) => {
-            toast.show({ body: e.message, variant: 'warning' }, {
-                pos: 'top-center',
-            });
+            toast.show({ body: e.message, variant: 'warning' }, { pos: 'top-center' });
         };
 
         return {

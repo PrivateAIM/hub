@@ -62,8 +62,8 @@ async function streamFiles(
 
         const promises : Promise<void>[] = [];
 
-        for (let i = 0; i < files.length; i++) {
-            promises.push(packFile(pack, name, files[i]));
+        for (const file of files) {
+            promises.push(packFile(pack, name, file));
         }
 
         Promise.resolve()
@@ -91,9 +91,7 @@ export async function executeBucketRouteStreamHandler(req: Request, res: Respons
     }
 
     const fileRepository = dataSource.getRepository(BucketFileEntity);
-    const files = await fileRepository.findBy({
-        bucket_id: entity.id,
-    });
+    const files = await fileRepository.findBy({ bucket_id: entity.id });
 
     res.writeHead(200, {
         'Content-Type': 'application/x-tar',

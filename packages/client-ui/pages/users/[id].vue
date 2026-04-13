@@ -12,7 +12,10 @@ import type { Ref } from 'vue';
 import { ref } from 'vue';
 import { definePageMeta } from '#imports';
 import {
-    createError, defineNuxtComponent, navigateTo, useRoute,
+    createError, 
+    defineNuxtComponent, 
+    navigateTo, 
+    useRoute,
 } from '#app';
 import DomainEntityNav from '../../components/DomainEntityNav';
 import { LayoutKey, LayoutNavigationID } from '../../config/layout';
@@ -31,9 +34,7 @@ export default defineNuxtComponent({
             user.value = await injectHTTPClient().user.getOne(useRoute().params.id as string);
         } catch (e) {
             if (isClientErrorWithStatusCode(e, 404)) {
-                navigateTo({
-                    path: '/',
-                });
+                navigateTo({ path: '/' });
             }
 
             throw createError({});
@@ -41,7 +42,10 @@ export default defineNuxtComponent({
 
         const tabs = [
             {
-                name: 'General', routeName: 'users-id', icon: 'fas fa-bars', path: '',
+                name: 'General', 
+                routeName: 'users-id', 
+                icon: 'fas fa-bars', 
+                path: '',
             },
         ];
 

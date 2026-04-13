@@ -9,7 +9,9 @@ import { ProcessStatus } from '@privateaim/kit';
 import type {
     AnalysisBuilderBasePayload,
     AnalysisBuilderCheckFinishedPayload,
-    AnalysisBuilderEventMap, AnalysisBuilderExecutionFinishedPayload, AnalysisBuilderExecutionProgressPayload,
+    AnalysisBuilderEventMap, 
+    AnalysisBuilderExecutionFinishedPayload, 
+    AnalysisBuilderExecutionProgressPayload,
 } from '@privateaim/server-core-worker-kit';
 import {
     AnalysisBuilderEvent,
@@ -24,9 +26,7 @@ export async function handleAnalysisBuilderEvent(
     const dataSource = useDataSourceSync();
     const repository = dataSource.getRepository(AnalysisEntity);
 
-    const entity = await repository.findOneBy({
-        id: value.id,
-    });
+    const entity = await repository.findOneBy({ id: value.id });
 
     if (!entity) {
         return;

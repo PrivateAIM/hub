@@ -22,13 +22,9 @@ export async function pushDockerImage(
         imageLatest = input;
     }
 
-    const stream = await imageLatest.push({
-        authconfig: authConfig,
-    });
+    const stream = await imageLatest.push({ authconfig: authConfig });
 
     await waitForStream(docker, stream);
 
-    await imageLatest.remove({
-        force: true,
-    });
+    await imageLatest.remove({ force: true });
 }

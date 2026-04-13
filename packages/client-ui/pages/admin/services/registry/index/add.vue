@@ -27,9 +27,7 @@ export default defineNuxtComponent({
             await navigateTo(`/admin/services/registry/${e.id}`);
         };
 
-        return {
-            handleCreated,
-        };
+        return { handleCreated };
     },
 });
 </script>

@@ -6,7 +6,11 @@
  */
 
 import {
-    afterAll, beforeAll, describe, expect, it,
+    afterAll, 
+    beforeAll, 
+    describe, 
+    expect, 
+    it,
 } from 'vitest';
 import type { AnalysisBucketFile } from '@privateaim/core-kit';
 import { AnalysisBucketType } from '@privateaim/core-kit';
@@ -39,9 +43,7 @@ describe('controllers/analysis-bucket-file', () => {
         const project = await client.project.create(createTestProject());
         expect(project.id).toBeDefined();
 
-        const analysis = await client.analysis.create({
-            project_id: project.id,
-        });
+        const analysis = await client.analysis.create({ project_id: project.id });
         expect(analysis.id).toBeDefined();
 
         const analysisBucket = await client.analysisBucket.create({
@@ -71,9 +73,7 @@ describe('controllers/analysis-bucket-file', () => {
 
     it('should update resource', async () => {
         const client = suite.client();
-        const data = await client.analysisBucketFile.update(details.id, {
-            root: true,
-        });
+        const data = await client.analysisBucketFile.update(details.id, { root: true });
 
         expect(data.root).toBeTruthy();
     });

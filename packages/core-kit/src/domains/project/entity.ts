@@ -6,7 +6,10 @@
  */
 
 import type {
-    Client, Realm, Robot, User,
+    Client, 
+    Realm, 
+    Robot, 
+    User,
 } from '@authup/core-kit';
 import type { MasterImage } from '../master-image';
 

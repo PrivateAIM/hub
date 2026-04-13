@@ -20,7 +20,9 @@ import {
 } from 'vue';
 import type { PropType, VNodeChild } from 'vue';
 import {
-    createEntityManager, defineEntityManagerEvents, injectCoreHTTPClient,
+    createEntityManager, 
+    defineEntityManagerEvents, 
+    injectCoreHTTPClient,
 } from '../../core';
 
 enum Direction {
@@ -35,21 +37,11 @@ enum Target {
 
 export default defineComponent({
     props: {
-        entity: {
-            type: Object as PropType<AnalysisNode>,
-        },
-        entityId: {
-            type: String,
-        },
-        queryFilters: {
-            type: Object as PropType<FiltersBuildInput<AnalysisNode>>,
-        },
-        direction: {
-            type: String as PropType<`${Direction.IN}` | `${Direction.OUT}`>,
-        },
-        target: {
-            type: String as PropType<`${Target.NODE}` | `${Target.ANALYSIS}`>,
-        },
+        entity: { type: Object as PropType<AnalysisNode> },
+        entityId: { type: String },
+        queryFilters: { type: Object as PropType<FiltersBuildInput<AnalysisNode>> },
+        direction: { type: String as PropType<`${Direction.IN}` | `${Direction.OUT}`> },
+        target: { type: String as PropType<`${Target.NODE}` | `${Target.ANALYSIS}`> },
     },
     emits: defineEntityManagerEvents<AnalysisNode>(),
     async setup(props, setup) {

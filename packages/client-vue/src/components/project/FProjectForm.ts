@@ -7,7 +7,9 @@
 import { buildFormSubmitWithTranslations, createFormSubmitTranslations } from '@authup/client-web-kit';
 import { getSeverity, useTranslationsForNestedValidations } from '@ilingo/vuelidate';
 import {
-    buildFormGroup, buildFormInput, buildFormTextarea,
+    buildFormGroup, 
+    buildFormInput, 
+    buildFormTextarea,
 } from '@vuecs/form-controls';
 import type { ListFooterSlotProps, ListHeaderSlotProps, ListItemSlotProps } from '@vuecs/list-controls';
 import useVuelidate from '@vuelidate/core';
@@ -15,7 +17,8 @@ import { maxLength, minLength, required } from '@vuelidate/validators';
 import {
     defineComponent,
     h,
-    reactive, ref,
+    reactive, 
+    ref,
     watch,
 } from 'vue';
 import type {
@@ -67,8 +70,7 @@ const FProjectForm = defineComponent({
                 minLength: minLength(5),
                 maxLength: maxLength(4096),
             },
-            master_image_id: {
-            },
+            master_image_id: {},
         }, form);
 
         const nodeIds = ref<string[]>([]);
@@ -157,9 +159,7 @@ const FProjectForm = defineComponent({
                     onChange(input) {
                         $v.value.description.$model = input;
                     },
-                    props: {
-                        rows: 4,
-                    },
+                    props: { rows: 4 },
                 }),
             });
 
@@ -178,13 +178,7 @@ const FProjectForm = defineComponent({
             }, translationsSubmit);
 
             const nodeVNode = h('div', [
-                h(FNodes, {
-                    query: {
-                        filters: {
-                            hidden: false,
-                        },
-                    },
-                } satisfies ListProps<Node>, {
+                h(FNodes, { query: { filters: { hidden: false } } } satisfies ListProps<Node>, {
                     [EntityListSlotName.HEADER]: (props: ListHeaderSlotProps<Node>) => [
                         h('label', 'Nodes'),
                         h(FSearch, {

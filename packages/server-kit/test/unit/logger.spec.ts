@@ -20,9 +20,7 @@ describe('src/logger', () => {
             ],
         });
 
-        logger.info('This is a log message', {
-            foo: 'bar',
-        });
+        logger.info('This is a log message', { foo: 'bar' });
 
         const [item] = memoryTransport.items;
         expect(item).toBeDefined();

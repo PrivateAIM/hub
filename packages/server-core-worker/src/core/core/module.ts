@@ -9,9 +9,7 @@ import type { Factory } from 'singa';
 import { singa } from 'singa';
 import type { Client } from '@privateaim/core-http-kit';
 
-const instance = singa<Client>({
-    name: 'core',
-});
+const instance = singa<Client>({ name: 'core' });
 
 export function setCoreFactory(factory: Factory<Client>) {
     instance.setFactory(factory);

@@ -7,7 +7,9 @@
 import { VCTimeago } from '@vuecs/timeago';
 import {
     computed,
-    defineComponent, h, toRef,
+    defineComponent, 
+    h, 
+    toRef,
 } from 'vue';
 import type {
     PropType,
@@ -36,7 +38,7 @@ export default defineComponent({
             LogLevel.EMERGENCE,
             LogLevel.ALERT,
             LogLevel.WARNING,
-        ] as `${LogLevel}`[]).indexOf(entity.value.level) !== -1);
+        ] as `${LogLevel}`[]).includes(entity.value.level));
 
         const isoDate = computed(() => new Date(entity.value.time).toISOString());
 
@@ -74,9 +76,7 @@ export default defineComponent({
 
         return () => h(
             'div',
-            {
-                class: `line line-${index.value + 1}`,
-            },
+            { class: `line line-${index.value + 1}` },
             [
                 h('div', { class: 'd-flex flex-row' }, [
                     h('div', { class: 'line-number' }, [index.value + 1]),

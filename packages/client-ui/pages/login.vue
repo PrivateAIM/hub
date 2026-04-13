@@ -7,7 +7,10 @@
 <script lang="ts">
 import { AIdentityProviders, injectHTTPClient } from '@authup/client-web-kit';
 import {
-    FPagination, FSearch, FTitle, LoginForm,
+    FPagination, 
+    FSearch, 
+    FTitle, 
+    LoginForm,
 } from '@privateaim/client-vue';
 import {
     definePageMeta,

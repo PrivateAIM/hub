@@ -5,12 +5,20 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
+import type {
     AnalysisPermission,
 } from '@privateaim/core-kit';
 
 import {
-    DBody, DController, DDelete, DGet, DPath, DPost, DRequest, DResponse, DTags,
+    DBody, 
+    DController, 
+    DDelete, 
+    DGet, 
+    DPath, 
+    DPost, 
+    DRequest, 
+    DResponse, 
+    DTags,
 } from '@routup/decorators';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import {
@@ -29,7 +37,7 @@ export class AnalysisPermissionController {
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
         @DRequest() req: any,
-            @DResponse() res: any,
+        @DResponse() res: any,
     ): Promise<PartialAnalysisPermission[]> {
         return await getManyAnalysisPermissionRouteHandler(req, res) as PartialAnalysisPermission[];
     }
@@ -37,8 +45,8 @@ export class AnalysisPermissionController {
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<PartialAnalysisPermission | undefined> {
         return await getOneAnalysisPermissionRouteHandler(req, res) as PartialAnalysisPermission | undefined;
     }
@@ -46,9 +54,9 @@ export class AnalysisPermissionController {
     @DPost('/:id', [ForceLoggedInMiddleware])
     async edit(
         @DPath('id') id: string,
-            @DBody() data: AnalysisPermission,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DBody() data: AnalysisPermission,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<PartialAnalysisPermission | undefined> {
         return await updateAnalysisPermissionRouteHandler(req, res) as PartialAnalysisPermission | undefined;
     }
@@ -56,8 +64,8 @@ export class AnalysisPermissionController {
     @DPost('', [ForceLoggedInMiddleware])
     async add(
         @DBody() data: PartialAnalysisPermission,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<PartialAnalysisPermission | undefined> {
         return await createAnalysisPermissionRouteHandler(req, res) as PartialAnalysisPermission | undefined;
     }
@@ -65,8 +73,8 @@ export class AnalysisPermissionController {
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @DPath('id') id: string,
-            @DRequest() req: any,
-            @DResponse() res: any,
+        @DRequest() req: any,
+        @DResponse() res: any,
     ): Promise<PartialAnalysisPermission | undefined> {
         return await deleteAnalysisPermissionRouteHandler(req, res) as PartialAnalysisPermission | undefined;
     }

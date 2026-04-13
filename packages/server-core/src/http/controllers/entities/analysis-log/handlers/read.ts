@@ -27,12 +27,8 @@ export async function getManyAnalysisLogRouteHandler(req: Request, res: Response
                     'analysis_id',
                 ],
             },
-            pagination: {
-                maxLimit: 50,
-            },
-            sort: {
-                allowed: ['time'],
-            },
+            pagination: { maxLimit: 50 },
+            sort: { allowed: ['time'] },
         },
     );
 

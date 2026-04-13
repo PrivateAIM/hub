@@ -19,9 +19,7 @@ import { ProcessStatus } from '@privateaim/kit';
 import FProcessStatus from '../../FProcessStatus.vue';
 
 export default defineComponent({
-    components: {
-        FProcessStatus,
-    },
+    components: { FProcessStatus },
     props: {
         entity: {
             type: Object as PropType<Analysis>,

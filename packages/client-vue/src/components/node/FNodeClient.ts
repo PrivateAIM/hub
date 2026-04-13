@@ -40,9 +40,7 @@ export default defineComponent({
                     emit('failed', e);
                 },
                 queryFields: ['+secret'],
-                queryFilters: {
-                    id: props.entity.client_id,
-                },
+                queryFilters: { id: props.entity.client_id },
             }, {
                 default: (slotProps: EntityVSlotProps<Client>) => {
                     if (!slotProps.data) {

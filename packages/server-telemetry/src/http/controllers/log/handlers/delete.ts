@@ -15,9 +15,7 @@ import { useLogStore } from '../../../../services/index.ts';
 
 export async function deleteManyLogRouteHandler(req: Request, res: Response) : Promise<any> {
     const permissionChecker = useRequestPermissionChecker(req);
-    await permissionChecker.preCheck({
-        name: PermissionName.LOG_DELETE,
-    });
+    await permissionChecker.preCheck({ name: PermissionName.LOG_DELETE });
 
     let start : number | undefined;
     const labels : Record<string, string> = {};
@@ -33,9 +31,7 @@ export async function deleteManyLogRouteHandler(req: Request, res: Response) : P
         }
 
         const keys = Object.keys(raw);
-        for (let i = 0; i < keys.length; i++) {
-            const key = keys[i];
-
+        for (const key of keys) {
             const index = key.indexOf('.');
             if (index === -1) {
                 continue;
