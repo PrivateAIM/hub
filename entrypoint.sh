@@ -46,24 +46,24 @@ fi
 
 case "${PACKAGE}" in
     core)
-        exec npm run "${COMMAND}" --workspace=packages/server-core -- "${@}"
+        exec npm run "${COMMAND}" --workspace=apps/server-core -- "${@}"
         ;;
     core-worker)
-        exec npm run "${COMMAND}" --workspace=packages/server-core-worker -- "${@}"
+        exec npm run "${COMMAND}" --workspace=apps/server-core-worker -- "${@}"
         ;;
     ui)
         export NUXT_HOST=0.0.0.0
         export NUXT_PORT=3000
-        exec npm run "${COMMAND}" --workspace=packages/client-ui -- "${@}"
+        exec npm run "${COMMAND}" --workspace=apps/client-ui -- "${@}"
         ;;
     messenger)
-        exec npm run "${COMMAND}" --workspace=packages/server-messenger -- "${@}"
+        exec npm run "${COMMAND}" --workspace=apps/server-messenger -- "${@}"
         ;;
     storage)
-        exec npm run "${COMMAND}" --workspace=packages/server-storage -- "${@}"
+        exec npm run "${COMMAND}" --workspace=apps/server-storage -- "${@}"
         ;;
     telemetry)
-        exec npm run "${COMMAND}" --workspace=packages/server-telemetry -- "${@}"
+        exec npm run "${COMMAND}" --workspace=apps/server-telemetry -- "${@}"
         ;;
 esac
 

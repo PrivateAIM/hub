@@ -39,11 +39,11 @@
         "lint": "eslint",
         "lint:fix": "npm run lint -- --fix",
         "prepare": "husky",
-        "cli": "npm run cli --workspace=packages/server-api",
-        "client-ui": "npm run dev --workspace=packages/client-ui",
-        "server-api": "npm run dev --workspace=packages/server-api",
-        "server-realtime": "npm run dev --workspace=packages/server-realtime",
-        "server-train-manager": "npm run dev --workspace=packages/server-train-manager"
+        "cli": "npm run cli --workspace=apps/server-core",
+        "client-ui": "npm run dev --workspace=apps/client-ui",
+        "server-api": "npm run dev --workspace=apps/server-core",
+        "server-realtime": "npm run dev --workspace=apps/server-messenger",
+        "server-train-manager": "npm run dev --workspace=apps/server-core-worker"
     },
     "lint-staged": {
         "*.{vue,js,ts}": "npm run lint:fix"

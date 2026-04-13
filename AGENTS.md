@@ -29,19 +29,19 @@ npm run server-train-manager    # Worker service
 
 ### Workspace Layout
 
-Apps are in `apps/` (currently empty), packages are in `packages/`. Libraries export ESM (`dist/index.mjs` + types), services compile with tsc.
+Applications (services + frontend) are in `apps/`, shared libraries are in `packages/`. Libraries export ESM (`dist/index.mjs` + types), services compile with tsc.
 
 ### CLI Entry Points
 
 | Binary               | Source                        |
 |----------------------|-------------------------------|
-| `server-core` CLI    | `packages/server-core/`       |
-| `server-storage` CLI | `packages/server-storage/`    |
-| `server-telemetry`   | `packages/server-telemetry/`  |
+| `server-core` CLI    | `apps/server-core/`           |
+| `server-storage` CLI | `apps/server-storage/`        |
+| `server-telemetry`   | `apps/server-telemetry/`      |
 
 ## Detailed Guides
 
-- **[Project Structure](.agents/structure.md)** — Monorepo layout, 21 packages, dependency layers between kits and services
+- **[Project Structure](.agents/structure.md)** — Monorepo layout, 6 apps + 15 libraries, dependency layers
 - **[Architecture](.agents/architecture.md)** — Routup HTTP framework, TypeORM entities, AMQP messaging, Authup auth integration
 - **[Testing](.agents/testing.md)** — Vitest with SWC, multi-database CI matrix (MySQL/Postgres/SQLite)
 - **[Conventions](.agents/conventions.md)** — Conventional Commits, Husky hooks, ESLint, Rollup bundling, Nx caching
@@ -51,7 +51,7 @@ Apps are in `apps/` (currently empty), packages are in `packages/`. Libraries ex
 Modernization and refactoring plans (execute in order):
 
 1. ~~Tooling Modernization~~ — Complete (#1511)
-2. **[Monorepo Restructuring](.agents/plans/002-monorepo-restructuring.md)** — Move services to `apps/`, keep libraries in `packages/`
+2. ~~Monorepo Restructuring~~ — Complete (#1512)
 3. **[Dependency Injection](.agents/plans/003-dependency-injection.md)** — Replace `singa` singletons with DI container + module system
 4. **[Hexagonal: server-core](.agents/plans/004-hexagonal-server-core.md)** — Core/adapters/app separation for the main service
 5. **[Hexagonal: remaining services](.agents/plans/005-hexagonal-remaining-services.md)** — Apply pattern to storage, telemetry, worker, messenger
