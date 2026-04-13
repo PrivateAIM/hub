@@ -6,6 +6,8 @@
  */
 
 export * from './adapters';
+export * from './constants';
+export * from './di-module';
 export * from './helper';
 export * from './singleton';
 export * from './module';

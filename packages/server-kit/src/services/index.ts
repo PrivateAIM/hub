@@ -9,6 +9,7 @@ export * from './amqp';
 export * from './authup';
 export * from './cache';
 export * from './entity-event';
+export * from './module-names';
 export * from './task-manager';
 export * from './logger';
 export * from './redis';

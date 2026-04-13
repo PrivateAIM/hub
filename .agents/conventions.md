@@ -96,6 +96,25 @@ export const analysisSchema = z.object({
 
 Automated via **release-please** (Google) for versioning + **monoship** (`tada5hi/monoship@v2`) for npm publishing. Creates release PRs that bump versions across all packages in lockstep (current: 0.8.31).
 
+## DI Modules
+
+Each DI module (orkos `IModule` implementation) lives in its own directory under `app/modules/<name>/`:
+
+```
+app/modules/<name>/
+├── constants.ts     # TypedToken injection keys
+├── types.ts         # Option types/interfaces
+├── module.ts        # IModule class implementation
+└── index.ts         # Barrel re-exports
+```
+
+- **Injection keys** use `TypedToken<T>` from `eldin` — one constant per token, co-located with the module that registers it
+- **Types/interfaces** always live in `types.ts`, never inline in `module.ts`
+- **Module names** are string constants in `ModuleName` enum (`packages/server-kit/src/services/module-names.ts`)
+- **Shared modules** (logger, redis, amqp, authup, cache, entity-event, queue-router) live in `packages/server-kit/src/services/<name>/`
+- **Per-service modules** (database, minio, victoria-logs, etc.) live in `apps/<service>/src/app/modules/<name>/`
+- Each service has an `app/factory.ts` with `createApplication()` that uses `BaseApplicationBuilder` to compose modules
+
 ## Docker
 
 Multi-service `Dockerfile` builds the entire monorepo. The `entrypoint.sh` script selects which service to start based on env vars.

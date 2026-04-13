@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { createAuthupClientAuthenticationHook, createAuthupUserTokenCreator } from '@privateaim/server-kit';
+import { BaseApplicationBuilder, createAuthupClientAuthenticationHook, createAuthupUserTokenCreator  } from '@privateaim/server-kit';
 import { APIClient } from '@privateaim/telemetry-kit';
 import { write } from 'envix';
 import { createServer } from 'node:http';
@@ -13,7 +13,8 @@ import type { Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { createNodeDispatcher } from 'routup';
 import { inject } from 'vitest';
-import { EnvironmentInputKey, configure, useEnv } from '../../src';
+import { EnvironmentInputKey, useEnv } from '../../src';
+import { VictoriaLogsModule } from '../../src/app/modules/victoria-logs';
 import { createHTTPRouter } from '../../src/http';
 import { TestDatabase } from './database';
 
@@ -30,8 +31,6 @@ class TestSuite {
             `http://${inject('VL_CONTAINER_HOST')}:${inject('VL_CONTAINER_PORT')}`,
         );
 
-        configure();
-
         this._database = new TestDatabase();
     }
 
@@ -44,6 +43,17 @@ class TestSuite {
     }
 
     async up() {
+        const env = useEnv();
+        const app = new BaseApplicationBuilder()
+            .withLogger()
+            .build();
+        app.addModule(new VictoriaLogsModule({
+            baseURL: env.victoriaLogsURL,
+            ingestorURL: env.victoriaLogsIngestorURL,
+            querierURL: env.victoriaLogsQuerierURL,
+        }));
+        await app.setup();
+
         await this._database.up();
 
         await this.startServer();

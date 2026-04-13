@@ -6,5 +6,6 @@
  */
 
 export * from './aggregator';
+export * from './app';
 export * from './component';
 export * from './queue-router';

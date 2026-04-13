@@ -32,15 +32,6 @@ import {
     useAnalysisMetadataComponent,
     useRegistryComponent,
 } from '../components/index.ts';
-import {
-    configureAmqp,
-    configureAuthup,
-    configureAuthupClientAuthenticationHook,
-    configureEventPublisher,
-    configureRedis,
-    configureTelemetryClient,
-    setupLogging,
-} from './services/index.ts';
 
 export type Config = {
     aggregators: Component[]
@@ -48,22 +39,6 @@ export type Config = {
 };
 
 export function createConfig() : Config {
-    setupLogging();
-
-    configureAuthupClientAuthenticationHook();
-
-    configureTelemetryClient();
-
-    configureAuthup();
-
-    configureRedis();
-
-    configureAmqp();
-
-    configureEventPublisher();
-
-    // ---------------------------------------------
-
     const aggregators : Component[] = [
         createAuthupAggregator(),
 
@@ -94,8 +69,6 @@ export function createConfig() : Config {
         ),
 
     ];
-
-    // ---------------------------------------------
 
     const components : Component[] = [
         new QueueWorkerComponentCaller(

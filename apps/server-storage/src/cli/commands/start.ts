@@ -13,8 +13,8 @@ import { defineCommand } from 'citty';
 import path from 'node:path';
 import process from 'node:process';
 import { useBucketComponent } from '../../components/index.ts';
-import { configure, useEnv } from '../../config/index.ts';
-import { setupDatabase } from '../../config/services/index.ts';
+import { createApplication } from '../../app/index.ts';
+import { useEnv } from '../../config/index.ts';
 import { CODE_PATH } from '../../constants.ts';
 import { createHttpServer } from '../../http/index.ts';
 
@@ -22,9 +22,8 @@ export function defineCLIStartCommand() {
     return defineCommand({
         meta: { name: 'start' },
         async setup() {
-            configure();
-
-            await setupDatabase();
+            const app = createApplication();
+            await app.setup();
 
             await generateSwagger({
                 authupURL: useEnv('authupURL'),

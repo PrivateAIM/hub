@@ -5,18 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { useLogger } from '@privateaim/server-kit';
+import { createLogger, setLogger, useLogger } from '@privateaim/server-kit';
 import { defineCommand } from 'citty';
 import path from 'node:path';
 import {
     checkDatabase,
-    createDatabase, 
-    dropDatabase, 
+    createDatabase,
+    dropDatabase,
     generateMigration,
 } from 'typeorm-extension';
 import type { DataSourceOptions } from 'typeorm';
 import { DataSource } from 'typeorm';
-import { setupLogging } from '../../config/services/index.ts';
 import { SRC_PATH } from '../../constants.ts';
 import { DataSourceOptionsBuilder } from '../../database/options.ts';
 
@@ -39,7 +38,7 @@ export function defineCLIMigrationCommand() {
             },
         },
         async setup(context) {
-            setupLogging();
+            setLogger(createLogger());
 
             const logger = useLogger();
             const optionsBuilder = new DataSourceOptionsBuilder();

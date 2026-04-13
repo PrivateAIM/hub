@@ -10,16 +10,17 @@ import { useLogger } from '@privateaim/server-kit';
 import path from 'node:path';
 import { DataSource } from 'typeorm';
 import {
-    checkDatabase, 
-    createDatabase, 
-    setDataSource, 
+    checkDatabase,
+    createDatabase,
+    setDataSource,
     synchronizeDatabaseSchema,
 } from 'typeorm-extension';
+import { createApplication } from '../app/index.ts';
 import { createSocketServer } from '../socket/index.ts';
 import {
-    createConfig, 
-    getRootDirPath, 
-    getWritableDirPath, 
+    createConfig,
+    getRootDirPath,
+    getWritableDirPath,
     useEnv,
 } from '../config/index.ts';
 import { setupAuthupService, setupHarborService } from '../core/index.ts';
@@ -29,7 +30,8 @@ import { createHttpServer } from '../http/server.ts';
 import { DatabaseIntegrityService } from '../services/index.ts';
 
 export async function startCommand() {
-    const config = createConfig();
+    const app = createApplication();
+    await app.setup();
 
     const logger = useLogger();
 
@@ -105,6 +107,7 @@ export async function startCommand() {
 
     createSocketServer(httpServer);
 
+    const config = createConfig();
     config.components.forEach((c) => c.start());
     config.aggregators.forEach((a) => a.start());
 
