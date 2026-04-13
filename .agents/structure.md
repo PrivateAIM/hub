@@ -4,11 +4,13 @@
 
 npm workspaces monorepo with two workspace roots: `apps/*` and `packages/*`. Nx orchestrates build/test/lint with dependency-aware caching.
 
-## Packages (21)
+## Applications (6)
+
+Runnable services and the frontend, located in `apps/`.
 
 ### Services
 
-| Package                | Purpose                                      | Key Dependencies                      |
+| Application            | Purpose                                      | Key Dependencies                      |
 |------------------------|----------------------------------------------|---------------------------------------|
 | `server-core`          | Main REST API — analyses, projects, nodes, registries | server-kit, server-db-kit, server-http-kit, core-kit |
 | `server-core-worker`   | Background worker — Docker container execution | server-kit, server-core-worker-kit, dockerode |
@@ -18,9 +20,18 @@ npm workspaces monorepo with two workspace roots: `apps/*` and `packages/*`. Nx 
 
 ### Frontend
 
-| Package      | Purpose                              | Key Dependencies                    |
+| Application  | Purpose                              | Key Dependencies                    |
 |--------------|--------------------------------------|-------------------------------------|
 | `client-ui`  | Nuxt 4 SSR web application           | client-vue, core-http-kit, authup   |
+
+## Packages & Libraries (15)
+
+Shared libraries, located in `packages/`.
+
+### Client Libraries
+
+| Package      | Purpose                              | Key Dependencies                    |
+|--------------|--------------------------------------|-------------------------------------|
 | `client-vue` | Reusable Vue 3 component library     | core-kit, storage-kit, bootstrap-vue-next |
 
 ### Server Kits (shared server libraries)
@@ -56,19 +67,18 @@ Layer 1:          core-http-kit, core-realtime-kit, server-kit
                      |
 Layer 2:          server-db-kit, server-http-kit, server-realtime-kit
                   server-storage-kit, server-telemetry-kit, server-core-worker-kit
+                  client-vue
                      |
 Layer 3 (apps):   server-core, server-core-worker, server-storage,
-                  server-telemetry, server-messenger, client-vue
-                     |
-Layer 4 (UI):     client-ui
+                  server-telemetry, server-messenger, client-ui
 ```
 
 Build order follows this DAG. Changes to a leaf kit (e.g., `core-kit`) require rebuilding all packages that depend on it.
 
-## Per-Package Directory Layout (typical service)
+## Per-Application Directory Layout (typical service)
 
 ```
-packages/server-core/
+apps/server-core/
 ├── src/
 │   ├── commands/          # CLI commands (start, migration, seed)
 │   ├── components/        # Domain modules (analysis, project, node, registry, ...)

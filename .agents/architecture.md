@@ -31,7 +31,7 @@ External services: Authup (OAuth2), Redis (pub/sub + caching), MySQL/Postgres
 Services use **Routup** (a lightweight HTTP framework with decorator support). Route handlers follow a consistent pattern:
 
 ```typescript
-// packages/server-core/src/components/<entity>/handlers/read.ts
+// apps/server-core/src/components/<entity>/handlers/read.ts
 import { DBody, DController, DDelete, DGet, DPath, DPost, DRequest, DResponse } from '@routup/decorators';
 
 export async function handleAnalysisReadMany(req: Request, res: Response) {
@@ -47,7 +47,7 @@ Routes are registered in each component's `index.ts` and mounted on the Routup r
 
 ## Data Layer — TypeORM
 
-Entities are defined as TypeORM decorated classes in `packages/server-core/src/components/<entity>/entity.ts`:
+Entities are defined as TypeORM decorated classes in `apps/server-core/src/components/<entity>/entity.ts`:
 
 ```typescript
 @Entity({ name: 'analyses' })
@@ -64,7 +64,7 @@ export class AnalysisEntity {
 }
 ```
 
-**Multi-database support**: MySQL, PostgreSQL, SQLite. The `DB_TYPE` env var selects the driver. Migrations are in `packages/server-core/src/components/**/migrations/` with separate files per database dialect.
+**Multi-database support**: MySQL, PostgreSQL, SQLite. The `DB_TYPE` env var selects the driver. Migrations are in `apps/server-core/src/components/**/migrations/` with separate files per database dialect.
 
 ## Domain Events & Messaging
 

@@ -38,11 +38,11 @@ export default defineNuxtConfig({
     ssr: true,
 
     alias: {
-        '@privateaim/core-kit': path.join(__dirname, '..', 'core-kit', 'src'),
-        '@privateaim/kit': path.join(__dirname, '..', 'kit', 'src'),
-        '@privateaim/client-vue': path.join(__dirname, '..', 'client-vue', 'src'),
-        '@privateaim/storage-kit': path.join(__dirname, '..', 'storage-kit', 'src'),
-        '@privateaim/telemetry-kit': path.join(__dirname, '..', 'telemetry-kit', 'src'),
+        '@privateaim/core-kit': path.join(__dirname, '..', '..', 'packages', 'core-kit', 'src'),
+        '@privateaim/kit': path.join(__dirname, '..', '..', 'packages', 'kit', 'src'),
+        '@privateaim/client-vue': path.join(__dirname, '..', '..', 'packages', 'client-vue', 'src'),
+        '@privateaim/storage-kit': path.join(__dirname, '..', '..', 'packages', 'storage-kit', 'src'),
+        '@privateaim/telemetry-kit': path.join(__dirname, '..', '..', 'packages', 'telemetry-kit', 'src'),
     },
 
     /*
@@ -53,7 +53,7 @@ export default defineNuxtConfig({
         '@vuecs/pagination/dist/index.css',
         '@vuecs/navigation/dist/index.css',
         '@authup/client-web-kit/dist/index.css',
-        '@/../client-vue/dist/style.css',
+        '@/../../packages/client-vue/dist/style.css',
         '@fortawesome/fontawesome-free/css/all.css',
         'bootstrap/dist/css/bootstrap.css',
         '@/assets/css/vue-layout-navigation.css',

@@ -9,12 +9,12 @@ COPY . .
 RUN rm -rf ./node-modules && \
     npm ci && \
     npm run build && \
-    touch packages/server-core/.env && \
-    touch packages/server-core-worker/.env && \
-    touch packages/server-messenger/.env && \
-    touch packages/server-storage/.env && \
-    touch packages/server-telemetry/.env && \
-    touch packages/client-ui/.env
+    touch apps/server-core/.env && \
+    touch apps/server-core-worker/.env && \
+    touch apps/server-messenger/.env && \
+    touch apps/server-storage/.env && \
+    touch apps/server-telemetry/.env && \
+    touch apps/client-ui/.env
 
 COPY ./entrypoint.sh ./entrypoint.sh
 

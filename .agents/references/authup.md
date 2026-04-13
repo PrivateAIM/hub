@@ -46,7 +46,7 @@ Hub integrates [Authup](https://github.com/authup/authup) as its OAuth2 identity
 | **Token middleware** | `@authup/server-adapter` | `packages/server-kit/src/` (auth middleware setup) |
 | **Permission checks** | `@authup/access` | `packages/server-http-kit/src/` (route-level guards) |
 | **Realm resolution** | `@authup/core-kit` | `packages/server-kit/src/` (realm context on requests) |
-| **Client session** | `@authup/client-web-nuxt` | `packages/client-ui/` (Nuxt module registration) |
+| **Client session** | `@authup/client-web-nuxt` | `apps/client-ui/` (Nuxt module registration) |
 | **Identity types** | `@authup/kit` | `packages/kit/src/` (re-exported where needed) |
 
 ## Integration Points
