@@ -5,5 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+export * from './components.ts';
 export * from './constants.ts';
+export * from './env.ts';
+export * from './env-constants.ts';
 export * from './module.ts';
+export * from './paths.ts';
+export * from './types.ts';

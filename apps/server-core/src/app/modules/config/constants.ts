@@ -6,6 +6,6 @@
  */
 
 import { TypedToken } from 'eldin';
-import type { Environment } from '../../../config/env/types.ts';
+import type { Environment } from './types.ts';
 
 export const ConfigInjectionKey = new TypedToken<Environment>('Config');

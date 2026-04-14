@@ -22,7 +22,7 @@ import {
     RegistryEntity,
     useDataSourceSync,
 } from '../../database/index.ts';
-import { RequestRepositoryAdapter } from '../../http/request/index.ts';
+import { RequestRepositoryAdapter } from '../../adapters/http/request/index.ts';
 import { type AnalysisMetadataComponentCaller, useAnalysisMetadataComponentCaller } from '../../components/index.ts';
 
 export class AnalysisDistributor {

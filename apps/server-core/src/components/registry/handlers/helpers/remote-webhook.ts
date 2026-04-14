@@ -15,7 +15,7 @@ import {
 } from '@privateaim/core-kit';
 import { isAuthupClientUsable, useAuthupClient } from '@privateaim/server-kit';
 import { stringifyAuthorizationHeader } from 'hapic';
-import { useEnv } from '../../../../config/index.ts';
+import { useEnv } from '../../../../app/modules/config/index.ts';
 
 export async function saveRemoteRegistryProjectWebhook(
     httpClient: HarborClient,

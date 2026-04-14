@@ -24,7 +24,7 @@ import {
     AnalysisNodeLogController,
     RootController,
     ServiceController,
-} from '../../../http/controllers/index.ts';
+} from '../../../adapters/http/controllers/index.ts';
 import { ConfigInjectionKey } from '../config/constants.ts';
 import { createControllers } from './controller.ts';
 import { HTTPInjectionKey } from './constants.ts';

@@ -17,7 +17,7 @@ import {
     getRootDirPath,
     getWritableDirPath,
     useEnv,
-} from '../config/index.ts';
+} from '../app/modules/config/index.ts';
 import { setupAuthupService, setupHarborService } from '../core/index.ts';
 import { DatabaseIntegrityService } from '../services/index.ts';
 

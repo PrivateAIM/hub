@@ -20,7 +20,7 @@ import {
 import type { AnalysisMetadataCommand } from '../../constants.ts';
 import { AnalysisMetadataEvent } from '../../constants.ts';
 import type { AnalysisMetadataEventMap, AnalysisMetadataRecalcPayload } from '../../types.ts';
-import { useEnv } from '../../../../config/index.ts';
+import { useEnv } from '../../../../app/modules/config/index.ts';
 
 export class AnalysisMetadataRecalcHandler implements ComponentHandler<
     AnalysisMetadataEventMap

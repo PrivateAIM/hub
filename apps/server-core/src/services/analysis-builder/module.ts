@@ -12,7 +12,7 @@ import { AnalysisBuilderComponentCaller } from '@privateaim/server-core-worker-k
 import type { Request } from 'routup';
 import type { Repository } from 'typeorm';
 import { AnalysisEntity, useDataSourceSync } from '../../database/index.ts';
-import { RequestRepositoryAdapter } from '../../http/request/index.ts';
+import { RequestRepositoryAdapter } from '../../adapters/http/request/index.ts';
 import type { AnalysisMetadataComponentCaller } from '../../components/index.ts';
 import {
     useAnalysisMetadataComponentCaller,

@@ -13,7 +13,7 @@ import {
     useLogger,
     useRedisSubscribeClient,
 } from '@privateaim/server-kit';
-import { useEnv } from '../../config/index.ts';
+import { useEnv } from '../../app/modules/config/index.ts';
 import {
     handleAuthupPermissionEvent,
     handleAuthupPolicyEvent,

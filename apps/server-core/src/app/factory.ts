@@ -19,7 +19,7 @@ import {
     useLogComponentCaller,
 } from '@privateaim/server-telemetry-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
-import { useEnv } from '../config/env/index.ts';
+import { useEnv } from './modules/config/index.ts';
 import { ServerCoreApplicationBuilder } from './builder.ts';
 import { TelemetryClientModule } from './modules/telemetry-client/index.ts';
 

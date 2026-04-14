@@ -21,19 +21,19 @@ import {
     RegistryProjectService,
     RegistryService,
 } from '../../../core/index.ts';
-import { NodeController } from '../../../http/controllers/entities/node/module.ts';
-import { RegistryController } from '../../../http/controllers/entities/registry/module.ts';
-import { MasterImageController } from '../../../http/controllers/entities/master-image/module.ts';
-import { MasterImageGroupController } from '../../../http/controllers/entities/master-image-group/module.ts';
-import { ProjectController } from '../../../http/controllers/entities/project/module.ts';
-import { RegistryProjectController } from '../../../http/controllers/entities/registry-project/module.ts';
-import { AnalysisController } from '../../../http/controllers/entities/analysis/module.ts';
-import { AnalysisBucketController } from '../../../http/controllers/entities/analysis-bucket/module.ts';
-import { AnalysisBucketFileController } from '../../../http/controllers/entities/analysis-bucket-file/module.ts';
-import { ProjectNodeController } from '../../../http/controllers/entities/project-node/module.ts';
-import { AnalysisNodeController } from '../../../http/controllers/entities/analysis-node/module.ts';
-import { AnalysisPermissionController } from '../../../http/controllers/entities/analysis-permission/module.ts';
-import { AnalysisNodeEventController } from '../../../http/controllers/entities/analysis-node-event/module.ts';
+import { NodeController } from '../../../adapters/http/controllers/entities/node/module.ts';
+import { RegistryController } from '../../../adapters/http/controllers/entities/registry/module.ts';
+import { MasterImageController } from '../../../adapters/http/controllers/entities/master-image/module.ts';
+import { MasterImageGroupController } from '../../../adapters/http/controllers/entities/master-image-group/module.ts';
+import { ProjectController } from '../../../adapters/http/controllers/entities/project/module.ts';
+import { RegistryProjectController } from '../../../adapters/http/controllers/entities/registry-project/module.ts';
+import { AnalysisController } from '../../../adapters/http/controllers/entities/analysis/module.ts';
+import { AnalysisBucketController } from '../../../adapters/http/controllers/entities/analysis-bucket/module.ts';
+import { AnalysisBucketFileController } from '../../../adapters/http/controllers/entities/analysis-bucket-file/module.ts';
+import { ProjectNodeController } from '../../../adapters/http/controllers/entities/project-node/module.ts';
+import { AnalysisNodeController } from '../../../adapters/http/controllers/entities/analysis-node/module.ts';
+import { AnalysisPermissionController } from '../../../adapters/http/controllers/entities/analysis-permission/module.ts';
+import { AnalysisNodeEventController } from '../../../adapters/http/controllers/entities/analysis-node-event/module.ts';
 import { DatabaseInjectionKey } from '../database/constants.ts';
 
 export function createControllers(container: IContainer): Record<string, any>[] {

@@ -7,7 +7,7 @@
 
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
-import { useEnv } from '../../../config/env/index.ts';
+import { useEnv } from './env.ts';
 import { ConfigInjectionKey } from './constants.ts';
 
 export class ConfigModule implements IModule {

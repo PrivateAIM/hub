@@ -18,7 +18,7 @@ import {
     AnalysisNodeEntity, 
     useDataSourceSync,
 } from '../../database/index.ts';
-import { RequestRepositoryAdapter } from '../../http/request/index.ts';
+import { RequestRepositoryAdapter } from '../../adapters/http/request/index.ts';
 import type { AnalysisConfiguratorLockOptions, AnalysisConfiguratorUnlockOptions } from './types.ts';
 
 export class AnalysisConfigurator {
