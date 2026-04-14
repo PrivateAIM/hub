@@ -10,7 +10,7 @@ export * from './analysis-bucket.ts';
 export * from './analysis-node-event.ts';
 export * from './analysis-permission.ts';
 export * from './analysis.ts';
-export * from './anaylsis-node.ts';
+export * from './analysis-node.ts';
 export * from './master-image-group.ts';
 export * from './master-image.ts';
 export * from './node.ts';

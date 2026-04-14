@@ -18,9 +18,9 @@ export type ActorContext = {
     permissionChecker: IPermissionChecker;
     realm?: { id: string; name: string };
     identity?: {
-        id: string; 
-        type: string; 
-        attributes?: Record<string, any> 
+        id: string;
+        type: 'user' | 'robot' | 'client';
+        attributes?: Record<string, any>;
     };
     metadata?: Record<string, any>;
 };

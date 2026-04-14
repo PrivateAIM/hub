@@ -79,6 +79,10 @@ export class AnalysisBucketService extends AbstractEntityService implements IAna
             throw new NotFoundError();
         }
 
+        if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
+            throw new ForbiddenError();
+        }
+
         const entityId = entity.id;
 
         await this.repository.remove(entity, { data: actor.metadata });

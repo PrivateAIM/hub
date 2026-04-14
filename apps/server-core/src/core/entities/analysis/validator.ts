@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { BadRequestError } from '@ebec/http';
 import { Container } from 'validup';
 import { createValidationChain, createValidator } from '@validup/adapter-validator';
 import type { Analysis } from '@privateaim/core-kit';
@@ -76,9 +77,12 @@ export class AnalysisValidator extends Container<Analysis> {
         const commandArgumentValidator = new ImageAttributeCommandArgumentsValidator();
         // image_command_executable
         this.mount('image_command_arguments', { optional: true }, (ctx) => {
+            if (ctx.value == null) {
+                return ctx.value;
+            }
+
             if (!Array.isArray(ctx.value)) {
-                // todo: throw error
-                return undefined;
+                throw new BadRequestError('image_command_arguments must be an array.');
             }
 
             const promises = ctx.value.map((child) => commandArgumentValidator.run(child, {

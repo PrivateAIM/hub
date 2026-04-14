@@ -11,7 +11,7 @@ import {
     applyQuery,
     validateEntityJoinColumns,
 } from 'typeorm-extension';
-import { AnalysisNodeEntity } from '../../../../../adapters/database/entities/anaylsis-node.ts';
+import { AnalysisNodeEntity } from '../../../../../adapters/database/entities/analysis-node.ts';
 import type {
     EntityPersistContext,
     EntityRepositoryFindManyResult,

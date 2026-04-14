@@ -5,18 +5,27 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
-import { createConfig } from '../config/components.ts';
+import type { Component } from '@privateaim/server-kit';
+
+type ComponentsModuleContext = {
+    aggregators: Component[];
+    components: Component[];
+};
 
 export class ComponentsModule implements IModule {
     readonly name = 'components';
 
     readonly dependencies: string[] = ['database'];
 
-    async setup(container: IContainer): Promise<void> { // eslint-disable-line @typescript-eslint/no-unused-vars
-        const config = createConfig();
-        config.components.forEach((c) => c.start());
-        config.aggregators.forEach((a) => a.start());
+    private ctx: ComponentsModuleContext;
+
+    constructor(ctx: ComponentsModuleContext) {
+        this.ctx = ctx;
+    }
+
+    async setup(): Promise<void> {
+        this.ctx.components.forEach((c) => c.start());
+        this.ctx.aggregators.forEach((a) => a.start());
     }
 }

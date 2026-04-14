@@ -7,14 +7,7 @@
 
 import { QueueRouterRoutingType } from '@privateaim/server-kit';
 
-export enum AnalysisMetadataCommand {
-    RECALC = 'recalc',
-}
-
-export enum AnalysisMetadataEvent {
-    RECALC_FINISHED = 'recalcFinished',
-    RECALC_FAILED = 'recalcFailed',
-}
+export { AnalysisMetadataCommand, AnalysisMetadataEvent } from '../../../core/domains/index.ts';
 
 export const AnalysisMetadataTaskQueue = {
     type: QueueRouterRoutingType.WORK,

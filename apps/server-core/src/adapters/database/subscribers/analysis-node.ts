@@ -14,8 +14,8 @@ import { DomainType } from '@privateaim/core-kit';
 import { BaseSubscriber } from '@privateaim/server-db-kit';
 import type { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
-import { AnalysisNodeEntity } from '../entities/anaylsis-node.ts';
-import { AnalysisMetadataCommand } from '../../../app/components/index.ts';
+import { AnalysisNodeEntity } from '../entities/analysis-node.ts';
+import { AnalysisMetadataCommand } from '../../../core/domains/index.ts';
 
 type MetadataCaller = {
     call(command: string, data: Record<string, any>, meta: Record<string, any>): Promise<void>;
