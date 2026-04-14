@@ -17,6 +17,7 @@ import type { Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { createNodeDispatcher } from 'routup';
 import { useDataSource } from 'typeorm-extension';
+import { AnalysisModule } from '../../src/app/modules/analysis';
 import { ConfigInjectionKey } from '../../src/app/modules/config';
 import { DatabaseInjectionKey, registerRepositories } from '../../src/app/modules/database';
 import { HTTPInjectionKey, HTTPModule } from '../../src/app/modules/http';
@@ -71,6 +72,10 @@ class TestSuite {
         container.register(ConfigInjectionKey, { useValue: config });
         container.register(DatabaseInjectionKey.DataSource, { useValue: dataSource });
         registerRepositories(container, dataSource);
+
+        // Wire analysis command services
+        const analysisModule = new AnalysisModule();
+        await analysisModule.setup(container);
 
         // Use HTTPModule to wire controllers (skip server creation)
         const httpModule = new HTTPModule({ skipServer: true });

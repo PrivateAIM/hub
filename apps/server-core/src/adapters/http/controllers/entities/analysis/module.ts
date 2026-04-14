@@ -5,7 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Analysis, AnalysisCommand } from '@privateaim/core-kit';
+import type { Analysis, AnalysisCommand as AnalysisCommandType } from '@privateaim/core-kit';
+import { AnalysisCommand } from '@privateaim/core-kit';
 import {
     DBody,
     DController,
@@ -18,16 +19,33 @@ import {
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
-import { send, sendAccepted, sendCreated } from 'routup';
-import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
+import { ForbiddenError, NotFoundError } from '@ebec/http';
+import { isRealmResourceWritable } from '@privateaim/kit';
+import { 
+    send, 
+    sendAccepted, 
+    sendCreated, 
+    useRequestParam, 
+} from 'routup';
+import { ForceLoggedInMiddleware, HTTPHandlerOperation, useRequestIdentityRealm } from '@privateaim/server-http-kit';
+import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import type { IAnalysisService } from '../../../../../core/index.ts';
+import type { AnalysisBuilder } from '../../../../../core/services/analysis-builder/index.ts';
+import type { AnalysisConfigurator } from '../../../../../core/services/analysis-configurator/index.ts';
+import type { AnalysisDistributor } from '../../../../../core/services/analysis-distributor/index.ts';
+import type { AnalysisStorageManager } from '../../../../../core/services/analysis-storage-manager/index.ts';
 import { buildActorContext } from '../../../request/index.ts';
-import { handleAnalysisCommandRouteHandler } from './handlers/index.ts';
+import { AnalysisCommandValidator } from './utils/index.ts';
 
 type PartialAnalysis = Partial<Analysis>;
 
 type AnalysisControllerContext = {
     service: IAnalysisService;
+    builder: AnalysisBuilder;
+    configurator: AnalysisConfigurator;
+    distributor: AnalysisDistributor;
+    storageManager: AnalysisStorageManager;
+    skipAnalysisApproval?: boolean;
 };
 
 @DTags('analysis')
@@ -35,8 +53,23 @@ type AnalysisControllerContext = {
 export class AnalysisController {
     protected service: IAnalysisService;
 
+    protected builder: AnalysisBuilder;
+
+    protected configurator: AnalysisConfigurator;
+
+    protected distributor: AnalysisDistributor;
+
+    protected storageManager: AnalysisStorageManager;
+
+    protected skipAnalysisApproval: boolean;
+
     constructor(ctx: AnalysisControllerContext) {
         this.service = ctx.service;
+        this.builder = ctx.builder;
+        this.configurator = ctx.configurator;
+        this.distributor = ctx.distributor;
+        this.storageManager = ctx.storageManager;
+        this.skipAnalysisApproval = ctx.skipAnalysisApproval ?? false;
     }
 
     @DGet('', [ForceLoggedInMiddleware])
@@ -85,13 +118,59 @@ export class AnalysisController {
     @DPost('/:id/command', [ForceLoggedInMiddleware])
     async doTask(
         @DPath('id') id: string,
-        @DBody() data: {
-            command: AnalysisCommand
-        },
+        @DBody() _cmdData: { command: AnalysisCommandType },
         @DRequest() req: any,
         @DResponse() res: any,
     ): Promise<PartialAnalysis | undefined> {
-        return handleAnalysisCommandRouteHandler(req, res);
+        const reqId = useRequestParam(req, 'id');
+        if (typeof reqId !== 'string' || reqId.length === 0) {
+            throw new NotFoundError();
+        }
+
+        const validator = new AnalysisCommandValidator();
+        const validatorAdapter = new RoutupContainerAdapter(validator);
+        const data = await validatorAdapter.run(req, { group: HTTPHandlerOperation.CREATE });
+
+        let entity = await this.service.getOne(reqId);
+
+        if (!isRealmResourceWritable(useRequestIdentityRealm(req), entity.realm_id)) {
+            throw new ForbiddenError();
+        }
+
+        const actor = buildActorContext(req);
+        const persistCtx = { data: actor.metadata };
+
+        switch (data.command) {
+            case AnalysisCommand.BUILD_CHECK:
+                entity = await this.builder.check(entity);
+                break;
+            case AnalysisCommand.BUILD_START:
+                entity = await this.builder.start(entity, persistCtx);
+                break;
+            case AnalysisCommand.CONFIGURATION_LOCK:
+                entity = await this.configurator.lock(entity, {
+                    ignoreApproval: this.skipAnalysisApproval,
+                    persistCtx,
+                });
+                break;
+            case AnalysisCommand.CONFIGURATION_UNLOCK:
+                entity = await this.configurator.unlock(entity, {
+                    ignoreApproval: this.skipAnalysisApproval,
+                    persistCtx,
+                });
+                break;
+            case AnalysisCommand.DISTRIBUTION_CHECK:
+                entity = await this.distributor.check(entity);
+                break;
+            case AnalysisCommand.DISTRIBUTION_START:
+                entity = await this.distributor.start(entity, persistCtx);
+                break;
+            case AnalysisCommand.STORAGE_CHECK:
+                entity = await this.storageManager.check(entity);
+                break;
+        }
+
+        return sendAccepted(res, entity) as PartialAnalysis | undefined;
     }
 
     @DDelete('/:id', [ForceLoggedInMiddleware])

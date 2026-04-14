@@ -35,6 +35,8 @@ import { AnalysisNodeController } from '../../../adapters/http/controllers/entit
 import { AnalysisPermissionController } from '../../../adapters/http/controllers/entities/analysis-permission/module.ts';
 import { AnalysisNodeEventController } from '../../../adapters/http/controllers/entities/analysis-node-event/module.ts';
 import { DatabaseInjectionKey } from '../database/constants.ts';
+import { AnalysisInjectionKey } from '../analysis/constants.ts';
+import { ConfigInjectionKey } from '../config/constants.ts';
 
 export function createControllers(container: IContainer): Record<string, any>[] {
     // Resolve repositories from container
@@ -76,7 +78,14 @@ export function createControllers(container: IContainer): Record<string, any>[] 
         new MasterImageGroupController({ service: masterImageGroupService }),
         new ProjectController({ service: projectService }),
         new RegistryProjectController({ service: registryProjectService }),
-        new AnalysisController({ service: analysisService }),
+        new AnalysisController({
+            service: analysisService,
+            builder: container.resolve(AnalysisInjectionKey.Builder),
+            configurator: container.resolve(AnalysisInjectionKey.Configurator),
+            distributor: container.resolve(AnalysisInjectionKey.Distributor),
+            storageManager: container.resolve(AnalysisInjectionKey.StorageManager),
+            skipAnalysisApproval: container.resolve(ConfigInjectionKey).skipAnalysisApproval,
+        }),
         new AnalysisBucketController({ service: analysisBucketService }),
         new AnalysisBucketFileController({ service: analysisBucketFileService }),
         new ProjectNodeController({ service: projectNodeService }),

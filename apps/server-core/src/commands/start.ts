@@ -41,12 +41,11 @@ export async function startCommand() {
         authupURL: useEnv('authupURL'),
         baseURL: useEnv('publicURL'),
         cwd: getRootDirPath(),
-        controllerBasePath: path.join(getRootDirPath(), 'src', 'http', 'controllers'),
+        controllerBasePath: path.join(getRootDirPath(), 'src', 'adapters', 'http', 'controllers'),
     });
 
     logger.debug('Generated documentation.');
 
-    // DataSource is created and registered by DatabaseModule
     const dataSource = app.container.resolve(DatabaseInjectionKey.DataSource);
 
     logger.debug(`Database: ${dataSource.options.type}`);
@@ -69,7 +68,7 @@ export async function startCommand() {
         logger.debug('Executed harbor service setup.');
     }
 
-    // HTTP server is created and registered by HTTPModule
+    // HTTP server is created and started by HTTPModule
     const httpServer = app.container.resolve(HTTPInjectionKey.Server);
 
     createSocketServer(httpServer);
@@ -77,8 +76,4 @@ export async function startCommand() {
     const config = createConfig();
     config.components.forEach((c) => c.start());
     config.aggregators.forEach((a) => a.start());
-
-    httpServer.listen(useEnv('port'), '0.0.0.0', () => {
-        logger.debug(`Listening on port ${useEnv('port')}.`);
-    });
 }

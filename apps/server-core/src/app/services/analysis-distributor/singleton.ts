@@ -8,12 +8,12 @@
 import { isQueueRouterUsable } from '@privateaim/server-kit';
 import { singa } from 'singa';
 import type { AnalysisDistributor } from '../../../core/services/analysis-distributor/module.ts';
-import { createAnalysisDistributor } from '../analysis-command/module.ts';
 
-const instance = singa<AnalysisDistributor>({
-    name: 'analysisManager',
-    factory: () => createAnalysisDistributor(),
-});
+const instance = singa<AnalysisDistributor>({ name: 'analysisManager' });
+
+export function setAnalysisManagerFactory(factory: () => AnalysisDistributor) {
+    instance.setFactory(factory);
+}
 
 export function isAnalysisManagerUsable() {
     return isQueueRouterUsable();

@@ -21,6 +21,7 @@ import {
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import { useEnv } from './modules/config/index.ts';
 import { ServerCoreApplicationBuilder } from './builder.ts';
+import { AnalysisModule } from './modules/analysis/index.ts';
 import { TelemetryClientModule } from './modules/telemetry-client/index.ts';
 
 export function createApplication() {
@@ -82,6 +83,8 @@ export function createApplication() {
     builder.withHTTP();
 
     const app = builder.build();
+
+    app.addModule(new AnalysisModule());
 
     if (env.telemetryURL) {
         app.addModule(new TelemetryClientModule({ baseURL: env.telemetryURL }));

@@ -15,6 +15,7 @@ import {
     isAuthupClientUsable,
     isRedisClientUsable,
     useAuthupClient,
+    useLogger,
     useRedisClient,
 } from '@privateaim/server-kit';
 import { createAuthupTokenVerifier, mountErrorMiddleware, mountMiddlewares } from '@privateaim/server-http-kit';
@@ -33,7 +34,7 @@ import type { HTTPModuleOptions } from './types.ts';
 export class HTTPModule implements IModule {
     readonly name = 'http';
 
-    readonly dependencies: string[] = ['config', 'database'];
+    readonly dependencies: string[] = ['config', 'database', 'analysisCommand'];
 
     private options: HTTPModuleOptions;
 
@@ -43,6 +44,8 @@ export class HTTPModule implements IModule {
 
     async setup(container: IContainer): Promise<void> {
         const config = container.resolve(ConfigInjectionKey);
+        const logger = useLogger();
+
         const router = new Router();
 
         const isTestEnvironment = config.env === EnvironmentName.TEST;
@@ -102,7 +105,26 @@ export class HTTPModule implements IModule {
         container.register(HTTPInjectionKey.Router, { useValue: router });
 
         if (!this.options.skipServer) {
+            logger.debug('Starting http server...');
+
             const server = new http.Server(createNodeDispatcher(router));
+
+            await new Promise<void>((resolve, reject) => {
+                const errorHandler = (err?: null | Error) => {
+                    reject(err);
+                };
+
+                server.once('error', errorHandler);
+                server.once('listening', () => {
+                    server.removeListener('error', errorHandler);
+                    resolve();
+                });
+
+                server.listen(config.port, '0.0.0.0');
+            });
+
+            logger.debug(`Listening on 0.0.0.0:${config.port}.`);
+
             container.register(HTTPInjectionKey.Server, { useValue: server });
         }
     }
