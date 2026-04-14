@@ -7,7 +7,6 @@
 
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
-import { BucketComponentCaller } from '@privateaim/server-storage-kit';
 import {
     AuthupClientInjectionKey,
     isAuthupClientUsable,
@@ -18,7 +17,6 @@ import {
     setDataSource,
     synchronizeDatabaseSchema,
 } from 'typeorm-extension';
-import { useTaskManager } from '../../../core/domains/index.ts';
 import {
     AnalysisBucketFileSubscriber,
     AnalysisBucketSubscriber,
@@ -111,19 +109,11 @@ export class DatabaseModule implements IModule {
             }
         }
 
-        let taskManager: any;
-        try {
-            taskManager = useTaskManager();
-        } catch {
-            // not available
-        }
-
         dataSource.subscribers.push(
             new NodeSubscriber({ nodeClientService }),
             new AnalysisSubscriber({
                 metadataCaller,
-                bucketCaller: new BucketComponentCaller(),
-                taskManager,
+                // storageManager injected later by AnalysisModule after it resolves from container
             }),
             new AnalysisBucketFileSubscriber({ metadataCaller }),
             new AnalysisNodeSubscriber({ metadataCaller }),

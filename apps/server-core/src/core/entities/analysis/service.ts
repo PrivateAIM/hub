@@ -71,10 +71,7 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
             throw new ForbiddenError('Only user accounts are permitted to create an analysis.');
         }
 
-        const entity = this.repository.create({
-            realm_id: actor.identity.attributes?.realmId,
-            ...validated,
-        });
+        const entity = this.repository.create({ ...validated });
 
         entity.user_id = actor.identity.id;
 

@@ -35,7 +35,7 @@ import type { HTTPModuleOptions } from './types.ts';
 export class HTTPModule implements IModule {
     readonly name = 'http';
 
-    readonly dependencies: string[] = ['config', 'database', 'analysisCommand'];
+    readonly dependencies: string[] = ['config', 'database', 'analysis'];
 
     private options: HTTPModuleOptions;
 

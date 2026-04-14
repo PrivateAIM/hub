@@ -78,6 +78,8 @@ npm run test          # npx nx run-many -t test
 - `strict: false` (migration to `strict: true` is a future effort)
 - Decorators enabled (`experimentalDecorators`, `emitDecoratorMetadata`) — required for TypeORM entities
 - All packages use `"type": "module"` (ESM-only, no CJS exports)
+- **Naming**: Interfaces always have an `I` prefix (e.g. `IEntityRepository`, `IAnalysisStorageManager`). Types do not (e.g. `ActorContext`, `EntityPersistContext`).
+- **Types/interfaces** always live in `types.ts` in the same directory, never inline in module files
 
 ## Validation
 

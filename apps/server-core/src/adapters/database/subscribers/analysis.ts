@@ -9,53 +9,30 @@ import type {
     EntitySubscriberInterface,
     InsertEvent,
     RemoveEvent,
-    Repository, 
-    UpdateEvent, 
+    UpdateEvent,
 } from 'typeorm';
-import type { Analysis, AnalysisBucket } from '@privateaim/core-kit';
 import { DomainType } from '@privateaim/core-kit';
 import { BaseSubscriber } from '@privateaim/server-db-kit';
 import type { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
-import type { IEntityRepository } from '../../../core/entities/types.ts';
 import { AnalysisMetadataCommand } from '../../../core/domains/index.ts';
-import { AnalysisStorageManager } from '../../../core/services/analysis-storage-manager/index.ts';
-import type { IBucketCaller, ITaskManager } from '../../../core/services/analysis-storage-manager/types.ts';
-import { AnalysisBucketEntity } from '../entities/analysis-bucket.ts';
 import { AnalysisEntity } from '../entities/analysis.ts';
 
-type AnalysisMetadataCaller = {
-    call(command: string, data: Record<string, any>, meta: Record<string, any>): Promise<void>;
-};
+
+
+import type { IAnalysisMetadataCaller, IAnalysisStorageManager } from './types.ts';
 
 type AnalysisSubscriberContext = {
-    metadataCaller?: AnalysisMetadataCaller;
-    bucketCaller?: IBucketCaller;
-    taskManager?: ITaskManager;
+    metadataCaller?: IAnalysisMetadataCaller;
+    storageManager?: IAnalysisStorageManager;
 };
-
-function wrapRepo<T>(repo: Repository<T>): IEntityRepository<T> {
-    return {
-        findMany: () => { throw new Error('Not implemented'); },
-        findOneById: (id: string) => repo.findOneBy({ id } as any),
-        findOneBy: (where: Record<string, any>) => repo.findOneBy(where as any),
-        findManyBy: (where: Record<string, any>) => repo.findBy(where as any),
-        create: (data: Partial<T>) => repo.create(data as any) as T,
-        merge: (entity: T, data: Partial<T>) => repo.merge(entity as any, data as any) as T,
-        save: (entity: T, ctx?: any) => repo.save(entity as any, ctx) as Promise<T>,
-        remove: async (entity: T, ctx?: any) => { await repo.remove(entity as any, ctx); },
-        validateJoinColumns: () => Promise.resolve(),
-    };
-}
 
 export class AnalysisSubscriber extends BaseSubscriber<
     AnalysisEntity
 > implements EntitySubscriberInterface<AnalysisEntity> {
-    protected metadataCaller?: AnalysisMetadataCaller;
+    protected metadataCaller?: IAnalysisMetadataCaller;
 
-    protected bucketCaller?: IBucketCaller;
-
-    protected taskManager?: ITaskManager;
+    protected storageManager?: IAnalysisStorageManager;
 
     constructor(ctx?: AnalysisSubscriberContext) {
         super({
@@ -90,25 +67,22 @@ export class AnalysisSubscriber extends BaseSubscriber<
         });
 
         this.metadataCaller = ctx?.metadataCaller;
-        this.bucketCaller = ctx?.bucketCaller;
-        this.taskManager = ctx?.taskManager;
+        this.storageManager = ctx?.storageManager;
     }
 
     async afterInsert(event: InsertEvent<AnalysisEntity>): Promise<any> {
         await super.afterInsert(event);
 
-        const storageManager = this.createStorageManager(event.manager);
-        if (storageManager) {
-            await storageManager.check(event.entity);
+        if (this.storageManager) {
+            await this.storageManager.check(event.entity);
         }
     }
 
     async beforeRemove(event: RemoveEvent<AnalysisEntity>): Promise<any> {
         await super.beforeRemove(event);
 
-        const storageManager = this.createStorageManager(event.manager);
-        if (storageManager) {
-            await storageManager.remove(event.entity);
+        if (this.storageManager) {
+            await this.storageManager.remove(event.entity);
         }
     }
 
@@ -123,9 +97,9 @@ export class AnalysisSubscriber extends BaseSubscriber<
         await this.metadataCaller.call(
             AnalysisMetadataCommand.RECALC,
             {
-                analysisId, 
-                queryNodes: false, 
-                queryFiles: false, 
+                analysisId,
+                queryNodes: false,
+                queryFiles: false,
             },
             { entityManager: event.manager },
         );
@@ -133,16 +107,5 @@ export class AnalysisSubscriber extends BaseSubscriber<
 
     listenTo() {
         return AnalysisEntity;
-    }
-
-    private createStorageManager(manager: any): AnalysisStorageManager | null {
-        if (!this.bucketCaller || !this.taskManager) return null;
-
-        return new AnalysisStorageManager({
-            repository: wrapRepo<Analysis>(manager.getRepository(AnalysisEntity)),
-            bucketRepository: wrapRepo<AnalysisBucket>(manager.getRepository(AnalysisBucketEntity)),
-            caller: this.bucketCaller,
-            taskManager: this.taskManager,
-        });
     }
 }
