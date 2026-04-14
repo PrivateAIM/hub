@@ -9,8 +9,12 @@ import { BadRequestError } from '@ebec/http';
 import type { Analysis, AnalysisBucket } from '@privateaim/core-kit';
 import { AnalysisBucketType, buildAnalysisBucketName } from '@privateaim/core-kit';
 import type { IEntityRepository } from '../../entities/types.ts';
-import type { IBucketCaller, ITaskManager } from '../types.ts';
-import type { AnalysisStorageMangerCheckOptions, AnalysisStorageMangerRemoveOptions } from './types.ts';
+import type { 
+    AnalysisStorageMangerCheckOptions, 
+    AnalysisStorageMangerRemoveOptions, 
+    IBucketCaller, 
+    ITaskManager,  
+} from './types.ts';
 
 type AnalysisStorageManagerContext = {
     repository: IEntityRepository<Analysis>;

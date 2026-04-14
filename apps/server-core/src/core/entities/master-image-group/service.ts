@@ -47,7 +47,11 @@ export class MasterImageGroupService extends AbstractEntityService implements IM
             throw new NotFoundError();
         }
 
+        const entityId = entity.id;
+
         await this.repository.remove(entity, { data: actor.metadata });
+
+        entity.id = entityId;
 
         return entity;
     }

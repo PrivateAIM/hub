@@ -10,7 +10,7 @@ import type { Analysis } from '@privateaim/core-kit';
 import { AnalysisBuilderCommandChecker } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
 import type { EntityPersistContext, IEntityRepository } from '../../entities/types.ts';
-import type { IAnalysisBuilderCaller, IAnalysisMetadataCaller } from '../types.ts';
+import type { IAnalysisBuilderCaller, IAnalysisMetadataCaller } from './types.ts';
 
 type AnalysisBuilderContext = {
     repository: IEntityRepository<Analysis>;

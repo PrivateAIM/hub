@@ -9,7 +9,7 @@ import { NotFoundError } from '@ebec/http';
 import type { Analysis, AnalysisNode } from '@privateaim/core-kit';
 import { AnalysisConfiguratorCommandChecker, NodeType } from '@privateaim/core-kit';
 import type { IEntityRepository } from '../../entities/types.ts';
-import type { IAnalysisMetadataCaller } from '../types.ts';
+import type { IAnalysisMetadataCaller } from '../analysis-builder/types.ts';
 import type { AnalysisConfiguratorLockOptions, AnalysisConfiguratorUnlockOptions } from './types.ts';
 
 type AnalysisConfiguratorContext = {

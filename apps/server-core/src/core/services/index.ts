@@ -10,4 +10,3 @@ export * from './analysis-configurator/index.ts';
 export * from './analysis-distributor/index.ts';
 export * from './analysis-storage-manager/index.ts';
 export * from './master-image/index.ts';
-export * from './types.ts';

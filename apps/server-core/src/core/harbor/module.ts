@@ -9,7 +9,7 @@ import { parseConnectionString } from '@hapic/harbor';
 import type { Registry } from '@privateaim/core-kit';
 import { getHostNameFromString } from '@privateaim/kit';
 import type { IEntityRepository } from '../entities/types.ts';
-import type { IRegistryCaller } from '../services/types.ts';
+import type { IRegistryCaller } from './types.ts';
 
 type SetupHarborContext = {
     harborURL: string;

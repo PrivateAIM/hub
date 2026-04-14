@@ -20,7 +20,7 @@ import { DomainEventNamespace } from '@privateaim/kit';
 import type { IEntityRepository } from '../../../core/entities/types.ts';
 import { AnalysisMetadataCommand } from '../../../app/components/index.ts';
 import { AnalysisStorageManager } from '../../../core/services/analysis-storage-manager/index.ts';
-import type { IBucketCaller, ITaskManager } from '../../../core/services/types.ts';
+import type { IBucketCaller, ITaskManager } from '../../../core/services/analysis-storage-manager/types.ts';
 import { AnalysisBucketEntity } from '../entities/analysis-bucket.ts';
 import { AnalysisEntity } from '../entities/analysis.ts';
 

@@ -110,7 +110,15 @@ export class HTTPModule implements IModule {
     async teardown(container: IContainer): Promise<void> {
         const result = container.tryResolve(HTTPInjectionKey.Server);
         if (result.success) {
-            result.data.close();
+            await new Promise<void>((resolve, reject) => {
+                result.data.close((error?: Error | null) => {
+                    if (error) {
+                        reject(error);
+                        return;
+                    }
+                    resolve();
+                });
+            });
         }
     }
 }

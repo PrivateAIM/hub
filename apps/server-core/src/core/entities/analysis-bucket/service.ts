@@ -66,7 +66,9 @@ export class AnalysisBucketService extends AbstractEntityService implements IAna
             throw new ForbiddenError();
         }
 
-        const merged = this.repository.merge(entity, data);
+        const validated = await this.validator.run(data, { group: ValidatorGroup.UPDATE });
+
+        const merged = this.repository.merge(entity, validated);
 
         return this.repository.save(merged, { data: actor.metadata });
     }

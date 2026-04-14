@@ -48,9 +48,13 @@ export function buildActorContext(req: Request): ActorContext {
     };
 }
 
-function flattenString(input: string | string[]): string {
+function flattenString(input: string | string[] | undefined): string {
     if (typeof input === 'string') {
         return input;
+    }
+
+    if (!input) {
+        return '';
     }
 
     return input.join(', ');

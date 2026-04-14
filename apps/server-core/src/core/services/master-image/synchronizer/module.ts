@@ -8,22 +8,11 @@
 import type { MasterImage, MasterImageGroup } from '@privateaim/core-kit';
 import type { MasterImageSynchronizerGroup, MasterImageSynchronizerImage } from '@privateaim/server-core-worker-kit';
 import type { IEntityRepository } from '../../../entities/types.ts';
-
-export type MasterImageSynchronizerExecuteContext = {
-    images: MasterImageSynchronizerImage[];
-    groups: MasterImageSynchronizerGroup[];
-};
-
-export type MasterImageSynchronizerResult<T> = {
-    updated: T[];
-    created: T[];
-    deleted: T[];
-};
-
-export type MasterImageSynchronizerExecuteResult = {
-    images: MasterImageSynchronizerResult<MasterImage>;
-    groups: MasterImageSynchronizerResult<MasterImageGroup>;
-};
+import type {
+    MasterImageSynchronizerExecuteContext,
+    MasterImageSynchronizerExecuteResult,
+    MasterImageSynchronizerResult,
+} from './types.ts';
 
 type MasterImageSynchronizerContext = {
     imageRepository: IEntityRepository<MasterImage>;
