@@ -16,7 +16,7 @@ import { DomainType } from '@privateaim/core-kit';
 import { BaseSubscriber } from '@privateaim/server-db-kit';
 import type { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
-import { AnalysisMetadataCommand, useAnalysisMetadataComponentCaller } from '../../../components/index.ts';
+import { AnalysisMetadataCommand, useAnalysisMetadataComponentCaller } from '../../../app/components/index.ts';
 import { AnalysisStorageManager } from '../../../core/services/analysis-storage-manager/index.ts';
 import { AnalysisBucketEntity } from '../entities/analysis-bucket.ts';
 import { AnalysisEntity } from '../entities/analysis.ts';

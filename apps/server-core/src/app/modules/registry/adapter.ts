@@ -8,7 +8,7 @@
 import type { RegistryProject } from '@privateaim/core-kit';
 import type { DataSource, Repository } from 'typeorm';
 import { RegistryEntity, RegistryProjectEntity } from '../../../adapters/database/entities/index.ts';
-import { RegistryCommand, useRegistryComponentCaller } from '../../../components/index.ts';
+import { RegistryCommand, useRegistryComponentCaller } from '../../components/index.ts';
 import type { IRegistryManager } from '../../../core/index.ts';
 
 export class RegistryManagerAdapter implements IRegistryManager {

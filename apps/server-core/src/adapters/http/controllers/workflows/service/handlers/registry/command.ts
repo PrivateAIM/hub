@@ -17,7 +17,7 @@ import { useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import {
     RegistryCommand,
     useRegistryComponentCaller,
-} from '../../../../../../../components/index.ts';
+} from '../../../../../../../app/components/index.ts';
 import { RegistryEntity, RegistryProjectEntity } from '../../../../../../database/index.ts';
 import { ServiceRegistryValidator } from '../../utils/validation.ts';
 

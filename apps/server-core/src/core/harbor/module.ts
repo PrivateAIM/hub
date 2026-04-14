@@ -9,7 +9,7 @@ import { parseConnectionString } from '@hapic/harbor';
 import { getHostNameFromString } from '@privateaim/kit';
 import { useDataSource } from 'typeorm-extension';
 import { isQueueRouterUsable } from '@privateaim/server-kit';
-import { RegistryCommand, useRegistryComponentCaller } from '../../components/index.ts';
+import { RegistryCommand, useRegistryComponentCaller } from '../../app/components/index.ts';
 import { RegistryEntity } from '../../adapters/database/index.ts';
 import { useEnv } from '../../app/modules/config/index.ts';
 

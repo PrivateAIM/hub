@@ -11,7 +11,7 @@ import { sendAccepted } from 'routup';
 import {
     RegistryCommand,
     useRegistryComponentCaller,
-} from '../../../../../../../components/index.ts';
+} from '../../../../../../../app/components/index.ts';
 
 export async function postHarborHookRouteHandler(req: Request, res: Response) : Promise<any> {
     const body = useRequestBody(req);

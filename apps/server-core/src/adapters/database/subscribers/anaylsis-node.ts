@@ -22,7 +22,7 @@ import { DomainEventNamespace } from '@privateaim/kit';
 import {
     AnalysisMetadataCommand,
     useAnalysisMetadataComponentCaller,
-} from '../../../components/index.ts';
+} from '../../../app/components/index.ts';
 import { AnalysisNodeEntity } from '../entities/anaylsis-node.ts';
 
 @EventSubscriber()

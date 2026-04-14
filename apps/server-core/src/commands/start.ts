@@ -11,7 +11,7 @@ import path from 'node:path';
 import { createApplication } from '../app/index.ts';
 import { DatabaseInjectionKey } from '../app/modules/database/index.ts';
 import { HTTPInjectionKey } from '../app/modules/http/index.ts';
-import { createSocketServer } from '../socket/index.ts';
+import { createSocketServer } from '../adapters/socket/index.ts';
 import {
     createConfig,
     getRootDirPath,

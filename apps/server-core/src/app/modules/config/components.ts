@@ -25,13 +25,13 @@ import {
     StorageBucketAggregator,
     StorageBucketFileAggregator,
     createAuthupAggregator,
-} from '../../../aggregators/index.ts';
+} from '../../aggregators/index.ts';
 import {
     AnalysisMetadataTaskQueue,
     RegistryTaskQueueRouterRouting,
     useAnalysisMetadataComponent,
     useRegistryComponent,
-} from '../../../components/index.ts';
+} from '../../components/index.ts';
 
 export type Config = {
     aggregators: Component[]

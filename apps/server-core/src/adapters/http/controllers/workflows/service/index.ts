@@ -20,7 +20,7 @@ import { NotFoundError } from '@ebec/http';
 import type { Request, Response } from 'routup';
 import { useRequestParam } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
-import type { RegistryHook } from '../../../../../components/index.ts';
+import type { RegistryHook } from '../../../../../app/components/index.ts';
 import { postHarborHookRouteHandler } from './handlers/registry/hook.ts';
 import { handleRegistryCommandRouteHandler } from './handlers/registry/command.ts';
 
