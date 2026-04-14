@@ -10,7 +10,7 @@ import { getHostNameFromString } from '@privateaim/kit';
 import { useDataSource } from 'typeorm-extension';
 import { isQueueRouterUsable } from '@privateaim/server-kit';
 import { RegistryCommand, useRegistryComponentCaller } from '../../components/index.ts';
-import { RegistryEntity } from '../../database/index.ts';
+import { RegistryEntity } from '../../adapters/database/index.ts';
 import { useEnv } from '../../app/modules/config/index.ts';
 
 export async function setupHarborService() {

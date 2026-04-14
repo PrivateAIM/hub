@@ -13,7 +13,8 @@ import {
     setDataSource,
     synchronizeDatabaseSchema,
 } from 'typeorm-extension';
-import { DataSourceOptionsBuilder, setDataSourceSync } from '../../../database/index.ts';
+import { DataSourceOptionsBuilder } from './options.ts';
+import { setDataSourceSync } from './singleton.ts';
 import { DatabaseInjectionKey } from './constants.ts';
 import { registerRepositories } from './register.ts';
 

@@ -11,7 +11,8 @@ import { ProcessStatus } from '@privateaim/kit';
 import { AnalysisBuilderComponentCaller } from '@privateaim/server-core-worker-kit';
 import type { Request } from 'routup';
 import type { Repository } from 'typeorm';
-import { AnalysisEntity, useDataSourceSync } from '../../database/index.ts';
+import { AnalysisEntity } from '../../adapters/database/index.ts';
+import { useDataSourceSync } from '../../app/modules/database/index.ts';
 import { RequestRepositoryAdapter } from '../../adapters/http/request/index.ts';
 import type { AnalysisMetadataComponentCaller } from '../../components/index.ts';
 import {

@@ -18,7 +18,7 @@ import {
 } from 'typeorm-extension';
 import { parseQueryFields } from 'rapiq';
 import { ProjectEntity } from '../../../../../adapters/database/entities/project.ts';
-import { DatabaseConflictError } from '../../../../../database/error/index.ts';
+import { DatabaseConflictError } from '../../../../../adapters/database/error/index.ts';
 import type {
     EntityPersistContext,
     EntityRepositoryFindManyResult,

@@ -6,4 +6,6 @@
  */
 
 export * from './entities/index.ts';
+export * from './error/index.ts';
+export * from './query/realm.ts';
 export * from './subscribers/index.ts';

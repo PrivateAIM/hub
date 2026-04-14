@@ -11,7 +11,7 @@ import {
     AnalysisNodeEntity, 
     ProjectEntity, 
     ProjectNodeEntity,
-} from '../../database/index.ts';
+} from '../../adapters/database/index.ts';
 
 export class DatabaseIntegrityService {
     protected dataSource : DataSource;

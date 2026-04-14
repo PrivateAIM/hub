@@ -8,7 +8,8 @@ import type { ComponentHandlerContext } from '@privateaim/server-kit';
 import { useLogger } from '@privateaim/server-kit';
 import type { BucketComponentEventMap, BucketEvent } from '@privateaim/server-storage-kit';
 import type { Bucket } from '@privateaim/storage-kit';
-import { AnalysisBucketEntity, AnalysisEntity, useDataSourceSync } from '../../../../database/index.ts';
+import { AnalysisBucketEntity, AnalysisEntity } from '../../../../adapters/database/index.ts';
+import { useDataSourceSync } from '../../../../app/modules/database/index.ts';
 import { TaskType } from '../../../../domains/index.ts';
 import { BaseAggregatorHandler } from '../../../base.ts';
 

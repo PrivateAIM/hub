@@ -15,8 +15,8 @@ import {
     AnalysisBucketFileEntity,
     AnalysisEntity,
     AnalysisNodeEntity,
-    useDataSourceSync,
-} from '../../../../database/index.ts';
+} from '../../../../adapters/database/index.ts';
+import { useDataSourceSync } from '../../../../app/modules/database/index.ts';
 import type { AnalysisMetadataCommand } from '../../constants.ts';
 import { AnalysisMetadataEvent } from '../../constants.ts';
 import type { AnalysisMetadataEventMap, AnalysisMetadataRecalcPayload } from '../../types.ts';

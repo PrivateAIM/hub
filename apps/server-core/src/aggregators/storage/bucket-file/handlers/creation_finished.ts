@@ -8,10 +8,10 @@ import { useLogger } from '@privateaim/server-kit';
 import type { BucketFileComponentEventMap, BucketFileEvent } from '@privateaim/server-storage-kit';
 import type { BucketFile } from '@privateaim/storage-kit';
 import {
-    AnalysisBucketEntity, 
-    AnalysisBucketFileEntity, 
-    useDataSourceSync,
-} from '../../../../database/index.ts';
+    AnalysisBucketEntity,
+    AnalysisBucketFileEntity,
+} from '../../../../adapters/database/index.ts';
+import { useDataSourceSync } from '../../../../app/modules/database/index.ts';
 import { BaseAggregatorHandler } from '../../../base.ts';
 
 export class StorageBucketFileCreationFinishedHandler extends BaseAggregatorHandler<

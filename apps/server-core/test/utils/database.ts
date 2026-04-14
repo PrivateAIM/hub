@@ -16,10 +16,10 @@ import {
     type DataSourceOptions,
 } from 'typeorm';
 import {
-    DataSourceOptionsBuilder, 
-    setDataSourceSync, 
+    DataSourceOptionsBuilder,
+    setDataSourceSync,
     unsetDataSourceSync,
-} from '../../src/database/index.ts';
+} from '../../src/app/modules/database/index.ts';
 
 export class TestDatabase {
     protected options : DataSourceOptions | undefined;

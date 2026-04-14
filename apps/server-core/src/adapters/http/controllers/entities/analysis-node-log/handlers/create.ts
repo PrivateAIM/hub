@@ -20,7 +20,7 @@ import { ValidupError, buildErrorMessageForAttribute, defineIssueItem } from 'va
 import {
     AnalysisEntity,
     NodeEntity,
-} from '../../../../../../database/index.ts';
+} from '../../../../../database/index.ts';
 import { isTelemetryClientUsable, useTelemetryClient } from '../../../../../../services/index.ts';
 import { AnalysisNodeLogValidator } from '../utils/index.ts';
 

@@ -19,7 +19,7 @@ import type { EntityManager } from 'typeorm';
 import { useAnalysisMetadataComponent } from '../singleton.ts';
 import type { AnalysisMetadataEventMap, AnalysisMetadataRecalcPayload } from '../types.ts';
 import { AnalysisMetadataCommand, AnalysisMetadataEvent, AnalysisMetadataTaskQueue } from '../constants.ts';
-import type { AnalysisEntity } from '../../../database/index.ts';
+import type { AnalysisEntity } from '../../../adapters/database/index.ts';
 
 export class AnalysisMetadataComponentCaller implements ComponentCaller<AnalysisMetadataEventMap> {
     protected directCaller : DirectComponentCaller<AnalysisMetadataEventMap>;

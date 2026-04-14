@@ -14,7 +14,7 @@ import type {
     ComponentHandler,
     ComponentHandlerContext,
 } from '@privateaim/server-kit';
-import { RegistryEntity, RegistryProjectEntity } from '../../../database/index.ts';
+import { RegistryEntity, RegistryProjectEntity } from '../../../adapters/database/index.ts';
 import { RegistryCommand } from '../constants.ts';
 import type { RegistryCleanupPayload, RegistryEventMap } from '../type.ts';
 import { createBasicHarborAPIClient } from './utils.ts';

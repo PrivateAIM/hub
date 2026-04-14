@@ -14,7 +14,7 @@ import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useEnv } from '../../../../../../app/modules/config/index.ts';
-import { AnalysisBucketEntity, AnalysisEntity } from '../../../../../../database/index.ts';
+import { AnalysisBucketEntity, AnalysisEntity } from '../../../../../database/index.ts';
 import {
     AnalysisBuilder,
     AnalysisConfigurator,

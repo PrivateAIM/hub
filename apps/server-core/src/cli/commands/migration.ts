@@ -16,7 +16,7 @@ import {
 } from 'typeorm-extension';
 import type { DataSourceOptions } from 'typeorm';
 import { DataSource } from 'typeorm';
-import { DataSourceOptionsBuilder } from '../../database/index.ts';
+import { DataSourceOptionsBuilder } from '../../app/modules/database/index.ts';
 import { SRC_PATH } from '../../constants.ts';
 
 const MigrationOperation = {

@@ -17,7 +17,7 @@ import {
     RegistryCommand,
     useRegistryComponentCaller,
 } from '../../../components/index.ts';
-import { RegistryProjectEntity } from '../../../database/index.ts';
+import { RegistryProjectEntity } from '../../../adapters/database/index.ts';
 
 export async function handleAuthupRobotEvent(context: EventRecord<EntityType.ROBOT, Robot>) {
     if (!context.data.id) {

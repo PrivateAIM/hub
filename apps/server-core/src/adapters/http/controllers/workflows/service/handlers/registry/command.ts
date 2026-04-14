@@ -18,7 +18,7 @@ import {
     RegistryCommand,
     useRegistryComponentCaller,
 } from '../../../../../../../components/index.ts';
-import { RegistryEntity, RegistryProjectEntity } from '../../../../../../../database/index.ts';
+import { RegistryEntity, RegistryProjectEntity } from '../../../../../../database/index.ts';
 import { ServiceRegistryValidator } from '../../utils/validation.ts';
 
 export async function handleRegistryCommandRouteHandler(req: Request, res: Response) : Promise<any> {

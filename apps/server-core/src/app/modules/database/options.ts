@@ -19,7 +19,7 @@ import {
     ProjectNodeEntity,
     RegistryEntity,
     RegistryProjectEntity,
-} from '../../adapters/database/entities/index.ts';
+} from '../../../adapters/database/entities/index.ts';
 import {
     AnalysisBucketFileSubscriber,
     AnalysisBucketSubscriber,
@@ -34,7 +34,7 @@ import {
     ProjectSubscriber,
     RegistryProjectSubscriber,
     RegistrySubscriber,
-} from '../../adapters/database/subscribers/index.ts';
+} from '../../../adapters/database/subscribers/index.ts';
 
 export class DataSourceOptionsBuilder extends BaseBuilder {
     constructor() {

@@ -17,7 +17,7 @@ import {
     type ComponentHandler, 
     type ComponentHandlerContext,
 } from '@privateaim/server-kit';
-import { RegistryEntity, RegistryProjectEntity } from '../../../database/index.ts';
+import { RegistryEntity, RegistryProjectEntity } from '../../../adapters/database/index.ts';
 import { RegistryCommand } from '../constants.ts';
 import type { RegistryEventMap, RegistrySetupPayload } from '../type.ts';
 

@@ -7,7 +7,7 @@
 
 import { useDataSource } from 'typeorm-extension';
 import type { MasterImageSynchronizerGroup, MasterImageSynchronizerImage } from '@privateaim/server-core-worker-kit';
-import { MasterImageEntity, MasterImageGroupEntity } from '../../../database/domains/index.ts';
+import { MasterImageEntity, MasterImageGroupEntity } from '../../../adapters/database/index.ts';
 
 export type MasterImageSynchronizerExecuteContext = {
     images: MasterImageSynchronizerImage[],
