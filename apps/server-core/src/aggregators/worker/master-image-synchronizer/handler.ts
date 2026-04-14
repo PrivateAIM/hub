@@ -9,7 +9,7 @@ import type {
     MasterImageSynchronizerExecutionFinishedPayload,
 } from '@privateaim/server-core-worker-kit';
 import { useLogger } from '@privateaim/server-kit';
-import { MasterImageSynchronizerService } from '../../../services/index.ts';
+import { MasterImageSynchronizerService } from '../../../core/services/master-image/index.ts';
 
 export async function handleMasterImageSynchronizerExecutionFinishedEvent(value: MasterImageSynchronizerExecutionFinishedPayload) {
     const synchronizer = new MasterImageSynchronizerService();

@@ -19,7 +19,7 @@ import {
     useEnv,
 } from '../app/modules/config/index.ts';
 import { setupAuthupService, setupHarborService } from '../core/index.ts';
-import { DatabaseIntegrityService } from '../services/index.ts';
+import { DatabaseIntegrityService } from '../app/services/database-integrity/index.ts';
 
 export async function startCommand() {
     const app = createApplication();

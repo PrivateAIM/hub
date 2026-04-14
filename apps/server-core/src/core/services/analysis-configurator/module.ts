@@ -11,11 +11,11 @@ import {
     NodeType,
 } from '@privateaim/core-kit';
 import type { Repository } from 'typeorm';
-import type { AnalysisMetadataComponentCaller } from '../../components/index.ts';
-import { useAnalysisMetadataComponentCaller } from '../../components/index.ts';
-import { AnalysisEntity, AnalysisNodeEntity } from '../../adapters/database/index.ts';
-import { useDataSourceSync } from '../../app/modules/database/index.ts';
-import { RequestRepositoryAdapter } from '../../adapters/http/request/index.ts';
+import type { AnalysisMetadataComponentCaller } from '../../../components/index.ts';
+import { useAnalysisMetadataComponentCaller } from '../../../components/index.ts';
+import { AnalysisEntity, AnalysisNodeEntity } from '../../../adapters/database/index.ts';
+import { useDataSourceSync } from '../../../app/modules/database/index.ts';
+import { RequestRepositoryAdapter } from '../../../adapters/http/request/index.ts';
 import type { AnalysisConfiguratorLockOptions, AnalysisConfiguratorUnlockOptions } from './types.ts';
 
 export class AnalysisConfigurator {

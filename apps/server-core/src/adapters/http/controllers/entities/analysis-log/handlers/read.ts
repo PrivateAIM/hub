@@ -14,7 +14,7 @@ import { BadRequestError } from '@ebec/http';
 import { type FiltersBuildInput, parseQuery } from 'rapiq';
 import type { AnalysisLog } from '@privateaim/core-kit';
 import { DomainType } from '@privateaim/core-kit';
-import { isTelemetryClientUsable, useTelemetryClient } from '../../../../../../services/index.ts';
+import { isTelemetryClientUsable, useTelemetryClient } from '../../../../../../app/services/telemetry/index.ts';
 
 export async function getManyAnalysisLogRouteHandler(req: Request, res: Response) : Promise<any> {
     const output = parseQuery<AnalysisLog>(

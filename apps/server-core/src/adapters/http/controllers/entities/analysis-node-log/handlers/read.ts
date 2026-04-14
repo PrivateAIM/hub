@@ -15,7 +15,7 @@ import type { FiltersBuildInput } from 'rapiq';
 import { parseQuery } from 'rapiq';
 import type { AnalysisNodeLog } from '@privateaim/core-kit';
 import { DomainType } from '@privateaim/core-kit';
-import { isTelemetryClientUsable, useTelemetryClient } from '../../../../../../services/index.ts';
+import { isTelemetryClientUsable, useTelemetryClient } from '../../../../../../app/services/telemetry/index.ts';
 
 export async function getManyAnalysisNodeLogRouteHandler(req: Request, res: Response) : Promise<any> {
     const output = parseQuery<AnalysisNodeLog>(useRequestQuery(req), {

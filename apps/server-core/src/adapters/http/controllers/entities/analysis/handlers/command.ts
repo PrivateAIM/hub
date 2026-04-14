@@ -15,12 +15,10 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useEnv } from '../../../../../../app/modules/config/index.ts';
 import { AnalysisBucketEntity, AnalysisEntity } from '../../../../../database/index.ts';
-import {
-    AnalysisBuilder,
-    AnalysisConfigurator,
-    AnalysisDistributor,
-    AnalysisStorageManager,
-} from '../../../../../../services/index.ts';
+import { AnalysisBuilder } from '../../../../../../core/services/analysis-builder/index.ts';
+import { AnalysisConfigurator } from '../../../../../../core/services/analysis-configurator/index.ts';
+import { AnalysisDistributor } from '../../../../../../core/services/analysis-distributor/index.ts';
+import { AnalysisStorageManager } from '../../../../../../core/services/analysis-storage-manager/index.ts';
 import { AnalysisCommandValidator } from '../utils/index.ts';
 
 /**

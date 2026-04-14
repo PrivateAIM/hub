@@ -14,7 +14,7 @@ import { type FiltersBuildInput, parseQueryFilters } from 'rapiq';
 import type { AnalysisLog } from '@privateaim/core-kit';
 import { DomainType } from '@privateaim/core-kit';
 import { useRequestQuery } from '@routup/basic/query';
-import { isTelemetryClientUsable, useTelemetryClient } from '../../../../../../services/index.ts';
+import { isTelemetryClientUsable, useTelemetryClient } from '../../../../../../app/services/telemetry/index.ts';
 
 export async function deleteAnalysisLogRouteHandler(req: Request, res: Response) : Promise<any> {
     const output = parseQueryFilters<AnalysisLog>(

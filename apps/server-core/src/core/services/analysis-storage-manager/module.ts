@@ -14,8 +14,8 @@ import {
 import type { TaskManager } from '@privateaim/server-kit';
 import { BucketComponentCaller } from '@privateaim/server-storage-kit';
 import type { Repository } from 'typeorm';
-import type { TaskMap } from '../../domains/index.ts';
-import { TaskType, useTaskManager } from '../../domains/index.ts';
+import type { TaskMap } from '../../../domains/index.ts';
+import { TaskType, useTaskManager } from '../../../domains/index.ts';
 import type {
     AnalysisStorageManagerContext,
     AnalysisStorageMangerCheckOptions,

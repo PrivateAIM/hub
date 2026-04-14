@@ -7,7 +7,7 @@
 
 import { isQueueRouterUsable } from '@privateaim/server-kit';
 import { singa } from 'singa';
-import { AnalysisDistributor } from './module.ts';
+import { AnalysisDistributor } from '../../../core/services/analysis-distributor/module.ts';
 
 const instance = singa<AnalysisDistributor>({
     name: 'analysisManager',

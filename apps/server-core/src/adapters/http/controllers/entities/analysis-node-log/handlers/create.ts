@@ -21,7 +21,7 @@ import {
     AnalysisEntity,
     NodeEntity,
 } from '../../../../../database/index.ts';
-import { isTelemetryClientUsable, useTelemetryClient } from '../../../../../../services/index.ts';
+import { isTelemetryClientUsable, useTelemetryClient } from '../../../../../../app/services/telemetry/index.ts';
 import { AnalysisNodeLogValidator } from '../utils/index.ts';
 
 export async function createAnalysisNodeLogRouteHandler(req: Request, res: Response) : Promise<any> {

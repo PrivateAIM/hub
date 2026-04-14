@@ -16,10 +16,10 @@ import {
 import type { Request } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import type { Repository } from 'typeorm';
-import { AnalysisEntity, AnalysisNodeEntity, RegistryEntity } from '../../adapters/database/index.ts';
-import { useDataSourceSync } from '../../app/modules/database/index.ts';
-import { RequestRepositoryAdapter } from '../../adapters/http/request/index.ts';
-import { type AnalysisMetadataComponentCaller, useAnalysisMetadataComponentCaller } from '../../components/index.ts';
+import { AnalysisEntity, AnalysisNodeEntity, RegistryEntity } from '../../../adapters/database/index.ts';
+import { useDataSourceSync } from '../../../app/modules/database/index.ts';
+import { RequestRepositoryAdapter } from '../../../adapters/http/request/index.ts';
+import { type AnalysisMetadataComponentCaller, useAnalysisMetadataComponentCaller } from '../../../components/index.ts';
 
 export class AnalysisDistributor {
     protected repository: Repository<AnalysisEntity>;
