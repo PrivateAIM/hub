@@ -7,4 +7,5 @@
 
 export type HTTPModuleOptions = {
     skipServer?: boolean;
+    socket?: boolean;
 };

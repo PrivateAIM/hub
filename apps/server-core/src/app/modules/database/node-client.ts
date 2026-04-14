@@ -8,18 +8,18 @@
 import type { Client, Permission } from '@authup/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { AuthupClient } from '@privateaim/server-kit';
-import { useAuthupClient, useLogger } from '@privateaim/server-kit';
+import { useLogger } from '@privateaim/server-kit';
 import { isClientErrorWithStatusCode } from 'hapic';
-import type { NodeEntity } from '../../../adapters/database/index.ts';
+import type { NodeEntity } from '../../../adapters/database/entities/index.ts';
 
 export class NodeClientService {
-    protected authup : AuthupClient;
+    protected authup: AuthupClient;
 
-    constructor() {
-        this.authup = useAuthupClient();
+    constructor(authup: AuthupClient) {
+        this.authup = authup;
     }
 
-    async dismiss(entity: NodeEntity) : Promise<void> {
+    async dismiss(entity: NodeEntity): Promise<void> {
         if (!entity.client_id) {
             return;
         }
@@ -35,8 +35,8 @@ export class NodeClientService {
         entity.client_id = null;
     }
 
-    async assign(entity: NodeEntity) : Promise<Client> {
-        let client : Client | undefined;
+    async assign(entity: NodeEntity): Promise<Client> {
+        let client: Client | undefined;
 
         if (entity.client_id) {
             try {
@@ -68,14 +68,14 @@ export class NodeClientService {
                 filter: { client_id: client.id },
             });
 
-        const permissionNames : string[] = [
+        const permissionNames: string[] = [
             PermissionName.ANALYSIS_APPROVE,
             PermissionName.ANALYSIS_UPDATE,
             PermissionName.PROJECT_APPROVE,
         ];
-        const permissionNamesAssigned : string[] = [];
+        const permissionNamesAssigned: string[] = [];
 
-        const relationsToDelete : string[] = [];
+        const relationsToDelete: string[] = [];
         for (const clientPermission of clientPermissions) {
             const index = permissionNames.indexOf(clientPermission.permission.name);
             if (index === -1) {
@@ -97,7 +97,7 @@ export class NodeClientService {
                 continue;
             }
 
-            let permission : Permission;
+            let permission: Permission;
 
             try {
                 permission = await this.authup.permission.getOne(permissionName);

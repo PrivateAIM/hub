@@ -9,6 +9,10 @@ import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
 import { BucketComponentCaller } from '@privateaim/server-storage-kit';
 import {
+    AuthupClientInjectionKey,
+    isAuthupClientUsable,
+} from '@privateaim/server-kit';
+import {
     checkDatabase,
     createDatabase,
     setDataSource,
@@ -31,7 +35,7 @@ import {
     RegistrySubscriber,
 } from '../../../adapters/database/subscribers/index.ts';
 import { useAnalysisMetadataComponentCaller } from '../../components/index.ts';
-import { NodeClientService } from '../../services/node-client/module.ts';
+import { NodeClientService } from './node-client.ts';
 import { DataSourceOptionsBuilder } from './options.ts';
 import { setDataSourceSync } from './singleton.ts';
 import { DatabaseInjectionKey } from './constants.ts';
@@ -63,7 +67,7 @@ export class DatabaseModule implements IModule {
         const dataSource = new DS(options);
 
         // Instantiate subscribers with DI dependencies
-        this.registerSubscribers(dataSource);
+        this.registerSubscribers(dataSource, container);
 
         await dataSource.initialize();
 
@@ -91,8 +95,7 @@ export class DatabaseModule implements IModule {
         }
     }
 
-    private registerSubscribers(dataSource: any): void {
-        // Resolve optional dependencies for subscribers
+    private registerSubscribers(dataSource: any, container: IContainer): void {
         let metadataCaller: any;
         try {
             metadataCaller = useAnalysisMetadataComponentCaller();
@@ -101,10 +104,11 @@ export class DatabaseModule implements IModule {
         }
 
         let nodeClientService: NodeClientService | undefined;
-        try {
-            nodeClientService = new NodeClientService();
-        } catch {
-            // not available if authup not configured
+        if (isAuthupClientUsable()) {
+            const authupResult = container.tryResolve(AuthupClientInjectionKey);
+            if (authupResult.success) {
+                nodeClientService = new NodeClientService(authupResult.data);
+            }
         }
 
         let taskManager: any;
@@ -114,9 +118,7 @@ export class DatabaseModule implements IModule {
             // not available
         }
 
-        // Push pre-instantiated subscribers
         dataSource.subscribers.push(
-            // Subscribers with dependencies
             new NodeSubscriber({ nodeClientService }),
             new AnalysisSubscriber({
                 metadataCaller,
@@ -126,7 +128,6 @@ export class DatabaseModule implements IModule {
             new AnalysisBucketFileSubscriber({ metadataCaller }),
             new AnalysisNodeSubscriber({ metadataCaller }),
 
-            // Simple subscribers (no custom dependencies)
             new AnalysisBucketSubscriber(),
             new AnalysisNodeEventSubscriber(),
             new AnalysisPermissionSubscriber(),

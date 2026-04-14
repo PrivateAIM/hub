@@ -19,7 +19,7 @@ import { BaseSubscriber } from '@privateaim/server-db-kit';
 import type { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
 import { NodeEntity } from '../entities/node.ts';
-import type { NodeClientService } from '../../../app/services/node-client/index.ts';
+import type { NodeClientService } from '../../../app/modules/database/node-client.ts';
 
 export class NodeSubscriber extends BaseSubscriber<NodeEntity> implements EntitySubscriberInterface<NodeEntity> {
     protected nodeClientService?: NodeClientService;

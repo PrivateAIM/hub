@@ -166,6 +166,21 @@ app/modules/<name>/
 - **Per-service modules** (database, minio, victoria-logs, etc.) live in `apps/<service>/src/app/modules/<name>/`
 - Each service has `app/builder.ts` (`ServiceXApplicationBuilder extends BaseApplicationBuilder`) with `withConfig()`, `withDatabase()`, `withHTTP()`
 - Each service has `app/factory.ts` with `createApplication()` using the builder
+- **`start.ts` should be minimal** — just `createApplication()` + `app.setup()`. All orchestration (DB, HTTP, swagger, harbor, components) happens in modules.
+- **HTTPModule starts the server** — `server.listen()` is inside the module with a Promise, not in `start.ts`. Socket server is toggleable via `options.socket`.
+
+### server-core Module Inventory
+
+| Module | Name | Dependencies | Registers |
+|--------|------|-------------|-----------|
+| ConfigModule | `config` | none | `ConfigInjectionKey` (typed env) |
+| DatabaseModule | `database` | none | `DataSource`, 13 repo adapters, `RegistryManager` |
+| AnalysisModule | `analysis` | `database` | `Builder`, `Configurator`, `Distributor`, `StorageManager` |
+| SwaggerModule | `swagger` | `config` | nothing (generates docs) |
+| HarborModule | `harbor` | `config`, `database` | nothing (sets up registry) |
+| ComponentsModule | `components` | `database` | nothing (starts aggregators/consumers) |
+| HTTPModule | `http` | `config`, `database`, `analysis` | `Server`, `Router` |
+| TelemetryClientModule | `telemetryClient` | (optional) | `TelemetryClient` |
 
 ## Docker
 

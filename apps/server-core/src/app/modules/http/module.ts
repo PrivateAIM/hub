@@ -26,6 +26,7 @@ import {
     RootController,
     ServiceController,
 } from '../../../adapters/http/controllers/index.ts';
+import { createSocketServer } from '../../../adapters/socket/server.ts';
 import { ConfigInjectionKey } from '../config/constants.ts';
 import { createControllers } from './controller.ts';
 import { HTTPInjectionKey } from './constants.ts';
@@ -126,6 +127,10 @@ export class HTTPModule implements IModule {
             logger.debug(`Listening on 0.0.0.0:${config.port}.`);
 
             container.register(HTTPInjectionKey.Server, { useValue: server });
+
+            if (this.options.socket) {
+                createSocketServer(server);
+            }
         }
     }
 

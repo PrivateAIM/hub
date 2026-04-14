@@ -115,20 +115,22 @@ apps/server-core/src/
 │   ├── builder.ts                 # ServerCoreApplicationBuilder
 │   ├── factory.ts                 # createApplication()
 │   ├── modules/
-│   │   ├── config/                # ConfigModule (env, paths, components)
-│   │   ├── database/              # DatabaseModule (DataSource + repos)
+│   │   ├── analysis/              # AnalysisModule (builder, configurator, distributor, storage)
+│   │   ├── components/            # ComponentsModule (starts aggregators + task consumers)
+│   │   ├── config/                # ConfigModule (env, paths, component config)
+│   │   ├── database/              # DatabaseModule (DataSource, repos, subscribers, node-client)
 │   │   │   ├── repositories/<entity>/  # Repository adapters
+│   │   │   ├── node-client.ts     # NodeClientService (authup integration)
 │   │   │   ├── options.ts         # DataSourceOptionsBuilder
 │   │   │   └── register.ts        # registerRepositories() helper
-│   │   ├── http/                  # HTTPModule (router + controllers)
+│   │   ├── harbor/                # HarborModule (registry setup)
+│   │   ├── http/                  # HTTPModule (router, controllers, server, socket)
 │   │   ├── registry/              # RegistryManagerAdapter
+│   │   ├── swagger/               # SwaggerModule (API docs generation)
 │   │   └── telemetry-client/      # TelemetryClientModule
-│   ├── services/                  # Infrastructure services
-│   │   ├── database-integrity/    # Data consistency checks
-│   │   ├── node-client/           # Authup client provisioning
-│   │   └── telemetry/             # Telemetry singleton bridge
+│   ├── services/                  # Remaining singleton bridges (telemetry)
 │   ├── aggregators/               # AMQP event consumers
-│   └── components/                # AMQP task consumers
+│   └── components/                # AMQP task consumers (registry, analysis-metadata)
 ├── cli/                           # CLI entry point (citty)
 └── commands/                      # start, migration commands
 ```
