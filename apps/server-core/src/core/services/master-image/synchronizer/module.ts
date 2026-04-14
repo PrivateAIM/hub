@@ -5,48 +5,56 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { useDataSource } from 'typeorm-extension';
+import type { MasterImage, MasterImageGroup } from '@privateaim/core-kit';
 import type { MasterImageSynchronizerGroup, MasterImageSynchronizerImage } from '@privateaim/server-core-worker-kit';
-import { MasterImageEntity, MasterImageGroupEntity } from '../../../../adapters/database/index.ts';
+import type { IEntityRepository } from '../../../entities/types.ts';
 
 export type MasterImageSynchronizerExecuteContext = {
-    images: MasterImageSynchronizerImage[],
-    groups: MasterImageSynchronizerGroup[]
+    images: MasterImageSynchronizerImage[];
+    groups: MasterImageSynchronizerGroup[];
 };
 
 export type MasterImageSynchronizerResult<T> = {
-    updated: T[],
-    created: T[],
-    deleted: T[]
+    updated: T[];
+    created: T[];
+    deleted: T[];
 };
 
 export type MasterImageSynchronizerExecuteResult = {
-    images: MasterImageSynchronizerResult<MasterImageEntity>,
-    groups: MasterImageSynchronizerResult<MasterImageGroupEntity>
+    images: MasterImageSynchronizerResult<MasterImage>;
+    groups: MasterImageSynchronizerResult<MasterImageGroup>;
+};
+
+type MasterImageSynchronizerContext = {
+    imageRepository: IEntityRepository<MasterImage>;
+    groupRepository: IEntityRepository<MasterImageGroup>;
 };
 
 export class MasterImageSynchronizerService {
+    protected imageRepository: IEntityRepository<MasterImage>;
+
+    protected groupRepository: IEntityRepository<MasterImageGroup>;
+
+    constructor(ctx: MasterImageSynchronizerContext) {
+        this.imageRepository = ctx.imageRepository;
+        this.groupRepository = ctx.groupRepository;
+    }
+
     async sync(
         input: MasterImageSynchronizerExecuteContext,
-    ) : Promise<MasterImageSynchronizerExecuteResult> {
+    ): Promise<MasterImageSynchronizerExecuteResult> {
         const groups = await this.syncGroups(input.groups);
         const images = await this.syncImages(input.images);
 
-        return {
-            groups,
-            images,
-        };
+        return { groups, images };
     }
 
     protected async syncImages(
         input: MasterImageSynchronizerImage[],
-    ) : Promise<MasterImageSynchronizerResult<MasterImageEntity>> {
-        const dataSource = await useDataSource();
+    ): Promise<MasterImageSynchronizerResult<MasterImage>> {
+        const entities = await this.imageRepository.findManyBy({});
 
-        const repository = dataSource.getRepository(MasterImageEntity);
-        const entities = await repository.find();
-
-        const result : MasterImageSynchronizerResult<MasterImageEntity> = {
+        const result: MasterImageSynchronizerResult<MasterImage> = {
             created: [],
             updated: [],
             deleted: [],
@@ -54,13 +62,13 @@ export class MasterImageSynchronizerService {
 
         const virtualPaths = input.map((entity) => entity.virtualPath);
         result.deleted = entities
-            .filter((image) => !virtualPaths.includes(image.virtual_path));
+            .filter((image) => !virtualPaths.includes((image as any).virtual_path));
 
         for (const element of input) {
             const parts = element.virtualPath.split('/');
             parts.pop();
 
-            const data : Partial<MasterImageEntity> = {
+            const data: Partial<MasterImage> = {
                 name: element.name,
                 path: element.path,
                 group_virtual_path: parts.join('/'),
@@ -69,29 +77,29 @@ export class MasterImageSynchronizerService {
             };
 
             if (element.commandArguments) {
-                data.command_arguments = element.commandArguments;
+                (data as any).command_arguments = element.commandArguments;
             }
 
             const index = entities.findIndex(
-                (entity) => entity.virtual_path === data.virtual_path,
+                (entity) => (entity as any).virtual_path === data.virtual_path,
             );
             if (index === -1) {
-                result.created.push(repository.create(data));
+                result.created.push(this.imageRepository.create(data));
             } else {
-                result.updated.push(repository.merge(entities[index], data));
+                result.updated.push(this.imageRepository.merge(entities[index], data));
             }
         }
 
-        if (result.created.length > 0) {
-            await repository.insert(result.created);
+        for (const entity of result.created) {
+            await this.imageRepository.save(entity);
         }
 
-        if (result.updated.length > 0) {
-            await repository.save(result.updated);
+        for (const entity of result.updated) {
+            await this.imageRepository.save(entity);
         }
 
-        if (result.deleted.length > 0) {
-            await repository.remove(result.deleted);
+        for (const entity of result.deleted) {
+            await this.imageRepository.remove(entity);
         }
 
         return result;
@@ -99,50 +107,47 @@ export class MasterImageSynchronizerService {
 
     protected async syncGroups(
         input: MasterImageSynchronizerGroup[],
-    ) : Promise<MasterImageSynchronizerResult<MasterImageGroupEntity>> {
-        const dataSource = await useDataSource();
+    ): Promise<MasterImageSynchronizerResult<MasterImageGroup>> {
+        const entities = await this.groupRepository.findManyBy({});
 
-        const repository = dataSource.getRepository(MasterImageGroupEntity);
-        const entities = await repository.find();
-
-        const result : MasterImageSynchronizerResult<MasterImageGroupEntity> = {
+        const result: MasterImageSynchronizerResult<MasterImageGroup> = {
             created: [],
             updated: [],
             deleted: [],
         };
 
-        const dirVirtualPaths : string[] = input.map((entity) => entity.virtualPath);
+        const dirVirtualPaths: string[] = input.map((entity) => entity.virtualPath);
         result.deleted = entities.filter(
-            (image) => !dirVirtualPaths.includes(image.virtual_path),
+            (image) => !dirVirtualPaths.includes((image as any).virtual_path),
         );
 
         for (const element of input) {
-            const data : Partial<MasterImageGroupEntity> = {
+            const data: Partial<MasterImageGroup> = {
                 path: element.path,
                 name: element.name,
             };
 
-            const index = entities.findIndex((dbEntity) => dbEntity.virtual_path === element.virtualPath);
+            const index = entities.findIndex((dbEntity) => (dbEntity as any).virtual_path === element.virtualPath);
             if (index === -1) {
-                result.created.push(repository.create({
+                result.created.push(this.groupRepository.create({
                     virtual_path: element.virtualPath,
                     ...data,
-                }));
+                } as Partial<MasterImageGroup>));
             } else {
-                result.updated.push(repository.merge(entities[index], data));
+                result.updated.push(this.groupRepository.merge(entities[index], data));
             }
         }
 
-        if (result.created.length > 0) {
-            await repository.save(result.created);
+        for (const entity of result.created) {
+            await this.groupRepository.save(entity);
         }
 
-        if (result.updated.length > 0) {
-            await repository.save(result.updated);
+        for (const entity of result.updated) {
+            await this.groupRepository.save(entity);
         }
 
-        if (result.deleted.length > 0) {
-            await repository.remove(result.deleted);
+        for (const entity of result.deleted) {
+            await this.groupRepository.remove(entity);
         }
 
         return result;

@@ -9,7 +9,6 @@ import type {
     EntitySubscriberInterface,
 } from 'typeorm';
 import {
-    EventSubscriber,
 } from 'typeorm';
 import {
     DomainType,
@@ -19,7 +18,6 @@ import type { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
 import { ProjectNodeEntity } from '../entities/project-node.ts';
 
-@EventSubscriber()
 export class ProjectNodeSubscriber extends BaseSubscriber<
     ProjectNodeEntity
 > implements EntitySubscriberInterface<ProjectNodeEntity> {

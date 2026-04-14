@@ -6,37 +6,32 @@
  */
 
 import { NotFoundError } from '@ebec/http';
+import type { Analysis } from '@privateaim/core-kit';
 import { AnalysisBuilderCommandChecker } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
-import { AnalysisBuilderComponentCaller } from '@privateaim/server-core-worker-kit';
-import type { Request } from 'routup';
-import type { Repository } from 'typeorm';
-import { AnalysisEntity } from '../../../adapters/database/index.ts';
-import { useDataSourceSync } from '../../../app/modules/database/index.ts';
-import { RequestRepositoryAdapter } from '../../../adapters/http/request/index.ts';
-import type { AnalysisMetadataComponentCaller } from '../../../app/components/index.ts';
-import {
-    useAnalysisMetadataComponentCaller,
-} from '../../../app/components/index.ts';
+import type { EntityPersistContext, IEntityRepository } from '../../entities/types.ts';
+import type { IAnalysisBuilderCaller, IAnalysisMetadataCaller } from '../types.ts';
+
+type AnalysisBuilderContext = {
+    repository: IEntityRepository<Analysis>;
+    caller: IAnalysisBuilderCaller;
+    metadataCaller: IAnalysisMetadataCaller;
+};
 
 export class AnalysisBuilder {
-    protected repository : Repository<AnalysisEntity>;
+    protected repository: IEntityRepository<Analysis>;
 
-    protected caller : AnalysisBuilderComponentCaller;
+    protected caller: IAnalysisBuilderCaller;
 
-    protected metadataCaller : AnalysisMetadataComponentCaller;
+    protected metadataCaller: IAnalysisMetadataCaller;
 
-    constructor() {
-        const dataSource = useDataSourceSync();
-        this.repository = dataSource.getRepository(AnalysisEntity);
-        this.caller = new AnalysisBuilderComponentCaller();
-        this.metadataCaller = useAnalysisMetadataComponentCaller();
+    constructor(ctx: AnalysisBuilderContext) {
+        this.repository = ctx.repository;
+        this.caller = ctx.caller;
+        this.metadataCaller = ctx.metadataCaller;
     }
 
-    async start(
-        input: string | AnalysisEntity,
-        request?: Request,
-    ) {
+    async start(input: string | Analysis, persistCtx?: EntityPersistContext) {
         const entityId = typeof input === 'string' ? input : input.id;
         const entity = await this.metadataCaller.callRecalcDirect({ analysisId: entityId });
 
@@ -45,44 +40,27 @@ export class AnalysisBuilder {
         entity.build_status = ProcessStatus.STARTING;
         entity.build_progress = null;
 
-        if (request) {
-            const requestRepository = new RequestRepositoryAdapter(
-                request,
-                this.repository,
-            );
-
-            await requestRepository.save(entity);
-        } else {
-            await this.repository.save(entity);
-        }
-
+        await this.repository.save(entity, persistCtx);
         await this.caller.callExecute({ id: entity.id });
 
         return entity;
     }
 
-    async check(input: string | AnalysisEntity) {
+    async check(input: string | Analysis) {
         const entity = await this.resolve(input);
-
         AnalysisBuilderCommandChecker.canCheck(entity);
-
         await this.caller.callCheck({ id: entity.id });
-
         return entity;
     }
 
-    // ---------------------------------------------------------------
-
-    protected async resolve(input: string | AnalysisEntity) : Promise<AnalysisEntity> {
+    protected async resolve(input: string | Analysis): Promise<Analysis> {
         if (typeof input === 'string') {
-            const entity = await this.repository.findOneBy({ id: input });
+            const entity = await this.repository.findOneById(input);
             if (!entity) {
                 throw new NotFoundError('Analysis could not be found.');
             }
-
             return entity;
         }
-
         return input;
     }
 }

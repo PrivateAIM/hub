@@ -6,29 +6,28 @@
  */
 
 import type {
-    EntitySubscriberInterface, 
-    InsertEvent, 
-    RemoveEvent, 
+    EntitySubscriberInterface,
+    InsertEvent,
+    RemoveEvent,
     UpdateEvent,
 } from 'typeorm';
-import { EventSubscriber } from 'typeorm';
-import {
-    DomainType,
-} from '@privateaim/core-kit';
+import { DomainType } from '@privateaim/core-kit';
 import { BaseSubscriber } from '@privateaim/server-db-kit';
 import type { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
-import {
-    AnalysisMetadataCommand,
-    useAnalysisMetadataComponentCaller,
-} from '../../../app/components/index.ts';
 import { AnalysisBucketFileEntity } from '../entities/analysis-bucket-file.ts';
+import { AnalysisMetadataCommand } from '../../../app/components/index.ts';
 
-@EventSubscriber()
+type MetadataCaller = {
+    call(command: string, data: Record<string, any>, meta: Record<string, any>): Promise<void>;
+};
+
 export class AnalysisBucketFileSubscriber extends BaseSubscriber<
     AnalysisBucketFileEntity
 > implements EntitySubscriberInterface<AnalysisBucketFileEntity> {
-    constructor() {
+    protected metadataCaller?: MetadataCaller;
+
+    constructor(ctx?: { metadataCaller?: MetadataCaller }) {
         super({
             refType: DomainType.ANALYSIS_BUCKET_FILE,
             destinations: (data) => {
@@ -59,19 +58,20 @@ export class AnalysisBucketFileSubscriber extends BaseSubscriber<
                 return destinations;
             },
         });
+
+        this.metadataCaller = ctx?.metadataCaller;
     }
 
     async afterInsert(event: InsertEvent<AnalysisBucketFileEntity>): Promise<any> {
         await super.afterInsert(event);
 
-        if (event.entity.root) {
-            const caller = useAnalysisMetadataComponentCaller();
-            await caller.call(
+        if (event.entity.root && this.metadataCaller) {
+            await this.metadataCaller.call(
                 AnalysisMetadataCommand.RECALC,
                 {
-                    analysisId: event.entity.analysis_id,
-                    queryNodes: false,
-                    querySelf: false,
+                    analysisId: event.entity.analysis_id, 
+                    queryNodes: false, 
+                    querySelf: false, 
                 },
                 { entityManager: event.manager },
             );
@@ -81,30 +81,29 @@ export class AnalysisBucketFileSubscriber extends BaseSubscriber<
     async afterUpdate(event: UpdateEvent<AnalysisBucketFileEntity>): Promise<any> {
         await super.afterUpdate(event);
 
-        const analysisId = event.entity?.analysis_id ??
-            event.databaseEntity?.analysis_id;
+        if (!this.metadataCaller) return;
 
-        const caller = useAnalysisMetadataComponentCaller();
-        await caller.call(
+        const analysisId = event.entity?.analysis_id ?? event.databaseEntity?.analysis_id;
+
+        await this.metadataCaller.call(
             AnalysisMetadataCommand.RECALC,
             {
-                analysisId,
-                queryNodes: false,
-                querySelf: false,
+                analysisId, 
+                queryNodes: false, 
+                querySelf: false, 
             },
             { entityManager: event.manager },
         );
     }
 
     async afterRemove(event: RemoveEvent<AnalysisBucketFileEntity>): Promise<any> {
-        if (event.entity.root) {
-            const caller = useAnalysisMetadataComponentCaller();
-            await caller.call(
+        if (event.entity.root && this.metadataCaller) {
+            await this.metadataCaller.call(
                 AnalysisMetadataCommand.RECALC,
                 {
-                    analysisId: event.entity.analysis_id,
-                    queryNodes: false,
-                    querySelf: false,
+                    analysisId: event.entity.analysis_id, 
+                    queryNodes: false, 
+                    querySelf: false, 
                 },
                 { entityManager: event.manager },
             );

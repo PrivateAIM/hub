@@ -1,96 +1,72 @@
 /*
  * Copyright (c) 2025.
- *  Author Peter Placzek (tada5hi)
- *  For the full copyright and license information,
- *  view the LICENSE file that was distributed with this source code.
+ * Author Peter Placzek (tada5hi)
+ * For the full copyright and license information,
+ * view the LICENSE file that was distributed with this source code.
  */
 
 import { BadRequestError } from '@ebec/http';
+import type { Analysis, AnalysisNode, Registry } from '@privateaim/core-kit';
+import { AnalysisDistributorCommandChecker } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
-import {
-    AnalysisDistributorCommandChecker,
-} from '@privateaim/core-kit';
-import {
-    AnalysisDistributorComponentCaller,
-} from '@privateaim/server-core-worker-kit';
-import type { Request } from 'routup';
-import { useDataSource } from 'typeorm-extension';
-import type { Repository } from 'typeorm';
-import { AnalysisEntity, AnalysisNodeEntity, RegistryEntity } from '../../../adapters/database/index.ts';
-import { useDataSourceSync } from '../../../app/modules/database/index.ts';
-import { RequestRepositoryAdapter } from '../../../adapters/http/request/index.ts';
-import { type AnalysisMetadataComponentCaller, useAnalysisMetadataComponentCaller } from '../../../app/components/index.ts';
+import type { EntityPersistContext, IEntityRepository } from '../../entities/types.ts';
+import type { IAnalysisDistributorCaller, IAnalysisMetadataCaller } from '../types.ts';
+
+type AnalysisDistributorContext = {
+    repository: IEntityRepository<Analysis>;
+    analysisNodeRepository: IEntityRepository<AnalysisNode>;
+    registryRepository: IEntityRepository<Registry>;
+    caller: IAnalysisDistributorCaller;
+    metadataCaller: IAnalysisMetadataCaller;
+};
 
 export class AnalysisDistributor {
-    protected repository: Repository<AnalysisEntity>;
+    protected repository: IEntityRepository<Analysis>;
 
-    protected analysisNodeRepository: Repository<AnalysisNodeEntity>;
+    protected analysisNodeRepository: IEntityRepository<AnalysisNode>;
 
-    protected registryRepository: Repository<RegistryEntity>;
+    protected registryRepository: IEntityRepository<Registry>;
 
-    protected caller : AnalysisDistributorComponentCaller;
+    protected caller: IAnalysisDistributorCaller;
 
-    protected metadataCaller : AnalysisMetadataComponentCaller;
+    protected metadataCaller: IAnalysisMetadataCaller;
 
-    constructor() {
-        const dataSource = useDataSourceSync();
-
-        this.repository = dataSource.getRepository(AnalysisEntity);
-        this.analysisNodeRepository = dataSource.getRepository(AnalysisNodeEntity);
-        this.registryRepository = dataSource.getRepository(RegistryEntity);
-
-        this.caller = new AnalysisDistributorComponentCaller();
-        this.metadataCaller = useAnalysisMetadataComponentCaller();
+    constructor(ctx: AnalysisDistributorContext) {
+        this.repository = ctx.repository;
+        this.analysisNodeRepository = ctx.analysisNodeRepository;
+        this.registryRepository = ctx.registryRepository;
+        this.caller = ctx.caller;
+        this.metadataCaller = ctx.metadataCaller;
     }
 
-    async start(
-        input: string | AnalysisEntity,
-        request?: Request,
-    ) {
+    async start(input: string | Analysis, persistCtx?: EntityPersistContext) {
         const entityId = typeof input === 'string' ? input : input.id;
         const entity = await this.metadataCaller.callRecalcDirect({ analysisId: entityId });
 
         AnalysisDistributorCommandChecker.canStart(entity);
 
         await this.assignRegistry(entity);
-
         await this.checkNodes(entity);
 
         entity.distribution_status = ProcessStatus.STARTING;
 
-        if (request) {
-            const requestRepository = new RequestRepositoryAdapter(
-                request,
-                this.repository,
-            );
-
-            await requestRepository.save(entity);
-        } else {
-            await this.repository.save(entity);
-        }
-
+        await this.repository.save(entity, persistCtx);
         await this.caller.callExecute({ id: entity.id });
 
         return entity;
     }
 
-    async check(
-        input: string | AnalysisEntity,
-    ) {
+    async check(input: string | Analysis) {
         const entity = await this.resolve(input);
-
         AnalysisDistributorCommandChecker.canCheck(entity);
-
         await this.caller.callCheck({ id: entity.id });
-
         return entity;
     }
 
-    // ---------------------------------------------------------------
-
-    protected async assignRegistry(entity: AnalysisEntity) {
+    protected async assignRegistry(entity: Analysis) {
         if (!entity.registry_id) {
-            const [registry] = await this.registryRepository.find({ take: 1 });
+            const registries = await this.registryRepository.findManyBy({});
+            const registry = registries[0];
 
             if (!registry) {
                 throw new BadRequestError('No docker registry is defined.');
@@ -102,43 +78,27 @@ export class AnalysisDistributor {
         return entity;
     }
 
-    /**
-     * todo: move this to metadata component.
-     *
-     * @param entity
-     * @protected
-     */
-    protected async checkNodes(entity: AnalysisEntity) {
-        const analysisNodes = await this.analysisNodeRepository.find({
-            where: { analysis_id: entity.id },
-            relations: ['node'],
-        });
+    protected async checkNodes(entity: Analysis) {
+        const analysisNodes = await this.analysisNodeRepository.findManyBy({ analysis_id: entity.id });
 
         for (const analysisNode of analysisNodes) {
             if (
-                analysisNode.node &&
-                !analysisNode.node.registry_id
+                (analysisNode as any).node &&
+                !(analysisNode as any).node.registry_id
             ) {
-                throw new BadRequestError(`The node ${analysisNode.node.name} is not assigned to a registry yet.`);
+                throw new BadRequestError(`The node ${(analysisNode as any).node.name} is not assigned to a registry yet.`);
             }
         }
     }
 
-    // ---------------------------------------------------------------
-
-    protected async resolve(input: string | AnalysisEntity) : Promise<AnalysisEntity> {
+    protected async resolve(input: string | Analysis): Promise<Analysis> {
         if (typeof input === 'string') {
-            const dataSource = await useDataSource();
-            const repository = dataSource.getRepository(AnalysisEntity);
-
-            const entity = await repository.findOneBy({ id: input });
+            const entity = await this.repository.findOneById(input);
             if (!entity) {
                 throw new BadRequestError('Analysis could not be found.');
             }
-
             return entity;
         }
-
         return input;
     }
 }

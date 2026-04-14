@@ -6,30 +6,27 @@
  */
 
 import type {
-    EntitySubscriberInterface, 
-    InsertEvent, 
+    EntitySubscriberInterface,
+    InsertEvent,
     RemoveEvent,
 } from 'typeorm';
-import {
-    EventSubscriber,
-} from 'typeorm';
-import {
-    DomainType,
-} from '@privateaim/core-kit';
+import { DomainType } from '@privateaim/core-kit';
 import { BaseSubscriber } from '@privateaim/server-db-kit';
 import type { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
-import {
-    AnalysisMetadataCommand,
-    useAnalysisMetadataComponentCaller,
-} from '../../../app/components/index.ts';
 import { AnalysisNodeEntity } from '../entities/anaylsis-node.ts';
+import { AnalysisMetadataCommand } from '../../../app/components/index.ts';
 
-@EventSubscriber()
+type MetadataCaller = {
+    call(command: string, data: Record<string, any>, meta: Record<string, any>): Promise<void>;
+};
+
 export class AnalysisNodeSubscriber extends BaseSubscriber<
     AnalysisNodeEntity
 > implements EntitySubscriberInterface<AnalysisNodeEntity> {
-    constructor() {
+    protected metadataCaller?: MetadataCaller;
+
+    constructor(ctx?: { metadataCaller?: MetadataCaller }) {
         super({
             refType: DomainType.ANALYSIS_NODE,
             destinations: (data) => {
@@ -72,39 +69,36 @@ export class AnalysisNodeSubscriber extends BaseSubscriber<
                 return destinations;
             },
         });
+
+        this.metadataCaller = ctx?.metadataCaller;
     }
 
     async afterInsert(event: InsertEvent<AnalysisNodeEntity>): Promise<any> {
         await super.afterInsert(event);
 
-        const caller = useAnalysisMetadataComponentCaller();
-        await caller.call(
+        if (!this.metadataCaller) return;
+
+        await this.metadataCaller.call(
             AnalysisMetadataCommand.RECALC,
             {
-                analysisId: event.entity.analysis_id,
-                queryFiles: false,
-                querySelf: false,
+                analysisId: event.entity.analysis_id, 
+                queryFiles: false, 
+                querySelf: false, 
             },
             { entityManager: event.manager },
         );
     }
 
     async afterRemove(event: RemoveEvent<AnalysisNodeEntity>): Promise<any> {
-        if (
-            !event.entity?.analysis_id &&
-            !event.databaseEntity?.analysis_id
-        ) {
-            return;
-        }
+        const analysisId = event.entity?.analysis_id || event.databaseEntity?.analysis_id;
+        if (!analysisId || !this.metadataCaller) return;
 
-        const caller = useAnalysisMetadataComponentCaller();
-        await caller.call(
+        await this.metadataCaller.call(
             AnalysisMetadataCommand.RECALC,
             {
-                analysisId: event.entity?.analysis_id ||
-                event.databaseEntity?.analysis_id,
-                queryFiles: false,
-                querySelf: false,
+                analysisId, 
+                queryFiles: false, 
+                querySelf: false, 
             },
             { entityManager: event.manager },
         );

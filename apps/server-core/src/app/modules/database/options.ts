@@ -20,21 +20,6 @@ import {
     RegistryEntity,
     RegistryProjectEntity,
 } from '../../../adapters/database/entities/index.ts';
-import {
-    AnalysisBucketFileSubscriber,
-    AnalysisBucketSubscriber,
-    AnalysisNodeEventSubscriber,
-    AnalysisNodeSubscriber,
-    AnalysisPermissionSubscriber,
-    AnalysisSubscriber,
-    MasterImageGroupSubscriber,
-    MasterImageSubscriber,
-    NodeSubscriber,
-    ProjectNodeSubscriber,
-    ProjectSubscriber,
-    RegistryProjectSubscriber,
-    RegistrySubscriber,
-} from '../../../adapters/database/subscribers/index.ts';
 
 export class DataSourceOptionsBuilder extends BaseBuilder {
     constructor() {
@@ -56,20 +41,7 @@ export class DataSourceOptionsBuilder extends BaseBuilder {
             AnalysisPermissionEntity,
         ]);
 
-        this.setSubscribers([
-            AnalysisSubscriber,
-            AnalysisBucketSubscriber,
-            AnalysisBucketFileSubscriber,
-            AnalysisNodeSubscriber,
-            AnalysisNodeEventSubscriber,
-            AnalysisPermissionSubscriber,
-            MasterImageSubscriber,
-            MasterImageGroupSubscriber,
-            NodeSubscriber,
-            ProjectSubscriber,
-            ProjectNodeSubscriber,
-            RegistrySubscriber,
-            RegistryProjectSubscriber,
-        ]);
+        // Subscribers are instantiated and pushed onto dataSource.subscribers
+        // in DatabaseModule.setup() — not registered here as classes.
     }
 }

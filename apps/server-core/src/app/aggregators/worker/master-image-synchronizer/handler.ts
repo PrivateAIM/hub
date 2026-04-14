@@ -9,10 +9,16 @@ import type {
     MasterImageSynchronizerExecutionFinishedPayload,
 } from '@privateaim/server-core-worker-kit';
 import { useLogger } from '@privateaim/server-kit';
+import { useDataSource } from 'typeorm-extension';
 import { MasterImageSynchronizerService } from '../../../../core/services/master-image/index.ts';
+import { MasterImageEntity, MasterImageGroupEntity } from '../../../../adapters/database/index.ts';
 
 export async function handleMasterImageSynchronizerExecutionFinishedEvent(value: MasterImageSynchronizerExecutionFinishedPayload) {
-    const synchronizer = new MasterImageSynchronizerService();
+    const dataSource = await useDataSource();
+    const synchronizer = new MasterImageSynchronizerService({
+        imageRepository: dataSource.getRepository(MasterImageEntity) as any,
+        groupRepository: dataSource.getRepository(MasterImageGroupEntity) as any,
+    });
 
     const output = await synchronizer
         .sync(value);

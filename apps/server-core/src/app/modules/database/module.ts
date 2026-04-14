@@ -7,12 +7,31 @@
 
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
+import { BucketComponentCaller } from '@privateaim/server-storage-kit';
 import {
     checkDatabase,
     createDatabase,
     setDataSource,
     synchronizeDatabaseSchema,
 } from 'typeorm-extension';
+import { useTaskManager } from '../../../core/domains/index.ts';
+import {
+    AnalysisBucketFileSubscriber,
+    AnalysisBucketSubscriber,
+    AnalysisNodeEventSubscriber,
+    AnalysisNodeSubscriber,
+    AnalysisPermissionSubscriber,
+    AnalysisSubscriber,
+    MasterImageGroupSubscriber,
+    MasterImageSubscriber,
+    NodeSubscriber,
+    ProjectNodeSubscriber,
+    ProjectSubscriber,
+    RegistryProjectSubscriber,
+    RegistrySubscriber,
+} from '../../../adapters/database/subscribers/index.ts';
+import { useAnalysisMetadataComponentCaller } from '../../components/index.ts';
+import { NodeClientService } from '../../services/node-client/module.ts';
 import { DataSourceOptionsBuilder } from './options.ts';
 import { setDataSourceSync } from './singleton.ts';
 import { DatabaseInjectionKey } from './constants.ts';
@@ -42,6 +61,10 @@ export class DatabaseModule implements IModule {
 
         const { DataSource: DS } = await import('typeorm');
         const dataSource = new DS(options);
+
+        // Instantiate subscribers with DI dependencies
+        this.registerSubscribers(dataSource);
+
         await dataSource.initialize();
 
         try {
@@ -66,5 +89,53 @@ export class DatabaseModule implements IModule {
         if (result.success && result.data.isInitialized) {
             await result.data.destroy();
         }
+    }
+
+    private registerSubscribers(dataSource: any): void {
+        // Resolve optional dependencies for subscribers
+        let metadataCaller: any;
+        try {
+            metadataCaller = useAnalysisMetadataComponentCaller();
+        } catch {
+            // not available (e.g. in tests)
+        }
+
+        let nodeClientService: NodeClientService | undefined;
+        try {
+            nodeClientService = new NodeClientService();
+        } catch {
+            // not available if authup not configured
+        }
+
+        let taskManager: any;
+        try {
+            taskManager = useTaskManager();
+        } catch {
+            // not available
+        }
+
+        // Push pre-instantiated subscribers
+        dataSource.subscribers.push(
+            // Subscribers with dependencies
+            new NodeSubscriber({ nodeClientService }),
+            new AnalysisSubscriber({
+                metadataCaller,
+                bucketCaller: new BucketComponentCaller(),
+                taskManager,
+            }),
+            new AnalysisBucketFileSubscriber({ metadataCaller }),
+            new AnalysisNodeSubscriber({ metadataCaller }),
+
+            // Simple subscribers (no custom dependencies)
+            new AnalysisBucketSubscriber(),
+            new AnalysisNodeEventSubscriber(),
+            new AnalysisPermissionSubscriber(),
+            new MasterImageSubscriber(),
+            new MasterImageGroupSubscriber(),
+            new ProjectSubscriber(),
+            new ProjectNodeSubscriber(),
+            new RegistrySubscriber(),
+            new RegistryProjectSubscriber(),
+        );
     }
 }

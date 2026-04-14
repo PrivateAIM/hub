@@ -8,7 +8,7 @@
 import type {
     EntitySubscriberInterface,
 } from 'typeorm';
-import { EventSubscriber } from 'typeorm';
+
 import {
     DomainType,
 } from '@privateaim/core-kit';
@@ -17,7 +17,6 @@ import type { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
 import { AnalysisBucketEntity } from '../entities/analysis-bucket.ts';
 
-@EventSubscriber()
 export class AnalysisBucketSubscriber extends BaseSubscriber<
     AnalysisBucketEntity
 > implements EntitySubscriberInterface<AnalysisBucketEntity> {

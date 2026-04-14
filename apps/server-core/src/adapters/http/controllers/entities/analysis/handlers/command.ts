@@ -14,11 +14,14 @@ import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useEnv } from '../../../../../../app/modules/config/index.ts';
-import { AnalysisBucketEntity, AnalysisEntity } from '../../../../../database/index.ts';
-import { AnalysisBuilder } from '../../../../../../core/services/analysis-builder/index.ts';
-import { AnalysisConfigurator } from '../../../../../../core/services/analysis-configurator/index.ts';
-import { AnalysisDistributor } from '../../../../../../core/services/analysis-distributor/index.ts';
-import { AnalysisStorageManager } from '../../../../../../core/services/analysis-storage-manager/index.ts';
+import { AnalysisEntity } from '../../../../../../adapters/database/index.ts';
+import { buildActorContext } from '../../../../request/index.ts';
+import {
+    createAnalysisBuilder,
+    createAnalysisConfigurator,
+    createAnalysisDistributor,
+    createAnalysisStorageManagerFromDataSource,
+} from '../../../../../../app/services/analysis-command/module.ts';
 import { AnalysisCommandValidator } from '../utils/index.ts';
 
 /**
@@ -51,16 +54,13 @@ export async function handleAnalysisCommandRouteHandler(req: Request, res: Respo
         throw new ForbiddenError();
     }
     const ignoreApproval = useEnv('skipAnalysisApproval');
+    const actor = buildActorContext(req);
+    const persistCtx = { data: actor.metadata };
 
-    const distributor = new AnalysisDistributor();
-    const builder = new AnalysisBuilder();
-    const configurator = new AnalysisConfigurator();
-
-    const bucketRepository = dataSource.getRepository(AnalysisBucketEntity);
-    const analysisStorageManager = new AnalysisStorageManager({
-        repository,
-        bucketRepository,
-    });
+    const distributor = createAnalysisDistributor();
+    const builder = createAnalysisBuilder();
+    const configurator = createAnalysisConfigurator();
+    const analysisStorageManager = createAnalysisStorageManagerFromDataSource();
 
     switch (data.command) {
         // Build
@@ -68,20 +68,20 @@ export async function handleAnalysisCommandRouteHandler(req: Request, res: Respo
             entity = await builder.check(entity);
             break;
         case AnalysisCommand.BUILD_START:
-            entity = await builder.start(entity, req);
+            entity = await builder.start(entity, persistCtx);
             break;
 
         // Configuration
         case AnalysisCommand.CONFIGURATION_LOCK:
             entity = await configurator.lock(entity, {
                 ignoreApproval,
-                request: req,
+                persistCtx,
             });
             break;
         case AnalysisCommand.CONFIGURATION_UNLOCK:
             entity = await configurator.unlock(entity, {
                 ignoreApproval,
-                request: req,
+                persistCtx,
             });
             break;
 
@@ -90,7 +90,7 @@ export async function handleAnalysisCommandRouteHandler(req: Request, res: Respo
             entity = await distributor.check(entity);
             break;
         case AnalysisCommand.DISTRIBUTION_START:
-            entity = await distributor.start(entity, req);
+            entity = await distributor.start(entity, persistCtx);
             break;
 
             // Storage

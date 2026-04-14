@@ -8,7 +8,7 @@
 import type {
     EntitySubscriberInterface,
 } from 'typeorm';
-import { EventSubscriber } from 'typeorm';
+
 import {
     DomainType,
 } from '@privateaim/core-kit';
@@ -16,7 +16,6 @@ import { BaseSubscriber } from '@privateaim/server-db-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
 import { MasterImageGroupEntity } from '../entities/master-image-group.ts';
 
-@EventSubscriber()
 export class MasterImageGroupSubscriber extends BaseSubscriber<
     MasterImageGroupEntity
 > implements EntitySubscriberInterface<MasterImageGroupEntity> {

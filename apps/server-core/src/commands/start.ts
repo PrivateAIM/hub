@@ -18,7 +18,8 @@ import {
     getWritableDirPath,
     useEnv,
 } from '../app/modules/config/index.ts';
-import { setupAuthupService, setupHarborService } from '../core/index.ts';
+import { setupAuthupService } from '../core/index.ts';
+import { setupHarborService } from '../core/harbor/module.ts';
 import { DatabaseIntegrityService } from '../app/services/database-integrity/index.ts';
 
 export async function startCommand() {
@@ -57,9 +58,16 @@ export async function startCommand() {
     await setupAuthupService();
     logger.debug('Executed authup service setup.');
 
-    logger.debug('Executing harbor service setup...');
-    await setupHarborService();
-    logger.debug('Executed harbor service setup.');
+    const harborURL = useEnv('harborURL');
+    if (harborURL) {
+        logger.debug('Executing harbor service setup...');
+        const registryRepository = app.container.resolve(DatabaseInjectionKey.RegistryRepository);
+        await setupHarborService({
+            harborURL,
+            registryRepository,
+        });
+        logger.debug('Executed harbor service setup.');
+    }
 
     // HTTP server is created and registered by HTTPModule
     const httpServer = app.container.resolve(HTTPInjectionKey.Server);

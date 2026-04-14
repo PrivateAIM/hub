@@ -6,26 +6,58 @@
  */
 
 import type {
-    EntitySubscriberInterface, 
-    InsertEvent, 
-    RemoveEvent, 
-    UpdateEvent,
+    EntitySubscriberInterface,
+    InsertEvent,
+    RemoveEvent,
+    Repository, 
+    UpdateEvent, 
 } from 'typeorm';
-import { EventSubscriber } from 'typeorm';
+import type { Analysis, AnalysisBucket } from '@privateaim/core-kit';
 import { DomainType } from '@privateaim/core-kit';
 import { BaseSubscriber } from '@privateaim/server-db-kit';
 import type { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
-import { AnalysisMetadataCommand, useAnalysisMetadataComponentCaller } from '../../../app/components/index.ts';
+import type { IEntityRepository } from '../../../core/entities/types.ts';
+import { AnalysisMetadataCommand } from '../../../app/components/index.ts';
 import { AnalysisStorageManager } from '../../../core/services/analysis-storage-manager/index.ts';
+import type { IBucketCaller, ITaskManager } from '../../../core/services/types.ts';
 import { AnalysisBucketEntity } from '../entities/analysis-bucket.ts';
 import { AnalysisEntity } from '../entities/analysis.ts';
 
-@EventSubscriber()
+type AnalysisMetadataCaller = {
+    call(command: string, data: Record<string, any>, meta: Record<string, any>): Promise<void>;
+};
+
+type AnalysisSubscriberContext = {
+    metadataCaller?: AnalysisMetadataCaller;
+    bucketCaller?: IBucketCaller;
+    taskManager?: ITaskManager;
+};
+
+function wrapRepo<T>(repo: Repository<T>): IEntityRepository<T> {
+    return {
+        findMany: () => { throw new Error('Not implemented'); },
+        findOneById: (id: string) => repo.findOneBy({ id } as any),
+        findOneBy: (where: Record<string, any>) => repo.findOneBy(where as any),
+        findManyBy: (where: Record<string, any>) => repo.findBy(where as any),
+        create: (data: Partial<T>) => repo.create(data as any) as T,
+        merge: (entity: T, data: Partial<T>) => repo.merge(entity as any, data as any) as T,
+        save: (entity: T, ctx?: any) => repo.save(entity as any, ctx) as Promise<T>,
+        remove: async (entity: T, ctx?: any) => { await repo.remove(entity as any, ctx); },
+        validateJoinColumns: () => Promise.resolve(),
+    };
+}
+
 export class AnalysisSubscriber extends BaseSubscriber<
     AnalysisEntity
 > implements EntitySubscriberInterface<AnalysisEntity> {
-    constructor() {
+    protected metadataCaller?: AnalysisMetadataCaller;
+
+    protected bucketCaller?: IBucketCaller;
+
+    protected taskManager?: ITaskManager;
+
+    constructor(ctx?: AnalysisSubscriberContext) {
         super({
             refType: DomainType.ANALYSIS,
             destinations: (data) => {
@@ -56,46 +88,44 @@ export class AnalysisSubscriber extends BaseSubscriber<
                 return destinations;
             },
         });
+
+        this.metadataCaller = ctx?.metadataCaller;
+        this.bucketCaller = ctx?.bucketCaller;
+        this.taskManager = ctx?.taskManager;
     }
 
     async afterInsert(event: InsertEvent<AnalysisEntity>): Promise<any> {
         await super.afterInsert(event);
 
-        const analysisStorageManager = new AnalysisStorageManager({
-            repository: event.manager.getRepository(AnalysisEntity),
-            bucketRepository: event.manager.getRepository(AnalysisBucketEntity),
-        });
-
-        await analysisStorageManager.check(event.entity);
+        const storageManager = this.createStorageManager(event.manager);
+        if (storageManager) {
+            await storageManager.check(event.entity);
+        }
     }
 
     async beforeRemove(event: RemoveEvent<AnalysisEntity>): Promise<any> {
         await super.beforeRemove(event);
 
-        const analysisStorageManager = new AnalysisStorageManager({
-            repository: event.manager.getRepository(AnalysisEntity),
-            bucketRepository: event.manager.getRepository(AnalysisBucketEntity),
-        });
-
-        await analysisStorageManager.remove(event.entity);
+        const storageManager = this.createStorageManager(event.manager);
+        if (storageManager) {
+            await storageManager.remove(event.entity);
+        }
     }
 
     async afterUpdate(event: UpdateEvent<AnalysisEntity>): Promise<any> {
         await super.afterUpdate(event);
 
-        const analysisId = event.entity?.id ??
-            event.databaseEntity?.id;
-        if (!analysisId) {
+        const analysisId = event.entity?.id ?? event.databaseEntity?.id;
+        if (!analysisId || !this.metadataCaller) {
             return;
         }
 
-        const caller = useAnalysisMetadataComponentCaller();
-        await caller.call(
+        await this.metadataCaller.call(
             AnalysisMetadataCommand.RECALC,
             {
-                analysisId,
-                queryNodes: false,
-                queryFiles: false,
+                analysisId, 
+                queryNodes: false, 
+                queryFiles: false, 
             },
             { entityManager: event.manager },
         );
@@ -103,5 +133,16 @@ export class AnalysisSubscriber extends BaseSubscriber<
 
     listenTo() {
         return AnalysisEntity;
+    }
+
+    private createStorageManager(manager: any): AnalysisStorageManager | null {
+        if (!this.bucketCaller || !this.taskManager) return null;
+
+        return new AnalysisStorageManager({
+            repository: wrapRepo<Analysis>(manager.getRepository(AnalysisEntity)),
+            bucketRepository: wrapRepo<AnalysisBucket>(manager.getRepository(AnalysisBucketEntity)),
+            caller: this.bucketCaller,
+            taskManager: this.taskManager,
+        });
     }
 }

@@ -40,6 +40,32 @@ export default defineConfig({
 
 Test files live in `test/unit/` and use the `.spec.ts` extension.
 
+## Test Suite Pattern (server-core)
+
+The test suite uses the DI module system. The `TestSuite` class:
+
+1. Sets up shared modules (logger) via `BaseApplicationBuilder`
+2. Creates its own `TestDatabase` (manages DataSource lifecycle)
+3. Registers `ConfigInjectionKey`, `DataSource`, and all repositories in a `Container`
+4. Uses `HTTPModule({ skipServer: true })` to wire controllers via DI
+5. Creates a test HTTP server from the router
+
+```typescript
+// test/utils/suite.ts
+const container = new Container();
+container.register(ConfigInjectionKey, { useValue: config });
+container.register(DatabaseInjectionKey.DataSource, { useValue: dataSource });
+registerRepositories(container, dataSource);
+
+const httpModule = new HTTPModule({ skipServer: true });
+await httpModule.setup(container);
+
+const router = container.resolve(HTTPInjectionKey.Router);
+const server = createServer(createNodeDispatcher(router));
+```
+
+This ensures tests exercise the same DI wiring as production.
+
 ## Database Testing
 
 Tests run against real databases (not mocks). The CI matrix tests three backends:
@@ -57,6 +83,30 @@ docker-compose up -d    # Start MySQL (3306) + Postgres (5432)
 npm run test:mysql
 npm run test:psql
 ```
+
+## Service-Level Tests (TODO)
+
+Following authup's pattern, service-level tests should use fake repositories:
+
+```typescript
+// test/unit/core/helpers/fake-repository.ts
+export class FakeEntityRepository<T> implements IEntityRepository<T> {
+    private store: T[] = [];
+    // In-memory implementation of all IEntityRepository methods
+}
+
+// test/unit/core/helpers/mock-actor.ts
+export function createAllowAllActor(): ActorContext { ... }
+export function createDenyAllActor(): ActorContext { ... }
+
+// test/unit/core/entities/node/service.spec.ts
+const repository = new FakeEntityRepository<Node>();
+const service = new NodeService({ repository });
+const actor = createAllowAllActor();
+const node = await service.create({ name: 'test' }, actor);
+```
+
+This allows testing business logic without a database.
 
 ## CI Pipeline
 
@@ -84,5 +134,7 @@ GitHub Actions (`.github/workflows/main.yml`) runs:
 
 - Place test files in `test/unit/**/*.spec.ts`
 - Use `@faker-js/faker` for test data generation
-- Tests interact with real databases — ensure docker-compose services are running for MySQL/Postgres tests
+- HTTP integration tests: use `TestSuite` which wires controllers via DI modules
+- Service-level tests (TODO): use `FakeEntityRepository` and mock actors
 - SQLite tests use in-memory databases and need no external services
+- MySQL/Postgres tests need docker-compose services running

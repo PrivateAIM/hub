@@ -8,25 +8,23 @@
 import {
     DomainType,
 } from '@privateaim/core-kit';
-import type { 
-    EntityManager, 
-    EntitySubscriberInterface, 
-    InsertEvent, 
-    RemoveEvent, 
-    UpdateEvent, 
-} from 'typeorm';
-import {
-    EventSubscriber,
+import type {
+    EntityManager,
+    EntitySubscriberInterface,
+    InsertEvent,
+    RemoveEvent,
+    UpdateEvent,
 } from 'typeorm';
 import { BaseSubscriber } from '@privateaim/server-db-kit';
 import type { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
 import { NodeEntity } from '../entities/node.ts';
-import { isNodeClientServiceUsable, useNodeClientService } from '../../../app/services/node-client/index.ts';
+import type { NodeClientService } from '../../../app/services/node-client/index.ts';
 
-@EventSubscriber()
 export class NodeSubscriber extends BaseSubscriber<NodeEntity> implements EntitySubscriberInterface<NodeEntity> {
-    constructor() {
+    protected nodeClientService?: NodeClientService;
+
+    constructor(ctx?: { nodeClientService?: NodeClientService }) {
         super({
             refType: DomainType.NODE,
             destinations: (data) => {
@@ -57,6 +55,8 @@ export class NodeSubscriber extends BaseSubscriber<NodeEntity> implements Entity
                 return destinations;
             },
         });
+
+        this.nodeClientService = ctx?.nodeClientService;
     }
 
     async afterInsert(event: InsertEvent<NodeEntity>): Promise<any> {
@@ -78,25 +78,23 @@ export class NodeSubscriber extends BaseSubscriber<NodeEntity> implements Entity
     }
 
     async afterRemove(event: RemoveEvent<NodeEntity>): Promise<any> {
-        if (!isNodeClientServiceUsable()) return;
+        if (!this.nodeClientService) return;
 
-        const nodeClientService = useNodeClientService();
-        await nodeClientService.dismiss(event.entity || event.databaseEntity);
+        await this.nodeClientService.dismiss(event.entity || event.databaseEntity);
     }
 
-    protected async assignClient(entity: NodeEntity, manager: EntityManager) : Promise<void> {
-        if (!isNodeClientServiceUsable()) return;
+    protected async assignClient(entity: NodeEntity, manager: EntityManager): Promise<void> {
+        if (!this.nodeClientService) return;
 
-        const nodeClientService = useNodeClientService();
         const prevId = entity.client_id;
 
-        const client = await nodeClientService.assign(entity);
+        const client = await this.nodeClientService.assign(entity);
         if (client.id !== prevId) {
             const repository = manager.getRepository(NodeEntity);
             await repository.save(entity);
         }
 
-        await nodeClientService.assignPermissions(client);
+        await this.nodeClientService.assignPermissions(client);
     }
 
     listenTo(): CallableFunction | string {

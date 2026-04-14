@@ -8,7 +8,7 @@
 import type {
     EntitySubscriberInterface,
 } from 'typeorm';
-import { EventSubscriber } from 'typeorm';
+
 import {
     DomainType,
 } from '@privateaim/core-kit';
@@ -17,7 +17,6 @@ import type { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
 import { RegistryEntity } from '../entities/registry.ts';
 
-@EventSubscriber()
 export class RegistrySubscriber extends BaseSubscriber<
     RegistryEntity
 > implements EntitySubscriberInterface<RegistryEntity> {

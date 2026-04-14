@@ -6,46 +6,35 @@
  */
 
 import { NotFoundError } from '@ebec/http';
-import {
-    AnalysisConfiguratorCommandChecker, 
-    NodeType,
-} from '@privateaim/core-kit';
-import type { Repository } from 'typeorm';
-import type { AnalysisMetadataComponentCaller } from '../../../app/components/index.ts';
-import { useAnalysisMetadataComponentCaller } from '../../../app/components/index.ts';
-import { AnalysisEntity, AnalysisNodeEntity } from '../../../adapters/database/index.ts';
-import { useDataSourceSync } from '../../../app/modules/database/index.ts';
-import { RequestRepositoryAdapter } from '../../../adapters/http/request/index.ts';
+import type { Analysis, AnalysisNode } from '@privateaim/core-kit';
+import { AnalysisConfiguratorCommandChecker, NodeType } from '@privateaim/core-kit';
+import type { IEntityRepository } from '../../entities/types.ts';
+import type { IAnalysisMetadataCaller } from '../types.ts';
 import type { AnalysisConfiguratorLockOptions, AnalysisConfiguratorUnlockOptions } from './types.ts';
 
+type AnalysisConfiguratorContext = {
+    repository: IEntityRepository<Analysis>;
+    analysisNodeRepository: IEntityRepository<AnalysisNode>;
+    metadataCaller: IAnalysisMetadataCaller;
+};
+
 export class AnalysisConfigurator {
-    protected repository : Repository<AnalysisEntity>;
+    protected repository: IEntityRepository<Analysis>;
 
-    protected analysisNodeRepository: Repository<AnalysisNodeEntity>;
+    protected analysisNodeRepository: IEntityRepository<AnalysisNode>;
 
-    protected metadataCaller : AnalysisMetadataComponentCaller;
+    protected metadataCaller: IAnalysisMetadataCaller;
 
-    constructor() {
-        const dataSource = useDataSourceSync();
-
-        this.repository = dataSource.getRepository(AnalysisEntity);
-        this.analysisNodeRepository = dataSource.getRepository(AnalysisNodeEntity);
-        this.metadataCaller = useAnalysisMetadataComponentCaller();
+    constructor(ctx: AnalysisConfiguratorContext) {
+        this.repository = ctx.repository;
+        this.analysisNodeRepository = ctx.analysisNodeRepository;
+        this.metadataCaller = ctx.metadataCaller;
     }
 
-    // ---------------------------------------------------------------
-
-    /**
-     * Lock the analysis configuration.
-     * The analysis and related resources become immutable and can not be changed.
-     *
-     * @param input
-     * @param options
-     */
     async lock(
-        input: string | AnalysisEntity,
+        input: string | Analysis,
         options: AnalysisConfiguratorLockOptions = {},
-    ): Promise<AnalysisEntity> {
+    ): Promise<Analysis> {
         const entityId = typeof input === 'string' ? input : input.id;
         const entity = await this.metadataCaller.callRecalcDirect({ analysisId: entityId });
 
@@ -53,44 +42,25 @@ export class AnalysisConfigurator {
 
         entity.configuration_locked = true;
 
-        if (options.request) {
-            const requestRepository = new RequestRepositoryAdapter(
-                options.request,
-                this.repository,
-            );
-
-            await requestRepository.save(entity);
-        } else {
-            await this.repository.save(entity);
-        }
+        await this.repository.save(entity, options.persistCtx);
 
         return entity;
     }
 
-    /**
-     * Un the analysis configuration.
-     * The analysis and related resources become mutable and can be changed again.
-     *
-     * @param input
-     * @param options
-     */
     async unlock(
-        input: string | AnalysisEntity,
-        options : AnalysisConfiguratorUnlockOptions = {},
-    ): Promise<AnalysisEntity> {
+        input: string | Analysis,
+        options: AnalysisConfiguratorUnlockOptions = {},
+    ): Promise<Analysis> {
         const entity = await this.resolve(input);
 
         AnalysisConfiguratorCommandChecker.canUnlock(entity);
 
-        const analysisNodes = await this.analysisNodeRepository.find({
-            where: { analysis_id: entity.id },
-            relations: ['node'],
-        });
+        const analysisNodes = await this.analysisNodeRepository.findManyBy({ analysis_id: entity.id });
 
         for (const analysisNode of analysisNodes) {
             if (
-                analysisNode.node &&
-                analysisNode.node.type === NodeType.AGGREGATOR
+                (analysisNode as any).node &&
+                (analysisNode as any).node.type === NodeType.AGGREGATOR
             ) {
                 continue;
             }
@@ -105,32 +75,19 @@ export class AnalysisConfigurator {
         entity.configuration_locked = false;
         entity.build_status = null;
 
-        if (options.request) {
-            const requestRepository = new RequestRepositoryAdapter(
-                options.request,
-                this.repository,
-            );
-
-            await requestRepository.save(entity);
-        } else {
-            await this.repository.save(entity);
-        }
+        await this.repository.save(entity, options.persistCtx);
 
         return entity;
     }
 
-    // ---------------------------------------------------------------
-
-    protected async resolve(input: string | AnalysisEntity) : Promise<AnalysisEntity> {
+    protected async resolve(input: string | Analysis): Promise<Analysis> {
         if (typeof input === 'string') {
-            const entity = await this.repository.findOneBy({ id: input });
+            const entity = await this.repository.findOneById(input);
             if (!entity) {
                 throw new NotFoundError('Analysis could not be found.');
             }
-
             return entity;
         }
-
         return input;
     }
 }
