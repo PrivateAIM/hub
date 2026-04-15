@@ -38,7 +38,12 @@ export async function handleAnalysisDistributorEvent(
         }
         case AnalysisDistributorEvent.EXECUTION_PROGRESS: {
             const temp = value as AnalysisDistributorExecutionProgressPayload;
-            entity.distribution_progress = temp.progress.percent;
+            if (
+                !entity.distribution_progress ||
+                temp.progress.percent >= entity.distribution_progress
+            ) {
+                entity.distribution_progress = temp.progress.percent;
+            }
             break;
         }
         case AnalysisDistributorEvent.CHECK_FAILED:
@@ -48,10 +53,16 @@ export async function handleAnalysisDistributorEvent(
         }
         case AnalysisDistributorEvent.EXECUTION_FINISHED: {
             entity.distribution_status = ProcessStatus.EXECUTED;
+            entity.distribution_progress = 100;
             break;
         }
         case AnalysisDistributorEvent.CHECK_FINISHED: {
             const temp = value as AnalysisDistributorCheckFinishedPayload;
+            if (temp.status) {
+                entity.distribution_progress = temp.status === ProcessStatus.EXECUTED ?
+                    100 :
+                    0;
+            }
 
             entity.distribution_status = temp.status || null;
         }

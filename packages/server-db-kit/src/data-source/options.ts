@@ -21,11 +21,14 @@ export class DataSourceOptionsBuilder {
 
     protected subscribers : DataSourceOptionsSubscribers;
 
+    protected migrationDirectory: string;
+
     // ------------------------------------------------------------------
 
     constructor() {
         this.entities = [];
         this.subscribers = [];
+        this.migrationDirectory = 'src/database/migrations';
     }
 
     // ------------------------------------------------------------------
@@ -52,6 +55,10 @@ export class DataSourceOptionsBuilder {
 
     setSubscribers(subscribers: DataSourceOptionsSubscribers) {
         this.subscribers = subscribers;
+    }
+
+    setMigrationDirectory(directory: string) {
+        this.migrationDirectory = directory;
     }
 
     // ------------------------------------------------------------------
@@ -81,7 +88,7 @@ export class DataSourceOptionsBuilder {
         };
 
         if (options.type === 'mysql' || options.type === 'postgres') {
-            let migrationPath = `src/database/migrations/${options.type}/*.{ts,js}`;
+            let migrationPath = `${this.migrationDirectory}/${options.type}/*.{ts,js}`;
             if (!isCodeTransformation(CodeTransformation.JUST_IN_TIME)) {
                 migrationPath = transformFilePath(migrationPath, './dist', './src');
             }

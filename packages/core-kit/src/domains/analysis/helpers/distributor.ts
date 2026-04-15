@@ -16,8 +16,15 @@ export class AnalysisDistributorCommandChecker {
      * @param entity
      */
     static canStart(entity: Analysis) {
-        if (!entity.build_status || entity.build_status !== ProcessStatus.EXECUTED) {
+        if (
+            !entity.build_status ||
+            entity.build_status !== ProcessStatus.EXECUTED
+        ) {
             throw new AnalysisError('The analysis is not built yet.');
+        }
+
+        if (entity.distribution_status === ProcessStatus.EXECUTED) {
+            throw new AnalysisError('The analysis is already distributed.');
         }
     }
 

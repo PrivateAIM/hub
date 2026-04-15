@@ -40,7 +40,12 @@ export async function handleAnalysisBuilderEvent(
         }
         case AnalysisBuilderEvent.EXECUTION_PROGRESS: {
             const temp = value as AnalysisBuilderExecutionProgressPayload;
-            entity.build_progress = temp.progress.percent;
+            if (
+                !entity.build_progress ||
+                temp.progress.percent >= entity.build_progress
+            ) {
+                entity.build_progress = temp.progress.percent;
+            }
             break;
         }
         case AnalysisBuilderEvent.CHECK_FAILED:
@@ -55,10 +60,16 @@ export async function handleAnalysisBuilderEvent(
             entity.build_os = temp.os ?? null;
             entity.build_size = temp.size ?? null;
             entity.build_status = ProcessStatus.EXECUTED;
+            entity.build_progress = 100;
             break;
         }
         case AnalysisBuilderEvent.CHECK_FINISHED: {
             const temp = value as AnalysisBuilderCheckFinishedPayload;
+            if (temp.status) {
+                entity.build_progress = temp.status === ProcessStatus.EXECUTED ?
+                    100 :
+                    0;
+            }
 
             entity.build_hash = temp.hash ?? null;
             entity.build_os = temp.os ?? null;
