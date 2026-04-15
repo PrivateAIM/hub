@@ -36,11 +36,18 @@ export async function handleMasterImageBuilderEvent(
     switch (context.key) {
         case MasterImageBuilderEvent.EXECUTION_STARTED: {
             entity.build_status = ProcessStatus.STARTED;
+            entity.build_progress = 0;
             break;
         }
         case MasterImageBuilderEvent.EXECUTION_PROGRESS: {
             const temp = value as MasterImageBuilderExecutionProgressPayload;
-            entity.build_progress = temp.progress.percent;
+
+            if (
+                !entity.build_progress ||
+                temp.progress.percent > entity.build_progress
+            ) {
+                entity.build_progress = temp.progress.percent;
+            }
             break;
         }
         case MasterImageBuilderEvent.EXECUTION_FAILED: {
@@ -49,6 +56,7 @@ export async function handleMasterImageBuilderEvent(
         }
         case MasterImageBuilderEvent.EXECUTION_FINISHED: {
             entity.build_status = ProcessStatus.EXECUTED;
+            entity.build_progress = 100;
         }
     }
 

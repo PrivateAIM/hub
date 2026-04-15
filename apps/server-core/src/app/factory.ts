@@ -26,7 +26,7 @@ import { AnalysisModule } from './modules/analysis/index.ts';
 import { ComponentsModule } from './modules/components/index.ts';
 import { HarborModule } from './modules/harbor/index.ts';
 import { SwaggerModule } from './modules/swagger/index.ts';
-import { AuthupSetupModule } from './modules/authup-setup/index.ts';
+import { AuthupModule } from './modules/authup/index.ts';
 import { TelemetryClientModule } from './modules/telemetry-client/index.ts';
 
 export function createApplication() {
@@ -47,7 +47,7 @@ export function createApplication() {
                 realm: env.realm,
             }),
         });
-        builder.withAuthup({ baseURL: env.authupURL });
+        builder.withAuthupClient({ baseURL: env.authupURL });
     }
 
     builder.withEntityEvent({
@@ -98,7 +98,7 @@ export function createApplication() {
     app.addModule(new ComponentsModule());
     app.addModule(new AnalysisModule());
     app.addModule(new AggregatorsModule());
-    app.addModule(new AuthupSetupModule());
+    app.addModule(new AuthupModule());
 
     return app;
 }

@@ -25,6 +25,8 @@ export class DataSourceOptionsBuilder extends BaseBuilder {
     constructor() {
         super();
 
+        this.setMigrationDirectory('src/adapters/database/migrations');
+
         this.setEntities([
             MasterImageEntity,
             MasterImageGroupEntity,

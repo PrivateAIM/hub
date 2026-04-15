@@ -41,7 +41,7 @@ export function createApplication() {
                 realm: env.realm,
             }),
         });
-        builder.withAuthup({ baseURL: env.authupURL });
+        builder.withAuthupClient({ baseURL: env.authupURL });
     }
 
     builder.withEntityEvent({

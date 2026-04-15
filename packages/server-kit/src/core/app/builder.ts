@@ -53,7 +53,7 @@ export class BaseApplicationBuilder {
         return this;
     }
 
-    withAuthup(options: AuthupClientModuleOptions | false): this {
+    withAuthupClient(options: AuthupClientModuleOptions | false): this {
         if (options !== false) {
             this.modules.push(new AuthupClientModule(options));
         }

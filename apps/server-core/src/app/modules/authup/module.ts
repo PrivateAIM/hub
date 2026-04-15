@@ -15,20 +15,15 @@ import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
 import {
     AuthupClientInjectionKey,
-    isAuthupClientUsable,
     useLogger,
 } from '@privateaim/server-kit';
 
-export class AuthupSetupModule implements IModule {
-    readonly name = 'authupSetup';
+export class AuthupModule implements IModule {
+    readonly name = 'authup';
 
     readonly dependencies: string[] = [];
 
     async setup(container: IContainer): Promise<void> {
-        if (!isAuthupClientUsable()) {
-            return;
-        }
-
         const authupResult = container.tryResolve(AuthupClientInjectionKey);
         if (!authupResult.success) {
             return;
