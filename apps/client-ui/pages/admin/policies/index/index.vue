@@ -117,7 +117,7 @@ export default defineComponent({
                 </template>
                 <template #cell(options)="data">
                     <NuxtLink
-                        :to="'/policies/'+ data.item.id"
+                        :to="'/admin/policies/'+ data.item.id"
                         class="btn btn-xs btn-outline-primary me-1"
                         :disabled="!hasEditPermission"
                     >

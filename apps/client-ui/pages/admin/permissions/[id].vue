@@ -12,17 +12,11 @@ import { PermissionName } from '@authup/core-kit';
 
 import { defineComponent, ref } from 'vue';
 import type { Ref } from 'vue';
-import {
-    definePageMeta,
-    updateObjectProperties,
-    useToast,
-} from '#imports';
-import {
-    createError, 
-    navigateTo, 
-    useRoute,
-} from '#app';
-import { LayoutKey, LayoutNavigationID } from '~/config/layout';
+import { useRoute } from 'vue-router';
+import { createError, definePageMeta, navigateTo } from '#imports';
+import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
+import { useToast } from '../../../composables/toast';
+import { updateObjectProperties } from '../../../utils';
 
 export default defineComponent({
     async setup() {
@@ -36,23 +30,28 @@ export default defineComponent({
 
         const items = [
             {
-                name: 'General', 
-                icon: 'fas fa-bars', 
+                name: 'General',
+                icon: 'fas fa-bars',
                 path: '',
             },
             {
-                name: 'Users', 
-                icon: 'fas fa-user', 
+                name: 'Policies',
+                icon: 'fas fa-shield-halved',
+                path: 'policies',
+            },
+            {
+                name: 'Users',
+                icon: 'fas fa-user',
                 path: 'users',
             },
             {
-                name: 'Robots', 
-                icon: 'fas fa-robot', 
+                name: 'Robots',
+                icon: 'fas fa-robot',
                 path: 'robots',
             },
             {
-                name: 'Roles', 
-                icon: 'fas fa-user-group', 
+                name: 'Roles',
+                icon: 'fas fa-user-group',
                 path: 'roles',
             },
         ];

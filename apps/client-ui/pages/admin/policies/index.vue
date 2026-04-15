@@ -1,13 +1,15 @@
 <script lang="ts">
 import type { Policy } from '@authup/core-kit';
 import { PermissionName as AuthupPermissionName } from '@authup/core-kit';
-import { definePageMeta, useToast } from '#imports';
+import { definePageMeta } from '#imports';
 import { defineNuxtComponent } from '#app';
-import { LayoutKey } from '../../../config/layout';
+import { useToast } from '../../../composables/toast';
+import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 
 export default defineNuxtComponent({
     setup() {
         definePageMeta({
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.REQUIRED_PERMISSIONS]: [
                 AuthupPermissionName.PERMISSION_READ,

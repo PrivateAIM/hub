@@ -4,7 +4,8 @@ import { APolicyForm } from '@authup/client-web-kit';
 import type { Policy } from '@authup/core-kit';
 import { PermissionName } from '@authup/core-kit';
 import type { PropType } from 'vue';
-import { defineNuxtComponent, definePageMeta } from '#imports';
+import { definePageMeta } from '#imports';
+import { defineNuxtComponent } from '#app';
 import { LayoutKey } from '../../../../config/layout';
 
 export default defineNuxtComponent({

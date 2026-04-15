@@ -4,21 +4,16 @@ import type { Policy } from '@authup/core-kit';
 import { PermissionName as AuthupPermissionName } from '@authup/core-kit';
 import { defineComponent, ref } from 'vue';
 import type { Ref } from 'vue';
-import {
-    definePageMeta,
-    updateObjectProperties,
-    useToast,
-} from '#imports';
-import {
-    createError, 
-    navigateTo, 
-    useRoute,
-} from '#app';
-import { LayoutKey } from '../../../config/layout';
+import { useRoute } from 'vue-router';
+import { createError, definePageMeta, navigateTo } from '#imports';
+import { useToast } from '../../../composables/toast';
+import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
+import { updateObjectProperties } from '../../../utils';
 
 export default defineComponent({
     async setup() {
         definePageMeta({
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.REQUIRED_PERMISSIONS]: [
                 AuthupPermissionName.PERMISSION_UPDATE,
@@ -27,9 +22,9 @@ export default defineComponent({
 
         const items = [
             {
-                name: 'General', 
-                icon: 'fas fa-bars', 
-                urlSuffix: '',
+                name: 'General',
+                icon: 'fas fa-bars',
+                path: '',
             },
         ];
 
@@ -43,7 +38,7 @@ export default defineComponent({
                 .policy
                 .getOne(route.params.id as string);
         } catch {
-            await navigateTo({ path: '/policies' });
+            await navigateTo({ path: '/admin/policies' });
             throw createError({});
         }
 
@@ -82,7 +77,7 @@ export default defineComponent({
         <div class="mb-2">
             <DomainEntityNav
                 :items="items"
-                :path="`/policies/${entity.id}`"
+                :path="`/admin/policies/${entity.id}`"
                 :prev-link="true"
             />
         </div>
