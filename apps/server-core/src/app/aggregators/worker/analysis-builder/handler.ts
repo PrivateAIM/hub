@@ -36,6 +36,7 @@ export async function handleAnalysisBuilderEvent(
     switch (context.key) {
         case AnalysisBuilderEvent.EXECUTION_STARTED: {
             entity.build_status = ProcessStatus.STARTED;
+            entity.build_progress = 0;
             break;
         }
         case AnalysisBuilderEvent.EXECUTION_PROGRESS: {

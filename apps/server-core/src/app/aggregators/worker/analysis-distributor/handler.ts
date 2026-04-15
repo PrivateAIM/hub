@@ -34,6 +34,7 @@ export async function handleAnalysisDistributorEvent(
     switch (context.key) {
         case AnalysisDistributorEvent.EXECUTION_STARTED: {
             entity.distribution_status = ProcessStatus.STARTED;
+            entity.distribution_progress = 0;
             break;
         }
         case AnalysisDistributorEvent.EXECUTION_PROGRESS: {
