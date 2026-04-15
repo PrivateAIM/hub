@@ -47,14 +47,14 @@ export class AnalysisMetadataRecalcHandler implements ComponentHandler<
         value: AnalysisMetadataRecalcPayload,
         context: ComponentHandlerContext<AnalysisMetadataEventMap, AnalysisMetadataCommand.RECALC>,
     ): Promise<void> {
-        let entityManger : EntityManager;
+        let entityManager : EntityManager;
         if (context.metadata.entityManager) {
-            entityManger = context.metadata.entityManager;
+            entityManager = context.metadata.entityManager;
         } else {
-            entityManger = this.dataSource.manager;
+            entityManager = this.dataSource.manager;
         }
 
-        const analysisRepository = entityManger.getRepository(AnalysisEntity);
+        const analysisRepository = entityManager.getRepository(AnalysisEntity);
 
         const entity = await analysisRepository.findOneBy({ id: value.analysisId });
 
@@ -71,12 +71,12 @@ export class AnalysisMetadataRecalcHandler implements ComponentHandler<
 
         const queryFiles = value.queryFiles ?? true;
         if (queryFiles) {
-            await this.queryAnalysisFiles(entity, entityManger);
+            await this.queryAnalysisFiles(entity, entityManager);
         }
 
         const queryNodes = value.queryNodes ?? true;
         if (queryNodes) {
-            await this.queryAnalysisNodes(entity, entityManger);
+            await this.queryAnalysisNodes(entity, entityManager);
         }
 
         if (this.hasChanged(cloned, entity)) {
@@ -90,8 +90,8 @@ export class AnalysisMetadataRecalcHandler implements ComponentHandler<
         entity.configuration_image_valid = !!entity.master_image_id;
     }
 
-    async queryAnalysisFiles(entity: AnalysisEntity, entityManger: EntityManager) : Promise<void> {
-        const analysisBuckerFileRepository = entityManger.getRepository(AnalysisBucketFileEntity);
+    async queryAnalysisFiles(entity: AnalysisEntity, entityManager: EntityManager) : Promise<void> {
+        const analysisBuckerFileRepository = entityManager.getRepository(AnalysisBucketFileEntity);
         const rootFile = await analysisBuckerFileRepository.findOne({
             where: {
                 analysis_id: entity.id,
@@ -104,8 +104,8 @@ export class AnalysisMetadataRecalcHandler implements ComponentHandler<
         entity.configuration_entrypoint_valid = !!rootFile;
     }
 
-    async queryAnalysisNodes(entity: AnalysisEntity, entityManger: EntityManager) : Promise<void> {
-        const analysisNodesRepository = entityManger.getRepository(AnalysisNodeEntity);
+    async queryAnalysisNodes(entity: AnalysisEntity, entityManager: EntityManager) : Promise<void> {
+        const analysisNodesRepository = entityManager.getRepository(AnalysisNodeEntity);
         const analysisNodes = await analysisNodesRepository.find({
             where: { analysis_id: entity.id },
             relations: ['node'],

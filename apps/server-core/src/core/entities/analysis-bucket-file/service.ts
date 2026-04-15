@@ -60,8 +60,8 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
         }
 
         // Set analysis_id from the related analysis_bucket
-        if ((validated as any).analysis_bucket?.analysis_id) {
-            validated.analysis_id = (validated as any).analysis_bucket.analysis_id;
+        if (validated.analysis_bucket?.analysis_id) {
+            validated.analysis_id = validated.analysis_bucket.analysis_id;
         }
 
         switch (actor.identity.type) {

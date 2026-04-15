@@ -5,28 +5,38 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Registry } from '@privateaim/core-kit';
+import type { Registry, RegistryProject } from '@privateaim/core-kit';
+import { RegistryAPICommand } from '@privateaim/core-kit';
 import { PermissionName, getHostNameFromString } from '@privateaim/kit';
-import { NotFoundError } from '@ebec/http';
+import { BadRequestError, NotFoundError } from '@ebec/http';
 import type { ActorContext } from '../actor/types.ts';
-import type { EntityRepositoryFindManyResult } from '../types.ts';
+import type { EntityRepositoryFindManyResult, IEntityRepository } from '../types.ts';
 import { AbstractEntityService } from '../service.ts';
+import type { IRegistryCaller } from '../../harbor/types.ts';
 import type { IRegistryRepository, IRegistryService } from './types.ts';
 import { RegistryValidator } from './validator.ts';
 import { ValidatorGroup } from '../constants.ts';
 
 type RegistryServiceContext = {
     repository: IRegistryRepository;
+    registryProjectRepository?: IEntityRepository<RegistryProject>;
+    registryCaller?: IRegistryCaller;
 };
 
 export class RegistryService extends AbstractEntityService implements IRegistryService {
     protected repository: IRegistryRepository;
+
+    protected registryProjectRepository?: IEntityRepository<RegistryProject>;
+
+    protected registryCaller?: IRegistryCaller;
 
     protected validator: RegistryValidator;
 
     constructor(ctx: RegistryServiceContext) {
         super();
         this.repository = ctx.repository;
+        this.registryProjectRepository = ctx.registryProjectRepository;
+        this.registryCaller = ctx.registryCaller;
         this.validator = new RegistryValidator();
     }
 
@@ -94,5 +104,71 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
         entity.id = entityId;
 
         return entity;
+    }
+
+    async executeCommand(
+        command: `${RegistryAPICommand}`,
+        data: { id: string; secret?: string },
+        actor: ActorContext,
+    ): Promise<void> {
+        await actor.permissionChecker.preCheck({ name: PermissionName.REGISTRY_MANAGE });
+
+        if (!this.registryCaller) {
+            throw new BadRequestError('Registry caller is not available.');
+        }
+
+        switch (command) {
+            case RegistryAPICommand.SETUP:
+            case RegistryAPICommand.CLEANUP:
+            case RegistryAPICommand.DELETE: {
+                const entity = await this.repository.findOneWithSecret(data.id);
+                if (!entity) {
+                    throw new NotFoundError();
+                }
+
+                const commandMap: Record<string, string> = {
+                    [RegistryAPICommand.SETUP]: 'SETUP',
+                    [RegistryAPICommand.CLEANUP]: 'CLEANUP',
+                    [RegistryAPICommand.DELETE]: 'DELETE',
+                };
+
+                await this.registryCaller.call(commandMap[command], { id: entity.id }, {});
+                break;
+            }
+            case RegistryAPICommand.PROJECT_LINK:
+            case RegistryAPICommand.PROJECT_UNLINK: {
+                if (!this.registryProjectRepository) {
+                    throw new BadRequestError('Registry project repository is not available.');
+                }
+
+                const entity = await this.registryProjectRepository.findOneBy({ id: data.id });
+                if (!entity) {
+                    throw new NotFoundError();
+                }
+
+                if (command === RegistryAPICommand.PROJECT_LINK) {
+                    await this.registryCaller.call(
+                        'PROJECT_LINK',
+                        { id: entity.id, secret: data.secret },
+                        {},
+                    );
+                } else {
+                    await this.registryCaller.call(
+                        'PROJECT_UNLINK',
+                        {
+                            id: entity.id,
+                            registryId: entity.registry_id,
+                            externalName: entity.external_name,
+                            accountId: entity.account_id,
+                        },
+                        {},
+                    );
+                }
+                break;
+            }
+            default: {
+                throw new BadRequestError(`Unknown command: ${command}`);
+            }
+        }
     }
 }

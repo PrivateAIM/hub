@@ -55,3 +55,4 @@ Modernization and refactoring plans (execute in order):
 3. **[Dependency Injection](.agents/plans/003-dependency-injection.md)** — Replace `singa` singletons with DI container + module system
 4. **[Hexagonal: server-core](.agents/plans/004-hexagonal-server-core.md)** — Core/adapters/app separation for the main service
 5. **[Hexagonal: remaining services](.agents/plans/005-hexagonal-remaining-services.md)** — Apply pattern to storage, telemetry, worker, messenger
+6. **[Service-Level Tests](.agents/plans/006-service-level-tests.md)** — Shared test package + core business logic unit tests

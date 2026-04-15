@@ -180,11 +180,13 @@ export function buildActorContext(req: Request): ActorContext {
 
 ## Domain Events & Messaging
 
-TypeORM subscribers in `adapters/database/subscribers/` publish domain events via the entity event system. Events flow through Redis pub/sub and AMQP (RabbitMQ).
+TypeORM subscribers in `adapters/database/subscribers/` (grouped by domain: `analysis/`, `node/`, `project/`, `registry/`, `master-image/`) publish domain events via the entity event system. Events flow through Redis pub/sub and AMQP (RabbitMQ).
 
-AMQP consumers:
-- **Aggregators** (`app/aggregators/`) — React to events from other services
-- **Components** (`app/components/`) — Process task queues (registry, analysis metadata)
+AMQP consumers are wired via two DI modules:
+- **AggregatorsModule** (`app/modules/aggregators/`) — Starts AMQP event consumers that react to events from other services (builder, distributor, storage, master-image, authup). Aggregator handlers receive `DataSource` and `TaskManager` via constructor DI.
+- **ComponentsModule** (`app/modules/components/`) — Registers `TaskManager`, `RegistryComponentCaller`, `AnalysisMetadataComponentCaller` in the container. Starts task consumer workers (registry, analysis-metadata).
+
+Implementation classes live in `app/aggregators/` and `app/components/`.
 
 ## Authentication — Authup
 

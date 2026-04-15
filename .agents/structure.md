@@ -99,7 +99,12 @@ apps/server-core/src/
 ├── adapters/                      # External system implementations
 │   ├── database/
 │   │   ├── entities/              # TypeORM entity definitions
-│   │   ├── subscribers/           # TypeORM event subscribers
+│   │   ├── subscribers/           # TypeORM event subscribers (domain-grouped)
+│   │   ├── analysis/          # Analysis, bucket, bucket-file, node, permission
+│   │   ├── master-image/      # MasterImage, MasterImageGroup
+│   │   ├── node/              # Node
+│   │   ├── project/           # Project, ProjectNode
+│   │   └── registry/          # Registry, RegistryProject
 │   │   ├── migrations/            # postgres/ and mysql/
 │   │   ├── error/                 # Database error types
 │   │   └── query/                 # Realm query helpers
@@ -116,8 +121,10 @@ apps/server-core/src/
 │   ├── factory.ts                 # createApplication()
 │   ├── modules/
 │   │   ├── analysis/              # AnalysisModule (builder, configurator, distributor, storage)
-│   │   ├── components/            # ComponentsModule (starts aggregators + task consumers)
-│   │   ├── config/                # ConfigModule (env, paths, component config)
+│   │   ├── aggregators/            # AggregatorsModule (starts AMQP event consumers)
+│   │   ├── authup-setup/          # AuthupSetupModule (realm, client, permissions)
+│   │   ├── components/            # ComponentsModule (TaskManager, callers, task consumers)
+│   │   ├── config/                # ConfigModule (env, paths)
 │   │   ├── database/              # DatabaseModule (DataSource, repos, subscribers, node-client)
 │   │   │   ├── repositories/<entity>/  # Repository adapters
 │   │   │   ├── node-client.ts     # NodeClientService (authup integration)

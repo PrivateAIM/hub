@@ -40,31 +40,44 @@ export default defineConfig({
 
 Test files live in `test/unit/` and use the `.spec.ts` extension.
 
-## Test Suite Pattern (server-core)
+## Test Application Pattern (server-core)
 
-The test suite uses the DI module system. The `TestSuite` class:
+Test infrastructure lives in `test/app/`, matching authup's pattern:
 
-1. Sets up shared modules (logger) via `BaseApplicationBuilder`
-2. Creates its own `TestDatabase` (manages DataSource lifecycle)
-3. Registers `ConfigInjectionKey`, `DataSource`, and all repositories in a `Container`
-4. Uses `HTTPModule({ skipServer: true })` to wire controllers via DI
-5. Creates a test HTTP server from the router
+- `test/app/module.ts` — `TestApplication extends Application` with `get dataSource()` accessor
+- `test/app/http.ts` — `TestHTTPApplication extends TestApplication` with `get client` (resolves server from container)
+- `test/app/database.ts` — `createTestDatabaseModule()` for per-test DB, `createTestDatabaseModuleForSetup()` for global setup
+- `test/app/factory.ts` — `createTestApplication()` returns `TestHTTPApplication`, `createTestDatabaseApplication()` returns `TestApplication`
 
 ```typescript
-// test/utils/suite.ts
-const container = new Container();
-container.register(ConfigInjectionKey, { useValue: config });
-container.register(DatabaseInjectionKey.DataSource, { useValue: dataSource });
-registerRepositories(container, dataSource);
-
-const httpModule = new HTTPModule({ skipServer: true });
-await httpModule.setup(container);
-
-const router = container.resolve(HTTPInjectionKey.Router);
-const server = createServer(createNodeDispatcher(router));
+// test/app/factory.ts
+export function createTestApplication(): TestHTTPApplication {
+    process.env.PORT = '0';
+    const modules: IModule[] = [
+        new ConfigModule(),
+        new LoggerModule(),
+        createTestDatabaseModule(),
+        createTestComponentsModule(),
+        new AnalysisModule(),
+        new HTTPModule(),
+    ];
+    return new TestHTTPApplication({ modules });
+}
 ```
 
-This ensures tests exercise the same DI wiring as production.
+HTTP tests use the full DI-wired application — the same modules as production:
+
+```typescript
+const suite = createTestApplication();
+beforeAll(async () => { await suite.setup(); });
+afterAll(async () => { await suite.teardown(); });
+
+it('should create', async () => {
+    const { client } = suite;
+    const result = await client.node.create(createTestNode());
+    expect(result.id).toBeDefined();
+});
+```
 
 ## Database Testing
 
@@ -84,29 +97,33 @@ npm run test:mysql
 npm run test:psql
 ```
 
-## Service-Level Tests (TODO)
+## Service-Level Tests
 
-Following authup's pattern, service-level tests should use fake repositories:
+Test helpers for service-level (core) unit tests are in `test/unit/core/helpers/`:
+
+- `FakeEntityRepository<T>` — In-memory `IEntityRepository<T>` implementation with `seed()`, `getAll()`, `clear()` helpers
+- `createAllowAllActor()` — Mock `ActorContext` that permits all operations
+- `createDenyAllActor()` — Mock `ActorContext` that throws `ForbiddenError`
+- `createMasterRealmActor()` / `createNonMasterRealmActor()` — Realm-specific mock actors
 
 ```typescript
-// test/unit/core/helpers/fake-repository.ts
-export class FakeEntityRepository<T> implements IEntityRepository<T> {
-    private store: T[] = [];
-    // In-memory implementation of all IEntityRepository methods
-}
-
-// test/unit/core/helpers/mock-actor.ts
-export function createAllowAllActor(): ActorContext { ... }
-export function createDenyAllActor(): ActorContext { ... }
-
 // test/unit/core/entities/node/service.spec.ts
 const repository = new FakeEntityRepository<Node>();
-const service = new NodeService({ repository });
-const actor = createAllowAllActor();
-const node = await service.create({ name: 'test' }, actor);
+const service = new NodeService({ repository, registryManager });
+
+it('should create with valid data', async () => {
+    const result = await service.create({ name: 'test' }, createAllowAllActor());
+    expect(result.id).toBeDefined();
+});
+
+it('should deny without permission', async () => {
+    await expect(
+        service.create({ name: 'test' }, createDenyAllActor()),
+    ).rejects.toThrow(ForbiddenError);
+});
 ```
 
-This allows testing business logic without a database.
+Service test files go in `test/unit/core/entities/<entity>/service.spec.ts`. See [Plan 006](.agents/plans/006-service-level-tests.md) for implementation roadmap.
 
 ## CI Pipeline
 

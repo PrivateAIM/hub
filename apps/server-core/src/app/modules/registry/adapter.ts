@@ -49,13 +49,19 @@ export class RegistryManagerAdapter implements IRegistryManager {
     }
 
     async linkProject(id: string): Promise<void> {
-        const caller = this.registryComponentCaller;
-        await caller.call(RegistryCommand.PROJECT_LINK, { id }, {});
+        if (!this.registryComponentCaller) {
+            return;
+        }
+
+        await this.registryComponentCaller.call(RegistryCommand.PROJECT_LINK, { id }, {});
     }
 
     async relinkProject(project: RegistryProject): Promise<void> {
-        const caller = this.registryComponentCaller;
-        await caller.call(
+        if (!this.registryComponentCaller) {
+            return;
+        }
+
+        await this.registryComponentCaller.call(
             RegistryCommand.PROJECT_RELINK,
             {
                 id: project.id,
@@ -68,8 +74,11 @@ export class RegistryManagerAdapter implements IRegistryManager {
     }
 
     async unlinkProject(project: RegistryProject): Promise<void> {
-        const caller = this.registryComponentCaller;
-        await caller.call(
+        if (!this.registryComponentCaller) {
+            return;
+        }
+
+        await this.registryComponentCaller.call(
             RegistryCommand.PROJECT_UNLINK,
             {
                 id: project.id,

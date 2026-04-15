@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Registry } from '@privateaim/core-kit';
+import type { Registry, RegistryAPICommand } from '@privateaim/core-kit';
 import type { ActorContext } from '../actor/types.ts';
 import type { EntityRepositoryFindManyResult, IEntityRepository } from '../types.ts';
 
@@ -19,4 +19,5 @@ export interface IRegistryService {
     create(data: Partial<Registry>, actor: ActorContext): Promise<Registry>;
     update(id: string, data: Partial<Registry>, actor: ActorContext): Promise<Registry>;
     delete(id: string, actor: ActorContext): Promise<Registry>;
+    executeCommand(command: `${RegistryAPICommand}`, data: { id: string; secret?: string }, actor: ActorContext): Promise<void>;
 }

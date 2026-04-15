@@ -22,7 +22,6 @@ import { send, sendAccepted } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { IMasterImageService } from '../../../../../core/index.ts';
 import { buildActorContext } from '../../../request/index.ts';
-import { commandMasterImageRouteHandler } from './handlers/index.ts';
 
 type PartialMasterImage = Partial<MasterImage>;
 
@@ -63,11 +62,14 @@ export class MasterImageController {
     async runCommand(
         @DBody() data: {
             command: MasterImageCommand;
+            id?: string;
         },
         @DRequest() req: any,
         @DResponse() res: any,
     ) {
-        return commandMasterImageRouteHandler(req, res);
+        const actor = buildActorContext(req);
+        const entity = await this.service.executeCommand(data.command, data, actor);
+        return sendAccepted(res, entity);
     }
 
     @DDelete('/:id', [ForceLoggedInMiddleware])

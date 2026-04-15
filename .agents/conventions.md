@@ -121,7 +121,7 @@ src/
 - **Port interfaces** (`core/entities/<name>/types.ts`): `IXRepository extends IEntityRepository<T>`, `IXService`
 - **Business services** (`core/services/`): Accept all dependencies via constructor (repositories, callers, task managers) — never use singletons
 - **Service port interfaces** (`core/services/types.ts`): `IAnalysisBuilderCaller`, `IBucketCaller`, `ITaskManager`, etc.
-- **No TypeORM, no routup, no singa** imports anywhere in `core/`
+- **No TypeORM, no routup** imports anywhere in `core/`. Use container DI via injection keys, never singa singletons.
 
 ### Controller Conventions
 
@@ -176,12 +176,14 @@ app/modules/<name>/
 | Module | Name | Dependencies | Registers |
 |--------|------|-------------|-----------|
 | ConfigModule | `config` | none | `ConfigInjectionKey` (typed env) |
-| DatabaseModule | `database` | none | `DataSource`, 13 repo adapters, `RegistryManager` |
-| AnalysisModule | `analysis` | `database` | `Builder`, `Configurator`, `Distributor`, `StorageManager` |
+| DatabaseModule | `database` | none | `DataSource`, 13 repo adapters, `RegistryManager`, `AnalysisSubscriber` |
+| ComponentsModule | `components` | `database` | `TaskManager`, `RegistryComponentCaller`, `AnalysisMetadataComponentCaller` |
+| AnalysisModule | `analysis` | `database`, `components` | `Builder`, `Configurator`, `Distributor`, `StorageManager` |
 | SwaggerModule | `swagger` | `config` | nothing (generates docs) |
 | HarborModule | `harbor` | `config`, `database` | nothing (sets up registry) |
-| ComponentsModule | `components` | `database` | nothing (starts aggregators/consumers) |
+| AggregatorsModule | `aggregators` | `database`, `components` | nothing (starts AMQP event consumers) |
 | HTTPModule | `http` | `config`, `database`, `analysis` | `Server`, `Router` |
+| AuthupSetupModule | `authupSetup` | none | nothing (provisions realm, clients, permissions) |
 | TelemetryClientModule | `telemetryClient` | (optional) | `TelemetryClient` |
 
 ## Docker

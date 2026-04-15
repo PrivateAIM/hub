@@ -8,67 +8,75 @@
 import type { RegistryAPICommand } from '@privateaim/core-kit';
 import { ServiceID } from '@privateaim/core-kit';
 import {
-    DBody, 
-    DController, 
-    DPost, 
-    DRequest, 
-    DResponse, 
+    DBody,
+    DController,
+    DPost,
+    DRequest,
+    DResponse,
     DTags,
 } from '@routup/decorators';
 
 import { NotFoundError } from '@ebec/http';
 import type { Request, Response } from 'routup';
-import { useRequestParam } from 'routup';
+import { sendAccepted, useRequestParam } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
-import type { RegistryComponentCaller } from '../../../../../app/components/registry/caller/module.ts';
-import type { RegistryHook } from '../../../../../app/components/index.ts';
-import { postHarborHookRouteHandler } from './handlers/registry/hook.ts';
-import { handleRegistryCommandRouteHandler } from './handlers/registry/command.ts';
+import type { IRegistryCaller } from '../../../../../core/harbor/types.ts';
+import type { IRegistryService } from '../../../../../core/index.ts';
+import { buildActorContext } from '../../../request/index.ts';
 
 type ServiceControllerContext = {
-    registryComponentCaller: RegistryComponentCaller;
+    registryService: IRegistryService;
+    registryCaller: IRegistryCaller;
 };
 
 @DTags('extra')
 @DController('/services')
 export class ServiceController {
-    protected registryComponentCaller: RegistryComponentCaller;
+    protected registryService: IRegistryService;
+
+    protected registryCaller: IRegistryCaller;
 
     constructor(ctx: ServiceControllerContext) {
-        this.registryComponentCaller = ctx.registryComponentCaller;
+        this.registryService = ctx.registryService;
+        this.registryCaller = ctx.registryCaller;
     }
 
     @DPost('/:id/hook', [ForceLoggedInMiddleware])
     async handleHarborHook(
         @DRequest() req: Request,
         @DResponse() res: Response,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        @DBody() _harborHook: RegistryHook,
+        @DBody() data: Record<string, any>,
     ) {
         const id = useRequestParam(req, 'id');
 
-        switch (id) {
-            case ServiceID.REGISTRY:
-                return postHarborHookRouteHandler(req, res, this.registryComponentCaller);
+        if (id !== ServiceID.REGISTRY) {
+            throw new NotFoundError();
         }
 
-        throw new NotFoundError();
+        await this.registryCaller.call('HOOK_PROCESS', data, {});
+
+        return sendAccepted(res);
     }
 
     @DPost('/:id/command', [ForceLoggedInMiddleware])
     async execHarborTask(
         @DRequest() req: Request,
         @DResponse() res: Response,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        @DBody() _data: { command: RegistryAPICommand },
+        @DBody() data: {
+            command: RegistryAPICommand; 
+            id: string; 
+            secret?: string 
+        },
     ) {
         const id = useRequestParam(req, 'id');
 
-        switch (id) {
-            case ServiceID.REGISTRY:
-                return handleRegistryCommandRouteHandler(req, res, this.registryComponentCaller);
+        if (id !== ServiceID.REGISTRY) {
+            throw new NotFoundError();
         }
 
-        throw new NotFoundError();
+        const actor = buildActorContext(req);
+        await this.registryService.executeCommand(data.command, data, actor);
+
+        return sendAccepted(res);
     }
 }

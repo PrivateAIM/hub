@@ -7,6 +7,10 @@
 
 import type { IContainer } from 'eldin';
 import {
+    MasterImageBuilderComponentCaller,
+    MasterImageSynchronizerComponentCaller,
+} from '@privateaim/server-core-worker-kit';
+import {
     AnalysisBucketFileService,
     AnalysisBucketService,
     AnalysisNodeEventService,
@@ -59,8 +63,23 @@ export function createControllers(container: IContainer): Record<string, any>[] 
 
     // Create services
     const nodeService = new NodeService({ repository: nodeRepository, registryManager });
-    const registryService = new RegistryService({ repository: registryRepository });
-    const masterImageService = new MasterImageService({ repository: masterImageRepository });
+    const callerResult = container.tryResolve(ComponentsInjectionKey.RegistryComponentCaller);
+    const registryService = new RegistryService({
+        repository: registryRepository,
+        registryProjectRepository,
+        registryCaller: callerResult.success ? callerResult.data : undefined,
+    });
+    const config = container.resolve(ConfigInjectionKey);
+    const masterImageService = new MasterImageService({
+        repository: masterImageRepository,
+        synchronizerCaller: new MasterImageSynchronizerComponentCaller(),
+        builderCaller: new MasterImageBuilderComponentCaller(),
+        masterImagesConfig: {
+            owner: config.masterImagesOwner,
+            repository: config.masterImagesRepository,
+            branch: config.masterImagesBranch,
+        },
+    });
     const masterImageGroupService = new MasterImageGroupService({ repository: masterImageGroupRepository });
     const projectService = new ProjectService({ repository: projectRepository });
     const registryProjectService = new RegistryProjectService({ repository: registryProjectRepository, registryManager });
@@ -97,9 +116,11 @@ export function createControllers(container: IContainer): Record<string, any>[] 
         new AnalysisNodeEventController({ service: analysisNodeEventService }),
     ];
 
-    const callerResult = container.tryResolve(ComponentsInjectionKey.RegistryComponentCaller);
     if (callerResult.success) {
-        controllers.push(new ServiceController({ registryComponentCaller: callerResult.data }));
+        controllers.push(new ServiceController({
+            registryService,
+            registryCaller: callerResult.data,
+        }));
     }
 
     return controllers;
