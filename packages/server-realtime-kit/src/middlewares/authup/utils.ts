@@ -6,7 +6,7 @@
  */
 
 import { PermissionName as AuthupPermissionName, REALM_MASTER_NAME } from '@authup/core-kit';
-import type { PermissionBinding } from '@authup/access';
+import type { PermissionPolicyBinding } from '@authup/access';
 import { PermissionEvaluator, PermissionMemoryProvider } from '@authup/access';
 import type { TokenVerificationData } from '@authup/server-adapter-kit';
 import { PermissionName } from '@privateaim/kit';
@@ -47,7 +47,7 @@ export function applyTokenVerificationData(
     data: TokenVerificationDataMinimal,
     fakeAbilities?: boolean,
 ) {
-    let abilities: PermissionBinding[];
+    let abilities: PermissionPolicyBinding[];
     if (fakeAbilities) {
         abilities = generateAbilityNames().map((name) => ({ permission: { name } }));
     } else {
@@ -67,5 +67,5 @@ export function applyTokenVerificationData(
         realmName: data.realm_name,
     };
 
-    socket.data.permissionChecker = new PermissionEvaluator({ repository: new PermissionMemoryProvider(abilities) });
+    socket.data.permissionChecker = new PermissionEvaluator({ provider: new PermissionMemoryProvider(abilities) });
 }

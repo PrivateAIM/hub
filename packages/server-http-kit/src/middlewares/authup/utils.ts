@@ -56,7 +56,7 @@ export function applyTokenVerificationData(
         })));
     }
 
-    const permissionEvaluator = new PermissionEvaluator({ repository });
+    const permissionEvaluator = new PermissionEvaluator({ provider: repository });
     const requestPermissionChecker = new RequestPermissionChecker(req, permissionEvaluator);
     setRequestEnv(req, 'permissionChecker', requestPermissionChecker);
 

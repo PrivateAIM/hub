@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { IPermissionProvider, PermissionBinding, PermissionGetOptions } from '@authup/access';
+import type { IPermissionProvider, PermissionGetOptions, PermissionPolicyBinding } from '@authup/access';
 
 export class FakePermissionProvider implements IPermissionProvider {
-    async findOne(criteria: PermissionGetOptions): Promise<PermissionBinding | null> {
+    async findOne(criteria: PermissionGetOptions): Promise<PermissionPolicyBinding | null> {
         return {
             permission: {
                 name: criteria.name,
