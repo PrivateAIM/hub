@@ -78,6 +78,8 @@ npm run test          # npx nx run-many -t test
 - `strict: false` (migration to `strict: true` is a future effort)
 - Decorators enabled (`experimentalDecorators`, `emitDecoratorMetadata`) — required for TypeORM entities
 - All packages use `"type": "module"` (ESM-only, no CJS exports)
+- **Naming**: Interfaces always have an `I` prefix (e.g. `IEntityRepository`, `IAnalysisStorageManager`). Types do not (e.g. `ActorContext`, `EntityPersistContext`).
+- **Types/interfaces** always live in `types.ts` in the same directory, never inline in module files
 
 ## Validation
 
@@ -96,6 +98,57 @@ export const analysisSchema = z.object({
 
 Automated via **release-please** (Google) for versioning + **monoship** (`tada5hi/monoship@v2`) for npm publishing. Creates release PRs that bump versions across all packages in lockstep (current: 0.8.31).
 
+## Hexagonal Architecture (server-core)
+
+server-core follows a hexagonal (ports & adapters) architecture matching authup's `apps/server-core/src/` layout:
+
+```
+src/
+├── core/          # Domain logic — zero imports from adapters/, app/, typeorm, routup
+├── adapters/      # External system implementations (database, HTTP, socket)
+└── app/           # Orchestration — DI modules, wiring, factory, infrastructure
+```
+
+### Dependency Rule
+
+**core/ → nothing** (only external domain packages like `@privateaim/core-kit`, `@privateaim/kit`, `@ebec/http`, `@authup/access`)
+**adapters/ → core/ and app/** (implements core ports, may use app singletons)
+**app/ → core/ and adapters/** (wires everything together)
+
+### Core Layer Conventions
+
+- **Entity services** (`core/entities/<name>/service.ts`): Own validation (`this.validator.run(data, { group: ValidatorGroup.CREATE })`), receive repos via constructor injection
+- **Port interfaces** (`core/entities/<name>/types.ts`): `IXRepository extends IEntityRepository<T>`, `IXService`
+- **Business services** (`core/services/`): Accept all dependencies via constructor (repositories, callers, task managers) — never use singletons
+- **Service port interfaces** (`core/services/types.ts`): `IAnalysisBuilderCaller`, `IBucketCaller`, `ITaskManager`, etc.
+- **No TypeORM, no routup** imports anywhere in `core/`. Use container DI via injection keys, never singa singletons.
+
+### Controller Conventions
+
+Controllers are truly thin — only: extract request → build `ActorContext` → delegate to service → send response. **Zero validation, zero business logic.**
+
+```typescript
+@DPost('', [ForceLoggedInMiddleware])
+async add(@DBody() data: any, @DRequest() req: any, @DResponse() res: any) {
+    const actor = buildActorContext(req);
+    const entity = await this.service.create(data, actor);
+    return sendCreated(res, entity);
+}
+```
+
+### Subscriber Conventions
+
+Subscribers are **pre-instantiated** with dependencies in `DatabaseModule.setup()` and pushed onto `dataSource.subscribers`. No `@EventSubscriber()` decorators — no auto-discovery.
+
+```typescript
+// In DatabaseModule.setup():
+dataSource.subscribers.push(
+    new NodeSubscriber({ nodeClientService }),
+    new AnalysisSubscriber({ metadataCaller, bucketCaller, taskManager }),
+    new RegistrySubscriber(), // no custom deps
+);
+```
+
 ## DI Modules
 
 Each DI module (orkos `IModule` implementation) lives in its own directory under `app/modules/<name>/`:
@@ -113,7 +166,25 @@ app/modules/<name>/
 - **Module names** are string constants in `ModuleName` enum (`packages/server-kit/src/services/module-names.ts`)
 - **Shared modules** (logger, redis, amqp, authup, cache, entity-event, queue-router) live in `packages/server-kit/src/services/<name>/`
 - **Per-service modules** (database, minio, victoria-logs, etc.) live in `apps/<service>/src/app/modules/<name>/`
-- Each service has an `app/factory.ts` with `createApplication()` that uses `BaseApplicationBuilder` to compose modules
+- Each service has `app/builder.ts` (`ServiceXApplicationBuilder extends BaseApplicationBuilder`) with `withConfig()`, `withDatabase()`, `withHTTP()`
+- Each service has `app/factory.ts` with `createApplication()` using the builder
+- **`start.ts` should be minimal** — just `createApplication()` + `app.setup()`. All orchestration (DB, HTTP, swagger, harbor, components) happens in modules.
+- **HTTPModule starts the server** — `server.listen()` is inside the module with a Promise, not in `start.ts`. Socket server is toggleable via `options.socket`.
+
+### server-core Module Inventory
+
+| Module | Name | Dependencies | Registers |
+|--------|------|-------------|-----------|
+| ConfigModule | `config` | none | `ConfigInjectionKey` (typed env) |
+| DatabaseModule | `database` | none | `DataSource`, 13 repo adapters, `RegistryManager`, `AnalysisSubscriber` |
+| ComponentsModule | `components` | `database` | `TaskManager`, `RegistryComponentCaller`, `AnalysisMetadataComponentCaller` |
+| AnalysisModule | `analysis` | `database`, `components` | `Builder`, `Configurator`, `Distributor`, `StorageManager` |
+| SwaggerModule | `swagger` | `config` | nothing (generates docs) |
+| HarborModule | `harbor` | `config`, `database` | nothing (sets up registry) |
+| AggregatorsModule | `aggregators` | `database`, `components` | nothing (starts AMQP event consumers) |
+| HTTPModule | `http` | `config`, `database`, `analysis` | `Server`, `Router` |
+| AuthupSetupModule | `authupSetup` | none | nothing (provisions realm, clients, permissions) |
+| TelemetryClientModule | `telemetryClient` | (optional) | `TelemetryClient` |
 
 ## Docker
 

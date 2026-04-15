@@ -6,7 +6,7 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { RegistryHookValidator } from '../../../../src/components';
+import { RegistryHookValidator } from '../../../../src/app/components';
 
 describe('src/components/registry/hook', () => {
     it('should validate hook schema', async () => {

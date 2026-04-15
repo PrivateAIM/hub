@@ -19,27 +19,27 @@ import {
     createTestNode,
     createTestProject,
 } from '../../utils/domains';
-import { createTestSuite } from '../../utils';
+import { createTestApplication } from '../../app';
 
 describe('controllers > analysis-node-log', () => {
-    const suite = createTestSuite();
+    const suite = createTestApplication();
 
     let analysis : Analysis | undefined;
     let node : Node | undefined;
 
     beforeAll(async () => {
-        await suite.up();
+        await suite.setup();
     });
 
     afterAll(async () => {
         analysis = undefined;
         node = undefined;
 
-        await suite.down();
+        await suite.teardown();
     });
 
     it('should create resource', async () => {
-        const client = suite.client();
+        const { client } = suite;
 
         const project = await client.project.create(createTestProject());
         node = await client.node.create(createTestNode());
@@ -71,7 +71,7 @@ describe('controllers > analysis-node-log', () => {
     });
 
     it('should read collection', async () => {
-        const client = suite.client();
+        const { client } = suite;
 
         const response = await client.analysisNodeLog
             .getMany({
@@ -86,7 +86,7 @@ describe('controllers > analysis-node-log', () => {
     });
 
     it('should delete resource', async () => {
-        const client = suite.client();
+        const { client } = suite;
 
         await client.analysisNodeLog.delete({
             filters: {

@@ -6,9 +6,9 @@
  */
 
 export * from './commands/index.ts';
-// export * from './components.ts';
-export * from './config/index.ts';
+// export * from './app/components.ts';
+export * from './app/modules/config/index.ts';
 // export * from './core.ts';
 // export * from './database.ts';
-// export * from './domains.ts';
+// export * from './core/domains.ts';
 // export * from './http.ts';

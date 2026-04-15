@@ -75,23 +75,71 @@ Layer 3 (apps):   server-core, server-core-worker, server-storage,
 
 Build order follows this DAG. Changes to a leaf kit (e.g., `core-kit`) require rebuilding all packages that depend on it.
 
-## Per-Application Directory Layout (typical service)
+## Per-Application Directory Layout (server-core, hexagonal)
 
 ```
-apps/server-core/
-├── src/
-│   ├── commands/          # CLI commands (start, migration, seed)
-│   ├── components/        # Domain modules (analysis, project, node, registry, ...)
+apps/server-core/src/
+├── core/                          # Domain logic (pure business rules)
+│   ├── entities/                  # Entity ports, services, validators
+│   │   ├── types.ts               # IEntityRepository<T>, EntityRepositoryFindManyResult
+│   │   ├── service.ts             # AbstractEntityService (realm helpers)
+│   │   ├── constants.ts           # ValidatorGroup enum
+│   │   ├── actor/types.ts         # ActorContext, IPermissionChecker
 │   │   └── <entity>/
-│   │       ├── entity.ts          # TypeORM entity definition
-│   │       ├── handlers/          # HTTP route handlers (CRUD)
-│   │       └── subscribers/       # TypeORM event subscribers
-│   ├── core/              # Application bootstrap (HTTP server, database, messaging)
-│   └── index.ts           # Entry point
-├── test/
-│   ├── unit/              # Vitest specs
-│   └── vitest.config.ts   # Test config
-└── package.json
+│   │       ├── types.ts           # IXRepository, IXService port interfaces
+│   │       ├── service.ts         # XService (business logic + validation)
+│   │       └── validator.ts       # Input validator (ValidatorGroup groups)
+│   ├── services/                  # Business logic services
+│   │   ├── analysis-builder/      # Analysis build lifecycle
+│   │   ├── analysis-configurator/ # Configuration lock/unlock
+│   │   ├── analysis-distributor/  # Distribution orchestration
+│   │   ├── analysis-storage-manager/ # Storage provisioning
+│   │   └── master-image/          # Image catalog sync
+│   └── domains/                   # Domain type definitions (task types)
+├── adapters/                      # External system implementations
+│   ├── database/
+│   │   ├── entities/              # TypeORM entity definitions
+│   │   ├── subscribers/           # TypeORM event subscribers (domain-grouped)
+│   │   ├── analysis/          # Analysis, bucket, bucket-file, node, permission
+│   │   ├── master-image/      # MasterImage, MasterImageGroup
+│   │   ├── node/              # Node
+│   │   ├── project/           # Project, ProjectNode
+│   │   └── registry/          # Registry, RegistryProject
+│   │   ├── migrations/            # postgres/ and mysql/
+│   │   ├── error/                 # Database error types
+│   │   └── query/                 # Realm query helpers
+│   ├── http/
+│   │   ├── controllers/
+│   │   │   ├── entities/<entity>/module.ts  # Thin controllers
+│   │   │   └── workflows/         # Non-CRUD workflow controllers
+│   │   └── request/
+│   │       ├── helpers/actor.ts   # buildActorContext bridge
+│   │       └── repository.ts      # RequestRepositoryAdapter (audit)
+│   └── socket/                    # WebSocket handlers
+├── app/                           # Orchestration & DI wiring
+│   ├── builder.ts                 # ServerCoreApplicationBuilder
+│   ├── factory.ts                 # createApplication()
+│   ├── modules/
+│   │   ├── analysis/              # AnalysisModule (builder, configurator, distributor, storage)
+│   │   ├── aggregators/            # AggregatorsModule (starts AMQP event consumers)
+│   │   ├── authup-setup/          # AuthupSetupModule (realm, client, permissions)
+│   │   ├── components/            # ComponentsModule (TaskManager, callers, task consumers)
+│   │   ├── config/                # ConfigModule (env, paths)
+│   │   ├── database/              # DatabaseModule (DataSource, repos, subscribers, node-client)
+│   │   │   ├── repositories/<entity>/  # Repository adapters
+│   │   │   ├── node-client.ts     # NodeClientService (authup integration)
+│   │   │   ├── options.ts         # DataSourceOptionsBuilder
+│   │   │   └── register.ts        # registerRepositories() helper
+│   │   ├── harbor/                # HarborModule (registry setup)
+│   │   ├── http/                  # HTTPModule (router, controllers, server, socket)
+│   │   ├── registry/              # RegistryManagerAdapter
+│   │   ├── swagger/               # SwaggerModule (API docs generation)
+│   │   └── telemetry-client/      # TelemetryClientModule
+│   ├── services/                  # Remaining singleton bridges (telemetry)
+│   ├── aggregators/               # AMQP event consumers
+│   └── components/                # AMQP task consumers (registry, analysis-metadata)
+├── cli/                           # CLI entry point (citty)
+└── commands/                      # start, migration commands
 ```
 
 ## Per-Package Directory Layout (typical kit)

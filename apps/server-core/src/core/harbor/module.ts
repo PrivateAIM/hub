@@ -6,30 +6,27 @@
  */
 
 import { parseConnectionString } from '@hapic/harbor';
+import type { Registry } from '@privateaim/core-kit';
 import { getHostNameFromString } from '@privateaim/kit';
-import { useDataSource } from 'typeorm-extension';
-import { isQueueRouterUsable } from '@privateaim/server-kit';
-import { RegistryCommand, useRegistryComponentCaller } from '../../components/index.ts';
-import { RegistryEntity } from '../../database/index.ts';
-import { useEnv } from '../../config/index.ts';
+import type { IEntityRepository } from '../entities/types.ts';
+import type { IRegistryCaller } from './types.ts';
 
-export async function setupHarborService() {
-    const harborURL = useEnv('harborURL');
-    if (!harborURL) {
-        return;
-    }
+type SetupHarborContext = {
+    harborURL: string;
+    registryRepository: IEntityRepository<Registry>;
+    registryCaller?: IRegistryCaller;
+};
 
-    const connection = parseConnectionString(harborURL);
+export async function setupHarborService(ctx: SetupHarborContext) {
+    const connection = parseConnectionString(ctx.harborURL);
     const host = getHostNameFromString(connection.host);
 
-    const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(RegistryEntity);
-    let entity = await repository.findOneBy({ name: 'default' });
+    let entity = await ctx.registryRepository.findOneBy({ name: 'default' });
     if (entity) {
         entity.account_name = connection.user;
         entity.account_secret = connection.password;
     } else {
-        entity = repository.create({
+        entity = ctx.registryRepository.create({
             name: 'default',
             host,
             account_name: connection.user,
@@ -37,16 +34,9 @@ export async function setupHarborService() {
         });
     }
 
-    await repository.save(entity);
+    await ctx.registryRepository.save(entity);
 
-    if (!isQueueRouterUsable()) {
-        return;
+    if (ctx.registryCaller) {
+        await ctx.registryCaller.call('SETUP', { id: entity.id }, {});
     }
-
-    const caller = useRegistryComponentCaller();
-    await caller.call(
-        RegistryCommand.SETUP,
-        { id: entity.id },
-        {},
-    );
 }

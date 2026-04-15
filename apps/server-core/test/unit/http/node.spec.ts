@@ -15,28 +15,28 @@ import {
 import type {
     Node,
 } from '@privateaim/core-kit';
+import { createTestApplication } from '../../app';
 import {
-    createTestSuite,
     expectProperties,
     removeDateProperties,
 } from '../../utils';
 import { createTestNode } from '../../utils/domains';
 
 describe('src/controllers/core/node', () => {
-    const suite = createTestSuite();
+    const suite = createTestApplication();
 
     beforeAll(async () => {
-        await suite.up();
+        await suite.setup();
     });
 
     afterAll(async () => {
-        await suite.down();
+        await suite.teardown();
     });
 
     let details: Node;
 
     it('should create node', async () => {
-        const client = suite.client();
+        const { client } = suite;
 
         const node = await client.node.create(createTestNode());
         expect(node.id).toBeDefined();
@@ -45,21 +45,21 @@ describe('src/controllers/core/node', () => {
     });
 
     it('should read collection', async () => {
-        const client = suite.client();
+        const { client } = suite;
 
         const { data } = await client.node.getMany();
         expect(data.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should read resource', async () => {
-        const client = suite.client();
+        const { client } = suite;
 
         const data = await client.node.getOne(details.id);
         expectProperties(details, data, { keysExcluded: ['robot_id'] });
     });
 
     it('should update resource', async () => {
-        const client = suite.client();
+        const { client } = suite;
 
         details.name = 'TestA';
 
@@ -69,7 +69,7 @@ describe('src/controllers/core/node', () => {
     });
 
     it('should delete resource', async () => {
-        const client = suite.client();
+        const { client } = suite;
 
         await client.node.delete(details.id);
     });

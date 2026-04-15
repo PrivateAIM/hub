@@ -12,21 +12,21 @@ import {
     expect, 
     it,
 } from 'vitest';
-import { createTestSuite } from '../../utils';
+import { createTestApplication } from '../../app';
 
 describe('src/controllers/core/master-image', () => {
-    const suite = createTestSuite();
+    const suite = createTestApplication();
 
     beforeAll(async () => {
-        await suite.up();
+        await suite.setup();
     });
 
     afterAll(async () => {
-        await suite.down();
+        await suite.teardown();
     });
 
     it('should read collection', async () => {
-        const client = suite.client();
+        const { client } = suite;
 
         const { data } = await client.masterImage.getMany();
         expect(data.length).toBeGreaterThanOrEqual(0);
