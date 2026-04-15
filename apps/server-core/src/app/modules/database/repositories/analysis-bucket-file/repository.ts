@@ -15,6 +15,7 @@ import {
     applySort,
     validateEntityJoinColumns,
 } from 'typeorm-extension';
+import type { ParseAllowedOption } from 'rapiq';
 import { parseQueryFields } from 'rapiq';
 import { AnalysisBucketFileEntity } from '../../../../../adapters/database/entities/analysis-bucket-file.ts';
 import type {
@@ -23,7 +24,7 @@ import type {
     IAnalysisBucketFileRepository,
 } from '../../../../../core/index.ts';
 
-const DEFAULT_FIELDS: (keyof AnalysisBucketFileEntity)[] = [
+const DEFAULT_FIELDS: ParseAllowedOption<AnalysisBucketFileEntity> = [
     'id',
     'path',
     'root',
@@ -62,7 +63,7 @@ export class AnalysisBucketFileRepositoryAdapter implements IAnalysisBucketFileR
         qb.groupBy('analysisBucketFile.id');
 
         const fieldsParsed = parseQueryFields<AnalysisBucketFileEntity>(fields, {
-            default: DEFAULT_FIELDS as any,
+            default: DEFAULT_FIELDS,
             defaultPath: 'analysisBucketFile',
         });
 

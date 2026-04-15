@@ -55,6 +55,10 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
 
         validated.realm_id = this.getActorRealmId(actor);
 
+        if (!isRealmResourceWritable(actor.realm, validated.realm_id)) {
+            throw new ForbiddenError();
+        }
+
         // Set analysis_id from the related analysis_bucket
         if ((validated as any).analysis_bucket?.analysis_id) {
             validated.analysis_id = (validated as any).analysis_bucket.analysis_id;

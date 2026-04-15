@@ -10,13 +10,12 @@ import { AnalysisBucketType, AnalysisNodeApprovalStatus, NodeType } from '@priva
 import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
 import { isEqual } from 'smob';
 import { EnvironmentName } from '@privateaim/kit';
-import type { EntityManager } from 'typeorm';
+import type { DataSource, EntityManager } from 'typeorm';
 import {
     AnalysisBucketFileEntity,
     AnalysisEntity,
     AnalysisNodeEntity,
 } from '../../../../../adapters/database/index.ts';
-import { useDataSourceSync } from '../../../../../app/modules/database/index.ts';
 import type { AnalysisMetadataCommand } from '../../constants.ts';
 import { AnalysisMetadataEvent } from '../../constants.ts';
 import type { AnalysisMetadataEventMap, AnalysisMetadataRecalcPayload } from '../../types.ts';
@@ -25,6 +24,11 @@ import { useEnv } from '../../../../../app/modules/config/index.ts';
 export class AnalysisMetadataRecalcHandler implements ComponentHandler<
     AnalysisMetadataEventMap
 > {
+    protected dataSource: DataSource;
+
+    constructor(ctx: { dataSource: DataSource }) {
+        this.dataSource = ctx.dataSource;
+    }
     async handle(
         value: AnalysisMetadataRecalcPayload,
         context: ComponentHandlerContext<AnalysisMetadataEventMap, AnalysisMetadataCommand.RECALC>,
@@ -47,8 +51,7 @@ export class AnalysisMetadataRecalcHandler implements ComponentHandler<
         if (context.metadata.entityManager) {
             entityManger = context.metadata.entityManager;
         } else {
-            const dataSource = useDataSourceSync();
-            entityManger = dataSource.manager;
+            entityManger = this.dataSource.manager;
         }
 
         const analysisRepository = entityManger.getRepository(AnalysisEntity);

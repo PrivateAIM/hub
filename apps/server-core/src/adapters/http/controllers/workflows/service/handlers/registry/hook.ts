@@ -8,15 +8,14 @@
 import { useRequestBody } from '@routup/basic/body';
 import type { Request, Response } from 'routup';
 import { sendAccepted } from 'routup';
+import type { RegistryComponentCaller } from '../../../../../../../app/components/registry/caller/module.ts';
 import {
     RegistryCommand,
-    useRegistryComponentCaller,
 } from '../../../../../../../app/components/index.ts';
 
-export async function postHarborHookRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function postHarborHookRouteHandler(req: Request, res: Response, caller: RegistryComponentCaller) : Promise<any> {
     const body = useRequestBody(req);
 
-    const caller = useRegistryComponentCaller();
     await caller.call(
         RegistryCommand.HOOK_PROCESS,
         body,

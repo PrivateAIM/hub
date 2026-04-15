@@ -9,19 +9,18 @@ import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
 import { AnalysisBuilderComponentCaller, AnalysisDistributorComponentCaller } from '@privateaim/server-core-worker-kit';
 import { BucketComponentCaller } from '@privateaim/server-storage-kit';
-import { useAnalysisMetadataComponentCaller } from '../../components/index.ts';
 import { AnalysisBuilder } from '../../../core/services/analysis-builder/index.ts';
 import { AnalysisConfigurator } from '../../../core/services/analysis-configurator/index.ts';
 import { AnalysisDistributor } from '../../../core/services/analysis-distributor/index.ts';
 import { AnalysisStorageManager } from '../../../core/services/analysis-storage-manager/index.ts';
-import { useTaskManager } from '../../../core/domains/index.ts';
 import { DatabaseInjectionKey } from '../database/constants.ts';
+import { ComponentsInjectionKey } from '../components/constants.ts';
 import { AnalysisInjectionKey } from './constants.ts';
 
 export class AnalysisModule implements IModule {
     readonly name = 'analysis';
 
-    readonly dependencies: string[] = ['database'];
+    readonly dependencies: string[] = ['database', 'components'];
 
     async setup(container: IContainer): Promise<void> {
         const analysisRepository = container.resolve(DatabaseInjectionKey.AnalysisRepository);
@@ -29,7 +28,7 @@ export class AnalysisModule implements IModule {
         const analysisBucketRepository = container.resolve(DatabaseInjectionKey.AnalysisBucketRepository);
         const registryRepository = container.resolve(DatabaseInjectionKey.RegistryRepository);
 
-        const metadataCaller = useAnalysisMetadataComponentCaller();
+        const metadataCaller = container.resolve(ComponentsInjectionKey.AnalysisMetadataComponentCaller);
 
         container.register(AnalysisInjectionKey.Builder, {
             useValue: new AnalysisBuilder({
@@ -57,13 +56,19 @@ export class AnalysisModule implements IModule {
             }),
         });
 
-        container.register(AnalysisInjectionKey.StorageManager, {
-            useValue: new AnalysisStorageManager({
-                repository: analysisRepository,
-                bucketRepository: analysisBucketRepository,
-                caller: new BucketComponentCaller(),
-                taskManager: useTaskManager(),
-            }),
+        const storageManager = new AnalysisStorageManager({
+            repository: analysisRepository,
+            bucketRepository: analysisBucketRepository,
+            caller: new BucketComponentCaller(),
+            taskManager: container.resolve(ComponentsInjectionKey.TaskManager),
         });
+
+        container.register(AnalysisInjectionKey.StorageManager, { useValue: storageManager });
+
+        // Inject storageManager into the AnalysisSubscriber (created earlier by DatabaseModule)
+        const subscriberResult = container.tryResolve(DatabaseInjectionKey.AnalysisSubscriber);
+        if (subscriberResult.success) {
+            subscriberResult.data.setStorageManager(storageManager);
+        }
     }
 }

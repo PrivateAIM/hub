@@ -14,14 +14,14 @@ import type { Request, Response } from 'routup';
 import { sendAccepted } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestPermissionChecker } from '@privateaim/server-http-kit';
+import type { RegistryComponentCaller } from '../../../../../../../app/components/registry/caller/module.ts';
 import {
     RegistryCommand,
-    useRegistryComponentCaller,
 } from '../../../../../../../app/components/index.ts';
 import { RegistryEntity, RegistryProjectEntity } from '../../../../../../database/index.ts';
 import { ServiceRegistryValidator } from '../../utils/validation.ts';
 
-export async function handleRegistryCommandRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function handleRegistryCommandRouteHandler(req: Request, res: Response, caller: RegistryComponentCaller) : Promise<any> {
     const permissionChecker = useRequestPermissionChecker(req);
     await permissionChecker.preCheck({ name: PermissionName.REGISTRY_MANAGE });
 
@@ -30,7 +30,6 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
     const result = await validatorAdapter.run(req);
 
     const dataSource = await useDataSource();
-    const caller = useRegistryComponentCaller();
 
     switch (result.command) {
         case RegistryAPICommand.SETUP:

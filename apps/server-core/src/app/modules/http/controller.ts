@@ -34,8 +34,10 @@ import { ProjectNodeController } from '../../../adapters/http/controllers/entiti
 import { AnalysisNodeController } from '../../../adapters/http/controllers/entities/analysis-node/module.ts';
 import { AnalysisPermissionController } from '../../../adapters/http/controllers/entities/analysis-permission/module.ts';
 import { AnalysisNodeEventController } from '../../../adapters/http/controllers/entities/analysis-node-event/module.ts';
+import { ServiceController } from '../../../adapters/http/controllers/workflows/service/index.ts';
 import { DatabaseInjectionKey } from '../database/constants.ts';
 import { AnalysisInjectionKey } from '../analysis/constants.ts';
+import { ComponentsInjectionKey } from '../components/constants.ts';
 import { ConfigInjectionKey } from '../config/constants.ts';
 
 export function createControllers(container: IContainer): Record<string, any>[] {
@@ -62,7 +64,15 @@ export function createControllers(container: IContainer): Record<string, any>[] 
     const masterImageGroupService = new MasterImageGroupService({ repository: masterImageGroupRepository });
     const projectService = new ProjectService({ repository: projectRepository });
     const registryProjectService = new RegistryProjectService({ repository: registryProjectRepository, registryManager });
-    const analysisService = new AnalysisService({ repository: analysisRepository, projectRepository });
+    const analysisService = new AnalysisService({
+        repository: analysisRepository,
+        projectRepository,
+        builder: container.resolve(AnalysisInjectionKey.Builder),
+        configurator: container.resolve(AnalysisInjectionKey.Configurator),
+        distributor: container.resolve(AnalysisInjectionKey.Distributor),
+        storageManager: container.resolve(AnalysisInjectionKey.StorageManager),
+        skipAnalysisApproval: container.resolve(ConfigInjectionKey).skipAnalysisApproval,
+    });
     const analysisBucketService = new AnalysisBucketService({ repository: analysisBucketRepository });
     const analysisBucketFileService = new AnalysisBucketFileService({ repository: analysisBucketFileRepository });
     const projectNodeService = new ProjectNodeService({ repository: projectNodeRepository, projectRepository });
@@ -71,21 +81,14 @@ export function createControllers(container: IContainer): Record<string, any>[] 
     const analysisNodeEventService = new AnalysisNodeEventService({ repository: analysisNodeEventRepository });
 
     // Create controller instances
-    return [
+    const controllers: Record<string, any>[] = [
         new NodeController({ service: nodeService }),
         new RegistryController({ service: registryService }),
         new MasterImageController({ service: masterImageService }),
         new MasterImageGroupController({ service: masterImageGroupService }),
         new ProjectController({ service: projectService }),
         new RegistryProjectController({ service: registryProjectService }),
-        new AnalysisController({
-            service: analysisService,
-            builder: container.resolve(AnalysisInjectionKey.Builder),
-            configurator: container.resolve(AnalysisInjectionKey.Configurator),
-            distributor: container.resolve(AnalysisInjectionKey.Distributor),
-            storageManager: container.resolve(AnalysisInjectionKey.StorageManager),
-            skipAnalysisApproval: container.resolve(ConfigInjectionKey).skipAnalysisApproval,
-        }),
+        new AnalysisController({ service: analysisService }),
         new AnalysisBucketController({ service: analysisBucketService }),
         new AnalysisBucketFileController({ service: analysisBucketFileService }),
         new ProjectNodeController({ service: projectNodeService }),
@@ -93,4 +96,11 @@ export function createControllers(container: IContainer): Record<string, any>[] 
         new AnalysisPermissionController({ service: analysisPermissionService }),
         new AnalysisNodeEventController({ service: analysisNodeEventService }),
     ];
+
+    const callerResult = container.tryResolve(ComponentsInjectionKey.RegistryComponentCaller);
+    if (callerResult.success) {
+        controllers.push(new ServiceController({ registryComponentCaller: callerResult.data }));
+    }
+
+    return controllers;
 }

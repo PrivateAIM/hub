@@ -14,6 +14,7 @@ import {
     applySort,
     validateEntityJoinColumns,
 } from 'typeorm-extension';
+import type { ParseAllowedOption } from 'rapiq';
 import { parseQueryFields } from 'rapiq';
 import { RegistryEntity } from '../../../../../adapters/database/entities/registry.ts';
 import type {
@@ -22,17 +23,13 @@ import type {
     IRegistryRepository,
 } from '../../../../../core/index.ts';
 
-const DEFAULT_FIELDS: (keyof RegistryEntity)[] = [
+const DEFAULT_FIELDS: ParseAllowedOption<RegistryEntity> = [
     'id',
     'name',
     'host',
     'account_name',
     'created_at',
     'updated_at',
-];
-
-const PROTECTED_FIELDS: (keyof RegistryEntity)[] = [
-    'account_secret',
 ];
 
 export class RegistryRepositoryAdapter implements IRegistryRepository {
@@ -57,8 +54,8 @@ export class RegistryRepositoryAdapter implements IRegistryRepository {
         qb.groupBy('registry.id');
 
         const fieldsParsed = parseQueryFields<RegistryEntity>(fields, {
-            default: DEFAULT_FIELDS as any,
-            allowed: PROTECTED_FIELDS,
+            default: DEFAULT_FIELDS,
+            allowed: DEFAULT_FIELDS,
             defaultPath: 'registry',
         });
 

@@ -6,7 +6,6 @@
  */
 
 import type { RegistryProject } from '@privateaim/core-kit';
-import type { ParseAllowedOption } from 'rapiq';
 import type { DataSource, Repository } from 'typeorm';
 import {
     applyFilters,
@@ -16,6 +15,7 @@ import {
     applySort,
     validateEntityJoinColumns,
 } from 'typeorm-extension';
+import type { ParseAllowedOption } from 'rapiq';
 import { parseQueryFields } from 'rapiq';
 import { RegistryProjectEntity } from '../../../../../adapters/database/entities/registry-project.ts';
 import type {
@@ -24,7 +24,7 @@ import type {
     IRegistryProjectRepository,
 } from '../../../../../core/index.ts';
 
-const DEFAULT_FIELDS: (keyof RegistryProjectEntity)[] = [
+const DEFAULT_FIELDS: ParseAllowedOption<RegistryProjectEntity> = [
     'id',
     'name',
     'type',
@@ -37,12 +37,6 @@ const DEFAULT_FIELDS: (keyof RegistryProjectEntity)[] = [
     'realm_id',
     'created_at',
     'updated_at',
-];
-
-const PROTECTED_FIELDS: ParseAllowedOption<RegistryProjectEntity> = [
-    'account_name',
-    'account_id',
-    'account_secret',
 ];
 
 export class RegistryProjectRepositoryAdapter implements IRegistryProjectRepository {
@@ -68,8 +62,8 @@ export class RegistryProjectRepositoryAdapter implements IRegistryProjectReposit
         qb.groupBy('registryProject.id');
 
         const fieldsParsed = parseQueryFields<RegistryProjectEntity>(fields, {
-            default: DEFAULT_FIELDS as any,
-            allowed: PROTECTED_FIELDS,
+            default: DEFAULT_FIELDS,
+            allowed: DEFAULT_FIELDS,
             defaultPath: 'registryProject',
         });
 

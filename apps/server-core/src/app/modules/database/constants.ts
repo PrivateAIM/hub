@@ -23,6 +23,7 @@ import type {
     IRegistryProjectRepository,
     IRegistryRepository,
 } from '../../../core/index.ts';
+import type { AnalysisSubscriber } from '../../../adapters/database/subscribers/index.ts';
 
 export const DatabaseInjectionKey = {
     DataSource: new TypedToken<DataSource>('DataSource'),
@@ -42,4 +43,6 @@ export const DatabaseInjectionKey = {
     AnalysisNodeEventRepository: new TypedToken<IAnalysisNodeEventRepository>('AnalysisNodeEventRepository'),
 
     RegistryManager: new TypedToken<IRegistryManager>('RegistryManager'),
+
+    AnalysisSubscriber: new TypedToken<AnalysisSubscriber>('AnalysisSubscriber'),
 } as const;

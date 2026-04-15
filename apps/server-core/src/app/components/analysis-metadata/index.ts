@@ -8,4 +8,3 @@
 export * from './caller/index.ts';
 export * from './constants.ts';
 export * from './module.ts';
-export * from './singleton.ts';

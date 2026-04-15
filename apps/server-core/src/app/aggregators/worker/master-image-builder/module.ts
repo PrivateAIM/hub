@@ -12,18 +12,21 @@ import {
 import {
     BaseComponent,
 } from '@privateaim/server-kit';
+import type { DataSource } from 'typeorm';
 import {
     handleMasterImageBuilderEvent,
 } from './handler.ts';
 
 export class MasterImageBuilderAggregator extends BaseComponent<MasterImageBuilderEventMap> {
-    constructor() {
+    constructor(ctx: { dataSource: DataSource }) {
         super();
 
-        this.mount(MasterImageBuilderEvent.EXECUTION_PROGRESS, handleMasterImageBuilderEvent);
-        this.mount(MasterImageBuilderEvent.EXECUTION_STARTED, handleMasterImageBuilderEvent);
-        this.mount(MasterImageBuilderEvent.EXECUTION_FAILED, handleMasterImageBuilderEvent);
-        this.mount(MasterImageBuilderEvent.EXECUTION_FINISHED, handleMasterImageBuilderEvent);
+        const handler = (value, context) => handleMasterImageBuilderEvent(value, context, ctx.dataSource);
+
+        this.mount(MasterImageBuilderEvent.EXECUTION_PROGRESS, handler);
+        this.mount(MasterImageBuilderEvent.EXECUTION_STARTED, handler);
+        this.mount(MasterImageBuilderEvent.EXECUTION_FAILED, handler);
+        this.mount(MasterImageBuilderEvent.EXECUTION_FINISHED, handler);
     }
 
     async start() : Promise<void> {

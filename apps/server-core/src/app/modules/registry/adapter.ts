@@ -8,7 +8,8 @@
 import type { RegistryProject } from '@privateaim/core-kit';
 import type { DataSource, Repository } from 'typeorm';
 import { RegistryEntity, RegistryProjectEntity } from '../../../adapters/database/entities/index.ts';
-import { RegistryCommand, useRegistryComponentCaller } from '../../components/index.ts';
+import { RegistryCommand } from '../../components/index.ts';
+import type { RegistryComponentCaller } from '../../components/registry/caller/module.ts';
 import type { IRegistryManager } from '../../../core/index.ts';
 
 export class RegistryManagerAdapter implements IRegistryManager {
@@ -16,9 +17,12 @@ export class RegistryManagerAdapter implements IRegistryManager {
 
     protected registryProjectRepository: Repository<RegistryProjectEntity>;
 
-    constructor(dataSource: DataSource) {
-        this.registryRepository = dataSource.getRepository(RegistryEntity);
-        this.registryProjectRepository = dataSource.getRepository(RegistryProjectEntity);
+    protected registryComponentCaller?: RegistryComponentCaller;
+
+    constructor(ctx: { dataSource: DataSource; registryComponentCaller?: RegistryComponentCaller }) {
+        this.registryRepository = ctx.dataSource.getRepository(RegistryEntity);
+        this.registryProjectRepository = ctx.dataSource.getRepository(RegistryProjectEntity);
+        this.registryComponentCaller = ctx.registryComponentCaller;
     }
 
     async findDefaultRegistryId(): Promise<string | null> {
@@ -45,12 +49,12 @@ export class RegistryManagerAdapter implements IRegistryManager {
     }
 
     async linkProject(id: string): Promise<void> {
-        const caller = useRegistryComponentCaller();
+        const caller = this.registryComponentCaller;
         await caller.call(RegistryCommand.PROJECT_LINK, { id }, {});
     }
 
     async relinkProject(project: RegistryProject): Promise<void> {
-        const caller = useRegistryComponentCaller();
+        const caller = this.registryComponentCaller;
         await caller.call(
             RegistryCommand.PROJECT_RELINK,
             {
@@ -64,7 +68,7 @@ export class RegistryManagerAdapter implements IRegistryManager {
     }
 
     async unlinkProject(project: RegistryProject): Promise<void> {
-        const caller = useRegistryComponentCaller();
+        const caller = this.registryComponentCaller;
         await caller.call(
             RegistryCommand.PROJECT_UNLINK,
             {

@@ -9,5 +9,4 @@ export * from './caller/index.ts';
 export * from './handlers/index.ts';
 export * from './module.ts';
 export * from './constants.ts';
-export * from './singleton.ts';
 export * from './type.ts';

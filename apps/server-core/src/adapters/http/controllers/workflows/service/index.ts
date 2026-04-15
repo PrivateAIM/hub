@@ -20,13 +20,24 @@ import { NotFoundError } from '@ebec/http';
 import type { Request, Response } from 'routup';
 import { useRequestParam } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
+import type { RegistryComponentCaller } from '../../../../../app/components/registry/caller/module.ts';
 import type { RegistryHook } from '../../../../../app/components/index.ts';
 import { postHarborHookRouteHandler } from './handlers/registry/hook.ts';
 import { handleRegistryCommandRouteHandler } from './handlers/registry/command.ts';
 
+type ServiceControllerContext = {
+    registryComponentCaller: RegistryComponentCaller;
+};
+
 @DTags('extra')
 @DController('/services')
 export class ServiceController {
+    protected registryComponentCaller: RegistryComponentCaller;
+
+    constructor(ctx: ServiceControllerContext) {
+        this.registryComponentCaller = ctx.registryComponentCaller;
+    }
+
     @DPost('/:id/hook', [ForceLoggedInMiddleware])
     async handleHarborHook(
         @DRequest() req: Request,
@@ -38,7 +49,7 @@ export class ServiceController {
 
         switch (id) {
             case ServiceID.REGISTRY:
-                return postHarborHookRouteHandler(req, res);
+                return postHarborHookRouteHandler(req, res, this.registryComponentCaller);
         }
 
         throw new NotFoundError();
@@ -55,7 +66,7 @@ export class ServiceController {
 
         switch (id) {
             case ServiceID.REGISTRY:
-                return handleRegistryCommandRouteHandler(req, res);
+                return handleRegistryCommandRouteHandler(req, res, this.registryComponentCaller);
         }
 
         throw new NotFoundError();

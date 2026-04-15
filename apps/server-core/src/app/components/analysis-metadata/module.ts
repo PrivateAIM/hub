@@ -8,15 +8,16 @@
 import {
     BaseComponent,
 } from '@privateaim/server-kit';
+import type { DataSource } from 'typeorm';
 import { AnalysisMetadataCommand } from './constants.ts';
 import { AnalysisMetadataRecalcHandler } from './handlers/index.ts';
 import type { AnalysisMetadataEventMap } from './types.ts';
 
 export class AnalysisMetadataComponent extends BaseComponent<AnalysisMetadataEventMap> {
-    constructor() {
+    constructor(ctx: { dataSource: DataSource }) {
         super();
 
-        this.mount(AnalysisMetadataCommand.RECALC, new AnalysisMetadataRecalcHandler());
+        this.mount(AnalysisMetadataCommand.RECALC, new AnalysisMetadataRecalcHandler({ dataSource: ctx.dataSource }));
     }
 
     async start() {

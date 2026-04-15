@@ -9,7 +9,6 @@ import { useLogger } from '@privateaim/server-kit';
 import type { BucketComponentEventMap, BucketEvent } from '@privateaim/server-storage-kit';
 import type { Bucket } from '@privateaim/storage-kit';
 import { AnalysisBucketEntity, AnalysisEntity } from '../../../../../adapters/database/index.ts';
-import { useDataSourceSync } from '../../../../../app/modules/database/index.ts';
 import { TaskType } from '../../../../../core/domains/index.ts';
 import { BaseAggregatorHandler } from '../../../base.ts';
 
@@ -24,8 +23,7 @@ export class StorageBucketCreationFinishedHandler extends BaseAggregatorHandler<
         }
 
         if (task.type === TaskType.ANALYSIS_BUCKET_CREATE) {
-            const dataSource = useDataSourceSync();
-            const analysisBucketRepository = dataSource.getRepository(AnalysisBucketEntity);
+            const analysisBucketRepository = this.dataSource.getRepository(AnalysisBucketEntity);
             let analysisBucket = await analysisBucketRepository.findOneBy({
                 analysis_id: task.data.analysisId,
                 type: task.data.bucketType,
@@ -36,7 +34,7 @@ export class StorageBucketCreationFinishedHandler extends BaseAggregatorHandler<
                 return;
             }
 
-            const analysisRepository = dataSource.getRepository(AnalysisEntity);
+            const analysisRepository = this.dataSource.getRepository(AnalysisEntity);
             const analysis = await analysisRepository.findOneBy({ id: task.data.analysisId });
 
             if (!analysis) {

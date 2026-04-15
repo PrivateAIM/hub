@@ -32,7 +32,7 @@ import {
     RegistryProjectSubscriber,
     RegistrySubscriber,
 } from '../../../adapters/database/subscribers/index.ts';
-import { useAnalysisMetadataComponentCaller } from '../../components/index.ts';
+import { ComponentsInjectionKey } from '../components/constants.ts';
 import { NodeClientService } from './node-client.ts';
 import { DataSourceOptionsBuilder } from './options.ts';
 import { setDataSourceSync } from './singleton.ts';
@@ -95,10 +95,9 @@ export class DatabaseModule implements IModule {
 
     private registerSubscribers(dataSource: any, container: IContainer): void {
         let metadataCaller: any;
-        try {
-            metadataCaller = useAnalysisMetadataComponentCaller();
-        } catch {
-            // not available (e.g. in tests)
+        const callerResult = container.tryResolve(ComponentsInjectionKey.AnalysisMetadataComponentCaller);
+        if (callerResult.success) {
+            metadataCaller = callerResult.data;
         }
 
         let nodeClientService: NodeClientService | undefined;
@@ -109,12 +108,13 @@ export class DatabaseModule implements IModule {
             }
         }
 
+        const analysisSubscriber = new AnalysisSubscriber({ metadataCaller });
+
+        container.register(DatabaseInjectionKey.AnalysisSubscriber, { useValue: analysisSubscriber });
+
         dataSource.subscribers.push(
             new NodeSubscriber({ nodeClientService }),
-            new AnalysisSubscriber({
-                metadataCaller,
-                // storageManager injected later by AnalysisModule after it resolves from container
-            }),
+            analysisSubscriber,
             new AnalysisBucketFileSubscriber({ metadataCaller }),
             new AnalysisNodeSubscriber({ metadataCaller }),
 

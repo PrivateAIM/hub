@@ -5,20 +5,30 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type {
-    ComponentEventMap,
-    ComponentHandler,
-    ComponentHandlerContext,
-    TaskEntryResolved,
+import type { 
+    ComponentEventMap, 
+    ComponentHandler, 
+    ComponentHandlerContext, 
+    TaskEntryResolved, 
+    TaskManager, 
 } from '@privateaim/server-kit';
 import { useLogger } from '@privateaim/server-kit';
+import type { DataSource } from 'typeorm';
 import type { TaskMap } from '../../core/domains/index.ts';
-import { useTaskManager } from '../../core/domains/index.ts';
 
 export abstract class BaseAggregatorHandler<
     EventMap extends ComponentEventMap = ComponentEventMap,
     Key extends keyof EventMap = keyof EventMap,
 > implements ComponentHandler<EventMap> {
+    protected dataSource: DataSource;
+
+    protected taskManager: TaskManager<TaskMap>;
+
+    constructor(ctx: { dataSource: DataSource; taskManager: TaskManager<TaskMap> }) {
+        this.dataSource = ctx.dataSource;
+        this.taskManager = ctx.taskManager;
+    }
+
     protected async resolveTask(context: ComponentHandlerContext<EventMap, Key>) : Promise<TaskEntryResolved<TaskMap>> {
         const { correlationId } = context.metadata;
         if (!correlationId) {
@@ -26,8 +36,7 @@ export abstract class BaseAggregatorHandler<
             return null;
         }
 
-        const taskManager = useTaskManager();
-        const task = await taskManager.resolve(correlationId);
+        const task = await this.taskManager.resolve(correlationId);
         if (!task) {
             useLogger().info(`${context.key} could not be associated to a triggered task.`);
             return null;

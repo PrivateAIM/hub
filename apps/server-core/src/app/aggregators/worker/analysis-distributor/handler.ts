@@ -9,21 +9,21 @@ import { ProcessStatus } from '@privateaim/kit';
 import type {
     AnalysisDistributorBasePayload,
     AnalysisDistributorCheckFinishedPayload,
-    AnalysisDistributorEventMap, 
+    AnalysisDistributorEventMap,
     AnalysisDistributorExecutionProgressPayload,
 } from '@privateaim/server-core-worker-kit';
 import {
     AnalysisDistributorEvent,
 } from '@privateaim/server-core-worker-kit';
 import type { ComponentHandlerContext } from '@privateaim/server-kit';
+import type { DataSource } from 'typeorm';
 import { AnalysisEntity } from '../../../../adapters/database/index.ts';
-import { useDataSourceSync } from '../../../../app/modules/database/index.ts';
 
 export async function handleAnalysisDistributorEvent(
     value: AnalysisDistributorBasePayload,
     context: ComponentHandlerContext<AnalysisDistributorEventMap>,
+    dataSource: DataSource,
 ) {
-    const dataSource = useDataSourceSync();
     const repository = dataSource.getRepository(AnalysisEntity);
     const entity = await repository.findOneBy({ id: value.id });
 

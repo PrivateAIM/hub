@@ -5,16 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './analysis-bucket-file.ts';
-export * from './analysis-bucket.ts';
-export * from './analysis-node-event.ts';
-export * from './analysis-permission.ts';
-export * from './analysis.ts';
-export * from './analysis-node.ts';
-export * from './master-image-group.ts';
-export * from './master-image.ts';
-export * from './node.ts';
-export * from './project-node.ts';
-export * from './project.ts';
-export * from './registry-project.ts';
-export * from './registry.ts';
+export * from './analysis/index.ts';
+export * from './master-image/index.ts';
+export * from './node/index.ts';
+export * from './project/index.ts';
+export * from './registry/index.ts';

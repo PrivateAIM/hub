@@ -12,21 +12,24 @@ import {
 import {
     BaseComponent,
 } from '@privateaim/server-kit';
+import type { DataSource } from 'typeorm';
 import {
     handleAnalysisBuilderEvent,
 } from './handler.ts';
 
 export class AnalysisBuilderAggregator extends BaseComponent<AnalysisBuilderEventMap> {
-    constructor() {
+    constructor(ctx: { dataSource: DataSource }) {
         super();
 
-        this.mount(AnalysisBuilderEvent.EXECUTION_PROGRESS, handleAnalysisBuilderEvent);
-        this.mount(AnalysisBuilderEvent.EXECUTION_STARTED, handleAnalysisBuilderEvent);
-        this.mount(AnalysisBuilderEvent.EXECUTION_FAILED, handleAnalysisBuilderEvent);
-        this.mount(AnalysisBuilderEvent.EXECUTION_FINISHED, handleAnalysisBuilderEvent);
+        const handler = (value, context) => handleAnalysisBuilderEvent(value, context, ctx.dataSource);
 
-        this.mount(AnalysisBuilderEvent.CHECK_FAILED, handleAnalysisBuilderEvent);
-        this.mount(AnalysisBuilderEvent.CHECK_FINISHED, handleAnalysisBuilderEvent);
+        this.mount(AnalysisBuilderEvent.EXECUTION_PROGRESS, handler);
+        this.mount(AnalysisBuilderEvent.EXECUTION_STARTED, handler);
+        this.mount(AnalysisBuilderEvent.EXECUTION_FAILED, handler);
+        this.mount(AnalysisBuilderEvent.EXECUTION_FINISHED, handler);
+
+        this.mount(AnalysisBuilderEvent.CHECK_FAILED, handler);
+        this.mount(AnalysisBuilderEvent.CHECK_FINISHED, handler);
     }
 
     async start() : Promise<void> {

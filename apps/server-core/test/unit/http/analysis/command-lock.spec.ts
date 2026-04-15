@@ -16,7 +16,7 @@ import type { Analysis, Node } from '@privateaim/core-kit';
 import { AnalysisCommand, AnalysisError, NodeType } from '@privateaim/core-kit';
 import { extractErrorMessage } from '@privateaim/kit';
 import { isClientError } from 'hapic';
-import { createTestSuite } from '../../../utils';
+import { createTestApplication } from '../../../app';
 import { createTestNode, createTestProject } from '../../../utils/domains';
 
 describe('analysis/command-lock', () => {
@@ -26,12 +26,12 @@ describe('analysis/command-lock', () => {
 
     let nodeAggregator : Node;
 
-    const suite = createTestSuite();
+    const suite = createTestApplication();
 
     beforeAll(async () => {
-        await suite.up();
+        await suite.setup();
 
-        const client = suite.client();
+        const { client } = suite;
 
         const project = await client.project.create(createTestProject());
 
@@ -52,13 +52,13 @@ describe('analysis/command-lock', () => {
     });
 
     afterAll(async () => {
-        await suite.down();
+        await suite.teardown();
     });
 
     it('should not lock analysis (defaultNodeRequired)', async () => {
         expect.assertions(1);
 
-        const client = suite.client();
+        const { client } = suite;
 
         try {
             await client.analysis.runCommand(
@@ -78,7 +78,7 @@ describe('analysis/command-lock', () => {
     it('should not lock analysis (aggregatorNodeRequired)', async () => {
         expect.assertions(1);
 
-        const client = suite.client();
+        const { client } = suite;
 
         await client.analysisNode.create({
             analysis_id: analysis.id,
@@ -103,7 +103,7 @@ describe('analysis/command-lock', () => {
     it('should not lock analysis (imageAssignmentRequired)', async () => {
         expect.assertions(1);
 
-        const client = suite.client();
+        const { client } = suite;
 
         await client.analysisNode.create({
             analysis_id: analysis.id,

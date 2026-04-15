@@ -12,12 +12,12 @@ import {
 } from '@privateaim/server-kit';
 import type { RegistryEventMap } from '../type.ts';
 import { RegistryTaskQueueRouterRouting } from '../constants.ts';
-import { useRegistryComponent } from '../singleton.ts';
+import type { RegistryComponent } from '../module.ts';
 
 export class RegistryComponentCaller extends CompoundComponentCaller<RegistryEventMap> {
-    constructor() {
+    constructor(component: RegistryComponent) {
         super([
-            new DirectComponentCaller<RegistryEventMap>(useRegistryComponent()),
+            new DirectComponentCaller<RegistryEventMap>(component),
             new QueueDispatchComponentCaller<RegistryEventMap>({ queue: RegistryTaskQueueRouterRouting }),
         ]);
     }

@@ -6,4 +6,3 @@
  */
 
 export * from './module.ts';
-export * from './singleton.ts';

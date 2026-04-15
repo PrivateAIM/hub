@@ -13,13 +13,13 @@ import type {
 import { ServiceID } from '@privateaim/core-kit';
 import { useDataSource } from 'typeorm-extension';
 import { useLogger } from '@privateaim/server-kit';
+import type { RegistryComponentCaller } from '../../../components/registry/caller/module.ts';
 import {
     RegistryCommand,
-    useRegistryComponentCaller,
 } from '../../../components/index.ts';
 import { RegistryProjectEntity } from '../../../../adapters/database/index.ts';
 
-export async function handleAuthupRobotEvent(context: EventRecord<EntityType.ROBOT, Robot>) {
+export async function handleAuthupRobotEvent(context: EventRecord<EntityType.ROBOT, Robot>, caller?: RegistryComponentCaller) {
     if (!context.data.id) {
         useLogger().warn('ID in authup robot event handler is missing.');
         return;
@@ -40,7 +40,9 @@ export async function handleAuthupRobotEvent(context: EventRecord<EntityType.ROB
     const projectRepository = dataSource.getRepository(RegistryProjectEntity);
     const projects = await projectRepository.find({ select: ['id'] });
 
-    const caller = useRegistryComponentCaller();
+    if (!caller) {
+        return;
+    }
 
     for (const project of projects) {
         await caller.call(

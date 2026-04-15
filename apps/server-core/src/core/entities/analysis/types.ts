@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Analysis } from '@privateaim/core-kit';
+import type { Analysis, AnalysisCommand } from '@privateaim/core-kit';
 import type { ActorContext } from '../actor/types.ts';
 import type { EntityRepositoryFindManyResult, IEntityRepository } from '../types.ts';
 
@@ -19,4 +19,5 @@ export interface IAnalysisService {
     create(data: Partial<Analysis>, actor: ActorContext): Promise<Analysis>;
     update(id: string, data: Partial<Analysis>, actor: ActorContext): Promise<Analysis>;
     delete(id: string, actor: ActorContext): Promise<Analysis>;
+    executeCommand(id: string, command: `${AnalysisCommand}`, actor: ActorContext): Promise<Analysis>;
 }

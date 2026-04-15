@@ -8,19 +8,22 @@
 import type { AnalysisDistributorEventMap } from '@privateaim/server-core-worker-kit';
 import { AnalysisDistributorEvent } from '@privateaim/server-core-worker-kit';
 import { BaseComponent } from '@privateaim/server-kit';
+import type { DataSource } from 'typeorm';
 import { handleAnalysisDistributorEvent } from './handler.ts';
 
 export class AnalysisDistributorAggregator extends BaseComponent<AnalysisDistributorEventMap> {
-    constructor() {
+    constructor(ctx: { dataSource: DataSource }) {
         super();
 
-        this.mount(AnalysisDistributorEvent.EXECUTION_STARTED, handleAnalysisDistributorEvent);
-        this.mount(AnalysisDistributorEvent.EXECUTION_PROGRESS, handleAnalysisDistributorEvent);
-        this.mount(AnalysisDistributorEvent.EXECUTION_FAILED, handleAnalysisDistributorEvent);
-        this.mount(AnalysisDistributorEvent.EXECUTION_FINISHED, handleAnalysisDistributorEvent);
+        const handler = (value, context) => handleAnalysisDistributorEvent(value, context, ctx.dataSource);
 
-        this.mount(AnalysisDistributorEvent.CHECK_FAILED, handleAnalysisDistributorEvent);
-        this.mount(AnalysisDistributorEvent.CHECK_FINISHED, handleAnalysisDistributorEvent);
+        this.mount(AnalysisDistributorEvent.EXECUTION_STARTED, handler);
+        this.mount(AnalysisDistributorEvent.EXECUTION_PROGRESS, handler);
+        this.mount(AnalysisDistributorEvent.EXECUTION_FAILED, handler);
+        this.mount(AnalysisDistributorEvent.EXECUTION_FINISHED, handler);
+
+        this.mount(AnalysisDistributorEvent.CHECK_FAILED, handler);
+        this.mount(AnalysisDistributorEvent.CHECK_FINISHED, handler);
     }
 
     async start() : Promise<void> {

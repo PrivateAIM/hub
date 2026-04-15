@@ -11,7 +11,6 @@ import {
     AnalysisBucketEntity,
     AnalysisBucketFileEntity,
 } from '../../../../../adapters/database/index.ts';
-import { useDataSourceSync } from '../../../../../app/modules/database/index.ts';
 import { BaseAggregatorHandler } from '../../../base.ts';
 
 export class StorageBucketFileCreationFinishedHandler extends BaseAggregatorHandler<
@@ -19,8 +18,7 @@ export class StorageBucketFileCreationFinishedHandler extends BaseAggregatorHand
     BucketFileEvent.CREATION_FINISHED
 > {
     async handle(data: BucketFile): Promise<void> {
-        const dataSource = useDataSourceSync();
-        const analysisBucketRepository = dataSource.getRepository(AnalysisBucketEntity);
+        const analysisBucketRepository = this.dataSource.getRepository(AnalysisBucketEntity);
         const analysisBucket = await analysisBucketRepository.findOneBy({ bucket_id: data.bucket_id });
 
         if (!analysisBucket) {
@@ -30,7 +28,7 @@ export class StorageBucketFileCreationFinishedHandler extends BaseAggregatorHand
 
         // todo: check if analysis is locked.
 
-        const analysisBucketFileRepository = dataSource.getRepository(AnalysisBucketFileEntity);
+        const analysisBucketFileRepository = this.dataSource.getRepository(AnalysisBucketFileEntity);
         const analysisBucketFile = analysisBucketFileRepository.create({
             path: data.path,
             analysis_bucket_id: analysisBucket.id,

@@ -12,32 +12,33 @@ import {
     expect, 
     it,
 } from 'vitest';
+import { createTestApplication } from '../../../app';
 import type { Analysis } from '@privateaim/core-kit';
 import { createNanoID } from '@privateaim/kit';
 import { isClientError } from 'hapic';
 import { EntityRelationLookupError } from 'typeorm-extension';
 import {
-    createTestSuite,
+    
     expectProperties,
     removeDateProperties,
 } from '../../../utils';
 import { createTestAnalysis, createTestProject } from '../../../utils/domains/index.ts';
 
 describe('src/controllers/core/analysis', () => {
-    const suite = createTestSuite();
+    const suite = createTestApplication();
 
     beforeAll(async () => {
-        await suite.up();
+        await suite.setup();
     });
 
     afterAll(async () => {
-        await suite.down();
+        await suite.teardown();
     });
 
     let details : Analysis;
 
     it('should create resource', async () => {
-        const client = suite.client();
+        const { client } = suite;
 
         const project = await client.project.create(createTestProject());
         const analysis = await client.analysis.create(createTestAnalysis({ project_id: project.id }));
@@ -48,21 +49,21 @@ describe('src/controllers/core/analysis', () => {
     });
 
     it('should get collection', async () => {
-        const client = suite.client();
+        const { client } = suite;
         const { data } = await client.analysis.getMany();
 
         expect(data.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should read resource', async () => {
-        const client = suite.client();
+        const { client } = suite;
         const data = await client.analysis.getOne(details.id);
 
         expectProperties(details, data);
     });
 
     it('should update resource', async () => {
-        const client = suite.client();
+        const { client } = suite;
         details.name = 'TestA';
 
         const data = await client.analysis.update(details.id, details);
@@ -71,7 +72,7 @@ describe('src/controllers/core/analysis', () => {
     });
 
     it('should delete resource', async () => {
-        const client = suite.client();
+        const { client } = suite;
         const response = await client.analysis.delete(details.id);
         expect(response).toBeDefined();
     });
@@ -79,7 +80,7 @@ describe('src/controllers/core/analysis', () => {
     it('should not create resource with invalid project', async () => {
         expect.assertions(1);
 
-        const client = suite.client();
+        const { client } = suite;
 
         try {
             await client.analysis.create({
@@ -99,7 +100,7 @@ describe('src/controllers/core/analysis', () => {
     it('should not create resource with invalid master-image', async () => {
         expect.assertions(1);
 
-        const client = suite.client();
+        const { client } = suite;
 
         const project = await client.project.create({ name: createNanoID() });
 

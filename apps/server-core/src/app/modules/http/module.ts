@@ -24,7 +24,6 @@ import {
     AnalysisLogController,
     AnalysisNodeLogController,
     RootController,
-    ServiceController,
 } from '../../../adapters/http/controllers/index.ts';
 import { createSocketServer } from '../../../adapters/socket/server.ts';
 import { ConfigInjectionKey } from '../config/constants.ts';
@@ -96,7 +95,6 @@ export class HTTPModule implements IModule {
 
                     // Workflows
                     RootController,
-                    ServiceController,
                 ],
             },
         });

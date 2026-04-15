@@ -6,5 +6,4 @@
  */
 
 export * from './constants.ts';
-export * from './singleton.ts';
 export * from './types.ts';

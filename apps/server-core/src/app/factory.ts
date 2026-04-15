@@ -21,11 +21,12 @@ import {
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import { useEnv } from './modules/config/index.ts';
 import { ServerCoreApplicationBuilder } from './builder.ts';
+import { AggregatorsModule } from './modules/aggregators/index.ts';
 import { AnalysisModule } from './modules/analysis/index.ts';
 import { ComponentsModule } from './modules/components/index.ts';
-import { createConfig } from './modules/config/components.ts';
 import { HarborModule } from './modules/harbor/index.ts';
 import { SwaggerModule } from './modules/swagger/index.ts';
+import { AuthupSetupModule } from './modules/authup-setup/index.ts';
 import { TelemetryClientModule } from './modules/telemetry-client/index.ts';
 
 export function createApplication() {
@@ -94,8 +95,10 @@ export function createApplication() {
 
     app.addModule(new SwaggerModule());
     app.addModule(new HarborModule());
+    app.addModule(new ComponentsModule());
     app.addModule(new AnalysisModule());
-    app.addModule(new ComponentsModule(createConfig()));
+    app.addModule(new AggregatorsModule());
+    app.addModule(new AuthupSetupModule());
 
     return app;
 }

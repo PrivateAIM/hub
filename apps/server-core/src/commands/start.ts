@@ -8,7 +8,6 @@
 import { useLogger } from '@privateaim/server-kit';
 import { createApplication } from '../app/index.ts';
 import { useEnv } from '../app/modules/config/index.ts';
-import { setupAuthupService } from '../core/index.ts';
 
 export async function startCommand() {
     const app = createApplication();
@@ -19,8 +18,4 @@ export async function startCommand() {
     logger.debug(`Environment: ${useEnv('env')}`);
     logger.debug(`Public-URL: ${useEnv('publicURL')}`);
     logger.debug(`Authup-URL: ${useEnv('authupURL')}`);
-
-    logger.debug('Executing authup service setup...');
-    await setupAuthupService();
-    logger.debug('Executed authup service setup.');
 }

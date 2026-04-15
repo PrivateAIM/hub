@@ -15,6 +15,7 @@ import {
     applySort,
     validateEntityJoinColumns,
 } from 'typeorm-extension';
+import type { ParseAllowedOption } from 'rapiq';
 import { parseQueryFields } from 'rapiq';
 import { AnalysisEntity } from '../../../../../adapters/database/entities/analysis.ts';
 import type {
@@ -23,7 +24,7 @@ import type {
     IAnalysisRepository,
 } from '../../../../../core/index.ts';
 
-const DEFAULT_FIELDS: (keyof AnalysisEntity)[] = [
+const DEFAULT_FIELDS: ParseAllowedOption<AnalysisEntity> = [
     'id',
     'name',
     'description',
@@ -45,7 +46,6 @@ const DEFAULT_FIELDS: (keyof AnalysisEntity)[] = [
     'build_size',
     'execution_status',
     'execution_progress',
-    'image_command_arguments',
     'created_at',
     'updated_at',
     'registry_id',
@@ -78,7 +78,7 @@ export class AnalysisRepositoryAdapter implements IAnalysisRepository {
         qb.groupBy('analysis.id');
 
         const fieldsParsed = parseQueryFields<AnalysisEntity>(fields, {
-            default: DEFAULT_FIELDS as any,
+            default: DEFAULT_FIELDS,
             defaultPath: 'analysis',
         });
 

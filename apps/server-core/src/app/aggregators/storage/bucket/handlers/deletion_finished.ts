@@ -8,7 +8,6 @@ import type { ComponentHandlerContext } from '@privateaim/server-kit';
 import type { BucketComponentEventMap, BucketEvent } from '@privateaim/server-storage-kit';
 import type { Bucket } from '@privateaim/storage-kit';
 import { AnalysisBucketEntity } from '../../../../../adapters/database/index.ts';
-import { useDataSourceSync } from '../../../../../app/modules/database/index.ts';
 import { TaskType } from '../../../../../core/domains/index.ts';
 import { BaseAggregatorHandler } from '../../../base.ts';
 
@@ -23,8 +22,7 @@ export class StorageBucketDeletionFinishedHandler extends BaseAggregatorHandler<
         }
 
         if (task.type === TaskType.ANALYSIS_BUCKET_DELETE) {
-            const dataSource = useDataSourceSync();
-            const analysisBucketRepository = dataSource.getRepository(AnalysisBucketEntity);
+            const analysisBucketRepository = this.dataSource.getRepository(AnalysisBucketEntity);
             const analysisBucket = await analysisBucketRepository.findOneBy({
                 analysis_id: task.data.analysisId,
                 bucket_id: bucket.id,

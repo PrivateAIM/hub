@@ -9,7 +9,7 @@ import { DomainType } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
 import type {
     MasterImageBuilderBasePayload,
-    MasterImageBuilderEventMap, 
+    MasterImageBuilderEventMap,
     MasterImageBuilderExecutionProgressPayload,
 } from '@privateaim/server-core-worker-kit';
 import {
@@ -17,14 +17,14 @@ import {
 } from '@privateaim/server-core-worker-kit';
 import type { ComponentHandlerContext } from '@privateaim/server-kit';
 import { isEventComponentCallerUsable, useEventComponentCaller } from '@privateaim/server-telemetry-kit';
+import type { DataSource } from 'typeorm';
 import { MasterImageEntity } from '../../../../adapters/database/index.ts';
-import { useDataSourceSync } from '../../../../app/modules/database/index.ts';
 
 export async function handleMasterImageBuilderEvent(
     value: MasterImageBuilderBasePayload,
     context: ComponentHandlerContext<MasterImageBuilderEventMap, MasterImageBuilderEvent>,
+    dataSource: DataSource,
 ) {
-    const dataSource = useDataSourceSync();
     const repository = dataSource.getRepository(MasterImageEntity);
 
     const entity = await repository.findOneBy({ id: value.id });

@@ -7,12 +7,13 @@
 
 import { EntityType } from '@authup/core-kit';
 import {
-    type Component, 
-    EnvironmentName, 
-    isRedisClientUsable, 
+    type Component,
+    EnvironmentName,
+    isRedisClientUsable,
     useLogger,
     useRedisSubscribeClient,
 } from '@privateaim/server-kit';
+import type { RegistryComponentCaller } from '../../components/registry/caller/module.ts';
 import { useEnv } from '../../../app/modules/config/index.ts';
 import {
     handleAuthupPermissionEvent,
@@ -22,7 +23,7 @@ import {
     handleAuthupUserEvent,
 } from './entities/index.ts';
 
-export function createAuthupAggregator() : Component {
+export function createAuthupAggregator(ctx?: { registryComponentCaller?: RegistryComponentCaller }) : Component {
     if (!isRedisClientUsable() || useEnv('env') === EnvironmentName.TEST) {
         return {
             start() {
@@ -61,7 +62,7 @@ export function createAuthupAggregator() : Component {
                         break;
                     }
                     case EntityType.ROBOT: {
-                        await handleAuthupRobotEvent(event);
+                        await handleAuthupRobotEvent(event, ctx?.registryComponentCaller);
                         break;
                     }
                     case EntityType.USER: {

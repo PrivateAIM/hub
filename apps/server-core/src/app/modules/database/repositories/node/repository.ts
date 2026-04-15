@@ -15,6 +15,7 @@ import {
     applySort,
     validateEntityJoinColumns,
 } from 'typeorm-extension';
+import type { ParseAllowedOption } from 'rapiq';
 import { parseQueryFields } from 'rapiq';
 import { NodeEntity } from '../../../../../adapters/database/entities/node.ts';
 import type {
@@ -23,7 +24,7 @@ import type {
     INodeRepository,
 } from '../../../../../core/index.ts';
 
-const DEFAULT_FIELDS: (keyof NodeEntity)[] = [
+const DEFAULT_FIELDS: ParseAllowedOption<NodeEntity> = [
     'id',
     'name',
     'client_id',
@@ -63,7 +64,7 @@ export class NodeRepositoryAdapter implements INodeRepository {
         qb.groupBy('node.id');
 
         const fieldsParsed = parseQueryFields<NodeEntity>(fields, {
-            default: DEFAULT_FIELDS as any,
+            default: DEFAULT_FIELDS,
             defaultPath: 'node',
         });
 

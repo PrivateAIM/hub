@@ -12,29 +12,30 @@ import {
     expect, 
     it,
 } from 'vitest';
+import { createTestApplication } from '../../app';
 import type { Project } from '@privateaim/core-kit';
 import {
-    createTestSuite,
+    
     expectProperties,
     removeDateProperties,
 } from '../../utils';
 import { createTestProject } from '../../utils/domains';
 
 describe('src/controllers/core/project', () => {
-    const suite = createTestSuite();
+    const suite = createTestApplication();
 
     beforeAll(async () => {
-        await suite.up();
+        await suite.setup();
     });
 
     afterAll(async () => {
-        await suite.down();
+        await suite.teardown();
     });
 
     let details : Project;
 
     it('should create resource', async () => {
-        const client = suite.client();
+        const { client } = suite;
 
         const project = await client.project.create(createTestProject());
         expect(project.id).toBeDefined();
@@ -43,21 +44,21 @@ describe('src/controllers/core/project', () => {
     });
 
     it('should read collection', async () => {
-        const client = suite.client();
+        const { client } = suite;
 
         const { data } = await client.project.getMany();
         expect(data.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should read resource', async () => {
-        const client = suite.client();
+        const { client } = suite;
 
         const data = await client.project.getOne(details.id);
         expectProperties(details, data);
     });
 
     it('should update resource', async () => {
-        const client = suite.client();
+        const { client } = suite;
 
         details.name = 'TestA';
 
@@ -66,7 +67,7 @@ describe('src/controllers/core/project', () => {
     });
 
     it('should delete resource', async () => {
-        const client = suite.client();
+        const { client } = suite;
 
         await client.project.delete(details.id);
     });

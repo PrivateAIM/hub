@@ -6,6 +6,7 @@
  */
 
 import type { Analysis } from '@privateaim/core-kit';
+import { AnalysisCommand } from '@privateaim/core-kit';
 import { BuiltInPolicyType, PolicyData } from '@authup/access';
 import {
     PermissionName,
@@ -18,12 +19,21 @@ import type { EntityRepositoryFindManyResult } from '../types.ts';
 import { ValidatorGroup } from '../constants.ts';
 import { AbstractEntityService } from '../service.ts';
 import type { IProjectRepository } from '../project/types.ts';
+import type { AnalysisBuilder } from '../../services/analysis-builder/index.ts';
+import type { AnalysisConfigurator } from '../../services/analysis-configurator/index.ts';
+import type { AnalysisDistributor } from '../../services/analysis-distributor/index.ts';
+import type { AnalysisStorageManager } from '../../services/analysis-storage-manager/index.ts';
 import type { IAnalysisRepository, IAnalysisService } from './types.ts';
 import { AnalysisValidator } from './validator.ts';
 
 type AnalysisServiceContext = {
     repository: IAnalysisRepository;
     projectRepository: IProjectRepository;
+    builder: AnalysisBuilder;
+    configurator: AnalysisConfigurator;
+    distributor: AnalysisDistributor;
+    storageManager: AnalysisStorageManager;
+    skipAnalysisApproval?: boolean;
 };
 
 export class AnalysisService extends AbstractEntityService implements IAnalysisService {
@@ -31,12 +41,27 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
 
     protected projectRepository: IProjectRepository;
 
+    protected builder: AnalysisBuilder;
+
+    protected configurator: AnalysisConfigurator;
+
+    protected distributor: AnalysisDistributor;
+
+    protected storageManager: AnalysisStorageManager;
+
+    protected skipAnalysisApproval: boolean;
+
     protected validator: AnalysisValidator;
 
     constructor(ctx: AnalysisServiceContext) {
         super();
         this.repository = ctx.repository;
         this.projectRepository = ctx.projectRepository;
+        this.builder = ctx.builder;
+        this.configurator = ctx.configurator;
+        this.distributor = ctx.distributor;
+        this.storageManager = ctx.storageManager;
+        this.skipAnalysisApproval = ctx.skipAnalysisApproval ?? false;
         this.validator = new AnalysisValidator();
     }
 
@@ -156,6 +181,52 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
         await this.projectRepository.save(project, { data: actor.metadata });
 
         entity.project = project;
+
+        return entity;
+    }
+
+    async executeCommand(id: string, command: `${AnalysisCommand}`, actor: ActorContext): Promise<Analysis> {
+        if (!Object.values(AnalysisCommand).includes(command as AnalysisCommand)) {
+            throw new BadRequestError('Invalid command.');
+        }
+
+        let entity = await this.getOne(id);
+
+        if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
+            throw new ForbiddenError();
+        }
+
+        const persistCtx = { data: actor.metadata };
+
+        switch (command) {
+            case AnalysisCommand.BUILD_CHECK:
+                entity = await this.builder.check(entity);
+                break;
+            case AnalysisCommand.BUILD_START:
+                entity = await this.builder.start(entity, persistCtx);
+                break;
+            case AnalysisCommand.CONFIGURATION_LOCK:
+                entity = await this.configurator.lock(entity, {
+                    ignoreApproval: this.skipAnalysisApproval,
+                    persistCtx,
+                });
+                break;
+            case AnalysisCommand.CONFIGURATION_UNLOCK:
+                entity = await this.configurator.unlock(entity, {
+                    ignoreApproval: this.skipAnalysisApproval,
+                    persistCtx,
+                });
+                break;
+            case AnalysisCommand.DISTRIBUTION_CHECK:
+                entity = await this.distributor.check(entity);
+                break;
+            case AnalysisCommand.DISTRIBUTION_START:
+                entity = await this.distributor.start(entity, persistCtx);
+                break;
+            case AnalysisCommand.STORAGE_CHECK:
+                entity = await this.storageManager.check(entity);
+                break;
+        }
 
         return entity;
     }

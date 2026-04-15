@@ -11,17 +11,20 @@ import {
 } from '@privateaim/server-storage-kit';
 import {
     BaseComponent,
+    type TaskManager,
 } from '@privateaim/server-kit';
+import type { DataSource } from 'typeorm';
+import type { TaskMap } from '../../../../core/domains/index.ts';
 import { StorageBucketCreationFinishedHandler, StorageBucketDeletionFinishedHandler } from './handlers/index.ts';
 
 export class StorageBucketAggregator extends BaseComponent<
     BucketComponentEventMap
 > {
-    constructor() {
+    constructor(ctx: { dataSource: DataSource; taskManager: TaskManager<TaskMap> }) {
         super();
 
-        this.mount(BucketEvent.CREATION_FINISHED, new StorageBucketCreationFinishedHandler());
-        this.mount(BucketEvent.DELETION_FINISHED, new StorageBucketDeletionFinishedHandler());
+        this.mount(BucketEvent.CREATION_FINISHED, new StorageBucketCreationFinishedHandler(ctx));
+        this.mount(BucketEvent.DELETION_FINISHED, new StorageBucketDeletionFinishedHandler(ctx));
     }
 
     async start() : Promise<void> {

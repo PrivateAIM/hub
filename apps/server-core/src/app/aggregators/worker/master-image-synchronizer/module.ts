@@ -14,15 +14,17 @@ import {
     BaseComponent,
 } from '@privateaim/server-kit';
 import { isEventComponentCallerUsable, useEventComponentCaller } from '@privateaim/server-telemetry-kit';
+import type { DataSource } from 'typeorm';
 import {
     handleMasterImageSynchronizerExecutionFinishedEvent,
 } from './handler.ts';
 
 export class MasterImageSynchronizerAggregator extends BaseComponent<MasterImageSynchronizerEventMap> {
-    constructor() {
+    constructor(ctx: { dataSource: DataSource }) {
         super();
 
-        this.mount(MasterImageSynchronizerEvent.EXECUTION_FINISHED, handleMasterImageSynchronizerExecutionFinishedEvent);
+        const handler = (value) => handleMasterImageSynchronizerExecutionFinishedEvent(value, ctx.dataSource);
+        this.mount(MasterImageSynchronizerEvent.EXECUTION_FINISHED, handler);
         this.mount('*', async (
             _payload,
             context,

@@ -12,11 +12,12 @@ import {
     expect, 
     it,
 } from 'vitest';
+import { createTestApplication } from '../../app';
 import { extendObject } from '@authup/kit';
 import type { AnalysisPermission } from '@privateaim/core-kit';
 import { isAuthupClientUsable, useAuthupClient } from '@privateaim/server-kit';
 import {
-    createTestSuite,
+    
     expectProperties,
     removeDateProperties,
 } from '../../utils';
@@ -26,20 +27,20 @@ import {
 } from '../../utils/domains';
 
 describe('src/controllers/core/analysis-permission', () => {
-    const suite = createTestSuite();
+    const suite = createTestApplication();
 
     beforeAll(async () => {
-        await suite.up();
+        await suite.setup();
     });
 
     afterAll(async () => {
-        await suite.down();
+        await suite.teardown();
     });
 
     const attributes : Partial<AnalysisPermission> = { permission_id: '667672f6-1c6b-468f-947f-6370cf18454c' };
 
     it('should create resource', async () => {
-        const client = suite.client();
+        const { client } = suite;
 
         const project = await client.project.create(createTestProject());
         expect(project.id).toBeDefined();
@@ -66,20 +67,20 @@ describe('src/controllers/core/analysis-permission', () => {
     });
 
     it('should read collection', async () => {
-        const client = suite.client();
+        const { client } = suite;
         const { data } = await client.analysisPermission.getMany();
         expect(data.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should read resource', async () => {
-        const client = suite.client();
+        const { client } = suite;
 
         const data = await client.analysisPermission.getOne(attributes.id);
         expectProperties(attributes, data);
     });
 
     it('should delete resource', async () => {
-        const client = suite.client();
+        const { client } = suite;
 
         await client.analysisPermission.delete(attributes.id);
     });

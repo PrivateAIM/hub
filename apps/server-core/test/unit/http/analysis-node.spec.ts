@@ -12,28 +12,29 @@ import {
     expect, 
     it,
 } from 'vitest';
+import { createTestApplication } from '../../app';
 import { extendObject } from '@authup/kit';
 import type { AnalysisNode } from '@privateaim/core-kit';
 import { NodeType } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
-import { createTestSuite, expectProperties, removeDateProperties } from '../../utils';
+import {  expectProperties, removeDateProperties } from '../../utils';
 import { createTestNode, createTestProject } from '../../utils/domains';
 
 describe('src/controllers/core/analysis-node', () => {
-    const suite = createTestSuite();
+    const suite = createTestApplication();
 
     beforeAll(async () => {
-        await suite.up();
+        await suite.setup();
     });
 
     afterAll(async () => {
-        await suite.down();
+        await suite.teardown();
     });
 
     let details : AnalysisNode;
 
     it('should create resource', async () => {
-        const client = suite.client();
+        const { client } = suite;
 
         const project = await client.project.create(createTestProject());
         expect(project.id).toBeDefined();
@@ -63,7 +64,7 @@ describe('src/controllers/core/analysis-node', () => {
     });
 
     it('should update record', async () => {
-        const client = suite.client();
+        const { client } = suite;
 
         const data = await client.analysisNode.update(details.id, {
             ...details,
@@ -77,21 +78,21 @@ describe('src/controllers/core/analysis-node', () => {
     });
 
     it('should read collection', async () => {
-        const client = suite.client();
+        const { client } = suite;
 
         const { data } = await client.analysisNode.getMany();
         expect(data.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should read resource', async () => {
-        const client = suite.client();
+        const { client } = suite;
 
         const data = await client.analysisNode.getOne(details.id);
         expectProperties(details, data);
     });
 
     it('should delete resource', async () => {
-        const client = suite.client();
+        const { client } = suite;
 
         await client.analysisNode.delete(details.id);
     });

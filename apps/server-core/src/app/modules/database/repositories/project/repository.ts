@@ -16,6 +16,7 @@ import {
     isEntityUnique,
     validateEntityJoinColumns,
 } from 'typeorm-extension';
+import type { ParseAllowedOption } from 'rapiq';
 import { parseQueryFields } from 'rapiq';
 import { ProjectEntity } from '../../../../../adapters/database/entities/project.ts';
 import { DatabaseConflictError } from '../../../../../adapters/database/error/index.ts';
@@ -25,7 +26,7 @@ import type {
     IProjectRepository,
 } from '../../../../../core/index.ts';
 
-const DEFAULT_FIELDS: (keyof ProjectEntity)[] = [
+const DEFAULT_FIELDS: ParseAllowedOption<ProjectEntity> = [
     'id',
     'name',
     'description',
@@ -63,7 +64,7 @@ export class ProjectRepositoryAdapter implements IProjectRepository {
         qb.groupBy('project.id');
 
         const fieldsParsed = parseQueryFields<ProjectEntity>(fields, {
-            default: DEFAULT_FIELDS as any,
+            default: DEFAULT_FIELDS,
             defaultPath: 'project',
         });
 

@@ -16,7 +16,7 @@ import {
 } from '@privateaim/server-kit';
 import { AnalysisError } from '@privateaim/core-kit';
 import type { EntityManager } from 'typeorm';
-import { useAnalysisMetadataComponent } from '../singleton.ts';
+import type { AnalysisMetadataComponent } from '../module.ts';
 import type { AnalysisMetadataEventMap, AnalysisMetadataRecalcPayload } from '../types.ts';
 import { AnalysisMetadataCommand, AnalysisMetadataEvent, AnalysisMetadataTaskQueue } from '../constants.ts';
 import type { AnalysisEntity } from '../../../../adapters/database/index.ts';
@@ -26,8 +26,8 @@ export class AnalysisMetadataComponentCaller implements ComponentCaller<Analysis
 
     protected queueDispatchCaller : QueueDispatchComponentCaller<AnalysisMetadataEventMap>;
 
-    constructor() {
-        this.directCaller = new DirectComponentCaller<AnalysisMetadataEventMap>(useAnalysisMetadataComponent());
+    constructor(component: AnalysisMetadataComponent) {
+        this.directCaller = new DirectComponentCaller<AnalysisMetadataEventMap>(component);
         this.queueDispatchCaller = new QueueDispatchComponentCaller<AnalysisMetadataEventMap>({ queue: AnalysisMetadataTaskQueue });
     }
 
