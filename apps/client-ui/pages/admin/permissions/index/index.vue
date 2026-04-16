@@ -9,12 +9,12 @@
 import { VCTimeago } from '@vuecs/timeago';
 import { BTable } from 'bootstrap-vue-next';
 import {
-    AEntityDelete, 
-    APagination, 
-    APermissions, 
-    ASearch, 
-    ATitle, 
-    injectStore, 
+    AEntityDelete,
+    APagination,
+    APermissions,
+    ASearch,
+    ATitle,
+    injectStore,
     storeToRefs,
     usePermissionCheck,
 } from '@authup/client-web-kit';
@@ -50,27 +50,39 @@ export default defineNuxtComponent({
 
         const fields = [
             {
-                key: 'name', 
-                label: 'Name', 
-                thClass: 'text-left', 
+                key: 'name',
+                label: 'Name',
+                thClass: 'text-left',
                 tdClass: 'text-left',
             },
             {
-                key: 'created_at', 
-                label: 'Created at', 
-                thClass: 'text-center', 
+                key: 'built_in',
+                label: 'Built in?',
+                thClass: 'text-center',
                 tdClass: 'text-center',
             },
             {
-                key: 'updated_at', 
-                label: 'Updated at', 
-                thClass: 'text-left', 
+                key: 'global',
+                label: 'Global?',
+                thClass: 'text-center',
+                tdClass: 'text-center',
+            },
+            {
+                key: 'created_at',
+                label: 'Created at',
+                thClass: 'text-center',
+                tdClass: 'text-center',
+            },
+            {
+                key: 'updated_at',
+                label: 'Updated at',
+                thClass: 'text-left',
                 tdClass: 'text-left',
             },
             {
-                key: 'options', 
-                label: '', 
-                tdClass: 'text-left', 
+                key: 'options',
+                label: '',
+                tdClass: 'text-left',
             },
         ];
 
@@ -111,6 +123,24 @@ export default defineNuxtComponent({
                 head-variant="'dark'"
                 outlined
             >
+                <template #cell(built_in)="data">
+                    <i
+                        class="fas"
+                        :class="{
+                            'fa-check text-success': data.item.built_in,
+                            'fa-times text-danger': !data.item.built_in,
+                        }"
+                    />
+                </template>
+                <template #cell(global)="data">
+                    <i
+                        class="fas"
+                        :class="{
+                            'fa-check text-success': !data.item.realm_id,
+                            'fa-times text-danger': data.item.realm_id,
+                        }"
+                    />
+                </template>
                 <template #cell(created_at)="data">
                     <VCTimeago :datetime="data.item.created_at" />
                 </template>
@@ -131,7 +161,7 @@ export default defineNuxtComponent({
                         entity-type="permission"
                         :with-text="false"
                         :disabled="data.item.built_in || !hasDropPermission"
-                        @deleted="props.deleted"
+                        @deleted="(e) => props.deleted!(e)"
                     />
                 </template>
             </BTable>

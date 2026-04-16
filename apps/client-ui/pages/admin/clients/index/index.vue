@@ -44,33 +44,45 @@ export default defineComponent({
 
         const fields = [
             {
-                key: 'name', 
-                label: 'Name', 
-                thClass: 'text-left', 
+                key: 'name',
+                label: 'Name',
+                thClass: 'text-left',
                 tdClass: 'text-left',
             },
             {
-                key: 'built_in', 
-                label: 'Built in?', 
-                thClass: 'text-center', 
+                key: 'active',
+                label: 'Active?',
+                thClass: 'text-center',
                 tdClass: 'text-center',
             },
             {
-                key: 'created_at', 
-                label: 'Created at', 
-                thClass: 'text-center', 
+                key: 'is_confidential',
+                label: 'Confidential?',
+                thClass: 'text-center',
                 tdClass: 'text-center',
             },
             {
-                key: 'updated_at', 
-                label: 'Updated at', 
-                thClass: 'text-left', 
+                key: 'built_in',
+                label: 'Built in?',
+                thClass: 'text-center',
+                tdClass: 'text-center',
+            },
+            {
+                key: 'created_at',
+                label: 'Created at',
+                thClass: 'text-center',
+                tdClass: 'text-center',
+            },
+            {
+                key: 'updated_at',
+                label: 'Updated at',
+                thClass: 'text-left',
                 tdClass: 'text-left',
             },
             {
-                key: 'options', 
-                label: '', 
-                tdClass: 'text-left', 
+                key: 'options',
+                label: '',
+                tdClass: 'text-left',
             },
         ];
 
@@ -111,11 +123,30 @@ export default defineComponent({
                 head-variant="'dark'"
                 outlined
             >
+                <template #cell(active)="data">
+                    <i
+                        class="fas"
+                        :class="{
+                            'fa-check text-success': data.item.active,
+                            'fa-times text-danger': !data.item.active,
+                        }"
+                    />
+                </template>
+                <template #cell(is_confidential)="data">
+                    <i
+                        class="fas"
+                        :class="{
+                            'fa-check text-success': data.item.is_confidential,
+                            'fa-times text-danger': !data.item.is_confidential,
+                        }"
+                    />
+                </template>
                 <template #cell(built_in)="data">
                     <i
+                        class="fas"
                         :class="{
-                            'fa fa-times text-danger': !data.item.built_in,
-                            'fa fa-check text-success': data.item.built_in,
+                            'fa-check text-success': data.item.built_in,
+                            'fa-times text-danger': !data.item.built_in,
                         }"
                     />
                 </template>
