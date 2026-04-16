@@ -1,7 +1,7 @@
 {
     "name": "@privateaim/server-realtime-kit",
     "type": "module",
-    "version": "0.8.33",
+    "version": "0.8.34",
     "module": "./dist/index.mjs",
     "types": "./dist/index.d.mts",
     "exports": {
@@ -28,9 +28,9 @@
         "@authup/server-adapter-kit": "^1.0.0-beta.35",
         "@authup/server-adapter-socket-io": "^1.0.0-beta.35",
         "@socket.io/redis-adapter": "^8.3.0",
-        "@privateaim/kit": "^0.8.33",
-        "@privateaim/telemetry-kit": "^0.8.33",
-        "@privateaim/server-kit": "^0.8.33",
+        "@privateaim/kit": "^0.8.34",
+        "@privateaim/telemetry-kit": "^0.8.34",
+        "@privateaim/server-kit": "^0.8.34",
         "@ebec/http": "^2.3.0"
     },
     "devDependencies": {

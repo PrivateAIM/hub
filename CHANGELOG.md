@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.8.34](https://github.com/PrivateAIM/hub/compare/v0.8.33...v0.8.34) (2026-04-16)
+
+
+### Features
+
+* **client-ui:** add search to admin assignment sub-pages ([cb85128](https://github.com/PrivateAIM/hub/commit/cb851280464cf2b7f3008729861662d773552994))
+
+
+### Bug Fixes
+
+* guarantee that metadata component is called ([#1534](https://github.com/PrivateAIM/hub/issues/1534)) ([3a0d520](https://github.com/PrivateAIM/hub/commit/3a0d520336b47e995f7205ed8c02ef09743c8e79))
+
 ## [0.8.33](https://github.com/PrivateAIM/hub/compare/v0.8.32...v0.8.33) (2026-04-16)
 
 ## [0.8.32](https://github.com/PrivateAIM/hub/compare/v0.8.31...v0.8.32) (2026-04-16)
