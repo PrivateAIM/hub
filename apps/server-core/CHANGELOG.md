@@ -1,5 +1,34 @@
 # Changelog
 
+## [0.8.32](https://github.com/PrivateAIM/hub/compare/v0.8.31...v0.8.32) (2026-04-16)
+
+
+### Bug Fixes
+
+* **deps:** bump [@authup](https://github.com/authup) packages to 1.0.0-beta.34 ([ab6e812](https://github.com/PrivateAIM/hub/commit/ab6e81246850e6378e364afaf036d4b4155b1673))
+* **deps:** bump [@authup](https://github.com/authup) packages to 1.0.0-beta.35 and align admin pages ([a2d742e](https://github.com/PrivateAIM/hub/commit/a2d742e33638ddc577e44bfffcf85b2698579527))
+* migration path + build-/distribution-status aggregation ([#1529](https://github.com/PrivateAIM/hub/issues/1529)) ([6ad6c1d](https://github.com/PrivateAIM/hub/commit/6ad6c1d11d6e9dd3be154b234a1bfae8fc906ff1))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.8.31 to ^0.8.32
+    * @privateaim/core-realtime-kit bumped from ^0.7.32 to ^0.7.33
+    * @privateaim/kit bumped from ^0.8.31 to ^0.8.32
+    * @privateaim/server-core-worker-kit bumped from ^0.7.32 to ^0.7.33
+    * @privateaim/server-db-kit bumped from ^0.8.31 to ^0.8.32
+    * @privateaim/server-http-kit bumped from ^0.8.31 to ^0.8.32
+    * @privateaim/server-kit bumped from ^0.8.31 to ^0.8.32
+    * @privateaim/server-realtime-kit bumped from ^0.8.31 to ^0.8.32
+    * @privateaim/server-telemetry bumped from ^0.8.31 to ^0.8.32
+    * @privateaim/server-telemetry-kit bumped from ^0.8.31 to ^0.8.32
+    * @privateaim/storage-kit bumped from ^0.8.31 to ^0.8.32
+    * @privateaim/telemetry-kit bumped from ^0.8.31 to ^0.8.32
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.8.31 to ^0.8.32
+
 ## [0.8.31](https://github.com/PrivateAIM/hub/compare/v0.8.30...v0.8.31) (2026-03-03)
 
 

@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.8.32](https://github.com/PrivateAIM/hub/compare/v0.8.31...v0.8.32) (2026-04-16)
+
+
+### Features
+
+* policy sub pages + permission-policy assignment page ([d7a4d07](https://github.com/PrivateAIM/hub/commit/d7a4d0708d6d15f68058723ff7d8a3e8bf95382a))
+
+
+### Bug Fixes
+
+* **deps:** bump [@authup](https://github.com/authup) packages to 1.0.0-beta.34 ([ab6e812](https://github.com/PrivateAIM/hub/commit/ab6e81246850e6378e364afaf036d4b4155b1673))
+* **deps:** bump [@authup](https://github.com/authup) packages to 1.0.0-beta.35 and align admin pages ([a2d742e](https://github.com/PrivateAIM/hub/commit/a2d742e33638ddc577e44bfffcf85b2698579527))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/client-vue bumped from ^0.8.31 to ^0.8.32
+    * @privateaim/core-kit bumped from ^0.8.31 to ^0.8.32
+    * @privateaim/kit bumped from ^0.8.31 to ^0.8.32
+    * @privateaim/storage-kit bumped from ^0.8.31 to ^0.8.32
+    * @privateaim/telemetry-kit bumped from ^0.8.31 to ^0.8.32
+
 ## [0.8.31](https://github.com/PrivateAIM/hub/compare/v0.8.30...v0.8.31) (2026-03-03)
 
 
