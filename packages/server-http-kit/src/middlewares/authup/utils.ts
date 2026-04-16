@@ -56,7 +56,11 @@ export function applyTokenVerificationData(
         })));
     }
 
-    const permissionEvaluator = new PermissionEvaluator({ provider: repository });
+    const permissionEvaluator = new PermissionEvaluator({
+        provider: repository,
+        realmId: null,
+        clientId:null,
+    });
     const requestPermissionChecker = new RequestPermissionChecker(req, permissionEvaluator);
     setRequestEnv(req, 'permissionChecker', requestPermissionChecker);
 

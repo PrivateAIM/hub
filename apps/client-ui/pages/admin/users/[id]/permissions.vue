@@ -6,13 +6,14 @@
   -->
 
 <script lang="ts">
-import { APagination, AUserPermissionAssignments } from '@authup/client-web-kit';
+import { APagination, ASearch, AUserPermissionAssignments } from '@authup/client-web-kit';
 import type { User } from '@authup/core-kit';
 import type { PropType } from 'vue';
 import { defineNuxtComponent } from '#app';
 
 export default defineNuxtComponent({
     components: {
+        ASearch,
         APagination,
         AUserPermissionAssignments,
     },
@@ -26,6 +27,12 @@ export default defineNuxtComponent({
 </script>
 <template>
     <AUserPermissionAssignments :entity-id="entity.id">
+        <template #header="props">
+            <ASearch
+                :load="props.load"
+                :meta="props.meta"
+            />
+        </template>
         <template #footer="props">
             <APagination
                 :busy="props.busy"
