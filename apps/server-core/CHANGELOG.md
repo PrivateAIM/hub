@@ -1,5 +1,32 @@
 # Changelog
 
+## [0.8.34](https://github.com/PrivateAIM/hub/compare/v0.8.33...v0.8.34) (2026-04-16)
+
+
+### Bug Fixes
+
+* guarantee that metadata component is called ([#1534](https://github.com/PrivateAIM/hub/issues/1534)) ([3a0d520](https://github.com/PrivateAIM/hub/commit/3a0d520336b47e995f7205ed8c02ef09743c8e79))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.8.33 to ^0.8.34
+    * @privateaim/core-realtime-kit bumped from ^0.7.34 to ^0.7.35
+    * @privateaim/kit bumped from ^0.8.33 to ^0.8.34
+    * @privateaim/server-core-worker-kit bumped from ^0.7.34 to ^0.7.35
+    * @privateaim/server-db-kit bumped from ^0.8.33 to ^0.8.34
+    * @privateaim/server-http-kit bumped from ^0.8.33 to ^0.8.34
+    * @privateaim/server-kit bumped from ^0.8.33 to ^0.8.34
+    * @privateaim/server-realtime-kit bumped from ^0.8.33 to ^0.8.34
+    * @privateaim/server-telemetry bumped from ^0.8.33 to ^0.8.34
+    * @privateaim/server-telemetry-kit bumped from ^0.8.33 to ^0.8.34
+    * @privateaim/storage-kit bumped from ^0.8.33 to ^0.8.34
+    * @privateaim/telemetry-kit bumped from ^0.8.33 to ^0.8.34
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.8.33 to ^0.8.34
+
 ## [0.8.33](https://github.com/PrivateAIM/hub/compare/v0.8.32...v0.8.33) (2026-04-16)
 
 
