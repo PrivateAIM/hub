@@ -41,6 +41,16 @@ function createTestComponentsModule(): IModule {
             const metadataComponent = new AnalysisMetadataComponent({ dataSource });
             const metadataCaller = new AnalysisMetadataComponentCaller(metadataComponent);
             container.register(ComponentsInjectionKey.AnalysisMetadataComponentCaller, { useValue: metadataCaller });
+
+            // Inject metadataCaller into subscribers (created by database module)
+            const analysisSubscriber = container.resolve(DatabaseInjectionKey.AnalysisSubscriber);
+            analysisSubscriber.setMetadataCaller(metadataCaller);
+
+            const bucketFileSubscriber = container.resolve(DatabaseInjectionKey.AnalysisBucketFileSubscriber);
+            bucketFileSubscriber.setMetadataCaller(metadataCaller);
+
+            const analysisNodeSubscriber = container.resolve(DatabaseInjectionKey.AnalysisNodeSubscriber);
+            analysisNodeSubscriber.setMetadataCaller(metadataCaller);
         },
     };
 }

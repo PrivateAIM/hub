@@ -70,6 +70,10 @@ export class AnalysisSubscriber extends BaseSubscriber<
         this.storageManager = ctx?.storageManager;
     }
 
+    setMetadataCaller(metadataCaller: IAnalysisMetadataCaller): void {
+        this.metadataCaller = metadataCaller;
+    }
+
     setStorageManager(storageManager: IAnalysisStorageManager): void {
         this.storageManager = storageManager;
     }

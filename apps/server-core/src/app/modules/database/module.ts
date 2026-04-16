@@ -32,7 +32,6 @@ import {
     RegistryProjectSubscriber,
     RegistrySubscriber,
 } from '../../../adapters/database/subscribers/index.ts';
-import { ComponentsInjectionKey } from '../components/constants.ts';
 import { NodeClientService } from './node-client.ts';
 import { DataSourceOptionsBuilder } from './options.ts';
 import { setDataSourceSync } from './singleton.ts';
@@ -94,12 +93,6 @@ export class DatabaseModule implements IModule {
     }
 
     private registerSubscribers(dataSource: any, container: IContainer): void {
-        let metadataCaller: any;
-        const callerResult = container.tryResolve(ComponentsInjectionKey.AnalysisMetadataComponentCaller);
-        if (callerResult.success) {
-            metadataCaller = callerResult.data;
-        }
-
         let nodeClientService: NodeClientService | undefined;
         if (isAuthupClientUsable()) {
             const authupResult = container.tryResolve(AuthupClientInjectionKey);
@@ -108,15 +101,19 @@ export class DatabaseModule implements IModule {
             }
         }
 
-        const analysisSubscriber = new AnalysisSubscriber({ metadataCaller });
+        const analysisSubscriber = new AnalysisSubscriber();
+        const analysisBucketFileSubscriber = new AnalysisBucketFileSubscriber();
+        const analysisNodeSubscriber = new AnalysisNodeSubscriber();
 
         container.register(DatabaseInjectionKey.AnalysisSubscriber, { useValue: analysisSubscriber });
+        container.register(DatabaseInjectionKey.AnalysisBucketFileSubscriber, { useValue: analysisBucketFileSubscriber });
+        container.register(DatabaseInjectionKey.AnalysisNodeSubscriber, { useValue: analysisNodeSubscriber });
 
         dataSource.subscribers.push(
             new NodeSubscriber({ nodeClientService }),
             analysisSubscriber,
-            new AnalysisBucketFileSubscriber({ metadataCaller }),
-            new AnalysisNodeSubscriber({ metadataCaller }),
+            analysisBucketFileSubscriber,
+            analysisNodeSubscriber,
 
             new AnalysisBucketSubscriber(),
             new AnalysisNodeEventSubscriber(),

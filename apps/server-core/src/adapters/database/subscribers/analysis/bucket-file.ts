@@ -62,6 +62,10 @@ export class AnalysisBucketFileSubscriber extends BaseSubscriber<
         this.metadataCaller = ctx?.metadataCaller;
     }
 
+    setMetadataCaller(metadataCaller: MetadataCaller): void {
+        this.metadataCaller = metadataCaller;
+    }
+
     async afterInsert(event: InsertEvent<AnalysisBucketFileEntity>): Promise<any> {
         await super.afterInsert(event);
 

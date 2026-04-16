@@ -73,6 +73,10 @@ export class AnalysisNodeSubscriber extends BaseSubscriber<
         this.metadataCaller = ctx?.metadataCaller;
     }
 
+    setMetadataCaller(metadataCaller: MetadataCaller): void {
+        this.metadataCaller = metadataCaller;
+    }
+
     async afterInsert(event: InsertEvent<AnalysisNodeEntity>): Promise<any> {
         await super.afterInsert(event);
 
