@@ -4,6 +4,11 @@ on:
     push:
         branches:
             - master
+    workflow_dispatch:
+        inputs:
+            version:
+                description: 'Version to publish (e.g. 0.8.32)'
+                required: true
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
@@ -14,6 +19,7 @@ permissions:
     packages: write
     contents: write
     pull-requests: write
+    id-token: write
 
 defaults:
     run:
@@ -26,41 +32,58 @@ jobs:
 
         steps:
             -   uses: googleapis/release-please-action@v4
+                if: github.event_name == 'push'
                 id: release
                 with:
                     token: ${{ secrets.GITHUB_TOKEN }}
 
+            -   name: Set publish flags
+                id: flags
+                run: |
+                    if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+                        echo "should_publish=true" >> "$GITHUB_OUTPUT"
+                        VERSION="${{ inputs.version }}"
+                    else
+                        echo "should_publish=${{ steps.release.outputs.releases_created }}" >> "$GITHUB_OUTPUT"
+                        VERSION="${{ steps.release.outputs['major'] }}.${{ steps.release.outputs['minor'] }}.${{ steps.release.outputs['patch'] }}"
+                    fi
+                    IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+                    echo "major=$MAJOR" >> "$GITHUB_OUTPUT"
+                    echo "minor=$MINOR" >> "$GITHUB_OUTPUT"
+                    echo "patch=$PATCH" >> "$GITHUB_OUTPUT"
+                    echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
             -   name: Checkout
-                if: steps.release.outputs.releases_created == 'true'
+                if: steps.flags.outputs.should_publish == 'true'
                 uses: actions/checkout@v6
                 with:
                     fetch-depth: 0
 
             -   name: Configure Git
-                if: steps.release.outputs.releases_created == 'true'
+                if: steps.flags.outputs.should_publish == 'true'
                 run: |
                     git config user.name "$GITHUB_ACTOR"
                     git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
             -   name: Install
-                if: steps.release.outputs.releases_created == 'true'
+                if: steps.flags.outputs.should_publish == 'true'
                 uses: ./.github/actions/install
                 with:
                     node-version: ${{ env.NODE_VERSION }}
 
             -   name: Build
-                if: steps.release.outputs.releases_created == 'true'
+                if: steps.flags.outputs.should_publish == 'true'
                 uses: ./.github/actions/build
 
             -   name: Publish
-                if: steps.release.outputs.releases_created == 'true'
+                if: steps.flags.outputs.should_publish == 'true'
                 uses: tada5hi/monoship@v2
                 env:
                     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
             -   uses: tada5hi/action-docker-image-publish@v3
-                if: steps.release.outputs.releases_created == 'true'
+                if: steps.flags.outputs.should_publish == 'true'
                 with:
                     registryTag: |
                         latest
-                        ${{ steps.release.outputs['major'] }}.${{ steps.release.outputs['minor'] }}.${{ steps.release.outputs['patch'] }}
+                        ${{ steps.flags.outputs.major }}.${{ steps.flags.outputs.minor }}.${{ steps.flags.outputs.patch }}
