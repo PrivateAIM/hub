@@ -18,6 +18,21 @@ import {
     DatabaseInjectionKey,
     registerRepositories,
 } from '../../src/app/modules/database/index.ts';
+import {
+    AnalysisBucketFileSubscriber,
+    AnalysisBucketSubscriber,
+    AnalysisNodeEventSubscriber,
+    AnalysisNodeSubscriber,
+    AnalysisPermissionSubscriber,
+    AnalysisSubscriber,
+    MasterImageGroupSubscriber,
+    MasterImageSubscriber,
+    NodeSubscriber,
+    ProjectNodeSubscriber,
+    ProjectSubscriber,
+    RegistryProjectSubscriber,
+    RegistrySubscriber,
+} from '../../src/adapters/database/subscribers/index.ts';
 
 export function createTestDatabaseModule(): IModule {
     return {
@@ -50,6 +65,30 @@ export function createTestDatabaseModule(): IModule {
             setDataSource(dataSource);
 
             container.register(DatabaseInjectionKey.DataSource, { useValue: dataSource });
+
+            const analysisSubscriber = new AnalysisSubscriber();
+            const analysisBucketFileSubscriber = new AnalysisBucketFileSubscriber();
+            const analysisNodeSubscriber = new AnalysisNodeSubscriber();
+
+            container.register(DatabaseInjectionKey.AnalysisSubscriber, { useValue: analysisSubscriber });
+            container.register(DatabaseInjectionKey.AnalysisBucketFileSubscriber, { useValue: analysisBucketFileSubscriber });
+            container.register(DatabaseInjectionKey.AnalysisNodeSubscriber, { useValue: analysisNodeSubscriber });
+
+            dataSource.subscribers.push(
+                new NodeSubscriber(),
+                analysisSubscriber,
+                analysisBucketFileSubscriber,
+                analysisNodeSubscriber,
+                new AnalysisBucketSubscriber(),
+                new AnalysisNodeEventSubscriber(),
+                new AnalysisPermissionSubscriber(),
+                new MasterImageSubscriber(),
+                new MasterImageGroupSubscriber(),
+                new ProjectSubscriber(),
+                new ProjectNodeSubscriber(),
+                new RegistrySubscriber(),
+                new RegistryProjectSubscriber(),
+            );
 
             registerRepositories(container, dataSource);
         },

@@ -47,6 +47,9 @@ export class ComponentsModule implements IModule {
         container.register(ComponentsInjectionKey.RegistryComponentCaller, { useValue: registryComponentCaller });
         container.register(ComponentsInjectionKey.AnalysisMetadataComponentCaller, { useValue: analysisMetadataComponentCaller });
 
+        // Inject metadataCaller into subscribers (created earlier by DatabaseModule)
+        this.injectMetadataCaller(container, analysisMetadataComponentCaller);
+
         // Start task consumers
         const components = [
             new QueueWorkerComponentCaller(
@@ -60,5 +63,22 @@ export class ComponentsModule implements IModule {
         ];
 
         components.forEach((c) => c.start());
+    }
+
+    private injectMetadataCaller(container: IContainer, metadataCaller: AnalysisMetadataComponentCaller): void {
+        const analysisSubscriber = container.tryResolve(DatabaseInjectionKey.AnalysisSubscriber);
+        if (analysisSubscriber.success) {
+            analysisSubscriber.data.setMetadataCaller(metadataCaller);
+        }
+
+        const bucketFileSubscriber = container.tryResolve(DatabaseInjectionKey.AnalysisBucketFileSubscriber);
+        if (bucketFileSubscriber.success) {
+            bucketFileSubscriber.data.setMetadataCaller(metadataCaller);
+        }
+
+        const nodeSubscriber = container.tryResolve(DatabaseInjectionKey.AnalysisNodeSubscriber);
+        if (nodeSubscriber.success) {
+            nodeSubscriber.data.setMetadataCaller(metadataCaller);
+        }
     }
 }
