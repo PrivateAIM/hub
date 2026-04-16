@@ -1,5 +1,34 @@
 # Changelog
 
+## [0.8.32](https://github.com/PrivateAIM/hub/compare/v0.8.31...v0.8.32) (2026-04-16)
+
+
+### Bug Fixes
+
+* **deps:** bump [@authup](https://github.com/authup) packages to 1.0.0-beta.34 ([ab6e812](https://github.com/PrivateAIM/hub/commit/ab6e81246850e6378e364afaf036d4b4155b1673))
+* **deps:** bump [@authup](https://github.com/authup) packages to 1.0.0-beta.35 and align admin pages ([a2d742e](https://github.com/PrivateAIM/hub/commit/a2d742e33638ddc577e44bfffcf85b2698579527))
+* **deps:** bump @authup/** packages to 1.0.0-beta.31 ([#1510](https://github.com/PrivateAIM/hub/issues/1510)) ([62feb46](https://github.com/PrivateAIM/hub/commit/62feb46e9e555bbd3e2896ec8426c7a3d146cc61))
+* **deps:** bump the minorandpatch group across 1 directory with 10 updates ([#1480](https://github.com/PrivateAIM/hub/issues/1480)) ([8d17ce6](https://github.com/PrivateAIM/hub/commit/8d17ce609123217d220e2e817122f24b09f42b72))
+* **deps:** bump the minorandpatch group across 1 directory with 21 updates ([#1505](https://github.com/PrivateAIM/hub/issues/1505)) ([2a2a177](https://github.com/PrivateAIM/hub/commit/2a2a17757aab9820aefd24c0bcaa815d810df979))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.8.31 to ^0.8.32
+    * @privateaim/core-kit bumped from ^0.8.31 to ^0.8.32
+    * @privateaim/core-realtime-kit bumped from ^0.7.32 to ^0.7.33
+    * @privateaim/kit bumped from ^0.8.31 to ^0.8.32
+    * @privateaim/storage-kit bumped from ^0.8.31 to ^0.8.32
+    * @privateaim/telemetry-kit bumped from ^0.8.31 to ^0.8.32
+  * peerDependencies
+    * @privateaim/core-http-kit bumped from ^0.8.31 to ^0.8.32
+    * @privateaim/core-kit bumped from ^0.8.31 to ^0.8.32
+    * @privateaim/kit bumped from ^0.8.31 to ^0.8.32
+    * @privateaim/storage-kit bumped from ^0.8.31 to ^0.8.32
+    * @privateaim/telemetry-kit bumped from ^0.8.31 to ^0.8.32
+
 ## [0.8.31](https://github.com/PrivateAIM/hub/compare/v0.8.30...v0.8.31) (2026-03-03)
 
 
