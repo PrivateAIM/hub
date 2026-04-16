@@ -43,7 +43,7 @@ describe('controllers/bucket-file', () => {
 
         const bucket = await client.bucket.create(createTestBucket({ region: 'eu-west' }));
 
-        const filePath = path.join(__dirname, '..', 'data', 'file.json');
+        const filePath = path.join(import.meta.dirname, '..', 'data', 'file.json');
         const file = await fs.promises.readFile(filePath);
 
         const formData = new FormData();

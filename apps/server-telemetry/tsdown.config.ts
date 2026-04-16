@@ -6,4 +6,5 @@ export default defineConfig({
     bundle: false,
     dts: false,
     sourcemap: true,
+    shims: true,
 });

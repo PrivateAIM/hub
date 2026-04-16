@@ -38,11 +38,11 @@ export default defineNuxtConfig({
     ssr: true,
 
     alias: {
-        '@privateaim/core-kit': path.join(__dirname, '..', '..', 'packages', 'core-kit', 'src'),
-        '@privateaim/kit': path.join(__dirname, '..', '..', 'packages', 'kit', 'src'),
-        '@privateaim/client-vue': path.join(__dirname, '..', '..', 'packages', 'client-vue', 'src'),
-        '@privateaim/storage-kit': path.join(__dirname, '..', '..', 'packages', 'storage-kit', 'src'),
-        '@privateaim/telemetry-kit': path.join(__dirname, '..', '..', 'packages', 'telemetry-kit', 'src'),
+        '@privateaim/core-kit': path.join(import.meta.dirname, '..', '..', 'packages', 'core-kit', 'src'),
+        '@privateaim/kit': path.join(import.meta.dirname, '..', '..', 'packages', 'kit', 'src'),
+        '@privateaim/client-vue': path.join(import.meta.dirname, '..', '..', 'packages', 'client-vue', 'src'),
+        '@privateaim/storage-kit': path.join(import.meta.dirname, '..', '..', 'packages', 'storage-kit', 'src'),
+        '@privateaim/telemetry-kit': path.join(import.meta.dirname, '..', '..', 'packages', 'telemetry-kit', 'src'),
     },
 
     /*

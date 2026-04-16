@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import path from 'node:path';
 import { orFail, read, readInt } from 'envix';
 import { config } from 'dotenv';
 import { EnvironmentName } from '@privateaim/server-kit';
@@ -13,7 +12,7 @@ import type { Environment } from './type';
 
 config({
     debug: false,
-    path: path.resolve(__dirname, '..', '..', '..', '.env'),
+    quiet: true,
 });
 
 let instance : Environment | undefined;

@@ -6,5 +6,6 @@ export default defineConfig({
     format: 'esm',
     dts: false,
     sourcemap: true,
+    shims: true,
     plugins: [vue()],
 });
