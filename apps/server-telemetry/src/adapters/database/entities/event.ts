@@ -49,18 +49,17 @@ export class EventEntity implements Event {
 
     @Column({
         type: 'text',
-        nullable: false,
-        default: '{}',
+        nullable: true,
         transformer: {
             to(value: any): any {
-                return serialize(value ?? {});
+                return serialize(value);
             },
             from(value: any): any {
-                return deserialize(value) ?? {};
+                return deserialize(value);
             },
         },
     })
-    data: ObjectLiteral;
+    data: ObjectLiteral | null;
 
     // ------------------------------------------------------------------
 
