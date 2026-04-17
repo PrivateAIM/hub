@@ -14,11 +14,10 @@ import {
     MasterImageSynchronizerCommand,
     MasterImageSynchronizerEvent,
 } from '@privateaim/server-core-worker-kit';
-import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
+import type { ComponentHandler, ComponentHandlerContext, Logger } from '@privateaim/server-kit';
 import { scanDirectory } from 'docken';
 import { MASTER_IMAGES_DIRECTORY_PATH } from '../../../../../constants';
 import { GitHubClient } from '../../../../../adapters/github/index.ts';
-import { createAnalysisBuilderLogger } from '../../../analysis-builder/utils';
 import {
     DockenGroupAttributesValidator,
     DockenImageAttributesValidator,
@@ -32,9 +31,12 @@ export class MasterImageSynchronizerExecuteHandler implements ComponentHandler<
 
     protected imageValidator : DockenImageAttributesValidator;
 
-    constructor() {
+    protected logger: Logger | undefined;
+
+    constructor(ctx?: { logger?: Logger }) {
         this.groupValidator = new DockenGroupAttributesValidator();
         this.imageValidator = new DockenImageAttributesValidator();
+        this.logger = ctx?.logger;
     }
 
     async handle(
@@ -45,7 +47,7 @@ export class MasterImageSynchronizerExecuteHandler implements ComponentHandler<
             // todo: check if image exists, otherwise local queue task
             await this.handleInternal(payload, context);
         } catch (e) {
-            createAnalysisBuilderLogger().error({
+            this.logger?.error({
                 message: e,
                 command: MasterImageSynchronizerCommand.EXECUTE,
                 event: MasterImageSynchronizerEvent.EXECUTION_FAILED,

@@ -15,9 +15,9 @@ import type { LogWriteCommandPayload } from './handlers';
 export class LogComponentCaller extends QueueDispatchComponentCaller {
     constructor(options: Partial<QueueDispatchComponentCallerOptions> = {}) {
         super({
+            ...options,
             queue: LogTaskQueueRouterRouting,
             logging: false,
-            ...options,
         });
     }
 

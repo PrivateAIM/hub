@@ -5,7 +5,7 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
+import type { ComponentHandler, ComponentHandlerContext, Logger } from '@privateaim/server-kit';
 import type {
     AnalysisDistributorEventMap,
     AnalysisDistributorExecutePayload,
@@ -27,16 +27,22 @@ import {
     cleanupDockerImages,
 } from '../../../../../adapters/docker/index.ts';
 import { BuilderError } from '../../../analysis-builder/error';
-import { createAnalysisDistributorLogger } from '../../helpers';
 
 export class AnalysisDistributorExecuteHandler implements ComponentHandler<AnalysisDistributorEventMap, AnalysisDistributorCommand.EXECUTE> {
     protected coreClient: CoreClient;
 
     protected docker: DockerClient;
 
-    constructor(ctx: { coreClient: CoreClient; docker: DockerClient }) {
+    protected logger: Logger | undefined;
+
+    constructor(ctx: {
+        coreClient: CoreClient; 
+        docker: DockerClient; 
+        logger?: Logger 
+    }) {
         this.coreClient = ctx.coreClient;
         this.docker = ctx.docker;
+        this.logger = ctx.logger;
     }
 
     async handle(
@@ -47,7 +53,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
             // todo: check if image exists, otherwise local queue task
             await this.handleInternal(value, context);
         } catch (e) {
-            createAnalysisDistributorLogger().error({
+            this.logger?.error({
                 message: e,
                 command: AnalysisDistributorCommand.EXECUTE,
                 analysis_id: value.id,
@@ -100,7 +106,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
                 registry,
             );
         } catch (e) {
-            createAnalysisDistributorLogger().error({
+            this.logger?.error({
                 message: 'Tagging images failed',
                 command: AnalysisDistributorCommand.EXECUTE,
                 analysis_id: analysis.id,
@@ -132,7 +138,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
                 },
             );
         } catch (e) {
-            createAnalysisDistributorLogger().error({
+            this.logger?.error({
                 message: 'Pushing images failed',
                 command: AnalysisDistributorCommand.EXECUTE,
                 analysis_id: analysis.id,
@@ -153,7 +159,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
         nodes: Node[],
         registry: Registry,
     ) : Promise<string[]> {
-        createAnalysisDistributorLogger().info({
+        this.logger?.info({
             message: 'Tagging images',
             command: AnalysisDistributorCommand.EXECUTE,
             analysis_id: analysis.id,
@@ -192,7 +198,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
             await image.remove({ force: true });
         }
 
-        createAnalysisDistributorLogger().info({
+        this.logger?.info({
             message: 'Tagged images',
             command: AnalysisDistributorCommand.EXECUTE,
             analysis_id: analysis.id,
@@ -207,7 +213,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
         tags: string[],
         options: { push: ImagePushOptions, stream: ModemStreamWaitOptions },
     ) {
-        createAnalysisDistributorLogger().info({
+        this.logger?.info({
             message: 'Pushing images',
             command: AnalysisDistributorCommand.EXECUTE,
             analysis_id: analysis.id,
@@ -245,7 +251,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
             await cleanupDockerImages(this.docker, tags);
         }
 
-        createAnalysisDistributorLogger().info({
+        this.logger?.info({
             message: 'Pushed images',
             command: AnalysisDistributorCommand.EXECUTE,
             analysis_id: analysis.id,

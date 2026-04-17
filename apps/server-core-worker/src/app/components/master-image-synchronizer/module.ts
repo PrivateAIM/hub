@@ -12,14 +12,15 @@ import {
 import {
     BaseComponent,
 } from '@privateaim/server-kit';
+import type { Logger } from '@privateaim/server-kit';
 
 import { MasterImageSynchronizerExecuteHandler } from './handlers';
 
 export class MasterImageSynchronizerComponent extends BaseComponent<MasterImageSynchronizerEventMap> {
-    constructor() {
+    constructor(ctx?: { logger?: Logger }) {
         super();
 
-        this.mount(MasterImageSynchronizerCommand.EXECUTE, new MasterImageSynchronizerExecuteHandler());
+        this.mount(MasterImageSynchronizerCommand.EXECUTE, new MasterImageSynchronizerExecuteHandler({ logger: ctx?.logger }));
     }
 
     async start() {

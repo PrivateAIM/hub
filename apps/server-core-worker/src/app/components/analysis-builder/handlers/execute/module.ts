@@ -17,7 +17,7 @@ import {
     AnalysisBuilderEventQueueRouterRouting,
 } from '@privateaim/server-core-worker-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
-import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
+import type { ComponentHandler, ComponentHandlerContext, Logger } from '@privateaim/server-kit';
 import type { Client as CoreClient } from '@privateaim/core-http-kit';
 import type { APIClient as StorageClient } from '@privateaim/storage-kit';
 import type { Client as DockerClient, ModemStreamWaitOptions  } from 'docken';
@@ -33,7 +33,6 @@ import {
 import { AnalysisContainerPath } from '../../constants';
 import { BuilderError } from '../../error';
 import { generateDockerFileContent } from '../../helpers';
-import { createAnalysisBuilderLogger } from '../../utils';
 
 export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisBuilderEventMap, AnalysisBuilderCommand.EXECUTE> {
     protected coreClient: CoreClient;
@@ -42,14 +41,18 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
 
     protected docker: DockerClient;
 
+    protected logger: Logger | undefined;
+
     constructor(ctx: {
-        coreClient: CoreClient; 
-        storageClient: StorageClient; 
-        docker: DockerClient 
+        coreClient: CoreClient;
+        storageClient: StorageClient;
+        docker: DockerClient;
+        logger?: Logger;
     }) {
         this.coreClient = ctx.coreClient;
         this.storageClient = ctx.storageClient;
         this.docker = ctx.docker;
+        this.logger = ctx.logger;
     }
 
     async handle(
@@ -60,7 +63,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
             // todo: check if image exists, otherwise local queue task
             await this.handleInternal(value, context);
         } catch (e) {
-            createAnalysisBuilderLogger().error({
+            this.logger?.error({
                 message: e,
                 command: AnalysisBuilderCommand.EXECUTE,
                 analysis_id: value.id,
@@ -107,12 +110,11 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
                 },
             });
         } catch (e) {
-            createAnalysisBuilderLogger()
-                .error('Building image failed', {
-                    command: AnalysisBuilderCommand.EXECUTE,
-                    analysis_id: analysis.id,
-                    [LogFlag.REF_ID]: analysis.id,
-                });
+            this.logger?.error('Building image failed', {
+                command: AnalysisBuilderCommand.EXECUTE,
+                analysis_id: analysis.id,
+                [LogFlag.REF_ID]: analysis.id,
+            });
 
             throw e;
         }
@@ -124,12 +126,11 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
         try {
             container = await this.createContainer(analysis);
         } catch (e) {
-            createAnalysisBuilderLogger()
-                .error('Creating container failed', {
-                    command: AnalysisBuilderCommand.EXECUTE,
-                    analysis_id: analysis.id,
-                    [LogFlag.REF_ID]: analysis.id,
-                });
+            this.logger?.error('Creating container failed', {
+                command: AnalysisBuilderCommand.EXECUTE,
+                analysis_id: analysis.id,
+                [LogFlag.REF_ID]: analysis.id,
+            });
 
             throw e;
         }
@@ -139,12 +140,11 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
         try {
             await this.packContainer(container, analysis);
         } catch (e) {
-            createAnalysisBuilderLogger()
-                .error('Packing container failed', {
-                    command: AnalysisBuilderCommand.EXECUTE,
-                    analysis_id: analysis.id,
-                    [LogFlag.REF_ID]: analysis.id,
-                });
+            this.logger?.error('Packing container failed', {
+                command: AnalysisBuilderCommand.EXECUTE,
+                analysis_id: analysis.id,
+                [LogFlag.REF_ID]: analysis.id,
+            });
 
             await container.remove({ force: true });
 
@@ -156,12 +156,11 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
         try {
             await this.commitContainer(container, analysis);
         } catch (e) {
-            createAnalysisBuilderLogger()
-                .error('Commiting container failed', {
-                    command: AnalysisBuilderCommand.EXECUTE,
-                    analysis_id: analysis.id,
-                    [LogFlag.REF_ID]: analysis.id,
-                });
+            this.logger?.error('Commiting container failed', {
+                command: AnalysisBuilderCommand.EXECUTE,
+                analysis_id: analysis.id,
+                [LogFlag.REF_ID]: analysis.id,
+            });
 
             await container.remove({ force: true });
 
@@ -190,7 +189,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
         analysis: Analysis,
         options: ModemStreamWaitOptions = {},
     ) {
-        createAnalysisBuilderLogger().info({
+        this.logger?.info({
             message: 'Building image',
             command: AnalysisBuilderCommand.EXECUTE,
             analysis_id: analysis.id,
@@ -226,7 +225,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
 
         return waitForStream(this.docker, buildStream, {
             onFinished: () => {
-                createAnalysisBuilderLogger().info({
+                this.logger?.info({
                     message: 'Built image',
                     command: AnalysisBuilderCommand.EXECUTE,
                     analysis_id: analysis.id,
@@ -238,7 +237,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
     }
 
     protected async createContainer(analysis: Analysis) : Promise<Container> {
-        createAnalysisBuilderLogger().info({
+        this.logger?.info({
             message: 'Creating container',
             command: AnalysisBuilderCommand.EXECUTE,
             analysis_id: analysis.id,
@@ -248,7 +247,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
         const container = await this.docker
             .createContainer({ Image: this.buildImageTag(analysis) });
 
-        createAnalysisBuilderLogger().info({
+        this.logger?.info({
             message: 'Created container',
             command: AnalysisBuilderCommand.EXECUTE,
             analysis_id: analysis.id,
@@ -262,12 +261,11 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
         container: Container,
         analysis: Analysis,
     ) : Promise<void> {
-        createAnalysisBuilderLogger()
-            .info('Packing container', {
-                command: AnalysisBuilderCommand.EXECUTE,
-                analysis_id: analysis.id,
-                [LogFlag.REF_ID]: analysis.id,
-            });
+        this.logger?.info('Packing container', {
+            command: AnalysisBuilderCommand.EXECUTE,
+            analysis_id: analysis.id,
+            [LogFlag.REF_ID]: analysis.id,
+        });
 
         const { data: analysisBuckets } = await this.coreClient.analysisBucket.getMany({
             filters: {
@@ -305,45 +303,41 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
                 },
 
                 onEntryPackStarted: (entry) => {
-                    createAnalysisBuilderLogger()
-                        .debug(`Packing ${entry.type} ${entry.name} (${entry.size} bytes)`, {
-                            command: AnalysisBuilderCommand.EXECUTE,
-                            analysis_id: analysis.id,
-                            [LogFlag.REF_ID]: analysis.id,
-                        });
+                    this.logger?.debug(`Packing ${entry.type} ${entry.name} (${entry.size} bytes)`, {
+                        command: AnalysisBuilderCommand.EXECUTE,
+                        analysis_id: analysis.id,
+                        [LogFlag.REF_ID]: analysis.id,
+                    });
                 },
                 onEntryPackFinished: (entry) => {
-                    createAnalysisBuilderLogger()
-                        .debug(`Packed ${entry.type} ${entry.name} (${entry.size} bytes)`, {
-                            command: AnalysisBuilderCommand.EXECUTE,
-                            analysis_id: analysis.id,
-                            [LogFlag.REF_ID]: analysis.id,
-                        });
+                    this.logger?.debug(`Packed ${entry.type} ${entry.name} (${entry.size} bytes)`, {
+                        command: AnalysisBuilderCommand.EXECUTE,
+                        analysis_id: analysis.id,
+                        [LogFlag.REF_ID]: analysis.id,
+                    });
                 },
                 onEntryPackFailed: (_, entry) => {
-                    createAnalysisBuilderLogger()
-                        .error(`Packing ${entry.type} ${entry.name} (${entry.size} bytes) failed`, {
-                            command: AnalysisBuilderCommand.EXECUTE,
-                            analysis_id: analysis.id,
-                            [LogFlag.REF_ID]: analysis.id,
-                        });
+                    this.logger?.error(`Packing ${entry.type} ${entry.name} (${entry.size} bytes) failed`, {
+                        command: AnalysisBuilderCommand.EXECUTE,
+                        analysis_id: analysis.id,
+                        [LogFlag.REF_ID]: analysis.id,
+                    });
                 },
             },
         );
 
-        createAnalysisBuilderLogger()
-            .info('Packed container', {
-                command: AnalysisBuilderCommand.EXECUTE,
-                analysis_id: analysis.id,
-                [LogFlag.REF_ID]: analysis.id,
-            });
+        this.logger?.info('Packed container', {
+            command: AnalysisBuilderCommand.EXECUTE,
+            analysis_id: analysis.id,
+            [LogFlag.REF_ID]: analysis.id,
+        });
     }
 
     protected async commitContainer(
         container: Container,
         analysis: Analysis,
     ) {
-        createAnalysisBuilderLogger().info({
+        this.logger?.info({
             message: 'Commiting container',
             command: AnalysisBuilderCommand.EXECUTE,
             analysis_id: analysis.id,
@@ -355,7 +349,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
             tag: REGISTRY_ARTIFACT_TAG_LATEST,
         });
 
-        createAnalysisBuilderLogger().info({
+        this.logger?.info({
             message: 'Commited container',
             command: AnalysisBuilderCommand.EXECUTE,
             analysis_id: analysis.id,

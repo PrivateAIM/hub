@@ -8,6 +8,7 @@
 import type { RegistryProject } from '@privateaim/core-kit';
 import {
     PermissionName,
+    isObject,
     isRealmResourceWritable,
 } from '@privateaim/kit';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
@@ -66,8 +67,23 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
             return;
         }
 
-        const fieldsStr = Array.isArray(fields) ? fields.join(',') : String(fields);
-        if (fieldsStr.includes('account_secret')) {
+        const tokens: string[] = [];
+        const collect = (v: unknown) => {
+            if (typeof v === 'string') {
+                tokens.push(...v.split(','));
+            } else if (Array.isArray(v)) {
+                v.forEach(collect);
+            } else if (isObject(v)) {
+                Object.values(v).forEach(collect);
+            }
+        };
+        collect(fields);
+
+        const requestsSecret = tokens
+            .map((t) => t.trim().replace(/^[+-]/, ''))
+            .includes('account_secret');
+
+        if (requestsSecret) {
             await actor.permissionChecker.preCheck({ name: PermissionName.REGISTRY_MANAGE });
         }
     }

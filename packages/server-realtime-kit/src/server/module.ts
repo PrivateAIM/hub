@@ -29,7 +29,12 @@ export function createServer<
     options: SocketServerOptions = {},
 ): Server<ListenEvents, EmitEvents, ServerSideEvents, SocketData> {
     let adapter : ServerOptions['adapter'] | undefined;
-    if (options.redisPublishClient && options.redisSubscribeClient) {
+    const hasRedisPublishClient = !!options.redisPublishClient;
+    const hasRedisSubscribeClient = !!options.redisSubscribeClient;
+
+    if (hasRedisPublishClient !== hasRedisSubscribeClient) {
+        options.logger?.warn('Socket.IO Redis adapter requires both publish and subscribe clients.');
+    } else if (options.redisPublishClient && options.redisSubscribeClient) {
         adapter = createAdapter(
             options.redisPublishClient,
             options.redisSubscribeClient,

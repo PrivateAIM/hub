@@ -19,23 +19,29 @@ import {
     AnalysisDistributorCommand,
     AnalysisDistributorEvent,
 } from '@privateaim/server-core-worker-kit';
-import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
+import type { ComponentHandler, ComponentHandlerContext, Logger } from '@privateaim/server-kit';
 import type { Client as CoreClient } from '@privateaim/core-http-kit';
 import type { Client as DockerClient } from 'docken';
 import {
     buildDockerAuthConfigFromRegistry,
     buildDockerImageURL,
 } from '../../../../../adapters/docker/index.ts';
-import { createAnalysisDistributorLogger } from '../../helpers';
 
 export class AnalysisDistributorCheckHandler implements ComponentHandler<AnalysisDistributorEventMap, AnalysisDistributorCommand.CHECK> {
     protected coreClient: CoreClient;
 
     protected docker: DockerClient;
 
-    constructor(ctx: { coreClient: CoreClient; docker: DockerClient }) {
+    protected logger: Logger | undefined;
+
+    constructor(ctx: {
+        coreClient: CoreClient; 
+        docker: DockerClient; 
+        logger?: Logger 
+    }) {
         this.coreClient = ctx.coreClient;
         this.docker = ctx.docker;
+        this.logger = ctx.logger;
     }
 
     async handle(
@@ -105,8 +111,8 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
 
         try {
             for (const node of nodes) {
-                createAnalysisDistributorLogger().info({
-                    message: `Checking analysis image of node ${node.name}}`,
+                this.logger?.info({
+                    message: `Checking analysis image of node ${node.name}`,
                     command: AnalysisDistributorCommand.CHECK,
                     analysis_id: analysis.id,
                     [LogFlag.REF_ID]: analysis.id,

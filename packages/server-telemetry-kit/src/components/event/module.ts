@@ -15,9 +15,9 @@ import { EventCommand, EventTaskQueueRouterRouting } from './constants';
 export class EventComponentCaller extends QueueDispatchComponentCaller {
     constructor(options: Partial<QueueDispatchComponentCallerOptions> = {}) {
         super({
+            ...options,
             queue: EventTaskQueueRouterRouting,
             logging: false,
-            ...options,
         });
     }
 

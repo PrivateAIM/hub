@@ -8,6 +8,7 @@
 import {
     BaseComponent,
 } from '@privateaim/server-kit';
+import type { Logger } from '@privateaim/server-kit';
 import type { AnalysisDistributorEventMap } from '@privateaim/server-core-worker-kit';
 import {
     AnalysisDistributorCommand,
@@ -17,16 +18,22 @@ import type { Client as DockerClient } from 'docken';
 import { AnalysisDistributorCheckHandler, AnalysisDistributorExecuteHandler } from './handlers';
 
 export class AnalysisDistributorComponent extends BaseComponent<AnalysisDistributorEventMap> {
-    constructor(ctx: { coreClient: CoreClient; docker: DockerClient }) {
+    constructor(ctx: {
+        coreClient: CoreClient; 
+        docker: DockerClient; 
+        logger?: Logger 
+    }) {
         super();
 
         this.mount(AnalysisDistributorCommand.CHECK, new AnalysisDistributorCheckHandler({
             coreClient: ctx.coreClient,
             docker: ctx.docker,
+            logger: ctx.logger,
         }));
         this.mount(AnalysisDistributorCommand.EXECUTE, new AnalysisDistributorExecuteHandler({
             coreClient: ctx.coreClient,
             docker: ctx.docker,
+            logger: ctx.logger,
         }));
     }
 
