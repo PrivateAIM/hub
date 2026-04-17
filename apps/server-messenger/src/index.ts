@@ -5,6 +5,4 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './config/index.ts';
-export * from './http/index.ts';
-export * from './socket/index.ts';
+export * from './app/modules/config/index.ts';

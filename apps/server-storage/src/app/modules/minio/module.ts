@@ -10,7 +10,6 @@ import type { IModule } from 'orkos';
 import type { ClientOptions } from 'minio';
 import { Client } from 'minio';
 import { parseProxyConnectionString } from '@privateaim/kit';
-import { setMinioFactory } from '../../../core/index.ts';
 import { MinioClientInjectionKey } from './constants.ts';
 import type { MinioModuleOptions } from './types.ts';
 
@@ -38,8 +37,5 @@ export class MinioModule implements IModule {
 
         const client = new Client(clientOptions);
         container.register(MinioClientInjectionKey, { useValue: client });
-
-        // Bridge: back-fill singa singleton
-        setMinioFactory(() => client);
     }
 }

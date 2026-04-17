@@ -17,17 +17,17 @@ import {
     createTestSuite,
     expectPropertiesEqualToSrc,
 } from '../utils';
-import type { EventEntity } from '../../src/database';
+import type { EventEntity } from '../../src/adapters/database/entities/event.ts';
 
 describe('controllers/event', () => {
     const suite = createTestSuite();
 
     beforeAll(async () => {
-        await suite.up();
+        await suite.setup();
     });
 
     afterAll(async () => {
-        await suite.down();
+        await suite.teardown();
     });
 
     let details : EventEntity;

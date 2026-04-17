@@ -9,7 +9,6 @@ import type { IContainer } from 'eldin';
 import type { IModule, ModuleDependency } from 'orkos';
 import { APIClient } from '@privateaim/storage-kit';
 import { AuthupClientAuthenticationHookInjectionKey, ModuleName } from '@privateaim/server-kit';
-import { setStorageFactory } from '../../../core/index.ts';
 import { StorageClientInjectionKey } from './constants.ts';
 import type { StorageClientModuleOptions } from './types.ts';
 
@@ -35,8 +34,5 @@ export class StorageClientModule implements IModule {
         }
 
         container.register(StorageClientInjectionKey, { useValue: client });
-
-        // Bridge: back-fill singa singleton
-        setStorageFactory(() => client);
     }
 }

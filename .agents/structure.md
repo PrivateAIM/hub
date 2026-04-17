@@ -142,6 +142,122 @@ apps/server-core/src/
 └── commands/                      # start, migration commands
 ```
 
+## Per-Application Directory Layout (server-telemetry, hexagonal)
+
+```
+apps/server-telemetry/src/
+├── core/                          # Domain logic
+│   └── services/
+│       └── log-store/
+│           └── types.ts           # LogStore port interface (query, write, delete)
+├── adapters/                      # External system implementations
+│   ├── database/
+│   │   ├── entities/event.ts      # EventEntity TypeORM definition
+│   │   ├── subscribers/event.ts   # EventSubscriber (no @EventSubscriber decorator)
+│   │   └── migrations/            # postgres/ and mysql/
+│   ├── http/
+│   │   └── controllers/
+│   │       ├── event/             # EventController (DataSource-based CRUD)
+│   │       └── log/               # LogController (LogStore-based operations)
+│   └── telemetry/
+│       ├── victoria-logs.ts       # VictoriaLogsLogStore (with query injection protection)
+│       └── memory.ts              # MemoryLogStore (fallback for components)
+├── app/                           # Orchestration & DI wiring
+│   ├── builder.ts                 # ServerTelemetryApplicationBuilder
+│   ├── factory.ts                 # createApplication()
+│   ├── modules/
+│   │   ├── config/                # ConfigModule (env, paths)
+│   │   ├── database/              # DatabaseModule (DataSource, subscribers)
+│   │   ├── http/                  # HTTPModule (router, controllers, server)
+│   │   ├── victoria-logs/         # VictoriaLogsModule (client + LogStore)
+│   │   ├── swagger/               # SwaggerModule (API docs generation)
+│   │   └── components/            # ComponentsModule (starts event + log consumers)
+│   └── components/                # AMQP task consumers (event, log)
+├── cli/                           # CLI entry point (citty)
+└── constants.ts
+```
+
+## Per-Application Directory Layout (server-storage, hexagonal)
+
+```
+apps/server-storage/src/
+├── core/                          # Domain logic
+│   └── utils/
+│       └── stream-to-buffer.ts    # Stream utility
+├── adapters/                      # External system implementations
+│   ├── database/
+│   │   ├── entities/              # BucketEntity, BucketFileEntity
+│   │   ├── subscribers/           # BucketSubscriber, BucketFileSubscriber
+│   │   └── migrations/            # postgres/ and mysql/
+│   └── http/
+│       └── controllers/
+│           ├── bucket/            # BucketController (CRUD + upload + stream)
+│           └── bucket-file/       # BucketFileController (CRUD + stream)
+├── app/                           # Orchestration & DI wiring
+│   ├── builder.ts                 # ServerStorageApplicationBuilder
+│   ├── factory.ts                 # createApplication()
+│   ├── modules/
+│   │   ├── config/                # ConfigModule (env, paths)
+│   │   ├── database/              # DatabaseModule (DataSource, subscribers)
+│   │   ├── http/                  # HTTPModule (router, controllers, server)
+│   │   ├── minio/                 # MinioModule (S3 client, no singa bridge)
+│   │   ├── swagger/               # SwaggerModule (API docs generation)
+│   │   └── components/            # ComponentsModule (starts bucket consumers)
+│   ├── components/                # AMQP task consumers (bucket, bucket-file)
+│   └── domains/                   # Domain utility helpers
+├── cli/                           # CLI entry point (citty)
+└── constants.ts
+```
+
+## Per-Application Directory Layout (server-core-worker, hexagonal)
+
+```
+apps/server-core-worker/src/
+├── core/                          # Domain logic (no infra imports)
+│   ├── core/module.ts             # Core API client (module-level variable)
+│   ├── storage/module.ts          # Storage API client (module-level variable)
+│   ├── crypto/                    # Cryptographic utilities (asymmetric, symmetric, hash)
+│   ├── docker/                    # Docker utilities (container-pack, image-push, etc.)
+│   ├── github/                    # GitHub API integration
+│   └── harbor/                    # Harbor registry utilities
+├── adapters/                      # External system implementations
+│   └── http/
+│       └── server.ts              # Health-check HTTP server
+├── app/                           # Orchestration & DI wiring
+│   ├── builder.ts                 # ServerCoreWorkerApplicationBuilder
+│   ├── factory.ts                 # createApplication()
+│   ├── modules/
+│   │   ├── config/                # ConfigModule (env, paths)
+│   │   ├── http/                  # HTTPModule (health-check server)
+│   │   ├── core-client/           # CoreClientModule (API client setup)
+│   │   ├── storage-client/        # StorageClientModule (API client setup)
+│   │   └── components/            # ComponentsModule (starts 4 worker components)
+│   └── components/                # AMQP task consumers (builder, distributor, master-image-*)
+├── index.ts                       # Entry point (no citty CLI — uses dotenv/config)
+└── constants.ts
+```
+
+## Per-Application Directory Layout (server-messenger, hexagonal)
+
+```
+apps/server-messenger/src/
+├── adapters/                      # External system implementations
+│   └── socket/
+│       ├── controllers/
+│       │   ├── connection/        # Socket.io connection handlers
+│       │   └── messaging/         # Socket.io messaging handlers
+│       ├── register.ts            # Socket controller registration
+│       └── types.ts               # Socket adapter types
+├── app/                           # Orchestration & DI wiring
+│   ├── builder.ts                 # ServerMessengerApplicationBuilder
+│   ├── factory.ts                 # createApplication()
+│   └── modules/
+│       ├── config/                # ConfigModule (env, paths)
+│       └── http/                  # HTTPModule (HTTP server + Socket.io server)
+├── cli/                           # CLI entry point (citty)
+└── constants.ts
+```
+
 ## Per-Package Directory Layout (typical kit)
 
 ```

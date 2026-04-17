@@ -8,7 +8,7 @@
 import { describe, expect, it } from 'vitest';
 import { wait } from '@privateaim/kit';
 import { LogChannel, LogLevel } from '@privateaim/telemetry-kit';
-import { MemoryLogStore } from '../../src';
+import { MemoryLogStore } from '../../src/adapters/telemetry';
 
 describe('logger', () => {
     it('should work with store', async () => {

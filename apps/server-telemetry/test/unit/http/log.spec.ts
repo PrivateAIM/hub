@@ -27,11 +27,11 @@ describe('controllers > analysis-node-log', () => {
     const suite = createTestSuite();
 
     beforeAll(async () => {
-        await suite.up();
+        await suite.setup();
     });
 
     afterAll(async () => {
-        await suite.down();
+        await suite.teardown();
     });
 
     it('should create resource', async () => {

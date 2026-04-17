@@ -9,7 +9,6 @@ import type { IContainer } from 'eldin';
 import type { IModule, ModuleDependency } from 'orkos';
 import { Client } from '@privateaim/core-http-kit';
 import { AuthupClientAuthenticationHookInjectionKey, ModuleName } from '@privateaim/server-kit';
-import { setCoreFactory } from '../../../core/index.ts';
 import { CoreClientInjectionKey } from './constants.ts';
 import type { CoreClientModuleOptions } from './types.ts';
 
@@ -35,8 +34,5 @@ export class CoreClientModule implements IModule {
         }
 
         container.register(CoreClientInjectionKey, { useValue: client });
-
-        // Bridge: back-fill singa singleton
-        setCoreFactory(() => client);
     }
 }

@@ -7,5 +7,7 @@
 
 import { TypedToken } from 'eldin';
 import type { VictoriaLogsClient } from '@hapic/victorialogs';
+import type { LogStore } from '../../../core/services/log-store/types.ts';
 
 export const VictoriaLogsClientInjectionKey = new TypedToken<VictoriaLogsClient>('VictoriaLogsClient');
+export const LogStoreInjectionKey = new TypedToken<LogStore>('LogStore');

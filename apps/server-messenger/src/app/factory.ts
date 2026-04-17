@@ -6,7 +6,6 @@
  */
 
 import {
-    BaseApplicationBuilder,
     LoggerConsoleTransport,
 } from '@privateaim/server-kit';
 import {
@@ -15,12 +14,14 @@ import {
     useLogComponentCaller,
 } from '@privateaim/server-telemetry-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
-import { useEnv } from '../config/env/index.ts';
+import { useEnv } from './modules/config/index.ts';
+import { ServerMessengerApplicationBuilder } from './builder.ts';
 
 export function createApplication() {
     const env = useEnv();
 
-    return new BaseApplicationBuilder()
+    return new ServerMessengerApplicationBuilder()
+        .withConfig()
         .withAmqp({ connectionString: env.rabbitMqConnectionString })
         .withRedis({ connectionString: env.redisConnectionString })
         .withLogger({
@@ -40,5 +41,6 @@ export function createApplication() {
                 }),
             ],
         })
+        .withHTTP()
         .build();
 }

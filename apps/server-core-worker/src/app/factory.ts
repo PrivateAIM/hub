@@ -6,7 +6,6 @@
  */
 
 import {
-    BaseApplicationBuilder,
     LoggerConsoleTransport,
     createAuthupClientTokenCreator,
 } from '@privateaim/server-kit';
@@ -16,14 +15,18 @@ import {
     useLogComponentCaller,
 } from '@privateaim/server-telemetry-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
-import { useEnv } from '../config/env/index.ts';
+import { useEnv } from './modules/config/index.ts';
 import { CoreClientModule } from './modules/core-client/index.ts';
 import { StorageClientModule } from './modules/storage-client/index.ts';
+import { DockerModule } from './modules/docker/index.ts';
+import { ComponentsModule } from './modules/components/index.ts';
+import { ServerCoreWorkerApplicationBuilder } from './builder.ts';
 
 export function createApplication() {
     const env = useEnv();
 
-    const builder = new BaseApplicationBuilder()
+    const builder = new ServerCoreWorkerApplicationBuilder()
+        .withConfig()
         .withAmqp({ connectionString: env.rabbitMqConnectionString });
 
     builder.withAuthupHook({
@@ -54,10 +57,14 @@ export function createApplication() {
         ],
     });
 
+    builder.withHTTP();
+
     const app = builder.build();
 
     app.addModule(new StorageClientModule({ baseURL: env.storageURL }));
     app.addModule(new CoreClientModule({ baseURL: env.coreURL }));
+    app.addModule(new DockerModule());
+    app.addModule(new ComponentsModule());
 
     return app;
 }

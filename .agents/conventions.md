@@ -98,9 +98,9 @@ export const analysisSchema = z.object({
 
 Automated via **release-please** (Google) for versioning + **monoship** (`tada5hi/monoship@v2`) for npm publishing. Creates release PRs that bump versions across all packages in lockstep (current: 0.8.31).
 
-## Hexagonal Architecture (server-core)
+## Hexagonal Architecture (all services)
 
-server-core follows a hexagonal (ports & adapters) architecture matching authup's `apps/server-core/src/` layout:
+All services follow a hexagonal (ports & adapters) architecture matching authup's `apps/server-core/src/` layout:
 
 ```
 src/
@@ -185,6 +185,45 @@ app/modules/<name>/
 | HTTPModule | `http` | `config`, `database`, `analysis` | `Server`, `Router` |
 | AuthupSetupModule | `authupSetup` | none | nothing (provisions realm, clients, permissions) |
 | TelemetryClientModule | `telemetryClient` | (optional) | `TelemetryClient` |
+
+### server-telemetry Module Inventory
+
+| Module | Name | Dependencies | Registers |
+|--------|------|-------------|-----------|
+| ConfigModule | `config` | none | `ConfigInjectionKey` (typed env) |
+| DatabaseModule | `database` | none | `DataSource` |
+| VictoriaLogsModule | `victoriaLogs` | `config` | `VictoriaLogsClient`, `LogStore` |
+| SwaggerModule | `swagger` | `config` | nothing (generates docs) |
+| ComponentsModule | `components` | none | nothing (starts event + log consumers) |
+| HTTPModule | `http` | `config`, `database`, `victoriaLogs` | `Server`, `Router` |
+
+### server-storage Module Inventory
+
+| Module | Name | Dependencies | Registers |
+|--------|------|-------------|-----------|
+| ConfigModule | `config` | none | `ConfigInjectionKey` (typed env) |
+| DatabaseModule | `database` | none | `DataSource` |
+| MinioModule | `minio` | `config` | `MinioClient` |
+| SwaggerModule | `swagger` | `config` | nothing (generates docs) |
+| ComponentsModule | `components` | `minio` | nothing (starts bucket consumers) |
+| HTTPModule | `http` | `config`, `database`, `minio`, `components` | `Server`, `Router` |
+
+### server-core-worker Module Inventory
+
+| Module | Name | Dependencies | Registers |
+|--------|------|-------------|-----------|
+| ConfigModule | `config` | none | `ConfigInjectionKey` (typed env) |
+| CoreClientModule | `coreClient` | `config` | nothing (calls `setCoreClient()`) |
+| StorageClientModule | `storageClient` | `config` | nothing (calls `setStorageClient()`) |
+| ComponentsModule | `components` | none | nothing (starts 4 worker components) |
+| HTTPModule | `http` | `config` | `Server` (health-check only) |
+
+### server-messenger Module Inventory
+
+| Module | Name | Dependencies | Registers |
+|--------|------|-------------|-----------|
+| ConfigModule | `config` | none | `ConfigInjectionKey` (typed env) |
+| HTTPModule | `http` | `config` | `Server`, `SocketServer` |
 
 ## Docker
 

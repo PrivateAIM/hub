@@ -17,7 +17,7 @@ import { Readable } from 'node:stream';
 import path from 'node:path';
 import tar from 'tar-stream';
 import { streamToBuffer } from '../../src/core';
-import type { BucketFileEntity } from '../../src/database';
+import type { BucketFileEntity } from '../../src/adapters/database';
 import {
     createTestSuite,
     expectPropertiesEqualToSrc,

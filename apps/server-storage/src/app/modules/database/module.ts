@@ -7,14 +7,17 @@
 
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
+import { DataSource } from 'typeorm';
 import {
     checkDatabase,
     createDatabase,
     setDataSource,
     synchronizeDatabaseSchema,
 } from 'typeorm-extension';
-import { DataSourceOptionsBuilder } from '../../../database/options.ts';
-import { DataSourceInjectionKey } from './constants.ts';
+import { BucketSubscriber } from '../../../adapters/database/subscribers/bucket.ts';
+import { BucketFileSubscriber } from '../../../adapters/database/subscribers/bucket-file.ts';
+import { DataSourceOptionsBuilder } from './options.ts';
+import { DatabaseInjectionKey } from './constants.ts';
 
 export class DatabaseModule implements IModule {
     readonly name = 'database';
@@ -38,9 +41,15 @@ export class DatabaseModule implements IModule {
             });
         }
 
-        const { DataSource: DS } = await import('typeorm');
-        const dataSource = new DS(options);
+        const dataSource = new DataSource(options);
         await dataSource.initialize();
+
+        // Subscribers must be pushed after initialize(), because
+        // initialize() overwrites dataSource.subscribers from options.
+        dataSource.subscribers.push(
+            new BucketSubscriber(),
+            new BucketFileSubscriber(),
+        );
 
         try {
             setDataSource(dataSource);
@@ -53,11 +62,11 @@ export class DatabaseModule implements IModule {
             throw e;
         }
 
-        container.register(DataSourceInjectionKey, { useValue: dataSource });
+        container.register(DatabaseInjectionKey.DataSource, { useValue: dataSource });
     }
 
     async teardown(container: IContainer): Promise<void> {
-        const result = container.tryResolve(DataSourceInjectionKey);
+        const result = container.tryResolve(DatabaseInjectionKey.DataSource);
         if (result.success && result.data.isInitialized) {
             await result.data.destroy();
         }

@@ -5,12 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { useLogger } from '@privateaim/server-kit';
 import { defineCommand } from 'citty';
 import { createApplication } from '../../app/index.ts';
-import { useEnv } from '../../config/index.ts';
-import { createHttpServer } from '../../http/index.ts';
-import { createSocketServer } from '../../socket/index.ts';
 
 export function defineCLIStartCommand() {
     return defineCommand({
@@ -18,22 +14,6 @@ export function defineCLIStartCommand() {
         async setup() {
             const app = createApplication();
             await app.setup();
-
-            const logger = useLogger();
-
-            const httpServer = createHttpServer();
-            const socketServer = createSocketServer(httpServer);
-
-            httpServer.on('error', (err) => {
-                logger.error(err);
-                process.exit(1);
-            });
-
-            const port = useEnv('port');
-            httpServer.listen(port, () => {
-                logger.debug(`Listening on 0.0.0.0:${port}`);
-                logger.debug(`Socket.io server mounted on path: ${socketServer.path()}`);
-            });
         },
     });
 }
