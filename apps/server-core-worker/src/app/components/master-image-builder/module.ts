@@ -12,14 +12,19 @@ import {
 import {
     BaseComponent,
 } from '@privateaim/server-kit';
+import type { Client as CoreClient } from '@privateaim/core-http-kit';
+import type { Client as DockerClient } from 'docken';
 
 import { MasterImageBuilderExecuteHandler } from './handlers';
 
 export class MasterImageBuilderComponent extends BaseComponent<MasterImageBuilderEventMap> {
-    constructor() {
+    constructor(ctx: { coreClient: CoreClient; docker: DockerClient }) {
         super();
 
-        this.mount(MasterImageBuilderCommand.EXECUTE, new MasterImageBuilderExecuteHandler());
+        this.mount(MasterImageBuilderCommand.EXECUTE, new MasterImageBuilderExecuteHandler({
+            coreClient: ctx.coreClient,
+            docker: ctx.docker,
+        }));
     }
 
     async start() {

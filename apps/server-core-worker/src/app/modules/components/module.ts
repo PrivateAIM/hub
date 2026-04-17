@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
 import type { Component } from '@privateaim/server-kit';
 import { QueueWorkerComponentCaller } from '@privateaim/server-kit';
@@ -18,6 +19,9 @@ import {
     MasterImageSynchronizerEventQueueRouterRouting,
     MasterImageSynchronizerTaskQueueRouterRouting,
 } from '@privateaim/server-core-worker-kit';
+import { CoreClientInjectionKey } from '../core-client/constants.ts';
+import { StorageClientInjectionKey } from '../storage-client/constants.ts';
+import { DockerInjectionKey } from '../docker/constants.ts';
 import {
     AnalysisBuilderComponent,
     AnalysisDistributorComponent,
@@ -28,26 +32,34 @@ import {
 export class ComponentsModule implements IModule {
     readonly name = 'components';
 
-    readonly dependencies: string[] = [];
+    readonly dependencies: string[] = ['coreClient', 'storageClient', 'docker'];
 
-    async setup(): Promise<void> {
+    async setup(container: IContainer): Promise<void> {
+        const coreClient = container.resolve(CoreClientInjectionKey);
+        const storageClient = container.resolve(StorageClientInjectionKey);
+        const docker = container.resolve(DockerInjectionKey);
+
         const components: Component<any>[] = [
             new QueueWorkerComponentCaller(
-                new AnalysisBuilderComponent(),
+                new AnalysisBuilderComponent({
+                    coreClient, 
+                    storageClient, 
+                    docker, 
+                }),
                 {
                     publishQueue: AnalysisBuilderEventQueueRouterRouting,
                     consumeQueue: AnalysisBuilderTaskQueueRouterRouting,
                 },
             ),
             new QueueWorkerComponentCaller(
-                new AnalysisDistributorComponent(),
+                new AnalysisDistributorComponent({ coreClient, docker }),
                 {
                     publishQueue: AnalysisDistributorEventQueueRouterRouting,
                     consumeQueue: AnalysisDistributorTaskQueueRouterRouting,
                 },
             ),
             new QueueWorkerComponentCaller(
-                new MasterImageBuilderComponent(),
+                new MasterImageBuilderComponent({ coreClient, docker }),
                 {
                     publishQueue: MasterImageBuilderEventQueueRouterRouting,
                     consumeQueue: MasterImageBuilderTaskQueueRouterRouting,

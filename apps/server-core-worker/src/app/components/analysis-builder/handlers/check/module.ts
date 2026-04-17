@@ -14,9 +14,19 @@ import type {
 } from '@privateaim/server-core-worker-kit';
 import { AnalysisBuilderEvent } from '@privateaim/server-core-worker-kit';
 import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
-import { useCoreClient, useDocker } from '../../../../../core';
+import type { Client as CoreClient } from '@privateaim/core-http-kit';
+import type { Client as DockerClient } from 'docken';
 
 export class AnalysisBuilderCheckHandler implements ComponentHandler<AnalysisBuilderEventMap, AnalysisBuilderCommand.CHECK> {
+    protected coreClient: CoreClient;
+
+    protected docker: DockerClient;
+
+    constructor(ctx: { coreClient: CoreClient; docker: DockerClient }) {
+        this.coreClient = ctx.coreClient;
+        this.docker = ctx.docker;
+    }
+
     async handle(
         value: AnalysisBuilderCheckPayload,
         context: ComponentHandlerContext<AnalysisBuilderEventMap, AnalysisBuilderCommand.CHECK>,
@@ -44,11 +54,9 @@ export class AnalysisBuilderCheckHandler implements ComponentHandler<AnalysisBui
             value,
         );
 
-        const client = useCoreClient();
-        const analysis = await client.analysis.getOne(value.id);
+        const analysis = await this.coreClient.analysis.getOne(value.id);
 
-        const docker = useDocker();
-        const image = docker.getImage(`${value.id}:latest`);
+        const image = this.docker.getImage(`${value.id}:latest`);
 
         try {
             const imageInfo = await image.inspect();

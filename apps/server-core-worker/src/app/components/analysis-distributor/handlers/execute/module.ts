@@ -17,20 +17,28 @@ import {
 import type { Analysis, Node, Registry } from '@privateaim/core-kit';
 import { REGISTRY_ARTIFACT_TAG_LATEST } from '@privateaim/core-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
+import type { Client as CoreClient } from '@privateaim/core-http-kit';
+import type { Client as DockerClient, ModemStreamWaitOptions  } from 'docken';
 import type { ImagePushOptions } from 'dockerode';
-import type { ModemStreamWaitOptions } from 'docken';
 import { waitForStream } from 'docken';
 import {
     buildDockerAuthConfigFromRegistry,
     buildDockerImageURL,
     cleanupDockerImages,
-    useCoreClient,
-    useDocker,
-} from '../../../../../core';
+} from '../../../../../adapters/docker/index.ts';
 import { BuilderError } from '../../../analysis-builder/error';
 import { useAnalysisDistributorLogger } from '../../helpers';
 
 export class AnalysisDistributorExecuteHandler implements ComponentHandler<AnalysisDistributorEventMap, AnalysisDistributorCommand.EXECUTE> {
+    protected coreClient: CoreClient;
+
+    protected docker: DockerClient;
+
+    constructor(ctx: { coreClient: CoreClient; docker: DockerClient }) {
+        this.coreClient = ctx.coreClient;
+        this.docker = ctx.docker;
+    }
+
     async handle(
         value: AnalysisDistributorExecutePayload,
         context: ComponentHandlerContext<AnalysisDistributorEventMap, AnalysisDistributorCommand.EXECUTE>,
@@ -66,19 +74,17 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
             value,
         );
 
-        const client = useCoreClient();
+        const analysis = await this.coreClient.analysis.getOne(value.id);
+        const registry = await this.coreClient.registry.getOne(analysis.registry_id, { fields: ['+account_secret'] });
 
-        const analysis = await client.analysis.getOne(value.id);
-        const registry = await client.registry.getOne(analysis.registry_id, { fields: ['+account_secret'] });
-
-        const { data: analysisNodes } = await client.analysisNode.getMany({ filter: { analysis_id: analysis.id } });
+        const { data: analysisNodes } = await this.coreClient.analysisNode.getMany({ filter: { analysis_id: analysis.id } });
 
         if (analysisNodes.length === 0) {
             // todo: custom error
             throw BuilderError.notFound();
         }
 
-        const { data: nodes } = await client.node.getMany({
+        const { data: nodes } = await this.coreClient.node.getMany({
             filter: { id: analysisNodes.map((analysisNode) => analysisNode.node_id) },
             relations: { registry_project: true },
         });
@@ -154,7 +160,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
             [LogFlag.REF_ID]: analysis.id,
         });
 
-        const image = useDocker()
+        const image = this.docker
             .getImage(this.buildImageTag(analysis));
 
         await image.inspect();
@@ -179,7 +185,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
                 });
             }
         } catch (e) {
-            await cleanupDockerImages(tags);
+            await cleanupDockerImages(this.docker, tags);
 
             throw e;
         } finally {
@@ -208,8 +214,6 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
             [LogFlag.REF_ID]: analysis.id,
         });
 
-        const docker = useDocker();
-
         const calcForIndex = (value: number, index: number) => {
             const current = (index + 1) * value;
             if (current === 0) {
@@ -221,11 +225,11 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
 
         try {
             for (const [i, tag] of tags.entries()) {
-                const image = docker.getImage(tag);
+                const image = this.docker.getImage(tag);
 
                 const stream = await image.push(options.push);
 
-                await waitForStream(docker, stream, {
+                await waitForStream(this.docker, stream, {
                     onPushing: async (process) => {
                         if (!options.stream.onPushing) return;
 
@@ -238,7 +242,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
                 });
             }
         } finally {
-            await cleanupDockerImages(tags);
+            await cleanupDockerImages(this.docker, tags);
         }
 
         useAnalysisDistributorLogger().info({

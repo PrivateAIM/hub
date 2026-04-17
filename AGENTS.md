@@ -29,7 +29,7 @@ npm run server-train-manager    # Worker service
 
 ### Workspace Layout
 
-Applications (services + frontend) are in `apps/`, shared libraries are in `packages/`. Libraries export ESM (`dist/index.mjs` + types), services compile with tsc.
+Applications (services + frontend) are in `apps/`, shared libraries are in `packages/`. Libraries export ESM (`dist/index.mjs` + types), services compile with tsdown + tsc.
 
 ### CLI Entry Points
 
@@ -42,7 +42,7 @@ Applications (services + frontend) are in `apps/`, shared libraries are in `pack
 ## Detailed Guides
 
 - **[Project Structure](.agents/structure.md)** — Monorepo layout, 6 apps + 15 libraries, dependency layers
-- **[Architecture](.agents/architecture.md)** — Routup HTTP framework, TypeORM entities, AMQP messaging, Authup auth integration
+- **[Architecture](.agents/architecture.md)** — Hexagonal architecture (all services), Routup HTTP, TypeORM, AMQP messaging, Authup auth
 - **[Testing](.agents/testing.md)** — Vitest with SWC, multi-database CI matrix (MySQL/Postgres/SQLite)
 - **[Conventions](.agents/conventions.md)** — Conventional Commits, Husky hooks, ESLint, Rollup bundling, Nx caching
 
@@ -54,5 +54,5 @@ Modernization and refactoring plans (execute in order):
 2. ~~Monorepo Restructuring~~ — Complete (#1512)
 3. **[Dependency Injection](.agents/plans/003-dependency-injection.md)** — Replace `singa` singletons with DI container + module system
 4. **[Hexagonal: server-core](.agents/plans/004-hexagonal-server-core.md)** — Core/adapters/app separation for the main service
-5. **[Hexagonal: remaining services](.agents/plans/005-hexagonal-remaining-services.md)** — Apply pattern to storage, telemetry, worker, messenger
+5. ~~[Hexagonal: remaining services](.agents/plans/005-hexagonal-remaining-services.md)~~ — Complete (#1528)
 6. **[Service-Level Tests](.agents/plans/006-service-level-tests.md)** — Shared test package + core business logic unit tests

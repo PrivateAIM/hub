@@ -79,6 +79,19 @@ it('should create', async () => {
 });
 ```
 
+## Test Infrastructure (all services with database)
+
+Services with databases (server-core, server-telemetry, server-storage) share the same test infrastructure pattern in `test/app/`:
+
+| File | Purpose |
+|------|---------|
+| `test/app/module.ts` | `TestApplication extends Application` with `get dataSource()` accessor |
+| `test/app/http.ts` | `TestHTTPApplication extends TestApplication` with `get client` (API client) |
+| `test/app/database.ts` | `createTestDatabaseModule()` for per-test DB with SQLite fallback |
+| `test/app/factory.ts` | `createTestApplication()` returns `TestHTTPApplication` with `PORT=0` |
+
+Each test application wires the same DI modules as production but uses `createTestDatabaseModule()` instead of the real `DatabaseModule`.
+
 ## Database Testing
 
 Tests run against real databases (not mocks). The CI matrix tests three backends:

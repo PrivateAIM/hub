@@ -12,14 +12,22 @@ import type { AnalysisDistributorEventMap } from '@privateaim/server-core-worker
 import {
     AnalysisDistributorCommand,
 } from '@privateaim/server-core-worker-kit';
+import type { Client as CoreClient } from '@privateaim/core-http-kit';
+import type { Client as DockerClient } from 'docken';
 import { AnalysisDistributorCheckHandler, AnalysisDistributorExecuteHandler } from './handlers';
 
 export class AnalysisDistributorComponent extends BaseComponent<AnalysisDistributorEventMap> {
-    constructor() {
+    constructor(ctx: { coreClient: CoreClient; docker: DockerClient }) {
         super();
 
-        this.mount(AnalysisDistributorCommand.CHECK, new AnalysisDistributorCheckHandler());
-        this.mount(AnalysisDistributorCommand.EXECUTE, new AnalysisDistributorExecuteHandler());
+        this.mount(AnalysisDistributorCommand.CHECK, new AnalysisDistributorCheckHandler({
+            coreClient: ctx.coreClient,
+            docker: ctx.docker,
+        }));
+        this.mount(AnalysisDistributorCommand.EXECUTE, new AnalysisDistributorExecuteHandler({
+            coreClient: ctx.coreClient,
+            docker: ctx.docker,
+        }));
     }
 
     async start() {

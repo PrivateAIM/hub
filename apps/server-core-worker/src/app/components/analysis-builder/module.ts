@@ -12,15 +12,29 @@ import {
 import {
     BaseComponent,
 } from '@privateaim/server-kit';
+import type { Client as CoreClient } from '@privateaim/core-http-kit';
+import type { APIClient as StorageClient } from '@privateaim/storage-kit';
+import type { Client as DockerClient } from 'docken';
 
 import { AnalysisBuilderCheckHandler, AnalysisBuilderExecuteHandler } from './handlers';
 
 export class AnalysisBuilderComponent extends BaseComponent<AnalysisBuilderEventMap> {
-    constructor() {
+    constructor(ctx: {
+        coreClient: CoreClient; 
+        storageClient: StorageClient; 
+        docker: DockerClient 
+    }) {
         super();
 
-        this.mount(AnalysisBuilderCommand.CHECK, new AnalysisBuilderCheckHandler());
-        this.mount(AnalysisBuilderCommand.EXECUTE, new AnalysisBuilderExecuteHandler());
+        this.mount(AnalysisBuilderCommand.CHECK, new AnalysisBuilderCheckHandler({
+            coreClient: ctx.coreClient,
+            docker: ctx.docker,
+        }));
+        this.mount(AnalysisBuilderCommand.EXECUTE, new AnalysisBuilderExecuteHandler({
+            coreClient: ctx.coreClient,
+            storageClient: ctx.storageClient,
+            docker: ctx.docker,
+        }));
     }
 
     async start() {

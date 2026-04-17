@@ -18,7 +18,7 @@ import type {
     GitHubRepositoryBranches,
     GitHubRepositoryCloneOptions,
     GitHubRepositoryTarballOptions,
-} from './types';
+} from './types.ts';
 
 export class GitHubClient extends Client {
     constructor(options: RequestBaseOptions = {}) {

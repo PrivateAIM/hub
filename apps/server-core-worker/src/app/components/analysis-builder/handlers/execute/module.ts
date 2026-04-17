@@ -18,7 +18,9 @@ import {
 } from '@privateaim/server-core-worker-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
-import type { ModemStreamWaitOptions } from 'docken';
+import type { Client as CoreClient } from '@privateaim/core-http-kit';
+import type { APIClient as StorageClient } from '@privateaim/storage-kit';
+import type { Client as DockerClient, ModemStreamWaitOptions  } from 'docken';
 import { waitForStream } from 'docken';
 import type { Container } from 'dockerode';
 import stream from 'node:stream';
@@ -27,16 +29,29 @@ import tar from 'tar-stream';
 import {
     cleanupDockerImage,
     packDockerContainerWithTarStream,
-    useCoreClient,
-    useDocker, 
-    useStorageClient,
-} from '../../../../../core';
+} from '../../../../../adapters/docker/index.ts';
 import { AnalysisContainerPath } from '../../constants';
 import { BuilderError } from '../../error';
 import { generateDockerFileContent } from '../../helpers';
 import { useAnalysisBuilderLogger } from '../../utils';
 
 export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisBuilderEventMap, AnalysisBuilderCommand.EXECUTE> {
+    protected coreClient: CoreClient;
+
+    protected storageClient: StorageClient;
+
+    protected docker: DockerClient;
+
+    constructor(ctx: {
+        coreClient: CoreClient; 
+        storageClient: StorageClient; 
+        docker: DockerClient 
+    }) {
+        this.coreClient = ctx.coreClient;
+        this.storageClient = ctx.storageClient;
+        this.docker = ctx.docker;
+    }
+
     async handle(
         value: AnalysisBuilderExecutePayload,
         context: ComponentHandlerContext<AnalysisBuilderEventMap, AnalysisBuilderCommand.EXECUTE>,
@@ -62,7 +77,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
                 { routing: AnalysisBuilderEventQueueRouterRouting },
             );
 
-            await cleanupDockerImage(value.id);
+            await cleanupDockerImage(this.docker, value.id);
         }
     }
 
@@ -75,8 +90,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
             value,
         );
 
-        const client = useCoreClient();
-        const analysis = await client.analysis.getOne(value.id);
+        const analysis = await this.coreClient.analysis.getOne(value.id);
 
         // -----------------------------------------------------------------------------------
 
@@ -154,8 +168,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
             throw e;
         }
 
-        const docker = useDocker();
-        const image = docker.getImage(this.buildImageTag(analysis));
+        const image = this.docker.getImage(this.buildImageTag(analysis));
         const imageInfo = await image.inspect();
 
         await context.handle(
@@ -184,7 +197,10 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
             [LogFlag.REF_ID]: analysis.id,
         });
 
-        const content = await generateDockerFileContent(analysis);
+        const content = await generateDockerFileContent(analysis, {
+            coreClient: this.coreClient,
+            storageClient: this.storageClient,
+        });
 
         const pack = tar.pack();
         const entry = pack.entry({
@@ -202,14 +218,13 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
         entry.write(content);
         entry.end();
 
-        const client = useDocker();
-        const stream = await client
+        const buildStream = await this.docker
             .buildImage(pack.pipe(createGzip()), {
                 t: this.buildImageTag(analysis),
                 platform: 'linux/amd64',
             });
 
-        return waitForStream(client, stream, {
+        return waitForStream(this.docker, buildStream, {
             onFinished: () => {
                 useAnalysisBuilderLogger().info({
                     message: 'Built image',
@@ -230,7 +245,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
             [LogFlag.REF_ID]: analysis.id,
         });
 
-        const container = await useDocker()
+        const container = await this.docker
             .createContainer({ Image: this.buildImageTag(analysis) });
 
         useAnalysisBuilderLogger().info({
@@ -254,8 +269,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
                 [LogFlag.REF_ID]: analysis.id,
             });
 
-        const core = useCoreClient();
-        const { data: analysisBuckets } = await core.analysisBucket.getMany({
+        const { data: analysisBuckets } = await this.coreClient.analysisBucket.getMany({
             filters: {
                 type: AnalysisBucketType.CODE,
                 analysis_id: analysis.id,
@@ -267,10 +281,10 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
             throw BuilderError.entrypointNotFound();
         }
 
-        const { data: analysisBucketFiles } = await core.analysisBucketFile.getMany({ filters: { analysis_bucket_id: analysisBucket.id } });
+        const { data: analysisBucketFiles } = await this.coreClient
+            .analysisBucketFile.getMany({ filters: { analysis_bucket_id: analysisBucket.id } });
 
-        const storage = useStorageClient();
-        const webStream = await storage.bucket.stream(analysisBucket.bucket_id);
+        const webStream = await this.storageClient.bucket.stream(analysisBucket.bucket_id);
         const nodeStream = stream.Readable.fromWeb(webStream as any);
 
         await packDockerContainerWithTarStream(

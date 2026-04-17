@@ -5,16 +5,15 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { Client } from 'docken';
 import { waitForStream } from 'docken';
 import type { AuthConfig, Image } from 'dockerode';
-import { useDocker } from './instance';
 
 export async function pushDockerImage(
+    docker: Client,
     input: Image | string,
     authConfig: AuthConfig,
 ) {
-    const docker = useDocker();
-
     let imageLatest : Image;
     if (typeof input === 'string') {
         imageLatest = docker.getImage(input);

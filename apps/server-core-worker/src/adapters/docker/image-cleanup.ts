@@ -5,11 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { Client } from 'docken';
 import type { Image } from 'dockerode';
-import { useDocker } from './instance';
 
-export async function cleanupDockerImage(input: string | Image) : Promise<boolean> {
-    const docker = useDocker();
+export async function cleanupDockerImage(docker: Client, input: string | Image) : Promise<boolean> {
     let image : Image;
     if (typeof input === 'string') {
         image = docker.getImage(input);
@@ -27,6 +26,6 @@ export async function cleanupDockerImage(input: string | Image) : Promise<boolea
     return true;
 }
 
-export async function cleanupDockerImages(input: (string | Image)[]) : Promise<boolean[]> {
-    return Promise.all(input.map((el) => cleanupDockerImage(el)));
+export async function cleanupDockerImages(docker: Client, input: (string | Image)[]) : Promise<boolean[]> {
+    return Promise.all(input.map((el) => cleanupDockerImage(docker, el)));
 }

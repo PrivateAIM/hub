@@ -26,9 +26,9 @@
 External services: Authup (OAuth2), Redis (pub/sub + caching), MySQL/Postgres
 ```
 
-## Hexagonal Architecture (server-core)
+## Hexagonal Architecture (all services)
 
-server-core follows a hexagonal (ports & adapters) architecture matching authup's pattern. Code is organized into three layers:
+All services follow a hexagonal (ports & adapters) architecture matching authup's pattern. Code is organized into three layers:
 
 ```
 src/
@@ -36,6 +36,15 @@ src/
 ├── adapters/      # External system implementations — database, HTTP, socket
 └── app/           # Orchestration — DI modules, wiring, factory
 ```
+
+Each service has the same structural elements:
+- `app/builder.ts` — `ServiceXApplicationBuilder extends BaseApplicationBuilder`
+- `app/factory.ts` — `createApplication()` using the builder
+- `app/modules/config/` — `ConfigModule` (env reading)
+- `app/modules/http/` — `HTTPModule` (server + controllers or socket)
+- `app/modules/components/` — `ComponentsModule` (AMQP consumers, if applicable)
+- `app/modules/swagger/` — `SwaggerModule` (API docs, for HTTP services)
+- Minimal `start.ts` / `cli/commands/start.ts` — just `createApplication()` + `app.setup()`
 
 ### Core Layer (`core/`)
 
@@ -213,6 +222,68 @@ Entities are scoped to realms via `realm_id`. The `isRealmResourceWritable()` he
 | `MasterImage`       | Base Docker images available for worker tasks    |
 | `Registry`          | Docker registry configuration                   |
 | `RegistryProject`   | Project within a Docker registry                 |
+
+## Per-Service Architecture
+
+### server-telemetry
+
+Manages log aggregation via VictoriaLogs and event tracking via TypeORM.
+
+**Core port:** `LogStore` interface (`core/services/log-store/types.ts`) — defines `query`, `write`, `delete` operations for log storage. No TypeORM or VictoriaLogs imports.
+
+**Adapters:**
+- `VictoriaLogsLogStore` (`adapters/telemetry/victoria-logs.ts`) — implements `LogStore` via VictoriaLogs HTTP API. Includes query injection protection (`isValidLabelKey`, `escapeQueryValue`).
+- `MemoryLogStore` (`adapters/telemetry/memory.ts`) — in-memory fallback for components that run before VictoriaLogs is available.
+- `EventController` / `LogController` — thin HTTP controllers receiving dependencies via constructor.
+
+**Service-specific modules:**
+- `VictoriaLogsModule` — registers VictoriaLogs client + `LogStore` in container (no singa bridge)
+- `ComponentsModule` — starts EventComponent + LogComponent via `QueueWorkerComponentCaller`
+
+**Special concern:** The telemetry service IS the log writer, so its own logger cannot use `useLogComponentCaller()` (circular). The `LogComponentWriteHandler` accepts an optional `LogStore` param with `MemoryLogStore` fallback.
+
+### server-storage
+
+File/object storage service backed by MinIO/S3.
+
+**Adapters:**
+- `BucketEntity` / `BucketFileEntity` — TypeORM entities in `adapters/database/entities/`
+- `BucketSubscriber` / `BucketFileSubscriber` — pre-instantiated in `DatabaseModule` (no `@EventSubscriber()`)
+- `BucketController` / `BucketFileController` — thin HTTP controllers with upload/stream endpoints
+
+**Service-specific modules:**
+- `MinioModule` — creates MinIO client, registers in container (no singa bridge)
+- `ComponentsModule` — resolves MinIO from container, starts BucketComponent via `QueueWorkerComponentCaller`
+
+### server-core-worker
+
+Background worker executing Docker containers. No database entities — purely queue-driven.
+
+**Core layer:** Docker utilities, crypto helpers, GitHub/Harbor integrations. Uses module-level variables (`setCoreClient`/`useCoreClient`) instead of singa singletons.
+
+**Adapters:**
+- `adapters/http/server.ts` — minimal health-check HTTP server
+
+**Service-specific modules:**
+- `CoreClientModule` — sets up core API client via `setCoreClient()`
+- `StorageClientModule` — sets up storage API client via `setStorageClient()`
+- `ComponentsModule` — starts all 4 worker components (analysis-builder, analysis-distributor, master-image-builder, master-image-synchronizer)
+
+**Entry point:** Uses `src/index.ts` with `dotenv/config` directly (no citty CLI).
+
+### server-messenger
+
+Real-time messaging relay via Socket.io. No database, no REST entities.
+
+**Adapters:**
+- `adapters/socket/controllers/connection/` — Socket.io connection lifecycle handlers
+- `adapters/socket/controllers/messaging/` — Message relay handlers
+- `adapters/socket/register.ts` — controller registration helper
+
+**Service-specific modules:**
+- `HTTPModule` — creates HTTP server + Socket.io server with Authup auth middleware
+
+**Minimal service** — no database, no components, no swagger.
 
 ## Configuration
 

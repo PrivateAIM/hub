@@ -8,7 +8,7 @@
 import type { Registry } from '@privateaim/core-kit';
 import { getHostNameFromString } from '@privateaim/kit';
 import type { AuthConfig } from 'dockerode';
-import type { DockerAuthConfig, DockerConnectionOptions } from './type';
+import type { DockerAuthConfig, DockerConnectionOptions } from './types.ts';
 
 export function buildDockerAuthConfig(config: DockerConnectionOptions): DockerAuthConfig {
     return {

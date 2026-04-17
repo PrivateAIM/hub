@@ -6,7 +6,7 @@
  */
 
 import { LogFlag } from '@privateaim/telemetry-kit';
-import type { ModemStreamWaitOptions } from 'docken';
+import type { Client as DockerClient, ModemStreamWaitOptions } from 'docken';
 import { waitForStream } from 'docken';
 import type { MasterImage } from '@privateaim/core-kit';
 import { REGISTRY_MASTER_IMAGE_PROJECT_NAME } from '@privateaim/core-kit';
@@ -19,20 +19,26 @@ import {
     MasterImageBuilderEvent,
 } from '@privateaim/server-core-worker-kit';
 import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
+import type { Client as CoreClient } from '@privateaim/core-http-kit';
 import path from 'node:path';
 import tar from 'tar-fs';
 import { MASTER_IMAGES_DIRECTORY_PATH } from '../../../../../constants';
-import {
-    buildDockerImageURL,
-    useCoreClient,
-    useDocker,
-} from '../../../../../core';
+import { buildDockerImageURL } from '../../../../../adapters/docker/index.ts';
 import { useMasterImageBuilderLogger } from '../../utils';
 
 export class MasterImageBuilderExecuteHandler implements ComponentHandler<
     MasterImageBuilderEventMap,
     MasterImageBuilderCommand.EXECUTE
 > {
+    protected coreClient: CoreClient;
+
+    protected docker: DockerClient;
+
+    constructor(ctx: { coreClient: CoreClient; docker: DockerClient }) {
+        this.coreClient = ctx.coreClient;
+        this.docker = ctx.docker;
+    }
+
     async handle(
         payload: MasterImageBuilderExecutePayload,
         context: ComponentHandlerContext<MasterImageBuilderEventMap, MasterImageBuilderCommand.EXECUTE>,
@@ -66,8 +72,7 @@ export class MasterImageBuilderExecuteHandler implements ComponentHandler<
             payload,
         );
 
-        const coreClient = useCoreClient();
-        const masterImage = await coreClient.masterImage.getOne(payload.id);
+        const masterImage = await this.coreClient.masterImage.getOne(payload.id);
 
         try {
             await this.buildImage(masterImage, {
@@ -107,7 +112,6 @@ export class MasterImageBuilderExecuteHandler implements ComponentHandler<
             [LogFlag.REF_ID]: masterImage.id,
         });
 
-        const docker = useDocker();
         const imageTag = buildDockerImageURL({
             projectName: REGISTRY_MASTER_IMAGE_PROJECT_NAME,
             repositoryName: masterImage.virtual_path,
@@ -117,13 +121,13 @@ export class MasterImageBuilderExecuteHandler implements ComponentHandler<
         const imageFilePath = path.join(MASTER_IMAGES_DIRECTORY_PATH, masterImage.path);
 
         const pack = tar.pack(imageFilePath);
-        const stream = await docker
+        const stream = await this.docker
             .buildImage(pack, {
                 t: imageTag,
                 platform: 'linux/amd64',
             });
 
-        await waitForStream(docker, stream, {
+        await waitForStream(this.docker, stream, {
             onFinished: () => {
                 useMasterImageBuilderLogger().info({
                     message: 'Built image',

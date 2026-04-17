@@ -14,17 +14,17 @@ import {
     AnalysisBucketType,
     REGISTRY_MASTER_IMAGE_PROJECT_NAME,
 } from '@privateaim/core-kit';
-import type { BucketFile } from '@privateaim/storage-kit';
+import type { BucketFile, APIClient as StorageClient  } from '@privateaim/storage-kit';
+import type { Client as CoreClient } from '@privateaim/core-http-kit';
 import path from 'node:path';
-import { useCoreClient, useStorageClient } from '../../../../core';
 import { AnalysisContainerPath } from '../constants';
 import { BuilderError } from '../error';
 
-export async function generateDockerFileContent(entity: Analysis) : Promise<string> {
-    const storageClient = useStorageClient();
-    const coreClient = useCoreClient();
-
-    const { data: analysisBuckets } = await coreClient.analysisBucket.getMany({
+export async function generateDockerFileContent(
+    entity: Analysis,
+    ctx: { coreClient: CoreClient; storageClient: StorageClient },
+) : Promise<string> {
+    const { data: analysisBuckets } = await ctx.coreClient.analysisBucket.getMany({
         filter: {
             analysis_id: entity.id,
             type: AnalysisBucketType.CODE,
@@ -35,7 +35,7 @@ export async function generateDockerFileContent(entity: Analysis) : Promise<stri
         throw BuilderError.entrypointNotFound();
     }
 
-    const { data: analysisBucketFiles } = await coreClient.analysisBucketFile.getMany({
+    const { data: analysisBucketFiles } = await ctx.coreClient.analysisBucketFile.getMany({
         filter: {
             root: true,
             analysis_bucket_id: analysisBucket.id,
@@ -49,7 +49,7 @@ export async function generateDockerFileContent(entity: Analysis) : Promise<stri
 
     let entryPoint : BucketFile;
     try {
-        entryPoint = await storageClient.bucketFile.getOne(analysisBucketFile.bucket_file_id);
+        entryPoint = await ctx.storageClient.bucketFile.getOne(analysisBucketFile.bucket_file_id);
     } catch {
         throw BuilderError.entrypointNotFound();
     }
@@ -57,7 +57,7 @@ export async function generateDockerFileContent(entity: Analysis) : Promise<stri
     let masterImage : MasterImage;
 
     try {
-        masterImage = await coreClient.masterImage.getOne(entity.master_image_id);
+        masterImage = await ctx.coreClient.masterImage.getOne(entity.master_image_id);
     } catch {
         throw BuilderError.masterImageNotFound();
     }

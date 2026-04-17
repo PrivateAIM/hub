@@ -20,15 +20,24 @@ import {
     AnalysisDistributorEvent,
 } from '@privateaim/server-core-worker-kit';
 import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
+import type { Client as CoreClient } from '@privateaim/core-http-kit';
+import type { Client as DockerClient } from 'docken';
 import {
     buildDockerAuthConfigFromRegistry,
     buildDockerImageURL,
-    useCoreClient, 
-    useDocker,
-} from '../../../../../core';
+} from '../../../../../adapters/docker/index.ts';
 import { useAnalysisDistributorLogger } from '../../helpers';
 
 export class AnalysisDistributorCheckHandler implements ComponentHandler<AnalysisDistributorEventMap, AnalysisDistributorCommand.CHECK> {
+    protected coreClient: CoreClient;
+
+    protected docker: DockerClient;
+
+    constructor(ctx: { coreClient: CoreClient; docker: DockerClient }) {
+        this.coreClient = ctx.coreClient;
+        this.docker = ctx.docker;
+    }
+
     async handle(
         value: AnalysisBuilderCheckPayload,
         context: ComponentHandlerContext<AnalysisDistributorEventMap, AnalysisDistributorCommand.CHECK>,
@@ -56,12 +65,11 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
             value,
         );
 
-        const client = useCoreClient();
-        const analysis = await client.analysis.getOne(value.id);
+        const analysis = await this.coreClient.analysis.getOne(value.id);
 
         // -----------------------------------------------------------------------------------
 
-        const { data: analysisNodes } = await client.analysisNode.getMany({
+        const { data: analysisNodes } = await this.coreClient.analysisNode.getMany({
             filter: { analysis_id: analysis.id },
             page: { limit: 1 },
         });
@@ -75,7 +83,7 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
             return;
         }
 
-        const { data: nodes } = await client.node.getMany({
+        const { data: nodes } = await this.coreClient.node.getMany({
             filter: { id: analysisNodes.map((analysisNode) => analysisNode.node_id) },
             relations: { registry_project: true },
         });
@@ -91,9 +99,8 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
 
         // -----------------------------------------------------------------------------------
 
-        const registry = await client.registry.getOne(analysis.registry_id, { fields: ['+account_secret'] });
+        const registry = await this.coreClient.registry.getOne(analysis.registry_id, { fields: ['+account_secret'] });
 
-        const docker = useDocker();
         const authConfig = buildDockerAuthConfigFromRegistry(registry);
 
         try {
@@ -112,8 +119,8 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
                     tagOrDigest: REGISTRY_ARTIFACT_TAG_LATEST,
                 });
 
-                const stream = await docker.pull(nodeImageURL, { authconfig: authConfig });
-                await waitForModemStream(docker.modem, stream);
+                const stream = await this.docker.pull(nodeImageURL, { authconfig: authConfig });
+                await waitForModemStream(this.docker.modem, stream);
             }
         } catch {
             let status: `${ProcessStatus}`;

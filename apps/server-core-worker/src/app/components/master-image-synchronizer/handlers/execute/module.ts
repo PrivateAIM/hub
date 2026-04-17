@@ -17,7 +17,7 @@ import {
 import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
 import { scanDirectory } from 'docken';
 import { MASTER_IMAGES_DIRECTORY_PATH } from '../../../../../constants';
-import { GitHubClient } from '../../../../../core';
+import { GitHubClient } from '../../../../../adapters/github/index.ts';
 import { useAnalysisBuilderLogger } from '../../../analysis-builder/utils';
 import {
     DockenGroupAttributesValidator,
