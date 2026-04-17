@@ -23,7 +23,7 @@ import { LogStoreInjectionKey } from '../victoria-logs/constants.ts';
 export class ComponentsModule implements IModule {
     readonly name = 'components';
 
-    readonly dependencies: string[] = ['database'];
+    readonly dependencies: string[] = ['database', 'victoriaLogs'];
 
     async setup(container: IContainer): Promise<void> {
         let logStore: LogStore | undefined;

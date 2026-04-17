@@ -91,6 +91,11 @@ export class HTTPModule implements IModule {
     }
 
     async teardown(container: IContainer): Promise<void> {
+        const socketResult = container.tryResolve(HTTPInjectionKey.SocketServer);
+        if (socketResult.success) {
+            await socketResult.data.close();
+        }
+
         const result = container.tryResolve(HTTPInjectionKey.Server);
         if (result.success) {
             await new Promise<void>((resolve, reject) => {

@@ -13,7 +13,6 @@ import type {
     BucketFileDeleteCommandPayload,
 } from '@privateaim/server-storage-kit';
 import {
-    BucketEvent,
     BucketFileCommand,
     BucketFileEvent,
 } from '@privateaim/server-storage-kit';
@@ -47,11 +46,11 @@ export class BucketFileDeleteHandler implements ComponentHandler<
                 command: BucketFileCommand.DELETE,
                 analysis_id: value.id,
                 [LogFlag.REF_ID]: value.id,
-                [LogFlag.REF_TYPE]: DomainType.BUCKET,
+                [LogFlag.REF_TYPE]: DomainType.BUCKET_FILE,
             });
 
             await context.handle(
-                BucketEvent.DELETION_FAILED,
+                BucketFileEvent.DELETION_FAILED,
                 {
                     ...value,
                     error: e,
