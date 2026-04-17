@@ -9,6 +9,7 @@ import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
 import {
     AuthupClientInjectionKey,
+    EntityEventPublisherInjectionKey,
 } from '@privateaim/server-kit';
 import {
     checkDatabase,
@@ -105,7 +106,7 @@ export class DatabaseModule implements IModule {
         container.register(DatabaseInjectionKey.AnalysisBucketFileSubscriber, { useValue: analysisBucketFileSubscriber });
         container.register(DatabaseInjectionKey.AnalysisNodeSubscriber, { useValue: analysisNodeSubscriber });
 
-        dataSource.subscribers.push(
+        const subscribers = [
             new NodeSubscriber({ nodeClientService }),
             analysisSubscriber,
             analysisBucketFileSubscriber,
@@ -120,6 +121,15 @@ export class DatabaseModule implements IModule {
             new ProjectNodeSubscriber(),
             new RegistrySubscriber(),
             new RegistryProjectSubscriber(),
-        );
+        ];
+
+        const publisherResult = container.tryResolve(EntityEventPublisherInjectionKey);
+        if (publisherResult.success) {
+            for (const subscriber of subscribers) {
+                subscriber.setPublisher(publisherResult.data);
+            }
+        }
+
+        dataSource.subscribers.push(...subscribers);
     }
 }

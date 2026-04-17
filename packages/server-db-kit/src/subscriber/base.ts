@@ -27,12 +27,16 @@ export class BaseSubscriber<
 
     private readonly refType: string;
 
-    private readonly publisher?: IEntityEventPublisher;
+    private publisher?: IEntityEventPublisher;
 
     constructor(ctx: BaseSubscriberContext<RECORD>) {
         this.refType = ctx.refType;
         this.destinations = ctx.destinations;
         this.publisher = ctx.publisher;
+    }
+
+    setPublisher(publisher: IEntityEventPublisher) {
+        this.publisher = publisher;
     }
 
     async afterInsert(event: InsertEvent<RECORD>): Promise<any> {

@@ -70,6 +70,7 @@ export function createSocketServer(
             }),
             redisClient: ctx.redisPublishClient,
         }),
+        logger: ctx.logger,
     });
 
     nsp.use((socket: Socket, next) => {

@@ -7,6 +7,7 @@
 
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
+import { EntityEventPublisherInjectionKey } from '@privateaim/server-kit';
 import { DataSource } from 'typeorm';
 import {
     checkDatabase,
@@ -46,10 +47,19 @@ export class DatabaseModule implements IModule {
 
         // Subscribers must be pushed after initialize(), because
         // initialize() overwrites dataSource.subscribers from options.
-        dataSource.subscribers.push(
+        const subscribers = [
             new BucketSubscriber(),
             new BucketFileSubscriber(),
-        );
+        ];
+
+        const publisherResult = container.tryResolve(EntityEventPublisherInjectionKey);
+        if (publisherResult.success) {
+            for (const subscriber of subscribers) {
+                subscriber.setPublisher(publisherResult.data);
+            }
+        }
+
+        dataSource.subscribers.push(...subscribers);
 
         try {
             setDataSource(dataSource);

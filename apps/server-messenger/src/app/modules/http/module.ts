@@ -89,7 +89,9 @@ export class HTTPModule implements IModule {
                     clientSecret: config.clientSecret,
                     realm: config.realm,
                 }),
+                redisClient: redisPublishResult.success ? redisPublishResult.data : undefined,
             }),
+            logger,
         });
 
         registerControllers(socketServer, { logger });

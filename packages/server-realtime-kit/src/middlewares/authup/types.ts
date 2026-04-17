@@ -5,10 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { Logger } from '@privateaim/server-kit';
 import type { TokenVerifier } from '@authup/server-adapter-kit';
 
 export type AuthorizationMiddlewareRegistrationOptions = {
     tokenVerifier: TokenVerifier,
     baseURL?: string,
-    fakeAbilities?: boolean
+    fakeAbilities?: boolean,
+    logger?: Logger,
 };

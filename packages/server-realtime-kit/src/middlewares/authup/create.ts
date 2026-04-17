@@ -6,15 +6,12 @@
  */
 
 import { UnauthorizedError } from '@ebec/http';
-import {
-    useLogger,
-} from '@privateaim/server-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import { createMiddleware } from '@authup/server-adapter-socket-io';
 import type {
-    Middleware, 
-    Namespace, 
-    Server, 
+    Middleware,
+    Namespace,
+    Server,
     Socket,
 } from '../../types';
 import type { AuthorizationMiddlewareRegistrationOptions } from './types';
@@ -48,15 +45,17 @@ export function mountAuthorizationMiddleware(
     const middleware = createAuthorizationMiddleware(options);
     nsp.use(middleware);
 
+    const { logger } = options;
+
     nsp.use((socket, next) => {
         if (socket.data.identity) {
-            useLogger().info(`Socket/${socket.id}: ${socket.data.identity.type} connected.`, {
+            logger?.info(`Socket/${socket.id}: ${socket.data.identity.type} connected.`, {
                 [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
                 actor_type: socket.data.identity.type,
                 actor_id: socket.data.identity.id,
             });
         } else {
-            useLogger().warn(`Socket/${socket.id}: Not authenticated.`, { [LogFlag.CHANNEL]: LogChannel.WEBSOCKET });
+            logger?.warn(`Socket/${socket.id}: Not authenticated.`, { [LogFlag.CHANNEL]: LogChannel.WEBSOCKET });
 
             next(new UnauthorizedError());
             return;
@@ -64,7 +63,7 @@ export function mountAuthorizationMiddleware(
 
         socket.on('disconnect', () => {
             if (socket.data.identity) {
-                useLogger().info(`Socket/${socket.id}: ${socket.data.identity.type} disconnected`, {
+                logger?.info(`Socket/${socket.id}: ${socket.data.identity.type} disconnected`, {
                     [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
                     actor_type: socket.data.identity.type,
                     actor_id: socket.data.identity.id,
