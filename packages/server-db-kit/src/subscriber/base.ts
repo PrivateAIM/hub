@@ -8,9 +8,8 @@
 import type { ObjectLiteral } from '@privateaim/kit';
 import { DomainEventName } from '@privateaim/kit';
 import type {
-    EntityEventDestinations, 
+    EntityEventDestinations,
     EntityEventDestinationsFn,
-    EntityEventPublisher,
 } from '@privateaim/server-kit';
 import {
     isEntityEventPublisherUsable,
@@ -27,18 +26,12 @@ import type { BaseSubscriberContext, SubscriberPublishPayload } from './types';
 export class BaseSubscriber<
     RECORD extends ObjectLiteral,
 > implements EntitySubscriberInterface<RECORD> {
-    private readonly publisher: EntityEventPublisher | undefined;
-
     private readonly destinations : EntityEventDestinations | EntityEventDestinationsFn<RECORD>;
 
     private readonly refType: string;
 
     constructor(ctx: BaseSubscriberContext<RECORD>) {
         this.refType = ctx.refType;
-        if (isEntityEventPublisherUsable()) {
-            this.publisher = useEntityEventPublisher();
-        }
-
         this.destinations = ctx.destinations;
     }
 
@@ -70,11 +63,12 @@ export class BaseSubscriber<
     }
 
     async publish(payload: SubscriberPublishPayload<RECORD>) {
-        if (!this.publisher) {
+        if (!isEntityEventPublisherUsable()) {
             return;
         }
 
-        await this.publisher.safePublish({
+        const publisher = useEntityEventPublisher();
+        await publisher.safePublish({
             data: payload.data,
             dataPrevious: payload.dataPrevious,
             metadata: {
