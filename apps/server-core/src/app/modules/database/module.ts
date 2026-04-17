@@ -37,6 +37,7 @@ import { DataSourceOptionsBuilder } from './options.ts';
 import { setDataSourceSync } from './singleton.ts';
 import { DatabaseInjectionKey } from './constants.ts';
 import { registerRepositories } from './register.ts';
+import { DataSource } from 'typeorm';
 
 export class DatabaseModule implements IModule {
     readonly name = 'database';
@@ -60,13 +61,13 @@ export class DatabaseModule implements IModule {
             });
         }
 
-        const { DataSource: DS } = await import('typeorm');
-        const dataSource = new DS(options);
-
-        // Instantiate subscribers with DI dependencies
-        this.registerSubscribers(dataSource, container);
+        const dataSource = new DataSource(options);
 
         await dataSource.initialize();
+
+        // Subscribers must be pushed after initialize(), because
+        // initialize() overwrites dataSource.subscribers from options.
+        this.registerSubscribers(dataSource, container);
 
         try {
             setDataSource(dataSource);
@@ -92,7 +93,7 @@ export class DatabaseModule implements IModule {
         }
     }
 
-    private registerSubscribers(dataSource: any, container: IContainer): void {
+    private registerSubscribers(dataSource: DataSource, container: IContainer): void {
         let nodeClientService: NodeClientService | undefined;
         if (isAuthupClientUsable()) {
             const authupResult = container.tryResolve(AuthupClientInjectionKey);
