@@ -64,12 +64,13 @@ export async function executeBucketRouteUpdateHandler(
 
     await repository.save(entity);
 
-    const hasBucket = await minio.bucketExists(entity.id);
+    const bucketName = toBucketName(entity.id);
+    const hasBucket = await minio.bucketExists(bucketName);
     if (!hasBucket) {
         if (entity.region) {
-            await minio.makeBucket(toBucketName(entity.id), entity.region);
+            await minio.makeBucket(bucketName, entity.region);
         } else {
-            await minio.makeBucket(toBucketName(entity.id));
+            await minio.makeBucket(bucketName);
         }
     }
 

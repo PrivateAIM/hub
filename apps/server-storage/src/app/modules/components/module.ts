@@ -16,7 +16,7 @@ import { MinioClientInjectionKey } from '../minio/constants.ts';
 export class ComponentsModule implements IModule {
     readonly name = 'components';
 
-    readonly dependencies: string[] = ['minio'];
+    readonly dependencies: string[] = ['minio', 'database'];
 
     async setup(container: IContainer): Promise<void> {
         const minio = container.resolve(MinioClientInjectionKey);
