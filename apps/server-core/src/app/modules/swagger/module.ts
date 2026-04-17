@@ -9,7 +9,7 @@ import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
 import path from 'node:path';
 import { generateSwagger } from '@privateaim/server-http-kit';
-import { useLogger } from '@privateaim/server-kit';
+import { LoggerInjectionKey } from '@privateaim/server-kit';
 import { ConfigInjectionKey } from '../config/constants.ts';
 import { getRootDirPath } from '../config/paths.ts';
 
@@ -20,7 +20,7 @@ export class SwaggerModule implements IModule {
 
     async setup(container: IContainer): Promise<void> {
         const config = container.resolve(ConfigInjectionKey);
-        const logger = useLogger();
+        const logger = container.resolve(LoggerInjectionKey);
 
         logger.debug('Generating documentation...');
 

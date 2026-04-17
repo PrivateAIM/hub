@@ -7,16 +7,18 @@
 
 import type { Client, Permission } from '@authup/core-kit';
 import { PermissionName } from '@privateaim/kit';
-import type { AuthupClient } from '@privateaim/server-kit';
-import { useLogger } from '@privateaim/server-kit';
+import type { AuthupClient, Logger } from '@privateaim/server-kit';
 import { isClientErrorWithStatusCode } from 'hapic';
 import type { NodeEntity } from '../../../adapters/database/entities/index.ts';
 
 export class NodeClientService {
     protected authup: AuthupClient;
 
-    constructor(authup: AuthupClient) {
+    protected logger?: Logger;
+
+    constructor(authup: AuthupClient, logger?: Logger) {
         this.authup = authup;
+        this.logger = logger;
     }
 
     async dismiss(entity: NodeEntity): Promise<void> {
@@ -106,8 +108,7 @@ export class NodeClientService {
                     throw e;
                 }
 
-                useLogger()
-                    .warn(`The node-client permission could not be created, due non existing permission ${permissionName}.`);
+                this.logger?.warn(`The node-client permission could not be created, due non existing permission ${permissionName}.`);
             }
 
             if (permission) {

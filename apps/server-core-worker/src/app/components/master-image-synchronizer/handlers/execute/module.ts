@@ -18,7 +18,7 @@ import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/serv
 import { scanDirectory } from 'docken';
 import { MASTER_IMAGES_DIRECTORY_PATH } from '../../../../../constants';
 import { GitHubClient } from '../../../../../adapters/github/index.ts';
-import { useAnalysisBuilderLogger } from '../../../analysis-builder/utils';
+import { createAnalysisBuilderLogger } from '../../../analysis-builder/utils';
 import {
     DockenGroupAttributesValidator,
     DockenImageAttributesValidator,
@@ -45,7 +45,7 @@ export class MasterImageSynchronizerExecuteHandler implements ComponentHandler<
             // todo: check if image exists, otherwise local queue task
             await this.handleInternal(payload, context);
         } catch (e) {
-            useAnalysisBuilderLogger().error({
+            createAnalysisBuilderLogger().error({
                 message: e,
                 command: MasterImageSynchronizerCommand.EXECUTE,
                 event: MasterImageSynchronizerEvent.EXECUTION_FAILED,

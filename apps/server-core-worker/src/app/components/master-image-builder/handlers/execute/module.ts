@@ -24,7 +24,7 @@ import path from 'node:path';
 import tar from 'tar-fs';
 import { MASTER_IMAGES_DIRECTORY_PATH } from '../../../../../constants';
 import { buildDockerImageURL } from '../../../../../adapters/docker/index.ts';
-import { useMasterImageBuilderLogger } from '../../utils';
+import { createMasterImageBuilderLogger } from '../../utils';
 
 export class MasterImageBuilderExecuteHandler implements ComponentHandler<
     MasterImageBuilderEventMap,
@@ -47,7 +47,7 @@ export class MasterImageBuilderExecuteHandler implements ComponentHandler<
             // todo: check if image exists, otherwise local queue task
             await this.handleInternal(payload, context);
         } catch (e) {
-            useMasterImageBuilderLogger().error({
+            createMasterImageBuilderLogger().error({
                 message: e,
                 command: MasterImageBuilderCommand.EXECUTE,
                 event: MasterImageBuilderEvent.EXECUTION_FAILED,
@@ -87,7 +87,7 @@ export class MasterImageBuilderExecuteHandler implements ComponentHandler<
                 },
             });
         } catch {
-            useMasterImageBuilderLogger().info({
+            createMasterImageBuilderLogger().info({
                 message: 'Building image failed',
                 command: MasterImageBuilderCommand.EXECUTE,
                 master_image_id: masterImage.id,
@@ -105,7 +105,7 @@ export class MasterImageBuilderExecuteHandler implements ComponentHandler<
         masterImage: MasterImage,
         options: ModemStreamWaitOptions = {},
     ) {
-        useMasterImageBuilderLogger().info({
+        createMasterImageBuilderLogger().info({
             message: 'Building image',
             command: MasterImageBuilderCommand.EXECUTE,
             master_image_id: masterImage.id,
@@ -129,7 +129,7 @@ export class MasterImageBuilderExecuteHandler implements ComponentHandler<
 
         await waitForStream(this.docker, stream, {
             onFinished: () => {
-                useMasterImageBuilderLogger().info({
+                createMasterImageBuilderLogger().info({
                     message: 'Built image',
                     command: MasterImageBuilderCommand.EXECUTE,
                     master_image_id: masterImage.id,

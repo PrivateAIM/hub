@@ -7,9 +7,11 @@
 
 import type { QueryResultCache } from 'typeorm/cache/QueryResultCache.js';
 import type { QueryResultCacheOptions } from 'typeorm/cache/QueryResultCacheOptions.js';
-import { isRedisClientUsable, useRedisClient } from '@privateaim/server-kit';
+import type { Client as RedisClient } from 'redis-extension';
 
 type DatabaseQueryResultCacheOptions = {
+    redisClient?: RedisClient,
+
     redisAlias?: string,
 
     redisKeyPrefix?: string
@@ -18,10 +20,13 @@ type DatabaseQueryResultCacheOptions = {
 export class DatabaseQueryResultCache implements QueryResultCache {
     protected options: DatabaseQueryResultCacheOptions;
 
+    protected redisClient?: RedisClient;
+
     constructor(options?: DatabaseQueryResultCacheOptions) {
         options = options || {};
 
         this.options = options;
+        this.redisClient = options.redisClient;
     }
 
     protected buildFullQualifiedId(id: string) {
@@ -37,14 +42,13 @@ export class DatabaseQueryResultCache implements QueryResultCache {
     }
 
     async clear(): Promise<void> {
-        if (!isRedisClientUsable()) {
+        if (!this.redisClient) {
             return;
         }
 
-        const client = useRedisClient();
-        const pipeline = client.pipeline();
+        const pipeline = this.redisClient.pipeline();
 
-        const keys = await client.keys(this.buildFullQualifiedId('*'));
+        const keys = await this.redisClient.keys(this.buildFullQualifiedId('*'));
         for (const key of keys) {
             pipeline.del(key);
         }
@@ -61,7 +65,7 @@ export class DatabaseQueryResultCache implements QueryResultCache {
     }
 
     async getFromCache(options: QueryResultCacheOptions): Promise<QueryResultCacheOptions | undefined> {
-        if (!isRedisClientUsable()) {
+        if (!this.redisClient) {
             return undefined;
         }
 
@@ -72,9 +76,8 @@ export class DatabaseQueryResultCache implements QueryResultCache {
         }
 
         const key = this.buildFullQualifiedId(options.identifier || options.query);
-        const client = useRedisClient();
 
-        const data = await client.get(
+        const data = await this.redisClient.get(
             key,
         );
 
@@ -94,12 +97,11 @@ export class DatabaseQueryResultCache implements QueryResultCache {
     }
 
     async remove(identifiers: string[]): Promise<void> {
-        if (!isRedisClientUsable()) {
+        if (!this.redisClient) {
             return;
         }
 
-        const client = useRedisClient();
-        const pipeline = client.pipeline();
+        const pipeline = this.redisClient.pipeline();
 
         for (const identifier of identifiers) {
             pipeline.del(this.buildFullQualifiedId(identifier));
@@ -111,7 +113,7 @@ export class DatabaseQueryResultCache implements QueryResultCache {
     async storeInCache(
         options: QueryResultCacheOptions,
     ): Promise<void> {
-        if (!isRedisClientUsable()) {
+        if (!this.redisClient) {
             return;
         }
 
@@ -122,9 +124,8 @@ export class DatabaseQueryResultCache implements QueryResultCache {
         }
 
         const key = this.buildFullQualifiedId(options.identifier || options.query);
-        const client = useRedisClient();
 
-        await client.set(
+        await this.redisClient.set(
             key,
             JSON.stringify(options),
             'PX',

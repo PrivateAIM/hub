@@ -11,7 +11,6 @@ import { ModuleName } from '../../module-names';
 import { AuthupClientAuthenticationHookInjectionKey } from '../client-hook/constants';
 import { AuthupClientInjectionKey } from './constants';
 import { AuthupClient } from './module';
-import { setAuthupClientFactory } from './singleton';
 
 export type AuthupClientModuleOptions = {
     baseURL: string;
@@ -37,8 +36,5 @@ export class AuthupClientModule implements IModule {
         }
 
         container.register(AuthupClientInjectionKey, { useValue: client });
-
-        // Bridge: back-fill singa singleton
-        setAuthupClientFactory(() => client);
     }
 }

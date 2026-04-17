@@ -8,10 +8,12 @@
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
 import {
-    Cache,
+    AuthupClientInjectionKey,
+    CacheInjectionKey,
+    LoggerInjectionKey,
+    QueueRouterInjectionKey,
     QueueWorkerComponentCaller,
     TaskManager,
-    createCacheAdapter,
 } from '@privateaim/server-kit';
 import type { TaskMap } from '../../../core/domains/index.ts';
 import { AnalysisMetadataComponent } from '../../components/analysis-metadata/module.ts';
@@ -32,13 +34,13 @@ export class ComponentsModule implements IModule {
         const dataSource = container.resolve(DatabaseInjectionKey.DataSource);
 
         // Create TaskManager
-        const cacheAdapter = createCacheAdapter();
-        const cache = new Cache(cacheAdapter);
+        const cache = container.resolve(CacheInjectionKey);
         const taskManager = new TaskManager<TaskMap>(cache);
         container.register(ComponentsInjectionKey.TaskManager, { useValue: taskManager });
 
         // Create components
-        const registryComponent = new RegistryComponent();
+        const authupResult = container.tryResolve(AuthupClientInjectionKey);
+        const registryComponent = new RegistryComponent({ authupClient: authupResult.success ? authupResult.data : undefined });
         const analysisMetadataComponent = new AnalysisMetadataComponent({ dataSource });
 
         // Create and register component callers
@@ -50,15 +52,27 @@ export class ComponentsModule implements IModule {
         // Inject metadataCaller into subscribers (created earlier by DatabaseModule)
         this.injectMetadataCaller(container, analysisMetadataComponentCaller);
 
+        const logger = container.resolve(LoggerInjectionKey);
+        const queueRouterResult = container.tryResolve(QueueRouterInjectionKey);
+        const queueRouter = queueRouterResult.success ? queueRouterResult.data : undefined;
+
         // Start task consumers
         const components = [
             new QueueWorkerComponentCaller(
                 registryComponent,
-                { consumeQueue: RegistryTaskQueueRouterRouting },
+                {
+                    consumeQueue: RegistryTaskQueueRouterRouting, 
+                    queueRouter, 
+                    logger, 
+                },
             ),
             new QueueWorkerComponentCaller(
                 analysisMetadataComponent,
-                { consumeQueue: AnalysisMetadataTaskQueue },
+                {
+                    consumeQueue: AnalysisMetadataTaskQueue, 
+                    queueRouter, 
+                    logger, 
+                },
             ),
         ];
 

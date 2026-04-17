@@ -7,24 +7,32 @@
 
 import { ExchangeType } from 'amqp-extension';
 import type { Client } from 'amqp-extension';
-import { isLoggerUsable, useLogger } from '../../services';
+import type { Logger } from '../../services';
 import { QueueRouterRoutingType } from './constants';
 import { isQueueRouterPayload } from './helpers';
 import type {
     QueueRouterHandler,
     QueueRouterHandlers,
-    QueueRouterPayload, 
-    QueueRouterPublishOptions, 
+    QueueRouterPayload,
+    QueueRouterPublishOptions,
     QueueRouterRouting,
 } from './types';
+
+type QueueRouterContext = {
+    driver: Client,
+    logger?: Logger,
+};
 
 export class QueueRouter {
     protected driver : Client;
 
+    protected logger?: Logger;
+
     //----------------------------------------------------------------
 
-    constructor(driver: Client) {
-        this.driver = driver;
+    constructor(ctx: QueueRouterContext) {
+        this.driver = ctx.driver;
+        this.logger = ctx.logger;
     }
 
     //----------------------------------------------------------------
@@ -50,9 +58,9 @@ export class QueueRouter {
 
         if (
             options.logging &&
-            isLoggerUsable()
+            this.logger
         ) {
-            useLogger()
+            this.logger
                 .debug(`Publishing queue message ${message.type} in ${message.metadata.routing.key}`);
         }
 
@@ -97,16 +105,16 @@ export class QueueRouter {
                 }
 
                 if (input.fields.redelivered) {
-                    if (isLoggerUsable()) {
-                        useLogger()
+                    if (this.logger) {
+                        this.logger
                             .debug(`Queue message ${input.properties.type} in ${routing.key} is not processed again.`);
                     }
 
                     return;
                 }
 
-                if (isLoggerUsable()) {
-                    useLogger()
+                if (this.logger) {
+                    this.logger
                         .debug(`Consuming queue message ${input.properties.type} in ${routing.key}`);
                 }
 
@@ -122,8 +130,8 @@ export class QueueRouter {
                 }
 
                 if (typeof handler !== 'function') {
-                    if (isLoggerUsable()) {
-                        useLogger()
+                    if (this.logger) {
+                        this.logger
                             .debug(`No queue handler to consume message ${input.properties.type} in ${routing.key}`);
                     }
 
@@ -133,8 +141,8 @@ export class QueueRouter {
                 try {
                     await handler(payload);
                 } catch (e) {
-                    if (isLoggerUsable()) {
-                        useLogger()
+                    if (this.logger) {
+                        this.logger
                             .error(e);
                     }
 

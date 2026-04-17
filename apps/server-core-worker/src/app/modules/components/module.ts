@@ -8,7 +8,7 @@
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
 import type { Component } from '@privateaim/server-kit';
-import { QueueWorkerComponentCaller } from '@privateaim/server-kit';
+import { QueueRouterInjectionKey, QueueWorkerComponentCaller } from '@privateaim/server-kit';
 import {
     AnalysisBuilderEventQueueRouterRouting,
     AnalysisBuilderTaskQueueRouterRouting,
@@ -28,6 +28,9 @@ import {
     MasterImageBuilderComponent,
     MasterImageSynchronizerComponent,
 } from '../../components/index.ts';
+import { createAnalysisBuilderLogger } from '../../components/analysis-builder/utils/logger.ts';
+import { createAnalysisDistributorLogger } from '../../components/analysis-distributor/helpers/logger.ts';
+import { createMasterImageBuilderLogger } from '../../components/master-image-builder/utils/logger.ts';
 
 export class ComponentsModule implements IModule {
     readonly name = 'components';
@@ -38,6 +41,13 @@ export class ComponentsModule implements IModule {
         const coreClient = container.resolve(CoreClientInjectionKey);
         const storageClient = container.resolve(StorageClientInjectionKey);
         const docker = container.resolve(DockerInjectionKey);
+
+        // Initialize component loggers with queueRouter (if available)
+        const queueRouterResult = container.tryResolve(QueueRouterInjectionKey);
+        const queueRouter = queueRouterResult.success ? queueRouterResult.data : undefined;
+        createAnalysisBuilderLogger(queueRouter);
+        createAnalysisDistributorLogger(queueRouter);
+        createMasterImageBuilderLogger(queueRouter);
 
         const components: Component<any>[] = [
             new QueueWorkerComponentCaller(

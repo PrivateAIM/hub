@@ -6,15 +6,28 @@
  */
 
 import { isEqual } from 'smob';
-import type { EntityEventHandleOptions, IEntityEventHandler } from '@privateaim/server-kit';
-import { useLogger } from '@privateaim/server-kit';
+import type { EntityEventHandleOptions, IEntityEventHandler, Logger } from '@privateaim/server-kit';
 import type { Event, EventData } from '@privateaim/telemetry-kit';
 import { DomainType } from '@privateaim/telemetry-kit';
 import type { ObjectDiff, ObjectLiteral } from '@privateaim/kit';
 import { WEEK_IN_MS, isObject } from '@privateaim/kit';
-import { isEventComponentCallerUsable, useEventComponentCaller } from '../../components';
+import type { EventComponentCaller } from '../../components';
+
+export type EntityEventHandlerContext = {
+    eventComponentCaller?: EventComponentCaller,
+    logger?: Logger,
+};
 
 export class EntityEventHandler implements IEntityEventHandler {
+    protected eventComponentCaller?: EventComponentCaller;
+
+    protected logger?: Logger;
+
+    constructor(ctx: EntityEventHandlerContext = {}) {
+        this.eventComponentCaller = ctx.eventComponentCaller;
+        this.logger = ctx.logger;
+    }
+
     async handle(ctx: EntityEventHandleOptions): Promise<void> {
         if (ctx.metadata.ref_type === DomainType.EVENT) {
             return;
@@ -91,13 +104,14 @@ export class EntityEventHandler implements IEntityEventHandler {
 
         entity.data = data;
 
-        if (isEventComponentCallerUsable()) {
-            const eventService = useEventComponentCaller();
-            await eventService.callCreate(entity);
+        if (this.eventComponentCaller) {
+            await this.eventComponentCaller.callCreate(entity);
 
             return;
         }
 
-        useLogger().debug('Event service is not available to publish events.');
+        if (this.logger) {
+            this.logger.debug('Event service is not available to publish events.');
+        }
     }
 }

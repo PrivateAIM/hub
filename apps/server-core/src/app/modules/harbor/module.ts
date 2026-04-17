@@ -7,7 +7,7 @@
 
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
-import { useLogger } from '@privateaim/server-kit';
+import { LoggerInjectionKey } from '@privateaim/server-kit';
 import { setupHarborService } from '../../../core/harbor/module.ts';
 import { ConfigInjectionKey } from '../config/constants.ts';
 import { DatabaseInjectionKey } from '../database/constants.ts';
@@ -22,7 +22,7 @@ export class HarborModule implements IModule {
 
         if (!config.harborURL) return;
 
-        const logger = useLogger();
+        const logger = container.resolve(LoggerInjectionKey);
         logger.debug('Executing harbor service setup...');
 
         const registryRepository = container.resolve(DatabaseInjectionKey.RegistryRepository);

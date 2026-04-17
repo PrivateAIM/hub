@@ -33,7 +33,7 @@ import {
 import { AnalysisContainerPath } from '../../constants';
 import { BuilderError } from '../../error';
 import { generateDockerFileContent } from '../../helpers';
-import { useAnalysisBuilderLogger } from '../../utils';
+import { createAnalysisBuilderLogger } from '../../utils';
 
 export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisBuilderEventMap, AnalysisBuilderCommand.EXECUTE> {
     protected coreClient: CoreClient;
@@ -60,7 +60,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
             // todo: check if image exists, otherwise local queue task
             await this.handleInternal(value, context);
         } catch (e) {
-            useAnalysisBuilderLogger().error({
+            createAnalysisBuilderLogger().error({
                 message: e,
                 command: AnalysisBuilderCommand.EXECUTE,
                 analysis_id: value.id,
@@ -107,7 +107,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
                 },
             });
         } catch (e) {
-            useAnalysisBuilderLogger()
+            createAnalysisBuilderLogger()
                 .error('Building image failed', {
                     command: AnalysisBuilderCommand.EXECUTE,
                     analysis_id: analysis.id,
@@ -124,7 +124,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
         try {
             container = await this.createContainer(analysis);
         } catch (e) {
-            useAnalysisBuilderLogger()
+            createAnalysisBuilderLogger()
                 .error('Creating container failed', {
                     command: AnalysisBuilderCommand.EXECUTE,
                     analysis_id: analysis.id,
@@ -139,7 +139,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
         try {
             await this.packContainer(container, analysis);
         } catch (e) {
-            useAnalysisBuilderLogger()
+            createAnalysisBuilderLogger()
                 .error('Packing container failed', {
                     command: AnalysisBuilderCommand.EXECUTE,
                     analysis_id: analysis.id,
@@ -156,7 +156,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
         try {
             await this.commitContainer(container, analysis);
         } catch (e) {
-            useAnalysisBuilderLogger()
+            createAnalysisBuilderLogger()
                 .error('Commiting container failed', {
                     command: AnalysisBuilderCommand.EXECUTE,
                     analysis_id: analysis.id,
@@ -190,7 +190,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
         analysis: Analysis,
         options: ModemStreamWaitOptions = {},
     ) {
-        useAnalysisBuilderLogger().info({
+        createAnalysisBuilderLogger().info({
             message: 'Building image',
             command: AnalysisBuilderCommand.EXECUTE,
             analysis_id: analysis.id,
@@ -226,7 +226,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
 
         return waitForStream(this.docker, buildStream, {
             onFinished: () => {
-                useAnalysisBuilderLogger().info({
+                createAnalysisBuilderLogger().info({
                     message: 'Built image',
                     command: AnalysisBuilderCommand.EXECUTE,
                     analysis_id: analysis.id,
@@ -238,7 +238,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
     }
 
     protected async createContainer(analysis: Analysis) : Promise<Container> {
-        useAnalysisBuilderLogger().info({
+        createAnalysisBuilderLogger().info({
             message: 'Creating container',
             command: AnalysisBuilderCommand.EXECUTE,
             analysis_id: analysis.id,
@@ -248,7 +248,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
         const container = await this.docker
             .createContainer({ Image: this.buildImageTag(analysis) });
 
-        useAnalysisBuilderLogger().info({
+        createAnalysisBuilderLogger().info({
             message: 'Created container',
             command: AnalysisBuilderCommand.EXECUTE,
             analysis_id: analysis.id,
@@ -262,7 +262,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
         container: Container,
         analysis: Analysis,
     ) : Promise<void> {
-        useAnalysisBuilderLogger()
+        createAnalysisBuilderLogger()
             .info('Packing container', {
                 command: AnalysisBuilderCommand.EXECUTE,
                 analysis_id: analysis.id,
@@ -305,7 +305,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
                 },
 
                 onEntryPackStarted: (entry) => {
-                    useAnalysisBuilderLogger()
+                    createAnalysisBuilderLogger()
                         .debug(`Packing ${entry.type} ${entry.name} (${entry.size} bytes)`, {
                             command: AnalysisBuilderCommand.EXECUTE,
                             analysis_id: analysis.id,
@@ -313,7 +313,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
                         });
                 },
                 onEntryPackFinished: (entry) => {
-                    useAnalysisBuilderLogger()
+                    createAnalysisBuilderLogger()
                         .debug(`Packed ${entry.type} ${entry.name} (${entry.size} bytes)`, {
                             command: AnalysisBuilderCommand.EXECUTE,
                             analysis_id: analysis.id,
@@ -321,7 +321,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
                         });
                 },
                 onEntryPackFailed: (_, entry) => {
-                    useAnalysisBuilderLogger()
+                    createAnalysisBuilderLogger()
                         .error(`Packing ${entry.type} ${entry.name} (${entry.size} bytes) failed`, {
                             command: AnalysisBuilderCommand.EXECUTE,
                             analysis_id: analysis.id,
@@ -331,7 +331,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
             },
         );
 
-        useAnalysisBuilderLogger()
+        createAnalysisBuilderLogger()
             .info('Packed container', {
                 command: AnalysisBuilderCommand.EXECUTE,
                 analysis_id: analysis.id,
@@ -343,7 +343,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
         container: Container,
         analysis: Analysis,
     ) {
-        useAnalysisBuilderLogger().info({
+        createAnalysisBuilderLogger().info({
             message: 'Commiting container',
             command: AnalysisBuilderCommand.EXECUTE,
             analysis_id: analysis.id,
@@ -355,7 +355,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
             tag: REGISTRY_ARTIFACT_TAG_LATEST,
         });
 
-        useAnalysisBuilderLogger().info({
+        createAnalysisBuilderLogger().info({
             message: 'Commited container',
             command: AnalysisBuilderCommand.EXECUTE,
             analysis_id: analysis.id,

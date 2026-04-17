@@ -6,8 +6,7 @@
  */
 
 import { NotFoundError } from '@ebec/http';
-import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
-import { useLogger } from '@privateaim/server-kit';
+import type { ComponentHandler, ComponentHandlerContext, Logger } from '@privateaim/server-kit';
 import type {
     BucketFileComponentEventMap,
     BucketFileDeleteCommandPayload,
@@ -29,8 +28,11 @@ export class BucketFileDeleteHandler implements ComponentHandler<
 > {
     protected minio: Client;
 
-    constructor(ctx: { minio: Client }) {
+    protected logger: Logger | undefined;
+
+    constructor(ctx: { minio: Client; logger?: Logger }) {
         this.minio = ctx.minio;
+        this.logger = ctx.logger;
     }
 
     async handle(
@@ -41,7 +43,7 @@ export class BucketFileDeleteHandler implements ComponentHandler<
             // todo: check if image exists, otherwise local queue task
             await this.process(value, context);
         } catch (e) {
-            useLogger().error({
+            this.logger?.error({
                 message: e,
                 command: BucketFileCommand.DELETE,
                 analysis_id: value.id,

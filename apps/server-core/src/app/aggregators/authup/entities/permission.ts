@@ -6,14 +6,12 @@
  */
 import type { EntityType, EventRecord, Permission } from '@authup/core-kit';
 import { useDataSource } from 'typeorm-extension';
-import { useLogger } from '@privateaim/server-kit';
 import { AnalysisPermissionEntity } from '../../../../adapters/database/index.ts';
 
 export async function handleAuthupPermissionEvent(
     context: EventRecord<EntityType.PERMISSION, Permission>,
 ) {
     if (!context.data.id) {
-        useLogger().warn('ID in authup permission event handler is missing.');
         return;
     }
 

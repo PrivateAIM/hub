@@ -16,7 +16,7 @@ import {
     MasterImageBuilderEvent,
 } from '@privateaim/server-core-worker-kit';
 import type { ComponentHandlerContext } from '@privateaim/server-kit';
-import { isEventComponentCallerUsable, useEventComponentCaller } from '@privateaim/server-telemetry-kit';
+import type { EventComponentCaller } from '@privateaim/server-telemetry-kit';
 import type { DataSource } from 'typeorm';
 import { MasterImageEntity } from '../../../../adapters/database/index.ts';
 
@@ -24,6 +24,7 @@ export async function handleMasterImageBuilderEvent(
     value: MasterImageBuilderBasePayload,
     context: ComponentHandlerContext<MasterImageBuilderEventMap, MasterImageBuilderEvent>,
     dataSource: DataSource,
+    eventComponentCaller?: EventComponentCaller,
 ) {
     const repository = dataSource.getRepository(MasterImageEntity);
 
@@ -62,9 +63,8 @@ export async function handleMasterImageBuilderEvent(
 
     await repository.save(entity);
 
-    if (isEventComponentCallerUsable()) {
-        const eventCaller = useEventComponentCaller();
-        await eventCaller.callCreate({
+    if (eventComponentCaller) {
+        await eventComponentCaller.callCreate({
             name: context.key,
             data: {},
             ref_type: DomainType.MASTER_IMAGE,

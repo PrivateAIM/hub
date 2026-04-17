@@ -6,8 +6,7 @@
  */
 
 import { wait } from '@privateaim/kit';
-import type { ComponentHandler } from '@privateaim/server-kit';
-import { useLogger } from '@privateaim/server-kit';
+import type { ComponentHandler, Logger } from '@privateaim/server-kit';
 import cron from 'node-cron';
 import { LessThan } from 'typeorm';
 import { useDataSource } from 'typeorm-extension';
@@ -18,6 +17,12 @@ export class EventComponentCleanerHandler implements ComponentHandler<
     EventComponentEventMap,
     EventCommand.CLEAN
 > {
+    protected logger: Logger | undefined;
+
+    constructor(ctx?: { logger?: Logger }) {
+        this.logger = ctx?.logger;
+    }
+
     async initialize() : Promise<void> {
         await this.handle();
 
@@ -32,7 +37,7 @@ export class EventComponentCleanerHandler implements ComponentHandler<
 
         const isoDate = new Date().toISOString();
 
-        useLogger().info(`Removing expired event entities before ${isoDate}`);
+        this.logger?.info(`Removing expired event entities before ${isoDate}`);
 
         const handleBatch = async (
             limit: number,

@@ -6,8 +6,9 @@
  */
 
 import type { IContainer } from 'eldin';
-import type { IModule } from 'orkos';
+import type { IModule, ModuleDependency } from 'orkos';
 import { AmqpClientInjectionKey } from '../../services/amqp/constants';
+import { LoggerInjectionKey } from '../../services/logger/constants';
 import { ModuleName } from '../../services/module-names';
 import { QueueRouterInjectionKey } from './constants';
 import { QueueRouter } from './module';
@@ -15,11 +16,18 @@ import { QueueRouter } from './module';
 export class QueueRouterModule implements IModule {
     readonly name = ModuleName.QUEUE_ROUTER;
 
-    readonly dependencies = [ModuleName.AMQP];
+    readonly dependencies: (string | ModuleDependency)[] = [
+        ModuleName.AMQP,
+        { name: ModuleName.LOGGER, optional: true },
+    ];
 
     async setup(container: IContainer): Promise<void> {
         const amqp = container.resolve(AmqpClientInjectionKey);
-        const router = new QueueRouter(amqp);
+        const loggerResult = container.tryResolve(LoggerInjectionKey);
+        const router = new QueueRouter({
+            driver: amqp,
+            logger: loggerResult.success ? loggerResult.data : undefined,
+        });
         container.register(QueueRouterInjectionKey, { useValue: router });
     }
 }

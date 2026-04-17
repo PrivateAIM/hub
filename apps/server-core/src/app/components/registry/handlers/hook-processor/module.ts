@@ -5,8 +5,7 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentData, ComponentHandler } from '@privateaim/server-kit';
-import { useLogger } from '@privateaim/server-kit';
+import type { ComponentData, ComponentHandler, Logger } from '@privateaim/server-kit';
 import type { RegistryCommand } from '../../constants.ts';
 import type { RegistryEventMap } from '../../type.ts';
 import { RegistryHookValidator } from './validator.ts';
@@ -17,8 +16,11 @@ export class RegistryHookHandler implements ComponentHandler<
 > {
     protected validator : RegistryHookValidator;
 
-    constructor() {
+    protected logger?: Logger;
+
+    constructor(ctx: { logger?: Logger } = {}) {
         this.validator = new RegistryHookValidator();
+        this.logger = ctx.logger;
     }
 
     async handle(
@@ -27,11 +29,9 @@ export class RegistryHookHandler implements ComponentHandler<
         try {
             const data = await this.validator.run(value);
 
-            useLogger()
-                .debug(`Registry event ${data.type} unhandled.`);
+            this.logger?.debug(`Registry event ${data.type} unhandled.`);
         } catch {
-            useLogger()
-                .warn(`Registry event ${value.t} malformed.`);
+            this.logger?.warn(`Registry event ${value.t} malformed.`);
         }
     }
 }

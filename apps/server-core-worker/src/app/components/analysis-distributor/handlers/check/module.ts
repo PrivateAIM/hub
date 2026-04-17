@@ -26,7 +26,7 @@ import {
     buildDockerAuthConfigFromRegistry,
     buildDockerImageURL,
 } from '../../../../../adapters/docker/index.ts';
-import { useAnalysisDistributorLogger } from '../../helpers';
+import { createAnalysisDistributorLogger } from '../../helpers';
 
 export class AnalysisDistributorCheckHandler implements ComponentHandler<AnalysisDistributorEventMap, AnalysisDistributorCommand.CHECK> {
     protected coreClient: CoreClient;
@@ -105,7 +105,7 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
 
         try {
             for (const node of nodes) {
-                useAnalysisDistributorLogger().info({
+                createAnalysisDistributorLogger().info({
                     message: `Checking analysis image of node ${node.name}}`,
                     command: AnalysisDistributorCommand.CHECK,
                     analysis_id: analysis.id,

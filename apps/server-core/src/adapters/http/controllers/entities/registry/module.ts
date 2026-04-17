@@ -43,8 +43,9 @@ export class RegistryController {
         @DRequest() req: any,
         @DResponse() res: any,
     ): Promise<PartialRegistry[]> {
+        const actor = buildActorContext(req);
         const query = useRequestQuery(req);
-        const { data, meta } = await this.service.getMany(query);
+        const { data, meta } = await this.service.getMany(query, actor);
         return send(res, { data, meta }) as any;
     }
 
@@ -54,8 +55,9 @@ export class RegistryController {
         @DRequest() req: any,
         @DResponse() res: any,
     ): Promise<PartialRegistry | undefined> {
+        const actor = buildActorContext(req);
         const query = useRequestQuery(req);
-        const entity = await this.service.getOne(id, Object.keys(query).length > 0 ? query : undefined);
+        const entity = await this.service.getOne(id, actor, Object.keys(query).length > 0 ? query : undefined);
         return send(res, entity) as PartialRegistry | undefined;
     }
 

@@ -6,7 +6,7 @@
  */
 
 import { BadRequestError } from '@ebec/http';
-import type { Log, LogLevel } from '@privateaim/telemetry-kit';
+import type { Log, LogLevel, APIClient as TelemetryClient } from '@privateaim/telemetry-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import { useRequestQuery } from '@routup/basic/query';
 import type { Request, Response } from 'routup';
@@ -15,9 +15,8 @@ import type { FiltersBuildInput } from 'rapiq';
 import { parseQuery } from 'rapiq';
 import type { AnalysisNodeLog } from '@privateaim/core-kit';
 import { DomainType } from '@privateaim/core-kit';
-import { isTelemetryClientUsable, useTelemetryClient } from '../../../../../../app/services/telemetry/index.ts';
 
-export async function getManyAnalysisNodeLogRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function getManyAnalysisNodeLogRouteHandler(req: Request, res: Response, telemetryClient?: TelemetryClient) : Promise<any> {
     const output = parseQuery<AnalysisNodeLog>(useRequestQuery(req), {
         filters: {
             allowed: [
@@ -57,9 +56,7 @@ export async function getManyAnalysisNodeLogRouteHandler(req: Request, res: Resp
 
     // todo: sort missing
 
-    if (isTelemetryClientUsable()) {
-        const telemetryClient = useTelemetryClient();
-
+    if (telemetryClient) {
         const response = await telemetryClient.log.getMany({
             filters,
             pagination: output.pagination,

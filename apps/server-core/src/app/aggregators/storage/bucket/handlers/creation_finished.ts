@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import type { ComponentHandlerContext } from '@privateaim/server-kit';
-import { useLogger } from '@privateaim/server-kit';
 import type { BucketComponentEventMap, BucketEvent } from '@privateaim/server-storage-kit';
 import type { Bucket } from '@privateaim/storage-kit';
 import { AnalysisBucketEntity, AnalysisEntity } from '../../../../../adapters/database/index.ts';
@@ -30,7 +29,7 @@ export class StorageBucketCreationFinishedHandler extends BaseAggregatorHandler<
             });
 
             if (analysisBucket) {
-                useLogger().info(`Analysis ${task.data.bucketType} bucket already exists for analysis ${task.data.analysisId}.`);
+                this.logger?.info(`Analysis ${task.data.bucketType} bucket already exists for analysis ${task.data.analysisId}.`);
                 return;
             }
 
@@ -38,7 +37,7 @@ export class StorageBucketCreationFinishedHandler extends BaseAggregatorHandler<
             const analysis = await analysisRepository.findOneBy({ id: task.data.analysisId });
 
             if (!analysis) {
-                useLogger().info(`Analysis ${task.data.analysisId} does not exist. Therefore ${task.data.bucketType} bucket can not be created.`);
+                this.logger?.info(`Analysis ${task.data.analysisId} does not exist. Therefore ${task.data.bucketType} bucket can not be created.`);
                 return;
             }
 

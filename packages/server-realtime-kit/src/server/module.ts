@@ -5,17 +5,19 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
-    isRedisClientUsable, 
-    useLogger, 
-    useRedisPublishClient, 
-    useRedisSubscribeClient,
-} from '@privateaim/server-kit';
+import type { Logger } from '@privateaim/server-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import { createAdapter } from '@socket.io/redis-adapter';
 import type { Server as HTTPServer } from 'node:http';
+import type { Client as RedisClient } from 'redis-extension';
 import type { DefaultEventsMap, ServerOptions } from 'socket.io';
 import { Server } from 'socket.io';
+
+type SocketServerOptions = {
+    redisPublishClient?: RedisClient,
+    redisSubscribeClient?: RedisClient,
+    logger?: Logger,
+};
 
 export function createServer<
     ListenEvents extends Record<string, any> = DefaultEventsMap,
@@ -24,12 +26,13 @@ export function createServer<
     SocketData = any,
 >(
     httpServer: HTTPServer,
+    options: SocketServerOptions = {},
 ): Server<ListenEvents, EmitEvents, ServerSideEvents, SocketData> {
     let adapter : ServerOptions['adapter'] | undefined;
-    if (isRedisClientUsable()) {
+    if (options.redisPublishClient && options.redisSubscribeClient) {
         adapter = createAdapter(
-            useRedisPublishClient(),
-            useRedisSubscribeClient(),
+            options.redisPublishClient,
+            options.redisSubscribeClient,
         );
     }
 
@@ -49,13 +52,16 @@ export function createServer<
         transports: ['websocket', 'polling'],
     });
 
-    server.engine.on('connection_error', (err) => {
-        useLogger().error({
-            message: err.message,
-            code: err.code,
-            [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
+    if (options.logger) {
+        const { logger } = options;
+        server.engine.on('connection_error', (err) => {
+            logger.error({
+                message: err.message,
+                code: err.code,
+                [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
+            });
         });
-    });
+    }
 
     return server;
 }

@@ -5,12 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { Logger } from '@privateaim/server-kit';
 import { mountConnectionController, mountMessagingController } from './controllers/index.ts';
 import type { Server, Socket } from './types.ts';
 
-export function registerControllers(server: Server) {
+export function registerControllers(server: Server, options?: { logger?: Logger }) {
     server.on('connection', (socket: Socket) => {
         mountConnectionController(socket);
-        mountMessagingController(socket);
+        mountMessagingController(socket, options);
     });
 }

@@ -10,7 +10,6 @@ import type { IModule } from 'orkos';
 import { ModuleName } from '../module-names';
 import { AmqpClientInjectionKey } from './constants';
 import { AmqpClient } from './module';
-import { setAmqpClientFactory } from './singleton';
 
 export type AmqpModuleOptions = {
     connectionString?: string;
@@ -34,8 +33,5 @@ export class AmqpModule implements IModule {
 
         const client = new AmqpClient({ connectionOptions: this.options.connectionString });
         container.register(AmqpClientInjectionKey, { useValue: client });
-
-        // Bridge: back-fill singa singleton
-        setAmqpClientFactory(() => client);
     }
 }

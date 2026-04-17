@@ -8,15 +8,16 @@
 import type {
     AnalysisNodeLog,
 } from '@privateaim/core-kit';
+import type { APIClient as TelemetryClient } from '@privateaim/telemetry-kit';
 
 import {
     DBody,
-    DController, 
-    DDelete, 
-    DGet, 
-    DPost, 
-    DRequest, 
-    DResponse, 
+    DController,
+    DDelete,
+    DGet,
+    DPost,
+    DRequest,
+    DResponse,
     DTags,
 } from '@routup/decorators';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
@@ -40,12 +41,18 @@ type PartialAnalysisLog = Partial<AnalysisNodeLog>;
 @DTags('analysis')
 @DController('/analysis-node-logs')
 export class AnalysisNodeLogController {
+    protected telemetryClient?: TelemetryClient;
+
+    constructor(ctx: { telemetryClient?: TelemetryClient } = {}) {
+        this.telemetryClient = ctx.telemetryClient;
+    }
+
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
         @DRequest() req: any,
         @DResponse() res: any,
     ): Promise<PartialAnalysisLog | undefined> {
-        return await getManyAnalysisNodeLogRouteHandler(req, res) as PartialAnalysisLog | undefined;
+        return await getManyAnalysisNodeLogRouteHandler(req, res, this.telemetryClient) as PartialAnalysisLog | undefined;
     }
 
     @DPost('', [ForceLoggedInMiddleware])
@@ -54,7 +61,7 @@ export class AnalysisNodeLogController {
         @DRequest() req: any,
         @DResponse() res: any,
     ): Promise<PartialAnalysisLog | undefined> {
-        return await createAnalysisNodeLogRouteHandler(req, res) as PartialAnalysisLog | undefined;
+        return await createAnalysisNodeLogRouteHandler(req, res, this.telemetryClient) as PartialAnalysisLog | undefined;
     }
 
     @DDelete('', [ForceLoggedInMiddleware])
@@ -62,6 +69,6 @@ export class AnalysisNodeLogController {
         @DRequest() req: any,
         @DResponse() res: any,
     ): Promise<PartialAnalysisLog | undefined> {
-        return await deleteAnalysisNodeLogRouteHandler(req, res) as PartialAnalysisLog | undefined;
+        return await deleteAnalysisNodeLogRouteHandler(req, res, this.telemetryClient) as PartialAnalysisLog | undefined;
     }
 }

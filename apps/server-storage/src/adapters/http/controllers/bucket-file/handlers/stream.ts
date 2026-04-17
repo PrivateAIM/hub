@@ -7,7 +7,7 @@
 
 import { createGzip } from 'node:zlib';
 import { NotFoundError } from '@ebec/http';
-import { useLogger } from '@privateaim/server-kit';
+import type { Logger } from '@privateaim/server-kit';
 import type { Request, Response } from 'routup';
 import { getRequestAcceptableEncoding, useRequestParam } from 'routup';
 import type { DataSource } from 'typeorm';
@@ -22,6 +22,7 @@ export async function executeBucketFileRouteStreamHandler(
     res: Response,
     dataSource: DataSource,
     minio: Client,
+    logger?: Logger,
 ) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
@@ -47,14 +48,14 @@ export async function executeBucketFileRouteStreamHandler(
 
     const bucketName = toBucketName(entity.bucket_id);
 
-    useLogger().debug(`Streaming file ${entity.hash} (${id}) of ${bucketName}`);
+    logger?.debug(`Streaming file ${entity.hash} (${id}) of ${bucketName}`);
 
     const stream = await minio.getObject(bucketName, entity.hash);
     stream.on('end', () => {
-        useLogger().debug(`Streamed file ${entity.hash} (${id}) of ${bucketName}`);
+        logger?.debug(`Streamed file ${entity.hash} (${id}) of ${bucketName}`);
     });
     stream.on('error', (err) => {
-        useLogger().error(err);
+        logger?.error(err);
     });
 
     if (gzipSupported) {

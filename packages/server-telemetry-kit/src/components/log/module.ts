@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentMetadata } from '@privateaim/server-kit';
+import type { ComponentMetadata, QueueDispatchComponentCallerOptions } from '@privateaim/server-kit';
 import {
     QueueDispatchComponentCaller,
 } from '@privateaim/server-kit';
@@ -13,10 +13,11 @@ import { LogCommand, LogTaskQueueRouterRouting } from './constants';
 import type { LogWriteCommandPayload } from './handlers';
 
 export class LogComponentCaller extends QueueDispatchComponentCaller {
-    constructor() {
+    constructor(options: Partial<QueueDispatchComponentCallerOptions> = {}) {
         super({
             queue: LogTaskQueueRouterRouting,
             logging: false,
+            ...options,
         });
     }
 

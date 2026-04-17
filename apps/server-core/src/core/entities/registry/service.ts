@@ -40,11 +40,17 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
         this.validator = new RegistryValidator();
     }
 
-    async getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<Registry>> {
+    async getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<Registry>> {
+        await this.checkSecretFieldAccess(query, actor);
+
         return this.repository.findMany(query);
     }
 
-    async getOne(id: string, query?: Record<string, any>): Promise<Registry> {
+    async getOne(id: string, actor: ActorContext, query?: Record<string, any>): Promise<Registry> {
+        if (query) {
+            await this.checkSecretFieldAccess(query, actor);
+        }
+
         const entity = query ?
             await this.repository.findMany({ ...query, filter: { id } }).then((r) => r.data[0]) :
             await this.repository.findOneById(id);
@@ -54,6 +60,18 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
         }
 
         return entity;
+    }
+
+    private async checkSecretFieldAccess(query: Record<string, any>, actor: ActorContext): Promise<void> {
+        const { fields } = query;
+        if (!fields) {
+            return;
+        }
+
+        const fieldsStr = Array.isArray(fields) ? fields.join(',') : String(fields);
+        if (fieldsStr.includes('account_secret')) {
+            await actor.permissionChecker.preCheck({ name: PermissionName.REGISTRY_MANAGE });
+        }
     }
 
     async create(data: Partial<Registry>, actor: ActorContext): Promise<Registry> {

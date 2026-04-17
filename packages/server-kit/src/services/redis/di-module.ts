@@ -10,7 +10,6 @@ import type { IModule } from 'orkos';
 import { ModuleName } from '../module-names';
 import { RedisClientInjectionKey, RedisPublishClientInjectionKey, RedisSubscribeClientInjectionKey } from './constants';
 import { createRedisClient } from './module';
-import { setRedisFactory } from './singleton';
 
 export type RedisModuleOptions = {
     connectionString?: string;
@@ -36,8 +35,5 @@ export class RedisModule implements IModule {
         container.register(RedisClientInjectionKey, { useValue: client });
         container.register(RedisPublishClientInjectionKey, { useFactory: () => client.duplicate() });
         container.register(RedisSubscribeClientInjectionKey, { useFactory: () => client.duplicate() });
-
-        // Bridge: back-fill singa singleton
-        setRedisFactory(() => client);
     }
 }

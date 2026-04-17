@@ -27,7 +27,7 @@ import {
     cleanupDockerImages,
 } from '../../../../../adapters/docker/index.ts';
 import { BuilderError } from '../../../analysis-builder/error';
-import { useAnalysisDistributorLogger } from '../../helpers';
+import { createAnalysisDistributorLogger } from '../../helpers';
 
 export class AnalysisDistributorExecuteHandler implements ComponentHandler<AnalysisDistributorEventMap, AnalysisDistributorCommand.EXECUTE> {
     protected coreClient: CoreClient;
@@ -47,7 +47,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
             // todo: check if image exists, otherwise local queue task
             await this.handleInternal(value, context);
         } catch (e) {
-            useAnalysisDistributorLogger().error({
+            createAnalysisDistributorLogger().error({
                 message: e,
                 command: AnalysisDistributorCommand.EXECUTE,
                 analysis_id: value.id,
@@ -100,7 +100,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
                 registry,
             );
         } catch (e) {
-            useAnalysisDistributorLogger().error({
+            createAnalysisDistributorLogger().error({
                 message: 'Tagging images failed',
                 command: AnalysisDistributorCommand.EXECUTE,
                 analysis_id: analysis.id,
@@ -132,7 +132,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
                 },
             );
         } catch (e) {
-            useAnalysisDistributorLogger().error({
+            createAnalysisDistributorLogger().error({
                 message: 'Pushing images failed',
                 command: AnalysisDistributorCommand.EXECUTE,
                 analysis_id: analysis.id,
@@ -153,7 +153,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
         nodes: Node[],
         registry: Registry,
     ) : Promise<string[]> {
-        useAnalysisDistributorLogger().info({
+        createAnalysisDistributorLogger().info({
             message: 'Tagging images',
             command: AnalysisDistributorCommand.EXECUTE,
             analysis_id: analysis.id,
@@ -192,7 +192,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
             await image.remove({ force: true });
         }
 
-        useAnalysisDistributorLogger().info({
+        createAnalysisDistributorLogger().info({
             message: 'Tagged images',
             command: AnalysisDistributorCommand.EXECUTE,
             analysis_id: analysis.id,
@@ -207,7 +207,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
         tags: string[],
         options: { push: ImagePushOptions, stream: ModemStreamWaitOptions },
     ) {
-        useAnalysisDistributorLogger().info({
+        createAnalysisDistributorLogger().info({
             message: 'Pushing images',
             command: AnalysisDistributorCommand.EXECUTE,
             analysis_id: analysis.id,
@@ -245,7 +245,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
             await cleanupDockerImages(this.docker, tags);
         }
 
-        useAnalysisDistributorLogger().info({
+        createAnalysisDistributorLogger().info({
             message: 'Pushed images',
             command: AnalysisDistributorCommand.EXECUTE,
             analysis_id: analysis.id,

@@ -7,13 +7,13 @@
 
 import { isClientErrorWithStatusCode } from '@hapic/harbor';
 import type {
-    HarborClient, 
+    HarborClient,
     ProjectWebhookPolicyCreateContext,
 } from '@hapic/harbor';
 import {
     ServiceID,
 } from '@privateaim/core-kit';
-import { isAuthupClientUsable, useAuthupClient } from '@privateaim/server-kit';
+import type { Client as AuthupClient } from '@authup/core-http-kit';
 import { stringifyAuthorizationHeader } from 'hapic';
 import { useEnv } from '../../../../../app/modules/config/index.ts';
 
@@ -21,14 +21,11 @@ export async function saveRemoteRegistryProjectWebhook(
     httpClient: HarborClient,
     context: {
         projectIdOrName: string,
-        isProjectName?: boolean
+        isProjectName?: boolean,
+        authupClient: AuthupClient,
     },
 ) : Promise<{ id: number } | undefined> {
-    if (!isAuthupClientUsable()) {
-        throw new Error('Authup client is not available');
-    }
-
-    const authupClient = useAuthupClient();
+    const { authupClient } = context;
 
     const client = await authupClient.client.getOne(ServiceID.REGISTRY, { fields: ['+secret'] });
 

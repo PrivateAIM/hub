@@ -8,7 +8,7 @@
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
 import type { Component } from '@privateaim/server-kit';
-import { QueueWorkerComponentCaller } from '@privateaim/server-kit';
+import { LoggerInjectionKey, QueueWorkerComponentCaller } from '@privateaim/server-kit';
 import { BucketEventQueueRouterRouting, BucketTaskQueueRouterRouting } from '@privateaim/server-storage-kit';
 import { BucketComponent } from '../../components/bucket/index.ts';
 import { MinioClientInjectionKey } from '../minio/constants.ts';
@@ -21,8 +21,11 @@ export class ComponentsModule implements IModule {
     async setup(container: IContainer): Promise<void> {
         const minio = container.resolve(MinioClientInjectionKey);
 
+        const loggerResult = container.tryResolve(LoggerInjectionKey);
+        const logger = loggerResult.success ? loggerResult.data : undefined;
+
         const components : Component<any>[] = [
-            new QueueWorkerComponentCaller(new BucketComponent({ minio }), {
+            new QueueWorkerComponentCaller(new BucketComponent({ minio, logger }), {
                 consumeQueue: BucketTaskQueueRouterRouting,
                 publishQueue: BucketEventQueueRouterRouting,
             }),

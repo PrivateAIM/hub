@@ -4,7 +4,6 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { useLogger } from '@privateaim/server-kit';
 import type { BucketFileComponentEventMap, BucketFileEvent } from '@privateaim/server-storage-kit';
 import type { BucketFile } from '@privateaim/storage-kit';
 import { AnalysisBucketFileEntity } from '../../../../../adapters/database/index.ts';
@@ -24,6 +23,6 @@ export class StorageBucketFileDeletionFinishedHandler extends BaseAggregatorHand
 
         await analysisBucketFileRepository.remove(analysisBucketFile);
 
-        useLogger().debug(`Removed analysis bucket file ${analysisBucketFile.path}`);
+        this.logger?.debug(`Removed analysis bucket file ${analysisBucketFile.path}`);
     }
 }

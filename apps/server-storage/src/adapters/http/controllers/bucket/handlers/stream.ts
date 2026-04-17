@@ -7,7 +7,7 @@
 
 import { isUUID } from '@authup/kit';
 import { NotFoundError } from '@ebec/http';
-import { useLogger } from '@privateaim/server-kit';
+import type { Logger } from '@privateaim/server-kit';
 import type { Request, Response } from 'routup';
 import { useRequestParam } from 'routup';
 import type { Pack } from 'tar-stream';
@@ -26,12 +26,13 @@ async function packFile(
     name: string,
     file: BucketFileEntity,
     minio: Client,
+    logger?: Logger,
 ) : Promise<void> {
     return new Promise<void>((resolve, reject) => {
         minio.getObject(name, file.hash)
             .then((stream) => streamToBuffer(stream))
             .then((data) => {
-                useLogger().debug(`Packing file ${file.path} (${file.id})`);
+                logger?.debug(`Packing file ${file.path} (${file.id})`);
 
                 pack.entry({
                     name: file.path,
@@ -55,6 +56,7 @@ async function streamFiles(
     name: string,
     files: BucketFileEntity[],
     minio: Client,
+    logger?: Logger,
 ) {
     return new Promise<void>((resolve, reject) => {
         const pack = tar.pack();
@@ -66,7 +68,7 @@ async function streamFiles(
         const promises : Promise<void>[] = [];
 
         for (const file of files) {
-            promises.push(packFile(pack, name, file, minio));
+            promises.push(packFile(pack, name, file, minio, logger));
         }
 
         Promise.resolve()
@@ -82,6 +84,7 @@ export async function executeBucketRouteStreamHandler(
     res: Response,
     dataSource: DataSource,
     minio: Client,
+    logger?: Logger,
 ) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
@@ -107,13 +110,13 @@ export async function executeBucketRouteStreamHandler(
 
     const bucketName = toBucketName(entity.id);
 
-    useLogger().debug(`Streaming files of ${bucketName}`);
+    logger?.debug(`Streaming files of ${bucketName}`);
 
     try {
-        await streamFiles(res, bucketName, files, minio);
+        await streamFiles(res, bucketName, files, minio, logger);
 
-        useLogger().debug(`Streamed files of ${bucketName}`);
+        logger?.debug(`Streamed files of ${bucketName}`);
     } catch (err) {
-        useLogger().error(err);
+        logger?.error(err);
     }
 }

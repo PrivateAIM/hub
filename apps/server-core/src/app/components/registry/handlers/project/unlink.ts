@@ -7,7 +7,7 @@
 
 import { buildRegistryClientConnectionStringFromRegistry } from '@privateaim/core-kit';
 import { useDataSource } from 'typeorm-extension';
-import { type ComponentHandler, useLogger } from '@privateaim/server-kit';
+import type { ComponentHandler, Logger } from '@privateaim/server-kit';
 import { RegistryEntity, RegistryProjectEntity } from '../../../../../adapters/database/index.ts';
 import { RegistryCommand } from '../../constants.ts';
 import type { RegistryEventMap, RegistryProjectUnlinkPayload } from '../../type.ts';
@@ -17,6 +17,12 @@ export class RegistryProjectUnlinkHandler implements ComponentHandler<
     RegistryEventMap,
     RegistryCommand.PROJECT_UNLINK
 > {
+    protected logger?: Logger;
+
+    constructor(ctx: { logger?: Logger } = {}) {
+        this.logger = ctx.logger;
+    }
+
     async handle(value: RegistryProjectUnlinkPayload): Promise<void> {
         const dataSource = await useDataSource();
         const registryRepository = dataSource.getRepository(RegistryEntity);
@@ -36,19 +42,18 @@ export class RegistryProjectUnlinkHandler implements ComponentHandler<
             const promises: Promise<any>[] = [];
 
             for (const repository of repositories) {
-                useLogger().debug(`Deleting registry project repository ${repository.name}`);
+                this.logger?.debug(`Deleting registry project repository ${repository.name}`);
                 promises.push(httpClient.projectRepository.delete(repository.name));
             }
 
             await Promise.all(promises);
         } catch (e) {
             // 'Project repositories could not be deleted.'
-            useLogger()
-                .error({
-                    message: e,
-                    component: 'registry',
-                    command: RegistryCommand.PROJECT_UNLINK,
-                });
+            this.logger?.error({
+                message: e,
+                component: 'registry',
+                command: RegistryCommand.PROJECT_UNLINK,
+            });
 
             return;
         }
@@ -58,12 +63,11 @@ export class RegistryProjectUnlinkHandler implements ComponentHandler<
                 .delete(value.externalName, true);
         } catch (e) {
             // 'Project could not be deleted.'
-            useLogger()
-                .warn({
-                    message: e,
-                    component: 'registry',
-                    command: RegistryCommand.PROJECT_UNLINK,
-                });
+            this.logger?.warn({
+                message: e,
+                component: 'registry',
+                command: RegistryCommand.PROJECT_UNLINK,
+            });
 
             return;
         }
@@ -74,12 +78,11 @@ export class RegistryProjectUnlinkHandler implements ComponentHandler<
                     .delete(Number.parseInt(value.accountId, 10));
             } catch (e) {
                 // 'Robot Account could not be deleted.'
-                useLogger()
-                    .warn({
-                        message: e,
-                        component: 'registry',
-                        command: RegistryCommand.PROJECT_UNLINK,
-                    });
+                this.logger?.warn({
+                    message: e,
+                    component: 'registry',
+                    command: RegistryCommand.PROJECT_UNLINK,
+                });
             }
         }
 

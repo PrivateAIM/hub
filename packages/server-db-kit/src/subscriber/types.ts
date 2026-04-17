@@ -9,6 +9,7 @@ import type {
     EntityEventDestinations,
     EntityEventDestinationsFn,
     EntityEventMetadata,
+    IEntityEventPublisher,
     ObjectLiteral,
 } from '@privateaim/server-kit';
 
@@ -24,4 +25,5 @@ export type BaseSubscriberContext<
 > = {
     refType: string,
     destinations: EntityEventDestinations | EntityEventDestinationsFn<RECORD>,
+    publisher?: IEntityEventPublisher,
 };

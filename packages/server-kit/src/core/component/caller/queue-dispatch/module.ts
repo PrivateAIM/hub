@@ -5,10 +5,11 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
+import type { Logger } from '../../../../services';
+import type { QueueRouter } from '../../../queue-router';
+import { buildQueueRouterPublishPayload } from '../../../queue-router';
 import type { ComponentEventMap } from '../../type';
 import type { ComponentCaller, ComponentCallerPayload } from '../types';
-import { buildQueueRouterPublishPayload, isQueueRouterUsable, useQueueRouter } from '../../../queue-router';
-import { useLogger } from '../../../../services';
 import type { QueueDispatchComponentCallerOptions } from './types';
 
 export class QueueDispatchComponentCaller<
@@ -16,8 +17,14 @@ export class QueueDispatchComponentCaller<
 > implements ComponentCaller<EventMap> {
     protected options : QueueDispatchComponentCallerOptions;
 
+    protected queueRouter?: QueueRouter;
+
+    protected logger?: Logger;
+
     constructor(options: QueueDispatchComponentCallerOptions) {
         this.options = options;
+        this.queueRouter = options.queueRouter;
+        this.logger = options.logger;
     }
 
     async call<K extends keyof EventMap>(
@@ -26,13 +33,14 @@ export class QueueDispatchComponentCaller<
     ): Promise<void> {
         const [data, metadata] = payload;
 
-        if (!isQueueRouterUsable()) {
-            useLogger().warn(`Can not publish ${type} event.`);
+        if (!this.queueRouter) {
+            if (this.logger) {
+                this.logger.warn(`Can not publish ${type} event.`);
+            }
             return;
         }
 
-        const client = useQueueRouter();
-        await client.publish(
+        await this.queueRouter.publish(
             buildQueueRouterPublishPayload({
                 type,
                 data,

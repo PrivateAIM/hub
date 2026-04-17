@@ -7,7 +7,6 @@
 
 import type { Client } from 'redis-extension';
 import { JsonAdapter } from 'redis-extension';
-import { useRedisClient } from '../../redis';
 import type { CacheClearOptions, CacheSetOptions } from '../types';
 import type { CacheAdapter } from './types';
 
@@ -16,8 +15,8 @@ export class RedisCacheAdapter implements CacheAdapter {
 
     protected instance : JsonAdapter;
 
-    constructor() {
-        this.client = useRedisClient();
+    constructor(client: Client) {
+        this.client = client;
         this.instance = new JsonAdapter(this.client);
     }
 

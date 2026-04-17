@@ -6,6 +6,7 @@
  */
 
 import { BaseComponent } from '@privateaim/server-kit';
+import type { Client as AuthupClient } from '@authup/core-http-kit';
 import { RegistryCommand } from './constants.ts';
 import {
     RegistryCleanupHandler,
@@ -18,7 +19,7 @@ import {
 import type { RegistryEventMap } from './type.ts';
 
 export class RegistryComponent extends BaseComponent<RegistryEventMap> {
-    constructor() {
+    constructor(ctx: { authupClient?: AuthupClient } = {}) {
         super();
 
         this.mount(RegistryCommand.SETUP, new RegistrySetupHandler());
@@ -26,7 +27,7 @@ export class RegistryComponent extends BaseComponent<RegistryEventMap> {
 
         this.mount(RegistryCommand.HOOK_PROCESS, new RegistryHookHandler());
 
-        this.mount(RegistryCommand.PROJECT_LINK, new RegistryProjectLinkHandler());
+        this.mount(RegistryCommand.PROJECT_LINK, new RegistryProjectLinkHandler({ authupClient: ctx.authupClient }));
         this.mount(RegistryCommand.PROJECT_UNLINK, new RegistryProjectUnlinkHandler());
         this.mount(RegistryCommand.PROJECT_RELINK, new RegistryProjectRelinkHandler());
     }

@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { Logger } from '@privateaim/server-kit';
 import {
     DController,
     DDelete,
@@ -37,14 +38,18 @@ export class BucketFileController {
 
     private bucketFileComponent: BucketFileComponent;
 
+    private logger: Logger | undefined;
+
     constructor(ctx: {
         dataSource: DataSource;
         minio: Client;
         bucketFileComponent: BucketFileComponent;
+        logger?: Logger;
     }) {
         this.dataSource = ctx.dataSource;
         this.minio = ctx.minio;
         this.bucketFileComponent = ctx.bucketFileComponent;
+        this.logger = ctx.logger;
     }
 
     @DGet('', [ForceLoggedInMiddleware])
@@ -61,7 +66,7 @@ export class BucketFileController {
         @DRequest() req: any,
         @DResponse() res: any,
     ): Promise<any> {
-        return await executeBucketFileRouteStreamHandler(req, res, this.dataSource, this.minio) as any;
+        return await executeBucketFileRouteStreamHandler(req, res, this.dataSource, this.minio, this.logger) as any;
     }
 
     @DGet('/:id', [ForceLoggedInMiddleware])

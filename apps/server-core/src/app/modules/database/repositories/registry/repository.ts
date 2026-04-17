@@ -32,6 +32,11 @@ const DEFAULT_FIELDS: ParseAllowedOption<RegistryEntity> = [
     'updated_at',
 ];
 
+const ALLOWED_FIELDS: ParseAllowedOption<RegistryEntity> = [
+    ...DEFAULT_FIELDS,
+    'account_secret',
+];
+
 export class RegistryRepositoryAdapter implements IRegistryRepository {
     protected dataSource: DataSource;
 
@@ -55,7 +60,7 @@ export class RegistryRepositoryAdapter implements IRegistryRepository {
 
         const fieldsParsed = parseQueryFields<RegistryEntity>(fields, {
             default: DEFAULT_FIELDS,
-            allowed: DEFAULT_FIELDS,
+            allowed: ALLOWED_FIELDS,
             defaultPath: 'registry',
         });
 

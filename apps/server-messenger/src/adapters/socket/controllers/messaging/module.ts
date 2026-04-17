@@ -14,14 +14,14 @@ import {
 import type {
     CTSMessagingMessage,
 } from '@privateaim/messenger-kit';
-import { useLogger } from '@privateaim/server-kit';
+import type { Logger } from '@privateaim/server-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import type { Socket } from '../../types.ts';
 import {
     buildConnectionRoomForIdentity,
 } from '../connection/index.ts';
 
-export function mountMessagingController(socket: Socket) {
+export function mountMessagingController(socket: Socket, options?: { logger?: Logger }) {
     const validator = new CTSMessagingMessageValidator();
 
     socket.on(CTSMessagingEventName.SEND, async (raw, cb) => {
@@ -38,8 +38,7 @@ export function mountMessagingController(socket: Socket) {
             data = await validator.run(raw);
         } catch (e) {
             if (isError(e)) {
-                useLogger()
-                    .error(e);
+                options?.logger?.error(e);
 
                 if (typeof cb === 'function') {
                     cb(e);
@@ -54,12 +53,11 @@ export function mountMessagingController(socket: Socket) {
         for (let i = 0; i < data.to.length; i++) {
             const to = data.to[i];
 
-            useLogger()
-                .info(`Sending message from ${from.id} (${from.type}) to ${to.id} (${to.type})`, {
-                    [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
-                    actor_type: from.type,
-                    actor_id: from.id,
-                });
+            options?.logger?.info(`Sending message from ${from.id} (${from.type}) to ${to.id} (${to.type})`, {
+                [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
+                actor_type: from.type,
+                actor_id: from.id,
+            });
 
             socket.in(buildConnectionRoomForIdentity(to))
                 .emit(STCMessagingEventName.SEND, {

@@ -8,13 +8,14 @@
 import type {
     AnalysisLog,
 } from '@privateaim/core-kit';
+import type { APIClient as TelemetryClient } from '@privateaim/telemetry-kit';
 
 import {
-    DController, 
-    DDelete, 
-    DGet, 
-    DRequest, 
-    DResponse, 
+    DController,
+    DDelete,
+    DGet,
+    DRequest,
+    DResponse,
     DTags,
 } from '@routup/decorators';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
@@ -28,12 +29,18 @@ type PartialAnalysisLog = Partial<AnalysisLog>;
 @DTags('analysis')
 @DController('/analysis-logs')
 export class AnalysisLogController {
+    protected telemetryClient?: TelemetryClient;
+
+    constructor(ctx: { telemetryClient?: TelemetryClient } = {}) {
+        this.telemetryClient = ctx.telemetryClient;
+    }
+
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
         @DRequest() req: any,
         @DResponse() res: any,
     ): Promise<PartialAnalysisLog[]> {
-        return await getManyAnalysisLogRouteHandler(req, res) as PartialAnalysisLog[];
+        return await getManyAnalysisLogRouteHandler(req, res, this.telemetryClient) as PartialAnalysisLog[];
     }
 
     @DDelete('', [ForceLoggedInMiddleware])
@@ -41,6 +48,6 @@ export class AnalysisLogController {
         @DRequest() req: any,
         @DResponse() res: any,
     ): Promise<PartialAnalysisLog | undefined> {
-        return await deleteAnalysisLogRouteHandler(req, res) as PartialAnalysisLog | undefined;
+        return await deleteAnalysisLogRouteHandler(req, res, this.telemetryClient) as PartialAnalysisLog | undefined;
     }
 }

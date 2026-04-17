@@ -5,18 +5,19 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { Application } from 'orkos';
 import {
     EntityEventRedisHandler,
     EntityEventSocketHandler,
     LoggerConsoleTransport,
+    QueueRouterInjectionKey,
     RedisClientInjectionKey,
     createAuthupClientTokenCreator,
 } from '@privateaim/server-kit';
 import {
     EntityEventHandler,
+    LogComponentCaller,
     LoggerTransport,
-    isLogComponentCallerUsable,
-    useLogComponentCaller,
 } from '@privateaim/server-telemetry-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import { useEnv } from './modules/config/index.ts';
@@ -28,6 +29,9 @@ import { ServerStorageApplicationBuilder } from './builder.ts';
 
 export function createApplication() {
     const env = useEnv();
+
+    let app: Application;
+    let logCaller: LogComponentCaller | undefined;
 
     const builder = new ServerStorageApplicationBuilder()
         .withConfig()
@@ -72,10 +76,12 @@ export function createApplication() {
                     [LogFlag.CHANNEL]: LogChannel.SYSTEM,
                 },
                 save: async (data) => {
-                    if (isLogComponentCallerUsable()) {
-                        const component = useLogComponentCaller();
-                        await component.callWrite(data);
+                    if (!logCaller) {
+                        const result = app?.container.tryResolve(QueueRouterInjectionKey);
+                        if (!result?.success) return;
+                        logCaller = new LogComponentCaller({ queueRouter: result.data });
                     }
+                    await logCaller.callWrite(data);
                 },
             }),
         ],
@@ -83,7 +89,7 @@ export function createApplication() {
 
     builder.withDatabase();
 
-    const app = builder.build();
+    app = builder.build();
 
     // Minio must be added before HTTP, because
     // HTTP controllers need the MinIO client from the container.

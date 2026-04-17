@@ -6,7 +6,8 @@
  */
 import { buildRegistryClientConnectionStringFromRegistry } from '@privateaim/core-kit';
 import { useDataSource } from 'typeorm-extension';
-import { type ComponentHandler, useLogger } from '@privateaim/server-kit';
+import type { ComponentHandler, Logger } from '@privateaim/server-kit';
+import type { Client as AuthupClient } from '@authup/core-http-kit';
 import { RegistryEntity, RegistryProjectEntity } from '../../../../../adapters/database/index.ts';
 import { RegistryCommand } from '../../constants.ts';
 import type { RegistryEventMap, RegistryProjectLinkPayload } from '../../type.ts';
@@ -19,6 +20,15 @@ export class RegistryProjectLinkHandler implements ComponentHandler<
     RegistryEventMap,
     RegistryCommand.PROJECT_LINK
 > {
+    protected logger?: Logger;
+
+    protected authupClient?: AuthupClient;
+
+    constructor(ctx: { logger?: Logger; authupClient?: AuthupClient } = {}) {
+        this.logger = ctx.logger;
+        this.authupClient = ctx.authupClient;
+    }
+
     async handle(
         value: RegistryProjectLinkPayload,
     ): Promise<void> {
@@ -32,11 +42,10 @@ export class RegistryProjectLinkHandler implements ComponentHandler<
             .getOne();
 
         if (!entity) {
-            useLogger()
-                .error('Registry project not found.', {
-                    component: 'registry',
-                    command: RegistryCommand.PROJECT_LINK,
-                });
+            this.logger?.error('Registry project not found.', {
+                component: 'registry',
+                command: RegistryCommand.PROJECT_LINK,
+            });
 
             return;
         }
@@ -50,11 +59,10 @@ export class RegistryProjectLinkHandler implements ComponentHandler<
             .getOne();
 
         if (!registryEntity) {
-            useLogger()
-                .error('Registry not found.', {
-                    component: 'registry',
-                    command: RegistryCommand.PROJECT_LINK,
-                });
+            this.logger?.error('Registry not found.', {
+                component: 'registry',
+                command: RegistryCommand.PROJECT_LINK,
+            });
 
             return;
         }
@@ -72,12 +80,11 @@ export class RegistryProjectLinkHandler implements ComponentHandler<
             entity.external_id = `${project.project_id}`;
         } catch (e) {
             // `Project ${entity.external_name} could not be created.`
-            useLogger()
-                .error({
-                    message: e,
-                    component: 'registry',
-                    command: RegistryCommand.PROJECT_LINK,
-                });
+            this.logger?.error({
+                message: e,
+                component: 'registry',
+                command: RegistryCommand.PROJECT_LINK,
+            });
 
             return;
         }
@@ -105,12 +112,11 @@ export class RegistryProjectLinkHandler implements ComponentHandler<
             }
         } catch (e) {
             // 'Robot account could not be created.'
-            useLogger()
-                .error({
-                    message: e,
-                    component: 'registry',
-                    command: RegistryCommand.PROJECT_LINK,
-                });
+            this.logger?.error({
+                message: e,
+                component: 'registry',
+                command: RegistryCommand.PROJECT_LINK,
+            });
 
             return;
         }
@@ -118,11 +124,16 @@ export class RegistryProjectLinkHandler implements ComponentHandler<
         await repository.save(entity);
 
         try {
+            if (!this.authupClient) {
+                throw new Error('Authup client is not available');
+            }
+
             const webhook = await saveRemoteRegistryProjectWebhook(
                 httpClient,
                 {
                     projectIdOrName: entity.external_name,
                     isProjectName: true,
+                    authupClient: this.authupClient,
                 },
             );
 
@@ -131,12 +142,11 @@ export class RegistryProjectLinkHandler implements ComponentHandler<
             entity.webhook_exists = true;
         } catch (e) {
             // 'Webhook could not be created.'
-            useLogger()
-                .error({
-                    message: e,
-                    component: 'registry',
-                    command: RegistryCommand.PROJECT_LINK,
-                });
+            this.logger?.error({
+                message: e,
+                component: 'registry',
+                command: RegistryCommand.PROJECT_LINK,
+            });
 
             return;
         }

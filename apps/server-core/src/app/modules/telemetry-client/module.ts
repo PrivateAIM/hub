@@ -9,7 +9,6 @@ import type { IContainer } from 'eldin';
 import type { IModule, ModuleDependency } from 'orkos';
 import { APIClient } from '@privateaim/telemetry-kit';
 import { AuthupClientAuthenticationHookInjectionKey, ModuleName } from '@privateaim/server-kit';
-import { setTelemetryClientFactory } from '../../services/telemetry/index.ts';
 import { TelemetryClientInjectionKey } from './constants.ts';
 import type { TelemetryClientModuleOptions } from './types.ts';
 
@@ -35,8 +34,5 @@ export class TelemetryClientModule implements IModule {
         }
 
         container.register(TelemetryClientInjectionKey, { useValue: client });
-
-        // Bridge: back-fill singa singleton
-        setTelemetryClientFactory(() => client);
     }
 }

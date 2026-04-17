@@ -45,6 +45,7 @@ export type EntityEventPublishOptions<
 
 export interface IEntityEventPublisher {
     publish(ctx: EntityEventPublishOptions) : Promise<void>;
+    safePublish(ctx: EntityEventPublishOptions) : Promise<void>;
 }
 
 export type EntityEventHandleOptions<

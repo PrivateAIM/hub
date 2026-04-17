@@ -9,5 +9,4 @@ export * from './constants';
 export * from './di-module';
 export * from './module';
 export * from './types';
-export * from './singleton';
 export * from './transports';

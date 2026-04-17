@@ -6,7 +6,7 @@
  */
 
 import 'dotenv/config';
-import { useLogger } from '@privateaim/server-kit';
+import { LoggerInjectionKey } from '@privateaim/server-kit';
 import { createApplication } from './app';
 import { useEnv } from './app/modules/config';
 
@@ -14,7 +14,7 @@ async function start() {
     const app = createApplication();
     await app.setup();
 
-    const logger = useLogger();
+    const logger = app.container.resolve(LoggerInjectionKey);
 
     logger.debug(`Environment: ${useEnv('env')}`);
     logger.debug(`Authup-URL: ${useEnv('authupURL')}`);

@@ -5,14 +5,15 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { Application } from 'orkos';
 import {
     LoggerConsoleTransport,
+    QueueRouterInjectionKey,
     createAuthupClientTokenCreator,
 } from '@privateaim/server-kit';
 import {
+    LogComponentCaller,
     LoggerTransport,
-    isLogComponentCallerUsable,
-    useLogComponentCaller,
 } from '@privateaim/server-telemetry-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import { useEnv } from './modules/config/index.ts';
@@ -24,6 +25,9 @@ import { ServerCoreWorkerApplicationBuilder } from './builder.ts';
 
 export function createApplication() {
     const env = useEnv();
+
+    let app: Application;
+    let logCaller: LogComponentCaller | undefined;
 
     const builder = new ServerCoreWorkerApplicationBuilder()
         .withConfig()
@@ -48,10 +52,12 @@ export function createApplication() {
                     [LogFlag.CHANNEL]: LogChannel.SYSTEM,
                 },
                 save: async (data) => {
-                    if (isLogComponentCallerUsable()) {
-                        const logComponent = useLogComponentCaller();
-                        await logComponent.callWrite(data);
+                    if (!logCaller) {
+                        const result = app?.container.tryResolve(QueueRouterInjectionKey);
+                        if (!result?.success) return;
+                        logCaller = new LogComponentCaller({ queueRouter: result.data });
                     }
+                    await logCaller.callWrite(data);
                 },
             }),
         ],
@@ -59,7 +65,7 @@ export function createApplication() {
 
     builder.withHTTP();
 
-    const app = builder.build();
+    app = builder.build();
 
     app.addModule(new StorageClientModule({ baseURL: env.storageURL }));
     app.addModule(new CoreClientModule({ baseURL: env.coreURL }));

@@ -5,8 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
-import { useLogger } from '@privateaim/server-kit';
+import type { ComponentHandler, ComponentHandlerContext, Logger } from '@privateaim/server-kit';
 import { DomainType, EventValidator, LogFlag } from '@privateaim/telemetry-kit';
 import { useDataSource } from 'typeorm-extension';
 import type {
@@ -25,8 +24,11 @@ export class EventComponentCreateHandler implements ComponentHandler<
 > {
     protected validator : EventValidator;
 
-    constructor() {
+    protected logger: Logger | undefined;
+
+    constructor(ctx?: { logger?: Logger }) {
         this.validator = new EventValidator();
+        this.logger = ctx?.logger;
     }
 
     async handle(
@@ -36,7 +38,7 @@ export class EventComponentCreateHandler implements ComponentHandler<
         try {
             await this.process(value, context);
         } catch (e) {
-            useLogger().error({
+            this.logger?.error({
                 message: e,
                 command: EventCommand.CREATE,
                 event_id: value.id,
