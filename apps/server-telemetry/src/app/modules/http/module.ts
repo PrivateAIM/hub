@@ -74,9 +74,7 @@ export class HTTPModule implements IModule {
                 }),
             },
             swagger,
-            decorators: {
-                controllers,
-            },
+            decorators: { controllers },
         });
 
         mountErrorMiddleware(router);

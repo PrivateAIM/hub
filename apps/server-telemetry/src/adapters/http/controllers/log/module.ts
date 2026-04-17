@@ -46,8 +46,8 @@ export class LogController {
     async getMany(
         @DRequest() req: any,
         @DResponse() res: any,
-    ): Promise<PartialLog[]> {
-        return await getManyLogLogRouteHandler(req, res, this.logStore) as PartialLog[];
+    ): Promise<{ data: PartialLog[]; meta: Record<string, unknown> }> {
+        return await getManyLogLogRouteHandler(req, res, this.logStore) as { data: PartialLog[]; meta: Record<string, unknown> };
     }
 
     @DDelete('', [ForceLoggedInMiddleware])

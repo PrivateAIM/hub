@@ -10,7 +10,6 @@ import type { IModule } from 'orkos';
 import {
     createDatabase,
     setDataSource,
-    synchronizeDatabaseSchema,
 } from 'typeorm-extension';
 import { DataSource } from 'typeorm';
 import {

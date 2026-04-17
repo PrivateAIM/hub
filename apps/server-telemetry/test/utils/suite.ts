@@ -9,7 +9,6 @@ import { write } from 'envix';
 import { inject } from 'vitest';
 import { EnvironmentInputKey } from '../../src/app/modules/config';
 import { createTestApplication } from '../app/factory';
-import type { TestHTTPApplication } from '../app/http';
 
 export function createTestSuite() {
     write(

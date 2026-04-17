@@ -5,16 +5,18 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Factory } from 'singa';
-import { singa } from 'singa';
 import type { Client } from '@privateaim/core-http-kit';
 
-const instance = singa<Client>({ name: 'core' });
+let instance : Client | undefined;
 
-export function setCoreFactory(factory: Factory<Client>) {
-    instance.setFactory(factory);
+export function setCoreClient(client: Client) {
+    instance = client;
 }
 
-export function useCoreClient() {
-    return instance.use();
+export function useCoreClient(): Client {
+    if (typeof instance === 'undefined') {
+        throw new Error('Core client has not been initialized.');
+    }
+
+    return instance;
 }

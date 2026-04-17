@@ -23,11 +23,11 @@ export async function deleteManyLogRouteHandler(req: Request, res: Response, log
     const raw = useRequestQuery(req, 'filter');
     if (isObject(raw)) {
         if (typeof raw.time !== 'undefined') {
-            if (typeof raw.time === 'string') {
-                start = Number(raw.time);
-            } else if (typeof raw.time === 'number') {
-                start = raw.time;
+            const parsed = typeof raw.time === 'string' ? Number(raw.time) : raw.time;
+            if (typeof parsed !== 'number' || !Number.isFinite(parsed)) {
+                throw new BadRequestError('Filter time must be a finite unix timestamp.');
             }
+            start = parsed;
         }
 
         const keys = Object.keys(raw);

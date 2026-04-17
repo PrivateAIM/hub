@@ -5,4 +5,5 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './factory.ts';
+export { createApplication } from './factory.ts';
+export { ServerCoreWorkerApplicationBuilder } from './builder.ts';

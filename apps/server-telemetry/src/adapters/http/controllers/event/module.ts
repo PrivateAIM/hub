@@ -40,16 +40,16 @@ export class EventController {
     async create(
         @DRequest() req: any,
         @DResponse() res: any,
-    ): Promise<PartialEvent[]> {
-        return await createEventRouteHandler(req, res, this.dataSource) as PartialEvent[];
+    ): Promise<PartialEvent> {
+        return await createEventRouteHandler(req, res, this.dataSource) as PartialEvent;
     }
 
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
         @DRequest() req: any,
         @DResponse() res: any,
-    ): Promise<PartialEvent[]> {
-        return await getManyEventLogRouteHandler(req, res, this.dataSource) as PartialEvent[];
+    ): Promise<{ data: PartialEvent[]; meta: Record<string, unknown> }> {
+        return await getManyEventLogRouteHandler(req, res, this.dataSource) as { data: PartialEvent[]; meta: Record<string, unknown> };
     }
 
     @DGet('/:id', [ForceLoggedInMiddleware])

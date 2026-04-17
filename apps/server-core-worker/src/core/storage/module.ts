@@ -5,16 +5,18 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Factory } from 'singa';
-import { singa } from 'singa';
 import type { APIClient } from '@privateaim/storage-kit';
 
-const instance = singa<APIClient>({ name: 'storage' });
+let instance : APIClient | undefined;
 
-export function setStorageFactory(factory: Factory<APIClient>) {
-    instance.setFactory(factory);
+export function setStorageClient(client: APIClient) {
+    instance = client;
 }
 
-export function useStorageClient() {
-    return instance.use();
+export function useStorageClient(): APIClient {
+    if (typeof instance === 'undefined') {
+        throw new Error('Storage client has not been initialized.');
+    }
+
+    return instance;
 }

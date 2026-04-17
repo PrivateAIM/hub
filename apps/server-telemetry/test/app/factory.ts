@@ -7,10 +7,9 @@
 
 import { LoggerModule } from '@privateaim/server-kit';
 import type { IModule } from 'orkos';
-import { ConfigModule } from '../../src/app/modules/config/index.ts';
+import { ConfigModule, useEnv  } from '../../src/app/modules/config/index.ts';
 import { VictoriaLogsModule } from '../../src/app/modules/victoria-logs/index.ts';
 import { HTTPModule } from '../../src/app/modules/http/index.ts';
-import { useEnv } from '../../src/app/modules/config/index.ts';
 
 import { TestHTTPApplication } from './http.ts';
 import { createTestDatabaseModule } from './database.ts';

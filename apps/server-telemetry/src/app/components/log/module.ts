@@ -9,13 +9,16 @@ import {
     BaseComponent,
 } from '@privateaim/server-kit';
 import { LogCommand } from '@privateaim/server-telemetry-kit';
+import type { LogStore } from '../../../core/services/log-store/types.ts';
+import { MemoryLogStore } from '../../../adapters/telemetry/memory.ts';
 import { LogComponentWriteHandler } from './handlers/index.ts';
 
 export class LogComponent extends BaseComponent {
-    constructor() {
+    constructor(ctx?: { logStore?: LogStore }) {
         super();
 
-        this.mount(LogCommand.WRITE, new LogComponentWriteHandler());
+        const logStore = ctx?.logStore ?? new MemoryLogStore();
+        this.mount(LogCommand.WRITE, new LogComponentWriteHandler(logStore));
     }
 
     async start() {

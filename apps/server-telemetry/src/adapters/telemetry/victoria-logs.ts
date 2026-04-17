@@ -64,12 +64,12 @@ export class VictoriaLogsLogStore implements LogStore {
         }
 
         if (input.end) {
-            options.end = new Date(input.start).toISOString();
+            options.end = new Date(input.end).toISOString();
         }
 
         const output : Log[] = [];
 
-        const data = await this.instance.querier.query({ query: options.query });
+        const data = await this.instance.querier.query(options);
 
         for (const {
             _time: time,
@@ -104,13 +104,28 @@ export class VictoriaLogsLogStore implements LogStore {
 
     // ----------------------------------------------
 
+    protected isValidLabelKey(key: string) : boolean {
+        return /^[A-Za-z_][A-Za-z0-9_]*$/.test(key);
+    }
+
+    protected escapeQueryValue(value: unknown) : string {
+        return String(value)
+            .replaceAll('\\', '\\\\')
+            .replaceAll('"', '\\"');
+    }
+
     protected buildQuery(labels: Record<string, any>, sort: 'DESC' | 'ASC' = 'DESC') : string {
         const filters : string[] = [];
 
         const keys = Object.keys(labels);
 
         for (const key of keys) {
-            filters.push(`${key}:="${labels[key]}"`);
+            if (!this.isValidLabelKey(key)) {
+                continue;
+            }
+
+            const value = this.escapeQueryValue(labels[key]);
+            filters.push(`${key}:="${value}"`);
         }
 
         const query = filters.length > 0 ? filters.join(' AND ') : '*';

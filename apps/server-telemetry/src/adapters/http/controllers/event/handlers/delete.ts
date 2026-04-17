@@ -5,11 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { NotFoundError } from '@ebec/http';
-import { PermissionName } from '@privateaim/kit';
+import { ForbiddenError, NotFoundError } from '@ebec/http';
+import { PermissionName, isRealmResourceWritable } from '@privateaim/kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
-import { useRequestPermissionChecker } from '@privateaim/server-http-kit';
+import { useRequestIdentityRealm, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import type { DataSource } from 'typeorm';
 import { EventEntity } from '../../../../database/index.ts';
 
@@ -25,6 +25,13 @@ export async function deleteEventRouteHandler(req: Request, res: Response, dataS
 
     if (!entity) {
         throw new NotFoundError();
+    }
+
+    if (entity.realm_id) {
+        const realm = useRequestIdentityRealm(req);
+        if (!isRealmResourceWritable(realm, entity.realm_id)) {
+            throw new ForbiddenError('You are not permitted to delete this event.');
+        }
     }
 
     const { id: entityId } = entity;

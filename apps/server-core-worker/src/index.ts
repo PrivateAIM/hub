@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import 'dotenv/config';
 import type { Component } from '@privateaim/server-kit';
 import { QueueWorkerComponentCaller, useLogger } from '@privateaim/server-kit';
 import {
@@ -18,13 +19,11 @@ import {
     MasterImageSynchronizerTaskQueueRouterRouting,
 } from '@privateaim/server-core-worker-kit';
 import {
+    AnalysisBuilderComponent,
+    AnalysisDistributorComponent,
     MasterImageBuilderComponent,
     MasterImageSynchronizerComponent,
-    useAnalysisBuilderComponent,
-    useAnalysisDistributorComponent,
-} from './components';
-import { useEnv } from './config';
-import { createHttpServer } from './http';
+} from './app/components';
 import { createApplication } from './app';
 
 async function start() {
@@ -33,14 +32,14 @@ async function start() {
 
     const components: Component[] = [
         new QueueWorkerComponentCaller(
-            useAnalysisBuilderComponent(),
+            new AnalysisBuilderComponent(),
             {
                 publishQueue: AnalysisBuilderEventQueueRouterRouting,
                 consumeQueue: AnalysisBuilderTaskQueueRouterRouting,
             },
         ),
         new QueueWorkerComponentCaller(
-            useAnalysisDistributorComponent(),
+            new AnalysisDistributorComponent(),
             {
                 publishQueue: AnalysisDistributorEventQueueRouterRouting,
                 consumeQueue: AnalysisDistributorTaskQueueRouterRouting,
@@ -62,13 +61,11 @@ async function start() {
         ),
     ];
 
-    components.forEach((c) => c.start());
+    const promises = components.map((c) => c.start());
+    await Promise.all(promises);
 
-    const server = createHttpServer();
-    const port = useEnv('port');
-    server.listen(port);
-
-    useLogger().debug(`Listening on 0.0.0.0:${port}`);
+    const logger = useLogger();
+    logger.debug('Application started successfully.');
 }
 
 start();
