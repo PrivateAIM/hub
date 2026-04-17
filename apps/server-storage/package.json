@@ -22,7 +22,7 @@
     "dependencies": {
         "@authup/core-kit": "^1.0.0-beta.35",
         "@authup/kit": "^1.0.0-beta.35",
-        "@ebec/http": "^2.3.0",
+        "@ebec/http": "^4.0.0",
         "@hapic/vault": "^2.3.11",
         "@privateaim/kit": "^0.8.34",
         "@privateaim/server-db-kit": "^0.8.34",
