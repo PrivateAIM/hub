@@ -9,7 +9,7 @@ import {
     expect, 
     it,
 } from 'vitest';
-import { toBucketName } from '../../src/domains';
+import { toBucketName } from '../../src/app/domains/bucket/utils';
 
 describe('src/domains/bucket', () => {
     it('should serialize bucket name', () => {

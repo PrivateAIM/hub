@@ -6,7 +6,6 @@
  */
 
 import {
-    BaseApplicationBuilder,
     EntityEventRedisHandler,
     EntityEventSocketHandler,
     LoggerConsoleTransport,
@@ -20,14 +19,16 @@ import {
     useLogComponentCaller,
 } from '@privateaim/server-telemetry-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
-import { useEnv } from '../config/env/index.ts';
-import { DatabaseModule } from './modules/database/index.ts';
+import { useEnv } from './modules/config/index.ts';
 import { MinioModule } from './modules/minio/index.ts';
+import { HTTPModule } from './modules/http/index.ts';
+import { ServerStorageApplicationBuilder } from './builder.ts';
 
 export function createApplication() {
     const env = useEnv();
 
-    const builder = new BaseApplicationBuilder()
+    const builder = new ServerStorageApplicationBuilder()
+        .withConfig()
         .withAmqp({ connectionString: env.rabbitMqConnectionString })
         .withRedis({ connectionString: env.redisConnectionString });
 
@@ -78,11 +79,15 @@ export function createApplication() {
         ],
     });
 
+    builder.withDatabase();
+
     const app = builder.build();
 
+    // Minio must be added before HTTP, because
+    // HTTP controllers need the MinIO client from the container.
     app.addModule(new MinioModule({ connectionString: env.minioConnectionString }));
 
-    app.addModule(new DatabaseModule());
+    app.addModule(new HTTPModule());
 
     return app;
 }

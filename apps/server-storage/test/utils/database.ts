@@ -15,7 +15,7 @@ import type { DataSourceOptions } from 'typeorm';
 import {
     DataSource,
 } from 'typeorm';
-import { DataSourceOptionsBuilder } from '../../src/database/index.ts';
+import { DataSourceOptionsBuilder } from '../../src/app/modules/database/index.ts';
 
 export class TestDatabase {
     protected options : DataSourceOptions | undefined;

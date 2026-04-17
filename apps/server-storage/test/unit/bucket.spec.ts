@@ -17,7 +17,7 @@ import {
     expectPropertiesEqualToSrc,
     removeDateProperties,
 } from '../utils';
-import type { BucketEntity } from '../../src/database';
+import type { BucketEntity } from '../../src/adapters/database';
 import { createTestBucket } from '../utils/domains/index.ts';
 
 describe('controllers/bucket', () => {
