@@ -22,6 +22,8 @@ import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import { useEnv } from './modules/config/index.ts';
 import { MinioModule } from './modules/minio/index.ts';
 import { HTTPModule } from './modules/http/index.ts';
+import { SwaggerModule } from './modules/swagger/index.ts';
+import { ComponentsModule } from './modules/components/index.ts';
 import { ServerStorageApplicationBuilder } from './builder.ts';
 
 export function createApplication() {
@@ -88,6 +90,8 @@ export function createApplication() {
     app.addModule(new MinioModule({ connectionString: env.minioConnectionString }));
 
     app.addModule(new HTTPModule());
+    app.addModule(new SwaggerModule());
+    app.addModule(new ComponentsModule());
 
     return app;
 }

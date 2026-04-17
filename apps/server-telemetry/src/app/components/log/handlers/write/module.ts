@@ -12,15 +12,16 @@ import type { LogWriteCommandPayload } from '@privateaim/server-telemetry-kit';
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import type { Request } from 'routup';
 import type { LogStore } from '../../../../../core/services/log-store/types.ts';
+import { MemoryLogStore } from '../../../../../adapters/telemetry/memory.ts';
 
 export class LogComponentWriteHandler implements ComponentHandler {
     protected validator : LogValidator;
 
     protected store : LogStore;
 
-    constructor(logStore: LogStore) {
+    constructor(logStore?: LogStore) {
         this.validator = new LogValidator();
-        this.store = logStore;
+        this.store = logStore ?? new MemoryLogStore();
     }
 
     async handle(

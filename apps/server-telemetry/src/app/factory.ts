@@ -15,10 +15,11 @@ import {
 import { EntityEventHandler, LoggerTransport } from '@privateaim/server-telemetry-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import { LogComponentWriteHandler } from './components/log/handlers/index.ts';
-import { MemoryLogStore } from '../adapters/telemetry/memory.ts';
 import { useEnv } from './modules/config/index.ts';
 import { VictoriaLogsModule } from './modules/victoria-logs/index.ts';
 import { HTTPModule } from './modules/http/index.ts';
+import { SwaggerModule } from './modules/swagger/index.ts';
+import { ComponentsModule } from './modules/components/index.ts';
 import { ServerTelemetryApplicationBuilder } from './builder.ts';
 
 export function createApplication() {
@@ -66,16 +67,14 @@ export function createApplication() {
                     [LogFlag.SERVICE]: 'hub-server-telemetry',
                     [LogFlag.CHANNEL]: LogChannel.SYSTEM,
                 },
-                save: (() => {
-                    const component = new LogComponentWriteHandler(new MemoryLogStore());
-                    return async (value) => {
-                        try {
-                            await component.handle(value);
-                        } catch (e) {
-                            console.error(e);
-                        }
-                    };
-                })(),
+                save: async (value) => {
+                    try {
+                        const component = new LogComponentWriteHandler();
+                        await component.handle(value);
+                    } catch (e) {
+                        console.error(e);
+                    }
+                },
             }),
         ],
     });
@@ -93,6 +92,8 @@ export function createApplication() {
     }));
 
     app.addModule(new HTTPModule());
+    app.addModule(new SwaggerModule());
+    app.addModule(new ComponentsModule());
 
     return app;
 }

@@ -6,66 +6,18 @@
  */
 
 import 'dotenv/config';
-import type { Component } from '@privateaim/server-kit';
-import { QueueWorkerComponentCaller, useLogger } from '@privateaim/server-kit';
-import {
-    AnalysisBuilderEventQueueRouterRouting,
-    AnalysisBuilderTaskQueueRouterRouting,
-    AnalysisDistributorEventQueueRouterRouting,
-    AnalysisDistributorTaskQueueRouterRouting,
-    MasterImageBuilderEventQueueRouterRouting,
-    MasterImageBuilderTaskQueueRouterRouting,
-    MasterImageSynchronizerEventQueueRouterRouting,
-    MasterImageSynchronizerTaskQueueRouterRouting,
-} from '@privateaim/server-core-worker-kit';
-import {
-    AnalysisBuilderComponent,
-    AnalysisDistributorComponent,
-    MasterImageBuilderComponent,
-    MasterImageSynchronizerComponent,
-} from './app/components';
+import { useLogger } from '@privateaim/server-kit';
 import { createApplication } from './app';
+import { useEnv } from './app/modules/config';
 
 async function start() {
     const app = createApplication();
     await app.setup();
 
-    const components: Component[] = [
-        new QueueWorkerComponentCaller(
-            new AnalysisBuilderComponent(),
-            {
-                publishQueue: AnalysisBuilderEventQueueRouterRouting,
-                consumeQueue: AnalysisBuilderTaskQueueRouterRouting,
-            },
-        ),
-        new QueueWorkerComponentCaller(
-            new AnalysisDistributorComponent(),
-            {
-                publishQueue: AnalysisDistributorEventQueueRouterRouting,
-                consumeQueue: AnalysisDistributorTaskQueueRouterRouting,
-            },
-        ),
-        new QueueWorkerComponentCaller(
-            new MasterImageBuilderComponent(),
-            {
-                publishQueue: MasterImageBuilderEventQueueRouterRouting,
-                consumeQueue: MasterImageBuilderTaskQueueRouterRouting,
-            },
-        ),
-        new QueueWorkerComponentCaller(
-            new MasterImageSynchronizerComponent(),
-            {
-                publishQueue: MasterImageSynchronizerEventQueueRouterRouting,
-                consumeQueue: MasterImageSynchronizerTaskQueueRouterRouting,
-            },
-        ),
-    ];
-
-    const promises = components.map((c) => c.start());
-    await Promise.all(promises);
-
     const logger = useLogger();
-    logger.debug('Application started successfully.');
+
+    logger.debug(`Environment: ${useEnv('env')}`);
+    logger.debug(`Authup-URL: ${useEnv('authupURL')}`);
 }
 
 start();

@@ -18,6 +18,7 @@ import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import { useEnv } from './modules/config/index.ts';
 import { CoreClientModule } from './modules/core-client/index.ts';
 import { StorageClientModule } from './modules/storage-client/index.ts';
+import { ComponentsModule } from './modules/components/index.ts';
 import { ServerCoreWorkerApplicationBuilder } from './builder.ts';
 
 export function createApplication() {
@@ -61,6 +62,7 @@ export function createApplication() {
 
     app.addModule(new StorageClientModule({ baseURL: env.storageURL }));
     app.addModule(new CoreClientModule({ baseURL: env.coreURL }));
+    app.addModule(new ComponentsModule());
 
     return app;
 }

@@ -5,17 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { generateSwagger } from '@privateaim/server-http-kit';
-import type { Component } from '@privateaim/server-kit';
-import { QueueWorkerComponentCaller, useLogger } from '@privateaim/server-kit';
-import { BucketEventQueueRouterRouting, BucketTaskQueueRouterRouting } from '@privateaim/server-storage-kit';
+import { useLogger } from '@privateaim/server-kit';
 import { defineCommand } from 'citty';
-import path from 'node:path';
-import process from 'node:process';
-import { BucketComponent } from '../../app/components/index.ts';
 import { createApplication } from '../../app/index.ts';
 import { useEnv } from '../../app/modules/config/index.ts';
-import { MinioClientInjectionKey } from '../../app/modules/minio/index.ts';
 
 export function defineCLIStartCommand() {
     return defineCommand({
@@ -24,28 +17,10 @@ export function defineCLIStartCommand() {
             const app = createApplication();
             await app.setup();
 
-            const minio = app.container.resolve(MinioClientInjectionKey);
-
-            await generateSwagger({
-                authupURL: useEnv('authupURL'),
-                baseURL: useEnv('publicURL'),
-                controllerBasePath: path.join(process.cwd(), 'src', 'adapters', 'http', 'controllers'),
-            });
-
-            const components : Component<any>[] = [
-                new QueueWorkerComponentCaller(new BucketComponent({ minio }), {
-                    consumeQueue: BucketTaskQueueRouterRouting,
-                    publishQueue: BucketEventQueueRouterRouting,
-                }),
-            ];
-
-            const promises = components.map(
-                (component) => component.start(),
-            );
-            await Promise.all(promises);
-
             const logger = useLogger();
-            logger.debug('Application started successfully.');
+
+            logger.debug(`Environment: ${useEnv('env')}`);
+            logger.debug(`Public-URL: ${useEnv('publicURL')}`);
         },
     });
 }
