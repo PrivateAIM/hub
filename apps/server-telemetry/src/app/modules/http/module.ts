@@ -31,7 +31,7 @@ import { HTTPInjectionKey } from './constants.ts';
 export class HTTPModule implements IModule {
     readonly name = 'http';
 
-    readonly dependencies: string[] = ['config', 'database'];
+    readonly dependencies: string[] = ['config', 'database', 'victoriaLogs'];
 
     async setup(container: IContainer): Promise<void> {
         const config = container.resolve(ConfigInjectionKey);

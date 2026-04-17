@@ -5,14 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { waitForModemStream } from 'docken';
+import { createClient, waitForModemStream } from 'docken';
 import fs from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { packDockerContainerWithTarStream, useDocker } from '../../../src/core/index.ts';
+import { packDockerContainerWithTarStream } from '../../../src/adapters/docker/index.ts';
 
 describe('docker/pack', () => {
     it('should pack docker container with tar stream', async () => {
-        const docker = useDocker();
+        const docker = createClient();
 
         const pullStream = await docker.pull('alpine:latest');
         await waitForModemStream(docker.modem, pullStream);

@@ -64,15 +64,15 @@ export async function executeBucketRouteDeleteHandler(
     );
 
     if (output.deletionFinished) {
-        return sendAccepted(res, output.creationFinished);
+        return sendAccepted(res, output.deletionFinished);
     }
 
     let error : Error;
 
     if (output.deletionFailed) {
-        error = output.creationFailed.error;
+        error = output.deletionFailed.error;
     } else {
-        error = new BadRequestError('Bucket could not be created.');
+        error = new BadRequestError('Bucket could not be deleted.');
     }
 
     throw error;
