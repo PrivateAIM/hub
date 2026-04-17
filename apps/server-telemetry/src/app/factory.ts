@@ -6,7 +6,6 @@
  */
 
 import {
-    BaseApplicationBuilder,
     EntityEventRedisHandler,
     EntityEventSocketHandler,
     LoggerConsoleTransport,
@@ -15,15 +14,17 @@ import {
 } from '@privateaim/server-kit';
 import { EntityEventHandler, LoggerTransport } from '@privateaim/server-telemetry-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
-import { LogComponentWriteHandler } from '../components/log/handlers/index.ts';
-import { useEnv } from '../config/env/index.ts';
-import { DatabaseModule } from './modules/database/index.ts';
+import { LogComponentWriteHandler } from './components/log/handlers/index.ts';
+import { useEnv } from './modules/config/index.ts';
 import { VictoriaLogsModule } from './modules/victoria-logs/index.ts';
+import { HTTPModule } from './modules/http/index.ts';
+import { ServerTelemetryApplicationBuilder } from './builder.ts';
 
 export function createApplication() {
     const env = useEnv();
 
-    const builder = new BaseApplicationBuilder()
+    const builder = new ServerTelemetryApplicationBuilder()
+        .withConfig()
         .withAmqp({ connectionString: env.rabbitMqConnectionString })
         .withRedis({ connectionString: env.redisConnectionString });
 
@@ -76,15 +77,19 @@ export function createApplication() {
         ],
     });
 
+    builder.withDatabase();
+
     const app = builder.build();
 
+    // VictoriaLogs must be added before HTTP, because
+    // HTTP controllers need the LogStore from the container.
     app.addModule(new VictoriaLogsModule({
         baseURL: env.victoriaLogsURL,
         ingestorURL: env.victoriaLogsIngestorURL,
         querierURL: env.victoriaLogsQuerierURL,
     }));
 
-    app.addModule(new DatabaseModule());
+    app.addModule(new HTTPModule());
 
     return app;
 }

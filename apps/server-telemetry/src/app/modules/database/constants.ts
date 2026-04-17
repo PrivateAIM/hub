@@ -8,4 +8,6 @@
 import { TypedToken } from 'eldin';
 import type { DataSource } from 'typeorm';
 
-export const DataSourceInjectionKey = new TypedToken<DataSource>('DataSource');
+export const DatabaseInjectionKey = {
+    DataSource: new TypedToken<DataSource>('DataSource'),
+};

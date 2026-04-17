@@ -9,8 +9,9 @@ import type { IContainer } from 'eldin';
 import type { ConfigInput } from '@hapic/victorialogs';
 import { VictoriaLogsClient } from '@hapic/victorialogs';
 import type { IModule } from 'orkos';
-import { setVictoriaLogsClientFactory } from '../../../services/victoria-logs/singleton.ts';
-import { VictoriaLogsClientInjectionKey } from './constants.ts';
+import { VictoriaLogsLogStore } from '../../../adapters/telemetry/victoria-logs.ts';
+import { MemoryLogStore } from '../../../adapters/telemetry/memory.ts';
+import { LogStoreInjectionKey, VictoriaLogsClientInjectionKey } from './constants.ts';
 import type { VictoriaLogsModuleOptions } from './types.ts';
 
 export class VictoriaLogsModule implements IModule {
@@ -26,6 +27,7 @@ export class VictoriaLogsModule implements IModule {
 
     async setup(container: IContainer): Promise<void> {
         if (!this.options.baseURL && !this.options.ingestorURL && !this.options.querierURL) {
+            container.register(LogStoreInjectionKey, { useValue: new MemoryLogStore() });
             return;
         }
 
@@ -46,8 +48,6 @@ export class VictoriaLogsModule implements IModule {
 
         const client = new VictoriaLogsClient(config);
         container.register(VictoriaLogsClientInjectionKey, { useValue: client });
-
-        // Bridge: back-fill singa singleton
-        setVictoriaLogsClientFactory(() => client);
+        container.register(LogStoreInjectionKey, { useValue: new VictoriaLogsLogStore(client) });
     }
 }
