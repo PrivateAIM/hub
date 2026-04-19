@@ -8,7 +8,7 @@
 import type { IContainer } from 'eldin';
 import type { IModule, ModuleDependency } from 'orkos';
 import { APIClient } from '@privateaim/telemetry-kit';
-import { AuthupClientAuthenticationHookInjectionKey, ModuleName } from '@privateaim/server-kit';
+import { AUTHUP_HOOK_MODULE_NAME, AuthupClientAuthenticationHookInjectionKey } from '@privateaim/server-kit';
 import { TelemetryClientInjectionKey } from './constants.ts';
 import type { TelemetryClientModuleOptions } from './types.ts';
 
@@ -16,7 +16,7 @@ export class TelemetryClientModule implements IModule {
     readonly name = 'telemetryClient';
 
     readonly dependencies: (string | ModuleDependency)[] = [
-        { name: ModuleName.AUTHUP_HOOK, optional: true },
+        { name: AUTHUP_HOOK_MODULE_NAME, optional: true },
     ];
 
     private options: TelemetryClientModuleOptions;

@@ -8,7 +8,7 @@
 import type { IContainer } from 'eldin';
 import type { IModule, ModuleDependency } from 'orkos';
 import { APIClient } from '@privateaim/storage-kit';
-import { AuthupClientAuthenticationHookInjectionKey, ModuleName } from '@privateaim/server-kit';
+import { AUTHUP_HOOK_MODULE_NAME, AuthupClientAuthenticationHookInjectionKey } from '@privateaim/server-kit';
 import { StorageClientInjectionKey } from './constants.ts';
 import type { StorageClientModuleOptions } from './types.ts';
 
@@ -16,7 +16,7 @@ export class StorageClientModule implements IModule {
     readonly name = 'storageClient';
 
     readonly dependencies: (string | ModuleDependency)[] = [
-        { name: ModuleName.AUTHUP_HOOK, optional: true },
+        { name: AUTHUP_HOOK_MODULE_NAME, optional: true },
     ];
 
     private options: StorageClientModuleOptions;
