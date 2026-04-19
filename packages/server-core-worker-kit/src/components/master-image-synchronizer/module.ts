@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentMetadata } from '@privateaim/server-kit';
+import type { ComponentMetadata, QueueDispatchComponentCallerOptions } from '@privateaim/server-kit';
 import {
     QueueDispatchComponentCaller,
 } from '@privateaim/server-kit';
@@ -16,8 +16,8 @@ import {
 import type { MasterImageSynchronizerEventMap, MasterImageSynchronizerExecutePayload } from './types';
 
 export class MasterImageSynchronizerComponentCaller extends QueueDispatchComponentCaller<MasterImageSynchronizerEventMap> {
-    constructor() {
-        super({ queue: MasterImageSynchronizerTaskQueueRouterRouting });
+    constructor(options: Partial<QueueDispatchComponentCallerOptions> = {}) {
+        super({ ...options, queue: MasterImageSynchronizerTaskQueueRouterRouting });
     }
 
     async callExecute(payload: MasterImageSynchronizerExecutePayload, metadata: ComponentMetadata = {}) {

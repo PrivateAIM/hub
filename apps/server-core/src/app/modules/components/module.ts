@@ -43,18 +43,18 @@ export class ComponentsModule implements IModule {
         const registryComponent = new RegistryComponent({ authupClient: authupResult.success ? authupResult.data : undefined });
         const analysisMetadataComponent = new AnalysisMetadataComponent({ dataSource });
 
+        const logger = container.resolve(LoggerInjectionKey);
+        const queueRouterResult = container.tryResolve(QueueRouterInjectionKey);
+        const queueRouter = queueRouterResult.success ? queueRouterResult.data : undefined;
+
         // Create and register component callers
-        const registryComponentCaller = new RegistryComponentCaller(registryComponent);
-        const analysisMetadataComponentCaller = new AnalysisMetadataComponentCaller(analysisMetadataComponent);
+        const registryComponentCaller = new RegistryComponentCaller(registryComponent, { queueRouter });
+        const analysisMetadataComponentCaller = new AnalysisMetadataComponentCaller(analysisMetadataComponent, { queueRouter });
         container.register(ComponentsInjectionKey.RegistryComponentCaller, { useValue: registryComponentCaller });
         container.register(ComponentsInjectionKey.AnalysisMetadataComponentCaller, { useValue: analysisMetadataComponentCaller });
 
         // Inject metadataCaller into subscribers (created earlier by DatabaseModule)
         this.injectMetadataCaller(container, analysisMetadataComponentCaller);
-
-        const logger = container.resolve(LoggerInjectionKey);
-        const queueRouterResult = container.tryResolve(QueueRouterInjectionKey);
-        const queueRouter = queueRouterResult.success ? queueRouterResult.data : undefined;
 
         // Start task consumers
         const components = [

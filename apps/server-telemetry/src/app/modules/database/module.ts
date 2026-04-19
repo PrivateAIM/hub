@@ -6,8 +6,8 @@
  */
 
 import type { IContainer } from 'eldin';
-import type { IModule } from 'orkos';
-import { EntityEventPublisherInjectionKey } from '@privateaim/server-kit';
+import type { IModule, ModuleDependency } from 'orkos';
+import { ENTITY_EVENT_MODULE_NAME, EntityEventPublisherInjectionKey } from '@privateaim/server-kit';
 import { DataSource } from 'typeorm';
 import {
     checkDatabase,
@@ -22,7 +22,9 @@ import { DatabaseInjectionKey } from './constants.ts';
 export class DatabaseModule implements IModule {
     readonly name = 'database';
 
-    readonly dependencies: string[] = [];
+    readonly dependencies: (string | ModuleDependency)[] = [
+        { name: ENTITY_EVENT_MODULE_NAME, optional: true },
+    ];
 
     async setup(container: IContainer): Promise<void> {
         const optionsBuilder = new DataSourceOptionsBuilder();

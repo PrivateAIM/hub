@@ -9,6 +9,7 @@ import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
 import { AnalysisBuilderComponentCaller, AnalysisDistributorComponentCaller } from '@privateaim/server-core-worker-kit';
 import { BucketComponentCaller } from '@privateaim/server-storage-kit';
+import { QueueRouterInjectionKey } from '@privateaim/server-kit';
 import { AnalysisBuilder } from '../../../core/services/analysis-builder/index.ts';
 import { AnalysisConfigurator } from '../../../core/services/analysis-configurator/index.ts';
 import { AnalysisDistributor } from '../../../core/services/analysis-distributor/index.ts';
@@ -30,10 +31,13 @@ export class AnalysisModule implements IModule {
 
         const metadataCaller = container.resolve(ComponentsInjectionKey.AnalysisMetadataComponentCaller);
 
+        const queueRouterResult = container.tryResolve(QueueRouterInjectionKey);
+        const queueRouter = queueRouterResult.success ? queueRouterResult.data : undefined;
+
         container.register(AnalysisInjectionKey.Builder, {
             useValue: new AnalysisBuilder({
                 repository: analysisRepository,
-                caller: new AnalysisBuilderComponentCaller(),
+                caller: new AnalysisBuilderComponentCaller({ queueRouter }),
                 metadataCaller,
             }),
         });
@@ -51,7 +55,7 @@ export class AnalysisModule implements IModule {
                 repository: analysisRepository,
                 analysisNodeRepository,
                 registryRepository,
-                caller: new AnalysisDistributorComponentCaller(),
+                caller: new AnalysisDistributorComponentCaller({ queueRouter }),
                 metadataCaller,
             }),
         });
@@ -59,7 +63,7 @@ export class AnalysisModule implements IModule {
         const storageManager = new AnalysisStorageManager({
             repository: analysisRepository,
             bucketRepository: analysisBucketRepository,
-            caller: new BucketComponentCaller(),
+            caller: new BucketComponentCaller({ queueRouter }),
             taskManager: container.resolve(ComponentsInjectionKey.TaskManager),
         });
 

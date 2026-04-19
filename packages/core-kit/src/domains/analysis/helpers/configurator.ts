@@ -51,7 +51,7 @@ export class AnalysisConfiguratorCommandChecker {
             throw new AnalysisError('The analysis configuration is already unlocked.');
         }
 
-        if (!entity.distribution_status) {
+        if (!entity.build_status) {
             return;
         }
 

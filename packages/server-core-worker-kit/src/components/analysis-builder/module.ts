@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentMetadata } from '@privateaim/server-kit';
+import type { ComponentMetadata, QueueDispatchComponentCallerOptions } from '@privateaim/server-kit';
 import {
     QueueDispatchComponentCaller,
 } from '@privateaim/server-kit';
@@ -13,8 +13,8 @@ import { AnalysisBuilderCommand, AnalysisBuilderTaskQueueRouterRouting } from '.
 import type { AnalysisBuilderBasePayload, AnalysisBuilderEventMap, AnalysisBuilderExecutePayload } from './types';
 
 export class AnalysisBuilderComponentCaller extends QueueDispatchComponentCaller<AnalysisBuilderEventMap> {
-    constructor() {
-        super({ queue: AnalysisBuilderTaskQueueRouterRouting });
+    constructor(options: Partial<QueueDispatchComponentCallerOptions> = {}) {
+        super({ ...options, queue: AnalysisBuilderTaskQueueRouterRouting });
     }
 
     async callExecute(payload: AnalysisBuilderExecutePayload, metadata: ComponentMetadata = {}) {

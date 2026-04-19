@@ -7,11 +7,11 @@
 import { isUUID } from '@authup/kit';
 import { NotFoundError } from '@ebec/http';
 import { DirectComponentCaller } from '@privateaim/server-kit';
-import type { BucketFileCreationFinishedEventPayload } from '@privateaim/server-storage-kit';
 import {
     BucketFileCommand,
+    type BucketFileCreationFinishedEventPayload,
     BucketFileEvent,
-    BucketFileEventCaller,
+    type BucketFileEventCaller,
 } from '@privateaim/server-storage-kit';
 import Busboy from 'busboy';
 import path from 'node:path';
@@ -30,6 +30,7 @@ export async function uploadRequestFilesToBucket(
     req: Request,
     bucket: BucketEntity,
     bucketFileComponent: BucketFileComponent,
+    bucketFileEventCaller: BucketFileEventCaller,
 ) {
     const instance = Busboy({
         headers: req.headers,
@@ -39,7 +40,6 @@ export async function uploadRequestFilesToBucket(
     const actor = useRequestIdentityOrFail(req);
 
     const caller = new DirectComponentCaller(bucketFileComponent);
-    const responseCaller = new BucketFileEventCaller();
 
     const identity = useRequestIdentityOrFail(req);
 
@@ -77,7 +77,7 @@ export async function uploadRequestFilesToBucket(
                                 {},
                                 {
                                     handle: async (childValue, childContext) => {
-                                        await responseCaller.call(
+                                        await bucketFileEventCaller.call(
                                             childContext.key,
                                             childValue,
                                             childContext.metadata,
@@ -123,6 +123,7 @@ export async function executeBucketRouteUploadHandler(
     res: Response,
     dataSource: DataSource,
     bucketFileComponent: BucketFileComponent,
+    bucketFileEventCaller: BucketFileEventCaller,
 ) : Promise<any> {
     // todo: check permissions by membership
     const id = useRequestParam(req, 'id');
@@ -139,7 +140,7 @@ export async function executeBucketRouteUploadHandler(
         throw new NotFoundError();
     }
 
-    const files = await uploadRequestFilesToBucket(req, entity, bucketFileComponent);
+    const files = await uploadRequestFilesToBucket(req, entity, bucketFileComponent, bucketFileEventCaller);
 
     return sendCreated(res, {
         data: files,
