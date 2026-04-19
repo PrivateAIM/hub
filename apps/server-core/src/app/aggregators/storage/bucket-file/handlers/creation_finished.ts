@@ -4,7 +4,6 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { useLogger } from '@privateaim/server-kit';
 import type { BucketFileComponentEventMap, BucketFileEvent } from '@privateaim/server-storage-kit';
 import type { BucketFile } from '@privateaim/storage-kit';
 import {
@@ -22,7 +21,7 @@ export class StorageBucketFileCreationFinishedHandler extends BaseAggregatorHand
         const analysisBucket = await analysisBucketRepository.findOneBy({ bucket_id: data.bucket_id });
 
         if (!analysisBucket) {
-            useLogger().debug(`Can not associate ${data.path} to an analysis bucket`);
+            this.logger?.debug(`Can not associate ${data.path} to an analysis bucket`);
             return;
         }
 

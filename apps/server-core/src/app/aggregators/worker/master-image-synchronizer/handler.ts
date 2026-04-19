@@ -8,7 +8,7 @@
 import type {
     MasterImageSynchronizerExecutionFinishedPayload,
 } from '@privateaim/server-core-worker-kit';
-import { useLogger } from '@privateaim/server-kit';
+import type { Logger } from '@privateaim/server-kit';
 import type { DataSource } from 'typeorm';
 import { MasterImageSynchronizerService } from '../../../../core/services/master-image/index.ts';
 import { MasterImageEntity, MasterImageGroupEntity } from '../../../../adapters/database/index.ts';
@@ -16,6 +16,7 @@ import { MasterImageEntity, MasterImageGroupEntity } from '../../../../adapters/
 export async function handleMasterImageSynchronizerExecutionFinishedEvent(
     value: MasterImageSynchronizerExecutionFinishedPayload,
     dataSource: DataSource,
+    logger?: Logger,
 ) {
     const synchronizer = new MasterImageSynchronizerService({
         imageRepository: dataSource.getRepository(MasterImageEntity) as any,
@@ -25,7 +26,7 @@ export async function handleMasterImageSynchronizerExecutionFinishedEvent(
     const output = await synchronizer
         .sync(value);
 
-    useLogger().info(`Created ${output.images.created.length} master images.`);
-    useLogger().info(`Deleted ${output.images.deleted.length} master images.`);
-    useLogger().info(`Updated ${output.images.updated.length} master images.`);
+    logger?.info(`Created ${output.images.created.length} master images.`);
+    logger?.info(`Deleted ${output.images.deleted.length} master images.`);
+    logger?.info(`Updated ${output.images.updated.length} master images.`);
 }

@@ -12,6 +12,7 @@ import {
 import {
     BaseComponent,
 } from '@privateaim/server-kit';
+import type { Logger } from '@privateaim/server-kit';
 import type { Client as CoreClient } from '@privateaim/core-http-kit';
 import type { APIClient as StorageClient } from '@privateaim/storage-kit';
 import type { Client as DockerClient } from 'docken';
@@ -20,9 +21,10 @@ import { AnalysisBuilderCheckHandler, AnalysisBuilderExecuteHandler } from './ha
 
 export class AnalysisBuilderComponent extends BaseComponent<AnalysisBuilderEventMap> {
     constructor(ctx: {
-        coreClient: CoreClient; 
-        storageClient: StorageClient; 
-        docker: DockerClient 
+        coreClient: CoreClient;
+        storageClient: StorageClient;
+        docker: DockerClient;
+        logger?: Logger;
     }) {
         super();
 
@@ -34,6 +36,7 @@ export class AnalysisBuilderComponent extends BaseComponent<AnalysisBuilderEvent
             coreClient: ctx.coreClient,
             storageClient: ctx.storageClient,
             docker: ctx.docker,
+            logger: ctx.logger,
         }));
     }
 

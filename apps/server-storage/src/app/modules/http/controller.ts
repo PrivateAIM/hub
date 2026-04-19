@@ -6,6 +6,7 @@
  */
 
 import type { IContainer } from 'eldin';
+import { LoggerInjectionKey } from '@privateaim/server-kit';
 import { BucketController } from '../../../adapters/http/controllers/bucket/module.ts';
 import { BucketFileController } from '../../../adapters/http/controllers/bucket-file/module.ts';
 import { BucketComponent } from '../../components/bucket/module.ts';
@@ -17,8 +18,11 @@ export function createControllers(container: IContainer): Record<string, any>[] 
     const dataSource = container.resolve(DatabaseInjectionKey.DataSource);
     const minio = container.resolve(MinioClientInjectionKey);
 
-    const bucketComponent = new BucketComponent({ minio });
-    const bucketFileComponent = new BucketFileComponent({ minio });
+    const loggerResult = container.tryResolve(LoggerInjectionKey);
+    const logger = loggerResult.success ? loggerResult.data : undefined;
+
+    const bucketComponent = new BucketComponent({ minio, logger });
+    const bucketFileComponent = new BucketFileComponent({ minio, logger });
 
     return [
         new BucketController({
@@ -26,11 +30,13 @@ export function createControllers(container: IContainer): Record<string, any>[] 
             minio,
             bucketComponent,
             bucketFileComponent,
+            logger,
         }),
         new BucketFileController({
             dataSource,
             minio,
             bucketFileComponent,
+            logger,
         }),
     ];
 }

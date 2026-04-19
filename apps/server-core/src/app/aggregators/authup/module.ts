@@ -6,13 +6,9 @@
  */
 
 import { EntityType } from '@authup/core-kit';
-import {
-    type Component,
-    EnvironmentName,
-    isRedisClientUsable,
-    useLogger,
-    useRedisSubscribeClient,
-} from '@privateaim/server-kit';
+import type { Component, Logger } from '@privateaim/server-kit';
+import { EnvironmentName } from '@privateaim/server-kit';
+import type { Client as RedisClient } from 'redis-extension';
 import type { RegistryComponentCaller } from '../../components/registry/caller/module.ts';
 import { useEnv } from '../../../app/modules/config/index.ts';
 import {
@@ -23,19 +19,26 @@ import {
     handleAuthupUserEvent,
 } from './entities/index.ts';
 
-export function createAuthupAggregator(ctx?: { registryComponentCaller?: RegistryComponentCaller }) : Component {
-    if (!isRedisClientUsable() || useEnv('env') === EnvironmentName.TEST) {
+type AuthupAggregatorContext = {
+    registryComponentCaller?: RegistryComponentCaller;
+    redisSubscribeClient?: RedisClient;
+    logger?: Logger;
+};
+
+export function createAuthupAggregator(ctx: AuthupAggregatorContext = {}) : Component {
+    if (!ctx.redisSubscribeClient || useEnv('env') === EnvironmentName.TEST) {
         return {
             start() {
-                useLogger().warn('Authup aggregator has not been initialized');
+                ctx.logger?.warn('Authup aggregator has not been initialized');
             },
         };
     }
 
+    const redisSub = ctx.redisSubscribeClient;
+    const { logger } = ctx;
+
     return {
         start() {
-            const redisSub = useRedisSubscribeClient();
-
             redisSub.subscribe(
                 'permission',
                 'policy',
@@ -45,7 +48,7 @@ export function createAuthupAggregator(ctx?: { registryComponentCaller?: Registr
             );
 
             redisSub.on('message', async (channel, message) => {
-                useLogger().debug(`Received event from channel ${channel}`);
+                logger?.debug(`Received event from channel ${channel}`);
                 const event = JSON.parse(message);
 
                 switch (event.type) {

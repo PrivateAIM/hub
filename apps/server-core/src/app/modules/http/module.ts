@@ -10,13 +10,13 @@ import type { IModule } from 'orkos';
 import http from 'node:http';
 import { Router, createNodeDispatcher } from 'routup';
 import {
+    AuthupClientInjectionKey,
     EnvironmentName,
+    LoggerInjectionKey,
+    RedisClientInjectionKey,
+    RedisPublishClientInjectionKey,
+    RedisSubscribeClientInjectionKey,
     createAuthupClientTokenCreator,
-    isAuthupClientUsable,
-    isRedisClientUsable,
-    useAuthupClient,
-    useLogger,
-    useRedisClient,
 } from '@privateaim/server-kit';
 import { createAuthupTokenVerifier, mountErrorMiddleware, mountMiddlewares } from '@privateaim/server-http-kit';
 import type { MiddlewareSwaggerOptions } from '@privateaim/server-http-kit';
@@ -27,6 +27,7 @@ import {
 } from '../../../adapters/http/controllers/index.ts';
 import { createSocketServer } from '../../../adapters/socket/server.ts';
 import { ConfigInjectionKey } from '../config/constants.ts';
+import { TelemetryClientInjectionKey } from '../telemetry-client/constants.ts';
 import { createControllers } from './controller.ts';
 import { HTTPInjectionKey } from './constants.ts';
 import type { HTTPModuleOptions } from './types.ts';
@@ -44,7 +45,7 @@ export class HTTPModule implements IModule {
 
     async setup(container: IContainer): Promise<void> {
         const config = container.resolve(ConfigInjectionKey);
-        const logger = useLogger();
+        const logger = container.resolve(LoggerInjectionKey);
 
         const router = new Router();
 
@@ -60,17 +61,23 @@ export class HTTPModule implements IModule {
         // Create DI-wired controller instances from container
         const controllers = createControllers(container);
 
+        const telemetryClientResult = container.tryResolve(TelemetryClientInjectionKey);
+        const telemetryClient = telemetryClientResult.success ? telemetryClientResult.data : undefined;
+
+        const authupResult = container.tryResolve(AuthupClientInjectionKey);
+        const redisResult = container.tryResolve(RedisClientInjectionKey);
+
         mountMiddlewares(router, {
             basic: true,
             cors: true,
             prometheus: !isTestEnvironment,
             rateLimit: !isTestEnvironment,
             authorization: {
-                authupClient: isAuthupClientUsable() ?
-                    useAuthupClient() :
+                authupClient: authupResult.success ?
+                    authupResult.data :
                     undefined,
-                redisClient: isRedisClientUsable() ?
-                    useRedisClient() :
+                redisClient: redisResult.success ?
+                    redisResult.data :
                     undefined,
                 dryRun: isTestEnvironment,
                 tokenVerifier: createAuthupTokenVerifier({
@@ -81,6 +88,7 @@ export class HTTPModule implements IModule {
                         clientSecret: config.clientSecret,
                         realm: config.realm,
                     }),
+                    redisClient: redisResult.success ? redisResult.data : undefined,
                 }),
             },
             swagger,
@@ -89,9 +97,9 @@ export class HTTPModule implements IModule {
                     // DI-wired instances
                     ...controllers,
 
-                    // Telemetry-coupled (keep handler-based for now)
-                    AnalysisLogController,
-                    AnalysisNodeLogController,
+                    // Telemetry-coupled (DI-wired instances)
+                    new AnalysisLogController({ telemetryClient }),
+                    new AnalysisNodeLogController({ telemetryClient }),
 
                     // Workflows
                     RootController,
@@ -99,7 +107,7 @@ export class HTTPModule implements IModule {
             },
         });
 
-        mountErrorMiddleware(router);
+        mountErrorMiddleware(router, { logger });
 
         container.register(HTTPInjectionKey.Router, { useValue: router });
 
@@ -127,7 +135,13 @@ export class HTTPModule implements IModule {
             container.register(HTTPInjectionKey.Server, { useValue: server });
 
             if (this.options.socket) {
-                createSocketServer(server);
+                const redisPubResult = container.tryResolve(RedisPublishClientInjectionKey);
+                const redisSubResult2 = container.tryResolve(RedisSubscribeClientInjectionKey);
+                createSocketServer(server, {
+                    logger,
+                    redisPublishClient: redisPubResult.success ? redisPubResult.data : undefined,
+                    redisSubscribeClient: redisSubResult2.success ? redisSubResult2.data : undefined,
+                });
             }
         }
     }

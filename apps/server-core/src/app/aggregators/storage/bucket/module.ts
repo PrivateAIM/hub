@@ -11,16 +11,14 @@ import {
 } from '@privateaim/server-storage-kit';
 import {
     BaseComponent,
-    type TaskManager,
 } from '@privateaim/server-kit';
-import type { DataSource } from 'typeorm';
-import type { TaskMap } from '../../../../core/domains/index.ts';
+import type { BaseAggregatorHandlerContext } from '../../base.ts';
 import { StorageBucketCreationFinishedHandler, StorageBucketDeletionFinishedHandler } from './handlers/index.ts';
 
 export class StorageBucketAggregator extends BaseComponent<
     BucketComponentEventMap
 > {
-    constructor(ctx: { dataSource: DataSource; taskManager: TaskManager<TaskMap> }) {
+    constructor(ctx: BaseAggregatorHandlerContext) {
         super();
 
         this.mount(BucketEvent.CREATION_FINISHED, new StorageBucketCreationFinishedHandler(ctx));

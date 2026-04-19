@@ -6,10 +6,10 @@
  */
 
 import {
-    Cache,
+    CacheInjectionKey,
+    CacheModule,
     LoggerModule,
     TaskManager,
-    createCacheAdapter,
 } from '@privateaim/server-kit';
 import type { IModule } from 'orkos';
 import type { TaskMap } from '../../src/core/domains/index.ts';
@@ -33,8 +33,7 @@ function createTestComponentsModule(): IModule {
         async setup(container): Promise<void> {
             const dataSource = container.resolve(DatabaseInjectionKey.DataSource);
 
-            const cacheAdapter = createCacheAdapter();
-            const cache = new Cache(cacheAdapter);
+            const cache = container.resolve(CacheInjectionKey);
             const taskManager = new TaskManager<TaskMap>(cache);
             container.register(ComponentsInjectionKey.TaskManager, { useValue: taskManager });
 
@@ -61,6 +60,7 @@ export function createTestApplication(): TestHTTPApplication {
     const modules: IModule[] = [
         new ConfigModule(),
         new LoggerModule(),
+        new CacheModule(),
         createTestDatabaseModule(),
         createTestComponentsModule(),
         new AnalysisModule(),
@@ -74,6 +74,7 @@ export function createTestDatabaseApplication(): TestApplication {
     const modules: IModule[] = [
         new ConfigModule(),
         new LoggerModule(),
+        new CacheModule(),
         createTestDatabaseModule(),
         createTestComponentsModule(),
         new AnalysisModule(),

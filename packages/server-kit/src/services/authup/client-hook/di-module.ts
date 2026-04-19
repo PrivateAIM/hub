@@ -11,7 +11,6 @@ import type { IModule } from 'orkos';
 import { ModuleName } from '../../module-names';
 import { AuthupClientAuthenticationHookInjectionKey } from './constants';
 import { createAuthupClientAuthenticationHook } from './setup';
-import { setAuthupClientAuthenticationHookFactory } from './singleton';
 
 export type AuthupHookModuleOptions = ClientAuthenticationHookOptions;
 
@@ -29,8 +28,5 @@ export class AuthupHookModule implements IModule {
     async setup(container: IContainer): Promise<void> {
         const hook = createAuthupClientAuthenticationHook(this.options);
         container.register(AuthupClientAuthenticationHookInjectionKey, { useValue: hook });
-
-        // Bridge: back-fill singa singleton
-        setAuthupClientAuthenticationHookFactory(() => hook);
     }
 }

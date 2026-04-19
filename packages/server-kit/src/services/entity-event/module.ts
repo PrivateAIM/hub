@@ -7,7 +7,7 @@
 
 import type { ObjectLiteral } from '@privateaim/kit';
 import { buildDomainEventFullName } from '@privateaim/kit';
-import { isLoggerUsable, useLogger } from '../logger';
+import type { Logger } from '../logger';
 import type {
     EntityEventDestination,
     EntityEventHandleOptions,
@@ -16,11 +16,18 @@ import type {
     IEntityEventPublisher,
 } from './types';
 
+export type EntityEventPublisherContext = {
+    logger?: Logger;
+};
+
 export class EntityEventPublisher implements IEntityEventPublisher {
     protected handlers : Set<IEntityEventHandler>;
 
-    constructor() {
+    protected logger?: Logger;
+
+    constructor(ctx: EntityEventPublisherContext = {}) {
         this.handlers = new Set<IEntityEventHandler>();
+        this.logger = ctx.logger;
     }
 
     register(consumer: IEntityEventHandler) {
@@ -33,9 +40,9 @@ export class EntityEventPublisher implements IEntityEventPublisher {
         try {
             await this.publish(ctx);
         } catch (e) {
-            if (isLoggerUsable()) {
-                useLogger().error(`Publishing event ${buildDomainEventFullName(ctx.metadata.ref_type, ctx.metadata.event)} failed`);
-                useLogger().error(e);
+            if (this.logger) {
+                this.logger.error(`Publishing event ${buildDomainEventFullName(ctx.metadata.ref_type, ctx.metadata.event)} failed`);
+                this.logger.error(e);
             }
         }
     }
@@ -43,8 +50,8 @@ export class EntityEventPublisher implements IEntityEventPublisher {
     async publish<T extends ObjectLiteral = ObjectLiteral>(
         ctx: EntityEventPublishOptions<T>,
     ) : Promise<void> {
-        if (isLoggerUsable()) {
-            useLogger()
+        if (this.logger) {
+            this.logger
                 .debug(
                     `Publishing event ${buildDomainEventFullName(ctx.metadata.ref_type, ctx.metadata.event)}`,
                 );

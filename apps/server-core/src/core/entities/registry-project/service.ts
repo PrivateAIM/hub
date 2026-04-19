@@ -8,6 +8,7 @@
 import type { RegistryProject } from '@privateaim/core-kit';
 import {
     PermissionName,
+    isObject,
     isRealmResourceWritable,
 } from '@privateaim/kit';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
@@ -38,11 +39,17 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
         this.validator = new RegistryProjectValidator();
     }
 
-    async getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<RegistryProject>> {
+    async getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<RegistryProject>> {
+        await this.checkSecretFieldAccess(query, actor);
+
         return this.repository.findMany(query);
     }
 
-    async getOne(id: string, query?: Record<string, any>): Promise<RegistryProject> {
+    async getOne(id: string, actor: ActorContext, query?: Record<string, any>): Promise<RegistryProject> {
+        if (query) {
+            await this.checkSecretFieldAccess(query, actor);
+        }
+
         const entity = query ?
             await this.repository.findMany({ ...query, filter: { id } }).then((r) => r.data[0]) :
             await this.repository.findOneById(id);
@@ -52,6 +59,33 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
         }
 
         return entity;
+    }
+
+    private async checkSecretFieldAccess(query: Record<string, any>, actor: ActorContext): Promise<void> {
+        const { fields } = query;
+        if (!fields) {
+            return;
+        }
+
+        const tokens: string[] = [];
+        const collect = (v: unknown) => {
+            if (typeof v === 'string') {
+                tokens.push(...v.split(','));
+            } else if (Array.isArray(v)) {
+                v.forEach(collect);
+            } else if (isObject(v)) {
+                Object.values(v).forEach(collect);
+            }
+        };
+        collect(fields);
+
+        const requestsSecret = tokens
+            .map((t) => t.trim().replace(/^[+-]/, ''))
+            .includes('account_secret');
+
+        if (requestsSecret) {
+            await actor.permissionChecker.preCheck({ name: PermissionName.REGISTRY_MANAGE });
+        }
     }
 
     async create(data: Partial<RegistryProject>, actor: ActorContext): Promise<RegistryProject> {

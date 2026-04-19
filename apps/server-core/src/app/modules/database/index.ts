@@ -10,4 +10,3 @@ export * from './constants.ts';
 export * from './module.ts';
 export * from './options.ts';
 export * from './register.ts';
-export * from './singleton.ts';

@@ -12,17 +12,18 @@ import {
     RedisTokenVerifierCache,
     TokenVerifier,
 } from '@authup/server-adapter-kit';
-import { isRedisClientUsable, useRedisClient } from '@privateaim/server-kit';
+import type { Client as RedisClient } from 'redis-extension';
 
 type AuthTokenVerifierCreateContext = {
     baseURL?: string,
-    creator: TokenCreator
+    creator: TokenCreator,
+    redisClient?: RedisClient,
 };
 
 export function createAuthupTokenVerifier(ctx: AuthTokenVerifierCreateContext) {
     let cache : ITokenVerifierCache;
-    if (isRedisClientUsable()) {
-        cache = new RedisTokenVerifierCache(useRedisClient());
+    if (ctx.redisClient) {
+        cache = new RedisTokenVerifierCache(ctx.redisClient);
     } else {
         cache = new MemoryTokenVerifierCache();
     }

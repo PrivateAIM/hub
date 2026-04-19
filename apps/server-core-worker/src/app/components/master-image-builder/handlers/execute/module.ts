@@ -18,13 +18,12 @@ import {
     MasterImageBuilderCommand,
     MasterImageBuilderEvent,
 } from '@privateaim/server-core-worker-kit';
-import type { ComponentHandler, ComponentHandlerContext } from '@privateaim/server-kit';
+import type { ComponentHandler, ComponentHandlerContext, Logger } from '@privateaim/server-kit';
 import type { Client as CoreClient } from '@privateaim/core-http-kit';
 import path from 'node:path';
 import tar from 'tar-fs';
 import { MASTER_IMAGES_DIRECTORY_PATH } from '../../../../../constants';
 import { buildDockerImageURL } from '../../../../../adapters/docker/index.ts';
-import { useMasterImageBuilderLogger } from '../../utils';
 
 export class MasterImageBuilderExecuteHandler implements ComponentHandler<
     MasterImageBuilderEventMap,
@@ -34,9 +33,16 @@ export class MasterImageBuilderExecuteHandler implements ComponentHandler<
 
     protected docker: DockerClient;
 
-    constructor(ctx: { coreClient: CoreClient; docker: DockerClient }) {
+    protected logger: Logger | undefined;
+
+    constructor(ctx: {
+        coreClient: CoreClient; 
+        docker: DockerClient; 
+        logger?: Logger 
+    }) {
         this.coreClient = ctx.coreClient;
         this.docker = ctx.docker;
+        this.logger = ctx.logger;
     }
 
     async handle(
@@ -47,7 +53,7 @@ export class MasterImageBuilderExecuteHandler implements ComponentHandler<
             // todo: check if image exists, otherwise local queue task
             await this.handleInternal(payload, context);
         } catch (e) {
-            useMasterImageBuilderLogger().error({
+            this.logger?.error({
                 message: e,
                 command: MasterImageBuilderCommand.EXECUTE,
                 event: MasterImageBuilderEvent.EXECUTION_FAILED,
@@ -87,7 +93,7 @@ export class MasterImageBuilderExecuteHandler implements ComponentHandler<
                 },
             });
         } catch {
-            useMasterImageBuilderLogger().info({
+            this.logger?.info({
                 message: 'Building image failed',
                 command: MasterImageBuilderCommand.EXECUTE,
                 master_image_id: masterImage.id,
@@ -105,7 +111,7 @@ export class MasterImageBuilderExecuteHandler implements ComponentHandler<
         masterImage: MasterImage,
         options: ModemStreamWaitOptions = {},
     ) {
-        useMasterImageBuilderLogger().info({
+        this.logger?.info({
             message: 'Building image',
             command: MasterImageBuilderCommand.EXECUTE,
             master_image_id: masterImage.id,
@@ -129,7 +135,7 @@ export class MasterImageBuilderExecuteHandler implements ComponentHandler<
 
         await waitForStream(this.docker, stream, {
             onFinished: () => {
-                useMasterImageBuilderLogger().info({
+                this.logger?.info({
                     message: 'Built image',
                     command: MasterImageBuilderCommand.EXECUTE,
                     master_image_id: masterImage.id,

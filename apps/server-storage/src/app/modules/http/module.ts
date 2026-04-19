@@ -10,13 +10,11 @@ import type { IModule } from 'orkos';
 import http from 'node:http';
 import { Router, createNodeDispatcher } from 'routup';
 import {
+    AuthupClientInjectionKey,
     EnvironmentName,
+    LoggerInjectionKey,
+    RedisClientInjectionKey,
     createAuthupClientTokenCreator,
-    isAuthupClientUsable,
-    isRedisClientUsable,
-    useAuthupClient,
-    useLogger,
-    useRedisClient,
 } from '@privateaim/server-kit';
 import {
     createAuthupTokenVerifier,
@@ -35,7 +33,7 @@ export class HTTPModule implements IModule {
 
     async setup(container: IContainer): Promise<void> {
         const config = container.resolve(ConfigInjectionKey);
-        const logger = useLogger();
+        const logger = container.resolve(LoggerInjectionKey);
 
         const router = new Router();
 
@@ -50,17 +48,20 @@ export class HTTPModule implements IModule {
 
         const controllers = createControllers(container);
 
+        const authupResult = container.tryResolve(AuthupClientInjectionKey);
+        const redisResult = container.tryResolve(RedisClientInjectionKey);
+
         mountMiddlewares(router, {
             basic: true,
             cors: true,
             prometheus: !isTestEnvironment,
             rateLimit: !isTestEnvironment,
             authorization: {
-                authupClient: isAuthupClientUsable() ?
-                    useAuthupClient() :
+                authupClient: authupResult.success ?
+                    authupResult.data :
                     undefined,
-                redisClient: isRedisClientUsable() ?
-                    useRedisClient() :
+                redisClient: redisResult.success ?
+                    redisResult.data :
                     undefined,
                 dryRun: isTestEnvironment,
                 tokenVerifier: createAuthupTokenVerifier({
@@ -71,13 +72,14 @@ export class HTTPModule implements IModule {
                         clientSecret: config.clientSecret,
                         realm: config.realm,
                     }),
+                    redisClient: redisResult.success ? redisResult.data : undefined,
                 }),
             },
             swagger,
             decorators: { controllers },
         });
 
-        mountErrorMiddleware(router);
+        mountErrorMiddleware(router, { logger });
 
         container.register(HTTPInjectionKey.Router, { useValue: router });
 

@@ -6,16 +6,16 @@
  */
 
 import {
-    afterAll, 
-    beforeAll, 
-    describe, 
-    expect, 
+    afterAll,
+    beforeAll,
+    describe,
+    expect,
     it,
 } from 'vitest';
 import { createTestApplication } from '../../app';
 import { extendObject } from '@authup/kit';
 import type { AnalysisPermission } from '@privateaim/core-kit';
-import { isAuthupClientUsable, useAuthupClient } from '@privateaim/server-kit';
+import { AuthupClientInjectionKey } from '@privateaim/server-kit';
 import {
     
     expectProperties,
@@ -51,10 +51,9 @@ describe('src/controllers/core/analysis-permission', () => {
         attributes.analysis_id = analysis.id;
 
         // todo: maybe create authup policy
-        if (isAuthupClientUsable()) {
-            const authup = useAuthupClient();
-
-            const permission = await authup.permission.create({ name: 'analysis_permission' });
+        const authupResult = suite.container.tryResolve(AuthupClientInjectionKey);
+        if (authupResult.success) {
+            const permission = await authupResult.data.permission.create({ name: 'analysis_permission' });
             attributes.permission_id = permission.id;
         }
 

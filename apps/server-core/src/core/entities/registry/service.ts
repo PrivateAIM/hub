@@ -7,7 +7,7 @@
 
 import type { Registry, RegistryProject } from '@privateaim/core-kit';
 import { RegistryAPICommand } from '@privateaim/core-kit';
-import { PermissionName, getHostNameFromString } from '@privateaim/kit';
+import { PermissionName, getHostNameFromString, isObject } from '@privateaim/kit';
 import { BadRequestError, NotFoundError } from '@ebec/http';
 import type { ActorContext } from '../actor/types.ts';
 import type { EntityRepositoryFindManyResult, IEntityRepository } from '../types.ts';
@@ -40,11 +40,17 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
         this.validator = new RegistryValidator();
     }
 
-    async getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<Registry>> {
+    async getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<Registry>> {
+        await this.checkSecretFieldAccess(query, actor);
+
         return this.repository.findMany(query);
     }
 
-    async getOne(id: string, query?: Record<string, any>): Promise<Registry> {
+    async getOne(id: string, actor: ActorContext, query?: Record<string, any>): Promise<Registry> {
+        if (query) {
+            await this.checkSecretFieldAccess(query, actor);
+        }
+
         const entity = query ?
             await this.repository.findMany({ ...query, filter: { id } }).then((r) => r.data[0]) :
             await this.repository.findOneById(id);
@@ -54,6 +60,33 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
         }
 
         return entity;
+    }
+
+    private async checkSecretFieldAccess(query: Record<string, any>, actor: ActorContext): Promise<void> {
+        const { fields } = query;
+        if (!fields) {
+            return;
+        }
+
+        const tokens: string[] = [];
+        const collect = (v: unknown) => {
+            if (typeof v === 'string') {
+                tokens.push(...v.split(','));
+            } else if (Array.isArray(v)) {
+                v.forEach(collect);
+            } else if (isObject(v)) {
+                Object.values(v).forEach(collect);
+            }
+        };
+        collect(fields);
+
+        const requestsSecret = tokens
+            .map((t) => t.trim().replace(/^[+-]/, ''))
+            .includes('account_secret');
+
+        if (requestsSecret) {
+            await actor.permissionChecker.preCheck({ name: PermissionName.REGISTRY_MANAGE });
+        }
     }
 
     async create(data: Partial<Registry>, actor: ActorContext): Promise<Registry> {

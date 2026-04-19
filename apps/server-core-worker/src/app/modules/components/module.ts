@@ -8,17 +8,26 @@
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
 import type { Component } from '@privateaim/server-kit';
-import { QueueWorkerComponentCaller } from '@privateaim/server-kit';
+import { 
+    LoggerConsoleTransport, 
+    QueueRouterInjectionKey, 
+    QueueWorkerComponentCaller, 
+    createLogger, 
+} from '@privateaim/server-kit';
 import {
     AnalysisBuilderEventQueueRouterRouting,
     AnalysisBuilderTaskQueueRouterRouting,
     AnalysisDistributorEventQueueRouterRouting,
     AnalysisDistributorTaskQueueRouterRouting,
+    ComponentName,
     MasterImageBuilderEventQueueRouterRouting,
     MasterImageBuilderTaskQueueRouterRouting,
-    MasterImageSynchronizerEventQueueRouterRouting,
-    MasterImageSynchronizerTaskQueueRouterRouting,
+    MasterImageSynchronizerEventQueueRouterRouting, 
+    MasterImageSynchronizerTaskQueueRouterRouting, 
 } from '@privateaim/server-core-worker-kit';
+import { DomainType } from '@privateaim/core-kit';
+import { LogComponentCaller, LoggerTransport } from '@privateaim/server-telemetry-kit';
+import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import { CoreClientInjectionKey } from '../core-client/constants.ts';
 import { StorageClientInjectionKey } from '../storage-client/constants.ts';
 import { DockerInjectionKey } from '../docker/constants.ts';
@@ -39,37 +48,119 @@ export class ComponentsModule implements IModule {
         const storageClient = container.resolve(StorageClientInjectionKey);
         const docker = container.resolve(DockerInjectionKey);
 
+        // Resolve queueRouter (if available) for log transport
+        const queueRouterResult = container.tryResolve(QueueRouterInjectionKey);
+        const queueRouter = queueRouterResult.success ? queueRouterResult.data : undefined;
+        const logCaller = queueRouter ? new LogComponentCaller({ queueRouter }) : undefined;
+
+        const analysisBuilderLogger = createLogger({
+            options: { defaultMeta: { component: ComponentName.ANALYSIS_BUILDER } },
+            transports: [
+                new LoggerConsoleTransport(),
+                new LoggerTransport({
+                    labels: {
+                        [LogFlag.SERVICE]: 'hub-server-worker',
+                        [LogFlag.CHANNEL]: LogChannel.SYSTEM,
+                        [LogFlag.COMPONENT]: ComponentName.ANALYSIS_BUILDER,
+                        [LogFlag.REF_TYPE]: DomainType.ANALYSIS,
+                    },
+                    save: async (data) => {
+                        if (logCaller) {
+                            await logCaller.callWrite(data);
+                        }
+                    },
+                }),
+            ],
+        });
+
+        const analysisDistributorLogger = createLogger({
+            options: { defaultMeta: { component: ComponentName.ANALYSIS_DISTRIBUTOR } },
+            transports: [
+                new LoggerConsoleTransport(),
+                new LoggerTransport({
+                    labels: {
+                        [LogFlag.SERVICE]: 'hub-server-worker',
+                        [LogFlag.CHANNEL]: LogChannel.SYSTEM,
+                        [LogFlag.COMPONENT]: ComponentName.ANALYSIS_DISTRIBUTOR,
+                        [LogFlag.REF_TYPE]: DomainType.ANALYSIS,
+                    },
+                    save: async (data) => {
+                        if (logCaller) {
+                            await logCaller.callWrite(data);
+                        }
+                    },
+                }),
+            ],
+        });
+
+        const masterImageBuilderLogger = createLogger({
+            options: { defaultMeta: { component: ComponentName.MASTER_IMAGE_BUILDER } },
+            transports: [
+                new LoggerConsoleTransport(),
+                new LoggerTransport({
+                    labels: {
+                        [LogFlag.SERVICE]: 'hub-server-worker',
+                        [LogFlag.CHANNEL]: LogChannel.SYSTEM,
+                        [LogFlag.COMPONENT]: ComponentName.MASTER_IMAGE_BUILDER,
+                        [LogFlag.REF_TYPE]: DomainType.MASTER_IMAGE,
+                    },
+                    save: async (data) => {
+                        if (logCaller) {
+                            await logCaller.callWrite(data);
+                        }
+                    },
+                }),
+            ],
+        });
+
         const components: Component<any>[] = [
             new QueueWorkerComponentCaller(
                 new AnalysisBuilderComponent({
-                    coreClient, 
-                    storageClient, 
-                    docker, 
+                    coreClient,
+                    storageClient,
+                    docker,
+                    logger: analysisBuilderLogger,
                 }),
                 {
                     publishQueue: AnalysisBuilderEventQueueRouterRouting,
                     consumeQueue: AnalysisBuilderTaskQueueRouterRouting,
+                    queueRouter,
+                    logger: analysisBuilderLogger,
                 },
             ),
             new QueueWorkerComponentCaller(
-                new AnalysisDistributorComponent({ coreClient, docker }),
+                new AnalysisDistributorComponent({
+                    coreClient,
+                    docker,
+                    logger: analysisDistributorLogger,
+                }),
                 {
                     publishQueue: AnalysisDistributorEventQueueRouterRouting,
                     consumeQueue: AnalysisDistributorTaskQueueRouterRouting,
+                    queueRouter,
+                    logger: analysisDistributorLogger,
                 },
             ),
             new QueueWorkerComponentCaller(
-                new MasterImageBuilderComponent({ coreClient, docker }),
+                new MasterImageBuilderComponent({
+                    coreClient,
+                    docker,
+                    logger: masterImageBuilderLogger,
+                }),
                 {
                     publishQueue: MasterImageBuilderEventQueueRouterRouting,
                     consumeQueue: MasterImageBuilderTaskQueueRouterRouting,
+                    queueRouter,
+                    logger: masterImageBuilderLogger,
                 },
             ),
             new QueueWorkerComponentCaller(
-                new MasterImageSynchronizerComponent(),
+                new MasterImageSynchronizerComponent({ logger: masterImageBuilderLogger }),
                 {
                     publishQueue: MasterImageSynchronizerEventQueueRouterRouting,
                     consumeQueue: MasterImageSynchronizerTaskQueueRouterRouting,
+                    queueRouter,
+                    logger: masterImageBuilderLogger,
                 },
             ),
         ];

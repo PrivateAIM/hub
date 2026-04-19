@@ -9,7 +9,7 @@ import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
 import {
     AuthupClientInjectionKey,
-    isAuthupClientUsable,
+    EntityEventPublisherInjectionKey,
 } from '@privateaim/server-kit';
 import {
     checkDatabase,
@@ -34,7 +34,6 @@ import {
 } from '../../../adapters/database/subscribers/index.ts';
 import { NodeClientService } from './node-client.ts';
 import { DataSourceOptionsBuilder } from './options.ts';
-import { setDataSourceSync } from './singleton.ts';
 import { DatabaseInjectionKey } from './constants.ts';
 import { registerRepositories } from './register.ts';
 import { DataSource } from 'typeorm';
@@ -71,7 +70,6 @@ export class DatabaseModule implements IModule {
 
         try {
             setDataSource(dataSource);
-            setDataSourceSync(dataSource);
 
             if (!check.schema) {
                 await synchronizeDatabaseSchema(dataSource);
@@ -95,11 +93,9 @@ export class DatabaseModule implements IModule {
 
     private registerSubscribers(dataSource: DataSource, container: IContainer): void {
         let nodeClientService: NodeClientService | undefined;
-        if (isAuthupClientUsable()) {
-            const authupResult = container.tryResolve(AuthupClientInjectionKey);
-            if (authupResult.success) {
-                nodeClientService = new NodeClientService(authupResult.data);
-            }
+        const authupResult = container.tryResolve(AuthupClientInjectionKey);
+        if (authupResult.success) {
+            nodeClientService = new NodeClientService(authupResult.data);
         }
 
         const analysisSubscriber = new AnalysisSubscriber();
@@ -110,7 +106,7 @@ export class DatabaseModule implements IModule {
         container.register(DatabaseInjectionKey.AnalysisBucketFileSubscriber, { useValue: analysisBucketFileSubscriber });
         container.register(DatabaseInjectionKey.AnalysisNodeSubscriber, { useValue: analysisNodeSubscriber });
 
-        dataSource.subscribers.push(
+        const subscribers = [
             new NodeSubscriber({ nodeClientService }),
             analysisSubscriber,
             analysisBucketFileSubscriber,
@@ -125,6 +121,15 @@ export class DatabaseModule implements IModule {
             new ProjectNodeSubscriber(),
             new RegistrySubscriber(),
             new RegistryProjectSubscriber(),
-        );
+        ];
+
+        const publisherResult = container.tryResolve(EntityEventPublisherInjectionKey);
+        if (publisherResult.success) {
+            for (const subscriber of subscribers) {
+                subscriber.setPublisher(publisherResult.data);
+            }
+        }
+
+        dataSource.subscribers.push(...subscribers);
     }
 }

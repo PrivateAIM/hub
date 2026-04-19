@@ -5,16 +5,22 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { 
-    ComponentEventMap, 
-    ComponentHandler, 
-    ComponentHandlerContext, 
-    TaskEntryResolved, 
-    TaskManager, 
+import type {
+    ComponentEventMap,
+    ComponentHandler,
+    ComponentHandlerContext,
+    Logger,
+    TaskEntryResolved,
+    TaskManager,
 } from '@privateaim/server-kit';
-import { useLogger } from '@privateaim/server-kit';
 import type { DataSource } from 'typeorm';
 import type { TaskMap } from '../../core/domains/index.ts';
+
+export type BaseAggregatorHandlerContext = {
+    dataSource: DataSource;
+    taskManager: TaskManager<TaskMap>;
+    logger?: Logger;
+};
 
 export abstract class BaseAggregatorHandler<
     EventMap extends ComponentEventMap = ComponentEventMap,
@@ -24,21 +30,24 @@ export abstract class BaseAggregatorHandler<
 
     protected taskManager: TaskManager<TaskMap>;
 
-    constructor(ctx: { dataSource: DataSource; taskManager: TaskManager<TaskMap> }) {
+    protected logger?: Logger;
+
+    constructor(ctx: BaseAggregatorHandlerContext) {
         this.dataSource = ctx.dataSource;
         this.taskManager = ctx.taskManager;
+        this.logger = ctx.logger;
     }
 
     protected async resolveTask(context: ComponentHandlerContext<EventMap, Key>) : Promise<TaskEntryResolved<TaskMap>> {
         const { correlationId } = context.metadata;
         if (!correlationId) {
-            useLogger().info(`${context.key} metadata does not contain a correlationId.`);
+            this.logger?.info(`${context.key} metadata does not contain a correlationId.`);
             return null;
         }
 
         const task = await this.taskManager.resolve(correlationId);
         if (!task) {
-            useLogger().info(`${context.key} could not be associated to a triggered task.`);
+            this.logger?.info(`${context.key} could not be associated to a triggered task.`);
             return null;
         }
 

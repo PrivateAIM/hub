@@ -9,7 +9,7 @@ import { pickRecord } from '@authup/kit';
 import { DomainType } from '@privateaim/core-kit';
 import { isRealmResourceWritable } from '@privateaim/kit';
 import { ForbiddenError } from '@ebec/http';
-import type { Log, LogLevel } from '@privateaim/telemetry-kit';
+import type { Log, LogLevel, APIClient as TelemetryClient } from '@privateaim/telemetry-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted } from 'routup';
@@ -21,10 +21,9 @@ import {
     AnalysisEntity,
     NodeEntity,
 } from '../../../../../database/index.ts';
-import { isTelemetryClientUsable, useTelemetryClient } from '../../../../../../app/services/telemetry/index.ts';
 import { AnalysisNodeLogValidator } from '../utils/index.ts';
 
-export async function createAnalysisNodeLogRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function createAnalysisNodeLogRouteHandler(req: Request, res: Response, telemetryClient?: TelemetryClient) : Promise<any> {
     const validator = new AnalysisNodeLogValidator();
     const validatorAdapter = new RoutupContainerAdapter(validator);
     const data = await validatorAdapter.run(req, { group: HTTPHandlerOperation.CREATE });
@@ -89,9 +88,8 @@ export async function createAnalysisNodeLogRouteHandler(req: Request, res: Respo
         labels,
     };
 
-    if (isTelemetryClientUsable()) {
-        const telemetry = useTelemetryClient();
-        await telemetry.log.create(entity);
+    if (telemetryClient) {
+        await telemetryClient.log.create(entity);
     }
 
     return sendAccepted(res, entity);

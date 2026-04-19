@@ -44,7 +44,8 @@ export type EntityEventPublishOptions<
 };
 
 export interface IEntityEventPublisher {
-    publish(ctx: EntityEventPublishOptions) : Promise<void>;
+    publish<T extends ObjectLiteral = ObjectLiteral>(ctx: EntityEventPublishOptions<T>) : Promise<void>;
+    safePublish<T extends ObjectLiteral = ObjectLiteral>(ctx: EntityEventPublishOptions<T>) : Promise<void>;
 }
 
 export type EntityEventHandleOptions<

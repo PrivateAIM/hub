@@ -136,6 +136,41 @@ async add(@DBody() data: any, @DRequest() req: any, @DResponse() res: any) {
 }
 ```
 
+### Repository Field Selection Conventions
+
+Repository adapters define `DEFAULT_FIELDS` (returned by default) and optionally `ALLOWED_FIELDS` (requestable via `?fields=+field_name`). Sensitive columns with `select: false` on the TypeORM entity must be in `ALLOWED_FIELDS` but NOT in `DEFAULT_FIELDS`.
+
+```typescript
+// app/modules/database/repositories/registry/repository.ts
+const DEFAULT_FIELDS: ParseAllowedOption<RegistryEntity> = [
+    'id', 'name', 'host', 'account_name', 'created_at', 'updated_at',
+];
+
+const ALLOWED_FIELDS: ParseAllowedOption<RegistryEntity> = [
+    ...DEFAULT_FIELDS,
+    'account_secret',  // select: false on entity — only returned when explicitly requested
+];
+
+// In findMany():
+const fieldsParsed = parseQueryFields<RegistryEntity>(fields, {
+    default: DEFAULT_FIELDS,
+    allowed: ALLOWED_FIELDS,  // NOT DEFAULT_FIELDS — allows opt-in field selection
+    defaultPath: 'registry',
+});
+```
+
+When an entity has permission-gated fields, the service's `getMany`/`getOne` methods accept `ActorContext` and check permissions before allowing access:
+
+```typescript
+// core/entities/registry/service.ts
+async getMany(query: Record<string, any>, actor: ActorContext) {
+    await this.checkSecretFieldAccess(query, actor);
+    return this.repository.findMany(query);
+}
+```
+
+The controller passes `buildActorContext(req)` for GET endpoints on these entities.
+
 ### Subscriber Conventions
 
 Subscribers are **pre-instantiated** with dependencies in `DatabaseModule.setup()` and pushed onto `dataSource.subscribers`. No `@EventSubscriber()` decorators — no auto-discovery.

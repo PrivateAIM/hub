@@ -10,8 +10,10 @@ import type { IModule } from 'orkos';
 import http from 'node:http';
 import { Router, coreHandler, createNodeDispatcher } from 'routup';
 import {
+    LoggerInjectionKey,
+    RedisPublishClientInjectionKey,
+    RedisSubscribeClientInjectionKey,
     createAuthupClientTokenCreator,
-    useLogger,
 } from '@privateaim/server-kit';
 import { createAuthupTokenVerifier, mountMiddlewares } from '@privateaim/server-http-kit';
 import {
@@ -30,7 +32,7 @@ export class HTTPModule implements IModule {
 
     async setup(container: IContainer): Promise<void> {
         const config = container.resolve(ConfigInjectionKey);
-        const logger = useLogger();
+        const logger = container.resolve(LoggerInjectionKey);
 
         const router = new Router();
 
@@ -66,9 +68,16 @@ export class HTTPModule implements IModule {
         container.register(HTTPInjectionKey.Server, { useValue: server });
 
         // Socket.io server
-        const socketServer = createSocketServer(server);
+        const redisPublishResult = container.tryResolve(RedisPublishClientInjectionKey);
+        const redisSubscribeResult = container.tryResolve(RedisSubscribeClientInjectionKey);
 
-        mountLoggingMiddleware(socketServer);
+        const socketServer = createSocketServer(server, {
+            redisPublishClient: redisPublishResult.success ? redisPublishResult.data : undefined,
+            redisSubscribeClient: redisSubscribeResult.success ? redisSubscribeResult.data : undefined,
+            logger,
+        });
+
+        mountLoggingMiddleware(socketServer, { logger });
 
         mountAuthorizationMiddleware(socketServer, {
             baseURL: config.authupURL,
@@ -80,10 +89,12 @@ export class HTTPModule implements IModule {
                     clientSecret: config.clientSecret,
                     realm: config.realm,
                 }),
+                redisClient: redisPublishResult.success ? redisPublishResult.data : undefined,
             }),
+            logger,
         });
 
-        registerControllers(socketServer);
+        registerControllers(socketServer, { logger });
 
         logger.debug(`Socket.io server mounted on path: ${socketServer.path()}`);
 

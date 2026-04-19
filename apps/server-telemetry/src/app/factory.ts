@@ -9,10 +9,12 @@ import {
     EntityEventRedisHandler,
     EntityEventSocketHandler,
     LoggerConsoleTransport,
+    LoggerInjectionKey,
+    QueueRouterInjectionKey,
     RedisClientInjectionKey,
     createAuthupClientTokenCreator,
 } from '@privateaim/server-kit';
-import { EntityEventHandler, LoggerTransport } from '@privateaim/server-telemetry-kit';
+import { EntityEventHandler, EventComponentCaller, LoggerTransport } from '@privateaim/server-telemetry-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import { LogComponentWriteHandler } from './components/log/handlers/index.ts';
 import { useEnv } from './modules/config/index.ts';
@@ -53,7 +55,15 @@ export function createApplication() {
                 handlers.push(new EntityEventSocketHandler(redisResult.data));
             }
 
-            handlers.push(new EntityEventHandler());
+            const qrResult = container.tryResolve(QueueRouterInjectionKey);
+            const queueRouter = qrResult.success ? qrResult.data : undefined;
+            const eventCaller = queueRouter ? new EventComponentCaller({ queueRouter }) : undefined;
+
+            const loggerResult = container.tryResolve(LoggerInjectionKey);
+            handlers.push(new EntityEventHandler({
+                eventComponentCaller: eventCaller,
+                logger: loggerResult.success ? loggerResult.data : undefined,
+            }));
 
             return handlers;
         },

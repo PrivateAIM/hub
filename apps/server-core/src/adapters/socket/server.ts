@@ -13,9 +13,9 @@ import type {
     STSEvents,
 } from '@privateaim/core-realtime-kit';
 import { createAuthupTokenVerifier } from '@privateaim/server-http-kit';
+import type { Logger } from '@privateaim/server-kit';
 import {
     createAuthupClientTokenCreator,
-    useLogger,
 } from '@privateaim/server-kit';
 import type { Socket, SocketData } from '@privateaim/server-realtime-kit';
 import {
@@ -25,24 +25,38 @@ import {
 } from '@privateaim/server-realtime-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import type { Server as HTTPServer } from 'node:http';
+import type { Client as RedisClient } from 'redis-extension';
 import type { Server } from 'socket.io';
 import { registerSocketControllers } from './register.ts';
 import { useEnv } from '../../app/modules/config/index.ts';
 
+type SocketServerContext = {
+    logger?: Logger;
+    redisPublishClient?: RedisClient;
+    redisSubscribeClient?: RedisClient;
+};
+
 export function createSocketServer(
     httpServer: HTTPServer,
+    ctx: SocketServerContext = {},
 ) : Server {
     const server = createServer<
         CTSEvents,
         STCEvents,
         STSEvents,
         SocketData
-    >(httpServer);
+    >(httpServer, {
+        logger: ctx.logger,
+        redisPublishClient: ctx.redisPublishClient,
+        redisSubscribeClient: ctx.redisSubscribeClient,
+    });
 
     const pattern = /^\/resources(?:\/[a-z0-9A-Z-_]+)?$/;
     const nsp = server.of(pattern);
 
-    mountLoggingMiddleware(nsp);
+    if (ctx.logger) {
+        mountLoggingMiddleware(nsp, { logger: ctx.logger });
+    }
 
     mountAuthorizationMiddleware(nsp, {
         baseURL: useEnv('authupURL'),
@@ -54,7 +68,9 @@ export function createSocketServer(
                 clientSecret: useEnv('clientSecret'),
                 realm: useEnv('realm'),
             }),
+            redisClient: ctx.redisPublishClient,
         }),
+        logger: ctx.logger,
     });
 
     nsp.use((socket: Socket, next) => {
@@ -66,11 +82,10 @@ export function createSocketServer(
         const matches = socket.nsp.name.match(pattern);
         if (typeof matches[1] === 'undefined') {
             if (socket.data.identity.realmName !== REALM_MASTER_NAME) {
-                useLogger()
-                    .error({
-                        message: `Socket/${socket.id}: Realm ${socket.data.identity.realmName} is not permitted for the global scope.`,
-                        [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
-                    });
+                ctx.logger?.error({
+                    message: `Socket/${socket.id}: Realm ${socket.data.identity.realmName} is not permitted for the global scope.`,
+                    [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
+                });
                 next(new ForbiddenError());
 
                 return;
@@ -82,11 +97,10 @@ export function createSocketServer(
                 matches[1] !== socket.data.identity.realmId &&
                 socket.data.identity.realmName !== REALM_MASTER_NAME
             ) {
-                useLogger()
-                    .error({
-                        message: `Socket/${socket.id}: Realm ${socket.data.identity.realmName} is not permitted for the realm ${matches[1]}.`,
-                        [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
-                    });
+                ctx.logger?.error({
+                    message: `Socket/${socket.id}: Realm ${socket.data.identity.realmName} is not permitted for the realm ${matches[1]}.`,
+                    [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
+                });
 
                 next(new ForbiddenError());
                 return;

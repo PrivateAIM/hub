@@ -158,6 +158,18 @@ export class NodeController {
 }
 ```
 
+GET endpoints also pass `ActorContext` when the entity has permission-gated fields (e.g. `account_secret`):
+
+```typescript
+@DGet('/:id', [ForceLoggedInMiddleware])
+async getOne(@DPath('id') id: string, @DRequest() req: any, @DResponse() res: any) {
+    const actor = buildActorContext(req);
+    const query = useRequestQuery(req);
+    const entity = await this.service.getOne(id, actor, Object.keys(query).length > 0 ? query : undefined);
+    return send(res, entity);
+}
+```
+
 ## Wiring Pattern
 
 DI modules resolve repositories from the container, create services, then controllers:

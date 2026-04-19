@@ -14,8 +14,8 @@ export interface IRegistryRepository extends IEntityRepository<Registry> {
 }
 
 export interface IRegistryService {
-    getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<Registry>>;
-    getOne(id: string, query?: Record<string, any>): Promise<Registry>;
+    getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<Registry>>;
+    getOne(id: string, actor: ActorContext, query?: Record<string, any>): Promise<Registry>;
     create(data: Partial<Registry>, actor: ActorContext): Promise<Registry>;
     update(id: string, data: Partial<Registry>, actor: ActorContext): Promise<Registry>;
     delete(id: string, actor: ActorContext): Promise<Registry>;

@@ -31,12 +31,19 @@ const DEFAULT_FIELDS: ParseAllowedOption<RegistryProjectEntity> = [
     'public',
     'external_name',
     'external_id',
+    'account_id',
+    'account_name',
     'webhook_name',
     'webhook_exists',
     'registry_id',
     'realm_id',
     'created_at',
     'updated_at',
+];
+
+const ALLOWED_FIELDS: ParseAllowedOption<RegistryProjectEntity> = [
+    ...DEFAULT_FIELDS,
+    'account_secret',
 ];
 
 export class RegistryProjectRepositoryAdapter implements IRegistryProjectRepository {
@@ -63,7 +70,7 @@ export class RegistryProjectRepositoryAdapter implements IRegistryProjectReposit
 
         const fieldsParsed = parseQueryFields<RegistryProjectEntity>(fields, {
             default: DEFAULT_FIELDS,
-            allowed: DEFAULT_FIELDS,
+            allowed: ALLOWED_FIELDS,
             defaultPath: 'registryProject',
         });
 

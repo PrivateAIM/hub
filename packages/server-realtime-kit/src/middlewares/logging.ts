@@ -5,25 +5,32 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { useLogger } from '@privateaim/server-kit';
+import type { Logger } from '@privateaim/server-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import type { Namespace, Server } from '../types';
 
+type LoggingMiddlewareOptions = {
+    logger: Logger,
+};
+
 export function mountLoggingMiddleware(
     nsp: Namespace | Server,
+    options: LoggingMiddlewareOptions,
 ) {
+    const { logger } = options;
+
     nsp.on('error', (err) => {
-        useLogger().error(err, { [LogFlag.CHANNEL]: LogChannel.WEBSOCKET });
+        logger.error(err, { [LogFlag.CHANNEL]: LogChannel.WEBSOCKET });
     });
 
     nsp.use((socket, next) => {
-        useLogger().debug(`Socket/${socket.id}: Connected.`, {
+        logger.debug(`Socket/${socket.id}: Connected.`, {
             namespace: socket.nsp.name,
             [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
         });
 
         socket.on('disconnect', () => {
-            useLogger().debug(`Socket/${socket.id}: Disconnected.`, {
+            logger.debug(`Socket/${socket.id}: Disconnected.`, {
                 namespace: socket.nsp.name,
                 [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
             });

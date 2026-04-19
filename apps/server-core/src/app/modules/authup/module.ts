@@ -15,7 +15,7 @@ import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
 import {
     AuthupClientInjectionKey,
-    useLogger,
+    LoggerInjectionKey,
 } from '@privateaim/server-kit';
 
 export class AuthupModule implements IModule {
@@ -30,7 +30,7 @@ export class AuthupModule implements IModule {
         }
 
         const authupClient = authupResult.data;
-        const logger = useLogger();
+        const logger = container.resolve(LoggerInjectionKey);
 
         let realm: Realm;
 

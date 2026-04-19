@@ -25,8 +25,7 @@
     "dependencies": {
         "@privateaim/core-kit": "^0.8.34",
         "@privateaim/kit": "^0.8.34",
-        "@privateaim/server-kit": "^0.8.34",
-        "singa": "^1.0.0"
+        "@privateaim/server-kit": "^0.8.34"
     },
     "devDependencies": {
         "docken": "^2.0.2"

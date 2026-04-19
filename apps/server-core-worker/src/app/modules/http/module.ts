@@ -7,7 +7,7 @@
 
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
-import { useLogger } from '@privateaim/server-kit';
+import { LoggerInjectionKey } from '@privateaim/server-kit';
 import { ConfigInjectionKey } from '../config/constants.ts';
 import { createHttpServer } from '../../../adapters/http/index.ts';
 import { HTTPInjectionKey } from './constants.ts';
@@ -19,7 +19,7 @@ export class HTTPModule implements IModule {
 
     async setup(container: IContainer): Promise<void> {
         const config = container.resolve(ConfigInjectionKey);
-        const logger = useLogger();
+        const logger = container.resolve(LoggerInjectionKey);
 
         const server = createHttpServer();
 

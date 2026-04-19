@@ -5,18 +5,21 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { Application } from 'orkos';
 import {
     EntityEventRedisHandler,
     EntityEventSocketHandler,
     LoggerConsoleTransport,
+    LoggerInjectionKey,
+    QueueRouterInjectionKey,
     RedisClientInjectionKey,
     createAuthupClientTokenCreator,
 } from '@privateaim/server-kit';
 import {
     EntityEventHandler,
+    EventComponentCaller,
+    LogComponentCaller,
     LoggerTransport,
-    isLogComponentCallerUsable,
-    useLogComponentCaller,
 } from '@privateaim/server-telemetry-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import { useEnv } from './modules/config/index.ts';
@@ -28,6 +31,9 @@ import { ServerStorageApplicationBuilder } from './builder.ts';
 
 export function createApplication() {
     const env = useEnv();
+
+    let app: Application;
+    let logCaller: LogComponentCaller | undefined;
 
     const builder = new ServerStorageApplicationBuilder()
         .withConfig()
@@ -57,7 +63,15 @@ export function createApplication() {
                 handlers.push(new EntityEventSocketHandler(redisResult.data));
             }
 
-            handlers.push(new EntityEventHandler());
+            const qrResult = container.tryResolve(QueueRouterInjectionKey);
+            const queueRouter = qrResult.success ? qrResult.data : undefined;
+            const eventCaller = queueRouter ? new EventComponentCaller({ queueRouter }) : undefined;
+
+            const loggerResult = container.tryResolve(LoggerInjectionKey);
+            handlers.push(new EntityEventHandler({
+                eventComponentCaller: eventCaller,
+                logger: loggerResult.success ? loggerResult.data : undefined,
+            }));
 
             return handlers;
         },
@@ -72,10 +86,12 @@ export function createApplication() {
                     [LogFlag.CHANNEL]: LogChannel.SYSTEM,
                 },
                 save: async (data) => {
-                    if (isLogComponentCallerUsable()) {
-                        const component = useLogComponentCaller();
-                        await component.callWrite(data);
+                    if (!logCaller) {
+                        const result = app?.container.tryResolve(QueueRouterInjectionKey);
+                        if (!result?.success) return;
+                        logCaller = new LogComponentCaller({ queueRouter: result.data });
                     }
+                    await logCaller.callWrite(data);
                 },
             }),
         ],
@@ -83,7 +99,7 @@ export function createApplication() {
 
     builder.withDatabase();
 
-    const app = builder.build();
+    app = builder.build();
 
     // Minio must be added before HTTP, because
     // HTTP controllers need the MinIO client from the container.

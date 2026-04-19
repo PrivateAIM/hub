@@ -10,15 +10,12 @@ import { DomainEventName } from '@privateaim/kit';
 import type {
     EntityEventDestinations,
     EntityEventDestinationsFn,
-} from '@privateaim/server-kit';
-import {
-    isEntityEventPublisherUsable,
-    useEntityEventPublisher,
+    IEntityEventPublisher,
 } from '@privateaim/server-kit';
 import type {
-    EntitySubscriberInterface, 
-    InsertEvent, 
-    RemoveEvent, 
+    EntitySubscriberInterface,
+    InsertEvent,
+    RemoveEvent,
     UpdateEvent,
 } from 'typeorm';
 import type { BaseSubscriberContext, SubscriberPublishPayload } from './types';
@@ -30,9 +27,16 @@ export class BaseSubscriber<
 
     private readonly refType: string;
 
+    private publisher?: IEntityEventPublisher;
+
     constructor(ctx: BaseSubscriberContext<RECORD>) {
         this.refType = ctx.refType;
         this.destinations = ctx.destinations;
+        this.publisher = ctx.publisher;
+    }
+
+    setPublisher(publisher: IEntityEventPublisher) {
+        this.publisher = publisher;
     }
 
     async afterInsert(event: InsertEvent<RECORD>): Promise<any> {
@@ -63,12 +67,11 @@ export class BaseSubscriber<
     }
 
     async publish(payload: SubscriberPublishPayload<RECORD>) {
-        if (!isEntityEventPublisherUsable()) {
+        if (!this.publisher) {
             return;
         }
 
-        const publisher = useEntityEventPublisher();
-        await publisher.safePublish({
+        await this.publisher.safePublish({
             data: payload.data,
             dataPrevious: payload.dataPrevious,
             metadata: {

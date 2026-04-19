@@ -8,7 +8,7 @@
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
 import type { Component } from '@privateaim/server-kit';
-import { QueueWorkerComponentCaller } from '@privateaim/server-kit';
+import { LoggerInjectionKey, QueueRouterInjectionKey, QueueWorkerComponentCaller } from '@privateaim/server-kit';
 import {
     EventEventQueueRouterRouting,
     EventTaskQueueRouterRouting,
@@ -32,12 +32,19 @@ export class ComponentsModule implements IModule {
             logStore = logStoreResult.data;
         }
 
+        const loggerResult = container.tryResolve(LoggerInjectionKey);
+        const logger = loggerResult.success ? loggerResult.data : undefined;
+        const queueRouterResult = container.tryResolve(QueueRouterInjectionKey);
+        const queueRouter = queueRouterResult.success ? queueRouterResult.data : undefined;
+
         const components : Component<any>[] = [
             new QueueWorkerComponentCaller(
-                new EventComponent(),
+                new EventComponent({ logger }),
                 {
                     consumeQueue: EventTaskQueueRouterRouting,
                     publishQueue: EventEventQueueRouterRouting,
+                    queueRouter,
+                    logger,
                 },
             ),
             new QueueWorkerComponentCaller(
@@ -45,6 +52,8 @@ export class ComponentsModule implements IModule {
                 {
                     consumeQueue: LogTaskQueueRouterRouting,
                     publishQueue: LogEventQueueRouterRouting,
+                    queueRouter,
+                    logger,
                 },
             ),
         ];

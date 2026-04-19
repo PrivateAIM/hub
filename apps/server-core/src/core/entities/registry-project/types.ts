@@ -12,8 +12,8 @@ import type { EntityRepositoryFindManyResult, IEntityRepository } from '../types
 export interface IRegistryProjectRepository extends IEntityRepository<RegistryProject> {}
 
 export interface IRegistryProjectService {
-    getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<RegistryProject>>;
-    getOne(id: string, query?: Record<string, any>): Promise<RegistryProject>;
+    getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<RegistryProject>>;
+    getOne(id: string, actor: ActorContext, query?: Record<string, any>): Promise<RegistryProject>;
     create(data: Partial<RegistryProject>, actor: ActorContext): Promise<RegistryProject>;
     update(id: string, data: Partial<RegistryProject>, actor: ActorContext): Promise<RegistryProject>;
     delete(id: string, actor: ActorContext): Promise<RegistryProject>;

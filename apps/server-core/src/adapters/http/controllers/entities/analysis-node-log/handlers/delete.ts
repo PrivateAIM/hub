@@ -6,7 +6,7 @@
  */
 
 import { BadRequestError } from '@ebec/http';
-import type { Log } from '@privateaim/telemetry-kit';
+import type { Log, APIClient as TelemetryClient } from '@privateaim/telemetry-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted } from 'routup';
@@ -15,9 +15,8 @@ import { parseQueryFilters } from 'rapiq';
 import { useRequestQuery } from '@routup/basic/query';
 import type { AnalysisNodeLog } from '@privateaim/core-kit';
 import { DomainType } from '@privateaim/core-kit';
-import { isTelemetryClientUsable, useTelemetryClient } from '../../../../../../app/services/telemetry/index.ts';
 
-export async function deleteAnalysisNodeLogRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function deleteAnalysisNodeLogRouteHandler(req: Request, res: Response, telemetryClient?: TelemetryClient) : Promise<any> {
     const output = parseQueryFilters<AnalysisNodeLog>(
         useRequestQuery(req, 'filter'),
         {
@@ -50,8 +49,7 @@ export async function deleteAnalysisNodeLogRouteHandler(req: Request, res: Respo
 
     // todo: check permissions
 
-    if (isTelemetryClientUsable()) {
-        const telemetryClient = useTelemetryClient();
+    if (telemetryClient) {
         await telemetryClient.log.deleteMany({ filters });
     }
 

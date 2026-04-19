@@ -5,9 +5,12 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import type { QueueRouterRouting } from '../../../queue-router';
+import type { Logger } from '../../../../services';
+import type { QueueRouter, QueueRouterRouting } from '../../../queue-router';
 
 export type QueueDispatchComponentCallerOptions = {
     queue: QueueRouterRouting,
-    logging?: boolean
+    logging?: boolean,
+    queueRouter?: QueueRouter,
+    logger?: Logger,
 };

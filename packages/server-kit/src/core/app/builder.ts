@@ -35,6 +35,7 @@ export class BaseApplicationBuilder {
     withRedis(options?: RedisModuleOptions | false): this {
         if (options !== false) {
             this.modules.push(new RedisModule(options));
+            this.modules.push(new CacheModule());
         }
         return this;
     }
@@ -42,6 +43,7 @@ export class BaseApplicationBuilder {
     withAmqp(options?: AmqpModuleOptions | false): this {
         if (options !== false) {
             this.modules.push(new AmqpModule(options));
+            this.modules.push(new QueueRouterModule());
         }
         return this;
     }

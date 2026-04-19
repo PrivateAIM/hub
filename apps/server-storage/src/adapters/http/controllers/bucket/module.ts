@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { Logger } from '@privateaim/server-kit';
 import type { Bucket } from '@privateaim/storage-kit';
 import {
     DBody,
@@ -47,16 +48,20 @@ export class BucketController {
 
     private bucketFileComponent: BucketFileComponent;
 
+    private logger: Logger | undefined;
+
     constructor(ctx: {
         dataSource: DataSource;
         minio: Client;
         bucketComponent: BucketComponent;
         bucketFileComponent: BucketFileComponent;
+        logger?: Logger;
     }) {
         this.dataSource = ctx.dataSource;
         this.minio = ctx.minio;
         this.bucketComponent = ctx.bucketComponent;
         this.bucketFileComponent = ctx.bucketFileComponent;
+        this.logger = ctx.logger;
     }
 
     @DGet('', [ForceLoggedInMiddleware])
@@ -73,7 +78,7 @@ export class BucketController {
         @DRequest() req: any,
         @DResponse() res: any,
     ): Promise<any> {
-        return await executeBucketRouteStreamHandler(req, res, this.dataSource, this.minio) as any;
+        return await executeBucketRouteStreamHandler(req, res, this.dataSource, this.minio, this.logger) as any;
     }
 
     @DPost('/:id/upload', [ForceLoggedInMiddleware])

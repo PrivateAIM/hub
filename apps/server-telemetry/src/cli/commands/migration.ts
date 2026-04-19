@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { createLogger, setLogger, useLogger } from '@privateaim/server-kit';
+import { createLogger } from '@privateaim/server-kit';
 import { defineCommand } from 'citty';
 import path from 'node:path';
 import {
@@ -38,9 +38,7 @@ export function defineCLIMigrationCommand() {
             },
         },
         async setup(context) {
-            setLogger(createLogger());
-
-            const logger = useLogger();
+            const logger = createLogger();
             const optionsBuilder = new DataSourceOptionsBuilder();
 
             if (

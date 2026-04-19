@@ -7,10 +7,10 @@
 
 import type { HubError } from '@privateaim/kit';
 import { isObject } from '@privateaim/kit';
+import type { Logger } from '@privateaim/server-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import type { Router } from 'routup';
 import { errorHandler, send } from 'routup';
-import { useLogger } from '@privateaim/server-kit';
 import type { Issue } from 'validup';
 import { sanitizeError } from '../core';
 
@@ -22,7 +22,11 @@ type ErrorResponsePayload = {
     [key: string]: any
 };
 
-export function mountErrorMiddleware(router: Router) {
+type ErrorMiddlewareOptions = {
+    logger?: Logger,
+};
+
+export function mountErrorMiddleware(router: Router, options: ErrorMiddlewareOptions = {}) {
     router.use(errorHandler((error, req, res) => {
         let next : HubError;
         if (error.cause) {
@@ -39,14 +43,14 @@ export function mountErrorMiddleware(router: Router) {
         };
 
         const isServerError = next.statusCode >= 500 && next.statusCode < 600;
-        if (isServerError) {
+        if (isServerError && options.logger) {
             if (error.cause && isObject(error.cause)) {
-                useLogger().error({
+                options.logger.error({
                     message: error.cause as Error,
                     [LogFlag.CHANNEL]: LogChannel.HTTP,
                 });
             } else {
-                useLogger().error({
+                options.logger.error({
                     message: error,
                     [LogFlag.CHANNEL]: LogChannel.HTTP,
                 });

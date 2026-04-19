@@ -26,7 +26,7 @@ export class CacheModule implements IModule {
 
         const result = container.tryResolve(RedisClientInjectionKey);
         if (result.success) {
-            adapter = new RedisCacheAdapter();
+            adapter = new RedisCacheAdapter(result.data);
         } else {
             adapter = new MemoryCacheAdapter();
         }

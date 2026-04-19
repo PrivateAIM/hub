@@ -10,7 +10,6 @@ import type {
     Realm,
 } from '@authup/core-kit';
 import { useDataSource } from 'typeorm-extension';
-import { useLogger } from '@privateaim/server-kit';
 import {
     AnalysisEntity,
     NodeEntity,
@@ -20,7 +19,6 @@ import {
 
 export async function handleAuthupRealmEvent(context: EventRecord<EntityType.REALM, Realm>) {
     if (!context.data.id) {
-        useLogger().warn('ID in authup realm event handler is missing.');
         return;
     }
 

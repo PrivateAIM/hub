@@ -10,28 +10,34 @@ import type { MasterImageSynchronizerEventMap } from '@privateaim/server-core-wo
 import {
     MasterImageSynchronizerEvent,
 } from '@privateaim/server-core-worker-kit';
+import type { Logger } from '@privateaim/server-kit';
 import {
     BaseComponent,
 } from '@privateaim/server-kit';
-import { isEventComponentCallerUsable, useEventComponentCaller } from '@privateaim/server-telemetry-kit';
+import type { EventComponentCaller } from '@privateaim/server-telemetry-kit';
 import type { DataSource } from 'typeorm';
 import {
     handleMasterImageSynchronizerExecutionFinishedEvent,
 } from './handler.ts';
 
+type MasterImageSynchronizerAggregatorContext = {
+    dataSource: DataSource;
+    eventComponentCaller?: EventComponentCaller;
+    logger?: Logger;
+};
+
 export class MasterImageSynchronizerAggregator extends BaseComponent<MasterImageSynchronizerEventMap> {
-    constructor(ctx: { dataSource: DataSource }) {
+    constructor(ctx: MasterImageSynchronizerAggregatorContext) {
         super();
 
-        const handler = (value) => handleMasterImageSynchronizerExecutionFinishedEvent(value, ctx.dataSource);
+        const handler = (value) => handleMasterImageSynchronizerExecutionFinishedEvent(value, ctx.dataSource, ctx.logger);
         this.mount(MasterImageSynchronizerEvent.EXECUTION_FINISHED, handler);
         this.mount('*', async (
             _payload,
             context,
         ) => {
-            if (isEventComponentCallerUsable()) {
-                const eventCaller = useEventComponentCaller();
-                await eventCaller.callCreate({
+            if (ctx.eventComponentCaller) {
+                await ctx.eventComponentCaller.callCreate({
                     name: context.key,
                     data: {},
                     ref_type: DomainType.MASTER_IMAGE,

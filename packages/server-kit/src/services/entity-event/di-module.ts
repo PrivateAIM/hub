@@ -7,10 +7,10 @@
 
 import type { IContainer } from 'eldin';
 import type { IModule, ModuleDependency  } from 'orkos';
+import { LoggerInjectionKey } from '../logger/constants';
 import { ModuleName } from '../module-names';
 import { EntityEventPublisherInjectionKey } from './constants';
 import { EntityEventPublisher } from './module';
-import { setEntityEventPublisherFactory } from './singleton';
 import type { IEntityEventHandler } from './types';
 
 export type EntityEventModuleOptions = {
@@ -23,6 +23,7 @@ export class EntityEventModule implements IModule {
 
     readonly dependencies: (string | ModuleDependency)[] = [
         { name: ModuleName.REDIS, optional: true },
+        { name: ModuleName.LOGGER, optional: true },
     ];
 
     private options: EntityEventModuleOptions;
@@ -32,7 +33,8 @@ export class EntityEventModule implements IModule {
     }
 
     async setup(container: IContainer): Promise<void> {
-        const publisher = new EntityEventPublisher();
+        const loggerResult = container.tryResolve(LoggerInjectionKey);
+        const publisher = new EntityEventPublisher({ logger: loggerResult.success ? loggerResult.data : undefined });
 
         if (this.options.handlerFactory) {
             const handlers = this.options.handlerFactory(container);
@@ -48,8 +50,5 @@ export class EntityEventModule implements IModule {
         }
 
         container.register(EntityEventPublisherInjectionKey, { useValue: publisher });
-
-        // Bridge: back-fill singa singleton
-        setEntityEventPublisherFactory(() => publisher);
     }
 }

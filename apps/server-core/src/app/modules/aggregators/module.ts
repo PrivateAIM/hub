@@ -8,8 +8,12 @@
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
 import {
+    LoggerInjectionKey,
+    QueueRouterInjectionKey,
     QueueWorkerComponentCaller,
+    RedisSubscribeClientInjectionKey,
 } from '@privateaim/server-kit';
+import { EventComponentCaller } from '@privateaim/server-telemetry-kit';
 import {
     AnalysisBuilderEventQueueRouterRouting,
     AnalysisDistributorEventQueueRouterRouting,
@@ -41,32 +45,79 @@ export class AggregatorsModule implements IModule {
         const dataSource = container.resolve(DatabaseInjectionKey.DataSource);
         const taskManager = container.resolve(ComponentsInjectionKey.TaskManager);
         const registryComponentCaller = container.resolve(ComponentsInjectionKey.RegistryComponentCaller);
+        const logger = container.resolve(LoggerInjectionKey);
+        const queueRouterResult = container.tryResolve(QueueRouterInjectionKey);
+        const queueRouter = queueRouterResult.success ? queueRouterResult.data : undefined;
+        const redisSubResult = container.tryResolve(RedisSubscribeClientInjectionKey);
 
         const aggregators = [
-            createAuthupAggregator({ registryComponentCaller }),
+            createAuthupAggregator({
+                registryComponentCaller,
+                redisSubscribeClient: redisSubResult.success ? redisSubResult.data : undefined,
+                logger,
+            }),
             new QueueWorkerComponentCaller(
                 new AnalysisBuilderAggregator({ dataSource }),
-                { consumeQueue: AnalysisBuilderEventQueueRouterRouting },
+                {
+                    consumeQueue: AnalysisBuilderEventQueueRouterRouting, 
+                    queueRouter, 
+                    logger, 
+                },
             ),
             new QueueWorkerComponentCaller(
                 new AnalysisDistributorAggregator({ dataSource }),
-                { consumeQueue: AnalysisDistributorEventQueueRouterRouting },
+                {
+                    consumeQueue: AnalysisDistributorEventQueueRouterRouting, 
+                    queueRouter, 
+                    logger, 
+                },
             ),
             new QueueWorkerComponentCaller(
-                new StorageBucketAggregator({ dataSource, taskManager }),
-                { consumeQueue: BucketEventQueueRouterRouting },
+                new StorageBucketAggregator({
+                    dataSource, 
+                    taskManager, 
+                    logger, 
+                }),
+                {
+                    consumeQueue: BucketEventQueueRouterRouting, 
+                    queueRouter, 
+                    logger, 
+                },
             ),
             new QueueWorkerComponentCaller(
-                new StorageBucketFileAggregator({ dataSource, taskManager }),
-                { consumeQueue: BucketFileEventQueueRouterRouting },
+                new StorageBucketFileAggregator({
+                    dataSource, 
+                    taskManager, 
+                    logger, 
+                }),
+                {
+                    consumeQueue: BucketFileEventQueueRouterRouting, 
+                    queueRouter, 
+                    logger, 
+                },
             ),
             new QueueWorkerComponentCaller(
-                new MasterImageBuilderAggregator({ dataSource }),
-                { consumeQueue: MasterImageBuilderEventQueueRouterRouting },
+                new MasterImageBuilderAggregator({
+                    dataSource,
+                    eventComponentCaller: queueRouter ? new EventComponentCaller({ queueRouter }) : undefined,
+                }),
+                {
+                    consumeQueue: MasterImageBuilderEventQueueRouterRouting, 
+                    queueRouter, 
+                    logger, 
+                },
             ),
             new QueueWorkerComponentCaller(
-                new MasterImageSynchronizerAggregator({ dataSource }),
-                { consumeQueue: MasterImageSynchronizerEventQueueRouterRouting },
+                new MasterImageSynchronizerAggregator({
+                    dataSource,
+                    logger,
+                    eventComponentCaller: queueRouter ? new EventComponentCaller({ queueRouter }) : undefined,
+                }),
+                {
+                    consumeQueue: MasterImageSynchronizerEventQueueRouterRouting, 
+                    queueRouter, 
+                    logger, 
+                },
             ),
         ];
 
