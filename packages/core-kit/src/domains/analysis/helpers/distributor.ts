@@ -23,8 +23,16 @@ export class AnalysisDistributorCommandChecker {
             throw new AnalysisError('The analysis is not built yet.');
         }
 
-        if (entity.distribution_status === ProcessStatus.EXECUTED) {
-            throw new AnalysisError('The analysis is already distributed.');
+        // we haven't started distribution yet.
+        if (!entity.distribution_status) {
+            return;
+        }
+
+        if (
+            entity.distribution_status !== ProcessStatus.FAILED &&
+            entity.distribution_status !== ProcessStatus.STOPPED
+        ) {
+            throw new AnalysisError(`The analysis can not be distributed in state ${  entity.distribution_status}`);
         }
     }
 

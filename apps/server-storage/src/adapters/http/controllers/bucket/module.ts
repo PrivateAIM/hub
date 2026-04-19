@@ -19,6 +19,7 @@ import {
     DTags,
 } from '@routup/decorators';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
+import type { BucketFileEventCaller } from '@privateaim/server-storage-kit';
 import type { DataSource } from 'typeorm';
 import type { Client } from 'minio';
 import type { BucketFileEntity } from '../../../database/index.ts';
@@ -48,6 +49,8 @@ export class BucketController {
 
     private bucketFileComponent: BucketFileComponent;
 
+    private bucketFileEventCaller: BucketFileEventCaller;
+
     private logger: Logger | undefined;
 
     constructor(ctx: {
@@ -55,12 +58,14 @@ export class BucketController {
         minio: Client;
         bucketComponent: BucketComponent;
         bucketFileComponent: BucketFileComponent;
+        bucketFileEventCaller: BucketFileEventCaller;
         logger?: Logger;
     }) {
         this.dataSource = ctx.dataSource;
         this.minio = ctx.minio;
         this.bucketComponent = ctx.bucketComponent;
         this.bucketFileComponent = ctx.bucketFileComponent;
+        this.bucketFileEventCaller = ctx.bucketFileEventCaller;
         this.logger = ctx.logger;
     }
 
@@ -87,7 +92,13 @@ export class BucketController {
         @DRequest() req: any,
         @DResponse() res: any,
     ): Promise<BucketFileEntity[]> {
-        return await executeBucketRouteUploadHandler(req, res, this.dataSource, this.bucketFileComponent) as BucketFileEntity[];
+        return await executeBucketRouteUploadHandler(
+            req,
+            res,
+            this.dataSource,
+            this.bucketFileComponent,
+            this.bucketFileEventCaller,
+        ) as BucketFileEntity[];
     }
 
     @DGet('/:id', [ForceLoggedInMiddleware])

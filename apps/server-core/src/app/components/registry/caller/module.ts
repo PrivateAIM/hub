@@ -5,6 +5,7 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
+import type { QueueRouter } from '@privateaim/server-kit';
 import {
     CompoundComponentCaller,
     DirectComponentCaller,
@@ -15,10 +16,13 @@ import { RegistryTaskQueueRouterRouting } from '../constants.ts';
 import type { RegistryComponent } from '../module.ts';
 
 export class RegistryComponentCaller extends CompoundComponentCaller<RegistryEventMap> {
-    constructor(component: RegistryComponent) {
+    constructor(component: RegistryComponent, ctx?: { queueRouter?: QueueRouter }) {
         super([
             new DirectComponentCaller<RegistryEventMap>(component),
-            new QueueDispatchComponentCaller<RegistryEventMap>({ queue: RegistryTaskQueueRouterRouting }),
+            new QueueDispatchComponentCaller<RegistryEventMap>({
+                queue: RegistryTaskQueueRouterRouting,
+                queueRouter: ctx?.queueRouter,
+            }),
         ]);
     }
 }

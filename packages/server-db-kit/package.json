@@ -23,14 +23,18 @@
         "@privateaim/server-kit": "^0.8.34"
     },
     "devDependencies": {
+        "cross-env": "^7.0.3",
         "typeorm": "^0.3.28",
-        "typeorm-extension": "^3.9.0"
+        "typeorm-extension": "^3.9.0",
+        "unplugin-swc": "^1.5.5",
+        "vitest": "^4.1.4"
     },
     "peerDependencies": {
         "typeorm": "^0.3.28",
         "typeorm-extension": "^3.9.0"
     },
     "scripts": {
-        "build": "rimraf ./dist && tsdown"
+        "build": "rimraf ./dist && tsdown",
+        "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts"
     }
 }

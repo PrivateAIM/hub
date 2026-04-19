@@ -13,11 +13,11 @@ import {
     useRequestPermissionChecker,
 } from '@privateaim/server-http-kit';
 import { DirectComponentCaller } from '@privateaim/server-kit';
-import type { BucketFileDeletionFinishedEventPayload } from '@privateaim/server-storage-kit';
 import {
     BucketFileCommand,
+    type BucketFileDeletionFinishedEventPayload,
     BucketFileEvent,
-    BucketFileEventCaller,
+    type BucketFileEventCaller,
 } from '@privateaim/server-storage-kit';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
@@ -32,6 +32,7 @@ export async function executeBucketFileRouteDeleteHandler(
     res: Response,
     dataSource: DataSource,
     bucketFileComponent: BucketFileComponent,
+    bucketFileEventCaller: BucketFileEventCaller,
 ) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
@@ -59,7 +60,6 @@ export async function executeBucketFileRouteDeleteHandler(
     }
 
     const caller = new DirectComponentCaller(bucketFileComponent);
-    const responseCaller = new BucketFileEventCaller();
 
     await new Promise((resolve, reject) => {
         caller.callWith(
@@ -68,7 +68,7 @@ export async function executeBucketFileRouteDeleteHandler(
             {},
             {
                 handle: async (childValue, childContext) => {
-                    await responseCaller.call(
+                    await bucketFileEventCaller.call(
                         childContext.key,
                         childValue,
                         childContext.metadata,

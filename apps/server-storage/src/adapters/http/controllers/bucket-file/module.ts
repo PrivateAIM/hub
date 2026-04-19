@@ -16,6 +16,7 @@ import {
     DTags,
 } from '@routup/decorators';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
+import type { BucketFileEventCaller } from '@privateaim/server-storage-kit';
 import type { DataSource } from 'typeorm';
 import type { Client } from 'minio';
 import type { BucketFileEntity } from '../../../database/index.ts';
@@ -38,17 +39,21 @@ export class BucketFileController {
 
     private bucketFileComponent: BucketFileComponent;
 
+    private bucketFileEventCaller: BucketFileEventCaller;
+
     private logger: Logger | undefined;
 
     constructor(ctx: {
         dataSource: DataSource;
         minio: Client;
         bucketFileComponent: BucketFileComponent;
+        bucketFileEventCaller: BucketFileEventCaller;
         logger?: Logger;
     }) {
         this.dataSource = ctx.dataSource;
         this.minio = ctx.minio;
         this.bucketFileComponent = ctx.bucketFileComponent;
+        this.bucketFileEventCaller = ctx.bucketFileEventCaller;
         this.logger = ctx.logger;
     }
 
@@ -84,6 +89,12 @@ export class BucketFileController {
         @DRequest() req: any,
         @DResponse() res: any,
     ): Promise<PartialBucketFile | undefined> {
-        return await executeBucketFileRouteDeleteHandler(req, res, this.dataSource, this.bucketFileComponent) as PartialBucketFile | undefined;
+        return await executeBucketFileRouteDeleteHandler(
+            req,
+            res,
+            this.dataSource,
+            this.bucketFileComponent,
+            this.bucketFileEventCaller,
+        ) as PartialBucketFile | undefined;
     }
 }
