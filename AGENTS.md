@@ -56,3 +56,4 @@ Modernization and refactoring plans (execute in order):
 4. **[Hexagonal: server-core](.agents/plans/004-hexagonal-server-core.md)** — Core/adapters/app separation for the main service
 5. ~~[Hexagonal: remaining services](.agents/plans/005-hexagonal-remaining-services.md)~~ — Complete (#1528)
 6. **[Service-Level Tests](.agents/plans/006-service-level-tests.md)** — Shared test package + core business logic unit tests
+7. **[Message Bus](.agents/plans/007-message-bus.md)** — Rename QueueRouter → MessageBus, driver abstraction (AMQP/Memory)

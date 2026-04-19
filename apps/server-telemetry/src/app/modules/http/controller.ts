@@ -8,6 +8,7 @@
 import type { IContainer } from 'eldin';
 import { EventController } from '../../../adapters/http/controllers/event/module.ts';
 import { LogController } from '../../../adapters/http/controllers/log/module.ts';
+import { RootController } from '../../../adapters/http/controllers/root/index.ts';
 import type { LogStore } from '../../../core/services/log-store/types.ts';
 import { DatabaseInjectionKey } from '../database/constants.ts';
 import { LogStoreInjectionKey } from '../victoria-logs/constants.ts';
@@ -23,6 +24,7 @@ export function createControllers(container: IContainer): Record<string, any>[] 
 
     const controllers: Record<string, any>[] = [
         new EventController({ dataSource }),
+        new RootController(),
     ];
 
     if (logStore) {

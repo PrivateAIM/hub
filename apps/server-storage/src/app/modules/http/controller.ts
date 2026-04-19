@@ -9,6 +9,7 @@ import type { IContainer } from 'eldin';
 import { LoggerInjectionKey } from '@privateaim/server-kit';
 import { BucketController } from '../../../adapters/http/controllers/bucket/module.ts';
 import { BucketFileController } from '../../../adapters/http/controllers/bucket-file/module.ts';
+import { RootController } from '../../../adapters/http/controllers/root/index.ts';
 import { BucketComponent } from '../../components/bucket/module.ts';
 import { BucketFileComponent } from '../../components/bucket-file/module.ts';
 import { DatabaseInjectionKey } from '../database/constants.ts';
@@ -38,5 +39,6 @@ export function createControllers(container: IContainer): Record<string, any>[] 
             bucketFileComponent,
             logger,
         }),
+        new RootController(),
     ];
 }
