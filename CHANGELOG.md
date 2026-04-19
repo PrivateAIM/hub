@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.8.35](https://github.com/PrivateAIM/hub/compare/v0.8.34...v0.8.35) (2026-04-19)
+
+
+### Bug Fixes
+
+* minor base subscriber refactoring ([5d9a0e8](https://github.com/PrivateAIM/hub/commit/5d9a0e877d64cc44eaf85c1ef402c80eb23b96b8))
+* pass queueRouter to all callers subclasses and fix DatabaseModul… ([#1541](https://github.com/PrivateAIM/hub/issues/1541)) ([558f1da](https://github.com/PrivateAIM/hub/commit/558f1dafab2da1a82a5919ed47bf4c5620404971))
+* register root-controller in server-storage & server-telemetry ([7d10825](https://github.com/PrivateAIM/hub/commit/7d108258db727c0f1303bb9cadeea92f86625589))
+* **server-core:** register TypeORM subscribers after DataSource.initialize() ([971abfe](https://github.com/PrivateAIM/hub/commit/971abfe1ac4dc3e963d76656ea4623bb65770a01))
+
 ## [0.8.34](https://github.com/PrivateAIM/hub/compare/v0.8.33...v0.8.34) (2026-04-16)
 
 
