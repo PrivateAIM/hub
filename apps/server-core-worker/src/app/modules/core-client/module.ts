@@ -8,7 +8,7 @@
 import type { IContainer } from 'eldin';
 import type { IModule, ModuleDependency } from 'orkos';
 import { Client } from '@privateaim/core-http-kit';
-import { AuthupClientAuthenticationHookInjectionKey, ModuleName } from '@privateaim/server-kit';
+import { AUTHUP_HOOK_MODULE_NAME, AuthupClientAuthenticationHookInjectionKey } from '@privateaim/server-kit';
 import { CoreClientInjectionKey } from './constants.ts';
 import type { CoreClientModuleOptions } from './types.ts';
 
@@ -16,7 +16,7 @@ export class CoreClientModule implements IModule {
     readonly name = 'coreClient';
 
     readonly dependencies: (string | ModuleDependency)[] = [
-        { name: ModuleName.AUTHUP_HOOK, optional: true },
+        { name: AUTHUP_HOOK_MODULE_NAME, optional: true },
     ];
 
     private options: CoreClientModuleOptions;
