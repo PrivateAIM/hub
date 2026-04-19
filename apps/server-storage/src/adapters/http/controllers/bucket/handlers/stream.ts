@@ -118,5 +118,9 @@ export async function executeBucketRouteStreamHandler(
         logger?.debug(`Streamed files of ${bucketName}`);
     } catch (err) {
         logger?.error(err);
+
+        if (!res.writableEnded) {
+            res.destroy(err instanceof Error ? err : undefined);
+        }
     }
 }

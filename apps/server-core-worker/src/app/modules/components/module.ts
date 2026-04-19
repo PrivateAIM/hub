@@ -124,35 +124,43 @@ export class ComponentsModule implements IModule {
                 {
                     publishQueue: AnalysisBuilderEventQueueRouterRouting,
                     consumeQueue: AnalysisBuilderTaskQueueRouterRouting,
+                    queueRouter,
+                    logger: analysisBuilderLogger,
                 },
             ),
             new QueueWorkerComponentCaller(
                 new AnalysisDistributorComponent({
-                    coreClient, 
-                    docker, 
-                    logger: analysisDistributorLogger, 
+                    coreClient,
+                    docker,
+                    logger: analysisDistributorLogger,
                 }),
                 {
                     publishQueue: AnalysisDistributorEventQueueRouterRouting,
                     consumeQueue: AnalysisDistributorTaskQueueRouterRouting,
+                    queueRouter,
+                    logger: analysisDistributorLogger,
                 },
             ),
             new QueueWorkerComponentCaller(
                 new MasterImageBuilderComponent({
-                    coreClient, 
-                    docker, 
-                    logger: masterImageBuilderLogger, 
+                    coreClient,
+                    docker,
+                    logger: masterImageBuilderLogger,
                 }),
                 {
                     publishQueue: MasterImageBuilderEventQueueRouterRouting,
                     consumeQueue: MasterImageBuilderTaskQueueRouterRouting,
+                    queueRouter,
+                    logger: masterImageBuilderLogger,
                 },
             ),
             new QueueWorkerComponentCaller(
-                new MasterImageSynchronizerComponent(),
+                new MasterImageSynchronizerComponent({ logger: masterImageBuilderLogger }),
                 {
                     publishQueue: MasterImageSynchronizerEventQueueRouterRouting,
                     consumeQueue: MasterImageSynchronizerTaskQueueRouterRouting,
+                    queueRouter,
+                    logger: masterImageBuilderLogger,
                 },
             ),
         ];
