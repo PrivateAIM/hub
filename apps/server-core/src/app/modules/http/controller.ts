@@ -97,8 +97,16 @@ export function createControllers(container: IContainer): Record<string, any>[] 
     });
     const analysisBucketService = new AnalysisBucketService({ repository: analysisBucketRepository });
     const analysisBucketFileService = new AnalysisBucketFileService({ repository: analysisBucketFileRepository });
-    const projectNodeService = new ProjectNodeService({ repository: projectNodeRepository, projectRepository });
-    const analysisNodeService = new AnalysisNodeService({ repository: analysisNodeRepository, projectNodeRepository });
+    const projectNodeService = new ProjectNodeService({
+        repository: projectNodeRepository,
+        projectRepository,
+        skipProjectApproval: config.skipProjectApproval,
+    });
+    const analysisNodeService = new AnalysisNodeService({
+        repository: analysisNodeRepository,
+        projectNodeRepository,
+        skipAnalysisApproval: config.skipAnalysisApproval,
+    });
     const analysisPermissionService = new AnalysisPermissionService({ repository: analysisPermissionRepository });
     const analysisNodeEventService = new AnalysisNodeEventService({ repository: analysisNodeEventRepository });
 
