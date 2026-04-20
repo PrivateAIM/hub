@@ -22,7 +22,8 @@ export class MemoryMessageBusDriver implements IMessageBusDriver {
     async publish(routing: MessageBusRouting, message: MessageBusPayload): Promise<boolean> {
         const matching = this.consumers.filter(
             (consumer) => consumer.routing.key === routing.key &&
-                consumer.routing.type === routing.type,
+                consumer.routing.type === routing.type &&
+                (consumer.routing.namespace || '') === (routing.namespace || ''),
         );
 
         if (matching.length === 0) {
