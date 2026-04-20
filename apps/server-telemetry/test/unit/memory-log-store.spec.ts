@@ -106,13 +106,13 @@ describe('MemoryLogStore', () => {
         });
 
         it('should exclude items without labels when filtering', async () => {
-            await store.write({
-                message: 'a', 
-                level: LogLevel.INFORMATIONAL, 
-                channel: LogChannel.SYSTEM, 
-                service: 'svc', 
-                labels: {}, 
+            const log = await store.write({
+                message: 'a',
+                level: LogLevel.INFORMATIONAL,
+                channel: LogChannel.SYSTEM,
+                service: 'svc',
             });
+            delete (log as { labels?: Record<string, unknown> }).labels;
 
             const [results] = await store.query({ labels: { node_id: 'node-1' } });
             expect(results).toHaveLength(0);
