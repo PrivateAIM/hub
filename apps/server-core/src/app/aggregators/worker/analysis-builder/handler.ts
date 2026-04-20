@@ -45,7 +45,7 @@ export async function handleAnalysisBuilderEvent(
                 !entity.build_progress ||
                 temp.progress.percent >= entity.build_progress
             ) {
-                entity.build_progress = temp.progress.percent;
+                entity.build_progress = Math.min(temp.progress.percent, 100);
             }
             break;
         }
@@ -59,7 +59,7 @@ export async function handleAnalysisBuilderEvent(
 
             entity.build_hash = temp.hash ?? null;
             entity.build_os = temp.os ?? null;
-            entity.build_size = temp.size ?? null;
+            entity.build_size = temp.size != null ? Math.min(temp.size, 4294967295) : null;
             entity.build_status = ProcessStatus.EXECUTED;
             entity.build_progress = 100;
             break;
@@ -74,7 +74,7 @@ export async function handleAnalysisBuilderEvent(
 
             entity.build_hash = temp.hash ?? null;
             entity.build_os = temp.os ?? null;
-            entity.build_size = temp.size ?? null;
+            entity.build_size = temp.size != null ? Math.min(temp.size, 4294967295) : null;
             entity.build_status = temp.status || null;
         }
     }

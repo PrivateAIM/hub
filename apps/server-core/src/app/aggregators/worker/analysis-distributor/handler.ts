@@ -43,7 +43,7 @@ export async function handleAnalysisDistributorEvent(
                 !entity.distribution_progress ||
                 temp.progress.percent >= entity.distribution_progress
             ) {
-                entity.distribution_progress = temp.progress.percent;
+                entity.distribution_progress = Math.min(temp.progress.percent, 100);
             }
             break;
         }
