@@ -266,7 +266,7 @@ export class BucketFileController {
                         }
                     },
                 },
-            );
+            ).catch(reject);
         });
 
         const { id: entityId } = entity;

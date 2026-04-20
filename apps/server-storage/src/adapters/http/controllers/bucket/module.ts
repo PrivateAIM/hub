@@ -128,7 +128,7 @@ export class BucketController {
         if (isUUID(id)) {
             query.where('bucket.id = :id', { id });
         } else {
-            query.where('bucket.name LIKE :name', { name: id });
+            query.where('bucket.name = :name', { name: id });
         }
         const entity = await query.getOne();
         if (!entity) {
@@ -171,7 +171,7 @@ export class BucketController {
         if (isUUID(id)) {
             query.where('bucket.id = :id', { id });
         } else {
-            query.where('bucket.name LIKE :name', { name: id });
+            query.where('bucket.name = :name', { name: id });
         }
         const entity = await query.getOne();
         if (!entity) {
@@ -198,7 +198,7 @@ export class BucketController {
         if (isUUID(id)) {
             query.where('bucket.id = :id', { id });
         } else {
-            query.where('bucket.name LIKE :name', { name: id });
+            query.where('bucket.name = :name', { name: id });
         }
 
         applyQuery(query, useRequestQuery(req), {
@@ -242,7 +242,7 @@ export class BucketController {
         if (isUUID(id)) {
             query.where('bucket.id = :id', { id });
         } else {
-            query.where('bucket.name LIKE :name', { name: id });
+            query.where('bucket.name = :name', { name: id });
         }
         let entity = await query.getOne();
         if (!entity) {
@@ -343,7 +343,7 @@ export class BucketController {
         if (isUUID(id)) {
             query.where('bucket.id = :id', { id });
         } else {
-            query.where('bucket.name LIKE :name', { name: id });
+            query.where('bucket.name = :name', { name: id });
         }
 
         const entity = await query.getOne();

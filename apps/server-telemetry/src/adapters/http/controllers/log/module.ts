@@ -137,11 +137,13 @@ export class LogController {
             const keys = Object.keys(raw);
             for (const key of keys) {
                 const index = key.indexOf('.');
-                if (index === -1) {
-                    continue;
-                }
 
-                const nextKey = key.substring(index + 1);
+                let nextKey: string;
+                if (index !== -1) {
+                    nextKey = key.substring(index + 1);
+                } else {
+                    nextKey = key;
+                }
 
                 if (typeof raw[key] === 'string') {
                     labels[nextKey] = raw[key];
