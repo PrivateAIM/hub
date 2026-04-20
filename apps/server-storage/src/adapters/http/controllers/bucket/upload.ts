@@ -4,8 +4,7 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { isUUID } from '@authup/kit';
-import { NotFoundError } from '@ebec/http';
+
 import { DirectComponentCaller } from '@privateaim/server-kit';
 import {
     BucketFileCommand,
@@ -15,16 +14,11 @@ import {
 } from '@privateaim/server-storage-kit';
 import Busboy from 'busboy';
 import path from 'node:path';
-import { sendCreated, useRequestParam } from 'routup';
-import type { Request, Response } from 'routup';
+import type { Request } from 'routup';
 import { useRequestIdentityOrFail } from '@privateaim/server-http-kit';
-import type { DataSource } from 'typeorm';
-import type { BucketFileComponent } from '../../../../../app/components/bucket-file/module.ts';
-import { streamToBuffer } from '../../../../../core/utils/stream-to-buffer.ts';
-import type { BucketFileEntity } from '../../../../database/index.ts';
-import {
-    BucketEntity,
-} from '../../../../database/index.ts';
+import type { BucketFileComponent } from '../../../../app/components/bucket-file/module.ts';
+import { streamToBuffer } from '../../../../core/utils/stream-to-buffer.ts';
+import type { BucketEntity, BucketFileEntity  } from '../../../database/index.ts';
 
 export async function uploadRequestFilesToBucket(
     req: Request,
@@ -115,35 +109,5 @@ export async function uploadRequestFilesToBucket(
         });
 
         req.pipe(instance);
-    });
-}
-
-export async function executeBucketRouteUploadHandler(
-    req: Request,
-    res: Response,
-    dataSource: DataSource,
-    bucketFileComponent: BucketFileComponent,
-    bucketFileEventCaller: BucketFileEventCaller,
-) : Promise<any> {
-    // todo: check permissions by membership
-    const id = useRequestParam(req, 'id');
-
-    const repository = dataSource.getRepository(BucketEntity);
-    const query = repository.createQueryBuilder('bucket');
-    if (isUUID(id)) {
-        query.where('bucket.id = :id', { id });
-    } else {
-        query.where('bucket.name LIKE :name', { name: id });
-    }
-    const entity = await query.getOne();
-    if (!entity) {
-        throw new NotFoundError();
-    }
-
-    const files = await uploadRequestFilesToBucket(req, entity, bucketFileComponent, bucketFileEventCaller);
-
-    return sendCreated(res, {
-        data: files,
-        meta: { total: files.length },
     });
 }
