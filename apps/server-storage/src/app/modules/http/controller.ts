@@ -6,7 +6,7 @@
  */
 
 import type { IContainer } from 'eldin';
-import { LoggerInjectionKey, QueueRouterInjectionKey } from '@privateaim/server-kit';
+import { LoggerInjectionKey, MessageBusInjectionKey } from '@privateaim/server-kit';
 import { BucketFileEventCaller } from '@privateaim/server-storage-kit';
 import { BucketController } from '../../../adapters/http/controllers/bucket/module.ts';
 import { BucketFileController } from '../../../adapters/http/controllers/bucket-file/module.ts';
@@ -23,12 +23,12 @@ export function createControllers(container: IContainer): Record<string, any>[] 
     const loggerResult = container.tryResolve(LoggerInjectionKey);
     const logger = loggerResult.success ? loggerResult.data : undefined;
 
-    const queueRouterResult = container.tryResolve(QueueRouterInjectionKey);
-    const queueRouter = queueRouterResult.success ? queueRouterResult.data : undefined;
+    const messageBusResult = container.tryResolve(MessageBusInjectionKey);
+    const messageBus = messageBusResult.success ? messageBusResult.data : undefined;
 
     const bucketComponent = new BucketComponent({ minio, logger });
     const bucketFileComponent = new BucketFileComponent({ minio, logger });
-    const bucketFileEventCaller = new BucketFileEventCaller({ queueRouter });
+    const bucketFileEventCaller = new BucketFileEventCaller({ messageBus });
 
     return [
         new BucketController({

@@ -6,11 +6,11 @@
  */
 
 import type { Logger } from '../../../logger';
-import type { QueueRouter, QueueRouterRouting } from '../../../queue-router';
+import type { MessageBus, MessageBusRouting } from '../../../message-bus';
 
 export type QueueSelfComponentCallerOptions = {
-    publishQueue?: QueueRouterRouting,
-    consumeQueue: QueueRouterRouting,
-    queueRouter?: QueueRouter,
+    publishQueue?: MessageBusRouting,
+    consumeQueue: MessageBusRouting,
+    messageBus?: MessageBus,
     logger?: Logger,
 };

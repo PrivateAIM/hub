@@ -9,7 +9,7 @@ import type {
     ComponentCaller,
     ComponentCallerPayload,
     ComponentDirectCallerResponse,
-    QueueRouter,
+    MessageBus,
 } from '@privateaim/server-kit';
 import {
     DirectComponentCaller,
@@ -27,11 +27,11 @@ export class AnalysisMetadataComponentCaller implements ComponentCaller<Analysis
 
     protected queueDispatchCaller : QueueDispatchComponentCaller<AnalysisMetadataEventMap>;
 
-    constructor(component: AnalysisMetadataComponent, ctx?: { queueRouter?: QueueRouter }) {
+    constructor(component: AnalysisMetadataComponent, ctx?: { messageBus?: MessageBus }) {
         this.directCaller = new DirectComponentCaller<AnalysisMetadataEventMap>(component);
         this.queueDispatchCaller = new QueueDispatchComponentCaller<AnalysisMetadataEventMap>({
             queue: AnalysisMetadataTaskQueue,
-            queueRouter: ctx?.queueRouter,
+            messageBus: ctx?.messageBus,
         });
     }
 

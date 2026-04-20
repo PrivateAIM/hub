@@ -11,13 +11,13 @@ import {
 } from '@privateaim/server-kit';
 import {
     MasterImageSynchronizerCommand,
-    MasterImageSynchronizerTaskQueueRouterRouting,
+    MasterImageSynchronizerTaskMessageBusRouting,
 } from './constants';
 import type { MasterImageSynchronizerEventMap, MasterImageSynchronizerExecutePayload } from './types';
 
 export class MasterImageSynchronizerComponentCaller extends QueueDispatchComponentCaller<MasterImageSynchronizerEventMap> {
     constructor(options: Partial<QueueDispatchComponentCallerOptions> = {}) {
-        super({ ...options, queue: MasterImageSynchronizerTaskQueueRouterRouting });
+        super({ ...options, queue: MasterImageSynchronizerTaskMessageBusRouting });
     }
 
     async callExecute(payload: MasterImageSynchronizerExecutePayload, metadata: ComponentMetadata = {}) {

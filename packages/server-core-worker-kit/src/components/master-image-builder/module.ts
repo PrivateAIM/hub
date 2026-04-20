@@ -9,12 +9,12 @@ import type { ComponentMetadata, QueueDispatchComponentCallerOptions } from '@pr
 import {
     QueueDispatchComponentCaller,
 } from '@privateaim/server-kit';
-import { MasterImageBuilderCommand, MasterImageBuilderTaskQueueRouterRouting } from './constants';
+import { MasterImageBuilderCommand, MasterImageBuilderTaskMessageBusRouting } from './constants';
 import type { MasterImageBuilderExecutePayload } from './types';
 
 export class MasterImageBuilderComponentCaller extends QueueDispatchComponentCaller {
     constructor(options: Partial<QueueDispatchComponentCallerOptions> = {}) {
-        super({ ...options, queue: MasterImageBuilderTaskQueueRouterRouting });
+        super({ ...options, queue: MasterImageBuilderTaskMessageBusRouting });
     }
 
     async callExecute(payload: MasterImageBuilderExecutePayload, metadata: ComponentMetadata = {}) {

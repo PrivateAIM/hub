@@ -8,12 +8,12 @@
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
 import type { Component } from '@privateaim/server-kit';
-import { LoggerInjectionKey, QueueRouterInjectionKey, QueueWorkerComponentCaller } from '@privateaim/server-kit';
+import { LoggerInjectionKey, MessageBusInjectionKey, QueueWorkerComponentCaller } from '@privateaim/server-kit';
 import {
-    EventEventQueueRouterRouting,
-    EventTaskQueueRouterRouting,
-    LogEventQueueRouterRouting,
-    LogTaskQueueRouterRouting,
+    EventEventMessageBusRouting,
+    EventTaskMessageBusRouting,
+    LogEventMessageBusRouting,
+    LogTaskMessageBusRouting,
 } from '@privateaim/server-telemetry-kit';
 import type { LogStore } from '../../../core/services/log-store/types.ts';
 import { EventComponent } from '../../components/event/index.ts';
@@ -34,25 +34,25 @@ export class ComponentsModule implements IModule {
 
         const loggerResult = container.tryResolve(LoggerInjectionKey);
         const logger = loggerResult.success ? loggerResult.data : undefined;
-        const queueRouterResult = container.tryResolve(QueueRouterInjectionKey);
-        const queueRouter = queueRouterResult.success ? queueRouterResult.data : undefined;
+        const messageBusResult = container.tryResolve(MessageBusInjectionKey);
+        const messageBus = messageBusResult.success ? messageBusResult.data : undefined;
 
         const components : Component<any>[] = [
             new QueueWorkerComponentCaller(
                 new EventComponent({ logger }),
                 {
-                    consumeQueue: EventTaskQueueRouterRouting,
-                    publishQueue: EventEventQueueRouterRouting,
-                    queueRouter,
+                    consumeQueue: EventTaskMessageBusRouting,
+                    publishQueue: EventEventMessageBusRouting,
+                    messageBus,
                     logger,
                 },
             ),
             new QueueWorkerComponentCaller(
                 new LogComponent({ logStore }),
                 {
-                    consumeQueue: LogTaskQueueRouterRouting,
-                    publishQueue: LogEventQueueRouterRouting,
-                    queueRouter,
+                    consumeQueue: LogTaskMessageBusRouting,
+                    publishQueue: LogEventMessageBusRouting,
+                    messageBus,
                     logger,
                 },
             ),

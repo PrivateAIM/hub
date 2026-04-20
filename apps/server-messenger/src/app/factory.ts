@@ -7,8 +7,10 @@
 
 import type { Application } from 'orkos';
 import {
+    AmqpMessageBusDriver,
     LoggerConsoleTransport,
-    QueueRouterInjectionKey,
+    MemoryMessageBusDriver,
+    MessageBusInjectionKey,
 } from '@privateaim/server-kit';
 import {
     LogComponentCaller,
@@ -26,7 +28,15 @@ export function createApplication() {
 
     const builder = new ServerMessengerApplicationBuilder()
         .withConfig()
-        .withAmqp({ connectionString: env.rabbitMqConnectionString })
+        .withMessageBus({
+            driverFactory: () => {
+                if (env.rabbitMqConnectionString) {
+                    return new AmqpMessageBusDriver({ connectionString: env.rabbitMqConnectionString });
+                }
+
+                return new MemoryMessageBusDriver();
+            },
+        })
         .withRedis({ connectionString: env.redisConnectionString })
         .withLogger({
             transports: [
@@ -38,9 +48,9 @@ export function createApplication() {
                     },
                     save: async (data) => {
                         if (!logCaller) {
-                            const result = app?.container.tryResolve(QueueRouterInjectionKey);
+                            const result = app?.container.tryResolve(MessageBusInjectionKey);
                             if (!result?.success) return;
-                            logCaller = new LogComponentCaller({ queueRouter: result.data });
+                            logCaller = new LogComponentCaller({ messageBus: result.data });
                         }
                         await logCaller.callWrite(data);
                     },

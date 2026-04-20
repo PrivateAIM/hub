@@ -6,7 +6,6 @@
  */
 
 export * from './aggregator';
-export * from './amqp';
 export * from './app';
 export * from './authup';
 export * from './cache';
@@ -14,7 +13,7 @@ export * from './component';
 export * from './constants';
 export * from './entity-event';
 export * from './logger';
-export * from './queue-router';
+export * from './message-bus';
 export * from './redis';
 export * from './task-manager';
 export * from './type';

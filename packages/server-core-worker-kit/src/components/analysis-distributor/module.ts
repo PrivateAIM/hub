@@ -9,7 +9,7 @@ import type { ComponentMetadata, QueueDispatchComponentCallerOptions } from '@pr
 import {
     QueueDispatchComponentCaller,
 } from '@privateaim/server-kit';
-import { AnalysisDistributorCommand, AnalysisDistributorTaskQueueRouterRouting } from './constants';
+import { AnalysisDistributorCommand, AnalysisDistributorTaskMessageBusRouting } from './constants';
 import type {
     AnalysisDistributorCheckPayload,
     AnalysisDistributorEventMap,
@@ -18,7 +18,7 @@ import type {
 
 export class AnalysisDistributorComponentCaller extends QueueDispatchComponentCaller<AnalysisDistributorEventMap> {
     constructor(options: Partial<QueueDispatchComponentCallerOptions> = {}) {
-        super({ ...options, queue: AnalysisDistributorTaskQueueRouterRouting });
+        super({ ...options, queue: AnalysisDistributorTaskMessageBusRouting });
     }
 
     async callExecute(payload: AnalysisDistributorExecutePayload, metadata: ComponentMetadata = {}) {

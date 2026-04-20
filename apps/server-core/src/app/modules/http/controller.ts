@@ -10,7 +10,7 @@ import {
     MasterImageBuilderComponentCaller,
     MasterImageSynchronizerComponentCaller,
 } from '@privateaim/server-core-worker-kit';
-import { QueueRouterInjectionKey } from '@privateaim/server-kit';
+import { MessageBusInjectionKey } from '@privateaim/server-kit';
 import {
     AnalysisBucketFileService,
     AnalysisBucketService,
@@ -71,12 +71,12 @@ export function createControllers(container: IContainer): Record<string, any>[] 
         registryCaller: callerResult.success ? callerResult.data : undefined,
     });
     const config = container.resolve(ConfigInjectionKey);
-    const queueRouterResult = container.tryResolve(QueueRouterInjectionKey);
-    const queueRouter = queueRouterResult.success ? queueRouterResult.data : undefined;
+    const messageBusResult = container.tryResolve(MessageBusInjectionKey);
+    const messageBus = messageBusResult.success ? messageBusResult.data : undefined;
     const masterImageService = new MasterImageService({
         repository: masterImageRepository,
-        synchronizerCaller: new MasterImageSynchronizerComponentCaller({ queueRouter }),
-        builderCaller: new MasterImageBuilderComponentCaller({ queueRouter }),
+        synchronizerCaller: new MasterImageSynchronizerComponentCaller({ messageBus }),
+        builderCaller: new MasterImageBuilderComponentCaller({ messageBus }),
         masterImagesConfig: {
             owner: config.masterImagesOwner,
             repository: config.masterImagesRepository,

@@ -5,28 +5,28 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { 
-    describe, 
-    expect, 
-    it, 
-    vi, 
+import {
+    describe,
+    expect,
+    it,
+    vi,
 } from 'vitest';
 import { QueueDispatchComponentCaller } from '../../src';
-import type { QueueRouter, QueueRouterRouting } from '../../src';
+import type { MessageBus, MessageBusRouting } from '../../src';
 
-const testQueue: QueueRouterRouting = {
+const testQueue: MessageBusRouting = {
     type: 'work',
     key: 'test-queue',
 };
 
 describe('src/component/caller/queue-dispatch', () => {
-    it('should publish via queueRouter when provided', async () => {
+    it('should publish via messageBus when provided', async () => {
         const publishMock = vi.fn().mockResolvedValue(true);
-        const queueRouter = { publish: publishMock } as unknown as QueueRouter;
+        const messageBus = { publish: publishMock } as unknown as MessageBus;
 
         const caller = new QueueDispatchComponentCaller({
             queue: testQueue,
-            queueRouter,
+            messageBus,
         });
 
         await caller.call('testCommand', { id: '123' }, {});
@@ -38,14 +38,14 @@ describe('src/component/caller/queue-dispatch', () => {
         expect(payload.metadata.routing).toEqual(testQueue);
     });
 
-    it('should silently skip when queueRouter is not provided', async () => {
+    it('should silently skip when messageBus is not provided', async () => {
         const caller = new QueueDispatchComponentCaller({ queue: testQueue });
 
         // should not throw
         await caller.call('testCommand', { id: '123' }, {});
     });
 
-    it('should log warning when queueRouter is missing but logger is provided', async () => {
+    it('should log warning when messageBus is missing but logger is provided', async () => {
         const warnMock = vi.fn();
         const logger = { warn: warnMock } as any;
 
@@ -62,16 +62,16 @@ describe('src/component/caller/queue-dispatch', () => {
 
     it('should pass options through from subclass constructor', async () => {
         const publishMock = vi.fn().mockResolvedValue(true);
-        const queueRouter = { publish: publishMock } as unknown as QueueRouter;
+        const messageBus = { publish: publishMock } as unknown as MessageBus;
 
         // Simulate subclass pattern: spread options, override queue
-        const subclassQueue: QueueRouterRouting = {
+        const subclassQueue: MessageBusRouting = {
             type: 'work',
             key: 'subclass-queue',
         };
 
         const caller = new QueueDispatchComponentCaller({
-            ...{ queueRouter },
+            ...{ messageBus },
             queue: subclassQueue,
         });
 

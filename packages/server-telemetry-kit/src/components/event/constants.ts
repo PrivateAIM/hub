@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { QueueRouterRoutingType } from '@privateaim/server-kit';
+import { MessageBusRoutingType } from '@privateaim/server-kit';
 
 export enum EventEvent {
     CREATION_STARTED = 'creationStarted',
@@ -18,12 +18,12 @@ export enum EventCommand {
     CLEAN = 'clean',
 }
 
-export const EventEventQueueRouterRouting = {
-    type: QueueRouterRoutingType.PUB_SUB,
+export const EventEventMessageBusRouting = {
+    type: MessageBusRoutingType.PUB_SUB,
     key: 'telemetryEventEvents',
 };
 
-export const EventTaskQueueRouterRouting = {
-    type: QueueRouterRoutingType.WORK,
+export const EventTaskMessageBusRouting = {
+    type: MessageBusRoutingType.WORK,
     key: 'telemetryEventTasks',
 };

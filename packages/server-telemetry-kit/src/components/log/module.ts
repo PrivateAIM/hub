@@ -9,14 +9,14 @@ import type { ComponentMetadata, QueueDispatchComponentCallerOptions } from '@pr
 import {
     QueueDispatchComponentCaller,
 } from '@privateaim/server-kit';
-import { LogCommand, LogTaskQueueRouterRouting } from './constants';
+import { LogCommand, LogTaskMessageBusRouting } from './constants';
 import type { LogWriteCommandPayload } from './handlers';
 
 export class LogComponentCaller extends QueueDispatchComponentCaller {
     constructor(options: Partial<QueueDispatchComponentCallerOptions> = {}) {
         super({
             ...options,
-            queue: LogTaskQueueRouterRouting,
+            queue: LogTaskMessageBusRouting,
             logging: false,
         });
     }

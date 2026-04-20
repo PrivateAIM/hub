@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { QueueRouterRoutingType } from '@privateaim/server-kit';
+import { MessageBusRoutingType } from '@privateaim/server-kit';
 
 export enum MasterImageSynchronizerEvent {
     EXECUTION_FAILED = 'executionFailed',
@@ -18,12 +18,12 @@ export enum MasterImageSynchronizerCommand {
     EXECUTE = 'execute',
 }
 
-export const MasterImageSynchronizerEventQueueRouterRouting = {
-    type: QueueRouterRoutingType.PUB_SUB,
+export const MasterImageSynchronizerEventMessageBusRouting = {
+    type: MessageBusRoutingType.PUB_SUB,
     key: 'masterImageSynchronizerEvents',
 };
 
-export const MasterImageSynchronizerTaskQueueRouterRouting = {
-    type: QueueRouterRoutingType.WORK,
+export const MasterImageSynchronizerTaskMessageBusRouting = {
+    type: MessageBusRoutingType.WORK,
     key: 'masterImageSynchronizerTasks',
 };

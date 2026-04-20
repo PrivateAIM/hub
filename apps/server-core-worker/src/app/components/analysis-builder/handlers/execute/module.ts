@@ -14,7 +14,7 @@ import type { AnalysisBuilderEventMap, AnalysisBuilderExecutePayload } from '@pr
 import {
     AnalysisBuilderCommand,
     AnalysisBuilderEvent,
-    AnalysisBuilderEventQueueRouterRouting,
+    AnalysisBuilderEventMessageBusRouting,
 } from '@privateaim/server-core-worker-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import type { ComponentHandler, ComponentHandlerContext, Logger } from '@privateaim/server-kit';
@@ -77,7 +77,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
                     ...value,
                     error: e,
                 },
-                { routing: AnalysisBuilderEventQueueRouterRouting },
+                { routing: AnalysisBuilderEventMessageBusRouting },
             );
 
             await cleanupDockerImage(this.docker, value.id);

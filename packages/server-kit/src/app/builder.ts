@@ -7,8 +7,6 @@
 
 import type { IModule } from 'orkos';
 import { Application } from 'orkos';
-import type { AmqpModuleOptions } from '../amqp/di-module';
-import { AmqpModule } from '../amqp/di-module';
 import type { AuthupHookModuleOptions } from '../authup/client-hook/di-module';
 import { AuthupHookModule } from '../authup/client-hook/di-module';
 import type { AuthupClientModuleOptions } from '../authup/client/di-module';
@@ -18,9 +16,10 @@ import type { EntityEventModuleOptions } from '../entity-event/di-module';
 import { EntityEventModule } from '../entity-event/di-module';
 import type { LoggerModuleOptions } from '../logger/di-module';
 import { LoggerModule } from '../logger/di-module';
+import type { MessageBusModuleOptions } from '../message-bus/di-module';
+import { MessageBusModule } from '../message-bus/di-module';
 import type { RedisModuleOptions } from '../redis/di-module';
 import { RedisModule } from '../redis/di-module';
-import { QueueRouterModule } from '../queue-router/di-module';
 
 export class BaseApplicationBuilder {
     protected modules: IModule[] = [];
@@ -40,10 +39,9 @@ export class BaseApplicationBuilder {
         return this;
     }
 
-    withAmqp(options?: AmqpModuleOptions | false): this {
-        if (options !== false) {
-            this.modules.push(new AmqpModule(options));
-            this.modules.push(new QueueRouterModule());
+    withMessageBus(options?: MessageBusModuleOptions | false): this {
+        if (options !== false && options) {
+            this.modules.push(new MessageBusModule(options));
         }
         return this;
     }
@@ -71,11 +69,6 @@ export class BaseApplicationBuilder {
         if (options !== false) {
             this.modules.push(new EntityEventModule(options));
         }
-        return this;
-    }
-
-    withQueueRouter(): this {
-        this.modules.push(new QueueRouterModule());
         return this;
     }
 

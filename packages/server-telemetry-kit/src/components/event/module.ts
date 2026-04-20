@@ -10,13 +10,13 @@ import {
     QueueDispatchComponentCaller,
 } from '@privateaim/server-kit';
 import type { EventCreateCommandPayload } from './handlers';
-import { EventCommand, EventTaskQueueRouterRouting } from './constants';
+import { EventCommand, EventTaskMessageBusRouting } from './constants';
 
 export class EventComponentCaller extends QueueDispatchComponentCaller {
     constructor(options: Partial<QueueDispatchComponentCallerOptions> = {}) {
         super({
             ...options,
-            queue: EventTaskQueueRouterRouting,
+            queue: EventTaskMessageBusRouting,
             logging: false,
         });
     }

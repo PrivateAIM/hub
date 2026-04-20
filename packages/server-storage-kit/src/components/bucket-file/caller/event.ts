@@ -11,13 +11,13 @@ import {
 } from '@privateaim/server-kit';
 import {
     BucketFileCommand,
-    BucketFileEventQueueRouterRouting,
+    BucketFileEventMessageBusRouting,
 } from '../constants';
 import type { BucketFileCreateCommandPayload, BucketFileDeleteCommandPayload } from '../handlers';
 
 export class BucketFileEventCaller extends QueueDispatchComponentCaller {
     constructor(options: Partial<QueueDispatchComponentCallerOptions> = {}) {
-        super({ ...options, queue: BucketFileEventQueueRouterRouting });
+        super({ ...options, queue: BucketFileEventMessageBusRouting });
     }
 
     async callCreate(payload: BucketFileCreateCommandPayload, metadata: ComponentMetadata = {}) {

@@ -9,12 +9,12 @@ import type { ComponentMetadata, QueueDispatchComponentCallerOptions } from '@pr
 import {
     QueueDispatchComponentCaller,
 } from '@privateaim/server-kit';
-import { AnalysisBuilderCommand, AnalysisBuilderTaskQueueRouterRouting } from './constants';
+import { AnalysisBuilderCommand, AnalysisBuilderTaskMessageBusRouting } from './constants';
 import type { AnalysisBuilderBasePayload, AnalysisBuilderEventMap, AnalysisBuilderExecutePayload } from './types';
 
 export class AnalysisBuilderComponentCaller extends QueueDispatchComponentCaller<AnalysisBuilderEventMap> {
     constructor(options: Partial<QueueDispatchComponentCallerOptions> = {}) {
-        super({ ...options, queue: AnalysisBuilderTaskQueueRouterRouting });
+        super({ ...options, queue: AnalysisBuilderTaskMessageBusRouting });
     }
 
     async callExecute(payload: AnalysisBuilderExecutePayload, metadata: ComponentMetadata = {}) {

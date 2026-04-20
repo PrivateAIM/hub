@@ -11,13 +11,13 @@ import {
 } from '@privateaim/server-kit';
 import {
     BucketCommand,
-    BucketTaskQueueRouterRouting,
+    BucketTaskMessageBusRouting,
 } from './constants';
 import type { BucketCreateCommandPayload, BucketDeleteCommandPayload } from './handlers';
 
 export class BucketComponentCaller extends QueueDispatchComponentCaller {
     constructor(options: Partial<QueueDispatchComponentCallerOptions> = {}) {
-        super({ ...options, queue: BucketTaskQueueRouterRouting });
+        super({ ...options, queue: BucketTaskMessageBusRouting });
     }
 
     async callCreate(payload: BucketCreateCommandPayload, metadata: ComponentMetadata = {}) {

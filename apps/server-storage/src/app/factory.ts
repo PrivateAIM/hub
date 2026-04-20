@@ -7,11 +7,13 @@
 
 import type { Application } from 'orkos';
 import {
+    AmqpMessageBusDriver,
     EntityEventRedisHandler,
     EntityEventSocketHandler,
     LoggerConsoleTransport,
     LoggerInjectionKey,
-    QueueRouterInjectionKey,
+    MemoryMessageBusDriver,
+    MessageBusInjectionKey,
     RedisClientInjectionKey,
     createAuthupClientTokenCreator,
 } from '@privateaim/server-kit';
@@ -37,7 +39,15 @@ export function createApplication() {
 
     const builder = new ServerStorageApplicationBuilder()
         .withConfig()
-        .withAmqp({ connectionString: env.rabbitMqConnectionString })
+        .withMessageBus({
+            driverFactory: () => {
+                if (env.rabbitMqConnectionString) {
+                    return new AmqpMessageBusDriver({ connectionString: env.rabbitMqConnectionString });
+                }
+
+                return new MemoryMessageBusDriver();
+            },
+        })
         .withRedis({ connectionString: env.redisConnectionString });
 
     if (env.authupURL) {
@@ -63,9 +73,9 @@ export function createApplication() {
                 handlers.push(new EntityEventSocketHandler(redisResult.data));
             }
 
-            const qrResult = container.tryResolve(QueueRouterInjectionKey);
-            const queueRouter = qrResult.success ? qrResult.data : undefined;
-            const eventCaller = queueRouter ? new EventComponentCaller({ queueRouter }) : undefined;
+            const mbResult = container.tryResolve(MessageBusInjectionKey);
+            const messageBus = mbResult.success ? mbResult.data : undefined;
+            const eventCaller = messageBus ? new EventComponentCaller({ messageBus }) : undefined;
 
             const loggerResult = container.tryResolve(LoggerInjectionKey);
             handlers.push(new EntityEventHandler({
@@ -87,9 +97,9 @@ export function createApplication() {
                 },
                 save: async (data) => {
                     if (!logCaller) {
-                        const result = app?.container.tryResolve(QueueRouterInjectionKey);
+                        const result = app?.container.tryResolve(MessageBusInjectionKey);
                         if (!result?.success) return;
-                        logCaller = new LogComponentCaller({ queueRouter: result.data });
+                        logCaller = new LogComponentCaller({ messageBus: result.data });
                     }
                     await logCaller.callWrite(data);
                 },

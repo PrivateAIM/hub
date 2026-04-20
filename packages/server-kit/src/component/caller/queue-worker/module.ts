@@ -6,8 +6,8 @@
  */
 
 import type { Logger } from '../../../logger';
-import type { QueueRouter } from '../../../queue-router';
-import { buildQueueRouterPublishPayload } from '../../../queue-router';
+import type { MessageBus } from '../../../message-bus';
+import { buildMessageBusPublishPayload } from '../../../message-bus';
 import type { Component, ComponentEventMap, ComponentHandleOptions } from '../../type';
 import type { ComponentCaller, ComponentCallerPayload } from '../types';
 import type { QueueSelfComponentCallerOptions } from './types';
@@ -19,28 +19,28 @@ export class QueueWorkerComponentCaller<
 
     protected options: QueueSelfComponentCallerOptions;
 
-    protected queueRouter?: QueueRouter;
+    protected messageBus?: MessageBus;
 
     protected logger?: Logger;
 
     constructor(component: Component<EventMap>, options: QueueSelfComponentCallerOptions) {
         this.component = component;
         this.options = options;
-        this.queueRouter = options.queueRouter;
+        this.messageBus = options.messageBus;
         this.logger = options.logger;
     }
 
     async start() {
         await this.component.start();
 
-        if (!this.queueRouter) {
+        if (!this.messageBus) {
             if (this.logger) {
                 this.logger.warn(`Can not consume queue for component ${this.component.constructor.name}`);
             }
             return;
         }
 
-        await this.queueRouter.consumeAny(
+        await this.messageBus.consumeAny(
             this.options.consumeQueue,
             async (payload) => {
                 await this.call(payload.type, payload.data, payload.metadata);
@@ -63,11 +63,11 @@ export class QueueWorkerComponentCaller<
             throw new Error(`Component ${this.component.constructor.name} can not be called.`);
         }
 
-        if (!this.queueRouter) {
-            throw new Error(`QueueRouter is not available for component ${this.component.constructor.name}.`);
+        if (!this.messageBus) {
+            throw new Error(`MessageBus is not available for component ${this.component.constructor.name}.`);
         }
 
-        const { queueRouter } = this;
+        const { messageBus } = this;
         const options : ComponentHandleOptions<EventMap> = {
             handle: async (
                 childValue,
@@ -78,7 +78,7 @@ export class QueueWorkerComponentCaller<
                      *
                      * publish unhandled requests to publish queue.
                      */
-                    await queueRouter.publish(buildQueueRouterPublishPayload({
+                    await messageBus.publish(buildMessageBusPublishPayload({
                         type: childContext.key,
                         data: childValue,
                         metadata: {

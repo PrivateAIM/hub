@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { QueueRouterRoutingType } from '@privateaim/server-kit';
+import { MessageBusRoutingType } from '@privateaim/server-kit';
 
 export enum BucketFileCommand {
     CREATE = 'create',
@@ -22,12 +22,12 @@ export enum BucketFileEvent {
     DELETION_FINISHED = 'deletionFinished',
 }
 
-export const BucketFileEventQueueRouterRouting = {
-    type: QueueRouterRoutingType.PUB_SUB,
+export const BucketFileEventMessageBusRouting = {
+    type: MessageBusRoutingType.PUB_SUB,
     key: 'storageBucketFileEvents',
 };
 
-export const BucketFileTaskQueueRouterRouting = {
-    type: QueueRouterRoutingType.WORK,
+export const BucketFileTaskMessageBusRouting = {
+    type: MessageBusRoutingType.WORK,
     key: 'storageBucketFileTasks',
 };
