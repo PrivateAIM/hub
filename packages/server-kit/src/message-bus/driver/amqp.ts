@@ -49,7 +49,18 @@ export class AmqpMessageBusDriver implements IMessageBusDriver {
             requeueOnFailure: routing.type === MessageBusRoutingType.WORK,
         }, {
             $any: async (input) => {
-                const payload = JSON.parse(input.content.toString('utf-8'));
+                let payload: unknown;
+
+                try {
+                    payload = JSON.parse(input.content.toString('utf-8'));
+                } catch {
+                    if (this.logger) {
+                        this.logger.warn(`Could not parse message in ${routing.key}.`);
+                    }
+
+                    return;
+                }
+
                 if (!isMessageBusPayload(payload)) {
                     return;
                 }
