@@ -112,16 +112,16 @@ src/
 ### Dependency Rule
 
 **core/ → nothing** (only external domain packages like `@privateaim/core-kit`, `@privateaim/kit`, `@ebec/http`, `@authup/access`)
-**adapters/ → core/ and app/** (implements core ports, may use app singletons)
+**adapters/ → core/ and app/** (implements core ports, may use app DI modules)
 **app/ → core/ and adapters/** (wires everything together)
 
 ### Core Layer Conventions
 
 - **Entity services** (`core/entities/<name>/service.ts`): Own validation (`this.validator.run(data, { group: ValidatorGroup.CREATE })`), receive repos via constructor injection
 - **Port interfaces** (`core/entities/<name>/types.ts`): `IXRepository extends IEntityRepository<T>`, `IXService`
-- **Business services** (`core/services/`): Accept all dependencies via constructor (repositories, callers, task managers) — never use singletons
+- **Business services** (`core/services/`): Accept all dependencies via constructor (repositories, callers, task managers)
 - **Service port interfaces** (`core/services/types.ts`): `IAnalysisBuilderCaller`, `IBucketCaller`, `ITaskManager`, etc.
-- **No TypeORM, no routup** imports anywhere in `core/`. Use container DI via injection keys, never singa singletons.
+- **No TypeORM, no routup** imports anywhere in `core/`. Use container DI via injection keys.
 
 ### Controller Conventions
 

@@ -135,7 +135,6 @@ apps/server-core/src/
 │   │   ├── registry/              # RegistryManagerAdapter
 │   │   ├── swagger/               # SwaggerModule (API docs generation)
 │   │   └── telemetry-client/      # TelemetryClientModule
-│   ├── services/                  # Remaining singleton bridges (telemetry)
 │   ├── aggregators/               # AMQP event consumers
 │   └── components/                # AMQP task consumers (registry, analysis-metadata)
 ├── cli/                           # CLI entry point (citty)
@@ -200,7 +199,7 @@ apps/server-storage/src/
 │   │   ├── config/                # ConfigModule (env, paths)
 │   │   ├── database/              # DatabaseModule (DataSource, subscribers)
 │   │   ├── http/                  # HTTPModule (router, controllers, server)
-│   │   ├── minio/                 # MinioModule (S3 client, no singa bridge)
+│   │   ├── minio/                 # MinioModule (S3 client)
 │   │   ├── swagger/               # SwaggerModule (API docs generation)
 │   │   └── components/            # ComponentsModule (starts bucket consumers)
 │   ├── components/                # AMQP task consumers (bucket, bucket-file)

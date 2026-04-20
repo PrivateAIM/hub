@@ -104,12 +104,6 @@ DI modules, wiring, and infrastructure services.
 - `ServerCoreApplicationBuilder extends BaseApplicationBuilder`
 - Fluent API: `.withConfig().withDatabase().withHTTP()`
 
-**Services** (`app/services/`):
-- Infrastructure services, singletons, and wiring
-- `database-integrity/` — Data consistency housekeeping
-- `node-client/` — Authup client provisioning for nodes
-- `telemetry/` — Telemetry client singleton bridge
-
 **Aggregators** (`app/aggregators/`): AMQP event consumers
 **Components** (`app/components/`): AMQP task consumers
 
@@ -249,7 +243,7 @@ Manages log aggregation via VictoriaLogs and event tracking via TypeORM.
 - `EventController` / `LogController` — thin HTTP controllers receiving dependencies via constructor.
 
 **Service-specific modules:**
-- `VictoriaLogsModule` — registers VictoriaLogs client + `LogStore` in container (no singa bridge)
+- `VictoriaLogsModule` — registers VictoriaLogs client + `LogStore` in container
 - `ComponentsModule` — starts EventComponent + LogComponent via `QueueWorkerComponentCaller`
 
 **Special concern:** The telemetry service IS the log writer, so its own logger cannot use `useLogComponentCaller()` (circular). The `LogComponentWriteHandler` accepts an optional `LogStore` param with `MemoryLogStore` fallback.
@@ -264,14 +258,14 @@ File/object storage service backed by MinIO/S3.
 - `BucketController` / `BucketFileController` — thin HTTP controllers with upload/stream endpoints
 
 **Service-specific modules:**
-- `MinioModule` — creates MinIO client, registers in container (no singa bridge)
+- `MinioModule` — creates MinIO client, registers in container
 - `ComponentsModule` — resolves MinIO from container, starts BucketComponent via `QueueWorkerComponentCaller`
 
 ### server-core-worker
 
 Background worker executing Docker containers. No database entities — purely queue-driven.
 
-**Core layer:** Docker utilities, crypto helpers, GitHub/Harbor integrations. Uses module-level variables (`setCoreClient`/`useCoreClient`) instead of singa singletons.
+**Core layer:** Docker utilities, crypto helpers, GitHub/Harbor integrations. Uses module-level variables (`setCoreClient`/`useCoreClient`) for API client access.
 
 **Adapters:**
 - `adapters/http/server.ts` — minimal health-check HTTP server
