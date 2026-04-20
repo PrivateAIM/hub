@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.8.35](https://github.com/PrivateAIM/hub/compare/v0.8.34...v0.8.35) (2026-04-19)
+
+
+### Bug Fixes
+
+* minor base subscriber refactoring ([5d9a0e8](https://github.com/PrivateAIM/hub/commit/5d9a0e877d64cc44eaf85c1ef402c80eb23b96b8))
+* pass queueRouter to all callers subclasses and fix DatabaseModul… ([#1541](https://github.com/PrivateAIM/hub/issues/1541)) ([558f1da](https://github.com/PrivateAIM/hub/commit/558f1dafab2da1a82a5919ed47bf4c5620404971))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.8.34 to ^0.8.35
+    * @privateaim/server-kit bumped from ^0.8.34 to ^0.8.35
+
 ## [0.8.34](https://github.com/PrivateAIM/hub/compare/v0.8.33...v0.8.34) (2026-04-16)
 
 

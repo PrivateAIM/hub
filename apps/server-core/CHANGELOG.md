@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.8.35](https://github.com/PrivateAIM/hub/compare/v0.8.34...v0.8.35) (2026-04-19)
+
+
+### Bug Fixes
+
+* pass queueRouter to all callers subclasses and fix DatabaseModul… ([#1541](https://github.com/PrivateAIM/hub/issues/1541)) ([558f1da](https://github.com/PrivateAIM/hub/commit/558f1dafab2da1a82a5919ed47bf4c5620404971))
+* **server-core:** register TypeORM subscribers after DataSource.initialize() ([971abfe](https://github.com/PrivateAIM/hub/commit/971abfe1ac4dc3e963d76656ea4623bb65770a01))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.8.34 to ^0.8.35
+    * @privateaim/core-realtime-kit bumped from ^0.7.35 to ^0.7.36
+    * @privateaim/kit bumped from ^0.8.34 to ^0.8.35
+    * @privateaim/server-core-worker-kit bumped from ^0.7.35 to ^0.7.36
+    * @privateaim/server-db-kit bumped from ^0.8.34 to ^0.8.35
+    * @privateaim/server-http-kit bumped from ^0.8.34 to ^0.8.35
+    * @privateaim/server-kit bumped from ^0.8.34 to ^0.8.35
+    * @privateaim/server-realtime-kit bumped from ^0.8.34 to ^0.8.35
+    * @privateaim/server-telemetry bumped from ^0.8.34 to ^0.8.35
+    * @privateaim/server-telemetry-kit bumped from ^0.8.34 to ^0.8.35
+    * @privateaim/storage-kit bumped from ^0.8.34 to ^0.8.35
+    * @privateaim/telemetry-kit bumped from ^0.8.34 to ^0.8.35
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.8.34 to ^0.8.35
+
 ## [0.8.34](https://github.com/PrivateAIM/hub/compare/v0.8.33...v0.8.34) (2026-04-16)
 
 

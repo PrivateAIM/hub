@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.8.35](https://github.com/PrivateAIM/hub/compare/v0.8.34...v0.8.35) (2026-04-19)
+
+
+### Bug Fixes
+
+* pass queueRouter to all callers subclasses and fix DatabaseModul… ([#1541](https://github.com/PrivateAIM/hub/issues/1541)) ([558f1da](https://github.com/PrivateAIM/hub/commit/558f1dafab2da1a82a5919ed47bf4c5620404971))
+* register root-controller in server-storage & server-telemetry ([7d10825](https://github.com/PrivateAIM/hub/commit/7d108258db727c0f1303bb9cadeea92f86625589))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.8.34 to ^0.8.35
+    * @privateaim/server-db-kit bumped from ^0.8.34 to ^0.8.35
+    * @privateaim/server-http-kit bumped from ^0.8.34 to ^0.8.35
+    * @privateaim/server-kit bumped from ^0.8.34 to ^0.8.35
+    * @privateaim/server-telemetry-kit bumped from ^0.8.34 to ^0.8.35
+    * @privateaim/storage-kit bumped from ^0.8.34 to ^0.8.35
+    * @privateaim/telemetry-kit bumped from ^0.8.34 to ^0.8.35
+
 ## [0.8.34](https://github.com/PrivateAIM/hub/compare/v0.8.33...v0.8.34) (2026-04-16)
 
 
