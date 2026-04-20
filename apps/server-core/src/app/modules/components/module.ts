@@ -11,8 +11,8 @@ import {
     AuthupClientInjectionKey,
     CacheInjectionKey,
     LoggerInjectionKey,
-    QueueRouterInjectionKey,
-    QueueWorkerComponentCaller,
+    MessageBusInjectionKey,
+    MessageBusWorkerComponentCaller,
     TaskManager,
 } from '@privateaim/server-kit';
 import type { TaskMap } from '../../../core/domains/index.ts';
@@ -21,7 +21,7 @@ import { AnalysisMetadataComponentCaller } from '../../components/analysis-metad
 import { AnalysisMetadataTaskQueue } from '../../components/analysis-metadata/constants.ts';
 import { RegistryComponent } from '../../components/registry/module.ts';
 import { RegistryComponentCaller } from '../../components/registry/caller/module.ts';
-import { RegistryTaskQueueRouterRouting } from '../../components/registry/constants.ts';
+import { RegistryTaskMessageBusRouting } from '../../components/registry/constants.ts';
 import { DatabaseInjectionKey } from '../database/constants.ts';
 import { ComponentsInjectionKey } from './constants.ts';
 
@@ -44,12 +44,12 @@ export class ComponentsModule implements IModule {
         const analysisMetadataComponent = new AnalysisMetadataComponent({ dataSource });
 
         const logger = container.resolve(LoggerInjectionKey);
-        const queueRouterResult = container.tryResolve(QueueRouterInjectionKey);
-        const queueRouter = queueRouterResult.success ? queueRouterResult.data : undefined;
+        const messageBusResult = container.tryResolve(MessageBusInjectionKey);
+        const messageBus = messageBusResult.success ? messageBusResult.data : undefined;
 
         // Create and register component callers
-        const registryComponentCaller = new RegistryComponentCaller(registryComponent, { queueRouter });
-        const analysisMetadataComponentCaller = new AnalysisMetadataComponentCaller(analysisMetadataComponent, { queueRouter });
+        const registryComponentCaller = new RegistryComponentCaller(registryComponent, { messageBus });
+        const analysisMetadataComponentCaller = new AnalysisMetadataComponentCaller(analysisMetadataComponent, { messageBus });
         container.register(ComponentsInjectionKey.RegistryComponentCaller, { useValue: registryComponentCaller });
         container.register(ComponentsInjectionKey.AnalysisMetadataComponentCaller, { useValue: analysisMetadataComponentCaller });
 
@@ -58,20 +58,20 @@ export class ComponentsModule implements IModule {
 
         // Start task consumers
         const components = [
-            new QueueWorkerComponentCaller(
+            new MessageBusWorkerComponentCaller(
                 registryComponent,
                 {
-                    consumeQueue: RegistryTaskQueueRouterRouting, 
-                    queueRouter, 
-                    logger, 
+                    consumeRouting: RegistryTaskMessageBusRouting,
+                    messageBus,
+                    logger,
                 },
             ),
-            new QueueWorkerComponentCaller(
+            new MessageBusWorkerComponentCaller(
                 analysisMetadataComponent,
                 {
-                    consumeQueue: AnalysisMetadataTaskQueue, 
-                    queueRouter, 
-                    logger, 
+                    consumeRouting: AnalysisMetadataTaskQueue,
+                    messageBus,
+                    logger,
                 },
             ),
         ];

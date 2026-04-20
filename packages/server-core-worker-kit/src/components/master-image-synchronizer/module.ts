@@ -5,19 +5,19 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentMetadata, QueueDispatchComponentCallerOptions } from '@privateaim/server-kit';
+import type { ComponentMetadata, MessageBusDispatchComponentCallerOptions } from '@privateaim/server-kit';
 import {
-    QueueDispatchComponentCaller,
+    MessageBusDispatchComponentCaller,
 } from '@privateaim/server-kit';
 import {
     MasterImageSynchronizerCommand,
-    MasterImageSynchronizerTaskQueueRouterRouting,
+    MasterImageSynchronizerTaskMessageBusRouting,
 } from './constants';
 import type { MasterImageSynchronizerEventMap, MasterImageSynchronizerExecutePayload } from './types';
 
-export class MasterImageSynchronizerComponentCaller extends QueueDispatchComponentCaller<MasterImageSynchronizerEventMap> {
-    constructor(options: Partial<QueueDispatchComponentCallerOptions> = {}) {
-        super({ ...options, queue: MasterImageSynchronizerTaskQueueRouterRouting });
+export class MasterImageSynchronizerComponentCaller extends MessageBusDispatchComponentCaller<MasterImageSynchronizerEventMap> {
+    constructor(options: Partial<MessageBusDispatchComponentCallerOptions> = {}) {
+        super({ ...options, routing: MasterImageSynchronizerTaskMessageBusRouting });
     }
 
     async callExecute(payload: MasterImageSynchronizerExecutePayload, metadata: ComponentMetadata = {}) {

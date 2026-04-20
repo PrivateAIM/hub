@@ -52,8 +52,8 @@ Modernization and refactoring plans (execute in order):
 
 1. ~~Tooling Modernization~~ — Complete (#1511)
 2. ~~Monorepo Restructuring~~ — Complete (#1512)
-3. **[Dependency Injection](.agents/plans/003-dependency-injection.md)** — Replace `singa` singletons with DI container + module system
-4. **[Hexagonal: server-core](.agents/plans/004-hexagonal-server-core.md)** — Core/adapters/app separation for the main service
+3. ~~[Dependency Injection](.agents/plans/003-dependency-injection.md)~~ — Complete (singa fully removed, all services use eldin/orkos DI)
+4. ~~[Hexagonal: server-core](.agents/plans/004-hexagonal-server-core.md)~~ — Complete (#1514)
 5. ~~[Hexagonal: remaining services](.agents/plans/005-hexagonal-remaining-services.md)~~ — Complete (#1528)
-6. **[Service-Level Tests](.agents/plans/006-service-level-tests.md)** — Shared test package + core business logic unit tests
+6. **[Service-Level Tests](.agents/plans/006-service-level-tests.md)** — Comprehensive business logic tests (command checkers, core services, entity services, DI wiring)
 7. **[Message Bus](.agents/plans/007-message-bus.md)** — Rename QueueRouter → MessageBus, driver abstraction (AMQP/Memory)

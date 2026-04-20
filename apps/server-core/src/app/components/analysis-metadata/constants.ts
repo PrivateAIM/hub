@@ -5,11 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { QueueRouterRoutingType } from '@privateaim/server-kit';
+import { MessageBusRoutingType } from '@privateaim/server-kit';
 
 export { AnalysisMetadataCommand, AnalysisMetadataEvent } from '../../../core/domains/index.ts';
 
 export const AnalysisMetadataTaskQueue = {
-    type: QueueRouterRoutingType.WORK,
+    type: MessageBusRoutingType.WORK,
     key: 'analysisMetadataTasks',
 };

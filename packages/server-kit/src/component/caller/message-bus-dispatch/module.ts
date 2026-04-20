@@ -6,24 +6,24 @@
  */
 
 import type { Logger } from '../../../logger';
-import type { QueueRouter } from '../../../queue-router';
-import { buildQueueRouterPublishPayload } from '../../../queue-router';
+import type { MessageBus } from '../../../message-bus';
+import { buildMessageBusPublishPayload } from '../../../message-bus';
 import type { ComponentEventMap } from '../../type';
 import type { ComponentCaller, ComponentCallerPayload } from '../types';
-import type { QueueDispatchComponentCallerOptions } from './types';
+import type { MessageBusDispatchComponentCallerOptions } from './types';
 
-export class QueueDispatchComponentCaller<
+export class MessageBusDispatchComponentCaller<
     EventMap extends ComponentEventMap = ComponentEventMap,
 > implements ComponentCaller<EventMap> {
-    protected options : QueueDispatchComponentCallerOptions;
+    protected options : MessageBusDispatchComponentCallerOptions;
 
-    protected queueRouter?: QueueRouter;
+    protected messageBus?: MessageBus;
 
     protected logger?: Logger;
 
-    constructor(options: QueueDispatchComponentCallerOptions) {
+    constructor(options: MessageBusDispatchComponentCallerOptions) {
         this.options = options;
-        this.queueRouter = options.queueRouter;
+        this.messageBus = options.messageBus;
         this.logger = options.logger;
     }
 
@@ -33,20 +33,20 @@ export class QueueDispatchComponentCaller<
     ): Promise<void> {
         const [data, metadata] = payload;
 
-        if (!this.queueRouter) {
+        if (!this.messageBus) {
             if (this.logger) {
                 this.logger.warn(`Can not publish ${type} event.`);
             }
             return;
         }
 
-        await this.queueRouter.publish(
-            buildQueueRouterPublishPayload({
+        await this.messageBus.publish(
+            buildMessageBusPublishPayload({
                 type,
                 data,
                 metadata: {
                     ...metadata,
-                    routing: this.options.queue,
+                    routing: this.options.routing,
                 },
             }),
             { logging: this.options.logging ?? true },

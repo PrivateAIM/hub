@@ -5,7 +5,7 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import { QueueRouterRoutingType } from '@privateaim/server-kit';
+import { MessageBusRoutingType } from '@privateaim/server-kit';
 
 export enum AnalysisDistributorEvent {
     EXECUTION_STARTED = 'executionStarted',
@@ -23,12 +23,12 @@ export enum AnalysisDistributorCommand {
     CHECK = 'check',
 }
 
-export const AnalysisDistributorEventQueueRouterRouting = {
-    type: QueueRouterRoutingType.PUB_SUB,
+export const AnalysisDistributorEventMessageBusRouting = {
+    type: MessageBusRoutingType.PUB_SUB,
     key: 'analysisDistributorEvents',
 };
 
-export const AnalysisDistributorTaskQueueRouterRouting = {
-    type: QueueRouterRoutingType.WORK,
+export const AnalysisDistributorTaskMessageBusRouting = {
+    type: MessageBusRoutingType.WORK,
     key: 'analysisDistributorCommands',
 };

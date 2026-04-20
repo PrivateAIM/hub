@@ -40,7 +40,6 @@
         "@privateaim/storage-kit": "^0.8.35",
         "@privateaim/telemetry-kit": "^0.8.35",
         "@validup/adapter-zod": "^0.2.3",
-        "amqp-extension": "^4.0.0",
         "docken": "^2.0.2",
         "dockerode": "^4.0.9",
         "dotenv": "^17.4.1",

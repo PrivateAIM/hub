@@ -5,18 +5,18 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentMetadata, QueueDispatchComponentCallerOptions } from '@privateaim/server-kit';
+import type { ComponentMetadata, MessageBusDispatchComponentCallerOptions } from '@privateaim/server-kit';
 import {
-    QueueDispatchComponentCaller,
+    MessageBusDispatchComponentCaller,
 } from '@privateaim/server-kit';
 import type { EventCreateCommandPayload } from './handlers';
-import { EventCommand, EventTaskQueueRouterRouting } from './constants';
+import { EventCommand, EventTaskMessageBusRouting } from './constants';
 
-export class EventComponentCaller extends QueueDispatchComponentCaller {
-    constructor(options: Partial<QueueDispatchComponentCallerOptions> = {}) {
+export class EventComponentCaller extends MessageBusDispatchComponentCaller {
+    constructor(options: Partial<MessageBusDispatchComponentCallerOptions> = {}) {
         super({
             ...options,
-            queue: EventTaskQueueRouterRouting,
+            routing: EventTaskMessageBusRouting,
             logging: false,
         });
     }

@@ -8,22 +8,22 @@
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
 import type { Component } from '@privateaim/server-kit';
-import { 
-    LoggerConsoleTransport, 
-    QueueRouterInjectionKey, 
-    QueueWorkerComponentCaller, 
-    createLogger, 
+import {
+    LoggerConsoleTransport,
+    MessageBusInjectionKey,
+    MessageBusWorkerComponentCaller,
+    createLogger,
 } from '@privateaim/server-kit';
 import {
-    AnalysisBuilderEventQueueRouterRouting,
-    AnalysisBuilderTaskQueueRouterRouting,
-    AnalysisDistributorEventQueueRouterRouting,
-    AnalysisDistributorTaskQueueRouterRouting,
+    AnalysisBuilderEventMessageBusRouting,
+    AnalysisBuilderTaskMessageBusRouting,
+    AnalysisDistributorEventMessageBusRouting,
+    AnalysisDistributorTaskMessageBusRouting,
     ComponentName,
-    MasterImageBuilderEventQueueRouterRouting,
-    MasterImageBuilderTaskQueueRouterRouting,
-    MasterImageSynchronizerEventQueueRouterRouting, 
-    MasterImageSynchronizerTaskQueueRouterRouting, 
+    MasterImageBuilderEventMessageBusRouting,
+    MasterImageBuilderTaskMessageBusRouting,
+    MasterImageSynchronizerEventMessageBusRouting,
+    MasterImageSynchronizerTaskMessageBusRouting,
 } from '@privateaim/server-core-worker-kit';
 import { DomainType } from '@privateaim/core-kit';
 import { LogComponentCaller, LoggerTransport } from '@privateaim/server-telemetry-kit';
@@ -48,10 +48,10 @@ export class ComponentsModule implements IModule {
         const storageClient = container.resolve(StorageClientInjectionKey);
         const docker = container.resolve(DockerInjectionKey);
 
-        // Resolve queueRouter (if available) for log transport
-        const queueRouterResult = container.tryResolve(QueueRouterInjectionKey);
-        const queueRouter = queueRouterResult.success ? queueRouterResult.data : undefined;
-        const logCaller = queueRouter ? new LogComponentCaller({ queueRouter }) : undefined;
+        // Resolve messageBus (if available) for log transport
+        const messageBusResult = container.tryResolve(MessageBusInjectionKey);
+        const messageBus = messageBusResult.success ? messageBusResult.data : undefined;
+        const logCaller = messageBus ? new LogComponentCaller({ messageBus }) : undefined;
 
         const analysisBuilderLogger = createLogger({
             options: { defaultMeta: { component: ComponentName.ANALYSIS_BUILDER } },
@@ -114,7 +114,7 @@ export class ComponentsModule implements IModule {
         });
 
         const components: Component<any>[] = [
-            new QueueWorkerComponentCaller(
+            new MessageBusWorkerComponentCaller(
                 new AnalysisBuilderComponent({
                     coreClient,
                     storageClient,
@@ -122,44 +122,44 @@ export class ComponentsModule implements IModule {
                     logger: analysisBuilderLogger,
                 }),
                 {
-                    publishQueue: AnalysisBuilderEventQueueRouterRouting,
-                    consumeQueue: AnalysisBuilderTaskQueueRouterRouting,
-                    queueRouter,
+                    publishRouting: AnalysisBuilderEventMessageBusRouting,
+                    consumeRouting: AnalysisBuilderTaskMessageBusRouting,
+                    messageBus,
                     logger: analysisBuilderLogger,
                 },
             ),
-            new QueueWorkerComponentCaller(
+            new MessageBusWorkerComponentCaller(
                 new AnalysisDistributorComponent({
                     coreClient,
                     docker,
                     logger: analysisDistributorLogger,
                 }),
                 {
-                    publishQueue: AnalysisDistributorEventQueueRouterRouting,
-                    consumeQueue: AnalysisDistributorTaskQueueRouterRouting,
-                    queueRouter,
+                    publishRouting: AnalysisDistributorEventMessageBusRouting,
+                    consumeRouting: AnalysisDistributorTaskMessageBusRouting,
+                    messageBus,
                     logger: analysisDistributorLogger,
                 },
             ),
-            new QueueWorkerComponentCaller(
+            new MessageBusWorkerComponentCaller(
                 new MasterImageBuilderComponent({
                     coreClient,
                     docker,
                     logger: masterImageBuilderLogger,
                 }),
                 {
-                    publishQueue: MasterImageBuilderEventQueueRouterRouting,
-                    consumeQueue: MasterImageBuilderTaskQueueRouterRouting,
-                    queueRouter,
+                    publishRouting: MasterImageBuilderEventMessageBusRouting,
+                    consumeRouting: MasterImageBuilderTaskMessageBusRouting,
+                    messageBus,
                     logger: masterImageBuilderLogger,
                 },
             ),
-            new QueueWorkerComponentCaller(
+            new MessageBusWorkerComponentCaller(
                 new MasterImageSynchronizerComponent({ logger: masterImageBuilderLogger }),
                 {
-                    publishQueue: MasterImageSynchronizerEventQueueRouterRouting,
-                    consumeQueue: MasterImageSynchronizerTaskQueueRouterRouting,
-                    queueRouter,
+                    publishRouting: MasterImageSynchronizerEventMessageBusRouting,
+                    consumeRouting: MasterImageSynchronizerTaskMessageBusRouting,
+                    messageBus,
                     logger: masterImageBuilderLogger,
                 },
             ),

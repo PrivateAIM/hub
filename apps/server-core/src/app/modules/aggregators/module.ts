@@ -9,20 +9,20 @@ import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
 import {
     LoggerInjectionKey,
-    QueueRouterInjectionKey,
-    QueueWorkerComponentCaller,
+    MessageBusInjectionKey,
+    MessageBusWorkerComponentCaller,
     RedisSubscribeClientInjectionKey,
 } from '@privateaim/server-kit';
 import { EventComponentCaller } from '@privateaim/server-telemetry-kit';
 import {
-    AnalysisBuilderEventQueueRouterRouting,
-    AnalysisDistributorEventQueueRouterRouting,
-    MasterImageBuilderEventQueueRouterRouting,
-    MasterImageSynchronizerEventQueueRouterRouting,
+    AnalysisBuilderEventMessageBusRouting,
+    AnalysisDistributorEventMessageBusRouting,
+    MasterImageBuilderEventMessageBusRouting,
+    MasterImageSynchronizerEventMessageBusRouting,
 } from '@privateaim/server-core-worker-kit';
 import {
-    BucketEventQueueRouterRouting,
-    BucketFileEventQueueRouterRouting,
+    BucketEventMessageBusRouting,
+    BucketFileEventMessageBusRouting,
 } from '@privateaim/server-storage-kit';
 import {
     AnalysisBuilderAggregator,
@@ -46,8 +46,8 @@ export class AggregatorsModule implements IModule {
         const taskManager = container.resolve(ComponentsInjectionKey.TaskManager);
         const registryComponentCaller = container.resolve(ComponentsInjectionKey.RegistryComponentCaller);
         const logger = container.resolve(LoggerInjectionKey);
-        const queueRouterResult = container.tryResolve(QueueRouterInjectionKey);
-        const queueRouter = queueRouterResult.success ? queueRouterResult.data : undefined;
+        const messageBusResult = container.tryResolve(MessageBusInjectionKey);
+        const messageBus = messageBusResult.success ? messageBusResult.data : undefined;
         const redisSubResult = container.tryResolve(RedisSubscribeClientInjectionKey);
 
         const aggregators = [
@@ -56,67 +56,67 @@ export class AggregatorsModule implements IModule {
                 redisSubscribeClient: redisSubResult.success ? redisSubResult.data : undefined,
                 logger,
             }),
-            new QueueWorkerComponentCaller(
+            new MessageBusWorkerComponentCaller(
                 new AnalysisBuilderAggregator({ dataSource }),
                 {
-                    consumeQueue: AnalysisBuilderEventQueueRouterRouting, 
-                    queueRouter, 
-                    logger, 
+                    consumeRouting: AnalysisBuilderEventMessageBusRouting,
+                    messageBus,
+                    logger,
                 },
             ),
-            new QueueWorkerComponentCaller(
+            new MessageBusWorkerComponentCaller(
                 new AnalysisDistributorAggregator({ dataSource }),
                 {
-                    consumeQueue: AnalysisDistributorEventQueueRouterRouting, 
-                    queueRouter, 
-                    logger, 
+                    consumeRouting: AnalysisDistributorEventMessageBusRouting,
+                    messageBus,
+                    logger,
                 },
             ),
-            new QueueWorkerComponentCaller(
+            new MessageBusWorkerComponentCaller(
                 new StorageBucketAggregator({
-                    dataSource, 
-                    taskManager, 
-                    logger, 
+                    dataSource,
+                    taskManager,
+                    logger,
                 }),
                 {
-                    consumeQueue: BucketEventQueueRouterRouting, 
-                    queueRouter, 
-                    logger, 
+                    consumeRouting: BucketEventMessageBusRouting,
+                    messageBus,
+                    logger,
                 },
             ),
-            new QueueWorkerComponentCaller(
+            new MessageBusWorkerComponentCaller(
                 new StorageBucketFileAggregator({
-                    dataSource, 
-                    taskManager, 
-                    logger, 
+                    dataSource,
+                    taskManager,
+                    logger,
                 }),
                 {
-                    consumeQueue: BucketFileEventQueueRouterRouting, 
-                    queueRouter, 
-                    logger, 
+                    consumeRouting: BucketFileEventMessageBusRouting,
+                    messageBus,
+                    logger,
                 },
             ),
-            new QueueWorkerComponentCaller(
+            new MessageBusWorkerComponentCaller(
                 new MasterImageBuilderAggregator({
                     dataSource,
-                    eventComponentCaller: queueRouter ? new EventComponentCaller({ queueRouter }) : undefined,
+                    eventComponentCaller: messageBus ? new EventComponentCaller({ messageBus }) : undefined,
                 }),
                 {
-                    consumeQueue: MasterImageBuilderEventQueueRouterRouting, 
-                    queueRouter, 
-                    logger, 
+                    consumeRouting: MasterImageBuilderEventMessageBusRouting,
+                    messageBus,
+                    logger,
                 },
             ),
-            new QueueWorkerComponentCaller(
+            new MessageBusWorkerComponentCaller(
                 new MasterImageSynchronizerAggregator({
                     dataSource,
                     logger,
-                    eventComponentCaller: queueRouter ? new EventComponentCaller({ queueRouter }) : undefined,
+                    eventComponentCaller: messageBus ? new EventComponentCaller({ messageBus }) : undefined,
                 }),
                 {
-                    consumeQueue: MasterImageSynchronizerEventQueueRouterRouting, 
-                    queueRouter, 
-                    logger, 
+                    consumeRouting: MasterImageSynchronizerEventMessageBusRouting,
+                    messageBus,
+                    logger,
                 },
             ),
         ];

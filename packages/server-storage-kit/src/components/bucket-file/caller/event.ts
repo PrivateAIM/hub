@@ -5,19 +5,19 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentMetadata, QueueDispatchComponentCallerOptions } from '@privateaim/server-kit';
+import type { ComponentMetadata, MessageBusDispatchComponentCallerOptions } from '@privateaim/server-kit';
 import {
-    QueueDispatchComponentCaller,
+    MessageBusDispatchComponentCaller,
 } from '@privateaim/server-kit';
 import {
     BucketFileCommand,
-    BucketFileEventQueueRouterRouting,
+    BucketFileEventMessageBusRouting,
 } from '../constants';
 import type { BucketFileCreateCommandPayload, BucketFileDeleteCommandPayload } from '../handlers';
 
-export class BucketFileEventCaller extends QueueDispatchComponentCaller {
-    constructor(options: Partial<QueueDispatchComponentCallerOptions> = {}) {
-        super({ ...options, queue: BucketFileEventQueueRouterRouting });
+export class BucketFileEventCaller extends MessageBusDispatchComponentCaller {
+    constructor(options: Partial<MessageBusDispatchComponentCallerOptions> = {}) {
+        super({ ...options, routing: BucketFileEventMessageBusRouting });
     }
 
     async callCreate(payload: BucketFileCreateCommandPayload, metadata: ComponentMetadata = {}) {

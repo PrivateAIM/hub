@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { QueueRouterRoutingType } from '@privateaim/server-kit';
+import { MessageBusRoutingType } from '@privateaim/server-kit';
 
 export enum LogEvent {
     STARTING = 'starting',
@@ -18,12 +18,12 @@ export enum LogCommand {
     WRITE = 'write',
 }
 
-export const LogEventQueueRouterRouting = {
-    type: QueueRouterRoutingType.PUB_SUB,
+export const LogEventMessageBusRouting = {
+    type: MessageBusRoutingType.PUB_SUB,
     key: 'telemetryLogEvents',
 };
 
-export const LogTaskQueueRouterRouting = {
-    type: QueueRouterRoutingType.WORK,
+export const LogTaskMessageBusRouting = {
+    type: MessageBusRoutingType.WORK,
     key: 'telemetryLogTasks',
 };

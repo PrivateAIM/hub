@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { QueueRouterRoutingType } from '@privateaim/server-kit';
+import { MessageBusRoutingType } from '@privateaim/server-kit';
 
 export enum MasterImageBuilderEvent {
     EXECUTION_FAILED = 'executionFailed',
@@ -18,12 +18,12 @@ export enum MasterImageBuilderCommand {
     EXECUTE = 'execute',
 }
 
-export const MasterImageBuilderEventQueueRouterRouting = {
-    type: QueueRouterRoutingType.PUB_SUB,
+export const MasterImageBuilderEventMessageBusRouting = {
+    type: MessageBusRoutingType.PUB_SUB,
     key: 'masterImageBuilderEvents',
 };
 
-export const MasterImageBuilderTaskQueueRouterRouting = {
-    type: QueueRouterRoutingType.WORK,
+export const MasterImageBuilderTaskMessageBusRouting = {
+    type: MessageBusRoutingType.WORK,
     key: 'masterImageBuilderTasks',
 };

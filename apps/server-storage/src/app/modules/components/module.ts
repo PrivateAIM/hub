@@ -8,8 +8,8 @@
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
 import type { Component } from '@privateaim/server-kit';
-import { LoggerInjectionKey, QueueRouterInjectionKey, QueueWorkerComponentCaller } from '@privateaim/server-kit';
-import { BucketEventQueueRouterRouting, BucketTaskQueueRouterRouting } from '@privateaim/server-storage-kit';
+import { LoggerInjectionKey, MessageBusInjectionKey, MessageBusWorkerComponentCaller } from '@privateaim/server-kit';
+import { BucketEventMessageBusRouting, BucketTaskMessageBusRouting } from '@privateaim/server-storage-kit';
 import { BucketComponent } from '../../components/bucket/index.ts';
 import { MinioClientInjectionKey } from '../minio/constants.ts';
 
@@ -23,14 +23,14 @@ export class ComponentsModule implements IModule {
 
         const loggerResult = container.tryResolve(LoggerInjectionKey);
         const logger = loggerResult.success ? loggerResult.data : undefined;
-        const queueRouterResult = container.tryResolve(QueueRouterInjectionKey);
-        const queueRouter = queueRouterResult.success ? queueRouterResult.data : undefined;
+        const messageBusResult = container.tryResolve(MessageBusInjectionKey);
+        const messageBus = messageBusResult.success ? messageBusResult.data : undefined;
 
         const components : Component<any>[] = [
-            new QueueWorkerComponentCaller(new BucketComponent({ minio, logger }), {
-                consumeQueue: BucketTaskQueueRouterRouting,
-                publishQueue: BucketEventQueueRouterRouting,
-                queueRouter,
+            new MessageBusWorkerComponentCaller(new BucketComponent({ minio, logger }), {
+                consumeRouting: BucketTaskMessageBusRouting,
+                publishRouting: BucketEventMessageBusRouting,
+                messageBus,
                 logger,
             }),
         ];

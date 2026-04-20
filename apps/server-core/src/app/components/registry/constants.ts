@@ -5,16 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { QueueRouterRoutingType } from '@privateaim/server-kit';
+import { MessageBusRoutingType } from '@privateaim/server-kit';
 
 export { RegistryCommand, RegistryHookEvent } from '../../../core/domains/index.ts';
 
-export const RegistryEventQueueRouterRouting = {
-    type: QueueRouterRoutingType.PUB_SUB,
+export const RegistryEventMessageBusRouting = {
+    type: MessageBusRoutingType.PUB_SUB,
     key: 'registryEvents',
 };
 
-export const RegistryTaskQueueRouterRouting = {
-    type: QueueRouterRoutingType.WORK,
+export const RegistryTaskMessageBusRouting = {
+    type: MessageBusRoutingType.WORK,
     key: 'registryCommands',
 };

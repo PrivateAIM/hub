@@ -5,23 +5,23 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import type { QueueRouter } from '@privateaim/server-kit';
+import type { MessageBus } from '@privateaim/server-kit';
 import {
     CompoundComponentCaller,
     DirectComponentCaller,
-    QueueDispatchComponentCaller,
+    MessageBusDispatchComponentCaller,
 } from '@privateaim/server-kit';
 import type { RegistryEventMap } from '../type.ts';
-import { RegistryTaskQueueRouterRouting } from '../constants.ts';
+import { RegistryTaskMessageBusRouting } from '../constants.ts';
 import type { RegistryComponent } from '../module.ts';
 
 export class RegistryComponentCaller extends CompoundComponentCaller<RegistryEventMap> {
-    constructor(component: RegistryComponent, ctx?: { queueRouter?: QueueRouter }) {
+    constructor(component: RegistryComponent, ctx?: { messageBus?: MessageBus }) {
         super([
             new DirectComponentCaller<RegistryEventMap>(component),
-            new QueueDispatchComponentCaller<RegistryEventMap>({
-                queue: RegistryTaskQueueRouterRouting,
-                queueRouter: ctx?.queueRouter,
+            new MessageBusDispatchComponentCaller<RegistryEventMap>({
+                routing: RegistryTaskMessageBusRouting,
+                messageBus: ctx?.messageBus,
             }),
         ]);
     }

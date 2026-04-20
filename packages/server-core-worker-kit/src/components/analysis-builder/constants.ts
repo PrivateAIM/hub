@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { QueueRouterRoutingType } from '@privateaim/server-kit';
+import { MessageBusRoutingType } from '@privateaim/server-kit';
 
 export enum AnalysisBuilderEvent {
     EXECUTION_FAILED = 'executionFailed',
@@ -29,12 +29,12 @@ export enum AnalysisBuilderErrorCode {
     UNKNOWN = 'unknown',
 }
 
-export const AnalysisBuilderEventQueueRouterRouting = {
-    type: QueueRouterRoutingType.PUB_SUB,
+export const AnalysisBuilderEventMessageBusRouting = {
+    type: MessageBusRoutingType.PUB_SUB,
     key: 'analysisBuilderEvents',
 };
 
-export const AnalysisBuilderTaskQueueRouterRouting = {
-    type: QueueRouterRoutingType.WORK,
+export const AnalysisBuilderTaskMessageBusRouting = {
+    type: MessageBusRoutingType.WORK,
     key: 'analysisBuilderCommands',
 };

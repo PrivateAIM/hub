@@ -6,13 +6,13 @@
  */
 
 import { TypedToken } from 'eldin';
-import type { QueueRouter } from './module';
+import type { MessageBus } from './module';
 
-export const QUEUE_ROUTER_MODULE_NAME = 'queueRouter';
+export const MESSAGE_BUS_MODULE_NAME = 'messageBus';
 
-export const QueueRouterInjectionKey = new TypedToken<QueueRouter>('QueueRouter');
+export const MessageBusInjectionKey = new TypedToken<MessageBus>('MessageBus');
 
-export enum QueueRouterRoutingType {
+export enum MessageBusRoutingType {
     WORK = 'work',
     PUB_SUB = 'pubSub',
 }
