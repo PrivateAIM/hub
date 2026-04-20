@@ -51,7 +51,7 @@ export class MasterImageSynchronizerService {
 
         const virtualPaths = input.map((entity) => entity.virtualPath);
         result.deleted = entities
-            .filter((image) => !virtualPaths.includes((image as any).virtual_path));
+            .filter((image) => !virtualPaths.includes(image.virtual_path));
 
         for (const element of input) {
             const parts = element.virtualPath.split('/');
@@ -66,11 +66,11 @@ export class MasterImageSynchronizerService {
             };
 
             if (element.commandArguments) {
-                (data as any).command_arguments = element.commandArguments;
+                data.command_arguments = element.commandArguments;
             }
 
             const index = entities.findIndex(
-                (entity) => (entity as any).virtual_path === data.virtual_path,
+                (entity) => entity.virtual_path === data.virtual_path,
             );
             if (index === -1) {
                 result.created.push(this.imageRepository.create(data));
@@ -107,7 +107,7 @@ export class MasterImageSynchronizerService {
 
         const dirVirtualPaths: string[] = input.map((entity) => entity.virtualPath);
         result.deleted = entities.filter(
-            (image) => !dirVirtualPaths.includes((image as any).virtual_path),
+            (image) => !dirVirtualPaths.includes(image.virtual_path),
         );
 
         for (const element of input) {
@@ -116,7 +116,7 @@ export class MasterImageSynchronizerService {
                 name: element.name,
             };
 
-            const index = entities.findIndex((dbEntity) => (dbEntity as any).virtual_path === element.virtualPath);
+            const index = entities.findIndex((dbEntity) => dbEntity.virtual_path === element.virtualPath);
             if (index === -1) {
                 result.created.push(this.groupRepository.create({
                     virtual_path: element.virtualPath,

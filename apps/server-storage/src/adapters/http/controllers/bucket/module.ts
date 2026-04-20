@@ -22,7 +22,7 @@ import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { BucketFileEventCaller } from '@privateaim/server-storage-kit';
 import type { DataSource } from 'typeorm';
 import type { Client } from 'minio';
-import type { BucketFileEntity } from '../../../database/index.ts';
+import type { Request, Response } from 'routup';
 import type { BucketComponent } from '../../../../app/components/bucket/module.ts';
 import type { BucketFileComponent } from '../../../../app/components/bucket-file/module.ts';
 import {
@@ -71,70 +71,70 @@ export class BucketController {
 
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
-        @DRequest() req: any,
-        @DResponse() res: any,
-    ): Promise<Bucket[]> {
-        return await executeBucketRouteGetManyHandler(req, res, this.dataSource) as Bucket[];
+        @DRequest() req: Request,
+        @DResponse() res: Response,
+    ) {
+        return executeBucketRouteGetManyHandler(req, res, this.dataSource);
     }
 
     @DGet('/:id/stream', [ForceLoggedInMiddleware])
     async stream(
         @DPath('id') id: string,
-        @DRequest() req: any,
-        @DResponse() res: any,
-    ): Promise<any> {
-        return await executeBucketRouteStreamHandler(req, res, this.dataSource, this.minio, this.logger) as any;
+        @DRequest() req: Request,
+        @DResponse() res: Response,
+    ) {
+        return executeBucketRouteStreamHandler(req, res, this.dataSource, this.minio, this.logger);
     }
 
     @DPost('/:id/upload', [ForceLoggedInMiddleware])
     async upload(
         @DPath('id') id: string,
-        @DRequest() req: any,
-        @DResponse() res: any,
-    ): Promise<BucketFileEntity[]> {
-        return await executeBucketRouteUploadHandler(
+        @DRequest() req: Request,
+        @DResponse() res: Response,
+    ) {
+        return executeBucketRouteUploadHandler(
             req,
             res,
             this.dataSource,
             this.bucketFileComponent,
             this.bucketFileEventCaller,
-        ) as BucketFileEntity[];
+        );
     }
 
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
-        @DRequest() req: any,
-        @DResponse() res: any,
-    ): Promise<Bucket | undefined> {
-        return await executeBucketRouteGetOneHandler(req, res, this.dataSource) as Bucket | undefined;
+        @DRequest() req: Request,
+        @DResponse() res: Response,
+    ) {
+        return executeBucketRouteGetOneHandler(req, res, this.dataSource);
     }
 
     @DPost('/:id', [ForceLoggedInMiddleware])
     async update(
         @DPath('id') id: string,
         @DBody() data: BucketUpdate,
-        @DRequest() req: any,
-        @DResponse() res: any,
-    ): Promise<Bucket | undefined> {
-        return await executeBucketRouteUpdateHandler(req, res, this.dataSource, this.minio) as Bucket | undefined;
+        @DRequest() req: Request,
+        @DResponse() res: Response,
+    ) {
+        return executeBucketRouteUpdateHandler(req, res, this.dataSource, this.minio);
     }
 
     @DPost('', [ForceLoggedInMiddleware])
     async add(
         @DBody() data: BucketCreate,
-        @DRequest() req: any,
-        @DResponse() res: any,
-    ): Promise<Bucket | undefined> {
-        return await executeBucketRouteCreateHandler(req, res, this.bucketComponent) as Bucket | undefined;
+        @DRequest() req: Request,
+        @DResponse() res: Response,
+    ) {
+        return executeBucketRouteCreateHandler(req, res, this.bucketComponent);
     }
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @DPath('id') id: string,
-        @DRequest() req: any,
-        @DResponse() res: any,
-    ): Promise<Bucket | undefined> {
-        return await executeBucketRouteDeleteHandler(req, res, this.dataSource, this.bucketComponent) as Bucket | undefined;
+        @DRequest() req: Request,
+        @DResponse() res: Response,
+    ) {
+        return executeBucketRouteDeleteHandler(req, res, this.dataSource, this.bucketComponent);
     }
 }

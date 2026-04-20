@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Event } from '@privateaim/telemetry-kit';
 import {
     DController,
     DDelete,
@@ -18,14 +17,13 @@ import {
 } from '@routup/decorators';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { DataSource } from 'typeorm';
+import type { Request, Response } from 'routup';
 import {
     createEventRouteHandler,
     deleteEventRouteHandler,
     getManyEventLogRouteHandler,
     getOneEventLogRouteHandler,
 } from './handlers/index.ts';
-
-type PartialEvent = Partial<Event>;
 
 @DTags('events')
 @DController('/events')
@@ -38,35 +36,35 @@ export class EventController {
 
     @DPost('', [ForceLoggedInMiddleware])
     async create(
-        @DRequest() req: any,
-        @DResponse() res: any,
-    ): Promise<PartialEvent> {
-        return await createEventRouteHandler(req, res, this.dataSource) as PartialEvent;
+        @DRequest() req: Request,
+        @DResponse() res: Response,
+    ) {
+        return createEventRouteHandler(req, res, this.dataSource);
     }
 
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
-        @DRequest() req: any,
-        @DResponse() res: any,
-    ): Promise<{ data: PartialEvent[]; meta: Record<string, unknown> }> {
-        return await getManyEventLogRouteHandler(req, res, this.dataSource) as { data: PartialEvent[]; meta: Record<string, unknown> };
+        @DRequest() req: Request,
+        @DResponse() res: Response,
+    ) {
+        return getManyEventLogRouteHandler(req, res, this.dataSource);
     }
 
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
-        @DRequest() req: any,
-        @DResponse() res: any,
-    ): Promise<PartialEvent | undefined> {
-        return await getOneEventLogRouteHandler(req, res, this.dataSource) as PartialEvent | undefined;
+        @DRequest() req: Request,
+        @DResponse() res: Response,
+    ) {
+        return getOneEventLogRouteHandler(req, res, this.dataSource);
     }
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @DPath('id') id: string,
-        @DRequest() req: any,
-        @DResponse() res: any,
-    ): Promise<PartialEvent | undefined> {
-        return await deleteEventRouteHandler(req, res, this.dataSource) as PartialEvent | undefined;
+        @DRequest() req: Request,
+        @DResponse() res: Response,
+    ) {
+        return deleteEventRouteHandler(req, res, this.dataSource);
     }
 }

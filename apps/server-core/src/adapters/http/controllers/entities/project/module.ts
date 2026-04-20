@@ -18,7 +18,7 @@ import {
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
-import { send, sendAccepted, sendCreated } from 'routup';
+import type { Request, Response } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { IProjectService } from '../../../../../core/index.ts';
 import { buildActorContext } from '../../../request/index.ts';
@@ -40,56 +40,56 @@ export class ProjectController {
 
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
-        @DRequest() req: any,
-        @DResponse() res: any,
-    ): Promise<PartialProject[]> {
+        @DRequest() req: Request,
+    ) {
         const query = useRequestQuery(req);
         const { data, meta } = await this.service.getMany(query);
-        return send(res, { data, meta }) as any;
+        return { data, meta };
     }
 
     @DPost('', [ForceLoggedInMiddleware])
     async add(
         @DBody() data: any,
-        @DRequest() req: any,
-        @DResponse() res: any,
+        @DRequest() req: Request,
+        @DResponse() res: Response,
     ): Promise<PartialProject | undefined> {
         const actor = buildActorContext(req);
         const entity = await this.service.create(data, actor);
-        return sendCreated(res, entity) as PartialProject | undefined;
+        res.statusCode = 201;
+        return entity;
     }
 
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
-        @DRequest() req: any,
-        @DResponse() res: any,
+        @DRequest() req: Request,
     ): Promise<PartialProject | undefined> {
         const query = useRequestQuery(req);
-        const entity = await this.service.getOne(id, Object.keys(query).length > 0 ? query : undefined);
-        return send(res, entity) as PartialProject | undefined;
+        return this.service.getOne(id, Object.keys(query).length > 0 ? query : undefined);
     }
 
     @DPost('/:id', [ForceLoggedInMiddleware])
     async edit(
         @DPath('id') id: string,
         @DBody() data: any,
-        @DRequest() req: any,
-        @DResponse() res: any,
+        @DRequest() req: Request,
+        @DResponse() res: Response,
     ): Promise<PartialProject | undefined> {
         const actor = buildActorContext(req);
         const entity = await this.service.update(id, data, actor);
-        return sendAccepted(res, entity) as PartialProject | undefined;
+        res.statusCode = 202;
+        return entity;
     }
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @DPath('id') id: string,
-        @DRequest() req: any,
-        @DResponse() res: any,
+        @DRequest() req: Request,
+        @DResponse() res: Response,
     ): Promise<PartialProject | undefined> {
         const actor = buildActorContext(req);
         const entity = await this.service.delete(id, actor);
-        return sendAccepted(res, entity) as PartialProject | undefined;
+        res.statusCode = 202;
+        return entity;
     }
 }

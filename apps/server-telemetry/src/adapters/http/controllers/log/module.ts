@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Log } from '@privateaim/telemetry-kit';
 import {
     DController,
     DDelete,
@@ -16,14 +15,13 @@ import {
     DTags,
 } from '@routup/decorators';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
+import type { Request, Response } from 'routup';
 import type { LogStore } from '../../../../core/services/log-store/types.ts';
 import {
     createLogRouteHandler,
     deleteManyLogRouteHandler,
     getManyLogLogRouteHandler,
 } from './handlers/index.ts';
-
-type PartialLog = Partial<Log>;
 
 @DTags('logs')
 @DController('/logs')
@@ -36,25 +34,25 @@ export class LogController {
 
     @DPost('', [ForceLoggedInMiddleware])
     async create(
-        @DRequest() req: any,
-        @DResponse() res: any,
-    ): Promise<PartialLog> {
-        return await createLogRouteHandler(req, res, this.logStore) as PartialLog;
+        @DRequest() req: Request,
+        @DResponse() res: Response,
+    ) {
+        return createLogRouteHandler(req, res, this.logStore);
     }
 
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
-        @DRequest() req: any,
-        @DResponse() res: any,
-    ): Promise<{ data: PartialLog[]; meta: Record<string, unknown> }> {
-        return await getManyLogLogRouteHandler(req, res, this.logStore) as { data: PartialLog[]; meta: Record<string, unknown> };
+        @DRequest() req: Request,
+        @DResponse() res: Response,
+    ) {
+        return getManyLogLogRouteHandler(req, res, this.logStore);
     }
 
     @DDelete('', [ForceLoggedInMiddleware])
     async deleteMany(
-        @DRequest() req: any,
-        @DResponse() res: any,
-    ): Promise<void> {
-        await deleteManyLogRouteHandler(req, res, this.logStore);
+        @DRequest() req: Request,
+        @DResponse() res: Response,
+    ) {
+        return deleteManyLogRouteHandler(req, res, this.logStore);
     }
 }

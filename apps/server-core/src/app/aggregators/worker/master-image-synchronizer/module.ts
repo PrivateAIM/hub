@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { MasterImage, MasterImageGroup } from '@privateaim/core-kit';
 import { DomainType } from '@privateaim/core-kit';
 import type { MasterImageSynchronizerEventMap } from '@privateaim/server-core-worker-kit';
 import {
@@ -15,13 +16,14 @@ import {
     BaseComponent,
 } from '@privateaim/server-kit';
 import type { EventComponentCaller } from '@privateaim/server-telemetry-kit';
-import type { DataSource } from 'typeorm';
+import type { IEntityRepository } from '../../../../core/entities/types.ts';
 import {
     handleMasterImageSynchronizerExecutionFinishedEvent,
 } from './handler.ts';
 
 type MasterImageSynchronizerAggregatorContext = {
-    dataSource: DataSource;
+    imageRepository: IEntityRepository<MasterImage>;
+    groupRepository: IEntityRepository<MasterImageGroup>;
     eventComponentCaller?: EventComponentCaller;
     logger?: Logger;
 };
@@ -30,7 +32,12 @@ export class MasterImageSynchronizerAggregator extends BaseComponent<MasterImage
     constructor(ctx: MasterImageSynchronizerAggregatorContext) {
         super();
 
-        const handler = (value) => handleMasterImageSynchronizerExecutionFinishedEvent(value, ctx.dataSource, ctx.logger);
+        const handler = (value) => handleMasterImageSynchronizerExecutionFinishedEvent(
+            value,
+            ctx.imageRepository,
+            ctx.groupRepository,
+            ctx.logger,
+        );
         this.mount(MasterImageSynchronizerEvent.EXECUTION_FINISHED, handler);
         this.mount('*', async (
             _payload,

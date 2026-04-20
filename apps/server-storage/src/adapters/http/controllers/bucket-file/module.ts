@@ -19,7 +19,7 @@ import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { BucketFileEventCaller } from '@privateaim/server-storage-kit';
 import type { DataSource } from 'typeorm';
 import type { Client } from 'minio';
-import type { BucketFileEntity } from '../../../database/index.ts';
+import type { Request, Response } from 'routup';
 import type { BucketFileComponent } from '../../../../app/components/bucket-file/module.ts';
 import {
     executeBucketFileRouteDeleteHandler,
@@ -27,8 +27,6 @@ import {
     executeBucketFileRouteGetOneHandler,
     executeBucketFileRouteStreamHandler,
 } from './handlers/index.ts';
-
-type PartialBucketFile = Partial<BucketFileEntity>;
 
 @DTags('buckets')
 @DController('/bucket-files')
@@ -59,42 +57,42 @@ export class BucketFileController {
 
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
-        @DRequest() req: any,
-        @DResponse() res: any,
-    ): Promise<PartialBucketFile[]> {
-        return await executeBucketFileRouteGetManyHandler(req, res, this.dataSource) as PartialBucketFile[];
+        @DRequest() req: Request,
+        @DResponse() res: Response,
+    ) {
+        return executeBucketFileRouteGetManyHandler(req, res, this.dataSource);
     }
 
     @DGet('/:id/stream', [ForceLoggedInMiddleware])
     async stream(
         @DPath('id') id: string,
-        @DRequest() req: any,
-        @DResponse() res: any,
-    ): Promise<any> {
-        return await executeBucketFileRouteStreamHandler(req, res, this.dataSource, this.minio, this.logger) as any;
+        @DRequest() req: Request,
+        @DResponse() res: Response,
+    ) {
+        return executeBucketFileRouteStreamHandler(req, res, this.dataSource, this.minio, this.logger);
     }
 
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
-        @DRequest() req: any,
-        @DResponse() res: any,
-    ): Promise<PartialBucketFile | undefined> {
-        return await executeBucketFileRouteGetOneHandler(req, res, this.dataSource) as PartialBucketFile | undefined;
+        @DRequest() req: Request,
+        @DResponse() res: Response,
+    ) {
+        return executeBucketFileRouteGetOneHandler(req, res, this.dataSource);
     }
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @DPath('id') id: string,
-        @DRequest() req: any,
-        @DResponse() res: any,
-    ): Promise<PartialBucketFile | undefined> {
-        return await executeBucketFileRouteDeleteHandler(
+        @DRequest() req: Request,
+        @DResponse() res: Response,
+    ) {
+        return executeBucketFileRouteDeleteHandler(
             req,
             res,
             this.dataSource,
             this.bucketFileComponent,
             this.bucketFileEventCaller,
-        ) as PartialBucketFile | undefined;
+        );
     }
 }
