@@ -11,7 +11,7 @@ import type { Component } from '@privateaim/server-kit';
 import {
     LoggerConsoleTransport,
     MessageBusInjectionKey,
-    QueueWorkerComponentCaller,
+    MessageBusWorkerComponentCaller,
     createLogger,
 } from '@privateaim/server-kit';
 import {
@@ -114,7 +114,7 @@ export class ComponentsModule implements IModule {
         });
 
         const components: Component<any>[] = [
-            new QueueWorkerComponentCaller(
+            new MessageBusWorkerComponentCaller(
                 new AnalysisBuilderComponent({
                     coreClient,
                     storageClient,
@@ -122,43 +122,43 @@ export class ComponentsModule implements IModule {
                     logger: analysisBuilderLogger,
                 }),
                 {
-                    publishQueue: AnalysisBuilderEventMessageBusRouting,
-                    consumeQueue: AnalysisBuilderTaskMessageBusRouting,
+                    publishRouting: AnalysisBuilderEventMessageBusRouting,
+                    consumeRouting: AnalysisBuilderTaskMessageBusRouting,
                     messageBus,
                     logger: analysisBuilderLogger,
                 },
             ),
-            new QueueWorkerComponentCaller(
+            new MessageBusWorkerComponentCaller(
                 new AnalysisDistributorComponent({
                     coreClient,
                     docker,
                     logger: analysisDistributorLogger,
                 }),
                 {
-                    publishQueue: AnalysisDistributorEventMessageBusRouting,
-                    consumeQueue: AnalysisDistributorTaskMessageBusRouting,
+                    publishRouting: AnalysisDistributorEventMessageBusRouting,
+                    consumeRouting: AnalysisDistributorTaskMessageBusRouting,
                     messageBus,
                     logger: analysisDistributorLogger,
                 },
             ),
-            new QueueWorkerComponentCaller(
+            new MessageBusWorkerComponentCaller(
                 new MasterImageBuilderComponent({
                     coreClient,
                     docker,
                     logger: masterImageBuilderLogger,
                 }),
                 {
-                    publishQueue: MasterImageBuilderEventMessageBusRouting,
-                    consumeQueue: MasterImageBuilderTaskMessageBusRouting,
+                    publishRouting: MasterImageBuilderEventMessageBusRouting,
+                    consumeRouting: MasterImageBuilderTaskMessageBusRouting,
                     messageBus,
                     logger: masterImageBuilderLogger,
                 },
             ),
-            new QueueWorkerComponentCaller(
+            new MessageBusWorkerComponentCaller(
                 new MasterImageSynchronizerComponent({ logger: masterImageBuilderLogger }),
                 {
-                    publishQueue: MasterImageSynchronizerEventMessageBusRouting,
-                    consumeQueue: MasterImageSynchronizerTaskMessageBusRouting,
+                    publishRouting: MasterImageSynchronizerEventMessageBusRouting,
+                    consumeRouting: MasterImageSynchronizerTaskMessageBusRouting,
                     messageBus,
                     logger: masterImageBuilderLogger,
                 },

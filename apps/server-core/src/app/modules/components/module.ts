@@ -12,7 +12,7 @@ import {
     CacheInjectionKey,
     LoggerInjectionKey,
     MessageBusInjectionKey,
-    QueueWorkerComponentCaller,
+    MessageBusWorkerComponentCaller,
     TaskManager,
 } from '@privateaim/server-kit';
 import type { TaskMap } from '../../../core/domains/index.ts';
@@ -58,18 +58,18 @@ export class ComponentsModule implements IModule {
 
         // Start task consumers
         const components = [
-            new QueueWorkerComponentCaller(
+            new MessageBusWorkerComponentCaller(
                 registryComponent,
                 {
-                    consumeQueue: RegistryTaskMessageBusRouting,
+                    consumeRouting: RegistryTaskMessageBusRouting,
                     messageBus,
                     logger,
                 },
             ),
-            new QueueWorkerComponentCaller(
+            new MessageBusWorkerComponentCaller(
                 analysisMetadataComponent,
                 {
-                    consumeQueue: AnalysisMetadataTaskQueue,
+                    consumeRouting: AnalysisMetadataTaskQueue,
                     messageBus,
                     logger,
                 },

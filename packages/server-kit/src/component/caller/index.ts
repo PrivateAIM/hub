@@ -7,7 +7,7 @@
 
 export * from './compound';
 export * from './direct';
-export * from './queue-dispatch';
-export * from './queue-worker';
+export * from './message-bus-dispatch';
+export * from './message-bus-worker';
 
 export * from './types';

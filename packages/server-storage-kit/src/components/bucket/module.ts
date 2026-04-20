@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentMetadata, QueueDispatchComponentCallerOptions } from '@privateaim/server-kit';
+import type { ComponentMetadata, MessageBusDispatchComponentCallerOptions } from '@privateaim/server-kit';
 import {
-    QueueDispatchComponentCaller,
+    MessageBusDispatchComponentCaller,
 } from '@privateaim/server-kit';
 import {
     BucketCommand,
@@ -15,9 +15,9 @@ import {
 } from './constants';
 import type { BucketCreateCommandPayload, BucketDeleteCommandPayload } from './handlers';
 
-export class BucketComponentCaller extends QueueDispatchComponentCaller {
-    constructor(options: Partial<QueueDispatchComponentCallerOptions> = {}) {
-        super({ ...options, queue: BucketTaskMessageBusRouting });
+export class BucketComponentCaller extends MessageBusDispatchComponentCaller {
+    constructor(options: Partial<MessageBusDispatchComponentCallerOptions> = {}) {
+        super({ ...options, routing: BucketTaskMessageBusRouting });
     }
 
     async callCreate(payload: BucketCreateCommandPayload, metadata: ComponentMetadata = {}) {

@@ -13,7 +13,7 @@ import type {
 } from '@privateaim/server-kit';
 import {
     DirectComponentCaller,
-    QueueDispatchComponentCaller,
+    MessageBusDispatchComponentCaller,
 } from '@privateaim/server-kit';
 import { AnalysisError } from '@privateaim/core-kit';
 import type { EntityManager } from 'typeorm';
@@ -25,12 +25,12 @@ import type { AnalysisEntity } from '../../../../adapters/database/index.ts';
 export class AnalysisMetadataComponentCaller implements ComponentCaller<AnalysisMetadataEventMap> {
     protected directCaller : DirectComponentCaller<AnalysisMetadataEventMap>;
 
-    protected queueDispatchCaller : QueueDispatchComponentCaller<AnalysisMetadataEventMap>;
+    protected messageBusDispatchCaller : MessageBusDispatchComponentCaller<AnalysisMetadataEventMap>;
 
     constructor(component: AnalysisMetadataComponent, ctx?: { messageBus?: MessageBus }) {
         this.directCaller = new DirectComponentCaller<AnalysisMetadataEventMap>(component);
-        this.queueDispatchCaller = new QueueDispatchComponentCaller<AnalysisMetadataEventMap>({
-            queue: AnalysisMetadataTaskQueue,
+        this.messageBusDispatchCaller = new MessageBusDispatchComponentCaller<AnalysisMetadataEventMap>({
+            routing: AnalysisMetadataTaskQueue,
             messageBus: ctx?.messageBus,
         });
     }
@@ -74,7 +74,7 @@ export class AnalysisMetadataComponentCaller implements ComponentCaller<Analysis
     ): Promise<void> {
         const [data, metadata] = payload;
 
-        return this.queueDispatchCaller.call(key, data, metadata);
+        return this.messageBusDispatchCaller.call(key, data, metadata);
     }
 
     async callRecalcDirect(

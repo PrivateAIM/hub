@@ -11,21 +11,21 @@ import {
     it,
     vi,
 } from 'vitest';
-import { QueueDispatchComponentCaller } from '../../src';
+import { MessageBusDispatchComponentCaller } from '../../src';
 import type { MessageBus, MessageBusRouting } from '../../src';
 
-const testQueue: MessageBusRouting = {
+const testRouting: MessageBusRouting = {
     type: 'work',
     key: 'test-queue',
 };
 
-describe('src/component/caller/queue-dispatch', () => {
+describe('src/component/caller/message-bus-dispatch', () => {
     it('should publish via messageBus when provided', async () => {
         const publishMock = vi.fn().mockResolvedValue(true);
         const messageBus = { publish: publishMock } as unknown as MessageBus;
 
-        const caller = new QueueDispatchComponentCaller({
-            queue: testQueue,
+        const caller = new MessageBusDispatchComponentCaller({
+            routing: testRouting,
             messageBus,
         });
 
@@ -35,11 +35,11 @@ describe('src/component/caller/queue-dispatch', () => {
         const payload = publishMock.mock.calls[0][0];
         expect(payload.type).toBe('testCommand');
         expect(payload.data).toEqual({ id: '123' });
-        expect(payload.metadata.routing).toEqual(testQueue);
+        expect(payload.metadata.routing).toEqual(testRouting);
     });
 
     it('should silently skip when messageBus is not provided', async () => {
-        const caller = new QueueDispatchComponentCaller({ queue: testQueue });
+        const caller = new MessageBusDispatchComponentCaller({ routing: testRouting });
 
         // should not throw
         await caller.call('testCommand', { id: '123' }, {});
@@ -49,8 +49,8 @@ describe('src/component/caller/queue-dispatch', () => {
         const warnMock = vi.fn();
         const logger = { warn: warnMock } as any;
 
-        const caller = new QueueDispatchComponentCaller({
-            queue: testQueue,
+        const caller = new MessageBusDispatchComponentCaller({
+            routing: testRouting,
             logger,
         });
 
@@ -64,21 +64,21 @@ describe('src/component/caller/queue-dispatch', () => {
         const publishMock = vi.fn().mockResolvedValue(true);
         const messageBus = { publish: publishMock } as unknown as MessageBus;
 
-        // Simulate subclass pattern: spread options, override queue
-        const subclassQueue: MessageBusRouting = {
+        // Simulate subclass pattern: spread options, override routing
+        const subclassRouting: MessageBusRouting = {
             type: 'work',
             key: 'subclass-queue',
         };
 
-        const caller = new QueueDispatchComponentCaller({
+        const caller = new MessageBusDispatchComponentCaller({
             ...{ messageBus },
-            queue: subclassQueue,
+            routing: subclassRouting,
         });
 
         await caller.call('someCommand', { data: true }, {});
 
         expect(publishMock).toHaveBeenCalledOnce();
         const payload = publishMock.mock.calls[0][0];
-        expect(payload.metadata.routing).toEqual(subclassQueue);
+        expect(payload.metadata.routing).toEqual(subclassRouting);
     });
 });

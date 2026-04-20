@@ -9,7 +9,7 @@ import type { MessageBus } from '@privateaim/server-kit';
 import {
     CompoundComponentCaller,
     DirectComponentCaller,
-    QueueDispatchComponentCaller,
+    MessageBusDispatchComponentCaller,
 } from '@privateaim/server-kit';
 import type { RegistryEventMap } from '../type.ts';
 import { RegistryTaskMessageBusRouting } from '../constants.ts';
@@ -19,8 +19,8 @@ export class RegistryComponentCaller extends CompoundComponentCaller<RegistryEve
     constructor(component: RegistryComponent, ctx?: { messageBus?: MessageBus }) {
         super([
             new DirectComponentCaller<RegistryEventMap>(component),
-            new QueueDispatchComponentCaller<RegistryEventMap>({
-                queue: RegistryTaskMessageBusRouting,
+            new MessageBusDispatchComponentCaller<RegistryEventMap>({
+                routing: RegistryTaskMessageBusRouting,
                 messageBus: ctx?.messageBus,
             }),
         ]);

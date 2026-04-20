@@ -8,7 +8,7 @@
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
 import type { Component } from '@privateaim/server-kit';
-import { LoggerInjectionKey, MessageBusInjectionKey, QueueWorkerComponentCaller } from '@privateaim/server-kit';
+import { LoggerInjectionKey, MessageBusInjectionKey, MessageBusWorkerComponentCaller } from '@privateaim/server-kit';
 import {
     EventEventMessageBusRouting,
     EventTaskMessageBusRouting,
@@ -38,20 +38,20 @@ export class ComponentsModule implements IModule {
         const messageBus = messageBusResult.success ? messageBusResult.data : undefined;
 
         const components : Component<any>[] = [
-            new QueueWorkerComponentCaller(
+            new MessageBusWorkerComponentCaller(
                 new EventComponent({ logger }),
                 {
-                    consumeQueue: EventTaskMessageBusRouting,
-                    publishQueue: EventEventMessageBusRouting,
+                    consumeRouting: EventTaskMessageBusRouting,
+                    publishRouting: EventEventMessageBusRouting,
                     messageBus,
                     logger,
                 },
             ),
-            new QueueWorkerComponentCaller(
+            new MessageBusWorkerComponentCaller(
                 new LogComponent({ logStore }),
                 {
-                    consumeQueue: LogTaskMessageBusRouting,
-                    publishQueue: LogEventMessageBusRouting,
+                    consumeRouting: LogTaskMessageBusRouting,
+                    publishRouting: LogEventMessageBusRouting,
                     messageBus,
                     logger,
                 },

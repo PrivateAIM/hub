@@ -8,9 +8,9 @@
 import type { Logger } from '../../../logger';
 import type { MessageBus, MessageBusRouting } from '../../../message-bus';
 
-export type QueueDispatchComponentCallerOptions = {
-    queue: MessageBusRouting,
-    logging?: boolean,
+export type MessageBusWorkerComponentCallerOptions = {
+    publishRouting?: MessageBusRouting,
+    consumeRouting: MessageBusRouting,
     messageBus?: MessageBus,
     logger?: Logger,
 };

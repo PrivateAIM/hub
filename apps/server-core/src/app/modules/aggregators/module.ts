@@ -10,7 +10,7 @@ import type { IModule } from 'orkos';
 import {
     LoggerInjectionKey,
     MessageBusInjectionKey,
-    QueueWorkerComponentCaller,
+    MessageBusWorkerComponentCaller,
     RedisSubscribeClientInjectionKey,
 } from '@privateaim/server-kit';
 import { EventComponentCaller } from '@privateaim/server-telemetry-kit';
@@ -56,65 +56,65 @@ export class AggregatorsModule implements IModule {
                 redisSubscribeClient: redisSubResult.success ? redisSubResult.data : undefined,
                 logger,
             }),
-            new QueueWorkerComponentCaller(
+            new MessageBusWorkerComponentCaller(
                 new AnalysisBuilderAggregator({ dataSource }),
                 {
-                    consumeQueue: AnalysisBuilderEventMessageBusRouting,
+                    consumeRouting: AnalysisBuilderEventMessageBusRouting,
                     messageBus,
                     logger,
                 },
             ),
-            new QueueWorkerComponentCaller(
+            new MessageBusWorkerComponentCaller(
                 new AnalysisDistributorAggregator({ dataSource }),
                 {
-                    consumeQueue: AnalysisDistributorEventMessageBusRouting,
+                    consumeRouting: AnalysisDistributorEventMessageBusRouting,
                     messageBus,
                     logger,
                 },
             ),
-            new QueueWorkerComponentCaller(
+            new MessageBusWorkerComponentCaller(
                 new StorageBucketAggregator({
                     dataSource,
                     taskManager,
                     logger,
                 }),
                 {
-                    consumeQueue: BucketEventMessageBusRouting,
+                    consumeRouting: BucketEventMessageBusRouting,
                     messageBus,
                     logger,
                 },
             ),
-            new QueueWorkerComponentCaller(
+            new MessageBusWorkerComponentCaller(
                 new StorageBucketFileAggregator({
                     dataSource,
                     taskManager,
                     logger,
                 }),
                 {
-                    consumeQueue: BucketFileEventMessageBusRouting,
+                    consumeRouting: BucketFileEventMessageBusRouting,
                     messageBus,
                     logger,
                 },
             ),
-            new QueueWorkerComponentCaller(
+            new MessageBusWorkerComponentCaller(
                 new MasterImageBuilderAggregator({
                     dataSource,
                     eventComponentCaller: messageBus ? new EventComponentCaller({ messageBus }) : undefined,
                 }),
                 {
-                    consumeQueue: MasterImageBuilderEventMessageBusRouting,
+                    consumeRouting: MasterImageBuilderEventMessageBusRouting,
                     messageBus,
                     logger,
                 },
             ),
-            new QueueWorkerComponentCaller(
+            new MessageBusWorkerComponentCaller(
                 new MasterImageSynchronizerAggregator({
                     dataSource,
                     logger,
                     eventComponentCaller: messageBus ? new EventComponentCaller({ messageBus }) : undefined,
                 }),
                 {
-                    consumeQueue: MasterImageSynchronizerEventMessageBusRouting,
+                    consumeRouting: MasterImageSynchronizerEventMessageBusRouting,
                     messageBus,
                     logger,
                 },

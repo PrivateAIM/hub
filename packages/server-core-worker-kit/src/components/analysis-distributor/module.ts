@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentMetadata, QueueDispatchComponentCallerOptions } from '@privateaim/server-kit';
+import type { ComponentMetadata, MessageBusDispatchComponentCallerOptions } from '@privateaim/server-kit';
 import {
-    QueueDispatchComponentCaller,
+    MessageBusDispatchComponentCaller,
 } from '@privateaim/server-kit';
 import { AnalysisDistributorCommand, AnalysisDistributorTaskMessageBusRouting } from './constants';
 import type {
@@ -16,9 +16,9 @@ import type {
     AnalysisDistributorExecutePayload,
 } from './types';
 
-export class AnalysisDistributorComponentCaller extends QueueDispatchComponentCaller<AnalysisDistributorEventMap> {
-    constructor(options: Partial<QueueDispatchComponentCallerOptions> = {}) {
-        super({ ...options, queue: AnalysisDistributorTaskMessageBusRouting });
+export class AnalysisDistributorComponentCaller extends MessageBusDispatchComponentCaller<AnalysisDistributorEventMap> {
+    constructor(options: Partial<MessageBusDispatchComponentCallerOptions> = {}) {
+        super({ ...options, routing: AnalysisDistributorTaskMessageBusRouting });
     }
 
     async callExecute(payload: AnalysisDistributorExecutePayload, metadata: ComponentMetadata = {}) {

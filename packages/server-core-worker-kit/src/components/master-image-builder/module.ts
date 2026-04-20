@@ -5,16 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentMetadata, QueueDispatchComponentCallerOptions } from '@privateaim/server-kit';
+import type { ComponentMetadata, MessageBusDispatchComponentCallerOptions } from '@privateaim/server-kit';
 import {
-    QueueDispatchComponentCaller,
+    MessageBusDispatchComponentCaller,
 } from '@privateaim/server-kit';
 import { MasterImageBuilderCommand, MasterImageBuilderTaskMessageBusRouting } from './constants';
 import type { MasterImageBuilderExecutePayload } from './types';
 
-export class MasterImageBuilderComponentCaller extends QueueDispatchComponentCaller {
-    constructor(options: Partial<QueueDispatchComponentCallerOptions> = {}) {
-        super({ ...options, queue: MasterImageBuilderTaskMessageBusRouting });
+export class MasterImageBuilderComponentCaller extends MessageBusDispatchComponentCaller {
+    constructor(options: Partial<MessageBusDispatchComponentCallerOptions> = {}) {
+        super({ ...options, routing: MasterImageBuilderTaskMessageBusRouting });
     }
 
     async callExecute(payload: MasterImageBuilderExecutePayload, metadata: ComponentMetadata = {}) {

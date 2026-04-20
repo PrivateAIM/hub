@@ -10,20 +10,20 @@ import type { MessageBus } from '../../../message-bus';
 import { buildMessageBusPublishPayload } from '../../../message-bus';
 import type { Component, ComponentEventMap, ComponentHandleOptions } from '../../type';
 import type { ComponentCaller, ComponentCallerPayload } from '../types';
-import type { QueueSelfComponentCallerOptions } from './types';
+import type { MessageBusWorkerComponentCallerOptions } from './types';
 
-export class QueueWorkerComponentCaller<
+export class MessageBusWorkerComponentCaller<
     EventMap extends ComponentEventMap = ComponentEventMap,
 > implements ComponentCaller<EventMap>, Component<EventMap> {
     protected component: Component<EventMap>;
 
-    protected options: QueueSelfComponentCallerOptions;
+    protected options: MessageBusWorkerComponentCallerOptions;
 
     protected messageBus?: MessageBus;
 
     protected logger?: Logger;
 
-    constructor(component: Component<EventMap>, options: QueueSelfComponentCallerOptions) {
+    constructor(component: Component<EventMap>, options: MessageBusWorkerComponentCallerOptions) {
         this.component = component;
         this.options = options;
         this.messageBus = options.messageBus;
@@ -41,7 +41,7 @@ export class QueueWorkerComponentCaller<
         }
 
         await this.messageBus.consumeAny(
-            this.options.consumeQueue,
+            this.options.consumeRouting,
             async (payload) => {
                 await this.call(payload.type, payload.data, payload.metadata);
             },
@@ -73,10 +73,10 @@ export class QueueWorkerComponentCaller<
                 childValue,
                 childContext,
             ) => {
-                if (this.options.publishQueue) {
+                if (this.options.publishRouting) {
                     /**
                      *
-                     * publish unhandled requests to publish queue.
+                     * publish unhandled requests to publish routing.
                      */
                     await messageBus.publish(buildMessageBusPublishPayload({
                         type: childContext.key,
@@ -84,7 +84,7 @@ export class QueueWorkerComponentCaller<
                         metadata: {
                             ...(metadata || {}),
                             ...childContext.metadata,
-                            routing: this.options.publishQueue,
+                            routing: this.options.publishRouting,
                         },
                     }));
                 } else if (this.logger) {
