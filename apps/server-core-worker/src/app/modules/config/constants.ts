@@ -5,10 +5,22 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { TypedToken } from 'eldin';
-import type { Environment } from './types.ts';
+import type { TypedToken } from 'eldin';
+import { ConfigInjectionKey as BaseConfigInjectionKey } from '@privateaim/server-kit';
+import type { Config } from './types.ts';
 
-export const ConfigInjectionKey = new TypedToken<Environment>('Config');
+export const ConfigInjectionKey = BaseConfigInjectionKey as unknown as TypedToken<Config>;
+
+export const ConfigDefaults = {
+    PORT: 3000,
+
+    REALM: 'master',
+
+    CLIENT_ID: 'system',
+    CLIENT_SECRET: 'start123',
+
+    RABBITMQ: 'amqp://root:start123@127.0.0.1',
+} as const;
 
 export enum EnvironmentInputKey {
     ENV = 'NODE_ENV',

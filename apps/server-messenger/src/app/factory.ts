@@ -7,9 +7,7 @@
 
 import type { Application } from 'orkos';
 import {
-    AmqpMessageBusDriver,
     LoggerConsoleTransport,
-    MemoryMessageBusDriver,
     MessageBusInjectionKey,
 } from '@privateaim/server-kit';
 import {
@@ -17,27 +15,16 @@ import {
     LoggerTransport,
 } from '@privateaim/server-telemetry-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
-import { useEnv } from './modules/config/index.ts';
 import { ServerMessengerApplicationBuilder } from './builder.ts';
 
 export function createApplication() {
-    const env = useEnv();
-
     let app: Application;
     let logCaller: LogComponentCaller | undefined;
 
     const builder = new ServerMessengerApplicationBuilder()
         .withConfig()
-        .withMessageBus({
-            driverFactory: () => {
-                if (env.rabbitMqConnectionString) {
-                    return new AmqpMessageBusDriver({ connectionString: env.rabbitMqConnectionString });
-                }
-
-                return new MemoryMessageBusDriver();
-            },
-        })
-        .withRedis({ connectionString: env.redisConnectionString })
+        .withMessageBus()
+        .withRedis()
         .withLogger({
             transports: [
                 new LoggerConsoleTransport(),

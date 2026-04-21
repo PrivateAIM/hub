@@ -5,10 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { LoggerInjectionKey } from '@privateaim/server-kit';
+import { ConfigInjectionKey, LoggerInjectionKey } from '@privateaim/server-kit';
 import { defineCommand } from 'citty';
 import { createApplication } from '../../app/index.ts';
-import { useEnv } from '../../app/modules/config/index.ts';
 
 export function defineCLIStartCommand() {
     return defineCommand({
@@ -18,9 +17,10 @@ export function defineCLIStartCommand() {
             await app.setup();
 
             const logger = app.container.resolve(LoggerInjectionKey);
+            const config = app.container.resolve(ConfigInjectionKey);
 
-            logger.debug(`Environment: ${useEnv('env')}`);
-            logger.debug(`Public-URL: ${useEnv('publicURL')}`);
+            logger.debug(`Environment: ${config.env}`);
+            logger.debug(`Public-URL: ${config.publicURL}`);
         },
     });
 }

@@ -15,6 +15,7 @@ import {
     MessageBusWorkerComponentCaller,
     TaskManager,
 } from '@privateaim/server-kit';
+import { ConfigInjectionKey } from '../config/constants.ts';
 import type { TaskMap } from '../../../core/domains/index.ts';
 import { AnalysisMetadataComponent } from '../../components/analysis-metadata/module.ts';
 import { AnalysisMetadataComponentCaller } from '../../components/analysis-metadata/caller/module.ts';
@@ -39,9 +40,19 @@ export class ComponentsModule implements IModule {
         container.register(ComponentsInjectionKey.TaskManager, { useValue: taskManager });
 
         // Create components
+        const config = container.resolve(ConfigInjectionKey);
         const authupResult = container.tryResolve(AuthupClientInjectionKey);
-        const registryComponent = new RegistryComponent({ authupClient: authupResult.success ? authupResult.data : undefined });
-        const analysisMetadataComponent = new AnalysisMetadataComponent({ dataSource });
+        const registryComponent = new RegistryComponent({
+            publicURL: config.publicURL,
+            authupClient: authupResult.success ? authupResult.data : undefined,
+        });
+        const analysisMetadataComponent = new AnalysisMetadataComponent({
+            dataSource,
+            config: {
+                env: config.env,
+                skipAnalysisApproval: config.skipAnalysisApproval,
+            },
+        });
 
         const logger = container.resolve(LoggerInjectionKey);
         const messageBusResult = container.tryResolve(MessageBusInjectionKey);

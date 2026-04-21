@@ -8,6 +8,7 @@
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
 import {
+    ConfigInjectionKey,
     LoggerInjectionKey,
     MessageBusInjectionKey,
     MessageBusWorkerComponentCaller,
@@ -50,8 +51,11 @@ export class AggregatorsModule implements IModule {
         const messageBus = messageBusResult.success ? messageBusResult.data : undefined;
         const redisSubResult = container.tryResolve(RedisSubscribeClientInjectionKey);
 
+        const config = container.resolve(ConfigInjectionKey);
+
         const aggregators = [
             createAuthupAggregator({
+                env: config.env,
                 registryComponentCaller,
                 redisSubscribeClient: redisSubResult.success ? redisSubResult.data : undefined,
                 logger,

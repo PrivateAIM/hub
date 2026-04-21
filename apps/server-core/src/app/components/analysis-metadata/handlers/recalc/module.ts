@@ -19,15 +19,22 @@ import {
 import type { AnalysisMetadataCommand } from '../../constants.ts';
 import { AnalysisMetadataEvent } from '../../constants.ts';
 import type { AnalysisMetadataEventMap, AnalysisMetadataRecalcPayload } from '../../types.ts';
-import { useEnv } from '../../../../../app/modules/config/index.ts';
+
+type AnalysisMetadataRecalcConfig = {
+    env: string;
+    skipAnalysisApproval: boolean;
+};
 
 export class AnalysisMetadataRecalcHandler implements ComponentHandler<
     AnalysisMetadataEventMap
 > {
     protected dataSource: DataSource;
 
-    constructor(ctx: { dataSource: DataSource }) {
+    protected config: AnalysisMetadataRecalcConfig;
+
+    constructor(ctx: { dataSource: DataSource; config: AnalysisMetadataRecalcConfig }) {
         this.dataSource = ctx.dataSource;
+        this.config = ctx.config;
     }
     async handle(
         value: AnalysisMetadataRecalcPayload,
@@ -140,8 +147,8 @@ export class AnalysisMetadataRecalcHandler implements ComponentHandler<
         entity.nodes = nodes;
         entity.nodes_approved = nodesApproved;
 
-        const ignoreApproval = useEnv('skipAnalysisApproval') ||
-            useEnv('env') === EnvironmentName.TEST;
+        const ignoreApproval = this.config.skipAnalysisApproval ||
+            this.config.env === EnvironmentName.TEST;
 
         entity.build_nodes_valid = ignoreApproval ? true : entity.nodes === entity.nodes_approved;
 

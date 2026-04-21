@@ -7,7 +7,7 @@
 
 import { LoggerModule } from '@privateaim/server-kit';
 import type { IModule } from 'orkos';
-import { ConfigModule, useEnv  } from '../../src/app/modules/config/index.ts';
+import { ConfigModule } from '../../src/app/modules/config/index.ts';
 import { MinioModule } from '../../src/app/modules/minio/index.ts';
 import { HTTPModule } from '../../src/app/modules/http/index.ts';
 
@@ -17,12 +17,10 @@ import { createTestDatabaseModule } from './database.ts';
 export function createTestApplication(): TestHTTPApplication {
     process.env.PORT = '0';
 
-    const env = useEnv();
-
     const modules: IModule[] = [
         new ConfigModule(),
         new LoggerModule(),
-        new MinioModule({ connectionString: env.minioConnectionString }),
+        new MinioModule(),
         createTestDatabaseModule(),
         new HTTPModule(),
     ];

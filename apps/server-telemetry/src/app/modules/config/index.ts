@@ -7,5 +7,4 @@
 
 export { ConfigModule } from './module.ts';
 export { ConfigInjectionKey, EnvironmentInputKey } from './constants.ts';
-export { useEnv } from './env.ts';
-export type { Environment } from './types.ts';
+export type { Config } from './types.ts';

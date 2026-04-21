@@ -9,24 +9,21 @@ import type { IContainer } from 'eldin';
 import type { IModule, ModuleDependency } from 'orkos';
 import { Client } from '@privateaim/core-http-kit';
 import { AUTHUP_HOOK_MODULE_NAME, AuthupClientAuthenticationHookInjectionKey } from '@privateaim/server-kit';
+import { ConfigInjectionKey } from '../config/constants.ts';
+import type { Config } from '../config/types.ts';
 import { CoreClientInjectionKey } from './constants.ts';
-import type { CoreClientModuleOptions } from './types.ts';
 
 export class CoreClientModule implements IModule {
     readonly name = 'coreClient';
 
     readonly dependencies: (string | ModuleDependency)[] = [
+        'config',
         { name: AUTHUP_HOOK_MODULE_NAME, optional: true },
     ];
 
-    private options: CoreClientModuleOptions;
-
-    constructor(options: CoreClientModuleOptions) {
-        this.options = options;
-    }
-
     async setup(container: IContainer): Promise<void> {
-        const client = new Client({ baseURL: this.options.baseURL });
+        const config = container.resolve(ConfigInjectionKey) as Config;
+        const client = new Client({ baseURL: config.coreURL });
 
         const hookResult = container.tryResolve(AuthupClientAuthenticationHookInjectionKey);
         if (hookResult.success) {

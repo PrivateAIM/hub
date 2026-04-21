@@ -7,15 +7,12 @@
 
 import type { Application } from 'orkos';
 import {
-    AmqpMessageBusDriver,
     EntityEventRedisHandler,
     EntityEventSocketHandler,
     LoggerConsoleTransport,
     LoggerInjectionKey,
-    MemoryMessageBusDriver,
     MessageBusInjectionKey,
     RedisClientInjectionKey,
-    createAuthupClientTokenCreator,
 } from '@privateaim/server-kit';
 import {
     EntityEventHandler,
@@ -24,7 +21,6 @@ import {
     LoggerTransport,
 } from '@privateaim/server-telemetry-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
-import { useEnv } from './modules/config/index.ts';
 import { MinioModule } from './modules/minio/index.ts';
 import { HTTPModule } from './modules/http/index.ts';
 import { SwaggerModule } from './modules/swagger/index.ts';
@@ -32,36 +28,15 @@ import { ComponentsModule } from './modules/components/index.ts';
 import { ServerStorageApplicationBuilder } from './builder.ts';
 
 export function createApplication() {
-    const env = useEnv();
-
     let app: Application;
     let logCaller: LogComponentCaller | undefined;
 
     const builder = new ServerStorageApplicationBuilder()
         .withConfig()
-        .withMessageBus({
-            driverFactory: () => {
-                if (env.rabbitMqConnectionString) {
-                    return new AmqpMessageBusDriver({ connectionString: env.rabbitMqConnectionString });
-                }
-
-                return new MemoryMessageBusDriver();
-            },
-        })
-        .withRedis({ connectionString: env.redisConnectionString });
-
-    if (env.authupURL) {
-        builder.withAuthupHook({
-            baseURL: env.authupURL,
-            tokenCreator: createAuthupClientTokenCreator({
-                baseURL: env.authupURL,
-                clientId: env.clientId,
-                clientSecret: env.clientSecret,
-                realm: env.realm,
-            }),
-        });
-        builder.withAuthupClient({ baseURL: env.authupURL });
-    }
+        .withMessageBus()
+        .withRedis()
+        .withAuthupHook()
+        .withAuthupClient();
 
     builder.withEntityEvent({
         handlerFactory: (container) => {
@@ -111,10 +86,7 @@ export function createApplication() {
 
     app = builder.build();
 
-    // Minio must be added before HTTP, because
-    // HTTP controllers need the MinIO client from the container.
-    app.addModule(new MinioModule({ connectionString: env.minioConnectionString }));
-
+    app.addModule(new MinioModule());
     app.addModule(new HTTPModule());
     app.addModule(new SwaggerModule());
     app.addModule(new ComponentsModule());

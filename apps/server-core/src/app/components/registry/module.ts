@@ -19,7 +19,7 @@ import {
 import type { RegistryEventMap } from './type.ts';
 
 export class RegistryComponent extends BaseComponent<RegistryEventMap> {
-    constructor(ctx: { authupClient?: AuthupClient } = {}) {
+    constructor(ctx: { publicURL?: string; authupClient?: AuthupClient } = {}) {
         super();
 
         this.mount(RegistryCommand.SETUP, new RegistrySetupHandler());
@@ -27,7 +27,7 @@ export class RegistryComponent extends BaseComponent<RegistryEventMap> {
 
         this.mount(RegistryCommand.HOOK_PROCESS, new RegistryHookHandler());
 
-        this.mount(RegistryCommand.PROJECT_LINK, new RegistryProjectLinkHandler({ authupClient: ctx.authupClient }));
+        this.mount(RegistryCommand.PROJECT_LINK, new RegistryProjectLinkHandler({ publicURL: ctx.publicURL, authupClient: ctx.authupClient }));
         this.mount(RegistryCommand.PROJECT_UNLINK, new RegistryProjectUnlinkHandler());
         this.mount(RegistryCommand.PROJECT_RELINK, new RegistryProjectRelinkHandler());
     }

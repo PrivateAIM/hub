@@ -9,11 +9,11 @@ import { APIClient } from '@privateaim/storage-kit';
 import type { Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import {
+    ConfigInjectionKey,
     createAuthupClientAuthenticationHook,
     createAuthupUserTokenCreator,
 } from '@privateaim/server-kit';
 import { HTTPInjectionKey } from '../../src/app/modules/http/index.ts';
-import { useEnv } from '../../src/app/modules/config/index.ts';
 import { TestApplication } from './module.ts';
 
 export class TestHTTPApplication extends TestApplication {
@@ -35,12 +35,12 @@ export class TestHTTPApplication extends TestApplication {
 
         const client = new APIClient({ baseURL });
 
-        const authupURL = useEnv('authupURL');
-        if (authupURL) {
+        const config = this.container.resolve(ConfigInjectionKey);
+        if (config.authupURL) {
             const hook = createAuthupClientAuthenticationHook({
-                baseURL: authupURL,
+                baseURL: config.authupURL,
                 tokenCreator: createAuthupUserTokenCreator({
-                    baseURL: authupURL,
+                    baseURL: config.authupURL,
                     name: 'admin',
                     password: 'start123',
                     realm: 'master',

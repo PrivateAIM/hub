@@ -7,27 +7,44 @@
 
 import type { IContainer } from 'eldin';
 import type { IModule, ModuleDependency } from 'orkos';
+import { CONFIG_MODULE_NAME, ConfigInjectionKey } from '../../config/constants';
 import { AUTHUP_HOOK_MODULE_NAME, AuthupClientAuthenticationHookInjectionKey } from '../client-hook/constants';
 import { AUTHUP_CLIENT_MODULE_NAME, AuthupClientInjectionKey } from './constants';
 import { AuthupClient } from './module';
 
 export type AuthupClientModuleOptions = {
-    baseURL: string;
+    baseURL?: string;
 };
 
 export class AuthupClientModule implements IModule {
     readonly name = AUTHUP_CLIENT_MODULE_NAME;
 
-    readonly dependencies: (string | ModuleDependency)[] = [{ name: AUTHUP_HOOK_MODULE_NAME, optional: true }];
+    readonly dependencies: (string | ModuleDependency)[] = [
+        { name: CONFIG_MODULE_NAME, optional: true },
+        { name: AUTHUP_HOOK_MODULE_NAME, optional: true },
+    ];
 
     private options: AuthupClientModuleOptions;
 
-    constructor(options: AuthupClientModuleOptions) {
+    constructor(options: AuthupClientModuleOptions = {}) {
         this.options = options;
     }
 
     async setup(container: IContainer): Promise<void> {
-        const client = new AuthupClient({ baseURL: this.options.baseURL });
+        let { baseURL } = this.options;
+
+        if (!baseURL) {
+            const configResult = container.tryResolve(ConfigInjectionKey);
+            if (configResult.success) {
+                baseURL = configResult.data.authupURL;
+            }
+        }
+
+        if (!baseURL) {
+            return;
+        }
+
+        const client = new AuthupClient({ baseURL });
 
         const hookResult = container.tryResolve(AuthupClientAuthenticationHookInjectionKey);
         if (hookResult.success) {

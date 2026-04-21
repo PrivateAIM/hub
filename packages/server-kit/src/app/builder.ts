@@ -40,20 +40,20 @@ export class BaseApplicationBuilder {
     }
 
     withMessageBus(options?: MessageBusModuleOptions | false): this {
-        if (options !== false && options) {
+        if (options !== false) {
             this.modules.push(new MessageBusModule(options));
         }
         return this;
     }
 
-    withAuthupHook(options: AuthupHookModuleOptions | false): this {
+    withAuthupHook(options?: AuthupHookModuleOptions | false): this {
         if (options !== false) {
             this.modules.push(new AuthupHookModule(options));
         }
         return this;
     }
 
-    withAuthupClient(options: AuthupClientModuleOptions | false): this {
+    withAuthupClient(options?: AuthupClientModuleOptions | false): this {
         if (options !== false) {
             this.modules.push(new AuthupClientModule(options));
         }

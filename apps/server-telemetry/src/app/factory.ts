@@ -6,20 +6,16 @@
  */
 
 import {
-    AmqpMessageBusDriver,
     EntityEventRedisHandler,
     EntityEventSocketHandler,
     LoggerConsoleTransport,
     LoggerInjectionKey,
-    MemoryMessageBusDriver,
     MessageBusInjectionKey,
     RedisClientInjectionKey,
-    createAuthupClientTokenCreator,
 } from '@privateaim/server-kit';
 import { EntityEventHandler, EventComponentCaller, LoggerTransport } from '@privateaim/server-telemetry-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import { LogComponentWriteHandler } from './components/log/handlers/index.ts';
-import { useEnv } from './modules/config/index.ts';
 import { VictoriaLogsModule } from './modules/victoria-logs/index.ts';
 import { HTTPModule } from './modules/http/index.ts';
 import { SwaggerModule } from './modules/swagger/index.ts';
@@ -27,33 +23,12 @@ import { ComponentsModule } from './modules/components/index.ts';
 import { ServerTelemetryApplicationBuilder } from './builder.ts';
 
 export function createApplication() {
-    const env = useEnv();
-
     const builder = new ServerTelemetryApplicationBuilder()
         .withConfig()
-        .withMessageBus({
-            driverFactory: () => {
-                if (env.rabbitMqConnectionString) {
-                    return new AmqpMessageBusDriver({ connectionString: env.rabbitMqConnectionString });
-                }
-
-                return new MemoryMessageBusDriver();
-            },
-        })
-        .withRedis({ connectionString: env.redisConnectionString });
-
-    if (env.authupURL) {
-        builder.withAuthupHook({
-            baseURL: env.authupURL,
-            tokenCreator: createAuthupClientTokenCreator({
-                baseURL: env.authupURL,
-                clientId: env.clientId,
-                clientSecret: env.clientSecret,
-                realm: env.realm,
-            }),
-        });
-        builder.withAuthupClient({ baseURL: env.authupURL });
-    }
+        .withMessageBus()
+        .withRedis()
+        .withAuthupHook()
+        .withAuthupClient();
 
     builder.withEntityEvent({
         handlerFactory: (container) => {
@@ -103,14 +78,7 @@ export function createApplication() {
 
     const app = builder.build();
 
-    // VictoriaLogs must be added before HTTP, because
-    // HTTP controllers need the LogStore from the container.
-    app.addModule(new VictoriaLogsModule({
-        baseURL: env.victoriaLogsURL,
-        ingestorURL: env.victoriaLogsIngestorURL,
-        querierURL: env.victoriaLogsQuerierURL,
-    }));
-
+    app.addModule(new VictoriaLogsModule());
     app.addModule(new HTTPModule());
     app.addModule(new SwaggerModule());
     app.addModule(new ComponentsModule());
