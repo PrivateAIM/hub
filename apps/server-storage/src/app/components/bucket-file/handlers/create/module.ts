@@ -22,7 +22,7 @@ import { useDataSource } from 'typeorm-extension';
 import type { Client } from 'minio';
 import { BucketEntity, BucketFileEntity } from '../../../../../adapters/database/index.ts';
 import { toBucketName } from '../../../../domains/bucket/utils.ts';
-import { BucketValidator } from '../../../../../adapters/http/controllers/bucket/utils/validation.ts';
+import { BucketValidator } from '../../../../../core/entities/bucket/validator.ts';
 
 export class BucketFileCreateHandler implements ComponentHandler<
     BucketFileComponentEventMap,

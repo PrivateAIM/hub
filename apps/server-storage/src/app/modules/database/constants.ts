@@ -7,5 +7,10 @@
 
 import { TypedToken } from 'eldin';
 import type { DataSource } from 'typeorm';
+import type { IBucketFileRepository, IBucketRepository } from '../../../core/entities/index.ts';
 
-export const DatabaseInjectionKey = { DataSource: new TypedToken<DataSource>('DataSource') };
+export const DatabaseInjectionKey = {
+    DataSource: new TypedToken<DataSource>('DataSource'),
+    BucketRepository: new TypedToken<IBucketRepository>('BucketRepository'),
+    BucketFileRepository: new TypedToken<IBucketFileRepository>('BucketFileRepository'),
+};

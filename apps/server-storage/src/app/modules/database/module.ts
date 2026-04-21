@@ -19,6 +19,7 @@ import { BucketSubscriber } from '../../../adapters/database/subscribers/bucket.
 import { BucketFileSubscriber } from '../../../adapters/database/subscribers/bucket-file.ts';
 import { DataSourceOptionsBuilder } from './options.ts';
 import { DatabaseInjectionKey } from './constants.ts';
+import { registerRepositories } from './register.ts';
 
 export class DatabaseModule implements IModule {
     readonly name = 'database';
@@ -75,6 +76,8 @@ export class DatabaseModule implements IModule {
         }
 
         container.register(DatabaseInjectionKey.DataSource, { useValue: dataSource });
+
+        registerRepositories(container, dataSource);
     }
 
     async teardown(container: IContainer): Promise<void> {

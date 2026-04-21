@@ -16,6 +16,7 @@ import {
     DataSourceOptionsBuilder,
     DatabaseInjectionKey,
 } from '../../src/app/modules/database/index.ts';
+import { registerRepositories } from '../../src/app/modules/database/register.ts';
 import { EventSubscriber } from '../../src/adapters/database/subscribers/event.ts';
 
 export function createTestDatabaseModule(): IModule {
@@ -54,6 +55,8 @@ export function createTestDatabaseModule(): IModule {
             );
 
             container.register(DatabaseInjectionKey.DataSource, { useValue: dataSource });
+
+            registerRepositories(container, dataSource);
         },
 
         async teardown(container: IContainer): Promise<void> {

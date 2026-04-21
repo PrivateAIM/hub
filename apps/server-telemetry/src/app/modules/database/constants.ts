@@ -7,5 +7,9 @@
 
 import { TypedToken } from 'eldin';
 import type { DataSource } from 'typeorm';
+import type { IEventRepository } from '../../../core/entities/index.ts';
 
-export const DatabaseInjectionKey = { DataSource: new TypedToken<DataSource>('DataSource') };
+export const DatabaseInjectionKey = {
+    DataSource: new TypedToken<DataSource>('DataSource'),
+    EventRepository: new TypedToken<IEventRepository>('EventRepository'),
+};
