@@ -9,5 +9,6 @@ export function toBucketName(input: string) : string {
     return input
         .toLowerCase()
         .replace(/[^a-z0-9.-]/g, '')
-        .slice(0, 63);
+        .slice(0, 63)
+        .replace(/[^a-z0-9]+$/g, '');
 }

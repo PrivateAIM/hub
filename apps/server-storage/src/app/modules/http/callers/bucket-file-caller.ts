@@ -8,7 +8,6 @@
 import { DirectComponentCaller } from '@privateaim/server-kit';
 import {
     BucketFileCommand,
-    type BucketFileDeletionFinishedEventPayload,
     BucketFileEvent,
     type BucketFileEventCaller,
 } from '@privateaim/server-storage-kit';
@@ -28,21 +27,26 @@ export class BucketFileCallerAdapter implements IBucketFileCaller {
     async delete(id: string): Promise<void> {
         const caller = new DirectComponentCaller(this.component);
 
-        await new Promise((resolve, reject) => {
+        await new Promise<void>((resolve, reject) => {
             caller.callWith(
                 BucketFileCommand.DELETE,
                 { id },
                 {},
                 {
                     handle: async (childValue, childContext) => {
-                        await this.eventCaller.call(
-                            childContext.key,
-                            childValue,
-                            childContext.metadata,
-                        );
+                        try {
+                            await this.eventCaller.call(
+                                childContext.key,
+                                childValue,
+                                childContext.metadata,
+                            );
+                        } catch (err) {
+                            reject(err);
+                            return;
+                        }
 
                         if (childContext.key === BucketFileEvent.DELETION_FINISHED) {
-                            resolve(childValue as BucketFileDeletionFinishedEventPayload);
+                            resolve();
                         }
 
                         if (childContext.key === BucketFileEvent.DELETION_FAILED) {
@@ -50,7 +54,7 @@ export class BucketFileCallerAdapter implements IBucketFileCaller {
                         }
                     },
                 },
-            );
+            ).catch(reject);
         });
     }
 }

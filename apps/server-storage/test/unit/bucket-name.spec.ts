@@ -17,6 +17,6 @@ describe('src/domains/bucket', () => {
         expect(output).toEqual('805735ec-6a00-4368-88cd-83c818806f7a');
 
         output = toBucketName('805735ec-6a00-4368-88cd-83c818806f7a-83c818806f7a-83c818806f7a-foo');
-        expect(output).toEqual('805735ec-6a00-4368-88cd-83c818806f7a-83c818806f7a-83c818806f7a-');
+        expect(output).toEqual('805735ec-6a00-4368-88cd-83c818806f7a-83c818806f7a-83c818806f7a');
     });
 });
