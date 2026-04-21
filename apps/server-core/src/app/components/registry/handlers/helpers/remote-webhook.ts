@@ -43,7 +43,7 @@ export async function saveRemoteRegistryProjectWebhook(
                         password: client.secret,
                     }),
                     skip_cert_verify: true,
-                    address: `${context.publicURL}services/${ServiceID.REGISTRY}/hook`,
+                    address: `${context.publicURL.replace(/\/$/, '')}/services/${ServiceID.REGISTRY}/hook`,
                     type: 'http',
                 },
             ],

@@ -19,7 +19,7 @@ import {
 import type { RegistryEventMap } from './type.ts';
 
 export class RegistryComponent extends BaseComponent<RegistryEventMap> {
-    constructor(ctx: { publicURL?: string; authupClient?: AuthupClient } = {}) {
+    constructor(ctx: { publicURL: string; authupClient?: AuthupClient }) {
         super();
 
         this.mount(RegistryCommand.SETUP, new RegistrySetupHandler());

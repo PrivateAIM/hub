@@ -8,6 +8,8 @@
 import type { BaseServerConfig } from '@privateaim/server-kit';
 
 export interface Config extends BaseServerConfig {
+    publicURL: string;
+
     vaultConnectionString?: string;
     harborURL?: string;
 
