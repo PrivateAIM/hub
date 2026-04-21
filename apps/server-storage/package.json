@@ -45,7 +45,7 @@
         "hapic": "^2.8.2",
         "locter": "^2.2.1",
         "minio": "^8.0.7",
-        "mysql2": "^3.22.0",
+        "mysql2": "^3.22.2",
         "orkos": "^1.1.1",
         "redis-extension": "^2.0.4",
         "reflect-metadata": "^0.2.2",
@@ -63,7 +63,7 @@
         "@types/tar-stream": "^3.1.4",
         "testcontainers": "^11.14.0",
         "ts-node": "^10.9.2",
-        "vitest": "^4.1.4"
+        "vitest": "^4.1.5"
     },
     "scripts": {
         "cli": "node dist/cli/index.mjs",
