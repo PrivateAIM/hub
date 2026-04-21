@@ -1,5 +1,35 @@
 # Changelog
 
+## [0.8.36](https://github.com/PrivateAIM/hub/compare/v0.8.35...v0.8.36) (2026-04-21)
+
+
+### Bug Fixes
+
+* enable node.client to access account_secret of registryProject entity ([1cbe079](https://github.com/PrivateAIM/hub/commit/1cbe079386e5d32584956a65252bd36da1944ec1))
+* pass skipProjectApproval and skipAnalysisApproval to controllers ([9af7ecf](https://github.com/PrivateAIM/hub/commit/9af7ecf039ccb5950eb657fde55ccad525b28b10))
+* properly init nodeClientService to node repository ([7f19abf](https://github.com/PrivateAIM/hub/commit/7f19abf6dae15605f93e2c37704287278f31c511))
+* set progress to max 100 ([fc78d15](https://github.com/PrivateAIM/hub/commit/fc78d158cd2b5334b73575c5db02c4cc85a21ba7))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.8.35 to ^0.8.36
+    * @privateaim/core-realtime-kit bumped from ^0.7.36 to ^0.7.37
+    * @privateaim/kit bumped from ^0.8.35 to ^0.8.36
+    * @privateaim/server-core-worker-kit bumped from ^0.7.36 to ^0.7.37
+    * @privateaim/server-db-kit bumped from ^0.8.35 to ^0.8.36
+    * @privateaim/server-http-kit bumped from ^0.8.35 to ^0.8.36
+    * @privateaim/server-kit bumped from ^0.8.35 to ^0.8.36
+    * @privateaim/server-realtime-kit bumped from ^0.8.35 to ^0.8.36
+    * @privateaim/server-telemetry bumped from ^0.8.35 to ^0.8.36
+    * @privateaim/server-telemetry-kit bumped from ^0.8.35 to ^0.8.36
+    * @privateaim/storage-kit bumped from ^0.8.35 to ^0.8.36
+    * @privateaim/telemetry-kit bumped from ^0.8.35 to ^0.8.36
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.8.35 to ^0.8.36
+
 ## [0.8.35](https://github.com/PrivateAIM/hub/compare/v0.8.34...v0.8.35) (2026-04-19)
 
 
