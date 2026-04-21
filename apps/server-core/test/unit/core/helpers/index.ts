@@ -5,5 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+export * from './fake-analysis-repository.ts';
+export * from './fake-bucket-caller.ts';
+export * from './fake-builder-caller.ts';
+export * from './fake-distributor-caller.ts';
+export * from './fake-metadata-caller.ts';
+export * from './fake-node-repository.ts';
+export * from './fake-project-repository.ts';
 export * from './fake-repository.ts';
+export * from './fake-task-manager.ts';
 export * from './mock-actor.ts';

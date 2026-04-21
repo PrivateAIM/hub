@@ -18,7 +18,7 @@ import {
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
-import { send, sendAccepted } from 'routup';
+import type { Request, Response } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { IMasterImageService } from '../../../../../core/index.ts';
 import { buildActorContext } from '../../../request/index.ts';
@@ -40,22 +40,18 @@ export class MasterImageController {
 
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
-        @DRequest() req: any,
-        @DResponse() res: any,
-    ): Promise<PartialMasterImage[]> {
+        @DRequest() req: Request,
+    ) {
         const query = useRequestQuery(req);
         const { data, meta } = await this.service.getMany(query);
-        return send(res, { data, meta }) as any;
+        return { data, meta };
     }
 
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
-        @DRequest() req: any,
-        @DResponse() res: any,
     ): Promise<PartialMasterImage | undefined> {
-        const entity = await this.service.getOne(id);
-        return send(res, entity) as PartialMasterImage | undefined;
+        return this.service.getOne(id);
     }
 
     @DPost('/command', [ForceLoggedInMiddleware])
@@ -64,22 +60,24 @@ export class MasterImageController {
             command: MasterImageCommand;
             id?: string;
         },
-        @DRequest() req: any,
-        @DResponse() res: any,
+        @DRequest() req: Request,
+        @DResponse() res: Response,
     ) {
         const actor = buildActorContext(req);
         const entity = await this.service.executeCommand(data.command, data, actor);
-        return sendAccepted(res, entity);
+        res.statusCode = 202;
+        return entity;
     }
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @DPath('id') id: string,
-        @DRequest() req: any,
-        @DResponse() res: any,
+        @DRequest() req: Request,
+        @DResponse() res: Response,
     ): Promise<PartialMasterImage | undefined> {
         const actor = buildActorContext(req);
         const entity = await this.service.delete(id, actor);
-        return sendAccepted(res, entity) as PartialMasterImage | undefined;
+        res.statusCode = 202;
+        return entity;
     }
 }

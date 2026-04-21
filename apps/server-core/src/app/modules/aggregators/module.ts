@@ -109,7 +109,8 @@ export class AggregatorsModule implements IModule {
             ),
             new MessageBusWorkerComponentCaller(
                 new MasterImageSynchronizerAggregator({
-                    dataSource,
+                    imageRepository: container.resolve(DatabaseInjectionKey.MasterImageRepository),
+                    groupRepository: container.resolve(DatabaseInjectionKey.MasterImageGroupRepository),
                     logger,
                     eventComponentCaller: messageBus ? new EventComponentCaller({ messageBus }) : undefined,
                 }),

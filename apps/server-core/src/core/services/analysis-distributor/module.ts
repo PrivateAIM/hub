@@ -84,10 +84,10 @@ export class AnalysisDistributor {
 
         for (const analysisNode of analysisNodes) {
             if (
-                (analysisNode as any).node &&
-                !(analysisNode as any).node.registry_id
+                analysisNode.node &&
+                !analysisNode.node.registry_id
             ) {
-                throw new BadRequestError(`The node ${(analysisNode as any).node.name} is not assigned to a registry yet.`);
+                throw new BadRequestError(`The node ${analysisNode.node.name} is not assigned to a registry yet.`);
             }
         }
     }

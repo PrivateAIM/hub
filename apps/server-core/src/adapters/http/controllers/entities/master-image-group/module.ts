@@ -16,7 +16,7 @@ import {
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
-import { send, sendAccepted } from 'routup';
+import type { Request, Response } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { IMasterImageGroupService } from '../../../../../core/index.ts';
 import { buildActorContext } from '../../../request/index.ts';
@@ -38,32 +38,29 @@ export class MasterImageGroupController {
 
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
-        @DRequest() req: any,
-        @DResponse() res: any,
-    ): Promise<PartialMasterImageGroup[]> {
+        @DRequest() req: Request,
+    ) {
         const query = useRequestQuery(req);
         const { data, meta } = await this.service.getMany(query);
-        return send(res, { data, meta }) as any;
+        return { data, meta };
     }
 
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
-        @DRequest() req: any,
-        @DResponse() res: any,
     ): Promise<PartialMasterImageGroup | undefined> {
-        const entity = await this.service.getOne(id);
-        return send(res, entity) as PartialMasterImageGroup | undefined;
+        return this.service.getOne(id);
     }
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @DPath('id') id: string,
-        @DRequest() req: any,
-        @DResponse() res: any,
+        @DRequest() req: Request,
+        @DResponse() res: Response,
     ): Promise<PartialMasterImageGroup | undefined> {
         const actor = buildActorContext(req);
         const entity = await this.service.delete(id, actor);
-        return sendAccepted(res, entity) as PartialMasterImageGroup | undefined;
+        res.statusCode = 202;
+        return entity;
     }
 }

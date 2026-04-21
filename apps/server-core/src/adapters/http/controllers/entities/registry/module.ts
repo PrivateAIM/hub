@@ -18,7 +18,7 @@ import {
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
-import { send, sendAccepted, sendCreated } from 'routup';
+import type { Request, Response } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { IRegistryService } from '../../../../../core/index.ts';
 import { buildActorContext } from '../../../request/index.ts';
@@ -40,58 +40,58 @@ export class RegistryController {
 
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
-        @DRequest() req: any,
-        @DResponse() res: any,
-    ): Promise<PartialRegistry[]> {
+        @DRequest() req: Request,
+    ) {
         const actor = buildActorContext(req);
         const query = useRequestQuery(req);
         const { data, meta } = await this.service.getMany(query, actor);
-        return send(res, { data, meta }) as any;
+        return { data, meta };
     }
 
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
-        @DRequest() req: any,
-        @DResponse() res: any,
+        @DRequest() req: Request,
     ): Promise<PartialRegistry | undefined> {
         const actor = buildActorContext(req);
         const query = useRequestQuery(req);
-        const entity = await this.service.getOne(id, actor, Object.keys(query).length > 0 ? query : undefined);
-        return send(res, entity) as PartialRegistry | undefined;
+        return this.service.getOne(id, actor, Object.keys(query).length > 0 ? query : undefined);
     }
 
     @DPost('', [ForceLoggedInMiddleware])
     async add(
         @DBody() data: any,
-        @DRequest() req: any,
-        @DResponse() res: any,
+        @DRequest() req: Request,
+        @DResponse() res: Response,
     ): Promise<PartialRegistry | undefined> {
         const actor = buildActorContext(req);
         const entity = await this.service.create(data, actor);
-        return sendCreated(res, entity) as PartialRegistry | undefined;
+        res.statusCode = 201;
+        return entity;
     }
 
     @DPost('/:id', [ForceLoggedInMiddleware])
     async edit(
         @DPath('id') id: string,
         @DBody() data: any,
-        @DRequest() req: any,
-        @DResponse() res: any,
+        @DRequest() req: Request,
+        @DResponse() res: Response,
     ): Promise<PartialRegistry | undefined> {
         const actor = buildActorContext(req);
         const entity = await this.service.update(id, data, actor);
-        return sendAccepted(res, entity) as PartialRegistry | undefined;
+        res.statusCode = 202;
+        return entity;
     }
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @DPath('id') id: string,
-        @DRequest() req: any,
-        @DResponse() res: any,
+        @DRequest() req: Request,
+        @DResponse() res: Response,
     ): Promise<PartialRegistry | undefined> {
         const actor = buildActorContext(req);
         const entity = await this.service.delete(id, actor);
-        return sendAccepted(res, entity) as PartialRegistry | undefined;
+        res.statusCode = 202;
+        return entity;
     }
 }

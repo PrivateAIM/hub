@@ -5,22 +5,23 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { MasterImage, MasterImageGroup } from '@privateaim/core-kit';
 import type {
     MasterImageSynchronizerExecutionFinishedPayload,
 } from '@privateaim/server-core-worker-kit';
 import type { Logger } from '@privateaim/server-kit';
-import type { DataSource } from 'typeorm';
+import type { IEntityRepository } from '../../../../core/entities/types.ts';
 import { MasterImageSynchronizerService } from '../../../../core/services/master-image/index.ts';
-import { MasterImageEntity, MasterImageGroupEntity } from '../../../../adapters/database/index.ts';
 
 export async function handleMasterImageSynchronizerExecutionFinishedEvent(
     value: MasterImageSynchronizerExecutionFinishedPayload,
-    dataSource: DataSource,
+    imageRepository: IEntityRepository<MasterImage>,
+    groupRepository: IEntityRepository<MasterImageGroup>,
     logger?: Logger,
 ) {
     const synchronizer = new MasterImageSynchronizerService({
-        imageRepository: dataSource.getRepository(MasterImageEntity) as any,
-        groupRepository: dataSource.getRepository(MasterImageGroupEntity) as any,
+        imageRepository,
+        groupRepository,
     });
 
     const output = await synchronizer

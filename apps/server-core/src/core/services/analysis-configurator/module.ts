@@ -59,8 +59,8 @@ export class AnalysisConfigurator {
 
         for (const analysisNode of analysisNodes) {
             if (
-                (analysisNode as any).node &&
-                (analysisNode as any).node.type === NodeType.AGGREGATOR
+                analysisNode.node &&
+                analysisNode.node.type === NodeType.AGGREGATOR
             ) {
                 continue;
             }

@@ -11,11 +11,10 @@ import {
     DGet,
     DPath,
     DRequest,
-    DResponse,
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
-import { send } from 'routup';
+import type { Request } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { IAnalysisNodeEventService } from '../../../../../core/index.ts';
 
@@ -36,21 +35,17 @@ export class AnalysisNodeEventController {
 
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
-        @DRequest() req: any,
-        @DResponse() res: any,
-    ): Promise<PartialAnalysisNodeEvent[]> {
+        @DRequest() req: Request,
+    ) {
         const query = useRequestQuery(req);
         const { data, meta } = await this.service.getMany(query);
-        return send(res, { data, meta }) as any;
+        return { data, meta };
     }
 
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
-        @DRequest() req: any,
-        @DResponse() res: any,
     ): Promise<PartialAnalysisNodeEvent | undefined> {
-        const entity = await this.service.getOne(id);
-        return send(res, entity) as PartialAnalysisNodeEvent | undefined;
+        return this.service.getOne(id);
     }
 }
