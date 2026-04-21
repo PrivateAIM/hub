@@ -8,6 +8,7 @@
 import type { IContainer } from 'eldin';
 import type { IModule, ModuleDependency } from 'orkos';
 import {
+    AUTHUP_CLIENT_MODULE_NAME,
     AuthupClientInjectionKey,
     ENTITY_EVENT_MODULE_NAME,
     EntityEventPublisherInjectionKey,
@@ -44,6 +45,7 @@ export class DatabaseModule implements IModule {
 
     readonly dependencies: (string | ModuleDependency)[] = [
         { name: ENTITY_EVENT_MODULE_NAME, optional: true },
+        { name: AUTHUP_CLIENT_MODULE_NAME, optional: true },
     ];
 
     async setup(container: IContainer): Promise<void> {
