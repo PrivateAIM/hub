@@ -13,11 +13,14 @@ import type { NodeClientService } from '../../../../../../src/app/modules/databa
 
 type DismissCall = { entity: Record<string, any> };
 type AssignCall = { entity: Record<string, any> };
+type AssignPermissionsCall = { client: Client };
 
 class FakeNodeClientService {
     private dismissCalls: DismissCall[] = [];
 
     private assignCalls: AssignCall[] = [];
+
+    private assignPermissionsCalls: AssignPermissionsCall[] = [];
 
     private nextClientId = 'client-1';
 
@@ -32,8 +35,8 @@ class FakeNodeClientService {
         return { id: this.nextClientId } as Client;
     }
 
-    async assignPermissions(): Promise<void> {
-        // no-op
+    async assignPermissions(client: Client): Promise<void> {
+        this.assignPermissionsCalls.push({ client });
     }
 
     getDismissCalls(): DismissCall[] {
@@ -42,6 +45,10 @@ class FakeNodeClientService {
 
     getAssignCalls(): AssignCall[] {
         return [...this.assignCalls];
+    }
+
+    getAssignPermissionsCalls(): AssignPermissionsCall[] {
+        return [...this.assignPermissionsCalls];
     }
 }
 
@@ -120,6 +127,17 @@ describe('NodeSubscriber', () => {
             expect(nodeClientService.getAssignCalls()).toHaveLength(1);
         });
 
+        it('should call nodeClientService.assignPermissions after assign', async () => {
+            const nodeClientService = new FakeNodeClientService();
+            const subscriber = new NodeSubscriber({ nodeClientService: nodeClientService as unknown as NodeClientService });
+
+            const event = createMockInsertEvent();
+            await subscriber.afterInsert(event as any);
+
+            expect(nodeClientService.getAssignPermissionsCalls()).toHaveLength(1);
+            expect(nodeClientService.getAssignPermissionsCalls()[0].client.id).toBe('client-1');
+        });
+
         it('should not throw when nodeClientService is not set', async () => {
             const subscriber = new NodeSubscriber();
 
@@ -137,6 +155,55 @@ describe('NodeSubscriber', () => {
             await subscriber.afterUpdate(event as any);
 
             expect(nodeClientService.getAssignCalls()).toHaveLength(1);
+        });
+
+        it('should call nodeClientService.assignPermissions after assign', async () => {
+            const nodeClientService = new FakeNodeClientService();
+            const subscriber = new NodeSubscriber({ nodeClientService: nodeClientService as unknown as NodeClientService });
+
+            const event = createMockUpdateEvent();
+            await subscriber.afterUpdate(event as any);
+
+            expect(nodeClientService.getAssignPermissionsCalls()).toHaveLength(1);
+            expect(nodeClientService.getAssignPermissionsCalls()[0].client.id).toBe('client-1');
+        });
+
+        it('should save entity when client_id changes', async () => {
+            const nodeClientService = new FakeNodeClientService();
+            const subscriber = new NodeSubscriber({ nodeClientService: nodeClientService as unknown as NodeClientService });
+
+            let savedEntity: Record<string, any> | undefined;
+            const event = createMockUpdateEvent({
+                entity: {
+                    id: randomUUID(), 
+                    client_id: null, 
+                    realm_id: randomUUID(), 
+                },
+                manager: { getRepository: () => ({ save: async (e: Record<string, any>) => { savedEntity = e; return e; } }) },
+            });
+            await subscriber.afterUpdate(event as any);
+
+            expect(savedEntity).toBeDefined();
+            expect(savedEntity!.client_id).toBe('client-1');
+        });
+
+        it('should not save entity when client_id is unchanged', async () => {
+            const nodeClientService = new FakeNodeClientService();
+            const subscriber = new NodeSubscriber({ nodeClientService: nodeClientService as unknown as NodeClientService });
+
+            let saveCalled = false;
+            const event = createMockUpdateEvent({
+                entity: {
+                    id: randomUUID(), 
+                    client_id: 'client-1', 
+                    realm_id: randomUUID(), 
+                },
+                manager: { getRepository: () => ({ save: async (e: Record<string, any>) => { saveCalled = true; return e; } }) },
+            });
+            await subscriber.afterUpdate(event as any);
+
+            expect(saveCalled).toBe(false);
+            expect(nodeClientService.getAssignPermissionsCalls()).toHaveLength(1);
         });
 
         it('should not throw when nodeClientService is not set', async () => {
