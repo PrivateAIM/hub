@@ -7,6 +7,7 @@
 
 import { NotFoundError } from '@ebec/http';
 import type { Analysis } from '@privateaim/core-kit';
+import { AnalysisError } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
 import { 
     beforeEach, 
@@ -87,14 +88,14 @@ describe('AnalysisBuilder', () => {
             const analysis = createFullAnalysis({ configuration_locked: false });
             repository.seed(analysis);
 
-            await expect(builder.start(analysis)).rejects.toThrow();
+            await expect(builder.start(analysis)).rejects.toThrow(AnalysisError);
         });
 
         it('should throw when build nodes not valid', async () => {
             const analysis = createFullAnalysis({ configuration_locked: true, build_nodes_valid: false });
             repository.seed(analysis);
 
-            await expect(builder.start(analysis)).rejects.toThrow();
+            await expect(builder.start(analysis)).rejects.toThrow(AnalysisError);
         });
 
         it('should allow retry when build FAILED', async () => {
@@ -109,7 +110,7 @@ describe('AnalysisBuilder', () => {
             const analysis = createFullAnalysis({ configuration_locked: true, build_status: ProcessStatus.STARTING });
             repository.seed(analysis);
 
-            await expect(builder.start(analysis)).rejects.toThrow();
+            await expect(builder.start(analysis)).rejects.toThrow(AnalysisError);
         });
     });
 
@@ -141,21 +142,21 @@ describe('AnalysisBuilder', () => {
             const analysis = createFullAnalysis({ configuration_locked: false, build_status: ProcessStatus.STARTED });
             repository.seed(analysis);
 
-            await expect(builder.check(analysis)).rejects.toThrow();
+            await expect(builder.check(analysis)).rejects.toThrow(AnalysisError);
         });
 
         it('should throw when no build started', async () => {
             const analysis = createFullAnalysis({ configuration_locked: true, build_status: null });
             repository.seed(analysis);
 
-            await expect(builder.check(analysis)).rejects.toThrow();
+            await expect(builder.check(analysis)).rejects.toThrow(AnalysisError);
         });
 
         it('should throw when build already EXECUTED', async () => {
             const analysis = createFullAnalysis({ configuration_locked: true, build_status: ProcessStatus.EXECUTED });
             repository.seed(analysis);
 
-            await expect(builder.check(analysis)).rejects.toThrow();
+            await expect(builder.check(analysis)).rejects.toThrow(AnalysisError);
         });
     });
 });

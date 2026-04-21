@@ -76,14 +76,18 @@ describe('ProjectService', () => {
 
     describe('delete', () => {
         it('should delete project with no analyses', async () => {
-            repository.seed(createTestProject({ analyses: 0 }));
+            const project = createTestProject();
+            project.analyses = 0;
+            repository.seed(project);
 
             const result = await service.delete('project-1', createAllowAllActor());
             expect(result.id).toBe('project-1');
         });
 
         it('should throw BadRequestError when project still has analyses', async () => {
-            repository.seed(createTestProject({ analyses: 3 }));
+            const project = createTestProject();
+            project.analyses = 3;
+            repository.seed(project);
 
             await expect(
                 service.delete('project-1', createAllowAllActor()),

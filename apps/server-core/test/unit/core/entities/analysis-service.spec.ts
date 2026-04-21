@@ -154,8 +154,7 @@ describe('AnalysisService', () => {
             const result = await service.delete('analysis-1', createAllowAllActor());
 
             expect(result.id).toBe('analysis-1');
-            // entity.project was destructured before remove, analyses-- applied once
-            expect(result.project.analyses).toBeLessThan(2);
+            expect(result.project.analyses).toBe(1);
         });
 
         it('should throw ForbiddenError when actor lacks permission', async () => {
@@ -268,6 +267,37 @@ describe('AnalysisService', () => {
             );
 
             expect(builderCaller.getCallsFor('callCheck')).toHaveLength(1);
+        });
+
+        it('should dispatch DISTRIBUTION_START to distributor', async () => {
+            analysisRepository.seed(createFullAnalysis({
+                configuration_locked: true,
+                build_status: ProcessStatus.EXECUTED,
+            }));
+
+            const result = await service.executeCommand(
+                'analysis-1',
+                AnalysisCommand.DISTRIBUTION_START,
+                createAllowAllActor(),
+            );
+
+            expect(result.distribution_status).toBe(ProcessStatus.STARTING);
+            expect(distributorCaller.getCallsFor('callExecute')).toHaveLength(1);
+        });
+
+        it('should dispatch DISTRIBUTION_CHECK to distributor', async () => {
+            analysisRepository.seed(createFullAnalysis({
+                configuration_locked: true,
+                build_status: ProcessStatus.EXECUTED,
+            }));
+
+            await service.executeCommand(
+                'analysis-1',
+                AnalysisCommand.DISTRIBUTION_CHECK,
+                createAllowAllActor(),
+            );
+
+            expect(distributorCaller.getCallsFor('callCheck')).toHaveLength(1);
         });
 
         it('should dispatch STORAGE_CHECK to storageManager', async () => {

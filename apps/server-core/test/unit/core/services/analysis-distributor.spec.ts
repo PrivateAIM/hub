@@ -6,13 +6,13 @@
  */
 
 import { BadRequestError } from '@ebec/http';
+import { AnalysisError, NodeType  } from '@privateaim/core-kit';
 import type { 
     Analysis, 
     AnalysisNode, 
     Node, 
     Registry, 
 } from '@privateaim/core-kit';
-import { NodeType } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
 import { 
     beforeEach, 
@@ -126,13 +126,13 @@ describe('AnalysisDistributor', () => {
         it('should throw when build not EXECUTED', async () => {
             const analysis = seedBuiltAnalysis({ build_status: ProcessStatus.STARTED });
 
-            await expect(distributor.start(analysis)).rejects.toThrow();
+            await expect(distributor.start(analysis)).rejects.toThrow(AnalysisError);
         });
 
         it('should throw when distribution already in progress', async () => {
             const analysis = seedBuiltAnalysis({ distribution_status: ProcessStatus.STARTING });
 
-            await expect(distributor.start(analysis)).rejects.toThrow();
+            await expect(distributor.start(analysis)).rejects.toThrow(AnalysisError);
         });
 
         it('should allow retry when distribution FAILED', async () => {
@@ -185,13 +185,13 @@ describe('AnalysisDistributor', () => {
         it('should throw when build not initialized', async () => {
             const analysis = seedBuiltAnalysis({ build_status: null });
 
-            await expect(distributor.check(analysis)).rejects.toThrow();
+            await expect(distributor.check(analysis)).rejects.toThrow(AnalysisError);
         });
 
         it('should throw when build not EXECUTED', async () => {
             const analysis = seedBuiltAnalysis({ build_status: ProcessStatus.FAILED });
 
-            await expect(distributor.check(analysis)).rejects.toThrow();
+            await expect(distributor.check(analysis)).rejects.toThrow(AnalysisError);
         });
     });
 });

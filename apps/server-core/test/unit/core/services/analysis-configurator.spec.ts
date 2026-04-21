@@ -7,7 +7,7 @@
 
 import { NotFoundError } from '@ebec/http';
 import type { Analysis, AnalysisNode } from '@privateaim/core-kit';
-import { AnalysisNodeApprovalStatus, NodeType } from '@privateaim/core-kit';
+import { AnalysisError, AnalysisNodeApprovalStatus, NodeType } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
 import { 
     beforeEach, 
@@ -81,28 +81,28 @@ describe('AnalysisConfigurator', () => {
             const analysis = createFullAnalysis({ configuration_locked: true });
             repository.seed(analysis);
 
-            await expect(configurator.lock(analysis)).rejects.toThrow();
+            await expect(configurator.lock(analysis)).rejects.toThrow(AnalysisError);
         });
 
         it('should throw when build already initialized', async () => {
             const analysis = createFullAnalysis({ build_status: ProcessStatus.STARTING });
             repository.seed(analysis);
 
-            await expect(configurator.lock(analysis)).rejects.toThrow();
+            await expect(configurator.lock(analysis)).rejects.toThrow(AnalysisError);
         });
 
         it('should throw when default node invalid', async () => {
             const analysis = createFullAnalysis({ configuration_node_default_valid: false });
             repository.seed(analysis);
 
-            await expect(configurator.lock(analysis)).rejects.toThrow();
+            await expect(configurator.lock(analysis)).rejects.toThrow(AnalysisError);
         });
 
         it('should throw when entrypoint invalid', async () => {
             const analysis = createFullAnalysis({ configuration_entrypoint_valid: false });
             repository.seed(analysis);
 
-            await expect(configurator.lock(analysis)).rejects.toThrow();
+            await expect(configurator.lock(analysis)).rejects.toThrow(AnalysisError);
         });
     });
 
@@ -136,7 +136,7 @@ describe('AnalysisConfigurator', () => {
             const analysis = createFullAnalysis({ configuration_locked: false });
             repository.seed(analysis);
 
-            await expect(configurator.unlock(analysis)).rejects.toThrow();
+            await expect(configurator.unlock(analysis)).rejects.toThrow(AnalysisError);
         });
 
         it('should throw when build in progress (STARTING)', async () => {
@@ -146,7 +146,7 @@ describe('AnalysisConfigurator', () => {
             });
             repository.seed(analysis);
 
-            await expect(configurator.unlock(analysis)).rejects.toThrow();
+            await expect(configurator.unlock(analysis)).rejects.toThrow(AnalysisError);
         });
 
         it('should reset approval_status on non-aggregator nodes', async () => {
