@@ -85,7 +85,11 @@ export function createControllers(container: IContainer): Record<string, any>[] 
     });
     const masterImageGroupService = new MasterImageGroupService({ repository: masterImageGroupRepository });
     const projectService = new ProjectService({ repository: projectRepository });
-    const registryProjectService = new RegistryProjectService({ repository: registryProjectRepository, registryManager });
+    const registryProjectService = new RegistryProjectService({
+        repository: registryProjectRepository, 
+        registryManager, 
+        nodeRepository, 
+    });
     const analysisService = new AnalysisService({
         repository: analysisRepository,
         projectRepository,
