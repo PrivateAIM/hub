@@ -22,6 +22,7 @@ import { ForceLoggedInMiddleware, useRequestPermissionChecker } from '@privateai
 import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { parseQueryPagination } from 'rapiq';
 import type { Request, Response } from 'routup';
+import { sendAccepted } from 'routup';
 import type { LogStore } from '../../../../core/services/log-store/types.ts';
 
 @DTags('logs')
@@ -136,14 +137,14 @@ export class LogController {
 
             const keys = Object.keys(raw);
             for (const key of keys) {
-                const index = key.indexOf('.');
-
-                let nextKey: string;
-                if (index !== -1) {
-                    nextKey = key.substring(index + 1);
-                } else {
-                    nextKey = key;
+                if (key === 'time') {
+                    continue;
                 }
+
+                const index = key.indexOf('.');
+                const nextKey = index === -1 ?
+                    key :
+                    key.substring(index + 1);
 
                 if (typeof raw[key] === 'string') {
                     labels[nextKey] = raw[key];
@@ -163,6 +164,6 @@ export class LogController {
             labels,
         });
 
-        res.statusCode = 202;
+        return sendAccepted(res);
     }
 }
