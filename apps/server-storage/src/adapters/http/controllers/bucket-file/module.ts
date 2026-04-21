@@ -23,6 +23,7 @@ import type { Request, Response } from 'routup';
 import { getRequestAcceptableEncoding } from 'routup';
 import type { Client } from 'minio';
 import type { IBucketFileRepository, IBucketFileService } from '../../../../core/entities/index.ts';
+import { toBucketName } from '../../../../core/utils/bucket-name.ts';
 import { buildActorContext } from '../../request/index.ts';
 
 type BucketFileControllerContext = {
@@ -84,7 +85,7 @@ export class BucketFileController {
             });
         }
 
-        const bucketName = entity.bucket_id.toLowerCase().replace(/[^a-z0-9.-]/g, '').substring(0, 63);
+        const bucketName = toBucketName(entity.bucket_id);
 
         this.logger?.debug(`Streaming file ${entity.hash} (${id}) of ${bucketName}`);
 

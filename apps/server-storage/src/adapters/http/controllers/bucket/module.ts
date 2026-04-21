@@ -23,6 +23,7 @@ import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { Request, Response } from 'routup';
 import type { Client } from 'minio';
 import type { IBucketFileRepository, IBucketService } from '../../../../core/entities/index.ts';
+import { toBucketName } from '../../../../core/utils/bucket-name.ts';
 import type { BucketFileComponent } from '../../../../app/components/bucket-file/module.ts';
 import { buildActorContext } from '../../request/index.ts';
 import { uploadRequestFilesToBucket } from './upload.ts';
@@ -85,7 +86,7 @@ export class BucketController {
             'Transfer-Encoding': 'chunked',
         });
 
-        const bucketName = entity.id.toLowerCase().replace(/[^a-z0-9.-]/g, '').substring(0, 63);
+        const bucketName = toBucketName(entity.id);
 
         this.logger?.debug(`Streaming files of ${bucketName}`);
 

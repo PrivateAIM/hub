@@ -9,6 +9,7 @@ import type { Bucket } from '@privateaim/storage-kit';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { PermissionName, isRealmResourceWritable } from '@privateaim/kit';
 import type { Client } from 'minio';
+import { toBucketName } from '../../utils/bucket-name.ts';
 import type { ActorContext } from '../actor/types.ts';
 import type { EntityRepositoryFindManyResult } from '../types.ts';
 import { AbstractEntityService } from '../service.ts';
@@ -99,7 +100,7 @@ export class BucketService extends AbstractEntityService implements IBucketServi
 
         await this.repository.save(entity, { data: actor.metadata });
 
-        const bucketName = this.toBucketName(entity.id);
+        const bucketName = toBucketName(entity.id);
         const hasBucket = await this.minio.bucketExists(bucketName);
         if (!hasBucket) {
             if (entity.region) {
@@ -133,9 +134,5 @@ export class BucketService extends AbstractEntityService implements IBucketServi
         if (!actor.identity) return false;
         return entity.actor_type === actor.identity.type &&
             entity.actor_id === actor.identity.id;
-    }
-
-    private toBucketName(id: string): string {
-        return id.toLowerCase().replace(/[^a-z0-9.-]/g, '').substring(0, 63);
     }
 }

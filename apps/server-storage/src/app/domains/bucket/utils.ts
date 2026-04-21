@@ -8,15 +8,9 @@
 import type { RequestIdentity } from '@privateaim/server-http-kit';
 import type { Bucket } from '@privateaim/storage-kit';
 
+export { toBucketName } from '../../../core/utils/bucket-name.ts';
+
 export function isBucketOwnedByIdentity(entity: Bucket, actor: RequestIdentity) {
     return entity.actor_type === actor.type &&
         entity.actor_id === actor.id;
-}
-
-export function toBucketName(input: string) : string {
-    input = input
-        .toLowerCase()
-        .replace(/[^a-z0-9.-]/g, '');
-
-    return input.slice(0, Math.min(63, input.length));
 }
