@@ -11,13 +11,18 @@ import { BucketFileEventCaller } from '@privateaim/server-storage-kit';
 import { BucketController } from '../../../adapters/http/controllers/bucket/module.ts';
 import { BucketFileController } from '../../../adapters/http/controllers/bucket-file/module.ts';
 import { RootController } from '../../../adapters/http/controllers/root/index.ts';
+import { BucketService } from '../../../core/entities/bucket/service.ts';
+import { BucketFileService } from '../../../core/entities/bucket-file/service.ts';
 import { BucketComponent } from '../../components/bucket/module.ts';
 import { BucketFileComponent } from '../../components/bucket-file/module.ts';
 import { DatabaseInjectionKey } from '../database/constants.ts';
 import { MinioClientInjectionKey } from '../minio/constants.ts';
+import { BucketCallerAdapter } from './callers/bucket-caller.ts';
+import { BucketFileCallerAdapter } from './callers/bucket-file-caller.ts';
 
 export function createControllers(container: IContainer): Record<string, any>[] {
-    const dataSource = container.resolve(DatabaseInjectionKey.DataSource);
+    const bucketRepository = container.resolve(DatabaseInjectionKey.BucketRepository);
+    const bucketFileRepository = container.resolve(DatabaseInjectionKey.BucketFileRepository);
     const minio = container.resolve(MinioClientInjectionKey);
 
     const loggerResult = container.tryResolve(LoggerInjectionKey);
@@ -30,20 +35,33 @@ export function createControllers(container: IContainer): Record<string, any>[] 
     const bucketFileComponent = new BucketFileComponent({ minio, logger });
     const bucketFileEventCaller = new BucketFileEventCaller({ messageBus });
 
+    const bucketCaller = new BucketCallerAdapter(bucketComponent);
+    const bucketFileCaller = new BucketFileCallerAdapter(bucketFileComponent, bucketFileEventCaller);
+
+    const bucketService = new BucketService({
+        repository: bucketRepository,
+        caller: bucketCaller,
+        minio,
+    });
+
+    const bucketFileService = new BucketFileService({
+        repository: bucketFileRepository,
+        caller: bucketFileCaller,
+    });
+
     return [
         new BucketController({
-            dataSource,
+            service: bucketService,
+            bucketFileRepository,
             minio,
-            bucketComponent,
             bucketFileComponent,
             bucketFileEventCaller,
             logger,
         }),
         new BucketFileController({
-            dataSource,
+            service: bucketFileService,
+            bucketFileRepository,
             minio,
-            bucketFileComponent,
-            bucketFileEventCaller,
             logger,
         }),
         new RootController(),

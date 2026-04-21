@@ -9,12 +9,14 @@ import type { IContainer } from 'eldin';
 import { EventController } from '../../../adapters/http/controllers/event/module.ts';
 import { LogController } from '../../../adapters/http/controllers/log/module.ts';
 import { RootController } from '../../../adapters/http/controllers/root/index.ts';
+import { EventService } from '../../../core/entities/event/service.ts';
 import type { LogStore } from '../../../core/services/log-store/types.ts';
 import { DatabaseInjectionKey } from '../database/constants.ts';
 import { LogStoreInjectionKey } from '../victoria-logs/constants.ts';
 
 export function createControllers(container: IContainer): Record<string, any>[] {
-    const dataSource = container.resolve(DatabaseInjectionKey.DataSource);
+    const eventRepository = container.resolve(DatabaseInjectionKey.EventRepository);
+    const eventService = new EventService({ repository: eventRepository });
 
     const logStoreResult = container.tryResolve(LogStoreInjectionKey);
     let logStore: LogStore | undefined;
@@ -23,7 +25,7 @@ export function createControllers(container: IContainer): Record<string, any>[] 
     }
 
     const controllers: Record<string, any>[] = [
-        new EventController({ dataSource }),
+        new EventController({ service: eventService }),
         new RootController(),
     ];
 
