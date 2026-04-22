@@ -158,7 +158,7 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
 
         const saved = await this.repository.save(merged, { data: actor.metadata });
 
-        this.recalculator.recalcDebounced(saved.id);
+        await this.recalculator.recalcDebounced(saved.id);
 
         return saved;
     }
