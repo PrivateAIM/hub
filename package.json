@@ -12,7 +12,8 @@
     "description": "This package contains all central packages. It was initially developed as part of my Bachelor Thesis.",
     "workspaces": [
         "apps/*",
-        "packages/*"
+        "packages/*",
+        "docs"
     ],
     "devDependencies": {
         "@swc/core": "^1.15.30",
@@ -38,12 +39,7 @@
         "test": "npx nx run-many -t test",
         "lint": "eslint",
         "lint:fix": "npm run lint -- --fix",
-        "prepare": "husky",
-        "cli": "npm run cli --workspace=apps/server-core",
-        "client-ui": "npm run dev --workspace=apps/client-ui",
-        "server-api": "npm run dev --workspace=apps/server-core",
-        "server-realtime": "npm run dev --workspace=apps/server-messenger",
-        "server-train-manager": "npm run dev --workspace=apps/server-core-worker"
+        "prepare": "husky"
     },
     "lint-staged": {
         "*.{vue,js,ts}": "npm run lint:fix"

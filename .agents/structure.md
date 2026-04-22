@@ -2,7 +2,7 @@
 
 ## Monorepo Overview
 
-npm workspaces monorepo with two workspace roots: `apps/*` and `packages/*`. Nx orchestrates build/test/lint with dependency-aware caching.
+npm workspaces monorepo with three workspace roots: `apps/*`, `packages/*`, and `docs`. Nx orchestrates build/test/lint with dependency-aware caching.
 
 ## Applications (6)
 
@@ -23,6 +23,14 @@ Runnable services and the frontend, located in `apps/`.
 | Application  | Purpose                              | Key Dependencies                    |
 |--------------|--------------------------------------|-------------------------------------|
 | `client-ui`  | Nuxt 4 SSR web application           | client-vue, core-http-kit, authup   |
+
+### Documentation
+
+| Directory | Purpose                              | Key Dependencies                    |
+|-----------|--------------------------------------|-------------------------------------|
+| `docs`    | VitePress documentation site         | vitepress, vue                      |
+
+See [Conventions — Documentation Site](.agents/conventions.md#documentation-site) for docs structure and update guidelines.
 
 ## Packages & Libraries (15)
 

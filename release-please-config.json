@@ -24,7 +24,8 @@
         "packages/storage-kit": {"component": "storage-kit"},
         "apps/server-telemetry": {"component": "server-telemetry"},
         "packages/server-telemetry-kit": {"component": "server-telemetry-kit"},
-        "packages/telemetry-kit": {"component": "telemetry-kit"}
+        "packages/telemetry-kit": {"component": "telemetry-kit"},
+        "docs": {"component": "docs"}
     },
     "plugins": [
         {

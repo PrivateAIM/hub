@@ -1,6 +1,20 @@
-# HUB - Server DB Kit 
+# @privateaim/server-db-kit 🗄️
 
-This repository contains the toolkit for db services.
+[![npm version][npm-src]][npm-href]
 
-## Credits
-If you have any questions, feel free to contact the author [Peter Placzek](https://github.com/Tada5hi) of the project.
+TypeORM database utilities for PrivateAIM Hub — data source configuration, subscriber helpers, and migration support.
+
+## Installation
+
+```bash
+npm install @privateaim/server-db-kit
+```
+
+## License
+
+Made with 💚
+
+Published under [Apache 2.0](../../LICENSE).
+
+[npm-src]: https://img.shields.io/npm/v/@privateaim/server-db-kit
+[npm-href]: https://npmjs.com/package/@privateaim/server-db-kit
