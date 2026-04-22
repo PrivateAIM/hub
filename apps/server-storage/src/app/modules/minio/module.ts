@@ -10,22 +10,19 @@ import type { IModule } from 'orkos';
 import type { ClientOptions } from 'minio';
 import { Client } from 'minio';
 import { parseProxyConnectionString } from '@privateaim/kit';
+import { ConfigInjectionKey } from '../config/constants.ts';
+import type { Config } from '../config/types.ts';
 import { MinioClientInjectionKey } from './constants.ts';
-import type { MinioModuleOptions } from './types.ts';
 
 export class MinioModule implements IModule {
     readonly name = 'minio';
 
-    readonly dependencies: string[] = [];
-
-    private options: MinioModuleOptions;
-
-    constructor(options: MinioModuleOptions) {
-        this.options = options;
-    }
+    readonly dependencies: string[] = ['config'];
 
     async setup(container: IContainer): Promise<void> {
-        const connectionConfig = parseProxyConnectionString(this.options.connectionString);
+        const config = container.resolve(ConfigInjectionKey) as Config;
+
+        const connectionConfig = parseProxyConnectionString(config.minioConnectionString);
 
         const clientOptions: ClientOptions = {
             endPoint: connectionConfig.host,

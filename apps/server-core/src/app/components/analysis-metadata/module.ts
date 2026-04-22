@@ -14,10 +14,10 @@ import { AnalysisMetadataRecalcHandler } from './handlers/index.ts';
 import type { AnalysisMetadataEventMap } from './types.ts';
 
 export class AnalysisMetadataComponent extends BaseComponent<AnalysisMetadataEventMap> {
-    constructor(ctx: { dataSource: DataSource }) {
+    constructor(ctx: { dataSource: DataSource; config: { env: string; skipAnalysisApproval: boolean } }) {
         super();
 
-        this.mount(AnalysisMetadataCommand.RECALC, new AnalysisMetadataRecalcHandler({ dataSource: ctx.dataSource }));
+        this.mount(AnalysisMetadataCommand.RECALC, new AnalysisMetadataRecalcHandler({ dataSource: ctx.dataSource, config: ctx.config }));
     }
 
     async start() {

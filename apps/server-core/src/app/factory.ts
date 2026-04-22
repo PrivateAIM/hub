@@ -7,15 +7,12 @@
 
 import type { Application } from 'orkos';
 import {
-    AmqpMessageBusDriver,
     EntityEventRedisHandler,
     EntityEventSocketHandler,
     LoggerConsoleTransport,
     LoggerInjectionKey,
-    MemoryMessageBusDriver,
     MessageBusInjectionKey,
     RedisClientInjectionKey,
-    createAuthupClientTokenCreator,
 } from '@privateaim/server-kit';
 import {
     EntityEventHandler,
@@ -24,7 +21,6 @@ import {
     LoggerTransport,
 } from '@privateaim/server-telemetry-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
-import { useEnv } from './modules/config/index.ts';
 import { ServerCoreApplicationBuilder } from './builder.ts';
 import { AggregatorsModule } from './modules/aggregators/index.ts';
 import { AnalysisModule } from './modules/analysis/index.ts';
@@ -35,36 +31,15 @@ import { AuthupModule } from './modules/authup/index.ts';
 import { TelemetryClientModule } from './modules/telemetry-client/index.ts';
 
 export function createApplication() {
-    const env = useEnv();
-
     let app: Application;
     let logCaller: LogComponentCaller | undefined;
 
     const builder = new ServerCoreApplicationBuilder()
         .withConfig()
-        .withMessageBus( {
-            driverFactory: () => {
-                if (env.rabbitMqConnectionString) {
-                    return new AmqpMessageBusDriver({ connectionString: env.rabbitMqConnectionString });
-                }
-
-                return new MemoryMessageBusDriver();
-            },
-        })
-        .withRedis({ connectionString: env.redisConnectionString });
-
-    if (env.authupURL) {
-        builder.withAuthupHook({
-            baseURL: env.authupURL,
-            tokenCreator: createAuthupClientTokenCreator({
-                baseURL: env.authupURL,
-                clientId: env.clientId,
-                clientSecret: env.clientSecret,
-                realm: env.realm,
-            }),
-        });
-        builder.withAuthupClient({ baseURL: env.authupURL });
-    }
+        .withMessageBus()
+        .withRedis()
+        .withAuthupHook()
+        .withAuthupClient();
 
     builder.withEntityEvent({
         handlerFactory: (container) => {
@@ -115,10 +90,7 @@ export function createApplication() {
 
     app = builder.build();
 
-    if (env.telemetryURL) {
-        app.addModule(new TelemetryClientModule({ baseURL: env.telemetryURL }));
-    }
-
+    app.addModule(new TelemetryClientModule());
     app.addModule(new SwaggerModule());
     app.addModule(new HarborModule());
     app.addModule(new ComponentsModule());

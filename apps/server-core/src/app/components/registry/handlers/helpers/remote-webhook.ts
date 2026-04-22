@@ -15,11 +15,11 @@ import {
 } from '@privateaim/core-kit';
 import type { Client as AuthupClient } from '@authup/core-http-kit';
 import { stringifyAuthorizationHeader } from 'hapic';
-import { useEnv } from '../../../../../app/modules/config/index.ts';
 
 export async function saveRemoteRegistryProjectWebhook(
     httpClient: HarborClient,
     context: {
+        publicURL: string,
         projectIdOrName: string,
         isProjectName?: boolean,
         authupClient: AuthupClient,
@@ -43,7 +43,7 @@ export async function saveRemoteRegistryProjectWebhook(
                         password: client.secret,
                     }),
                     skip_cert_verify: true,
-                    address: `${useEnv('publicURL')}services/${ServiceID.REGISTRY}/hook`,
+                    address: `${context.publicURL.replace(/\/$/, '')}/services/${ServiceID.REGISTRY}/hook`,
                     type: 'http',
                 },
             ],

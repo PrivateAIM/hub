@@ -11,38 +11,38 @@ import { VictoriaLogsClient } from '@hapic/victorialogs';
 import type { IModule } from 'orkos';
 import { VictoriaLogsLogStore } from '../../../adapters/telemetry/victoria-logs.ts';
 import { MemoryLogStore } from '../../../adapters/telemetry/memory.ts';
+import { ConfigInjectionKey } from '../config/constants.ts';
+import type { Config } from '../config/types.ts';
 import { LogStoreInjectionKey, VictoriaLogsClientInjectionKey } from './constants.ts';
-import type { VictoriaLogsModuleOptions } from './types.ts';
 
 export class VictoriaLogsModule implements IModule {
     readonly name = 'victoriaLogs';
 
-    readonly dependencies: string[] = [];
-
-    private options: VictoriaLogsModuleOptions;
-
-    constructor(options: VictoriaLogsModuleOptions = {}) {
-        this.options = options;
-    }
+    readonly dependencies: string[] = ['config'];
 
     async setup(container: IContainer): Promise<void> {
-        if (!this.options.baseURL && !this.options.ingestorURL && !this.options.querierURL) {
+        const envConfig = container.resolve(ConfigInjectionKey) as Config;
+        const baseURL = envConfig.victoriaLogsURL ?? undefined;
+        const ingestorURL = envConfig.victoriaLogsIngestorURL ?? undefined;
+        const querierURL = envConfig.victoriaLogsQuerierURL ?? undefined;
+
+        if (!baseURL && !ingestorURL && !querierURL) {
             container.register(LogStoreInjectionKey, { useValue: new MemoryLogStore() });
             return;
         }
 
         const config: ConfigInput = {};
-        if (this.options.baseURL) {
-            config.request = { baseURL: this.options.baseURL };
+        if (baseURL) {
+            config.request = { baseURL };
         }
 
-        if (this.options.ingestorURL || this.options.querierURL) {
+        if (ingestorURL || querierURL) {
             config.options = {};
-            if (this.options.ingestorURL) {
-                config.options.ingesterURL = this.options.ingestorURL;
+            if (ingestorURL) {
+                config.options.ingesterURL = ingestorURL;
             }
-            if (this.options.querierURL) {
-                config.options.querierURL = this.options.querierURL;
+            if (querierURL) {
+                config.options.querierURL = querierURL;
             }
         }
 

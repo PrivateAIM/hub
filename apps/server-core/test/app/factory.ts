@@ -8,6 +8,7 @@
 import {
     CacheInjectionKey,
     CacheModule,
+    ConfigInjectionKey,
     LoggerModule,
     TaskManager,
 } from '@privateaim/server-kit';
@@ -37,7 +38,11 @@ function createTestComponentsModule(): IModule {
             const taskManager = new TaskManager<TaskMap>(cache);
             container.register(ComponentsInjectionKey.TaskManager, { useValue: taskManager });
 
-            const metadataComponent = new AnalysisMetadataComponent({ dataSource });
+            const config = container.resolve(ConfigInjectionKey);
+            const metadataComponent = new AnalysisMetadataComponent({
+                dataSource,
+                config: { env: config.env, skipAnalysisApproval: false },
+            });
             const metadataCaller = new AnalysisMetadataComponentCaller(metadataComponent);
             container.register(ComponentsInjectionKey.AnalysisMetadataComponentCaller, { useValue: metadataCaller });
 

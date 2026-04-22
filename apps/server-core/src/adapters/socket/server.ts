@@ -13,7 +13,7 @@ import type {
     STSEvents,
 } from '@privateaim/core-realtime-kit';
 import { createAuthupTokenVerifier } from '@privateaim/server-http-kit';
-import type { Logger } from '@privateaim/server-kit';
+import type { BaseServerConfig, Logger } from '@privateaim/server-kit';
 import {
     createAuthupClientTokenCreator,
 } from '@privateaim/server-kit';
@@ -28,9 +28,9 @@ import type { Server as HTTPServer } from 'node:http';
 import type { Client as RedisClient } from 'redis-extension';
 import type { Server } from 'socket.io';
 import { registerSocketControllers } from './register.ts';
-import { useEnv } from '../../app/modules/config/index.ts';
 
 type SocketServerContext = {
+    config: BaseServerConfig;
     logger?: Logger;
     redisPublishClient?: RedisClient;
     redisSubscribeClient?: RedisClient;
@@ -38,7 +38,7 @@ type SocketServerContext = {
 
 export function createSocketServer(
     httpServer: HTTPServer,
-    ctx: SocketServerContext = {},
+    ctx: SocketServerContext,
 ) : Server {
     const server = createServer<
         CTSEvents,
@@ -59,14 +59,14 @@ export function createSocketServer(
     }
 
     mountAuthorizationMiddleware(nsp, {
-        baseURL: useEnv('authupURL'),
+        baseURL: ctx.config.authupURL,
         tokenVerifier: createAuthupTokenVerifier({
-            baseURL: useEnv('authupURL'),
+            baseURL: ctx.config.authupURL,
             creator: createAuthupClientTokenCreator({
-                baseURL: useEnv('authupURL'),
-                clientId: useEnv('clientId'),
-                clientSecret: useEnv('clientSecret'),
-                realm: useEnv('realm'),
+                baseURL: ctx.config.authupURL,
+                clientId: ctx.config.clientId,
+                clientSecret: ctx.config.clientSecret,
+                realm: ctx.config.realm,
             }),
             redisClient: ctx.redisPublishClient,
         }),

@@ -5,19 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { EnvironmentName } from '@privateaim/server-kit';
+import type { BaseServerConfig } from '@privateaim/server-kit';
 
-export interface Environment {
-    env: `${EnvironmentName}`,
-    port: number,
-
-    clientId: string,
-    clientSecret: string
-
-    realm: string,
-
-    rabbitMqConnectionString?: string,
-    redisConnectionString: string,
-
-    authupURL: string,
+export interface Config extends BaseServerConfig {
+    authupURL: string;
+    redisConnectionString: string;
 }

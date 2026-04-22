@@ -20,11 +20,18 @@ export class RegistryProjectLinkHandler implements ComponentHandler<
     RegistryEventMap,
     RegistryCommand.PROJECT_LINK
 > {
+    protected publicURL: string;
+
     protected logger?: Logger;
 
     protected authupClient?: AuthupClient;
 
-    constructor(ctx: { logger?: Logger; authupClient?: AuthupClient } = {}) {
+    constructor(ctx: {
+        publicURL: string;
+        logger?: Logger;
+        authupClient?: AuthupClient;
+    }) {
+        this.publicURL = ctx.publicURL;
         this.logger = ctx.logger;
         this.authupClient = ctx.authupClient;
     }
@@ -131,6 +138,7 @@ export class RegistryProjectLinkHandler implements ComponentHandler<
             const webhook = await saveRemoteRegistryProjectWebhook(
                 httpClient,
                 {
+                    publicURL: this.publicURL,
                     projectIdOrName: entity.external_name,
                     isProjectName: true,
                     authupClient: this.authupClient,

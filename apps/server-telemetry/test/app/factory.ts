@@ -7,7 +7,7 @@
 
 import { LoggerModule } from '@privateaim/server-kit';
 import type { IModule } from 'orkos';
-import { ConfigModule, useEnv  } from '../../src/app/modules/config/index.ts';
+import { ConfigModule } from '../../src/app/modules/config/index.ts';
 import { VictoriaLogsModule } from '../../src/app/modules/victoria-logs/index.ts';
 import { HTTPModule } from '../../src/app/modules/http/index.ts';
 
@@ -17,16 +17,10 @@ import { createTestDatabaseModule } from './database.ts';
 export function createTestApplication(): TestHTTPApplication {
     process.env.PORT = '0';
 
-    const env = useEnv();
-
     const modules: IModule[] = [
         new ConfigModule(),
         new LoggerModule(),
-        new VictoriaLogsModule({
-            baseURL: env.victoriaLogsURL,
-            ingestorURL: env.victoriaLogsIngestorURL,
-            querierURL: env.victoriaLogsQuerierURL,
-        }),
+        new VictoriaLogsModule(),
         createTestDatabaseModule(),
         new HTTPModule(),
     ];

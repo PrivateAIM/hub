@@ -9,24 +9,24 @@ import type { IContainer } from 'eldin';
 import type { IModule, ModuleDependency } from 'orkos';
 import { APIClient } from '@privateaim/telemetry-kit';
 import { AUTHUP_HOOK_MODULE_NAME, AuthupClientAuthenticationHookInjectionKey } from '@privateaim/server-kit';
+import { ConfigInjectionKey } from '../config/constants.ts';
 import { TelemetryClientInjectionKey } from './constants.ts';
-import type { TelemetryClientModuleOptions } from './types.ts';
 
 export class TelemetryClientModule implements IModule {
     readonly name = 'telemetryClient';
 
     readonly dependencies: (string | ModuleDependency)[] = [
+        'config',
         { name: AUTHUP_HOOK_MODULE_NAME, optional: true },
     ];
 
-    private options: TelemetryClientModuleOptions;
-
-    constructor(options: TelemetryClientModuleOptions) {
-        this.options = options;
-    }
-
     async setup(container: IContainer): Promise<void> {
-        const client = new APIClient({ baseURL: this.options.baseURL });
+        const config = container.resolve(ConfigInjectionKey);
+        if (!config.telemetryURL) {
+            return;
+        }
+
+        const client = new APIClient({ baseURL: config.telemetryURL });
 
         const hookResult = container.tryResolve(AuthupClientAuthenticationHookInjectionKey);
         if (hookResult.success) {

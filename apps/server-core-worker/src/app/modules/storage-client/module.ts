@@ -9,24 +9,21 @@ import type { IContainer } from 'eldin';
 import type { IModule, ModuleDependency } from 'orkos';
 import { APIClient } from '@privateaim/storage-kit';
 import { AUTHUP_HOOK_MODULE_NAME, AuthupClientAuthenticationHookInjectionKey } from '@privateaim/server-kit';
+import { ConfigInjectionKey } from '../config/constants.ts';
+import type { Config } from '../config/types.ts';
 import { StorageClientInjectionKey } from './constants.ts';
-import type { StorageClientModuleOptions } from './types.ts';
 
 export class StorageClientModule implements IModule {
     readonly name = 'storageClient';
 
     readonly dependencies: (string | ModuleDependency)[] = [
+        'config',
         { name: AUTHUP_HOOK_MODULE_NAME, optional: true },
     ];
 
-    private options: StorageClientModuleOptions;
-
-    constructor(options: StorageClientModuleOptions) {
-        this.options = options;
-    }
-
     async setup(container: IContainer): Promise<void> {
-        const client = new APIClient({ baseURL: this.options.baseURL });
+        const config = container.resolve(ConfigInjectionKey) as Config;
+        const client = new APIClient({ baseURL: config.storageURL });
 
         const hookResult = container.tryResolve(AuthupClientAuthenticationHookInjectionKey);
         if (hookResult.success) {

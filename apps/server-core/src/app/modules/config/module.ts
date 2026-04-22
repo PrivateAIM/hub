@@ -7,16 +7,29 @@
 
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
-import { useEnv } from './env.ts';
 import { ConfigInjectionKey } from './constants.ts';
+import { normalizeConfig } from './normalize.ts';
+import { readConfigFromEnv } from './read.ts';
+import type { Config } from './types.ts';
 
 export class ConfigModule implements IModule {
     readonly name = 'config';
 
     readonly dependencies: string[] = [];
 
+    private readonly instance?: Config;
+
+    constructor(instance?: Config) {
+        this.instance = instance;
+    }
+
     async setup(container: IContainer): Promise<void> {
-        const config = useEnv();
+        const config = this.instance ?? await this.read();
         container.register(ConfigInjectionKey, { useValue: config });
+    }
+
+    private async read(): Promise<Config> {
+        const raw = readConfigFromEnv();
+        return normalizeConfig(raw);
     }
 }

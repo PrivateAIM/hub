@@ -10,6 +10,7 @@ export * from './app';
 export * from './authup';
 export * from './cache';
 export * from './component';
+export * from './config';
 export * from './constants';
 export * from './entity-event';
 export * from './logger';

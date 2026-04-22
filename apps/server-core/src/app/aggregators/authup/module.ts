@@ -10,7 +10,6 @@ import type { Component, Logger } from '@privateaim/server-kit';
 import { EnvironmentName } from '@privateaim/server-kit';
 import type { Client as RedisClient } from 'redis-extension';
 import type { RegistryComponentCaller } from '../../components/registry/caller/module.ts';
-import { useEnv } from '../../../app/modules/config/index.ts';
 import {
     handleAuthupPermissionEvent,
     handleAuthupPolicyEvent,
@@ -20,13 +19,14 @@ import {
 } from './entities/index.ts';
 
 type AuthupAggregatorContext = {
+    env: string;
     registryComponentCaller?: RegistryComponentCaller;
     redisSubscribeClient?: RedisClient;
     logger?: Logger;
 };
 
-export function createAuthupAggregator(ctx: AuthupAggregatorContext = {}) : Component {
-    if (!ctx.redisSubscribeClient || useEnv('env') === EnvironmentName.TEST) {
+export function createAuthupAggregator(ctx: AuthupAggregatorContext) : Component {
+    if (!ctx.redisSubscribeClient || ctx.env === EnvironmentName.TEST) {
         return {
             start() {
                 ctx.logger?.warn('Authup aggregator has not been initialized');

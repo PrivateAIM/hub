@@ -5,24 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { EnvironmentName } from '@privateaim/kit';
+import type { BaseServerConfig } from '@privateaim/server-kit';
 
-export interface Environment {
-    env: `${EnvironmentName}`,
-    port: number,
-
-    publicURL: string,
-
-    clientId: string,
-    clientSecret: string,
-
-    realm: string,
-
-    rabbitMqConnectionString?: string | null,
-    redisConnectionString?: string | null,
-    authupURL?: string | null,
-
-    victoriaLogsURL?: string | null,
-    victoriaLogsIngestorURL?: string | null,
-    victoriaLogsQuerierURL?: string | null,
+export interface Config extends BaseServerConfig {
+    publicURL: string;
+    victoriaLogsURL?: string | null;
+    victoriaLogsIngestorURL?: string | null;
+    victoriaLogsQuerierURL?: string | null;
 }

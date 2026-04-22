@@ -5,30 +5,20 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { EnvironmentName } from '@privateaim/server-kit';
+import type { BaseServerConfig } from '@privateaim/server-kit';
 
-export interface Environment {
-    env: `${EnvironmentName}`,
-    port: number,
+export interface Config extends BaseServerConfig {
+    publicURL: string;
 
-    realm: string,
+    vaultConnectionString?: string;
+    harborURL?: string;
 
-    clientId: string,
-    clientSecret: string,
+    telemetryURL?: string;
 
-    redisConnectionString?: string,
-    rabbitMqConnectionString?: string,
-    vaultConnectionString?: string,
-    harborURL?: string,
+    masterImagesRepository: string;
+    masterImagesOwner: string;
+    masterImagesBranch: string;
 
-    publicURL: string,
-    authupURL?: string,
-    telemetryURL?: string,
-
-    masterImagesRepository: string,
-    masterImagesOwner: string,
-    masterImagesBranch: string,
-
-    skipProjectApproval: boolean,
-    skipAnalysisApproval: boolean
+    skipProjectApproval: boolean;
+    skipAnalysisApproval: boolean;
 }
