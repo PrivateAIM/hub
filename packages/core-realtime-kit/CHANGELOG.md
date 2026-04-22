@@ -1,5 +1,32 @@
 # Changelog
 
+## [0.7.38](https://github.com/PrivateAIM/hub/compare/v0.7.37...v0.7.38) (2026-04-22)
+
+
+### Features
+
+* enhance typing for doamin entities ([9d7c516](https://github.com/PrivateAIM/hub/commit/9d7c51644b66c9361e5436e2c43f463f4f219f90))
+* migrate to esm & replace jest with vitest ([#1368](https://github.com/PrivateAIM/hub/issues/1368)) ([5a4d9d1](https://github.com/PrivateAIM/hub/commit/5a4d9d1ce118f65740aa49caf948208eac299032))
+* restructure domain event handling ([2ad7318](https://github.com/PrivateAIM/hub/commit/2ad7318930bd342d571105982fc92996443326fa))
+
+
+### Bug Fixes
+
+* **build:** replace __dirname with import.meta.dirname and enable tsdown shims ([b08de35](https://github.com/PrivateAIM/hub/commit/b08de35f59d325fda2222a3290b75561936e88e1))
+* socket resources nsp pattern + project master-image requirement ([2d7be7f](https://github.com/PrivateAIM/hub/commit/2d7be7f333e6c06074f2ba9c5489f6685a6ab2ec))
+* submit and process socket events ([0240664](https://github.com/PrivateAIM/hub/commit/02406645a5171a235845935b03f189517c0331cb))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.8.36 to ^0.8.37
+    * @privateaim/core-kit bumped from ^0.8.36 to ^0.8.37
+  * peerDependencies
+    * @privateaim/kit bumped from ^0.8.36 to ^0.8.37
+    * @privateaim/core-kit bumped from ^0.8.36 to ^0.8.37
+
 ## [0.7.37](https://github.com/PrivateAIM/hub/compare/v0.7.36...v0.7.37) (2026-04-21)
 
 
