@@ -23,14 +23,14 @@
         "build-watch": "rimraf ./dist && tsc -p tsconfig.build.json --watch"
     },
     "devDependencies": {
-        "@authup/kit": "^1.0.0-beta.35",
+        "@authup/kit": "^1.0.0-beta.36",
         "@privateaim/core-kit": "^0.8.36",
         "@privateaim/telemetry-kit": "^0.8.36",
         "hapic": "^2.8.2",
         "rapiq": "^0.9.0"
     },
     "peerDependencies": {
-        "@authup/kit": "^1.0.0-beta.35",
+        "@authup/kit": "^1.0.0-beta.36",
         "@privateaim/core-kit": "^0.8.36",
         "@privateaim/telemetry-kit": "^0.8.36",
         "hapic": "^2.8.2",
