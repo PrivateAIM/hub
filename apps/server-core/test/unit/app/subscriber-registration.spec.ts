@@ -48,15 +48,4 @@ describe('subscriber registration', () => {
         expect(hasNodeSubscriber).toBe(true);
         expect(hasBucketFileSubscriber).toBe(true);
     });
-
-    it('should have same subscriber instances in container and DataSource', () => {
-        const dataSource = suite.container.resolve(DatabaseInjectionKey.DataSource);
-
-        const containerSub = suite.container.resolve(DatabaseInjectionKey.AnalysisNodeSubscriber);
-        const dsSubscriber = dataSource.subscribers.find(
-            (s: any) => s instanceof AnalysisNodeSubscriber,
-        );
-
-        expect(containerSub).toBe(dsSubscriber);
-    });
 });

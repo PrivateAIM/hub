@@ -10,6 +10,7 @@ export * from './fake-bucket-caller.ts';
 export * from './fake-builder-caller.ts';
 export * from './fake-distributor-caller.ts';
 export * from './fake-metadata-caller.ts';
+
 export * from './fake-node-repository.ts';
 export * from './fake-project-repository.ts';
 export * from './fake-repository.ts';

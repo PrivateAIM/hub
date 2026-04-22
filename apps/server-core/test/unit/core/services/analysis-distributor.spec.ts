@@ -23,7 +23,9 @@ import {
 import { AnalysisDistributor } from '../../../../src/core/services/analysis-distributor/module.ts';
 import {
     FakeAnalysisDistributorCaller,
-    FakeAnalysisMetadataCaller,
+    FakeAnalysisFileMetadataRecalculator,
+    FakeAnalysisMetadataRecalculator,
+    FakeAnalysisNodeMetadataRecalculator,
     FakeEntityRepository,
 } from '../helpers/index.ts';
 import { createFullAnalysis, createTestAnalysisNode } from '../../../utils/domains/index.ts';
@@ -46,21 +48,21 @@ describe('AnalysisDistributor', () => {
     let analysisNodeRepository: FakeEntityRepository<AnalysisNode>;
     let registryRepository: FakeEntityRepository<Registry>;
     let caller: FakeAnalysisDistributorCaller;
-    let metadataCaller: FakeAnalysisMetadataCaller;
     let distributor: AnalysisDistributor;
 
     beforeEach(() => {
         repository = new FakeEntityRepository<Analysis>();
         analysisNodeRepository = new FakeEntityRepository<AnalysisNode>();
         registryRepository = new FakeEntityRepository<Registry>();
-        metadataCaller = new FakeAnalysisMetadataCaller(repository);
         caller = new FakeAnalysisDistributorCaller();
         distributor = new AnalysisDistributor({
             repository,
             analysisNodeRepository,
             registryRepository,
             caller,
-            metadataCaller,
+            analysisRecalculator: new FakeAnalysisMetadataRecalculator(repository),
+            nodeRecalculator: new FakeAnalysisNodeMetadataRecalculator(repository),
+            fileRecalculator: new FakeAnalysisFileMetadataRecalculator(repository),
         });
     });
 
@@ -89,14 +91,12 @@ describe('AnalysisDistributor', () => {
             expect(caller.getCallsFor('callExecute')[0].data.id).toBe('analysis-1');
         });
 
-        it('should call metadataCaller.callRecalcDirect', async () => {
+        it('should call recalculators before starting', async () => {
             const analysis = seedBuiltAnalysis();
             registryRepository.seed(createTestRegistry());
             analysisNodeRepository.seed(createTestAnalysisNode({ analysis_id: 'analysis-1' }));
 
             await distributor.start(analysis);
-
-            expect(metadataCaller.getCallCount()).toBe(1);
         });
 
         it('should resolve entity by string ID', async () => {

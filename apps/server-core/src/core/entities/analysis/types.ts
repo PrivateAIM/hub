@@ -13,6 +13,11 @@ export interface IAnalysisRepository extends IEntityRepository<Analysis> {
     findOneWithProject(id: string): Promise<Analysis | null>;
 }
 
+export interface IAnalysisMetadataRecalculator {
+    recalc(analysisId: string): Promise<Analysis>;
+    recalcDebounced(analysisId: string): Promise<void>;
+}
+
 export interface IAnalysisService {
     getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<Analysis>>;
     getOne(id: string): Promise<Analysis>;

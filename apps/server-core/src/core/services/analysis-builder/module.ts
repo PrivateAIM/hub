@@ -10,12 +10,17 @@ import type { Analysis } from '@privateaim/core-kit';
 import { AnalysisBuilderCommandChecker } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
 import type { EntityPersistContext, IEntityRepository } from '../../entities/types.ts';
-import type { IAnalysisBuilderCaller, IAnalysisMetadataCaller } from './types.ts';
+import type { IAnalysisMetadataRecalculator } from '../../entities/analysis/types.ts';
+import type { IAnalysisNodeMetadataRecalculator } from '../../entities/analysis-node/types.ts';
+import type { IAnalysisFileMetadataRecalculator } from '../../entities/analysis-bucket-file/types.ts';
+import type { IAnalysisBuilderCaller } from './types.ts';
 
 type AnalysisBuilderContext = {
     repository: IEntityRepository<Analysis>;
     caller: IAnalysisBuilderCaller;
-    metadataCaller: IAnalysisMetadataCaller;
+    analysisRecalculator: IAnalysisMetadataRecalculator;
+    nodeRecalculator: IAnalysisNodeMetadataRecalculator;
+    fileRecalculator: IAnalysisFileMetadataRecalculator;
 };
 
 export class AnalysisBuilder {
@@ -23,17 +28,26 @@ export class AnalysisBuilder {
 
     protected caller: IAnalysisBuilderCaller;
 
-    protected metadataCaller: IAnalysisMetadataCaller;
+    protected analysisRecalculator: IAnalysisMetadataRecalculator;
+
+    protected nodeRecalculator: IAnalysisNodeMetadataRecalculator;
+
+    protected fileRecalculator: IAnalysisFileMetadataRecalculator;
 
     constructor(ctx: AnalysisBuilderContext) {
         this.repository = ctx.repository;
         this.caller = ctx.caller;
-        this.metadataCaller = ctx.metadataCaller;
+        this.analysisRecalculator = ctx.analysisRecalculator;
+        this.nodeRecalculator = ctx.nodeRecalculator;
+        this.fileRecalculator = ctx.fileRecalculator;
     }
 
     async start(input: string | Analysis, persistCtx?: EntityPersistContext) {
         const entityId = typeof input === 'string' ? input : input.id;
-        const entity = await this.metadataCaller.callRecalcDirect({ analysisId: entityId });
+
+        await this.analysisRecalculator.recalc(entityId);
+        await this.nodeRecalculator.recalc(entityId);
+        const entity = await this.fileRecalculator.recalc(entityId);
 
         AnalysisBuilderCommandChecker.canStart(entity);
 

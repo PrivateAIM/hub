@@ -103,19 +103,11 @@ export class DatabaseModule implements IModule {
             nodeClientService = new NodeClientService(authupResult.data);
         }
 
-        const analysisSubscriber = new AnalysisSubscriber();
-        const analysisBucketFileSubscriber = new AnalysisBucketFileSubscriber();
-        const analysisNodeSubscriber = new AnalysisNodeSubscriber();
-
-        container.register(DatabaseInjectionKey.AnalysisSubscriber, { useValue: analysisSubscriber });
-        container.register(DatabaseInjectionKey.AnalysisBucketFileSubscriber, { useValue: analysisBucketFileSubscriber });
-        container.register(DatabaseInjectionKey.AnalysisNodeSubscriber, { useValue: analysisNodeSubscriber });
-
         const subscribers = [
             new NodeSubscriber({ nodeClientService }),
-            analysisSubscriber,
-            analysisBucketFileSubscriber,
-            analysisNodeSubscriber,
+            new AnalysisSubscriber(),
+            new AnalysisBucketFileSubscriber(),
+            new AnalysisNodeSubscriber(),
 
             new AnalysisBucketSubscriber(),
             new AnalysisNodeEventSubscriber(),

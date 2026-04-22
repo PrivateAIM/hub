@@ -18,7 +18,9 @@ import {
 import { AnalysisBuilder } from '../../../../src/core/services/analysis-builder/module.ts';
 import {
     FakeAnalysisBuilderCaller,
-    FakeAnalysisMetadataCaller,
+    FakeAnalysisFileMetadataRecalculator,
+    FakeAnalysisMetadataRecalculator,
+    FakeAnalysisNodeMetadataRecalculator,
     FakeEntityRepository,
 } from '../helpers/index.ts';
 import { createFullAnalysis } from '../../../utils/domains/index.ts';
@@ -26,17 +28,23 @@ import { createFullAnalysis } from '../../../utils/domains/index.ts';
 describe('AnalysisBuilder', () => {
     let repository: FakeEntityRepository<Analysis>;
     let caller: FakeAnalysisBuilderCaller;
-    let metadataCaller: FakeAnalysisMetadataCaller;
+    let analysisRecalculator: FakeAnalysisMetadataRecalculator;
+    let nodeRecalculator: FakeAnalysisNodeMetadataRecalculator;
+    let fileRecalculator: FakeAnalysisFileMetadataRecalculator;
     let builder: AnalysisBuilder;
 
     beforeEach(() => {
         repository = new FakeEntityRepository<Analysis>();
-        metadataCaller = new FakeAnalysisMetadataCaller(repository);
+        analysisRecalculator = new FakeAnalysisMetadataRecalculator(repository);
+        nodeRecalculator = new FakeAnalysisNodeMetadataRecalculator(repository);
+        fileRecalculator = new FakeAnalysisFileMetadataRecalculator(repository);
         caller = new FakeAnalysisBuilderCaller();
         builder = new AnalysisBuilder({
-            repository, 
-            caller, 
-            metadataCaller, 
+            repository,
+            caller,
+            analysisRecalculator,
+            nodeRecalculator,
+            fileRecalculator,
         });
     });
 
@@ -53,14 +61,15 @@ describe('AnalysisBuilder', () => {
             expect(caller.getCallsFor('callExecute')[0].data.id).toBe('analysis-1');
         });
 
-        it('should call metadataCaller.callRecalcDirect before checking', async () => {
+        it('should call all recalculators before checking', async () => {
             const analysis = createFullAnalysis({ configuration_locked: true });
             repository.seed(analysis);
 
             await builder.start(analysis);
 
-            expect(metadataCaller.getCallCount()).toBe(1);
-            expect(metadataCaller.getCalls()[0].analysisId).toBe('analysis-1');
+            expect(analysisRecalculator.getCallCount()).toBe(1);
+            expect(nodeRecalculator.getCallCount()).toBe(1);
+            expect(fileRecalculator.getCallCount()).toBe(1);
         });
 
         it('should resolve entity by string ID', async () => {

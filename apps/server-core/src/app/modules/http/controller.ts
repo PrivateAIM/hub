@@ -97,10 +97,14 @@ export function createControllers(container: IContainer): Record<string, any>[] 
         configurator: container.resolve(AnalysisInjectionKey.Configurator),
         distributor: container.resolve(AnalysisInjectionKey.Distributor),
         storageManager: container.resolve(AnalysisInjectionKey.StorageManager),
+        recalculator: container.resolve(AnalysisInjectionKey.AnalysisRecalculator),
         skipAnalysisApproval: container.resolve(ConfigInjectionKey).skipAnalysisApproval,
     });
     const analysisBucketService = new AnalysisBucketService({ repository: analysisBucketRepository });
-    const analysisBucketFileService = new AnalysisBucketFileService({ repository: analysisBucketFileRepository });
+    const analysisBucketFileService = new AnalysisBucketFileService({
+        repository: analysisBucketFileRepository,
+        recalculator: container.resolve(AnalysisInjectionKey.FileRecalculator),
+    });
     const projectNodeService = new ProjectNodeService({
         repository: projectNodeRepository,
         projectRepository,
@@ -109,6 +113,7 @@ export function createControllers(container: IContainer): Record<string, any>[] 
     const analysisNodeService = new AnalysisNodeService({
         repository: analysisNodeRepository,
         projectNodeRepository,
+        recalculator: container.resolve(AnalysisInjectionKey.NodeRecalculator),
         skipAnalysisApproval: config.skipAnalysisApproval,
     });
     const analysisPermissionService = new AnalysisPermissionService({ repository: analysisPermissionRepository });

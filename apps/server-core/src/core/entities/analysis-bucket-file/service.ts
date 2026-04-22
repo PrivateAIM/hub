@@ -12,21 +12,25 @@ import type { ActorContext } from '../actor/types.ts';
 import type { EntityRepositoryFindManyResult } from '../types.ts';
 import { ValidatorGroup } from '../constants.ts';
 import { AbstractEntityService } from '../service.ts';
-import type { IAnalysisBucketFileRepository, IAnalysisBucketFileService } from './types.ts';
+import type { IAnalysisBucketFileRepository, IAnalysisBucketFileService, IAnalysisFileMetadataRecalculator } from './types.ts';
 import { AnalysisBucketFileValidator } from './validator.ts';
 
 type AnalysisBucketFileServiceContext = {
     repository: IAnalysisBucketFileRepository;
+    recalculator: IAnalysisFileMetadataRecalculator;
 };
 
 export class AnalysisBucketFileService extends AbstractEntityService implements IAnalysisBucketFileService {
     protected repository: IAnalysisBucketFileRepository;
+
+    protected recalculator: IAnalysisFileMetadataRecalculator;
 
     protected validator: AnalysisBucketFileValidator;
 
     constructor(ctx: AnalysisBucketFileServiceContext) {
         super();
         this.repository = ctx.repository;
+        this.recalculator = ctx.recalculator;
         this.validator = new AnalysisBucketFileValidator();
     }
 
@@ -84,7 +88,13 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
 
         const entity = this.repository.create(validated);
 
-        return this.repository.save(entity, { data: actor.metadata });
+        const saved = await this.repository.save(entity, { data: actor.metadata });
+
+        if (saved.root) {
+            await this.recalculator.recalc(saved.analysis_id);
+        }
+
+        return saved;
     }
 
     async update(id: string, data: Partial<AnalysisBucketFile>, actor: ActorContext): Promise<AnalysisBucketFile> {
@@ -101,7 +111,11 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
 
         const merged = this.repository.merge(entity, validated);
 
-        return this.repository.save(merged, { data: actor.metadata });
+        const saved = await this.repository.save(merged, { data: actor.metadata });
+
+        this.recalculator.recalcDebounced(saved.analysis_id);
+
+        return saved;
     }
 
     async delete(id: string, actor: ActorContext): Promise<AnalysisBucketFile> {
@@ -119,6 +133,10 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
         await this.repository.remove(entity, { data: actor.metadata });
 
         entity.id = entityId;
+
+        if (entity.root) {
+            await this.recalculator.recalc(entity.analysis_id);
+        }
 
         return entity;
     }
