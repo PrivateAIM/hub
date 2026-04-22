@@ -1,10 +1,10 @@
-# PrivateAIM Hub 🏥
+# Hub 🏥
 
 [![CI][ci-src]][ci-href]
 [![CodeQL][codeql-src]][codeql-href]
 [![Conventional Commits][conventional-src]][conventional-href]
 
-Central services for the [PrivateAIM](https://privateaim.net) platform — a privacy-preserving analytics infrastructure for federated data analysis across distributed institutions.
+Central services for the Flame platform — a privacy-preserving analytics infrastructure for federated data analysis across distributed institutions.
 
 **Table of Contents**
 

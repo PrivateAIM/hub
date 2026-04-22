@@ -144,7 +144,7 @@ apps/server-core/src/
 │   │   ├── swagger/               # SwaggerModule (API docs generation)
 │   │   └── telemetry-client/      # TelemetryClientModule
 │   ├── aggregators/               # AMQP event consumers
-│   └── components/                # AMQP task consumers (registry, analysis-metadata)
+│   └── components/                # AMQP task consumers (registry)
 ├── cli/                           # CLI entry point (citty)
 └── commands/                      # start, migration commands
 ```
