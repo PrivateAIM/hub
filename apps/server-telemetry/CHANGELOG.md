@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.8.37](https://github.com/PrivateAIM/hub/compare/v0.8.36...v0.8.37) (2026-04-22)
+
+
+### Bug Fixes
+
+* bump authup to v1.0.0-beta.36 ([76fb047](https://github.com/PrivateAIM/hub/commit/76fb047dfd551e4e3eddb23986693a19e68f8d3c))
+* **deps:** bump the minorandpatch group across 1 directory with 9 updates ([#1552](https://github.com/PrivateAIM/hub/issues/1552)) ([577f530](https://github.com/PrivateAIM/hub/commit/577f5305c6358470e5bf9d26faeb1d2f3b64a3dd))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.8.36 to ^0.8.37
+    * @privateaim/server-db-kit bumped from ^0.8.36 to ^0.8.37
+    * @privateaim/server-http-kit bumped from ^0.8.36 to ^0.8.37
+    * @privateaim/server-kit bumped from ^0.8.36 to ^0.8.37
+    * @privateaim/server-telemetry-kit bumped from ^0.8.36 to ^0.8.37
+    * @privateaim/telemetry-kit bumped from ^0.8.36 to ^0.8.37
+
 ## [0.8.36](https://github.com/PrivateAIM/hub/compare/v0.8.35...v0.8.36) (2026-04-21)
 
 

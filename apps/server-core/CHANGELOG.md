@@ -1,5 +1,34 @@
 # Changelog
 
+## [0.8.37](https://github.com/PrivateAIM/hub/compare/v0.8.36...v0.8.37) (2026-04-22)
+
+
+### Bug Fixes
+
+* analysis-node subscriber ([dfcf021](https://github.com/PrivateAIM/hub/commit/dfcf0210fd3e5e10375437c8fa841e74989c4d2e))
+* bump authup to v1.0.0-beta.36 ([76fb047](https://github.com/PrivateAIM/hub/commit/76fb047dfd551e4e3eddb23986693a19e68f8d3c))
+* **deps:** bump the minorandpatch group across 1 directory with 9 updates ([#1552](https://github.com/PrivateAIM/hub/issues/1552)) ([577f530](https://github.com/PrivateAIM/hub/commit/577f5305c6358470e5bf9d26faeb1d2f3b64a3dd))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.8.36 to ^0.8.37
+    * @privateaim/core-realtime-kit bumped from ^0.7.37 to ^0.7.38
+    * @privateaim/kit bumped from ^0.8.36 to ^0.8.37
+    * @privateaim/server-core-worker-kit bumped from ^0.7.37 to ^0.7.38
+    * @privateaim/server-db-kit bumped from ^0.8.36 to ^0.8.37
+    * @privateaim/server-http-kit bumped from ^0.8.36 to ^0.8.37
+    * @privateaim/server-kit bumped from ^0.8.36 to ^0.8.37
+    * @privateaim/server-realtime-kit bumped from ^0.8.36 to ^0.8.37
+    * @privateaim/server-telemetry bumped from ^0.8.36 to ^0.8.37
+    * @privateaim/server-telemetry-kit bumped from ^0.8.36 to ^0.8.37
+    * @privateaim/storage-kit bumped from ^0.8.36 to ^0.8.37
+    * @privateaim/telemetry-kit bumped from ^0.8.36 to ^0.8.37
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.8.36 to ^0.8.37
+
 ## [0.8.36](https://github.com/PrivateAIM/hub/compare/v0.8.35...v0.8.36) (2026-04-21)
 
 
