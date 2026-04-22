@@ -269,6 +269,61 @@ docker build -t privateaim/hub .
 docker-compose up       # Local dev: MySQL + Postgres
 ```
 
+## Documentation Site
+
+The `docs/` directory contains a VitePress site — the authoritative reference for Hub. It is a workspace member (`@privateaim/docs`).
+
+```bash
+npm run dev --workspace=docs     # Dev server
+npm run build --workspace=docs   # Build static site
+```
+
+### Keeping Docs in Sync
+
+When making changes that affect any of the following, **update the corresponding docs page(s)**:
+
+| Change | Docs to update |
+|--------|---------------|
+| Service env vars (ConfigModule) | `docs/src/reference/<service>/index.md` |
+| New/changed API endpoints | `docs/src/reference/<service>/index.md` and `docs/src/guide/development/api.md` |
+| New/changed package exports | `docs/src/reference/<service>/<kit>.md` |
+| Entity changes (new fields, new entities) | `docs/src/guide/user/` pages and `docs/src/getting-started/architecture.md` |
+| Deployment config changes | `docs/src/guide/deployment/configuration.md` |
+| New DI modules | `docs/src/reference/<service>/index.md` and `.agents/conventions.md` module inventory |
+| README changes | Keep `README.md` in the affected app/package in sync |
+
+### Using Docs as Context
+
+When you need context beyond the code (deployment patterns, admin workflows, env var semantics, platform concepts), check docs first:
+
+- `docs/src/reference/` — per-service configuration, env vars, endpoints, related packages
+- `docs/src/guide/user/` — user-facing workflows (projects, analyses, approval, realms)
+- `docs/src/guide/deployment/` — Docker Compose, Kubernetes, reverse proxy configuration
+- `docs/src/guide/development/` — local setup, repo structure, contributing
+
+### Docs Structure
+
+```
+docs/src/
+├── .vitepress/config.mjs   # Nav, sidebar, theme config
+├── index.md                 # Landing page
+├── getting-started/         # Overview, architecture
+├── guide/
+│   ├── user/                # Projects, analyses, realms, nodes, approval
+│   ├── deployment/          # Config, Docker, K8s, reverse proxy
+│   └── development/         # Setup, repo structure, API, contributing
+├── reference/               # Services + packages (grouped by service area)
+│   ├── shared/              # kit, server-kit, server-db-kit, server-http-kit
+│   ├── core/                # server-core service + core-kit, core-http-kit, core-realtime-kit
+│   ├── worker/              # server-core-worker + server-core-worker-kit
+│   ├── storage/             # server-storage + storage-kit, server-storage-kit
+│   ├── telemetry/           # server-telemetry + telemetry-kit, server-telemetry-kit
+│   ├── messenger/           # server-messenger + messenger-kit, server-realtime-kit
+│   └── frontend/            # client-ui + client-vue
+├── about/team.{md,vue}      # Team page
+└── public/images/           # UI screenshots and architecture diagram
+```
+
 ## References
 
 External project references live in `.agents/references/`. When looking up source code in a referenced project (e.g., authup, routup, hapic), always update the corresponding reference file with:
