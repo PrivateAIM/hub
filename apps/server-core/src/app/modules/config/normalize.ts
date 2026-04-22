@@ -8,32 +8,29 @@
 import { EnvironmentName } from '@privateaim/server-kit';
 import { ConfigDefaults } from './constants.ts';
 import type { Config } from './types.ts';
+import { ConfigValidator } from './validator.ts';
 
-export function normalizeConfig(input: Partial<Config>): Config {
+const validator = new ConfigValidator();
+
+export async function normalizeConfig(input: Partial<Config>): Promise<Config> {
+    const validated = await validator.run(input);
+
     return {
-        env: input.env ?? EnvironmentName.DEVELOPMENT,
-        port: input.port ?? ConfigDefaults.PORT,
+        ...validated,
+        env: validated.env ?? EnvironmentName.DEVELOPMENT,
+        port: validated.port ?? ConfigDefaults.PORT,
 
-        realm: input.realm ?? ConfigDefaults.REALM,
+        realm: validated.realm ?? ConfigDefaults.REALM,
+        clientId: validated.clientId ?? ConfigDefaults.CLIENT_ID,
+        clientSecret: validated.clientSecret ?? ConfigDefaults.CLIENT_SECRET,
 
-        clientId: input.clientId ?? ConfigDefaults.CLIENT_ID,
-        clientSecret: input.clientSecret ?? ConfigDefaults.CLIENT_SECRET,
+        publicURL: validated.publicURL ?? `http://127.0.0.1:${validated.port ?? ConfigDefaults.PORT}/`,
 
-        publicURL: input.publicURL ?? `http://127.0.0.1:${input.port ?? ConfigDefaults.PORT}/`,
+        masterImagesOwner: validated.masterImagesOwner ?? ConfigDefaults.MASTER_IMAGES_OWNER,
+        masterImagesRepository: validated.masterImagesRepository ?? ConfigDefaults.MASTER_IMAGES_REPOSITORY,
+        masterImagesBranch: validated.masterImagesBranch ?? ConfigDefaults.MASTER_IMAGES_BRANCH,
 
-        authupURL: input.authupURL,
-        telemetryURL: input.telemetryURL,
-        harborURL: input.harborURL,
-
-        redisConnectionString: input.redisConnectionString,
-        rabbitMqConnectionString: input.rabbitMqConnectionString,
-        vaultConnectionString: input.vaultConnectionString,
-
-        masterImagesOwner: input.masterImagesOwner ?? ConfigDefaults.MASTER_IMAGES_OWNER,
-        masterImagesRepository: input.masterImagesRepository ?? ConfigDefaults.MASTER_IMAGES_REPOSITORY,
-        masterImagesBranch: input.masterImagesBranch ?? ConfigDefaults.MASTER_IMAGES_BRANCH,
-
-        skipProjectApproval: input.skipProjectApproval ?? false,
-        skipAnalysisApproval: input.skipAnalysisApproval ?? false,
+        skipProjectApproval: validated.skipProjectApproval ?? false,
+        skipAnalysisApproval: validated.skipAnalysisApproval ?? false,
     };
 }

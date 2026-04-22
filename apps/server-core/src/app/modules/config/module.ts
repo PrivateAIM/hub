@@ -24,11 +24,11 @@ export class ConfigModule implements IModule {
     }
 
     async setup(container: IContainer): Promise<void> {
-        const config = this.instance ?? this.read();
+        const config = this.instance ?? await this.read();
         container.register(ConfigInjectionKey, { useValue: config });
     }
 
-    private read(): Config {
+    private async read(): Promise<Config> {
         const raw = readConfigFromEnv();
         return normalizeConfig(raw);
     }
