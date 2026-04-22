@@ -165,6 +165,30 @@ GitHub Actions (`.github/workflows/main.yml`) runs:
 - Place test files in `test/unit/**/*.spec.ts`
 - Use `@faker-js/faker` for test data generation
 - HTTP integration tests: use `TestSuite` which wires controllers via DI modules
-- Service-level tests (TODO): use `FakeEntityRepository` and mock actors
+- Service-level tests: use `FakeEntityRepository` and fake callers
 - SQLite tests use in-memory databases and need no external services
 - MySQL/Postgres tests need docker-compose services running
+
+## Fakes Over Mocks
+
+**Always prefer fake implementations over `vi.fn()` / `vi.mock()`.** The hexagonal architecture with dependency inversion makes every dependency injectable via a port interface — if it doesn't, that's a signal the architecture isn't fully hexagonal yet and should be fixed.
+
+Write a class that implements the port interface with in-memory behavior and call-recording helpers. Never use `vi.fn()` to stub methods or `vi.mock()` to replace modules.
+
+```typescript
+// Good — fake implements the port interface
+const metadataCaller = new FakeMetadataCaller();
+const subscriber = new AnalysisNodeSubscriber({ metadataCaller });
+
+// Bad — vi.fn() stubs bypass the interface contract
+const metadataCaller = { call: vi.fn() };
+```
+
+Existing fakes to reuse:
+- `FakeEntityRepository<T>` — `IEntityRepository<T>` with `seed()`, `getAll()`, `clear()`
+- `FakeMetadataCaller` — records `call()` invocations with command/data/meta
+- `FakeStorageManager` — records `check()`/`remove()` calls
+- `createAllowAllActor()` / `createDenyAllActor()` — `ActorContext` fakes for permission testing
+- `createMasterRealmActor()` / `createNonMasterRealmActor()` — realm-scoped actor fakes
+
+When a dependency has no fake yet, create one in the appropriate `test/**/helpers/` directory implementing the port interface.

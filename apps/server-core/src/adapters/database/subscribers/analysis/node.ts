@@ -9,6 +9,7 @@ import type {
     EntitySubscriberInterface,
     InsertEvent,
     RemoveEvent,
+    UpdateEvent,
 } from 'typeorm';
 import { DomainType } from '@privateaim/core-kit';
 import { BaseSubscriber } from '@privateaim/server-db-kit';
@@ -88,6 +89,23 @@ export class AnalysisNodeSubscriber extends BaseSubscriber<
                 analysisId: event.entity.analysis_id, 
                 queryFiles: false, 
                 querySelf: false, 
+            },
+            { entityManager: event.manager },
+        );
+    }
+
+    async afterUpdate(event: UpdateEvent<AnalysisNodeEntity>): Promise<any> {
+        await super.afterUpdate(event);
+
+        const analysisId = event.entity?.analysis_id || event.databaseEntity?.analysis_id;
+        if (!analysisId || !this.metadataCaller) return;
+
+        await this.metadataCaller.call(
+            AnalysisMetadataCommand.RECALC,
+            {
+                analysisId,
+                queryFiles: false,
+                querySelf: false,
             },
             { entityManager: event.manager },
         );

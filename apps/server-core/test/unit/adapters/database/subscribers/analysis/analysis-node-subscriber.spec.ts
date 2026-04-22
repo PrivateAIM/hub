@@ -24,6 +24,24 @@ function createMockInsertEvent(overrides: Record<string, any> = {}) {
     };
 }
 
+function createMockUpdateEvent(overrides: Record<string, any> = {}) {
+    const analysisId = randomUUID();
+    return {
+        entity: {
+            id: randomUUID(),
+            analysis_id: analysisId,
+            analysis_realm_id: randomUUID(),
+        },
+        databaseEntity: {
+            id: randomUUID(),
+            analysis_id: analysisId,
+        },
+        manager: {},
+        queryRunner: { data: {} },
+        ...overrides,
+    };
+}
+
 function createMockRemoveEvent(overrides: Record<string, any> = {}) {
     return {
         entity: {
@@ -66,6 +84,66 @@ describe('AnalysisNodeSubscriber', () => {
             const event = createMockInsertEvent();
             await subscriber.afterInsert(event as any);
             // No error thrown
+        });
+    });
+
+    describe('afterUpdate', () => {
+        it('should call metadataCaller when set via setter', async () => {
+            const metadataCaller = new FakeMetadataCaller();
+            const subscriber = new AnalysisNodeSubscriber();
+            subscriber.setMetadataCaller(metadataCaller);
+
+            const event = createMockUpdateEvent();
+            await subscriber.afterUpdate(event as any);
+
+            expect(metadataCaller.getCallCount()).toBe(1);
+
+            const call = metadataCaller.getLastCall();
+            expect(call!.command).toBe(AnalysisMetadataCommand.RECALC);
+            expect(call!.data).toEqual({
+                analysisId: event.entity.analysis_id,
+                queryFiles: false,
+                querySelf: false,
+            });
+            expect(call!.meta).toEqual({ entityManager: event.manager });
+        });
+
+        it('should not call metadataCaller when not set', async () => {
+            const subscriber = new AnalysisNodeSubscriber();
+
+            const event = createMockUpdateEvent();
+            await subscriber.afterUpdate(event as any);
+            // No error thrown
+        });
+
+        it('should not call when no analysisId available', async () => {
+            const metadataCaller = new FakeMetadataCaller();
+            const subscriber = new AnalysisNodeSubscriber();
+            subscriber.setMetadataCaller(metadataCaller);
+
+            const event = createMockUpdateEvent({
+                entity: {},
+                databaseEntity: {},
+            });
+            await subscriber.afterUpdate(event as any);
+
+            expect(metadataCaller.getCallCount()).toBe(0);
+        });
+
+        it('should use databaseEntity analysisId when entity analysisId is missing', async () => {
+            const metadataCaller = new FakeMetadataCaller();
+            const subscriber = new AnalysisNodeSubscriber();
+            subscriber.setMetadataCaller(metadataCaller);
+
+            const dbAnalysisId = randomUUID();
+            const event = createMockUpdateEvent({
+                entity: {},
+                databaseEntity: { analysis_id: dbAnalysisId },
+            });
+            await subscriber.afterUpdate(event as any);
+
+            expect(metadataCaller.getCallCount()).toBe(1);
+            expect(metadataCaller.getLastCall()!.data.analysisId).toBe(dbAnalysisId);
         });
     });
 
