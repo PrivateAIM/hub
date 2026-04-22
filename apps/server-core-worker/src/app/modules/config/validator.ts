@@ -18,7 +18,7 @@ export class ConfigValidator extends Container<Config> {
         this.mount('env', { optional: true }, createValidator(
             zod.enum([EnvironmentName.TEST, EnvironmentName.DEVELOPMENT, EnvironmentName.PRODUCTION]),
         ));
-        this.mount('port', { optional: true }, createValidator(zod.number().int().nonnegative()));
+        this.mount('port', { optional: true }, createValidator(zod.number().int().nonnegative().max(65535)));
 
         this.mount('realm', { optional: true }, createValidator(zod.string().min(1)));
         this.mount('clientId', { optional: true }, createValidator(zod.string().min(1)));

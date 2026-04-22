@@ -18,17 +18,17 @@ export class ConfigValidator extends Container<Config> {
         this.mount('env', { optional: true }, createValidator(
             zod.enum([EnvironmentName.TEST, EnvironmentName.DEVELOPMENT, EnvironmentName.PRODUCTION]),
         ));
-        this.mount('port', { optional: true }, createValidator(zod.number().int().nonnegative()));
+        this.mount('port', { optional: true }, createValidator(zod.number().int().nonnegative().max(65535)));
 
         this.mount('realm', { optional: true }, createValidator(zod.string().min(1)));
         this.mount('clientId', { optional: true }, createValidator(zod.string().min(1)));
         this.mount('clientSecret', { optional: true }, createValidator(zod.string().min(1)));
 
-        this.mount('publicURL', { optional: true }, createValidator(zod.string()));
+        this.mount('publicURL', { optional: true }, createValidator(zod.url()));
 
-        this.mount('authupURL', { optional: true }, createValidator(zod.string()));
-        this.mount('redisConnectionString', { optional: true }, createValidator(zod.string()));
-        this.mount('rabbitMqConnectionString', { optional: true }, createValidator(zod.string()));
+        this.mount('authupURL', { optional: true }, createValidator(zod.url()));
+        this.mount('redisConnectionString', { optional: true }, createValidator(zod.string().min(1)));
+        this.mount('rabbitMqConnectionString', { optional: true }, createValidator(zod.string().min(1)));
 
         this.mount('minioConnectionString', { optional: true }, createValidator(zod.string().min(1)));
     }
