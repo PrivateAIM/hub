@@ -8,12 +8,12 @@
 import type { Analysis } from '@privateaim/core-kit';
 import { isEqual } from 'smob';
 
-export class RecalcQueue {
+export class AnalysisRecalcQueue {
     private promises = new Map<string, Promise<void>>();
 
     private pending = new Set<string>();
 
-    private handler: (analysisId: string) => Promise<Analysis>;
+    private readonly handler: (analysisId: string) => Promise<Analysis>;
 
     constructor(handler: (analysisId: string) => Promise<Analysis>) {
         this.handler = handler;
@@ -34,17 +34,19 @@ export class RecalcQueue {
     }
 
     private async processNext(analysisId: string): Promise<void> {
-        while (this.pending.has(analysisId)) {
-            this.pending.delete(analysisId);
+        try {
+            while (this.pending.has(analysisId)) {
+                this.pending.delete(analysisId);
 
-            await this.handler(analysisId);
+                await this.handler(analysisId);
+            }
+        } finally {
+            this.promises.delete(analysisId);
         }
-
-        this.promises.delete(analysisId);
     }
 }
 
-export function hasChanged(a: Analysis, b: Analysis): boolean {
+export function hasAnalysisChanged(a: Analysis, b: Analysis): boolean {
     const excludeKeys: (keyof Analysis)[] = [
         'updated_at',
         'created_at',

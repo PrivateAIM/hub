@@ -9,7 +9,9 @@ import type { Analysis, AnalysisBucketFile } from '@privateaim/core-kit';
 import type { ActorContext } from '../actor/types.ts';
 import type { EntityRepositoryFindManyResult, IEntityRepository } from '../types.ts';
 
-export interface IAnalysisBucketFileRepository extends IEntityRepository<AnalysisBucketFile> {}
+export interface IAnalysisBucketFileRepository extends IEntityRepository<AnalysisBucketFile> {
+    findRootCodeFile(analysisId: string): Promise<AnalysisBucketFile | null>;
+}
 
 export interface IAnalysisFileMetadataRecalculator {
     recalc(analysisId: string): Promise<Analysis>;

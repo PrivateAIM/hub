@@ -232,15 +232,15 @@ describe('analysis metadata: node recalc', () => {
 
         // Update all 3 nodes to 100% progress
         await client.analysisNode.update(an1.id, {
-            execution_status: ProcessStatus.FINISHED,
+            execution_status: ProcessStatus.EXECUTED,
             execution_progress: 100,
         });
         await client.analysisNode.update(an2.id, {
-            execution_status: ProcessStatus.FINISHED,
+            execution_status: ProcessStatus.EXECUTED,
             execution_progress: 100,
         });
         await client.analysisNode.update(an3.id, {
-            execution_status: ProcessStatus.FINISHED,
+            execution_status: ProcessStatus.EXECUTED,
             execution_progress: 100,
         });
 
@@ -271,15 +271,15 @@ describe('analysis metadata: node recalc', () => {
         // Update all 3 nodes concurrently
         await Promise.all([
             client.analysisNode.update(an1.id, {
-                execution_status: ProcessStatus.FINISHED,
+                execution_status: ProcessStatus.EXECUTED,
                 execution_progress: 100,
             }),
             client.analysisNode.update(an2.id, {
-                execution_status: ProcessStatus.FINISHED,
+                execution_status: ProcessStatus.EXECUTED,
                 execution_progress: 100,
             }),
             client.analysisNode.update(an3.id, {
-                execution_status: ProcessStatus.FINISHED,
+                execution_status: ProcessStatus.EXECUTED,
                 execution_progress: 100,
             }),
         ]);
@@ -287,5 +287,118 @@ describe('analysis metadata: node recalc', () => {
 
         const updated = await client.analysis.getOne(analysis.id);
         expect(updated.execution_progress).toBe(100);
+    });
+
+    it('should set analysis execution_status to STARTED when first node starts', async () => {
+        const { client } = suite;
+
+        const project = await client.project.create(createTestProject());
+        const defaultNode = await client.node.create(createTestNode({ type: NodeType.DEFAULT }));
+        const aggregatorNode = await client.node.create(createTestNode({ type: NodeType.AGGREGATOR }));
+        await client.projectNode.create({ node_id: defaultNode.id, project_id: project.id });
+        await client.projectNode.create({ node_id: aggregatorNode.id, project_id: project.id });
+
+        const analysis = await client.analysis.create({ project_id: project.id });
+
+        const an1 = await client.analysisNode.create({ analysis_id: analysis.id, node_id: defaultNode.id });
+        await client.analysisNode.create({ analysis_id: analysis.id, node_id: aggregatorNode.id });
+
+        await client.analysisNode.update(an1.id, { execution_status: ProcessStatus.STARTED });
+
+        const updated = await client.analysis.getOne(analysis.id);
+        expect(updated.execution_status).toBe(ProcessStatus.STARTED);
+    });
+
+    it('should keep analysis execution_status at STARTED when not all nodes are executed', async () => {
+        const { client } = suite;
+
+        const project = await client.project.create(createTestProject());
+        const defaultNode = await client.node.create(createTestNode({ type: NodeType.DEFAULT }));
+        const aggregatorNode = await client.node.create(createTestNode({ type: NodeType.AGGREGATOR }));
+        await client.projectNode.create({ node_id: defaultNode.id, project_id: project.id });
+        await client.projectNode.create({ node_id: aggregatorNode.id, project_id: project.id });
+
+        const analysis = await client.analysis.create({ project_id: project.id });
+
+        const an1 = await client.analysisNode.create({ analysis_id: analysis.id, node_id: defaultNode.id });
+        const an2 = await client.analysisNode.create({ analysis_id: analysis.id, node_id: aggregatorNode.id });
+
+        await client.analysisNode.update(an1.id, {
+            execution_status: ProcessStatus.EXECUTED,
+            execution_progress: 100,
+        });
+        await client.analysisNode.update(an2.id, {
+            execution_status: ProcessStatus.STARTED,
+            execution_progress: 20,
+        });
+
+        const updated = await client.analysis.getOne(analysis.id);
+        expect(updated.execution_status).toBe(ProcessStatus.STARTED);
+    });
+
+    it('should set analysis execution_status to EXECUTED when all nodes are executed', async () => {
+        const { client } = suite;
+
+        const project = await client.project.create(createTestProject());
+        const defaultNode = await client.node.create(createTestNode({ type: NodeType.DEFAULT }));
+        const aggregatorNode = await client.node.create(createTestNode({ type: NodeType.AGGREGATOR }));
+        await client.projectNode.create({ node_id: defaultNode.id, project_id: project.id });
+        await client.projectNode.create({ node_id: aggregatorNode.id, project_id: project.id });
+
+        const analysis = await client.analysis.create({ project_id: project.id });
+
+        const an1 = await client.analysisNode.create({ analysis_id: analysis.id, node_id: defaultNode.id });
+        const an2 = await client.analysisNode.create({ analysis_id: analysis.id, node_id: aggregatorNode.id });
+
+        await client.analysisNode.update(an1.id, {
+            execution_status: ProcessStatus.EXECUTED,
+            execution_progress: 100,
+        });
+        await client.analysisNode.update(an2.id, {
+            execution_status: ProcessStatus.EXECUTED,
+            execution_progress: 100,
+        });
+
+        const updated = await client.analysis.getOne(analysis.id);
+        expect(updated.execution_status).toBe(ProcessStatus.EXECUTED);
+    });
+
+    it('should set analysis execution_status to FAILED when any node fails', async () => {
+        const { client } = suite;
+
+        const project = await client.project.create(createTestProject());
+        const defaultNode = await client.node.create(createTestNode({ type: NodeType.DEFAULT }));
+        const aggregatorNode = await client.node.create(createTestNode({ type: NodeType.AGGREGATOR }));
+        await client.projectNode.create({ node_id: defaultNode.id, project_id: project.id });
+        await client.projectNode.create({ node_id: aggregatorNode.id, project_id: project.id });
+
+        const analysis = await client.analysis.create({ project_id: project.id });
+
+        const an1 = await client.analysisNode.create({ analysis_id: analysis.id, node_id: defaultNode.id });
+        const an2 = await client.analysisNode.create({ analysis_id: analysis.id, node_id: aggregatorNode.id });
+
+        await client.analysisNode.update(an1.id, {
+            execution_status: ProcessStatus.EXECUTED,
+            execution_progress: 100,
+        });
+        await client.analysisNode.update(an2.id, { execution_status: ProcessStatus.FAILED });
+
+        const updated = await client.analysis.getOne(analysis.id);
+        expect(updated.execution_status).toBe(ProcessStatus.FAILED);
+    });
+
+    it('should reset analysis execution_status to null when no nodes have status', async () => {
+        const { client } = suite;
+
+        const project = await client.project.create(createTestProject());
+        const defaultNode = await client.node.create(createTestNode({ type: NodeType.DEFAULT }));
+        await client.projectNode.create({ node_id: defaultNode.id, project_id: project.id });
+
+        const analysis = await client.analysis.create({ project_id: project.id });
+
+        await client.analysisNode.create({ analysis_id: analysis.id, node_id: defaultNode.id });
+
+        const updated = await client.analysis.getOne(analysis.id);
+        expect(updated.execution_status).toBeNull();
     });
 });

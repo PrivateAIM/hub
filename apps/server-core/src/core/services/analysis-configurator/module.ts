@@ -90,9 +90,7 @@ export class AnalysisConfigurator {
 
         await this.repository.save(entity, options.persistCtx);
 
-        await this.nodeRecalculator.recalc(entity.id);
-
-        return entity;
+        return this.nodeRecalculator.recalc(entity.id);
     }
 
     protected async resolve(input: string | Analysis): Promise<Analysis> {

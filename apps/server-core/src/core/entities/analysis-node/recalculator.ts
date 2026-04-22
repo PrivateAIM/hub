@@ -7,47 +7,56 @@
 
 import type { Analysis } from '@privateaim/core-kit';
 import { AnalysisNodeApprovalStatus, NodeType } from '@privateaim/core-kit';
-import { EnvironmentName } from '@privateaim/kit';
-import type { DataSource } from 'typeorm';
-import type { IAnalysisNodeMetadataRecalculator } from '../../core/entities/analysis-node/types.ts';
-import { AnalysisEntity, AnalysisNodeEntity } from '../database/index.ts';
-import type { AnalysisMetadataRecalculatorConfig, AnalysisMetadataRecalculatorContext } from './types.ts';
-import { RecalcQueue, hasChanged } from './utils.ts';
+import type { ProcessStatus } from '@privateaim/kit';
+import { EnvironmentName, getMinProcessStatus } from '@privateaim/kit';
+import type { IAnalysisRepository } from '../analysis/types.ts';
+import { AnalysisRecalcQueue, hasAnalysisChanged } from '../utils.ts';
+import type { IAnalysisNodeMetadataRecalculator, IAnalysisNodeRepository } from './types.ts';
+
+type AnalysisNodeMetadataRecalculatorConfig = {
+    env: string;
+    skipAnalysisApproval: boolean;
+};
+
+type AnalysisNodeMetadataRecalculatorContext = {
+    analysisRepository: IAnalysisRepository;
+    analysisNodeRepository: IAnalysisNodeRepository;
+    config: AnalysisNodeMetadataRecalculatorConfig;
+};
 
 export class AnalysisNodeMetadataRecalculator implements IAnalysisNodeMetadataRecalculator {
-    protected dataSource: DataSource;
+    protected analysisRepository: IAnalysisRepository;
 
-    protected config: AnalysisMetadataRecalculatorConfig;
+    protected analysisNodeRepository: IAnalysisNodeRepository;
 
-    private queue: RecalcQueue;
+    protected config: AnalysisNodeMetadataRecalculatorConfig;
 
-    constructor(ctx: AnalysisMetadataRecalculatorContext) {
-        this.dataSource = ctx.dataSource;
+    private queue: AnalysisRecalcQueue;
+
+    constructor(ctx: AnalysisNodeMetadataRecalculatorContext) {
+        this.analysisRepository = ctx.analysisRepository;
+        this.analysisNodeRepository = ctx.analysisNodeRepository;
         this.config = ctx.config;
-        this.queue = new RecalcQueue((id) => this.recalc(id));
+        this.queue = new AnalysisRecalcQueue((id) => this.recalc(id));
     }
 
     async recalc(analysisId: string): Promise<Analysis> {
-        const repository = this.dataSource.manager.getRepository(AnalysisEntity);
-        const entity = await repository.findOneBy({ id: analysisId });
+        const entity = await this.analysisRepository.findOneById(analysisId);
         if (!entity) {
             throw new Error(`Analysis ${analysisId} not found`);
         }
 
         const cloned = { ...entity };
 
-        const analysisNodesRepository = this.dataSource.manager.getRepository(AnalysisNodeEntity);
-        const analysisNodes = await analysisNodesRepository.find({
-            where: { analysis_id: entity.id },
-            relations: ['node'],
-            cache: false,
-        });
+        const analysisNodes = await this.analysisNodeRepository.findManyWithNodeByAnalysis(entity.id);
 
         let nodes = 0;
         let nodesApproved = 0;
         let executionProgress = 0;
         let hasAggregator = false;
         let hasDefault = false;
+
+        const executionStatuses: (`${ProcessStatus}` | null)[] = [];
 
         for (const analysisNode of analysisNodes) {
             nodes++;
@@ -56,6 +65,7 @@ export class AnalysisNodeMetadataRecalculator implements IAnalysisNodeMetadataRe
             }
 
             executionProgress += analysisNode.execution_progress || 0;
+            executionStatuses.push(analysisNode.execution_status);
 
             if (analysisNode.node.type === NodeType.AGGREGATOR) {
                 hasAggregator = true;
@@ -73,8 +83,10 @@ export class AnalysisNodeMetadataRecalculator implements IAnalysisNodeMetadataRe
         const ignoreApproval = this.config.skipAnalysisApproval ||
             this.config.env === EnvironmentName.TEST;
 
-        entity.build_nodes_valid = ignoreApproval ? true : entity.nodes === entity.nodes_approved;
+        entity.build_nodes_valid = entity.nodes > 0 &&
+            (ignoreApproval || entity.nodes === entity.nodes_approved);
 
+        entity.execution_status = getMinProcessStatus(executionStatuses);
         entity.execution_progress = executionProgress > 0 && nodes > 0 ?
             Math.floor(executionProgress / nodes) :
             0;
@@ -83,14 +95,14 @@ export class AnalysisNodeMetadataRecalculator implements IAnalysisNodeMetadataRe
         entity.configuration_node_default_valid = hasDefault;
         entity.configuration_nodes_valid = hasAggregator && hasDefault;
 
-        if (hasChanged(cloned, entity)) {
-            await repository.save(entity);
+        if (hasAnalysisChanged(cloned, entity)) {
+            await this.analysisRepository.save(entity);
         }
 
         return entity;
     }
 
     recalcDebounced(analysisId: string): Promise<void> {
-        this.queue.enqueue(analysisId);
+        return this.queue.enqueue(analysisId);
     }
 }

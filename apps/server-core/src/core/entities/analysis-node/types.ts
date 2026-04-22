@@ -9,7 +9,9 @@ import type { Analysis, AnalysisNode } from '@privateaim/core-kit';
 import type { ActorContext } from '../actor/types.ts';
 import type { EntityRepositoryFindManyResult, IEntityRepository } from '../types.ts';
 
-export interface IAnalysisNodeRepository extends IEntityRepository<AnalysisNode> {}
+export interface IAnalysisNodeRepository extends IEntityRepository<AnalysisNode> {
+    findManyWithNodeByAnalysis(analysisId: string): Promise<AnalysisNode[]>;
+}
 
 export interface IAnalysisNodeMetadataRecalculator {
     recalc(analysisId: string): Promise<Analysis>;

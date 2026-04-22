@@ -14,11 +14,9 @@ import { AnalysisBuilder } from '../../../core/services/analysis-builder/index.t
 import { AnalysisConfigurator } from '../../../core/services/analysis-configurator/index.ts';
 import { AnalysisDistributor } from '../../../core/services/analysis-distributor/index.ts';
 import { AnalysisStorageManager } from '../../../core/services/analysis-storage-manager/index.ts';
-import {
-    AnalysisFileMetadataRecalculator,
-    AnalysisNodeMetadataRecalculator,
-    AnalysisSelfMetadataRecalculator,
-} from '../../../adapters/analysis-metadata-recalculator/index.ts';
+import { AnalysisMetadataRecalculator } from '../../../core/entities/analysis/recalculator.ts';
+import { AnalysisNodeMetadataRecalculator } from '../../../core/entities/analysis-node/recalculator.ts';
+import { AnalysisFileMetadataRecalculator } from '../../../core/entities/analysis-bucket-file/recalculator.ts';
 import { DatabaseInjectionKey } from '../database/constants.ts';
 import { ComponentsInjectionKey } from '../components/constants.ts';
 import { ConfigInjectionKey } from '../config/constants.ts';
@@ -33,29 +31,25 @@ export class AnalysisModule implements IModule {
         const analysisRepository = container.resolve(DatabaseInjectionKey.AnalysisRepository);
         const analysisNodeRepository = container.resolve(DatabaseInjectionKey.AnalysisNodeRepository);
         const analysisBucketRepository = container.resolve(DatabaseInjectionKey.AnalysisBucketRepository);
+        const analysisBucketFileRepository = container.resolve(DatabaseInjectionKey.AnalysisBucketFileRepository);
         const registryRepository = container.resolve(DatabaseInjectionKey.RegistryRepository);
-        const dataSource = container.resolve(DatabaseInjectionKey.DataSource);
         const config = container.resolve(ConfigInjectionKey);
 
         const messageBusResult = container.tryResolve(MessageBusInjectionKey);
         const messageBus = messageBusResult.success ? messageBusResult.data : undefined;
 
-        const recalculatorConfig = {
-            env: config.env,
-            skipAnalysisApproval: config.skipAnalysisApproval,
-        };
-
-        const analysisRecalculator = new AnalysisSelfMetadataRecalculator({
-            dataSource,
-            config: recalculatorConfig,
-        });
+        const analysisRecalculator = new AnalysisMetadataRecalculator({ repository: analysisRepository });
         const nodeRecalculator = new AnalysisNodeMetadataRecalculator({
-            dataSource,
-            config: recalculatorConfig,
+            analysisRepository,
+            analysisNodeRepository,
+            config: {
+                env: config.env,
+                skipAnalysisApproval: config.skipAnalysisApproval,
+            },
         });
         const fileRecalculator = new AnalysisFileMetadataRecalculator({
-            dataSource,
-            config: recalculatorConfig,
+            analysisRepository,
+            bucketFileRepository: analysisBucketFileRepository,
         });
 
         container.register(AnalysisInjectionKey.AnalysisRecalculator, { useValue: analysisRecalculator });
