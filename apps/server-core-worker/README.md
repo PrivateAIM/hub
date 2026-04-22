@@ -1,26 +1,34 @@
-# Hub - Analysis Manager 🏭
+# @privateaim/server-core-worker 🏭
 
-[![npm version](https://badge.fury.io/js/@privateaim%2Fanalysis.svg)](https://badge.fury.io/js/@privateaim%2Fserver-analysis)
+[![npm version][npm-src]][npm-href]
 
-This repository contains the analysis manager of FLAME.
-It communicates with some services of FLAME and need therefore to be configured properly, like described 
-in the following sections.
+Background worker service for PrivateAIM Hub — builds and distributes Docker containers for federated analyses.
+
+## Usage
+
+```bash
+# Development
+npm run dev --workspace=apps/server-core-worker
+
+# Docker
+docker run privateaim/hub core-worker
+```
 
 ## Configuration
-The following settings need to be added to the environment file `.env` in the root directory.
-```
-PORT=<port>
-NODE_ENV=development
 
-RABBITMQ_CONNECTION_STRING=amqp://<username>:<password>@<host>
-VAULT_CONNECTION_STRING=<token>@<url>/v1/
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `PORT` | `3000` | Health-check HTTP port |
+| `AUTHUP_URL` | — | Authup identity provider URL |
+| `CORE_URL` | — | Core API base URL (**required**) |
+| `STORAGE_URL` | — | Storage service base URL (**required**) |
+| `RABBITMQ_CONNECTION_STRING` | `amqp://root:start123@127.0.0.1` | RabbitMQ connection |
 
-AUTHUP_URL=...
-CORE_URL=...
-STORAGE_URL=...
-```
+## License
 
-## Credits
-If you have any questions, feel free to contact the author [Peter Placzek](https://github.com/Tada5hi) of the project.
-The project was initially developed during his bachelor thesis, and he worked after that as employee
-on the project.
+Made with 💚
+
+Published under [Apache 2.0](../../LICENSE).
+
+[npm-src]: https://img.shields.io/npm/v/@privateaim/server-core-worker
+[npm-href]: https://npmjs.com/package/@privateaim/server-core-worker

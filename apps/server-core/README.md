@@ -1,33 +1,43 @@
-# Hub - Server Core 🌴
+# @privateaim/server-core 🌐
 
-[![npm version](https://badge.fury.io/js/@personalhealthtrain%2Fcentral-api.svg)](https://badge.fury.io/js/@personalhealthtrain%2Fcentral-api)
+[![npm version][npm-src]][npm-href]
 
-This repository contains the server core service of the HUB ecosystem.
-It communicates with some services of FLAME and need therefore to be configured properly, like described 
-in the following sections.
+Main REST API service for PrivateAIM Hub — manages analyses, projects, nodes, registries, and master images.
+
+## Usage
+
+```bash
+# Development
+npm run dev --workspace=apps/server-core
+
+# CLI
+npm run cli --workspace=apps/server-core -- start
+
+# Docker
+docker run privateaim/hub core cli start
+```
 
 ## Configuration
-The following settings need to be added to the environment file `.env` in the root directory.
-```
-PORT=<port>
-NODE_ENV=<development|production>
 
-API_URL=http://localhost:<port>/
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `PORT` | `3000` | HTTP server port |
+| `AUTHUP_URL` | — | Authup identity provider URL |
+| `REDIS_CONNECTION_STRING` | — | Redis connection |
+| `RABBITMQ_CONNECTION_STRING` | — | RabbitMQ connection |
+| `HARBOR_URL` | — | Harbor registry URL |
+| `TELEMETRY_URL` | — | Telemetry service URL |
+| `VAULT_CONNECTION_STRING` | `start123@http://127.0.0.1:8090/v1/` | Vault connection |
+| `SKIP_PROJECT_APPROVAL` | `false` | Skip project approval workflow |
+| `SKIP_ANALYSIS_APPROVAL` | `false` | Skip analysis approval workflow |
 
-AUTHUP_API_URL=http://localhost:<port>/
-VAULT_CONNECTION_STRING=<token>@<api url>
-RABBITMQ_CONNECTION_STRING=amqp://<username>:<password>@<host>
-HARBOR_CONNECTION_STRING=<user>:<password>@<api url>
+Plus [database configuration](../../docs/src/reference/index.md#database-configuration).
 
-```
+## License
 
-## Setup
+Made with 💚
 
-```shell
-$ npm run cli -- setup
-```
+Published under [Apache 2.0](../../LICENSE).
 
-## Credits
-If you have any questions, feel free to contact the author [Peter Placzek](https://github.com/tada5hi) of the project.
-The project was initially developed during his bachelor thesis, and he worked after that as employee
-on the project.
+[npm-src]: https://img.shields.io/npm/v/@privateaim/server-core
+[npm-href]: https://npmjs.com/package/@privateaim/server-core

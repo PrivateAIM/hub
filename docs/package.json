@@ -1,0 +1,14 @@
+{
+    "name": "@privateaim/docs",
+    "version": "0.8.36",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "vitepress dev src --temp .temp",
+        "build": "vitepress build src --temp .temp"
+    },
+    "devDependencies": {
+        "vitepress": "^1.6.3",
+        "vue": "^3.5.32"
+    }
+}
