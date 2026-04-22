@@ -42,14 +42,18 @@ export default defineComponent({
             }
 
             if (entity.value.build_status === ProcessStatus.STARTED) {
-                return 20;
-            }
-
-            if (entity.value.build_status === ProcessStatus.STARTING) {
                 return 10;
             }
 
-            return 0;
+            if (entity.value.build_status === ProcessStatus.STARTING) {
+                return 5;
+            }
+
+            if (!entity.value.build_status) {
+                return 0;
+            }
+
+            return Math.max(10, entity.value.build_progress ?? 0);
         });
 
         const runProgress = computed(() => {
@@ -58,14 +62,18 @@ export default defineComponent({
             }
 
             if (entity.value.execution_status === ProcessStatus.STARTED) {
-                return 20;
-            }
-
-            if (entity.value.execution_status === ProcessStatus.STARTING) {
                 return 10;
             }
 
-            return 0;
+            if (entity.value.execution_status === ProcessStatus.STARTING) {
+                return 5;
+            }
+
+            if (!entity.value.execution_status) {
+                return 0;
+            }
+
+            return Math.max(10, entity.value.execution_progress ?? 0);
         });
 
         const progress = computed(() => {
