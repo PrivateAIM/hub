@@ -2,7 +2,6 @@
 
 [![CI][ci-src]][ci-href]
 [![CodeQL][codeql-src]][codeql-href]
-[![Known Vulnerabilities][snyk-src]][snyk-href]
 [![Conventional Commits][conventional-src]][conventional-href]
 
 Central services for the [PrivateAIM](https://privateaim.net) platform — a privacy-preserving analytics infrastructure for federated data analysis across distributed institutions.
@@ -91,8 +90,6 @@ Published under [Apache 2.0](./LICENSE).
 [ci-href]: https://github.com/PrivateAIM/hub/actions/workflows/main.yml
 [codeql-src]: https://github.com/PrivateAIM/hub/actions/workflows/codeql.yml/badge.svg
 [codeql-href]: https://github.com/PrivateAIM/hub/actions/workflows/codeql.yml
-[snyk-src]: https://snyk.io/test/github/PrivateAim/hub/badge.svg
-[snyk-href]: https://snyk.io/test/github/PrivateAim/hub
 [conventional-src]: https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits&logoColor=white
 [conventional-href]: https://conventionalcommits.org
 
