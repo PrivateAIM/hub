@@ -27,7 +27,7 @@
         "typeorm": "^0.3.28",
         "typeorm-extension": "^3.9.0",
         "unplugin-swc": "^1.5.5",
-        "vitest": "^4.1.4"
+        "vitest": "^4.1.5"
     },
     "peerDependencies": {
         "typeorm": "^0.3.28",

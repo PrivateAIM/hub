@@ -42,7 +42,7 @@
         "amqp-extension": "^4.0.0",
         "redis-extension": "^2.0.4",
         "typeorm-extension": "^3.7.4",
-        "vitest": "^4.1.4"
+        "vitest": "^4.1.5"
     },
     "peerDependencies": {
         "@authup/core-http-kit": "^1.0.0-beta.35",
