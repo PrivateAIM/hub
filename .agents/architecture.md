@@ -62,6 +62,12 @@ Pure business logic. No imports from `typeorm`, `routup`, or other infrastructur
 - `ValidatorGroup` — Domain-level validation groups (not HTTP-specific)
 - `IPermissionChecker` — Permission evaluation interface (preCheck, check, preCheckOneOf, checkOneOf)
 
+### Test Architecture
+
+- Unit tests are grouped by domain under `test/unit/core/entities/<domain>/` and `test/unit/core/services/`.
+- Shared test fakes and helpers are imported from `@privateaim/server-test-kit` (`FakeEntityRepository`, `FakePermissionChecker`, actor factories).
+- Domain-specific fakes (e.g. `FakeNodeRepository`, `FakeRegistryManager`) are colocated beside the tests that use them.
+
 **Services** (`core/services/`):
 - Business logic that spans multiple entities or orchestrates workflows
 - `analysis-builder/` — Build lifecycle orchestration

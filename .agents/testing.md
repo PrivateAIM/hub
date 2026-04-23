@@ -126,7 +126,7 @@ Generic test fakes shared across all services live in `packages/server-test-kit/
 
 Service-level tests are organized by domain, with fakes colocated next to the tests that use them:
 
-```
+```text
 test/unit/core/
 ├── helpers/
 │   └── index.ts                      # Re-exports from @privateaim/server-test-kit
