@@ -20,6 +20,8 @@ import { RegistryEntity } from '../../../../../adapters/database/entities/regist
 import type {
     EntityPersistContext,
     EntityRepositoryFindManyResult,
+} from '@privateaim/server-kit';
+import type {
     IRegistryRepository,
 } from '../../../../../core/index.ts';
 

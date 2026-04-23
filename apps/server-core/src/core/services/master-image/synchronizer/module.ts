@@ -7,7 +7,7 @@
 
 import type { MasterImage, MasterImageGroup } from '@privateaim/core-kit';
 import type { MasterImageSynchronizerGroup, MasterImageSynchronizerImage } from '@privateaim/server-core-worker-kit';
-import type { IEntityRepository } from '../../../entities/types.ts';
+import type { IEntityRepository } from '@privateaim/server-kit';
 import type {
     MasterImageSynchronizerExecuteContext,
     MasterImageSynchronizerExecuteResult,

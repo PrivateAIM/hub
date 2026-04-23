@@ -6,8 +6,7 @@
  */
 
 import type { ProjectNode } from '@privateaim/core-kit';
-import type { ActorContext } from '../actor/types.ts';
-import type { EntityRepositoryFindManyResult, IEntityRepository } from '../types.ts';
+import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
 
 export interface IProjectNodeRepository extends IEntityRepository<ProjectNode> {}
 

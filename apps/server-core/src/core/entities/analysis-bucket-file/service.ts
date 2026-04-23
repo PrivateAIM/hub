@@ -8,10 +8,8 @@
 import type { AnalysisBucketFile } from '@privateaim/core-kit';
 import { isRealmResourceWritable } from '@privateaim/kit';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
-import type { ActorContext } from '../actor/types.ts';
-import type { EntityRepositoryFindManyResult } from '../types.ts';
-import { ValidatorGroup } from '../constants.ts';
-import { AbstractEntityService } from '../service.ts';
+import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
+import { AbstractEntityService, ValidatorGroup } from '@privateaim/server-kit';
 import type { IAnalysisBucketFileRepository, IAnalysisBucketFileService, IAnalysisFileMetadataRecalculator } from './types.ts';
 import { AnalysisBucketFileValidator } from './validator.ts';
 

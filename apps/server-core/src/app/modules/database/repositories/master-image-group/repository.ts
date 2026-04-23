@@ -15,6 +15,8 @@ import { MasterImageGroupEntity } from '../../../../../adapters/database/entitie
 import type {
     EntityPersistContext,
     EntityRepositoryFindManyResult,
+} from '@privateaim/server-kit';
+import type {
     IMasterImageGroupRepository,
 } from '../../../../../core/index.ts';
 

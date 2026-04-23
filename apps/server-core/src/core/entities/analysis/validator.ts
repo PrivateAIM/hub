@@ -9,7 +9,7 @@ import { BadRequestError } from '@ebec/http';
 import { Container } from 'validup';
 import { createValidationChain, createValidator } from '@validup/adapter-validator';
 import type { Analysis } from '@privateaim/core-kit';
-import { ValidatorGroup } from '../constants.ts';
+import { ValidatorGroup } from '@privateaim/server-kit';
 import { ImageAttributeCommandArgumentsValidator } from './validator-image-command-argument.ts';
 
 export class AnalysisValidator extends Container<Analysis> {

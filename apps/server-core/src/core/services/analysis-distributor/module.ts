@@ -9,7 +9,7 @@ import { BadRequestError } from '@ebec/http';
 import type { Analysis, AnalysisNode, Registry } from '@privateaim/core-kit';
 import { AnalysisDistributorCommandChecker } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
-import type { EntityPersistContext, IEntityRepository } from '../../entities/types.ts';
+import type { EntityPersistContext, IEntityRepository } from '@privateaim/server-kit';
 import type { IAnalysisMetadataRecalculator } from '../../entities/analysis/types.ts';
 import type { IAnalysisNodeMetadataRecalculator } from '../../entities/analysis-node/types.ts';
 import type { IAnalysisFileMetadataRecalculator } from '../../entities/analysis-bucket-file/types.ts';

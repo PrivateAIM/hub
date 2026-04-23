@@ -11,7 +11,7 @@ import {
     useRequestIdentityRealm,
     useRequestPermissionChecker,
 } from '@privateaim/server-http-kit';
-import type { ActorContext } from '../../../../core/entities/actor/types.ts';
+import type { ActorContext } from '@privateaim/server-kit';
 
 export function buildActorContext(req: Request): ActorContext {
     const identity = useRequestIdentity(req);

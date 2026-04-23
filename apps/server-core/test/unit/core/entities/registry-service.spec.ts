@@ -16,6 +16,7 @@ import {
     it,
 } from 'vitest';
 import { RegistryService } from '../../../../src/core/entities/registry/service.ts';
+import type { FakePermissionChecker } from '../helpers/index.ts';
 import {
     FakeEntityRepository,
     FakeRegistryCaller,
@@ -74,7 +75,7 @@ describe('RegistryService', () => {
                 actor,
             );
 
-            expect(actor.permissionChecker.preCheck).toHaveBeenCalled();
+            expect((actor.permissionChecker as FakePermissionChecker).wasMethodCalled('preCheck')).toBe(true);
         });
 
         it('should throw ForbiddenError when requesting secret without permission', async () => {
@@ -94,7 +95,7 @@ describe('RegistryService', () => {
             const actor = createAllowAllActor();
             await service.getMany({}, actor);
 
-            expect(actor.permissionChecker.preCheck).not.toHaveBeenCalled();
+            expect((actor.permissionChecker as FakePermissionChecker).wasMethodCalled('preCheck')).toBe(false);
         });
     });
 
@@ -120,7 +121,7 @@ describe('RegistryService', () => {
             const actor = createAllowAllActor();
             await service.getOne('r-1', actor, { fields: '+account_secret' });
 
-            expect(actor.permissionChecker.preCheck).toHaveBeenCalled();
+            expect((actor.permissionChecker as FakePermissionChecker).wasMethodCalled('preCheck')).toBe(true);
         });
     });
 

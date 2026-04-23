@@ -14,10 +14,8 @@ import {
 } from '@privateaim/kit';
 import { isPropertySet } from '@authup/kit';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
-import type { ActorContext } from '../actor/types.ts';
-import type { EntityRepositoryFindManyResult } from '../types.ts';
-import { ValidatorGroup } from '../constants.ts';
-import { AbstractEntityService } from '../service.ts';
+import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
+import { AbstractEntityService, ValidatorGroup } from '@privateaim/server-kit';
 import type { IProjectRepository } from '../project/types.ts';
 import type { AnalysisBuilder } from '../../services/analysis-builder/index.ts';
 import type { AnalysisConfigurator } from '../../services/analysis-configurator/index.ts';

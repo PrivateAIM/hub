@@ -9,13 +9,11 @@ import type { Registry, RegistryProject } from '@privateaim/core-kit';
 import { RegistryAPICommand } from '@privateaim/core-kit';
 import { PermissionName, getHostNameFromString, isObject } from '@privateaim/kit';
 import { BadRequestError, NotFoundError } from '@ebec/http';
-import type { ActorContext } from '../actor/types.ts';
-import type { EntityRepositoryFindManyResult, IEntityRepository } from '../types.ts';
-import { AbstractEntityService } from '../service.ts';
+import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
+import { AbstractEntityService, ValidatorGroup } from '@privateaim/server-kit';
 import type { IRegistryCaller } from '../../harbor/types.ts';
 import type { IRegistryRepository, IRegistryService } from './types.ts';
 import { RegistryValidator } from './validator.ts';
-import { ValidatorGroup } from '../constants.ts';
 
 type RegistryServiceContext = {
     repository: IRegistryRepository;

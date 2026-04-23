@@ -15,8 +15,8 @@ import { EventEntity } from '../../../../../adapters/database/entities/event.ts'
 import type {
     EntityPersistContext,
     EntityRepositoryFindManyResult,
-    IEventRepository,
-} from '../../../../../core/entities/index.ts';
+} from '@privateaim/server-kit';
+import type { IEventRepository } from '../../../../../core/entities/index.ts';
 
 export class EventRepositoryAdapter implements IEventRepository {
     protected dataSource: DataSource;

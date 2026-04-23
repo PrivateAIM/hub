@@ -16,6 +16,7 @@ import {
     it,
 } from 'vitest';
 import { RegistryProjectService } from '../../../../src/core/entities/registry-project/service.ts';
+import type { FakePermissionChecker } from '../helpers/index.ts';
 import {
     FakeEntityRepository,
     FakeRegistryManager,
@@ -100,7 +101,7 @@ describe('RegistryProjectService', () => {
             const actor = createAllowAllActor();
             await service.getMany({}, actor);
 
-            expect(actor.permissionChecker.preCheck).toHaveBeenCalled();
+            expect((actor.permissionChecker as FakePermissionChecker).wasMethodCalled('preCheck')).toBe(true);
         });
     });
 
@@ -126,7 +127,7 @@ describe('RegistryProjectService', () => {
             const actor = createAllowAllActor();
             await service.getOne('rp-1', actor);
 
-            expect(actor.permissionChecker.preCheck).toHaveBeenCalled();
+            expect((actor.permissionChecker as FakePermissionChecker).wasMethodCalled('preCheck')).toBe(true);
         });
 
         it('should allow node-client to access own registry project secret', async () => {

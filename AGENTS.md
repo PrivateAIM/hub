@@ -59,14 +59,15 @@ When you need additional context beyond what's in the code (e.g., deployment pat
 - **[Testing](.agents/testing.md)** — Vitest with SWC, multi-database CI matrix (MySQL/Postgres/SQLite)
 - **[Conventions](.agents/conventions.md)** — Conventional Commits, Husky hooks, ESLint, tsdown bundling, Nx caching
 
-## Completed Plans
+## Plans
 
-All modernization and refactoring plans are complete:
+Modernization and refactoring plans:
 
-1. ~~Tooling Modernization~~ — #1511
-2. ~~Monorepo Restructuring~~ — #1512
-3. ~~Dependency Injection~~ — singa fully removed, all services use eldin/orkos DI
-4. ~~Hexagonal: server-core~~ — #1514
-5. ~~Hexagonal: remaining services~~ — #1528
-6. ~~Service-Level Tests~~ — all 13 entity services, command checkers, core services tested
-7. ~~Message Bus~~ — QueueRouter → MessageBus, AMQP/Memory driver abstraction
+1. ~~Tooling Modernization~~ — Complete (#1511)
+2. ~~Monorepo Restructuring~~ — Complete (#1512)
+3. ~~Dependency Injection~~ — Complete (singa fully removed, all services use eldin/orkos DI)
+4. ~~Hexagonal: server-core~~ — Complete (#1514)
+5. ~~Hexagonal: remaining services~~ — Complete (#1528)
+6. ~~Service-Level Tests~~ — Complete (all 13 entity services, command checkers, core services tested)
+7. ~~Message Bus~~ — Complete (QueueRouter → MessageBus, AMQP/Memory driver abstraction)
+8. **[Shared Test Infrastructure](.agents/plans/008-shared-test-infrastructure.md)** — server-test-kit package, domain-grouped test layout (Phase 1 complete)

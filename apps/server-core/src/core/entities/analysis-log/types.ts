@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { EntityRepositoryFindManyResult } from '../types.ts';
+import type { EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 
 export interface IAnalysisLogService {
     getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<Record<string, any>>>;

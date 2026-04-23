@@ -12,11 +12,8 @@ import {
     validateEntityJoinColumns,
 } from 'typeorm-extension';
 import { BucketFileEntity } from '../../../../../adapters/database/entities/bucket-file.ts';
-import type {
-    EntityPersistContext,
-    EntityRepositoryFindManyResult,
-    IBucketFileRepository,
-} from '../../../../../core/entities/index.ts';
+import type { EntityPersistContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
+import type { IBucketFileRepository } from '../../../../../core/entities/index.ts';
 
 export class BucketFileRepositoryAdapter implements IBucketFileRepository {
     protected dataSource: DataSource;

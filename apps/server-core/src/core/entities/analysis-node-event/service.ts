@@ -7,8 +7,8 @@
 
 import type { AnalysisNodeEvent } from '@privateaim/core-kit';
 import { NotFoundError } from '@ebec/http';
-import type { EntityRepositoryFindManyResult } from '../types.ts';
-import { AbstractEntityService } from '../service.ts';
+import type { EntityRepositoryFindManyResult } from '@privateaim/server-kit';
+import { AbstractEntityService } from '@privateaim/server-kit';
 import type { IAnalysisNodeEventRepository, IAnalysisNodeEventService } from './types.ts';
 
 type AnalysisNodeEventServiceContext = {

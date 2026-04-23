@@ -9,9 +9,8 @@ import type { MasterImage } from '@privateaim/core-kit';
 import { MasterImageCommand } from '@privateaim/core-kit';
 import { PermissionName, ProcessStatus } from '@privateaim/kit';
 import { BadRequestError, NotFoundError } from '@ebec/http';
-import type { ActorContext } from '../actor/types.ts';
-import type { EntityRepositoryFindManyResult } from '../types.ts';
-import { AbstractEntityService } from '../service.ts';
+import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
+import { AbstractEntityService } from '@privateaim/server-kit';
 import type {
     IMasterImageBuilderCaller,
     IMasterImageRepository,

@@ -15,7 +15,7 @@ import { ProjectNodeEntity } from '../../../../../adapters/database/entities/pro
 import type {
     EntityPersistContext,
     EntityRepositoryFindManyResult,
-} from '../../../../../core/entities/types.ts';
+} from '@privateaim/server-kit';
 import type { IProjectNodeRepository } from '../../../../../core/entities/project-node/types.ts';
 
 export class ProjectNodeRepositoryAdapter implements IProjectNodeRepository {

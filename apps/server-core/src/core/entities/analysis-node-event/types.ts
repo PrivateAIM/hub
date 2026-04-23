@@ -6,7 +6,7 @@
  */
 
 import type { AnalysisNodeEvent } from '@privateaim/core-kit';
-import type { EntityRepositoryFindManyResult, IEntityRepository } from '../types.ts';
+import type { EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
 
 export interface IAnalysisNodeEventRepository extends IEntityRepository<AnalysisNodeEvent> {}
 

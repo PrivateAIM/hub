@@ -22,6 +22,8 @@ import { AnalysisBucketFileEntity } from '../../../../../adapters/database/entit
 import type {
     EntityPersistContext,
     EntityRepositoryFindManyResult,
+} from '@privateaim/server-kit';
+import type {
     IAnalysisBucketFileRepository,
 } from '../../../../../core/index.ts';
 

@@ -5,9 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './actor/index.ts';
 export * from './analysis/index.ts';
-export * from './constants.ts';
 export * from './analysis-bucket/index.ts';
 export * from './analysis-bucket-file/index.ts';
 export * from './analysis-log/index.ts';
@@ -22,5 +20,3 @@ export * from './project/index.ts';
 export * from './project-node/index.ts';
 export * from './registry/index.ts';
 export * from './registry-project/index.ts';
-export * from './service.ts';
-export * from './types.ts';

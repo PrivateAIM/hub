@@ -10,7 +10,7 @@ import type { Analysis } from '@privateaim/core-kit';
 import type { IAnalysisMetadataRecalculator } from '../../../../src/core/entities/analysis/types.ts';
 import type { IAnalysisNodeMetadataRecalculator } from '../../../../src/core/entities/analysis-node/types.ts';
 import type { IAnalysisFileMetadataRecalculator } from '../../../../src/core/entities/analysis-bucket-file/types.ts';
-import type { IEntityRepository } from '../../../../src/core/entities/types.ts';
+import type { IEntityRepository } from '@privateaim/server-kit';
 
 export class FakeAnalysisMetadataRecalculator implements IAnalysisMetadataRecalculator {
     private repository: IEntityRepository<Analysis>;

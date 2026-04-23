@@ -8,7 +8,7 @@
 import { BadRequestError } from '@ebec/http';
 import type { Analysis, AnalysisBucket } from '@privateaim/core-kit';
 import { AnalysisBucketType, buildAnalysisBucketName } from '@privateaim/core-kit';
-import type { IEntityRepository } from '../../entities/types.ts';
+import type { IEntityRepository } from '@privateaim/server-kit';
 import type { 
     AnalysisStorageMangerCheckOptions, 
     AnalysisStorageMangerRemoveOptions, 
