@@ -111,7 +111,7 @@ src/
 
 ### Dependency Rule
 
-**core/ → nothing** (only external domain packages like `@privateaim/core-kit`, `@privateaim/kit`, `@ebec/http`, `@authup/access`)
+**core/ → nothing** (only external domain packages like `@privateaim/core-kit`, `@privateaim/kit`, `@privateaim/server-kit`, `@ebec/http`, `@authup/access`)
 **adapters/ → core/ and app/** (implements core ports, may use app DI modules)
 **app/ → core/ and adapters/** (wires everything together)
 

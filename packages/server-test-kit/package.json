@@ -1,0 +1,39 @@
+{
+    "name": "@privateaim/server-test-kit",
+    "type": "module",
+    "version": "0.8.37",
+    "license": "Apache-2.0",
+    "description": "Shared test fakes and helpers for PrivateAIM server packages.",
+    "exports": {
+        "./package.json": "./package.json",
+        ".": {
+            "types": "./dist/index.d.mts",
+            "import": "./dist/index.mjs"
+        }
+    },
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.mts",
+    "author": {
+        "name": "Peter Placzek",
+        "email": "contact@tada5hi.net",
+        "url": "https://tada5hi.net"
+    },
+    "devDependencies": {
+        "@authup/access": "^1.0.0-beta.36",
+        "@authup/core-kit": "^1.0.0-beta.36",
+        "@ebec/http": "^2.3.0",
+        "@privateaim/server-kit": "^0.8.37"
+    },
+    "peerDependencies": {
+        "@authup/access": "^1.0.0-beta.36",
+        "@authup/core-kit": "^1.0.0-beta.36",
+        "@ebec/http": "^2.3.0",
+        "@privateaim/server-kit": "^0.8.37"
+    },
+    "scripts": {
+        "build": "rimraf ./dist && tsdown"
+    },
+    "publishConfig": {
+        "access": "public"
+    }
+}

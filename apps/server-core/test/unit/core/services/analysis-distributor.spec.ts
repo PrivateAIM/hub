@@ -21,13 +21,11 @@ import {
     it, 
 } from 'vitest';
 import { AnalysisDistributor } from '../../../../src/core/services/analysis-distributor/module.ts';
-import {
-    FakeAnalysisDistributorCaller,
-    FakeAnalysisFileMetadataRecalculator,
-    FakeAnalysisMetadataRecalculator,
-    FakeAnalysisNodeMetadataRecalculator,
-    FakeEntityRepository,
-} from '../helpers/index.ts';
+import { FakeEntityRepository } from '../helpers/index.ts';
+import { FakeAnalysisDistributorCaller } from './helpers/fake-distributor-caller.ts';
+import { FakeAnalysisMetadataRecalculator } from '../entities/analysis/fake-metadata-recalculator.ts';
+import { FakeAnalysisNodeMetadataRecalculator } from '../entities/analysis-node/fake-metadata-recalculator.ts';
+import { FakeAnalysisFileMetadataRecalculator } from '../entities/analysis-bucket-file/fake-metadata-recalculator.ts';
 import { createFullAnalysis, createTestAnalysisNode } from '../../../utils/domains/index.ts';
 
 function createTestRegistry(overrides?: Partial<Registry>): Registry {

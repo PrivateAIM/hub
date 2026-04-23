@@ -32,7 +32,7 @@ Runnable services and the frontend, located in `apps/`.
 
 See [Conventions — Documentation Site](.agents/conventions.md#documentation-site) for docs structure and update guidelines.
 
-## Packages & Libraries (15)
+## Packages & Libraries (16)
 
 Shared libraries, located in `packages/`.
 
@@ -46,7 +46,8 @@ Shared libraries, located in `packages/`.
 
 | Package                  | Purpose                                    |
 |--------------------------|--------------------------------------------|
-| `server-kit`             | Logging (Winston), auth helpers, AMQP messaging, Redis |
+| `server-kit`             | Logging (Winston), auth helpers, AMQP messaging, Redis, shared core types (IEntityRepository, ActorContext, AbstractEntityService, ValidatorGroup) |
+| `server-test-kit`        | Shared test fakes (FakeEntityRepository, FakePermissionChecker, actor factories) |
 | `server-db-kit`          | TypeORM utilities, database setup, migrations |
 | `server-http-kit`        | HTTP route/controller decorators for Routup |
 | `server-realtime-kit`    | Socket.io server helpers                   |
@@ -75,7 +76,7 @@ Layer 1:          core-http-kit, core-realtime-kit, server-kit
                      |
 Layer 2:          server-db-kit, server-http-kit, server-realtime-kit
                   server-storage-kit, server-telemetry-kit, server-core-worker-kit
-                  client-vue
+                  server-test-kit, client-vue
                      |
 Layer 3 (apps):   server-core, server-core-worker, server-storage,
                   server-telemetry, server-messenger, client-ui
@@ -89,10 +90,6 @@ Build order follows this DAG. Changes to a leaf kit (e.g., `core-kit`) require r
 apps/server-core/src/
 ├── core/                          # Domain logic (pure business rules)
 │   ├── entities/                  # Entity ports, services, validators
-│   │   ├── types.ts               # IEntityRepository<T>, EntityRepositoryFindManyResult
-│   │   ├── service.ts             # AbstractEntityService (realm helpers)
-│   │   ├── constants.ts           # ValidatorGroup enum
-│   │   ├── actor/types.ts         # ActorContext, IPermissionChecker
 │   │   └── <entity>/
 │   │       ├── types.ts           # IXRepository, IXService port interfaces
 │   │       ├── service.ts         # XService (business logic + validation)

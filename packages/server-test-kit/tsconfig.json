@@ -1,0 +1,8 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "paths": {
+            "@privateaim/server-kit": ["./packages/server-kit/src"]
+        }
+    }
+}

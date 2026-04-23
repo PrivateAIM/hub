@@ -5,4 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from '@privateaim/server-test-kit';
+export * from './actor.ts';
+export * from './fake-entity-repository.ts';
+export * from './fake-permission-checker.ts';

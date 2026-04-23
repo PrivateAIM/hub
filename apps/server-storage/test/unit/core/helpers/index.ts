@@ -5,10 +5,4 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './fake-bucket-caller.ts';
-export * from './fake-bucket-file-caller.ts';
-export * from './fake-bucket-repository.ts';
-export * from './fake-minio.ts';
-export * from './fake-permission-checker.ts';
-export * from './fake-repository.ts';
-export * from './mock-actor.ts';
+export * from '@privateaim/server-test-kit';

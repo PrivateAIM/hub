@@ -70,6 +70,7 @@
     "devDependencies": {
         "@faker-js/faker": "^10.4.0",
         "@privateaim/core-http-kit": "^0.8.37",
+        "@privateaim/server-test-kit": "^0.8.37",
         "@types/busboy": "^1.5.3",
         "@types/cors": "^2.8.19",
         "@types/module-alias": "^2.0.4",

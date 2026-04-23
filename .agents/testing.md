@@ -112,16 +112,44 @@ npm run test:psql
 
 ## Service-Level Tests
 
-Test helpers for service-level (core) unit tests are in `test/unit/core/helpers/`:
+### Shared test package (`@privateaim/server-test-kit`)
 
-- `FakeEntityRepository<T>` — In-memory `IEntityRepository<T>` implementation with `seed()`, `getAll()`, `clear()` helpers
-- `createAllowAllActor()` — Mock `ActorContext` that permits all operations
-- `createDenyAllActor()` — Mock `ActorContext` that throws `ForbiddenError`
-- `createMasterRealmActor()` / `createNonMasterRealmActor()` — Realm-specific mock actors
+Generic test fakes shared across all services live in `packages/server-test-kit/`:
+
+- `FakeEntityRepository<T>` — In-memory `IEntityRepository<T>` with `seed()`, `getAll()`, `clear()`
+- `FakePermissionChecker` — `IPermissionChecker` with call recording (`getCalls()`, `wasMethodCalled()`)
+- `createAllowAllActor()` — `ActorContext` with master realm that permits all operations
+- `createDenyAllActor()` — `ActorContext` with non-master realm that throws `ForbiddenError`
+- `createMasterRealmActor()` / `createNonMasterRealmActor()` — Realm-specific actor factories
+
+### Test directory layout (domain-grouped)
+
+Service-level tests are organized by domain, with fakes colocated next to the tests that use them:
+
+```text
+test/unit/core/
+├── helpers/
+│   └── index.ts                      # Re-exports from @privateaim/server-test-kit
+├── entities/
+│   └── <entity>/
+│       ├── service.spec.ts           # Entity service tests
+│       ├── fake-repository.ts        # Domain-specific fake repository (if needed)
+│       └── fake-*.ts                 # Other domain-specific fakes
+└── services/
+    ├── helpers/                      # Fakes for core service tests
+    │   └── index.ts
+    └── <service>.spec.ts             # Core service tests (builder, configurator, etc.)
+```
+
+### Example
 
 ```typescript
 // test/unit/core/entities/node/service.spec.ts
-const repository = new FakeEntityRepository<Node>();
+import { FakeEntityRepository, createAllowAllActor, createDenyAllActor } from '@privateaim/server-test-kit';
+import { FakeNodeRepository } from './fake-repository.ts';
+import { FakeRegistryManager } from './fake-registry-manager.ts';
+
+const repository = new FakeNodeRepository();
 const service = new NodeService({ repository, registryManager });
 
 it('should create with valid data', async () => {
@@ -135,8 +163,6 @@ it('should deny without permission', async () => {
     ).rejects.toThrow(ForbiddenError);
 });
 ```
-
-Service test files go in `test/unit/core/entities/<entity>/service.spec.ts`. See [Plan 006](.agents/plans/006-service-level-tests.md) for implementation roadmap.
 
 ## CI Pipeline
 
@@ -185,12 +211,23 @@ const recalculator = { recalc: vi.fn(), recalcDebounced: vi.fn() };
 ```
 
 Existing fakes to reuse:
+
+**Shared (`@privateaim/server-test-kit`):**
 - `FakeEntityRepository<T>` — `IEntityRepository<T>` with `seed()`, `getAll()`, `clear()`
-- `FakeAnalysisRepository` — `IAnalysisRepository` with `findOneWithProject()`
-- `FakeAnalysisNodeRepository` — `IAnalysisNodeRepository` with `findManyWithNodeByAnalysis()`
-- `FakeAnalysisBucketFileRepository` — `IAnalysisBucketFileRepository` with `findRootCodeFile()`
-- `FakeAnalysisMetadataRecalculator` / `FakeAnalysisNodeMetadataRecalculator` / `FakeAnalysisFileMetadataRecalculator` — record `recalc()` and `recalcDebounced()` calls
+- `FakePermissionChecker` — `IPermissionChecker` with `getCalls()`, `wasMethodCalled()`
 - `createAllowAllActor()` / `createDenyAllActor()` — `ActorContext` fakes for permission testing
 - `createMasterRealmActor()` / `createNonMasterRealmActor()` — realm-scoped actor fakes
 
-When a dependency has no fake yet, create one in the appropriate `test/**/helpers/` directory implementing the port interface.
+**Domain-specific (colocated in `test/unit/core/entities/<entity>/`):**
+- `FakeAnalysisRepository` — `IAnalysisRepository` with `findOneWithProject()`
+- `FakeAnalysisNodeRepository` — `IAnalysisNodeRepository` with `findManyWithNodeByAnalysis()`
+- `FakeAnalysisBucketFileRepository` — `IAnalysisBucketFileRepository` with `findRootCodeFile()`
+- `FakeNodeRepository` — `INodeRepository` with `findOneWithExternalName()`
+- `FakeProjectRepository` — `IProjectRepository` with `checkUniqueness()`
+- `FakeRegistryRepository` — `IRegistryRepository` with `findOneWithSecret()`
+- `FakeRegistryManager` — `IRegistryManager` with call recording
+- `FakeRegistryCaller` — `IRegistryCaller` with call recording
+- `FakeMasterImageBuilderCaller` / `FakeMasterImageSynchronizerCaller` — caller fakes with call recording
+- `FakeAnalysisMetadataRecalculator` / `FakeAnalysisNodeMetadataRecalculator` / `FakeAnalysisFileMetadataRecalculator` — record `recalc()` and `recalcDebounced()` calls
+
+When a dependency has no fake yet, create one in the entity's test directory (`test/unit/core/entities/<entity>/`) implementing the port interface.
