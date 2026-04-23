@@ -109,6 +109,8 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
 
         await this.repository.save(entity, { data: actor.metadata });
 
+        await this.recalculator.recalcDebounced(entity.id);
+
         await this.storageManager.check(entity);
 
         entity.project.analyses++;
