@@ -79,10 +79,15 @@ export class BucketCreateHandler implements ComponentHandler<
 
         await repository.save(entity);
 
-        if (entity.region) {
-            await this.minio.makeBucket(toBucketName(entity.id), entity.region);
-        } else {
-            await this.minio.makeBucket(toBucketName(entity.id));
+        try {
+            if (entity.region) {
+                await this.minio.makeBucket(toBucketName(entity.id), entity.region);
+            } else {
+                await this.minio.makeBucket(toBucketName(entity.id));
+            }
+        } catch (e) {
+            await repository.remove(entity);
+            throw e;
         }
 
         await context.handle(

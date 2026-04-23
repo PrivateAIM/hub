@@ -76,10 +76,19 @@ export class BucketDeleteHandler implements ComponentHandler<
         }
 
         const entityId = entity.id;
+        const bucketName = toBucketName(entityId);
+        const exists = await this.minio.bucketExists(bucketName);
+
+        if (exists) {
+            const objects = await this.collectObjects(bucketName);
+            if (objects.length > 0) {
+                await this.minio.removeObjects(bucketName, objects);
+            }
+
+            await this.minio.removeBucket(bucketName);
+        }
 
         await repository.remove(entity);
-
-        await this.minio.removeBucket(toBucketName(entityId));
 
         await context.handle(
             BucketEvent.DELETION_FINISHED,
@@ -88,5 +97,19 @@ export class BucketDeleteHandler implements ComponentHandler<
                 id: entityId,
             },
         );
+    }
+
+    protected collectObjects(bucketName: string): Promise<string[]> {
+        return new Promise((resolve, reject) => {
+            const objects: string[] = [];
+            const stream = this.minio.listObjects(bucketName, '', true);
+            stream.on('data', (obj) => {
+                if (obj.name) {
+                    objects.push(obj.name);
+                }
+            });
+            stream.on('end', () => resolve(objects));
+            stream.on('error', (err) => reject(err));
+        });
     }
 }
