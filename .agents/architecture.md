@@ -55,11 +55,12 @@ Pure business logic. No imports from `typeorm`, `routup`, or other infrastructur
 - `service.ts` — Domain service implementing `IXService`
 - `validator.ts` — Input validation with `ValidatorGroup.CREATE`/`UPDATE`
 
-**Base types** (`core/entities/`):
+**Shared base types** (from `@privateaim/server-kit`):
 - `IEntityRepository<T>` — Generic repository port (findMany, findOneById, save, remove, etc.)
 - `AbstractEntityService` — Realm helpers (`isActorMasterRealmMember`, `getActorRealmId`)
 - `ActorContext` — Permission checker + realm + identity, decoupled from HTTP
 - `ValidatorGroup` — Domain-level validation groups (not HTTP-specific)
+- `IPermissionChecker` — Permission evaluation interface (preCheck, check, preCheckOneOf, checkOneOf)
 
 **Services** (`core/services/`):
 - Business logic that spans multiple entities or orchestrates workflows

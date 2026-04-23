@@ -70,4 +70,4 @@ Modernization and refactoring plans:
 5. ~~Hexagonal: remaining services~~ — Complete (#1528)
 6. ~~Service-Level Tests~~ — Complete (all 13 entity services, command checkers, core services tested)
 7. ~~Message Bus~~ — Complete (QueueRouter → MessageBus, AMQP/Memory driver abstraction)
-8. **[Shared Test Infrastructure](.agents/plans/008-shared-test-infrastructure.md)** — server-test-kit package, domain-grouped test layout (Phase 1 complete)
+8. ~~[Shared Test Infrastructure](.agents/plans/008-shared-test-infrastructure.md)~~ — Complete (server-test-kit package, shared core types in server-kit, domain-grouped test layout)

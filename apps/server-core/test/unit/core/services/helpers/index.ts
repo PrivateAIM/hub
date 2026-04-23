@@ -5,4 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from '@privateaim/server-test-kit';
+export * from './fake-bucket-caller.ts';
+export * from './fake-builder-caller.ts';
+export * from './fake-distributor-caller.ts';
+export * from './fake-task-manager.ts';

@@ -15,11 +15,9 @@ import {
     it, 
 } from 'vitest';
 import { AnalysisStorageManager } from '../../../../src/core/services/analysis-storage-manager/module.ts';
-import {
-    FakeBucketCaller,
-    FakeEntityRepository,
-    FakeTaskManager,
-} from '../helpers/index.ts';
+import { FakeEntityRepository } from '../helpers/index.ts';
+import { FakeBucketCaller } from './helpers/fake-bucket-caller.ts';
+import { FakeTaskManager } from './helpers/fake-task-manager.ts';
 import { createFullAnalysis } from '../../../utils/domains/index.ts';
 
 function createTestBucket(overrides?: Partial<AnalysisBucket>): AnalysisBucket {

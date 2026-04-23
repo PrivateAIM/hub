@@ -16,13 +16,11 @@ import {
     it, 
 } from 'vitest';
 import { AnalysisBuilder } from '../../../../src/core/services/analysis-builder/module.ts';
-import {
-    FakeAnalysisBuilderCaller,
-    FakeAnalysisFileMetadataRecalculator,
-    FakeAnalysisMetadataRecalculator,
-    FakeAnalysisNodeMetadataRecalculator,
-    FakeEntityRepository,
-} from '../helpers/index.ts';
+import { FakeEntityRepository } from '../helpers/index.ts';
+import { FakeAnalysisBuilderCaller } from './helpers/fake-builder-caller.ts';
+import { FakeAnalysisMetadataRecalculator } from '../entities/analysis/fake-metadata-recalculator.ts';
+import { FakeAnalysisNodeMetadataRecalculator } from '../entities/analysis-node/fake-metadata-recalculator.ts';
+import { FakeAnalysisFileMetadataRecalculator } from '../entities/analysis-bucket-file/fake-metadata-recalculator.ts';
 import { createFullAnalysis } from '../../../utils/domains/index.ts';
 
 describe('AnalysisBuilder', () => {
