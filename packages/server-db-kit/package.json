@@ -23,7 +23,7 @@
         "@privateaim/server-kit": "^0.8.38"
     },
     "devDependencies": {
-        "cross-env": "^7.0.3",
+        "cross-env": "^10.1.0",
         "typeorm": "^0.3.28",
         "typeorm-extension": "^3.9.0",
         "unplugin-swc": "^1.5.5",
