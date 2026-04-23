@@ -59,14 +59,14 @@ When you need additional context beyond what's in the code (e.g., deployment pat
 - **[Testing](.agents/testing.md)** — Vitest with SWC, multi-database CI matrix (MySQL/Postgres/SQLite)
 - **[Conventions](.agents/conventions.md)** — Conventional Commits, Husky hooks, ESLint, tsdown bundling, Nx caching
 
-## Active Plans
+## Completed Plans
 
-Modernization and refactoring plans (execute in order):
+All modernization and refactoring plans are complete:
 
-1. ~~Tooling Modernization~~ — Complete (#1511)
-2. ~~Monorepo Restructuring~~ — Complete (#1512)
-3. ~~[Dependency Injection](.agents/plans/003-dependency-injection.md)~~ — Complete (singa fully removed, all services use eldin/orkos DI)
-4. ~~[Hexagonal: server-core](.agents/plans/004-hexagonal-server-core.md)~~ — Complete (#1514)
-5. ~~[Hexagonal: remaining services](.agents/plans/005-hexagonal-remaining-services.md)~~ — Complete (#1528)
-6. **[Service-Level Tests](.agents/plans/006-service-level-tests.md)** — Comprehensive business logic tests (command checkers, core services, entity services, DI wiring)
-7. **[Message Bus](.agents/plans/007-message-bus.md)** — Rename QueueRouter → MessageBus, driver abstraction (AMQP/Memory)
+1. ~~Tooling Modernization~~ — #1511
+2. ~~Monorepo Restructuring~~ — #1512
+3. ~~Dependency Injection~~ — singa fully removed, all services use eldin/orkos DI
+4. ~~Hexagonal: server-core~~ — #1514
+5. ~~Hexagonal: remaining services~~ — #1528
+6. ~~Service-Level Tests~~ — all 13 entity services, command checkers, core services tested
+7. ~~Message Bus~~ — QueueRouter → MessageBus, AMQP/Memory driver abstraction
