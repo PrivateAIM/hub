@@ -27,14 +27,17 @@ import { createFullAnalysis, createTestAnalysisNode } from '../../../utils/domai
 describe('AnalysisConfigurator', () => {
     let repository: FakeEntityRepository<Analysis>;
     let analysisNodeRepository: FakeEntityRepository<AnalysisNode>;
+    let analysisRecalculator: FakeAnalysisMetadataRecalculator;
+    let nodeRecalculator: FakeAnalysisNodeMetadataRecalculator;
+    let fileRecalculator: FakeAnalysisFileMetadataRecalculator;
     let configurator: AnalysisConfigurator;
 
     beforeEach(() => {
         repository = new FakeEntityRepository<Analysis>();
         analysisNodeRepository = new FakeEntityRepository<AnalysisNode>();
-        const analysisRecalculator = new FakeAnalysisMetadataRecalculator(repository);
-        const nodeRecalculator = new FakeAnalysisNodeMetadataRecalculator(repository);
-        const fileRecalculator = new FakeAnalysisFileMetadataRecalculator(repository);
+        analysisRecalculator = new FakeAnalysisMetadataRecalculator(repository);
+        nodeRecalculator = new FakeAnalysisNodeMetadataRecalculator(repository);
+        fileRecalculator = new FakeAnalysisFileMetadataRecalculator(repository);
         configurator = new AnalysisConfigurator({
             repository,
             analysisNodeRepository,
@@ -59,6 +62,10 @@ describe('AnalysisConfigurator', () => {
             repository.seed(analysis);
 
             await configurator.lock(analysis);
+
+            expect(analysisRecalculator.getCallCount()).toBeGreaterThanOrEqual(1);
+            expect(nodeRecalculator.getCallCount()).toBeGreaterThanOrEqual(1);
+            expect(fileRecalculator.getCallCount()).toBeGreaterThanOrEqual(1);
         });
 
         it('should resolve entity by string ID', async () => {

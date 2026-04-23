@@ -48,6 +48,9 @@ describe('AnalysisDistributor', () => {
     let analysisNodeRepository: FakeEntityRepository<AnalysisNode>;
     let registryRepository: FakeEntityRepository<Registry>;
     let caller: FakeAnalysisDistributorCaller;
+    let analysisRecalculator: FakeAnalysisMetadataRecalculator;
+    let nodeRecalculator: FakeAnalysisNodeMetadataRecalculator;
+    let fileRecalculator: FakeAnalysisFileMetadataRecalculator;
     let distributor: AnalysisDistributor;
 
     beforeEach(() => {
@@ -55,14 +58,17 @@ describe('AnalysisDistributor', () => {
         analysisNodeRepository = new FakeEntityRepository<AnalysisNode>();
         registryRepository = new FakeEntityRepository<Registry>();
         caller = new FakeAnalysisDistributorCaller();
+        analysisRecalculator = new FakeAnalysisMetadataRecalculator(repository);
+        nodeRecalculator = new FakeAnalysisNodeMetadataRecalculator(repository);
+        fileRecalculator = new FakeAnalysisFileMetadataRecalculator(repository);
         distributor = new AnalysisDistributor({
             repository,
             analysisNodeRepository,
             registryRepository,
             caller,
-            analysisRecalculator: new FakeAnalysisMetadataRecalculator(repository),
-            nodeRecalculator: new FakeAnalysisNodeMetadataRecalculator(repository),
-            fileRecalculator: new FakeAnalysisFileMetadataRecalculator(repository),
+            analysisRecalculator,
+            nodeRecalculator,
+            fileRecalculator,
         });
     });
 
@@ -97,6 +103,10 @@ describe('AnalysisDistributor', () => {
             analysisNodeRepository.seed(createTestAnalysisNode({ analysis_id: 'analysis-1' }));
 
             await distributor.start(analysis);
+
+            expect(analysisRecalculator.getCallCount()).toBeGreaterThanOrEqual(1);
+            expect(nodeRecalculator.getCallCount()).toBeGreaterThanOrEqual(1);
+            expect(fileRecalculator.getCallCount()).toBeGreaterThanOrEqual(1);
         });
 
         it('should resolve entity by string ID', async () => {

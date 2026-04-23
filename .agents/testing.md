@@ -189,7 +189,7 @@ Existing fakes to reuse:
 - `FakeAnalysisRepository` — `IAnalysisRepository` with `findOneWithProject()`
 - `FakeAnalysisNodeRepository` — `IAnalysisNodeRepository` with `findManyWithNodeByAnalysis()`
 - `FakeAnalysisBucketFileRepository` — `IAnalysisBucketFileRepository` with `findRootCodeFile()`
-- `FakeAnalysisMetadataRecalculator` / `FakeAnalysisNodeMetadataRecalculator` / `FakeAnalysisFileMetadataRecalculator` — records `recalc()` and `recalcDebounced()` calls
+- `FakeAnalysisMetadataRecalculator` / `FakeAnalysisNodeMetadataRecalculator` / `FakeAnalysisFileMetadataRecalculator` — record `recalc()` and `recalcDebounced()` calls
 - `createAllowAllActor()` / `createDenyAllActor()` — `ActorContext` fakes for permission testing
 - `createMasterRealmActor()` / `createNonMasterRealmActor()` — realm-scoped actor fakes
 
