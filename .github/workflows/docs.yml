@@ -1,32 +1,29 @@
-name: Docs
+name: Deploy
 
 on:
     push:
-        branches: [master]
+        branches:
+            - master
         paths:
             - 'docs/**'
             - '.github/workflows/docs.yml'
     pull_request:
-        branches: [master]
+        branches:
+            - master
         paths:
             - 'docs/**'
             - '.github/workflows/docs.yml'
 
-env:
-    NODE_VERSION: 22
-
 jobs:
     build:
-        name: Build Docs
         runs-on: ubuntu-latest
+        permissions:
+            contents: read
         steps:
-            - name: Checkout
-              uses: actions/checkout@v6
-
-            - name: Setup Node.js
-              uses: actions/setup-node@v4
+            - uses: actions/checkout@v6
+            - uses: actions/setup-node@v6
               with:
-                  node-version: ${{ env.NODE_VERSION }}
+                  node-version: 22
 
             - name: Install
               run: npm ci
@@ -35,23 +32,30 @@ jobs:
               run: npm run build -w docs
 
             - name: Upload artifact
-              if: github.event_name == 'push'
-              uses: actions/upload-pages-artifact@v3
+              if: ${{ github.event_name == 'push' }}
+              uses: actions/upload-artifact@v7
               with:
-                  path: docs/src/.vitepress/dist
+                  name: docs-dist
+                  path: ./docs/src/.vitepress/dist
 
     deploy:
-        name: Deploy to GitHub Pages
-        if: github.event_name == 'push'
+        if: ${{ github.event_name == 'push' }}
         needs: build
         runs-on: ubuntu-latest
         permissions:
-            pages: write
-            id-token: write
-        environment:
-            name: github-pages
-            url: ${{ steps.deployment.outputs.page_url }}
+            contents: write
         steps:
+            - name: Download artifact
+              uses: actions/download-artifact@v8
+              with:
+                  name: docs-dist
+                  path: ./dist
+
+            - name: CNAME
+              run: echo "hub.docs.privateaim.net" > ./dist/CNAME
+
             - name: Deploy
-              id: deployment
-              uses: actions/deploy-pages@v4
+              uses: peaceiris/actions-gh-pages@v4
+              with:
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+                  publish_dir: ./dist
