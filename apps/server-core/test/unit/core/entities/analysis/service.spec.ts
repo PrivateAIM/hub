@@ -176,6 +176,26 @@ describe('AnalysisService', () => {
             expect(result.id).toBeDefined();
             expect(taskManager.getCallCount()).toBeGreaterThan(0);
         });
+
+        it('should call recalcDebounced after save', async () => {
+            const project = createTestProject({ master_image_id: randomUUID() });
+            projectRepository.seed(project);
+
+            const origValidate = analysisRepository.validateJoinColumns.bind(analysisRepository);
+            analysisRepository.validateJoinColumns = async (data: Partial<Analysis>) => {
+                await origValidate(data);
+                data.project = project;
+            };
+
+            const result = await service.create(
+                { name: 'test-analysis', project_id: project.id },
+                createAllowAllActor(),
+            );
+
+            expect(result.id).toBeDefined();
+            expect(analysisRecalculator.getDebouncedCallCount()).toBe(1);
+            expect(analysisRecalculator.getDebouncedCalls()[0]).toBe(result.id);
+        });
     });
 
     describe('update', () => {
