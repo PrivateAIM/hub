@@ -23,6 +23,8 @@ import { DatabaseConflictError } from '../../../../../adapters/database/error/in
 import type {
     EntityPersistContext,
     EntityRepositoryFindManyResult,
+} from '@privateaim/server-kit';
+import type {
     IProjectRepository,
 } from '../../../../../core/index.ts';
 

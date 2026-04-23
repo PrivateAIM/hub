@@ -10,10 +10,8 @@ import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { PermissionName, isRealmResourceWritable } from '@privateaim/kit';
 import type { Client } from 'minio';
 import { toBucketName } from '../../utils/bucket-name.ts';
-import type { ActorContext } from '../actor/types.ts';
-import type { EntityRepositoryFindManyResult } from '../types.ts';
-import { AbstractEntityService } from '../service.ts';
-import { ValidatorGroup } from '../constants.ts';
+import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
+import { AbstractEntityService, ValidatorGroup } from '@privateaim/server-kit';
 import type { IBucketCaller, IBucketRepository, IBucketService } from './types.ts';
 import { BucketValidator } from './validator.ts';
 

@@ -9,7 +9,7 @@ import { createValidator } from '@validup/adapter-zod';
 import zod from 'zod';
 import { Container } from 'validup';
 import type { Bucket } from '@privateaim/storage-kit';
-import { ValidatorGroup } from '../constants.ts';
+import { ValidatorGroup } from '@privateaim/server-kit';
 
 export class BucketValidator extends Container<Partial<Bucket>> {
     protected initialize() {
@@ -32,6 +32,16 @@ export class BucketValidator extends Container<Partial<Bucket>> {
                 zod.string()
                     .min(3)
                     .max(256)
+                    .nullable(),
+            ),
+        );
+
+        this.mount(
+            'realm_id',
+            { group: ValidatorGroup.CREATE, optional: true },
+            createValidator(
+                zod.string()
+                    .uuid()
                     .nullable(),
             ),
         );

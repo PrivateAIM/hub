@@ -7,7 +7,7 @@
 
 import { Container } from 'validup';
 import { createValidationChain, createValidator } from '@validup/adapter-validator';
-import { ValidatorGroup } from '../constants.ts';
+import { ValidatorGroup } from '@privateaim/server-kit';
 import type { Project } from '@privateaim/core-kit';
 
 export class ProjectValidator extends Container<Project> {

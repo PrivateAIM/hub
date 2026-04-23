@@ -15,7 +15,7 @@ import { AnalysisNodeEntity } from '../../../../../adapters/database/entities/an
 import type {
     EntityPersistContext,
     EntityRepositoryFindManyResult,
-} from '../../../../../core/entities/types.ts';
+} from '@privateaim/server-kit';
 import type { IAnalysisNodeRepository } from '../../../../../core/entities/analysis-node/types.ts';
 
 export class AnalysisNodeRepositoryAdapter implements IAnalysisNodeRepository {

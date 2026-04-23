@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { EntityPersistContext } from '../../entities/types.ts';
+import type { EntityPersistContext } from '@privateaim/server-kit';
 
 export type AnalysisConfiguratorUnlockOptions = {
     ignoreApproval?: boolean;

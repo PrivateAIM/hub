@@ -5,8 +5,5 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './actor/types.ts';
 export * from './event/types.ts';
 export * from './event/service.ts';
-export * from './service.ts';
-export * from './types.ts';

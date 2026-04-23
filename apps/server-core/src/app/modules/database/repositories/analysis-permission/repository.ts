@@ -15,7 +15,7 @@ import { AnalysisPermissionEntity } from '../../../../../adapters/database/entit
 import type {
     EntityPersistContext,
     EntityRepositoryFindManyResult,
-} from '../../../../../core/entities/types.ts';
+} from '@privateaim/server-kit';
 import type { IAnalysisPermissionRepository } from '../../../../../core/entities/analysis-permission/types.ts';
 
 export class AnalysisPermissionRepositoryAdapter implements IAnalysisPermissionRepository {

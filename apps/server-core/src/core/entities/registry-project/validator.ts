@@ -9,7 +9,7 @@ import type { RegistryProject } from '@privateaim/core-kit';
 import { RegistryProjectType } from '@privateaim/core-kit';
 import { Container } from 'validup';
 import { createValidationChain, createValidator } from '@validup/adapter-validator';
-import { ValidatorGroup } from '../constants.ts';
+import { ValidatorGroup } from '@privateaim/server-kit';
 
 export class RegistryProjectValidator extends Container<RegistryProject> {
     protected initialize() {

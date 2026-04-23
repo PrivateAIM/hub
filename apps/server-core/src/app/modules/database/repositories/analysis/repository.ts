@@ -21,6 +21,8 @@ import { AnalysisEntity } from '../../../../../adapters/database/entities/analys
 import type {
     EntityPersistContext,
     EntityRepositoryFindManyResult,
+} from '@privateaim/server-kit';
+import type {
     IAnalysisRepository,
 } from '../../../../../core/index.ts';
 

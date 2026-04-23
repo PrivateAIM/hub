@@ -17,7 +17,8 @@ import { useDataSource } from 'typeorm-extension';
 import type { Client } from 'minio';
 import { BucketEntity } from '../../../../../adapters/database/index.ts';
 import { toBucketName } from '../../../../domains/bucket/utils.ts';
-import { BucketValidator, ValidatorGroup } from '../../../../../core/entities/index.ts';
+import { ValidatorGroup } from '@privateaim/server-kit';
+import { BucketValidator } from '../../../../../core/entities/index.ts';
 
 export class BucketCreateHandler implements ComponentHandler<
     BucketComponentEventMap,

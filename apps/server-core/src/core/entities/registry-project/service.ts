@@ -12,13 +12,11 @@ import {
     isRealmResourceWritable,
 } from '@privateaim/kit';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
-import type { ActorContext } from '../actor/types.ts';
-import type { EntityRepositoryFindManyResult, IEntityRepository } from '../types.ts';
-import { AbstractEntityService } from '../service.ts';
+import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
+import { AbstractEntityService, ValidatorGroup } from '@privateaim/server-kit';
 import type { IRegistryManager } from '../node/types.ts';
 import type { IRegistryProjectRepository, IRegistryProjectService } from './types.ts';
 import { RegistryProjectValidator } from './validator.ts';
-import { ValidatorGroup } from '../constants.ts';
 
 type RegistryProjectServiceContext = {
     repository: IRegistryProjectRepository;

@@ -21,6 +21,8 @@ import { NodeEntity } from '../../../../../adapters/database/entities/node.ts';
 import type {
     EntityPersistContext,
     EntityRepositoryFindManyResult,
+} from '@privateaim/server-kit';
+import type {
     INodeRepository,
 } from '../../../../../core/index.ts';
 

@@ -10,7 +10,7 @@ import type {
     EntityPersistContext,
     EntityRepositoryFindManyResult,
     IEntityRepository,
-} from '../../../../src/core/entities/types.ts';
+} from '@privateaim/server-kit';
 
 export class FakeEntityRepository<T extends Record<string, any>> implements IEntityRepository<T> {
     private store: T[] = [];

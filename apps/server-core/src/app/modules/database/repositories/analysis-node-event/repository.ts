@@ -15,7 +15,7 @@ import { AnalysisNodeEventEntity } from '../../../../../adapters/database/entiti
 import type {
     EntityPersistContext,
     EntityRepositoryFindManyResult,
-} from '../../../../../core/entities/types.ts';
+} from '@privateaim/server-kit';
 import type { IAnalysisNodeEventRepository } from '../../../../../core/entities/analysis-node-event/types.ts';
 
 export class AnalysisNodeEventRepositoryAdapter implements IAnalysisNodeEventRepository {

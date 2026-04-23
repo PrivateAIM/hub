@@ -16,6 +16,7 @@ export * from './fake-master-image-synchronizer-caller.ts';
 export * from './fake-metadata-caller.ts';
 
 export * from './fake-node-repository.ts';
+export * from './fake-permission-checker.ts';
 export * from './fake-project-repository.ts';
 export * from './fake-registry-caller.ts';
 export * from './fake-registry-manager.ts';

@@ -21,6 +21,8 @@ import { RegistryProjectEntity } from '../../../../../adapters/database/entities
 import type {
     EntityPersistContext,
     EntityRepositoryFindManyResult,
+} from '@privateaim/server-kit';
+import type {
     IRegistryProjectRepository,
 } from '../../../../../core/index.ts';
 

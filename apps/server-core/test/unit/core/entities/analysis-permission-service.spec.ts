@@ -15,6 +15,7 @@ import {
     it,
 } from 'vitest';
 import { AnalysisPermissionService } from '../../../../src/core/entities/analysis-permission/service.ts';
+import type { FakePermissionChecker } from '../helpers/index.ts';
 import {
     FakeEntityRepository,
     createAllowAllActor,
@@ -120,7 +121,7 @@ describe('AnalysisPermissionService', () => {
                 actor,
             );
 
-            expect(actor.permissionChecker.preCheck).toHaveBeenCalled();
+            expect((actor.permissionChecker as FakePermissionChecker).wasMethodCalled('preCheck')).toBe(true);
         });
 
         it('should throw ForbiddenError when actor lacks permission', async () => {

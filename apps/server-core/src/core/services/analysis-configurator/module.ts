@@ -8,7 +8,7 @@
 import { NotFoundError } from '@ebec/http';
 import type { Analysis, AnalysisNode } from '@privateaim/core-kit';
 import { AnalysisConfiguratorCommandChecker, NodeType } from '@privateaim/core-kit';
-import type { IEntityRepository } from '../../entities/types.ts';
+import type { IEntityRepository } from '@privateaim/server-kit';
 import type { IAnalysisMetadataRecalculator } from '../../entities/analysis/types.ts';
 import type { IAnalysisNodeMetadataRecalculator } from '../../entities/analysis-node/types.ts';
 import type { IAnalysisFileMetadataRecalculator } from '../../entities/analysis-bucket-file/types.ts';

@@ -9,8 +9,7 @@ import type { MasterImage, MasterImageGroup } from '@privateaim/core-kit';
 import type {
     MasterImageSynchronizerExecutionFinishedPayload,
 } from '@privateaim/server-core-worker-kit';
-import type { Logger } from '@privateaim/server-kit';
-import type { IEntityRepository } from '../../../../core/entities/types.ts';
+import type { IEntityRepository, Logger } from '@privateaim/server-kit';
 import { MasterImageSynchronizerService } from '../../../../core/services/master-image/index.ts';
 
 export async function handleMasterImageSynchronizerExecutionFinishedEvent(

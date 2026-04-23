@@ -14,12 +14,10 @@ import {
     isRealmResourceWritable,
 } from '@privateaim/kit';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
-import type { ActorContext } from '../actor/types.ts';
-import type { EntityRepositoryFindManyResult } from '../types.ts';
-import { AbstractEntityService } from '../service.ts';
+import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
+import { AbstractEntityService, ValidatorGroup } from '@privateaim/server-kit';
 import type { INodeRepository, INodeService, IRegistryManager } from './types.ts';
 import { NodeValidator } from './validator.ts';
-import { ValidatorGroup } from '../constants.ts';
 
 type NodeServiceContext = {
     repository: INodeRepository;
@@ -103,7 +101,7 @@ export class NodeService extends AbstractEntityService implements INodeService {
         }
 
         if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
-            throw new ForbiddenError('You are not permitted to delete this station.');
+            throw new ForbiddenError('You are not permitted to update this node.');
         }
 
         const merged = this.repository.merge(entity, validated);

@@ -9,7 +9,7 @@ import type { AnalysisNode } from '@privateaim/core-kit';
 import { AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
 import { Container } from 'validup';
 import { createValidationChain, createValidator } from '@validup/adapter-validator';
-import { ValidatorGroup } from '../constants.ts';
+import { ValidatorGroup } from '@privateaim/server-kit';
 import { ProcessStatus } from '@privateaim/kit';
 
 export class AnalysisNodeValidator extends Container<AnalysisNode> {

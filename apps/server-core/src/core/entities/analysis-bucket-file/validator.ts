@@ -8,7 +8,7 @@
 import { Container } from 'validup';
 import type { AnalysisBucketFile } from '@privateaim/core-kit';
 import { createValidationChain, createValidator } from '@validup/adapter-validator';
-import { ValidatorGroup } from '../constants.ts';
+import { ValidatorGroup } from '@privateaim/server-kit';
 
 export class AnalysisBucketFileValidator extends Container<AnalysisBucketFile> {
     protected initialize() {

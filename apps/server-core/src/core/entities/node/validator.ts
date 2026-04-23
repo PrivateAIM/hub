@@ -9,7 +9,7 @@ import type { Node } from '@privateaim/core-kit';
 import { NodeType } from '@privateaim/core-kit';
 import { Container } from 'validup';
 import { createValidationChain, createValidator } from '@validup/adapter-validator';
-import { ValidatorGroup } from '../constants.ts';
+import { ValidatorGroup } from '@privateaim/server-kit';
 
 export class NodeValidator extends Container<Node> {
     protected initialize() {

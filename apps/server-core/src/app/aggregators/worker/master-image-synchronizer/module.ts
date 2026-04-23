@@ -11,12 +11,11 @@ import type { MasterImageSynchronizerEventMap } from '@privateaim/server-core-wo
 import {
     MasterImageSynchronizerEvent,
 } from '@privateaim/server-core-worker-kit';
-import type { Logger } from '@privateaim/server-kit';
+import type { IEntityRepository, Logger } from '@privateaim/server-kit';
 import {
     BaseComponent,
 } from '@privateaim/server-kit';
 import type { EventComponentCaller } from '@privateaim/server-telemetry-kit';
-import type { IEntityRepository } from '../../../../core/entities/types.ts';
 import {
     handleMasterImageSynchronizerExecutionFinishedEvent,
 } from './handler.ts';
