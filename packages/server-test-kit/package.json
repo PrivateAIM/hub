@@ -21,13 +21,13 @@
     "devDependencies": {
         "@authup/access": "^1.0.0-beta.36",
         "@authup/core-kit": "^1.0.0-beta.36",
-        "@ebec/http": "^2.3.0",
+        "@ebec/http": "^4.0.0",
         "@privateaim/server-kit": "^0.8.37"
     },
     "peerDependencies": {
         "@authup/access": "^1.0.0-beta.36",
         "@authup/core-kit": "^1.0.0-beta.36",
-        "@ebec/http": "^2.3.0",
+        "@ebec/http": "^4.0.0",
         "@privateaim/server-kit": "^0.8.37"
     },
     "scripts": {

@@ -31,7 +31,7 @@
         "@privateaim/kit": "^0.8.38",
         "@privateaim/telemetry-kit": "^0.8.38",
         "@privateaim/server-kit": "^0.8.38",
-        "@ebec/http": "^2.3.0"
+        "@ebec/http": "^4.0.0"
     },
     "devDependencies": {
         "redis-extension": "^2.0.4",
