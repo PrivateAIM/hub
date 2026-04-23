@@ -57,14 +57,10 @@ export async function packBucketFiles(
             reject(err);
         });
 
-        const promises : Promise<void>[] = [];
-
-        for (const file of files) {
-            promises.push(packFile(pack, name, file, minio, logger));
-        }
-
-        Promise.resolve()
-            .then(() => Promise.all(promises))
+        files.reduce(
+            (prev, file) => prev.then(() => packFile(pack, name, file, minio, logger)),
+            Promise.resolve(),
+        )
             .then(() => pack.finalize())
             .then(() => resolve())
             .catch((e) => reject(e));
