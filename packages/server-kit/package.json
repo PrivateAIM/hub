@@ -24,8 +24,6 @@
         "test:coverage": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts --coverage"
     },
     "dependencies": {
-        "@authup/access": "^1.0.0-beta.36",
-        "@authup/core-kit": "^1.0.0-beta.36",
         "@ebec/http": "^2.3.0",
         "@hapic/oauth2": "^3.2.0",
         "@isaacs/ttlcache": "^2.1.4",
@@ -35,20 +33,25 @@
         "envix": "^1.5.0",
         "hapic": "^2.8.2",
         "orkos": "^1.1.1",
-        "rapiq": "^0.9.0",
         "triple-beam": "^1.4.1",
         "winston": "^3.19.0",
         "winston-transport": "^4.9.0"
     },
     "devDependencies": {
+        "@authup/access": "^1.0.0-beta.36",
         "@authup/core-http-kit": "^1.0.0-beta.36",
+        "@authup/core-kit": "^1.0.0-beta.36",
+        "rapiq": "^0.9.0",
         "amqp-extension": "^4.0.0",
         "redis-extension": "^2.0.4",
         "typeorm-extension": "^3.7.4",
         "vitest": "^4.1.5"
     },
     "peerDependencies": {
+        "@authup/access": "^1.0.0-beta.36",
         "@authup/core-http-kit": "^1.0.0-beta.36",
+        "@authup/core-kit": "^1.0.0-beta.36",
+        "rapiq": "^0.9.0",
         "amqp-extension": "^4.0.0",
         "redis-extension": "^2.0.4",
         "typeorm-extension": "^3.7.4"

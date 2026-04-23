@@ -27,7 +27,7 @@ export function createDenyAllActor(realmId?: string): ActorContext {
         permissionChecker: new FakePermissionChecker(() => {
             throw new ForbiddenError();
         }),
-        realm: { id, name: REALM_MASTER_NAME },
+        realm: { id, name: 'test-realm' },
         identity: { id: randomUUID(), type: 'user' },
         metadata: {},
     };

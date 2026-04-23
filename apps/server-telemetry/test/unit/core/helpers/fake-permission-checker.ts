@@ -14,32 +14,32 @@ type PermissionCall = {
 };
 
 export class FakePermissionChecker implements IPermissionChecker {
-    private handler: (ctx: PermissionEvaluationContext) => void;
+    private handler: (ctx: PermissionEvaluationContext) => void | Promise<void>;
 
     private calls: PermissionCall[] = [];
 
-    constructor(handler?: (ctx: PermissionEvaluationContext) => void) {
+    constructor(handler?: (ctx: PermissionEvaluationContext) => void | Promise<void>) {
         this.handler = handler ?? (() => { /* allow all */ });
     }
 
     async preCheck(ctx: PermissionEvaluationContext): Promise<void> {
         this.calls.push({ method: 'preCheck', ctx });
-        this.handler(ctx);
+        await this.handler(ctx);
     }
 
     async check(ctx: PermissionEvaluationContext): Promise<void> {
         this.calls.push({ method: 'check', ctx });
-        this.handler(ctx);
+        await this.handler(ctx);
     }
 
     async preCheckOneOf(ctx: PermissionEvaluationContext): Promise<void> {
         this.calls.push({ method: 'preCheckOneOf', ctx });
-        this.handler(ctx);
+        await this.handler(ctx);
     }
 
     async checkOneOf(ctx: PermissionEvaluationContext): Promise<void> {
         this.calls.push({ method: 'checkOneOf', ctx });
-        this.handler(ctx);
+        await this.handler(ctx);
     }
 
     // --- Test helpers ---

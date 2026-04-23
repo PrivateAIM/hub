@@ -191,6 +191,7 @@ describe('BucketService', () => {
 
             await service.update(bucket.id, {}, createMasterRealmActor());
 
+            expect(minio.getMakeBucketCalls()).toHaveLength(1);
             expect(minio.getBuckets()).toHaveLength(1);
         });
 
@@ -207,6 +208,7 @@ describe('BucketService', () => {
 
             await service.update(bucket.id, {}, createMasterRealmActor());
 
+            expect(minio.getMakeBucketCalls()).toHaveLength(0);
             expect(minio.getBuckets()).toHaveLength(1);
         });
     });
