@@ -1,5 +1,32 @@
 # Changelog
 
+## [0.8.38](https://github.com/PrivateAIM/hub/compare/v0.8.37...v0.8.38) (2026-04-23)
+
+
+### Features
+
+* extract core types to server-kit package ([#1563](https://github.com/PrivateAIM/hub/issues/1563)) ([b754cf7](https://github.com/PrivateAIM/hub/commit/b754cf7024ad1890378ad59b1518d8e640f6ff4c))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.8.37 to ^0.8.38
+    * @privateaim/core-realtime-kit bumped from ^0.7.38 to ^0.7.39
+    * @privateaim/kit bumped from ^0.8.37 to ^0.8.38
+    * @privateaim/server-core-worker-kit bumped from ^0.7.38 to ^0.7.39
+    * @privateaim/server-db-kit bumped from ^0.8.37 to ^0.8.38
+    * @privateaim/server-http-kit bumped from ^0.8.37 to ^0.8.38
+    * @privateaim/server-kit bumped from ^0.8.37 to ^0.8.38
+    * @privateaim/server-realtime-kit bumped from ^0.8.37 to ^0.8.38
+    * @privateaim/server-telemetry bumped from ^0.8.37 to ^0.8.38
+    * @privateaim/server-telemetry-kit bumped from ^0.8.37 to ^0.8.38
+    * @privateaim/storage-kit bumped from ^0.8.37 to ^0.8.38
+    * @privateaim/telemetry-kit bumped from ^0.8.37 to ^0.8.38
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.8.37 to ^0.8.38
+
 ## [0.8.37](https://github.com/PrivateAIM/hub/compare/v0.8.36...v0.8.37) (2026-04-22)
 
 
