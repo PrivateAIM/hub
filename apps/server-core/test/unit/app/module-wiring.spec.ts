@@ -64,11 +64,6 @@ describe('DI module wiring', () => {
         expect(result.success).toBe(true);
     });
 
-    it('should resolve AnalysisMetadataComponentCaller', () => {
-        const result = suite.container.tryResolve(ComponentsInjectionKey.AnalysisMetadataComponentCaller);
-        expect(result.success).toBe(true);
-    });
-
     // --- Analysis module registers all 4 pipeline services ---
 
     it('should resolve AnalysisBuilder', () => {
@@ -91,24 +86,21 @@ describe('DI module wiring', () => {
         expect(storageManager).toBeInstanceOf(AnalysisStorageManager);
     });
 
-    // --- Subscribers have metadataCaller injected ---
+    // --- Recalculators are registered ---
 
-    it('should inject metadataCaller into AnalysisSubscriber', () => {
-        const subscriber = suite.container.resolve(DatabaseInjectionKey.AnalysisSubscriber);
-        // metadataCaller is set via setMetadataCaller in ComponentsModule
-        // If it weren't set, afterUpdate would silently no-op — verify it's present
-        expect(subscriber).toBeDefined();
-        expect((subscriber as any).metadataCaller).toBeDefined();
+    it('should resolve AnalysisRecalculator', () => {
+        const recalculator = suite.container.resolve(AnalysisInjectionKey.AnalysisRecalculator);
+        expect(recalculator).toBeDefined();
     });
 
-    it('should inject metadataCaller into AnalysisNodeSubscriber', () => {
-        const subscriber = suite.container.resolve(DatabaseInjectionKey.AnalysisNodeSubscriber);
-        expect((subscriber as any).metadataCaller).toBeDefined();
+    it('should resolve NodeRecalculator', () => {
+        const recalculator = suite.container.resolve(AnalysisInjectionKey.NodeRecalculator);
+        expect(recalculator).toBeDefined();
     });
 
-    it('should inject metadataCaller into AnalysisBucketFileSubscriber', () => {
-        const subscriber = suite.container.resolve(DatabaseInjectionKey.AnalysisBucketFileSubscriber);
-        expect((subscriber as any).metadataCaller).toBeDefined();
+    it('should resolve FileRecalculator', () => {
+        const recalculator = suite.container.resolve(AnalysisInjectionKey.FileRecalculator);
+        expect(recalculator).toBeDefined();
     });
 
     // --- RegistryManager is wired ---

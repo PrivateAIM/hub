@@ -23,7 +23,7 @@ import type { AnalysisBuilder } from '../../services/analysis-builder/index.ts';
 import type { AnalysisConfigurator } from '../../services/analysis-configurator/index.ts';
 import type { AnalysisDistributor } from '../../services/analysis-distributor/index.ts';
 import type { AnalysisStorageManager } from '../../services/analysis-storage-manager/index.ts';
-import type { IAnalysisRepository, IAnalysisService } from './types.ts';
+import type { IAnalysisMetadataRecalculator, IAnalysisRepository, IAnalysisService } from './types.ts';
 import { AnalysisValidator } from './validator.ts';
 
 type AnalysisServiceContext = {
@@ -33,6 +33,7 @@ type AnalysisServiceContext = {
     configurator: AnalysisConfigurator;
     distributor: AnalysisDistributor;
     storageManager: AnalysisStorageManager;
+    recalculator: IAnalysisMetadataRecalculator;
     skipAnalysisApproval?: boolean;
 };
 
@@ -49,6 +50,8 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
 
     protected storageManager: AnalysisStorageManager;
 
+    protected recalculator: IAnalysisMetadataRecalculator;
+
     protected skipAnalysisApproval: boolean;
 
     protected validator: AnalysisValidator;
@@ -61,6 +64,7 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
         this.configurator = ctx.configurator;
         this.distributor = ctx.distributor;
         this.storageManager = ctx.storageManager;
+        this.recalculator = ctx.recalculator;
         this.skipAnalysisApproval = ctx.skipAnalysisApproval ?? false;
         this.validator = new AnalysisValidator();
     }
@@ -107,6 +111,8 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
 
         await this.repository.save(entity, { data: actor.metadata });
 
+        await this.storageManager.check(entity);
+
         entity.project.analyses++;
         await this.projectRepository.save(entity.project, { data: actor.metadata });
 
@@ -150,7 +156,11 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
 
         const merged = this.repository.merge(entity, validated);
 
-        return this.repository.save(merged, { data: actor.metadata });
+        const saved = await this.repository.save(merged, { data: actor.metadata });
+
+        await this.recalculator.recalcDebounced(saved.id);
+
+        return saved;
     }
 
     async delete(id: string, actor: ActorContext): Promise<Analysis> {
@@ -172,6 +182,8 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
 
         const { project } = entity;
         const entityId = entity.id;
+
+        await this.storageManager.remove(entity);
 
         await this.repository.remove(entity, { data: actor.metadata });
 

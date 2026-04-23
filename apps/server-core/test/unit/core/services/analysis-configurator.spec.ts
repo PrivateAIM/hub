@@ -17,7 +17,9 @@ import {
 } from 'vitest';
 import { AnalysisConfigurator } from '../../../../src/core/services/analysis-configurator/module.ts';
 import {
-    FakeAnalysisMetadataCaller,
+    FakeAnalysisFileMetadataRecalculator,
+    FakeAnalysisMetadataRecalculator,
+    FakeAnalysisNodeMetadataRecalculator,
     FakeEntityRepository,
 } from '../helpers/index.ts';
 import { createFullAnalysis, createTestAnalysisNode } from '../../../utils/domains/index.ts';
@@ -25,17 +27,23 @@ import { createFullAnalysis, createTestAnalysisNode } from '../../../utils/domai
 describe('AnalysisConfigurator', () => {
     let repository: FakeEntityRepository<Analysis>;
     let analysisNodeRepository: FakeEntityRepository<AnalysisNode>;
-    let metadataCaller: FakeAnalysisMetadataCaller;
+    let analysisRecalculator: FakeAnalysisMetadataRecalculator;
+    let nodeRecalculator: FakeAnalysisNodeMetadataRecalculator;
+    let fileRecalculator: FakeAnalysisFileMetadataRecalculator;
     let configurator: AnalysisConfigurator;
 
     beforeEach(() => {
         repository = new FakeEntityRepository<Analysis>();
         analysisNodeRepository = new FakeEntityRepository<AnalysisNode>();
-        metadataCaller = new FakeAnalysisMetadataCaller(repository);
+        analysisRecalculator = new FakeAnalysisMetadataRecalculator(repository);
+        nodeRecalculator = new FakeAnalysisNodeMetadataRecalculator(repository);
+        fileRecalculator = new FakeAnalysisFileMetadataRecalculator(repository);
         configurator = new AnalysisConfigurator({
             repository,
             analysisNodeRepository,
-            metadataCaller,
+            analysisRecalculator,
+            nodeRecalculator,
+            fileRecalculator,
         });
     });
 
@@ -49,14 +57,15 @@ describe('AnalysisConfigurator', () => {
             expect(result.configuration_locked).toBe(true);
         });
 
-        it('should call metadataCaller.callRecalcDirect', async () => {
+        it('should call recalculators before locking', async () => {
             const analysis = createFullAnalysis();
             repository.seed(analysis);
 
             await configurator.lock(analysis);
 
-            expect(metadataCaller.getCallCount()).toBe(1);
-            expect(metadataCaller.getCalls()[0].analysisId).toBe('analysis-1');
+            expect(analysisRecalculator.getCallCount()).toBeGreaterThanOrEqual(1);
+            expect(nodeRecalculator.getCallCount()).toBeGreaterThanOrEqual(1);
+            expect(fileRecalculator.getCallCount()).toBeGreaterThanOrEqual(1);
         });
 
         it('should resolve entity by string ID', async () => {

@@ -5,8 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { randomUUID } from 'node:crypto';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
 import type {
+    Analysis,
     AnalysisBucket,
     AnalysisNode,
     Project,
@@ -28,7 +30,9 @@ import { AnalysisStorageManager } from '../../../../src/core/services/analysis-s
 import {
     FakeAnalysisBuilderCaller,
     FakeAnalysisDistributorCaller,
-    FakeAnalysisMetadataCaller,
+    FakeAnalysisFileMetadataRecalculator,
+    FakeAnalysisMetadataRecalculator,
+    FakeAnalysisNodeMetadataRecalculator,
     FakeAnalysisRepository,
     FakeBucketCaller,
     FakeEntityRepository,
@@ -43,7 +47,7 @@ import { createFullAnalysis } from '../../../utils/domains/index.ts';
 
 function createTestProject(overrides?: Partial<Project>): Project {
     return {
-        id: 'project-1',
+        id: randomUUID(),
         name: 'test-project',
         description: null,
         nodes: 0,
@@ -65,16 +69,15 @@ describe('AnalysisService', () => {
     let service: AnalysisService;
 
     // Sub-service dependencies
-    let metadataCaller: FakeAnalysisMetadataCaller;
     let builderCaller: FakeAnalysisBuilderCaller;
     let distributorCaller: FakeAnalysisDistributorCaller;
     let bucketCaller: FakeBucketCaller;
     let taskManager: FakeTaskManager;
+    let analysisRecalculator: FakeAnalysisMetadataRecalculator;
 
     beforeEach(() => {
         analysisRepository = new FakeAnalysisRepository();
         projectRepository = new FakeProjectRepository();
-        metadataCaller = new FakeAnalysisMetadataCaller(analysisRepository);
         builderCaller = new FakeAnalysisBuilderCaller();
         distributorCaller = new FakeAnalysisDistributorCaller();
         bucketCaller = new FakeBucketCaller();
@@ -84,22 +87,32 @@ describe('AnalysisService', () => {
         const registryRepository = new FakeEntityRepository<Registry>();
         const bucketRepository = new FakeEntityRepository<AnalysisBucket>();
 
+        analysisRecalculator = new FakeAnalysisMetadataRecalculator(analysisRepository);
+        const nodeRecalculator = new FakeAnalysisNodeMetadataRecalculator(analysisRepository);
+        const fileRecalculator = new FakeAnalysisFileMetadataRecalculator(analysisRepository);
+
         const builder = new AnalysisBuilder({
             repository: analysisRepository,
             caller: builderCaller,
-            metadataCaller,
+            analysisRecalculator,
+            nodeRecalculator,
+            fileRecalculator,
         });
         const configurator = new AnalysisConfigurator({
             repository: analysisRepository,
             analysisNodeRepository,
-            metadataCaller,
+            analysisRecalculator,
+            nodeRecalculator,
+            fileRecalculator,
         });
         const distributor = new AnalysisDistributor({
             repository: analysisRepository,
             analysisNodeRepository,
             registryRepository,
             caller: distributorCaller,
-            metadataCaller,
+            analysisRecalculator,
+            nodeRecalculator,
+            fileRecalculator,
         });
         const storageManager = new AnalysisStorageManager({
             repository: analysisRepository,
@@ -115,6 +128,7 @@ describe('AnalysisService', () => {
             configurator,
             distributor,
             storageManager,
+            recalculator: analysisRecalculator,
         });
     });
 
@@ -143,7 +157,59 @@ describe('AnalysisService', () => {
         });
     });
 
+    describe('create', () => {
+        it('should call storageManager.check after save', async () => {
+            const project = createTestProject();
+            projectRepository.seed(project);
+
+            const origValidate = analysisRepository.validateJoinColumns.bind(analysisRepository);
+            analysisRepository.validateJoinColumns = async (data: Partial<Analysis>) => {
+                await origValidate(data);
+                data.project = project;
+            };
+
+            const result = await service.create(
+                { name: 'test-analysis', project_id: project.id },
+                createAllowAllActor(),
+            );
+
+            expect(result.id).toBeDefined();
+            expect(taskManager.getCallCount()).toBeGreaterThan(0);
+        });
+    });
+
+    describe('update', () => {
+        it('should call recalcDebounced after save', async () => {
+            analysisRepository.seed(createFullAnalysis());
+
+            await service.update('analysis-1', { name: 'updated' }, createAllowAllActor());
+
+            expect(analysisRecalculator.getDebouncedCallCount()).toBe(1);
+            expect(analysisRecalculator.getDebouncedCalls()[0]).toBe('analysis-1');
+        });
+
+        it('should not use immediate recalc on update', async () => {
+            analysisRepository.seed(createFullAnalysis());
+
+            await service.update('analysis-1', { name: 'updated' }, createAllowAllActor());
+
+            expect(analysisRecalculator.getCallCount()).toBe(0);
+        });
+    });
+
     describe('delete', () => {
+        it('should call storageManager.remove before repository.remove', async () => {
+            const project = createTestProject();
+            project.analyses = 1;
+            projectRepository.seed(project);
+            analysisRepository.seed(createFullAnalysis({ project, project_id: project.id }));
+
+            await service.delete('analysis-1', createAllowAllActor());
+
+            const remaining = await analysisRepository.findOneById('analysis-1');
+            expect(remaining).toBeNull();
+        });
+
         it('should delete and decrement project.analyses', async () => {
             const project = createTestProject();
             project.analyses = 2;

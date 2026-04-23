@@ -7,27 +7,17 @@
 
 import type {
     EntitySubscriberInterface,
-    InsertEvent,
-    RemoveEvent,
-    UpdateEvent,
 } from 'typeorm';
 import { DomainType } from '@privateaim/core-kit';
 import { BaseSubscriber } from '@privateaim/server-db-kit';
 import type { EntityEventDestination } from '@privateaim/server-kit';
 import { DomainEventNamespace } from '@privateaim/kit';
 import { AnalysisNodeEntity } from '../../entities/analysis-node.ts';
-import { AnalysisMetadataCommand } from '../../../../core/domains/index.ts';
-
-type MetadataCaller = {
-    call(command: string, data: Record<string, any>, meta: Record<string, any>): Promise<void>;
-};
 
 export class AnalysisNodeSubscriber extends BaseSubscriber<
     AnalysisNodeEntity
 > implements EntitySubscriberInterface<AnalysisNodeEntity> {
-    protected metadataCaller?: MetadataCaller;
-
-    constructor(ctx?: { metadataCaller?: MetadataCaller }) {
+    constructor() {
         super({
             refType: DomainType.ANALYSIS_NODE,
             destinations: (data) => {
@@ -70,60 +60,6 @@ export class AnalysisNodeSubscriber extends BaseSubscriber<
                 return destinations;
             },
         });
-
-        this.metadataCaller = ctx?.metadataCaller;
-    }
-
-    setMetadataCaller(metadataCaller: MetadataCaller): void {
-        this.metadataCaller = metadataCaller;
-    }
-
-    async afterInsert(event: InsertEvent<AnalysisNodeEntity>): Promise<any> {
-        await super.afterInsert(event);
-
-        if (!this.metadataCaller) return;
-
-        await this.metadataCaller.call(
-            AnalysisMetadataCommand.RECALC,
-            {
-                analysisId: event.entity.analysis_id, 
-                queryFiles: false, 
-                querySelf: false, 
-            },
-            { entityManager: event.manager },
-        );
-    }
-
-    async afterUpdate(event: UpdateEvent<AnalysisNodeEntity>): Promise<any> {
-        await super.afterUpdate(event);
-
-        const analysisId = event.entity?.analysis_id || event.databaseEntity?.analysis_id;
-        if (!analysisId || !this.metadataCaller) return;
-
-        await this.metadataCaller.call(
-            AnalysisMetadataCommand.RECALC,
-            {
-                analysisId,
-                queryFiles: false,
-                querySelf: false,
-            },
-            { entityManager: event.manager },
-        );
-    }
-
-    async afterRemove(event: RemoveEvent<AnalysisNodeEntity>): Promise<any> {
-        const analysisId = event.entity?.analysis_id || event.databaseEntity?.analysis_id;
-        if (!analysisId || !this.metadataCaller) return;
-
-        await this.metadataCaller.call(
-            AnalysisMetadataCommand.RECALC,
-            {
-                analysisId, 
-                queryFiles: false, 
-                querySelf: false, 
-            },
-            { entityManager: event.manager },
-        );
     }
 
     listenTo(): CallableFunction | string {

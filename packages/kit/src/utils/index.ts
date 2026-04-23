@@ -17,4 +17,5 @@ export * from './nanoseconds';
 export * from './object-properties';
 export * from './proxy-connection-string';
 export * from './regex-patterns';
+export * from './process-status';
 export * from './wait';

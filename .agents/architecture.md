@@ -199,7 +199,7 @@ TypeORM subscribers in `adapters/database/subscribers/` (grouped by domain: `ana
 
 AMQP consumers are wired via two DI modules:
 - **AggregatorsModule** (`app/modules/aggregators/`) — Starts AMQP event consumers that react to events from other services (builder, distributor, storage, master-image, authup). Aggregator handlers receive `DataSource` and `TaskManager` via constructor DI.
-- **ComponentsModule** (`app/modules/components/`) — Registers `TaskManager`, `RegistryComponentCaller`, `AnalysisMetadataComponentCaller` in the container. Starts task consumer workers (registry, analysis-metadata).
+- **ComponentsModule** (`app/modules/components/`) — Registers `TaskManager`, `RegistryComponentCaller` in the container. Starts task consumer workers (registry).
 
 Implementation classes live in `app/aggregators/` and `app/components/`.
 

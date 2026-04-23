@@ -5,11 +5,18 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { AnalysisBucketFile } from '@privateaim/core-kit';
+import type { Analysis, AnalysisBucketFile } from '@privateaim/core-kit';
 import type { ActorContext } from '../actor/types.ts';
 import type { EntityRepositoryFindManyResult, IEntityRepository } from '../types.ts';
 
-export interface IAnalysisBucketFileRepository extends IEntityRepository<AnalysisBucketFile> {}
+export interface IAnalysisBucketFileRepository extends IEntityRepository<AnalysisBucketFile> {
+    findRootCodeFile(analysisId: string): Promise<AnalysisBucketFile | null>;
+}
+
+export interface IAnalysisFileMetadataRecalculator {
+    recalc(analysisId: string): Promise<Analysis>;
+    recalcDebounced(analysisId: string): Promise<void>;
+}
 
 export interface IAnalysisBucketFileService {
     getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<AnalysisBucketFile>>;

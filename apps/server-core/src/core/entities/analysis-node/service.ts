@@ -18,12 +18,13 @@ import type { EntityRepositoryFindManyResult } from '../types.ts';
 import { ValidatorGroup } from '../constants.ts';
 import { AbstractEntityService } from '../service.ts';
 import type { IProjectNodeRepository } from '../project-node/types.ts';
-import type { IAnalysisNodeRepository, IAnalysisNodeService } from './types.ts';
+import type { IAnalysisNodeMetadataRecalculator, IAnalysisNodeRepository, IAnalysisNodeService } from './types.ts';
 import { AnalysisNodeValidator } from './validator.ts';
 
 type AnalysisNodeServiceContext = {
     repository: IAnalysisNodeRepository;
     projectNodeRepository: IProjectNodeRepository;
+    recalculator: IAnalysisNodeMetadataRecalculator;
     skipAnalysisApproval?: boolean;
 };
 
@@ -31,6 +32,8 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
     protected repository: IAnalysisNodeRepository;
 
     protected projectNodeRepository: IProjectNodeRepository;
+
+    protected recalculator: IAnalysisNodeMetadataRecalculator;
 
     protected skipAnalysisApproval: boolean;
 
@@ -40,6 +43,7 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
         super();
         this.repository = ctx.repository;
         this.projectNodeRepository = ctx.projectNodeRepository;
+        this.recalculator = ctx.recalculator;
         this.skipAnalysisApproval = ctx.skipAnalysisApproval ?? false;
         this.validator = new AnalysisNodeValidator();
     }
@@ -90,7 +94,11 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
             entity.approval_status = AnalysisNodeApprovalStatus.APPROVED;
         }
 
-        return this.repository.save(entity, { data: actor.metadata });
+        const saved = await this.repository.save(entity, { data: actor.metadata });
+
+        await this.recalculator.recalc(saved.analysis_id);
+
+        return saved;
     }
 
     async update(id: string, data: Partial<AnalysisNode>, actor: ActorContext): Promise<AnalysisNode> {
@@ -148,7 +156,11 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
 
         const merged = this.repository.merge(entity, validated);
 
-        return this.repository.save(merged, { data: actor.metadata });
+        const saved = await this.repository.save(merged, { data: actor.metadata });
+
+        await this.recalculator.recalcDebounced(saved.analysis_id);
+
+        return saved;
     }
 
     async delete(id: string, actor: ActorContext): Promise<AnalysisNode> {
@@ -176,6 +188,8 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
         await this.repository.remove(entity, { data: actor.metadata });
 
         entity.id = entityId;
+
+        await this.recalculator.recalc(entity.analysis_id);
 
         return entity;
     }

@@ -10,7 +10,9 @@ import type { Analysis, AnalysisNode, Registry } from '@privateaim/core-kit';
 import { AnalysisDistributorCommandChecker } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
 import type { EntityPersistContext, IEntityRepository } from '../../entities/types.ts';
-import type { IAnalysisMetadataCaller } from '../analysis-builder/types.ts';
+import type { IAnalysisMetadataRecalculator } from '../../entities/analysis/types.ts';
+import type { IAnalysisNodeMetadataRecalculator } from '../../entities/analysis-node/types.ts';
+import type { IAnalysisFileMetadataRecalculator } from '../../entities/analysis-bucket-file/types.ts';
 import type { IAnalysisDistributorCaller } from './types.ts';
 
 type AnalysisDistributorContext = {
@@ -18,7 +20,9 @@ type AnalysisDistributorContext = {
     analysisNodeRepository: IEntityRepository<AnalysisNode>;
     registryRepository: IEntityRepository<Registry>;
     caller: IAnalysisDistributorCaller;
-    metadataCaller: IAnalysisMetadataCaller;
+    analysisRecalculator: IAnalysisMetadataRecalculator;
+    nodeRecalculator: IAnalysisNodeMetadataRecalculator;
+    fileRecalculator: IAnalysisFileMetadataRecalculator;
 };
 
 export class AnalysisDistributor {
@@ -30,19 +34,28 @@ export class AnalysisDistributor {
 
     protected caller: IAnalysisDistributorCaller;
 
-    protected metadataCaller: IAnalysisMetadataCaller;
+    protected analysisRecalculator: IAnalysisMetadataRecalculator;
+
+    protected nodeRecalculator: IAnalysisNodeMetadataRecalculator;
+
+    protected fileRecalculator: IAnalysisFileMetadataRecalculator;
 
     constructor(ctx: AnalysisDistributorContext) {
         this.repository = ctx.repository;
         this.analysisNodeRepository = ctx.analysisNodeRepository;
         this.registryRepository = ctx.registryRepository;
         this.caller = ctx.caller;
-        this.metadataCaller = ctx.metadataCaller;
+        this.analysisRecalculator = ctx.analysisRecalculator;
+        this.nodeRecalculator = ctx.nodeRecalculator;
+        this.fileRecalculator = ctx.fileRecalculator;
     }
 
     async start(input: string | Analysis, persistCtx?: EntityPersistContext) {
         const entityId = typeof input === 'string' ? input : input.id;
-        const entity = await this.metadataCaller.callRecalcDirect({ analysisId: entityId });
+
+        await this.analysisRecalculator.recalc(entityId);
+        await this.nodeRecalculator.recalc(entityId);
+        const entity = await this.fileRecalculator.recalc(entityId);
 
         AnalysisDistributorCommandChecker.canStart(entity);
 

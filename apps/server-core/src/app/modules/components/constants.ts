@@ -8,11 +8,9 @@
 import type { TaskManager } from '@privateaim/server-kit';
 import { TypedToken } from 'eldin';
 import type { TaskMap } from '../../../core/domains/index.ts';
-import type { AnalysisMetadataComponentCaller } from '../../components/analysis-metadata/caller/module.ts';
 import type { RegistryComponentCaller } from '../../components/registry/caller/module.ts';
 
 export const ComponentsInjectionKey = {
     TaskManager: new TypedToken<TaskManager<TaskMap>>('TaskManager'),
-    AnalysisMetadataComponentCaller: new TypedToken<AnalysisMetadataComponentCaller>('AnalysisMetadataComponentCaller'),
     RegistryComponentCaller: new TypedToken<RegistryComponentCaller>('RegistryComponentCaller'),
 } as const;

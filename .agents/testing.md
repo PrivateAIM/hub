@@ -177,17 +177,19 @@ Write a class that implements the port interface with in-memory behavior and cal
 
 ```typescript
 // Good — fake implements the port interface
-const metadataCaller = new FakeMetadataCaller();
-const subscriber = new AnalysisNodeSubscriber({ metadataCaller });
+const recalculator = new FakeAnalysisNodeMetadataRecalculator(analysisRepository);
+const service = new AnalysisNodeService({ repository, recalculator });
 
 // Bad — vi.fn() stubs bypass the interface contract
-const metadataCaller = { call: vi.fn() };
+const recalculator = { recalc: vi.fn(), recalcDebounced: vi.fn() };
 ```
 
 Existing fakes to reuse:
 - `FakeEntityRepository<T>` — `IEntityRepository<T>` with `seed()`, `getAll()`, `clear()`
-- `FakeMetadataCaller` — records `call()` invocations with command/data/meta
-- `FakeStorageManager` — records `check()`/`remove()` calls
+- `FakeAnalysisRepository` — `IAnalysisRepository` with `findOneWithProject()`
+- `FakeAnalysisNodeRepository` — `IAnalysisNodeRepository` with `findManyWithNodeByAnalysis()`
+- `FakeAnalysisBucketFileRepository` — `IAnalysisBucketFileRepository` with `findRootCodeFile()`
+- `FakeAnalysisMetadataRecalculator` / `FakeAnalysisNodeMetadataRecalculator` / `FakeAnalysisFileMetadataRecalculator` — record `recalc()` and `recalcDebounced()` calls
 - `createAllowAllActor()` / `createDenyAllActor()` — `ActorContext` fakes for permission testing
 - `createMasterRealmActor()` / `createNonMasterRealmActor()` — realm-scoped actor fakes
 

@@ -93,6 +93,14 @@ export class AnalysisNodeRepositoryAdapter implements IAnalysisNodeRepository {
         return this.repository.findBy(where);
     }
 
+    async findManyWithNodeByAnalysis(analysisId: string): Promise<AnalysisNode[]> {
+        return this.repository.find({
+            where: { analysis_id: analysisId },
+            relations: ['node'],
+            cache: false,
+        });
+    }
+
     create(data: Partial<AnalysisNode>): AnalysisNode {
         return this.repository.create(data) as AnalysisNode;
     }

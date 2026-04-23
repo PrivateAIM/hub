@@ -7,5 +7,4 @@
 
 export * from './constants.ts';
 
-export * from './analysis-metadata/index.ts';
 export * from './registry/index.ts';

@@ -6,6 +6,7 @@
  */
 
 import type { AnalysisBucketFile } from '@privateaim/core-kit';
+import { AnalysisBucketType } from '@privateaim/core-kit';
 import type { DataSource, Repository } from 'typeorm';
 import {
     applyFilters,
@@ -118,6 +119,17 @@ export class AnalysisBucketFileRepositoryAdapter implements IAnalysisBucketFileR
 
     async findManyBy(where: Record<string, any>): Promise<AnalysisBucketFile[]> {
         return this.repository.findBy(where);
+    }
+
+    async findRootCodeFile(analysisId: string): Promise<AnalysisBucketFile | null> {
+        return this.repository.findOne({
+            where: {
+                analysis_id: analysisId,
+                root: true,
+                analysis_bucket: { type: AnalysisBucketType.CODE },
+            },
+            relations: ['analysis_bucket'],
+        });
     }
 
     create(data: Partial<AnalysisBucketFile>): AnalysisBucketFile {

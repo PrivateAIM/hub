@@ -179,10 +179,12 @@ Subscribers are **pre-instantiated** with dependencies in `DatabaseModule.setup(
 // In DatabaseModule.setup():
 dataSource.subscribers.push(
     new NodeSubscriber({ nodeClientService }),
-    new AnalysisSubscriber({ metadataCaller, bucketCaller, taskManager }),
-    new RegistrySubscriber(), // no custom deps
+    new AnalysisSubscriber(),
+    new RegistrySubscriber(),
 );
 ```
+
+Subscribers are purely for domain event publishing (via `BaseSubscriber`). Business logic (metadata recalculation, storage management) lives in entity services, not subscribers.
 
 ## DI Modules
 
@@ -211,9 +213,9 @@ app/modules/<name>/
 | Module | Name | Dependencies | Registers |
 |--------|------|-------------|-----------|
 | ConfigModule | `config` | none | `ConfigInjectionKey` (typed env) |
-| DatabaseModule | `database` | none | `DataSource`, 13 repo adapters, `RegistryManager`, `AnalysisSubscriber` |
-| ComponentsModule | `components` | `database` | `TaskManager`, `RegistryComponentCaller`, `AnalysisMetadataComponentCaller` |
-| AnalysisModule | `analysis` | `database`, `components` | `Builder`, `Configurator`, `Distributor`, `StorageManager` |
+| DatabaseModule | `database` | none | `DataSource`, 13 repo adapters, `RegistryManager` |
+| ComponentsModule | `components` | `database` | `TaskManager`, `RegistryComponentCaller` |
+| AnalysisModule | `analysis` | `database`, `components` | `Builder`, `Configurator`, `Distributor`, `StorageManager`, 3 metadata recalculators |
 | SwaggerModule | `swagger` | `config` | nothing (generates docs) |
 | HarborModule | `harbor` | `config`, `database` | nothing (sets up registry) |
 | AggregatorsModule | `aggregators` | `database`, `components` | nothing (starts AMQP event consumers) |
