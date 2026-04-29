@@ -10,7 +10,7 @@ jobs:
         permissions:
             issues: write
         steps:
-            - uses: pozil/auto-assign-issue@v2
+            - uses: pozil/auto-assign-issue@v3
               with:
                   assignees: tada5hi
                   numOfAssignee: 2
