@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.8.39](https://github.com/PrivateAIM/hub/compare/v0.8.38...v0.8.39) (2026-04-29)
+
+
+### Bug Fixes
+
+* include .mjs in db migration pattern ([ab1f37a](https://github.com/PrivateAIM/hub/commit/ab1f37a859572a700a5f4d6bd7f2aee04b30751c))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.8.38 to ^0.8.39
+    * @privateaim/server-kit bumped from ^0.8.38 to ^0.8.39
+
 ## [0.8.38](https://github.com/PrivateAIM/hub/compare/v0.8.37...v0.8.38) (2026-04-23)
 
 
