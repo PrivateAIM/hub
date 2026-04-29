@@ -88,7 +88,7 @@ export class DataSourceOptionsBuilder {
         };
 
         if (options.type === 'mysql' || options.type === 'postgres') {
-            let migrationPath = `${this.migrationDirectory}/${options.type}/*.{ts,js}`;
+            let migrationPath = `${this.migrationDirectory}/${options.type}/*.{ts,js,mjs}`;
             if (!isCodeTransformation(CodeTransformation.JUST_IN_TIME)) {
                 migrationPath = transformFilePath(migrationPath, './dist', './src');
             }
