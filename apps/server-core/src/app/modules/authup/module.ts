@@ -14,6 +14,7 @@ import { PermissionName } from '@privateaim/kit';
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
 import {
+    AUTHUP_CLIENT_MODULE_NAME,
     AuthupClientInjectionKey,
     LoggerInjectionKey,
 } from '@privateaim/server-kit';
@@ -21,7 +22,7 @@ import {
 export class AuthupModule implements IModule {
     readonly name = 'authup';
 
-    readonly dependencies: string[] = [];
+    readonly dependencies: string[] = [AUTHUP_CLIENT_MODULE_NAME];
 
     async setup(container: IContainer): Promise<void> {
         const authupResult = container.tryResolve(AuthupClientInjectionKey);
