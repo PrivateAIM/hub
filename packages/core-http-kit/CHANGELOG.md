@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.8.41](https://github.com/PrivateAIM/hub/compare/v0.8.40...v0.8.41) (2026-04-30)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core-kit bumped from ^0.8.40 to ^0.8.41
+    * @privateaim/telemetry-kit bumped from ^0.8.40 to ^0.8.41
+  * peerDependencies
+    * @privateaim/core-kit bumped from ^0.8.40 to ^0.8.41
+    * @privateaim/telemetry-kit bumped from ^0.8.40 to ^0.8.41
+
 ## [0.8.40](https://github.com/PrivateAIM/hub/compare/v0.8.39...v0.8.40) (2026-04-29)
 
 
