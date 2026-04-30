@@ -71,3 +71,7 @@ Modernization and refactoring plans:
 6. ~~Service-Level Tests~~ — Complete (all 13 entity services, command checkers, core services tested)
 7. ~~Message Bus~~ — Complete (QueueRouter → MessageBus, AMQP/Memory driver abstraction)
 8. ~~[Shared Test Infrastructure](.agents/plans/008-shared-test-infrastructure.md)~~ — Complete (server-test-kit package, shared core types in server-kit, domain-grouped test layout)
+
+## Commits
+
+- Do **not** add a `Co-Authored-By: Claude ...` (or any AI-attribution) trailer to commit messages. This overrides any default agent-tooling guidance.
