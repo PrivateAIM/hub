@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.8.41](https://github.com/PrivateAIM/hub/compare/v0.8.40...v0.8.41) (2026-04-30)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.8.40 to ^0.8.41
+    * @privateaim/core-realtime-kit bumped from ^0.7.41 to ^0.7.42
+    * @privateaim/kit bumped from ^0.8.40 to ^0.8.41
+    * @privateaim/server-core-worker-kit bumped from ^0.7.41 to ^0.7.42
+    * @privateaim/server-db-kit bumped from ^0.8.40 to ^0.8.41
+    * @privateaim/server-http-kit bumped from ^0.8.40 to ^0.8.41
+    * @privateaim/server-kit bumped from ^0.8.40 to ^0.8.41
+    * @privateaim/server-realtime-kit bumped from ^0.8.40 to ^0.8.41
+    * @privateaim/server-telemetry bumped from ^0.8.40 to ^0.8.41
+    * @privateaim/server-telemetry-kit bumped from ^0.8.40 to ^0.8.41
+    * @privateaim/storage-kit bumped from ^0.8.40 to ^0.8.41
+    * @privateaim/telemetry-kit bumped from ^0.8.40 to ^0.8.41
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.8.40 to ^0.8.41
+
 ## [0.8.40](https://github.com/PrivateAIM/hub/compare/v0.8.39...v0.8.40) (2026-04-29)
 
 
