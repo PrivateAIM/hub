@@ -42,7 +42,7 @@
         "routup": "^4.1.0",
         "socket.io": "^4.8.2",
         "validup": "^0.2.2",
-        "zod": "^4.3.6"
+        "zod": "^4.4.3"
     },
     "scripts": {
         "cli": "node dist/cli/index.mjs",
