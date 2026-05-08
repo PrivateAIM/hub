@@ -21,6 +21,7 @@ export function mountAuthorizationMiddleware(
 
         router.use(defineCoreHandler((event) => {
             applyTokenVerificationData(event, data, options.dryRun);
+            return event.next();
         }));
 
         return;
@@ -42,5 +43,7 @@ export function mountAuthorizationMiddleware(
         if (data) {
             applyTokenVerificationData(event, data, options.dryRun);
         }
+
+        return event.next();
     }));
 }

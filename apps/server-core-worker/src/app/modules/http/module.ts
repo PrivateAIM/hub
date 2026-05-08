@@ -7,7 +7,7 @@
 
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
-import { serve } from 'routup/node';
+import { serve } from 'routup';
 import { LoggerInjectionKey } from '@privateaim/server-kit';
 import { ConfigInjectionKey } from '../config/constants.ts';
 import { createHttpRouter } from '../../../adapters/http/index.ts';

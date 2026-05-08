@@ -34,7 +34,6 @@
         "@privateaim/telemetry-kit": "^0.8.40",
         "@routup/basic": "^2.1.0",
         "@routup/decorators": "^4.1.0",
-        "@validup/adapter-routup": "^0.2.2",
         "@validup/adapter-zod": "^0.2.3",
         "busboy": "^1.6.0",
         "citty": "^0.2.1",

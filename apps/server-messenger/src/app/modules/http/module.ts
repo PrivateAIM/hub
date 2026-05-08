@@ -8,8 +8,7 @@
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
 import type { Server } from 'node:http';
-import { Router, defineCoreHandler } from 'routup';
-import { serve } from 'routup/node';
+import { Router, defineCoreHandler, serve } from 'routup';
 import {
     LoggerInjectionKey,
     RedisPublishClientInjectionKey,

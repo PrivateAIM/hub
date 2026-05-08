@@ -6,8 +6,7 @@
  */
 
 import { TypedToken } from 'eldin';
-import type { serve } from 'routup/node';
-import type { Router } from 'routup';
+import type { Router, serve } from 'routup';
 
 export type HTTPServer = ReturnType<typeof serve>;
 

@@ -7,8 +7,7 @@
 
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
-import { Router } from 'routup';
-import { serve } from 'routup/node';
+import { Router, serve } from 'routup';
 import {
     AuthupClientInjectionKey,
     EnvironmentName,
