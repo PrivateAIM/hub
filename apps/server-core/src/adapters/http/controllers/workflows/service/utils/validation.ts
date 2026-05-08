@@ -6,8 +6,9 @@
  */
 
 import { RegistryAPICommand } from '@privateaim/core-kit';
-import { createValidationChain, createValidator } from '@validup/adapter-validator';
+import { createValidator } from '@validup/adapter-zod';
 import { Container } from 'validup';
+import { z } from 'zod';
 
 type ValidationResult = {
     id: string,
@@ -21,32 +22,22 @@ export class ServiceRegistryValidator extends Container<ValidationResult> {
 
         this.mount(
             'id',
-            createValidator(() => {
-                const chain = createValidationChain();
-                return chain
-                    .isUUID();
-            }),
+            createValidator(z.uuid()),
         );
 
         this.mount(
             'command',
-            createValidator(() => {
-                const chain = createValidationChain();
-                return chain
-                    .isString()
-                    .custom((value) => Object.values(RegistryAPICommand).includes(value));
-            }),
+            createValidator(z.nativeEnum(RegistryAPICommand)),
         );
 
         this.mount(
             'secret',
             { optional: true },
-            createValidator(() => {
-                const chain = createValidationChain();
-                return chain
-                    .matches(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/)
-                    .optional({ nullable: true });
-            }),
+            createValidator(
+                z.string()
+                    .regex(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/)
+                    .nullable(),
+            ),
         );
     }
 }

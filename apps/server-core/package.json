@@ -37,7 +37,6 @@
         "@routup/basic": "^2.1.0",
         "@routup/decorators": "^4.1.0",
         "@socket.io/redis-emitter": "^5.1.0",
-        "@validup/adapter-validator": "^0.3.2",
         "@validup/adapter-zod": "^0.2.3",
         "busboy": "^1.6.0",
         "citty": "^0.2.1",
