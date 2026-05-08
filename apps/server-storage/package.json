@@ -58,6 +58,9 @@
     "devDependencies": {
         "@faker-js/faker": "^10.4.0",
         "@privateaim/server-test-kit": "^0.8.37",
+        "@trapi/cli": "^0.1.2-beta.3",
+        "@trapi/metadata": "^2.0.0-beta.4",
+        "@trapi/swagger": "^2.0.0-beta.4",
         "@types/busboy": "^1.5.3",
         "@types/cors": "^2.8.19",
         "@types/tar-stream": "^3.1.4",
@@ -70,6 +73,7 @@
         "cli-dev": "ts-node src/cli/index.ts",
         "build:js": "tsdown",
         "build:types": "tsc --emitDeclarationOnly -p tsconfig.build.json",
+        "build:swagger": "trapi generate",
         "build": "rimraf ./dist && npm run build:js && npm run build:types",
         "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts",
         "test:mysql": "cross-env DB_TYPE=mysql DB_HOST=127.0.0.1 DB_USERNAME=root DB_PASSWORD=start123 DB_DATABASE=app vitest run --config test/vitest.config.ts",
