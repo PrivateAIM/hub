@@ -161,6 +161,6 @@ export class LogController {
         });
 
         event.response.status = 202;
-        return undefined;
+        return null;
     }
 }

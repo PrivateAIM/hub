@@ -53,7 +53,7 @@ export class ServiceController {
         await this.registryCaller.call('HOOK_PROCESS', data, {});
 
         event.response.status = 202;
-        return undefined;
+        return null;
     }
 
     @DPost('/:id/command', [ForceLoggedInMiddleware])
@@ -75,6 +75,6 @@ export class ServiceController {
         await this.registryService.executeCommand(data.command, data, actor);
 
         event.response.status = 202;
-        return undefined;
+        return null;
     }
 }

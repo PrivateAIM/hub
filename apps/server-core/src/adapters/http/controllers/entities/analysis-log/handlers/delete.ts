@@ -55,5 +55,5 @@ export async function deleteAnalysisLogRouteHandler(event: IRoutupEvent, telemet
     }
 
     event.response.status = 202;
-    return undefined;
+    return null;
 }

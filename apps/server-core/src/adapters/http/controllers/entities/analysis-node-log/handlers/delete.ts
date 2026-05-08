@@ -53,5 +53,5 @@ export async function deleteAnalysisNodeLogRouteHandler(event: IRoutupEvent, tel
     }
 
     event.response.status = 202;
-    return undefined;
+    return null;
 }
