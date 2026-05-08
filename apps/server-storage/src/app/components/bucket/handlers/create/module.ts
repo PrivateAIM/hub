@@ -14,7 +14,7 @@ import {
 import { BucketValidator, DomainType  } from '@privateaim/storage-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import { useDataSource } from 'typeorm-extension';
-import type { Client } from 'minio';
+import type { StorageAdapter } from '../../../../../core/storage/types.ts';
 import { BucketEntity } from '../../../../../adapters/database/index.ts';
 import { toBucketName } from '../../../../domains/bucket/utils.ts';
 import { ValidatorGroup } from '@privateaim/kit';
@@ -25,13 +25,13 @@ export class BucketCreateHandler implements ComponentHandler<
 > {
     protected validator : BucketValidator;
 
-    protected minio: Client;
+    protected storage: StorageAdapter;
 
     protected logger: Logger | undefined;
 
-    constructor(ctx: { minio: Client; logger?: Logger }) {
+    constructor(ctx: { storage: StorageAdapter; logger?: Logger }) {
         this.validator = new BucketValidator();
-        this.minio = ctx.minio;
+        this.storage = ctx.storage;
         this.logger = ctx.logger;
     }
 
@@ -80,9 +80,9 @@ export class BucketCreateHandler implements ComponentHandler<
 
         try {
             if (entity.region) {
-                await this.minio.makeBucket(toBucketName(entity.id), entity.region);
+                await this.storage.makeBucket(toBucketName(entity.id), entity.region);
             } else {
-                await this.minio.makeBucket(toBucketName(entity.id));
+                await this.storage.makeBucket(toBucketName(entity.id));
             }
         } catch (e) {
             await repository.remove(entity);

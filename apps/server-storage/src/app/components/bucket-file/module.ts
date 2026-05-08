@@ -13,15 +13,15 @@ import type { BucketFileComponentEventMap } from '@privateaim/server-storage-kit
 import {
     BucketFileCommand,
 } from '@privateaim/server-storage-kit';
-import type { Client } from 'minio';
+import type { StorageAdapter } from '../../../core/storage/types.ts';
 import { BucketFileCreateHandler, BucketFileDeleteHandler } from './handlers/index.ts';
 
 export class BucketFileComponent extends BaseComponent<BucketFileComponentEventMap> {
-    constructor(ctx: { minio: Client; logger?: Logger }) {
+    constructor(ctx: { storage: StorageAdapter; logger?: Logger }) {
         super();
 
-        this.mount(BucketFileCommand.CREATE, new BucketFileCreateHandler({ minio: ctx.minio, logger: ctx.logger }));
-        this.mount(BucketFileCommand.DELETE, new BucketFileDeleteHandler({ minio: ctx.minio, logger: ctx.logger }));
+        this.mount(BucketFileCommand.CREATE, new BucketFileCreateHandler({ storage: ctx.storage, logger: ctx.logger }));
+        this.mount(BucketFileCommand.DELETE, new BucketFileDeleteHandler({ storage: ctx.storage, logger: ctx.logger }));
     }
 
     async start() {

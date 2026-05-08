@@ -5,12 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { StorageAdapter } from '../../../../../src/core/storage/types.ts';
+
 type MakeBucketCall = {
     name: string;
     region?: string;
 };
 
-export class FakeMinioClient {
+export class FakeStorageAdapter implements StorageAdapter {
     private buckets: Set<string> = new Set();
 
     private makeBucketCalls: MakeBucketCall[] = [];
@@ -22,6 +24,30 @@ export class FakeMinioClient {
     async makeBucket(name: string, region?: string): Promise<void> {
         this.makeBucketCalls.push({ name, region });
         this.buckets.add(name);
+    }
+
+    async removeBucket(): Promise<void> {
+        // no-op for tests
+    }
+
+    async putObject(): Promise<void> {
+        // no-op for tests
+    }
+
+    async getObject(): Promise<never> {
+        throw new Error('Not implemented in fake');
+    }
+
+    async removeObject(): Promise<void> {
+        // no-op for tests
+    }
+
+    async removeObjects(): Promise<void> {
+        // no-op for tests
+    }
+
+    async listObjects(): Promise<string[]> {
+        return [];
     }
 
     // --- Test helpers ---

@@ -8,17 +8,17 @@
 import type { Bucket } from '@privateaim/storage-kit';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { PermissionName, ValidatorGroup, isRealmResourceWritable  } from '@privateaim/kit';
-import type { Client } from 'minio';
 import { toBucketName } from '../../utils/bucket-name.ts';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
 import type { IBucketCaller, IBucketRepository, IBucketService } from './types.ts';
 import { BucketValidator } from '@privateaim/storage-kit';
+import type { StorageAdapter } from '../../storage/types.ts';
 
 type BucketServiceContext = {
     repository: IBucketRepository;
     caller: IBucketCaller;
-    minio: Client;
+    storage: StorageAdapter;
 };
 
 export class BucketService extends AbstractEntityService implements IBucketService {
@@ -26,7 +26,7 @@ export class BucketService extends AbstractEntityService implements IBucketServi
 
     protected caller: IBucketCaller;
 
-    protected minio: Client;
+    protected storage: StorageAdapter;
 
     protected validator: BucketValidator;
 
@@ -34,7 +34,7 @@ export class BucketService extends AbstractEntityService implements IBucketServi
         super();
         this.repository = ctx.repository;
         this.caller = ctx.caller;
-        this.minio = ctx.minio;
+        this.storage = ctx.storage;
         this.validator = new BucketValidator();
     }
 
@@ -99,12 +99,12 @@ export class BucketService extends AbstractEntityService implements IBucketServi
         await this.repository.save(entity, { data: actor.metadata });
 
         const bucketName = toBucketName(entity.id);
-        const hasBucket = await this.minio.bucketExists(bucketName);
+        const hasBucket = await this.storage.bucketExists(bucketName);
         if (!hasBucket) {
             if (entity.region) {
-                await this.minio.makeBucket(bucketName, entity.region);
+                await this.storage.makeBucket(bucketName, entity.region);
             } else {
-                await this.minio.makeBucket(bucketName);
+                await this.storage.makeBucket(bucketName);
             }
         }
 

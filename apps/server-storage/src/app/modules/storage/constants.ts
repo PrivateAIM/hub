@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export { MinioModule } from './module.ts';
-export { MinioClientInjectionKey } from './constants.ts';
-export type { MinioModuleOptions } from './types.ts';
+import { TypedToken } from 'eldin';
+import type { StorageAdapter } from '../../../core/storage/types.ts';
+
+export const StorageInjectionKey = new TypedToken<StorageAdapter>('Storage');

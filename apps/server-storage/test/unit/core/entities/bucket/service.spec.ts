@@ -8,7 +8,6 @@
 import { randomUUID } from 'node:crypto';
 import type { Bucket } from '@privateaim/storage-kit';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
-import type { Client } from 'minio';
 import {
     beforeEach,
     describe,
@@ -24,7 +23,7 @@ import {
 } from '@privateaim/server-test-kit';
 import { FakeBucketCaller } from './fake-caller.ts';
 import { FakeBucketRepository } from './fake-repository.ts';
-import { FakeMinioClient } from './fake-minio.ts';
+import { FakeStorageAdapter } from './fake-storage.ts';
 
 function createTestBucket(overrides?: Partial<Bucket>): Bucket {
     return {
@@ -43,17 +42,17 @@ function createTestBucket(overrides?: Partial<Bucket>): Bucket {
 describe('BucketService', () => {
     let repository: FakeBucketRepository;
     let caller: FakeBucketCaller;
-    let minio: FakeMinioClient;
+    let storage: FakeStorageAdapter;
     let service: BucketService;
 
     beforeEach(() => {
         repository = new FakeBucketRepository();
         caller = new FakeBucketCaller();
-        minio = new FakeMinioClient();
+        storage = new FakeStorageAdapter();
         service = new BucketService({
             repository,
             caller,
-            minio: minio as unknown as Client,
+            storage,
         });
     });
 
@@ -191,8 +190,8 @@ describe('BucketService', () => {
 
             await service.update(bucket.id, {}, createMasterRealmActor());
 
-            expect(minio.getMakeBucketCalls()).toHaveLength(1);
-            expect(minio.getBuckets()).toHaveLength(1);
+            expect(storage.getMakeBucketCalls()).toHaveLength(1);
+            expect(storage.getBuckets()).toHaveLength(1);
         });
 
         it('should not recreate minio bucket if it already exists', async () => {
@@ -204,12 +203,12 @@ describe('BucketService', () => {
                 .replace(/[^a-z0-9.-]/g, '')
                 .slice(0, 63)
                 .replace(/[^a-z0-9]+$/g, '');
-            minio.addBucket(bucketName);
+            storage.addBucket(bucketName);
 
             await service.update(bucket.id, {}, createMasterRealmActor());
 
-            expect(minio.getMakeBucketCalls()).toHaveLength(0);
-            expect(minio.getBuckets()).toHaveLength(1);
+            expect(storage.getMakeBucketCalls()).toHaveLength(0);
+            expect(storage.getBuckets()).toHaveLength(1);
         });
     });
 

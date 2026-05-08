@@ -15,7 +15,7 @@ import {
 import { DomainType } from '@privateaim/storage-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import { useDataSource } from 'typeorm-extension';
-import type { Client } from 'minio';
+import type { StorageAdapter } from '../../../../../core/storage/types.ts';
 import { BucketEntity } from '../../../../../adapters/database/index.ts';
 import { toBucketName } from '../../../../domains/bucket/utils.ts';
 
@@ -23,12 +23,12 @@ export class BucketDeleteHandler implements ComponentHandler<
     BucketComponentEventMap,
     BucketCommand.DELETE
 > {
-    protected minio: Client;
+    protected storage: StorageAdapter;
 
     protected logger: Logger | undefined;
 
-    constructor(ctx: { minio: Client; logger?: Logger }) {
-        this.minio = ctx.minio;
+    constructor(ctx: { storage: StorageAdapter; logger?: Logger }) {
+        this.storage = ctx.storage;
         this.logger = ctx.logger;
     }
 
@@ -77,15 +77,15 @@ export class BucketDeleteHandler implements ComponentHandler<
 
         const entityId = entity.id;
         const bucketName = toBucketName(entityId);
-        const exists = await this.minio.bucketExists(bucketName);
+        const exists = await this.storage.bucketExists(bucketName);
 
         if (exists) {
-            const objects = await this.collectObjects(bucketName);
+            const objects = await this.storage.listObjects(bucketName);
             if (objects.length > 0) {
-                await this.minio.removeObjects(bucketName, objects);
+                await this.storage.removeObjects(bucketName, objects);
             }
 
-            await this.minio.removeBucket(bucketName);
+            await this.storage.removeBucket(bucketName);
         }
 
         await repository.remove(entity);
@@ -97,19 +97,5 @@ export class BucketDeleteHandler implements ComponentHandler<
                 id: entityId,
             },
         );
-    }
-
-    protected collectObjects(bucketName: string): Promise<string[]> {
-        return new Promise((resolve, reject) => {
-            const objects: string[] = [];
-            const stream = this.minio.listObjects(bucketName, '', true);
-            stream.on('data', (obj) => {
-                if (obj.name) {
-                    objects.push(obj.name);
-                }
-            });
-            stream.on('end', () => resolve(objects));
-            stream.on('error', (err) => reject(err));
-        });
     }
 }

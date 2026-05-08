@@ -26,6 +26,7 @@ export async function normalizeConfig(input: Partial<Config>): Promise<Config> {
 
         publicURL: validated.publicURL ?? `http://localhost:${validated.port ?? ConfigDefaults.PORT}`,
 
-        minioConnectionString: validated.minioConnectionString ?? ConfigDefaults.MINIO_CONNECTION_STRING,
+        minioConnectionString: validated.minioConnectionString,
+        storagePath: validated.storagePath,
     };
 }

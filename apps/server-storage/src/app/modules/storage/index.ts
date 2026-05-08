@@ -5,7 +5,5 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { TypedToken } from 'eldin';
-import type { Client } from 'minio';
-
-export const MinioClientInjectionKey = new TypedToken<Client>('MinioClient');
+export { StorageModule } from './module.ts';
+export { StorageInjectionKey } from './constants.ts';

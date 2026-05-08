@@ -8,7 +8,7 @@
 import { LoggerModule } from '@privateaim/server-kit';
 import type { IModule } from 'orkos';
 import { ConfigModule } from '../../src/app/modules/config/index.ts';
-import { MinioModule } from '../../src/app/modules/minio/index.ts';
+import { StorageModule } from '../../src/app/modules/storage/index.ts';
 import { HTTPModule } from '../../src/app/modules/http/index.ts';
 
 import { TestHTTPApplication } from './http.ts';
@@ -20,7 +20,7 @@ export function createTestApplication(): TestHTTPApplication {
     const modules: IModule[] = [
         new ConfigModule(),
         new LoggerModule(),
-        new MinioModule(),
+        new StorageModule(),
         createTestDatabaseModule(),
         new HTTPModule(),
     ];

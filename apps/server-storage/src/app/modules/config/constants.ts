@@ -20,8 +20,6 @@ export const ConfigDefaults = {
     CLIENT_SECRET: 'start123',
 
     PUBLIC_URL: 'http://localhost:3000',
-
-    MINIO_CONNECTION_STRING: 'http://admin:start123@127.0.0.1:9000',
 } as const;
 
 export enum EnvironmentInputKey {
@@ -36,6 +34,7 @@ export enum EnvironmentInputKey {
     RABBITMQ_CONNECTION_STRING = 'RABBITMQ_CONNECTION_STRING',
     REDIS_CONNECTION_STRING = 'REDIS_CONNECTION_STRING',
     MINIO_CONNECTION_STRING = 'MINIO_CONNECTION_STRING',
+    STORAGE_PATH = 'STORAGE_PATH',
 
     AUTHUP_URL = 'AUTHUP_URL',
 

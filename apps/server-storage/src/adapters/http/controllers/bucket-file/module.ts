@@ -22,7 +22,7 @@ import { useRequestQuery } from '@routup/basic/query';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { IRoutupEvent } from 'routup';
 import { getRequestAcceptableEncoding } from 'routup';
-import type { Client } from 'minio';
+import type { StorageAdapter } from '../../../../core/storage/types.ts';
 import type { IBucketFileRepository, IBucketFileService } from '../../../../core/entities/index.ts';
 import { toBucketName } from '../../../../core/utils/bucket-name.ts';
 import { buildActorContext } from '../../request/index.ts';
@@ -30,7 +30,7 @@ import { buildActorContext } from '../../request/index.ts';
 type BucketFileControllerContext = {
     service: IBucketFileService;
     bucketFileRepository: IBucketFileRepository;
-    minio: Client;
+    storage: StorageAdapter;
     logger?: Logger;
 };
 
@@ -41,14 +41,14 @@ export class BucketFileController {
 
     protected bucketFileRepository: IBucketFileRepository;
 
-    protected minio: Client;
+    protected storage: StorageAdapter;
 
     protected logger: Logger | undefined;
 
     constructor(ctx: BucketFileControllerContext) {
         this.service = ctx.service;
         this.bucketFileRepository = ctx.bucketFileRepository;
-        this.minio = ctx.minio;
+        this.storage = ctx.storage;
         this.logger = ctx.logger;
     }
 
@@ -78,7 +78,7 @@ export class BucketFileController {
 
         this.logger?.debug(`Streaming file ${entity.hash} (${id}) of ${bucketName}`);
 
-        const nodeStream = await this.minio.getObject(bucketName, entity.hash);
+        const nodeStream = await this.storage.getObject(bucketName, entity.hash);
         nodeStream.on('end', () => {
             this.logger?.debug(`Streamed file ${entity.hash} (${id}) of ${bucketName}`);
         });

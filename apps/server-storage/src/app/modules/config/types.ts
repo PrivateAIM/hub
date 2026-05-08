@@ -9,5 +9,6 @@ import type { BaseServerConfig } from '@privateaim/server-kit';
 
 export interface Config extends BaseServerConfig {
     publicURL: string;
-    minioConnectionString: string;
+    minioConnectionString?: string;
+    storagePath?: string;
 }

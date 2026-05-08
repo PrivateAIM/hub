@@ -21,7 +21,7 @@ import {
     LoggerTransport,
 } from '@privateaim/server-telemetry-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
-import { MinioModule } from './modules/minio/index.ts';
+import { StorageModule } from './modules/storage/index.ts';
 import { HTTPModule } from './modules/http/index.ts';
 import { ComponentsModule } from './modules/components/index.ts';
 import { ServerStorageApplicationBuilder } from './builder.ts';
@@ -85,7 +85,7 @@ export function createApplication() {
 
     app = builder.build();
 
-    app.addModule(new MinioModule());
+    app.addModule(new StorageModule());
     app.addModule(new HTTPModule());
     app.addModule(new ComponentsModule());
 
