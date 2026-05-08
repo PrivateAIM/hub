@@ -6,6 +6,7 @@
  */
 
 import type { Node } from '@privateaim/core-kit';
+import type { NodeCreatePayload, NodeUpdatePayload } from '@privateaim/core-http-kit';
 import {
     DBody,
     DContext,
@@ -21,8 +22,6 @@ import type { IRoutupEvent } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { INodeService } from '../../../../../core/index.ts';
 import { buildActorContext } from '../../../request/index.ts';
-
-type PartialNode = Partial<Node>;
 
 type NodeControllerContext = {
     service: INodeService;
@@ -48,9 +47,9 @@ export class NodeController {
 
     @DPost('', [ForceLoggedInMiddleware])
     async add(
-        @DBody() data: any,
+        @DBody() data: NodeCreatePayload,
         @DContext() event: IRoutupEvent,
-    ): Promise<PartialNode | undefined> {
+    ): Promise<Node> {
         const actor = buildActorContext(event);
         const entity = await this.service.create(data, actor);
         event.response.status = 201;
@@ -61,7 +60,7 @@ export class NodeController {
     async getOne(
         @DPath('id') id: string,
         @DContext() event: IRoutupEvent,
-    ): Promise<PartialNode | undefined> {
+    ): Promise<Node> {
         const query = useRequestQuery(event);
         return this.service.getOne(id, Object.keys(query).length > 0 ? query : undefined);
     }
@@ -69,9 +68,9 @@ export class NodeController {
     @DPost('/:id', [ForceLoggedInMiddleware])
     async edit(
         @DPath('id') id: string,
-        @DBody() data: any,
+        @DBody() data: NodeUpdatePayload,
         @DContext() event: IRoutupEvent,
-    ): Promise<PartialNode | undefined> {
+    ): Promise<Node> {
         const actor = buildActorContext(event);
         const entity = await this.service.update(id, data, actor);
         event.response.status = 202;
@@ -82,7 +81,7 @@ export class NodeController {
     async drop(
         @DPath('id') id: string,
         @DContext() event: IRoutupEvent,
-    ): Promise<PartialNode | undefined> {
+    ): Promise<Node> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);
         event.response.status = 202;

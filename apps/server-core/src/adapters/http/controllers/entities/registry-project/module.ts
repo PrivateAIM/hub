@@ -6,6 +6,7 @@
  */
 
 import type { RegistryProject } from '@privateaim/core-kit';
+import type { RegistryProjectCreatePayload, RegistryProjectUpdatePayload } from '@privateaim/core-http-kit';
 import {
     DBody,
     DContext,
@@ -21,8 +22,6 @@ import type { IRoutupEvent } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { IRegistryProjectService } from '../../../../../core/index.ts';
 import { buildActorContext } from '../../../request/index.ts';
-
-type PartialRegistryProject = Partial<RegistryProject>;
 
 type RegistryProjectControllerContext = {
     service: IRegistryProjectService;
@@ -49,9 +48,9 @@ export class RegistryProjectController {
 
     @DPost('', [ForceLoggedInMiddleware])
     async add(
-        @DBody() data: any,
+        @DBody() data: RegistryProjectCreatePayload,
         @DContext() event: IRoutupEvent,
-    ): Promise<PartialRegistryProject | undefined> {
+    ): Promise<RegistryProject> {
         const actor = buildActorContext(event);
         const entity = await this.service.create(data, actor);
         event.response.status = 201;
@@ -62,7 +61,7 @@ export class RegistryProjectController {
     async getOne(
         @DPath('id') id: string,
         @DContext() event: IRoutupEvent,
-    ): Promise<PartialRegistryProject | undefined> {
+    ): Promise<RegistryProject> {
         const actor = buildActorContext(event);
         const query = useRequestQuery(event);
         return this.service.getOne(id, actor, Object.keys(query).length > 0 ? query : undefined);
@@ -71,9 +70,9 @@ export class RegistryProjectController {
     @DPost('/:id', [ForceLoggedInMiddleware])
     async edit(
         @DPath('id') id: string,
-        @DBody() data: any,
+        @DBody() data: RegistryProjectUpdatePayload,
         @DContext() event: IRoutupEvent,
-    ): Promise<PartialRegistryProject | undefined> {
+    ): Promise<RegistryProject> {
         const actor = buildActorContext(event);
         const entity = await this.service.update(id, data, actor);
         event.response.status = 202;
@@ -84,7 +83,7 @@ export class RegistryProjectController {
     async drop(
         @DPath('id') id: string,
         @DContext() event: IRoutupEvent,
-    ): Promise<PartialRegistryProject | undefined> {
+    ): Promise<RegistryProject> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);
         event.response.status = 202;

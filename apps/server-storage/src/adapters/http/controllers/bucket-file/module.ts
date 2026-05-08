@@ -8,6 +8,7 @@
 import { Readable } from 'node:stream';
 import { createGzip } from 'node:zlib';
 import { NotFoundError } from '@ebec/http';
+import type { BucketFile } from '@privateaim/storage-kit';
 import type { Logger } from '@privateaim/server-kit';
 import {
     DContext,
@@ -113,7 +114,7 @@ export class BucketFileController {
     async getOne(
         @DPath('id') id: string,
         @DContext() event: IRoutupEvent,
-    ) {
+    ): Promise<BucketFile> {
         const query = useRequestQuery(event);
         return this.service.getOne(id, Object.keys(query).length > 0 ? query : undefined);
     }
@@ -122,7 +123,7 @@ export class BucketFileController {
     async drop(
         @DPath('id') id: string,
         @DContext() event: IRoutupEvent,
-    ) {
+    ): Promise<BucketFile> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);
         event.response.status = 202;

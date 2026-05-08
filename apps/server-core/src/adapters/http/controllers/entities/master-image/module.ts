@@ -22,8 +22,6 @@ import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { IMasterImageService } from '../../../../../core/index.ts';
 import { buildActorContext } from '../../../request/index.ts';
 
-type PartialMasterImage = Partial<MasterImage>;
-
 type MasterImageControllerContext = {
     service: IMasterImageService;
 };
@@ -49,7 +47,7 @@ export class MasterImageController {
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
-    ): Promise<PartialMasterImage | undefined> {
+    ): Promise<MasterImage> {
         return this.service.getOne(id);
     }
 
@@ -71,7 +69,7 @@ export class MasterImageController {
     async drop(
         @DPath('id') id: string,
         @DContext() event: IRoutupEvent,
-    ): Promise<PartialMasterImage | undefined> {
+    ): Promise<MasterImage> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);
         event.response.status = 202;

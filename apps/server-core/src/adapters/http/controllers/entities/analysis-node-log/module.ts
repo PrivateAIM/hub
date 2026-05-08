@@ -106,9 +106,9 @@ export class AnalysisNodeLogController {
 
     @DPost('', [ForceLoggedInMiddleware])
     async add(
-        @DBody() body: any,
+        @DBody() body: Partial<AnalysisNodeLog>,
         @DContext() event: IRoutupEvent,
-    ) {
+    ): Promise<Log> {
         const validator = new AnalysisNodeLogValidator();
         const data = await validator.run(body, { group: 'create' });
 

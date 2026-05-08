@@ -10,6 +10,7 @@ import { buildQuery } from 'rapiq';
 import type { AnalysisNode } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
+import type { AnalysisNodeCreatePayload, AnalysisNodeUpdatePayload } from './types';
 
 export class AnalysisNodeAPI extends BaseAPI {
     async getMany(options?: BuildInput<AnalysisNode>): Promise<CollectionResourceResponse<AnalysisNode>> {
@@ -29,13 +30,13 @@ export class AnalysisNodeAPI extends BaseAPI {
         return response;
     }
 
-    async update(id: AnalysisNode['id'], data: Partial<AnalysisNode>): Promise<SingleResourceResponse<AnalysisNode>> {
+    async update(id: AnalysisNode['id'], data: AnalysisNodeUpdatePayload): Promise<SingleResourceResponse<AnalysisNode>> {
         const { data: response } = await this.client.post(`analysis-nodes/${id}`, data);
 
         return response;
     }
 
-    async create(data: Partial<AnalysisNode>): Promise<SingleResourceResponse<AnalysisNode>> {
+    async create(data: AnalysisNodeCreatePayload): Promise<SingleResourceResponse<AnalysisNode>> {
         const { data: response } = await this.client.post('analysis-nodes', data);
 
         return response;

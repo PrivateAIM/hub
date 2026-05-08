@@ -16,6 +16,7 @@ import {
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
+import type { Event } from '@privateaim/telemetry-kit';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { IRoutupEvent } from 'routup';
 import type { IEventService } from '../../../../core/entities/index.ts';
@@ -36,9 +37,9 @@ export class EventController {
 
     @DPost('', [ForceLoggedInMiddleware])
     async create(
-        @DBody() data: any,
+        @DBody() data: Partial<Event>,
         @DContext() event: IRoutupEvent,
-    ) {
+    ): Promise<Event> {
         const actor = buildActorContext(event);
         const entity = await this.service.create(data, actor);
         event.response.status = 201;
@@ -59,7 +60,7 @@ export class EventController {
     async getOne(
         @DPath('id') id: string,
         @DContext() event: IRoutupEvent,
-    ) {
+    ): Promise<Event> {
         const actor = buildActorContext(event);
         return this.service.getOne(id, actor);
     }
@@ -68,7 +69,7 @@ export class EventController {
     async drop(
         @DPath('id') id: string,
         @DContext() event: IRoutupEvent,
-    ) {
+    ): Promise<Event> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);
         event.response.status = 202;

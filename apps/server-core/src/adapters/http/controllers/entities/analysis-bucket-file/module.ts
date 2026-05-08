@@ -6,6 +6,7 @@
  */
 
 import type { AnalysisBucketFile } from '@privateaim/core-kit';
+import type { AnalysisBucketFileCreatePayload, AnalysisBucketFileUpdatePayload } from '@privateaim/core-http-kit';
 import {
     DBody,
     DContext,
@@ -21,8 +22,6 @@ import type { IRoutupEvent } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { IAnalysisBucketFileService } from '../../../../../core/index.ts';
 import { buildActorContext } from '../../../request/index.ts';
-
-type PartialAnalysisBucketFile = Partial<AnalysisBucketFile>;
 
 type AnalysisBucketFileControllerContext = {
     service: IAnalysisBucketFileService;
@@ -49,15 +48,15 @@ export class AnalysisBucketFileController {
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
-    ): Promise<PartialAnalysisBucketFile | undefined> {
+    ): Promise<AnalysisBucketFile> {
         return this.service.getOne(id);
     }
 
     @DPost('', [ForceLoggedInMiddleware])
     async add(
-        @DBody() data: any,
+        @DBody() data: AnalysisBucketFileCreatePayload,
         @DContext() event: IRoutupEvent,
-    ): Promise<PartialAnalysisBucketFile | undefined> {
+    ): Promise<AnalysisBucketFile> {
         const actor = buildActorContext(event);
         const entity = await this.service.create(data, actor);
         event.response.status = 201;
@@ -67,9 +66,9 @@ export class AnalysisBucketFileController {
     @DPost('/:id', [ForceLoggedInMiddleware])
     async edit(
         @DPath('id') id: string,
-        @DBody() data: any,
+        @DBody() data: AnalysisBucketFileUpdatePayload,
         @DContext() event: IRoutupEvent,
-    ): Promise<PartialAnalysisBucketFile | undefined> {
+    ): Promise<AnalysisBucketFile> {
         const actor = buildActorContext(event);
         const entity = await this.service.update(id, data, actor);
         event.response.status = 202;
@@ -80,7 +79,7 @@ export class AnalysisBucketFileController {
     async drop(
         @DPath('id') id: string,
         @DContext() event: IRoutupEvent,
-    ): Promise<PartialAnalysisBucketFile | undefined> {
+    ): Promise<AnalysisBucketFile> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);
         event.response.status = 202;

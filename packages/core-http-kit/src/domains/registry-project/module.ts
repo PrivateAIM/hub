@@ -11,6 +11,7 @@ import type { RegistryProject } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
 import { nullifyEmptyObjectProperties } from '../../utils';
+import type { RegistryProjectCreatePayload, RegistryProjectUpdatePayload } from './types';
 
 export class RegistryProjectAPI extends BaseAPI {
     async getMany(options?: BuildInput<RegistryProject>): Promise<CollectionResourceResponse<RegistryProject>> {
@@ -25,13 +26,13 @@ export class RegistryProjectAPI extends BaseAPI {
         return response.data;
     }
 
-    async create(data: Record<string, any>): Promise<SingleResourceResponse<RegistryProject>> {
+    async create(data: RegistryProjectCreatePayload): Promise<SingleResourceResponse<RegistryProject>> {
         const response = await this.client.post('registry-projects', nullifyEmptyObjectProperties(data));
 
         return response.data;
     }
 
-    async update(id: RegistryProject['id'], data: Record<string, any>): Promise<SingleResourceResponse<RegistryProject>> {
+    async update(id: RegistryProject['id'], data: RegistryProjectUpdatePayload): Promise<SingleResourceResponse<RegistryProject>> {
         const response = await this.client.post(`registry-projects/${id}`, nullifyEmptyObjectProperties(data));
 
         return response.data;

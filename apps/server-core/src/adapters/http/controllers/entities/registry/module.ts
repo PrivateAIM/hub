@@ -6,6 +6,7 @@
  */
 
 import type { Registry } from '@privateaim/core-kit';
+import type { RegistryCreatePayload, RegistryUpdatePayload } from '@privateaim/core-http-kit';
 import {
     DBody,
     DContext,
@@ -21,8 +22,6 @@ import type { IRoutupEvent } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { IRegistryService } from '../../../../../core/index.ts';
 import { buildActorContext } from '../../../request/index.ts';
-
-type PartialRegistry = Partial<Registry>;
 
 type RegistryControllerContext = {
     service: IRegistryService;
@@ -51,7 +50,7 @@ export class RegistryController {
     async getOne(
         @DPath('id') id: string,
         @DContext() event: IRoutupEvent,
-    ): Promise<PartialRegistry | undefined> {
+    ): Promise<Registry> {
         const actor = buildActorContext(event);
         const query = useRequestQuery(event);
         return this.service.getOne(id, actor, Object.keys(query).length > 0 ? query : undefined);
@@ -59,9 +58,9 @@ export class RegistryController {
 
     @DPost('', [ForceLoggedInMiddleware])
     async add(
-        @DBody() data: any,
+        @DBody() data: RegistryCreatePayload,
         @DContext() event: IRoutupEvent,
-    ): Promise<PartialRegistry | undefined> {
+    ): Promise<Registry> {
         const actor = buildActorContext(event);
         const entity = await this.service.create(data, actor);
         event.response.status = 201;
@@ -71,9 +70,9 @@ export class RegistryController {
     @DPost('/:id', [ForceLoggedInMiddleware])
     async edit(
         @DPath('id') id: string,
-        @DBody() data: any,
+        @DBody() data: RegistryUpdatePayload,
         @DContext() event: IRoutupEvent,
-    ): Promise<PartialRegistry | undefined> {
+    ): Promise<Registry> {
         const actor = buildActorContext(event);
         const entity = await this.service.update(id, data, actor);
         event.response.status = 202;
@@ -84,7 +83,7 @@ export class RegistryController {
     async drop(
         @DPath('id') id: string,
         @DContext() event: IRoutupEvent,
-    ): Promise<PartialRegistry | undefined> {
+    ): Promise<Registry> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);
         event.response.status = 202;
