@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { createMiddleware } from '@authup/server-adapter-http';
+import { verifyRequest } from '@authup/server-adapter-web';
 import { useRequestCookie } from '@routup/basic/cookie';
 import type { Router } from 'routup';
-import { coreHandler } from 'routup';
+import { defineCoreHandler } from 'routup';
 import type { AuthorizationMiddlewareRegistrationOptions } from './types.ts';
 import { applyTokenVerificationData, createFakeTokenVerificationData } from './utils.ts';
 
@@ -19,26 +19,35 @@ export function mountAuthorizationMiddleware(
     if (!options.authupClient) {
         const data = createFakeTokenVerificationData();
 
-        router.use(coreHandler((req, res, next) => {
-            applyTokenVerificationData(req, data, options.dryRun);
-            next();
+        router.use(defineCoreHandler((event) => {
+            applyTokenVerificationData(event, data, options.dryRun);
+            return event.next();
         }));
 
         return;
     }
 
-    const middleware = createMiddleware({
-        tokenByCookie: (req, cookieName) => useRequestCookie(req, cookieName),
-        tokenVerifier: options.tokenVerifier,
-        tokenVerifierHandler: (
-            req,
-            data,
-        ) => applyTokenVerificationData(req, data, options.dryRun),
-    });
+    router.use(defineCoreHandler(async (event) => {
+        try {
+            const data = await verifyRequest(event.request, {
+                tokenVerifier: options.tokenVerifier,
+                tokenByRequest: () => {
+                    const cookieToken = useRequestCookie(event, 'access_token');
+                    if (cookieToken) {
+                        return cookieToken;
+                    }
 
-    router.use(coreHandler((
-        req,
-        res,
-        next,
-    ) => middleware(req, res, next)));
+                    return undefined;
+                },
+            });
+
+            if (data) {
+                applyTokenVerificationData(event, data, options.dryRun);
+            }
+        } catch (err) {
+            return event.next(err);
+        }
+
+        return event.next();
+    }));
 }

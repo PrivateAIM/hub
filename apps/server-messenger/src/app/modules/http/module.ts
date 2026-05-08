@@ -7,8 +7,8 @@
 
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
-import http from 'node:http';
-import { Router, coreHandler, createNodeDispatcher } from 'routup';
+import type { Server } from 'node:http';
+import { Router, defineCoreHandler, serve } from 'routup';
 import {
     LoggerInjectionKey,
     RedisPublishClientInjectionKey,
@@ -23,6 +23,7 @@ import {
 } from '@privateaim/server-realtime-kit';
 import { ConfigInjectionKey } from '../config/constants.ts';
 import { registerControllers } from '../../../adapters/socket/register.ts';
+import type { HTTPServer } from './constants.ts';
 import { HTTPInjectionKey } from './constants.ts';
 
 export class HTTPModule implements IModule {
@@ -30,13 +31,15 @@ export class HTTPModule implements IModule {
 
     readonly dependencies: string[] = ['config'];
 
+    private instance: HTTPServer | undefined;
+
     async setup(container: IContainer): Promise<void> {
         const config = container.resolve(ConfigInjectionKey);
         const logger = container.resolve(LoggerInjectionKey);
 
         const router = new Router();
 
-        router.get('/', coreHandler(() => ({ timestamp: Date.now() })));
+        router.get('/', defineCoreHandler(() => ({ timestamp: Date.now() })));
 
         mountMiddlewares(router, {
             basic: true,
@@ -47,58 +50,60 @@ export class HTTPModule implements IModule {
 
         logger.debug('Starting http server...');
 
-        const server = new http.Server(createNodeDispatcher(router));
+        const server = serve(router, {
+            port: config.port,
+            hostname: '0.0.0.0',
+            silent: true,
+            gracefulShutdown: false,
+        });
 
-        await new Promise<void>((resolve, reject) => {
-            const errorHandler = (err?: null | Error) => {
-                reject(err);
-            };
+        try {
+            await server.ready();
 
-            server.once('error', errorHandler);
-            server.once('listening', () => {
-                server.removeListener('error', errorHandler);
-                resolve();
+            this.instance = server;
+
+            if (server.url) {
+                logger.debug(`Listening on ${server.url}`);
+            }
+
+            container.register(HTTPInjectionKey.Server, { useValue: server });
+
+            // Socket.io server
+            const redisPublishResult = container.tryResolve(RedisPublishClientInjectionKey);
+            const redisSubscribeResult = container.tryResolve(RedisSubscribeClientInjectionKey);
+
+            const socketServer = createSocketServer(server.node!.server as Server, {
+                redisPublishClient: redisPublishResult.success ? redisPublishResult.data : undefined,
+                redisSubscribeClient: redisSubscribeResult.success ? redisSubscribeResult.data : undefined,
+                logger,
             });
 
-            server.listen(config.port, '0.0.0.0');
-        });
+            mountLoggingMiddleware(socketServer, { logger });
 
-        logger.debug(`Listening on 0.0.0.0:${config.port}.`);
-
-        container.register(HTTPInjectionKey.Server, { useValue: server });
-
-        // Socket.io server
-        const redisPublishResult = container.tryResolve(RedisPublishClientInjectionKey);
-        const redisSubscribeResult = container.tryResolve(RedisSubscribeClientInjectionKey);
-
-        const socketServer = createSocketServer(server, {
-            redisPublishClient: redisPublishResult.success ? redisPublishResult.data : undefined,
-            redisSubscribeClient: redisSubscribeResult.success ? redisSubscribeResult.data : undefined,
-            logger,
-        });
-
-        mountLoggingMiddleware(socketServer, { logger });
-
-        mountAuthorizationMiddleware(socketServer, {
-            baseURL: config.authupURL,
-            tokenVerifier: createAuthupTokenVerifier({
+            mountAuthorizationMiddleware(socketServer, {
                 baseURL: config.authupURL,
-                creator: createAuthupClientTokenCreator({
+                tokenVerifier: createAuthupTokenVerifier({
                     baseURL: config.authupURL,
-                    clientId: config.clientId,
-                    clientSecret: config.clientSecret,
-                    realm: config.realm,
+                    creator: createAuthupClientTokenCreator({
+                        baseURL: config.authupURL,
+                        clientId: config.clientId,
+                        clientSecret: config.clientSecret,
+                        realm: config.realm,
+                    }),
+                    redisClient: redisPublishResult.success ? redisPublishResult.data : undefined,
                 }),
-                redisClient: redisPublishResult.success ? redisPublishResult.data : undefined,
-            }),
-            logger,
-        });
+                logger,
+            });
 
-        registerControllers(socketServer, { logger });
+            registerControllers(socketServer, { logger });
 
-        logger.debug(`Socket.io server mounted on path: ${socketServer.path()}`);
+            logger.debug(`Socket.io server mounted on path: ${socketServer.path()}`);
 
-        container.register(HTTPInjectionKey.SocketServer, { useValue: socketServer });
+            container.register(HTTPInjectionKey.SocketServer, { useValue: socketServer });
+        } catch (e) {
+            await server.close().catch(() => undefined);
+            throw e;
+        }
     }
 
     async teardown(container: IContainer): Promise<void> {
@@ -107,17 +112,11 @@ export class HTTPModule implements IModule {
             await socketResult.data.close();
         }
 
-        const result = container.tryResolve(HTTPInjectionKey.Server);
-        if (result.success) {
-            await new Promise<void>((resolve, reject) => {
-                result.data.close((error?: Error | null) => {
-                    if (error) {
-                        reject(error);
-                        return;
-                    }
-                    resolve();
-                });
-            });
-        }
+        if (!this.instance) return;
+
+        container.unregister(HTTPInjectionKey.Server);
+
+        await this.instance.close();
+        this.instance = undefined;
     }
 }

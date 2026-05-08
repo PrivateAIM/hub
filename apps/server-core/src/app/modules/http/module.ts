@@ -7,8 +7,8 @@
 
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
-import http from 'node:http';
-import { Router, createNodeDispatcher } from 'routup';
+import type { Server } from 'node:http';
+import { Router, serve } from 'routup';
 import {
     AuthupClientInjectionKey,
     EnvironmentName,
@@ -29,6 +29,7 @@ import { createSocketServer } from '../../../adapters/socket/server.ts';
 import { ConfigInjectionKey } from '../config/constants.ts';
 import { TelemetryClientInjectionKey } from '../telemetry-client/constants.ts';
 import { createControllers } from './controller.ts';
+import type { HTTPServer } from './constants.ts';
 import { HTTPInjectionKey } from './constants.ts';
 import type { HTTPModuleOptions } from './types.ts';
 
@@ -38,6 +39,8 @@ export class HTTPModule implements IModule {
     readonly dependencies: string[] = ['config', 'database', 'analysis'];
 
     private options: HTTPModuleOptions;
+
+    private instance: HTTPServer | undefined;
 
     constructor(options: HTTPModuleOptions = {}) {
         this.options = options;
@@ -114,51 +117,47 @@ export class HTTPModule implements IModule {
         if (!this.options.skipServer) {
             logger.debug('Starting http server...');
 
-            const server = new http.Server(createNodeDispatcher(router));
-
-            await new Promise<void>((resolve, reject) => {
-                const errorHandler = (err?: null | Error) => {
-                    reject(err);
-                };
-
-                server.once('error', errorHandler);
-                server.once('listening', () => {
-                    server.removeListener('error', errorHandler);
-                    resolve();
-                });
-
-                server.listen(config.port, '0.0.0.0');
+            const server = serve(router, {
+                port: config.port,
+                hostname: '0.0.0.0',
+                silent: true,
+                gracefulShutdown: false,
             });
 
-            logger.debug(`Listening on 0.0.0.0:${config.port}.`);
+            try {
+                await server.ready();
 
-            container.register(HTTPInjectionKey.Server, { useValue: server });
+                this.instance = server;
 
-            if (this.options.socket) {
-                const redisPubResult = container.tryResolve(RedisPublishClientInjectionKey);
-                const redisSubResult2 = container.tryResolve(RedisSubscribeClientInjectionKey);
-                createSocketServer(server, {
-                    config,
-                    logger,
-                    redisPublishClient: redisPubResult.success ? redisPubResult.data : undefined,
-                    redisSubscribeClient: redisSubResult2.success ? redisSubResult2.data : undefined,
-                });
+                if (server.url) {
+                    logger.debug(`Listening on ${server.url}`);
+                }
+
+                container.register(HTTPInjectionKey.Server, { useValue: server });
+
+                if (this.options.socket) {
+                    const redisPubResult = container.tryResolve(RedisPublishClientInjectionKey);
+                    const redisSubResult2 = container.tryResolve(RedisSubscribeClientInjectionKey);
+                    createSocketServer(server.node!.server as Server, {
+                        config,
+                        logger,
+                        redisPublishClient: redisPubResult.success ? redisPubResult.data : undefined,
+                        redisSubscribeClient: redisSubResult2.success ? redisSubResult2.data : undefined,
+                    });
+                }
+            } catch (e) {
+                await server.close().catch(() => undefined);
+                throw e;
             }
         }
     }
 
     async teardown(container: IContainer): Promise<void> {
-        const result = container.tryResolve(HTTPInjectionKey.Server);
-        if (result.success) {
-            await new Promise<void>((resolve, reject) => {
-                result.data.close((error?: Error | null) => {
-                    if (error) {
-                        reject(error);
-                        return;
-                    }
-                    resolve();
-                });
-            });
-        }
+        if (!this.instance) return;
+
+        container.unregister(HTTPInjectionKey.Server);
+
+        await this.instance.close();
+        this.instance = undefined;
     }
 }

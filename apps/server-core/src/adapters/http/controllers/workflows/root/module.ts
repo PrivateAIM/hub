@@ -5,24 +5,37 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import path from 'node:path';
+import process from 'node:process';
 import {
-    DController, 
-    DGet, 
-    DRequest, 
-    DResponse, 
+    DController,
+    DGet,
     DTags,
 } from '@routup/decorators';
-import type { EndpointInfo } from './status/index.ts';
-import { useStatusRouteHandler } from './status/index.ts';
+import { load } from 'locter';
+
+type EndpointInfo = {
+    version: string,
+    timestamp: number,
+};
+
+let info : undefined | EndpointInfo;
 
 @DTags('root')
 @DController('')
 export class RootController {
     @DGet('/', [])
-    async status(
-        @DRequest() req: any,
-        @DResponse() res: any,
-    ): Promise<EndpointInfo> {
-        return useStatusRouteHandler(req, res);
+    async status(): Promise<EndpointInfo> {
+        if (typeof info === 'undefined') {
+            const pkgJson = await load(path.join(process.cwd(), 'package.json'));
+            info = {
+                version: pkgJson.version,
+                timestamp: Date.now(),
+            };
+        }
+
+        info.timestamp = Date.now();
+
+        return info;
     }
 }

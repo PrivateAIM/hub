@@ -6,7 +6,7 @@
  */
 
 import path from 'node:path';
-import { swaggerUI } from '@routup/swagger';
+import { swaggerUI } from '@routup/swagger-ui';
 import { loadSync } from 'locter';
 import process from 'node:process';
 import type { Router } from 'routup';

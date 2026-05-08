@@ -9,16 +9,14 @@ import type { RegistryAPICommand } from '@privateaim/core-kit';
 import { ServiceID } from '@privateaim/core-kit';
 import {
     DBody,
+    DContext,
     DController,
     DPost,
-    DRequest,
-    DResponse,
     DTags,
 } from '@routup/decorators';
 
 import { NotFoundError } from '@ebec/http';
-import type { Request, Response } from 'routup';
-import { sendAccepted, useRequestParam } from 'routup';
+import type { IRoutupEvent } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { IRegistryCaller } from '../../../../../core/harbor/types.ts';
 import type { IRegistryService } from '../../../../../core/index.ts';
@@ -43,11 +41,10 @@ export class ServiceController {
 
     @DPost('/:id/hook', [ForceLoggedInMiddleware])
     async handleHarborHook(
-        @DRequest() req: Request,
-        @DResponse() res: Response,
+        @DContext() event: IRoutupEvent,
         @DBody() data: Record<string, any>,
     ) {
-        const id = useRequestParam(req, 'id');
+        const { id } = event.params;
 
         if (id !== ServiceID.REGISTRY) {
             throw new NotFoundError();
@@ -55,28 +52,29 @@ export class ServiceController {
 
         await this.registryCaller.call('HOOK_PROCESS', data, {});
 
-        return sendAccepted(res);
+        event.response.status = 202;
+        return null;
     }
 
     @DPost('/:id/command', [ForceLoggedInMiddleware])
     async execHarborTask(
-        @DRequest() req: Request,
-        @DResponse() res: Response,
+        @DContext() event: IRoutupEvent,
         @DBody() data: {
-            command: RegistryAPICommand; 
-            id: string; 
-            secret?: string 
+            command: RegistryAPICommand;
+            id: string;
+            secret?: string
         },
     ) {
-        const id = useRequestParam(req, 'id');
+        const { id } = event.params;
 
         if (id !== ServiceID.REGISTRY) {
             throw new NotFoundError();
         }
 
-        const actor = buildActorContext(req);
+        const actor = buildActorContext(event);
         await this.registryService.executeCommand(data.command, data, actor);
 
-        return sendAccepted(res);
+        event.response.status = 202;
+        return null;
     }
 }

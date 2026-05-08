@@ -10,12 +10,8 @@ import process from 'node:process';
 import {
     DController,
     DGet,
-    DRequest,
-    DResponse,
 } from '@routup/decorators';
 import { load } from 'locter';
-import { send } from 'routup';
-import type { Request, Response } from 'routup';
 
 type StatusInfo = {
     version: string;
@@ -27,10 +23,7 @@ let info: StatusInfo | undefined;
 @DController('')
 export class RootController {
     @DGet('/', [])
-    async status(
-        @DRequest() req: Request,
-        @DResponse() res: Response,
-    ) {
+    async status() {
         if (!info) {
             const pkgJson = await load(path.join(process.cwd(), 'package.json'));
             info = { version: pkgJson.version, timestamp: Date.now() };
@@ -38,6 +31,6 @@ export class RootController {
 
         info.timestamp = Date.now();
 
-        return send(res, info);
+        return info;
     }
 }

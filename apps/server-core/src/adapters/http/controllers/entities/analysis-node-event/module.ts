@@ -7,14 +7,14 @@
 
 import type { AnalysisNodeEvent } from '@privateaim/core-kit';
 import {
+    DContext,
     DController,
     DGet,
     DPath,
-    DRequest,
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
-import type { Request } from 'routup';
+import type { IRoutupEvent } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { IAnalysisNodeEventService } from '../../../../../core/index.ts';
 
@@ -35,9 +35,9 @@ export class AnalysisNodeEventController {
 
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
-        @DRequest() req: Request,
+        @DContext() event: IRoutupEvent,
     ) {
-        const query = useRequestQuery(req);
+        const query = useRequestQuery(event);
         const { data, meta } = await this.service.getMany(query);
         return { data, meta };
     }

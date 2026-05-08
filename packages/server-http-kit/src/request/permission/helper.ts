@@ -5,17 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Request } from 'routup';
+import type { IRoutupEvent } from 'routup';
 import { BadRequestError } from '@ebec/http';
 import { setRequestEnv, useRequestEnv } from '../env';
 import type { RequestPermissionChecker } from './module';
 
-export function setRequestPermissionChecker(req: Request, checker: RequestPermissionChecker) {
-    setRequestEnv(req, 'permissionChecker', checker);
+export function setRequestPermissionChecker(event: IRoutupEvent, checker: RequestPermissionChecker) {
+    setRequestEnv(event, 'permissionChecker', checker);
 }
 
-export function useRequestPermissionChecker(req: Request) : RequestPermissionChecker {
-    const checker = useRequestEnv(req, 'permissionChecker');
+export function useRequestPermissionChecker(event: IRoutupEvent) : RequestPermissionChecker {
+    const checker = useRequestEnv(event, 'permissionChecker');
     if (!checker) {
         throw new BadRequestError('The request permission checker is not initialized.');
     }

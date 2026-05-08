@@ -8,17 +8,16 @@
 import type { ProjectNode } from '@privateaim/core-kit';
 import {
     DBody,
+    DContext,
     DController,
     DDelete,
     DGet,
     DPath,
     DPost,
-    DRequest,
-    DResponse,
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
-import type { Request, Response } from 'routup';
+import type { IRoutupEvent } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { IProjectNodeService } from '../../../../../core/index.ts';
 import { buildActorContext } from '../../../request/index.ts';
@@ -40,9 +39,9 @@ export class ProjectNodeController {
 
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
-        @DRequest() req: Request,
+        @DContext() event: IRoutupEvent,
     ) {
-        const query = useRequestQuery(req);
+        const query = useRequestQuery(event);
         const { data, meta } = await this.service.getMany(query);
         return { data, meta };
     }
@@ -50,12 +49,11 @@ export class ProjectNodeController {
     @DPost('', [ForceLoggedInMiddleware])
     async add(
         @DBody() data: any,
-        @DRequest() req: Request,
-        @DResponse() res: Response,
+        @DContext() event: IRoutupEvent,
     ): Promise<PartialProjectNode | undefined> {
-        const actor = buildActorContext(req);
+        const actor = buildActorContext(event);
         const entity = await this.service.create(data, actor);
-        res.statusCode = 201;
+        event.response.status = 201;
         return entity;
     }
 
@@ -70,24 +68,22 @@ export class ProjectNodeController {
     async edit(
         @DPath('id') id: string,
         @DBody() data: any,
-        @DRequest() req: Request,
-        @DResponse() res: Response,
+        @DContext() event: IRoutupEvent,
     ): Promise<PartialProjectNode | undefined> {
-        const actor = buildActorContext(req);
+        const actor = buildActorContext(event);
         const entity = await this.service.update(id, data, actor);
-        res.statusCode = 202;
+        event.response.status = 202;
         return entity;
     }
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @DPath('id') id: string,
-        @DRequest() req: Request,
-        @DResponse() res: Response,
+        @DContext() event: IRoutupEvent,
     ): Promise<PartialProjectNode | undefined> {
-        const actor = buildActorContext(req);
+        const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);
-        res.statusCode = 202;
+        event.response.status = 202;
         return entity;
     }
 }

@@ -7,8 +7,7 @@
 
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
-import http from 'node:http';
-import { Router, createNodeDispatcher } from 'routup';
+import { Router, serve } from 'routup';
 import {
     AuthupClientInjectionKey,
     EnvironmentName,
@@ -24,12 +23,15 @@ import {
 import type { MiddlewareSwaggerOptions } from '@privateaim/server-http-kit';
 import { ConfigInjectionKey } from '../config/constants.ts';
 import { createControllers } from './controller.ts';
+import type { HTTPServer } from './constants.ts';
 import { HTTPInjectionKey } from './constants.ts';
 
 export class HTTPModule implements IModule {
     readonly name = 'http';
 
     readonly dependencies: string[] = ['config', 'database', 'victoriaLogs'];
+
+    private instance: HTTPServer | undefined;
 
     async setup(container: IContainer): Promise<void> {
         const config = container.resolve(ConfigInjectionKey);
@@ -85,39 +87,35 @@ export class HTTPModule implements IModule {
 
         logger.debug('Starting http server...');
 
-        const server = new http.Server(createNodeDispatcher(router));
-
-        await new Promise<void>((resolve, reject) => {
-            const errorHandler = (err?: null | Error) => {
-                reject(err);
-            };
-
-            server.once('error', errorHandler);
-            server.once('listening', () => {
-                server.removeListener('error', errorHandler);
-                resolve();
-            });
-
-            server.listen(config.port, '0.0.0.0');
+        const server = serve(router, {
+            port: config.port,
+            hostname: '0.0.0.0',
+            silent: true,
+            gracefulShutdown: false,
         });
 
-        logger.debug(`Listening on 0.0.0.0:${config.port}.`);
+        try {
+            await server.ready();
 
-        container.register(HTTPInjectionKey.Server, { useValue: server });
+            this.instance = server;
+
+            if (server.url) {
+                logger.debug(`Listening on ${server.url}`);
+            }
+
+            container.register(HTTPInjectionKey.Server, { useValue: server });
+        } catch (e) {
+            await server.close().catch(() => undefined);
+            throw e;
+        }
     }
 
     async teardown(container: IContainer): Promise<void> {
-        const result = container.tryResolve(HTTPInjectionKey.Server);
-        if (result.success) {
-            await new Promise<void>((resolve, reject) => {
-                result.data.close((error?: Error | null) => {
-                    if (error) {
-                        reject(error);
-                        return;
-                    }
-                    resolve();
-                });
-            });
-        }
+        if (!this.instance) return;
+
+        container.unregister(HTTPInjectionKey.Server);
+
+        await this.instance.close();
+        this.instance = undefined;
     }
 }

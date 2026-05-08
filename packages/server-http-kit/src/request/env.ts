@@ -5,24 +5,23 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { setRequestEnv as setEnv, useRequestEnv as useEnv } from 'routup';
-import type { Request } from 'routup';
+import type { IRoutupEvent } from 'routup';
 import type { RequestEnv } from './types';
 
-export function useRequestEnv(req: Request) : RequestEnv;
-export function useRequestEnv<T extends keyof RequestEnv>(req: Request, key: T) : RequestEnv[T];
-export function useRequestEnv<T extends keyof RequestEnv>(req: Request, key?: T) {
+export function useRequestEnv(event: IRoutupEvent) : RequestEnv;
+export function useRequestEnv<T extends keyof RequestEnv>(event: IRoutupEvent, key: T) : RequestEnv[T];
+export function useRequestEnv<T extends keyof RequestEnv>(event: IRoutupEvent, key?: T) {
     if (typeof key === 'string') {
-        return useEnv(req, key) as RequestEnv[T];
+        return event.store[key] as RequestEnv[T];
     }
 
-    return useEnv(req);
+    return event.store as unknown as RequestEnv;
 }
 
 export function setRequestEnv<T extends keyof RequestEnv>(
-    req: Request,
+    event: IRoutupEvent,
     key: T,
     value: RequestEnv[T],
 ) {
-    return setEnv(req, key, value);
+    event.store[key] = value;
 }

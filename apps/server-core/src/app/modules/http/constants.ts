@@ -6,10 +6,11 @@
  */
 
 import { TypedToken } from 'eldin';
-import type { Server } from 'node:http';
-import type { Router } from 'routup';
+import type { Router, serve } from 'routup';
+
+export type HTTPServer = ReturnType<typeof serve>;
 
 export const HTTPInjectionKey = {
-    Server: new TypedToken<Server>('Server'),
+    Server: new TypedToken<HTTPServer>('Server'),
     Router: new TypedToken<Router>('Router'),
 } as const;
