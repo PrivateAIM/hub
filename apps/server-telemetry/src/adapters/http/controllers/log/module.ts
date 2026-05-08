@@ -7,6 +7,7 @@
 
 import { BadRequestError } from '@ebec/http';
 import { PermissionName, isObject } from '@privateaim/kit';
+import type { Log, LogInput } from '@privateaim/telemetry-kit';
 import { LogValidator } from '@privateaim/telemetry-kit';
 import {
     DBody,
@@ -34,9 +35,9 @@ export class LogController {
 
     @DPost('', [ForceLoggedInMiddleware])
     async create(
-        @DBody() body: any,
+        @DBody() body: LogInput,
         @DContext() event: IRoutupEvent,
-    ) {
+    ): Promise<Log> {
         const permissionChecker = useRequestPermissionChecker(event);
         await permissionChecker.preCheck({ name: PermissionName.LOG_CREATE });
 

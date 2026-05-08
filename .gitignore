@@ -100,3 +100,4 @@ sw.*
 
 .agents/plans
 .claude/settings.local.json
+apps/*/writable/swagger.json

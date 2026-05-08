@@ -7,13 +7,13 @@
 
 import type { Bucket } from '@privateaim/storage-kit';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
-import { PermissionName, isRealmResourceWritable } from '@privateaim/kit';
+import { PermissionName, ValidatorGroup, isRealmResourceWritable  } from '@privateaim/kit';
 import type { Client } from 'minio';
 import { toBucketName } from '../../utils/bucket-name.ts';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService, ValidatorGroup } from '@privateaim/server-kit';
+import { AbstractEntityService } from '@privateaim/server-kit';
 import type { IBucketCaller, IBucketRepository, IBucketService } from './types.ts';
-import { BucketValidator } from './validator.ts';
+import { BucketValidator } from '@privateaim/storage-kit';
 
 type BucketServiceContext = {
     repository: IBucketRepository;

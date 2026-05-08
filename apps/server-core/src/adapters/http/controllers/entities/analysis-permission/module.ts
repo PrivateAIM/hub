@@ -6,6 +6,7 @@
  */
 
 import type { AnalysisPermission } from '@privateaim/core-kit';
+import type { AnalysisPermissionCreatePayload } from '@privateaim/core-http-kit';
 import {
     DBody,
     DContext,
@@ -21,8 +22,6 @@ import type { IRoutupEvent } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { IAnalysisPermissionService } from '../../../../../core/index.ts';
 import { buildActorContext } from '../../../request/index.ts';
-
-type PartialAnalysisPermission = Partial<AnalysisPermission>;
 
 type AnalysisPermissionControllerContext = {
     service: IAnalysisPermissionService;
@@ -48,9 +47,9 @@ export class AnalysisPermissionController {
 
     @DPost('', [ForceLoggedInMiddleware])
     async add(
-        @DBody() data: any,
+        @DBody() data: AnalysisPermissionCreatePayload,
         @DContext() event: IRoutupEvent,
-    ): Promise<PartialAnalysisPermission | undefined> {
+    ): Promise<AnalysisPermission> {
         const actor = buildActorContext(event);
         const entity = await this.service.create(data, actor);
         event.response.status = 201;
@@ -60,7 +59,7 @@ export class AnalysisPermissionController {
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
-    ): Promise<PartialAnalysisPermission | undefined> {
+    ): Promise<AnalysisPermission> {
         return this.service.getOne(id);
     }
 
@@ -68,7 +67,7 @@ export class AnalysisPermissionController {
     async drop(
         @DPath('id') id: string,
         @DContext() event: IRoutupEvent,
-    ): Promise<PartialAnalysisPermission | undefined> {
+    ): Promise<AnalysisPermission> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);
         event.response.status = 202;

@@ -6,6 +6,7 @@
  */
 
 import type { Project } from '@privateaim/core-kit';
+import type { ProjectCreatePayload, ProjectUpdatePayload } from '@privateaim/core-http-kit';
 import {
     DBody,
     DContext,
@@ -21,8 +22,6 @@ import type { IRoutupEvent } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { IProjectService } from '../../../../../core/index.ts';
 import { buildActorContext } from '../../../request/index.ts';
-
-type PartialProject = Partial<Project>;
 
 type ProjectControllerContext = {
     service: IProjectService;
@@ -48,9 +47,9 @@ export class ProjectController {
 
     @DPost('', [ForceLoggedInMiddleware])
     async add(
-        @DBody() data: any,
+        @DBody() data: ProjectCreatePayload,
         @DContext() event: IRoutupEvent,
-    ): Promise<PartialProject | undefined> {
+    ): Promise<Project> {
         const actor = buildActorContext(event);
         const entity = await this.service.create(data, actor);
         event.response.status = 201;
@@ -61,7 +60,7 @@ export class ProjectController {
     async getOne(
         @DPath('id') id: string,
         @DContext() event: IRoutupEvent,
-    ): Promise<PartialProject | undefined> {
+    ): Promise<Project> {
         const query = useRequestQuery(event);
         return this.service.getOne(id, Object.keys(query).length > 0 ? query : undefined);
     }
@@ -69,9 +68,9 @@ export class ProjectController {
     @DPost('/:id', [ForceLoggedInMiddleware])
     async edit(
         @DPath('id') id: string,
-        @DBody() data: any,
+        @DBody() data: ProjectUpdatePayload,
         @DContext() event: IRoutupEvent,
-    ): Promise<PartialProject | undefined> {
+    ): Promise<Project> {
         const actor = buildActorContext(event);
         const entity = await this.service.update(id, data, actor);
         event.response.status = 202;
@@ -82,7 +81,7 @@ export class ProjectController {
     async drop(
         @DPath('id') id: string,
         @DContext() event: IRoutupEvent,
-    ): Promise<PartialProject | undefined> {
+    ): Promise<Project> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);
         event.response.status = 202;

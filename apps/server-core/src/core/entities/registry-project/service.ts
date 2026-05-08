@@ -8,15 +8,16 @@
 import type { Node, RegistryProject } from '@privateaim/core-kit';
 import {
     PermissionName,
-    isPropertySet,
-    isRealmResourceWritable,
+    ValidatorGroup,
+    isPropertySet, 
+    isRealmResourceWritable, 
 } from '@privateaim/kit';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
-import { AbstractEntityService, ValidatorGroup } from '@privateaim/server-kit';
+import { AbstractEntityService } from '@privateaim/server-kit';
 import type { IRegistryManager } from '../node/types.ts';
 import type { IRegistryProjectRepository, IRegistryProjectService } from './types.ts';
-import { RegistryProjectValidator } from './validator.ts';
+import { RegistryProjectValidator } from '@privateaim/core-kit';
 
 type RegistryProjectServiceContext = {
     repository: IRegistryProjectRepository;

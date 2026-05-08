@@ -8,4 +8,3 @@
 export * from './constants';
 export * from './middlewares';
 export * from './request';
-export * from './swagger';

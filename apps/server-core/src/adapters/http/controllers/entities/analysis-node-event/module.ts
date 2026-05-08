@@ -18,8 +18,6 @@ import type { IRoutupEvent } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { IAnalysisNodeEventService } from '../../../../../core/index.ts';
 
-type PartialAnalysisNodeEvent = Partial<AnalysisNodeEvent>;
-
 type AnalysisNodeEventControllerContext = {
     service: IAnalysisNodeEventService;
 };
@@ -45,7 +43,7 @@ export class AnalysisNodeEventController {
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
-    ): Promise<PartialAnalysisNodeEvent | undefined> {
+    ): Promise<AnalysisNodeEvent> {
         return this.service.getOne(id);
     }
 }

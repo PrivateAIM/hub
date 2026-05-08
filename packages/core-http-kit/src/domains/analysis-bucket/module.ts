@@ -10,6 +10,7 @@ import { buildQuery } from 'rapiq';
 import type { AnalysisBucket } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
+import type { AnalysisBucketCreatePayload } from './types';
 
 export class AnalysisBucketAPI extends BaseAPI {
     async getMany(
@@ -28,7 +29,7 @@ export class AnalysisBucketAPI extends BaseAPI {
         return response.data;
     }
 
-    async create(data: Partial<AnalysisBucket>): Promise<SingleResourceResponse<AnalysisBucket>> {
+    async create(data: AnalysisBucketCreatePayload): Promise<SingleResourceResponse<AnalysisBucket>> {
         const { data: response } = await this.client.post('analysis-buckets', data);
 
         return response;

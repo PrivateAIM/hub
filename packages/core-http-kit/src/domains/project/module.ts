@@ -11,6 +11,7 @@ import type { Project } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
 import { nullifyEmptyObjectProperties } from '../../utils';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
+import type { ProjectCreatePayload, ProjectUpdatePayload } from './types';
 
 export class ProjectAPI extends BaseAPI {
     async getMany(record?: BuildInput<Project>): Promise<CollectionResourceResponse<Project>> {
@@ -24,7 +25,7 @@ export class ProjectAPI extends BaseAPI {
         return response.data;
     }
 
-    async create(data: Partial<Project>): Promise<SingleResourceResponse<Project>> {
+    async create(data: ProjectCreatePayload): Promise<SingleResourceResponse<Project>> {
         const response = await this.client.post('projects', nullifyEmptyObjectProperties(data));
 
         return response.data;
@@ -35,7 +36,7 @@ export class ProjectAPI extends BaseAPI {
         return response.data;
     }
 
-    async update(id: Project['id'], data: Record<string, any>): Promise<SingleResourceResponse<Project>> {
+    async update(id: Project['id'], data: ProjectUpdatePayload): Promise<SingleResourceResponse<Project>> {
         const response = await this.client.post(`projects/${id}`, nullifyEmptyObjectProperties(data));
         return response.data;
     }

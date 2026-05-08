@@ -9,3 +9,5 @@ export * from './entity';
 export * from './error';
 export * from './helpers';
 export * from './constants';
+export * from './validator';
+export * from './validator-image-command-argument';

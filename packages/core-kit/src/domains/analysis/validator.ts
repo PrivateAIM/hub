@@ -7,9 +7,10 @@
 
 import { BadRequestError } from '@ebec/http';
 import { Container } from 'validup';
-import { createValidationChain, createValidator } from '@validup/adapter-validator';
-import type { Analysis } from '@privateaim/core-kit';
-import { ValidatorGroup } from '@privateaim/server-kit';
+import { createValidator } from '@validup/adapter-zod';
+import { z } from 'zod';
+import type { Analysis } from './entity.ts';
+import { ValidatorGroup } from '@privateaim/kit';
 import { ImageAttributeCommandArgumentsValidator } from './validator-image-command-argument.ts';
 
 export class AnalysisValidator extends Container<Analysis> {
@@ -19,59 +20,31 @@ export class AnalysisValidator extends Container<Analysis> {
         this.mount(
             'project_id',
             { group: ValidatorGroup.CREATE },
-            createValidator(() => {
-                const chain = createValidationChain();
-                return chain
-                    .exists()
-                    .notEmpty()
-                    .isUUID();
-            }),
+            createValidator(z.uuid()),
         );
 
         this.mount(
             'name',
             { optional: true },
-            createValidator(() => {
-                const chain = createValidationChain();
-                return chain
-                    .isString()
-                    .isLength({ min: 3, max: 128 })
-                    .optional({ values: 'null' });
-            }),
+            createValidator(z.string().min(3).max(128).nullable()),
         );
 
         this.mount(
             'description',
             { optional: true },
-            createValidator(() => {
-                const chain = createValidationChain();
-                return chain
-                    .isString()
-                    .isLength({ min: 5, max: 4096 })
-                    .optional({ values: 'null' });
-            }),
+            createValidator(z.string().min(5).max(4096).nullable()),
         );
 
         this.mount(
             'master_image_id',
             { optional: true },
-            createValidator(() => {
-                const chain = createValidationChain();
-                return chain
-                    .isUUID()
-                    .optional({ values: 'null' });
-            }),
+            createValidator(z.uuid().nullable()),
         );
 
         this.mount(
             'registry_id',
             { optional: true },
-            createValidator(() => {
-                const chain = createValidationChain();
-                return chain
-                    .isUUID()
-                    .optional({ values: 'null' });
-            }),
+            createValidator(z.uuid().nullable()),
         );
 
         const commandArgumentValidator = new ImageAttributeCommandArgumentsValidator();

@@ -10,6 +10,7 @@ import { buildQuery } from 'rapiq';
 import type { AnalysisPermission } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
+import type { AnalysisPermissionCreatePayload } from './types';
 
 export class AnalysisPermissionAPI extends BaseAPI {
     async getMany(options?: BuildInput<AnalysisPermission>): Promise<CollectionResourceResponse<AnalysisPermission>> {
@@ -29,13 +30,13 @@ export class AnalysisPermissionAPI extends BaseAPI {
         return response;
     }
 
-    async update(id: AnalysisPermission['id'], data: Partial<AnalysisPermission>): Promise<SingleResourceResponse<AnalysisPermission>> {
+    async update(id: AnalysisPermission['id'], data: Partial<AnalysisPermissionCreatePayload>): Promise<SingleResourceResponse<AnalysisPermission>> {
         const { data: response } = await this.client.post(`analysis-permissions/${id}`, data);
 
         return response;
     }
 
-    async create(data: Partial<AnalysisPermission>): Promise<SingleResourceResponse<AnalysisPermission>> {
+    async create(data: AnalysisPermissionCreatePayload): Promise<SingleResourceResponse<AnalysisPermission>> {
         const { data: response } = await this.client.post('analysis-permissions', data);
 
         return response;

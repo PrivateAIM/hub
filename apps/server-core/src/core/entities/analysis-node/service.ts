@@ -6,18 +6,18 @@
  */
 
 import type { AnalysisNode } from '@privateaim/core-kit';
-import { AnalysisNodeApprovalStatus, NodeType } from '@privateaim/core-kit';
+import { AnalysisNodeApprovalStatus, AnalysisNodeValidator, NodeType  } from '@privateaim/core-kit';
 import {
     PermissionName,
-    isRealmResourceWritable,
+    ValidatorGroup, 
+    isRealmResourceWritable, 
 } from '@privateaim/kit';
 import { isPropertySet } from '@authup/kit';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService, ValidatorGroup } from '@privateaim/server-kit';
+import { AbstractEntityService } from '@privateaim/server-kit';
 import type { IProjectNodeRepository } from '../project-node/types.ts';
 import type { IAnalysisNodeMetadataRecalculator, IAnalysisNodeRepository, IAnalysisNodeService } from './types.ts';
-import { AnalysisNodeValidator } from './validator.ts';
 
 type AnalysisNodeServiceContext = {
     repository: IAnalysisNodeRepository;

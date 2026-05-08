@@ -11,6 +11,7 @@ import type { Node } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
 import { nullifyEmptyObjectProperties } from '../../utils';
+import type { NodeCreatePayload, NodeUpdatePayload } from './types';
 
 export class NodeAPI extends BaseAPI {
     async getMany(options?: BuildInput<Node>): Promise<CollectionResourceResponse<Node>> {
@@ -25,13 +26,13 @@ export class NodeAPI extends BaseAPI {
         return response.data;
     }
 
-    async create(data: Record<string, any>): Promise<SingleResourceResponse<Node>> {
+    async create(data: NodeCreatePayload): Promise<SingleResourceResponse<Node>> {
         const response = await this.client.post('nodes', nullifyEmptyObjectProperties(data));
 
         return response.data;
     }
 
-    async update(id: Node['id'], data: Record<string, any>): Promise<SingleResourceResponse<Node>> {
+    async update(id: Node['id'], data: NodeUpdatePayload): Promise<SingleResourceResponse<Node>> {
         const response = await this.client.post(`nodes/${id}`, nullifyEmptyObjectProperties(data));
 
         return response.data;

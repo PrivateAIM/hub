@@ -6,6 +6,7 @@
  */
 
 import type { AnalysisBucket } from '@privateaim/core-kit';
+import type { AnalysisBucketCreatePayload } from '@privateaim/core-http-kit';
 import {
     DBody,
     DContext,
@@ -21,8 +22,6 @@ import type { IRoutupEvent } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { IAnalysisBucketService } from '../../../../../core/index.ts';
 import { buildActorContext } from '../../../request/index.ts';
-
-type PartialAnalysisBucket = Partial<AnalysisBucket>;
 
 type AnalysisBucketControllerContext = {
     service: IAnalysisBucketService;
@@ -49,15 +48,15 @@ export class AnalysisBucketController {
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
-    ): Promise<PartialAnalysisBucket | undefined> {
+    ): Promise<AnalysisBucket> {
         return this.service.getOne(id);
     }
 
     @DPost('', [ForceLoggedInMiddleware])
     async add(
-        @DBody() data: any,
+        @DBody() data: AnalysisBucketCreatePayload,
         @DContext() event: IRoutupEvent,
-    ): Promise<PartialAnalysisBucket | undefined> {
+    ): Promise<AnalysisBucket> {
         const actor = buildActorContext(event);
         const entity = await this.service.create(data, actor);
         event.response.status = 201;
@@ -67,9 +66,9 @@ export class AnalysisBucketController {
     @DPost('/:id', [ForceLoggedInMiddleware])
     async edit(
         @DPath('id') id: string,
-        @DBody() data: any,
+        @DBody() data: Partial<AnalysisBucketCreatePayload>,
         @DContext() event: IRoutupEvent,
-    ): Promise<PartialAnalysisBucket | undefined> {
+    ): Promise<AnalysisBucket> {
         const actor = buildActorContext(event);
         const entity = await this.service.update(id, data, actor);
         event.response.status = 202;
@@ -80,7 +79,7 @@ export class AnalysisBucketController {
     async drop(
         @DPath('id') id: string,
         @DContext() event: IRoutupEvent,
-    ): Promise<PartialAnalysisBucket | undefined> {
+    ): Promise<AnalysisBucket> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);
         event.response.status = 202;

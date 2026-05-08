@@ -6,6 +6,7 @@
  */
 
 import type { Analysis, AnalysisCommand } from '@privateaim/core-kit';
+import type { AnalysisCreatePayload, AnalysisUpdatePayload } from '@privateaim/core-http-kit';
 import {
     DBody,
     DContext,
@@ -21,8 +22,6 @@ import type { IRoutupEvent } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { IAnalysisService } from '../../../../../core/index.ts';
 import { buildActorContext } from '../../../request/index.ts';
-
-type PartialAnalysis = Partial<Analysis>;
 
 type AnalysisControllerContext = {
     service: IAnalysisService;
@@ -49,15 +48,15 @@ export class AnalysisController {
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
-    ): Promise<PartialAnalysis | undefined> {
+    ): Promise<Analysis> {
         return this.service.getOne(id);
     }
 
     @DPost('', [ForceLoggedInMiddleware])
     async add(
-        @DBody() data: any,
+        @DBody() data: AnalysisCreatePayload,
         @DContext() event: IRoutupEvent,
-    ): Promise<PartialAnalysis | undefined> {
+    ): Promise<Analysis> {
         const actor = buildActorContext(event);
         const entity = await this.service.create(data, actor);
         event.response.status = 201;
@@ -67,9 +66,9 @@ export class AnalysisController {
     @DPost('/:id', [ForceLoggedInMiddleware])
     async edit(
         @DPath('id') id: string,
-        @DBody() data: any,
+        @DBody() data: AnalysisUpdatePayload,
         @DContext() event: IRoutupEvent,
-    ): Promise<PartialAnalysis | undefined> {
+    ): Promise<Analysis> {
         const actor = buildActorContext(event);
         const entity = await this.service.update(id, data, actor);
         event.response.status = 202;
@@ -81,7 +80,7 @@ export class AnalysisController {
         @DPath('id') id: string,
         @DBody() data: { command: AnalysisCommand },
         @DContext() event: IRoutupEvent,
-    ): Promise<PartialAnalysis | undefined> {
+    ): Promise<Analysis> {
         const actor = buildActorContext(event);
         const entity = await this.service.executeCommand(id, data.command, actor);
         event.response.status = 202;
@@ -92,7 +91,7 @@ export class AnalysisController {
     async drop(
         @DPath('id') id: string,
         @DContext() event: IRoutupEvent,
-    ): Promise<PartialAnalysis | undefined> {
+    ): Promise<Analysis> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);
         event.response.status = 202;

@@ -12,6 +12,7 @@ import type { CollectionResourceResponse, SingleResourceResponse } from '../type
 import { BaseAPI } from '../base';
 import type { BucketFile } from '../bucket-file';
 import type { Bucket } from './entity';
+import type { BucketCreatePayload } from './types';
 
 export class BucketAPI extends BaseAPI {
     async getMany(record?: BuildInput<Bucket>): Promise<CollectionResourceResponse<Bucket>> {
@@ -25,7 +26,7 @@ export class BucketAPI extends BaseAPI {
         return response.data;
     }
 
-    async create(data: Record<string, any>): Promise<SingleResourceResponse<Bucket>> {
+    async create(data: BucketCreatePayload): Promise<SingleResourceResponse<Bucket>> {
         const response = await this.client.post('buckets', nullifyEmptyObjectProperties(data));
 
         return response.data;
@@ -36,7 +37,7 @@ export class BucketAPI extends BaseAPI {
         return response.data;
     }
 
-    async update(id: Bucket['id'], data: Record<string, any>): Promise<SingleResourceResponse<Bucket>> {
+    async update(id: Bucket['id'], data: Partial<BucketCreatePayload>): Promise<SingleResourceResponse<Bucket>> {
         const response = await this.client.post(`buckets/${id}`, nullifyEmptyObjectProperties(data));
         return response.data;
     }

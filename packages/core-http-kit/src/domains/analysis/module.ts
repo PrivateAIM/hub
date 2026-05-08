@@ -12,6 +12,7 @@ import type { Analysis, AnalysisCommand } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
 import { nullifyEmptyObjectProperties } from '../../utils';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
+import type { AnalysisCreatePayload, AnalysisUpdatePayload } from './types';
 
 export class AnalysisAPI extends BaseAPI {
     // todo: we properly don't need this anymore
@@ -61,13 +62,13 @@ export class AnalysisAPI extends BaseAPI {
         return response;
     }
 
-    async update(id: Analysis['id'], data: Partial<Analysis>): Promise<SingleResourceResponse<Analysis>> {
+    async update(id: Analysis['id'], data: AnalysisUpdatePayload): Promise<SingleResourceResponse<Analysis>> {
         const { data: response } = await this.client.post(`analyses/${id}`, nullifyEmptyObjectProperties(data));
 
         return response;
     }
 
-    async create(data: Partial<Analysis>): Promise<SingleResourceResponse<Analysis>> {
+    async create(data: AnalysisCreatePayload): Promise<SingleResourceResponse<Analysis>> {
         const { data: response } = await this.client.post('analyses', nullifyEmptyObjectProperties(data));
 
         return response;

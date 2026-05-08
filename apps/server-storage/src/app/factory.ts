@@ -23,7 +23,6 @@ import {
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import { MinioModule } from './modules/minio/index.ts';
 import { HTTPModule } from './modules/http/index.ts';
-import { SwaggerModule } from './modules/swagger/index.ts';
 import { ComponentsModule } from './modules/components/index.ts';
 import { ServerStorageApplicationBuilder } from './builder.ts';
 
@@ -88,7 +87,6 @@ export function createApplication() {
 
     app.addModule(new MinioModule());
     app.addModule(new HTTPModule());
-    app.addModule(new SwaggerModule());
     app.addModule(new ComponentsModule());
 
     return app;

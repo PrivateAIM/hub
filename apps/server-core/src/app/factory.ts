@@ -26,7 +26,6 @@ import { AggregatorsModule } from './modules/aggregators/index.ts';
 import { AnalysisModule } from './modules/analysis/index.ts';
 import { ComponentsModule } from './modules/components/index.ts';
 import { HarborModule } from './modules/harbor/index.ts';
-import { SwaggerModule } from './modules/swagger/index.ts';
 import { AuthupModule } from './modules/authup/index.ts';
 import { TelemetryClientModule } from './modules/telemetry-client/index.ts';
 
@@ -91,7 +90,6 @@ export function createApplication() {
     app = builder.build();
 
     app.addModule(new TelemetryClientModule());
-    app.addModule(new SwaggerModule());
     app.addModule(new HarborModule());
     app.addModule(new ComponentsModule());
     app.addModule(new AnalysisModule());

@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { Bucket, BucketCreatePayload } from '@privateaim/storage-kit';
 import type { Logger } from '@privateaim/server-kit';
 import type { BucketFileEventCaller } from '@privateaim/server-storage-kit';
 import {
@@ -115,7 +116,7 @@ export class BucketController {
     async getOne(
         @DPath('id') id: string,
         @DContext() event: IRoutupEvent,
-    ) {
+    ): Promise<Bucket> {
         const query = useRequestQuery(event);
         return this.service.getOne(id, Object.keys(query).length > 0 ? query : undefined);
     }
@@ -123,9 +124,9 @@ export class BucketController {
     @DPost('/:id', [ForceLoggedInMiddleware])
     async update(
         @DPath('id') id: string,
-        @DBody() data: any,
+        @DBody() data: Partial<BucketCreatePayload>,
         @DContext() event: IRoutupEvent,
-    ) {
+    ): Promise<Bucket> {
         const actor = buildActorContext(event);
         const entity = await this.service.update(id, data, actor);
         event.response.status = 202;
@@ -134,9 +135,9 @@ export class BucketController {
 
     @DPost('', [ForceLoggedInMiddleware])
     async add(
-        @DBody() data: any,
+        @DBody() data: BucketCreatePayload,
         @DContext() event: IRoutupEvent,
-    ) {
+    ): Promise<Bucket> {
         const actor = buildActorContext(event);
         const entity = await this.service.create(data, actor);
         event.response.status = 201;
@@ -147,7 +148,7 @@ export class BucketController {
     async drop(
         @DPath('id') id: string,
         @DContext() event: IRoutupEvent,
-    ) {
+    ): Promise<Bucket> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);
         event.response.status = 202;

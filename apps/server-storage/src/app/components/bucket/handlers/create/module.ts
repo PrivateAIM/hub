@@ -11,14 +11,13 @@ import {
     BucketCommand,
     BucketEvent,
 } from '@privateaim/server-storage-kit';
-import { DomainType } from '@privateaim/storage-kit';
+import { BucketValidator, DomainType  } from '@privateaim/storage-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import { useDataSource } from 'typeorm-extension';
 import type { Client } from 'minio';
 import { BucketEntity } from '../../../../../adapters/database/index.ts';
 import { toBucketName } from '../../../../domains/bucket/utils.ts';
-import { ValidatorGroup } from '@privateaim/server-kit';
-import { BucketValidator } from '../../../../../core/entities/index.ts';
+import { ValidatorGroup } from '@privateaim/kit';
 
 export class BucketCreateHandler implements ComponentHandler<
     BucketComponentEventMap,

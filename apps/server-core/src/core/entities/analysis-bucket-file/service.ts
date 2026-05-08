@@ -6,12 +6,12 @@
  */
 
 import type { AnalysisBucketFile } from '@privateaim/core-kit';
-import { isRealmResourceWritable } from '@privateaim/kit';
+import { ValidatorGroup, isRealmResourceWritable  } from '@privateaim/kit';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService, ValidatorGroup } from '@privateaim/server-kit';
+import { AbstractEntityService } from '@privateaim/server-kit';
 import type { IAnalysisBucketFileRepository, IAnalysisBucketFileService, IAnalysisFileMetadataRecalculator } from './types.ts';
-import { AnalysisBucketFileValidator } from './validator.ts';
+import { AnalysisBucketFileValidator } from '@privateaim/core-kit';
 
 type AnalysisBucketFileServiceContext = {
     repository: IAnalysisBucketFileRepository;

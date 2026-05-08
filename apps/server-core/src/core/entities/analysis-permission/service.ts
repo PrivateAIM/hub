@@ -8,13 +8,14 @@
 import type { AnalysisPermission } from '@privateaim/core-kit';
 import {
     PermissionName,
-    isRealmResourceWritable,
+    ValidatorGroup, 
+    isRealmResourceWritable, 
 } from '@privateaim/kit';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService, ValidatorGroup } from '@privateaim/server-kit';
+import { AbstractEntityService } from '@privateaim/server-kit';
 import type { IAnalysisPermissionRepository, IAnalysisPermissionService } from './types.ts';
-import { AnalysisPermissionValidator } from './validator.ts';
+import { AnalysisPermissionValidator } from '@privateaim/core-kit';
 
 type AnalysisPermissionServiceContext = {
     repository: IAnalysisPermissionRepository;

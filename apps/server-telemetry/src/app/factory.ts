@@ -18,7 +18,6 @@ import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import { LogComponentWriteHandler } from './components/log/handlers/index.ts';
 import { VictoriaLogsModule } from './modules/victoria-logs/index.ts';
 import { HTTPModule } from './modules/http/index.ts';
-import { SwaggerModule } from './modules/swagger/index.ts';
 import { ComponentsModule } from './modules/components/index.ts';
 import { ServerTelemetryApplicationBuilder } from './builder.ts';
 
@@ -80,7 +79,6 @@ export function createApplication() {
 
     app.addModule(new VictoriaLogsModule());
     app.addModule(new HTTPModule());
-    app.addModule(new SwaggerModule());
     app.addModule(new ComponentsModule());
 
     return app;

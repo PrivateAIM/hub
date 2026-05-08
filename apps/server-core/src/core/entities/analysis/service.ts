@@ -6,23 +6,23 @@
  */
 
 import type { Analysis } from '@privateaim/core-kit';
-import { AnalysisCommand } from '@privateaim/core-kit';
+import { AnalysisCommand, AnalysisValidator  } from '@privateaim/core-kit';
 import { BuiltInPolicyType, PolicyData } from '@authup/access';
 import {
     PermissionName,
-    isRealmResourceWritable,
+    ValidatorGroup, 
+    isRealmResourceWritable, 
 } from '@privateaim/kit';
 import { isPropertySet } from '@authup/kit';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService, ValidatorGroup } from '@privateaim/server-kit';
+import { AbstractEntityService } from '@privateaim/server-kit';
 import type { IProjectRepository } from '../project/types.ts';
 import type { AnalysisBuilder } from '../../services/analysis-builder/index.ts';
 import type { AnalysisConfigurator } from '../../services/analysis-configurator/index.ts';
 import type { AnalysisDistributor } from '../../services/analysis-distributor/index.ts';
 import type { AnalysisStorageManager } from '../../services/analysis-storage-manager/index.ts';
 import type { IAnalysisMetadataRecalculator, IAnalysisRepository, IAnalysisService } from './types.ts';
-import { AnalysisValidator } from './validator.ts';
 
 type AnalysisServiceContext = {
     repository: IAnalysisRepository;

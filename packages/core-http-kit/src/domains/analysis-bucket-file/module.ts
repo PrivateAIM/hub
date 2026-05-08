@@ -11,6 +11,7 @@ import type { AnalysisBucketFile } from '@privateaim/core-kit';
 import { nullifyEmptyObjectProperties } from '../../utils';
 import { BaseAPI } from '../base';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
+import type { AnalysisBucketFileCreatePayload, AnalysisBucketFileUpdatePayload } from './types';
 
 export class AnalysisBucketFileAPI extends BaseAPI {
     async getMany(
@@ -37,13 +38,13 @@ export class AnalysisBucketFileAPI extends BaseAPI {
         return response.data;
     }
 
-    async update(id: AnalysisBucketFile['id'], data: Partial<AnalysisBucketFile>): Promise<SingleResourceResponse<AnalysisBucketFile>> {
+    async update(id: AnalysisBucketFile['id'], data: AnalysisBucketFileUpdatePayload): Promise<SingleResourceResponse<AnalysisBucketFile>> {
         const { data: response } = await this.client.post(`analysis-bucket-files/${id}`, nullifyEmptyObjectProperties(data));
 
         return response;
     }
 
-    async create(data: Partial<AnalysisBucketFile>): Promise<SingleResourceResponse<AnalysisBucketFile>> {
+    async create(data: AnalysisBucketFileCreatePayload): Promise<SingleResourceResponse<AnalysisBucketFile>> {
         const { data: response } = await this.client.post('analysis-bucket-files', nullifyEmptyObjectProperties(data));
 
         return response;
