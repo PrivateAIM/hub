@@ -8,8 +8,6 @@
 import path from 'node:path';
 import { load } from 'locter';
 import process from 'node:process';
-import { send } from 'routup';
-import type { Request, Response } from 'routup';
 
 export type EndpointInfo = {
     version: string,
@@ -32,9 +30,9 @@ export async function useInfo() {
 
     return info;
 }
-export async function useStatusRouteHandler(req: Request, res: Response) : Promise<any> {
+export async function useStatusRouteHandler() : Promise<any> {
     const status = await useInfo();
     status.timestamp = Date.now();
 
-    return send(res, status);
+    return status;
 }

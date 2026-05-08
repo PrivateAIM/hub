@@ -9,20 +9,18 @@ import { BadRequestError } from '@ebec/http';
 import { PermissionName, isObject } from '@privateaim/kit';
 import { LogValidator } from '@privateaim/telemetry-kit';
 import {
+    DContext,
     DController,
     DDelete,
     DGet,
     DPost,
-    DRequest,
-    DResponse,
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
+import { readRequestBody } from '@routup/basic/body';
 import { ForceLoggedInMiddleware, useRequestPermissionChecker } from '@privateaim/server-http-kit';
-import { RoutupContainerAdapter } from '@validup/adapter-routup';
 import { parseQueryPagination } from 'rapiq';
-import type { Request, Response } from 'routup';
-import { sendAccepted } from 'routup';
+import type { IRoutupEvent } from 'routup';
 import type { LogStore } from '../../../../core/services/log-store/types.ts';
 
 @DTags('logs')
@@ -36,27 +34,26 @@ export class LogController {
 
     @DPost('', [ForceLoggedInMiddleware])
     async create(
-        @DRequest() req: Request,
-        @DResponse() res: Response,
+        @DContext() event: IRoutupEvent,
     ) {
-        const permissionChecker = useRequestPermissionChecker(req);
+        const permissionChecker = useRequestPermissionChecker(event);
         await permissionChecker.preCheck({ name: PermissionName.LOG_CREATE });
 
         const validator = new LogValidator();
-        const validatorAdapter = new RoutupContainerAdapter(validator);
-        const data = await validatorAdapter.run(req);
+        const body = await readRequestBody(event);
+        const data = await validator.run(body);
 
         const entity = await this.logStore.write(data);
 
-        res.statusCode = 201;
+        event.response.status = 201;
         return entity;
     }
 
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
-        @DRequest() req: Request,
+        @DContext() event: IRoutupEvent,
     ) {
-        const permissionChecker = useRequestPermissionChecker(req);
+        const permissionChecker = useRequestPermissionChecker(event);
         await permissionChecker.preCheckOneOf({
             name: [
                 PermissionName.LOG_READ,
@@ -65,7 +62,7 @@ export class LogController {
         });
 
         const labels: Record<string, string> = {};
-        const filtersRaw = useRequestQuery(req, 'filter');
+        const filtersRaw = useRequestQuery(event, 'filter');
         if (isObject(filtersRaw)) {
             const keys = Object.keys(filtersRaw);
             for (const key of keys) {
@@ -91,7 +88,7 @@ export class LogController {
             throw new BadRequestError('Filter labels must be specified.');
         }
 
-        const paginationRaw = useRequestQuery(req, 'pagination');
+        const paginationRaw = useRequestQuery(event, 'pagination');
         const pagination = parseQueryPagination(paginationRaw, { maxLimit: 100 });
 
         const limit = pagination.limit || 100;
@@ -116,16 +113,15 @@ export class LogController {
 
     @DDelete('', [ForceLoggedInMiddleware])
     async deleteMany(
-        @DRequest() req: Request,
-        @DResponse() res: Response,
+        @DContext() event: IRoutupEvent,
     ) {
-        const permissionChecker = useRequestPermissionChecker(req);
+        const permissionChecker = useRequestPermissionChecker(event);
         await permissionChecker.preCheck({ name: PermissionName.LOG_DELETE });
 
         let start : number | undefined;
         const labels : Record<string, string> = {};
 
-        const raw = useRequestQuery(req, 'filter');
+        const raw = useRequestQuery(event, 'filter');
         if (isObject(raw)) {
             if (typeof raw.time !== 'undefined') {
                 const parsed = typeof raw.time === 'string' ? Number(raw.time) : raw.time;
@@ -164,6 +160,7 @@ export class LogController {
             labels,
         });
 
-        return sendAccepted(res);
+        event.response.status = 202;
+        return undefined;
     }
 }

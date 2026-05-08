@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { Readable } from 'node:stream';
 import type { Logger } from '@privateaim/server-kit';
-import type { Response } from 'routup';
 import type { Pack } from 'tar-stream';
 import tar from 'tar-stream';
 import type { Client } from 'minio';
@@ -44,25 +44,29 @@ async function packFile(
 }
 
 export async function packBucketFiles(
-    res: Response,
     name: string,
     files: BucketFileEntity[],
     minio: Client,
     logger?: Logger,
-) {
-    return new Promise<void>((resolve, reject) => {
-        const pack = tar.pack();
-        pack.pipe(res);
-        pack.on('error', (err) => {
-            reject(err);
-        });
+) : Promise<Response> {
+    const pack = tar.pack();
 
-        files.reduce(
-            (prev, file) => prev.then(() => packFile(pack, name, file, minio, logger)),
-            Promise.resolve(),
-        )
-            .then(() => pack.finalize())
-            .then(() => resolve())
-            .catch((e) => reject(e));
+    const promise = files.reduce(
+        (prev, file) => prev.then(() => packFile(pack, name, file, minio, logger)),
+        Promise.resolve(),
+    );
+
+    promise
+        .then(() => pack.finalize())
+        .catch(() => pack.destroy());
+
+    const webStream = Readable.toWeb(pack) as ReadableStream;
+
+    return new Response(webStream, {
+        status: 200,
+        headers: {
+            'Content-Type': 'application/x-tar',
+            'Transfer-Encoding': 'chunked',
+        },
     });
 }

@@ -5,15 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import cors from 'cors';
-import { coreHandler } from 'routup';
+import { cors } from '@routup/cors';
 import type { Router } from 'routup';
 
 export function mountCorsMiddleware(router: Router) {
-    router.use(coreHandler((req, res, next) => cors({
-        origin(origin, callback) {
-            callback(null, true);
-        },
+    router.use(cors({
+        origin: true,
         credentials: true,
-    })(req, res, next)));
+    }));
 }

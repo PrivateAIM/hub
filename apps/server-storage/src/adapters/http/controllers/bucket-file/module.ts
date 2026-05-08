@@ -5,21 +5,21 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { Readable } from 'node:stream';
 import { createGzip } from 'node:zlib';
 import { NotFoundError } from '@ebec/http';
 import type { Logger } from '@privateaim/server-kit';
 import {
+    DContext,
     DController,
     DDelete,
     DGet,
     DPath,
-    DRequest,
-    DResponse,
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
-import type { Request, Response } from 'routup';
+import type { IRoutupEvent } from 'routup';
 import { getRequestAcceptableEncoding } from 'routup';
 import type { Client } from 'minio';
 import type { IBucketFileRepository, IBucketFileService } from '../../../../core/entities/index.ts';
@@ -53,9 +53,9 @@ export class BucketFileController {
 
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
-        @DRequest() req: Request,
+        @DContext() event: IRoutupEvent,
     ) {
-        const query = useRequestQuery(req);
+        const query = useRequestQuery(event);
         const { data, meta } = await this.service.getMany(query);
         return { data, meta };
     }
@@ -63,8 +63,7 @@ export class BucketFileController {
     @DGet('/:id/stream', [ForceLoggedInMiddleware])
     async stream(
         @DPath('id') id: string,
-        @DRequest() req: Request,
-        @DResponse() res: Response,
+        @DContext() event: IRoutupEvent,
     ) {
         const entity = await this.bucketFileRepository.findOneById(id);
 
@@ -72,58 +71,61 @@ export class BucketFileController {
             throw new NotFoundError();
         }
 
-        const gzipSupported = getRequestAcceptableEncoding(req, 'gzip');
-        if (gzipSupported) {
-            res.writeHead(200, {
-                'Content-Type': 'application/octet-stream',
-                'Content-Encoding': 'gzip',
-            });
-        } else {
-            res.writeHead(200, {
-                'Content-Type': 'application/octet-stream',
-                'Content-Encoding': 'identity',
-            });
-        }
+        const gzipSupported = getRequestAcceptableEncoding(event, 'gzip');
 
         const bucketName = toBucketName(entity.bucket_id);
 
         this.logger?.debug(`Streaming file ${entity.hash} (${id}) of ${bucketName}`);
 
-        const stream = await this.minio.getObject(bucketName, entity.hash);
-        stream.on('end', () => {
+        const nodeStream = await this.minio.getObject(bucketName, entity.hash);
+        nodeStream.on('end', () => {
             this.logger?.debug(`Streamed file ${entity.hash} (${id}) of ${bucketName}`);
         });
-        stream.on('error', (err) => {
+        nodeStream.on('error', (err) => {
             this.logger?.error(err);
         });
 
         if (gzipSupported) {
-            stream
-                .pipe(createGzip())
-                .pipe(res);
-        } else {
-            stream.pipe(res);
+            const gzipped = nodeStream.pipe(createGzip());
+            const webStream = Readable.toWeb(gzipped) as ReadableStream;
+
+            return new Response(webStream, {
+                status: 200,
+                headers: {
+                    'Content-Type': 'application/octet-stream',
+                    'Content-Encoding': 'gzip',
+                },
+            });
         }
+
+        const webStream = Readable.toWeb(nodeStream) as ReadableStream;
+
+        return new Response(webStream, {
+            status: 200,
+            headers: {
+                'Content-Type': 'application/octet-stream',
+                'Content-Encoding': 'identity',
+            },
+        });
     }
 
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
-        @DRequest() req: Request,
+        @DContext() event: IRoutupEvent,
     ) {
-        const query = useRequestQuery(req);
+        const query = useRequestQuery(event);
         return this.service.getOne(id, Object.keys(query).length > 0 ? query : undefined);
     }
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @DPath('id') id: string,
-        @DRequest() req: Request,
-        @DResponse() res: Response,
+        @DContext() event: IRoutupEvent,
     ) {
-        const actor = buildActorContext(req);
+        const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);
-        res.statusCode = 202;
+        event.response.status = 202;
         return entity;
     }
 }

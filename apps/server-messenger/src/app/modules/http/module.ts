@@ -7,8 +7,9 @@
 
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
-import http from 'node:http';
-import { Router, coreHandler, createNodeDispatcher } from 'routup';
+import type { Server } from 'node:http';
+import { Router, defineCoreHandler } from 'routup';
+import { serve } from 'routup/node';
 import {
     LoggerInjectionKey,
     RedisPublishClientInjectionKey,
@@ -23,6 +24,7 @@ import {
 } from '@privateaim/server-realtime-kit';
 import { ConfigInjectionKey } from '../config/constants.ts';
 import { registerControllers } from '../../../adapters/socket/register.ts';
+import type { HTTPServer } from './constants.ts';
 import { HTTPInjectionKey } from './constants.ts';
 
 export class HTTPModule implements IModule {
@@ -30,13 +32,15 @@ export class HTTPModule implements IModule {
 
     readonly dependencies: string[] = ['config'];
 
+    private instance: HTTPServer | undefined;
+
     async setup(container: IContainer): Promise<void> {
         const config = container.resolve(ConfigInjectionKey);
         const logger = container.resolve(LoggerInjectionKey);
 
         const router = new Router();
 
-        router.get('/', coreHandler(() => ({ timestamp: Date.now() })));
+        router.get('/', defineCoreHandler(() => ({ timestamp: Date.now() })));
 
         mountMiddlewares(router, {
             basic: true,
@@ -47,23 +51,20 @@ export class HTTPModule implements IModule {
 
         logger.debug('Starting http server...');
 
-        const server = new http.Server(createNodeDispatcher(router));
-
-        await new Promise<void>((resolve, reject) => {
-            const errorHandler = (err?: null | Error) => {
-                reject(err);
-            };
-
-            server.once('error', errorHandler);
-            server.once('listening', () => {
-                server.removeListener('error', errorHandler);
-                resolve();
-            });
-
-            server.listen(config.port, '0.0.0.0');
+        const server = serve(router, {
+            port: config.port,
+            hostname: '0.0.0.0',
+            silent: true,
+            gracefulShutdown: false,
         });
 
-        logger.debug(`Listening on 0.0.0.0:${config.port}.`);
+        await server.ready();
+
+        this.instance = server;
+
+        if (server.url) {
+            logger.debug(`Listening on ${server.url}`);
+        }
 
         container.register(HTTPInjectionKey.Server, { useValue: server });
 
@@ -71,7 +72,7 @@ export class HTTPModule implements IModule {
         const redisPublishResult = container.tryResolve(RedisPublishClientInjectionKey);
         const redisSubscribeResult = container.tryResolve(RedisSubscribeClientInjectionKey);
 
-        const socketServer = createSocketServer(server, {
+        const socketServer = createSocketServer(server.node!.server as Server, {
             redisPublishClient: redisPublishResult.success ? redisPublishResult.data : undefined,
             redisSubscribeClient: redisSubscribeResult.success ? redisSubscribeResult.data : undefined,
             logger,
@@ -107,17 +108,11 @@ export class HTTPModule implements IModule {
             await socketResult.data.close();
         }
 
-        const result = container.tryResolve(HTTPInjectionKey.Server);
-        if (result.success) {
-            await new Promise<void>((resolve, reject) => {
-                result.data.close((error?: Error | null) => {
-                    if (error) {
-                        reject(error);
-                        return;
-                    }
-                    resolve();
-                });
-            });
-        }
+        if (!this.instance) return;
+
+        container.unregister(HTTPInjectionKey.Server);
+
+        await this.instance.close();
+        this.instance = undefined;
     }
 }

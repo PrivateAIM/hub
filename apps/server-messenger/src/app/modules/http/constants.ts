@@ -6,10 +6,12 @@
  */
 
 import { TypedToken } from 'eldin';
-import type { Server } from 'node:http';
+import type { serve } from 'routup/node';
 import type { Server as SocketServer } from 'socket.io';
 
+export type HTTPServer = ReturnType<typeof serve>;
+
 export const HTTPInjectionKey = {
-    Server: new TypedToken<Server>('Server'),
+    Server: new TypedToken<HTTPServer>('Server'),
     SocketServer: new TypedToken<SocketServer>('SocketServer'),
 };

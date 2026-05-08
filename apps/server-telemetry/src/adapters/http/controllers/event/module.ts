@@ -7,18 +7,17 @@
 
 import {
     DBody,
+    DContext,
     DController,
     DDelete,
     DGet,
     DPath,
     DPost,
-    DRequest,
-    DResponse,
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
-import type { Request, Response } from 'routup';
+import type { IRoutupEvent } from 'routup';
 import type { IEventService } from '../../../../core/entities/index.ts';
 import { buildActorContext } from '../../request/index.ts';
 
@@ -38,21 +37,20 @@ export class EventController {
     @DPost('', [ForceLoggedInMiddleware])
     async create(
         @DBody() data: any,
-        @DRequest() req: Request,
-        @DResponse() res: Response,
+        @DContext() event: IRoutupEvent,
     ) {
-        const actor = buildActorContext(req);
+        const actor = buildActorContext(event);
         const entity = await this.service.create(data, actor);
-        res.statusCode = 201;
+        event.response.status = 201;
         return entity;
     }
 
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
-        @DRequest() req: Request,
+        @DContext() event: IRoutupEvent,
     ) {
-        const actor = buildActorContext(req);
-        const query = useRequestQuery(req);
+        const actor = buildActorContext(event);
+        const query = useRequestQuery(event);
         const { data, meta } = await this.service.getMany(query, actor);
         return { data, meta };
     }
@@ -60,21 +58,20 @@ export class EventController {
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
-        @DRequest() req: Request,
+        @DContext() event: IRoutupEvent,
     ) {
-        const actor = buildActorContext(req);
+        const actor = buildActorContext(event);
         return this.service.getOne(id, actor);
     }
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @DPath('id') id: string,
-        @DRequest() req: Request,
-        @DResponse() res: Response,
+        @DContext() event: IRoutupEvent,
     ) {
-        const actor = buildActorContext(req);
+        const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);
-        res.statusCode = 202;
+        event.response.status = 202;
         return entity;
     }
 }

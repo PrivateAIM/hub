@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Request } from 'routup';
+import type { IRoutupEvent } from 'routup';
 import {
     useRequestIdentity,
     useRequestIdentityRealm,
@@ -13,10 +13,10 @@ import {
 } from '@privateaim/server-http-kit';
 import type { ActorContext } from '@privateaim/server-kit';
 
-export function buildActorContext(req: Request): ActorContext {
-    const identity = useRequestIdentity(req);
-    const realm = useRequestIdentityRealm(req);
-    const permissionChecker = useRequestPermissionChecker(req);
+export function buildActorContext(event: IRoutupEvent): ActorContext {
+    const identity = useRequestIdentity(event);
+    const realm = useRequestIdentityRealm(event);
+    const permissionChecker = useRequestPermissionChecker(event);
 
     return {
         permissionChecker,

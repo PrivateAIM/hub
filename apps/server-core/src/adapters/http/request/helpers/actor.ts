@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Request } from 'routup';
-import { getRequestHeader, getRequestIP, useRequestPath } from 'routup';
+import type { IRoutupEvent } from 'routup';
+import { getRequestHeader, getRequestIP } from 'routup';
 import {
     useRequestIdentity,
     useRequestIdentityRealm,
@@ -14,18 +14,18 @@ import {
 } from '@privateaim/server-http-kit';
 import type { ActorContext } from '@privateaim/server-kit';
 
-export function buildActorContext(req: Request): ActorContext {
-    const identity = useRequestIdentity(req);
-    const realm = useRequestIdentityRealm(req);
-    const permissionChecker = useRequestPermissionChecker(req);
+export function buildActorContext(event: IRoutupEvent): ActorContext {
+    const identity = useRequestIdentity(event);
+    const realm = useRequestIdentityRealm(event);
+    const permissionChecker = useRequestPermissionChecker(event);
 
     const metadata: Record<string, any> = {
-        request_path: useRequestPath(req),
-        request_method: req.method || 'GET',
+        request_path: event.path,
+        request_method: event.method || 'GET',
         request_user_agent: flattenString(
-            getRequestHeader(req, 'user-agent'),
+            getRequestHeader(event, 'user-agent'),
         ),
-        request_ip_address: getRequestIP(req, { trustProxy: true }),
+        request_ip_address: getRequestIP(event, { trustProxy: true }),
     };
 
     if (identity) {

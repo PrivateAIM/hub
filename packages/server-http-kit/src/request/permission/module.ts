@@ -11,20 +11,20 @@ import type {
     PermissionEvaluationContext,
 } from '@authup/access';
 import {
-    BuiltInPolicyType, 
+    BuiltInPolicyType,
     PolicyData,
 } from '@authup/access';
-import type { Request } from 'routup';
+import type { IRoutupEvent } from 'routup';
 import { useRequestEnv } from '../env';
 import { useRequestIdentity } from '../identity';
 
 export class RequestPermissionChecker {
-    protected req: Request;
+    protected event: IRoutupEvent;
 
     protected checker: IPermissionEvaluator;
 
-    constructor(req: Request, checker: IPermissionEvaluator) {
-        this.req = req;
+    constructor(event: IRoutupEvent, checker: IPermissionEvaluator) {
+        this.event = event;
         this.checker = checker;
     }
 
@@ -51,10 +51,10 @@ export class RequestPermissionChecker {
     // --------------------------------------------------------------
 
     protected extendCheckContext(ctx: PermissionEvaluationContext) {
-        const scopes = useRequestEnv(this.req, 'scopes') || [];
+        const scopes = useRequestEnv(this.event, 'scopes') || [];
         if (scopes.includes(ScopeName.GLOBAL)) {
             ctx.input = ctx.input || new PolicyData();
-            ctx.input.set(BuiltInPolicyType.IDENTITY, useRequestIdentity(this.req));
+            ctx.input.set(BuiltInPolicyType.IDENTITY, useRequestIdentity(this.event));
         }
 
         return ctx;

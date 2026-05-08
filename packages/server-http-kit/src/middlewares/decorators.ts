@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { useRequestBody } from '@routup/basic/body';
+import { readRequestBody } from '@routup/basic/body';
 import { useRequestCookie, useRequestCookies } from '@routup/basic/cookie';
 import { useRequestQuery } from '@routup/basic/query';
 import { decorators } from '@routup/decorators';
@@ -18,24 +18,24 @@ export function mountDecoratorsMiddleware(router: Router, options: MiddlewareDec
         parameter: {
             body: (context, name) => {
                 if (name) {
-                    return useRequestBody(context.request, name);
+                    return readRequestBody(context.event, name);
                 }
 
-                return useRequestBody(context.request);
+                return readRequestBody(context.event);
             },
             cookie: (context, name) => {
                 if (name) {
-                    return useRequestCookie(context.request, name);
+                    return useRequestCookie(context.event, name);
                 }
 
-                return useRequestCookies(context.request);
+                return useRequestCookies(context.event);
             },
             query: (context, name) => {
                 if (name) {
-                    return useRequestQuery(context.request, name);
+                    return useRequestQuery(context.event, name);
                 }
 
-                return useRequestQuery(context.request);
+                return useRequestQuery(context.event);
             },
         },
     }));

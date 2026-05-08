@@ -6,13 +6,12 @@
  */
 
 import { APIClient } from '@privateaim/storage-kit';
-import type { Server } from 'node:http';
-import type { AddressInfo } from 'node:net';
 import {
     ConfigInjectionKey,
     createAuthupClientAuthenticationHook,
     createAuthupUserTokenCreator,
 } from '@privateaim/server-kit';
+import type { HTTPServer } from '../../src/app/modules/http/constants.ts';
 import { HTTPInjectionKey } from '../../src/app/modules/http/index.ts';
 import { TestApplication } from './module.ts';
 
@@ -28,10 +27,9 @@ export class TestHTTPApplication extends TestApplication {
     }
 
     protected createClient(): APIClient {
-        const server = this.container.resolve<Server>(HTTPInjectionKey.Server);
+        const server = this.container.resolve<HTTPServer>(HTTPInjectionKey.Server);
 
-        const address = server.address() as AddressInfo;
-        const baseURL = `http://localhost:${address.port}`;
+        const baseURL = server.url;
 
         const client = new APIClient({ baseURL });
 

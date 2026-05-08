@@ -11,11 +11,10 @@ import { isRealmResourceWritable } from '@privateaim/kit';
 import { ForbiddenError } from '@ebec/http';
 import type { Log, LogLevel, APIClient as TelemetryClient } from '@privateaim/telemetry-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
-import type { Request, Response } from 'routup';
-import { sendAccepted } from 'routup';
+import type { IRoutupEvent } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestIdentityRealm } from '@privateaim/server-http-kit';
-import { RoutupContainerAdapter } from '@validup/adapter-routup';
+import { readRequestBody } from '@routup/basic/body';
 import { ValidupError, buildErrorMessageForAttribute, defineIssueItem } from 'validup';
 import {
     AnalysisEntity,
@@ -23,10 +22,10 @@ import {
 } from '../../../../../database/index.ts';
 import { AnalysisNodeLogValidator } from '../utils/index.ts';
 
-export async function createAnalysisNodeLogRouteHandler(req: Request, res: Response, telemetryClient?: TelemetryClient) : Promise<any> {
+export async function createAnalysisNodeLogRouteHandler(event: IRoutupEvent, telemetryClient?: TelemetryClient) : Promise<any> {
     const validator = new AnalysisNodeLogValidator();
-    const validatorAdapter = new RoutupContainerAdapter(validator);
-    const data = await validatorAdapter.run(req, { group: 'create' });
+    const body = await readRequestBody(event);
+    const data = await validator.run(body, { group: 'create' });
 
     const dataSource = await useDataSource();
     const nodeRepository = dataSource.getRepository(NodeEntity);
@@ -55,7 +54,7 @@ export async function createAnalysisNodeLogRouteHandler(req: Request, res: Respo
 
     data.analysis_realm_id = analysis.realm_id;
 
-    const isAuthorityOfNode = isRealmResourceWritable(useRequestIdentityRealm(req), data.node_realm_id);
+    const isAuthorityOfNode = isRealmResourceWritable(useRequestIdentityRealm(event), data.node_realm_id);
     if (!isAuthorityOfNode) {
         throw new ForbiddenError('You are not an actor of to the node realm.');
     }
@@ -92,5 +91,6 @@ export async function createAnalysisNodeLogRouteHandler(req: Request, res: Respo
         await telemetryClient.log.create(entity);
     }
 
-    return sendAccepted(res, entity);
+    event.response.status = 202;
+    return entity;
 }

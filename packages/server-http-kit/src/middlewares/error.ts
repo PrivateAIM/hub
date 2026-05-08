@@ -10,7 +10,7 @@ import { isObject } from '@privateaim/kit';
 import type { Logger } from '@privateaim/server-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import type { Router } from 'routup';
-import { errorHandler, send } from 'routup';
+import { defineErrorHandler } from 'routup';
 import type { Issue } from 'validup';
 import { sanitizeError } from '../core';
 
@@ -27,7 +27,7 @@ type ErrorMiddlewareOptions = {
 };
 
 export function mountErrorMiddleware(router: Router, options: ErrorMiddlewareOptions = {}) {
-    router.use(errorHandler((error, req, res) => {
+    router.use(defineErrorHandler((error, event) => {
         let next : HubError;
         if (error.cause) {
             next = sanitizeError(error.cause);
@@ -62,7 +62,7 @@ export function mountErrorMiddleware(router: Router, options: ErrorMiddlewareOpt
             }
         }
 
-        res.statusCode = payload.statusCode;
-        return send(res, payload);
+        event.response.status = payload.statusCode;
+        return payload;
     }));
 }

@@ -6,10 +6,8 @@
  */
 
 import {
-    DController, 
-    DGet, 
-    DRequest, 
-    DResponse, 
+    DController,
+    DGet,
     DTags,
 } from '@routup/decorators';
 import type { EndpointInfo } from './status/index.ts';
@@ -19,10 +17,7 @@ import { useStatusRouteHandler } from './status/index.ts';
 @DController('')
 export class RootController {
     @DGet('/', [])
-    async status(
-        @DRequest() req: any,
-        @DResponse() res: any,
-    ): Promise<EndpointInfo> {
-        return useStatusRouteHandler(req, res);
+    async status(): Promise<EndpointInfo> {
+        return useStatusRouteHandler();
     }
 }

@@ -7,20 +7,20 @@
 
 import { REALM_MASTER_NAME } from '@authup/core-kit';
 import { UnauthorizedError } from '@ebec/http';
-import type { Request } from 'routup';
+import type { IRoutupEvent } from 'routup';
 import type { RequestIdentity } from './types';
 import { setRequestEnv, useRequestEnv } from './env';
 
-export function useRequestIdentity(req: Request) : RequestIdentity | undefined {
-    return useRequestEnv(req, 'identity');
+export function useRequestIdentity(event: IRoutupEvent) : RequestIdentity | undefined {
+    return useRequestEnv(event, 'identity');
 }
 
-export function setRequestIdentity(req: Request, identity: RequestIdentity) : void {
-    setRequestEnv(req, 'identity', identity);
+export function setRequestIdentity(event: IRoutupEvent, identity: RequestIdentity) : void {
+    setRequestEnv(event, 'identity', identity);
 }
 
-export function useRequestIdentityOrFail(req: Request) : RequestIdentity {
-    const identity = useRequestIdentity(req);
+export function useRequestIdentityOrFail(event: IRoutupEvent) : RequestIdentity {
+    const identity = useRequestIdentity(event);
     if (!identity) {
         throw new UnauthorizedError();
     }

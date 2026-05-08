@@ -5,6 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { Readable } from 'node:stream';
+import type { ReadableStream } from 'node:stream/web';
 import { DirectComponentCaller } from '@privateaim/server-kit';
 import {
     BucketFileCommand,
@@ -14,28 +16,28 @@ import {
 } from '@privateaim/server-storage-kit';
 import Busboy from 'busboy';
 import path from 'node:path';
-import type { Request } from 'routup';
+import type { IRoutupEvent } from 'routup';
 import { useRequestIdentityOrFail } from '@privateaim/server-http-kit';
 import type { BucketFileComponent } from '../../../../app/components/bucket-file/module.ts';
 import { streamToBuffer } from '../../../../core/utils/stream-to-buffer.ts';
 import type { BucketEntity, BucketFileEntity  } from '../../../database/index.ts';
 
 export async function uploadRequestFilesToBucket(
-    req: Request,
+    event: IRoutupEvent,
     bucket: BucketEntity,
     bucketFileComponent: BucketFileComponent,
     bucketFileEventCaller: BucketFileEventCaller,
 ) {
     const instance = Busboy({
-        headers: req.headers,
+        headers: { 'content-type': event.headers.get('content-type') },
         preservePath: true,
     });
 
-    const actor = useRequestIdentityOrFail(req);
+    const actor = useRequestIdentityOrFail(event);
 
     const caller = new DirectComponentCaller(bucketFileComponent);
 
-    const identity = useRequestIdentityOrFail(req);
+    const identity = useRequestIdentityOrFail(event);
 
     return new Promise<BucketFileEntity[]>((resolve, reject) => {
         const entries : Promise<BucketFileEntity>[] = [];
@@ -97,8 +99,6 @@ export async function uploadRequestFilesToBucket(
         });
 
         instance.on('error', (err) => {
-            req.unpipe(instance);
-
             reject(err);
         });
 
@@ -108,6 +108,6 @@ export async function uploadRequestFilesToBucket(
                 .catch((e) => reject(e));
         });
 
-        req.pipe(instance);
+        Readable.fromWeb(event.request.body as ReadableStream).pipe(instance);
     });
 }

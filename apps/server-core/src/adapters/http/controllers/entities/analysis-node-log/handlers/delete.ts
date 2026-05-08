@@ -8,17 +8,16 @@
 import { BadRequestError } from '@ebec/http';
 import type { Log, APIClient as TelemetryClient } from '@privateaim/telemetry-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
-import type { Request, Response } from 'routup';
-import { sendAccepted } from 'routup';
+import type { IRoutupEvent } from 'routup';
 import type { FiltersBuildInput } from 'rapiq';
 import { parseQueryFilters } from 'rapiq';
 import { useRequestQuery } from '@routup/basic/query';
 import type { AnalysisNodeLog } from '@privateaim/core-kit';
 import { DomainType } from '@privateaim/core-kit';
 
-export async function deleteAnalysisNodeLogRouteHandler(req: Request, res: Response, telemetryClient?: TelemetryClient) : Promise<any> {
+export async function deleteAnalysisNodeLogRouteHandler(event: IRoutupEvent, telemetryClient?: TelemetryClient) : Promise<any> {
     const output = parseQueryFilters<AnalysisNodeLog>(
-        useRequestQuery(req, 'filter'),
+        useRequestQuery(event, 'filter'),
         {
             allowed: [
                 'analysis_id',
@@ -53,5 +52,6 @@ export async function deleteAnalysisNodeLogRouteHandler(req: Request, res: Respo
         await telemetryClient.log.deleteMany({ filters });
     }
 
-    return sendAccepted(res);
+    event.response.status = 202;
+    return undefined;
 }

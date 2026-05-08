@@ -12,14 +12,14 @@ import type { APIClient as TelemetryClient } from '@privateaim/telemetry-kit';
 
 import {
     DBody,
+    DContext,
     DController,
     DDelete,
     DGet,
     DPost,
-    DRequest,
-    DResponse,
     DTags,
 } from '@routup/decorators';
+import type { IRoutupEvent } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import {
     createAnalysisNodeLogRouteHandler,
@@ -49,26 +49,23 @@ export class AnalysisNodeLogController {
 
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
-        @DRequest() req: any,
-        @DResponse() res: any,
+        @DContext() event: IRoutupEvent,
     ): Promise<PartialAnalysisLog | undefined> {
-        return await getManyAnalysisNodeLogRouteHandler(req, res, this.telemetryClient) as PartialAnalysisLog | undefined;
+        return await getManyAnalysisNodeLogRouteHandler(event, this.telemetryClient) as PartialAnalysisLog | undefined;
     }
 
     @DPost('', [ForceLoggedInMiddleware])
     async add(
         @DBody() data: PartialAnalysisLog,
-        @DRequest() req: any,
-        @DResponse() res: any,
+        @DContext() event: IRoutupEvent,
     ): Promise<PartialAnalysisLog | undefined> {
-        return await createAnalysisNodeLogRouteHandler(req, res, this.telemetryClient) as PartialAnalysisLog | undefined;
+        return await createAnalysisNodeLogRouteHandler(event, this.telemetryClient) as PartialAnalysisLog | undefined;
     }
 
     @DDelete('', [ForceLoggedInMiddleware])
     async drop(
-        @DRequest() req: any,
-        @DResponse() res: any,
+        @DContext() event: IRoutupEvent,
     ): Promise<PartialAnalysisLog | undefined> {
-        return await deleteAnalysisNodeLogRouteHandler(req, res, this.telemetryClient) as PartialAnalysisLog | undefined;
+        return await deleteAnalysisNodeLogRouteHandler(event, this.telemetryClient) as PartialAnalysisLog | undefined;
     }
 }

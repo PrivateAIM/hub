@@ -5,13 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Server } from 'node:http';
-import http from 'node:http';
-import { Router, coreHandler, createNodeDispatcher } from 'routup';
+import { Router, defineCoreHandler } from 'routup';
 
-export function createHttpServer() : Server {
+export function createHttpRouter() : Router {
     const router = new Router();
-    router.get('/', coreHandler(() => ({ timestamp: Date.now() })));
+    router.get('/', defineCoreHandler(() => ({ timestamp: Date.now() })));
 
-    return new http.Server(createNodeDispatcher(router));
+    return router;
 }

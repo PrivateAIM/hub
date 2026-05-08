@@ -10,7 +10,7 @@ import type { IPermissionProvider } from '@authup/access';
 import { PermissionEvaluator, PermissionMemoryProvider } from '@authup/access';
 import { REALM_MASTER_NAME } from '@authup/core-kit';
 import type { TokenVerificationData } from '@authup/server-adapter-kit';
-import type { Request } from 'routup';
+import type { IRoutupEvent } from 'routup';
 import { RequestPermissionChecker, setRequestEnv } from '../../request/index.ts';
 import { FakePermissionProvider } from './permission-provider.ts';
 
@@ -39,7 +39,7 @@ export function createFakeTokenVerificationData(): TokenVerificationDataMinimal 
 }
 
 export function applyTokenVerificationData(
-    req: Request,
+    event: IRoutupEvent,
     data: TokenVerificationDataMinimal,
     fakeAbilities?: boolean,
 ) {
@@ -61,10 +61,10 @@ export function applyTokenVerificationData(
         realmId: null,
         clientId:null,
     });
-    const requestPermissionChecker = new RequestPermissionChecker(req, permissionEvaluator);
-    setRequestEnv(req, 'permissionChecker', requestPermissionChecker);
+    const requestPermissionChecker = new RequestPermissionChecker(event, permissionEvaluator);
+    setRequestEnv(event, 'permissionChecker', requestPermissionChecker);
 
-    setRequestEnv(req, 'identity', {
+    setRequestEnv(event, 'identity', {
         id: data.sub,
         type: data.sub_kind,
         realmId: data.realm_id,
@@ -75,5 +75,5 @@ export function applyTokenVerificationData(
         },
     });
 
-    setRequestEnv(req, 'scopes', unwrapOAuth2Scope(data.scope || []));
+    setRequestEnv(event, 'scopes', unwrapOAuth2Scope(data.scope || []));
 }

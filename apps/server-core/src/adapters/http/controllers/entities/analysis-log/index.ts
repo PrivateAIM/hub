@@ -11,13 +11,13 @@ import type {
 import type { APIClient as TelemetryClient } from '@privateaim/telemetry-kit';
 
 import {
+    DContext,
     DController,
     DDelete,
     DGet,
-    DRequest,
-    DResponse,
     DTags,
 } from '@routup/decorators';
+import type { IRoutupEvent } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import {
     deleteAnalysisLogRouteHandler,
@@ -37,17 +37,15 @@ export class AnalysisLogController {
 
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
-        @DRequest() req: any,
-        @DResponse() res: any,
+        @DContext() event: IRoutupEvent,
     ): Promise<PartialAnalysisLog[]> {
-        return await getManyAnalysisLogRouteHandler(req, res, this.telemetryClient) as PartialAnalysisLog[];
+        return await getManyAnalysisLogRouteHandler(event, this.telemetryClient) as PartialAnalysisLog[];
     }
 
     @DDelete('', [ForceLoggedInMiddleware])
     async drop(
-        @DRequest() req: any,
-        @DResponse() res: any,
+        @DContext() event: IRoutupEvent,
     ): Promise<PartialAnalysisLog | undefined> {
-        return await deleteAnalysisLogRouteHandler(req, res, this.telemetryClient) as PartialAnalysisLog | undefined;
+        return await deleteAnalysisLogRouteHandler(event, this.telemetryClient) as PartialAnalysisLog | undefined;
     }
 }

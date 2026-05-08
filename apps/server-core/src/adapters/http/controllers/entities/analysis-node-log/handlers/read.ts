@@ -9,15 +9,14 @@ import { BadRequestError } from '@ebec/http';
 import type { Log, LogLevel, APIClient as TelemetryClient } from '@privateaim/telemetry-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import { useRequestQuery } from '@routup/basic/query';
-import type { Request, Response } from 'routup';
-import { send } from 'routup';
+import type { IRoutupEvent } from 'routup';
 import type { FiltersBuildInput } from 'rapiq';
 import { parseQuery } from 'rapiq';
 import type { AnalysisNodeLog } from '@privateaim/core-kit';
 import { DomainType } from '@privateaim/core-kit';
 
-export async function getManyAnalysisNodeLogRouteHandler(req: Request, res: Response, telemetryClient?: TelemetryClient) : Promise<any> {
-    const output = parseQuery<AnalysisNodeLog>(useRequestQuery(req), {
+export async function getManyAnalysisNodeLogRouteHandler(event: IRoutupEvent, telemetryClient?: TelemetryClient) : Promise<any> {
+    const output = parseQuery<AnalysisNodeLog>(useRequestQuery(event), {
         filters: {
             allowed: [
                 'level',
@@ -57,15 +56,13 @@ export async function getManyAnalysisNodeLogRouteHandler(req: Request, res: Resp
     // todo: sort missing
 
     if (telemetryClient) {
-        const response = await telemetryClient.log.getMany({
+        return telemetryClient.log.getMany({
             filters,
             pagination: output.pagination,
         });
-
-        return send(res, response);
     }
 
-    return send(res, {
+    return {
         data: [],
         meta: {
             total: 0,
@@ -74,5 +71,5 @@ export async function getManyAnalysisNodeLogRouteHandler(req: Request, res: Resp
                 offset: 0,
             },
         },
-    });
+    };
 }

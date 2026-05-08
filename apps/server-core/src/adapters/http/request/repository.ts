@@ -5,8 +5,8 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import type { Request } from 'routup';
-import { getRequestHeader, getRequestIP, useRequestPath } from 'routup';
+import type { IRoutupEvent } from 'routup';
+import { getRequestHeader, getRequestIP } from 'routup';
 import type { Repository, SaveOptions } from 'typeorm';
 import { useRequestIdentity } from '@privateaim/server-http-kit';
 import type { RemoveOptions } from 'typeorm/repository/RemoveOptions.js';
@@ -15,15 +15,15 @@ import type { EntityEventMetadata } from '@privateaim/server-kit';
 type RepositoryEntity<T> = T extends Repository<infer U> ? U : never;
 
 export class RequestRepositoryAdapter<T extends Repository<any>> {
-    protected request: Request;
+    protected event: IRoutupEvent;
 
     protected repository: T;
 
     constructor(
-        request: Request,
+        event: IRoutupEvent,
         repository: T,
     ) {
-        this.request = request;
+        this.event = event;
         this.repository = repository;
     }
 
@@ -43,15 +43,15 @@ export class RequestRepositoryAdapter<T extends Repository<any>> {
 
     private extendOptionsData<F extends { data?: any, [key: string]: any }>(options: F) : F {
         const metadata : Partial<EntityEventMetadata> = {
-            request_path: useRequestPath(this.request),
-            request_method: this.request.method || 'GET',
+            request_path: this.event.path,
+            request_method: this.event.method || 'GET',
             request_user_agent: this.flattenString(
-                getRequestHeader(this.request, 'user-agent'),
+                getRequestHeader(this.event, 'user-agent'),
             ),
-            request_ip_address: getRequestIP(this.request, { trustProxy: true }),
+            request_ip_address: getRequestIP(this.event, { trustProxy: true }),
         };
 
-        const identity = useRequestIdentity(this.request);
+        const identity = useRequestIdentity(this.event);
         if (identity) {
             metadata.actor_id = identity.id;
             metadata.actor_type = identity.type;

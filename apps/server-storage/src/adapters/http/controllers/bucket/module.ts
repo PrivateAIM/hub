@@ -9,18 +9,17 @@ import type { Logger } from '@privateaim/server-kit';
 import type { BucketFileEventCaller } from '@privateaim/server-storage-kit';
 import {
     DBody,
+    DContext,
     DController,
     DDelete,
     DGet,
     DPath,
     DPost,
-    DRequest,
-    DResponse,
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
-import type { Request, Response } from 'routup';
+import type { IRoutupEvent } from 'routup';
 import type { Client } from 'minio';
 import type { IBucketFileRepository, IBucketService } from '../../../../core/entities/index.ts';
 import { toBucketName } from '../../../../core/utils/bucket-name.ts';
@@ -64,9 +63,9 @@ export class BucketController {
 
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
-        @DRequest() req: Request,
+        @DContext() event: IRoutupEvent,
     ) {
-        const query = useRequestQuery(req);
+        const query = useRequestQuery(event);
         const { data, meta } = await this.service.getMany(query);
         return { data, meta };
     }
@@ -74,46 +73,38 @@ export class BucketController {
     @DGet('/:id/stream', [ForceLoggedInMiddleware])
     async stream(
         @DPath('id') id: string,
-        @DRequest() req: Request,
-        @DResponse() res: Response,
     ) {
         const entity = await this.service.getOne(id);
 
         const files = await this.bucketFileRepository.findManyBy({ bucket_id: entity.id });
-
-        res.writeHead(200, {
-            'Content-Type': 'application/x-tar',
-            'Transfer-Encoding': 'chunked',
-        });
 
         const bucketName = toBucketName(entity.id);
 
         this.logger?.debug(`Streaming files of ${bucketName}`);
 
         try {
-            await packBucketFiles(res, bucketName, files, this.minio, this.logger);
+            const response = await packBucketFiles(bucketName, files, this.minio, this.logger);
 
             this.logger?.debug(`Streamed files of ${bucketName}`);
+
+            return response;
         } catch (err) {
             this.logger?.error(err);
 
-            if (!res.writableEnded) {
-                res.destroy(err instanceof Error ? err : undefined);
-            }
+            throw err;
         }
     }
 
     @DPost('/:id/upload', [ForceLoggedInMiddleware])
     async upload(
         @DPath('id') id: string,
-        @DRequest() req: Request,
-        @DResponse() res: Response,
+        @DContext() event: IRoutupEvent,
     ) {
         const entity = await this.service.getOne(id);
 
-        const files = await uploadRequestFilesToBucket(req, entity, this.bucketFileComponent, this.bucketFileEventCaller);
+        const files = await uploadRequestFilesToBucket(event, entity, this.bucketFileComponent, this.bucketFileEventCaller);
 
-        res.statusCode = 201;
+        event.response.status = 201;
         return {
             data: files,
             meta: { total: files.length },
@@ -123,9 +114,9 @@ export class BucketController {
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
-        @DRequest() req: Request,
+        @DContext() event: IRoutupEvent,
     ) {
-        const query = useRequestQuery(req);
+        const query = useRequestQuery(event);
         return this.service.getOne(id, Object.keys(query).length > 0 ? query : undefined);
     }
 
@@ -133,36 +124,33 @@ export class BucketController {
     async update(
         @DPath('id') id: string,
         @DBody() data: any,
-        @DRequest() req: Request,
-        @DResponse() res: Response,
+        @DContext() event: IRoutupEvent,
     ) {
-        const actor = buildActorContext(req);
+        const actor = buildActorContext(event);
         const entity = await this.service.update(id, data, actor);
-        res.statusCode = 202;
+        event.response.status = 202;
         return entity;
     }
 
     @DPost('', [ForceLoggedInMiddleware])
     async add(
         @DBody() data: any,
-        @DRequest() req: Request,
-        @DResponse() res: Response,
+        @DContext() event: IRoutupEvent,
     ) {
-        const actor = buildActorContext(req);
+        const actor = buildActorContext(event);
         const entity = await this.service.create(data, actor);
-        res.statusCode = 201;
+        event.response.status = 201;
         return entity;
     }
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @DPath('id') id: string,
-        @DRequest() req: Request,
-        @DResponse() res: Response,
+        @DContext() event: IRoutupEvent,
     ) {
-        const actor = buildActorContext(req);
+        const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);
-        res.statusCode = 202;
+        event.response.status = 202;
         return entity;
     }
 }

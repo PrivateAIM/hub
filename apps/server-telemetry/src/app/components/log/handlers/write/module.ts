@@ -9,8 +9,8 @@ import type { ComponentHandler } from '@privateaim/server-kit';
 import type { Log, LogInput } from '@privateaim/telemetry-kit';
 import { LogValidator } from '@privateaim/telemetry-kit';
 import type { LogWriteCommandPayload } from '@privateaim/server-telemetry-kit';
-import { RoutupContainerAdapter } from '@validup/adapter-routup';
-import type { Request } from 'routup';
+import { readRequestBody } from '@routup/basic/body';
+import type { IRoutupEvent } from 'routup';
 import type { LogStore } from '../../../../../core/services/log-store/types.ts';
 import { MemoryLogStore } from '../../../../../adapters/telemetry/memory.ts';
 
@@ -36,9 +36,9 @@ export class LogComponentWriteHandler implements ComponentHandler {
         return this.validator.run(input);
     }
 
-    async validateWithRequest(request: Request) : Promise<LogInput> {
-        const validatorAdapter = new RoutupContainerAdapter(this.validator);
-        return validatorAdapter.run(request);
+    async validateWithRequest(event: IRoutupEvent) : Promise<LogInput> {
+        const body = await readRequestBody(event);
+        return this.validator.run(body);
     }
 
     async write(value: LogInput) : Promise<Log> {
