@@ -51,7 +51,7 @@ export class RegistryProjectValidator extends Container<RegistryProject> {
         this.mount(
             'type',
             { group: ValidatorGroup.CREATE },
-            createValidator(z.nativeEnum(RegistryProjectType)),
+            createValidator(z.enum(RegistryProjectType)),
         );
     }
 }

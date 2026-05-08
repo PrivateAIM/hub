@@ -31,7 +31,7 @@ export class NodeValidator extends Container<Node> {
         this.mount(
             'type',
             { optional: true },
-            createValidator(z.nativeEnum(NodeType).nullable()),
+            createValidator(z.enum(NodeType).nullable()),
         );
 
         this.mount(

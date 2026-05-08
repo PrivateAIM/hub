@@ -27,7 +27,7 @@ export class ServiceRegistryValidator extends Container<ValidationResult> {
 
         this.mount(
             'command',
-            createValidator(z.nativeEnum(RegistryAPICommand)),
+            createValidator(z.enum(RegistryAPICommand)),
         );
 
         this.mount(

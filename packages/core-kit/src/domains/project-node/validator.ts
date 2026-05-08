@@ -31,7 +31,7 @@ export class ProjectNodeValidator extends Container<ProjectNode> {
         this.mount(
             'approval_status',
             { group: ValidatorGroup.UPDATE, optional: true },
-            createValidator(z.nativeEnum(ProjectNodeApprovalStatus).nullable()),
+            createValidator(z.enum(ProjectNodeApprovalStatus).nullable()),
         );
 
         this.mount(

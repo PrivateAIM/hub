@@ -31,7 +31,7 @@ export class AnalysisNodeValidator extends Container<AnalysisNode> {
         this.mount(
             'execution_status',
             { optional: true },
-            createValidator(z.nativeEnum(ProcessStatus).nullable()),
+            createValidator(z.enum(ProcessStatus).nullable()),
         );
 
         this.mount(
@@ -43,7 +43,7 @@ export class AnalysisNodeValidator extends Container<AnalysisNode> {
         this.mount(
             'approval_status',
             { optional: true },
-            createValidator(z.nativeEnum(AnalysisNodeApprovalStatus).nullable()),
+            createValidator(z.enum(AnalysisNodeApprovalStatus).nullable()),
         );
 
         this.mount(

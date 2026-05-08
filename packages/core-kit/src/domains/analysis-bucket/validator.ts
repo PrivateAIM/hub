@@ -31,7 +31,7 @@ export class AnalysisBucketValidator extends Container<AnalysisBucket> {
         this.mount(
             'type',
             { group: ValidatorGroup.CREATE },
-            createValidator(z.nativeEnum(AnalysisBucketType)),
+            createValidator(z.enum(AnalysisBucketType)),
         );
     }
 }
