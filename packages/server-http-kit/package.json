@@ -47,7 +47,7 @@
     },
     "peerDependencies": {
         "redis-extension": "^2.0.4",
-        "routup": "^5.0.0",
+        "routup": "^5.1.0",
         "typeorm-extension": "^3.7.4"
     },
     "scripts": {
