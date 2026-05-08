@@ -28,20 +28,24 @@ export function mountAuthorizationMiddleware(
     }
 
     router.use(defineCoreHandler(async (event) => {
-        const data = await verifyRequest(event.request, {
-            tokenVerifier: options.tokenVerifier,
-            tokenByRequest: () => {
-                const cookieToken = useRequestCookie(event, 'access_token');
-                if (cookieToken) {
-                    return cookieToken;
-                }
+        try {
+            const data = await verifyRequest(event.request, {
+                tokenVerifier: options.tokenVerifier,
+                tokenByRequest: () => {
+                    const cookieToken = useRequestCookie(event, 'access_token');
+                    if (cookieToken) {
+                        return cookieToken;
+                    }
 
-                return undefined;
-            },
-        });
+                    return undefined;
+                },
+            });
 
-        if (data) {
-            applyTokenVerificationData(event, data, options.dryRun);
+            if (data) {
+                applyTokenVerificationData(event, data, options.dryRun);
+            }
+        } catch (err) {
+            return event.next(err);
         }
 
         return event.next();
