@@ -72,7 +72,7 @@
         "build:js": "tsdown",
         "build:types": "tsc --emitDeclarationOnly -p tsconfig.build.json",
         "build:swagger": "trapi generate",
-        "build": "rimraf ./dist && npm run build:js && npm run build:types",
+        "build": "rimraf ./dist && npm run build:js && npm run build:types && npm run build:swagger",
         "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts",
         "test:mysql": "cross-env DB_TYPE=mysql DB_HOST=127.0.0.1 DB_USERNAME=root DB_PASSWORD=start123 DB_DATABASE=app vitest run --config test/vitest.config.ts",
         "test:coverage": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts --coverage"
