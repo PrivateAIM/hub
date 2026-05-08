@@ -37,7 +37,7 @@ export class AnalysisNodeValidator extends Container<AnalysisNode> {
         this.mount(
             'execution_progress',
             { optional: true },
-            createValidator(z.number().int().min(0).nullable()),
+            createValidator(z.number().int().min(0).max(100).nullable()),
         );
 
         this.mount(
