@@ -8,8 +8,8 @@
 import { createValidator } from '@validup/adapter-zod';
 import zod from 'zod';
 import { Container } from 'validup';
-import type { Bucket } from '@privateaim/storage-kit';
-import { ValidatorGroup } from '@privateaim/server-kit';
+import type { Bucket } from './entity.ts';
+import { ValidatorGroup } from '@privateaim/kit';
 
 export class BucketValidator extends Container<Partial<Bucket>> {
     protected initialize() {

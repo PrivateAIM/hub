@@ -6,18 +6,18 @@
  */
 
 import type { Node, RegistryProject } from '@privateaim/core-kit';
-import { RegistryProjectType } from '@privateaim/core-kit';
+import { NodeValidator, RegistryProjectType  } from '@privateaim/core-kit';
 import {
     PermissionName,
+    ValidatorGroup,
     createNanoID,
-    isHex,
-    isRealmResourceWritable,
+    isHex, 
+    isRealmResourceWritable, 
 } from '@privateaim/kit';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService, ValidatorGroup } from '@privateaim/server-kit';
+import { AbstractEntityService } from '@privateaim/server-kit';
 import type { INodeRepository, INodeService, IRegistryManager } from './types.ts';
-import { NodeValidator } from './validator.ts';
 
 type NodeServiceContext = {
     repository: INodeRepository;

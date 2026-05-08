@@ -9,7 +9,7 @@ import zod from 'zod';
 import { LogLevel } from '@privateaim/telemetry-kit';
 import { Container } from 'validup';
 import { createValidator } from '@validup/adapter-zod';
-import type { AnalysisNodeLog } from '@privateaim/core-kit';
+import type { AnalysisNodeLog } from './entity.ts';
 
 export class AnalysisNodeLogValidator extends Container<AnalysisNodeLog> {
     protected initialize() {

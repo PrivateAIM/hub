@@ -7,7 +7,7 @@
 
 import { pickRecord } from '@authup/kit';
 import type { AnalysisNodeLog } from '@privateaim/core-kit';
-import { DomainType } from '@privateaim/core-kit';
+import { AnalysisNodeLogValidator, DomainType  } from '@privateaim/core-kit';
 import { isRealmResourceWritable } from '@privateaim/kit';
 import type { Log, LogLevel, APIClient as TelemetryClient } from '@privateaim/telemetry-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
@@ -32,7 +32,6 @@ import {
     AnalysisEntity,
     NodeEntity,
 } from '../../../../database/index.ts';
-import { AnalysisNodeLogValidator } from './utils/index.ts';
 
 type AnalysisNodeLogControllerContext = {
     telemetryClient?: TelemetryClient;

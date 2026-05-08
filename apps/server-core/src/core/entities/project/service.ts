@@ -8,13 +8,14 @@
 import type { Project } from '@privateaim/core-kit';
 import {
     PermissionName,
-    isRealmResourceWritable,
+    ValidatorGroup, 
+    isRealmResourceWritable, 
 } from '@privateaim/kit';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService, ValidatorGroup } from '@privateaim/server-kit';
+import { AbstractEntityService } from '@privateaim/server-kit';
 import type { IProjectRepository, IProjectService } from './types.ts';
-import { ProjectValidator } from './validator.ts';
+import { ProjectValidator } from '@privateaim/core-kit';
 
 type ProjectServiceContext = {
     repository: IProjectRepository;

@@ -6,17 +6,17 @@
  */
 
 import type { ProjectNode } from '@privateaim/core-kit';
-import { NodeType, ProjectNodeApprovalStatus } from '@privateaim/core-kit';
+import { NodeType, ProjectNodeApprovalStatus, ProjectNodeValidator  } from '@privateaim/core-kit';
 import {
     PermissionName,
-    isRealmResourceWritable,
+    ValidatorGroup, 
+    isRealmResourceWritable, 
 } from '@privateaim/kit';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService, ValidatorGroup } from '@privateaim/server-kit';
+import { AbstractEntityService } from '@privateaim/server-kit';
 import type { IProjectRepository } from '../project/types.ts';
 import type { IProjectNodeRepository, IProjectNodeService } from './types.ts';
-import { ProjectNodeValidator } from './validator.ts';
 
 type ProjectNodeServiceContext = {
     repository: IProjectNodeRepository;

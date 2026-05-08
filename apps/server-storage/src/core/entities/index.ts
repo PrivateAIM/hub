@@ -7,6 +7,5 @@
 
 export * from './bucket/types.ts';
 export * from './bucket/service.ts';
-export * from './bucket/validator.ts';
 export * from './bucket-file/types.ts';
 export * from './bucket-file/service.ts';

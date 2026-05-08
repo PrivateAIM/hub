@@ -8,7 +8,7 @@
 import { Container } from 'validup';
 import { createValidator } from '@validup/adapter-zod';
 import { z } from 'zod';
-import type { MasterImageCommandArgument } from '@privateaim/core-kit';
+import type { MasterImageCommandArgument } from '../master-image/types.ts';
 
 export class ImageAttributeCommandArgumentsValidator extends Container<MasterImageCommandArgument> {
     protected initialize() {

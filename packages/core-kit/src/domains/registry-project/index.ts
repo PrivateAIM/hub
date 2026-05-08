@@ -9,3 +9,4 @@ export * from './constants';
 export * from './entity';
 export * from './socket';
 export * from './utils';
+export * from './validator';

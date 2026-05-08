@@ -15,14 +15,13 @@ import {
     BucketCommand,
     BucketFileEvent,
 } from '@privateaim/server-storage-kit';
-import { DomainType } from '@privateaim/storage-kit';
+import { BucketValidator, DomainType  } from '@privateaim/storage-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import crypto from 'node:crypto';
 import { useDataSource } from 'typeorm-extension';
 import type { Client } from 'minio';
 import { BucketEntity, BucketFileEntity } from '../../../../../adapters/database/index.ts';
 import { toBucketName } from '../../../../domains/bucket/utils.ts';
-import { BucketValidator } from '../../../../../core/entities/bucket/validator.ts';
 
 export class BucketFileCreateHandler implements ComponentHandler<
     BucketFileComponentEventMap,
