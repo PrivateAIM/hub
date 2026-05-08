@@ -13,6 +13,7 @@ import type { Log, LogLevel, APIClient as TelemetryClient } from '@privateaim/te
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import { BadRequestError, ForbiddenError } from '@ebec/http';
 import {
+    DBody,
     DContext,
     DController,
     DDelete,
@@ -21,7 +22,6 @@ import {
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
-import { readRequestBody } from '@routup/basic/body';
 import type { FiltersBuildInput } from 'rapiq';
 import { parseQuery, parseQueryFilters } from 'rapiq';
 import type { IRoutupEvent } from 'routup';
@@ -107,10 +107,10 @@ export class AnalysisNodeLogController {
 
     @DPost('', [ForceLoggedInMiddleware])
     async add(
+        @DBody() body: any,
         @DContext() event: IRoutupEvent,
     ) {
         const validator = new AnalysisNodeLogValidator();
-        const body = await readRequestBody(event);
         const data = await validator.run(body, { group: 'create' });
 
         const dataSource = await useDataSource();

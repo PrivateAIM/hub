@@ -9,6 +9,7 @@ import { BadRequestError } from '@ebec/http';
 import { PermissionName, isObject } from '@privateaim/kit';
 import { LogValidator } from '@privateaim/telemetry-kit';
 import {
+    DBody,
     DContext,
     DController,
     DDelete,
@@ -17,7 +18,6 @@ import {
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
-import { readRequestBody } from '@routup/basic/body';
 import { ForceLoggedInMiddleware, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { parseQueryPagination } from 'rapiq';
 import type { IRoutupEvent } from 'routup';
@@ -34,13 +34,13 @@ export class LogController {
 
     @DPost('', [ForceLoggedInMiddleware])
     async create(
+        @DBody() body: any,
         @DContext() event: IRoutupEvent,
     ) {
         const permissionChecker = useRequestPermissionChecker(event);
         await permissionChecker.preCheck({ name: PermissionName.LOG_CREATE });
 
         const validator = new LogValidator();
-        const body = await readRequestBody(event);
         const data = await validator.run(body);
 
         const entity = await this.logStore.write(data);
