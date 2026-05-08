@@ -7,10 +7,7 @@
 
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
-import path from 'node:path';
-import process from 'node:process';
-import { generateSwagger } from '@privateaim/server-http-kit';
-import { ConfigInjectionKey } from '../config/constants.ts';
+import { LoggerInjectionKey } from '@privateaim/server-kit';
 
 export class SwaggerModule implements IModule {
     readonly name = 'swagger';
@@ -18,12 +15,8 @@ export class SwaggerModule implements IModule {
     readonly dependencies: string[] = ['config'];
 
     async setup(container: IContainer): Promise<void> {
-        const config = container.resolve(ConfigInjectionKey);
+        const logger = container.resolve(LoggerInjectionKey);
 
-        await generateSwagger({
-            authupURL: config.authupURL,
-            baseURL: config.publicURL,
-            controllerBasePath: path.join(process.cwd(), 'src', 'adapters', 'http', 'controllers'),
-        });
+        logger.debug('Swagger generation skipped (use @trapi/cli)');
     }
 }

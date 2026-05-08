@@ -124,25 +124,30 @@ export class HTTPModule implements IModule {
                 gracefulShutdown: false,
             });
 
-            await server.ready();
+            try {
+                await server.ready();
 
-            this.instance = server;
+                this.instance = server;
 
-            if (server.url) {
-                logger.debug(`Listening on ${server.url}`);
-            }
+                if (server.url) {
+                    logger.debug(`Listening on ${server.url}`);
+                }
 
-            container.register(HTTPInjectionKey.Server, { useValue: server });
+                container.register(HTTPInjectionKey.Server, { useValue: server });
 
-            if (this.options.socket) {
-                const redisPubResult = container.tryResolve(RedisPublishClientInjectionKey);
-                const redisSubResult2 = container.tryResolve(RedisSubscribeClientInjectionKey);
-                createSocketServer(server.node!.server as Server, {
-                    config,
-                    logger,
-                    redisPublishClient: redisPubResult.success ? redisPubResult.data : undefined,
-                    redisSubscribeClient: redisSubResult2.success ? redisSubResult2.data : undefined,
-                });
+                if (this.options.socket) {
+                    const redisPubResult = container.tryResolve(RedisPublishClientInjectionKey);
+                    const redisSubResult2 = container.tryResolve(RedisSubscribeClientInjectionKey);
+                    createSocketServer(server.node!.server as Server, {
+                        config,
+                        logger,
+                        redisPublishClient: redisPubResult.success ? redisPubResult.data : undefined,
+                        redisSubscribeClient: redisSubResult2.success ? redisSubResult2.data : undefined,
+                    });
+                }
+            } catch (e) {
+                await server.close().catch(() => undefined);
+                throw e;
             }
         }
     }

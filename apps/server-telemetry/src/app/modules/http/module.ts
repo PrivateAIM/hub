@@ -94,15 +94,20 @@ export class HTTPModule implements IModule {
             gracefulShutdown: false,
         });
 
-        await server.ready();
+        try {
+            await server.ready();
 
-        this.instance = server;
+            this.instance = server;
 
-        if (server.url) {
-            logger.debug(`Listening on ${server.url}`);
+            if (server.url) {
+                logger.debug(`Listening on ${server.url}`);
+            }
+
+            container.register(HTTPInjectionKey.Server, { useValue: server });
+        } catch (e) {
+            await server.close().catch(() => undefined);
+            throw e;
         }
-
-        container.register(HTTPInjectionKey.Server, { useValue: server });
     }
 
     async teardown(container: IContainer): Promise<void> {

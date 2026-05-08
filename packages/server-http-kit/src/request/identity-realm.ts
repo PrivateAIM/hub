@@ -13,7 +13,7 @@ type RequestRealm = {
     name: string
 };
 
-export function useRequestIdentityRealm(event: IRoutupEvent) : RequestRealm {
+export function useRequestIdentityRealm(event: IRoutupEvent) : RequestRealm | undefined {
     const identity = useRequestIdentity(event);
     if (!identity) {
         return undefined;

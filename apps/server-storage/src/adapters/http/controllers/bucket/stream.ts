@@ -60,11 +60,16 @@ export async function packBucketFiles(
         .then(() => pack.finalize())
         .catch(() => pack.destroy());
 
-    if (!pack.readableHighWaterMark) {
-        pack.readableHighWaterMark = 16384;
-    }
+    const readable = new Readable({
+        highWaterMark: 16384,
+        read() {},
+    });
 
-    const webStream = Readable.toWeb(pack) as ReadableStream;
+    pack.on('data', (chunk: Buffer) => readable.push(chunk));
+    pack.on('end', () => readable.push(null));
+    pack.on('error', (err: Error) => readable.destroy(err));
+
+    const webStream = Readable.toWeb(readable) as ReadableStream;
 
     return new Response(webStream, {
         status: 200,

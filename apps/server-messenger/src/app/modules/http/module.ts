@@ -57,48 +57,53 @@ export class HTTPModule implements IModule {
             gracefulShutdown: false,
         });
 
-        await server.ready();
+        try {
+            await server.ready();
 
-        this.instance = server;
+            this.instance = server;
 
-        if (server.url) {
-            logger.debug(`Listening on ${server.url}`);
-        }
+            if (server.url) {
+                logger.debug(`Listening on ${server.url}`);
+            }
 
-        container.register(HTTPInjectionKey.Server, { useValue: server });
+            container.register(HTTPInjectionKey.Server, { useValue: server });
 
-        // Socket.io server
-        const redisPublishResult = container.tryResolve(RedisPublishClientInjectionKey);
-        const redisSubscribeResult = container.tryResolve(RedisSubscribeClientInjectionKey);
+            // Socket.io server
+            const redisPublishResult = container.tryResolve(RedisPublishClientInjectionKey);
+            const redisSubscribeResult = container.tryResolve(RedisSubscribeClientInjectionKey);
 
-        const socketServer = createSocketServer(server.node!.server as Server, {
-            redisPublishClient: redisPublishResult.success ? redisPublishResult.data : undefined,
-            redisSubscribeClient: redisSubscribeResult.success ? redisSubscribeResult.data : undefined,
-            logger,
-        });
+            const socketServer = createSocketServer(server.node!.server as Server, {
+                redisPublishClient: redisPublishResult.success ? redisPublishResult.data : undefined,
+                redisSubscribeClient: redisSubscribeResult.success ? redisSubscribeResult.data : undefined,
+                logger,
+            });
 
-        mountLoggingMiddleware(socketServer, { logger });
+            mountLoggingMiddleware(socketServer, { logger });
 
-        mountAuthorizationMiddleware(socketServer, {
-            baseURL: config.authupURL,
-            tokenVerifier: createAuthupTokenVerifier({
+            mountAuthorizationMiddleware(socketServer, {
                 baseURL: config.authupURL,
-                creator: createAuthupClientTokenCreator({
+                tokenVerifier: createAuthupTokenVerifier({
                     baseURL: config.authupURL,
-                    clientId: config.clientId,
-                    clientSecret: config.clientSecret,
-                    realm: config.realm,
+                    creator: createAuthupClientTokenCreator({
+                        baseURL: config.authupURL,
+                        clientId: config.clientId,
+                        clientSecret: config.clientSecret,
+                        realm: config.realm,
+                    }),
+                    redisClient: redisPublishResult.success ? redisPublishResult.data : undefined,
                 }),
-                redisClient: redisPublishResult.success ? redisPublishResult.data : undefined,
-            }),
-            logger,
-        });
+                logger,
+            });
 
-        registerControllers(socketServer, { logger });
+            registerControllers(socketServer, { logger });
 
-        logger.debug(`Socket.io server mounted on path: ${socketServer.path()}`);
+            logger.debug(`Socket.io server mounted on path: ${socketServer.path()}`);
 
-        container.register(HTTPInjectionKey.SocketServer, { useValue: socketServer });
+            container.register(HTTPInjectionKey.SocketServer, { useValue: socketServer });
+        } catch (e) {
+            await server.close().catch(() => undefined);
+            throw e;
+        }
     }
 
     async teardown(container: IContainer): Promise<void> {

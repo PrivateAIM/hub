@@ -11,7 +11,6 @@ import type {
 import type { APIClient as TelemetryClient } from '@privateaim/telemetry-kit';
 
 import {
-    DBody,
     DContext,
     DController,
     DDelete,
@@ -56,7 +55,6 @@ export class AnalysisNodeLogController {
 
     @DPost('', [ForceLoggedInMiddleware])
     async add(
-        @DBody() data: PartialAnalysisLog,
         @DContext() event: IRoutupEvent,
     ): Promise<PartialAnalysisLog | undefined> {
         return await createAnalysisNodeLogRouteHandler(event, this.telemetryClient) as PartialAnalysisLog | undefined;

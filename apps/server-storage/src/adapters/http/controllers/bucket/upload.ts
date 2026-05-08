@@ -17,6 +17,7 @@ import {
 import Busboy from 'busboy';
 import path from 'node:path';
 import type { IRoutupEvent } from 'routup';
+import { BadRequestError } from '@ebec/http';
 import { useRequestIdentityOrFail } from '@privateaim/server-http-kit';
 import type { BucketFileComponent } from '../../../../app/components/bucket-file/module.ts';
 import { streamToBuffer } from '../../../../core/utils/stream-to-buffer.ts';
@@ -28,8 +29,17 @@ export async function uploadRequestFilesToBucket(
     bucketFileComponent: BucketFileComponent,
     bucketFileEventCaller: BucketFileEventCaller,
 ) {
+    const contentType = event.headers.get('content-type');
+    if (!contentType || !contentType.startsWith('multipart/')) {
+        throw new BadRequestError('A multipart content-type header is required.');
+    }
+
+    if (!event.request.body) {
+        throw new BadRequestError('The request body is empty.');
+    }
+
     const instance = Busboy({
-        headers: { 'content-type': event.headers.get('content-type') },
+        headers: { 'content-type': contentType },
         preservePath: true,
     });
 
