@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { Readable } from 'node:stream';
 import type { IStorageAdapter } from '../../../../../src/core/storage/types.ts';
 
 type MakeBucketCall = {
@@ -14,6 +15,8 @@ type MakeBucketCall = {
 
 export class FakeStorageAdapter implements IStorageAdapter {
     private buckets: Set<string> = new Set();
+
+    private objects: Map<string, Buffer> = new Map();
 
     private makeBucketCalls: MakeBucketCall[] = [];
 
@@ -26,28 +29,51 @@ export class FakeStorageAdapter implements IStorageAdapter {
         this.buckets.add(name);
     }
 
-    async removeBucket(): Promise<void> {
-        // no-op for tests
+    async removeBucket(name: string): Promise<void> {
+        this.buckets.delete(name);
+
+        for (const key of this.objects.keys()) {
+            if (key.startsWith(`${name}/`)) {
+                this.objects.delete(key);
+            }
+        }
     }
 
-    async putObject(): Promise<void> {
-        // no-op for tests
+    async putObject(bucket: string, key: string, data: Buffer): Promise<void> {
+        this.objects.set(`${bucket}/${key}`, data);
     }
 
-    async getObject(): Promise<never> {
-        throw new Error('Not implemented in fake');
+    async getObject(bucket: string, key: string): Promise<Readable> {
+        const data = this.objects.get(`${bucket}/${key}`);
+        if (!data) {
+            throw new Error(`Object not found: ${bucket}/${key}`);
+        }
+
+        return Readable.from(data);
     }
 
-    async removeObject(): Promise<void> {
-        // no-op for tests
+    async removeObject(bucket: string, key: string): Promise<void> {
+        this.objects.delete(`${bucket}/${key}`);
     }
 
-    async removeObjects(): Promise<void> {
-        // no-op for tests
+    async removeObjects(bucket: string, keys: string[]): Promise<void> {
+        for (const key of keys) {
+            this.objects.delete(`${bucket}/${key}`);
+        }
     }
 
-    async listObjects(): Promise<string[]> {
-        return [];
+    async listObjects(bucket: string, prefix?: string): Promise<string[]> {
+        const bucketPrefix = `${bucket}/`;
+        const result: string[] = [];
+        for (const key of this.objects.keys()) {
+            if (key.startsWith(bucketPrefix)) {
+                const objectKey = key.substring(bucketPrefix.length);
+                if (!prefix || objectKey.startsWith(prefix)) {
+                    result.push(objectKey);
+                }
+            }
+        }
+        return result;
     }
 
     // --- Test helpers ---
@@ -62,5 +88,9 @@ export class FakeStorageAdapter implements IStorageAdapter {
 
     addBucket(name: string): void {
         this.buckets.add(name);
+    }
+
+    getStoredObjects(): Map<string, Buffer> {
+        return new Map(this.objects);
     }
 }

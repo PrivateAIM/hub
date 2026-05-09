@@ -21,7 +21,12 @@ import {
 import { useRequestQuery } from '@routup/basic/query';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { IRoutupEvent } from 'routup';
-import { getRequestAcceptableEncoding } from 'routup';
+import {
+    getRequestAcceptableEncoding,
+    sendStream,
+    setResponseHeaderAttachment,
+    setResponseHeaderContentType,
+} from 'routup';
 import type { IStorageAdapter } from '../../../../core/storage/types.ts';
 import type { IBucketFileRepository, IBucketFileService } from '../../../../core/entities/index.ts';
 import { toBucketName } from '../../../../core/utils/bucket-name.ts';
@@ -72,8 +77,6 @@ export class BucketFileController {
             throw new NotFoundError();
         }
 
-        const gzipSupported = getRequestAcceptableEncoding(event, 'gzip');
-
         const bucketName = toBucketName(entity.bucket_id);
 
         this.logger?.debug(`Streaming file ${entity.hash} (${id}) of ${bucketName}`);
@@ -86,28 +89,18 @@ export class BucketFileController {
             this.logger?.error(err);
         });
 
-        if (gzipSupported) {
-            const gzipped = nodeStream.pipe(createGzip());
-            const webStream = Readable.toWeb(gzipped) as ReadableStream;
+        setResponseHeaderAttachment(event, entity.name || entity.hash);
+        setResponseHeaderContentType(event, 'application/octet-stream', true);
 
-            return new Response(webStream, {
-                status: 200,
-                headers: {
-                    'Content-Type': 'application/octet-stream',
-                    'Content-Encoding': 'gzip',
-                },
-            });
+        const gzipSupported = getRequestAcceptableEncoding(event, 'gzip');
+
+        if (gzipSupported) {
+            event.response.headers.set('content-encoding', 'gzip');
+            const gzipped = nodeStream.pipe(createGzip());
+            return sendStream(event, Readable.toWeb(gzipped) as ReadableStream);
         }
 
-        const webStream = Readable.toWeb(nodeStream) as ReadableStream;
-
-        return new Response(webStream, {
-            status: 200,
-            headers: {
-                'Content-Type': 'application/octet-stream',
-                'Content-Encoding': 'identity',
-            },
-        });
+        return sendStream(event, Readable.toWeb(nodeStream) as ReadableStream);
     }
 
     @DGet('/:id', [ForceLoggedInMiddleware])
