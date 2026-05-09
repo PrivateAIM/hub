@@ -5,69 +5,139 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-/*
- * Copyright (c) 2021-2024.
- * Author Peter Placzek (tada5hi)
- * For the full copyright and license information,
- * view the LICENSE file that was distributed with this source code.
- */
-
 import {
-    afterAll, 
-    beforeAll, 
-    describe, 
-    expect, 
+    afterAll,
+    beforeAll,
+    describe,
+    expect,
     it,
 } from 'vitest';
 import { wait } from '@privateaim/kit';
 import { LogChannel, LogLevel } from '@privateaim/telemetry-kit';
 import { createTestSuite } from '../../utils';
 
-describe('controllers > analysis-node-log', () => {
+describe('log HTTP endpoints', () => {
     const suite = createTestSuite();
+    let baseURL: string;
 
     beforeAll(async () => {
         await suite.setup();
+        baseURL = suite.client().getBaseURL().replace(/\/+$/, '');
     });
 
     afterAll(async () => {
         await suite.teardown();
     });
 
-    it('should create resource', async () => {
-        const client = suite.client();
+    const logPayload = {
+        message: 'Test log entry',
+        level: LogLevel.INFORMATIONAL,
+        service: 'test-service',
+        channel: LogChannel.HTTP,
+        labels: { foo: 'bar', ref_type: 'analysis' },
+    };
 
-        const response = await client.log.create({
-            channel: LogChannel.SYSTEM,
-            service: 'unknown',
-            level: LogLevel.ERROR,
-            message: 'An test error occurred.',
-            labels: { foo: 'bar' },
+    describe('POST /logs', () => {
+        it('should create log with 201 status', async () => {
+            const response = await fetch(`${baseURL}/logs`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: 'Bearer test',
+                },
+                body: JSON.stringify(logPayload),
+            });
+
+            expect(response.status).toBe(201);
         });
 
-        expect(response.channel).toEqual(LogChannel.SYSTEM);
-        expect(response.time).toBeDefined();
-        expect(response.level).toEqual(LogLevel.ERROR);
-        expect(response.message).toEqual('An test error occurred.');
-        expect(response.labels).toBeDefined();
-        expect(response.labels.foo).toEqual('bar');
+        it('should return log entity with time and message', async () => {
+            const response = await fetch(`${baseURL}/logs`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: 'Bearer test',
+                },
+                body: JSON.stringify(logPayload),
+            });
+
+            const body = await response.json();
+            expect(body.time).toBeDefined();
+            expect(body.message).toBe(logPayload.message);
+            expect(body.level).toBe(logPayload.level);
+            expect(body.channel).toBe(logPayload.channel);
+            expect(body.labels).toBeDefined();
+            expect(body.labels.foo).toBe('bar');
+            expect(body.labels.ref_type).toBe('analysis');
+        });
     });
 
-    it('should read collection', async () => {
-        const client = suite.client();
+    describe('GET /logs', () => {
+        it('should return collection with label filter', async () => {
+            // VictoriaLogs buffers before writing to disk
+            await wait(1_000);
 
-        // VL safes log to buffer first before writing to disk.
-        await wait(1_000);
+            const response = await fetch(`${baseURL}/logs?filter[foo]=bar`, {
+                method: 'GET',
+                headers: { Authorization: 'Bearer test' },
+            });
 
-        const result = await client.log
-            .getMany({ filters: { labels: { foo: 'bar' } } });
+            expect(response.status).toBe(200);
 
-        expect(result.data.length).toBeGreaterThanOrEqual(1);
+            const body = await response.json();
+            expect(body.data).toBeDefined();
+            expect(Array.isArray(body.data)).toBe(true);
+            expect(body.data.length).toBeGreaterThanOrEqual(1);
+            expect(body.meta).toBeDefined();
+            expect(body.meta.total).toBeDefined();
+            expect(body.meta.limit).toBeDefined();
+            expect(body.meta.offset).toBeDefined();
+        });
+
+        it('should return 400 when no filter labels provided', async () => {
+            const response = await fetch(`${baseURL}/logs`, {
+                method: 'GET',
+                headers: { Authorization: 'Bearer test' },
+            });
+
+            expect(response.status).toBe(400);
+        });
+
+        it('should support pagination params', async () => {
+            // VictoriaLogs buffers before writing to disk
+            await wait(1_000);
+
+            const response = await fetch(`${baseURL}/logs?filter[foo]=bar&pagination[limit]=1&pagination[offset]=0`, {
+                method: 'GET',
+                headers: { Authorization: 'Bearer test' },
+            });
+
+            expect(response.status).toBe(200);
+
+            const body = await response.json();
+            expect(body.data.length).toBeLessThanOrEqual(1);
+            expect(body.meta.limit).toBe(1);
+            expect(body.meta.offset).toBe(0);
+        });
     });
 
-    it('should delete resource', async () => {
-        const client = suite.client();
+    describe('DELETE /logs', () => {
+        it('should delete logs with 202 status', async () => {
+            const response = await fetch(`${baseURL}/logs?filter[foo]=bar`, {
+                method: 'DELETE',
+                headers: { Authorization: 'Bearer test' },
+            });
 
-        await client.log.deleteMany({ filters: { labels: { foo: 'bar' } } });
+            expect(response.status).toBe(202);
+        });
+
+        it('should return 400 when no filter labels provided', async () => {
+            const response = await fetch(`${baseURL}/logs`, {
+                method: 'DELETE',
+                headers: { Authorization: 'Bearer test' },
+            });
+
+            expect(response.status).toBe(400);
+        });
     });
 });
