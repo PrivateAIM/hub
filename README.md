@@ -4,7 +4,9 @@
 [![CodeQL][codeql-src]][codeql-href]
 [![Conventional Commits][conventional-src]][conventional-href]
 
-Central services for the Flame platform — a privacy-preserving analytics infrastructure for federated data analysis across distributed institutions.
+Central services for the FLAME platform ([PrivateAIM](https://privateaim.net)) — a privacy-preserving analytics infrastructure for federated data analysis across distributed institutions.
+
+> **[Documentation](https://docs.privateaim.net)** — deployment guides, API references, and user workflows.
 
 **Table of Contents**
 
@@ -33,6 +35,7 @@ Central services for the Flame platform — a privacy-preserving analytics infra
 | **[server-telemetry](apps/server-telemetry)** | Log aggregation (VictoriaLogs) | [![npm][telemetry-badge]][telemetry-npm] |
 | **[server-messenger](apps/server-messenger)** | Real-time messaging (Socket.io) | [![npm][messenger-badge]][messenger-npm] |
 | **[client-ui](apps/client-ui)** | Nuxt 4 web application | |
+| **[docs](docs)** | VitePress documentation site | |
 
 ## Packages
 
@@ -47,6 +50,7 @@ Central services for the Flame platform — a privacy-preserving analytics infra
 | **[messenger-kit](packages/messenger-kit)** | Messenger domain types | [![npm][messenger-kit-badge]][messenger-kit-npm] |
 | **[client-vue](packages/client-vue)** | Vue 3 component library | [![npm][client-vue-badge]][client-vue-npm] |
 | **[server-kit](packages/server-kit)** | Shared server foundation (logging, auth, AMQP, Redis) | [![npm][server-kit-badge]][server-kit-npm] |
+| **[server-test-kit](packages/server-test-kit)** | Shared test fakes and helpers | [![npm][server-test-kit-badge]][server-test-kit-npm] |
 | **[server-db-kit](packages/server-db-kit)** | TypeORM utilities | [![npm][server-db-kit-badge]][server-db-kit-npm] |
 | **[server-http-kit](packages/server-http-kit)** | HTTP middleware and Swagger | [![npm][server-http-kit-badge]][server-http-kit-npm] |
 | **[server-realtime-kit](packages/server-realtime-kit)** | Socket.io server helpers | [![npm][server-realtime-kit-badge]][server-realtime-kit-npm] |
@@ -56,8 +60,19 @@ Central services for the Flame platform — a privacy-preserving analytics infra
 
 ## Quick Start
 
+### Prerequisites
+
+- **Node.js** 22+
+- **npm** (workspaces)
+- **Docker** (optional) — for MySQL/Postgres test databases
+
+External services (for running services locally):
+[Authup](https://authup.org) (OAuth2), Redis, RabbitMQ, MySQL or PostgreSQL
+
+### Install & Build
+
 ```bash
-# Install
+# Install dependencies
 npm ci
 
 # Build all packages
@@ -68,6 +83,21 @@ npm run test
 
 # Lint
 npm run lint
+```
+
+### Development
+
+```bash
+# Start local databases (MySQL + Postgres)
+docker-compose up -d
+
+# Dev servers
+npm run dev --workspace=apps/client-ui          # Nuxt frontend
+npm run dev --workspace=apps/server-core        # Core API
+npm run dev --workspace=apps/server-storage     # Storage service
+npm run dev --workspace=apps/server-telemetry   # Telemetry service
+npm run dev --workspace=apps/server-messenger   # Messenger service
+npm run dev --workspace=docs                    # Documentation site
 ```
 
 ## Contributing
@@ -122,6 +152,8 @@ Published under [Apache 2.0](./LICENSE).
 [client-vue-npm]: https://npmjs.com/package/@privateaim/client-vue
 [server-kit-badge]: https://img.shields.io/npm/v/@privateaim/server-kit?label=
 [server-kit-npm]: https://npmjs.com/package/@privateaim/server-kit
+[server-test-kit-badge]: https://img.shields.io/npm/v/@privateaim/server-test-kit?label=
+[server-test-kit-npm]: https://npmjs.com/package/@privateaim/server-test-kit
 [server-db-kit-badge]: https://img.shields.io/npm/v/@privateaim/server-db-kit?label=
 [server-db-kit-npm]: https://npmjs.com/package/@privateaim/server-db-kit
 [server-http-kit-badge]: https://img.shields.io/npm/v/@privateaim/server-http-kit?label=
