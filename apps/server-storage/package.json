@@ -58,7 +58,7 @@
     "devDependencies": {
         "@faker-js/faker": "^10.4.0",
         "@privateaim/server-test-kit": "^0.8.37",
-        "@trapi/cli": "^0.1.2-beta.3",
+        "@trapi/cli": "^2.0.0",
         "@types/busboy": "^1.5.3",
         "@types/cors": "^2.8.19",
         "@types/tar-stream": "^3.1.4",

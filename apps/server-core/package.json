@@ -64,7 +64,7 @@
     },
     "devDependencies": {
         "@faker-js/faker": "^10.4.0",
-        "@trapi/cli": "^0.1.2-beta.3",
+        "@trapi/cli": "^2.0.0",
         "@privateaim/core-http-kit": "^0.8.40",
         "@privateaim/server-test-kit": "^0.8.37",
         "@types/busboy": "^1.5.3",
