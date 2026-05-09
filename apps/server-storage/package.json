@@ -50,7 +50,7 @@
         "reflect-metadata": "^0.2.2",
         "routup": "^5.1.0",
         "tar-stream": "^3.2.0",
-        "typeorm": "^0.3.28",
+        "typeorm": "^0.3.29",
         "typeorm-extension": "^3.9.0",
         "validup": "^0.2.1",
         "zod": "^4.3.6"
