@@ -55,7 +55,6 @@
         "@faker-js/faker": "^10.4.0",
         "@privateaim/server-test-kit": "^0.8.37",
         "@trapi/cli": "^0.1.2-beta.3",
-        "@types/cors": "^2.8.19",
         "testcontainers": "^11.14.0",
         "vitest": "^4.1.5"
     },

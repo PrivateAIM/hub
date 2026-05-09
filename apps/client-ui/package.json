@@ -48,7 +48,6 @@
         "@vueuse/core": "^14.3.0",
         "bootstrap": "^5.3.8",
         "bootstrap-vue-next": "^0.45.2",
-        "events": "^3.3.0",
         "hapic": "^2.8.2",
         "nuxt": "4.4.4",
         "rapiq": "^0.9.0",

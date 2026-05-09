@@ -60,7 +60,6 @@
         "@privateaim/server-test-kit": "^0.8.37",
         "@trapi/cli": "^0.1.2-beta.3",
         "@types/busboy": "^1.5.3",
-        "@types/cors": "^2.8.19",
         "@types/tar-stream": "^3.1.4",
         "testcontainers": "^11.14.0",
         "ts-node": "^10.9.2",
