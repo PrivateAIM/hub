@@ -7,9 +7,9 @@
 
 import type { Client } from 'minio';
 import type { Readable } from 'node:stream';
-import type { StorageAdapter } from '../../core/storage/types.ts';
+import type { IStorageAdapter } from '../../core/storage/types.ts';
 
-export class MinioStorageAdapter implements StorageAdapter {
+export class MinioStorageAdapter implements IStorageAdapter {
     protected client: Client;
 
     constructor(client: Client) {

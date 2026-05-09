@@ -14,7 +14,7 @@ import {
 import { BucketValidator, DomainType  } from '@privateaim/storage-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import { useDataSource } from 'typeorm-extension';
-import type { StorageAdapter } from '../../../../../core/storage/types.ts';
+import type { IStorageAdapter } from '../../../../../core/storage/types.ts';
 import { BucketEntity } from '../../../../../adapters/database/index.ts';
 import { toBucketName } from '../../../../domains/bucket/utils.ts';
 import { ValidatorGroup } from '@privateaim/kit';
@@ -25,11 +25,11 @@ export class BucketCreateHandler implements ComponentHandler<
 > {
     protected validator : BucketValidator;
 
-    protected storage: StorageAdapter;
+    protected storage: IStorageAdapter;
 
     protected logger: Logger | undefined;
 
-    constructor(ctx: { storage: StorageAdapter; logger?: Logger }) {
+    constructor(ctx: { storage: IStorageAdapter; logger?: Logger }) {
         this.validator = new BucketValidator();
         this.storage = ctx.storage;
         this.logger = ctx.logger;

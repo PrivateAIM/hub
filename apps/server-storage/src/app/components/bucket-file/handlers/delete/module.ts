@@ -18,7 +18,7 @@ import {
 import { DomainType } from '@privateaim/storage-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import { useDataSource } from 'typeorm-extension';
-import type { StorageAdapter } from '../../../../../core/storage/types.ts';
+import type { IStorageAdapter } from '../../../../../core/storage/types.ts';
 import { BucketFileEntity } from '../../../../../adapters/database/index.ts';
 import { toBucketName } from '../../../../domains/bucket/utils.ts';
 
@@ -26,11 +26,11 @@ export class BucketFileDeleteHandler implements ComponentHandler<
     BucketFileComponentEventMap,
     BucketFileCommand.DELETE
 > {
-    protected storage: StorageAdapter;
+    protected storage: IStorageAdapter;
 
     protected logger: Logger | undefined;
 
-    constructor(ctx: { storage: StorageAdapter; logger?: Logger }) {
+    constructor(ctx: { storage: IStorageAdapter; logger?: Logger }) {
         this.storage = ctx.storage;
         this.logger = ctx.logger;
     }

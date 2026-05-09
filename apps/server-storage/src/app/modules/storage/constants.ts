@@ -6,6 +6,6 @@
  */
 
 import { TypedToken } from 'eldin';
-import type { StorageAdapter } from '../../../core/storage/types.ts';
+import type { IStorageAdapter } from '../../../core/storage/types.ts';
 
-export const StorageInjectionKey = new TypedToken<StorageAdapter>('Storage');
+export const StorageInjectionKey = new TypedToken<IStorageAdapter>('Storage');

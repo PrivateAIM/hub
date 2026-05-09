@@ -21,7 +21,7 @@ import {
 import { useRequestQuery } from '@routup/basic/query';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { IRoutupEvent } from 'routup';
-import type { StorageAdapter } from '../../../../core/storage/types.ts';
+import type { IStorageAdapter } from '../../../../core/storage/types.ts';
 import type { IBucketFileRepository, IBucketService } from '../../../../core/entities/index.ts';
 import { toBucketName } from '../../../../core/utils/bucket-name.ts';
 import type { BucketFileComponent } from '../../../../app/components/bucket-file/module.ts';
@@ -32,7 +32,7 @@ import { packBucketFiles } from './stream.ts';
 type BucketControllerContext = {
     service: IBucketService;
     bucketFileRepository: IBucketFileRepository;
-    storage: StorageAdapter;
+    storage: IStorageAdapter;
     bucketFileComponent: BucketFileComponent;
     bucketFileEventCaller: BucketFileEventCaller;
     logger?: Logger;
@@ -45,7 +45,7 @@ export class BucketController {
 
     protected bucketFileRepository: IBucketFileRepository;
 
-    protected storage: StorageAdapter;
+    protected storage: IStorageAdapter;
 
     protected bucketFileComponent: BucketFileComponent;
 

@@ -22,7 +22,7 @@ import { useRequestQuery } from '@routup/basic/query';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { IRoutupEvent } from 'routup';
 import { getRequestAcceptableEncoding } from 'routup';
-import type { StorageAdapter } from '../../../../core/storage/types.ts';
+import type { IStorageAdapter } from '../../../../core/storage/types.ts';
 import type { IBucketFileRepository, IBucketFileService } from '../../../../core/entities/index.ts';
 import { toBucketName } from '../../../../core/utils/bucket-name.ts';
 import { buildActorContext } from '../../request/index.ts';
@@ -30,7 +30,7 @@ import { buildActorContext } from '../../request/index.ts';
 type BucketFileControllerContext = {
     service: IBucketFileService;
     bucketFileRepository: IBucketFileRepository;
-    storage: StorageAdapter;
+    storage: IStorageAdapter;
     logger?: Logger;
 };
 
@@ -41,7 +41,7 @@ export class BucketFileController {
 
     protected bucketFileRepository: IBucketFileRepository;
 
-    protected storage: StorageAdapter;
+    protected storage: IStorageAdapter;
 
     protected logger: Logger | undefined;
 

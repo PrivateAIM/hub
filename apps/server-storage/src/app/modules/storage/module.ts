@@ -11,7 +11,7 @@ import { Client } from 'minio';
 import path from 'node:path';
 import process from 'node:process';
 import { parseProxyConnectionString } from '@privateaim/kit';
-import type { StorageAdapter } from '../../../core/storage/types.ts';
+import type { IStorageAdapter } from '../../../core/storage/types.ts';
 import { MinioStorageAdapter } from '../../../adapters/storage/minio.ts';
 import { FsStorageAdapter } from '../../../adapters/storage/fs.ts';
 import { ConfigInjectionKey } from '../config/constants.ts';
@@ -25,15 +25,18 @@ export class StorageModule implements IModule {
     async setup(container: IContainer): Promise<void> {
         const config = container.resolve(ConfigInjectionKey);
 
-        let adapter: StorageAdapter;
+        let adapter: IStorageAdapter;
 
         if (config.minioConnectionString) {
             const connectionConfig = parseProxyConnectionString(config.minioConnectionString);
+            if (!connectionConfig) {
+                throw new Error('Invalid MINIO_CONNECTION_STRING format.');
+            }
 
             const client = new Client({
                 endPoint: connectionConfig.host,
                 port: connectionConfig.port,
-                useSSL: false,
+                useSSL: connectionConfig.protocol === 'https',
                 accessKey: connectionConfig.auth.username,
                 secretKey: connectionConfig.auth.password,
             });

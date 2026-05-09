@@ -7,7 +7,7 @@
 
 import type { Readable } from 'node:stream';
 
-export interface StorageAdapter {
+export interface IStorageAdapter {
     bucketExists(name: string): Promise<boolean>;
     makeBucket(name: string, region?: string): Promise<void>;
     removeBucket(name: string): Promise<void>;

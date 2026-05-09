@@ -5,14 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { StorageAdapter } from '../../../../../src/core/storage/types.ts';
+import type { IStorageAdapter } from '../../../../../src/core/storage/types.ts';
 
 type MakeBucketCall = {
     name: string;
     region?: string;
 };
 
-export class FakeStorageAdapter implements StorageAdapter {
+export class FakeStorageAdapter implements IStorageAdapter {
     private buckets: Set<string> = new Set();
 
     private makeBucketCalls: MakeBucketCall[] = [];

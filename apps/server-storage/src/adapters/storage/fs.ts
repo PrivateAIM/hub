@@ -9,9 +9,9 @@ import fs from 'node:fs/promises';
 import { createReadStream } from 'node:fs';
 import path from 'node:path';
 import type { Readable } from 'node:stream';
-import type { StorageAdapter } from '../../core/storage/types.ts';
+import type { IStorageAdapter } from '../../core/storage/types.ts';
 
-export class FsStorageAdapter implements StorageAdapter {
+export class FsStorageAdapter implements IStorageAdapter {
     protected basePath: string;
 
     constructor(basePath: string) {
@@ -42,11 +42,20 @@ export class FsStorageAdapter implements StorageAdapter {
     }
 
     async getObject(bucket: string, key: string): Promise<Readable> {
-        return createReadStream(path.join(this.basePath, bucket, key));
+        const filePath = path.join(this.basePath, bucket, key);
+        await fs.access(filePath);
+        return createReadStream(filePath);
     }
 
     async removeObject(bucket: string, key: string): Promise<void> {
-        await fs.unlink(path.join(this.basePath, bucket, key)).catch(() => {});
+        try {
+            await fs.unlink(path.join(this.basePath, bucket, key));
+        } catch (err) {
+            if (err && typeof err === 'object' && 'code' in err && err.code === 'ENOENT') {
+                return;
+            }
+            throw err;
+        }
     }
 
     async removeObjects(bucket: string, keys: string[]): Promise<void> {

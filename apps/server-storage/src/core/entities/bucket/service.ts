@@ -13,12 +13,12 @@ import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/s
 import { AbstractEntityService } from '@privateaim/server-kit';
 import type { IBucketCaller, IBucketRepository, IBucketService } from './types.ts';
 import { BucketValidator } from '@privateaim/storage-kit';
-import type { StorageAdapter } from '../../storage/types.ts';
+import type { IStorageAdapter } from '../../storage/types.ts';
 
 type BucketServiceContext = {
     repository: IBucketRepository;
     caller: IBucketCaller;
-    storage: StorageAdapter;
+    storage: IStorageAdapter;
 };
 
 export class BucketService extends AbstractEntityService implements IBucketService {
@@ -26,7 +26,7 @@ export class BucketService extends AbstractEntityService implements IBucketServi
 
     protected caller: IBucketCaller;
 
-    protected storage: StorageAdapter;
+    protected storage: IStorageAdapter;
 
     protected validator: BucketValidator;
 
