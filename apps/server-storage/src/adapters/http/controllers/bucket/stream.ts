@@ -20,35 +20,31 @@ async function packFile(
     storage: IStorageAdapter,
     logger?: Logger,
 ) : Promise<void> {
+    const stream = await storage.getObject(name, file.hash);
+    const data = await streamToBuffer(stream);
+
+    logger?.debug(`Packing file ${file.path} (${file.id})`);
+
     return new Promise<void>((resolve, reject) => {
-        storage.getObject(name, file.hash)
-            .then((stream) => streamToBuffer(stream))
-            .then((data) => {
-                logger?.debug(`Packing file ${file.path} (${file.id})`);
-
-                pack.entry({
-                    name: file.path,
-                    size: data.byteLength,
-                }, data, (err) => {
-                    if (err) {
-                        reject(err);
-
-                        return;
-                    }
-
-                    resolve();
-                });
-            })
-            .catch((e) => reject(e));
+        pack.entry({
+            name: file.path,
+            size: data.byteLength,
+        }, data, (err) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            resolve();
+        });
     });
 }
 
-export async function packBucketFiles(
+export function packBucketFiles(
     name: string,
     files: BucketFileEntity[],
     storage: IStorageAdapter,
     logger?: Logger,
-) : Promise<Response> {
+) : ReadableStream {
     const pack = tar.pack();
 
     const promise = files.reduce(
@@ -60,22 +56,12 @@ export async function packBucketFiles(
         .then(() => pack.finalize())
         .catch(() => pack.destroy());
 
-    const readable = new Readable({
-        highWaterMark: 16384,
-        read() {},
-    });
-
+    // tar-stream's Pack doesn't set readableHighWaterMark which
+    // Readable.toWeb() requires. Pipe through a wrapper that has it.
+    const readable = new Readable({ highWaterMark: 16384, read() {} });
     pack.on('data', (chunk: Buffer) => readable.push(chunk));
     pack.on('end', () => readable.push(null));
     pack.on('error', (err: Error) => readable.destroy(err));
 
-    const webStream = Readable.toWeb(readable) as ReadableStream;
-
-    return new Response(webStream, {
-        status: 200,
-        headers: {
-            'Content-Type': 'application/x-tar',
-            'Transfer-Encoding': 'chunked',
-        },
-    });
+    return Readable.toWeb(readable) as ReadableStream;
 }

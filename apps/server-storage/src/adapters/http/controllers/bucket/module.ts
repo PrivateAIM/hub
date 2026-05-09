@@ -21,6 +21,11 @@ import {
 import { useRequestQuery } from '@routup/basic/query';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { IRoutupEvent } from 'routup';
+import {
+    sendStream,
+    setResponseHeaderAttachment,
+    setResponseHeaderContentType,
+} from 'routup';
 import type { IStorageAdapter } from '../../../../core/storage/types.ts';
 import type { IBucketFileRepository, IBucketService } from '../../../../core/entities/index.ts';
 import { toBucketName } from '../../../../core/utils/bucket-name.ts';
@@ -74,6 +79,7 @@ export class BucketController {
     @DGet('/:id/stream', [ForceLoggedInMiddleware])
     async stream(
         @DPath('id') id: string,
+        @DContext() event: IRoutupEvent,
     ) {
         const entity = await this.service.getOne(id);
 
@@ -83,17 +89,12 @@ export class BucketController {
 
         this.logger?.debug(`Streaming files of ${bucketName}`);
 
-        try {
-            const response = await packBucketFiles(bucketName, files, this.storage, this.logger);
+        const stream = packBucketFiles(bucketName, files, this.storage, this.logger);
 
-            this.logger?.debug(`Streamed files of ${bucketName}`);
+        setResponseHeaderAttachment(event, `${bucketName}.tar`);
+        setResponseHeaderContentType(event, 'application/x-tar');
 
-            return response;
-        } catch (err) {
-            this.logger?.error(err);
-
-            throw err;
-        }
+        return sendStream(event, stream);
     }
 
     @DPost('/:id/upload', [ForceLoggedInMiddleware])
