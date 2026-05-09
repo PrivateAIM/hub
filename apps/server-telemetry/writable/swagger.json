@@ -172,7 +172,7 @@
             },
             "URLAlias": {
                 "type": "string",
-                "description": "The **`URL`** interface is used to parse, construct, normalize, and encode URL.\n\n[MDN Reference](https://developer.mozilla.org/docs/Web/API/URL)"
+                "description": "The **`URL`** interface is used to parse, construct, normalize, and encode URLs. It works by providing properties which allow you to easily read and modify the components of a URL.\n\n[MDN Reference](https://developer.mozilla.org/docs/Web/API/URL)"
             },
             "SocketReadyState": {
                 "type": "string",
@@ -200,24 +200,6 @@
                 "additionalProperties": {
                     "type": "string"
                 }
-            },
-            "Error": {
-                "properties": {
-                    "name": {
-                        "type": "string"
-                    },
-                    "message": {
-                        "type": "string"
-                    },
-                    "stack": {
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "name",
-                    "message"
-                ],
-                "type": "object"
             },
             "Settings": {
                 "properties": {
@@ -531,7 +513,7 @@
                 "$ref": "#/components/schemas/ServerRequest"
             },
             "Headers": {
-                "description": "The **`Headers`** interface of the Fetch API allows you to perform various actions on HTTP request and response headers.\n\n[MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers)",
+                "description": "The **`Headers`** interface of the Fetch API allows you to perform various actions on HTTP request and response headers. These actions include retrieving, setting, adding to, and removing headers from the list of the request's headers.\n\n[MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers)",
                 "properties": {},
                 "type": "object"
             },
@@ -874,7 +856,6 @@
                         }
                     }
                 },
-                "security": [],
                 "description": "",
                 "tags": [],
                 "parameters": [],
@@ -892,31 +873,94 @@
                                         "type": "string"
                                     },
                                     "expires_at": {
-                                        "type": "string"
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
                                     },
                                     "realm_id": {
-                                        "type": "string"
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
                                     },
                                     "actor_name": {
-                                        "type": "string"
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
                                     },
                                     "actor_id": {
-                                        "type": "string"
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
                                     },
                                     "actor_type": {
-                                        "type": "string"
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
                                     },
                                     "request_user_agent": {
-                                        "type": "string"
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
                                     },
                                     "request_ip_address": {
-                                        "type": "string"
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
                                     },
                                     "request_method": {
-                                        "type": "string"
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
                                     },
                                     "request_path": {
-                                        "type": "string"
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
                                     },
                                     "expiring": {
                                         "type": "boolean"
@@ -935,7 +979,14 @@
                                         "type": "string"
                                     },
                                     "ref_id": {
-                                        "type": "string"
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
                                     },
                                     "ref_type": {
                                         "type": "string"
@@ -995,7 +1046,6 @@
                         }
                     }
                 },
-                "security": [],
                 "description": "",
                 "tags": [],
                 "parameters": []
@@ -1016,7 +1066,6 @@
                         }
                     }
                 },
-                "security": [],
                 "description": "",
                 "tags": [],
                 "parameters": [
@@ -1048,7 +1097,6 @@
                         }
                     }
                 },
-                "security": [],
                 "description": "",
                 "tags": [],
                 "parameters": [
@@ -1082,7 +1130,6 @@
                         }
                     }
                 },
-                "security": [],
                 "description": "",
                 "tags": [],
                 "parameters": [],
@@ -1146,7 +1193,6 @@
                         }
                     }
                 },
-                "security": [],
                 "description": "",
                 "tags": [],
                 "parameters": []
@@ -1159,19 +1205,24 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "additionalProperties": true
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ],
+                                    "enum": [
+                                        null
+                                    ]
                                 }
                             }
                         }
                     }
                 },
-                "security": [],
                 "description": "",
                 "tags": [],
                 "parameters": []
             }
         },
-        "": {
+        "/": {
             "get": {
                 "operationId": "Status",
                 "responses": {
@@ -1186,7 +1237,6 @@
                         }
                     }
                 },
-                "security": [],
                 "description": "",
                 "tags": [],
                 "parameters": []
