@@ -23,7 +23,8 @@ export function readConfigFromEnv(): Partial<Config> {
 
         rabbitMqConnectionString: read(EnvironmentInputKey.RABBITMQ_CONNECTION_STRING),
         redisConnectionString: read(EnvironmentInputKey.REDIS_CONNECTION_STRING),
-        minioConnectionString: read(EnvironmentInputKey.MINIO_CONNECTION_STRING, ConfigDefaults.MINIO_CONNECTION_STRING),
+        minioConnectionString: read(EnvironmentInputKey.MINIO_CONNECTION_STRING),
+        storagePath: read(EnvironmentInputKey.STORAGE_PATH),
 
         authupURL: read(EnvironmentInputKey.AUTHUP_URL),
     };

@@ -11,15 +11,15 @@ import type { Component } from '@privateaim/server-kit';
 import { LoggerInjectionKey, MessageBusInjectionKey, MessageBusWorkerComponentCaller } from '@privateaim/server-kit';
 import { BucketEventMessageBusRouting, BucketTaskMessageBusRouting } from '@privateaim/server-storage-kit';
 import { BucketComponent } from '../../components/bucket/index.ts';
-import { MinioClientInjectionKey } from '../minio/constants.ts';
+import { StorageInjectionKey } from '../storage/constants.ts';
 
 export class ComponentsModule implements IModule {
     readonly name = 'components';
 
-    readonly dependencies: string[] = ['minio', 'database'];
+    readonly dependencies: string[] = ['storage', 'database'];
 
     async setup(container: IContainer): Promise<void> {
-        const minio = container.resolve(MinioClientInjectionKey);
+        const storage = container.resolve(StorageInjectionKey);
 
         const loggerResult = container.tryResolve(LoggerInjectionKey);
         const logger = loggerResult.success ? loggerResult.data : undefined;
@@ -27,7 +27,7 @@ export class ComponentsModule implements IModule {
         const messageBus = messageBusResult.success ? messageBusResult.data : undefined;
 
         const components : Component<any>[] = [
-            new MessageBusWorkerComponentCaller(new BucketComponent({ minio, logger }), {
+            new MessageBusWorkerComponentCaller(new BucketComponent({ storage, logger }), {
                 consumeRouting: BucketTaskMessageBusRouting,
                 publishRouting: BucketEventMessageBusRouting,
                 messageBus,

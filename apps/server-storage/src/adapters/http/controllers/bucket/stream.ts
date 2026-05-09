@@ -9,7 +9,7 @@ import { Readable } from 'node:stream';
 import type { Logger } from '@privateaim/server-kit';
 import type { Pack } from 'tar-stream';
 import tar from 'tar-stream';
-import type { Client } from 'minio';
+import type { IStorageAdapter } from '../../../../core/storage/types.ts';
 import { streamToBuffer } from '../../../../core/utils/stream-to-buffer.ts';
 import type { BucketFileEntity } from '../../../database/entities/bucket-file.ts';
 
@@ -17,11 +17,11 @@ async function packFile(
     pack: Pack,
     name: string,
     file: BucketFileEntity,
-    minio: Client,
+    storage: IStorageAdapter,
     logger?: Logger,
 ) : Promise<void> {
     return new Promise<void>((resolve, reject) => {
-        minio.getObject(name, file.hash)
+        storage.getObject(name, file.hash)
             .then((stream) => streamToBuffer(stream))
             .then((data) => {
                 logger?.debug(`Packing file ${file.path} (${file.id})`);
@@ -46,13 +46,13 @@ async function packFile(
 export async function packBucketFiles(
     name: string,
     files: BucketFileEntity[],
-    minio: Client,
+    storage: IStorageAdapter,
     logger?: Logger,
 ) : Promise<Response> {
     const pack = tar.pack();
 
     const promise = files.reduce(
-        (prev, file) => prev.then(() => packFile(pack, name, file, minio, logger)),
+        (prev, file) => prev.then(() => packFile(pack, name, file, storage, logger)),
         Promise.resolve(),
     );
 

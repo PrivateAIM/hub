@@ -21,7 +21,7 @@ import {
 import { useRequestQuery } from '@routup/basic/query';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { IRoutupEvent } from 'routup';
-import type { Client } from 'minio';
+import type { IStorageAdapter } from '../../../../core/storage/types.ts';
 import type { IBucketFileRepository, IBucketService } from '../../../../core/entities/index.ts';
 import { toBucketName } from '../../../../core/utils/bucket-name.ts';
 import type { BucketFileComponent } from '../../../../app/components/bucket-file/module.ts';
@@ -32,7 +32,7 @@ import { packBucketFiles } from './stream.ts';
 type BucketControllerContext = {
     service: IBucketService;
     bucketFileRepository: IBucketFileRepository;
-    minio: Client;
+    storage: IStorageAdapter;
     bucketFileComponent: BucketFileComponent;
     bucketFileEventCaller: BucketFileEventCaller;
     logger?: Logger;
@@ -45,7 +45,7 @@ export class BucketController {
 
     protected bucketFileRepository: IBucketFileRepository;
 
-    protected minio: Client;
+    protected storage: IStorageAdapter;
 
     protected bucketFileComponent: BucketFileComponent;
 
@@ -56,7 +56,7 @@ export class BucketController {
     constructor(ctx: BucketControllerContext) {
         this.service = ctx.service;
         this.bucketFileRepository = ctx.bucketFileRepository;
-        this.minio = ctx.minio;
+        this.storage = ctx.storage;
         this.bucketFileComponent = ctx.bucketFileComponent;
         this.bucketFileEventCaller = ctx.bucketFileEventCaller;
         this.logger = ctx.logger;
@@ -84,7 +84,7 @@ export class BucketController {
         this.logger?.debug(`Streaming files of ${bucketName}`);
 
         try {
-            const response = await packBucketFiles(bucketName, files, this.minio, this.logger);
+            const response = await packBucketFiles(bucketName, files, this.storage, this.logger);
 
             this.logger?.debug(`Streamed files of ${bucketName}`);
 

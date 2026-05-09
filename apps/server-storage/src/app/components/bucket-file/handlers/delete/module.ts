@@ -18,7 +18,7 @@ import {
 import { DomainType } from '@privateaim/storage-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import { useDataSource } from 'typeorm-extension';
-import type { Client } from 'minio';
+import type { IStorageAdapter } from '../../../../../core/storage/types.ts';
 import { BucketFileEntity } from '../../../../../adapters/database/index.ts';
 import { toBucketName } from '../../../../domains/bucket/utils.ts';
 
@@ -26,12 +26,12 @@ export class BucketFileDeleteHandler implements ComponentHandler<
     BucketFileComponentEventMap,
     BucketFileCommand.DELETE
 > {
-    protected minio: Client;
+    protected storage: IStorageAdapter;
 
     protected logger: Logger | undefined;
 
-    constructor(ctx: { minio: Client; logger?: Logger }) {
-        this.minio = ctx.minio;
+    constructor(ctx: { storage: IStorageAdapter; logger?: Logger }) {
+        this.storage = ctx.storage;
         this.logger = ctx.logger;
     }
 
@@ -81,7 +81,7 @@ export class BucketFileDeleteHandler implements ComponentHandler<
             throw new NotFoundError();
         }
 
-        await this.minio.removeObject(toBucketName(entity.bucket.id), entity.hash);
+        await this.storage.removeObject(toBucketName(entity.bucket.id), entity.hash);
 
         const entityId = entity.id;
 

@@ -16,14 +16,14 @@ import { BucketFileService } from '../../../core/entities/bucket-file/service.ts
 import { BucketComponent } from '../../components/bucket/module.ts';
 import { BucketFileComponent } from '../../components/bucket-file/module.ts';
 import { DatabaseInjectionKey } from '../database/constants.ts';
-import { MinioClientInjectionKey } from '../minio/constants.ts';
+import { StorageInjectionKey } from '../storage/constants.ts';
 import { BucketCallerAdapter } from './callers/bucket-caller.ts';
 import { BucketFileCallerAdapter } from './callers/bucket-file-caller.ts';
 
 export function createControllers(container: IContainer): Record<string, any>[] {
     const bucketRepository = container.resolve(DatabaseInjectionKey.BucketRepository);
     const bucketFileRepository = container.resolve(DatabaseInjectionKey.BucketFileRepository);
-    const minio = container.resolve(MinioClientInjectionKey);
+    const storage = container.resolve(StorageInjectionKey);
 
     const loggerResult = container.tryResolve(LoggerInjectionKey);
     const logger = loggerResult.success ? loggerResult.data : undefined;
@@ -31,8 +31,8 @@ export function createControllers(container: IContainer): Record<string, any>[] 
     const messageBusResult = container.tryResolve(MessageBusInjectionKey);
     const messageBus = messageBusResult.success ? messageBusResult.data : undefined;
 
-    const bucketComponent = new BucketComponent({ minio, logger });
-    const bucketFileComponent = new BucketFileComponent({ minio, logger });
+    const bucketComponent = new BucketComponent({ storage, logger });
+    const bucketFileComponent = new BucketFileComponent({ storage, logger });
     const bucketFileEventCaller = new BucketFileEventCaller({ messageBus });
 
     const bucketCaller = new BucketCallerAdapter(bucketComponent);
@@ -41,7 +41,7 @@ export function createControllers(container: IContainer): Record<string, any>[] 
     const bucketService = new BucketService({
         repository: bucketRepository,
         caller: bucketCaller,
-        minio,
+        storage,
     });
 
     const bucketFileService = new BucketFileService({
@@ -53,7 +53,7 @@ export function createControllers(container: IContainer): Record<string, any>[] 
         new BucketController({
             service: bucketService,
             bucketFileRepository,
-            minio,
+            storage,
             bucketFileComponent,
             bucketFileEventCaller,
             logger,
@@ -61,7 +61,7 @@ export function createControllers(container: IContainer): Record<string, any>[] 
         new BucketFileController({
             service: bucketFileService,
             bucketFileRepository,
-            minio,
+            storage,
             logger,
         }),
         new RootController(),

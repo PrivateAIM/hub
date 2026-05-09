@@ -19,7 +19,7 @@ import { BucketValidator, DomainType  } from '@privateaim/storage-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import crypto from 'node:crypto';
 import { useDataSource } from 'typeorm-extension';
-import type { Client } from 'minio';
+import type { IStorageAdapter } from '../../../../../core/storage/types.ts';
 import { BucketEntity, BucketFileEntity } from '../../../../../adapters/database/index.ts';
 import { toBucketName } from '../../../../domains/bucket/utils.ts';
 
@@ -29,13 +29,13 @@ export class BucketFileCreateHandler implements ComponentHandler<
 > {
     protected validator : BucketValidator;
 
-    protected minio: Client;
+    protected storage: IStorageAdapter;
 
     protected logger: Logger | undefined;
 
-    constructor(ctx: { minio: Client; logger?: Logger }) {
+    constructor(ctx: { storage: IStorageAdapter; logger?: Logger }) {
         this.validator = new BucketValidator();
-        this.minio = ctx.minio;
+        this.storage = ctx.storage;
         this.logger = ctx.logger;
     }
 
@@ -96,7 +96,7 @@ export class BucketFileCreateHandler implements ComponentHandler<
         const hash = hashBuilder.digest('hex');
 
         // upload
-        await this.minio.putObject(
+        await this.storage.putObject(
             toBucketName(bucket.id),
             hash,
             data,

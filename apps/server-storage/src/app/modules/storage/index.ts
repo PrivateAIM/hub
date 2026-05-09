@@ -5,6 +5,5 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export { MinioModule } from './module.ts';
-export { MinioClientInjectionKey } from './constants.ts';
-export type { MinioModuleOptions } from './types.ts';
+export { StorageModule } from './module.ts';
+export { StorageInjectionKey } from './constants.ts';

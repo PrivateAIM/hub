@@ -6,6 +6,6 @@
  */
 
 import { TypedToken } from 'eldin';
-import type { Client } from 'minio';
+import type { IStorageAdapter } from '../../../core/storage/types.ts';
 
-export const MinioClientInjectionKey = new TypedToken<Client>('MinioClient');
+export const StorageInjectionKey = new TypedToken<IStorageAdapter>('Storage');
