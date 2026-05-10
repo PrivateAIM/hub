@@ -81,7 +81,12 @@ export class BucketFileDeleteHandler implements ComponentHandler<
             throw new NotFoundError();
         }
 
-        await this.storage.removeObject(toBucketName(entity.bucket.id), entity.hash);
+        const bucketName = toBucketName(entity.bucket.id);
+        const bucketExists = await this.storage.bucketExists(bucketName);
+
+        if (bucketExists) {
+            await this.storage.removeObject(bucketName, entity.hash);
+        }
 
         const entityId = entity.id;
 
