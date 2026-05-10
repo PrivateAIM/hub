@@ -1,5 +1,35 @@
 # Changelog
 
+## [0.8.41](https://github.com/PrivateAIM/hub/compare/v0.8.40...v0.8.41) (2026-05-10)
+
+
+### Features
+
+* migrate to routup v5 with web API handlers ([#1587](https://github.com/PrivateAIM/hub/issues/1587)) ([01c5881](https://github.com/PrivateAIM/hub/commit/01c5881294c4a2768b4842b0ab3ce9bc1345f732))
+* **server-storage:** use sendStream + setResponseHeaderAttachment for bucket-file streaming ([c5cab43](https://github.com/PrivateAIM/hub/commit/c5cab437fc586b1635f64d2d8a7367651256f041))
+* typed controller signatures, validators in kit packages, swagger via @trapi/cli ([#1590](https://github.com/PrivateAIM/hub/issues/1590)) ([74a35c8](https://github.com/PrivateAIM/hub/commit/74a35c8bed92036a00b581868589c40a192278aa))
+
+
+### Bug Fixes
+
+* **build:** add rootDir to service tsconfig.build.json files ([9128c63](https://github.com/PrivateAIM/hub/commit/9128c633160849e9ca20fcd165b64be80a004b64))
+* **deps:** bump the minorandpatch group across 1 directory with 16 updates ([#1589](https://github.com/PrivateAIM/hub/issues/1589)) ([3358afc](https://github.com/PrivateAIM/hub/commit/3358afc590f01884ac0f6c3faaa6ef9423e47422))
+* **deps:** bump the minorandpatch group across 1 directory with 3 updates ([#1592](https://github.com/PrivateAIM/hub/issues/1592)) ([727fea3](https://github.com/PrivateAIM/hub/commit/727fea3427c2932883edd249a73b251685d76aa0))
+* **server-storage:** handle missing MinIO bucket on bucket-file deletion ([0f73303](https://github.com/PrivateAIM/hub/commit/0f733033ffbc3b479c0bc083e4583a88ebd4ec70))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.8.40 to ^0.8.41
+    * @privateaim/server-db-kit bumped from ^0.8.40 to ^0.8.41
+    * @privateaim/server-http-kit bumped from ^0.8.40 to ^0.8.41
+    * @privateaim/server-kit bumped from ^0.8.40 to ^0.8.41
+    * @privateaim/server-telemetry-kit bumped from ^0.8.40 to ^0.8.41
+    * @privateaim/storage-kit bumped from ^0.8.40 to ^0.8.41
+    * @privateaim/telemetry-kit bumped from ^0.8.40 to ^0.8.41
+
 ## [0.8.40](https://github.com/PrivateAIM/hub/compare/v0.8.39...v0.8.40) (2026-04-29)
 
 

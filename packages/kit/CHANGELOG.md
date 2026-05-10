@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.8.41](https://github.com/PrivateAIM/hub/compare/v0.8.40...v0.8.41) (2026-05-10)
+
+
+### Features
+
+* typed controller signatures, validators in kit packages, swagger via @trapi/cli ([#1590](https://github.com/PrivateAIM/hub/issues/1590)) ([74a35c8](https://github.com/PrivateAIM/hub/commit/74a35c8bed92036a00b581868589c40a192278aa))
+
+
+### Bug Fixes
+
+* **deps:** bump nanoid from 3.3.11 to 5.1.11 ([#1581](https://github.com/PrivateAIM/hub/issues/1581)) ([28d90f5](https://github.com/PrivateAIM/hub/commit/28d90f533edb3a730f7d3653a2902af0bd940ad1))
+
 ## [0.8.40](https://github.com/PrivateAIM/hub/compare/v0.8.39...v0.8.40) (2026-04-29)
 
 ## [0.8.39](https://github.com/PrivateAIM/hub/compare/v0.8.38...v0.8.39) (2026-04-29)

@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.8.41](https://github.com/PrivateAIM/hub/compare/v0.8.40...v0.8.41) (2026-05-10)
+
+
+### Features
+
+* migrate to routup v5 with web API handlers ([#1587](https://github.com/PrivateAIM/hub/issues/1587)) ([01c5881](https://github.com/PrivateAIM/hub/commit/01c5881294c4a2768b4842b0ab3ce9bc1345f732))
+
+
+### Bug Fixes
+
+* **build:** add rootDir to service tsconfig.build.json files ([9128c63](https://github.com/PrivateAIM/hub/commit/9128c633160849e9ca20fcd165b64be80a004b64))
+* **deps:** bump the minorandpatch group across 1 directory with 16 updates ([#1589](https://github.com/PrivateAIM/hub/issues/1589)) ([3358afc](https://github.com/PrivateAIM/hub/commit/3358afc590f01884ac0f6c3faaa6ef9423e47422))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.8.40 to ^0.8.41
+    * @privateaim/messenger-kit bumped from ^0.7.41 to ^0.7.42
+    * @privateaim/server-http-kit bumped from ^0.8.40 to ^0.8.41
+    * @privateaim/server-kit bumped from ^0.8.40 to ^0.8.41
+    * @privateaim/server-realtime-kit bumped from ^0.8.40 to ^0.8.41
+    * @privateaim/server-telemetry-kit bumped from ^0.8.40 to ^0.8.41
+    * @privateaim/telemetry-kit bumped from ^0.8.40 to ^0.8.41
+
 ## [0.8.40](https://github.com/PrivateAIM/hub/compare/v0.8.39...v0.8.40) (2026-04-29)
 
 
