@@ -6,7 +6,7 @@
  */
 
 import type { Bucket } from '@privateaim/storage-kit';
-import { ForbiddenError, NotFoundError } from '@ebec/http';
+import { PermissionDeniedError, EntityNotFoundError } from '@privateaim/errors';
 import { PermissionName, ValidatorGroup, isRealmResourceWritable  } from '@privateaim/kit';
 import { toBucketName } from '../../utils/bucket-name.ts';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
@@ -48,7 +48,7 @@ export class BucketService extends AbstractEntityService implements IBucketServi
             await this.repository.findOneByIdOrName(id);
 
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError();
         }
 
         return entity;
@@ -58,14 +58,14 @@ export class BucketService extends AbstractEntityService implements IBucketServi
         await actor.permissionChecker.preCheck({ name: PermissionName.BUCKET_CREATE });
 
         if (!actor.identity) {
-            throw new ForbiddenError('Only clients, users & robots are permitted to create a bucket.');
+            throw new PermissionDeniedError('Only clients, users & robots are permitted to create a bucket.');
         }
 
         const validated = await this.validator.run(data, { group: ValidatorGroup.CREATE });
 
         if (validated.realm_id) {
             if (!isRealmResourceWritable(actor.realm, validated.realm_id)) {
-                throw new ForbiddenError('You are not permitted to create this bucket.');
+                throw new PermissionDeniedError('You are not permitted to create this bucket.');
             }
         } else {
             validated.realm_id = this.getActorRealmId(actor);
@@ -83,14 +83,14 @@ export class BucketService extends AbstractEntityService implements IBucketServi
 
         let entity = await this.repository.findOneByIdOrName(id);
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError();
         }
 
         if (!this.isOwnedByActor(entity, actor)) {
             await actor.permissionChecker.preCheck({ name: PermissionName.BUCKET_UPDATE });
 
             if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
-                throw new ForbiddenError();
+                throw new PermissionDeniedError();
             }
         }
 
@@ -114,14 +114,14 @@ export class BucketService extends AbstractEntityService implements IBucketServi
     async delete(id: string, actor: ActorContext): Promise<Bucket> {
         const entity = await this.repository.findOneByIdOrName(id);
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError();
         }
 
         if (!this.isOwnedByActor(entity, actor)) {
             await actor.permissionChecker.preCheck({ name: PermissionName.BUCKET_DELETE });
 
             if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
-                throw new ForbiddenError();
+                throw new PermissionDeniedError();
             }
         }
 

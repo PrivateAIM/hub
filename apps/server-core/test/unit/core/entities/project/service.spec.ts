@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
+import { BadRequestError, PermissionDeniedError, EntityNotFoundError } from '@privateaim/errors';
 import type { Project } from '@privateaim/core-kit';
 import {
     beforeEach,
@@ -69,8 +69,8 @@ describe('ProjectService', () => {
             expect(result.id).toBe('project-1');
         });
 
-        it('should throw NotFoundError for missing entity', async () => {
-            await expect(service.getOne('nonexistent')).rejects.toThrow(NotFoundError);
+        it('should throw EntityNotFoundError for missing entity', async () => {
+            await expect(service.getOne('nonexistent')).rejects.toThrow(EntityNotFoundError);
         });
     });
 
@@ -94,18 +94,18 @@ describe('ProjectService', () => {
             ).rejects.toThrow(BadRequestError);
         });
 
-        it('should throw ForbiddenError when actor lacks permission', async () => {
+        it('should throw PermissionDeniedError when actor lacks permission', async () => {
             repository.seed(createTestProject());
 
             await expect(
                 service.delete('project-1', createDenyAllActor()),
-            ).rejects.toThrow(ForbiddenError);
+            ).rejects.toThrow(PermissionDeniedError);
         });
 
-        it('should throw NotFoundError for missing entity', async () => {
+        it('should throw EntityNotFoundError for missing entity', async () => {
             await expect(
                 service.delete('nonexistent', createAllowAllActor()),
-            ).rejects.toThrow(NotFoundError);
+            ).rejects.toThrow(EntityNotFoundError);
         });
 
         it('should enforce realm writability for non-master realm', async () => {
@@ -114,7 +114,7 @@ describe('ProjectService', () => {
             const actor = createNonMasterRealmActor('realm-1');
             await expect(
                 service.delete('project-1', actor),
-            ).rejects.toThrow(ForbiddenError);
+            ).rejects.toThrow(PermissionDeniedError);
         });
 
         it('should allow master realm to delete any project', async () => {

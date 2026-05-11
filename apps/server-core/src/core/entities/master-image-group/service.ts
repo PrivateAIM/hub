@@ -7,7 +7,7 @@
 
 import type { MasterImageGroup } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
-import { NotFoundError } from '@ebec/http';
+import { EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
 import type { IMasterImageGroupRepository, IMasterImageGroupService } from './types.ts';
@@ -32,7 +32,7 @@ export class MasterImageGroupService extends AbstractEntityService implements IM
         const entity = await this.repository.findOneById(id);
 
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError();
         }
 
         return entity;
@@ -43,7 +43,7 @@ export class MasterImageGroupService extends AbstractEntityService implements IM
 
         const entity = await this.repository.findOneBy({ id });
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError();
         }
 
         const entityId = entity.id;

@@ -5,7 +5,7 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import { NotFoundError } from '@ebec/http';
+import { EntityNotFoundError } from '@privateaim/errors';
 import type { ComponentHandler, ComponentHandlerContext, Logger } from '@privateaim/server-kit';
 import type { BucketComponentEventMap, BucketDeleteCommandPayload } from '@privateaim/server-storage-kit';
 import {
@@ -72,7 +72,7 @@ export class BucketDeleteHandler implements ComponentHandler<
         const entity = await repository.findOneBy({ id: value.id });
 
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError();
         }
 
         const entityId = entity.id;

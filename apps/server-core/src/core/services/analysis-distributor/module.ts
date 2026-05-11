@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BadRequestError } from '@ebec/http';
+import { BadRequestError } from '@privateaim/errors';
 import type { Analysis, AnalysisNode, Registry } from '@privateaim/core-kit';
 import { AnalysisDistributorCommandChecker } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';

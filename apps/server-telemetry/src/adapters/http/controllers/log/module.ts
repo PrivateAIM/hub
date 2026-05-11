@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BadRequestError } from '@ebec/http';
+import { BadRequestError } from '@privateaim/errors';
 import { PermissionName, isObject } from '@privateaim/kit';
 import type { Log, LogInput } from '@privateaim/telemetry-kit';
 import { LogValidator } from '@privateaim/telemetry-kit';

@@ -9,7 +9,7 @@ import { randomUUID } from 'node:crypto';
 import type { MasterImage } from '@privateaim/core-kit';
 import { MasterImageCommand } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
-import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
+import { BadRequestError, PermissionDeniedError, EntityNotFoundError } from '@privateaim/errors';
 import {
     beforeEach,
     describe,
@@ -90,8 +90,8 @@ describe('MasterImageService', () => {
             expect(result.id).toBe('mi-1');
         });
 
-        it('should throw NotFoundError for missing entity', async () => {
-            await expect(service.getOne('nonexistent')).rejects.toThrow(NotFoundError);
+        it('should throw EntityNotFoundError for missing entity', async () => {
+            await expect(service.getOne('nonexistent')).rejects.toThrow(EntityNotFoundError);
         });
     });
 
@@ -118,14 +118,14 @@ describe('MasterImageService', () => {
                 expect(result).toBeUndefined();
             });
 
-            it('should throw ForbiddenError when actor lacks permission', async () => {
+            it('should throw PermissionDeniedError when actor lacks permission', async () => {
                 await expect(
                     service.executeCommand(
                         MasterImageCommand.SYNC,
                         {},
                         createDenyAllActor(),
                     ),
-                ).rejects.toThrow(ForbiddenError);
+                ).rejects.toThrow(PermissionDeniedError);
             });
         });
 
@@ -156,24 +156,24 @@ describe('MasterImageService', () => {
                 ).rejects.toThrow(BadRequestError);
             });
 
-            it('should throw NotFoundError when image does not exist', async () => {
+            it('should throw EntityNotFoundError when image does not exist', async () => {
                 await expect(
                     service.executeCommand(
                         MasterImageCommand.BUILD,
                         { id: 'nonexistent' },
                         createAllowAllActor(),
                     ),
-                ).rejects.toThrow(NotFoundError);
+                ).rejects.toThrow(EntityNotFoundError);
             });
 
-            it('should throw ForbiddenError when actor lacks permission', async () => {
+            it('should throw PermissionDeniedError when actor lacks permission', async () => {
                 await expect(
                     service.executeCommand(
                         MasterImageCommand.BUILD,
                         { id: 'mi-1' },
                         createDenyAllActor(),
                     ),
-                ).rejects.toThrow(ForbiddenError);
+                ).rejects.toThrow(PermissionDeniedError);
             });
         });
 
@@ -198,19 +198,19 @@ describe('MasterImageService', () => {
             expect(repository.getAll()).toHaveLength(0);
         });
 
-        it('should throw ForbiddenError when actor lacks permission', async () => {
+        it('should throw PermissionDeniedError when actor lacks permission', async () => {
             const image = createTestMasterImage();
             repository.seed(image);
 
             await expect(
                 service.delete(image.id, createDenyAllActor()),
-            ).rejects.toThrow(ForbiddenError);
+            ).rejects.toThrow(PermissionDeniedError);
         });
 
-        it('should throw NotFoundError for missing entity', async () => {
+        it('should throw EntityNotFoundError for missing entity', async () => {
             await expect(
                 service.delete('nonexistent', createAllowAllActor()),
-            ).rejects.toThrow(NotFoundError);
+            ).rejects.toThrow(EntityNotFoundError);
         });
     });
 });

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BadRequestError } from '@ebec/http';
+import { BadRequestError } from '@privateaim/errors';
 import type { Analysis, AnalysisBucket } from '@privateaim/core-kit';
 import { AnalysisBucketType, buildAnalysisBucketName } from '@privateaim/core-kit';
 import type { IEntityRepository } from '@privateaim/server-kit';

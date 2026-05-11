@@ -6,7 +6,7 @@
  */
 
 import { REALM_MASTER_NAME } from '@authup/core-kit';
-import { ForbiddenError } from '@ebec/http';
+import { PermissionDeniedError } from '@privateaim/errors';
 import type {
     CTSEvents,
     STCEvents,
@@ -86,7 +86,7 @@ export function createSocketServer(
                     message: `Socket/${socket.id}: Realm ${socket.data.identity.realmName} is not permitted for the global scope.`,
                     [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
                 });
-                next(new ForbiddenError());
+                next(new PermissionDeniedError());
 
                 return;
             }
@@ -102,7 +102,7 @@ export function createSocketServer(
                     [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
                 });
 
-                next(new ForbiddenError());
+                next(new PermissionDeniedError());
                 return;
             }
         }

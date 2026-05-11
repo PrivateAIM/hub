@@ -12,7 +12,7 @@ import {
     ValidatorGroup, 
     isRealmResourceWritable, 
 } from '@privateaim/kit';
-import { ForbiddenError, NotFoundError } from '@ebec/http';
+import { PermissionDeniedError, EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
 import type { IProjectRepository } from '../project/types.ts';
@@ -49,7 +49,7 @@ export class ProjectNodeService extends AbstractEntityService implements IProjec
         const entity = await this.repository.findOneById(id);
 
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError();
         }
 
         return entity;
@@ -71,7 +71,7 @@ export class ProjectNodeService extends AbstractEntityService implements IProjec
         validated.node_realm_id = validated.node.realm_id;
 
         if (!isRealmResourceWritable(actor.realm, validated.project.realm_id)) {
-            throw new ForbiddenError('The referenced project realm is not permitted.');
+            throw new PermissionDeniedError('The referenced project realm is not permitted.');
         }
 
         const entity = this.repository.create(validated);
@@ -98,12 +98,12 @@ export class ProjectNodeService extends AbstractEntityService implements IProjec
 
         const entity = await this.repository.findOneBy({ id });
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError();
         }
 
         const isAuthorityOfNode = isRealmResourceWritable(actor.realm, entity.node_realm_id);
         if (!isAuthorityOfNode) {
-            throw new ForbiddenError('You are not permitted to update this object.');
+            throw new PermissionDeniedError('You are not permitted to update this object.');
         }
 
         const merged = this.repository.merge(entity, validated);
@@ -121,14 +121,14 @@ export class ProjectNodeService extends AbstractEntityService implements IProjec
 
         const entity = await this.repository.findOneBy({ id });
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError();
         }
 
         if (
             !isRealmResourceWritable(actor.realm, entity.node_realm_id) &&
             !isRealmResourceWritable(actor.realm, entity.project_realm_id)
         ) {
-            throw new ForbiddenError('You are not authorized to drop this relation object.');
+            throw new PermissionDeniedError('You are not authorized to drop this relation object.');
         }
 
         const entityId = entity.id;

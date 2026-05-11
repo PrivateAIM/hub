@@ -65,9 +65,9 @@ export function sanitizeError(input: unknown): HubError {
     }
 
     if (isObject(input)) {
-        const code = isObject(input) && typeof input.code === 'string'
-            ? input.code
-            : undefined;
+        const code = isObject(input) && typeof input.code === 'string' ?
+            input.code :
+            undefined;
 
         /**
          * @see https://dev.mysql.com/doc/mysql-errors/8.0/en/server-error-reference.html

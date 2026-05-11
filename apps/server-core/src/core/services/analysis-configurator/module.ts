@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { NotFoundError } from '@ebec/http';
+import { EntityNotFoundError } from '@privateaim/errors';
 import type { Analysis, AnalysisNode } from '@privateaim/core-kit';
 import { AnalysisConfiguratorCommandChecker, NodeType } from '@privateaim/core-kit';
 import type { IEntityRepository } from '@privateaim/server-kit';
@@ -97,7 +97,7 @@ export class AnalysisConfigurator {
         if (typeof input === 'string') {
             const entity = await this.repository.findOneById(input);
             if (!entity) {
-                throw new NotFoundError('Analysis could not be found.');
+                throw new EntityNotFoundError('Analysis could not be found.');
             }
             return entity;
         }

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { NotFoundError } from '@ebec/http';
+import { EntityNotFoundError } from '@privateaim/errors';
 import type { Analysis } from '@privateaim/core-kit';
 import { AnalysisError } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
@@ -141,8 +141,8 @@ describe('AnalysisBuilder', () => {
             expect(result.id).toBe('analysis-1');
         });
 
-        it('should throw NotFoundError for missing entity', async () => {
-            await expect(builder.check('nonexistent')).rejects.toThrow(NotFoundError);
+        it('should throw EntityNotFoundError for missing entity', async () => {
+            await expect(builder.check('nonexistent')).rejects.toThrow(EntityNotFoundError);
         });
 
         it('should throw when config not locked', async () => {

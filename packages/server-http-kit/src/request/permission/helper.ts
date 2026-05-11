@@ -6,7 +6,7 @@
  */
 
 import type { IRoutupEvent } from 'routup';
-import { BadRequestError } from '@ebec/http';
+import { BadRequestError } from '@privateaim/errors';
 import { setRequestEnv, useRequestEnv } from '../env';
 import type { RequestPermissionChecker } from './module';
 

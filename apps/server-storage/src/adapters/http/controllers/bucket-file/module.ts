@@ -7,7 +7,7 @@
 
 import { Readable } from 'node:stream';
 import { createGzip } from 'node:zlib';
-import { NotFoundError } from '@ebec/http';
+import { EntityNotFoundError } from '@privateaim/errors';
 import type { BucketFile } from '@privateaim/storage-kit';
 import type { Logger } from '@privateaim/server-kit';
 import {
@@ -74,7 +74,7 @@ export class BucketFileController {
         const entity = await this.bucketFileRepository.findOneById(id);
 
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError();
         }
 
         const bucketName = toBucketName(entity.bucket_id);

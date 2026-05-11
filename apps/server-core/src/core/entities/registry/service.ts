@@ -13,7 +13,7 @@ import {
     getHostNameFromString, 
     isObject,  
 } from '@privateaim/kit';
-import { BadRequestError, NotFoundError } from '@ebec/http';
+import { BadRequestError, EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
 import type { IRegistryCaller } from '../../harbor/types.ts';
@@ -58,7 +58,7 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
             await this.repository.findOneById(id);
 
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError();
         }
 
         return entity;
@@ -116,7 +116,7 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
 
         const entity = await this.repository.findOneBy({ id });
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError();
         }
 
         const merged = this.repository.merge(entity, validated);
@@ -129,7 +129,7 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
 
         const entity = await this.repository.findOneBy({ id });
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError();
         }
 
         const entityId = entity.id;
@@ -158,7 +158,7 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
             case RegistryAPICommand.DELETE: {
                 const entity = await this.repository.findOneWithSecret(data.id);
                 if (!entity) {
-                    throw new NotFoundError();
+                    throw new EntityNotFoundError();
                 }
 
                 const commandMap: Record<string, string> = {
@@ -178,7 +178,7 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
 
                 const entity = await this.registryProjectRepository.findOneBy({ id: data.id });
                 if (!entity) {
-                    throw new NotFoundError();
+                    throw new EntityNotFoundError();
                 }
 
                 if (command === RegistryAPICommand.PROJECT_LINK) {

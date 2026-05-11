@@ -6,7 +6,7 @@
  */
 
 import type { AnalysisNodeEvent } from '@privateaim/core-kit';
-import { NotFoundError } from '@ebec/http';
+import { EntityNotFoundError } from '@privateaim/errors';
 import type { EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
 import type { IAnalysisNodeEventRepository, IAnalysisNodeEventService } from './types.ts';
@@ -31,7 +31,7 @@ export class AnalysisNodeEventService extends AbstractEntityService implements I
         const entity = await this.repository.findOneById(id);
 
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError();
         }
 
         return entity;

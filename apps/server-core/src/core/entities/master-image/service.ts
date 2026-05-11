@@ -8,7 +8,7 @@
 import type { MasterImage } from '@privateaim/core-kit';
 import { MasterImageCommand } from '@privateaim/core-kit';
 import { PermissionName, ProcessStatus } from '@privateaim/kit';
-import { BadRequestError, NotFoundError } from '@ebec/http';
+import { BadRequestError, EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
 import type {
@@ -58,7 +58,7 @@ export class MasterImageService extends AbstractEntityService implements IMaster
         const entity = await this.repository.findOneById(id);
 
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError();
         }
 
         return entity;
@@ -88,7 +88,7 @@ export class MasterImageService extends AbstractEntityService implements IMaster
 
                 const entity = await this.repository.findOneBy({ id });
                 if (!entity) {
-                    throw new NotFoundError();
+                    throw new EntityNotFoundError();
                 }
 
                 entity.build_status = ProcessStatus.STARTING;
@@ -108,7 +108,7 @@ export class MasterImageService extends AbstractEntityService implements IMaster
 
         const entity = await this.repository.findOneBy({ id });
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError();
         }
 
         const entityId = entity.id;

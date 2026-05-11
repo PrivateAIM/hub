@@ -22,7 +22,6 @@
     "dependencies": {
         "@authup/core-kit": "^1.0.0-beta.36",
         "@authup/kit": "^1.0.0-beta.36",
-        "@ebec/http": "^2.3.0",
         "@privateaim/kit": "^0.8.42",
         "@privateaim/messenger-kit": "^0.7.43",
         "@privateaim/server-http-kit": "^0.8.42",

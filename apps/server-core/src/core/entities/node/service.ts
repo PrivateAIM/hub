@@ -14,7 +14,7 @@ import {
     isHex, 
     isRealmResourceWritable, 
 } from '@privateaim/kit';
-import { ForbiddenError, NotFoundError } from '@ebec/http';
+import { PermissionDeniedError, EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
 import type { INodeRepository, INodeService, IRegistryManager } from './types.ts';
@@ -48,7 +48,7 @@ export class NodeService extends AbstractEntityService implements INodeService {
             await this.repository.findOneById(id);
 
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError();
         }
 
         return entity;
@@ -63,7 +63,7 @@ export class NodeService extends AbstractEntityService implements INodeService {
 
         if (validated.realm_id) {
             if (!isRealmResourceWritable(actor.realm, validated.realm_id)) {
-                throw new ForbiddenError('You are not permitted to create this node.');
+                throw new PermissionDeniedError('You are not permitted to create this node.');
             }
         } else {
             validated.realm_id = this.getActorRealmId(actor);
@@ -97,11 +97,11 @@ export class NodeService extends AbstractEntityService implements INodeService {
 
         const entity = await this.repository.findOneWithExternalName(id);
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError();
         }
 
         if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
-            throw new ForbiddenError('You are not permitted to update this node.');
+            throw new PermissionDeniedError('You are not permitted to update this node.');
         }
 
         const merged = this.repository.merge(entity, validated);
@@ -116,11 +116,11 @@ export class NodeService extends AbstractEntityService implements INodeService {
 
         const entity = await this.repository.findOneBy({ id });
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError();
         }
 
         if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
-            throw new ForbiddenError('You are not permitted to delete this station.');
+            throw new PermissionDeniedError('You are not permitted to delete this station.');
         }
 
         await this.unlinkRegistryProject(entity);

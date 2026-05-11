@@ -10,7 +10,7 @@ import type { IModule } from 'orkos';
 import { Client } from 'minio';
 import path from 'node:path';
 import process from 'node:process';
-import { ServerError } from '@ebec/http';
+import { InternalError } from '@privateaim/errors';
 import { parseProxyConnectionString } from '@privateaim/kit';
 import type { IStorageAdapter } from '../../../core/storage/types.ts';
 import { MinioStorageAdapter } from '../../../adapters/storage/minio.ts';
@@ -31,7 +31,7 @@ export class StorageModule implements IModule {
         if (config.minioConnectionString) {
             const connectionConfig = parseProxyConnectionString(config.minioConnectionString);
             if (!connectionConfig) {
-                throw new ServerError('Invalid MINIO_CONNECTION_STRING format.');
+                throw new InternalError('Invalid MINIO_CONNECTION_STRING format.');
             }
 
             const client = new Client({

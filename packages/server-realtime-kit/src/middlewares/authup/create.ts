@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { UnauthorizedError } from '@ebec/http';
+import { UnauthorizedError } from '@privateaim/errors';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import { createMiddleware } from '@authup/server-adapter-socket-io';
 import type {

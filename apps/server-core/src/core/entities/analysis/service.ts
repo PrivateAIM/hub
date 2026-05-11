@@ -14,7 +14,7 @@ import {
     isRealmResourceWritable, 
 } from '@privateaim/kit';
 import { isPropertySet } from '@authup/kit';
-import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
+import { BadRequestError, PermissionDeniedError, EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
 import type { IProjectRepository } from '../project/types.ts';
@@ -75,7 +75,7 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
         const entity = await this.repository.findOneById(id);
 
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError();
         }
 
         return entity;
@@ -95,7 +95,7 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
         validated.realm_id = validated.project.realm_id;
 
         if (!actor.identity || actor.identity.type !== 'user') {
-            throw new ForbiddenError('Only user accounts are permitted to create an analysis.');
+            throw new PermissionDeniedError('Only user accounts are permitted to create an analysis.');
         }
 
         const entity = this.repository.create({ ...validated });
@@ -128,7 +128,7 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
 
         const entity = await this.repository.findOneBy({ id });
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError();
         }
 
         await actor.permissionChecker.check({
@@ -137,7 +137,7 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
         });
 
         if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
-            throw new ForbiddenError();
+            throw new PermissionDeniedError();
         }
 
         if (
@@ -168,7 +168,7 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
 
         const entity = await this.repository.findOneWithProject(id);
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError();
         }
 
         await actor.permissionChecker.check({
@@ -177,7 +177,7 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
         });
 
         if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
-            throw new ForbiddenError();
+            throw new PermissionDeniedError();
         }
 
         const { project } = entity;
@@ -205,7 +205,7 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
         let entity = await this.getOne(id);
 
         if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
-            throw new ForbiddenError();
+            throw new PermissionDeniedError();
         }
 
         const persistCtx = { data: actor.metadata };

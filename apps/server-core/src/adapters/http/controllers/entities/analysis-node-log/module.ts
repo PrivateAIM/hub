@@ -11,7 +11,7 @@ import { AnalysisNodeLogValidator, DomainType  } from '@privateaim/core-kit';
 import { isRealmResourceWritable } from '@privateaim/kit';
 import type { Log, LogLevel, APIClient as TelemetryClient } from '@privateaim/telemetry-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
-import { BadRequestError, ForbiddenError } from '@ebec/http';
+import { BadRequestError, PermissionDeniedError } from '@privateaim/errors';
 import {
     DBody,
     DContext,
@@ -141,7 +141,7 @@ export class AnalysisNodeLogController {
 
         const isAuthorityOfNode = isRealmResourceWritable(useRequestIdentityRealm(event), data.node_realm_id);
         if (!isAuthorityOfNode) {
-            throw new ForbiddenError('You are not an actor of to the node realm.');
+            throw new PermissionDeniedError('You are not an actor of to the node realm.');
         }
 
         const labels : Record<string, string> = {};

@@ -7,7 +7,7 @@
 
 import type { Realm } from '@authup/core-kit';
 import { REALM_MASTER_NAME } from '@authup/core-kit';
-import { ServerError } from '@ebec/http';
+import { InternalError } from '@privateaim/errors';
 import { isClientErrorWithStatusCode } from '@hapic/harbor';
 import { ServiceID } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
@@ -38,7 +38,7 @@ export class AuthupModule implements IModule {
         try {
             realm = await authupClient.realm.getOne(REALM_MASTER_NAME);
         } catch {
-            throw new ServerError(`The ${REALM_MASTER_NAME} does not exist.`);
+            throw new InternalError(`The ${REALM_MASTER_NAME} does not exist.`);
         }
 
         await authupClient.robot.getOne(ServiceID.SYSTEM);

@@ -6,7 +6,7 @@
  */
 
 import { REALM_MASTER_NAME } from '@authup/core-kit';
-import { UnauthorizedError } from '@ebec/http';
+import { UnauthorizedError } from '@privateaim/errors';
 import type { IRoutupEvent } from 'routup';
 import type { RequestIdentity } from './types';
 import { setRequestEnv, useRequestEnv } from './env';

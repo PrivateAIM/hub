@@ -9,7 +9,7 @@ import type { AnalysisLog } from '@privateaim/core-kit';
 import { DomainType } from '@privateaim/core-kit';
 import type { Log, LogLevel, APIClient as TelemetryClient } from '@privateaim/telemetry-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
-import { BadRequestError } from '@ebec/http';
+import { BadRequestError } from '@privateaim/errors';
 import {
     DContext,
     DController,

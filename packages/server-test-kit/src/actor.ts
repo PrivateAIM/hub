@@ -7,7 +7,7 @@
 
 import { randomUUID } from 'node:crypto';
 import { REALM_MASTER_NAME } from '@authup/core-kit';
-import { ForbiddenError } from '@ebec/http';
+import { PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext } from '@privateaim/server-kit';
 import { FakePermissionChecker } from './fake-permission-checker.ts';
 
@@ -25,7 +25,7 @@ export function createDenyAllActor(realmId?: string): ActorContext {
     const id = realmId ?? randomUUID();
     return {
         permissionChecker: new FakePermissionChecker(() => {
-            throw new ForbiddenError();
+            throw new PermissionDeniedError();
         }),
         realm: { id, name: 'test-realm' },
         identity: { id: randomUUID(), type: 'user' },
