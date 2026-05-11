@@ -48,6 +48,7 @@ export class AnalysisBucketFileValidator extends Container<AnalysisBucketFile> {
 
         this.mount(
             'root',
+            { optional: true },
             createValidator(z.boolean().optional().default(false)),
         );
     }
