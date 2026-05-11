@@ -58,7 +58,7 @@ export class MasterImageService extends AbstractEntityService implements IMaster
         const entity = await this.repository.findOneById(id);
 
         if (!entity) {
-            throw new EntityNotFoundError();
+            throw new EntityNotFoundError({ entity: 'master-image' });
         }
 
         return entity;
@@ -88,7 +88,7 @@ export class MasterImageService extends AbstractEntityService implements IMaster
 
                 const entity = await this.repository.findOneBy({ id });
                 if (!entity) {
-                    throw new EntityNotFoundError();
+                    throw new EntityNotFoundError({ entity: 'master-image' });
                 }
 
                 entity.build_status = ProcessStatus.STARTING;
@@ -108,7 +108,7 @@ export class MasterImageService extends AbstractEntityService implements IMaster
 
         const entity = await this.repository.findOneBy({ id });
         if (!entity) {
-            throw new EntityNotFoundError();
+            throw new EntityNotFoundError({ entity: 'master-image' });
         }
 
         const entityId = entity.id;

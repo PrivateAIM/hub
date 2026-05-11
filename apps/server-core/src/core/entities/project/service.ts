@@ -11,7 +11,7 @@ import {
     ValidatorGroup, 
     isRealmResourceWritable, 
 } from '@privateaim/kit';
-import { BadRequestError, PermissionDeniedError, EntityNotFoundError } from '@privateaim/errors';
+import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
 import type { IProjectRepository, IProjectService } from './types.ts';
@@ -42,7 +42,7 @@ export class ProjectService extends AbstractEntityService implements IProjectSer
             await this.repository.findOneById(id);
 
         if (!entity) {
-            throw new EntityNotFoundError();
+            throw new EntityNotFoundError({ entity: 'project' });
         }
 
         return entity;
@@ -99,7 +99,7 @@ export class ProjectService extends AbstractEntityService implements IProjectSer
 
         const entity = await this.repository.findOneBy({ id });
         if (!entity) {
-            throw new EntityNotFoundError();
+            throw new EntityNotFoundError({ entity: 'project' });
         }
 
         if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
@@ -118,7 +118,7 @@ export class ProjectService extends AbstractEntityService implements IProjectSer
 
         const entity = await this.repository.findOneBy({ id });
         if (!entity) {
-            throw new EntityNotFoundError();
+            throw new EntityNotFoundError({ entity: 'project' });
         }
 
         if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {

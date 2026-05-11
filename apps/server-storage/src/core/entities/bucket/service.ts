@@ -6,7 +6,7 @@
  */
 
 import type { Bucket } from '@privateaim/storage-kit';
-import { PermissionDeniedError, EntityNotFoundError } from '@privateaim/errors';
+import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import { PermissionName, ValidatorGroup, isRealmResourceWritable  } from '@privateaim/kit';
 import { toBucketName } from '../../utils/bucket-name.ts';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
@@ -48,7 +48,7 @@ export class BucketService extends AbstractEntityService implements IBucketServi
             await this.repository.findOneByIdOrName(id);
 
         if (!entity) {
-            throw new EntityNotFoundError();
+            throw new EntityNotFoundError({ entity: 'bucket' });
         }
 
         return entity;
@@ -83,7 +83,7 @@ export class BucketService extends AbstractEntityService implements IBucketServi
 
         let entity = await this.repository.findOneByIdOrName(id);
         if (!entity) {
-            throw new EntityNotFoundError();
+            throw new EntityNotFoundError({ entity: 'bucket' });
         }
 
         if (!this.isOwnedByActor(entity, actor)) {
@@ -114,7 +114,7 @@ export class BucketService extends AbstractEntityService implements IBucketServi
     async delete(id: string, actor: ActorContext): Promise<Bucket> {
         const entity = await this.repository.findOneByIdOrName(id);
         if (!entity) {
-            throw new EntityNotFoundError();
+            throw new EntityNotFoundError({ entity: 'bucket' });
         }
 
         if (!this.isOwnedByActor(entity, actor)) {

@@ -14,7 +14,7 @@ import {
     isHex, 
     isRealmResourceWritable, 
 } from '@privateaim/kit';
-import { PermissionDeniedError, EntityNotFoundError } from '@privateaim/errors';
+import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
 import type { INodeRepository, INodeService, IRegistryManager } from './types.ts';
@@ -48,7 +48,7 @@ export class NodeService extends AbstractEntityService implements INodeService {
             await this.repository.findOneById(id);
 
         if (!entity) {
-            throw new EntityNotFoundError();
+            throw new EntityNotFoundError({ entity: 'node' });
         }
 
         return entity;
@@ -97,7 +97,7 @@ export class NodeService extends AbstractEntityService implements INodeService {
 
         const entity = await this.repository.findOneWithExternalName(id);
         if (!entity) {
-            throw new EntityNotFoundError();
+            throw new EntityNotFoundError({ entity: 'node' });
         }
 
         if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
@@ -116,7 +116,7 @@ export class NodeService extends AbstractEntityService implements INodeService {
 
         const entity = await this.repository.findOneBy({ id });
         if (!entity) {
-            throw new EntityNotFoundError();
+            throw new EntityNotFoundError({ entity: 'node' });
         }
 
         if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {

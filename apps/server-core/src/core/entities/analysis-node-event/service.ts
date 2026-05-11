@@ -31,7 +31,7 @@ export class AnalysisNodeEventService extends AbstractEntityService implements I
         const entity = await this.repository.findOneById(id);
 
         if (!entity) {
-            throw new EntityNotFoundError();
+            throw new EntityNotFoundError({ entity: 'analysis-node-event' });
         }
 
         return entity;

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BadRequestError, PermissionDeniedError, EntityNotFoundError } from '@privateaim/errors';
+import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { Project } from '@privateaim/core-kit';
 import {
     beforeEach,

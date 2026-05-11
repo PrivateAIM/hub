@@ -97,7 +97,7 @@ export class AnalysisConfigurator {
         if (typeof input === 'string') {
             const entity = await this.repository.findOneById(input);
             if (!entity) {
-                throw new EntityNotFoundError('Analysis could not be found.');
+                throw new EntityNotFoundError({ entity: 'analysis' });
             }
             return entity;
         }

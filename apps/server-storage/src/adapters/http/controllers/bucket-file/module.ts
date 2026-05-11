@@ -74,7 +74,7 @@ export class BucketFileController {
         const entity = await this.bucketFileRepository.findOneById(id);
 
         if (!entity) {
-            throw new EntityNotFoundError();
+            throw new EntityNotFoundError({ entity: 'bucket-file' });
         }
 
         const bucketName = toBucketName(entity.bucket_id);

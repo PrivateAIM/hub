@@ -14,7 +14,7 @@ import {
     isRealmResourceWritable, 
 } from '@privateaim/kit';
 import { isPropertySet } from '@authup/kit';
-import { BadRequestError, PermissionDeniedError, EntityNotFoundError } from '@privateaim/errors';
+import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
 import type { IProjectRepository } from '../project/types.ts';
@@ -75,7 +75,7 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
         const entity = await this.repository.findOneById(id);
 
         if (!entity) {
-            throw new EntityNotFoundError();
+            throw new EntityNotFoundError({ entity: 'analysis' });
         }
 
         return entity;
@@ -128,7 +128,7 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
 
         const entity = await this.repository.findOneBy({ id });
         if (!entity) {
-            throw new EntityNotFoundError();
+            throw new EntityNotFoundError({ entity: 'analysis' });
         }
 
         await actor.permissionChecker.check({
@@ -168,7 +168,7 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
 
         const entity = await this.repository.findOneWithProject(id);
         if (!entity) {
-            throw new EntityNotFoundError();
+            throw new EntityNotFoundError({ entity: 'analysis' });
         }
 
         await actor.permissionChecker.check({

@@ -6,7 +6,7 @@
  */
 
 import type { BucketFile } from '@privateaim/storage-kit';
-import { PermissionDeniedError, EntityNotFoundError } from '@privateaim/errors';
+import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import { PermissionName, isRealmResourceWritable } from '@privateaim/kit';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
@@ -38,7 +38,7 @@ export class BucketFileService extends AbstractEntityService implements IBucketF
             await this.repository.findOneById(id);
 
         if (!entity) {
-            throw new EntityNotFoundError();
+            throw new EntityNotFoundError({ entity: 'bucket-file' });
         }
 
         return entity;
@@ -48,7 +48,7 @@ export class BucketFileService extends AbstractEntityService implements IBucketF
         const entity = await this.repository.findOneBy({ id });
 
         if (!entity) {
-            throw new EntityNotFoundError();
+            throw new EntityNotFoundError({ entity: 'bucket-file' });
         }
 
         if (

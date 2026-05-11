@@ -47,7 +47,7 @@ export class ServiceController {
         const { id } = event.params;
 
         if (id !== ServiceID.REGISTRY) {
-            throw new EntityNotFoundError();
+            throw new EntityNotFoundError({ entity: 'service' });
         }
 
         await this.registryCaller.call('HOOK_PROCESS', data, {});
@@ -68,7 +68,7 @@ export class ServiceController {
         const { id } = event.params;
 
         if (id !== ServiceID.REGISTRY) {
-            throw new EntityNotFoundError();
+            throw new EntityNotFoundError({ entity: 'service' });
         }
 
         const actor = buildActorContext(event);

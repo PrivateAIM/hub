@@ -7,7 +7,7 @@
 
 import { randomUUID } from 'node:crypto';
 import type { Node } from '@privateaim/core-kit';
-import { PermissionDeniedError, EntityNotFoundError } from '@privateaim/errors';
+import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import {
     beforeEach,
     describe,

@@ -12,7 +12,7 @@ import {
     isPropertySet, 
     isRealmResourceWritable, 
 } from '@privateaim/kit';
-import { PermissionDeniedError, EntityNotFoundError } from '@privateaim/errors';
+import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
 import type { IRegistryManager } from '../node/types.ts';
@@ -58,7 +58,7 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
             await this.repository.findOneById(id);
 
         if (!entity) {
-            throw new EntityNotFoundError();
+            throw new EntityNotFoundError({ entity: 'registry-project' });
         }
 
         if (this.hasSecretField(entity)) {
@@ -123,7 +123,7 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
 
         const entity = await this.repository.findOneBy({ id });
         if (!entity) {
-            throw new EntityNotFoundError();
+            throw new EntityNotFoundError({ entity: 'registry-project' });
         }
 
         if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
@@ -157,7 +157,7 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
 
         const entity = await this.repository.findOneBy({ id });
         if (!entity) {
-            throw new EntityNotFoundError();
+            throw new EntityNotFoundError({ entity: 'registry-project' });
         }
 
         if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {

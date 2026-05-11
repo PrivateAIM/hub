@@ -8,7 +8,7 @@
 import { randomUUID } from 'node:crypto';
 import type { Node, Registry, RegistryProject } from '@privateaim/core-kit';
 import { RegistryProjectType } from '@privateaim/core-kit';
-import { PermissionDeniedError, EntityNotFoundError } from '@privateaim/errors';
+import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import {
     beforeEach,
     describe,

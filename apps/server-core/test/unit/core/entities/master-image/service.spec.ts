@@ -9,7 +9,7 @@ import { randomUUID } from 'node:crypto';
 import type { MasterImage } from '@privateaim/core-kit';
 import { MasterImageCommand } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
-import { BadRequestError, PermissionDeniedError, EntityNotFoundError } from '@privateaim/errors';
+import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import {
     beforeEach,
     describe,

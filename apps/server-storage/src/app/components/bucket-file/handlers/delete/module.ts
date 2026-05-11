@@ -78,7 +78,7 @@ export class BucketFileDeleteHandler implements ComponentHandler<
         });
 
         if (!entity) {
-            throw new EntityNotFoundError();
+            throw new EntityNotFoundError({ entity: 'bucket-file' });
         }
 
         const bucketName = toBucketName(entity.bucket.id);

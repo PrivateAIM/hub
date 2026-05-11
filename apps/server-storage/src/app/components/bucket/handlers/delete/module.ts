@@ -72,7 +72,7 @@ export class BucketDeleteHandler implements ComponentHandler<
         const entity = await repository.findOneBy({ id: value.id });
 
         if (!entity) {
-            throw new EntityNotFoundError();
+            throw new EntityNotFoundError({ entity: 'bucket' });
         }
 
         const entityId = entity.id;

@@ -8,7 +8,7 @@
 import { randomUUID } from 'node:crypto';
 import type { Analysis, AnalysisBucket } from '@privateaim/core-kit';
 import { AnalysisBucketType } from '@privateaim/core-kit';
-import { PermissionDeniedError, EntityNotFoundError } from '@privateaim/errors';
+import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import {
     beforeEach,
     describe,

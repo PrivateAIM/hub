@@ -32,7 +32,7 @@ export class MasterImageGroupService extends AbstractEntityService implements IM
         const entity = await this.repository.findOneById(id);
 
         if (!entity) {
-            throw new EntityNotFoundError();
+            throw new EntityNotFoundError({ entity: 'master-image-group' });
         }
 
         return entity;
@@ -43,7 +43,7 @@ export class MasterImageGroupService extends AbstractEntityService implements IM
 
         const entity = await this.repository.findOneBy({ id });
         if (!entity) {
-            throw new EntityNotFoundError();
+            throw new EntityNotFoundError({ entity: 'master-image-group' });
         }
 
         const entityId = entity.id;

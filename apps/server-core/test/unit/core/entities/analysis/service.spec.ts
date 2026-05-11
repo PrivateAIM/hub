@@ -6,7 +6,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
-import { BadRequestError, PermissionDeniedError, EntityNotFoundError } from '@privateaim/errors';
+import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type {
     Analysis,
     AnalysisBucket,
