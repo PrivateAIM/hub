@@ -41,7 +41,7 @@ export default defineComponent({
 
             emit('updated', {
                 ...props.entity,
-                root: isRoot.value ? null : props.entity.id,
+                root: !isRoot.value,
             });
         };
         return {
