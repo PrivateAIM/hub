@@ -15,11 +15,15 @@ export const ENTITY_NOT_FOUND_ERROR_INSTANCE = Symbol.for('@privateaim/errors/En
 export class EntityNotFoundError extends HubError {
     constructor(input?: string | HubEntityErrorOptions) {
         const options: HubEntityErrorOptions = typeof input === 'string' ? { message: input } : (input ?? {});
-        const { entity, ...rest } = options;
+        const {
+            entity, 
+            message, 
+            ...rest 
+        } = options;
         super({
-            code: ErrorCode.ENTITY_NOT_FOUND,
-            message: entity ? `The ${entity} was not found.` : 'Entity not found.',
             ...rest,
+            code: ErrorCode.ENTITY_NOT_FOUND,
+            message: message ?? (entity ? `The ${entity} was not found.` : 'Entity not found.'),
         });
         markInstanceof(this, ENTITY_NOT_FOUND_ERROR_INSTANCE);
     }

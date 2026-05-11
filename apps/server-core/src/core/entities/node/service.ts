@@ -120,7 +120,7 @@ export class NodeService extends AbstractEntityService implements INodeService {
         }
 
         if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
-            throw new PermissionDeniedError('You are not permitted to delete this station.');
+            throw new PermissionDeniedError('You are not permitted to delete this node.');
         }
 
         await this.unlinkRegistryProject(entity);

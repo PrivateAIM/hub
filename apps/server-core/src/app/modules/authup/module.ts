@@ -37,8 +37,11 @@ export class AuthupModule implements IModule {
 
         try {
             realm = await authupClient.realm.getOne(REALM_MASTER_NAME);
-        } catch {
-            throw new InternalError(`The ${REALM_MASTER_NAME} does not exist.`);
+        } catch (e) {
+            if (isClientErrorWithStatusCode(e, 404)) {
+                throw new InternalError(`The ${REALM_MASTER_NAME} does not exist.`);
+            }
+            throw e;
         }
 
         await authupClient.robot.getOne(ServiceID.SYSTEM);

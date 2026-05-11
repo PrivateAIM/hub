@@ -9,6 +9,6 @@ import { EntityConflictError } from '@privateaim/errors';
 
 export class DatabaseConflictError extends EntityConflictError {
     constructor() {
-        super('A db entry with some unique attributes already exist.');
+        super('A db entry with some unique attributes already exists.');
     }
 }

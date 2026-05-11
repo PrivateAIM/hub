@@ -15,10 +15,11 @@ export const ENTITY_RELATION_INVALID_ERROR_INSTANCE = Symbol.for('@privateaim/er
 export class EntityRelationInvalidError extends HubError {
     constructor(input?: string | HubErrorOptions) {
         const options: HubErrorOptions = typeof input === 'string' ? { message: input } : (input ?? {});
+        const { message, ...rest } = options;
         super({
+            ...rest,
             code: ErrorCode.ENTITY_RELATION_INVALID,
-            message: 'Entity relation is invalid.',
-            ...options,
+            message: message ?? 'Entity relation is invalid.',
         });
         markInstanceof(this, ENTITY_RELATION_INVALID_ERROR_INSTANCE);
     }

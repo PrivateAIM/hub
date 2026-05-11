@@ -15,10 +15,11 @@ export const PERMISSION_DENIED_ERROR_INSTANCE = Symbol.for('@privateaim/errors/P
 export class PermissionDeniedError extends HubError {
     constructor(input?: string | HubErrorOptions) {
         const options: HubErrorOptions = typeof input === 'string' ? { message: input } : (input ?? {});
+        const { message, ...rest } = options;
         super({
+            ...rest,
             code: ErrorCode.PERMISSION_DENIED,
-            message: 'Permission denied.',
-            ...options,
+            message: message ?? 'Permission denied.',
         });
         markInstanceof(this, PERMISSION_DENIED_ERROR_INSTANCE);
     }

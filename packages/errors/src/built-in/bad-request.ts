@@ -16,8 +16,8 @@ export class BadRequestError extends HubError {
     constructor(input?: string | HubErrorOptions) {
         const options: HubErrorOptions = typeof input === 'string' ? { message: input } : (input ?? {});
         super({
-            code: ErrorCode.BAD_REQUEST,
             ...options,
+            code: ErrorCode.BAD_REQUEST,
         });
         markInstanceof(this, BAD_REQUEST_ERROR_INSTANCE);
     }

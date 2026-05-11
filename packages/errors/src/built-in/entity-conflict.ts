@@ -15,11 +15,15 @@ export const ENTITY_CONFLICT_ERROR_INSTANCE = Symbol.for('@privateaim/errors/Ent
 export class EntityConflictError extends HubError {
     constructor(input?: string | HubEntityErrorOptions) {
         const options: HubEntityErrorOptions = typeof input === 'string' ? { message: input } : (input ?? {});
-        const { entity, ...rest } = options;
+        const {
+            entity, 
+            message, 
+            ...rest 
+        } = options;
         super({
-            code: ErrorCode.ENTITY_CONFLICT,
-            message: entity ? `The ${entity} already exists.` : 'Entity already exists.',
             ...rest,
+            code: ErrorCode.ENTITY_CONFLICT,
+            message: message ?? (entity ? `The ${entity} already exists.` : 'Entity already exists.'),
         });
         markInstanceof(this, ENTITY_CONFLICT_ERROR_INSTANCE);
     }

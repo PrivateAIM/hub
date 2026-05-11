@@ -15,10 +15,11 @@ export const INTERNAL_ERROR_INSTANCE = Symbol.for('@privateaim/errors/InternalEr
 export class InternalError extends HubError {
     constructor(input?: string | HubErrorOptions) {
         const options: HubErrorOptions = typeof input === 'string' ? { message: input } : (input ?? {});
+        const { message, ...rest } = options;
         super({
+            ...rest,
             code: ErrorCode.INTERNAL_ERROR,
-            message: 'An internal error occurred.',
-            ...options,
+            message: message ?? 'An internal error occurred.',
         });
         markInstanceof(this, INTERNAL_ERROR_INSTANCE);
     }

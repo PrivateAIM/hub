@@ -178,7 +178,7 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
 
                 const entity = await this.registryProjectRepository.findOneBy({ id: data.id });
                 if (!entity) {
-                    throw new EntityNotFoundError({ entity: 'registry' });
+                    throw new EntityNotFoundError({ entity: 'registry-project' });
                 }
 
                 if (command === RegistryAPICommand.PROJECT_LINK) {

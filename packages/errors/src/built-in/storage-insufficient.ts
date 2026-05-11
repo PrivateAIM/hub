@@ -15,10 +15,11 @@ export const STORAGE_INSUFFICIENT_ERROR_INSTANCE = Symbol.for('@privateaim/error
 export class StorageInsufficientError extends HubError {
     constructor(input?: string | HubErrorOptions) {
         const options: HubErrorOptions = typeof input === 'string' ? { message: input } : (input ?? {});
+        const { message, ...rest } = options;
         super({
+            ...rest,
             code: ErrorCode.STORAGE_INSUFFICIENT,
-            message: 'Insufficient storage.',
-            ...options,
+            message: message ?? 'Insufficient storage.',
         });
         markInstanceof(this, STORAGE_INSUFFICIENT_ERROR_INSTANCE);
     }

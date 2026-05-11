@@ -15,10 +15,11 @@ export const UNAUTHORIZED_ERROR_INSTANCE = Symbol.for('@privateaim/errors/Unauth
 export class UnauthorizedError extends HubError {
     constructor(input?: string | HubErrorOptions) {
         const options: HubErrorOptions = typeof input === 'string' ? { message: input } : (input ?? {});
+        const { message, ...rest } = options;
         super({
+            ...rest,
             code: ErrorCode.IDENTITY_UNAUTHORIZED,
-            message: 'Authentication required.',
-            ...options,
+            message: message ?? 'Authentication required.',
         });
         markInstanceof(this, UNAUTHORIZED_ERROR_INSTANCE);
     }

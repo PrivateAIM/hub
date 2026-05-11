@@ -141,7 +141,7 @@ export class AnalysisNodeLogController {
 
         const isAuthorityOfNode = isRealmResourceWritable(useRequestIdentityRealm(event), data.node_realm_id);
         if (!isAuthorityOfNode) {
-            throw new PermissionDeniedError('You are not an actor of to the node realm.');
+            throw new PermissionDeniedError('You are not an actor of the node realm.');
         }
 
         const labels : Record<string, string> = {};

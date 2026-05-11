@@ -65,7 +65,7 @@ export function sanitizeError(input: unknown): HubError {
     }
 
     if (isObject(input)) {
-        const code = isObject(input) && typeof input.code === 'string' ?
+        const code = Object.prototype.hasOwnProperty.call(input, 'code') && typeof input.code === 'string' ?
             input.code :
             undefined;
 
