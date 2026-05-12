@@ -45,7 +45,7 @@
         "rapiq": "0.9.0",
         "redis-extension": "^2.0.4",
         "reflect-metadata": "^0.2.2",
-        "routup": "^5.1.0",
+        "routup": "^5.1.1",
         "typeorm": "^0.3.29",
         "typeorm-extension": "^3.9.0",
         "validup": "^0.2.1",
@@ -56,7 +56,7 @@
         "@privateaim/server-test-kit": "^0.8.37",
         "@trapi/cli": "^2.0.0",
         "testcontainers": "^11.14.0",
-        "vitest": "^4.1.5"
+        "vitest": "^4.1.6"
     },
     "scripts": {
         "cli": "node dist/cli/index.mjs",
