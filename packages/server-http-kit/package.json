@@ -30,24 +30,24 @@
         "@privateaim/kit": "^0.8.43",
         "@privateaim/server-kit": "^0.8.43",
         "@privateaim/telemetry-kit": "^0.8.43",
-        "@routup/basic": "^2.1.0",
-        "@routup/cors": "^1.0.1",
-        "@routup/decorators": "^4.1.0",
-        "@routup/prometheus": "^3.1.0",
-        "@routup/rate-limit": "^3.1.0",
-        "@routup/swagger-ui": "^3.1.0",
+        "@routup/basic": "^2.2.0",
+        "@routup/cors": "^1.1.0",
+        "@routup/decorators": "^4.2.0",
+        "@routup/prometheus": "^3.2.0",
+        "@routup/rate-limit": "^3.2.0",
+        "@routup/swagger-ui": "^3.2.0",
         "hapic": "^2.8.2",
         "locter": "^2.2.1",
         "validup": "^0.2.1"
     },
     "devDependencies": {
         "redis-extension": "^2.0.4",
-        "routup": "^5.1.0",
+        "routup": "^5.2.0",
         "typeorm-extension": "^3.7.4"
     },
     "peerDependencies": {
         "redis-extension": "^2.0.4",
-        "routup": "^5.1.0",
+        "routup": "^5.2.0",
         "typeorm-extension": "^3.7.4"
     },
     "scripts": {
