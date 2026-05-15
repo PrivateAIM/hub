@@ -32,8 +32,8 @@
         "@privateaim/server-telemetry-kit": "^0.8.43",
         "@privateaim/storage-kit": "^0.8.43",
         "@privateaim/telemetry-kit": "^0.8.43",
-        "@routup/basic": "^2.1.0",
-        "@routup/decorators": "^4.1.0",
+        "@routup/basic": "^2.2.0",
+        "@routup/decorators": "^4.2.0",
         "@validup/adapter-zod": "^0.2.3",
         "busboy": "^1.6.0",
         "citty": "^0.2.1",
@@ -48,7 +48,7 @@
         "orkos": "^1.1.1",
         "redis-extension": "^2.0.4",
         "reflect-metadata": "^0.2.2",
-        "routup": "^5.1.0",
+        "routup": "^5.2.0",
         "tar-stream": "^3.2.0",
         "typeorm": "^0.3.29",
         "typeorm-extension": "^3.9.0",
@@ -63,7 +63,7 @@
         "@types/tar-stream": "^3.1.4",
         "testcontainers": "^11.14.0",
         "ts-node": "^10.9.2",
-        "vitest": "^4.1.5"
+        "vitest": "^4.1.6"
     },
     "scripts": {
         "cli": "node dist/cli/index.mjs",
