@@ -19,6 +19,7 @@ import { BucketValidator, DomainType  } from '@privateaim/storage-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import crypto from 'node:crypto';
 import { Transform } from 'node:stream';
+import { pipeline } from 'node:stream/promises';
 import { useDataSource } from 'typeorm-extension';
 import type { IStorageAdapter } from '../../../../../core/storage/types.ts';
 import { BucketEntity, BucketFileEntity } from '../../../../../adapters/database/index.ts';
@@ -103,14 +104,18 @@ export class BucketFileCreateHandler implements ComponentHandler<
                 cb(null, chunk);
             },
         });
-        data.pipe(counter);
 
-        // upload
-        await this.storage.putObject(
+        // upload — pipeline forwards source errors to the counter Transform
+        // so a client abort destroys both streams and putObject rejects.
+        const uploadPromise = this.storage.putObject(
             toBucketName(bucket.id),
             hash,
             counter,
         );
+        await Promise.all([
+            uploadPromise,
+            pipeline(data, counter),
+        ]);
 
         const repository = dataSource.getRepository(BucketFileEntity);
         const entity = repository.create({
