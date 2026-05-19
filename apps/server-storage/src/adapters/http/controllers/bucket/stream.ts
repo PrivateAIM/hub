@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Readable } from 'node:stream';
+import { PassThrough, Readable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import type { Logger } from '@privateaim/server-kit';
 import type { Pack } from 'tar-stream';
@@ -51,12 +51,15 @@ export function packBucketFiles(
         .then(() => pack.finalize())
         .catch((err) => pack.destroy(err));
 
-    // tar-stream's Pack doesn't set readableHighWaterMark which
-    // Readable.toWeb() requires. Pipe through a wrapper that has it.
-    const readable = new Readable({ highWaterMark: 16384, read() {} });
-    pack.on('data', (chunk: Buffer) => readable.push(chunk));
-    pack.on('end', () => readable.push(null));
-    pack.on('error', (err: Error) => readable.destroy(err));
+    // tar-stream's Pack doesn't expose readableHighWaterMark, which
+    // Readable.toWeb requires. Bridge through a PassThrough so pipeline can
+    // forward backpressure end-to-end (slow HTTP consumer -> web stream ->
+    // PassThrough -> pack -> packFile pipeline -> MinIO source) and
+    // propagate errors in both directions.
+    const wrapper = new PassThrough({ highWaterMark: 16384 });
+    pipeline(pack, wrapper).catch(() => {
+        // error already surfaces via wrapper destruction
+    });
 
-    return Readable.toWeb(readable) as ReadableStream;
+    return Readable.toWeb(wrapper) as ReadableStream;
 }
