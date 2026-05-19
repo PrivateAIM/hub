@@ -6,11 +6,11 @@
  */
 
 import { Readable } from 'node:stream';
+import { pipeline } from 'node:stream/promises';
 import type { Logger } from '@privateaim/server-kit';
 import type { Pack } from 'tar-stream';
 import tar from 'tar-stream';
 import type { IStorageAdapter } from '../../../../core/storage/types.ts';
-import { streamToBuffer } from '../../../../core/utils/stream-to-buffer.ts';
 import type { BucketFileEntity } from '../../../database/entities/bucket-file.ts';
 
 async function packFile(
@@ -20,23 +20,18 @@ async function packFile(
     storage: IStorageAdapter,
     logger?: Logger,
 ) : Promise<void> {
-    const stream = await storage.getObject(name, file.hash);
-    const data = await streamToBuffer(stream);
+    if (file.size === null) {
+        throw new Error(`Cannot pack bucket file ${file.id}: size is not recorded.`);
+    }
 
     logger?.debug(`Packing file ${file.path} (${file.id})`);
 
-    return new Promise<void>((resolve, reject) => {
-        pack.entry({
-            name: file.path,
-            size: data.byteLength,
-        }, data, (err) => {
-            if (err) {
-                reject(err);
-                return;
-            }
-            resolve();
-        });
+    const source = await storage.getObject(name, file.hash);
+    const entry = pack.entry({
+        name: file.path,
+        size: file.size,
     });
+    await pipeline(source, entry);
 }
 
 export function packBucketFiles(
@@ -54,7 +49,7 @@ export function packBucketFiles(
 
     promise
         .then(() => pack.finalize())
-        .catch(() => pack.destroy());
+        .catch((err) => pack.destroy(err));
 
     // tar-stream's Pack doesn't set readableHighWaterMark which
     // Readable.toWeb() requires. Pipe through a wrapper that has it.
