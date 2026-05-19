@@ -18,6 +18,7 @@ import {
 import { BucketValidator, DomainType  } from '@privateaim/storage-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import crypto from 'node:crypto';
+import { Transform } from 'node:stream';
 import { useDataSource } from 'typeorm-extension';
 import type { IStorageAdapter } from '../../../../../core/storage/types.ts';
 import { BucketEntity, BucketFileEntity } from '../../../../../adapters/database/index.ts';
@@ -90,23 +91,32 @@ export class BucketFileCreateHandler implements ComponentHandler<
         }
 
         // hash
-
         const hashBuilder = crypto.createHash('sha256');
         hashBuilder.update(meta.path);
         const hash = hashBuilder.digest('hex');
+
+        // count bytes while streaming into storage
+        let size = 0;
+        const counter = new Transform({
+            transform(chunk: Buffer, _enc, cb) {
+                size += chunk.length;
+                cb(null, chunk);
+            },
+        });
+        data.pipe(counter);
 
         // upload
         await this.storage.putObject(
             toBucketName(bucket.id),
             hash,
-            data,
-            data.length,
+            counter,
         );
 
         const repository = dataSource.getRepository(BucketFileEntity);
         const entity = repository.create({
             ...meta,
             hash,
+            size,
         });
 
         await repository.save(entity);

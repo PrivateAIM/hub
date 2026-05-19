@@ -39,8 +39,18 @@ export class FakeStorageAdapter implements IStorageAdapter {
         }
     }
 
-    async putObject(bucket: string, key: string, data: Buffer): Promise<void> {
-        this.objects.set(`${bucket}/${key}`, data);
+    async putObject(bucket: string, key: string, data: Buffer | Readable): Promise<void> {
+        let buffer: Buffer;
+        if (Buffer.isBuffer(data)) {
+            buffer = data;
+        } else {
+            const chunks: Buffer[] = [];
+            for await (const chunk of data) {
+                chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+            }
+            buffer = Buffer.concat(chunks);
+        }
+        this.objects.set(`${bucket}/${key}`, buffer);
     }
 
     async getObject(bucket: string, key: string): Promise<Readable> {

@@ -32,7 +32,7 @@ export class MinioStorageAdapter implements IStorageAdapter {
         await this.client.removeBucket(name);
     }
 
-    async putObject(bucket: string, key: string, data: Buffer, size: number): Promise<void> {
+    async putObject(bucket: string, key: string, data: Buffer | Readable, size?: number): Promise<void> {
         await this.client.putObject(bucket, key, data, size);
     }
 

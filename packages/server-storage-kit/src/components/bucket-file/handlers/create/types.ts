@@ -5,11 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { Readable } from 'node:stream';
 import type { BucketFile } from '@privateaim/storage-kit';
 
 export type BucketFileCreateCommandPayload = {
     meta: Partial<BucketFile>,
-    data: Buffer
+    data: Readable
 };
 
 export type BucketFileCreationFailedEventPayload = {

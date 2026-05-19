@@ -6,9 +6,10 @@
  */
 
 import fs from 'node:fs/promises';
-import { createReadStream } from 'node:fs';
+import { createReadStream, createWriteStream } from 'node:fs';
 import path from 'node:path';
-import type { Readable } from 'node:stream';
+import { Readable } from 'node:stream';
+import { pipeline } from 'node:stream/promises';
 import type { IStorageAdapter } from '../../core/storage/types.ts';
 
 export class FsStorageAdapter implements IStorageAdapter {
@@ -35,10 +36,14 @@ export class FsStorageAdapter implements IStorageAdapter {
         await fs.rm(path.join(this.basePath, name), { recursive: true, force: true });
     }
 
-    async putObject(bucket: string, key: string, data: Buffer): Promise<void> {
+    async putObject(bucket: string, key: string, data: Buffer | Readable): Promise<void> {
         const filePath = path.join(this.basePath, bucket, key);
         await fs.mkdir(path.dirname(filePath), { recursive: true });
-        await fs.writeFile(filePath, data);
+        if (data instanceof Readable) {
+            await pipeline(data, createWriteStream(filePath));
+        } else {
+            await fs.writeFile(filePath, data);
+        }
     }
 
     async getObject(bucket: string, key: string): Promise<Readable> {
