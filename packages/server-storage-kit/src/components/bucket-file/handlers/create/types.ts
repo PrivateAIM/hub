@@ -18,6 +18,6 @@ export type BucketFileCreationFailedEventPayload = {
     error: Error
 };
 
-export type BucketFileCreationStartedEventPayload = Partial<BucketFile>;
+export type BucketFileCreationStartedEventPayload = Partial<Omit<BucketFile, 'bucket'>>;
 
-export type BucketFileCreationFinishedEventPayload = BucketFile;
+export type BucketFileCreationFinishedEventPayload = Omit<BucketFile, 'bucket'>;

@@ -49,10 +49,15 @@ export class BucketFileCreateHandler implements ComponentHandler<
             // todo: check if image exists, otherwise local queue task
             await this.process(value, context);
         } catch (e) {
+            // Drain the source stream so the upstream parser (Busboy) can move on.
+            // Idempotent if pipeline already destroyed it.
+            if (!value.data.destroyed) {
+                value.data.destroy();
+            }
+
             this.logger?.error({
                 message: e,
                 command: BucketCommand.CREATE,
-                analysis_id: value.meta.id,
                 [LogFlag.REF_ID]: value.meta.id,
                 [LogFlag.REF_TYPE]: DomainType.BUCKET_FILE,
             });
@@ -72,10 +77,11 @@ export class BucketFileCreateHandler implements ComponentHandler<
         context: ComponentHandlerContext<BucketFileComponentEventMap, BucketFileCommand.CREATE>,
     ): Promise<void> {
         const { data, meta } = value;
+        const { bucket: bucketRelation, ...metaForEvent } = meta;
 
         await context.handle(
             BucketFileEvent.CREATION_STARTED,
-            meta,
+            metaForEvent,
         );
 
         // todo: validate meta
@@ -83,18 +89,17 @@ export class BucketFileCreateHandler implements ComponentHandler<
         const dataSource = await useDataSource();
 
         let bucket : BucketEntity;
-        if (meta.bucket) {
-            bucket = meta.bucket;
+        if (bucketRelation) {
+            bucket = bucketRelation;
         } else {
             const bucketRepository = dataSource.getRepository(BucketEntity);
 
             bucket = await bucketRepository.findOneByOrFail({ id: meta.bucket_id });
         }
 
-        // hash
-        const hashBuilder = crypto.createHash('sha256');
-        hashBuilder.update(meta.path);
-        const hash = hashBuilder.digest('hex');
+        // Random storage key — the (bucket_id, path) DB unique constraint enforces
+        // logical de-duplication, so the object key just needs to be unique per row.
+        const hash = crypto.randomBytes(32).toString('hex');
 
         // count bytes while streaming into storage
         let size = 0;
@@ -105,13 +110,19 @@ export class BucketFileCreateHandler implements ComponentHandler<
             },
         });
 
-        // upload — pipeline forwards source errors to the counter Transform
-        // so a client abort destroys both streams and putObject rejects.
+        // Bidirectional teardown:
+        //   - pipeline(data, counter) forwards source errors to counter
+        //   - putObject rejection destroys counter, which causes pipeline to destroy data
         const uploadPromise = this.storage.putObject(
             toBucketName(bucket.id),
             hash,
             counter,
-        );
+        ).catch((err) => {
+            if (!counter.destroyed) {
+                counter.destroy(err);
+            }
+            throw err;
+        });
         await Promise.all([
             uploadPromise,
             pipeline(data, counter),
@@ -119,7 +130,7 @@ export class BucketFileCreateHandler implements ComponentHandler<
 
         const repository = dataSource.getRepository(BucketFileEntity);
         const entity = repository.create({
-            ...meta,
+            ...metaForEvent,
             hash,
             size,
         });
