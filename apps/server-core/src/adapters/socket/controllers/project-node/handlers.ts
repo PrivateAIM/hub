@@ -14,7 +14,7 @@ import {
 import {
     isEventCallback,
 } from '@privateaim/core-realtime-kit';
-import { UnauthorizedError } from '@ebec/http';
+import { UnauthorizedError } from '@privateaim/errors';
 import { PermissionName, buildDomainEventFullName } from '@privateaim/kit';
 import {
     isSocketAuthenticated,

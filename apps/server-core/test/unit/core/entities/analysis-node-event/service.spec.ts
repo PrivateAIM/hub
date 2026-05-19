@@ -7,7 +7,7 @@
 
 import { randomUUID } from 'node:crypto';
 import type { AnalysisNodeEvent } from '@privateaim/core-kit';
-import { NotFoundError } from '@ebec/http';
+import { EntityNotFoundError } from '@privateaim/errors';
 import {
     beforeEach,
     describe,
@@ -70,8 +70,8 @@ describe('AnalysisNodeEventService', () => {
             expect(result.analysis_id).toBe(event.analysis_id);
         });
 
-        it('should throw NotFoundError for missing entity', async () => {
-            await expect(service.getOne('nonexistent')).rejects.toThrow(NotFoundError);
+        it('should throw EntityNotFoundError for missing entity', async () => {
+            await expect(service.getOne('nonexistent')).rejects.toThrow(EntityNotFoundError);
         });
     });
 });

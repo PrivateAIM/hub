@@ -7,7 +7,6 @@
 
 export * from './crypto';
 export * from './domains';
-export * from './error';
 export * from './domain-event';
 export * from './utils';
 export * from './constants';

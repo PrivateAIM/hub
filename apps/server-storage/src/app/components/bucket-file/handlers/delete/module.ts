@@ -5,7 +5,7 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import { NotFoundError } from '@ebec/http';
+import { EntityNotFoundError } from '@privateaim/errors';
 import type { ComponentHandler, ComponentHandlerContext, Logger } from '@privateaim/server-kit';
 import type {
     BucketFileComponentEventMap,
@@ -78,7 +78,7 @@ export class BucketFileDeleteHandler implements ComponentHandler<
         });
 
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError({ entity: 'bucket-file' });
         }
 
         const bucketName = toBucketName(entity.bucket.id);

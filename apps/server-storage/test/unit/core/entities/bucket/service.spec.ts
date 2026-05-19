@@ -7,7 +7,7 @@
 
 import { randomUUID } from 'node:crypto';
 import type { Bucket } from '@privateaim/storage-kit';
-import { ForbiddenError, NotFoundError } from '@ebec/http';
+import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import {
     beforeEach,
     describe,
@@ -86,8 +86,8 @@ describe('BucketService', () => {
             expect(result.name).toBe('my-bucket');
         });
 
-        it('should throw NotFoundError for missing entity', async () => {
-            await expect(service.getOne('nonexistent')).rejects.toThrow(NotFoundError);
+        it('should throw EntityNotFoundError for missing entity', async () => {
+            await expect(service.getOne('nonexistent')).rejects.toThrow(EntityNotFoundError);
         });
     });
 
@@ -107,19 +107,19 @@ describe('BucketService', () => {
             expect(caller.getCreateCalls()[0].actor_type).toBe('user');
         });
 
-        it('should throw ForbiddenError when actor lacks permission', async () => {
+        it('should throw PermissionDeniedError when actor lacks permission', async () => {
             await expect(
                 service.create({ name: 'new-bucket' }, createDenyAllActor()),
-            ).rejects.toThrow(ForbiddenError);
+            ).rejects.toThrow(PermissionDeniedError);
         });
 
-        it('should throw ForbiddenError when actor has no identity', async () => {
+        it('should throw PermissionDeniedError when actor has no identity', async () => {
             const actor = createAllowAllActor();
             actor.identity = undefined;
 
             await expect(
                 service.create({ name: 'new-bucket' }, actor),
-            ).rejects.toThrow(ForbiddenError);
+            ).rejects.toThrow(PermissionDeniedError);
         });
 
         it('should set realm_id from actor when not provided', async () => {
@@ -131,7 +131,7 @@ describe('BucketService', () => {
             expect(call.realm_id).toBe('my-realm');
         });
 
-        it('should throw ForbiddenError when non-master realm sets different realm_id', async () => {
+        it('should throw PermissionDeniedError when non-master realm sets different realm_id', async () => {
             const actor = createNonMasterRealmActor('realm-1');
             const otherRealmId = randomUUID();
 
@@ -140,7 +140,7 @@ describe('BucketService', () => {
                     { name: 'new-bucket', realm_id: otherRealmId },
                     actor,
                 ),
-            ).rejects.toThrow(ForbiddenError);
+            ).rejects.toThrow(PermissionDeniedError);
         });
     });
 
@@ -153,10 +153,10 @@ describe('BucketService', () => {
             expect(result.id).toBe(bucket.id);
         });
 
-        it('should throw NotFoundError for missing entity', async () => {
+        it('should throw EntityNotFoundError for missing entity', async () => {
             await expect(
                 service.update('nonexistent', {}, createAllowAllActor()),
-            ).rejects.toThrow(NotFoundError);
+            ).rejects.toThrow(EntityNotFoundError);
         });
 
         it('should skip permission check when actor owns the bucket', async () => {
@@ -181,7 +181,7 @@ describe('BucketService', () => {
 
             await expect(
                 service.update(bucket.id, {}, createNonMasterRealmActor('realm-1')),
-            ).rejects.toThrow(ForbiddenError);
+            ).rejects.toThrow(PermissionDeniedError);
         });
 
         it('should create minio bucket if it does not exist', async () => {
@@ -222,10 +222,10 @@ describe('BucketService', () => {
             expect(caller.getDeleteCalls()).toHaveLength(1);
         });
 
-        it('should throw NotFoundError for missing entity', async () => {
+        it('should throw EntityNotFoundError for missing entity', async () => {
             await expect(
                 service.delete('nonexistent', createAllowAllActor()),
-            ).rejects.toThrow(NotFoundError);
+            ).rejects.toThrow(EntityNotFoundError);
         });
 
         it('should skip permission check when actor owns the bucket', async () => {
@@ -249,7 +249,7 @@ describe('BucketService', () => {
 
             await expect(
                 service.delete(bucket.id, createNonMasterRealmActor('realm-1')),
-            ).rejects.toThrow(ForbiddenError);
+            ).rejects.toThrow(PermissionDeniedError);
         });
     });
 });

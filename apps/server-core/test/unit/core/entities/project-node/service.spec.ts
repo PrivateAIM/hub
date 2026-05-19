@@ -8,7 +8,7 @@
 import { randomUUID } from 'node:crypto';
 import type { Node, Project, ProjectNode } from '@privateaim/core-kit';
 import { NodeType, ProjectNodeApprovalStatus } from '@privateaim/core-kit';
-import { ForbiddenError, NotFoundError } from '@ebec/http';
+import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import {
     beforeEach,
     describe,
@@ -118,8 +118,8 @@ describe('ProjectNodeService', () => {
             expect(result.id).toBe('pn-1');
         });
 
-        it('should throw NotFoundError for missing entity', async () => {
-            await expect(service.getOne('nonexistent')).rejects.toThrow(NotFoundError);
+        it('should throw EntityNotFoundError for missing entity', async () => {
+            await expect(service.getOne('nonexistent')).rejects.toThrow(EntityNotFoundError);
         });
     });
 
@@ -145,16 +145,16 @@ describe('ProjectNodeService', () => {
             expect(result.node_realm_id).toBe('realm-1');
         });
 
-        it('should throw ForbiddenError when actor lacks permission', async () => {
+        it('should throw PermissionDeniedError when actor lacks permission', async () => {
             await expect(
                 service.create(
                     { project_id: projectId, node_id: nodeId },
                     createDenyAllActor(),
                 ),
-            ).rejects.toThrow(ForbiddenError);
+            ).rejects.toThrow(PermissionDeniedError);
         });
 
-        it('should throw ForbiddenError when actor cannot write to project realm', async () => {
+        it('should throw PermissionDeniedError when actor cannot write to project realm', async () => {
             const foreignRepo = createFakeProjectNodeRepository('other-realm', 'realm-1');
 
             const foreignService = new ProjectNodeService({
@@ -168,7 +168,7 @@ describe('ProjectNodeService', () => {
                     { project_id: projectId, node_id: nodeId },
                     createNonMasterRealmActor('realm-1'),
                 ),
-            ).rejects.toThrow(ForbiddenError);
+            ).rejects.toThrow(PermissionDeniedError);
         });
 
         it('should auto-approve when skipProjectApproval is true', async () => {
@@ -235,19 +235,19 @@ describe('ProjectNodeService', () => {
             expect(result.approval_status).toBe(ProjectNodeApprovalStatus.APPROVED);
         });
 
-        it('should throw NotFoundError for missing entity', async () => {
+        it('should throw EntityNotFoundError for missing entity', async () => {
             await expect(
                 service.update('nonexistent', {}, createAllowAllActor()),
-            ).rejects.toThrow(NotFoundError);
+            ).rejects.toThrow(EntityNotFoundError);
         });
 
-        it('should throw ForbiddenError when actor lacks permission', async () => {
+        it('should throw PermissionDeniedError when actor lacks permission', async () => {
             const pn = createTestProjectNode();
             repository.seed(pn);
 
             await expect(
                 service.update(pn.id, {}, createDenyAllActor()),
-            ).rejects.toThrow(ForbiddenError);
+            ).rejects.toThrow(PermissionDeniedError);
         });
 
         it('should enforce node realm writability', async () => {
@@ -256,7 +256,7 @@ describe('ProjectNodeService', () => {
 
             await expect(
                 service.update(pn.id, {}, createNonMasterRealmActor('realm-1')),
-            ).rejects.toThrow(ForbiddenError);
+            ).rejects.toThrow(PermissionDeniedError);
         });
     });
 
@@ -274,22 +274,22 @@ describe('ProjectNodeService', () => {
             expect(repository.getAll()).toHaveLength(0);
         });
 
-        it('should throw ForbiddenError when actor lacks permission', async () => {
+        it('should throw PermissionDeniedError when actor lacks permission', async () => {
             const pn = createTestProjectNode();
             repository.seed(pn);
 
             await expect(
                 service.delete(pn.id, createDenyAllActor()),
-            ).rejects.toThrow(ForbiddenError);
+            ).rejects.toThrow(PermissionDeniedError);
         });
 
-        it('should throw NotFoundError for missing entity', async () => {
+        it('should throw EntityNotFoundError for missing entity', async () => {
             await expect(
                 service.delete('nonexistent', createAllowAllActor()),
-            ).rejects.toThrow(NotFoundError);
+            ).rejects.toThrow(EntityNotFoundError);
         });
 
-        it('should throw ForbiddenError when not authority of node or project realm', async () => {
+        it('should throw PermissionDeniedError when not authority of node or project realm', async () => {
             const pn = createTestProjectNode({
                 node_realm_id: 'other-realm',
                 project_realm_id: 'another-realm',
@@ -298,7 +298,7 @@ describe('ProjectNodeService', () => {
 
             await expect(
                 service.delete(pn.id, createNonMasterRealmActor('realm-1')),
-            ).rejects.toThrow(ForbiddenError);
+            ).rejects.toThrow(PermissionDeniedError);
         });
 
         it('should allow delete when actor is authority of node realm', async () => {

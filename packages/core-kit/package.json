@@ -24,7 +24,7 @@
         "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts"
     },
     "dependencies": {
-        "@ebec/http": "^2.3.0",
+        "@privateaim/errors": "^0.8.42",
         "@validup/adapter-zod": "^0.2.3",
         "validup": "^0.2.1",
         "zod": "^4.3.6"

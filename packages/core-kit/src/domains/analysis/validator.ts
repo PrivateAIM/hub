@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BadRequestError } from '@ebec/http';
+import { BadRequestError } from '@privateaim/errors';
 import { Container } from 'validup';
 import { createValidator } from '@validup/adapter-zod';
 import { z } from 'zod';

@@ -11,7 +11,7 @@ import {
     PermissionName,
     isRealmResourceWritable,
 } from '@privateaim/kit';
-import { ForbiddenError, NotFoundError } from '@ebec/http';
+import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
 import type { IEventRepository, IEventService } from './types.ts';
@@ -53,7 +53,7 @@ export class EventService extends AbstractEntityService implements IEventService
         const entity = await this.repository.findOneById(id);
 
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError({ entity: 'event' });
         }
 
         return entity;
@@ -68,7 +68,7 @@ export class EventService extends AbstractEntityService implements IEventService
 
         if (validated.realm_id) {
             if (!isRealmResourceWritable(actor.realm, validated.realm_id)) {
-                throw new ForbiddenError('You are not permitted to create this event.');
+                throw new PermissionDeniedError('You are not permitted to create this event.');
             }
         } else {
             validated.realm_id = this.getActorRealmId(actor);
@@ -85,12 +85,12 @@ export class EventService extends AbstractEntityService implements IEventService
         const entity = await this.repository.findOneById(id);
 
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError({ entity: 'event' });
         }
 
         if (entity.realm_id) {
             if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
-                throw new ForbiddenError('You are not permitted to delete this event.');
+                throw new PermissionDeniedError('You are not permitted to delete this event.');
             }
         }
 

@@ -11,7 +11,7 @@ import {
     ValidatorGroup, 
     isRealmResourceWritable, 
 } from '@privateaim/kit';
-import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
+import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
 import type { IProjectRepository, IProjectService } from './types.ts';
@@ -42,7 +42,7 @@ export class ProjectService extends AbstractEntityService implements IProjectSer
             await this.repository.findOneById(id);
 
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError({ entity: 'project' });
         }
 
         return entity;
@@ -57,7 +57,7 @@ export class ProjectService extends AbstractEntityService implements IProjectSer
 
         if (validated.realm_id) {
             if (!isRealmResourceWritable(actor.realm, validated.realm_id)) {
-                throw new ForbiddenError('You are not permitted to create this project.');
+                throw new PermissionDeniedError('You are not permitted to create this project.');
             }
         } else {
             validated.realm_id = this.getActorRealmId(actor);
@@ -99,11 +99,11 @@ export class ProjectService extends AbstractEntityService implements IProjectSer
 
         const entity = await this.repository.findOneBy({ id });
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError({ entity: 'project' });
         }
 
         if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
-            throw new ForbiddenError();
+            throw new PermissionDeniedError();
         }
 
         const merged = this.repository.merge(entity, validated);
@@ -118,11 +118,11 @@ export class ProjectService extends AbstractEntityService implements IProjectSer
 
         const entity = await this.repository.findOneBy({ id });
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError({ entity: 'project' });
         }
 
         if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
-            throw new ForbiddenError();
+            throw new PermissionDeniedError();
         }
 
         if (entity.analyses > 0) {

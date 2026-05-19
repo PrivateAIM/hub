@@ -7,7 +7,7 @@
 
 import type { AnalysisBucket } from '@privateaim/core-kit';
 import { ValidatorGroup, isRealmResourceWritable  } from '@privateaim/kit';
-import { ForbiddenError, NotFoundError } from '@ebec/http';
+import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
 import type { IAnalysisBucketRepository, IAnalysisBucketService } from './types.ts';
@@ -36,7 +36,7 @@ export class AnalysisBucketService extends AbstractEntityService implements IAna
         const entity = await this.repository.findOneById(id);
 
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError({ entity: 'analysis-bucket' });
         }
 
         return entity;
@@ -57,11 +57,11 @@ export class AnalysisBucketService extends AbstractEntityService implements IAna
     async update(id: string, data: Partial<AnalysisBucket>, actor: ActorContext): Promise<AnalysisBucket> {
         const entity = await this.repository.findOneBy({ id });
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError({ entity: 'analysis-bucket' });
         }
 
         if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
-            throw new ForbiddenError();
+            throw new PermissionDeniedError();
         }
 
         const validated = await this.validator.run(data, { group: ValidatorGroup.UPDATE });
@@ -74,11 +74,11 @@ export class AnalysisBucketService extends AbstractEntityService implements IAna
     async delete(id: string, actor: ActorContext): Promise<AnalysisBucket> {
         const entity = await this.repository.findOneBy({ id });
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError({ entity: 'analysis-bucket' });
         }
 
         if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
-            throw new ForbiddenError();
+            throw new PermissionDeniedError();
         }
 
         const entityId = entity.id;

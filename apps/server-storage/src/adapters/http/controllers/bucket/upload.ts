@@ -18,7 +18,7 @@ import {
 import Busboy from 'busboy';
 import path from 'node:path';
 import type { IRoutupEvent } from 'routup';
-import { BadRequestError } from '@ebec/http';
+import { BadRequestError } from '@privateaim/errors';
 import { useRequestIdentityOrFail } from '@privateaim/server-http-kit';
 import type { BucketFileComponent } from '../../../../app/components/bucket-file/module.ts';
 import type { BucketEntity } from '../../../database/index.ts';

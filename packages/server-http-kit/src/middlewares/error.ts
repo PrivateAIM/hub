@@ -1,12 +1,13 @@
 /*
- * Copyright (c) 2021-2024.
+ * Copyright (c) 2021-2026.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { HubError } from '@privateaim/kit';
 import { isObject } from '@privateaim/kit';
+import type { HubError } from '@privateaim/errors';
+import { httpStatusFromCode } from '@privateaim/errors';
 import type { Logger } from '@privateaim/server-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import type { Router } from 'routup';
@@ -28,21 +29,23 @@ type ErrorMiddlewareOptions = {
 
 export function mountErrorMiddleware(router: Router, options: ErrorMiddlewareOptions = {}) {
     router.use(defineErrorHandler((error, event) => {
-        let next : HubError;
+        let next: HubError;
         if (error.cause) {
             next = sanitizeError(error.cause);
         } else {
             next = sanitizeError(error);
         }
 
-        const payload : ErrorResponsePayload = {
-            statusCode: next.statusCode,
+        const status = httpStatusFromCode(next.code);
+
+        const payload: ErrorResponsePayload = {
+            statusCode: status,
             code: `${next.code}`,
             message: next.message,
             issues: next.issues,
         };
 
-        const isServerError = next.statusCode >= 500 && next.statusCode < 600;
+        const isServerError = status >= 500 && status < 600;
         if (isServerError && options.logger) {
             if (error.cause && isObject(error.cause)) {
                 options.logger.error({
@@ -62,7 +65,7 @@ export function mountErrorMiddleware(router: Router, options: ErrorMiddlewareOpt
             }
         }
 
-        event.response.status = payload.statusCode;
+        event.response.status = status;
         return payload;
     }));
 }

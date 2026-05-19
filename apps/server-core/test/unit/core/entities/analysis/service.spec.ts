@@ -6,7 +6,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
-import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
+import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type {
     Analysis,
     AnalysisBucket,
@@ -152,8 +152,8 @@ describe('AnalysisService', () => {
             expect(result.id).toBe('analysis-1');
         });
 
-        it('should throw NotFoundError for missing entity', async () => {
-            await expect(service.getOne('nonexistent')).rejects.toThrow(NotFoundError);
+        it('should throw EntityNotFoundError for missing entity', async () => {
+            await expect(service.getOne('nonexistent')).rejects.toThrow(EntityNotFoundError);
         });
     });
 
@@ -243,18 +243,18 @@ describe('AnalysisService', () => {
             expect(result.project.analyses).toBe(1);
         });
 
-        it('should throw ForbiddenError when actor lacks permission', async () => {
+        it('should throw PermissionDeniedError when actor lacks permission', async () => {
             analysisRepository.seed(createFullAnalysis());
 
             await expect(
                 service.delete('analysis-1', createDenyAllActor()),
-            ).rejects.toThrow(ForbiddenError);
+            ).rejects.toThrow(PermissionDeniedError);
         });
 
-        it('should throw NotFoundError for missing entity', async () => {
+        it('should throw EntityNotFoundError for missing entity', async () => {
             await expect(
                 service.delete('nonexistent', createAllowAllActor()),
-            ).rejects.toThrow(NotFoundError);
+            ).rejects.toThrow(EntityNotFoundError);
         });
 
         it('should enforce realm writability', async () => {
@@ -263,7 +263,7 @@ describe('AnalysisService', () => {
             const actor = createNonMasterRealmActor('realm-1');
             await expect(
                 service.delete('analysis-1', actor),
-            ).rejects.toThrow(ForbiddenError);
+            ).rejects.toThrow(PermissionDeniedError);
         });
 
         it('should allow master realm to delete', async () => {
@@ -288,10 +288,10 @@ describe('AnalysisService', () => {
             ).rejects.toThrow(BadRequestError);
         });
 
-        it('should throw NotFoundError for missing entity', async () => {
+        it('should throw EntityNotFoundError for missing entity', async () => {
             await expect(
                 service.executeCommand('nonexistent', AnalysisCommand.BUILD_START, createAllowAllActor()),
-            ).rejects.toThrow(NotFoundError);
+            ).rejects.toThrow(EntityNotFoundError);
         });
 
         it('should enforce realm writability', async () => {
@@ -300,7 +300,7 @@ describe('AnalysisService', () => {
             const actor = createNonMasterRealmActor('realm-1');
             await expect(
                 service.executeCommand('analysis-1', AnalysisCommand.STORAGE_CHECK, actor),
-            ).rejects.toThrow(ForbiddenError);
+            ).rejects.toThrow(PermissionDeniedError);
         });
 
         it('should dispatch CONFIGURATION_LOCK to configurator', async () => {

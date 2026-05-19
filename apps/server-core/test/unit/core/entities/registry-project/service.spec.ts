@@ -8,7 +8,7 @@
 import { randomUUID } from 'node:crypto';
 import type { Node, Registry, RegistryProject } from '@privateaim/core-kit';
 import { RegistryProjectType } from '@privateaim/core-kit';
-import { ForbiddenError, NotFoundError } from '@ebec/http';
+import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import {
     beforeEach,
     describe,
@@ -114,10 +114,10 @@ describe('RegistryProjectService', () => {
             expect(result.id).toBe('rp-1');
         });
 
-        it('should throw NotFoundError for missing entity', async () => {
+        it('should throw EntityNotFoundError for missing entity', async () => {
             await expect(
                 service.getOne('nonexistent', createAllowAllActor()),
-            ).rejects.toThrow(NotFoundError);
+            ).rejects.toThrow(EntityNotFoundError);
         });
 
         it('should check secret access when entity has account_secret', async () => {
@@ -186,7 +186,7 @@ describe('RegistryProjectService', () => {
             expect(registryManager.getLinkCalls()).toHaveLength(1);
         });
 
-        it('should throw ForbiddenError when actor lacks permission', async () => {
+        it('should throw PermissionDeniedError when actor lacks permission', async () => {
             await expect(
                 service.create(
                     {
@@ -197,7 +197,7 @@ describe('RegistryProjectService', () => {
                     },
                     createDenyAllActor(),
                 ),
-            ).rejects.toThrow(ForbiddenError);
+            ).rejects.toThrow(PermissionDeniedError);
         });
     });
 
@@ -215,19 +215,19 @@ describe('RegistryProjectService', () => {
             expect(result.name).toBe('updated-project');
         });
 
-        it('should throw NotFoundError for missing entity', async () => {
+        it('should throw EntityNotFoundError for missing entity', async () => {
             await expect(
                 service.update('nonexistent', { name: 'updated-project' }, createAllowAllActor()),
-            ).rejects.toThrow(NotFoundError);
+            ).rejects.toThrow(EntityNotFoundError);
         });
 
-        it('should throw ForbiddenError when actor lacks permission', async () => {
+        it('should throw PermissionDeniedError when actor lacks permission', async () => {
             const project = createTestRegistryProject();
             repository.seed(project);
 
             await expect(
                 service.update(project.id, { name: 'updated-project' }, createDenyAllActor()),
-            ).rejects.toThrow(ForbiddenError);
+            ).rejects.toThrow(PermissionDeniedError);
         });
 
         it('should enforce realm writability for non-master realm', async () => {
@@ -236,7 +236,7 @@ describe('RegistryProjectService', () => {
 
             await expect(
                 service.update(project.id, { name: 'updated-project' }, createNonMasterRealmActor('realm-1')),
-            ).rejects.toThrow(ForbiddenError);
+            ).rejects.toThrow(PermissionDeniedError);
         });
 
         it('should unlink and relink when external_name changes', async () => {
@@ -278,19 +278,19 @@ describe('RegistryProjectService', () => {
             expect(repository.getAll()).toHaveLength(0);
         });
 
-        it('should throw ForbiddenError when actor lacks permission', async () => {
+        it('should throw PermissionDeniedError when actor lacks permission', async () => {
             const project = createTestRegistryProject();
             repository.seed(project);
 
             await expect(
                 service.delete(project.id, createDenyAllActor()),
-            ).rejects.toThrow(ForbiddenError);
+            ).rejects.toThrow(PermissionDeniedError);
         });
 
-        it('should throw NotFoundError for missing entity', async () => {
+        it('should throw EntityNotFoundError for missing entity', async () => {
             await expect(
                 service.delete('nonexistent', createAllowAllActor()),
-            ).rejects.toThrow(NotFoundError);
+            ).rejects.toThrow(EntityNotFoundError);
         });
 
         it('should enforce realm writability for non-master realm', async () => {
@@ -299,7 +299,7 @@ describe('RegistryProjectService', () => {
 
             await expect(
                 service.delete(project.id, createNonMasterRealmActor('realm-1')),
-            ).rejects.toThrow(ForbiddenError);
+            ).rejects.toThrow(PermissionDeniedError);
         });
 
         it('should unlink project via registryManager on delete', async () => {

@@ -7,7 +7,7 @@
 
 import { randomUUID } from 'node:crypto';
 import type { Bucket, BucketFile } from '@privateaim/storage-kit';
-import { ForbiddenError, NotFoundError } from '@ebec/http';
+import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import {
     beforeEach,
     describe,
@@ -76,8 +76,8 @@ describe('BucketFileService', () => {
             expect(result.id).toBe('bf-1');
         });
 
-        it('should throw NotFoundError for missing entity', async () => {
-            await expect(service.getOne('nonexistent')).rejects.toThrow(NotFoundError);
+        it('should throw EntityNotFoundError for missing entity', async () => {
+            await expect(service.getOne('nonexistent')).rejects.toThrow(EntityNotFoundError);
         });
     });
 
@@ -93,10 +93,10 @@ describe('BucketFileService', () => {
             expect(repository.getAll()).toHaveLength(0);
         });
 
-        it('should throw NotFoundError for missing entity', async () => {
+        it('should throw EntityNotFoundError for missing entity', async () => {
             await expect(
                 service.delete('nonexistent', createAllowAllActor()),
-            ).rejects.toThrow(NotFoundError);
+            ).rejects.toThrow(EntityNotFoundError);
         });
 
         it('should skip permission check when actor owns the file', async () => {
@@ -146,10 +146,10 @@ describe('BucketFileService', () => {
 
             await expect(
                 service.delete(file.id, createNonMasterRealmActor('realm-1')),
-            ).rejects.toThrow(ForbiddenError);
+            ).rejects.toThrow(PermissionDeniedError);
         });
 
-        it('should throw ForbiddenError when actor lacks permission and is not owner', async () => {
+        it('should throw PermissionDeniedError when actor lacks permission and is not owner', async () => {
             const file = createTestBucketFile({
                 actor_id: 'other-user',
                 actor_type: 'user',
@@ -160,7 +160,7 @@ describe('BucketFileService', () => {
 
             await expect(
                 service.delete(file.id, createDenyAllActor()),
-            ).rejects.toThrow(ForbiddenError);
+            ).rejects.toThrow(PermissionDeniedError);
         });
     });
 });

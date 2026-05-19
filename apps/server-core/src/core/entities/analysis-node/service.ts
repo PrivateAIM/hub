@@ -13,7 +13,7 @@ import {
     isRealmResourceWritable, 
 } from '@privateaim/kit';
 import { isPropertySet } from '@authup/kit';
-import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
+import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
 import type { IProjectNodeRepository } from '../project-node/types.ts';
@@ -54,7 +54,7 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
         const entity = await this.repository.findOneById(id);
 
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError({ entity: 'analysis-node' });
         }
 
         return entity;
@@ -80,7 +80,7 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
         });
 
         if (!projectNode) {
-            throw new NotFoundError('The referenced node is not part of the analysis project.');
+            throw new EntityNotFoundError('The referenced node is not part of the analysis project.');
         }
 
         const entity = this.repository.create(validated);
@@ -104,14 +104,14 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
 
         const entity = await this.repository.findOneBy({ id });
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError({ entity: 'analysis-node' });
         }
 
         const isAuthorityOfNode = isRealmResourceWritable(actor.realm, entity.node_realm_id);
         const isAuthorityOfAnalysis = isRealmResourceWritable(actor.realm, entity.analysis_realm_id);
 
         if (!isAuthorityOfNode && !isAuthorityOfAnalysis) {
-            throw new ForbiddenError('You are neither part of the node nor analysis realm.');
+            throw new PermissionDeniedError('You are neither part of the node nor analysis realm.');
         }
 
         let canUpdate = false;
@@ -130,7 +130,7 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
         }
 
         if (!canUpdate && !canApprove) {
-            throw new ForbiddenError();
+            throw new PermissionDeniedError();
         }
 
         if (
@@ -171,14 +171,14 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
 
         const entity = await this.repository.findOneBy({ id });
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError({ entity: 'analysis-node' });
         }
 
         if (
             !isRealmResourceWritable(actor.realm, entity.node_realm_id) &&
             !isRealmResourceWritable(actor.realm, entity.analysis_realm_id)
         ) {
-            throw new ForbiddenError();
+            throw new PermissionDeniedError();
         }
 
         const entityId = entity.id;

@@ -12,7 +12,7 @@ import {
     isPropertySet, 
     isRealmResourceWritable, 
 } from '@privateaim/kit';
-import { ForbiddenError, NotFoundError } from '@ebec/http';
+import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
 import type { IRegistryManager } from '../node/types.ts';
@@ -58,7 +58,7 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
             await this.repository.findOneById(id);
 
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError({ entity: 'registry-project' });
         }
 
         if (this.hasSecretField(entity)) {
@@ -95,7 +95,7 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
             }
         }
 
-        throw new ForbiddenError();
+        throw new PermissionDeniedError();
     }
 
     async create(data: Partial<RegistryProject>, actor: ActorContext): Promise<RegistryProject> {
@@ -123,11 +123,11 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
 
         const entity = await this.repository.findOneBy({ id });
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError({ entity: 'registry-project' });
         }
 
         if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
-            throw new ForbiddenError();
+            throw new PermissionDeniedError();
         }
 
         const previousExternalName = entity.external_name;
@@ -157,11 +157,11 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
 
         const entity = await this.repository.findOneBy({ id });
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError({ entity: 'registry-project' });
         }
 
         if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
-            throw new ForbiddenError();
+            throw new PermissionDeniedError();
         }
 
         const entityId = entity.id;

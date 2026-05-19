@@ -1,31 +1,45 @@
 /*
- * Copyright (c) 2024.
+ * Copyright (c) 2024-2026.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { isObject } from '@authup/kit';
 import {
-    BadRequestErrorOptions,
-    ConflictErrorOptions,
-    HTTPError,
-    InsufficientStorageErrorOptions,
-    InternalServerErrorOptions,
-} from '@ebec/http';
-import { HubError } from '@privateaim/kit';
+    BadRequestError,
+    EntityConflictError,
+    EntityRelationInvalidError,
+    HubError,
+    InternalError,
+    StorageInsufficientError,
+    codeFromHttpStatus,
+    isHubError,
+} from '@privateaim/errors';
+import { isHTTPError } from '@ebec/http';
 import { EntityRelationLookupError } from 'typeorm-extension';
 import { buildErrorMessageForAttributes, isValidupError, stringifyPath } from 'validup';
-import { hasOwnProperty, isObject } from '@authup/kit';
 
-export function sanitizeError(input: unknown) : HubError {
-    if (input instanceof HubError) {
+/**
+ * Normalize an unknown error to a HubError. Recognised shapes:
+ *
+ * 1. HubError instance                 → returned as-is
+ * 2. EntityRelationLookupError         → EntityRelationInvalidError
+ * 3. validup Issue error               → BadRequestError carrying issues
+ * 4. foreign @ebec/http HTTPError      → HubError with the closest semantic code
+ * 5. driver error w/ a recognised code → EntityConflictError or StorageInsufficientError
+ * 6. anything else                     → InternalError
+ *
+ * The HTTP-status concern is handled separately by `httpStatusFromCode` in
+ * the adapter — this function only assigns a semantic `code`.
+ */
+export function sanitizeError(input: unknown): HubError {
+    if (isHubError(input)) {
         return input;
     }
 
     if (input instanceof EntityRelationLookupError) {
-        return new HubError({
-            statusCode: BadRequestErrorOptions.statusCode,
-            code: BadRequestErrorOptions.code,
+        return new EntityRelationInvalidError({
             message: input.message,
             stack: input.stack,
         });
@@ -33,9 +47,7 @@ export function sanitizeError(input: unknown) : HubError {
 
     if (isValidupError(input)) {
         const paths = input.issues.map((issue) => stringifyPath(issue.path));
-        const error = new HubError({
-            statusCode: BadRequestErrorOptions.statusCode,
-            code: BadRequestErrorOptions.code,
+        const error = new BadRequestError({
             stack: input.stack,
             message: input.message || buildErrorMessageForAttributes(paths),
         });
@@ -44,19 +56,16 @@ export function sanitizeError(input: unknown) : HubError {
         return error;
     }
 
-    if (input instanceof HTTPError) {
+    if (isHTTPError(input)) {
         return new HubError({
-            statusCode: input.statusCode,
-            code: input.code,
+            code: codeFromHttpStatus(input.status),
             message: input.message,
-            data: input.data,
             stack: input.stack,
         });
     }
 
     if (isObject(input)) {
-        const code = hasOwnProperty(input, 'code') &&
-        typeof input.code === 'string' ?
+        const code = Object.prototype.hasOwnProperty.call(input, 'code') && typeof input.code === 'string' ?
             input.code :
             undefined;
 
@@ -64,34 +73,26 @@ export function sanitizeError(input: unknown) : HubError {
          * @see https://dev.mysql.com/doc/mysql-errors/8.0/en/server-error-reference.html
          */
         switch (code) {
+            case '23505':
             case 'ER_DUP_ENTRY':
             case 'SQLITE_CONSTRAINT_UNIQUE': {
-                return new HubError({
-                    statusCode: ConflictErrorOptions.statusCode,
-                    code: ConflictErrorOptions.code,
-                    message: 'An entry with some unique attributes already exist.',
-                    stack: input.stack,
+                return new EntityConflictError({
+                    message: 'An entry with some unique attributes already exists.',
+                    stack: input.stack as string | undefined,
                 });
             }
             case 'ER_DISK_FULL':
-                return new HubError({
-                    statusCode: InsufficientStorageErrorOptions.statusCode,
-                    code: InsufficientStorageErrorOptions.code,
-                    message: 'No database operation possible, due the leak of free disk space.',
-                    stack: input.stack,
+                return new StorageInsufficientError({
+                    message: 'No database operation possible, due to the lack of free disk space.',
+                    stack: input.stack as string | undefined,
                 });
         }
 
-        return new HubError({
-            statusCode: InternalServerErrorOptions.statusCode,
-            code: InternalServerErrorOptions.code,
-            message: input.message,
-            stack: input.stack,
+        return new InternalError({
+            message: input.message as string | undefined,
+            stack: input.stack as string | undefined,
         });
     }
 
-    return new HubError({
-        statusCode: InternalServerErrorOptions.statusCode,
-        code: InternalServerErrorOptions.code,
-    });
+    return new InternalError();
 }

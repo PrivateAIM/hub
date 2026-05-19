@@ -6,7 +6,7 @@
  */
 
 import type { Bucket } from '@privateaim/storage-kit';
-import { BadRequestError } from '@ebec/http';
+import { BadRequestError } from '@privateaim/errors';
 import { DirectComponentCaller } from '@privateaim/server-kit';
 import { BucketCommand } from '@privateaim/server-storage-kit';
 import type { IBucketCaller } from '../../../../core/entities/index.ts';

@@ -11,7 +11,7 @@ import {
     ValidatorGroup, 
     isRealmResourceWritable, 
 } from '@privateaim/kit';
-import { ForbiddenError, NotFoundError } from '@ebec/http';
+import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
 import type { IAnalysisPermissionRepository, IAnalysisPermissionService } from './types.ts';
@@ -40,7 +40,7 @@ export class AnalysisPermissionService extends AbstractEntityService implements 
         const entity = await this.repository.findOneById(id);
 
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError({ entity: 'analysis-permission' });
         }
 
         return entity;
@@ -65,11 +65,11 @@ export class AnalysisPermissionService extends AbstractEntityService implements 
 
         const entity = await this.repository.findOneBy({ id });
         if (!entity) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError({ entity: 'analysis-permission' });
         }
 
         if (!isRealmResourceWritable(actor.realm, entity.analysis_realm_id)) {
-            throw new ForbiddenError();
+            throw new PermissionDeniedError();
         }
 
         const entityId = entity.id;

@@ -15,7 +15,7 @@ import {
     DTags,
 } from '@routup/decorators';
 
-import { NotFoundError } from '@ebec/http';
+import { EntityNotFoundError } from '@privateaim/errors';
 import type { IRoutupEvent } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { IRegistryCaller } from '../../../../../core/harbor/types.ts';
@@ -47,7 +47,7 @@ export class ServiceController {
         const { id } = event.params;
 
         if (id !== ServiceID.REGISTRY) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError({ entity: 'service' });
         }
 
         await this.registryCaller.call('HOOK_PROCESS', data, {});
@@ -68,7 +68,7 @@ export class ServiceController {
         const { id } = event.params;
 
         if (id !== ServiceID.REGISTRY) {
-            throw new NotFoundError();
+            throw new EntityNotFoundError({ entity: 'service' });
         }
 
         const actor = buildActorContext(event);

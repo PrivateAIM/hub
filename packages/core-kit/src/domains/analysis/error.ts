@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { HubError } from '@privateaim/kit';
+import { HubError } from '@privateaim/errors';
 
 export class AnalysisError extends HubError {
     static notFound() {

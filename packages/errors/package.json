@@ -1,0 +1,34 @@
+{
+    "name": "@privateaim/errors",
+    "type": "module",
+    "version": "0.8.42",
+    "description": "Hub error codes, root HubError class, built-in subclasses, code→HTTP-status mapping, and duck-type guards.",
+    "license": "Apache-2.0",
+    "exports": {
+        "./package.json": "./package.json",
+        ".": {
+            "types": "./dist/index.d.mts",
+            "import": "./dist/index.mjs"
+        }
+    },
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.mts",
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "build": "rimraf ./dist && tsdown"
+    },
+    "author": {
+        "name": "Peter Placzek",
+        "email": "admin@tada5hi.net",
+        "url": "https://github.com/tada5hi"
+    },
+    "dependencies": {
+        "@ebec/core": "^1.1.0",
+        "validup": "^0.2.2"
+    },
+    "publishConfig": {
+        "access": "public"
+    }
+}
