@@ -12,7 +12,7 @@ export interface IStorageAdapter {
     makeBucket(name: string, region?: string): Promise<void>;
     removeBucket(name: string): Promise<void>;
 
-    putObject(bucket: string, key: string, data: Buffer, size: number): Promise<void>;
+    putObject(bucket: string, key: string, data: Buffer | Readable, size?: number): Promise<void>;
     getObject(bucket: string, key: string): Promise<Readable>;
     removeObject(bucket: string, key: string): Promise<void>;
     removeObjects(bucket: string, keys: string[]): Promise<void>;

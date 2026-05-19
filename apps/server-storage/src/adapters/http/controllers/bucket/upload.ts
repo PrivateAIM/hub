@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { randomUUID } from 'node:crypto';
 import { Readable } from 'node:stream';
 import type { ReadableStream } from 'node:stream/web';
 import { DirectComponentCaller } from '@privateaim/server-kit';
@@ -20,8 +21,7 @@ import type { IRoutupEvent } from 'routup';
 import { BadRequestError } from '@ebec/http';
 import { useRequestIdentityOrFail } from '@privateaim/server-http-kit';
 import type { BucketFileComponent } from '../../../../app/components/bucket-file/module.ts';
-import { streamToBuffer } from '../../../../core/utils/stream-to-buffer.ts';
-import type { BucketEntity, BucketFileEntity  } from '../../../database/index.ts';
+import type { BucketEntity } from '../../../database/index.ts';
 
 export async function uploadRequestFilesToBucket(
     event: IRoutupEvent,
@@ -49,58 +49,55 @@ export async function uploadRequestFilesToBucket(
 
     const identity = useRequestIdentityOrFail(event);
 
-    return new Promise<BucketFileEntity[]>((resolve, reject) => {
-        const entries : Promise<BucketFileEntity>[] = [];
+    return new Promise<BucketFileCreationFinishedEventPayload[]>((resolve, reject) => {
+        const entries : Promise<BucketFileCreationFinishedEventPayload>[] = [];
 
         instance.on('file', (_, file, info) => {
             if (typeof info.filename === 'undefined') {
+                file.resume();
                 return;
             }
 
-            const promise = new Promise<BucketFileEntity>(
+            const promise = new Promise<BucketFileCreationFinishedEventPayload>(
                 (
                     fileResolve,
                     fileReject,
                 ) => {
-                    streamToBuffer(file)
-                        .then((buffer) => {
-                            caller.callWith(
-                                BucketFileCommand.CREATE,
-                                {
-                                    meta: {
-                                        actor_type: actor.type,
-                                        actor_id: actor.id,
-                                        name: path.basename(info.filename),
-                                        path: info.filename,
-                                        size: buffer.length,
-                                        directory: path.dirname(info.filename),
-                                        realm_id: identity.realmId,
-                                        bucket_id: bucket.id,
-                                        bucket,
-                                    },
-                                    data: buffer,
-                                },
-                                {},
-                                {
-                                    handle: async (childValue, childContext) => {
-                                        await bucketFileEventCaller.call(
-                                            childContext.key,
-                                            childValue,
-                                            childContext.metadata,
-                                        );
+                    caller.callWith(
+                        BucketFileCommand.CREATE,
+                        {
+                            meta: {
+                                id: randomUUID(),
+                                actor_type: actor.type,
+                                actor_id: actor.id,
+                                name: path.basename(info.filename),
+                                path: info.filename,
+                                directory: path.dirname(info.filename),
+                                realm_id: identity.realmId,
+                                bucket_id: bucket.id,
+                                bucket,
+                            },
+                            data: file,
+                        },
+                        {},
+                        {
+                            handle: async (childValue, childContext) => {
+                                await bucketFileEventCaller.call(
+                                    childContext.key,
+                                    childValue,
+                                    childContext.metadata,
+                                );
 
-                                        if (childContext.key === BucketFileEvent.CREATION_FINISHED) {
-                                            fileResolve(childValue as BucketFileCreationFinishedEventPayload);
-                                        }
+                                if (childContext.key === BucketFileEvent.CREATION_FINISHED) {
+                                    fileResolve(childValue as BucketFileCreationFinishedEventPayload);
+                                }
 
-                                        if (childContext.key === BucketFileEvent.CREATION_FAILED) {
-                                            fileReject(childValue);
-                                        }
-                                    },
-                                },
-                            )
-                                .catch((e) => fileReject(e));
-                        })
+                                if (childContext.key === BucketFileEvent.CREATION_FAILED) {
+                                    fileReject(childValue);
+                                }
+                            },
+                        },
+                    )
                         .catch((e) => fileReject(e));
                 },
             );
