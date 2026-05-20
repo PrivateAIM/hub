@@ -46,7 +46,7 @@
         "redis-extension": "^2.0.4",
         "reflect-metadata": "^0.2.2",
         "routup": "^6.0.0",
-        "typeorm": "^0.3.29",
+        "typeorm": "^1.0.0",
         "typeorm-extension": "^3.9.0",
         "validup": "^0.2.1",
         "zod": "^4.3.6"

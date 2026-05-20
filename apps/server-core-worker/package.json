@@ -40,7 +40,7 @@
         "@privateaim/telemetry-kit": "^0.8.44",
         "@validup/adapter-zod": "^0.2.3",
         "docken": "^2.0.2",
-        "dockerode": "^4.0.9",
+        "dockerode": "^5.0.0",
         "dotenv": "^17.4.1",
         "eldin": "^1.1.0",
         "envix": "^1.3.0",
