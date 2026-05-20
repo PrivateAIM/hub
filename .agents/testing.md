@@ -246,14 +246,32 @@ This catches SQL syntax errors, cross-DB type mismatches, and `down()` regressio
 
 The job pre-flights with a sanity check that the compiled migrations exist under `apps/<service>/dist/adapters/database/migrations/{mysql,postgres}/` — without this guard, running the CLI from the wrong working directory results in typeorm silently reporting "No migrations are pending" with exit code 0, masking the failure.
 
-Locally, run the same flow with a running compose stack:
+Locally, run the same `run → revert × N → run` flow against a running compose stack:
 
 ```bash
-docker compose up -d mysql        # or: postgres
+# MySQL
+docker compose up -d mysql
 cd apps/server-core               # or: server-storage / server-telemetry
 
-DB_TYPE=mysql DB_HOST=127.0.0.1 DB_PORT=3306 DB_USERNAME=root DB_PASSWORD=start123 DB_DATABASE=app \
-    node dist/cli/index.mjs migration run
+export DB_TYPE=mysql DB_HOST=127.0.0.1 DB_PORT=3306 \
+       DB_USERNAME=root DB_PASSWORD=start123 DB_DATABASE=app
+
+node dist/cli/index.mjs migration run
+node dist/cli/index.mjs migration revert    # repeat once per migration
+node dist/cli/index.mjs migration run       # idempotency replay
+```
+
+```bash
+# Postgres
+docker compose up -d postgres
+cd apps/server-core
+
+export DB_TYPE=postgres DB_HOST=127.0.0.1 DB_PORT=5432 \
+       DB_USERNAME=postgres DB_PASSWORD=start123 DB_DATABASE=app
+
+node dist/cli/index.mjs migration run
+node dist/cli/index.mjs migration revert
+node dist/cli/index.mjs migration run
 ```
 
 The CLI auto-creates the target database if it does not exist.
