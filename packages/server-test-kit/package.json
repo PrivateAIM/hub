@@ -22,13 +22,13 @@
         "@authup/access": "^1.0.0-beta.36",
         "@authup/core-kit": "^1.0.0-beta.36",
         "@privateaim/errors": "^0.8.42",
-        "@privateaim/server-kit": "^0.8.37"
+        "@privateaim/server-kit": "^0.9.0"
     },
     "peerDependencies": {
         "@authup/access": "^1.0.0-beta.36",
         "@authup/core-kit": "^1.0.0-beta.36",
         "@privateaim/errors": "^0.8.42",
-        "@privateaim/server-kit": "^0.8.37"
+        "@privateaim/server-kit": "^0.9.0"
     },
     "scripts": {
         "build": "rimraf ./dist && tsdown"
