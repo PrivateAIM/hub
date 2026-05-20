@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.9.0](https://github.com/PrivateAIM/hub/compare/v0.8.43...v0.9.0) (2026-05-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* **deps:** bump routup and plugins to v6 ([#1624](https://github.com/PrivateAIM/hub/issues/1624))
+* **errors:** introduce @privateaim/errors + sweep @ebec/http ([#1607](https://github.com/PrivateAIM/hub/issues/1607))
+
+### Bug Fixes
+
+* **server-storage:** stream packFile entries via pipeline ([#1618](https://github.com/PrivateAIM/hub/issues/1618)) ([8aae1a6](https://github.com/PrivateAIM/hub/commit/8aae1a65ac1531c92c44fbe276bac2f576c0b2da))
+* **server-storage:** stream uploads end-to-end to avoid Hash.update overflow ([#1617](https://github.com/PrivateAIM/hub/issues/1617)) ([d117ee1](https://github.com/PrivateAIM/hub/commit/d117ee1ef55f412b1e9f13933d26bd6a8fb6fe19))
+
+
+### Miscellaneous Chores
+
+* **deps:** bump routup and plugins to v6 ([#1624](https://github.com/PrivateAIM/hub/issues/1624)) ([e49dbd2](https://github.com/PrivateAIM/hub/commit/e49dbd22963e12232def70254eb93ff291422fc0))
+
+
+### Code Refactoring
+
+* **errors:** introduce @privateaim/errors + sweep @ebec/http ([#1607](https://github.com/PrivateAIM/hub/issues/1607)) ([954e06f](https://github.com/PrivateAIM/hub/commit/954e06fbf8facb49f897b32be84bb93c51a85622))
+
 ## [0.8.43](https://github.com/PrivateAIM/hub/compare/v0.8.42...v0.8.43) (2026-05-11)
 
 ## [0.8.42](https://github.com/PrivateAIM/hub/compare/v0.8.41...v0.8.42) (2026-05-10)
