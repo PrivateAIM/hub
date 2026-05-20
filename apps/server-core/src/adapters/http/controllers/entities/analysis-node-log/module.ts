@@ -24,7 +24,7 @@ import {
 import { useRequestQuery } from '@routup/basic/query';
 import type { FiltersBuildInput } from 'rapiq';
 import { parseQuery, parseQueryFilters } from 'rapiq';
-import type { IRoutupEvent } from 'routup';
+import type { IAppEvent } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { ForceLoggedInMiddleware, useRequestIdentityRealm } from '@privateaim/server-http-kit';
 import { ValidupError, buildErrorMessageForAttribute, defineIssueItem } from 'validup';
@@ -48,7 +48,7 @@ export class AnalysisNodeLogController {
 
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
-        @DContext() event: IRoutupEvent,
+        @DContext() event: IAppEvent,
     ) {
         const output = parseQuery<AnalysisNodeLog>(useRequestQuery(event), {
             filters: {
@@ -107,7 +107,7 @@ export class AnalysisNodeLogController {
     @DPost('', [ForceLoggedInMiddleware])
     async add(
         @DBody() body: Partial<AnalysisNodeLog>,
-        @DContext() event: IRoutupEvent,
+        @DContext() event: IAppEvent,
     ): Promise<Log> {
         const validator = new AnalysisNodeLogValidator();
         const data = await validator.run(body, { group: 'create' });
@@ -182,7 +182,7 @@ export class AnalysisNodeLogController {
 
     @DDelete('', [ForceLoggedInMiddleware])
     async drop(
-        @DContext() event: IRoutupEvent,
+        @DContext() event: IAppEvent,
     ) {
         const output = parseQueryFilters<AnalysisNodeLog>(
             useRequestQuery(event, 'filter'),

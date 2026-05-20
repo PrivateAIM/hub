@@ -20,7 +20,7 @@ import {
 import { useRequestQuery } from '@routup/basic/query';
 import type { FiltersBuildInput } from 'rapiq';
 import { parseQuery, parseQueryFilters } from 'rapiq';
-import type { IRoutupEvent } from 'routup';
+import type { IAppEvent } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 
 type AnalysisLogControllerContext = {
@@ -38,7 +38,7 @@ export class AnalysisLogController {
 
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
-        @DContext() event: IRoutupEvent,
+        @DContext() event: IAppEvent,
     ) {
         const output = parseQuery<AnalysisLog>(
             useRequestQuery(event),
@@ -98,7 +98,7 @@ export class AnalysisLogController {
 
     @DDelete('', [ForceLoggedInMiddleware])
     async drop(
-        @DContext() event: IRoutupEvent,
+        @DContext() event: IAppEvent,
     ) {
         const output = parseQueryFilters<AnalysisLog>(
             useRequestQuery(event, 'filter'),

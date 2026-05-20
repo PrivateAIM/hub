@@ -20,7 +20,7 @@ import {
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
-import type { IRoutupEvent } from 'routup';
+import type { IAppEvent } from 'routup';
 import {
     getRequestAcceptableEncoding,
     sendStream,
@@ -59,7 +59,7 @@ export class BucketFileController {
 
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
-        @DContext() event: IRoutupEvent,
+        @DContext() event: IAppEvent,
     ) {
         const query = useRequestQuery(event);
         const { data, meta } = await this.service.getMany(query);
@@ -69,7 +69,7 @@ export class BucketFileController {
     @DGet('/:id/stream', [ForceLoggedInMiddleware])
     async stream(
         @DPath('id') id: string,
-        @DContext() event: IRoutupEvent,
+        @DContext() event: IAppEvent,
     ) {
         const entity = await this.bucketFileRepository.findOneById(id);
 
@@ -106,7 +106,7 @@ export class BucketFileController {
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
-        @DContext() event: IRoutupEvent,
+        @DContext() event: IAppEvent,
     ): Promise<BucketFile> {
         const query = useRequestQuery(event);
         return this.service.getOne(id, Object.keys(query).length > 0 ? query : undefined);
@@ -115,7 +115,7 @@ export class BucketFileController {
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @DPath('id') id: string,
-        @DContext() event: IRoutupEvent,
+        @DContext() event: IAppEvent,
     ): Promise<BucketFile> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);

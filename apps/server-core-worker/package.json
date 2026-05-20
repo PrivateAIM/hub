@@ -48,7 +48,7 @@
         "orkos": "^1.1.1",
         "rapiq": "^0.9.0",
         "redis-extension": "^2.0.4",
-        "routup": "^5.1.1",
+        "routup": "^6.0.0",
         "tar": "^7.5.15",
         "tar-fs": "^3.1.2",
         "tar-stream": "^3.2.0",

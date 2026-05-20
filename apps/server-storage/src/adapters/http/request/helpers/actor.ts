@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { IRoutupEvent } from 'routup';
+import type { IAppEvent } from 'routup';
 import {
     useRequestIdentity,
     useRequestIdentityRealm,
@@ -13,7 +13,7 @@ import {
 } from '@privateaim/server-http-kit';
 import type { ActorContext } from '@privateaim/server-kit';
 
-export function buildActorContext(event: IRoutupEvent): ActorContext {
+export function buildActorContext(event: IAppEvent): ActorContext {
     const identity = useRequestIdentity(event);
     const realm = useRequestIdentityRealm(event);
     const permissionChecker = useRequestPermissionChecker(event);

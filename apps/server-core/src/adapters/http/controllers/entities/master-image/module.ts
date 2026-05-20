@@ -17,7 +17,7 @@ import {
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
-import type { IRoutupEvent } from 'routup';
+import type { IAppEvent } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { IMasterImageService } from '../../../../../core/index.ts';
 import { buildActorContext } from '../../../request/index.ts';
@@ -37,7 +37,7 @@ export class MasterImageController {
 
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
-        @DContext() event: IRoutupEvent,
+        @DContext() event: IAppEvent,
     ) {
         const query = useRequestQuery(event);
         const { data, meta } = await this.service.getMany(query);
@@ -57,7 +57,7 @@ export class MasterImageController {
             command: MasterImageCommand;
             id?: string;
         },
-        @DContext() event: IRoutupEvent,
+        @DContext() event: IAppEvent,
     ) {
         const actor = buildActorContext(event);
         const entity = await this.service.executeCommand(data.command, data, actor);
@@ -68,7 +68,7 @@ export class MasterImageController {
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @DPath('id') id: string,
-        @DContext() event: IRoutupEvent,
+        @DContext() event: IAppEvent,
     ): Promise<MasterImage> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);

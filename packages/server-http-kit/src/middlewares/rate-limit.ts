@@ -8,19 +8,19 @@
 import { REALM_MASTER_NAME } from '@authup/core-kit';
 import type { OptionsInput } from '@routup/rate-limit';
 import { rateLimit } from '@routup/rate-limit';
-import type { IRoutupEvent, Router } from 'routup';
+import type { App, IAppEvent } from 'routup';
 import { useRequestIdentity } from '../request';
 
-export function mountRateLimiterMiddleware(router: Router) {
+export function mountRateLimiterMiddleware(app: App) {
     const options : OptionsInput = {
-        skip(event: IRoutupEvent) {
+        skip(event: IAppEvent) {
             const identity = useRequestIdentity(event);
 
             return identity &&
                 identity.type === 'robot' &&
                 identity.realmName === REALM_MASTER_NAME;
         },
-        max(event: IRoutupEvent) {
+        max(event: IAppEvent) {
             const identity = useRequestIdentity(event);
             if (identity && identity.type === 'user') {
                 return 60 * 100; // 100 req p. sec
@@ -38,5 +38,5 @@ export function mountRateLimiterMiddleware(router: Router) {
         windowMs: 60 * 1000, // 60 sec
     };
 
-    router.use(rateLimit(options));
+    app.use(rateLimit(options));
 }

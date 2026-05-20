@@ -5,11 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Router, defineCoreHandler } from 'routup';
+import { App, defineCoreHandler } from 'routup';
 
-export function createHttpRouter() : Router {
-    const router = new Router();
-    router.get('/', defineCoreHandler(() => ({ timestamp: Date.now() })));
+export function createHttpApp() : App {
+    const app = new App();
+    app.get('/', defineCoreHandler(() => ({ timestamp: Date.now() })));
 
-    return router;
+    return app;
 }

@@ -14,16 +14,16 @@ import {
     BuiltInPolicyType,
     PolicyData,
 } from '@authup/access';
-import type { IRoutupEvent } from 'routup';
+import type { IAppEvent } from 'routup';
 import { useRequestEnv } from '../env';
 import { useRequestIdentity } from '../identity';
 
 export class RequestPermissionChecker {
-    protected event: IRoutupEvent;
+    protected event: IAppEvent;
 
     protected checker: IPermissionEvaluator;
 
-    constructor(event: IRoutupEvent, checker: IPermissionEvaluator) {
+    constructor(event: IAppEvent, checker: IPermissionEvaluator) {
         this.event = event;
         this.checker = checker;
     }

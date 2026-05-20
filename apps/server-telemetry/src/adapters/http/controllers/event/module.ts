@@ -18,7 +18,7 @@ import {
 import { useRequestQuery } from '@routup/basic/query';
 import type { Event } from '@privateaim/telemetry-kit';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
-import type { IRoutupEvent } from 'routup';
+import type { IAppEvent } from 'routup';
 import type { IEventService } from '../../../../core/entities/index.ts';
 import { buildActorContext } from '../../request/index.ts';
 
@@ -38,7 +38,7 @@ export class EventController {
     @DPost('', [ForceLoggedInMiddleware])
     async create(
         @DBody() data: Partial<Event>,
-        @DContext() event: IRoutupEvent,
+        @DContext() event: IAppEvent,
     ): Promise<Event> {
         const actor = buildActorContext(event);
         const entity = await this.service.create(data, actor);
@@ -48,7 +48,7 @@ export class EventController {
 
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
-        @DContext() event: IRoutupEvent,
+        @DContext() event: IAppEvent,
     ) {
         const actor = buildActorContext(event);
         const query = useRequestQuery(event);
@@ -59,7 +59,7 @@ export class EventController {
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
-        @DContext() event: IRoutupEvent,
+        @DContext() event: IAppEvent,
     ): Promise<Event> {
         const actor = buildActorContext(event);
         return this.service.getOne(id, actor);
@@ -68,7 +68,7 @@ export class EventController {
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @DPath('id') id: string,
-        @DContext() event: IRoutupEvent,
+        @DContext() event: IAppEvent,
     ): Promise<Event> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);

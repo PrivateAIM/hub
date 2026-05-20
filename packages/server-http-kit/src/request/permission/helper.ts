@@ -5,16 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { IRoutupEvent } from 'routup';
+import type { IAppEvent } from 'routup';
 import { BadRequestError } from '@privateaim/errors';
 import { setRequestEnv, useRequestEnv } from '../env';
 import type { RequestPermissionChecker } from './module';
 
-export function setRequestPermissionChecker(event: IRoutupEvent, checker: RequestPermissionChecker) {
+export function setRequestPermissionChecker(event: IAppEvent, checker: RequestPermissionChecker) {
     setRequestEnv(event, 'permissionChecker', checker);
 }
 
-export function useRequestPermissionChecker(event: IRoutupEvent) : RequestPermissionChecker {
+export function useRequestPermissionChecker(event: IAppEvent) : RequestPermissionChecker {
     const checker = useRequestEnv(event, 'permissionChecker');
     if (!checker) {
         throw new BadRequestError('The request permission checker is not initialized.');

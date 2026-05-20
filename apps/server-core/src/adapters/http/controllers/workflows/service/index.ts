@@ -16,7 +16,7 @@ import {
 } from '@routup/decorators';
 
 import { EntityNotFoundError } from '@privateaim/errors';
-import type { IRoutupEvent } from 'routup';
+import type { IAppEvent } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { IRegistryCaller } from '../../../../../core/harbor/types.ts';
 import type { IRegistryService } from '../../../../../core/index.ts';
@@ -41,7 +41,7 @@ export class ServiceController {
 
     @DPost('/:id/hook', [ForceLoggedInMiddleware])
     async handleHarborHook(
-        @DContext() event: IRoutupEvent,
+        @DContext() event: IAppEvent,
         @DBody() data: Record<string, any>,
     ) {
         const { id } = event.params;
@@ -58,7 +58,7 @@ export class ServiceController {
 
     @DPost('/:id/command', [ForceLoggedInMiddleware])
     async execHarborTask(
-        @DContext() event: IRoutupEvent,
+        @DContext() event: IAppEvent,
         @DBody() data: {
             command: RegistryAPICommand;
             id: string;

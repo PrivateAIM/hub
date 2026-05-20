@@ -20,7 +20,7 @@ import {
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
-import type { IRoutupEvent } from 'routup';
+import type { IAppEvent } from 'routup';
 import {
     sendStream,
     setResponseHeaderAttachment,
@@ -69,7 +69,7 @@ export class BucketController {
 
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
-        @DContext() event: IRoutupEvent,
+        @DContext() event: IAppEvent,
     ) {
         const query = useRequestQuery(event);
         const { data, meta } = await this.service.getMany(query);
@@ -79,7 +79,7 @@ export class BucketController {
     @DGet('/:id/stream', [ForceLoggedInMiddleware])
     async stream(
         @DPath('id') id: string,
-        @DContext() event: IRoutupEvent,
+        @DContext() event: IAppEvent,
     ) {
         const entity = await this.service.getOne(id);
 
@@ -100,7 +100,7 @@ export class BucketController {
     @DPost('/:id/upload', [ForceLoggedInMiddleware])
     async upload(
         @DPath('id') id: string,
-        @DContext() event: IRoutupEvent,
+        @DContext() event: IAppEvent,
     ) {
         const entity = await this.service.getOne(id);
 
@@ -116,7 +116,7 @@ export class BucketController {
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
-        @DContext() event: IRoutupEvent,
+        @DContext() event: IAppEvent,
     ): Promise<Bucket> {
         const query = useRequestQuery(event);
         return this.service.getOne(id, Object.keys(query).length > 0 ? query : undefined);
@@ -126,7 +126,7 @@ export class BucketController {
     async update(
         @DPath('id') id: string,
         @DBody() data: Partial<BucketCreatePayload>,
-        @DContext() event: IRoutupEvent,
+        @DContext() event: IAppEvent,
     ): Promise<Bucket> {
         const actor = buildActorContext(event);
         const entity = await this.service.update(id, data, actor);
@@ -137,7 +137,7 @@ export class BucketController {
     @DPost('', [ForceLoggedInMiddleware])
     async add(
         @DBody() data: BucketCreatePayload,
-        @DContext() event: IRoutupEvent,
+        @DContext() event: IAppEvent,
     ): Promise<Bucket> {
         const actor = buildActorContext(event);
         const entity = await this.service.create(data, actor);
@@ -148,7 +148,7 @@ export class BucketController {
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @DPath('id') id: string,
-        @DContext() event: IRoutupEvent,
+        @DContext() event: IAppEvent,
     ): Promise<Bucket> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);

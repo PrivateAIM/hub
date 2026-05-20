@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { IRoutupEvent } from 'routup';
+import type { IAppEvent } from 'routup';
 import { useRequestIdentity } from './identity';
 
 type RequestRealm = {
@@ -13,7 +13,7 @@ type RequestRealm = {
     name: string
 };
 
-export function useRequestIdentityRealm(event: IRoutupEvent) : RequestRealm | undefined {
+export function useRequestIdentityRealm(event: IAppEvent) : RequestRealm | undefined {
     const identity = useRequestIdentity(event);
     if (!identity) {
         return undefined;

@@ -509,15 +509,43 @@
                 },
                 "type": "object"
             },
-            "RoutupRequest": {
+            "AppRequest": {
                 "$ref": "#/components/schemas/ServerRequest"
+            },
+            "MethodNameLike": {
+                "anyOf": [
+                    {
+                        "type": "string",
+                        "enum": [
+                            "GET",
+                            "POST",
+                            "PUT",
+                            "PATCH",
+                            "DELETE",
+                            "OPTIONS",
+                            "HEAD"
+                        ]
+                    },
+                    {
+                        "allOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "properties": {},
+                                "type": "object"
+                            }
+                        ]
+                    }
+                ],
+                "description": "`MethodName` plus the open-enum escape hatch for non-standard\nmethods (`PROPFIND`, `MKCOL`, custom verbs). The `(string & {})`\nintersection is structurally identical to `string` but TypeScript\ndoesn't collapse the union — so callers still get autocomplete\nfor the canonical methods while remaining free to pass anything."
             },
             "Headers": {
                 "description": "The **`Headers`** interface of the Fetch API allows you to perform various actions on HTTP request and response headers. These actions include retrieving, setting, adding to, and removing headers from the list of the request's headers.\n\n[MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers)",
                 "properties": {},
                 "type": "object"
             },
-            "RoutupResponse": {
+            "AppResponse": {
                 "properties": {
                     "headers": {
                         "$ref": "#/components/schemas/Headers"
@@ -533,9 +561,6 @@
                 ],
                 "type": "object"
             },
-            "Path": {
-                "type": "string"
-            },
             "EtagFn": {
                 "type": "object",
                 "additionalProperties": true
@@ -543,51 +568,6 @@
             "TrustProxyFn": {
                 "type": "object",
                 "additionalProperties": true
-            },
-            "RouterOptions": {
-                "properties": {
-                    "trustProxy": {
-                        "$ref": "#/components/schemas/TrustProxyFn"
-                    },
-                    "etag": {
-                        "$ref": "#/components/schemas/EtagFn"
-                    },
-                    "proxyIpMax": {
-                        "type": "number",
-                        "format": "double"
-                    },
-                    "subdomainOffset": {
-                        "type": "number",
-                        "format": "double"
-                    },
-                    "handlerTimeoutOverridable": {
-                        "type": "boolean",
-                        "description": "Whether handlers can extend the `handlerTimeout` default.\n\nWhen `false` (default), a handler's `timeout` is clamped to\n`Math.min(handlerTimeout, handler.timeout)`. When `true`, the\nhandler's `timeout` fully replaces the router default."
-                    },
-                    "handlerTimeout": {
-                        "type": "number",
-                        "format": "double",
-                        "description": "Default per-handler timeout in milliseconds.\n\nApplies individually to each handler's `fn()` execution. Handlers can\noverride this value via their own `timeout` option — see\n`handlerTimeoutOverridable` to control whether overrides can extend\nor only narrow this default."
-                    },
-                    "timeout": {
-                        "type": "number",
-                        "format": "double",
-                        "description": "Global request timeout in milliseconds.\n\nApplies to the entire dispatch pipeline in `fetch()`. When exceeded,\nthe request is aborted and a 408 response is returned. The AbortSignal\non the event is also aborted for cooperative cancellation."
-                    },
-                    "name": {
-                        "type": "string"
-                    },
-                    "path": {
-                        "$ref": "#/components/schemas/Path"
-                    }
-                },
-                "required": [
-                    "trustProxy",
-                    "etag",
-                    "proxyIpMax",
-                    "subdomainOffset"
-                ],
-                "type": "object"
             },
             "AbortSignal": {
                 "description": "The **`AbortSignal`** interface represents a signal object that allows you to communicate with an asynchronous operation (such as a fetch request) and abort it if required via an AbortController object.\n\n[MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal)",
@@ -599,31 +579,31 @@
                 "properties": {},
                 "type": "object"
             },
-            "IRoutupEvent": {
+            "IAppEvent": {
                 "properties": {
                     "request": {
-                        "$ref": "#/components/schemas/RoutupRequest",
+                        "$ref": "#/components/schemas/AppRequest",
                         "description": "The srvx ServerRequest (extends Web Standard Request)."
                     },
                     "params": {
                         "properties": {},
                         "additionalProperties": {
-                            "additionalProperties": true
+                            "type": "string"
                         },
                         "type": "object",
-                        "description": "Route parameters extracted from the URL path pattern."
+                        "description": "Route parameters extracted from the URL path pattern. Values\nare `string` (or `undefined` for an optional param that\ndidn't match) — both the trie router (`extractTrieParams`)\nand the linear router (path-to-regexp output) only ever\nproduce string values."
                     },
                     "path": {
                         "type": "string",
                         "description": "Current request path, adjusted relative to the mount point during router nesting."
                     },
                     "method": {
-                        "type": "string",
-                        "description": "HTTP method (GET, POST, PUT, etc.)."
+                        "$ref": "#/components/schemas/MethodNameLike",
+                        "description": "HTTP method (GET, POST, PUT, etc.). Typed as the canonical\n`MethodName` set with an open-enum escape hatch — non-\nstandard methods (`PROPFIND`, custom verbs) still type-check\nwhile standard ones autocomplete."
                     },
                     "mountPath": {
                         "type": "string",
-                        "description": "Accumulated mount path from nested routers."
+                        "description": "Prefix the active route was matched on (the substring of the\nrequest path the matcher consumed). Set per dispatched handler\nand restored when the handler returns; useful for static-asset\n/ mount-aware helpers that need to strip this off `path` to\nrecover a mount-relative path."
                     },
                     "headers": {
                         "$ref": "#/components/schemas/Headers",
@@ -634,7 +614,7 @@
                         "description": "Lazily-parsed URL search parameters.\n\nFor advanced query parsing (arrays, nesting), use `@routup/query`."
                     },
                     "response": {
-                        "$ref": "#/components/schemas/RoutupResponse",
+                        "$ref": "#/components/schemas/AppResponse",
                         "description": "Response accumulator — set status/headers before returning a plain value.\n\nIf the handler returns a `Response` object directly, these values are\nignored. They only apply when returning plain values (string, object, etc.)\nthat go through `toResponse()`."
                     },
                     "store": {
@@ -645,8 +625,42 @@
                         "type": "object",
                         "description": "Per-request store for caching and plugin state.\n\nUse symbol keys (e.g., `Symbol.for('routup:body')`) to avoid collisions.\nData is garbage collected with the event when the request completes."
                     },
-                    "routerOptions": {
-                        "$ref": "#/components/schemas/RouterOptions",
+                    "appOptions": {
+                        "properties": {
+                            "trustProxy": {
+                                "$ref": "#/components/schemas/TrustProxyFn"
+                            },
+                            "etag": {
+                                "anyOf": [
+                                    {
+                                        "$ref": "#/components/schemas/EtagFn"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            },
+                            "proxyIpMax": {
+                                "type": "number",
+                                "format": "double"
+                            },
+                            "subdomainOffset": {
+                                "type": "number",
+                                "format": "double"
+                            },
+                            "handlerTimeoutOverridable": {
+                                "type": "boolean"
+                            },
+                            "handlerTimeout": {
+                                "type": "number",
+                                "format": "double"
+                            },
+                            "timeout": {
+                                "type": "number",
+                                "format": "double"
+                            }
+                        },
+                        "type": "object",
                         "description": "Pre-resolved router options for the current dispatch context.\n\nContains merged options from the router path stack with defaults applied."
                     },
                     "signal": {
@@ -672,7 +686,7 @@
                     "searchParams",
                     "response",
                     "store",
-                    "routerOptions",
+                    "appOptions",
                     "signal",
                     "nextCalled"
                 ],

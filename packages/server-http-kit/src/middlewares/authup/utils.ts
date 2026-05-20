@@ -10,7 +10,7 @@ import type { IPermissionProvider } from '@authup/access';
 import { PermissionEvaluator, PermissionMemoryProvider } from '@authup/access';
 import { REALM_MASTER_NAME } from '@authup/core-kit';
 import type { TokenVerificationData } from '@authup/server-adapter-kit';
-import type { IRoutupEvent } from 'routup';
+import type { IAppEvent } from 'routup';
 import { RequestPermissionChecker, setRequestEnv } from '../../request/index.ts';
 import { FakePermissionProvider } from './permission-provider.ts';
 
@@ -39,7 +39,7 @@ export function createFakeTokenVerificationData(): TokenVerificationDataMinimal 
 }
 
 export function applyTokenVerificationData(
-    event: IRoutupEvent,
+    event: IAppEvent,
     data: TokenVerificationDataMinimal,
     fakeAbilities?: boolean,
 ) {

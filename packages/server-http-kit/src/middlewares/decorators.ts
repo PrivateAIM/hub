@@ -6,9 +6,9 @@
  */
 
 import { decorators } from '@routup/decorators';
-import type { Router } from 'routup';
+import type { App } from 'routup';
 import type { MiddlewareDecoratorsOptions } from './types';
 
-export function mountDecoratorsMiddleware(router: Router, options: MiddlewareDecoratorsOptions) {
-    router.use(decorators({ controllers: options.controllers }));
+export function mountDecoratorsMiddleware(app: App, options: MiddlewareDecoratorsOptions) {
+    app.use(decorators({ controllers: options.controllers }));
 }

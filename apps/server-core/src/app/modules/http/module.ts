@@ -8,7 +8,7 @@
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
 import type { Server } from 'node:http';
-import { Router, serve } from 'routup';
+import { App, serve } from 'routup';
 import {
     AuthupClientInjectionKey,
     EnvironmentName,
@@ -50,7 +50,7 @@ export class HTTPModule implements IModule {
         const config = container.resolve(ConfigInjectionKey);
         const logger = container.resolve(LoggerInjectionKey);
 
-        const router = new Router();
+        const app = new App();
 
         const isTestEnvironment = config.env === EnvironmentName.TEST;
 
@@ -70,7 +70,7 @@ export class HTTPModule implements IModule {
         const authupResult = container.tryResolve(AuthupClientInjectionKey);
         const redisResult = container.tryResolve(RedisClientInjectionKey);
 
-        mountMiddlewares(router, {
+        mountMiddlewares(app, {
             basic: true,
             cors: true,
             prometheus: !isTestEnvironment,
@@ -110,14 +110,14 @@ export class HTTPModule implements IModule {
             },
         });
 
-        mountErrorMiddleware(router, { logger });
+        mountErrorMiddleware(app, { logger });
 
-        container.register(HTTPInjectionKey.Router, { useValue: router });
+        container.register(HTTPInjectionKey.App, { useValue: app });
 
         if (!this.options.skipServer) {
             logger.debug('Starting http server...');
 
-            const server = serve(router, {
+            const server = serve(app, {
                 port: config.port,
                 hostname: '0.0.0.0',
                 silent: true,

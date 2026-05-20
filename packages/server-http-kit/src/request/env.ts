@@ -5,12 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { IRoutupEvent } from 'routup';
+import type { IAppEvent } from 'routup';
 import type { RequestEnv } from './types';
 
-export function useRequestEnv(event: IRoutupEvent) : RequestEnv;
-export function useRequestEnv<T extends keyof RequestEnv>(event: IRoutupEvent, key: T) : RequestEnv[T];
-export function useRequestEnv<T extends keyof RequestEnv>(event: IRoutupEvent, key?: T) {
+export function useRequestEnv(event: IAppEvent) : RequestEnv;
+export function useRequestEnv<T extends keyof RequestEnv>(event: IAppEvent, key: T) : RequestEnv[T];
+export function useRequestEnv<T extends keyof RequestEnv>(event: IAppEvent, key?: T) {
     if (typeof key === 'string') {
         return event.store[key] as RequestEnv[T];
     }
@@ -19,7 +19,7 @@ export function useRequestEnv<T extends keyof RequestEnv>(event: IRoutupEvent, k
 }
 
 export function setRequestEnv<T extends keyof RequestEnv>(
-    event: IRoutupEvent,
+    event: IAppEvent,
     key: T,
     value: RequestEnv[T],
 ) {

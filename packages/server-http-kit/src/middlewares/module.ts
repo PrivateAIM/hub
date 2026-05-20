@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Router } from 'routup';
+import type { App } from 'routup';
 import { mountAuthorizationMiddleware } from './authup';
 import { boolableToObject } from '../utils';
 import { mountBasicMiddleware } from './basic';
@@ -17,34 +17,34 @@ import { mountSwaggerMiddleware } from './swagger';
 import type { MiddlewareMountOptions } from './types';
 
 export function mountMiddlewares(
-    router: Router,
+    app: App,
     options: MiddlewareMountOptions = {},
 ) {
     if (options.cors) {
-        mountCorsMiddleware(router);
+        mountCorsMiddleware(app);
     }
 
     if (options.basic) {
-        mountBasicMiddleware(router);
+        mountBasicMiddleware(app);
     }
 
     if (options.authorization) {
-        mountAuthorizationMiddleware(router, options.authorization);
+        mountAuthorizationMiddleware(app, options.authorization);
     }
 
     if (options.prometheus) {
-        mountPrometheusMiddleware(router);
+        mountPrometheusMiddleware(app);
     }
 
     if (options.rateLimit) {
-        mountRateLimiterMiddleware(router);
+        mountRateLimiterMiddleware(app);
     }
 
     if (options.swagger) {
-        mountSwaggerMiddleware(router, boolableToObject(options.swagger));
+        mountSwaggerMiddleware(app, boolableToObject(options.swagger));
     }
 
     if (options.decorators) {
-        mountDecoratorsMiddleware(router, options.decorators);
+        mountDecoratorsMiddleware(app, options.decorators);
     }
 }

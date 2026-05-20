@@ -10,7 +10,7 @@ import type { IModule } from 'orkos';
 import { serve } from 'routup';
 import { LoggerInjectionKey } from '@privateaim/server-kit';
 import { ConfigInjectionKey } from '../config/constants.ts';
-import { createHttpRouter } from '../../../adapters/http/index.ts';
+import { createHttpApp } from '../../../adapters/http/index.ts';
 import type { HTTPServer } from './constants.ts';
 import { HTTPInjectionKey } from './constants.ts';
 
@@ -25,11 +25,11 @@ export class HTTPModule implements IModule {
         const config = container.resolve(ConfigInjectionKey);
         const logger = container.resolve(LoggerInjectionKey);
 
-        const router = createHttpRouter();
+        const app = createHttpApp();
 
         logger.debug('Starting http server...');
 
-        const server = serve(router, {
+        const server = serve(app, {
             port: config.port,
             hostname: '0.0.0.0',
             silent: true,
