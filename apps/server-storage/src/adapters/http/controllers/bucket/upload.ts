@@ -17,14 +17,14 @@ import {
 } from '@privateaim/server-storage-kit';
 import Busboy from 'busboy';
 import path from 'node:path';
-import type { IRoutupEvent } from 'routup';
+import type { IAppEvent } from 'routup';
 import { BadRequestError } from '@privateaim/errors';
 import { useRequestIdentityOrFail } from '@privateaim/server-http-kit';
 import type { BucketFileComponent } from '../../../../app/components/bucket-file/module.ts';
 import type { BucketEntity } from '../../../database/index.ts';
 
 export async function uploadRequestFilesToBucket(
-    event: IRoutupEvent,
+    event: IAppEvent,
     bucket: BucketEntity,
     bucketFileComponent: BucketFileComponent,
     bucketFileEventCaller: BucketFileEventCaller,

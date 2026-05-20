@@ -8,7 +8,7 @@
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
 import type { Server } from 'node:http';
-import { Router, defineCoreHandler, serve } from 'routup';
+import { App, defineCoreHandler, serve } from 'routup';
 import {
     LoggerInjectionKey,
     RedisPublishClientInjectionKey,
@@ -37,11 +37,11 @@ export class HTTPModule implements IModule {
         const config = container.resolve(ConfigInjectionKey);
         const logger = container.resolve(LoggerInjectionKey);
 
-        const router = new Router();
+        const app = new App();
 
-        router.get('/', defineCoreHandler(() => ({ timestamp: Date.now() })));
+        app.get('/', defineCoreHandler(() => ({ timestamp: Date.now() })));
 
-        mountMiddlewares(router, {
+        mountMiddlewares(app, {
             basic: true,
             cors: true,
             prometheus: true,
@@ -50,7 +50,7 @@ export class HTTPModule implements IModule {
 
         logger.debug('Starting http server...');
 
-        const server = serve(router, {
+        const server = serve(app, {
             port: config.port,
             hostname: '0.0.0.0',
             silent: true,

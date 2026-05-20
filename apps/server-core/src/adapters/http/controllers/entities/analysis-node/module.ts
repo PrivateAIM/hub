@@ -18,7 +18,7 @@ import {
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
-import type { IRoutupEvent } from 'routup';
+import type { IAppEvent } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { IAnalysisNodeService } from '../../../../../core/index.ts';
 import { buildActorContext } from '../../../request/index.ts';
@@ -38,7 +38,7 @@ export class AnalysisNodeController {
 
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
-        @DContext() event: IRoutupEvent,
+        @DContext() event: IAppEvent,
     ) {
         const query = useRequestQuery(event);
         const { data, meta } = await this.service.getMany(query);
@@ -48,7 +48,7 @@ export class AnalysisNodeController {
     @DPost('', [ForceLoggedInMiddleware])
     async add(
         @DBody() data: AnalysisNodeCreatePayload,
-        @DContext() event: IRoutupEvent,
+        @DContext() event: IAppEvent,
     ): Promise<AnalysisNode> {
         const actor = buildActorContext(event);
         const entity = await this.service.create(data, actor);
@@ -67,7 +67,7 @@ export class AnalysisNodeController {
     async edit(
         @DPath('id') id: string,
         @DBody() data: AnalysisNodeUpdatePayload,
-        @DContext() event: IRoutupEvent,
+        @DContext() event: IAppEvent,
     ): Promise<AnalysisNode> {
         const actor = buildActorContext(event);
         const entity = await this.service.update(id, data, actor);
@@ -78,7 +78,7 @@ export class AnalysisNodeController {
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @DPath('id') id: string,
-        @DContext() event: IRoutupEvent,
+        @DContext() event: IAppEvent,
     ): Promise<AnalysisNode> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);

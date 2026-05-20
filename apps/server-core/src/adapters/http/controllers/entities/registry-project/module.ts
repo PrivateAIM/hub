@@ -18,7 +18,7 @@ import {
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
-import type { IRoutupEvent } from 'routup';
+import type { IAppEvent } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type { IRegistryProjectService } from '../../../../../core/index.ts';
 import { buildActorContext } from '../../../request/index.ts';
@@ -38,7 +38,7 @@ export class RegistryProjectController {
 
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
-        @DContext() event: IRoutupEvent,
+        @DContext() event: IAppEvent,
     ) {
         const actor = buildActorContext(event);
         const query = useRequestQuery(event);
@@ -49,7 +49,7 @@ export class RegistryProjectController {
     @DPost('', [ForceLoggedInMiddleware])
     async add(
         @DBody() data: RegistryProjectCreatePayload,
-        @DContext() event: IRoutupEvent,
+        @DContext() event: IAppEvent,
     ): Promise<RegistryProject> {
         const actor = buildActorContext(event);
         const entity = await this.service.create(data, actor);
@@ -60,7 +60,7 @@ export class RegistryProjectController {
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
-        @DContext() event: IRoutupEvent,
+        @DContext() event: IAppEvent,
     ): Promise<RegistryProject> {
         const actor = buildActorContext(event);
         const query = useRequestQuery(event);
@@ -71,7 +71,7 @@ export class RegistryProjectController {
     async edit(
         @DPath('id') id: string,
         @DBody() data: RegistryProjectUpdatePayload,
-        @DContext() event: IRoutupEvent,
+        @DContext() event: IAppEvent,
     ): Promise<RegistryProject> {
         const actor = buildActorContext(event);
         const entity = await this.service.update(id, data, actor);
@@ -82,7 +82,7 @@ export class RegistryProjectController {
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @DPath('id') id: string,
-        @DContext() event: IRoutupEvent,
+        @DContext() event: IAppEvent,
     ): Promise<RegistryProject> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);

@@ -10,7 +10,7 @@ import type { HubError } from '@privateaim/errors';
 import { httpStatusFromCode } from '@privateaim/errors';
 import type { Logger } from '@privateaim/server-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
-import type { Router } from 'routup';
+import type { App } from 'routup';
 import { defineErrorHandler } from 'routup';
 import type { Issue } from 'validup';
 import { sanitizeError } from '../core';
@@ -27,8 +27,8 @@ type ErrorMiddlewareOptions = {
     logger?: Logger,
 };
 
-export function mountErrorMiddleware(router: Router, options: ErrorMiddlewareOptions = {}) {
-    router.use(defineErrorHandler((error, event) => {
+export function mountErrorMiddleware(app: App, options: ErrorMiddlewareOptions = {}) {
+    app.use(defineErrorHandler((error, event) => {
         let next: HubError;
         if (error.cause) {
             next = sanitizeError(error.cause);

@@ -21,7 +21,7 @@ import {
 import { useRequestQuery } from '@routup/basic/query';
 import { ForceLoggedInMiddleware, useRequestPermissionChecker } from '@privateaim/server-http-kit';
 import { parseQueryPagination } from 'rapiq';
-import type { IRoutupEvent } from 'routup';
+import type { IAppEvent } from 'routup';
 import type { LogStore } from '../../../../core/services/log-store/types.ts';
 
 @DTags('logs')
@@ -36,7 +36,7 @@ export class LogController {
     @DPost('', [ForceLoggedInMiddleware])
     async create(
         @DBody() body: LogInput,
-        @DContext() event: IRoutupEvent,
+        @DContext() event: IAppEvent,
     ): Promise<Log> {
         const permissionChecker = useRequestPermissionChecker(event);
         await permissionChecker.preCheck({ name: PermissionName.LOG_CREATE });
@@ -52,7 +52,7 @@ export class LogController {
 
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
-        @DContext() event: IRoutupEvent,
+        @DContext() event: IAppEvent,
     ) {
         const permissionChecker = useRequestPermissionChecker(event);
         await permissionChecker.preCheckOneOf({
@@ -114,7 +114,7 @@ export class LogController {
 
     @DDelete('', [ForceLoggedInMiddleware])
     async deleteMany(
-        @DContext() event: IRoutupEvent,
+        @DContext() event: IAppEvent,
     ) {
         const permissionChecker = useRequestPermissionChecker(event);
         await permissionChecker.preCheck({ name: PermissionName.LOG_DELETE });

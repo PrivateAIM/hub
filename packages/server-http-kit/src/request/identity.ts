@@ -7,19 +7,19 @@
 
 import { REALM_MASTER_NAME } from '@authup/core-kit';
 import { UnauthorizedError } from '@privateaim/errors';
-import type { IRoutupEvent } from 'routup';
+import type { IAppEvent } from 'routup';
 import type { RequestIdentity } from './types';
 import { setRequestEnv, useRequestEnv } from './env';
 
-export function useRequestIdentity(event: IRoutupEvent) : RequestIdentity | undefined {
+export function useRequestIdentity(event: IAppEvent) : RequestIdentity | undefined {
     return useRequestEnv(event, 'identity');
 }
 
-export function setRequestIdentity(event: IRoutupEvent, identity: RequestIdentity) : void {
+export function setRequestIdentity(event: IAppEvent, identity: RequestIdentity) : void {
     setRequestEnv(event, 'identity', identity);
 }
 
-export function useRequestIdentityOrFail(event: IRoutupEvent) : RequestIdentity {
+export function useRequestIdentityOrFail(event: IAppEvent) : RequestIdentity {
     const identity = useRequestIdentity(event);
     if (!identity) {
         throw new UnauthorizedError();

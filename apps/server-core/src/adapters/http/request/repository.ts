@@ -5,7 +5,7 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import type { IRoutupEvent } from 'routup';
+import type { IAppEvent } from 'routup';
 import { getRequestHeader, getRequestIP } from 'routup';
 import type { Repository, SaveOptions } from 'typeorm';
 import { useRequestIdentity } from '@privateaim/server-http-kit';
@@ -15,12 +15,12 @@ import type { EntityEventMetadata } from '@privateaim/server-kit';
 type RepositoryEntity<T> = T extends Repository<infer U> ? U : never;
 
 export class RequestRepositoryAdapter<T extends Repository<any>> {
-    protected event: IRoutupEvent;
+    protected event: IAppEvent;
 
     protected repository: T;
 
     constructor(
-        event: IRoutupEvent,
+        event: IAppEvent,
         repository: T,
     ) {
         this.event = event;

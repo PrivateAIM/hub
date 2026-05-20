@@ -6,8 +6,8 @@
  */
 
 import { basic } from '@routup/basic';
-import type { Router } from 'routup';
+import type { App } from 'routup';
 
-export function mountBasicMiddleware(router: Router) {
-    router.use(basic());
+export function mountBasicMiddleware(app: App) {
+    app.use(basic());
 }

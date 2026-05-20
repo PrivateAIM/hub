@@ -7,19 +7,19 @@
 
 import { verifyRequest } from '@authup/server-adapter-web';
 import { useRequestCookie } from '@routup/basic/cookie';
-import type { Router } from 'routup';
+import type { App } from 'routup';
 import { defineCoreHandler } from 'routup';
 import type { AuthorizationMiddlewareRegistrationOptions } from './types.ts';
 import { applyTokenVerificationData, createFakeTokenVerificationData } from './utils.ts';
 
 export function mountAuthorizationMiddleware(
-    router: Router,
+    app: App,
     options: AuthorizationMiddlewareRegistrationOptions,
 ) {
     if (!options.authupClient) {
         const data = createFakeTokenVerificationData();
 
-        router.use(defineCoreHandler((event) => {
+        app.use(defineCoreHandler((event) => {
             applyTokenVerificationData(event, data, options.dryRun);
             return event.next();
         }));
@@ -27,7 +27,7 @@ export function mountAuthorizationMiddleware(
         return;
     }
 
-    router.use(defineCoreHandler(async (event) => {
+    app.use(defineCoreHandler(async (event) => {
         try {
             const data = await verifyRequest(event.request, {
                 tokenVerifier: options.tokenVerifier,

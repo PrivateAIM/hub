@@ -7,10 +7,10 @@
 
 import type { Options as CorsOptions } from '@routup/cors';
 import { cors } from '@routup/cors';
-import type { Router } from 'routup';
+import type { App } from 'routup';
 
-export function mountCorsMiddleware(router: Router, input?: CorsOptions) {
-    router.use(cors({
+export function mountCorsMiddleware(app: App, input?: CorsOptions) {
+    app.use(cors({
         origin: true,
         credentials: true,
         // `credentials: true` is incompatible with the `*` wildcard for
