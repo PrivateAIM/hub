@@ -1,7 +1,7 @@
 {
     "name": "@privateaim/server-http-kit",
     "type": "module",
-    "version": "0.8.43",
+    "version": "0.9.0",
     "module": "./dist/index.mjs",
     "types": "./dist/index.d.mts",
     "exports": {
@@ -28,9 +28,9 @@
         "@authup/server-adapter-web": "^1.0.0-beta.41",
         "@ebec/http": "^4.1.0",
         "@privateaim/errors": "^0.8.42",
-        "@privateaim/kit": "^0.8.43",
-        "@privateaim/server-kit": "^0.8.43",
-        "@privateaim/telemetry-kit": "^0.8.43",
+        "@privateaim/kit": "^0.9.0",
+        "@privateaim/server-kit": "^0.9.0",
+        "@privateaim/telemetry-kit": "^0.8.44",
         "@routup/basic": "^3.0.0",
         "@routup/cors": "^2.0.0",
         "@routup/decorators": "^5.0.0",

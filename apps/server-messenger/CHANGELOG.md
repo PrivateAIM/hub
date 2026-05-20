@@ -1,5 +1,35 @@
 # Changelog
 
+## [0.9.0](https://github.com/PrivateAIM/hub/compare/v0.8.43...v0.9.0) (2026-05-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* **deps:** bump routup and plugins to v6 ([#1624](https://github.com/PrivateAIM/hub/issues/1624))
+* **errors:** introduce @privateaim/errors + sweep @ebec/http ([#1607](https://github.com/PrivateAIM/hub/issues/1607))
+
+### Miscellaneous Chores
+
+* **deps:** bump routup and plugins to v6 ([#1624](https://github.com/PrivateAIM/hub/issues/1624)) ([e49dbd2](https://github.com/PrivateAIM/hub/commit/e49dbd22963e12232def70254eb93ff291422fc0))
+
+
+### Code Refactoring
+
+* **errors:** introduce @privateaim/errors + sweep @ebec/http ([#1607](https://github.com/PrivateAIM/hub/issues/1607)) ([954e06f](https://github.com/PrivateAIM/hub/commit/954e06fbf8facb49f897b32be84bb93c51a85622))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.8.43 to ^0.9.0
+    * @privateaim/messenger-kit bumped from ^0.7.44 to ^0.7.45
+    * @privateaim/server-http-kit bumped from ^0.8.43 to ^0.9.0
+    * @privateaim/server-kit bumped from ^0.8.43 to ^0.9.0
+    * @privateaim/server-realtime-kit bumped from ^0.8.43 to ^0.9.0
+    * @privateaim/server-telemetry-kit bumped from ^0.8.43 to ^0.8.44
+    * @privateaim/telemetry-kit bumped from ^0.8.43 to ^0.8.44
+
 ## [0.8.43](https://github.com/PrivateAIM/hub/compare/v0.8.42...v0.8.43) (2026-05-11)
 
 

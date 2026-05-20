@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.9.0](https://github.com/PrivateAIM/hub/compare/v0.8.43...v0.9.0) (2026-05-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* **errors:** introduce @privateaim/errors + sweep @ebec/http ([#1607](https://github.com/PrivateAIM/hub/issues/1607))
+
+### Code Refactoring
+
+* **errors:** introduce @privateaim/errors + sweep @ebec/http ([#1607](https://github.com/PrivateAIM/hub/issues/1607)) ([954e06f](https://github.com/PrivateAIM/hub/commit/954e06fbf8facb49f897b32be84bb93c51a85622))
+
 ## [0.8.43](https://github.com/PrivateAIM/hub/compare/v0.8.42...v0.8.43) (2026-05-11)
 
 ## [0.8.42](https://github.com/PrivateAIM/hub/compare/v0.8.41...v0.8.42) (2026-05-10)
