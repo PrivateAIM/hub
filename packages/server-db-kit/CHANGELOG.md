@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.8.44](https://github.com/PrivateAIM/hub/compare/v0.8.43...v0.8.44) (2026-05-20)
+
+
+### Bug Fixes
+
+* **deps:** bump the minorandpatch group across 1 directory with 12 updates ([#1626](https://github.com/PrivateAIM/hub/issues/1626)) ([73580a8](https://github.com/PrivateAIM/hub/commit/73580a804599727c9436652f08d5689e7063f9d5))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.8.43 to ^0.9.0
+    * @privateaim/server-kit bumped from ^0.8.43 to ^0.9.0
+
 ## [0.8.43](https://github.com/PrivateAIM/hub/compare/v0.8.42...v0.8.43) (2026-05-11)
 
 
