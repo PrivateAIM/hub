@@ -111,6 +111,8 @@ export class HTTPModule implements IModule {
     }
 
     async teardown(container: IContainer): Promise<void> {
+        container.unregister(HTTPInjectionKey.App);
+
         if (!this.instance) return;
 
         container.unregister(HTTPInjectionKey.Server);
