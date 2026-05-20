@@ -231,3 +231,29 @@ Existing fakes to reuse:
 - `FakeAnalysisMetadataRecalculator` / `FakeAnalysisNodeMetadataRecalculator` / `FakeAnalysisFileMetadataRecalculator` — record `recalc()` and `recalcDebounced()` calls
 
 When a dependency has no fake yet, create one in the entity's test directory (`test/unit/core/entities/<entity>/`) implementing the port interface.
+
+## Migration Tests
+
+The `test` CI job runs the integration suite against MySQL, Postgres, and SQLite, but the schema is built via `dataSource.synchronize()` (see `apps/<service>/test/app/database.ts`) — migration files in `apps/<service>/src/adapters/database/migrations/{mysql,postgres}/` are **not** exercised by that suite.
+
+A separate `tests-migrations` CI job runs the migration CLI end-to-end for `server-core`, `server-storage`, and `server-telemetry` against a fresh MySQL and Postgres container:
+
+1. `migration run` — applies all migrations forward
+2. `migration revert` × N — undoes every migration in reverse order (verifies every `down()` works)
+3. `migration run` — re-applies the full chain (verifies idempotency)
+
+This catches SQL syntax errors, cross-DB type mismatches, and `down()` regressions across every migration. It does **not** catch data-correctness bugs in `UPDATE`/`INSERT` migrations against pre-existing rows — those still require manual smoke-testing against a populated database.
+
+The job pre-flights with a sanity check that the compiled migrations exist under `apps/<service>/dist/adapters/database/migrations/{mysql,postgres}/` — without this guard, running the CLI from the wrong working directory results in typeorm silently reporting "No migrations are pending" with exit code 0, masking the failure.
+
+Locally, run the same flow with a running compose stack:
+
+```bash
+docker compose up -d mysql        # or: postgres
+cd apps/server-core               # or: server-storage / server-telemetry
+
+DB_TYPE=mysql DB_HOST=127.0.0.1 DB_PORT=3306 DB_USERNAME=root DB_PASSWORD=start123 DB_DATABASE=app \
+    node dist/cli/index.mjs migration run
+```
+
+The CLI auto-creates the target database if it does not exist.
