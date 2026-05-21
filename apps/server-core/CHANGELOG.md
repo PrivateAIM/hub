@@ -1,5 +1,74 @@
 # Changelog
 
+## [0.10.0](https://github.com/PrivateAIM/hub/compare/v0.9.0...v0.10.0) (2026-05-21)
+
+
+### ⚠ BREAKING CHANGES
+
+* **deps:** bump routup and plugins to v6 ([#1624](https://github.com/PrivateAIM/hub/issues/1624))
+* **errors:** introduce @privateaim/errors + sweep @ebec/http ([#1607](https://github.com/PrivateAIM/hub/issues/1607))
+
+### Features
+
+* extract core types to server-kit package ([#1563](https://github.com/PrivateAIM/hub/issues/1563)) ([b754cf7](https://github.com/PrivateAIM/hub/commit/b754cf7024ad1890378ad59b1518d8e640f6ff4c))
+* migrate to routup v5 with web API handlers ([#1587](https://github.com/PrivateAIM/hub/issues/1587)) ([01c5881](https://github.com/PrivateAIM/hub/commit/01c5881294c4a2768b4842b0ab3ce9bc1345f732))
+* **server-core:** call metadata recalculator on analysis create ([#1568](https://github.com/PrivateAIM/hub/issues/1568)) ([95bc34b](https://github.com/PrivateAIM/hub/commit/95bc34b8a2c9a3b676b66da9bf1f6007f03a4be4))
+* typed controller signatures, validators in kit packages, swagger via @trapi/cli ([#1590](https://github.com/PrivateAIM/hub/issues/1590)) ([74a35c8](https://github.com/PrivateAIM/hub/commit/74a35c8bed92036a00b581868589c40a192278aa))
+
+
+### Bug Fixes
+
+* analysis-node subscriber ([dfcf021](https://github.com/PrivateAIM/hub/commit/dfcf0210fd3e5e10375437c8fa841e74989c4d2e))
+* **build:** add rootDir to service tsconfig.build.json files ([9128c63](https://github.com/PrivateAIM/hub/commit/9128c633160849e9ca20fcd165b64be80a004b64))
+* **build:** replace __dirname with import.meta.dirname and enable tsdown shims ([b08de35](https://github.com/PrivateAIM/hub/commit/b08de35f59d325fda2222a3290b75561936e88e1))
+* bump authup to v1.0.0-beta.36 ([76fb047](https://github.com/PrivateAIM/hub/commit/76fb047dfd551e4e3eddb23986693a19e68f8d3c))
+* create permissions on start-up ([7d9db61](https://github.com/PrivateAIM/hub/commit/7d9db6113b354fa127dba9e7d7db0d615e51e730))
+* **deps:** bump [@authup](https://github.com/authup) packages to 1.0.0-beta.34 ([ab6e812](https://github.com/PrivateAIM/hub/commit/ab6e81246850e6378e364afaf036d4b4155b1673))
+* **deps:** bump [@authup](https://github.com/authup) packages to 1.0.0-beta.35 and align admin pages ([a2d742e](https://github.com/PrivateAIM/hub/commit/a2d742e33638ddc577e44bfffcf85b2698579527))
+* **deps:** bump the minorandpatch group across 1 directory with 12 updates ([#1626](https://github.com/PrivateAIM/hub/issues/1626)) ([73580a8](https://github.com/PrivateAIM/hub/commit/73580a804599727c9436652f08d5689e7063f9d5))
+* **deps:** bump the minorandpatch group across 1 directory with 16 updates ([#1589](https://github.com/PrivateAIM/hub/issues/1589)) ([3358afc](https://github.com/PrivateAIM/hub/commit/3358afc590f01884ac0f6c3faaa6ef9423e47422))
+* **deps:** bump the minorandpatch group across 1 directory with 3 updates ([#1592](https://github.com/PrivateAIM/hub/issues/1592)) ([727fea3](https://github.com/PrivateAIM/hub/commit/727fea3427c2932883edd249a73b251685d76aa0))
+* **deps:** bump the minorandpatch group across 1 directory with 9 updates ([#1552](https://github.com/PrivateAIM/hub/issues/1552)) ([577f530](https://github.com/PrivateAIM/hub/commit/577f5305c6358470e5bf9d26faeb1d2f3b64a3dd))
+* enable node.client to access account_secret of registryProject entity ([1cbe079](https://github.com/PrivateAIM/hub/commit/1cbe079386e5d32584956a65252bd36da1944ec1))
+* guarantee that metadata component is called ([#1534](https://github.com/PrivateAIM/hub/issues/1534)) ([3a0d520](https://github.com/PrivateAIM/hub/commit/3a0d520336b47e995f7205ed8c02ef09743c8e79))
+* migration path + build-/distribution-status aggregation ([#1529](https://github.com/PrivateAIM/hub/issues/1529)) ([6ad6c1d](https://github.com/PrivateAIM/hub/commit/6ad6c1d11d6e9dd3be154b234a1bfae8fc906ff1))
+* pass queueRouter to all callers subclasses and fix DatabaseModul… ([#1541](https://github.com/PrivateAIM/hub/issues/1541)) ([558f1da](https://github.com/PrivateAIM/hub/commit/558f1dafab2da1a82a5919ed47bf4c5620404971))
+* pass skipProjectApproval and skipAnalysisApproval to controllers ([9af7ecf](https://github.com/PrivateAIM/hub/commit/9af7ecf039ccb5950eb657fde55ccad525b28b10))
+* properly init nodeClientService to node repository ([7f19abf](https://github.com/PrivateAIM/hub/commit/7f19abf6dae15605f93e2c37704287278f31c511))
+* **server-core:** register TypeORM subscribers after DataSource.initialize() ([971abfe](https://github.com/PrivateAIM/hub/commit/971abfe1ac4dc3e963d76656ea4623bb65770a01))
+* set progress to max 100 ([fc78d15](https://github.com/PrivateAIM/hub/commit/fc78d158cd2b5334b73575c5db02c4cc85a21ba7))
+* widen build_size / bucket file size to bigint ([#1631](https://github.com/PrivateAIM/hub/issues/1631)) ([24922c0](https://github.com/PrivateAIM/hub/commit/24922c03db23c917fc0e7a7e35c27ff397ae3871))
+
+
+### Miscellaneous Chores
+
+* **deps:** bump routup and plugins to v6 ([#1624](https://github.com/PrivateAIM/hub/issues/1624)) ([e49dbd2](https://github.com/PrivateAIM/hub/commit/e49dbd22963e12232def70254eb93ff291422fc0))
+
+
+### Code Refactoring
+
+* **errors:** introduce @privateaim/errors + sweep @ebec/http ([#1607](https://github.com/PrivateAIM/hub/issues/1607)) ([954e06f](https://github.com/PrivateAIM/hub/commit/954e06fbf8facb49f897b32be84bb93c51a85622))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.9.0 to ^0.10.0
+    * @privateaim/core-realtime-kit bumped from ^0.7.45 to ^0.7.46
+    * @privateaim/kit bumped from ^0.9.0 to ^0.10.0
+    * @privateaim/server-core-worker-kit bumped from ^0.7.45 to ^0.7.46
+    * @privateaim/server-db-kit bumped from ^0.8.44 to ^0.8.45
+    * @privateaim/server-http-kit bumped from ^0.9.0 to ^0.10.0
+    * @privateaim/server-kit bumped from ^0.9.0 to ^0.10.0
+    * @privateaim/server-realtime-kit bumped from ^0.9.0 to ^0.10.0
+    * @privateaim/server-telemetry bumped from ^0.9.0 to ^0.10.0
+    * @privateaim/server-telemetry-kit bumped from ^0.8.44 to ^0.8.45
+    * @privateaim/storage-kit bumped from ^0.8.44 to ^0.8.45
+    * @privateaim/telemetry-kit bumped from ^0.8.44 to ^0.8.45
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.8.44 to ^0.8.45
+
 ## [0.9.0](https://github.com/PrivateAIM/hub/compare/v0.8.43...v0.9.0) (2026-05-20)
 
 
