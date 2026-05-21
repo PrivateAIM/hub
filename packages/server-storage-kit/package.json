@@ -19,14 +19,14 @@
     "license": "Apache-2.0",
     "description": "This package contains server side db helpers & utilities.",
     "devDependencies": {
-        "@privateaim/kit": "^0.9.0",
-        "@privateaim/server-kit": "^0.9.0",
-        "@privateaim/storage-kit": "^0.8.21"
+        "@privateaim/kit": "^0.10.0",
+        "@privateaim/server-kit": "^0.10.0",
+        "@privateaim/storage-kit": "^0.8.45"
     },
     "peerDependencies": {
-        "@privateaim/kit": "^0.9.0",
-        "@privateaim/server-kit": "^0.9.0",
-        "@privateaim/storage-kit": "^0.8.21"
+        "@privateaim/kit": "^0.10.0",
+        "@privateaim/server-kit": "^0.10.0",
+        "@privateaim/storage-kit": "^0.8.45"
     },
     "scripts": {
         "build": "rimraf ./dist && tsdown"
