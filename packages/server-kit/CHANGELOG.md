@@ -1,5 +1,104 @@
 # Changelog
 
+## [0.10.0](https://github.com/PrivateAIM/hub/compare/v0.9.0...v0.10.0) (2026-05-21)
+
+
+### ⚠ BREAKING CHANGES
+
+* **errors:** introduce @privateaim/errors + sweep @ebec/http ([#1607](https://github.com/PrivateAIM/hub/issues/1607))
+
+### Features
+
+* analysis aggregated configuration columns  ([#1267](https://github.com/PrivateAIM/hub/issues/1267)) ([e60c460](https://github.com/PrivateAIM/hub/commit/e60c460c1f701f8b73450e7c618d00de27f8462a))
+* analysis-distributor  ([#1285](https://github.com/PrivateAIM/hub/issues/1285)) ([5da60be](https://github.com/PrivateAIM/hub/commit/5da60be91c4ae27ea16369b5d7e3d09782118826))
+* bucket-file aggregation with analysis-bucket-file management ([#1324](https://github.com/PrivateAIM/hub/issues/1324)) ([00d5aa8](https://github.com/PrivateAIM/hub/commit/00d5aa8bc16a66d7a761ef60b2b4ec27983e5c9a))
+* bump authup dependencies & adjusted code base ([90f7131](https://github.com/PrivateAIM/hub/commit/90f7131723e4e00dad04cb5ababa3e3f232e9c24))
+* component caller(s) implementation ([#1295](https://github.com/PrivateAIM/hub/issues/1295)) ([3b21fe1](https://github.com/PrivateAIM/hub/commit/3b21fe1b2cf3d47332722578cff67359442d84eb))
+* database migration capabilities ([#1437](https://github.com/PrivateAIM/hub/issues/1437)) ([ada0c8c](https://github.com/PrivateAIM/hub/commit/ada0c8c82c50d7ff999c60d7d6b8a6aea10064f0))
+* enable custom url for loki compactor & querier ([2c0d7da](https://github.com/PrivateAIM/hub/commit/2c0d7dab59e18a3ba4bbe645366e9576d00fe845))
+* enhance debugging domain event publisher ([ae294a6](https://github.com/PrivateAIM/hub/commit/ae294a6151c830ae710b07c081cd3b4112631730))
+* enhance logger abstraction ([d3fdca6](https://github.com/PrivateAIM/hub/commit/d3fdca6c1c18daffb76cc053be2420560999ce52))
+* enhance typing for doamin entities ([9d7c516](https://github.com/PrivateAIM/hub/commit/9d7c51644b66c9361e5436e2c43f463f4f219f90))
+* event (re-) modelling ([#1125](https://github.com/PrivateAIM/hub/issues/1125)) ([621f704](https://github.com/PrivateAIM/hub/commit/621f7041794d0bf6d530445a9c3e7c9b66a373ba))
+* event components ([b4529ee](https://github.com/PrivateAIM/hub/commit/b4529eec406d03ac83c9843f06997c3e4abc4eff))
+* explicit logger abstraction type ([3f25a77](https://github.com/PrivateAIM/hub/commit/3f25a77671304dc6102f4e35cc84b2d5ea773dcd))
+* extract core types to server-kit package ([#1563](https://github.com/PrivateAIM/hub/issues/1563)) ([b754cf7](https://github.com/PrivateAIM/hub/commit/b754cf7024ad1890378ad59b1518d8e640f6ff4c))
+* initial hybrid cache (redis or memory) implementation ([b1cd569](https://github.com/PrivateAIM/hub/commit/b1cd569ff52d222f61d4b87abc921cb769de8264))
+* introduce safe publish method for domain-event-publisher ([cff0b35](https://github.com/PrivateAIM/hub/commit/cff0b3567ad11fb4a8ee42c58082122185c50c6c))
+* master-image component(s) ([#1300](https://github.com/PrivateAIM/hub/issues/1300)) ([94cd580](https://github.com/PrivateAIM/hub/commit/94cd58057082ba9c48dae52346bfe5a8cabb28d8))
+* merge server-core & server-core-realtime package ([5298c48](https://github.com/PrivateAIM/hub/commit/5298c48705aa3cc9a2a7ff9e452a8ae1b26e57d8))
+* migrate to esm & replace jest with vitest ([#1368](https://github.com/PrivateAIM/hub/issues/1368)) ([5a4d9d1](https://github.com/PrivateAIM/hub/commit/5a4d9d1ce118f65740aa49caf948208eac299032))
+* migrated to authup v1.0.0-beta.25 ([a5f6b65](https://github.com/PrivateAIM/hub/commit/a5f6b65499ee3a8c4b4bbdcda47979fa73ee5c48))
+* migrated to authup v1.0.0-beta.27 ([f96db78](https://github.com/PrivateAIM/hub/commit/f96db782a5b74e3aa8ab1ada270af770f3c92631))
+* minor subscriber & event publish refactoring ([1ffdd68](https://github.com/PrivateAIM/hub/commit/1ffdd6853283409e83d1d9bb89a67e2964e3cb35))
+* move log-store, loki setup etc. to telemetry service ([#1151](https://github.com/PrivateAIM/hub/issues/1151)) ([8b38b0e](https://github.com/PrivateAIM/hub/commit/8b38b0ee0fafafb121eb4efb0aaf548c27edcde4))
+* only recompute necessary data in metadata component ([9ded46e](https://github.com/PrivateAIM/hub/commit/9ded46e2c6225c296b6c573c1e86b484a416b00d))
+* refactor domain event publisher & register amqp ([0f98ecf](https://github.com/PrivateAIM/hub/commit/0f98ecf3c24239d9050fd4a7c2e0bd6843cb3dc8))
+* refactor http controller validation ([#880](https://github.com/PrivateAIM/hub/issues/880)) ([6e11074](https://github.com/PrivateAIM/hub/commit/6e110742f946d4d0e827f4beb497ba2612568b9a))
+* refactoring of master-image workflow ([#845](https://github.com/PrivateAIM/hub/issues/845)) ([7d2b866](https://github.com/PrivateAIM/hub/commit/7d2b8662b24dcf411d3ae8232152fecf53167382))
+* replace robot- with client-authentication/authorization ([#1445](https://github.com/PrivateAIM/hub/issues/1445)) ([f55dc66](https://github.com/PrivateAIM/hub/commit/f55dc668df66f6efa7a0bb2285c91b1d5f2ae9ef))
+* restructure domain event handling ([2ad7318](https://github.com/PrivateAIM/hub/commit/2ad7318930bd342d571105982fc92996443326fa))
+* reusable client authentication hook ([0a608cd](https://github.com/PrivateAIM/hub/commit/0a608cd94984314166c15fa11684e022b5ceb53e))
+* storage components + component/handler refactoring ([#1289](https://github.com/PrivateAIM/hub/issues/1289)) ([c22db47](https://github.com/PrivateAIM/hub/commit/c22db471bb2a7e71f33a299926f38fde551efc39))
+* store actor & request with event ([#1133](https://github.com/PrivateAIM/hub/issues/1133)) ([7310c8c](https://github.com/PrivateAIM/hub/commit/7310c8c48058734510fba08413ddf5a9fcb8137c))
+* store analysis build hash, size & os ([#1374](https://github.com/PrivateAIM/hub/issues/1374)) ([6110ba6](https://github.com/PrivateAIM/hub/commit/6110ba6c94b3321c1477173c35afdea8b04ad33d))
+* submit & receive logs with loki ([#1100](https://github.com/PrivateAIM/hub/issues/1100)) ([83698d4](https://github.com/PrivateAIM/hub/commit/83698d43549cc3a34410bd01910288ba1b263201))
+* task manager/tracker ([#1293](https://github.com/PrivateAIM/hub/issues/1293)) ([a618c3c](https://github.com/PrivateAIM/hub/commit/a618c3c544e798df9ed169153ab573b593e59445))
+* track socket engine errors ([39771e4](https://github.com/PrivateAIM/hub/commit/39771e4c7d1eb2f14d2dad968b293d3bd513397c))
+* typed controller signatures, validators in kit packages, swagger via @trapi/cli ([#1590](https://github.com/PrivateAIM/hub/issues/1590)) ([74a35c8](https://github.com/PrivateAIM/hub/commit/74a35c8bed92036a00b581868589c40a192278aa))
+
+
+### Bug Fixes
+
+* **build:** replace __dirname with import.meta.dirname and enable tsdown shims ([b08de35](https://github.com/PrivateAIM/hub/commit/b08de35f59d325fda2222a3290b75561936e88e1))
+* bump authup to v1.0.0-beta.36 ([76fb047](https://github.com/PrivateAIM/hub/commit/76fb047dfd551e4e3eddb23986693a19e68f8d3c))
+* change info log messages to debug ([c24d5ee](https://github.com/PrivateAIM/hub/commit/c24d5ee682fb6cc17e64b13f5a4bb58dfd0f2713))
+* **deps:** bump [@authup](https://github.com/authup) packages to 1.0.0-beta.34 ([ab6e812](https://github.com/PrivateAIM/hub/commit/ab6e81246850e6378e364afaf036d4b4155b1673))
+* **deps:** bump [@authup](https://github.com/authup) packages to 1.0.0-beta.35 and align admin pages ([a2d742e](https://github.com/PrivateAIM/hub/commit/a2d742e33638ddc577e44bfffcf85b2698579527))
+* **deps:** bump @authup/** packages to 1.0.0-beta.31 ([#1510](https://github.com/PrivateAIM/hub/issues/1510)) ([62feb46](https://github.com/PrivateAIM/hub/commit/62feb46e9e555bbd3e2896ec8426c7a3d146cc61))
+* **deps:** bump amqp-extension from 4.0.0-beta.3 to 4.0.0 ([#1018](https://github.com/PrivateAIM/hub/issues/1018)) ([6f969f1](https://github.com/PrivateAIM/hub/commit/6f969f17c64f61da85799fd1193d7343d0130ac5))
+* **deps:** bump authup to v1.0.0-beta.24 ([#963](https://github.com/PrivateAIM/hub/issues/963)) ([90c40c0](https://github.com/PrivateAIM/hub/commit/90c40c0d55018557ee8bb381aad7e3cfbcd29b83))
+* **deps:** bump the minorandpatch group across 1 directory with 12 updates ([#1626](https://github.com/PrivateAIM/hub/issues/1626)) ([73580a8](https://github.com/PrivateAIM/hub/commit/73580a804599727c9436652f08d5689e7063f9d5))
+* **deps:** bump the minorandpatch group across 1 directory with 16 updates ([#1329](https://github.com/PrivateAIM/hub/issues/1329)) ([7b394da](https://github.com/PrivateAIM/hub/commit/7b394da159d8e52cc37fe489832307a234f3ddb0))
+* **deps:** bump the minorandpatch group across 1 directory with 19 updates ([#1099](https://github.com/PrivateAIM/hub/issues/1099)) ([30b0ab6](https://github.com/PrivateAIM/hub/commit/30b0ab6b748b287380eb84ac0c8aae4ee22e0be7))
+* **deps:** bump the minorandpatch group across 1 directory with 19 updates ([#1392](https://github.com/PrivateAIM/hub/issues/1392)) ([23060bf](https://github.com/PrivateAIM/hub/commit/23060bfce24100d17d4d83c7ee45ed6d85073c6b))
+* **deps:** bump the minorandpatch group across 1 directory with 2 updates ([#1033](https://github.com/PrivateAIM/hub/issues/1033)) ([b228557](https://github.com/PrivateAIM/hub/commit/b228557eb213761ab97d2d9f8e618b86c50ab155))
+* **deps:** bump the minorandpatch group across 1 directory with 20 updates ([#1231](https://github.com/PrivateAIM/hub/issues/1231)) ([dddccd3](https://github.com/PrivateAIM/hub/commit/dddccd358e8caa9512bd8945dd8f1efc7155b20e))
+* **deps:** bump the minorandpatch group across 1 directory with 21 updates ([#1505](https://github.com/PrivateAIM/hub/issues/1505)) ([2a2a177](https://github.com/PrivateAIM/hub/commit/2a2a17757aab9820aefd24c0bcaa815d810df979))
+* **deps:** bump the minorandpatch group across 1 directory with 24 updates ([#1084](https://github.com/PrivateAIM/hub/issues/1084)) ([92a3f43](https://github.com/PrivateAIM/hub/commit/92a3f43eb47795a7fff756939a036f2e771bd3cd))
+* **deps:** bump the minorandpatch group across 1 directory with 3 updates ([#1019](https://github.com/PrivateAIM/hub/issues/1019)) ([a82d65d](https://github.com/PrivateAIM/hub/commit/a82d65da5e08edce3d97e7432c22d8a028853217))
+* **deps:** bump the minorandpatch group across 1 directory with 31 updates ([#945](https://github.com/PrivateAIM/hub/issues/945)) ([448e9b8](https://github.com/PrivateAIM/hub/commit/448e9b86bf80f83c4aa8bb32ee0a75190a1d5cb8))
+* **deps:** bump the minorandpatch group across 1 directory with 4 updates ([#906](https://github.com/PrivateAIM/hub/issues/906)) ([e11bc5f](https://github.com/PrivateAIM/hub/commit/e11bc5f3b565347af3180e8e29b4e3b79ace5961))
+* **deps:** bump the minorandpatch group across 1 directory with 4 updates ([#997](https://github.com/PrivateAIM/hub/issues/997)) ([949ba29](https://github.com/PrivateAIM/hub/commit/949ba29f66ef6840b9e92b2504b26b7a7a7036e0))
+* **deps:** bump the minorandpatch group across 1 directory with 8 updates ([#1105](https://github.com/PrivateAIM/hub/issues/1105)) ([c4f9255](https://github.com/PrivateAIM/hub/commit/c4f9255832f6473ea1d3fc1793ff9ec2aefacf4c))
+* **deps:** bump the minorandpatch group across 1 directory with 9 updates ([#1331](https://github.com/PrivateAIM/hub/issues/1331)) ([2802bc3](https://github.com/PrivateAIM/hub/commit/2802bc319b84453f8bb351ba1723d9a58bba9830))
+* **deps:** bump the minorandpatch group across 1 directory with 9 updates ([#1552](https://github.com/PrivateAIM/hub/issues/1552)) ([577f530](https://github.com/PrivateAIM/hub/commit/577f5305c6358470e5bf9d26faeb1d2f3b64a3dd))
+* **deps:** bump the minorandpatch group with 6 updates ([#1449](https://github.com/PrivateAIM/hub/issues/1449)) ([042a8f5](https://github.com/PrivateAIM/hub/commit/042a8f5444a826d4a2c450c3186e876c41cb5a2b))
+* **deps:** bump winston from 3.15.0 to 3.16.0 ([#878](https://github.com/PrivateAIM/hub/issues/878)) ([71a2fcd](https://github.com/PrivateAIM/hub/commit/71a2fcd6b507dc44543645acd9622d5d9372dd80))
+* docker file & entrypoint + added amqp config to telemetry service ([2ad782b](https://github.com/PrivateAIM/hub/commit/2ad782bf188ad087d4e4d720eb2812254dcc202e))
+* domain subscriber + queue event create task submission ([94c61ea](https://github.com/PrivateAIM/hub/commit/94c61ead90db550f50edbd9217fb1956230e9609))
+* don't throw in registry component ([78a638b](https://github.com/PrivateAIM/hub/commit/78a638bcf17884a88e2f0df6ea0aaf0f3ea41742))
+* entity event publish method ([03b312e](https://github.com/PrivateAIM/hub/commit/03b312e425d3cdfcf65add5274a792b082ea22e9))
+* initializing event component + reading event batches ([482e9e6](https://github.com/PrivateAIM/hub/commit/482e9e65f2aba1811bec26c4fcebe4d4bc91234b))
+* logger usage in http mount error middleware ([de41d68](https://github.com/PrivateAIM/hub/commit/de41d689292eccba9ec2b324bc1e8c0d9fe0bf85))
+* migration path + build-/distribution-status aggregation ([#1529](https://github.com/PrivateAIM/hub/issues/1529)) ([6ad6c1d](https://github.com/PrivateAIM/hub/commit/6ad6c1d11d6e9dd3be154b234a1bfae8fc906ff1))
+* pass queueRouter to all callers subclasses and fix DatabaseModul… ([#1541](https://github.com/PrivateAIM/hub/issues/1541)) ([558f1da](https://github.com/PrivateAIM/hub/commit/558f1dafab2da1a82a5919ed47bf4c5620404971))
+* rename component setup fn to initialize ([cf124f8](https://github.com/PrivateAIM/hub/commit/cf124f88d7752150dd9fc5b2a33c20b99ae02b46))
+* restrict call response to direct component caller ([004d1ee](https://github.com/PrivateAIM/hub/commit/004d1ee9169dac95fd5e332b7acc0fa5528967e9))
+* submit and process socket events ([0240664](https://github.com/PrivateAIM/hub/commit/02406645a5171a235845935b03f189517c0331cb))
+
+
+### Code Refactoring
+
+* **errors:** introduce @privateaim/errors + sweep @ebec/http ([#1607](https://github.com/PrivateAIM/hub/issues/1607)) ([954e06f](https://github.com/PrivateAIM/hub/commit/954e06fbf8facb49f897b32be84bb93c51a85622))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.9.0 to ^0.10.0
+
 ## [0.9.0](https://github.com/PrivateAIM/hub/compare/v0.8.43...v0.9.0) (2026-05-20)
 
 

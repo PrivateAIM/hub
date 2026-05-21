@@ -1,5 +1,53 @@
 # Changelog
 
+## [0.10.0](https://github.com/PrivateAIM/hub/compare/v0.9.0...v0.10.0) (2026-05-21)
+
+
+### ⚠ BREAKING CHANGES
+
+* **deps:** bump routup and plugins to v6 ([#1624](https://github.com/PrivateAIM/hub/issues/1624))
+* **errors:** introduce @privateaim/errors + sweep @ebec/http ([#1607](https://github.com/PrivateAIM/hub/issues/1607))
+
+### Features
+
+* migrate to routup v5 with web API handlers ([#1587](https://github.com/PrivateAIM/hub/issues/1587)) ([01c5881](https://github.com/PrivateAIM/hub/commit/01c5881294c4a2768b4842b0ab3ce9bc1345f732))
+
+
+### Bug Fixes
+
+* **build:** add rootDir to service tsconfig.build.json files ([9128c63](https://github.com/PrivateAIM/hub/commit/9128c633160849e9ca20fcd165b64be80a004b64))
+* **build:** replace __dirname with import.meta.dirname and enable tsdown shims ([b08de35](https://github.com/PrivateAIM/hub/commit/b08de35f59d325fda2222a3290b75561936e88e1))
+* bump authup to v1.0.0-beta.36 ([76fb047](https://github.com/PrivateAIM/hub/commit/76fb047dfd551e4e3eddb23986693a19e68f8d3c))
+* **deps:** bump [@authup](https://github.com/authup) packages to 1.0.0-beta.34 ([ab6e812](https://github.com/PrivateAIM/hub/commit/ab6e81246850e6378e364afaf036d4b4155b1673))
+* **deps:** bump [@authup](https://github.com/authup) packages to 1.0.0-beta.35 and align admin pages ([a2d742e](https://github.com/PrivateAIM/hub/commit/a2d742e33638ddc577e44bfffcf85b2698579527))
+* **deps:** bump the minorandpatch group across 1 directory with 12 updates ([#1626](https://github.com/PrivateAIM/hub/issues/1626)) ([73580a8](https://github.com/PrivateAIM/hub/commit/73580a804599727c9436652f08d5689e7063f9d5))
+* **deps:** bump the minorandpatch group across 1 directory with 16 updates ([#1589](https://github.com/PrivateAIM/hub/issues/1589)) ([3358afc](https://github.com/PrivateAIM/hub/commit/3358afc590f01884ac0f6c3faaa6ef9423e47422))
+* **deps:** bump the minorandpatch group across 1 directory with 9 updates ([#1552](https://github.com/PrivateAIM/hub/issues/1552)) ([577f530](https://github.com/PrivateAIM/hub/commit/577f5305c6358470e5bf9d26faeb1d2f3b64a3dd))
+
+
+### Miscellaneous Chores
+
+* **deps:** bump routup and plugins to v6 ([#1624](https://github.com/PrivateAIM/hub/issues/1624)) ([e49dbd2](https://github.com/PrivateAIM/hub/commit/e49dbd22963e12232def70254eb93ff291422fc0))
+
+
+### Code Refactoring
+
+* **errors:** introduce @privateaim/errors + sweep @ebec/http ([#1607](https://github.com/PrivateAIM/hub/issues/1607)) ([954e06f](https://github.com/PrivateAIM/hub/commit/954e06fbf8facb49f897b32be84bb93c51a85622))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-http-kit bumped from ^0.8.44 to ^0.8.45
+    * @privateaim/core-kit bumped from ^0.9.0 to ^0.10.0
+    * @privateaim/kit bumped from ^0.9.0 to ^0.10.0
+    * @privateaim/server-core-worker-kit bumped from ^0.7.45 to ^0.7.46
+    * @privateaim/server-kit bumped from ^0.9.0 to ^0.10.0
+    * @privateaim/server-telemetry-kit bumped from ^0.8.44 to ^0.8.45
+    * @privateaim/storage-kit bumped from ^0.8.44 to ^0.8.45
+    * @privateaim/telemetry-kit bumped from ^0.8.44 to ^0.8.45
+
 ## [0.9.0](https://github.com/PrivateAIM/hub/compare/v0.8.43...v0.9.0) (2026-05-20)
 
 
