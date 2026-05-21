@@ -2,7 +2,7 @@
 version: '3.9'
 services:
     mysql:
-        image: mysql
+        image: mysql:9
         restart: always
         healthcheck:
             test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
@@ -14,7 +14,7 @@ services:
         ports:
             - '3306:3306'
     postgres:
-        image: postgres
+        image: postgres:18
         restart: always
         healthcheck:
             test: [ "CMD", "pg_isready" ]

@@ -136,6 +136,98 @@ jobs:
                 run: |
                     npm run test
 
+    tests-migrations:
+        name: Test Migrations
+        needs: [build]
+        runs-on: ubuntu-latest
+
+        strategy:
+            fail-fast: false
+            matrix:
+                service: [ server-core, server-storage, server-telemetry ]
+                db: [ mysql, postgres ]
+                include:
+                    -   db: mysql
+                        port: 3306
+                        user: root
+                    -   db: postgres
+                        port: 5432
+                        user: postgres
+
+        env:
+            DB_TYPE: ${{ matrix.db }}
+            DB_HOST: 127.0.0.1
+            DB_PORT: ${{ matrix.port }}
+            DB_USERNAME: ${{ matrix.user }}
+            DB_PASSWORD: start123
+            DB_DATABASE: app
+
+        services:
+            mysql:
+                image: mysql:9
+                env:
+                    MYSQL_ROOT_PASSWORD: start123
+                ports:
+                    - 3306:3306
+                options: >-
+                    --health-cmd="mysqladmin ping -h localhost -pstart123"
+                    --health-interval=10s
+                    --health-timeout=5s
+                    --health-retries=5
+
+            postgres:
+                image: postgres:18
+                env:
+                    POSTGRES_PASSWORD: start123
+                ports:
+                    - 5432:5432
+                options: >-
+                    --health-cmd="pg_isready -U postgres"
+                    --health-interval=10s
+                    --health-timeout=5s
+                    --health-retries=5
+
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v6
+
+            -   name: Install
+                uses: ./.github/actions/install
+                with:
+                    node-version: ${{ env.NODE_VERSION }}
+                    node-registry: ${{ env.NODE_REGISTRY }}
+
+            -   name: Build
+                uses: ./.github/actions/build
+
+            -   name: Verify compiled migrations exist
+                working-directory: apps/${{ matrix.service }}
+                run: |
+                    shopt -s nullglob
+                    files=(dist/adapters/database/migrations/${{ matrix.db }}/*.mjs)
+                    count=${#files[@]}
+                    if [ "$count" = "0" ]; then
+                        echo "ERROR: no compiled migrations in apps/${{ matrix.service }}/dist/adapters/database/migrations/${{ matrix.db }}/"
+                        exit 1
+                    fi
+                    echo "Found $count migration(s)"
+                    echo "MIGRATION_COUNT=$count" >> "$GITHUB_ENV"
+
+            -   name: Run migrations forward
+                working-directory: apps/${{ matrix.service }}
+                run: node dist/cli/index.mjs migration run
+
+            -   name: Revert all migrations
+                working-directory: apps/${{ matrix.service }}
+                run: |
+                    for ((i = 1; i <= MIGRATION_COUNT; i++)); do
+                        node dist/cli/index.mjs migration revert
+                    done
+
+            -   name: Re-apply all migrations (idempotency)
+                working-directory: apps/${{ matrix.service }}
+                run: node dist/cli/index.mjs migration run
+
     lint:
         needs: [build]
         runs-on: ubuntu-latest
