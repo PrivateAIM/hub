@@ -6,6 +6,7 @@
  */
 
 import type { Realm } from '@authup/core-kit';
+import { bigintNumberTransformer } from '@privateaim/server-db-kit';
 import type { BucketFile } from '@privateaim/storage-kit';
 import {
     Column,
@@ -38,9 +39,10 @@ export class BucketFileEntity implements BucketFile {
     directory: string;
 
     @Column({
-        type: 'int',
+        type: 'bigint',
         unsigned: true,
         nullable: true,
+        transformer: bigintNumberTransformer,
     })
     size: number | null;
 

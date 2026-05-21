@@ -14,6 +14,7 @@ import {
     ref,
     watch,
 } from 'vue';
+import { humanFileSize } from '@privateaim/kit';
 import type { BucketFile } from '@privateaim/storage-kit';
 import { injectStorageHTTPClient } from '../../core';
 import { FBucketFileDownload } from './FBucketFileDownload';
@@ -118,6 +119,8 @@ export default defineComponent({
             isActive,
 
             isInFileList,
+
+            humanFileSize,
         };
     },
 });
@@ -148,7 +151,7 @@ export default defineComponent({
         </div>
         <template v-if="data">
             <div class="bucket-file-size">
-                {{ data.size }} Bytes
+                {{ humanFileSize(data.size) }}
             </div>
         </template>
         <template v-if="data">
