@@ -26,7 +26,7 @@
         "@authup/core-http-kit": "^1.0.0-beta.36",
         "@authup/core-realtime-kit": "^1.0.0-beta.36",
         "@authup/server-adapter-kit": "^1.0.0-beta.36",
-        "@authup/server-adapter-socket-io": "^1.0.0-beta.36",
+        "@authup/server-adapter-socket-io": "^1.0.0-beta.39",
         "@socket.io/redis-adapter": "^8.3.0",
         "@privateaim/errors": "^0.8.42",
         "@privateaim/kit": "^0.10.0",
