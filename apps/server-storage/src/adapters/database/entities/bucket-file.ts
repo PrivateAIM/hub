@@ -40,6 +40,7 @@ export class BucketFileEntity implements BucketFile {
 
     @Column({
         type: 'bigint',
+        unsigned: true,
         nullable: true,
         transformer: bigintNumberTransformer,
     })

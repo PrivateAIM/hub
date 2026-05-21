@@ -140,6 +140,7 @@ export class AnalysisEntity implements Analysis {
 
     @Column({
         type: 'bigint',
+        unsigned: true,
         nullable: true,
         default: null,
         transformer: bigintNumberTransformer,

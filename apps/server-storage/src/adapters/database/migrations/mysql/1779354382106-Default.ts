@@ -5,7 +5,7 @@ export class Default1779354382106 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`
-            ALTER TABLE \`bucket_files\` MODIFY COLUMN \`size\` bigint NULL
+            ALTER TABLE \`bucket_files\` MODIFY COLUMN \`size\` bigint UNSIGNED NULL
         `);
     }
 

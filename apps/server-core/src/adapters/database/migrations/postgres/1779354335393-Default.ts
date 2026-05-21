@@ -14,13 +14,13 @@ export class Default1779354335393 implements MigrationInterface {
 
     public async down(queryRunner: QueryRunner): Promise<void> {
         const [{ overflow_count: analysisOverflow }] = await queryRunner.query(`
-            SELECT COUNT(*)::int AS overflow_count
+            SELECT COUNT(*) AS overflow_count
             FROM "analysis_entity"
             WHERE "build_size" IS NOT NULL
               AND ("build_size" > 2147483647 OR "build_size" < -2147483648)
         `);
         const [{ overflow_count: masterOverflow }] = await queryRunner.query(`
-            SELECT COUNT(*)::int AS overflow_count
+            SELECT COUNT(*) AS overflow_count
             FROM "master_images"
             WHERE "build_size" IS NOT NULL
               AND ("build_size" > 2147483647 OR "build_size" < -2147483648)

@@ -11,7 +11,7 @@ export class Default1779354382106 implements MigrationInterface {
 
     public async down(queryRunner: QueryRunner): Promise<void> {
         const [{ overflow_count: overflow }] = await queryRunner.query(`
-            SELECT COUNT(*)::int AS overflow_count
+            SELECT COUNT(*) AS overflow_count
             FROM "bucket_files"
             WHERE "size" IS NOT NULL
               AND ("size" > 2147483647 OR "size" < -2147483648)

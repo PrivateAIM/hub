@@ -51,6 +51,7 @@ export class MasterImageEntity implements MasterImage {
 
     @Column({
         type: 'bigint',
+        unsigned: true,
         nullable: true,
         default: null,
         transformer: bigintNumberTransformer,
