@@ -7,6 +7,7 @@
 
 import { deserialize, serialize } from '@authup/kit';
 import type { ProcessStatus } from '@privateaim/kit';
+import { bigintNumberTransformer } from '@privateaim/server-db-kit';
 import {
     Column,
     CreateDateColumn,
@@ -49,10 +50,10 @@ export class MasterImageEntity implements MasterImage {
     build_hash: string | null;
 
     @Column({
-        type: 'int',
-        unsigned: true,
+        type: 'bigint',
         nullable: true,
         default: null,
+        transformer: bigintNumberTransformer,
     })
     build_size: number | null;
 

@@ -13,6 +13,7 @@ import type {
     Project,
     Registry,
 } from '@privateaim/core-kit';
+import { bigintNumberTransformer } from '@privateaim/server-db-kit';
 import {
     Column,
     CreateDateColumn,
@@ -138,10 +139,10 @@ export class AnalysisEntity implements Analysis {
     build_os: string | null;
 
     @Column({
-        type: 'int',
-        unsigned: true,
+        type: 'bigint',
         nullable: true,
         default: null,
+        transformer: bigintNumberTransformer,
     })
     build_size: number | null;
 

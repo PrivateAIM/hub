@@ -113,7 +113,7 @@ export function defineCLIMigrationCommand() {
                 },
             ];
 
-            const baseDirectory = path.join(SRC_PATH, 'database', 'migrations');
+            const baseDirectory = path.join(SRC_PATH, 'adapters', 'database', 'migrations');
             const timestamp = Date.now();
 
             for (const connection of connections) {
