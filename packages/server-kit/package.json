@@ -38,7 +38,7 @@
     },
     "devDependencies": {
         "@authup/access": "^1.0.0-beta.36",
-        "@authup/core-http-kit": "^1.0.0-beta.36",
+        "@authup/core-http-kit": "^1.0.0-beta.42",
         "@authup/core-kit": "^1.0.0-beta.36",
         "rapiq": "^0.9.0",
         "amqp-extension": "^4.0.0",
@@ -48,7 +48,7 @@
     },
     "peerDependencies": {
         "@authup/access": "^1.0.0-beta.36",
-        "@authup/core-http-kit": "^1.0.0-beta.36",
+        "@authup/core-http-kit": "^1.0.0-beta.42",
         "@authup/core-kit": "^1.0.0-beta.36",
         "rapiq": "^0.9.0",
         "amqp-extension": "^4.0.0",
