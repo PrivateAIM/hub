@@ -26,7 +26,7 @@
     "dependencies": {
         "@privateaim/errors": "^0.8.42",
         "@validup/adapter-zod": "^0.2.3",
-        "validup": "^0.2.1",
+        "validup": "^0.3.0",
         "zod": "^4.3.6"
     },
     "devDependencies": {
