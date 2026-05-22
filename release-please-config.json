@@ -31,6 +31,36 @@
     },
     "plugins": [
         {
+            "type": "linked-versions",
+            "groupName": "monorepo",
+            "components": [
+                "root",
+                "client-ui",
+                "client-vue",
+                "core-http-kit",
+                "core-kit",
+                "core-realtime-kit",
+                "kit",
+                "messenger-kit",
+                "server-core",
+                "server-core-worker",
+                "server-core-worker-kit",
+                "server-db-kit",
+                "server-http-kit",
+                "server-kit",
+                "server-messenger",
+                "server-realtime-kit",
+                "server-test-kit",
+                "server-storage",
+                "server-storage-kit",
+                "storage-kit",
+                "server-telemetry",
+                "server-telemetry-kit",
+                "telemetry-kit",
+                "docs"
+            ]
+        },
+        {
             "type": "node-workspace",
             "updatePeerDependencies": true,
             "merge": false,
