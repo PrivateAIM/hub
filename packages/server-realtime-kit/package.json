@@ -30,7 +30,7 @@
         "@socket.io/redis-adapter": "^8.3.0",
         "@privateaim/errors": "^0.8.42",
         "@privateaim/kit": "^0.10.0",
-        "@privateaim/telemetry-kit": "^0.8.45",
+        "@privateaim/telemetry-kit": "^0.10.0",
         "@privateaim/server-kit": "^0.10.0"
     },
     "devDependencies": {

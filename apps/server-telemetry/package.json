@@ -25,11 +25,11 @@
         "@hapic/victorialogs": "^1.0.3",
         "@privateaim/errors": "^0.8.42",
         "@privateaim/kit": "^0.10.0",
-        "@privateaim/server-db-kit": "^0.8.45",
+        "@privateaim/server-db-kit": "^0.10.0",
         "@privateaim/server-http-kit": "^0.10.0",
         "@privateaim/server-kit": "^0.10.0",
-        "@privateaim/server-telemetry-kit": "^0.8.45",
-        "@privateaim/telemetry-kit": "^0.8.45",
+        "@privateaim/server-telemetry-kit": "^0.10.0",
+        "@privateaim/telemetry-kit": "^0.10.0",
         "@routup/basic": "^3.0.0",
         "@routup/decorators": "^5.0.0",
         "@validup/adapter-zod": "^0.2.4",
@@ -53,7 +53,7 @@
     },
     "devDependencies": {
         "@faker-js/faker": "^10.4.0",
-        "@privateaim/server-test-kit": "^0.8.37",
+        "@privateaim/server-test-kit": "^0.10.0",
         "@trapi/cli": "^2.0.0",
         "testcontainers": "^11.14.0",
         "vitest": "^4.1.7"

@@ -1,7 +1,7 @@
 {
     "name": "@privateaim/server-db-kit",
     "type": "module",
-    "version": "0.8.45",
+    "version": "0.10.0",
     "module": "./dist/index.mjs",
     "types": "./dist/index.d.mts",
     "exports": {
