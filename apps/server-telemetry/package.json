@@ -39,7 +39,7 @@
         "envix": "^1.3.0",
         "hapic": "^2.8.2",
         "locter": "^2.2.1",
-        "mysql2": "^3.22.3",
+        "mysql2": "^3.22.4",
         "node-cron": "^4.2.1",
         "orkos": "^1.1.1",
         "rapiq": "0.9.0",
@@ -48,7 +48,7 @@
         "routup": "^6.0.0",
         "typeorm": "^0.3.29",
         "typeorm-extension": "^3.9.0",
-        "validup": "^0.2.1",
+        "validup": "^0.3.0",
         "zod": "^4.3.6"
     },
     "devDependencies": {
