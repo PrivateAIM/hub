@@ -5,15 +5,19 @@ export class AddDisplayName1780300000000 implements MigrationInterface {
     name = 'AddDisplayName1780300000000';
 
     public async up(queryRunner: QueryRunner): Promise<void> {
-        // ----- analysis_entity -----
+        // ----- analysis_entity -> analysis -----
+        // Align the table name with the entity (@Entity({ name: 'analysis' })).
+        // Foreign keys referencing this table follow the rename automatically.
+        await queryRunner.query('RENAME TABLE `analysis_entity` TO `analysis`');
+
         await queryRunner.query(`
-            ALTER TABLE \`analysis_entity\`
+            ALTER TABLE \`analysis\`
             ADD \`display_name\` varchar(256) NULL
         `);
 
         // Preserve the existing free-form name as the human-readable display_name.
         await queryRunner.query(`
-            UPDATE \`analysis_entity\`
+            UPDATE \`analysis\`
             SET \`display_name\` = \`name\`
             WHERE \`name\` IS NOT NULL
         `);
@@ -21,7 +25,7 @@ export class AddDisplayName1780300000000 implements MigrationInterface {
         // Turn every existing name into a URL-friendly slug, generating one for
         // rows that have no name yet.
         const analysisRows: { id: string; name: string | null }[] = await queryRunner.query(`
-            SELECT \`id\`, \`name\` FROM \`analysis_entity\`
+            SELECT \`id\`, \`name\` FROM \`analysis\`
         `);
 
         for (const row of analysisRows) {
@@ -31,13 +35,13 @@ export class AddDisplayName1780300000000 implements MigrationInterface {
             }
 
             await queryRunner.query(
-                'UPDATE `analysis_entity` SET `name` = ? WHERE `id` = ?',
+                'UPDATE `analysis` SET `name` = ? WHERE `id` = ?',
                 [next, row.id],
             );
         }
 
         await queryRunner.query(`
-            ALTER TABLE \`analysis_entity\`
+            ALTER TABLE \`analysis\`
             MODIFY \`name\` varchar(128) NOT NULL
         `);
 
@@ -88,9 +92,9 @@ export class AddDisplayName1780300000000 implements MigrationInterface {
             DROP COLUMN \`display_name\`
         `);
 
-        // ----- analysis_entity -----
+        // ----- analysis -> analysis_entity -----
         await queryRunner.query(`
-            ALTER TABLE \`analysis_entity\`
+            ALTER TABLE \`analysis\`
             MODIFY \`name\` varchar(128) NULL
         `);
 
@@ -98,14 +102,17 @@ export class AddDisplayName1780300000000 implements MigrationInterface {
         // (truncated to the name column length). Rows that had no original name
         // keep their generated slug.
         await queryRunner.query(`
-            UPDATE \`analysis_entity\`
+            UPDATE \`analysis\`
             SET \`name\` = LEFT(\`display_name\`, 128)
             WHERE \`display_name\` IS NOT NULL
         `);
 
         await queryRunner.query(`
-            ALTER TABLE \`analysis_entity\`
+            ALTER TABLE \`analysis\`
             DROP COLUMN \`display_name\`
         `);
+
+        // Restore the original table name so the older migrations revert cleanly.
+        await queryRunner.query('RENAME TABLE `analysis` TO `analysis_entity`');
     }
 }

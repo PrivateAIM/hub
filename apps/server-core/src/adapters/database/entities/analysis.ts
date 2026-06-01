@@ -30,7 +30,7 @@ import { MasterImageEntity } from './master-image.ts';
 import { ProjectEntity } from './project.ts';
 import { RegistryEntity } from './registry.ts';
 
-@Entity()
+@Entity({ name: 'analysis' })
 export class AnalysisEntity implements Analysis {
     @PrimaryGeneratedColumn('uuid')
     id: string;
