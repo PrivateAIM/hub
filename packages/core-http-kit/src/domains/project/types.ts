@@ -7,7 +7,6 @@
 
 import type { Project } from '@privateaim/core-kit';
 
-export type ProjectCreatePayload =    & Pick<Project, 'name'> &
-    Partial<Pick<Project, 'description' | 'master_image_id'>>;
+export type ProjectCreatePayload =    Partial<Pick<Project, 'name' | 'display_name' | 'description' | 'master_image_id'>>;
 
 export type ProjectUpdatePayload = Partial<ProjectCreatePayload>;

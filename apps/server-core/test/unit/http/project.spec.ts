@@ -60,7 +60,7 @@ describe('src/controllers/core/project', () => {
     it('should update resource', async () => {
         const { client } = suite;
 
-        details.name = 'TestA';
+        details.name = 'test-a';
 
         const data = await client.project.update(details.id, details);
         expectProperties(details, data);

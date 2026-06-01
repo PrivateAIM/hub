@@ -157,7 +157,7 @@ export default defineComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            <i class="fas fa-project-diagram" /> {{ entity.name }}
+            <i class="fas fa-project-diagram" /> {{ entity.display_name || entity.name }}
         </h1>
 
         <div class="m-b-20 m-t-10">

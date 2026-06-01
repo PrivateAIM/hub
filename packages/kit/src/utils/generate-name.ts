@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2025.
+ * Copyright (c) 2026.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { slugify } from '@privateaim/kit';
+import { slugify } from './slugify';
 
 const ADJECTIVES = [
     'agile amber ancient autumn azure blithe bold brave bright brisk calm clever',
@@ -30,13 +30,13 @@ function pick(list: readonly string[]): string {
 }
 
 /**
- * Generate a human-friendly, URL-friendly analysis name, e.g. `brave-otter-1a2b3c`.
+ * Generate a human-friendly, URL-friendly name, e.g. `brave-otter-1a2b3c`.
  *
  * The trailing random hex suffix keeps generated names readable while making
  * collisions practically irrelevant. The result always satisfies the slug
- * charset (`[a-z0-9-]`) and the entity's length constraints.
+ * charset (`[a-z0-9-]`) and stays within 128 characters.
  */
-export function generateAnalysisName(): string {
+export function generateName(): string {
     const suffix = Math.floor(Math.random() * 0x1000000)
         .toString(16)
         .padStart(6, '0');

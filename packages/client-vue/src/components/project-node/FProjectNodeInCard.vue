@@ -76,7 +76,7 @@ export default defineComponent({
                             :to="'/projects/' + entity.project.id"
                             class="mb-0"
                         >
-                            {{ entity.project.name }}
+                            {{ entity.project.display_name || entity.project.name }}
                         </VCLink>
                     </slot>
                 </div>
@@ -215,7 +215,7 @@ export default defineComponent({
             :hide-footer="true"
         >
             <template #title>
-                <i class="fas fa-file-import" /> Project {{ entity.project.name }}
+                <i class="fas fa-file-import" /> Project {{ entity.project.display_name || entity.project.name }}
             </template>
             <template v-if="entity">
                 <FProjectInForm

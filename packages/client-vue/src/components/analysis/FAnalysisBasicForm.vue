@@ -8,7 +8,8 @@
 import { IVuelidate } from '@ilingo/vuelidate';
 import { isNameValid } from '@authup/core-kit';
 import type { Analysis, Project } from '@privateaim/core-kit';
-import { DomainType, generateAnalysisName } from '@privateaim/core-kit';
+import { DomainType } from '@privateaim/core-kit';
+import { generateName } from '@privateaim/kit';
 import {
     helpers, 
     maxLength, 
@@ -86,7 +87,7 @@ export default defineComponent({
         // analysis. Runs client-side only to avoid SSR hydration mismatches.
         onMounted(() => {
             if (!props.entity && !form.name) {
-                form.name = generateAnalysisName();
+                form.name = generateName();
             }
         });
 

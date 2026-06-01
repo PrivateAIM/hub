@@ -8,8 +8,9 @@
 import type { Project } from '@privateaim/core-kit';
 import {
     PermissionName,
-    ValidatorGroup, 
-    isRealmResourceWritable, 
+    ValidatorGroup,
+    generateName,
+    isRealmResourceWritable,
 } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
@@ -49,7 +50,15 @@ export class ProjectService extends AbstractEntityService implements IProjectSer
     }
 
     async create(data: Partial<Project>, actor: ActorContext): Promise<Project> {
-        const validated = await this.validator.run(data, { group: ValidatorGroup.CREATE });
+        // The name is a unique, URL-friendly identifier. Generate one up-front
+        // when the caller did not provide a (non-empty) name, so it passes
+        // validation instead of being rejected as null/empty.
+        const input: Partial<Project> = { ...data };
+        if (!input.name) {
+            input.name = generateName();
+        }
+
+        const validated = await this.validator.run(input, { group: ValidatorGroup.CREATE });
 
         await actor.permissionChecker.preCheck({ name: PermissionName.PROJECT_CREATE });
 

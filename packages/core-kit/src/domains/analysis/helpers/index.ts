@@ -8,4 +8,3 @@
 export * from './builder';
 export * from './configurator';
 export * from './distributor';
-export * from './generate-name';

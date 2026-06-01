@@ -77,7 +77,7 @@ export default defineComponent({
                             :to="'/projects/' + entity.id"
                             class="mb-0"
                         >
-                            {{ entity.name }}
+                            {{ entity.display_name || entity.name }}
                         </VCLink>
                     </slot>
                 </div>
