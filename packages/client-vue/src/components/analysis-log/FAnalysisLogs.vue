@@ -11,11 +11,12 @@ import {
     defineComponent,
     ref,
 } from 'vue';
+import { useScrollPreserver } from '../../composables';
 import { injectCoreHTTPClient } from '../../core';
-import { FLog } from '../log';
+import { FLog, FLogsRefresh } from '../log';
 
 export default defineComponent({
-    components: { FLog },
+    components: { FLog, FLogsRefresh },
     props: {
         entityId: {
             type: String,
@@ -33,39 +34,51 @@ export default defineComponent({
         const total = ref(0);
         const data : Ref<Log[]> = ref([]);
 
-        const load = async (time?: string | bigint) => {
+        const { preserve } = useScrollPreserver('logContainer');
+
+        const collect = async (target: Log[], offset = 0) : Promise<void> => {
             const response = await httpClient.analysisLog.getMany({
-                filter: {
-                    analysis_id: props.entityId,
-                    ...(time ? { time: `>${time}` } : {}),
-                },
+                filter: { analysis_id: props.entityId },
+                page: { offset },
             });
 
-            data.value.push(...response.data);
-
-            if (response.meta.total > data.value.length) {
-                return load(data.value[data.value.length - 1].time);
-            }
+            target.push(...response.data);
 
             total.value = response.meta.total;
 
-            return Promise.resolve();
+            // Page forward while records remain beyond the current window
+            // (total > offset + limit), advancing the offset by one page.
+            const nextOffset = response.meta.offset + response.meta.limit;
+            if (response.meta.total > nextOffset) {
+                return collect(target, nextOffset);
+            }
+
+            return undefined;
         };
+
+        const load = (offset = 0) => collect(data.value, offset);
 
         Promise.resolve()
             .then(() => { busy.value = true; })
             .then(() => load())
             .then(() => { busy.value = false; });
 
+        // Collect into a fresh array and swap atomically, so the currently
+        // displayed logs stay visible until the reload completes (no flicker
+        // while auto-refreshing). `preserve` keeps the scroll position sensible:
+        // following the newest entries at the bottom, staying put otherwise.
         const reload = async () => {
             busy.value = true;
 
-            data.value = [];
-            total.value = 0;
-
-            await load();
-
-            busy.value = false;
+            try {
+                const next : Log[] = [];
+                await collect(next);
+                await preserve(() => {
+                    data.value = next;
+                });
+            } finally {
+                busy.value = false;
+            }
         };
 
         return {
@@ -81,15 +94,26 @@ export default defineComponent({
 <template>
     <div class="d-flex flex-column gap-1">
         <slot name="default">
-            <slot
-                name="header"
-                v-bind="{ busy, data, meta, load, reload }"
-            />
+            <div class="d-flex flex-row align-items-center">
+                <slot
+                    name="header"
+                    v-bind="{ busy, data, meta, load, reload }"
+                />
+                <div class="ms-auto">
+                    <FLogsRefresh
+                        :busy="busy"
+                        @refresh="reload"
+                    />
+                </div>
+            </div>
             <slot
                 name="body"
                 v-bind="{ busy, data, meta, load, reload }"
             >
-                <div class="log-container">
+                <div
+                    ref="logContainer"
+                    class="log-container"
+                >
                     <div class="log-body">
                         <template
                             v-for="(item, key) in data"
@@ -103,11 +127,6 @@ export default defineComponent({
                     </div>
                 </div>
             </slot>
-
-            <slot
-                name="header"
-                v-bind="{ busy, data, meta, load, reload }"
-            />
         </slot>
     </div>
 </template>
