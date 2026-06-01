@@ -5,12 +5,14 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import { usePermissionCheck } from '@authup/client-web-kit';
 import {
     DomainType,
 } from '@privateaim/core-kit';
 import { FDisplayName, createEntityManager } from '@privateaim/client-vue';
+import { PermissionName } from '@privateaim/kit';
 import { isClientErrorWithStatusCode } from 'hapic';
-import { defineComponent } from 'vue';
+import { computed, defineComponent } from 'vue';
 import { definePageMeta, useToast } from '#imports';
 import {
     createError, 
@@ -35,6 +37,8 @@ export default defineComponent({
 
         const toast = useToast();
 
+        const canEdit = usePermissionCheck({ name: PermissionName.ANALYSIS_UPDATE });
+
         const manager = createEntityManager({
             type: `${DomainType.ANALYSIS}`,
             props: { entityId: useRoute().params.id as string },
@@ -55,38 +59,50 @@ export default defineComponent({
             throw createError({});
         }
 
-        const tabs = [
-            {
-                name: 'Overview', 
-                icon: 'fas fa-bars', 
-                path: '', 
-            },
-            {
-                name: 'Nodes', 
-                icon: 'fa fa-city', 
-                path: '/nodes', 
-            },
-            {
-                name: 'Code', 
-                icon: 'fa fa-code', 
-                path: '/code-files', 
-            },
-            {
-                name: 'Image', 
-                icon: 'fa fa-compact-disc', 
-                path: '/image', 
-            },
-            {
-                name: 'Security', 
-                icon: 'fa fa-lock', 
-                path: '/security', 
-            },
-            {
-                name: 'Results', 
-                icon: 'fas fa-chart-bar', 
-                path: '/result-files', 
-            },
-        ];
+        const tabs = computed(() => {
+            const items = [
+                {
+                    name: 'Overview',
+                    icon: 'fas fa-bars',
+                    path: '',
+                },
+                {
+                    name: 'Nodes',
+                    icon: 'fa fa-city',
+                    path: '/nodes',
+                },
+                {
+                    name: 'Code',
+                    icon: 'fa fa-code',
+                    path: '/code-files',
+                },
+                {
+                    name: 'Image',
+                    icon: 'fa fa-compact-disc',
+                    path: '/image',
+                },
+                {
+                    name: 'Security',
+                    icon: 'fa fa-lock',
+                    path: '/security',
+                },
+                {
+                    name: 'Results',
+                    icon: 'fas fa-chart-bar',
+                    path: '/result-files',
+                },
+            ];
+
+            if (canEdit.value) {
+                items.push({
+                    name: 'Settings',
+                    icon: 'fa fa-cog',
+                    path: '/settings',
+                });
+            }
+
+            return items;
+        });
 
         return {
             tabs,
