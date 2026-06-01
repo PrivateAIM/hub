@@ -106,6 +106,7 @@ export default defineComponent({
                     <FAnalysisName
                         :entity-id="entity.id"
                         :entity-name="entity.name"
+                        :entity-display-name="entity.display_name"
                     />
                 </template>
                 <template v-else>

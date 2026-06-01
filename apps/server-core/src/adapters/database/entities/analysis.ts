@@ -37,11 +37,19 @@ export class AnalysisEntity implements Analysis {
 
     @Index()
     @Column({
-        type: 'varchar', 
-        length: 128, 
-        nullable: true, 
+        type: 'varchar',
+        length: 128,
+        nullable: false,
     })
     name: string;
+
+    @Column({
+        type: 'varchar',
+        length: 256,
+        nullable: true,
+        default: null,
+    })
+    display_name: string | null;
 
     @Column({ type: 'text', nullable: true })
     description: string | null;

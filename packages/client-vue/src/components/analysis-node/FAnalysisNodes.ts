@@ -215,7 +215,10 @@ export default defineComponent({
                                 props.target === DomainType.ANALYSIS &&
                                 slotProps.data.analysis
                             ) {
-                                text = h('div', [slotProps.data.analysis.name]);
+                                text = h('div', [
+                                    slotProps.data.analysis.display_name ||
+                                    slotProps.data.analysis.name,
+                                ]);
                             } else {
                                 text = h('div', [slotProps.data.id]);
                             }

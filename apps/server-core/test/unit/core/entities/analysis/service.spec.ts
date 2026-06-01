@@ -196,6 +196,58 @@ describe('AnalysisService', () => {
             expect(analysisRecalculator.getDebouncedCallCount()).toBe(1);
             expect(analysisRecalculator.getDebouncedCalls()[0]).toBe(result.id);
         });
+
+        it('should auto-generate a url-friendly name when none is provided', async () => {
+            const project = createTestProject();
+            projectRepository.seed(project);
+
+            const origValidate = analysisRepository.validateJoinColumns.bind(analysisRepository);
+            analysisRepository.validateJoinColumns = async (data: Partial<Analysis>) => {
+                await origValidate(data);
+                data.project = project;
+            };
+
+            const result = await service.create(
+                { project_id: project.id },
+                createAllowAllActor(),
+            );
+
+            expect(result.name).toBeTruthy();
+            expect(result.name.length).toBeGreaterThanOrEqual(3);
+            expect(result.name).toMatch(/^[a-z0-9-_.]+$/);
+        });
+
+        it('should keep a provided name and display_name', async () => {
+            const project = createTestProject();
+            projectRepository.seed(project);
+
+            const origValidate = analysisRepository.validateJoinColumns.bind(analysisRepository);
+            analysisRepository.validateJoinColumns = async (data: Partial<Analysis>) => {
+                await origValidate(data);
+                data.project = project;
+            };
+
+            const result = await service.create(
+                {
+                    project_id: project.id, 
+                    name: 'my-analysis', 
+                    display_name: 'My Analysis', 
+                },
+                createAllowAllActor(),
+            );
+
+            expect(result.name).toBe('my-analysis');
+            expect(result.display_name).toBe('My Analysis');
+        });
+
+        it('should reject a name that is not url-friendly', async () => {
+            await expect(
+                service.create(
+                    { project_id: randomUUID(), name: 'Not A Slug!' },
+                    createAllowAllActor(),
+                ),
+            ).rejects.toThrow(/name is invalid/i);
+        });
     });
 
     describe('update', () => {

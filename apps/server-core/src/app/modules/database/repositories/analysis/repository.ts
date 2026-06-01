@@ -29,6 +29,7 @@ import type {
 const DEFAULT_FIELDS: ParseAllowedOption<AnalysisEntity> = [
     'id',
     'name',
+    'display_name',
     'description',
     'nodes',
     'nodes_approved',
@@ -104,6 +105,7 @@ export class AnalysisRepositoryAdapter implements IAnalysisRepository {
             allowed: [
                 'id',
                 'name',
+                'display_name',
                 'description',
                 'project_id',
                 'realm_id',

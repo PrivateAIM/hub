@@ -8,7 +8,12 @@
 import { IVuelidate } from '@ilingo/vuelidate';
 import type { Analysis, Project } from '@privateaim/core-kit';
 import { DomainType } from '@privateaim/core-kit';
-import { maxLength, minLength, required } from '@vuelidate/validators';
+import {
+    helpers, 
+    maxLength, 
+    minLength, 
+    required,
+} from '@vuelidate/validators';
 import type { BuildInput } from 'rapiq';
 import useVuelidate from '@vuelidate/core';
 import type { PropType } from 'vue';
@@ -45,14 +50,23 @@ export default defineComponent({
         const form = reactive({
             project_id: '',
             name: '',
+            display_name: '',
             description: '',
         });
 
         const $v = useVuelidate({
             project_id: { required },
             name: {
+                slug: helpers.withMessage(
+                    'Only lowercase letters, numbers and the characters -_. are allowed.',
+                    (value: string) => !value || /^[a-z0-9-_.]+$/.test(value),
+                ),
                 minLength: minLength(3),
                 maxLength: maxLength(128),
+            },
+            display_name: {
+                minLength: minLength(3),
+                maxLength: maxLength(256),
             },
             description: {
                 minLength: minLength(5),
@@ -111,6 +125,30 @@ export default defineComponent({
                             <template #default>
                                 <VCFormInput
                                     v-model="v$.name.$model"
+                                />
+                                <small class="text-muted">
+                                    URL-friendly identifier (lowercase letters, numbers, - _ .).
+                                    Leave empty to generate one automatically.
+                                </small>
+                            </template>
+                        </VCFormGroup>
+                    </template>
+                </IVuelidate>
+
+                <hr>
+
+                <IVuelidate :validation="v$.display_name">
+                    <template #default="props">
+                        <VCFormGroup
+                            :validation-messages="props.data"
+                            :validation-severity="props.severity"
+                        >
+                            <template #label>
+                                Display Name
+                            </template>
+                            <template #default>
+                                <VCFormInput
+                                    v-model="v$.display_name.$model"
                                 />
                             </template>
                         </VCFormGroup>

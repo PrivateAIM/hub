@@ -24,6 +24,7 @@ export function createFullAnalysis(overrides?: Partial<Analysis>): Analysis {
     return {
         id: 'analysis-1',
         name: 'test-analysis',
+        display_name: null,
         description: null,
         nodes: 0,
         nodes_approved: 0,

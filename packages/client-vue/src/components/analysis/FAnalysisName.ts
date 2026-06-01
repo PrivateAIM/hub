@@ -7,17 +7,17 @@
 
 import type { PropType, VNodeChild } from 'vue';
 import {
-    computed, 
-    defineComponent, 
-    h, 
-    ref, 
-    toRef, 
+    computed,
+    defineComponent,
+    h,
+    ref,
+    toRef,
     watch,
 } from 'vue';
 import {
-    hasNormalizedSlot, 
-    injectCoreHTTPClient, 
-    normalizeSlot, 
+    hasNormalizedSlot,
+    injectCoreHTTPClient,
+    normalizeSlot,
     wrapFnWithBusyState,
 } from '../../core';
 
@@ -31,6 +31,10 @@ export default defineComponent({
             type: String as PropType<string | null | undefined>,
             default: undefined,
         },
+        entityDisplayName: {
+            type: String as PropType<string | null | undefined>,
+            default: undefined,
+        },
         editable: {
             type: Boolean,
             default: false,
@@ -40,29 +44,27 @@ export default defineComponent({
     setup(props, { emit, slots }) {
         const apiClient = injectCoreHTTPClient();
         const busy = ref(false);
-        const name = ref('');
+        const displayName = ref('');
 
-        if (props.entityName) {
-            name.value = props.entityName;
+        if (props.entityDisplayName) {
+            displayName.value = props.entityDisplayName;
         }
 
-        const propName = toRef(props, 'entityName');
-        watch(propName, (val) => {
-            name.value = val || '';
+        const propDisplayName = toRef(props, 'entityDisplayName');
+        watch(propDisplayName, (val) => {
+            displayName.value = val || '';
         });
 
         const editing = ref(false);
 
+        // Prefer the human-readable display_name, fall back to the URL-friendly
+        // name (slug). The opaque id is intentionally never shown.
         const nameDisplay = computed(() => {
-            if (name.value) {
-                return name.value;
+            if (displayName.value) {
+                return displayName.value;
             }
 
-            if (props.entityName) {
-                return props.entityName;
-            }
-
-            return props.entityId;
+            return props.entityName || '';
         });
 
         const toggle = () => {
@@ -71,7 +73,7 @@ export default defineComponent({
 
         const save = wrapFnWithBusyState(busy, async () => {
             try {
-                const train = await apiClient.analysis.update(props.entityId, { name: name.value });
+                const train = await apiClient.analysis.update(props.entityId, { display_name: displayName.value });
 
                 emit('updated', train);
 
@@ -87,10 +89,10 @@ export default defineComponent({
             if (editing.value) {
                 return h('div', { class: 'input-group' }, [
                     h('input', {
-                        value: name.value,
+                        value: displayName.value,
                         onInput($event: any) {
                             $event.preventDefault();
-                            name.value = $event.target.value;
+                            displayName.value = $event.target.value;
                         },
                         disabled: busy.value,
                         class: 'form-control',
@@ -115,16 +117,11 @@ export default defineComponent({
                 text = normalizeSlot('default', {
                     entityId: props.entityId,
                     entityName: props.entityName,
+                    entityDisplayName: props.entityDisplayName,
                     nameDisplay: nameDisplay.value,
                 }, slots);
             } else {
-                text = [
-                    nameDisplay.value,
-                    ...(props.entityName ? [
-                        ' ',
-                        h('small', { class: 'text-muted' }, [`${props.entityId}`]),
-                    ] : []),
-                ];
+                text = nameDisplay.value;
             }
 
             return h('span', [

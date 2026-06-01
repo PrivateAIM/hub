@@ -91,6 +91,7 @@ export default defineComponent({
                     class="analysis-item-card-title"
                     :entity-id="entity.id"
                     :entity-name="entity.name"
+                    :entity-display-name="entity.display_name"
                     :editable="true"
                     @updated="handleUpdated"
                 >
@@ -99,11 +100,6 @@ export default defineComponent({
                         <VCLink :to="'/analyses/' + props.entityId">
                             {{ props.nameDisplay }}
                         </VCLink>
-                        <template v-if="props.entityName">
-                            <span class="text-muted ms-1">
-                                {{ props.entityId }}
-                            </span>
-                        </template>
                     </template>
                 </FAnalysisName>
             </div>

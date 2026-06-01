@@ -80,6 +80,7 @@ export default defineComponent({
                         <FAnalysisName
                             :entity-id="entity.analysis.id"
                             :entity-name="entity.analysis.name"
+                            :entity-display-name="entity.analysis.display_name"
                         />
                     </slot>
                 </div>

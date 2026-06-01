@@ -14,7 +14,15 @@ import type { Registry } from '../registry';
 export interface Analysis {
     id: string;
 
-    name: string | null;
+    /**
+     * URL-friendly identifier (slug). Auto-generated on creation when not provided.
+     */
+    name: string;
+
+    /**
+     * Human-readable label shown in the UI. Falls back to `name` when not set.
+     */
+    display_name: string | null;
 
     description: string | null;
 

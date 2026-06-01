@@ -20,8 +20,8 @@
     "license": "Apache-2.0",
     "description": "",
     "dependencies": {
-        "@authup/core-kit": "^1.0.0-beta.36",
-        "@authup/kit": "^1.0.0-beta.36",
+        "@authup/core-kit": "^1.0.0-beta.39",
+        "@authup/kit": "^1.0.0-beta.39",
         "@hapic/vault": "^2.3.11",
         "@privateaim/errors": "^0.8.42",
         "@privateaim/kit": "^0.10.0",

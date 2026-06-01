@@ -22,6 +22,7 @@ import type { AnalysisBuilder } from '../../services/analysis-builder/index.ts';
 import type { AnalysisConfigurator } from '../../services/analysis-configurator/index.ts';
 import type { AnalysisDistributor } from '../../services/analysis-distributor/index.ts';
 import type { AnalysisStorageManager } from '../../services/analysis-storage-manager/index.ts';
+import { generateAnalysisName } from './generate-name.ts';
 import type { IAnalysisMetadataRecalculator, IAnalysisRepository, IAnalysisService } from './types.ts';
 
 type AnalysisServiceContext = {
@@ -101,6 +102,12 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
         const entity = this.repository.create({ ...validated });
 
         entity.user_id = actor.identity.id;
+
+        // The name acts as a URL-friendly identifier and is required at the
+        // database level. Generate one when the caller did not provide it.
+        if (!entity.name) {
+            entity.name = generateAnalysisName();
+        }
 
         await actor.permissionChecker.check({
             name: PermissionName.ANALYSIS_CREATE,
