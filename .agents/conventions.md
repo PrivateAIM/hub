@@ -101,14 +101,17 @@ Logs flow through Winston → `LoggerTransport` (`packages/server-telemetry-kit/
 **Rule: keep human-readable tokens in the message; move opaque UUIDs to labels.**
 
 - **Human-readable tokens stay inline** — filenames, paths, entity names, enum-like types (`CODE`/`RESULT`, `user`/`robot`), counts. They give the line meaning; stripping them collapses distinct lines into identical text (`Packing file` × N).
-- **Opaque UUIDs move to labels** — never interpolate an entity id into the message string. Attach it via `LogFlag.REF_TYPE` + `LogFlag.REF_ID` (`packages/telemetry-kit/src/domains/log/constants.ts`) for the primary referenced entity, plus named labels (`bucket_id`, `target_id`, …) for secondary ids. `LogFlag.REF_TYPE` takes a `DomainType` value.
+- **Opaque UUIDs move to labels** — never interpolate an entity id into the message string. Attach it via `LogFlag.REF_TYPE` + `LogFlag.REF_ID` (`packages/telemetry-kit/src/domains/log/constants.ts`) for the primary referenced entity, plus named labels (`bucket_id`, `target_id`, …) for secondary ids. `LogFlag.REF_TYPE` takes the referenced entity's `DomainType` — import it from **that entity's own kit** (`@privateaim/core-kit` for analysis, `@privateaim/storage-kit` for bucket/bucket-file), **not** telemetry-kit's `DomainType` (which only covers `event`/`log`).
 
 ```typescript
+import { DomainType } from '@privateaim/core-kit';
+import { LogFlag } from '@privateaim/telemetry-kit';
+
 // Bad — opaque UUID baked into the message, unreadable and unqueryable
 this.logger?.info(`Created bucket for analysis ${analysis.id}`);
 
 // Good — readable message, ids as labels (canonical pattern in
-// apps/server-core-worker/.../analysis-builder/handlers/execute/module.ts)
+// apps/server-core-worker/src/app/components/analysis-builder/handlers/execute/module.ts)
 this.logger?.info('Created bucket for analysis', {
     [LogFlag.REF_TYPE]: DomainType.ANALYSIS,
     [LogFlag.REF_ID]: analysis.id,

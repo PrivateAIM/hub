@@ -43,7 +43,7 @@ export class StorageBucketCreationFinishedHandler extends BaseAggregatorHandler<
             const analysis = await analysisRepository.findOneBy({ id: task.data.analysisId });
 
             if (!analysis) {
-                this.logger?.info(`Analysis does not exist; ${task.data.bucketType} bucket can not be created`, {
+                this.logger?.info(`Analysis does not exist; ${task.data.bucketType} bucket cannot be created`, {
                     [LogFlag.REF_TYPE]: DomainType.ANALYSIS,
                     [LogFlag.REF_ID]: task.data.analysisId,
                     bucket_type: task.data.bucketType,
