@@ -32,7 +32,9 @@ export default defineComponent({
     setup(props, { emit }) {
         const active = ref(props.enabled);
 
-        const intervalMs = computed(() => Math.max(0, props.interval) * 1000);
+        // Clamp to at least 1s so a 0/negative interval can't produce a 0ms
+        // countdown that ends immediately and storms the API.
+        const intervalMs = computed(() => Math.max(1, props.interval) * 1000);
 
         const toggle = () => {
             active.value = !active.value;

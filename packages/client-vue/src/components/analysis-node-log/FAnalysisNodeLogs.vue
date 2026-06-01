@@ -8,6 +8,7 @@
 import type { Log } from '@privateaim/telemetry-kit';
 import type { Ref } from 'vue';
 import {
+    computed,
     defineComponent,
     ref,
 } from 'vue';
@@ -48,9 +49,11 @@ export default defineComponent({
             total.value = response.meta.total;
 
             // Page forward while records remain beyond the current window
-            // (total > offset + limit), advancing the offset by one page.
+            // (total > offset + limit), advancing the offset by one page. The
+            // `limit > 0` guard prevents an unbounded loop if the window never
+            // advances.
             const nextOffset = response.meta.offset + response.meta.limit;
-            if (response.meta.total > nextOffset) {
+            if (response.meta.limit > 0 && response.meta.total > nextOffset) {
                 return collect(target, nextOffset);
             }
 
@@ -59,10 +62,15 @@ export default defineComponent({
 
         const load = (offset = 0) => collect(data.value, offset);
 
-        Promise.resolve()
-            .then(() => { busy.value = true; })
-            .then(() => load())
-            .then(() => { busy.value = false; });
+        (async () => {
+            busy.value = true;
+
+            try {
+                await load();
+            } finally {
+                busy.value = false;
+            }
+        })();
 
         // Collect into a fresh array and swap atomically, so the currently
         // displayed logs stay visible until the reload completes (no flicker
@@ -85,7 +93,7 @@ export default defineComponent({
         return {
             data,
             busy,
-            meta: { total: total.value },
+            meta: computed(() => ({ total: total.value })),
             load,
             reload,
         };
