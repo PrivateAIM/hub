@@ -6,7 +6,7 @@
  */
 
 import type { Analysis } from '@privateaim/core-kit';
-import { AnalysisCommand, AnalysisValidator  } from '@privateaim/core-kit';
+import { AnalysisCommand, AnalysisValidator, generateAnalysisName } from '@privateaim/core-kit';
 import { BuiltInPolicyType, PolicyData } from '@authup/access';
 import {
     PermissionName,
@@ -22,7 +22,6 @@ import type { AnalysisBuilder } from '../../services/analysis-builder/index.ts';
 import type { AnalysisConfigurator } from '../../services/analysis-configurator/index.ts';
 import type { AnalysisDistributor } from '../../services/analysis-distributor/index.ts';
 import type { AnalysisStorageManager } from '../../services/analysis-storage-manager/index.ts';
-import { generateAnalysisName } from './generate-name.ts';
 import type { IAnalysisMetadataRecalculator, IAnalysisRepository, IAnalysisService } from './types.ts';
 
 type AnalysisServiceContext = {

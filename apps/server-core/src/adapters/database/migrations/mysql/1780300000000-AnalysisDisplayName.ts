@@ -1,5 +1,6 @@
 import type { MigrationInterface, QueryRunner } from 'typeorm';
-import { generateAnalysisName, slugify } from '../../../../core/entities/analysis/generate-name.ts';
+import { generateAnalysisName } from '@privateaim/core-kit';
+import { slugify } from '@privateaim/kit';
 
 export class AnalysisDisplayName1780300000000 implements MigrationInterface {
     name = 'AnalysisDisplayName1780300000000';

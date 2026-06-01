@@ -8,7 +8,7 @@
 import { IVuelidate } from '@ilingo/vuelidate';
 import { isNameValid } from '@authup/core-kit';
 import type { Analysis, Project } from '@privateaim/core-kit';
-import { DomainType } from '@privateaim/core-kit';
+import { DomainType, generateAnalysisName } from '@privateaim/core-kit';
 import {
     helpers, 
     maxLength, 
@@ -19,9 +19,10 @@ import type { BuildInput } from 'rapiq';
 import useVuelidate from '@vuelidate/core';
 import type { PropType } from 'vue';
 import {
-    computed, 
-    defineComponent, 
-    reactive, 
+    computed,
+    defineComponent,
+    onMounted,
+    reactive,
     ref,
 } from 'vue';
 import { VCFormInput } from '@vuecs/form-controls';
@@ -80,6 +81,14 @@ export default defineComponent({
         if (props.projectId) {
             form.project_id = props.projectId as string;
         }
+
+        // Pre-fill an editable, generated name suggestion when creating a new
+        // analysis. Runs client-side only to avoid SSR hydration mismatches.
+        onMounted(() => {
+            if (!props.entity && !form.name) {
+                form.name = generateAnalysisName();
+            }
+        });
 
         const manager = createEntityManager({
             type: `${DomainType.ANALYSIS}`,
@@ -149,7 +158,7 @@ export default defineComponent({
                                 />
                                 <small class="text-muted">
                                     URL-friendly identifier (letters, numbers, - _ .).
-                                    Leave empty to generate one automatically.
+                                    A suggestion is filled in automatically — edit it if you like.
                                 </small>
                             </template>
                         </VCFormGroup>
