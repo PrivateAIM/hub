@@ -19,7 +19,7 @@
         "typecheck": "nuxi typecheck"
     },
     "devDependencies": {
-        "@authup/access": "^1.0.0-beta.39",
+        "@authup/access": "^1.0.0-beta.42",
         "@authup/kit": "^1.0.0-beta.39",
         "@authup/client-web-kit": "^1.0.0-beta.39",
         "@authup/client-web-nuxt": "^1.0.0-beta.39",
