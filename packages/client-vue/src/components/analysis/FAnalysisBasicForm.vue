@@ -6,6 +6,7 @@
   -->
 <script lang="ts">
 import { IVuelidate } from '@ilingo/vuelidate';
+import { isNameValid } from '@authup/core-kit';
 import type { Analysis, Project } from '@privateaim/core-kit';
 import { DomainType } from '@privateaim/core-kit';
 import {
@@ -58,8 +59,8 @@ export default defineComponent({
             project_id: { required },
             name: {
                 slug: helpers.withMessage(
-                    'Only lowercase letters, numbers and the characters -_. are allowed.',
-                    (value: string) => !value || /^[a-z0-9-_.]+$/.test(value),
+                    'Only letters, numbers and the characters -_. are allowed (no whitespace).',
+                    (value: string) => !value || isNameValid(value.trim().toLowerCase()),
                 ),
                 minLength: minLength(3),
                 maxLength: maxLength(128),
@@ -113,6 +114,26 @@ export default defineComponent({
     <form @submit.prevent="add">
         <div class="row">
             <div class="col">
+                <IVuelidate :validation="v$.display_name">
+                    <template #default="props">
+                        <VCFormGroup
+                            :validation-messages="props.data"
+                            :validation-severity="props.severity"
+                        >
+                            <template #label>
+                                Display Name
+                            </template>
+                            <template #default>
+                                <VCFormInput
+                                    v-model="v$.display_name.$model"
+                                />
+                            </template>
+                        </VCFormGroup>
+                    </template>
+                </IVuelidate>
+
+                <hr>
+
                 <IVuelidate :validation="v$.name">
                     <template #default="props">
                         <VCFormGroup
@@ -127,29 +148,9 @@ export default defineComponent({
                                     v-model="v$.name.$model"
                                 />
                                 <small class="text-muted">
-                                    URL-friendly identifier (lowercase letters, numbers, - _ .).
+                                    URL-friendly identifier (letters, numbers, - _ .).
                                     Leave empty to generate one automatically.
                                 </small>
-                            </template>
-                        </VCFormGroup>
-                    </template>
-                </IVuelidate>
-
-                <hr>
-
-                <IVuelidate :validation="v$.display_name">
-                    <template #default="props">
-                        <VCFormGroup
-                            :validation-messages="props.data"
-                            :validation-severity="props.severity"
-                        >
-                            <template #label>
-                                Display Name
-                            </template>
-                            <template #default>
-                                <VCFormInput
-                                    v-model="v$.display_name.$model"
-                                />
                             </template>
                         </VCFormGroup>
                     </template>

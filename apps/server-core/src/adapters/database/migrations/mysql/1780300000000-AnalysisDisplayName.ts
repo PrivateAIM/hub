@@ -46,6 +46,16 @@ export class AnalysisDisplayName1780300000000 implements MigrationInterface {
             ALTER TABLE \`analysis_entity\`
             MODIFY \`name\` varchar(128) NULL
         `);
+
+        // Restore the original free-form name that was moved into display_name
+        // (truncated to the name column length). Rows that had no original name
+        // keep their generated slug.
+        await queryRunner.query(`
+            UPDATE \`analysis_entity\`
+            SET \`name\` = LEFT(\`display_name\`, 128)
+            WHERE \`display_name\` IS NOT NULL
+        `);
+
         await queryRunner.query(`
             ALTER TABLE \`analysis_entity\`
             DROP COLUMN \`display_name\`
