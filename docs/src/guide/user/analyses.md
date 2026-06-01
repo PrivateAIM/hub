@@ -11,6 +11,15 @@ An analysis requires:
 - A **master image** — the base Docker image for execution
 - **Analysis code** — uploaded to a storage bucket and built into a container
 
+### Naming
+
+Every analysis has two name fields:
+
+- **`name`** — a URL-friendly identifier (lowercase letters, digits and the characters `-`, `_`, `.`; no whitespace). It is **required**. If you do not provide one when creating an analysis, a readable name is **generated automatically** (e.g. `brave-otter-1a2b3c`). The create form also pre-fills an editable suggestion.
+- **`display_name`** — an optional, free-form human-readable label. When set, it is shown in the UI in place of the `name`.
+
+The opaque analysis id (UUID) is no longer surfaced in list views or page headlines — analyses are identified by their `display_name` (falling back to `name`).
+
 ## Execution Flow
 
 Once [approved](/guide/user/approval), an analysis goes through:

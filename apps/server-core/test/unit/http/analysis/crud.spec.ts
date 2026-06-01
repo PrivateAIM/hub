@@ -64,7 +64,7 @@ describe('src/controllers/core/analysis', () => {
 
     it('should update resource', async () => {
         const { client } = suite;
-        details.name = 'TestA';
+        details.name = 'test-a';
 
         const data = await client.analysis.update(details.id, details);
 

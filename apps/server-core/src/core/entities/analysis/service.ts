@@ -6,12 +6,13 @@
  */
 
 import type { Analysis } from '@privateaim/core-kit';
-import { AnalysisCommand, AnalysisValidator  } from '@privateaim/core-kit';
+import { AnalysisCommand, AnalysisValidator } from '@privateaim/core-kit';
 import { BuiltInPolicyType, PolicyData } from '@authup/access';
 import {
     PermissionName,
-    ValidatorGroup, 
-    isRealmResourceWritable, 
+    ValidatorGroup,
+    generateName,
+    isRealmResourceWritable,
 } from '@privateaim/kit';
 import { isPropertySet } from '@authup/kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
@@ -82,7 +83,16 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
     }
 
     async create(data: Partial<Analysis>, actor: ActorContext): Promise<Analysis> {
-        const validated = await this.validator.run(data, { group: ValidatorGroup.CREATE });
+        // The name is a URL-friendly identifier and required at the database
+        // level. Generate one up-front when the caller did not provide a
+        // (non-empty) name, so it passes validation instead of being rejected
+        // as null/empty before generation could happen.
+        const input: Partial<Analysis> = { ...data };
+        if (!input.name) {
+            input.name = generateName();
+        }
+
+        const validated = await this.validator.run(input, { group: ValidatorGroup.CREATE });
 
         await actor.permissionChecker.preCheck({ name: PermissionName.ANALYSIS_CREATE });
 

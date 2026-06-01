@@ -93,6 +93,7 @@ export class AnalysisBucketFileRepositoryAdapter implements IAnalysisBucketFileR
                 'analysis_id',
                 'analysis.id',
                 'analysis.name',
+                'analysis.display_name',
                 'analysis_bucket.type',
             ],
             defaultAlias: 'analysisBucketFile',

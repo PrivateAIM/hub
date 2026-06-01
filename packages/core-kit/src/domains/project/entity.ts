@@ -16,7 +16,16 @@ import type { MasterImage } from '../master-image';
 export interface Project {
     id: string;
 
+    /**
+     * URL-friendly identifier (slug). Unique. Auto-generated on creation when
+     * not provided.
+     */
     name: string;
+
+    /**
+     * Human-readable label shown in the UI. Falls back to `name` when not set.
+     */
+    display_name: string | null;
 
     description: string | null;
 

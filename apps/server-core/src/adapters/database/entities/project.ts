@@ -29,11 +29,19 @@ export class ProjectEntity implements Project {
     id: string;
 
     @Column({
-        type: 'varchar', 
-        length: 256, 
-        unique: true, 
+        type: 'varchar',
+        length: 256,
+        unique: true,
     })
     name: string;
+
+    @Column({
+        type: 'varchar',
+        length: 256,
+        nullable: true,
+        default: null,
+    })
+    display_name: string | null;
 
     @Column({ type: 'text', nullable: true })
     description: string | null;

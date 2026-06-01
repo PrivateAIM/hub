@@ -5,19 +5,25 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import { buildFormSubmitWithTranslations, createFormSubmitTranslations } from '@authup/client-web-kit';
+import { isNameValid } from '@authup/core-kit';
 import { getSeverity, useTranslationsForNestedValidations } from '@ilingo/vuelidate';
 import {
-    buildFormGroup, 
-    buildFormInput, 
+    buildFormGroup,
+    buildFormInput,
     buildFormTextarea,
 } from '@vuecs/form-controls';
 import type { ListFooterSlotProps, ListHeaderSlotProps, ListItemSlotProps } from '@vuecs/list-controls';
 import useVuelidate from '@vuelidate/core';
-import { maxLength, minLength, required } from '@vuelidate/validators';
+import {
+    helpers, 
+    maxLength, 
+    minLength,
+} from '@vuelidate/validators';
 import {
     defineComponent,
     h,
-    reactive, 
+    onMounted,
+    reactive,
     ref,
     watch,
 } from 'vue';
@@ -27,6 +33,7 @@ import type {
 
 import type { MasterImage, Node, Project } from '@privateaim/core-kit';
 import { DomainType } from '@privateaim/core-kit';
+import { generateName } from '@privateaim/kit';
 import { useUpdatedAt } from '../../composables';
 import type { ListProps } from '../../core';
 import {
@@ -56,15 +63,23 @@ const FProjectForm = defineComponent({
         const busy = ref(false);
         const form = reactive({
             name: '',
+            display_name: '',
             description: '',
             master_image_id: '',
         });
 
         const $v = useVuelidate({
             name: {
-                required,
-                minLength: minLength(5),
-                maxLength: maxLength(100),
+                slug: helpers.withMessage(
+                    'Only letters, numbers and the characters -_. are allowed (no whitespace).',
+                    (value: string) => !value || isNameValid(value.trim().toLowerCase()),
+                ),
+                minLength: minLength(3),
+                maxLength: maxLength(128),
+            },
+            display_name: {
+                minLength: minLength(3),
+                maxLength: maxLength(256),
             },
             description: {
                 minLength: minLength(5),
@@ -89,6 +104,14 @@ const FProjectForm = defineComponent({
 
         initFromProperties();
 
+        // Pre-fill an editable, generated name suggestion when creating a new
+        // project. Runs client-side only to avoid SSR hydration mismatches.
+        onMounted(() => {
+            if (!props.entity && !form.name) {
+                form.name = generateName();
+            }
+        });
+
         const updatedAt = useUpdatedAt(props.entity);
 
         watch(updatedAt, (val, oldVal) => {
@@ -109,6 +132,12 @@ const FProjectForm = defineComponent({
 
         const submit = wrapFnWithBusyState(busy, async () => {
             if ($v.value.$invalid) return;
+
+            // Normalize the slug like the backend (trim + lowercase) so the
+            // validated value is what gets submitted and stored.
+            if (form.name) {
+                form.name = form.name.trim().toLowerCase();
+            }
 
             const existed = !!manager.data.value;
             await manager.createOrUpdate(form);
@@ -136,6 +165,19 @@ const FProjectForm = defineComponent({
         const translationsSubmit = createFormSubmitTranslations();
 
         return () => {
+            const displayName = buildFormGroup({
+                validationMessages: translationsValidation.display_name.value,
+                validationSeverity: getSeverity($v.value.display_name),
+                label: true,
+                labelContent: 'Display Name',
+                content: buildFormInput({
+                    value: form.display_name,
+                    onChange(input) {
+                        form.display_name = input;
+                    },
+                }),
+            });
+
             const name = buildFormGroup({
                 validationMessages: translationsValidation.name.value,
                 validationSeverity: getSeverity($v.value.name),
@@ -222,6 +264,8 @@ const FProjectForm = defineComponent({
                         'div',
                         { class: 'col' },
                         [
+                            displayName,
+                            h('hr'),
                             name,
                             h('hr'),
                             description,

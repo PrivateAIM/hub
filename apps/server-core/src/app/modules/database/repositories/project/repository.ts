@@ -31,6 +31,7 @@ import type {
 const DEFAULT_FIELDS: ParseAllowedOption<ProjectEntity> = [
     'id',
     'name',
+    'display_name',
     'description',
     'nodes',
     'analyses',
@@ -86,7 +87,7 @@ export class ProjectRepositoryAdapter implements IProjectRepository {
         });
 
         applyFilters(qb, filter, {
-            allowed: ['id', 'name', 'realm_id', 'user_id'],
+            allowed: ['id', 'name', 'display_name', 'realm_id', 'user_id'],
             defaultAlias: 'project',
         });
 

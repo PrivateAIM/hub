@@ -8,6 +8,6 @@
 import type { Analysis } from '@privateaim/core-kit';
 
 export type AnalysisCreatePayload =    & Pick<Analysis, 'project_id'> &
-    Partial<Pick<Analysis, 'name' | 'description' | 'master_image_id' | 'registry_id' | 'image_command_arguments'>>;
+    Partial<Pick<Analysis, 'name' | 'display_name' | 'description' | 'master_image_id' | 'registry_id' | 'image_command_arguments'>>;
 
 export type AnalysisUpdatePayload = Partial<AnalysisCreatePayload>;

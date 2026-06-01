@@ -84,6 +84,7 @@ export class AnalysisBucketRepositoryAdapter implements IAnalysisBucketRepositor
                 'type',
                 'analysis.id',
                 'analysis.name',
+                'analysis.display_name',
             ],
             defaultAlias: 'analysisBucket',
         });

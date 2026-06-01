@@ -233,7 +233,10 @@ export default defineComponent({
                                 props.target === DomainType.PROJECT &&
                                 slotProps.data.project
                             ) {
-                                text = h('div', [slotProps.data.project.name]);
+                                text = h('div', [
+                                    slotProps.data.project.display_name ||
+                                    slotProps.data.project.name,
+                                ]);
                             } else {
                                 text = h('div', [slotProps.data.id]);
                             }

@@ -119,6 +119,7 @@ export default defineComponent({
                 ) {
                     if (props.target === Target.PROJECT) {
                         return h('div', [
+                            manager.data.value?.project.display_name ||
                             manager.data.value?.project.name,
                         ]);
                     }

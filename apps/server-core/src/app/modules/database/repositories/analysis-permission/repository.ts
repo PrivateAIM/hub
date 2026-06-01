@@ -42,6 +42,7 @@ export class AnalysisPermissionRepositoryAdapter implements IAnalysisPermissionR
                     'analysis_realm_id',
                     'analysis.id',
                     'analysis.name',
+                    'analysis.display_name',
                 ],
             },
             pagination: { maxLimit: 50 },

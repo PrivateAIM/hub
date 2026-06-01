@@ -14,8 +14,8 @@ import { VCTimeago } from '@vuecs/timeago';
 import type { PropType, SlotsType } from 'vue';
 import { defineComponent, ref } from 'vue';
 import type { EntityListSlotName } from '../../core';
+import FDisplayName from '../FDisplayName';
 import FEntityDelete from '../FEntityDelete';
-import FAnalysisName from './FAnalysisName';
 import FAnalysisStatus from './status/FAnalysisStatus.vue';
 import FAnalysisProgressBar from './FAnalysisProgressBar.vue';
 
@@ -23,7 +23,7 @@ export default defineComponent({
     components: {
         FAnalysisProgressBar,
         FAnalysisPipeline: FAnalysisStatus,
-        FAnalysisName,
+        FDisplayName,
         FEntityDelete,
         VCLink,
         VCTimeago,
@@ -87,25 +87,18 @@ export default defineComponent({
     >
         <div class="d-flex flex-row align-items-center">
             <div class="me-1">
-                <FAnalysisName
+                <FDisplayName
                     class="analysis-item-card-title"
-                    :entity-id="entity.id"
-                    :entity-name="entity.name"
-                    :editable="true"
-                    @updated="handleUpdated"
+                    :name="entity.name"
+                    :display-name="entity.display_name"
                 >
                     <template #default="props">
                         <i class="fas fa-microscope me-1" />
-                        <VCLink :to="'/analyses/' + props.entityId">
-                            {{ props.nameDisplay }}
+                        <VCLink :to="'/analyses/' + entity.id">
+                            {{ props.display }}
                         </VCLink>
-                        <template v-if="props.entityName">
-                            <span class="text-muted ms-1">
-                                {{ props.entityId }}
-                            </span>
-                        </template>
                     </template>
-                </FAnalysisName>
+                </FDisplayName>
             </div>
             <div class="ms-auto">
                 <slot

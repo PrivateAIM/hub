@@ -74,6 +74,39 @@ describe('ProjectService', () => {
         });
     });
 
+    describe('create', () => {
+        it('should auto-generate a url-friendly name when none is provided', async () => {
+            const result = await service.create({}, createAllowAllActor());
+
+            expect(result.name).toBeTruthy();
+            expect(result.name.length).toBeGreaterThanOrEqual(3);
+            expect(result.name).toMatch(/^[a-z0-9-_.]+$/);
+        });
+
+        it('should generate a name when an empty name is provided', async () => {
+            const result = await service.create({ name: '' }, createAllowAllActor());
+
+            expect(result.name).toBeTruthy();
+            expect(result.name).toMatch(/^[a-z0-9-_.]+$/);
+        });
+
+        it('should keep a provided name and display_name', async () => {
+            const result = await service.create(
+                { name: 'my-project', display_name: 'My Project' },
+                createAllowAllActor(),
+            );
+
+            expect(result.name).toBe('my-project');
+            expect(result.display_name).toBe('My Project');
+        });
+
+        it('should reject a name that is not url-friendly', async () => {
+            await expect(
+                service.create({ name: 'Not A Slug!' }, createAllowAllActor()),
+            ).rejects.toThrow(/name is invalid/i);
+        });
+    });
+
     describe('delete', () => {
         it('should delete project with no analyses', async () => {
             const project = createTestProject();

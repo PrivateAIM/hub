@@ -25,6 +25,7 @@ export * from './project-node';
 export * from './registry';
 export * from './registry-project';
 export * from './node';
+export { default as FDisplayName } from './FDisplayName';
 export { default as FEntityDelete } from './FEntityDelete';
 export { default as FProcessStatus } from './FProcessStatus.vue';
 export * from './constants';

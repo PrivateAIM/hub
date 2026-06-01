@@ -8,6 +8,7 @@
 export * from './boolean';
 export * from './error';
 export * from './file-size';
+export * from './generate-name';
 export * from './has-own-property';
 export * from './hex-checker';
 export * from './hostname';
@@ -18,4 +19,5 @@ export * from './object-properties';
 export * from './proxy-connection-string';
 export * from './regex-patterns';
 export * from './process-status';
+export * from './slugify';
 export * from './wait';

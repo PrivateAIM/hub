@@ -120,6 +120,7 @@ export default defineComponent({
                 ) {
                     if (props.target === Target.ANALYSIS) {
                         return h('div', [
+                            manager.data.value?.analysis.display_name ||
                             manager.data.value?.analysis.name,
                         ]);
                     }

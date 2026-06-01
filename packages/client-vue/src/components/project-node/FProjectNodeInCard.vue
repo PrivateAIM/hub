@@ -10,6 +10,7 @@ import { BModal } from 'bootstrap-vue-next';
 import type { ProjectNode } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
 import { defineComponent, ref } from 'vue';
+import FDisplayName from '../FDisplayName';
 import { FProjectInForm } from '../project/FProjectInForm';
 import { FProjectNodeApprovalCommand } from './FProjectNodeApprovalCommand';
 import { FProjectNodeApprovalStatus } from './FProjectNodeApprovalStatus';
@@ -17,6 +18,7 @@ import { FProjectNodeApprovalStatus } from './FProjectNodeApprovalStatus';
 export default defineComponent({
     components: {
         BModal,
+        FDisplayName,
         FProjectInForm,
         FProjectNodeApprovalCommand,
         FProjectNodeApprovalStatus,
@@ -76,7 +78,10 @@ export default defineComponent({
                             :to="'/projects/' + entity.project.id"
                             class="mb-0"
                         >
-                            {{ entity.project.name }}
+                            <FDisplayName
+                                :name="entity.project.name"
+                                :display-name="entity.project.display_name"
+                            />
                         </VCLink>
                     </slot>
                 </div>
@@ -215,7 +220,11 @@ export default defineComponent({
             :hide-footer="true"
         >
             <template #title>
-                <i class="fas fa-file-import" /> Project {{ entity.project.name }}
+                <i class="fas fa-file-import" /> Project
+                <FDisplayName
+                    :name="entity.project.name"
+                    :display-name="entity.project.display_name"
+                />
             </template>
             <template v-if="entity">
                 <FProjectInForm

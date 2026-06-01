@@ -6,16 +6,24 @@
   -->
 <script lang="ts">
 import { IVuelidate } from '@ilingo/vuelidate';
+import { isNameValid } from '@authup/core-kit';
 import type { Analysis, Project } from '@privateaim/core-kit';
 import { DomainType } from '@privateaim/core-kit';
-import { maxLength, minLength, required } from '@vuelidate/validators';
+import { generateName } from '@privateaim/kit';
+import {
+    helpers, 
+    maxLength, 
+    minLength, 
+    required,
+} from '@vuelidate/validators';
 import type { BuildInput } from 'rapiq';
 import useVuelidate from '@vuelidate/core';
 import type { PropType } from 'vue';
 import {
-    computed, 
-    defineComponent, 
-    reactive, 
+    computed,
+    defineComponent,
+    onMounted,
+    reactive,
     ref,
 } from 'vue';
 import { VCFormInput } from '@vuecs/form-controls';
@@ -45,14 +53,23 @@ export default defineComponent({
         const form = reactive({
             project_id: '',
             name: '',
+            display_name: '',
             description: '',
         });
 
         const $v = useVuelidate({
             project_id: { required },
             name: {
+                slug: helpers.withMessage(
+                    'Only letters, numbers and the characters -_. are allowed (no whitespace).',
+                    (value: string) => !value || isNameValid(value.trim().toLowerCase()),
+                ),
                 minLength: minLength(3),
                 maxLength: maxLength(128),
+            },
+            display_name: {
+                minLength: minLength(3),
+                maxLength: maxLength(256),
             },
             description: {
                 minLength: minLength(5),
@@ -66,6 +83,14 @@ export default defineComponent({
             form.project_id = props.projectId as string;
         }
 
+        // Pre-fill an editable, generated name suggestion when creating a new
+        // analysis. Runs client-side only to avoid SSR hydration mismatches.
+        onMounted(() => {
+            if (!props.entity && !form.name) {
+                form.name = generateName();
+            }
+        });
+
         const manager = createEntityManager({
             type: `${DomainType.ANALYSIS}`,
             setup,
@@ -73,6 +98,13 @@ export default defineComponent({
         });
 
         const add = wrapFnWithBusyState(busy, async () => {
+            // Normalize the slug exactly like the backend (trim + lowercase) so
+            // the value that was validated is the value that gets submitted and
+            // stored.
+            if (form.name) {
+                form.name = form.name.trim().toLowerCase();
+            }
+
             await manager.createOrUpdate(form);
         });
 
@@ -99,6 +131,26 @@ export default defineComponent({
     <form @submit.prevent="add">
         <div class="row">
             <div class="col">
+                <IVuelidate :validation="v$.display_name">
+                    <template #default="props">
+                        <VCFormGroup
+                            :validation-messages="props.data"
+                            :validation-severity="props.severity"
+                        >
+                            <template #label>
+                                Display Name
+                            </template>
+                            <template #default>
+                                <VCFormInput
+                                    v-model="v$.display_name.$model"
+                                />
+                            </template>
+                        </VCFormGroup>
+                    </template>
+                </IVuelidate>
+
+                <hr>
+
                 <IVuelidate :validation="v$.name">
                     <template #default="props">
                         <VCFormGroup
@@ -112,6 +164,10 @@ export default defineComponent({
                                 <VCFormInput
                                     v-model="v$.name.$model"
                                 />
+                                <small class="text-muted">
+                                    URL-friendly identifier (letters, numbers, - _ .).
+                                    A suggestion is filled in automatically — edit it if you like.
+                                </small>
                             </template>
                         </VCFormGroup>
                     </template>

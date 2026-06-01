@@ -12,7 +12,7 @@ import type { BuildInput } from 'rapiq';
 import type { PropType } from 'vue';
 import { computed, defineComponent } from 'vue';
 import { FAnalysisBucket, FAnalysisBucketDownload } from '../analysis-bucket';
-import FAnalysisName from '../analysis/FAnalysisName';
+import FDisplayName from '../FDisplayName';
 import { FAnalysisNodeApprovalCommand } from './FAnalsisNodeApprovalCommand';
 import { FAnalysisNodeApprovalStatus } from './FAnalysisNodeApprovalStatus';
 
@@ -20,7 +20,7 @@ export default defineComponent({
     components: {
         FAnalysisBucket,
         FAnalysisBucketDownload,
-        FAnalysisName,
+        FDisplayName,
         FAnalysisNodeApprovalCommand,
         FAnalysisNodeApprovalStatus,
         VCLink,
@@ -77,9 +77,9 @@ export default defineComponent({
                     >
                         <i class="fas fa-microscope me-1" />
 
-                        <FAnalysisName
-                            :entity-id="entity.analysis.id"
-                            :entity-name="entity.analysis.name"
+                        <FDisplayName
+                            :name="entity.analysis.name"
+                            :display-name="entity.analysis.display_name"
                         />
                     </slot>
                 </div>
