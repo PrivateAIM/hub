@@ -24,7 +24,7 @@
         "@authup/client-web-kit": "^1.0.0-beta.39",
         "@authup/client-web-nuxt": "^1.0.0-beta.39",
         "@authup/core-http-kit": "^1.0.0-beta.39",
-        "@authup/core-kit": "^1.0.0-beta.39",
+        "@authup/core-kit": "^1.0.0-beta.42",
         "@ilingo/vuelidate": "^6.0.0",
         "@fortawesome/fontawesome-free": "^7.2.0",
         "@nuxtjs/google-fonts": "^3.2.0",

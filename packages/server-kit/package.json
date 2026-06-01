@@ -39,7 +39,7 @@
     "devDependencies": {
         "@authup/access": "^1.0.0-beta.39",
         "@authup/core-http-kit": "^1.0.0-beta.39",
-        "@authup/core-kit": "^1.0.0-beta.39",
+        "@authup/core-kit": "^1.0.0-beta.42",
         "rapiq": "^0.9.0",
         "amqp-extension": "^4.0.0",
         "redis-extension": "^2.0.4",
@@ -49,7 +49,7 @@
     "peerDependencies": {
         "@authup/access": "^1.0.0-beta.39",
         "@authup/core-http-kit": "^1.0.0-beta.39",
-        "@authup/core-kit": "^1.0.0-beta.39",
+        "@authup/core-kit": "^1.0.0-beta.42",
         "rapiq": "^0.9.0",
         "amqp-extension": "^4.0.0",
         "redis-extension": "^2.0.4",

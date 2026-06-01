@@ -20,13 +20,13 @@
     },
     "devDependencies": {
         "@authup/access": "^1.0.0-beta.39",
-        "@authup/core-kit": "^1.0.0-beta.39",
+        "@authup/core-kit": "^1.0.0-beta.42",
         "@privateaim/errors": "^0.8.42",
         "@privateaim/server-kit": "^0.10.0"
     },
     "peerDependencies": {
         "@authup/access": "^1.0.0-beta.39",
-        "@authup/core-kit": "^1.0.0-beta.39",
+        "@authup/core-kit": "^1.0.0-beta.42",
         "@privateaim/errors": "^0.8.42",
         "@privateaim/server-kit": "^0.10.0"
     },
