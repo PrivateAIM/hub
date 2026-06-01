@@ -31,7 +31,10 @@ export class AddDisplayName1780300000000 implements MigrationInterface {
         `);
 
         for (const row of analysisRows) {
-            let next = row.name ? slugify(row.name) : '';
+            // Cap to the name column length (varchar(128)). slugify never grows
+            // the string, so this is defensive, but it keeps the write safe even
+            // for unexpectedly long pre-existing values.
+            let next = row.name ? slugify(row.name).slice(0, 128) : '';
             if (next.length < 3) {
                 next = generateName();
             }
