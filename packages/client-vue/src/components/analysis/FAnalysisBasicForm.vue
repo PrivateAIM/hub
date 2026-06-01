@@ -25,11 +25,14 @@ import {
     onMounted,
     reactive,
     ref,
+    watch,
 } from 'vue';
 import { VCFormInput } from '@vuecs/form-controls';
+import { useUpdatedAt } from '../../composables';
 import {
-    createEntityManager, 
-    defineEntityManagerEvents, 
+    createEntityManager,
+    defineEntityManagerEvents,
+    initFormAttributesFromSource,
     wrapFnWithBusyState,
 } from '../../core';
 import { FProjects } from '../project';
@@ -79,9 +82,25 @@ export default defineComponent({
 
         const proposalQuery = computed<BuildInput<Project>>(() => ({ filters: { ...(props.realmId ? { realm_id: props.realmId } : {}) } }));
 
+        const manager = createEntityManager({
+            type: `${DomainType.ANALYSIS}`,
+            setup,
+            props,
+        });
+
+        const isEditing = computed(() => !!manager.data.value);
+
         if (props.projectId) {
             form.project_id = props.projectId as string;
         }
+
+        const initFromProperties = () => {
+            if (!manager.data.value) return;
+
+            initFormAttributesFromSource(form, manager.data.value);
+        };
+
+        initFromProperties();
 
         // Pre-fill an editable, generated name suggestion when creating a new
         // analysis. Runs client-side only to avoid SSR hydration mismatches.
@@ -91,10 +110,14 @@ export default defineComponent({
             }
         });
 
-        const manager = createEntityManager({
-            type: `${DomainType.ANALYSIS}`,
-            setup,
-            props,
+        const updatedAt = useUpdatedAt(props.entity);
+
+        watch(updatedAt, (val, oldVal) => {
+            if (val && val !== oldVal) {
+                manager.data.value = props.entity;
+
+                initFromProperties();
+            }
         });
 
         const add = wrapFnWithBusyState(busy, async () => {
@@ -123,6 +146,7 @@ export default defineComponent({
             toggle,
             proposalQuery,
             busy,
+            isEditing,
         };
     },
 });
@@ -201,12 +225,17 @@ export default defineComponent({
                         :disabled="v$.$invalid || busy"
                         @click.prevent="add"
                     >
-                        <i class="fa fa-plus" /> create
+                        <template v-if="isEditing">
+                            <i class="fa fa-save" /> update
+                        </template>
+                        <template v-else>
+                            <i class="fa fa-plus" /> create
+                        </template>
                     </button>
                 </div>
             </div>
             <div
-                v-if="!projectId"
+                v-if="!projectId && !isEditing"
                 class="col"
             >
                 <FProjects :query="proposalQuery">
