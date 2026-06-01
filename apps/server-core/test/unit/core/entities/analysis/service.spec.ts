@@ -217,6 +217,27 @@ describe('AnalysisService', () => {
             expect(result.name).toMatch(/^[a-z0-9-_.]+$/);
         });
 
+        it('should generate a name when an empty name is provided', async () => {
+            const project = createTestProject();
+            projectRepository.seed(project);
+
+            const origValidate = analysisRepository.validateJoinColumns.bind(analysisRepository);
+            analysisRepository.validateJoinColumns = async (data: Partial<Analysis>) => {
+                await origValidate(data);
+                data.project = project;
+            };
+
+            // An empty name must not be rejected before the generator runs.
+            const result = await service.create(
+                { project_id: project.id, name: '' },
+                createAllowAllActor(),
+            );
+
+            expect(result.name).toBeTruthy();
+            expect(result.name.length).toBeGreaterThanOrEqual(3);
+            expect(result.name).toMatch(/^[a-z0-9-_.]+$/);
+        });
+
         it('should keep a provided name and display_name', async () => {
             const project = createTestProject();
             projectRepository.seed(project);

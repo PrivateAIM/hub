@@ -82,7 +82,16 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
     }
 
     async create(data: Partial<Analysis>, actor: ActorContext): Promise<Analysis> {
-        const validated = await this.validator.run(data, { group: ValidatorGroup.CREATE });
+        // The name is a URL-friendly identifier and required at the database
+        // level. Generate one up-front when the caller did not provide a
+        // (non-empty) name, so it passes validation instead of being rejected
+        // as null/empty before generation could happen.
+        const input: Partial<Analysis> = { ...data };
+        if (!input.name) {
+            input.name = generateAnalysisName();
+        }
+
+        const validated = await this.validator.run(input, { group: ValidatorGroup.CREATE });
 
         await actor.permissionChecker.preCheck({ name: PermissionName.ANALYSIS_CREATE });
 
@@ -101,12 +110,6 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
         const entity = this.repository.create({ ...validated });
 
         entity.user_id = actor.identity.id;
-
-        // The name acts as a URL-friendly identifier and is required at the
-        // database level. Generate one when the caller did not provide it.
-        if (!entity.name) {
-            entity.name = generateAnalysisName();
-        }
 
         await actor.permissionChecker.check({
             name: PermissionName.ANALYSIS_CREATE,

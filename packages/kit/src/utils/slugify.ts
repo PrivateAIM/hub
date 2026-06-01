@@ -8,13 +8,18 @@
 /**
  * Normalize an arbitrary string into a URL-friendly slug.
  *
- * Lowercases the input, replaces every run of non `[a-z0-9]` characters with a
- * single hyphen and trims leading/trailing hyphens. The result only contains
- * `[a-z0-9-]` and never starts/ends with a hyphen.
+ * Lowercases the input and splits on every run of non `[a-z0-9]` characters,
+ * dropping empty segments (which also strips leading/trailing separators), then
+ * joins the segments with a single hyphen. The result only contains `[a-z0-9-]`
+ * and never starts/ends with a hyphen.
+ *
+ * Implemented with split/join rather than an anchored `^-+|-+$` trim to avoid a
+ * (super-)linear backtracking regex on inputs with many separators.
  */
 export function slugify(value: string): string {
     return value
         .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '');
+        .split(/[^a-z0-9]+/)
+        .filter(Boolean)
+        .join('-');
 }

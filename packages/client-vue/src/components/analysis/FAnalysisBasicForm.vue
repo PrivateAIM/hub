@@ -97,6 +97,13 @@ export default defineComponent({
         });
 
         const add = wrapFnWithBusyState(busy, async () => {
+            // Normalize the slug exactly like the backend (trim + lowercase) so
+            // the value that was validated is the value that gets submitted and
+            // stored.
+            if (form.name) {
+                form.name = form.name.trim().toLowerCase();
+            }
+
             await manager.createOrUpdate(form);
         });
 
