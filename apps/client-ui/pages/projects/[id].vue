@@ -13,7 +13,7 @@ import type {
 import {
     DomainType,
 } from '@privateaim/core-kit';
-import { createEntityManager, injectCoreHTTPClient } from '@privateaim/client-vue';
+import { FDisplayName, createEntityManager, injectCoreHTTPClient } from '@privateaim/client-vue';
 import { PermissionName } from '@privateaim/kit';
 import type { Ref } from 'vue';
 import {
@@ -34,7 +34,7 @@ import DomainEntityNav from '../../components/DomainEntityNav';
 import { LayoutKey, LayoutNavigationID } from '../../config/layout';
 
 export default defineComponent({
-    components: { DomainEntityNav },
+    components: { DomainEntityNav, FDisplayName },
     async setup() {
         definePageMeta({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
@@ -157,7 +157,11 @@ export default defineComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            <i class="fas fa-project-diagram" /> {{ entity.display_name || entity.name }}
+            <i class="fas fa-project-diagram" />
+            <FDisplayName
+                :name="entity.name"
+                :display-name="entity.display_name"
+            />
         </h1>
 
         <div class="m-b-20 m-t-10">

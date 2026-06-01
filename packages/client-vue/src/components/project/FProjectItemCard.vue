@@ -14,12 +14,14 @@ import { VCTimeago } from '@vuecs/timeago';
 import type { PropType, SlotsType } from 'vue';
 import { defineComponent } from 'vue';
 import type { EntityListSlotName } from '../../core';
+import FDisplayName from '../FDisplayName';
 import FEntityDelete from '../FEntityDelete';
 import FProjectCreator from './FProjectCreator.vue';
 
 export default defineComponent({
     components: {
         FProjectCreator,
+        FDisplayName,
         FEntityDelete,
         VCLink,
         VCTimeago,
@@ -77,7 +79,10 @@ export default defineComponent({
                             :to="'/projects/' + entity.id"
                             class="mb-0"
                         >
-                            {{ entity.display_name || entity.name }}
+                            <FDisplayName
+                                :name="entity.name"
+                                :display-name="entity.display_name"
+                            />
                         </VCLink>
                     </slot>
                 </div>

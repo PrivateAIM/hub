@@ -8,7 +8,7 @@
 import {
     DomainType,
 } from '@privateaim/core-kit';
-import { FAnalysisName, createEntityManager } from '@privateaim/client-vue';
+import { FDisplayName, createEntityManager } from '@privateaim/client-vue';
 import { isClientErrorWithStatusCode } from 'hapic';
 import { defineComponent } from 'vue';
 import { definePageMeta, useToast } from '#imports';
@@ -25,7 +25,7 @@ export default defineComponent({
     components: {
         DomainEntityNav,
         DomainEntityNavItem,
-        FAnalysisName,
+        FDisplayName,
     },
     async setup() {
         definePageMeta({
@@ -103,10 +103,9 @@ export default defineComponent({
             <i class="fas fa-microscope" /> Analysis
             <span class="sub-title">
                 <template v-if="entity">
-                    <FAnalysisName
-                        :entity-id="entity.id"
-                        :entity-name="entity.name"
-                        :entity-display-name="entity.display_name"
+                    <FDisplayName
+                        :name="entity.name"
+                        :display-name="entity.display_name"
                     />
                 </template>
                 <template v-else>
