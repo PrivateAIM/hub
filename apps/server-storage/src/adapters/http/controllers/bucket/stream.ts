@@ -8,6 +8,8 @@
 import { PassThrough, Readable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import type { Logger } from '@privateaim/server-kit';
+import { DomainType } from '@privateaim/storage-kit';
+import { LogFlag } from '@privateaim/telemetry-kit';
 import type { Pack } from 'tar-stream';
 import tar from 'tar-stream';
 import type { IStorageAdapter } from '../../../../core/storage/types.ts';
@@ -24,7 +26,11 @@ async function packFile(
         throw new Error(`Cannot pack bucket file ${file.id}: size is not recorded.`);
     }
 
-    logger?.debug(`Packing file ${file.path} (${file.id})`);
+    logger?.debug(`Packing file ${file.path}`, {
+        [LogFlag.REF_TYPE]: DomainType.BUCKET_FILE,
+        [LogFlag.REF_ID]: file.id,
+        bucket_id: file.bucket_id,
+    });
 
     const source = await storage.getObject(name, file.hash);
     const entry = pack.entry({

@@ -4,9 +4,11 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
+import { DomainType } from '@privateaim/core-kit';
 import type { ComponentHandlerContext } from '@privateaim/server-kit';
 import type { BucketComponentEventMap, BucketEvent } from '@privateaim/server-storage-kit';
 import type { Bucket } from '@privateaim/storage-kit';
+import { LogFlag } from '@privateaim/telemetry-kit';
 import { AnalysisBucketEntity, AnalysisEntity } from '../../../../../adapters/database/index.ts';
 import { TaskType } from '../../../../../core/domains/index.ts';
 import { BaseAggregatorHandler } from '../../../base.ts';
@@ -29,7 +31,11 @@ export class StorageBucketCreationFinishedHandler extends BaseAggregatorHandler<
             });
 
             if (analysisBucket) {
-                this.logger?.info(`Analysis ${task.data.bucketType} bucket already exists for analysis ${task.data.analysisId}.`);
+                this.logger?.info(`${task.data.bucketType} bucket already exists for analysis`, {
+                    [LogFlag.REF_TYPE]: DomainType.ANALYSIS,
+                    [LogFlag.REF_ID]: task.data.analysisId,
+                    bucket_type: task.data.bucketType,
+                });
                 return;
             }
 
@@ -37,7 +43,11 @@ export class StorageBucketCreationFinishedHandler extends BaseAggregatorHandler<
             const analysis = await analysisRepository.findOneBy({ id: task.data.analysisId });
 
             if (!analysis) {
-                this.logger?.info(`Analysis ${task.data.analysisId} does not exist. Therefore ${task.data.bucketType} bucket can not be created.`);
+                this.logger?.info(`Analysis does not exist; ${task.data.bucketType} bucket cannot be created`, {
+                    [LogFlag.REF_TYPE]: DomainType.ANALYSIS,
+                    [LogFlag.REF_ID]: task.data.analysisId,
+                    bucket_type: task.data.bucketType,
+                });
                 return;
             }
 

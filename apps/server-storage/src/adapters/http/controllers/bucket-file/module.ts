@@ -9,7 +9,9 @@ import { Readable } from 'node:stream';
 import { createGzip } from 'node:zlib';
 import { EntityNotFoundError } from '@privateaim/errors';
 import type { BucketFile } from '@privateaim/storage-kit';
+import { DomainType } from '@privateaim/storage-kit';
 import type { Logger } from '@privateaim/server-kit';
+import { LogFlag } from '@privateaim/telemetry-kit';
 import {
     DContext,
     DController,
@@ -79,11 +81,19 @@ export class BucketFileController {
 
         const bucketName = toBucketName(entity.bucket_id);
 
-        this.logger?.debug(`Streaming file ${entity.hash} (${id}) of ${bucketName}`);
+        this.logger?.debug(`Streaming file ${entity.path}`, {
+            [LogFlag.REF_TYPE]: DomainType.BUCKET_FILE,
+            [LogFlag.REF_ID]: id,
+            bucket_id: entity.bucket_id,
+        });
 
         const nodeStream = await this.storage.getObject(bucketName, entity.hash);
         nodeStream.on('end', () => {
-            this.logger?.debug(`Streamed file ${entity.hash} (${id}) of ${bucketName}`);
+            this.logger?.debug(`Streamed file ${entity.path}`, {
+                [LogFlag.REF_TYPE]: DomainType.BUCKET_FILE,
+                [LogFlag.REF_ID]: id,
+                bucket_id: entity.bucket_id,
+            });
         });
         nodeStream.on('error', (err) => {
             this.logger?.error(err);
