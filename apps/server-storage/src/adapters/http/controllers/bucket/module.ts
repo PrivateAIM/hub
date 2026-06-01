@@ -6,7 +6,9 @@
  */
 
 import type { Bucket, BucketCreatePayload } from '@privateaim/storage-kit';
+import { DomainType } from '@privateaim/storage-kit';
 import type { Logger } from '@privateaim/server-kit';
+import { LogFlag } from '@privateaim/telemetry-kit';
 import type { BucketFileEventCaller } from '@privateaim/server-storage-kit';
 import {
     DBody,
@@ -87,7 +89,10 @@ export class BucketController {
 
         const bucketName = toBucketName(entity.id);
 
-        this.logger?.debug(`Streaming files of ${bucketName}`);
+        this.logger?.debug(`Streaming files of bucket ${entity.name}`, {
+            [LogFlag.REF_TYPE]: DomainType.BUCKET,
+            [LogFlag.REF_ID]: entity.id,
+        });
 
         const stream = packBucketFiles(bucketName, files, this.storage, this.logger);
 

@@ -53,10 +53,12 @@ export function mountMessagingController(socket: Socket, options?: { logger?: Lo
         for (let i = 0; i < data.to.length; i++) {
             const to = data.to[i];
 
-            options?.logger?.info(`Sending message from ${from.id} (${from.type}) to ${to.id} (${to.type})`, {
+            options?.logger?.info(`Sending message from ${from.type} to ${to.type}`, {
                 [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
                 actor_type: from.type,
                 actor_id: from.id,
+                target_type: to.type,
+                target_id: to.id,
             });
 
             socket.in(buildConnectionRoomForIdentity(to))
