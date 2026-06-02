@@ -1,5 +1,34 @@
 # Changelog
 
+## [0.10.1](https://github.com/PrivateAIM/hub/compare/v0.10.0...v0.10.1) (2026-06-02)
+
+
+### Features
+
+* **analysis:** auto-generate url-friendly name and add display_name ([#1656](https://github.com/PrivateAIM/hub/issues/1656)) ([2d56b10](https://github.com/PrivateAIM/hub/commit/2d56b10f56c590a92f4f8f20a170269ea54d6619))
+* log entity references as labels instead of inline UUIDs ([#1655](https://github.com/PrivateAIM/hub/issues/1655)) ([449d38f](https://github.com/PrivateAIM/hub/commit/449d38f73b182d57baf455987f79f27606cda22a))
+
+
+### Bug Fixes
+
+* **deps:** bump the minorandpatch group across 1 directory with 11 updates ([#1653](https://github.com/PrivateAIM/hub/issues/1653)) ([db03012](https://github.com/PrivateAIM/hub/commit/db030128f7d4b766f2202a3afe70ae9bc7f09c5a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.10.0 to ^0.10.1
+    * @privateaim/server-db-kit bumped from ^0.10.0 to ^0.10.1
+    * @privateaim/server-http-kit bumped from ^0.10.0 to ^0.10.1
+    * @privateaim/server-kit bumped from ^0.10.0 to ^0.10.1
+    * @privateaim/server-storage-kit bumped from ^0.10.0 to ^0.10.1
+    * @privateaim/server-telemetry-kit bumped from ^0.10.0 to ^0.10.1
+    * @privateaim/storage-kit bumped from ^0.10.0 to ^0.10.1
+    * @privateaim/telemetry-kit bumped from ^0.10.0 to ^0.10.1
+  * devDependencies
+    * @privateaim/server-test-kit bumped from ^0.10.0 to ^0.10.1
+
 ## [0.10.0](https://github.com/PrivateAIM/hub/compare/v0.9.0...v0.10.0) (2026-05-21)
 
 
