@@ -228,23 +228,28 @@ const FProjectForm = defineComponent({
                             meta: props.meta,
                         }),
                     ],
-                    [EntityListSlotName.ITEM_ACTIONS]: (props: ListItemSlotProps<Node>) => {
-                        if (manager.data.value) {
-                            return h(FProjectNodeAssignAction, {
+                    [EntityListSlotName.ITEM]: (props: ListItemSlotProps<Node>) => {
+                        const action = manager.data.value ?
+                            h(FProjectNodeAssignAction, {
                                 key: props.data.id,
                                 nodeId: props.data.id,
                                 projectId: manager.data.value.id,
                                 realmId: manager.data.value.id,
+                            }) :
+                            renderEntityAssignAction({
+                                item: nodeIds.value.includes(props.data.id) ? props.data.id : undefined,
+                                add: () => toggleNodeIds(props.data.id),
+                                drop: () => toggleNodeIds(props.data.id),
                             });
-                        }
 
-                        const itemIndex = nodeIds.value.indexOf(props.data.id);
-
-                        return renderEntityAssignAction({
-                            item: itemIndex === -1 ? undefined : nodeIds.value[itemIndex],
-                            add: () => toggleNodeIds(props.data.id),
-                            drop: () => toggleNodeIds(props.data.id),
-                        });
+                        return h('div', { class: 'd-flex flex-row w-100' }, [
+                            h('div', [
+                                props.data.name,
+                                ' ',
+                                h('span', { class: 'text-muted' }, `(${props.data.type})`),
+                            ]),
+                            h('div', { class: 'ms-auto' }, [action]),
+                        ]);
                     },
                     [EntityListSlotName.FOOTER]: (props: ListFooterSlotProps<Node>) => h(FPagination, {
                         load: props.load,
