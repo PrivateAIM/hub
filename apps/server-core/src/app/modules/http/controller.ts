@@ -93,11 +93,14 @@ export function createControllers(container: IContainer): Record<string, any>[] 
     const analysisService = new AnalysisService({
         repository: analysisRepository,
         projectRepository,
+        projectNodeRepository,
+        analysisNodeRepository,
         builder: container.resolve(AnalysisInjectionKey.Builder),
         configurator: container.resolve(AnalysisInjectionKey.Configurator),
         distributor: container.resolve(AnalysisInjectionKey.Distributor),
         storageManager: container.resolve(AnalysisInjectionKey.StorageManager),
         recalculator: container.resolve(AnalysisInjectionKey.AnalysisRecalculator),
+        nodeRecalculator: container.resolve(AnalysisInjectionKey.NodeRecalculator),
         skipAnalysisApproval: container.resolve(ConfigInjectionKey).skipAnalysisApproval,
     });
     const analysisBucketService = new AnalysisBucketService({ repository: analysisBucketRepository });

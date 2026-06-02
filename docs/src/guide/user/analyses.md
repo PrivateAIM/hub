@@ -20,6 +20,14 @@ Every analysis has two name fields:
 
 The opaque analysis id (UUID) is no longer surfaced in list views or page headlines — analyses are identified by their `display_name` (falling back to `name`).
 
+### Node Assignment
+
+When an analysis is created, every **approved** node of its parent project is automatically assigned to it (as an `AnalysisNode`). Project nodes that are still pending project approval are skipped — once approved, they can be assigned manually.
+
+Auto-assignment does not bypass the [per-analysis approval](/guide/user/approval) step: each assigned node still carries its own approval decision. Aggregator nodes are approved automatically, while default nodes start pending and must be approved by the node's realm authority before the analysis can be locked.
+
+You can still add or remove nodes afterwards. Re-assigning a node that is already attached to the analysis updates the existing assignment instead of failing, so manual selection and auto-assignment coexist safely.
+
 ## Execution Flow
 
 Once [approved](/guide/user/approval), an analysis goes through:

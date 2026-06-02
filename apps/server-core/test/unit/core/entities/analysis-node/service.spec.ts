@@ -12,7 +12,7 @@ import type {
     Node,
     ProjectNode,
 } from '@privateaim/core-kit';
-import { NodeType } from '@privateaim/core-kit';
+import { AnalysisNodeApprovalStatus, NodeType } from '@privateaim/core-kit';
 import {
     beforeEach,
     describe,
@@ -25,6 +25,7 @@ import {
     createAllowAllActor,
 } from '../../helpers/index.ts';
 import { FakeAnalysisNodeMetadataRecalculator } from './fake-metadata-recalculator.ts';
+import { FakeProjectNodeRepository } from '../project-node/fake-repository.ts';
 import { createTestAnalysisNode } from '../../../../utils/domains/index.ts';
 
 function createFakeAnalysisNodeRepository(projectId: string) {
@@ -70,7 +71,7 @@ describe('AnalysisNodeService', () => {
         const projectId = randomUUID();
 
         repository = createFakeAnalysisNodeRepository(projectId);
-        const projectNodeRepository = new FakeEntityRepository<ProjectNode>();
+        const projectNodeRepository = new FakeProjectNodeRepository();
         const analysisRepository = new FakeEntityRepository<Analysis>();
         recalculator = new FakeAnalysisNodeMetadataRecalculator(analysisRepository);
 
@@ -112,6 +113,38 @@ describe('AnalysisNodeService', () => {
             );
 
             expect(recalculator.getDebouncedCallCount()).toBe(0);
+        });
+
+        it('should be idempotent when the node is already assigned', async () => {
+            const existing = createTestAnalysisNode({
+                id: 'existing-node',
+                analysis_id: analysisId,
+                node_id: nodeId,
+                analysis_realm_id: 'realm-1',
+                node_realm_id: 'realm-1',
+                approval_status: null,
+            });
+            repository.seed(existing);
+
+            // A repeated assignment must not create a duplicate, and must not be able to
+            // escalate the approval decision — that is reserved for update() with the
+            // node-authority permission checks.
+            const result = await service.create(
+                {
+                    analysis_id: analysisId,
+                    node_id: nodeId,
+                    approval_status: AnalysisNodeApprovalStatus.APPROVED,
+                },
+                createAllowAllActor(),
+            );
+
+            expect(result.id).toBe('existing-node');
+            expect(result.approval_status).toBeNull();
+            expect(
+                repository.getAll().filter(
+                    (node) => node.analysis_id === analysisId && node.node_id === nodeId,
+                ),
+            ).toHaveLength(1);
         });
     });
 

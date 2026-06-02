@@ -83,6 +83,23 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
             throw new EntityNotFoundError('The referenced node is not part of the analysis project.');
         }
 
+        // The node may already be assigned to the analysis — e.g. every approved project
+        // node is auto-assigned when the analysis is created. Treat a repeated assignment
+        // as an idempotent no-op instead of a unique-constraint conflict. The existing
+        // relation (and its approval decision) is left untouched: field changes such as
+        // approval_status or execution_status must go through update(), which enforces the
+        // node-authority permission checks. A recalc keeps the analysis metadata consistent.
+        const existing = await this.repository.findOneBy({
+            analysis_id: validated.analysis_id,
+            node_id: validated.node_id,
+        });
+
+        if (existing) {
+            await this.recalculator.recalc(existing.analysis_id);
+
+            return existing;
+        }
+
         const entity = this.repository.create(validated);
 
         if (
