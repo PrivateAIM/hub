@@ -91,6 +91,14 @@ export class ProjectNodeRepositoryAdapter implements IProjectNodeRepository {
         return this.repository.findBy(where);
     }
 
+    async findManyWithNodeByProject(projectId: string): Promise<ProjectNode[]> {
+        return this.repository.find({
+            where: { project_id: projectId },
+            relations: ['node'],
+            cache: false,
+        });
+    }
+
     create(data: Partial<ProjectNode>): ProjectNode {
         return this.repository.create(data) as ProjectNode;
     }

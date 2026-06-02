@@ -8,7 +8,9 @@
 import type { ProjectNode } from '@privateaim/core-kit';
 import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
 
-export interface IProjectNodeRepository extends IEntityRepository<ProjectNode> {}
+export interface IProjectNodeRepository extends IEntityRepository<ProjectNode> {
+    findManyWithNodeByProject(projectId: string): Promise<ProjectNode[]>;
+}
 
 export interface IProjectNodeService {
     getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<ProjectNode>>;

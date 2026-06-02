@@ -6,7 +6,13 @@
  */
 
 import type { Analysis } from '@privateaim/core-kit';
-import { AnalysisCommand, AnalysisValidator } from '@privateaim/core-kit';
+import {
+    AnalysisCommand,
+    AnalysisNodeApprovalStatus,
+    AnalysisValidator,
+    NodeType,
+    ProjectNodeApprovalStatus,
+} from '@privateaim/core-kit';
 import { BuiltInPolicyType, PolicyData } from '@authup/access';
 import {
     PermissionName,
@@ -19,6 +25,8 @@ import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@pr
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
 import type { IProjectRepository } from '../project/types.ts';
+import type { IProjectNodeRepository } from '../project-node/types.ts';
+import type { IAnalysisNodeMetadataRecalculator, IAnalysisNodeRepository } from '../analysis-node/types.ts';
 import type { AnalysisBuilder } from '../../services/analysis-builder/index.ts';
 import type { AnalysisConfigurator } from '../../services/analysis-configurator/index.ts';
 import type { AnalysisDistributor } from '../../services/analysis-distributor/index.ts';
@@ -28,11 +36,14 @@ import type { IAnalysisMetadataRecalculator, IAnalysisRepository, IAnalysisServi
 type AnalysisServiceContext = {
     repository: IAnalysisRepository;
     projectRepository: IProjectRepository;
+    projectNodeRepository: IProjectNodeRepository;
+    analysisNodeRepository: IAnalysisNodeRepository;
     builder: AnalysisBuilder;
     configurator: AnalysisConfigurator;
     distributor: AnalysisDistributor;
     storageManager: AnalysisStorageManager;
     recalculator: IAnalysisMetadataRecalculator;
+    nodeRecalculator: IAnalysisNodeMetadataRecalculator;
     skipAnalysisApproval?: boolean;
 };
 
@@ -40,6 +51,10 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
     protected repository: IAnalysisRepository;
 
     protected projectRepository: IProjectRepository;
+
+    protected projectNodeRepository: IProjectNodeRepository;
+
+    protected analysisNodeRepository: IAnalysisNodeRepository;
 
     protected builder: AnalysisBuilder;
 
@@ -51,6 +66,8 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
 
     protected recalculator: IAnalysisMetadataRecalculator;
 
+    protected nodeRecalculator: IAnalysisNodeMetadataRecalculator;
+
     protected skipAnalysisApproval: boolean;
 
     protected validator: AnalysisValidator;
@@ -59,11 +76,14 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
         super();
         this.repository = ctx.repository;
         this.projectRepository = ctx.projectRepository;
+        this.projectNodeRepository = ctx.projectNodeRepository;
+        this.analysisNodeRepository = ctx.analysisNodeRepository;
         this.builder = ctx.builder;
         this.configurator = ctx.configurator;
         this.distributor = ctx.distributor;
         this.storageManager = ctx.storageManager;
         this.recalculator = ctx.recalculator;
+        this.nodeRecalculator = ctx.nodeRecalculator;
         this.skipAnalysisApproval = ctx.skipAnalysisApproval ?? false;
         this.validator = new AnalysisValidator();
     }
@@ -119,6 +139,8 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
 
         await this.repository.save(entity, { data: actor.metadata });
 
+        await this.assignProjectNodes(entity, actor);
+
         await this.recalculator.recalcDebounced(entity.id);
 
         await this.storageManager.check(entity);
@@ -127,6 +149,46 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
         await this.projectRepository.save(entity.project, { data: actor.metadata });
 
         return entity;
+    }
+
+    /**
+     * Assign the approved nodes of the analysis' project to the freshly created analysis.
+     *
+     * Only project nodes whose project membership is approved are assigned — nodes still
+     * pending project approval are skipped. The resulting analysis-node still carries its
+     * own per-analysis approval decision, mirroring {@see AnalysisNodeService.create}:
+     * aggregator nodes (and all nodes when approval is skipped) are auto-approved,
+     * otherwise the node starts pending. The node-derived analysis metadata is
+     * recalculated once at the end instead of per node.
+     */
+    protected async assignProjectNodes(analysis: Analysis, actor: ActorContext): Promise<void> {
+        const projectNodes = await this.projectNodeRepository.findManyWithNodeByProject(analysis.project_id);
+        const approvedProjectNodes = projectNodes.filter(
+            (projectNode) => projectNode.approval_status === ProjectNodeApprovalStatus.APPROVED,
+        );
+        if (approvedProjectNodes.length === 0) {
+            return;
+        }
+
+        for (const projectNode of approvedProjectNodes) {
+            const entity = this.analysisNodeRepository.create({
+                analysis_id: analysis.id,
+                analysis_realm_id: analysis.realm_id,
+                node_id: projectNode.node_id,
+                node_realm_id: projectNode.node_realm_id,
+            });
+
+            if (
+                this.skipAnalysisApproval ||
+                projectNode.node.type === NodeType.AGGREGATOR
+            ) {
+                entity.approval_status = AnalysisNodeApprovalStatus.APPROVED;
+            }
+
+            await this.analysisNodeRepository.save(entity, { data: actor.metadata });
+        }
+
+        await this.nodeRecalculator.recalc(analysis.id);
     }
 
     async update(id: string, data: Partial<Analysis>, actor: ActorContext): Promise<Analysis> {

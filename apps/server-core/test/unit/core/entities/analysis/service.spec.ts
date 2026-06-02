@@ -10,11 +10,17 @@ import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@pr
 import type {
     Analysis,
     AnalysisBucket,
-    AnalysisNode,
+    Node,
     Project,
+    ProjectNode,
     Registry,
 } from '@privateaim/core-kit';
-import { AnalysisCommand } from '@privateaim/core-kit';
+import {
+    AnalysisCommand,
+    AnalysisNodeApprovalStatus,
+    NodeType,
+    ProjectNodeApprovalStatus,
+} from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
 import {
     beforeEach,
@@ -37,8 +43,10 @@ import {
 import { FakeAnalysisRepository } from './fake-repository.ts';
 import { FakeAnalysisMetadataRecalculator } from './fake-metadata-recalculator.ts';
 import { FakeAnalysisNodeMetadataRecalculator } from '../analysis-node/fake-metadata-recalculator.ts';
+import { FakeAnalysisNodeRepository } from '../analysis-node/fake-repository.ts';
 import { FakeAnalysisFileMetadataRecalculator } from '../analysis-bucket-file/fake-metadata-recalculator.ts';
 import { FakeProjectRepository } from '../project/fake-repository.ts';
+import { FakeProjectNodeRepository } from '../project-node/fake-repository.ts';
 import { FakeAnalysisBuilderCaller } from '../../services/helpers/fake-builder-caller.ts';
 import { FakeAnalysisDistributorCaller } from '../../services/helpers/fake-distributor-caller.ts';
 import { FakeBucketCaller } from '../../services/helpers/fake-bucket-caller.ts';
@@ -66,6 +74,8 @@ function createTestProject(overrides?: Partial<Project>): Project {
 describe('AnalysisService', () => {
     let analysisRepository: FakeAnalysisRepository;
     let projectRepository: FakeProjectRepository;
+    let projectNodeRepository: FakeProjectNodeRepository;
+    let analysisNodeRepository: FakeAnalysisNodeRepository;
     let service: AnalysisService;
 
     // Sub-service dependencies
@@ -74,21 +84,23 @@ describe('AnalysisService', () => {
     let bucketCaller: FakeBucketCaller;
     let taskManager: FakeTaskManager;
     let analysisRecalculator: FakeAnalysisMetadataRecalculator;
+    let nodeRecalculator: FakeAnalysisNodeMetadataRecalculator;
 
     beforeEach(() => {
         analysisRepository = new FakeAnalysisRepository();
         projectRepository = new FakeProjectRepository();
+        projectNodeRepository = new FakeProjectNodeRepository();
         builderCaller = new FakeAnalysisBuilderCaller();
         distributorCaller = new FakeAnalysisDistributorCaller();
         bucketCaller = new FakeBucketCaller();
         taskManager = new FakeTaskManager();
 
-        const analysisNodeRepository = new FakeEntityRepository<AnalysisNode>();
+        analysisNodeRepository = new FakeAnalysisNodeRepository();
         const registryRepository = new FakeEntityRepository<Registry>();
         const bucketRepository = new FakeEntityRepository<AnalysisBucket>();
 
         analysisRecalculator = new FakeAnalysisMetadataRecalculator(analysisRepository);
-        const nodeRecalculator = new FakeAnalysisNodeMetadataRecalculator(analysisRepository);
+        nodeRecalculator = new FakeAnalysisNodeMetadataRecalculator(analysisRepository);
         const fileRecalculator = new FakeAnalysisFileMetadataRecalculator(analysisRepository);
 
         const builder = new AnalysisBuilder({
@@ -124,11 +136,14 @@ describe('AnalysisService', () => {
         service = new AnalysisService({
             repository: analysisRepository,
             projectRepository,
+            projectNodeRepository,
+            analysisNodeRepository,
             builder,
             configurator,
             distributor,
             storageManager,
             recalculator: analysisRecalculator,
+            nodeRecalculator,
         });
     });
 
@@ -268,6 +283,136 @@ describe('AnalysisService', () => {
                     createAllowAllActor(),
                 ),
             ).rejects.toThrow(/name is invalid/i);
+        });
+
+        it('should assign every approved project node to the created analysis', async () => {
+            const project = createTestProject({ realm_id: 'analysis-realm' });
+            projectRepository.seed(project);
+
+            const aggregatorNodeId = randomUUID();
+            const defaultNodeId = randomUUID();
+            projectNodeRepository.seed([
+                {
+                    id: randomUUID(),
+                    project_id: project.id,
+                    node_id: aggregatorNodeId,
+                    node_realm_id: 'node-realm-1',
+                    approval_status: ProjectNodeApprovalStatus.APPROVED,
+                    node: {
+                        id: aggregatorNodeId, 
+                        type: NodeType.AGGREGATOR, 
+                        realm_id: 'node-realm-1', 
+                    } as Node,
+                } as ProjectNode,
+                {
+                    id: randomUUID(),
+                    project_id: project.id,
+                    node_id: defaultNodeId,
+                    node_realm_id: 'node-realm-2',
+                    approval_status: ProjectNodeApprovalStatus.APPROVED,
+                    node: {
+                        id: defaultNodeId, 
+                        type: NodeType.DEFAULT, 
+                        realm_id: 'node-realm-2', 
+                    } as Node,
+                } as ProjectNode,
+            ]);
+
+            const origValidate = analysisRepository.validateJoinColumns.bind(analysisRepository);
+            analysisRepository.validateJoinColumns = async (data: Partial<Analysis>) => {
+                await origValidate(data);
+                data.project = project;
+            };
+
+            const result = await service.create(
+                { name: 'test-analysis', project_id: project.id },
+                createAllowAllActor(),
+            );
+
+            const analysisNodes = analysisNodeRepository.getAll();
+            expect(analysisNodes).toHaveLength(2);
+            expect(analysisNodes.every((node) => node.analysis_id === result.id)).toBe(true);
+            expect(analysisNodes.every((node) => node.analysis_realm_id === 'analysis-realm')).toBe(true);
+            expect(analysisNodes.map((node) => node.node_id).sort())
+                .toEqual([aggregatorNodeId, defaultNodeId].sort());
+
+            // aggregator nodes are auto-approved, default nodes stay pending (approval not skipped)
+            const aggregatorNode = analysisNodes.find((node) => node.node_id === aggregatorNodeId);
+            const defaultNode = analysisNodes.find((node) => node.node_id === defaultNodeId);
+            expect(aggregatorNode?.approval_status).toBe(AnalysisNodeApprovalStatus.APPROVED);
+            expect(defaultNode?.approval_status).toBeUndefined();
+
+            // node-derived analysis metadata is recalculated exactly once
+            expect(nodeRecalculator.getCallCount()).toBe(1);
+            expect(nodeRecalculator.getCalls()[0]).toBe(result.id);
+        });
+
+        it('should skip project nodes that are not approved', async () => {
+            const project = createTestProject();
+            projectRepository.seed(project);
+
+            const approvedNodeId = randomUUID();
+            const pendingNodeId = randomUUID();
+            projectNodeRepository.seed([
+                {
+                    id: randomUUID(),
+                    project_id: project.id,
+                    node_id: approvedNodeId,
+                    node_realm_id: 'node-realm-1',
+                    approval_status: ProjectNodeApprovalStatus.APPROVED,
+                    node: {
+                        id: approvedNodeId, 
+                        type: NodeType.DEFAULT, 
+                        realm_id: 'node-realm-1', 
+                    } as Node,
+                } as ProjectNode,
+                {
+                    id: randomUUID(),
+                    project_id: project.id,
+                    node_id: pendingNodeId,
+                    node_realm_id: 'node-realm-2',
+                    approval_status: null,
+                    node: {
+                        id: pendingNodeId, 
+                        type: NodeType.DEFAULT, 
+                        realm_id: 'node-realm-2', 
+                    } as Node,
+                } as ProjectNode,
+            ]);
+
+            const origValidate = analysisRepository.validateJoinColumns.bind(analysisRepository);
+            analysisRepository.validateJoinColumns = async (data: Partial<Analysis>) => {
+                await origValidate(data);
+                data.project = project;
+            };
+
+            await service.create(
+                { name: 'test-analysis', project_id: project.id },
+                createAllowAllActor(),
+            );
+
+            const analysisNodes = analysisNodeRepository.getAll();
+            expect(analysisNodes).toHaveLength(1);
+            expect(analysisNodes[0].node_id).toBe(approvedNodeId);
+        });
+
+        it('should not create analysis nodes when the project has no nodes', async () => {
+            const project = createTestProject();
+            projectRepository.seed(project);
+
+            const origValidate = analysisRepository.validateJoinColumns.bind(analysisRepository);
+            analysisRepository.validateJoinColumns = async (data: Partial<Analysis>) => {
+                await origValidate(data);
+                data.project = project;
+            };
+
+            await service.create(
+                { name: 'test-analysis', project_id: project.id },
+                createAllowAllActor(),
+            );
+
+            expect(analysisNodeRepository.getAll()).toHaveLength(0);
+            expect(nodeRecalculator.getCallCount()).toBe(0);
         });
     });
 

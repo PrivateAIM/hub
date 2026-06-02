@@ -20,13 +20,15 @@ import FAnalysisNodeLogs from '../analysis-node-log/FAnalysisNodeLogs.vue';
 import FAnalysisNodePicker from './FAnalysisNodePicker.vue';
 import FAnalysisNodes from './FAnalysisNodes';
 import FAnalysisNodeExecutionStatus from './FAnalysisNodeExecutionStatus.vue';
+import { FAnalysisNodeApprovalStatus } from './FAnalysisNodeApprovalStatus';
 
 export default defineComponent({
     components: {
-        FAnalysisNodePicker, 
-        BModal, 
-        FAnalysisNodeExecutionStatus, 
-        FAnalysisNodes, 
+        FAnalysisNodePicker,
+        BModal,
+        FAnalysisNodeExecutionStatus,
+        FAnalysisNodeApprovalStatus,
+        FAnalysisNodes,
         FAnalysisNodeLogs,
     },
     props: {
@@ -184,6 +186,12 @@ export default defineComponent({
                                                 </button>
                                             </div>
                                         </div>
+                                        <template v-if="!item.execution_status">
+                                            <small class="text-muted">
+                                                approval:
+                                                <FAnalysisNodeApprovalStatus :status="item.approval_status" />
+                                            </small>
+                                        </template>
                                         <template v-if="item.execution_status">
                                             <FAnalysisNodeExecutionStatus
                                                 :status="item.execution_status"
@@ -226,6 +234,8 @@ export default defineComponent({
             v-model="modal"
             :no-footer="true"
             :size="'lg'"
+            :lazy="true"
+            :unmount-lazy="true"
         >
             <template #header="props">
                 <div class="d-flex flex-row w-100">

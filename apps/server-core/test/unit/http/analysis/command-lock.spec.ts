@@ -38,6 +38,11 @@ describe('analysis/command-lock', () => {
         nodeDefault = await client.node.create(createTestNode({ type: NodeType.DEFAULT }));
         nodeAggregator = await client.node.create(createTestNode({ type: NodeType.AGGREGATOR }));
 
+        // Create the analysis before the project nodes so this suite can drive the
+        // node-validation gates one analysis-node at a time. Approved project nodes are
+        // auto-assigned at analysis creation; creating the analysis first keeps that a no-op.
+        analysis = await client.analysis.create({ project_id: project.id });
+
         await client.projectNode.create({
             node_id: nodeDefault.id,
             project_id: project.id,
@@ -47,8 +52,6 @@ describe('analysis/command-lock', () => {
             node_id: nodeAggregator.id,
             project_id: project.id,
         });
-
-        analysis = await client.analysis.create({ project_id: project.id });
     });
 
     afterAll(async () => {
