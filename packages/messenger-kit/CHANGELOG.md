@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.10.1](https://github.com/PrivateAIM/hub/compare/v0.10.0...v0.10.1) (2026-06-02)
+
+
+### Bug Fixes
+
+* **deps:** bump the minorandpatch group across 1 directory with 11 updates ([#1653](https://github.com/PrivateAIM/hub/issues/1653)) ([db03012](https://github.com/PrivateAIM/hub/commit/db030128f7d4b766f2202a3afe70ae9bc7f09c5a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core-kit bumped from ^0.10.0 to ^0.10.1
+  * peerDependencies
+    * @privateaim/core-kit bumped from ^0.10.0 to ^0.10.1
+
 ## [0.7.46](https://github.com/PrivateAIM/hub/compare/v0.7.45...v0.7.46) (2026-05-21)
 
 

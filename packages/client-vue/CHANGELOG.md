@@ -1,5 +1,39 @@
 # Changelog
 
+## [0.10.1](https://github.com/PrivateAIM/hub/compare/v0.10.0...v0.10.1) (2026-06-02)
+
+
+### Features
+
+* **analysis:** auto-generate url-friendly name and add display_name ([#1656](https://github.com/PrivateAIM/hub/issues/1656)) ([2d56b10](https://github.com/PrivateAIM/hub/commit/2d56b10f56c590a92f4f8f20a170269ea54d6619))
+* **client-ui:** add analysis settings tab to edit name and display_name ([#1658](https://github.com/PrivateAIM/hub/issues/1658)) ([58b337a](https://github.com/PrivateAIM/hub/commit/58b337a19ce92da0c089e6aa7ed2a3c988c17d71))
+* **client-vue:** auto-refresh analysis and node logs with countdown ([#1659](https://github.com/PrivateAIM/hub/issues/1659)) ([e195231](https://github.com/PrivateAIM/hub/commit/e195231d43637403e55c9177da5c57d7c8483c4e))
+* **client-vue:** show node type during project node selection ([#1660](https://github.com/PrivateAIM/hub/issues/1660)) ([7a0edeb](https://github.com/PrivateAIM/hub/commit/7a0edebfcd689b136affd85e6ffd0cfbcad5c1dd))
+* **server-core:** auto-assign approved project nodes on analysis creation ([#1661](https://github.com/PrivateAIM/hub/issues/1661)) ([a435889](https://github.com/PrivateAIM/hub/commit/a43588987abf022e16777dd3fac15390bdebb973))
+
+
+### Bug Fixes
+
+* **deps:** bump the minorandpatch group across 1 directory with 11 updates ([#1653](https://github.com/PrivateAIM/hub/issues/1653)) ([db03012](https://github.com/PrivateAIM/hub/commit/db030128f7d4b766f2202a3afe70ae9bc7f09c5a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.10.0 to ^0.10.1
+    * @privateaim/core-kit bumped from ^0.10.0 to ^0.10.1
+    * @privateaim/core-realtime-kit bumped from ^0.10.0 to ^0.10.1
+    * @privateaim/kit bumped from ^0.10.0 to ^0.10.1
+    * @privateaim/storage-kit bumped from ^0.10.0 to ^0.10.1
+    * @privateaim/telemetry-kit bumped from ^0.10.0 to ^0.10.1
+  * peerDependencies
+    * @privateaim/core-http-kit bumped from ^0.10.0 to ^0.10.1
+    * @privateaim/core-kit bumped from ^0.10.0 to ^0.10.1
+    * @privateaim/kit bumped from ^0.10.0 to ^0.10.1
+    * @privateaim/storage-kit bumped from ^0.10.0 to ^0.10.1
+    * @privateaim/telemetry-kit bumped from ^0.10.0 to ^0.10.1
+
 ## [0.8.45](https://github.com/PrivateAIM/hub/compare/v0.8.44...v0.8.45) (2026-05-21)
 
 
