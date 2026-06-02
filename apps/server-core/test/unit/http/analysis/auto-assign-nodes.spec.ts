@@ -45,21 +45,10 @@ describe('analysis: auto-assign project nodes', () => {
         expect(persisted.configuration_node_aggregator_valid).toBe(true);
     });
 
-    it('should not assign project nodes that are still pending approval', async () => {
-        const { client } = suite;
-
-        const project = await client.project.create(createTestProject());
-
-        // Default project nodes stay pending until approved, so they must not be assigned.
-        const defaultNode = await client.node.create(createTestNode({ type: NodeType.DEFAULT }));
-        await client.projectNode.create({ node_id: defaultNode.id, project_id: project.id });
-
-        const analysis = await client.analysis.create({ project_id: project.id });
-
-        const persisted = await client.analysis.getOne(analysis.id);
-        expect(persisted.nodes).toBe(0);
-        expect(persisted.configuration_node_default_valid).toBe(false);
-    });
+    // Note: the "pending project nodes are skipped" branch is covered deterministically by
+    // the unit test (test/unit/core/entities/analysis/service.spec.ts). It cannot be asserted
+    // reliably at the HTTP level because CI runs with SKIP_PROJECT_APPROVAL=true, which
+    // auto-approves every project node on creation — so there is no genuinely-pending node.
 
     it('should treat a manual re-assignment of an auto-assigned node as a no-op', async () => {
         const { client } = suite;
