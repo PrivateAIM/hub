@@ -31,6 +31,12 @@
     },
     "plugins": [
         {
+            "type": "node-workspace",
+            "updatePeerDependencies": true,
+            "merge": false,
+            "updateAllPackages": true
+        },
+        {
             "type": "linked-versions",
             "groupName": "monorepo",
             "components": [
@@ -59,12 +65,6 @@
                 "telemetry-kit",
                 "docs"
             ]
-        },
-        {
-            "type": "node-workspace",
-            "updatePeerDependencies": true,
-            "merge": false,
-            "updateAllPackages": true
         }
     ],
     "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json"
