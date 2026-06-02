@@ -7,3 +7,4 @@
 
 export { default as FLog } from './FLog';
 export { default as FLogs } from './FLogs.vue';
+export { default as FLogsRefresh } from './FLogsRefresh.vue';

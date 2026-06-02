@@ -7,4 +7,5 @@
 
 export * from './is-editing';
 export * from './on-change';
+export * from './scroll';
 export * from './updated-at';
