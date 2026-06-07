@@ -54,7 +54,7 @@ export default defineComponent({
                 class="btn btn-dark btn-xs"
                 @click.prevent="drop"
             >
-                <i class="fa fa fa-trash" />
+                <VCIcon name="fa6-solid:trash" />
             </button>
         </div>
     </div>

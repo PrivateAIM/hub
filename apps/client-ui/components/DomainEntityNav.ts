@@ -6,7 +6,7 @@
  */
 
 import type { PropType, SlotsType, VNodeChild } from 'vue';
-import { defineComponent } from 'vue';
+import { defineComponent, h, resolveComponent } from 'vue';
 import { hasNormalizedSlot, normalizeSlot } from '@privateaim/client-vue';
 import {
     DomainEntityNavItem, 
@@ -34,6 +34,8 @@ export default defineComponent({
         after: undefined
     }>,
     setup(props, { slots }) {
+        const VCIcon = resolveComponent('VCIcon');
+
         const lastIndex = props.path.lastIndexOf('/');
         const basePath = props.path.substring(0, lastIndex);
 
@@ -58,7 +60,7 @@ export default defineComponent({
                         },
                         {
                             default: () => [
-                                h('i', { class: 'fa fa-arrow-left' }),
+                                h(VCIcon, { name: 'fa6-solid:arrow-left' }),
                             ],
                         },
                     ),

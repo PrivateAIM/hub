@@ -21,10 +21,11 @@ import {
 } from '@vuelidate/validators';
 import type { SlotsType, VNodeChild } from 'vue';
 import {
-    defineComponent, 
-    h, 
-    reactive, 
+    defineComponent,
+    h,
+    reactive,
     ref,
+    resolveComponent,
 } from 'vue';
 import type { EntityManagerSlotsType } from '../../core';
 import {
@@ -103,6 +104,7 @@ export default defineComponent({
         }
 
         return () => {
+            const VCIcon = resolveComponent('VCIcon');
             const fallback = () : VNodeChild => h('div', [
                 h('div', { class: 'mb-2 flex flex-col' }, [
                     h('div', { class: 'form-group' }, [
@@ -143,11 +145,9 @@ export default defineComponent({
 
                     h('div', [
                         h('strong', { class: 'pe-1' }, 'Webhook:'),
-                        h('i', {
-                            class: {
-                                'fa fa-check text-success-600': manager.data.value?.webhook_exists,
-                                'fa fa-times text-error-600': !manager.data.value?.webhook_exists,
-                            },
+                        h(VCIcon, {
+                            name: manager.data.value?.webhook_exists ? 'fa6-solid:check' : 'fa6-solid:xmark',
+                            class: manager.data.value?.webhook_exists ? 'text-success-600' : 'text-error-600',
                         }),
                     ]),
                 ]),
@@ -168,7 +168,7 @@ export default defineComponent({
                                     return execute(RegistryAPICommand.PROJECT_LINK);
                                 },
                             }, [
-                                h('i', { class: 'fa-solid fa-plug pe-1' }),
+                                h(VCIcon, { name: 'fa6-solid:plug', class: 'pe-1' }),
                                 'Connect',
                             ]),
                         ]),
@@ -187,7 +187,7 @@ export default defineComponent({
                                     return execute(RegistryAPICommand.PROJECT_UNLINK);
                                 },
                             }, [
-                                h('i', { class: 'fa-solid fa-power-off pe-1' }),
+                                h(VCIcon, { name: 'fa6-solid:power-off', class: 'pe-1' }),
                                 'Disconnect',
                             ]),
                         ]),

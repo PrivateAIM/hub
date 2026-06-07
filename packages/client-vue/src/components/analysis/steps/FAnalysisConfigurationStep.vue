@@ -97,12 +97,12 @@ export default defineComponent({
                 <div class="ms-auto">
                     <template v-if="passed">
                         <span class="text-success-600">
-                            <i class="fa fa-check" />
+                            <VCIcon name="fa6-solid:check" />
                         </span>
                     </template>
                     <template v-else>
                         <span class="text-error-600">
-                            <i class="fa fa-times" />
+                            <VCIcon name="fa6-solid:xmark" />
                         </span>
                     </template>
                 </div>
@@ -111,7 +111,10 @@ export default defineComponent({
         <div class="card-body">
             <div class="flex flex-col h-full">
                 <div class="text-center mb-3">
-                    <i class="fas fa-gear fa-4x" />
+                    <VCIcon
+                        name="fa6-solid:gear"
+                        class="text-4xl"
+                    />
                 </div>
                 <div class="progress bg-white">
                     <div
@@ -153,13 +156,7 @@ export default defineComponent({
                                     'text-error-600': !passed,
                                 }"
                             >
-                                <i
-                                    class="fa"
-                                    :class="{
-                                        'fa-check': passed,
-                                        'fa-times': !passed,
-                                    }"
-                                />
+                                <VCIcon :name="passed ? 'fa6-solid:check' : 'fa6-solid:xmark'" />
                             </span>
                         </template>
                     </FAnalysisConfigurationNodesStep>
@@ -199,13 +196,7 @@ export default defineComponent({
                                             'text-error-600': !passed,
                                         }"
                                     >
-                                        <i
-                                            class="fa"
-                                            :class="{
-                                                'fa-check': passed,
-                                                'fa-times': !passed,
-                                            }"
-                                        />
+                                        <VCIcon :name="passed ? 'fa6-solid:check' : 'fa6-solid:xmark'" />
                                     </span>
                                 </div>
                             </div>
@@ -230,13 +221,7 @@ export default defineComponent({
                                             'text-error-600': !passed,
                                         }"
                                     >
-                                        <i
-                                            class="fa"
-                                            :class="{
-                                                'fa-check': passed,
-                                                'fa-times': !passed,
-                                            }"
-                                        />
+                                        <VCIcon :name="passed ? 'fa6-solid:check' : 'fa6-solid:xmark'" />
                                     </span>
                                 </div>
                             </div>

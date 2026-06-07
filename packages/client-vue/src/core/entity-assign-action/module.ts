@@ -6,7 +6,7 @@
  */
 
 import type { VNodeArrayChildren } from 'vue';
-import { h } from 'vue';
+import { h, resolveComponent } from 'vue';
 
 type Context<T> = {
     add: () => Promise<void> | void,
@@ -17,6 +17,7 @@ type Context<T> = {
 export function renderEntityAssignAction<T>(
     ctx: Context<T>,
 ) {
+    const VCIcon = resolveComponent('VCIcon');
     let children: VNodeArrayChildren = [];
 
     if (!ctx.busy) {
@@ -36,12 +37,7 @@ export function renderEntityAssignAction<T>(
                     return ctx.add.call(null);
                 },
             }, [
-                h('i', {
-                    class: ['fa', {
-                        'fa-plus': !ctx.item,
-                        'fa-minus': ctx.item,
-                    }],
-                }),
+                h(VCIcon, { name: ctx.item ? 'fa6-solid:minus' : 'fa6-solid:plus' }),
             ]),
         ];
     }

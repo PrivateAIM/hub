@@ -64,8 +64,11 @@ export default defineComponent({
                 </div>
                 <div class="ms-auto">
                     <FProcessStatus :value="entity.execution_status">
-                        <template #default=" { iconClass, classSuffix }">
-                            <i :class="iconClass + ' text-'+ classSuffix" />
+                        <template #default=" { iconName, iconClass, classSuffix }">
+                            <VCIcon
+                                :name="iconName"
+                                :class="iconClass + ' text-'+ classSuffix"
+                            />
                         </template>
                     </FProcessStatus>
                 </div>
@@ -73,7 +76,10 @@ export default defineComponent({
         </div>
         <div class="card-body">
             <div class="text-center mb-3">
-                <i class="fas fa-microchip fa-4x" />
+                <VCIcon
+                    name="fa6-solid:microchip"
+                    class="text-4xl"
+                />
             </div>
 
             <div class="progress bg-white">

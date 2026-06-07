@@ -144,7 +144,7 @@ export default defineComponent({
                                         class="btn btn-xs btn-dark"
                                         @click.prevent="copy('publicKey')"
                                     >
-                                        <i class="fa fa-copy" /> Copy
+                                        <VCIcon name="fa6-solid:copy" /> Copy
                                     </button>
                                 </div>
                             </div>
@@ -171,7 +171,7 @@ export default defineComponent({
                                         class="btn btn-xs btn-dark"
                                         @click.prevent="copy('privateKey')"
                                     >
-                                        <i class="fa fa-copy" /> Copy
+                                        <VCIcon name="fa6-solid:copy" /> Copy
                                     </button>
                                 </div>
                             </div>
@@ -187,7 +187,7 @@ export default defineComponent({
 
                     <template v-if="privateKey">
                         <div class="alert alert-sm alert-danger">
-                            <i class="fa fa-warning" />
+                            <VCIcon name="fa6-solid:triangle-exclamation" />
                             Please copy the key to a safe location, as it is not stored remotely.
                         </div>
                     </template>
@@ -201,7 +201,7 @@ export default defineComponent({
                         class="btn btn-primary btn-xs"
                         @click.prevent="save"
                     >
-                        <i class="fa fa-save" /> Save
+                        <VCIcon name="fa6-solid:floppy-disk" /> Save
                     </button>
                 </div>
                 <div>
@@ -211,7 +211,7 @@ export default defineComponent({
                         class="btn btn-dark btn-xs"
                         @click.prevent="generate"
                     >
-                        <i class="fas fa-sync-alt" /> Generate
+                        <VCIcon name="fa6-solid:arrows-rotate" /> Generate
                     </button>
                 </div>
             </div>

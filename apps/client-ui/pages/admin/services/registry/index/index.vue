@@ -121,7 +121,7 @@ export default defineNuxtComponent({
                         :to="'/admin/services/registry/'+row.id"
                         class="btn btn-xs btn-outline-primary"
                     >
-                        <i class="fa fa-bars" />
+                        <VCIcon name="fa6-solid:bars" />
                     </NuxtLink>
                     <EntityDelete
                         v-if="canManage"

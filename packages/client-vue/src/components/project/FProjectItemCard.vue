@@ -74,7 +74,10 @@ export default defineComponent({
                         name="title"
                         :data="entity"
                     >
-                        <i class="fas fa-project-diagram me-1" />
+                        <VCIcon
+                            name="fa6-solid:diagram-project"
+                            class="me-1"
+                        />
                         <VCLink
                             :to="'/projects/' + entity.id"
                             class="mb-0"
@@ -96,7 +99,7 @@ export default defineComponent({
                             :disabled="busy"
                             class="btn btn-xs btn-dark"
                         >
-                            <i class="fa fa-bars" />
+                            <VCIcon name="fa6-solid:bars" />
                         </VCLink>
                         <template v-if="canDelete">
                             <FEntityDelete
@@ -119,7 +122,7 @@ export default defineComponent({
             <div class="flex justify-between flex-row">
                 <div class="flex grow items-center flex-col">
                     <div>
-                        <strong><i class="fa fa-microscope" /> Analyses</strong>
+                        <strong><VCIcon name="fa6-solid:microscope" /> Analyses</strong>
                     </div>
                     <div
                         :class="{'text-success-600': entity.analyses > 0, 'text-fg-muted': entity.analyses === 0}"
@@ -129,7 +132,7 @@ export default defineComponent({
                 </div>
                 <div class="flex grow items-center flex-col">
                     <div>
-                        <strong><i class="fa-solid fa-server" /> Nodes</strong>
+                        <strong><VCIcon name="fa6-solid:server" /> Nodes</strong>
                     </div>
                     <div
                         :class="{'text-success-600': entity.nodes > 0, 'text-fg-muted': entity.nodes === 0}"
@@ -139,7 +142,7 @@ export default defineComponent({
                 </div>
                 <div class="flex grow items-center flex-col">
                     <div>
-                        <strong><i class="fa fa-user" /> Creator</strong>
+                        <strong><VCIcon name="fa6-solid:user" /> Creator</strong>
                     </div>
                     <div>
                         <FProjectCreator :entity="entity" />

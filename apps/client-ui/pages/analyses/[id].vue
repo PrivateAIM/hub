@@ -63,32 +63,32 @@ export default defineComponent({
             const items = [
                 {
                     name: 'Overview',
-                    icon: 'fas fa-bars',
+                    icon: 'fa6-solid:bars',
                     path: '',
                 },
                 {
                     name: 'Nodes',
-                    icon: 'fa fa-city',
+                    icon: 'fa6-solid:city',
                     path: '/nodes',
                 },
                 {
                     name: 'Code',
-                    icon: 'fa fa-code',
+                    icon: 'fa6-solid:code',
                     path: '/code-files',
                 },
                 {
                     name: 'Image',
-                    icon: 'fa fa-compact-disc',
+                    icon: 'fa6-solid:compact-disc',
                     path: '/image',
                 },
                 {
                     name: 'Security',
-                    icon: 'fa fa-lock',
+                    icon: 'fa6-solid:lock',
                     path: '/security',
                 },
                 {
                     name: 'Results',
-                    icon: 'fas fa-chart-bar',
+                    icon: 'fa6-solid:chart-bar',
                     path: '/result-files',
                 },
             ];
@@ -96,7 +96,7 @@ export default defineComponent({
             if (canEdit.value) {
                 items.push({
                     name: 'Settings',
-                    icon: 'fa fa-cog',
+                    icon: 'fa6-solid:gear',
                     path: '/settings',
                 });
             }
@@ -116,7 +116,7 @@ export default defineComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            <i class="fas fa-microscope" /> Analysis
+            <VCIcon name="fa6-solid:microscope" /> Analysis
             <span class="sub-title">
                 <template v-if="entity">
                     <FDisplayName
@@ -139,7 +139,7 @@ export default defineComponent({
                     <template #before>
                         <DomainEntityNavItem
                             :path="'/projects/'+entity.project_id+'/analyses'"
-                            :icon="'fa fa-arrow-left'"
+                            :icon="'fa6-solid:arrow-left'"
                         />
                     </template>
                 </DomainEntityNav>

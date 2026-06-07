@@ -32,12 +32,9 @@ export default defineComponent({
             }"
         >
             <div>
-                <i
-                    class="fa"
-                    :class="{
-                        'fa-check text-success-600': entity.expiring,
-                        'fa-times text-error-600': !entity.expiring
-                    }"
+                <VCIcon
+                    :name="entity.expiring ? 'fa6-solid:check' : 'fa6-solid:xmark'"
+                    :class="entity.expiring ? 'text-success-600' : 'text-error-600'"
                 />
             </div>
             <template v-if="entity.expiring">

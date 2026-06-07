@@ -24,7 +24,7 @@ export default defineNuxtComponent({
             {
                 id: 'master-images',
                 name: 'Master Images',
-                icon: 'fa-solid fa-atom',
+                icon: 'fa6-solid:atom',
                 version: 'v1.0.0-alpha.0',
             },
         ];
@@ -33,7 +33,7 @@ export default defineNuxtComponent({
             {
                 id: ServiceID.REGISTRY,
                 name: 'Image Registry',
-                icon: 'fab fa-docker',
+                icon: 'fa6-brands:docker',
                 version: 'v2.4.0',
             },
         ];
@@ -53,7 +53,7 @@ export default defineNuxtComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            <i class="fa fa-map-signs" /> Services <span class="sub-title">Management</span>
+            <VCIcon name="fa6-solid:signs-post" /> Services <span class="sub-title">Management</span>
         </h1>
 
         <h6>
@@ -74,7 +74,7 @@ export default defineNuxtComponent({
                             <h3>{{ item.name }}</h3>
                         </div>
                         <div class="event-card-body">
-                            <i :class="item.icon" />
+                            <VCIcon :name="item.icon" />
                         </div>
                     </div>
                 </div>
@@ -99,7 +99,7 @@ export default defineNuxtComponent({
                             <h3>{{ item.name }}</h3>
                         </div>
                         <div class="event-card-body">
-                            <i :class="item.icon" />
+                            <VCIcon :name="item.icon" />
                         </div>
                         <div class="event-card-footer">
                             <div class="flex flex-row">
@@ -131,7 +131,7 @@ export default defineNuxtComponent({
     font-weight: 600;
     color: inherit;
 }
-.event-card-body i {
+.event-card-body svg.iconify {
     font-size: 5rem;
 }
 .event-card .foot-print {

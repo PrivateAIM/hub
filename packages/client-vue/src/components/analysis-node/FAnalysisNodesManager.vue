@@ -180,7 +180,7 @@ export default defineComponent({
                                                     class="btn btn-danger btn-xs"
                                                     @click.prevent="drop(item)"
                                                 >
-                                                    <i class="fa fa-trash" />
+                                                    <VCIcon name="fa6-solid:trash" />
                                                 </button>
                                             </div>
                                         </div>
@@ -234,7 +234,7 @@ export default defineComponent({
                     <div class="flex flex-row w-full">
                         <div>
                             <h5 class="mb-0">
-                                <i class="fa fa-city" /> Nodes
+                                <VCIcon name="fa6-solid:city" /> Nodes
                             </h5>
                         </div>
                         <div class="ms-auto">
@@ -243,7 +243,7 @@ export default defineComponent({
                                 class="btn btn-xs btn-secondary"
                                 @click.prevent="modal = false"
                             >
-                                <i class="fa fa-times" />
+                                <VCIcon name="fa6-solid:xmark" />
                             </button>
                         </div>
                     </div>

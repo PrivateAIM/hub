@@ -104,6 +104,22 @@
     }
 
     /*
+     * Pin Iconify icons inside nav-links to a fixed 1rem box. Without
+     * this the SVG sizes against the inherited font-size (which varies
+     * between the navbar's smaller letter-spaced text and elsewhere),
+     * and the width="0.75em" / width="1em" attributes from @iconify/vue
+     * render at different pixel widths depending on context, breaking
+     * cross-axis alignment of sibling nav items. Pre-migration the
+     * anchor `<i>` icons were size-pinned via
+     * `.navbar-gadgets > li > a i { font-size: 16px }` in core/navbar.css;
+     * the SVG path needs the equivalent.
+     */
+    .vc-nav-link svg.iconify {
+        width: 1rem;
+        height: 1rem;
+    }
+
+    /*
      * Tailwind v4 preflight resets `<hr>` margins to 0. Restore vertical
      * rhythm + a muted divider color project-wide.
      */

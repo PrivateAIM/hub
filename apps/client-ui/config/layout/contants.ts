@@ -27,11 +27,11 @@ export enum LayoutNavigationID {
 export const LayoutTopNavigation: NavigationItem<NavigationItemMeta>[] = [
     {
         name: 'Home',
-        icon: 'fa fa-home',
+        icon: 'fa6-solid:house',
     },
     {
         name: 'Admin',
-        icon: 'fas fa-cog',
+        icon: 'fa6-solid:gear',
         activeMatch: '/admin/',
         meta: {
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
@@ -44,14 +44,14 @@ export const LayoutSideDefaultNavigation: NavigationItem<NavigationItemMeta>[] =
         name: 'Info',
         type: 'link',
         url: '/',
-        icon: 'fas fa-info',
+        icon: 'fa6-solid:info',
         meta: { [LayoutKey.REQUIRED_LOGGED_IN]: true },
     },
     {
         name: 'Projects',
         type: 'link',
         url: '/projects',
-        icon: 'fas fa-project-diagram',
+        icon: 'fa6-solid:diagram-project',
         meta: {
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.REQUIRED_PERMISSIONS]: [
@@ -75,7 +75,7 @@ export const LayoutSideDefaultNavigation: NavigationItem<NavigationItemMeta>[] =
         name: 'Analyses',
         type: 'link',
         url: '/analyses',
-        icon: 'fas fa-microscope',
+        icon: 'fa6-solid:microscope',
         meta: {
             requireLoggedIn: true,
             requirePermissions: [
@@ -97,14 +97,14 @@ export const LayoutSideDefaultNavigation: NavigationItem<NavigationItemMeta>[] =
         name: 'Login',
         type: 'link',
         url: '/login',
-        icon: 'fas fa-sign',
+        icon: 'fa6-solid:right-to-bracket',
         meta: { [LayoutKey.REQUIRED_LOGGED_OUT]: true },
     },
     {
         name: 'Settings',
         type: 'link',
         url: '/settings',
-        icon: 'fas fa-cog',
+        icon: 'fa6-solid:gear',
         meta: { [LayoutKey.REQUIRED_LOGGED_IN]: true },
     },
 ];
@@ -112,7 +112,7 @@ export const LayoutSideAdminNavigation: NavigationItem<NavigationItemMeta>[] = [
     {
         name: 'Auth',
         type: 'link',
-        icon: 'fas fa-lock',
+        icon: 'fa6-solid:lock',
         meta: {
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.REQUIRED_PERMISSIONS]: [
@@ -144,7 +144,7 @@ export const LayoutSideAdminNavigation: NavigationItem<NavigationItemMeta>[] = [
                 name: 'Realms',
                 type: 'link',
                 url: '/admin/realms',
-                icon: 'fas fa-university',
+                icon: 'fa6-solid:building-columns',
                 meta: {
                     [LayoutKey.REQUIRED_LOGGED_IN]: true,
                     [LayoutKey.REQUIRED_PERMISSIONS]: [
@@ -161,7 +161,7 @@ export const LayoutSideAdminNavigation: NavigationItem<NavigationItemMeta>[] = [
                 name: 'Clients',
                 type: 'link',
                 url: '/admin/clients',
-                icon: 'fa-solid fa-ghost',
+                icon: 'fa6-solid:ghost',
                 meta: {
                     [LayoutKey.REQUIRED_LOGGED_IN]: true,
                     [LayoutKey.REQUIRED_PERMISSIONS]: [
@@ -176,7 +176,7 @@ export const LayoutSideAdminNavigation: NavigationItem<NavigationItemMeta>[] = [
                 name: 'Identity Providers',
                 type: 'link',
                 url: '/admin/identity-providers',
-                icon: 'fas fa-atom',
+                icon: 'fa6-solid:atom',
                 meta: {
                     [LayoutKey.REQUIRED_LOGGED_IN]: true,
                     [LayoutKey.REQUIRED_PERMISSIONS]: [
@@ -190,7 +190,7 @@ export const LayoutSideAdminNavigation: NavigationItem<NavigationItemMeta>[] = [
                 name: 'Users',
                 type: 'link',
                 url: '/admin/users',
-                icon: 'fas fa-user',
+                icon: 'fa6-solid:user',
                 meta: {
                     [LayoutKey.REQUIRED_LOGGED_IN]: true,
                     [LayoutKey.REQUIRED_PERMISSIONS]: [
@@ -204,7 +204,7 @@ export const LayoutSideAdminNavigation: NavigationItem<NavigationItemMeta>[] = [
                 name: 'Roles',
                 type: 'link',
                 url: '/admin/roles',
-                icon: 'fas fa-users',
+                icon: 'fa6-solid:users',
                 meta: {
                     [LayoutKey.REQUIRED_LOGGED_IN]: true,
                     [LayoutKey.REQUIRED_PERMISSIONS]: [
@@ -221,7 +221,7 @@ export const LayoutSideAdminNavigation: NavigationItem<NavigationItemMeta>[] = [
                 name: 'Policies',
                 type: 'link',
                 url: '/admin/policies',
-                icon: 'fa fa-balance-scale',
+                icon: 'fa6-solid:scale-balanced',
                 meta: {
                     [LayoutKey.REQUIRED_LOGGED_IN]: true,
                     [LayoutKey.REQUIRED_PERMISSIONS]: [
@@ -236,7 +236,7 @@ export const LayoutSideAdminNavigation: NavigationItem<NavigationItemMeta>[] = [
                 name: 'Permissions',
                 type: 'link',
                 url: '/admin/permissions',
-                icon: 'fas fa-key',
+                icon: 'fa6-solid:key',
                 meta: {
                     [LayoutKey.REQUIRED_LOGGED_IN]: true,
                     [LayoutKey.REQUIRED_PERMISSIONS]: [
@@ -251,7 +251,7 @@ export const LayoutSideAdminNavigation: NavigationItem<NavigationItemMeta>[] = [
     {
         name: 'General',
         type: 'link',
-        icon: 'fas fa-globe',
+        icon: 'fa6-solid:globe',
         meta: {
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.REQUIRED_PERMISSIONS]: [
@@ -267,7 +267,7 @@ export const LayoutSideAdminNavigation: NavigationItem<NavigationItemMeta>[] = [
                 name: 'Events',
                 type: 'link',
                 url: '/admin/events',
-                icon: 'fa-solid fa-bullhorn',
+                icon: 'fa6-solid:bullhorn',
                 meta: {
                     [LayoutKey.REQUIRED_LOGGED_IN]: true,
                     [LayoutKey.REQUIRED_PERMISSIONS]: [
@@ -280,7 +280,7 @@ export const LayoutSideAdminNavigation: NavigationItem<NavigationItemMeta>[] = [
                 name: 'Nodes',
                 type: 'link',
                 url: '/admin/nodes',
-                icon: 'fa-solid fa-server',
+                icon: 'fa6-solid:server',
                 meta: {
                     [LayoutKey.REQUIRED_LOGGED_IN]: true,
                     [LayoutKey.REQUIRED_PERMISSIONS]: [
@@ -294,7 +294,7 @@ export const LayoutSideAdminNavigation: NavigationItem<NavigationItemMeta>[] = [
                 name: 'Services',
                 type: 'link',
                 url: '/admin/services',
-                icon: 'fa fa-map-signs',
+                icon: 'fa6-solid:signs-post',
                 meta: {
                     [LayoutKey.REQUIRED_LOGGED_IN]: true,
                     [LayoutKey.REQUIRED_PERMISSIONS]: [

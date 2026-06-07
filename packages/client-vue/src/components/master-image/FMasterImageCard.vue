@@ -42,8 +42,11 @@ export default defineComponent({
                 </div>
                 <div class="ms-auto">
                     <FProcessStatus :value="entity.build_status">
-                        <template #default=" {value, iconClass, classSuffix }">
-                            <span class="me-1">{{ value }}</span> <i :class="iconClass + ' text-'+ classSuffix" />
+                        <template #default=" {value, iconName, iconClass, classSuffix }">
+                            <span class="me-1">{{ value }}</span> <VCIcon
+                                :name="iconName"
+                                :class="iconClass + ' text-'+ classSuffix"
+                            />
                         </template>
                     </FProcessStatus>
                 </div>

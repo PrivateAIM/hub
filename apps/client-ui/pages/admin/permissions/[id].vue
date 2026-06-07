@@ -31,27 +31,27 @@ export default defineComponent({
         const items = [
             {
                 name: 'General',
-                icon: 'fas fa-bars',
+                icon: 'fa6-solid:bars',
                 path: '',
             },
             {
                 name: 'Policies',
-                icon: 'fas fa-shield-halved',
+                icon: 'fa6-solid:shield-halved',
                 path: 'policies',
             },
             {
                 name: 'Users',
-                icon: 'fas fa-user',
+                icon: 'fa6-solid:user',
                 path: 'users',
             },
             {
                 name: 'Robots',
-                icon: 'fas fa-robot',
+                icon: 'fa6-solid:robot',
                 path: 'robots',
             },
             {
                 name: 'Roles',
-                icon: 'fas fa-user-group',
+                icon: 'fa6-solid:user-group',
                 path: 'roles',
             },
         ];
@@ -92,7 +92,10 @@ export default defineComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            <i class="fa fa-user me-1" />
+            <VCIcon
+                name="fa6-solid:user"
+                class="me-1"
+            />
             {{ entity.name }}
             <span class="sub-title ms-1">
                 Details

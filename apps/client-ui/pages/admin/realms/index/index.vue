@@ -125,7 +125,7 @@ export default defineNuxtComponent({
                             class="btn btn-xs btn-primary me-1"
                             @click.prevent="setRealmManagement(row)"
                         >
-                            <i class="fa-solid fa-check" />
+                            <VCIcon name="fa6-solid:check" />
                         </button>
                     </template>
                     <NuxtLink
@@ -133,7 +133,7 @@ export default defineNuxtComponent({
                         class="btn btn-xs btn-outline-primary me-1"
                         :disabled="!hasEditPermission"
                     >
-                        <i class="fa-solid fa-bars" />
+                        <VCIcon name="fa6-solid:bars" />
                     </NuxtLink>
                     <AEntityDelete
                         class="btn btn-xs btn-outline-danger"

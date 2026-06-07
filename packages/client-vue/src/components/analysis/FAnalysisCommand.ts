@@ -132,14 +132,14 @@ const FAnalysisCommand = defineComponent({
             switch (props.command) {
                 case AnalysisCommand.BUILD_START:
                 case AnalysisCommand.DISTRIBUTION_START:
-                    return 'fa fa-play';
+                    return 'fa6-solid:play';
                 case AnalysisCommand.BUILD_CHECK:
                 case AnalysisCommand.DISTRIBUTION_CHECK:
-                    return 'fas fa-search';
+                    return 'fa6-solid:magnifying-glass';
                 case AnalysisCommand.CONFIGURATION_LOCK:
-                    return 'fas fa-lock';
+                    return 'fa6-solid:lock';
                 case AnalysisCommand.CONFIGURATION_UNLOCK:
-                    return 'fas fa-unlock';
+                    return 'fa6-solid:unlock';
                 default:
                     return '';
             }

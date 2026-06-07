@@ -22,17 +22,17 @@ export default defineNuxtComponent({
             {
                 name: 'Create',
                 path: '/add',
-                icon: 'fa fa-plus',
+                icon: 'fa6-solid:plus',
             },
             {
                 name: 'Outgoing',
                 path: '',
-                icon: 'fa fa-file-export',
+                icon: 'fa6-solid:file-export',
             },
             {
                 name: 'Incoming',
                 path: '/in',
-                icon: 'fa fa-file-import',
+                icon: 'fa6-solid:file-import',
             },
         ];
 
@@ -54,7 +54,7 @@ export default defineNuxtComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            <i class="fas fa-microscope" /> Analyses
+            <VCIcon name="fa6-solid:microscope" /> Analyses
             <span class="sub-title">Manage incoming & outgoing analyses</span>
         </h1>
 

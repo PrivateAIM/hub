@@ -108,7 +108,7 @@ export default defineNuxtComponent({
                                 :to="'/settings'"
                                 class="vc-nav-link"
                             >
-                                <i class="fa fa-cog" />
+                                <VCIcon name="fa6-solid:gear" />
                             </nuxt-link>
                         </li>
                         <li class="vc-nav-item">
@@ -116,7 +116,7 @@ export default defineNuxtComponent({
                                 :to="'/logout'"
                                 class="vc-nav-link"
                             >
-                                <i class="fa fa-power-off" />
+                                <VCIcon name="fa6-solid:power-off" />
                             </nuxt-link>
                         </li>
                     </ul>

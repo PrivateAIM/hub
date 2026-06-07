@@ -28,18 +28,18 @@ export default defineNuxtComponent({
             {
                 name: 'overview',
                 path: '',
-                icon: 'fa fa-bars',
+                icon: 'fa6-solid:bars',
             },
             {
                 name: 'add',
                 path: '/add',
-                icon: 'fa fa-plus',
+                icon: 'fa6-solid:plus',
             },
 
             {
                 name: 'client',
                 path: '/client',
-                icon: 'fa fa-ghost',
+                icon: 'fa6-solid:ghost',
             },
         ];
 
@@ -57,7 +57,10 @@ export default defineNuxtComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            <i class="fab fa-docker me-1" /> Registry
+            <VCIcon
+                name="fa6-brands:docker"
+                class="me-1"
+            /> Registry
             <span class="sub-title ms-1">Management</span>
         </h1>
         <div class="content-wrapper">

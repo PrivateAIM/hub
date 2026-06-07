@@ -176,7 +176,7 @@ export default defineComponent({
                                 :disabled="busy"
                                 @click.prevent="drop"
                             >
-                                <i class="fa fa-trash" />
+                                <VCIcon name="fa6-solid:trash" />
                             </button>
                         </div>
                     </template>

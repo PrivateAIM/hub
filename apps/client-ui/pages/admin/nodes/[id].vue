@@ -58,22 +58,22 @@ export default defineComponent({
         const tabs = [
             {
                 name: 'Overview', 
-                icon: 'fas fa-bars', 
+                icon: 'fa6-solid:bars', 
                 path: '', 
             },
             {
                 name: 'Crypto', 
-                icon: 'fas fa-shield-alt', 
+                icon: 'fa6-solid:shield-halved', 
                 path: 'crypto', 
             },
             {
                 name: 'Client', 
-                icon: 'fa-solid fa-ghost', 
+                icon: 'fa6-solid:ghost', 
                 path: 'client', 
             },
             {
                 name: 'Registry', 
-                icon: 'fab fa-docker', 
+                icon: 'fa6-brands:docker', 
                 path: 'registry', 
             },
         ];
@@ -90,7 +90,7 @@ export default defineComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            <i class="fa-solid fa-server" /> {{ entity.name }} <span class="sub-title">Details</span>
+            <VCIcon name="fa6-solid:server" /> {{ entity.name }} <span class="sub-title">Details</span>
         </h1>
 
         <div class="m-b-20 m-t-10">

@@ -66,7 +66,6 @@ export default defineNuxtConfig({
         '@/assets/css/tailwind.css',
         '@authup/client-web-kit/dist/style.css',
         '@/../../packages/client-vue/dist/style.css',
-        '@fortawesome/fontawesome-free/css/all.css',
         '@/assets/css/fonts.css',
     ],
 

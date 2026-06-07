@@ -170,7 +170,7 @@ export default defineComponent({
                         class="btn btn-xs btn-outline-primary"
                         :to="'/admin/events/'+row.id"
                     >
-                        <i class="fa fa-share-square" />
+                        <VCIcon name="fa6-solid:share-from-square" />
                     </nuxt-link>
                     <FEntityDelete
                         v-if="canDrop"

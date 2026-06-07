@@ -49,7 +49,7 @@ export default defineNuxtComponent({
 <template>
     <div v-if="entity">
         <div class="mb-2">
-            <h6><i class="fa-solid fa-info" /> Info</h6>
+            <h6><VCIcon name="fa6-solid:info" /> Info</h6>
             <div class="flex flex-row gap-3 w-full">
                 <div class="card-grey card grow">
                     <div class="card-header">
@@ -57,7 +57,10 @@ export default defineNuxtComponent({
                     </div>
                     <div class="card-body text-center">
                         <div class="mb-2">
-                            <i class="fas fa-microscope fa-4x" />
+                            <VCIcon
+                                name="fa6-solid:microscope"
+                                class="text-4xl"
+                            />
                         </div>
                         <div class="h6">
                             {{ entity.analyses }}
@@ -72,7 +75,10 @@ export default defineNuxtComponent({
                         </div>
                         <div class="card-body text-center">
                             <div class="mb-2">
-                                <i class="fa fa-compact-disc fa-4x" />
+                                <VCIcon
+                                    name="fa6-solid:compact-disc"
+                                    class="text-4xl"
+                                />
                             </div>
                             <div class="h6">
                                 <template v-if="entity.master_image">
@@ -99,7 +105,10 @@ export default defineNuxtComponent({
                     </div>
                     <div class="card-body text-center">
                         <div class="mb-2">
-                            <i class="fas fa-university fa-4x" />
+                            <VCIcon
+                                name="fa6-solid:building-columns"
+                                class="text-4xl"
+                            />
                         </div>
                         <div class="h6">
                             <ARealm :entity-id="entity.realm_id">
@@ -120,7 +129,10 @@ export default defineNuxtComponent({
                     </div>
                     <div class="card-body text-center">
                         <div class="mb-1">
-                            <i class="fa fa-user fa-4x" />
+                            <VCIcon
+                                name="fa6-solid:user"
+                                class="text-4xl"
+                            />
                         </div>
                         <div class="h6">
                             <FProjectCreator :entity="entity" />

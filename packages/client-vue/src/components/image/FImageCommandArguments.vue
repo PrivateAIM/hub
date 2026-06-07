@@ -157,7 +157,7 @@ export default defineComponent({
                         class="btn btn-xs btn-danger me-1"
                         @click.prevent="resetItemsForPosition('before')"
                     >
-                        <i class="fa fa-undo" />
+                        <VCIcon name="fa6-solid:rotate-left" />
                     </button>
                     <button
                         class="btn btn-xs btn-primary"
@@ -165,7 +165,7 @@ export default defineComponent({
                         :disabled="readonly"
                         @click.prevent="props.add()"
                     >
-                        <i class="fa fa-plus" />
+                        <VCIcon name="fa6-solid:plus" />
                     </button>
                 </template>
                 <template #noItems>
@@ -192,7 +192,7 @@ export default defineComponent({
                         class="btn btn-xs btn-danger me-1"
                         @click.prevent="resetItemsForPosition('after')"
                     >
-                        <i class="fa fa-undo" />
+                        <VCIcon name="fa6-solid:rotate-left" />
                     </button>
                     <button
                         class="btn btn-xs btn-primary"
@@ -200,7 +200,7 @@ export default defineComponent({
                         :disabled="readonly"
                         @click.prevent="props.add()"
                     >
-                        <i class="fa fa-plus" />
+                        <VCIcon name="fa6-solid:plus" />
                     </button>
                 </template>
                 <template #noItems>

@@ -107,7 +107,7 @@ export default defineComponent({
             const items = [
                 {
                     name: 'Overview', 
-                    icon: 'fas fa-bars', 
+                    icon: 'fa6-solid:bars', 
                     path: '', 
                 },
 
@@ -116,7 +116,7 @@ export default defineComponent({
             if (isProjectOwner.value || isNodeAuthority.value) {
                 items.push({
                     name: 'Analyses', 
-                    icon: 'fas fa-microscope', 
+                    icon: 'fa6-solid:microscope', 
                     path: '/analyses', 
                 });
             }
@@ -127,7 +127,7 @@ export default defineComponent({
             ) {
                 items.push({
                     name: 'Settings', 
-                    icon: 'fa fa-cog', 
+                    icon: 'fa6-solid:gear', 
                     path: '/settings', 
                 });
             }
@@ -157,7 +157,7 @@ export default defineComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            <i class="fas fa-project-diagram" />
+            <VCIcon name="fa6-solid:diagram-project" />
             <FDisplayName
                 :name="entity.name"
                 :display-name="entity.display_name"

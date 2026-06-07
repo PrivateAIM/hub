@@ -93,7 +93,7 @@ export default defineComponent({
                             class="btn btn-xs btn-dark"
                             @click.prevent="handleDeleted"
                         >
-                            <i class="fa fa-minus" />
+                            <VCIcon name="fa6-solid:minus" />
                         </button>
                     </template>
                 </VCFormInput>

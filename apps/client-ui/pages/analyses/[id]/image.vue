@@ -90,7 +90,7 @@ export default defineComponent({
             <div class="flex flex-col gap-3">
                 <div class="card-grey card">
                     <div class="card-header">
-                        <span class="title"><i class="fa fa-compact-disc" /> Base</span>
+                        <span class="title"><VCIcon name="fa6-solid:compact-disc" /> Base</span>
                     </div>
                     <div class="card-body">
                         <div
@@ -101,7 +101,7 @@ export default defineComponent({
                             }"
                         >
                             <div>
-                                <i class="fa fa-info" />
+                                <VCIcon name="fa6-solid:info" />
                             </div>
                             <div>
                                 Pick a Docker-based master image that provides the runtime environment for your analysis.<br>
@@ -118,7 +118,7 @@ export default defineComponent({
                 </div>
                 <div class="card-grey card">
                     <div class="card-header">
-                        <span class="title"><i class="fa fa-keyboard" /> Command-Arguments</span>
+                        <span class="title"><VCIcon name="fa6-solid:keyboard" /> Command-Arguments</span>
                     </div>
                     <div class="card-body">
                         <FAnalysisImageCommandArguments
@@ -134,7 +134,7 @@ export default defineComponent({
             <div class="flex flex-col gap-3">
                 <div class="card-grey card">
                     <div class="card-header">
-                        <span class="title"><i class="fa fa-file" /> Entrypoint</span>
+                        <span class="title"><VCIcon name="fa6-solid:file" /> Entrypoint</span>
                     </div>
                     <div class="card-body">
                         <div
@@ -145,7 +145,7 @@ export default defineComponent({
                             }"
                         >
                             <div>
-                                <i class="fa fa-info" />
+                                <VCIcon name="fa6-solid:info" />
                             </div>
                             <div>
                                 An entrypoint file must be selected.
@@ -194,7 +194,7 @@ export default defineComponent({
                 </div>
                 <div class="card-grey card">
                     <div class="card-header">
-                        <span class="title"><i class="fa fa-bolt" /> Command</span>
+                        <span class="title"><VCIcon name="fa6-solid:bolt" /> Command</span>
                     </div>
                     <div class="card-body">
                         <FAnalysisImageCommand

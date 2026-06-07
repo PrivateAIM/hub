@@ -19,12 +19,12 @@ export default defineNuxtComponent({
         const items = [
             {
                 name: 'Account', 
-                icon: 'fas fa-bars', 
+                icon: 'fa6-solid:bars', 
                 path: '',
             },
             {
                 name: 'Security', 
-                icon: 'fa fa-lock', 
+                icon: 'fa6-solid:lock', 
                 path: '/security',
             },
         ];
@@ -36,7 +36,7 @@ export default defineNuxtComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            <i class="fa fa-cog" /> Settings <span class="sub-title">Management</span>
+            <VCIcon name="fa6-solid:gear" /> Settings <span class="sub-title">Management</span>
         </h1>
 
         <div class="content-wrapper">

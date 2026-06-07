@@ -165,14 +165,14 @@ export default {
                             class="btn btn-xs btn-outline-primary"
                             :to="'/admin/services/registry/'+entity.id+'/projects/'+row.id"
                         >
-                            <i class="fa fa-bars" />
+                            <VCIcon name="fa6-solid:bars" />
                         </nuxt-link>
                         <button
                             type="button"
                             class="btn btn-xs btn-outline-dark ms-1 me-1"
                             @click.prevent="showDetails(row)"
                         >
-                            <i class="fa-solid fa-info" />
+                            <VCIcon name="fa6-solid:info" />
                         </button>
                         <entity-delete
                             v-if="canDrop"
@@ -197,7 +197,7 @@ export default {
             <VCModalContent class="modal-lg">
                 <div class="modal-header">
                     <VCModalTitle class="modal-title">
-                        <i class="fa-solid fa-diagram-project" /> {{ item ? item.name : 'Unknown' }}
+                        <VCIcon name="fa6-solid:diagram-project" /> {{ item ? item.name : 'Unknown' }}
                     </VCModalTitle>
                     <VCModalClose class="btn-close" />
                 </div>

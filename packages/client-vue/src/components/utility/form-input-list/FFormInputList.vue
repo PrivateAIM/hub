@@ -134,7 +134,7 @@ export default defineComponent({
                         :disabled="!canAdd || readonly"
                         @click.prevent="add()"
                     >
-                        <i class="fa fa-plus" /> <FTranslationDefault :name="'add'" />
+                        <VCIcon name="fa6-solid:plus" /> <FTranslationDefault :name="'add'" />
                     </button>
                 </slot>
             </div>

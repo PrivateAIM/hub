@@ -226,10 +226,10 @@ export default defineComponent({
                         @click.prevent="add"
                     >
                         <template v-if="isEditing">
-                            <i class="fa fa-save" /> update
+                            <VCIcon name="fa6-solid:floppy-disk" /> update
                         </template>
                         <template v-else>
-                            <i class="fa fa-plus" /> create
+                            <VCIcon name="fa6-solid:plus" /> create
                         </template>
                     </button>
                 </div>
@@ -258,12 +258,7 @@ export default defineComponent({
                             }"
                             @click.prevent="toggle('project_id', props.data.id)"
                         >
-                            <i
-                                :class="{
-                                    'fa fa-plus': form.project_id !== props.data.id,
-                                    'fa fa-minus': form.project_id === props.data.id
-                                }"
-                            />
+                            <VCIcon :name="form.project_id !== props.data.id ? 'fa6-solid:plus' : 'fa6-solid:minus'" />
                         </button>
                     </template>
                 </FProjects>

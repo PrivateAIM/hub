@@ -198,8 +198,8 @@ export default defineComponent({
                         'Analyses',
                     icon: true,
                     iconClass: props.target === DomainType.NODE ?
-                        'fa fa-hospital' :
-                        'fa-solid fa-file',
+                        'fa6-solid:hospital' :
+                        'fa6-solid:file',
                 }),
             },
 

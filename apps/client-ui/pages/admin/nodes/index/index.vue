@@ -124,7 +124,7 @@ export default defineNuxtComponent({
                         class="btn btn-xs btn-outline-primary"
                         :to="'/admin/nodes/'+row.id"
                     >
-                        <i class="fa fa-bars" />
+                        <VCIcon name="fa6-solid:bars" />
                     </nuxt-link>
                     <EntityDelete
                         v-if="canDrop"

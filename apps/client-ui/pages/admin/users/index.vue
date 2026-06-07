@@ -28,12 +28,12 @@ export default defineNuxtComponent({
             {
                 name: 'overview',
                 path: '',
-                icon: 'fa fa-bars',
+                icon: 'fa6-solid:bars',
             },
             {
                 name: 'add',
                 path: '/add',
-                icon: 'fa fa-plus',
+                icon: 'fa6-solid:plus',
             },
         ];
 
@@ -58,7 +58,10 @@ export default defineNuxtComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            <i class="fa fa-user me-1" /> User
+            <VCIcon
+                name="fa6-solid:user"
+                class="me-1"
+            /> User
             <span class="sub-title ms-1">
                 Management
             </span>

@@ -42,7 +42,10 @@ export default defineComponent({
                                 class="btn btn-primary btn-xs"
                                 @click.prevent="add"
                             >
-                                <i class="fa fa-plus me-1" /> Add
+                                <VCIcon
+                                    name="fa6-solid:plus"
+                                    class="me-1"
+                                /> Add
                             </button>
                         </div>
                     </template>

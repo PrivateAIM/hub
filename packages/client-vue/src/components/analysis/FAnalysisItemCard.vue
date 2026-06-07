@@ -93,7 +93,10 @@ export default defineComponent({
                     :display-name="entity.display_name"
                 >
                     <template #default="props">
-                        <i class="fas fa-microscope me-1" />
+                        <VCIcon
+                            name="fa6-solid:microscope"
+                            class="me-1"
+                        />
                         <VCLink :to="'/analyses/' + entity.id">
                             {{ props.display }}
                         </VCLink>
@@ -109,19 +112,14 @@ export default defineComponent({
                         class="btn btn-xs btn-dark"
                         @click.prevent="toggleView"
                     >
-                        <i
-                            :class="{
-                                'fa fa-chevron-down': !extendedView,
-                                'fa fa-chevron-up': extendedView}
-                            "
-                        />
+                        <VCIcon :name="!extendedView ? 'fa6-solid:chevron-down' : 'fa6-solid:chevron-up'" />
                     </button>
                     <VCLink
                         :to="'/analyses/' + entity.id"
                         :disabled="busy"
                         class="btn btn-xs btn-dark ms-1"
                     >
-                        <i class="fa fa-bars" />
+                        <VCIcon name="fa6-solid:bars" />
                     </VCLink>
                     <template v-if="canDelete">
                         <FEntityDelete

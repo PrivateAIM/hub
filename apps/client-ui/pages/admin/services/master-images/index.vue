@@ -29,7 +29,7 @@ export default {
             {
                 name: 'overview',
                 path: '',
-                icon: 'fa fa-bars',
+                icon: 'fa6-solid:bars',
             },
         ];
 
@@ -47,7 +47,7 @@ export default {
 <template>
     <div class="flex flex-col gap-3">
         <h1 class="title no-border mb-0">
-            <i class="fa-solid fa-atom" /> Master Images <span class="sub-title">Management</span>
+            <VCIcon name="fa6-solid:atom" /> Master Images <span class="sub-title">Management</span>
         </h1>
         <div class="mb-2">
             <DomainEntityNav
@@ -78,7 +78,10 @@ export default {
                                     class="btn btn-block btn-primary"
                                     @click.prevent="props.execute"
                                 >
-                                    <span class="me-2">{{ props.commandText }}</span>  <i :class="props.iconClass" />
+                                    <span class="me-2">{{ props.commandText }}</span>  <VCIcon
+                                        :name="props.iconName"
+                                        :class="props.iconClass"
+                                    />
                                 </button>
                             </template>
                         </FMasterImageCommand>
@@ -116,7 +119,7 @@ export default {
                 </div>
             </div>
             <div class="col-6">
-                <h6><i class="fa-solid fa-bullhorn" /> Events</h6>
+                <h6><VCIcon name="fa6-solid:bullhorn" /> Events</h6>
                 <FEvents
                     :query="{
                         filters: {

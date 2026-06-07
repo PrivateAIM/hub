@@ -26,11 +26,12 @@ import {
 } from '@vuelidate/validators';
 import type { PropType, VNodeArrayChildren } from 'vue';
 import {
-    computed, 
-    defineComponent, 
-    h, 
-    reactive, 
-    ref, 
+    computed,
+    defineComponent,
+    h,
+    reactive,
+    ref,
+    resolveComponent,
     watch,
 } from 'vue';
 import { useUpdatedAt } from '../../composables';
@@ -163,6 +164,7 @@ export default defineComponent({
         const translationsSubmit = createFormSubmitTranslations();
 
         return () => {
+            const VCIcon = resolveComponent('VCIcon');
             const name = buildFormGroup({
                 validationMessages: translationsValidation.name.value,
                 validationSeverity: getSeverity($v.value.name),
@@ -209,7 +211,7 @@ export default defineComponent({
                         generateAlias();
                     },
                 }, [
-                    h('i', { class: 'fa fa-wrench pe-1' }),
+                    h(VCIcon, { name: 'fa6-solid:wrench', class: 'pe-1' }),
                     'Generate',
                 ]),
                 h('button', {
@@ -222,7 +224,7 @@ export default defineComponent({
                         resetAlias();
                     },
                 }, [
-                    h('i', { class: 'fa fa-undo pe-1' }),
+                    h(VCIcon, { name: 'fa6-solid:rotate-left', class: 'pe-1' }),
                     'Reset',
                 ]),
             ]);
@@ -259,12 +261,7 @@ export default defineComponent({
                                 toggleForm('registry_id', props.data.id);
                             },
                         }, [
-                            h('i', {
-                                class: {
-                                    'fa fa-plus': form.registry_id !== props.data.id,
-                                    'fa fa-minus': form.registry_id === props.data.id,
-                                },
-                            }),
+                            h(VCIcon, { name: form.registry_id === props.data.id ? 'fa6-solid:minus' : 'fa6-solid:plus' }),
                         ]),
                     }),
                 ];

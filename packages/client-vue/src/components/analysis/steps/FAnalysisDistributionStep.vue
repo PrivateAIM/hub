@@ -69,8 +69,11 @@ export default defineComponent({
                 </div>
                 <div class="ms-auto">
                     <FProcessStatus :value="entity.distribution_status">
-                        <template #default=" { iconClass, classSuffix }">
-                            <i :class="iconClass + ' text-'+ classSuffix" />
+                        <template #default=" { iconName, iconClass, classSuffix }">
+                            <VCIcon
+                                :name="iconName"
+                                :class="iconClass + ' text-'+ classSuffix"
+                            />
                         </template>
                     </FProcessStatus>
                 </div>
@@ -79,7 +82,10 @@ export default defineComponent({
         <div class="card-body">
             <div class="flex flex-col h-full">
                 <div class="text-center mb-3">
-                    <i class="fas fa-sitemap fa-4x" />
+                    <VCIcon
+                        name="fa6-solid:sitemap"
+                        class="text-4xl"
+                    />
                 </div>
 
                 <div class="progress bg-white">

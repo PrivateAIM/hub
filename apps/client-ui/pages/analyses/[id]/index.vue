@@ -85,7 +85,7 @@ export default defineNuxtComponent({
                     <div class="card-body">
                         <div class="flex flex-row gap-2 items-center alert alert-sm alert-danger mb-0">
                             <div>
-                                <i class="fa fa-info" />
+                                <VCIcon name="fa6-solid:info" />
                             </div>
                             <div>
                                 The analysis is not configured yet!<br>

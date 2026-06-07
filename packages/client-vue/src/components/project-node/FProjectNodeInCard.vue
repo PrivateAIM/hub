@@ -71,7 +71,10 @@ export default defineComponent({
                         name="title"
                         :data="entity"
                     >
-                        <i class="fas fa-project-diagram me-1" />
+                        <VCIcon
+                            name="fa6-solid:diagram-project"
+                            class="me-1"
+                        />
                         <VCLink
                             :to="'/projects/' + entity.project.id"
                             class="mb-0"
@@ -93,14 +96,14 @@ export default defineComponent({
                             :disabled="busy"
                             class="btn btn-xs btn-dark"
                         >
-                            <i class="fa fa-bars" />
+                            <VCIcon name="fa6-solid:bars" />
                         </VCLink>
                         <button
                             type="button"
                             class="btn btn-xs btn-primary"
                             @click.prevent="toggleModal"
                         >
-                            <i class="fa fa-comment-alt" />
+                            <VCIcon name="fa6-solid:comment" />
                         </button>
                         <FProjectNodeApprovalCommand
                             :entity-id="entity.id"
@@ -131,7 +134,7 @@ export default defineComponent({
             <div class="row">
                 <div class="col-12 col-md-4 flex items-center flex-col">
                     <div>
-                        <strong><i class="fa-solid fa-server" /> Node</strong>
+                        <strong><VCIcon name="fa6-solid:server" /> Node</strong>
                     </div>
                     <div>
                         {{ entity.node.name }}
@@ -139,7 +142,7 @@ export default defineComponent({
                 </div>
                 <div class="col-12 col-md-4 flex items-center flex-col">
                     <div>
-                        <strong><i class="fa-solid fa-heartbeat" /> Status</strong>
+                        <strong><VCIcon name="fa6-solid:heart-pulse" /> Status</strong>
                     </div>
                     <div>
                         <FProjectNodeApprovalStatus
@@ -157,7 +160,7 @@ export default defineComponent({
                 </div>
                 <div class="col-12 col-md-4 flex items-center flex-col">
                     <div>
-                        <strong><i class="fa-solid fa-user" /> Creator</strong>
+                        <strong><VCIcon name="fa6-solid:user" /> Creator</strong>
                     </div>
                     <div>
                         <template v-if="entity.project.user_id">
@@ -213,7 +216,7 @@ export default defineComponent({
             <VCModalContent class="modal-lg">
                 <div class="modal-header">
                     <VCModalTitle class="modal-title">
-                        <i class="fas fa-file-import" /> Project
+                        <VCIcon name="fa6-solid:file-import" /> Project
                         <FDisplayName
                             :name="entity.project.name"
                             :display-name="entity.project.display_name"

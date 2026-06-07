@@ -38,7 +38,7 @@ export default defineComponent({
         const items = [
             {
                 name: 'General', 
-                icon: 'fas fa-bars', 
+                icon: 'fa6-solid:bars', 
                 path: '',
             },
         ];
@@ -79,7 +79,10 @@ export default defineComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            <i class="fa-solid fa-building me-1" /> {{ entity.name }}
+            <VCIcon
+                name="fa6-solid:building"
+                class="me-1"
+            /> {{ entity.name }}
             <span class="sub-title ms-1">Details</span>
         </h1>
         <div class="mb-2">

@@ -35,19 +35,19 @@ export default defineNuxtComponent({
         const tabs = computed(() => [
             {
                 name: 'Outgoing', 
-                icon: 'fa fa-file-export', 
+                icon: 'fa6-solid:file-export', 
                 path: '',
             },
             {
                 name: 'Incoming', 
-                icon: 'fa fa-file-import', 
+                icon: 'fa6-solid:file-import', 
                 path: '/in',
             },
             ...(isOwner.value ? [
                 {
                     name: 'Add', 
                     routeName: 'settings-id-security', 
-                    icon: 'fa fa-plus', 
+                    icon: 'fa6-solid:plus', 
                     path: '/add',
                 },
             ] : []),

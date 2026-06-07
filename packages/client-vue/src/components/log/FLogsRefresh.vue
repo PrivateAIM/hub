@@ -66,7 +66,10 @@ export default defineComponent({
     <div class="flex flex-row items-center gap-2">
         <small class="log-refresh-status text-fg-muted">
             <template v-if="busy">
-                <i class="fa fa-spinner fa-spin pe-1" />refreshing
+                <VCIcon
+                    name="fa6-solid:spinner"
+                    class="animate-spin pe-1"
+                />refreshing
             </template>
             <template v-else-if="active">
                 <VCCountdown
@@ -74,12 +77,18 @@ export default defineComponent({
                     @end="handleEnd"
                 >
                     <template #default="countdown">
-                        <i class="fa fa-clock pe-1" />refresh in {{ countdown.totalSeconds }}s
+                        <VCIcon
+                            name="fa6-solid:clock"
+                            class="pe-1"
+                        />refresh in {{ countdown.totalSeconds }}s
                     </template>
                 </VCCountdown>
             </template>
             <template v-else>
-                <i class="fa fa-pause pe-1" />paused
+                <VCIcon
+                    name="fa6-solid:pause"
+                    class="pe-1"
+                />paused
             </template>
         </small>
         <button
@@ -89,10 +98,7 @@ export default defineComponent({
             :title="active ? 'Pause auto-refresh' : 'Resume auto-refresh'"
             @click.prevent="toggle"
         >
-            <i
-                class="fa"
-                :class="active ? 'fa-pause' : 'fa-play'"
-            />
+            <VCIcon :name="active ? 'fa6-solid:pause' : 'fa6-solid:play'" />
         </button>
         <button
             type="button"
@@ -101,7 +107,7 @@ export default defineComponent({
             title="Refresh now"
             @click.prevent="refresh"
         >
-            <i class="fa fa-refresh" />
+            <VCIcon name="fa6-solid:arrows-rotate" />
         </button>
     </div>
 </template>

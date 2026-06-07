@@ -44,7 +44,7 @@ export default defineNuxtComponent({
             {
                 name: 'General', 
                 routeName: 'users-id', 
-                icon: 'fas fa-bars', 
+                icon: 'fa6-solid:bars', 
                 path: '',
             },
         ];

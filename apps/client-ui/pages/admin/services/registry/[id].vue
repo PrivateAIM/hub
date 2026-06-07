@@ -64,7 +64,7 @@ export default defineComponent({
         const tabs = computed(() => [
             {
                 name: 'General', 
-                icon: 'fas fa-bars', 
+                icon: 'fa6-solid:bars', 
                 path: '',
             },
             ...(
@@ -72,30 +72,30 @@ export default defineComponent({
                     [
                         {
                             name: 'Cleanup', 
-                            icon: 'fa-solid fa-hands-bubbles', 
+                            icon: 'fa6-solid:hands-bubbles', 
                             path: 'cleanup',
                         },
                         {
                             name: 'Setup', 
-                            icon: 'fa-solid fa-cog', 
+                            icon: 'fa6-solid:gear', 
                             path: 'setup',
                         },
                     ] : []
             ),
             {
                 name: 'Projects',
-                icon: 'fa-solid fa-diagram-project',
+                icon: 'fa6-solid:diagram-project',
                 path: 'projects',
                 children: [
                     {
                         name: 'overview',
                         path: '',
-                        icon: 'fa fa-bars',
+                        icon: 'fa6-solid:bars',
                     },
                     {
                         name: 'add',
                         path: '/add',
-                        icon: 'fa fa-plus',
+                        icon: 'fa6-solid:plus',
                     },
                 ],
             },
@@ -113,7 +113,10 @@ export default defineComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            <i class="fab fa-docker me-1" /> {{ entity.name }}
+            <VCIcon
+                name="fa6-brands:docker"
+                class="me-1"
+            /> {{ entity.name }}
             <span class="sub-title ms-1">Details</span>
         </h1>
 

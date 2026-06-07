@@ -98,7 +98,7 @@ export default defineComponent({
             </div>
             <div class="modal-body">
                 <div class="alert alert-success alert-sm">
-                    <i class="fa fa-info" /> The analysis is now in a state in which it can be locked and build.<br>
+                    <VCIcon name="fa6-solid:info" /> The analysis is now in a state in which it can be locked and build.<br>
                 </div>
                 <div class="flex flex-col gap-2">
                     <div>
@@ -111,7 +111,7 @@ export default defineComponent({
                         >
                             <template #label="props">
                                 <label :for="props.id">
-                                    <i class="fa fa-lock" /> Lock it?
+                                    <VCIcon name="fa6-solid:lock" /> Lock it?
                                 </label>
                             </template>
                         </VCFormCheckbox>
@@ -127,7 +127,7 @@ export default defineComponent({
                         >
                             <template #label="props">
                                 <label :for="props.id">
-                                    <i class="fa fa-wrench" /> Build it?
+                                    <VCIcon name="fa6-solid:wrench" /> Build it?
                                 </label>
                             </template>
                         </VCFormCheckbox>

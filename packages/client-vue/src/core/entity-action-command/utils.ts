@@ -35,6 +35,7 @@ export type ActionCommandSlotsType = {
         commandText: string,
         isDisabled: boolean,
         isAllowed: boolean,
+        iconName: string,
         iconClass: string[],
         execute: () => Promise<any>
     }
@@ -54,7 +55,7 @@ export function renderActionCommand(ctx: Context) : VNodeChild {
         disabled: ctx.isDisabled,
     };
 
-    const iconClasses : string[] = [ctx.iconClass];
+    const iconClasses : string[] = [];
     if (ctx.withIcon && ctx.withText) {
         iconClasses.push('me-1');
     }
@@ -87,7 +88,10 @@ export function renderActionCommand(ctx: Context) : VNodeChild {
     }
 
     if (ctx.withIcon) {
-        text.unshift(h('i', { class: iconClasses }));
+        text.unshift(h(resolveDynamicComponent('VCIcon') as Component, {
+            name: ctx.iconClass,
+            class: iconClasses,
+        }));
     }
 
     if (hasNormalizedSlot('default', ctx.slots)) {
@@ -95,6 +99,7 @@ export function renderActionCommand(ctx: Context) : VNodeChild {
             commandText: ctx.commandText,
             isDisabled: ctx.isDisabled,
             isAllowed: ctx.isAllowed,
+            iconName: ctx.iconClass,
             iconClass: iconClasses,
             execute: () => ctx.execute(),
         }, ctx.slots);

@@ -75,7 +75,10 @@ export default defineComponent({
                         name="title"
                         :data="entity"
                     >
-                        <i class="fas fa-microscope me-1" />
+                        <VCIcon
+                            name="fa6-solid:microscope"
+                            class="me-1"
+                        />
 
                         <FDisplayName
                             :name="entity.analysis.name"
@@ -93,7 +96,7 @@ export default defineComponent({
                             :disabled="busy"
                             class="btn btn-xs btn-dark"
                         >
-                            <i class="fa fa-bars" />
+                            <VCIcon name="fa6-solid:bars" />
                         </VCLink>
                         <FAnalysisBucket :query="bucketQuery">
                             <template #default="{ data: bucket }">
@@ -133,7 +136,7 @@ export default defineComponent({
             <div class="row">
                 <div class="col-12 col-md-4 flex items-center flex-col">
                     <div>
-                        <strong><i class="fa-solid fa-server" /> Node</strong>
+                        <strong><VCIcon name="fa6-solid:server" /> Node</strong>
                     </div>
                     <div>
                         {{ entity.node.name }}
@@ -141,7 +144,7 @@ export default defineComponent({
                 </div>
                 <div class="col-12 col-md-4 flex items-center flex-col">
                     <div>
-                        <strong><i class="fa-solid fa-heartbeat" /> Status</strong>
+                        <strong><VCIcon name="fa6-solid:heart-pulse" /> Status</strong>
                     </div>
                     <div>
                         <FAnalysisNodeApprovalStatus
@@ -159,7 +162,7 @@ export default defineComponent({
                 </div>
                 <div class="col-12 col-md-4 flex items-center flex-col">
                     <div>
-                        <strong><i class="fa-solid fa-user" /> Creator</strong>
+                        <strong><VCIcon name="fa6-solid:user" /> Creator</strong>
                     </div>
                     <div>
                         <template v-if="entity.analysis.user_id">

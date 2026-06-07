@@ -32,11 +32,12 @@ import type {
     VNodeArrayChildren,
 } from 'vue';
 import {
-    computed, 
-    defineComponent, 
-    h, 
-    reactive, 
-    ref, 
+    computed,
+    defineComponent,
+    h,
+    reactive,
+    ref,
+    resolveComponent,
     watch,
 } from 'vue';
 import { useUpdatedAt } from '../../composables';
@@ -146,6 +147,7 @@ export default defineComponent({
         const translationsSubmit = createFormSubmitTranslations();
 
         return () => {
+            const VCIcon = resolveComponent('VCIcon');
             let realm : VNodeArrayChildren = [];
             if (!isRealmLocked.value) {
                 realm = [
@@ -251,12 +253,7 @@ export default defineComponent({
                                     toggleFormData('registry_id', props.data.id);
                                 },
                             }, [
-                                h('i', {
-                                    class: {
-                                        'fa fa-plus': form.registry_id !== props.data.id,
-                                        'fa fa-minus': form.registry_id === props.data.id,
-                                    },
-                                }),
+                                h(VCIcon, { name: form.registry_id === props.data.id ? 'fa6-solid:minus' : 'fa6-solid:plus' }),
                             ]),
                         }),
                 }),

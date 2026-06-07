@@ -199,7 +199,7 @@ export default defineComponent({
                     <template v-if="resolved && data.length === 0">
                         <div class="flex flex-col gap-1">
                             <div class="alert alert-sm alert-dark mb-0">
-                                <i class="fa fa-info" /> No files found in bucket
+                                <VCIcon name="fa6-solid:info" /> No files found in bucket
                             </div>
                         </div>
                     </template>
@@ -247,7 +247,7 @@ export default defineComponent({
                         :disabled="busy || selected.length === 0"
                         @click.prevent="dropSelected"
                     >
-                        <i class="fa fa-trash" />
+                        <VCIcon name="fa6-solid:trash" />
                     </button>
                 </div>
                 <template v-if="!readonly">
@@ -258,7 +258,7 @@ export default defineComponent({
                             class="btn btn-xs btn-dark"
                             @click.prevent="toggleModal"
                         >
-                            <i class="fa fa-add" />
+                            <VCIcon name="fa6-solid:plus" />
                         </button>
                     </div>
                 </template>
@@ -271,7 +271,7 @@ export default defineComponent({
                         <div class="flex flex-row w-full">
                             <div>
                                 <h5 class="mb-0">
-                                    <i class="fa fa-upload" /> Upload
+                                    <VCIcon name="fa6-solid:upload" /> Upload
                                 </h5>
                             </div>
                             <div class="ms-auto">
@@ -280,7 +280,7 @@ export default defineComponent({
                                     class="btn btn-xs btn-secondary"
                                     @click.prevent="modal = false"
                                 >
-                                    <i class="fa fa-times" />
+                                    <VCIcon name="fa6-solid:xmark" />
                                 </button>
                             </div>
                         </div>

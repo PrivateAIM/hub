@@ -150,7 +150,7 @@ export default defineComponent({
                     :disabled="busy || tempFiles.length === 0"
                     @click.prevent="upload"
                 >
-                    <i class="fa fa-upload" /> Upload
+                    <VCIcon name="fa6-solid:upload" /> Upload
                 </button>
             </div>
         </div>

@@ -9,7 +9,12 @@ import type {
     PropType,
     VNodeChild,
 } from 'vue';
-import { defineComponent, ref } from 'vue';
+import { 
+    defineComponent, 
+    h, 
+    ref, 
+    resolveComponent, 
+} from 'vue';
 import { onClickOutside } from '@vueuse/core';
 import { NuxtLink } from '#components';
 
@@ -62,6 +67,8 @@ export const DomainEntityNavItem = defineComponent({
         icon: { type: String },
     },
     setup(props) {
+        const VCIcon = resolveComponent('VCIcon');
+
         return () => h('li', { class: 'nav-item' }, [
             h(
                 NuxtLink,
@@ -73,7 +80,7 @@ export const DomainEntityNavItem = defineComponent({
                     default: () => {
                         const items : VNodeChild = [];
                         if (props.icon) {
-                            items.push(h('i', { class: `${props.icon}` }));
+                            items.push(h(VCIcon, { name: props.icon }));
                         }
 
                         if (props.icon && props.name) {
@@ -103,6 +110,8 @@ export const DomainEntityNavSub = defineComponent({
         children: { type: Array as PropType<NavItem[]> },
     },
     setup(props) {
+        const VCIcon = resolveComponent('VCIcon');
+
         const expand = ref(false);
 
         const linkRef = ref(null);
@@ -114,7 +123,7 @@ export const DomainEntityNavSub = defineComponent({
         return () => {
             let icon : VNodeChild = [];
             if (props.icon) {
-                icon = h('i', { class: `${props.icon} pe-1` });
+                icon = h(VCIcon, { name: props.icon, class: 'pe-1' });
             }
 
             return h('li', { class: 'nav-item dropdown' }, [

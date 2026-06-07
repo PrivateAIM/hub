@@ -86,9 +86,9 @@ export default defineComponent({
         const iconClass = computed(() => {
             switch (props.command) {
                 case MasterImageCommand.SYNC:
-                    return 'fa fa-sync';
+                    return 'fa6-solid:arrows-rotate';
                 case MasterImageCommand.BUILD:
-                    return 'fa fa-wrench';
+                    return 'fa6-solid:wrench';
                 default:
                     return '';
             }

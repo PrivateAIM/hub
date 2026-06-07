@@ -17,10 +17,11 @@ import { DomainType } from '@privateaim/core-kit';
 import useVuelidate from '@vuelidate/core';
 import { maxLength, minLength, required } from '@vuelidate/validators';
 import {
-    defineComponent, 
-    h, 
-    reactive, 
-    ref, 
+    defineComponent,
+    h,
+    reactive,
+    ref,
+    resolveComponent,
     watch,
 } from 'vue';
 import type {
@@ -107,6 +108,7 @@ export default defineComponent({
         const translationsSubmit = createFormSubmitTranslations();
 
         return () => {
+            const VCIcon = resolveComponent('VCIcon');
             const name = buildFormGroup({
                 validationMessages: translationsValidation.name.value,
                 validationSeverity: getSeverity($v.value.name),
@@ -174,7 +176,7 @@ export default defineComponent({
                 h('div', { class: 'row' }, [
                     h('div', { class: 'col' }, [
                         h('h6', [
-                            h('i', { class: 'fas fa-infinity pe-1' }),
+                            h(VCIcon, { name: 'fa6-solid:infinity', class: 'pe-1' }),
                             'General',
                         ]),
                         name,
@@ -182,7 +184,7 @@ export default defineComponent({
                     ]),
                     h('div', { class: 'col' }, [
                         h('h6', [
-                            h('i', { class: 'fas fa-robot pe-1' }),
+                            h(VCIcon, { name: 'fa6-solid:robot', class: 'pe-1' }),
                             'Robot',
                         ]),
                         accountName,

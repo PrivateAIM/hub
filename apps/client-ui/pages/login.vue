@@ -74,7 +74,10 @@ export default defineNuxtComponent({
 <template>
     <div class="container">
         <h4>
-            <i class="fa-solid fa-arrow-right-to-bracket pe-2" />
+            <VCIcon
+                name="fa6-solid:arrow-right-to-bracket"
+                class="pe-2"
+            />
             Login
         </h4>
         <div class="text-center">
@@ -93,7 +96,7 @@ export default defineNuxtComponent({
                     <template #header="props">
                         <ListTitle
                             text="Providers"
-                            icon-class="fa-solid fa-atom"
+                            icon-class="fa6-solid:atom"
                         />
                         <ListSearch
                             :load="props.load"

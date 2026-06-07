@@ -73,7 +73,10 @@ export default defineNuxtComponent({
                         :time="tokenExpiresIn"
                     >
                         <template #default="props">
-                            <i class="fa fa-clock pe-1" /> The session will be renewed in
+                            <VCIcon
+                                name="fa6-solid:clock"
+                                class="pe-1"
+                            /> The session will be renewed in
                             <span class="text-success-600">
                                 {{ props.minutes }} minute(s), {{ props.seconds }} second(s)
                             </span>
@@ -90,7 +93,7 @@ export default defineNuxtComponent({
                         :href="'javascript:void(0)'"
                         target="_blank"
                     >
-                        <i class="fa fa-file" /> <span class="vc-nav-link-text">Documentation</span>
+                        <VCIcon name="fa6-solid:file" /> <span class="vc-nav-link-text">Documentation</span>
                     </a>
                 </li>
             </ul>

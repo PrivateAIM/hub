@@ -25,12 +25,12 @@ export default defineComponent({
             return 'none';
         });
 
-        const iconClass = computed(() => {
+        const iconName = computed(() => {
             if (locked.value) {
-                return 'fas fa-lock';
+                return 'fa6-solid:lock';
             }
 
-            return 'fas fa-unlock';
+            return 'fa6-solid:unlock';
         });
 
         const classSuffix = computed(() => {
@@ -43,7 +43,7 @@ export default defineComponent({
 
         return {
             statusText,
-            iconClass,
+            iconName,
             classSuffix,
         };
     },
