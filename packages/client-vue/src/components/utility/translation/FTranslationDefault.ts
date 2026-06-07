@@ -8,7 +8,7 @@
 import type { PropType } from 'vue';
 import { defineComponent, h } from 'vue';
 import type { TranslatorTranslationDefaultKey } from '@authup/client-web-kit';
-import { TranslatorTranslationGroup } from '@authup/client-web-kit';
+import { TranslatorTranslationNamespace } from '@authup/client-web-kit';
 import { FTranslation } from './FTranslation';
 
 export const FTranslationDefault = defineComponent({
@@ -20,7 +20,7 @@ export const FTranslationDefault = defineComponent({
     },
     setup(props) {
         return () => h(FTranslation, {
-            group: TranslatorTranslationGroup.DEFAULT,
+            group: TranslatorTranslationNamespace.DEFAULT,
             name: props.name,
         });
     },

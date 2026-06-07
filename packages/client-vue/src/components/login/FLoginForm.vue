@@ -11,19 +11,21 @@ import { IVuelidate } from '@ilingo/vuelidate';
 import useVuelidate from '@vuelidate/core';
 import { maxLength, minLength, required } from '@vuelidate/validators';
 import {
-    defineComponent, 
-    reactive, 
-    ref, 
-    toRef, 
+    computed,
+    defineComponent,
+    reactive,
+    ref,
+    toRef,
     watch,
 } from 'vue';
-import { VCFormInput, VCFormSubmit } from '@vuecs/form-controls';
+import { VCButton } from '@vuecs/button';
+import { VCFormInput, useSubmitButton } from '@vuecs/forms';
 
 export default defineComponent({
     components: {
         IVuelidate,
+        VCButton,
         VCFormInput,
-        VCFormSubmit,
     },
     props: { realmId: { type: String } },
     emits: ['done', 'failed'],
@@ -62,6 +64,11 @@ export default defineComponent({
 
         const busy = ref(false);
 
+        const submitButton = useSubmitButton({
+            loading: busy,
+            disabled: computed(() => busy.value || vuelidate.value.$invalid),
+        });
+
         const submit = async () => {
             try {
                 await store.login({
@@ -83,6 +90,7 @@ export default defineComponent({
             form,
             submit,
             busy,
+            submitButton,
         };
     },
 });
@@ -126,13 +134,10 @@ export default defineComponent({
             </template>
         </IVuelidate>
 
-        <VCFormSubmit
-            v-model="busy"
-            :invalid="vuelidate.$invalid"
-            :create-text="'Login'"
-            :create-button-class="{value: 'btn btn-sm btn-dark btn-block', presets: { bootstrap: false }}"
-            :create-icon-class="'fa-solid fa-right-to-bracket'"
-            :submit="submit"
+        <VCButton
+            v-bind="submitButton"
+            label="Login"
+            class="w-full"
         />
     </form>
 </template>

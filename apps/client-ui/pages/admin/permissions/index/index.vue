@@ -7,7 +7,7 @@
 
 <script lang="ts">
 import { VCTimeago } from '@vuecs/timeago';
-import { BTable } from 'bootstrap-vue-next';
+import type { TableColumn } from '@vuecs/table';
 import {
     AEntityDelete,
     APagination,
@@ -29,7 +29,6 @@ export default defineNuxtComponent({
         ATitle,
         APagination,
         ASearch,
-        BTable,
         AEntityDelete,
         APermissions,
         VCTimeago,
@@ -48,46 +47,46 @@ export default defineNuxtComponent({
         const hasEditPermission = usePermissionCheck({ name: PermissionName.PERMISSION_UPDATE });
         const hasDropPermission = usePermissionCheck({ name: PermissionName.PERMISSION_DELETE });
 
-        const fields = [
+        const columns: TableColumn[] = [
             {
                 key: 'name',
                 label: 'Name',
-                thClass: 'text-left',
-                tdClass: 'text-left',
+                headerClass: 'text-left',
+                cellClass: 'text-left',
             },
             {
                 key: 'built_in',
                 label: 'Built in?',
-                thClass: 'text-center',
-                tdClass: 'text-center',
+                headerClass: 'text-center',
+                cellClass: 'text-center',
             },
             {
                 key: 'global',
                 label: 'Global?',
-                thClass: 'text-center',
-                tdClass: 'text-center',
+                headerClass: 'text-center',
+                cellClass: 'text-center',
             },
             {
                 key: 'created_at',
                 label: 'Created at',
-                thClass: 'text-center',
-                tdClass: 'text-center',
+                headerClass: 'text-center',
+                cellClass: 'text-center',
             },
             {
                 key: 'updated_at',
                 label: 'Updated at',
-                thClass: 'text-left',
-                tdClass: 'text-left',
+                headerClass: 'text-left',
+                cellClass: 'text-left',
             },
             {
                 key: 'options',
                 label: '',
-                tdClass: 'text-left',
+                cellClass: 'text-left',
             },
         ];
 
         return {
-            fields,
+            columns,
             hasEditPermission,
             hasDropPermission,
             handleDeleted,
@@ -116,40 +115,39 @@ export default defineNuxtComponent({
             />
         </template>
         <template #body="props">
-            <BTable
-                :items="props.data"
-                :fields="fields"
+            <VCTable
+                :data="props.data"
+                :columns="columns"
                 :busy="props.busy"
-                head-variant="'dark'"
-                outlined
+                bordered
             >
-                <template #cell(built_in)="data">
+                <template #cell-built_in="{ row }: { row: any }">
                     <i
                         class="fas"
                         :class="{
-                            'fa-check text-success': data.item.built_in,
-                            'fa-times text-danger': !data.item.built_in,
+                            'fa-check text-success': row.built_in,
+                            'fa-times text-danger': !row.built_in,
                         }"
                     />
                 </template>
-                <template #cell(global)="data">
+                <template #cell-global="{ row }: { row: any }">
                     <i
                         class="fas"
                         :class="{
-                            'fa-check text-success': !data.item.realm_id,
-                            'fa-times text-danger': data.item.realm_id,
+                            'fa-check text-success': !row.realm_id,
+                            'fa-times text-danger': row.realm_id,
                         }"
                     />
                 </template>
-                <template #cell(created_at)="data">
-                    <VCTimeago :datetime="data.item.created_at" />
+                <template #cell-created_at="{ row }: { row: any }">
+                    <VCTimeago :datetime="row.created_at" />
                 </template>
-                <template #cell(updated_at)="data">
-                    <VCTimeago :datetime="data.item.created_at" />
+                <template #cell-updated_at="{ row }: { row: any }">
+                    <VCTimeago :datetime="row.created_at" />
                 </template>
-                <template #cell(options)="data">
+                <template #cell-options="{ row }: { row: any }">
                     <NuxtLink
-                        :to="'/admin/permissions/'+ data.item.id"
+                        :to="'/admin/permissions/'+ row.id"
                         class="btn btn-xs btn-outline-primary me-1"
                         :disabled="!hasEditPermission"
                     >
@@ -157,14 +155,14 @@ export default defineNuxtComponent({
                     </NuxtLink>
                     <AEntityDelete
                         class="btn btn-xs btn-outline-danger"
-                        :entity-id="data.item.id"
+                        :entity-id="row.id"
                         entity-type="permission"
                         :with-text="false"
-                        :disabled="data.item.built_in || !hasDropPermission"
+                        :disabled="row.built_in || !hasDropPermission"
                         @deleted="(e) => props.deleted!(e)"
                     />
                 </template>
-            </BTable>
+            </VCTable>
         </template>
     </APermissions>
 </template>

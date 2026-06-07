@@ -5,15 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { buildFormSubmitWithTranslations, createFormSubmitTranslations } from '@authup/client-web-kit';
+import { 
+    buildFormGroup, 
+    buildFormSelect, 
+    buildFormSubmitWithTranslations, 
+    buildFormTextarea, 
+    createFormSubmitTranslations, 
+} from '@authup/client-web-kit';
 import { getSeverity, useTranslationsForNestedValidations } from '@ilingo/vuelidate';
 import type { ProjectNode } from '@privateaim/core-kit';
 import { DomainType, ProjectNodeApprovalStatus } from '@privateaim/core-kit';
-import {
-    buildFormGroup, 
-    buildFormSelect, 
-    buildFormTextarea,
-} from '@vuecs/form-controls';
 import useVuelidate from '@vuelidate/core';
 import { maxLength, minLength, required } from '@vuelidate/validators';
 import {

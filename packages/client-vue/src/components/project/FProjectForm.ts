@@ -4,15 +4,15 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { buildFormSubmitWithTranslations, createFormSubmitTranslations } from '@authup/client-web-kit';
-import { isNameValid } from '@authup/core-kit';
-import { getSeverity, useTranslationsForNestedValidations } from '@ilingo/vuelidate';
 import {
     buildFormGroup,
     buildFormInput,
+    buildFormSubmitWithTranslations,
     buildFormTextarea,
-} from '@vuecs/form-controls';
-import type { ListFooterSlotProps, ListHeaderSlotProps, ListItemSlotProps } from '@vuecs/list-controls';
+    createFormSubmitTranslations,
+} from '@authup/client-web-kit';
+import { isNameValid } from '@authup/core-kit';
+import { getSeverity, useTranslationsForNestedValidations } from '@ilingo/vuelidate';
 import useVuelidate from '@vuelidate/core';
 import {
     helpers, 
@@ -35,7 +35,12 @@ import type { MasterImage, Node, Project } from '@privateaim/core-kit';
 import { DomainType } from '@privateaim/core-kit';
 import { generateName } from '@privateaim/kit';
 import { useUpdatedAt } from '../../composables';
-import type { ListProps } from '../../core';
+import type {
+    ListFooterSlotProps,
+    ListHeaderSlotProps,
+    ListItemSlotProps,
+    ListProps,
+} from '../../core';
 import {
     EntityListSlotName,
     createEntityManager,

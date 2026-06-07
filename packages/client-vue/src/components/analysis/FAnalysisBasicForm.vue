@@ -27,7 +27,7 @@ import {
     ref,
     watch,
 } from 'vue';
-import { VCFormInput } from '@vuecs/form-controls';
+import { VCFormInput } from '@vuecs/forms';
 import { useUpdatedAt } from '../../composables';
 import {
     createEntityManager,

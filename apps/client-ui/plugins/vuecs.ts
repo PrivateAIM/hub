@@ -5,58 +5,34 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { injectStore } from '@authup/client-web-kit';
-import type { StoreManagerOptions } from '@vuecs/core';
-import bootstrap from '@vuecs/preset-bootstrap-v5';
-import fontAwesome from '@vuecs/preset-font-awesome';
-
-import { applyStoreManagerOptions, installStoreManager } from '@vuecs/form-controls/core';
+import vuecs from '@vuecs/core';
+import installButton from '@vuecs/button';
 import installCountdown from '@vuecs/countdown';
-import installFormControl from '@vuecs/form-controls';
-import { install as installNavigation } from '@vuecs/navigation';
+import installElements from '@vuecs/elements';
+import installForms from '@vuecs/forms';
+import installList from '@vuecs/list';
+import installOverlays from '@vuecs/overlays';
 import installPagination from '@vuecs/pagination';
+import installTable from '@vuecs/table';
 import installTimeago from '@vuecs/timeago';
 
 import { defineNuxtPlugin } from '#app';
-import { Navigation } from '../config/layout';
 
 export default defineNuxtPlugin({
     name: 'vuecs',
     dependsOn: ['authup'],
     setup: (ctx) => {
-        const storeManagerOptions : StoreManagerOptions = {
-            presets: {
-                bootstrap,
-                fontAwesome,
-            },
-            defaults: {
-                list: { class: 'list' },
-                listBody: { class: 'list-body' },
-                listItem: { class: 'list-item' },
-                pagination: {
-                    class: 'pagination',
-                    itemClass: 'page-item',
-                },
-            },
-        };
+        ctx.vueApp.use(vuecs);
 
-        const storeManager = installStoreManager(ctx.vueApp);
-        applyStoreManagerOptions(storeManager, storeManagerOptions);
+        ctx.vueApp.use(installButton);
+        ctx.vueApp.use(installElements);
+        ctx.vueApp.use(installForms);
+        ctx.vueApp.use(installList);
+        ctx.vueApp.use(installOverlays);
+        ctx.vueApp.use(installPagination);
+        ctx.vueApp.use(installTable);
 
         ctx.vueApp.use(installCountdown);
-        ctx.vueApp.use(installFormControl);
-
-        const store = injectStore();
-        const navigation = new Navigation(store);
-
-        ctx.vueApp.use(installNavigation, {
-            items: ({
-                level,
-                parent,
-            }) => navigation.getItems(level, parent),
-        });
-
-        ctx.vueApp.use(installPagination);
         ctx.vueApp.use(installTimeago);
     },
 });

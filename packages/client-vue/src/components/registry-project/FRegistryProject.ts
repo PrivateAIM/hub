@@ -14,7 +14,7 @@ import {
     ServiceID,
     registryRobotSecretRegex,
 } from '@privateaim/core-kit';
-import { buildFormGroup, buildFormInput } from '@vuecs/form-controls';
+import { buildFormGroup, buildFormInput } from '@authup/client-web-kit';
 import useVuelidate from '@vuelidate/core';
 import {
     helpers,

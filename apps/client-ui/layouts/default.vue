@@ -6,6 +6,7 @@
   -->
 <script lang="ts">
 
+import { VCToastProvider } from '@vuecs/overlays';
 import PageHeader from '../components/layout/header.vue';
 import PageSidebar from '../components/layout/sidebar.vue';
 import PageFooter from '../components/layout/footer.vue';
@@ -13,24 +14,27 @@ import { defineNuxtComponent } from '#app';
 
 export default defineNuxtComponent({
     components: {
-        PageHeader, 
-        PageSidebar, 
-        PageFooter, 
-    }, 
+        PageHeader,
+        PageSidebar,
+        PageFooter,
+        VCToastProvider,
+    },
 });
 </script>
 
 <template>
-    <div id="app">
-        <PageHeader />
-        <div class="page-wrapper">
-            <PageSidebar />
-            <div class="page-content">
-                <NuxtPage />
+    <VCToastProvider>
+        <div id="app">
+            <PageHeader />
+            <div class="page-wrapper">
+                <PageSidebar />
+                <div class="page-content">
+                    <NuxtPage />
+                </div>
             </div>
+            <PageFooter />
         </div>
-        <PageFooter />
-    </div>
+    </VCToastProvider>
 </template>
 <style>
 #__nuxt,

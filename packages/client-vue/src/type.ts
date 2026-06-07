@@ -5,15 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { StoreManagerOptions } from '@vuecs/list-controls/core';
-
 export type Options = {
     coreURL: string,
     storageURL: string,
     telemetryURL: string,
 
     components?: boolean | string[],
-    storeManager?: StoreManagerOptions,
 
     translatorLocale?: string,
 

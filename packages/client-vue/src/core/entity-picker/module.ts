@@ -5,7 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { SlotName } from '@vuecs/list-controls';
+import { 
+    APagination, 
+    ASearch, 
+    SlotName, 
+    defineEntityCollectionVEmitOptions, 
+    defineEntityCollectionVProps, 
+    renderToggleButton, 
+} from '@authup/client-web-kit';
 import type {
     PropType, 
     Ref, 
@@ -19,13 +26,6 @@ import {
     toRef, 
     watch,
 } from 'vue';
-import {
-    APagination, 
-    ASearch, 
-    defineEntityCollectionVEmitOptions, 
-    defineEntityCollectionVProps,
-    renderToggleButton,
-} from '@authup/client-web-kit';
 import type { EntityCollectionVSlots } from '@authup/client-web-kit';
 import {
     hasNormalizedSlot, 

@@ -7,12 +7,11 @@
 <script lang="ts">
 import { isClientErrorWithStatusCode } from '@privateaim/core-http-kit';
 import type { Analysis, AnalysisNode } from '@privateaim/core-kit';
-import { BModal } from 'bootstrap-vue-next';
 import type { BuildInput } from 'rapiq';
 import type { PropType } from 'vue';
 import {
-    defineComponent, 
-    ref, 
+    defineComponent,
+    ref,
     useTemplateRef,
 } from 'vue';
 import { injectCoreHTTPClient, wrapFnWithBusyState } from '../../core';
@@ -25,7 +24,6 @@ import { FAnalysisNodeApprovalStatus } from './FAnalysisNodeApprovalStatus';
 export default defineComponent({
     components: {
         FAnalysisNodePicker,
-        BModal,
         FAnalysisNodeExecutionStatus,
         FAnalysisNodeApprovalStatus,
         FAnalysisNodes,
@@ -230,43 +228,38 @@ export default defineComponent({
             </FAnalysisNodes>
         </div>
 
-        <BModal
-            v-model="modal"
-            :no-footer="true"
-            :size="'lg'"
-            :lazy="true"
-            :unmount-lazy="true"
-        >
-            <template #header="props">
-                <div class="d-flex flex-row w-100">
-                    <div>
-                        <h5 class="mb-0">
-                            <i class="fa fa-city" /> Nodes
-                        </h5>
-                    </div>
-                    <div class="ms-auto">
-                        <button
-                            type="button"
-                            class="btn btn-xs btn-secondary"
-                            @click.prevent="props.close()"
-                        >
-                            <i class="fa fa-times" />
-                        </button>
+        <VCModal v-model:open="modal">
+            <VCModalContent class="modal-lg">
+                <div class="modal-header">
+                    <div class="d-flex flex-row w-100">
+                        <div>
+                            <h5 class="mb-0">
+                                <i class="fa fa-city" /> Nodes
+                            </h5>
+                        </div>
+                        <div class="ms-auto">
+                            <button
+                                type="button"
+                                class="btn btn-xs btn-secondary"
+                                @click.prevent="modal = false"
+                            >
+                                <i class="fa fa-times" />
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </template>
-
-            <template #default>
-                <FAnalysisNodePicker
-                    :analysis-id="entity.id"
-                    :project-id="entity.project_id"
-                    @created="handleCreated"
-                    @deleted="handleDeleted"
-                    @failed="handleFailed"
-                    @updated="handleUpdated"
-                />
-            </template>
-        </BModal>
+                <div class="modal-body">
+                    <FAnalysisNodePicker
+                        :analysis-id="entity.id"
+                        :project-id="entity.project_id"
+                        @created="handleCreated"
+                        @deleted="handleDeleted"
+                        @failed="handleFailed"
+                        @updated="handleUpdated"
+                    />
+                </div>
+            </VCModalContent>
+        </VCModal>
     </div>
 </template>
 <style>

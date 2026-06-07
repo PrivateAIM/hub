@@ -6,7 +6,6 @@
   -->
 <script lang="ts">
 import { VCLink } from '@vuecs/link';
-import { BModal } from 'bootstrap-vue-next';
 import type { ProjectNode } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
 import { defineComponent, ref } from 'vue';
@@ -17,7 +16,6 @@ import { FProjectNodeApprovalStatus } from './FProjectNodeApprovalStatus';
 
 export default defineComponent({
     components: {
-        BModal,
         FDisplayName,
         FProjectInForm,
         FProjectNodeApprovalCommand,
@@ -211,31 +209,31 @@ export default defineComponent({
             </div>
         </slot>
 
-        <BModal
-            v-model="modal"
-            size="lg"
-            button-size="sm"
-            :no-close-on-backdrop="true"
-            :no-close-on-esc="true"
-            :hide-footer="true"
-        >
-            <template #title>
-                <i class="fas fa-file-import" /> Project
-                <FDisplayName
-                    :name="entity.project.name"
-                    :display-name="entity.project.display_name"
-                />
-            </template>
-            <template v-if="entity">
-                <FProjectInForm
-                    :entity="entity"
-                    @updated="handleUpdated"
-                    @failed="handleFailed"
-                />
-            </template>
-            <template v-else>
-                ...
-            </template>
-        </BModal>
+        <VCModal v-model:open="modal">
+            <VCModalContent class="modal-lg">
+                <div class="modal-header">
+                    <VCModalTitle class="modal-title">
+                        <i class="fas fa-file-import" /> Project
+                        <FDisplayName
+                            :name="entity.project.name"
+                            :display-name="entity.project.display_name"
+                        />
+                    </VCModalTitle>
+                    <VCModalClose class="btn-close" />
+                </div>
+                <div class="modal-body">
+                    <template v-if="entity">
+                        <FProjectInForm
+                            :entity="entity"
+                            @updated="handleUpdated"
+                            @failed="handleFailed"
+                        />
+                    </template>
+                    <template v-else>
+                        ...
+                    </template>
+                </div>
+            </VCModalContent>
+        </VCModal>
     </div>
 </template>

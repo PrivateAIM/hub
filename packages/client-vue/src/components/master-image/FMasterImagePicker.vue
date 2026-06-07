@@ -169,8 +169,8 @@ export default defineComponent({
                                         v-model="v$.group_virtual_path.$model"
                                         :options="data.map((el) => {
                                             return {
-                                                id: el.virtual_path,
-                                                value: el.virtual_path
+                                                value: el.virtual_path,
+                                                label: el.virtual_path
                                             }
                                         })"
                                         :disabled="readonly || busy"
@@ -208,8 +208,8 @@ export default defineComponent({
                                         v-model="v$.master_image_id.$model"
                                         :options="data.map((el) => {
                                             return {
-                                                id: el.id,
-                                                value: el.name,
+                                                value: el.id,
+                                                label: el.name,
                                                 disabled: el.build_status !== 'executed',
                                             }
                                         })"

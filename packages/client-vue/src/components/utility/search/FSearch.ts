@@ -5,11 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ListLoadFn } from '@vuecs/list-controls';
 import type { PropType, SlotsType } from 'vue';
 import { defineComponent, h } from 'vue';
 import { ASearch } from '@authup/client-web-kit';
-import type { ListMeta } from '../../../core';
+import type { ListLoadFn, ListMeta } from '../../../core';
 
 export const FSearch = defineComponent({
     props: {

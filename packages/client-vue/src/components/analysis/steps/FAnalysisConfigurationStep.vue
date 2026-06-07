@@ -134,7 +134,6 @@ export default defineComponent({
                         <template #default="{passed, message}">
                             <div>
                                 <strong
-                                    v-b-tooltip.hover.top
                                     :title="message"
                                 >
                                     <template v-if="nodesLink">
@@ -187,7 +186,6 @@ export default defineComponent({
                             <div class="d-flex flex-row gap-1">
                                 <div>
                                     <strong
-                                        v-b-tooltip.hover.top
                                         :title="message"
                                     >
                                         Base
@@ -219,7 +217,6 @@ export default defineComponent({
                             <div class="d-flex flex-row gap-1">
                                 <div>
                                     <strong
-                                        v-b-tooltip.hover.top
                                         :title="message"
                                     >
                                         Entrypoint

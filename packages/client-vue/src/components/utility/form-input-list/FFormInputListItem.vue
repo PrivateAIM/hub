@@ -14,7 +14,7 @@
 
 <script lang="ts">
 import { IVuelidate } from '@ilingo/vuelidate';
-import { VCFormGroup, VCFormInput } from '@vuecs/form-controls';
+import { VCFormGroup, VCFormInput } from '@vuecs/forms';
 import useVuelidate from '@vuelidate/core';
 import {
     maxLength, 

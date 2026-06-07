@@ -7,8 +7,7 @@
 
 <script lang="ts">
 import { provide } from '@authup/client-web-kit';
-import { VCFormInputCheckbox } from '@vuecs/form-controls';
-import { BModal } from 'bootstrap-vue-next';
+import { VCFormCheckbox } from '@vuecs/forms';
 import {
     computed,
     defineComponent,
@@ -26,10 +25,9 @@ import FBucketFiles from './FBucketFiles.vue';
 export default defineComponent({
     components: {
         FBucketFiles,
-        BModal,
         FBucketFilesUpload,
         FBucketFile,
-        VCFormInputCheckbox,
+        VCFormCheckbox,
     },
     props: {
         entityId: {
@@ -173,7 +171,7 @@ export default defineComponent({
     <div>
         <div class="d-flex flex-column gap-2">
             <template v-if="!readonly">
-                <VCFormInputCheckbox
+                <VCFormCheckbox
                     v-model="allSelected"
                     :disabled="busy"
                     :label="true"
@@ -184,7 +182,7 @@ export default defineComponent({
                             Select all?
                         </label>
                     </template>
-                </VCFormInputCheckbox>
+                </VCFormCheckbox>
             </template>
 
             <hr
@@ -243,7 +241,6 @@ export default defineComponent({
             >
                 <div>
                     <button
-                        v-b-tooltip.hover.top
                         title="Delete Files"
                         type="button"
                         class="btn btn-danger btn-xs"
@@ -256,7 +253,6 @@ export default defineComponent({
                 <template v-if="!readonly">
                     <div class="ms-auto">
                         <button
-                            v-b-tooltip.hover.top
                             title="Add File"
                             type="button"
                             class="btn btn-xs btn-dark"
@@ -269,36 +265,35 @@ export default defineComponent({
             </div>
         </div>
         <div>
-            <BModal
-                v-model="modal"
-                :no-footer="true"
-                :size="'lg'"
-            >
-                <template #header="props">
-                    <div class="d-flex flex-row w-100">
-                        <div>
-                            <h5 class="mb-0">
-                                <i class="fa fa-upload" /> Upload
-                            </h5>
-                        </div>
-                        <div class="ms-auto">
-                            <button
-                                type="button"
-                                class="btn btn-xs btn-secondary"
-                                @click.prevent="props.close()"
-                            >
-                                <i class="fa fa-times" />
-                            </button>
+            <VCModal v-model:open="modal">
+                <VCModalContent class="modal-lg">
+                    <div class="modal-header">
+                        <div class="d-flex flex-row w-100">
+                            <div>
+                                <h5 class="mb-0">
+                                    <i class="fa fa-upload" /> Upload
+                                </h5>
+                            </div>
+                            <div class="ms-auto">
+                                <button
+                                    type="button"
+                                    class="btn btn-xs btn-secondary"
+                                    @click.prevent="modal = false"
+                                >
+                                    <i class="fa fa-times" />
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </template>
-
-                <FBucketFilesUpload
-                    :bucket-id="entityId"
-                    @uploaded="handleUploaded"
-                    @failed="handleFailed"
-                />
-            </BModal>
+                    <div class="modal-body">
+                        <FBucketFilesUpload
+                            :bucket-id="entityId"
+                            @uploaded="handleUploaded"
+                            @failed="handleFailed"
+                        />
+                    </div>
+                </VCModalContent>
+            </VCModal>
         </div>
     </div>
 </template>

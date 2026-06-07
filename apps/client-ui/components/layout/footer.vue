@@ -5,12 +5,12 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { BOrchestrator } from 'bootstrap-vue-next';
+import { VCToaster } from '@vuecs/overlays';
 import { computed, defineComponent } from 'vue';
 import { useRuntimeConfig } from '#imports';
 
 export default defineComponent({
-    components: { BOrchestrator },
+    components: { VCToaster },
     setup() {
         const runtimeConfig = useRuntimeConfig();
 
@@ -49,7 +49,7 @@ export default defineComponent({
                 &copy; {{ year }}
             </div>
         </div>
-        <BOrchestrator />
+        <VCToaster position="top-center" />
     </div>
 </template>
 <style>

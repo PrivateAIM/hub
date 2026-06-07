@@ -4,7 +4,15 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { ARealms, buildFormSubmitWithTranslations, createFormSubmitTranslations } from '@authup/client-web-kit';
+import {
+    ARealms,
+    buildFormCheckbox,
+    buildFormGroup,
+    buildFormInput,
+    buildFormSelect,
+    buildFormSubmitWithTranslations,
+    createFormSubmitTranslations,
+} from '@authup/client-web-kit';
 import { getSeverity, useTranslationsForNestedValidations } from '@ilingo/vuelidate';
 import type { Node, Registry } from '@privateaim/core-kit';
 import {
@@ -12,13 +20,6 @@ import {
     NodeType,
 } from '@privateaim/core-kit';
 import { alphaNumHyphenUnderscoreRegex } from '@privateaim/kit';
-import {
-    buildFormGroup,
-    buildFormInput, 
-    buildFormInputCheckbox, 
-    buildFormSelect,
-} from '@vuecs/form-controls';
-import type { ListBodySlotProps, ListItemSlotProps } from '@vuecs/list-controls';
 import useVuelidate from '@vuelidate/core';
 import {
     helpers, 
@@ -39,6 +40,7 @@ import {
     watch,
 } from 'vue';
 import { useUpdatedAt } from '../../composables';
+import type { ListBodySlotProps, ListItemSlotProps } from '../../core';
 import {
     EntityListSlotName,
     createEntityManager,
@@ -221,7 +223,7 @@ export default defineComponent({
                 validationSeverity: getSeverity($v.value.hidden),
                 label: true,
                 labelContent: 'Visibility',
-                content: buildFormInputCheckbox({
+                content: buildFormCheckbox({
                     groupClass: 'form-switch',
                     value: form.hidden,
                     onChange(input) {

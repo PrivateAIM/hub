@@ -8,12 +8,12 @@
 import { usePermissionCheck } from '@authup/client-web-kit';
 import type { Registry, RegistryProject } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
-import { BModal, BTable } from 'bootstrap-vue-next';
+import type { TableColumn } from '@vuecs/table';
 import type { BuildInput } from 'rapiq';
 import { computed, ref, toRefs } from 'vue';
 import type { PropType, Ref } from 'vue';
 import {
-    FEntityDelete, 
+    FEntityDelete,
     FPagination,
     FSearch,
     FTitle,
@@ -28,8 +28,6 @@ export default {
         ListPagination: FPagination,
         ListSearch: FSearch,
         ListTitle: FTitle,
-        BModal,
-        BTable,
         EntityDelete: FEntityDelete,
         RegistryProjectDetails,
         RegistryProjectList,
@@ -54,41 +52,41 @@ export default {
             fields: ['+account_id', '+account_name', '+account_secret'],
         };
 
-        const fields = [
+        const columns: TableColumn[] = [
             {
-                key: 'id', 
-                label: 'ID', 
-                thClass: 'text-left', 
-                tdClass: 'text-left',
+                key: 'id',
+                label: 'ID',
+                headerClass: 'text-left',
+                cellClass: 'text-left',
             },
             {
-                key: 'type', 
-                label: 'Type', 
-                thClass: 'text-left', 
-                tdClass: 'text-left',
+                key: 'type',
+                label: 'Type',
+                headerClass: 'text-left',
+                cellClass: 'text-left',
             },
             {
-                key: 'name', 
-                label: 'Name', 
-                thClass: 'text-left', 
-                tdClass: 'text-left',
+                key: 'name',
+                label: 'Name',
+                headerClass: 'text-left',
+                cellClass: 'text-left',
             },
             {
-                key: 'created_at', 
-                label: 'Created At', 
-                thClass: 'text-center', 
-                tdClass: 'text-center',
+                key: 'created_at',
+                label: 'Created At',
+                headerClass: 'text-center',
+                cellClass: 'text-center',
             },
             {
-                key: 'updated_at', 
-                label: 'Updated At', 
-                thClass: 'text-left', 
-                tdClass: 'text-left',
+                key: 'updated_at',
+                label: 'Updated At',
+                headerClass: 'text-left',
+                cellClass: 'text-left',
             },
             {
-                key: 'options', 
-                label: '', 
-                tdClass: 'text-left',
+                key: 'options',
+                label: '',
+                cellClass: 'text-left',
             },
         ];
 
@@ -119,7 +117,7 @@ export default {
             canView,
             canDrop,
             handleDeleted,
-            fields,
+            columns,
             query,
             item,
             modalShow,
@@ -150,75 +148,68 @@ export default {
                 />
             </template>
             <template #body="props">
-                <BTable
-                    :items="props.data"
-                    :fields="fields"
+                <VCTable
+                    :data="props.data"
+                    :columns="columns"
                     :busy="props.busy"
-                    head-variant="'dark'"
-                    outlined
+                    bordered
                 >
-                    <template #cell(type)="data">
+                    <template #cell-type="{ row }: { row: any }">
                         <span class="badge bg-dark">
-                            {{ data.item.type }}
+                            {{ row.type }}
                         </span>
                     </template>
-                    <template #cell(options)="data">
+                    <template #cell-options="{ row }: { row: any }">
                         <nuxt-link
                             v-if="canView"
                             class="btn btn-xs btn-outline-primary"
-                            :to="'/admin/services/registry/'+entity.id+'/projects/'+data.item.id"
+                            :to="'/admin/services/registry/'+entity.id+'/projects/'+row.id"
                         >
                             <i class="fa fa-bars" />
                         </nuxt-link>
                         <button
                             type="button"
                             class="btn btn-xs btn-outline-dark ms-1 me-1"
-                            @click.prevent="showDetails(data.item)"
+                            @click.prevent="showDetails(row)"
                         >
                             <i class="fa-solid fa-info" />
                         </button>
                         <entity-delete
                             v-if="canDrop"
                             class="btn btn-xs btn-outline-danger"
-                            :entity-id="data.item.id"
+                            :entity-id="row.id"
                             :entity-type="'registryProject'"
                             :with-text="false"
                             @deleted="handleDeleted"
                         />
                     </template>
-                    <template #cell(created_at)="data">
-                        <timeago :datetime="data.item.created_at" />
+                    <template #cell-created_at="{ row }: { row: any }">
+                        <timeago :datetime="row.created_at" />
                     </template>
-                    <template #cell(updated_at)="data">
-                        <timeago :datetime="data.item.updated_at" />
+                    <template #cell-updated_at="{ row }: { row: any }">
+                        <timeago :datetime="row.updated_at" />
                     </template>
-                    <template #table-busy>
-                        <div class="text-center text-danger my-2">
-                            <b-spinner class="align-middle" />
-                            <strong>Loading...</strong>
-                        </div>
-                    </template>
-                </BTable>
+                </VCTable>
             </template>
         </registry-project-list>
 
-        <BModal
-            v-model="modalShow"
-            size="lg"
-            button-size="sm"
-            :no-close-on-backdrop="true"
-            :no-close-on-esc="true"
-            :hide-footer="true"
-        >
-            <template #title>
-                <i class="fa-solid fa-diagram-project" /> {{ item ? item.name : 'Unknown' }}
-            </template>
-            <RegistryProjectDetails
-                v-if="item"
-                :key="item.id"
-                :entity-id="item.id"
-                :realm-id="item.realm_id"
-            />
-        </BModal>
+        <VCModal v-model:open="modalShow">
+            <VCModalContent class="modal-lg">
+                <div class="modal-header">
+                    <VCModalTitle class="modal-title">
+                        <i class="fa-solid fa-diagram-project" /> {{ item ? item.name : 'Unknown' }}
+                    </VCModalTitle>
+                    <VCModalClose class="btn-close" />
+                </div>
+                <div class="modal-body">
+                    <RegistryProjectDetails
+                        v-if="item"
+                        :key="item.id"
+                        :entity-id="item.id"
+                        :realm-id="item.realm_id"
+                    />
+                </div>
+            </VCModalContent>
+        </VCModal>
     </div>
 </template>

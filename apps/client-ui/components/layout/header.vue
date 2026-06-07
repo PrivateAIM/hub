@@ -8,14 +8,12 @@
 import { injectStore, storeToRefs } from '@authup/client-web-kit';
 import { VCGravatar } from '@vuecs/gravatar';
 import { VCNavItems } from '@vuecs/navigation';
-import { BCollapse } from 'bootstrap-vue-next';
 import { computed } from 'vue';
 import { ref } from '#imports';
 import { defineNuxtComponent } from '#app';
 
 export default defineNuxtComponent({
     components: {
-        BCollapse,
         VCGravatar,
         VCNavItems,
     },
@@ -67,7 +65,7 @@ export default defineNuxtComponent({
                 </div>
             </div>
             <nav class="page-navbar navbar-expand-md">
-                <b-collapse
+                <div
                     id="page-navbar"
                     class="navbar-content navbar-collapse collapse"
                     :class="{'show': displayNav}"
@@ -106,7 +104,7 @@ export default defineNuxtComponent({
                             </nuxt-link>
                         </li>
                     </ul>
-                </b-collapse>
+                </div>
             </nav>
         </header>
     </div>

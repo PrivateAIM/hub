@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 import { inject } from '@authup/client-web-kit';
-import { VCFormInputCheckbox } from '@vuecs/form-controls';
+import { VCFormCheckbox } from '@vuecs/forms';
 import type { PropType, Ref } from 'vue';
 import {
     computed,
@@ -20,7 +20,7 @@ import { injectStorageHTTPClient } from '../../core';
 import { FBucketFileDownload } from './FBucketFileDownload';
 
 export default defineComponent({
-    components: { FBucketFileDownload, VCFormInputCheckbox },
+    components: { FBucketFileDownload, VCFormCheckbox },
     props: {
         entity: { type: Object as PropType<BucketFile> },
         entityId: { type: String },
@@ -131,7 +131,7 @@ export default defineComponent({
         :class="{'checked': isActive}"
     >
         <div class="d-flex align-items-center">
-            <VCFormInputCheckbox
+            <VCFormCheckbox
                 :model-value="isActive"
                 @change="toggleIsActive"
             />
@@ -170,7 +170,6 @@ export default defineComponent({
                     <template v-if="!readonly">
                         <div>
                             <button
-                                v-b-tooltip.hover.top
                                 title="Delete"
                                 type="button"
                                 class="btn btn-danger btn-xs"

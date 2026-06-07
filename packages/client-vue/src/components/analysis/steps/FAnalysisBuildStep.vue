@@ -116,7 +116,6 @@ export default defineComponent({
                                 <div class="d-flex flex-row gap-1">
                                     <div>
                                         <strong
-                                            v-b-tooltip.hover.top
                                             :title="message"
                                         >
                                             Node(s) Approval
