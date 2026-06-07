@@ -50,9 +50,9 @@ export default defineComponent({
             'div',
             { class: `line line-${props.index + 1}` },
             [
-                h('div', { class: 'd-flex flex-row' }, [
+                h('div', { class: 'flex flex-row' }, [
                     h('div', { class: 'line-number' }, [props.index + 1]),
-                    h('div', { class: 'line-content d-flex flex-row' }, [
+                    h('div', { class: 'line-content flex flex-row' }, [
                         h('div', { class: ['line-message'] }, [
                             message,
                         ]),

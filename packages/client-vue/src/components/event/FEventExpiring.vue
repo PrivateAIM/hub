@@ -25,18 +25,18 @@ export default defineComponent({
 <template>
     <slot v-bind="entity">
         <div
-            class="d-flex justify-content-center gap-1"
+            class="flex justify-center gap-1"
             :class="{
                 'flex-row': direction === 'row',
-                'flex-column': direction === 'column'
+                'flex-col': direction === 'column'
             }"
         >
             <div>
                 <i
                     class="fa"
                     :class="{
-                        'fa-check text-success': entity.expiring,
-                        'fa-times text-danger': !entity.expiring
+                        'fa-check text-success-600': entity.expiring,
+                        'fa-times text-error-600': !entity.expiring
                     }"
                 />
             </div>

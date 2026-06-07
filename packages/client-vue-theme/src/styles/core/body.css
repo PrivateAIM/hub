@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024.
+ * Copyright (c) 2021-2026.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
@@ -65,16 +65,10 @@ Content
 }
 
 .list .list-item {
-    background-color: #f1f1f1;
-    /*
-    background-color: #ececec;
-
-     */
-    border: 1px solid #dedede;
+    background-color: var(--vc-color-bg-muted);
+    border: 1px solid var(--vc-color-border);
     transition: all .3s ease-in-out;
-
     border-radius: 4px;
-
     padding: 0.25rem 0.25rem;
     margin-bottom: 0.5rem;
     vertical-align: middle;
@@ -82,7 +76,7 @@ Content
 
 .list .list-item.active,
 .list .list-item.checked {
-    background-color: #d7d3d3;
+    background-color: var(--vc-color-bg-elevated);
 }
 
 .list .list-icon,

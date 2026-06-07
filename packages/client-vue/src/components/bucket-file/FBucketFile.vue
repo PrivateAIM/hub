@@ -127,17 +127,17 @@ export default defineComponent({
 </script>
 <template>
     <div
-        class="bucket-file d-flex flex-row align-items-center gap-1 p-2"
+        class="bucket-file flex flex-row items-center gap-1 p-2"
         :class="{'checked': isActive}"
     >
-        <div class="d-flex align-items-center">
+        <div class="flex items-center">
             <VCFormCheckbox
                 :model-value="isActive"
                 @change="toggleIsActive"
             />
         </div>
         <div
-            class="d-flex align-items-center bucket-file-text"
+            class="flex items-center bucket-file-text"
             @click.prevent="toggleIsActive"
         >
             <span>
@@ -155,7 +155,7 @@ export default defineComponent({
             </div>
         </template>
         <template v-if="data">
-            <div class="ms-auto d-flex flex-row gap-1">
+            <div class="ms-auto flex flex-row gap-1">
                 <slot
                     name="actions"
                     v-bind="{ data }"

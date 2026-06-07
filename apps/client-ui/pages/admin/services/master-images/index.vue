@@ -45,7 +45,7 @@ export default {
 };
 </script>
 <template>
-    <div class="d-flex flex-column gap-3">
+    <div class="flex flex-col gap-3">
         <h1 class="title no-border mb-0">
             <i class="fa-solid fa-atom" /> Master Images <span class="sub-title">Management</span>
         </h1>
@@ -66,7 +66,7 @@ export default {
         </div>
         <div class="row">
             <div class="col-6">
-                <div class="d-flex flex-column gap-3">
+                <div class="flex flex-col gap-3">
                     <div>
                         <FMasterImageCommand
                             :command="'sync'"
@@ -100,7 +100,7 @@ export default {
                                 />
                             </template>
                             <template #body="{ data }">
-                                <div class="d-flex flex-column mt-2 mb-2 gap-3">
+                                <div class="flex flex-col mt-2 mb-2 gap-3">
                                     <template
                                         v-for="item in data"
                                         :key="item.id"

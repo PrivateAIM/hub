@@ -247,11 +247,11 @@ const FProjectForm = defineComponent({
                                 drop: () => toggleNodeIds(props.data.id),
                             });
 
-                        return h('div', { class: 'd-flex flex-row w-100' }, [
+                        return h('div', { class: 'flex flex-row w-full' }, [
                             h('div', [
                                 props.data.name,
                                 ' ',
-                                h('span', { class: 'text-muted' }, `(${props.data.type})`),
+                                h('span', { class: 'text-fg-muted' }, `(${props.data.type})`),
                             ]),
                             h('div', { class: 'ms-auto' }, [action]),
                         ]);

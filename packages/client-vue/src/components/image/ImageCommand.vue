@@ -59,7 +59,7 @@ export default defineComponent({
 <template>
     <component
         :is="tag"
-        class="command-box d-flex flex-row gap-1 flex-wrap"
+        class="command-box flex flex-row gap-1 flex-wrap"
     >
         <div class="shell-sign">
             $

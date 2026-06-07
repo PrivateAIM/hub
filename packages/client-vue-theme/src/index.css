@@ -1,0 +1,324 @@
+/*!
+ * @privateaim/client-vue-theme — app-level layer on top of
+ * `@authup/client-web-kit-theme`.
+ *
+ * Cascade order (apps consume this file; the kit theme's cascade
+ * is included transitively):
+ *   1. tailwindcss            — via the kit theme
+ *   2. @vuecs/design          — via the kit theme
+ *   3. @vuecs/theme-tailwind  — via the kit theme
+ *   4. privateaim tokens      — project palette / chrome / typography
+ *   5. privateaim compat layer — Bootstrap-shaped class shims (@apply'd
+ *                                from Tailwind utilities). Phased out
+ *                                as templates migrate to <VCButton> /
+ *                                <VCAlert> / etc.
+ */
+
+/*
+ * Kit-theme CSS cascade — inlined.
+ *
+ * Upstream packaging bug: @authup/client-web-kit-theme@1.0.0-beta.44
+ * ships `files: ["dist", "src/index.css"]` but its `src/index.css`
+ * `@import`s `./styles/list.css` + `./styles/form-validation.css`,
+ * which are NOT in the published tarball. authup's own apps never hit
+ * this because they alias the workspace `src`; an external consumer
+ * resolving the published `style` export fails with
+ * "Can't resolve './styles/list.css'". Until a fixed beta ships, hub
+ * reproduces the kit theme's CSS cascade here and vendors the two
+ * kit-component stylesheets (styles/kit-*.css). The JS theme
+ * (`clientWebKitTheme()`) is still consumed from npm — see index.ts +
+ * plugins/vuecs.ts.
+ */
+@layer theme, vuecs, base, components, utilities;
+
+@import "tailwindcss";
+@import "@vuecs/design";
+@import "@vuecs/theme-tailwind";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@source ".";
+@source "../../../node_modules/@authup/client-web-kit/dist";
+@source "../../../node_modules/@authup/client-web-kit/src";
+@source "../../../node_modules/@vuecs";
+
+@import "./styles/kit-list.css";
+@import "./styles/kit-form-validation.css";
+
+/* ------------------------------------------------------------------
+   PrivateAIM design tokens
+   Override `--vc-color-*` (or palette names via setColorPalette()) to
+   reskin the entire UI without touching component class strings.
+   ------------------------------------------------------------------ */
+@layer base {
+    :root {
+        /* Chrome (header, sidebar, footer, navbar dropdowns) — always
+           dark, mirroring hub's historical layout. */
+        --privateaim-chrome-bg:             rgb(64, 67, 78);
+        --privateaim-chrome-bg-elevated:    #32333B;
+        --privateaim-chrome-fg:             #ffffff;
+        --privateaim-chrome-fg-muted:       #aeb2b7;
+        --privateaim-chrome-border:         #333333;
+
+        /* Brand accents — unchanged across modes */
+        --privateaim-brand-coral:           #FF5B5B;
+        --privateaim-brand-teal:            #4ECDC4;
+        --privateaim-brand-purple:          #6259ca;
+        --privateaim-brand-blue:            #2776dc;
+        --privateaim-brand-rust:            #a6592d;
+    }
+
+    /*
+     * Dark-mode content softening. `@vuecs/design`'s `.dark` puts
+     * `--vc-color-bg` at neutral-900 (~20.5% L) — near-black — which
+     * feels harsh against hub's warm dark chrome. Lift it so the
+     * content surface pairs with the chrome as a gentle tonal step.
+     */
+    .dark {
+        --vc-color-bg: var(--vc-color-neutral-400);
+        --vc-color-bg-muted: var(--vc-color-neutral-500);
+        --vc-color-border: var(--vc-color-neutral-500);
+    }
+
+    /*
+     * Tailwind v4 preflight resets every heading to inherit the parent
+     * font-size. Restore the heading size scale here once, project-wide.
+     * Font-family + font-weight come from styles/root.css.
+     */
+    h1 { @apply text-4xl; }
+    h2 { @apply text-3xl; }
+    h3 { @apply text-2xl; }
+    h4 { @apply text-xl; }
+    h5 { @apply text-lg; }
+    h6 { @apply text-base; }
+
+    /*
+     * Tailwind v4 preflight sets `svg { display: block }`, which breaks
+     * inline icon-next-to-text layouts. `@iconify/vue` tags every
+     * rendered SVG with `class="iconify ..."` — scope the override to
+     * those so full-bleed `<svg>` illustrations keep `display: block`.
+     */
+    svg.iconify {
+        display: inline-block;
+        vertical-align: -0.125em;
+    }
+
+    /*
+     * Tailwind v4 preflight resets `<hr>` margins to 0. Restore vertical
+     * rhythm + a muted divider color project-wide.
+     */
+    hr {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        border-color: var(--vc-color-border);
+    }
+
+    /*
+     * Plain text-alignment helpers. Hub's templates use `text-left` /
+     * `text-right` directly (carried over from the Bootstrap era); both
+     * collide with Tailwind utilities of the same name, so keep them in
+     * `@layer base` where the utility layer still wins when both apply.
+     */
+    .text-left  { text-align: left; }
+    .text-right { text-align: right; }
+}
+
+/* ------------------------------------------------------------------
+   Bootstrap-compat layer
+   Provides the Bootstrap-shaped utility / component class names that
+   hub's pre-Tailwind templates still reference. Each rule `@apply`s
+   Tailwind utilities — same visual contract, no `bootstrap` dep, and
+   the rules disappear automatically when the last caller is rewritten
+   to a `<VC*>` component.
+   ------------------------------------------------------------------ */
+@layer components {
+    /* Buttons --------------------------------------------------------- */
+    .btn {
+        @apply inline-flex items-center justify-center gap-1 rounded-md
+               border border-transparent px-3 py-1.5 text-sm font-medium
+               transition-colors cursor-pointer
+               focus-visible:outline-2 focus-visible:outline-offset-2
+               focus-visible:outline-primary-500
+               disabled:opacity-50 disabled:cursor-not-allowed;
+    }
+    .btn-xs    { @apply px-1.5! py-1.25! text-xs!; }
+    .btn-sm    { @apply px-2! py-1! text-xs!; }
+    .btn-md    { @apply px-2! py-1! text-base!; }
+    .btn-lg    { @apply px-4! py-2! text-base!; }
+    .btn-block { @apply block w-full; }
+
+    .btn-primary   { @apply bg-primary-600 text-on-primary hover:bg-primary-700; }
+    .btn-secondary { @apply bg-bg-elevated text-fg         hover:bg-bg-muted; }
+    .btn-success   { @apply bg-success-600 text-on-success hover:bg-success-700; }
+    .btn-danger    { @apply bg-error-600   text-on-error   hover:bg-error-700; }
+    .btn-warning   { @apply bg-warning-500 text-on-warning hover:bg-warning-600; }
+    .btn-info      { @apply bg-info-500    text-on-info    hover:bg-info-600; }
+    .btn-light     { @apply bg-bg-muted    text-fg         hover:bg-bg-elevated; }
+    .btn-dark      { @apply bg-fg          text-bg         hover:opacity-80; }
+
+    .btn-outline-primary   { @apply border-primary-600  text-primary-600 hover:bg-primary-600 hover:text-on-primary; }
+    .btn-outline-secondary { @apply border-border       text-fg          hover:bg-bg-muted; }
+    .btn-outline-success   { @apply border-success-600  text-success-600 hover:bg-success-600 hover:text-on-success; }
+    .btn-outline-danger    { @apply border-error-600    text-error-600   hover:bg-error-600   hover:text-on-error; }
+    .btn-outline-warning   { @apply border-warning-500  text-warning-600 hover:bg-warning-500 hover:text-on-warning; }
+    .btn-outline-info      { @apply border-info-500     text-info-600    hover:bg-info-500    hover:text-on-info; }
+    .btn-outline-dark      { @apply border-fg           text-fg          hover:bg-fg          hover:text-bg; }
+
+    /* Grid — Bootstrap-style 12-col layout via flex (not CSS grid). */
+    .row     { @apply flex flex-wrap; margin-left: -0.5rem; margin-right: -0.5rem; }
+    .col     { @apply flex-1 basis-0 px-2; }
+    .col-1   { @apply w-1/12 px-2; }
+    .col-2   { @apply w-2/12 px-2; }
+    .col-3   { @apply w-3/12 px-2; }
+    .col-4   { @apply w-4/12 px-2; }
+    .col-5   { @apply w-5/12 px-2; }
+    .col-6   { @apply w-6/12 px-2; }
+    .col-7   { @apply w-7/12 px-2; }
+    .col-8   { @apply w-8/12 px-2; }
+    .col-9   { @apply w-9/12 px-2; }
+    .col-10  { @apply w-10/12 px-2; }
+    .col-11  { @apply w-11/12 px-2; }
+    .col-12  { @apply w-full px-2; }
+
+    /* Responsive columns — md+ breakpoint (hub uses col-sm, col-md, col-lg variants). */
+    .col-sm    { @apply px-2 sm:flex-1 sm:basis-0; }
+    .col-sm-4  { @apply w-full px-2 sm:w-4/12; }
+    .col-md    { @apply px-2 md:flex-1 md:basis-0; }
+    .col-md-3  { @apply w-full px-2 md:w-3/12; }
+    .col-md-4  { @apply w-full px-2 md:w-4/12; }
+    .col-md-6  { @apply w-full px-2 md:w-6/12; }
+    .col-lg-6  { @apply w-full px-2 lg:w-6/12; }
+
+    .container       { @apply mx-auto w-full max-w-screen-lg px-4; }
+    .container-fluid { @apply w-full px-4; }
+
+    /* Cards — Bootstrap-shaped card chrome. Surface decorations
+       (shadow, header chevron, card-grey, card-file) live in
+       styles/card.css; these shims provide the structural defaults. */
+    .card        { @apply relative flex flex-col rounded-md border border-border bg-bg-elevated; }
+    .card-header { @apply flex items-center border-b border-border px-3 py-2; }
+    .card-body   { @apply flex-1 px-3 py-2; }
+    .card-footer { @apply border-t border-border px-3 py-2; }
+    .card-title  { @apply font-semibold; }
+
+    /* Alerts --------------------------------------------------------- */
+    .alert         { @apply relative mb-3 rounded-md border px-4 py-3; }
+    .alert-sm      { @apply px-3 py-2 text-sm; }
+    .alert-primary { @apply border-primary-200 bg-primary-50 text-primary-700; }
+    .alert-success { @apply border-success-200 bg-success-50 text-success-700; }
+    .alert-warning { @apply border-warning-200 bg-warning-50 text-warning-700; }
+    .alert-danger  { @apply border-error-200   bg-error-50   text-error-700; }
+    .alert-info    { @apply border-info-200    bg-info-50    text-info-700; }
+    .alert-dark    { @apply border-border bg-bg-elevated text-fg; }
+
+    /* Badges --------------------------------------------------------- */
+    .badge {
+        @apply inline-flex items-center rounded-full px-2 py-0.5
+               text-xs font-medium;
+    }
+
+    /* Nav / navbar --------------------------------------------------- */
+    .nav             { @apply flex flex-wrap; }
+    .nav-item        { @apply list-none; }
+    .nav-link        { @apply block px-3 py-2 text-fg hover:text-primary-600 no-underline; }
+    .nav-link.active { @apply text-primary-600; }
+    .navbar          { @apply flex flex-wrap items-center justify-between; }
+    .navbar-nav      { @apply flex flex-col list-none; }
+    .navbar-toggler  { @apply rounded border border-border px-2 py-1; }
+    .navbar-collapse { @apply grow basis-full items-center; }
+
+    .navbar-collapse:not(.show)        { @apply hidden; }
+    .navbar-expand-md .navbar-collapse { @apply md:flex!; }
+    .navbar-expand-md .navbar-nav      { @apply md:flex-row!; }
+    .navbar-expand-md                  { @apply md:flex-nowrap md:justify-start; }
+
+    /* Forms — minimal shims (vuecs SFCs own the real form styles) ---- */
+    .form-group   { @apply mb-3; }
+    .form-switch  { @apply inline-flex items-center gap-2; }
+
+    /* Pagination — joined-tab look over theme-tailwind's per-button
+       rounded-md. */
+    .vc-pagination .vc-pagination-link {
+        @apply !rounded-none;
+        margin-left: -1px;
+    }
+    .vc-pagination > :first-child .vc-pagination-link {
+        @apply !rounded-l-md;
+        margin-left: 0;
+    }
+    .vc-pagination > :last-child .vc-pagination-link {
+        @apply !rounded-r-md;
+    }
+
+    /* Form validation visual state. */
+    .is-valid {
+        @apply border-success-600 ring-1 ring-success-500;
+    }
+
+    /* Dropdowns — Bootstrap-style toggle/menu (also used by the
+       navbar/sidebar chrome). The `hidden` on `.dropdown-menu` is
+       load-bearing; the toggle's click handler flips `.show`. */
+    .dropdown { @apply relative; }
+    .dropdown-toggle { @apply cursor-pointer; }
+    .dropdown-menu {
+        @apply absolute top-full left-0 z-50 hidden min-w-40 rounded-md
+               border border-border bg-bg py-1 shadow-md;
+    }
+    .dropdown-menu-end { @apply left-auto right-0; }
+    .dropdown-menu.show { @apply block; }
+    .dropdown-item {
+        @apply block w-full cursor-pointer border-0 bg-transparent
+               px-3 py-1 text-left text-sm text-fg hover:bg-bg-muted;
+    }
+    .dropdown-item.active {
+        @apply bg-primary-600 text-on-primary hover:bg-primary-700;
+    }
+    .dropdown-divider { @apply my-1 h-px bg-border; }
+
+    /* Modal — INNER chrome only. The backdrop / positioning shell is
+       owned by Reka / <VCModalContent> (@vuecs/overlays); hub mounts
+       VCModal compound directly. These rules style the structural
+       classes still carried on the markup inside <VCModalContent>
+       (.modal-header / .modal-body / .modal-footer / .modal-title /
+       .btn-close). */
+    .modal-header   { @apply flex items-center justify-between border-b border-border px-4 py-3; }
+    .modal-title    { @apply font-semibold; }
+    .modal-body     { @apply px-4 py-3; }
+    .modal-footer   { @apply flex items-center justify-end gap-2 border-t border-border px-4 py-3; }
+    .btn-close {
+        @apply cursor-pointer border-0 bg-transparent text-fg-muted
+               hover:text-fg;
+    }
+}
+
+/* ------------------------------------------------------------------
+   PrivateAIM app styles — chrome (header, navbar, sidebar, body)
+   + project utilities + login chrome. Layered LAST so app-specific
+   selectors win over the Tailwind utility / compat layers when the
+   classes overlap.
+   ------------------------------------------------------------------ */
+@import "./styles/root.css";
+@import "./styles/colors.css";
+@import "./styles/domain.css";
+@import "./styles/form.css";
+@import "./styles/card.css";
+@import "./styles/vue-layout-navigation.css";
+@import "./styles/vue-form-wizard.css";
+@import "./styles/core/header.css";
+@import "./styles/core/navbar.css";
+@import "./styles/core/body.css";
+@import "./styles/core/sidebar.css";
+
+/*
+ * Pagination hover override. Lives at the top level (outside `@layer
+ * components`) and uses `!important` — belt-and-suspenders against the
+ * underlying `<VCPagination>` button hover utility which sits in
+ * `@layer utilities`. The active page button paints `bg-primary-600` /
+ * `text-on-primary`; mirroring it on hover previews "click → this page".
+ */
+.vc-pagination .vc-pagination-link:hover:not(:disabled),
+.vc-pagination .vc-pagination-link:focus-visible:not(:disabled) {
+    background-color: var(--color-primary-600) !important;
+    color:            var(--color-on-primary)  !important;
+    border-color:     var(--color-primary-600) !important;
+}

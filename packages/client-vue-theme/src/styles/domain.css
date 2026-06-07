@@ -1,23 +1,20 @@
 /*
- * Copyright (c) 2022-2024.
+ * Copyright (c) 2022-2026.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
 
 .train-card {
-    /* box-shadow: 0 4px 25px 0 rgba(0,0,0,.1); */
     transition: all .3s ease-in-out;
-
     border-radius: 4px;
-
     padding: 0.5rem 1rem;
     display: flex;
     flex-direction: column;
     width: 100%;
 }
 
-.train-card-content{
+.train-card-content {
     min-height: 1.5rem;
 }
 
@@ -39,7 +36,7 @@
 .log-container {
     background-color: #24292f;
     min-height: 150px;
-    border-color: hsla(210,18%,87%,1);
+    border-color: hsla(210, 18%, 87%, 1);
     border-radius: 4px;
     max-height: 350px;
     overflow-y: scroll;
@@ -84,10 +81,8 @@
 .log-body .line {
     color: #d0d7de;
     width: 100%;
-
     line-height: 1.3rem;
     font-size: .875rem;
-
     text-align: left;
 }
 
@@ -98,7 +93,7 @@
 .log-body .line-number {
     width: 48px;
     overflow: hidden;
-    color: rgba(140,149,159,0.75);
+    color: rgba(140, 149, 159, 0.75);
     text-align: center;
     text-decoration: none;
     text-overflow: ellipsis;
@@ -149,8 +144,7 @@
 
 .command-box {
     background-color: rgb(43, 43, 43);
-    border: 1px solid #dedede;
-    /* box-shadow: 0 4px 25px 0 rgb(0 0 0 / 10%); */
+    border: 1px solid var(--vc-color-border);
     transition: all .3s ease-in-out;
     border-radius: 4px;
     padding: 0.5rem 1rem;
@@ -160,5 +154,5 @@
 }
 
 .command-box .shell-sign {
-    color: rgb(166, 89, 45);
+    color: var(--privateaim-brand-rust);
 }

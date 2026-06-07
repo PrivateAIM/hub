@@ -161,7 +161,7 @@ export default defineComponent({
                                 <template #label>
                                     Group
                                     <template v-if="isVirtualGroupPathDefined">
-                                        <i class="fa fa-check text-success" />
+                                        <i class="fa fa-check text-success-600" />
                                     </template>
                                 </template>
                                 <template #default>
@@ -200,7 +200,7 @@ export default defineComponent({
                                 <template #label>
                                     Image
                                     <template v-if="v$.master_image_id.$model">
-                                        <i class="fa fa-check text-success" />
+                                        <i class="fa fa-check text-success-600" />
                                     </template>
                                 </template>
                                 <template #default>

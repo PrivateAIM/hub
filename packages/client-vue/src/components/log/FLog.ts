@@ -78,9 +78,9 @@ export default defineComponent({
             'div',
             { class: `line line-${index.value + 1}` },
             [
-                h('div', { class: 'd-flex flex-row' }, [
+                h('div', { class: 'flex flex-row' }, [
                     h('div', { class: 'line-number' }, [index.value + 1]),
-                    h('div', { class: 'line-content d-flex flex-row' }, [
+                    h('div', { class: 'line-content flex flex-row' }, [
                         h('div', { class: 'line-component', style: `color: ${color.value}` }, [
                             `${entity.value.level}`,
                         ]),

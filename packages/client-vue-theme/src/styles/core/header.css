@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024.
+ * Copyright (c) 2021-2026.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
@@ -9,12 +9,12 @@
     position: fixed;
     left: 0;
     right: 0;
-    top:0;
+    top: 0;
     z-index: 1002;
     display: flex;
     align-items: center;
     box-shadow: 0px -6px 0px rgba(0, 0, 0, 0.3) inset;
-    background-color: rgb(64,67,78);
+    background-color: var(--privateaim-chrome-bg);
     padding-bottom: 6px;
 }
 
@@ -30,15 +30,15 @@
 }
 
 .page-header .toggle-box {
-    color: #aeb2b7;
-    margin:0px 10px 0px 10px;
+    color: var(--privateaim-chrome-fg-muted);
+    margin: 0px 10px 0px 10px;
 }
 
 .page-header .toggle-box .toggle-trigger {
     cursor: pointer;
     padding: 9px 10px;
     background-color: transparent;
-    border: 1px solid #333;
+    border: 1px solid var(--privateaim-chrome-border);
     border-radius: .25rem;
 }
 
@@ -47,22 +47,22 @@
     width: 22px;
     height: 2px;
     border-radius: 1px;
-    margin-top:4px;
-    background:#fff;
+    margin-top: 4px;
+    background: var(--privateaim-chrome-fg);
 }
 
 .page-header .logo {
     font-size: 1.8rem;
-    color: #f2f2f2;
+    color: var(--privateaim-chrome-fg);
     flex: none;
 }
 
 .page-header .logo span:not(.info-text) {
-    color: #6259ca;
+    color: var(--privateaim-brand-purple);
 }
 
 .page-header .logo .info-text {
-    font-size:0.875em;
+    font-size: 0.875em;
 }
 
 .page-header .logo .info-text:before {
@@ -73,11 +73,11 @@
 
 @media (min-width: 768px) {
     .page-header .header-title {
-        min-width:270px;
+        min-width: 270px;
         text-align: center;
     }
 
     .page-header .toggle-box .toggle-trigger {
-        display: none
+        display: none;
     }
 }

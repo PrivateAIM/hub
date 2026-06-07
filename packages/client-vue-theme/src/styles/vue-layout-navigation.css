@@ -1,21 +1,27 @@
 /*
- * Copyright (c) 2021-2024.
+ * Copyright (c) 2021-2026.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
 
 .vc-nav-items .vc-nav-link {
-    color: #aeb2b7;
+    color: var(--privateaim-chrome-fg-muted);
     line-height: 1rem;
     font-size: 0.875rem;
+}
+
+.page-sidebar .vc-nav-link,
+.page-sidebar .nav-link {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
 }
 
 .vc-nav-items .vc-nav-item.vc-nav-item-nested:hover > .vc-nav-link,
 .vc-nav-items .vc-nav-item.vc-nav-item-nested:active > .vc-nav-link,
 .vc-nav-items .vc-nav-item.vc-nav-item-nested.active > .vc-nav-link {
-    background: #32333B;
-    color: #aeb2b7;
+    background: var(--privateaim-chrome-bg-elevated);
+    color: var(--privateaim-chrome-fg-muted);
 }
 
 .vc-nav-items .vc-nav-item .vc-nav-link.dropdown-toggle {
@@ -27,7 +33,7 @@
 .vc-nav-items .vc-nav-item .vc-nav-link,
 .vc-nav-items .vc-nav-item:hover .vc-nav-link,
 .vc-nav-items .vc-nav-item.active .vc-nav-link {
-    border-left-color: #32333B !important;
+    border-left-color: var(--privateaim-chrome-bg-elevated) !important;
 }
 
 .vc-nav-items .vc-nav-link.active:not(.vc-nav-link-root),
@@ -41,22 +47,22 @@
 .vc-nav-items .vc-nav-link.router-link-exact-active,
 .vc-nav-items .vc-nav-link.nuxt-link-exact-active {
     cursor: pointer;
-    color: #FF5B5B;
-    background: #32333B;
+    color: var(--privateaim-brand-coral);
+    background: var(--privateaim-chrome-bg-elevated);
 }
 
 .vc-nav-items .vc-nav-separator:before,
 .vc-nav-items .vc-nav-separator:after {
     content: '';
     flex: 1;
-    height:3px;
-    background: #32333B;
+    height: 3px;
+    background: var(--privateaim-chrome-bg-elevated);
 }
 
 .vc-nav-item-nested .vc-nav-items .vc-nav-link {
     border-left-width: 6px;
     border-left-style: solid;
-    border-left-color: rgb(64,67,78);
+    border-left-color: var(--privateaim-chrome-bg);
 }
 
 @media (max-width: 768px) {

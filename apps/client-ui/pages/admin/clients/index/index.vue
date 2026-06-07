@@ -125,8 +125,8 @@ export default defineComponent({
                     <i
                         class="fas"
                         :class="{
-                            'fa-check text-success': row.active,
-                            'fa-times text-danger': !row.active,
+                            'fa-check text-success-600': row.active,
+                            'fa-times text-error-600': !row.active,
                         }"
                     />
                 </template>
@@ -134,8 +134,8 @@ export default defineComponent({
                     <i
                         class="fas"
                         :class="{
-                            'fa-check text-success': row.is_confidential,
-                            'fa-times text-danger': !row.is_confidential,
+                            'fa-check text-success-600': row.is_confidential,
+                            'fa-times text-error-600': !row.is_confidential,
                         }"
                     />
                 </template>
@@ -143,8 +143,8 @@ export default defineComponent({
                     <i
                         class="fas"
                         :class="{
-                            'fa-check text-success': row.built_in,
-                            'fa-times text-danger': !row.built_in,
+                            'fa-check text-success-600': row.built_in,
+                            'fa-times text-error-600': !row.built_in,
                         }"
                     />
                 </template>

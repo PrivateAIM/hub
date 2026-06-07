@@ -49,7 +49,7 @@ export default defineNuxtComponent({
 
 <template>
     <div v-if="entity">
-        <div class="d-flex flex-column gap-3">
+        <div class="flex flex-col gap-3">
             <div>
                 <FAnalysisSteps
                     :entity="entity"
@@ -83,7 +83,7 @@ export default defineNuxtComponent({
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="d-flex flex-row gap-2 align-items-center alert alert-sm alert-danger mb-0">
+                        <div class="flex flex-row gap-2 items-center alert alert-sm alert-danger mb-0">
                             <div>
                                 <i class="fa fa-info" />
                             </div>

@@ -165,7 +165,7 @@ export default defineComponent({
         </h1>
 
         <div class="m-b-20 m-t-10">
-            <div class="flex-wrap flex-row d-flex align-items-center">
+            <div class="flex-wrap flex-row flex items-center">
                 <DomainEntityNav
                     :items="tabs"
                     :path="'/projects/' + entity.id"

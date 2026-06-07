@@ -11,6 +11,7 @@ import { VCNavItems } from '@vuecs/navigation';
 import { computed } from 'vue';
 import { ref } from '#imports';
 import { defineNuxtComponent } from '#app';
+import { Navigation } from '../../config/layout';
 
 export default defineNuxtComponent({
     components: {
@@ -20,9 +21,9 @@ export default defineNuxtComponent({
     setup() {
         const store = injectStore();
         const {
-            loggedIn, 
-            user, 
-            realmManagementName, 
+            loggedIn,
+            user,
+            realmManagementName,
         } = storeToRefs(store);
 
         const displayNav = ref(false);
@@ -33,12 +34,26 @@ export default defineNuxtComponent({
 
         const infoText = computed(() => realmManagementName.value || 'PrivateAim');
 
+        // Top nav is permission-filtered — pass the resolver as `:data` to
+        // `<VCNavItems>`. The reactive session reads happen after an `await`
+        // inside the resolver, so the explicit `:watch` list re-runs it on
+        // every session transition (login/logout, identity change).
+        const navigation = new Navigation(store);
+        const topItems = () => navigation.getTopItems();
+        const topItemsWatch = [
+            () => store.loggedIn,
+            () => store.userId,
+            () => store.realmManagement,
+        ];
+
         return {
             infoText,
             loggedIn,
             user,
             toggleNav,
             displayNav,
+            topItems,
+            topItemsWatch,
         };
     },
 });
@@ -72,7 +87,8 @@ export default defineNuxtComponent({
                 >
                     <VCNavItems
                         class="navbar-nav"
-                        :level="0"
+                        :data="topItems"
+                        :watch="topItemsWatch"
                     />
                     <ul
                         v-if="loggedIn && user"

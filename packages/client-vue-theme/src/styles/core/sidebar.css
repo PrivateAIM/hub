@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 2021-2024.
+ * Copyright (c) 2021-2026.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
 
 .page-sidebar {
-    width:300px;
-    background-color: rgb(64,67,78);
-    color: #fff;
+    width: 300px;
+    background-color: var(--privateaim-chrome-bg);
+    color: var(--privateaim-chrome-fg);
     transition: all 0.3s;
     display: flex;
     flex-direction: column;
@@ -22,7 +22,7 @@
 }
 
 .page-sidebar .sidebar-header span {
-    color: #4ECDC4;
+    color: var(--privateaim-brand-teal);
 }
 
 @media only screen and (max-width: 768px) {

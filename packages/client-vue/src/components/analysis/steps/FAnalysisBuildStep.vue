@@ -71,9 +71,9 @@ export default defineComponent({
 });
 </script>
 <template>
-    <div class="card-grey card flex-grow-1">
+    <div class="card-grey card grow">
         <div class="card-header">
-            <div class="title d-flex flex-row">
+            <div class="title flex flex-row">
                 <div>
                     Build
                 </div>
@@ -87,14 +87,14 @@ export default defineComponent({
             </div>
         </div>
         <div class="card-body">
-            <div class="d-flex flex-column h-100">
+            <div class="flex flex-col h-full">
                 <div class="text-center mb-3">
                     <i class="fas fa-hammer fa-4x" />
                 </div>
                 <div class="progress bg-white">
                     <div
                         class="progress-bar"
-                        :class="'bg-success'"
+                        :class="'bg-success-600'"
                         :style="{width: progress + '%'}"
                         :aria-valuenow="progress"
                         aria-valuemin="0"
@@ -106,14 +106,14 @@ export default defineComponent({
 
                 <hr>
 
-                <div class="d-flex flex-column">
+                <div class="flex flex-col">
                     <div>
                         <h6 class="mb-0">
                             Requirements
                         </h6>
                         <FAnalysisBuildNodesStep :entity="entity">
                             <template #default="{passed, message}">
-                                <div class="d-flex flex-row gap-1">
+                                <div class="flex flex-row gap-1">
                                     <div>
                                         <strong
                                             :title="message"
@@ -123,10 +123,10 @@ export default defineComponent({
                                     </div>
                                     <div>
                                         <span
-                                            class="text-success"
+                                            class="text-success-600"
                                             :class="{
-                                                'text-success': passed,
-                                                'text-danger': !passed,
+                                                'text-success-600': passed,
+                                                'text-error-600': !passed,
                                             }"
                                         >
                                             <i
@@ -150,10 +150,10 @@ export default defineComponent({
                             <h6 class="mb-0">
                                 Info
                             </h6>
-                            <div class="d-flex flex-column">
+                            <div class="flex flex-col">
                                 <div
                                     v-if="entity.build_os"
-                                    class="d-flex flex-row gap-1"
+                                    class="flex flex-row gap-1"
                                 >
                                     <div>
                                         <strong>OS</strong>
@@ -168,7 +168,7 @@ export default defineComponent({
                                 </div>
                                 <div
                                     v-if="entity.build_hash"
-                                    class="d-flex flex-row gap-1"
+                                    class="flex flex-row gap-1"
                                 >
                                     <div>
                                         <strong>Hash</strong>
@@ -179,7 +179,7 @@ export default defineComponent({
                                 </div>
                                 <div
                                     v-if="size"
-                                    class="d-flex flex-row gap-1"
+                                    class="flex flex-row gap-1"
                                 >
                                     <div>
                                         <strong>Size</strong>
@@ -194,7 +194,7 @@ export default defineComponent({
                 </div>
 
                 <div class="mt-auto">
-                    <div class="d-flex flex-row gap-1 ">
+                    <div class="flex flex-row gap-1 ">
                         <div>
                             <FAnalysisCommand
                                 :command="'buildStart'"

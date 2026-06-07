@@ -90,10 +90,10 @@ export default defineComponent({
 
         const bgClazz = computed(() => {
             if (entity.value.execution_status === ProcessStatus.EXECUTED) {
-                return 'bg-success';
+                return 'bg-success-600';
             }
 
-            return 'bg-dark';
+            return 'bg-fg';
         });
 
         return {

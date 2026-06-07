@@ -59,7 +59,7 @@ export default defineNuxtComponent({
 </script>
 <template>
     <div class="content-wrapper">
-        <div class="content-sidebar flex-column">
+        <div class="content-sidebar flex-col">
             <DomainEntityNav
                 :items="tabs"
                 :direction="'vertical'"

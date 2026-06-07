@@ -63,8 +63,8 @@ export default defineComponent({
 });
 </script>
 <template>
-    <div class="d-flex flex-row align-items-center gap-2">
-        <small class="log-refresh-status text-muted">
+    <div class="flex flex-row items-center gap-2">
+        <small class="log-refresh-status text-fg-muted">
             <template v-if="busy">
                 <i class="fa fa-spinner fa-spin pe-1" />refreshing
             </template>

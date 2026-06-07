@@ -9,7 +9,8 @@ import { injectStore, storeToRefs } from '@authup/client-web-kit';
 import { VCCountdown } from '@vuecs/countdown';
 import { VCNavItems } from '@vuecs/navigation';
 import { defineNuxtComponent } from '#app';
-import { computed } from '#imports';
+import { computed, useRoute } from '#imports';
+import { Navigation } from '../../config/layout';
 
 export default defineNuxtComponent({
     components: { VCCountdown, VCNavItems },
@@ -17,9 +18,9 @@ export default defineNuxtComponent({
         const store = injectStore();
 
         const {
-            loggedIn, 
-            accessTokenExpireDate: tokenExpireDate, 
-            realmManagement, 
+            loggedIn,
+            accessTokenExpireDate: tokenExpireDate,
+            realmManagement,
         } = storeToRefs(store);
 
         const tokenExpiresIn = computed(() => {
@@ -30,10 +31,26 @@ export default defineNuxtComponent({
             return tokenExpireDate.value.getTime() - Date.now();
         });
 
+        // Sidebar items are permission-filtered and additionally vary by
+        // route (`/admin/*` selects the admin sidebar). Pass the resolver as
+        // `:data`; the `:watch` list re-runs it on session transitions and
+        // when the active path crosses the admin boundary.
+        const route = useRoute();
+        const navigation = new Navigation(store);
+        const sideItems = () => navigation.getSideItems(route.path);
+        const sideItemsWatch = [
+            () => store.loggedIn,
+            () => store.userId,
+            () => store.realmManagement,
+            () => route.path,
+        ];
+
         return {
             loggedIn,
             tokenExpiresIn,
             realmManagement,
+            sideItems,
+            sideItemsWatch,
         };
     },
 });
@@ -42,13 +59,14 @@ export default defineNuxtComponent({
     <div class="page-sidebar">
         <VCNavItems
             class="sidebar-menu navbar-nav"
-            :level="1"
+            :data="sideItems"
+            :watch="sideItemsWatch"
         />
 
         <div class="mt-auto">
             <div
                 v-if="loggedIn"
-                class="font-weight-light d-flex flex-column ms-3 me-3 mb-1 mt-auto"
+                class="font-weight-light flex flex-col ms-3 me-3 mb-1 mt-auto"
             >
                 <small class="countdown-text">
                     <VCCountdown
@@ -56,7 +74,7 @@ export default defineNuxtComponent({
                     >
                         <template #default="props">
                             <i class="fa fa-clock pe-1" /> The session will be renewed in
-                            <span class="text-success">
+                            <span class="text-success-600">
                                 {{ props.minutes }} minute(s), {{ props.seconds }} second(s)
                             </span>
                         </template>

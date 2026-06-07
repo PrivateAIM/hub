@@ -87,14 +87,14 @@ export default defineComponent({
         class="row"
     >
         <div class="col-12 col-md-6">
-            <div class="d-flex flex-column gap-3">
+            <div class="flex flex-col gap-3">
                 <div class="card-grey card">
                     <div class="card-header">
                         <span class="title"><i class="fa fa-compact-disc" /> Base</span>
                     </div>
                     <div class="card-body">
                         <div
-                            class="d-flex flex-row gap-2 align-items-center alert alert-sm"
+                            class="flex flex-row gap-2 items-center alert alert-sm"
                             :class="{
                                 'alert-warning': entity.configuration_image_valid,
                                 'alert-danger': !entity.configuration_image_valid,
@@ -131,14 +131,14 @@ export default defineComponent({
             </div>
         </div>
         <div class="col-12 col-md-6">
-            <div class="d-flex flex-column gap-3">
+            <div class="flex flex-col gap-3">
                 <div class="card-grey card">
                     <div class="card-header">
                         <span class="title"><i class="fa fa-file" /> Entrypoint</span>
                     </div>
                     <div class="card-body">
                         <div
-                            class="d-flex flex-row gap-2 align-items-center alert alert-sm"
+                            class="flex flex-row gap-2 items-center alert alert-sm"
                             :class="{
                                 'alert-warning': entity.configuration_entrypoint_valid,
                                 'alert-danger': !entity.configuration_entrypoint_valid,
@@ -170,7 +170,7 @@ export default defineComponent({
                                             @failed="bucketFilesProps.failed"
                                         >
                                             <template #default="bucketFileProps">
-                                                <div class="d-flex flex-row align-items-center gap-2 p-1 w-100">
+                                                <div class="flex flex-row items-center gap-2 p-1 w-full">
                                                     <div>
                                                         {{ bucketFileProps.data.path }}
                                                     </div>

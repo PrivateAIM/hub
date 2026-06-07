@@ -75,7 +75,7 @@ export default defineComponent({
 });
 </script>
 <template>
-    <div class="d-flex flex-column gap-1">
+    <div class="flex flex-col gap-1">
         <slot name="default">
             <slot
                 name="header"
@@ -98,7 +98,7 @@ export default defineComponent({
                         </template>
                     </div>
                 </div>
-                <div class="d-flex flex-column gap-1" />
+                <div class="flex flex-col gap-1" />
             </slot>
             <slot
                 name="footer"

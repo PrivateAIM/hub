@@ -32,7 +32,7 @@ export default defineComponent({
     <div v-if="entity">
         <div class="card-grey card mb-3">
             <div class="card-header">
-                <div class="d-flex flex-row w-100">
+                <div class="flex flex-row w-full">
                     <div>
                         <span class="title">Code</span>
                     </div>
@@ -52,7 +52,7 @@ export default defineComponent({
             </div>
             <div class="card-body">
                 <div
-                    class="d-flex flex-row gap-2 align-items-center alert alert-sm alert-warning"
+                    class="flex flex-row gap-2 items-center alert alert-sm alert-warning"
                 >
                     <div>
                         <i class="fa fa-upload" />

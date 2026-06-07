@@ -83,9 +83,9 @@ export default defineComponent({
 </script>
 <template>
     <div
-        class="d-flex flex-column analysis-item-card"
+        class="flex flex-col analysis-item-card"
     >
-        <div class="d-flex flex-row align-items-center">
+        <div class="flex flex-row items-center">
             <div class="me-1">
                 <FDisplayName
                     class="analysis-item-card-title"
@@ -146,10 +146,10 @@ export default defineComponent({
             @failed="handleFailed"
         />
         <FAnalysisProgressBar :entity="entity" />
-        <div class="d-flex flex-row">
+        <div class="flex flex-row">
             <div class="">
                 <small>
-                    <span class="text-muted">
+                    <span class="text-fg-muted">
                         created
                     </span>
                     <VCTimeago :datetime="entity.created_at" />
@@ -157,7 +157,7 @@ export default defineComponent({
             </div>
             <div class="ms-auto">
                 <small>
-                    <span class="text-muted">
+                    <span class="text-fg-muted">
                         updated
                     </span>
                     <VCTimeago :datetime="entity.updated_at" />

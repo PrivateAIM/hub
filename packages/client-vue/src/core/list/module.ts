@@ -357,7 +357,7 @@ export function createListRaw<
                             const actionsNode = actionsNodes.length > 0 ?
                                 h(
                                     'div',
-                                    { class: 'vc-list-item-actions ms-auto d-flex align-items-center gap-1' },
+                                    { class: 'vc-list-item-actions ms-auto flex items-center gap-1' },
                                     actionsNodes,
                                 ) :
                                 undefined;

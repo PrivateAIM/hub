@@ -188,7 +188,7 @@ export default defineComponent({
                                 <VCFormInput
                                     v-model="v$.name.$model"
                                 />
-                                <small class="text-muted">
+                                <small class="text-fg-muted">
                                     URL-friendly identifier (letters, numbers, - _ .).
                                     A suggestion is filled in automatically — edit it if you like.
                                 </small>

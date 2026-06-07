@@ -120,7 +120,7 @@ export default defineComponent({
 });
 </script>
 <template>
-    <div class="d-flex flex-column gap-1">
+    <div class="flex flex-col gap-1">
         <slot name="default">
             <slot
                 name="header"
@@ -130,7 +130,7 @@ export default defineComponent({
                 name="body"
                 v-bind="{ resolved, busy, data, meta, load, deleted: handleDeleted }"
             >
-                <div class="d-flex flex-column gap-2">
+                <div class="flex flex-col gap-2">
                     <template
                         v-for="(item, key) in data"
                         :key="key"

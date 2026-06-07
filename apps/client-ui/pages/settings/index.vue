@@ -40,7 +40,7 @@ export default defineNuxtComponent({
         </h1>
 
         <div class="content-wrapper">
-            <div class="content-sidebar flex-column">
+            <div class="content-sidebar flex-col">
                 <DomainEntityNav
                     :items="items"
                     :path="'/settings'"

@@ -146,10 +146,10 @@ export default defineComponent({
             >
                 <template #body="props">
                     <div
-                        class="d-flex flex-row flex-wrap justify-content-between"
+                        class="flex flex-row flex-wrap justify-between"
                         :class="{
                             'flex-row': entity.configuration_locked,
-                            'flex-column gap-1': !entity.configuration_locked
+                            'flex-col gap-1': !entity.configuration_locked
                         }"
                     >
                         <template
@@ -160,14 +160,14 @@ export default defineComponent({
                                 class="col-12"
                                 :class="{'col-lg-6': entity.configuration_locked}"
                             >
-                                <div class="d-flex flex-column gap-2 m-1">
-                                    <div class="progress-step d-flex flex-column">
-                                        <div class="d-flex flex-row">
+                                <div class="flex flex-col gap-2 m-1">
+                                    <div class="progress-step flex flex-col">
+                                        <div class="flex flex-row">
                                             <div>
                                                 <h6 class="mb-0">
                                                     {{ item.node.name }}
 
-                                                    <small class="text-muted">({{ item.node.type }})</small>
+                                                    <small class="text-fg-muted">({{ item.node.type }})</small>
                                                 </h6>
                                             </div>
                                             <div
@@ -185,7 +185,7 @@ export default defineComponent({
                                             </div>
                                         </div>
                                         <template v-if="!item.execution_status">
-                                            <small class="text-muted">
+                                            <small class="text-fg-muted">
                                                 approval:
                                                 <FAnalysisNodeApprovalStatus :status="item.approval_status" />
                                             </small>
@@ -197,7 +197,7 @@ export default defineComponent({
                                             >
                                                 <template #default="data">
                                                     <div
-                                                        class="d-flex justify-content-center status-text text-light p-1"
+                                                        class="flex justify-center status-text text-light p-1"
                                                         :class="'bg-' + data.classSuffix"
                                                     >
                                                         <span class="icon">
@@ -231,7 +231,7 @@ export default defineComponent({
         <VCModal v-model:open="modal">
             <VCModalContent class="modal-lg">
                 <div class="modal-header">
-                    <div class="d-flex flex-row w-100">
+                    <div class="flex flex-row w-full">
                         <div>
                             <h5 class="mb-0">
                                 <i class="fa fa-city" /> Nodes

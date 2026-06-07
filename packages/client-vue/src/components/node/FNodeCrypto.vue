@@ -128,12 +128,12 @@ export default defineComponent({
             different nodes through the storage service.
         </p>
 
-        <div class="d-flex flex-column gap-1">
+        <div class="flex flex-col gap-1">
             <div class="row">
                 <div class="col-4">
-                    <VCFormGroup :label-class="'w-100 mb-1'">
+                    <VCFormGroup :label-class="'w-full mb-1'">
                         <template #label>
-                            <div class="d-flex flex-row">
+                            <div class="flex flex-row">
                                 <div>
                                     PublicKey
                                 </div>
@@ -158,9 +158,9 @@ export default defineComponent({
                     </VCFormGroup>
                 </div>
                 <div class="col-8">
-                    <VCFormGroup :label-class="'w-100 mb-1'">
+                    <VCFormGroup :label-class="'w-full mb-1'">
                         <template #label>
-                            <div class="d-flex flex-row">
+                            <div class="flex flex-row">
                                 <div>
                                     PrivateKey
                                 </div>
@@ -193,7 +193,7 @@ export default defineComponent({
                     </template>
                 </div>
             </div>
-            <div class="d-flex flex-row gap-1">
+            <div class="flex flex-row gap-1">
                 <div>
                     <button
                         :disabled="busy"

@@ -100,7 +100,7 @@ export default defineComponent({
                 <div class="alert alert-success alert-sm">
                     <i class="fa fa-info" /> The analysis is now in a state in which it can be locked and build.<br>
                 </div>
-                <div class="d-flex flex-column gap-2">
+                <div class="flex flex-col gap-2">
                     <div>
                         <VCFormCheckbox
                             v-model="lockIt"
@@ -137,7 +137,7 @@ export default defineComponent({
             </div>
             <div class="modal-footer">
                 <div
-                    class="d-flex flex-row"
+                    class="flex flex-row"
                     style="width: 100%;"
                 >
                     <div>

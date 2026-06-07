@@ -1,0 +1,43 @@
+/*
+ * Tailwind v4 entry for apps/client-ui.
+ *
+ * Pulls in the PrivateAIM theme (tailwindcss + @vuecs/design +
+ * theme-tailwind + the kit theme + compat layer), then declares this
+ * app's local `@source` scopes so the JIT picks up class-name tokens it
+ * can't reach via the theme alone.
+ */
+
+@import "@privateaim/client-vue-theme";
+
+/*
+ * Scan this app's templates (pages / components / layouts / plugins).
+ * Re-anchored to the app root so coverage is independent of where this
+ * file lives.
+ */
+@source "../..";
+
+/*
+ * client-vue ships class strings in two places the app entry must scan:
+ * the `.vue` SFC templates AND the ~81 hyperscript `.ts` components that
+ * emit class strings inside `h(...)` calls outside any template. Without
+ * this glob those utilities silently never compile.
+ */
+@source "../../../packages/client-vue/src";
+
+/*
+ * Nested vuecs deps. npm workspaces hoist most `@vuecs/*` to the repo
+ * root, but several land under app-local node_modules due to peer
+ * deduplication. Tailwind v4 silently skips missing paths, so listing
+ * both the app-local and root trees is safe and keeps the JIT corpus
+ * complete regardless of the hoist layout.
+ */
+@source "../../node_modules/@vuecs";
+@source "../../../../node_modules/@vuecs";
+
+/*
+ * @authup/client-web-kit ships compiled component class strings under
+ * its dist tree. The kit theme covers its own dist via a relative glob,
+ * but re-anchor from hub's hoist layout (app-local and root) to be safe.
+ */
+@source "../../node_modules/@authup/client-web-kit/dist";
+@source "../../../../node_modules/@authup/client-web-kit/dist";

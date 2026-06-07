@@ -67,7 +67,7 @@ export default defineNuxtComponent({
                     class="col-sm-4 col-md-3 col-12 mb-3"
                 >
                     <div
-                        class="event-card p-3 d-flex flex-column text-center"
+                        class="event-card p-3 flex flex-col text-center"
                         @click.prevent="goTo(item.id)"
                     >
                         <div class="event-card-header">
@@ -92,7 +92,7 @@ export default defineNuxtComponent({
                     class="col-sm-4 col-md-3 col-12 mb-3"
                 >
                     <div
-                        class="event-card p-3 d-flex flex-column text-center"
+                        class="event-card p-3 flex flex-col text-center"
                         @click.prevent="goTo(item.id)"
                     >
                         <div class="event-card-header">
@@ -102,7 +102,7 @@ export default defineNuxtComponent({
                             <i :class="item.icon" />
                         </div>
                         <div class="event-card-footer">
-                            <div class="d-flex flex-row">
+                            <div class="flex flex-row">
                                 <div class="ms-auto">
                                     <span class="foot-print">{{ item.version }}</span>
                                 </div>

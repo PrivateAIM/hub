@@ -61,9 +61,9 @@ export default defineComponent({
 });
 </script>
 <template>
-    <div class="card-grey card flex-grow-1">
+    <div class="card-grey card grow">
         <div class="card-header">
-            <div class="title d-flex flex-row">
+            <div class="title flex flex-row">
                 <div>
                     3. Distribution
                 </div>
@@ -77,7 +77,7 @@ export default defineComponent({
             </div>
         </div>
         <div class="card-body">
-            <div class="d-flex flex-column h-100">
+            <div class="flex flex-col h-full">
                 <div class="text-center mb-3">
                     <i class="fas fa-sitemap fa-4x" />
                 </div>
@@ -85,7 +85,7 @@ export default defineComponent({
                 <div class="progress bg-white">
                     <div
                         class="progress-bar"
-                        :class="'bg-success'"
+                        :class="'bg-success-600'"
                         :style="{width: progress + '%'}"
                         :aria-valuenow="progress"
                         aria-valuemin="0"
@@ -95,7 +95,7 @@ export default defineComponent({
                     </div>
                 </div>
                 <div class="mt-auto">
-                    <div class="d-flex flex-row gap-1">
+                    <div class="flex flex-row gap-1">
                         <div>
                             <FAnalysisCommand
                                 :command="'distributionStart'"

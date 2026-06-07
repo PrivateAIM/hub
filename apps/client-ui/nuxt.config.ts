@@ -8,8 +8,15 @@
 import type { ModuleOptions } from '@authup/client-web-nuxt';
 import path from 'node:path';
 import { defineNuxtConfig } from 'nuxt/config';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineNuxtConfig({
+    vite: {
+        plugins: [
+            tailwindcss(),
+        ],
+    },
+
     experimental: {
         appManifest: false,
         scanPageMeta: false,
@@ -49,27 +56,18 @@ export default defineNuxtConfig({
  ** Global CSS
  */
     css: [
-        'bootstrap-vue-next/dist/bootstrap-vue-next.css',
-        '@vuecs/pagination/dist/index.css',
-        '@vuecs/navigation/dist/index.css',
+        // App-local Tailwind v4 entry — `@import`s @privateaim/client-vue-theme
+        // (which transitively pulls in @authup/client-web-kit-theme +
+        // tailwindcss + @vuecs/design + @vuecs/theme-tailwind + every
+        // migrated hub chrome stylesheet) and adds `@source` scopes for
+        // this app's template tree + the client-vue hyperscript .ts tree
+        // + per-app nested vuecs deps. The theme package absorbed all the
+        // former local assets/css/* project stylesheets.
+        '@/assets/css/tailwind.css',
         '@authup/client-web-kit/dist/style.css',
         '@/../../packages/client-vue/dist/style.css',
         '@fortawesome/fontawesome-free/css/all.css',
-        'bootstrap/dist/css/bootstrap.css',
-        '@/assets/css/vue-layout-navigation.css',
-        '@/assets/css/vue-form-wizard.css',
         '@/assets/css/fonts.css',
-        '@/assets/css/root.css',
-        '@/assets/css/core/header.css',
-        '@/assets/css/core/navbar.css',
-        '@/assets/css/core/body.css',
-        '@/assets/css/core/sidebar.css',
-        '@/assets/css/domain.css',
-        '@/assets/css/card.css',
-        '@/assets/css/colors.css',
-        '@/assets/css/form.css',
-
-        '@/assets/css/bootstrap-override.css',
     ],
 
     /*

@@ -68,7 +68,7 @@ export default defineNuxtComponent({
             <i class="fa-solid fa-server" /> Node <span class="sub-title">Management</span>
         </h1>
         <div class="content-wrapper">
-            <div class="content-sidebar flex-column">
+            <div class="content-sidebar flex-col">
                 <DomainEntityNav
                     :direction="'vertical'"
                     :items="tabs"

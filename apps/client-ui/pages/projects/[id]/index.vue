@@ -50,8 +50,8 @@ export default defineNuxtComponent({
     <div v-if="entity">
         <div class="mb-2">
             <h6><i class="fa-solid fa-info" /> Info</h6>
-            <div class="d-flex flex-row gap-3 w-100">
-                <div class="card-grey card flex-grow-1">
+            <div class="flex flex-row gap-3 w-full">
+                <div class="card-grey card grow">
                     <div class="card-header">
                         <span class="title">Analyses</span>
                     </div>
@@ -66,7 +66,7 @@ export default defineNuxtComponent({
                 </div>
 
                 <template v-if="entity.master_image_id">
-                    <div class="card-grey card flex-grow-1">
+                    <div class="card-grey card grow">
                         <div class="card-header">
                             <span class="title">MasterImage</span>
                         </div>
@@ -93,7 +93,7 @@ export default defineNuxtComponent({
                     </div>
                 </template>
 
-                <div class="card-grey card flex-grow-1">
+                <div class="card-grey card grow">
                     <div class="card-header">
                         <span class="title">Realm</span>
                     </div>
@@ -114,7 +114,7 @@ export default defineNuxtComponent({
                     </div>
                 </div>
 
-                <div class="card-grey card flex-grow-1">
+                <div class="card-grey card grow">
                     <div class="card-header">
                         <span class="title">Creator</span>
                     </div>
@@ -134,12 +134,12 @@ export default defineNuxtComponent({
             :query="projectNodeQuery"
         >
             <template #body="{ data }">
-                <div class="d-flex flex-row gap-3 w-100">
+                <div class="flex flex-row gap-3 w-full">
                     <template
                         v-for="item in data"
                         :key="item.id"
                     >
-                        <div class="card card-grey flex-grow-1">
+                        <div class="card card-grey grow">
                             <div class="card-header">
                                 <span class="title">{{ item.node.name }}</span>
                             </div>

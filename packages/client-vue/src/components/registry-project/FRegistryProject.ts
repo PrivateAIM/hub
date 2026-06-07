@@ -104,7 +104,7 @@ export default defineComponent({
 
         return () => {
             const fallback = () : VNodeChild => h('div', [
-                h('div', { class: 'mb-2 d-flex flex-column' }, [
+                h('div', { class: 'mb-2 flex flex-col' }, [
                     h('div', { class: 'form-group' }, [
                         h('label', { class: 'pe-1' }, 'Project'),
                         h('input', {
@@ -145,8 +145,8 @@ export default defineComponent({
                         h('strong', { class: 'pe-1' }, 'Webhook:'),
                         h('i', {
                             class: {
-                                'fa fa-check text-success': manager.data.value?.webhook_exists,
-                                'fa fa-times text-danger': !manager.data.value?.webhook_exists,
+                                'fa fa-check text-success-600': manager.data.value?.webhook_exists,
+                                'fa fa-times text-error-600': !manager.data.value?.webhook_exists,
                             },
                         }),
                     ]),

@@ -56,9 +56,9 @@ export default defineComponent({
 });
 </script>
 <template>
-    <div class="card-grey card flex-grow-1">
+    <div class="card-grey card grow">
         <div class="card-header">
-            <div class="title d-flex flex-row">
+            <div class="title flex flex-row">
                 <div>
                     4. Execution
                 </div>
@@ -79,7 +79,7 @@ export default defineComponent({
             <div class="progress bg-white">
                 <div
                     class="progress-bar"
-                    :class="'bg-success'"
+                    :class="'bg-success-600'"
                     :style="{width: progress + '%'}"
                     :aria-valuenow="progress"
                     aria-valuemin="0"

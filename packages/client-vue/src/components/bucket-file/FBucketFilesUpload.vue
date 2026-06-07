@@ -92,7 +92,7 @@ export default defineComponent({
 });
 </script>
 <template>
-    <div class="d-flex flex-column">
+    <div class="flex flex-col">
         <div>
             <div class="form-group">
                 <label class="form-label">{{ directoryMode ? 'Directories' : 'Files' }}</label>
@@ -130,7 +130,7 @@ export default defineComponent({
                 You have not selected any {{ directoryMode ? 'directories' : 'files' }} to upload.
             </div>
 
-            <div class="d-flex flex-column">
+            <div class="flex flex-col">
                 <template
                     v-for="(file,key) in tempFiles"
                     :key="key"

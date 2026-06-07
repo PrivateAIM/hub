@@ -155,7 +155,7 @@ export default {
                     bordered
                 >
                     <template #cell-type="{ row }: { row: any }">
-                        <span class="badge bg-dark">
+                        <span class="badge bg-fg">
                             {{ row.type }}
                         </span>
                     </template>

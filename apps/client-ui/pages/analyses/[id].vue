@@ -131,7 +131,7 @@ export default defineComponent({
         </h1>
 
         <div v-if="entity">
-            <div class="flex-wrap flex-row d-flex align-items-center">
+            <div class="flex-wrap flex-row flex items-center">
                 <DomainEntityNav
                     :items="tabs"
                     :path="'/analyses/' + entity.id"
@@ -147,7 +147,7 @@ export default defineComponent({
         </div>
 
         <template v-if="entity">
-            <div class="d-flex flex-column gap-1">
+            <div class="flex flex-col gap-1">
                 <hr>
 
                 <div>

@@ -169,7 +169,7 @@ export default defineComponent({
 </script>
 <template>
     <div>
-        <div class="d-flex flex-column gap-2">
+        <div class="flex flex-col gap-2">
             <template v-if="!readonly">
                 <VCFormCheckbox
                     v-model="allSelected"
@@ -187,7 +187,7 @@ export default defineComponent({
 
             <hr
                 v-if="!readonly"
-                class="small"
+                class="text-sm"
             >
 
             <FBucketFiles
@@ -197,14 +197,14 @@ export default defineComponent({
             >
                 <template #body="{ data, resolved, deleted }">
                     <template v-if="resolved && data.length === 0">
-                        <div class="d-flex flex-column gap-1">
+                        <div class="flex flex-col gap-1">
                             <div class="alert alert-sm alert-dark mb-0">
                                 <i class="fa fa-info" /> No files found in bucket
                             </div>
                         </div>
                     </template>
                     <template v-else>
-                        <div class="d-flex flex-column">
+                        <div class="flex flex-col">
                             <template
                                 v-for="file in data"
                                 :key="file.id"
@@ -232,12 +232,12 @@ export default defineComponent({
 
             <hr
                 v-if="!readonly"
-                class="small"
+                class="text-sm"
             >
 
             <div
                 v-if="!readonly"
-                class="d-flex flex-row"
+                class="flex flex-row"
             >
                 <div>
                     <button
@@ -268,7 +268,7 @@ export default defineComponent({
             <VCModal v-model:open="modal">
                 <VCModalContent class="modal-lg">
                     <div class="modal-header">
-                        <div class="d-flex flex-row w-100">
+                        <div class="flex flex-row w-full">
                             <div>
                                 <h5 class="mb-0">
                                     <i class="fa fa-upload" /> Upload

@@ -66,9 +66,9 @@ export default defineComponent({
 });
 </script>
 <template>
-    <div class="d-flex flex-column w-100">
-        <div class="w-100">
-            <div class="d-flex flex-row align-items-center">
+    <div class="flex flex-col w-full">
+        <div class="w-full">
+            <div class="flex flex-row items-center">
                 <div>
                     <slot
                         name="title"
@@ -116,28 +116,28 @@ export default defineComponent({
             name="body"
             :data="entity"
         >
-            <div class="d-flex justify-content-between flex-row">
-                <div class="d-flex flex-grow-1 align-items-center flex-column">
+            <div class="flex justify-between flex-row">
+                <div class="flex grow items-center flex-col">
                     <div>
                         <strong><i class="fa fa-microscope" /> Analyses</strong>
                     </div>
                     <div
-                        :class="{'text-success': entity.analyses > 0, 'text-muted': entity.analyses === 0}"
+                        :class="{'text-success-600': entity.analyses > 0, 'text-fg-muted': entity.analyses === 0}"
                     >
                         {{ entity.analyses }}
                     </div>
                 </div>
-                <div class="d-flex flex-grow-1 align-items-center flex-column">
+                <div class="flex grow items-center flex-col">
                     <div>
                         <strong><i class="fa-solid fa-server" /> Nodes</strong>
                     </div>
                     <div
-                        :class="{'text-success': entity.nodes > 0, 'text-muted': entity.nodes === 0}"
+                        :class="{'text-success-600': entity.nodes > 0, 'text-fg-muted': entity.nodes === 0}"
                     >
                         {{ entity.nodes }}
                     </div>
                 </div>
-                <div class="d-flex flex-grow-1 align-items-center flex-column">
+                <div class="flex grow items-center flex-col">
                     <div>
                         <strong><i class="fa fa-user" /> Creator</strong>
                     </div>
@@ -151,10 +151,10 @@ export default defineComponent({
             name="footer"
             :data="entity"
         >
-            <div class="d-flex flex-row">
+            <div class="flex flex-row">
                 <div class="">
                     <small>
-                        <span class="text-muted">
+                        <span class="text-fg-muted">
                             created
                         </span>
                         <VCTimeago :datetime="entity.created_at" />
@@ -162,7 +162,7 @@ export default defineComponent({
                 </div>
                 <div class="ms-auto">
                     <small>
-                        <span class="text-muted">
+                        <span class="text-fg-muted">
                             updated
                         </span>
                         <VCTimeago :datetime="entity.updated_at" />

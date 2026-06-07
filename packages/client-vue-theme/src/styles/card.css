@@ -1,17 +1,16 @@
 /*
- * Copyright (c) 2021-2024.
+ * Copyright (c) 2021-2026.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
 
 .panel-card {
-    /** background: rgba(59,59,59,0.1); **/
     border-radius: 0.5rem;
-    box-shadow: 0 4px 25px 0 rgba(0,0,0,.1);
+    box-shadow: 0 4px 25px 0 rgba(0, 0, 0, .1);
     transition: all .3s ease-in-out;
-    border: 1px solid #e5e5e5;
-    background: #fff;
+    border: 1px solid var(--vc-color-border);
+    background: var(--vc-color-bg-elevated);
 }
 
 .panel-card > .panel-card-header {
@@ -41,8 +40,8 @@
 }
 
 .panel-card > .panel-card-body.body-dark {
-    background: #efefef;
-    color: #7F828B;
+    background: var(--vc-color-bg-muted);
+    color: var(--vc-color-fg-muted);
 }
 
 /*
@@ -60,14 +59,14 @@ Card
 }
 
 .card-grey {
-    background-color: #ececec;
-    border: 1px solid #dedede;
+    background-color: var(--vc-color-bg-muted);
+    border: 1px solid var(--vc-color-border);
 }
 
 .card .card-header {
     background-color: transparent;
     border-bottom: none;
-    padding: .5rem!important;
+    padding: .5rem !important;
     position: relative;
     box-shadow: 0px 1px 20px 0px rgba(69, 125, 125, 0.08);
     display: flex;
@@ -97,7 +96,7 @@ Card
     margin: 0 7px;
     cursor: pointer;
     font-size: 12px;
-    color: #8c8c8c;
+    color: var(--vc-color-fg-muted);
     line-height: 2;
 }
 
@@ -106,14 +105,14 @@ Card
 }
 
 .card .card-header .title {
-    color: #37474f;
+    color: var(--vc-color-fg);
     position: relative;
     margin: 0 0 0 1rem;
     width: 100%;
 }
 
 .card .card-header .title:after {
-    color: #6259ca;
+    color: var(--privateaim-brand-purple);
     position: absolute;
     left: -1rem;
     top: 0;
@@ -128,7 +127,7 @@ Card
 }
 
 .card .card-block {
-    padding: .5rem!important;
+    padding: .5rem !important;
 }
 
 .card .card-block table tr {
@@ -142,7 +141,7 @@ Card
 }
 
 .card .card-block code {
-    background-color: #eee;
+    background-color: var(--vc-color-bg-muted);
     margin: 5px;
     display: inline-block;
 }
@@ -164,7 +163,7 @@ Card
 
 .card .card-block a.dropdown-item:active,
 .card .card-block a.dropdown-item .active {
-    background-color: #448aff;
+    background-color: var(--privateaim-brand-blue);
 }
 
 .card .card-block.remove-label i {
@@ -177,26 +176,26 @@ Card
 }
 
 .card .card-block .dropdown-menu {
-    background-color: #fff;
+    background-color: var(--vc-color-bg-elevated);
     padding: 0;
 }
 
 .card .card-block .dropdown-menu .dropdown-divider {
-    background-color: #ddd;
+    background-color: var(--vc-color-border);
     margin: 3px 0;
 }
 
-.card .card-block .dropdown-menu>a {
+.card .card-block .dropdown-menu > a {
     padding: 10px 16px;
     line-height: 1.429;
 }
 
-.card .card-block .dropdown-menu>li>a:focus,
-.card .card-block .dropdown-menu>li>a:hover {
-    background-color: rgba(202, 206, 209, 0.5);
+.card .card-block .dropdown-menu > li > a:focus,
+.card .card-block .dropdown-menu > li > a:hover {
+    background-color: var(--vc-color-bg-muted);
 }
 
-.card .card-block .dropdown-menu>li:first-child>a:first-child {
+.card .card-block .dropdown-menu > li:first-child > a:first-child {
     border-top-right-radius: 4px;
     border-top-left-radius: 4px;
 }
@@ -214,7 +213,6 @@ Card
     padding: 15px;
 }
 
-
 .card.card-file {
     padding: 0;
     margin-bottom: 0.4rem;
@@ -223,11 +221,11 @@ Card
 }
 
 .card-file.checked {
-    background-color: #dcdcdc;
+    background-color: var(--vc-color-bg-muted);
 }
 
 .card-file.checked .card-heading i {
-    color: rgb(166, 89, 45);
+    color: var(--privateaim-brand-rust);
 }
 
 .card.card-file .card-heading {
@@ -236,7 +234,6 @@ Card
     background: none;
     cursor: pointer;
 }
-
 
 .card.card-file .card-heading .title {
     font-size: .8125em;
@@ -262,7 +259,6 @@ Card
 
 .pcoded .card.full-card {
     position: fixed;
-
     top: calc(56px + 15px);
     z-index: 99999;
     -webkit-box-shadow: 0 0 35px 0px rgba(0, 0, 0, 0.44);
@@ -302,6 +298,6 @@ Card
 
 .pcoded .card.card-load .card-loader i {
     margin: 0 auto;
-    color: #448aff;
+    color: var(--privateaim-brand-blue);
     font-size: 20px;
 }

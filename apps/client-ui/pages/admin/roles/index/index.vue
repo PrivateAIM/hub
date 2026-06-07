@@ -122,8 +122,8 @@ export default defineNuxtComponent({
                     <i
                         class="fas"
                         :class="{
-                            'fa-check text-success': row.built_in,
-                            'fa-times text-danger': !row.built_in,
+                            'fa-check text-success-600': row.built_in,
+                            'fa-times text-error-600': !row.built_in,
                         }"
                     />
                 </template>
@@ -131,8 +131,8 @@ export default defineNuxtComponent({
                     <i
                         class="fas"
                         :class="{
-                            'fa-check text-success': !row.realm_id,
-                            'fa-times text-danger': row.realm_id,
+                            'fa-check text-success-600': !row.realm_id,
+                            'fa-times text-error-600': row.realm_id,
                         }"
                     />
                 </template>

@@ -42,7 +42,7 @@ export default defineComponent({
 });
 </script>
 <template>
-    <div class="card card-file d-flex flex-row align-items-center p-1">
+    <div class="card card-file flex flex-row items-center p-1">
         <div class="card-heading">
             <span class="title">
                 {{ path }}

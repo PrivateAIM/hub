@@ -10,7 +10,6 @@ import { BuiltInPolicyType, PolicyData } from '@authup/access';
 import type { Store } from '@authup/client-web-kit';
 import type {
     NavigationItem,
-    NavigationItemNormalized,
 } from '@vuecs/navigation';
 import {
     LayoutSideAdminNavigation,
@@ -43,22 +42,28 @@ export class Navigation {
         }
     }
 
-    async getItems(level: number, parent?: NavigationItemNormalized): Promise<NavigationItem[]> {
-        if (level === 0) {
-            return this.reduce(LayoutTopNavigation);
+    /**
+     * Resolve the top navigation items, filtered against the current session.
+     * Used as the `:data` resolver of the header's `<VCNavItems>`.
+     */
+    getTopItems(): Promise<NavigationItem[]> {
+        return this.reduce(LayoutTopNavigation);
+    }
+
+    /**
+     * Resolve the sidebar navigation items, filtered against the current
+     * session. The admin sidebar is selected when the active route lives under
+     * `/admin/` (mirrors the pre-4.x `parent.name === 'Admin'` branch — the
+     * @vuecs/navigation 4.x registry model has no NavigationManager to carry
+     * the active top-level item, so the variant is derived from the path).
+     * Used as the `:data` resolver of the sidebar's `<VCNavItems>`.
+     */
+    getSideItems(path?: string): Promise<NavigationItem[]> {
+        if (path && path.startsWith('/admin')) {
+            return this.reduce(LayoutSideAdminNavigation);
         }
 
-        if (parent) {
-            if (level === 1) {
-                if (parent.name === 'Admin') {
-                    return this.reduce(LayoutSideAdminNavigation);
-                }
-
-                return this.reduce(LayoutSideDefaultNavigation);
-            }
-        }
-
-        return [];
+        return this.reduce(LayoutSideDefaultNavigation);
     }
 
     protected async reduce(items: NavigationItem[]) : Promise<NavigationItem[]> {
