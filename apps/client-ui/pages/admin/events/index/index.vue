@@ -147,7 +147,7 @@ export default defineComponent({
                 :busy="props.busy"
                 bordered
             >
-                <template #cell-scoppe="{ row }: { row: any }">
+                <template #cell-scope="{ row }: { row: any }">
                     <template v-if="row.scope">
                         {{ row.scope }}
                     </template>

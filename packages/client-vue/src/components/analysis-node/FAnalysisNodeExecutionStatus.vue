@@ -32,7 +32,7 @@ export default defineComponent({
             switch (props.status) {
                 case ProcessStatus.STARTING:
                     return 'primary';
-                case ProcessStatus.FINISHED:
+                case ProcessStatus.EXECUTED:
                     return 'success';
                 case ProcessStatus.STARTED:
                     return 'dark';

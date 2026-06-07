@@ -152,7 +152,7 @@ export default defineComponent({
                     <VCTimeago :datetime="row.created_at" />
                 </template>
                 <template #cell-updated_at="{ row }: { row: any }">
-                    <VCTimeago :datetime="row.created_at" />
+                    <VCTimeago :datetime="row.updated_at" />
                 </template>
                 <template #cell-user_id="{ row }: { row: any }">
                     <template v-if="row.user_id">
