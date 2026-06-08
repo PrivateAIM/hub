@@ -57,12 +57,12 @@ export default defineComponent({
     display: flex;
     flex-direction: row;
     box-shadow: 0px 6px 0px 0px rgba(0, 0, 0, 0.3) inset;
-    background-color: #40434E;
+    background-color: var(--privateaim-chrome-bg);
     padding: 10px 0px 4px 0px;
     justify-content: center;
     align-items: center;
     text-align: center;
-    color: #aeb2b7;
+    color: var(--privateaim-chrome-fg-muted);
     gap: 0.5rem;
     line-height: 1.25rem;
 }
@@ -75,7 +75,7 @@ export default defineComponent({
 }
 
 .page-footer a {
-    color:#FF5B5B;
+    color: var(--privateaim-brand-coral);
     text-decoration: none;
 }
 

@@ -24,15 +24,40 @@ export enum LayoutNavigationID {
     DEFAULT = 'default',
 }
 
+/**
+ * Display labels of the top-level sections. The sidebar resolver matches
+ * the active top item by name to pick the admin vs. default sidebar, so
+ * the label is the single source of truth shared by both navs.
+ */
+export enum LayoutTopNavigationName {
+    HOME = 'Home',
+    ADMIN = 'Admin',
+}
+
+/**
+ * Registry id under which the header's top `<VCNavItems registry>`
+ * publishes its resolved active trail. The sidebar's `:data` resolver
+ * reads this id (via the resolver context's `registry()` accessor) to
+ * derive which sidebar to show — see components/layout/sidebar.vue.
+ */
+export const LayoutTopNavigationRegistryId = 'top';
+
+/**
+ * The top items are url-less section switchers: clicking one selects it
+ * (the shared navigation registry republishes the active trail) instead
+ * of navigating, which is what drives the sidebar. `activeMatch` keeps
+ * the section highlighted — and the sidebar in sync — on a fresh load of
+ * an `/admin/*` route, where there is no click to seed the selection.
+ */
 export const LayoutTopNavigation: NavigationItem<NavigationItemMeta>[] = [
     {
-        name: 'Home',
+        name: LayoutTopNavigationName.HOME,
         icon: 'fa6-solid:house',
     },
     {
-        name: 'Admin',
+        name: LayoutTopNavigationName.ADMIN,
         icon: 'fa6-solid:gear',
-        activeMatch: '/admin/',
+        activeMatch: '/admin',
         meta: {
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.REQUIRED_PERMISSIONS]: [],

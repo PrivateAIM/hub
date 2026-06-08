@@ -8,6 +8,7 @@
 <script lang="ts">
 import type { Registry } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
+import type { NavigationItem } from '@vuecs/navigation';
 import { definePageMeta, useToast } from '#imports';
 import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
@@ -24,22 +25,21 @@ export default defineNuxtComponent({
 
         const toast = useToast();
 
-        const tabs = [
+        const tabs: NavigationItem[] = [
             {
-                name: 'overview',
-                path: '',
-                icon: 'fa6-solid:bars',
+                name: 'overview', 
+                url: '/admin/services/registry', 
+                icon: 'fa6-solid:bars', 
             },
             {
-                name: 'add',
-                path: '/add',
-                icon: 'fa6-solid:plus',
+                name: 'add', 
+                url: '/admin/services/registry/add', 
+                icon: 'fa6-solid:plus', 
             },
-
             {
-                name: 'client',
-                path: '/client',
-                icon: 'fa6-solid:ghost',
+                name: 'client', 
+                url: '/admin/services/registry/client', 
+                icon: 'fa6-solid:ghost', 
             },
         ];
 
@@ -65,10 +65,10 @@ export default defineNuxtComponent({
         </h1>
         <div class="content-wrapper">
             <div class="content-sidebar flex-col">
-                <DomainEntityNav
-                    :direction="'vertical'"
-                    :items="tabs"
-                    :path="'/admin/services/registry'"
+                <VCNavItems
+                    :data="tabs"
+                    variant="pills"
+                    orientation="vertical"
                 />
             </div>
             <div class="content-container">

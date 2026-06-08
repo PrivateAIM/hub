@@ -9,11 +9,10 @@ import { injectStore, storeToRefs } from '@authup/client-web-kit';
 import { computed, toRef } from 'vue';
 import type { PropType } from 'vue';
 import type { Project, ProjectNode } from '@privateaim/core-kit';
+import type { NavigationItem } from '@vuecs/navigation';
 import { defineNuxtComponent } from '#app';
-import DomainEntityNav from '../../../components/DomainEntityNav';
 
 export default defineNuxtComponent({
-    components: { DomainEntityNav },
     props: {
         entity: {
             type: Object as PropType<Project>,
@@ -32,26 +31,29 @@ export default defineNuxtComponent({
 
         const isOwner = computed(() => entity.value.realm_id === realmId.value);
 
-        const tabs = computed(() => [
-            {
-                name: 'Outgoing', 
-                icon: 'fa6-solid:file-export', 
-                path: '',
-            },
-            {
-                name: 'Incoming', 
-                icon: 'fa6-solid:file-import', 
-                path: '/in',
-            },
-            ...(isOwner.value ? [
+        const tabs = computed<NavigationItem[]>(() => {
+            const base = `/projects/${entity.value.id}/analyses`;
+
+            return [
                 {
-                    name: 'Add', 
-                    routeName: 'settings-id-security', 
-                    icon: 'fa6-solid:plus', 
-                    path: '/add',
+                    name: 'Outgoing',
+                    icon: 'fa6-solid:file-export',
+                    url: base,
                 },
-            ] : []),
-        ]);
+                {
+                    name: 'Incoming',
+                    icon: 'fa6-solid:file-import',
+                    url: `${base}/in`,
+                },
+                ...(isOwner.value ? [
+                    {
+                        name: 'Add',
+                        icon: 'fa6-solid:plus',
+                        url: `${base}/add`,
+                    },
+                ] : []),
+            ];
+        });
 
         return { tabs };
     },
@@ -60,10 +62,10 @@ export default defineNuxtComponent({
 <template>
     <div class="content-wrapper">
         <div class="content-sidebar flex-col">
-            <DomainEntityNav
-                :items="tabs"
-                :direction="'vertical'"
-                :path="'/projects/' + entity.id + '/analyses'"
+            <VCNavItems
+                :data="tabs"
+                variant="pills"
+                orientation="vertical"
             />
         </div>
         <div class="content-container">

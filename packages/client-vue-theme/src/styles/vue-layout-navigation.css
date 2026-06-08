@@ -5,23 +5,39 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-.vc-nav-items .vc-nav-link {
+/*
+ * `.vc-nav-trigger` is the clickable element of an item WITH children
+ * (collapse mode — sidebar groups, entity pills). It is a sibling shape
+ * to `.vc-nav-link`, so it must inherit the same base color/size and (in
+ * the sidebar) the same padding to line up with its leaf siblings.
+ */
+.vc-nav-items .vc-nav-link,
+.vc-nav-items .vc-nav-trigger {
     color: var(--privateaim-chrome-fg-muted);
     line-height: 1rem;
     font-size: 0.875rem;
 }
 
 .page-sidebar .vc-nav-link,
-.page-sidebar .nav-link {
-    padding-top: 1rem;
-    padding-bottom: 1rem;
+.page-sidebar .nav-link,
+.page-sidebar .vc-nav-trigger {
+    padding: 1rem 1.25rem;
 }
 
-.vc-nav-items .vc-nav-item.vc-nav-item-nested:hover > .vc-nav-link,
-.vc-nav-items .vc-nav-item.vc-nav-item-nested:active > .vc-nav-link,
-.vc-nav-items .vc-nav-item.vc-nav-item-nested.active > .vc-nav-link {
+/*
+ * Nested-parent highlight. A nested item's clickable element is a
+ * `.vc-nav-trigger` (collapse) and the active/open state is an `.active`
+ * class on its `<li>` (`.vc-nav-item-nested.active`) — set when a child
+ * route is active. The legacy `> .vc-nav-link` target never matched the
+ * trigger; include it. Scoped away from `--pills`, which paints its own
+ * brand-coral active state below.
+ */
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-item.vc-nav-item-nested:hover > .vc-nav-trigger,
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-item.vc-nav-item-nested.active > .vc-nav-trigger,
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-item.vc-nav-item-nested:hover > .vc-nav-link,
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-item.vc-nav-item-nested.active > .vc-nav-link {
     background: var(--privateaim-chrome-bg-elevated);
-    color: var(--privateaim-chrome-fg-muted);
+    color: var(--privateaim-brand-coral);
 }
 
 .vc-nav-items .vc-nav-item .vc-nav-link.dropdown-toggle {
@@ -30,32 +46,98 @@
     border: none;
 }
 
-.vc-nav-items .vc-nav-item .vc-nav-link,
-.vc-nav-items .vc-nav-item:hover .vc-nav-link,
-.vc-nav-items .vc-nav-item.active .vc-nav-link {
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-item .vc-nav-link,
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-item:hover .vc-nav-link,
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-item.active .vc-nav-link {
     border-left-color: var(--privateaim-chrome-bg-elevated) !important;
 }
 
-.vc-nav-items .vc-nav-link.active:not(.vc-nav-link-root),
+/*
+ * Chrome nav-link active/hover accent (sidebar + header). Excluded from
+ * `--pills` so it does not clobber the domain-entity pills' own active
+ * paint below — the `:not()` keeps this 0,4,0 coral rule from outranking
+ * the pills' lower-specificity `.active` rule.
+ */
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-link.active:not(.vc-nav-link-root),
 
-.vc-nav-items .vc-nav-link:active,
-.vc-nav-items .vc-nav-link:hover,
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-link:active,
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-link:hover,
 
-.vc-nav-items .vc-nav-link.router-link-active:not(.vc-nav-link-root),
-.vc-nav-items .vc-nav-link.nuxt-link-active:not(.vc-nav-link-root),
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-link.router-link-active:not(.vc-nav-link-root),
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-link.nuxt-link-active:not(.vc-nav-link-root),
 
-.vc-nav-items .vc-nav-link.router-link-exact-active,
-.vc-nav-items .vc-nav-link.nuxt-link-exact-active {
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-link.router-link-exact-active,
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-link.nuxt-link-exact-active {
     cursor: pointer;
     color: var(--privateaim-brand-coral);
     background: var(--privateaim-chrome-bg-elevated);
 }
 
+/*
+ * Section-divider layout: text centered between two flanking lines.
+ * The `:before` / `:after` pseudo-elements only stretch (`flex: 1`)
+ * inside a flex parent, so make the separator itself a flex row;
+ * `gap` adds breathing room between the text and the flanking lines.
+ */
+.vc-nav-items .vc-nav-separator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/*
+ * Line color uses `--privateaim-chrome-fg-muted` (with opacity) rather
+ * than `--privateaim-chrome-bg-elevated`: in light mode chrome-bg and
+ * chrome-bg-elevated are only a sliver of lightness apart, so the lines
+ * vanish against the sidebar surface. The fg-muted token is a mid-tone
+ * in both modes and always contrasts against the chrome background.
+ */
 .vc-nav-items .vc-nav-separator:before,
 .vc-nav-items .vc-nav-separator:after {
     content: '';
     flex: 1;
-    height: 3px;
+    height: 1px;
+    background: var(--privateaim-chrome-fg-muted);
+    opacity: 0.3;
+}
+
+/*
+ * Domain-entity pills (variant="pills" on <VCNavItems>) — brand skin on
+ * top of @vuecs/navigation's structural style.css (imported by
+ * client-vue-theme/index.css), which supplies the layout: the flex pill
+ * row, per-pill padding + radius, the submenu trigger's inline
+ * icon/label, and the dropdown content panel. Here we only repaint the
+ * active/hover state with the privateaim brand tokens (they flip with the
+ * color mode) and give the nested submenu trigger the same pill box as
+ * its sibling links.
+ *
+ * Kept UNLAYERED (this file is imported outside any `@layer`) so it
+ * outranks the structural rules and theme-tailwind utilities regardless
+ * of specificity.
+ */
+/*
+ * A nested item (e.g. registry "Projects") renders as a Reka
+ * <button class="vc-nav-trigger">, not a `.vc-nav-link--pills`. Give it
+ * the same pill box so it sits flush with its sibling pills; structural
+ * CSS already lays its icon + label out inline.
+ */
+.vc-nav-items--pills .vc-nav-item-nested .vc-nav-trigger {
+    border-radius: 0.375rem;
+    padding: 0.375rem 0.75rem;
+}
+
+/*
+ * Active/hover paint — mirrors the chrome nav accent (coral text on the
+ * elevated chrome surface) so entity pills read consistently with the
+ * sidebar/header. Leaf pills carry `.active` on the link (VCLink); the
+ * nested-parent trigger's active/open state is an `.active` class on its
+ * `<li>` (`.vc-nav-item-nested.active`, collapse mode).
+ */
+.vc-nav-items--pills .vc-nav-link--pills:hover,
+.vc-nav-items--pills .vc-nav-link--pills.active,
+.vc-nav-items--pills .vc-nav-item-nested .vc-nav-trigger:hover,
+.vc-nav-items--pills .vc-nav-item-nested.active > .vc-nav-trigger {
+    color: var(--privateaim-brand-coral);
     background: var(--privateaim-chrome-bg-elevated);
 }
 

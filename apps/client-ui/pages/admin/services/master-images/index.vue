@@ -10,6 +10,7 @@ import { FEvents, FMasterImageCard } from '@privateaim/client-vue';
 import FMasterImages from '@privateaim/client-vue/components/master-image/FMasterImages';
 import { APagination, ASearch, ATitle } from '@authup/client-web-kit';
 import FMasterImageCommand from '@privateaim/client-vue/components/master-image/FMasterImageCommand';
+import type { NavigationItem } from '@vuecs/navigation';
 import { useToast } from '../../../../composables/toast';
 
 export default {
@@ -25,11 +26,16 @@ export default {
     setup() {
         const toast = useToast();
 
-        const tabs = [
+        const tabs: NavigationItem[] = [
             {
-                name: 'overview',
-                path: '',
-                icon: 'fa6-solid:bars',
+                name: '', 
+                icon: 'fa6-solid:arrow-left', 
+                url: '/admin/services', 
+            },
+            {
+                name: 'overview', 
+                url: '/admin/services/master-images', 
+                icon: 'fa6-solid:bars', 
             },
         ];
 
@@ -50,10 +56,9 @@ export default {
             <VCIcon name="fa6-solid:atom" /> Master Images <span class="sub-title">Management</span>
         </h1>
         <div class="mb-2">
-            <DomainEntityNav
-                :items="tabs"
-                :prev-link="true"
-                :path="'/admin/services/master-images'"
+            <VCNavItems
+                :data="tabs"
+                variant="pills"
             />
         </div>
         <div>

@@ -11,24 +11,19 @@ import {
 } from '@privateaim/core-kit';
 import { FDisplayName, createEntityManager } from '@privateaim/client-vue';
 import { PermissionName } from '@privateaim/kit';
+import type { NavigationItem } from '@vuecs/navigation';
 import { isClientErrorWithStatusCode } from 'hapic';
 import { computed, defineComponent } from 'vue';
 import { definePageMeta, useToast } from '#imports';
 import {
-    createError, 
-    navigateTo, 
+    createError,
+    navigateTo,
     useRoute,
 } from '#app';
-import DomainEntityNav from '../../components/DomainEntityNav';
 import { LayoutKey, LayoutNavigationID } from '../../config/layout';
-import { DomainEntityNavItem } from '../../core';
 
 export default defineComponent({
-    components: {
-        DomainEntityNav,
-        DomainEntityNavItem,
-        FDisplayName,
-    },
+    components: { FDisplayName },
     async setup() {
         definePageMeta({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
@@ -59,37 +54,44 @@ export default defineComponent({
             throw createError({});
         }
 
-        const tabs = computed(() => {
-            const items = [
+        const tabs = computed<NavigationItem[]>(() => {
+            const base = `/analyses/${manager.data.value?.id}`;
+
+            const items: NavigationItem[] = [
+                {
+                    name: '',
+                    icon: 'fa6-solid:arrow-left',
+                    url: `/projects/${manager.data.value?.project_id}/analyses`,
+                },
                 {
                     name: 'Overview',
                     icon: 'fa6-solid:bars',
-                    path: '',
+                    url: base,
                 },
                 {
                     name: 'Nodes',
                     icon: 'fa6-solid:city',
-                    path: '/nodes',
+                    url: `${base}/nodes`,
                 },
                 {
                     name: 'Code',
                     icon: 'fa6-solid:code',
-                    path: '/code-files',
+                    url: `${base}/code-files`,
                 },
                 {
                     name: 'Image',
                     icon: 'fa6-solid:compact-disc',
-                    path: '/image',
+                    url: `${base}/image`,
                 },
                 {
                     name: 'Security',
                     icon: 'fa6-solid:lock',
-                    path: '/security',
+                    url: `${base}/security`,
                 },
                 {
                     name: 'Results',
                     icon: 'fa6-solid:chart-bar',
-                    path: '/result-files',
+                    url: `${base}/result-files`,
                 },
             ];
 
@@ -97,7 +99,7 @@ export default defineComponent({
                 items.push({
                     name: 'Settings',
                     icon: 'fa6-solid:gear',
-                    path: '/settings',
+                    url: `${base}/settings`,
                 });
             }
 
@@ -132,17 +134,10 @@ export default defineComponent({
 
         <div v-if="entity">
             <div class="flex-wrap flex-row flex items-center">
-                <DomainEntityNav
-                    :items="tabs"
-                    :path="'/analyses/' + entity.id"
-                >
-                    <template #before>
-                        <DomainEntityNavItem
-                            :path="'/projects/'+entity.project_id+'/analyses'"
-                            :icon="'fa6-solid:arrow-left'"
-                        />
-                    </template>
-                </DomainEntityNav>
+                <VCNavItems
+                    :data="tabs"
+                    variant="pills"
+                />
             </div>
         </div>
 

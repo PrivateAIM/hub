@@ -12,6 +12,7 @@ import type {
 import {
     DomainType,
 } from '@privateaim/core-kit';
+import type { NavigationItem } from '@vuecs/navigation';
 import { defineComponent } from 'vue';
 import {
     useRoute,
@@ -55,26 +56,32 @@ export default defineComponent({
             throw createError({});
         }
 
-        const tabs = [
+        const base = `/admin/nodes/${manager.data.value.id}`;
+        const tabs: NavigationItem[] = [
             {
-                name: 'Overview', 
-                icon: 'fa6-solid:bars', 
-                path: '', 
+                name: '',
+                icon: 'fa6-solid:arrow-left',
+                url: '/admin/nodes',
             },
             {
-                name: 'Crypto', 
-                icon: 'fa6-solid:shield-halved', 
-                path: 'crypto', 
+                name: 'Overview',
+                icon: 'fa6-solid:bars',
+                url: base,
             },
             {
-                name: 'Client', 
-                icon: 'fa6-solid:ghost', 
-                path: 'client', 
+                name: 'Crypto',
+                icon: 'fa6-solid:shield-halved',
+                url: `${base}/crypto`,
             },
             {
-                name: 'Registry', 
-                icon: 'fa6-brands:docker', 
-                path: 'registry', 
+                name: 'Client',
+                icon: 'fa6-solid:ghost',
+                url: `${base}/client`,
+            },
+            {
+                name: 'Registry',
+                icon: 'fa6-brands:docker',
+                url: `${base}/registry`,
             },
         ];
 
@@ -95,10 +102,9 @@ export default defineComponent({
 
         <div class="m-b-20 m-t-10">
             <div class="flex-wrap flex-row flex">
-                <DomainEntityNav
-                    :items="tabs"
-                    :path="'/admin/nodes/' + entity.id"
-                    :prev-link="true"
+                <VCNavItems
+                    :data="tabs"
+                    variant="pills"
                 />
             </div>
         </div>

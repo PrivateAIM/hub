@@ -11,7 +11,7 @@ import { VCNavItems } from '@vuecs/navigation';
 import { computed } from 'vue';
 import { ref, useColorMode } from '#imports';
 import { defineNuxtComponent } from '#app';
-import { Navigation } from '../../config/layout';
+import { LayoutTopNavigationRegistryId, Navigation } from '../../config/layout';
 
 export default defineNuxtComponent({
     components: {
@@ -59,6 +59,7 @@ export default defineNuxtComponent({
             displayNav,
             topItems,
             topItemsWatch,
+            topRegistryId: LayoutTopNavigationRegistryId,
             isDark,
             toggleColorMode,
         };
@@ -96,6 +97,8 @@ export default defineNuxtComponent({
                         class="navbar-nav"
                         :data="topItems"
                         :watch="topItemsWatch"
+                        registry
+                        :registry-id="topRegistryId"
                     />
                     <ul class="navbar-nav vc-nav-items navbar-gadgets">
                         <li class="vc-nav-item">

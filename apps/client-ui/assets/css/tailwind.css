@@ -7,6 +7,18 @@
  * can't reach via the theme alone.
  */
 
+/*
+ * Structural CSS for @vuecs/navigation (<VCNavItems>): flex layout for
+ * nav links + submenu triggers (inline icon/label), the dropdown content
+ * panel, and the base pills box. The JS plugin only registers components;
+ * this stylesheet ships separately and must be imported explicitly.
+ * Imported here (not in the theme) because @vuecs/navigation is a direct
+ * dependency of this app — keeping it out of the theme's deps avoids a
+ * dependency re-resolution. Placed BEFORE the theme so the theme's
+ * app-level overrides (styles/vue-layout-navigation.css) still win.
+ */
+@import "@vuecs/navigation/style.css";
+
 @import "@privateaim/client-vue-theme";
 
 /*

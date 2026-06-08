@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { Client } from '@authup/core-kit';
 import { PermissionName } from '@authup/core-kit';
+import type { NavigationItem } from '@vuecs/navigation';
 import { defineNuxtComponent } from '#app';
 import { definePageMeta, useToast } from '#imports';
 import { LayoutKey } from '../../../config/layout';
@@ -19,16 +20,16 @@ export default defineNuxtComponent({
 
         const toast = useToast();
 
-        const items = [
+        const items: NavigationItem[] = [
             {
-                name: 'overview',
-                path: '',
-                icon: 'fa6-solid:bars',
+                name: 'overview', 
+                url: '/admin/clients', 
+                icon: 'fa6-solid:bars', 
             },
             {
-                name: 'add',
-                path: '/add',
-                icon: 'fa6-solid:plus',
+                name: 'add', 
+                url: '/admin/clients/add', 
+                icon: 'fa6-solid:plus', 
             },
         ];
 
@@ -63,10 +64,10 @@ export default defineNuxtComponent({
         </h1>
         <div class="content-wrapper">
             <div class="content-sidebar flex-col">
-                <DomainEntityNav
-                    :items="items"
-                    path="/admin/clients"
-                    direction="vertical"
+                <VCNavItems
+                    :data="items"
+                    variant="pills"
+                    orientation="vertical"
                 />
             </div>
             <div class="content-container">

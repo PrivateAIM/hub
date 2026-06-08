@@ -3,8 +3,9 @@ import { injectHTTPClient } from '@authup/client-web-kit';
 import type { Client } from '@authup/core-kit';
 import { PermissionName } from '@authup/core-kit';
 import { extendObject } from '@authup/kit';
+import type { NavigationItem } from '@vuecs/navigation';
 import { type Ref, defineComponent } from 'vue';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import {
     createError,
     definePageMeta,
@@ -23,34 +24,6 @@ export default defineComponent({
             ],
         });
 
-        const items = [
-            {
-                name: 'General', 
-                icon: 'fa6-solid:bars', 
-                path: '',
-            },
-            {
-                name: 'Scopes', 
-                icon: 'fa6-solid:meteor', 
-                path: '/scopes',
-            },
-            {
-                name: 'URL', 
-                icon: 'fa6-solid:link', 
-                path: '/url',
-            },
-            {
-                name: 'Permissions', 
-                icon: 'fa6-solid:user-secret', 
-                path: '/permissions',
-            },
-            {
-                name: 'Roles', 
-                icon: 'fa6-solid:user-group', 
-                path: '/roles',
-            },
-        ];
-
         const toast = useToast();
         const route = useRoute();
 
@@ -64,6 +37,42 @@ export default defineComponent({
             await navigateTo({ path: '/admin/clients' });
             throw createError({});
         }
+
+        const items = computed<NavigationItem[]>(() => {
+            const base = `/admin/clients/${entity.value?.id}`;
+            return [
+                {
+                    name: '', 
+                    icon: 'fa6-solid:arrow-left', 
+                    url: '/admin/clients', 
+                },
+                {
+                    name: 'General', 
+                    icon: 'fa6-solid:bars', 
+                    url: base, 
+                },
+                {
+                    name: 'Scopes', 
+                    icon: 'fa6-solid:meteor', 
+                    url: `${base}/scopes`, 
+                },
+                {
+                    name: 'URL', 
+                    icon: 'fa6-solid:link', 
+                    url: `${base}/url`, 
+                },
+                {
+                    name: 'Permissions', 
+                    icon: 'fa6-solid:user-secret', 
+                    url: `${base}/permissions`, 
+                },
+                {
+                    name: 'Roles', 
+                    icon: 'fa6-solid:user-group', 
+                    url: `${base}/roles`, 
+                },
+            ];
+        });
 
         const handleUpdated = (e: Client) => {
             if (toast) {
@@ -98,10 +107,9 @@ export default defineComponent({
             <span class="sub-title ms-1">Details</span>
         </h1>
         <div class="mb-2">
-            <DomainEntityNav
-                :path="'/admin/clients/'+entity.id"
-                :items="items"
-                :prev-link="true"
+            <VCNavItems
+                :data="items"
+                variant="pills"
             />
         </div>
         <div>

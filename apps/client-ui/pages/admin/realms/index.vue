@@ -10,6 +10,7 @@ import type { Realm } from '@authup/core-kit';
 import { PermissionName } from '@authup/core-kit';
 import { definePageMeta, useToast } from '#imports';
 import { defineNuxtComponent } from '#app';
+import type { NavigationItem } from '@vuecs/navigation';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 
 export default defineNuxtComponent({
@@ -27,16 +28,16 @@ export default defineNuxtComponent({
 
         const toast = useToast();
 
-        const items = [
+        const items: NavigationItem[] = [
             {
-                name: 'overview',
-                path: '',
-                icon: 'fa6-solid:bars',
+                name: 'overview', 
+                url: '/admin/realms', 
+                icon: 'fa6-solid:bars', 
             },
             {
-                name: 'add',
-                path: '/add',
-                icon: 'fa6-solid:plus',
+                name: 'add', 
+                url: '/admin/realms/add', 
+                icon: 'fa6-solid:plus', 
             },
         ];
 
@@ -67,10 +68,10 @@ export default defineNuxtComponent({
         </h1>
         <div class="content-wrapper">
             <div class="content-sidebar flex-col">
-                <DomainEntityNav
-                    :items="items"
-                    path="/admin/realms"
-                    direction="vertical"
+                <VCNavItems
+                    :data="items"
+                    variant="pills"
+                    orientation="vertical"
                 />
             </div>
             <div class="content-container">

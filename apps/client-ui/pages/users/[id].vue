@@ -7,21 +7,20 @@
 <script lang="ts">
 import { injectHTTPClient } from '@authup/client-web-kit';
 import type { User } from '@authup/core-kit';
+import type { NavigationItem } from '@vuecs/navigation';
 import { isClientErrorWithStatusCode } from 'hapic';
 import type { Ref } from 'vue';
 import { ref } from 'vue';
 import { definePageMeta } from '#imports';
 import {
-    createError, 
-    defineNuxtComponent, 
-    navigateTo, 
+    createError,
+    defineNuxtComponent,
+    navigateTo,
     useRoute,
 } from '#app';
-import DomainEntityNav from '../../components/DomainEntityNav';
 import { LayoutKey, LayoutNavigationID } from '../../config/layout';
 
 export default defineNuxtComponent({
-    components: { DomainEntityNav },
     async setup() {
         definePageMeta({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
@@ -40,12 +39,12 @@ export default defineNuxtComponent({
             throw createError({});
         }
 
-        const tabs = [
+        const base = `/users/${user.value.id}`;
+        const tabs: NavigationItem[] = [
             {
-                name: 'General', 
-                routeName: 'users-id', 
-                icon: 'fa6-solid:bars', 
-                path: '',
+                name: 'General',
+                icon: 'fa6-solid:bars',
+                url: base,
             },
         ];
 
@@ -68,9 +67,9 @@ export default defineNuxtComponent({
         <div class="m-b-20 m-t-10">
             <div class="panel-card">
                 <div class="panel-card-body">
-                    <DomainEntityNav
-                        :items="tabs"
-                        :path="'/users/' + user.id"
+                    <VCNavItems
+                        :data="tabs"
+                        variant="pills"
                     />
                 </div>
             </div>

@@ -6,6 +6,7 @@
   -->
 <script lang="ts">
 import type { Project } from '@privateaim/core-kit';
+import type { NavigationItem } from '@vuecs/navigation';
 import { defineNuxtComponent, navigateTo } from '#app';
 import { definePageMeta, useToast } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
@@ -17,20 +18,20 @@ export default defineNuxtComponent({
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
         });
 
-        const tabs = [
+        const tabs: NavigationItem[] = [
             {
                 name: 'Create',
-                path: '/add',
+                url: '/projects/add',
                 icon: 'fa6-solid:plus',
             },
             {
                 name: 'Outgoing',
-                path: '',
+                url: '/projects',
                 icon: 'fa6-solid:file-export',
             },
             {
                 name: 'Incoming',
-                path: '/in',
+                url: '/projects/in',
                 icon: 'fa6-solid:file-import',
             },
         ];
@@ -59,10 +60,10 @@ export default defineNuxtComponent({
 
         <div class="content-wrapper">
             <div class="content-sidebar flex-col">
-                <DomainEntityNav
-                    :items="tabs"
-                    :path="'/projects'"
-                    :direction="'vertical'"
+                <VCNavItems
+                    :data="tabs"
+                    variant="pills"
+                    orientation="vertical"
                 />
             </div>
             <div class="content-container">

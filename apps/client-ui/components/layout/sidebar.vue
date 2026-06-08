@@ -7,10 +7,11 @@
 <script lang="ts">
 import { injectStore, storeToRefs } from '@authup/client-web-kit';
 import { VCCountdown } from '@vuecs/countdown';
+import type { NavigationResolverContext } from '@vuecs/navigation';
 import { VCNavItems } from '@vuecs/navigation';
 import { defineNuxtComponent } from '#app';
-import { computed, useRoute } from '#imports';
-import { Navigation } from '../../config/layout';
+import { computed } from '#imports';
+import { LayoutTopNavigationRegistryId, Navigation } from '../../config/layout';
 
 export default defineNuxtComponent({
     components: { VCCountdown, VCNavItems },
@@ -31,18 +32,25 @@ export default defineNuxtComponent({
             return tokenExpireDate.value.getTime() - Date.now();
         });
 
-        // Sidebar items are permission-filtered and additionally vary by
-        // route (`/admin/*` selects the admin sidebar). Pass the resolver as
-        // `:data`; the `:watch` list re-runs it on session transitions and
-        // when the active path crosses the admin boundary.
-        const route = useRoute();
+        // Sidebar items are permission-filtered and additionally vary by the
+        // active top-level section. The header's top `<VCNavItems registry>`
+        // publishes its active trail to the shared navigation registry; this
+        // resolver reads that section's name (synchronously, so the nav tracks
+        // it as a reactive dep) and re-renders whenever it changes — i.e. on a
+        // click of the url-less "Admin"/"Home" tab or on navigation across the
+        // `/admin` boundary. The `:watch` list covers session transitions read
+        // only after the first `await` inside the resolver.
         const navigation = new Navigation(store);
-        const sideItems = () => navigation.getSideItems(route.path);
+        const sideItems = (ctx: NavigationResolverContext) => {
+            const activeTopName = ctx.registry(LayoutTopNavigationRegistryId)
+                .activeTrail.value[0]?.name;
+
+            return navigation.getSideItems(activeTopName);
+        };
         const sideItemsWatch = [
             () => store.loggedIn,
             () => store.userId,
             () => store.realmManagement,
-            () => route.path,
         ];
 
         return {

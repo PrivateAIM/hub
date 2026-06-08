@@ -6,32 +6,31 @@
   -->
 <script lang="ts">
 import type { Analysis } from '@privateaim/core-kit';
+import type { NavigationItem } from '@vuecs/navigation';
 import { defineNuxtComponent } from '#app';
 import { definePageMeta, navigateTo, useToast } from '#imports';
-import DomainEntityNav from '../../components/DomainEntityNav';
 import { LayoutKey, LayoutNavigationID } from '../../config/layout';
 
 export default defineNuxtComponent({
-    components: { DomainEntityNav },
     setup() {
         definePageMeta({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
         });
-        const items = [
+        const items: NavigationItem[] = [
             {
                 name: 'Create',
-                path: '/add',
+                url: '/analyses/add',
                 icon: 'fa6-solid:plus',
             },
             {
                 name: 'Outgoing',
-                path: '',
+                url: '/analyses',
                 icon: 'fa6-solid:file-export',
             },
             {
                 name: 'Incoming',
-                path: '/in',
+                url: '/analyses/in',
                 icon: 'fa6-solid:file-import',
             },
         ];
@@ -60,10 +59,10 @@ export default defineNuxtComponent({
 
         <div class="content-wrapper">
             <div class="content-sidebar flex-col">
-                <DomainEntityNav
-                    :items="items"
-                    :path="'/analyses'"
-                    :direction="'vertical'"
+                <VCNavItems
+                    :data="items"
+                    variant="pills"
+                    orientation="vertical"
                 />
             </div>
             <div class="content-container">

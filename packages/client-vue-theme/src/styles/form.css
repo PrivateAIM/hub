@@ -46,7 +46,7 @@
 }
 
 .form-group-hint.group-required {
-    color: var(--vc-color-primary-600);
+    color: var(--vc-color-warning-600);
 }
 
 .form-group-error .form-group-hint {

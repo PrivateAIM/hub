@@ -15,6 +15,7 @@ import {
     LayoutSideAdminNavigation,
     LayoutSideDefaultNavigation,
     LayoutTopNavigation,
+    LayoutTopNavigationName,
 } from './contants';
 import type { NavigationItemMeta } from './types';
 
@@ -52,14 +53,17 @@ export class Navigation {
 
     /**
      * Resolve the sidebar navigation items, filtered against the current
-     * session. The admin sidebar is selected when the active route lives under
-     * `/admin/` (mirrors the pre-4.x `parent.name === 'Admin'` branch — the
-     * @vuecs/navigation 4.x registry model has no NavigationManager to carry
-     * the active top-level item, so the variant is derived from the path).
-     * Used as the `:data` resolver of the sidebar's `<VCNavItems>`.
+     * session. The admin sidebar is selected when the header's top nav has
+     * the "Admin" section active — the sidebar reads that active section name
+     * from the shared navigation registry (published by the top
+     * `<VCNavItems registry>`). This switches the sidebar both on navigation
+     * into `/admin/*` (path-matched via the section's `activeMatch`) AND on a
+     * direct click of the url-less "Admin" top tab (selection republished
+     * through the registry). Used as the `:data` resolver of the sidebar's
+     * `<VCNavItems>`.
      */
-    getSideItems(path?: string): Promise<NavigationItem[]> {
-        if (path && path.startsWith('/admin')) {
+    getSideItems(activeTopName?: string): Promise<NavigationItem[]> {
+        if (activeTopName === LayoutTopNavigationName.ADMIN) {
             return this.reduce(LayoutSideAdminNavigation);
         }
 
