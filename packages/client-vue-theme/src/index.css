@@ -80,6 +80,27 @@
         --privateaim-brand-purple:          #6259ca;
         --privateaim-brand-blue:            #2776dc;
         --privateaim-brand-rust:            #a6592d;
+
+        /*
+         * Primary palette → hub brand coral. Overrides the vuecs primary
+         * scale (which @vuecs/design aliases to blue); theme-tailwind
+         * bridges `--color-primary-*` from these, so every `primary`
+         * utility/component (buttons, active states, rings) adopts the
+         * brand coral. Tints/shades are color-mixed from the brand var so
+         * the whole scale stays in sync with it; the pure brand sits at
+         * 600 — the shade buttons and active states use.
+         */
+        --vc-color-primary-50:  color-mix(in oklab, var(--privateaim-brand-coral) 8%,  white);
+        --vc-color-primary-100: color-mix(in oklab, var(--privateaim-brand-coral) 16%, white);
+        --vc-color-primary-200: color-mix(in oklab, var(--privateaim-brand-coral) 32%, white);
+        --vc-color-primary-300: color-mix(in oklab, var(--privateaim-brand-coral) 52%, white);
+        --vc-color-primary-400: color-mix(in oklab, var(--privateaim-brand-coral) 74%, white);
+        --vc-color-primary-500: color-mix(in oklab, var(--privateaim-brand-coral) 90%, white);
+        --vc-color-primary-600: var(--privateaim-brand-coral);
+        --vc-color-primary-700: color-mix(in oklab, var(--privateaim-brand-coral) 82%, black);
+        --vc-color-primary-800: color-mix(in oklab, var(--privateaim-brand-coral) 64%, black);
+        --vc-color-primary-900: color-mix(in oklab, var(--privateaim-brand-coral) 50%, black);
+        --vc-color-primary-950: color-mix(in oklab, var(--privateaim-brand-coral) 32%, black);
     }
 
     /*
@@ -101,9 +122,17 @@
         --privateaim-chrome-fg-muted:       #aeb2b7;
         --privateaim-chrome-border:         #333333;
 
-        --vc-color-bg: var(--vc-color-neutral-400);
-        --vc-color-bg-muted: var(--vc-color-neutral-500);
-        --vc-color-border: var(--vc-color-neutral-500);
+        /*
+         * Content surface — soft dark that pairs with the warm chrome
+         * (#40434E) as a gentle tonal step. @vuecs/design's dark `--vc-color-fg`
+         * is light (neutral-200), so the surface MUST stay dark; the prior
+         * `neutral-400` (a light-mid grey) left light text on light grey
+         * (~1.7:1, unreadable). Content sits a touch darker than the chrome so
+         * the sidebar/header read as raised panels.
+         */
+        --vc-color-bg: #2a2d35;
+        --vc-color-bg-muted: #343742;
+        --vc-color-border: #3e414c;
     }
 
     /*

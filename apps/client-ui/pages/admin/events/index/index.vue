@@ -145,7 +145,6 @@ export default defineComponent({
                 :data="props.data"
                 :columns="columns"
                 :busy="props.busy"
-                bordered
             >
                 <template #cell-scope="{ row }: { row: any }">
                     <template v-if="row.scope">

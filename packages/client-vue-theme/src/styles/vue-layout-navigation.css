@@ -102,43 +102,98 @@
 }
 
 /*
- * Domain-entity pills (variant="pills" on <VCNavItems>) — brand skin on
- * top of @vuecs/navigation's structural style.css (imported by
- * client-vue-theme/index.css), which supplies the layout: the flex pill
- * row, per-pill padding + radius, the submenu trigger's inline
- * icon/label, and the dropdown content panel. Here we only repaint the
- * active/hover state with the privateaim brand tokens (they flip with the
- * color mode) and give the nested submenu trigger the same pill box as
- * its sibling links.
+ * Domain-entity tabs (variant="pills" on <VCNavItems>) — rendered as a
+ * JOINED SEGMENTED CONTROL on top of @vuecs/navigation's structural
+ * style.css (imported by the app CSS entry), which supplies the base flex
+ * row, per-segment padding/width and the submenu trigger's inline
+ * icon/label. Here we drop the structural inter-pill gap + per-pill
+ * radius, draw the segments as one bordered strip sharing 1px seams, and
+ * fill the active segment with the brand coral.
+ *
+ * `.vc-nav-trigger` is the clickable element of a segment WITH children
+ * (e.g. registry "Projects", collapse mode); it is treated identically to
+ * a leaf segment's `.vc-nav-link--pills`.
  *
  * Kept UNLAYERED (this file is imported outside any `@layer`) so it
  * outranks the structural rules and theme-tailwind utilities regardless
  * of specificity.
  */
 /*
- * A nested item (e.g. registry "Projects") renders as a Reka
- * <button class="vc-nav-trigger">, not a `.vc-nav-link--pills`. Give it
- * the same pill box so it sits flush with its sibling pills; structural
- * CSS already lays its icon + label out inline.
+ * Match the structural selector's specificity (`.vc-nav-items.vc-nav-items--pills`
+ * sets `gap: .25rem`); a bare `.vc-nav-items--pills` would lose to it. Source
+ * order then breaks the tie in our favour. Segments share a seam, so no gap.
  */
+.vc-nav-items.vc-nav-items--pills {
+    gap: 0;
+}
+
+.vc-nav-items--pills .vc-nav-link--pills,
 .vc-nav-items--pills .vc-nav-item-nested .vc-nav-trigger {
-    border-radius: 0.375rem;
     padding: 0.375rem 0.75rem;
+    border: 1px solid var(--vc-color-border);
+    border-radius: 0;
+    background-color: transparent;
+    color: var(--vc-color-fg);
 }
 
 /*
- * Active/hover paint — mirrors the chrome nav accent (coral text on the
- * elevated chrome surface) so entity pills read consistently with the
- * sidebar/header. Leaf pills carry `.active` on the link (VCLink); the
- * nested-parent trigger's active/open state is an `.active` class on its
- * `<li>` (`.vc-nav-item-nested.active`, collapse mode).
+ * Pull each segment onto its neighbour so the two 1px borders collapse
+ * into one shared seam. The negative margin lives on the flex ITEM (the
+ * `<li>`), which is what flexbox lays out.
  */
+.vc-nav-items--pills:not(.vc-nav-items--vertical) .vc-nav-item--pills {
+    margin-left: -1px;
+}
+.vc-nav-items--pills:not(.vc-nav-items--vertical) .vc-nav-item--pills:first-child {
+    margin-left: 0;
+}
+.vc-nav-items--pills:not(.vc-nav-items--vertical) .vc-nav-item--pills:first-child .vc-nav-link--pills,
+.vc-nav-items--pills:not(.vc-nav-items--vertical) .vc-nav-item--pills:first-child .vc-nav-trigger {
+    border-top-left-radius: 0.375rem;
+    border-bottom-left-radius: 0.375rem;
+}
+.vc-nav-items--pills:not(.vc-nav-items--vertical) .vc-nav-item--pills:last-child .vc-nav-link--pills,
+.vc-nav-items--pills:not(.vc-nav-items--vertical) .vc-nav-item--pills:last-child .vc-nav-trigger {
+    border-top-right-radius: 0.375rem;
+    border-bottom-right-radius: 0.375rem;
+}
+
+/* Vertical strip (list pages, orientation="vertical") — seam on the top edge. */
+.vc-nav-items--pills.vc-nav-items--vertical .vc-nav-item--pills {
+    margin-top: -1px;
+}
+.vc-nav-items--pills.vc-nav-items--vertical .vc-nav-item--pills:first-child {
+    margin-top: 0;
+}
+.vc-nav-items--pills.vc-nav-items--vertical .vc-nav-item--pills:first-child .vc-nav-link--pills,
+.vc-nav-items--pills.vc-nav-items--vertical .vc-nav-item--pills:first-child .vc-nav-trigger {
+    border-top-left-radius: 0.375rem;
+    border-top-right-radius: 0.375rem;
+}
+.vc-nav-items--pills.vc-nav-items--vertical .vc-nav-item--pills:last-child .vc-nav-link--pills,
+.vc-nav-items--pills.vc-nav-items--vertical .vc-nav-item--pills:last-child .vc-nav-trigger {
+    border-bottom-left-radius: 0.375rem;
+    border-bottom-right-radius: 0.375rem;
+}
+
 .vc-nav-items--pills .vc-nav-link--pills:hover,
+.vc-nav-items--pills .vc-nav-item-nested .vc-nav-trigger:hover {
+    background-color: var(--vc-color-bg-muted);
+}
+
+/*
+ * Active segment = brand-coral fill. Raised above its neighbours so its
+ * coral border isn't clipped by their overlapping seams. Leaf segments
+ * carry `.active` on the link (VCLink); a nested-parent segment carries
+ * `.active` on its `<li>` (collapse mode).
+ */
 .vc-nav-items--pills .vc-nav-link--pills.active,
-.vc-nav-items--pills .vc-nav-item-nested .vc-nav-trigger:hover,
 .vc-nav-items--pills .vc-nav-item-nested.active > .vc-nav-trigger {
-    color: var(--privateaim-brand-coral);
-    background: var(--privateaim-chrome-bg-elevated);
+    position: relative;
+    z-index: 1;
+    background-color: var(--privateaim-brand-coral);
+    border-color: var(--privateaim-brand-coral);
+    color: var(--color-on-primary);
 }
 
 .vc-nav-item-nested .vc-nav-items .vc-nav-link {

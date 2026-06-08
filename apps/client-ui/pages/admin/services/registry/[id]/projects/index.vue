@@ -152,7 +152,6 @@ export default {
                     :data="props.data"
                     :columns="columns"
                     :busy="props.busy"
-                    bordered
                 >
                     <template #cell-type="{ row }: { row: any }">
                         <span class="badge bg-fg">
