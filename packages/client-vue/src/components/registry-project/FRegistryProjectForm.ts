@@ -5,25 +5,24 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { 
-    buildFormGroup, 
-    buildFormInput, 
-    buildFormSelect, 
-    buildFormSubmitWithTranslations, 
-    createFormSubmitTranslations, 
-} from '@authup/client-web-kit';
-import { getSeverity, useTranslationsForNestedValidations } from '@ilingo/vuelidate';
-import type { Registry, RegistryProject } from '@privateaim/core-kit';
-import { DomainType, RegistryProjectType } from '@privateaim/core-kit';
-import { createNanoID } from '@privateaim/kit';
-import type { ListItemSlotProps } from '../../core';
-import useVuelidate from '@vuelidate/core';
 import {
-    helpers, 
-    maxLength, 
-    minLength, 
-    required,
-} from '@vuelidate/validators';
+    buildFormGroup,
+    buildFormInput,
+    buildFormSelect,
+    buildFormSubmitWithTranslations,
+    createFormSubmitTranslations,
+} from '@authup/client-web-kit';
+import { useFieldValidation } from '@ilingo/validup-vue';
+import { useValidup } from '@validup/vue';
+import type { Severity } from '@validup/vue';
+import type { Registry, RegistryProject } from '@privateaim/core-kit';
+import {
+    DomainType,
+    RegistryProjectType,
+    RegistryProjectValidator,
+} from '@privateaim/core-kit';
+import { ValidatorGroup, createNanoID } from '@privateaim/kit';
+import type { ListItemSlotProps } from '../../core';
 import type { PropType, VNodeArrayChildren } from 'vue';
 import {
     computed,
@@ -42,11 +41,6 @@ import {
     wrapFnWithBusyState,
 } from '../../core';
 import RegistryList from '../registry/FRegistries';
-
-// todo: must start with character or number!!
-const alphaNumHyphenUnderscore = helpers.regex(
-    /^[a-z0-9-_]*$/,
-);
 
 export default defineComponent({
     props: {
@@ -69,27 +63,23 @@ export default defineComponent({
             registry_id: '',
         });
 
-        const $v = useVuelidate({
-            name: {
-                required,
-                minLength: minLength(3),
-                maxLength: maxLength(128),
-            },
-            external_name: {
-                required,
-                alphaNumHyphenUnderscore,
-                minLength: minLength(3),
-                maxLength: maxLength(64),
-            },
-            type: { required },
-            registry_id: { required },
-        }, form);
-
         const manager = createEntityManager({
             type: `${DomainType.REGISTRY_PROJECT}`,
             setup,
             props,
         });
+
+        const $v = useValidup(
+            new RegistryProjectValidator(),
+            form,
+            { group: computed(() => (manager.data.value ? ValidatorGroup.UPDATE : ValidatorGroup.CREATE)) },
+        );
+
+        const nameValidation = useFieldValidation($v.fields.name);
+        const externalNameValidation = useFieldValidation($v.fields.external_name);
+        const typeValidation = useFieldValidation($v.fields.type);
+
+        const toSeverity = (input: Severity) => (input === 'error' || input === 'warning' ? input : undefined);
 
         const types = [
             { id: RegistryProjectType.DEFAULT, value: 'DEFAULT' },
@@ -153,21 +143,20 @@ export default defineComponent({
         });
 
         const submit = wrapFnWithBusyState(busy, async () => {
-            if ($v.value.$invalid) {
+            if ($v.$invalid.value) {
                 return;
             }
 
             await manager.createOrUpdate(form);
         });
 
-        const translationsValidation = useTranslationsForNestedValidations($v.value);
         const translationsSubmit = createFormSubmitTranslations();
 
         return () => {
             const VCIcon = resolveComponent('VCIcon');
             const name = buildFormGroup({
-                validationMessages: translationsValidation.name.value,
-                validationSeverity: getSeverity($v.value.name),
+                validationMessages: nameValidation.messages,
+                validationSeverity: toSeverity(nameValidation.severity),
                 label: true,
                 labelContent: 'Name',
                 content: buildFormInput({
@@ -178,8 +167,8 @@ export default defineComponent({
                 }),
             });
             const externalName = buildFormGroup({
-                validationMessages: translationsValidation.external_name.value,
-                validationSeverity: getSeverity($v.value.external_name),
+                validationMessages: externalNameValidation.messages,
+                validationSeverity: toSeverity(externalNameValidation.severity),
                 label: true,
                 labelContent: 'External Name',
                 content: buildFormInput({
@@ -230,8 +219,8 @@ export default defineComponent({
             ]);
 
             const type = buildFormGroup({
-                validationMessages: translationsValidation.type.value,
-                validationSeverity: getSeverity($v.value.type),
+                validationMessages: typeValidation.messages,
+                validationSeverity: toSeverity(typeValidation.severity),
                 label: true,
                 labelContent: 'Type',
                 content: buildFormSelect({
@@ -271,7 +260,7 @@ export default defineComponent({
                 submit,
                 busy: busy.value,
                 isEditing: !!manager.data.value,
-                invalid: $v.value.$invalid,
+                invalid: $v.$invalid.value,
             }, translationsSubmit);
 
             return h('form', {

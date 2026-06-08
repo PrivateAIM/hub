@@ -8,7 +8,7 @@
 import { BadRequestError } from '@privateaim/errors';
 import { isNameValid } from '@authup/core-kit';
 import { Container } from 'validup';
-import { createValidator } from '@validup/adapter-zod';
+import { createValidator } from '@validup/zod';
 import { z } from 'zod';
 import type { Analysis } from './entity.ts';
 import { ValidatorGroup } from '@privateaim/kit';

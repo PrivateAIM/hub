@@ -8,29 +8,42 @@
 <script lang="ts">
 import type { MasterImage } from '@privateaim/core-kit';
 import { DomainType } from '@privateaim/core-kit';
-import useVuelidate from '@vuelidate/core';
-import { required } from '@vuelidate/validators';
+import { IFieldValidation } from '@ilingo/validup-vue';
+import { useValidup } from '@validup/vue';
+import { createValidator } from '@validup/zod';
+import { Container } from 'validup';
+import { z } from 'zod';
 import {
-    type PropType, 
-    computed, 
-    defineComponent, 
-    nextTick, 
-    reactive, 
-    ref, 
-    toRef, 
-    useTemplateRef, 
+    type PropType,
+    computed,
+    defineComponent,
+    nextTick,
+    reactive,
+    ref,
+    toRef,
+    useTemplateRef,
     watch,
 } from 'vue';
-import { IVuelidate } from '@ilingo/vuelidate';
 import FMasterImageGroups from '../master-image-group/FMasterImageGroups';
 import FMasterImages from './FMasterImages';
 import { createEntityManager, defineEntityManagerEvents } from '../../core';
 
+class MasterImagePickerValidator extends Container<{
+    group_virtual_path: string;
+    master_image_id: string;
+}> {
+    protected override initialize() {
+        super.initialize();
+        this.mount('group_virtual_path', createValidator(z.string().min(1)));
+        this.mount('master_image_id', createValidator(z.string().min(1)));
+    }
+}
+
 export default defineComponent({
     components: {
-        FMasterImages, 
-        FMasterImageGroups, 
-        IVuelidate, 
+        FMasterImages,
+        FMasterImageGroups,
+        IFieldValidation,
     },
     props: {
         entityId: { type: String },
@@ -84,10 +97,7 @@ export default defineComponent({
         Promise.resolve()
             .then(() => manager.resolve());
 
-        const v$ = useVuelidate({
-            group_virtual_path: { required },
-            master_image_id: { required },
-        }, form, { $scope: false });
+        const v = useValidup(new MasterImagePickerValidator(), form, { detached: true });
 
         const isVirtualGroupPathDefined = computed(() => !!form.group_virtual_path &&
             form.group_virtual_path.length > 0);
@@ -137,7 +147,7 @@ export default defineComponent({
             selectImage,
             selectGroup,
 
-            v$,
+            v,
 
             busy: manager.busy,
             data: manager.data,
@@ -152,38 +162,36 @@ export default defineComponent({
         <div class="col">
             <FMasterImageGroups>
                 <template #default=" { data }">
-                    <IVuelidate :validation="v$.group_virtual_path">
-                        <template #default="props">
-                            <VCFormGroup
-                                :validation-messages="props.data"
-                                :validation-severity="props.severity"
-                            >
-                                <template #label>
-                                    Group
-                                    <template v-if="isVirtualGroupPathDefined">
-                                        <VCIcon
-                                            name="fa6-solid:check"
-                                            class="text-success-600"
-                                        />
-                                    </template>
-                                </template>
-                                <template #default>
-                                    <VCFormSelect
-                                        v-model="v$.group_virtual_path.$model"
-                                        :options="data.map((el) => {
-                                            return {
-                                                value: el.virtual_path,
-                                                label: el.virtual_path
-                                            }
-                                        })"
-                                        :disabled="readonly || busy"
-
-                                        @update:model-value="selectGroup"
+                    <IFieldValidation
+                        v-slot="{ value }"
+                        :field="v.fields.group_virtual_path"
+                    >
+                        <VCFormGroup :validation="value">
+                            <template #label>
+                                Group
+                                <template v-if="isVirtualGroupPathDefined">
+                                    <VCIcon
+                                        name="fa6-solid:check"
+                                        class="text-success-600"
                                     />
                                 </template>
-                            </VCFormGroup>
-                        </template>
-                    </IVuelidate>
+                            </template>
+                            <template #default>
+                                <VCFormSelect
+                                    v-model="v.fields.group_virtual_path.$model.value"
+                                    :options="data.map((el) => {
+                                        return {
+                                            value: el.virtual_path,
+                                            label: el.virtual_path
+                                        }
+                                    })"
+                                    :disabled="readonly || busy"
+
+                                    @update:model-value="selectGroup"
+                                />
+                            </template>
+                        </VCFormGroup>
+                    </IFieldValidation>
                 </template>
             </FMasterImageGroups>
         </div>
@@ -194,38 +202,36 @@ export default defineComponent({
                 :query="imageQuery"
             >
                 <template #default="{ data }">
-                    <IVuelidate :validation="v$.master_image_id">
-                        <template #default="props">
-                            <VCFormGroup
-                                :validation-messages="props.data"
-                                :validation-severity="props.severity"
-                            >
-                                <template #label>
-                                    Image
-                                    <template v-if="v$.master_image_id.$model">
-                                        <VCIcon
-                                            name="fa6-solid:check"
-                                            class="text-success-600"
-                                        />
-                                    </template>
-                                </template>
-                                <template #default>
-                                    <VCFormSelect
-                                        v-model="v$.master_image_id.$model"
-                                        :options="data.map((el) => {
-                                            return {
-                                                value: el.id,
-                                                label: el.name,
-                                                disabled: el.build_status !== 'executed',
-                                            }
-                                        })"
-                                        :disabled="readonly || busy"
-                                        @update:model-value="selectImage"
+                    <IFieldValidation
+                        v-slot="{ value }"
+                        :field="v.fields.master_image_id"
+                    >
+                        <VCFormGroup :validation="value">
+                            <template #label>
+                                Image
+                                <template v-if="v.fields.master_image_id.$model.value">
+                                    <VCIcon
+                                        name="fa6-solid:check"
+                                        class="text-success-600"
                                     />
                                 </template>
-                            </VCFormGroup>
-                        </template>
-                    </IVuelidate>
+                            </template>
+                            <template #default>
+                                <VCFormSelect
+                                    v-model="v.fields.master_image_id.$model.value"
+                                    :options="data.map((el) => {
+                                        return {
+                                            value: el.id,
+                                            label: el.name,
+                                            disabled: el.build_status !== 'executed',
+                                        }
+                                    })"
+                                    :disabled="readonly || busy"
+                                    @update:model-value="selectImage"
+                                />
+                            </template>
+                        </VCFormGroup>
+                    </IFieldValidation>
                 </template>
             </FMasterImages>
         </div>

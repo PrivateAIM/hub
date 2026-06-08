@@ -5,23 +5,28 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { 
-    buildFormGroup, 
-    buildFormSelect, 
-    buildFormSubmitWithTranslations, 
-    buildFormTextarea, 
-    createFormSubmitTranslations, 
-} from '@authup/client-web-kit';
-import { getSeverity, useTranslationsForNestedValidations } from '@ilingo/vuelidate';
-import type { ProjectNode } from '@privateaim/core-kit';
-import { DomainType, ProjectNodeApprovalStatus } from '@privateaim/core-kit';
-import useVuelidate from '@vuelidate/core';
-import { maxLength, minLength, required } from '@vuelidate/validators';
 import {
-    defineComponent, 
-    h, 
-    reactive, 
-    ref, 
+    buildFormGroup,
+    buildFormSelect,
+    buildFormSubmitWithTranslations,
+    buildFormTextarea,
+    createFormSubmitTranslations,
+} from '@authup/client-web-kit';
+import { useFieldValidation } from '@ilingo/validup-vue';
+import { useValidup } from '@validup/vue';
+import type { Severity } from '@validup/vue';
+import type { ProjectNode } from '@privateaim/core-kit';
+import {
+    DomainType,
+    ProjectNodeApprovalStatus,
+    ProjectNodeValidator,
+} from '@privateaim/core-kit';
+import { ValidatorGroup } from '@privateaim/kit';
+import {
+    defineComponent,
+    h,
+    reactive,
+    ref,
     watch,
 } from 'vue';
 import type { PropType } from 'vue';
@@ -51,14 +56,6 @@ const FProjectInForm = defineComponent({
             ProjectNodeApprovalStatus.REJECTED,
         ];
 
-        const $v = useVuelidate({
-            comment: {
-                minLength: minLength(5),
-                maxLength: maxLength(2048),
-            },
-            approval_status: { required },
-        }, form);
-
         const updatedAt = useUpdatedAt(props.entity);
 
         const manager = createEntityManager({
@@ -66,6 +63,17 @@ const FProjectInForm = defineComponent({
             setup,
             props,
         });
+
+        const $v = useValidup(
+            new ProjectNodeValidator(),
+            form,
+            { group: ValidatorGroup.UPDATE },
+        );
+
+        const commentValidation = useFieldValidation($v.fields.comment);
+        const approvalStatusValidation = useFieldValidation($v.fields.approval_status);
+
+        const toSeverity = (input: Severity) => (input === 'error' || input === 'warning' ? input : undefined);
 
         function initForm() {
             initFormAttributesFromSource(form, manager.data.value);
@@ -80,18 +88,17 @@ const FProjectInForm = defineComponent({
         });
 
         const submit = wrapFnWithBusyState(busy, async () => {
-            if ($v.value.$invalid) return;
+            if ($v.$invalid.value) return;
 
             await manager.createOrUpdate(form);
         });
 
-        const translationsValidation = useTranslationsForNestedValidations($v.value);
         const translationsSubmit = createFormSubmitTranslations();
 
         return () => {
             const comment = buildFormGroup({
-                validationMessages: translationsValidation.comment.value,
-                validationSeverity: getSeverity($v.value.comment),
+                validationMessages: commentValidation.messages,
+                validationSeverity: toSeverity(commentValidation.severity),
                 label: true,
                 labelContent: 'Comment',
                 content: buildFormTextarea({
@@ -107,8 +114,8 @@ const FProjectInForm = defineComponent({
             });
 
             const status = buildFormGroup({
-                validationMessages: translationsValidation.approval_status.value,
-                validationSeverity: getSeverity($v.value.approval_status),
+                validationMessages: approvalStatusValidation.messages,
+                validationSeverity: toSeverity(approvalStatusValidation.severity),
                 label: true,
                 labelContent: 'Status',
                 content: buildFormSelect({
@@ -127,7 +134,7 @@ const FProjectInForm = defineComponent({
                 submit,
                 busy: busy.value,
                 isEditing: !!manager.data.value,
-                invalid: $v.value.$invalid,
+                invalid: $v.$invalid.value,
             }, translationsSubmit);
 
             return h(

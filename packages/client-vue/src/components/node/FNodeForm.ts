@@ -13,22 +13,18 @@ import {
     buildFormSubmitWithTranslations,
     createFormSubmitTranslations,
 } from '@authup/client-web-kit';
-import { getSeverity, useTranslationsForNestedValidations } from '@ilingo/vuelidate';
+import { useFieldValidation } from '@ilingo/validup-vue';
+import { useValidup } from '@validup/vue';
+import type { Severity } from '@validup/vue';
 import type { Node, Registry } from '@privateaim/core-kit';
 import {
     DomainType,
     NodeType,
+    NodeValidator,
 } from '@privateaim/core-kit';
-import { alphaNumHyphenUnderscoreRegex } from '@privateaim/kit';
-import useVuelidate from '@vuelidate/core';
-import {
-    helpers, 
-    maxLength, 
-    minLength, 
-    required,
-} from '@vuelidate/validators';
+import { ValidatorGroup } from '@privateaim/kit';
 import type {
-    PropType, 
+    PropType,
     VNodeArrayChildren,
 } from 'vue';
 import {
@@ -78,28 +74,25 @@ export default defineComponent({
             type: NodeType.DEFAULT,
         });
 
-        const $v = useVuelidate({
-            name: {
-                required,
-                minLength: minLength(3),
-                maxLength: maxLength(128),
-            },
-            hidden: {},
-            realm_id: { required },
-            registry_id: {},
-            external_name: {
-                alphaNumHyphenUnderscore: helpers.regex(alphaNumHyphenUnderscoreRegex),
-                minLength: minLength(3),
-                maxLength: maxLength(64),
-            },
-            type: { required },
-        }, form);
-
         const manager = createEntityManager({
             type: `${DomainType.NODE}`,
             setup,
             props,
         });
+
+        const $v = useValidup(
+            new NodeValidator(),
+            form,
+            { group: computed(() => (manager.data.value ? ValidatorGroup.UPDATE : ValidatorGroup.CREATE)) },
+        );
+
+        const nameValidation = useFieldValidation($v.fields.name);
+        const realmValidation = useFieldValidation($v.fields.realm_id);
+        const typeValidation = useFieldValidation($v.fields.type);
+        const externalNameValidation = useFieldValidation($v.fields.external_name);
+        const hiddenValidation = useFieldValidation($v.fields.hidden);
+
+        const toSeverity = (input: Severity) => (input === 'error' || input === 'warning' ? input : undefined);
 
         const isRealmLocked = computed(() => props.realmId ||
                 (manager.data.value && manager.data.value.realm_id));
@@ -130,7 +123,7 @@ export default defineComponent({
         });
 
         const submit = wrapFnWithBusyState(busy, async () => {
-            if ($v.value.$invalid) return;
+            if ($v.$invalid.value) return;
 
             await manager.createOrUpdate(form as Partial<Node>);
         });
@@ -143,7 +136,6 @@ export default defineComponent({
             }
         };
 
-        const translationsValidation = useTranslationsForNestedValidations($v.value);
         const translationsSubmit = createFormSubmitTranslations();
 
         return () => {
@@ -156,8 +148,8 @@ export default defineComponent({
                         {},
                         {
                             [EntityListSlotName.BODY]: (props: ListBodySlotProps<Node>) => buildFormGroup({
-                                validationMessages: translationsValidation.realm_id.value,
-                                validationSeverity: getSeverity($v.value.realm_id),
+                                validationMessages: realmValidation.messages,
+                                validationSeverity: toSeverity(realmValidation.severity),
                                 label: true,
                                 labelContent: 'Realms',
                                 content: buildFormSelect({
@@ -178,21 +170,21 @@ export default defineComponent({
             }
 
             const name = buildFormGroup({
-                validationMessages: translationsValidation.name.value,
-                validationSeverity: getSeverity($v.value.name),
+                validationMessages: nameValidation.messages,
+                validationSeverity: toSeverity(nameValidation.severity),
                 label: true,
                 labelContent: 'Name',
                 content: buildFormInput({
-                    value: $v.value.name.$model,
+                    value: $v.fields.name.$model.value,
                     onChange(input) {
-                        $v.value.name.$model = input;
+                        $v.fields.name.$model.value = input;
                     },
                 }),
             });
 
             const type = buildFormGroup({
-                validationMessages: translationsValidation.type.value,
-                validationSeverity: getSeverity($v.value.type),
+                validationMessages: typeValidation.messages,
+                validationSeverity: toSeverity(typeValidation.severity),
                 label: true,
                 labelContent: 'Type',
                 content: buildFormSelect({
@@ -208,8 +200,8 @@ export default defineComponent({
             });
 
             const externalName = buildFormGroup({
-                validationMessages: translationsValidation.external_name.value,
-                validationSeverity: getSeverity($v.value.external_name),
+                validationMessages: externalNameValidation.messages,
+                validationSeverity: toSeverity(externalNameValidation.severity),
                 label: true,
                 labelContent: 'External Name',
                 content: buildFormInput({
@@ -221,8 +213,8 @@ export default defineComponent({
             });
 
             const hidden = buildFormGroup({
-                validationMessages: translationsValidation.hidden.value,
-                validationSeverity: getSeverity($v.value.hidden),
+                validationMessages: hiddenValidation.messages,
+                validationSeverity: toSeverity(hiddenValidation.severity),
                 label: true,
                 labelContent: 'Visibility',
                 content: buildFormCheckbox({
@@ -263,7 +255,7 @@ export default defineComponent({
                 submit,
                 busy: busy.value,
                 isEditing: !!manager.data.value,
-                invalid: $v.value.$invalid,
+                invalid: $v.$invalid.value,
             }, translationsSubmit);
 
             return h('div', [

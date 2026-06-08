@@ -5,19 +5,12 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { IVuelidate } from '@ilingo/vuelidate';
-import { isNameValid } from '@authup/core-kit';
+import { IFieldValidation } from '@ilingo/validup-vue';
 import type { Analysis, Project } from '@privateaim/core-kit';
-import { DomainType } from '@privateaim/core-kit';
-import { generateName } from '@privateaim/kit';
-import {
-    helpers, 
-    maxLength, 
-    minLength, 
-    required,
-} from '@vuelidate/validators';
+import { AnalysisValidator, DomainType } from '@privateaim/core-kit';
+import { ValidatorGroup, generateName } from '@privateaim/kit';
+import { useValidup } from '@validup/vue';
 import type { BuildInput } from 'rapiq';
-import useVuelidate from '@vuelidate/core';
 import type { PropType } from 'vue';
 import {
     computed,
@@ -41,7 +34,7 @@ import { FSearch } from '../utility';
 export default defineComponent({
     components: {
         FSearch,
-        IVuelidate,
+        IFieldValidation,
         VCFormInput,
         FProjects,
     },
@@ -60,26 +53,6 @@ export default defineComponent({
             description: '',
         });
 
-        const $v = useVuelidate({
-            project_id: { required },
-            name: {
-                slug: helpers.withMessage(
-                    'Only letters, numbers and the characters -_. are allowed (no whitespace).',
-                    (value: string) => !value || isNameValid(value.trim().toLowerCase()),
-                ),
-                minLength: minLength(3),
-                maxLength: maxLength(128),
-            },
-            display_name: {
-                minLength: minLength(3),
-                maxLength: maxLength(256),
-            },
-            description: {
-                minLength: minLength(5),
-                maxLength: maxLength(4096),
-            },
-        }, form);
-
         const proposalQuery = computed<BuildInput<Project>>(() => ({ filters: { ...(props.realmId ? { realm_id: props.realmId } : {}) } }));
 
         const manager = createEntityManager({
@@ -89,6 +62,12 @@ export default defineComponent({
         });
 
         const isEditing = computed(() => !!manager.data.value);
+
+        const v = useValidup(
+            new AnalysisValidator(),
+            form,
+            { group: computed(() => (isEditing.value ? ValidatorGroup.UPDATE : ValidatorGroup.CREATE)) },
+        );
 
         if (props.projectId) {
             form.project_id = props.projectId as string;
@@ -140,7 +119,7 @@ export default defineComponent({
         };
 
         return {
-            v$: $v,
+            v,
             form,
             add,
             toggle,
@@ -155,74 +134,65 @@ export default defineComponent({
     <form @submit.prevent="add">
         <div class="row">
             <div class="col">
-                <IVuelidate :validation="v$.display_name">
-                    <template #default="props">
-                        <VCFormGroup
-                            :validation-messages="props.data"
-                            :validation-severity="props.severity"
-                        >
-                            <template #label>
-                                Display Name
-                            </template>
-                            <template #default>
-                                <VCFormInput
-                                    v-model="v$.display_name.$model"
-                                />
-                            </template>
-                        </VCFormGroup>
-                    </template>
-                </IVuelidate>
+                <IFieldValidation
+                    v-slot="{ value }"
+                    :field="v.fields.display_name"
+                >
+                    <VCFormGroup :validation="value">
+                        <template #label>
+                            Display Name
+                        </template>
+                        <VCFormInput
+                            :model-value="v.fields.display_name.$model.value ?? ''"
+                            @update:model-value="(next: string) => { v.fields.display_name.$model.value = next; }"
+                        />
+                    </VCFormGroup>
+                </IFieldValidation>
 
                 <hr>
 
-                <IVuelidate :validation="v$.name">
-                    <template #default="props">
-                        <VCFormGroup
-                            :validation-messages="props.data"
-                            :validation-severity="props.severity"
-                        >
-                            <template #label>
-                                Name
-                            </template>
-                            <template #default>
-                                <VCFormInput
-                                    v-model="v$.name.$model"
-                                />
-                                <small class="text-fg-muted">
-                                    URL-friendly identifier (letters, numbers, - _ .).
-                                    A suggestion is filled in automatically — edit it if you like.
-                                </small>
-                            </template>
-                        </VCFormGroup>
-                    </template>
-                </IVuelidate>
+                <IFieldValidation
+                    v-slot="{ value }"
+                    :field="v.fields.name"
+                >
+                    <VCFormGroup :validation="value">
+                        <template #label>
+                            Name
+                        </template>
+                        <VCFormInput
+                            :model-value="v.fields.name.$model.value ?? ''"
+                            @update:model-value="(next: string) => { v.fields.name.$model.value = next; }"
+                        />
+                        <small class="text-fg-muted">
+                            URL-friendly identifier (letters, numbers, - _ .).
+                            A suggestion is filled in automatically — edit it if you like.
+                        </small>
+                    </VCFormGroup>
+                </IFieldValidation>
 
                 <hr>
 
-                <IVuelidate :validation="v$.description">
-                    <template #default="props">
-                        <VCFormGroup
-                            :validation-messages="props.data"
-                            :validation-severity="props.severity"
-                        >
-                            <template #label>
-                                Description
-                            </template>
-                            <template #default>
-                                <VCFormTextarea
-                                    v-model="v$.description.$model"
-                                    rows="4"
-                                />
-                            </template>
-                        </VCFormGroup>
-                    </template>
-                </IVuelidate>
+                <IFieldValidation
+                    v-slot="{ value }"
+                    :field="v.fields.description"
+                >
+                    <VCFormGroup :validation="value">
+                        <template #label>
+                            Description
+                        </template>
+                        <VCFormTextarea
+                            :model-value="v.fields.description.$model.value ?? ''"
+                            rows="4"
+                            @update:model-value="(next: string) => { v.fields.description.$model.value = next; }"
+                        />
+                    </VCFormGroup>
+                </IFieldValidation>
 
                 <div>
                     <button
                         type="submit"
                         class="btn btn-xs btn-primary"
-                        :disabled="v$.$invalid || busy"
+                        :disabled="v.$invalid.value || busy"
                         @click.prevent="add"
                     >
                         <template v-if="isEditing">
@@ -264,7 +234,7 @@ export default defineComponent({
                 </FProjects>
 
                 <div
-                    v-if="!v$.project_id.required && !v$.project_id.$model"
+                    v-if="!v.fields.project_id.$model.value"
                     class="alert alert-sm alert-warning"
                 >
                     Choose a project as base of your analysis

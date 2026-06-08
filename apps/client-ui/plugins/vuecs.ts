@@ -5,6 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { buildSubmitButtonDefaults } from '@authup/client-web-kit';
+import { createValidup } from '@validup/vue';
+import { OptionalValue } from 'validup';
+
 import vuecs from '@vuecs/core';
 import clientWebKitTheme from '@authup/client-web-kit-theme';
 import clientVueTheme from '@privateaim/client-vue-theme';
@@ -36,7 +40,13 @@ export default defineNuxtPlugin({
         ctx.vueApp.use(vuecs, {
             themes: [clientWebKitTheme(), clientVueTheme()],
             icons: [fontAwesome()],
+            defaults: { submitButton: buildSubmitButtonDefaults() },
         });
+
+        ctx.vueApp.use(createValidup({
+            optionalValue: [OptionalValue.UNDEFINED, OptionalValue.NULL, OptionalValue.EMPTY_STRING],
+            optionalAs: null,
+        }));
 
         ctx.vueApp.use(installButton);
         ctx.vueApp.use(installElements);

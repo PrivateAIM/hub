@@ -26,8 +26,8 @@
     "dependencies": {
         "@authup/core-kit": "^1.0.0-beta.44",
         "@privateaim/errors": "^0.8.42",
-        "@validup/adapter-zod": "^0.2.3",
-        "validup": "^0.4.0",
+        "@validup/zod": "^0.3.3",
+        "validup": "^0.5.1",
         "zod": "^4.3.6"
     },
     "devDependencies": {
