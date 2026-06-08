@@ -51,14 +51,28 @@
    reskin the entire UI without touching component class strings.
    ------------------------------------------------------------------ */
 @layer base {
+    /*
+     * PrivateAIM chrome + brand tokens. Two shapes:
+     *
+     *   1. Chrome (header, navbar, sidebar, navbar dropdowns) flips with
+     *      mode. Light-mode defaults alias `--vc-color-bg-elevated` /
+     *      `-fg` / `-border` etc. so the chrome reads as a light surface
+     *      distinct from the page-content bg. The `.dark` block below
+     *      restores hub's historical warm-dark chrome palette so the
+     *      chrome stays the recognizable dark grey.
+     *
+     *   2. Brand accents (coral, teal, purple, blue, rust) carry hub's
+     *      identity and are hard-coded; they read fine on both light and
+     *      dark backgrounds. They are used as text/accent colors on
+     *      chrome surfaces, so they flip alongside the chrome they sit on.
+     */
     :root {
-        /* Chrome (header, sidebar, footer, navbar dropdowns) — always
-           dark, mirroring hub's historical layout. */
-        --privateaim-chrome-bg:             rgb(64, 67, 78);
-        --privateaim-chrome-bg-elevated:    #32333B;
-        --privateaim-chrome-fg:             #ffffff;
-        --privateaim-chrome-fg-muted:       #aeb2b7;
-        --privateaim-chrome-border:         #333333;
+        /* Chrome — light-mode defaults, alias semantic vuecs tokens */
+        --privateaim-chrome-bg:             var(--vc-color-bg-elevated);
+        --privateaim-chrome-bg-elevated:    var(--vc-color-bg-muted);
+        --privateaim-chrome-fg:             var(--vc-color-fg);
+        --privateaim-chrome-fg-muted:       var(--vc-color-fg-muted);
+        --privateaim-chrome-border:         var(--vc-color-border);
 
         /* Brand accents — unchanged across modes */
         --privateaim-brand-coral:           #FF5B5B;
@@ -69,12 +83,24 @@
     }
 
     /*
-     * Dark-mode content softening. `@vuecs/design`'s `.dark` puts
-     * `--vc-color-bg` at neutral-900 (~20.5% L) — near-black — which
-     * feels harsh against hub's warm dark chrome. Lift it so the
-     * content surface pairs with the chrome as a gentle tonal step.
+     * Dark-mode overrides. Two distinct moves:
+     *
+     *   a) Restore hub's historical warm-dark chrome palette so the dark
+     *      chrome stays the recognizable dark grey rather than vuecs's
+     *      `bg-elevated` value, which would blend into the page-content bg.
+     *
+     *   b) Soften the content background. `@vuecs/design`'s `.dark` puts
+     *      `--vc-color-bg` at neutral-900 (~20.5% L) — near-black — which
+     *      feels harsh against hub's warm dark chrome. Lift it so the
+     *      content surface pairs with the chrome as a gentle tonal step.
      */
     .dark {
+        --privateaim-chrome-bg:             rgb(64, 67, 78);
+        --privateaim-chrome-bg-elevated:    #32333B;
+        --privateaim-chrome-fg:             #ffffff;
+        --privateaim-chrome-fg-muted:       #aeb2b7;
+        --privateaim-chrome-border:         #333333;
+
         --vc-color-bg: var(--vc-color-neutral-400);
         --vc-color-bg-muted: var(--vc-color-neutral-500);
         --vc-color-border: var(--vc-color-neutral-500);

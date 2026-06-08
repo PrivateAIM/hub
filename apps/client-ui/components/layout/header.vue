@@ -9,7 +9,7 @@ import { injectStore, storeToRefs } from '@authup/client-web-kit';
 import { VCGravatar } from '@vuecs/gravatar';
 import { VCNavItems } from '@vuecs/navigation';
 import { computed } from 'vue';
-import { ref } from '#imports';
+import { ref, useColorMode } from '#imports';
 import { defineNuxtComponent } from '#app';
 import { Navigation } from '../../config/layout';
 
@@ -46,6 +46,11 @@ export default defineNuxtComponent({
             () => store.realmManagement,
         ];
 
+        const { isDark } = useColorMode();
+        const toggleColorMode = () => {
+            isDark.value = !isDark.value;
+        };
+
         return {
             infoText,
             loggedIn,
@@ -54,6 +59,8 @@ export default defineNuxtComponent({
             displayNav,
             topItems,
             topItemsWatch,
+            isDark,
+            toggleColorMode,
         };
     },
 });
@@ -82,7 +89,7 @@ export default defineNuxtComponent({
             <nav class="page-navbar navbar-expand-md">
                 <div
                     id="page-navbar"
-                    class="navbar-content navbar-collapse collapse"
+                    class="navbar-content navbar-collapse"
                     :class="{'show': displayNav}"
                 >
                     <VCNavItems
@@ -90,35 +97,45 @@ export default defineNuxtComponent({
                         :data="topItems"
                         :watch="topItemsWatch"
                     />
-                    <ul
-                        v-if="loggedIn && user"
-                        class="navbar-nav vc-nav-items navbar-gadgets"
-                    >
+                    <ul class="navbar-nav vc-nav-items navbar-gadgets">
                         <li class="vc-nav-item">
-                            <nuxt-link
-                                class="vc-nav-link user-link"
-                                :to="'/users/'+user.id"
-                            >
-                                <VCGravatar :email="user.email ? user.email : ''" />
-                                <span>{{ user.display_name ? user.display_name : user.name }}</span>
-                            </nuxt-link>
-                        </li>
-                        <li class="vc-nav-item">
-                            <nuxt-link
-                                :to="'/settings'"
+                            <button
+                                type="button"
                                 class="vc-nav-link"
+                                :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
+                                :aria-pressed="isDark ? 'true' : 'false'"
+                                @click.prevent="toggleColorMode"
                             >
-                                <VCIcon name="fa6-solid:gear" />
-                            </nuxt-link>
+                                <VCIcon :name="isDark ? 'fa6-solid:sun' : 'fa6-solid:moon'" />
+                            </button>
                         </li>
-                        <li class="vc-nav-item">
-                            <nuxt-link
-                                :to="'/logout'"
-                                class="vc-nav-link"
-                            >
-                                <VCIcon name="fa6-solid:power-off" />
-                            </nuxt-link>
-                        </li>
+                        <template v-if="loggedIn && user">
+                            <li class="vc-nav-item">
+                                <nuxt-link
+                                    class="vc-nav-link user-link"
+                                    :to="'/users/'+user.id"
+                                >
+                                    <VCGravatar :email="user.email ? user.email : ''" />
+                                    <span>{{ user.display_name ? user.display_name : user.name }}</span>
+                                </nuxt-link>
+                            </li>
+                            <li class="vc-nav-item">
+                                <nuxt-link
+                                    :to="'/settings'"
+                                    class="vc-nav-link"
+                                >
+                                    <VCIcon name="fa6-solid:gear" />
+                                </nuxt-link>
+                            </li>
+                            <li class="vc-nav-item">
+                                <nuxt-link
+                                    :to="'/logout'"
+                                    class="vc-nav-link"
+                                >
+                                    <VCIcon name="fa6-solid:power-off" />
+                                </nuxt-link>
+                            </li>
+                        </template>
                     </ul>
                 </div>
             </nav>

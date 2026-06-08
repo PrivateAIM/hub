@@ -83,7 +83,7 @@ export default defineNuxtConfig({
 } satisfies ModuleOptions,
         ],
         [
-            '@nuxtjs/google-fonts', 
+            '@nuxtjs/google-fonts',
             {
                 families: {
                     Asap: [400, 700],
@@ -92,6 +92,21 @@ export default defineNuxtConfig({
                 download: true,
             },
         ],
+        '@vuecs/nuxt',
     ],
+
+    // @vuecs/nuxt — only wire color-mode persistence here. Theme
+    // registration + per-package plugins stay in plugins/vuecs.ts
+    // (which handles installForms / installTable / etc. + defaults).
+    // `themes: []` prevents the module from auto-installing a duplicate
+    // theme manager. `injectTokens: false` — @vuecs/design is already
+    // pulled in via @privateaim/client-vue-theme's CSS @import chain.
+    vuecs: {
+        injectTokens: false,
+        themes: [],
+        colorMode: { value: 'system' },
+        colorPalette: false,
+    },
+
     compatibilityDate: '2025-01-21',
 });
