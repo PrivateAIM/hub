@@ -288,6 +288,19 @@
                text-xs font-medium;
     }
 
+    /* Progress — Bootstrap-shaped track + bar (analysis build/exec/
+       distribution steps, master-image card). The bar's color comes from a
+       `bg-*` utility on the markup and its width from an inline style; this
+       only restores the structure Bootstrap used to provide. */
+    .progress {
+        @apply flex h-4 overflow-hidden rounded-md bg-bg-muted text-xs;
+    }
+    .progress-bar {
+        @apply flex flex-col justify-center overflow-hidden whitespace-nowrap
+               text-center text-white;
+        transition: width 0.5s ease;
+    }
+
     /* Nav / navbar --------------------------------------------------- */
     .nav             { @apply flex flex-wrap; }
     .nav-item        { @apply list-none; }
