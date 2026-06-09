@@ -17,8 +17,7 @@
 
 .page-sidebar .sidebar-header {
     padding: 20px;
-    -webkit-box-shadow: 0px -6px 0px rgba(0, 0, 0, 0.3) inset;
-    box-shadow: 0px -6px 0px rgba(0, 0, 0, 0.3) inset;
+    box-shadow: var(--privateaim-chrome-edge-shadow);
 }
 
 .page-sidebar .sidebar-header span {

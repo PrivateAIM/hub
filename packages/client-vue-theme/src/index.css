@@ -73,6 +73,11 @@
         --privateaim-chrome-fg:             var(--vc-color-fg);
         --privateaim-chrome-fg-muted:       var(--vc-color-fg-muted);
         --privateaim-chrome-border:         var(--vc-color-border);
+        /* Header / sidebar-header bottom edge. Light mode: a soft drop
+           shadow so the fixed chrome reads as raised above the content
+           (the dark inset band used in dark mode would be a muddy grey
+           stripe on a light surface). */
+        --privateaim-chrome-edge-shadow:    0 2px 8px 0 rgba(0, 0, 0, 0.06);
 
         /* Brand accents — unchanged across modes */
         --privateaim-brand-coral:           #FF5B5B;
@@ -121,6 +126,8 @@
         --privateaim-chrome-fg:             #ffffff;
         --privateaim-chrome-fg-muted:       #aeb2b7;
         --privateaim-chrome-border:         #333333;
+        /* Recessed bottom band — hub's historical raised-dark-chrome edge. */
+        --privateaim-chrome-edge-shadow:    0 -6px 0 0 rgba(0, 0, 0, 0.3) inset;
 
         /*
          * Content surface — soft dark that pairs with the warm chrome
