@@ -40,6 +40,21 @@
     color: var(--privateaim-brand-coral);
 }
 
+/*
+ * When a nested group is active (a child route matches, so the `<li>`
+ * carries `.active` and the collapsible body is expanded), fill that body
+ * — `.vc-nav-content` — with the elevated chrome surface. The trigger rule
+ * above only highlights the parent ROW; without this the expanded panel
+ * (its left gutter + the non-active sibling links) stays transparent and
+ * shows the plain sidebar `chrome-bg`. Painting the content wrapper ties
+ * the whole open group into one raised block under the active parent. The
+ * child links' 6px `border-left` (the indentation rail, below) sits on top
+ * of this fill, so the padded gutter is covered too.
+ */
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-item.vc-nav-item-nested.active > .vc-nav-content {
+    background: var(--privateaim-chrome-bg-elevated);
+}
+
 .vc-nav-items .vc-nav-item .vc-nav-link.dropdown-toggle {
     background: none;
     display: block;

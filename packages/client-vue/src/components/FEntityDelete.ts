@@ -5,7 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { TranslatorTranslationDefaultKey, TranslatorTranslationNamespace, useTranslation } from '@authup/client-web-kit';
+import { useTranslation } from '@authup/client-web-kit';
+import { TranslatorTranslationActionKey, TranslatorTranslationNamespace } from '@authup/i18n';
 import type { DomainType } from '@privateaim/core-kit';
 import type {
     Component,
@@ -113,8 +114,8 @@ export default defineComponent({
         };
 
         const translation = useTranslation({
-            namespace: TranslatorTranslationNamespace.DEFAULT,
-            key: TranslatorTranslationDefaultKey.DELETE,
+            namespace: TranslatorTranslationNamespace.ACTION,
+            key: TranslatorTranslationActionKey.DELETE,
         });
 
         const render = () => {
