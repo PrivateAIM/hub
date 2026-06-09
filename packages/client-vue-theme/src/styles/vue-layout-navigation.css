@@ -41,18 +41,35 @@
 }
 
 /*
- * When a nested group is active (a child route matches, so the `<li>`
- * carries `.active` and the collapsible body is expanded), fill that body
- * — `.vc-nav-content` — with the elevated chrome surface. The trigger rule
- * above only highlights the parent ROW; without this the expanded panel
- * (its left gutter + the non-active sibling links) stays transparent and
- * shows the plain sidebar `chrome-bg`. Painting the content wrapper ties
- * the whole open group into one raised block under the active parent. The
- * child links' 6px `border-left` (the indentation rail, below) sits on top
- * of this fill, so the padded gutter is covered too.
+ * Keep the open group as one raised block: fill the active/expanded group's
+ * collapsible body (`.vc-nav-content`) with the elevated chrome surface,
+ * extending the parent-trigger highlight down over the whole submenu
+ * (its left gutter + the child rows). `.active` is set on the `<li>` both
+ * when a child route matches and when the group is toggled open.
  */
 .vc-nav-items:not(.vc-nav-items--pills) .vc-nav-item.vc-nav-item-nested.active > .vc-nav-content {
     background: var(--privateaim-chrome-bg-elevated);
+}
+
+/*
+ * With the whole panel elevated, an active child can no longer stand out by
+ * its elevated background alone — every sibling now shares it. Give the
+ * active (and hover) child a coral-tinted surface so only the selected row
+ * reads as active against its plain-elevated siblings. Scoped under
+ * `.vc-nav-item-nested.active` so it outranks the generic nav-link
+ * active/hover rule below (which only paints plain elevated); coral text
+ * still comes from that rule.
+ */
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-item-nested.active .vc-nav-link.active:not(.vc-nav-link-root),
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-item-nested.active .vc-nav-link.router-link-active:not(.vc-nav-link-root),
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-item-nested.active .vc-nav-link.nuxt-link-active:not(.vc-nav-link-root),
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-item-nested.active .vc-nav-link.router-link-exact-active,
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-item-nested.active .vc-nav-link.nuxt-link-exact-active {
+    background: color-mix(in srgb, var(--privateaim-brand-coral) 16%, var(--privateaim-chrome-bg-elevated));
+}
+
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-item-nested.active .vc-nav-link:hover {
+    background: color-mix(in srgb, var(--privateaim-brand-coral) 8%, var(--privateaim-chrome-bg-elevated));
 }
 
 .vc-nav-items .vc-nav-item .vc-nav-link.dropdown-toggle {
