@@ -263,14 +263,8 @@
     .container       { @apply mx-auto w-full max-w-screen-lg px-4; }
     .container-fluid { @apply w-full px-4; }
 
-    /* Cards — Bootstrap-shaped card chrome. Surface decorations
-       (shadow, header chevron, card-grey, card-file) live in
-       styles/card.css; these shims provide the structural defaults. */
-    .card        { @apply relative flex flex-col rounded-md border border-border bg-bg-elevated; }
-    .card-header { @apply flex items-center border-b border-border px-3 py-2; }
-    .card-body   { @apply flex-1 px-3 py-2; }
-    .card-footer { @apply border-t border-border px-3 py-2; }
-    .card-title  { @apply font-semibold; }
+    /* Cards — the full mechanism (base + variants, all variable-driven)
+       lives in styles/card.css, imported below into @layer components. */
 
     /* Alerts --------------------------------------------------------- */
     .alert         { @apply relative mb-3 rounded-md border px-4 py-3; }

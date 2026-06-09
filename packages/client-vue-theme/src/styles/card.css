@@ -5,299 +5,164 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-.panel-card {
-    border-radius: 0.5rem;
-    box-shadow: 0 4px 25px 0 rgba(0, 0, 0, .1);
-    transition: all .3s ease-in-out;
-    border: 1px solid var(--vc-color-border);
-    background: var(--vc-color-bg-elevated);
-}
-
-.panel-card > .panel-card-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.panel-card > .panel-card-header h1,
-.panel-card > .panel-card-header h2,
-.panel-card > .panel-card-header h3,
-.panel-card > .panel-card-header h4,
-.panel-card > .panel-card-header h5,
-.panel-card > .panel-card-header h6 {
-    font-weight: 600;
-    margin-bottom: 0;
-}
-
-.panel-card > .panel-card-header .title:before {
-    width: 0;
-    padding: 0;
-}
-
-.panel-card > .panel-card-header,
-.panel-card > .panel-card-body {
-    padding: 0.45rem;
-}
-
-.panel-card > .panel-card-body.body-dark {
-    background: var(--vc-color-bg-muted);
-    color: var(--vc-color-fg-muted);
-}
-
 /*
-Card
+ * Unified card mechanism.
+ *
+ * One base `.card` whose entire surface — background, border, radius,
+ * shadow, padding, header/footer dividers, accent — is driven by
+ * `--card-*` custom properties. Variants (`.card-grey`, `.card-panel`,
+ * `.card-event`, `.card-file`) ONLY override those variables; they add
+ * no structural rules of their own. Every color resolves to a vuecs
+ * semantic token (`--vc-color-*`), so all cards adapt to light/dark
+ * automatically.
+ *
+ * Structure (`.card`, `.card-header`, `.card-body`, `.card-footer`,
+ * `.card-title`) lives in `@layer components` so Tailwind utilities used
+ * in templates (`flex flex-row`, `grow`, `text-center`, padding helpers)
+ * still win over these defaults.
  */
+@layer components {
+    .card {
+        /* ---- themable contract — override on variants ---- */
+        --card-bg: transparent;
+        --card-fg: var(--vc-color-fg);
+        --card-border-color: transparent;
+        --card-border-width: 0;
+        --card-radius: 0.3125rem; /* 5px */
+        --card-shadow: 0 1px 20px 0 rgba(69, 90, 100, 0.08);
+        --card-pad-x: 0.5rem;
+        --card-pad-y: 0.5rem;
+        --card-cursor: default;
 
-.card {
-    border-radius: 5px;
-    -webkit-box-shadow: 0 1px 20px 0 rgba(69, 90, 100, 0.08);
-    box-shadow: 0 1px 20px 0 rgba(69, 90, 100, 0.08);
-    border: none;
-    background: none;
-    -webkit-transition: all 0.3s ease-in-out;
-    transition: all 0.3s ease-in-out;
-}
+        --card-header-fg: var(--vc-color-fg);
+        --card-header-border: transparent;
+        --card-header-shadow: 0 1px 20px 0 rgba(69, 125, 125, 0.08);
 
-.card-grey {
-    background-color: var(--vc-color-bg-muted);
-    border: 1px solid var(--vc-color-border);
-}
+        --card-footer-border: var(--vc-color-border);
 
-.card .card-header {
-    background-color: transparent;
-    border-bottom: none;
-    padding: .5rem !important;
-    position: relative;
-    box-shadow: 0px 1px 20px 0px rgba(69, 125, 125, 0.08);
-    display: flex;
-    flex-direction: row;
-}
+        --card-body-font-size: 0.875em;
 
-.card .card-header .card-header-left {
-    display: inline-block;
-}
+        --card-accent: var(--privateaim-brand-purple);
+        /* Header-title chevron, sourced from the iconify `fa6-solid:chevron-right`
+           SVG (we no longer ship a Font Awesome webfont — icons are iconify /
+           VCIcon). Painted via `mask-image` so `--card-accent` colors it. */
+        --card-accent-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 512'%3E%3Cpath d='M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256 73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z'/%3E%3C/svg%3E");
 
-.card .card-header .card-header-right {
-    right: 10px;
-    top: 13px;
-    display: inline-block;
-    float: right;
-    padding: 7px 0;
-    position: absolute;
-}
-
-@media only screen and (max-width: 575px) {
-    .card .card-header .card-header-right {
-        display: none;
+        /* ---- structure ---- */
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        border-radius: var(--card-radius);
+        background-color: var(--card-bg);
+        color: var(--card-fg);
+        border: var(--card-border-width) solid var(--card-border-color);
+        box-shadow: var(--card-shadow);
+        cursor: var(--card-cursor);
+        transition: all 0.3s ease-in-out;
     }
-}
 
-.card .card-header .card-header-right i {
-    margin: 0 7px;
-    cursor: pointer;
-    font-size: 12px;
-    color: var(--vc-color-fg-muted);
-    line-height: 2;
-}
+    .card a {
+        text-decoration: none;
+    }
 
-.card a {
-    text-decoration: none;
-}
+    /* ---- Header ---- */
+    .card .card-header {
+        position: relative;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: var(--card-pad-y) var(--card-pad-x);
+        color: var(--card-header-fg);
+        background-color: transparent;
+        border-bottom: 1px solid var(--card-header-border);
+        box-shadow: var(--card-header-shadow);
+    }
 
-.card .card-header .title {
-    color: var(--vc-color-fg);
-    position: relative;
-    margin: 0 0 0 1rem;
-    width: 100%;
-}
+    .card .card-header .title {
+        position: relative;
+        width: 100%;
+        margin: 0 0 0 1rem;
+        color: var(--card-header-fg);
+    }
 
-.card .card-header .title:after {
-    color: var(--privateaim-brand-purple);
-    position: absolute;
-    left: -1rem;
-    top: 0;
-    content: "\f054";
-    font-family: var(--fa-style-family, "Font Awesome 7 Free"), serif;
-    font-weight: 900;
-    font-style: normal;
-}
+    .card .card-header .title::after {
+        content: "";
+        position: absolute;
+        left: -1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 0.7em;
+        height: 0.7em;
+        background-color: var(--card-accent);
+        -webkit-mask: var(--card-accent-icon) no-repeat center / contain;
+        mask: var(--card-accent-icon) no-repeat center / contain;
+    }
 
-.card .card-body {
-    font-size: .875em;
-}
+    /* ---- Body ---- */
+    .card .card-body {
+        flex: 1 1 auto;
+        padding: var(--card-pad-y) var(--card-pad-x);
+        font-size: var(--card-body-font-size);
+    }
 
-.card .card-block {
-    padding: .5rem !important;
-}
+    /* ---- Footer ---- */
+    .card .card-footer {
+        padding: var(--card-pad-y) var(--card-pad-x);
+        background-color: transparent;
+        border-top: 1px solid var(--card-footer-border);
+    }
 
-.card .card-block table tr {
-    padding-bottom: 20px;
-}
+    /* ---- Standalone title ---- */
+    .card .card-title {
+        margin-bottom: 0;
+        font-weight: 600;
+    }
 
-.card .card-block .sub-title {
-    font-size: 14px;
-    font-weight: 500;
-    letter-spacing: 1px;
-}
+    /* ============================================================
+       Variants — variable overrides only
+       ============================================================ */
 
-.card .card-block code {
-    background-color: var(--vc-color-bg-muted);
-    margin: 5px;
-    display: inline-block;
-}
+    /* Grey surface — the default content card across the app. */
+    .card-grey {
+        --card-bg: var(--vc-color-bg-muted);
+        --card-border-color: var(--vc-color-border);
+        --card-border-width: 1px;
+    }
 
-.card .card-block .dropdown-menu {
-    top: 38px;
-}
+    /* Panel — elevated surface, larger radius (settings / profile). */
+    .card-panel {
+        --card-bg: var(--vc-color-bg-elevated);
+        --card-border-color: var(--vc-color-border);
+        --card-border-width: 1px;
+        --card-radius: 0.5rem;
+        --card-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.1);
+        --card-pad-x: 0.45rem;
+        --card-pad-y: 0.45rem;
+    }
 
-.card .card-block p {
-    line-height: 1.4;
-}
+    /* Event — clickable tile (service catalog). */
+    .card-event {
+        --card-bg: var(--vc-color-bg-muted);
+        --card-border-color: var(--vc-color-border);
+        --card-border-width: 1px;
+        --card-radius: 0.25rem;
+        --card-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.1);
+        --card-cursor: pointer;
+    }
 
-.card .card-block a.dropdown-item {
-    margin-bottom: 0;
-    font-size: 14px;
-    -webkit-transition: 0.25s;
-    transition: 0.25s;
-}
+    /* File — compact single-line row (bucket file list). */
+    .card-file {
+        --card-radius: 5px;
+        margin-bottom: 0.4rem;
+    }
 
-.card .card-block a.dropdown-item:active,
-.card .card-block a.dropdown-item .active {
-    background-color: var(--privateaim-brand-blue);
-}
+    .card-file .card-heading {
+        font-size: 1em;
+        cursor: pointer;
+    }
 
-.card .card-block.remove-label i {
-    margin: 0;
-    padding: 0;
-}
-
-.card .card-block.button-list span.badge {
-    margin-left: 5px;
-}
-
-.card .card-block .dropdown-menu {
-    background-color: var(--vc-color-bg-elevated);
-    padding: 0;
-}
-
-.card .card-block .dropdown-menu .dropdown-divider {
-    background-color: var(--vc-color-border);
-    margin: 3px 0;
-}
-
-.card .card-block .dropdown-menu > a {
-    padding: 10px 16px;
-    line-height: 1.429;
-}
-
-.card .card-block .dropdown-menu > li > a:focus,
-.card .card-block .dropdown-menu > li > a:hover {
-    background-color: var(--vc-color-bg-muted);
-}
-
-.card .card-block .dropdown-menu > li:first-child > a:first-child {
-    border-top-right-radius: 4px;
-    border-top-left-radius: 4px;
-}
-
-.card .card-block .badge-box {
-    padding: 10px;
-    margin: 12px 0;
-}
-
-.card .card-block-big {
-    padding: 35px;
-}
-
-.card .card-block-small {
-    padding: 15px;
-}
-
-.card.card-file {
-    padding: 0;
-    margin-bottom: 0.4rem;
-    height: 1.75rem;
-    line-height: 1.75rem;
-}
-
-.card-file.checked {
-    background-color: var(--vc-color-bg-muted);
-}
-
-.card-file.checked .card-heading i {
-    color: var(--privateaim-brand-rust);
-}
-
-.card.card-file .card-heading {
-    margin-left: 0.3rem;
-    font-size: 1em;
-    background: none;
-    cursor: pointer;
-}
-
-.card.card-file .card-heading .title {
-    font-size: .8125em;
-    font-weight: 600;
-}
-
-.card.card-file .card-body {
-    max-height: 40px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    flex: none;
-    padding: 0 0 0 10px;
-}
-
-.card.card-file .train-card-footer {
-    background: none;
-    padding: 0;
-    margin-right: 0rem;
-    margin-left: auto;
-    border: none;
-}
-
-.pcoded .card.full-card {
-    position: fixed;
-    top: calc(56px + 15px);
-    z-index: 99999;
-    -webkit-box-shadow: 0 0 35px 0px rgba(0, 0, 0, 0.44);
-    box-shadow: 0 0 35px 0px rgba(0, 0, 0, 0.44);
-    left: 15px;
-    border-radius: 5px;
-    width: calc(100vw - 50px);
-    height: calc(100vh - 86px);
-    -webkit-transition: all 5s ease-in-out;
-    transition: all 5s ease-in-out;
-}
-
-.pcoded .card.full-card.card-load {
-    position: fixed;
-}
-
-.pcoded .card.card-load {
-    position: relative;
-    overflow: hidden;
-}
-
-.pcoded .card.card-load .card-loader {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-box-align: center;
-    -ms-flex-align: center;
-    align-items: center;
-    background-color: rgba(255, 255, 255, 0.7);
-    z-index: 999;
-}
-
-.pcoded .card.card-load .card-loader i {
-    margin: 0 auto;
-    color: var(--privateaim-brand-blue);
-    font-size: 20px;
+    .card-file .card-heading .title {
+        font-size: 0.8125em;
+        font-weight: 600;
+    }
 }

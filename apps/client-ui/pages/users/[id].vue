@@ -65,8 +65,8 @@ export default defineNuxtComponent({
         </div>
 
         <div class="m-b-20 m-t-10">
-            <div class="panel-card">
-                <div class="panel-card-body">
+            <div class="card card-panel">
+                <div class="card-body">
                     <VCNavItems
                         :data="tabs"
                         variant="pills"

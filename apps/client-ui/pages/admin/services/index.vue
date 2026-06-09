@@ -67,14 +67,17 @@ export default defineNuxtComponent({
                     class="col-sm-4 col-md-3 col-12 mb-3"
                 >
                     <div
-                        class="event-card p-3 flex flex-col text-center"
+                        class="card card-event p-3 flex flex-col text-center"
                         @click.prevent="goTo(item.id)"
                     >
-                        <div class="event-card-header">
+                        <div>
                             <h3>{{ item.name }}</h3>
                         </div>
-                        <div class="event-card-body">
-                            <VCIcon :name="item.icon" />
+                        <div>
+                            <VCIcon
+                                :name="item.icon"
+                                class="text-[5rem]"
+                            />
                         </div>
                     </div>
                 </div>
@@ -92,20 +95,21 @@ export default defineNuxtComponent({
                     class="col-sm-4 col-md-3 col-12 mb-3"
                 >
                     <div
-                        class="event-card p-3 flex flex-col text-center"
+                        class="card card-event p-3 flex flex-col text-center"
                         @click.prevent="goTo(item.id)"
                     >
-                        <div class="event-card-header">
+                        <div>
                             <h3>{{ item.name }}</h3>
                         </div>
-                        <div class="event-card-body">
-                            <VCIcon :name="item.icon" />
+                        <div>
+                            <VCIcon
+                                :name="item.icon"
+                                class="text-[5rem]"
+                            />
                         </div>
-                        <div class="event-card-footer">
-                            <div class="flex flex-row">
-                                <div class="ms-auto">
-                                    <span class="foot-print">{{ item.version }}</span>
-                                </div>
+                        <div class="mt-auto flex flex-row">
+                            <div class="ms-auto">
+                                <span class="text-fg-muted">{{ item.version }}</span>
                             </div>
                         </div>
                     </div>
@@ -114,28 +118,3 @@ export default defineNuxtComponent({
         </div>
     </div>
 </template>
-<style>
-.event-card {
-    background-color: #ececec;
-    border: 1px solid #dedede;
-    box-shadow: 0 4px 25px 0 rgb(0 0 0 / 10%);
-    border-radius: 4px;
-    cursor: pointer;
-}
-.event-card-header,
-.event-card-header a {
-    text-decoration: none;
-}
-.event-card-header a:hover,
-.event-card-header a:active {
-    font-weight: 600;
-    color: inherit;
-}
-.event-card-body svg.iconify {
-    font-size: 5rem;
-}
-.event-card .foot-print {
-    color: #cc8181;
-}
-
-</style>

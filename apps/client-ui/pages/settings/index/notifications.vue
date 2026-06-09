@@ -18,8 +18,8 @@ export default {
     <div>
         <div class="row">
             <div class="col">
-                <div class="panel-card">
-                    <div class="panel-card-body">
+                <div class="card card-panel">
+                    <div class="card-body">
                         <h6 class="title">
                             Benachrichtungen
                         </h6>
