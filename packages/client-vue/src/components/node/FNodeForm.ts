@@ -16,6 +16,8 @@ import {
 import { useFieldValidation } from '@ilingo/validup-vue';
 import { useValidup } from '@validup/vue';
 import type { Severity } from '@validup/vue';
+import { createValidator } from '@validup/zod';
+import { z } from 'zod';
 import type { Node, Registry } from '@privateaim/core-kit';
 import {
     DomainType,
@@ -64,6 +66,25 @@ export default defineComponent({
     },
     emits: defineEntityManagerEvents<Node>(),
     setup(props, setup) {
+        /**
+         * Form-level validator. The shared {@link NodeValidator} keeps
+         * `realm_id` optional on CREATE (the server defaults it from the
+         * actor realm), but the form requires an explicit realm selection —
+         * the pre-migration UI contract. `mount()` appends, so this rule
+         * runs in addition to the base ones.
+         */
+        class NodeFormValidator extends NodeValidator {
+            protected initialize() {
+                super.initialize();
+
+                this.mount(
+                    'realm_id',
+                    { group: ValidatorGroup.CREATE },
+                    createValidator(z.uuid()),
+                );
+            }
+        }
+
         const busy = ref(false);
         const form = reactive({
             name: '',
@@ -81,7 +102,7 @@ export default defineComponent({
         });
 
         const $v = useValidup(
-            new NodeValidator(),
+            new NodeFormValidator(),
             form,
             { group: computed(() => (manager.data.value ? ValidatorGroup.UPDATE : ValidatorGroup.CREATE)) },
         );
