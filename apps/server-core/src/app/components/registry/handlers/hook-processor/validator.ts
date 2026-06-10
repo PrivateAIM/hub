@@ -8,7 +8,7 @@
 // eslint-disable-next-line max-classes-per-file
 import zod from 'zod';
 import { Container } from 'validup';
-import { createValidator } from '@validup/adapter-zod';
+import { createValidator } from '@validup/zod';
 import type {
     RegistryHook,
     RegistryHookEventData,

@@ -6,7 +6,7 @@
  */
 
 import { z } from 'zod';
-import { createValidator } from '@validup/adapter-zod';
+import { createValidator } from '@validup/zod';
 import { Container } from 'validup';
 import type { CTSMessagingParty } from '../types';
 

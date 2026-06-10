@@ -39,7 +39,7 @@
         "@routup/swagger-ui": "^4.0.0",
         "hapic": "^2.8.2",
         "locter": "^3.0.0",
-        "validup": "^0.4.0"
+        "validup": "^0.5.1"
     },
     "devDependencies": {
         "redis-extension": "^2.0.4",

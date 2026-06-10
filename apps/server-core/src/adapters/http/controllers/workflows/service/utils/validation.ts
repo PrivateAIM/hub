@@ -6,7 +6,7 @@
  */
 
 import { RegistryAPICommand } from '@privateaim/core-kit';
-import { createValidator } from '@validup/adapter-zod';
+import { createValidator } from '@validup/zod';
 import { Container } from 'validup';
 import { z } from 'zod';
 

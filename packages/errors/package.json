@@ -26,7 +26,7 @@
     },
     "dependencies": {
         "@ebec/core": "^1.1.0",
-        "validup": "^0.4.0"
+        "validup": "^0.5.1"
     },
     "publishConfig": {
         "access": "public"

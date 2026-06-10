@@ -34,7 +34,7 @@
         "@privateaim/telemetry-kit": "^0.10.0",
         "@routup/basic": "^3.0.0",
         "@routup/decorators": "^5.0.0",
-        "@validup/adapter-zod": "^0.2.3",
+        "@validup/zod": "^0.3.3",
         "busboy": "^1.6.0",
         "citty": "^0.2.1",
         "cors": "^2.8.6",
@@ -52,7 +52,7 @@
         "tar-stream": "^3.2.0",
         "typeorm": "^0.3.29",
         "typeorm-extension": "^3.9.0",
-        "validup": "^0.4.0",
+        "validup": "^0.5.1",
         "zod": "^4.3.6"
     },
     "devDependencies": {

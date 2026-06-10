@@ -6,7 +6,7 @@
  */
 
 import { Container } from 'validup';
-import { createValidator } from '@validup/adapter-zod';
+import { createValidator } from '@validup/zod';
 import { z } from 'zod';
 import type { DockenGroupAttributes } from '../types';
 
