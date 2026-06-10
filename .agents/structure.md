@@ -32,15 +32,16 @@ Runnable services and the frontend, located in `apps/`.
 
 See [Conventions — Documentation Site](.agents/conventions.md#documentation-site) for docs structure and update guidelines.
 
-## Packages & Libraries (16)
+## Packages & Libraries (17)
 
 Shared libraries, located in `packages/`.
 
 ### Client Libraries
 
-| Package      | Purpose                              | Key Dependencies                    |
-|--------------|--------------------------------------|-------------------------------------|
-| `client-vue` | Reusable Vue 3 component library     | core-kit, storage-kit, bootstrap-vue-next |
+| Package            | Purpose                              | Key Dependencies                    |
+|--------------------|--------------------------------------|-------------------------------------|
+| `client-vue`       | Reusable Vue 3 component library     | core-kit, storage-kit, @vuecs/*, validup, ilingo |
+| `client-vue-theme` | Tailwind v4 theme — design tokens, light/dark chrome, card system | tailwindcss, @vuecs/design, @authup/client-web-kit-theme |
 
 ### Server Kits (shared server libraries)
 
@@ -70,7 +71,8 @@ Shared libraries, located in `packages/`.
 ## Dependency Layers
 
 ```
-Layer 0 (leaf):   kit, core-kit, storage-kit, telemetry-kit, messenger-kit
+Layer 0 (leaf):   kit, core-kit, storage-kit, telemetry-kit, messenger-kit,
+                  client-vue-theme
                      |
 Layer 1:          core-http-kit, core-realtime-kit, server-kit
                      |

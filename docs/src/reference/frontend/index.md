@@ -34,11 +34,14 @@ docker run -e ... privateaim/hub ui
 - **Node management** — register and manage compute nodes
 - **Administration** — realm management, user roles, approval workflows
 - **Real-time updates** — live status via WebSocket (Messenger service)
+- **Light / dark mode** — class-based color mode with a header toggle
 
 ## Technology
 
 - **Nuxt 4** with SSR
 - **Vue 3** composition API
+- **Tailwind CSS v4** via **@privateaim/client-vue-theme** — design tokens, light/dark chrome, card system
+- **@vuecs/\*** component framework + **Iconify** SVG icons
 - **@privateaim/client-vue** — shared component library
 - **@privateaim/core-http-kit** — typed HTTP client for Core API
 - **Authup client libraries** — authentication and authorization UI

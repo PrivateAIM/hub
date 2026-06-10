@@ -140,6 +140,7 @@ export default defineConfig({
                     items: [
                         { text: 'Application', link: '/reference/frontend/' },
                         { text: 'client-vue', link: '/reference/frontend/client-vue' },
+                        { text: 'client-vue-theme', link: '/reference/frontend/client-vue-theme' },
                     ],
                 },
             ],
