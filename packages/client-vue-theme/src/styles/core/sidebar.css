@@ -13,11 +13,18 @@
     display: flex;
     flex-direction: column;
     font-size: 1rem;
+    /* Soften the edge against the page content (light mode; `none` in dark).
+       `.page-content` is a later positioned sibling with its own background,
+       which would paint over an in-flow sidebar's outset shadow — lift the
+       sidebar one stacking step (below the header's z-index: 2). */
+    box-shadow: var(--privateaim-chrome-edge-shadow-right);
+    position: relative;
+    z-index: 1;
 }
 
 .page-sidebar .sidebar-header {
     padding: 20px;
-    box-shadow: var(--privateaim-chrome-edge-shadow);
+    box-shadow: var(--privateaim-chrome-edge-shadow-bottom);
 }
 
 .page-sidebar .sidebar-header span {

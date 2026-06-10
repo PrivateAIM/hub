@@ -73,11 +73,14 @@
         --privateaim-chrome-fg:             var(--vc-color-fg);
         --privateaim-chrome-fg-muted:       var(--vc-color-fg-muted);
         --privateaim-chrome-border:         var(--vc-color-border);
-        /* Header / sidebar-header bottom edge. Light mode: a soft drop
-           shadow so the fixed chrome reads as raised above the content
-           (the dark inset band used in dark mode would be a muddy grey
-           stripe on a light surface). */
-        --privateaim-chrome-edge-shadow:    0 2px 8px 0 rgba(0, 0, 0, 0.06);
+        /* Chrome edge where it meets the content — `-bottom` for top chrome
+           (header / sidebar-header), `-top` for bottom chrome (footer).
+           Light mode: a soft drop shadow so the fixed chrome reads as
+           raised above the content (the dark inset band used in dark mode
+           would be a muddy grey stripe on a light surface). */
+        --privateaim-chrome-edge-shadow-bottom: 0 2px 8px 0 rgba(0, 0, 0, 0.06);
+        --privateaim-chrome-edge-shadow-top:    0 -2px 8px 0 rgba(0, 0, 0, 0.06);
+        --privateaim-chrome-edge-shadow-right:  2px 0 8px 0 rgba(0, 0, 0, 0.06);
 
         /* Brand accents — unchanged across modes */
         --privateaim-brand-coral:           #FF5B5B;
@@ -126,8 +129,12 @@
         --privateaim-chrome-fg:             #ffffff;
         --privateaim-chrome-fg-muted:       #aeb2b7;
         --privateaim-chrome-border:         #333333;
-        /* Recessed bottom band — hub's historical raised-dark-chrome edge. */
-        --privateaim-chrome-edge-shadow:    0 -6px 0 0 rgba(0, 0, 0, 0.3) inset;
+        /* Recessed band — hub's historical raised-dark-chrome edge. The
+           sidebar's right edge stays shadow-free: the chrome/content tonal
+           step carries the separation in dark mode. */
+        --privateaim-chrome-edge-shadow-bottom: 0 -6px 0 0 rgba(0, 0, 0, 0.3) inset;
+        --privateaim-chrome-edge-shadow-top:    0 6px 0 0 rgba(0, 0, 0, 0.3) inset;
+        --privateaim-chrome-edge-shadow-right:  none;
 
         /*
          * Content surface — soft dark that pairs with the warm chrome

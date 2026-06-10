@@ -56,8 +56,12 @@ export default defineComponent({
 .page-footer {
     display: flex;
     flex-direction: row;
-    box-shadow: 0px 6px 0px 0px rgba(0, 0, 0, 0.3) inset;
+    box-shadow: var(--privateaim-chrome-edge-shadow-top);
     background-color: var(--privateaim-chrome-bg);
+    /* Lift above `.page-content` (positioned, own background) so the
+       outset edge shadow paints over the content surface. */
+    position: relative;
+    z-index: 1;
     padding: 10px 0px 4px 0px;
     justify-content: center;
     align-items: center;
