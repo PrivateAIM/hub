@@ -17,9 +17,10 @@ import { computed, defineComponent } from 'vue';
 import type { Analysis } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
 import FProcessStatus from '../../FProcessStatus.vue';
+import { FProgressBar } from '../../utility';
 
 export default defineComponent({
-    components: { FProcessStatus },
+    components: { FProcessStatus, FProgressBar },
     props: {
         entity: {
             type: Object as PropType<Analysis>,
@@ -82,18 +83,10 @@ export default defineComponent({
                 />
             </div>
 
-            <div class="progress bg-white">
-                <div
-                    class="progress-bar"
-                    :class="'bg-success-600'"
-                    :style="{width: progress + '%'}"
-                    :aria-valuenow="progress"
-                    aria-valuemin="0"
-                    aria-valuemax="100"
-                >
-                    {{ progress }}%
-                </div>
-            </div>
+            <FProgressBar
+                :progress="progress"
+                show-text
+            />
         </div>
     </div>
 </template>

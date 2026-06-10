@@ -5,34 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-.train-card {
-    transition: all .3s ease-in-out;
-    border-radius: 4px;
-    padding: 0.5rem 1rem;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-}
-
-.train-card-content {
-    min-height: 1.5rem;
-}
-
-.train-card-content input {
-    height: 1.5rem;
-}
-
-.train-card .train-card-content,
-.train-card .train-card-footer {
-    display: flex;
-    flex-direction: row;
-}
-
-.train-card .train-card-icon {
-    font-size: 1.5rem;
-    padding-right: 0.5rem;
-}
-
 .log-container {
     background-color: #24292f;
     min-height: 150px;
@@ -144,7 +116,6 @@
 .command-box {
     background-color: rgb(43, 43, 43);
     border: 1px solid var(--vc-color-border);
-    transition: all .3s ease-in-out;
     border-radius: 4px;
     padding: 0.5rem 1rem;
     display: flex;

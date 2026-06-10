@@ -74,7 +74,7 @@ export default defineNuxtComponent({
         <div class="mt-auto">
             <div
                 v-if="loggedIn"
-                class="font-weight-light flex flex-col ms-3 me-3 mb-1 mt-auto"
+                class="font-light flex flex-col ms-3 me-3 mb-1 mt-auto"
             >
                 <small class="countdown-text">
                     <VCCountdown

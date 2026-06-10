@@ -9,8 +9,10 @@ import type { Analysis } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
 import type { PropType } from 'vue';
 import { computed, defineComponent, toRef } from 'vue';
+import { FProgressBar } from '../utility';
 
 export default defineComponent({
+    components: { FProgressBar },
     props: {
         entity: {
             type: Object as PropType<Analysis>,
@@ -93,7 +95,7 @@ export default defineComponent({
                 return 'bg-success-600';
             }
 
-            return 'bg-fg';
+            return 'bg-primary-600';
         });
 
         return {
@@ -104,14 +106,8 @@ export default defineComponent({
 });
 </script>
 <template>
-    <div class="progress bg-white">
-        <div
-            class="progress-bar"
-            :class="bgClazz"
-            :style="{width: progress + '%'}"
-            :aria-valuenow="progress"
-            aria-valuemin="0"
-            aria-valuemax="100"
-        />
-    </div>
+    <FProgressBar
+        :progress="progress"
+        :color-class="bgClazz"
+    />
 </template>

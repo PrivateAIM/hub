@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { defineTheme } from '@vuecs/core';
+import { defineTheme, extend } from '@vuecs/core';
 
 export { default as clientWebKitTheme, merge } from '@authup/client-web-kit-theme';
 
@@ -30,5 +30,25 @@ export { default as clientWebKitTheme, merge } from '@authup/client-web-kit-them
  * any theme configuration here.
  */
 export default function clientVueTheme() {
-    return defineTheme({ elements: { tableHeadCell: { classes: { root: 'px-3 font-medium' } } } });
+    return defineTheme({
+        elements: {
+            tableHeadCell: { classes: { root: 'px-3 font-medium' } },
+            /*
+             * Hovering / focusing a page button previews the active-page
+             * paint ("click → this page"). `extend()` appends to the
+             * theme-tailwind base `link` classes; the `!` suffix wins over
+             * per-variant hover utilities the same way the stock
+             * `linkActive` classes do. `enabled:` keeps disabled
+             * first/prev/next/last buttons unpainted.
+             */
+            pagination: {
+                classes: {
+                    link: extend(
+                        'enabled:hover:bg-primary-600! enabled:hover:text-on-primary! enabled:hover:border-primary-600! ' +
+                        'enabled:focus-visible:bg-primary-600! enabled:focus-visible:text-on-primary! enabled:focus-visible:border-primary-600!',
+                    ),
+                },
+            },
+        },
+    });
 }

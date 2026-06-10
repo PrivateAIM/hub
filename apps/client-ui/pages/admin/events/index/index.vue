@@ -187,6 +187,8 @@ export default defineComponent({
                 <template #cell-updated_at="{ row }: { row: any }">
                     <VCTimeago :datetime="row.updated_at" />
                 </template>
+                <VCTableLoading />
+                <VCTableEmpty />
             </VCTable>
         </template>
     </FEvents>

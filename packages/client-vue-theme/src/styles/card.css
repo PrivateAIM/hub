@@ -58,7 +58,9 @@
         border: var(--card-border-width) solid var(--card-border-color);
         box-shadow: var(--card-shadow);
         cursor: var(--card-cursor);
-        transition: all 0.3s ease-in-out;
+        /* Compositor-friendly transition set — `all` would animate
+           layout-triggering properties across whole card grids. */
+        transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out, border-color 0.3s ease-in-out;
     }
 
     .card a {

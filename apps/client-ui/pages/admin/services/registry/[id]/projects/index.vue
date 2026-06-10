@@ -154,7 +154,7 @@ export default {
                     :busy="props.busy"
                 >
                     <template #cell-type="{ row }: { row: any }">
-                        <span class="badge bg-fg">
+                        <span class="badge bg-fg text-bg">
                             {{ row.type }}
                         </span>
                     </template>
@@ -188,6 +188,8 @@ export default {
                     <template #cell-updated_at="{ row }: { row: any }">
                         <timeago :datetime="row.updated_at" />
                     </template>
+                    <VCTableLoading />
+                    <VCTableEmpty />
                 </VCTable>
             </template>
         </registry-project-list>

@@ -15,6 +15,7 @@ import {
     VCListItem,
     VCListLoading,
 } from '@vuecs/list';
+import { VCIcon } from '@vuecs/icon';
 import type { BuildInput, FiltersBuildInput } from 'rapiq';
 import type { Ref, VNodeArrayChildren, VNodeChild } from 'vue';
 import {
@@ -325,6 +326,16 @@ export function createListRaw<
                     }
 
                     if (data.value.length === 0) {
+                        // The `noMore` chrome below renders for exactly this
+                        // state (`!busy && total === 0`) — suppress the default
+                        // empty marker when it will, so the empty list shows
+                        // one message, not two stacked ones.
+                        const noMoreVisible = options.noMore !== false &&
+                            total.value === 0 &&
+                            (!!slots[EntityListSlotName.NO_MORE] || !!noMoreOpt?.content);
+                        if (noMoreVisible) {
+                            return null;
+                        }
                         return h(VCListEmpty);
                     }
 
@@ -365,6 +376,13 @@ export function createListRaw<
                             const sections: ListItemContentSections = {
                                 slot: itemSlot ? itemSlot(itemSlotProps) : undefined,
                                 actions: actionsNode,
+                                // Opt-in row marker (`item: { icon: true }`) —
+                                // the old list engine's default item icon,
+                                // consumed by custom content callbacks
+                                // (FAnalysisNodes, FProjectNodes).
+                                icon: itemOpt?.icon ?
+                                    h(VCIcon, { name: 'fa6-solid:bars', class: 'me-1' }) :
+                                    undefined,
                             };
 
                             let body: VNodeChild;
@@ -375,7 +393,8 @@ export function createListRaw<
                                     itemOpt.content(item, itemSlotProps, sections) :
                                     itemOpt.content;
                             } else {
-                                body = h('span', String((item as any).name ?? (item as any).id ?? ''));
+                                const textPropName = itemOpt?.textPropName ?? 'name';
+                                body = h('span', String((item as any)[textPropName] ?? (item as any).id ?? ''));
                             }
 
                             if (!actionsNode) {

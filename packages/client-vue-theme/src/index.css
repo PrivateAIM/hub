@@ -37,10 +37,16 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/*
+ * Only the theme's own sources are scanned here. Dependency trees
+ * (@vuecs/*, @authup/client-web-kit) must be declared by the CONSUMING
+ * app (see apps/client-ui/assets/css/tailwind.css) — npm hoisting decides
+ * where those packages physically live relative to the app, so
+ * node_modules-relative globs anchored at this package silently miss
+ * them (and previously did: the @authup globs here resolved to
+ * nonexistent paths).
+ */
 @source ".";
-@source "../../../node_modules/@authup/client-web-kit/dist";
-@source "../../../node_modules/@authup/client-web-kit/src";
-@source "../../../node_modules/@vuecs";
 
 @import "./styles/kit-list.css";
 @import "./styles/kit-form-validation.css";
@@ -237,15 +243,36 @@
     .btn-success   { @apply bg-success-600 text-on-success hover:bg-success-700; }
     .btn-danger    { @apply bg-error-600   text-on-error   hover:bg-error-700; }
     .btn-warning   { @apply bg-warning-500 text-on-warning hover:bg-warning-600; }
+    /* btn-info is reachable only via dynamic `btn-${classSuffix}`
+       (F*Command components) — keep it despite zero static users. */
     .btn-info      { @apply bg-info-500    text-on-info    hover:bg-info-600; }
-    .btn-light     { @apply bg-bg-muted    text-fg         hover:bg-bg-elevated; }
     .btn-dark      { @apply bg-fg          text-bg         hover:opacity-80; }
+
+    /* Semantic color aliases — status/approval components build
+       `text-${suffix}` / `bg-${suffix}` / `btn-${suffix}` dynamically
+       (FProcessStatus, F*ApprovalStatus, F*Command, …), which the Tailwind
+       scanner cannot see; these map the Bootstrap-era bare names onto the
+       token scale. `bg-dark` / `bg-secondary` pair with white `text-light`
+       chips, so they pin the RAW neutral scale (mode-stable) rather than
+       the flipped semantic `fg` token. */
+    .text-primary { @apply text-primary-600; }
+    .text-success { @apply text-success-600; }
+    .text-warning { @apply text-warning-600; }
+    .text-danger  { @apply text-error-600; }
+    .text-info    { @apply text-info-600; }
+    .text-dark    { @apply text-fg; }
+    .text-light   { @apply text-white; }
+
+    .bg-primary   { @apply bg-primary-600; }
+    .bg-success   { @apply bg-success-600; }
+    .bg-warning   { @apply bg-warning-500; }
+    .bg-danger    { @apply bg-error-600; }
+    .bg-secondary { background-color: var(--vc-color-neutral-500); }
+    .bg-dark      { background-color: var(--vc-color-neutral-800); }
 
     .btn-outline-primary   { @apply border-primary-600  text-primary-600 hover:bg-primary-600 hover:text-on-primary; }
     .btn-outline-secondary { @apply border-border       text-fg          hover:bg-bg-muted; }
-    .btn-outline-success   { @apply border-success-600  text-success-600 hover:bg-success-600 hover:text-on-success; }
     .btn-outline-danger    { @apply border-error-600    text-error-600   hover:bg-error-600   hover:text-on-error; }
-    .btn-outline-warning   { @apply border-warning-500  text-warning-600 hover:bg-warning-500 hover:text-on-warning; }
     .btn-outline-info      { @apply border-info-500     text-info-600    hover:bg-info-500    hover:text-on-info; }
     .btn-outline-dark      { @apply border-fg           text-fg          hover:bg-fg          hover:text-bg; }
 
@@ -392,7 +419,6 @@
 @import "./styles/root.css";
 @import "./styles/colors.css";
 @import "./styles/domain.css";
-@import "./styles/form.css";
 @import "./styles/card.css";
 @import "./styles/vue-layout-navigation.css";
 @import "./styles/vue-form-wizard.css";
@@ -401,16 +427,6 @@
 @import "./styles/core/body.css";
 @import "./styles/core/sidebar.css";
 
-/*
- * Pagination hover override. Lives at the top level (outside `@layer
- * components`) and uses `!important` — belt-and-suspenders against the
- * underlying `<VCPagination>` button hover utility which sits in
- * `@layer utilities`. The active page button paints `bg-primary-600` /
- * `text-on-primary`; mirroring it on hover previews "click → this page".
- */
-.vc-pagination .vc-pagination-link:hover:not(:disabled),
-.vc-pagination .vc-pagination-link:focus-visible:not(:disabled) {
-    background-color: var(--color-primary-600) !important;
-    color:            var(--color-on-primary)  !important;
-    border-color:     var(--color-primary-600) !important;
-}
+/* Pagination hover/focus preview lives in the JS theme —
+   `clientVueTheme()` (src/index.ts) extends the pagination `link` theme
+   classes instead of fighting `@layer utilities` from here. */

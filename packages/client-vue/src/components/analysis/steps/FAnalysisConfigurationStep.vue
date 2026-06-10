@@ -20,9 +20,11 @@ import FAnalysisConfigurationImageStep from './FAnalysisConfigurationImageStep.v
 import FAnalysisConfigurationEntrypointStep from './FAnalysisConfigurationEntrypointStep.vue';
 import FAnalysisConfigurationNodesStep from './FAnalysisConfigurationNodesStep.vue';
 import { FAnalysisCommand } from '../FAnalysisCommand';
+import { FProgressBar } from '../../utility';
 
 export default defineComponent({
     components: {
+        FProgressBar,
         FAnalysisCommand,
         FAnalysisConfigurationNodesStep,
         FAnalysisConfigurationEntrypointStep,
@@ -116,18 +118,10 @@ export default defineComponent({
                         class="text-4xl"
                     />
                 </div>
-                <div class="progress bg-white">
-                    <div
-                        class="progress-bar"
-                        :class="'bg-success-600'"
-                        :style="{width: progress + '%'}"
-                        :aria-valuenow="progress"
-                        aria-valuemin="0"
-                        aria-valuemax="100"
-                    >
-                        {{ progress }}%
-                    </div>
-                </div>
+                <FProgressBar
+                    :progress="progress"
+                    show-text
+                />
                 <hr>
                 <h6 class="mb-0">
                     Requirements
@@ -150,7 +144,6 @@ export default defineComponent({
                                 </strong>
                             </div>
                             <span
-                                class="text-success-600"
                                 :class="{
                                     'text-success-600': passed,
                                     'text-error-600': !passed,
@@ -190,7 +183,6 @@ export default defineComponent({
                                 </div>
                                 <div>
                                     <span
-                                        class="text-success-600"
                                         :class="{
                                             'text-success-600': passed,
                                             'text-error-600': !passed,
@@ -215,7 +207,6 @@ export default defineComponent({
                                 </div>
                                 <div>
                                     <span
-                                        class="text-success-600"
                                         :class="{
                                             'text-success-600': passed,
                                             'text-error-600': !passed,

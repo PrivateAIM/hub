@@ -19,9 +19,11 @@ import type { Analysis } from '@privateaim/core-kit';
 import FProcessStatus from '../../FProcessStatus.vue';
 import { FAnalysisCommand } from '../FAnalysisCommand';
 import FAnalysisBuildNodesStep from './FAnalysisBuildNodesStep.vue';
+import { FProgressBar } from '../../utility';
 
 export default defineComponent({
     components: {
+        FProgressBar,
         FAnalysisBuildNodesStep,
         FProcessStatus,
         FAnalysisCommand,
@@ -97,18 +99,10 @@ export default defineComponent({
                         class="text-4xl"
                     />
                 </div>
-                <div class="progress bg-white">
-                    <div
-                        class="progress-bar"
-                        :class="'bg-success-600'"
-                        :style="{width: progress + '%'}"
-                        :aria-valuenow="progress"
-                        aria-valuemin="0"
-                        aria-valuemax="100"
-                    >
-                        {{ progress }}%
-                    </div>
-                </div>
+                <FProgressBar
+                    :progress="progress"
+                    show-text
+                />
 
                 <hr>
 
@@ -129,7 +123,6 @@ export default defineComponent({
                                     </div>
                                     <div>
                                         <span
-                                            class="text-success-600"
                                             :class="{
                                                 'text-success-600': passed,
                                                 'text-error-600': !passed,

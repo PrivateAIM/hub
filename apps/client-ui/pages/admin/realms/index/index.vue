@@ -143,6 +143,8 @@ export default defineNuxtComponent({
                         @deleted="props.deleted"
                     />
                 </template>
+                <VCTableLoading />
+                <VCTableEmpty />
             </VCTable>
         </template>
     </ARealms>

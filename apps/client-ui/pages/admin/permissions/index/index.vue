@@ -155,6 +155,8 @@ export default defineNuxtComponent({
                         @deleted="(e) => props.deleted!(e)"
                     />
                 </template>
+                <VCTableLoading />
+                <VCTableEmpty />
             </VCTable>
         </template>
     </APermissions>

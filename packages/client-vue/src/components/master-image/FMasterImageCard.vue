@@ -11,9 +11,14 @@ import type { MasterImage } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
 import FProcessStatus from '../FProcessStatus.vue';
 import FMasterImageCommand from './FMasterImageCommand.ts';
+import { FProgressBar } from '../utility';
 
 export default defineComponent({
-    components: { FMasterImageCommand, FProcessStatus },
+    components: {
+        FMasterImageCommand, 
+        FProcessStatus, 
+        FProgressBar, 
+    },
     props: {
         entity: {
             type: Object as PropType<MasterImage>,
@@ -54,18 +59,10 @@ export default defineComponent({
         </div>
         <div class="card-body">
             <div class="flex flex-col gap-1">
-                <div class="progress bg-white">
-                    <div
-                        class="progress-bar"
-                        :class="'bg-success-600'"
-                        :style="{width: progress + '%'}"
-                        :aria-valuenow="progress"
-                        aria-valuemin="0"
-                        aria-valuemax="100"
-                    >
-                        {{ progress }}%
-                    </div>
-                </div>
+                <FProgressBar
+                    :progress="progress"
+                    show-text
+                />
 
                 <div>
                     <FMasterImageCommand

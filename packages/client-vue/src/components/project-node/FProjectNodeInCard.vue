@@ -213,7 +213,15 @@ export default defineComponent({
         </slot>
 
         <VCModal v-model:open="modal">
-            <VCModalContent class="modal-lg">
+            <!-- attrs forward to reka-ui DialogContent: preventing
+                 escapeKeyDown / interactOutside restores the pre-migration
+                 no-close-on-esc / no-close-on-backdrop guards (the form
+                 inside holds in-progress approval input). -->
+            <VCModalContent
+                class="modal-lg"
+                @escape-key-down="(event: Event) => event.preventDefault()"
+                @interact-outside="(event: Event) => event.preventDefault()"
+            >
                 <div class="modal-header">
                     <VCModalTitle class="modal-title">
                         <VCIcon name="fa6-solid:file-import" /> Project

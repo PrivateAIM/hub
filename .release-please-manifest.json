@@ -2,6 +2,7 @@
     ".": "0.10.0",
     "apps/client-ui": "0.10.0",
     "packages/client-vue": "0.10.0",
+    "packages/client-vue-theme": "0.10.0",
     "packages/core-http-kit": "0.10.0",
     "packages/core-kit": "0.10.0",
     "packages/core-realtime-kit": "0.10.0",

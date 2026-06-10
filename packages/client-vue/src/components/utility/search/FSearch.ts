@@ -28,6 +28,7 @@ export const FSearch = defineComponent({
             slots,
             icon: props.icon,
             iconPosition: props.iconPosition,
+            iconClass: props.iconClass,
             busy: props.busy,
             load: props.load,
             meta: props.meta,

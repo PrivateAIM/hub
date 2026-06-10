@@ -43,11 +43,9 @@
     display: block;
 }
 
-/*
 .form-group-hint.group-required {
-    color: var(--vc-color-info-600);
+    color: var(--vc-color-warning-600);
 }
- */
 
 .form-group-error .form-group-hint {
     color: var(--vc-color-error-500);

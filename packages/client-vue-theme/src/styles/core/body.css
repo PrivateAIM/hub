@@ -49,11 +49,11 @@ Content
     }
 }
 
-.list {
-    display: flex;
-    flex-direction: column;
-}
-
+/*
+ * Hub deltas on top of the vendored kit list styles (styles/kit-list.css)
+ * — only properties that deliberately differ live here; the base
+ * `.list` / `.list-item` chrome comes from the kit file.
+ */
 .list .list-header {
     margin-bottom: 0.7rem;
 }
@@ -64,29 +64,11 @@ Content
     margin-bottom: 0;
 }
 
-.list .list-item {
-    background-color: var(--vc-color-bg-muted);
-    border: 1px solid var(--vc-color-border);
-    transition: all .3s ease-in-out;
-    border-radius: 4px;
-    padding: 0.25rem 0.25rem;
-    margin-bottom: 0.5rem;
-    vertical-align: middle;
-}
-
-.list .list-item.active,
+/* kit styles only `.active` — hub's pickers also mark rows `.checked`. */
 .list .list-item.checked {
     background-color: var(--vc-color-bg-elevated);
 }
 
-.list .list-icon,
-.c-list .c-list-icon {
-    font-size: 1rem;
-    padding-right: 0.5rem;
-}
-
 .list-no-more {
-    padding: 0.4rem 0.7rem;
-    position: relative;
     margin: 1rem 0;
 }

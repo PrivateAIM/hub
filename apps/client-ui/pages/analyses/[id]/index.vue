@@ -98,12 +98,3 @@ export default defineNuxtComponent({
         </div>
     </div>
 </template>
-<style>
-.panel-box {
-    background-color: #ececec;
-    border: 1px solid #dedede;
-    transition: all .3s ease-in-out;
-    border-radius: 4px;
-    padding: 0.5rem 1rem;
-}
-</style>
