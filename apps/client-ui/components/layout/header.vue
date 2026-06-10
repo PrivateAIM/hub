@@ -8,13 +8,14 @@
 import { injectStore, storeToRefs } from '@authup/client-web-kit';
 import { VCGravatar } from '@vuecs/gravatar';
 import { VCNavItems } from '@vuecs/navigation';
-import { computed } from 'vue';
 import { ref, useColorMode } from '#imports';
 import { defineNuxtComponent } from '#app';
 import { LayoutTopNavigationRegistryId, Navigation } from '../../config/layout';
+import Logo from '../svg/Logo';
 
 export default defineNuxtComponent({
     components: {
+        Logo,
         VCGravatar,
         VCNavItems,
     },
@@ -23,7 +24,6 @@ export default defineNuxtComponent({
         const {
             loggedIn,
             user,
-            realmManagementName,
         } = storeToRefs(store);
 
         const displayNav = ref(false);
@@ -31,8 +31,6 @@ export default defineNuxtComponent({
         const toggleNav = () => {
             displayNav.value = !displayNav.value;
         };
-
-        const infoText = computed(() => realmManagementName.value || 'PrivateAim');
 
         // Top nav is permission-filtered — pass the resolver as `:data` to
         // `<VCNavItems>`. The reactive session reads happen after an `await`
@@ -52,7 +50,6 @@ export default defineNuxtComponent({
         };
 
         return {
-            infoText,
             loggedIn,
             user,
             toggleNav,
@@ -83,8 +80,10 @@ export default defineNuxtComponent({
                     </button>
                 </div>
                 <div class="logo">
-                    <span>H</span>U<span>B</span>
-                    <span class="info-text">{{ infoText }}</span>
+                    <Logo :height="32" />
+                    <div class="logo-text">
+                        <span>H</span>U<span>B</span>
+                    </div>
                 </div>
             </div>
             <nav class="page-navbar navbar-expand-md">

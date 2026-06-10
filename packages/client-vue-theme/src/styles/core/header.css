@@ -59,18 +59,19 @@
     flex: none;
 }
 
-.page-header .logo span:not(.info-text) {
+/* More specific than `.page-header .header-title > div` so `display`
+ * wins over the inline-block default; flex + gap keeps the logo icon
+ * and wordmark on one centered row (Tailwind preflight makes <img>
+ * display:block, which would otherwise stack them). */
+.page-header .header-title .logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.page-header .logo span {
     color: var(--privateaim-brand-coral);
-}
-
-.page-header .logo .info-text {
-    font-size: 0.875em;
-}
-
-.page-header .logo .info-text:before {
-    content: "-";
-    margin-left: 0.25rem;
-    margin-right: 0.25rem;
 }
 
 @media (min-width: 768px) {

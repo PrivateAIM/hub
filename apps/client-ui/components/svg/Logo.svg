@@ -1,0 +1,47 @@
+<!--
+  - Copyright (c) 2026.
+  -  Author Peter Placzek (tada5hi)
+  -  For the full copyright and license information,
+  -  view the LICENSE file that was distributed with this source code.
+  -->
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 310 421">
+    <!--
+      Four stacked flame layers (outer → core). All segment junctions are
+      tangent-continuous (collinear control handles), so edges stay smooth;
+      the only sharp points are the deliberate flame tips.
+    -->
+    <path fill="#f04a13"
+          d="M150 10
+             C140 70 104 122 82 178
+             C58 240 85 411 155 411
+             C225 411 252 240 228 178
+             C204 116 172 70 150 10
+             Z"/>
+
+    <path fill="#f15a29"
+          d="M150 10
+             C146 70 118 124 100 180
+             C82 238 92 330 155 411
+             C112 348 102 260 118 196
+             C132 142 146 80 150 10
+             Z"/>
+
+    <path fill="#f7931a"
+          d="M172 150
+             C178 196 162 228 146 254
+             C128 282 120 308 124 340
+             C127 372 135 411 155 411
+             C215 411 228 350 226 298
+             C224 240 200 190 172 150
+             Z"/>
+
+    <path fill="#f2f2f2"
+          d="M158 240
+             C162 268 154 288 144 304
+             C132 324 128 342 132 362
+             C136 384 145 408 155 408
+             C185 408 200 372 198 340
+             C196 304 180 268 158 240
+             Z"/>
+</svg>

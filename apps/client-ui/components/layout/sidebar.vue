@@ -65,6 +65,15 @@ export default defineNuxtComponent({
 </script>
 <template>
     <div class="page-sidebar">
+        <div
+            v-if="realmManagement"
+            class="sidebar-header"
+        >
+            <div class="text-center">
+                {{ realmManagement.name }}
+            </div>
+        </div>
+
         <VCNavItems
             class="sidebar-menu navbar-nav"
             :data="sideItems"
