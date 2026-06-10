@@ -153,6 +153,36 @@
         --vc-color-bg: #2a2d35;
         --vc-color-bg-muted: #343742;
         --vc-color-border: #3e414c;
+
+        /*
+         * Warning / danger surfaces — tinted panels (alert-warning,
+         * alert-danger, list no-more / empty markers). Hand-tuned
+         * mid-lightness, low-chroma tones: the palette deep ends
+         * (orange-950 / red-950) read brown/black against the soft dark
+         * content surface. Border sits a step lighter than the fill
+         * (edge highlight); panel text is a hue-matched near-white.
+         */
+        --privateaim-warning-surface:        oklch(0.55 0.06 66.93);
+        --privateaim-warning-surface-border: oklch(0.65 0.08 66.93);
+        --privateaim-warning-surface-fg:     oklch(0.97 0.02 66.93);
+
+        --privateaim-danger-surface:         oklch(0.45 0.11 22.78);
+        --privateaim-danger-surface-border:  oklch(0.55 0.13 22.78);
+        --privateaim-danger-surface-fg:      oklch(0.97 0.015 22.78);
+
+        --privateaim-info-surface:           oklch(0.5 0.08 237);
+        --privateaim-info-surface-border:    oklch(0.6 0.1 237);
+        --privateaim-info-surface-fg:        oklch(0.97 0.015 237);
+
+        /*
+         * Standalone warning / danger text (`.text-warning` /
+         * `.text-danger`) — same hues as the surfaces, lifted to stay
+         * readable on the dark content background (the surface values
+         * themselves land below ~3:1 as text).
+         */
+        --privateaim-warning-text:           oklch(0.75 0.1 66.93);
+        --privateaim-danger-text:            oklch(0.7 0.14 22.78);
+        --privateaim-info-text:              oklch(0.75 0.12 237);
     }
 
     /*
@@ -263,10 +293,20 @@
     .text-dark    { @apply text-fg; }
     .text-light   { @apply text-white; }
 
+    /* Dark mode — the 600 weights are tuned for light surfaces and turn
+       harsh/dim on the dark content bg; lift warning/danger/info to the
+       hand-tuned text tokens (same hues as the alert surfaces). */
+    .dark .text-warning { color: var(--privateaim-warning-text); }
+    .dark .text-danger  { color: var(--privateaim-danger-text); }
+    .dark .text-info    { color: var(--privateaim-info-text); }
+
     .bg-primary   { @apply bg-primary-600; }
     .bg-success   { @apply bg-success-600; }
     .bg-warning   { @apply bg-warning-500; }
-    .bg-danger    { @apply bg-error-600; }
+    /* 500 (not 600) — Tailwind red-600 reads much harsher than the old
+       Bootstrap #dc3545 on the white-text node execution status banner
+       (the only `bg-danger` consumer); 500 matches bg-warning's weight. */
+    .bg-danger    { @apply bg-error-500; }
     .bg-secondary { background-color: var(--vc-color-neutral-500); }
     .bg-dark      { background-color: var(--vc-color-neutral-800); }
 
@@ -307,15 +347,41 @@
     /* Cards — the full mechanism (base + variants, all variable-driven)
        lives in styles/card.css, imported below into @layer components. */
 
-    /* Alerts --------------------------------------------------------- */
+    /* Alerts ---------------------------------------------------------
+       The tinted variants use raw palette steps that do NOT flip with
+       the mode — in dark mode the light `*-50` fills glare against the
+       dark surface, so each variant carries a deep-end dark recipe
+       (950 fill / 900 border / 300 text). `.alert-dark` builds on
+       semantic tokens and adapts on its own. */
     .alert         { @apply relative mb-3 rounded-md border px-4 py-3; }
     .alert-sm      { @apply px-3 py-2 text-sm; }
-    .alert-primary { @apply border-primary-200 bg-primary-50 text-primary-700; }
-    .alert-success { @apply border-success-200 bg-success-50 text-success-700; }
-    .alert-warning { @apply border-warning-200 bg-warning-50 text-warning-700; }
+    .alert-primary { @apply border-primary-200 bg-primary-50 text-primary-700 dark:border-primary-900 dark:bg-primary-950 dark:text-primary-300; }
+    .alert-success { @apply border-success-200 bg-success-50 text-success-700 dark:border-success-900 dark:bg-success-950 dark:text-success-300; }
+    /* Orange scale (not the amber `warning` tokens) — amber's dark end
+       reads brown; orange keeps the warm tone in both modes. */
+    .alert-warning { @apply border-orange-200 bg-orange-50 text-orange-700; }
     .alert-danger  { @apply border-error-200   bg-error-50   text-error-700; }
     .alert-info    { @apply border-info-200    bg-info-50    text-info-700; }
     .alert-dark    { @apply border-border bg-bg-elevated text-fg; }
+
+    /* Warning / danger / info dark recipes use the hand-tuned surface
+       tokens (see the `.dark` token block above) — the palette deep
+       ends the other variants use read brown/black/near-navy. */
+    .dark .alert-warning {
+        background-color: var(--privateaim-warning-surface);
+        border-color: var(--privateaim-warning-surface-border);
+        color: var(--privateaim-warning-surface-fg);
+    }
+    .dark .alert-danger {
+        background-color: var(--privateaim-danger-surface);
+        border-color: var(--privateaim-danger-surface-border);
+        color: var(--privateaim-danger-surface-fg);
+    }
+    .dark .alert-info {
+        background-color: var(--privateaim-info-surface);
+        border-color: var(--privateaim-info-surface-border);
+        color: var(--privateaim-info-surface-fg);
+    }
 
     /* Badges --------------------------------------------------------- */
     .badge {

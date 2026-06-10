@@ -5,22 +5,18 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-.list {
-    display: flex;
-    flex-direction: column;
-}
+/*
+ * Vendored from @authup/client-web-kit-theme `styles/list.css` (missing
+ * from the published tarball — see index.css), with one deliberate
+ * delta: upstream still targets the pre-vuecs-major class names
+ * (`.list`, `.list-item`, …), but @vuecs/list and the kit components
+ * now emit `vc-list`, `vc-list-item`, `vc-list-body`, `vc-list-no-more`.
+ * The JS theme (@vuecs/theme-tailwind) only supplies layout utilities
+ * for these elements — the row chrome (background, border, shadow)
+ * below is what makes list items stand out from the page background.
+ */
 
-.list .list-items {
-    padding: 0;
-    margin: 0;
-}
-
-.list-header,
-.list-search {
-    margin-bottom: 0.5rem;
-}
-
-.list .list-item {
+.vc-list .vc-list-item {
     background-color: var(--vc-color-bg-muted);
     border: 1px solid var(--vc-color-border);
 
@@ -34,25 +30,35 @@
     vertical-align: middle;
 }
 
-.list .list-item.active {
+.vc-list .vc-list-item.active {
     background-color: var(--vc-color-bg-elevated);
 }
 
-.list .list-icon,
-.c-list .c-list-icon {
-    font-size: 1rem;
-    padding-right: 0.5rem;
-}
-
-.list-no-more {
+/* Orange scale (not the amber `warning` tokens) — amber's dark end
+   reads brown; orange keeps the warm tone in both modes. Matches the
+   `.alert-warning` recipe in index.css. */
+.vc-list-no-more {
     margin-top: 0.5rem;
-    color: var(--vc-color-warning-700);
-    background-color: var(--vc-color-warning-50);
+    color: var(--color-orange-700);
+    background-color: var(--color-orange-50);
     padding: 0.4rem 0.7rem;
     position: relative;
     margin-bottom: 1rem;
-    border: 1px solid var(--vc-color-warning-200);
+    border: 1px solid var(--color-orange-200);
     border-radius: 0.25rem;
+}
+
+/* Dark mode — the light tint above glares against the dark surface;
+   flip to the hand-tuned warm surface tokens (same recipe as
+   `.dark .alert-warning` in index.css). `.vc-list-empty` gets the same
+   treatment: the @vuecs/theme-tailwind JS theme paints it with the
+   identical light-tint utilities (bg-warning-50 etc.), which an
+   unlayered rule here outranks. */
+.dark .vc-list-no-more,
+.dark .vc-list-empty {
+    color: var(--privateaim-warning-surface-fg);
+    background-color: var(--privateaim-warning-surface);
+    border-color: var(--privateaim-warning-surface-border);
 }
 
 

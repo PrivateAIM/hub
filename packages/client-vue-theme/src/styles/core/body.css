@@ -52,23 +52,17 @@ Content
 /*
  * Hub deltas on top of the vendored kit list styles (styles/kit-list.css)
  * — only properties that deliberately differ live here; the base
- * `.list` / `.list-item` chrome comes from the kit file.
+ * `.vc-list` / `.vc-list-item` chrome comes from the kit file.
  */
-.list .list-header {
+.vc-list .vc-list-header {
     margin-bottom: 0.7rem;
 }
 
-.list .list-body {
-    padding-left: 0;
-    list-style: none;
-    margin-bottom: 0;
-}
-
 /* kit styles only `.active` — hub's pickers also mark rows `.checked`. */
-.list .list-item.checked {
+.vc-list .vc-list-item.checked {
     background-color: var(--vc-color-bg-elevated);
 }
 
-.list-no-more {
+.vc-list-no-more {
     margin: 1rem 0;
 }

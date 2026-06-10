@@ -263,16 +263,6 @@ export default defineComponent({
     </div>
 </template>
 <style>
-.analysis-nodes .list-body {
-    flex-direction: column;
-    /*
-    justify-content: space-between;
-     */
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
 .status-text {
     height: 50px;
     font-weight: 600;
