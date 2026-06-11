@@ -71,6 +71,7 @@ Modernization and refactoring plans:
 6. ~~Service-Level Tests~~ — Complete (all 13 entity services, command checkers, core services tested)
 7. ~~Message Bus~~ — Complete (QueueRouter → MessageBus, AMQP/Memory driver abstraction)
 8. ~~[Shared Test Infrastructure](.agents/plans/008-shared-test-infrastructure.md)~~ — Complete (server-test-kit package, shared core types in server-kit, domain-grouped test layout)
+9. [Analysis Check Hardening](.agents/plans/009-analysis-check-hardening.md) — Proposed (race-safe check verdicts, worker ports + verdict unit tests, registry error classification, check observability)
 
 ## Commits
 
