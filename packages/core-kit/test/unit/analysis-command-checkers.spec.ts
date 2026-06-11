@@ -230,9 +230,9 @@ describe('AnalysisBuilderCommandChecker', () => {
             expect(() => AnalysisBuilderCommandChecker.canCheck(entity)).toThrow(AnalysisError);
         });
 
-        it('should throw when build already EXECUTED', () => {
+        it('should allow when build EXECUTED (reconciliation after data loss)', () => {
             const entity = createBaseAnalysis({ configuration_locked: true, build_status: ProcessStatus.EXECUTED });
-            expect(() => AnalysisBuilderCommandChecker.canCheck(entity)).toThrow(AnalysisError);
+            expect(() => AnalysisBuilderCommandChecker.canCheck(entity)).not.toThrow();
         });
 
         it('should allow when build STARTED', () => {
@@ -320,8 +320,28 @@ describe('AnalysisDistributorCommandChecker', () => {
     });
 
     describe('canCheck', () => {
-        it('should allow when build EXECUTED', () => {
-            const entity = createBaseAnalysis({ build_status: ProcessStatus.EXECUTED });
+        it('should allow when build EXECUTED and distribution in progress', () => {
+            const entity = createBaseAnalysis({ build_status: ProcessStatus.EXECUTED, distribution_status: ProcessStatus.STARTED });
+            expect(() => AnalysisDistributorCommandChecker.canCheck(entity)).not.toThrow();
+        });
+
+        it('should allow when distribution STARTING', () => {
+            const entity = createBaseAnalysis({ build_status: ProcessStatus.EXECUTED, distribution_status: ProcessStatus.STARTING });
+            expect(() => AnalysisDistributorCommandChecker.canCheck(entity)).not.toThrow();
+        });
+
+        it('should allow when distribution FAILED', () => {
+            const entity = createBaseAnalysis({ build_status: ProcessStatus.EXECUTED, distribution_status: ProcessStatus.FAILED });
+            expect(() => AnalysisDistributorCommandChecker.canCheck(entity)).not.toThrow();
+        });
+
+        it('should throw when distribution not initialized', () => {
+            const entity = createBaseAnalysis({ build_status: ProcessStatus.EXECUTED, distribution_status: null });
+            expect(() => AnalysisDistributorCommandChecker.canCheck(entity)).toThrow(AnalysisError);
+        });
+
+        it('should allow when distribution EXECUTED (reconciliation after data loss)', () => {
+            const entity = createBaseAnalysis({ build_status: ProcessStatus.EXECUTED, distribution_status: ProcessStatus.EXECUTED });
             expect(() => AnalysisDistributorCommandChecker.canCheck(entity)).not.toThrow();
         });
 

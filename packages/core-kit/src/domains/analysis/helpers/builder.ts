@@ -52,9 +52,8 @@ export class AnalysisBuilderCommandChecker {
             throw new AnalysisError('The analysis build process has not been initialized.');
         }
 
-        if (entity.build_status === ProcessStatus.EXECUTED) {
-            throw new AnalysisError('The analysis build process has already been successfully completed.');
-        }
+        // EXECUTED is checkable on purpose: it reconciles the recorded state
+        // with the docker daemon after data loss (image gone -> FAILED -> rebuildable).
 
         // todo: check time
     }

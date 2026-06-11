@@ -159,11 +159,14 @@ describe('AnalysisBuilder', () => {
             await expect(builder.check(analysis)).rejects.toThrow(AnalysisError);
         });
 
-        it('should throw when build already EXECUTED', async () => {
+        it('should dispatch check call for EXECUTED build (reconciliation after data loss)', async () => {
             const analysis = createFullAnalysis({ configuration_locked: true, build_status: ProcessStatus.EXECUTED });
             repository.seed(analysis);
 
-            await expect(builder.check(analysis)).rejects.toThrow(AnalysisError);
+            const result = await builder.check(analysis);
+
+            expect(result.id).toBe('analysis-1');
+            expect(caller.getCallsFor('callCheck')).toHaveLength(1);
         });
     });
 });

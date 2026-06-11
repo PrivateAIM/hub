@@ -41,6 +41,20 @@ await client.analysis.update(analysisId, { name: 'Updated' });
 await client.analysis.delete(analysisId);
 ```
 
+### Exhaustive Collections
+
+`getMany` returns a single page; the server caps the page size (default `maxLimit: 50`).
+Use `getManyAll` to follow the pagination until every record is retrieved:
+
+```typescript
+import { getManyAll } from '@privateaim/core-http-kit';
+
+const analysisNodes = await getManyAll((page) => client.analysisNode.getMany({
+    filter: { analysis_id: analysisId },
+    page,
+}));
+```
+
 ### With Authentication
 
 ```typescript
@@ -58,6 +72,7 @@ const client = new HTTPClient({
 |--------|-------------|
 | `client` | `HTTPClient` class with typed domain API methods |
 | `domains` | Domain-specific request/response types |
+| `getManyAll` | Helper that fetches a resource collection exhaustively across all pages |
 
 ### Client Methods
 

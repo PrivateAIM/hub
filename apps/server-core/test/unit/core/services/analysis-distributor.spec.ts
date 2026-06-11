@@ -171,7 +171,7 @@ describe('AnalysisDistributor', () => {
 
     describe('check', () => {
         it('should dispatch check call', async () => {
-            const analysis = seedBuiltAnalysis();
+            const analysis = seedBuiltAnalysis({ distribution_status: ProcessStatus.STARTED });
 
             const result = await distributor.check(analysis);
 
@@ -180,7 +180,7 @@ describe('AnalysisDistributor', () => {
         });
 
         it('should resolve entity by string ID', async () => {
-            seedBuiltAnalysis();
+            seedBuiltAnalysis({ distribution_status: ProcessStatus.STARTED });
 
             const result = await distributor.check('analysis-1');
             expect(result.id).toBe('analysis-1');
@@ -200,6 +200,21 @@ describe('AnalysisDistributor', () => {
             const analysis = seedBuiltAnalysis({ build_status: ProcessStatus.FAILED });
 
             await expect(distributor.check(analysis)).rejects.toThrow(AnalysisError);
+        });
+
+        it('should throw when distribution not initialized', async () => {
+            const analysis = seedBuiltAnalysis();
+
+            await expect(distributor.check(analysis)).rejects.toThrow(AnalysisError);
+        });
+
+        it('should dispatch check call for EXECUTED distribution (reconciliation after data loss)', async () => {
+            const analysis = seedBuiltAnalysis({ distribution_status: ProcessStatus.EXECUTED });
+
+            const result = await distributor.check(analysis);
+
+            expect(result.id).toBe('analysis-1');
+            expect(caller.getCallsFor('callCheck')).toHaveLength(1);
         });
     });
 });
