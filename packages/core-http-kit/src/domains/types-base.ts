@@ -18,6 +18,15 @@ export type CollectionResourceResponse<R> = {
     }
 };
 
+export type CollectionResourcePage = {
+    limit: number,
+    offset: number
+};
+
+export type CollectionResourceFetcher<R> = (
+    page: CollectionResourcePage,
+) => Promise<CollectionResourceResponse<R>>;
+
 export type DomainEntityWithID = {
     [key: string]: any,
     id: any

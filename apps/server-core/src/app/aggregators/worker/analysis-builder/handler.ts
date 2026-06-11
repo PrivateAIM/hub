@@ -49,7 +49,10 @@ export async function handleAnalysisBuilderEvent(
             }
             break;
         }
-        case AnalysisBuilderEvent.CHECK_FAILED:
+        case AnalysisBuilderEvent.CHECK_FAILED: {
+            // failure of the check itself says nothing about the build outcome
+            return;
+        }
         case AnalysisBuilderEvent.EXECUTION_FAILED: {
             entity.build_status = ProcessStatus.FAILED;
             break;
@@ -66,16 +69,25 @@ export async function handleAnalysisBuilderEvent(
         }
         case AnalysisBuilderEvent.CHECK_FINISHED: {
             const temp = value as AnalysisBuilderCheckFinishedPayload;
-            if (temp.status) {
-                entity.build_progress = temp.status === ProcessStatus.EXECUTED ?
-                    100 :
-                    0;
+            if (!temp.status) {
+                return;
             }
 
-            entity.build_hash = temp.hash ?? null;
-            entity.build_os = temp.os ?? null;
-            entity.build_size = temp.size ?? null;
-            entity.build_status = temp.status || null;
+            entity.build_status = temp.status;
+
+            if (temp.status === ProcessStatus.EXECUTED) {
+                entity.build_progress = 100;
+                entity.build_hash = temp.hash ?? entity.build_hash;
+                entity.build_os = temp.os ?? entity.build_os;
+                entity.build_size = temp.size ?? entity.build_size;
+            } else if (temp.status === ProcessStatus.FAILED) {
+                // the image is verifiably gone (e.g. docker daemon data loss) —
+                // reset the build artifacts so the build can be retriggered.
+                entity.build_progress = 0;
+                entity.build_hash = temp.hash ?? null;
+                entity.build_os = temp.os ?? null;
+                entity.build_size = temp.size ?? null;
+            }
         }
     }
 

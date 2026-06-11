@@ -31,6 +31,7 @@ export class AnalysisBuilderComponent extends BaseComponent<AnalysisBuilderEvent
         this.mount(AnalysisBuilderCommand.CHECK, new AnalysisBuilderCheckHandler({
             coreClient: ctx.coreClient,
             docker: ctx.docker,
+            logger: ctx.logger,
         }));
         this.mount(AnalysisBuilderCommand.EXECUTE, new AnalysisBuilderExecuteHandler({
             coreClient: ctx.coreClient,
