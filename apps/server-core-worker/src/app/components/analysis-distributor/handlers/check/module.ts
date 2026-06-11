@@ -25,6 +25,7 @@ import type { Client as DockerClient } from 'docken';
 import {
     buildDockerAuthConfigFromRegistry,
     buildDockerImageURL,
+    isDockerDistributionImageMissingError,
 } from '../../../../../adapters/docker/index.ts';
 import { isAnalysisProcessStale } from '../../../helpers.ts';
 
@@ -143,7 +144,13 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
             }
 
             status = ProcessStatus.EXECUTED;
-        } catch {
+        } catch (e) {
+            // anything but a missing-image response (daemon down, registry 5xx)
+            // means the image state is unknown and no verdict can be made.
+            if (!isDockerDistributionImageMissingError(e)) {
+                throw e;
+            }
+
             if (
                 analysis.distribution_status === ProcessStatus.STARTED ||
                 analysis.distribution_status === ProcessStatus.STARTING
