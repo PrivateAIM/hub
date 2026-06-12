@@ -13,6 +13,7 @@ import {
     FAnalysisImageCommandArguments,
     FAnalysisMasterImagePicker,
     FAnalysisTypeBucket,
+    FPagination,
 } from '@privateaim/client-vue';
 import type { Analysis, AnalysisBucketFile } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
@@ -27,6 +28,7 @@ export default defineComponent({
         FAnalysisTypeBucket,
         FAnalysisImageCommand,
         FAnalysisImageCommandArguments,
+        FPagination,
     },
     props: { entity: { type: Object as PropType<Analysis> } },
     emits: ['updated'],
@@ -186,6 +188,12 @@ export default defineComponent({
                                                 </div>
                                             </template>
                                         </FAnalysisBucketFile>
+                                    </template>
+                                    <template #footer="footerProps">
+                                        <FPagination
+                                            :load="footerProps.load"
+                                            :meta="footerProps.meta"
+                                        />
                                     </template>
                                 </FAnalysisBucketFiles>
                             </template>

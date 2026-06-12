@@ -2,6 +2,7 @@
 import { injectHTTPClient } from '@authup/client-web-kit';
 import type { Policy } from '@authup/core-kit';
 import { PermissionName as AuthupPermissionName } from '@authup/core-kit';
+import { FDisplayName } from '@privateaim/client-vue';
 import { computed, defineComponent, ref } from 'vue';
 import type { Ref } from 'vue';
 import type { NavigationItem } from '@vuecs/navigation';
@@ -12,6 +13,7 @@ import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 import { updateObjectProperties } from '../../../utils';
 
 export default defineComponent({
+    components: { FDisplayName },
     async setup() {
         definePageMeta({
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
@@ -81,7 +83,10 @@ export default defineComponent({
                 name="fa6-solid:scale-balanced"
                 class="me-1"
             />
-            {{ entity.name }}
+            <FDisplayName
+                :name="entity.name"
+                :display-name="entity.display_name"
+            />
             <span class="sub-title ms-1">
                 Details
             </span>

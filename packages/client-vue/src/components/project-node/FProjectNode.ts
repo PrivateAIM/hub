@@ -23,6 +23,7 @@ import type {
     VNodeChild,
 } from 'vue';
 import { createEntityManager, defineEntityManagerEvents, injectCoreHTTPClient } from '../../core';
+import FDisplayName from '../FDisplayName';
 
 enum Direction {
     IN = 'in',
@@ -119,8 +120,10 @@ export default defineComponent({
                 ) {
                     if (props.target === Target.PROJECT) {
                         return h('div', [
-                            manager.data.value?.project.display_name ||
-                            manager.data.value?.project.name,
+                            h(FDisplayName, {
+                                name: manager.data.value?.project.name,
+                                displayName: manager.data.value?.project.display_name,
+                            }),
                         ]);
                     }
                     if (props.target === Target.NODE) {

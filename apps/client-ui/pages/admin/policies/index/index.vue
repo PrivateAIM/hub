@@ -15,10 +15,12 @@ import {
 } from '@authup/client-web-kit';
 import type { Policy } from '@authup/core-kit';
 import { PermissionName } from '@authup/core-kit';
+import { FDisplayName } from '@privateaim/client-vue';
 import type { BuildInput } from 'rapiq';
 
 export default defineComponent({
     components: {
+        FDisplayName,
         ATitle,
         APagination,
         ASearch,
@@ -107,6 +109,12 @@ export default defineComponent({
                 :columns="columns"
                 :busy="props.busy"
             >
+                <template #cell-name="{ row }: { row: any }">
+                    <FDisplayName
+                        :name="row.name"
+                        :display-name="row.display_name"
+                    />
+                </template>
                 <template #cell-created_at="{ row }: { row: any }">
                     <VCTimeago :datetime="row.created_at" />
                 </template>

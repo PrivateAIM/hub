@@ -10,9 +10,8 @@ import {
 } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
-import { waitForModemStream } from 'docken';
 import type {
-    AnalysisBuilderCheckPayload,
+    AnalysisDistributorCheckPayload,
     AnalysisDistributorEventMap,
 } from '@privateaim/server-core-worker-kit';
 import {
@@ -21,11 +20,14 @@ import {
 } from '@privateaim/server-core-worker-kit';
 import type { ComponentHandler, ComponentHandlerContext, Logger } from '@privateaim/server-kit';
 import type { Client as CoreClient } from '@privateaim/core-http-kit';
+import { getManyAll } from '@privateaim/core-http-kit';
 import type { Client as DockerClient } from 'docken';
 import {
     buildDockerAuthConfigFromRegistry,
     buildDockerImageURL,
+    isDockerDistributionImageMissingError,
 } from '../../../../../adapters/docker/index.ts';
+import { isAnalysisProcessStale } from '../../../helpers.ts';
 
 export class AnalysisDistributorCheckHandler implements ComponentHandler<AnalysisDistributorEventMap, AnalysisDistributorCommand.CHECK> {
     protected coreClient: CoreClient;
@@ -45,13 +47,21 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
     }
 
     async handle(
-        value: AnalysisBuilderCheckPayload,
+        value: AnalysisDistributorCheckPayload,
         context: ComponentHandlerContext<AnalysisDistributorEventMap, AnalysisDistributorCommand.CHECK>,
     ): Promise<void> {
         try {
             // todo: check if image exists, otherwise local queue task
             await this.handleInternal(value, context);
         } catch (e) {
+            this.logger?.error({
+                message: e,
+                command: AnalysisDistributorCommand.CHECK,
+                analysis_id: value.id,
+                [LogFlag.REF_ID]: value.id,
+                event: AnalysisDistributorEvent.CHECK_FAILED,
+            });
+
             await context.handle(
                 AnalysisDistributorEvent.CHECK_FAILED,
                 {
@@ -63,7 +73,7 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
     }
 
     async handleInternal(
-        value: AnalysisBuilderCheckPayload,
+        value: AnalysisDistributorCheckPayload,
         context: ComponentHandlerContext<AnalysisDistributorEventMap, AnalysisDistributorCommand.CHECK>,
     ): Promise<void> {
         await context.handle(
@@ -75,10 +85,10 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
 
         // -----------------------------------------------------------------------------------
 
-        const { data: analysisNodes } = await this.coreClient.analysisNode.getMany({
+        const analysisNodes = await getManyAll((page) => this.coreClient.analysisNode.getMany({
             filter: { analysis_id: analysis.id },
-            page: { limit: 1 },
-        });
+            page,
+        }));
 
         if (analysisNodes.length === 0) {
             await context.handle(
@@ -89,10 +99,11 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
             return;
         }
 
-        const { data: nodes } = await this.coreClient.node.getMany({
+        const nodes = await getManyAll((page) => this.coreClient.node.getMany({
             filter: { id: analysisNodes.map((analysisNode) => analysisNode.node_id) },
             relations: { registry_project: true },
-        });
+            page,
+        }));
 
         if (nodes.length === 0) {
             await context.handle(
@@ -108,6 +119,8 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
         const registry = await this.coreClient.registry.getOne(analysis.registry_id, { fields: ['+account_secret'] });
 
         const authConfig = buildDockerAuthConfigFromRegistry(registry);
+
+        let status: `${ProcessStatus}`;
 
         try {
             for (const node of nodes) {
@@ -125,31 +138,31 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
                     tagOrDigest: REGISTRY_ARTIFACT_TAG_LATEST,
                 });
 
-                const stream = await this.docker.pull(nodeImageURL, { authconfig: authConfig });
-                await waitForModemStream(this.docker.modem, stream);
+                // registry manifest lookup — verifies existence without pulling the image
+                await this.docker.getImage(nodeImageURL)
+                    .distribution({ authconfig: authConfig });
             }
-        } catch {
-            let status: `${ProcessStatus}`;
+
+            status = ProcessStatus.EXECUTED;
+        } catch (e) {
+            // anything but a missing-image response (daemon down, registry 5xx)
+            // means the image state is unknown and no verdict can be made.
+            if (!isDockerDistributionImageMissingError(e)) {
+                throw e;
+            }
 
             if (
                 analysis.distribution_status === ProcessStatus.STARTED ||
                 analysis.distribution_status === ProcessStatus.STARTING
             ) {
-                // todo: if started & starting trigger is to far back in time, status should also be failed.
-                status = analysis.build_status;
+                // an in-progress distribution refreshes the entity via progress events;
+                // a long-untouched one is orphaned (e.g. worker died) and recoverable as FAILED.
+                status = isAnalysisProcessStale(analysis.updated_at) ?
+                    ProcessStatus.FAILED :
+                    analysis.distribution_status;
             } else {
                 status = ProcessStatus.FAILED;
             }
-
-            await context.handle(
-                AnalysisDistributorEvent.CHECK_FINISHED,
-                {
-                    ...value,
-                    status,
-                },
-            );
-
-            return;
         }
 
         // -----------------------------------------------------------------------------------
@@ -158,7 +171,7 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
             AnalysisDistributorEvent.CHECK_FINISHED,
             {
                 ...value,
-                status: ProcessStatus.EXECUTED,
+                status,
             },
         );
     }

@@ -7,6 +7,7 @@
 <script lang="ts">
 import { injectHTTPClient } from '@authup/client-web-kit';
 import type { User } from '@authup/core-kit';
+import { FDisplayName } from '@privateaim/client-vue';
 import type { NavigationItem } from '@vuecs/navigation';
 import { isClientErrorWithStatusCode } from 'hapic';
 import type { Ref } from 'vue';
@@ -21,6 +22,7 @@ import {
 import { LayoutKey, LayoutNavigationID } from '../../config/layout';
 
 export default defineNuxtComponent({
+    components: { FDisplayName },
     async setup() {
         definePageMeta({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
@@ -59,7 +61,10 @@ export default defineNuxtComponent({
     <div class="">
         <div class="m-b-10">
             <h4 class="title">
-                {{ user.name }}
+                <FDisplayName
+                    :name="user.name"
+                    :display-name="user.display_name"
+                />
                 <span class="sub-title">Profil</span>
             </h4>
         </div>

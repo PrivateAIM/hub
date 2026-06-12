@@ -47,7 +47,10 @@ export async function handleAnalysisDistributorEvent(
             }
             break;
         }
-        case AnalysisDistributorEvent.CHECK_FAILED:
+        case AnalysisDistributorEvent.CHECK_FAILED: {
+            // failure of the check itself says nothing about the distribution outcome
+            return;
+        }
         case AnalysisDistributorEvent.EXECUTION_FAILED: {
             entity.distribution_status = ProcessStatus.FAILED;
             break;
@@ -59,13 +62,17 @@ export async function handleAnalysisDistributorEvent(
         }
         case AnalysisDistributorEvent.CHECK_FINISHED: {
             const temp = value as AnalysisDistributorCheckFinishedPayload;
-            if (temp.status) {
-                entity.distribution_progress = temp.status === ProcessStatus.EXECUTED ?
-                    100 :
-                    0;
+            if (!temp.status) {
+                return;
             }
 
-            entity.distribution_status = temp.status || null;
+            entity.distribution_status = temp.status;
+
+            if (temp.status === ProcessStatus.EXECUTED) {
+                entity.distribution_progress = 100;
+            } else if (temp.status === ProcessStatus.FAILED) {
+                entity.distribution_progress = 0;
+            }
         }
     }
 

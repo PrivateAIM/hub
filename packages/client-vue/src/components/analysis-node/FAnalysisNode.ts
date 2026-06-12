@@ -20,10 +20,11 @@ import {
 } from 'vue';
 import type { PropType, VNodeChild } from 'vue';
 import {
-    createEntityManager, 
-    defineEntityManagerEvents, 
+    createEntityManager,
+    defineEntityManagerEvents,
     injectCoreHTTPClient,
 } from '../../core';
+import FDisplayName from '../FDisplayName';
 
 enum Direction {
     IN = 'in',
@@ -120,8 +121,10 @@ export default defineComponent({
                 ) {
                     if (props.target === Target.ANALYSIS) {
                         return h('div', [
-                            manager.data.value?.analysis.display_name ||
-                            manager.data.value?.analysis.name,
+                            h(FDisplayName, {
+                                name: manager.data.value?.analysis.name,
+                                displayName: manager.data.value?.analysis.display_name,
+                            }),
                         ]);
                     }
                     if (props.target === Target.NODE) {

@@ -6,6 +6,7 @@
   -->
 <script lang="ts">
 import { injectStore, storeToRefs } from '@authup/client-web-kit';
+import { FDisplayName } from '@privateaim/client-vue';
 import { VCGravatar } from '@vuecs/gravatar';
 import { VCNavItems } from '@vuecs/navigation';
 import { ref, useColorMode } from '#imports';
@@ -15,6 +16,7 @@ import Logo from '../svg/Logo';
 
 export default defineNuxtComponent({
     components: {
+        FDisplayName,
         Logo,
         VCGravatar,
         VCNavItems,
@@ -118,7 +120,12 @@ export default defineNuxtComponent({
                                     :to="'/users/'+user.id"
                                 >
                                     <VCGravatar :email="user.email ? user.email : ''" />
-                                    <span>{{ user.display_name ? user.display_name : user.name }}</span>
+                                    <span>
+                                        <FDisplayName
+                                            :name="user.name"
+                                            :display-name="user.display_name"
+                                        />
+                                    </span>
                                 </nuxt-link>
                             </li>
                             <li class="vc-nav-item">

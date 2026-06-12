@@ -19,11 +19,17 @@ import {
     usePermissionCheck,
 } from '@authup/client-web-kit';
 import type { BuildInput } from 'rapiq';
-import { FPagination, FSearch, FTitle } from '@privateaim/client-vue';
+import {
+    FDisplayName, 
+    FPagination, 
+    FSearch, 
+    FTitle,
+} from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
 
 export default defineNuxtComponent({
     components: {
+        FDisplayName,
         FPagination,
         FSearch,
         FTitle,
@@ -104,6 +110,12 @@ export default defineNuxtComponent({
                 :columns="columns"
                 :busy="props.busy"
             >
+                <template #cell-name="{ row }: { row: any }">
+                    <FDisplayName
+                        :name="row.name"
+                        :display-name="row.display_name"
+                    />
+                </template>
                 <template #cell-created_at="{ row }: { row: any }">
                     <VCTimeago :datetime="row.created_at" />
                 </template>

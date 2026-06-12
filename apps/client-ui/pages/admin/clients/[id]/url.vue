@@ -1,6 +1,7 @@
 <script lang="ts">
 import { AClientScopes } from '@authup/client-web-kit';
 import type { Client, ClientScope } from '@authup/core-kit';
+import { FDisplayName } from '@privateaim/client-vue';
 import {
     VCFormCheckbox,
     VCFormInput,
@@ -13,6 +14,7 @@ import { defineNuxtComponent } from '#imports';
 
 export default defineNuxtComponent({
     components: {
+        FDisplayName,
         VCFormInput,
         VCFormCheckbox,
         AClientScopes,
@@ -91,7 +93,10 @@ export default defineNuxtComponent({
                 >
                     <template #label="iProps">
                         <label :for="iProps.id">
-                            {{ props.data.scope.name }}
+                            <FDisplayName
+                                :name="props.data.scope.name"
+                                :display-name="props.data.scope.display_name"
+                            />
                         </label>
                     </template>
                 </VCFormCheckbox>

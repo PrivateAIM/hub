@@ -7,9 +7,10 @@
 <script lang="ts">
 import { AIdentityProviders, injectHTTPClient } from '@authup/client-web-kit';
 import {
-    FPagination, 
-    FSearch, 
-    FTitle, 
+    FDisplayName,
+    FPagination,
+    FSearch,
+    FTitle,
     LoginForm,
 } from '@privateaim/client-vue';
 import {
@@ -26,6 +27,7 @@ import { LayoutKey, LayoutNavigationID } from '../config/layout';
 
 export default defineNuxtComponent({
     components: {
+        FDisplayName,
         LoginForm,
         ListPagination: FPagination,
         ListSearch: FSearch,
@@ -111,14 +113,22 @@ export default defineNuxtComponent({
                     </template>
                     <template #item="props">
                         <div>
-                            <strong>{{ props.data.name }}</strong>
+                            <strong>
+                                <FDisplayName
+                                    :name="props.data.name"
+                                    :display-name="props.data.display_name"
+                                />
+                            </strong>
                         </div>
                         <div class="ms-auto">
                             <a
                                 :href="buildIdentityProviderURL(props.data.id)"
                                 class="btn btn-primary btn-xs"
                             >
-                                {{ props.data.name }}
+                                <FDisplayName
+                                    :name="props.data.name"
+                                    :display-name="props.data.display_name"
+                                />
                             </a>
                         </div>
                     </template>

@@ -9,6 +9,7 @@
 import { VCTimeago } from '@vuecs/timeago';
 import type { TableColumn } from '@vuecs/table';
 import { REALM_MASTER_NAME, type Realm } from '@authup/core-kit';
+import { FDisplayName } from '@privateaim/client-vue';
 import { PermissionName } from '@authup/core-kit';
 import {
     AEntityDelete,
@@ -25,6 +26,7 @@ import { defineNuxtComponent } from '#imports';
 
 export default defineNuxtComponent({
     components: {
+        FDisplayName,
         ATitle,
         APagination,
         ASearch,
@@ -111,6 +113,12 @@ export default defineNuxtComponent({
                 :columns="columns"
                 :busy="props.busy"
             >
+                <template #cell-name="{ row }: { row: any }">
+                    <FDisplayName
+                        :name="row.name"
+                        :display-name="row.display_name"
+                    />
+                </template>
                 <template #cell-created_at="{ row }: { row: any }">
                     <VCTimeago :datetime="row.created_at" />
                 </template>

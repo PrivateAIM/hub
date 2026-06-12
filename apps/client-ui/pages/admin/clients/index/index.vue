@@ -14,6 +14,7 @@ import {
 } from '@authup/client-web-kit';
 import type { Client } from '@authup/core-kit';
 import { PermissionName } from '@authup/core-kit';
+import { FDisplayName } from '@privateaim/client-vue';
 
 import type { BuildInput } from 'rapiq';
 import { defineComponent } from 'vue';
@@ -26,6 +27,7 @@ export default defineComponent({
         AEntityDelete,
         AClients,
         AUser,
+        FDisplayName,
     },
     emits: ['deleted'],
     setup(props, { emit }) {
@@ -120,6 +122,12 @@ export default defineComponent({
                 :columns="columns"
                 :busy="props.busy"
             >
+                <template #cell-name="{ row }: { row: any }">
+                    <FDisplayName
+                        :name="row.name"
+                        :display-name="row.display_name"
+                    />
+                </template>
                 <template #cell-active="{ row }: { row: any }">
                     <VCIcon
                         :name="row.active ? 'fa6-solid:check' : 'fa6-solid:xmark'"
@@ -148,7 +156,10 @@ export default defineComponent({
                     <template v-if="row.user_id">
                         <AUser :entity-id="row.user_id">
                             <template #default="user">
-                                {{ user.data.name }}
+                                <FDisplayName
+                                    :name="user.data.name"
+                                    :display-name="user.data.display_name"
+                                />
                             </template>
                             <template #error>
                                 -

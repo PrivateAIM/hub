@@ -1,5 +1,58 @@
 # Changelog
 
+## [0.10.3](https://github.com/PrivateAIM/hub/compare/v0.10.2...v0.10.3) (2026-06-12)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.10.2 to ^0.10.3
+    * @privateaim/core-realtime-kit bumped from ^0.10.2 to ^0.10.3
+    * @privateaim/kit bumped from ^0.10.2 to ^0.10.3
+    * @privateaim/server-core-worker-kit bumped from ^0.10.2 to ^0.10.3
+    * @privateaim/server-db-kit bumped from ^0.10.2 to ^0.10.3
+    * @privateaim/server-http-kit bumped from ^0.10.2 to ^0.10.3
+    * @privateaim/server-kit bumped from ^0.10.2 to ^0.10.3
+    * @privateaim/server-realtime-kit bumped from ^0.10.2 to ^0.10.3
+    * @privateaim/server-storage-kit bumped from ^0.10.2 to ^0.10.3
+    * @privateaim/server-telemetry bumped from ^0.10.2 to ^0.10.3
+    * @privateaim/server-telemetry-kit bumped from ^0.10.2 to ^0.10.3
+    * @privateaim/storage-kit bumped from ^0.10.2 to ^0.10.3
+    * @privateaim/telemetry-kit bumped from ^0.10.2 to ^0.10.3
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.10.2 to ^0.10.3
+    * @privateaim/server-test-kit bumped from ^0.10.2 to ^0.10.3
+
+## [0.10.2](https://github.com/PrivateAIM/hub/compare/v0.10.1...v0.10.2) (2026-06-11)
+
+
+### Bug Fixes
+
+* **analysis:** make build & distribution check a reliable reconciliation path ([#1669](https://github.com/PrivateAIM/hub/issues/1669)) ([133704b](https://github.com/PrivateAIM/hub/commit/133704b6986e183d742dc9da899c276a0917b47e))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.10.1 to ^0.10.2
+    * @privateaim/core-realtime-kit bumped from ^0.10.1 to ^0.10.2
+    * @privateaim/kit bumped from ^0.10.1 to ^0.10.2
+    * @privateaim/server-core-worker-kit bumped from ^0.10.1 to ^0.10.2
+    * @privateaim/server-db-kit bumped from ^0.10.1 to ^0.10.2
+    * @privateaim/server-http-kit bumped from ^0.10.1 to ^0.10.2
+    * @privateaim/server-kit bumped from ^0.10.1 to ^0.10.2
+    * @privateaim/server-realtime-kit bumped from ^0.10.1 to ^0.10.2
+    * @privateaim/server-storage-kit bumped from ^0.10.1 to ^0.10.2
+    * @privateaim/server-telemetry bumped from ^0.10.1 to ^0.10.2
+    * @privateaim/server-telemetry-kit bumped from ^0.10.1 to ^0.10.2
+    * @privateaim/storage-kit bumped from ^0.10.1 to ^0.10.2
+    * @privateaim/telemetry-kit bumped from ^0.10.1 to ^0.10.2
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.10.1 to ^0.10.2
+    * @privateaim/server-test-kit bumped from ^0.10.1 to ^0.10.2
+
 ## [0.10.1](https://github.com/PrivateAIM/hub/compare/v0.10.0...v0.10.1) (2026-06-02)
 
 

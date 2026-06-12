@@ -2,6 +2,7 @@
 import { injectHTTPClient } from '@authup/client-web-kit';
 import type { Client } from '@authup/core-kit';
 import { PermissionName } from '@authup/core-kit';
+import { FDisplayName } from '@privateaim/client-vue';
 import { extendObject } from '@authup/kit';
 import type { NavigationItem } from '@vuecs/navigation';
 import { type Ref, defineComponent } from 'vue';
@@ -16,6 +17,7 @@ import {
 import { LayoutKey } from '../../../config/layout';
 
 export default defineComponent({
+    components: { FDisplayName },
     async setup() {
         definePageMeta({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
@@ -103,7 +105,10 @@ export default defineComponent({
             <VCIcon
                 name="fa6-solid:ghost"
                 class="me-1"
-            /> {{ entity.name }}
+            /> <FDisplayName
+                :name="entity.name"
+                :display-name="entity.display_name"
+            />
             <span class="sub-title ms-1">Details</span>
         </h1>
         <div class="mb-2">

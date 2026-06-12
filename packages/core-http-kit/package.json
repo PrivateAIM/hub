@@ -1,7 +1,7 @@
 {
     "name": "@privateaim/core-http-kit",
     "type": "module",
-    "version": "0.10.1",
+    "version": "0.10.3",
     "license": "Apache-2.0",
     "description": "",
     "module": "./dist/index.mjs",
@@ -20,19 +20,21 @@
     },
     "scripts": {
         "build": "rimraf ./dist && tsdown",
-        "build-watch": "rimraf ./dist && tsc -p tsconfig.build.json --watch"
+        "build-watch": "rimraf ./dist && tsc -p tsconfig.build.json --watch",
+        "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts"
     },
     "devDependencies": {
         "@authup/kit": "^1.0.0-beta.46",
-        "@privateaim/core-kit": "^0.10.1",
-        "@privateaim/telemetry-kit": "^0.10.1",
+        "@privateaim/core-kit": "^0.10.3",
+        "@privateaim/telemetry-kit": "^0.10.3",
         "hapic": "^2.8.2",
-        "rapiq": "^0.9.0"
+        "rapiq": "^0.9.0",
+        "vitest": "^4.1.7"
     },
     "peerDependencies": {
         "@authup/kit": "^1.0.0-beta.46",
-        "@privateaim/core-kit": "^0.10.1",
-        "@privateaim/telemetry-kit": "^0.10.1",
+        "@privateaim/core-kit": "^0.10.3",
+        "@privateaim/telemetry-kit": "^0.10.3",
         "hapic": "^2.8.2",
         "rapiq": "^0.9.0"
     },

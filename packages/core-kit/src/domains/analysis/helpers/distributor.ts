@@ -50,6 +50,13 @@ export class AnalysisDistributorCommandChecker {
             throw new AnalysisError('The analysis build process has not been finished.');
         }
 
+        if (!entity.distribution_status) {
+            throw new AnalysisError('The analysis distribution process has not been initialized.');
+        }
+
+        // EXECUTED is checkable on purpose: it reconciles the recorded state
+        // with the registry after data loss (images gone -> FAILED -> redistributable).
+
         // todo: check time
     }
 }

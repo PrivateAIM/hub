@@ -593,6 +593,7 @@ describe('AnalysisService', () => {
             analysisRepository.seed(createFullAnalysis({
                 configuration_locked: true,
                 build_status: ProcessStatus.EXECUTED,
+                distribution_status: ProcessStatus.STARTED,
             }));
 
             await service.executeCommand(

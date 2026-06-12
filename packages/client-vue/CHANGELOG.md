@@ -1,5 +1,50 @@
 # Changelog
 
+## [0.10.3](https://github.com/PrivateAIM/hub/compare/v0.10.2...v0.10.3) (2026-06-12)
+
+
+### Bug Fixes
+
+* **client:** entrypoint pagination + display_name in views ([#1671](https://github.com/PrivateAIM/hub/issues/1671)) ([474aa48](https://github.com/PrivateAIM/hub/commit/474aa487cf8ee09f899f820387664e77be42645f))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.10.2 to ^0.10.3
+    * @privateaim/core-kit bumped from ^0.10.2 to ^0.10.3
+    * @privateaim/core-realtime-kit bumped from ^0.10.2 to ^0.10.3
+    * @privateaim/kit bumped from ^0.10.2 to ^0.10.3
+    * @privateaim/storage-kit bumped from ^0.10.2 to ^0.10.3
+    * @privateaim/telemetry-kit bumped from ^0.10.2 to ^0.10.3
+  * peerDependencies
+    * @privateaim/core-http-kit bumped from ^0.10.2 to ^0.10.3
+    * @privateaim/core-kit bumped from ^0.10.2 to ^0.10.3
+    * @privateaim/kit bumped from ^0.10.2 to ^0.10.3
+    * @privateaim/storage-kit bumped from ^0.10.2 to ^0.10.3
+    * @privateaim/telemetry-kit bumped from ^0.10.2 to ^0.10.3
+
+## [0.10.2](https://github.com/PrivateAIM/hub/compare/v0.10.1...v0.10.2) (2026-06-11)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.10.1 to ^0.10.2
+    * @privateaim/core-kit bumped from ^0.10.1 to ^0.10.2
+    * @privateaim/core-realtime-kit bumped from ^0.10.1 to ^0.10.2
+    * @privateaim/kit bumped from ^0.10.1 to ^0.10.2
+    * @privateaim/storage-kit bumped from ^0.10.1 to ^0.10.2
+    * @privateaim/telemetry-kit bumped from ^0.10.1 to ^0.10.2
+  * peerDependencies
+    * @privateaim/core-http-kit bumped from ^0.10.1 to ^0.10.2
+    * @privateaim/core-kit bumped from ^0.10.1 to ^0.10.2
+    * @privateaim/kit bumped from ^0.10.1 to ^0.10.2
+    * @privateaim/storage-kit bumped from ^0.10.1 to ^0.10.2
+    * @privateaim/telemetry-kit bumped from ^0.10.1 to ^0.10.2
+
 ## [0.10.1](https://github.com/PrivateAIM/hub/compare/v0.10.0...v0.10.1) (2026-06-02)
 
 

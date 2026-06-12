@@ -19,6 +19,7 @@ import {
 import { LogFlag } from '@privateaim/telemetry-kit';
 import type { ComponentHandler, ComponentHandlerContext, Logger } from '@privateaim/server-kit';
 import type { Client as CoreClient } from '@privateaim/core-http-kit';
+import { getManyAll } from '@privateaim/core-http-kit';
 import type { APIClient as StorageClient } from '@privateaim/storage-kit';
 import type { Client as DockerClient, ModemStreamWaitOptions  } from 'docken';
 import { waitForStream } from 'docken';
@@ -279,8 +280,10 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
             throw BuilderError.entrypointNotFound();
         }
 
-        const { data: analysisBucketFiles } = await this.coreClient
-            .analysisBucketFile.getMany({ filters: { analysis_bucket_id: analysisBucket.id } });
+        const analysisBucketFiles = await getManyAll((page) => this.coreClient.analysisBucketFile.getMany({
+            filters: { analysis_bucket_id: analysisBucket.id },
+            page,
+        }));
 
         const webStream = await this.storageClient.bucket.stream(analysisBucket.bucket_id);
         const nodeStream = stream.Readable.fromWeb(webStream as any);
