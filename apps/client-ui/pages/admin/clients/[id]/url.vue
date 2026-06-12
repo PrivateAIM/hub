@@ -1,8 +1,9 @@
 <script lang="ts">
 import { AClientScopes } from '@authup/client-web-kit';
 import type { Client, ClientScope } from '@authup/core-kit';
+import { FDisplayName } from '@privateaim/client-vue';
 import {
-    VCFormInput, 
+    VCFormInput,
     VCFormInputCheckbox,
 } from '@vuecs/form-controls';
 import type { BuildInput } from 'rapiq';
@@ -13,9 +14,10 @@ import { defineNuxtComponent } from '#imports';
 
 export default defineNuxtComponent({
     components: {
-        VCFormInput, 
-        VCFormInputCheckbox, 
-        AClientScopes, 
+        FDisplayName,
+        VCFormInput,
+        VCFormInputCheckbox,
+        AClientScopes,
     },
     props: {
         entity: {
@@ -91,7 +93,10 @@ export default defineNuxtComponent({
                 >
                     <template #label="iProps">
                         <label :for="iProps.id">
-                            {{ props.data.scope.name }}
+                            <FDisplayName
+                                :name="props.data.scope.name"
+                                :display-name="props.data.scope.display_name"
+                            />
                         </label>
                     </template>
                 </VCFormInputCheckbox>

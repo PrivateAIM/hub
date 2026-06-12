@@ -7,9 +7,10 @@
 <script lang="ts">
 import { ARealm } from '@authup/client-web-kit';
 import {
-    FMasterImage, 
-    FProjectCreator, 
-    FProjectNodeApprovalStatus, 
+    FDisplayName,
+    FMasterImage,
+    FProjectCreator,
+    FProjectNodeApprovalStatus,
     FProjectNodes,
 } from '@privateaim/client-vue';
 import type { Project, ProjectNode } from '@privateaim/core-kit';
@@ -20,6 +21,7 @@ import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 
 export default defineNuxtComponent({
     components: {
+        FDisplayName,
         FProjectCreator,
         ARealm,
         FMasterImage,
@@ -104,7 +106,10 @@ export default defineNuxtComponent({
                         <div class="h6">
                             <ARealm :entity-id="entity.realm_id">
                                 <template #default="{ data }">
-                                    {{ data.name }}
+                                    <FDisplayName
+                                        :name="data.name"
+                                        :display-name="data.display_name"
+                                    />
                                 </template>
                                 <template #error>
                                     {{ entity.realm_id }}

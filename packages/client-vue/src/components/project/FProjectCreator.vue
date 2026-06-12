@@ -9,11 +9,13 @@ import { ARobot, AUser } from '@authup/client-web-kit';
 import type { Project } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
+import FDisplayName from '../FDisplayName';
 
 export default defineComponent({
     components: {
         AUser,
         ARobot,
+        FDisplayName,
     },
     props: {
         entity: {
@@ -32,7 +34,10 @@ export default defineComponent({
                         name="default"
                         :data="data"
                     >
-                        {{ data.name }}
+                        <FDisplayName
+                            :name="data.name"
+                            :display-name="data.display_name"
+                        />
                     </slot>
                 </template>
                 <template #error="error">
@@ -52,7 +57,10 @@ export default defineComponent({
                         name="default"
                         :data="data"
                     >
-                        {{ data.name }}
+                        <FDisplayName
+                            :name="data.name"
+                            :display-name="data.display_name"
+                        />
                     </slot>
                 </template>
                 <template #error="error">

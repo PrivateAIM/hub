@@ -9,6 +9,7 @@
 import { injectHTTPClient } from '@authup/client-web-kit';
 import type { User } from '@authup/core-kit';
 import { PermissionName } from '@authup/core-kit';
+import { FDisplayName } from '@privateaim/client-vue';
 import { defineComponent, ref } from 'vue';
 import type { Ref } from 'vue';
 import {
@@ -25,7 +26,7 @@ import { LayoutKey, LayoutNavigationID } from '~/config/layout';
 import DomainEntityNav from '../../../components/DomainEntityNav';
 
 export default defineComponent({
-    components: { DomainEntityNav },
+    components: { DomainEntityNav, FDisplayName },
     async setup() {
         definePageMeta({
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
@@ -93,7 +94,10 @@ export default defineComponent({
     <div>
         <h1 class="title no-border mb-3">
             <i class="fa fa-user me-1" />
-            {{ entity.name }}
+            <FDisplayName
+                :name="entity.name"
+                :display-name="entity.display_name"
+            />
             <span class="sub-title ms-1">
                 Details
             </span>

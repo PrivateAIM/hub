@@ -21,11 +21,13 @@ import {
 import type { Permission } from '@authup/core-kit';
 import { PermissionName } from '@authup/core-kit';
 
+import { FDisplayName } from '@privateaim/client-vue';
 import type { BuildInput } from 'rapiq';
 import { defineNuxtComponent } from '#app';
 
 export default defineNuxtComponent({
     components: {
+        FDisplayName,
         ATitle,
         APagination,
         ASearch,
@@ -123,6 +125,12 @@ export default defineNuxtComponent({
                 head-variant="'dark'"
                 outlined
             >
+                <template #cell(name)="data">
+                    <FDisplayName
+                        :name="data.item.name"
+                        :display-name="data.item.display_name"
+                    />
+                </template>
                 <template #cell(built_in)="data">
                     <i
                         class="fas"

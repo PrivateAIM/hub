@@ -9,6 +9,7 @@
 import { injectHTTPClient } from '@authup/client-web-kit';
 import type { Realm } from '@authup/core-kit';
 import { PermissionName } from '@authup/core-kit';
+import { FDisplayName } from '@privateaim/client-vue';
 
 import { defineComponent, ref } from 'vue';
 import type { Ref } from 'vue';
@@ -25,6 +26,7 @@ import { LayoutKey, LayoutNavigationID } from '~/config/layout';
 import { updateObjectProperties } from '../../../utils';
 
 export default defineComponent({
+    components: { FDisplayName },
     async setup() {
         definePageMeta({
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
@@ -79,7 +81,10 @@ export default defineComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            <i class="fa-solid fa-building me-1" /> {{ entity.name }}
+            <i class="fa-solid fa-building me-1" /> <FDisplayName
+                :name="entity.name"
+                :display-name="entity.display_name"
+            />
             <span class="sub-title ms-1">Details</span>
         </h1>
         <div class="mb-2">

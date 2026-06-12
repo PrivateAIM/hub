@@ -19,11 +19,13 @@ import {
     storeToRefs,
     usePermissionCheck,
 } from '@authup/client-web-kit';
+import { FDisplayName } from '@privateaim/client-vue';
 import type { BuildInput } from 'rapiq';
 import { defineNuxtComponent } from '#imports';
 
 export default defineNuxtComponent({
     components: {
+        FDisplayName,
         ATitle,
         APagination,
         ASearch,
@@ -119,6 +121,12 @@ export default defineNuxtComponent({
                 :busy="props.busy"
                 outlined
             >
+                <template #cell(name)="data">
+                    <FDisplayName
+                        :name="data.item.name"
+                        :display-name="data.item.display_name"
+                    />
+                </template>
                 <template #cell(built_in)="data">
                     <i
                         class="fas"
