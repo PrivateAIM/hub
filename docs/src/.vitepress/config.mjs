@@ -153,7 +153,7 @@ export default defineConfig({
             text: 'Edit this page on GitHub',
         },
         footer: {
-            message: 'Released under the Apache-2.0 License.',
+            message: 'Released under the Apache-2.0 License. Built with <a href="https://authup.org" target="_blank" rel="noopener">authup</a>, <a href="https://vuecs.dev" target="_blank" rel="noopener">vuecs</a>, <a href="https://routup.dev" target="_blank" rel="noopener">routup</a>, <a href="https://validup.tada5hi.net" target="_blank" rel="noopener">validup</a> &amp; <a href="https://ilingo.tada5hi.net" target="_blank" rel="noopener">ilingo</a>.',
             copyright: 'Copyright 2024-present PrivateAIM',
         },
     },
