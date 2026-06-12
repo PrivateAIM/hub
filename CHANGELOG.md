@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.3](https://github.com/PrivateAIM/hub/compare/v0.10.2...v0.10.3) (2026-06-12)
+
+
+### Bug Fixes
+
+* **client:** entrypoint pagination + display_name in views ([#1671](https://github.com/PrivateAIM/hub/issues/1671)) ([474aa48](https://github.com/PrivateAIM/hub/commit/474aa487cf8ee09f899f820387664e77be42645f))
+
 ## [0.10.2](https://github.com/PrivateAIM/hub/compare/v0.10.1...v0.10.2) (2026-06-11)
 
 
