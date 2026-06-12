@@ -11,9 +11,10 @@ import {
     DomainType,
 } from '@privateaim/core-kit';
 import type { SlotsType } from 'vue';
-import { defineComponent } from 'vue';
+import { defineComponent, h } from 'vue';
 import type { ListSlotsType } from '../../core';
 import { createList, defineListEvents, defineListProps } from '../../core';
+import FDisplayName from '../FDisplayName';
 
 const FProjects = defineComponent({
     props: {
@@ -23,8 +24,8 @@ const FProjects = defineComponent({
             default: undefined,
         },
     },
-    slots: Object as SlotsType<ListSlotsType<Project>>,
     emits: defineListEvents<Project>(),
+    slots: Object as SlotsType<ListSlotsType<Project>>,
     setup(props, setup) {
         const { render, setDefaults } = createList({
             type: `${DomainType.PROJECT}`,
@@ -32,7 +33,26 @@ const FProjects = defineComponent({
             setup,
         });
 
-        setDefaults({ noMore: { content: 'No more projects available...' } });
+        setDefaults({
+            item: {
+                content(item, itemProps, slotContent) {
+                    if (slotContent.slot) {
+                        return slotContent.slot;
+                    }
+
+                    return [
+                        slotContent.icon,
+                        h(FDisplayName, {
+                            name: item.name,
+                            displayName: item.display_name,
+                        }),
+                        slotContent.actions,
+                    ];
+                },
+            },
+
+            noMore: { content: 'No more projects available...' },
+        });
 
         return () => render();
     },

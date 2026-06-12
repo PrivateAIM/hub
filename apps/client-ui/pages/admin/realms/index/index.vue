@@ -9,6 +9,7 @@
 import { VCTimeago } from '@vuecs/timeago';
 import { BTable } from 'bootstrap-vue-next';
 import { REALM_MASTER_NAME, type Realm } from '@authup/core-kit';
+import { FDisplayName } from '@privateaim/client-vue';
 import { PermissionName } from '@authup/core-kit';
 import {
     AEntityDelete, 
@@ -25,6 +26,7 @@ import { defineNuxtComponent } from '#imports';
 
 export default defineNuxtComponent({
     components: {
+        FDisplayName,
         ATitle,
         APagination,
         ASearch,
@@ -114,6 +116,12 @@ export default defineNuxtComponent({
                 head-variant="'dark'"
                 outlined
             >
+                <template #cell(name)="data">
+                    <FDisplayName
+                        :name="data.item.name"
+                        :display-name="data.item.display_name"
+                    />
+                </template>
                 <template #cell(created_at)="data">
                     <VCTimeago :datetime="data.item.created_at" />
                 </template>

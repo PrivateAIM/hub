@@ -26,6 +26,7 @@ import {
     defineListEvents, 
     defineListProps,
 } from '../../core';
+import FDisplayName from '../FDisplayName';
 import type { DomainDetailsSlotProps } from '../type';
 import FProjectNode from './FProjectNode';
 
@@ -59,8 +60,8 @@ export default defineComponent({
             default: false,
         },
     },
-    slots: Object as SlotsType<ListSlotsType<ProjectNode>>,
     emits: defineListEvents<ProjectNode>(),
+    slots: Object as SlotsType<ListSlotsType<ProjectNode>>,
     async setup(props, ctx) {
         const source = computed(() => (props.target === DomainType.NODE ?
             DomainType.PROJECT :
@@ -234,8 +235,10 @@ export default defineComponent({
                                 slotProps.data.project
                             ) {
                                 text = h('div', [
-                                    slotProps.data.project.display_name ||
-                                    slotProps.data.project.name,
+                                    h(FDisplayName, {
+                                        name: slotProps.data.project.name,
+                                        displayName: slotProps.data.project.display_name,
+                                    }),
                                 ]);
                             } else {
                                 text = h('div', [slotProps.data.id]);

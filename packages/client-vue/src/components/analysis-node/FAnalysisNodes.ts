@@ -24,6 +24,7 @@ import {
     defineListEvents, 
     defineListProps,
 } from '../../core';
+import FDisplayName from '../FDisplayName';
 import type { DomainDetailsSlotProps } from '../type';
 import FAnalysisNode from './FAnalysisNode';
 
@@ -216,8 +217,10 @@ export default defineComponent({
                                 slotProps.data.analysis
                             ) {
                                 text = h('div', [
-                                    slotProps.data.analysis.display_name ||
-                                    slotProps.data.analysis.name,
+                                    h(FDisplayName, {
+                                        name: slotProps.data.analysis.name,
+                                        displayName: slotProps.data.analysis.display_name,
+                                    }),
                                 ]);
                             } else {
                                 text = h('div', [slotProps.data.id]);
