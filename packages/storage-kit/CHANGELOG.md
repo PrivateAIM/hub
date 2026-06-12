@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.10.3](https://github.com/PrivateAIM/hub/compare/v0.10.2...v0.10.3) (2026-06-12)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.10.2 to ^0.10.3
+  * peerDependencies
+    * @privateaim/kit bumped from ^0.10.2 to ^0.10.3
+
 ## [0.10.2](https://github.com/PrivateAIM/hub/compare/v0.10.1...v0.10.2) (2026-06-11)
 
 
