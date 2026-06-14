@@ -58,13 +58,13 @@ export default defineNuxtConfig({
     css: [
         // App-local Tailwind v4 entry — `@import`s @privateaim/client-vue-theme
         // (which transitively pulls in @authup/client-web-kit-theme +
-        // tailwindcss + @vuecs/design + @vuecs/theme-tailwind + every
-        // migrated hub chrome stylesheet) and adds `@source` scopes for
-        // this app's template tree + the client-vue hyperscript .ts tree
-        // + per-app nested vuecs deps. The theme package absorbed all the
-        // former local assets/css/* project stylesheets.
+        // tailwindcss + @vuecs/design + @vuecs/theme-tailwind + the authup
+        // kit-component styles + every migrated hub chrome stylesheet) and
+        // adds `@source` scopes for this app's template tree + the
+        // client-vue hyperscript .ts tree + per-app nested vuecs deps. The
+        // theme package absorbed all the former local assets/css/* project
+        // stylesheets.
         '@/assets/css/tailwind.css',
-        '@authup/client-web-kit/dist/style.css',
         '@/../../packages/client-vue/dist/style.css',
         '@/assets/css/fonts.css',
     ],

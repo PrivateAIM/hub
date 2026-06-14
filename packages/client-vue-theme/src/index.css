@@ -15,27 +15,25 @@
  */
 
 /*
- * Kit-theme CSS cascade — inlined.
+ * Kit-theme CSS cascade — consumed from npm.
  *
- * Upstream packaging bug: @authup/client-web-kit-theme@1.0.0-beta.44
- * ships `files: ["dist", "src/index.css"]` but its `src/index.css`
- * `@import`s `./styles/list.css` + `./styles/form-validation.css`,
- * which are NOT in the published tarball. authup's own apps never hit
- * this because they alias the workspace `src`; an external consumer
- * resolving the published `style` export fails with
- * "Can't resolve './styles/list.css'". Until a fixed beta ships, hub
- * reproduces the kit theme's CSS cascade here and vendors the two
- * kit-component stylesheets (styles/kit-*.css). The JS theme
- * (`clientWebKitTheme()`) is still consumed from npm — see index.ts +
- * plugins/vuecs.ts.
+ * `@authup/client-web-kit-theme` 1.0.0-beta.48 fixed the beta.44
+ * packaging bug (published `src/index.css` imported stylesheets missing
+ * from the tarball) that previously forced hub to inline this cascade.
+ * The published `index.css` brings tailwindcss + @vuecs/design +
+ * @vuecs/theme-tailwind, the authup kit-component styles
+ * (tokens/picker/auth/realm/login — formerly
+ * `@authup/client-web-kit/dist/style.css`, which beta.48 no longer
+ * ships), the `.dark` class `@custom-variant`, and `@source` scopes for
+ * the kit's own class strings.
+ *
+ * The two stylesheets under styles/kit-*.css stay vendored: upstream
+ * dropped list.css / form-validation.css from the theme entirely, and
+ * hub's copies carry vc-* class-name deltas on top.
  */
-@layer theme, vuecs, base, components, utilities;
+@layer theme, vuecs, authup, base, components, utilities;
 
-@import "tailwindcss";
-@import "@vuecs/design";
-@import "@vuecs/theme-tailwind";
-
-@custom-variant dark (&:where(.dark, .dark *));
+@import "@authup/client-web-kit-theme/index.css";
 
 /*
  * Only the theme's own sources are scanned here. Dependency trees
@@ -394,7 +392,12 @@
        `bg-*` utility on the markup and its width from an inline style; this
        only restores the structure Bootstrap used to provide. */
     .progress {
-        @apply flex h-4 overflow-hidden rounded-md bg-bg-muted text-xs;
+        /* `bg-bg` (the base content surface) + a border, NOT `bg-bg-muted`:
+           the track is mostly consumed inside `.card-grey` whose `--card-bg`
+           IS `bg-bg-muted`, so a muted track vanished into the card. The
+           darker base fill reads as a recessed groove and the border keeps
+           the shape detectable on any surface. */
+        @apply flex h-4 overflow-hidden rounded-md border border-border bg-bg text-xs;
     }
     .progress-bar {
         @apply flex flex-col justify-center overflow-hidden whitespace-nowrap

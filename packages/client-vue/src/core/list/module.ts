@@ -6,7 +6,7 @@
  */
 
 import { hasOwnProperty } from '@privateaim/kit';
-import type { EntityAPI } from '@authup/core-http-kit';
+import type { IEntityAPI } from '@authup/core-http-kit';
 import type { DomainTypeMap } from '@privateaim/core-kit';
 import {
     VCList,
@@ -86,7 +86,7 @@ export function createListRaw<
 
     const client = injectCoreHTTPClient();
 
-    let domainAPI : EntityAPI<Entity<RECORD>> | undefined;
+    let domainAPI : IEntityAPI<Entity<RECORD>> | undefined;
     if (hasOwnProperty(client, context.type)) {
         domainAPI = client[context.type] as any;
     }
@@ -373,9 +373,21 @@ export function createListRaw<
                                 ) :
                                 undefined;
 
+                            // Content callbacks receive the sections and may
+                            // place the actions block inside their own layout
+                            // (FProjects, FProjectNodes, FAnalysisNodes) — or
+                            // ignore it entirely (FAnalyses). The getter records
+                            // which happened, so the auto-append below only
+                            // fires when the callback did NOT consume it;
+                            // appending unconditionally rendered the block
+                            // twice per row.
+                            let actionsConsumed = false;
                             const sections: ListItemContentSections = {
                                 slot: itemSlot ? itemSlot(itemSlotProps) : undefined,
-                                actions: actionsNode,
+                                get actions() {
+                                    actionsConsumed = true;
+                                    return actionsNode;
+                                },
                                 // Opt-in row marker (`item: { icon: true }`) —
                                 // the old list engine's default item icon,
                                 // consumed by custom content callbacks
@@ -397,7 +409,7 @@ export function createListRaw<
                                 body = h('span', String((item as any)[textPropName] ?? (item as any).id ?? ''));
                             }
 
-                            if (!actionsNode) {
+                            if (!actionsNode || actionsConsumed) {
                                 return body;
                             }
 
