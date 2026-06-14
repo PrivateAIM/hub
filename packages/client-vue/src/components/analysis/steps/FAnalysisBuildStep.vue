@@ -108,9 +108,10 @@ export default defineComponent({
 
                 <div class="flex flex-col">
                     <div>
-                        <h6 class="mb-0">
-                            Requirements
-                        </h6>
+                        <div class="flex flex-row items-center gap-1 text-fg-muted text-xs mb-1">
+                            <VCIcon name="fa6-solid:list-check" />
+                            <span>Requirements</span>
+                        </div>
                         <FAnalysisBuildNodesStep :entity="entity">
                             <template #default="{passed, message}">
                                 <div class="flex flex-row gap-1">
@@ -140,9 +141,10 @@ export default defineComponent({
                         <hr>
 
                         <div>
-                            <h6 class="mb-0">
-                                Info
-                            </h6>
+                            <div class="flex flex-row items-center gap-1 text-fg-muted text-xs mb-1">
+                                <VCIcon name="fa6-solid:circle-info" />
+                                <span>Info</span>
+                            </div>
                             <div class="flex flex-col">
                                 <div
                                     v-if="entity.build_os"

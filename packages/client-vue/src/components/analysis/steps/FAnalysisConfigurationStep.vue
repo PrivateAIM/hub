@@ -123,9 +123,10 @@ export default defineComponent({
                     show-text
                 />
                 <hr>
-                <h6 class="mb-0">
-                    Requirements
-                </h6>
+                <div class="flex flex-row items-center gap-1 text-fg-muted text-xs mb-1">
+                    <VCIcon name="fa6-solid:list-check" />
+                    <span>Requirements</span>
+                </div>
                 <div class="flex flex-row gap-1">
                     <FAnalysisConfigurationNodesStep :entity="entity">
                         <template #default="{passed, message}">
