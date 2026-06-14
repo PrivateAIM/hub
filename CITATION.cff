@@ -16,8 +16,8 @@ authors:
     family-names: Placzek
     email: contact@tada5hi.net
     website: "https://tada5hi.net"
-    # orcid: "https://orcid.org/0000-0000-0000-0000"  # add your ORCID iD
-    # affiliation: ""                                  # add your institution
+    orcid: "https://orcid.org/0009-0004-1237-105X"
+    # affiliation: ""  # add your institution
 repository-code: "https://github.com/PrivateAIM/hub"
 url: "https://privateaim.net"
 license: Apache-2.0
