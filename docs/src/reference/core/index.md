@@ -1,6 +1,6 @@
 # Core API (server-core)
 
-The Core API is the main REST service of PrivateAIM Hub. It manages analyses, projects, nodes, registries, and master images, and coordinates workflows through AMQP messaging.
+The Core API is the main REST service of FLAME Hub. It manages analyses, projects, nodes, registries, and master images, and coordinates workflows through AMQP messaging.
 
 ## Running
 

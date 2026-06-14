@@ -1,6 +1,6 @@
 # Services & Packages
 
-PrivateAIM Hub is composed of five backend services, a frontend, and shared libraries. Each service area groups the runnable application with its related packages.
+FLAME Hub is composed of five backend services, a frontend, and shared libraries. Each service area groups the runnable application with its related packages.
 
 ## Service Areas
 

@@ -4,7 +4,7 @@
     "bump-minor-pre-major": true,
     "bump-patch-for-minor-pre-major": true,
     "packages": {
-        ".": { "component": "root" },
+        ".": { "component": "root", "extra-files": ["CITATION.cff"] },
         "apps/client-ui": {"component": "client-ui" },
         "packages/client-vue": {"component": "client-vue" },
         "packages/client-vue-theme": {"component": "client-vue-theme" },

@@ -2,7 +2,7 @@
 
 [![npm version][npm-src]][npm-href]
 
-Shared server foundation for PrivateAIM Hub services — logging (Winston), authentication (Authup), AMQP messaging, Redis, caching, and DI module infrastructure.
+Shared server foundation for FLAME Hub services — logging (Winston), authentication (Authup), AMQP messaging, Redis, caching, and DI module infrastructure.
 
 ## Installation
 

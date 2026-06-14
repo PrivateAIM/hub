@@ -15,6 +15,7 @@ Central services for the FLAME platform ([PrivateAIM](https://privateaim.net)) â
 - [Packages](#packages)
 - [Quick Start](#quick-start)
 - [Contributing](#contributing)
+- [Citation](#citation)
 - [License](#license)
 
 ## Architecture
@@ -108,7 +109,15 @@ These guidelines will help to ensure that contributions are made effectively and
 
 ## Credits
 
-If you have any questions, feel free to contact the author [Peter Placzek](https://github.com/tada5hi).
+Created and maintained by [Peter Placzek](https://tada5hi.net) ([@tada5hi](https://github.com/tada5hi)), with contributions from the [PrivateAIM team](https://github.com/PrivateAIM/hub/graphs/contributors). If you have any questions, feel free to reach out.
+
+## Citation
+
+If you use FLAME Hub in academic work, please cite it. Citation metadata is maintained in [`CITATION.cff`](./CITATION.cff) â€” GitHub renders a **"Cite this repository"** button from it.
+
+Each [release](https://github.com/PrivateAIM/hub/releases) can be archived on [Zenodo](https://zenodo.org) with a versioned DOI (metadata in [`.zenodo.json`](./.zenodo.json)). Once the repository is enabled on Zenodo and a release is archived, add the DOI badge here:
+
+<!-- [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX) -->
 
 ## License
 

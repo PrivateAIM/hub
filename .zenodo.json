@@ -1,0 +1,19 @@
+{
+    "title": "FLAME Hub",
+    "description": "Central services for the FLAME platform — a privacy-preserving analytics infrastructure for federated data analysis across distributed institutions. Includes the core REST API, background worker, storage, telemetry and messaging services, a Nuxt web client, and shared TypeScript libraries.",
+    "upload_type": "software",
+    "access_right": "open",
+    "license": "Apache-2.0",
+    "creators": [
+        {
+            "name": "Placzek, Peter"
+        }
+    ],
+    "keywords": [
+        "federated analytics",
+        "privacy-preserving",
+        "distributed data analysis",
+        "FLAME",
+        "PrivateAIM"
+    ]
+}

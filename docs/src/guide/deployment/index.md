@@ -1,6 +1,6 @@
 # Deployment
 
-This section covers deploying PrivateAIM Hub services to production environments.
+This section covers deploying FLAME Hub services to production environments.
 
 ::: tip Source Repository
 Deployment manifests, scripts, and detailed instructions are maintained in the [hub-deployment](https://github.com/PrivateAIM/hub-deployment) repository.

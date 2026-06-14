@@ -2,7 +2,7 @@
 layout: home
 
 hero:
-  name: PrivateAIM Hub
+  name: FLAME Hub
   text: Privacy-Preserving Analytics Infrastructure
   tagline: Central services for federated, privacy-aware data analysis across distributed institutions.
   actions:

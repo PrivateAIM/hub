@@ -54,7 +54,7 @@ export default defineComponent({
                 <div class="page-footer-brand">
                     <div class="page-footer-brand-title">
                         <Logo :height="24" />
-                        <span>PrivateAIM Hub</span>
+                        <span>FLAME Hub</span>
                     </div>
                     <p>
                         Privacy-preserving analytics infrastructure for federated

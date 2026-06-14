@@ -2,7 +2,7 @@
 
 [![npm version][npm-src]][npm-href]
 
-Server-side storage components for PrivateAIM Hub — AMQP-driven bucket and file operations.
+Server-side storage components for FLAME Hub — AMQP-driven bucket and file operations.
 
 ## Installation
 

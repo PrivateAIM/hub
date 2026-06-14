@@ -44,7 +44,7 @@ export default defineComponent({
                     <Logo :height="40" />
                     <div>
                         <div class="about-modal-title">
-                            PrivateAIM Hub
+                            FLAME Hub
                         </div>
                         <div class="about-modal-version">
                             {{ version }}
@@ -69,6 +69,27 @@ export default defineComponent({
                         target="_blank"
                         rel="noopener"
                     >GitHub</a>.
+                </p>
+                <div class="about-modal-heading">
+                    Development
+                </div>
+                <p>
+                    Created and maintained by
+                    <a
+                        href="https://tada5hi.net"
+                        target="_blank"
+                        rel="noopener"
+                    >Peter Placzek</a>
+                    (<a
+                        href="https://github.com/tada5hi"
+                        target="_blank"
+                        rel="noopener"
+                    >@tada5hi</a>), with contributions from the
+                    <a
+                        href="https://github.com/PrivateAIM/hub/graphs/contributors"
+                        target="_blank"
+                        rel="noopener"
+                    >PrivateAIM team</a>.
                 </p>
                 <div class="about-modal-heading">
                     Built with open source

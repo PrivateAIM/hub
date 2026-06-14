@@ -2,7 +2,7 @@
 
 [![npm version][npm-src]][npm-href]
 
-File and object storage service for PrivateAIM Hub — backed by MinIO (S3-compatible).
+File and object storage service for FLAME Hub — backed by MinIO (S3-compatible).
 
 ## Usage
 

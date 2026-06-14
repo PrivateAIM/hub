@@ -2,7 +2,7 @@
 
 [![npm version][npm-src]][npm-href]
 
-Background worker service for PrivateAIM Hub — builds and distributes Docker containers for federated analyses.
+Background worker service for FLAME Hub — builds and distributes Docker containers for federated analyses.
 
 ## Usage
 

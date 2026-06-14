@@ -2,7 +2,7 @@
 
 [![npm version][npm-src]][npm-href]
 
-HTTP server middleware, request handling, and Swagger/OpenAPI documentation for PrivateAIM Hub services.
+HTTP server middleware, request handling, and Swagger/OpenAPI documentation for FLAME Hub services.
 
 ## Installation
 

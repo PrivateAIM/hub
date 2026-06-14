@@ -1,8 +1,8 @@
 # Getting Started
 
-PrivateAIM Hub is the central services platform of the **PrivateAIM** project — a privacy-preserving analytics infrastructure for federated data analysis across distributed institutions.
+FLAME Hub is the central services platform of the **PrivateAIM** project — a privacy-preserving analytics infrastructure for federated data analysis across distributed institutions.
 
-## What is PrivateAIM Hub?
+## What is FLAME Hub?
 
 Hub provides the backend services and frontend application that coordinate federated analyses:
 

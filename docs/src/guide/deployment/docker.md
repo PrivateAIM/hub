@@ -1,6 +1,6 @@
 # Docker
 
-PrivateAIM Hub uses a multi-service `Dockerfile` that builds the entire monorepo. The `entrypoint.sh` script selects which service to start based on environment variables.
+FLAME Hub uses a multi-service `Dockerfile` that builds the entire monorepo. The `entrypoint.sh` script selects which service to start based on environment variables.
 
 ## Building the Image
 

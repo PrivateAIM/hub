@@ -1,8 +1,8 @@
 <!-- NOTE: Keep this file and all corresponding files in the .agents directory updated as the project evolves. When making architectural changes, adding new patterns, or discovering important conventions, update the relevant sections. -->
 
-# PrivateAIM Hub — Agent Guide
+# FLAME Hub — Agent Guide
 
-PrivateAIM Hub is a monorepo for the central services of the PrivateAIM platform — a privacy-preserving analytics infrastructure. It contains backend services (core API, storage, telemetry, messenger, worker), a Nuxt frontend, shared libraries, and a VitePress documentation site. All packages are TypeScript, built with tsdown (libraries) or tsdown + tsc (services), orchestrated by Nx.
+FLAME Hub is a monorepo for the central services of the FLAME platform — a privacy-preserving analytics infrastructure. It contains backend services (core API, storage, telemetry, messenger, worker), a Nuxt frontend, shared libraries, and a VitePress documentation site. All packages are TypeScript, built with tsdown (libraries) or tsdown + tsc (services), orchestrated by Nx.
 
 ## Quick Reference
 

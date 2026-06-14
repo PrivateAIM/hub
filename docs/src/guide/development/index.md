@@ -1,6 +1,6 @@
 # Development
 
-Welcome to the PrivateAIM Hub development guide. This section covers contributing to the project, understanding the codebase, and working with the API.
+Welcome to the FLAME Hub development guide. This section covers contributing to the project, understanding the codebase, and working with the API.
 
 ## Guides
 
