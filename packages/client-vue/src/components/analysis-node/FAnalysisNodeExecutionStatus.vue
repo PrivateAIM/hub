@@ -25,7 +25,7 @@ export default defineComponent({
             if (props.status) {
                 return props.status;
             }
-            return 'none';
+            return 'unknown';
         });
 
         const classSuffix = computed(() => {

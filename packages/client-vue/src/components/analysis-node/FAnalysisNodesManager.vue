@@ -15,11 +15,16 @@ import {
     useTemplateRef,
 } from 'vue';
 import { injectCoreHTTPClient, wrapFnWithBusyState } from '../../core';
+import { FProgressBar } from '../utility';
 import FAnalysisNodeLogs from '../analysis-node-log/FAnalysisNodeLogs.vue';
 import FAnalysisNodePicker from './FAnalysisNodePicker.vue';
 import FAnalysisNodes from './FAnalysisNodes';
 import FAnalysisNodeExecutionStatus from './FAnalysisNodeExecutionStatus.vue';
 import { FAnalysisNodeApprovalStatus } from './FAnalysisNodeApprovalStatus';
+import {
+    getAnalysisNodeExecutionProgress,
+    getAnalysisNodeExecutionProgressColor,
+} from './utils';
 
 export default defineComponent({
     components: {
@@ -28,6 +33,7 @@ export default defineComponent({
         FAnalysisNodeApprovalStatus,
         FAnalysisNodes,
         FAnalysisNodeLogs,
+        FProgressBar,
     },
     props: {
         entity: {
@@ -130,6 +136,9 @@ export default defineComponent({
             handleDeleted,
             handleFailed,
             handleUpdated,
+
+            nodeProgress: getAnalysisNodeExecutionProgress,
+            nodeProgressColor: getAnalysisNodeExecutionProgressColor,
         };
     },
 });
@@ -161,7 +170,7 @@ export default defineComponent({
                                 :class="{'col-lg-6': entity.configuration_locked}"
                             >
                                 <div class="flex flex-col gap-2 m-1">
-                                    <div class="progress-step flex flex-col">
+                                    <div class="progress-step flex flex-col gap-1">
                                         <div class="flex flex-row">
                                             <div>
                                                 <h6 class="mb-0">
@@ -184,29 +193,21 @@ export default defineComponent({
                                                 </button>
                                             </div>
                                         </div>
-                                        <template v-if="!item.execution_status">
+                                        <div class="flex flex-row flex-wrap items-center gap-x-2">
                                             <small class="text-fg-muted">
                                                 approval:
                                                 <FAnalysisNodeApprovalStatus :status="item.approval_status" />
                                             </small>
-                                        </template>
-                                        <template v-if="item.execution_status">
-                                            <FAnalysisNodeExecutionStatus
-                                                :status="item.execution_status"
-                                                :tag="'div'"
-                                            >
-                                                <template #default="data">
-                                                    <div
-                                                        class="flex justify-center status-text text-light p-1"
-                                                        :class="'bg-' + data.classSuffix"
-                                                    >
-                                                        <span class="icon">
-                                                            {{ data.statusText }}
-                                                        </span>
-                                                    </div>
-                                                </template>
-                                            </FAnalysisNodeExecutionStatus>
-                                        </template>
+                                            <small class="text-fg-muted ms-auto">
+                                                execution:
+                                                <FAnalysisNodeExecutionStatus :status="item.execution_status" />
+                                            </small>
+                                        </div>
+                                        <FProgressBar
+                                            :progress="nodeProgress(item)"
+                                            :color-class="nodeProgressColor(item)"
+                                            show-text
+                                        />
                                     </div>
 
                                     <template v-if="item.execution_status">
@@ -262,14 +263,3 @@ export default defineComponent({
         </VCModal>
     </div>
 </template>
-<style>
-.status-text {
-    height: 50px;
-    font-weight: 600;
-    text-transform: capitalize;
-    font-size: 1.25rem;
-    justify-content: center;
-    align-items: center;
-    border-radius: 5px;
-}
-</style>

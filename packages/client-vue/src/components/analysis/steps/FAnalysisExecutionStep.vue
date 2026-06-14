@@ -17,10 +17,15 @@ import { computed, defineComponent } from 'vue';
 import type { Analysis } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
 import FProcessStatus from '../../FProcessStatus.vue';
+import FAnalysisNodeExecutionList from '../../analysis-node/FAnalysisNodeExecutionList.vue';
 import { FProgressBar } from '../../utility';
 
 export default defineComponent({
-    components: { FProcessStatus, FProgressBar },
+    components: {
+        FProcessStatus, 
+        FProgressBar, 
+        FAnalysisNodeExecutionList, 
+    },
     props: {
         entity: {
             type: Object as PropType<Analysis>,
@@ -87,6 +92,15 @@ export default defineComponent({
                 :progress="progress"
                 show-text
             />
+
+            <div class="nodes-progress mt-3">
+                <div class="flex flex-row items-center gap-1 text-fg-muted text-xs mb-1">
+                    <VCIcon name="fa6-solid:hospital" />
+                    <span>Nodes</span>
+                </div>
+
+                <FAnalysisNodeExecutionList :entity="entity" />
+            </div>
         </div>
     </div>
 </template>
