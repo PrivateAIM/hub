@@ -107,7 +107,7 @@ export default defineComponent({
                             :disabled="isBusy"
                             :label="true"
                             :group-class="'form-switch mb-0'"
-                            @change="handleLockItChanged"
+                            @update:model-value="handleLockItChanged"
                         >
                             <template #label="props">
                                 <label :for="props.id">
@@ -123,7 +123,7 @@ export default defineComponent({
                             :disabled="isBusy"
                             :label="true"
                             :group-class="'form-switch mb-0'"
-                            @change="handleBuildItChanged"
+                            @update:model-value="handleBuildItChanged"
                         >
                             <template #label="props">
                                 <label :for="props.id">

@@ -19,6 +19,18 @@
  */
 @import "@vuecs/navigation/style.css";
 
+/*
+ * Structural CSS for @vuecs/forms (<VCFormCheckbox>, <VCFormInput>,
+ * <VCFormSelect>, …): the checkbox/radio indicator glyphs (a masked SVG
+ * checkmark on `.vc-form-checkbox-indicator:before`), select/textarea
+ * chrome, and group layout. Like navigation, the JS plugin only registers
+ * the components — this stylesheet ships separately and must be imported
+ * explicitly, otherwise checked boxes render empty (no checkmark glyph).
+ * Imported here (not the theme) because @vuecs/forms is a direct
+ * dependency of this app.
+ */
+@import "@vuecs/forms/style.css";
+
 @import "@privateaim/client-vue-theme";
 
 /*

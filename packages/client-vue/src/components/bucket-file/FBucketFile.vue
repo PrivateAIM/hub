@@ -133,7 +133,8 @@ export default defineComponent({
         <div class="flex items-center">
             <VCFormCheckbox
                 :model-value="isActive"
-                @change="toggleIsActive"
+                :label="false"
+                @update:model-value="toggleIsActive"
             />
         </div>
         <div
