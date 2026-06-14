@@ -45,8 +45,15 @@
  * the `.vue` SFC templates AND the ~81 hyperscript `.ts` components that
  * emit class strings inside `h(...)` calls outside any template. Without
  * this glob those utilities silently never compile.
+ *
+ * Path is relative to THIS file (apps/client-ui/assets/css/), so reaching
+ * the repo-root `packages/` needs four `../` (css → assets → client-ui →
+ * apps → root). The earlier three-`../` form resolved to the non-existent
+ * `apps/packages/...`, which Tailwind skips silently — so every utility
+ * class UNIQUE to a client-vue component (e.g. the `ms-4` step indent)
+ * was never generated.
  */
-@source "../../../packages/client-vue/src";
+@source "../../../../packages/client-vue/src";
 
 /*
  * Nested vuecs deps. npm workspaces hoist most `@vuecs/*` to the repo
