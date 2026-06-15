@@ -15,6 +15,14 @@ export default defineComponent({
             type: Object as PropType<File>,
             required: true,
         },
+        // Explicit relative path (incl. directories). Drag-dropped files have
+        // an empty webkitRelativePath, so the parent supplies the path it
+        // derived from the FileSystem entry; falls back to webkitRelativePath
+        // (directory picker) then the bare name.
+        relativePath: {
+            type: String,
+            default: '',
+        },
         pathSelected: {
             type: Boolean,
             default: false,
@@ -22,13 +30,9 @@ export default defineComponent({
     },
     emits: ['drop'],
     setup(props, { emit }) {
-        const path = computed(() => {
-            let filename = props.file.name;
-            if (props.file.webkitRelativePath) {
-                filename = props.file.webkitRelativePath;
-            }
-            return filename;
-        });
+        const path = computed(() => props.relativePath ||
+            props.file.webkitRelativePath ||
+            props.file.name);
 
         const drop = () => {
             emit('drop', props.file);

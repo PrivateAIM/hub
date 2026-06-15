@@ -143,7 +143,7 @@ export default defineComponent({
         >
             <span>
                 <template v-if="data">
-                    {{ data.name }}
+                    {{ data.path || data.name }}
                 </template>
                 <template v-else>
                     ...
