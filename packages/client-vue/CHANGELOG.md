@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.11.2](https://github.com/PrivateAIM/hub/compare/v0.11.1...v0.11.2) (2026-06-15)
+
+
+### Features
+
+* **client-vue:** redesign bucket file upload with drag-and-drop dropzone ([#1681](https://github.com/PrivateAIM/hub/issues/1681)) ([d682e31](https://github.com/PrivateAIM/hub/commit/d682e31580065400e151679623599ae6dc6062a7))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.11.1 to ^0.11.2
+    * @privateaim/core-kit bumped from ^0.11.1 to ^0.11.2
+    * @privateaim/core-realtime-kit bumped from ^0.10.5 to ^0.10.6
+    * @privateaim/kit bumped from ^0.11.1 to ^0.11.2
+    * @privateaim/storage-kit bumped from ^0.11.1 to ^0.11.2
+    * @privateaim/telemetry-kit bumped from ^0.11.1 to ^0.11.2
+  * peerDependencies
+    * @privateaim/core-http-kit bumped from ^0.11.1 to ^0.11.2
+    * @privateaim/core-kit bumped from ^0.11.1 to ^0.11.2
+    * @privateaim/kit bumped from ^0.11.1 to ^0.11.2
+    * @privateaim/storage-kit bumped from ^0.11.1 to ^0.11.2
+    * @privateaim/telemetry-kit bumped from ^0.11.1 to ^0.11.2
+
 ## [0.11.1](https://github.com/PrivateAIM/hub/compare/v0.11.0...v0.11.1) (2026-06-15)
 
 
