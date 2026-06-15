@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.11.1](https://github.com/PrivateAIM/hub/compare/v0.11.0...v0.11.1) (2026-06-15)
+
+
+### Bug Fixes
+
+* **ui:** scroll the document instead of .page-content ([923390e](https://github.com/PrivateAIM/hub/commit/923390eb767c4508c5db384b91bbf05c7aee215a))
+
 ## [0.11.0](https://github.com/PrivateAIM/hub/compare/v0.10.3...v0.11.0) (2026-06-15)
 
 
