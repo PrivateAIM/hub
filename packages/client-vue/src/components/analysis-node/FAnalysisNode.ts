@@ -6,6 +6,7 @@
  */
 
 import {
+    DomainEventSubscriptionName,
     DomainSubType,
     DomainType,
     buildDomainChannelName,
@@ -13,6 +14,7 @@ import {
 import type {
     AnalysisNode,
 } from '@privateaim/core-kit';
+import { buildDomainEventFullName } from '@privateaim/kit';
 import type { FiltersBuildInput } from 'rapiq';
 import {
     defineComponent,
@@ -82,16 +84,42 @@ export default defineComponent({
 
                     return false;
                 },
+                // Events are emitted to the base entity room within the realm namespace;
+                // realm scoping is enforced by the namespace and the realmId check above.
                 buildChannelName(id) {
-                    if (props.direction === Direction.IN) {
-                        return buildDomainChannelName(DomainSubType.ANALYSIS_NODE_IN, id);
-                    }
-
-                    if (props.direction === Direction.OUT) {
-                        return buildDomainChannelName(DomainSubType.ANALYSIS_NODE_OUT, id);
-                    }
-
                     return buildDomainChannelName(DomainType.ANALYSIS_NODE, id);
+                },
+                // Match the subscribe event to the namespace createEntitySocket connects to:
+                // directional handlers exist only in realm namespaces, the base handler only at root.
+                buildSubscribeEventName(realmId) {
+                    if (realmId) {
+                        return buildDomainEventFullName(
+                            props.direction === Direction.IN ?
+                                DomainSubType.ANALYSIS_NODE_IN :
+                                DomainSubType.ANALYSIS_NODE_OUT,
+                            DomainEventSubscriptionName.SUBSCRIBE,
+                        );
+                    }
+
+                    return buildDomainEventFullName(
+                        DomainType.ANALYSIS_NODE,
+                        DomainEventSubscriptionName.SUBSCRIBE,
+                    );
+                },
+                buildUnsubscribeEventName(realmId) {
+                    if (realmId) {
+                        return buildDomainEventFullName(
+                            props.direction === Direction.IN ?
+                                DomainSubType.ANALYSIS_NODE_IN :
+                                DomainSubType.ANALYSIS_NODE_OUT,
+                            DomainEventSubscriptionName.UNSUBSCRIBE,
+                        );
+                    }
+
+                    return buildDomainEventFullName(
+                        DomainType.ANALYSIS_NODE,
+                        DomainEventSubscriptionName.UNSUBSCRIBE,
+                    );
                 },
             },
         });

@@ -29,8 +29,8 @@ export type EntitySocketContext<
     refType?: () => string,
 
     buildChannelName?(entityId?: DomainEntityID<T>) : string;
-    buildSubscribeEventName?(): DomainEventFullName<string, DomainEventSubscriptionName>;
-    buildUnsubscribeEventName?(): DomainEventFullName<string, DomainEventSubscriptionName>;
+    buildSubscribeEventName?(realmId?: string): DomainEventFullName<string, DomainEventSubscriptionName>;
+    buildUnsubscribeEventName?(realmId?: string): DomainEventFullName<string, DomainEventSubscriptionName>;
 };
 
 export type EntitySocket = {

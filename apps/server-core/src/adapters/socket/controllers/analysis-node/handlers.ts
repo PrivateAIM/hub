@@ -54,7 +54,7 @@ export function registerAnalysisNodeSocketHandlers(socket: Socket) {
     );
 
     socket.on(
-        buildDomainEventFullName(DomainType.ANALYSIS_NODE, DomainEventSubscriptionName.SUBSCRIBE),
+        buildDomainEventFullName(DomainType.ANALYSIS_NODE, DomainEventSubscriptionName.UNSUBSCRIBE),
         (target) => {
             unsubscribeSocketRoom(socket, buildDomainChannelName(DomainType.ANALYSIS_NODE, target));
         },
@@ -63,6 +63,11 @@ export function registerAnalysisNodeSocketHandlers(socket: Socket) {
 
 export function registerAnalysisNodeForRealmSocketHandlers(socket: Socket) {
     if (!isSocketAuthenticated(socket)) return;
+
+    // The realm namespace already isolates events by realm (analysis realm vs. node realm
+    // are distinct namespaces), so all directional subscriptions join the base entity room —
+    // the room the subscriber actually emits to. The in/out event names differ only to apply
+    // the correct permission gate (ANALYSIS_APPROVE for in, ANALYSIS_UPDATE for out).
 
     socket.on(
         buildDomainEventFullName(DomainSubType.ANALYSIS_NODE_IN, DomainEventSubscriptionName.SUBSCRIBE),
@@ -81,7 +86,7 @@ export function registerAnalysisNodeForRealmSocketHandlers(socket: Socket) {
                 return;
             }
 
-            subscribeSocketRoom(socket, buildDomainChannelName(DomainSubType.ANALYSIS_NODE_IN, target));
+            subscribeSocketRoom(socket, buildDomainChannelName(DomainType.ANALYSIS_NODE, target));
 
             if (isEventCallback(cb)) {
                 cb(null);
@@ -92,7 +97,7 @@ export function registerAnalysisNodeForRealmSocketHandlers(socket: Socket) {
     socket.on(
         buildDomainEventFullName(DomainSubType.ANALYSIS_NODE_IN, DomainEventSubscriptionName.UNSUBSCRIBE),
         (target) => {
-            unsubscribeSocketRoom(socket, buildDomainChannelName(DomainSubType.ANALYSIS_NODE_IN, target));
+            unsubscribeSocketRoom(socket, buildDomainChannelName(DomainType.ANALYSIS_NODE, target));
         },
     );
 
@@ -115,7 +120,7 @@ export function registerAnalysisNodeForRealmSocketHandlers(socket: Socket) {
                 return;
             }
 
-            subscribeSocketRoom(socket, buildDomainChannelName(DomainSubType.ANALYSIS_NODE_OUT, target));
+            subscribeSocketRoom(socket, buildDomainChannelName(DomainType.ANALYSIS_NODE, target));
 
             if (isEventCallback(cb)) {
                 cb(null);
@@ -126,7 +131,7 @@ export function registerAnalysisNodeForRealmSocketHandlers(socket: Socket) {
     socket.on(
         buildDomainEventFullName(DomainSubType.ANALYSIS_NODE_OUT, DomainEventSubscriptionName.UNSUBSCRIBE),
         (target) => {
-            unsubscribeSocketRoom(socket, buildDomainChannelName(DomainSubType.ANALYSIS_NODE_OUT, target));
+            unsubscribeSocketRoom(socket, buildDomainChannelName(DomainType.ANALYSIS_NODE, target));
         },
     );
 }

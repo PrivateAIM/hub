@@ -13,7 +13,6 @@ import {
     DomainEventSubscriptionName,
     DomainSubType,
     DomainType,
-    buildDomainChannelName,
 } from '@privateaim/core-kit';
 import { buildDomainEventFullName, hasOwnProperty } from '@privateaim/kit';
 import type { RelationsBuildInput } from 'rapiq';
@@ -67,21 +66,6 @@ export default defineComponent({
             DomainType.PROJECT :
             DomainType.NODE));
 
-        const isSameSocketRoom = (room?: string) => {
-            if (props.realmId) {
-                switch (props.direction) {
-                    case Direction.IN:
-                        return room === buildDomainChannelName(DomainSubType.PROJECT_NODE_IN);
-                    case Direction.OUT:
-                        return room === buildDomainChannelName(DomainSubType.PROJECT_NODE_OUT);
-                }
-            } else {
-                return room === buildDomainChannelName(DomainType.PROJECT_NODE);
-            }
-
-            return false;
-        };
-
         const isSocketEventForSource = (item: ProjectNode) => {
             switch (source.value) {
                 case DomainType.NODE:
@@ -109,12 +93,17 @@ export default defineComponent({
             props,
             setup: ctx,
             socket: {
+                // Realm scoping is handled by the namespace and the base-room check in
+                // createEntitySocket; here we only confirm the event belongs to this source.
                 processEvent(event) {
-                    return isSameSocketRoom(event.meta.roomName) &&
-                        isSocketEventForSource(event.data);
+                    return isSocketEventForSource(event.data);
                 },
-                buildSubscribeEventName() {
-                    if (props.realmId) {
+                // Branch on the effective realmId (resolved by createEntitySocket — undefined
+                // for master-realm sockets on the root namespace), not props.realmId, so the
+                // subscribe event always matches the namespace the socket actually connects to:
+                // directional handlers live only in realm namespaces, the base handler only at root.
+                buildSubscribeEventName(realmId) {
+                    if (realmId) {
                         if (props.direction === Direction.IN) {
                             return buildDomainEventFullName(
                                 DomainSubType.PROJECT_NODE_IN,
@@ -133,8 +122,8 @@ export default defineComponent({
                         DomainEventSubscriptionName.SUBSCRIBE,
                     );
                 },
-                buildUnsubscribeEventName() {
-                    if (props.realmId) {
+                buildUnsubscribeEventName(realmId) {
+                    if (realmId) {
                         if (props.direction === Direction.IN) {
                             return buildDomainEventFullName(
                                 DomainSubType.PROJECT_NODE_IN,
