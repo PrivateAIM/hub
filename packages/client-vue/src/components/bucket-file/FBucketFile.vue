@@ -192,8 +192,11 @@ export default defineComponent({
     align-items: center;
 }
 
+/* Selected-row highlight as a brand-tinted step above the content surface,
+   so it flips with light/dark instead of the old fixed light-blue (#c5d7e7,
+   unreadable on the dark content bg). */
 .bucket-file.checked {
-    background: #c5d7e7;
+    background: color-mix(in oklab, var(--vc-color-primary-600) 16%, var(--vc-color-bg));
 }
 
 .form-check-input {
