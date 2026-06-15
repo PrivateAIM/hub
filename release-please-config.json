@@ -34,7 +34,6 @@
         {
             "type": "node-workspace",
             "updatePeerDependencies": true,
-            "merge": false,
             "updateAllPackages": true
         },
         {
