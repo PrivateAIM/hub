@@ -20,6 +20,9 @@
        which would paint over an in-flow sidebar's outset shadow — lift the
        sidebar one stacking step (below the header's z-index: 2). */
     box-shadow: var(--privateaim-chrome-edge-shadow-right);
+    /* Stretches to the wrapper's height (now content-driven) so the chrome
+       background fills the column and the `.mt-auto` session countdown stays
+       pinned to the sidebar's bottom. Scrolls with the document. */
     position: relative;
     z-index: 1;
 }

@@ -5,16 +5,28 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+/*
+ * App-shell sizing. The shell grows with its content so the document
+ * (window) owns the single scrollbar and the footer flows after the content.
+ * `#app` is a flex column that fills at least the viewport, so a short page
+ * still pins the footer to the bottom (sticky-footer) while tall content
+ * grows the page and scrolls the window — instead of `.page-content`
+ * scrolling internally with its own scrollbar.
+ */
 #__nuxt,
-#__layout,
+#__layout {
+    min-height: 100vh;
+}
+
 #app {
-    height: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 html, body {
     margin: 0;
     padding: 0;
-    height: 100%;
 }
 
 body {
@@ -132,13 +144,15 @@ hr.small {
 body
  */
 .page-wrapper {
-    padding-top: 56px;
+    padding-top: 56px;          /* clear the fixed header */
     display: flex;
     width: 100%;
     align-items: stretch;
-    height: -moz-calc(100% - (34px));
-    height: -webkit-calc(100% - (34px));
-    height: calc(100% - (34px));
+    /* Grow to fill the shell so the footer is pushed to the viewport bottom
+       on short pages; on tall pages the content sets the height and the
+       window scrolls. Replaces the old fixed `height: calc(100% - 34px)`,
+       whose 34px no longer matched the (now multi-section) footer. */
+    flex: 1 0 auto;
 }
 
 .page-content {
