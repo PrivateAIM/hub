@@ -30,7 +30,7 @@ export default defineNuxtComponent({
 });
 </script>
 <template>
-    <div class="d-flex flex-column gap-3">
+    <div class="flex flex-col gap-3">
         <div class="row">
             <div class="col-4">
                 <div class="card-grey card">
@@ -40,49 +40,49 @@ export default defineNuxtComponent({
                         </span>
                     </div>
                     <div class="card-body">
-                        <div class="d-flex flex-column gap-3">
-                            <div class="d-flex flex-row gap-3">
-                                <div class="flex-grow-1">
+                        <div class="flex flex-col gap-3">
+                            <div class="flex flex-row gap-3">
+                                <div class="grow">
                                     <strong>Name</strong>
                                 </div>
                                 <div class="">
                                     {{ entity.name }}
                                 </div>
                             </div>
-                            <div class="d-flex flex-row gap-3">
-                                <div class="flex-grow-1">
+                            <div class="flex flex-row gap-3">
+                                <div class="grow">
                                     <strong>Scope</strong>
                                 </div>
                                 <div class="">
                                     {{ entity.scope }}
                                 </div>
                             </div>
-                            <div class="d-flex flex-row gap-3">
-                                <div class="flex-grow-1">
+                            <div class="flex flex-row gap-3">
+                                <div class="grow">
                                     <strong>Ref Type</strong>
                                 </div>
                                 <div class="">
                                     {{ entity.ref_type }}
                                 </div>
                             </div>
-                            <div class="d-flex flex-row gap-3">
-                                <div class="flex-grow-1">
+                            <div class="flex flex-row gap-3">
+                                <div class="grow">
                                     <strong>Ref ID</strong>
                                 </div>
                                 <div class="">
                                     {{ entity.ref_id }}
                                 </div>
                             </div>
-                            <div class="d-flex flex-row gap-3">
-                                <div class="flex-grow-1">
+                            <div class="flex flex-row gap-3">
+                                <div class="grow">
                                     <strong>Created</strong>
                                 </div>
                                 <div class="">
                                     <VCTimeago :datetime="entity.created_at" />
                                 </div>
                             </div>
-                            <div class="d-flex flex-row gap-3">
-                                <div class="flex-grow-1">
+                            <div class="flex flex-row gap-3">
+                                <div class="grow">
                                     <strong>Expiring?</strong>
                                 </div>
                                 <div class="">
@@ -104,25 +104,25 @@ export default defineNuxtComponent({
                         </span>
                     </div>
                     <div class="card-body">
-                        <div class="d-flex flex-column gap-3">
-                            <div class="d-flex flex-row gap-3">
-                                <div class="flex-grow-1">
+                        <div class="flex flex-col gap-3">
+                            <div class="flex flex-row gap-3">
+                                <div class="grow">
                                     <strong>Type</strong>
                                 </div>
                                 <div class="">
                                     {{ entity.actor_type }}
                                 </div>
                             </div>
-                            <div class="d-flex flex-row gap-3">
-                                <div class="flex-grow-1">
+                            <div class="flex flex-row gap-3">
+                                <div class="grow">
                                     <strong>ID</strong>
                                 </div>
                                 <div class="">
                                     {{ entity.actor_id }}
                                 </div>
                             </div>
-                            <div class="d-flex flex-row gap-3">
-                                <div class="flex-grow-1">
+                            <div class="flex flex-row gap-3">
+                                <div class="grow">
                                     <strong>Name</strong>
                                 </div>
                                 <div class="">
@@ -141,33 +141,33 @@ export default defineNuxtComponent({
                         </span>
                     </div>
                     <div class="card-body">
-                        <div class="d-flex flex-column gap-3">
-                            <div class="d-flex flex-row gap-3">
-                                <div class="flex-grow-1">
+                        <div class="flex flex-col gap-3">
+                            <div class="flex flex-row gap-3">
+                                <div class="grow">
                                     <strong>Path</strong>
                                 </div>
                                 <div class="">
                                     {{ entity.request_path }}
                                 </div>
                             </div>
-                            <div class="d-flex flex-row gap-3">
-                                <div class="flex-grow-1">
+                            <div class="flex flex-row gap-3">
+                                <div class="grow">
                                     <strong>Method</strong>
                                 </div>
                                 <div class="">
                                     {{ entity.request_method }}
                                 </div>
                             </div>
-                            <div class="d-flex flex-row gap-3">
-                                <div class="flex-grow-1">
+                            <div class="flex flex-row gap-3">
+                                <div class="grow">
                                     <strong>IP Address</strong>
                                 </div>
                                 <div class="">
                                     {{ entity.request_ip_address }}
                                 </div>
                             </div>
-                            <div class="d-flex flex-row gap-3">
-                                <div class="flex-grow-1">
+                            <div class="flex flex-row gap-3">
+                                <div class="grow">
                                     <strong>User Agent</strong>
                                 </div>
                                 <div class="">

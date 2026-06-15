@@ -2,7 +2,7 @@
 
 [![npm version][npm-src]][npm-href]
 
-TypeORM database utilities for PrivateAIM Hub — data source configuration, subscriber helpers, and migration support.
+TypeORM database utilities for FLAME Hub — data source configuration, subscriber helpers, and migration support.
 
 ## Installation
 

@@ -28,7 +28,7 @@
         "test:coverage": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts --coverage"
     },
     "dependencies": {
-        "@authup/core-http-kit": "^1.0.0-beta.42",
+        "@authup/core-http-kit": "^1.0.0-beta.48",
         "@hapic/harbor": "^2.5.6",
         "@privateaim/core-http-kit": "^0.10.3",
         "@privateaim/core-kit": "^0.10.3",
@@ -38,7 +38,7 @@
         "@privateaim/server-telemetry-kit": "^0.10.3",
         "@privateaim/storage-kit": "^0.10.3",
         "@privateaim/telemetry-kit": "^0.10.3",
-        "@validup/adapter-zod": "^0.2.3",
+        "@validup/zod": "^0.3.3",
         "docken": "^2.0.2",
         "dockerode": "^5.0.0",
         "dotenv": "^17.4.1",
@@ -53,7 +53,7 @@
         "tar-fs": "^3.1.2",
         "tar-stream": "^3.2.0",
         "uuid": "^14.0.0",
-        "validup": "^0.4.0",
+        "validup": "^0.5.1",
         "zod": "^4.3.6"
     },
     "devDependencies": {

@@ -26,7 +26,10 @@ export default defineNuxtComponent({
             FLAME
         </h1>
 
-        <WorldSvg width="100%" />
+        <WorldSvg
+            width="100%"
+            style="height:500px"
+        />
     </div>
 </template>
 <style scoped>

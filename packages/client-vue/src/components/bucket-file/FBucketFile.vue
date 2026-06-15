@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 import { inject } from '@authup/client-web-kit';
-import { VCFormInputCheckbox } from '@vuecs/form-controls';
+import { VCFormCheckbox } from '@vuecs/forms';
 import type { PropType, Ref } from 'vue';
 import {
     computed,
@@ -20,7 +20,7 @@ import { injectStorageHTTPClient } from '../../core';
 import { FBucketFileDownload } from './FBucketFileDownload';
 
 export default defineComponent({
-    components: { FBucketFileDownload, VCFormInputCheckbox },
+    components: { FBucketFileDownload, VCFormCheckbox },
     props: {
         entity: { type: Object as PropType<BucketFile> },
         entityId: { type: String },
@@ -127,17 +127,18 @@ export default defineComponent({
 </script>
 <template>
     <div
-        class="bucket-file d-flex flex-row align-items-center gap-1 p-2"
+        class="bucket-file flex flex-row items-center gap-1 p-2"
         :class="{'checked': isActive}"
     >
-        <div class="d-flex align-items-center">
-            <VCFormInputCheckbox
+        <div class="flex items-center">
+            <VCFormCheckbox
                 :model-value="isActive"
-                @change="toggleIsActive"
+                :label="false"
+                @update:model-value="toggleIsActive"
             />
         </div>
         <div
-            class="d-flex align-items-center bucket-file-text"
+            class="flex items-center bucket-file-text"
             @click.prevent="toggleIsActive"
         >
             <span>
@@ -155,7 +156,7 @@ export default defineComponent({
             </div>
         </template>
         <template v-if="data">
-            <div class="ms-auto d-flex flex-row gap-1">
+            <div class="ms-auto flex flex-row gap-1">
                 <slot
                     name="actions"
                     v-bind="{ data }"
@@ -170,14 +171,13 @@ export default defineComponent({
                     <template v-if="!readonly">
                         <div>
                             <button
-                                v-b-tooltip.hover.top
                                 title="Delete"
                                 type="button"
                                 class="btn btn-danger btn-xs"
                                 :disabled="busy"
                                 @click.prevent="drop"
                             >
-                                <i class="fa fa-trash" />
+                                <VCIcon name="fa6-solid:trash" />
                             </button>
                         </div>
                     </template>

@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { TranslatorTranslationDefaultKey, TranslatorTranslationGroup, useTranslation } from '@authup/client-web-kit';
-import type { EntityAPISlim } from '@authup/core-http-kit';
+import { useTranslation } from '@authup/client-web-kit';
+import { TranslatorTranslationActionKey, TranslatorTranslationNamespace } from '@authup/i18n';
 import type { DomainType } from '@privateaim/core-kit';
 import type {
     Component,
@@ -35,7 +35,7 @@ export default defineComponent({
         },
         elementIcon: {
             type: String,
-            default: 'fa-solid fa-trash',
+            default: 'fa6-solid:trash',
         },
         withText: {
             type: Boolean,
@@ -79,15 +79,15 @@ export default defineComponent({
             let domainAPI : DomainAPISlim<any> | undefined;
             switch (props.service) {
                 case 'core': {
-                    domainAPI = (coreClient as Record<string, any>)[props.entityType] as EntityAPISlim<any> | undefined;
+                    domainAPI = (coreClient as Record<string, any>)[props.entityType] as DomainAPISlim<any> | undefined;
                     break;
                 }
                 case 'storage': {
-                    domainAPI = (storageClient as Record<string, any>)[props.entityType] as EntityAPISlim<any> | undefined;
+                    domainAPI = (storageClient as Record<string, any>)[props.entityType] as DomainAPISlim<any> | undefined;
                     break;
                 }
                 case 'telemetry': {
-                    domainAPI = (telemetryClient as Record<string, any>)[props.entityType] as EntityAPISlim<any> | undefined;
+                    domainAPI = (telemetryClient as Record<string, any>)[props.entityType] as DomainAPISlim<any> | undefined;
                     break;
                 }
             }
@@ -114,8 +114,8 @@ export default defineComponent({
         };
 
         const translation = useTranslation({
-            group: TranslatorTranslationGroup.DEFAULT,
-            key: TranslatorTranslationDefaultKey.DELETE,
+            namespace: TranslatorTranslationNamespace.ACTION,
+            key: TranslatorTranslationActionKey.DELETE,
         });
 
         const render = () => {
@@ -129,9 +129,9 @@ export default defineComponent({
                 case ElementType.DROP_DOWN_ITEM:
                     if (
                         instance &&
-                        typeof instance.appContext.app.component('BDropdownItem') !== 'undefined'
+                        typeof instance.appContext.app.component('VCDropdownMenuItem') !== 'undefined'
                     ) {
-                        tag = resolveDynamicComponent('BDropdownItem') as Component;
+                        tag = resolveDynamicComponent('VCDropdownMenuItem') as Component;
                     }
                     break;
             }
@@ -139,7 +139,10 @@ export default defineComponent({
             let icon : VNodeArrayChildren = [];
             if (props.elementIcon) {
                 icon = [
-                    h('i', { class: [props.elementIcon, { 'pe-1': props.withText }] }),
+                    h(resolveDynamicComponent('VCIcon') as Component, {
+                        name: props.elementIcon,
+                        class: props.withText ? 'pe-1' : undefined,
+                    }),
                 ];
             }
 

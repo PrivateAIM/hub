@@ -8,26 +8,32 @@
 <script lang="ts">
 import type { Analysis } from '@privateaim/core-kit';
 import { AnalysisCommand } from '@privateaim/core-kit';
-import { BModal } from 'bootstrap-vue-next';
 import type { PropType } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { injectCoreHTTPClient, wrapFnWithBusyState } from '../../core';
 
 export default defineComponent({
-    components: { BModal },
     props: {
         entity: {
             type: Object as PropType<Analysis>,
             required: true,
         },
+        modelValue: {
+            type: Boolean,
+            default: false,
+        },
     },
-    emits: ['updated', 'executed', 'failed'],
+    emits: ['update:modelValue', 'updated', 'executed', 'failed'],
     setup(props, { emit }) {
         const apiClient = injectCoreHTTPClient();
 
         const isBusy = ref(false);
         const lockIt = ref(true);
         const buildIt = ref(true);
+
+        const close = () => {
+            emit('update:modelValue', false);
+        };
 
         const handleLockItChanged = () => {
             buildIt.value = lockIt.value;
@@ -37,7 +43,7 @@ export default defineComponent({
 
         };
 
-        const execute = wrapFnWithBusyState(isBusy, async (fn: CallableFunction) => {
+        const execute = wrapFnWithBusyState(isBusy, async () => {
             try {
                 let entity: Analysis;
                 if (lockIt.value) {
@@ -58,7 +64,7 @@ export default defineComponent({
             } catch (e) {
                 emit('failed', e);
             } finally {
-                fn();
+                close();
             }
         });
 
@@ -72,87 +78,90 @@ export default defineComponent({
             lockIt,
 
             execute,
+            close,
         };
     },
 });
 </script>
 
 <template>
-    <BModal
-        :size="'md'"
-        :no-close-on-backdrop="true"
-        :no-close-on-esc="true"
+    <VCModal
+        :open="modelValue"
+        @update:open="$emit('update:modelValue', $event)"
     >
-        <template #header>
-            <h6 class="mb-0">
-                Next Steps
-            </h6>
-        </template>
-        <template #default>
-            <div class="alert alert-success alert-sm">
-                <i class="fa fa-info" /> The analysis is now in a state in which it can be locked and build.<br>
+        <VCModalContent class="modal-md">
+            <div class="modal-header">
+                <h6 class="mb-0">
+                    Next Steps
+                </h6>
+                <VCModalClose class="btn-close" />
             </div>
-            <div class="d-flex flex-column gap-2">
-                <div>
-                    <VCFormInputCheckbox
-                        v-model="lockIt"
-                        :disabled="isBusy"
-                        :label="true"
-                        :group-class="'form-switch mb-0'"
-                        @change="handleLockItChanged"
-                    >
-                        <template #label="props">
-                            <label :for="props.id">
-                                <i class="fa fa-lock" /> Lock it?
-                            </label>
-                        </template>
-                    </VCFormInputCheckbox>
-                    In order to build the analysis, the configuration must be locked!
+            <div class="modal-body">
+                <div class="alert alert-success alert-sm">
+                    <VCIcon name="fa6-solid:info" /> The analysis is now in a state in which it can be locked and build.<br>
                 </div>
-                <div v-if="lockIt">
-                    <VCFormInputCheckbox
-                        v-model="buildIt"
-                        :disabled="isBusy"
-                        :label="true"
-                        :group-class="'form-switch mb-0'"
-                        @change="handleBuildItChanged"
-                    >
-                        <template #label="props">
-                            <label :for="props.id">
-                                <i class="fa fa-wrench" /> Build it?
-                            </label>
-                        </template>
-                    </VCFormInputCheckbox>
-                    Be aware that you will then no longer be able to modify the configuration after the build proccess is started.
-                </div>
-            </div>
-        </template>
-        <template #footer="props">
-            <div
-                class="d-flex flex-row"
-                style="width: 100%;"
-            >
-                <div>
-                    <button
-                        :disabled="isBusy"
-                        type="button"
-                        class="btn btn-secondary btn-xs"
-                        @click.prevent="props.cancel()"
-                    >
-                        Cancel
-                    </button>
-                </div>
-                <div class="ms-auto">
-                    <button
-                        :disabled="isBusy"
-                        type="button"
-                        class="btn btn-xs btn-dark"
-                        @click.prevent="execute(props.ok)"
-                    >
-                        Continue
-                    </button>
+                <div class="flex flex-col gap-2">
+                    <div>
+                        <VCFormCheckbox
+                            v-model="lockIt"
+                            :disabled="isBusy"
+                            :label="true"
+                            :group-class="'form-switch mb-0'"
+                            @update:model-value="handleLockItChanged"
+                        >
+                            <template #label="props">
+                                <label :for="props.id">
+                                    <VCIcon name="fa6-solid:lock" /> Lock it?
+                                </label>
+                            </template>
+                        </VCFormCheckbox>
+                        In order to build the analysis, the configuration must be locked!
+                    </div>
+                    <div v-if="lockIt">
+                        <VCFormCheckbox
+                            v-model="buildIt"
+                            :disabled="isBusy"
+                            :label="true"
+                            :group-class="'form-switch mb-0'"
+                            @update:model-value="handleBuildItChanged"
+                        >
+                            <template #label="props">
+                                <label :for="props.id">
+                                    <VCIcon name="fa6-solid:wrench" /> Build it?
+                                </label>
+                            </template>
+                        </VCFormCheckbox>
+                        Be aware that you will then no longer be able to modify the configuration after the build proccess is started.
+                    </div>
                 </div>
             </div>
-        </template>
-    </BModal>
+            <div class="modal-footer">
+                <div
+                    class="flex flex-row"
+                    style="width: 100%;"
+                >
+                    <div>
+                        <button
+                            :disabled="isBusy"
+                            type="button"
+                            class="btn btn-secondary btn-xs"
+                            @click.prevent="close()"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                    <div class="ms-auto">
+                        <button
+                            :disabled="isBusy"
+                            type="button"
+                            class="btn btn-xs btn-dark"
+                            @click.prevent="execute()"
+                        >
+                            Continue
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </VCModalContent>
+    </VCModal>
 </template>

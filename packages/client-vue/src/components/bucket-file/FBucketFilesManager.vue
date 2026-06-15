@@ -7,8 +7,7 @@
 
 <script lang="ts">
 import { provide } from '@authup/client-web-kit';
-import { VCFormInputCheckbox } from '@vuecs/form-controls';
-import { BModal } from 'bootstrap-vue-next';
+import { VCFormCheckbox } from '@vuecs/forms';
 import {
     computed,
     defineComponent,
@@ -26,10 +25,9 @@ import FBucketFiles from './FBucketFiles.vue';
 export default defineComponent({
     components: {
         FBucketFiles,
-        BModal,
         FBucketFilesUpload,
         FBucketFile,
-        VCFormInputCheckbox,
+        VCFormCheckbox,
     },
     props: {
         entityId: {
@@ -171,9 +169,9 @@ export default defineComponent({
 </script>
 <template>
     <div>
-        <div class="d-flex flex-column gap-2">
+        <div class="flex flex-col gap-2">
             <template v-if="!readonly">
-                <VCFormInputCheckbox
+                <VCFormCheckbox
                     v-model="allSelected"
                     :disabled="busy"
                     :label="true"
@@ -184,12 +182,12 @@ export default defineComponent({
                             Select all?
                         </label>
                     </template>
-                </VCFormInputCheckbox>
+                </VCFormCheckbox>
             </template>
 
             <hr
                 v-if="!readonly"
-                class="small"
+                class="text-sm"
             >
 
             <FBucketFiles
@@ -199,14 +197,14 @@ export default defineComponent({
             >
                 <template #body="{ data, resolved, deleted }">
                     <template v-if="resolved && data.length === 0">
-                        <div class="d-flex flex-column gap-1">
+                        <div class="flex flex-col gap-1">
                             <div class="alert alert-sm alert-dark mb-0">
-                                <i class="fa fa-info" /> No files found in bucket
+                                <VCIcon name="fa6-solid:info" /> No files found in bucket
                             </div>
                         </div>
                     </template>
                     <template v-else>
-                        <div class="d-flex flex-column">
+                        <div class="flex flex-col">
                             <template
                                 v-for="file in data"
                                 :key="file.id"
@@ -234,71 +232,68 @@ export default defineComponent({
 
             <hr
                 v-if="!readonly"
-                class="small"
+                class="text-sm"
             >
 
             <div
                 v-if="!readonly"
-                class="d-flex flex-row"
+                class="flex flex-row"
             >
                 <div>
                     <button
-                        v-b-tooltip.hover.top
                         title="Delete Files"
                         type="button"
                         class="btn btn-danger btn-xs"
                         :disabled="busy || selected.length === 0"
                         @click.prevent="dropSelected"
                     >
-                        <i class="fa fa-trash" />
+                        <VCIcon name="fa6-solid:trash" />
                     </button>
                 </div>
                 <template v-if="!readonly">
                     <div class="ms-auto">
                         <button
-                            v-b-tooltip.hover.top
                             title="Add File"
                             type="button"
                             class="btn btn-xs btn-dark"
                             @click.prevent="toggleModal"
                         >
-                            <i class="fa fa-add" />
+                            <VCIcon name="fa6-solid:plus" />
                         </button>
                     </div>
                 </template>
             </div>
         </div>
         <div>
-            <BModal
-                v-model="modal"
-                :no-footer="true"
-                :size="'lg'"
-            >
-                <template #header="props">
-                    <div class="d-flex flex-row w-100">
-                        <div>
-                            <h5 class="mb-0">
-                                <i class="fa fa-upload" /> Upload
-                            </h5>
-                        </div>
-                        <div class="ms-auto">
-                            <button
-                                type="button"
-                                class="btn btn-xs btn-secondary"
-                                @click.prevent="props.close()"
-                            >
-                                <i class="fa fa-times" />
-                            </button>
+            <VCModal v-model:open="modal">
+                <VCModalContent class="modal-lg">
+                    <div class="modal-header">
+                        <div class="flex flex-row w-full">
+                            <div>
+                                <h5 class="mb-0">
+                                    <VCIcon name="fa6-solid:upload" /> Upload
+                                </h5>
+                            </div>
+                            <div class="ms-auto">
+                                <button
+                                    type="button"
+                                    class="btn btn-xs btn-secondary"
+                                    @click.prevent="modal = false"
+                                >
+                                    <VCIcon name="fa6-solid:xmark" />
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </template>
-
-                <FBucketFilesUpload
-                    :bucket-id="entityId"
-                    @uploaded="handleUploaded"
-                    @failed="handleFailed"
-                />
-            </BModal>
+                    <div class="modal-body">
+                        <FBucketFilesUpload
+                            :bucket-id="entityId"
+                            @uploaded="handleUploaded"
+                            @failed="handleFailed"
+                        />
+                    </div>
+                </VCModalContent>
+            </VCModal>
         </div>
     </div>
 </template>

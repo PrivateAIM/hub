@@ -2,7 +2,7 @@
 
 [![npm version][npm-src]][npm-href]
 
-Real-time messaging service for PrivateAIM Hub — powered by Socket.io with Redis adapter.
+Real-time messaging service for FLAME Hub — powered by Socket.io with Redis adapter.
 
 ## Usage
 

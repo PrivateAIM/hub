@@ -32,7 +32,7 @@ export default defineComponent({
     <div v-if="entity">
         <div class="card-grey card mb-3">
             <div class="card-header">
-                <div class="d-flex flex-row w-100">
+                <div class="flex flex-row w-full">
                     <div>
                         <span class="title">Code</span>
                     </div>
@@ -44,7 +44,10 @@ export default defineComponent({
                                 class="btn btn-primary btn-xs"
                                 @click.prevent="add"
                             >
-                                <i class="fa fa-plus me-1" /> Add
+                                <VCIcon
+                                    name="fa6-solid:plus"
+                                    class="me-1"
+                                /> Add
                             </button>
                         </div>
                     </template>
@@ -52,10 +55,10 @@ export default defineComponent({
             </div>
             <div class="card-body">
                 <div
-                    class="d-flex flex-row gap-2 align-items-center alert alert-sm alert-warning"
+                    class="flex flex-row gap-2 items-center alert alert-sm alert-warning"
                 >
                     <div>
-                        <i class="fa fa-upload" />
+                        <VCIcon name="fa6-solid:upload" />
                     </div>
                     <div>
                         Upload one or more code files that define the logic of your analysis.

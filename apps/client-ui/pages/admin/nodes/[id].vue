@@ -12,6 +12,7 @@ import type {
 import {
     DomainType,
 } from '@privateaim/core-kit';
+import type { NavigationItem } from '@vuecs/navigation';
 import { defineComponent } from 'vue';
 import {
     useRoute,
@@ -55,26 +56,32 @@ export default defineComponent({
             throw createError({});
         }
 
-        const tabs = [
+        const base = `/admin/nodes/${manager.data.value.id}`;
+        const tabs: NavigationItem[] = [
             {
-                name: 'Overview', 
-                icon: 'fas fa-bars', 
-                path: '', 
+                name: '',
+                icon: 'fa6-solid:arrow-left',
+                url: '/admin/nodes',
             },
             {
-                name: 'Crypto', 
-                icon: 'fas fa-shield-alt', 
-                path: 'crypto', 
+                name: 'Overview',
+                icon: 'fa6-solid:bars',
+                url: base,
             },
             {
-                name: 'Client', 
-                icon: 'fa-solid fa-ghost', 
-                path: 'client', 
+                name: 'Crypto',
+                icon: 'fa6-solid:shield-halved',
+                url: `${base}/crypto`,
             },
             {
-                name: 'Registry', 
-                icon: 'fab fa-docker', 
-                path: 'registry', 
+                name: 'Client',
+                icon: 'fa6-solid:ghost',
+                url: `${base}/client`,
+            },
+            {
+                name: 'Registry',
+                icon: 'fa6-brands:docker',
+                url: `${base}/registry`,
             },
         ];
 
@@ -90,15 +97,14 @@ export default defineComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            <i class="fa-solid fa-server" /> {{ entity.name }} <span class="sub-title">Details</span>
+            <VCIcon name="fa6-solid:server" /> {{ entity.name }} <span class="sub-title">Details</span>
         </h1>
 
         <div class="m-b-20 m-t-10">
-            <div class="flex-wrap flex-row d-flex">
-                <DomainEntityNav
-                    :items="tabs"
-                    :path="'/admin/nodes/' + entity.id"
-                    :prev-link="true"
+            <div class="flex-wrap flex-row flex">
+                <VCNavItems
+                    :data="tabs"
+                    variant="pills"
                 />
             </div>
         </div>

@@ -1,0 +1,170 @@
+/*
+ * Copyright (c) 2021-2026.
+ * Author Peter Placzek (tada5hi)
+ * For the full copyright and license information,
+ * view the LICENSE file that was distributed with this source code.
+ */
+
+/*
+ * Unified card mechanism.
+ *
+ * One base `.card` whose entire surface — background, border, radius,
+ * shadow, padding, header/footer dividers, accent — is driven by
+ * `--card-*` custom properties. Variants (`.card-grey`, `.card-panel`,
+ * `.card-event`, `.card-file`) ONLY override those variables; they add
+ * no structural rules of their own. Every color resolves to a vuecs
+ * semantic token (`--vc-color-*`), so all cards adapt to light/dark
+ * automatically.
+ *
+ * Structure (`.card`, `.card-header`, `.card-body`, `.card-footer`,
+ * `.card-title`) lives in `@layer components` so Tailwind utilities used
+ * in templates (`flex flex-row`, `grow`, `text-center`, padding helpers)
+ * still win over these defaults.
+ */
+@layer components {
+    .card {
+        /* ---- themable contract — override on variants ---- */
+        --card-bg: transparent;
+        --card-fg: var(--vc-color-fg);
+        --card-border-color: transparent;
+        --card-border-width: 0;
+        --card-radius: 0.3125rem; /* 5px */
+        --card-shadow: 0 1px 20px 0 rgba(69, 90, 100, 0.08);
+        --card-pad-x: 0.5rem;
+        --card-pad-y: 0.5rem;
+        --card-cursor: default;
+
+        --card-header-fg: var(--vc-color-fg);
+        --card-header-border: transparent;
+        --card-header-shadow: 0 1px 20px 0 rgba(69, 125, 125, 0.08);
+
+        --card-footer-border: var(--vc-color-border);
+
+        --card-body-font-size: 0.875em;
+
+        --card-accent: var(--privateaim-brand-purple);
+        /* Header-title chevron, sourced from the iconify `fa6-solid:chevron-right`
+           SVG (we no longer ship a Font Awesome webfont — icons are iconify /
+           VCIcon). Painted via `mask-image` so `--card-accent` colors it. */
+        --card-accent-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 512'%3E%3Cpath d='M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256 73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z'/%3E%3C/svg%3E");
+
+        /* ---- structure ---- */
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        border-radius: var(--card-radius);
+        background-color: var(--card-bg);
+        color: var(--card-fg);
+        border: var(--card-border-width) solid var(--card-border-color);
+        box-shadow: var(--card-shadow);
+        cursor: var(--card-cursor);
+        /* Compositor-friendly transition set — `all` would animate
+           layout-triggering properties across whole card grids. */
+        transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out, border-color 0.3s ease-in-out;
+    }
+
+    .card a {
+        text-decoration: none;
+    }
+
+    /* ---- Header ---- */
+    .card .card-header {
+        position: relative;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: var(--card-pad-y) var(--card-pad-x);
+        color: var(--card-header-fg);
+        background-color: transparent;
+        border-bottom: 1px solid var(--card-header-border);
+        box-shadow: var(--card-header-shadow);
+    }
+
+    .card .card-header .title {
+        position: relative;
+        width: 100%;
+        margin: 0 0 0 1rem;
+        color: var(--card-header-fg);
+    }
+
+    .card .card-header .title::after {
+        content: "";
+        position: absolute;
+        left: -1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 0.7em;
+        height: 0.7em;
+        background-color: var(--card-accent);
+        -webkit-mask: var(--card-accent-icon) no-repeat center / contain;
+        mask: var(--card-accent-icon) no-repeat center / contain;
+    }
+
+    /* ---- Body ---- */
+    .card .card-body {
+        flex: 1 1 auto;
+        padding: var(--card-pad-y) var(--card-pad-x);
+        font-size: var(--card-body-font-size);
+    }
+
+    /* ---- Footer ---- */
+    .card .card-footer {
+        padding: var(--card-pad-y) var(--card-pad-x);
+        background-color: transparent;
+        border-top: 1px solid var(--card-footer-border);
+    }
+
+    /* ---- Standalone title ---- */
+    .card .card-title {
+        margin-bottom: 0;
+        font-weight: 600;
+    }
+
+    /* ============================================================
+       Variants — variable overrides only
+       ============================================================ */
+
+    /* Grey surface — the default content card across the app. */
+    .card-grey {
+        --card-bg: var(--vc-color-bg-muted);
+        --card-border-color: var(--vc-color-border);
+        --card-border-width: 1px;
+    }
+
+    /* Panel — elevated surface, larger radius (settings / profile). */
+    .card-panel {
+        --card-bg: var(--vc-color-bg-elevated);
+        --card-border-color: var(--vc-color-border);
+        --card-border-width: 1px;
+        --card-radius: 0.5rem;
+        --card-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.1);
+        --card-pad-x: 0.45rem;
+        --card-pad-y: 0.45rem;
+    }
+
+    /* Event — clickable tile (service catalog). */
+    .card-event {
+        --card-bg: var(--vc-color-bg-muted);
+        --card-border-color: var(--vc-color-border);
+        --card-border-width: 1px;
+        --card-radius: 0.25rem;
+        --card-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.1);
+        --card-cursor: pointer;
+    }
+
+    /* File — compact single-line row (bucket file list). */
+    .card-file {
+        --card-radius: 5px;
+        margin-bottom: 0.4rem;
+    }
+
+    .card-file .card-heading {
+        font-size: 1em;
+        cursor: pointer;
+    }
+
+    .card-file .card-heading .title {
+        font-size: 0.8125em;
+        font-weight: 600;
+    }
+}

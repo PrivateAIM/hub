@@ -66,11 +66,11 @@ const FProjectNodeApprovalCommand = defineComponent({
         const iconClass = computed(() => {
             switch (props.command) {
                 case ProjectNodeApprovalCommand.APPROVE:
-                    return 'fa fa-check';
+                    return 'fa6-solid:check';
                 case ProjectNodeApprovalCommand.REJECT:
-                    return 'fa fa-ban';
+                    return 'fa6-solid:ban';
                 default:
-                    return 'fa fa-sync-alt';
+                    return 'fa6-solid:arrows-rotate';
             }
         });
 

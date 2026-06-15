@@ -8,17 +8,17 @@
 import { injectStore, storeToRefs, usePermissionCheck } from '@authup/client-web-kit';
 import { PermissionName } from '@privateaim/kit';
 import { VCTimeago } from '@vuecs/timeago';
+import type { TableColumn } from '@vuecs/table';
 import type { Node } from '@privateaim/core-kit';
-import { BTable } from 'bootstrap-vue-next';
 import type { BuildInput } from 'rapiq';
 import { computed, defineComponent } from 'vue';
 import {
-    FEntityDelete, 
-    FEventActor, 
-    FEventExpiring, 
-    FEvents, 
-    FPagination, 
-    FSearch, 
+    FEntityDelete,
+    FEventActor,
+    FEventExpiring,
+    FEvents,
+    FPagination,
+    FSearch,
     FTitle,
 } from '@privateaim/client-vue';
 import { definePageMeta } from '#imports';
@@ -32,7 +32,6 @@ export default defineComponent({
         FSearch,
         FTitle,
         FEntityDelete,
-        BTable,
         FEvents,
         VCTimeago,
     },
@@ -43,53 +42,53 @@ export default defineComponent({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
         });
 
-        const fields = [
+        const columns: TableColumn[] = [
             {
-                key: 'name', 
-                label: 'Name', 
-                thClass: 'text-left', 
-                tdClass: 'text-left',
+                key: 'name',
+                label: 'Name',
+                headerClass: 'text-left',
+                cellClass: 'text-left',
             },
             {
-                key: 'scope', 
-                label: 'Scope', 
-                thClass: 'text-left', 
-                tdClass: 'text-left',
+                key: 'scope',
+                label: 'Scope',
+                headerClass: 'text-left',
+                cellClass: 'text-left',
             },
             {
-                key: 'ref_type', 
-                label: 'Ref Type', 
-                thClass: 'text-left', 
-                tdClass: 'text-left',
+                key: 'ref_type',
+                label: 'Ref Type',
+                headerClass: 'text-left',
+                cellClass: 'text-left',
             },
             {
-                key: 'ref_id', 
-                label: 'Ref ID', 
-                thClass: 'text-left', 
-                tdClass: 'text-left',
+                key: 'ref_id',
+                label: 'Ref ID',
+                headerClass: 'text-left',
+                cellClass: 'text-left',
             },
             {
-                key: 'actor', 
-                label: 'Actor', 
-                thClass: 'text-center', 
-                tdClass: 'text-center',
+                key: 'actor',
+                label: 'Actor',
+                headerClass: 'text-center',
+                cellClass: 'text-center',
             },
             {
-                key: 'expiring', 
-                label: 'Expiring?', 
-                thClass: 'text-center', 
-                tdClass: 'text-center',
+                key: 'expiring',
+                label: 'Expiring?',
+                headerClass: 'text-center',
+                cellClass: 'text-center',
             },
             {
-                key: 'created_at', 
-                label: 'Created At', 
-                thClass: 'text-center', 
-                tdClass: 'text-center',
+                key: 'created_at',
+                label: 'Created At',
+                headerClass: 'text-center',
+                cellClass: 'text-center',
             },
             {
-                key: 'options', 
-                label: '', 
-                tdClass: 'text-left',
+                key: 'options',
+                label: '',
+                cellClass: 'text-left',
             },
         ];
 
@@ -111,7 +110,7 @@ export default defineComponent({
         };
 
         return {
-            fields,
+            columns,
             realmManagementId,
             canView,
             canDrop,
@@ -142,54 +141,55 @@ export default defineComponent({
             />
         </template>
         <template #body="props">
-            <BTable
-                :items="props.data"
-                :fields="fields"
+            <VCTable
+                :data="props.data"
+                :columns="columns"
                 :busy="props.busy"
-                outlined
             >
-                <template #cell(scoppe)="data">
-                    <template v-if="data.item.scope">
-                        {{ data.item.scope }}
+                <template #cell-scope="{ row }: { row: any }">
+                    <template v-if="row.scope">
+                        {{ row.scope }}
                     </template>
                     <template v-else>
                         -
                     </template>
                 </template>
-                <template #cell(actor)="data">
-                    <FEventActor :entity="data.item" />
+                <template #cell-actor="{ row }: { row: any }">
+                    <FEventActor :entity="row" />
                 </template>
-                <template #cell(expiring)="data">
+                <template #cell-expiring="{ row }: { row: any }">
                     <FEventExpiring
-                        :entity="data.item"
+                        :entity="row"
                         :direction="'row'"
                     />
                 </template>
-                <template #cell(options)="data">
+                <template #cell-options="{ row }: { row: any }">
                     <nuxt-link
                         v-if="canView"
                         class="btn btn-xs btn-outline-primary"
-                        :to="'/admin/events/'+data.item.id"
+                        :to="'/admin/events/'+row.id"
                     >
-                        <i class="fa fa-share-square" />
+                        <VCIcon name="fa6-solid:share-from-square" />
                     </nuxt-link>
                     <FEntityDelete
                         v-if="canDrop"
                         service="telemetry"
                         class="btn btn-xs btn-outline-danger ms-1"
-                        :entity-id="data.item.id"
+                        :entity-id="row.id"
                         :entity-type="'event'"
                         :with-text="false"
                         @deleted="props.deleted"
                     />
                 </template>
-                <template #cell(created_at)="data">
-                    <VCTimeago :datetime="data.item.created_at" />
+                <template #cell-created_at="{ row }: { row: any }">
+                    <VCTimeago :datetime="row.created_at" />
                 </template>
-                <template #cell(updated_at)="data">
-                    <VCTimeago :datetime="data.item.updated_at" />
+                <template #cell-updated_at="{ row }: { row: any }">
+                    <VCTimeago :datetime="row.updated_at" />
                 </template>
-            </BTable>
+                <VCTableLoading />
+                <VCTableEmpty />
+            </VCTable>
         </template>
     </FEvents>
 </template>

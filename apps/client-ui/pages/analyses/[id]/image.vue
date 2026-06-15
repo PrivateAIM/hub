@@ -89,21 +89,21 @@ export default defineComponent({
         class="row"
     >
         <div class="col-12 col-md-6">
-            <div class="d-flex flex-column gap-3">
+            <div class="flex flex-col gap-3">
                 <div class="card-grey card">
                     <div class="card-header">
-                        <span class="title"><i class="fa fa-compact-disc" /> Base</span>
+                        <span class="title"><VCIcon name="fa6-solid:compact-disc" /> Base</span>
                     </div>
                     <div class="card-body">
                         <div
-                            class="d-flex flex-row gap-2 align-items-center alert alert-sm"
+                            class="flex flex-row gap-2 items-center alert alert-sm"
                             :class="{
                                 'alert-warning': entity.configuration_image_valid,
                                 'alert-danger': !entity.configuration_image_valid,
                             }"
                         >
                             <div>
-                                <i class="fa fa-info" />
+                                <VCIcon name="fa6-solid:info" />
                             </div>
                             <div>
                                 Pick a Docker-based master image that provides the runtime environment for your analysis.<br>
@@ -120,7 +120,7 @@ export default defineComponent({
                 </div>
                 <div class="card-grey card">
                     <div class="card-header">
-                        <span class="title"><i class="fa fa-keyboard" /> Command-Arguments</span>
+                        <span class="title"><VCIcon name="fa6-solid:keyboard" /> Command-Arguments</span>
                     </div>
                     <div class="card-body">
                         <FAnalysisImageCommandArguments
@@ -133,21 +133,21 @@ export default defineComponent({
             </div>
         </div>
         <div class="col-12 col-md-6">
-            <div class="d-flex flex-column gap-3">
+            <div class="flex flex-col gap-3">
                 <div class="card-grey card">
                     <div class="card-header">
-                        <span class="title"><i class="fa fa-file" /> Entrypoint</span>
+                        <span class="title"><VCIcon name="fa6-solid:file" /> Entrypoint</span>
                     </div>
                     <div class="card-body">
                         <div
-                            class="d-flex flex-row gap-2 align-items-center alert alert-sm"
+                            class="flex flex-row gap-2 items-center alert alert-sm"
                             :class="{
                                 'alert-warning': entity.configuration_entrypoint_valid,
                                 'alert-danger': !entity.configuration_entrypoint_valid,
                             }"
                         >
                             <div>
-                                <i class="fa fa-info" />
+                                <VCIcon name="fa6-solid:info" />
                             </div>
                             <div>
                                 An entrypoint file must be selected.
@@ -172,7 +172,7 @@ export default defineComponent({
                                             @failed="bucketFilesProps.failed"
                                         >
                                             <template #default="bucketFileProps">
-                                                <div class="d-flex flex-row align-items-center gap-2 p-1 w-100">
+                                                <div class="flex flex-row items-center gap-2 p-1 w-full">
                                                     <div>
                                                         {{ bucketFileProps.data.path }}
                                                     </div>
@@ -202,7 +202,7 @@ export default defineComponent({
                 </div>
                 <div class="card-grey card">
                     <div class="card-header">
-                        <span class="title"><i class="fa fa-bolt" /> Command</span>
+                        <span class="title"><VCIcon name="fa6-solid:bolt" /> Command</span>
                     </div>
                     <div class="card-body">
                         <FAnalysisImageCommand

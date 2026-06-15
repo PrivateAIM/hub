@@ -8,6 +8,7 @@
 <script lang="ts">
 import type { Node } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
+import type { NavigationItem } from '@vuecs/navigation';
 import { definePageMeta, useToast } from '#imports';
 import { defineNuxtComponent, navigateTo } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
@@ -24,16 +25,16 @@ export default defineNuxtComponent({
             ],
         });
 
-        const tabs = [
+        const tabs: NavigationItem[] = [
             {
                 name: 'overview',
-                path: '',
-                icon: 'fa fa-bars',
+                url: '/admin/nodes',
+                icon: 'fa6-solid:bars',
             },
             {
                 name: 'add',
-                path: '/add',
-                icon: 'fa fa-plus',
+                url: '/admin/nodes/add',
+                icon: 'fa6-solid:plus',
             },
         ];
 
@@ -65,14 +66,14 @@ export default defineNuxtComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            <i class="fa-solid fa-server" /> Node <span class="sub-title">Management</span>
+            <VCIcon name="fa6-solid:server" /> Node <span class="sub-title">Management</span>
         </h1>
         <div class="content-wrapper">
-            <div class="content-sidebar flex-column">
-                <DomainEntityNav
-                    :direction="'vertical'"
-                    :items="tabs"
-                    :path="'/admin/nodes'"
+            <div class="content-sidebar flex-col">
+                <VCNavItems
+                    :data="tabs"
+                    variant="pills"
+                    orientation="vertical"
                 />
             </div>
             <div class="content-container">

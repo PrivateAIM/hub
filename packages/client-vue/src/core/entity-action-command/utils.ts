@@ -5,14 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { vBTooltip } from 'bootstrap-vue-next';
 import { isObject } from 'smob';
-import { h, resolveDynamicComponent, withDirectives } from 'vue';
+import { h, resolveDynamicComponent } from 'vue';
 import type {
-    Component, 
-    Slots, 
+    Component,
+    Slots,
     VNodeArrayChildren,
-    VNodeChild, 
+    VNodeChild,
     VNodeProps,
 } from 'vue';
 import { hasNormalizedSlot, normalizeSlot } from '../slot';
@@ -36,6 +35,7 @@ export type ActionCommandSlotsType = {
         commandText: string,
         isDisabled: boolean,
         isAllowed: boolean,
+        iconName: string,
         iconClass: string[],
         execute: () => Promise<any>
     }
@@ -55,7 +55,7 @@ export function renderActionCommand(ctx: Context) : VNodeChild {
         disabled: ctx.isDisabled,
     };
 
-    const iconClasses : string[] = [ctx.iconClass];
+    const iconClasses : string[] = [];
     if (ctx.withIcon && ctx.withText) {
         iconClasses.push('me-1');
     }
@@ -63,7 +63,7 @@ export function renderActionCommand(ctx: Context) : VNodeChild {
     let tag : string | Component | undefined;
 
     if (ctx.elementType === 'dropDownItem') {
-        const component = resolveDynamicComponent('BDropdownItem');
+        const component = resolveDynamicComponent('VCDropdownMenuItem');
         if (isObject(component)) {
             tag = component as Component;
             iconClasses.push('ps-1', `text-${ctx.classSuffix}`);
@@ -88,7 +88,10 @@ export function renderActionCommand(ctx: Context) : VNodeChild {
     }
 
     if (ctx.withIcon) {
-        text.unshift(h('i', { class: iconClasses }));
+        text.unshift(h(resolveDynamicComponent('VCIcon') as Component, {
+            name: ctx.iconClass,
+            class: iconClasses,
+        }));
     }
 
     if (hasNormalizedSlot('default', ctx.slots)) {
@@ -96,27 +99,15 @@ export function renderActionCommand(ctx: Context) : VNodeChild {
             commandText: ctx.commandText,
             isDisabled: ctx.isDisabled,
             isAllowed: ctx.isAllowed,
+            iconName: ctx.iconClass,
             iconClass: iconClasses,
             execute: () => ctx.execute(),
         }, ctx.slots);
     }
 
-    const vNode = h(tag as string, attributes, text);
     if (ctx.commandTooltip) {
-        return withDirectives(
-            vNode,
-            [
-                [
-                    vBTooltip,
-                    ctx.commandTooltip,
-                    undefined,
-                    {
-                        hover: true,
-                        top: true,
-                    },
-                ],
-            ],
-        );
+        attributes.title = ctx.commandTooltip;
     }
-    return vNode;
+
+    return h(tag as string, attributes, text);
 }

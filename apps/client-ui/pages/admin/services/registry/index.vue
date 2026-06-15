@@ -8,6 +8,7 @@
 <script lang="ts">
 import type { Registry } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
+import type { NavigationItem } from '@vuecs/navigation';
 import { definePageMeta, useToast } from '#imports';
 import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
@@ -24,22 +25,21 @@ export default defineNuxtComponent({
 
         const toast = useToast();
 
-        const tabs = [
+        const tabs: NavigationItem[] = [
             {
-                name: 'overview',
-                path: '',
-                icon: 'fa fa-bars',
+                name: 'overview', 
+                url: '/admin/services/registry', 
+                icon: 'fa6-solid:bars', 
             },
             {
-                name: 'add',
-                path: '/add',
-                icon: 'fa fa-plus',
+                name: 'add', 
+                url: '/admin/services/registry/add', 
+                icon: 'fa6-solid:plus', 
             },
-
             {
-                name: 'client',
-                path: '/client',
-                icon: 'fa fa-ghost',
+                name: 'client', 
+                url: '/admin/services/registry/client', 
+                icon: 'fa6-solid:ghost', 
             },
         ];
 
@@ -57,15 +57,18 @@ export default defineNuxtComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            <i class="fab fa-docker me-1" /> Registry
+            <VCIcon
+                name="fa6-brands:docker"
+                class="me-1"
+            /> Registry
             <span class="sub-title ms-1">Management</span>
         </h1>
         <div class="content-wrapper">
-            <div class="content-sidebar flex-column">
-                <DomainEntityNav
-                    :direction="'vertical'"
-                    :items="tabs"
-                    :path="'/admin/services/registry'"
+            <div class="content-sidebar flex-col">
+                <VCNavItems
+                    :data="tabs"
+                    variant="pills"
+                    orientation="vertical"
                 />
             </div>
             <div class="content-container">

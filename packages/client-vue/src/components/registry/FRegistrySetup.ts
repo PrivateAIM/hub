@@ -6,7 +6,12 @@
  */
 
 import type { PropType } from 'vue';
-import { defineComponent, h, ref } from 'vue';
+import {
+    defineComponent, 
+    h, 
+    ref, 
+    resolveComponent,
+} from 'vue';
 import type { Registry } from '@privateaim/core-kit';
 import { RegistryAPICommand } from '@privateaim/core-kit';
 import { injectCoreHTTPClient } from '../../core';
@@ -44,9 +49,11 @@ export default defineComponent({
             busy.value = false;
         };
 
+        const VCIcon = resolveComponent('VCIcon');
+
         return () => h('div', [
             h('h6', [
-                h('i', { class: 'fa fa-info me-1' }),
+                h(VCIcon, { name: 'fa6-solid:info', class: 'me-1' }),
                 'Info',
             ]),
             h('p', [

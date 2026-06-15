@@ -42,7 +42,7 @@ export default defineComponent({
 });
 </script>
 <template>
-    <div class="card card-file d-flex flex-row align-items-center p-1">
+    <div class="card card-file flex flex-row items-center p-1">
         <div class="card-heading">
             <span class="title">
                 {{ path }}
@@ -54,7 +54,7 @@ export default defineComponent({
                 class="btn btn-dark btn-xs"
                 @click.prevent="drop"
             >
-                <i class="fa fa fa-trash" />
+                <VCIcon name="fa6-solid:trash" />
             </button>
         </div>
     </div>

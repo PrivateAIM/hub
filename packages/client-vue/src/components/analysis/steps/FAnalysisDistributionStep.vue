@@ -18,9 +18,11 @@ import type { Analysis } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
 import FProcessStatus from '../../FProcessStatus.vue';
 import { FAnalysisCommand } from '../FAnalysisCommand';
+import { FProgressBar } from '../../utility';
 
 export default defineComponent({
     components: {
+        FProgressBar,
         FProcessStatus,
         FAnalysisCommand,
     },
@@ -61,41 +63,39 @@ export default defineComponent({
 });
 </script>
 <template>
-    <div class="card-grey card flex-grow-1">
+    <div class="card-grey card grow">
         <div class="card-header">
-            <div class="title d-flex flex-row">
+            <div class="title flex flex-row">
                 <div>
                     3. Distribution
                 </div>
                 <div class="ms-auto">
                     <FProcessStatus :value="entity.distribution_status">
-                        <template #default=" { iconClass, classSuffix }">
-                            <i :class="iconClass + ' text-'+ classSuffix" />
+                        <template #default=" { iconName, iconClass, classSuffix }">
+                            <VCIcon
+                                :name="iconName"
+                                :class="iconClass + ' text-'+ classSuffix"
+                            />
                         </template>
                     </FProcessStatus>
                 </div>
             </div>
         </div>
         <div class="card-body">
-            <div class="d-flex flex-column h-100">
+            <div class="flex flex-col h-full">
                 <div class="text-center mb-3">
-                    <i class="fas fa-sitemap fa-4x" />
+                    <VCIcon
+                        name="fa6-solid:sitemap"
+                        class="text-4xl"
+                    />
                 </div>
 
-                <div class="progress bg-white">
-                    <div
-                        class="progress-bar"
-                        :class="'bg-success'"
-                        :style="{width: progress + '%'}"
-                        :aria-valuenow="progress"
-                        aria-valuemin="0"
-                        aria-valuemax="100"
-                    >
-                        {{ progress }}%
-                    </div>
-                </div>
+                <FProgressBar
+                    :progress="progress"
+                    show-text
+                />
                 <div class="mt-auto">
-                    <div class="d-flex flex-row gap-1">
+                    <div class="flex flex-row gap-1">
                         <div>
                             <FAnalysisCommand
                                 :command="'distributionStart'"

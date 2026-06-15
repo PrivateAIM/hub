@@ -48,7 +48,7 @@ export default defineComponent({
     <div v-if="entity">
         <div class="card-grey card mb-3">
             <div class="card-header">
-                <div class="d-flex flex-row w-100">
+                <div class="flex flex-row w-full">
                     <div>
                         <span class="title">Permissions</span>
                     </div>

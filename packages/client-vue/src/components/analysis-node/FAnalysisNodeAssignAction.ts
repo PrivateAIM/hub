@@ -11,7 +11,7 @@ import {
     DomainType,
 } from '@privateaim/core-kit';
 import { createEntityManager, defineEntityManagerEvents } from '../../core';
-import { renderToggleButton } from '../utility';
+import { renderToggleButton } from '@authup/client-web-kit';
 
 export default defineComponent({
     props: {

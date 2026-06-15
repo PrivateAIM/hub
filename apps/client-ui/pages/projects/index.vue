@@ -6,6 +6,7 @@
   -->
 <script lang="ts">
 import type { Project } from '@privateaim/core-kit';
+import type { NavigationItem } from '@vuecs/navigation';
 import { defineNuxtComponent, navigateTo } from '#app';
 import { definePageMeta, useToast } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
@@ -17,21 +18,21 @@ export default defineNuxtComponent({
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
         });
 
-        const tabs = [
+        const tabs: NavigationItem[] = [
             {
                 name: 'Create',
-                path: '/add',
-                icon: 'fa fa-plus',
+                url: '/projects/add',
+                icon: 'fa6-solid:plus',
             },
             {
                 name: 'Outgoing',
-                path: '',
-                icon: 'fa fa-file-export',
+                url: '/projects',
+                icon: 'fa6-solid:file-export',
             },
             {
                 name: 'Incoming',
-                path: '/in',
-                icon: 'fa fa-file-import',
+                url: '/projects/in',
+                icon: 'fa6-solid:file-import',
             },
         ];
 
@@ -53,16 +54,16 @@ export default defineNuxtComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            <i class="fas fa-project-diagram" /> Projects
+            <VCIcon name="fa6-solid:diagram-project" /> Projects
             <span class="sub-title">Manage incoming & outgoing projects</span>
         </h1>
 
         <div class="content-wrapper">
-            <div class="content-sidebar flex-column">
-                <DomainEntityNav
-                    :items="tabs"
-                    :path="'/projects'"
-                    :direction="'vertical'"
+            <div class="content-sidebar flex-col">
+                <VCNavItems
+                    :data="tabs"
+                    variant="pills"
+                    orientation="vertical"
                 />
             </div>
             <div class="content-container">

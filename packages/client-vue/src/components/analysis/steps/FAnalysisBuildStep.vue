@@ -19,9 +19,11 @@ import type { Analysis } from '@privateaim/core-kit';
 import FProcessStatus from '../../FProcessStatus.vue';
 import { FAnalysisCommand } from '../FAnalysisCommand';
 import FAnalysisBuildNodesStep from './FAnalysisBuildNodesStep.vue';
+import { FProgressBar } from '../../utility';
 
 export default defineComponent({
     components: {
+        FProgressBar,
         FAnalysisBuildNodesStep,
         FProcessStatus,
         FAnalysisCommand,
@@ -71,52 +73,50 @@ export default defineComponent({
 });
 </script>
 <template>
-    <div class="card-grey card flex-grow-1">
+    <div class="card-grey card grow">
         <div class="card-header">
-            <div class="title d-flex flex-row">
+            <div class="title flex flex-row">
                 <div>
                     Build
                 </div>
                 <div class="ms-auto">
                     <FProcessStatus :value="entity.build_status">
-                        <template #default=" { iconClass, classSuffix }">
-                            <i :class="iconClass + ' text-'+ classSuffix" />
+                        <template #default=" { iconName, iconClass, classSuffix }">
+                            <VCIcon
+                                :name="iconName"
+                                :class="iconClass + ' text-'+ classSuffix"
+                            />
                         </template>
                     </FProcessStatus>
                 </div>
             </div>
         </div>
         <div class="card-body">
-            <div class="d-flex flex-column h-100">
+            <div class="flex flex-col h-full">
                 <div class="text-center mb-3">
-                    <i class="fas fa-hammer fa-4x" />
+                    <VCIcon
+                        name="fa6-solid:hammer"
+                        class="text-4xl"
+                    />
                 </div>
-                <div class="progress bg-white">
-                    <div
-                        class="progress-bar"
-                        :class="'bg-success'"
-                        :style="{width: progress + '%'}"
-                        :aria-valuenow="progress"
-                        aria-valuemin="0"
-                        aria-valuemax="100"
-                    >
-                        {{ progress }}%
-                    </div>
-                </div>
+                <FProgressBar
+                    :progress="progress"
+                    show-text
+                />
 
                 <hr>
 
-                <div class="d-flex flex-column">
+                <div class="flex flex-col">
                     <div>
-                        <h6 class="mb-0">
-                            Requirements
-                        </h6>
+                        <div class="flex flex-row items-center gap-1 text-fg-muted text-xs mb-1">
+                            <VCIcon name="fa6-solid:list-check" />
+                            <span>Requirements</span>
+                        </div>
                         <FAnalysisBuildNodesStep :entity="entity">
                             <template #default="{passed, message}">
-                                <div class="d-flex flex-row gap-1">
+                                <div class="flex flex-row gap-1">
                                     <div>
                                         <strong
-                                            v-b-tooltip.hover.top
                                             :title="message"
                                         >
                                             Node(s) Approval
@@ -124,19 +124,12 @@ export default defineComponent({
                                     </div>
                                     <div>
                                         <span
-                                            class="text-success"
                                             :class="{
-                                                'text-success': passed,
-                                                'text-danger': !passed,
+                                                'text-success-600': passed,
+                                                'text-error-600': !passed,
                                             }"
                                         >
-                                            <i
-                                                class="fa"
-                                                :class="{
-                                                    'fa-check': passed,
-                                                    'fa-times': !passed,
-                                                }"
-                                            />
+                                            <VCIcon :name="passed ? 'fa6-solid:check' : 'fa6-solid:xmark'" />
                                         </span>
                                     </div>
                                 </div>
@@ -148,28 +141,26 @@ export default defineComponent({
                         <hr>
 
                         <div>
-                            <h6 class="mb-0">
-                                Info
-                            </h6>
-                            <div class="d-flex flex-column">
+                            <div class="flex flex-row items-center gap-1 text-fg-muted text-xs mb-1">
+                                <VCIcon name="fa6-solid:circle-info" />
+                                <span>Info</span>
+                            </div>
+                            <div class="flex flex-col">
                                 <div
                                     v-if="entity.build_os"
-                                    class="d-flex flex-row gap-1"
+                                    class="flex flex-row gap-1"
                                 >
                                     <div>
                                         <strong>OS</strong>
                                     </div>
                                     <div>
                                         {{ entity.build_os }}
-                                        <i
-                                            class="fa-brands"
-                                            :class="'fa-' + entity.build_os"
-                                        />
+                                        <VCIcon :name="'fa6-brands:' + entity.build_os" />
                                     </div>
                                 </div>
                                 <div
                                     v-if="entity.build_hash"
-                                    class="d-flex flex-row gap-1"
+                                    class="flex flex-row gap-1"
                                 >
                                     <div>
                                         <strong>Hash</strong>
@@ -180,7 +171,7 @@ export default defineComponent({
                                 </div>
                                 <div
                                     v-if="size"
-                                    class="d-flex flex-row gap-1"
+                                    class="flex flex-row gap-1"
                                 >
                                     <div>
                                         <strong>Size</strong>
@@ -195,7 +186,7 @@ export default defineComponent({
                 </div>
 
                 <div class="mt-auto">
-                    <div class="d-flex flex-row gap-1 ">
+                    <div class="flex flex-row gap-1 ">
                         <div>
                             <FAnalysisCommand
                                 :command="'buildStart'"

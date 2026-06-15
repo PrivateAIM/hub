@@ -4,7 +4,9 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { getSeverity, useTranslationsForNestedValidations } from '@ilingo/vuelidate';
+import { useFieldValidation } from '@ilingo/validup-vue';
+import { useValidup } from '@validup/vue';
+import type { Severity } from '@validup/vue';
 import type {
     RegistryProject,
 } from '@privateaim/core-kit';
@@ -14,17 +16,17 @@ import {
     ServiceID,
     registryRobotSecretRegex,
 } from '@privateaim/core-kit';
-import { buildFormGroup, buildFormInput } from '@vuecs/form-controls';
-import useVuelidate from '@vuelidate/core';
-import {
-    helpers,
-} from '@vuelidate/validators';
+import { buildFormGroup, buildFormInput } from '@authup/client-web-kit';
+import { Container } from 'validup';
+import { createValidator } from '@validup/zod';
+import { z } from 'zod';
 import type { SlotsType, VNodeChild } from 'vue';
 import {
-    defineComponent, 
-    h, 
-    reactive, 
+    defineComponent,
+    h,
+    reactive,
     ref,
+    resolveComponent,
 } from 'vue';
 import type { EntityManagerSlotsType } from '../../core';
 import {
@@ -34,6 +36,18 @@ import {
     injectCoreHTTPClient,
     wrapFnWithBusyState,
 } from '../../core';
+
+class RegistryProjectSecretValidator extends Container<{ secret: string }> {
+    protected initialize() {
+        super.initialize();
+
+        this.mount(
+            'secret',
+            { optional: true },
+            createValidator(z.string().regex(registryRobotSecretRegex)),
+        );
+    }
+}
 
 export default defineComponent({
     props: defineEntityManagerProps<RegistryProject>(),
@@ -45,9 +59,11 @@ export default defineComponent({
 
         const form = reactive({ secret: '' });
 
-        const vuelidate = useVuelidate({ secret: { registryRobotSecret: helpers.regex(registryRobotSecretRegex) } }, form);
+        const $v = useValidup(new RegistryProjectSecretValidator(), form);
 
-        const translationsValidation = useTranslationsForNestedValidations(vuelidate.value);
+        const secretValidation = useFieldValidation($v.fields.secret);
+
+        const toSeverity = (input: Severity) => (input === 'error' || input === 'warning' ? input : undefined);
 
         const manager = createEntityManager({
             type: `${DomainType.REGISTRY_PROJECT}`,
@@ -103,8 +119,9 @@ export default defineComponent({
         }
 
         return () => {
+            const VCIcon = resolveComponent('VCIcon');
             const fallback = () : VNodeChild => h('div', [
-                h('div', { class: 'mb-2 d-flex flex-column' }, [
+                h('div', { class: 'mb-2 flex flex-col' }, [
                     h('div', { class: 'form-group' }, [
                         h('label', { class: 'pe-1' }, 'Project'),
                         h('input', {
@@ -129,8 +146,8 @@ export default defineComponent({
                         buildFormGroup({
                             label: true,
                             labelContent: 'Account Secret',
-                            validationMessages: translationsValidation.secret.value,
-                            validationSeverity: getSeverity(vuelidate.value.secret),
+                            validationMessages: secretValidation.messages,
+                            validationSeverity: toSeverity(secretValidation.severity),
                             content: buildFormInput({
                                 props: { placeholder: '...' },
                                 value: form.secret,
@@ -143,11 +160,9 @@ export default defineComponent({
 
                     h('div', [
                         h('strong', { class: 'pe-1' }, 'Webhook:'),
-                        h('i', {
-                            class: {
-                                'fa fa-check text-success': manager.data.value?.webhook_exists,
-                                'fa fa-times text-danger': !manager.data.value?.webhook_exists,
-                            },
+                        h(VCIcon, {
+                            name: manager.data.value?.webhook_exists ? 'fa6-solid:check' : 'fa6-solid:xmark',
+                            class: manager.data.value?.webhook_exists ? 'text-success-600' : 'text-error-600',
                         }),
                     ]),
                 ]),
@@ -168,7 +183,7 @@ export default defineComponent({
                                     return execute(RegistryAPICommand.PROJECT_LINK);
                                 },
                             }, [
-                                h('i', { class: 'fa-solid fa-plug pe-1' }),
+                                h(VCIcon, { name: 'fa6-solid:plug', class: 'pe-1' }),
                                 'Connect',
                             ]),
                         ]),
@@ -187,7 +202,7 @@ export default defineComponent({
                                     return execute(RegistryAPICommand.PROJECT_UNLINK);
                                 },
                             }, [
-                                h('i', { class: 'fa-solid fa-power-off pe-1' }),
+                                h(VCIcon, { name: 'fa6-solid:power-off', class: 'pe-1' }),
                                 'Disconnect',
                             ]),
                         ]),

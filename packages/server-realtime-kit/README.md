@@ -2,7 +2,7 @@
 
 [![npm version][npm-src]][npm-href]
 
-Socket.io server helpers with Authup authentication middleware and Redis adapter for PrivateAIM Hub.
+Socket.io server helpers with Authup authentication middleware and Redis adapter for FLAME Hub.
 
 ## Installation
 

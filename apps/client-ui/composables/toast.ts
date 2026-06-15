@@ -5,40 +5,57 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { isObject } from '@privateaim/kit'; import type { OrchestratedToast } from 'bootstrap-vue-next';
-import { useToastController } from 'bootstrap-vue-next';
+import { isObject } from '@privateaim/kit';
+import { useToast as useVuecsToast } from '@vuecs/overlays';
+
+type LegacyVariant = 'success' | 'danger' | 'warning' | 'info' | 'primary' | 'secondary' | 'light' | 'dark';
+type VuecsColor = 'neutral' | 'primary' | 'info' | 'success' | 'warning' | 'error';
+
+function variantToColor(variant?: string): VuecsColor {
+    switch (variant) {
+        case 'success': return 'success';
+        case 'warning': return 'warning';
+        case 'danger': return 'error';
+        case 'info': return 'info';
+        case 'primary': return 'primary';
+        default: return 'neutral';
+    }
+}
+
+type ToastShowOptions = {
+    body?: string;
+    title?: string;
+    variant?: LegacyVariant;
+    pos?: string;
+    [key: string]: unknown;
+};
 
 export function useToast() {
-    const toast = useToastController();
+    const toast = useVuecsToast();
+
+    function showImpl(opts: ToastShowOptions) {
+        return toast.add({
+            title: opts.title,
+            description: opts.body,
+            color: variantToColor(opts.variant),
+        });
+    }
 
     return {
-        hide(el: symbol) {
-            if (typeof toast.remove !== 'undefined') {
-                toast.remove(el);
-            }
+        hide(el: string) {
+            toast.dismiss(el);
         },
         show(
-            el: string | OrchestratedToast,
-            options: OrchestratedToast = {},
+            el: string | ToastShowOptions,
+            options: ToastShowOptions = {},
         ) {
-            if (typeof toast.show === 'undefined') {
-                return Symbol('');
-            }
-
             if (isObject(el)) {
-                el.pos = el.pos || 'top-center';
-                return toast.show({ props: el });
+                return showImpl(el as ToastShowOptions);
             }
 
-            if (options) {
-                options.pos = options.pos || 'top-center';
-            }
-
-            return toast.show({
-                props: {
-                    ...(options || {}),
-                    body: el,
-                },
+            return showImpl({
+                ...options,
+                body: el,
             });
         },
     };

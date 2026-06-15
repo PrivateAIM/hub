@@ -2,7 +2,7 @@
 
 [![npm version][npm-src]][npm-href]
 
-Server-side telemetry components for PrivateAIM Hub — Winston transport and AMQP consumers for log/event ingestion.
+Server-side telemetry components for FLAME Hub — Winston transport and AMQP consumers for log/event ingestion.
 
 ## Installation
 

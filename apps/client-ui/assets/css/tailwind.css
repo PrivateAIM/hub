@@ -1,0 +1,74 @@
+/*
+ * Tailwind v4 entry for apps/client-ui.
+ *
+ * Pulls in the PrivateAIM theme (tailwindcss + @vuecs/design +
+ * theme-tailwind + the kit theme + compat layer), then declares this
+ * app's local `@source` scopes so the JIT picks up class-name tokens it
+ * can't reach via the theme alone.
+ */
+
+/*
+ * Structural CSS for @vuecs/navigation (<VCNavItems>): flex layout for
+ * nav links + submenu triggers (inline icon/label), the dropdown content
+ * panel, and the base pills box. The JS plugin only registers components;
+ * this stylesheet ships separately and must be imported explicitly.
+ * Imported here (not in the theme) because @vuecs/navigation is a direct
+ * dependency of this app — keeping it out of the theme's deps avoids a
+ * dependency re-resolution. Placed BEFORE the theme so the theme's
+ * app-level overrides (styles/vue-layout-navigation.css) still win.
+ */
+@import "@vuecs/navigation/style.css";
+
+/*
+ * Structural CSS for @vuecs/forms (<VCFormCheckbox>, <VCFormInput>,
+ * <VCFormSelect>, …): the checkbox/radio indicator glyphs (a masked SVG
+ * checkmark on `.vc-form-checkbox-indicator:before`), select/textarea
+ * chrome, and group layout. Like navigation, the JS plugin only registers
+ * the components — this stylesheet ships separately and must be imported
+ * explicitly, otherwise checked boxes render empty (no checkmark glyph).
+ * Imported here (not the theme) because @vuecs/forms is a direct
+ * dependency of this app.
+ */
+@import "@vuecs/forms/style.css";
+
+@import "@privateaim/client-vue-theme";
+
+/*
+ * Scan this app's templates (pages / components / layouts / plugins).
+ * Re-anchored to the app root so coverage is independent of where this
+ * file lives.
+ */
+@source "../..";
+
+/*
+ * client-vue ships class strings in two places the app entry must scan:
+ * the `.vue` SFC templates AND the ~81 hyperscript `.ts` components that
+ * emit class strings inside `h(...)` calls outside any template. Without
+ * this glob those utilities silently never compile.
+ *
+ * Path is relative to THIS file (apps/client-ui/assets/css/), so reaching
+ * the repo-root `packages/` needs four `../` (css → assets → client-ui →
+ * apps → root). The earlier three-`../` form resolved to the non-existent
+ * `apps/packages/...`, which Tailwind skips silently — so every utility
+ * class UNIQUE to a client-vue component (e.g. the `ms-4` step indent)
+ * was never generated.
+ */
+@source "../../../../packages/client-vue/src";
+
+/*
+ * Nested vuecs deps. npm workspaces hoist most `@vuecs/*` to the repo
+ * root, but several land under app-local node_modules due to peer
+ * deduplication. Tailwind v4 silently skips missing paths, so listing
+ * both the app-local and root trees is safe and keeps the JIT corpus
+ * complete regardless of the hoist layout.
+ */
+@source "../../node_modules/@vuecs";
+@source "../../../../node_modules/@vuecs";
+
+/*
+ * @authup/client-web-kit ships compiled component class strings under
+ * its dist tree. The kit theme covers its own dist via a relative glob,
+ * but re-anchor from hub's hoist layout (app-local and root) to be safe.
+ */
+@source "../../node_modules/@authup/client-web-kit/dist";
+@source "../../../../node_modules/@authup/client-web-kit/dist";

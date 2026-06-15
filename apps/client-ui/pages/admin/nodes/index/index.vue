@@ -8,15 +8,15 @@
 import { injectStore, storeToRefs, usePermissionCheck } from '@authup/client-web-kit';
 import { PermissionName } from '@privateaim/kit';
 import { VCTimeago } from '@vuecs/timeago';
+import type { TableColumn } from '@vuecs/table';
 import type { Node } from '@privateaim/core-kit';
-import { BTable } from 'bootstrap-vue-next';
 import type { BuildInput } from 'rapiq';
 import { computed } from 'vue';
 import {
-    FEntityDelete, 
-    FNodes, 
-    FPagination, 
-    FSearch, 
+    FEntityDelete,
+    FNodes,
+    FPagination,
+    FSearch,
     FTitle,
 } from '@privateaim/client-vue';
 import { definePageMeta } from '#imports';
@@ -29,7 +29,6 @@ export default defineNuxtComponent({
         ListSearch: FSearch,
         ListTitle: FTitle,
         EntityDelete: FEntityDelete,
-        BTable,
         FNodes,
         VCTimeago,
     },
@@ -40,29 +39,29 @@ export default defineNuxtComponent({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
         });
 
-        const fields = [
+        const columns: TableColumn[] = [
             {
-                key: 'name', 
-                label: 'Name', 
-                thClass: 'text-left', 
-                tdClass: 'text-left',
+                key: 'name',
+                label: 'Name',
+                headerClass: 'text-left',
+                cellClass: 'text-left',
             },
             {
-                key: 'created_at', 
-                label: 'Created At', 
-                thClass: 'text-center', 
-                tdClass: 'text-center',
+                key: 'created_at',
+                label: 'Created At',
+                headerClass: 'text-center',
+                cellClass: 'text-center',
             },
             {
-                key: 'updated_at', 
-                label: 'Updated At', 
-                thClass: 'text-left', 
-                tdClass: 'text-left',
+                key: 'updated_at',
+                label: 'Updated At',
+                headerClass: 'text-left',
+                cellClass: 'text-left',
             },
             {
-                key: 'options', 
-                label: '', 
-                tdClass: 'text-left',
+                key: 'options',
+                label: '',
+                cellClass: 'text-left',
             },
         ];
 
@@ -83,7 +82,7 @@ export default defineNuxtComponent({
         };
 
         return {
-            fields,
+            columns,
             realmManagementId,
             canView,
             canDrop,
@@ -113,37 +112,37 @@ export default defineNuxtComponent({
             />
         </template>
         <template #body="props">
-            <BTable
-                :items="props.data"
-                :fields="fields"
+            <VCTable
+                :data="props.data"
+                :columns="columns"
                 :busy="props.busy"
-                head-variant="'dark'"
-                outlined
             >
-                <template #cell(options)="data">
+                <template #cell-options="{ row }: { row: any }">
                     <nuxt-link
                         v-if="canView"
                         class="btn btn-xs btn-outline-primary"
-                        :to="'/admin/nodes/'+data.item.id"
+                        :to="'/admin/nodes/'+row.id"
                     >
-                        <i class="fa fa-bars" />
+                        <VCIcon name="fa6-solid:bars" />
                     </nuxt-link>
                     <EntityDelete
                         v-if="canDrop"
                         class="btn btn-xs btn-outline-danger ms-1"
-                        :entity-id="data.item.id"
+                        :entity-id="row.id"
                         :entity-type="'node'"
                         :with-text="false"
                         @deleted="props.deleted"
                     />
                 </template>
-                <template #cell(created_at)="data">
-                    <VCTimeago :datetime="data.item.created_at" />
+                <template #cell-created_at="{ row }: { row: any }">
+                    <VCTimeago :datetime="row.created_at" />
                 </template>
-                <template #cell(updated_at)="data">
-                    <VCTimeago :datetime="data.item.updated_at" />
+                <template #cell-updated_at="{ row }: { row: any }">
+                    <VCTimeago :datetime="row.updated_at" />
                 </template>
-            </BTable>
+                <VCTableLoading />
+                <VCTableEmpty />
+            </VCTable>
         </template>
     </FNodes>
 </template>

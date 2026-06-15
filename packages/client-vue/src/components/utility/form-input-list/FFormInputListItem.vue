@@ -13,24 +13,29 @@
   -->
 
 <script lang="ts">
-import { IVuelidate } from '@ilingo/vuelidate';
-import { VCFormGroup, VCFormInput } from '@vuecs/form-controls';
-import useVuelidate from '@vuelidate/core';
+import { IFieldValidation } from '@ilingo/validup-vue';
+import { useValidup } from '@validup/vue';
+import { createValidator } from '@validup/zod';
+import { Container } from 'validup';
+import { z } from 'zod';
+import { VCFormGroup, VCFormInput } from '@vuecs/forms';
 import {
-    maxLength, 
-    minLength, 
-    required,
-} from '@vuelidate/validators';
-import {
-    defineComponent, 
+    defineComponent,
     reactive,
 } from 'vue';
 
+class FormInputListItemValidator extends Container<{ name: string }> {
+    protected override initialize() {
+        super.initialize();
+        this.mount('name', createValidator(z.string().min(2).max(512)));
+    }
+}
+
 export default defineComponent({
     components: {
-        IVuelidate, 
-        VCFormInput, 
-        VCFormGroup, 
+        IFieldValidation,
+        VCFormInput,
+        VCFormGroup,
     },
     props: {
         name: {
@@ -48,18 +53,12 @@ export default defineComponent({
     },
     emits: ['updated', 'deleted'],
     setup(props, ctx) {
-        const form = reactive({ name: props.name });
+        const form = reactive({ name: props.name ?? '' });
 
-        const vuelidate = useVuelidate({
-            name: {
-                required,
-                minLength: minLength(2),
-                maxLength: maxLength(512),
-            },
-        }, form);
+        const v = useValidup(new FormInputListItemValidator(), form);
 
         const handleUpdated = () => {
-            ctx.emit('updated', vuelidate.value.name.$model);
+            ctx.emit('updated', v.fields.name.$model.value);
         };
 
         const handleDeleted = () => {
@@ -69,35 +68,33 @@ export default defineComponent({
         return {
             handleUpdated,
             handleDeleted,
-            vuelidate,
+            v,
         };
     },
 });
 </script>
 <template>
-    <IVuelidate :validation="vuelidate.name">
-        <template #default="props">
-            <VCFormGroup
-                :validation-messages="props.data"
-                :validation-severity="props.severity"
+    <IFieldValidation
+        v-slot="{ value }"
+        :field="v.fields.name"
+    >
+        <VCFormGroup :validation="value">
+            <VCFormInput
+                v-model="v.fields.name.$model.value"
+                :disabled="readonly"
+                @change="handleUpdated"
             >
-                <VCFormInput
-                    v-model="vuelidate.name.$model"
-                    :disabled="readonly"
-                    @change="handleUpdated"
-                >
-                    <template #groupAppend>
-                        <button
-                            :disabled="!canDrop || readonly"
-                            type="button"
-                            class="btn btn-xs btn-dark"
-                            @click.prevent="handleDeleted"
-                        >
-                            <i class="fa fa-minus" />
-                        </button>
-                    </template>
-                </VCFormInput>
-            </VCFormGroup>
-        </template>
-    </IVuelidate>
+                <template #groupAppend>
+                    <button
+                        :disabled="!canDrop || readonly"
+                        type="button"
+                        class="btn btn-xs btn-dark"
+                        @click.prevent="handleDeleted"
+                    >
+                        <VCIcon name="fa6-solid:minus" />
+                    </button>
+                </template>
+            </VCFormInput>
+        </VCFormGroup>
+    </IFieldValidation>
 </template>

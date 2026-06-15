@@ -11,7 +11,8 @@ import type { Permission } from '@authup/core-kit';
 import { PermissionName } from '@authup/core-kit';
 import { FDisplayName } from '@privateaim/client-vue';
 
-import { defineComponent, ref } from 'vue';
+import type { NavigationItem } from '@vuecs/navigation';
+import { computed, defineComponent, ref } from 'vue';
 import type { Ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { createError, definePageMeta, navigateTo } from '#imports';
@@ -30,34 +31,6 @@ export default defineComponent({
             ],
         });
 
-        const items = [
-            {
-                name: 'General',
-                icon: 'fas fa-bars',
-                path: '',
-            },
-            {
-                name: 'Policies',
-                icon: 'fas fa-shield-halved',
-                path: 'policies',
-            },
-            {
-                name: 'Users',
-                icon: 'fas fa-user',
-                path: 'users',
-            },
-            {
-                name: 'Robots',
-                icon: 'fas fa-robot',
-                path: 'robots',
-            },
-            {
-                name: 'Roles',
-                icon: 'fas fa-user-group',
-                path: 'roles',
-            },
-        ];
-
         const toast = useToast();
         const route = useRoute();
 
@@ -71,6 +44,42 @@ export default defineComponent({
             await navigateTo({ path: '/admin/permissions' });
             throw createError({});
         }
+
+        const items = computed<NavigationItem[]>(() => {
+            const base = `/admin/permissions/${entity.value?.id}`;
+            return [
+                {
+                    name: '', 
+                    icon: 'fa6-solid:arrow-left', 
+                    url: '/admin/permissions', 
+                },
+                {
+                    name: 'General', 
+                    icon: 'fa6-solid:bars', 
+                    url: base, 
+                },
+                {
+                    name: 'Policies', 
+                    icon: 'fa6-solid:shield-halved', 
+                    url: `${base}/policies`, 
+                },
+                {
+                    name: 'Users', 
+                    icon: 'fa6-solid:user', 
+                    url: `${base}/users`, 
+                },
+                {
+                    name: 'Robots', 
+                    icon: 'fa6-solid:robot', 
+                    url: `${base}/robots`, 
+                },
+                {
+                    name: 'Roles', 
+                    icon: 'fa6-solid:user-group', 
+                    url: `${base}/roles`, 
+                },
+            ];
+        });
 
         const handleUpdated = (e: Permission) => {
             toast.show({ variant: 'success', body: 'The permission was successfully updated.' });
@@ -94,7 +103,10 @@ export default defineComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            <i class="fa fa-user me-1" />
+            <VCIcon
+                name="fa6-solid:user"
+                class="me-1"
+            />
             <FDisplayName
                 :name="entity.name"
                 :display-name="entity.display_name"
@@ -104,10 +116,9 @@ export default defineComponent({
             </span>
         </h1>
         <div class="mb-2">
-            <DomainEntityNav
-                :items="items"
-                :path="`/admin/permissions/${entity.id}`"
-                :prev-link="true"
+            <VCNavItems
+                :data="items"
+                variant="pills"
             />
         </div>
 

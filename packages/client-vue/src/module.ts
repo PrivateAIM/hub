@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { applyStoreManagerOptions, installStoreManager } from '@vuecs/list-controls/core';
 import type { App, Component } from 'vue';
 import * as components from './components';
 import {
@@ -27,11 +26,6 @@ export function install(app: App, options: Options): void {
     installSocketManager(app, { baseURL: options.coreURL });
 
     installTranslator(app, { locale: options.translatorLocale });
-
-    const storeManager = installStoreManager(app);
-    if (options.storeManager) {
-        applyStoreManagerOptions(storeManager, options.storeManager);
-    }
 
     if (options.components) {
         let componentsSelected: undefined | string[];

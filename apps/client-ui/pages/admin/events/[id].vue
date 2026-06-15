@@ -36,7 +36,7 @@ export default defineComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            <i class="fa-solid fa-bullhorn" />
+            <VCIcon name="fa6-solid:bullhorn" />
             Event
             <span class="sub-title">{{ entity.id }}</span>
         </h1>

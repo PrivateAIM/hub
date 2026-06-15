@@ -5,16 +5,31 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { MemoryStore } from '@ilingo/vuelidate/core';
-import { install } from '@ilingo/vuelidate';
+import {
+    MemoryStore,
+    defineCatalog,
+    defineLocale,
+    defineNamespace,
+    defineTranslations,
+} from 'ilingo';
+import { install as installIlingoVue } from '@ilingo/vue';
+import { install as installIlingoValidup } from '@ilingo/validup-vue';
 import type { App } from 'vue';
 import type { TranslatorInstallOptions } from './types';
 
 export function installTranslator(app: App, options: TranslatorInstallOptions = {}) {
-    const store = new MemoryStore({ data: {} });
+    const catalog = defineCatalog([
+        defineLocale('en', [
+            defineNamespace('app', [defineTranslations({})]),
+        ]),
+        defineLocale('de', [
+            defineNamespace('app', [defineTranslations({})]),
+        ]),
+    ]);
 
-    install(app, {
-        store,
+    installIlingoVue(app, {
+        store: new MemoryStore({ data: catalog }),
         locale: options.locale,
     });
+    installIlingoValidup(app);
 }

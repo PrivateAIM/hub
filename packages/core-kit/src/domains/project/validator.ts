@@ -7,7 +7,7 @@
 
 import { isNameValid } from '@authup/core-kit';
 import { Container } from 'validup';
-import { createValidator } from '@validup/adapter-zod';
+import { createValidator } from '@validup/zod';
 import { z } from 'zod';
 import type { Project } from './entity.ts';
 

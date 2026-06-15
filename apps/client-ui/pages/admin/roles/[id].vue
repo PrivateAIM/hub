@@ -10,7 +10,8 @@ import { injectHTTPClient } from '@authup/client-web-kit';
 import type { Role } from '@authup/core-kit';
 import { PermissionName } from '@authup/core-kit';
 import { FDisplayName } from '@privateaim/client-vue';
-import { defineComponent, ref } from 'vue';
+import type { NavigationItem } from '@vuecs/navigation';
+import { computed, defineComponent, ref } from 'vue';
 import type { Ref } from 'vue';
 import {
     definePageMeta,
@@ -38,24 +39,6 @@ export default defineComponent({
             ],
         });
 
-        const items = [
-            {
-                name: 'General', 
-                icon: 'fas fa-bars', 
-                path: '',
-            },
-            {
-                name: 'Permissions', 
-                icon: 'fas fa-user-secret', 
-                path: 'permissions',
-            },
-            {
-                name: 'Users', 
-                icon: 'fas fa-users', 
-                path: 'users',
-            },
-        ];
-
         const toast = useToast();
         const route = useRoute();
 
@@ -69,6 +52,32 @@ export default defineComponent({
             await navigateTo({ path: '/admin/roles' });
             throw createError({});
         }
+
+        const items = computed<NavigationItem[]>(() => {
+            const base = `/admin/roles/${entity.value?.id}`;
+            return [
+                {
+                    name: '', 
+                    icon: 'fa6-solid:arrow-left', 
+                    url: '/admin/roles', 
+                },
+                {
+                    name: 'General', 
+                    icon: 'fa6-solid:bars', 
+                    url: base, 
+                },
+                {
+                    name: 'Permissions', 
+                    icon: 'fa6-solid:user-secret', 
+                    url: `${base}/permissions`, 
+                },
+                {
+                    name: 'Users', 
+                    icon: 'fa6-solid:users', 
+                    url: `${base}/users`, 
+                },
+            ];
+        });
 
         const handleUpdated = (e: Role) => {
             toast.show({ variant: 'success', body: 'The role was successfully updated.' });
@@ -92,17 +101,19 @@ export default defineComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            <i class="fa-solid fa-theater-masks me-1" /> <FDisplayName
+            <VCIcon
+                name="fa6-solid:masks-theater"
+                class="me-1"
+            /> <FDisplayName
                 :name="entity.name"
                 :display-name="entity.display_name"
             />
             <span class="sub-title ms-1">Details</span>
         </h1>
         <div class="mb-2">
-            <DomainEntityNav
-                :path="'/admin/roles/'+entity.id"
-                :items="items"
-                :prev-link="true"
+            <VCNavItems
+                :data="items"
+                variant="pills"
             />
         </div>
         <div>

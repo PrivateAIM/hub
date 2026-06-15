@@ -2,7 +2,7 @@
 
 [![npm version][npm-src]][npm-href]
 
-Log aggregation and event tracking service for PrivateAIM Hub — backed by VictoriaLogs.
+Log aggregation and event tracking service for FLAME Hub — backed by VictoriaLogs.
 
 ## Usage
 

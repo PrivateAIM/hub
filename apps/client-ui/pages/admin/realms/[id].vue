@@ -11,8 +11,9 @@ import type { Realm } from '@authup/core-kit';
 import { PermissionName } from '@authup/core-kit';
 import { FDisplayName } from '@privateaim/client-vue';
 
-import { defineComponent, ref } from 'vue';
+import { computed, defineComponent, ref } from 'vue';
 import type { Ref } from 'vue';
+import type { NavigationItem } from '@vuecs/navigation';
 import {
     definePageMeta,
     useToast,
@@ -37,14 +38,6 @@ export default defineComponent({
             ],
         });
 
-        const items = [
-            {
-                name: 'General', 
-                icon: 'fas fa-bars', 
-                path: '',
-            },
-        ];
-
         const toast = useToast();
         const route = useRoute();
 
@@ -58,6 +51,22 @@ export default defineComponent({
             await navigateTo({ path: '/admin/realms' });
             throw createError({});
         }
+
+        const items = computed<NavigationItem[]>(() => {
+            const base = `/admin/realms/${entity.value?.id}`;
+            return [
+                {
+                    name: '', 
+                    icon: 'fa6-solid:arrow-left', 
+                    url: '/admin/realms', 
+                },
+                {
+                    name: 'General', 
+                    icon: 'fa6-solid:bars', 
+                    url: base, 
+                },
+            ];
+        });
 
         const handleUpdated = (e: Realm) => {
             toast.show({ variant: 'success', body: 'The realm was successfully updated.' });
@@ -81,17 +90,19 @@ export default defineComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            <i class="fa-solid fa-building me-1" /> <FDisplayName
+            <VCIcon
+                name="fa6-solid:building"
+                class="me-1"
+            /> <FDisplayName
                 :name="entity.name"
                 :display-name="entity.display_name"
             />
             <span class="sub-title ms-1">Details</span>
         </h1>
         <div class="mb-2">
-            <DomainEntityNav
-                :path="'/admin/realms/'+entity.id"
-                :items="items"
-                :prev-link="true"
+            <VCNavItems
+                :data="items"
+                variant="pills"
             />
         </div>
         <div>

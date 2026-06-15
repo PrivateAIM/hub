@@ -1,6 +1,6 @@
 # Repository Structure
 
-PrivateAIM Hub is an npm workspaces monorepo with two workspace roots: `apps/*` and `packages/*`. Nx orchestrates build, test, and lint with dependency-aware caching.
+FLAME Hub is an npm workspaces monorepo with two workspace roots: `apps/*` and `packages/*`. Nx orchestrates build, test, and lint with dependency-aware caching.
 
 ## Layout
 

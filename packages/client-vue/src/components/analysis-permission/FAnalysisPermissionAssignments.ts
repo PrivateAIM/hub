@@ -12,8 +12,7 @@ import {
     ref,
 } from 'vue';
 import type { Permission } from '@authup/core-kit';
-import { SlotName } from '@vuecs/list-controls';
-import { APermissions, defineEntityCollectionVProps } from '@authup/client-web-kit';
+import { APermissions, SlotName, defineEntityCollectionVProps  } from '@authup/client-web-kit';
 import {
     FAnalysisPermissionAssignment,
 } from './FAnalysisPermissionAssignment';

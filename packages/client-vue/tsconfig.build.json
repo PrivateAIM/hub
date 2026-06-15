@@ -3,12 +3,13 @@
 
     "compilerOptions": {
         "outDir": "./dist",
+        "rootDir": "./src",
 
         "isolatedModules": true,
         "skipLibCheck": true
     },
     "include": [
-        "./src/**/*.{vue.ts}",
+        "./src/**/*.ts",
         "./types/*.d.ts"
     ]
 }

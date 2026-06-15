@@ -3,6 +3,7 @@ import type { Policy } from '@authup/core-kit';
 import { PermissionName as AuthupPermissionName } from '@authup/core-kit';
 import { definePageMeta } from '#imports';
 import { defineNuxtComponent } from '#app';
+import type { NavigationItem } from '@vuecs/navigation';
 import { useToast } from '../../../composables/toast';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 
@@ -21,16 +22,16 @@ export default defineNuxtComponent({
 
         const toast = useToast();
 
-        const items = [
+        const items: NavigationItem[] = [
             {
-                name: 'overview',
-                path: '',
-                icon: 'fa fa-bars',
+                name: 'overview', 
+                url: '/admin/policies', 
+                icon: 'fa6-solid:bars', 
             },
             {
-                name: 'add',
-                path: '/add',
-                icon: 'fa fa-plus',
+                name: 'add', 
+                url: '/admin/policies/add', 
+                icon: 'fa6-solid:plus', 
             },
         ];
 
@@ -57,15 +58,18 @@ export default defineNuxtComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            <i class="fa fa-balance-scale me-1" /> Policy
+            <VCIcon
+                name="fa6-solid:scale-balanced"
+                class="me-1"
+            /> Policy
             <span class="sub-title ms-1">Management</span>
         </h1>
         <div class="content-wrapper">
-            <div class="content-sidebar flex-column">
-                <DomainEntityNav
-                    :items="items"
-                    path="/admin/policies"
-                    direction="vertical"
+            <div class="content-sidebar flex-col">
+                <VCNavItems
+                    :data="items"
+                    variant="pills"
+                    orientation="vertical"
                 />
             </div>
             <div class="content-container">

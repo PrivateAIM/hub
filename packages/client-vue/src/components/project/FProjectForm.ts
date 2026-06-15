@@ -4,22 +4,18 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { buildFormSubmitWithTranslations, createFormSubmitTranslations } from '@authup/client-web-kit';
-import { isNameValid } from '@authup/core-kit';
-import { getSeverity, useTranslationsForNestedValidations } from '@ilingo/vuelidate';
 import {
     buildFormGroup,
     buildFormInput,
+    buildFormSubmitWithTranslations,
     buildFormTextarea,
-} from '@vuecs/form-controls';
-import type { ListFooterSlotProps, ListHeaderSlotProps, ListItemSlotProps } from '@vuecs/list-controls';
-import useVuelidate from '@vuelidate/core';
+    createFormSubmitTranslations,
+} from '@authup/client-web-kit';
+import { useFieldValidation } from '@ilingo/validup-vue';
+import { useValidup } from '@validup/vue';
+import type { Severity } from '@validup/vue';
 import {
-    helpers, 
-    maxLength, 
-    minLength,
-} from '@vuelidate/validators';
-import {
+    computed,
     defineComponent,
     h,
     onMounted,
@@ -32,10 +28,15 @@ import type {
 } from 'vue';
 
 import type { MasterImage, Node, Project } from '@privateaim/core-kit';
-import { DomainType } from '@privateaim/core-kit';
-import { generateName } from '@privateaim/kit';
+import { DomainType, ProjectValidator } from '@privateaim/core-kit';
+import { ValidatorGroup, generateName } from '@privateaim/kit';
 import { useUpdatedAt } from '../../composables';
-import type { ListProps } from '../../core';
+import type {
+    ListFooterSlotProps,
+    ListHeaderSlotProps,
+    ListItemSlotProps,
+    ListProps,
+} from '../../core';
 import {
     EntityListSlotName,
     createEntityManager,
@@ -68,26 +69,6 @@ const FProjectForm = defineComponent({
             master_image_id: '',
         });
 
-        const $v = useVuelidate({
-            name: {
-                slug: helpers.withMessage(
-                    'Only letters, numbers and the characters -_. are allowed (no whitespace).',
-                    (value: string) => !value || isNameValid(value.trim().toLowerCase()),
-                ),
-                minLength: minLength(3),
-                maxLength: maxLength(128),
-            },
-            display_name: {
-                minLength: minLength(3),
-                maxLength: maxLength(256),
-            },
-            description: {
-                minLength: minLength(5),
-                maxLength: maxLength(4096),
-            },
-            master_image_id: {},
-        }, form);
-
         const nodeIds = ref<string[]>([]);
 
         const manager = createEntityManager({
@@ -95,6 +76,18 @@ const FProjectForm = defineComponent({
             setup,
             props,
         });
+
+        const $v = useValidup(
+            new ProjectValidator(),
+            form,
+            { group: computed(() => (manager.data.value ? ValidatorGroup.UPDATE : ValidatorGroup.CREATE)) },
+        );
+
+        const nameValidation = useFieldValidation($v.fields.name);
+        const displayNameValidation = useFieldValidation($v.fields.display_name);
+        const descriptionValidation = useFieldValidation($v.fields.description);
+
+        const toSeverity = (input: Severity) => (input === 'error' || input === 'warning' ? input : undefined);
 
         const initFromProperties = () => {
             if (!manager.data.value) return;
@@ -131,7 +124,7 @@ const FProjectForm = defineComponent({
         };
 
         const submit = wrapFnWithBusyState(busy, async () => {
-            if ($v.value.$invalid) return;
+            if ($v.$invalid.value) return;
 
             // Normalize the slug like the backend (trim + lowercase) so the
             // validated value is what gets submitted and stored.
@@ -161,13 +154,12 @@ const FProjectForm = defineComponent({
             }
         };
 
-        const translationsValidation = useTranslationsForNestedValidations($v.value);
         const translationsSubmit = createFormSubmitTranslations();
 
         return () => {
             const displayName = buildFormGroup({
-                validationMessages: translationsValidation.display_name.value,
-                validationSeverity: getSeverity($v.value.display_name),
+                validationMessages: displayNameValidation.messages,
+                validationSeverity: toSeverity(displayNameValidation.severity),
                 label: true,
                 labelContent: 'Display Name',
                 content: buildFormInput({
@@ -179,8 +171,8 @@ const FProjectForm = defineComponent({
             });
 
             const name = buildFormGroup({
-                validationMessages: translationsValidation.name.value,
-                validationSeverity: getSeverity($v.value.name),
+                validationMessages: nameValidation.messages,
+                validationSeverity: toSeverity(nameValidation.severity),
                 label: true,
                 labelContent: 'Name',
                 content: buildFormInput({
@@ -192,14 +184,14 @@ const FProjectForm = defineComponent({
             });
 
             const description = buildFormGroup({
-                validationMessages: translationsValidation.description.value,
-                validationSeverity: getSeverity($v.value.description),
+                validationMessages: descriptionValidation.messages,
+                validationSeverity: toSeverity(descriptionValidation.severity),
                 label: true,
                 labelContent: 'Description',
                 content: buildFormTextarea({
-                    value: $v.value.description.$model,
+                    value: $v.fields.description.$model.value,
                     onChange(input) {
-                        $v.value.description.$model = input;
+                        $v.fields.description.$model.value = input;
                     },
                     props: { rows: 4 },
                 }),
@@ -216,7 +208,7 @@ const FProjectForm = defineComponent({
                 submit,
                 busy: busy.value,
                 isEditing: !!manager.data.value,
-                invalid: $v.value.$invalid,
+                invalid: $v.$invalid.value,
             }, translationsSubmit);
 
             const nodeVNode = h('div', [
@@ -242,11 +234,11 @@ const FProjectForm = defineComponent({
                                 drop: () => toggleNodeIds(props.data.id),
                             });
 
-                        return h('div', { class: 'd-flex flex-row w-100' }, [
+                        return h('div', { class: 'flex flex-row w-full' }, [
                             h('div', [
                                 props.data.name,
                                 ' ',
-                                h('span', { class: 'text-muted' }, `(${props.data.type})`),
+                                h('span', { class: 'text-fg-muted' }, `(${props.data.type})`),
                             ]),
                             h('div', { class: 'ms-auto' }, [action]),
                         ]);

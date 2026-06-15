@@ -56,11 +56,11 @@ const FAnalysisNodeApprovalCommand = defineComponent({
         const iconClass = computed(() => {
             switch (props.command) {
                 case AnalysisNodeApprovalCommand.APPROVE:
-                    return 'fa fa-check';
+                    return 'fa6-solid:check';
                 case AnalysisNodeApprovalCommand.REJECT:
-                    return 'fa fa-ban';
+                    return 'fa6-solid:ban';
                 default:
-                    return 'fa fa-sync-alt';
+                    return 'fa6-solid:arrows-rotate';
             }
         });
 

@@ -25,14 +25,14 @@ export default defineComponent({
             if (props.status) {
                 return props.status;
             }
-            return 'none';
+            return 'unknown';
         });
 
         const classSuffix = computed(() => {
             switch (props.status) {
                 case ProcessStatus.STARTING:
                     return 'primary';
-                case ProcessStatus.FINISHED:
+                case ProcessStatus.EXECUTED:
                     return 'success';
                 case ProcessStatus.STARTED:
                     return 'dark';

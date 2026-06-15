@@ -1,0 +1,86 @@
+/*
+ * Copyright (c) 2021-2026.
+ * Author Peter Placzek (tada5hi)
+ * For the full copyright and license information,
+ * view the LICENSE file that was distributed with this source code.
+ */
+
+.page-header {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    /* Above the sidebar (z-index: 1) so chrome layers correctly when the
+       page scrolls beneath the fixed header. */
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    box-shadow: var(--privateaim-chrome-edge-shadow-bottom);
+    background-color: var(--privateaim-chrome-bg);
+    padding-bottom: 6px;
+}
+
+.page-header .header-title {
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.page-header .header-title > div {
+    display: inline-block;
+}
+
+.page-header .toggle-box {
+    color: var(--privateaim-chrome-fg-muted);
+    margin: 0px 10px 0px 10px;
+}
+
+.page-header .toggle-box .toggle-trigger {
+    cursor: pointer;
+    padding: 9px 10px;
+    background-color: transparent;
+    border: 1px solid var(--privateaim-chrome-border);
+    border-radius: .25rem;
+}
+
+.page-header .toggle-box .toggle-trigger .icon-bar {
+    display: block;
+    width: 22px;
+    height: 2px;
+    border-radius: 1px;
+    margin-top: 4px;
+    background: var(--privateaim-chrome-fg);
+}
+
+.page-header .logo {
+    font-size: 1.8rem;
+    color: var(--privateaim-chrome-fg);
+    flex: none;
+}
+
+/* More specific than `.page-header .header-title > div` so `display`
+ * wins over the inline-block default; flex + gap keeps the logo icon
+ * and wordmark on one centered row (Tailwind preflight makes <img>
+ * display:block, which would otherwise stack them). */
+.page-header .header-title .logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.page-header .logo span {
+    color: var(--privateaim-brand-coral);
+}
+
+@media (min-width: 768px) {
+    .page-header .header-title {
+        min-width: 270px;
+        text-align: center;
+    }
+
+    .page-header .toggle-box .toggle-trigger {
+        display: none;
+    }
+}

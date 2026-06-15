@@ -8,6 +8,7 @@
 <script lang="ts">
 import type { User } from '@authup/core-kit';
 import { PermissionName } from '@authup/core-kit';
+import type { NavigationItem } from '@vuecs/navigation';
 import { definePageMeta, useToast } from '#imports';
 import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
@@ -24,16 +25,16 @@ export default defineNuxtComponent({
             ],
         });
 
-        const items = [
+        const items: NavigationItem[] = [
             {
                 name: 'overview',
-                path: '',
-                icon: 'fa fa-bars',
+                url: '/admin/users',
+                icon: 'fa6-solid:bars',
             },
             {
                 name: 'add',
-                path: '/add',
-                icon: 'fa fa-plus',
+                url: '/admin/users/add',
+                icon: 'fa6-solid:plus',
             },
         ];
 
@@ -58,17 +59,20 @@ export default defineNuxtComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            <i class="fa fa-user me-1" /> User
+            <VCIcon
+                name="fa6-solid:user"
+                class="me-1"
+            /> User
             <span class="sub-title ms-1">
                 Management
             </span>
         </h1>
         <div class="content-wrapper">
-            <div class="content-sidebar flex-column">
-                <DomainEntityNav
-                    :items="items"
-                    path="/admin/users"
-                    direction="vertical"
+            <div class="content-sidebar flex-col">
+                <VCNavItems
+                    :data="items"
+                    variant="pills"
+                    orientation="vertical"
                 />
             </div>
             <div class="content-container">

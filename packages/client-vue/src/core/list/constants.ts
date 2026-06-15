@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { SlotName } from '@vuecs/list-controls';
+import { SlotName } from '@authup/client-web-kit';
 
 export enum EntityListSlotName {
     DEFAULT = SlotName.DEFAULT,

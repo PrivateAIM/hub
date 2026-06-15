@@ -2,7 +2,7 @@
 
 [![npm version][npm-src]][npm-href]
 
-Worker task type definitions and AMQP component constants for the PrivateAIM Hub worker service.
+Worker task type definitions and AMQP component constants for the FLAME Hub worker service.
 
 ## Installation
 

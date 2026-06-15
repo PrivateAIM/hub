@@ -1,6 +1,6 @@
 # Realms
 
-Realms are organizational containers in PrivateAIM Hub that group identity providers, robots, users, roles, and nodes. They are managed through Authup and enforced across all Hub services.
+Realms are organizational containers in FLAME Hub that group identity providers, robots, users, roles, and nodes. They are managed through Authup and enforced across all Hub services.
 
 ## Overview
 

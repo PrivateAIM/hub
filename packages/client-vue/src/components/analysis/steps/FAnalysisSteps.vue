@@ -36,7 +36,7 @@ export default defineComponent({
 });
 </script>
 <template>
-    <div class="d-flex flex-row gap-3 w-100 analysis-steps">
+    <div class="flex flex-row gap-3 w-full analysis-steps">
         <FAnalysisConfigurationStep
             :entity="entity"
             :image-link="configurationImageLink"

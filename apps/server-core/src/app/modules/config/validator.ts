@@ -6,7 +6,7 @@
  */
 
 import { EnvironmentName } from '@privateaim/server-kit';
-import { createValidator } from '@validup/adapter-zod';
+import { createValidator } from '@validup/zod';
 import { Container } from 'validup';
 import zod from 'zod';
 import type { Config } from './types.ts';

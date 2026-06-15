@@ -8,7 +8,7 @@
 import type { RegistryProject } from './entity.ts';
 import { RegistryProjectType } from './constants.ts';
 import { Container } from 'validup';
-import { createValidator } from '@validup/adapter-zod';
+import { createValidator } from '@validup/zod';
 import { z } from 'zod';
 import { ValidatorGroup } from '@privateaim/kit';
 
@@ -35,7 +35,10 @@ export class RegistryProjectValidator extends Container<RegistryProject> {
             nameValidator,
         );
 
-        const externalNameValidator = createValidator(z.string().min(1).max(255).regex(/^[a-z0-9-_]*$/));
+        // max(64) matches the varchar(64) column — anything longer used to
+        // pass validation and blow up in the database instead; min(3)
+        // mirrors the pre-migration form rule.
+        const externalNameValidator = createValidator(z.string().min(3).max(64).regex(/^[a-z0-9-_]*$/));
         this.mount(
             'external_name',
             { group: ValidatorGroup.CREATE },

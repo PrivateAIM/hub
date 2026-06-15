@@ -10,23 +10,23 @@ import { injectHTTPClient } from '@authup/client-web-kit';
 import type { User } from '@authup/core-kit';
 import { PermissionName } from '@authup/core-kit';
 import { FDisplayName } from '@privateaim/client-vue';
-import { defineComponent, ref } from 'vue';
+import type { NavigationItem } from '@vuecs/navigation';
+import { computed, defineComponent, ref } from 'vue';
 import type { Ref } from 'vue';
 import {
-    definePageMeta, 
-    updateObjectProperties, 
+    definePageMeta,
+    updateObjectProperties,
     useToast,
 } from '#imports';
 import {
-    createError, 
-    navigateTo, 
+    createError,
+    navigateTo,
     useRoute,
 } from '#app';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
-import DomainEntityNav from '../../../components/DomainEntityNav';
 
 export default defineComponent({
-    components: { DomainEntityNav, FDisplayName },
+    components: { FDisplayName },
     async setup() {
         definePageMeta({
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
@@ -38,24 +38,6 @@ export default defineComponent({
                 PermissionName.USER_ROLE_DELETE,
             ],
         });
-
-        const items = [
-            {
-                name: 'General', 
-                icon: 'fas fa-bars', 
-                path: '',
-            },
-            {
-                name: 'Permissions', 
-                icon: 'fas fa-user-secret', 
-                path: 'permissions',
-            },
-            {
-                name: 'Roles', 
-                icon: 'fa-solid fa-user-group', 
-                path: 'roles',
-            },
-        ];
 
         const toast = useToast();
         const route = useRoute();
@@ -70,6 +52,33 @@ export default defineComponent({
             await navigateTo({ path: '/admin/users' });
             throw createError({});
         }
+
+        const items = computed<NavigationItem[]>(() => {
+            const base = `/admin/users/${entity.value?.id}`;
+
+            return [
+                {
+                    name: '',
+                    icon: 'fa6-solid:arrow-left',
+                    url: '/admin/users',
+                },
+                {
+                    name: 'General',
+                    icon: 'fa6-solid:bars',
+                    url: base,
+                },
+                {
+                    name: 'Permissions',
+                    icon: 'fa6-solid:user-secret',
+                    url: `${base}/permissions`,
+                },
+                {
+                    name: 'Roles',
+                    icon: 'fa6-solid:user-group',
+                    url: `${base}/roles`,
+                },
+            ];
+        });
 
         const handleUpdated = (e: User) => {
             toast.show({ variant: 'success', body: 'The user was successfully updated.' });
@@ -93,7 +102,10 @@ export default defineComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            <i class="fa fa-user me-1" />
+            <VCIcon
+                name="fa6-solid:user"
+                class="me-1"
+            />
             <FDisplayName
                 :name="entity.name"
                 :display-name="entity.display_name"
@@ -103,10 +115,9 @@ export default defineComponent({
             </span>
         </h1>
         <div class="mb-2">
-            <DomainEntityNav
-                :items="items"
-                :path="`/admin/users/${entity.id}`"
-                :prev-link="true"
+            <VCNavItems
+                :data="items"
+                variant="pills"
             />
         </div>
 

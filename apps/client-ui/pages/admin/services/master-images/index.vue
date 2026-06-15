@@ -10,6 +10,7 @@ import { FEvents, FMasterImageCard } from '@privateaim/client-vue';
 import FMasterImages from '@privateaim/client-vue/components/master-image/FMasterImages';
 import { APagination, ASearch, ATitle } from '@authup/client-web-kit';
 import FMasterImageCommand from '@privateaim/client-vue/components/master-image/FMasterImageCommand';
+import type { NavigationItem } from '@vuecs/navigation';
 import { useToast } from '../../../../composables/toast';
 
 export default {
@@ -25,11 +26,16 @@ export default {
     setup() {
         const toast = useToast();
 
-        const tabs = [
+        const tabs: NavigationItem[] = [
             {
-                name: 'overview',
-                path: '',
-                icon: 'fa fa-bars',
+                name: '', 
+                icon: 'fa6-solid:arrow-left', 
+                url: '/admin/services', 
+            },
+            {
+                name: 'overview', 
+                url: '/admin/services/master-images', 
+                icon: 'fa6-solid:bars', 
             },
         ];
 
@@ -45,15 +51,14 @@ export default {
 };
 </script>
 <template>
-    <div class="d-flex flex-column gap-3">
+    <div class="flex flex-col gap-3">
         <h1 class="title no-border mb-0">
-            <i class="fa-solid fa-atom" /> Master Images <span class="sub-title">Management</span>
+            <VCIcon name="fa6-solid:atom" /> Master Images <span class="sub-title">Management</span>
         </h1>
         <div class="mb-2">
-            <DomainEntityNav
-                :items="tabs"
-                :prev-link="true"
-                :path="'/admin/services/master-images'"
+            <VCNavItems
+                :data="tabs"
+                variant="pills"
             />
         </div>
         <div>
@@ -66,7 +71,7 @@ export default {
         </div>
         <div class="row">
             <div class="col-6">
-                <div class="d-flex flex-column gap-3">
+                <div class="flex flex-col gap-3">
                     <div>
                         <FMasterImageCommand
                             :command="'sync'"
@@ -78,7 +83,10 @@ export default {
                                     class="btn btn-block btn-primary"
                                     @click.prevent="props.execute"
                                 >
-                                    <span class="me-2">{{ props.commandText }}</span>  <i :class="props.iconClass" />
+                                    <span class="me-2">{{ props.commandText }}</span>  <VCIcon
+                                        :name="props.iconName"
+                                        :class="props.iconClass"
+                                    />
                                 </button>
                             </template>
                         </FMasterImageCommand>
@@ -100,7 +108,7 @@ export default {
                                 />
                             </template>
                             <template #body="{ data }">
-                                <div class="d-flex flex-column mt-2 mb-2 gap-3">
+                                <div class="flex flex-col mt-2 mb-2 gap-3">
                                     <template
                                         v-for="item in data"
                                         :key="item.id"
@@ -116,7 +124,7 @@ export default {
                 </div>
             </div>
             <div class="col-6">
-                <h6><i class="fa-solid fa-bullhorn" /> Events</h6>
+                <h6><VCIcon name="fa6-solid:bullhorn" /> Events</h6>
                 <FEvents
                     :query="{
                         filters: {

@@ -7,23 +7,41 @@
 
 <script lang="ts">
 import { injectStore } from '@authup/client-web-kit';
-import { IVuelidate } from '@ilingo/vuelidate';
-import useVuelidate from '@vuelidate/core';
-import { maxLength, minLength, required } from '@vuelidate/validators';
+import { IFieldValidation } from '@ilingo/validup-vue';
+import { useValidup } from '@validup/vue';
+import { createValidator } from '@validup/zod';
+import { Container } from 'validup';
+import { z } from 'zod';
 import {
-    defineComponent, 
-    reactive, 
-    ref, 
-    toRef, 
+    computed,
+    defineComponent,
+    reactive,
+    ref,
+    toRef,
     watch,
 } from 'vue';
-import { VCFormInput, VCFormSubmit } from '@vuecs/form-controls';
+import { VCButton } from '@vuecs/button';
+import { VCFormGroup, VCFormInput, useSubmitButton } from '@vuecs/forms';
+
+class LoginCredentialsValidator extends Container<{
+    name: string;
+    password: string;
+    realm_id: string;
+}> {
+    protected override initialize() {
+        super.initialize();
+        this.mount('name', createValidator(z.string().min(3).max(255)));
+        this.mount('password', createValidator(z.string().min(3).max(255)));
+        this.mount('realm_id', { optional: true }, createValidator(z.string()));
+    }
+}
 
 export default defineComponent({
     components: {
-        IVuelidate,
+        IFieldValidation,
+        VCButton,
+        VCFormGroup,
         VCFormInput,
-        VCFormSubmit,
     },
     props: { realmId: { type: String } },
     emits: ['done', 'failed'],
@@ -46,21 +64,14 @@ export default defineComponent({
             form.realm_id = val ?? '';
         });
 
-        const vuelidate = useVuelidate({
-            name: {
-                required,
-                minLength: minLength(3),
-                maxLength: maxLength(255),
-            },
-            password: {
-                required,
-                minLength: minLength(3),
-                maxLength: maxLength(255),
-            },
-            realm_id: {},
-        }, form);
+        const v = useValidup(new LoginCredentialsValidator(), form);
 
         const busy = ref(false);
+
+        const submitButton = useSubmitButton({
+            loading: busy,
+            disabled: computed(() => busy.value || v.$invalid.value),
+        });
 
         const submit = async () => {
             try {
@@ -79,60 +90,48 @@ export default defineComponent({
         };
 
         return {
-            vuelidate,
+            v,
             form,
             submit,
             busy,
+            submitButton,
         };
     },
 });
 </script>
 <template>
     <form @submit.prevent="submit">
-        <IVuelidate :validation="vuelidate.name">
-            <template #default="props">
-                <VCFormGroup
-                    :validation-messages="props.data"
-                    :validation-severity="props.severity"
-                >
-                    <template #label>
-                        Name
-                    </template>
-                    <template #default>
-                        <VCFormInput
-                            v-model="vuelidate.name.$model"
-                        />
-                    </template>
-                </VCFormGroup>
-            </template>
-        </IVuelidate>
+        <IFieldValidation
+            v-slot="{ value }"
+            :field="v.fields.name"
+        >
+            <VCFormGroup :validation="value">
+                <template #label>
+                    Name
+                </template>
+                <VCFormInput v-model="v.fields.name.$model.value" />
+            </VCFormGroup>
+        </IFieldValidation>
 
-        <IVuelidate :validation="vuelidate.password">
-            <template #default="props">
-                <VCFormGroup
-                    :validation-messages="props.data"
-                    :validation-severity="props.severity"
-                >
-                    <template #label>
-                        Password
-                    </template>
-                    <template #default>
-                        <VCFormInput
-                            v-model="vuelidate.password.$model"
-                            type="password"
-                        />
-                    </template>
-                </VCFormGroup>
-            </template>
-        </IVuelidate>
+        <IFieldValidation
+            v-slot="{ value }"
+            :field="v.fields.password"
+        >
+            <VCFormGroup :validation="value">
+                <template #label>
+                    Password
+                </template>
+                <VCFormInput
+                    v-model="v.fields.password.$model.value"
+                    type="password"
+                />
+            </VCFormGroup>
+        </IFieldValidation>
 
-        <VCFormSubmit
-            v-model="busy"
-            :invalid="vuelidate.$invalid"
-            :create-text="'Login'"
-            :create-button-class="{value: 'btn btn-sm btn-dark btn-block', presets: { bootstrap: false }}"
-            :create-icon-class="'fa-solid fa-right-to-bracket'"
-            :submit="submit"
+        <VCButton
+            v-bind="submitButton"
+            label="Login"
+            class="w-full"
         />
     </form>
 </template>

@@ -6,33 +6,32 @@
   -->
 <script lang="ts">
 import type { Analysis } from '@privateaim/core-kit';
+import type { NavigationItem } from '@vuecs/navigation';
 import { defineNuxtComponent } from '#app';
 import { definePageMeta, navigateTo, useToast } from '#imports';
-import DomainEntityNav from '../../components/DomainEntityNav';
 import { LayoutKey, LayoutNavigationID } from '../../config/layout';
 
 export default defineNuxtComponent({
-    components: { DomainEntityNav },
     setup() {
         definePageMeta({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
         });
-        const items = [
+        const items: NavigationItem[] = [
             {
                 name: 'Create',
-                path: '/add',
-                icon: 'fa fa-plus',
+                url: '/analyses/add',
+                icon: 'fa6-solid:plus',
             },
             {
                 name: 'Outgoing',
-                path: '',
-                icon: 'fa fa-file-export',
+                url: '/analyses',
+                icon: 'fa6-solid:file-export',
             },
             {
                 name: 'Incoming',
-                path: '/in',
-                icon: 'fa fa-file-import',
+                url: '/analyses/in',
+                icon: 'fa6-solid:file-import',
             },
         ];
 
@@ -54,16 +53,16 @@ export default defineNuxtComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            <i class="fas fa-microscope" /> Analyses
+            <VCIcon name="fa6-solid:microscope" /> Analyses
             <span class="sub-title">Manage incoming & outgoing analyses</span>
         </h1>
 
         <div class="content-wrapper">
-            <div class="content-sidebar flex-column">
-                <DomainEntityNav
-                    :items="items"
-                    :path="'/analyses'"
-                    :direction="'vertical'"
+            <div class="content-sidebar flex-col">
+                <VCNavItems
+                    :data="items"
+                    variant="pills"
+                    orientation="vertical"
                 />
             </div>
             <div class="content-container">

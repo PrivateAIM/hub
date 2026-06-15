@@ -24,6 +24,7 @@ export default defineComponent({
 
         return () => h('img', {
             src: MedicineWorkerTemplate,
+            class: 'mx-auto',
             width: refs.width.value,
             height: refs.height.value,
             style: { maxWidth: '100%' },

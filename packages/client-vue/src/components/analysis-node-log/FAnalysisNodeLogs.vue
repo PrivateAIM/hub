@@ -101,9 +101,9 @@ export default defineComponent({
 });
 </script>
 <template>
-    <div class="d-flex flex-column gap-1">
+    <div class="flex flex-col gap-1">
         <slot name="default">
-            <div class="d-flex flex-row align-items-center">
+            <div class="flex flex-row items-center">
                 <slot
                     name="header"
                     v-bind="{ busy, data, meta, load, reload }"

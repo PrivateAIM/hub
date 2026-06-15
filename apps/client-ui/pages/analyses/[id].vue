@@ -11,24 +11,19 @@ import {
 } from '@privateaim/core-kit';
 import { FDisplayName, createEntityManager } from '@privateaim/client-vue';
 import { PermissionName } from '@privateaim/kit';
+import type { NavigationItem } from '@vuecs/navigation';
 import { isClientErrorWithStatusCode } from 'hapic';
 import { computed, defineComponent } from 'vue';
 import { definePageMeta, useToast } from '#imports';
 import {
-    createError, 
-    navigateTo, 
+    createError,
+    navigateTo,
     useRoute,
 } from '#app';
-import DomainEntityNav from '../../components/DomainEntityNav';
 import { LayoutKey, LayoutNavigationID } from '../../config/layout';
-import { DomainEntityNavItem } from '../../core';
 
 export default defineComponent({
-    components: {
-        DomainEntityNav,
-        DomainEntityNavItem,
-        FDisplayName,
-    },
+    components: { FDisplayName },
     async setup() {
         definePageMeta({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
@@ -59,45 +54,52 @@ export default defineComponent({
             throw createError({});
         }
 
-        const tabs = computed(() => {
-            const items = [
+        const tabs = computed<NavigationItem[]>(() => {
+            const base = `/analyses/${manager.data.value?.id}`;
+
+            const items: NavigationItem[] = [
+                {
+                    name: '',
+                    icon: 'fa6-solid:arrow-left',
+                    url: `/projects/${manager.data.value?.project_id}/analyses`,
+                },
                 {
                     name: 'Overview',
-                    icon: 'fas fa-bars',
-                    path: '',
+                    icon: 'fa6-solid:bars',
+                    url: base,
                 },
                 {
                     name: 'Nodes',
-                    icon: 'fa fa-city',
-                    path: '/nodes',
+                    icon: 'fa6-solid:city',
+                    url: `${base}/nodes`,
                 },
                 {
                     name: 'Code',
-                    icon: 'fa fa-code',
-                    path: '/code-files',
+                    icon: 'fa6-solid:code',
+                    url: `${base}/code-files`,
                 },
                 {
                     name: 'Image',
-                    icon: 'fa fa-compact-disc',
-                    path: '/image',
+                    icon: 'fa6-solid:compact-disc',
+                    url: `${base}/image`,
                 },
                 {
                     name: 'Security',
-                    icon: 'fa fa-lock',
-                    path: '/security',
+                    icon: 'fa6-solid:lock',
+                    url: `${base}/security`,
                 },
                 {
                     name: 'Results',
-                    icon: 'fas fa-chart-bar',
-                    path: '/result-files',
+                    icon: 'fa6-solid:chart-bar',
+                    url: `${base}/result-files`,
                 },
             ];
 
             if (canEdit.value) {
                 items.push({
                     name: 'Settings',
-                    icon: 'fa fa-cog',
-                    path: '/settings',
+                    icon: 'fa6-solid:gear',
+                    url: `${base}/settings`,
                 });
             }
 
@@ -116,7 +118,7 @@ export default defineComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            <i class="fas fa-microscope" /> Analysis
+            <VCIcon name="fa6-solid:microscope" /> Analysis
             <span class="sub-title">
                 <template v-if="entity">
                     <FDisplayName
@@ -131,23 +133,16 @@ export default defineComponent({
         </h1>
 
         <div v-if="entity">
-            <div class="flex-wrap flex-row d-flex align-items-center">
-                <DomainEntityNav
-                    :items="tabs"
-                    :path="'/analyses/' + entity.id"
-                >
-                    <template #before>
-                        <DomainEntityNavItem
-                            :path="'/projects/'+entity.project_id+'/analyses'"
-                            :icon="'fa fa-arrow-left'"
-                        />
-                    </template>
-                </DomainEntityNav>
+            <div class="flex-wrap flex-row flex items-center">
+                <VCNavItems
+                    :data="tabs"
+                    variant="pills"
+                />
             </div>
         </div>
 
         <template v-if="entity">
-            <div class="d-flex flex-column gap-1">
+            <div class="flex flex-col gap-1">
                 <hr>
 
                 <div>

@@ -7,20 +7,20 @@
 
 import type { PropType } from 'vue';
 import { defineComponent, h } from 'vue';
-import type { TranslatorTranslationDefaultKey } from '@authup/client-web-kit';
-import { TranslatorTranslationGroup } from '@authup/client-web-kit';
+import type { TranslatorTranslationActionKey } from '@authup/i18n';
+import { TranslatorTranslationNamespace } from '@authup/i18n';
 import { FTranslation } from './FTranslation';
 
 export const FTranslationDefault = defineComponent({
     props: {
         name: {
-            type: String as PropType<`${TranslatorTranslationDefaultKey}`>,
+            type: String as PropType<`${TranslatorTranslationActionKey}`>,
             required: true,
         },
     },
     setup(props) {
         return () => h(FTranslation, {
-            group: TranslatorTranslationGroup.DEFAULT,
+            group: TranslatorTranslationNamespace.ACTION,
             name: props.name,
         });
     },

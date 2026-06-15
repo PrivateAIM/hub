@@ -4,41 +4,42 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { ARealms, buildFormSubmitWithTranslations, createFormSubmitTranslations } from '@authup/client-web-kit';
-import { getSeverity, useTranslationsForNestedValidations } from '@ilingo/vuelidate';
+import {
+    ARealms,
+    buildFormCheckbox,
+    buildFormGroup,
+    buildFormInput,
+    buildFormSelect,
+    buildFormSubmitWithTranslations,
+    createFormSubmitTranslations,
+} from '@authup/client-web-kit';
+import { useFieldValidation } from '@ilingo/validup-vue';
+import { useValidup } from '@validup/vue';
+import type { Severity } from '@validup/vue';
+import { createValidator } from '@validup/zod';
+import { z } from 'zod';
 import type { Node, Registry } from '@privateaim/core-kit';
 import {
     DomainType,
     NodeType,
+    NodeValidator,
 } from '@privateaim/core-kit';
-import { alphaNumHyphenUnderscoreRegex } from '@privateaim/kit';
-import {
-    buildFormGroup,
-    buildFormInput, 
-    buildFormInputCheckbox, 
-    buildFormSelect,
-} from '@vuecs/form-controls';
-import type { ListBodySlotProps, ListItemSlotProps } from '@vuecs/list-controls';
-import useVuelidate from '@vuelidate/core';
-import {
-    helpers, 
-    maxLength, 
-    minLength, 
-    required,
-} from '@vuelidate/validators';
+import { ValidatorGroup } from '@privateaim/kit';
 import type {
-    PropType, 
+    PropType,
     VNodeArrayChildren,
 } from 'vue';
 import {
-    computed, 
-    defineComponent, 
-    h, 
-    reactive, 
-    ref, 
+    computed,
+    defineComponent,
+    h,
+    reactive,
+    ref,
+    resolveComponent,
     watch,
 } from 'vue';
 import { useUpdatedAt } from '../../composables';
+import type { ListBodySlotProps, ListItemSlotProps } from '../../core';
 import {
     EntityListSlotName,
     createEntityManager,
@@ -65,6 +66,25 @@ export default defineComponent({
     },
     emits: defineEntityManagerEvents<Node>(),
     setup(props, setup) {
+        /**
+         * Form-level validator. The shared {@link NodeValidator} keeps
+         * `realm_id` optional on CREATE (the server defaults it from the
+         * actor realm), but the form requires an explicit realm selection —
+         * the pre-migration UI contract. `mount()` appends, so this rule
+         * runs in addition to the base ones.
+         */
+        class NodeFormValidator extends NodeValidator {
+            protected initialize() {
+                super.initialize();
+
+                this.mount(
+                    'realm_id',
+                    { group: ValidatorGroup.CREATE },
+                    createValidator(z.uuid()),
+                );
+            }
+        }
+
         const busy = ref(false);
         const form = reactive({
             name: '',
@@ -75,28 +95,25 @@ export default defineComponent({
             type: NodeType.DEFAULT,
         });
 
-        const $v = useVuelidate({
-            name: {
-                required,
-                minLength: minLength(3),
-                maxLength: maxLength(128),
-            },
-            hidden: {},
-            realm_id: { required },
-            registry_id: {},
-            external_name: {
-                alphaNumHyphenUnderscore: helpers.regex(alphaNumHyphenUnderscoreRegex),
-                minLength: minLength(3),
-                maxLength: maxLength(64),
-            },
-            type: { required },
-        }, form);
-
         const manager = createEntityManager({
             type: `${DomainType.NODE}`,
             setup,
             props,
         });
+
+        const $v = useValidup(
+            new NodeFormValidator(),
+            form,
+            { group: computed(() => (manager.data.value ? ValidatorGroup.UPDATE : ValidatorGroup.CREATE)) },
+        );
+
+        const nameValidation = useFieldValidation($v.fields.name);
+        const realmValidation = useFieldValidation($v.fields.realm_id);
+        const typeValidation = useFieldValidation($v.fields.type);
+        const externalNameValidation = useFieldValidation($v.fields.external_name);
+        const hiddenValidation = useFieldValidation($v.fields.hidden);
+
+        const toSeverity = (input: Severity) => (input === 'error' || input === 'warning' ? input : undefined);
 
         const isRealmLocked = computed(() => props.realmId ||
                 (manager.data.value && manager.data.value.realm_id));
@@ -127,7 +144,7 @@ export default defineComponent({
         });
 
         const submit = wrapFnWithBusyState(busy, async () => {
-            if ($v.value.$invalid) return;
+            if ($v.$invalid.value) return;
 
             await manager.createOrUpdate(form as Partial<Node>);
         });
@@ -140,10 +157,10 @@ export default defineComponent({
             }
         };
 
-        const translationsValidation = useTranslationsForNestedValidations($v.value);
         const translationsSubmit = createFormSubmitTranslations();
 
         return () => {
+            const VCIcon = resolveComponent('VCIcon');
             let realm : VNodeArrayChildren = [];
             if (!isRealmLocked.value) {
                 realm = [
@@ -152,8 +169,8 @@ export default defineComponent({
                         {},
                         {
                             [EntityListSlotName.BODY]: (props: ListBodySlotProps<Node>) => buildFormGroup({
-                                validationMessages: translationsValidation.realm_id.value,
-                                validationSeverity: getSeverity($v.value.realm_id),
+                                validationMessages: realmValidation.messages,
+                                validationSeverity: toSeverity(realmValidation.severity),
                                 label: true,
                                 labelContent: 'Realms',
                                 content: buildFormSelect({
@@ -174,21 +191,21 @@ export default defineComponent({
             }
 
             const name = buildFormGroup({
-                validationMessages: translationsValidation.name.value,
-                validationSeverity: getSeverity($v.value.name),
+                validationMessages: nameValidation.messages,
+                validationSeverity: toSeverity(nameValidation.severity),
                 label: true,
                 labelContent: 'Name',
                 content: buildFormInput({
-                    value: $v.value.name.$model,
+                    value: $v.fields.name.$model.value,
                     onChange(input) {
-                        $v.value.name.$model = input;
+                        $v.fields.name.$model.value = input;
                     },
                 }),
             });
 
             const type = buildFormGroup({
-                validationMessages: translationsValidation.type.value,
-                validationSeverity: getSeverity($v.value.type),
+                validationMessages: typeValidation.messages,
+                validationSeverity: toSeverity(typeValidation.severity),
                 label: true,
                 labelContent: 'Type',
                 content: buildFormSelect({
@@ -204,8 +221,8 @@ export default defineComponent({
             });
 
             const externalName = buildFormGroup({
-                validationMessages: translationsValidation.external_name.value,
-                validationSeverity: getSeverity($v.value.external_name),
+                validationMessages: externalNameValidation.messages,
+                validationSeverity: toSeverity(externalNameValidation.severity),
                 label: true,
                 labelContent: 'External Name',
                 content: buildFormInput({
@@ -217,11 +234,11 @@ export default defineComponent({
             });
 
             const hidden = buildFormGroup({
-                validationMessages: translationsValidation.hidden.value,
-                validationSeverity: getSeverity($v.value.hidden),
+                validationMessages: hiddenValidation.messages,
+                validationSeverity: toSeverity(hiddenValidation.severity),
                 label: true,
                 labelContent: 'Visibility',
-                content: buildFormInputCheckbox({
+                content: buildFormCheckbox({
                     groupClass: 'form-switch',
                     value: form.hidden,
                     onChange(input) {
@@ -249,12 +266,7 @@ export default defineComponent({
                                     toggleFormData('registry_id', props.data.id);
                                 },
                             }, [
-                                h('i', {
-                                    class: {
-                                        'fa fa-plus': form.registry_id !== props.data.id,
-                                        'fa fa-minus': form.registry_id === props.data.id,
-                                    },
-                                }),
+                                h(VCIcon, { name: form.registry_id === props.data.id ? 'fa6-solid:minus' : 'fa6-solid:plus' }),
                             ]),
                         }),
                 }),
@@ -264,7 +276,7 @@ export default defineComponent({
                 submit,
                 busy: busy.value,
                 isEditing: !!manager.data.value,
-                invalid: $v.value.$invalid,
+                invalid: $v.$invalid.value,
             }, translationsSubmit);
 
             return h('div', [

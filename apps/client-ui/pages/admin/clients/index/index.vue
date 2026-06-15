@@ -1,15 +1,15 @@
 <script lang="ts">
 
-import { BTable } from 'bootstrap-vue-next';
+import type { TableColumn } from '@vuecs/table';
 import {
     AClients,
-    AEntityDelete, 
-    APagination, 
-    ASearch, 
-    ATitle, 
-    AUser, 
-    injectStore, 
-    storeToRefs, 
+    AEntityDelete,
+    APagination,
+    ASearch,
+    ATitle,
+    AUser,
+    injectStore,
+    storeToRefs,
     usePermissionCheck,
 } from '@authup/client-web-kit';
 import type { Client } from '@authup/core-kit';
@@ -24,7 +24,6 @@ export default defineComponent({
         APagination,
         ASearch,
         ATitle,
-        BTable,
         AEntityDelete,
         AClients,
         AUser,
@@ -44,52 +43,52 @@ export default defineComponent({
         const hasEditPermission = usePermissionCheck({ name: PermissionName.CLIENT_UPDATE });
         const hasDropPermission = usePermissionCheck({ name: PermissionName.CLIENT_DELETE });
 
-        const fields = [
+        const columns: TableColumn[] = [
             {
                 key: 'name',
                 label: 'Name',
-                thClass: 'text-left',
-                tdClass: 'text-left',
+                headerClass: 'text-left',
+                cellClass: 'text-left',
             },
             {
                 key: 'active',
                 label: 'Active?',
-                thClass: 'text-center',
-                tdClass: 'text-center',
+                headerClass: 'text-center',
+                cellClass: 'text-center',
             },
             {
                 key: 'is_confidential',
                 label: 'Confidential?',
-                thClass: 'text-center',
-                tdClass: 'text-center',
+                headerClass: 'text-center',
+                cellClass: 'text-center',
             },
             {
                 key: 'built_in',
                 label: 'Built in?',
-                thClass: 'text-center',
-                tdClass: 'text-center',
+                headerClass: 'text-center',
+                cellClass: 'text-center',
             },
             {
                 key: 'created_at',
                 label: 'Created at',
-                thClass: 'text-center',
-                tdClass: 'text-center',
+                headerClass: 'text-center',
+                cellClass: 'text-center',
             },
             {
                 key: 'updated_at',
                 label: 'Updated at',
-                thClass: 'text-left',
-                tdClass: 'text-left',
+                headerClass: 'text-left',
+                cellClass: 'text-left',
             },
             {
                 key: 'options',
                 label: '',
-                tdClass: 'text-left',
+                cellClass: 'text-left',
             },
         ];
 
         return {
-            fields,
+            columns,
             hasEditPermission,
             hasDropPermission,
             handleDeleted,
@@ -118,55 +117,44 @@ export default defineComponent({
             />
         </template>
         <template #body="props">
-            <BTable
-                :items="props.data"
-                :fields="fields"
+            <VCTable
+                :data="props.data"
+                :columns="columns"
                 :busy="props.busy"
-                head-variant="'dark'"
-                outlined
             >
-                <template #cell(name)="data">
+                <template #cell-name="{ row }: { row: any }">
                     <FDisplayName
-                        :name="data.item.name"
-                        :display-name="data.item.display_name"
+                        :name="row.name"
+                        :display-name="row.display_name"
                     />
                 </template>
-                <template #cell(active)="data">
-                    <i
-                        class="fas"
-                        :class="{
-                            'fa-check text-success': data.item.active,
-                            'fa-times text-danger': !data.item.active,
-                        }"
+                <template #cell-active="{ row }: { row: any }">
+                    <VCIcon
+                        :name="row.active ? 'fa6-solid:check' : 'fa6-solid:xmark'"
+                        :class="row.active ? 'text-success-600' : 'text-error-600'"
                     />
                 </template>
-                <template #cell(is_confidential)="data">
-                    <i
-                        class="fas"
-                        :class="{
-                            'fa-check text-success': data.item.is_confidential,
-                            'fa-times text-danger': !data.item.is_confidential,
-                        }"
+                <template #cell-is_confidential="{ row }: { row: any }">
+                    <VCIcon
+                        :name="row.is_confidential ? 'fa6-solid:check' : 'fa6-solid:xmark'"
+                        :class="row.is_confidential ? 'text-success-600' : 'text-error-600'"
                     />
                 </template>
-                <template #cell(built_in)="data">
-                    <i
-                        class="fas"
-                        :class="{
-                            'fa-check text-success': data.item.built_in,
-                            'fa-times text-danger': !data.item.built_in,
-                        }"
+                <template #cell-built_in="{ row }: { row: any }">
+                    <VCIcon
+                        :name="row.built_in ? 'fa6-solid:check' : 'fa6-solid:xmark'"
+                        :class="row.built_in ? 'text-success-600' : 'text-error-600'"
                     />
                 </template>
-                <template #cell(created_at)="data">
-                    <VCTimeago :datetime="data.item.created_at" />
+                <template #cell-created_at="{ row }: { row: any }">
+                    <VCTimeago :datetime="row.created_at" />
                 </template>
-                <template #cell(updated_at)="data">
-                    <VCTimeago :datetime="data.item.created_at" />
+                <template #cell-updated_at="{ row }: { row: any }">
+                    <VCTimeago :datetime="row.updated_at" />
                 </template>
-                <template #cell(user_id)="data">
-                    <template v-if="data.item.user_id">
-                        <AUser :entity-id="data.item.user_id">
+                <template #cell-user_id="{ row }: { row: any }">
+                    <template v-if="row.user_id">
+                        <AUser :entity-id="row.user_id">
                             <template #default="user">
                                 <FDisplayName
                                     :name="user.data.name"
@@ -182,24 +170,26 @@ export default defineComponent({
                         -
                     </template>
                 </template>
-                <template #cell(options)="data">
+                <template #cell-options="{ row }: { row: any }">
                     <NuxtLink
-                        :to="'/admin/clients/'+ data.item.id"
+                        :to="'/admin/clients/'+ row.id"
                         class="btn btn-xs btn-outline-primary me-1"
                         :disabled="!hasEditPermission"
                     >
-                        <i class="fa-solid fa-bars" />
+                        <VCIcon name="fa6-solid:bars" />
                     </NuxtLink>
                     <AEntityDelete
                         class="btn btn-xs btn-outline-danger"
-                        :entity-id="data.item.id"
+                        :entity-id="row.id"
                         entity-type="client"
                         :with-text="false"
                         :disabled="!hasDropPermission"
                         @deleted="props.deleted"
                     />
                 </template>
-            </BTable>
+                <VCTableLoading />
+                <VCTableEmpty />
+            </VCTable>
         </template>
     </AClients>
 </template>

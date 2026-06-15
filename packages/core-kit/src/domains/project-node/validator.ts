@@ -8,7 +8,7 @@
 import type { ProjectNode } from './entity.ts';
 import { ProjectNodeApprovalStatus } from './constants.ts';
 import { Container } from 'validup';
-import { createValidator } from '@validup/adapter-zod';
+import { createValidator } from '@validup/zod';
 import { z } from 'zod';
 import { ValidatorGroup } from '@privateaim/kit';
 

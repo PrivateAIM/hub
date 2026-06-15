@@ -1,0 +1,55 @@
+/*
+ * Copyright (c) 2021-2026.
+ * Author Peter Placzek (tada5hi)
+ * For the full copyright and license information,
+ * view the LICENSE file that was distributed with this source code.
+ */
+
+.page-sidebar {
+    width: 300px;
+    background-color: var(--privateaim-chrome-bg);
+    color: var(--privateaim-chrome-fg);
+    /* `width` covers the mobile collapse; avoid `all` so theme flips
+       don't animate layout properties. */
+    transition: width 0.3s, background-color 0.3s, box-shadow 0.3s;
+    display: flex;
+    flex-direction: column;
+    font-size: 1rem;
+    /* Soften the edge against the page content (light mode; `none` in dark).
+       `.page-content` is a later positioned sibling with its own background,
+       which would paint over an in-flow sidebar's outset shadow — lift the
+       sidebar one stacking step (below the header's z-index: 2). */
+    box-shadow: var(--privateaim-chrome-edge-shadow-right);
+    position: relative;
+    z-index: 1;
+}
+
+.page-sidebar .sidebar-header {
+    padding: 20px;
+    box-shadow: var(--privateaim-chrome-edge-shadow-bottom);
+}
+
+.page-sidebar .sidebar-header span {
+    color: var(--privateaim-brand-teal);
+}
+
+@media only screen and (max-width: 768px) {
+    .page-sidebar {
+        width: 56px;
+        overflow: hidden;
+    }
+
+    .page-sidebar .sidebar-header,
+    .page-sidebar .nav-separator,
+    .page-sidebar .nav-link-text {
+        display: none !important;
+    }
+
+    .page-sidebar .nav-item {
+        text-align: center !important;
+    }
+
+    .m-l-sidebar {
+        margin-left: 56px;
+    }
+}

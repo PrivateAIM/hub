@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024.
+ * Copyright (c) 2021-2026.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
@@ -49,50 +49,20 @@ Content
     }
 }
 
-.list {
-    display: flex;
-    flex-direction: column;
-}
-
-.list .list-header {
+/*
+ * Hub deltas on top of the vendored kit list styles (styles/kit-list.css)
+ * — only properties that deliberately differ live here; the base
+ * `.vc-list` / `.vc-list-item` chrome comes from the kit file.
+ */
+.vc-list .vc-list-header {
     margin-bottom: 0.7rem;
 }
 
-.list .list-body {
-    padding-left: 0;
-    list-style: none;
-    margin-bottom: 0;
+/* kit styles only `.active` — hub's pickers also mark rows `.checked`. */
+.vc-list .vc-list-item.checked {
+    background-color: var(--vc-color-bg-elevated);
 }
 
-.list .list-item {
-    background-color: #f1f1f1;
-    /*
-    background-color: #ececec;
-
-     */
-    border: 1px solid #dedede;
-    transition: all .3s ease-in-out;
-
-    border-radius: 4px;
-
-    padding: 0.25rem 0.25rem;
-    margin-bottom: 0.5rem;
-    vertical-align: middle;
-}
-
-.list .list-item.active,
-.list .list-item.checked {
-    background-color: #d7d3d3;
-}
-
-.list .list-icon,
-.c-list .c-list-icon {
-    font-size: 1rem;
-    padding-right: 0.5rem;
-}
-
-.list-no-more {
-    padding: 0.4rem 0.7rem;
-    position: relative;
+.vc-list-no-more {
     margin: 1rem 0;
 }

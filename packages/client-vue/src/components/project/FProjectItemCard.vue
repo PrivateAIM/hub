@@ -66,15 +66,18 @@ export default defineComponent({
 });
 </script>
 <template>
-    <div class="d-flex flex-column w-100">
-        <div class="w-100">
-            <div class="d-flex flex-row align-items-center">
+    <div class="flex flex-col w-full">
+        <div class="w-full">
+            <div class="flex flex-row items-center">
                 <div>
                     <slot
                         name="title"
                         :data="entity"
                     >
-                        <i class="fas fa-project-diagram me-1" />
+                        <VCIcon
+                            name="fa6-solid:diagram-project"
+                            class="me-1"
+                        />
                         <VCLink
                             :to="'/projects/' + entity.id"
                             class="mb-0"
@@ -96,7 +99,7 @@ export default defineComponent({
                             :disabled="busy"
                             class="btn btn-xs btn-dark"
                         >
-                            <i class="fa fa-bars" />
+                            <VCIcon name="fa6-solid:bars" />
                         </VCLink>
                         <template v-if="canDelete">
                             <FEntityDelete
@@ -116,30 +119,30 @@ export default defineComponent({
             name="body"
             :data="entity"
         >
-            <div class="d-flex justify-content-between flex-row">
-                <div class="d-flex flex-grow-1 align-items-center flex-column">
+            <div class="flex justify-between flex-row">
+                <div class="flex grow items-center flex-col">
                     <div>
-                        <strong><i class="fa fa-microscope" /> Analyses</strong>
+                        <strong><VCIcon name="fa6-solid:microscope" /> Analyses</strong>
                     </div>
                     <div
-                        :class="{'text-success': entity.analyses > 0, 'text-muted': entity.analyses === 0}"
+                        :class="{'text-success-600': entity.analyses > 0, 'text-fg-muted': entity.analyses === 0}"
                     >
                         {{ entity.analyses }}
                     </div>
                 </div>
-                <div class="d-flex flex-grow-1 align-items-center flex-column">
+                <div class="flex grow items-center flex-col">
                     <div>
-                        <strong><i class="fa-solid fa-server" /> Nodes</strong>
+                        <strong><VCIcon name="fa6-solid:server" /> Nodes</strong>
                     </div>
                     <div
-                        :class="{'text-success': entity.nodes > 0, 'text-muted': entity.nodes === 0}"
+                        :class="{'text-success-600': entity.nodes > 0, 'text-fg-muted': entity.nodes === 0}"
                     >
                         {{ entity.nodes }}
                     </div>
                 </div>
-                <div class="d-flex flex-grow-1 align-items-center flex-column">
+                <div class="flex grow items-center flex-col">
                     <div>
-                        <strong><i class="fa fa-user" /> Creator</strong>
+                        <strong><VCIcon name="fa6-solid:user" /> Creator</strong>
                     </div>
                     <div>
                         <FProjectCreator :entity="entity" />
@@ -151,10 +154,10 @@ export default defineComponent({
             name="footer"
             :data="entity"
         >
-            <div class="d-flex flex-row">
+            <div class="flex flex-row">
                 <div class="">
                     <small>
-                        <span class="text-muted">
+                        <span class="text-fg-muted">
                             created
                         </span>
                         <VCTimeago :datetime="entity.created_at" />
@@ -162,7 +165,7 @@ export default defineComponent({
                 </div>
                 <div class="ms-auto">
                     <small>
-                        <span class="text-muted">
+                        <span class="text-fg-muted">
                             updated
                         </span>
                         <VCTimeago :datetime="entity.updated_at" />

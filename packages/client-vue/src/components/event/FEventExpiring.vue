@@ -25,19 +25,16 @@ export default defineComponent({
 <template>
     <slot v-bind="entity">
         <div
-            class="d-flex justify-content-center gap-1"
+            class="flex justify-center gap-1"
             :class="{
                 'flex-row': direction === 'row',
-                'flex-column': direction === 'column'
+                'flex-col': direction === 'column'
             }"
         >
             <div>
-                <i
-                    class="fa"
-                    :class="{
-                        'fa-check text-success': entity.expiring,
-                        'fa-times text-danger': !entity.expiring
-                    }"
+                <VCIcon
+                    :name="entity.expiring ? 'fa6-solid:check' : 'fa6-solid:xmark'"
+                    :class="entity.expiring ? 'text-success-600' : 'text-error-600'"
                 />
             </div>
             <template v-if="entity.expiring">

@@ -7,30 +7,19 @@
 
 import type { ObjectLiteralKeys } from '@privateaim/kit';
 import type {
-    ListBodyBuildOptionsInput,
-    ListBodySlotProps,
-    ListFooterSlotProps,
-    ListHeaderBuildOptionsInput,
-    ListHeaderSlotProps,
-    ListItemBuildOptionsInput,
-    ListItemSlotProps,
-    ListLoadFn,
-    ListSlotProps,
-} from '@vuecs/list-controls';
-import type {
     BuildInput,
     FieldsBuildInput,
     FiltersBuildInput,
     ObjectLiteral,
     PaginationBuildInput,
-    Parameter, 
+    Parameter,
     RelationsBuildInput,
     SortBuildInput,
 } from 'rapiq';
 import type {
     MaybeRef,
-    Ref, 
-    SetupContext, 
+    Ref,
+    SetupContext,
     VNodeChild,
 } from 'vue';
 import type { EntitySocketContext } from '../entity-socket';
@@ -48,23 +37,56 @@ export type ListMeta<T> = ObjectLiteralKeys<{
     [Parameter.RELATIONS]?: RelationsBuildInput<T extends ObjectLiteral ? T : never>
 }>;
 
+export type ListLoadFn<M = any> = (meta?: M) => Promise<void>;
+
+export type ListSlotProps<T, M = any> = {
+    data: T[];
+    busy: boolean;
+    total: number;
+    load: ListLoadFn<M>;
+    meta: M;
+    created(item: T): void;
+    updated(item: T): void;
+    deleted(item: T): void;
+};
+
+export type ListBodySlotProps<T, M = any> = ListSlotProps<T, M>;
+export type ListHeaderSlotProps<T, M = any> = ListSlotProps<T, M>;
+export type ListFooterSlotProps<T, M = any> = ListSlotProps<T, M>;
+export type ListItemSlotProps<T> = {
+    data: T;
+    index: number;
+    busy: boolean;
+    updated(item: T): void;
+    deleted(item: T): void;
+    failed(error: Error): void;
+};
+
+export type ListItemContentSections = {
+    slot?: VNodeChild,
+    actions?: VNodeChild,
+    icon?: VNodeChild
+};
+
 export type ListHeaderOptions<T> = {
-    content?: ListHeaderBuildOptionsInput<T>['content'],
-    tag?: ListHeaderBuildOptionsInput<T>['tag']
+    content?: VNodeChild | (() => VNodeChild),
+    tag?: string,
+    /** @internal phantom field — keeps `T` referenced for eslint while preserving the public generic surface. */
+    _typeWitness?: (row: T) => void,
 };
 export type ListFooterOptions<T> = ListHeaderOptions<T>;
 export type ListNoMoreOptions<T> = ListHeaderOptions<T>;
 export type ListLoadingOptions<T> = ListHeaderOptions<T>;
 export type ListItemOptions<T> = {
-    content?: ListItemBuildOptionsInput<T>['content'],
-    tag?: ListItemBuildOptionsInput<T>['tag'],
-    textPropName?: ListItemBuildOptionsInput<T>['textPropName'],
-    icon?: ListItemBuildOptionsInput<T>['icon']
+    content?: VNodeChild | ((item: T, props: ListItemSlotProps<T>, sections: ListItemContentSections) => VNodeChild),
+    tag?: string,
+    textPropName?: string,
+    icon?: boolean
 };
 
 export type ListBodyOptions<T> = {
-    data?: ListBodyBuildOptionsInput<T>['data'],
-    tag?: ListBodyBuildOptionsInput<T>['tag'],
+    data?: T[],
+    tag?: string,
     item?: ListItemOptions<T>
 };
 

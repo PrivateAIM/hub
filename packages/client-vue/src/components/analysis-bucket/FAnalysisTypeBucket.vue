@@ -98,7 +98,7 @@ export default defineComponent({
                     class="btn btn-xs btn-dark"
                     @click.prevent="retry"
                 >
-                    <i class="fas fa-rotate-right" /> Retry
+                    <VCIcon name="fa6-solid:rotate-right" /> Retry
                 </button>
             </div>
         </template>

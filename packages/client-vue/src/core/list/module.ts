@@ -6,21 +6,24 @@
  */
 
 import { hasOwnProperty } from '@privateaim/kit';
-import type { EntityAPI } from '@authup/core-http-kit';
+import type { IEntityAPI } from '@authup/core-http-kit';
 import type { DomainTypeMap } from '@privateaim/core-kit';
-import type {
-    ListFooterBuildOptionsInput, 
-    ListHeaderBuildOptionsInput,
-} from '@vuecs/list-controls';
 import {
-    buildList,
-} from '@vuecs/list-controls';
+    VCList,
+    VCListBody,
+    VCListEmpty,
+    VCListItem,
+    VCListLoading,
+} from '@vuecs/list';
+import { VCIcon } from '@vuecs/icon';
 import type { BuildInput, FiltersBuildInput } from 'rapiq';
-import type { Ref, VNodeChild } from 'vue';
+import type { Ref, VNodeArrayChildren, VNodeChild } from 'vue';
 import {
-    computed, 
+    Fragment,
+    computed,
+    h,
     isRef,
-    ref, 
+    ref,
     unref,
 } from 'vue';
 import { createMerger, isObject } from 'smob';
@@ -29,11 +32,19 @@ import { injectCoreHTTPClient } from '../http-client';
 import { createEntitySocket } from '../entity-socket';
 import type { EntitySocketContext } from '../entity-socket';
 import { isQuerySortedDescByDate } from '../query';
+import { EntityListSlotName } from './constants';
 import type {
     List,
     ListCreateContext,
+    ListFooterOptions,
+    ListHeaderOptions,
+    ListItemContentSections,
+    ListItemSlotProps,
+    ListLoadingOptions,
     ListMeta,
+    ListNoMoreOptions,
     ListRenderOptions,
+    ListSlotProps,
 } from './type';
 import {
     ListHandlers,
@@ -75,7 +86,7 @@ export function createListRaw<
 
     const client = injectCoreHTTPClient();
 
-    let domainAPI : EntityAPI<Entity<RECORD>> | undefined;
+    let domainAPI : IEntityAPI<Entity<RECORD>> | undefined;
     if (hasOwnProperty(client, context.type)) {
         domainAPI = client[context.type] as any;
     }
@@ -207,51 +218,239 @@ export function createListRaw<
     };
 
     function render() : VNodeChild {
-        const header : ListHeaderBuildOptionsInput<RECORD> = boolableToObject(options.header || {});
-        const footer : ListFooterBuildOptionsInput<RECORD> = boolableToObject(options.footer || {});
+        const headerOpt: ListHeaderOptions<RECORD> | undefined = boolableToObject(options.header || {});
+        const footerOpt: ListFooterOptions<RECORD> | undefined = boolableToObject(options.footer || {});
+        const noMoreOpt: ListNoMoreOptions<RECORD> | undefined = boolableToObject(options.noMore || {});
+        const loadingOpt: ListLoadingOptions<RECORD> | undefined = boolableToObject(options.loading || {});
 
-        if (options.item) {
-            if (
-                typeof options.body === 'undefined' ||
-                typeof options.body === 'boolean'
-            ) {
-                options.body = { item: options.item };
-            } else {
-                options.body.item = options.item;
-            }
-        }
+        const itemOpt = options.item ||
+            (options.body && typeof options.body === 'object' ?
+                options.body.item :
+                undefined);
 
-        return buildList<RECORD, ListMeta<RECORD>>({
-            footer,
-            header,
-            noMore: options.noMore,
-            body: options.body,
-            loading: options.loading,
+        const slots = context.setup.slots || {};
+
+        // Each callback delegates to the `handlers` instance which already
+        // updates total/data and emits the corresponding parent event —
+        // adding a parallel `context.setup.emit(...)` here would fire each
+        // event twice (silent data-corruption risk on entity mutations).
+        const slotProps = (): ListSlotProps<RECORD, ListMeta<RECORD>> => ({
+            data: data.value,
+            busy: busy.value,
             total: total.value,
             load,
+            meta: meta.value,
+            created: (value: RECORD) => handlers.created(value),
+            updated: (value: RECORD) => handlers.updated(value),
+            deleted: (value: RECORD) => handlers.deleted(value),
+        });
+
+        const renderChrome = (
+            slotName: EntityListSlotName,
+            opt: ListHeaderOptions<RECORD> | undefined,
+            cssClass: string,
+            withSlotProps = true,
+        ): VNodeChild | null => {
+            const slot = slots[slotName];
+            if (slot) {
+                return h(
+                    opt?.tag ?? 'div',
+                    { class: cssClass },
+                    withSlotProps ? slot(slotProps()) : slot(undefined),
+                );
+            }
+            if (opt?.content) {
+                const content: VNodeArrayChildren = [
+                    typeof opt.content === 'function' ?
+                        opt.content() :
+                        opt.content,
+                ];
+                return h(opt.tag ?? 'div', { class: cssClass }, content);
+            }
+            return null;
+        };
+
+        // <VCList> must receive `:data` / `:busy` / `:total` (or `:state`)
+        // — without them, the list context publishes an empty data ref,
+        // and child <VCListBody> / <VCListEmpty> short-circuit
+        // (return null) regardless of what slot vnodes the renderer
+        // emits. Symptom: junction list views render the header + footer
+        // but the body is silently dropped. See @vuecs/list source —
+        // `useList()` reads from the parent VCList's provided state,
+        // not from the children passed to VCListBody.
+        const listProps = {
+            data: data.value,
             busy: busy.value,
-            data: data.value as Entity<RECORD>[],
-            meta: {
-                ...meta.value,
-                total: total.value,
-            },
-            onCreated(value: RECORD) {
-                handlers.created(value);
-            },
-            onDeleted(value: RECORD) {
-                handlers.deleted(value);
-            },
-            onUpdated: (value: RECORD) => {
-                handlers.updated(value);
-            },
-            slotItems: context.setup.slots || {},
+            total: total.value,
+            meta: meta.value,
+        };
+
+        // DEFAULT slot — if provided, takes over the entire list contents
+        // (legacy buildList contract). Used as the escape hatch for
+        // consumers that want full control over the list body.
+        const defaultSlot = slots[EntityListSlotName.DEFAULT];
+        if (defaultSlot) {
+            return h(VCList, listProps, () => defaultSlot(slotProps()));
+        }
+
+        return h(VCList, listProps, () => {
+            const children: VNodeChild[] = [];
+
+            const headerVNode = options.header !== false ?
+                renderChrome(EntityListSlotName.HEADER, headerOpt, 'vc-list-header') :
+                null;
+            if (headerVNode) children.push(headerVNode);
+
+            // BODY slot — if provided, the consumer renders the full body
+            // (e.g. a `<VCTable>` with `:columns` driving auto-render) and
+            // per-item rendering is skipped. Otherwise fall back to
+            // <VCListBody> + per-item <VCListItem>.
+            const bodySlot = slots[EntityListSlotName.BODY];
+            if (bodySlot) {
+                children.push(bodySlot(slotProps()));
+            } else {
+                children.push(h(VCListBody, {}, () => {
+                    const renderLoadingBand = (overlay: boolean) => {
+                        if (options.loading === false) return null;
+                        const slot = slots[EntityListSlotName.LOADING];
+                        if (slot) return slot(undefined);
+                        if (loadingOpt?.content) {
+                            return h(loadingOpt.tag ?? 'div', { class: 'vc-list-loading' }, loadingOpt.content);
+                        }
+                        return h(VCListLoading, { overlay });
+                    };
+
+                    // First-load: data is empty AND busy → show loading in place.
+                    if (busy.value && data.value.length === 0) {
+                        return renderLoadingBand(false);
+                    }
+
+                    if (data.value.length === 0) {
+                        // The `noMore` chrome below renders for exactly this
+                        // state (`!busy && total === 0`) — suppress the default
+                        // empty marker when it will, so the empty list shows
+                        // one message, not two stacked ones.
+                        const noMoreVisible = options.noMore !== false &&
+                            total.value === 0 &&
+                            (!!slots[EntityListSlotName.NO_MORE] || !!noMoreOpt?.content);
+                        if (noMoreVisible) {
+                            return null;
+                        }
+                        return h(VCListEmpty);
+                    }
+
+                    // Refresh path: data shown AND busy → overlay loading on top
+                    // of existing rows so consumers still see refresh feedback.
+                    const rows = data.value.map((item, index) => {
+                        // Same single-emit contract as `slotProps()`: handlers
+                        // already emits, so we delegate and don't double-fire.
+                        const itemSlotProps: ListItemSlotProps<RECORD> = {
+                            data: item,
+                            index,
+                            busy: busy.value,
+                            updated: (next: RECORD) => handlers.updated(next),
+                            deleted: (next: RECORD) => handlers.deleted(next),
+                            failed: () => {},
+                        };
+                        return h(VCListItem, { key: (item as any).id ?? index }, () => {
+                            const itemSlot = slots[EntityListSlotName.ITEM];
+                            const itemActionsSlot = slots[EntityListSlotName.ITEM_ACTIONS];
+                            const itemActionsExtraSlot = slots[EntityListSlotName.ITEM_ACTIONS_EXTRA];
+
+                            const actionsNodes: VNodeChild[] = [];
+                            if (itemActionsSlot) {
+                                actionsNodes.push(itemActionsSlot(itemSlotProps));
+                            }
+                            if (itemActionsExtraSlot) {
+                                actionsNodes.push(itemActionsExtraSlot(itemSlotProps));
+                            }
+
+                            const actionsNode = actionsNodes.length > 0 ?
+                                h(
+                                    'div',
+                                    { class: 'vc-list-item-actions ms-auto flex items-center gap-1' },
+                                    actionsNodes,
+                                ) :
+                                undefined;
+
+                            // Content callbacks receive the sections and may
+                            // place the actions block inside their own layout
+                            // (FProjects, FProjectNodes, FAnalysisNodes) — or
+                            // ignore it entirely (FAnalyses). The getter records
+                            // which happened, so the auto-append below only
+                            // fires when the callback did NOT consume it;
+                            // appending unconditionally rendered the block
+                            // twice per row.
+                            let actionsConsumed = false;
+                            const sections: ListItemContentSections = {
+                                slot: itemSlot ? itemSlot(itemSlotProps) : undefined,
+                                get actions() {
+                                    actionsConsumed = true;
+                                    return actionsNode;
+                                },
+                                // Opt-in row marker (`item: { icon: true }`) —
+                                // the old list engine's default item icon,
+                                // consumed by custom content callbacks
+                                // (FAnalysisNodes, FProjectNodes).
+                                icon: itemOpt?.icon ?
+                                    h(VCIcon, { name: 'fa6-solid:bars', class: 'me-1' }) :
+                                    undefined,
+                            };
+
+                            let body: VNodeChild;
+                            if (itemSlot) {
+                                body = sections.slot;
+                            } else if (itemOpt?.content) {
+                                body = typeof itemOpt.content === 'function' ?
+                                    itemOpt.content(item, itemSlotProps, sections) :
+                                    itemOpt.content;
+                            } else {
+                                const textPropName = itemOpt?.textPropName ?? 'name';
+                                body = h('span', String((item as any)[textPropName] ?? (item as any).id ?? ''));
+                            }
+
+                            if (!actionsNode || actionsConsumed) {
+                                return body;
+                            }
+
+                            return [
+                                body,
+                                actionsNode,
+                            ];
+                        });
+                    });
+
+                    if (busy.value) {
+                        return [rows, renderLoadingBand(true)];
+                    }
+                    return rows;
+                }));
+            }
+
+            // "No more" — empty-list indicator. Rendered ONLY when the list
+            // is empty (`total === 0`) and not currently loading.
+            if (
+                options.noMore !== false &&
+                !busy.value &&
+                total.value === 0
+            ) {
+                const noMoreVNode = renderChrome(EntityListSlotName.NO_MORE, noMoreOpt, 'vc-list-no-more', false);
+                if (noMoreVNode) children.push(noMoreVNode);
+            }
+
+            const footerVNode = options.footer !== false ?
+                renderChrome(EntityListSlotName.FOOTER, footerOpt, 'vc-list-footer') :
+                null;
+            if (footerVNode) children.push(footerVNode);
+
+            return h(Fragment, children);
         });
     }
 
     context.setup.expose({
-        handleCreated: (data) => handlers.created(data),
-        handleDeleted: (data) => handlers.deleted(data),
-        handleUpdated: (data) => handlers.updated(data),
+        handleCreated: (data: RECORD) => handlers.created(data),
+        handleDeleted: (data: RECORD) => handlers.deleted(data),
+        handleUpdated: (data: RECORD) => handlers.updated(data),
         load,
         data,
     });

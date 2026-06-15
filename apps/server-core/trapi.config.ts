@@ -9,7 +9,7 @@ export default defineConfig({
     swagger: {
         version: 'v3.2',
         data: {
-            name: 'PrivateAIM Hub Core API',
+            name: 'FLAME Hub Core API',
             securityDefinitions: {
                 bearer: {
                     type: 'apiKey',

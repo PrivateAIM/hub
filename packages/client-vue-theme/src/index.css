@@ -1,0 +1,501 @@
+/*!
+ * @privateaim/client-vue-theme — app-level layer on top of
+ * `@authup/client-web-kit-theme`.
+ *
+ * Cascade order (apps consume this file; the kit theme's cascade
+ * is included transitively):
+ *   1. tailwindcss            — via the kit theme
+ *   2. @vuecs/design          — via the kit theme
+ *   3. @vuecs/theme-tailwind  — via the kit theme
+ *   4. privateaim tokens      — project palette / chrome / typography
+ *   5. privateaim compat layer — Bootstrap-shaped class shims (@apply'd
+ *                                from Tailwind utilities). Phased out
+ *                                as templates migrate to <VCButton> /
+ *                                <VCAlert> / etc.
+ */
+
+/*
+ * Kit-theme CSS cascade — consumed from npm.
+ *
+ * `@authup/client-web-kit-theme` 1.0.0-beta.48 fixed the beta.44
+ * packaging bug (published `src/index.css` imported stylesheets missing
+ * from the tarball) that previously forced hub to inline this cascade.
+ * The published `index.css` brings tailwindcss + @vuecs/design +
+ * @vuecs/theme-tailwind, the authup kit-component styles
+ * (tokens/picker/auth/realm/login — formerly
+ * `@authup/client-web-kit/dist/style.css`, which beta.48 no longer
+ * ships), the `.dark` class `@custom-variant`, and `@source` scopes for
+ * the kit's own class strings.
+ *
+ * The two stylesheets under styles/kit-*.css stay vendored: upstream
+ * dropped list.css / form-validation.css from the theme entirely, and
+ * hub's copies carry vc-* class-name deltas on top.
+ */
+@layer theme, vuecs, authup, base, components, utilities;
+
+@import "@authup/client-web-kit-theme/index.css";
+
+/*
+ * Only the theme's own sources are scanned here. Dependency trees
+ * (@vuecs/*, @authup/client-web-kit) must be declared by the CONSUMING
+ * app (see apps/client-ui/assets/css/tailwind.css) — npm hoisting decides
+ * where those packages physically live relative to the app, so
+ * node_modules-relative globs anchored at this package silently miss
+ * them (and previously did: the @authup globs here resolved to
+ * nonexistent paths).
+ */
+@source ".";
+
+@import "./styles/kit-list.css";
+@import "./styles/kit-form-validation.css";
+
+/* ------------------------------------------------------------------
+   PrivateAIM design tokens
+   Override `--vc-color-*` (or palette names via setColorPalette()) to
+   reskin the entire UI without touching component class strings.
+   ------------------------------------------------------------------ */
+@layer base {
+    /*
+     * PrivateAIM chrome + brand tokens. Two shapes:
+     *
+     *   1. Chrome (header, navbar, sidebar, navbar dropdowns) flips with
+     *      mode. Light-mode defaults alias `--vc-color-bg-elevated` /
+     *      `-fg` / `-border` etc. so the chrome reads as a light surface
+     *      distinct from the page-content bg. The `.dark` block below
+     *      restores hub's historical warm-dark chrome palette so the
+     *      chrome stays the recognizable dark grey.
+     *
+     *   2. Brand accents (coral, teal, purple, blue, rust) carry hub's
+     *      identity and are hard-coded; they read fine on both light and
+     *      dark backgrounds. They are used as text/accent colors on
+     *      chrome surfaces, so they flip alongside the chrome they sit on.
+     */
+    :root {
+        /* Chrome — light-mode defaults, alias semantic vuecs tokens */
+        --privateaim-chrome-bg:             var(--vc-color-bg-elevated);
+        --privateaim-chrome-bg-elevated:    var(--vc-color-bg-muted);
+        --privateaim-chrome-fg:             var(--vc-color-fg);
+        --privateaim-chrome-fg-muted:       var(--vc-color-fg-muted);
+        --privateaim-chrome-border:         var(--vc-color-border);
+        /* Chrome edge where it meets the content — `-bottom` for top chrome
+           (header / sidebar-header), `-top` for bottom chrome (footer).
+           Light mode: a soft drop shadow so the fixed chrome reads as
+           raised above the content (the dark inset band used in dark mode
+           would be a muddy grey stripe on a light surface). */
+        --privateaim-chrome-edge-shadow-bottom: 0 2px 8px 0 rgba(0, 0, 0, 0.06);
+        --privateaim-chrome-edge-shadow-top:    0 -2px 8px 0 rgba(0, 0, 0, 0.06);
+        --privateaim-chrome-edge-shadow-right:  2px 0 8px 0 rgba(0, 0, 0, 0.06);
+
+        /* Brand accents — unchanged across modes */
+        --privateaim-brand-coral:           #FF5B5B;
+        --privateaim-brand-teal:            #4ECDC4;
+        --privateaim-brand-purple:          #6259ca;
+        --privateaim-brand-blue:            #2776dc;
+        --privateaim-brand-rust:            #a6592d;
+
+        /*
+         * Primary palette → hub brand coral. Overrides the vuecs primary
+         * scale (which @vuecs/design aliases to blue); theme-tailwind
+         * bridges `--color-primary-*` from these, so every `primary`
+         * utility/component (buttons, active states, rings) adopts the
+         * brand coral. Tints/shades are color-mixed from the brand var so
+         * the whole scale stays in sync with it; the pure brand sits at
+         * 600 — the shade buttons and active states use.
+         */
+        --vc-color-primary-50:  color-mix(in oklab, var(--privateaim-brand-coral) 8%,  white);
+        --vc-color-primary-100: color-mix(in oklab, var(--privateaim-brand-coral) 16%, white);
+        --vc-color-primary-200: color-mix(in oklab, var(--privateaim-brand-coral) 32%, white);
+        --vc-color-primary-300: color-mix(in oklab, var(--privateaim-brand-coral) 52%, white);
+        --vc-color-primary-400: color-mix(in oklab, var(--privateaim-brand-coral) 74%, white);
+        --vc-color-primary-500: color-mix(in oklab, var(--privateaim-brand-coral) 90%, white);
+        --vc-color-primary-600: var(--privateaim-brand-coral);
+        --vc-color-primary-700: color-mix(in oklab, var(--privateaim-brand-coral) 82%, black);
+        --vc-color-primary-800: color-mix(in oklab, var(--privateaim-brand-coral) 64%, black);
+        --vc-color-primary-900: color-mix(in oklab, var(--privateaim-brand-coral) 50%, black);
+        --vc-color-primary-950: color-mix(in oklab, var(--privateaim-brand-coral) 32%, black);
+    }
+
+    /*
+     * Dark-mode overrides. Two distinct moves:
+     *
+     *   a) Restore hub's historical warm-dark chrome palette so the dark
+     *      chrome stays the recognizable dark grey rather than vuecs's
+     *      `bg-elevated` value, which would blend into the page-content bg.
+     *
+     *   b) Soften the content background. `@vuecs/design`'s `.dark` puts
+     *      `--vc-color-bg` at neutral-900 (~20.5% L) — near-black — which
+     *      feels harsh against hub's warm dark chrome. Lift it so the
+     *      content surface pairs with the chrome as a gentle tonal step.
+     */
+    .dark {
+        --privateaim-chrome-bg:             rgb(64, 67, 78);
+        --privateaim-chrome-bg-elevated:    #32333B;
+        --privateaim-chrome-fg:             #ffffff;
+        --privateaim-chrome-fg-muted:       #aeb2b7;
+        --privateaim-chrome-border:         #333333;
+        /* Recessed band — hub's historical raised-dark-chrome edge. The
+           sidebar's right edge stays shadow-free: the chrome/content tonal
+           step carries the separation in dark mode. */
+        --privateaim-chrome-edge-shadow-bottom: 0 -6px 0 0 rgba(0, 0, 0, 0.3) inset;
+        --privateaim-chrome-edge-shadow-top:    0 6px 0 0 rgba(0, 0, 0, 0.3) inset;
+        --privateaim-chrome-edge-shadow-right:  none;
+
+        /*
+         * Content surface — soft dark that pairs with the warm chrome
+         * (#40434E) as a gentle tonal step. @vuecs/design's dark `--vc-color-fg`
+         * is light (neutral-200), so the surface MUST stay dark; the prior
+         * `neutral-400` (a light-mid grey) left light text on light grey
+         * (~1.7:1, unreadable). Content sits a touch darker than the chrome so
+         * the sidebar/header read as raised panels.
+         */
+        --vc-color-bg: #2a2d35;
+        --vc-color-bg-muted: #343742;
+        --vc-color-border: #3e414c;
+
+        /*
+         * Warning / danger surfaces — tinted panels (alert-warning,
+         * alert-danger, list no-more / empty markers). Hand-tuned
+         * mid-lightness, low-chroma tones: the palette deep ends
+         * (orange-950 / red-950) read brown/black against the soft dark
+         * content surface. Border sits a step lighter than the fill
+         * (edge highlight); panel text is a hue-matched near-white.
+         */
+        --privateaim-warning-surface:        oklch(0.55 0.06 66.93);
+        --privateaim-warning-surface-border: oklch(0.65 0.08 66.93);
+        --privateaim-warning-surface-fg:     oklch(0.97 0.02 66.93);
+
+        --privateaim-danger-surface:         oklch(0.45 0.11 22.78);
+        --privateaim-danger-surface-border:  oklch(0.55 0.13 22.78);
+        --privateaim-danger-surface-fg:      oklch(0.97 0.015 22.78);
+
+        --privateaim-info-surface:           oklch(0.5 0.08 237);
+        --privateaim-info-surface-border:    oklch(0.6 0.1 237);
+        --privateaim-info-surface-fg:        oklch(0.97 0.015 237);
+
+        /*
+         * Standalone warning / danger text (`.text-warning` /
+         * `.text-danger`) — same hues as the surfaces, lifted to stay
+         * readable on the dark content background (the surface values
+         * themselves land below ~3:1 as text).
+         */
+        --privateaim-warning-text:           oklch(0.75 0.1 66.93);
+        --privateaim-danger-text:            oklch(0.7 0.14 22.78);
+        --privateaim-info-text:              oklch(0.75 0.12 237);
+    }
+
+    /*
+     * Tailwind v4 preflight resets every heading to inherit the parent
+     * font-size. Restore the heading size scale here once, project-wide.
+     * Font-family + font-weight come from styles/root.css.
+     */
+    h1 { @apply text-4xl; }
+    h2 { @apply text-3xl; }
+    h3 { @apply text-2xl; }
+    h4 { @apply text-xl; }
+    h5 { @apply text-lg; }
+    h6 { @apply text-base; }
+
+    /*
+     * Tailwind v4 preflight sets `svg { display: block }`, which breaks
+     * inline icon-next-to-text layouts. `@iconify/vue` tags every
+     * rendered SVG with `class="iconify ..."` — scope the override to
+     * those so full-bleed `<svg>` illustrations keep `display: block`.
+     */
+    svg.iconify {
+        display: inline-block;
+        vertical-align: -0.125em;
+    }
+
+    /*
+     * Pin Iconify icons inside nav-links to a fixed 1rem box. Without
+     * this the SVG sizes against the inherited font-size (which varies
+     * between the navbar's smaller letter-spaced text and elsewhere),
+     * and the width="0.75em" / width="1em" attributes from @iconify/vue
+     * render at different pixel widths depending on context, breaking
+     * cross-axis alignment of sibling nav items. Pre-migration the
+     * anchor `<i>` icons were size-pinned via
+     * `.navbar-gadgets > li > a i { font-size: 16px }` in core/navbar.css;
+     * the SVG path needs the equivalent.
+     */
+    .vc-nav-link svg.iconify {
+        width: 1rem;
+        height: 1rem;
+    }
+
+    /*
+     * Tailwind v4 preflight resets `<hr>` margins to 0. Restore vertical
+     * rhythm + a muted divider color project-wide.
+     */
+    hr {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        border-color: var(--vc-color-border);
+    }
+
+    /*
+     * Plain text-alignment helpers. Hub's templates use `text-left` /
+     * `text-right` directly (carried over from the Bootstrap era); both
+     * collide with Tailwind utilities of the same name, so keep them in
+     * `@layer base` where the utility layer still wins when both apply.
+     */
+    .text-left  { text-align: left; }
+    .text-right { text-align: right; }
+}
+
+/* ------------------------------------------------------------------
+   Bootstrap-compat layer
+   Provides the Bootstrap-shaped utility / component class names that
+   hub's pre-Tailwind templates still reference. Each rule `@apply`s
+   Tailwind utilities — same visual contract, no `bootstrap` dep, and
+   the rules disappear automatically when the last caller is rewritten
+   to a `<VC*>` component.
+   ------------------------------------------------------------------ */
+@layer components {
+    /* Buttons --------------------------------------------------------- */
+    .btn {
+        @apply inline-flex items-center justify-center gap-1 rounded-md
+               border border-transparent px-3 py-1.5 text-sm font-medium
+               transition-colors cursor-pointer
+               focus-visible:outline-2 focus-visible:outline-offset-2
+               focus-visible:outline-primary-500
+               disabled:opacity-50 disabled:cursor-not-allowed;
+    }
+    .btn-xs    { @apply px-1.5! py-1.25! text-xs!; }
+    .btn-sm    { @apply px-2! py-1! text-xs!; }
+    .btn-md    { @apply px-2! py-1! text-base!; }
+    .btn-lg    { @apply px-4! py-2! text-base!; }
+    .btn-block { @apply block w-full; }
+
+    .btn-primary   { @apply bg-primary-600 text-on-primary hover:bg-primary-700; }
+    .btn-secondary { @apply bg-bg-elevated text-fg         hover:bg-bg-muted; }
+    .btn-success   { @apply bg-success-600 text-on-success hover:bg-success-700; }
+    .btn-danger    { @apply bg-error-600   text-on-error   hover:bg-error-700; }
+    .btn-warning   { @apply bg-warning-500 text-on-warning hover:bg-warning-600; }
+    /* btn-info is reachable only via dynamic `btn-${classSuffix}`
+       (F*Command components) — keep it despite zero static users. */
+    .btn-info      { @apply bg-info-500    text-on-info    hover:bg-info-600; }
+    .btn-dark      { @apply bg-fg          text-bg         hover:opacity-80; }
+
+    /* Semantic color aliases — status/approval components build
+       `text-${suffix}` / `bg-${suffix}` / `btn-${suffix}` dynamically
+       (FProcessStatus, F*ApprovalStatus, F*Command, …), which the Tailwind
+       scanner cannot see; these map the Bootstrap-era bare names onto the
+       token scale. `bg-dark` / `bg-secondary` pair with white `text-light`
+       chips, so they pin the RAW neutral scale (mode-stable) rather than
+       the flipped semantic `fg` token. */
+    .text-primary { @apply text-primary-600; }
+    .text-success { @apply text-success-600; }
+    .text-warning { @apply text-warning-600; }
+    .text-danger  { @apply text-error-600; }
+    .text-info    { @apply text-info-600; }
+    .text-dark    { @apply text-fg; }
+    .text-light   { @apply text-white; }
+
+    /* Dark mode — the 600 weights are tuned for light surfaces and turn
+       harsh/dim on the dark content bg; lift warning/danger/info to the
+       hand-tuned text tokens (same hues as the alert surfaces). */
+    .dark .text-warning { color: var(--privateaim-warning-text); }
+    .dark .text-danger  { color: var(--privateaim-danger-text); }
+    .dark .text-info    { color: var(--privateaim-info-text); }
+
+    .bg-primary   { @apply bg-primary-600; }
+    .bg-success   { @apply bg-success-600; }
+    .bg-warning   { @apply bg-warning-500; }
+    /* 500 (not 600) — Tailwind red-600 reads much harsher than the old
+       Bootstrap #dc3545 on the white-text node execution status banner
+       (the only `bg-danger` consumer); 500 matches bg-warning's weight. */
+    .bg-danger    { @apply bg-error-500; }
+    .bg-secondary { background-color: var(--vc-color-neutral-500); }
+    .bg-dark      { background-color: var(--vc-color-neutral-800); }
+
+    .btn-outline-primary   { @apply border-primary-600  text-primary-600 hover:bg-primary-600 hover:text-on-primary; }
+    .btn-outline-secondary { @apply border-border       text-fg          hover:bg-bg-muted; }
+    .btn-outline-danger    { @apply border-error-600    text-error-600   hover:bg-error-600   hover:text-on-error; }
+    .btn-outline-info      { @apply border-info-500     text-info-600    hover:bg-info-500    hover:text-on-info; }
+    .btn-outline-dark      { @apply border-fg           text-fg          hover:bg-fg          hover:text-bg; }
+
+    /* Grid — Bootstrap-style 12-col layout via flex (not CSS grid). */
+    .row     { @apply flex flex-wrap; margin-left: -0.5rem; margin-right: -0.5rem; }
+    .col     { @apply flex-1 basis-0 px-2; }
+    .col-1   { @apply w-1/12 px-2; }
+    .col-2   { @apply w-2/12 px-2; }
+    .col-3   { @apply w-3/12 px-2; }
+    .col-4   { @apply w-4/12 px-2; }
+    .col-5   { @apply w-5/12 px-2; }
+    .col-6   { @apply w-6/12 px-2; }
+    .col-7   { @apply w-7/12 px-2; }
+    .col-8   { @apply w-8/12 px-2; }
+    .col-9   { @apply w-9/12 px-2; }
+    .col-10  { @apply w-10/12 px-2; }
+    .col-11  { @apply w-11/12 px-2; }
+    .col-12  { @apply w-full px-2; }
+
+    /* Responsive columns — md+ breakpoint (hub uses col-sm, col-md, col-lg variants). */
+    .col-sm    { @apply px-2 sm:flex-1 sm:basis-0; }
+    .col-sm-4  { @apply w-full px-2 sm:w-4/12; }
+    .col-md    { @apply px-2 md:flex-1 md:basis-0; }
+    .col-md-3  { @apply w-full px-2 md:w-3/12; }
+    .col-md-4  { @apply w-full px-2 md:w-4/12; }
+    .col-md-6  { @apply w-full px-2 md:w-6/12; }
+    .col-lg-6  { @apply w-full px-2 lg:w-6/12; }
+
+    .container       { @apply mx-auto w-full max-w-screen-lg px-4; }
+    .container-fluid { @apply w-full px-4; }
+
+    /* Cards — the full mechanism (base + variants, all variable-driven)
+       lives in styles/card.css, imported below into @layer components. */
+
+    /* Alerts ---------------------------------------------------------
+       The tinted variants use raw palette steps that do NOT flip with
+       the mode — in dark mode the light `*-50` fills glare against the
+       dark surface, so each variant carries a deep-end dark recipe
+       (950 fill / 900 border / 300 text). `.alert-dark` builds on
+       semantic tokens and adapts on its own. */
+    .alert         { @apply relative mb-3 rounded-md border px-4 py-3; }
+    .alert-sm      { @apply px-3 py-2 text-sm; }
+    .alert-primary { @apply border-primary-200 bg-primary-50 text-primary-700 dark:border-primary-900 dark:bg-primary-950 dark:text-primary-300; }
+    .alert-success { @apply border-success-200 bg-success-50 text-success-700 dark:border-success-900 dark:bg-success-950 dark:text-success-300; }
+    /* Orange scale (not the amber `warning` tokens) — amber's dark end
+       reads brown; orange keeps the warm tone in both modes. */
+    .alert-warning { @apply border-orange-200 bg-orange-50 text-orange-700; }
+    .alert-danger  { @apply border-error-200   bg-error-50   text-error-700; }
+    .alert-info    { @apply border-info-200    bg-info-50    text-info-700; }
+    .alert-dark    { @apply border-border bg-bg-elevated text-fg; }
+
+    /* Warning / danger / info dark recipes use the hand-tuned surface
+       tokens (see the `.dark` token block above) — the palette deep
+       ends the other variants use read brown/black/near-navy. */
+    .dark .alert-warning {
+        background-color: var(--privateaim-warning-surface);
+        border-color: var(--privateaim-warning-surface-border);
+        color: var(--privateaim-warning-surface-fg);
+    }
+    .dark .alert-danger {
+        background-color: var(--privateaim-danger-surface);
+        border-color: var(--privateaim-danger-surface-border);
+        color: var(--privateaim-danger-surface-fg);
+    }
+    .dark .alert-info {
+        background-color: var(--privateaim-info-surface);
+        border-color: var(--privateaim-info-surface-border);
+        color: var(--privateaim-info-surface-fg);
+    }
+
+    /* Badges --------------------------------------------------------- */
+    .badge {
+        @apply inline-flex items-center rounded-full px-2 py-0.5
+               text-xs font-medium;
+    }
+
+    /* Progress — Bootstrap-shaped track + bar (analysis build/exec/
+       distribution steps, master-image card). The bar's color comes from a
+       `bg-*` utility on the markup and its width from an inline style; this
+       only restores the structure Bootstrap used to provide. */
+    .progress {
+        /* `bg-bg` (the base content surface) + a border, NOT `bg-bg-muted`:
+           the track is mostly consumed inside `.card-grey` whose `--card-bg`
+           IS `bg-bg-muted`, so a muted track vanished into the card. The
+           darker base fill reads as a recessed groove and the border keeps
+           the shape detectable on any surface. */
+        @apply flex h-4 overflow-hidden rounded-md border border-border bg-bg text-xs;
+    }
+    .progress-bar {
+        @apply flex flex-col justify-center overflow-hidden whitespace-nowrap
+               text-center text-white;
+        transition: width 0.5s ease;
+    }
+
+    /* Nav / navbar --------------------------------------------------- */
+    .nav             { @apply flex flex-wrap; }
+    .nav-item        { @apply list-none; }
+    .nav-link        { @apply block px-3 py-2 text-fg hover:text-primary-600 no-underline; }
+    .nav-link.active { @apply text-primary-600; }
+    .navbar          { @apply flex flex-wrap items-center justify-between; }
+    .navbar-nav      { @apply flex flex-col list-none; }
+    .navbar-toggler  { @apply rounded border border-border px-2 py-1; }
+    .navbar-collapse { @apply grow basis-full items-center; }
+
+    .navbar-collapse:not(.show)        { @apply hidden; }
+    .navbar-expand-md .navbar-collapse { @apply md:flex!; }
+    .navbar-expand-md .navbar-nav      { @apply md:flex-row!; }
+    .navbar-expand-md                  { @apply md:flex-nowrap md:justify-start; }
+
+    /* Forms — minimal shims (vuecs SFCs own the real form styles) ---- */
+    .form-group   { @apply mb-3; }
+    .form-switch  { @apply inline-flex items-center gap-2; }
+
+    /* Pagination — joined-tab look over theme-tailwind's per-button
+       rounded-md. */
+    .vc-pagination .vc-pagination-link {
+        @apply !rounded-none;
+        margin-left: -1px;
+    }
+    .vc-pagination > :first-child .vc-pagination-link {
+        @apply !rounded-l-md;
+        margin-left: 0;
+    }
+    .vc-pagination > :last-child .vc-pagination-link {
+        @apply !rounded-r-md;
+    }
+
+    /* Form validation visual state. */
+    .is-valid {
+        @apply border-success-600 ring-1 ring-success-500;
+    }
+
+    /* Dropdowns — Bootstrap-style toggle/menu (also used by the
+       navbar/sidebar chrome). The `hidden` on `.dropdown-menu` is
+       load-bearing; the toggle's click handler flips `.show`. */
+    .dropdown { @apply relative; }
+    .dropdown-toggle { @apply cursor-pointer; }
+    .dropdown-menu {
+        @apply absolute top-full left-0 z-50 hidden min-w-40 rounded-md
+               border border-border bg-bg py-1 shadow-md;
+    }
+    .dropdown-menu-end { @apply left-auto right-0; }
+    .dropdown-menu.show { @apply block; }
+    .dropdown-item {
+        @apply block w-full cursor-pointer border-0 bg-transparent
+               px-3 py-1 text-left text-sm text-fg hover:bg-bg-muted;
+    }
+    .dropdown-item.active {
+        @apply bg-primary-600 text-on-primary hover:bg-primary-700;
+    }
+    .dropdown-divider { @apply my-1 h-px bg-border; }
+
+    /* Modal — INNER chrome only. The backdrop / positioning shell is
+       owned by Reka / <VCModalContent> (@vuecs/overlays); hub mounts
+       VCModal compound directly. These rules style the structural
+       classes still carried on the markup inside <VCModalContent>
+       (.modal-header / .modal-body / .modal-footer / .modal-title /
+       .btn-close). */
+    .modal-header   { @apply flex items-center justify-between border-b border-border px-4 py-3; }
+    .modal-title    { @apply font-semibold; }
+    .modal-body     { @apply px-4 py-3; }
+    .modal-footer   { @apply flex items-center justify-end gap-2 border-t border-border px-4 py-3; }
+    .btn-close {
+        @apply cursor-pointer border-0 bg-transparent text-fg-muted
+               hover:text-fg;
+    }
+}
+
+/* ------------------------------------------------------------------
+   PrivateAIM app styles — chrome (header, navbar, sidebar, body)
+   + project utilities + login chrome. Layered LAST so app-specific
+   selectors win over the Tailwind utility / compat layers when the
+   classes overlap.
+   ------------------------------------------------------------------ */
+@import "./styles/root.css";
+@import "./styles/colors.css";
+@import "./styles/domain.css";
+@import "./styles/card.css";
+@import "./styles/vue-layout-navigation.css";
+@import "./styles/vue-form-wizard.css";
+@import "./styles/core/header.css";
+@import "./styles/core/navbar.css";
+@import "./styles/core/body.css";
+@import "./styles/core/sidebar.css";
+
+/* Pagination hover/focus preview lives in the JS theme —
+   `clientVueTheme()` (src/index.ts) extends the pagination `link` theme
+   classes instead of fighting `@layer utilities` from here. */

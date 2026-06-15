@@ -52,9 +52,9 @@ export default defineComponent({
 </script>
 <template>
     <div
-        class="d-flex justify-content-around"
+        class="flex justify-around"
         :class="{
-            'flex-column': listDirection === 'column',
+            'flex-col': listDirection === 'column',
             'flex-row': listDirection === 'row'
         }"
     >
@@ -64,11 +64,11 @@ export default defineComponent({
                 v-bind="entity"
             />
             <div
-                class="d-flex flex-grow-1 align-items-center"
+                class="flex grow items-center"
                 style="flex-basis: 0"
                 :class="{
                     'flex-row': listDirection === 'column',
-                    'flex-column': listDirection === 'row'
+                    'flex-col': listDirection === 'row'
                 }"
             >
                 <div class="me-1">
@@ -92,11 +92,11 @@ export default defineComponent({
             />
 
             <div
-                class="d-flex flex-grow-1 align-items-center"
+                class="flex grow items-center"
                 style="flex-basis: 0"
                 :class="{
                     'flex-row': listDirection === 'column',
-                    'flex-column': listDirection === 'row'
+                    'flex-col': listDirection === 'row'
                 }"
             >
                 <div class="me-1">
@@ -120,11 +120,11 @@ export default defineComponent({
             />
 
             <div
-                class="d-flex flex-grow-1 align-items-center"
+                class="flex grow items-center"
                 style="flex-basis: 0"
                 :class="{
                     'flex-row': listDirection === 'column',
-                    'flex-column': listDirection === 'row'
+                    'flex-col': listDirection === 'row'
                 }"
             >
                 <div class="me-1">
@@ -148,11 +148,11 @@ export default defineComponent({
             />
 
             <div
-                class="d-flex flex-grow-1 align-items-center"
+                class="flex grow items-center"
                 style="flex-basis: 0"
                 :class="{
                     'flex-row': listDirection === 'column',
-                    'flex-column': listDirection === 'row'
+                    'flex-col': listDirection === 'row'
                 }"
             >
                 <div class="me-1">

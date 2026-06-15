@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024.
+ * Copyright (c) 2021-2026.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
@@ -12,20 +12,20 @@
 .page-navbar {
     border-radius: 0;
     margin: 0 auto;
-    padding:0;
+    padding: 0;
     border: none;
-    width:100%;
+    width: 100%;
     text-align: right;
     display: flex;
 }
 
 .page-navbar:before,
 .page-navbar:after {
-    clear:both;
+    clear: both;
 }
 
 .page-navbar .navbar-toggler {
-    border-color: #333;
+    border-color: var(--privateaim-chrome-border);
     padding: 9px 10px;
     margin: 8px 15px 8px 0px;
 }
@@ -35,10 +35,9 @@
     width: 22px;
     height: 2px;
     border-radius: 1px;
-    margin-top:4px;
-    background:#fff;
+    margin-top: 4px;
+    background: var(--privateaim-chrome-fg);
 }
-
 
 .page-navbar .navbar-content li:not(:last-child) .nav-item {
     padding-right: 0.25rem;
@@ -55,34 +54,62 @@
 .page-navbar .navbar-content .dropdown-menu > .dropdown-item:active,
 .page-navbar .navbar-content .dropdown-menu > .dropdown-item:focus,
 .page-navbar .navbar-content .dropdown-menu > .dropdown-item.active {
-    color: #FF5B5B;
-    background: #32333B;
+    color: var(--privateaim-brand-coral);
+    background: var(--privateaim-chrome-bg-elevated);
     text-decoration: none;
 }
-
 
 .page-navbar .navbar-content .dropdown-menu > .dropdown-item {
     padding: 10px 20px 10px 20px;
     display: block;
     font-size: 11px;
     font-weight: bold;
-    color: #9d9d9d;
+    color: var(--privateaim-chrome-fg-muted);
 }
 
 .page-navbar .navbar-content .dropdown-menu {
-    background-color: #40434E;
+    background-color: var(--privateaim-chrome-bg-elevated);
 }
 
-
+/*
+ * `align-items: center` centers each gadget <li> on the row's cross
+ * axis (the default `stretch` would grow each <li> to the tallest
+ * sibling while its link stays top-anchored). Box-height EQUALITY is
+ * handled on the links themselves — see the `inline-flex` note below.
+ */
 .page-navbar .navbar-content .navbar-gadgets {
     margin-left: auto;
+    align-items: center;
 }
 
 .page-navbar .navbar-content li:not(:last-child) .vc-nav-item {
     padding-right: 0.25rem;
 }
 
+/*
+ * `inline-flex` normalizes the gadget control types onto ONE box
+ * model. They are different element types, so without it the same
+ * padding/line-height rules yield different heights:
+ *
+ *   - <a> (settings, logout) is `display: inline` — vertical padding
+ *     paints but does NOT expand the line box, so the box collapses to
+ *     bare font-metric height (~20.8px) and the icon sits on the text
+ *     baseline.
+ *   - <button> with text (language dropdown-toggle) is inline-block —
+ *     padding counts: 16px line + 8px padding = 24px.
+ *   - <button> with an svg icon (color-mode toggle) is inline-block,
+ *     but the icon's `vertical-align: -0.125em` baseline shift extends
+ *     the line box ~2px past the text strut → 26px.
+ *
+ * As a flex container, padding counts on all of them, `vertical-align`
+ * no longer applies (flex items aren't inline-level), and
+ * `align-items: center` puts every glyph on the same axis: a uniform
+ * 24px box (16px content + 2×4px padding) for anchors and buttons,
+ * icon and text alike.
+ */
 .page-navbar .navbar-content .vc-nav-link {
+    display: inline-flex;
+    align-items: center;
     padding: 0.25rem 0.5rem;
     font-weight: 500;
     letter-spacing: 1px;
@@ -98,14 +125,6 @@
     border-radius: 50%;
     height: 1.25rem;
     width: 1.25rem;
-}
-
-.page-navbar .navbar-content .navbar-gadgets > li > a.vc-nav-link.user-link span {
-    padding-left:6px;
-}
-
-.page-navbar .navbar-content > .navbar-gadgets> li > a i {
-    font-size:16px;
 }
 
 @media (max-width: 1024px) {
@@ -143,10 +162,6 @@
         text-align: center;
         align-items: center;
         justify-content: center;
-    }
-
-    .page-navbar .navbar-content .navbar-gadgets {
-        flex-direction: row;
     }
 
     .page-header {

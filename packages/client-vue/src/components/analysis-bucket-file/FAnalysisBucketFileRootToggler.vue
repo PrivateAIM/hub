@@ -62,11 +62,6 @@ export default defineComponent({
         }"
         @click.prevent="toggle"
     >
-        <i
-            :class="{
-                'fa fa-check': !isRoot,
-                'fa fa-times': isRoot
-            }"
-        />
+        <VCIcon :name="!isRoot ? 'fa6-solid:check' : 'fa6-solid:xmark'" />
     </button>
 </template>

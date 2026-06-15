@@ -1,11 +1,15 @@
 /*
- * Copyright (c) 2021-2024.
+ * Copyright (c) 2021-2026.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
 
-/* @import url('https://fonts.googleapis.com/css?family=Asap'); */
+#__nuxt,
+#__layout,
+#app {
+    height: 100%;
+}
 
 html, body {
     margin: 0;
@@ -15,9 +19,9 @@ html, body {
 
 body {
     font-family: 'Nunito', sans-serif;
-    color: #30373E;
+    color: var(--vc-color-fg);
     font-weight: 400;
-    background: #D5D8DA none repeat scroll 0% 0%;
+    background: var(--vc-color-bg-muted) none repeat scroll 0% 0%;
 }
 
 b, strong {
@@ -41,31 +45,31 @@ Generics
 }
 
 .m-b-10 {
-    margin-bottom:10px;
+    margin-bottom: 10px;
 }
 
 .m-b-20 {
-  margin-bottom: 20px;
+    margin-bottom: 20px;
 }
 
 .m-t-5 {
-    margin-top:5px;
+    margin-top: 5px;
 }
 
 .m-t-10 {
-    margin-top:10px;
+    margin-top: 10px;
 }
 
 .m-t-20 {
-    margin-top:20px;
+    margin-top: 20px;
 }
 
 .m-l-10 {
-  margin-left: 10px;
+    margin-left: 10px;
 }
 
 .m-l-20 {
-  margin-left: 20px;
+    margin-left: 20px;
 }
 
 /*
@@ -87,8 +91,7 @@ h2.title,
 h3.title,
 h4.title,
 h5.title {
-/* font-weight: 700; */
-    color: rgba(0,0,0,0.7);
+    color: var(--vc-color-fg);
 }
 
 h1.title:before,
@@ -99,21 +102,21 @@ h5.title:before {
     content: "";
     width: 4px;
     padding-right: 4px;
-    background: #2776dc;
+    background: var(--privateaim-brand-blue);
     margin-right: 4px;
 }
 
 .title.no-border:before {
     content: none;
-    width:0;
+    width: 0;
     height: 0;
     padding-right: 0;
     margin-right: 0;
 }
 
 .title .sub-title {
-  font-size: .65em;
-  color: #cc8181;
+    font-size: .65em;
+    color: var(--vc-color-fg-muted);
 }
 
 .form-horizontal .form-group {
@@ -124,28 +127,6 @@ h5.title:before {
 hr.small {
     margin: 0.5rem 0;
 }
-
-/*
-header
- */
-
-
-/*
-sidebar
-*/
-
-
-
-/*
-@media (max-width: 768px) {
-    .page-sidebar {
-        margin-left: -300px;
-    }
-    .page-sidebar.active {
-        margin-left: 0;
-    }
-}
- */
 
 /*
 body
@@ -162,9 +143,8 @@ body
 
 .page-content {
     padding: 15px 15px 40px;
-    position:relative;
+    position: relative;
     overflow-x: hidden;
     width: 100%;
-    background: #fafafa;
+    background: var(--vc-color-bg);
 }
-

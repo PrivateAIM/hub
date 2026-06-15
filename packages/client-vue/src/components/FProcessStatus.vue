@@ -39,24 +39,41 @@ export default defineComponent({
             }
         });
 
+        const iconName = computed(() => {
+            switch (props.value) {
+                case ProcessStatus.STARTING:
+                case ProcessStatus.STARTED:
+                case ProcessStatus.STOPPING:
+                    return 'fa6-solid:rotate';
+                case ProcessStatus.EXECUTED:
+                    return 'fa6-solid:check';
+                case ProcessStatus.FAILED:
+                case ProcessStatus.STOPPED:
+                    return 'fa6-solid:xmark';
+                default:
+                    return 'fa6-solid:question';
+            }
+        });
+
         const iconClass = computed(() => {
             switch (props.value) {
                 case ProcessStatus.STARTING:
                 case ProcessStatus.STARTED:
                 case ProcessStatus.STOPPING:
-                    return 'fa fa-rotate fa-spin';
+                    return 'animate-spin';
                 case ProcessStatus.EXECUTED:
-                    return 'fa fa-check';
+                    return '';
                 case ProcessStatus.FAILED:
                 case ProcessStatus.STOPPED:
-                    return 'fa fa-sm fa-times';
+                    return 'text-sm';
                 default:
-                    return 'fa fa-sm fa-question';
+                    return 'text-sm';
             }
         });
 
         return {
             classSuffix,
+            iconName,
             iconClass,
         };
     },
@@ -65,7 +82,7 @@ export default defineComponent({
 <template>
     <slot
         name="default"
-        v-bind="{ iconClass, value: value || defaultValue, classSuffix }"
+        v-bind="{ iconName, iconClass, value: value || defaultValue, classSuffix }"
     >
         <component
             :is="tag"

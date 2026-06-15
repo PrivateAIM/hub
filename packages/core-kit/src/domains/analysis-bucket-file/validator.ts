@@ -7,7 +7,7 @@
 
 import { Container } from 'validup';
 import type { AnalysisBucketFile } from './entity.ts';
-import { createValidator } from '@validup/adapter-zod';
+import { createValidator } from '@validup/zod';
 import { z } from 'zod';
 import { ValidatorGroup } from '@privateaim/kit';
 

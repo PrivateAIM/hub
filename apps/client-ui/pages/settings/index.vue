@@ -5,6 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import type { NavigationItem } from '@vuecs/navigation';
 import { defineNuxtComponent, definePageMeta } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
 
@@ -16,16 +17,16 @@ export default defineNuxtComponent({
 
         });
 
-        const items = [
+        const items: NavigationItem[] = [
             {
-                name: 'Account', 
-                icon: 'fas fa-bars', 
-                path: '',
+                name: 'Account',
+                icon: 'fa6-solid:bars',
+                url: '/settings',
             },
             {
-                name: 'Security', 
-                icon: 'fa fa-lock', 
-                path: '/security',
+                name: 'Security',
+                icon: 'fa6-solid:lock',
+                url: '/settings/security',
             },
         ];
 
@@ -36,15 +37,15 @@ export default defineNuxtComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            <i class="fa fa-cog" /> Settings <span class="sub-title">Management</span>
+            <VCIcon name="fa6-solid:gear" /> Settings <span class="sub-title">Management</span>
         </h1>
 
         <div class="content-wrapper">
-            <div class="content-sidebar flex-column">
-                <DomainEntityNav
-                    :items="items"
-                    :path="'/settings'"
-                    :direction="'vertical'"
+            <div class="content-sidebar flex-col">
+                <VCNavItems
+                    :data="items"
+                    variant="pills"
+                    orientation="vertical"
                 />
             </div>
             <div class="content-container">

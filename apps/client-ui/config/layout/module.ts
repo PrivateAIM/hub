@@ -10,12 +10,12 @@ import { BuiltInPolicyType, PolicyData } from '@authup/access';
 import type { Store } from '@authup/client-web-kit';
 import type {
     NavigationItem,
-    NavigationItemNormalized,
 } from '@vuecs/navigation';
 import {
     LayoutSideAdminNavigation,
     LayoutSideDefaultNavigation,
     LayoutTopNavigation,
+    LayoutTopNavigationName,
 } from './contants';
 import type { NavigationItemMeta } from './types';
 
@@ -43,22 +43,31 @@ export class Navigation {
         }
     }
 
-    async getItems(level: number, parent?: NavigationItemNormalized): Promise<NavigationItem[]> {
-        if (level === 0) {
-            return this.reduce(LayoutTopNavigation);
+    /**
+     * Resolve the top navigation items, filtered against the current session.
+     * Used as the `:data` resolver of the header's `<VCNavItems>`.
+     */
+    getTopItems(): Promise<NavigationItem[]> {
+        return this.reduce(LayoutTopNavigation);
+    }
+
+    /**
+     * Resolve the sidebar navigation items, filtered against the current
+     * session. The admin sidebar is selected when the header's top nav has
+     * the "Admin" section active — the sidebar reads that active section name
+     * from the shared navigation registry (published by the top
+     * `<VCNavItems registry>`). This switches the sidebar both on navigation
+     * into `/admin/*` (path-matched via the section's `activeMatch`) AND on a
+     * direct click of the url-less "Admin" top tab (selection republished
+     * through the registry). Used as the `:data` resolver of the sidebar's
+     * `<VCNavItems>`.
+     */
+    getSideItems(activeTopName?: string): Promise<NavigationItem[]> {
+        if (activeTopName === LayoutTopNavigationName.ADMIN) {
+            return this.reduce(LayoutSideAdminNavigation);
         }
 
-        if (parent) {
-            if (level === 1) {
-                if (parent.name === 'Admin') {
-                    return this.reduce(LayoutSideAdminNavigation);
-                }
-
-                return this.reduce(LayoutSideDefaultNavigation);
-            }
-        }
-
-        return [];
+        return this.reduce(LayoutSideDefaultNavigation);
     }
 
     protected async reduce(items: NavigationItem[]) : Promise<NavigationItem[]> {

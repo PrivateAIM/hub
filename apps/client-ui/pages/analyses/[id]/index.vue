@@ -49,7 +49,7 @@ export default defineNuxtComponent({
 
 <template>
     <div v-if="entity">
-        <div class="d-flex flex-column gap-3">
+        <div class="flex flex-col gap-3">
             <div>
                 <FAnalysisSteps
                     :entity="entity"
@@ -83,9 +83,9 @@ export default defineNuxtComponent({
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="d-flex flex-row gap-2 align-items-center alert alert-sm alert-danger mb-0">
+                        <div class="flex flex-row gap-2 items-center alert alert-sm alert-danger mb-0">
                             <div>
-                                <i class="fa fa-info" />
+                                <VCIcon name="fa6-solid:info" />
                             </div>
                             <div>
                                 The analysis is not configured yet!<br>
@@ -98,12 +98,3 @@ export default defineNuxtComponent({
         </div>
     </div>
 </template>
-<style>
-.panel-box {
-    background-color: #ececec;
-    border: 1px solid #dedede;
-    transition: all .3s ease-in-out;
-    border-radius: 4px;
-    padding: 0.5rem 1rem;
-}
-</style>

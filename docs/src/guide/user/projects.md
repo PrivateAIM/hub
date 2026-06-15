@@ -1,6 +1,6 @@
 # Projects
 
-Projects are collaborative research units in PrivateAIM Hub. They group analyses, nodes, and data requirements into a single organizational context.
+Projects are collaborative research units in FLAME Hub. They group analyses, nodes, and data requirements into a single organizational context.
 
 ## Overview
 

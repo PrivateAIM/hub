@@ -5,9 +5,8 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import { SlotName } from '@vuecs/list-controls';
+import { SlotName, useTranslation  } from '@authup/client-web-kit';
 import { defineComponent } from 'vue';
-import { useTranslation } from '@authup/client-web-kit';
 import { hasNormalizedSlot, normalizeSlot } from '../../../core';
 
 export const FTranslation = defineComponent({
@@ -23,7 +22,7 @@ export const FTranslation = defineComponent({
     },
     setup(props, { slots }) {
         const translation = useTranslation({
-            group: props.group,
+            namespace: props.group,
             key: props.name,
         });
 

@@ -6,7 +6,7 @@
  */
 
 import { hasOwnProperty } from '@privateaim/kit';
-import type { EntityAPI } from '@authup/core-http-kit';
+import type { IEntityAPI } from '@authup/core-http-kit';
 import type {
     DomainEntityID, 
     DomainTypeMap,
@@ -41,7 +41,7 @@ export function createEntityManager<
     ctx: EntityManagerContext<TYPE, RECORD>,
 ) : EntityManager<RECORD> {
     const client = injectCoreHTTPClient();
-    let domainAPI : EntityAPI<RECORD> | undefined;
+    let domainAPI : IEntityAPI<RECORD> | undefined;
     if (hasOwnProperty(client, ctx.type)) {
         domainAPI = client[ctx.type] as any;
     }

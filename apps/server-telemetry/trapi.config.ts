@@ -9,7 +9,7 @@ export default defineConfig({
     swagger: {
         version: 'v3.2',
         data: {
-            name: 'PrivateAIM Hub Telemetry API',
+            name: 'FLAME Hub Telemetry API',
             securityDefinitions: {
                 bearer: {
                     type: 'apiKey',

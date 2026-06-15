@@ -1,6 +1,6 @@
 # @privateaim/client-ui 🖥️
 
-Nuxt 4 web application for PrivateAIM Hub — the user-facing frontend for managing projects, analyses, nodes, and platform administration.
+Nuxt 4 web application for FLAME Hub — the user-facing frontend for managing projects, analyses, nodes, and platform administration.
 
 ## Usage
 

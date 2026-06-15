@@ -6,7 +6,6 @@
   -->
 <script lang="ts">
 import { VCLink } from '@vuecs/link';
-import { BModal } from 'bootstrap-vue-next';
 import type { ProjectNode } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
 import { defineComponent, ref } from 'vue';
@@ -17,7 +16,6 @@ import { FProjectNodeApprovalStatus } from './FProjectNodeApprovalStatus';
 
 export default defineComponent({
     components: {
-        BModal,
         FDisplayName,
         FProjectInForm,
         FProjectNodeApprovalCommand,
@@ -65,15 +63,18 @@ export default defineComponent({
 });
 </script>
 <template>
-    <div class="d-flex flex-column gap-1 w-100">
-        <div class="w-100">
-            <div class="d-flex flex-row align-items-center">
+    <div class="flex flex-col gap-1 w-full">
+        <div class="w-full">
+            <div class="flex flex-row items-center">
                 <div>
                     <slot
                         name="title"
                         :data="entity"
                     >
-                        <i class="fas fa-project-diagram me-1" />
+                        <VCIcon
+                            name="fa6-solid:diagram-project"
+                            class="me-1"
+                        />
                         <VCLink
                             :to="'/projects/' + entity.project.id"
                             class="mb-0"
@@ -85,7 +86,7 @@ export default defineComponent({
                         </VCLink>
                     </slot>
                 </div>
-                <div class="ms-auto d-flex flex-row gap-1">
+                <div class="ms-auto flex flex-row gap-1">
                     <slot
                         name="itemActions"
                         :data="entity"
@@ -95,14 +96,14 @@ export default defineComponent({
                             :disabled="busy"
                             class="btn btn-xs btn-dark"
                         >
-                            <i class="fa fa-bars" />
+                            <VCIcon name="fa6-solid:bars" />
                         </VCLink>
                         <button
                             type="button"
                             class="btn btn-xs btn-primary"
                             @click.prevent="toggleModal"
                         >
-                            <i class="fa fa-comment-alt" />
+                            <VCIcon name="fa6-solid:comment" />
                         </button>
                         <FProjectNodeApprovalCommand
                             :entity-id="entity.id"
@@ -131,17 +132,17 @@ export default defineComponent({
             :data="entity"
         >
             <div class="row">
-                <div class="col-12 col-md-4 d-flex align-items-center flex-column">
+                <div class="col-12 col-md-4 flex items-center flex-col">
                     <div>
-                        <strong><i class="fa-solid fa-server" /> Node</strong>
+                        <strong><VCIcon name="fa6-solid:server" /> Node</strong>
                     </div>
                     <div>
                         {{ entity.node.name }}
                     </div>
                 </div>
-                <div class="col-12 col-md-4 d-flex align-items-center flex-column">
+                <div class="col-12 col-md-4 flex items-center flex-col">
                     <div>
-                        <strong><i class="fa-solid fa-heartbeat" /> Status</strong>
+                        <strong><VCIcon name="fa6-solid:heart-pulse" /> Status</strong>
                     </div>
                     <div>
                         <FProjectNodeApprovalStatus
@@ -157,9 +158,9 @@ export default defineComponent({
                         </FProjectNodeApprovalStatus>
                     </div>
                 </div>
-                <div class="col-12 col-md-4 d-flex align-items-center flex-column">
+                <div class="col-12 col-md-4 flex items-center flex-col">
                     <div>
-                        <strong><i class="fa-solid fa-user" /> Creator</strong>
+                        <strong><VCIcon name="fa6-solid:user" /> Creator</strong>
                     </div>
                     <div>
                         <template v-if="entity.project.user_id">
@@ -172,7 +173,7 @@ export default defineComponent({
                 </div>
                 <!-- todo: this is only possible when authup supports user access from other realm -->
                 <!--
-                <div class="d-flex flex-grow-1 align-items-center flex-column">
+                <div class="flex grow items-center flex-col">
                     <div>
                         <strong><i class="fa fa-user" /> Creator</strong>
                     </div>
@@ -191,10 +192,10 @@ export default defineComponent({
             name="footer"
             :data="entity"
         >
-            <div class="d-flex flex-row">
+            <div class="flex flex-row">
                 <div class="">
                     <small>
-                        <span class="text-muted">
+                        <span class="text-fg-muted">
                             created
                         </span>
                         <VCTimeago :datetime="entity.created_at" />
@@ -202,7 +203,7 @@ export default defineComponent({
                 </div>
                 <div class="ms-auto">
                     <small>
-                        <span class="text-muted">
+                        <span class="text-fg-muted">
                             updated
                         </span>
                         <VCTimeago :datetime="entity.updated_at" />
@@ -211,31 +212,39 @@ export default defineComponent({
             </div>
         </slot>
 
-        <BModal
-            v-model="modal"
-            size="lg"
-            button-size="sm"
-            :no-close-on-backdrop="true"
-            :no-close-on-esc="true"
-            :hide-footer="true"
-        >
-            <template #title>
-                <i class="fas fa-file-import" /> Project
-                <FDisplayName
-                    :name="entity.project.name"
-                    :display-name="entity.project.display_name"
-                />
-            </template>
-            <template v-if="entity">
-                <FProjectInForm
-                    :entity="entity"
-                    @updated="handleUpdated"
-                    @failed="handleFailed"
-                />
-            </template>
-            <template v-else>
-                ...
-            </template>
-        </BModal>
+        <VCModal v-model:open="modal">
+            <!-- attrs forward to reka-ui DialogContent: preventing
+                 escapeKeyDown / interactOutside restores the pre-migration
+                 no-close-on-esc / no-close-on-backdrop guards (the form
+                 inside holds in-progress approval input). -->
+            <VCModalContent
+                class="modal-lg"
+                @escape-key-down="(event: Event) => event.preventDefault()"
+                @interact-outside="(event: Event) => event.preventDefault()"
+            >
+                <div class="modal-header">
+                    <VCModalTitle class="modal-title">
+                        <VCIcon name="fa6-solid:file-import" /> Project
+                        <FDisplayName
+                            :name="entity.project.name"
+                            :display-name="entity.project.display_name"
+                        />
+                    </VCModalTitle>
+                    <VCModalClose class="btn-close" />
+                </div>
+                <div class="modal-body">
+                    <template v-if="entity">
+                        <FProjectInForm
+                            :entity="entity"
+                            @updated="handleUpdated"
+                            @failed="handleFailed"
+                        />
+                    </template>
+                    <template v-else>
+                        ...
+                    </template>
+                </div>
+            </VCModalContent>
+        </VCModal>
     </div>
 </template>

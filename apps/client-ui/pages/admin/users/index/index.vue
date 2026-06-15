@@ -6,15 +6,15 @@
   -->
 
 <script lang="ts">
-import { BTable } from 'bootstrap-vue-next';
+import type { TableColumn } from '@vuecs/table';
 import type { User } from '@authup/core-kit';
 import {
     PermissionName,
 } from '@authup/core-kit';
 import {
-    AEntityDelete, 
-    AUsers, 
-    injectStore, 
+    AEntityDelete,
+    AUsers,
+    injectStore,
     storeToRefs,
     usePermissionCheck,
 } from '@authup/client-web-kit';
@@ -30,11 +30,10 @@ import { defineNuxtComponent } from '#app';
 export default defineNuxtComponent({
     components: {
         FDisplayName,
-        FPagination, 
-        FSearch, 
-        FTitle, 
-        BTable, 
-        AUsers, 
+        FPagination,
+        FSearch,
+        FTitle,
+        AUsers,
         AEntityDelete,
     },
     emits: ['deleted'],
@@ -51,34 +50,34 @@ export default defineNuxtComponent({
         const hasEditPermission = usePermissionCheck({ name: PermissionName.USER_UPDATE });
         const hasDropPermission = usePermissionCheck({ name: PermissionName.USER_DELETE });
 
-        const fields = [
+        const columns: TableColumn[] = [
             {
-                key: 'name', 
-                label: 'Name', 
-                thClass: 'text-left', 
-                tdClass: 'text-left',
+                key: 'name',
+                label: 'Name',
+                headerClass: 'text-left',
+                cellClass: 'text-left',
             },
             {
-                key: 'created_at', 
-                label: 'Created At', 
-                thClass: 'text-center', 
-                tdClass: 'text-center',
+                key: 'created_at',
+                label: 'Created At',
+                headerClass: 'text-center',
+                cellClass: 'text-center',
             },
             {
-                key: 'updated_at', 
-                label: 'Updated At', 
-                thClass: 'text-left', 
-                tdClass: 'text-left',
+                key: 'updated_at',
+                label: 'Updated At',
+                headerClass: 'text-left',
+                cellClass: 'text-left',
             },
             {
-                key: 'options', 
-                label: '', 
-                tdClass: 'text-left', 
+                key: 'options',
+                label: '',
+                cellClass: 'text-left',
             },
         ];
 
         return {
-            fields,
+            columns,
             hasEditPermission,
             hasDropPermission,
             handleDeleted,
@@ -106,43 +105,43 @@ export default defineNuxtComponent({
             />
         </template>
         <template #body="props">
-            <BTable
-                :items="props.data"
-                :fields="fields"
+            <VCTable
+                :data="props.data"
+                :columns="columns"
                 :busy="props.busy"
-                head-variant="'dark'"
-                outlined
             >
-                <template #cell(name)="data">
+                <template #cell-name="{ row }: { row: any }">
                     <FDisplayName
-                        :name="data.item.name"
-                        :display-name="data.item.display_name"
+                        :name="row.name"
+                        :display-name="row.display_name"
                     />
                 </template>
-                <template #cell(created_at)="data">
-                    <VCTimeago :datetime="data.item.created_at" />
+                <template #cell-created_at="{ row }: { row: any }">
+                    <VCTimeago :datetime="row.created_at" />
                 </template>
-                <template #cell(updated_at)="data">
-                    <VCTimeago :datetime="data.item.created_at" />
+                <template #cell-updated_at="{ row }: { row: any }">
+                    <VCTimeago :datetime="row.updated_at" />
                 </template>
-                <template #cell(options)="data">
+                <template #cell-options="{ row }: { row: any }">
                     <NuxtLink
-                        :to="'/admin/users/'+ data.item.id"
+                        :to="'/admin/users/'+ row.id"
                         class="btn btn-xs btn-outline-primary me-1"
                         :disabled="!hasEditPermission"
                     >
-                        <i class="fa-solid fa-bars" />
+                        <VCIcon name="fa6-solid:bars" />
                     </NuxtLink>
                     <AEntityDelete
                         class="btn btn-xs btn-outline-danger"
-                        :entity-id="data.item.id"
+                        :entity-id="row.id"
                         entity-type="user"
                         :with-text="false"
                         :disabled="!hasDropPermission"
                         @deleted="props.deleted"
                     />
                 </template>
-            </BTable>
+                <VCTableLoading />
+                <VCTableEmpty />
+            </VCTable>
         </template>
     </AUsers>
 </template>

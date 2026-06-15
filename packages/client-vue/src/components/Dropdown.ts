@@ -25,9 +25,9 @@ export default defineComponent({
 
         if (
             instance &&
-            typeof instance.appContext.app.component('BDropdown') !== 'undefined'
+            typeof instance.appContext.app.component('VCDropdownMenu') !== 'undefined'
         ) {
-            tag = resolveDynamicComponent('BDropdown') as Component;
+            tag = resolveDynamicComponent('VCDropdownMenu') as Component;
         } else {
             tag = 'div';
         }

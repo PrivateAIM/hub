@@ -30,7 +30,7 @@ export default defineComponent({
     <div v-if="entity">
         <div class="card-grey card mb-3">
             <div class="card-header">
-                <div class="d-flex flex-row w-100">
+                <div class="flex flex-row w-full">
                     <div>
                         <span class="title">Nodes</span>
                     </div>
@@ -42,7 +42,10 @@ export default defineComponent({
                                 class="btn btn-primary btn-xs"
                                 @click.prevent="add"
                             >
-                                <i class="fa fa-plus me-1" /> Add
+                                <VCIcon
+                                    name="fa6-solid:plus"
+                                    class="me-1"
+                                /> Add
                             </button>
                         </div>
                     </template>

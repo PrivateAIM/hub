@@ -3,9 +3,9 @@ import { AClientScopes } from '@authup/client-web-kit';
 import type { Client, ClientScope } from '@authup/core-kit';
 import { FDisplayName } from '@privateaim/client-vue';
 import {
+    VCFormCheckbox,
     VCFormInput,
-    VCFormInputCheckbox,
-} from '@vuecs/form-controls';
+} from '@vuecs/forms';
 import type { BuildInput } from 'rapiq';
 import type { PropType } from 'vue';
 import { computed, ref } from 'vue';
@@ -16,7 +16,7 @@ export default defineNuxtComponent({
     components: {
         FDisplayName,
         VCFormInput,
-        VCFormInputCheckbox,
+        VCFormCheckbox,
         AClientScopes,
     },
     props: {
@@ -85,7 +85,7 @@ export default defineNuxtComponent({
             :item="{class: ''}"
         >
             <template #item="props">
-                <VCFormInputCheckbox
+                <VCFormCheckbox
                     :label="true"
                     :group-class="'form-switch'"
                     :model-value="scopes.includes(props.data.scope.name)"
@@ -99,7 +99,7 @@ export default defineNuxtComponent({
                             />
                         </label>
                     </template>
-                </VCFormInputCheckbox>
+                </VCFormCheckbox>
             </template>
         </AClientScopes>
 

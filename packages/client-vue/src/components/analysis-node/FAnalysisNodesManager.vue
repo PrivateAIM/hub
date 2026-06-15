@@ -7,29 +7,33 @@
 <script lang="ts">
 import { isClientErrorWithStatusCode } from '@privateaim/core-http-kit';
 import type { Analysis, AnalysisNode } from '@privateaim/core-kit';
-import { BModal } from 'bootstrap-vue-next';
 import type { BuildInput } from 'rapiq';
 import type { PropType } from 'vue';
 import {
-    defineComponent, 
-    ref, 
+    defineComponent,
+    ref,
     useTemplateRef,
 } from 'vue';
 import { injectCoreHTTPClient, wrapFnWithBusyState } from '../../core';
+import { FProgressBar } from '../utility';
 import FAnalysisNodeLogs from '../analysis-node-log/FAnalysisNodeLogs.vue';
 import FAnalysisNodePicker from './FAnalysisNodePicker.vue';
 import FAnalysisNodes from './FAnalysisNodes';
 import FAnalysisNodeExecutionStatus from './FAnalysisNodeExecutionStatus.vue';
 import { FAnalysisNodeApprovalStatus } from './FAnalysisNodeApprovalStatus';
+import {
+    getAnalysisNodeExecutionProgress,
+    getAnalysisNodeExecutionProgressColor,
+} from './utils';
 
 export default defineComponent({
     components: {
         FAnalysisNodePicker,
-        BModal,
         FAnalysisNodeExecutionStatus,
         FAnalysisNodeApprovalStatus,
         FAnalysisNodes,
         FAnalysisNodeLogs,
+        FProgressBar,
     },
     props: {
         entity: {
@@ -132,6 +136,9 @@ export default defineComponent({
             handleDeleted,
             handleFailed,
             handleUpdated,
+
+            nodeProgress: getAnalysisNodeExecutionProgress,
+            nodeProgressColor: getAnalysisNodeExecutionProgressColor,
         };
     },
 });
@@ -148,10 +155,10 @@ export default defineComponent({
             >
                 <template #body="props">
                     <div
-                        class="d-flex flex-row flex-wrap justify-content-between"
+                        class="flex flex-row flex-wrap justify-between"
                         :class="{
                             'flex-row': entity.configuration_locked,
-                            'flex-column gap-1': !entity.configuration_locked
+                            'flex-col gap-1': !entity.configuration_locked
                         }"
                     >
                         <template
@@ -162,14 +169,14 @@ export default defineComponent({
                                 class="col-12"
                                 :class="{'col-lg-6': entity.configuration_locked}"
                             >
-                                <div class="d-flex flex-column gap-2 m-1">
-                                    <div class="progress-step d-flex flex-column">
-                                        <div class="d-flex flex-row">
+                                <div class="flex flex-col gap-2 m-1">
+                                    <div class="progress-step flex flex-col gap-1">
+                                        <div class="flex flex-row">
                                             <div>
                                                 <h6 class="mb-0">
                                                     {{ item.node.name }}
 
-                                                    <small class="text-muted">({{ item.node.type }})</small>
+                                                    <small class="text-fg-muted">({{ item.node.type }})</small>
                                                 </h6>
                                             </div>
                                             <div
@@ -182,33 +189,25 @@ export default defineComponent({
                                                     class="btn btn-danger btn-xs"
                                                     @click.prevent="drop(item)"
                                                 >
-                                                    <i class="fa fa-trash" />
+                                                    <VCIcon name="fa6-solid:trash" />
                                                 </button>
                                             </div>
                                         </div>
-                                        <template v-if="!item.execution_status">
-                                            <small class="text-muted">
+                                        <div class="flex flex-row flex-wrap items-center gap-x-2">
+                                            <small class="text-fg-muted">
                                                 approval:
                                                 <FAnalysisNodeApprovalStatus :status="item.approval_status" />
                                             </small>
-                                        </template>
-                                        <template v-if="item.execution_status">
-                                            <FAnalysisNodeExecutionStatus
-                                                :status="item.execution_status"
-                                                :tag="'div'"
-                                            >
-                                                <template #default="data">
-                                                    <div
-                                                        class="d-flex justify-content-center status-text text-light p-1"
-                                                        :class="'bg-' + data.classSuffix"
-                                                    >
-                                                        <span class="icon">
-                                                            {{ data.statusText }}
-                                                        </span>
-                                                    </div>
-                                                </template>
-                                            </FAnalysisNodeExecutionStatus>
-                                        </template>
+                                            <small class="text-fg-muted ms-auto">
+                                                execution:
+                                                <FAnalysisNodeExecutionStatus :status="item.execution_status" />
+                                            </small>
+                                        </div>
+                                        <FProgressBar
+                                            :progress="nodeProgress(item)"
+                                            :color-class="nodeProgressColor(item)"
+                                            show-text
+                                        />
                                     </div>
 
                                     <template v-if="item.execution_status">
@@ -230,63 +229,37 @@ export default defineComponent({
             </FAnalysisNodes>
         </div>
 
-        <BModal
-            v-model="modal"
-            :no-footer="true"
-            :size="'lg'"
-            :lazy="true"
-            :unmount-lazy="true"
-        >
-            <template #header="props">
-                <div class="d-flex flex-row w-100">
-                    <div>
-                        <h5 class="mb-0">
-                            <i class="fa fa-city" /> Nodes
-                        </h5>
-                    </div>
-                    <div class="ms-auto">
-                        <button
-                            type="button"
-                            class="btn btn-xs btn-secondary"
-                            @click.prevent="props.close()"
-                        >
-                            <i class="fa fa-times" />
-                        </button>
+        <VCModal v-model:open="modal">
+            <VCModalContent class="modal-lg">
+                <div class="modal-header">
+                    <div class="flex flex-row w-full">
+                        <div>
+                            <h5 class="mb-0">
+                                <VCIcon name="fa6-solid:city" /> Nodes
+                            </h5>
+                        </div>
+                        <div class="ms-auto">
+                            <button
+                                type="button"
+                                class="btn btn-xs btn-secondary"
+                                @click.prevent="modal = false"
+                            >
+                                <VCIcon name="fa6-solid:xmark" />
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </template>
-
-            <template #default>
-                <FAnalysisNodePicker
-                    :analysis-id="entity.id"
-                    :project-id="entity.project_id"
-                    @created="handleCreated"
-                    @deleted="handleDeleted"
-                    @failed="handleFailed"
-                    @updated="handleUpdated"
-                />
-            </template>
-        </BModal>
+                <div class="modal-body">
+                    <FAnalysisNodePicker
+                        :analysis-id="entity.id"
+                        :project-id="entity.project_id"
+                        @created="handleCreated"
+                        @deleted="handleDeleted"
+                        @failed="handleFailed"
+                        @updated="handleUpdated"
+                    />
+                </div>
+            </VCModalContent>
+        </VCModal>
     </div>
 </template>
-<style>
-.analysis-nodes .list-body {
-    flex-direction: column;
-    /*
-    justify-content: space-between;
-     */
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
-.status-text {
-    height: 50px;
-    font-weight: 600;
-    text-transform: capitalize;
-    font-size: 1.25rem;
-    justify-content: center;
-    align-items: center;
-    border-radius: 5px;
-}
-</style>

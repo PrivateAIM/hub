@@ -1,0 +1,251 @@
+/*
+ * Copyright (c) 2021-2026.
+ * Author Peter Placzek (tada5hi)
+ * For the full copyright and license information,
+ * view the LICENSE file that was distributed with this source code.
+ */
+
+/*
+ * `.vc-nav-trigger` is the clickable element of an item WITH children
+ * (collapse mode — sidebar groups, entity pills). It is a sibling shape
+ * to `.vc-nav-link`, so it must inherit the same base color/size and (in
+ * the sidebar) the same padding to line up with its leaf siblings.
+ */
+.vc-nav-items .vc-nav-link,
+.vc-nav-items .vc-nav-trigger {
+    color: var(--privateaim-chrome-fg-muted);
+    line-height: 1rem;
+    font-size: 0.875rem;
+}
+
+.page-sidebar .vc-nav-link,
+.page-sidebar .nav-link,
+.page-sidebar .vc-nav-trigger {
+    padding: 1rem 1.25rem;
+}
+
+/*
+ * Nested-parent highlight. A nested item's clickable element is a
+ * `.vc-nav-trigger` (collapse) and the active/open state is an `.active`
+ * class on its `<li>` (`.vc-nav-item-nested.active`) — set when a child
+ * route is active. The legacy `> .vc-nav-link` target never matched the
+ * trigger; include it. Scoped away from `--pills`, which paints its own
+ * brand-coral active state below.
+ */
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-item.vc-nav-item-nested:hover > .vc-nav-trigger,
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-item.vc-nav-item-nested.active > .vc-nav-trigger,
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-item.vc-nav-item-nested:hover > .vc-nav-link,
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-item.vc-nav-item-nested.active > .vc-nav-link {
+    background: var(--privateaim-chrome-bg-elevated);
+    color: var(--privateaim-brand-coral);
+}
+
+/*
+ * Keep the open group as one raised block: fill the active/expanded group's
+ * collapsible body (`.vc-nav-content`) with the elevated chrome surface,
+ * extending the parent-trigger highlight down over the whole submenu
+ * (its left gutter + the child rows). `.active` is set on the `<li>` both
+ * when a child route matches and when the group is toggled open.
+ */
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-item.vc-nav-item-nested.active > .vc-nav-content {
+    background: var(--privateaim-chrome-bg-elevated);
+}
+
+/*
+ * With the whole panel elevated, an active child can no longer stand out by
+ * its elevated background alone — every sibling now shares it. Give the
+ * active (and hover) child a coral-tinted surface so only the selected row
+ * reads as active against its plain-elevated siblings. Scoped under
+ * `.vc-nav-item-nested.active` so it outranks the generic nav-link
+ * active/hover rule below (which only paints plain elevated); coral text
+ * still comes from that rule.
+ */
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-item-nested.active .vc-nav-link.active:not(.vc-nav-link-root),
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-item-nested.active .vc-nav-link.router-link-active:not(.vc-nav-link-root),
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-item-nested.active .vc-nav-link.nuxt-link-active:not(.vc-nav-link-root),
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-item-nested.active .vc-nav-link.router-link-exact-active,
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-item-nested.active .vc-nav-link.nuxt-link-exact-active {
+    background: color-mix(in srgb, var(--privateaim-brand-coral) 16%, var(--privateaim-chrome-bg-elevated));
+}
+
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-item-nested.active .vc-nav-link:hover {
+    background: color-mix(in srgb, var(--privateaim-brand-coral) 8%, var(--privateaim-chrome-bg-elevated));
+}
+
+.vc-nav-items .vc-nav-item .vc-nav-link.dropdown-toggle {
+    background: none;
+    display: block;
+    border: none;
+}
+
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-item .vc-nav-link,
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-item:hover .vc-nav-link,
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-item.active .vc-nav-link {
+    border-left-color: var(--privateaim-chrome-bg-elevated) !important;
+}
+
+/*
+ * Chrome nav-link active/hover accent (sidebar + header). Excluded from
+ * `--pills` so it does not clobber the domain-entity pills' own active
+ * paint below — the `:not()` keeps this 0,4,0 coral rule from outranking
+ * the pills' lower-specificity `.active` rule.
+ */
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-link.active:not(.vc-nav-link-root),
+
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-link:active,
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-link:hover,
+
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-link.router-link-active:not(.vc-nav-link-root),
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-link.nuxt-link-active:not(.vc-nav-link-root),
+
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-link.router-link-exact-active,
+.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-link.nuxt-link-exact-active {
+    cursor: pointer;
+    color: var(--privateaim-brand-coral);
+    background: var(--privateaim-chrome-bg-elevated);
+}
+
+/*
+ * Section-divider layout: text centered between two flanking lines.
+ * The `:before` / `:after` pseudo-elements only stretch (`flex: 1`)
+ * inside a flex parent, so make the separator itself a flex row;
+ * `gap` adds breathing room between the text and the flanking lines.
+ */
+.vc-nav-items .vc-nav-separator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/*
+ * Line color uses `--privateaim-chrome-fg-muted` (with opacity) rather
+ * than `--privateaim-chrome-bg-elevated`: in light mode chrome-bg and
+ * chrome-bg-elevated are only a sliver of lightness apart, so the lines
+ * vanish against the sidebar surface. The fg-muted token is a mid-tone
+ * in both modes and always contrasts against the chrome background.
+ */
+.vc-nav-items .vc-nav-separator:before,
+.vc-nav-items .vc-nav-separator:after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--privateaim-chrome-fg-muted);
+    opacity: 0.3;
+}
+
+/*
+ * Domain-entity tabs (variant="pills" on <VCNavItems>) — rendered as a
+ * JOINED SEGMENTED CONTROL on top of @vuecs/navigation's structural
+ * style.css (imported by the app CSS entry), which supplies the base flex
+ * row, per-segment padding/width and the submenu trigger's inline
+ * icon/label. Here we drop the structural inter-pill gap + per-pill
+ * radius, draw the segments as one bordered strip sharing 1px seams, and
+ * fill the active segment with the brand coral.
+ *
+ * `.vc-nav-trigger` is the clickable element of a segment WITH children
+ * (e.g. registry "Projects", collapse mode); it is treated identically to
+ * a leaf segment's `.vc-nav-link--pills`.
+ *
+ * Kept UNLAYERED (this file is imported outside any `@layer`) so it
+ * outranks the structural rules and theme-tailwind utilities regardless
+ * of specificity.
+ */
+/*
+ * Match the structural selector's specificity (`.vc-nav-items.vc-nav-items--pills`
+ * sets `gap: .25rem`); a bare `.vc-nav-items--pills` would lose to it. Source
+ * order then breaks the tie in our favour. Segments share a seam, so no gap.
+ */
+.vc-nav-items.vc-nav-items--pills {
+    gap: 0;
+}
+
+.vc-nav-items--pills .vc-nav-link--pills,
+.vc-nav-items--pills .vc-nav-item-nested .vc-nav-trigger {
+    padding: 0.375rem 0.75rem;
+    border: 1px solid var(--vc-color-border);
+    border-radius: 0;
+    background-color: transparent;
+    color: var(--vc-color-fg);
+}
+
+/*
+ * Pull each segment onto its neighbour so the two 1px borders collapse
+ * into one shared seam. The negative margin lives on the flex ITEM (the
+ * `<li>`), which is what flexbox lays out.
+ */
+.vc-nav-items--pills:not(.vc-nav-items--vertical) .vc-nav-item--pills {
+    margin-left: -1px;
+}
+.vc-nav-items--pills:not(.vc-nav-items--vertical) .vc-nav-item--pills:first-child {
+    margin-left: 0;
+}
+.vc-nav-items--pills:not(.vc-nav-items--vertical) .vc-nav-item--pills:first-child .vc-nav-link--pills,
+.vc-nav-items--pills:not(.vc-nav-items--vertical) .vc-nav-item--pills:first-child .vc-nav-trigger {
+    border-top-left-radius: 0.375rem;
+    border-bottom-left-radius: 0.375rem;
+}
+.vc-nav-items--pills:not(.vc-nav-items--vertical) .vc-nav-item--pills:last-child .vc-nav-link--pills,
+.vc-nav-items--pills:not(.vc-nav-items--vertical) .vc-nav-item--pills:last-child .vc-nav-trigger {
+    border-top-right-radius: 0.375rem;
+    border-bottom-right-radius: 0.375rem;
+}
+
+/* Vertical strip (list pages, orientation="vertical") — seam on the top edge. */
+.vc-nav-items--pills.vc-nav-items--vertical .vc-nav-item--pills {
+    margin-top: -1px;
+}
+.vc-nav-items--pills.vc-nav-items--vertical .vc-nav-item--pills:first-child {
+    margin-top: 0;
+}
+.vc-nav-items--pills.vc-nav-items--vertical .vc-nav-item--pills:first-child .vc-nav-link--pills,
+.vc-nav-items--pills.vc-nav-items--vertical .vc-nav-item--pills:first-child .vc-nav-trigger {
+    border-top-left-radius: 0.375rem;
+    border-top-right-radius: 0.375rem;
+}
+.vc-nav-items--pills.vc-nav-items--vertical .vc-nav-item--pills:last-child .vc-nav-link--pills,
+.vc-nav-items--pills.vc-nav-items--vertical .vc-nav-item--pills:last-child .vc-nav-trigger {
+    border-bottom-left-radius: 0.375rem;
+    border-bottom-right-radius: 0.375rem;
+}
+
+.vc-nav-items--pills .vc-nav-link--pills:hover,
+.vc-nav-items--pills .vc-nav-item-nested .vc-nav-trigger:hover {
+    background-color: var(--vc-color-bg-muted);
+}
+
+/*
+ * Active segment = brand-coral fill. Raised above its neighbours so its
+ * coral border isn't clipped by their overlapping seams. Leaf segments
+ * carry `.active` on the link (VCLink); a nested-parent segment carries
+ * `.active` on its `<li>` (collapse mode).
+ */
+.vc-nav-items--pills .vc-nav-link--pills.active,
+.vc-nav-items--pills .vc-nav-item-nested.active > .vc-nav-trigger {
+    position: relative;
+    z-index: 1;
+    background-color: var(--privateaim-brand-coral);
+    border-color: var(--privateaim-brand-coral);
+    color: var(--color-on-primary);
+}
+
+.vc-nav-item-nested .vc-nav-items .vc-nav-link {
+    border-left-width: 6px;
+    border-left-style: solid;
+    border-left-color: var(--privateaim-chrome-bg);
+}
+
+@media (max-width: 768px) {
+    .page-sidebar .vc-nav-link-text {
+        display: none;
+    }
+
+    .page-sidebar .vc-nav-separator {
+        display: none;
+    }
+
+    .vc-nav-items .vc-nav-link {
+        text-align: center;
+        align-items: center;
+        justify-content: center;
+    }
+}

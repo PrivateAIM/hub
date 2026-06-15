@@ -2,7 +2,7 @@
 
 [![npm version][npm-src]][npm-href]
 
-Main REST API service for PrivateAIM Hub — manages analyses, projects, nodes, registries, and master images.
+Main REST API service for FLAME Hub — manages analyses, projects, nodes, registries, and master images.
 
 ## Usage
 

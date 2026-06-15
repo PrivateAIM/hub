@@ -88,9 +88,9 @@ export default defineComponent({
         </template>
 
         <template #item="props">
-            <div class="d-flex flex-row w-100">
+            <div class="flex flex-row w-full">
                 <div>
-                    {{ props.data.node.name }} <span class="text-muted">({{ props.data.node.type }})</span>
+                    {{ props.data.node.name }} <span class="text-fg-muted">({{ props.data.node.type }})</span>
                 </div>
                 <div class="ms-auto">
                     <FAnalysisNodeAssignAction

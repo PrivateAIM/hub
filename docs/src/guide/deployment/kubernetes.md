@@ -1,6 +1,6 @@
 # Kubernetes (Helm)
 
-PrivateAIM Hub can be deployed to Kubernetes using the official Helm chart. This is the recommended approach for production environments.
+FLAME Hub can be deployed to Kubernetes using the official Helm chart. This is the recommended approach for production environments.
 
 ::: tip
 Deployment manifests, scripts, and step-by-step guides are in the [hub-deployment](https://github.com/PrivateAIM/hub-deployment) repository under `kubernetes/`.

@@ -1,0 +1,61 @@
+{
+    "name": "@privateaim/client-vue-theme",
+    "type": "module",
+    "version": "0.10.0",
+    "description": "PrivateAIM theme for vuecs components, built on top of @vuecs/theme-tailwind.",
+    "license": "Apache-2.0",
+    "exports": {
+        "./package.json": "./package.json",
+        ".": {
+            "types": "./dist/index.d.mts",
+            "style": "./src/index.css",
+            "import": "./dist/index.mjs"
+        },
+        "./index.css": "./src/index.css",
+        "./src/index.css": "./src/index.css"
+    },
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.mts",
+    "files": [
+        "dist",
+        "src/index.css"
+    ],
+    "scripts": {
+        "build": "rimraf ./dist && tsdown"
+    },
+    "keywords": [
+        "privateaim",
+        "vuecs",
+        "theme",
+        "tailwindcss",
+        "ui-theme"
+    ],
+    "author": {
+        "name": "Peter Placzek",
+        "email": "contact@tada5hi.net",
+        "url": "https://github.com/tada5hi"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/PrivateAim/hub.git",
+        "directory": "packages/client-vue-theme"
+    },
+    "bugs": {
+        "url": "https://github.com/PrivateAim/hub/issues"
+    },
+    "homepage": "https://github.com/PrivateAim/hub#readme",
+    "dependencies": {
+        "@authup/client-web-kit-theme": "^1.0.0-beta.48",
+        "@vuecs/design": "^1.0.4",
+        "@vuecs/theme-tailwind": "^4.0.0"
+    },
+    "peerDependencies": {
+        "@vuecs/core": "^3.x",
+        "@vuecs/design": "^1.x",
+        "@vuecs/theme-tailwind": "^4.x",
+        "tailwindcss": "^4.x"
+    },
+    "publishConfig": {
+        "access": "public"
+    }
+}

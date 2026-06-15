@@ -115,9 +115,9 @@ export default defineComponent({
 });
 </script>
 <template>
-    <div class="d-flex flex-column gap-2">
-        <div class="d-flex flex-row">
-            <div class="align-self-end">
+    <div class="flex flex-col gap-2">
+        <div class="flex flex-row">
+            <div class="self-end">
                 <slot name="headerLabel">
                     Names
                 </slot>
@@ -134,12 +134,12 @@ export default defineComponent({
                         :disabled="!canAdd || readonly"
                         @click.prevent="add()"
                     >
-                        <i class="fa fa-plus" /> <FTranslationDefault :name="'add'" />
+                        <VCIcon name="fa6-solid:plus" /> <FTranslationDefault :name="'add'" />
                     </button>
                 </slot>
             </div>
         </div>
-        <div class="d-flex flex-column gap-1">
+        <div class="flex flex-col gap-1">
             <template v-if="items.length === 0">
                 <slot name="noItems">
                     <div class="alert alert-sm alert-info">

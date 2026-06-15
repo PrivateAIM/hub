@@ -20,9 +20,11 @@ import FAnalysisConfigurationImageStep from './FAnalysisConfigurationImageStep.v
 import FAnalysisConfigurationEntrypointStep from './FAnalysisConfigurationEntrypointStep.vue';
 import FAnalysisConfigurationNodesStep from './FAnalysisConfigurationNodesStep.vue';
 import { FAnalysisCommand } from '../FAnalysisCommand';
+import { FProgressBar } from '../../utility';
 
 export default defineComponent({
     components: {
+        FProgressBar,
         FAnalysisCommand,
         FAnalysisConfigurationNodesStep,
         FAnalysisConfigurationEntrypointStep,
@@ -90,51 +92,46 @@ export default defineComponent({
 <template>
     <div class="card-grey card">
         <div class="card-header">
-            <div class="title d-flex flex-row">
+            <div class="title flex flex-row">
                 <div>
                     Configuration
                 </div>
                 <div class="ms-auto">
                     <template v-if="passed">
-                        <span class="text-success">
-                            <i class="fa fa-check" />
+                        <span class="text-success-600">
+                            <VCIcon name="fa6-solid:check" />
                         </span>
                     </template>
                     <template v-else>
-                        <span class="text-danger">
-                            <i class="fa fa-times" />
+                        <span class="text-error-600">
+                            <VCIcon name="fa6-solid:xmark" />
                         </span>
                     </template>
                 </div>
             </div>
         </div>
         <div class="card-body">
-            <div class="d-flex flex-column h-100">
+            <div class="flex flex-col h-full">
                 <div class="text-center mb-3">
-                    <i class="fas fa-gear fa-4x" />
+                    <VCIcon
+                        name="fa6-solid:gear"
+                        class="text-4xl"
+                    />
                 </div>
-                <div class="progress bg-white">
-                    <div
-                        class="progress-bar"
-                        :class="'bg-success'"
-                        :style="{width: progress + '%'}"
-                        :aria-valuenow="progress"
-                        aria-valuemin="0"
-                        aria-valuemax="100"
-                    >
-                        {{ progress }}%
-                    </div>
-                </div>
+                <FProgressBar
+                    :progress="progress"
+                    show-text
+                />
                 <hr>
-                <h6 class="mb-0">
-                    Requirements
-                </h6>
-                <div class="d-flex flex-row gap-1">
+                <div class="flex flex-row items-center gap-1 text-fg-muted text-xs mb-1">
+                    <VCIcon name="fa6-solid:list-check" />
+                    <span>Requirements</span>
+                </div>
+                <div class="flex flex-row gap-1">
                     <FAnalysisConfigurationNodesStep :entity="entity">
                         <template #default="{passed, message}">
                             <div>
                                 <strong
-                                    v-b-tooltip.hover.top
                                     :title="message"
                                 >
                                     <template v-if="nodesLink">
@@ -148,19 +145,12 @@ export default defineComponent({
                                 </strong>
                             </div>
                             <span
-                                class="text-success"
                                 :class="{
-                                    'text-success': passed,
-                                    'text-danger': !passed,
+                                    'text-success-600': passed,
+                                    'text-error-600': !passed,
                                 }"
                             >
-                                <i
-                                    class="fa"
-                                    :class="{
-                                        'fa-check': passed,
-                                        'fa-times': !passed,
-                                    }"
-                                />
+                                <VCIcon :name="passed ? 'fa6-solid:check' : 'fa6-solid:xmark'" />
                             </span>
                         </template>
                     </FAnalysisConfigurationNodesStep>
@@ -179,15 +169,14 @@ export default defineComponent({
                         </strong>
                     </strong>
                 </div>
-                <div class="d-flex flex-column ms-4">
+                <div class="flex flex-col ms-4">
                     <FAnalysisConfigurationImageStep
                         :entity="entity"
                     >
                         <template #default="{passed, message}">
-                            <div class="d-flex flex-row gap-1">
+                            <div class="flex flex-row gap-1">
                                 <div>
                                     <strong
-                                        v-b-tooltip.hover.top
                                         :title="message"
                                     >
                                         Base
@@ -195,19 +184,12 @@ export default defineComponent({
                                 </div>
                                 <div>
                                     <span
-                                        class="text-success"
                                         :class="{
-                                            'text-success': passed,
-                                            'text-danger': !passed,
+                                            'text-success-600': passed,
+                                            'text-error-600': !passed,
                                         }"
                                     >
-                                        <i
-                                            class="fa"
-                                            :class="{
-                                                'fa-check': passed,
-                                                'fa-times': !passed,
-                                            }"
-                                        />
+                                        <VCIcon :name="passed ? 'fa6-solid:check' : 'fa6-solid:xmark'" />
                                     </span>
                                 </div>
                             </div>
@@ -216,10 +198,9 @@ export default defineComponent({
 
                     <FAnalysisConfigurationEntrypointStep :entity="entity">
                         <template #default="{passed, message}">
-                            <div class="d-flex flex-row gap-1">
+                            <div class="flex flex-row gap-1">
                                 <div>
                                     <strong
-                                        v-b-tooltip.hover.top
                                         :title="message"
                                     >
                                         Entrypoint
@@ -227,19 +208,12 @@ export default defineComponent({
                                 </div>
                                 <div>
                                     <span
-                                        class="text-success"
                                         :class="{
-                                            'text-success': passed,
-                                            'text-danger': !passed,
+                                            'text-success-600': passed,
+                                            'text-error-600': !passed,
                                         }"
                                     >
-                                        <i
-                                            class="fa"
-                                            :class="{
-                                                'fa-check': passed,
-                                                'fa-times': !passed,
-                                            }"
-                                        />
+                                        <VCIcon :name="passed ? 'fa6-solid:check' : 'fa6-solid:xmark'" />
                                     </span>
                                 </div>
                             </div>
@@ -248,7 +222,7 @@ export default defineComponent({
                 </div>
 
                 <div class="mt-auto">
-                    <div class="d-flex flex-column gap-1">
+                    <div class="flex flex-col gap-1">
                         <div>
                             <FAnalysisCommand
                                 :command="'configurationLock'"

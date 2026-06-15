@@ -11,9 +11,14 @@ import type { MasterImage } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
 import FProcessStatus from '../FProcessStatus.vue';
 import FMasterImageCommand from './FMasterImageCommand.ts';
+import { FProgressBar } from '../utility';
 
 export default defineComponent({
-    components: { FMasterImageCommand, FProcessStatus },
+    components: {
+        FMasterImageCommand, 
+        FProcessStatus, 
+        FProgressBar, 
+    },
     props: {
         entity: {
             type: Object as PropType<MasterImage>,
@@ -34,35 +39,30 @@ export default defineComponent({
 });
 </script>
 <template>
-    <div class="card-grey card flex-grow-1">
+    <div class="card-grey card grow">
         <div class="card-header">
-            <div class="title d-flex flex-row">
+            <div class="title flex flex-row">
                 <div>
                     {{ entity.virtual_path }}
                 </div>
                 <div class="ms-auto">
                     <FProcessStatus :value="entity.build_status">
-                        <template #default=" {value, iconClass, classSuffix }">
-                            <span class="me-1">{{ value }}</span> <i :class="iconClass + ' text-'+ classSuffix" />
+                        <template #default=" {value, iconName, iconClass, classSuffix }">
+                            <span class="me-1">{{ value }}</span> <VCIcon
+                                :name="iconName"
+                                :class="iconClass + ' text-'+ classSuffix"
+                            />
                         </template>
                     </FProcessStatus>
                 </div>
             </div>
         </div>
         <div class="card-body">
-            <div class="d-flex flex-column gap-1">
-                <div class="progress bg-white">
-                    <div
-                        class="progress-bar"
-                        :class="'bg-success'"
-                        :style="{width: progress + '%'}"
-                        :aria-valuenow="progress"
-                        aria-valuemin="0"
-                        aria-valuemax="100"
-                    >
-                        {{ progress }}%
-                    </div>
-                </div>
+            <div class="flex flex-col gap-1">
+                <FProgressBar
+                    :progress="progress"
+                    show-text
+                />
 
                 <div>
                     <FMasterImageCommand

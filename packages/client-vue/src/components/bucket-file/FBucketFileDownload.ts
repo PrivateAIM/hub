@@ -47,7 +47,7 @@ const FBucketFileDownload = defineComponent({
             withIcon: props.withIcon,
             withText: props.withText,
             isDisabled: false,
-            iconClass: 'fas fa-download',
+            iconClass: 'fa6-solid:download',
             isAllowed: true, // todo: maybe bind to permission
             commandText: 'download',
             commandTooltip: 'Download',

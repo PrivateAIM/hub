@@ -8,16 +8,16 @@
 import { DomainType } from '@privateaim/core-kit';
 import { createEntityManager } from '@privateaim/client-vue';
 import { PermissionName } from '@privateaim/kit';
+import type { NavigationItem } from '@vuecs/navigation';
 import { computed, defineComponent } from 'vue';
 import {
     createError,
     definePageMeta,
-    navigateTo, 
-    useRoute, 
+    navigateTo,
+    useRoute,
     useToast,
 } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
-import type { NavItems } from '../../../../core';
 
 export default defineComponent({
     async setup() {
@@ -61,45 +61,55 @@ export default defineComponent({
             throw createError({});
         }
 
-        const tabs = computed(() => [
-            {
-                name: 'General', 
-                icon: 'fas fa-bars', 
-                path: '',
-            },
-            ...(
-                manager.data.value ?
-                    [
+        const tabs = computed<NavigationItem[]>(() => {
+            const base = `/admin/services/registry/${manager.data.value?.id}`;
+            const projectsBase = `${base}/projects`;
+
+            return [
+                {
+                    name: '',
+                    icon: 'fa6-solid:arrow-left',
+                    url: '/admin/services/registry',
+                },
+                {
+                    name: 'General',
+                    icon: 'fa6-solid:bars',
+                    url: base,
+                },
+                ...(
+                    manager.data.value ?
+                        [
+                            {
+                                name: 'Cleanup',
+                                icon: 'fa6-solid:hands-bubbles',
+                                url: `${base}/cleanup`,
+                            },
+                            {
+                                name: 'Setup',
+                                icon: 'fa6-solid:gear',
+                                url: `${base}/setup`,
+                            },
+                        ] : []
+                ),
+                {
+                    name: 'Projects',
+                    icon: 'fa6-solid:diagram-project',
+                    url: projectsBase,
+                    children: [
                         {
-                            name: 'Cleanup', 
-                            icon: 'fa-solid fa-hands-bubbles', 
-                            path: 'cleanup',
+                            name: 'overview',
+                            icon: 'fa6-solid:bars',
+                            url: projectsBase,
                         },
                         {
-                            name: 'Setup', 
-                            icon: 'fa-solid fa-cog', 
-                            path: 'setup',
+                            name: 'add',
+                            icon: 'fa6-solid:plus',
+                            url: `${projectsBase}/add`,
                         },
-                    ] : []
-            ),
-            {
-                name: 'Projects',
-                icon: 'fa-solid fa-diagram-project',
-                path: 'projects',
-                children: [
-                    {
-                        name: 'overview',
-                        path: '',
-                        icon: 'fa fa-bars',
-                    },
-                    {
-                        name: 'add',
-                        path: '/add',
-                        icon: 'fa fa-plus',
-                    },
-                ],
-            },
-        ] satisfies NavItems);
+                    ],
+                },
+            ];
+        });
 
         return {
             handleUpdated: manager.updated,
@@ -113,15 +123,17 @@ export default defineComponent({
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            <i class="fab fa-docker me-1" /> {{ entity.name }}
+            <VCIcon
+                name="fa6-brands:docker"
+                class="me-1"
+            /> {{ entity.name }}
             <span class="sub-title ms-1">Details</span>
         </h1>
 
         <div class="mb-2">
-            <DomainEntityNav
-                :prev-link="true"
-                :items="tabs"
-                :path="'/admin/services/registry/' + entity.id "
+            <VCNavItems
+                :data="tabs"
+                variant="pills"
             />
         </div>
 
