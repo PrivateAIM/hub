@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.11.0](https://github.com/PrivateAIM/hub/compare/v0.10.3...v0.11.0) (2026-06-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* **ui:** vuecs new majors + Tailwind v4 + repo-wide validup 0.5 + authup beta.48 ([#1668](https://github.com/PrivateAIM/hub/issues/1668))
+
+### Features
+
+* **ui:** vuecs new majors + Tailwind v4 + repo-wide validup 0.5 + authup beta.48 ([#1668](https://github.com/PrivateAIM/hub/issues/1668)) ([3b39672](https://github.com/PrivateAIM/hub/commit/3b396724ae9ac76b7f80909ec8f64d5ada2fa1c6))
+
+
+### Bug Fixes
+
+* **deps:** bump pozil/auto-assign-issue from 3 to 4 ([#1667](https://github.com/PrivateAIM/hub/issues/1667)) ([c2aa477](https://github.com/PrivateAIM/hub/commit/c2aa4778f1bfb834ec1477aa9364b329235ce014))
+* **ui:** adapt selected bucket-file row highlight for dark mode ([#1678](https://github.com/PrivateAIM/hub/issues/1678)) ([59e8fad](https://github.com/PrivateAIM/hub/commit/59e8fad66f19797251807f6041b0be500df33b4d))
+
 ## [0.10.3](https://github.com/PrivateAIM/hub/compare/v0.10.2...v0.10.3) (2026-06-12)
 
 

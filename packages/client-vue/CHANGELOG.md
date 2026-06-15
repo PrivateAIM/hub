@@ -1,5 +1,39 @@
 # Changelog
 
+## [0.11.0](https://github.com/PrivateAIM/hub/compare/v0.10.3...v0.11.0) (2026-06-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* **ui:** vuecs new majors + Tailwind v4 + repo-wide validup 0.5 + authup beta.48 ([#1668](https://github.com/PrivateAIM/hub/issues/1668))
+
+### Features
+
+* **ui:** vuecs new majors + Tailwind v4 + repo-wide validup 0.5 + authup beta.48 ([#1668](https://github.com/PrivateAIM/hub/issues/1668)) ([3b39672](https://github.com/PrivateAIM/hub/commit/3b396724ae9ac76b7f80909ec8f64d5ada2fa1c6))
+
+
+### Bug Fixes
+
+* **ui:** adapt selected bucket-file row highlight for dark mode ([#1678](https://github.com/PrivateAIM/hub/issues/1678)) ([59e8fad](https://github.com/PrivateAIM/hub/commit/59e8fad66f19797251807f6041b0be500df33b4d))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.10.3 to ^0.11.0
+    * @privateaim/core-kit bumped from ^0.10.3 to ^0.11.0
+    * @privateaim/core-realtime-kit bumped from ^0.10.3 to ^0.10.4
+    * @privateaim/kit bumped from ^0.10.3 to ^0.11.0
+    * @privateaim/storage-kit bumped from ^0.10.3 to ^0.11.0
+    * @privateaim/telemetry-kit bumped from ^0.10.3 to ^0.11.0
+  * peerDependencies
+    * @privateaim/core-http-kit bumped from ^0.10.3 to ^0.11.0
+    * @privateaim/core-kit bumped from ^0.10.3 to ^0.11.0
+    * @privateaim/kit bumped from ^0.10.3 to ^0.11.0
+    * @privateaim/storage-kit bumped from ^0.10.3 to ^0.11.0
+    * @privateaim/telemetry-kit bumped from ^0.10.3 to ^0.11.0
+
 ## [0.10.3](https://github.com/PrivateAIM/hub/compare/v0.10.2...v0.10.3) (2026-06-12)
 
 
