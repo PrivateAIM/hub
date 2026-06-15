@@ -5,10 +5,59 @@
   -  view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { hasOwnProperty, humanFileSize } from '@privateaim/kit';
+import { humanFileSize } from '@privateaim/kit';
 import { computed, defineComponent, ref } from 'vue';
 import { injectStorageHTTPClient, wrapFnWithBusyState } from '../../core';
 import FBucketFileForm from './FBucketFileForm.vue';
+
+// A staged file plus the relative path (incl. directories) to upload it under.
+// The path is sent as the multipart filename; the storage service runs busboy
+// with `preservePath: true` and keeps it as the bucket-file `path`/`directory`.
+type StagedFile = { file: File; path: string };
+
+// Drag-dropped File objects carry an empty `webkitRelativePath`, so dropped
+// directories must be expanded via the FileSystem Entry API and the path read
+// from `entry.fullPath` instead. (The directory picker, by contrast, fills
+// `webkitRelativePath` itself.)
+function readEntryFile(entry: FileSystemFileEntry): Promise<File> {
+    return new Promise((resolve, reject) => {
+        entry.file(resolve, reject);
+    });
+}
+
+function readAllEntries(reader: FileSystemDirectoryReader): Promise<FileSystemEntry[]> {
+    return new Promise((resolve, reject) => {
+        const entries: FileSystemEntry[] = [];
+        // readEntries yields at most ~100 entries per call; keep reading until
+        // it returns an empty batch.
+        const readBatch = () => {
+            reader.readEntries((batch) => {
+                if (batch.length === 0) {
+                    resolve(entries);
+                    return;
+                }
+                entries.push(...batch);
+                readBatch();
+            }, reject);
+        };
+        readBatch();
+    });
+}
+
+async function collectEntry(entry: FileSystemEntry, out: StagedFile[]): Promise<void> {
+    if (entry.isFile) {
+        const file = await readEntryFile(entry as FileSystemFileEntry);
+        out.push({ file, path: entry.fullPath.replace(/^\/+/, '') });
+        return;
+    }
+
+    if (entry.isDirectory) {
+        const children = await readAllEntries((entry as FileSystemDirectoryEntry).createReader());
+        for (const child of children) {
+            await collectEntry(child, out);
+        }
+    }
+}
 
 export default defineComponent({
     components: { FBucketFileForm },
@@ -23,27 +72,43 @@ export default defineComponent({
         const storageClient = injectStorageHTTPClient();
 
         const busy = ref(false);
-        const tempFiles = ref<File[]>([]);
+        const tempFiles = ref<StagedFile[]>([]);
         const directoryMode = ref<boolean>(true);
         const dragOver = ref<boolean>(false);
 
         const totalSize = computed(
-            () => tempFiles.value.reduce((acc, file) => acc + file.size, 0),
+            () => tempFiles.value.reduce((acc, item) => acc + item.file.size, 0),
         );
 
-        const addFiles = (files: FileList | null) => {
+        // Stage files, deduping by relative path. The server enforces a unique
+        // (bucket_id, path), so re-adding the same path would only produce a
+        // duplicate row and a 409 on upload — drop it here instead.
+        const addStaged = (staged: StagedFile[]) => {
+            const existing = new Set(tempFiles.value.map((item) => item.path));
+            for (const item of staged) {
+                if (!existing.has(item.path)) {
+                    tempFiles.value.push(item);
+                    existing.add(item.path);
+                }
+            }
+        };
+
+        const addFileList = (files: FileList | null) => {
             if (!files) {
                 return;
             }
 
-            for (const file of files) {
-                tempFiles.value.push(file);
-            }
+            addStaged(
+                Array.from(files).map((file) => ({
+                    file,
+                    path: file.webkitRelativePath || file.name,
+                })),
+            );
         };
 
         const checkTempFiles = (event: Event) => {
             const target = event.target as HTMLInputElement;
-            addFiles(target.files);
+            addFileList(target.files);
             target.value = '';
         };
 
@@ -57,27 +122,44 @@ export default defineComponent({
             dragOver.value = false;
         };
 
-        const onDrop = (event: DragEvent) => {
+        const onDrop = async (event: DragEvent) => {
             dragOver.value = false;
 
             if (busy.value) {
                 return;
             }
 
-            addFiles(event.dataTransfer ? event.dataTransfer.files : null);
+            // `webkitGetAsEntry()` must be called synchronously while the
+            // DataTransferItemList is still alive — collect entries before any
+            // await, then traverse them asynchronously.
+            const items = event.dataTransfer?.items;
+            const entries: FileSystemEntry[] = [];
+            if (items) {
+                for (const item of Array.from(items)) {
+                    const entry = typeof item.webkitGetAsEntry === 'function' ?
+                        item.webkitGetAsEntry() :
+                        null;
+                    if (entry) {
+                        entries.push(entry);
+                    }
+                }
+            }
+
+            if (entries.length > 0) {
+                const collected: StagedFile[] = [];
+                for (const entry of entries) {
+                    await collectEntry(entry, collected);
+                }
+                addStaged(collected);
+                return;
+            }
+
+            // Fallback for browsers without the entry API: flat files only.
+            addFileList(event.dataTransfer?.files ?? null);
         };
 
         const dropTempFile = (file: File) => {
-            const index = tempFiles.value.findIndex((el) => {
-                if (
-                    hasOwnProperty(el, 'webkitRelativePath') &&
-                    hasOwnProperty(file, 'webkitRelativePath')
-                ) {
-                    return el.webkitRelativePath === file.webkitRelativePath;
-                }
-                return el.name === file.name;
-            });
-
+            const index = tempFiles.value.findIndex((el) => el.file === file);
             if (index !== -1) {
                 tempFiles.value.splice(index, 1);
             }
@@ -93,7 +175,10 @@ export default defineComponent({
             try {
                 const formData = new FormData();
                 for (let i = 0; i < tempFiles.value.length; i++) {
-                    formData.append(`files[${i}]`, tempFiles.value[i]);
+                    const { file, path } = tempFiles.value[i];
+                    // 3rd arg sets the multipart filename — send the relative
+                    // path so the directory structure survives to the server.
+                    formData.append(`files[${i}]`, file, path);
                 }
 
                 const { data: bucketFiles } = await storageClient.bucket.upload(
@@ -212,10 +297,11 @@ export default defineComponent({
 
             <div class="upload-file-list flex flex-col">
                 <FBucketFileForm
-                    v-for="(file, key) in tempFiles"
+                    v-for="(item, key) in tempFiles"
                     :key="key"
                     class="me-1"
-                    :file="file"
+                    :file="item.file"
+                    :relative-path="item.path"
                     @drop="dropTempFile"
                 />
             </div>
@@ -349,8 +435,29 @@ export default defineComponent({
     pointer-events: none;
 }
 
+/* Visually hidden but kept in the tab order (NOT `display: none`, which drops
+   it from focus) so keyboard users can tab to the input and open the picker
+   with Enter/Space. It is not overlaid on the dropzone — that would let the
+   native file input swallow drops and fight the label's @drop handler. */
 .upload-dropzone__input {
-    display: none;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Surface keyboard focus on the wrapping label, since the input itself is
+   visually hidden. */
+.upload-dropzone:focus-within {
+    border-style: solid;
+    border-color: var(--vc-color-primary-600);
+    color: var(--vc-color-fg);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--vc-color-primary-600) 30%, transparent);
 }
 
 .upload-dropzone__icon {
