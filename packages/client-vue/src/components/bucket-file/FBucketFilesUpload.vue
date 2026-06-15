@@ -146,11 +146,17 @@ export default defineComponent({
             }
 
             if (entries.length > 0) {
-                const collected: StagedFile[] = [];
-                for (const entry of entries) {
-                    await collectEntry(entry, collected);
+                try {
+                    const collected: StagedFile[] = [];
+                    for (const entry of entries) {
+                        await collectEntry(entry, collected);
+                    }
+                    addStaged(collected);
+                } catch (e) {
+                    // Entry-API traversal can reject (read errors, permissions)
+                    // — surface it instead of failing the drop silently.
+                    emit('failed', e);
                 }
-                addStaged(collected);
                 return;
             }
 
