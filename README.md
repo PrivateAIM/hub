@@ -115,9 +115,7 @@ Created and maintained by [Peter Placzek](https://tada5hi.net) ([@tada5hi](https
 
 If you use FLAME Hub in academic work, please cite it. Citation metadata is maintained in [`CITATION.cff`](./CITATION.cff) — GitHub renders a **"Cite this repository"** button from it.
 
-Each [release](https://github.com/PrivateAIM/hub/releases) can be archived on [Zenodo](https://zenodo.org) with a versioned DOI (metadata in [`.zenodo.json`](./.zenodo.json)). Once the repository is enabled on Zenodo and a release is archived, add the DOI badge here:
-
-<!-- [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX) -->
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20701036.svg)](https://doi.org/10.5281/zenodo.20701036)
 
 ## License
 
