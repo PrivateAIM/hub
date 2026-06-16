@@ -66,6 +66,11 @@ export function registerProjectNodeSocketHandlers(socket: Socket) {
 export function registerProjectNodeForRealmSocketHandlers(socket: Socket) {
     if (!isSocketAuthenticated(socket)) return;
 
+    // The realm namespace already isolates events by realm (project realm vs. node realm
+    // are distinct namespaces), so all directional subscriptions join the base entity room —
+    // the room the subscriber actually emits to. The in/out event names differ only to apply
+    // the correct permission gate (PROJECT_APPROVE for in, PROJECT_UPDATE for out).
+
     // ------------------------------------------------------------
 
     socket.on(
@@ -87,7 +92,7 @@ export function registerProjectNodeForRealmSocketHandlers(socket: Socket) {
 
             subscribeSocketRoom(
                 socket,
-                buildDomainChannelName(DomainSubType.PROJECT_NODE_IN, target),
+                buildDomainChannelName(DomainType.PROJECT_NODE, target),
             );
 
             if (isEventCallback(cb)) {
@@ -101,7 +106,7 @@ export function registerProjectNodeForRealmSocketHandlers(socket: Socket) {
         (target) => {
             unsubscribeSocketRoom(
                 socket,
-                buildDomainChannelName(DomainSubType.PROJECT_NODE_IN, target),
+                buildDomainChannelName(DomainType.PROJECT_NODE, target),
             );
         },
     );
@@ -127,7 +132,7 @@ export function registerProjectNodeForRealmSocketHandlers(socket: Socket) {
 
             subscribeSocketRoom(
                 socket,
-                buildDomainChannelName(DomainSubType.PROJECT_NODE_OUT, target),
+                buildDomainChannelName(DomainType.PROJECT_NODE, target),
             );
 
             if (isEventCallback(cb)) {
@@ -141,7 +146,7 @@ export function registerProjectNodeForRealmSocketHandlers(socket: Socket) {
         (target) => {
             unsubscribeSocketRoom(
                 socket,
-                buildDomainChannelName(DomainSubType.PROJECT_NODE_OUT, target),
+                buildDomainChannelName(DomainType.PROJECT_NODE, target),
             );
         },
     );

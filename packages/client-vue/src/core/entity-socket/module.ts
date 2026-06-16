@@ -178,7 +178,7 @@ export function createEntitySocket<
         const socket = await socketManager.connect(buildDomainNamespaceName(realmId.value));
         let event : DomainEventFullName<string, DomainEventSubscriptionName> | undefined;
         if (ctx.buildSubscribeEventName) {
-            event = ctx.buildSubscribeEventName();
+            event = ctx.buildSubscribeEventName(realmId.value);
         } else {
             event = buildDomainEventFullName(
                 ctx.type,
@@ -221,7 +221,7 @@ export function createEntitySocket<
 
         let event : DomainEventFullName<string, DomainEventSubscriptionName>;
         if (ctx.buildUnsubscribeEventName) {
-            event = ctx.buildUnsubscribeEventName();
+            event = ctx.buildUnsubscribeEventName(realmId.value);
         } else {
             event = buildDomainEventFullName(
                 ctx.type,

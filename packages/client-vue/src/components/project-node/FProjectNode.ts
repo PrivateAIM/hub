@@ -6,6 +6,7 @@
  */
 
 import {
+    DomainEventSubscriptionName,
     DomainSubType,
     DomainType,
     buildDomainChannelName,
@@ -13,6 +14,7 @@ import {
 import type {
     ProjectNode,
 } from '@privateaim/core-kit';
+import { buildDomainEventFullName } from '@privateaim/kit';
 import type { FiltersBuildInput } from 'rapiq';
 import {
     defineComponent, 
@@ -72,25 +74,51 @@ export default defineComponent({
                     }
 
                     if (props.target === Target.PROJECT) {
-                        return realmId === event.data.node_realm_id;
+                        return realmId === event.data.project_realm_id;
                     }
 
                     if (props.target === Target.NODE) {
-                        return realmId === event.data.project_realm_id;
+                        return realmId === event.data.node_realm_id;
                     }
 
                     return false;
                 },
+                // Events are emitted to the base entity room within the realm namespace;
+                // realm scoping is enforced by the namespace and the realmId check above.
                 buildChannelName(id) {
-                    if (props.direction === Direction.IN) {
-                        return buildDomainChannelName(DomainSubType.PROJECT_NODE_IN, id);
-                    }
-
-                    if (props.direction === Direction.OUT) {
-                        return buildDomainChannelName(DomainSubType.PROJECT_NODE_OUT, id);
-                    }
-
                     return buildDomainChannelName(DomainType.PROJECT_NODE, id);
+                },
+                // Match the subscribe event to the namespace createEntitySocket connects to:
+                // directional handlers exist only in realm namespaces, the base handler only at root.
+                buildSubscribeEventName(realmId) {
+                    if (realmId) {
+                        return buildDomainEventFullName(
+                            props.direction === Direction.IN ?
+                                DomainSubType.PROJECT_NODE_IN :
+                                DomainSubType.PROJECT_NODE_OUT,
+                            DomainEventSubscriptionName.SUBSCRIBE,
+                        );
+                    }
+
+                    return buildDomainEventFullName(
+                        DomainType.PROJECT_NODE,
+                        DomainEventSubscriptionName.SUBSCRIBE,
+                    );
+                },
+                buildUnsubscribeEventName(realmId) {
+                    if (realmId) {
+                        return buildDomainEventFullName(
+                            props.direction === Direction.IN ?
+                                DomainSubType.PROJECT_NODE_IN :
+                                DomainSubType.PROJECT_NODE_OUT,
+                            DomainEventSubscriptionName.UNSUBSCRIBE,
+                        );
+                    }
+
+                    return buildDomainEventFullName(
+                        DomainType.PROJECT_NODE,
+                        DomainEventSubscriptionName.UNSUBSCRIBE,
+                    );
                 },
             },
         });
