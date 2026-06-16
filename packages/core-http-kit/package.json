@@ -1,7 +1,7 @@
 {
     "name": "@privateaim/core-http-kit",
     "type": "module",
-    "version": "0.11.2",
+    "version": "0.11.3",
     "license": "Apache-2.0",
     "description": "",
     "module": "./dist/index.mjs",
@@ -25,16 +25,16 @@
     },
     "devDependencies": {
         "@authup/kit": "^1.0.0-beta.48",
-        "@privateaim/core-kit": "^0.11.2",
-        "@privateaim/telemetry-kit": "^0.11.2",
+        "@privateaim/core-kit": "^0.11.3",
+        "@privateaim/telemetry-kit": "^0.11.3",
         "hapic": "^2.8.2",
         "rapiq": "^0.9.0",
         "vitest": "^4.1.7"
     },
     "peerDependencies": {
         "@authup/kit": "^1.0.0-beta.48",
-        "@privateaim/core-kit": "^0.11.2",
-        "@privateaim/telemetry-kit": "^0.11.2",
+        "@privateaim/core-kit": "^0.11.3",
+        "@privateaim/telemetry-kit": "^0.11.3",
         "hapic": "^2.8.2",
         "rapiq": "^0.9.0"
     },

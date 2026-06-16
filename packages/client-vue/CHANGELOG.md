@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.11.3](https://github.com/PrivateAIM/hub/compare/v0.11.2...v0.11.3) (2026-06-16)
+
+
+### Bug Fixes
+
+* **realtime:** deliver realtime updates for analysis & project node lists ([#1684](https://github.com/PrivateAIM/hub/issues/1684)) ([adccc77](https://github.com/PrivateAIM/hub/commit/adccc773dd808af360f8b1c1f05b4351fc4cdcbf))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.11.2 to ^0.11.3
+    * @privateaim/core-kit bumped from ^0.11.2 to ^0.11.3
+    * @privateaim/core-realtime-kit bumped from ^0.10.6 to ^0.10.7
+    * @privateaim/kit bumped from ^0.11.2 to ^0.11.3
+    * @privateaim/storage-kit bumped from ^0.11.2 to ^0.11.3
+    * @privateaim/telemetry-kit bumped from ^0.11.2 to ^0.11.3
+  * peerDependencies
+    * @privateaim/core-http-kit bumped from ^0.11.2 to ^0.11.3
+    * @privateaim/core-kit bumped from ^0.11.2 to ^0.11.3
+    * @privateaim/kit bumped from ^0.11.2 to ^0.11.3
+    * @privateaim/storage-kit bumped from ^0.11.2 to ^0.11.3
+    * @privateaim/telemetry-kit bumped from ^0.11.2 to ^0.11.3
+
 ## [0.11.2](https://github.com/PrivateAIM/hub/compare/v0.11.1...v0.11.2) (2026-06-15)
 
 

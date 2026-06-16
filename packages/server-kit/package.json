@@ -1,7 +1,7 @@
 {
     "name": "@privateaim/server-kit",
     "type": "module",
-    "version": "0.11.2",
+    "version": "0.11.3",
     "module": "./dist/index.mjs",
     "types": "./dist/index.d.mts",
     "exports": {
@@ -26,7 +26,7 @@
     "dependencies": {
         "@hapic/oauth2": "^3.2.0",
         "@isaacs/ttlcache": "^2.1.5",
-        "@privateaim/kit": "^0.11.2",
+        "@privateaim/kit": "^0.11.3",
         "@socket.io/redis-emitter": "^5.1.0",
         "eldin": "^1.1.0",
         "envix": "^1.5.0",
