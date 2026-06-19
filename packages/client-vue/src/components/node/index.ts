@@ -9,4 +9,4 @@ export { default as FNodeForm } from './FNodeForm';
 export { default as FNodeCrypto } from './FNodeCrypto.vue';
 export { default as FNodes } from './FNodes';
 export { default as FNodeRegistryProject } from './FNodeRegistryProject';
-export { default as FNodeClient } from './FNodeClient';
+export { default as FNodeClientCredentials } from './FNodeClientCredentials.vue';

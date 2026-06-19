@@ -11,7 +11,7 @@ import type { Node } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
 import { nullifyEmptyObjectProperties } from '../../utils';
-import type { NodeCreatePayload, NodeUpdatePayload } from './types';
+import type { NodeClientCredentials, NodeCreatePayload, NodeUpdatePayload } from './types';
 
 export class NodeAPI extends BaseAPI {
     async getMany(options?: BuildInput<Node>): Promise<CollectionResourceResponse<Node>> {
@@ -46,6 +46,12 @@ export class NodeAPI extends BaseAPI {
 
     async runCommand(id: Node['id'], task: string, data: Record<string, any>): Promise<SingleResourceResponse<Node>> {
         const response = await this.client.post(`nodes/${id}/task`, { task, ...data });
+
+        return response.data;
+    }
+
+    async getClientCredentials(id: Node['id']): Promise<NodeClientCredentials> {
+        const response = await this.client.get(`nodes/${id}/client/credentials`);
 
         return response.data;
     }

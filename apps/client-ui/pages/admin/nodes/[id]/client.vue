@@ -7,40 +7,31 @@
 <script lang="ts">
 import type { Node } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
-import { FNodeClient } from '@privateaim/client-vue';
+import { FNodeClientCredentials } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
 
 export default defineNuxtComponent({
-    components: { FNodeClient },
+    components: { FNodeClientCredentials },
     props: {
         entity: {
             type: Object as PropType<Node>,
             required: true,
         },
     },
-    emits: ['failed', 'updated'],
+    emits: ['failed'],
     setup(props, { emit }) {
         const handleFailed = (e: Error) => {
             emit('failed', e);
         };
 
-        const handleUpdated = () => {
-            emit('updated', props.entity);
-        };
-
-        return {
-            handleFailed,
-            handleUpdated,
-        };
+        return { handleFailed };
     },
 });
 </script>
 <template>
-    <FNodeClient
+    <FNodeClientCredentials
         v-if="entity"
         :entity="entity"
-        :realm-id="entity.realm_id"
         @failed="handleFailed"
-        @updated="handleUpdated"
     />
 </template>
