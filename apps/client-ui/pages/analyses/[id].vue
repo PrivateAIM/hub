@@ -84,11 +84,6 @@ export default defineComponent({
                     url: `${base}/image`,
                 },
                 {
-                    name: 'Security',
-                    icon: 'fa6-solid:lock',
-                    url: `${base}/security`,
-                },
-                {
                     name: 'Results',
                     icon: 'fa6-solid:chart-bar',
                     url: `${base}/result-files`,

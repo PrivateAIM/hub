@@ -72,6 +72,7 @@ Modernization and refactoring plans:
 7. ~~Message Bus~~ — Complete (QueueRouter → MessageBus, AMQP/Memory driver abstraction)
 8. ~~[Shared Test Infrastructure](.agents/plans/008-shared-test-infrastructure.md)~~ — Complete (server-test-kit package, shared core types in server-kit, domain-grouped test layout)
 9. [Analysis Check Hardening](.agents/plans/009-analysis-check-hardening.md) — Proposed (race-safe check verdicts, worker ports + verdict unit tests, registry error classification, check observability)
+10. [Per-Analysis Authup Client](.agents/plans/010-analysis-dedicated-client.md) — Proposed (dedicated OAuth2 client per analysis mirroring the Node pattern, admin-configurable self-capabilities, node-side credential delivery, removal of the AnalysisPermission entity; future capability-token model for storage sharing)
 
 ## Commits
 

@@ -11,8 +11,6 @@ import { EnvironmentName } from '@privateaim/server-kit';
 import type { Client as RedisClient } from 'redis-extension';
 import type { RegistryComponentCaller } from '../../components/registry/caller/module.ts';
 import {
-    handleAuthupPermissionEvent,
-    handleAuthupPolicyEvent,
     handleAuthupRealmEvent,
     handleAuthupRobotEvent,
     handleAuthupUserEvent,
@@ -40,8 +38,6 @@ export function createAuthupAggregator(ctx: AuthupAggregatorContext) : Component
     return {
         start() {
             redisSub.subscribe(
-                'permission',
-                'policy',
                 'realm',
                 'user',
                 'robot',
@@ -52,14 +48,6 @@ export function createAuthupAggregator(ctx: AuthupAggregatorContext) : Component
                 const event = JSON.parse(message);
 
                 switch (event.type) {
-                    case EntityType.POLICY: {
-                        await handleAuthupPolicyEvent(event);
-                        break;
-                    }
-                    case EntityType.PERMISSION: {
-                        await handleAuthupPermissionEvent(event);
-                        break;
-                    }
                     case EntityType.REALM: {
                         await handleAuthupRealmEvent(event);
                         break;

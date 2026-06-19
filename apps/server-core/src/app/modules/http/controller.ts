@@ -16,7 +16,6 @@ import {
     AnalysisBucketService,
     AnalysisNodeEventService,
     AnalysisNodeService,
-    AnalysisPermissionService,
     AnalysisService,
     MasterImageGroupService,
     MasterImageService,
@@ -37,7 +36,6 @@ import { AnalysisBucketController } from '../../../adapters/http/controllers/ent
 import { AnalysisBucketFileController } from '../../../adapters/http/controllers/entities/analysis-bucket-file/module.ts';
 import { ProjectNodeController } from '../../../adapters/http/controllers/entities/project-node/module.ts';
 import { AnalysisNodeController } from '../../../adapters/http/controllers/entities/analysis-node/module.ts';
-import { AnalysisPermissionController } from '../../../adapters/http/controllers/entities/analysis-permission/module.ts';
 import { AnalysisNodeEventController } from '../../../adapters/http/controllers/entities/analysis-node-event/module.ts';
 import { ServiceController } from '../../../adapters/http/controllers/workflows/service/index.ts';
 import { DatabaseInjectionKey } from '../database/constants.ts';
@@ -58,7 +56,6 @@ export function createControllers(container: IContainer): Record<string, any>[] 
     const analysisBucketFileRepository = container.resolve(DatabaseInjectionKey.AnalysisBucketFileRepository);
     const projectNodeRepository = container.resolve(DatabaseInjectionKey.ProjectNodeRepository);
     const analysisNodeRepository = container.resolve(DatabaseInjectionKey.AnalysisNodeRepository);
-    const analysisPermissionRepository = container.resolve(DatabaseInjectionKey.AnalysisPermissionRepository);
     const analysisNodeEventRepository = container.resolve(DatabaseInjectionKey.AnalysisNodeEventRepository);
     const registryManager = container.resolve(DatabaseInjectionKey.RegistryManager);
 
@@ -119,7 +116,6 @@ export function createControllers(container: IContainer): Record<string, any>[] 
         recalculator: container.resolve(AnalysisInjectionKey.NodeRecalculator),
         skipAnalysisApproval: config.skipAnalysisApproval,
     });
-    const analysisPermissionService = new AnalysisPermissionService({ repository: analysisPermissionRepository });
     const analysisNodeEventService = new AnalysisNodeEventService({ repository: analysisNodeEventRepository });
 
     // Create controller instances
@@ -135,7 +131,6 @@ export function createControllers(container: IContainer): Record<string, any>[] 
         new AnalysisBucketFileController({ service: analysisBucketFileService }),
         new ProjectNodeController({ service: projectNodeService }),
         new AnalysisNodeController({ service: analysisNodeService }),
-        new AnalysisPermissionController({ service: analysisPermissionService }),
         new AnalysisNodeEventController({ service: analysisNodeEventService }),
     ];
 

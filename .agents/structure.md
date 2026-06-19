@@ -107,7 +107,7 @@ apps/server-core/src/
 │   ├── database/
 │   │   ├── entities/              # TypeORM entity definitions
 │   │   ├── subscribers/           # TypeORM event subscribers (domain-grouped)
-│   │   ├── analysis/          # Analysis, bucket, bucket-file, node, permission
+│   │   ├── analysis/          # Analysis, bucket, bucket-file, node
 │   │   ├── master-image/      # MasterImage, MasterImageGroup
 │   │   ├── node/              # Node
 │   │   ├── project/           # Project, ProjectNode
