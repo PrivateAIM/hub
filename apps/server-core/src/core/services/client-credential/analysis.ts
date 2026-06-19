@@ -8,24 +8,22 @@
 import type { Analysis } from '@privateaim/core-kit';
 import { AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
-import type { ActorContext, AuthupClient } from '@privateaim/server-kit';
+import type { ActorContext } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
+import type { IAnalysisRepository } from '../../entities/analysis/types.ts';
+import type { IAnalysisNodeRepository } from '../../entities/analysis-node/types.ts';
+import type { INodeRepository } from '../../entities/node/types.ts';
 import type {
-    IAnalysisNodeRepository,
-    IAnalysisRepository,
-    INodeRepository,
-} from '../../../core/index.ts';
-
-export type AnalysisClientCredentials = {
-    id: string;
-    secret: string | null;
-};
+    ClientCredentials,
+    IAnalysisClientCredentialService,
+    IClientCredentialReader,
+} from './types.ts';
 
 type AnalysisClientCredentialServiceContext = {
-    authup: AuthupClient;
-    analysisRepository: IAnalysisRepository;
+    repository: IAnalysisRepository;
     nodeRepository: INodeRepository;
     analysisNodeRepository: IAnalysisNodeRepository;
+    credentialReader: IClientCredentialReader;
 };
 
 /**
@@ -34,25 +32,25 @@ type AnalysisClientCredentialServiceContext = {
  * Authorization is fail-closed: only a master-realm member or the node that
  * actually runs the analysis may read the secret.
  */
-export class AnalysisClientCredentialService extends AbstractEntityService {
-    protected authup: AuthupClient;
-
-    protected analysisRepository: IAnalysisRepository;
+export class AnalysisClientCredentialService extends AbstractEntityService implements IAnalysisClientCredentialService {
+    protected repository: IAnalysisRepository;
 
     protected nodeRepository: INodeRepository;
 
     protected analysisNodeRepository: IAnalysisNodeRepository;
 
+    protected credentialReader: IClientCredentialReader;
+
     constructor(ctx: AnalysisClientCredentialServiceContext) {
         super();
-        this.authup = ctx.authup;
-        this.analysisRepository = ctx.analysisRepository;
+        this.repository = ctx.repository;
         this.nodeRepository = ctx.nodeRepository;
         this.analysisNodeRepository = ctx.analysisNodeRepository;
+        this.credentialReader = ctx.credentialReader;
     }
 
-    async getCredentials(analysisId: string, actor: ActorContext): Promise<AnalysisClientCredentials> {
-        const analysis = await this.analysisRepository.findOneById(analysisId);
+    async getCredentials(analysisId: string, actor: ActorContext): Promise<ClientCredentials> {
+        const analysis = await this.repository.findOneById(analysisId);
         if (!analysis) {
             throw new EntityNotFoundError({ entity: 'analysis' });
         }
@@ -66,12 +64,7 @@ export class AnalysisClientCredentialService extends AbstractEntityService {
             throw new PermissionDeniedError('You are not permitted to read the credentials of this analysis client.');
         }
 
-        const client = await this.authup.client.getOne(analysis.client_id, { fields: ['+secret'] });
-
-        return {
-            id: client.id,
-            secret: client.secret ?? null,
-        };
+        return this.credentialReader.readByClientId(analysis.client_id);
     }
 
     /**
