@@ -58,7 +58,7 @@
         "@vuecs/pagination": "^2.1.3",
         "@vuecs/placeholder": "^1.0.4",
         "@vuecs/table": "^1.2.1",
-        "@vuecs/theme-tailwind": "^4.0.0",
+        "@vuecs/theme-tailwind": "^5.0.0",
         "@vuecs/timeago": "^2.1.0",
         "@validup/vue": "^0.3.3",
         "@validup/zod": "^0.3.3",
