@@ -72,7 +72,8 @@ Modernization and refactoring plans:
 7. ~~Message Bus~~ — Complete (QueueRouter → MessageBus, AMQP/Memory driver abstraction)
 8. ~~[Shared Test Infrastructure](.agents/plans/008-shared-test-infrastructure.md)~~ — Complete (server-test-kit package, shared core types in server-kit, domain-grouped test layout)
 9. [Analysis Check Hardening](.agents/plans/009-analysis-check-hardening.md) — Proposed (race-safe check verdicts, worker ports + verdict unit tests, registry error classification, check observability)
-10. [Per-Analysis Authup Client](.agents/plans/010-analysis-dedicated-client.md) — Proposed (dedicated OAuth2 client per analysis mirroring the Node pattern, admin-configurable self-capabilities, node-side credential delivery, removal of the AnalysisPermission entity; future capability-token model for storage sharing)
+10. [Per-Analysis Authup Client](.agents/plans/010-analysis-dedicated-client.md) — In progress (dedicated OAuth2 client per analysis mirroring the Node pattern; phase 4 removed the AnalysisPermission entity (#1692, merged), phase 1 added `analysis.client_id` + `AnalysisClientService` (#1693); remaining: phase 2 admin-configurable capabilities, phase 3 node-side credential delivery)
+11. [Analysis Capability Tokens](.agents/plans/012-analysis-capability-tokens.md) — Proposed (resource-scoped, Google-Docs-style capability tokens issued by server-core so analyses can use storage/telemetry/messenger only for owned-or-shared resources; split out of plan 010's phase 5)
 
 ## Commits
 
