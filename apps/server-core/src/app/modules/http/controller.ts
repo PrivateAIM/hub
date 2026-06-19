@@ -10,7 +10,7 @@ import {
     MasterImageBuilderComponentCaller,
     MasterImageSynchronizerComponentCaller,
 } from '@privateaim/server-core-worker-kit';
-import { MessageBusInjectionKey } from '@privateaim/server-kit';
+import { AuthupClientInjectionKey, MessageBusInjectionKey } from '@privateaim/server-kit';
 import {
     AnalysisBucketFileService,
     AnalysisBucketService,
@@ -37,6 +37,10 @@ import { AnalysisBucketFileController } from '../../../adapters/http/controllers
 import { ProjectNodeController } from '../../../adapters/http/controllers/entities/project-node/module.ts';
 import { AnalysisNodeController } from '../../../adapters/http/controllers/entities/analysis-node/module.ts';
 import { AnalysisNodeEventController } from '../../../adapters/http/controllers/entities/analysis-node-event/module.ts';
+import { AnalysisClientPermissionController } from '../../../adapters/http/controllers/entities/analysis-client-permission/module.ts';
+import { AnalysisClientPermissionService } from '../database/analysis-client-permission.ts';
+import { AnalysisClientCredentialController } from '../../../adapters/http/controllers/entities/analysis-client-credential/module.ts';
+import { AnalysisClientCredentialService } from '../database/analysis-client-credential.ts';
 import { ServiceController } from '../../../adapters/http/controllers/workflows/service/index.ts';
 import { DatabaseInjectionKey } from '../database/constants.ts';
 import { AnalysisInjectionKey } from '../analysis/constants.ts';
@@ -139,6 +143,25 @@ export function createControllers(container: IContainer): Record<string, any>[] 
             registryService,
             registryCaller: callerResult.data,
         }));
+    }
+
+    // The analysis-client capability surface manages Authup client-permissions
+    // directly, so it is only mounted when an Authup client is available.
+    const authupResult = container.tryResolve(AuthupClientInjectionKey);
+    if (authupResult.success) {
+        const analysisClientPermissionService = new AnalysisClientPermissionService({
+            authup: authupResult.data,
+            analysisRepository,
+        });
+        controllers.push(new AnalysisClientPermissionController({ service: analysisClientPermissionService }));
+
+        const analysisClientCredentialService = new AnalysisClientCredentialService({
+            authup: authupResult.data,
+            analysisRepository,
+            nodeRepository,
+            analysisNodeRepository,
+        });
+        controllers.push(new AnalysisClientCredentialController({ service: analysisClientCredentialService }));
     }
 
     return controllers;
