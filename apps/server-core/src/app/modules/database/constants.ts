@@ -12,7 +12,6 @@ import type {
     IAnalysisBucketRepository,
     IAnalysisNodeEventRepository,
     IAnalysisNodeRepository,
-    IAnalysisPermissionRepository,
     IAnalysisRepository,
     IMasterImageGroupRepository,
     IMasterImageRepository,
@@ -38,7 +37,6 @@ export const DatabaseInjectionKey = {
     AnalysisBucketFileRepository: new TypedToken<IAnalysisBucketFileRepository>('AnalysisBucketFileRepository'),
     ProjectNodeRepository: new TypedToken<IProjectNodeRepository>('ProjectNodeRepository'),
     AnalysisNodeRepository: new TypedToken<IAnalysisNodeRepository>('AnalysisNodeRepository'),
-    AnalysisPermissionRepository: new TypedToken<IAnalysisPermissionRepository>('AnalysisPermissionRepository'),
     AnalysisNodeEventRepository: new TypedToken<IAnalysisNodeEventRepository>('AnalysisNodeEventRepository'),
 
     RegistryManager: new TypedToken<IRegistryManager>('RegistryManager'),

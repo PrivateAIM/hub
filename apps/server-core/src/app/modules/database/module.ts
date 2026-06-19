@@ -24,7 +24,6 @@ import {
     AnalysisBucketSubscriber,
     AnalysisNodeEventSubscriber,
     AnalysisNodeSubscriber,
-    AnalysisPermissionSubscriber,
     AnalysisSubscriber,
     MasterImageGroupSubscriber,
     MasterImageSubscriber,
@@ -111,7 +110,6 @@ export class DatabaseModule implements IModule {
 
             new AnalysisBucketSubscriber(),
             new AnalysisNodeEventSubscriber(),
-            new AnalysisPermissionSubscriber(),
             new MasterImageSubscriber(),
             new MasterImageGroupSubscriber(),
             new ProjectSubscriber(),

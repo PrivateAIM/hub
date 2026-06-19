@@ -34,7 +34,7 @@ describe('DI module wiring', () => {
 
     // --- Database module registers all repositories ---
 
-    it('should resolve all 13 repository injection keys', () => {
+    it('should resolve all 12 repository injection keys', () => {
         const keys = [
             DatabaseInjectionKey.NodeRepository,
             DatabaseInjectionKey.RegistryRepository,
@@ -47,7 +47,6 @@ describe('DI module wiring', () => {
             DatabaseInjectionKey.AnalysisBucketFileRepository,
             DatabaseInjectionKey.ProjectNodeRepository,
             DatabaseInjectionKey.AnalysisNodeRepository,
-            DatabaseInjectionKey.AnalysisPermissionRepository,
             DatabaseInjectionKey.AnalysisNodeEventRepository,
         ];
 

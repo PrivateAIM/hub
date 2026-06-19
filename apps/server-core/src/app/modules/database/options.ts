@@ -11,7 +11,6 @@ import {
     AnalysisEntity,
     AnalysisNodeEntity,
     AnalysisNodeEventEntity,
-    AnalysisPermissionEntity,
     MasterImageEntity,
     MasterImageGroupEntity,
     NodeEntity,
@@ -40,7 +39,6 @@ export class DataSourceOptionsBuilder extends BaseBuilder {
             AnalysisBucketFileEntity,
             AnalysisNodeEntity,
             AnalysisNodeEventEntity,
-            AnalysisPermissionEntity,
         ]);
 
         // Subscribers are instantiated and pushed onto dataSource.subscribers

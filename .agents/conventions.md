@@ -239,7 +239,7 @@ app/modules/<name>/
 | Module | Name | Dependencies | Registers |
 |--------|------|-------------|-----------|
 | ConfigModule | `config` | none | `ConfigInjectionKey` (typed env) |
-| DatabaseModule | `database` | none | `DataSource`, 13 repo adapters, `RegistryManager` |
+| DatabaseModule | `database` | none | `DataSource`, 12 repo adapters, `RegistryManager` |
 | ComponentsModule | `components` | `database` | `TaskManager`, `RegistryComponentCaller` |
 | AnalysisModule | `analysis` | `database`, `components` | `Builder`, `Configurator`, `Distributor`, `StorageManager`, 3 metadata recalculators |
 | SwaggerModule | `swagger` | `config` | nothing (generates docs) |

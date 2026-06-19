@@ -10,4 +10,3 @@ export * from './bucket.ts';
 export * from './module.ts';
 export * from './node-event.ts';
 export * from './node.ts';
-export * from './permission.ts';

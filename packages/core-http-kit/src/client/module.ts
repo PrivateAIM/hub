@@ -15,7 +15,6 @@ import {
     AnalysisNodeAPI,
     AnalysisNodeEventAPI,
     AnalysisNodeLogAPI,
-    AnalysisPermissionAPI,
     MasterImageAPI,
     MasterImageGroupAPI,
     NodeAPI,
@@ -55,8 +54,6 @@ export class Client extends BaseClient {
 
     public readonly analysisNodeLog: AnalysisNodeLogAPI;
 
-    public readonly analysisPermission : AnalysisPermissionAPI;
-
     public readonly service : ServiceAPI;
 
     constructor(config: RequestBaseOptions) {
@@ -76,7 +73,6 @@ export class Client extends BaseClient {
         this.analysisNode = new AnalysisNodeAPI({ client: this });
         this.analysisNodeEvent = new AnalysisNodeEventAPI({ client: this });
         this.analysisNodeLog = new AnalysisNodeLogAPI({ client: this });
-        this.analysisPermission = new AnalysisPermissionAPI({ client: this });
         this.service = new ServiceAPI({ client: this });
 
         this.on(HookName.RESPONSE_ERROR, ((error) => {
