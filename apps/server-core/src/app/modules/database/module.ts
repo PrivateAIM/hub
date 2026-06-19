@@ -34,6 +34,7 @@ import {
     RegistrySubscriber,
 } from '../../../adapters/database/subscribers/index.ts';
 import { NodeClientService } from './node-client.ts';
+import { AnalysisClientService } from './analysis-client.ts';
 import { DataSourceOptionsBuilder } from './options.ts';
 import { DatabaseInjectionKey } from './constants.ts';
 import { registerRepositories } from './register.ts';
@@ -97,14 +98,16 @@ export class DatabaseModule implements IModule {
 
     private registerSubscribers(dataSource: DataSource, container: IContainer): void {
         let nodeClientService: NodeClientService | undefined;
+        let analysisClientService: AnalysisClientService | undefined;
         const authupResult = container.tryResolve(AuthupClientInjectionKey);
         if (authupResult.success) {
             nodeClientService = new NodeClientService(authupResult.data);
+            analysisClientService = new AnalysisClientService(authupResult.data);
         }
 
         const subscribers = [
             new NodeSubscriber({ nodeClientService }),
-            new AnalysisSubscriber(),
+            new AnalysisSubscriber({ analysisClientService }),
             new AnalysisBucketFileSubscriber(),
             new AnalysisNodeSubscriber(),
 

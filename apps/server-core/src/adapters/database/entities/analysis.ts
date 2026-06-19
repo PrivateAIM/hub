@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Realm, User } from '@authup/core-kit';
+import type { Client, Realm, User } from '@authup/core-kit';
 import type {
     Analysis,
     MasterImage,
@@ -206,6 +206,11 @@ export class AnalysisEntity implements Analysis {
     @ManyToOne(() => RegistryEntity, { onDelete: 'CASCADE', nullable: true })
     @JoinColumn({ name: 'registry_id' })
     registry: RegistryEntity | null;
+
+    // ------------------------------------------------------------------
+
+    @Column({ type: 'uuid', nullable: true })
+    client_id: Client['id'] | null;
 
     // ------------------------------------------------------------------
 
