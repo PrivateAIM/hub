@@ -52,6 +52,7 @@ const DEFAULT_FIELDS: ParseAllowedOption<AnalysisEntity> = [
     'created_at',
     'updated_at',
     'registry_id',
+    'client_id',
     'realm_id',
     'user_id',
     'project_id',

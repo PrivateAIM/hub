@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Realm, User } from '@authup/core-kit';
+import type { Client, Realm, User } from '@authup/core-kit';
 import type { ProcessStatus } from '@privateaim/kit';
 import type { MasterImage, MasterImageCommandArgument } from '../master-image';
 import type { Project } from '../project';
@@ -122,6 +122,14 @@ export interface Analysis {
     registry: Registry;
 
     registry_id: Registry['id'];
+
+    // ------------------------------------------------------------------
+
+    /**
+     * Dedicated OAuth2/Authup client the analysis uses to act on the node side
+     * under its own (restricted) identity. Provisioned on creation.
+     */
+    client_id: Client['id'] | null;
 
     // ------------------------------------------------------------------
 
