@@ -39,6 +39,8 @@ import { AnalysisNodeController } from '../../../adapters/http/controllers/entit
 import { AnalysisNodeEventController } from '../../../adapters/http/controllers/entities/analysis-node-event/module.ts';
 import { AnalysisClientPermissionController } from '../../../adapters/http/controllers/entities/analysis-client-permission/module.ts';
 import { AnalysisClientPermissionService } from '../database/analysis-client-permission.ts';
+import { AnalysisClientCredentialController } from '../../../adapters/http/controllers/entities/analysis-client-credential/module.ts';
+import { AnalysisClientCredentialService } from '../database/analysis-client-credential.ts';
 import { ServiceController } from '../../../adapters/http/controllers/workflows/service/index.ts';
 import { DatabaseInjectionKey } from '../database/constants.ts';
 import { AnalysisInjectionKey } from '../analysis/constants.ts';
@@ -152,6 +154,14 @@ export function createControllers(container: IContainer): Record<string, any>[] 
             analysisRepository,
         });
         controllers.push(new AnalysisClientPermissionController({ service: analysisClientPermissionService }));
+
+        const analysisClientCredentialService = new AnalysisClientCredentialService({
+            authup: authupResult.data,
+            analysisRepository,
+            nodeRepository,
+            analysisNodeRepository,
+        });
+        controllers.push(new AnalysisClientCredentialController({ service: analysisClientCredentialService }));
     }
 
     return controllers;

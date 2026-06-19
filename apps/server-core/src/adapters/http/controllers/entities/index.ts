@@ -8,6 +8,7 @@
 export * from './analysis/index.ts';
 export * from './analysis-bucket/index.ts';
 export * from './analysis-bucket-file/index.ts';
+export * from './analysis-client-credential/index.ts';
 export * from './analysis-client-permission/index.ts';
 export * from './analysis-log/index.ts';
 export * from './analysis-node/index.ts';
