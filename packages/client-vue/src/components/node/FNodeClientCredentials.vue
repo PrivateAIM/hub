@@ -12,6 +12,7 @@ import {
     defineComponent,
     onMounted,
     ref,
+    watch,
 } from 'vue';
 import { injectCoreHTTPClient } from '../../core';
 
@@ -31,9 +32,22 @@ export default defineComponent({
         const secret = ref<string | null>(null);
         const revealed = ref(false);
         const busy = ref(false);
+        const loaded = ref(false);
 
         const load = async () => {
-            if (!props.entity.client_id || busy.value) {
+            if (busy.value) {
+                return;
+            }
+
+            // Reset so a previous node's credentials never linger while the
+            // current one is (re)loaded — important because the parent reuses
+            // this component across node ids.
+            revealed.value = false;
+            clientId.value = null;
+            secret.value = null;
+
+            if (!props.entity.client_id) {
+                loaded.value = true;
                 return;
             }
 
@@ -46,10 +60,12 @@ export default defineComponent({
                 emit('failed', e);
             } finally {
                 busy.value = false;
+                loaded.value = true;
             }
         };
 
         onMounted(load);
+        watch(() => props.entity.id, load);
 
         const copy = (value: string | null) => {
             if (!value) {
@@ -65,6 +81,7 @@ export default defineComponent({
 
         return {
             busy,
+            loaded,
             clientId,
             secret,
             revealed,
@@ -88,6 +105,16 @@ export default defineComponent({
             class="alert alert-sm alert-warning"
         >
             The node has not been assigned to a client yet.
+        </div>
+        <div
+            v-else-if="busy || !loaded"
+            class="flex flex-row items-center gap-2"
+        >
+            <VCIcon
+                name="fa6-solid:circle-notch"
+                class="animate-spin"
+            />
+            <span>Loading credentials…</span>
         </div>
         <div
             v-else
