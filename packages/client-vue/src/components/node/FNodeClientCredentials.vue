@@ -79,14 +79,46 @@ export default defineComponent({
             revealed.value = !revealed.value;
         };
 
+        // Rotating invalidates the current secret, so it is gated behind an
+        // inline confirm rather than firing on a single click.
+        const confirming = ref(false);
+
+        const cancelRegenerate = () => {
+            confirming.value = false;
+        };
+
+        const regenerate = async () => {
+            confirming.value = false;
+
+            if (busy.value || !props.entity.client_id) {
+                return;
+            }
+
+            busy.value = true;
+            try {
+                const credentials = await httpClient.node.setClientCredentials(props.entity.id);
+                clientId.value = credentials.id;
+                secret.value = credentials.secret;
+                // Reveal the freshly generated secret so the admin can copy it.
+                revealed.value = true;
+            } catch (e) {
+                emit('failed', e);
+            } finally {
+                busy.value = false;
+            }
+        };
+
         return {
             busy,
+            confirming,
             loaded,
             clientId,
             secret,
             revealed,
             copy,
             toggleReveal,
+            regenerate,
+            cancelRegenerate,
         };
     },
 });
@@ -165,6 +197,32 @@ export default defineComponent({
                             >
                                 <VCIcon name="fa6-solid:copy" /> Copy
                             </button>
+                            <button
+                                v-if="!confirming"
+                                type="button"
+                                class="btn btn-xs btn-danger"
+                                :disabled="busy"
+                                @click.prevent="confirming = true"
+                            >
+                                <VCIcon name="fa6-solid:rotate" /> Regenerate
+                            </button>
+                            <template v-else>
+                                <button
+                                    type="button"
+                                    class="btn btn-xs btn-danger"
+                                    :disabled="busy"
+                                    @click.prevent="regenerate"
+                                >
+                                    Confirm
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn btn-xs btn-dark"
+                                    @click.prevent="cancelRegenerate"
+                                >
+                                    Cancel
+                                </button>
+                            </template>
                         </div>
                     </div>
                 </template>

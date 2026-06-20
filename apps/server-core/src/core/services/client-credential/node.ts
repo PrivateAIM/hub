@@ -11,13 +11,13 @@ import type { ActorContext } from '@privateaim/server-kit';
 import type { INodeRepository } from '../../entities/node/types.ts';
 import type {
     ClientCredentials,
-    IClientCredentialReader,
+    IClientCredentialStore,
     INodeClientCredentialService,
 } from './types.ts';
 
 type NodeClientCredentialServiceContext = {
     repository: INodeRepository;
-    credentialReader: IClientCredentialReader;
+    credentialStore: IClientCredentialStore;
 };
 
 /**
@@ -29,11 +29,11 @@ type NodeClientCredentialServiceContext = {
 export class NodeClientCredentialService implements INodeClientCredentialService {
     protected repository: INodeRepository;
 
-    protected credentialReader: IClientCredentialReader;
+    protected credentialStore: IClientCredentialStore;
 
     constructor(ctx: NodeClientCredentialServiceContext) {
         this.repository = ctx.repository;
-        this.credentialReader = ctx.credentialReader;
+        this.credentialStore = ctx.credentialStore;
     }
 
     async getCredentials(nodeId: string, actor: ActorContext): Promise<ClientCredentials> {
@@ -54,6 +54,30 @@ export class NodeClientCredentialService implements INodeClientCredentialService
             throw new BadRequestError('The node has no client provisioned yet.');
         }
 
-        return this.credentialReader.readByClientId(node.client_id);
+        return this.credentialStore.readByClientId(node.client_id);
+    }
+
+    async setCredentials(
+        nodeId: string,
+        secret: string | undefined,
+        actor: ActorContext,
+    ): Promise<ClientCredentials> {
+        // Same management gate as the read path; the running node never rotates.
+        await actor.permissionChecker.preCheck({ name: PermissionName.NODE_UPDATE });
+
+        const node = await this.repository.findOneById(nodeId);
+        if (!node) {
+            throw new EntityNotFoundError({ entity: 'node' });
+        }
+
+        if (!isRealmResourceWritable(actor.realm, node.realm_id)) {
+            throw new PermissionDeniedError('You are not permitted to write the credentials of this node client.');
+        }
+
+        if (!node.client_id) {
+            throw new BadRequestError('The node has no client provisioned yet.');
+        }
+
+        return this.credentialStore.writeByClientId(node.client_id, secret);
     }
 }

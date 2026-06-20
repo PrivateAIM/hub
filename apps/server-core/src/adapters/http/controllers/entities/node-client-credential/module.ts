@@ -6,10 +6,12 @@
  */
 
 import {
+    DBody,
     DContext,
     DController,
     DGet,
     DPath,
+    DPost,
     DTags,
 } from '@routup/decorators';
 import type { IAppEvent } from 'routup';
@@ -40,5 +42,15 @@ export class NodeClientCredentialController {
     ): Promise<ClientCredentials> {
         const actor = buildActorContext(event);
         return this.service.getCredentials(id, actor);
+    }
+
+    @DPost('/:id/client/credentials', [ForceLoggedInMiddleware])
+    async setCredentials(
+        @DPath('id') id: string,
+        @DBody() data: { secret?: string },
+        @DContext() event: IAppEvent,
+    ): Promise<ClientCredentials> {
+        const actor = buildActorContext(event);
+        return this.service.setCredentials(id, data?.secret, actor);
     }
 }

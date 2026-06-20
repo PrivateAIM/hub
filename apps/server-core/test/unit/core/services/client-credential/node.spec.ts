@@ -13,7 +13,7 @@ import { createAllowAllActor, createDenyAllActor } from '@privateaim/server-test
 import { describe, expect, it } from 'vitest';
 import { NodeClientCredentialService } from '../../../../../src/core/services/client-credential/index.ts';
 import type { INodeRepository } from '../../../../../src/core/index.ts';
-import { FakeClientCredentialReader } from './fake-credential-reader.ts';
+import { FakeClientCredentialStore } from './fake-credential-store.ts';
 
 function createNodeRepository(nodes: Partial<Node>[]): INodeRepository {
     return { findOneById: async (id: string) => nodes.find((n) => n.id === id) ?? null } as unknown as INodeRepository;
@@ -34,10 +34,10 @@ function realmManagerActor(realmId: string): ActorContext {
 const NODE_ID = randomUUID();
 
 function buildService(opts: { node?: Partial<Node>; secret?: string | null }) {
-    const reader = new FakeClientCredentialReader(opts.secret);
+    const reader = new FakeClientCredentialStore(opts.secret);
     const service = new NodeClientCredentialService({
         repository: createNodeRepository(opts.node ? [opts.node] : []),
-        credentialReader: reader,
+        credentialStore: reader,
     });
     return { service, reader };
 }
@@ -110,5 +110,50 @@ describe('NodeClientCredentialService', () => {
             service.getCredentials(NODE_ID, createDenyAllActor()),
         ).rejects.not.toBeInstanceOf(BadRequestError);
         expect(reader.calls).toHaveLength(0);
+    });
+
+    describe('setCredentials', () => {
+        it('should rotate (no secret) for a manager', async () => {
+            const { service, reader } = buildService({ node: baseNode() });
+
+            const credentials = await service.setCredentials(NODE_ID, undefined, createAllowAllActor());
+
+            expect(reader.writes).toEqual([{ clientId: 'node-client-1', secret: undefined }]);
+            expect(credentials.secret).toBe('generated-secret');
+        });
+
+        it('should set a provided secret for a manager', async () => {
+            const { service, reader } = buildService({ node: baseNode() });
+
+            await service.setCredentials(NODE_ID, 'my-secret', createAllowAllActor());
+
+            expect(reader.writes).toEqual([{ clientId: 'node-client-1', secret: 'my-secret' }]);
+        });
+
+        it('should deny without permission', async () => {
+            const { service, reader } = buildService({ node: baseNode() });
+
+            await expect(
+                service.setCredentials(NODE_ID, undefined, createDenyAllActor()),
+            ).rejects.toThrow();
+            expect(reader.writes).toHaveLength(0);
+        });
+
+        it('should deny a manager from a different realm', async () => {
+            const { service, reader } = buildService({ node: baseNode({ realm_id: 'realm-b' }) });
+
+            await expect(
+                service.setCredentials(NODE_ID, undefined, realmManagerActor('realm-a')),
+            ).rejects.toThrow(PermissionDeniedError);
+            expect(reader.writes).toHaveLength(0);
+        });
+
+        it('should reject when the node has no client provisioned', async () => {
+            const { service } = buildService({ node: baseNode({ client_id: null }) });
+
+            await expect(
+                service.setCredentials(NODE_ID, undefined, createAllowAllActor()),
+            ).rejects.toThrow(BadRequestError);
+        });
     });
 });

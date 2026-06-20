@@ -18,7 +18,7 @@ import type {
     IAnalysisRepository,
     INodeRepository,
 } from '../../../../../src/core/index.ts';
-import { FakeClientCredentialReader } from './fake-credential-reader.ts';
+import { FakeClientCredentialStore } from './fake-credential-store.ts';
 
 function createAnalysisRepository(analyses: Partial<Analysis>[]): IAnalysisRepository {
     return { findOneById: async (id: string) => analyses.find((a) => a.id === id) ?? null } as unknown as IAnalysisRepository;
@@ -41,7 +41,12 @@ function createAnalysisNodeRepository(analysisNodes: Partial<AnalysisNode>[]): I
 }
 
 function nodeClientActor(clientId: string): ActorContext {
-    return { realm: { name: 'node-realm' }, identity: { type: 'client', id: clientId } } as unknown as ActorContext;
+    return {
+        realm: { name: 'node-realm' },
+        identity: { type: 'client', id: clientId },
+        // A node client has no analysis-management permission.
+        permissionChecker: { preCheck: async () => { throw new Error('forbidden'); } },
+    } as unknown as ActorContext;
 }
 
 function userActor(): ActorContext {
@@ -57,12 +62,12 @@ function buildService(opts: {
     analysisNodes?: Partial<AnalysisNode>[];
     secret?: string | null;
 }) {
-    const reader = new FakeClientCredentialReader(opts.secret);
+    const reader = new FakeClientCredentialStore(opts.secret);
     const service = new AnalysisClientCredentialService({
         repository: createAnalysisRepository(opts.analysis ? [opts.analysis] : []),
         nodeRepository: createNodeRepository(opts.nodes || []),
         analysisNodeRepository: createAnalysisNodeRepository(opts.analysisNodes || []),
-        credentialReader: reader,
+        credentialStore: reader,
     });
     return { service, reader };
 }
@@ -157,5 +162,34 @@ describe('AnalysisClientCredentialService', () => {
         await expect(
             service.getCredentials(ANALYSIS_ID, userActor()),
         ).rejects.toThrow(PermissionDeniedError);
+    });
+
+    describe('setCredentials', () => {
+        it('should rotate (no secret) for a manager', async () => {
+            const { service, reader } = buildService({ analysis: baseAnalysis() });
+
+            const credentials = await service.setCredentials(ANALYSIS_ID, undefined, createAllowAllActor());
+
+            expect(reader.writes).toEqual([{ clientId: 'analysis-client-1', secret: undefined }]);
+            expect(credentials.secret).toBe('generated-secret');
+        });
+
+        it('should deny a node client that may only read', async () => {
+            // The read path allows an approved assigned node; writing must not.
+            const { service, reader } = buildService({
+                analysis: baseAnalysis(),
+                nodes: [{ id: NODE_ID, client_id: 'node-client-1' }],
+                analysisNodes: [{
+                    analysis_id: ANALYSIS_ID,
+                    node_id: NODE_ID,
+                    approval_status: AnalysisNodeApprovalStatus.APPROVED,
+                }],
+            });
+
+            await expect(
+                service.setCredentials(ANALYSIS_ID, undefined, nodeClientActor('node-client-1')),
+            ).rejects.toThrow();
+            expect(reader.writes).toHaveLength(0);
+        });
     });
 });

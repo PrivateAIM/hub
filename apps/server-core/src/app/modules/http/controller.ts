@@ -45,7 +45,7 @@ import {
     AnalysisClientCredentialService,
     NodeClientCredentialService,
 } from '../../../core/services/client-credential/index.ts';
-import { AuthupClientCredentialReader } from '../database/authup-client-credential-reader.ts';
+import { AuthupClientCredentialStore } from '../database/authup-client-credential-store.ts';
 import { ServiceController } from '../../../adapters/http/controllers/workflows/service/index.ts';
 import { DatabaseInjectionKey } from '../database/constants.ts';
 import { AnalysisInjectionKey } from '../analysis/constants.ts';
@@ -160,19 +160,19 @@ export function createControllers(container: IContainer): Record<string, any>[] 
         });
         controllers.push(new AnalysisClientPermissionController({ service: analysisClientPermissionService }));
 
-        const clientCredentialReader = new AuthupClientCredentialReader(authupResult.data);
+        const clientCredentialStore = new AuthupClientCredentialStore(authupResult.data);
 
         const analysisClientCredentialService = new AnalysisClientCredentialService({
             repository: analysisRepository,
             nodeRepository,
             analysisNodeRepository,
-            credentialReader: clientCredentialReader,
+            credentialStore: clientCredentialStore,
         });
         controllers.push(new AnalysisClientCredentialController({ service: analysisClientCredentialService }));
 
         const nodeClientCredentialService = new NodeClientCredentialService({
             repository: nodeRepository,
-            credentialReader: clientCredentialReader,
+            credentialStore: clientCredentialStore,
         });
         controllers.push(new NodeClientCredentialController({ service: nodeClientCredentialService }));
     }

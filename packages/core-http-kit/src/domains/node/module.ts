@@ -55,4 +55,14 @@ export class NodeAPI extends BaseAPI {
 
         return response.data;
     }
+
+    /**
+     * Rotate (or, when a secret is given, set) the node client's credentials.
+     * Returns the new credentials once.
+     */
+    async setClientCredentials(id: Node['id'], secret?: string): Promise<NodeClientCredentials> {
+        const response = await this.client.post(`nodes/${id}/client/credentials`, { secret });
+
+        return response.data;
+    }
 }

@@ -7,6 +7,8 @@
 
 import type { Analysis } from '@privateaim/core-kit';
 import { AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
+import { BuiltInPolicyType, PolicyData } from '@authup/access';
+import { PermissionName, isRealmResourceWritable } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
@@ -16,14 +18,14 @@ import type { INodeRepository } from '../../entities/node/types.ts';
 import type {
     ClientCredentials,
     IAnalysisClientCredentialService,
-    IClientCredentialReader,
+    IClientCredentialStore,
 } from './types.ts';
 
 type AnalysisClientCredentialServiceContext = {
     repository: IAnalysisRepository;
     nodeRepository: INodeRepository;
     analysisNodeRepository: IAnalysisNodeRepository;
-    credentialReader: IClientCredentialReader;
+    credentialStore: IClientCredentialStore;
 };
 
 /**
@@ -39,14 +41,14 @@ export class AnalysisClientCredentialService extends AbstractEntityService imple
 
     protected analysisNodeRepository: IAnalysisNodeRepository;
 
-    protected credentialReader: IClientCredentialReader;
+    protected credentialStore: IClientCredentialStore;
 
     constructor(ctx: AnalysisClientCredentialServiceContext) {
         super();
         this.repository = ctx.repository;
         this.nodeRepository = ctx.nodeRepository;
         this.analysisNodeRepository = ctx.analysisNodeRepository;
-        this.credentialReader = ctx.credentialReader;
+        this.credentialStore = ctx.credentialStore;
     }
 
     async getCredentials(analysisId: string, actor: ActorContext): Promise<ClientCredentials> {
@@ -67,7 +69,37 @@ export class AnalysisClientCredentialService extends AbstractEntityService imple
             throw new BadRequestError('The analysis has no client provisioned yet.');
         }
 
-        return this.credentialReader.readByClientId(analysis.client_id);
+        return this.credentialStore.readByClientId(analysis.client_id);
+    }
+
+    async setCredentials(
+        analysisId: string,
+        secret: string | undefined,
+        actor: ActorContext,
+    ): Promise<ClientCredentials> {
+        // Writing is a manager action (ANALYSIS_UPDATE), not the read path's
+        // master-or-assigned-node rule: the running analysis never rotates.
+        await actor.permissionChecker.preCheck({ name: PermissionName.ANALYSIS_UPDATE });
+
+        const analysis = await this.repository.findOneById(analysisId);
+        if (!analysis) {
+            throw new EntityNotFoundError({ entity: 'analysis' });
+        }
+
+        await actor.permissionChecker.check({
+            name: PermissionName.ANALYSIS_UPDATE,
+            input: new PolicyData({ [BuiltInPolicyType.ATTRIBUTES]: analysis }),
+        });
+
+        if (!isRealmResourceWritable(actor.realm, analysis.realm_id)) {
+            throw new PermissionDeniedError('You are not permitted to write the credentials of this analysis client.');
+        }
+
+        if (!analysis.client_id) {
+            throw new BadRequestError('The analysis has no client provisioned yet.');
+        }
+
+        return this.credentialStore.writeByClientId(analysis.client_id, secret);
     }
 
     /**
