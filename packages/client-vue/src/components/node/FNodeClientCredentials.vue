@@ -33,6 +33,9 @@ export default defineComponent({
         const revealed = ref(false);
         const busy = ref(false);
         const loaded = ref(false);
+        // Rotating invalidates the current secret, so it is gated behind an
+        // inline confirm rather than firing on a single click.
+        const confirming = ref(false);
 
         const load = async () => {
             if (busy.value) {
@@ -43,6 +46,7 @@ export default defineComponent({
             // current one is (re)loaded — important because the parent reuses
             // this component across node ids.
             revealed.value = false;
+            confirming.value = false;
             clientId.value = null;
             secret.value = null;
 
@@ -78,10 +82,6 @@ export default defineComponent({
         const toggleReveal = () => {
             revealed.value = !revealed.value;
         };
-
-        // Rotating invalidates the current secret, so it is gated behind an
-        // inline confirm rather than firing on a single click.
-        const confirming = ref(false);
 
         const cancelRegenerate = () => {
             confirming.value = false;
