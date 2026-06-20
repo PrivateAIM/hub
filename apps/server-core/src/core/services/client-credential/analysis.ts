@@ -55,13 +55,16 @@ export class AnalysisClientCredentialService extends AbstractEntityService imple
             throw new EntityNotFoundError({ entity: 'analysis' });
         }
 
-        if (!analysis.client_id) {
-            throw new BadRequestError('The analysis has no client provisioned yet.');
-        }
-
+        // Authorize before exposing provisioning state, so an unauthorized
+        // caller can never infer it from BadRequest vs PermissionDenied. (The
+        // existence 404 above is unavoidable — authorization needs the entity.)
         const authorized = await this.isAuthorized(analysis, actor);
         if (!authorized) {
             throw new PermissionDeniedError('You are not permitted to read the credentials of this analysis client.');
+        }
+
+        if (!analysis.client_id) {
+            throw new BadRequestError('The analysis has no client provisioned yet.');
         }
 
         return this.credentialReader.readByClientId(analysis.client_id);

@@ -37,19 +37,21 @@ export class NodeClientCredentialService implements INodeClientCredentialService
     }
 
     async getCredentials(nodeId: string, actor: ActorContext): Promise<ClientCredentials> {
+        // Authorize before touching node state, so an unauthorized caller can
+        // never infer provisioning state from BadRequest vs PermissionDenied.
+        await actor.permissionChecker.preCheck({ name: PermissionName.NODE_UPDATE });
+
         const node = await this.repository.findOneById(nodeId);
         if (!node) {
             throw new EntityNotFoundError({ entity: 'node' });
         }
 
-        if (!node.client_id) {
-            throw new BadRequestError('The node has no client provisioned yet.');
-        }
-
-        await actor.permissionChecker.preCheck({ name: PermissionName.NODE_UPDATE });
-
         if (!isRealmResourceWritable(actor.realm, node.realm_id)) {
             throw new PermissionDeniedError('You are not permitted to read the credentials of this node client.');
+        }
+
+        if (!node.client_id) {
+            throw new BadRequestError('The node has no client provisioned yet.');
         }
 
         return this.credentialReader.readByClientId(node.client_id);

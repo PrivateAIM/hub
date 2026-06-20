@@ -148,4 +148,14 @@ describe('AnalysisClientCredentialService', () => {
             service.getCredentials(randomUUID(), createAllowAllActor()),
         ).rejects.toThrow(EntityNotFoundError);
     });
+
+    it('should authorize before exposing provisioning state', async () => {
+        // An unauthorized actor on an unprovisioned analysis must be denied,
+        // never leak provisioning state via BadRequestError.
+        const { service } = buildService({ analysis: baseAnalysis({ client_id: null }) });
+
+        await expect(
+            service.getCredentials(ANALYSIS_ID, userActor()),
+        ).rejects.toThrow(PermissionDeniedError);
+    });
 });

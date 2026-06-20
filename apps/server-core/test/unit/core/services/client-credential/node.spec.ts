@@ -100,4 +100,15 @@ describe('NodeClientCredentialService', () => {
             service.getCredentials(randomUUID(), createAllowAllActor()),
         ).rejects.toThrow(EntityNotFoundError);
     });
+
+    it('should authorize before exposing provisioning state', async () => {
+        // A denied actor on an unprovisioned node must be rejected by the auth
+        // gate, never leak provisioning state via BadRequestError.
+        const { service, reader } = buildService({ node: baseNode({ client_id: null }) });
+
+        await expect(
+            service.getCredentials(NODE_ID, createDenyAllActor()),
+        ).rejects.not.toBeInstanceOf(BadRequestError);
+        expect(reader.calls).toHaveLength(0);
+    });
 });
