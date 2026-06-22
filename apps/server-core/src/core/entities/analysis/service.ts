@@ -139,14 +139,19 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
 
         await this.repository.save(entity, { data: actor.metadata });
 
+        // Derive the count from the actual rows instead of incrementing a stored
+        // counter — the latter drifts out of sync (e.g. when a later step below
+        // throws, or on concurrent creates) and can end up negative on delete.
+        // This runs before the steps that may throw so the count stays accurate
+        // even if the build/storage check fails after the analysis is persisted.
+        entity.project.analyses = await this.repository.countByProject(entity.project_id);
+        await this.projectRepository.save(entity.project, { data: actor.metadata });
+
         await this.assignProjectNodes(entity, actor);
 
         await this.recalculator.recalcDebounced(entity.id);
 
         await this.storageManager.check(entity);
-
-        entity.project.analyses++;
-        await this.projectRepository.save(entity.project, { data: actor.metadata });
 
         return entity;
     }
@@ -261,7 +266,9 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
 
         entity.id = entityId;
 
-        project.analyses--;
+        // Recompute from the actual rows rather than decrementing a stored counter,
+        // which can drift below zero once it is out of sync.
+        project.analyses = await this.repository.countByProject(project.id);
         await this.projectRepository.save(project, { data: actor.metadata });
 
         entity.project = project;

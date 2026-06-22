@@ -212,6 +212,28 @@ describe('AnalysisService', () => {
             expect(analysisRecalculator.getDebouncedCalls()[0]).toBe(result.id);
         });
 
+        it('should recompute project.analyses from the actual rows on create', async () => {
+            // Stored counter starts out of sync (e.g. drifted negative); creating
+            // an analysis must resync it to the real row count, not blindly add one.
+            const project = createTestProject({ analyses: -3 });
+            projectRepository.seed(project);
+
+            const origValidate = analysisRepository.validateJoinColumns.bind(analysisRepository);
+            analysisRepository.validateJoinColumns = async (data: Partial<Analysis>) => {
+                await origValidate(data);
+                data.project = project;
+            };
+
+            const result = await service.create(
+                { name: 'test-analysis', project_id: project.id },
+                createAllowAllActor(),
+            );
+
+            const stored = await projectRepository.findOneById(project.id);
+            expect(result.project.analyses).toBe(1);
+            expect(stored?.analyses).toBe(1);
+        });
+
         it('should auto-generate a url-friendly name when none is provided', async () => {
             const project = createTestProject();
             projectRepository.seed(project);
@@ -448,17 +470,41 @@ describe('AnalysisService', () => {
             expect(remaining).toBeNull();
         });
 
-        it('should delete and decrement project.analyses', async () => {
+        it('should recompute project.analyses from the remaining rows on delete', async () => {
             const project = createTestProject();
-            project.analyses = 2;
+            // The stored counter is deliberately wrong to prove the value is
+            // recomputed from the actual rows, not merely decremented.
+            project.analyses = 5;
             projectRepository.seed(project);
-            analysisRepository.seed(createFullAnalysis({ project, project_id: project.id }));
+            analysisRepository.seed(createFullAnalysis({
+                id: 'analysis-1', 
+                project, 
+                project_id: project.id, 
+            }));
+            analysisRepository.seed(createFullAnalysis({
+                id: 'analysis-2', 
+                project, 
+                project_id: project.id, 
+            }));
 
-            expect(project.analyses).toBe(2);
             const result = await service.delete('analysis-1', createAllowAllActor());
 
             expect(result.id).toBe('analysis-1');
+            // one row remains for the project
             expect(result.project.analyses).toBe(1);
+        });
+
+        it('should never let project.analyses go negative when the counter is out of sync', async () => {
+            const project = createTestProject();
+            // Counter already drifted to 0 (or below) while a row still exists.
+            project.analyses = 0;
+            projectRepository.seed(project);
+            analysisRepository.seed(createFullAnalysis({ project, project_id: project.id }));
+
+            const result = await service.delete('analysis-1', createAllowAllActor());
+
+            expect(result.project.analyses).toBe(0);
+            expect(result.project.analyses).toBeGreaterThanOrEqual(0);
         });
 
         it('should throw PermissionDeniedError when actor lacks permission', async () => {

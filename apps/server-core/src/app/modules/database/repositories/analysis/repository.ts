@@ -138,6 +138,10 @@ export class AnalysisRepositoryAdapter implements IAnalysisRepository {
         return this.repository.findOne({ where: { id }, relations: ['project'] });
     }
 
+    async countByProject(projectId: string): Promise<number> {
+        return this.repository.countBy({ project_id: projectId });
+    }
+
     async findOneBy(where: Record<string, any>): Promise<Analysis | null> {
         return this.repository.findOneBy(where);
     }
