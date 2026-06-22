@@ -8,6 +8,7 @@
     "packages/core-realtime-kit": "0.10.7",
     "packages/kit": "0.11.3",
     "packages/messenger-kit": "0.11.3",
+    "packages/messenger-http-kit": "0.11.3",
     "apps/server-core": "0.11.3",
     "apps/server-core-worker": "0.11.3",
     "packages/server-core-worker-kit": "0.11.3",
