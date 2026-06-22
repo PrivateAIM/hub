@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.11.4](https://github.com/PrivateAIM/hub/compare/v0.11.3...v0.11.4) (2026-06-22)
+
+
+### Features
+
+* node & analysis client credentials — read + write/rotate behind a core port ([#1696](https://github.com/PrivateAIM/hub/issues/1696)) ([a91ad0b](https://github.com/PrivateAIM/hub/commit/a91ad0b70763ec3b54bec7fd6298ab4a47611560))
+* **server-core:** analysis client capabilities API + node-side credential delivery ([#1695](https://github.com/PrivateAIM/hub/issues/1695)) ([155bd21](https://github.com/PrivateAIM/hub/commit/155bd216aee5b410d88266a77b7c610c8fabc5c6))
+* **server-core:** provision a dedicated Authup client per analysis ([#1693](https://github.com/PrivateAIM/hub/issues/1693)) ([451b89c](https://github.com/PrivateAIM/hub/commit/451b89cb3f361ee63e2354ca238f3ee2f04157ac))
+
+
+### Bug Fixes
+
+* **deps:** bump actions/checkout from 6 to 7 ([#1690](https://github.com/PrivateAIM/hub/issues/1690)) ([51f60c7](https://github.com/PrivateAIM/hub/commit/51f60c719a46bd2cb68f8a35fef6d21853e6d896))
+* **server-core:** derive project analysis count from rows to prevent negative values ([#1699](https://github.com/PrivateAIM/hub/issues/1699)) ([dd0faa2](https://github.com/PrivateAIM/hub/commit/dd0faa2ff6c0bda49e533117716b4a8bc8fb403a)), closes [#1689](https://github.com/PrivateAIM/hub/issues/1689)
+
 ## [0.11.3](https://github.com/PrivateAIM/hub/compare/v0.11.2...v0.11.3) (2026-06-16)
 
 

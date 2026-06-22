@@ -1,5 +1,41 @@
 # Changelog
 
+## [0.11.4](https://github.com/PrivateAIM/hub/compare/v0.11.3...v0.11.4) (2026-06-22)
+
+
+### Features
+
+* node & analysis client credentials — read + write/rotate behind a core port ([#1696](https://github.com/PrivateAIM/hub/issues/1696)) ([a91ad0b](https://github.com/PrivateAIM/hub/commit/a91ad0b70763ec3b54bec7fd6298ab4a47611560))
+* **server-core:** analysis client capabilities API + node-side credential delivery ([#1695](https://github.com/PrivateAIM/hub/issues/1695)) ([155bd21](https://github.com/PrivateAIM/hub/commit/155bd216aee5b410d88266a77b7c610c8fabc5c6))
+* **server-core:** provision a dedicated Authup client per analysis ([#1693](https://github.com/PrivateAIM/hub/issues/1693)) ([451b89c](https://github.com/PrivateAIM/hub/commit/451b89cb3f361ee63e2354ca238f3ee2f04157ac))
+
+
+### Bug Fixes
+
+* **server-core:** derive project analysis count from rows to prevent negative values ([#1699](https://github.com/PrivateAIM/hub/issues/1699)) ([dd0faa2](https://github.com/PrivateAIM/hub/commit/dd0faa2ff6c0bda49e533117716b4a8bc8fb403a)), closes [#1689](https://github.com/PrivateAIM/hub/issues/1689)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.11.3 to ^0.11.4
+    * @privateaim/core-realtime-kit bumped from ^0.10.7 to ^0.10.8
+    * @privateaim/kit bumped from ^0.11.3 to ^0.11.4
+    * @privateaim/server-core-worker-kit bumped from ^0.11.3 to ^0.11.4
+    * @privateaim/server-db-kit bumped from ^0.11.3 to ^0.11.4
+    * @privateaim/server-http-kit bumped from ^0.11.3 to ^0.11.4
+    * @privateaim/server-kit bumped from ^0.11.3 to ^0.11.4
+    * @privateaim/server-realtime-kit bumped from ^0.11.3 to ^0.11.4
+    * @privateaim/server-storage-kit bumped from ^0.11.3 to ^0.11.4
+    * @privateaim/server-telemetry bumped from ^0.11.3 to ^0.11.4
+    * @privateaim/server-telemetry-kit bumped from ^0.11.3 to ^0.11.4
+    * @privateaim/storage-kit bumped from ^0.11.3 to ^0.11.4
+    * @privateaim/telemetry-kit bumped from ^0.11.3 to ^0.11.4
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.11.3 to ^0.11.4
+    * @privateaim/server-test-kit bumped from ^0.11.3 to ^0.11.4
+
 ## [0.11.3](https://github.com/PrivateAIM/hub/compare/v0.11.2...v0.11.3) (2026-06-16)
 
 
