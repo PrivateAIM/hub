@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Message } from '@privateaim/messenger-kit';
+import type { Message, MessageParty } from '@privateaim/messenger-kit';
 import type { DataSource, Repository } from 'typeorm';
 import { MessageEntity } from '../../../../../adapters/database/entities/message.ts';
 import type { IMessageRepository, MessagePersistInput } from '../../../../../core/entities/message/types.ts';
@@ -23,7 +23,7 @@ export class MessageRepositoryAdapter implements IMessageRepository {
         return this.repository.save(entities);
     }
 
-    async findManyForRecipient(recipientId: string, limit: number): Promise<Message[]> {
+    async findManyForRecipient(recipient: MessageParty, limit: number): Promise<Message[]> {
         // select only the public Message fields — `expires_at` is internal (TTL)
         return this.repository.createQueryBuilder('message')
             .select([
@@ -36,14 +36,15 @@ export class MessageRepositoryAdapter implements IMessageRepository {
                 'message.metadata',
                 'message.created_at',
             ])
-            .where('message.recipient_id = :recipientId', { recipientId })
+            .where('message.recipient_type = :recipientType', { recipientType: recipient.type })
+            .andWhere('message.recipient_id = :recipientId', { recipientId: recipient.id })
             .orderBy('message.created_at', 'ASC')
             .addOrderBy('message.id', 'ASC')
             .limit(limit)
             .getMany();
     }
 
-    async ackByIds(recipientId: string, ids: string[]): Promise<void> {
+    async ackByIds(recipient: MessageParty, ids: string[]): Promise<void> {
         if (ids.length === 0) {
             return;
         }
@@ -51,7 +52,8 @@ export class MessageRepositoryAdapter implements IMessageRepository {
         await this.repository.createQueryBuilder()
             .delete()
             .from(MessageEntity)
-            .where('recipient_id = :recipientId', { recipientId })
+            .where('recipient_type = :recipientType', { recipientType: recipient.type })
+            .andWhere('recipient_id = :recipientId', { recipientId: recipient.id })
             .andWhere('id IN (:...ids)', { ids })
             .execute();
     }

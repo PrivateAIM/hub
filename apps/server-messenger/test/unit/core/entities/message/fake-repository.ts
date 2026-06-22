@@ -6,7 +6,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
-import type { Message } from '@privateaim/messenger-kit';
+import type { Message, MessageParty } from '@privateaim/messenger-kit';
 import type { IMessageRepository, MessagePersistInput } from '../../../../../src/core/entities/message/types.ts';
 
 type StoredMessage = Message & { expires_at: string };
@@ -30,17 +30,21 @@ export class FakeMessageRepository implements IMessageRepository {
         });
     }
 
-    async findManyForRecipient(recipientId: string, limit: number): Promise<Message[]> {
+    async findManyForRecipient(recipient: MessageParty, limit: number): Promise<Message[]> {
         return this.messages
-            .filter((message) => message.recipient_id === recipientId)
+            .filter((message) => message.recipient_type === recipient.type && message.recipient_id === recipient.id)
             .sort((a, b) => (a.created_at.getTime() - b.created_at.getTime()) || a.id.localeCompare(b.id))
             .slice(0, limit);
     }
 
-    async ackByIds(recipientId: string, ids: string[]): Promise<void> {
+    async ackByIds(recipient: MessageParty, ids: string[]): Promise<void> {
         const set = new Set(ids);
         this.messages = this.messages.filter(
-            (message) => !(message.recipient_id === recipientId && set.has(message.id)),
+            (message) => !(
+                message.recipient_type === recipient.type &&
+                message.recipient_id === recipient.id &&
+                set.has(message.id)
+            ),
         );
     }
 

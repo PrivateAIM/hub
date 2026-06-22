@@ -30,7 +30,14 @@ export class SweeperModule implements IModule {
         const loggerResult = container.tryResolve(LoggerInjectionKey);
         const logger = loggerResult.success ? loggerResult.data : undefined;
 
+        let inFlight = false;
         this.timer = setInterval(() => {
+            // skip this tick if the previous sweep is still running (avoid pile-up)
+            if (inFlight) {
+                return;
+            }
+
+            inFlight = true;
             repository.deleteExpired(new Date())
                 .then((removed) => {
                     if (removed > 0) {
@@ -39,6 +46,9 @@ export class SweeperModule implements IModule {
                 })
                 .catch((error) => {
                     logger?.error(error);
+                })
+                .finally(() => {
+                    inFlight = false;
                 });
         }, SWEEP_INTERVAL_MS);
 

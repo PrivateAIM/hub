@@ -67,14 +67,14 @@ describe('database/message-repository', () => {
             persistInput(recipientB, 'z'),
         ]);
 
-        const forA = await repository.findManyForRecipient(recipientA, 50);
+        const forA = await repository.findManyForRecipient({ type: 'client', id: recipientA }, 50);
         expect(forA.map((m) => m.data).sort()).toEqual(['x', 'y']);
 
-        const forB = await repository.findManyForRecipient(recipientB, 50);
+        const forB = await repository.findManyForRecipient({ type: 'client', id: recipientB }, 50);
         expect(forB).toHaveLength(1);
 
-        await repository.ackByIds(recipientA, [forA[0].id]);
-        const afterAck = await repository.findManyForRecipient(recipientA, 50);
+        await repository.ackByIds({ type: 'client', id: recipientA }, [forA[0].id]);
+        const afterAck = await repository.findManyForRecipient({ type: 'client', id: recipientA }, 50);
         expect(afterAck).toHaveLength(1);
         expect(afterAck[0].id).toBe(forA[1].id);
     });
@@ -87,7 +87,7 @@ describe('database/message-repository', () => {
             persistInput(recipient, '3'),
         ]);
 
-        const limited = await repository.findManyForRecipient(recipient, 2);
+        const limited = await repository.findManyForRecipient({ type: 'client', id: recipient }, 2);
         expect(limited).toHaveLength(2);
     });
 
@@ -101,7 +101,7 @@ describe('database/message-repository', () => {
         const removed = await repository.deleteExpired(new Date());
         expect(removed).toBeGreaterThanOrEqual(1);
 
-        const remaining = await repository.findManyForRecipient(recipient, 50);
+        const remaining = await repository.findManyForRecipient({ type: 'client', id: recipient }, 50);
         expect(remaining.map((m) => m.data)).toEqual(['fresh']);
     });
 });

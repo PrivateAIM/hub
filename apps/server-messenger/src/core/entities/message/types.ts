@@ -8,6 +8,7 @@
 import type {
     Message,
     MessageAckRequest,
+    MessageParty,
     MessagePullQuery,
     MessagePullResponse,
     SendMessageRequest,
@@ -26,11 +27,11 @@ export interface IMessageRepository {
     /** Persist one row per recipient and return the stored messages. */
     createMany(input: MessagePersistInput[]): Promise<Message[]>;
 
-    /** Pending messages addressed to `recipientId`, oldest first, up to `limit`. */
-    findManyForRecipient(recipientId: string, limit: number): Promise<Message[]>;
+    /** Pending messages addressed to `recipient` (type + id), oldest first, up to `limit`. */
+    findManyForRecipient(recipient: MessageParty, limit: number): Promise<Message[]>;
 
-    /** Delete the named messages for `recipientId` (delete-on-ack). */
-    ackByIds(recipientId: string, ids: string[]): Promise<void>;
+    /** Delete the named messages for `recipient` (type + id) — delete-on-ack. */
+    ackByIds(recipient: MessageParty, ids: string[]): Promise<void>;
 
     /** Delete messages whose absolute expiry (`expires_at`) is before `now` (TTL sweep); returns the count removed. */
     deleteExpired(now: Date): Promise<number>;

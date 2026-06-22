@@ -78,13 +78,6 @@ export class MessageController {
             }
         }
 
-        if (typeof query.wait !== 'undefined') {
-            const wait = Number(query.wait);
-            if (!Number.isNaN(wait)) {
-                result.wait = wait;
-            }
-        }
-
         return result;
     }
 }

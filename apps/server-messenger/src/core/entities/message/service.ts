@@ -60,7 +60,7 @@ export class MessageService implements IMessageService {
         const recipient = this.requireIdentity(actor);
 
         const limit = this.resolveLimit(query.limit);
-        const messages = await this.repository.findManyForRecipient(recipient.id, limit);
+        const messages = await this.repository.findManyForRecipient(recipient, limit);
 
         return { messages };
     }
@@ -72,15 +72,20 @@ export class MessageService implements IMessageService {
             throw new BadRequestError('At least one message id is required to acknowledge.');
         }
 
-        await this.repository.ackByIds(recipient.id, data.ids);
+        await this.repository.ackByIds(recipient, data.ids);
     }
 
     protected resolveLimit(limit: number | undefined): number {
-        if (typeof limit !== 'number' || Number.isNaN(limit) || limit <= 0) {
+        if (typeof limit !== 'number' || !Number.isFinite(limit)) {
             return DEFAULT_PULL_LIMIT;
         }
 
-        return Math.min(limit, MAX_PULL_LIMIT);
+        const normalized = Math.floor(limit);
+        if (normalized <= 0) {
+            return DEFAULT_PULL_LIMIT;
+        }
+
+        return Math.min(normalized, MAX_PULL_LIMIT);
     }
 
     protected requireIdentity(actor: ActorContext): MessageParty {

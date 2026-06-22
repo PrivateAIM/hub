@@ -25,10 +25,13 @@ describe('adapters/http/message', () => {
         app = createTestApplication();
         await app.setup();
 
-        // drain any leftover messages for the fixed fake identity so the
-        // round-trip is deterministic on the shared/persistent CI database
-        const leftover = await app.client.message.pull({ limit: 100 });
-        if (leftover.messages.length > 0) {
+        // drain the fixed fake identity's mailbox until empty so the round-trip
+        // is deterministic on the shared/persistent CI database (backlog may exceed one page)
+        for (;;) {
+            const leftover = await app.client.message.pull({ limit: 100 });
+            if (leftover.messages.length === 0) {
+                break;
+            }
             await app.client.message.ack({ ids: leftover.messages.map((m) => m.id) });
         }
     });
