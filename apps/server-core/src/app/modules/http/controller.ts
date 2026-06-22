@@ -40,7 +40,12 @@ import { AnalysisNodeEventController } from '../../../adapters/http/controllers/
 import { AnalysisClientPermissionController } from '../../../adapters/http/controllers/entities/analysis-client-permission/module.ts';
 import { AnalysisClientPermissionService } from '../database/analysis-client-permission.ts';
 import { AnalysisClientCredentialController } from '../../../adapters/http/controllers/entities/analysis-client-credential/module.ts';
-import { AnalysisClientCredentialService } from '../database/analysis-client-credential.ts';
+import { NodeClientCredentialController } from '../../../adapters/http/controllers/entities/node-client-credential/module.ts';
+import {
+    AnalysisClientCredentialService,
+    NodeClientCredentialService,
+} from '../../../core/services/client-credential/index.ts';
+import { AuthupClientCredentialStore } from '../database/authup-client-credential-store.ts';
 import { ServiceController } from '../../../adapters/http/controllers/workflows/service/index.ts';
 import { DatabaseInjectionKey } from '../database/constants.ts';
 import { AnalysisInjectionKey } from '../analysis/constants.ts';
@@ -155,13 +160,21 @@ export function createControllers(container: IContainer): Record<string, any>[] 
         });
         controllers.push(new AnalysisClientPermissionController({ service: analysisClientPermissionService }));
 
+        const clientCredentialStore = new AuthupClientCredentialStore(authupResult.data);
+
         const analysisClientCredentialService = new AnalysisClientCredentialService({
-            authup: authupResult.data,
-            analysisRepository,
+            repository: analysisRepository,
             nodeRepository,
             analysisNodeRepository,
+            credentialStore: clientCredentialStore,
         });
         controllers.push(new AnalysisClientCredentialController({ service: analysisClientCredentialService }));
+
+        const nodeClientCredentialService = new NodeClientCredentialService({
+            repository: nodeRepository,
+            credentialStore: clientCredentialStore,
+        });
+        controllers.push(new NodeClientCredentialController({ service: nodeClientCredentialService }));
     }
 
     return controllers;

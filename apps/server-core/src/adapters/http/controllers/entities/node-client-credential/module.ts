@@ -18,20 +18,20 @@ import type { IAppEvent } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type {
     ClientCredentials,
-    IAnalysisClientCredentialService,
+    INodeClientCredentialService,
 } from '../../../../../core/services/client-credential/index.ts';
 import { buildActorContext } from '../../../request/index.ts';
 
-type AnalysisClientCredentialControllerContext = {
-    service: IAnalysisClientCredentialService;
+type NodeClientCredentialControllerContext = {
+    service: INodeClientCredentialService;
 };
 
-@DTags('analysis')
-@DController('/analyses')
-export class AnalysisClientCredentialController {
-    protected service: IAnalysisClientCredentialService;
+@DTags('node')
+@DController('/nodes')
+export class NodeClientCredentialController {
+    protected service: INodeClientCredentialService;
 
-    constructor(ctx: AnalysisClientCredentialControllerContext) {
+    constructor(ctx: NodeClientCredentialControllerContext) {
         this.service = ctx.service;
     }
 

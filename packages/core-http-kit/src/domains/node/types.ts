@@ -11,3 +11,8 @@ export type NodeCreatePayload =    & Pick<Node, 'name'> &
     Partial<Pick<Node, 'type' | 'hidden' | 'public_key' | 'external_name' | 'registry_id' | 'client_id' | 'realm_id'>>;
 
 export type NodeUpdatePayload = Partial<NodeCreatePayload>;
+
+export type NodeClientCredentials = {
+    id: string;
+    secret: string | null;
+};
