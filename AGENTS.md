@@ -74,6 +74,7 @@ Modernization and refactoring plans:
 9. [Analysis Check Hardening](.agents/plans/009-analysis-check-hardening.md) — Proposed (race-safe check verdicts, worker ports + verdict unit tests, registry error classification, check observability)
 10. [Per-Analysis Authup Client](.agents/plans/010-analysis-dedicated-client.md) — In progress (dedicated OAuth2 client per analysis mirroring the Node pattern; phase 4 removed the AnalysisPermission entity (#1692, merged), phase 1 added `analysis.client_id` + `AnalysisClientService` (#1693); remaining: phase 2 admin-configurable capabilities, phase 3 node-side credential delivery)
 11. [Analysis Capability Tokens](.agents/plans/012-analysis-capability-tokens.md) — Proposed (resource-scoped, Google-Docs-style capability tokens issued by server-core so analyses can use storage/telemetry/messenger only for owned-or-shared resources; split out of plan 010's phase 5)
+12. [Message Broker Rewrite](.agents/plans/013-message-broker-rewrite.md) — Proposed (turn the stateless Hub messenger into a durable store-and-forward broker with DB + REST send/pull API + AMQP participant projection + socket wakeup; replace the unmaintainable Java node-message-broker with a thin TS service in a dedicated repo that keeps only E2E crypto + local container delivery)
 
 ## Commits
 
