@@ -19,8 +19,8 @@ function buildPullQuery(query?: MessagePullQuery): string {
     }
 
     const params = new URLSearchParams();
-    if (typeof query.after !== 'undefined') {
-        params.set('after', query.after);
+    if (typeof query.limit !== 'undefined') {
+        params.set('limit', `${query.limit}`);
     }
     if (typeof query.wait !== 'undefined') {
         params.set('wait', `${query.wait}`);
@@ -34,15 +34,17 @@ export class MessageAPI extends BaseAPI {
     /**
      * Send a message to one or more recipients. The sender is the authenticated
      * identity; the hub persists one durable row per recipient. The analysis
-     * scope (if any) travels in `metadata.analysisId`.
+     * scope (if any) travels in `metadata.analysisId`. Returns the ids of the
+     * persisted messages.
      */
-    async send(data: SendMessageRequest): Promise<void> {
-        await this.client.post('messages', data);
+    async send(data: SendMessageRequest): Promise<string[]> {
+        const { data: response } = await this.client.post('messages', data);
+        return response.data ?? [];
     }
 
     /**
-     * Node-level long-poll: pull every pending message addressed to the calling
-     * identity, plus the cursor to ack / pass as `after` on the next pull.
+     * Pull the calling identity's pending (un-acked) messages, oldest first.
+     * Process them and `ack` their ids to delete them (delete-on-ack).
      */
     async pull(query?: MessagePullQuery): Promise<MessagePullResponse> {
         const { data } = await this.client.get(`messages${buildPullQuery(query)}`);
@@ -50,7 +52,7 @@ export class MessageAPI extends BaseAPI {
     }
 
     /**
-     * Acknowledge up to and including `cursor` — the hub deletes those messages.
+     * Acknowledge messages by id — the hub deletes them for the caller.
      */
     async ack(data: MessageAckRequest): Promise<void> {
         await this.client.post('messages/ack', data);
