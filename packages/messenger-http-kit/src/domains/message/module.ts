@@ -6,6 +6,7 @@
  */
 
 import type {
+    Message,
     MessageAckRequest,
     MessagePullQuery,
     MessagePullResponse,
@@ -22,12 +23,14 @@ function buildPullQuery(query?: MessagePullQuery): string {
     if (typeof query.limit !== 'undefined') {
         params.set('limit', `${query.limit}`);
     }
-    if (typeof query.wait !== 'undefined') {
-        params.set('wait', `${query.wait}`);
-    }
 
     const serialized = params.toString();
     return serialized.length > 0 ? `?${serialized}` : '';
+}
+
+function rehydrate(message: Message): Message {
+    // JSON transports created_at as a string; restore the Date contract
+    return { ...message, created_at: new Date(message.created_at) };
 }
 
 export class MessageAPI extends BaseAPI {
@@ -48,7 +51,7 @@ export class MessageAPI extends BaseAPI {
      */
     async pull(query?: MessagePullQuery): Promise<MessagePullResponse> {
         const { data } = await this.client.get(`messages${buildPullQuery(query)}`);
-        return data;
+        return { messages: (data.messages ?? []).map(rehydrate) };
     }
 
     /**
