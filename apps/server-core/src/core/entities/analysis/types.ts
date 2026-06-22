@@ -10,6 +10,7 @@ import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } 
 
 export interface IAnalysisRepository extends IEntityRepository<Analysis> {
     findOneWithProject(id: string): Promise<Analysis | null>;
+    countByProject(projectId: string): Promise<number>;
 }
 
 export interface IAnalysisMetadataRecalculator {

@@ -13,4 +13,8 @@ export class FakeAnalysisRepository extends FakeEntityRepository<Analysis> imple
     async findOneWithProject(id: string): Promise<Analysis | null> {
         return this.findOneById(id);
     }
+
+    async countByProject(projectId: string): Promise<number> {
+        return this.getAll().filter((entity) => entity.project_id === projectId).length;
+    }
 }
