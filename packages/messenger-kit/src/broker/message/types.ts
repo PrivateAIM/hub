@@ -81,12 +81,10 @@ export type MessagePullResponse = {
     messages: Message[]
 };
 
-/** Query params for the long-poll pull. */
+/** Query params for the pull. */
 export type MessagePullQuery = {
     /** maximum number of messages to return */
-    limit?: number,
-    /** long-poll wait budget in milliseconds before returning empty */
-    wait?: number
+    limit?: number
 };
 
 /** Ack request — deletes the named messages for the caller (delete-on-ack). */
