@@ -70,12 +70,13 @@ export async function importAsymmetricPrivateKey(
     pem: string,
     algorithm: AsymmetricAlgorithmImportParams,
     usages: KeyUsage[] = ['deriveBits', 'deriveKey'],
+    extractable = false,
 ): Promise<CryptoKey> {
     return crypto.subtle.importKey(
         'pkcs8',
         base64ToArrayBuffer(stripPem(pem)),
         algorithm,
-        true,
+        extractable,
         usages,
     );
 }
