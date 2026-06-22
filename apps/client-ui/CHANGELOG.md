@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.11.4](https://github.com/PrivateAIM/hub/compare/v0.11.3...v0.11.4) (2026-06-22)
+
+
+### Features
+
+* node & analysis client credentials — read + write/rotate behind a core port ([#1696](https://github.com/PrivateAIM/hub/issues/1696)) ([a91ad0b](https://github.com/PrivateAIM/hub/commit/a91ad0b70763ec3b54bec7fd6298ab4a47611560))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/client-vue bumped from ^0.11.3 to ^0.11.4
+    * @privateaim/client-vue-theme bumped from ^0.11.3 to ^0.11.4
+    * @privateaim/core-kit bumped from ^0.11.3 to ^0.11.4
+    * @privateaim/kit bumped from ^0.11.3 to ^0.11.4
+    * @privateaim/storage-kit bumped from ^0.11.3 to ^0.11.4
+    * @privateaim/telemetry-kit bumped from ^0.11.3 to ^0.11.4
+
 ## [0.11.3](https://github.com/PrivateAIM/hub/compare/v0.11.2...v0.11.3) (2026-06-16)
 
 
