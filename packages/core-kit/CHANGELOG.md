@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.11.4](https://github.com/PrivateAIM/hub/compare/v0.11.3...v0.11.4) (2026-06-22)
+
+
+### Features
+
+* **server-core:** provision a dedicated Authup client per analysis ([#1693](https://github.com/PrivateAIM/hub/issues/1693)) ([451b89c](https://github.com/PrivateAIM/hub/commit/451b89cb3f361ee63e2354ca238f3ee2f04157ac))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.11.3 to ^0.11.4
+    * @privateaim/telemetry-kit bumped from ^0.11.3 to ^0.11.4
+  * peerDependencies
+    * @privateaim/kit bumped from ^0.11.3 to ^0.11.4
+    * @privateaim/telemetry-kit bumped from ^0.11.3 to ^0.11.4
+
 ## [0.11.3](https://github.com/PrivateAIM/hub/compare/v0.11.2...v0.11.3) (2026-06-16)
 
 
