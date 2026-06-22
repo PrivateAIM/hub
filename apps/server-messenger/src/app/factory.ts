@@ -44,6 +44,8 @@ export function createApplication() {
                 }),
             ],
         })
+        .withDatabase()
+        .withSweeper()
         .withHTTP();
 
     app = builder.build();
