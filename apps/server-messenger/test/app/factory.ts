@@ -8,6 +8,7 @@
 import { LoggerModule } from '@privateaim/server-kit';
 import type { IModule } from 'orkos';
 import { ConfigModule } from '../../src/app/modules/config/index.ts';
+import { WakeupModule } from '../../src/app/modules/wakeup/index.ts';
 import { HTTPModule } from '../../src/app/modules/http/index.ts';
 import { TestApplication } from './module.ts';
 import { TestHTTPApplication } from './http.ts';
@@ -29,6 +30,7 @@ export function createTestApplication(): TestHTTPApplication {
         new ConfigModule(),
         new LoggerModule(),
         createTestDatabaseModule(),
+        new WakeupModule(),
         new HTTPModule(),
     ];
 
