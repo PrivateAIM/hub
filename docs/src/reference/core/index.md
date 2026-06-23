@@ -51,6 +51,9 @@ See [Shared Configuration](/reference/#shared-configuration) and [Database Confi
 | `GET/POST/PUT/DELETE` | `/nodes` | Node CRUD |
 | `GET/POST/PUT/DELETE` | `/registries` | Registry CRUD |
 | `GET/POST/PUT/DELETE` | `/master-images` | Master image CRUD |
+| `GET/POST` | `/nodes/:id/client/credentials` | Read / rotate the node's OAuth2 client credentials (management permission required) |
+| `GET` | `/nodes/:id/registry/credentials` | Read the node's own registry project (Harbor robot) credentials — accessible to the node's own client without any management permission |
+| `GET/POST` | `/analyses/:id/client/credentials` | Read / rotate the analysis's OAuth2 client credentials |
 | `GET` | `/docs` | Swagger/OpenAPI documentation |
 
 ## Architecture

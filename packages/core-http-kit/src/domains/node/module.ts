@@ -11,7 +11,12 @@ import type { Node } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
 import { nullifyEmptyObjectProperties } from '../../utils';
-import type { NodeClientCredentials, NodeCreatePayload, NodeUpdatePayload } from './types';
+import type {
+    NodeClientCredentials,
+    NodeCreatePayload,
+    NodeRegistryCredentials,
+    NodeUpdatePayload,
+} from './types';
 
 export class NodeAPI extends BaseAPI {
     async getMany(options?: BuildInput<Node>): Promise<CollectionResourceResponse<Node>> {
@@ -62,6 +67,17 @@ export class NodeAPI extends BaseAPI {
      */
     async setClientCredentials(id: Node['id'], secret?: string): Promise<NodeClientCredentials> {
         const response = await this.client.post(`nodes/${id}/client/credentials`, { secret });
+
+        return response.data;
+    }
+
+    /**
+     * Read the node's own registry project credentials (Harbor robot account)
+     * so it can authenticate against the docker registry. Accessible to the
+     * node's own client without holding any management permission.
+     */
+    async getRegistryCredentials(id: Node['id']): Promise<NodeRegistryCredentials> {
+        const response = await this.client.get(`nodes/${id}/registry/credentials`);
 
         return response.data;
     }

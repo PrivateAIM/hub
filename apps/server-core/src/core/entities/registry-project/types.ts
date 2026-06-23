@@ -8,7 +8,9 @@
 import type { RegistryProject } from '@privateaim/core-kit';
 import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
 
-export interface IRegistryProjectRepository extends IEntityRepository<RegistryProject> {}
+export interface IRegistryProjectRepository extends IEntityRepository<RegistryProject> {
+    findOneWithSecret(id: string): Promise<RegistryProject | null>;
+}
 
 export interface IRegistryProjectService {
     getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<RegistryProject>>;
