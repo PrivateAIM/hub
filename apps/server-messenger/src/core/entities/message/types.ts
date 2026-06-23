@@ -17,10 +17,10 @@ import type { ActorContext } from '@privateaim/server-kit';
 
 /**
  * The writable fields of a message — `id` and `created_at` are generated.
- * `expires_at` is an absolute epoch (ms), set by the sender (TTL).
+ * `expires_at` is an absolute expiry timestamp, set from the TTL at send time.
  */
 export type MessagePersistInput = Omit<Message, 'id' | 'created_at'> & {
-    expires_at: string;
+    expires_at: Date;
 };
 
 export interface IMessageRepository {
