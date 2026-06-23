@@ -62,7 +62,7 @@ export class MessageRepositoryAdapter implements IMessageRepository {
         const result = await this.repository.createQueryBuilder()
             .delete()
             .from(MessageEntity)
-            .where('expires_at < :now', { now: now.getTime() })
+            .where('expires_at < :now', { now })
             .execute();
 
         return result.affected ?? 0;

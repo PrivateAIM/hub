@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { deserialize, serialize } from '@authup/kit';
 import type { Message, MessageData, MessageMetadata } from '@privateaim/messenger-kit';
 import {
     Column,
@@ -18,10 +19,9 @@ import {
  * The durable mailbox. Append-only: one row per recipient, delivered delete-on-ack.
  * Pulls are ordered by `created_at` (relative ordering is timezone-independent) and
  * scoped to `recipient_id`; `data` is opaque to the hub (base64 E2E ciphertext for
- * analysis messaging). `expires_at` is an absolute epoch (ms) used by the TTL sweep —
- * a bigint, so the comparison is timezone-immune (unlike a zone-less datetime).
+ * analysis messaging). `expires_at` is an absolute datetime used by the TTL sweep.
  */
-@Index(['recipient_id', 'created_at'])
+@Index(['recipient_id', 'created_at', 'id'])
 @Index(['expires_at'])
 @Entity({ name: 'messages' })
 export class MessageEntity implements Message {
@@ -40,16 +40,30 @@ export class MessageEntity implements Message {
     @Column({ type: 'uuid' })
     recipient_id!: string;
 
-    @Column({ type: 'simple-json', nullable: true })
+    @Column({
+        type: 'text',
+        nullable: true,
+        transformer: {
+            to: (value: MessageData): string => serialize(value),
+            from: (value: string | null): MessageData => deserialize<MessageData>(value),
+        },
+    })
     data!: MessageData;
 
-    @Column({ type: 'simple-json', nullable: true })
+    @Column({
+        type: 'text',
+        nullable: true,
+        transformer: {
+            to: (value: MessageMetadata | null): string => serialize(value),
+            from: (value: string | null): MessageMetadata | null => deserialize<MessageMetadata | null>(value),
+        },
+    })
     metadata!: MessageMetadata | null;
 
     @CreateDateColumn()
     created_at!: Date;
 
-    /** absolute expiry, epoch milliseconds (bigint, stored as a string by typeorm) */
-    @Column({ type: 'bigint' })
-    expires_at!: string;
+    /** absolute expiry timestamp; the TTL sweep deletes rows past it */
+    @Column({ type: Date })
+    expires_at!: Date;
 }

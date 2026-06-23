@@ -14,16 +14,16 @@ export class Default1782138800821 implements MigrationInterface {
                 \`data\` text NULL,
                 \`metadata\` text NULL,
                 \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-                \`expires_at\` bigint NOT NULL,
+                \`expires_at\` datetime NOT NULL,
                 INDEX \`IDX_3a83b1bc057fd8dd8ffcc926ca\` (\`expires_at\`),
-                INDEX \`IDX_6f3011974e71494d267c3b9df5\` (\`recipient_id\`, \`created_at\`),
+                INDEX \`IDX_f4070ef2c27d60b10b2083ffcc\` (\`recipient_id\`, \`created_at\`, \`id\`),
                 PRIMARY KEY (\`id\`)
             ) ENGINE = InnoDB
         `);
     }
     public async down(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`
-            DROP INDEX \`IDX_6f3011974e71494d267c3b9df5\` ON \`messages\`
+            DROP INDEX \`IDX_f4070ef2c27d60b10b2083ffcc\` ON \`messages\`
         `);
         await queryRunner.query(`
             DROP INDEX \`IDX_3a83b1bc057fd8dd8ffcc926ca\` ON \`messages\`

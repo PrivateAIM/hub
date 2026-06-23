@@ -53,7 +53,7 @@ export class MessageService implements IMessageService {
         const sender = this.requireIdentity(actor);
         const recipients = this.validateRecipients(data);
 
-        const expiresAt = `${Date.now() + this.ttlMs}`;
+        const expiresAt = new Date(Date.now() + this.ttlMs);
 
         const input: MessagePersistInput[] = recipients.map((recipient) => ({
             sender_type: sender.type,

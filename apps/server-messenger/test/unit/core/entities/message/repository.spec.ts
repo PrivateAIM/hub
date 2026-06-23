@@ -27,7 +27,7 @@ function persistInput(recipientId: string, data: string, expiresAtEpoch = Date.n
         recipient_id: recipientId,
         data,
         metadata: { analysisId: 'analysis-1' },
-        expires_at: `${expiresAtEpoch}`,
+        expires_at: new Date(expiresAtEpoch),
     };
 }
 

@@ -9,7 +9,7 @@ import { randomUUID } from 'node:crypto';
 import type { Message, MessageParty } from '@privateaim/messenger-kit';
 import type { IMessageRepository, MessagePersistInput } from '../../../../../src/core/entities/message/types.ts';
 
-type StoredMessage = Message & { expires_at: string };
+type StoredMessage = Message & { expires_at: Date };
 
 export class FakeMessageRepository implements IMessageRepository {
     public messages: StoredMessage[] = [];
@@ -51,7 +51,7 @@ export class FakeMessageRepository implements IMessageRepository {
     async deleteExpired(now: Date): Promise<number> {
         const before = this.messages.length;
         const cutoff = now.getTime();
-        this.messages = this.messages.filter((message) => Number(message.expires_at) >= cutoff);
+        this.messages = this.messages.filter((message) => message.expires_at.getTime() >= cutoff);
         return before - this.messages.length;
     }
 }

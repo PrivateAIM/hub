@@ -14,7 +14,7 @@ export class Default1782138800821 implements MigrationInterface {
                 "data" text,
                 "metadata" text,
                 "created_at" TIMESTAMP NOT NULL DEFAULT now(),
-                "expires_at" bigint NOT NULL,
+                "expires_at" TIMESTAMP NOT NULL,
                 CONSTRAINT "PK_18325f38ae6de43878487eff986" PRIMARY KEY ("id")
             )
         `);
@@ -22,12 +22,12 @@ export class Default1782138800821 implements MigrationInterface {
             CREATE INDEX "IDX_3a83b1bc057fd8dd8ffcc926ca" ON "messages" ("expires_at")
         `);
         await queryRunner.query(`
-            CREATE INDEX "IDX_6f3011974e71494d267c3b9df5" ON "messages" ("recipient_id", "created_at")
+            CREATE INDEX "IDX_f4070ef2c27d60b10b2083ffcc" ON "messages" ("recipient_id", "created_at", "id")
         `);
     }
     public async down(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`
-            DROP INDEX "public"."IDX_6f3011974e71494d267c3b9df5"
+            DROP INDEX "public"."IDX_f4070ef2c27d60b10b2083ffcc"
         `);
         await queryRunner.query(`
             DROP INDEX "public"."IDX_3a83b1bc057fd8dd8ffcc926ca"
