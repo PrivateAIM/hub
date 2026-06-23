@@ -25,7 +25,10 @@ import { WakeupInjectionKey } from './constants.ts';
 export class WakeupModule implements IModule {
     readonly name = 'wakeup';
 
-    readonly dependencies: string[] = ['config'];
+    // `redis` is optional (absent in tests / single-node), but when present it MUST be set up
+    // first so the cross-instance transport is chosen — declaring it keeps the topo sort from
+    // silently degrading to the in-memory wakeup if the builder order changes.
+    readonly dependencies = ['config', { name: 'redis', optional: true }];
 
     private wakeup: RedisMessageWakeup | undefined;
 
@@ -39,10 +42,15 @@ export class WakeupModule implements IModule {
                 return;
             }
 
-            const room = buildConnectionRoomForIdentity(recipient);
-            // `.local`: every instance already receives the wakeup via our own pub/sub and
-            // emits to its own sockets — bypass the socket.io redis adapter to avoid duplicates.
-            socketResult.data.local.in(room).emit(WakeupEventName.MESSAGE_PENDING, { recipient });
+            try {
+                const room = buildConnectionRoomForIdentity(recipient);
+                // `.local`: every instance already receives the wakeup via our own pub/sub and
+                // emits to its own sockets — bypass the socket.io redis adapter to avoid duplicates.
+                socketResult.data.local.in(room).emit(WakeupEventName.MESSAGE_PENDING, { recipient });
+            } catch (error) {
+                // best-effort: a socket-emit failure must not propagate into notify()/send()
+                logger?.warn(`Message wakeup socket emit failed: ${(error as Error).message}`);
+            }
         };
 
         const redisResult = container.tryResolve(RedisClientInjectionKey);
@@ -53,6 +61,7 @@ export class WakeupModule implements IModule {
                 publishClient: redisResult.data,
                 subscribeClient: redisResult.data.duplicate(),
                 onPending,
+                logger,
             });
             await redis.start();
             this.wakeup = redis;

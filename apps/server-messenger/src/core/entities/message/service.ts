@@ -67,8 +67,10 @@ export class MessageService implements IMessageService {
 
         const messages = await this.repository.createMany(input);
 
-        // wake recipients only after the rows are committed, so a woken pull sees them
-        await Promise.all(recipients.map((recipient) => this.wakeup.notify(recipient)));
+        // wake recipients only after the rows are committed, so a woken pull sees them.
+        // best-effort: the wakeup is an optimization (pull/long-poll deliver regardless),
+        // so a failed notify must never fail an already-durable send.
+        await Promise.allSettled(recipients.map((recipient) => this.wakeup.notify(recipient)));
 
         return messages;
     }
@@ -81,7 +83,10 @@ export class MessageService implements IMessageService {
 
         const waitMs = this.resolveWait(query.wait);
         if (messages.length === 0 && waitMs > 0) {
-            // long-poll: park until a message is pending for this recipient, then re-query once
+            // long-poll: park until a message is pending for this recipient, then re-query once.
+            // a notify racing the window between the query above and wait() registering is not
+            // lost — send commits before it notifies, so the re-query finds it (worst case: the
+            // client waits out the budget). `wait` is therefore a maximum, not a guaranteed hold.
             await this.wakeup.wait(recipient, waitMs);
             messages = await this.repository.findManyForRecipient(recipient, limit);
         }
