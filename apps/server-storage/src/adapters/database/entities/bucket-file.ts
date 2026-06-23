@@ -6,7 +6,7 @@
  */
 
 import type { Realm } from '@authup/core-kit';
-import { bigintNumberTransformer } from '@privateaim/server-db-kit';
+import { bigintNumberTransformer, dateToISOStringTransformer } from '@privateaim/server-db-kit';
 import type { BucketFile } from '@privateaim/storage-kit';
 import {
     Column,
@@ -48,10 +48,10 @@ export class BucketFileEntity implements BucketFile {
 
     // ------------------------------------------------------------------
 
-    @CreateDateColumn()
+    @CreateDateColumn({ transformer: dateToISOStringTransformer })
     created_at: string;
 
-    @UpdateDateColumn()
+    @UpdateDateColumn({ transformer: dateToISOStringTransformer })
     updated_at: string;
 
     // ------------------------------------------------------------------

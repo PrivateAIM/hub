@@ -13,7 +13,7 @@ import type {
     Project,
     Registry,
 } from '@privateaim/core-kit';
-import { bigintNumberTransformer } from '@privateaim/server-db-kit';
+import { bigintNumberTransformer, dateToISOStringTransformer } from '@privateaim/server-db-kit';
 import {
     Column,
     CreateDateColumn,
@@ -192,10 +192,10 @@ export class AnalysisEntity implements Analysis {
 
     // ------------------------------------------------------------------
 
-    @CreateDateColumn()
+    @CreateDateColumn({ transformer: dateToISOStringTransformer })
     created_at: string;
 
-    @UpdateDateColumn()
+    @UpdateDateColumn({ transformer: dateToISOStringTransformer })
     updated_at: string;
 
     // ------------------------------------------------------------------

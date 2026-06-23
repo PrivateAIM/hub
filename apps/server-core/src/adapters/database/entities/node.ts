@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { dateToISOStringTransformer } from '@privateaim/server-db-kit';
 import {
     Column,
     CreateDateColumn,
@@ -87,9 +88,9 @@ export class NodeEntity implements Node {
 
     // ------------------------------------------------------------------
 
-    @CreateDateColumn()
+    @CreateDateColumn({ transformer: dateToISOStringTransformer })
     created_at: string;
 
-    @UpdateDateColumn()
+    @UpdateDateColumn({ transformer: dateToISOStringTransformer })
     updated_at: string;
 }

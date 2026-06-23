@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { dateToISOStringTransformer } from '@privateaim/server-db-kit';
 import type { Realm } from '@authup/core-kit';
 import { deserialize, serialize } from '@authup/kit';
 import type { ObjectLiteral } from '@privateaim/kit';
@@ -137,9 +138,9 @@ export class EventEntity implements Event {
     })
     expires_at: string | null;
 
-    @CreateDateColumn()
+    @CreateDateColumn({ transformer: dateToISOStringTransformer })
     created_at: string;
 
-    @UpdateDateColumn()
+    @UpdateDateColumn({ transformer: dateToISOStringTransformer })
     updated_at: string;
 }

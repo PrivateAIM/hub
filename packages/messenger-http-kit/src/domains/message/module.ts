@@ -48,7 +48,7 @@ export class MessageAPI extends BaseAPI {
      */
     async pull(query?: MessagePullQuery): Promise<MessagePullResponse> {
         const { data } = await this.client.get(`messages${buildPullQuery(query)}`);
-        return { messages: data.messages ?? [] };
+        return { messages: Array.isArray(data.messages) ? data.messages : [] };
     }
 
     /**

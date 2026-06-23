@@ -7,7 +7,7 @@
 
 import { deserialize, serialize } from '@authup/kit';
 import type { ProcessStatus } from '@privateaim/kit';
-import { bigintNumberTransformer } from '@privateaim/server-db-kit';
+import { bigintNumberTransformer, dateToISOStringTransformer } from '@privateaim/server-db-kit';
 import {
     Column,
     CreateDateColumn,
@@ -95,9 +95,9 @@ export class MasterImageEntity implements MasterImage {
 
     // ------------------------------------------------------------------
 
-    @CreateDateColumn()
+    @CreateDateColumn({ transformer: dateToISOStringTransformer })
     created_at: string;
 
-    @UpdateDateColumn()
+    @UpdateDateColumn({ transformer: dateToISOStringTransformer })
     updated_at: string;
 }
