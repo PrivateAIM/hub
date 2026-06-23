@@ -37,7 +37,7 @@ import { HTTPInjectionKey } from './constants.ts';
 export class HTTPModule implements IModule {
     readonly name = 'http';
 
-    readonly dependencies: string[] = ['config', 'database'];
+    readonly dependencies: string[] = ['config', 'database', 'wakeup'];
 
     private instance: HTTPServer | undefined;
 

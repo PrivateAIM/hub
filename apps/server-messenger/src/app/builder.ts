@@ -10,6 +10,7 @@ import type { IModule } from 'orkos';
 import { ConfigModule } from './modules/config/index.ts';
 import { DatabaseModule } from './modules/database/index.ts';
 import { SweeperModule } from './modules/sweeper/index.ts';
+import { WakeupModule } from './modules/wakeup/index.ts';
 import { HTTPModule } from './modules/http/index.ts';
 
 export class ServerMessengerApplicationBuilder extends BaseApplicationBuilder {
@@ -23,6 +24,10 @@ export class ServerMessengerApplicationBuilder extends BaseApplicationBuilder {
 
     withSweeper(instance?: SweeperModule | false): this {
         return this.addModuleSlot('sweeper', instance, () => new SweeperModule());
+    }
+
+    withWakeup(instance?: WakeupModule | false): this {
+        return this.addModuleSlot('wakeup', instance, () => new WakeupModule());
     }
 
     withHTTP(instance?: HTTPModule | false): this {

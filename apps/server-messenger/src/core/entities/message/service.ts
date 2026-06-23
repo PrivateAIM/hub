@@ -16,10 +16,15 @@ import type {
 } from '@privateaim/messenger-kit';
 import { MessagePartyKind } from '@privateaim/messenger-kit';
 import type { ActorContext } from '@privateaim/server-kit';
+import { MemoryMessageWakeup } from '../../services/wakeup/index.ts';
+import type { IMessageWakeup } from '../../services/wakeup/index.ts';
 import type { IMessageRepository, IMessageService, MessagePersistInput } from './types.ts';
 
 const DEFAULT_PULL_LIMIT = 50;
 const MAX_PULL_LIMIT = 100;
+
+/** Upper bound on a long-poll `wait` budget. */
+const MAX_PULL_WAIT_MS = 30 * 1000;
 
 /** Uniform message time-to-live (24h). */
 const DEFAULT_TTL_MS = 24 * 60 * 60 * 1000;
@@ -30,10 +35,17 @@ const PARTY_KINDS = new Set<string>(Object.values(MessagePartyKind));
 export class MessageService implements IMessageService {
     protected repository: IMessageRepository;
 
+    protected wakeup: IMessageWakeup;
+
     protected ttlMs: number;
 
-    constructor(ctx: { repository: IMessageRepository, ttlMs?: number }) {
+    constructor(ctx: {
+        repository: IMessageRepository, 
+        wakeup?: IMessageWakeup, 
+        ttlMs?: number 
+    }) {
         this.repository = ctx.repository;
+        this.wakeup = ctx.wakeup ?? new MemoryMessageWakeup();
         this.ttlMs = ctx.ttlMs ?? DEFAULT_TTL_MS;
     }
 
@@ -53,14 +65,26 @@ export class MessageService implements IMessageService {
             expires_at: expiresAt,
         }));
 
-        return this.repository.createMany(input);
+        const messages = await this.repository.createMany(input);
+
+        // wake recipients only after the rows are committed, so a woken pull sees them
+        await Promise.all(recipients.map((recipient) => this.wakeup.notify(recipient)));
+
+        return messages;
     }
 
     async pull(query: MessagePullQuery, actor: ActorContext): Promise<MessagePullResponse> {
         const recipient = this.requireIdentity(actor);
 
         const limit = this.resolveLimit(query.limit);
-        const messages = await this.repository.findManyForRecipient(recipient, limit);
+        let messages = await this.repository.findManyForRecipient(recipient, limit);
+
+        const waitMs = this.resolveWait(query.wait);
+        if (messages.length === 0 && waitMs > 0) {
+            // long-poll: park until a message is pending for this recipient, then re-query once
+            await this.wakeup.wait(recipient, waitMs);
+            messages = await this.repository.findManyForRecipient(recipient, limit);
+        }
 
         return { messages };
     }
@@ -86,6 +110,14 @@ export class MessageService implements IMessageService {
         }
 
         return Math.min(normalized, MAX_PULL_LIMIT);
+    }
+
+    protected resolveWait(wait: number | undefined): number {
+        if (typeof wait !== 'number' || !Number.isFinite(wait) || wait <= 0) {
+            return 0;
+        }
+
+        return Math.min(Math.floor(wait), MAX_PULL_WAIT_MS);
     }
 
     protected requireIdentity(actor: ActorContext): MessageParty {
