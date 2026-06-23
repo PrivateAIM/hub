@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { dateToISOStringTransformer } from '@privateaim/server-db-kit';
 import { deserialize, serialize } from '@authup/kit';
 import type { Message, MessageData, MessageMetadata } from '@privateaim/messenger-kit';
 import {
@@ -60,10 +61,10 @@ export class MessageEntity implements Message {
     })
     metadata!: MessageMetadata | null;
 
-    @CreateDateColumn()
-    created_at!: Date;
+    @CreateDateColumn({ transformer: dateToISOStringTransformer })
+    created_at!: string;
 
     /** absolute expiry timestamp; the TTL sweep deletes rows past it */
-    @Column({ type: Date })
-    expires_at!: Date;
+    @Column({ type: Date, transformer: dateToISOStringTransformer })
+    expires_at!: string;
 }

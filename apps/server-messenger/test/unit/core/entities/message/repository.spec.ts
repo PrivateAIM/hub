@@ -27,7 +27,7 @@ function persistInput(recipientId: string, data: string, expiresAtEpoch = Date.n
         recipient_id: recipientId,
         data,
         metadata: { analysisId: 'analysis-1' },
-        expires_at: new Date(expiresAtEpoch),
+        expires_at: new Date(expiresAtEpoch).toISOString(),
     };
 }
 
@@ -54,7 +54,8 @@ describe('database/message-repository', () => {
 
         expect(created).toHaveLength(2);
         expect(created[0].id).toBeDefined();
-        expect(created[0].created_at).toBeInstanceOf(Date);
+        expect(created[0].created_at).toBeDefined();
+        expect(Number.isNaN(new Date(created[0].created_at).getTime())).toBe(false);
         expect(created[0].metadata).toEqual({ analysisId: 'analysis-1' });
     });
 

@@ -16,9 +16,9 @@ export interface Bucket {
 
     // ------------------------------------------------------------------
 
-    created_at: Date;
+    created_at: string;
 
-    updated_at: Date;
+    updated_at: string;
 
     // ------------------------------------------------------------------
 

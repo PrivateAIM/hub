@@ -6,3 +6,4 @@
  */
 
 export * from './bigint-number.ts';
+export * from './date-iso-string.ts';

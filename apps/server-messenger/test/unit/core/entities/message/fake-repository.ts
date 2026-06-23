@@ -9,7 +9,7 @@ import { randomUUID } from 'node:crypto';
 import type { Message, MessageParty } from '@privateaim/messenger-kit';
 import type { IMessageRepository, MessagePersistInput } from '../../../../../src/core/entities/message/types.ts';
 
-type StoredMessage = Message & { expires_at: Date };
+type StoredMessage = Message & { expires_at: string };
 
 export class FakeMessageRepository implements IMessageRepository {
     public messages: StoredMessage[] = [];
@@ -22,8 +22,8 @@ export class FakeMessageRepository implements IMessageRepository {
             const message: StoredMessage = {
                 ...item,
                 id: randomUUID(),
-                // monotonic timestamp so ordering is deterministic in tests
-                created_at: new Date(Date.now() + this.counter),
+                // monotonic ISO timestamp so ordering is deterministic in tests
+                created_at: new Date(Date.now() + this.counter).toISOString(),
             };
             this.messages.push(message);
             return message;
@@ -33,7 +33,7 @@ export class FakeMessageRepository implements IMessageRepository {
     async findManyForRecipient(recipient: MessageParty, limit: number): Promise<Message[]> {
         return this.messages
             .filter((message) => message.recipient_type === recipient.type && message.recipient_id === recipient.id)
-            .sort((a, b) => (a.created_at.getTime() - b.created_at.getTime()) || a.id.localeCompare(b.id))
+            .sort((a, b) => a.created_at.localeCompare(b.created_at) || a.id.localeCompare(b.id))
             .slice(0, limit);
     }
 
@@ -51,7 +51,7 @@ export class FakeMessageRepository implements IMessageRepository {
     async deleteExpired(now: Date): Promise<number> {
         const before = this.messages.length;
         const cutoff = now.getTime();
-        this.messages = this.messages.filter((message) => message.expires_at.getTime() >= cutoff);
+        this.messages = this.messages.filter((message) => new Date(message.expires_at).getTime() >= cutoff);
         return before - this.messages.length;
     }
 }

@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { dateToISOStringTransformer } from '@privateaim/server-db-kit';
 import type { 
     Client, 
     Realm, 
@@ -83,11 +84,11 @@ export class AnalysisBucketFileEntity implements AnalysisBucketFile {
 
     // ------------------------------------------------------------------
 
-    @CreateDateColumn()
-    created_at: Date;
+    @CreateDateColumn({ transformer: dateToISOStringTransformer })
+    created_at: string;
 
-    @UpdateDateColumn()
-    updated_at: Date;
+    @UpdateDateColumn({ transformer: dateToISOStringTransformer })
+    updated_at: string;
 
     // ------------------------------------------------------------------
 }

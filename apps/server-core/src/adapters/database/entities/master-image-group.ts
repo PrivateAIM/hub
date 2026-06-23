@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { dateToISOStringTransformer } from '@privateaim/server-db-kit';
 import {
     Column,
     CreateDateColumn,
@@ -32,9 +33,9 @@ export class MasterImageGroupEntity implements MasterImageGroup {
 
     // ------------------------------------------------------------------
 
-    @CreateDateColumn()
-    created_at: Date;
+    @CreateDateColumn({ transformer: dateToISOStringTransformer })
+    created_at: string;
 
-    @UpdateDateColumn()
-    updated_at: Date;
+    @UpdateDateColumn({ transformer: dateToISOStringTransformer })
+    updated_at: string;
 }
