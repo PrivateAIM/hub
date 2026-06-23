@@ -84,7 +84,9 @@ export type MessagePullResponse = {
 /** Query params for the pull. */
 export type MessagePullQuery = {
     /** maximum number of messages to return */
-    limit?: number
+    limit?: number,
+    /** long-poll budget in milliseconds — park up to this long for a pending message before returning empty */
+    wait?: number
 };
 
 /** Ack request — deletes the named messages for the caller (delete-on-ack). */
