@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { MessagePendingEvents } from './broker';
 import type { CTSConnectionEvents, STCConnectionEvents } from './connection';
 import type { CTSMessagingEvents, STCMessagingEvents } from './messaging';
 
@@ -25,6 +26,8 @@ export type STSEvents = {
     [event: string]: (...args: any[]) => void;
 };
 
-export type STCEvents = STCConnectionEvents & STCMessagingEvents;
+// the broker wakeup (`messagePending`) is additive — it rides the same socket as
+// the legacy connection/messaging events until those are retired (Phase 5)
+export type STCEvents = STCConnectionEvents & STCMessagingEvents & MessagePendingEvents;
 
 export type CTSEvents = CTSConnectionEvents & CTSMessagingEvents;
