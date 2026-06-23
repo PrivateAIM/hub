@@ -12,6 +12,7 @@ import type { ActorContext } from '@privateaim/server-kit';
 import type { INodeRepository } from '../../entities/node/types.ts';
 import type {
     ClientCredentials,
+    ClientCredentialsUpdate,
     IClientCredentialStore,
     INodeClientCredentialService,
 } from './types.ts';
@@ -59,7 +60,7 @@ export class NodeClientCredentialService implements INodeClientCredentialService
 
     async setCredentials(
         nodeId: string,
-        secret: string | undefined,
+        data: ClientCredentialsUpdate,
         actor: ActorContext,
     ): Promise<ClientCredentials> {
         const node = await this.repository.findOneById(nodeId);
@@ -75,7 +76,7 @@ export class NodeClientCredentialService implements INodeClientCredentialService
             throw new BadRequestError('The node has no client provisioned yet.');
         }
 
-        return this.credentialStore.writeByClientId(node.client_id, secret);
+        return this.credentialStore.writeByClientId(node.client_id, data);
     }
 
     /**

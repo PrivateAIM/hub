@@ -99,7 +99,7 @@ export class AnalysisClientCredentialService extends AbstractEntityService imple
             throw new BadRequestError('The analysis has no client provisioned yet.');
         }
 
-        return this.credentialStore.writeByClientId(analysis.client_id, secret);
+        return this.credentialStore.writeByClientId(analysis.client_id, { secret });
     }
 
     /**

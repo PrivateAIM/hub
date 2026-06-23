@@ -105,7 +105,12 @@ describe('AnalysisClientCredentialService', () => {
 
         const credentials = await service.getCredentials(ANALYSIS_ID, createAllowAllActor());
 
-        expect(credentials).toEqual({ id: 'analysis-client-1', secret: 'the-secret' });
+        expect(credentials).toEqual({
+            id: 'analysis-client-1',
+            name: 'the-name',
+            display_name: null,
+            secret: 'the-secret',
+        });
         expect(reader.calls).toEqual(['analysis-client-1']);
     });
 
@@ -199,7 +204,7 @@ describe('AnalysisClientCredentialService', () => {
 
             const credentials = await service.setCredentials(ANALYSIS_ID, undefined, createAllowAllActor());
 
-            expect(reader.writes).toEqual([{ clientId: 'analysis-client-1', secret: undefined }]);
+            expect(reader.writes).toEqual([{ clientId: 'analysis-client-1', data: { secret: undefined } }]);
             expect(credentials.secret).toBe('generated-secret');
         });
 

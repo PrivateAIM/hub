@@ -7,7 +7,11 @@
 
 import { randomBytes } from 'node:crypto';
 import type { AuthupClient } from '@privateaim/server-kit';
-import type { ClientCredentials, IClientCredentialStore } from '../../../core/services/client-credential/index.ts';
+import type {
+    ClientCredentials,
+    ClientCredentialsUpdate,
+    IClientCredentialStore,
+} from '../../../core/services/client-credential/index.ts';
 
 /**
  * Authup-backed adapter for the {@link IClientCredentialStore} core port. Reads
@@ -26,19 +30,25 @@ export class AuthupClientCredentialStore implements IClientCredentialStore {
 
         return {
             id: client.id,
+            name: client.name,
+            display_name: client.display_name ?? null,
             secret: client.secret ?? null,
         };
     }
 
-    async writeByClientId(clientId: string, secret?: string): Promise<ClientCredentials> {
+    async writeByClientId(clientId: string, data?: ClientCredentialsUpdate): Promise<ClientCredentials> {
         // Rotate by default (generate a fresh secret); otherwise set the caller's.
-        const next = secret ?? randomBytes(32).toString('hex');
+        // Undefined name/display_name keys are dropped on the wire, leaving them
+        // unchanged.
+        const next = data?.secret ?? randomBytes(32).toString('hex');
 
-        const client = await this.authup.client.update(clientId, { secret: next });
+        const client = await this.authup.client.update(clientId, { ...data, secret: next });
 
         // Return the plaintext we wrote — the stored value may be hashed.
         return {
             id: client.id,
+            name: client.name,
+            display_name: client.display_name ?? null,
             secret: next,
         };
     }

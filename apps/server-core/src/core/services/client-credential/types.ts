@@ -5,31 +5,41 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { Client } from '@authup/core-kit';
 import type { ActorContext } from '@privateaim/server-kit';
 
-export type ClientCredentials = {
-    id: string;
-    secret: string | null;
-};
+/**
+ * The subset of an OAuth2 client a credential consumer needs — identity, the
+ * human-facing labels and the secret. Projected from the Authup {@link Client}.
+ */
+export type ClientCredentials = Pick<Client, 'id' | 'name' | 'display_name' | 'secret'>;
 
 /**
- * Port for reading and writing an OAuth2 client's credentials (id + secret) by
- * its id. The concrete, Authup-backed adapter lives in the app layer, keeping
- * the credential services free of any infrastructure client.
+ * Patch applied to an OAuth2 client's credentials. An omitted `secret` rotates
+ * to a fresh random one; an omitted `name` / `display_name` leaves that field
+ * unchanged. Projected from the Authup {@link Client}.
+ */
+export type ClientCredentialsUpdate = Partial<Pick<Client, 'secret' | 'name' | 'display_name'>>;
+
+/**
+ * Port for reading and writing an OAuth2 client's credentials (id, name,
+ * secret) by its id. The concrete, Authup-backed adapter lives in the app
+ * layer, keeping the credential services free of any infrastructure client.
  */
 export interface IClientCredentialStore {
     readByClientId(clientId: string): Promise<ClientCredentials>;
 
     /**
-     * Set the client's secret. When `secret` is omitted, a new random secret is
-     * generated. Returns the (plaintext) credentials that were written.
+     * Apply a credentials patch. When `secret` is omitted, a new random secret
+     * is generated; when `name` is omitted, the name is left unchanged. Returns
+     * the (plaintext) credentials that were written.
      */
-    writeByClientId(clientId: string, secret?: string): Promise<ClientCredentials>;
+    writeByClientId(clientId: string, data?: ClientCredentialsUpdate): Promise<ClientCredentials>;
 }
 
 export interface INodeClientCredentialService {
     getCredentials(nodeId: string, actor: ActorContext): Promise<ClientCredentials>;
-    setCredentials(nodeId: string, secret: string | undefined, actor: ActorContext): Promise<ClientCredentials>;
+    setCredentials(nodeId: string, data: ClientCredentialsUpdate, actor: ActorContext): Promise<ClientCredentials>;
 }
 
 export interface IAnalysisClientCredentialService {
