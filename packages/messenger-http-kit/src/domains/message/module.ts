@@ -23,6 +23,9 @@ function buildPullQuery(query?: MessagePullQuery): string {
     if (typeof query.limit !== 'undefined') {
         params.set('limit', `${query.limit}`);
     }
+    if (typeof query.wait !== 'undefined') {
+        params.set('wait', `${query.wait}`);
+    }
 
     const serialized = params.toString();
     return serialized.length > 0 ? `?${serialized}` : '';
