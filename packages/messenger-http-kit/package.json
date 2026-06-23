@@ -20,13 +20,11 @@
     },
     "scripts": {
         "build": "rimraf ./dist && tsdown",
-        "build-watch": "rimraf ./dist && tsc -p tsconfig.build.json --watch",
-        "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts"
+        "build-watch": "rimraf ./dist && tsc -p tsconfig.build.json --watch"
     },
     "devDependencies": {
         "@privateaim/messenger-kit": "^0.11.4",
-        "hapic": "^2.8.2",
-        "vitest": "^4.1.7"
+        "hapic": "^2.8.2"
     },
     "peerDependencies": {
         "@privateaim/messenger-kit": "^0.11.4",

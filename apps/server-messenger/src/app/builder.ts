@@ -8,11 +8,21 @@
 import { BaseApplicationBuilder } from '@privateaim/server-kit';
 import type { IModule } from 'orkos';
 import { ConfigModule } from './modules/config/index.ts';
+import { DatabaseModule } from './modules/database/index.ts';
+import { SweeperModule } from './modules/sweeper/index.ts';
 import { HTTPModule } from './modules/http/index.ts';
 
 export class ServerMessengerApplicationBuilder extends BaseApplicationBuilder {
     withConfig(instance?: ConfigModule | false): this {
         return this.addModuleSlot('config', instance, () => new ConfigModule());
+    }
+
+    withDatabase(instance?: DatabaseModule | false): this {
+        return this.addModuleSlot('database', instance, () => new DatabaseModule());
+    }
+
+    withSweeper(instance?: SweeperModule | false): this {
+        return this.addModuleSlot('sweeper', instance, () => new SweeperModule());
     }
 
     withHTTP(instance?: HTTPModule | false): this {

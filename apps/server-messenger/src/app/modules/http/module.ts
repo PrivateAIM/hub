@@ -10,12 +10,19 @@ import type { IModule } from 'orkos';
 import type { Server } from 'node:http';
 import { App, defineCoreHandler, serve } from 'routup';
 import {
+    AuthupClientInjectionKey,
+    EnvironmentName,
     LoggerInjectionKey,
+    RedisClientInjectionKey,
     RedisPublishClientInjectionKey,
     RedisSubscribeClientInjectionKey,
     createAuthupClientTokenCreator,
 } from '@privateaim/server-kit';
-import { createAuthupTokenVerifier, mountMiddlewares } from '@privateaim/server-http-kit';
+import {
+    createAuthupTokenVerifier,
+    mountErrorMiddleware,
+    mountMiddlewares,
+} from '@privateaim/server-http-kit';
 import {
     createServer as createSocketServer,
     mountAuthorizationMiddleware,
@@ -23,13 +30,14 @@ import {
 } from '@privateaim/server-realtime-kit';
 import { ConfigInjectionKey } from '../config/constants.ts';
 import { registerControllers } from '../../../adapters/socket/register.ts';
+import { createControllers } from './controller.ts';
 import type { HTTPServer } from './constants.ts';
 import { HTTPInjectionKey } from './constants.ts';
 
 export class HTTPModule implements IModule {
     readonly name = 'http';
 
-    readonly dependencies: string[] = ['config'];
+    readonly dependencies: string[] = ['config', 'database'];
 
     private instance: HTTPServer | undefined;
 
@@ -39,14 +47,44 @@ export class HTTPModule implements IModule {
 
         const app = new App();
 
+        const isTestEnvironment = config.env === EnvironmentName.TEST;
+
         app.get('/', defineCoreHandler(() => ({ timestamp: Date.now() })));
+
+        const controllers = createControllers(container);
+
+        const authupResult = container.tryResolve(AuthupClientInjectionKey);
+        const redisResult = container.tryResolve(RedisClientInjectionKey);
 
         mountMiddlewares(app, {
             basic: true,
             cors: true,
-            prometheus: true,
-            rateLimit: true,
+            prometheus: !isTestEnvironment,
+            rateLimit: !isTestEnvironment,
+            authorization: {
+                authupClient: authupResult.success ?
+                    authupResult.data :
+                    undefined,
+                redisClient: redisResult.success ?
+                    redisResult.data :
+                    undefined,
+                dryRun: isTestEnvironment,
+                tokenVerifier: createAuthupTokenVerifier({
+                    baseURL: config.authupURL,
+                    creator: createAuthupClientTokenCreator({
+                        baseURL: config.authupURL,
+                        clientId: config.clientId,
+                        clientSecret: config.clientSecret,
+                        realm: config.realm,
+                    }),
+                    redisClient: redisResult.success ? redisResult.data : undefined,
+                }),
+            },
+            swagger: false,
+            decorators: { controllers },
         });
+
+        mountErrorMiddleware(app, { logger });
 
         logger.debug('Starting http server...');
 

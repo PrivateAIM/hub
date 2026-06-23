@@ -29,21 +29,32 @@ export type MessageMetadata = {
     analysisId?: string
 } & Record<string, any>;
 
-/** A durable message as stored by the broker and returned on pull. */
-export type StoredMessage = {
-    id: string,
-    sender: MessageParty,
-    recipient: MessageParty,
-    /**
-     * Monotonic per-recipient ordering cursor. Serialized as a string to stay
-     * safe for bigint-sized values across JSON.
-     */
-    sequence: string,
-    data?: MessageData,
-    metadata?: MessageMetadata | null,
-    created_at: string,
-    expires_at?: string | null
-};
+/**
+ * A durable message as stored by the broker and returned on pull — the domain
+ * model implemented by the persistence entity (`MessageEntity implements Message`).
+ * Identity is flat (`sender_type`/`sender_id`, `recipient_type`/`recipient_id`)
+ * to match the storage row. Ordering uses `created_at` (the universal entity
+ * field); delivery is delete-on-ack, so `id` is the ack key and the recipient's
+ * dedup key across at-least-once redelivery.
+ */
+export interface Message {
+    id: string;
+
+    sender_type: `${MessagePartyKind}`;
+
+    sender_id: string;
+
+    recipient_type: `${MessagePartyKind}`;
+
+    recipient_id: string;
+
+    /** opaque payload (base64 E2E ciphertext for analysis messaging) */
+    data: MessageData;
+
+    metadata: MessageMetadata | null;
+
+    created_at: Date;
+}
 
 /**
  * Send request (`POST /messages`). The sender is the authenticated identity;
@@ -62,24 +73,21 @@ export type SendMessageRequest = {
 };
 
 /**
- * Long-poll pull response (hub → recipient). Node-level: returns every pending
- * message addressed to the calling identity. `cursor` is the value to ack and to
- * pass as `after` on the next pull.
+ * Long-poll pull response (hub → recipient). Node-level: the calling identity's
+ * pending (un-acked) messages, oldest first. The recipient processes them and
+ * acks their ids, which deletes them.
  */
 export type MessagePullResponse = {
-    messages: StoredMessage[],
-    cursor: string
+    messages: Message[]
 };
 
-/** Query params for the long-poll pull. */
+/** Query params for the pull. */
 export type MessagePullQuery = {
-    /** return messages with a sequence strictly greater than this cursor */
-    after?: string,
-    /** long-poll wait budget in milliseconds before returning empty */
-    wait?: number
+    /** maximum number of messages to return */
+    limit?: number
 };
 
-/** Ack request — deletes everything up to and including `cursor` for the caller. */
+/** Ack request — deletes the named messages for the caller (delete-on-ack). */
 export type MessageAckRequest = {
-    cursor: string
+    ids: string[]
 };

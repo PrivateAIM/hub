@@ -10,6 +10,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { PACKAGE_PATH } from '../constants.ts';
 import {
+    defineCLIMigrationCommand,
     defineCLIStartCommand,
 } from './commands/index.ts';
 
@@ -26,6 +27,9 @@ export async function createCLIEntryPointCommand() {
             version: pkg.version,
             description: pkg.description,
         },
-        subCommands: { start: defineCLIStartCommand() },
+        subCommands: {
+            start: defineCLIStartCommand(),
+            migration: defineCLIMigrationCommand(),
+        },
     });
 }
