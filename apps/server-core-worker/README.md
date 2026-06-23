@@ -1,8 +1,31 @@
-# @privateaim/server-core-worker 🏭
+<p align="center">
+  <a href="https://github.com/PrivateAIM/hub" target="_blank" rel="noopener noreferrer">
+    <img src="https://raw.githubusercontent.com/PrivateAIM/hub/master/.github/assets/logo.svg" alt="FLAME Hub" height="100">
+  </a>
+</p>
 
-[![npm version][npm-src]][npm-href]
+<h1 align="center">@privateaim/server-core-worker 🏭</h1>
 
-Background worker service for FLAME Hub — builds and distributes Docker containers for federated analyses.
+<p align="center">
+  <b>The background worker of FLAME Hub.</b><br>
+  Builds &amp; distributes Docker containers for federated analyses.
+</p>
+
+<p align="center">
+  <a href="https://github.com/PrivateAIM/hub/actions/workflows/main.yml"><img src="https://github.com/PrivateAIM/hub/actions/workflows/main.yml/badge.svg" alt="CI"></a>
+  <img src="https://img.shields.io/badge/node-%E2%89%A522-3c873a?logo=node.js&logoColor=fff" alt="node >=22">
+  <a href="https://github.com/PrivateAIM/hub/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" alt="license"></a>
+</p>
+
+<p align="center">
+  <a href="https://docs.privateaim.net"><b>Documentation</b></a> &nbsp;·&nbsp;
+  <a href="https://github.com/PrivateAIM/hub">Monorepo</a> &nbsp;·&nbsp;
+  <a href="https://github.com/PrivateAIM/hub/blob/master/CONTRIBUTING.md">Contributing</a>
+</p>
+
+---
+
+Part of the **[FLAME Hub](https://github.com/PrivateAIM/hub)** monorepo — central services for the [PrivateAIM](https://privateaim.net) platform.
 
 ## Usage
 
@@ -28,7 +51,4 @@ docker run privateaim/hub core-worker
 
 Made with 💚
 
-Published under [Apache 2.0](../../LICENSE).
-
-[npm-src]: https://img.shields.io/npm/v/@privateaim/server-core-worker
-[npm-href]: https://npmjs.com/package/@privateaim/server-core-worker
+Published under [Apache 2.0](https://github.com/PrivateAIM/hub/blob/master/LICENSE).

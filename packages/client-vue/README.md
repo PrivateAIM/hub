@@ -1,8 +1,31 @@
-# @privateaim/client-vue 🎨
+<p align="center">
+  <a href="https://github.com/PrivateAIM/hub" target="_blank" rel="noopener noreferrer">
+    <img src="https://raw.githubusercontent.com/PrivateAIM/hub/master/.github/assets/logo.svg" alt="FLAME Hub" height="90">
+  </a>
+</p>
 
-[![npm version][npm-src]][npm-href]
+<h1 align="center">@privateaim/client-vue 🎨</h1>
 
-Reusable Vue 3 component library for building PrivateAIM client applications — forms, lists, and detail views for all domain entities.
+<p align="center">
+  <b>Vue 3 component library for FLAME Hub clients.</b><br>
+  Forms, lists &amp; detail views for every domain entity.
+</p>
+
+<p align="center">
+  <a href="https://www.npmjs.com/package/@privateaim/client-vue"><img src="https://img.shields.io/npm/v/@privateaim/client-vue?logo=npm&logoColor=fff&label=npm&color=cb3837" alt="npm version"></a>
+  <a href="https://www.npmjs.com/package/@privateaim/client-vue"><img src="https://img.shields.io/npm/dm/@privateaim/client-vue?color=cb3837&label=downloads" alt="npm downloads"></a>
+  <a href="https://github.com/PrivateAIM/hub/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" alt="license"></a>
+</p>
+
+<p align="center">
+  <a href="https://docs.privateaim.net"><b>Documentation</b></a> &nbsp;·&nbsp;
+  <a href="https://github.com/PrivateAIM/hub">Monorepo</a> &nbsp;·&nbsp;
+  <a href="https://github.com/PrivateAIM/hub/blob/master/CONTRIBUTING.md">Contributing</a>
+</p>
+
+---
+
+Part of the **[FLAME Hub](https://github.com/PrivateAIM/hub)** monorepo — central services for the [PrivateAIM](https://privateaim.net) platform. Built with [vuecs](https://github.com/tada5hi/vuecs).
 
 ## Installation
 
@@ -14,7 +37,4 @@ npm install @privateaim/client-vue
 
 Made with 💚
 
-Published under [Apache 2.0](../../LICENSE).
-
-[npm-src]: https://img.shields.io/npm/v/@privateaim/client-vue
-[npm-href]: https://npmjs.com/package/@privateaim/client-vue
+Published under [Apache 2.0](https://github.com/PrivateAIM/hub/blob/master/LICENSE).
