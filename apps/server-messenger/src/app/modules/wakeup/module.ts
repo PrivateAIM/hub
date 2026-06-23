@@ -63,9 +63,18 @@ export class WakeupModule implements IModule {
                 onPending,
                 logger,
             });
-            await redis.start();
-            this.wakeup = redis;
-            wakeup = redis;
+            try {
+                await redis.start();
+                this.wakeup = redis;
+                wakeup = redis;
+            } catch (error) {
+                // redis is configured but unreachable: don't abort setup over a best-effort
+                // optimization — close the half-started subscribe connection and degrade to
+                // the in-memory wakeup (pull/long-poll still deliver, just not cross-instance).
+                await redis.stop().catch(() => undefined);
+                wakeup = new MemoryMessageWakeup({ onPending });
+                logger?.warn(`Message wakeup redis start failed (${(error as Error).message}) — falling back to in-memory; cross-instance long-poll/socket wakeup disabled`);
+            }
         } else {
             wakeup = new MemoryMessageWakeup({ onPending });
             logger?.warn('Message wakeup running in-memory — cross-instance long-poll/socket wakeup disabled (no redis)');

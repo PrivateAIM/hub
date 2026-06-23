@@ -115,8 +115,10 @@ describe('core/entities/message/service', () => {
     it('should long-poll and return empty after the wait budget with no message', async () => {
         const service = new MessageService({ repository: new FakeMessageRepository() });
 
+        const start = Date.now();
         const result = await service.pull({ wait: 30 }, actorFor(randomUUID(), 'client'));
         expect(result.messages).toHaveLength(0);
+        expect(Date.now() - start).toBeGreaterThanOrEqual(20);
     });
 
     it('should still succeed when the wakeup fails (best-effort, already-durable send)', async () => {

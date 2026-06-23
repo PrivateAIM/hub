@@ -79,19 +79,41 @@ export class MessageService implements IMessageService {
         const recipient = this.requireIdentity(actor);
 
         const limit = this.resolveLimit(query.limit);
-        let messages = await this.repository.findManyForRecipient(recipient, limit);
-
         const waitMs = this.resolveWait(query.wait);
-        if (messages.length === 0 && waitMs > 0) {
-            // long-poll: park until a message is pending for this recipient, then re-query once.
-            // a notify racing the window between the query above and wait() registering is not
-            // lost — send commits before it notifies, so the re-query finds it (worst case: the
-            // client waits out the budget). `wait` is therefore a maximum, not a guaranteed hold.
-            await this.wakeup.wait(recipient, waitMs);
-            messages = await this.repository.findManyForRecipient(recipient, limit);
-        }
 
-        return { messages };
+        // Register the wakeup listener *before* the first query so a notify that commits
+        // during the query window is not lost (subscribe registers synchronously). The
+        // listener is always torn down in `finally`, so nothing lingers past this call.
+        let signal: () => void = () => {};
+        const pending = new Promise<void>((resolve) => { signal = resolve; });
+        const unsubscribe = this.wakeup.subscribe(recipient, () => signal());
+
+        try {
+            let messages = await this.repository.findManyForRecipient(recipient, limit);
+            if (messages.length === 0 && waitMs > 0) {
+                // long-poll: park until a message is pending for this recipient or the
+                // budget elapses, then re-query once.
+                let timer: ReturnType<typeof setTimeout> | undefined;
+                const timeout = new Promise<void>((resolve) => {
+                    timer = setTimeout(resolve, waitMs);
+                    if (typeof timer.unref === 'function') {
+                        timer.unref();
+                    }
+                });
+                try {
+                    await Promise.race([pending, timeout]);
+                } finally {
+                    if (timer) {
+                        clearTimeout(timer);
+                    }
+                }
+                messages = await this.repository.findManyForRecipient(recipient, limit);
+            }
+
+            return { messages };
+        } finally {
+            unsubscribe();
+        }
     }
 
     async ack(data: MessageAckRequest, actor: ActorContext): Promise<void> {
