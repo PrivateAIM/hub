@@ -4,6 +4,9 @@
     "version": "0.11.4",
     "module": "./dist/index.mjs",
     "types": "./dist/index.d.mts",
+    "files": [
+        "dist"
+    ],
     "exports": {
         "./package.json": "./package.json",
         ".": {

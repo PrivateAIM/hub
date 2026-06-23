@@ -13,6 +13,9 @@
     },
     "module": "./dist/index.mjs",
     "types": "./dist/index.d.mts",
+    "files": [
+        "dist"
+    ],
     "author": {
         "name": "Peter Placzek",
         "email": "contact@tada5hi.net",
