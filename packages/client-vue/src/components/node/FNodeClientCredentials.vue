@@ -6,6 +6,7 @@
   -->
 <script lang="ts">
 import type { Node } from '@privateaim/core-kit';
+import type { NodeClientCredentialsUpdate } from '@privateaim/core-http-kit';
 import { useClipboard } from '@vueuse/core';
 import {
     type PropType,
@@ -29,13 +30,12 @@ export default defineComponent({
         const clipboard = useClipboard();
 
         const clientId = ref<string | null>(null);
-        const secret = ref<string | null>(null);
+        const name = ref<string>('');
+        const displayName = ref<string>('');
+        const secret = ref<string>('');
         const revealed = ref(false);
         const busy = ref(false);
         const loaded = ref(false);
-        // Rotating invalidates the current secret, so it is gated behind an
-        // inline confirm rather than firing on a single click.
-        const confirming = ref(false);
 
         const load = async () => {
             if (busy.value) {
@@ -46,9 +46,10 @@ export default defineComponent({
             // current one is (re)loaded — important because the parent reuses
             // this component across node ids.
             revealed.value = false;
-            confirming.value = false;
             clientId.value = null;
-            secret.value = null;
+            name.value = '';
+            displayName.value = '';
+            secret.value = '';
 
             if (!props.entity.client_id) {
                 loaded.value = true;
@@ -59,7 +60,9 @@ export default defineComponent({
             try {
                 const credentials = await httpClient.node.getClientCredentials(props.entity.id);
                 clientId.value = credentials.id;
-                secret.value = credentials.secret;
+                name.value = credentials.name ?? '';
+                displayName.value = credentials.display_name ?? '';
+                secret.value = credentials.secret ?? '';
             } catch (e) {
                 emit('failed', e);
             } finally {
@@ -83,23 +86,27 @@ export default defineComponent({
             revealed.value = !revealed.value;
         };
 
-        const cancelRegenerate = () => {
-            confirming.value = false;
-        };
-
-        const regenerate = async () => {
-            confirming.value = false;
-
+        const submit = async () => {
             if (busy.value || !props.entity.client_id) {
                 return;
             }
 
+            // The form is the desired state: a non-empty name/display-name is
+            // written, an empty secret rotates to a freshly generated one.
+            const data: NodeClientCredentialsUpdate = {
+                secret: secret.value ? secret.value : undefined,
+                name: name.value ? name.value : undefined,
+                display_name: displayName.value ? displayName.value : null,
+            };
+
             busy.value = true;
             try {
-                const credentials = await httpClient.node.setClientCredentials(props.entity.id);
+                const credentials = await httpClient.node.setClientCredentials(props.entity.id, data);
                 clientId.value = credentials.id;
-                secret.value = credentials.secret;
-                // Reveal the freshly generated secret so the admin can copy it.
+                name.value = credentials.name ?? '';
+                displayName.value = credentials.display_name ?? '';
+                secret.value = credentials.secret ?? '';
+                // Reveal the freshly written secret so the admin can copy it.
                 revealed.value = true;
             } catch (e) {
                 emit('failed', e);
@@ -110,15 +117,15 @@ export default defineComponent({
 
         return {
             busy,
-            confirming,
             loaded,
             clientId,
+            name,
+            displayName,
             secret,
             revealed,
             copy,
             toggleReveal,
-            regenerate,
-            cancelRegenerate,
+            submit,
         };
     },
 });
@@ -148,9 +155,10 @@ export default defineComponent({
             />
             <span>Loading credentials…</span>
         </div>
-        <div
+        <form
             v-else
             class="flex flex-col gap-2"
+            @submit.prevent="submit"
         >
             <VCFormGroup :label-class="'w-full mb-1'">
                 <template #label>
@@ -178,6 +186,24 @@ export default defineComponent({
 
             <VCFormGroup :label-class="'w-full mb-1'">
                 <template #label>
+                    Name
+                </template>
+                <template #default>
+                    <VCFormInput v-model="name" />
+                </template>
+            </VCFormGroup>
+
+            <VCFormGroup :label-class="'w-full mb-1'">
+                <template #label>
+                    Display Name
+                </template>
+                <template #default>
+                    <VCFormInput v-model="displayName" />
+                </template>
+            </VCFormGroup>
+
+            <VCFormGroup :label-class="'w-full mb-1'">
+                <template #label>
                     <div class="flex flex-row">
                         <div>Secret</div>
                         <div class="ms-auto flex flex-row gap-1">
@@ -197,43 +223,27 @@ export default defineComponent({
                             >
                                 <VCIcon name="fa6-solid:copy" /> Copy
                             </button>
-                            <button
-                                v-if="!confirming"
-                                type="button"
-                                class="btn btn-xs btn-danger"
-                                :disabled="busy"
-                                @click.prevent="confirming = true"
-                            >
-                                <VCIcon name="fa6-solid:rotate" /> Regenerate
-                            </button>
-                            <template v-else>
-                                <button
-                                    type="button"
-                                    class="btn btn-xs btn-danger"
-                                    :disabled="busy"
-                                    @click.prevent="regenerate"
-                                >
-                                    Confirm
-                                </button>
-                                <button
-                                    type="button"
-                                    class="btn btn-xs btn-dark"
-                                    @click.prevent="cancelRegenerate"
-                                >
-                                    Cancel
-                                </button>
-                            </template>
                         </div>
                     </div>
                 </template>
                 <template #default>
                     <VCFormInput
-                        :model-value="secret"
+                        v-model="secret"
                         :type="revealed ? 'text' : 'password'"
-                        :readonly="true"
                     />
+                    <small class="text-secondary">Leave empty to generate a new secret.</small>
                 </template>
             </VCFormGroup>
-        </div>
+
+            <div class="flex flex-row">
+                <button
+                    type="submit"
+                    class="btn btn-primary btn-sm ms-auto"
+                    :disabled="busy"
+                >
+                    <VCIcon name="fa6-solid:floppy-disk" /> Update
+                </button>
+            </div>
+        </form>
     </div>
 </template>
