@@ -12,6 +12,7 @@ import {
     expect, 
     it,
 } from 'vitest';
+import { WakeupEventName } from '@privateaim/messenger-kit';
 import { createTestApplication } from '../../../app/factory.ts';
 import type { TestHTTPApplication } from '../../../app/http.ts';
 
@@ -60,5 +61,23 @@ describe('adapters/http/message', () => {
 
         const after = await client.message.pull();
         expect(after.messages).toHaveLength(0);
+    });
+
+    it('should open an SSE stream and emit a messagePending wakeup on connect', async () => {
+        const res = await fetch(`${app.baseURL}messages/stream`, { headers: { accept: 'text/event-stream' } });
+
+        expect(res.status).toBe(200);
+        expect(res.headers.get('content-type')).toContain('text/event-stream');
+
+        if (!res.body) {
+            throw new Error('expected an SSE response body');
+        }
+
+        const reader = res.body.getReader();
+        const { value } = await reader.read();
+        const text = new TextDecoder().decode(value);
+        await reader.cancel();
+
+        expect(text).toContain(WakeupEventName.MESSAGE_PENDING);
     });
 });

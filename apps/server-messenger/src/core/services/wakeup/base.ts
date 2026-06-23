@@ -17,6 +17,8 @@ import type { IMessageWakeup, MessageWakeupContext } from './types.ts';
 export abstract class AbstractMessageWakeup implements IMessageWakeup {
     private waiters = new Map<string, Set<() => void>>();
 
+    private listeners = new Map<string, Set<() => void>>();
+
     protected onPending: ((recipient: MessageParty) => void) | undefined;
 
     constructor(ctx: MessageWakeupContext = {}) {
@@ -57,12 +59,42 @@ export abstract class AbstractMessageWakeup implements IMessageWakeup {
         });
     }
 
-    /** Resolve locally-parked long-polls for `recipient` and fire the socket-emit hook. */
+    subscribe(recipient: MessageParty, listener: () => void): () => void {
+        const key = this.keyFor(recipient);
+        let set = this.listeners.get(key);
+        if (!set) {
+            set = new Set();
+            this.listeners.set(key, set);
+        }
+        set.add(listener);
+
+        return () => {
+            set.delete(listener);
+            if (set.size === 0) {
+                this.listeners.delete(key);
+            }
+        };
+    }
+
+    /** Resolve locally-parked long-polls + persistent listeners for `recipient`, then fire the socket-emit hook. */
     protected dispatch(recipient: MessageParty): void {
-        const set = this.waiters.get(this.keyFor(recipient));
-        if (set) {
-            for (const settle of [...set]) {
+        const key = this.keyFor(recipient);
+
+        const waiterSet = this.waiters.get(key);
+        if (waiterSet) {
+            for (const settle of [...waiterSet]) {
                 settle();
+            }
+        }
+
+        const listenerSet = this.listeners.get(key);
+        if (listenerSet) {
+            for (const listener of [...listenerSet]) {
+                try {
+                    listener();
+                } catch {
+                    // a failing listener (e.g. a closed SSE stream) must not break others
+                }
             }
         }
 

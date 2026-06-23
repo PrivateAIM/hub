@@ -53,4 +53,29 @@ describe('core/services/wakeup/memory', () => {
 
         expect(seen).toEqual([RECIPIENT.id]);
     });
+
+    it('should fire a subscribed listener on every notify until unsubscribed', async () => {
+        const wakeup = new MemoryMessageWakeup();
+
+        let count = 0;
+        const unsubscribe = wakeup.subscribe(RECIPIENT, () => { count += 1; });
+
+        await wakeup.notify(RECIPIENT);
+        await wakeup.notify(RECIPIENT);
+        expect(count).toBe(2);
+
+        unsubscribe();
+        await wakeup.notify(RECIPIENT);
+        expect(count).toBe(2);
+    });
+
+    it('should not fire a listener subscribed for a different recipient', async () => {
+        const wakeup = new MemoryMessageWakeup();
+
+        let fired = false;
+        wakeup.subscribe(RECIPIENT, () => { fired = true; });
+
+        await wakeup.notify({ type: 'user', id: randomUUID() });
+        expect(fired).toBe(false);
+    });
 });

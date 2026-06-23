@@ -16,6 +16,12 @@ export interface IMessageWakeup {
     notify(recipient: MessageParty): Promise<void>;
 
     wait(recipient: MessageParty, timeoutMs: number): Promise<void>;
+
+    /**
+     * Register a persistent listener fired on every wakeup for `recipient`
+     * (used by the SSE stream); returns an unsubscribe function.
+     */
+    subscribe(recipient: MessageParty, listener: () => void): () => void;
 }
 
 export type MessageWakeupContext = {

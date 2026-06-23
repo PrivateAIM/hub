@@ -18,6 +18,6 @@ export function createControllers(container: IContainer): Record<string, any>[] 
     const messageService = new MessageService({ repository: messageRepository, wakeup });
 
     return [
-        new MessageController({ service: messageService }),
+        new MessageController({ service: messageService, wakeup }),
     ];
 }

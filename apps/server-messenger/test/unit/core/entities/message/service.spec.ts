@@ -14,6 +14,7 @@ import {
 import type { ActorContext } from '@privateaim/server-kit';
 import { FakePermissionChecker } from '@privateaim/server-test-kit';
 import { MessageService } from '../../../../../src/core/entities/message/service.ts';
+import type { IMessageWakeup } from '../../../../../src/core/services/wakeup/index.ts';
 import { FakeMessageRepository } from './fake-repository.ts';
 
 function actorFor(id: string, type: 'user' | 'robot' | 'client' = 'client'): ActorContext {
@@ -116,5 +117,23 @@ describe('core/entities/message/service', () => {
 
         const result = await service.pull({ wait: 30 }, actorFor(randomUUID(), 'client'));
         expect(result.messages).toHaveLength(0);
+    });
+
+    it('should still succeed when the wakeup fails (best-effort, already-durable send)', async () => {
+        const repository = new FakeMessageRepository();
+        const failingWakeup: IMessageWakeup = {
+            notify: async () => { throw new Error('redis down'); },
+            wait: async () => {},
+            subscribe: () => () => {},
+        };
+        const service = new MessageService({ repository, wakeup: failingWakeup });
+
+        const messages = await service.send(
+            { recipients: [{ type: 'client', id: randomUUID() }], data: 'x' },
+            actorFor(randomUUID(), 'user'),
+        );
+
+        expect(messages).toHaveLength(1);
+        expect(repository.messages).toHaveLength(1);
     });
 });
