@@ -31,6 +31,18 @@ function realmManagerActor(realmId: string): ActorContext {
     } as unknown as ActorContext;
 }
 
+/**
+ * The node's own OAuth2 client — a client-type identity that holds no
+ * management permission.
+ */
+function nodeClientActor(clientId: string): ActorContext {
+    return {
+        realm: { name: 'node-realm' },
+        identity: { type: 'client', id: clientId },
+        permissionChecker: { preCheck: async () => { throw new Error('forbidden'); } },
+    } as unknown as ActorContext;
+}
+
 const NODE_ID = randomUUID();
 
 function buildService(opts: { node?: Partial<Node>; secret?: string | null }) {
@@ -57,7 +69,12 @@ describe('NodeClientCredentialService', () => {
 
         const credentials = await service.getCredentials(NODE_ID, createAllowAllActor());
 
-        expect(credentials).toEqual({ id: 'node-client-1', secret: 'the-secret' });
+        expect(credentials).toEqual({
+            id: 'node-client-1',
+            name: 'the-name',
+            display_name: null,
+            secret: 'the-secret',
+        });
         expect(reader.calls).toEqual(['node-client-1']);
     });
 
@@ -66,6 +83,24 @@ describe('NodeClientCredentialService', () => {
 
         const credentials = await service.getCredentials(NODE_ID, realmManagerActor('realm-b'));
         expect(credentials.secret).toBe('the-secret');
+    });
+
+    it('should return credentials for the node\'s own client without any permission', async () => {
+        const { service, reader } = buildService({ node: baseNode() });
+
+        const credentials = await service.getCredentials(NODE_ID, nodeClientActor('node-client-1'));
+
+        expect(credentials.secret).toBe('the-secret');
+        expect(reader.calls).toEqual(['node-client-1']);
+    });
+
+    it('should deny a foreign client', async () => {
+        const { service, reader } = buildService({ node: baseNode() });
+
+        await expect(
+            service.getCredentials(NODE_ID, nodeClientActor('some-other-client')),
+        ).rejects.toThrow(PermissionDeniedError);
+        expect(reader.calls).toHaveLength(0);
     });
 
     it('should deny a manager from a different realm', async () => {
@@ -116,25 +151,58 @@ describe('NodeClientCredentialService', () => {
         it('should rotate (no secret) for a manager', async () => {
             const { service, reader } = buildService({ node: baseNode() });
 
-            const credentials = await service.setCredentials(NODE_ID, undefined, createAllowAllActor());
+            const credentials = await service.setCredentials(NODE_ID, {}, createAllowAllActor());
 
-            expect(reader.writes).toEqual([{ clientId: 'node-client-1', secret: undefined }]);
+            expect(reader.writes).toEqual([{ clientId: 'node-client-1', data: {} }]);
             expect(credentials.secret).toBe('generated-secret');
         });
 
         it('should set a provided secret for a manager', async () => {
             const { service, reader } = buildService({ node: baseNode() });
 
-            await service.setCredentials(NODE_ID, 'my-secret', createAllowAllActor());
+            await service.setCredentials(NODE_ID, { secret: 'my-secret' }, createAllowAllActor());
 
-            expect(reader.writes).toEqual([{ clientId: 'node-client-1', secret: 'my-secret' }]);
+            expect(reader.writes).toEqual([{ clientId: 'node-client-1', data: { secret: 'my-secret' } }]);
+        });
+
+        it('should update the client name and display name', async () => {
+            const { service, reader } = buildService({ node: baseNode() });
+
+            await service.setCredentials(
+                NODE_ID,
+                { name: 'new-name', display_name: 'New Name' },
+                createAllowAllActor(),
+            );
+
+            expect(reader.writes).toEqual([{
+                clientId: 'node-client-1',
+                data: { name: 'new-name', display_name: 'New Name' },
+            }]);
+        });
+
+        it('should let the node\'s own client rotate its credentials without any permission', async () => {
+            const { service, reader } = buildService({ node: baseNode() });
+
+            const credentials = await service.setCredentials(NODE_ID, {}, nodeClientActor('node-client-1'));
+
+            expect(reader.writes).toEqual([{ clientId: 'node-client-1', data: {} }]);
+            expect(credentials.secret).toBe('generated-secret');
+        });
+
+        it('should deny a foreign client', async () => {
+            const { service, reader } = buildService({ node: baseNode() });
+
+            await expect(
+                service.setCredentials(NODE_ID, {}, nodeClientActor('some-other-client')),
+            ).rejects.toThrow(PermissionDeniedError);
+            expect(reader.writes).toHaveLength(0);
         });
 
         it('should deny without permission', async () => {
             const { service, reader } = buildService({ node: baseNode() });
 
             await expect(
-                service.setCredentials(NODE_ID, undefined, createDenyAllActor()),
+                service.setCredentials(NODE_ID, {}, createDenyAllActor()),
             ).rejects.toThrow();
             expect(reader.writes).toHaveLength(0);
         });
@@ -143,7 +211,7 @@ describe('NodeClientCredentialService', () => {
             const { service, reader } = buildService({ node: baseNode({ realm_id: 'realm-b' }) });
 
             await expect(
-                service.setCredentials(NODE_ID, undefined, realmManagerActor('realm-a')),
+                service.setCredentials(NODE_ID, {}, realmManagerActor('realm-a')),
             ).rejects.toThrow(PermissionDeniedError);
             expect(reader.writes).toHaveLength(0);
         });
@@ -152,7 +220,7 @@ describe('NodeClientCredentialService', () => {
             const { service } = buildService({ node: baseNode({ client_id: null }) });
 
             await expect(
-                service.setCredentials(NODE_ID, undefined, createAllowAllActor()),
+                service.setCredentials(NODE_ID, {}, createAllowAllActor()),
             ).rejects.toThrow(BadRequestError);
         });
     });

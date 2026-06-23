@@ -41,10 +41,12 @@ import { AnalysisClientPermissionController } from '../../../adapters/http/contr
 import { AnalysisClientPermissionService } from '../database/analysis-client-permission.ts';
 import { AnalysisClientCredentialController } from '../../../adapters/http/controllers/entities/analysis-client-credential/module.ts';
 import { NodeClientCredentialController } from '../../../adapters/http/controllers/entities/node-client-credential/module.ts';
+import { NodeRegistryCredentialController } from '../../../adapters/http/controllers/entities/node-registry-credential/module.ts';
 import {
     AnalysisClientCredentialService,
     NodeClientCredentialService,
 } from '../../../core/services/client-credential/index.ts';
+import { NodeRegistryCredentialService } from '../../../core/services/registry-credential/index.ts';
 import { AuthupClientCredentialStore } from '../database/authup-client-credential-store.ts';
 import { ServiceController } from '../../../adapters/http/controllers/workflows/service/index.ts';
 import { DatabaseInjectionKey } from '../database/constants.ts';
@@ -126,10 +128,16 @@ export function createControllers(container: IContainer): Record<string, any>[] 
         skipAnalysisApproval: config.skipAnalysisApproval,
     });
     const analysisNodeEventService = new AnalysisNodeEventService({ repository: analysisNodeEventRepository });
+    const nodeRegistryCredentialService = new NodeRegistryCredentialService({
+        repository: nodeRepository,
+        registryRepository,
+        registryProjectRepository,
+    });
 
     // Create controller instances
     const controllers: Record<string, any>[] = [
         new NodeController({ service: nodeService }),
+        new NodeRegistryCredentialController({ service: nodeRegistryCredentialService }),
         new RegistryController({ service: registryService }),
         new MasterImageController({ service: masterImageService }),
         new MasterImageGroupController({ service: masterImageGroupService }),

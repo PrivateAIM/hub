@@ -6,6 +6,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
+import { REALM_MASTER_NAME } from '@authup/core-kit';
 import type { Analysis, AnalysisNode, Node } from '@privateaim/core-kit';
 import { AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
@@ -50,7 +51,24 @@ function nodeClientActor(clientId: string): ActorContext {
 }
 
 function userActor(): ActorContext {
-    return { realm: { name: 'some-realm' }, identity: { type: 'user', id: randomUUID() } } as unknown as ActorContext;
+    return {
+        realm: { name: 'some-realm' },
+        identity: { type: 'user', id: randomUUID() },
+        // A plain user without ANALYSIS_UPDATE.
+        permissionChecker: { preCheck: async () => { throw new Error('forbidden'); } },
+    } as unknown as ActorContext;
+}
+
+/**
+ * A master-realm member who does NOT hold ANALYSIS_UPDATE — used to prove that
+ * realm membership alone never grants access.
+ */
+function masterRealmWithoutPermissionActor(): ActorContext {
+    return {
+        realm: { name: REALM_MASTER_NAME },
+        identity: { type: 'user', id: randomUUID() },
+        permissionChecker: { preCheck: async () => { throw new Error('forbidden'); } },
+    } as unknown as ActorContext;
 }
 
 const ANALYSIS_ID = randomUUID();
@@ -82,13 +100,29 @@ function baseAnalysis(overrides: Partial<Analysis> = {}): Partial<Analysis> {
 }
 
 describe('AnalysisClientCredentialService', () => {
-    it('should return credentials for a master-realm member', async () => {
+    it('should return credentials for a permitted manager', async () => {
         const { service, reader } = buildService({ analysis: baseAnalysis() });
 
         const credentials = await service.getCredentials(ANALYSIS_ID, createAllowAllActor());
 
-        expect(credentials).toEqual({ id: 'analysis-client-1', secret: 'the-secret' });
+        expect(credentials).toEqual({
+            id: 'analysis-client-1',
+            name: 'the-name',
+            display_name: null,
+            secret: 'the-secret',
+        });
         expect(reader.calls).toEqual(['analysis-client-1']);
+    });
+
+    it('should deny a master-realm member that lacks the permission', async () => {
+        // Realm membership is not a permission: without ANALYSIS_UPDATE, even a
+        // master-realm member must be denied.
+        const { service, reader } = buildService({ analysis: baseAnalysis() });
+
+        await expect(
+            service.getCredentials(ANALYSIS_ID, masterRealmWithoutPermissionActor()),
+        ).rejects.toThrow(PermissionDeniedError);
+        expect(reader.calls).toHaveLength(0);
     });
 
     it('should return credentials for the client of an approved, assigned node', async () => {
@@ -170,7 +204,7 @@ describe('AnalysisClientCredentialService', () => {
 
             const credentials = await service.setCredentials(ANALYSIS_ID, undefined, createAllowAllActor());
 
-            expect(reader.writes).toEqual([{ clientId: 'analysis-client-1', secret: undefined }]);
+            expect(reader.writes).toEqual([{ clientId: 'analysis-client-1', data: { secret: undefined } }]);
             expect(credentials.secret).toBe('generated-secret');
         });
 

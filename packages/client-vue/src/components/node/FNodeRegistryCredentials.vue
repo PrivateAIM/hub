@@ -6,7 +6,6 @@
   -->
 <script lang="ts">
 import type { Node } from '@privateaim/core-kit';
-import type { NodeClientCredentialsUpdate } from '@privateaim/core-http-kit';
 import { useClipboard } from '@vueuse/core';
 import {
     type PropType,
@@ -29,10 +28,10 @@ export default defineComponent({
         const httpClient = injectCoreHTTPClient();
         const clipboard = useClipboard();
 
-        const clientId = ref<string | null>(null);
-        const name = ref<string>('');
-        const displayName = ref<string>('');
-        const secret = ref<string>('');
+        const host = ref<string | null>(null);
+        const externalName = ref<string | null>(null);
+        const accountName = ref<string | null>(null);
+        const accountSecret = ref<string | null>(null);
         const revealed = ref(false);
         const busy = ref(false);
         const loaded = ref(false);
@@ -46,23 +45,23 @@ export default defineComponent({
             // current one is (re)loaded — important because the parent reuses
             // this component across node ids.
             revealed.value = false;
-            clientId.value = null;
-            name.value = '';
-            displayName.value = '';
-            secret.value = '';
+            host.value = null;
+            externalName.value = null;
+            accountName.value = null;
+            accountSecret.value = null;
 
-            if (!props.entity.client_id) {
+            if (!props.entity.registry_project_id) {
                 loaded.value = true;
                 return;
             }
 
             busy.value = true;
             try {
-                const credentials = await httpClient.node.getClientCredentials(props.entity.id);
-                clientId.value = credentials.id;
-                name.value = credentials.name ?? '';
-                displayName.value = credentials.display_name ?? '';
-                secret.value = credentials.secret ?? '';
+                const credentials = await httpClient.node.getRegistryCredentials(props.entity.id);
+                host.value = credentials.host;
+                externalName.value = credentials.external_name;
+                accountName.value = credentials.account_name;
+                accountSecret.value = credentials.account_secret;
             } catch (e) {
                 emit('failed', e);
             } finally {
@@ -86,64 +85,34 @@ export default defineComponent({
             revealed.value = !revealed.value;
         };
 
-        const submit = async () => {
-            if (busy.value || !props.entity.client_id) {
-                return;
-            }
-
-            // The form is the desired state: a non-empty name/display-name is
-            // written, an empty secret rotates to a freshly generated one.
-            const data: NodeClientCredentialsUpdate = {
-                secret: secret.value ? secret.value : undefined,
-                name: name.value ? name.value : undefined,
-                display_name: displayName.value ? displayName.value : null,
-            };
-
-            busy.value = true;
-            try {
-                const credentials = await httpClient.node.setClientCredentials(props.entity.id, data);
-                clientId.value = credentials.id;
-                name.value = credentials.name ?? '';
-                displayName.value = credentials.display_name ?? '';
-                secret.value = credentials.secret ?? '';
-                // Reveal the freshly written secret so the admin can copy it.
-                revealed.value = true;
-            } catch (e) {
-                emit('failed', e);
-            } finally {
-                busy.value = false;
-            }
-        };
-
         return {
             busy,
             loaded,
-            clientId,
-            name,
-            displayName,
-            secret,
+            host,
+            externalName,
+            accountName,
+            accountSecret,
             revealed,
             copy,
             toggleReveal,
-            submit,
         };
     },
 });
 </script>
 <template>
     <div>
-        <h6>Client Credentials</h6>
+        <h6>Registry Credentials</h6>
 
         <p>
-            These credentials authenticate the node's dedicated client against the Hub.
-            Keep the secret confidential.
+            These credentials let the node authenticate against the docker registry of its
+            registry project (robot account). Keep the secret confidential.
         </p>
 
         <div
-            v-if="!entity.client_id"
+            v-if="!entity.registry_project_id"
             class="alert alert-sm alert-warning"
         >
-            The node has not been assigned to a client yet.
+            The node has no registry project provisioned yet.
         </div>
         <div
             v-else-if="busy || !loaded"
@@ -155,21 +124,20 @@ export default defineComponent({
             />
             <span>Loading credentials…</span>
         </div>
-        <form
+        <div
             v-else
             class="flex flex-col gap-2"
-            @submit.prevent="submit"
         >
             <VCFormGroup :label-class="'w-full mb-1'">
                 <template #label>
                     <div class="flex flex-row">
-                        <div>Client ID</div>
+                        <div>Host</div>
                         <div class="ms-auto">
                             <button
                                 type="button"
                                 class="btn btn-xs btn-dark"
-                                :disabled="!clientId"
-                                @click.prevent="copy(clientId)"
+                                :disabled="!host"
+                                @click.prevent="copy(host)"
                             >
                                 <VCIcon name="fa6-solid:copy" /> Copy
                             </button>
@@ -178,7 +146,7 @@ export default defineComponent({
                 </template>
                 <template #default>
                     <VCFormInput
-                        :model-value="clientId"
+                        :model-value="host"
                         :readonly="true"
                     />
                 </template>
@@ -186,19 +154,49 @@ export default defineComponent({
 
             <VCFormGroup :label-class="'w-full mb-1'">
                 <template #label>
-                    Name
+                    <div class="flex flex-row">
+                        <div>Project</div>
+                        <div class="ms-auto">
+                            <button
+                                type="button"
+                                class="btn btn-xs btn-dark"
+                                :disabled="!externalName"
+                                @click.prevent="copy(externalName)"
+                            >
+                                <VCIcon name="fa6-solid:copy" /> Copy
+                            </button>
+                        </div>
+                    </div>
                 </template>
                 <template #default>
-                    <VCFormInput v-model="name" />
+                    <VCFormInput
+                        :model-value="externalName"
+                        :readonly="true"
+                    />
                 </template>
             </VCFormGroup>
 
             <VCFormGroup :label-class="'w-full mb-1'">
                 <template #label>
-                    Display Name
+                    <div class="flex flex-row">
+                        <div>Account Name</div>
+                        <div class="ms-auto">
+                            <button
+                                type="button"
+                                class="btn btn-xs btn-dark"
+                                :disabled="!accountName"
+                                @click.prevent="copy(accountName)"
+                            >
+                                <VCIcon name="fa6-solid:copy" /> Copy
+                            </button>
+                        </div>
+                    </div>
                 </template>
                 <template #default>
-                    <VCFormInput v-model="displayName" />
+                    <VCFormInput
+                        :model-value="accountName"
+                        :readonly="true"
+                    />
                 </template>
             </VCFormGroup>
 
@@ -218,8 +216,8 @@ export default defineComponent({
                             <button
                                 type="button"
                                 class="btn btn-xs btn-dark"
-                                :disabled="!secret"
-                                @click.prevent="copy(secret)"
+                                :disabled="!accountSecret"
+                                @click.prevent="copy(accountSecret)"
                             >
                                 <VCIcon name="fa6-solid:copy" /> Copy
                             </button>
@@ -228,22 +226,12 @@ export default defineComponent({
                 </template>
                 <template #default>
                     <VCFormInput
-                        v-model="secret"
+                        :model-value="accountSecret"
                         :type="revealed ? 'text' : 'password'"
+                        :readonly="true"
                     />
-                    <small class="text-secondary">Leave empty to generate a new secret.</small>
                 </template>
             </VCFormGroup>
-
-            <div class="flex flex-row">
-                <button
-                    type="submit"
-                    class="btn btn-primary btn-sm ms-auto"
-                    :disabled="busy"
-                >
-                    <VCIcon name="fa6-solid:floppy-disk" /> Update
-                </button>
-            </div>
-        </form>
+        </div>
     </div>
 </template>

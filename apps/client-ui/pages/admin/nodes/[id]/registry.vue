@@ -7,11 +7,11 @@
 <script lang="ts">
 import type { Node } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
-import { FNodeRegistryProject } from '@privateaim/client-vue';
+import { FNodeRegistryCredentials, FNodeRegistryProject } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
 
 export default defineNuxtComponent({
-    components: { FNodeRegistryProject },
+    components: { FNodeRegistryCredentials, FNodeRegistryProject },
     props: {
         entity: {
             type: Object as PropType<Node>,
@@ -36,11 +36,22 @@ export default defineNuxtComponent({
 });
 </script>
 <template>
-    <FNodeRegistryProject
+    <div
         v-if="entity"
-        :entity="entity"
-        :realm-id="entity.realm_id"
-        @updated="handleUpdated"
-        @failed="handleFailed"
-    />
+        class="flex flex-col gap-4"
+    >
+        <FNodeRegistryCredentials
+            :entity="entity"
+            @failed="handleFailed"
+        />
+
+        <hr class="my-0">
+
+        <FNodeRegistryProject
+            :entity="entity"
+            :realm-id="entity.realm_id"
+            @updated="handleUpdated"
+            @failed="handleFailed"
+        />
+    </div>
 </template>

@@ -99,33 +99,36 @@ export class AnalysisClientCredentialService extends AbstractEntityService imple
             throw new BadRequestError('The analysis has no client provisioned yet.');
         }
 
-        return this.credentialStore.writeByClientId(analysis.client_id, secret);
+        return this.credentialStore.writeByClientId(analysis.client_id, { secret });
     }
 
     /**
-     * Fail-closed: a master-realm member (admin/ops) may always read; otherwise
-     * the actor must be the client of a node that is assigned to this analysis
-     * with an APPROVED analysis-node link. Everything else is denied.
+     * Fail-closed: the client of a node that is assigned to this analysis with
+     * an APPROVED analysis-node link may always read (the referenced identity);
+     * any other caller must actually hold {@link PermissionName.ANALYSIS_UPDATE}.
+     * Being a master-realm member is, by itself, not sufficient: membership is
+     * not a permission.
      */
     protected async isAuthorized(analysis: Analysis, actor: ActorContext): Promise<boolean> {
-        if (this.isActorMasterRealmMember(actor)) {
+        if (actor.identity && actor.identity.type === 'client') {
+            const node = await this.nodeRepository.findOneBy({ client_id: actor.identity.id });
+            if (node) {
+                const analysisNode = await this.analysisNodeRepository.findOneBy({
+                    analysis_id: analysis.id,
+                    node_id: node.id,
+                });
+
+                if (analysisNode && analysisNode.approval_status === AnalysisNodeApprovalStatus.APPROVED) {
+                    return true;
+                }
+            }
+        }
+
+        try {
+            await actor.permissionChecker.preCheck({ name: PermissionName.ANALYSIS_UPDATE });
             return true;
-        }
-
-        if (!actor.identity || actor.identity.type !== 'client') {
+        } catch {
             return false;
         }
-
-        const node = await this.nodeRepository.findOneBy({ client_id: actor.identity.id });
-        if (!node) {
-            return false;
-        }
-
-        const analysisNode = await this.analysisNodeRepository.findOneBy({
-            analysis_id: analysis.id,
-            node_id: node.id,
-        });
-
-        return !!analysisNode && analysisNode.approval_status === AnalysisNodeApprovalStatus.APPROVED;
     }
 }

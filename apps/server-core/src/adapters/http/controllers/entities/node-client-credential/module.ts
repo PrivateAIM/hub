@@ -18,6 +18,7 @@ import type { IAppEvent } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import type {
     ClientCredentials,
+    ClientCredentialsUpdate,
     INodeClientCredentialService,
 } from '../../../../../core/services/client-credential/index.ts';
 import { buildActorContext } from '../../../request/index.ts';
@@ -47,10 +48,10 @@ export class NodeClientCredentialController {
     @DPost('/:id/client/credentials', [ForceLoggedInMiddleware])
     async setCredentials(
         @DPath('id') id: string,
-        @DBody() data: { secret?: string },
+        @DBody() data: ClientCredentialsUpdate,
         @DContext() event: IAppEvent,
     ): Promise<ClientCredentials> {
         const actor = buildActorContext(event);
-        return this.service.setCredentials(id, data?.secret, actor);
+        return this.service.setCredentials(id, data ?? {}, actor);
     }
 }

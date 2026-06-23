@@ -25,9 +25,10 @@ import {
     createNonMasterRealmActor,
 } from '../../helpers/index.ts';
 import { FakeRegistryManager } from '../node/fake-registry-manager.ts';
+import { FakeRegistryProjectRepository } from './fake-repository.ts';
 
 function createFakeRegistryProjectRepository() {
-    const repo = new FakeEntityRepository<RegistryProject>();
+    const repo = new FakeRegistryProjectRepository();
 
     const originalValidateJoinColumns = repo.validateJoinColumns.bind(repo);
     repo.validateJoinColumns = async (data: Partial<RegistryProject>) => {
