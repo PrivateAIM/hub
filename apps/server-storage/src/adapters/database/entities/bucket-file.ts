@@ -49,10 +49,10 @@ export class BucketFileEntity implements BucketFile {
     // ------------------------------------------------------------------
 
     @CreateDateColumn()
-    created_at: Date;
+    created_at: string;
 
     @UpdateDateColumn()
-    updated_at: Date;
+    updated_at: string;
 
     // ------------------------------------------------------------------
 

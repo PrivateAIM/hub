@@ -61,9 +61,9 @@ export class MessageEntity implements Message {
     metadata!: MessageMetadata | null;
 
     @CreateDateColumn()
-    created_at!: Date;
+    created_at!: string;
 
     /** absolute expiry timestamp; the TTL sweep deletes rows past it */
     @Column({ type: Date })
-    expires_at!: Date;
+    expires_at!: string;
 }

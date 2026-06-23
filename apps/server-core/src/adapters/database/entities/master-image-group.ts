@@ -33,8 +33,8 @@ export class MasterImageGroupEntity implements MasterImageGroup {
     // ------------------------------------------------------------------
 
     @CreateDateColumn()
-    created_at: Date;
+    created_at: string;
 
     @UpdateDateColumn()
-    updated_at: Date;
+    updated_at: string;
 }

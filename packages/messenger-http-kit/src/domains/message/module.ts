@@ -6,7 +6,6 @@
  */
 
 import type {
-    Message,
     MessageAckRequest,
     MessagePullQuery,
     MessagePullResponse,
@@ -31,11 +30,6 @@ function buildPullQuery(query?: MessagePullQuery): string {
     return serialized.length > 0 ? `?${serialized}` : '';
 }
 
-function rehydrate(message: Message): Message {
-    // JSON transports created_at as a string; restore the Date contract
-    return { ...message, created_at: new Date(message.created_at) };
-}
-
 export class MessageAPI extends BaseAPI {
     /**
      * Send a message to one or more recipients. The sender is the authenticated
@@ -54,7 +48,7 @@ export class MessageAPI extends BaseAPI {
      */
     async pull(query?: MessagePullQuery): Promise<MessagePullResponse> {
         const { data } = await this.client.get(`messages${buildPullQuery(query)}`);
-        return { messages: (data.messages ?? []).map(rehydrate) };
+        return { messages: data.messages ?? [] };
     }
 
     /**

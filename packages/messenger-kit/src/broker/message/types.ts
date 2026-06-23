@@ -53,7 +53,8 @@ export interface Message {
 
     metadata: MessageMetadata | null;
 
-    created_at: Date;
+    /** ISO-8601 timestamp; serialized form crossing every transport (HTTP/AMQP/socket) */
+    created_at: string;
 }
 
 /**

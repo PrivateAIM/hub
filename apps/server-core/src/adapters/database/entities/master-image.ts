@@ -96,8 +96,8 @@ export class MasterImageEntity implements MasterImage {
     // ------------------------------------------------------------------
 
     @CreateDateColumn()
-    created_at: Date;
+    created_at: string;
 
     @UpdateDateColumn()
-    updated_at: Date;
+    updated_at: string;
 }
