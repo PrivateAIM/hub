@@ -31,6 +31,18 @@ function realmManagerActor(realmId: string): ActorContext {
     } as unknown as ActorContext;
 }
 
+/**
+ * The node's own OAuth2 client — a client-type identity that holds no
+ * management permission.
+ */
+function nodeClientActor(clientId: string): ActorContext {
+    return {
+        realm: { name: 'node-realm' },
+        identity: { type: 'client', id: clientId },
+        permissionChecker: { preCheck: async () => { throw new Error('forbidden'); } },
+    } as unknown as ActorContext;
+}
+
 const NODE_ID = randomUUID();
 
 function buildService(opts: { node?: Partial<Node>; secret?: string | null }) {
@@ -66,6 +78,24 @@ describe('NodeClientCredentialService', () => {
 
         const credentials = await service.getCredentials(NODE_ID, realmManagerActor('realm-b'));
         expect(credentials.secret).toBe('the-secret');
+    });
+
+    it('should return credentials for the node\'s own client without any permission', async () => {
+        const { service, reader } = buildService({ node: baseNode() });
+
+        const credentials = await service.getCredentials(NODE_ID, nodeClientActor('node-client-1'));
+
+        expect(credentials.secret).toBe('the-secret');
+        expect(reader.calls).toEqual(['node-client-1']);
+    });
+
+    it('should deny a foreign client', async () => {
+        const { service, reader } = buildService({ node: baseNode() });
+
+        await expect(
+            service.getCredentials(NODE_ID, nodeClientActor('some-other-client')),
+        ).rejects.toThrow(PermissionDeniedError);
+        expect(reader.calls).toHaveLength(0);
     });
 
     it('should deny a manager from a different realm', async () => {
@@ -128,6 +158,24 @@ describe('NodeClientCredentialService', () => {
             await service.setCredentials(NODE_ID, 'my-secret', createAllowAllActor());
 
             expect(reader.writes).toEqual([{ clientId: 'node-client-1', secret: 'my-secret' }]);
+        });
+
+        it('should let the node\'s own client rotate its credentials without any permission', async () => {
+            const { service, reader } = buildService({ node: baseNode() });
+
+            const credentials = await service.setCredentials(NODE_ID, undefined, nodeClientActor('node-client-1'));
+
+            expect(reader.writes).toEqual([{ clientId: 'node-client-1', secret: undefined }]);
+            expect(credentials.secret).toBe('generated-secret');
+        });
+
+        it('should deny a foreign client', async () => {
+            const { service, reader } = buildService({ node: baseNode() });
+
+            await expect(
+                service.setCredentials(NODE_ID, undefined, nodeClientActor('some-other-client')),
+            ).rejects.toThrow(PermissionDeniedError);
+            expect(reader.writes).toHaveLength(0);
         });
 
         it('should deny without permission', async () => {
