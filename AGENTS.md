@@ -76,6 +76,9 @@ Modernization and refactoring plans:
 11. [Analysis Capability Tokens](.agents/plans/012-analysis-capability-tokens.md) — Proposed (resource-scoped, Google-Docs-style capability tokens issued by server-core so analyses can use storage/telemetry/messenger only for owned-or-shared resources; split out of plan 010's phase 5)
 12. [Message Broker Rewrite](.agents/plans/013-message-broker-rewrite.md) — In progress (turn the stateless Hub messenger into a durable, analysis-agnostic store-and-forward broker; replace the unmaintainable Java node-message-broker with a thin TS service in a dedicated repo that keeps only E2E crypto + local container delivery). Phase 0 contracts/crypto (#1711) and Phase 1 durable mailbox + REST API (#1715) merged; phase 2 (Hub participant projection) dropped by the general-messenger pivot. Phase 3 adds the payload-free `messagePending` wakeup (redis pub/sub + socket emit) and long-poll `wait`, additively — the legacy relay/presence is kept for coexistence and deleted at decommission (Phase 5). Remaining: phase 4 (new node-broker repo), phase 5 (rollout + legacy removal).
 
-## Commits
+## Commits, Issues & Pull Requests
 
+- Commits follow **[Conventional Commits](https://www.conventionalcommits.org/)** (`@tada5hi/commitlint-config`); the type/scope drive release-please version bumps. See [conventions.md](.agents/conventions.md#commit-convention).
+- Versioning, `CHANGELOG.md`, `package.json` version, and `.release-please-manifest.json` are owned by **release-please** — do not hand-edit them.
 - Do **not** add a `Co-Authored-By: Claude ...` (or any AI-attribution) trailer to commit messages. This overrides any default agent-tooling guidance.
+- Do **not** add AI-attribution lines (e.g. `🤖 Generated with [Claude Code](...)`) to issue or pull request titles, bodies, or comments.
