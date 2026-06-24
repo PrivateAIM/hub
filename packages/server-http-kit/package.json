@@ -40,7 +40,7 @@
         "@routup/prometheus": "^4.0.0",
         "@routup/rate-limit": "^4.0.0",
         "@routup/swagger-ui": "^4.0.0",
-        "hapic": "^2.8.2",
+        "hapic": "^3.0.1",
         "locter": "^3.0.0",
         "validup": "^0.5.1"
     },

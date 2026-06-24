@@ -30,14 +30,14 @@
         "@authup/kit": "^1.0.0-beta.48",
         "@authup/core-kit": "^1.0.0-beta.48",
         "@privateaim/kit": "^0.11.5",
-        "hapic": "^2.8.2",
+        "hapic": "^3.0.1",
         "rapiq": "^0.9.0"
     },
     "peerDependencies": {
         "@authup/kit": "^1.0.0-beta.48",
         "@authup/core-kit": "^1.0.0-beta.48",
         "@privateaim/kit": "^0.11.5",
-        "hapic": "^2.8.2",
+        "hapic": "^3.0.1",
         "rapiq": "^0.9.0"
     },
     "scripts": {
