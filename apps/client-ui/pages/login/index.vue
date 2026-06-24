@@ -183,4 +183,12 @@ export default defineNuxtComponent({
     background: color-mix(in srgb, var(--vc-color-bg, #070b16) 82%, transparent);
     backdrop-filter: blur(8px);
 }
+
+/* The tile's hover drop-shadow extends past the tile and gets clipped to a hard
+   rectangle by the scrollable picker (.login-realms overflow), reading as a
+   square box over the rounded tiles. Drop the shadow — the kit's gradient
+   border + lift are cue enough. */
+.login-realms :deep(.a-realm-grid-item:hover) {
+    box-shadow: none;
+}
 </style>
