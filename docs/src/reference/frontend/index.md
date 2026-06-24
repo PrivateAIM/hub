@@ -23,9 +23,24 @@ docker run -e ... privateaim/hub ui
 |----------|---------|-------------|
 | `NUXT_PUBLIC_CORE_URL` | — | Core API base URL |
 | `NUXT_PUBLIC_AUTHUP_URL` | — | Authup URL |
+| `NUXT_PUBLIC_AUTHUP_CLIENT_ID` | `web` | OAuth2 client used for the login (authorization-code) flow |
 | `NUXT_PUBLIC_STORAGE_URL` | — | Storage service URL |
 | `NUXT_PUBLIC_TELEMETRY_URL` | — | Telemetry service URL |
 | `NUXT_PUBLIC_MESSENGER_URL` | — | Messenger service URL |
+
+## Authentication
+
+The UI signs in with the **OAuth2 Authorization Code flow (PKCE)** — credentials are
+never entered in the Hub UI itself. On the login page the user picks a **realm**
+(`ARealmGrid`, which reveals a search field once more than 8 realms exist); the app
+then builds an authorize URL and redirects to Authup's `/authorize` endpoint, where the
+login form and configured identity providers live. Authup redirects back to
+`<ui-origin>/login/callback`, and the `@authup/client-web-nuxt` routing interceptor
+exchanges the authorization code for a session.
+
+The OAuth client is configurable via `NUXT_PUBLIC_AUTHUP_CLIENT_ID` (default: `web`, the
+Authup built-in web client). The configured client **must** register
+`<ui-origin>/login/callback` as an allowed redirect URI.
 
 ## Key Features
 
