@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.11.5](https://github.com/PrivateAIM/hub/compare/v0.11.4...v0.11.5) (2026-06-24)
+
+
+### Features
+
+* message broker rewrite (push wakeup + long-poll) ([#1717](https://github.com/PrivateAIM/hub/issues/1717)) ([ca809d9](https://github.com/PrivateAIM/hub/commit/ca809d91ba77851271dcff640ca2abf34a49bee0))
+* **server-core:** node registry credentials read route ([#1718](https://github.com/PrivateAIM/hub/issues/1718)) ([eee921f](https://github.com/PrivateAIM/hub/commit/eee921f1e139f46ed17a524ebe68f57f7df7c90a))
+
 ## [0.11.4](https://github.com/PrivateAIM/hub/compare/v0.11.3...v0.11.4) (2026-06-22)
 
 ## [0.11.3](https://github.com/PrivateAIM/hub/compare/v0.11.2...v0.11.3) (2026-06-16)

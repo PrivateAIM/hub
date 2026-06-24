@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.11.5](https://github.com/PrivateAIM/hub/compare/v0.11.4...v0.11.5) (2026-06-24)
+
+
+### Features
+
+* **server-core:** node registry credentials read route ([#1718](https://github.com/PrivateAIM/hub/issues/1718)) ([eee921f](https://github.com/PrivateAIM/hub/commit/eee921f1e139f46ed17a524ebe68f57f7df7c90a))
+
+
+### Bug Fixes
+
+* ship dist directory in published kit packages ([#1719](https://github.com/PrivateAIM/hub/issues/1719)) ([576dcc4](https://github.com/PrivateAIM/hub/commit/576dcc481e9677c0b33fbbf148ce2b1d1c3300c1))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core-kit bumped from ^0.11.4 to ^0.11.5
+    * @privateaim/telemetry-kit bumped from ^0.11.4 to ^0.11.5
+  * peerDependencies
+    * @privateaim/core-kit bumped from ^0.11.4 to ^0.11.5
+    * @privateaim/telemetry-kit bumped from ^0.11.4 to ^0.11.5
+
 ## [0.11.4](https://github.com/PrivateAIM/hub/compare/v0.11.3...v0.11.4) (2026-06-22)
 
 

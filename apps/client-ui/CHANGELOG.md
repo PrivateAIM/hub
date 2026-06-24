@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.11.5](https://github.com/PrivateAIM/hub/compare/v0.11.4...v0.11.5) (2026-06-24)
+
+
+### Features
+
+* **server-core:** node registry credentials read route ([#1718](https://github.com/PrivateAIM/hub/issues/1718)) ([eee921f](https://github.com/PrivateAIM/hub/commit/eee921f1e139f46ed17a524ebe68f57f7df7c90a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/client-vue bumped from ^0.11.4 to ^0.11.5
+    * @privateaim/client-vue-theme bumped from ^0.11.4 to ^0.11.5
+    * @privateaim/core-kit bumped from ^0.11.4 to ^0.11.5
+    * @privateaim/kit bumped from ^0.11.4 to ^0.11.5
+    * @privateaim/storage-kit bumped from ^0.11.4 to ^0.11.5
+    * @privateaim/telemetry-kit bumped from ^0.11.4 to ^0.11.5
+
 ## [0.11.4](https://github.com/PrivateAIM/hub/compare/v0.11.3...v0.11.4) (2026-06-22)
 
 
