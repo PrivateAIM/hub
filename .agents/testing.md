@@ -236,7 +236,7 @@ When a dependency has no fake yet, create one in the entity's test directory (`t
 
 The `test` CI job runs the integration suite against MySQL, Postgres, and SQLite, but the schema is built via `dataSource.synchronize()` (see `apps/<service>/test/app/database.ts`) — migration files in `apps/<service>/src/adapters/database/migrations/{mysql,postgres}/` are **not** exercised by that suite.
 
-A separate `tests-migrations` CI job runs the migration CLI end-to-end for `server-core`, `server-storage`, and `server-telemetry` against a fresh MySQL and Postgres container:
+A separate `tests-migrations` CI job runs the migration CLI end-to-end for `server-core`, `server-storage`, `server-telemetry`, and `server-messenger` against a fresh MySQL and Postgres container:
 
 1. `migration run` — applies all migrations forward
 2. `migration revert` × N — undoes every migration in reverse order (verifies every `down()` works)
@@ -251,7 +251,7 @@ Locally, run the same `run → revert × N → run` flow against a running compo
 ```bash
 # MySQL
 docker compose up -d mysql
-cd apps/server-core               # or: server-storage / server-telemetry
+cd apps/server-core               # or: server-storage / server-telemetry / server-messenger
 
 export DB_TYPE=mysql DB_HOST=127.0.0.1 DB_PORT=3306 \
        DB_USERNAME=root DB_PASSWORD=start123 DB_DATABASE=app

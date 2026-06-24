@@ -144,7 +144,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                service: [ server-core, server-storage, server-telemetry ]
+                service: [ server-core, server-storage, server-telemetry, server-messenger ]
                 db: [ mysql, postgres ]
                 include:
                     -   db: mysql
