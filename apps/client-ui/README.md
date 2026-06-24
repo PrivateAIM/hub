@@ -43,6 +43,7 @@ docker run privateaim/hub ui
 |----------|---------|-------------|
 | `NUXT_PUBLIC_CORE_URL` | — | Core API base URL |
 | `NUXT_PUBLIC_AUTHUP_URL` | — | Authup URL |
+| `NUXT_PUBLIC_AUTHUP_CLIENT_ID` | `web` | OAuth2 client used for the login (authorization-code) flow |
 | `NUXT_PUBLIC_STORAGE_URL` | — | Storage service URL |
 | `NUXT_PUBLIC_TELEMETRY_URL` | — | Telemetry service URL |
 | `NUXT_PUBLIC_MESSENGER_URL` | — | Messenger service URL |
