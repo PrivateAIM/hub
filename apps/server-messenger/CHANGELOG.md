@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.11.5](https://github.com/PrivateAIM/hub/compare/v0.11.4...v0.11.5) (2026-06-24)
+
+
+### Features
+
+* message broker rewrite — Phase 1 (durable mailbox + REST API) ([#1715](https://github.com/PrivateAIM/hub/issues/1715)) ([dda1103](https://github.com/PrivateAIM/hub/commit/dda1103e52734cd0a03b4b32940e4c8ae2484565))
+* message broker rewrite (push wakeup + long-poll) ([#1717](https://github.com/PrivateAIM/hub/issues/1717)) ([ca809d9](https://github.com/PrivateAIM/hub/commit/ca809d91ba77851271dcff640ca2abf34a49bee0))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.11.4 to ^0.11.5
+    * @privateaim/messenger-kit bumped from ^0.11.4 to ^0.11.5
+    * @privateaim/server-db-kit bumped from ^0.11.4 to ^0.11.5
+    * @privateaim/server-http-kit bumped from ^0.11.4 to ^0.11.5
+    * @privateaim/server-kit bumped from ^0.11.4 to ^0.11.5
+    * @privateaim/server-realtime-kit bumped from ^0.11.4 to ^0.11.5
+    * @privateaim/server-telemetry-kit bumped from ^0.11.4 to ^0.11.5
+    * @privateaim/telemetry-kit bumped from ^0.11.4 to ^0.11.5
+  * devDependencies
+    * @privateaim/messenger-http-kit bumped from ^0.11.4 to ^0.11.5
+    * @privateaim/server-test-kit bumped from ^0.11.4 to ^0.11.5
+
 ## [0.11.4](https://github.com/PrivateAIM/hub/compare/v0.11.3...v0.11.4) (2026-06-22)
 
 

@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.11.5](https://github.com/PrivateAIM/hub/compare/v0.11.4...v0.11.5) (2026-06-24)
+
+
+### Bug Fixes
+
+* ship dist directory in published kit packages ([#1719](https://github.com/PrivateAIM/hub/issues/1719)) ([576dcc4](https://github.com/PrivateAIM/hub/commit/576dcc481e9677c0b33fbbf148ce2b1d1c3300c1))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.11.4 to ^0.11.5
+    * @privateaim/server-kit bumped from ^0.11.4 to ^0.11.5
+    * @privateaim/telemetry-kit bumped from ^0.11.4 to ^0.11.5
+  * peerDependencies
+    * @privateaim/kit bumped from ^0.11.4 to ^0.11.5
+    * @privateaim/server-kit bumped from ^0.11.4 to ^0.11.5
+    * @privateaim/telemetry-kit bumped from ^0.11.4 to ^0.11.5
+
 ## [0.11.4](https://github.com/PrivateAIM/hub/compare/v0.11.3...v0.11.4) (2026-06-22)
 
 

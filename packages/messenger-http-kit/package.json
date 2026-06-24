@@ -1,7 +1,7 @@
 {
     "name": "@privateaim/messenger-http-kit",
     "type": "module",
-    "version": "0.11.4",
+    "version": "0.11.5",
     "license": "Apache-2.0",
     "description": "",
     "module": "./dist/index.mjs",
@@ -26,11 +26,11 @@
         "build-watch": "rimraf ./dist && tsc -p tsconfig.build.json --watch"
     },
     "devDependencies": {
-        "@privateaim/messenger-kit": "^0.11.4",
+        "@privateaim/messenger-kit": "^0.11.5",
         "hapic": "^2.8.2"
     },
     "peerDependencies": {
-        "@privateaim/messenger-kit": "^0.11.4",
+        "@privateaim/messenger-kit": "^0.11.5",
         "hapic": "^2.8.2"
     },
     "publishConfig": {
