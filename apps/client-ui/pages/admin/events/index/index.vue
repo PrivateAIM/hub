@@ -11,7 +11,7 @@ import { VCButton } from '@vuecs/button';
 import { VCIcon } from '@vuecs/icon';
 import { VCTimeago } from '@vuecs/timeago';
 import type { TableColumn } from '@vuecs/table';
-import type { Node } from '@privateaim/core-kit';
+import type { Event } from '@privateaim/telemetry-kit';
 import type { BuildInput } from 'rapiq';
 import { computed, defineComponent, resolveComponent } from 'vue';
 import {
@@ -46,7 +46,7 @@ export default defineComponent({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
         });
 
-        const columns: TableColumn[] = [
+        const columns: TableColumn<Event>[] = [
             {
                 key: 'name',
                 label: 'Name',
@@ -103,13 +103,13 @@ export default defineComponent({
         const canDrop = usePermissionCheck({ name: PermissionName.NODE_DELETE });
         const canView = computed(() => canEdit.value || canDrop.value);
 
-        const query = computed<BuildInput<Node>>(() => ({
+        const query = computed<BuildInput<Event>>(() => ({
             filters: { realm_id: [realmManagementId.value, null] },
             sort: { updated_at: 'DESC' },
             pagination: { limit: 50 },
         }));
 
-        const handleDeleted = async (item: Node) => {
+        const handleDeleted = async (item: Event) => {
             emit('deleted', item);
         };
 
@@ -153,7 +153,7 @@ export default defineComponent({
                 :columns="columns"
                 :busy="props.busy"
             >
-                <template #cell-scope="{ row }: { row: any }">
+                <template #cell-scope="{ row }">
                     <template v-if="row.scope">
                         {{ row.scope }}
                     </template>
@@ -161,16 +161,16 @@ export default defineComponent({
                         -
                     </template>
                 </template>
-                <template #cell-actor="{ row }: { row: any }">
+                <template #cell-actor="{ row }">
                     <FEventActor :entity="row" />
                 </template>
-                <template #cell-expiring="{ row }: { row: any }">
+                <template #cell-expiring="{ row }">
                     <FEventExpiring
                         :entity="row"
                         :direction="'row'"
                     />
                 </template>
-                <template #cell-options="{ row }: { row: any }">
+                <template #cell-options="{ row }">
                     <VCButton
                         v-if="canView"
                         :as="NuxtLink"
@@ -192,10 +192,10 @@ export default defineComponent({
                         @deleted="props.deleted"
                     />
                 </template>
-                <template #cell-created_at="{ row }: { row: any }">
+                <template #cell-created_at="{ row }">
                     <VCTimeago :datetime="row.created_at" />
                 </template>
-                <template #cell-updated_at="{ row }: { row: any }">
+                <template #cell-updated_at="{ row }">
                     <VCTimeago :datetime="row.updated_at" />
                 </template>
                 <VCTableLoading />

@@ -10,7 +10,9 @@ import { TranslatorTranslationActionKey, TranslatorTranslationNamespace } from '
 import { VCButton } from '@vuecs/button';
 import type { ButtonColor, ButtonSize, ButtonVariant } from '@vuecs/button';
 import { VCIcon } from '@vuecs/icon';
-import type { DomainType } from '@privateaim/core-kit';
+import type { DomainType as CoreDomainType } from '@privateaim/core-kit';
+import type { DomainType as StorageDomainType } from '@privateaim/storage-kit';
+import type { DomainType as TelemetryDomainType } from '@privateaim/telemetry-kit';
 import type {
     Component,
     PropType,
@@ -52,7 +54,9 @@ export default defineComponent({
             required: true,
         },
         entityType: {
-            type: String as PropType<`${DomainType}`>,
+            // Accept core / storage / telemetry domain types — the `service`
+            // prop selects which API client resolves it.
+            type: String as PropType<`${CoreDomainType}` | `${StorageDomainType}` | `${TelemetryDomainType}`>,
             required: true,
         },
 
