@@ -5,7 +5,9 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import { VCButton } from '@vuecs/button';
 import { VCCountdown } from '@vuecs/countdown';
+import { VCIcon } from '@vuecs/icon';
 import {
     computed,
     defineComponent,
@@ -13,7 +15,11 @@ import {
 } from 'vue';
 
 export default defineComponent({
-    components: { VCCountdown },
+    components: {
+        VCButton,
+        VCCountdown,
+        VCIcon,
+    },
     props: {
         busy: {
             type: Boolean,
@@ -91,23 +97,23 @@ export default defineComponent({
                 />paused
             </template>
         </small>
-        <button
-            type="button"
-            class="btn btn-xs"
-            :class="active ? 'btn-secondary' : 'btn-primary'"
+        <VCButton
+            size="xs"
+            :color="active ? 'neutral' : 'primary'"
+            :variant="active ? 'soft' : 'solid'"
             :title="active ? 'Pause auto-refresh' : 'Resume auto-refresh'"
             @click.prevent="toggle"
         >
             <VCIcon :name="active ? 'fa6-solid:pause' : 'fa6-solid:play'" />
-        </button>
-        <button
-            type="button"
-            class="btn btn-xs btn-primary"
+        </VCButton>
+        <VCButton
+            size="xs"
+            color="primary"
             :disabled="busy"
             title="Refresh now"
             @click.prevent="refresh"
         >
             <VCIcon name="fa6-solid:arrows-rotate" />
-        </button>
+        </VCButton>
     </div>
 </template>

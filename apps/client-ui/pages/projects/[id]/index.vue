@@ -14,6 +14,7 @@ import {
     FProjectNodes,
 } from '@privateaim/client-vue';
 import type { Project, ProjectNode } from '@privateaim/core-kit';
+import { VCIcon } from '@vuecs/icon';
 import type { BuildInput } from 'rapiq';
 import type { PropType } from 'vue';
 import { defineNuxtComponent } from '#app';
@@ -27,6 +28,7 @@ export default defineNuxtComponent({
         FMasterImage,
         FProjectNodeApprovalStatus,
         FProjectNodes,
+        VCIcon,
     },
     meta: {
         [LayoutKey.REQUIRED_LOGGED_IN]: true,

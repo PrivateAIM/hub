@@ -6,7 +6,9 @@
  */
 
 import type { VNodeArrayChildren } from 'vue';
-import { h, resolveComponent } from 'vue';
+import { h } from 'vue';
+import { VCButton } from '@vuecs/button';
+import { VCIcon } from '@vuecs/icon';
 
 type Context<T> = {
     add: () => Promise<void> | void,
@@ -17,16 +19,13 @@ type Context<T> = {
 export function renderEntityAssignAction<T>(
     ctx: Context<T>,
 ) {
-    const VCIcon = resolveComponent('VCIcon');
     let children: VNodeArrayChildren = [];
 
     if (!ctx.busy) {
         children = [
-            h('button', {
-                class: ['btn btn-xs', {
-                    'btn-success': !ctx.item,
-                    'btn-danger': ctx.item,
-                }],
+            h(VCButton, {
+                size: 'xs',
+                color: ctx.item ? 'error' : 'success',
                 onClick($event: any) {
                     $event.preventDefault();
 
@@ -36,7 +35,7 @@ export function renderEntityAssignAction<T>(
 
                     return ctx.add.call(null);
                 },
-            }, [
+            }, () => [
                 h(VCIcon, { name: ctx.item ? 'fa6-solid:minus' : 'fa6-solid:plus' }),
             ]),
         ];

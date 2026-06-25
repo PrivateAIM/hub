@@ -4,6 +4,7 @@ import type { Client } from '@authup/core-kit';
 import { PermissionName } from '@authup/core-kit';
 import { FDisplayName } from '@privateaim/client-vue';
 import { extendObject } from '@authup/kit';
+import { VCIcon } from '@vuecs/icon';
 import type { NavigationItem } from '@vuecs/navigation';
 import { type Ref, defineComponent } from 'vue';
 import { computed, ref } from 'vue';
@@ -17,7 +18,7 @@ import {
 import { LayoutKey } from '../../../config/layout';
 
 export default defineComponent({
-    components: { FDisplayName },
+    components: { FDisplayName, VCIcon },
     async setup() {
         definePageMeta({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,

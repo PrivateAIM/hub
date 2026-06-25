@@ -6,12 +6,14 @@
   -->
 <script lang="ts">
 import type { Project } from '@privateaim/core-kit';
+import { VCIcon } from '@vuecs/icon';
 import type { NavigationItem } from '@vuecs/navigation';
 import { defineNuxtComponent, navigateTo } from '#app';
 import { definePageMeta, useToast } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
 
 export default defineNuxtComponent({
+    components: { VCIcon },
     setup() {
         definePageMeta({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,

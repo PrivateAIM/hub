@@ -7,6 +7,7 @@
 
 import type { PropType } from 'vue';
 import { defineComponent, h } from 'vue';
+import { VCAlert } from '@vuecs/elements';
 import type { Node, RegistryProject } from '@privateaim/core-kit';
 import RegistryProjectDetails from '../registry-project/FRegistryProject';
 
@@ -21,9 +22,14 @@ export default defineComponent({
     setup(props, { emit }) {
         if (!props.entity.registry_id) {
             return () => h(
-                'div',
-                { class: 'alert alert-sm alert-warning' },
-                [
+                VCAlert,
+                {
+                    color: 'warning', 
+                    variant: 'soft', 
+                    size: 'sm', 
+                    class: 'mb-3',
+                },
+                () => [
                     'The node has not been assigned to a registry yet.',
                 ],
             );
@@ -31,9 +37,14 @@ export default defineComponent({
 
         if (!props.entity.registry_project_id) {
             return () => h(
-                'div',
-                { class: 'alert alert-sm alert-warning' },
-                [
+                VCAlert,
+                {
+                    color: 'warning', 
+                    variant: 'soft', 
+                    size: 'sm', 
+                    class: 'mb-3',
+                },
+                () => [
                     'No related registry-resource exists at the moment.',
                     ' ',
                     'To create one, execute the update operation after a registry is selected.',

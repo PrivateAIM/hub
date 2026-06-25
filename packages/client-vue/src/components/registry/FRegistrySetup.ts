@@ -7,11 +7,12 @@
 
 import type { PropType } from 'vue';
 import {
-    defineComponent, 
-    h, 
-    ref, 
-    resolveComponent,
+    defineComponent,
+    h,
+    ref,
 } from 'vue';
+import { VCButton } from '@vuecs/button';
+import { VCIcon } from '@vuecs/icon';
 import type { Registry } from '@privateaim/core-kit';
 import { RegistryAPICommand } from '@privateaim/core-kit';
 import { injectCoreHTTPClient } from '../../core';
@@ -49,8 +50,6 @@ export default defineComponent({
             busy.value = false;
         };
 
-        const VCIcon = resolveComponent('VCIcon');
-
         return () => h('div', [
             h('h6', [
                 h(VCIcon, { name: 'fa6-solid:info', class: 'me-1' }),
@@ -61,16 +60,16 @@ export default defineComponent({
                 'the corresponding webhooks run the setup routine.',
             ]),
 
-            h('button', {
-                type: 'button',
+            h(VCButton, {
+                color: 'neutral',
+                size: 'xs',
                 disabled: busy.value,
-                class: 'btn btn-xs btn-dark',
                 onClick(event: any) {
                     event.preventDefault();
 
                     return setup();
                 },
-            }, [
+            }, () => [
                 'Execute',
             ]),
         ]);

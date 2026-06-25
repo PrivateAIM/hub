@@ -5,13 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
-    buildFormGroup,
-    buildFormSelect,
-    buildFormSubmitWithTranslations,
-    buildFormTextarea,
-    createFormSubmitTranslations,
-} from '@authup/client-web-kit';
 import { useFieldValidation } from '@ilingo/validup-vue';
 import { useValidup } from '@validup/vue';
 import type { Severity } from '@validup/vue';
@@ -22,6 +15,12 @@ import {
     ProjectNodeValidator,
 } from '@privateaim/core-kit';
 import { ValidatorGroup } from '@privateaim/kit';
+import { VCAlert } from '@vuecs/elements';
+import {
+    VCFormGroup,
+    VCFormSelect,
+    VCFormTextarea,
+} from '@vuecs/forms';
 import {
     defineComponent,
     h,
@@ -32,8 +31,9 @@ import {
 import type { PropType } from 'vue';
 import { useUpdatedAt } from '../../composables';
 import {
-    createEntityManager, 
-    initFormAttributesFromSource, 
+    buildFormSubmit,
+    createEntityManager,
+    initFormAttributesFromSource,
     wrapFnWithBusyState,
 } from '../../core';
 
@@ -93,54 +93,66 @@ const FProjectInForm = defineComponent({
             await manager.createOrUpdate(form);
         });
 
-        const translationsSubmit = createFormSubmitTranslations();
 
         return () => {
-            const comment = buildFormGroup({
-                validationMessages: commentValidation.messages,
-                validationSeverity: toSeverity(commentValidation.severity),
-                label: true,
-                labelContent: 'Comment',
-                content: buildFormTextarea({
-                    value: form.comment,
-                    onChange(input) {
-                        form.comment = input;
-                    },
-                    props: {
+            const comment = h(
+                VCFormGroup,
+                {
+                    label: true,
+                    labelContent: 'Comment',
+                    validationMessages: commentValidation.messages,
+                    validationSeverity: toSeverity(commentValidation.severity),
+                },
+                {
+                    default: () => h(VCFormTextarea, {
+                        modelValue: form.comment == null ? '' : String(form.comment),
+                        'onUpdate:modelValue': (input: string) => {
+                            form.comment = input;
+                        },
                         rows: 4,
                         placeholder: 'Write a comment why you want to approve or either reject the project...',
-                    },
-                }),
-            });
+                    }),
+                },
+            );
 
-            const status = buildFormGroup({
-                validationMessages: approvalStatusValidation.messages,
-                validationSeverity: toSeverity(approvalStatusValidation.severity),
-                label: true,
-                labelContent: 'Status',
-                content: buildFormSelect({
-                    value: form.approval_status,
-                    onChange(input) {
-                        form.approval_status = input;
-                    },
-                    options: options.map((option) => ({
-                        id: option,
-                        value: option,
-                    })),
-                }),
-            });
+            const status = h(
+                VCFormGroup,
+                {
+                    label: true,
+                    labelContent: 'Status',
+                    validationMessages: approvalStatusValidation.messages,
+                    validationSeverity: toSeverity(approvalStatusValidation.severity),
+                },
+                {
+                    default: () => h(VCFormSelect, {
+                        modelValue: form.approval_status,
+                        'onUpdate:modelValue': (input: unknown) => {
+                            form.approval_status = input as ProjectNodeApprovalStatus;
+                        },
+                        options: options.map((option) => ({
+                            value: option,
+                            label: typeof option === 'string' ? option : String(option),
+                        })),
+                    }),
+                },
+            );
 
-            const submitNode = buildFormSubmitWithTranslations({
+            const submitNode = buildFormSubmit({
                 submit,
                 busy: busy.value,
                 isEditing: !!manager.data.value,
                 invalid: $v.$invalid.value,
-            }, translationsSubmit);
+            });
 
             return h(
                 'div',
                 [
-                    h('div', { class: 'alert alert-sm alert-info' }, [
+                    h(VCAlert, {
+                        color: 'info', 
+                        variant: 'soft', 
+                        size: 'sm', 
+                        class: 'mb-3', 
+                    }, () => [
                         'You have to approve the project, so the project owner can target you as a node for the analysis.',
                     ]),
                     comment,

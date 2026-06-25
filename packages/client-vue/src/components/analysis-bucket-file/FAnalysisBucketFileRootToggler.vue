@@ -6,6 +6,8 @@
   -->
 <script lang="ts">
 import type { AnalysisBucketFile } from '@privateaim/core-kit';
+import { VCButton } from '@vuecs/button';
+import { VCIcon } from '@vuecs/icon';
 import type { PropType } from 'vue';
 import {
     computed,
@@ -15,6 +17,10 @@ import {
 } from 'vue';
 
 export default defineComponent({
+    components: {
+        VCButton,
+        VCIcon,
+    },
     props: {
         entity: {
             type: Object as PropType<AnalysisBucketFile>,
@@ -52,16 +58,12 @@ export default defineComponent({
 });
 </script>
 <template>
-    <button
-        type="button"
-        class="btn btn-xs"
+    <VCButton
+        size="xs"
         :disabled="readonly"
-        :class="{
-            'btn-success': !isRoot,
-            'btn-warning': isRoot
-        }"
+        :color="!isRoot ? 'success' : 'warning'"
         @click.prevent="toggle"
     >
         <VCIcon :name="!isRoot ? 'fa6-solid:check' : 'fa6-solid:xmark'" />
-    </button>
+    </VCButton>
 </template>

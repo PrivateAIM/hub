@@ -6,6 +6,8 @@
   -->
 
 <script lang="ts">
+import { VCButton } from '@vuecs/button';
+import { VCIcon } from '@vuecs/icon';
 import { VCTimeago } from '@vuecs/timeago';
 import type { TableColumn } from '@vuecs/table';
 import { REALM_MASTER_NAME, type Realm } from '@authup/core-kit';
@@ -21,7 +23,7 @@ import {
     storeToRefs,
     usePermissionCheck,
 } from '@authup/client-web-kit';
-import { computed } from 'vue';
+import { computed, resolveComponent } from 'vue';
 import { defineNuxtComponent } from '#imports';
 
 export default defineNuxtComponent({
@@ -32,6 +34,8 @@ export default defineNuxtComponent({
         ASearch,
         AEntityDelete,
         ARealms,
+        VCButton,
+        VCIcon,
         VCTimeago,
     },
     emits: ['deleted'],
@@ -51,7 +55,9 @@ export default defineNuxtComponent({
 
         const isMaster = computed(() => realm.value && realm.value.name === REALM_MASTER_NAME);
 
-        const columns: TableColumn[] = [
+        const NuxtLink = resolveComponent('NuxtLink');
+
+        const columns: TableColumn<Realm>[] = [
             {
                 key: 'name',
                 label: 'Name',
@@ -85,6 +91,7 @@ export default defineNuxtComponent({
             handleDeleted,
             realmManagementId,
             setRealmManagement: store.setRealmManagement,
+            NuxtLink,
         };
     },
 });
@@ -113,37 +120,43 @@ export default defineNuxtComponent({
                 :columns="columns"
                 :busy="props.busy"
             >
-                <template #cell-name="{ row }: { row: any }">
+                <template #cell-name="{ row }">
                     <FDisplayName
                         :name="row.name"
                         :display-name="row.display_name"
                     />
                 </template>
-                <template #cell-created_at="{ row }: { row: any }">
+                <template #cell-created_at="{ row }">
                     <VCTimeago :datetime="row.created_at" />
                 </template>
-                <template #cell-updated_at="{ row }: { row: any }">
+                <template #cell-updated_at="{ row }">
                     <VCTimeago :datetime="row.updated_at" />
                 </template>
-                <template #cell-options="{ row }: { row: any }">
+                <template #cell-options="{ row }">
                     <template v-if="isMaster">
-                        <button
+                        <VCButton
                             v-if="realmManagementId !== row.id"
-                            class="btn btn-xs btn-primary me-1"
+                            size="xs"
+                            color="primary"
+                            class="me-1"
                             @click.prevent="setRealmManagement(row)"
                         >
                             <VCIcon name="fa6-solid:check" />
-                        </button>
+                        </VCButton>
                     </template>
-                    <NuxtLink
+                    <VCButton
+                        :as="NuxtLink"
                         :to="'/admin/realms/'+ row.id"
-                        class="btn btn-xs btn-outline-primary me-1"
+                        size="xs"
+                        color="primary"
+                        variant="outline"
+                        class="me-1"
                         :disabled="!hasEditPermission"
                     >
                         <VCIcon name="fa6-solid:bars" />
-                    </NuxtLink>
+                    </VCButton>
                     <AEntityDelete
-                        class="btn btn-xs btn-outline-danger"
+                        size="xs"
                         :entity-id="row.id"
                         entity-type="realm"
                         :with-text="false"

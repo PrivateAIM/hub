@@ -9,11 +9,13 @@
 import type { Registry } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { NavigationItem } from '@vuecs/navigation';
+import { VCIcon } from '@vuecs/icon';
 import { definePageMeta, useToast } from '#imports';
 import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
 
 export default defineNuxtComponent({
+    components: { VCIcon },
     setup() {
         definePageMeta({
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,

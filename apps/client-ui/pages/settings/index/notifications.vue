@@ -16,8 +16,8 @@ export default {
 </script>
 <template>
     <div>
-        <div class="row">
-            <div class="col">
+        <div class="flex flex-wrap -mx-2">
+            <div class="flex-1 basis-0 px-2">
                 <div class="card card-panel">
                     <div class="card-body">
                         <h6 class="title">

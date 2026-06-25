@@ -16,6 +16,8 @@ import {
     FPagination,
 } from '@privateaim/client-vue';
 import type { Analysis, AnalysisBucketFile } from '@privateaim/core-kit';
+import { VCAlert } from '@vuecs/elements';
+import { VCIcon } from '@vuecs/icon';
 import type { PropType } from 'vue';
 import { defineComponent, ref, useTemplateRef } from 'vue';
 
@@ -29,6 +31,8 @@ export default defineComponent({
         FAnalysisImageCommand,
         FAnalysisImageCommandArguments,
         FPagination,
+        VCAlert,
+        VCIcon,
     },
     props: { entity: { type: Object as PropType<Analysis> } },
     emits: ['updated'],
@@ -86,21 +90,20 @@ export default defineComponent({
 <template>
     <div
         v-if="entity"
-        class="row"
+        class="flex flex-wrap -mx-2"
     >
-        <div class="col-12 col-md-6">
+        <div class="w-full px-2 md:w-6/12">
             <div class="flex flex-col gap-3">
                 <div class="card-grey card">
                     <div class="card-header">
                         <span class="title"><VCIcon name="fa6-solid:compact-disc" /> Base</span>
                     </div>
                     <div class="card-body">
-                        <div
-                            class="flex flex-row gap-2 items-center alert alert-sm"
-                            :class="{
-                                'alert-warning': entity.configuration_image_valid,
-                                'alert-danger': !entity.configuration_image_valid,
-                            }"
+                        <VCAlert
+                            variant="soft"
+                            size="sm"
+                            class="flex flex-row gap-2 items-center mb-3"
+                            :color="entity.configuration_image_valid ? 'warning' : 'error'"
                         >
                             <div>
                                 <VCIcon name="fa6-solid:info" />
@@ -109,7 +112,7 @@ export default defineComponent({
                                 Pick a Docker-based master image that provides the runtime environment for your analysis.<br>
                                 Your uploaded code will be embedded into this image before distribution.
                             </div>
-                        </div>
+                        </VCAlert>
                         <FAnalysisMasterImagePicker
                             :readonly="entity.configuration_locked"
                             :entity-id="entity.id"
@@ -132,19 +135,18 @@ export default defineComponent({
                 </div>
             </div>
         </div>
-        <div class="col-12 col-md-6">
+        <div class="w-full px-2 md:w-6/12">
             <div class="flex flex-col gap-3">
                 <div class="card-grey card">
                     <div class="card-header">
                         <span class="title"><VCIcon name="fa6-solid:file" /> Entrypoint</span>
                     </div>
                     <div class="card-body">
-                        <div
-                            class="flex flex-row gap-2 items-center alert alert-sm"
-                            :class="{
-                                'alert-warning': entity.configuration_entrypoint_valid,
-                                'alert-danger': !entity.configuration_entrypoint_valid,
-                            }"
+                        <VCAlert
+                            variant="soft"
+                            size="sm"
+                            class="flex flex-row gap-2 items-center mb-3"
+                            :color="entity.configuration_entrypoint_valid ? 'warning' : 'error'"
                         >
                             <div>
                                 <VCIcon name="fa6-solid:info" />
@@ -152,7 +154,7 @@ export default defineComponent({
                             <div>
                                 An entrypoint file must be selected.
                             </div>
-                        </div>
+                        </VCAlert>
 
                         <FAnalysisTypeBucket
                             :entity-id="entity.id"

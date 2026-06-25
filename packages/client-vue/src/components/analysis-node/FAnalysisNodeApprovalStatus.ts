@@ -7,7 +7,7 @@
 import type { PropType } from 'vue';
 import { computed, defineComponent, h } from 'vue';
 import { AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
-import { hasNormalizedSlot, normalizeSlot } from '../../core';
+import { hasNormalizedSlot, normalizeSlot, resolveTextColorClass } from '../../core';
 
 const FAnalysisNodeApprovalStatus = defineComponent({
     props: {
@@ -46,7 +46,7 @@ const FAnalysisNodeApprovalStatus = defineComponent({
             }, slots);
         }
 
-        return () => h('span', { class: `text-${classSuffix.value}` }, statusText.value);
+        return () => h('span', { class: resolveTextColorClass(classSuffix.value) }, statusText.value);
     },
 });
 

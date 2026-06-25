@@ -7,19 +7,20 @@
 
 import { useTranslation } from '@authup/client-web-kit';
 import { TranslatorTranslationActionKey, TranslatorTranslationNamespace } from '@authup/i18n';
+import { VCButton } from '@vuecs/button';
+import type { ButtonColor, ButtonSize, ButtonVariant } from '@vuecs/button';
+import { VCIcon } from '@vuecs/icon';
 import type { DomainType } from '@privateaim/core-kit';
 import type {
     Component,
     PropType,
     VNodeArrayChildren,
-    VNodeProps,
 } from 'vue';
 import {
-    defineComponent, 
-    getCurrentInstance, 
-    h, 
-    mergeProps, 
-    ref, 
+    defineComponent,
+    getCurrentInstance,
+    h,
+    ref,
     resolveDynamicComponent,
 } from 'vue';
 import type { DomainAPISlim } from '@privateaim/core-http-kit';
@@ -62,6 +63,26 @@ export default defineComponent({
         locale: {
             type: String,
             default: undefined,
+        },
+
+        // Button styling (BUTTON elementType). Baked into the rendered
+        // <VCButton> so call sites no longer pass the retired `.btn*`
+        // compat classes.
+        size: {
+            type: String as PropType<ButtonSize>,
+            default: 'xs' satisfies ButtonSize,
+        },
+        color: {
+            type: String as PropType<ButtonColor>,
+            default: 'error' satisfies ButtonColor,
+        },
+        variant: {
+            type: String as PropType<ButtonVariant>,
+            default: undefined,
+        },
+        disabled: {
+            type: Boolean,
+            default: false,
         },
     },
     emits: ['deleted', 'failed'],
@@ -119,27 +140,53 @@ export default defineComponent({
         });
 
         const render = () => {
-            let tag : Component | string = 'button';
-            const data : VNodeProps = {};
+            const onClick = ($event: any) => {
+                $event.preventDefault();
 
-            switch (props.elementType) {
-                case ElementType.LINK:
-                    tag = 'a';
-                    break;
-                case ElementType.DROP_DOWN_ITEM:
-                    if (
-                        instance &&
-                        typeof instance.appContext.app.component('VCDropdownMenuItem') !== 'undefined'
-                    ) {
-                        tag = resolveDynamicComponent('VCDropdownMenuItem') as Component;
-                    }
-                    break;
+                return submit.apply(null);
+            };
+
+            // Default (button) path: a self-styled <VCButton> so call sites
+            // no longer need the retired `.btn`/`.btn-*` compat classes. The
+            // icon rendered as a <VCIcon> child in the default slot.
+            if (props.elementType === ElementType.BUTTON) {
+                return h(
+                    VCButton,
+                    {
+                        color: props.color,
+                        variant: props.variant,
+                        size: props.size,
+                        disabled: busy.value || props.disabled,
+                        onClick,
+                    },
+                    () => [
+                        props.elementIcon ?
+                            h(VCIcon, {
+                                name: props.elementIcon,
+                                class: props.withText ? 'pe-1' : undefined,
+                            }) :
+                            null,
+                        props.withText ? translation.value : null,
+                    ],
+                );
+            }
+
+            // Link / dropdown-item paths keep the bare element — their call
+            // sites style them as nav/dropdown entries, not buttons.
+            let tag : Component | string = 'a';
+            if (props.elementType === ElementType.DROP_DOWN_ITEM) {
+                if (
+                    instance &&
+                    typeof instance.appContext.app.component('VCDropdownMenuItem') !== 'undefined'
+                ) {
+                    tag = resolveDynamicComponent('VCDropdownMenuItem') as Component;
+                }
             }
 
             let icon : VNodeArrayChildren = [];
             if (props.elementIcon) {
                 icon = [
-                    h(resolveDynamicComponent('VCIcon') as Component, {
+                    h(VCIcon, {
                         name: props.elementIcon,
                         class: props.withText ? 'pe-1' : undefined,
                     }),
@@ -155,14 +202,10 @@ export default defineComponent({
 
             return h(
                 tag as string,
-                mergeProps({
-                    disabled: busy.value,
-                    onClick($event: any) {
-                        $event.preventDefault();
-
-                        return submit.apply(null);
-                    },
-                }, data),
+                {
+                    disabled: busy.value || props.disabled,
+                    onClick,
+                },
                 [
                     icon,
                     text,

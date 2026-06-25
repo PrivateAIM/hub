@@ -7,11 +7,13 @@
 <script lang="ts">
 import { injectStore, storeToRefs, usePermissionCheck } from '@authup/client-web-kit';
 import { PermissionName } from '@privateaim/kit';
+import { VCButton } from '@vuecs/button';
+import { VCIcon } from '@vuecs/icon';
 import { VCTimeago } from '@vuecs/timeago';
 import type { TableColumn } from '@vuecs/table';
 import type { Node } from '@privateaim/core-kit';
 import type { BuildInput } from 'rapiq';
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, resolveComponent } from 'vue';
 import {
     FEntityDelete,
     FEventActor,
@@ -33,6 +35,8 @@ export default defineComponent({
         FTitle,
         FEntityDelete,
         FEvents,
+        VCButton,
+        VCIcon,
         VCTimeago,
     },
     emits: ['deleted'],
@@ -109,6 +113,8 @@ export default defineComponent({
             emit('deleted', item);
         };
 
+        const NuxtLink = resolveComponent('NuxtLink');
+
         return {
             columns,
             realmManagementId,
@@ -116,6 +122,7 @@ export default defineComponent({
             canDrop,
             query,
             handleDeleted,
+            NuxtLink,
         };
     },
 });
@@ -164,17 +171,21 @@ export default defineComponent({
                     />
                 </template>
                 <template #cell-options="{ row }: { row: any }">
-                    <nuxt-link
+                    <VCButton
                         v-if="canView"
-                        class="btn btn-xs btn-outline-primary"
+                        :as="NuxtLink"
+                        size="xs"
+                        color="primary"
+                        variant="outline"
                         :to="'/admin/events/'+row.id"
                     >
                         <VCIcon name="fa6-solid:share-from-square" />
-                    </nuxt-link>
+                    </VCButton>
                     <FEntityDelete
                         v-if="canDrop"
                         service="telemetry"
-                        class="btn btn-xs btn-outline-danger ms-1"
+                        size="xs"
+                        class="ms-1"
                         :entity-id="row.id"
                         :entity-type="'event'"
                         :with-text="false"

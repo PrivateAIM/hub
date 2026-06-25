@@ -8,15 +8,19 @@
 import type { PropType } from 'vue';
 import type { Analysis } from '@privateaim/core-kit';
 import {
-    FAnalysisLogs, 
+    FAnalysisLogs,
     FAnalysisSteps,
 } from '@privateaim/client-vue';
+import { VCAlert } from '@vuecs/elements';
+import { VCIcon } from '@vuecs/icon';
 import { defineNuxtComponent } from '#app';
 
 export default defineNuxtComponent({
     components: {
         FAnalysisSteps,
         FAnalysisLogs,
+        VCAlert,
+        VCIcon,
     },
     props: {
         entity: {
@@ -83,7 +87,12 @@ export default defineNuxtComponent({
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="flex flex-row gap-2 items-center alert alert-sm alert-danger mb-0">
+                        <VCAlert
+                            color="error"
+                            variant="soft"
+                            size="sm"
+                            class="flex flex-row gap-2 items-center mb-0"
+                        >
                             <div>
                                 <VCIcon name="fa6-solid:info" />
                             </div>
@@ -91,7 +100,7 @@ export default defineNuxtComponent({
                                 The analysis is not configured yet!<br>
                                 Therefore follow the Pipeline Steps on the right to be able to submit your analysis.
                             </div>
-                        </div>
+                        </VCAlert>
                     </div>
                 </div>
             </div>

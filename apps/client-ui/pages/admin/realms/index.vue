@@ -10,10 +10,12 @@ import type { Realm } from '@authup/core-kit';
 import { PermissionName } from '@authup/core-kit';
 import { definePageMeta, useToast } from '#imports';
 import { defineNuxtComponent } from '#app';
+import { VCIcon } from '@vuecs/icon';
 import type { NavigationItem } from '@vuecs/navigation';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 
 export default defineNuxtComponent({
+    components: { VCIcon },
     setup() {
         definePageMeta({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,

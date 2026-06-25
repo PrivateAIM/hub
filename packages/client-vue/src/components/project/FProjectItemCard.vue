@@ -9,6 +9,8 @@
 import { usePermissionCheck } from '@authup/client-web-kit';
 import type { Project } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
+import { VCButton } from '@vuecs/button';
+import { VCIcon } from '@vuecs/icon';
 import { VCLink } from '@vuecs/link';
 import { VCTimeago } from '@vuecs/timeago';
 import type { PropType, SlotsType } from 'vue';
@@ -23,6 +25,8 @@ export default defineComponent({
         FProjectCreator,
         FDisplayName,
         FEntityDelete,
+        VCButton,
+        VCIcon,
         VCLink,
         VCTimeago,
     },
@@ -59,6 +63,8 @@ export default defineComponent({
         };
 
         return {
+            VCLink,
+
             canDelete,
             handleDeleted,
         };
@@ -94,20 +100,23 @@ export default defineComponent({
                         name="itemActions"
                         :data="entity"
                     >
-                        <VCLink
+                        <VCButton
+                            :as="VCLink"
                             :to="'/projects/' + entity.id"
                             :disabled="busy"
-                            class="btn btn-xs btn-dark"
+                            size="xs"
+                            color="neutral"
                         >
                             <VCIcon name="fa6-solid:bars" />
-                        </VCLink>
+                        </VCButton>
                         <template v-if="canDelete">
                             <FEntityDelete
                                 :with-text="false"
                                 :entity-id="entity.id"
                                 :entity-type="'project'"
                                 :disabled="busy || entity.analyses > 0"
-                                class="btn btn-xs btn-danger ms-1"
+                                size="xs"
+                                class="ms-1"
                                 @deleted="handleDeleted"
                             />
                         </template>

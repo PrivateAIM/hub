@@ -6,6 +6,9 @@
   -->
 <script lang="ts">
 import type { Node } from '@privateaim/core-kit';
+import { VCButton } from '@vuecs/button';
+import { VCAlert } from '@vuecs/elements';
+import { VCIcon } from '@vuecs/icon';
 import { useClipboard } from '@vueuse/core';
 import {
     type PropType,
@@ -17,6 +20,11 @@ import {
 import { injectCoreHTTPClient } from '../../core';
 
 export default defineComponent({
+    components: {
+        VCAlert,
+        VCButton,
+        VCIcon,
+    },
     props: {
         entity: {
             type: Object as PropType<Node>,
@@ -108,12 +116,15 @@ export default defineComponent({
             registry project (robot account). Keep the secret confidential.
         </p>
 
-        <div
+        <VCAlert
             v-if="!entity.registry_project_id"
-            class="alert alert-sm alert-warning"
+            color="warning"
+            variant="soft"
+            size="sm"
+            class="mb-3"
         >
             The node has no registry project provisioned yet.
-        </div>
+        </VCAlert>
         <div
             v-else-if="busy || !loaded"
             class="flex flex-row items-center gap-2"
@@ -133,14 +144,14 @@ export default defineComponent({
                     <div class="flex flex-row">
                         <div>Host</div>
                         <div class="ms-auto">
-                            <button
-                                type="button"
-                                class="btn btn-xs btn-dark"
+                            <VCButton
+                                size="xs"
+                                color="neutral"
                                 :disabled="!host"
                                 @click.prevent="copy(host)"
                             >
                                 <VCIcon name="fa6-solid:copy" /> Copy
-                            </button>
+                            </VCButton>
                         </div>
                     </div>
                 </template>
@@ -157,14 +168,14 @@ export default defineComponent({
                     <div class="flex flex-row">
                         <div>Project</div>
                         <div class="ms-auto">
-                            <button
-                                type="button"
-                                class="btn btn-xs btn-dark"
+                            <VCButton
+                                size="xs"
+                                color="neutral"
                                 :disabled="!externalName"
                                 @click.prevent="copy(externalName)"
                             >
                                 <VCIcon name="fa6-solid:copy" /> Copy
-                            </button>
+                            </VCButton>
                         </div>
                     </div>
                 </template>
@@ -181,14 +192,14 @@ export default defineComponent({
                     <div class="flex flex-row">
                         <div>Account Name</div>
                         <div class="ms-auto">
-                            <button
-                                type="button"
-                                class="btn btn-xs btn-dark"
+                            <VCButton
+                                size="xs"
+                                color="neutral"
                                 :disabled="!accountName"
                                 @click.prevent="copy(accountName)"
                             >
                                 <VCIcon name="fa6-solid:copy" /> Copy
-                            </button>
+                            </VCButton>
                         </div>
                     </div>
                 </template>
@@ -205,22 +216,22 @@ export default defineComponent({
                     <div class="flex flex-row">
                         <div>Secret</div>
                         <div class="ms-auto flex flex-row gap-1">
-                            <button
-                                type="button"
-                                class="btn btn-xs btn-dark"
+                            <VCButton
+                                size="xs"
+                                color="neutral"
                                 @click.prevent="toggleReveal"
                             >
                                 <VCIcon :name="revealed ? 'fa6-solid:eye-slash' : 'fa6-solid:eye'" />
                                 {{ revealed ? 'Hide' : 'Reveal' }}
-                            </button>
-                            <button
-                                type="button"
-                                class="btn btn-xs btn-dark"
+                            </VCButton>
+                            <VCButton
+                                size="xs"
+                                color="neutral"
                                 :disabled="!accountSecret"
                                 @click.prevent="copy(accountSecret)"
                             >
                                 <VCIcon name="fa6-solid:copy" /> Copy
-                            </button>
+                            </VCButton>
                         </div>
                     </div>
                 </template>

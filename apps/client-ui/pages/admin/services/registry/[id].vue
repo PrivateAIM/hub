@@ -9,6 +9,7 @@ import { DomainType } from '@privateaim/core-kit';
 import { createEntityManager } from '@privateaim/client-vue';
 import { PermissionName } from '@privateaim/kit';
 import type { NavigationItem } from '@vuecs/navigation';
+import { VCIcon } from '@vuecs/icon';
 import { computed, defineComponent } from 'vue';
 import {
     createError,
@@ -20,6 +21,7 @@ import {
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
 
 export default defineComponent({
+    components: { VCIcon },
     async setup() {
         definePageMeta({
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,

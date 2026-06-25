@@ -6,6 +6,9 @@
   -->
 <script lang="ts">
 import { humanFileSize } from '@privateaim/kit';
+import { VCButton } from '@vuecs/button';
+import { VCAlert } from '@vuecs/elements';
+import { VCIcon } from '@vuecs/icon';
 import { computed, defineComponent, ref } from 'vue';
 import { injectStorageHTTPClient, wrapFnWithBusyState } from '../../core';
 import FBucketFileForm from './FBucketFileForm.vue';
@@ -60,7 +63,12 @@ async function collectEntry(entry: FileSystemEntry, out: StagedFile[]): Promise<
 }
 
 export default defineComponent({
-    components: { FBucketFileForm },
+    components: {
+        FBucketFileForm,
+        VCAlert,
+        VCButton,
+        VCIcon,
+    },
     props: {
         bucketId: {
             type: String,
@@ -279,10 +287,15 @@ export default defineComponent({
 
         <!-- Selection -->
         <template v-if="tempFiles.length === 0">
-            <div class="alert alert-info alert-sm mb-0">
+            <VCAlert
+                color="info"
+                variant="soft"
+                size="sm"
+                class="mb-0"
+            >
                 <VCIcon name="fa6-solid:circle-info" />
                 No {{ directoryMode ? 'directories' : 'files' }} selected yet.
-            </div>
+            </VCAlert>
         </template>
         <template v-else>
             <div class="upload-summary">
@@ -314,15 +327,16 @@ export default defineComponent({
         </template>
 
         <!-- Upload action -->
-        <button
-            type="button"
-            class="btn btn-sm btn-primary btn-block"
+        <VCButton
+            size="sm"
+            color="primary"
+            class="w-full"
             :disabled="busy || tempFiles.length === 0"
             @click.prevent="upload"
         >
             <VCIcon name="fa6-solid:upload" />
             Upload{{ tempFiles.length ? ` (${tempFiles.length})` : '' }}
-        </button>
+        </VCButton>
     </div>
 </template>
 <style scoped>

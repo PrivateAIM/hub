@@ -20,7 +20,10 @@ import {
     ref,
     watch,
 } from 'vue';
+import { VCButton } from '@vuecs/button';
+import { VCAlert } from '@vuecs/elements';
 import { VCFormInput } from '@vuecs/forms';
+import { VCIcon } from '@vuecs/icon';
 import { useUpdatedAt } from '../../composables';
 import {
     createEntityManager,
@@ -35,7 +38,10 @@ export default defineComponent({
     components: {
         FSearch,
         IFieldValidation,
+        VCAlert,
+        VCButton,
         VCFormInput,
+        VCIcon,
         FProjects,
     },
     props: {
@@ -132,8 +138,8 @@ export default defineComponent({
 </script>
 <template>
     <form @submit.prevent="add">
-        <div class="row">
-            <div class="col">
+        <div class="flex flex-wrap -mx-2">
+            <div class="flex-1 basis-0 px-2">
                 <IFieldValidation
                     v-slot="{ value }"
                     :field="v.fields.display_name"
@@ -189,9 +195,10 @@ export default defineComponent({
                 </IFieldValidation>
 
                 <div>
-                    <button
+                    <VCButton
                         type="submit"
-                        class="btn btn-xs btn-primary"
+                        size="xs"
+                        color="primary"
                         :disabled="v.$invalid.value || busy"
                         @click.prevent="add"
                     >
@@ -201,12 +208,12 @@ export default defineComponent({
                         <template v-else>
                             <VCIcon name="fa6-solid:plus" /> create
                         </template>
-                    </button>
+                    </VCButton>
                 </div>
             </div>
             <div
                 v-if="!projectId && !isEditing"
-                class="col"
+                class="flex-1 basis-0 px-2"
             >
                 <FProjects :query="proposalQuery">
                     <template #header="props">
@@ -218,27 +225,26 @@ export default defineComponent({
                         />
                     </template>
                     <template #itemActions="props">
-                        <button
+                        <VCButton
                             :disabled="props.busy"
-                            type="button"
-                            class="btn btn-xs"
-                            :class="{
-                                'btn-dark': form.project_id !== props.data.id,
-                                'btn-warning': form.project_id === props.data.id
-                            }"
+                            size="xs"
+                            :color="form.project_id !== props.data.id ? 'neutral' : 'warning'"
                             @click.prevent="toggle('project_id', props.data.id)"
                         >
                             <VCIcon :name="form.project_id !== props.data.id ? 'fa6-solid:plus' : 'fa6-solid:minus'" />
-                        </button>
+                        </VCButton>
                     </template>
                 </FProjects>
 
-                <div
+                <VCAlert
                     v-if="!v.fields.project_id.$model.value"
-                    class="alert alert-sm alert-warning"
+                    color="warning"
+                    variant="soft"
+                    size="sm"
+                    class="mb-3"
                 >
                     Choose a project as base of your analysis
-                </div>
+                </VCAlert>
             </div>
         </div>
     </form>

@@ -15,9 +15,11 @@ import {
 import type { Client } from '@authup/core-kit';
 import { PermissionName } from '@authup/core-kit';
 import { FDisplayName } from '@privateaim/client-vue';
+import { VCButton } from '@vuecs/button';
+import { VCIcon } from '@vuecs/icon';
 
 import type { BuildInput } from 'rapiq';
-import { defineComponent } from 'vue';
+import { defineComponent, resolveComponent } from 'vue';
 
 export default defineComponent({
     components: {
@@ -28,9 +30,13 @@ export default defineComponent({
         AClients,
         AUser,
         FDisplayName,
+        VCButton,
+        VCIcon,
     },
     emits: ['deleted'],
     setup(props, { emit }) {
+        const NuxtLink = resolveComponent('NuxtLink');
+
         const handleDeleted = (e: Client) => {
             emit('deleted', e);
         };
@@ -93,6 +99,7 @@ export default defineComponent({
             hasDropPermission,
             handleDeleted,
             query,
+            NuxtLink,
         };
     },
 });
@@ -171,15 +178,19 @@ export default defineComponent({
                     </template>
                 </template>
                 <template #cell-options="{ row }: { row: any }">
-                    <NuxtLink
+                    <VCButton
+                        :as="NuxtLink"
                         :to="'/admin/clients/'+ row.id"
-                        class="btn btn-xs btn-outline-primary me-1"
+                        size="xs"
+                        color="primary"
+                        variant="outline"
+                        class="me-1"
                         :disabled="!hasEditPermission"
                     >
                         <VCIcon name="fa6-solid:bars" />
-                    </NuxtLink>
+                    </VCButton>
                     <AEntityDelete
-                        class="btn btn-xs btn-outline-danger"
+                        size="xs"
                         :entity-id="row.id"
                         entity-type="client"
                         :with-text="false"

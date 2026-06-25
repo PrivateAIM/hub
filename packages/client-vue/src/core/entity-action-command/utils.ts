@@ -14,6 +14,9 @@ import type {
     VNodeChild,
     VNodeProps,
 } from 'vue';
+import { VCButton } from '@vuecs/button';
+import { VCIcon } from '@vuecs/icon';
+import { resolveButtonColor, resolveTextColorClass } from '../color';
 import { hasNormalizedSlot, normalizeSlot } from '../slot';
 
 type Context = {
@@ -46,13 +49,10 @@ export function renderActionCommand(ctx: Context) : VNodeChild {
         return h('span', {}, ['']);
     }
 
-    const attributes : VNodeProps & Record<string, any> = {
-        onClick(event: any) {
-            event.preventDefault();
+    const onClick = (event: any) => {
+        event.preventDefault();
 
-            return ctx.execute();
-        },
-        disabled: ctx.isDisabled,
+        return ctx.execute();
     };
 
     const iconClasses : string[] = [];
@@ -60,25 +60,23 @@ export function renderActionCommand(ctx: Context) : VNodeChild {
         iconClasses.push('me-1');
     }
 
+    // Link / dropdown-item element resolution. The button case renders a
+    // <VCButton> further down (legacy `.btn .btn-xs .btn-${suffix}`); links
+    // and dropdown items keep their bare tag and carry the status color on
+    // the icon via the resolved Tailwind class.
     let tag : string | Component | undefined;
 
     if (ctx.elementType === 'dropDownItem') {
         const component = resolveDynamicComponent('VCDropdownMenuItem');
         if (isObject(component)) {
             tag = component as Component;
-            iconClasses.push('ps-1', `text-${ctx.classSuffix}`);
+            iconClasses.push('ps-1', resolveTextColorClass(ctx.classSuffix));
         }
     }
 
     if (ctx.elementType === 'link') {
         tag = 'a';
-        iconClasses.push(`text-${ctx.classSuffix}`);
-    }
-
-    if (!tag) {
-        tag = 'button';
-        attributes.type = 'button';
-        attributes.class = ['btn', 'btn-xs', `btn-${ctx.classSuffix}`];
+        iconClasses.push(resolveTextColorClass(ctx.classSuffix));
     }
 
     let text : VNodeArrayChildren = [ctx.commandText];
@@ -88,7 +86,7 @@ export function renderActionCommand(ctx: Context) : VNodeChild {
     }
 
     if (ctx.withIcon) {
-        text.unshift(h(resolveDynamicComponent('VCIcon') as Component, {
+        text.unshift(h(VCIcon, {
             name: ctx.iconClass,
             class: iconClasses,
         }));
@@ -104,6 +102,25 @@ export function renderActionCommand(ctx: Context) : VNodeChild {
             execute: () => ctx.execute(),
         }, ctx.slots);
     }
+
+    if (!tag) {
+        return h(
+            VCButton,
+            {
+                size: 'xs',
+                color: resolveButtonColor(ctx.classSuffix),
+                disabled: ctx.isDisabled,
+                title: ctx.commandTooltip,
+                onClick,
+            },
+            () => text,
+        );
+    }
+
+    const attributes : VNodeProps & Record<string, any> = {
+        onClick,
+        disabled: ctx.isDisabled,
+    };
 
     if (ctx.commandTooltip) {
         attributes.title = ctx.commandTooltip;

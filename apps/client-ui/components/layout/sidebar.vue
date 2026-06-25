@@ -7,6 +7,7 @@
 <script lang="ts">
 import { injectStore, storeToRefs } from '@authup/client-web-kit';
 import { VCCountdown } from '@vuecs/countdown';
+import { VCIcon } from '@vuecs/icon';
 import type { NavigationResolverContext } from '@vuecs/navigation';
 import { VCNavItems } from '@vuecs/navigation';
 import { defineNuxtComponent } from '#app';
@@ -14,7 +15,11 @@ import { computed } from '#imports';
 import { LayoutTopNavigationRegistryId, Navigation } from '../../config/layout';
 
 export default defineNuxtComponent({
-    components: { VCCountdown, VCNavItems },
+    components: {
+        VCCountdown, 
+        VCIcon, 
+        VCNavItems, 
+    },
     setup() {
         const store = injectStore();
 
@@ -75,7 +80,7 @@ export default defineNuxtComponent({
         </div>
 
         <VCNavItems
-            class="sidebar-menu navbar-nav"
+            class="sidebar-menu flex flex-col list-none"
             :data="sideItems"
             :watch="sideItemsWatch"
         />

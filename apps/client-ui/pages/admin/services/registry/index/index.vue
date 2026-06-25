@@ -7,11 +7,13 @@
 <script lang="ts">
 import { usePermissionCheck } from '@authup/client-web-kit';
 import { PermissionName } from '@privateaim/kit';
+import { VCButton } from '@vuecs/button';
+import { VCIcon } from '@vuecs/icon';
 import { VCTimeago } from '@vuecs/timeago';
 import type { TableColumn } from '@vuecs/table';
 import type { Registry } from '@privateaim/core-kit';
 import type { BuildInput } from 'rapiq';
-import { ref } from 'vue';
+import { ref, resolveComponent } from 'vue';
 import {
     FEntityDelete,
     FPagination,
@@ -30,6 +32,8 @@ export default defineNuxtComponent({
         ListTitle: FTitle,
         EntityDelete: FEntityDelete,
         RegistryList,
+        VCButton,
+        VCIcon,
         VCTimeago,
     },
     setup(props, { emit }) {
@@ -38,7 +42,7 @@ export default defineNuxtComponent({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
         });
 
-        const columns: TableColumn[] = [
+        const columns: TableColumn<Registry>[] = [
             {
                 key: 'name',
                 label: 'Name',
@@ -70,6 +74,8 @@ export default defineNuxtComponent({
 
         const registryNode = ref<typeof RegistryList | null>(null);
 
+        const NuxtLink = resolveComponent('NuxtLink');
+
         const handleDeleted = (item: Registry) => {
             emit('deleted', item);
 
@@ -84,6 +90,7 @@ export default defineNuxtComponent({
             canManage,
             registryNode,
             handleDeleted,
+            NuxtLink,
         };
     },
 });
@@ -113,28 +120,32 @@ export default defineNuxtComponent({
                 :columns="columns"
                 :busy="props.busy"
             >
-                <template #cell-options="{ row }: { row: any }">
-                    <NuxtLink
+                <template #cell-options="{ row }">
+                    <VCButton
                         v-if="canManage"
+                        :as="NuxtLink"
                         title="Overview"
                         :to="'/admin/services/registry/'+row.id"
-                        class="btn btn-xs btn-outline-primary"
+                        size="xs"
+                        color="primary"
+                        variant="outline"
                     >
                         <VCIcon name="fa6-solid:bars" />
-                    </NuxtLink>
+                    </VCButton>
                     <EntityDelete
                         v-if="canManage"
-                        class="btn btn-xs btn-outline-danger ms-1"
+                        size="xs"
+                        class="ms-1"
                         :entity-id="row.id"
                         :entity-type="'registry'"
                         :with-text="false"
                         @deleted="handleDeleted"
                     />
                 </template>
-                <template #cell-created_at="{ row }: { row: any }">
+                <template #cell-created_at="{ row }">
                     <VCTimeago :datetime="row.created_at" />
                 </template>
-                <template #cell-updated_at="{ row }: { row: any }">
+                <template #cell-updated_at="{ row }">
                     <VCTimeago :datetime="row.updated_at" />
                 </template>
                 <VCTableLoading />

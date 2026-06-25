@@ -6,13 +6,16 @@
   -->
 <script lang="ts">
 import type { MasterImageCommandArgument } from '@privateaim/core-kit';
+import { VCButton } from '@vuecs/button';
+import { VCAlert } from '@vuecs/elements';
+import { VCIcon } from '@vuecs/icon';
 import type { PropType } from 'vue';
 import {
     computed,
-    defineComponent, 
-    nextTick, 
-    ref, 
-    toRef, 
+    defineComponent,
+    nextTick,
+    ref,
+    toRef,
     useTemplateRef,
     watch,
 } from 'vue';
@@ -32,7 +35,12 @@ const extractItemsByPosition = (
 };
 
 export default defineComponent({
-    components: { FFormInputList },
+    components: {
+        FFormInputList,
+        VCAlert,
+        VCButton,
+        VCIcon,
+    },
     props: {
         items: { type: Object as PropType<MasterImageCommandArgument[]> },
         readonly: {
@@ -139,8 +147,8 @@ export default defineComponent({
 });
 </script>
 <template>
-    <div class="row">
-        <div class="col">
+    <div class="flex flex-wrap -mx-2">
+        <div class="flex-1 basis-0 px-2">
             <FFormInputList
                 ref="itemsBefore"
                 :readonly="readonly"
@@ -152,30 +160,37 @@ export default defineComponent({
                     Before
                 </template>
                 <template #headerActions="props">
-                    <button
+                    <VCButton
                         :disabled="readonly"
-                        class="btn btn-xs btn-danger me-1"
+                        size="xs"
+                        color="error"
+                        class="me-1"
                         @click.prevent="resetItemsForPosition('before')"
                     >
                         <VCIcon name="fa6-solid:rotate-left" />
-                    </button>
-                    <button
-                        class="btn btn-xs btn-primary"
-                        type="button"
+                    </VCButton>
+                    <VCButton
+                        size="xs"
+                        color="primary"
                         :disabled="readonly"
                         @click.prevent="props.add()"
                     >
                         <VCIcon name="fa6-solid:plus" />
-                    </button>
+                    </VCButton>
                 </template>
                 <template #noItems>
-                    <div class="alert alert-sm alert-info">
+                    <VCAlert
+                        color="info"
+                        variant="soft"
+                        size="sm"
+                        class="mb-3"
+                    >
                         No command arguments are selected to be placed between command and entrypoint.
-                    </div>
+                    </VCAlert>
                 </template>
             </FFormInputList>
         </div>
-        <div class="col">
+        <div class="flex-1 basis-0 px-2">
             <FFormInputList
                 ref="itemsAfter"
                 :readonly="readonly"
@@ -187,26 +202,33 @@ export default defineComponent({
                     After
                 </template>
                 <template #headerActions="props">
-                    <button
+                    <VCButton
                         :disabled="readonly"
-                        class="btn btn-xs btn-danger me-1"
+                        size="xs"
+                        color="error"
+                        class="me-1"
                         @click.prevent="resetItemsForPosition('after')"
                     >
                         <VCIcon name="fa6-solid:rotate-left" />
-                    </button>
-                    <button
-                        class="btn btn-xs btn-primary"
-                        type="button"
+                    </VCButton>
+                    <VCButton
+                        size="xs"
+                        color="primary"
                         :disabled="readonly"
                         @click.prevent="props.add()"
                     >
                         <VCIcon name="fa6-solid:plus" />
-                    </button>
+                    </VCButton>
                 </template>
                 <template #noItems>
-                    <div class="alert alert-sm alert-info">
+                    <VCAlert
+                        color="info"
+                        variant="soft"
+                        size="sm"
+                        class="mb-3"
+                    >
                         No command arguments are selected to be placed after the entrypoint.
-                    </div>
+                    </VCAlert>
                 </template>
             </FFormInputList>
         </div>

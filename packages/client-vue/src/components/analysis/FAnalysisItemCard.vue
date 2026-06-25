@@ -9,6 +9,8 @@
 import { usePermissionCheck } from '@authup/client-web-kit';
 import type { Analysis } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
+import { VCButton } from '@vuecs/button';
+import { VCIcon } from '@vuecs/icon';
 import { VCLink } from '@vuecs/link';
 import { VCTimeago } from '@vuecs/timeago';
 import type { PropType, SlotsType } from 'vue';
@@ -25,6 +27,8 @@ export default defineComponent({
         FAnalysisPipeline: FAnalysisStatus,
         FDisplayName,
         FEntityDelete,
+        VCButton,
+        VCIcon,
         VCLink,
         VCTimeago,
     },
@@ -69,6 +73,8 @@ export default defineComponent({
         };
 
         return {
+            VCLink,
+
             extendedView,
             toggleView,
 
@@ -108,26 +114,31 @@ export default defineComponent({
                     name="itemActions"
                     :data="entity"
                 >
-                    <button
-                        class="btn btn-xs btn-dark"
+                    <VCButton
+                        size="xs"
+                        color="neutral"
                         @click.prevent="toggleView"
                     >
                         <VCIcon :name="!extendedView ? 'fa6-solid:chevron-down' : 'fa6-solid:chevron-up'" />
-                    </button>
-                    <VCLink
+                    </VCButton>
+                    <VCButton
+                        :as="VCLink"
                         :to="'/analyses/' + entity.id"
                         :disabled="busy"
-                        class="btn btn-xs btn-dark ms-1"
+                        size="xs"
+                        color="neutral"
+                        class="ms-1"
                     >
                         <VCIcon name="fa6-solid:bars" />
-                    </VCLink>
+                    </VCButton>
                     <template v-if="canDelete">
                         <FEntityDelete
                             :with-text="false"
                             :entity-id="entity.id"
                             :entity-type="'analysis'"
                             :disabled="busy"
-                            class="btn btn-xs btn-danger ms-1"
+                            size="xs"
+                            class="ms-1"
                             @deleted="handleDeleted"
                         />
                     </template>

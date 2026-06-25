@@ -7,6 +7,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, toRef } from 'vue';
+import { resolveTextColorClass } from '../../../core';
 
 export default defineComponent({
     props: {
@@ -45,6 +46,7 @@ export default defineComponent({
             statusText,
             iconName,
             classSuffix,
+            resolveTextColorClass,
         };
     },
 });
@@ -54,7 +56,7 @@ export default defineComponent({
         <slot
             v-bind="{ classSuffix, statusText }"
         >
-            <span :class="'text-'+classSuffix"> {{ statusText }}</span>
+            <span :class="resolveTextColorClass(classSuffix)"> {{ statusText }}</span>
         </slot>
     </span>
 </template>

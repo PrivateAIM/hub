@@ -5,6 +5,8 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import { VCButton } from '@vuecs/button';
+import { VCIcon } from '@vuecs/icon';
 import { VCLink } from '@vuecs/link';
 import type { AnalysisBucket, AnalysisNode } from '@privateaim/core-kit';
 import { AnalysisBucketType } from '@privateaim/core-kit';
@@ -15,6 +17,7 @@ import { FAnalysisBucket, FAnalysisBucketDownload } from '../analysis-bucket';
 import FDisplayName from '../FDisplayName';
 import { FAnalysisNodeApprovalCommand } from './FAnalsisNodeApprovalCommand';
 import { FAnalysisNodeApprovalStatus } from './FAnalysisNodeApprovalStatus';
+import { resolveTextColorClass } from '../../core';
 
 export default defineComponent({
     components: {
@@ -23,7 +26,8 @@ export default defineComponent({
         FDisplayName,
         FAnalysisNodeApprovalCommand,
         FAnalysisNodeApprovalStatus,
-        VCLink,
+        VCButton,
+        VCIcon,
     },
     props: {
         entity: {
@@ -57,11 +61,15 @@ export default defineComponent({
         };
 
         return {
+            VCLink,
+
             bucketQuery,
 
             handleDeleted,
             handleFailed,
             handleUpdated,
+
+            resolveTextColorClass,
         };
     },
 });
@@ -91,13 +99,15 @@ export default defineComponent({
                         name="itemActions"
                         :data="entity"
                     >
-                        <VCLink
+                        <VCButton
+                            :as="VCLink"
                             :to="'/analyses/' + entity.analysis.id"
                             :disabled="busy"
-                            class="btn btn-xs btn-dark"
+                            size="xs"
+                            color="neutral"
                         >
                             <VCIcon name="fa6-solid:bars" />
-                        </VCLink>
+                        </VCButton>
                         <FAnalysisBucket :query="bucketQuery">
                             <template #default="{ data: bucket }">
                                 <FAnalysisBucketDownload
@@ -133,8 +143,8 @@ export default defineComponent({
             name="body"
             :data="entity"
         >
-            <div class="row">
-                <div class="col-12 col-md-4 flex items-center flex-col">
+            <div class="flex flex-wrap -mx-2">
+                <div class="w-full px-2 md:w-4/12 flex items-center flex-col">
                     <div>
                         <strong><VCIcon name="fa6-solid:server" /> Node</strong>
                     </div>
@@ -142,7 +152,7 @@ export default defineComponent({
                         {{ entity.node.name }}
                     </div>
                 </div>
-                <div class="col-12 col-md-4 flex items-center flex-col">
+                <div class="w-full px-2 md:w-4/12 flex items-center flex-col">
                     <div>
                         <strong><VCIcon name="fa6-solid:heart-pulse" /> Status</strong>
                     </div>
@@ -152,7 +162,7 @@ export default defineComponent({
                         >
                             <template #default="slotProps">
                                 <span
-                                    :class="'text-'+slotProps.classSuffix"
+                                    :class="resolveTextColorClass(slotProps.classSuffix)"
                                 >
                                     {{ slotProps.statusText }}
                                 </span>
@@ -160,7 +170,7 @@ export default defineComponent({
                         </FAnalysisNodeApprovalStatus>
                     </div>
                 </div>
-                <div class="col-12 col-md-4 flex items-center flex-col">
+                <div class="w-full px-2 md:w-4/12 flex items-center flex-col">
                     <div>
                         <strong><VCIcon name="fa6-solid:user" /> Creator</strong>
                     </div>

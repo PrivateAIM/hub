@@ -7,11 +7,13 @@
 <script lang="ts">
 import { ServiceID } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
+import { VCIcon } from '@vuecs/icon';
 import { definePageMeta, navigateTo } from '#imports';
 import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
 
 export default defineNuxtComponent({
+    components: { VCIcon },
     setup() {
         definePageMeta({
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
@@ -60,11 +62,11 @@ export default defineNuxtComponent({
             Internal
         </h6>
         <div class="m-t-10">
-            <div class="row">
+            <div class="flex flex-wrap -mx-2">
                 <div
                     v-for="(item,key) in items"
                     :key="key"
-                    class="col-sm-4 col-md-3 col-12 mb-3"
+                    class="w-full px-2 sm:w-4/12 md:w-3/12 mb-3"
                 >
                     <div
                         class="card card-event p-3 flex flex-col text-center"
@@ -88,11 +90,11 @@ export default defineNuxtComponent({
 
         <h6>External</h6>
         <div class="m-t-10">
-            <div class="row">
+            <div class="flex flex-wrap -mx-2">
                 <div
                     v-for="(item,key) in thirdPartyItems"
                     :key="key"
-                    class="col-sm-4 col-md-3 col-12 mb-3"
+                    class="w-full px-2 sm:w-4/12 md:w-3/12 mb-3"
                 >
                     <div
                         class="card card-event p-3 flex flex-col text-center"

@@ -5,6 +5,8 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import { VCButton } from '@vuecs/button';
+import { VCIcon } from '@vuecs/icon';
 import { VCLink } from '@vuecs/link';
 import type { ProjectNode } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
@@ -13,6 +15,7 @@ import FDisplayName from '../FDisplayName';
 import { FProjectInForm } from '../project/FProjectInForm';
 import { FProjectNodeApprovalCommand } from './FProjectNodeApprovalCommand';
 import { FProjectNodeApprovalStatus } from './FProjectNodeApprovalStatus';
+import { resolveTextColorClass } from '../../core';
 
 export default defineComponent({
     components: {
@@ -20,6 +23,8 @@ export default defineComponent({
         FProjectInForm,
         FProjectNodeApprovalCommand,
         FProjectNodeApprovalStatus,
+        VCButton,
+        VCIcon,
         VCLink,
     },
     props: {
@@ -52,12 +57,16 @@ export default defineComponent({
         };
 
         return {
+            VCLink,
+
             modal,
             toggleModal,
 
             handleDeleted,
             handleFailed,
             handleUpdated,
+
+            resolveTextColorClass,
         };
     },
 });
@@ -91,20 +100,22 @@ export default defineComponent({
                         name="itemActions"
                         :data="entity"
                     >
-                        <VCLink
+                        <VCButton
+                            :as="VCLink"
                             :to="'/projects/' + entity.project.id"
                             :disabled="busy"
-                            class="btn btn-xs btn-dark"
+                            size="xs"
+                            color="neutral"
                         >
                             <VCIcon name="fa6-solid:bars" />
-                        </VCLink>
-                        <button
-                            type="button"
-                            class="btn btn-xs btn-primary"
+                        </VCButton>
+                        <VCButton
+                            size="xs"
+                            color="primary"
                             @click.prevent="toggleModal"
                         >
                             <VCIcon name="fa6-solid:comment" />
-                        </button>
+                        </VCButton>
                         <FProjectNodeApprovalCommand
                             :entity-id="entity.id"
                             :approval-status="entity.approval_status"
@@ -131,8 +142,8 @@ export default defineComponent({
             name="body"
             :data="entity"
         >
-            <div class="row">
-                <div class="col-12 col-md-4 flex items-center flex-col">
+            <div class="flex flex-wrap -mx-2">
+                <div class="w-full px-2 md:w-4/12 flex items-center flex-col">
                     <div>
                         <strong><VCIcon name="fa6-solid:server" /> Node</strong>
                     </div>
@@ -140,7 +151,7 @@ export default defineComponent({
                         {{ entity.node.name }}
                     </div>
                 </div>
-                <div class="col-12 col-md-4 flex items-center flex-col">
+                <div class="w-full px-2 md:w-4/12 flex items-center flex-col">
                     <div>
                         <strong><VCIcon name="fa6-solid:heart-pulse" /> Status</strong>
                     </div>
@@ -150,7 +161,7 @@ export default defineComponent({
                         >
                             <template #default="slotProps">
                                 <span
-                                    :class="'text-'+slotProps.classSuffix"
+                                    :class="resolveTextColorClass(slotProps.classSuffix)"
                                 >
                                     {{ slotProps.statusText }}
                                 </span>
@@ -158,7 +169,7 @@ export default defineComponent({
                         </FProjectNodeApprovalStatus>
                     </div>
                 </div>
-                <div class="col-12 col-md-4 flex items-center flex-col">
+                <div class="w-full px-2 md:w-4/12 flex items-center flex-col">
                     <div>
                         <strong><VCIcon name="fa6-solid:user" /> Creator</strong>
                     </div>

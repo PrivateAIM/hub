@@ -7,6 +7,8 @@
 <script lang="ts">
 import { isClientErrorWithStatusCode } from '@privateaim/core-http-kit';
 import type { Analysis, AnalysisNode } from '@privateaim/core-kit';
+import { VCButton } from '@vuecs/button';
+import { VCIcon } from '@vuecs/icon';
 import type { BuildInput } from 'rapiq';
 import type { PropType } from 'vue';
 import {
@@ -34,6 +36,8 @@ export default defineComponent({
         FAnalysisNodes,
         FAnalysisNodeLogs,
         FProgressBar,
+        VCButton,
+        VCIcon,
     },
     props: {
         entity: {
@@ -166,8 +170,8 @@ export default defineComponent({
                             :key="item.id"
                         >
                             <div
-                                class="col-12"
-                                :class="{'col-lg-6': entity.configuration_locked}"
+                                class="w-full px-2"
+                                :class="{'w-full px-2 lg:w-6/12': entity.configuration_locked}"
                             >
                                 <div class="flex flex-col gap-2 m-1">
                                     <div class="progress-step flex flex-col gap-1">
@@ -183,14 +187,14 @@ export default defineComponent({
                                                 v-if="!entity.configuration_locked"
                                                 class="ms-auto"
                                             >
-                                                <button
+                                                <VCButton
                                                     :disabled="busy"
-                                                    type="button"
-                                                    class="btn btn-danger btn-xs"
+                                                    color="error"
+                                                    size="xs"
                                                     @click.prevent="drop(item)"
                                                 >
                                                     <VCIcon name="fa6-solid:trash" />
-                                                </button>
+                                                </VCButton>
                                             </div>
                                         </div>
                                         <div class="flex flex-row flex-wrap items-center gap-x-2">
@@ -239,13 +243,14 @@ export default defineComponent({
                             </h5>
                         </div>
                         <div class="ms-auto">
-                            <button
-                                type="button"
-                                class="btn btn-xs btn-secondary"
+                            <VCButton
+                                size="xs"
+                                color="neutral"
+                                variant="soft"
                                 @click.prevent="modal = false"
                             >
                                 <VCIcon name="fa6-solid:xmark" />
-                            </button>
+                            </VCButton>
                         </div>
                     </div>
                 </div>

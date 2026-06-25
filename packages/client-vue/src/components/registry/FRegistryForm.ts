@@ -5,18 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
-    buildFormGroup,
-    buildFormInput,
-    buildFormSubmitWithTranslations,
-    createFormSubmitTranslations,
-} from '@authup/client-web-kit';
 import { useFieldValidation } from '@ilingo/validup-vue';
 import { useValidup } from '@validup/vue';
 import type { Severity } from '@validup/vue';
 import type { Registry } from '@privateaim/core-kit';
 import { DomainType, RegistryValidator } from '@privateaim/core-kit';
 import { ValidatorGroup } from '@privateaim/kit';
+import { VCAlert } from '@vuecs/elements';
+import { VCFormGroup, VCFormInput } from '@vuecs/forms';
 import {
     computed,
     defineComponent,
@@ -31,6 +27,7 @@ import type {
 } from 'vue';
 import { useUpdatedAt } from '../../composables';
 import {
+    buildFormSubmit,
     createEntityManager,
     defineEntityManagerEvents,
     initFormAttributesFromSource,
@@ -99,76 +96,95 @@ export default defineComponent({
             await manager.createOrUpdate(form);
         });
 
-        const translationsSubmit = createFormSubmitTranslations();
 
         return () => {
             const VCIcon = resolveComponent('VCIcon');
-            const name = buildFormGroup({
-                validationMessages: nameValidation.messages,
-                validationSeverity: toSeverity(nameValidation.severity),
-                label: true,
-                labelContent: 'Name',
-                content: buildFormInput({
-                    value: form.name,
-                    props: { placeholder: '...' },
-                    onChange(input) {
-                        form.name = input;
-                    },
-                }),
-            });
+            const name = h(
+                VCFormGroup,
+                {
+                    label: true,
+                    labelContent: 'Name',
+                    validationMessages: nameValidation.messages,
+                    validationSeverity: toSeverity(nameValidation.severity),
+                },
+                {
+                    default: () => h(VCFormInput, {
+                        modelValue: form.name == null ? '' : String(form.name),
+                        'onUpdate:modelValue': (input: string) => {
+                            form.name = input;
+                        },
+                        placeholder: '...',
+                    }),
+                },
+            );
 
-            const host = buildFormGroup({
-                validationMessages: hostValidation.messages,
-                validationSeverity: toSeverity(hostValidation.severity),
-                label: true,
-                labelContent: 'Host',
-                content: buildFormInput({
-                    value: form.host,
-                    onChange(input) {
-                        form.host = input;
-                    },
-                    props: { placeholder: 'e.g. ghcr.io' },
-                }),
-            });
+            const host = h(
+                VCFormGroup,
+                {
+                    label: true,
+                    labelContent: 'Host',
+                    validationMessages: hostValidation.messages,
+                    validationSeverity: toSeverity(hostValidation.severity),
+                },
+                {
+                    default: () => h(VCFormInput, {
+                        modelValue: form.host == null ? '' : String(form.host),
+                        'onUpdate:modelValue': (input: string) => {
+                            form.host = input;
+                        },
+                        placeholder: 'e.g. ghcr.io',
+                    }),
+                },
+            );
 
-            const accountName = buildFormGroup({
-                validationMessages: accountNameValidation.messages,
-                validationSeverity: toSeverity(accountNameValidation.severity),
-                label: true,
-                labelContent: 'Account Name',
-                content: buildFormInput({
-                    value: form.account_name,
-                    props: { placeholder: '...' },
-                    onChange(input) {
-                        form.account_name = input;
-                    },
-                }),
-            });
+            const accountName = h(
+                VCFormGroup,
+                {
+                    label: true,
+                    labelContent: 'Account Name',
+                    validationMessages: accountNameValidation.messages,
+                    validationSeverity: toSeverity(accountNameValidation.severity),
+                },
+                {
+                    default: () => h(VCFormInput, {
+                        modelValue: form.account_name == null ? '' : String(form.account_name),
+                        'onUpdate:modelValue': (input: string) => {
+                            form.account_name = input;
+                        },
+                        placeholder: '...',
+                    }),
+                },
+            );
 
-            const accountSecret = buildFormGroup({
-                validationMessages: accountSecretValidation.messages,
-                validationSeverity: toSeverity(accountSecretValidation.severity),
-                label: true,
-                labelContent: 'Account Secret',
-                content: buildFormInput({
-                    value: form.account_secret,
-                    props: { placeholder: '...' },
-                    onChange(input) {
-                        form.account_secret = input;
-                    },
-                }),
-            });
+            const accountSecret = h(
+                VCFormGroup,
+                {
+                    label: true,
+                    labelContent: 'Account Secret',
+                    validationMessages: accountSecretValidation.messages,
+                    validationSeverity: toSeverity(accountSecretValidation.severity),
+                },
+                {
+                    default: () => h(VCFormInput, {
+                        modelValue: form.account_secret == null ? '' : String(form.account_secret),
+                        'onUpdate:modelValue': (input: string) => {
+                            form.account_secret = input;
+                        },
+                        placeholder: '...',
+                    }),
+                },
+            );
 
-            const submitNode = buildFormSubmitWithTranslations({
+            const submitNode = buildFormSubmit({
                 submit,
                 busy: busy.value,
                 isEditing: !!manager.data.value,
                 invalid: $v.$invalid.value,
-            }, translationsSubmit);
+            });
 
             return h('form', [
-                h('div', { class: 'row' }, [
-                    h('div', { class: 'col' }, [
+                h('div', { class: 'flex flex-wrap -mx-2' }, [
+                    h('div', { class: 'flex-1 basis-0 px-2' }, [
                         h('h6', [
                             h(VCIcon, { name: 'fa6-solid:infinity', class: 'pe-1' }),
                             'General',
@@ -176,7 +192,7 @@ export default defineComponent({
                         name,
                         host,
                     ]),
-                    h('div', { class: 'col' }, [
+                    h('div', { class: 'flex-1 basis-0 px-2' }, [
                         h('h6', [
                             h(VCIcon, { name: 'fa6-solid:robot', class: 'pe-1' }),
                             'Robot',
@@ -186,9 +202,14 @@ export default defineComponent({
                     ]),
                 ]),
                 h(
-                    'div',
-                    { class: 'alert alert-sm alert-warning alert-danger' },
-                    [
+                    VCAlert,
+                    {
+                        color: 'error', 
+                        variant: 'soft', 
+                        size: 'sm', 
+                        class: 'mb-3', 
+                    },
+                    () => [
                         'It is only possible to register harbor registries > v2.3.0',
                     ],
                 ),

@@ -5,6 +5,7 @@ import { PermissionName as AuthupPermissionName } from '@authup/core-kit';
 import { FDisplayName } from '@privateaim/client-vue';
 import { computed, defineComponent, ref } from 'vue';
 import type { Ref } from 'vue';
+import { VCIcon } from '@vuecs/icon';
 import type { NavigationItem } from '@vuecs/navigation';
 import { useRoute } from 'vue-router';
 import { createError, definePageMeta, navigateTo } from '#imports';
@@ -13,7 +14,7 @@ import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 import { updateObjectProperties } from '../../../utils';
 
 export default defineComponent({
-    components: { FDisplayName },
+    components: { FDisplayName, VCIcon },
     async setup() {
         definePageMeta({
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,

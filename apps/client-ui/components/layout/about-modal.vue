@@ -5,12 +5,13 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import { VCIcon } from '@vuecs/icon';
 import { defineComponent } from 'vue';
 import { TOOLS } from '../../config/tools';
 import Logo from '../svg/Logo';
 
 export default defineComponent({
-    components: { Logo },
+    components: { Logo, VCIcon },
     props: {
         modelValue: {
             type: Boolean,
