@@ -16,7 +16,7 @@ import type {
 } from 'vue';
 import { VCButton } from '@vuecs/button';
 import { VCIcon } from '@vuecs/icon';
-import { resolveButtonColor, resolveTextColorClass } from '../color';
+import { resolveButtonAppearance, resolveTextColorClass } from '../color';
 import { hasNormalizedSlot, normalizeSlot } from '../slot';
 
 type Context = {
@@ -104,11 +104,14 @@ export function renderActionCommand(ctx: Context) : VNodeChild {
     }
 
     if (!tag) {
+        const { color, variant } = resolveButtonAppearance(ctx.classSuffix);
+
         return h(
             VCButton,
             {
                 size: 'xs',
-                color: resolveButtonColor(ctx.classSuffix),
+                color,
+                variant,
                 disabled: ctx.isDisabled,
                 title: ctx.commandTooltip,
                 onClick,

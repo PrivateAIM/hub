@@ -106,20 +106,6 @@ export default defineNuxtComponent({
                     </VCCountdown>
                 </small>
             </div>
-
-            <!--
-            <ul class="sidebar-menu vc-nav-items navbar-nav">
-                <li class="vc-nav-item">
-                    <a
-                        class="vc-nav-link"
-                        :href="'javascript:void(0)'"
-                        target="_blank"
-                    >
-                        <VCIcon name="fa6-solid:file" /> <span class="vc-nav-link-text">Documentation</span>
-                    </a>
-                </li>
-            </ul>
-            -->
         </div>
     </div>
 </template>

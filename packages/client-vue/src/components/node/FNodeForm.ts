@@ -185,8 +185,8 @@ export default defineComponent({
                                             form.realm_id = input as string;
                                         },
                                         options: props.data.map((item) => ({
-                                            value: item.name,
-                                            label: item.name ?? (item.id !== undefined ? String(item.id) : ''),
+                                            value: item.id,
+                                            label: item.name ?? String(item.id),
                                         })),
                                     }),
                                 },

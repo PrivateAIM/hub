@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ButtonColor } from '@vuecs/button';
+import type { ButtonColor, ButtonVariant } from '@vuecs/button';
 
 /*
  * Maps the legacy Bootstrap "classSuffix" (primary / secondary / success /
@@ -18,15 +18,20 @@ import type { ButtonColor } from '@vuecs/button';
  * Bootstrap-compat aliases.
  */
 
-export function resolveButtonColor(suffix?: string): ButtonColor {
+/**
+ * Resolve a `<VCButton>` color + variant from the legacy Bootstrap suffix.
+ * `secondary` keeps its soft look (`.btn-secondary` was a soft/elevated
+ * button); everything else is a solid color.
+ */
+export function resolveButtonAppearance(suffix?: string): { color: ButtonColor; variant?: ButtonVariant } {
     switch (suffix) {
-        case 'success': return 'success';
-        case 'danger': return 'error';
-        case 'warning': return 'warning';
-        case 'info': return 'info';
-        case 'secondary':
-        case 'dark': return 'neutral';
-        default: return 'primary';
+        case 'success': return { color: 'success' };
+        case 'danger': return { color: 'error' };
+        case 'warning': return { color: 'warning' };
+        case 'info': return { color: 'info' };
+        case 'secondary': return { color: 'neutral', variant: 'soft' };
+        case 'dark': return { color: 'neutral' };
+        default: return { color: 'primary' };
     }
 }
 

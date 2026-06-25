@@ -99,9 +99,8 @@ export default defineComponent({
         const store = injectStore();
         const { realmManagementId } = storeToRefs(store);
 
-        const canEdit = usePermissionCheck({ name: PermissionName.NODE_UPDATE });
-        const canDrop = usePermissionCheck({ name: PermissionName.NODE_DELETE });
-        const canView = computed(() => canEdit.value || canDrop.value);
+        const canView = usePermissionCheck({ name: PermissionName.EVENT_READ });
+        const canDrop = usePermissionCheck({ name: PermissionName.EVENT_DELETE });
 
         const query = computed<BuildInput<Event>>(() => ({
             filters: { realm_id: [realmManagementId.value, null] },
