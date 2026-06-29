@@ -173,33 +173,35 @@ export default {
                         </VCBadge>
                     </template>
                     <template #cell-options="{ row }">
-                        <VCButton
-                            v-if="canView"
-                            :as="NuxtLink"
-                            size="xs"
-                            color="primary"
-                            variant="outline"
-                            :to="'/admin/services/registry/'+entity.id+'/projects/'+row.id"
-                        >
-                            <VCIcon name="fa6-solid:bars" />
-                        </VCButton>
-                        <VCButton
-                            size="xs"
-                            color="neutral"
-                            variant="outline"
-                            class="ms-1 me-1"
-                            @click.prevent="showDetails(row)"
-                        >
-                            <VCIcon name="fa6-solid:info" />
-                        </VCButton>
-                        <entity-delete
-                            v-if="canDrop"
-                            size="xs"
-                            :entity-id="row.id"
-                            :entity-type="'registryProject'"
-                            :with-text="false"
-                            @deleted="handleDeleted"
-                        />
+                        <div class="flex items-center">
+                            <VCButton
+                                v-if="canView"
+                                :as="NuxtLink"
+                                size="xs"
+                                color="primary"
+                                variant="outline"
+                                :to="'/admin/services/registry/'+entity.id+'/projects/'+row.id"
+                            >
+                                <VCIcon name="fa6-solid:bars" />
+                            </VCButton>
+                            <VCButton
+                                size="xs"
+                                color="neutral"
+                                variant="outline"
+                                class="ms-1 me-1"
+                                @click.prevent="showDetails(row)"
+                            >
+                                <VCIcon name="fa6-solid:info" />
+                            </VCButton>
+                            <entity-delete
+                                v-if="canDrop"
+                                size="sm"
+                                :entity-id="row.id"
+                                :entity-type="'registryProject'"
+                                :with-text="false"
+                                @deleted="handleDeleted"
+                            />
+                        </div>
                     </template>
                     <template #cell-created_at="{ row }">
                         <timeago :datetime="row.created_at" />

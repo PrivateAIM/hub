@@ -170,26 +170,28 @@ export default defineComponent({
                     />
                 </template>
                 <template #cell-options="{ row }">
-                    <VCButton
-                        v-if="canView"
-                        :as="NuxtLink"
-                        size="xs"
-                        color="primary"
-                        variant="outline"
-                        :to="'/admin/events/'+row.id"
-                    >
-                        <VCIcon name="fa6-solid:share-from-square" />
-                    </VCButton>
-                    <FEntityDelete
-                        v-if="canDrop"
-                        service="telemetry"
-                        size="xs"
-                        class="ms-1"
-                        :entity-id="row.id"
-                        :entity-type="'event'"
-                        :with-text="false"
-                        @deleted="props.deleted"
-                    />
+                    <div class="flex items-center">
+                        <VCButton
+                            v-if="canView"
+                            :as="NuxtLink"
+                            size="xs"
+                            color="primary"
+                            variant="outline"
+                            :to="'/admin/events/'+row.id"
+                        >
+                            <VCIcon name="fa6-solid:share-from-square" />
+                        </VCButton>
+                        <FEntityDelete
+                            v-if="canDrop"
+                            service="telemetry"
+                            size="sm"
+                            class="ms-1"
+                            :entity-id="row.id"
+                            :entity-type="'event'"
+                            :with-text="false"
+                            @deleted="props.deleted"
+                        />
+                    </div>
                 </template>
                 <template #cell-created_at="{ row }">
                     <VCTimeago :datetime="row.created_at" />

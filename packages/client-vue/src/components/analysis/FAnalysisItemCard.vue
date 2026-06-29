@@ -109,7 +109,7 @@ export default defineComponent({
                     </template>
                 </FDisplayName>
             </div>
-            <div class="ms-auto">
+            <div class="ms-auto flex items-center">
                 <slot
                     name="itemActions"
                     :data="entity"
@@ -137,7 +137,7 @@ export default defineComponent({
                             :entity-id="entity.id"
                             :entity-type="'analysis'"
                             :disabled="busy"
-                            size="xs"
+                            size="sm"
                             class="ms-1"
                             @deleted="handleDeleted"
                         />

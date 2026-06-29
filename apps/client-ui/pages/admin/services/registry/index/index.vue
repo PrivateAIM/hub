@@ -121,26 +121,28 @@ export default defineNuxtComponent({
                 :busy="props.busy"
             >
                 <template #cell-options="{ row }">
-                    <VCButton
-                        v-if="canManage"
-                        :as="NuxtLink"
-                        title="Overview"
-                        :to="'/admin/services/registry/'+row.id"
-                        size="xs"
-                        color="primary"
-                        variant="outline"
-                    >
-                        <VCIcon name="fa6-solid:bars" />
-                    </VCButton>
-                    <EntityDelete
-                        v-if="canManage"
-                        size="xs"
-                        class="ms-1"
-                        :entity-id="row.id"
-                        :entity-type="'registry'"
-                        :with-text="false"
-                        @deleted="handleDeleted"
-                    />
+                    <div class="flex items-center">
+                        <VCButton
+                            v-if="canManage"
+                            :as="NuxtLink"
+                            title="Overview"
+                            :to="'/admin/services/registry/'+row.id"
+                            size="xs"
+                            color="primary"
+                            variant="outline"
+                        >
+                            <VCIcon name="fa6-solid:bars" />
+                        </VCButton>
+                        <EntityDelete
+                            v-if="canManage"
+                            size="sm"
+                            class="ms-1"
+                            :entity-id="row.id"
+                            :entity-type="'registry'"
+                            :with-text="false"
+                            @deleted="handleDeleted"
+                        />
+                    </div>
                 </template>
                 <template #cell-created_at="{ row }">
                     <VCTimeago :datetime="row.created_at" />

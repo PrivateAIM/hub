@@ -74,15 +74,18 @@ export default defineComponent({
         // compat classes.
         size: {
             type: String as PropType<ButtonSize>,
-            default: 'xs' satisfies ButtonSize,
+            default: 'sm' satisfies ButtonSize,
         },
         color: {
             type: String as PropType<ButtonColor>,
             default: 'error' satisfies ButtonColor,
         },
         variant: {
+            // Danger-outline by default — mirrors authup's <AEntityDelete>
+            // and the adjacent outline "details" action buttons (the VCButton
+            // default is solid, which renders a filled-red button that clashes).
             type: String as PropType<ButtonVariant>,
-            default: undefined,
+            default: 'outline' satisfies ButtonVariant,
         },
         disabled: {
             type: Boolean,
@@ -150,29 +153,20 @@ export default defineComponent({
                 return submit.apply(null);
             };
 
-            // Default (button) path: a self-styled <VCButton> so call sites
-            // no longer need the retired `.btn`/`.btn-*` compat classes. The
-            // icon rendered as a <VCIcon> child in the default slot.
+            // Default (button) path — mirrors authup's <AEntityDelete>: a
+            // self-styled <VCButton> with the icon via `iconLeft` (leading
+            // span) and text via `label`, so hub + authup delete buttons
+            // render identically.
             if (props.elementType === ElementType.BUTTON) {
-                return h(
-                    VCButton,
-                    {
-                        color: props.color,
-                        variant: props.variant,
-                        size: props.size,
-                        disabled: busy.value || props.disabled,
-                        onClick,
-                    },
-                    () => [
-                        props.elementIcon ?
-                            h(VCIcon, {
-                                name: props.elementIcon,
-                                class: props.withText ? 'pe-1' : undefined,
-                            }) :
-                            null,
-                        props.withText ? translation.value : null,
-                    ],
-                );
+                return h(VCButton, {
+                    color: props.color,
+                    variant: props.variant,
+                    size: props.size,
+                    iconLeft: props.elementIcon || undefined,
+                    label: props.withText ? translation.value : undefined,
+                    disabled: busy.value || props.disabled,
+                    onClick,
+                });
             }
 
             // Link / dropdown-item paths keep the bare element — their call

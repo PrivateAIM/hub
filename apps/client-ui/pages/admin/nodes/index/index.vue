@@ -125,25 +125,27 @@ export default defineNuxtComponent({
                 :busy="props.busy"
             >
                 <template #cell-options="{ row }">
-                    <VCButton
-                        v-if="canView"
-                        :as="NuxtLink"
-                        size="xs"
-                        color="primary"
-                        variant="outline"
-                        :to="'/admin/nodes/'+row.id"
-                    >
-                        <VCIcon name="fa6-solid:bars" />
-                    </VCButton>
-                    <EntityDelete
-                        v-if="canDrop"
-                        size="xs"
-                        class="ms-1"
-                        :entity-id="row.id"
-                        :entity-type="'node'"
-                        :with-text="false"
-                        @deleted="props.deleted"
-                    />
+                    <div class="flex items-center">
+                        <VCButton
+                            v-if="canView"
+                            :as="NuxtLink"
+                            size="xs"
+                            color="primary"
+                            variant="outline"
+                            :to="'/admin/nodes/'+row.id"
+                        >
+                            <VCIcon name="fa6-solid:bars" />
+                        </VCButton>
+                        <EntityDelete
+                            v-if="canDrop"
+                            size="sm"
+                            class="ms-1"
+                            :entity-id="row.id"
+                            :entity-type="'node'"
+                            :with-text="false"
+                            @deleted="props.deleted"
+                        />
+                    </div>
                 </template>
                 <template #cell-created_at="{ row }">
                     <VCTimeago :datetime="row.created_at" />
