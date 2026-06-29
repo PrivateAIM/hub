@@ -141,7 +141,7 @@ export default defineComponent({
                         <VCIcon name="fa6-solid:bars" />
                     </VCButton>
                     <AEntityDelete
-                        size="xs"
+                        size="sm"
                         :entity-id="row.id"
                         entity-type="policy"
                         :with-text="false"
