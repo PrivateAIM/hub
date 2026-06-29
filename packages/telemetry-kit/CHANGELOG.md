@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.12.0](https://github.com/PrivateAIM/hub/compare/v0.11.5...v0.12.0) (2026-06-29)
+
+
+### ⚠ BREAKING CHANGES
+
+* **client-ui:** the Bootstrap-compat CSS classes (.btn*, .alert*, .row/.col, .navbar*, .badge, .is-valid, .form-group, .form-switch, .text-*/.bg-* aliases, .dropdown*) are removed; use the @vuecs components / Tailwind utilities instead.
+
+### Features
+
+* **client-ui:** modernize @vuecs/@authup/hapic stack & retire Bootstrap-compat layer ([#1726](https://github.com/PrivateAIM/hub/issues/1726)) ([dc47bf7](https://github.com/PrivateAIM/hub/commit/dc47bf79ad0abac55191c33297f1539d52527188))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.11.5 to ^0.12.0
+  * peerDependencies
+    * @privateaim/kit bumped from ^0.11.5 to ^0.12.0
+
 ## [0.11.5](https://github.com/PrivateAIM/hub/compare/v0.11.4...v0.11.5) (2026-06-24)
 
 

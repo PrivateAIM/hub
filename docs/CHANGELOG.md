@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.11.6](https://github.com/PrivateAIM/hub/compare/v0.11.5...v0.11.6) (2026-06-29)
+
+
+### Features
+
+* **client-ui:** OAuth2 authorization-code login flow with network background ([#1725](https://github.com/PrivateAIM/hub/issues/1725)) ([a3a857b](https://github.com/PrivateAIM/hub/commit/a3a857bb2c3cf8588d4fb0fc5787c4b70e21e584))
+
 ## [0.11.5](https://github.com/PrivateAIM/hub/compare/v0.11.4...v0.11.5) (2026-06-24)
 
 
