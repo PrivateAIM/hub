@@ -158,25 +158,27 @@ export default defineComponent({
                     <VCTimeago :datetime="row.updated_at" />
                 </template>
                 <template #cell-options="{ row }">
-                    <VCButton
-                        :as="NuxtLink"
-                        :to="'/admin/clients/'+ row.id"
-                        size="xs"
-                        color="primary"
-                        variant="outline"
-                        class="me-1"
-                        :disabled="!hasEditPermission"
-                    >
-                        <VCIcon name="fa6-solid:bars" />
-                    </VCButton>
-                    <AEntityDelete
-                        size="sm"
-                        :entity-id="row.id"
-                        entity-type="client"
-                        :with-text="false"
-                        :disabled="!hasDropPermission"
-                        @deleted="props.deleted"
-                    />
+                    <div class="flex items-center">
+                        <VCButton
+                            :as="NuxtLink"
+                            :to="'/admin/clients/'+ row.id"
+                            size="xs"
+                            color="primary"
+                            variant="outline"
+                            class="me-1"
+                            :disabled="!hasEditPermission"
+                        >
+                            <VCIcon name="fa6-solid:bars" />
+                        </VCButton>
+                        <AEntityDelete
+                            size="sm"
+                            :entity-id="row.id"
+                            entity-type="client"
+                            :with-text="false"
+                            :disabled="!hasDropPermission"
+                            @deleted="props.deleted"
+                        />
+                    </div>
                 </template>
                 <VCTableLoading />
                 <VCTableEmpty />

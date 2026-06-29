@@ -133,36 +133,38 @@ export default defineNuxtComponent({
                     <VCTimeago :datetime="row.updated_at" />
                 </template>
                 <template #cell-options="{ row }">
-                    <template v-if="isMaster">
+                    <div class="flex items-center">
+                        <template v-if="isMaster">
+                            <VCButton
+                                v-if="realmManagementId !== row.id"
+                                size="xs"
+                                color="primary"
+                                class="me-1"
+                                @click.prevent="setRealmManagement(row)"
+                            >
+                                <VCIcon name="fa6-solid:check" />
+                            </VCButton>
+                        </template>
                         <VCButton
-                            v-if="realmManagementId !== row.id"
+                            :as="NuxtLink"
+                            :to="'/admin/realms/'+ row.id"
                             size="xs"
                             color="primary"
+                            variant="outline"
                             class="me-1"
-                            @click.prevent="setRealmManagement(row)"
+                            :disabled="!hasEditPermission"
                         >
-                            <VCIcon name="fa6-solid:check" />
+                            <VCIcon name="fa6-solid:bars" />
                         </VCButton>
-                    </template>
-                    <VCButton
-                        :as="NuxtLink"
-                        :to="'/admin/realms/'+ row.id"
-                        size="xs"
-                        color="primary"
-                        variant="outline"
-                        class="me-1"
-                        :disabled="!hasEditPermission"
-                    >
-                        <VCIcon name="fa6-solid:bars" />
-                    </VCButton>
-                    <AEntityDelete
-                        size="sm"
-                        :entity-id="row.id"
-                        entity-type="realm"
-                        :with-text="false"
-                        :disabled="!row.built_in || !hasDropPermission"
-                        @deleted="props.deleted"
-                    />
+                        <AEntityDelete
+                            size="sm"
+                            :entity-id="row.id"
+                            entity-type="realm"
+                            :with-text="false"
+                            :disabled="!row.built_in || !hasDropPermission"
+                            @deleted="props.deleted"
+                        />
+                    </div>
                 </template>
                 <VCTableLoading />
                 <VCTableEmpty />

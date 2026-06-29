@@ -155,25 +155,27 @@ export default defineNuxtComponent({
                     <VCTimeago :datetime="row.updated_at" />
                 </template>
                 <template #cell-options="{ row }">
-                    <VCButton
-                        :as="NuxtLink"
-                        :to="'/admin/permissions/'+ row.id"
-                        size="xs"
-                        color="primary"
-                        variant="outline"
-                        class="me-1"
-                        :disabled="!hasEditPermission"
-                    >
-                        <VCIcon name="fa6-solid:bars" />
-                    </VCButton>
-                    <AEntityDelete
-                        size="sm"
-                        :entity-id="row.id"
-                        entity-type="permission"
-                        :with-text="false"
-                        :disabled="row.built_in || !hasDropPermission"
-                        @deleted="(e) => props.deleted!(e)"
-                    />
+                    <div class="flex items-center">
+                        <VCButton
+                            :as="NuxtLink"
+                            :to="'/admin/permissions/'+ row.id"
+                            size="xs"
+                            color="primary"
+                            variant="outline"
+                            class="me-1"
+                            :disabled="!hasEditPermission"
+                        >
+                            <VCIcon name="fa6-solid:bars" />
+                        </VCButton>
+                        <AEntityDelete
+                            size="sm"
+                            :entity-id="row.id"
+                            entity-type="permission"
+                            :with-text="false"
+                            :disabled="row.built_in || !hasDropPermission"
+                            @deleted="(e) => props.deleted!(e)"
+                        />
+                    </div>
                 </template>
                 <VCTableLoading />
                 <VCTableEmpty />
