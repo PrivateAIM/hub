@@ -102,16 +102,11 @@ export default defineComponent({
                         <VCAlert
                             variant="soft"
                             size="sm"
-                            class="flex flex-row gap-2 items-center mb-3"
+                            class="mb-3"
                             :color="entity.configuration_image_valid ? 'warning' : 'error'"
                         >
-                            <div>
-                                <VCIcon name="fa6-solid:info" />
-                            </div>
-                            <div>
-                                Pick a Docker-based master image that provides the runtime environment for your analysis.<br>
-                                Your uploaded code will be embedded into this image before distribution.
-                            </div>
+                            Pick a Docker-based master image that provides the runtime environment for your analysis.<br>
+                            Your uploaded code will be embedded into this image before distribution.
                         </VCAlert>
                         <FAnalysisMasterImagePicker
                             :readonly="entity.configuration_locked"
@@ -145,15 +140,10 @@ export default defineComponent({
                         <VCAlert
                             variant="soft"
                             size="sm"
-                            class="flex flex-row gap-2 items-center mb-3"
+                            class="mb-3"
                             :color="entity.configuration_entrypoint_valid ? 'warning' : 'error'"
                         >
-                            <div>
-                                <VCIcon name="fa6-solid:info" />
-                            </div>
-                            <div>
-                                An entrypoint file must be selected.
-                            </div>
+                            An entrypoint file must be selected.
                         </VCAlert>
 
                         <FAnalysisTypeBucket

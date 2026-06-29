@@ -200,7 +200,6 @@ export default defineComponent({
                             size="sm"
                             class="mb-3"
                         >
-                            <VCIcon name="fa6-solid:triangle-exclamation" />
                             Please copy the key to a safe location, as it is not stored remotely.
                         </VCAlert>
                     </template>

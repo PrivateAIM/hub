@@ -293,7 +293,6 @@ export default defineComponent({
                 size="sm"
                 class="mb-0"
             >
-                <VCIcon name="fa6-solid:circle-info" />
                 No {{ directoryMode ? 'directories' : 'files' }} selected yet.
             </VCAlert>
         </template>

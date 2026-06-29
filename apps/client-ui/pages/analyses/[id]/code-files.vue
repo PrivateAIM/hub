@@ -67,15 +67,11 @@ export default defineComponent({
                     color="warning"
                     variant="soft"
                     size="sm"
-                    class="flex flex-row gap-2 items-center mb-3"
+                    icon="fa6-solid:upload"
+                    class="mb-3"
                 >
-                    <div>
-                        <VCIcon name="fa6-solid:upload" />
-                    </div>
-                    <div>
-                        Upload one or more code files that define the logic of your analysis.
-                        These files will later be packaged and distributed as part of the analysis image.
-                    </div>
+                    Upload one or more code files that define the logic of your analysis.
+                    These files will later be packaged and distributed as part of the analysis image.
                 </VCAlert>
 
                 <FAnalysisTypeBucket

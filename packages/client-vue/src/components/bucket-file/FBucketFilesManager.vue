@@ -210,7 +210,7 @@ export default defineComponent({
                                 size="sm"
                                 class="mb-0"
                             >
-                                <VCIcon name="fa6-solid:info" /> No files found in bucket
+                                No files found in bucket
                             </VCAlert>
                         </div>
                     </template>

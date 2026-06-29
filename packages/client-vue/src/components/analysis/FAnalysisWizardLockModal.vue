@@ -111,7 +111,7 @@ export default defineComponent({
                     size="sm"
                     class="mb-3"
                 >
-                    <VCIcon name="fa6-solid:info" /> The analysis is now in a state in which it can be locked and build.<br>
+                    The analysis is now in a state in which it can be locked and build.
                 </VCAlert>
                 <div class="flex flex-col gap-2">
                     <div>
