@@ -7,11 +7,20 @@
 <script lang="ts">
 import { FAnalysisTypeBucket, FBucketFilesManager } from '@privateaim/client-vue';
 import type { Analysis } from '@privateaim/core-kit';
+import { VCButton } from '@vuecs/button';
+import { VCAlert } from '@vuecs/elements';
+import { VCIcon } from '@vuecs/icon';
 import { type PropType, useTemplateRef } from 'vue';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-    components: { FBucketFilesManager, FAnalysisTypeBucket },
+    components: {
+        FBucketFilesManager, 
+        FAnalysisTypeBucket, 
+        VCButton, 
+        VCAlert, 
+        VCIcon, 
+    },
     props: { entity: { type: Object as PropType<Analysis> } },
     setup() {
         const analysisCodeFiles = useTemplateRef<
@@ -38,33 +47,32 @@ export default defineComponent({
                     </div>
                     <template v-if="!entity.configuration_locked">
                         <div class="ms-auto">
-                            <button
+                            <VCButton
                                 style="width: 120px"
-                                type="button"
-                                class="btn btn-primary btn-xs"
+                                color="primary"
+                                size="xs"
                                 @click.prevent="add"
                             >
                                 <VCIcon
                                     name="fa6-solid:plus"
                                     class="me-1"
                                 /> Add
-                            </button>
+                            </VCButton>
                         </div>
                     </template>
                 </div>
             </div>
             <div class="card-body">
-                <div
-                    class="flex flex-row gap-2 items-center alert alert-sm alert-warning"
+                <VCAlert
+                    color="warning"
+                    variant="soft"
+                    size="sm"
+                    icon="fa6-solid:upload"
+                    class="mb-3"
                 >
-                    <div>
-                        <VCIcon name="fa6-solid:upload" />
-                    </div>
-                    <div>
-                        Upload one or more code files that define the logic of your analysis.
-                        These files will later be packaged and distributed as part of the analysis image.
-                    </div>
-                </div>
+                    Upload one or more code files that define the logic of your analysis.
+                    These files will later be packaged and distributed as part of the analysis image.
+                </VCAlert>
 
                 <FAnalysisTypeBucket
                     :entity-id="entity.id"

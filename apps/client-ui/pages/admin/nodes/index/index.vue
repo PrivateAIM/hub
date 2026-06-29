@@ -7,11 +7,13 @@
 <script lang="ts">
 import { injectStore, storeToRefs, usePermissionCheck } from '@authup/client-web-kit';
 import { PermissionName } from '@privateaim/kit';
+import { VCButton } from '@vuecs/button';
+import { VCIcon } from '@vuecs/icon';
 import { VCTimeago } from '@vuecs/timeago';
 import type { TableColumn } from '@vuecs/table';
 import type { Node } from '@privateaim/core-kit';
 import type { BuildInput } from 'rapiq';
-import { computed } from 'vue';
+import { computed, resolveComponent } from 'vue';
 import {
     FEntityDelete,
     FNodes,
@@ -30,6 +32,8 @@ export default defineNuxtComponent({
         ListTitle: FTitle,
         EntityDelete: FEntityDelete,
         FNodes,
+        VCButton,
+        VCIcon,
         VCTimeago,
     },
     emits: ['deleted'],
@@ -39,7 +43,7 @@ export default defineNuxtComponent({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
         });
 
-        const columns: TableColumn[] = [
+        const columns: TableColumn<Node>[] = [
             {
                 key: 'name',
                 label: 'Name',
@@ -81,6 +85,8 @@ export default defineNuxtComponent({
             emit('deleted', item);
         };
 
+        const NuxtLink = resolveComponent('NuxtLink');
+
         return {
             columns,
             realmManagementId,
@@ -88,6 +94,7 @@ export default defineNuxtComponent({
             canDrop,
             query,
             handleDeleted,
+            NuxtLink,
         };
     },
 });
@@ -117,27 +124,33 @@ export default defineNuxtComponent({
                 :columns="columns"
                 :busy="props.busy"
             >
-                <template #cell-options="{ row }: { row: any }">
-                    <nuxt-link
-                        v-if="canView"
-                        class="btn btn-xs btn-outline-primary"
-                        :to="'/admin/nodes/'+row.id"
-                    >
-                        <VCIcon name="fa6-solid:bars" />
-                    </nuxt-link>
-                    <EntityDelete
-                        v-if="canDrop"
-                        class="btn btn-xs btn-outline-danger ms-1"
-                        :entity-id="row.id"
-                        :entity-type="'node'"
-                        :with-text="false"
-                        @deleted="props.deleted"
-                    />
+                <template #cell-options="{ row }">
+                    <div class="flex items-center">
+                        <VCButton
+                            v-if="canView"
+                            :as="NuxtLink"
+                            size="xs"
+                            color="primary"
+                            variant="outline"
+                            :to="'/admin/nodes/'+row.id"
+                        >
+                            <VCIcon name="fa6-solid:bars" />
+                        </VCButton>
+                        <EntityDelete
+                            v-if="canDrop"
+                            size="sm"
+                            class="ms-1"
+                            :entity-id="row.id"
+                            :entity-type="'node'"
+                            :with-text="false"
+                            @deleted="props.deleted"
+                        />
+                    </div>
                 </template>
-                <template #cell-created_at="{ row }: { row: any }">
+                <template #cell-created_at="{ row }">
                     <VCTimeago :datetime="row.created_at" />
                 </template>
-                <template #cell-updated_at="{ row }: { row: any }">
+                <template #cell-updated_at="{ row }">
                     <VCTimeago :datetime="row.updated_at" />
                 </template>
                 <VCTableLoading />

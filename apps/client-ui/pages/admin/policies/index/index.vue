@@ -1,6 +1,8 @@
 <script lang="ts">
 
-import { defineComponent } from 'vue';
+import { defineComponent, resolveComponent } from 'vue';
+import { VCButton } from '@vuecs/button';
+import { VCIcon } from '@vuecs/icon';
 import { VCTimeago } from '@vuecs/timeago';
 import type { TableColumn } from '@vuecs/table';
 import {
@@ -26,10 +28,14 @@ export default defineComponent({
         ASearch,
         AEntityDelete,
         APolicies,
+        VCButton,
+        VCIcon,
         VCTimeago,
     },
     emits: ['deleted'],
     setup(props, { emit }) {
+        const NuxtLink = resolveComponent('NuxtLink');
+
         const handleDeleted = (e: Policy) => {
             emit('deleted', e);
         };
@@ -42,7 +48,7 @@ export default defineComponent({
         const hasEditPermission = usePermissionCheck({ name: PermissionName.PERMISSION_UPDATE });
         const hasDropPermission = usePermissionCheck({ name: PermissionName.PERMISSION_DELETE });
 
-        const columns: TableColumn[] = [
+        const columns: TableColumn<Policy>[] = [
             {
                 key: 'name',
                 label: 'Name',
@@ -80,6 +86,7 @@ export default defineComponent({
             hasDropPermission,
             handleDeleted,
             query,
+            NuxtLink,
         };
     },
 });
@@ -109,34 +116,40 @@ export default defineComponent({
                 :columns="columns"
                 :busy="props.busy"
             >
-                <template #cell-name="{ row }: { row: any }">
+                <template #cell-name="{ row }">
                     <FDisplayName
                         :name="row.name"
                         :display-name="row.display_name"
                     />
                 </template>
-                <template #cell-created_at="{ row }: { row: any }">
+                <template #cell-created_at="{ row }">
                     <VCTimeago :datetime="row.created_at" />
                 </template>
-                <template #cell-updated_at="{ row }: { row: any }">
+                <template #cell-updated_at="{ row }">
                     <VCTimeago :datetime="row.updated_at" />
                 </template>
-                <template #cell-options="{ row }: { row: any }">
-                    <NuxtLink
-                        :to="'/admin/policies/'+ row.id"
-                        class="btn btn-xs btn-outline-primary me-1"
-                        :disabled="!hasEditPermission"
-                    >
-                        <VCIcon name="fa6-solid:bars" />
-                    </NuxtLink>
-                    <AEntityDelete
-                        class="btn btn-xs btn-outline-danger"
-                        :entity-id="row.id"
-                        entity-type="policy"
-                        :with-text="false"
-                        :disabled="row.built_in || !hasDropPermission"
-                        @deleted="props.deleted"
-                    />
+                <template #cell-options="{ row }">
+                    <div class="flex items-center">
+                        <VCButton
+                            :as="NuxtLink"
+                            :to="'/admin/policies/'+ row.id"
+                            size="xs"
+                            color="primary"
+                            variant="outline"
+                            class="me-1"
+                            :disabled="!hasEditPermission"
+                        >
+                            <VCIcon name="fa6-solid:bars" />
+                        </VCButton>
+                        <AEntityDelete
+                            size="sm"
+                            :entity-id="row.id"
+                            entity-type="policy"
+                            :with-text="false"
+                            :disabled="row.built_in || !hasDropPermission"
+                            @deleted="props.deleted"
+                        />
+                    </div>
                 </template>
                 <VCTableLoading />
                 <VCTableEmpty />

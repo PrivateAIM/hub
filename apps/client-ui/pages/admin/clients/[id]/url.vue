@@ -87,7 +87,7 @@ export default defineNuxtComponent({
             <template #item="props">
                 <VCFormCheckbox
                     :label="true"
-                    :group-class="'form-switch'"
+                    :group-class="'inline-flex items-center gap-2'"
                     :model-value="scopes.includes(props.data.scope.name)"
                     @update:model-value="toggleScope(props.data.scope.name)"
                 >

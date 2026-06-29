@@ -15,6 +15,7 @@ import {
 } from '@privateaim/core-kit';
 import { FDisplayName, createEntityManager, injectCoreHTTPClient } from '@privateaim/client-vue';
 import { PermissionName } from '@privateaim/kit';
+import { VCIcon } from '@vuecs/icon';
 import type { NavigationItem } from '@vuecs/navigation';
 import type { Ref } from 'vue';
 import {
@@ -34,7 +35,7 @@ import {
 import { LayoutKey, LayoutNavigationID } from '../../config/layout';
 
 export default defineComponent({
-    components: { FDisplayName },
+    components: { FDisplayName, VCIcon },
     async setup() {
         definePageMeta({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,

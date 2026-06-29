@@ -243,160 +243,30 @@
 }
 
 /* ------------------------------------------------------------------
-   Bootstrap-compat layer
-   Provides the Bootstrap-shaped utility / component class names that
-   hub's pre-Tailwind templates still reference. Each rule `@apply`s
-   Tailwind utilities — same visual contract, no `bootstrap` dep, and
-   the rules disappear automatically when the last caller is rewritten
-   to a `<VC*>` component.
+   Structural component styles (no @vuecs equivalent)
+
+   The Bootstrap-compat shims (`.btn*`, `.alert*`, `.row`/`.col`,
+   `.navbar*`, `.badge`, `.is-valid`, `.form-group`/`.form-switch`,
+   `.text-*`/`.bg-*` aliases, `.dropdown*`) were retired — their call
+   sites moved to `<VCButton>` / `<VCAlert>` / `<VCBadge>` / native
+   `@vuecs/forms` + Tailwind utilities (status colors via
+   `resolveTextColorClass()` in `@privateaim/client-vue`).
+
+   What remains here styles structure `@vuecs` does not provide: the
+   progress track/bar, the joined-tab pagination look, and the inner
+   chrome of `<VCModal>`.
    ------------------------------------------------------------------ */
 @layer components {
-    /* Buttons --------------------------------------------------------- */
-    .btn {
-        @apply inline-flex items-center justify-center gap-1 rounded-md
-               border border-transparent px-3 py-1.5 text-sm font-medium
-               transition-colors cursor-pointer
-               focus-visible:outline-2 focus-visible:outline-offset-2
-               focus-visible:outline-primary-500
-               disabled:opacity-50 disabled:cursor-not-allowed;
-    }
-    .btn-xs    { @apply px-1.5! py-1.25! text-xs!; }
-    .btn-sm    { @apply px-2! py-1! text-xs!; }
-    .btn-md    { @apply px-2! py-1! text-base!; }
-    .btn-lg    { @apply px-4! py-2! text-base!; }
-    .btn-block { @apply block w-full; }
+    /* Progress — track + bar (analysis build/exec/distribution steps,
+       master-image card). The bar's color comes from a `bg-*` utility on
+       the markup and its width from an inline style.
 
-    .btn-primary   { @apply bg-primary-600 text-on-primary hover:bg-primary-700; }
-    .btn-secondary { @apply bg-bg-elevated text-fg         hover:bg-bg-muted; }
-    .btn-success   { @apply bg-success-600 text-on-success hover:bg-success-700; }
-    .btn-danger    { @apply bg-error-600   text-on-error   hover:bg-error-700; }
-    .btn-warning   { @apply bg-warning-500 text-on-warning hover:bg-warning-600; }
-    /* btn-info is reachable only via dynamic `btn-${classSuffix}`
-       (F*Command components) — keep it despite zero static users. */
-    .btn-info      { @apply bg-info-500    text-on-info    hover:bg-info-600; }
-    .btn-dark      { @apply bg-fg          text-bg         hover:opacity-80; }
-
-    /* Semantic color aliases — status/approval components build
-       `text-${suffix}` / `bg-${suffix}` / `btn-${suffix}` dynamically
-       (FProcessStatus, F*ApprovalStatus, F*Command, …), which the Tailwind
-       scanner cannot see; these map the Bootstrap-era bare names onto the
-       token scale. `bg-dark` / `bg-secondary` pair with white `text-light`
-       chips, so they pin the RAW neutral scale (mode-stable) rather than
-       the flipped semantic `fg` token. */
-    .text-primary { @apply text-primary-600; }
-    .text-success { @apply text-success-600; }
-    .text-warning { @apply text-warning-600; }
-    .text-danger  { @apply text-error-600; }
-    .text-info    { @apply text-info-600; }
-    .text-dark    { @apply text-fg; }
-    .text-light   { @apply text-white; }
-
-    /* Dark mode — the 600 weights are tuned for light surfaces and turn
-       harsh/dim on the dark content bg; lift warning/danger/info to the
-       hand-tuned text tokens (same hues as the alert surfaces). */
-    .dark .text-warning { color: var(--privateaim-warning-text); }
-    .dark .text-danger  { color: var(--privateaim-danger-text); }
-    .dark .text-info    { color: var(--privateaim-info-text); }
-
-    .bg-primary   { @apply bg-primary-600; }
-    .bg-success   { @apply bg-success-600; }
-    .bg-warning   { @apply bg-warning-500; }
-    /* 500 (not 600) — Tailwind red-600 reads much harsher than the old
-       Bootstrap #dc3545 on the white-text node execution status banner
-       (the only `bg-danger` consumer); 500 matches bg-warning's weight. */
-    .bg-danger    { @apply bg-error-500; }
-    .bg-secondary { background-color: var(--vc-color-neutral-500); }
-    .bg-dark      { background-color: var(--vc-color-neutral-800); }
-
-    .btn-outline-primary   { @apply border-primary-600  text-primary-600 hover:bg-primary-600 hover:text-on-primary; }
-    .btn-outline-secondary { @apply border-border       text-fg          hover:bg-bg-muted; }
-    .btn-outline-danger    { @apply border-error-600    text-error-600   hover:bg-error-600   hover:text-on-error; }
-    .btn-outline-info      { @apply border-info-500     text-info-600    hover:bg-info-500    hover:text-on-info; }
-    .btn-outline-dark      { @apply border-fg           text-fg          hover:bg-fg          hover:text-bg; }
-
-    /* Grid — Bootstrap-style 12-col layout via flex (not CSS grid). */
-    .row     { @apply flex flex-wrap; margin-left: -0.5rem; margin-right: -0.5rem; }
-    .col     { @apply flex-1 basis-0 px-2; }
-    .col-1   { @apply w-1/12 px-2; }
-    .col-2   { @apply w-2/12 px-2; }
-    .col-3   { @apply w-3/12 px-2; }
-    .col-4   { @apply w-4/12 px-2; }
-    .col-5   { @apply w-5/12 px-2; }
-    .col-6   { @apply w-6/12 px-2; }
-    .col-7   { @apply w-7/12 px-2; }
-    .col-8   { @apply w-8/12 px-2; }
-    .col-9   { @apply w-9/12 px-2; }
-    .col-10  { @apply w-10/12 px-2; }
-    .col-11  { @apply w-11/12 px-2; }
-    .col-12  { @apply w-full px-2; }
-
-    /* Responsive columns — md+ breakpoint (hub uses col-sm, col-md, col-lg variants). */
-    .col-sm    { @apply px-2 sm:flex-1 sm:basis-0; }
-    .col-sm-4  { @apply w-full px-2 sm:w-4/12; }
-    .col-md    { @apply px-2 md:flex-1 md:basis-0; }
-    .col-md-3  { @apply w-full px-2 md:w-3/12; }
-    .col-md-4  { @apply w-full px-2 md:w-4/12; }
-    .col-md-6  { @apply w-full px-2 md:w-6/12; }
-    .col-lg-6  { @apply w-full px-2 lg:w-6/12; }
-
-    .container       { @apply mx-auto w-full max-w-screen-lg px-4; }
-    .container-fluid { @apply w-full px-4; }
-
-    /* Cards — the full mechanism (base + variants, all variable-driven)
-       lives in styles/card.css, imported below into @layer components. */
-
-    /* Alerts ---------------------------------------------------------
-       The tinted variants use raw palette steps that do NOT flip with
-       the mode — in dark mode the light `*-50` fills glare against the
-       dark surface, so each variant carries a deep-end dark recipe
-       (950 fill / 900 border / 300 text). `.alert-dark` builds on
-       semantic tokens and adapts on its own. */
-    .alert         { @apply relative mb-3 rounded-md border px-4 py-3; }
-    .alert-sm      { @apply px-3 py-2 text-sm; }
-    .alert-primary { @apply border-primary-200 bg-primary-50 text-primary-700 dark:border-primary-900 dark:bg-primary-950 dark:text-primary-300; }
-    .alert-success { @apply border-success-200 bg-success-50 text-success-700 dark:border-success-900 dark:bg-success-950 dark:text-success-300; }
-    /* Orange scale (not the amber `warning` tokens) — amber's dark end
-       reads brown; orange keeps the warm tone in both modes. */
-    .alert-warning { @apply border-orange-200 bg-orange-50 text-orange-700; }
-    .alert-danger  { @apply border-error-200   bg-error-50   text-error-700; }
-    .alert-info    { @apply border-info-200    bg-info-50    text-info-700; }
-    .alert-dark    { @apply border-border bg-bg-elevated text-fg; }
-
-    /* Warning / danger / info dark recipes use the hand-tuned surface
-       tokens (see the `.dark` token block above) — the palette deep
-       ends the other variants use read brown/black/near-navy. */
-    .dark .alert-warning {
-        background-color: var(--privateaim-warning-surface);
-        border-color: var(--privateaim-warning-surface-border);
-        color: var(--privateaim-warning-surface-fg);
-    }
-    .dark .alert-danger {
-        background-color: var(--privateaim-danger-surface);
-        border-color: var(--privateaim-danger-surface-border);
-        color: var(--privateaim-danger-surface-fg);
-    }
-    .dark .alert-info {
-        background-color: var(--privateaim-info-surface);
-        border-color: var(--privateaim-info-surface-border);
-        color: var(--privateaim-info-surface-fg);
-    }
-
-    /* Badges --------------------------------------------------------- */
-    .badge {
-        @apply inline-flex items-center rounded-full px-2 py-0.5
-               text-xs font-medium;
-    }
-
-    /* Progress — Bootstrap-shaped track + bar (analysis build/exec/
-       distribution steps, master-image card). The bar's color comes from a
-       `bg-*` utility on the markup and its width from an inline style; this
-       only restores the structure Bootstrap used to provide. */
+       `bg-bg` (the base content surface) + a border, NOT `bg-bg-muted`:
+       the track is mostly consumed inside `.card-grey` whose `--card-bg`
+       IS `bg-bg-muted`, so a muted track vanished into the card. The
+       darker base fill reads as a recessed groove and the border keeps
+       the shape detectable on any surface. */
     .progress {
-        /* `bg-bg` (the base content surface) + a border, NOT `bg-bg-muted`:
-           the track is mostly consumed inside `.card-grey` whose `--card-bg`
-           IS `bg-bg-muted`, so a muted track vanished into the card. The
-           darker base fill reads as a recessed groove and the border keeps
-           the shape detectable on any surface. */
         @apply flex h-4 overflow-hidden rounded-md border border-border bg-bg text-xs;
     }
     .progress-bar {
@@ -404,25 +274,6 @@
                text-center text-white;
         transition: width 0.5s ease;
     }
-
-    /* Nav / navbar --------------------------------------------------- */
-    .nav             { @apply flex flex-wrap; }
-    .nav-item        { @apply list-none; }
-    .nav-link        { @apply block px-3 py-2 text-fg hover:text-primary-600 no-underline; }
-    .nav-link.active { @apply text-primary-600; }
-    .navbar          { @apply flex flex-wrap items-center justify-between; }
-    .navbar-nav      { @apply flex flex-col list-none; }
-    .navbar-toggler  { @apply rounded border border-border px-2 py-1; }
-    .navbar-collapse { @apply grow basis-full items-center; }
-
-    .navbar-collapse:not(.show)        { @apply hidden; }
-    .navbar-expand-md .navbar-collapse { @apply md:flex!; }
-    .navbar-expand-md .navbar-nav      { @apply md:flex-row!; }
-    .navbar-expand-md                  { @apply md:flex-nowrap md:justify-start; }
-
-    /* Forms — minimal shims (vuecs SFCs own the real form styles) ---- */
-    .form-group   { @apply mb-3; }
-    .form-switch  { @apply inline-flex items-center gap-2; }
 
     /* Pagination — joined-tab look over theme-tailwind's per-button
        rounded-md. */
@@ -437,31 +288,6 @@
     .vc-pagination > :last-child .vc-pagination-link {
         @apply !rounded-r-md;
     }
-
-    /* Form validation visual state. */
-    .is-valid {
-        @apply border-success-600 ring-1 ring-success-500;
-    }
-
-    /* Dropdowns — Bootstrap-style toggle/menu (also used by the
-       navbar/sidebar chrome). The `hidden` on `.dropdown-menu` is
-       load-bearing; the toggle's click handler flips `.show`. */
-    .dropdown { @apply relative; }
-    .dropdown-toggle { @apply cursor-pointer; }
-    .dropdown-menu {
-        @apply absolute top-full left-0 z-50 hidden min-w-40 rounded-md
-               border border-border bg-bg py-1 shadow-md;
-    }
-    .dropdown-menu-end { @apply left-auto right-0; }
-    .dropdown-menu.show { @apply block; }
-    .dropdown-item {
-        @apply block w-full cursor-pointer border-0 bg-transparent
-               px-3 py-1 text-left text-sm text-fg hover:bg-bg-muted;
-    }
-    .dropdown-item.active {
-        @apply bg-primary-600 text-on-primary hover:bg-primary-700;
-    }
-    .dropdown-divider { @apply my-1 h-px bg-border; }
 
     /* Modal — INNER chrome only. The backdrop / positioning shell is
        owned by Reka / <VCModalContent> (@vuecs/overlays); hub mounts

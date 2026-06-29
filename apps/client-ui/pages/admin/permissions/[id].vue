@@ -10,6 +10,7 @@ import { injectHTTPClient } from '@authup/client-web-kit';
 import type { Permission } from '@authup/core-kit';
 import { PermissionName } from '@authup/core-kit';
 import { FDisplayName } from '@privateaim/client-vue';
+import { VCIcon } from '@vuecs/icon';
 
 import type { NavigationItem } from '@vuecs/navigation';
 import { computed, defineComponent, ref } from 'vue';
@@ -21,7 +22,7 @@ import { useToast } from '../../../composables/toast';
 import { updateObjectProperties } from '../../../utils';
 
 export default defineComponent({
-    components: { FDisplayName },
+    components: { FDisplayName, VCIcon },
     async setup() {
         definePageMeta({
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,

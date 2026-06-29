@@ -10,12 +10,14 @@ import type {
     Event,
 } from '@privateaim/telemetry-kit';
 import { defineComponent, ref } from 'vue';
+import { VCIcon } from '@vuecs/icon';
 import {
     useRoute,
 } from '#imports';
 import { createError, navigateTo } from '#app';
 
 export default defineComponent({
+    components: { VCIcon },
     async setup() {
         const route = useRoute();
 

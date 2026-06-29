@@ -8,6 +8,7 @@
 import { injectStore, storeToRefs } from '@authup/client-web-kit';
 import { FDisplayName } from '@privateaim/client-vue';
 import { VCGravatar } from '@vuecs/gravatar';
+import { VCIcon } from '@vuecs/icon';
 import { VCNavItems } from '@vuecs/navigation';
 import { ref, useColorMode } from '#imports';
 import { defineNuxtComponent } from '#app';
@@ -19,6 +20,7 @@ export default defineNuxtComponent({
         FDisplayName,
         Logo,
         VCGravatar,
+        VCIcon,
         VCNavItems,
     },
     setup() {
@@ -88,20 +90,20 @@ export default defineNuxtComponent({
                     </div>
                 </div>
             </div>
-            <nav class="page-navbar navbar-expand-md">
+            <nav class="page-navbar md:flex-nowrap md:justify-start">
                 <div
                     id="page-navbar"
-                    class="navbar-content navbar-collapse"
-                    :class="{'show': displayNav}"
+                    class="navbar-content grow basis-full items-center md:flex!"
+                    :class="{ hidden: !displayNav }"
                 >
                     <VCNavItems
-                        class="navbar-nav"
+                        class="flex flex-col list-none md:flex-row!"
                         :data="topItems"
                         :watch="topItemsWatch"
                         registry
                         :registry-id="topRegistryId"
                     />
-                    <ul class="navbar-nav vc-nav-items navbar-gadgets">
+                    <ul class="flex flex-col list-none md:flex-row! vc-nav-items navbar-gadgets">
                         <li class="vc-nav-item">
                             <button
                                 type="button"

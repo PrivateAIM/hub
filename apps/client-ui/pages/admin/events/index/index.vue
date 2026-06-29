@@ -7,11 +7,13 @@
 <script lang="ts">
 import { injectStore, storeToRefs, usePermissionCheck } from '@authup/client-web-kit';
 import { PermissionName } from '@privateaim/kit';
+import { VCButton } from '@vuecs/button';
+import { VCIcon } from '@vuecs/icon';
 import { VCTimeago } from '@vuecs/timeago';
 import type { TableColumn } from '@vuecs/table';
-import type { Node } from '@privateaim/core-kit';
+import type { Event } from '@privateaim/telemetry-kit';
 import type { BuildInput } from 'rapiq';
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, resolveComponent } from 'vue';
 import {
     FEntityDelete,
     FEventActor,
@@ -33,6 +35,8 @@ export default defineComponent({
         FTitle,
         FEntityDelete,
         FEvents,
+        VCButton,
+        VCIcon,
         VCTimeago,
     },
     emits: ['deleted'],
@@ -42,7 +46,7 @@ export default defineComponent({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
         });
 
-        const columns: TableColumn[] = [
+        const columns: TableColumn<Event>[] = [
             {
                 key: 'name',
                 label: 'Name',
@@ -95,19 +99,20 @@ export default defineComponent({
         const store = injectStore();
         const { realmManagementId } = storeToRefs(store);
 
-        const canEdit = usePermissionCheck({ name: PermissionName.NODE_UPDATE });
-        const canDrop = usePermissionCheck({ name: PermissionName.NODE_DELETE });
-        const canView = computed(() => canEdit.value || canDrop.value);
+        const canView = usePermissionCheck({ name: PermissionName.EVENT_READ });
+        const canDrop = usePermissionCheck({ name: PermissionName.EVENT_DELETE });
 
-        const query = computed<BuildInput<Node>>(() => ({
+        const query = computed<BuildInput<Event>>(() => ({
             filters: { realm_id: [realmManagementId.value, null] },
             sort: { updated_at: 'DESC' },
             pagination: { limit: 50 },
         }));
 
-        const handleDeleted = async (item: Node) => {
+        const handleDeleted = async (item: Event) => {
             emit('deleted', item);
         };
+
+        const NuxtLink = resolveComponent('NuxtLink');
 
         return {
             columns,
@@ -116,6 +121,7 @@ export default defineComponent({
             canDrop,
             query,
             handleDeleted,
+            NuxtLink,
         };
     },
 });
@@ -146,7 +152,7 @@ export default defineComponent({
                 :columns="columns"
                 :busy="props.busy"
             >
-                <template #cell-scope="{ row }: { row: any }">
+                <template #cell-scope="{ row }">
                     <template v-if="row.scope">
                         {{ row.scope }}
                     </template>
@@ -154,37 +160,43 @@ export default defineComponent({
                         -
                     </template>
                 </template>
-                <template #cell-actor="{ row }: { row: any }">
+                <template #cell-actor="{ row }">
                     <FEventActor :entity="row" />
                 </template>
-                <template #cell-expiring="{ row }: { row: any }">
+                <template #cell-expiring="{ row }">
                     <FEventExpiring
                         :entity="row"
                         :direction="'row'"
                     />
                 </template>
-                <template #cell-options="{ row }: { row: any }">
-                    <nuxt-link
-                        v-if="canView"
-                        class="btn btn-xs btn-outline-primary"
-                        :to="'/admin/events/'+row.id"
-                    >
-                        <VCIcon name="fa6-solid:share-from-square" />
-                    </nuxt-link>
-                    <FEntityDelete
-                        v-if="canDrop"
-                        service="telemetry"
-                        class="btn btn-xs btn-outline-danger ms-1"
-                        :entity-id="row.id"
-                        :entity-type="'event'"
-                        :with-text="false"
-                        @deleted="props.deleted"
-                    />
+                <template #cell-options="{ row }">
+                    <div class="flex items-center">
+                        <VCButton
+                            v-if="canView"
+                            :as="NuxtLink"
+                            size="xs"
+                            color="primary"
+                            variant="outline"
+                            :to="'/admin/events/'+row.id"
+                        >
+                            <VCIcon name="fa6-solid:share-from-square" />
+                        </VCButton>
+                        <FEntityDelete
+                            v-if="canDrop"
+                            service="telemetry"
+                            size="sm"
+                            class="ms-1"
+                            :entity-id="row.id"
+                            :entity-type="'event'"
+                            :with-text="false"
+                            @deleted="props.deleted"
+                        />
+                    </div>
                 </template>
-                <template #cell-created_at="{ row }: { row: any }">
+                <template #cell-created_at="{ row }">
                     <VCTimeago :datetime="row.created_at" />
                 </template>
-                <template #cell-updated_at="{ row }: { row: any }">
+                <template #cell-updated_at="{ row }">
                     <VCTimeago :datetime="row.updated_at" />
                 </template>
                 <VCTableLoading />

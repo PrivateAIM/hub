@@ -6,10 +6,16 @@
   -->
 
 <script lang="ts">
+import { VCButton } from '@vuecs/button';
+import { VCIcon } from '@vuecs/icon';
 import type { PropType } from 'vue';
 import { computed, defineComponent } from 'vue';
 
 export default defineComponent({
+    components: {
+        VCButton,
+        VCIcon,
+    },
     props: {
         file: {
             type: Object as PropType<File>,
@@ -53,13 +59,13 @@ export default defineComponent({
             </span>
         </div>
         <div class="ms-auto">
-            <button
-                type="button"
-                class="btn btn-dark btn-xs"
+            <VCButton
+                color="neutral"
+                size="xs"
                 @click.prevent="drop"
             >
                 <VCIcon name="fa6-solid:trash" />
-            </button>
+            </VCButton>
         </div>
     </div>
 </template>

@@ -12,6 +12,7 @@ import {
 import { FDisplayName, createEntityManager } from '@privateaim/client-vue';
 import { PermissionName } from '@privateaim/kit';
 import type { NavigationItem } from '@vuecs/navigation';
+import { VCIcon } from '@vuecs/icon';
 import { isClientErrorWithStatusCode } from 'hapic';
 import { computed, defineComponent } from 'vue';
 import { definePageMeta, useToast } from '#imports';
@@ -23,7 +24,7 @@ import {
 import { LayoutKey, LayoutNavigationID } from '../../config/layout';
 
 export default defineComponent({
-    components: { FDisplayName },
+    components: { FDisplayName, VCIcon },
     async setup() {
         definePageMeta({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,

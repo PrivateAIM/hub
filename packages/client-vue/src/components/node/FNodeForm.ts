@@ -6,12 +6,6 @@
  */
 import {
     ARealms,
-    buildFormCheckbox,
-    buildFormGroup,
-    buildFormInput,
-    buildFormSelect,
-    buildFormSubmitWithTranslations,
-    createFormSubmitTranslations,
 } from '@authup/client-web-kit';
 import { useFieldValidation } from '@ilingo/validup-vue';
 import { useValidup } from '@validup/vue';
@@ -25,6 +19,14 @@ import {
     NodeValidator,
 } from '@privateaim/core-kit';
 import { ValidatorGroup } from '@privateaim/kit';
+import { VCButton } from '@vuecs/button';
+import { extend } from '@vuecs/core';
+import {
+    VCFormCheckbox,
+    VCFormGroup,
+    VCFormInput,
+    VCFormSelect,
+} from '@vuecs/forms';
 import type {
     PropType,
     VNodeArrayChildren,
@@ -42,6 +44,7 @@ import { useUpdatedAt } from '../../composables';
 import type { ListBodySlotProps, ListItemSlotProps } from '../../core';
 import {
     EntityListSlotName,
+    buildFormSubmit,
     createEntityManager,
     defineEntityManagerEvents,
     initFormAttributesFromSource,
@@ -157,7 +160,6 @@ export default defineComponent({
             }
         };
 
-        const translationsSubmit = createFormSubmitTranslations();
 
         return () => {
             const VCIcon = resolveComponent('VCIcon');
@@ -168,120 +170,147 @@ export default defineComponent({
                         ARealms,
                         {},
                         {
-                            [EntityListSlotName.BODY]: (props: ListBodySlotProps<Node>) => buildFormGroup({
-                                validationMessages: realmValidation.messages,
-                                validationSeverity: toSeverity(realmValidation.severity),
-                                label: true,
-                                labelContent: 'Realms',
-                                content: buildFormSelect({
-                                    value: form.realm_id,
-                                    onChange(input) {
-                                        form.realm_id = input;
-                                    },
-                                    options: props.data.map((item) => ({
-                                        id: item.id,
-                                        value: item.name,
-                                    })),
-                                }),
-                            }),
+                            [EntityListSlotName.BODY]: (props: ListBodySlotProps<Node>) => h(
+                                VCFormGroup,
+                                {
+                                    label: true,
+                                    labelContent: 'Realms',
+                                    validationMessages: realmValidation.messages,
+                                    validationSeverity: toSeverity(realmValidation.severity),
+                                },
+                                {
+                                    default: () => h(VCFormSelect, {
+                                        modelValue: form.realm_id,
+                                        'onUpdate:modelValue': (input: unknown) => {
+                                            form.realm_id = input as string;
+                                        },
+                                        options: props.data.map((item) => ({
+                                            value: item.id,
+                                            label: item.name ?? String(item.id),
+                                        })),
+                                    }),
+                                },
+                            ),
                         },
                     ),
                     h('hr'),
                 ];
             }
 
-            const name = buildFormGroup({
-                validationMessages: nameValidation.messages,
-                validationSeverity: toSeverity(nameValidation.severity),
-                label: true,
-                labelContent: 'Name',
-                content: buildFormInput({
-                    value: $v.fields.name.$model.value,
-                    onChange(input) {
-                        $v.fields.name.$model.value = input;
-                    },
-                }),
-            });
+            const name = h(
+                VCFormGroup,
+                {
+                    label: true,
+                    labelContent: 'Name',
+                    validationMessages: nameValidation.messages,
+                    validationSeverity: toSeverity(nameValidation.severity),
+                },
+                {
+                    default: () => h(VCFormInput, {
+                        modelValue: $v.fields.name.$model.value == null ? '' : String($v.fields.name.$model.value),
+                        'onUpdate:modelValue': (input: string) => {
+                            $v.fields.name.$model.value = input;
+                        },
+                    }),
+                },
+            );
 
-            const type = buildFormGroup({
-                validationMessages: typeValidation.messages,
-                validationSeverity: toSeverity(typeValidation.severity),
-                label: true,
-                labelContent: 'Type',
-                content: buildFormSelect({
-                    value: form.type,
-                    options: Object.values(NodeType).map((type) => ({
-                        id: type,
-                        value: type,
-                    })),
-                    onChange(input) {
-                        form.type = input;
-                    },
-                }),
-            });
+            const type = h(
+                VCFormGroup,
+                {
+                    label: true,
+                    labelContent: 'Type',
+                    validationMessages: typeValidation.messages,
+                    validationSeverity: toSeverity(typeValidation.severity),
+                },
+                {
+                    default: () => h(VCFormSelect, {
+                        modelValue: form.type,
+                        'onUpdate:modelValue': (input: unknown) => {
+                            form.type = input as NodeType;
+                        },
+                        options: Object.values(NodeType).map((type) => ({
+                            value: type,
+                            label: typeof type === 'string' ? type : String(type),
+                        })),
+                    }),
+                },
+            );
 
-            const externalName = buildFormGroup({
-                validationMessages: externalNameValidation.messages,
-                validationSeverity: toSeverity(externalNameValidation.severity),
-                label: true,
-                labelContent: 'External Name',
-                content: buildFormInput({
-                    value: form.external_name,
-                    onChange(input) {
-                        form.external_name = input;
-                    },
-                }),
-            });
+            const externalName = h(
+                VCFormGroup,
+                {
+                    label: true,
+                    labelContent: 'External Name',
+                    validationMessages: externalNameValidation.messages,
+                    validationSeverity: toSeverity(externalNameValidation.severity),
+                },
+                {
+                    default: () => h(VCFormInput, {
+                        modelValue: form.external_name == null ? '' : String(form.external_name),
+                        'onUpdate:modelValue': (input: string) => {
+                            form.external_name = input;
+                        },
+                    }),
+                },
+            );
 
-            const hidden = buildFormGroup({
-                validationMessages: hiddenValidation.messages,
-                validationSeverity: toSeverity(hiddenValidation.severity),
-                label: true,
-                labelContent: 'Visibility',
-                content: buildFormCheckbox({
-                    groupClass: 'form-switch',
-                    value: form.hidden,
-                    onChange(input) {
-                        form.hidden = input;
-                    },
-                    labelContent: 'Hide for project/analysis selection?',
-                }),
-            });
+            const hidden = h(
+                VCFormGroup,
+                {
+                    label: true,
+                    labelContent: 'Visibility',
+                    validationMessages: hiddenValidation.messages,
+                    validationSeverity: toSeverity(hiddenValidation.severity),
+                },
+                {
+                    default: () => h(VCFormCheckbox, {
+                        modelValue: !!form.hidden,
+                        'onUpdate:modelValue': (input: boolean) => {
+                            form.hidden = input;
+                        },
+                        labelContent: 'Hide for project/analysis selection?',
+                        themeClass: { group: extend('inline-flex items-center gap-2') },
+                    }),
+                },
+            );
 
             const registry : VNodeArrayChildren = [
-                buildFormGroup({
-                    label: true,
-                    labelContent: 'Registry',
-                    content:
-                        h(RegistryList, {}, {
-                            [EntityListSlotName.ITEM_ACTIONS]: (props: ListItemSlotProps<Registry>) => h('button', {
+                h(
+                    VCFormGroup,
+                    {
+                        label: true,
+                        labelContent: 'Registry',
+                    },
+                    {
+                        default: () => h(RegistryList, {}, {
+                            [EntityListSlotName.ITEM_ACTIONS]: (props: ListItemSlotProps<Registry>) => h(VCButton, {
                                 disabled: props.busy,
-                                class: ['btn btn-xs', {
-                                    'btn-dark': form.registry_id !== props.data.id,
-                                    'btn-warning': form.registry_id === props.data.id,
-                                }],
+                                size: 'xs',
+                                color: form.registry_id === props.data.id ? 'warning' : 'neutral',
                                 onClick($event: any) {
                                     $event.preventDefault();
 
                                     toggleFormData('registry_id', props.data.id);
                                 },
-                            }, [
+                            }, () => [
                                 h(VCIcon, { name: form.registry_id === props.data.id ? 'fa6-solid:minus' : 'fa6-solid:plus' }),
                             ]),
                         }),
-                }),
+                    },
+                ),
             ];
 
-            const submitNode = buildFormSubmitWithTranslations({
+            const submitNode = buildFormSubmit({
                 submit,
                 busy: busy.value,
                 isEditing: !!manager.data.value,
                 invalid: $v.$invalid.value,
-            }, translationsSubmit);
+            });
 
             return h('div', [
-                h('div', { class: 'row' }, [
-                    h('div', { class: 'col' }, [
+                h('div', { class: 'flex flex-wrap -mx-2' }, [
+                    h('div', { class: 'flex-1 basis-0 px-2' }, [
                         realm,
                         name,
                         h('hr'),
@@ -290,7 +319,7 @@ export default defineComponent({
                         registry,
 
                     ]),
-                    h('div', { class: 'col' }, [
+                    h('div', { class: 'flex-1 basis-0 px-2' }, [
                         type,
                         h('hr'),
                         hidden,

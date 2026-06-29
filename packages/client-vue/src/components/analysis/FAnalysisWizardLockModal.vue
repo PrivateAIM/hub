@@ -8,11 +8,19 @@
 <script lang="ts">
 import type { Analysis } from '@privateaim/core-kit';
 import { AnalysisCommand } from '@privateaim/core-kit';
+import { VCButton } from '@vuecs/button';
+import { VCAlert } from '@vuecs/elements';
+import { VCIcon } from '@vuecs/icon';
 import type { PropType } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { injectCoreHTTPClient, wrapFnWithBusyState } from '../../core';
 
 export default defineComponent({
+    components: {
+        VCAlert,
+        VCButton,
+        VCIcon,
+    },
     props: {
         entity: {
             type: Object as PropType<Analysis>,
@@ -97,16 +105,21 @@ export default defineComponent({
                 <VCModalClose class="btn-close" />
             </div>
             <div class="modal-body">
-                <div class="alert alert-success alert-sm">
-                    <VCIcon name="fa6-solid:info" /> The analysis is now in a state in which it can be locked and build.<br>
-                </div>
+                <VCAlert
+                    color="success"
+                    variant="soft"
+                    size="sm"
+                    class="mb-3"
+                >
+                    The analysis is now in a state in which it can be locked and build.
+                </VCAlert>
                 <div class="flex flex-col gap-2">
                     <div>
                         <VCFormCheckbox
                             v-model="lockIt"
                             :disabled="isBusy"
                             :label="true"
-                            :group-class="'form-switch mb-0'"
+                            :group-class="'inline-flex items-center gap-2 mb-0'"
                             @update:model-value="handleLockItChanged"
                         >
                             <template #label="props">
@@ -122,7 +135,7 @@ export default defineComponent({
                             v-model="buildIt"
                             :disabled="isBusy"
                             :label="true"
-                            :group-class="'form-switch mb-0'"
+                            :group-class="'inline-flex items-center gap-2 mb-0'"
                             @update:model-value="handleBuildItChanged"
                         >
                             <template #label="props">
@@ -141,24 +154,25 @@ export default defineComponent({
                     style="width: 100%;"
                 >
                     <div>
-                        <button
+                        <VCButton
                             :disabled="isBusy"
-                            type="button"
-                            class="btn btn-secondary btn-xs"
+                            color="neutral"
+                            variant="soft"
+                            size="xs"
                             @click.prevent="close()"
                         >
                             Cancel
-                        </button>
+                        </VCButton>
                     </div>
                     <div class="ms-auto">
-                        <button
+                        <VCButton
                             :disabled="isBusy"
-                            type="button"
-                            class="btn btn-xs btn-dark"
+                            size="xs"
+                            color="neutral"
                             @click.prevent="execute()"
                         >
                             Continue
-                        </button>
+                        </VCButton>
                     </div>
                 </div>
             </div>

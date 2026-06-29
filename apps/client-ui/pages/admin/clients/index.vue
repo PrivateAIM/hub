@@ -1,12 +1,14 @@
 <script lang="ts">
 import type { Client } from '@authup/core-kit';
 import { PermissionName } from '@authup/core-kit';
+import { VCIcon } from '@vuecs/icon';
 import type { NavigationItem } from '@vuecs/navigation';
 import { defineNuxtComponent } from '#app';
 import { definePageMeta, useToast } from '#imports';
 import { LayoutKey } from '../../../config/layout';
 
 export default defineNuxtComponent({
+    components: { VCIcon },
     setup() {
         definePageMeta({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,

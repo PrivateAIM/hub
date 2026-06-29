@@ -50,6 +50,15 @@ export default defineNuxtConfig({
     telemetry: false,
     ssr: true,
 
+    // The OAuth2 authorization-code exchange runs CLIENT-side only — the
+    // @authup/client-web-nuxt RoutingInterceptor skips the `?code=` exchange
+    // on the server (`import.meta.server` guard). With SSR on, the callback
+    // page's `navigateTo('/')` would 302 away on the server before the client
+    // can exchange the code, bouncing the user back to /login. Render the
+    // callback client-only so the interceptor handles the code. (Mirrors
+    // authup's client-web.)
+    routeRules: { '/login/callback': { ssr: false } },
+
     alias: {
         '@privateaim/core-kit': path.join(import.meta.dirname, '..', '..', 'packages', 'core-kit', 'src'),
         '@privateaim/kit': path.join(import.meta.dirname, '..', '..', 'packages', 'kit', 'src'),

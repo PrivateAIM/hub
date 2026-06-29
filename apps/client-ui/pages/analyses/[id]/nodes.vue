@@ -7,11 +7,17 @@
 <script lang="ts">
 import { FAnalysisNodesManager } from '@privateaim/client-vue';
 import type { Analysis } from '@privateaim/core-kit';
+import { VCButton } from '@vuecs/button';
+import { VCIcon } from '@vuecs/icon';
 import type { PropType } from 'vue';
 import { defineComponent, useTemplateRef } from 'vue';
 
 export default defineComponent({
-    components: { FAnalysisNodesManager },
+    components: {
+        FAnalysisNodesManager, 
+        VCButton, 
+        VCIcon, 
+    },
     props: { entity: { type: Object as PropType<Analysis> } },
     setup() {
         const analysisNodes = useTemplateRef<typeof FAnalysisNodesManager | null>('analysisNodes');
@@ -36,17 +42,17 @@ export default defineComponent({
                     </div>
                     <template v-if="!entity.configuration_locked">
                         <div class="ms-auto">
-                            <button
+                            <VCButton
                                 style="width: 120px"
-                                type="button"
-                                class="btn btn-primary btn-xs"
+                                color="primary"
+                                size="xs"
                                 @click.prevent="add"
                             >
                                 <VCIcon
                                     name="fa6-solid:plus"
                                     class="me-1"
                                 /> Add
-                            </button>
+                            </VCButton>
                         </div>
                     </template>
                 </div>

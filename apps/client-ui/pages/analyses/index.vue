@@ -7,11 +7,13 @@
 <script lang="ts">
 import type { Analysis } from '@privateaim/core-kit';
 import type { NavigationItem } from '@vuecs/navigation';
+import { VCIcon } from '@vuecs/icon';
 import { defineNuxtComponent } from '#app';
 import { definePageMeta, navigateTo, useToast } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '../../config/layout';
 
 export default defineNuxtComponent({
+    components: { VCIcon },
     setup() {
         definePageMeta({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,

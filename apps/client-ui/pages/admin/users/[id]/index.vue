@@ -47,8 +47,8 @@ export default defineNuxtComponent({
 });
 </script>
 <template>
-    <div class="row">
-        <div class="col-7">
+    <div class="flex flex-wrap -mx-2">
+        <div class="w-7/12 px-2">
             <h6 class="title">
                 General
             </h6>
@@ -60,7 +60,7 @@ export default defineNuxtComponent({
                 @failed="handleFailed"
             />
         </div>
-        <div class="col-5">
+        <div class="w-5/12 px-2">
             <h6 class="title">
                 Password
             </h6>

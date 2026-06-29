@@ -7,7 +7,10 @@
 
 <script lang="ts">
 import { provide } from '@authup/client-web-kit';
+import { VCButton } from '@vuecs/button';
+import { VCAlert } from '@vuecs/elements';
 import { VCFormCheckbox } from '@vuecs/forms';
+import { VCIcon } from '@vuecs/icon';
 import {
     computed,
     defineComponent,
@@ -27,7 +30,10 @@ export default defineComponent({
         FBucketFiles,
         FBucketFilesUpload,
         FBucketFile,
+        VCAlert,
+        VCButton,
         VCFormCheckbox,
+        VCIcon,
     },
     props: {
         entityId: {
@@ -175,7 +181,7 @@ export default defineComponent({
                     v-model="allSelected"
                     :disabled="busy"
                     :label="true"
-                    :group-class="'form-switch mb-0'"
+                    :group-class="'inline-flex items-center gap-2 mb-0'"
                 >
                     <template #label="props">
                         <label :for="props.id">
@@ -198,9 +204,14 @@ export default defineComponent({
                 <template #body="{ data, resolved, deleted }">
                     <template v-if="resolved && data.length === 0">
                         <div class="flex flex-col gap-1">
-                            <div class="alert alert-sm alert-dark mb-0">
-                                <VCIcon name="fa6-solid:info" /> No files found in bucket
-                            </div>
+                            <VCAlert
+                                color="neutral"
+                                variant="soft"
+                                size="sm"
+                                class="mb-0"
+                            >
+                                No files found in bucket
+                            </VCAlert>
                         </div>
                     </template>
                     <template v-else>
@@ -240,26 +251,26 @@ export default defineComponent({
                 class="flex flex-row"
             >
                 <div>
-                    <button
+                    <VCButton
                         title="Delete Files"
-                        type="button"
-                        class="btn btn-danger btn-xs"
+                        color="error"
+                        size="xs"
                         :disabled="busy || selected.length === 0"
                         @click.prevent="dropSelected"
                     >
                         <VCIcon name="fa6-solid:trash" />
-                    </button>
+                    </VCButton>
                 </div>
                 <template v-if="!readonly">
                     <div class="ms-auto">
-                        <button
+                        <VCButton
                             title="Add File"
-                            type="button"
-                            class="btn btn-xs btn-dark"
+                            size="xs"
+                            color="neutral"
                             @click.prevent="toggleModal"
                         >
                             <VCIcon name="fa6-solid:plus" />
-                        </button>
+                        </VCButton>
                     </div>
                 </template>
             </div>
@@ -275,13 +286,14 @@ export default defineComponent({
                                 </h5>
                             </div>
                             <div class="ms-auto">
-                                <button
-                                    type="button"
-                                    class="btn btn-xs btn-secondary"
+                                <VCButton
+                                    size="xs"
+                                    color="neutral"
+                                    variant="soft"
                                     @click.prevent="modal = false"
                                 >
                                     <VCIcon name="fa6-solid:xmark" />
-                                </button>
+                                </VCButton>
                             </div>
                         </div>
                     </div>

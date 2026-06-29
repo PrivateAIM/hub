@@ -10,6 +10,7 @@ import { injectHTTPClient } from '@authup/client-web-kit';
 import type { Realm } from '@authup/core-kit';
 import { PermissionName } from '@authup/core-kit';
 import { FDisplayName } from '@privateaim/client-vue';
+import { VCIcon } from '@vuecs/icon';
 
 import { computed, defineComponent, ref } from 'vue';
 import type { Ref } from 'vue';
@@ -27,7 +28,7 @@ import { LayoutKey, LayoutNavigationID } from '~/config/layout';
 import { updateObjectProperties } from '../../../utils';
 
 export default defineComponent({
-    components: { FDisplayName },
+    components: { FDisplayName, VCIcon },
     async setup() {
         definePageMeta({
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,

@@ -19,6 +19,7 @@ import { ProcessStatus } from '@privateaim/kit';
 import FProcessStatus from '../../FProcessStatus.vue';
 import { FAnalysisCommand } from '../FAnalysisCommand';
 import { FProgressBar } from '../../utility';
+import { resolveTextColorClass } from '../../../core';
 
 export default defineComponent({
     components: {
@@ -58,6 +59,7 @@ export default defineComponent({
             handleExecuted,
 
             progress,
+            resolveTextColorClass,
         };
     },
 });
@@ -74,7 +76,7 @@ export default defineComponent({
                         <template #default=" { iconName, iconClass, classSuffix }">
                             <VCIcon
                                 :name="iconName"
-                                :class="iconClass + ' text-'+ classSuffix"
+                                :class="[iconClass, resolveTextColorClass(classSuffix)]"
                             />
                         </template>
                     </FProcessStatus>

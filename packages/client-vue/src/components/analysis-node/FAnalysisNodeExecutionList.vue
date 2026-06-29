@@ -11,6 +11,7 @@ import type { BuildInput } from 'rapiq';
 import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
 import { FProgressBar } from '../utility';
+import { resolveTextColorClass } from '../../core';
 import FAnalysisNodes from './FAnalysisNodes';
 import FAnalysisNodeExecutionStatus from './FAnalysisNodeExecutionStatus.vue';
 import {
@@ -40,6 +41,7 @@ export default defineComponent({
             query,
             nodeProgress: getAnalysisNodeExecutionProgress,
             nodeProgressColor: getAnalysisNodeExecutionProgressColor,
+            resolveTextColorClass,
         };
     },
 });
@@ -76,7 +78,7 @@ export default defineComponent({
                                 <template #default="data">
                                     <span
                                         class="node-execution-status shrink-0 text-xs"
-                                        :class="'text-' + data.classSuffix"
+                                        :class="resolveTextColorClass(data.classSuffix)"
                                     >
                                         {{ data.statusText }}
                                     </span>

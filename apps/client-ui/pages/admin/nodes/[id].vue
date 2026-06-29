@@ -12,6 +12,7 @@ import type {
 import {
     DomainType,
 } from '@privateaim/core-kit';
+import { VCIcon } from '@vuecs/icon';
 import type { NavigationItem } from '@vuecs/navigation';
 import { defineComponent } from 'vue';
 import {
@@ -21,6 +22,7 @@ import {
 import { createError, navigateTo } from '#app';
 
 export default defineComponent({
+    components: { VCIcon },
     async setup() {
         const toast = useToast();
 

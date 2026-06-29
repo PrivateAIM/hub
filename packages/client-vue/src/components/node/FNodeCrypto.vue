@@ -13,15 +13,23 @@ import {
     hexToUTF8,
     isHex,
 } from '@privateaim/kit';
+import { VCButton } from '@vuecs/button';
+import { VCAlert } from '@vuecs/elements';
+import { VCIcon } from '@vuecs/icon';
 import { useClipboard } from '@vueuse/core';
 import {
-    type PropType, 
-    defineComponent, 
+    type PropType,
+    defineComponent,
     ref,
 } from 'vue';
 import { injectCoreHTTPClient } from '../../core';
 
 export default defineComponent({
+    components: {
+        VCAlert,
+        VCButton,
+        VCIcon,
+    },
     props: {
         entity: {
             type: Object as PropType<Node>,
@@ -129,8 +137,8 @@ export default defineComponent({
         </p>
 
         <div class="flex flex-col gap-1">
-            <div class="row">
-                <div class="col-4">
+            <div class="flex flex-wrap -mx-2">
+                <div class="w-4/12 px-2">
                     <VCFormGroup :label-class="'w-full mb-1'">
                         <template #label>
                             <div class="flex flex-row">
@@ -138,14 +146,14 @@ export default defineComponent({
                                     PublicKey
                                 </div>
                                 <div class="ms-auto">
-                                    <button
+                                    <VCButton
                                         v-show="!!publicKey"
-                                        type="button"
-                                        class="btn btn-xs btn-dark"
+                                        size="xs"
+                                        color="neutral"
                                         @click.prevent="copy('publicKey')"
                                     >
                                         <VCIcon name="fa6-solid:copy" /> Copy
-                                    </button>
+                                    </VCButton>
                                 </div>
                             </div>
                         </template>
@@ -157,7 +165,7 @@ export default defineComponent({
                         </template>
                     </VCFormGroup>
                 </div>
-                <div class="col-8">
+                <div class="w-8/12 px-2">
                     <VCFormGroup :label-class="'w-full mb-1'">
                         <template #label>
                             <div class="flex flex-row">
@@ -165,14 +173,14 @@ export default defineComponent({
                                     PrivateKey
                                 </div>
                                 <div class="ms-auto">
-                                    <button
+                                    <VCButton
                                         v-show="!!privateKey"
-                                        type="button"
-                                        class="btn btn-xs btn-dark"
+                                        size="xs"
+                                        color="neutral"
                                         @click.prevent="copy('privateKey')"
                                     >
                                         <VCIcon name="fa6-solid:copy" /> Copy
-                                    </button>
+                                    </VCButton>
                                 </div>
                             </div>
                         </template>
@@ -186,33 +194,37 @@ export default defineComponent({
                     </VCFormGroup>
 
                     <template v-if="privateKey">
-                        <div class="alert alert-sm alert-danger">
-                            <VCIcon name="fa6-solid:triangle-exclamation" />
+                        <VCAlert
+                            color="error"
+                            variant="soft"
+                            size="sm"
+                            class="mb-3"
+                        >
                             Please copy the key to a safe location, as it is not stored remotely.
-                        </div>
+                        </VCAlert>
                     </template>
                 </div>
             </div>
             <div class="flex flex-row gap-1">
                 <div>
-                    <button
+                    <VCButton
                         :disabled="busy"
-                        type="button"
-                        class="btn btn-primary btn-xs"
+                        color="primary"
+                        size="xs"
                         @click.prevent="save"
                     >
                         <VCIcon name="fa6-solid:floppy-disk" /> Save
-                    </button>
+                    </VCButton>
                 </div>
                 <div>
-                    <button
+                    <VCButton
                         :disabled="busy"
-                        type="button"
-                        class="btn btn-dark btn-xs"
+                        color="neutral"
+                        size="xs"
                         @click.prevent="generate"
                     >
                         <VCIcon name="fa6-solid:arrows-rotate" /> Generate
-                    </button>
+                    </VCButton>
                 </div>
             </div>
         </div>

@@ -4,16 +4,15 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import {
-    buildFormGroup,
-    buildFormInput,
-    buildFormSubmitWithTranslations,
-    buildFormTextarea,
-    createFormSubmitTranslations,
-} from '@authup/client-web-kit';
 import { useFieldValidation } from '@ilingo/validup-vue';
 import { useValidup } from '@validup/vue';
 import type { Severity } from '@validup/vue';
+import { VCAlert } from '@vuecs/elements';
+import {
+    VCFormGroup,
+    VCFormInput,
+    VCFormTextarea,
+} from '@vuecs/forms';
 import {
     computed,
     defineComponent,
@@ -39,6 +38,7 @@ import type {
 } from '../../core';
 import {
     EntityListSlotName,
+    buildFormSubmit,
     createEntityManager,
     defineEntityManagerEvents,
     initFormAttributesFromSource,
@@ -154,48 +154,62 @@ const FProjectForm = defineComponent({
             }
         };
 
-        const translationsSubmit = createFormSubmitTranslations();
 
         return () => {
-            const displayName = buildFormGroup({
-                validationMessages: displayNameValidation.messages,
-                validationSeverity: toSeverity(displayNameValidation.severity),
-                label: true,
-                labelContent: 'Display Name',
-                content: buildFormInput({
-                    value: form.display_name,
-                    onChange(input) {
-                        form.display_name = input;
-                    },
-                }),
-            });
+            const displayName = h(
+                VCFormGroup,
+                {
+                    label: true,
+                    labelContent: 'Display Name',
+                    validationMessages: displayNameValidation.messages,
+                    validationSeverity: toSeverity(displayNameValidation.severity),
+                },
+                {
+                    default: () => h(VCFormInput, {
+                        modelValue: form.display_name == null ? '' : String(form.display_name),
+                        'onUpdate:modelValue': (input: string) => {
+                            form.display_name = input;
+                        },
+                    }),
+                },
+            );
 
-            const name = buildFormGroup({
-                validationMessages: nameValidation.messages,
-                validationSeverity: toSeverity(nameValidation.severity),
-                label: true,
-                labelContent: 'Name',
-                content: buildFormInput({
-                    value: form.name,
-                    onChange(input) {
-                        form.name = input;
-                    },
-                }),
-            });
+            const name = h(
+                VCFormGroup,
+                {
+                    label: true,
+                    labelContent: 'Name',
+                    validationMessages: nameValidation.messages,
+                    validationSeverity: toSeverity(nameValidation.severity),
+                },
+                {
+                    default: () => h(VCFormInput, {
+                        modelValue: form.name == null ? '' : String(form.name),
+                        'onUpdate:modelValue': (input: string) => {
+                            form.name = input;
+                        },
+                    }),
+                },
+            );
 
-            const description = buildFormGroup({
-                validationMessages: descriptionValidation.messages,
-                validationSeverity: toSeverity(descriptionValidation.severity),
-                label: true,
-                labelContent: 'Description',
-                content: buildFormTextarea({
-                    value: $v.fields.description.$model.value,
-                    onChange(input) {
-                        $v.fields.description.$model.value = input;
-                    },
-                    props: { rows: 4 },
-                }),
-            });
+            const description = h(
+                VCFormGroup,
+                {
+                    label: true,
+                    labelContent: 'Description',
+                    validationMessages: descriptionValidation.messages,
+                    validationSeverity: toSeverity(descriptionValidation.severity),
+                },
+                {
+                    default: () => h(VCFormTextarea, {
+                        modelValue: $v.fields.description.$model.value == null ? '' : String($v.fields.description.$model.value),
+                        'onUpdate:modelValue': (input: string) => {
+                            $v.fields.description.$model.value = input;
+                        },
+                        rows: 4,
+                    }),
+                },
+            );
 
             const masterImagePicker = h(FMasterImagePicker, {
                 entityId: form.master_image_id,
@@ -204,12 +218,12 @@ const FProjectForm = defineComponent({
                 },
             });
 
-            const submitNode = buildFormSubmitWithTranslations({
+            const submitNode = buildFormSubmit({
                 submit,
                 busy: busy.value,
                 isEditing: !!manager.data.value,
                 invalid: $v.$invalid.value,
-            }, translationsSubmit);
+            });
 
             const nodeVNode = h('div', [
                 h(FNodes, { query: { filters: { hidden: false } } } satisfies ListProps<Node>, {
@@ -248,18 +262,23 @@ const FProjectForm = defineComponent({
                         meta: props.meta,
                     }),
                 }),
-                h('div', { class: 'alert alert-dark alert-sm' }, [
+                h(VCAlert, {
+                    color: 'neutral', 
+                    variant: 'soft', 
+                    size: 'sm', 
+                    class: 'mb-3', 
+                }, () => [
                     'Chose a arbitrary amount of target nodes.',
                 ]),
             ]);
 
             return h(
                 'div',
-                { class: 'row' },
+                { class: 'flex flex-wrap -mx-2' },
                 [
                     h(
                         'div',
-                        { class: 'col' },
+                        { class: 'flex-1 basis-0 px-2' },
                         [
                             displayName,
                             h('hr'),
@@ -272,7 +291,7 @@ const FProjectForm = defineComponent({
                     ),
                     h(
                         'div',
-                        { class: 'col' },
+                        { class: 'flex-1 basis-0 px-2' },
                         [
                             nodeVNode,
                             h('hr'),

@@ -5,13 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
-    buildFormGroup,
-    buildFormInput,
-    buildFormSelect,
-    buildFormSubmitWithTranslations,
-    createFormSubmitTranslations,
-} from '@authup/client-web-kit';
 import { useFieldValidation } from '@ilingo/validup-vue';
 import { useValidup } from '@validup/vue';
 import type { Severity } from '@validup/vue';
@@ -22,6 +15,9 @@ import {
     RegistryProjectValidator,
 } from '@privateaim/core-kit';
 import { ValidatorGroup, createNanoID } from '@privateaim/kit';
+import { VCButton } from '@vuecs/button';
+import { VCAlert } from '@vuecs/elements';
+import { VCFormGroup, VCFormInput, VCFormSelect } from '@vuecs/forms';
 import type { ListItemSlotProps } from '../../core';
 import type { PropType, VNodeArrayChildren } from 'vue';
 import {
@@ -35,9 +31,10 @@ import {
 } from 'vue';
 import { useUpdatedAt } from '../../composables';
 import {
-    EntityListSlotName, 
-    createEntityManager, 
-    initFormAttributesFromSource, 
+    EntityListSlotName,
+    buildFormSubmit,
+    createEntityManager,
+    initFormAttributesFromSource,
     wrapFnWithBusyState,
 } from '../../core';
 import RegistryList from '../registry/FRegistries';
@@ -150,87 +147,105 @@ export default defineComponent({
             await manager.createOrUpdate(form);
         });
 
-        const translationsSubmit = createFormSubmitTranslations();
 
         return () => {
             const VCIcon = resolveComponent('VCIcon');
-            const name = buildFormGroup({
-                validationMessages: nameValidation.messages,
-                validationSeverity: toSeverity(nameValidation.severity),
-                label: true,
-                labelContent: 'Name',
-                content: buildFormInput({
-                    value: form.name,
-                    onChange(input) {
-                        form.name = input;
-                    },
-                }),
-            });
-            const externalName = buildFormGroup({
-                validationMessages: externalNameValidation.messages,
-                validationSeverity: toSeverity(externalNameValidation.severity),
-                label: true,
-                labelContent: 'External Name',
-                content: buildFormInput({
-                    value: form.external_name,
-                    onChange(input) {
-                        form.external_name = input;
-                    },
-                }),
-            });
+            const name = h(
+                VCFormGroup,
+                {
+                    label: true,
+                    labelContent: 'Name',
+                    validationMessages: nameValidation.messages,
+                    validationSeverity: toSeverity(nameValidation.severity),
+                },
+                {
+                    default: () => h(VCFormInput, {
+                        modelValue: form.name == null ? '' : String(form.name),
+                        'onUpdate:modelValue': (input: string) => {
+                            form.name = input;
+                        },
+                    }),
+                },
+            );
+            const externalName = h(
+                VCFormGroup,
+                {
+                    label: true,
+                    labelContent: 'External Name',
+                    validationMessages: externalNameValidation.messages,
+                    validationSeverity: toSeverity(externalNameValidation.severity),
+                },
+                {
+                    default: () => h(VCFormInput, {
+                        modelValue: form.external_name == null ? '' : String(form.external_name),
+                        'onUpdate:modelValue': (input: string) => {
+                            form.external_name = input;
+                        },
+                    }),
+                },
+            );
 
-            const externalNameHint = h('div', {
-                class: ['alert alert-sm', {
-                    'alert-danger': !isExternalNameUnchanged.value,
-                    'alert-info': isExternalNameUnchanged.value,
-                }],
-            }, [
+            const externalNameHint = h(VCAlert, {
+                color: !isExternalNameUnchanged.value ? 'error' : 'info',
+                variant: 'soft',
+                size: 'sm',
+                class: 'mb-3',
+            }, () => [
                 h('div', { class: 'mb-1' }, [
                     (!isExternalNameUnchanged.value ?
                         'If you change the external_name, a new representation will be created in the Registry.' :
                         'If you don\'t want to chose a external_name by your own, you can generate one.'
                     ),
                 ]),
-                h('button', {
-                    class: 'btn btn-xs btn-dark',
-                    type: 'button',
+                h(VCButton, {
+                    color: 'neutral',
+                    size: 'xs',
                     onClick($event: any) {
                         $event.preventDefault();
 
                         generateAlias();
                     },
-                }, [
+                }, () => [
                     h(VCIcon, { name: 'fa6-solid:wrench', class: 'pe-1' }),
                     'Generate',
                 ]),
-                h('button', {
-                    class: 'btn btn-xs btn-dark ms-1',
-                    type: 'button',
+                h(VCButton, {
+                    color: 'neutral',
+                    size: 'xs',
+                    class: 'ms-1',
                     disabled: isExternalNameUnchanged.value,
                     onClick($event: any) {
                         $event.preventDefault();
 
                         resetAlias();
                     },
-                }, [
+                }, () => [
                     h(VCIcon, { name: 'fa6-solid:rotate-left', class: 'pe-1' }),
                     'Reset',
                 ]),
             ]);
 
-            const type = buildFormGroup({
-                validationMessages: typeValidation.messages,
-                validationSeverity: toSeverity(typeValidation.severity),
-                label: true,
-                labelContent: 'Type',
-                content: buildFormSelect({
-                    value: form.type,
-                    options: types,
-                    onChange(input) {
-                        form.type = input;
-                    },
-                }),
-            });
+            const type = h(
+                VCFormGroup,
+                {
+                    label: true,
+                    labelContent: 'Type',
+                    validationMessages: typeValidation.messages,
+                    validationSeverity: toSeverity(typeValidation.severity),
+                },
+                {
+                    default: () => h(VCFormSelect, {
+                        modelValue: form.type,
+                        'onUpdate:modelValue': (input: unknown) => {
+                            form.type = input as RegistryProjectType;
+                        },
+                        options: types.map((o) => ({
+                            value: o.value,
+                            label: o.value ?? (o.id !== undefined ? String(o.id) : ''),
+                        })),
+                    }),
+                },
+            );
 
             let registry : VNodeArrayChildren = [];
 
@@ -238,30 +253,28 @@ export default defineComponent({
                 registry = [
                     h('hr'),
                     h(RegistryList, {
-                        [EntityListSlotName.ITEM_ACTIONS]: (props: ListItemSlotProps<Registry>) => h('button', {
+                        [EntityListSlotName.ITEM_ACTIONS]: (props: ListItemSlotProps<Registry>) => h(VCButton, {
                             attrs: { disabled: props.busy },
-                            class: ['btn btn-xs', {
-                                'btn-dark': form.registry_id !== props.data.id,
-                                'btn-warning': form.registry_id === props.data.id,
-                            }],
+                            size: 'xs',
+                            color: form.registry_id === props.data.id ? 'warning' : 'neutral',
                             onClick($event: any) {
                                 $event.preventDefault();
 
                                 toggleForm('registry_id', props.data.id);
                             },
-                        }, [
+                        }, () => [
                             h(VCIcon, { name: form.registry_id === props.data.id ? 'fa6-solid:minus' : 'fa6-solid:plus' }),
                         ]),
                     }),
                 ];
             }
 
-            const submitNode = buildFormSubmitWithTranslations({
+            const submitNode = buildFormSubmit({
                 submit,
                 busy: busy.value,
                 isEditing: !!manager.data.value,
                 invalid: $v.$invalid.value,
-            }, translationsSubmit);
+            });
 
             return h('form', {
                 onSubmit($event: any) {

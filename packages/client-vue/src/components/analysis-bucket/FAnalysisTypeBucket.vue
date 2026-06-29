@@ -7,6 +7,9 @@
 <script lang="ts">
 import type { AnalysisBucket, AnalysisBucketType } from '@privateaim/core-kit';
 import { AnalysisCommand } from '@privateaim/core-kit';
+import { VCButton } from '@vuecs/button';
+import { VCAlert } from '@vuecs/elements';
+import { VCIcon } from '@vuecs/icon';
 import type { PropType } from 'vue';
 import {
     defineComponent, 
@@ -17,7 +20,12 @@ import { type EntityManagerResolveContext, injectCoreHTTPClient, wrapFnWithBusyS
 import FAnalysisBucket from './FAnalysisBucket';
 
 export default defineComponent({
-    components: { FAnalysisBucket },
+    components: {
+        FAnalysisBucket,
+        VCAlert,
+        VCButton,
+        VCIcon,
+    },
     props: {
         entityId: {
             type: String,
@@ -88,19 +96,24 @@ export default defineComponent({
             />
         </template>
         <template #error>
-            <div class="alert alert-sm alert-warning">
+            <VCAlert
+                color="warning"
+                variant="soft"
+                size="sm"
+                class="mb-3"
+            >
                 <p>
                     The {{ type }} bucket does not exist.
                 </p>
 
-                <button
-                    type="button"
-                    class="btn btn-xs btn-dark"
+                <VCButton
+                    size="xs"
+                    color="neutral"
                     @click.prevent="retry"
                 >
                     <VCIcon name="fa6-solid:rotate-right" /> Retry
-                </button>
-            </div>
+                </VCButton>
+            </VCAlert>
         </template>
     </FAnalysisBucket>
 </template>

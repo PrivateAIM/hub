@@ -6,6 +6,9 @@
   -->
 
 <script lang="ts">
+import { VCButton } from '@vuecs/button';
+import { VCAlert } from '@vuecs/elements';
+import { VCIcon } from '@vuecs/icon';
 import type { PropType } from 'vue';
 import {
     computed,
@@ -19,6 +22,9 @@ export default defineComponent({
     components: {
         FTranslationDefault,
         FFormInputListItem,
+        VCAlert,
+        VCButton,
+        VCIcon,
     },
     props: {
         names: {
@@ -128,23 +134,28 @@ export default defineComponent({
                     :add="add"
                     :can-add="canAdd && !readonly"
                 >
-                    <button
-                        class="btn btn-xs btn-primary"
-                        type="button"
+                    <VCButton
+                        size="xs"
+                        color="primary"
                         :disabled="!canAdd || readonly"
                         @click.prevent="add()"
                     >
                         <VCIcon name="fa6-solid:plus" /> <FTranslationDefault :name="'add'" />
-                    </button>
+                    </VCButton>
                 </slot>
             </div>
         </div>
         <div class="flex flex-col gap-1">
             <template v-if="items.length === 0">
                 <slot name="noItems">
-                    <div class="alert alert-sm alert-info">
+                    <VCAlert
+                        color="info"
+                        variant="soft"
+                        size="sm"
+                        class="mb-3"
+                    >
                         The form list has no items yet
-                    </div>
+                    </VCAlert>
                 </slot>
             </template>
             <template

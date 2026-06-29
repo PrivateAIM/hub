@@ -5,6 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import { VCIcon } from '@vuecs/icon';
 import { VCToaster } from '@vuecs/overlays';
 import { computed, defineComponent, ref } from 'vue';
 import { useRuntimeConfig } from '#imports';
@@ -14,9 +15,10 @@ import AboutModal from './about-modal.vue';
 
 export default defineComponent({
     components: {
-        AboutModal, 
-        Logo, 
-        VCToaster, 
+        AboutModal,
+        Logo,
+        VCIcon,
+        VCToaster,
     },
     setup() {
         const runtimeConfig = useRuntimeConfig();

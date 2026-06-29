@@ -16,16 +16,18 @@ import {
     FSearch as ListSearch,
     FTitle as ListTitle,
 } from '@privateaim/client-vue';
+import { VCAlert } from '@vuecs/elements';
 import { definePageMeta } from '#imports';
 import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
 
 export default defineNuxtComponent({
     components: {
-        ListTitle, 
-        ListSearch, 
-        ListPagination, 
+        ListTitle,
+        ListSearch,
+        ListPagination,
         FAnalyses,
+        VCAlert,
     },
     props: {
         entity: {
@@ -63,9 +65,14 @@ export default defineNuxtComponent({
     <div>
         <div class="m-t-10">
             <template v-if="visitorProjectNode">
-                <div class="alert alert-sm alert-warning">
+                <VCAlert
+                    color="warning"
+                    variant="soft"
+                    size="sm"
+                    class="mb-3"
+                >
                     You are not permitted to view the analyses list.
-                </div>
+                </VCAlert>
             </template>
             <template v-else>
                 <FAnalyses :query="query">

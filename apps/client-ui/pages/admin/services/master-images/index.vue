@@ -10,6 +10,8 @@ import { FEvents, FMasterImageCard } from '@privateaim/client-vue';
 import FMasterImages from '@privateaim/client-vue/components/master-image/FMasterImages';
 import { APagination, ASearch, ATitle } from '@authup/client-web-kit';
 import FMasterImageCommand from '@privateaim/client-vue/components/master-image/FMasterImageCommand';
+import { VCButton } from '@vuecs/button';
+import { VCIcon } from '@vuecs/icon';
 import type { NavigationItem } from '@vuecs/navigation';
 import { useToast } from '../../../../composables/toast';
 
@@ -22,6 +24,8 @@ export default {
         ASearch,
         FMasterImages,
         FEvents,
+        VCButton,
+        VCIcon,
     },
     setup() {
         const toast = useToast();
@@ -69,8 +73,8 @@ export default {
                 In addition, the master images are built and transferred to all registered registry instances.
             </p>
         </div>
-        <div class="row">
-            <div class="col-6">
+        <div class="flex flex-wrap -mx-2">
+            <div class="w-6/12 px-2">
                 <div class="flex flex-col gap-3">
                     <div>
                         <FMasterImageCommand
@@ -78,16 +82,16 @@ export default {
                             @failed="handleFailed"
                         >
                             <template #default="props">
-                                <button
-                                    type="button"
-                                    class="btn btn-block btn-primary"
+                                <VCButton
+                                    color="primary"
+                                    class="w-full"
                                     @click.prevent="props.execute"
                                 >
                                     <span class="me-2">{{ props.commandText }}</span>  <VCIcon
                                         :name="props.iconName"
                                         :class="props.iconClass"
                                     />
-                                </button>
+                                </VCButton>
                             </template>
                         </FMasterImageCommand>
                     </div>
@@ -123,7 +127,7 @@ export default {
                     </div>
                 </div>
             </div>
-            <div class="col-6">
+            <div class="w-6/12 px-2">
                 <h6><VCIcon name="fa6-solid:bullhorn" /> Events</h6>
                 <FEvents
                     :query="{

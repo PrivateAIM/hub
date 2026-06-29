@@ -8,6 +8,7 @@
 import { ProcessStatus } from '@privateaim/kit';
 import type { PropType } from 'vue';
 import { computed, defineComponent } from 'vue';
+import { resolveTextColorClass } from '../../core';
 
 export default defineComponent({
     props: {
@@ -49,6 +50,7 @@ export default defineComponent({
         return {
             statusText,
             classSuffix,
+            resolveTextColorClass,
         };
     },
 });
@@ -59,7 +61,7 @@ export default defineComponent({
             :class-suffix="classSuffix"
             :status-text="statusText"
         >
-            <span :class="'text-'+classSuffix">{{ statusText }}</span>
+            <span :class="resolveTextColorClass(classSuffix)">{{ statusText }}</span>
         </slot>
     </component>
 </template>

@@ -7,6 +7,9 @@
 <script lang="ts">
 import type { Node } from '@privateaim/core-kit';
 import type { NodeClientCredentialsUpdate } from '@privateaim/core-http-kit';
+import { VCButton } from '@vuecs/button';
+import { VCAlert } from '@vuecs/elements';
+import { VCIcon } from '@vuecs/icon';
 import { useClipboard } from '@vueuse/core';
 import {
     type PropType,
@@ -18,6 +21,11 @@ import {
 import { injectCoreHTTPClient } from '../../core';
 
 export default defineComponent({
+    components: {
+        VCAlert,
+        VCButton,
+        VCIcon,
+    },
     props: {
         entity: {
             type: Object as PropType<Node>,
@@ -139,12 +147,15 @@ export default defineComponent({
             Keep the secret confidential.
         </p>
 
-        <div
+        <VCAlert
             v-if="!entity.client_id"
-            class="alert alert-sm alert-warning"
+            color="warning"
+            variant="soft"
+            size="sm"
+            class="mb-3"
         >
             The node has not been assigned to a client yet.
-        </div>
+        </VCAlert>
         <div
             v-else-if="busy || !loaded"
             class="flex flex-row items-center gap-2"
@@ -165,14 +176,14 @@ export default defineComponent({
                     <div class="flex flex-row">
                         <div>Client ID</div>
                         <div class="ms-auto">
-                            <button
-                                type="button"
-                                class="btn btn-xs btn-dark"
+                            <VCButton
+                                size="xs"
+                                color="neutral"
                                 :disabled="!clientId"
                                 @click.prevent="copy(clientId)"
                             >
                                 <VCIcon name="fa6-solid:copy" /> Copy
-                            </button>
+                            </VCButton>
                         </div>
                     </div>
                 </template>
@@ -207,22 +218,22 @@ export default defineComponent({
                     <div class="flex flex-row">
                         <div>Secret</div>
                         <div class="ms-auto flex flex-row gap-1">
-                            <button
-                                type="button"
-                                class="btn btn-xs btn-dark"
+                            <VCButton
+                                size="xs"
+                                color="neutral"
                                 @click.prevent="toggleReveal"
                             >
                                 <VCIcon :name="revealed ? 'fa6-solid:eye-slash' : 'fa6-solid:eye'" />
                                 {{ revealed ? 'Hide' : 'Reveal' }}
-                            </button>
-                            <button
-                                type="button"
-                                class="btn btn-xs btn-dark"
+                            </VCButton>
+                            <VCButton
+                                size="xs"
+                                color="neutral"
                                 :disabled="!secret"
                                 @click.prevent="copy(secret)"
                             >
                                 <VCIcon name="fa6-solid:copy" /> Copy
-                            </button>
+                            </VCButton>
                         </div>
                     </div>
                 </template>
@@ -231,18 +242,20 @@ export default defineComponent({
                         v-model="secret"
                         :type="revealed ? 'text' : 'password'"
                     />
-                    <small class="text-secondary">Leave empty to generate a new secret.</small>
+                    <small class="text-fg-muted">Leave empty to generate a new secret.</small>
                 </template>
             </VCFormGroup>
 
             <div class="flex flex-row">
-                <button
+                <VCButton
                     type="submit"
-                    class="btn btn-primary btn-sm ms-auto"
+                    color="primary"
+                    size="sm"
+                    class="ms-auto"
                     :disabled="busy"
                 >
                     <VCIcon name="fa6-solid:floppy-disk" /> Update
-                </button>
+                </VCButton>
             </div>
         </form>
     </div>

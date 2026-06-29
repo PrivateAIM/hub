@@ -6,7 +6,9 @@
   -->
 <script lang="ts">
 import { inject } from '@authup/client-web-kit';
+import { VCButton } from '@vuecs/button';
 import { VCFormCheckbox } from '@vuecs/forms';
+import { VCIcon } from '@vuecs/icon';
 import type { PropType, Ref } from 'vue';
 import {
     computed,
@@ -20,7 +22,12 @@ import { injectStorageHTTPClient } from '../../core';
 import { FBucketFileDownload } from './FBucketFileDownload';
 
 export default defineComponent({
-    components: { FBucketFileDownload, VCFormCheckbox },
+    components: {
+        FBucketFileDownload,
+        VCButton,
+        VCFormCheckbox,
+        VCIcon,
+    },
     props: {
         entity: { type: Object as PropType<BucketFile> },
         entityId: { type: String },
@@ -170,15 +177,15 @@ export default defineComponent({
                     </div>
                     <template v-if="!readonly">
                         <div>
-                            <button
+                            <VCButton
                                 title="Delete"
-                                type="button"
-                                class="btn btn-danger btn-xs"
+                                color="error"
+                                size="xs"
                                 :disabled="busy"
                                 @click.prevent="drop"
                             >
                                 <VCIcon name="fa6-solid:trash" />
-                            </button>
+                            </VCButton>
                         </div>
                     </template>
                 </slot>

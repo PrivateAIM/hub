@@ -5,6 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import { VCIcon } from '@vuecs/icon';
 import { VCToastProvider } from '@vuecs/overlays';
 import { defineNuxtComponent } from '#app';
 import { useColorMode } from '#imports';
@@ -15,6 +16,7 @@ export default defineNuxtComponent({
     components: {
         NetworkBackground,
         PageFooter,
+        VCIcon,
         VCToastProvider,
     },
     setup() {

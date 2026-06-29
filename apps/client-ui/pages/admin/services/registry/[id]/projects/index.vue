@@ -8,9 +8,17 @@
 import { usePermissionCheck } from '@authup/client-web-kit';
 import type { Registry, RegistryProject } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
+import { VCButton } from '@vuecs/button';
+import { VCBadge } from '@vuecs/elements';
+import { VCIcon } from '@vuecs/icon';
 import type { TableColumn } from '@vuecs/table';
 import type { BuildInput } from 'rapiq';
-import { computed, ref, toRefs } from 'vue';
+import { 
+    computed, 
+    ref, 
+    resolveComponent, 
+    toRefs, 
+} from 'vue';
 import type { PropType, Ref } from 'vue';
 import {
     FEntityDelete,
@@ -31,6 +39,9 @@ export default {
         EntityDelete: FEntityDelete,
         RegistryProjectDetails,
         RegistryProjectList,
+        VCButton,
+        VCBadge,
+        VCIcon,
     },
     props: {
         entity: {
@@ -52,7 +63,7 @@ export default {
             fields: ['+account_id', '+account_name', '+account_secret'],
         };
 
-        const columns: TableColumn[] = [
+        const columns: TableColumn<RegistryProject>[] = [
             {
                 key: 'id',
                 label: 'ID',
@@ -113,6 +124,8 @@ export default {
             modalShow.value = true;
         };
 
+        const NuxtLink = resolveComponent('NuxtLink');
+
         return {
             canView,
             canDrop,
@@ -123,6 +136,7 @@ export default {
             modalShow,
             listNode,
             showDetails,
+            NuxtLink,
         };
     },
 };
@@ -153,39 +167,46 @@ export default {
                     :columns="columns"
                     :busy="props.busy"
                 >
-                    <template #cell-type="{ row }: { row: any }">
-                        <span class="badge bg-fg text-bg">
+                    <template #cell-type="{ row }">
+                        <VCBadge class="bg-fg text-bg">
                             {{ row.type }}
-                        </span>
+                        </VCBadge>
                     </template>
-                    <template #cell-options="{ row }: { row: any }">
-                        <nuxt-link
-                            v-if="canView"
-                            class="btn btn-xs btn-outline-primary"
-                            :to="'/admin/services/registry/'+entity.id+'/projects/'+row.id"
-                        >
-                            <VCIcon name="fa6-solid:bars" />
-                        </nuxt-link>
-                        <button
-                            type="button"
-                            class="btn btn-xs btn-outline-dark ms-1 me-1"
-                            @click.prevent="showDetails(row)"
-                        >
-                            <VCIcon name="fa6-solid:info" />
-                        </button>
-                        <entity-delete
-                            v-if="canDrop"
-                            class="btn btn-xs btn-outline-danger"
-                            :entity-id="row.id"
-                            :entity-type="'registryProject'"
-                            :with-text="false"
-                            @deleted="handleDeleted"
-                        />
+                    <template #cell-options="{ row }">
+                        <div class="flex items-center">
+                            <VCButton
+                                v-if="canView"
+                                :as="NuxtLink"
+                                size="xs"
+                                color="primary"
+                                variant="outline"
+                                :to="'/admin/services/registry/'+entity.id+'/projects/'+row.id"
+                            >
+                                <VCIcon name="fa6-solid:bars" />
+                            </VCButton>
+                            <VCButton
+                                size="xs"
+                                color="neutral"
+                                variant="outline"
+                                class="ms-1 me-1"
+                                @click.prevent="showDetails(row)"
+                            >
+                                <VCIcon name="fa6-solid:info" />
+                            </VCButton>
+                            <entity-delete
+                                v-if="canDrop"
+                                size="sm"
+                                :entity-id="row.id"
+                                :entity-type="'registryProject'"
+                                :with-text="false"
+                                @deleted="handleDeleted"
+                            />
+                        </div>
                     </template>
-                    <template #cell-created_at="{ row }: { row: any }">
+                    <template #cell-created_at="{ row }">
                         <timeago :datetime="row.created_at" />
                     </template>
-                    <template #cell-updated_at="{ row }: { row: any }">
+                    <template #cell-updated_at="{ row }">
                         <timeago :datetime="row.updated_at" />
                     </template>
                     <VCTableLoading />

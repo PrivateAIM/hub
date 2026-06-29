@@ -20,6 +20,7 @@ import FProcessStatus from '../../FProcessStatus.vue';
 import { FAnalysisCommand } from '../FAnalysisCommand';
 import FAnalysisBuildNodesStep from './FAnalysisBuildNodesStep.vue';
 import { FProgressBar } from '../../utility';
+import { resolveTextColorClass } from '../../../core';
 
 export default defineComponent({
     components: {
@@ -68,6 +69,7 @@ export default defineComponent({
             handleFailed,
             handleExecuted,
             size,
+            resolveTextColorClass,
         };
     },
 });
@@ -84,7 +86,7 @@ export default defineComponent({
                         <template #default=" { iconName, iconClass, classSuffix }">
                             <VCIcon
                                 :name="iconName"
-                                :class="iconClass + ' text-'+ classSuffix"
+                                :class="[iconClass, resolveTextColorClass(classSuffix)]"
                             />
                         </template>
                     </FProcessStatus>

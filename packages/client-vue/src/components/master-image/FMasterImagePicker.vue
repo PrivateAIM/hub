@@ -158,8 +158,8 @@ export default defineComponent({
 });
 </script>
 <template>
-    <div class="row">
-        <div class="col">
+    <div class="flex flex-wrap -mx-2">
+        <div class="flex-1 basis-0 px-2">
             <FMasterImageGroups>
                 <template #default=" { data }">
                     <IFieldValidation
@@ -195,7 +195,7 @@ export default defineComponent({
                 </template>
             </FMasterImageGroups>
         </div>
-        <div class="col">
+        <div class="flex-1 basis-0 px-2">
             <FMasterImages
                 v-if="isVirtualGroupPathDefined"
                 ref="masterImages"

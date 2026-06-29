@@ -8,6 +8,7 @@
 import { ProcessStatus } from '@privateaim/kit';
 import type { PropType } from 'vue';
 import { computed, defineComponent } from 'vue';
+import { resolveTextColorClass } from '../core';
 
 export default defineComponent({
     props: {
@@ -75,6 +76,7 @@ export default defineComponent({
             classSuffix,
             iconName,
             iconClass,
+            resolveTextColorClass,
         };
     },
 });
@@ -86,7 +88,7 @@ export default defineComponent({
     >
         <component
             :is="tag"
-            :class="'text-'+classSuffix"
+            :class="resolveTextColorClass(classSuffix)"
         >
             {{ value || defaultValue }}
         </component>

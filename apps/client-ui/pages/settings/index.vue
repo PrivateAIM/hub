@@ -5,11 +5,13 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import { VCIcon } from '@vuecs/icon';
 import type { NavigationItem } from '@vuecs/navigation';
 import { defineNuxtComponent, definePageMeta } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
 
 export default defineNuxtComponent({
+    components: { VCIcon },
     setup() {
         definePageMeta({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,

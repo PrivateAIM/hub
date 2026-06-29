@@ -31,8 +31,8 @@ export default defineNuxtComponent({
 </script>
 <template>
     <div class="flex flex-col gap-3">
-        <div class="row">
-            <div class="col-4">
+        <div class="flex flex-wrap -mx-2">
+            <div class="w-4/12 px-2">
                 <div class="card-grey card">
                     <div class="card-header">
                         <span class="title">
@@ -96,7 +96,7 @@ export default defineNuxtComponent({
                     </div>
                 </div>
             </div>
-            <div class="col-4">
+            <div class="w-4/12 px-2">
                 <div class="card-grey card">
                     <div class="card-header">
                         <span class="title">
@@ -133,7 +133,7 @@ export default defineNuxtComponent({
                     </div>
                 </div>
             </div>
-            <div class="col-4">
+            <div class="w-4/12 px-2">
                 <div class="card-grey card">
                     <div class="card-header">
                         <span class="title">

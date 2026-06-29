@@ -7,6 +7,7 @@
 
 import type { PropType } from 'vue';
 import { defineComponent, h, ref } from 'vue';
+import { VCButton } from '@vuecs/button';
 import type { Registry } from '@privateaim/core-kit';
 import { RegistryAPICommand } from '@privateaim/core-kit';
 import EntityDelete from '../FEntityDelete';
@@ -49,16 +50,16 @@ export default defineComponent({
                 'This command will remove any registry project which is not present in the current instance.',
             ]),
 
-            h('button', {
-                type: 'button',
+            h(VCButton, {
+                color: 'neutral',
+                size: 'xs',
                 disabled: busy.value,
-                class: 'btn btn-xs btn-dark',
                 onClick(event: any) {
                     event.preventDefault();
 
                     return execute();
                 },
-            }, [
+            }, () => [
                 'Execute',
             ]),
         ]);

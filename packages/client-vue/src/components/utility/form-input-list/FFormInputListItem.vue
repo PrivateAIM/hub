@@ -18,7 +18,9 @@ import { useValidup } from '@validup/vue';
 import { createValidator } from '@validup/zod';
 import { Container } from 'validup';
 import { z } from 'zod';
+import { VCButton } from '@vuecs/button';
 import { VCFormGroup, VCFormInput } from '@vuecs/forms';
+import { VCIcon } from '@vuecs/icon';
 import {
     defineComponent,
     reactive,
@@ -34,8 +36,10 @@ class FormInputListItemValidator extends Container<{ name: string }> {
 export default defineComponent({
     components: {
         IFieldValidation,
+        VCButton,
         VCFormInput,
         VCFormGroup,
+        VCIcon,
     },
     props: {
         name: {
@@ -85,14 +89,14 @@ export default defineComponent({
                 @change="handleUpdated"
             >
                 <template #groupAppend>
-                    <button
+                    <VCButton
                         :disabled="!canDrop || readonly"
-                        type="button"
-                        class="btn btn-xs btn-dark"
+                        size="xs"
+                        color="neutral"
                         @click.prevent="handleDeleted"
                     >
                         <VCIcon name="fa6-solid:minus" />
-                    </button>
+                    </VCButton>
                 </template>
             </VCFormInput>
         </VCFormGroup>

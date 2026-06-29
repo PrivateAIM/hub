@@ -16,10 +16,12 @@ import {
     ServiceID,
     registryRobotSecretRegex,
 } from '@privateaim/core-kit';
-import { buildFormGroup, buildFormInput } from '@authup/client-web-kit';
 import { Container } from 'validup';
 import { createValidator } from '@validup/zod';
 import { z } from 'zod';
+import { VCButton } from '@vuecs/button';
+import { VCAlert } from '@vuecs/elements';
+import { VCFormGroup, VCFormInput } from '@vuecs/forms';
 import type { SlotsType, VNodeChild } from 'vue';
 import {
     defineComponent,
@@ -110,9 +112,14 @@ export default defineComponent({
 
         if (!manager.data.value) {
             return () => h(
-                'div',
-                { class: 'alert alert-sm alert-warning' },
-                [
+                VCAlert,
+                {
+                    color: 'warning', 
+                    variant: 'soft', 
+                    size: 'sm', 
+                    class: 'mb-3', 
+                },
+                () => [
                     'The registry-project details can not be displayed.',
                 ],
             );
@@ -122,7 +129,7 @@ export default defineComponent({
             const VCIcon = resolveComponent('VCIcon');
             const fallback = () : VNodeChild => h('div', [
                 h('div', { class: 'mb-2 flex flex-col' }, [
-                    h('div', { class: 'form-group' }, [
+                    h('div', { class: 'mb-3' }, [
                         h('label', { class: 'pe-1' }, 'Project'),
                         h('input', {
                             class: 'form-control',
@@ -133,7 +140,7 @@ export default defineComponent({
                     ]),
 
                     h('div', [
-                        h('div', { class: 'form-group' }, [
+                        h('div', { class: 'mb-3' }, [
                             h('label', { class: 'pe-1' }, 'Account ID'),
                             h('input', {
                                 class: 'form-control',
@@ -143,19 +150,24 @@ export default defineComponent({
                                 disabled: true,
                             }),
                         ]),
-                        buildFormGroup({
-                            label: true,
-                            labelContent: 'Account Secret',
-                            validationMessages: secretValidation.messages,
-                            validationSeverity: toSeverity(secretValidation.severity),
-                            content: buildFormInput({
-                                props: { placeholder: '...' },
-                                value: form.secret,
-                                onChange(value) {
-                                    form.secret = value;
-                                },
-                            }),
-                        }),
+                        h(
+                            VCFormGroup,
+                            {
+                                label: true,
+                                labelContent: 'Account Secret',
+                                validationMessages: secretValidation.messages,
+                                validationSeverity: toSeverity(secretValidation.severity),
+                            },
+                            {
+                                default: () => h(VCFormInput, {
+                                    modelValue: form.secret == null ? '' : String(form.secret),
+                                    'onUpdate:modelValue': (value: string) => {
+                                        form.secret = value;
+                                    },
+                                    placeholder: '...',
+                                }),
+                            },
+                        ),
                     ]),
 
                     h('div', [
@@ -167,41 +179,51 @@ export default defineComponent({
                     ]),
                 ]),
                 h('hr'),
-                h('div', { class: 'row' }, [
-                    h('div', { class: 'col' }, [
-                        h('div', { class: 'alert alert-sm alert-info' }, [
+                h('div', { class: 'flex flex-wrap -mx-2' }, [
+                    h('div', { class: 'flex-1 basis-0 px-2' }, [
+                        h(VCAlert, {
+                            color: 'info', 
+                            variant: 'soft', 
+                            size: 'sm', 
+                            class: 'mb-3', 
+                        }, () => [
                             'Connect the database entity to the registry.',
                         ]),
                         h('div', { class: 'text-center' }, [
-                            h('button', {
-                                class: 'btn btn-xs btn-primary',
+                            h(VCButton, {
+                                color: 'primary',
+                                size: 'xs',
                                 disabled: busy.value,
-                                type: 'button',
                                 onClick($event: any) {
                                     $event.preventDefault();
 
                                     return execute(RegistryAPICommand.PROJECT_LINK);
                                 },
-                            }, [
+                            }, () => [
                                 h(VCIcon, { name: 'fa6-solid:plug', class: 'pe-1' }),
                                 'Connect',
                             ]),
                         ]),
                     ]),
-                    h('div', { class: 'col' }, [
-                        h('div', { class: 'alert alert-sm alert-warning' }, [
+                    h('div', { class: 'flex-1 basis-0 px-2' }, [
+                        h(VCAlert, {
+                            color: 'warning', 
+                            variant: 'soft', 
+                            size: 'sm', 
+                            class: 'mb-3', 
+                        }, () => [
                             'Disconnect the database entity of the registry.',
                         ]),
                         h('div', { class: 'text-center' }, [
-                            h('button', {
-                                class: 'btn btn-xs btn-danger',
+                            h(VCButton, {
+                                color: 'error',
+                                size: 'xs',
                                 disabled: busy.value,
-                                type: 'button',
                                 onClick($event: any) {
                                     $event.preventDefault();
                                     return execute(RegistryAPICommand.PROJECT_UNLINK);
                                 },
-                            }, [
+                            }, () => [
                                 h(VCIcon, { name: 'fa6-solid:power-off', class: 'pe-1' }),
                                 'Disconnect',
                             ]),
