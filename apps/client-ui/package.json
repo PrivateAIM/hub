@@ -35,7 +35,7 @@
         "@iconify-json/fa6-solid": "^1.2.0",
         "@nuxtjs/google-fonts": "^3.2.0",
         "@pinia/nuxt": "^0.11.3",
-        "@tailwindcss/vite": "^4.3.1",
+        "@tailwindcss/vite": "^4.3.2",
         "@privateaim/client-vue": "^0.12.0",
         "@privateaim/client-vue-theme": "^0.12.0",
         "@privateaim/core-kit": "^0.12.0",
@@ -72,7 +72,7 @@
         "tailwindcss": "^4.3.1",
         "validup": "^0.5.1",
         "vue": "^3.5.35",
-        "vue-tsc": "^3.3.2",
+        "vue-tsc": "^3.3.5",
         "zod": "^4.3.6"
     },
     "gitHead": "8881a3d4b427c45ac4b81ac4b31bf3d719463ef7"
