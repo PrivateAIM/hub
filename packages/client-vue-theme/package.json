@@ -1,7 +1,7 @@
 {
     "name": "@privateaim/client-vue-theme",
     "type": "module",
-    "version": "0.11.5",
+    "version": "0.12.0",
     "description": "PrivateAIM theme for vuecs components, built on top of @vuecs/theme-tailwind.",
     "license": "Apache-2.0",
     "exports": {
