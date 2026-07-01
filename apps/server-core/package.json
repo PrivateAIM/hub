@@ -46,9 +46,9 @@
         "envix": "^1.3.0",
         "hapic": "^3.0.1",
         "locter": "^3.0.0",
-        "mysql2": "^3.22.4",
+        "mysql2": "^3.22.5",
         "orkos": "^1.1.1",
-        "pg": "^8.21.0",
+        "pg": "^8.22.0",
         "prom-client": "^15.1.3",
         "rapiq": "^0.9.0",
         "redis-extension": "^2.0.4",
@@ -62,16 +62,16 @@
         "zod": "^4.3.6"
     },
     "devDependencies": {
-        "@faker-js/faker": "^10.4.0",
-        "@trapi/cli": "^2.0.0",
+        "@faker-js/faker": "^10.5.0",
+        "@trapi/cli": "^2.0.1",
         "@privateaim/core-http-kit": "^0.12.0",
         "@privateaim/server-test-kit": "^0.12.0",
         "@types/busboy": "^1.5.3",
-        "better-sqlite3": "^12.10.0",
+        "better-sqlite3": "^12.11.1",
         "cross-env": "^10.1.0",
-        "testcontainers": "^12.0.1",
+        "testcontainers": "^12.0.4",
         "ts-node": "^10.9.2",
-        "vitest": "^4.1.7"
+        "vitest": "^4.1.9"
     },
     "scripts": {
         "cli": "node dist/cli/index.mjs",
