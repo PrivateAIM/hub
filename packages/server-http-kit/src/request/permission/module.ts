@@ -53,8 +53,8 @@ export class RequestPermissionChecker {
     protected extendCheckContext(ctx: PermissionEvaluationContext) {
         const scopes = useRequestEnv(this.event, 'scopes') || [];
         if (scopes.includes(ScopeName.GLOBAL)) {
-            ctx.input = ctx.input || new PolicyData();
-            ctx.input.set(BuiltInPolicyType.IDENTITY, useRequestIdentity(this.event));
+            ctx.data = ctx.data || new PolicyData();
+            ctx.data.set(BuiltInPolicyType.IDENTITY, useRequestIdentity(this.event));
         }
 
         return ctx;

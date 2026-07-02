@@ -123,11 +123,11 @@ export class Navigation {
 
             if (permissions.length > 0) {
                 try {
-                    const input = new PolicyData();
-                    input.set(BuiltInPolicyType.IDENTITY, identity);
+                    const data = new PolicyData();
+                    data.set(BuiltInPolicyType.IDENTITY, identity);
                     await this.store.permissionEvaluator.preEvaluateOneOf({
                         name: permissions,
-                        input,
+                        data,
                     });
                 } catch {
                     canPass = false;

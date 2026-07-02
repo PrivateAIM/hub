@@ -27,15 +27,15 @@
         "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts"
     },
     "devDependencies": {
-        "@authup/kit": "^1.0.0-beta.50",
-        "@authup/core-kit": "^1.0.0-beta.50",
+        "@authup/kit": "^1.0.0-beta.51",
+        "@authup/core-kit": "^1.0.0-beta.51",
         "cross-env": "^10.1.0",
         "unplugin-swc": "^1.5.5",
         "vitest": "^4.1.7"
     },
     "peerDependencies": {
-        "@authup/kit": "^1.0.0-beta.50",
-        "@authup/core-kit": "^1.0.0-beta.50"
+        "@authup/kit": "^1.0.0-beta.51",
+        "@authup/core-kit": "^1.0.0-beta.51"
     },
     "dependencies": {
         "nanoid": "^5.1.11",
