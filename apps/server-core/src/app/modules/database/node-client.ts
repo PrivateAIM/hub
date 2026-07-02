@@ -71,9 +71,8 @@ export class NodeClientService {
             });
 
         const permissionNames: string[] = [
-            PermissionName.ANALYSIS_APPROVE,
+            // todo: remove this permission, node should be permissionless
             PermissionName.ANALYSIS_UPDATE,
-            PermissionName.PROJECT_APPROVE,
         ];
         const permissionNamesAssigned: string[] = [];
 
