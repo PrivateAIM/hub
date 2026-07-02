@@ -5,13 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { defineComponent } from 'vue';
+import { defineComponent, h } from 'vue';
 import type { ProjectNode } from '@privateaim/core-kit';
 import {
     DomainType,
 } from '@privateaim/core-kit';
 import { createEntityManager, defineEntityManagerEvents } from '../../core';
-import { renderToggleButton } from '@authup/client-web-kit';
+import { AToggleButton } from '@authup/client-web-kit';
 
 export default defineComponent({
     props: {
@@ -23,7 +23,11 @@ export default defineComponent({
             type: String,
             required: true,
         },
-        realmId: String,
+        realmId: { type: String },
+        withPrompt: {
+            type: Boolean,
+            default: true,
+        },
     },
     emits: defineEntityManagerEvents<ProjectNode>(),
     async setup(props, setup) {
@@ -48,10 +52,13 @@ export default defineComponent({
             },
         });
 
-        return () => renderToggleButton({
+        // withPrompt confirms only the removal transition (assigned →
+        // un-assign) via useAlertDialog(); adding a node never prompts.
+        return () => h(AToggleButton, {
             isBusy: manager.busy.value,
             value: !!manager.data.value,
-            changed: (value) => {
+            withPrompt: props.withPrompt,
+            onChanged: (value: boolean) => {
                 if (value) {
                     return manager.create({
                         project_id: props.projectId,
