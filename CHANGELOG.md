@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.12.1](https://github.com/PrivateAIM/hub/compare/v0.12.0...v0.12.1) (2026-07-02)
+
+
+### Features
+
+* stip node client of analysis/project approval permissions ([#1734](https://github.com/PrivateAIM/hub/issues/1734)) ([f245eec](https://github.com/PrivateAIM/hub/commit/f245eec33d0823de046b7225f4cfa92c7966a0fc))
+
 ## [0.12.0](https://github.com/PrivateAIM/hub/compare/v0.11.5...v0.12.0) (2026-06-29)
 
 
