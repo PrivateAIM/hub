@@ -88,7 +88,7 @@ export class AnalysisClientCredentialService extends AbstractEntityService imple
 
         await actor.permissionChecker.check({
             name: PermissionName.ANALYSIS_UPDATE,
-            input: new PolicyData({ [BuiltInPolicyType.ATTRIBUTES]: analysis }),
+            data: new PolicyData({ [BuiltInPolicyType.ATTRIBUTES]: analysis }),
         });
 
         if (!isRealmResourceWritable(actor.realm, analysis.realm_id)) {

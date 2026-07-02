@@ -134,7 +134,7 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
 
         await actor.permissionChecker.check({
             name: PermissionName.ANALYSIS_CREATE,
-            input: new PolicyData({ [BuiltInPolicyType.ATTRIBUTES]: entity }),
+            data: new PolicyData({ [BuiltInPolicyType.ATTRIBUTES]: entity }),
         });
 
         await this.repository.save(entity, { data: actor.metadata });
@@ -210,7 +210,7 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
 
         await actor.permissionChecker.check({
             name: PermissionName.ANALYSIS_UPDATE,
-            input: new PolicyData({ [BuiltInPolicyType.ATTRIBUTES]: entity }),
+            data: new PolicyData({ [BuiltInPolicyType.ATTRIBUTES]: entity }),
         });
 
         if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
@@ -250,7 +250,7 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
 
         await actor.permissionChecker.check({
             name: PermissionName.ANALYSIS_DELETE,
-            input: new PolicyData({ [BuiltInPolicyType.ATTRIBUTES]: entity }),
+            data: new PolicyData({ [BuiltInPolicyType.ATTRIBUTES]: entity }),
         });
 
         if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {

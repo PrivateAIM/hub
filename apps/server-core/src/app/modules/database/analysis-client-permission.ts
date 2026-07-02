@@ -63,7 +63,7 @@ export class AnalysisClientPermissionService {
         await actor.permissionChecker.preCheck({ name: PermissionName.ANALYSIS_UPDATE });
         await actor.permissionChecker.check({
             name: PermissionName.ANALYSIS_UPDATE,
-            input: new PolicyData({ [BuiltInPolicyType.ATTRIBUTES]: analysis }),
+            data: new PolicyData({ [BuiltInPolicyType.ATTRIBUTES]: analysis }),
         });
 
         if (!isRealmResourceWritable(actor.realm, analysis.realm_id)) {
