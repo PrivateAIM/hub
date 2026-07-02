@@ -1,6 +1,6 @@
 {
     "name": "@privateaim/docs",
-    "version": "0.11.6",
+    "version": "0.12.0",
     "private": true,
     "type": "module",
     "scripts": {
