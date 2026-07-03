@@ -39,22 +39,25 @@ export class DatabaseModule implements IModule {
         }
 
         const dataSource = new DataSource(options);
-        await dataSource.initialize();
 
         try {
+            await dataSource.initialize();
+
             setDataSource(dataSource);
 
             if (!check.schema) {
                 await synchronizeDatabaseSchema(dataSource);
             }
+
+            container.register(DatabaseInjectionKey.DataSource, { useValue: dataSource });
+
+            registerRepositories(container, dataSource);
         } catch (e) {
-            await dataSource.destroy();
+            if (dataSource.isInitialized) {
+                await dataSource.destroy();
+            }
             throw e;
         }
-
-        container.register(DatabaseInjectionKey.DataSource, { useValue: dataSource });
-
-        registerRepositories(container, dataSource);
     }
 
     async teardown(container: IContainer): Promise<void> {
