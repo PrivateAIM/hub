@@ -193,14 +193,33 @@ export default defineComponent({
         const onClick = async ($event: any) => {
             $event.preventDefault();
 
+            // Re-entrancy guard: a fast double-click could otherwise stack two
+            // confirmation dialogs (or fire two deletes) before submit() flips
+            // `busy`, since the button stays enabled while confirmDialog() is
+            // pending.
+            if (busy.value) {
+                return undefined;
+            }
+
             if (props.withPrompt && confirmDialog) {
-                const confirmed = await confirmDialog({
-                    title: promptTitle.value,
-                    description: promptDescription.value,
-                    confirmLabel: translation.value,
-                    cancelLabel: abortLabel.value,
-                    tone: 'error',
-                });
+                // Mark busy across the confirmation so the button is disabled
+                // while the dialog is open, then release it before submit() —
+                // which owns `busy` for the delete request and early-returns if
+                // it is still set. No await between the release and submit(), so
+                // no re-entrancy window reopens.
+                busy.value = true;
+                let confirmed: boolean;
+                try {
+                    confirmed = await confirmDialog({
+                        title: promptTitle.value,
+                        description: promptDescription.value,
+                        confirmLabel: translation.value,
+                        cancelLabel: abortLabel.value,
+                        tone: 'error',
+                    });
+                } finally {
+                    busy.value = false;
+                }
 
                 if (!confirmed) {
                     return undefined;
