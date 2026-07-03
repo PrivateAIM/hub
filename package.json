@@ -46,6 +46,6 @@
         "*.{vue,js,ts}": "npm run lint:fix"
     },
     "overrides": {
-        "vue": "3.5.35"
+        "vue": "3.5.39"
     }
 }
