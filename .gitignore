@@ -101,3 +101,6 @@ sw.*
 .agents/plans
 .claude/settings.local.json
 apps/*/writable/swagger.json
+
+# SQLite test artifacts
+apps/*/db.sqlite

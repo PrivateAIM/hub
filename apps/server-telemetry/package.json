@@ -42,6 +42,7 @@
         "mysql2": "^3.22.5",
         "node-cron": "^4.5.0",
         "orkos": "^1.1.1",
+        "pg": "^8.22.0",
         "rapiq": "0.9.0",
         "redis-extension": "^2.0.4",
         "reflect-metadata": "^0.2.2",
