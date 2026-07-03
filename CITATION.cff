@@ -21,7 +21,7 @@ authors:
 repository-code: "https://github.com/PrivateAIM/hub"
 url: "https://privateaim.net"
 license: Apache-2.0
-version: 0.12.0 # x-release-please-version
+version: 0.12.1 # x-release-please-version
 # date-released: 2026-01-01  # set/automate to the release date of `version`
 keywords:
   - federated analytics

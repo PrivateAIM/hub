@@ -1,5 +1,52 @@
 # Changelog
 
+## [0.12.0](https://github.com/PrivateAIM/hub/compare/v0.11.6...v0.12.0) (2026-07-03)
+
+
+### ⚠ BREAKING CHANGES
+
+* **ui:** vuecs new majors + Tailwind v4 + repo-wide validup 0.5 + authup beta.48 ([#1668](https://github.com/PrivateAIM/hub/issues/1668))
+
+### Features
+
+* bucket-file aggregation with analysis-bucket-file management ([#1324](https://github.com/PrivateAIM/hub/issues/1324)) ([00d5aa8](https://github.com/PrivateAIM/hub/commit/00d5aa8bc16a66d7a761ef60b2b4ec27983e5c9a))
+* component caller(s) implementation ([#1295](https://github.com/PrivateAIM/hub/issues/1295)) ([3b21fe1](https://github.com/PrivateAIM/hub/commit/3b21fe1b2cf3d47332722578cff67359442d84eb))
+* database migration capabilities ([#1437](https://github.com/PrivateAIM/hub/issues/1437)) ([ada0c8c](https://github.com/PrivateAIM/hub/commit/ada0c8c82c50d7ff999c60d7d6b8a6aea10064f0))
+* event components ([b4529ee](https://github.com/PrivateAIM/hub/commit/b4529eec406d03ac83c9843f06997c3e4abc4eff))
+* initial server-telemetry-kit package ([bdb9678](https://github.com/PrivateAIM/hub/commit/bdb9678f7a05bb70fcefdb632a3e9fc2eb541f97))
+* merge server-core & server-core-realtime package ([5298c48](https://github.com/PrivateAIM/hub/commit/5298c48705aa3cc9a2a7ff9e452a8ae1b26e57d8))
+* migrate to esm & replace jest with vitest ([#1368](https://github.com/PrivateAIM/hub/issues/1368)) ([5a4d9d1](https://github.com/PrivateAIM/hub/commit/5a4d9d1ce118f65740aa49caf948208eac299032))
+* move log-store, loki setup etc. to telemetry service ([#1151](https://github.com/PrivateAIM/hub/issues/1151)) ([8b38b0e](https://github.com/PrivateAIM/hub/commit/8b38b0ee0fafafb121eb4efb0aaf548c27edcde4))
+* refactor domain event publisher & register amqp ([0f98ecf](https://github.com/PrivateAIM/hub/commit/0f98ecf3c24239d9050fd4a7c2e0bd6843cb3dc8))
+* set expire date for analysis-node run events ([5f6d3b3](https://github.com/PrivateAIM/hub/commit/5f6d3b3ed06dfb23d66042b61696f6140978a22c))
+* **ui:** vuecs new majors + Tailwind v4 + repo-wide validup 0.5 + authup beta.48 ([#1668](https://github.com/PrivateAIM/hub/issues/1668)) ([3b39672](https://github.com/PrivateAIM/hub/commit/3b396724ae9ac76b7f80909ec8f64d5ada2fa1c6))
+
+
+### Bug Fixes
+
+* **build:** replace __dirname with import.meta.dirname and enable tsdown shims ([b08de35](https://github.com/PrivateAIM/hub/commit/b08de35f59d325fda2222a3290b75561936e88e1))
+* **deps:** bump the minorandpatch group across 1 directory with 15 updates ([#1415](https://github.com/PrivateAIM/hub/issues/1415)) ([ae2e03c](https://github.com/PrivateAIM/hub/commit/ae2e03cea61aa74820128bc22039d5f23f51466f))
+* do not transmit nested event payload ([#1200](https://github.com/PrivateAIM/hub/issues/1200)) ([8180ddc](https://github.com/PrivateAIM/hub/commit/8180ddc6440963e32ce83769ed4c007d36b9533c))
+* don't write debug level messages ([1a71201](https://github.com/PrivateAIM/hub/commit/1a71201e91ad9f94c316bcf9345b8a37a1a9cc50))
+* entity subscriber & analysis-metadata component (trigger) ([#1280](https://github.com/PrivateAIM/hub/issues/1280)) ([b565e9e](https://github.com/PrivateAIM/hub/commit/b565e9e58e4eca147944214ded6aa8387afab0c0))
+* enum to string conversion ([95272f8](https://github.com/PrivateAIM/hub/commit/95272f8252f326f8112d7192975c143e68244826))
+* setting top level log attributes ([f74439b](https://github.com/PrivateAIM/hub/commit/f74439ba31c6a30f3ed0e530671fea5d4321181c))
+* ship dist directory in published kit packages ([#1719](https://github.com/PrivateAIM/hub/issues/1719)) ([576dcc4](https://github.com/PrivateAIM/hub/commit/576dcc481e9677c0b33fbbf148ce2b1d1c3300c1))
+* transmitting logs ([bc6855c](https://github.com/PrivateAIM/hub/commit/bc6855c1dc99e0b831d94f1d6d469cdb3b78a64f))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.12.0 to ^0.12.1
+    * @privateaim/server-kit bumped from ^0.12.0 to ^0.12.1
+    * @privateaim/telemetry-kit bumped from ^0.12.0 to ^0.12.1
+  * peerDependencies
+    * @privateaim/kit bumped from ^0.12.0 to ^0.12.1
+    * @privateaim/server-kit bumped from ^0.12.0 to ^0.12.1
+    * @privateaim/telemetry-kit bumped from ^0.12.0 to ^0.12.1
+
 ## [0.11.6](https://github.com/PrivateAIM/hub/compare/v0.11.5...v0.11.6) (2026-06-29)
 
 
