@@ -6,10 +6,15 @@
  */
 
 import { useTranslation } from '@authup/client-web-kit';
-import { TranslatorTranslationActionKey, TranslatorTranslationNamespace } from '@authup/i18n';
+import {
+    TranslatorTranslationActionKey,
+    TranslatorTranslationAppKey,
+    TranslatorTranslationNamespace,
+} from '@authup/i18n';
 import { VCButton } from '@vuecs/button';
 import type { ButtonColor, ButtonSize, ButtonVariant } from '@vuecs/button';
 import { VCIcon } from '@vuecs/icon';
+import { useAlertDialog } from '@vuecs/overlays';
 import type { DomainType as CoreDomainType } from '@privateaim/core-kit';
 import type { DomainType as StorageDomainType } from '@privateaim/storage-kit';
 import type { DomainType as TelemetryDomainType } from '@privateaim/telemetry-kit';
@@ -91,6 +96,14 @@ export default defineComponent({
             type: Boolean,
             default: false,
         },
+
+        // Gate the (irreversible) delete behind a confirmation dialog rendered
+        // by the app-level <VCAlertDialogProvider> via useAlertDialog(). On by
+        // default — opt out per call site with :with-prompt="false".
+        withPrompt: {
+            type: Boolean,
+            default: true,
+        },
     },
     emits: ['deleted', 'failed'],
     setup(props, ctx) {
@@ -146,13 +159,77 @@ export default defineComponent({
             key: TranslatorTranslationActionKey.DELETE,
         });
 
+        // Imperative confirmation dialog, resolved ONLY when prompting is
+        // enabled — so `<FEntityDelete :with-prompt="false">` never injects the
+        // AlertDialogManager and therefore doesn't require the app-level
+        // <VCAlertDialogProvider>. `useAlertDialog()` only calls inject() (no
+        // lifecycle hooks), so this one-time conditional resolution in setup is
+        // safe. It resolves true (Delete) / false (Abort / Escape).
+        const confirmDialog = props.withPrompt ? useAlertDialog() : undefined;
+
+        // Singular, localized entity noun (`count: 1`) interpolated into the
+        // confirmation title. Hub entity types are not part of authup's ENTITY
+        // namespace, so most fall back to the raw key (e.g. "node") — still
+        // readable, and superseded once the hub ships its own i18n catalog.
+        const entityLabel = useTranslation({
+            namespace: TranslatorTranslationNamespace.ENTITY,
+            key: props.entityType,
+            count: 1,
+        });
+        const abortLabel = useTranslation({
+            namespace: TranslatorTranslationNamespace.ACTION,
+            key: TranslatorTranslationActionKey.ABORT,
+        });
+        const promptTitle = useTranslation({
+            namespace: TranslatorTranslationNamespace.APP,
+            key: TranslatorTranslationAppKey.DELETE_CONFIRM_TITLE,
+            data: { entity: entityLabel },
+        });
+        const promptDescription = useTranslation({
+            namespace: TranslatorTranslationNamespace.APP,
+            key: TranslatorTranslationAppKey.DELETE_CONFIRM_DESCRIPTION,
+        });
+
+        const onClick = async ($event: any) => {
+            $event.preventDefault();
+
+            // Re-entrancy guard: a fast double-click could otherwise stack two
+            // confirmation dialogs (or fire two deletes) before submit() flips
+            // `busy`, since the button stays enabled while confirmDialog() is
+            // pending.
+            if (busy.value) {
+                return undefined;
+            }
+
+            if (props.withPrompt && confirmDialog) {
+                // Mark busy across the confirmation so the button is disabled
+                // while the dialog is open, then release it before submit() —
+                // which owns `busy` for the delete request and early-returns if
+                // it is still set. No await between the release and submit(), so
+                // no re-entrancy window reopens.
+                busy.value = true;
+                let confirmed: boolean;
+                try {
+                    confirmed = await confirmDialog({
+                        title: promptTitle.value,
+                        description: promptDescription.value,
+                        confirmLabel: translation.value,
+                        cancelLabel: abortLabel.value,
+                        tone: 'error',
+                    });
+                } finally {
+                    busy.value = false;
+                }
+
+                if (!confirmed) {
+                    return undefined;
+                }
+            }
+
+            return submit();
+        };
+
         const render = () => {
-            const onClick = ($event: any) => {
-                $event.preventDefault();
-
-                return submit.apply(null);
-            };
-
             // Default (button) path — mirrors authup's <AEntityDelete>: a
             // self-styled <VCButton> with the icon via `iconLeft` (leading
             // span) and text via `label`, so hub + authup delete buttons

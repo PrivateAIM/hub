@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 
-import { VCToastProvider } from '@vuecs/overlays';
+import { VCAlertDialogProvider, VCToastProvider } from '@vuecs/overlays';
 import PageHeader from '../components/layout/header.vue';
 import PageSidebar from '../components/layout/sidebar.vue';
 import PageFooter from '../components/layout/footer.vue';
@@ -17,6 +17,7 @@ export default defineNuxtComponent({
         PageHeader,
         PageSidebar,
         PageFooter,
+        VCAlertDialogProvider,
         VCToastProvider,
     },
 });
@@ -34,6 +35,17 @@ export default defineNuxtComponent({
             </div>
             <PageFooter />
         </div>
+
+        <!--
+            Single host for the imperative useAlertDialog() confirmation API
+            (e.g. <FEntityDelete>'s delete prompt and the assignment toggles'
+            removal prompt). The AlertDialogManager is provided app-wide by
+            `app.use(installOverlays)` in plugins/vuecs.ts, so this host can sit
+            anywhere under the shell and still drain confirmations from every
+            page — it is not a Reka context provider like <VCToastProvider>
+            (which is why it nests here without being scoped to any subtree).
+        -->
+        <VCAlertDialogProvider />
     </VCToastProvider>
 </template>
 <style>
