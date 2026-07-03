@@ -46,38 +46,41 @@ export class DatabaseModule implements IModule {
         }
 
         const dataSource = new DataSource(options);
-        await dataSource.initialize();
-
-        // Subscribers must be pushed after initialize(), because
-        // initialize() overwrites dataSource.subscribers from options.
-        const subscribers = [
-            new BucketSubscriber(),
-            new BucketFileSubscriber(),
-        ];
-
-        const publisherResult = container.tryResolve(EntityEventPublisherInjectionKey);
-        if (publisherResult.success) {
-            for (const subscriber of subscribers) {
-                subscriber.setPublisher(publisherResult.data);
-            }
-        }
-
-        dataSource.subscribers.push(...subscribers);
 
         try {
+            await dataSource.initialize();
+
+            // Subscribers must be pushed after initialize(), because
+            // initialize() overwrites dataSource.subscribers from options.
+            const subscribers = [
+                new BucketSubscriber(),
+                new BucketFileSubscriber(),
+            ];
+
+            const publisherResult = container.tryResolve(EntityEventPublisherInjectionKey);
+            if (publisherResult.success) {
+                for (const subscriber of subscribers) {
+                    subscriber.setPublisher(publisherResult.data);
+                }
+            }
+
+            dataSource.subscribers.push(...subscribers);
+
             setDataSource(dataSource);
 
             if (!check.schema) {
                 await synchronizeDatabaseSchema(dataSource);
             }
+
+            container.register(DatabaseInjectionKey.DataSource, { useValue: dataSource });
+
+            registerRepositories(container, dataSource);
         } catch (e) {
-            await dataSource.destroy();
+            if (dataSource.isInitialized) {
+                await dataSource.destroy();
+            }
             throw e;
         }
-
-        container.register(DatabaseInjectionKey.DataSource, { useValue: dataSource });
-
-        registerRepositories(container, dataSource);
     }
 
     async teardown(container: IContainer): Promise<void> {

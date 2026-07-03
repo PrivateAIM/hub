@@ -79,17 +79,21 @@ export function defineCLIMigrationCommand() {
                     ...options,
                     logging: ['error', 'schema', 'migration'],
                 });
-                await dataSource.initialize();
+                try {
+                    await dataSource.initialize();
 
-                if (context.args.operation === MigrationOperation.REVERT) {
-                    await dataSource.undoLastMigration();
-                } else if (context.args.operation === MigrationOperation.STATUS) {
-                    await dataSource.showMigrations();
-                } else {
-                    await dataSource.runMigrations();
+                    if (context.args.operation === MigrationOperation.REVERT) {
+                        await dataSource.undoLastMigration();
+                    } else if (context.args.operation === MigrationOperation.STATUS) {
+                        await dataSource.showMigrations();
+                    } else {
+                        await dataSource.runMigrations();
+                    }
+                } finally {
+                    if (dataSource.isInitialized) {
+                        await dataSource.destroy();
+                    }
                 }
-
-                await dataSource.destroy();
 
                 process.exit(0);
             }
@@ -126,16 +130,24 @@ export function defineCLIMigrationCommand() {
                 await createDatabase({ options: dataSourceOptions, synchronize: false });
 
                 const dataSource = new DataSource(dataSourceOptions);
-                await dataSource.initialize();
-                await dataSource.runMigrations();
 
-                await generateMigration({
-                    dataSource,
-                    name: 'Default',
-                    directoryPath,
-                    timestamp,
-                    prettify: true,
-                });
+                try {
+                    await dataSource.initialize();
+
+                    await dataSource.runMigrations();
+
+                    await generateMigration({
+                        dataSource,
+                        name: 'Default',
+                        directoryPath,
+                        timestamp,
+                        prettify: true,
+                    });
+                } finally {
+                    if (dataSource.isInitialized) {
+                        await dataSource.destroy();
+                    }
+                }
             }
 
             process.exit(0);

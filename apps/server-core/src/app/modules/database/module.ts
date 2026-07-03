@@ -67,26 +67,28 @@ export class DatabaseModule implements IModule {
 
         const dataSource = new DataSource(options);
 
-        await dataSource.initialize();
-
-        // Subscribers must be pushed after initialize(), because
-        // initialize() overwrites dataSource.subscribers from options.
-        this.registerSubscribers(dataSource, container);
-
         try {
+            await dataSource.initialize();
+
+            // Subscribers must be pushed after initialize(), because
+            // initialize() overwrites dataSource.subscribers from options.
+            this.registerSubscribers(dataSource, container);
+
             setDataSource(dataSource);
 
             if (!check.schema) {
                 await synchronizeDatabaseSchema(dataSource);
             }
+
+            container.register(DatabaseInjectionKey.DataSource, { useValue: dataSource });
+
+            registerRepositories(container, dataSource);
         } catch (e) {
-            await dataSource.destroy();
+            if (dataSource.isInitialized) {
+                await dataSource.destroy();
+            }
             throw e;
         }
-
-        container.register(DatabaseInjectionKey.DataSource, { useValue: dataSource });
-
-        registerRepositories(container, dataSource);
     }
 
     async teardown(container: IContainer): Promise<void> {
