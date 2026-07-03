@@ -79,9 +79,9 @@ export function defineCLIMigrationCommand() {
                     ...options,
                     logging: ['error', 'schema', 'migration'],
                 });
-                await dataSource.initialize();
-
                 try {
+                    await dataSource.initialize();
+
                     if (context.args.operation === MigrationOperation.REVERT) {
                         await dataSource.undoLastMigration();
                     } else if (context.args.operation === MigrationOperation.STATUS) {
@@ -90,7 +90,9 @@ export function defineCLIMigrationCommand() {
                         await dataSource.runMigrations();
                     }
                 } finally {
-                    await dataSource.destroy();
+                    if (dataSource.isInitialized) {
+                        await dataSource.destroy();
+                    }
                 }
 
                 process.exit(0);
@@ -128,9 +130,10 @@ export function defineCLIMigrationCommand() {
                 await createDatabase({ options: dataSourceOptions, synchronize: false });
 
                 const dataSource = new DataSource(dataSourceOptions);
-                await dataSource.initialize();
 
                 try {
+                    await dataSource.initialize();
+
                     await dataSource.runMigrations();
 
                     await generateMigration({
@@ -141,7 +144,9 @@ export function defineCLIMigrationCommand() {
                         prettify: true,
                     });
                 } finally {
-                    await dataSource.destroy();
+                    if (dataSource.isInitialized) {
+                        await dataSource.destroy();
+                    }
                 }
             }
 
