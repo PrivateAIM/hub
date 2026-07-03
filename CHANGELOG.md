@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.12.1](https://github.com/PrivateAIM/hub/compare/v0.12.0...v0.12.1) (2026-07-03)
+
+
+### Features
+
+* **client-vue:** confirm destructive delete & assignment removal via AlertDialog ([#1735](https://github.com/PrivateAIM/hub/issues/1735)) ([9d62aa3](https://github.com/PrivateAIM/hub/commit/9d62aa319694c1ff1717e83be4f75e7187f3a946))
+* stip node client of analysis/project approval permissions ([#1734](https://github.com/PrivateAIM/hub/issues/1734)) ([f245eec](https://github.com/PrivateAIM/hub/commit/f245eec33d0823de046b7225f4cfa92c7966a0fc))
+
+
+### Bug Fixes
+
+* **deps:** bump the minorandpatch group across 1 directory with 23 updates ([#1736](https://github.com/PrivateAIM/hub/issues/1736)) ([e3e5658](https://github.com/PrivateAIM/hub/commit/e3e5658d4d711b5afad3aef8a1491a8b1fc9cc19))
+* **deps:** bump tmp and nx ([#1737](https://github.com/PrivateAIM/hub/issues/1737)) ([6985d5a](https://github.com/PrivateAIM/hub/commit/6985d5a2ef42c267fc5bc3cb1b355dee9bf3f88c))
+* **deps:** bump ws, engine.io-client, socket.io-adapter and engine.io ([#1738](https://github.com/PrivateAIM/hub/issues/1738)) ([0fb629b](https://github.com/PrivateAIM/hub/commit/0fb629bdeced2f85877b68eaf8d131734f47b0d5))
+* **deps:** dedupe vue to a single copy to unbreak client-vue build ([9db3439](https://github.com/PrivateAIM/hub/commit/9db3439ce34190a0b4df5e593b0d4b70ff5ffa10))
+
 ## [0.12.0](https://github.com/PrivateAIM/hub/compare/v0.11.5...v0.12.0) (2026-06-29)
 
 

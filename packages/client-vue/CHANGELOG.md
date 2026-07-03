@@ -1,5 +1,35 @@
 # Changelog
 
+## [0.12.1](https://github.com/PrivateAIM/hub/compare/v0.12.0...v0.12.1) (2026-07-03)
+
+
+### Features
+
+* **client-vue:** confirm destructive delete & assignment removal via AlertDialog ([#1735](https://github.com/PrivateAIM/hub/issues/1735)) ([9d62aa3](https://github.com/PrivateAIM/hub/commit/9d62aa319694c1ff1717e83be4f75e7187f3a946))
+
+
+### Bug Fixes
+
+* **deps:** bump the minorandpatch group across 1 directory with 23 updates ([#1736](https://github.com/PrivateAIM/hub/issues/1736)) ([e3e5658](https://github.com/PrivateAIM/hub/commit/e3e5658d4d711b5afad3aef8a1491a8b1fc9cc19))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.12.0 to ^0.12.1
+    * @privateaim/core-kit bumped from ^0.12.0 to ^0.12.1
+    * @privateaim/core-realtime-kit bumped from ^0.10.10 to ^0.10.11
+    * @privateaim/kit bumped from ^0.12.0 to ^0.12.1
+    * @privateaim/storage-kit bumped from ^0.12.0 to ^0.12.1
+    * @privateaim/telemetry-kit bumped from ^0.12.0 to ^0.12.1
+  * peerDependencies
+    * @privateaim/core-http-kit bumped from ^0.12.0 to ^0.12.1
+    * @privateaim/core-kit bumped from ^0.12.0 to ^0.12.1
+    * @privateaim/kit bumped from ^0.12.0 to ^0.12.1
+    * @privateaim/storage-kit bumped from ^0.12.0 to ^0.12.1
+    * @privateaim/telemetry-kit bumped from ^0.12.0 to ^0.12.1
+
 ## [0.12.0](https://github.com/PrivateAIM/hub/compare/v0.11.5...v0.12.0) (2026-06-29)
 
 
