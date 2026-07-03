@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.12.2](https://github.com/PrivateAIM/hub/compare/v0.12.1...v0.12.2) (2026-07-03)
+
+
+### Bug Fixes
+
+* destroy DataSource on error paths in migration CLI and DatabaseModule ([#1741](https://github.com/PrivateAIM/hub/issues/1741)) ([efd11a9](https://github.com/PrivateAIM/hub/commit/efd11a998f3d1c26789f92652b367ee8134232d1))
+
 ## [0.12.1](https://github.com/PrivateAIM/hub/compare/v0.12.0...v0.12.1) (2026-07-03)
 
 
