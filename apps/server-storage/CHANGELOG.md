@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.12.1](https://github.com/PrivateAIM/hub/compare/v0.12.0...v0.12.1) (2026-07-03)
+
+
+### Bug Fixes
+
+* **deps:** bump the minorandpatch group across 1 directory with 23 updates ([#1736](https://github.com/PrivateAIM/hub/issues/1736)) ([e3e5658](https://github.com/PrivateAIM/hub/commit/e3e5658d4d711b5afad3aef8a1491a8b1fc9cc19))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.12.0 to ^0.12.1
+    * @privateaim/server-db-kit bumped from ^0.11.6 to ^0.12.0
+    * @privateaim/server-http-kit bumped from ^0.12.0 to ^0.12.1
+    * @privateaim/server-kit bumped from ^0.12.0 to ^0.12.1
+    * @privateaim/server-storage-kit bumped from ^0.11.6 to ^0.12.0
+    * @privateaim/server-telemetry-kit bumped from ^0.11.6 to ^0.12.0
+    * @privateaim/storage-kit bumped from ^0.12.0 to ^0.12.1
+    * @privateaim/telemetry-kit bumped from ^0.12.0 to ^0.12.1
+  * devDependencies
+    * @privateaim/server-test-kit bumped from ^0.12.0 to ^0.12.1
+
 ## [0.12.0](https://github.com/PrivateAIM/hub/compare/v0.11.5...v0.12.0) (2026-06-29)
 
 
