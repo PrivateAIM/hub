@@ -117,7 +117,10 @@ export class AnalysisCommunicationSummaryController {
             await Promise.all(buckets.map(async (bucket) => {
                 try {
                     const response = await this.storageClient.bucketFile.getMany({ filter: { bucket_id: bucket.bucket_id } });
-                    filesByType[bucket.type] = response.data;
+                    filesByType[bucket.type] = [
+                        ...(filesByType[bucket.type] || []),
+                        ...response.data,
+                    ];
                 } catch {
                     degraded = true;
                 }
