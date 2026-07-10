@@ -1,0 +1,3022 @@
+{
+  "generated_at": "2026-06-12T08:29:24.948Z",
+  "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+  "analysis": {
+    "id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+    "name": "gentle-badger-fff705",
+    "display_name": "pet-synth-1",
+    "description": null,
+    "nodes": 3,
+    "nodes_approved": 3,
+    "configuration_locked": true,
+    "configuration_entrypoint_valid": true,
+    "configuration_image_valid": true,
+    "configuration_node_aggregator_valid": true,
+    "configuration_node_default_valid": true,
+    "configuration_nodes_valid": true,
+    "distribution_status": "executed",
+    "distribution_progress": 100,
+    "build_nodes_valid": true,
+    "build_status": "executed",
+    "build_progress": 100,
+    "build_hash": "sha256:4e87fee60b6a05240dc3a3c757e542786a1b16944581220a4e8b74c8c3a1406d",
+    "build_os": "linux",
+    "build_size": 10204663216,
+    "execution_status": "executed",
+    "execution_progress": 100,
+    "created_at": "2026-06-12T08:07:13.711Z",
+    "updated_at": "2026-06-12T08:24:11.074Z",
+    "registry_id": "0d40b58d-b9ec-412b-8eb0-d7a56c7205ac",
+    "realm_id": "823719b9-ae39-4708-a0f9-fdc6dd8f7f4e",
+    "user_id": "54e8b720-cc1f-453c-978c-7d31bab52949",
+    "project_id": "d543222b-68d1-40fc-81d4-3ddc1cba229f",
+    "master_image_id": "2d6b1d6c-53c9-49a4-afcf-6b63b5405994"
+  },
+  "analysis_nodes": {
+    "data": [
+      {
+        "id": "872d1bc4-2699-4e56-95f9-dcfeddae339c",
+        "approval_status": "approved",
+        "execution_status": "executed",
+        "execution_progress": 100,
+        "comment": null,
+        "artifact_tag": null,
+        "artifact_digest": null,
+        "created_at": "2026-06-12T08:07:13.728Z",
+        "updated_at": "2026-06-12T08:24:11.043Z",
+        "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "analysis_realm_id": "823719b9-ae39-4708-a0f9-fdc6dd8f7f4e",
+        "node_id": "ad1174c2-f173-4627-b130-2df9881243ce",
+        "node": {
+          "id": "ad1174c2-f173-4627-b130-2df9881243ce",
+          "external_name": "node1",
+          "public_key": "2d2d2d2d2d424547494e205055424c4943204b45592d2d2d2d2d0a4d466b77457759484b6f5a497a6a3043415159494b6f5a497a6a304441516344516741452b425a78634f4564646f50524941776f4e535578436c346744597a7746306a4b417836796d742b507961395672714a6142425a71465737375135624e6d5052416473514873516c7a3348574d772b79504f37666b72773d3d0a2d2d2d2d2d454e44205055424c4943204b45592d2d2d2d2d",
+          "name": "node1",
+          "hidden": false,
+          "type": "default",
+          "online": false,
+          "registry_id": "0d40b58d-b9ec-412b-8eb0-d7a56c7205ac",
+          "registry_project_id": "81310b58-692c-43ba-a6c8-3eaf18401d8c",
+          "client_id": "748a40b5-a512-4783-b925-bb829fdeaa3d",
+          "robot_id": null,
+          "realm_id": "823719b9-ae39-4708-a0f9-fdc6dd8f7f4e",
+          "created_at": "2026-05-21T13:42:11.919Z",
+          "updated_at": "2026-05-21T13:42:29.462Z"
+        },
+        "node_realm_id": "823719b9-ae39-4708-a0f9-fdc6dd8f7f4e"
+      },
+      {
+        "id": "9e921a60-b21b-4ff1-a264-f82ec10231e2",
+        "approval_status": "approved",
+        "execution_status": "executed",
+        "execution_progress": 100,
+        "comment": null,
+        "artifact_tag": null,
+        "artifact_digest": null,
+        "created_at": "2026-06-12T08:07:13.746Z",
+        "updated_at": "2026-06-12T08:24:11.049Z",
+        "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "analysis_realm_id": "823719b9-ae39-4708-a0f9-fdc6dd8f7f4e",
+        "node_id": "db4fd7da-ec2d-4fd6-b4a4-c9e1b7f448cf",
+        "node": {
+          "id": "db4fd7da-ec2d-4fd6-b4a4-c9e1b7f448cf",
+          "external_name": "node2",
+          "public_key": "2d2d2d2d2d424547494e205055424c4943204b45592d2d2d2d2d0a4d466b77457759484b6f5a497a6a3043415159494b6f5a497a6a304441516344516741454b692f6b576271316f4d614b70364e584e522f32797655717a5948737234417632395041317530514f53384862634f754d555a31646e41716e38485248593973323553764e5331506939306153384147703632444e513d3d0a2d2d2d2d2d454e44205055424c4943204b45592d2d2d2d2d",
+          "name": "node2",
+          "hidden": false,
+          "type": "default",
+          "online": false,
+          "registry_id": "0d40b58d-b9ec-412b-8eb0-d7a56c7205ac",
+          "registry_project_id": "ad818333-1f5b-4457-9dfe-eaba5f085eae",
+          "client_id": "166a8237-a972-4a47-a236-adbe857f5ee5",
+          "robot_id": null,
+          "realm_id": "823719b9-ae39-4708-a0f9-fdc6dd8f7f4e",
+          "created_at": "2026-05-21T13:43:54.743Z",
+          "updated_at": "2026-05-21T13:44:09.117Z"
+        },
+        "node_realm_id": "823719b9-ae39-4708-a0f9-fdc6dd8f7f4e"
+      },
+      {
+        "id": "bb4f849f-7d13-4c9b-a004-1b5316a5de95",
+        "approval_status": "approved",
+        "execution_status": "executed",
+        "execution_progress": 100,
+        "comment": null,
+        "artifact_tag": null,
+        "artifact_digest": null,
+        "created_at": "2026-06-12T08:07:13.757Z",
+        "updated_at": "2026-06-12T08:24:10.926Z",
+        "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "analysis_realm_id": "823719b9-ae39-4708-a0f9-fdc6dd8f7f4e",
+        "node_id": "c5ccedba-e5e5-4093-aa7a-1cdcfdd76c68",
+        "node": {
+          "id": "c5ccedba-e5e5-4093-aa7a-1cdcfdd76c68",
+          "external_name": "node4",
+          "public_key": "2d2d2d2d2d424547494e205055424c4943204b45592d2d2d2d2d0a4d466b77457759484b6f5a497a6a3043415159494b6f5a497a6a304441516344516741455a57584b4f7735365a324f714a5a3262305264575732704342443768484e506264774351357352743336544d6655715473537a2f524e32375a6c30746d7856596173523047646a37795649554e344d466465365a4a413d3d0a2d2d2d2d2d454e44205055424c4943204b45592d2d2d2d2d",
+          "name": "node4",
+          "hidden": false,
+          "type": "aggregator",
+          "online": false,
+          "registry_id": "0d40b58d-b9ec-412b-8eb0-d7a56c7205ac",
+          "registry_project_id": "2805e78f-ade6-4660-aee2-563ceab811a4",
+          "client_id": "6589f680-306d-43bb-a143-6b741b8c9618",
+          "robot_id": null,
+          "realm_id": "823719b9-ae39-4708-a0f9-fdc6dd8f7f4e",
+          "created_at": "2026-05-21T13:45:47.876Z",
+          "updated_at": "2026-05-22T06:36:10.048Z"
+        },
+        "node_realm_id": "823719b9-ae39-4708-a0f9-fdc6dd8f7f4e"
+      }
+    ],
+    "meta": {
+      "total": 3,
+      "limit": 50,
+      "offset": 0
+    }
+  },
+  "analysis_buckets": {
+    "data": [
+      {
+        "id": "2f840b86-69f9-498b-97cb-93e6a6d0ebc4",
+        "type": "CODE",
+        "bucket_id": "8b5411ea-7cf8-4198-95a6-67622f7784fa",
+        "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "realm_id": "823719b9-ae39-4708-a0f9-fdc6dd8f7f4e",
+        "created_at": "2026-06-12T08:07:13.901Z",
+        "updated_at": "2026-06-12T08:07:13.901Z"
+      },
+      {
+        "id": "91a5e7da-bb46-4585-aa40-f6b3b82e68a9",
+        "type": "RESULT",
+        "bucket_id": "0c219764-2734-43d3-b9a9-9bec506238b5",
+        "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "realm_id": "823719b9-ae39-4708-a0f9-fdc6dd8f7f4e",
+        "created_at": "2026-06-12T08:07:13.962Z",
+        "updated_at": "2026-06-12T08:07:13.962Z"
+      },
+      {
+        "id": "a84829c6-d442-4d2f-ada7-5f5b17592120",
+        "type": "TEMP",
+        "bucket_id": "6346dc19-9fe1-4ef5-a511-a7ef09b2ce41",
+        "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "realm_id": "823719b9-ae39-4708-a0f9-fdc6dd8f7f4e",
+        "created_at": "2026-06-12T08:07:14.056Z",
+        "updated_at": "2026-06-12T08:07:14.056Z"
+      }
+    ],
+    "meta": {
+      "total": 3,
+      "limit": 50,
+      "offset": 0
+    }
+  },
+  "bucket_files": {
+    "CODE": {
+      "data": [
+        {
+          "id": "f1504109-5cc4-4b70-999f-8ac301049389",
+          "name": "dp_synthetic_data.py",
+          "path": "dp_synthetic_data.py",
+          "hash": "794d86cfd89ecfd0ac964da6db338beb519e8aedf2bd4f17d4859b42c6a7c025",
+          "directory": ".",
+          "size": 8238,
+          "created_at": "2026-06-12T08:07:23.638Z",
+          "updated_at": "2026-06-12T08:07:23.638Z",
+          "actor_type": "user",
+          "actor_id": "54e8b720-cc1f-453c-978c-7d31bab52949",
+          "realm_id": "823719b9-ae39-4708-a0f9-fdc6dd8f7f4e",
+          "bucket_id": "8b5411ea-7cf8-4198-95a6-67622f7784fa"
+        }
+      ],
+      "meta": {
+        "total": 1,
+        "limit": 50,
+        "offset": 0
+      }
+    },
+    "RESULT": {
+      "data": [
+        {
+          "id": "b82949f2-dea9-4e8f-9123-7312b429e216",
+          "name": "result_98f9_260612082409.txt",
+          "path": "result_98f9_260612082409.txt",
+          "hash": "100cf3c5b3c863b4f39ffae8effc89706514db49a5de032cada500893c80912c",
+          "directory": ".",
+          "size": 15374,
+          "created_at": "2026-06-12T08:24:10.357Z",
+          "updated_at": "2026-06-12T08:24:10.357Z",
+          "actor_type": "client",
+          "actor_id": "6589f680-306d-43bb-a143-6b741b8c9618",
+          "realm_id": "823719b9-ae39-4708-a0f9-fdc6dd8f7f4e",
+          "bucket_id": "0c219764-2734-43d3-b9a9-9bec506238b5"
+        }
+      ],
+      "meta": {
+        "total": 1,
+        "limit": 50,
+        "offset": 0
+      }
+    },
+    "TEMP": {
+      "data": [
+        {
+          "id": "da3e1e3a-7e2b-4dab-85df-1bd704d942df",
+          "name": "result_eebc_260612082407.pkl",
+          "path": "result_eebc_260612082407.pkl",
+          "hash": "5d84670d23877abb618650d7226ee31313622633908130b40b3298ce66d74a69",
+          "directory": ".",
+          "size": 77325,
+          "created_at": "2026-06-12T08:24:08.072Z",
+          "updated_at": "2026-06-12T08:24:08.072Z",
+          "actor_type": "client",
+          "actor_id": "166a8237-a972-4a47-a236-adbe857f5ee5",
+          "realm_id": "823719b9-ae39-4708-a0f9-fdc6dd8f7f4e",
+          "bucket_id": "6346dc19-9fe1-4ef5-a511-a7ef09b2ce41"
+        },
+        {
+          "id": "2aa9c085-8899-4967-b66c-83d1b31e75b1",
+          "name": "result_1228_260612082241.pkl",
+          "path": "result_1228_260612082241.pkl",
+          "hash": "6b10208df54344b5d78460a604877488bd3236481774918f5271300654abcee3",
+          "directory": ".",
+          "size": 115736,
+          "created_at": "2026-06-12T08:22:42.078Z",
+          "updated_at": "2026-06-12T08:22:42.078Z",
+          "actor_type": "client",
+          "actor_id": "748a40b5-a512-4783-b925-bb829fdeaa3d",
+          "realm_id": "823719b9-ae39-4708-a0f9-fdc6dd8f7f4e",
+          "bucket_id": "6346dc19-9fe1-4ef5-a511-a7ef09b2ce41"
+        }
+      ],
+      "meta": {
+        "total": 2,
+        "limit": 50,
+        "offset": 0
+      }
+    }
+  },
+  "analysis_logs": {
+    "data": [
+      {
+        "channel": "system",
+        "service": "hub-server-worker",
+        "time": "2026-06-12T08:14:54.054Z",
+        "message": "Pushed images",
+        "level": "info",
+        "labels": {
+          "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+          "command": "execute",
+          "component": "analysisDistributor",
+          "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+          "ref_type": "analysis"
+        }
+      },
+      {
+        "channel": "system",
+        "service": "hub-server-worker",
+        "time": "2026-06-12T08:07:50.454Z",
+        "message": "Pushing images",
+        "level": "info",
+        "labels": {
+          "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+          "command": "execute",
+          "component": "analysisDistributor",
+          "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+          "ref_type": "analysis"
+        }
+      },
+      {
+        "channel": "system",
+        "service": "hub-server-worker",
+        "time": "2026-06-12T08:07:50.453Z",
+        "message": "Tagged images",
+        "level": "info",
+        "labels": {
+          "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+          "command": "execute",
+          "component": "analysisDistributor",
+          "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+          "ref_type": "analysis"
+        }
+      },
+      {
+        "channel": "system",
+        "service": "hub-server-worker",
+        "time": "2026-06-12T08:07:50.357Z",
+        "message": "Tagging images",
+        "level": "info",
+        "labels": {
+          "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+          "command": "execute",
+          "component": "analysisDistributor",
+          "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+          "ref_type": "analysis"
+        }
+      },
+      {
+        "channel": "system",
+        "service": "hub-server-worker",
+        "time": "2026-06-12T08:07:47.505Z",
+        "message": "Commited container",
+        "level": "info",
+        "labels": {
+          "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+          "command": "execute",
+          "component": "analysisBuilder",
+          "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+          "ref_type": "analysis"
+        }
+      },
+      {
+        "channel": "system",
+        "service": "hub-server-worker",
+        "time": "2026-06-12T08:07:47.295Z",
+        "message": "Packed container",
+        "level": "info",
+        "labels": {
+          "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+          "command": "execute",
+          "component": "analysisBuilder",
+          "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+          "ref_type": "analysis"
+        }
+      },
+      {
+        "channel": "system",
+        "service": "hub-server-worker",
+        "time": "2026-06-12T08:07:47.295Z",
+        "message": "Commiting container",
+        "level": "info",
+        "labels": {
+          "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+          "command": "execute",
+          "component": "analysisBuilder",
+          "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+          "ref_type": "analysis"
+        }
+      },
+      {
+        "channel": "system",
+        "service": "hub-server-worker",
+        "time": "2026-06-12T08:07:47.25Z",
+        "message": "Packed file dp_synthetic_data.py (8238 bytes)",
+        "level": "debug",
+        "labels": {
+          "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+          "command": "execute",
+          "component": "analysisBuilder",
+          "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+          "ref_type": "analysis"
+        }
+      },
+      {
+        "channel": "system",
+        "service": "hub-server-worker",
+        "time": "2026-06-12T08:07:47.248Z",
+        "message": "Packing file dp_synthetic_data.py (8238 bytes)",
+        "level": "debug",
+        "labels": {
+          "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+          "command": "execute",
+          "component": "analysisBuilder",
+          "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+          "ref_type": "analysis"
+        }
+      },
+      {
+        "channel": "system",
+        "service": "hub-server-worker",
+        "time": "2026-06-12T08:07:47.217Z",
+        "message": "Packing container",
+        "level": "info",
+        "labels": {
+          "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+          "command": "execute",
+          "component": "analysisBuilder",
+          "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+          "ref_type": "analysis"
+        }
+      },
+      {
+        "channel": "system",
+        "service": "hub-server-worker",
+        "time": "2026-06-12T08:07:47.216Z",
+        "message": "Created container",
+        "level": "info",
+        "labels": {
+          "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+          "command": "execute",
+          "component": "analysisBuilder",
+          "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+          "ref_type": "analysis"
+        }
+      },
+      {
+        "channel": "system",
+        "service": "hub-server-worker",
+        "time": "2026-06-12T08:07:46.996Z",
+        "message": "Creating container",
+        "level": "info",
+        "labels": {
+          "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+          "command": "execute",
+          "component": "analysisBuilder",
+          "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+          "ref_type": "analysis"
+        }
+      },
+      {
+        "channel": "system",
+        "service": "hub-server-worker",
+        "time": "2026-06-12T08:07:46.995Z",
+        "message": "Built image",
+        "level": "info",
+        "labels": {
+          "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+          "command": "execute",
+          "component": "analysisBuilder",
+          "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+          "ref_type": "analysis"
+        }
+      },
+      {
+        "channel": "system",
+        "service": "hub-server-worker",
+        "time": "2026-06-12T08:07:40.367Z",
+        "message": "Building image",
+        "level": "info",
+        "labels": {
+          "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+          "command": "execute",
+          "component": "analysisBuilder",
+          "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+          "ref_type": "analysis"
+        }
+      }
+    ],
+    "meta": {
+      "total": 14,
+      "limit": 100,
+      "offset": 0
+    }
+  },
+  "analysis_node_logs": {
+    "node1": {
+      "data": [
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:24:18.831Z",
+          "message": "Set analysis status to executed, because of partner statuses: {'9e921a60-b21b-4ff1-a264-f82ec10231e2': 'executed', 'bb4f849f-7d13-4c9b-a004-1b5316a5de95': 'executed'}",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "ad1174c2-f173-4627-b130-2df9881243ce",
+            "ref_type": "analysisNode",
+            "status": "executed"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:24:11.019Z",
+          "message": "Node finished successfully",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "ad1174c2-f173-4627-b130-2df9881243ce",
+            "ref_type": "analysisNode",
+            "status": "executed"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:24:10.64Z",
+          "message": "received message from c5ccedba-e5e5-4093-aa7a-1cdcfdd76c68",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "ad1174c2-f173-4627-b130-2df9881243ce",
+            "ref_type": "analysisNode",
+            "status": "executing"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:22:55.657Z",
+          "message": "received message from c5ccedba-e5e5-4093-aa7a-1cdcfdd76c68",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "ad1174c2-f173-4627-b130-2df9881243ce",
+            "ref_type": "analysisNode",
+            "status": "executing"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:22:43.224Z",
+          "message": "Analysis finished!",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "ad1174c2-f173-4627-b130-2df9881243ce",
+            "ref_type": "analysisNode",
+            "status": "executing"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:22:42.129Z",
+          "message": "sending intermediate result",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "ad1174c2-f173-4627-b130-2df9881243ce",
+            "ref_type": "analysisNode",
+            "status": "executing"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:22:41.726Z",
+          "message": "Generated 3600 rows. Mean per-column TVD = 0.012.",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "ad1174c2-f173-4627-b130-2df9881243ce",
+            "ref_type": "analysisNode",
+            "status": "executing"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:22:28.93Z",
+          "message": "Fitting MWEM on 3600 rows, 7 cols, eps=3.0 (0.45 preprocessor).",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "ad1174c2-f173-4627-b130-2df9881243ce",
+            "ref_type": "analysisNode",
+            "status": "executing"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:22:27.884Z",
+          "message": "Awaiting contact with aggregator node...success",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "ad1174c2-f173-4627-b130-2df9881243ce",
+            "ref_type": "analysisNode",
+            "status": "executing"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:22:25.755Z",
+          "message": "Awaiting contact with aggregator node...",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "ad1174c2-f173-4627-b130-2df9881243ce",
+            "ref_type": "analysisNode",
+            "status": "executing"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:22:25.699Z",
+          "message": "Analyzer started",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "ad1174c2-f173-4627-b130-2df9881243ce",
+            "ref_type": "analysisNode",
+            "status": "executing"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:22:25.622Z",
+          "message": "FlameCoreSDK ready",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "ad1174c2-f173-4627-b130-2df9881243ce",
+            "ref_type": "analysisNode",
+            "status": "executing"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:22:25.572Z",
+          "message": "\tStarting FlameApi thread...success",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "ad1174c2-f173-4627-b130-2df9881243ce",
+            "ref_type": "analysisNode",
+            "status": "starting"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:22:25.514Z",
+          "message": "\tConnecting to DataApi...success",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "ad1174c2-f173-4627-b130-2df9881243ce",
+            "ref_type": "analysisNode",
+            "status": "starting"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:22:25.401Z",
+          "message": "\tConnecting to ResultService...success",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "ad1174c2-f173-4627-b130-2df9881243ce",
+            "ref_type": "analysisNode",
+            "status": "starting"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:22:25.343Z",
+          "message": "\tConnecting to PO service...success",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "ad1174c2-f173-4627-b130-2df9881243ce",
+            "ref_type": "analysisNode",
+            "status": "starting"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:22:25.295Z",
+          "message": "\tConnecting to MessageBroker...success",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "ad1174c2-f173-4627-b130-2df9881243ce",
+            "ref_type": "analysisNode",
+            "status": "starting"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:22:25.242Z",
+          "message": "\tConnecting to nginx...success",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "ad1174c2-f173-4627-b130-2df9881243ce",
+            "ref_type": "analysisNode",
+            "status": "starting"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:22:25.187Z",
+          "message": "\tExtracting node config",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "ad1174c2-f173-4627-b130-2df9881243ce",
+            "ref_type": "analysisNode",
+            "status": "starting"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:22:25.107Z",
+          "message": "Starting FlameCoreSDK",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "ad1174c2-f173-4627-b130-2df9881243ce",
+            "ref_type": "analysisNode",
+            "status": "starting"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:22:06.525Z",
+          "message": "[flame -- POAPI: ANALYSISSTARTUPERROR -- 2026-06-12 10:22:06] Error: The analysis took too long during startup and was restarted [restart 1 of 10].",
+          "level": "error",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "ad1174c2-f173-4627-b130-2df9881243ce",
+            "ref_type": "analysisNode",
+            "status": "started"
+          }
+        }
+      ],
+      "meta": {
+        "total": 21,
+        "limit": 100,
+        "offset": 0
+      }
+    },
+    "node2": {
+      "data": [
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:24:11.026Z",
+          "message": "Node finished successfully",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "db4fd7da-ec2d-4fd6-b4a4-c9e1b7f448cf",
+            "ref_type": "analysisNode",
+            "status": "executed"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:24:10.598Z",
+          "message": "received message from c5ccedba-e5e5-4093-aa7a-1cdcfdd76c68",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "db4fd7da-ec2d-4fd6-b4a4-c9e1b7f448cf",
+            "ref_type": "analysisNode",
+            "status": "executing"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:24:09.212Z",
+          "message": "Analysis finished!",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "db4fd7da-ec2d-4fd6-b4a4-c9e1b7f448cf",
+            "ref_type": "analysisNode",
+            "status": "executing"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:24:08.123Z",
+          "message": "sending intermediate result",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "db4fd7da-ec2d-4fd6-b4a4-c9e1b7f448cf",
+            "ref_type": "analysisNode",
+            "status": "executing"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:24:07.712Z",
+          "message": "Generated 2400 rows. Mean per-column TVD = 0.017.",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "db4fd7da-ec2d-4fd6-b4a4-c9e1b7f448cf",
+            "ref_type": "analysisNode",
+            "status": "executing"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:23:57.589Z",
+          "message": "received message from c5ccedba-e5e5-4093-aa7a-1cdcfdd76c68",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "db4fd7da-ec2d-4fd6-b4a4-c9e1b7f448cf",
+            "ref_type": "analysisNode",
+            "status": "executing"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:23:54.688Z",
+          "message": "Fitting MWEM on 2400 rows, 7 cols, eps=3.0 (0.45 preprocessor).",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "db4fd7da-ec2d-4fd6-b4a4-c9e1b7f448cf",
+            "ref_type": "analysisNode",
+            "status": "executing"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:23:53.749Z",
+          "message": "Awaiting contact with aggregator node...success",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "db4fd7da-ec2d-4fd6-b4a4-c9e1b7f448cf",
+            "ref_type": "analysisNode",
+            "status": "executing"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:23:51.66Z",
+          "message": "Awaiting contact with aggregator node...",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "db4fd7da-ec2d-4fd6-b4a4-c9e1b7f448cf",
+            "ref_type": "analysisNode",
+            "status": "executing"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:23:51.613Z",
+          "message": "Analyzer started",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "db4fd7da-ec2d-4fd6-b4a4-c9e1b7f448cf",
+            "ref_type": "analysisNode",
+            "status": "executing"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:23:51.536Z",
+          "message": "FlameCoreSDK ready",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "db4fd7da-ec2d-4fd6-b4a4-c9e1b7f448cf",
+            "ref_type": "analysisNode",
+            "status": "executing"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:23:51.487Z",
+          "message": "\tStarting FlameApi thread...success",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "db4fd7da-ec2d-4fd6-b4a4-c9e1b7f448cf",
+            "ref_type": "analysisNode",
+            "status": "starting"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:23:51.437Z",
+          "message": "\tConnecting to DataApi...success",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "db4fd7da-ec2d-4fd6-b4a4-c9e1b7f448cf",
+            "ref_type": "analysisNode",
+            "status": "starting"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:23:51.335Z",
+          "message": "\tConnecting to ResultService...success",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "db4fd7da-ec2d-4fd6-b4a4-c9e1b7f448cf",
+            "ref_type": "analysisNode",
+            "status": "starting"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:23:51.281Z",
+          "message": "\tConnecting to PO service...success",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "db4fd7da-ec2d-4fd6-b4a4-c9e1b7f448cf",
+            "ref_type": "analysisNode",
+            "status": "starting"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:23:51.238Z",
+          "message": "\tConnecting to MessageBroker...success",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "db4fd7da-ec2d-4fd6-b4a4-c9e1b7f448cf",
+            "ref_type": "analysisNode",
+            "status": "starting"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:23:51.193Z",
+          "message": "\tConnecting to nginx...success",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "db4fd7da-ec2d-4fd6-b4a4-c9e1b7f448cf",
+            "ref_type": "analysisNode",
+            "status": "starting"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:23:51.136Z",
+          "message": "\tExtracting node config",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "db4fd7da-ec2d-4fd6-b4a4-c9e1b7f448cf",
+            "ref_type": "analysisNode",
+            "status": "starting"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:23:51.059Z",
+          "message": "Starting FlameCoreSDK",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "db4fd7da-ec2d-4fd6-b4a4-c9e1b7f448cf",
+            "ref_type": "analysisNode",
+            "status": "starting"
+          }
+        }
+      ],
+      "meta": {
+        "total": 19,
+        "limit": 100,
+        "offset": 0
+      }
+    },
+    "node4": {
+      "data": [
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:24:16.126Z",
+          "message": "Set analysis status to executed, because of partner statuses: {'872d1bc4-2699-4e56-95f9-dcfeddae339c': 'executed', '9e921a60-b21b-4ff1-a264-f82ec10231e2': 'executed'}",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "c5ccedba-e5e5-4093-aa7a-1cdcfdd76c68",
+            "ref_type": "analysisNode",
+            "status": "executed"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:24:11.494Z",
+          "message": "Analysis finished!",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "c5ccedba-e5e5-4093-aa7a-1cdcfdd76c68",
+            "ref_type": "analysisNode",
+            "status": "executed"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:24:10.901Z",
+          "message": "Node finished successfully",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "c5ccedba-e5e5-4093-aa7a-1cdcfdd76c68",
+            "ref_type": "analysisNode",
+            "status": "executed"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:24:10.41Z",
+          "message": "success (response={'status': 'success'})",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "c5ccedba-e5e5-4093-aa7a-1cdcfdd76c68",
+            "ref_type": "analysisNode",
+            "status": "executing"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:24:09.241Z",
+          "message": "Pooled 2 node datasets into 6000 synthetic rows. Mean per-node TVD = 0.014. Worst eps = 3.00.",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "c5ccedba-e5e5-4093-aa7a-1cdcfdd76c68",
+            "ref_type": "analysisNode",
+            "status": "executing"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:24:08.237Z",
+          "message": "received message from db4fd7da-ec2d-4fd6-b4a4-c9e1b7f448cf",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "c5ccedba-e5e5-4093-aa7a-1cdcfdd76c68",
+            "ref_type": "analysisNode",
+            "status": "executing"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:23:59.646Z",
+          "message": "Awaiting intermediate results...",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "c5ccedba-e5e5-4093-aa7a-1cdcfdd76c68",
+            "ref_type": "analysisNode",
+            "status": "executing"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:23:59.597Z",
+          "message": "Awaiting contact with analyzer nodes...success",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "c5ccedba-e5e5-4093-aa7a-1cdcfdd76c68",
+            "ref_type": "analysisNode",
+            "status": "executing"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:23:51.772Z",
+          "message": "received message from db4fd7da-ec2d-4fd6-b4a4-c9e1b7f448cf",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "c5ccedba-e5e5-4093-aa7a-1cdcfdd76c68",
+            "ref_type": "analysisNode",
+            "status": "executing"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:22:42.255Z",
+          "message": "received message from ad1174c2-f173-4627-b130-2df9881243ce",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "c5ccedba-e5e5-4093-aa7a-1cdcfdd76c68",
+            "ref_type": "analysisNode",
+            "status": "executing"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:22:25.909Z",
+          "message": "received message from ad1174c2-f173-4627-b130-2df9881243ce",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "c5ccedba-e5e5-4093-aa7a-1cdcfdd76c68",
+            "ref_type": "analysisNode",
+            "status": "executing"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:22:24.376Z",
+          "message": "Awaiting contact with analyzer nodes...",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "c5ccedba-e5e5-4093-aa7a-1cdcfdd76c68",
+            "ref_type": "analysisNode",
+            "status": "executing"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:22:24.3Z",
+          "message": "Aggregator started",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "c5ccedba-e5e5-4093-aa7a-1cdcfdd76c68",
+            "ref_type": "analysisNode",
+            "status": "executing"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:22:24.223Z",
+          "message": "FlameCoreSDK ready",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "c5ccedba-e5e5-4093-aa7a-1cdcfdd76c68",
+            "ref_type": "analysisNode",
+            "status": "executing"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:22:24.17Z",
+          "message": "\tStarting FlameApi thread...success",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "c5ccedba-e5e5-4093-aa7a-1cdcfdd76c68",
+            "ref_type": "analysisNode",
+            "status": "starting"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:22:23.984Z",
+          "message": "\tConnecting to ResultService...success",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "c5ccedba-e5e5-4093-aa7a-1cdcfdd76c68",
+            "ref_type": "analysisNode",
+            "status": "starting"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:22:23.925Z",
+          "message": "\tConnecting to PO service...success",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "c5ccedba-e5e5-4093-aa7a-1cdcfdd76c68",
+            "ref_type": "analysisNode",
+            "status": "starting"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:22:23.875Z",
+          "message": "\tConnecting to MessageBroker...success",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "c5ccedba-e5e5-4093-aa7a-1cdcfdd76c68",
+            "ref_type": "analysisNode",
+            "status": "starting"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:22:23.824Z",
+          "message": "\tConnecting to nginx...success",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "c5ccedba-e5e5-4093-aa7a-1cdcfdd76c68",
+            "ref_type": "analysisNode",
+            "status": "starting"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:22:23.765Z",
+          "message": "\tExtracting node config",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "c5ccedba-e5e5-4093-aa7a-1cdcfdd76c68",
+            "ref_type": "analysisNode",
+            "status": "starting"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:22:23.684Z",
+          "message": "Starting FlameCoreSDK",
+          "level": "info",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "c5ccedba-e5e5-4093-aa7a-1cdcfdd76c68",
+            "ref_type": "analysisNode",
+            "status": "starting"
+          }
+        },
+        {
+          "channel": "http",
+          "service": "hub-server-core",
+          "time": "2026-06-12T08:15:18.577Z",
+          "message": "[flame -- POAPI: ANALYSISSTARTUPERROR -- 2026-06-12 10:15:18] Error: The analysis took too long during startup and was restarted [restart 1 of 10].",
+          "level": "error",
+          "labels": {
+            "analysis_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+            "node_id": "c5ccedba-e5e5-4093-aa7a-1cdcfdd76c68",
+            "ref_type": "analysisNode",
+            "status": "started"
+          }
+        }
+      ],
+      "meta": {
+        "total": 22,
+        "limit": 100,
+        "offset": 0
+      }
+    }
+  },
+  "storage_logs": {
+    "bucket_CODE": {
+      "data": [
+        {
+          "channel": "system",
+          "service": "hub-server-storage",
+          "time": "2026-06-12T08:07:47.236Z",
+          "message": "Streaming files of bucket analysis-code-files.79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+          "level": "debug",
+          "labels": {
+            "ref_id": "8b5411ea-7cf8-4198-95a6-67622f7784fa",
+            "ref_type": "bucket"
+          }
+        }
+      ],
+      "meta": {
+        "total": 1,
+        "limit": 100,
+        "offset": 0
+      }
+    },
+    "bucket_RESULT": {
+      "data": [],
+      "meta": {
+        "total": 0,
+        "limit": 100,
+        "offset": 0
+      }
+    },
+    "bucket_TEMP": {
+      "data": [],
+      "meta": {
+        "total": 0,
+        "limit": 100,
+        "offset": 0
+      }
+    },
+    "file_CODE_dp_synthetic_data.py": {
+      "data": [
+        {
+          "channel": "system",
+          "service": "hub-server-storage",
+          "time": "2026-06-12T08:07:47.24Z",
+          "message": "Packing file dp_synthetic_data.py",
+          "level": "debug",
+          "labels": {
+            "bucket_id": "8b5411ea-7cf8-4198-95a6-67622f7784fa",
+            "ref_id": "f1504109-5cc4-4b70-999f-8ac301049389",
+            "ref_type": "bucketFile"
+          }
+        }
+      ],
+      "meta": {
+        "total": 1,
+        "limit": 100,
+        "offset": 0
+      }
+    },
+    "file_RESULT_result_98f9_260612082409.txt": {
+      "data": [
+        {
+          "channel": "system",
+          "service": "hub-server-storage",
+          "time": "2026-06-12T08:25:01.426Z",
+          "message": "Streamed file result_98f9_260612082409.txt",
+          "level": "debug",
+          "labels": {
+            "bucket_id": "0c219764-2734-43d3-b9a9-9bec506238b5",
+            "ref_id": "b82949f2-dea9-4e8f-9123-7312b429e216",
+            "ref_type": "bucketFile"
+          }
+        },
+        {
+          "channel": "system",
+          "service": "hub-server-storage",
+          "time": "2026-06-12T08:25:01.421Z",
+          "message": "Streaming file result_98f9_260612082409.txt",
+          "level": "debug",
+          "labels": {
+            "bucket_id": "0c219764-2734-43d3-b9a9-9bec506238b5",
+            "ref_id": "b82949f2-dea9-4e8f-9123-7312b429e216",
+            "ref_type": "bucketFile"
+          }
+        }
+      ],
+      "meta": {
+        "total": 2,
+        "limit": 100,
+        "offset": 0
+      }
+    },
+    "file_TEMP_result_eebc_260612082407.pkl": {
+      "data": [
+        {
+          "channel": "system",
+          "service": "hub-server-storage",
+          "time": "2026-06-12T08:24:09.094Z",
+          "message": "Streamed file result_eebc_260612082407.pkl",
+          "level": "debug",
+          "labels": {
+            "bucket_id": "6346dc19-9fe1-4ef5-a511-a7ef09b2ce41",
+            "ref_id": "da3e1e3a-7e2b-4dab-85df-1bd704d942df",
+            "ref_type": "bucketFile"
+          }
+        },
+        {
+          "channel": "system",
+          "service": "hub-server-storage",
+          "time": "2026-06-12T08:24:09.088Z",
+          "message": "Streaming file result_eebc_260612082407.pkl",
+          "level": "debug",
+          "labels": {
+            "bucket_id": "6346dc19-9fe1-4ef5-a511-a7ef09b2ce41",
+            "ref_id": "da3e1e3a-7e2b-4dab-85df-1bd704d942df",
+            "ref_type": "bucketFile"
+          }
+        }
+      ],
+      "meta": {
+        "total": 2,
+        "limit": 100,
+        "offset": 0
+      }
+    },
+    "file_TEMP_result_1228_260612082241.pkl": {
+      "data": [
+        {
+          "channel": "system",
+          "service": "hub-server-storage",
+          "time": "2026-06-12T08:24:08.936Z",
+          "message": "Streamed file result_1228_260612082241.pkl",
+          "level": "debug",
+          "labels": {
+            "bucket_id": "6346dc19-9fe1-4ef5-a511-a7ef09b2ce41",
+            "ref_id": "2aa9c085-8899-4967-b66c-83d1b31e75b1",
+            "ref_type": "bucketFile"
+          }
+        },
+        {
+          "channel": "system",
+          "service": "hub-server-storage",
+          "time": "2026-06-12T08:24:08.927Z",
+          "message": "Streaming file result_1228_260612082241.pkl",
+          "level": "debug",
+          "labels": {
+            "bucket_id": "6346dc19-9fe1-4ef5-a511-a7ef09b2ce41",
+            "ref_id": "2aa9c085-8899-4967-b66c-83d1b31e75b1",
+            "ref_type": "bucketFile"
+          }
+        }
+      ],
+      "meta": {
+        "total": 2,
+        "limit": 100,
+        "offset": 0
+      }
+    }
+  },
+  "events_analysis": {
+    "data": [
+      {
+        "id": "1fb43898-26e1-4801-9604-55985be0aa7c",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysis",
+        "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "data": {
+          "diff": {
+            "execution_status": {
+              "next": "executed",
+              "previous": "executing"
+            },
+            "execution_progress": {
+              "next": 100,
+              "previous": 66
+            },
+            "image_command_arguments": {
+              "next": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": null,
+        "request_method": null,
+        "request_ip_address": null,
+        "request_user_agent": null,
+        "actor_type": null,
+        "actor_id": null,
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:24:11.076Z",
+        "created_at": "2026-06-12T08:24:11.095Z",
+        "updated_at": "2026-06-12T08:24:11.095Z"
+      },
+      {
+        "id": "5c1939ce-b199-41b4-bf0f-aec94a9cf7ce",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysis",
+        "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "data": {
+          "diff": {
+            "execution_progress": {
+              "next": 66,
+              "previous": 33
+            },
+            "image_command_arguments": {
+              "next": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": null,
+        "request_method": null,
+        "request_ip_address": null,
+        "request_user_agent": null,
+        "actor_type": null,
+        "actor_id": null,
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:24:11.062Z",
+        "created_at": "2026-06-12T08:24:11.082Z",
+        "updated_at": "2026-06-12T08:24:11.082Z"
+      },
+      {
+        "id": "785482e3-6e75-4f1c-8df5-6304d611bf99",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysis",
+        "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "data": {
+          "diff": {
+            "execution_progress": {
+              "next": 33,
+              "previous": 0
+            },
+            "image_command_arguments": {
+              "next": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": null,
+        "request_method": null,
+        "request_ip_address": null,
+        "request_user_agent": null,
+        "actor_type": null,
+        "actor_id": null,
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:24:10.942Z",
+        "created_at": "2026-06-12T08:24:10.947Z",
+        "updated_at": "2026-06-12T08:24:10.947Z"
+      },
+      {
+        "id": "0bd9cd7e-d2b9-4592-a5e4-5b710049bb75",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysis",
+        "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "data": {
+          "diff": {
+            "execution_status": {
+              "next": "executing",
+              "previous": "starting"
+            },
+            "image_command_arguments": {
+              "next": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": null,
+        "request_method": null,
+        "request_ip_address": null,
+        "request_user_agent": null,
+        "actor_type": null,
+        "actor_id": null,
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:23:51.575Z",
+        "created_at": "2026-06-12T08:23:51.581Z",
+        "updated_at": "2026-06-12T08:23:51.581Z"
+      },
+      {
+        "id": "3418e9a5-a527-45c0-bcf4-098cf1272598",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysis",
+        "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "data": {
+          "diff": {
+            "execution_status": {
+              "next": "starting",
+              "previous": "started"
+            },
+            "image_command_arguments": {
+              "next": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": null,
+        "request_method": null,
+        "request_ip_address": null,
+        "request_user_agent": null,
+        "actor_type": null,
+        "actor_id": null,
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:23:51.097Z",
+        "created_at": "2026-06-12T08:23:51.103Z",
+        "updated_at": "2026-06-12T08:23:51.103Z"
+      },
+      {
+        "id": "d3547e02-1e06-463d-ad62-54dbe1122c9a",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysis",
+        "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "data": {
+          "diff": {
+            "execution_status": {
+              "next": "started",
+              "previous": "executing"
+            },
+            "image_command_arguments": {
+              "next": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": null,
+        "request_method": null,
+        "request_ip_address": null,
+        "request_user_agent": null,
+        "actor_type": null,
+        "actor_id": null,
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:23:47.270Z",
+        "created_at": "2026-06-12T08:23:47.323Z",
+        "updated_at": "2026-06-12T08:23:47.323Z"
+      },
+      {
+        "id": "12118ad9-17f0-44de-ac23-7cd5e68f4b6c",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysis",
+        "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "data": {
+          "diff": {
+            "execution_status": {
+              "next": "executing",
+              "previous": "starting"
+            },
+            "image_command_arguments": {
+              "next": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": null,
+        "request_method": null,
+        "request_ip_address": null,
+        "request_user_agent": null,
+        "actor_type": null,
+        "actor_id": null,
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:22:25.659Z",
+        "created_at": "2026-06-12T08:22:25.667Z",
+        "updated_at": "2026-06-12T08:22:25.667Z"
+      },
+      {
+        "id": "07b6f7aa-fda9-4cec-92f2-1868b79ea27e",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysis",
+        "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "data": {
+          "diff": {
+            "execution_status": {
+              "next": "starting",
+              "previous": "started"
+            },
+            "image_command_arguments": {
+              "next": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": null,
+        "request_method": null,
+        "request_ip_address": null,
+        "request_user_agent": null,
+        "actor_type": null,
+        "actor_id": null,
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:22:25.149Z",
+        "created_at": "2026-06-12T08:22:25.155Z",
+        "updated_at": "2026-06-12T08:22:25.155Z"
+      },
+      {
+        "id": "b6ed53f8-9414-4848-835d-d69b1b7d1a06",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysis",
+        "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "data": {
+          "diff": {
+            "execution_status": {
+              "next": "started",
+              "previous": "starting"
+            },
+            "image_command_arguments": {
+              "next": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": null,
+        "request_method": null,
+        "request_ip_address": null,
+        "request_user_agent": null,
+        "actor_type": null,
+        "actor_id": null,
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:22:24.260Z",
+        "created_at": "2026-06-12T08:22:24.266Z",
+        "updated_at": "2026-06-12T08:22:24.266Z"
+      },
+      {
+        "id": "d2e1dfc1-4112-49ae-8eb1-e37488fbffe9",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysis",
+        "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "data": {
+          "diff": {
+            "execution_status": {
+              "next": "starting",
+              "previous": "started"
+            },
+            "image_command_arguments": {
+              "next": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": null,
+        "request_method": null,
+        "request_ip_address": null,
+        "request_user_agent": null,
+        "actor_type": null,
+        "actor_id": null,
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:22:23.726Z",
+        "created_at": "2026-06-12T08:22:23.778Z",
+        "updated_at": "2026-06-12T08:22:23.778Z"
+      },
+      {
+        "id": "ea02b049-2802-46db-a1a8-ca7273d77bc1",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysis",
+        "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "data": {
+          "diff": {
+            "execution_status": {
+              "next": "started",
+              "previous": null
+            },
+            "image_command_arguments": {
+              "next": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": null,
+        "request_method": null,
+        "request_ip_address": null,
+        "request_user_agent": null,
+        "actor_type": null,
+        "actor_id": null,
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:15:18.629Z",
+        "created_at": "2026-06-12T08:15:18.682Z",
+        "updated_at": "2026-06-12T08:15:18.682Z"
+      },
+      {
+        "id": "813c0f8e-d408-4a22-b40a-d397f28c2f2b",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysis",
+        "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "data": {
+          "diff": {
+            "distribution_status": {
+              "next": "executed",
+              "previous": "started"
+            },
+            "image_command_arguments": {
+              "next": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": null,
+        "request_method": null,
+        "request_ip_address": null,
+        "request_user_agent": null,
+        "actor_type": null,
+        "actor_id": null,
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:14:54.068Z",
+        "created_at": "2026-06-12T08:14:54.154Z",
+        "updated_at": "2026-06-12T08:14:54.154Z"
+      },
+      {
+        "id": "cb4b1cd7-9d4c-4ded-b75d-18aea6f6608f",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysis",
+        "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "data": {
+          "diff": {
+            "distribution_progress": {
+              "next": 100,
+              "previous": 45
+            },
+            "image_command_arguments": {
+              "next": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": null,
+        "request_method": null,
+        "request_ip_address": null,
+        "request_user_agent": null,
+        "actor_type": null,
+        "actor_id": null,
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:07:53.546Z",
+        "created_at": "2026-06-12T08:07:53.586Z",
+        "updated_at": "2026-06-12T08:07:53.586Z"
+      },
+      {
+        "id": "58e4d4f7-be7b-48c3-b1d4-314ba8063750",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysis",
+        "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "data": {
+          "diff": {
+            "distribution_progress": {
+              "next": 100,
+              "previous": 45
+            },
+            "image_command_arguments": {
+              "next": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": null,
+        "request_method": null,
+        "request_ip_address": null,
+        "request_user_agent": null,
+        "actor_type": null,
+        "actor_id": null,
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:07:53.492Z",
+        "created_at": "2026-06-12T08:07:53.540Z",
+        "updated_at": "2026-06-12T08:07:53.540Z"
+      },
+      {
+        "id": "ab0d9acd-031c-443a-9026-2ca4412a7fc6",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysis",
+        "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "data": {
+          "diff": {
+            "distribution_progress": {
+              "next": 45,
+              "previous": 47
+            },
+            "image_command_arguments": {
+              "next": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": null,
+        "request_method": null,
+        "request_ip_address": null,
+        "request_user_agent": null,
+        "actor_type": null,
+        "actor_id": null,
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:07:51.172Z",
+        "created_at": "2026-06-12T08:07:51.247Z",
+        "updated_at": "2026-06-12T08:07:51.247Z"
+      },
+      {
+        "id": "c37eaec8-d776-45c9-aa89-16538b071786",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysis",
+        "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "data": {
+          "diff": {
+            "distribution_progress": {
+              "next": 2,
+              "previous": 36
+            },
+            "image_command_arguments": {
+              "next": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": null,
+        "request_method": null,
+        "request_ip_address": null,
+        "request_user_agent": null,
+        "actor_type": null,
+        "actor_id": null,
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:07:51.118Z",
+        "created_at": "2026-06-12T08:07:51.167Z",
+        "updated_at": "2026-06-12T08:07:51.167Z"
+      },
+      {
+        "id": "8e4ea879-47dd-452f-9d8f-07aa4e5bd761",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysis",
+        "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "data": {
+          "diff": {
+            "distribution_progress": {
+              "next": 47,
+              "previous": 2
+            },
+            "image_command_arguments": {
+              "next": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": null,
+        "request_method": null,
+        "request_ip_address": null,
+        "request_user_agent": null,
+        "actor_type": null,
+        "actor_id": null,
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:07:51.104Z",
+        "created_at": "2026-06-12T08:07:51.111Z",
+        "updated_at": "2026-06-12T08:07:51.111Z"
+      },
+      {
+        "id": "9e51aad6-e289-4a09-ac36-3fad2e3eb4f5",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysis",
+        "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "data": {
+          "diff": {
+            "distribution_progress": {
+              "next": 36,
+              "previous": 2
+            },
+            "image_command_arguments": {
+              "next": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": null,
+        "request_method": null,
+        "request_ip_address": null,
+        "request_user_agent": null,
+        "actor_type": null,
+        "actor_id": null,
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:07:51.091Z",
+        "created_at": "2026-06-12T08:07:51.098Z",
+        "updated_at": "2026-06-12T08:07:51.098Z"
+      },
+      {
+        "id": "e3449338-3ee5-43ac-b9c1-89b2239842c5",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysis",
+        "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "data": {
+          "diff": {
+            "distribution_progress": {
+              "next": 2,
+              "previous": 0
+            },
+            "image_command_arguments": {
+              "next": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": null,
+        "request_method": null,
+        "request_ip_address": null,
+        "request_user_agent": null,
+        "actor_type": null,
+        "actor_id": null,
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:07:51.051Z",
+        "created_at": "2026-06-12T08:07:51.057Z",
+        "updated_at": "2026-06-12T08:07:51.057Z"
+      },
+      {
+        "id": "80d95aec-59eb-49ad-9415-ec0485971de9",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysis",
+        "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "data": {
+          "diff": {
+            "distribution_status": {
+              "next": "started",
+              "previous": "starting"
+            },
+            "distribution_progress": {
+              "next": 0,
+              "previous": null
+            },
+            "image_command_arguments": {
+              "next": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": null,
+        "request_method": null,
+        "request_ip_address": null,
+        "request_user_agent": null,
+        "actor_type": null,
+        "actor_id": null,
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:07:50.343Z",
+        "created_at": "2026-06-12T08:07:50.350Z",
+        "updated_at": "2026-06-12T08:07:50.350Z"
+      },
+      {
+        "id": "ed8f6776-4d5b-49ee-9e7d-9fc4afe08583",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysis",
+        "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "data": {
+          "diff": {
+            "distribution_status": {
+              "next": "starting",
+              "previous": null
+            },
+            "image_command_arguments": {
+              "next": null
+            },
+            "registry_id": {
+              "next": "0d40b58d-b9ec-412b-8eb0-d7a56c7205ac",
+              "previous": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": "/analyses/79540b77-8c8a-44b5-96b3-9f2bf04ac858/command",
+        "request_method": "POST",
+        "request_ip_address": "203.0.113.65",
+        "request_user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+        "actor_type": "user",
+        "actor_id": "54e8b720-cc1f-453c-978c-7d31bab52949",
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:07:50.317Z",
+        "created_at": "2026-06-12T08:07:50.325Z",
+        "updated_at": "2026-06-12T08:07:50.325Z"
+      },
+      {
+        "id": "67c1e5e9-8ef6-4a66-87ee-dacf04906b39",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysis",
+        "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "data": {
+          "diff": {
+            "build_status": {
+              "next": "executed",
+              "previous": "started"
+            },
+            "build_hash": {
+              "next": "sha256:4e87fee60b6a05240dc3a3c757e542786a1b16944581220a4e8b74c8c3a1406d",
+              "previous": null
+            },
+            "build_os": {
+              "next": "linux",
+              "previous": null
+            },
+            "build_size": {
+              "next": 10204663216,
+              "previous": null
+            },
+            "image_command_arguments": {
+              "next": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": null,
+        "request_method": null,
+        "request_ip_address": null,
+        "request_user_agent": null,
+        "actor_type": null,
+        "actor_id": null,
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:07:47.518Z",
+        "created_at": "2026-06-12T08:07:47.524Z",
+        "updated_at": "2026-06-12T08:07:47.524Z"
+      },
+      {
+        "id": "436a6ab1-c7a9-4e8b-89eb-26c1b5ec8f72",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysis",
+        "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "data": {
+          "diff": {
+            "build_progress": {
+              "next": 100,
+              "previous": 87
+            },
+            "image_command_arguments": {
+              "next": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": null,
+        "request_method": null,
+        "request_ip_address": null,
+        "request_user_agent": null,
+        "actor_type": null,
+        "actor_id": null,
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:07:46.981Z",
+        "created_at": "2026-06-12T08:07:46.987Z",
+        "updated_at": "2026-06-12T08:07:46.987Z"
+      },
+      {
+        "id": "a8bd3ede-8b86-4e66-a7ce-be300a1e98ad",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysis",
+        "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "data": {
+          "diff": {
+            "build_progress": {
+              "next": 87,
+              "previous": 62
+            },
+            "image_command_arguments": {
+              "next": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": null,
+        "request_method": null,
+        "request_ip_address": null,
+        "request_user_agent": null,
+        "actor_type": null,
+        "actor_id": null,
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:07:46.639Z",
+        "created_at": "2026-06-12T08:07:46.684Z",
+        "updated_at": "2026-06-12T08:07:46.684Z"
+      },
+      {
+        "id": "4ae715e3-b256-49c7-a067-d5512b5342a9",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysis",
+        "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "data": {
+          "diff": {
+            "build_progress": {
+              "next": 75,
+              "previous": 62
+            },
+            "image_command_arguments": {
+              "next": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": null,
+        "request_method": null,
+        "request_ip_address": null,
+        "request_user_agent": null,
+        "actor_type": null,
+        "actor_id": null,
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:07:46.629Z",
+        "created_at": "2026-06-12T08:07:46.635Z",
+        "updated_at": "2026-06-12T08:07:46.635Z"
+      },
+      {
+        "id": "3d525c29-64b6-41d4-bfa8-8dca52f92129",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysis",
+        "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "data": {
+          "diff": {
+            "build_progress": {
+              "next": 62,
+              "previous": 37
+            },
+            "image_command_arguments": {
+              "next": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": null,
+        "request_method": null,
+        "request_ip_address": null,
+        "request_user_agent": null,
+        "actor_type": null,
+        "actor_id": null,
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:07:43.591Z",
+        "created_at": "2026-06-12T08:07:43.648Z",
+        "updated_at": "2026-06-12T08:07:43.648Z"
+      },
+      {
+        "id": "d1f031d4-3db5-4339-8849-db46ea51efdf",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysis",
+        "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "data": {
+          "diff": {
+            "build_progress": {
+              "next": 50,
+              "previous": 37
+            },
+            "image_command_arguments": {
+              "next": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": null,
+        "request_method": null,
+        "request_ip_address": null,
+        "request_user_agent": null,
+        "actor_type": null,
+        "actor_id": null,
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:07:43.580Z",
+        "created_at": "2026-06-12T08:07:43.586Z",
+        "updated_at": "2026-06-12T08:07:43.586Z"
+      },
+      {
+        "id": "52e1a607-533b-420a-a2ba-7a315efa242c",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysis",
+        "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "data": {
+          "diff": {
+            "build_progress": {
+              "next": 37,
+              "previous": 0
+            },
+            "image_command_arguments": {
+              "next": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": null,
+        "request_method": null,
+        "request_ip_address": null,
+        "request_user_agent": null,
+        "actor_type": null,
+        "actor_id": null,
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:07:40.585Z",
+        "created_at": "2026-06-12T08:07:40.633Z",
+        "updated_at": "2026-06-12T08:07:40.633Z"
+      },
+      {
+        "id": "09c045d3-3a1b-4222-a51c-402491e77445",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysis",
+        "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "data": {
+          "diff": {
+            "build_progress": {
+              "next": 25,
+              "previous": 0
+            },
+            "image_command_arguments": {
+              "next": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": null,
+        "request_method": null,
+        "request_ip_address": null,
+        "request_user_agent": null,
+        "actor_type": null,
+        "actor_id": null,
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:07:40.533Z",
+        "created_at": "2026-06-12T08:07:40.581Z",
+        "updated_at": "2026-06-12T08:07:40.581Z"
+      },
+      {
+        "id": "99e0b78e-595f-4b7d-b3d3-7dd80a27c2f3",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysis",
+        "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "data": {
+          "diff": {
+            "build_progress": {
+              "next": 12,
+              "previous": 0
+            },
+            "image_command_arguments": {
+              "next": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": null,
+        "request_method": null,
+        "request_ip_address": null,
+        "request_user_agent": null,
+        "actor_type": null,
+        "actor_id": null,
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:07:40.521Z",
+        "created_at": "2026-06-12T08:07:40.527Z",
+        "updated_at": "2026-06-12T08:07:40.527Z"
+      },
+      {
+        "id": "2533438a-aa8f-46cc-bd5b-fb1abc753340",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysis",
+        "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "data": {
+          "diff": {
+            "build_status": {
+              "next": "started",
+              "previous": "starting"
+            },
+            "build_progress": {
+              "next": 0,
+              "previous": null
+            },
+            "image_command_arguments": {
+              "next": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": null,
+        "request_method": null,
+        "request_ip_address": null,
+        "request_user_agent": null,
+        "actor_type": null,
+        "actor_id": null,
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:07:40.374Z",
+        "created_at": "2026-06-12T08:07:40.380Z",
+        "updated_at": "2026-06-12T08:07:40.380Z"
+      },
+      {
+        "id": "e023988c-6426-450c-b050-016c72e45f50",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysis",
+        "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "data": {
+          "diff": {
+            "build_status": {
+              "next": "starting",
+              "previous": null
+            },
+            "image_command_arguments": {
+              "next": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": "/analyses/79540b77-8c8a-44b5-96b3-9f2bf04ac858/command",
+        "request_method": "POST",
+        "request_ip_address": "203.0.113.65",
+        "request_user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+        "actor_type": "user",
+        "actor_id": "54e8b720-cc1f-453c-978c-7d31bab52949",
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:07:40.344Z",
+        "created_at": "2026-06-12T08:07:40.353Z",
+        "updated_at": "2026-06-12T08:07:40.353Z"
+      },
+      {
+        "id": "7d6c4e29-a139-4ccc-badc-75941c3fd9a2",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysis",
+        "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "data": {
+          "diff": {
+            "configuration_locked": {
+              "next": true,
+              "previous": false
+            },
+            "image_command_arguments": {
+              "next": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": "/analyses/79540b77-8c8a-44b5-96b3-9f2bf04ac858/command",
+        "request_method": "POST",
+        "request_ip_address": "203.0.113.65",
+        "request_user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+        "actor_type": "user",
+        "actor_id": "54e8b720-cc1f-453c-978c-7d31bab52949",
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:07:38.621Z",
+        "created_at": "2026-06-12T08:07:38.642Z",
+        "updated_at": "2026-06-12T08:07:38.642Z"
+      },
+      {
+        "id": "8f2ff675-8136-487a-93bc-9f197088a423",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysis",
+        "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "data": {
+          "diff": {
+            "configuration_entrypoint_valid": {
+              "next": true,
+              "previous": false
+            },
+            "image_command_arguments": {
+              "next": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": null,
+        "request_method": null,
+        "request_ip_address": null,
+        "request_user_agent": null,
+        "actor_type": null,
+        "actor_id": null,
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:07:27.191Z",
+        "created_at": "2026-06-12T08:07:27.198Z",
+        "updated_at": "2026-06-12T08:07:27.198Z"
+      },
+      {
+        "id": "2c32e29a-1fec-4feb-b2b2-085d406d36be",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysis",
+        "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "data": {
+          "diff": {
+            "configuration_image_valid": {
+              "next": true,
+              "previous": false
+            },
+            "image_command_arguments": {
+              "next": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": null,
+        "request_method": null,
+        "request_ip_address": null,
+        "request_user_agent": null,
+        "actor_type": null,
+        "actor_id": null,
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:07:13.788Z",
+        "created_at": "2026-06-12T08:07:13.807Z",
+        "updated_at": "2026-06-12T08:07:13.807Z"
+      },
+      {
+        "id": "5427144e-3b93-4acf-b17b-fb7ac4da826f",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysis",
+        "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "data": {
+          "diff": {
+            "nodes": {
+              "next": 3,
+              "previous": 0
+            },
+            "nodes_approved": {
+              "next": 3,
+              "previous": 0
+            },
+            "configuration_node_aggregator_valid": {
+              "next": true,
+              "previous": false
+            },
+            "configuration_node_default_valid": {
+              "next": true,
+              "previous": false
+            },
+            "configuration_nodes_valid": {
+              "next": true,
+              "previous": false
+            },
+            "build_nodes_valid": {
+              "next": true,
+              "previous": false
+            },
+            "execution_progress": {
+              "next": 0,
+              "previous": null
+            },
+            "image_command_arguments": {
+              "next": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": null,
+        "request_method": null,
+        "request_ip_address": null,
+        "request_user_agent": null,
+        "actor_type": null,
+        "actor_id": null,
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:07:13.774Z",
+        "created_at": "2026-06-12T08:07:13.795Z",
+        "updated_at": "2026-06-12T08:07:13.795Z"
+      },
+      {
+        "id": "a4be3b02-38b0-48e0-b79d-80e7fea27bad",
+        "scope": "entity",
+        "name": "created",
+        "ref_type": "analysis",
+        "ref_id": "79540b77-8c8a-44b5-96b3-9f2bf04ac858",
+        "data": {},
+        "expiring": true,
+        "request_path": "/analyses",
+        "request_method": "POST",
+        "request_ip_address": "203.0.113.65",
+        "request_user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+        "actor_type": "user",
+        "actor_id": "54e8b720-cc1f-453c-978c-7d31bab52949",
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:07:13.715Z",
+        "created_at": "2026-06-12T08:07:13.731Z",
+        "updated_at": "2026-06-12T08:07:13.731Z"
+      }
+    ],
+    "meta": {
+      "total": 37,
+      "limit": 50,
+      "offset": 0
+    }
+  },
+  "events_analysis_nodes": {
+    "data": [
+      {
+        "id": "45cbae8b-2d8a-4231-812c-bdedffc6f072",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysisNode",
+        "ref_id": "9e921a60-b21b-4ff1-a264-f82ec10231e2",
+        "data": {
+          "diff": {
+            "execution_status": {
+              "next": "executed",
+              "previous": "executing"
+            },
+            "execution_progress": {
+              "next": 100,
+              "previous": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": "/analysis-nodes/9e921a60-b21b-4ff1-a264-f82ec10231e2",
+        "request_method": "POST",
+        "request_ip_address": "192.168.1.42",
+        "request_user_agent": "python-httpx/0.28.1",
+        "actor_type": "client",
+        "actor_id": "166a8237-a972-4a47-a236-adbe857f5ee5",
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:24:11.051Z",
+        "created_at": "2026-06-12T08:24:11.068Z",
+        "updated_at": "2026-06-12T08:24:11.068Z"
+      },
+      {
+        "id": "7dc3a56b-05b9-4d19-b8b5-086a095b5465",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysisNode",
+        "ref_id": "872d1bc4-2699-4e56-95f9-dcfeddae339c",
+        "data": {
+          "diff": {
+            "execution_status": {
+              "next": "executed",
+              "previous": "executing"
+            },
+            "execution_progress": {
+              "next": 100,
+              "previous": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": "/analysis-nodes/872d1bc4-2699-4e56-95f9-dcfeddae339c",
+        "request_method": "POST",
+        "request_ip_address": "192.168.1.42",
+        "request_user_agent": "python-httpx/0.28.1",
+        "actor_type": "client",
+        "actor_id": "748a40b5-a512-4783-b925-bb829fdeaa3d",
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:24:11.045Z",
+        "created_at": "2026-06-12T08:24:11.052Z",
+        "updated_at": "2026-06-12T08:24:11.052Z"
+      },
+      {
+        "id": "2e5f808d-8c59-4a29-b7f6-afd100825f5b",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysisNode",
+        "ref_id": "bb4f849f-7d13-4c9b-a004-1b5316a5de95",
+        "data": {
+          "diff": {
+            "execution_status": {
+              "next": "executed",
+              "previous": "executing"
+            },
+            "execution_progress": {
+              "next": 100,
+              "previous": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": "/analysis-nodes/bb4f849f-7d13-4c9b-a004-1b5316a5de95",
+        "request_method": "POST",
+        "request_ip_address": "192.168.1.42",
+        "request_user_agent": "python-httpx/0.28.1",
+        "actor_type": "client",
+        "actor_id": "6589f680-306d-43bb-a143-6b741b8c9618",
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:24:10.928Z",
+        "created_at": "2026-06-12T08:24:10.934Z",
+        "updated_at": "2026-06-12T08:24:10.934Z"
+      },
+      {
+        "id": "838421ab-0d59-49f1-9c0f-98c67a5754d6",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysisNode",
+        "ref_id": "9e921a60-b21b-4ff1-a264-f82ec10231e2",
+        "data": {
+          "diff": {
+            "execution_status": {
+              "next": "executing",
+              "previous": "starting"
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": "/analysis-nodes/9e921a60-b21b-4ff1-a264-f82ec10231e2",
+        "request_method": "POST",
+        "request_ip_address": "192.168.1.42",
+        "request_user_agent": "python-httpx/0.28.1",
+        "actor_type": "client",
+        "actor_id": "166a8237-a972-4a47-a236-adbe857f5ee5",
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:23:51.559Z",
+        "created_at": "2026-06-12T08:23:51.564Z",
+        "updated_at": "2026-06-12T08:23:51.564Z"
+      },
+      {
+        "id": "9283162c-53ea-4461-b072-fd82d76c0377",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysisNode",
+        "ref_id": "9e921a60-b21b-4ff1-a264-f82ec10231e2",
+        "data": {
+          "diff": {
+            "execution_status": {
+              "next": "starting",
+              "previous": "started"
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": "/analysis-nodes/9e921a60-b21b-4ff1-a264-f82ec10231e2",
+        "request_method": "POST",
+        "request_ip_address": "192.168.1.42",
+        "request_user_agent": "python-httpx/0.28.1",
+        "actor_type": "client",
+        "actor_id": "166a8237-a972-4a47-a236-adbe857f5ee5",
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:23:51.083Z",
+        "created_at": "2026-06-12T08:23:51.089Z",
+        "updated_at": "2026-06-12T08:23:51.089Z"
+      },
+      {
+        "id": "745414ff-dddc-4ee9-a12f-5f0ff5268c8b",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysisNode",
+        "ref_id": "9e921a60-b21b-4ff1-a264-f82ec10231e2",
+        "data": {
+          "diff": {
+            "execution_status": {
+              "next": "started",
+              "previous": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": "/analysis-nodes/9e921a60-b21b-4ff1-a264-f82ec10231e2",
+        "request_method": "POST",
+        "request_ip_address": "192.168.1.42",
+        "request_user_agent": "python-httpx/0.28.1",
+        "actor_type": "client",
+        "actor_id": "166a8237-a972-4a47-a236-adbe857f5ee5",
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:23:47.255Z",
+        "created_at": "2026-06-12T08:23:47.271Z",
+        "updated_at": "2026-06-12T08:23:47.271Z"
+      },
+      {
+        "id": "094584c2-0dbf-41cd-ac49-fffa79f75b1e",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysisNode",
+        "ref_id": "872d1bc4-2699-4e56-95f9-dcfeddae339c",
+        "data": {
+          "diff": {
+            "execution_status": {
+              "next": "executing",
+              "previous": "starting"
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": "/analysis-nodes/872d1bc4-2699-4e56-95f9-dcfeddae339c",
+        "request_method": "POST",
+        "request_ip_address": "192.168.1.42",
+        "request_user_agent": "python-httpx/0.28.1",
+        "actor_type": "client",
+        "actor_id": "748a40b5-a512-4783-b925-bb829fdeaa3d",
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:22:25.645Z",
+        "created_at": "2026-06-12T08:22:25.651Z",
+        "updated_at": "2026-06-12T08:22:25.651Z"
+      },
+      {
+        "id": "2a020735-886e-43ca-baf5-cd389816a2bc",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysisNode",
+        "ref_id": "872d1bc4-2699-4e56-95f9-dcfeddae339c",
+        "data": {
+          "diff": {
+            "execution_status": {
+              "next": "starting",
+              "previous": "started"
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": "/analysis-nodes/872d1bc4-2699-4e56-95f9-dcfeddae339c",
+        "request_method": "POST",
+        "request_ip_address": "192.168.1.42",
+        "request_user_agent": "python-httpx/0.28.1",
+        "actor_type": "client",
+        "actor_id": "748a40b5-a512-4783-b925-bb829fdeaa3d",
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:22:25.132Z",
+        "created_at": "2026-06-12T08:22:25.139Z",
+        "updated_at": "2026-06-12T08:22:25.139Z"
+      },
+      {
+        "id": "8a0d52cb-d06e-43da-9c6b-83646dbed189",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysisNode",
+        "ref_id": "bb4f849f-7d13-4c9b-a004-1b5316a5de95",
+        "data": {
+          "diff": {
+            "execution_status": {
+              "next": "executing",
+              "previous": "starting"
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": "/analysis-nodes/bb4f849f-7d13-4c9b-a004-1b5316a5de95",
+        "request_method": "POST",
+        "request_ip_address": "192.168.1.42",
+        "request_user_agent": "python-httpx/0.28.1",
+        "actor_type": "client",
+        "actor_id": "6589f680-306d-43bb-a143-6b741b8c9618",
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:22:24.245Z",
+        "created_at": "2026-06-12T08:22:24.251Z",
+        "updated_at": "2026-06-12T08:22:24.251Z"
+      },
+      {
+        "id": "d035a831-afd9-449d-9a3d-95546d626878",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysisNode",
+        "ref_id": "bb4f849f-7d13-4c9b-a004-1b5316a5de95",
+        "data": {
+          "diff": {
+            "execution_status": {
+              "next": "starting",
+              "previous": "started"
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": "/analysis-nodes/bb4f849f-7d13-4c9b-a004-1b5316a5de95",
+        "request_method": "POST",
+        "request_ip_address": "192.168.1.42",
+        "request_user_agent": "python-httpx/0.28.1",
+        "actor_type": "client",
+        "actor_id": "6589f680-306d-43bb-a143-6b741b8c9618",
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:22:23.710Z",
+        "created_at": "2026-06-12T08:22:23.726Z",
+        "updated_at": "2026-06-12T08:22:23.726Z"
+      },
+      {
+        "id": "26e3cbbd-3b74-43ca-b1ab-342a75400343",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysisNode",
+        "ref_id": "872d1bc4-2699-4e56-95f9-dcfeddae339c",
+        "data": {
+          "diff": {
+            "execution_status": {
+              "next": "started",
+              "previous": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": "/analysis-nodes/872d1bc4-2699-4e56-95f9-dcfeddae339c",
+        "request_method": "POST",
+        "request_ip_address": "192.168.1.42",
+        "request_user_agent": "python-httpx/0.28.1",
+        "actor_type": "client",
+        "actor_id": "748a40b5-a512-4783-b925-bb829fdeaa3d",
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:22:06.557Z",
+        "created_at": "2026-06-12T08:22:06.573Z",
+        "updated_at": "2026-06-12T08:22:06.573Z"
+      },
+      {
+        "id": "dfb70df0-b177-4aef-ae28-c54a08eb2c08",
+        "scope": "entity",
+        "name": "updated",
+        "ref_type": "analysisNode",
+        "ref_id": "bb4f849f-7d13-4c9b-a004-1b5316a5de95",
+        "data": {
+          "diff": {
+            "execution_status": {
+              "next": "started",
+              "previous": null
+            }
+          }
+        },
+        "expiring": true,
+        "request_path": "/analysis-nodes/bb4f849f-7d13-4c9b-a004-1b5316a5de95",
+        "request_method": "POST",
+        "request_ip_address": "192.168.1.42",
+        "request_user_agent": "python-httpx/0.28.1",
+        "actor_type": "client",
+        "actor_id": "6589f680-306d-43bb-a143-6b741b8c9618",
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:15:18.613Z",
+        "created_at": "2026-06-12T08:15:18.628Z",
+        "updated_at": "2026-06-12T08:15:18.628Z"
+      },
+      {
+        "id": "3dd64c78-5645-45f2-90c4-eac26196e400",
+        "scope": "entity",
+        "name": "created",
+        "ref_type": "analysisNode",
+        "ref_id": "bb4f849f-7d13-4c9b-a004-1b5316a5de95",
+        "data": {},
+        "expiring": true,
+        "request_path": "/analyses",
+        "request_method": "POST",
+        "request_ip_address": "203.0.113.65",
+        "request_user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+        "actor_type": "user",
+        "actor_id": "54e8b720-cc1f-453c-978c-7d31bab52949",
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:07:13.759Z",
+        "created_at": "2026-06-12T08:07:13.781Z",
+        "updated_at": "2026-06-12T08:07:13.781Z"
+      },
+      {
+        "id": "52ce2790-5451-4144-ac47-26414e99bc5b",
+        "scope": "entity",
+        "name": "created",
+        "ref_type": "analysisNode",
+        "ref_id": "9e921a60-b21b-4ff1-a264-f82ec10231e2",
+        "data": {},
+        "expiring": true,
+        "request_path": "/analyses",
+        "request_method": "POST",
+        "request_ip_address": "203.0.113.65",
+        "request_user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+        "actor_type": "user",
+        "actor_id": "54e8b720-cc1f-453c-978c-7d31bab52949",
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:07:13.748Z",
+        "created_at": "2026-06-12T08:07:13.765Z",
+        "updated_at": "2026-06-12T08:07:13.765Z"
+      },
+      {
+        "id": "20e59c64-ecc4-40ac-9d4b-b614829cc40e",
+        "scope": "entity",
+        "name": "created",
+        "ref_type": "analysisNode",
+        "ref_id": "872d1bc4-2699-4e56-95f9-dcfeddae339c",
+        "data": {},
+        "expiring": true,
+        "request_path": "/analyses",
+        "request_method": "POST",
+        "request_ip_address": "203.0.113.65",
+        "request_user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+        "actor_type": "user",
+        "actor_id": "54e8b720-cc1f-453c-978c-7d31bab52949",
+        "actor_name": null,
+        "realm_id": null,
+        "expires_at": "2026-06-19T08:07:13.731Z",
+        "created_at": "2026-06-12T08:07:13.753Z",
+        "updated_at": "2026-06-12T08:07:13.753Z"
+      }
+    ],
+    "meta": {
+      "total": 15,
+      "limit": 50,
+      "offset": 0
+    }
+  }
+}

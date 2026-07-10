@@ -27,6 +27,7 @@ export enum EnvironmentInputKey {
 
     AUTHUP_URL = 'AUTHUP_URL',
     TELEMETRY_URL = 'TELEMETRY_URL',
+    STORAGE_URL = 'STORAGE_URL',
 
     PUBLIC_URL = 'PUBLIC_URL',
 
