@@ -1,0 +1,36 @@
+{
+    "name": "@privateaim/communication-kit",
+    "type": "module",
+    "version": "0.12.1",
+    "license": "Apache-2.0",
+    "description": "Framework-free analysis communication measurement model and derivation, shared by the client UI and the server-side communication-summary endpoint.",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.mts",
+    "files": [
+        "dist"
+    ],
+    "exports": {
+        "./package.json": "./package.json",
+        ".": {
+            "types": "./dist/index.d.mts",
+            "import": "./dist/index.mjs"
+        }
+    },
+    "devDependencies": {
+        "@privateaim/core-kit": "^0.12.1",
+        "@privateaim/storage-kit": "^0.12.1",
+        "@privateaim/telemetry-kit": "^0.12.1"
+    },
+    "peerDependencies": {
+        "@privateaim/core-kit": "^0.12.1",
+        "@privateaim/storage-kit": "^0.12.1",
+        "@privateaim/telemetry-kit": "^0.12.1"
+    },
+    "scripts": {
+        "build": "rimraf ./dist && tsdown",
+        "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts"
+    },
+    "publishConfig": {
+        "access": "public"
+    }
+}

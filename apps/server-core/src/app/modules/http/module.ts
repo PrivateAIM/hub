@@ -21,12 +21,14 @@ import {
 import { createAuthupTokenVerifier, mountErrorMiddleware, mountMiddlewares } from '@privateaim/server-http-kit';
 import type { MiddlewareSwaggerOptions } from '@privateaim/server-http-kit';
 import {
+    AnalysisCommunicationSummaryController,
     AnalysisLogController,
     AnalysisNodeLogController,
     RootController,
 } from '../../../adapters/http/controllers/index.ts';
 import { createSocketServer } from '../../../adapters/socket/server.ts';
 import { ConfigInjectionKey } from '../config/constants.ts';
+import { StorageClientInjectionKey } from '../storage-client/constants.ts';
 import { TelemetryClientInjectionKey } from '../telemetry-client/constants.ts';
 import { createControllers } from './controller.ts';
 import type { HTTPServer } from './constants.ts';
@@ -67,6 +69,9 @@ export class HTTPModule implements IModule {
         const telemetryClientResult = container.tryResolve(TelemetryClientInjectionKey);
         const telemetryClient = telemetryClientResult.success ? telemetryClientResult.data : undefined;
 
+        const storageClientResult = container.tryResolve(StorageClientInjectionKey);
+        const storageClient = storageClientResult.success ? storageClientResult.data : undefined;
+
         const authupResult = container.tryResolve(AuthupClientInjectionKey);
         const redisResult = container.tryResolve(RedisClientInjectionKey);
 
@@ -103,6 +108,7 @@ export class HTTPModule implements IModule {
                     // Telemetry-coupled (DI-wired instances)
                     new AnalysisLogController({ telemetryClient }),
                     new AnalysisNodeLogController({ telemetryClient }),
+                    new AnalysisCommunicationSummaryController({ telemetryClient, storageClient }),
 
                     // Workflows
                     RootController,

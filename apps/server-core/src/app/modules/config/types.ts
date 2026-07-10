@@ -14,6 +14,7 @@ export interface Config extends BaseServerConfig {
     harborURL?: string;
 
     telemetryURL?: string;
+    storageURL?: string;
 
     masterImagesRepository: string;
     masterImagesOwner: string;
