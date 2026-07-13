@@ -5,7 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { injectStore, storeToRefs } from '@authup/client-web-kit';
+import { StoreAuthStatus, injectStore, storeToRefs } from '@authup/client-web-kit';
 import { VCCountdown } from '@vuecs/countdown';
 import { VCIcon } from '@vuecs/icon';
 import type { NavigationResolverContext } from '@vuecs/navigation';
@@ -24,10 +24,12 @@ export default defineNuxtComponent({
         const store = injectStore();
 
         const {
-            loggedIn,
+            status,
             accessTokenExpireDate: tokenExpireDate,
             realmManagement,
         } = storeToRefs(store);
+
+        const authenticated = computed(() => status.value === StoreAuthStatus.AUTHENTICATED);
 
         const tokenExpiresIn = computed(() => {
             if (!tokenExpireDate.value) {
@@ -53,13 +55,13 @@ export default defineNuxtComponent({
             return navigation.getSideItems(activeTopName);
         };
         const sideItemsWatch = [
-            () => store.loggedIn,
+            () => store.status,
             () => store.userId,
             () => store.realmManagement,
         ];
 
         return {
-            loggedIn,
+            authenticated,
             tokenExpiresIn,
             realmManagement,
             sideItems,
@@ -87,7 +89,7 @@ export default defineNuxtComponent({
 
         <div class="mt-auto">
             <div
-                v-if="loggedIn"
+                v-if="authenticated"
                 class="font-light flex flex-col ms-3 me-3 mb-1 mt-auto"
             >
                 <small class="countdown-text">

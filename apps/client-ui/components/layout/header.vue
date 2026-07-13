@@ -5,12 +5,12 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { injectStore, storeToRefs } from '@authup/client-web-kit';
+import { StoreAuthStatus, injectStore, storeToRefs } from '@authup/client-web-kit';
 import { FDisplayName } from '@privateaim/client-vue';
 import { VCGravatar } from '@vuecs/gravatar';
 import { VCIcon } from '@vuecs/icon';
 import { VCNavItems } from '@vuecs/navigation';
-import { ref, useColorMode } from '#imports';
+import { computed, ref, useColorMode } from '#imports';
 import { defineNuxtComponent } from '#app';
 import { LayoutTopNavigationRegistryId, Navigation } from '../../config/layout';
 import Logo from '../svg/Logo';
@@ -26,9 +26,11 @@ export default defineNuxtComponent({
     setup() {
         const store = injectStore();
         const {
-            loggedIn,
+            status,
             user,
         } = storeToRefs(store);
+
+        const authenticated = computed(() => status.value === StoreAuthStatus.AUTHENTICATED);
 
         const displayNav = ref(false);
 
@@ -43,7 +45,7 @@ export default defineNuxtComponent({
         const navigation = new Navigation(store);
         const topItems = () => navigation.getTopItems();
         const topItemsWatch = [
-            () => store.loggedIn,
+            () => store.status,
             () => store.userId,
             () => store.realmManagement,
         ];
@@ -54,7 +56,7 @@ export default defineNuxtComponent({
         };
 
         return {
-            loggedIn,
+            authenticated,
             user,
             toggleNav,
             displayNav,
@@ -115,7 +117,7 @@ export default defineNuxtComponent({
                                 <VCIcon :name="isDark ? 'fa6-solid:sun' : 'fa6-solid:moon'" />
                             </button>
                         </li>
-                        <template v-if="loggedIn && user">
+                        <template v-if="authenticated && user">
                             <li class="vc-nav-item">
                                 <nuxt-link
                                     class="vc-nav-link user-link"

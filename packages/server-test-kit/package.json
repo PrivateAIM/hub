@@ -22,14 +22,14 @@
         "url": "https://tada5hi.net"
     },
     "devDependencies": {
-        "@authup/access": "^1.0.0-beta.51",
-        "@authup/core-kit": "^1.0.0-beta.51",
+        "@authup/access": "^1.0.0-beta.52",
+        "@authup/core-kit": "^1.0.0-beta.52",
         "@privateaim/errors": "^0.8.42",
         "@privateaim/server-kit": "^0.12.1"
     },
     "peerDependencies": {
-        "@authup/access": "^1.0.0-beta.51",
-        "@authup/core-kit": "^1.0.0-beta.51",
+        "@authup/access": "^1.0.0-beta.52",
+        "@authup/core-kit": "^1.0.0-beta.52",
         "@privateaim/errors": "^0.8.42",
         "@privateaim/server-kit": "^0.12.1"
     },

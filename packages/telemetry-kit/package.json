@@ -27,15 +27,15 @@
         "zod": "^4.3.6"
     },
     "devDependencies": {
-        "@authup/kit": "^1.0.0-beta.51",
-        "@authup/core-kit": "^1.0.0-beta.51",
+        "@authup/kit": "^1.0.0-beta.52",
+        "@authup/core-kit": "^1.0.0-beta.52",
         "@privateaim/kit": "^0.12.1",
         "hapic": "^3.0.1",
         "rapiq": "^0.9.0"
     },
     "peerDependencies": {
-        "@authup/kit": "^1.0.0-beta.51",
-        "@authup/core-kit": "^1.0.0-beta.51",
+        "@authup/kit": "^1.0.0-beta.52",
+        "@authup/core-kit": "^1.0.0-beta.52",
         "@privateaim/kit": "^0.12.1",
         "hapic": "^3.0.1",
         "rapiq": "^0.9.0"
