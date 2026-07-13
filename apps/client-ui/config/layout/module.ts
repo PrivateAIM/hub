@@ -8,6 +8,7 @@
 import type { IdentityPolicyData } from '@authup/access';
 import { BuiltInPolicyType, PolicyData } from '@authup/access';
 import type { Store } from '@authup/client-web-kit';
+import { StoreAuthStatus } from '@authup/client-web-kit';
 import type {
     NavigationItem,
 } from '@vuecs/navigation';
@@ -89,7 +90,7 @@ export class Navigation {
             return item;
         }
 
-        const { loggedIn } = this.store;
+        const authenticated = this.store.status === StoreAuthStatus.AUTHENTICATED;
         let identity: IdentityPolicyData | undefined;
         if (this.store.userId) {
             identity = {
@@ -101,7 +102,7 @@ export class Navigation {
         if (
             typeof item.meta.requireLoggedIn !== 'undefined' &&
             item.meta.requireLoggedIn &&
-            !loggedIn
+            !authenticated
         ) {
             return undefined;
         }
@@ -109,7 +110,7 @@ export class Navigation {
         if (
             typeof item.meta.requireLoggedOut !== 'undefined' &&
             item.meta.requireLoggedOut &&
-            loggedIn
+            authenticated
         ) {
             return undefined;
         }
