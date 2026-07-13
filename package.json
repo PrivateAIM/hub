@@ -8,7 +8,7 @@
         "url": "https://tada5hi.net"
     },
     "license": "Apache-2.0",
-    "version": "0.12.1",
+    "version": "0.12.2",
     "description": "This package contains all central packages. It was initially developed as part of my Bachelor Thesis.",
     "workspaces": [
         "apps/*",
@@ -23,7 +23,7 @@
         "@types/node": "^25.9.1",
         "cross-env": "^10.1.0",
         "eslint": "^10.6.0",
-        "eslint-plugin-vue": "^10.9.2",
+        "eslint-plugin-vue": "^10.9.1",
         "husky": "^9.1.7",
         "lint-staged": "^17.0.8",
         "nx": "^22.7.6",
