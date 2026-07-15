@@ -10,7 +10,6 @@ import { REALM_MASTER_NAME } from '@authup/core-kit';
 import { InternalError } from '@privateaim/errors';
 import { isClientErrorWithStatusCode } from '@hapic/harbor';
 import { ServiceID } from '@privateaim/core-kit';
-import { PermissionName } from '@privateaim/kit';
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
 import {
@@ -62,25 +61,6 @@ export class AuthupModule implements IModule {
             logger.debug(`Client ${ServiceID.REGISTRY} created.`);
         } else {
             logger.debug(`Client ${ServiceID.REGISTRY} already exists.`);
-        }
-
-        const permissionNames = Object.values(PermissionName);
-        for (const permissionName of permissionNames) {
-            try {
-                await authupClient.permission.create({
-                    name: permissionName,
-                    realm_id: null,
-                    client_id: null,
-                });
-
-                logger.debug(`Created permission ${permissionName}`);
-            } catch (e) {
-                if (isClientErrorWithStatusCode(e, 409)) {
-                    logger.debug(`Permission ${permissionName} already exists`);
-                } else {
-                    throw e;
-                }
-            }
         }
     }
 }
