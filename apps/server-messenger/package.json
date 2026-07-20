@@ -46,7 +46,7 @@
         "reflect-metadata": "^0.2.2",
         "routup": "^6.0.0",
         "socket.io": "^4.8.2",
-        "typeorm": "^0.3.29",
+        "typeorm": "^1.1.0",
         "typeorm-extension": "^3.9.0",
         "validup": "^0.5.1",
         "zod": "^4.3.6"
