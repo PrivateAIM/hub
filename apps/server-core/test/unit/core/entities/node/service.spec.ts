@@ -6,7 +6,8 @@
  */
 
 import { randomUUID } from 'node:crypto';
-import type { Node } from '@privateaim/core-kit';
+import type { Node, RegistryProject } from '@privateaim/core-kit';
+import { RegistryProjectType } from '@privateaim/core-kit';
 import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import {
     beforeEach,
@@ -42,6 +43,27 @@ function createTestNode(overrides?: Partial<Node>): Node {
         updated_at: new Date(),
         ...overrides,
     } as Node;
+}
+
+function createTestRegistryProject(overrides?: Partial<RegistryProject>): RegistryProject {
+    return {
+        id: randomUUID(),
+        name: 'test-project',
+        type: RegistryProjectType.NODE,
+        public: false,
+        external_name: 'extname',
+        external_id: null,
+        account_id: null,
+        account_name: null,
+        account_secret: null,
+        webhook_name: null,
+        webhook_exists: null,
+        registry_id: randomUUID(),
+        realm_id: 'realm-1',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        ...overrides,
+    } as RegistryProject;
 }
 
 describe('NodeService', () => {
@@ -180,6 +202,74 @@ describe('NodeService', () => {
             await expect(
                 service.update(node.id, { name: 'updated-node' }, createNonMasterRealmActor('realm-1')),
             ).rejects.toThrow(PermissionDeniedError);
+        });
+
+        it('should re-provision the registry project when re-assigned to a different registry', async () => {
+            const registryId = randomUUID();
+            const nextRegistryId = randomUUID();
+
+            const registryProject = createTestRegistryProject({
+                registry_id: registryId,
+                external_name: 'extname',
+            });
+            registryManager.seedProject(registryProject);
+
+            const node = createTestNode({
+                realm_id: 'realm-1',
+                registry_id: registryId,
+                registry_project_id: registryProject.id,
+                external_name: 'extname',
+            });
+            repository.seed(node);
+
+            const result = await service.update(
+                node.id,
+                { registry_id: nextRegistryId },
+                createMasterRealmActor(),
+            );
+
+            // The stale project (on the old registry) is torn down ...
+            expect(registryManager.getUnlinkCalls()).toHaveLength(1);
+            expect(registryManager.getUnlinkCalls()[0].id).toBe(registryProject.id);
+
+            // ... and a fresh project is provisioned on the new registry.
+            const projects = registryManager.getProjects();
+            expect(projects).toHaveLength(1);
+            expect(projects[0].id).not.toBe(registryProject.id);
+            expect(projects[0].registry_id).toBe(nextRegistryId);
+
+            // The node now points at the new project (so credentials resolve the
+            // new registry's host, not the old one).
+            expect(result.registry_project_id).toBe(projects[0].id);
+            expect(registryManager.getLinkCalls()).toContain(projects[0].id);
+        });
+
+        it('should keep the existing registry project when the registry is unchanged', async () => {
+            const registryId = randomUUID();
+
+            const registryProject = createTestRegistryProject({
+                registry_id: registryId,
+                external_name: 'extname',
+            });
+            registryManager.seedProject(registryProject);
+
+            const node = createTestNode({
+                realm_id: 'realm-1',
+                registry_id: registryId,
+                registry_project_id: registryProject.id,
+                external_name: 'extname',
+            });
+            repository.seed(node);
+
+            const result = await service.update(
+                node.id,
+                { name: 'renamed-node' },
+                createMasterRealmActor(),
+            );
+
+            expect(registryManager.getUnlinkCalls()).toHaveLength(0);
+            expect(registryManager.getProjects()).toHaveLength(1);
+            expect(result.registry_project_id).toBe(registryProject.id);
         });
     });
 
