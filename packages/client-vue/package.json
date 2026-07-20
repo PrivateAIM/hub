@@ -55,7 +55,7 @@
         "@privateaim/storage-kit": "^0.12.2",
         "@privateaim/telemetry-kit": "^0.12.2",
         "@tsdown/css": "^0.22.0",
-        "@types/node": "^25.9.1",
+        "@types/node": "^26.1.1",
         "@vitejs/plugin-vue": "^6.0.5",
         "@vuecs/button": "^1.3.0",
         "@vuecs/core": "^3.4.0",
