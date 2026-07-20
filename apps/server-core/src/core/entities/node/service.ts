@@ -175,6 +175,17 @@ export class NodeService extends AbstractEntityService implements INodeService {
             registryProject = await this.registryManager.findProject(entity.registry_project_id) ?? undefined;
         }
 
+        // A registry project lives inside a single registry, so when the node is
+        // re-assigned to a different registry the existing project can no longer
+        // serve it. Tear it down and provision a fresh one on the new registry —
+        // otherwise the node keeps resolving its credentials (and host) from the
+        // old registry.
+        if (registryProject && registryProject.registry_id !== entity.registry_id) {
+            await this.registryManager.unlinkProject(registryProject);
+            await this.registryManager.removeProject(registryProject);
+            registryProject = undefined;
+        }
+
         if (registryProject) {
             if (registryProject.external_name !== externalName) {
                 registryProject.external_name = externalName;

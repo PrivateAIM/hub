@@ -26,9 +26,17 @@ export class RegistryManagerAdapter implements IRegistryManager {
     }
 
     async findDefaultRegistryId(): Promise<string | null> {
-        const registries = await this.registryRepository.find({ take: 1 });
-        const [registry] = registries;
-        return registry?.id ?? null;
+        // Only auto-assign a registry when the choice is unambiguous. There is no
+        // designated "default" registry, so with more than one configured, picking
+        // an arbitrary "first" row would provision the node against the wrong
+        // registry — later surfacing the wrong host in its credentials. When the
+        // choice is ambiguous, require an explicit registry selection instead.
+        const [registries, total] = await this.registryRepository.findAndCount({ take: 2 });
+        if (total !== 1) {
+            return null;
+        }
+
+        return registries[0].id;
     }
 
     async createProject(data: Partial<RegistryProject>): Promise<RegistryProject> {
