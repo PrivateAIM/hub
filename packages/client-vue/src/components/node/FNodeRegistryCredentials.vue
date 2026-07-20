@@ -44,14 +44,20 @@ export default defineComponent({
         const busy = ref(false);
         const loaded = ref(false);
 
+        // Monotonic token identifying the most recent load(). The parent reuses
+        // this component across node ids, so a slow in-flight request for a
+        // previous node must never overwrite the credentials of the node that is
+        // shown now — otherwise a node renders another node's registry host
+        // (only noticeable when the nodes belong to registries with different
+        // hosts). Only the response whose token still matches is applied.
+        let loadToken = 0;
+
         const load = async () => {
-            if (busy.value) {
-                return;
-            }
+            const token = ++loadToken;
+            const nodeId = props.entity.id;
 
             // Reset so a previous node's credentials never linger while the
-            // current one is (re)loaded — important because the parent reuses
-            // this component across node ids.
+            // current one is (re)loaded.
             revealed.value = false;
             host.value = null;
             externalName.value = null;
@@ -59,22 +65,33 @@ export default defineComponent({
             accountSecret.value = null;
 
             if (!props.entity.registry_project_id) {
+                busy.value = false;
                 loaded.value = true;
                 return;
             }
 
             busy.value = true;
+            loaded.value = false;
             try {
-                const credentials = await httpClient.node.getRegistryCredentials(props.entity.id);
+                const credentials = await httpClient.node.getRegistryCredentials(nodeId);
+                if (token !== loadToken) {
+                    // A newer load() superseded this request — drop the result.
+                    return;
+                }
+
                 host.value = credentials.host;
                 externalName.value = credentials.external_name;
                 accountName.value = credentials.account_name;
                 accountSecret.value = credentials.account_secret;
             } catch (e) {
-                emit('failed', e);
+                if (token === loadToken) {
+                    emit('failed', e);
+                }
             } finally {
-                busy.value = false;
-                loaded.value = true;
+                if (token === loadToken) {
+                    busy.value = false;
+                    loaded.value = true;
+                }
             }
         };
 
