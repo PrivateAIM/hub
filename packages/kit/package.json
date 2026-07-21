@@ -31,7 +31,7 @@
         "@authup/core-kit": "^1.0.0-beta.52",
         "cross-env": "^10.1.0",
         "unplugin-swc": "^1.5.5",
-        "vitest": "^4.1.9"
+        "vitest": "^4.1.10"
     },
     "peerDependencies": {
         "@authup/kit": "^1.0.0-beta.52",
