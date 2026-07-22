@@ -41,7 +41,7 @@
         "@routup/rate-limit": "^4.0.0",
         "@routup/swagger-ui": "^4.0.0",
         "hapic": "^3.0.1",
-        "locter": "^3.0.0",
+        "locter": "^4.1.0",
         "validup": "^0.5.1"
     },
     "devDependencies": {

@@ -27,13 +27,13 @@
     },
     "devDependencies": {
         "cross-env": "^10.1.0",
-        "typeorm": "^0.3.29",
+        "typeorm": "^1.1.0",
         "typeorm-extension": "^3.9.0",
         "unplugin-swc": "^1.5.5",
         "vitest": "^4.1.9"
     },
     "peerDependencies": {
-        "typeorm": "^0.3.29",
+        "typeorm": "^1.1.0",
         "typeorm-extension": "^3.9.0"
     },
     "scripts": {
