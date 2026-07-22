@@ -12,7 +12,7 @@ import {
     usePermissionCheck,
 } from '@authup/client-web-kit';
 import type { Client } from '@authup/core-kit';
-import { PermissionName } from '@authup/core-kit';
+import { ClientAuthMethod, PermissionName } from '@authup/core-kit';
 import { FDisplayName } from '@privateaim/client-vue';
 import { VCButton } from '@vuecs/button';
 import { VCIcon } from '@vuecs/icon';
@@ -61,8 +61,8 @@ export default defineComponent({
                 cellClass: 'text-center',
             },
             {
-                key: 'is_confidential',
-                label: 'Confidential?',
+                key: 'authMethod',
+                label: 'Auth Method',
                 headerClass: 'text-center',
                 cellClass: 'text-center',
             },
@@ -91,11 +91,25 @@ export default defineComponent({
             },
         ];
 
+        // authup dropped the Client.is_confidential flag; clients now carry an
+        // auth method (none/secret/tls) instead — mirror authup's client table.
+        const authMethodLabel = (method: `${ClientAuthMethod}`) => {
+            switch (method) {
+                case ClientAuthMethod.SECRET:
+                    return 'Secret';
+                case ClientAuthMethod.TLS:
+                    return 'TLS';
+                default:
+                    return 'None';
+            }
+        };
+
         return {
             columns,
             hasEditPermission,
             hasDropPermission,
             handleDeleted,
+            authMethodLabel,
             query,
             NuxtLink,
         };
@@ -139,11 +153,8 @@ export default defineComponent({
                         :class="row.active ? 'text-success-600' : 'text-error-600'"
                     />
                 </template>
-                <template #cell-is_confidential="{ row }">
-                    <VCIcon
-                        :name="row.is_confidential ? 'fa6-solid:check' : 'fa6-solid:xmark'"
-                        :class="row.is_confidential ? 'text-success-600' : 'text-error-600'"
-                    />
+                <template #cell-authMethod="{ row }">
+                    {{ authMethodLabel(row.authMethod) }}
                 </template>
                 <template #cell-builtIn="{ row }">
                     <VCIcon

@@ -43,7 +43,7 @@ export default defineNuxtComponent({
     setup(props) {
         const projectNodeQuery : QueryBuildInput<ProjectNode, 3> = {
             filters: { project_id: props.entity.id },
-            sort: { node: { name: 'ASC' } },
+            sort: 'node.name',
         };
 
         return { projectNodeQuery };
