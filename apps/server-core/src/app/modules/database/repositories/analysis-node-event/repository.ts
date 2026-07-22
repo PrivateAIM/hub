@@ -5,18 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { IQuery } from '@rapiq/core';
 import type { AnalysisNodeEvent } from '@privateaim/core-kit';
 import type { DataSource, Repository } from 'typeorm';
-import {
-    applyQuery,
-    validateEntityJoinColumns,
-} from 'typeorm-extension';
+import { validateEntityJoinColumns } from 'typeorm-extension';
 import { AnalysisNodeEventEntity } from '../../../../../adapters/database/entities/analysis-node-event.ts';
 import type {
     EntityPersistContext,
     EntityRepositoryFindManyResult,
 } from '@privateaim/server-kit';
 import type { IAnalysisNodeEventRepository } from '../../../../../core/entities/analysis-node-event/types.ts';
+import { applyQuery } from '../query.ts';
 
 export class AnalysisNodeEventRepositoryAdapter implements IAnalysisNodeEventRepository {
     protected dataSource: DataSource;
@@ -28,32 +27,11 @@ export class AnalysisNodeEventRepositoryAdapter implements IAnalysisNodeEventRep
         this.repository = dataSource.getRepository(AnalysisNodeEventEntity);
     }
 
-    async findMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<AnalysisNodeEvent>> {
+    async findMany(query: IQuery): Promise<EntityRepositoryFindManyResult<AnalysisNodeEvent>> {
         const qb = this.repository.createQueryBuilder('e');
         qb.groupBy('e.id');
 
-        const { pagination } = applyQuery(qb, query, {
-            defaultAlias: 'e',
-            filters: {
-                allowed: [
-                    'analysis_id',
-                    'node_id',
-                ],
-            },
-            pagination: { maxLimit: 50 },
-            relations: {
-                allowed: ['analysis', 'node'],
-                onJoin: (_property, key, query) => {
-                    query.addGroupBy(`${key}.id`);
-                },
-            },
-            sort: {
-                allowed: [
-                    'created_at',
-                    'updated_at',
-                ],
-            },
-        });
+        const { pagination } = applyQuery(qb, query);
 
         const [entities, total] = await qb.getManyAndCount();
 

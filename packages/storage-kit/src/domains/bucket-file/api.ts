@@ -5,21 +5,21 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { BuildInput } from 'rapiq';
-import { buildQuery } from 'rapiq';
+import type { EntityQueryInput } from '../../utils';
+import { buildQueryString } from '../../utils';
 import { nullifyEmptyObjectProperties } from '@privateaim/kit';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
 import type { BucketFile } from './entity';
 import { BaseAPI } from '../base';
 
 export class BucketFileAPI extends BaseAPI {
-    async getMany(record?: BuildInput<BucketFile>): Promise<CollectionResourceResponse<BucketFile>> {
-        const response = await this.client.get(`bucket-files${buildQuery(record)}`);
+    async getMany(record?: EntityQueryInput<BucketFile>): Promise<CollectionResourceResponse<BucketFile>> {
+        const response = await this.client.get(`bucket-files${buildQueryString(record)}`);
         return response.data;
     }
 
-    async getOne(id: BucketFile['id'], requestRecord?: BuildInput<BucketFile>): Promise<SingleResourceResponse<BucketFile>> {
-        const response = await this.client.get(`bucket-files/${id}${buildQuery(requestRecord)}`);
+    async getOne(id: BucketFile['id'], requestRecord?: EntityQueryInput<BucketFile>): Promise<SingleResourceResponse<BucketFile>> {
+        const response = await this.client.get(`bucket-files/${id}${buildQueryString(requestRecord)}`);
 
         return response.data;
     }

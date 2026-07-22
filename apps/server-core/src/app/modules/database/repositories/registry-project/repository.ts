@@ -7,16 +7,8 @@
 
 import type { RegistryProject } from '@privateaim/core-kit';
 import type { DataSource, Repository } from 'typeorm';
-import {
-    applyFilters,
-    applyPagination,
-    applyQueryFieldsParseOutput,
-    applyRelations,
-    applySort,
-    validateEntityJoinColumns,
-} from 'typeorm-extension';
-import type { ParseAllowedOption } from 'rapiq';
-import { parseQueryFields } from 'rapiq';
+import { validateEntityJoinColumns } from 'typeorm-extension';
+import type { IQuery } from '@rapiq/core';
 import { RegistryProjectEntity } from '../../../../../adapters/database/entities/registry-project.ts';
 import type {
     EntityPersistContext,
@@ -25,28 +17,7 @@ import type {
 import type {
     IRegistryProjectRepository,
 } from '../../../../../core/index.ts';
-
-const DEFAULT_FIELDS: ParseAllowedOption<RegistryProjectEntity> = [
-    'id',
-    'name',
-    'type',
-    'public',
-    'external_name',
-    'external_id',
-    'account_id',
-    'account_name',
-    'webhook_name',
-    'webhook_exists',
-    'registry_id',
-    'realm_id',
-    'created_at',
-    'updated_at',
-];
-
-const ALLOWED_FIELDS: ParseAllowedOption<RegistryProjectEntity> = [
-    ...DEFAULT_FIELDS,
-    'account_secret',
-];
+import { applyQuery } from '../query.ts';
 
 export class RegistryProjectRepositoryAdapter implements IRegistryProjectRepository {
     protected dataSource: DataSource;
@@ -58,45 +29,11 @@ export class RegistryProjectRepositoryAdapter implements IRegistryProjectReposit
         this.repository = dataSource.getRepository(RegistryProjectEntity);
     }
 
-    async findMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<RegistryProject>> {
-        const {
-            filter,
-            page,
-            fields,
-            include,
-            sort,
-        } = query;
-
+    async findMany(query: IQuery): Promise<EntityRepositoryFindManyResult<RegistryProject>> {
         const qb = this.repository.createQueryBuilder('registryProject');
         qb.groupBy('registryProject.id');
 
-        const fieldsParsed = parseQueryFields<RegistryProjectEntity>(fields, {
-            default: DEFAULT_FIELDS,
-            allowed: ALLOWED_FIELDS,
-            defaultPath: 'registryProject',
-        });
-
-        applyQueryFieldsParseOutput(qb, fieldsParsed, { defaultAlias: 'registryProject' });
-
-        applyRelations(qb, include, {
-            defaultAlias: 'registryProject',
-            allowed: ['registry'],
-            onJoin: (_property, key, query) => {
-                query.addGroupBy(`${key}.id`);
-            },
-        });
-
-        applySort(qb, sort, {
-            defaultAlias: 'registryProject',
-            allowed: ['id', 'updated_at', 'created_at'],
-        });
-
-        applyFilters(qb, filter, {
-            allowed: ['id', 'name', 'registry_id', 'external_name', 'type'],
-            defaultAlias: 'registryProject',
-        });
-
-        const pagination = applyPagination(qb, page, { maxLimit: 50 });
+        const { pagination } = applyQuery(qb, query);
 
         const [entities, total] = await qb.getManyAndCount();
 

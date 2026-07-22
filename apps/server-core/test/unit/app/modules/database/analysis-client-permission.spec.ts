@@ -17,8 +17,8 @@ import type { IAnalysisRepository } from '../../../../../src/core/index.ts';
 
 type ClientPermissionRecord = {
     id: string;
-    client_id: string;
-    permission_id?: string;
+    clientId: string;
+    permissionId?: string;
     permission?: { name: string };
 };
 
@@ -42,14 +42,14 @@ class FakeAuthupClient {
     }
 
     clientPermission = {
-        getMany: async (query: { filter?: Record<string, any> } = {}) => {
+        getMany: async (query: { filters?: Record<string, any> } = {}) => {
             let data = this.clientPermissions;
-            const filter = query.filter || {};
-            if (filter.client_id) {
-                data = data.filter((cp) => cp.client_id === filter.client_id);
+            const filters = query.filters || {};
+            if (filters.clientId) {
+                data = data.filter((cp) => cp.clientId === filters.clientId);
             }
-            if (filter.permission_id) {
-                data = data.filter((cp) => cp.permission_id === filter.permission_id);
+            if (filters.permissionId) {
+                data = data.filter((cp) => cp.permissionId === filters.permissionId);
             }
             return { data, meta: { total: data.length } };
         },
@@ -101,14 +101,14 @@ describe('AnalysisClientPermissionService', () => {
             const authup = new FakeAuthupClient({
                 clientPermissions: [
                     {
-                        id: 'cp-1', 
-                        client_id: 'client-1', 
-                        permission: { name: STORAGE_PERMISSION.name }, 
+                        id: 'cp-1',
+                        clientId: 'client-1',
+                        permission: { name: STORAGE_PERMISSION.name },
                     },
                     {
-                        id: 'cp-2', 
-                        client_id: 'other', 
-                        permission: { name: STORAGE_PERMISSION.name }, 
+                        id: 'cp-2',
+                        clientId: 'other',
+                        permission: { name: STORAGE_PERMISSION.name },
                     },
                 ],
             });
@@ -149,8 +149,8 @@ describe('AnalysisClientPermissionService', () => {
 
             expect(authup.createdClientPermissions).toHaveLength(1);
             expect(authup.createdClientPermissions[0]).toMatchObject({
-                client_id: 'client-1',
-                permission_id: STORAGE_PERMISSION.id,
+                clientId: 'client-1',
+                permissionId: STORAGE_PERMISSION.id,
             });
         });
 
@@ -227,9 +227,9 @@ describe('AnalysisClientPermissionService', () => {
             const authup = new FakeAuthupClient({
                 clientPermissions: [
                     {
-                        id: 'cp-1', 
-                        client_id: 'client-1', 
-                        permission_id: STORAGE_PERMISSION.id, 
+                        id: 'cp-1',
+                        clientId: 'client-1',
+                        permissionId: STORAGE_PERMISSION.id,
                     },
                 ],
             });

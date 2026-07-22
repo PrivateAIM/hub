@@ -27,16 +27,18 @@
         "zod": "^4.3.6"
     },
     "devDependencies": {
-        "@authup/core-kit": "^1.0.0-beta.52",
+        "@authup/core-kit": "^1.0.0-beta.54",
         "@privateaim/kit": "^0.12.2",
-        "hapic": "^3.0.1",
-        "rapiq": "^0.9.0"
+        "@rapiq/codec-url": "^2.0.0-beta.7",
+        "@rapiq/core": "^2.0.0-beta.7",
+        "hapic": "^3.0.1"
     },
     "peerDependencies": {
-        "@authup/core-kit": "^1.0.0-beta.52",
+        "@authup/core-kit": "^1.0.0-beta.54",
         "@privateaim/kit": "^0.12.2",
-        "hapic": "^3.0.1",
-        "rapiq": "^0.9.0"
+        "@rapiq/codec-url": "^2.0.0-beta.7",
+        "@rapiq/core": "^2.0.0-beta.7",
+        "hapic": "^3.0.1"
     },
     "scripts": {
         "build": "rimraf ./dist && tsdown",

@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 import { DomainType } from '@privateaim/core-kit';
-import type { FieldsBuildInput } from 'rapiq';
+import type { FieldsBuildInput } from '@rapiq/core';
 import type { PropType } from 'vue';
 import type {
     Registry,

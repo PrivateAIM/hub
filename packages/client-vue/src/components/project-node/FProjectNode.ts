@@ -15,7 +15,7 @@ import type {
     ProjectNode,
 } from '@privateaim/core-kit';
 import { buildDomainEventFullName } from '@privateaim/kit';
-import type { FiltersBuildInput } from 'rapiq';
+import type { FiltersBuildInput } from '@rapiq/core';
 import {
     defineComponent, 
     h,

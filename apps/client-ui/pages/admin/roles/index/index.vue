@@ -22,7 +22,7 @@ import {
     usePermissionCheck,
 } from '@authup/client-web-kit';
 import { FDisplayName } from '@privateaim/client-vue';
-import type { BuildInput } from 'rapiq';
+import type { QueryBuildInput } from '@rapiq/core';
 import { resolveComponent } from 'vue';
 import { defineNuxtComponent } from '#imports';
 
@@ -48,7 +48,7 @@ export default defineNuxtComponent({
         const store = injectStore();
         const { realmManagementId } = storeToRefs(store);
 
-        const query : BuildInput<Role> = { filter: { realm_id: [realmManagementId.value, null] } };
+        const query : QueryBuildInput<Role> = { filters: { realmId: [realmManagementId.value, null] } };
 
         const hasEditPermission = usePermissionCheck({ name: PermissionName.ROLE_UPDATE });
         const hasDropPermission = usePermissionCheck({ name: PermissionName.ROLE_DELETE });
@@ -130,26 +130,26 @@ export default defineNuxtComponent({
                 <template #cell-name="{ row }">
                     <FDisplayName
                         :name="row.name"
-                        :display-name="row.display_name"
+                        :display-name="row.displayName"
                     />
                 </template>
                 <template #cell-built_in="{ row }">
                     <VCIcon
-                        :name="row.built_in ? 'fa6-solid:check' : 'fa6-solid:xmark'"
-                        :class="row.built_in ? 'text-success-600' : 'text-error-600'"
+                        :name="row.builtIn ? 'fa6-solid:check' : 'fa6-solid:xmark'"
+                        :class="row.builtIn ? 'text-success-600' : 'text-error-600'"
                     />
                 </template>
                 <template #cell-global="{ row }">
                     <VCIcon
-                        :name="!row.realm_id ? 'fa6-solid:check' : 'fa6-solid:xmark'"
-                        :class="!row.realm_id ? 'text-success-600' : 'text-error-600'"
+                        :name="!row.realmId ? 'fa6-solid:check' : 'fa6-solid:xmark'"
+                        :class="!row.realmId ? 'text-success-600' : 'text-error-600'"
                     />
                 </template>
                 <template #cell-created_at="{ row }">
-                    <VCTimeago :datetime="row.created_at" />
+                    <VCTimeago :datetime="row.createdAt" />
                 </template>
                 <template #cell-updated_at="{ row }">
-                    <VCTimeago :datetime="row.updated_at" />
+                    <VCTimeago :datetime="row.updatedAt" />
                 </template>
                 <template #cell-options="{ row }">
                     <div class="flex items-center">

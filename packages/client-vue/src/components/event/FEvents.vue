@@ -8,7 +8,7 @@
 import type {
     Event,
 } from '@privateaim/telemetry-kit';
-import type { BuildInput } from 'rapiq';
+import type { QueryBuildInput } from '@rapiq/core';
 import type { PropType } from 'vue';
 import {
     defineComponent,
@@ -20,7 +20,7 @@ import FEvent from './FEvent';
 
 export default defineComponent({
     components: { FEvent },
-    props: { query: { type: Object as PropType<BuildInput<Event>> } },
+    props: { query: { type: Object as PropType<QueryBuildInput<Event>> } },
     setup(props) {
         const httpClient = injectTelemetryHTTPClient();
 
@@ -33,7 +33,7 @@ export default defineComponent({
         const busy = ref(false);
         const data = ref<Event[]>([]);
 
-        const resolve = async (query?: BuildInput<Event>) => {
+        const resolve = async (query?: QueryBuildInput<Event>) => {
             busy.value = true;
 
             const response = await httpClient.event.getMany(query);

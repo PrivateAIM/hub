@@ -10,7 +10,7 @@ import { VCIcon } from '@vuecs/icon';
 import { VCLink } from '@vuecs/link';
 import type { AnalysisBucket, AnalysisNode } from '@privateaim/core-kit';
 import { AnalysisBucketType } from '@privateaim/core-kit';
-import type { BuildInput } from 'rapiq';
+import type { QueryBuildInput } from '@rapiq/core';
 import type { PropType } from 'vue';
 import { computed, defineComponent } from 'vue';
 import { FAnalysisBucket, FAnalysisBucketDownload } from '../analysis-bucket';
@@ -41,12 +41,12 @@ export default defineComponent({
     },
     emits: ['deleted', 'failed', 'updated'],
     setup(props, { emit }) {
-        const bucketQuery = computed<BuildInput<AnalysisBucket>>(() => ({
-            filter: {
+        const bucketQuery = computed<QueryBuildInput<AnalysisBucket>>(() => ({
+            filters: {
                 type: AnalysisBucketType.CODE,
                 analysis_id: props.entity.analysis_id,
             },
-        } satisfies BuildInput<AnalysisBucket>));
+        } satisfies QueryBuildInput<AnalysisBucket>));
 
         const handleDeleted = (data: AnalysisNode) => {
             emit('deleted', data);

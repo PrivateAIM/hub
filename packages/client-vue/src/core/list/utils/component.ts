@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { BuildInput } from 'rapiq';
+import type { QueryBuildInput } from '@rapiq/core';
 import type { PropType } from 'vue';
 import type {
     ListBodyOptions,
@@ -29,7 +29,7 @@ export function defineListEvents<T>() : ListEventsType<T> {
 export function defineListProps<T>() {
     return {
         query: {
-            type: Object as PropType<BuildInput<T extends Record<string, any> ? T : never>>,
+            type: Object as PropType<QueryBuildInput<T>>,
             default() {
                 return {};
             },

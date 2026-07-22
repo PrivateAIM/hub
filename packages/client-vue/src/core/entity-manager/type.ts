@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { BuildInput, FieldsBuildInput, FiltersBuildInput } from 'rapiq';
+import type { FieldsBuildInput, FiltersBuildInput, QueryBuildInput } from '@rapiq/core';
 import type {
     MaybeRef, 
     Ref, 
@@ -29,7 +29,7 @@ export type EntityManagerRenderFn = () => VNodeChild;
 export type EntityManagerResolveContext<T> = {
     id?: EntityID<T> | null,
     reset?: boolean,
-    query?: T extends Record<string, any> ? BuildInput<T> : never
+    query?: QueryBuildInput<T>
 };
 
 export type EntityManager<T> = {
@@ -53,9 +53,9 @@ export type EntityManager<T> = {
 export type EntityManagerProps<T> = {
     entity?: T,
     entityId?: EntityID<T>,
-    queryFilters?: T extends Record<string, any> ? FiltersBuildInput<T> : never,
-    queryFields?: T extends Record<string, any> ? FieldsBuildInput<T> : never,
-    query?: T extends Record<string, any> ? BuildInput<T> : never
+    queryFilters?: FiltersBuildInput<T>,
+    queryFields?: FieldsBuildInput<T>,
+    query?: QueryBuildInput<T>
 };
 
 export type EntityManagerSlotProps<T> = {

@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { eq } from '@rapiq/core';
 import type { Project } from '@privateaim/core-kit';
 import {
     PermissionName,
@@ -15,7 +16,9 @@ import {
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
+import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
 import type { IProjectRepository, IProjectService } from './types.ts';
+import { projectSchema } from './schema.ts';
 import { ProjectValidator } from '@privateaim/core-kit';
 
 type ProjectServiceContext = {
@@ -34,12 +37,12 @@ export class ProjectService extends AbstractEntityService implements IProjectSer
     }
 
     async getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<Project>> {
-        return this.repository.findMany(query);
+        return this.repository.findMany(decodeQuery(query, { schema: projectSchema }));
     }
 
     async getOne(id: string, query?: Record<string, any>): Promise<Project> {
         const entity = query ?
-            await this.repository.findMany({ ...query, filter: { id } }).then((r) => r.data[0]) :
+            await this.repository.findMany(appendQueryConditions(decodeQuery(query, { schema: projectSchema, parameters: ['fields', 'relations'] }), eq('id', id))).then((r) => r.data[0]) :
             await this.repository.findOneById(id);
 
         if (!entity) {

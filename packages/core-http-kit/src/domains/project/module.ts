@@ -5,22 +5,21 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { BuildInput } from 'rapiq';
-import { buildQuery } from 'rapiq';
+import type { EntityQueryInput } from '../../utils';
+import { buildQueryString, nullifyEmptyObjectProperties  } from '../../utils';
 import type { Project } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
-import { nullifyEmptyObjectProperties } from '../../utils';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
 import type { ProjectCreatePayload, ProjectUpdatePayload } from './types';
 
 export class ProjectAPI extends BaseAPI {
-    async getMany(record?: BuildInput<Project>): Promise<CollectionResourceResponse<Project>> {
-        const response = await this.client.get(`projects${buildQuery(record)}`);
+    async getMany(record?: EntityQueryInput<Project>): Promise<CollectionResourceResponse<Project>> {
+        const response = await this.client.get(`projects${buildQueryString(record)}`);
         return response.data;
     }
 
-    async getOne(id: Project['id'], requestRecord?: BuildInput<Project>): Promise<SingleResourceResponse<Project>> {
-        const response = await this.client.get(`projects/${id}${buildQuery(requestRecord)}`);
+    async getOne(id: Project['id'], requestRecord?: EntityQueryInput<Project>): Promise<SingleResourceResponse<Project>> {
+        const response = await this.client.get(`projects/${id}${buildQueryString(requestRecord)}`);
 
         return response.data;
     }

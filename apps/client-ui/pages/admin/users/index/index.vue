@@ -18,7 +18,7 @@ import {
     storeToRefs,
     usePermissionCheck,
 } from '@authup/client-web-kit';
-import type { BuildInput } from 'rapiq';
+import type { QueryBuildInput } from '@rapiq/core';
 import {
     FDisplayName,
     FPagination,
@@ -52,7 +52,7 @@ export default defineNuxtComponent({
         const store = injectStore();
         const { realmManagementId } = storeToRefs(store);
 
-        const query : BuildInput<User> = { filter: { realm_id: [realmManagementId.value, null] } };
+        const query : QueryBuildInput<User> = { filters: { realmId: [realmManagementId.value, null] } };
 
         const hasEditPermission = usePermissionCheck({ name: PermissionName.USER_UPDATE });
         const hasDropPermission = usePermissionCheck({ name: PermissionName.USER_DELETE });
@@ -121,14 +121,14 @@ export default defineNuxtComponent({
                 <template #cell-name="{ row }">
                     <FDisplayName
                         :name="row.name"
-                        :display-name="row.display_name"
+                        :display-name="row.displayName"
                     />
                 </template>
                 <template #cell-created_at="{ row }">
-                    <VCTimeago :datetime="row.created_at" />
+                    <VCTimeago :datetime="row.createdAt" />
                 </template>
                 <template #cell-updated_at="{ row }">
-                    <VCTimeago :datetime="row.updated_at" />
+                    <VCTimeago :datetime="row.updatedAt" />
                 </template>
                 <template #cell-options="{ row }">
                     <div class="flex items-center">

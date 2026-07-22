@@ -11,7 +11,7 @@ import type {
     DomainEntityID, 
     DomainTypeMap,
 } from '@privateaim/core-kit';
-import type { BuildInput } from 'rapiq';
+import type { QueryBuildInput } from '@rapiq/core';
 import { isObject } from 'smob';
 import type { Ref, VNodeChild } from 'vue';
 import {
@@ -275,7 +275,7 @@ export function createEntityManager<
 
         if (resolveCtx.id) {
             try {
-                entity.value = await domainAPI.getOne(resolveCtx.id, resolveCtx.query as BuildInput<any>);
+                entity.value = await domainAPI.getOne(resolveCtx.id, resolveCtx.query as QueryBuildInput<any>);
 
                 if (socket) {
                     socket.subscribe();
@@ -294,7 +294,7 @@ export function createEntityManager<
         if (resolveCtx.query) {
             try {
                 const response = await domainAPI.getMany({
-                    ...resolveCtx.query as BuildInput<any>,
+                    ...resolveCtx.query as QueryBuildInput<any>,
                     pagination: { limit: 1 },
                 } as any);
 
@@ -379,7 +379,7 @@ export function createEntityManager<
 
         entity.value = null;
 
-        let query : (RECORD extends Record<string, any> ? BuildInput<RECORD> : never) | undefined;
+        let query : (QueryBuildInput<RECORD>) | undefined;
         if (resolveCtx.query) {
             query = resolveCtx.query;
         }

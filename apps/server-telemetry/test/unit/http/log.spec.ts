@@ -107,7 +107,7 @@ describe('log HTTP endpoints', () => {
             // VictoriaLogs buffers before writing to disk
             await wait(1_000);
 
-            const response = await fetch(`${baseURL}/logs?filter[foo]=bar&pagination[limit]=1&pagination[offset]=0`, {
+            const response = await fetch(`${baseURL}/logs?filter[foo]=bar&page[limit]=1&page[offset]=0`, {
                 method: 'GET',
                 headers: { Authorization: 'Bearer test' },
             });

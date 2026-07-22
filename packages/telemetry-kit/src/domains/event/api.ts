@@ -5,15 +5,15 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { BuildInput } from 'rapiq';
-import { buildQuery } from 'rapiq';
+import type { EntityQueryInput } from '../../utils';
+import { buildQueryString } from '../../utils';
 import type { Event } from './entity';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
 import { BaseAPI } from '../base';
 
 export class EventAPI extends BaseAPI {
-    async getMany(options?: BuildInput<Event>): Promise<CollectionResourceResponse<Event>> {
-        const { data: response } = await this.client.get(`events${buildQuery(options)}`);
+    async getMany(options?: EntityQueryInput<Event>): Promise<CollectionResourceResponse<Event>> {
+        const { data: response } = await this.client.get(`events${buildQueryString(options)}`);
         return response;
     }
 

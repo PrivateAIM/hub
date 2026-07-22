@@ -156,10 +156,10 @@ export default defineComponent({
             },
             query: () => {
                 if (props.target === DomainType.NODE) {
-                    return { include: ['node'] };
+                    return { relations: ['node'] };
                 }
 
-                return { include: ['analysis'] };
+                return { relations: ['analysis'] };
             },
         });
 

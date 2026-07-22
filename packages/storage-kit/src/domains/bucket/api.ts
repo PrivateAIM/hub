@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { BuildInput } from 'rapiq';
-import { buildQuery } from 'rapiq';
+import type { EntityQueryInput } from '../../utils';
+import { buildQueryString } from '../../utils';
 import { nullifyEmptyObjectProperties } from '@privateaim/kit';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
 import { BaseAPI } from '../base';
@@ -15,13 +15,13 @@ import type { Bucket } from './entity';
 import type { BucketCreatePayload } from './types';
 
 export class BucketAPI extends BaseAPI {
-    async getMany(record?: BuildInput<Bucket>): Promise<CollectionResourceResponse<Bucket>> {
-        const response = await this.client.get(`buckets${buildQuery(record)}`);
+    async getMany(record?: EntityQueryInput<Bucket>): Promise<CollectionResourceResponse<Bucket>> {
+        const response = await this.client.get(`buckets${buildQueryString(record)}`);
         return response.data;
     }
 
-    async getOne(id: Bucket['id'], requestRecord?: BuildInput<Bucket>): Promise<SingleResourceResponse<Bucket>> {
-        const response = await this.client.get(`buckets/${id}${buildQuery(requestRecord)}`);
+    async getOne(id: Bucket['id'], requestRecord?: EntityQueryInput<Bucket>): Promise<SingleResourceResponse<Bucket>> {
+        const response = await this.client.get(`buckets/${id}${buildQueryString(requestRecord)}`);
 
         return response.data;
     }

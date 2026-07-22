@@ -15,7 +15,7 @@ import {
 } from '@privateaim/client-vue';
 import type { Project, ProjectNode } from '@privateaim/core-kit';
 import { VCIcon } from '@vuecs/icon';
-import type { BuildInput } from 'rapiq';
+import type { QueryBuildInput } from '@rapiq/core';
 import type { PropType } from 'vue';
 import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
@@ -41,8 +41,8 @@ export default defineNuxtComponent({
         },
     },
     setup(props) {
-        const projectNodeQuery : BuildInput<ProjectNode> = {
-            filter: { project_id: props.entity.id },
+        const projectNodeQuery : QueryBuildInput<ProjectNode> = {
+            filters: { project_id: props.entity.id },
             sort: { node: { name: 'ASC' } },
         };
 

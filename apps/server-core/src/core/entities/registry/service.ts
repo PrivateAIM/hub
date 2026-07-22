@@ -16,7 +16,10 @@ import {
 import { BadRequestError, EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
+import { eq } from '@rapiq/core';
 import type { IRegistryCaller } from '../../harbor/types.ts';
+import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
+import { registrySchema } from './schema.ts';
 import type { IRegistryRepository, IRegistryService } from './types.ts';
 
 type RegistryServiceContext = {
@@ -45,7 +48,7 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
     async getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<Registry>> {
         await this.checkSecretFieldAccess(query, actor);
 
-        return this.repository.findMany(query);
+        return this.repository.findMany(decodeQuery(query, { schema: registrySchema }));
     }
 
     async getOne(id: string, actor: ActorContext, query?: Record<string, any>): Promise<Registry> {
@@ -54,7 +57,7 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
         }
 
         const entity = query ?
-            await this.repository.findMany({ ...query, filter: { id } }).then((r) => r.data[0]) :
+            await this.repository.findMany(appendQueryConditions(decodeQuery(query, { schema: registrySchema, parameters: ['fields', 'relations'] }), eq('id', id))).then((r) => r.data[0]) :
             await this.repository.findOneById(id);
 
         if (!entity) {

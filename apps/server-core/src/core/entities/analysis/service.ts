@@ -31,6 +31,8 @@ import type { AnalysisBuilder } from '../../services/analysis-builder/index.ts';
 import type { AnalysisConfigurator } from '../../services/analysis-configurator/index.ts';
 import type { AnalysisDistributor } from '../../services/analysis-distributor/index.ts';
 import type { AnalysisStorageManager } from '../../services/analysis-storage-manager/index.ts';
+import { decodeQuery } from '../../query/index.ts';
+import { analysisSchema } from './schema.ts';
 import type { IAnalysisMetadataRecalculator, IAnalysisRepository, IAnalysisService } from './types.ts';
 
 type AnalysisServiceContext = {
@@ -89,7 +91,7 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
     }
 
     async getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<Analysis>> {
-        return this.repository.findMany(query);
+        return this.repository.findMany(decodeQuery(query, { schema: analysisSchema }));
     }
 
     async getOne(id: string): Promise<Analysis> {

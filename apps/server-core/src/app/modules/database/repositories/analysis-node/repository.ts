@@ -5,18 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { IQuery } from '@rapiq/core';
 import type { AnalysisNode } from '@privateaim/core-kit';
 import type { DataSource, Repository } from 'typeorm';
-import {
-    applyQuery,
-    validateEntityJoinColumns,
-} from 'typeorm-extension';
+import { validateEntityJoinColumns } from 'typeorm-extension';
 import { AnalysisNodeEntity } from '../../../../../adapters/database/entities/analysis-node.ts';
 import type {
     EntityPersistContext,
     EntityRepositoryFindManyResult,
 } from '@privateaim/server-kit';
 import type { IAnalysisNodeRepository } from '../../../../../core/entities/analysis-node/types.ts';
+import { applyQuery } from '../query.ts';
 
 export class AnalysisNodeRepositoryAdapter implements IAnalysisNodeRepository {
     protected dataSource: DataSource;
@@ -28,49 +27,11 @@ export class AnalysisNodeRepositoryAdapter implements IAnalysisNodeRepository {
         this.repository = dataSource.getRepository(AnalysisNodeEntity);
     }
 
-    async findMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<AnalysisNode>> {
+    async findMany(query: IQuery): Promise<EntityRepositoryFindManyResult<AnalysisNode>> {
         const qb = this.repository.createQueryBuilder('analysisNode');
         qb.groupBy('analysisNode.id');
 
-        const { pagination } = applyQuery(qb, query, {
-            defaultAlias: 'analysisNode',
-            filters: {
-                allowed: [
-                    'execution_status',
-                    'approval_status',
-                    'analysis_id',
-                    'analysis_realm_id',
-                    'analysis.id',
-                    'analysis.name',
-                    'analysis.display_name',
-                    'analysis.project_id',
-                    'node_id',
-                    'node_realm_id',
-                    'node.name',
-                    'node.realm_id',
-                ],
-            },
-            pagination: { maxLimit: 50 },
-            relations: {
-                allowed: ['node', 'analysis'],
-                onJoin: (_property, key, query) => {
-                    query.addGroupBy(`${key}.id`);
-                },
-            },
-            sort: {
-                allowed: [
-                    'created_at',
-                    'updated_at',
-                    'analysis.name',
-                    'analysis.display_name',
-                    'analysis.created_at',
-                    'analysis.updated_at',
-                    'node.name',
-                    'node.created_at',
-                    'node.updated_at',
-                ],
-            },
-        });
+        const { pagination } = applyQuery(qb, query);
 
         const [entities, total] = await qb.getManyAndCount();
 

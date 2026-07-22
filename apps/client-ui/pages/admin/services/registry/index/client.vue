@@ -21,7 +21,7 @@ export default defineNuxtComponent({
 
         try {
             const response = await injectHTTPClient().client.getMany({
-                filter: { name: ServiceID.REGISTRY },
+                filters: { name: ServiceID.REGISTRY },
                 fields: ['+secret'],
             });
 

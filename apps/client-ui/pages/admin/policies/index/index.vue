@@ -18,7 +18,7 @@ import {
 import type { Policy } from '@authup/core-kit';
 import { PermissionName } from '@authup/core-kit';
 import { FDisplayName } from '@privateaim/client-vue';
-import type { BuildInput } from 'rapiq';
+import type { QueryBuildInput } from '@rapiq/core';
 
 export default defineComponent({
     components: {
@@ -43,7 +43,7 @@ export default defineComponent({
         const store = injectStore();
         const { realmManagementId } = storeToRefs(store);
 
-        const query : BuildInput<Policy> = { filters: { realm_id: [realmManagementId.value, null] } };
+        const query : QueryBuildInput<Policy> = { filters: { realmId: [realmManagementId.value, null] } };
 
         const hasEditPermission = usePermissionCheck({ name: PermissionName.PERMISSION_UPDATE });
         const hasDropPermission = usePermissionCheck({ name: PermissionName.PERMISSION_DELETE });
@@ -119,14 +119,14 @@ export default defineComponent({
                 <template #cell-name="{ row }">
                     <FDisplayName
                         :name="row.name"
-                        :display-name="row.display_name"
+                        :display-name="row.displayName"
                     />
                 </template>
                 <template #cell-created_at="{ row }">
-                    <VCTimeago :datetime="row.created_at" />
+                    <VCTimeago :datetime="row.createdAt" />
                 </template>
                 <template #cell-updated_at="{ row }">
-                    <VCTimeago :datetime="row.updated_at" />
+                    <VCTimeago :datetime="row.updatedAt" />
                 </template>
                 <template #cell-options="{ row }">
                     <div class="flex items-center">
@@ -146,7 +146,7 @@ export default defineComponent({
                             :entity-id="row.id"
                             entity-type="policy"
                             :with-text="false"
-                            :disabled="row.built_in || !hasDropPermission"
+                            :disabled="row.builtIn || !hasDropPermission"
                             @deleted="props.deleted"
                         />
                     </div>

@@ -5,11 +5,20 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { PaginationParseOutput } from 'rapiq';
+import type { IQuery } from '@rapiq/core';
+
+/**
+ * The pagination actually applied to a list query — mirrors the
+ * pagination block a rapiq adapter reports back (limit/offset).
+ */
+export type EntityRepositoryPaginationMeta = {
+    limit?: number;
+    offset?: number;
+};
 
 export type EntityRepositoryFindManyResult<T> = {
     data: T[];
-    meta: PaginationParseOutput & {
+    meta: EntityRepositoryPaginationMeta & {
         total: number;
     };
 };
@@ -19,7 +28,7 @@ export type EntityPersistContext = {
 };
 
 export interface IEntityRepository<T> {
-    findMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<T>>;
+    findMany(query: IQuery): Promise<EntityRepositoryFindManyResult<T>>;
 
     findOneById(id: string): Promise<T | null>;
 

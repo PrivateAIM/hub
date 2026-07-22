@@ -7,7 +7,7 @@
 <script lang="ts">
 import type { Analysis, Project, ProjectNode } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
-import type { BuildInput } from 'rapiq';
+import type { QueryBuildInput } from '@rapiq/core';
 import { computed } from 'vue';
 import type { PropType } from 'vue';
 import {
@@ -55,7 +55,7 @@ export default defineNuxtComponent({
             ],
         });
 
-        const query = computed<BuildInput<Analysis>>(() => ({ filter: { project_id: props.entity.id } }));
+        const query = computed<QueryBuildInput<Analysis>>(() => ({ filters: { project_id: props.entity.id } }));
 
         return { query };
     },

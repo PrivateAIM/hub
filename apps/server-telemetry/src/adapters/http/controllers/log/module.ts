@@ -6,7 +6,7 @@
  */
 
 import { BadRequestError } from '@privateaim/errors';
-import { PermissionName, isObject } from '@privateaim/kit';
+import { PermissionName } from '@privateaim/kit';
 import type { Log, LogInput } from '@privateaim/telemetry-kit';
 import { LogValidator } from '@privateaim/telemetry-kit';
 import {
@@ -20,9 +20,9 @@ import {
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
 import { ForceLoggedInMiddleware, useRequestPermissionChecker } from '@privateaim/server-http-kit';
-import { parseQueryPagination } from 'rapiq';
 import type { IAppEvent } from 'routup';
 import type { LogStore } from '../../../../core/services/log-store/types.ts';
+import { collectRootFilterValues, decodeQueryOpen } from '../../../../core/query/index.ts';
 
 @DTags('logs')
 @DController('/logs')
@@ -62,26 +62,13 @@ export class LogController {
             ],
         });
 
+        const decoded = decodeQueryOpen(useRequestQuery(event));
+
         const labels: Record<string, string> = {};
-        const filtersRaw = useRequestQuery(event, 'filter');
-        if (isObject(filtersRaw)) {
-            const keys = Object.keys(filtersRaw);
-            for (const key of keys) {
-                const index = key.indexOf('.');
-
-                let nextKey : string;
-                if (index !== -1) {
-                    nextKey = key.substring(index + 1);
-                } else {
-                    nextKey = key;
-                }
-
-                if (typeof filtersRaw[key] === 'string') {
-                    labels[nextKey] = filtersRaw[key];
-                } else if (typeof filtersRaw[key] === 'number') {
-                    labels[nextKey] = `${filtersRaw[key]}`;
-                }
-            }
+        for (const [key, value] of Object.entries(collectRootFilterValues(decoded))) {
+            const index = key.indexOf('.');
+            const nextKey = index === -1 ? key : key.substring(index + 1);
+            labels[nextKey] = value;
         }
 
         const labelKeys = Object.keys(labels);
@@ -89,11 +76,10 @@ export class LogController {
             throw new BadRequestError('Filter labels must be specified.');
         }
 
-        const paginationRaw = useRequestQuery(event, 'pagination');
-        const pagination = parseQueryPagination(paginationRaw, { maxLimit: 100 });
-
-        const limit = pagination.limit || 100;
-        const offset = pagination.offset || 0;
+        const limit = decoded.pagination.limit && decoded.pagination.limit > 0 ?
+            Math.min(decoded.pagination.limit, 100) :
+            100;
+        const offset = decoded.pagination.offset || 0;
 
         const [entities, total] = await this.logStore.query({
             labels,
@@ -122,33 +108,19 @@ export class LogController {
         let start : number | undefined;
         const labels : Record<string, string> = {};
 
-        const raw = useRequestQuery(event, 'filter');
-        if (isObject(raw)) {
-            if (typeof raw.time !== 'undefined') {
-                const parsed = typeof raw.time === 'string' ? Number(raw.time) : raw.time;
-                if (typeof parsed !== 'number' || !Number.isFinite(parsed)) {
+        for (const [key, value] of Object.entries(collectRootFilterValues(decodeQueryOpen(useRequestQuery(event))))) {
+            if (key === 'time') {
+                const parsed = Number(value);
+                if (!Number.isFinite(parsed)) {
                     throw new BadRequestError('Filter time must be a finite unix timestamp.');
                 }
                 start = parsed;
+                continue;
             }
 
-            const keys = Object.keys(raw);
-            for (const key of keys) {
-                if (key === 'time') {
-                    continue;
-                }
-
-                const index = key.indexOf('.');
-                const nextKey = index === -1 ?
-                    key :
-                    key.substring(index + 1);
-
-                if (typeof raw[key] === 'string') {
-                    labels[nextKey] = raw[key];
-                } else if (typeof raw[key] === 'number') {
-                    labels[nextKey] = `${raw[key]}`;
-                }
-            }
+            const index = key.indexOf('.');
+            const nextKey = index === -1 ? key : key.substring(index + 1);
+            labels[nextKey] = value;
         }
 
         const labelKeys = Object.keys(labels);

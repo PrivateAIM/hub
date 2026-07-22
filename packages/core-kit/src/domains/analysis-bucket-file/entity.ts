@@ -8,7 +8,6 @@
 import type {
     Client, 
     Realm, 
-    Robot, 
     User,
 } from '@authup/core-kit';
 import type { AnalysisBucket } from '../analysis-bucket';
@@ -53,5 +52,5 @@ export interface AnalysisBucketFile {
 
     user_id: User['id'] | null;
 
-    robot_id: Robot['id'] | null;
+    robot_id: Client['id'] | null;
 }

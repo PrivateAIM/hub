@@ -23,7 +23,7 @@ import {
 import { FDisplayName } from '@privateaim/client-vue';
 import { VCButton } from '@vuecs/button';
 import { VCIcon } from '@vuecs/icon';
-import type { BuildInput } from 'rapiq';
+import type { QueryBuildInput } from '@rapiq/core';
 import { resolveComponent } from 'vue';
 import { defineNuxtComponent } from '#app';
 
@@ -50,7 +50,7 @@ export default defineNuxtComponent({
         const store = injectStore();
         const { realmManagementId } = storeToRefs(store);
 
-        const query : BuildInput<IdentityProvider> = { filter: { realm_id: [realmManagementId.value, null] } };
+        const query : QueryBuildInput<IdentityProvider> = { filters: { realmId: [realmManagementId.value, null] } };
 
         const hasEditPermission = usePermissionCheck({ name: PermissionName.IDENTITY_PROVIDER_UPDATE });
         const hasDropPermission = usePermissionCheck({ name: PermissionName.IDENTITY_PROVIDER_DELETE });
@@ -132,14 +132,14 @@ export default defineNuxtComponent({
                 <template #cell-name="{ row }">
                     <FDisplayName
                         :name="row.name"
-                        :display-name="row.display_name"
+                        :display-name="row.displayName"
                     />
                 </template>
                 <template #cell-created_at="{ row }">
-                    <VCTimeago :datetime="row.created_at" />
+                    <VCTimeago :datetime="row.createdAt" />
                 </template>
                 <template #cell-updated_at="{ row }">
-                    <VCTimeago :datetime="row.updated_at" />
+                    <VCTimeago :datetime="row.updatedAt" />
                 </template>
                 <template #cell-options="{ row }">
                     <div class="flex items-center">

@@ -6,6 +6,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
+import type { IQuery } from '@rapiq/core';
 import type {
     EntityPersistContext,
     EntityRepositoryFindManyResult,
@@ -15,16 +16,14 @@ import type {
 export class FakeEntityRepository<T extends Record<string, any>> implements IEntityRepository<T> {
     private store: T[] = [];
 
-    async findMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<T>> {
-        const limit = query?.page?.limit ?? 50;
-        const offset = query?.page?.offset ?? 0;
-
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    async findMany(query: IQuery): Promise<EntityRepositoryFindManyResult<T>> {
         return {
-            data: this.store.slice(offset, offset + limit),
+            data: [...this.store],
             meta: {
                 total: this.store.length,
-                limit,
-                offset,
+                offset: 0,
+                limit: 50,
             },
         };
     }

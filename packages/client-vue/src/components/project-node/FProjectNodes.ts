@@ -15,7 +15,7 @@ import {
     DomainType,
 } from '@privateaim/core-kit';
 import { buildDomainEventFullName, hasOwnProperty } from '@privateaim/kit';
-import type { RelationsBuildInput } from 'rapiq';
+import type { RelationsBuildInput } from '@rapiq/core';
 
 import type { PropType, SlotsType, VNodeChild } from 'vue';
 import { computed, defineComponent, h } from 'vue';
@@ -176,7 +176,7 @@ export default defineComponent({
                     include.push('project');
                 }
 
-                return { include: include as RelationsBuildInput<ProjectNode> };
+                return { relations: include as RelationsBuildInput<ProjectNode> };
             },
         });
 

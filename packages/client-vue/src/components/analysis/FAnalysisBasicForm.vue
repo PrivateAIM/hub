@@ -10,7 +10,7 @@ import type { Analysis, Project } from '@privateaim/core-kit';
 import { AnalysisValidator, DomainType } from '@privateaim/core-kit';
 import { ValidatorGroup, generateName } from '@privateaim/kit';
 import { useValidup } from '@validup/vue';
-import type { BuildInput } from 'rapiq';
+import type { QueryBuildInput } from '@rapiq/core';
 import type { PropType } from 'vue';
 import {
     computed,
@@ -59,7 +59,7 @@ export default defineComponent({
             description: '',
         });
 
-        const proposalQuery = computed<BuildInput<Project>>(() => ({ filters: { ...(props.realmId ? { realm_id: props.realmId } : {}) } }));
+        const proposalQuery = computed<QueryBuildInput<Project>>(() => ({ filters: { ...(props.realmId ? { realm_id: props.realmId } : {}) } }));
 
         const manager = createEntityManager({
             type: `${DomainType.ANALYSIS}`,

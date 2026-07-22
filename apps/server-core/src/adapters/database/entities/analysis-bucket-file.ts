@@ -9,7 +9,6 @@ import { dateToISOStringTransformer } from '@privateaim/server-db-kit';
 import type { 
     Client, 
     Realm, 
-    Robot, 
     User,  
 } from '@authup/core-kit';
 import type {
@@ -56,7 +55,7 @@ export class AnalysisBucketFileEntity implements AnalysisBucketFile {
     client_id: Client['id'] | null;
 
     @Column({ type: 'uuid', nullable: true })
-    robot_id: Robot['id'] | null;
+    robot_id: Client['id'] | null;
 
     @Column({ type: 'uuid', nullable: true })
     user_id: User['id'] | null;

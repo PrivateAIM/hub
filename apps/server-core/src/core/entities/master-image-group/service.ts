@@ -10,6 +10,8 @@ import { PermissionName } from '@privateaim/kit';
 import { EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
+import { decodeQuery } from '../../query/index.ts';
+import { masterImageGroupSchema } from './schema.ts';
 import type { IMasterImageGroupRepository, IMasterImageGroupService } from './types.ts';
 
 type MasterImageGroupServiceContext = {
@@ -25,7 +27,7 @@ export class MasterImageGroupService extends AbstractEntityService implements IM
     }
 
     async getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<MasterImageGroup>> {
-        return this.repository.findMany(query);
+        return this.repository.findMany(decodeQuery(query, { schema: masterImageGroupSchema }));
     }
 
     async getOne(id: string): Promise<MasterImageGroup> {

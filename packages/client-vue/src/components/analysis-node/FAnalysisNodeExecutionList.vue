@@ -7,7 +7,7 @@
 
 <script lang="ts">
 import type { Analysis, AnalysisNode } from '@privateaim/core-kit';
-import type { BuildInput } from 'rapiq';
+import type { QueryBuildInput } from '@rapiq/core';
 import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
 import { FProgressBar } from '../utility';
@@ -32,7 +32,7 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const query : BuildInput<AnalysisNode> = {
+        const query : QueryBuildInput<AnalysisNode> = {
             filters: { analysis_id: props.entity.id },
             sort: { node: { name: 'ASC' } },
         };

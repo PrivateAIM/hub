@@ -6,15 +6,14 @@
  */
 
 import { isUUID } from '@authup/kit';
+import type { IQuery } from '@rapiq/core';
 import type { Bucket } from '@privateaim/storage-kit';
 import type { DataSource, Repository } from 'typeorm';
-import {
-    applyQuery,
-    validateEntityJoinColumns,
-} from 'typeorm-extension';
+import { validateEntityJoinColumns } from 'typeorm-extension';
 import { BucketEntity } from '../../../../../adapters/database/entities/bucket.ts';
 import type { EntityPersistContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import type { IBucketRepository } from '../../../../../core/entities/index.ts';
+import { applyQuery } from '../query.ts';
 
 export class BucketRepositoryAdapter implements IBucketRepository {
     protected dataSource: DataSource;
@@ -26,28 +25,11 @@ export class BucketRepositoryAdapter implements IBucketRepository {
         this.repository = dataSource.getRepository(BucketEntity);
     }
 
-    async findMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<Bucket>> {
+    async findMany(query: IQuery): Promise<EntityRepositoryFindManyResult<Bucket>> {
         const qb = this.repository.createQueryBuilder('bucket');
         qb.groupBy('bucket.id');
 
-        const { pagination } = applyQuery(qb, query, {
-            defaultAlias: 'bucket',
-            fields: {
-                default: [
-                    'id',
-                    'name',
-                    'region',
-                    'created_at',
-                    'updated_at',
-                    'realm_id',
-                    'actor_id',
-                    'actor_type',
-                ],
-            },
-            filters: { allowed: ['id', 'name', 'realm_id', 'actor_type', 'actor_id'] },
-            pagination: { maxLimit: 50 },
-            sort: { allowed: ['id', 'updated_at', 'created_at'] },
-        });
+        const { pagination } = applyQuery(qb, query);
 
         const [entities, total] = await qb.getManyAndCount();
 

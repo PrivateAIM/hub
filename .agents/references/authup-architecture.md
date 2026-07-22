@@ -65,7 +65,10 @@ The base contract all entity repositories must implement:
 
 ```typescript
 export interface IEntityRepository<T> {
-    findMany(query: Record<string, any>): Promise<{ data: T[], meta: { total: number } }>;
+    // Since the rapiq v2 refactor (#1758) findMany takes the decoded rapiq IR
+    // (`IQuery` from `@rapiq/core`), not the raw wire record — services decode
+    // the wire query once (`decodeQuery` in `core/query/`) and pass the IR down.
+    findMany(query: IQuery): Promise<{ data: T[], meta: { total: number } }>;
     findOneById(id: string): Promise<T | null>;
     findOneByName?(name: string, realm?: string): Promise<T | null>;
     findOneByIdOrName(idOrName: string, realm?: string): Promise<T | null>;
@@ -111,8 +114,8 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
         validated.realm_id = validated.realm_id ?? this.getActorRealmId(actor);
         // 4. Validate join columns
         await this.repository.validateJoinColumns(validated);
-        // 5. Full permission evaluation
-        await actor.permissionEvaluator.evaluate({ name: ..., input: new PolicyData({ ... }) });
+        // 5. Full permission evaluation — the PolicyData bag is passed as `data`
+        await actor.permissionEvaluator.evaluate({ name: ..., data: new PolicyData({ ... }) });
         // 6. Uniqueness check
         await this.repository.checkUniqueness(validated);
         // 7. Create & save

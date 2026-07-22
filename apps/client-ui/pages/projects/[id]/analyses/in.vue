@@ -8,7 +8,7 @@
 import { injectStore, storeToRefs, usePermissionCheck } from '@authup/client-web-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { AnalysisNode, Project, ProjectNode } from '@privateaim/core-kit';
-import type { BuildInput } from 'rapiq';
+import type { QueryBuildInput } from '@rapiq/core';
 import { type PropType, defineComponent, ref } from 'vue';
 import {
     FAnalysisNodeInCard,
@@ -98,18 +98,17 @@ export default defineComponent({
 
         const canManage = usePermissionCheck({ name: PermissionName.ANALYSIS_APPROVE });
 
-        const query : BuildInput<AnalysisNode> = {
+        const query : QueryBuildInput<AnalysisNode> = {
             include: {
                 node: true,
                 analysis: true,
             },
-            filter: { analysis: { project_id: props.entity.id } },
+            filters: { analysis: { project_id: props.entity.id } },
             sort: { updated_at: 'DESC' },
         };
 
         const download = (item: AnalysisNode) => {
             if (typeof window !== 'undefined') {
-                // eslint-disable-next-line no-undef
                 window.open(api.analysis.getFileDownloadURL(item.analysis_id), '_blank');
             }
         };

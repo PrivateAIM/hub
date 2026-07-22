@@ -8,7 +8,7 @@
 import type {
     BucketFile,
 } from '@privateaim/storage-kit';
-import type { BuildInput } from 'rapiq';
+import type { QueryBuildInput } from '@rapiq/core';
 import type { PropType } from 'vue';
 import {
     defineComponent,
@@ -18,7 +18,7 @@ import type { ListMeta } from '../../core';
 import { injectStorageHTTPClient } from '../../core';
 
 export default defineComponent({
-    props: { query: { type: Object as PropType<BuildInput<BucketFile>> } },
+    props: { query: { type: Object as PropType<QueryBuildInput<BucketFile>> } },
     emits: ['deleted', 'failed', 'created'],
     setup(props, { emit, expose }) {
         const httpClient = injectStorageHTTPClient();
@@ -34,7 +34,7 @@ export default defineComponent({
 
         const data = ref<BucketFile[]>([]);
 
-        const resolve = async (query?: BuildInput<BucketFile>) => {
+        const resolve = async (query?: QueryBuildInput<BucketFile>) => {
             busy.value = true;
 
             const response = await httpClient.bucketFile.getMany(query);

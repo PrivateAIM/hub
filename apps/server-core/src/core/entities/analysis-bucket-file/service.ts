@@ -12,6 +12,8 @@ import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/s
 import { AbstractEntityService } from '@privateaim/server-kit';
 import type { IAnalysisBucketFileRepository, IAnalysisBucketFileService, IAnalysisFileMetadataRecalculator } from './types.ts';
 import { AnalysisBucketFileValidator } from '@privateaim/core-kit';
+import { decodeQuery } from '../../query/index.ts';
+import { analysisBucketFileSchema } from './schema.ts';
 
 type AnalysisBucketFileServiceContext = {
     repository: IAnalysisBucketFileRepository;
@@ -33,7 +35,7 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
     }
 
     async getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<AnalysisBucketFile>> {
-        return this.repository.findMany(query);
+        return this.repository.findMany(decodeQuery(query, { schema: analysisBucketFileSchema }));
     }
 
     async getOne(id: string): Promise<AnalysisBucketFile> {

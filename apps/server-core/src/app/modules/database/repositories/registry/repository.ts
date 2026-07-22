@@ -5,17 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { IQuery } from '@rapiq/core';
 import type { Registry } from '@privateaim/core-kit';
 import type { DataSource, Repository } from 'typeorm';
 import {
-    applyFilters,
-    applyPagination,
-    applyQueryFieldsParseOutput,
-    applySort,
     validateEntityJoinColumns,
 } from 'typeorm-extension';
-import type { ParseAllowedOption } from 'rapiq';
-import { parseQueryFields } from 'rapiq';
 import { RegistryEntity } from '../../../../../adapters/database/entities/registry.ts';
 import type {
     EntityPersistContext,
@@ -24,20 +19,7 @@ import type {
 import type {
     IRegistryRepository,
 } from '../../../../../core/index.ts';
-
-const DEFAULT_FIELDS: ParseAllowedOption<RegistryEntity> = [
-    'id',
-    'name',
-    'host',
-    'account_name',
-    'created_at',
-    'updated_at',
-];
-
-const ALLOWED_FIELDS: ParseAllowedOption<RegistryEntity> = [
-    ...DEFAULT_FIELDS,
-    'account_secret',
-];
+import { applyQuery } from '../query.ts';
 
 export class RegistryRepositoryAdapter implements IRegistryRepository {
     protected dataSource: DataSource;
@@ -49,36 +31,11 @@ export class RegistryRepositoryAdapter implements IRegistryRepository {
         this.repository = dataSource.getRepository(RegistryEntity);
     }
 
-    async findMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<Registry>> {
-        const {
-            filter,
-            page,
-            fields,
-            sort,
-        } = query;
-
+    async findMany(query: IQuery): Promise<EntityRepositoryFindManyResult<Registry>> {
         const qb = this.repository.createQueryBuilder('registry');
         qb.groupBy('registry.id');
 
-        const fieldsParsed = parseQueryFields<RegistryEntity>(fields, {
-            default: DEFAULT_FIELDS,
-            allowed: ALLOWED_FIELDS,
-            defaultPath: 'registry',
-        });
-
-        applyQueryFieldsParseOutput(qb, fieldsParsed, { defaultAlias: 'registry' });
-
-        applyFilters(qb, filter, {
-            defaultAlias: 'registry',
-            allowed: ['id', 'name'],
-        });
-
-        applySort(qb, sort, {
-            defaultAlias: 'registry',
-            allowed: ['id', 'updated_at', 'created_at'],
-        });
-
-        const pagination = applyPagination(qb, page, { maxLimit: 50 });
+        const { pagination } = applyQuery(qb, query);
 
         const [entities, total] = await qb.getManyAndCount();
 

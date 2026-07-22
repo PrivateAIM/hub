@@ -5,15 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { IQuery } from '@rapiq/core';
 import type { BucketFile } from '@privateaim/storage-kit';
 import type { DataSource, Repository } from 'typeorm';
-import {
-    applyQuery,
-    validateEntityJoinColumns,
-} from 'typeorm-extension';
+import { validateEntityJoinColumns } from 'typeorm-extension';
 import { BucketFileEntity } from '../../../../../adapters/database/entities/bucket-file.ts';
 import type { EntityPersistContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import type { IBucketFileRepository } from '../../../../../core/entities/index.ts';
+import { applyQuery } from '../query.ts';
 
 export class BucketFileRepositoryAdapter implements IBucketFileRepository {
     protected dataSource: DataSource;
@@ -25,48 +24,11 @@ export class BucketFileRepositoryAdapter implements IBucketFileRepository {
         this.repository = dataSource.getRepository(BucketFileEntity);
     }
 
-    async findMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<BucketFile>> {
+    async findMany(query: IQuery): Promise<EntityRepositoryFindManyResult<BucketFile>> {
         const qb = this.repository.createQueryBuilder('bucketFile');
         qb.groupBy('bucketFile.id');
 
-        const { pagination } = applyQuery(qb, query, {
-            defaultAlias: 'bucketFile',
-            fields: {
-                default: [
-                    'id',
-                    'name',
-                    'path',
-                    'directory',
-                    'size',
-                    'hash',
-                    'created_at',
-                    'updated_at',
-                    'realm_id',
-                    'actor_type',
-                    'actor_id',
-                    'bucket_id',
-                ],
-            },
-            relations: {
-                allowed: ['bucket'],
-                onJoin: (_property, key, query) => {
-                    query.addGroupBy(`${key}.id`);
-                },
-            },
-            filters: {
-                allowed: [
-                    'id',
-                    'name',
-                    'directory',
-                    'realm_id',
-                    'actor_type',
-                    'actor_id',
-                    'bucket_id',
-                ],
-            },
-            pagination: { maxLimit: 50 },
-            sort: { allowed: ['id', 'directory', 'name', 'updated_at', 'created_at'] },
-        });
+        const { pagination } = applyQuery(qb, query);
 
         const [entities, total] = await qb.getManyAndCount();
 

@@ -18,7 +18,7 @@ import {
     useTemplateRef,
     watch,
 } from 'vue';
-import type { BuildInput } from 'rapiq';
+import type { QueryBuildInput } from '@rapiq/core';
 import type { BucketFile } from '@privateaim/storage-kit';
 import { wrapFnWithBusyState } from '../../core';
 import FBucketFile from './FBucketFile.vue';
@@ -63,7 +63,7 @@ export default defineComponent({
         provide('files', selected);
 
         const vNode = useTemplateRef<typeof FBucketFiles>('bucketFiles');
-        const query = computed<BuildInput<BucketFile>>(() => ({ filters: { bucket_id: props.entityId } }));
+        const query = computed<QueryBuildInput<BucketFile>>(() => ({ filters: { bucket_id: props.entityId } }));
 
         const handleCreated = (entity: BucketFile) => {
             emit('created', entity);

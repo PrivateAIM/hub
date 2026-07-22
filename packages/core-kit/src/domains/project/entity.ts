@@ -8,7 +8,6 @@
 import type {
     Client, 
     Realm, 
-    Robot, 
     User,
 } from '@authup/core-kit';
 import type { MasterImage } from '../master-image';
@@ -47,7 +46,7 @@ export interface Project {
 
     client_id: Client['id'] | null;
 
-    robot_id: Robot['id'] | null;
+    robot_id: Client['id'] | null;
 
     user_id: User['id'] | null;
 

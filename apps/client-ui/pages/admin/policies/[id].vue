@@ -86,7 +86,7 @@ export default defineComponent({
             />
             <FDisplayName
                 :name="entity.name"
-                :display-name="entity.display_name"
+                :display-name="entity.displayName"
             />
             <span class="sub-title ms-1">
                 Details

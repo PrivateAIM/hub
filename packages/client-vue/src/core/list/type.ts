@@ -7,15 +7,14 @@
 
 import type { ObjectLiteralKeys } from '@privateaim/kit';
 import type {
-    BuildInput,
     FieldsBuildInput,
     FiltersBuildInput,
-    ObjectLiteral,
     PaginationBuildInput,
     Parameter,
+    QueryBuildInput,
     RelationsBuildInput,
-    SortBuildInput,
-} from 'rapiq';
+    SortsBuildInput,
+} from '@rapiq/core';
 import type {
     MaybeRef,
     Ref,
@@ -25,16 +24,16 @@ import type {
 import type { EntitySocketContext } from '../entity-socket';
 import type { EntityListSlotName } from './constants';
 
-type Entity<T> = T extends Record<string, any> ? T : never;
+type Entity<T> = T;
 
 export type ListMeta<T> = ObjectLiteralKeys<{
     total?: number,
     busy?: boolean,
     [Parameter.PAGINATION]?: PaginationBuildInput,
-    [Parameter.FILTERS]?: FiltersBuildInput<T extends ObjectLiteral ? T : never>,
-    [Parameter.SORT]?: SortBuildInput<T extends ObjectLiteral ? T : never>,
-    [Parameter.FIELDS]?: FieldsBuildInput<T extends ObjectLiteral ? T : never>,
-    [Parameter.RELATIONS]?: RelationsBuildInput<T extends ObjectLiteral ? T : never>
+    [Parameter.FILTERS]?: FiltersBuildInput<T>,
+    [Parameter.SORT]?: SortsBuildInput<T>,
+    [Parameter.FIELDS]?: FieldsBuildInput<T>,
+    [Parameter.RELATIONS]?: RelationsBuildInput<T>
 }>;
 
 export type ListLoadFn<M = any> = (meta?: M) => Promise<void>;
@@ -101,7 +100,7 @@ export type ListRenderOptions<T> = {
 
 export type ListProps<T> = {
     realmId?: string,
-    query?: BuildInput<Entity<T>>,
+    query?: QueryBuildInput<Entity<T>>,
     loadOnSetup?: boolean,
 } & ListRenderOptions<T>;
 
@@ -145,7 +144,7 @@ export type ListCreateContext<
     setup: SetupContext<ListEventsType<RECORD>>,
     props: ListProps<RECORD>,
     loadAll?: boolean,
-    query?: BuildInput<Entity<RECORD>> | (() => BuildInput<Entity<RECORD>>),
+    query?: QueryBuildInput<Entity<RECORD>> | (() => QueryBuildInput<Entity<RECORD>>),
     queryFilters?: ((data: FiltersBuildInput<Entity<RECORD>>) => void),
     onCreated?: (entity: RECORD, meta: ListMeta<RECORD>) => void | Promise<void>,
     onLoaded?: (meta: ListMeta<RECORD>) => void | Promise<void>,

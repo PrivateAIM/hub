@@ -8,7 +8,7 @@
 import { injectStore, storeToRefs, usePermissionCheck } from '@authup/client-web-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { AnalysisNode } from '@privateaim/core-kit';
-import type { BuildInput } from 'rapiq';
+import type { QueryBuildInput } from '@rapiq/core';
 import { ref } from 'vue';
 import {
     FAnalysisNodeInCard,
@@ -90,7 +90,7 @@ export default defineNuxtComponent({
 
         const canManage = usePermissionCheck({ name: PermissionName.ANALYSIS_APPROVE });
 
-        const query : BuildInput<AnalysisNode> = {
+        const query : QueryBuildInput<AnalysisNode> = {
             include: {
                 node: true,
                 analysis: true,
@@ -100,7 +100,6 @@ export default defineNuxtComponent({
 
         const download = (item: AnalysisNode) => {
             if (typeof window !== 'undefined') {
-                // eslint-disable-next-line no-undef
                 window.open(api.analysis.getFileDownloadURL(item.analysis_id), '_blank');
             }
         };

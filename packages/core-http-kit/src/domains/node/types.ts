@@ -13,7 +13,12 @@ export type NodeCreatePayload =    & Pick<Node, 'name'> &
 
 export type NodeUpdatePayload = Partial<NodeCreatePayload>;
 
-export type NodeClientCredentials = Pick<Client, 'id' | 'name' | 'display_name' | 'secret'>;
+export type NodeClientCredentials = {
+    id: Client['id'];
+    name: Client['name'];
+    display_name: Client['displayName'];
+    secret: Client['secret'];
+};
 
 export type NodeClientCredentialsUpdate = Partial<Pick<Client, 'secret' | 'name' | 'display_name'>>;
 
