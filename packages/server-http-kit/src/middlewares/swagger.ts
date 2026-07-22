@@ -7,7 +7,7 @@
 
 import path from 'node:path';
 import { swaggerUI } from '@routup/swagger-ui';
-import { loadSync } from 'locter';
+import { readSync } from 'locter';
 import process from 'node:process';
 import type { App } from 'routup';
 import type { MiddlewareSwaggerOptions } from './types';
@@ -15,9 +15,9 @@ import type { MiddlewareSwaggerOptions } from './types';
 export function mountSwaggerMiddleware(app: App, options: MiddlewareSwaggerOptions = {}) {
     let document : any;
     if (options.cwd) {
-        document = loadSync(path.join(options.cwd, 'swagger.json'));
+        document = readSync(path.join(options.cwd, 'swagger.json'));
     } else {
-        document = loadSync(path.join(process.cwd(), 'writable', 'swagger.json'));
+        document = readSync(path.join(process.cwd(), 'writable', 'swagger.json'));
     }
 
     app.use('/docs', swaggerUI(document, { baseURL: options.baseURL }));

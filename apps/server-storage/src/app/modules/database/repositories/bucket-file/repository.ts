@@ -84,7 +84,7 @@ export class BucketFileRepositoryAdapter implements IBucketFileRepository {
     }
 
     async findOneBy(where: Record<string, any>): Promise<BucketFile | null> {
-        return this.repository.findOne({ where, relations: ['bucket'] });
+        return this.repository.findOne({ where, relations: { bucket: true } });
     }
 
     async findManyBy(where: Record<string, any>): Promise<BucketFile[]> {

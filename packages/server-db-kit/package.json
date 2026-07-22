@@ -27,14 +27,14 @@
     },
     "devDependencies": {
         "cross-env": "^10.1.0",
-        "typeorm": "^0.3.29",
-        "typeorm-extension": "^3.9.0",
+        "typeorm": "^1.1.0",
+        "typeorm-extension": "^4.0.0-beta.1",
         "unplugin-swc": "^1.5.5",
         "vitest": "^4.1.9"
     },
     "peerDependencies": {
-        "typeorm": "^0.3.29",
-        "typeorm-extension": "^3.9.0"
+        "typeorm": "^1.1.0",
+        "typeorm-extension": "^4.0.0-beta.1"
     },
     "scripts": {
         "build": "rimraf ./dist && tsdown",

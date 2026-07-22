@@ -12,7 +12,7 @@ import {
     DGet,
     DTags,
 } from '@routup/decorators';
-import { load } from 'locter';
+import { read } from 'locter';
 
 type EndpointInfo = {
     version: string,
@@ -27,7 +27,7 @@ export class RootController {
     @DGet('/', [])
     async status(): Promise<EndpointInfo> {
         if (typeof info === 'undefined') {
-            const pkgJson = await load(path.join(process.cwd(), 'package.json'));
+            const pkgJson = await read(path.join(process.cwd(), 'package.json'));
             info = {
                 version: pkgJson.version,
                 timestamp: Date.now(),

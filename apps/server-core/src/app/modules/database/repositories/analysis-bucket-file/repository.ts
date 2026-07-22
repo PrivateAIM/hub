@@ -131,7 +131,7 @@ export class AnalysisBucketFileRepositoryAdapter implements IAnalysisBucketFileR
                 root: true,
                 analysis_bucket: { type: AnalysisBucketType.CODE },
             },
-            relations: ['analysis_bucket'],
+            relations: { analysis_bucket: true },
         });
     }
 
