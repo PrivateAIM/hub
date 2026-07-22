@@ -46,7 +46,7 @@ export default defineNuxtComponent({
         const store = injectStore();
         const { realmId } = storeToRefs(store);
 
-        const query = computed<QueryBuildInput<Analysis>>(() => ({ filters: { realm_id: realmId.value } }));
+        const query = computed<QueryBuildInput<Analysis, 3>>(() => ({ filters: { realm_id: realmId.value } }));
 
         return { query };
     },

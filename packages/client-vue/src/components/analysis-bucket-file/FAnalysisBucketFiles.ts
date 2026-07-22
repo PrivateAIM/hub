@@ -14,11 +14,6 @@ import { computed, defineComponent } from 'vue';
 import type { ListSlotsType } from '../../core';
 import { createList, defineListEvents, defineListProps } from '../../core';
 
-// NOTE: `vue-tsc` declaration emit currently trips TS7056 here — the
-// `QueryBuildInput<AnalysisBucketFile>` list prop expands over hub's cyclic
-// entity graph (analysis ↔ project ↔ node) into a type too large to
-// serialize. Tracked upstream: tada5hi/rapiq#821 (the runtime + JS build are
-// unaffected; only the .d.ts emit fails).
 const FAnalysisBucketFiles = defineComponent({
     props: {
         ...defineListProps<AnalysisBucketFile>(),

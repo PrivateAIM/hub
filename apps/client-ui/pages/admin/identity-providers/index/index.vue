@@ -23,7 +23,7 @@ import {
 import { FDisplayName } from '@privateaim/client-vue';
 import { VCButton } from '@vuecs/button';
 import { VCIcon } from '@vuecs/icon';
-import type { QueryBuildInput } from '@rapiq/core';
+import type { EntityListQueryInput } from '@authup/client-web-kit';
 import { resolveComponent } from 'vue';
 import { defineNuxtComponent } from '#app';
 
@@ -50,7 +50,7 @@ export default defineNuxtComponent({
         const store = injectStore();
         const { realmManagementId } = storeToRefs(store);
 
-        const query : QueryBuildInput<IdentityProvider> = { filters: { realmId: [realmManagementId.value, null] } };
+        const query : EntityListQueryInput<IdentityProvider> = { filters: { realmId: [realmManagementId.value, null] } };
 
         const hasEditPermission = usePermissionCheck({ name: PermissionName.IDENTITY_PROVIDER_UPDATE });
         const hasDropPermission = usePermissionCheck({ name: PermissionName.IDENTITY_PROVIDER_DELETE });

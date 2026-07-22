@@ -48,6 +48,8 @@ import type { DecodeQueryOptions } from './types.ts';
  */
 export const schemaRegistry = new SchemaRegistry();
 
+// Schema is invariant in its record type, so a heterogeneous registry of
+// Schema<Node> | Schema<Analysis> | ... can only be typed as Schema<any>[].
 const schemas: Schema<any>[] = [
     analysisSchema,
     analysisBucketSchema,

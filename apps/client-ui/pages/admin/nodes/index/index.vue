@@ -76,7 +76,7 @@ export default defineNuxtComponent({
         const canDrop = usePermissionCheck({ name: PermissionName.NODE_DELETE });
         const canView = computed(() => canEdit.value || canDrop.value);
 
-        const query = computed<QueryBuildInput<Node>>(() => ({
+        const query = computed<QueryBuildInput<Node, 3>>(() => ({
             filters: { realm_id: realmManagementId.value },
             sort: { updated_at: 'DESC' },
         }));

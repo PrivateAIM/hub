@@ -58,7 +58,7 @@ export default {
         const toast = useToast();
         const refs = toRefs(props);
 
-        const query : QueryBuildInput<RegistryProject> = {
+        const query : QueryBuildInput<RegistryProject, 3> = {
             filters: { registry_id: refs.entity.value.id },
             fields: ['+account_id', '+account_name', '+account_secret'],
         };

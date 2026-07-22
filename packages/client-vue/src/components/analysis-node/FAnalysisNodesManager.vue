@@ -28,10 +28,6 @@ import {
     getAnalysisNodeExecutionProgressColor,
 } from './utils';
 
-// NOTE: `vue-tsc` declaration emit currently trips TS7056 here — rendering
-// <FAnalysisNodes> pulls its `QueryBuildInput<AnalysisNode>` prop (expanded
-// over hub's cyclic entity graph) into this component's emitted type. Tracked
-// upstream: tada5hi/rapiq#821 (runtime + JS build unaffected; only .d.ts emit).
 export default defineComponent({
     components: {
         FAnalysisNodePicker,
@@ -68,9 +64,9 @@ export default defineComponent({
         const busy = ref<boolean>(false);
 
         const vNodes = useTemplateRef<typeof FAnalysisNodes>('analysisNodes');
-        const vNodesQuery : QueryBuildInput<AnalysisNode> = {
+        const vNodesQuery : QueryBuildInput<AnalysisNode, 3> = {
             filters: { analysis_id: props.entity.id },
-            sort: { node: { name: 'ASC' } },
+            sort: 'node.name',
         };
 
         const add = () => toggleModal();

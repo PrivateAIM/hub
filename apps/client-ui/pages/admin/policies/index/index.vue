@@ -18,7 +18,7 @@ import {
 import type { Policy } from '@authup/core-kit';
 import { PermissionName } from '@authup/core-kit';
 import { FDisplayName } from '@privateaim/client-vue';
-import type { QueryBuildInput } from '@rapiq/core';
+import type { EntityListQueryInput } from '@authup/client-web-kit';
 
 export default defineComponent({
     components: {
@@ -43,7 +43,7 @@ export default defineComponent({
         const store = injectStore();
         const { realmManagementId } = storeToRefs(store);
 
-        const query : QueryBuildInput<Policy> = { filters: { realmId: [realmManagementId.value, null] } };
+        const query : EntityListQueryInput<Policy> = { filters: { realmId: [realmManagementId.value, null] } };
 
         const hasEditPermission = usePermissionCheck({ name: PermissionName.PERMISSION_UPDATE });
         const hasDropPermission = usePermissionCheck({ name: PermissionName.PERMISSION_DELETE });

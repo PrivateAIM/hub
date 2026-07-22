@@ -26,14 +26,19 @@ import type { EntityListSlotName } from './constants';
 
 type Entity<T> = T;
 
+// All rapiq build-input surfaces are depth-bounded to 3 (matching
+// @authup/client-web-kit's QueryInput family). The library default (depth 5)
+// expands over hub's cyclic entity graph (analysis ↔ project ↔ node) into a
+// type too large for vue-tsc to serialize into the emitted .d.ts (TS7056).
+// UI queries never address more than three relation segments.
 export type ListMeta<T> = ObjectLiteralKeys<{
     total?: number,
     busy?: boolean,
     [Parameter.PAGINATION]?: PaginationBuildInput,
-    [Parameter.FILTERS]?: FiltersBuildInput<T>,
-    [Parameter.SORT]?: SortsBuildInput<T>,
-    [Parameter.FIELDS]?: FieldsBuildInput<T>,
-    [Parameter.RELATIONS]?: RelationsBuildInput<T>
+    [Parameter.FILTERS]?: FiltersBuildInput<T, 3>,
+    [Parameter.SORT]?: SortsBuildInput<T, 3>,
+    [Parameter.FIELDS]?: FieldsBuildInput<T, 3>,
+    [Parameter.RELATIONS]?: RelationsBuildInput<T, 3>
 }>;
 
 export type ListLoadFn<M = any> = (meta?: M) => Promise<void>;
@@ -100,7 +105,7 @@ export type ListRenderOptions<T> = {
 
 export type ListProps<T> = {
     realmId?: string,
-    query?: QueryBuildInput<Entity<T>>,
+    query?: QueryBuildInput<Entity<T>, 3>,
     loadOnSetup?: boolean,
 } & ListRenderOptions<T>;
 
@@ -144,8 +149,8 @@ export type ListCreateContext<
     setup: SetupContext<ListEventsType<RECORD>>,
     props: ListProps<RECORD>,
     loadAll?: boolean,
-    query?: QueryBuildInput<Entity<RECORD>> | (() => QueryBuildInput<Entity<RECORD>>),
-    queryFilters?: ((data: FiltersBuildInput<Entity<RECORD>>) => void),
+    query?: QueryBuildInput<Entity<RECORD>, 3> | (() => QueryBuildInput<Entity<RECORD>, 3>),
+    queryFilters?: ((data: FiltersBuildInput<Entity<RECORD>, 3>) => void),
     onCreated?: (entity: RECORD, meta: ListMeta<RECORD>) => void | Promise<void>,
     onLoaded?: (meta: ListMeta<RECORD>) => void | Promise<void>,
     socket?: boolean | Omit<EntitySocketContext<TYPE, RECORD>, 'type'>

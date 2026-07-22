@@ -70,9 +70,9 @@ export default defineComponent({
                     url: `${base}/users`, 
                 },
                 {
-                    name: 'Robots', 
-                    icon: 'fa6-solid:robot', 
-                    url: `${base}/robots`, 
+                    name: 'Clients',
+                    icon: 'fa6-solid:robot',
+                    url: `${base}/clients`,
                 },
                 {
                     name: 'Roles', 

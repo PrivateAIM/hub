@@ -41,12 +41,12 @@ export default defineNuxtComponent({
                 updateObjectProperties(entity.value, item);
             }
 
-            toast.show({ variant: 'success', body: 'The robot was successfully updated.' });
+            toast.show({ variant: 'success', body: 'The client was successfully updated.' });
         };
 
         return () => h(AClientForm, {
             name: ServiceID.REGISTRY,
-            realmId: entity.value?.realm_id,
+            realmId: entity.value?.realmId,
             entity: entity.value,
             onUpdated: (item) => {
                 handleUpdated(item);

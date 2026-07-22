@@ -20,7 +20,11 @@ export type NodeClientCredentials = {
     secret: Client['secret'];
 };
 
-export type NodeClientCredentialsUpdate = Partial<Pick<Client, 'secret' | 'name' | 'display_name'>>;
+export type NodeClientCredentialsUpdate = Partial<{
+    secret: Client['secret'];
+    name: Client['name'];
+    display_name: Client['displayName'];
+}>;
 
 export type NodeRegistryCredentials =    & Pick<Registry, 'host' | 'account_name' | 'account_secret'> &
     Pick<RegistryProject, 'external_name'>;

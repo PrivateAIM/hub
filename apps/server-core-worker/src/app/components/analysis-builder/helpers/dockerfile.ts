@@ -25,7 +25,7 @@ export async function generateDockerFileContent(
     ctx: { coreClient: CoreClient; storageClient: StorageClient },
 ) : Promise<string> {
     const { data: analysisBuckets } = await ctx.coreClient.analysisBucket.getMany({
-        filter: {
+        filters: {
             analysis_id: entity.id,
             type: AnalysisBucketType.CODE,
         },
@@ -36,7 +36,7 @@ export async function generateDockerFileContent(
     }
 
     const { data: analysisBucketFiles } = await ctx.coreClient.analysisBucketFile.getMany({
-        filter: {
+        filters: {
             root: true,
             analysis_bucket_id: analysisBucket.id,
         },

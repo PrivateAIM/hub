@@ -56,7 +56,9 @@
     },
     "scripts": {
         "dev": "ts-node src/index.ts",
-        "build": "rimraf ./dist && tsdown",
+        "build:js": "rimraf ./dist && tsdown",
+        "build:types": "tsc --noEmit -p tsconfig.build.json",
+        "build": "npm run build:js && npm run build:types",
         "start": "node dist/index.mjs"
     }
 }

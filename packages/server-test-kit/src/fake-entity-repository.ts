@@ -46,7 +46,7 @@ export class FakeEntityRepository<T extends Record<string, any>> implements IEnt
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
             ...data,
-        } as T;
+        } as Partial<T> as T;
     }
 
     merge(entity: T, data: Partial<T>): T {

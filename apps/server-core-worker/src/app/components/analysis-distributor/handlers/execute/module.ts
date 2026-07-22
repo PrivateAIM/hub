@@ -85,8 +85,8 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
         const registry = await this.coreClient.registry.getOne(analysis.registry_id, { fields: ['+account_secret'] });
 
         const analysisNodes = await getManyAll((page) => this.coreClient.analysisNode.getMany({
-            filter: { analysis_id: analysis.id },
-            page,
+            filters: { analysis_id: analysis.id },
+            pagination: page,
         }));
 
         if (analysisNodes.length === 0) {
@@ -95,9 +95,9 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
         }
 
         const nodes = await getManyAll((page) => this.coreClient.node.getMany({
-            filter: { id: analysisNodes.map((analysisNode) => analysisNode.node_id) },
+            filters: { id: analysisNodes.map((analysisNode) => analysisNode.node_id) },
             relations: { registry_project: true },
-            page,
+            pagination: page,
         }));
 
         // -----------------------------------------------------------------------------------

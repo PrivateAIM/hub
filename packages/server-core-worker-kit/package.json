@@ -22,7 +22,9 @@
         "url": "https://github.com/tada5hi"
     },
     "scripts": {
-        "build": "rimraf ./dist && tsdown",
+        "build:js": "rimraf ./dist && tsdown",
+        "build:types": "tsc --noEmit -p tsconfig.build.json",
+        "build": "npm run build:js && npm run build:types",
         "build-watch": "rimraf ./dist && tsc -p tsconfig.build.json --watch"
     },
     "dependencies": {

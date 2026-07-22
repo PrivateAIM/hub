@@ -1,11 +1,10 @@
 {
     "extends": "../../tsconfig.build.json",
+
     "compilerOptions": {
-        "outDir": "./dist",
-        "types": [
-            "node"
-        ]
+        "outDir": "./dist"
     },
+
     "include": [
         "src/**/*.ts"
     ]

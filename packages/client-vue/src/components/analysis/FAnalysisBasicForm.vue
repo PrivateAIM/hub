@@ -59,7 +59,7 @@ export default defineComponent({
             description: '',
         });
 
-        const proposalQuery = computed<QueryBuildInput<Project>>(() => ({ filters: { ...(props.realmId ? { realm_id: props.realmId } : {}) } }));
+        const proposalQuery = computed<QueryBuildInput<Project, 3>>(() => ({ filters: { ...(props.realmId ? { realm_id: props.realmId } : {}) } }));
 
         const manager = createEntityManager({
             type: `${DomainType.ANALYSIS}`,

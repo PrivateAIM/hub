@@ -22,7 +22,9 @@
     "license": "Apache-2.0",
     "description": "This package contains common constants, functions, types, ... for the server side.",
     "scripts": {
-        "build": "rimraf ./dist && tsdown",
+        "build:js": "rimraf ./dist && tsdown",
+        "build:types": "tsc --noEmit -p tsconfig.build.json",
+        "build": "npm run build:js && npm run build:types",
         "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts",
         "test:coverage": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts --coverage"
     },

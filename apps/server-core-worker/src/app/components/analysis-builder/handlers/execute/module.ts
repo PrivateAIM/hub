@@ -282,7 +282,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
 
         const analysisBucketFiles = await getManyAll((page) => this.coreClient.analysisBucketFile.getMany({
             filters: { analysis_bucket_id: analysisBucket.id },
-            page,
+            pagination: page,
         }));
 
         const webStream = await this.storageClient.bucket.stream(analysisBucket.bucket_id);

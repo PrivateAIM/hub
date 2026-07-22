@@ -9,7 +9,7 @@ import { injectStore, storeToRefs, usePermissionCheck } from '@authup/client-web
 import { PermissionName } from '@privateaim/kit';
 import type { AnalysisNode } from '@privateaim/core-kit';
 import type { QueryBuildInput } from '@rapiq/core';
-import { ref } from 'vue';
+import { useTemplateRef } from 'vue';
 import {
     FAnalysisNodeInCard,
     FAnalysisNodes,
@@ -90,8 +90,8 @@ export default defineNuxtComponent({
 
         const canManage = usePermissionCheck({ name: PermissionName.ANALYSIS_APPROVE });
 
-        const query : QueryBuildInput<AnalysisNode> = {
-            include: {
+        const query : QueryBuildInput<AnalysisNode, 3> = {
+            relations: {
                 node: true,
                 analysis: true,
             },
@@ -104,7 +104,7 @@ export default defineNuxtComponent({
             }
         };
 
-        const listNode = ref<null | typeof FAnalysisNodes>(null);
+        const listNode = useTemplateRef<typeof FAnalysisNodes>('listNode');
 
         const handleUpdated = (item: AnalysisNode) => {
             if (listNode.value) {
@@ -128,7 +128,7 @@ export default defineNuxtComponent({
     <div>
         <div class="m-t-10">
             <FAnalysisNodes
-                :ref="listNode"
+                ref="listNode"
                 :target="'analysis'"
                 :realm-id="realmId"
                 :direction="'in'"

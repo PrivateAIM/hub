@@ -176,7 +176,7 @@ export default defineComponent({
                     include.push('project');
                 }
 
-                return { relations: include as RelationsBuildInput<ProjectNode> };
+                return { relations: include as RelationsBuildInput<ProjectNode, 3> };
             },
         });
 

@@ -67,7 +67,7 @@
         "cli": "node dist/cli/index.mjs",
         "cli-dev": "ts-node src/cli/index.ts",
         "build:js": "tsdown",
-        "build:types": "tsc --emitDeclarationOnly -p tsconfig.build.json",
+        "build:types": "tsc --noEmit -p tsconfig.build.json",
         "build:swagger": "trapi generate",
         "build": "rimraf ./dist && npm run build:js && npm run build:types && npm run build:swagger",
         "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts",

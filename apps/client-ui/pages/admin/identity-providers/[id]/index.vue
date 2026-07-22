@@ -52,7 +52,7 @@ export default defineNuxtComponent({
     <AIdentityProviderOAuth2Form
         :api-url="apiUrl"
         :entity="entity"
-        :realm-id="entity.realm_id"
+        :realm-id="entity.realmId"
         @updated="handleUpdated"
         @failed="handleFailed"
     />

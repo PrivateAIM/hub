@@ -29,7 +29,13 @@ export function defineListEvents<T>() : ListEventsType<T> {
 export function defineListProps<T>() {
     return {
         query: {
-            type: Object as PropType<QueryBuildInput<T>>,
+            // Depth-bounded to 3 (matching @authup/client-web-kit's
+            // EntityListQueryInput): the library default (depth 5) expands
+            // QueryBuildInput over hub's cyclic entity graph
+            // (analysis ↔ project ↔ node) into a type too large for vue-tsc
+            // to serialize into the emitted .d.ts (TS7056). UI queries never
+            // address more than three relation segments.
+            type: Object as PropType<QueryBuildInput<T, 3>>,
             default() {
                 return {};
             },

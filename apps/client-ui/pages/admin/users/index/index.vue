@@ -18,7 +18,7 @@ import {
     storeToRefs,
     usePermissionCheck,
 } from '@authup/client-web-kit';
-import type { QueryBuildInput } from '@rapiq/core';
+import type { EntityListQueryInput } from '@authup/client-web-kit';
 import {
     FDisplayName,
     FPagination,
@@ -52,7 +52,7 @@ export default defineNuxtComponent({
         const store = injectStore();
         const { realmManagementId } = storeToRefs(store);
 
-        const query : QueryBuildInput<User> = { filters: { realmId: [realmManagementId.value, null] } };
+        const query : EntityListQueryInput<User> = { filters: { realmId: [realmManagementId.value, null] } };
 
         const hasEditPermission = usePermissionCheck({ name: PermissionName.USER_UPDATE });
         const hasDropPermission = usePermissionCheck({ name: PermissionName.USER_DELETE });

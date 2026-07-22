@@ -17,13 +17,13 @@ export class FakePermissionProvider implements IPermissionProvider {
         return {
             permission: {
                 name: criteria.name,
-                realm_id: criteria.realmId,
+                realmId: criteria.realmId,
             },
             // A single grant with no policy and the widest realm reach — an
             // unconditional allow. The evaluator short-circuits to granted for
             // any grant that carries no policy restriction.
             grants: [
-                { realm_scope: RealmScope.ANY },
+                { realmScope: RealmScope.ANY },
             ],
         };
     }

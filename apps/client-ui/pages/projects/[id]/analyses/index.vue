@@ -55,7 +55,7 @@ export default defineNuxtComponent({
             ],
         });
 
-        const query = computed<QueryBuildInput<Analysis>>(() => ({ filters: { project_id: props.entity.id } }));
+        const query = computed<QueryBuildInput<Analysis, 3>>(() => ({ filters: { project_id: props.entity.id } }));
 
         return { query };
     },

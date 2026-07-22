@@ -23,7 +23,9 @@
         "lint": "eslint --ext .ts src/",
         "lint:fix": "npm run lint -- --fix",
         "start": "node dist/index.mjs",
-        "build": "rimraf ./dist && tsdown",
+        "build:js": "rimraf ./dist && tsdown",
+        "build:types": "tsc --noEmit -p tsconfig.build.json",
+        "build": "npm run build:js && npm run build:types",
         "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts",
         "test:coverage": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts --coverage"
     },

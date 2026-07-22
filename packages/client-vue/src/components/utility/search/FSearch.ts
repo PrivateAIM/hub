@@ -17,7 +17,11 @@ export const FSearch = defineComponent({
         iconPosition: { type: String as PropType<'start' | 'end'> },
         iconClass: { type: String },
         busy: { type: Boolean },
-        load: { type: Function as PropType<ListLoadFn<ListMeta<any>>> },
+        // A generic utility renderer: it forwards whatever loader/meta the parent
+        // list produces. Pinning M here would make the prop invariant against the
+        // per-entity ListMeta<T> (rapiq's SortsBuildInput<T> is a literal union),
+        // so the loader stays parameter-generic.
+        load: { type: Function as PropType<ListLoadFn> },
         meta: { type: Object as PropType<ListMeta<any>> },
     },
     slots: Object as SlotsType<{

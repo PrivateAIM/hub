@@ -5,13 +5,13 @@
     "license": "Apache-2.0",
     "description": "This package contains vue components.",
     "module": "./dist/index.mjs",
-    "types": "./dist/index.d.mts",
+    "types": "./dist/index.d.ts",
     "style": "./dist/style.css",
     "exports": {
         "./package.json": "./package.json",
         "./dist/style.css": "./dist/style.css",
         ".": {
-            "types": "./dist/index.d.mts",
+            "types": "./dist/index.d.ts",
             "import": "./dist/index.mjs"
         }
     },
