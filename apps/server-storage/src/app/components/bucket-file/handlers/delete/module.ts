@@ -74,7 +74,7 @@ export class BucketFileDeleteHandler implements ComponentHandler<
         const repository = dataSource.getRepository(BucketFileEntity);
         const entity = await repository.findOne({
             where: { id: value.id },
-            relations: ['bucket'],
+            relations: { bucket: true },
         });
 
         if (!entity) {

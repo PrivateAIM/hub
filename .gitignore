@@ -104,3 +104,4 @@ apps/*/writable/swagger.json
 
 # SQLite test artifacts
 apps/*/db.sqlite
+apps/*/:memory:

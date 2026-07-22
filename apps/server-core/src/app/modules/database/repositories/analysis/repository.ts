@@ -135,7 +135,7 @@ export class AnalysisRepositoryAdapter implements IAnalysisRepository {
     }
 
     async findOneWithProject(id: string): Promise<Analysis | null> {
-        return this.repository.findOne({ where: { id }, relations: ['project'] });
+        return this.repository.findOne({ where: { id }, relations: { project: true } });
     }
 
     async countByProject(projectId: string): Promise<number> {

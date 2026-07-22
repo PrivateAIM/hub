@@ -46,6 +46,7 @@
         "*.{vue,js,ts}": "npm run lint:fix"
     },
     "overrides": {
+        "typeorm": "1.1.0",
         "vue": "3.5.39"
     }
 }

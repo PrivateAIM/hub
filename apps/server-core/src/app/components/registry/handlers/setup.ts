@@ -103,7 +103,7 @@ export class RegistrySetupHandler implements ComponentHandler<
 
         const entities = await projectRepository.find({
             where: { registry_id: entity.id },
-            select: ['id'],
+            select: { id: true },
         });
 
         for (const entity_ of entities) {

@@ -36,7 +36,7 @@ export async function handleAuthupRobotEvent(context: EventRecord<EntityType.ROB
     const dataSource = await useDataSource();
 
     const projectRepository = dataSource.getRepository(RegistryProjectEntity);
-    const projects = await projectRepository.find({ select: ['id'] });
+    const projects = await projectRepository.find({ select: { id: true } });
 
     if (!caller) {
         return;
