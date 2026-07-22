@@ -30,7 +30,7 @@
         "typeorm": "^1.1.0",
         "typeorm-extension": "^4.0.0-beta.1",
         "unplugin-swc": "^1.5.5",
-        "vitest": "^4.1.9"
+        "vitest": "^4.1.10"
     },
     "peerDependencies": {
         "typeorm": "^1.1.0",
