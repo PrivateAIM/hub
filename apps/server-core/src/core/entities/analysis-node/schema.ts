@@ -16,9 +16,9 @@ const schemaMapping = {
 export const analysisNodeSchema = defineSchema({
     name: DomainType.ANALYSIS_NODE,
     strict: true,
-    filters: { allowed: ['execution_status', 'approval_status', 'analysis_id', 'analysis_realm_id', 'analysis.id', 'analysis.name', 'analysis.display_name', 'analysis.project_id', 'node_id', 'node_realm_id', 'node.name', 'node.realm_id'] },
+    filters: { allowed: ['execution_status', 'approval_status', 'analysis_id', 'analysis_realm_id', 'node_id', 'node_realm_id'] },
     relations: { allowed: ['node', 'analysis'] },
-    sort: { allowed: ['created_at', 'updated_at', 'analysis.name', 'analysis.display_name', 'analysis.created_at', 'analysis.updated_at', 'node.name', 'node.created_at', 'node.updated_at'] },
+    sort: { allowed: ['created_at', 'updated_at'] },
     pagination: { maxLimit: 50 },
     schemaMapping,
 });
