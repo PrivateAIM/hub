@@ -16,7 +16,7 @@ import {
     VCListLoading,
 } from '@vuecs/list';
 import { VCIcon } from '@vuecs/icon';
-import type { BuildInput, FiltersBuildInput } from 'rapiq';
+import type { FiltersBuildInput, QueryBuildInput, SortsBuildInput } from '@rapiq/core';
 import type { Ref, VNodeArrayChildren, VNodeChild } from 'vue';
 import {
     Fragment,
@@ -51,7 +51,7 @@ import {
     mergeListOptions,
 } from './utils';
 
-type Entity<T> = T extends Record<string, any> ? T : never;
+type Entity<T> = T;
 
 const merger = createMerger({
     array: false,
@@ -91,7 +91,7 @@ export function createListRaw<
         domainAPI = client[context.type] as any;
     }
 
-    let query : BuildInput<Entity<RECORD>> | undefined;
+    let query : QueryBuildInput<Entity<RECORD>> | undefined;
 
     async function load(input: ListMeta<RECORD> = {}) {
         if (!domainAPI || busy.value) return;
@@ -136,7 +136,7 @@ export function createListRaw<
             );
 
             const response = await domainAPI.getMany(
-                nextQuery as BuildInput<Entity<RECORD>>,
+                nextQuery as QueryBuildInput<Entity<RECORD>>,
             );
 
             meta.value = nextQuery;
@@ -492,7 +492,9 @@ export function createListRaw<
 
             const isSorted = query &&
                 query.sort &&
-                isQuerySortedDescByDate(query.sort) &&
+                // query is build input here, so sort is always the build-input
+                // form (not an already-assembled ISorts node).
+                isQuerySortedDescByDate(query.sort as SortsBuildInput<RECORD>) &&
                 meta.value?.pagination?.offset === 0;
 
             if (isSorted) {

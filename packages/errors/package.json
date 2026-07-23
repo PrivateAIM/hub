@@ -17,7 +17,9 @@
         "dist"
     ],
     "scripts": {
-        "build": "rimraf ./dist && tsdown"
+        "build:js": "rimraf ./dist && tsdown",
+        "build:types": "tsc --noEmit -p tsconfig.build.json",
+        "build": "npm run build:js && npm run build:types"
     },
     "author": {
         "name": "Peter Placzek",

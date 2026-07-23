@@ -9,15 +9,9 @@ import type { AnalysisBucketFile } from '@privateaim/core-kit';
 import { AnalysisBucketType } from '@privateaim/core-kit';
 import type { DataSource, Repository } from 'typeorm';
 import {
-    applyFilters,
-    applyPagination,
-    applyQueryFieldsParseOutput,
-    applyRelations,
-    applySort,
     validateEntityJoinColumns,
 } from 'typeorm-extension';
-import type { ParseAllowedOption } from 'rapiq';
-import { parseQueryFields } from 'rapiq';
+import type { IQuery } from '@rapiq/core';
 import { AnalysisBucketFileEntity } from '../../../../../adapters/database/entities/analysis-bucket-file.ts';
 import type {
     EntityPersistContext,
@@ -26,22 +20,7 @@ import type {
 import type {
     IAnalysisBucketFileRepository,
 } from '../../../../../core/index.ts';
-
-const DEFAULT_FIELDS: ParseAllowedOption<AnalysisBucketFileEntity> = [
-    'id',
-    'path',
-    'root',
-    'bucket_id',
-    'bucket_file_id',
-    'client_id',
-    'robot_id',
-    'user_id',
-    'realm_id',
-    'analysis_id',
-    'analysis_bucket_id',
-    'created_at',
-    'updated_at',
-];
+import { applyQuery } from '../query.ts';
 
 export class AnalysisBucketFileRepositoryAdapter implements IAnalysisBucketFileRepository {
     protected dataSource: DataSource;
@@ -53,53 +32,11 @@ export class AnalysisBucketFileRepositoryAdapter implements IAnalysisBucketFileR
         this.repository = dataSource.getRepository(AnalysisBucketFileEntity);
     }
 
-    async findMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<AnalysisBucketFile>> {
-        const {
-            filter,
-            page,
-            fields,
-            include,
-            sort,
-        } = query;
-
+    async findMany(query: IQuery): Promise<EntityRepositoryFindManyResult<AnalysisBucketFile>> {
         const qb = this.repository.createQueryBuilder('analysisBucketFile');
         qb.groupBy('analysisBucketFile.id');
 
-        const fieldsParsed = parseQueryFields<AnalysisBucketFileEntity>(fields, {
-            default: DEFAULT_FIELDS,
-            defaultPath: 'analysisBucketFile',
-        });
-
-        applyQueryFieldsParseOutput(qb, fieldsParsed, { defaultAlias: 'analysisBucketFile' });
-
-        applyRelations(qb, include, {
-            defaultAlias: 'analysisBucketFile',
-            allowed: ['analysis', 'analysis_bucket'],
-            onJoin: (_property, key, query) => {
-                query.addGroupBy(`${key}.id`);
-            },
-        });
-
-        applySort(qb, sort, {
-            defaultAlias: 'analysisBucketFile',
-            allowed: ['path', 'created_at', 'updated_at'],
-        });
-
-        applyFilters(qb, filter, {
-            allowed: [
-                'path',
-                'root',
-                'analysis_bucket_id',
-                'analysis_id',
-                'analysis.id',
-                'analysis.name',
-                'analysis.display_name',
-                'analysis_bucket.type',
-            ],
-            defaultAlias: 'analysisBucketFile',
-        });
-
-        const pagination = applyPagination(qb, page, { maxLimit: 50 });
+        const { pagination } = applyQuery(qb, query);
 
         const [entities, total] = await qb.getManyAndCount();
 

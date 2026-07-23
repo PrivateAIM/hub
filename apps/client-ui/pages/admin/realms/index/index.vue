@@ -123,14 +123,14 @@ export default defineNuxtComponent({
                 <template #cell-name="{ row }">
                     <FDisplayName
                         :name="row.name"
-                        :display-name="row.display_name"
+                        :display-name="row.displayName"
                     />
                 </template>
                 <template #cell-created_at="{ row }">
-                    <VCTimeago :datetime="row.created_at" />
+                    <VCTimeago :datetime="row.createdAt" />
                 </template>
                 <template #cell-updated_at="{ row }">
-                    <VCTimeago :datetime="row.updated_at" />
+                    <VCTimeago :datetime="row.updatedAt" />
                 </template>
                 <template #cell-options="{ row }">
                     <div class="flex items-center">
@@ -161,7 +161,7 @@ export default defineNuxtComponent({
                             :entity-id="row.id"
                             entity-type="realm"
                             :with-text="false"
-                            :disabled="!row.built_in || !hasDropPermission"
+                            :disabled="!row.builtIn || !hasDropPermission"
                             @deleted="props.deleted"
                         />
                     </div>

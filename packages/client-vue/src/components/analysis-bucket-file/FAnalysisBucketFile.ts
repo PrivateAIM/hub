@@ -12,16 +12,23 @@ import {
 import {
     defineComponent,
 } from 'vue';
-import type { SlotsType } from 'vue';
+import type { PropType, SlotsType } from 'vue';
 import type { EntityManagerSlotsType } from '../../core';
 import {
     createEntityManager,
     defineEntityManagerEvents,
-    defineEntityManagerProps,
 } from '../../core';
 
 export default defineComponent({
-    props: defineEntityManagerProps<AnalysisBucketFile>(),
+    // AnalysisBucketFile is the deepest node in the cyclic entity graph
+    // (bucket-file → bucket → analysis → project → nodes → …); the generic
+    // defineEntityManagerProps query surfaces (even depth-bounded) blow past
+    // TS's union-representation limit (TS2590) for it. This component only ever
+    // resolves by entity/entityId, so declare just those.
+    props: {
+        entity: { type: Object as PropType<AnalysisBucketFile> },
+        entityId: { type: String },
+    },
     emits: defineEntityManagerEvents<AnalysisBucketFile>(),
     slots: Object as SlotsType<EntityManagerSlotsType<AnalysisBucketFile>>,
     async setup(props, setup) {

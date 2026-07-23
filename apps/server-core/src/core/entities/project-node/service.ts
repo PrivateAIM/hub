@@ -15,7 +15,9 @@ import {
 import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
+import { decodeQuery } from '../../query/index.ts';
 import type { IProjectRepository } from '../project/types.ts';
+import { projectNodeSchema } from './schema.ts';
 import type { IProjectNodeRepository, IProjectNodeService } from './types.ts';
 
 type ProjectNodeServiceContext = {
@@ -42,7 +44,7 @@ export class ProjectNodeService extends AbstractEntityService implements IProjec
     }
 
     async getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<ProjectNode>> {
-        return this.repository.findMany(query);
+        return this.repository.findMany(decodeQuery(query, { schema: projectNodeSchema }));
     }
 
     async getOne(id: string): Promise<ProjectNode> {

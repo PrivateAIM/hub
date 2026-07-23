@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { IQuery } from '@rapiq/core';
 import type { MasterImage } from '@privateaim/core-kit';
 import type { DataSource, Repository } from 'typeorm';
 import {
-    applyQuery,
     validateEntityJoinColumns,
 } from 'typeorm-extension';
 import { MasterImageEntity } from '../../../../../adapters/database/entities/master-image.ts';
@@ -19,6 +19,7 @@ import type {
 import type {
     IMasterImageRepository,
 } from '../../../../../core/index.ts';
+import { applyQuery } from '../query.ts';
 
 export class MasterImageRepositoryAdapter implements IMasterImageRepository {
     protected dataSource: DataSource;
@@ -30,16 +31,11 @@ export class MasterImageRepositoryAdapter implements IMasterImageRepository {
         this.repository = dataSource.getRepository(MasterImageEntity);
     }
 
-    async findMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<MasterImage>> {
+    async findMany(query: IQuery): Promise<EntityRepositoryFindManyResult<MasterImage>> {
         const qb = this.repository.createQueryBuilder('image');
         qb.groupBy('image.id');
 
-        const { pagination } = applyQuery(qb, query, {
-            defaultAlias: 'image',
-            filters: { allowed: ['id', 'name', 'path', 'virtual_path', 'group_virtual_path'] },
-            sort: { default: { path: 'ASC' } },
-            pagination: { maxLimit: 50 },
-        });
+        const { pagination } = applyQuery(qb, query);
 
         const [entities, total] = await qb.getManyAndCount();
 

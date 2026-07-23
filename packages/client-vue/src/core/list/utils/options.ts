@@ -30,7 +30,7 @@ function mergeListOption<T extends boolean | Record<string, any> | undefined>(
     return merge(primaryRecord, secondaryRecord) as T;
 }
 
-export function mergeListOptions<T>(
+export function mergeListOptions<T extends Record<string, any>>(
     props: ListProps<T>,
     defaults: Partial<ListRenderOptions<T>>,
 ) : ListRenderOptions<T> {

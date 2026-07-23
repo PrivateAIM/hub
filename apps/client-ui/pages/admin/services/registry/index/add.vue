@@ -19,7 +19,7 @@ export default defineNuxtComponent({
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.REQUIRED_PERMISSIONS]: [
-                PermissionName.ROBOT_CREATE,
+                PermissionName.CLIENT_CREATE,
             ],
         });
 

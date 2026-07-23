@@ -49,7 +49,7 @@ export default defineComponent({
 
         const canEdit = usePermissionCheck({ name: PermissionName.PROJECT_UPDATE });
 
-        const manager = createEntityManager<`${DomainType.PROJECT}`>({
+        const manager = createEntityManager<`${DomainType.PROJECT}`, Project>({
             type: `${DomainType.PROJECT}`,
             props: { entityId: useRoute().params.id as string },
             onUpdated() {
@@ -78,7 +78,7 @@ export default defineComponent({
 
         if (manager.data.value.realm_id !== store.realmId) {
             const response = await api.projectNode.getMany({
-                filter: {
+                filters: {
                     project_id: manager.data.value.id,
                     node_realm_id: store.realmId,
                 },

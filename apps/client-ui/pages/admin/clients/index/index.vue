@@ -12,12 +12,12 @@ import {
     usePermissionCheck,
 } from '@authup/client-web-kit';
 import type { Client } from '@authup/core-kit';
-import { PermissionName } from '@authup/core-kit';
+import { ClientAuthMethod, PermissionName } from '@authup/core-kit';
 import { FDisplayName } from '@privateaim/client-vue';
 import { VCButton } from '@vuecs/button';
 import { VCIcon } from '@vuecs/icon';
 
-import type { BuildInput } from 'rapiq';
+import type { EntityListQueryInput } from '@authup/client-web-kit';
 import { defineComponent, resolveComponent } from 'vue';
 
 export default defineComponent({
@@ -42,7 +42,7 @@ export default defineComponent({
         const store = injectStore();
         const { realmManagementId } = storeToRefs(store);
 
-        const query : BuildInput<Client> = { filters: { realm_id: [realmManagementId.value, null] } };
+        const query : EntityListQueryInput<Client> = { filters: { realmId: [realmManagementId.value, null] } };
 
         const hasEditPermission = usePermissionCheck({ name: PermissionName.CLIENT_UPDATE });
         const hasDropPermission = usePermissionCheck({ name: PermissionName.CLIENT_DELETE });
@@ -61,25 +61,25 @@ export default defineComponent({
                 cellClass: 'text-center',
             },
             {
-                key: 'is_confidential',
-                label: 'Confidential?',
+                key: 'authMethod',
+                label: 'Auth Method',
                 headerClass: 'text-center',
                 cellClass: 'text-center',
             },
             {
-                key: 'built_in',
+                key: 'builtIn',
                 label: 'Built in?',
                 headerClass: 'text-center',
                 cellClass: 'text-center',
             },
             {
-                key: 'created_at',
+                key: 'createdAt',
                 label: 'Created at',
                 headerClass: 'text-center',
                 cellClass: 'text-center',
             },
             {
-                key: 'updated_at',
+                key: 'updatedAt',
                 label: 'Updated at',
                 headerClass: 'text-left',
                 cellClass: 'text-left',
@@ -91,11 +91,25 @@ export default defineComponent({
             },
         ];
 
+        // authup dropped the Client.is_confidential flag; clients now carry an
+        // auth method (none/secret/tls) instead — mirror authup's client table.
+        const authMethodLabel = (method: `${ClientAuthMethod}`) => {
+            switch (method) {
+                case ClientAuthMethod.SECRET:
+                    return 'Secret';
+                case ClientAuthMethod.TLS:
+                    return 'TLS';
+                default:
+                    return 'None';
+            }
+        };
+
         return {
             columns,
             hasEditPermission,
             hasDropPermission,
             handleDeleted,
+            authMethodLabel,
             query,
             NuxtLink,
         };
@@ -130,7 +144,7 @@ export default defineComponent({
                 <template #cell-name="{ row }">
                     <FDisplayName
                         :name="row.name"
-                        :display-name="row.display_name"
+                        :display-name="row.displayName"
                     />
                 </template>
                 <template #cell-active="{ row }">
@@ -139,23 +153,20 @@ export default defineComponent({
                         :class="row.active ? 'text-success-600' : 'text-error-600'"
                     />
                 </template>
-                <template #cell-is_confidential="{ row }">
+                <template #cell-authMethod="{ row }">
+                    {{ authMethodLabel(row.authMethod) }}
+                </template>
+                <template #cell-builtIn="{ row }">
                     <VCIcon
-                        :name="row.is_confidential ? 'fa6-solid:check' : 'fa6-solid:xmark'"
-                        :class="row.is_confidential ? 'text-success-600' : 'text-error-600'"
+                        :name="row.builtIn ? 'fa6-solid:check' : 'fa6-solid:xmark'"
+                        :class="row.builtIn ? 'text-success-600' : 'text-error-600'"
                     />
                 </template>
-                <template #cell-built_in="{ row }">
-                    <VCIcon
-                        :name="row.built_in ? 'fa6-solid:check' : 'fa6-solid:xmark'"
-                        :class="row.built_in ? 'text-success-600' : 'text-error-600'"
-                    />
+                <template #cell-createdAt="{ row }">
+                    <VCTimeago :datetime="row.createdAt" />
                 </template>
-                <template #cell-created_at="{ row }">
-                    <VCTimeago :datetime="row.created_at" />
-                </template>
-                <template #cell-updated_at="{ row }">
-                    <VCTimeago :datetime="row.updated_at" />
+                <template #cell-updatedAt="{ row }">
+                    <VCTimeago :datetime="row.updatedAt" />
                 </template>
                 <template #cell-options="{ row }">
                     <div class="flex items-center">

@@ -39,7 +39,7 @@ export default defineComponent({
             <template v-if="data">
                 <FMasterImagePicker
                     :readonly="readonly || busy"
-                    :entity-id="data.master_image_id"
+                    :entity-id="data.master_image_id ?? undefined"
                     :entity="data.master_image"
                     @resolved="(value) => {
                         if(
@@ -56,7 +56,7 @@ export default defineComponent({
                             updated({
                                 ...data,
                                 master_image_id: value ? value.id : null,
-                                master_image: value
+                                master_image: value ?? data.master_image
                             })
                         }
                     }"

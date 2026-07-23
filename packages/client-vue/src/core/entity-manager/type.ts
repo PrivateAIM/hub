@@ -5,12 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { BuildInput, FieldsBuildInput, FiltersBuildInput } from 'rapiq';
+import type { FieldsBuildInput, FiltersBuildInput, QueryBuildInput } from '@rapiq/core';
 import type {
-    MaybeRef, 
-    Ref, 
-    SetupContext, 
-    SlotsType,
+    MaybeRef,
+    Ref,
+    SetupContext,
     VNodeChild,
 } from 'vue';
 import type { EntitySocketContext } from '../entity-socket';
@@ -26,13 +25,13 @@ type EntityID<T> = T extends EntityWithID ?
 
 export type EntityManagerRenderFn = () => VNodeChild;
 
-export type EntityManagerResolveContext<T> = {
+export type EntityManagerResolveContext<T extends Record<string, any>> = {
     id?: EntityID<T> | null,
     reset?: boolean,
-    query?: T extends Record<string, any> ? BuildInput<T> : never
+    query?: QueryBuildInput<T, 3>
 };
 
-export type EntityManager<T> = {
+export type EntityManager<T extends Record<string, any>> = {
     busy: Ref<boolean>,
     data: Ref<T | null>,
     error: Ref<Error | undefined>,
@@ -50,22 +49,22 @@ export type EntityManager<T> = {
     render(content?: VNodeChild | EntityManagerRenderFn) : VNodeChild;
 };
 
-export type EntityManagerProps<T> = {
+export type EntityManagerProps<T extends Record<string, any>> = {
     entity?: T,
     entityId?: EntityID<T>,
-    queryFilters?: T extends Record<string, any> ? FiltersBuildInput<T> : never,
-    queryFields?: T extends Record<string, any> ? FieldsBuildInput<T> : never,
-    query?: T extends Record<string, any> ? BuildInput<T> : never
+    queryFilters?: FiltersBuildInput<T, 3>,
+    queryFields?: FieldsBuildInput<T, 3>,
+    query?: QueryBuildInput<T, 3>
 };
 
-export type EntityManagerSlotProps<T> = {
+export type EntityManagerSlotProps<T extends Record<string, any>> = {
     [K in keyof EntityManager<T>]: EntityManager<T>[K] extends Ref<infer U> ?
         U :
         EntityManager<T>[K]
 };
 
-export type EntityManagerSlotsType<T> = {
-    default?: EntityManagerSlotProps<T>,
+export type EntityManagerSlotsType<T extends Record<string, any>> = {
+    default: EntityManagerSlotProps<T>,
     error?: Error
 };
 
@@ -82,7 +81,11 @@ export type EntityManagerContext<
     T extends Record<string, any>,
 > = {
     type: A,
-    setup?: Partial<SetupContext<EntityManagerEventsType<T>, SlotsType<EntityManagerSlotsType<T>>>>,
+    // The slots shape is intentionally left generic: base entity components
+    // pass a typed (required-default) setup context while higher-level ones
+    // pass Vue's generic InternalSlots — createEntityManager only forwards
+    // `setup` for emit + internal slot rendering, so it must accept both.
+    setup?: Partial<SetupContext<EntityManagerEventsType<T>>>,
     props?: EntityManagerProps<T>,
     realmId?: MaybeRef<string> | ((entity: T | undefined) => string | undefined),
     onResolved?(entity: T | null) : any,

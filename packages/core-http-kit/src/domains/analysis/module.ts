@@ -6,11 +6,10 @@
  */
 
 import type { RequestBaseOptions } from 'hapic';
-import type { BuildInput } from 'rapiq';
-import { buildQuery } from 'rapiq';
+import type { EntityQueryInput } from '../../utils';
+import { buildQueryString, nullifyEmptyObjectProperties  } from '../../utils';
 import type { Analysis, AnalysisCommand } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
-import { nullifyEmptyObjectProperties } from '../../utils';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
 import type { AnalysisCreatePayload, AnalysisUpdatePayload } from './types';
 
@@ -39,19 +38,19 @@ export class AnalysisAPI extends BaseAPI {
     }
 
     async getMany(
-        options?: BuildInput<Analysis>,
+        options?: EntityQueryInput<Analysis>,
     ): Promise<CollectionResourceResponse<Analysis>> {
-        const { data: response } = await this.client.get(`analyses${buildQuery(options)}`);
+        const { data: response } = await this.client.get(`analyses${buildQueryString(options)}`);
         return response;
     }
 
     async getOne(
         id: Analysis['id'],
-        options?: BuildInput<Analysis>,
+        options?: EntityQueryInput<Analysis>,
         requestConfig?: RequestBaseOptions,
     ): Promise<SingleResourceResponse<Analysis>> {
         const { data: response } = await this.client
-            .get(`analyses/${id}${buildQuery(options)}`, requestConfig);
+            .get(`analyses/${id}${buildQueryString(options)}`, requestConfig);
 
         return response;
     }

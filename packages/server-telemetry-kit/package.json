@@ -36,6 +36,8 @@
         "@privateaim/telemetry-kit": "^0.12.2"
     },
     "scripts": {
-        "build": "rimraf ./dist && tsdown"
+        "build:js": "rimraf ./dist && tsdown",
+        "build:types": "tsc --noEmit -p tsconfig.build.json",
+        "build": "npm run build:js && npm run build:types"
     }
 }

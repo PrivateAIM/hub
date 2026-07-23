@@ -5,18 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { IQuery } from '@rapiq/core';
 import type { ProjectNode } from '@privateaim/core-kit';
 import type { DataSource, Repository } from 'typeorm';
-import {
-    applyQuery,
-    validateEntityJoinColumns,
-} from 'typeorm-extension';
+import { validateEntityJoinColumns } from 'typeorm-extension';
 import { ProjectNodeEntity } from '../../../../../adapters/database/entities/project-node.ts';
 import type {
     EntityPersistContext,
     EntityRepositoryFindManyResult,
 } from '@privateaim/server-kit';
 import type { IProjectNodeRepository } from '../../../../../core/entities/project-node/types.ts';
+import { applyQuery } from '../query.ts';
 
 export class ProjectNodeRepositoryAdapter implements IProjectNodeRepository {
     protected dataSource: DataSource;
@@ -28,45 +27,11 @@ export class ProjectNodeRepositoryAdapter implements IProjectNodeRepository {
         this.repository = dataSource.getRepository(ProjectNodeEntity);
     }
 
-    async findMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<ProjectNode>> {
+    async findMany(query: IQuery): Promise<EntityRepositoryFindManyResult<ProjectNode>> {
         const qb = this.repository.createQueryBuilder('projectNode');
         qb.groupBy('projectNode.id');
 
-        const { pagination } = applyQuery(qb, query, {
-            defaultAlias: 'projectNode',
-            filters: {
-                allowed: [
-                    'project_realm_id',
-                    'project_id',
-                    'project.id',
-                    'project.name',
-                    'project.display_name',
-                    'node_realm_id',
-                    'node_id',
-                    'node.name',
-                ],
-            },
-            pagination: { maxLimit: 50 },
-            relations: {
-                allowed: ['node', 'project'],
-                onJoin: (_property, key, query) => {
-                    query.addGroupBy(`${key}.id`);
-                },
-            },
-            sort: {
-                allowed: [
-                    'created_at',
-                    'updated_at',
-                    'project.name',
-                    'project.display_name',
-                    'project.created_at',
-                    'project.updated_at',
-                    'node.name',
-                    'node.created_at',
-                    'node.updated_at',
-                ],
-            },
-        });
+        const { pagination } = applyQuery(qb, query);
 
         const [entities, total] = await qb.getManyAndCount();
 

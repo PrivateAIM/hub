@@ -8,7 +8,7 @@ import { DomainType } from '@privateaim/core-kit';
 import type {
     AnalysisBucketFile,
 } from '@privateaim/core-kit';
-import type { FiltersBuildInput } from 'rapiq';
+import type { FiltersBuildInput } from '@rapiq/core';
 import type { SlotsType } from 'vue';
 import { computed, defineComponent } from 'vue';
 import type { ListSlotsType } from '../../core';
@@ -27,13 +27,15 @@ const FAnalysisBucketFiles = defineComponent({
     setup(props, setup) {
         // todo: include sort
 
-        const filters = computed<FiltersBuildInput<AnalysisBucketFile>>(
+        const filters = computed<FiltersBuildInput<AnalysisBucketFile, 3>>(
             () => {
                 if (props.query) {
-                    return props.query.filters;
+                    // query.filters may be a compound ICondition; this list only
+                    // reads the flat build-input record form.
+                    return props.query.filters as FiltersBuildInput<AnalysisBucketFile, 3>;
                 }
 
-                return {} as FiltersBuildInput<AnalysisBucketFile>;
+                return {} as FiltersBuildInput<AnalysisBucketFile, 3>;
             },
         );
 

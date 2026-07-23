@@ -77,7 +77,7 @@ export default defineComponent({
          * runs in addition to the base ones.
          */
         class NodeFormValidator extends NodeValidator {
-            protected initialize() {
+            protected override initialize() {
                 super.initialize();
 
                 this.mount(
@@ -124,7 +124,7 @@ export default defineComponent({
         const updatedAt = useUpdatedAt(props.entity);
 
         const initForm = () => {
-            initFormAttributesFromSource(form, manager.data.value);
+            initFormAttributesFromSource(form, manager.data.value ?? undefined);
 
             if (!form.realm_id && props.realmId) {
                 form.realm_id = props.realmId;

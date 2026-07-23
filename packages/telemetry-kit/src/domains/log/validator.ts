@@ -12,7 +12,7 @@ import { LogChannel, LogLevel } from './constants';
 import type { LogInput } from './entity';
 
 export class LogValidator extends Container<LogInput> {
-    protected initialize() {
+    protected override initialize() {
         super.initialize();
 
         this.mount(

@@ -19,7 +19,6 @@ import type { MasterImage, Project } from '@privateaim/core-kit';
 import type {
     Client, 
     Realm, 
-    Robot, 
     User,
 } from '@authup/core-kit';
 import { MasterImageEntity } from './master-image.ts';
@@ -83,7 +82,7 @@ export class ProjectEntity implements Project {
     user_id: User['id'] | null;
 
     @Column({ type: 'uuid', nullable: true })
-    robot_id: Robot['id'] | null;
+    robot_id: Client['id'] | null;
 
     @Column({ nullable: true, default: null })
     master_image_id: MasterImage['id'] | null;

@@ -6,6 +6,7 @@
  */
 
 import type { Client, Permission } from '@authup/core-kit';
+import { ClientAuthMethod } from '@authup/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { AuthupClient, Logger } from '@privateaim/server-kit';
 import { isClientErrorWithStatusCode } from 'hapic';
@@ -64,8 +65,8 @@ export class AnalysisClientService {
         if (!client) {
             client = await this.authup.client.create({
                 name: entity.id,
-                realm_id: entity.realm_id,
-                is_confidential: true,
+                realmId: entity.realm_id,
+                authMethod: ClientAuthMethod.SECRET,
             });
 
             entity.client_id = client.id;
@@ -83,7 +84,7 @@ export class AnalysisClientService {
         const { data: clientPermissions } = await this.authup
             .clientPermission.getMany({
                 relations: { permission: true },
-                filter: { client_id: client.id },
+                filters: { clientId: client.id },
             });
 
         const permissionNamesAssigned = clientPermissions.map(
@@ -109,8 +110,8 @@ export class AnalysisClientService {
 
             if (permission) {
                 await this.authup.clientPermission.create({
-                    client_id: client.id,
-                    permission_id: permission.id,
+                    clientId: client.id,
+                    permissionId: permission.id,
                 });
             }
         }

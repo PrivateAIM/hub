@@ -13,7 +13,7 @@ import { z } from 'zod';
 import { ProcessStatus, ValidatorGroup } from '@privateaim/kit';
 
 export class AnalysisNodeValidator extends Container<AnalysisNode> {
-    protected initialize() {
+    protected override initialize() {
         super.initialize();
 
         this.mount(

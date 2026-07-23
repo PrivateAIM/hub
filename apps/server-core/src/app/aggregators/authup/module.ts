@@ -40,7 +40,7 @@ export function createAuthupAggregator(ctx: AuthupAggregatorContext) : Component
             redisSub.subscribe(
                 'realm',
                 'user',
-                'robot',
+                'client',
             );
 
             redisSub.on('message', async (channel, message) => {
@@ -52,7 +52,7 @@ export function createAuthupAggregator(ctx: AuthupAggregatorContext) : Component
                         await handleAuthupRealmEvent(event);
                         break;
                     }
-                    case EntityType.ROBOT: {
+                    case EntityType.CLIENT: {
                         await handleAuthupRobotEvent(event, ctx?.registryComponentCaller);
                         break;
                     }

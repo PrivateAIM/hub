@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { BuildInput, FieldsBuildInput, FiltersBuildInput } from 'rapiq';
+import type { FieldsBuildInput, FiltersBuildInput, QueryBuildInput } from '@rapiq/core';
 import { unref } from 'vue';
 import type { PropType } from 'vue';
 import type {
@@ -14,7 +14,7 @@ import type {
     EntityManagerSlotProps,
 } from './type';
 
-export function buildEntityManagerSlotProps<T>(
+export function buildEntityManagerSlotProps<T extends Record<string, any>>(
     input: EntityManager<T>,
 ) : EntityManagerSlotProps<T> {
     return {
@@ -41,12 +41,12 @@ export function defineEntityManagerEvents<T>(): EntityManagerEventsType<T> {
     };
 }
 
-export function defineEntityManagerProps<T>() {
+export function defineEntityManagerProps<T extends Record<string, any>>() {
     return {
         entity: { type: Object as PropType<T> },
         entityId: { type: String },
-        queryFilters: { type: Object as PropType<FiltersBuildInput<T extends Record<string, any> ? T : never>> },
-        queryFields: { type: Object as PropType<FieldsBuildInput<T extends Record<string, any> ? T : never>> },
-        query: { type: Object as PropType<T extends Record<string, any> ? BuildInput<T> : never> },
+        queryFilters: { type: Object as PropType<FiltersBuildInput<T, 3>> },
+        queryFields: { type: Object as PropType<FieldsBuildInput<T, 3>> },
+        query: { type: Object as PropType<QueryBuildInput<T, 3>> },
     };
 }

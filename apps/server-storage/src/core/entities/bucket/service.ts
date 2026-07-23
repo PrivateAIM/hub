@@ -6,13 +6,16 @@
  */
 
 import type { Bucket } from '@privateaim/storage-kit';
+import { eq } from '@rapiq/core';
 import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import { PermissionName, ValidatorGroup, isRealmResourceWritable  } from '@privateaim/kit';
 import { toBucketName } from '../../utils/bucket-name.ts';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
+import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
 import type { IBucketCaller, IBucketRepository, IBucketService } from './types.ts';
 import { BucketValidator } from '@privateaim/storage-kit';
+import { bucketSchema } from './schema.ts';
 import type { IStorageAdapter } from '../../storage/types.ts';
 
 type BucketServiceContext = {
@@ -39,12 +42,12 @@ export class BucketService extends AbstractEntityService implements IBucketServi
     }
 
     async getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<Bucket>> {
-        return this.repository.findMany(query);
+        return this.repository.findMany(decodeQuery(query, { schema: bucketSchema }));
     }
 
     async getOne(id: string, query?: Record<string, any>): Promise<Bucket> {
         const entity = query ?
-            await this.repository.findMany({ ...query, filter: { id } }).then((r) => r.data[0]) :
+            await this.repository.findMany(appendQueryConditions(decodeQuery(query, { schema: bucketSchema, parameters: ['fields', 'relations'] }), eq('id', id))).then((r) => r.data[0]) :
             await this.repository.findOneByIdOrName(id);
 
         if (!entity) {

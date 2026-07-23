@@ -13,12 +13,13 @@ import {
 } from './constants';
 import type { MessageSealInput, OpenMessageContext, SealMessageContext } from './types';
 
-function toBytes(input: MessageSealInput): Uint8Array {
+function toBytes(input: MessageSealInput): Uint8Array<ArrayBuffer> {
     if (typeof input === 'string') {
         return new TextEncoder().encode(input);
     }
     if (ArrayBuffer.isView(input)) {
-        return new Uint8Array(input.buffer, input.byteOffset, input.byteLength);
+        // These crypto payloads are never backed by a SharedArrayBuffer.
+        return new Uint8Array(input.buffer as ArrayBuffer, input.byteOffset, input.byteLength);
     }
     return new Uint8Array(input);
 }
@@ -32,7 +33,7 @@ function bytesToBase64(bytes: Uint8Array): string {
     return btoa(binary);
 }
 
-function base64ToBytes(base64: string): Uint8Array {
+function base64ToBytes(base64: string): Uint8Array<ArrayBuffer> {
     const binary = atob(base64);
     const bytes = new Uint8Array(binary.length);
     for (let i = 0; i < binary.length; i++) {
@@ -62,8 +63,8 @@ function curveBitLength(key: CryptoKey): number {
 async function deriveMessageKey(
     privateKey: CryptoKey,
     publicKey: CryptoKey,
-    salt: Uint8Array,
-    info: Uint8Array,
+    salt: Uint8Array<ArrayBuffer>,
+    info: Uint8Array<ArrayBuffer>,
     usage: KeyUsage,
 ): Promise<CryptoKey> {
     const sharedSecret = await crypto.subtle.deriveBits(

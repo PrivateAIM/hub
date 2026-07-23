@@ -6,6 +6,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
+import { ClientAuthMethod } from '@authup/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { AuthupClient } from '@privateaim/server-kit';
 import { describe, expect, it } from 'vitest';
@@ -116,8 +117,8 @@ describe('AnalysisClientService', () => {
             expect(authup.createdClients).toHaveLength(1);
             expect(authup.createdClients[0]).toMatchObject({
                 name: entity.id,
-                realm_id: entity.realm_id,
-                is_confidential: true,
+                realmId: entity.realm_id,
+                authMethod: ClientAuthMethod.SECRET,
             });
             expect(client.id).toBe('client-1');
             expect(entity.client_id).toBe('client-1');
@@ -171,7 +172,7 @@ describe('AnalysisClientService', () => {
 
             await service.assignDefaultPermissions({ id: 'client-1' } as any);
 
-            const created = authup.createdClientPermissions.map((cp) => cp.permission_id);
+            const created = authup.createdClientPermissions.map((cp) => cp.permissionId);
             expect(created).toContain(`perm-${PermissionName.ANALYSIS_SELF_STORAGE_USE}`);
             expect(created).toContain(`perm-${PermissionName.ANALYSIS_SELF_MESSAGE_BROKER_USE}`);
             expect(authup.createdClientPermissions).toHaveLength(2);
@@ -192,7 +193,7 @@ describe('AnalysisClientService', () => {
             await service.assignDefaultPermissions({ id: 'client-1' } as any);
 
             expect(authup.createdClientPermissions).toHaveLength(1);
-            expect(authup.createdClientPermissions[0].permission_id).toBe(`perm-${PermissionName.ANALYSIS_SELF_MESSAGE_BROKER_USE}`);
+            expect(authup.createdClientPermissions[0].permissionId).toBe(`perm-${PermissionName.ANALYSIS_SELF_MESSAGE_BROKER_USE}`);
             expect(authup.deletedClientPermissionIds).toHaveLength(0);
         });
     });

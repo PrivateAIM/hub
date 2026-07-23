@@ -36,16 +36,16 @@ export default defineComponent({
         const masterImageManager = createEntityManager({
             type: DomainType.MASTER_IMAGE,
             props: {
-                entityId: props.masterImageId,
-                entity: props.masterImage,
+                entityId: props.masterImageId ?? undefined,
+                entity: props.masterImage ?? undefined,
             },
         });
 
         const analysisBucketFileManager = createEntityManager({
             type: DomainType.ANALYSIS_BUCKET_FILE,
             props: {
-                entityId: props.analysisFileId,
-                entity: props.analysisFile,
+                entityId: props.analysisFileId ?? undefined,
+                entity: props.analysisFile ?? undefined,
             },
             onResolved: (entity) => {
                 setup.emit('analysisBucketFileResolved', entity);
@@ -55,7 +55,10 @@ export default defineComponent({
         const analysisManager = createEntityManager({
             type: DomainType.ANALYSIS,
             setup,
-            props,
+            props: {
+                entityId: props.entityId ?? undefined,
+                entity: props.entity ?? undefined,
+            },
             onResolved: (entity) => {
                 if (entity) {
                     if (entity.master_image) {

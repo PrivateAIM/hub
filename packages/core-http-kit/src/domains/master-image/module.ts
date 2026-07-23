@@ -5,24 +5,24 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { BuildInput } from 'rapiq';
-import { buildQuery } from 'rapiq';
+import type { EntityQueryInput } from '../../utils';
+import { buildQueryString } from '../../utils';
 
 import type { MasterImage, MasterImageCommand } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
 
 export class MasterImageAPI extends BaseAPI {
-    async getMany(data?: BuildInput<MasterImage>): Promise<CollectionResourceResponse<MasterImage>> {
-        const response = await this.client.get(`master-images${buildQuery(data)}`);
+    async getMany(data?: EntityQueryInput<MasterImage>): Promise<CollectionResourceResponse<MasterImage>> {
+        const response = await this.client.get(`master-images${buildQueryString(data)}`);
         return response.data;
     }
 
     async getOne(
         id: MasterImage['id'],
-        data?: BuildInput<MasterImage>,
+        data?: EntityQueryInput<MasterImage>,
     ): Promise<SingleResourceResponse<MasterImage>> {
-        const response = await this.client.get(`master-images/${id}${buildQuery(data)}`);
+        const response = await this.client.get(`master-images/${id}${buildQueryString(data)}`);
         return response.data;
     }
 

@@ -15,8 +15,11 @@ import {
 import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
+import { eq } from '@rapiq/core';
+import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
 import type { IRegistryManager } from '../node/types.ts';
 import type { IRegistryProjectRepository, IRegistryProjectService } from './types.ts';
+import { registryProjectSchema } from './schema.ts';
 import { RegistryProjectValidator } from '@privateaim/core-kit';
 
 type RegistryProjectServiceContext = {
@@ -43,7 +46,7 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
     }
 
     async getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<RegistryProject>> {
-        const result = await this.repository.findMany(query);
+        const result = await this.repository.findMany(decodeQuery(query, { schema: registryProjectSchema }));
 
         if (result.data.some((e) => this.hasSecretField(e))) {
             await this.checkSecretFieldAccess(result.data, actor);
@@ -54,7 +57,7 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
 
     async getOne(id: string, actor: ActorContext, query?: Record<string, any>): Promise<RegistryProject> {
         const entity = query ?
-            await this.repository.findMany({ ...query, filter: { id } }).then((r) => r.data[0]) :
+            await this.repository.findMany(appendQueryConditions(decodeQuery(query, { schema: registryProjectSchema, parameters: ['fields', 'relations'] }), eq('id', id))).then((r) => r.data[0]) :
             await this.repository.findOneById(id);
 
         if (!entity) {

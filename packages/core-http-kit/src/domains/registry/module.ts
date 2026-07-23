@@ -5,23 +5,22 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { BuildInput } from 'rapiq';
-import { buildQuery } from 'rapiq';
+import type { EntityQueryInput } from '../../utils';
+import { buildQueryString, nullifyEmptyObjectProperties  } from '../../utils';
 import type { Registry } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
-import { nullifyEmptyObjectProperties } from '../../utils';
 import type { RegistryCreatePayload, RegistryUpdatePayload } from './types';
 
 export class RegistryAPI extends BaseAPI {
-    async getMany(options?: BuildInput<Registry>): Promise<CollectionResourceResponse<Registry>> {
-        const response = await this.client.get(`registries${buildQuery(options)}`);
+    async getMany(options?: EntityQueryInput<Registry>): Promise<CollectionResourceResponse<Registry>> {
+        const response = await this.client.get(`registries${buildQueryString(options)}`);
 
         return response.data;
     }
 
-    async getOne(id: Registry['id'], options?: BuildInput<Registry>): Promise<SingleResourceResponse<Registry>> {
-        const response = await this.client.get(`registries/${id}${buildQuery(options)}`);
+    async getOne(id: Registry['id'], options?: EntityQueryInput<Registry>): Promise<SingleResourceResponse<Registry>> {
+        const response = await this.client.get(`registries/${id}${buildQueryString(options)}`);
 
         return response.data;
     }

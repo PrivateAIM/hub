@@ -109,7 +109,7 @@ const FProjectForm = defineComponent({
 
         watch(updatedAt, (val, oldVal) => {
             if (val && val !== oldVal) {
-                manager.data.value = props.entity;
+                manager.data.value = props.entity ?? null;
 
                 initFromProperties();
             }
@@ -137,9 +137,14 @@ const FProjectForm = defineComponent({
 
             if (!existed && manager.data.value) {
                 for (let i = 0; i < nodeIds.value.length; i++) {
+                    const nodeId = nodeIds.value[i];
+                    if (!nodeId) {
+                        continue;
+                    }
+
                     await apiClient.projectNode.create({
                         project_id: manager.data.value.id,
-                        node_id: nodeIds.value[i],
+                        node_id: nodeId,
                     });
                 }
             }
@@ -213,8 +218,8 @@ const FProjectForm = defineComponent({
 
             const masterImagePicker = h(FMasterImagePicker, {
                 entityId: form.master_image_id,
-                onResolved(value: MasterImage | null) {
-                    handleMasterImagePicker(value);
+                onResolved(value?: MasterImage) {
+                    handleMasterImagePicker(value ?? null);
                 },
             });
 

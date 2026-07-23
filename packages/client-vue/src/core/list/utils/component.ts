@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { BuildInput } from 'rapiq';
+import type { QueryBuildInput } from '@rapiq/core';
 import type { PropType } from 'vue';
 import type {
     ListBodyOptions,
@@ -26,10 +26,16 @@ export function defineListEvents<T>() : ListEventsType<T> {
         updated: (_item: T) => true,
     };
 }
-export function defineListProps<T>() {
+export function defineListProps<T extends Record<string, any>>() {
     return {
         query: {
-            type: Object as PropType<BuildInput<T extends Record<string, any> ? T : never>>,
+            // Depth-bounded to 3 (matching @authup/client-web-kit's
+            // EntityListQueryInput): the library default (depth 5) expands
+            // QueryBuildInput over hub's cyclic entity graph
+            // (analysis ↔ project ↔ node) into a type too large for vue-tsc
+            // to serialize into the emitted .d.ts (TS7056). UI queries never
+            // address more than three relation segments.
+            type: Object as PropType<QueryBuildInput<T, 3>>,
             default() {
                 return {};
             },

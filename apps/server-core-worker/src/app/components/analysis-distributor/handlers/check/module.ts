@@ -86,8 +86,8 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
         // -----------------------------------------------------------------------------------
 
         const analysisNodes = await getManyAll((page) => this.coreClient.analysisNode.getMany({
-            filter: { analysis_id: analysis.id },
-            page,
+            filters: { analysis_id: analysis.id },
+            pagination: page,
         }));
 
         if (analysisNodes.length === 0) {
@@ -100,9 +100,9 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
         }
 
         const nodes = await getManyAll((page) => this.coreClient.node.getMany({
-            filter: { id: analysisNodes.map((analysisNode) => analysisNode.node_id) },
+            filters: { id: analysisNodes.map((analysisNode) => analysisNode.node_id) },
             relations: { registry_project: true },
-            page,
+            pagination: page,
         }));
 
         if (nodes.length === 0) {

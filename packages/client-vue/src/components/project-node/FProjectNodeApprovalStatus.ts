@@ -12,7 +12,7 @@ import { hasNormalizedSlot, normalizeSlot, resolveTextColorClass } from '../../c
 const FProjectNodeApprovalStatus = defineComponent({
     props: {
         status: {
-            type: String as PropType<ProjectNodeApprovalStatus>,
+            type: String as PropType<ProjectNodeApprovalStatus | null>,
             default: undefined,
         },
     },

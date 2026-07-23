@@ -20,7 +20,7 @@ import type { Node, Registry, RegistryProject } from '@privateaim/core-kit';
 import {
     NodeType,
 } from '@privateaim/core-kit';
-import type { Client, Realm, Robot } from '@authup/core-kit';
+import type { Client, Realm } from '@authup/core-kit';
 import { RegistryProjectEntity } from './registry-project.ts';
 import { RegistryEntity } from './registry.ts';
 
@@ -81,7 +81,7 @@ export class NodeEntity implements Node {
     client_id: Client['id'] | null;
 
     @Column({ type: 'uuid', nullable: true })
-    robot_id: Robot['id'] | null;
+    robot_id: Client['id'] | null;
 
     @Column({ type: 'uuid' })
     realm_id: Realm['id'];

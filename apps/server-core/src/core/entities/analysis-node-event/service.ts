@@ -9,6 +9,8 @@ import type { AnalysisNodeEvent } from '@privateaim/core-kit';
 import { EntityNotFoundError } from '@privateaim/errors';
 import type { EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
+import { decodeQuery } from '../../query/index.ts';
+import { analysisNodeEventSchema } from './schema.ts';
 import type { IAnalysisNodeEventRepository, IAnalysisNodeEventService } from './types.ts';
 
 type AnalysisNodeEventServiceContext = {
@@ -24,7 +26,7 @@ export class AnalysisNodeEventService extends AbstractEntityService implements I
     }
 
     async getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<AnalysisNodeEvent>> {
-        return this.repository.findMany(query);
+        return this.repository.findMany(decodeQuery(query, { schema: analysisNodeEventSchema }));
     }
 
     async getOne(id: string): Promise<AnalysisNodeEvent> {

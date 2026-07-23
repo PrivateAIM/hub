@@ -13,7 +13,7 @@ import { z } from 'zod';
 import { ValidatorGroup } from '@privateaim/kit';
 
 export class ProjectNodeValidator extends Container<ProjectNode> {
-    protected initialize() {
+    protected override initialize() {
         super.initialize();
 
         this.mount(

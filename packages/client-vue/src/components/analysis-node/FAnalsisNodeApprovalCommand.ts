@@ -18,7 +18,7 @@ const FAnalysisNodeApprovalCommand = defineComponent({
             type: String,
             required: true,
         },
-        approvalStatus: String as PropType<`${AnalysisNodeApprovalStatus}`>,
+        approvalStatus: String as PropType<AnalysisNodeApprovalStatus | null>,
 
         command: {
             type: String as PropType<`${AnalysisNodeApprovalCommand}`>,

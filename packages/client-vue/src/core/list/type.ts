@@ -7,15 +7,14 @@
 
 import type { ObjectLiteralKeys } from '@privateaim/kit';
 import type {
-    BuildInput,
     FieldsBuildInput,
     FiltersBuildInput,
-    ObjectLiteral,
     PaginationBuildInput,
     Parameter,
+    QueryBuildInput,
     RelationsBuildInput,
-    SortBuildInput,
-} from 'rapiq';
+    SortsBuildInput,
+} from '@rapiq/core';
 import type {
     MaybeRef,
     Ref,
@@ -25,16 +24,21 @@ import type {
 import type { EntitySocketContext } from '../entity-socket';
 import type { EntityListSlotName } from './constants';
 
-type Entity<T> = T extends Record<string, any> ? T : never;
+type Entity<T> = T;
 
-export type ListMeta<T> = ObjectLiteralKeys<{
+// All rapiq build-input surfaces are depth-bounded to 3 (matching
+// @authup/client-web-kit's QueryInput family). The library default (depth 5)
+// expands over hub's cyclic entity graph (analysis ↔ project ↔ node) into a
+// type too large for vue-tsc to serialize into the emitted .d.ts (TS7056).
+// UI queries never address more than three relation segments.
+export type ListMeta<T extends Record<string, any>> = ObjectLiteralKeys<{
     total?: number,
     busy?: boolean,
     [Parameter.PAGINATION]?: PaginationBuildInput,
-    [Parameter.FILTERS]?: FiltersBuildInput<T extends ObjectLiteral ? T : never>,
-    [Parameter.SORT]?: SortBuildInput<T extends ObjectLiteral ? T : never>,
-    [Parameter.FIELDS]?: FieldsBuildInput<T extends ObjectLiteral ? T : never>,
-    [Parameter.RELATIONS]?: RelationsBuildInput<T extends ObjectLiteral ? T : never>
+    [Parameter.FILTERS]?: FiltersBuildInput<T, 3>,
+    [Parameter.SORT]?: SortsBuildInput<T, 3>,
+    [Parameter.FIELDS]?: FieldsBuildInput<T, 3>,
+    [Parameter.RELATIONS]?: RelationsBuildInput<T, 3>
 }>;
 
 export type ListLoadFn<M = any> = (meta?: M) => Promise<void>;
@@ -99,13 +103,13 @@ export type ListRenderOptions<T> = {
     loading?: ListLoadingOptions<T> | boolean
 };
 
-export type ListProps<T> = {
+export type ListProps<T extends Record<string, any>> = {
     realmId?: string,
-    query?: BuildInput<Entity<T>>,
+    query?: QueryBuildInput<Entity<T>, 3>,
     loadOnSetup?: boolean,
 } & ListRenderOptions<T>;
 
-export type List<T> = {
+export type List<T extends Record<string, any>> = {
     render() : VNodeChild;
     load: ListLoadFn<ListMeta<T>>,
     handleCreated(item: T) : void;
@@ -118,7 +122,7 @@ export type List<T> = {
     total: Ref<number>,
 };
 
-export type ListSlotsType<T> = ObjectLiteralKeys<{
+export type ListSlotsType<T extends Record<string, any>> = ObjectLiteralKeys<{
     [EntityListSlotName.BODY]: ListBodySlotProps<T, ListMeta<T>>,
     [EntityListSlotName.DEFAULT]: ListSlotProps<T, ListMeta<T>>,
     [EntityListSlotName.ITEM]: ListItemSlotProps<T>, // todo: add generic
@@ -145,8 +149,8 @@ export type ListCreateContext<
     setup: SetupContext<ListEventsType<RECORD>>,
     props: ListProps<RECORD>,
     loadAll?: boolean,
-    query?: BuildInput<Entity<RECORD>> | (() => BuildInput<Entity<RECORD>>),
-    queryFilters?: ((data: FiltersBuildInput<Entity<RECORD>>) => void),
+    query?: QueryBuildInput<Entity<RECORD>, 3> | (() => QueryBuildInput<Entity<RECORD>, 3>),
+    queryFilters?: ((data: FiltersBuildInput<Entity<RECORD>, 3>) => void),
     onCreated?: (entity: RECORD, meta: ListMeta<RECORD>) => void | Promise<void>,
     onLoaded?: (meta: ListMeta<RECORD>) => void | Promise<void>,
     socket?: boolean | Omit<EntitySocketContext<TYPE, RECORD>, 'type'>

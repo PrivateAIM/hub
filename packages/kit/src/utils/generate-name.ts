@@ -26,7 +26,9 @@ const NOUNS = [
 ].join(' ').split(' ');
 
 function pick(list: readonly string[]): string {
-    return list[Math.floor(Math.random() * list.length)];
+    // ADJECTIVES/NOUNS are non-empty module constants, so a modulo-bounded
+    // index is always in range.
+    return list[Math.floor(Math.random() * list.length)]!;
 }
 
 /**

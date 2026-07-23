@@ -12,7 +12,7 @@ import { VCIcon } from '@vuecs/icon';
 import { VCTimeago } from '@vuecs/timeago';
 import type { TableColumn } from '@vuecs/table';
 import type { Event } from '@privateaim/telemetry-kit';
-import type { BuildInput } from 'rapiq';
+import type { QueryBuildInput } from '@rapiq/core';
 import { computed, defineComponent, resolveComponent } from 'vue';
 import {
     FEntityDelete,
@@ -102,7 +102,7 @@ export default defineComponent({
         const canView = usePermissionCheck({ name: PermissionName.EVENT_READ });
         const canDrop = usePermissionCheck({ name: PermissionName.EVENT_DELETE });
 
-        const query = computed<BuildInput<Event>>(() => ({
+        const query = computed<QueryBuildInput<Event, 3>>(() => ({
             filters: { realm_id: [realmManagementId.value, null] },
             sort: { updated_at: 'DESC' },
             pagination: { limit: 50 },

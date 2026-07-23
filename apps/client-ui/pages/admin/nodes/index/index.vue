@@ -12,7 +12,7 @@ import { VCIcon } from '@vuecs/icon';
 import { VCTimeago } from '@vuecs/timeago';
 import type { TableColumn } from '@vuecs/table';
 import type { Node } from '@privateaim/core-kit';
-import type { BuildInput } from 'rapiq';
+import type { QueryBuildInput } from '@rapiq/core';
 import { computed, resolveComponent } from 'vue';
 import {
     FEntityDelete,
@@ -76,7 +76,7 @@ export default defineNuxtComponent({
         const canDrop = usePermissionCheck({ name: PermissionName.NODE_DELETE });
         const canView = computed(() => canEdit.value || canDrop.value);
 
-        const query = computed<BuildInput<Node>>(() => ({
+        const query = computed<QueryBuildInput<Node, 3>>(() => ({
             filters: { realm_id: realmManagementId.value },
             sort: { updated_at: 'DESC' },
         }));

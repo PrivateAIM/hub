@@ -189,7 +189,12 @@ export default defineComponent({
             try {
                 const formData = new FormData();
                 for (let i = 0; i < tempFiles.value.length; i++) {
-                    const { file, path } = tempFiles.value[i];
+                    const tempFile = tempFiles.value[i];
+                    if (!tempFile) {
+                        continue;
+                    }
+
+                    const { file, path } = tempFile;
                     // 3rd arg sets the multipart filename — send the relative
                     // path so the directory structure survives to the server.
                     formData.append(`files[${i}]`, file, path);

@@ -5,12 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { BuildInput } from 'rapiq';
-import { buildQuery } from 'rapiq';
+import type { EntityQueryInput } from '../../utils';
+import { buildQueryString, nullifyEmptyObjectProperties  } from '../../utils';
 import type { Node } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
-import { nullifyEmptyObjectProperties } from '../../utils';
 import type {
     NodeClientCredentials,
     NodeClientCredentialsUpdate,
@@ -20,14 +19,14 @@ import type {
 } from './types';
 
 export class NodeAPI extends BaseAPI {
-    async getMany(options?: BuildInput<Node>): Promise<CollectionResourceResponse<Node>> {
-        const response = await this.client.get(`nodes${buildQuery(options)}`);
+    async getMany(options?: EntityQueryInput<Node>): Promise<CollectionResourceResponse<Node>> {
+        const response = await this.client.get(`nodes${buildQueryString(options)}`);
 
         return response.data;
     }
 
-    async getOne(id: Node['id'], options?: BuildInput<Node>): Promise<SingleResourceResponse<Node>> {
-        const response = await this.client.get(`nodes/${id}${buildQuery(options)}`);
+    async getOne(id: Node['id'], options?: EntityQueryInput<Node>): Promise<SingleResourceResponse<Node>> {
+        const response = await this.client.get(`nodes/${id}${buildQueryString(options)}`);
 
         return response.data;
     }

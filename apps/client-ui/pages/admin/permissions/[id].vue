@@ -70,9 +70,9 @@ export default defineComponent({
                     url: `${base}/users`, 
                 },
                 {
-                    name: 'Robots', 
-                    icon: 'fa6-solid:robot', 
-                    url: `${base}/robots`, 
+                    name: 'Clients',
+                    icon: 'fa6-solid:robot',
+                    url: `${base}/clients`,
                 },
                 {
                     name: 'Roles', 
@@ -110,7 +110,7 @@ export default defineComponent({
             />
             <FDisplayName
                 :name="entity.name"
-                :display-name="entity.display_name"
+                :display-name="entity.displayName"
             />
             <span class="sub-title ms-1">
                 Details

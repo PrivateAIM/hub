@@ -39,6 +39,15 @@ Hub integrates [Authup](https://github.com/authup/authup) as its OAuth2 identity
 | `PolicyIdentity` (`@authup/kit`) | `IdentityPolicyData` (`@authup/access`) | #2943 |
 | `store.permissionChecker` (`client-web-kit`) | `store.permissionEvaluator` | #2943 |
 
+### Tri-state policy evaluation (`@authup/access` ≥ v1.0.0-beta.54, hub #1760)
+
+`@authup/access` moved to a **data-availability-driven, tri-state** policy engine (authup #3286/#3290/#3291). The public API hub consumes — `IPermissionEvaluator.{evaluate,preEvaluate,evaluateOneOf,preEvaluateOneOf}` — is **unchanged**, so hub's `RequestPermissionChecker` (`packages/server-http-kit/src/request/permission/module.ts`) and the realtime-kit counterpart need no code change. What changed under the hood:
+
+- **`preEvaluate` is now derived from data availability**, not a hardcoded type-exclusion list. A policy whose declared `requires()` data keys are absent from the `PolicyData` bag stays **pending** and passes the pre-gate (`pendingPolicies: 'permit'`); only a policy that *settles false* with the current bag denies. The full `evaluate()` with the enriched bag remains the authority (there, pending ⇒ deny). This replaces — and is obsolete relative to — the old mask-to-true `policiesExcluded: [ATTRIBUTES, ATTRIBUTE_NAMES, REALM_MATCH]` encoding, whose interaction with `invert` produced spurious settled denials at the pre-gate. `invert` is never applied to a pending result — unknown stays unknown.
+- **Additive, non-breaking members** (safe to ignore; nothing in hub implements `IPolicyEvaluator`): `IPolicyEvaluator.requires?()` / `toCondition?()`, `PolicyEvaluationResult.{pending,condition}`, `PermissionEvaluationOptions.pendingPolicies`, the `withConditions` evaluation-context flag, and a new additive `IPermissionEvaluator.compile()` (row-condition/WHERE-pushdown authorization — hub does not use it yet; a future follow-up could push a pending residual's `condition` into the rapiq query instead of dropping rows post-load).
+- Requires `@rapiq/* ≥ 2.0.0-beta.6` (first-class `not()`, the null-inclusive complement used by condition lowering).
+- **Guard rail for future hub-authored policy evaluators:** any custom `IPolicyEvaluator` hub registers must ship `requires()` (and optionally `toCondition()`), or it runs at the pre-gate against missing data (fail-closed, but exactly the spurious-denial class this migration removes). Hub registers none today.
+
 ## Code Mapping (Authup → Hub)
 
 | Concept | Authup | Hub |

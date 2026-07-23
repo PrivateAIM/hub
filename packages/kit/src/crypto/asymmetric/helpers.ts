@@ -8,7 +8,7 @@
 import type { AsymmetricAlgorithmImportParams } from './types';
 
 function arrayBufferToBase64(arrayBuffer: ArrayBuffer): string {
-    return btoa(String.fromCharCode.apply(null, new Uint8Array(arrayBuffer)));
+    return btoa(String.fromCharCode.apply(null, Array.from(new Uint8Array(arrayBuffer))));
 }
 
 function base64ToArrayBuffer(base64: string): ArrayBuffer {

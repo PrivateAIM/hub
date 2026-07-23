@@ -11,7 +11,7 @@ import zod from 'zod';
 import type { Event } from './entity';
 
 export class EventValidator extends Container<Event> {
-    protected initialize() {
+    protected override initialize() {
         super.initialize();
 
         this.mount(

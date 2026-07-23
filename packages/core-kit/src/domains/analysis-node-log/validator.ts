@@ -12,7 +12,7 @@ import { createValidator } from '@validup/zod';
 import type { AnalysisNodeLog } from './entity.ts';
 
 export class AnalysisNodeLogValidator extends Container<AnalysisNodeLog> {
-    protected initialize() {
+    protected override initialize() {
         super.initialize();
 
         this.mount(

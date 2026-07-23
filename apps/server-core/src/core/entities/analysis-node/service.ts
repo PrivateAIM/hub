@@ -16,6 +16,8 @@ import { isPropertySet } from '@authup/kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
+import { decodeQuery } from '../../query/index.ts';
+import { analysisNodeSchema } from './schema.ts';
 import type { IProjectNodeRepository } from '../project-node/types.ts';
 import type { IAnalysisNodeMetadataRecalculator, IAnalysisNodeRepository, IAnalysisNodeService } from './types.ts';
 
@@ -47,7 +49,7 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
     }
 
     async getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<AnalysisNode>> {
-        return this.repository.findMany(query);
+        return this.repository.findMany(decodeQuery(query, { schema: analysisNodeSchema }));
     }
 
     async getOne(id: string): Promise<AnalysisNode> {

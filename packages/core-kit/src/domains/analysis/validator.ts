@@ -15,7 +15,7 @@ import { ValidatorGroup } from '@privateaim/kit';
 import { ImageAttributeCommandArgumentsValidator } from './validator-image-command-argument.ts';
 
 export class AnalysisValidator extends Container<Analysis> {
-    protected initialize() {
+    protected override initialize() {
         super.initialize();
 
         this.mount(
