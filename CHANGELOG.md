@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.12.3](https://github.com/PrivateAIM/hub/compare/v0.12.2...v0.12.3) (2026-07-23)
+
+
+### Bug Fixes
+
+* **client-vue:** sequence node client credential loads with a monotonic token ([eb02776](https://github.com/PrivateAIM/hub/commit/eb02776bd0568057ee0142ef7ac6458edea1fcc5))
+* **deps:** bump nanoid from 5.1.16 to 6.0.0 ([#1750](https://github.com/PrivateAIM/hub/issues/1750)) ([f98f4c3](https://github.com/PrivateAIM/hub/commit/f98f4c3aad9018f1409b59052f317094fa62647b))
+* render correct registry host for node registry credentials ([#1757](https://github.com/PrivateAIM/hub/issues/1757)) ([79ea47e](https://github.com/PrivateAIM/hub/commit/79ea47e475e2fca0e79ea72aace0f9f5b5d290d1))
+
 ## [0.12.2](https://github.com/PrivateAIM/hub/compare/v0.12.1...v0.12.2) (2026-07-13)
 
 
