@@ -17,7 +17,7 @@ export const analysisBucketSchema = defineSchema({
         default: ['id', 'type', 'bucket_id', 'analysis_id', 'realm_id', 'created_at', 'updated_at'],
         allowed: ['id', 'type', 'bucket_id', 'analysis_id', 'realm_id', 'created_at', 'updated_at'],
     },
-    filters: { allowed: ['analysis_id', 'type', 'analysis.id', 'analysis.name', 'analysis.display_name'] },
+    filters: { allowed: ['analysis_id', 'type'] },
     relations: { allowed: ['analysis'] },
     sort: { allowed: ['type', 'created_at', 'updated_at'] },
     pagination: { maxLimit: 50 },

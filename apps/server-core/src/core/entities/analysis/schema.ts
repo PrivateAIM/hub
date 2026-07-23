@@ -23,7 +23,7 @@ export const analysisSchema = defineSchema<Analysis>({
     },
     filters: { allowed: ['id', 'name', 'display_name', 'description', 'project_id', 'realm_id', 'build_status', 'execution_status', 'configuration_locked'] },
     relations: { allowed: ['project', 'master_image'] },
-    sort: { allowed: ['created_at', 'updated_at'], default: { updated_at: 'DESC' } },
+    sort: { allowed: ['name', 'display_name', 'created_at', 'updated_at'], default: { updated_at: 'DESC' } },
     pagination: { maxLimit: 50 },
     schemaMapping,
 });

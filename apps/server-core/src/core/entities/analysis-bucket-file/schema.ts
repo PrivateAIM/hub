@@ -20,7 +20,7 @@ export const analysisBucketFileSchema = defineSchema({
         default: ['id', 'path', 'root', 'bucket_id', 'bucket_file_id', 'client_id', 'robot_id', 'user_id', 'realm_id', 'analysis_id', 'analysis_bucket_id', 'created_at', 'updated_at'],
         allowed: ['id', 'path', 'root', 'bucket_id', 'bucket_file_id', 'client_id', 'robot_id', 'user_id', 'realm_id', 'analysis_id', 'analysis_bucket_id', 'created_at', 'updated_at'],
     },
-    filters: { allowed: ['path', 'root', 'analysis_bucket_id', 'analysis_id', 'analysis.id', 'analysis.name', 'analysis.display_name', 'analysis_bucket.type'] },
+    filters: { allowed: ['path', 'root', 'analysis_bucket_id', 'analysis_id'] },
     relations: { allowed: ['analysis', 'analysis_bucket'] },
     sort: { allowed: ['path', 'created_at', 'updated_at'] },
     pagination: { maxLimit: 50 },
