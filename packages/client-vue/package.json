@@ -56,7 +56,7 @@
         "@privateaim/telemetry-kit": "^0.12.3",
         "@rapiq/core": "^2.0.0-beta.7",
         "@tsdown/css": "^0.22.0",
-        "@types/node": "^25.9.1",
+        "@types/node": "^26.1.1",
         "@validup/vue": "^0.3.3",
         "@validup/zod": "^0.3.3",
         "@vitejs/plugin-vue": "^6.0.5",
