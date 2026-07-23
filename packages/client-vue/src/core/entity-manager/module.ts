@@ -58,7 +58,7 @@ export function createEntityManager<
 
             if (ctx.realmId) {
                 if (typeof ctx.realmId === 'function') {
-                    return ctx.realmId(entity.value);
+                    return ctx.realmId(entity.value ?? undefined);
                 }
 
                 realmId = isRef(ctx.realmId) ? ctx.realmId.value : ctx.realmId;
@@ -119,7 +119,7 @@ export function createEntityManager<
 
     const resolved = (value: RECORD | null) => {
         if (ctx.setup && ctx.setup.emit) {
-            ctx.setup.emit('resolved', value ? { ...value } : null);
+            ctx.setup.emit('resolved', value ? { ...value } : undefined);
         }
 
         if (ctx.onResolved) {
@@ -182,7 +182,7 @@ export function createEntityManager<
                 entityId.value,
             );
 
-            entity.value = undefined;
+            entity.value = null;
 
             deleted(response);
         } catch (e) {
@@ -299,7 +299,7 @@ export function createEntityManager<
                 } as any);
 
                 if (response.data.length === 1) {
-                    [entity.value] = response.data;
+                    entity.value = response.data[0] ?? null;
 
                     if (socket) {
                         socket.subscribe();

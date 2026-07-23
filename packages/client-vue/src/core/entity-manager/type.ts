@@ -7,10 +7,9 @@
 
 import type { FieldsBuildInput, FiltersBuildInput, QueryBuildInput } from '@rapiq/core';
 import type {
-    MaybeRef, 
-    Ref, 
-    SetupContext, 
-    SlotsType,
+    MaybeRef,
+    Ref,
+    SetupContext,
     VNodeChild,
 } from 'vue';
 import type { EntitySocketContext } from '../entity-socket';
@@ -65,7 +64,7 @@ export type EntityManagerSlotProps<T extends Record<string, any>> = {
 };
 
 export type EntityManagerSlotsType<T extends Record<string, any>> = {
-    default?: EntityManagerSlotProps<T>,
+    default: EntityManagerSlotProps<T>,
     error?: Error
 };
 
@@ -82,7 +81,11 @@ export type EntityManagerContext<
     T extends Record<string, any>,
 > = {
     type: A,
-    setup?: Partial<SetupContext<EntityManagerEventsType<T>, SlotsType<EntityManagerSlotsType<T>>>>,
+    // The slots shape is intentionally left generic: base entity components
+    // pass a typed (required-default) setup context while higher-level ones
+    // pass Vue's generic InternalSlots — createEntityManager only forwards
+    // `setup` for emit + internal slot rendering, so it must accept both.
+    setup?: Partial<SetupContext<EntityManagerEventsType<T>>>,
     props?: EntityManagerProps<T>,
     realmId?: MaybeRef<string> | ((entity: T | undefined) => string | undefined),
     onResolved?(entity: T | null) : any,
