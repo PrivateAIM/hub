@@ -12,6 +12,16 @@ import { DomainType } from '@privateaim/core-kit';
 export const masterImageGroupSchema = defineSchema<MasterImageGroup>({
     name: DomainType.MASTER_IMAGE_GROUP,
     strict: true,
+    fields: {
+        default: [
+            'id',
+            'name',
+            'path',
+            'virtual_path',
+            'created_at',
+            'updated_at',
+        ],
+    },
     filters: { allowed: ['id', 'name', 'path', 'virtual_path'] },
     pagination: { maxLimit: 50 },
 });

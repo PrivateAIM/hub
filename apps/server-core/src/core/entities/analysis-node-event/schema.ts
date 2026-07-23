@@ -17,6 +17,18 @@ const schemaMapping = {
 export const analysisNodeEventSchema = defineSchema<AnalysisNodeEvent>({
     name: DomainType.ANALYSIS_NODE_EVENT,
     strict: true,
+    fields: {
+        default: [
+            'id',
+            'event_id',
+            'created_at',
+            'updated_at',
+            'analysis_id',
+            'analysis_realm_id',
+            'node_id',
+            'node_realm_id',
+        ],
+    },
     filters: { allowed: ['analysis_id', 'node_id'] },
     relations: { allowed: ['analysis', 'node'] },
     sort: { allowed: ['created_at', 'updated_at'] },
