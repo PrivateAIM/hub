@@ -87,7 +87,7 @@ Services with databases (server-core, server-telemetry, server-storage) share th
 |------|---------|
 | `test/app/module.ts` | `TestApplication extends Application` with `get dataSource()` accessor |
 | `test/app/http.ts` | `TestHTTPApplication extends TestApplication` with `get client` (API client) |
-| `test/app/database.ts` | `createTestDatabaseModule()` for per-test DB with SQLite fallback |
+| `test/app/database.ts` | `createTestDatabaseModule()` for per-test DB, using the configured database or a PostgreSQL testcontainer by default |
 | `test/app/factory.ts` | `createTestApplication()` returns `TestHTTPApplication` with `PORT=0` |
 
 Each test application wires the same DI modules as production but uses `createTestDatabaseModule()` instead of the real `DatabaseModule`.

@@ -14,6 +14,12 @@ import { createAuthupUserTokenCreator } from '@privateaim/server-kit';
  *
  * Used by tests that issue raw HTTP requests (uploads, streaming) instead of the
  * authenticated API client.
+ *
+ * This mints with the fixed `admin` / `start123` / `master` credentials — the same
+ * contract the started Authup container provides (`USER_ADMIN_PASSWORD=start123`)
+ * and that the API-client hook uses (`test/app/http.ts`). An externally provided
+ * `AUTHUP_URL` MUST therefore expose that same master-realm admin, otherwise token
+ * minting (and the authenticated HTTP tests) will fail.
  */
 export async function createAdminAccessToken(baseURL = process.env.AUTHUP_URL): Promise<string> {
     if (!baseURL) {

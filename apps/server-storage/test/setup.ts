@@ -51,8 +51,13 @@ async function setup(project: TestProject) {
 }
 
 async function teardown() {
-    await globalThis.MINIO_CONTAINER.stop();
-    await stopTestContainers();
+    // Stop the shared containers even if the MinIO teardown rejects, so Authup /
+    // PostgreSQL containers cannot leak; the MinIO failure is still surfaced.
+    try {
+        await globalThis.MINIO_CONTAINER.stop();
+    } finally {
+        await stopTestContainers();
+    }
 }
 
 export {

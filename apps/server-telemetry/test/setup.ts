@@ -62,8 +62,13 @@ async function setup(project: TestProject) {
 }
 
 async function teardown() {
-    await globalThis.VL_CONTAINER.stop();
-    await stopTestContainers();
+    // Stop the shared containers even if the Victoria Logs teardown rejects, so
+    // Authup / PostgreSQL containers cannot leak; the VL failure is still surfaced.
+    try {
+        await globalThis.VL_CONTAINER.stop();
+    } finally {
+        await stopTestContainers();
+    }
 }
 
 export {
